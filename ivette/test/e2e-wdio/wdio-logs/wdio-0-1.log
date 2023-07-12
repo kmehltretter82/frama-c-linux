@@ -1,0 +1,230 @@
+2023-06-23T10:09:58.730Z INFO @wdio/local-runner: Run worker command: run
+2023-06-23T10:09:58.810Z DEBUG @wdio/runner: init remote session
+2023-06-23T10:09:58.813Z DEBUG @wdio/utils:initialiseServices: initialise service "electron" as NPM package
+2023-06-23T10:09:58.884Z DEBUG electron-service: setting browser capabilities {
+  browserName: 'chrome',
+  'goog:chromeOptions': {
+    binary: '/home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette',
+    args: [ 'foo', 'bar=baz' ],
+    windowTypes: [ 'app', 'webview' ]
+  }
+}
+2023-06-23T10:09:58.885Z DEBUG @wdio/utils:shim: Finished to run "beforeSession" hook in 0ms
+2023-06-23T10:09:58.953Z DEBUG @wdio/runner: init remote session
+2023-06-23T10:09:58.954Z INFO webdriver: Initiate new session using the WebDriver protocol
+2023-06-23T10:09:59.047Z INFO webdriver: [POST] http://127.0.0.1:9519/session
+2023-06-23T10:09:59.047Z INFO webdriver: DATA {
+  capabilities: {
+    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: {
+    browserName: 'chrome',
+    'goog:chromeOptions': {
+      binary: '/home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette',
+      args: [Array],
+      windowTypes: [Array]
+    }
+  }
+}
+2023-06-23T10:09:59.066Z DEBUG webdriver: request failed due to response error: unknown error
+2023-06-23T10:09:59.066Z WARN webdriver: Request failed with status 500 due to unknown error: no chrome binary at /home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette
+2023-06-23T10:09:59.066Z INFO webdriver: Retrying 1/10
+2023-06-23T10:09:59.066Z INFO webdriver: [POST] http://127.0.0.1:9519/session
+2023-06-23T10:09:59.066Z INFO webdriver: DATA {
+  capabilities: {
+    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: {
+    browserName: 'chrome',
+    'goog:chromeOptions': {
+      binary: '/home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette',
+      args: [Array],
+      windowTypes: [Array]
+    }
+  }
+}
+2023-06-23T10:09:59.070Z DEBUG webdriver: request failed due to response error: unknown error
+2023-06-23T10:09:59.070Z WARN webdriver: Request failed with status 500 due to unknown error: no chrome binary at /home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette
+2023-06-23T10:09:59.070Z INFO webdriver: Retrying 2/10
+2023-06-23T10:09:59.070Z INFO webdriver: [POST] http://127.0.0.1:9519/session
+2023-06-23T10:09:59.070Z INFO webdriver: DATA {
+  capabilities: {
+    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: {
+    browserName: 'chrome',
+    'goog:chromeOptions': {
+      binary: '/home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette',
+      args: [Array],
+      windowTypes: [Array]
+    }
+  }
+}
+2023-06-23T10:09:59.074Z DEBUG webdriver: request failed due to response error: unknown error
+2023-06-23T10:09:59.074Z WARN webdriver: Request failed with status 500 due to unknown error: no chrome binary at /home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette
+2023-06-23T10:09:59.074Z INFO webdriver: Retrying 3/10
+2023-06-23T10:09:59.074Z INFO webdriver: [POST] http://127.0.0.1:9519/session
+2023-06-23T10:09:59.074Z INFO webdriver: DATA {
+  capabilities: {
+    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: {
+    browserName: 'chrome',
+    'goog:chromeOptions': {
+      binary: '/home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette',
+      args: [Array],
+      windowTypes: [Array]
+    }
+  }
+}
+2023-06-23T10:09:59.077Z DEBUG webdriver: request failed due to response error: unknown error
+2023-06-23T10:09:59.077Z WARN webdriver: Request failed with status 500 due to unknown error: no chrome binary at /home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette
+2023-06-23T10:09:59.077Z INFO webdriver: Retrying 4/10
+2023-06-23T10:09:59.077Z INFO webdriver: [POST] http://127.0.0.1:9519/session
+2023-06-23T10:09:59.077Z INFO webdriver: DATA {
+  capabilities: {
+    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: {
+    browserName: 'chrome',
+    'goog:chromeOptions': {
+      binary: '/home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette',
+      args: [Array],
+      windowTypes: [Array]
+    }
+  }
+}
+2023-06-23T10:09:59.080Z DEBUG webdriver: request failed due to response error: unknown error
+2023-06-23T10:09:59.080Z WARN webdriver: Request failed with status 500 due to unknown error: no chrome binary at /home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette
+2023-06-23T10:09:59.080Z INFO webdriver: Retrying 5/10
+2023-06-23T10:09:59.080Z INFO webdriver: [POST] http://127.0.0.1:9519/session
+2023-06-23T10:09:59.081Z INFO webdriver: DATA {
+  capabilities: {
+    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: {
+    browserName: 'chrome',
+    'goog:chromeOptions': {
+      binary: '/home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette',
+      args: [Array],
+      windowTypes: [Array]
+    }
+  }
+}
+2023-06-23T10:09:59.087Z DEBUG webdriver: request failed due to response error: unknown error
+2023-06-23T10:09:59.087Z WARN webdriver: Request failed with status 500 due to unknown error: no chrome binary at /home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette
+2023-06-23T10:09:59.087Z INFO webdriver: Retrying 6/10
+2023-06-23T10:09:59.087Z INFO webdriver: [POST] http://127.0.0.1:9519/session
+2023-06-23T10:09:59.087Z INFO webdriver: DATA {
+  capabilities: {
+    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: {
+    browserName: 'chrome',
+    'goog:chromeOptions': {
+      binary: '/home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette',
+      args: [Array],
+      windowTypes: [Array]
+    }
+  }
+}
+2023-06-23T10:09:59.091Z DEBUG webdriver: request failed due to response error: unknown error
+2023-06-23T10:09:59.091Z WARN webdriver: Request failed with status 500 due to unknown error: no chrome binary at /home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette
+2023-06-23T10:09:59.091Z INFO webdriver: Retrying 7/10
+2023-06-23T10:09:59.091Z INFO webdriver: [POST] http://127.0.0.1:9519/session
+2023-06-23T10:09:59.091Z INFO webdriver: DATA {
+  capabilities: {
+    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: {
+    browserName: 'chrome',
+    'goog:chromeOptions': {
+      binary: '/home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette',
+      args: [Array],
+      windowTypes: [Array]
+    }
+  }
+}
+2023-06-23T10:09:59.103Z DEBUG webdriver: request failed due to response error: unknown error
+2023-06-23T10:09:59.103Z WARN webdriver: Request failed with status 500 due to unknown error: no chrome binary at /home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette
+2023-06-23T10:09:59.103Z INFO webdriver: Retrying 8/10
+2023-06-23T10:09:59.103Z INFO webdriver: [POST] http://127.0.0.1:9519/session
+2023-06-23T10:09:59.103Z INFO webdriver: DATA {
+  capabilities: {
+    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: {
+    browserName: 'chrome',
+    'goog:chromeOptions': {
+      binary: '/home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette',
+      args: [Array],
+      windowTypes: [Array]
+    }
+  }
+}
+2023-06-23T10:09:59.107Z DEBUG webdriver: request failed due to response error: unknown error
+2023-06-23T10:09:59.107Z WARN webdriver: Request failed with status 500 due to unknown error: no chrome binary at /home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette
+2023-06-23T10:09:59.107Z INFO webdriver: Retrying 9/10
+2023-06-23T10:09:59.107Z INFO webdriver: [POST] http://127.0.0.1:9519/session
+2023-06-23T10:09:59.107Z INFO webdriver: DATA {
+  capabilities: {
+    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: {
+    browserName: 'chrome',
+    'goog:chromeOptions': {
+      binary: '/home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette',
+      args: [Array],
+      windowTypes: [Array]
+    }
+  }
+}
+2023-06-23T10:09:59.123Z DEBUG webdriver: request failed due to response error: unknown error
+2023-06-23T10:09:59.128Z WARN webdriver: Request failed with status 500 due to unknown error: no chrome binary at /home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette
+2023-06-23T10:09:59.128Z INFO webdriver: Retrying 10/10
+2023-06-23T10:09:59.128Z INFO webdriver: [POST] http://127.0.0.1:9519/session
+2023-06-23T10:09:59.128Z INFO webdriver: DATA {
+  capabilities: {
+    alwaysMatch: { browserName: 'chrome', 'goog:chromeOptions': [Object] },
+    firstMatch: [ {} ]
+  },
+  desiredCapabilities: {
+    browserName: 'chrome',
+    'goog:chromeOptions': {
+      binary: '/home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette',
+      args: [Array],
+      windowTypes: [Array]
+    }
+  }
+}
+2023-06-23T10:09:59.149Z DEBUG webdriver: request failed due to response error: unknown error
+2023-06-23T10:09:59.149Z ERROR webdriver: Request failed with status 500 due to unknown error: unknown error: no chrome binary at /home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette
+2023-06-23T10:09:59.149Z ERROR webdriver: unknown error: unknown error: no chrome binary at /home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette
+    at getErrorFromResponseBody (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/webdriver/build/utils.js:194:12)
+    at NodeJSRequest._request (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/webdriver/build/request/index.js:164:23)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async startWebDriverSession (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/webdriver/build/utils.js:63:20)
+    at async Function.newSession (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/webdriver/build/index.js:26:45)
+    at async remote (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/webdriverio/build/index.js:48:22)
+    at async Runner._startSession (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/@wdio/runner/build/index.js:221:29)
+    at async Runner._initSession (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/@wdio/runner/build/index.js:187:25)
+    at async Runner.run (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/@wdio/runner/build/index.js:77:19)
+2023-06-23T10:09:59.150Z ERROR @wdio/runner: Error: Failed to create session.
+unknown error: no chrome binary at /home/user01/Documents/sources/frama-c/bin/linux-unpacked/ivette
+    at startWebDriverSession (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/webdriver/build/utils.js:68:15)
+    at processTicksAndRejections (node:internal/process/task_queues:96:5)
+    at async Function.newSession (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/webdriver/build/index.js:26:45)
+    at async remote (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/webdriverio/build/index.js:48:22)
+    at async Runner._startSession (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/@wdio/runner/build/index.js:221:29)
+    at async Runner._initSession (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/@wdio/runner/build/index.js:187:25)
+    at async Runner.run (file:///home/user01/Documents/sources/frama-c/ivette/test/e2e/node_modules/@wdio/runner/build/index.js:77:19)

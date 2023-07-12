@@ -1,0 +1,39 @@
+{
+  "ts-node": {
+    "esm": true,
+    "compilerOptions": {
+      "module": "ESNext"
+    },
+    "transpileOnly": true,
+    "files": true
+  },
+  "compilerOptions": {
+    "baseUrl": ".",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noUnusedLocals": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "inlineSources": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "newLine": "lf",
+    "noEmitOnError": true,
+    "lib": ["DOM", "ESNext"],
+    "noImplicitAny": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": true,
+    "typeRoots": ["./node_modules/@types", "./@types"],
+    "noEmit": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "types": ["node", "mocha", "@wdio/globals/types", "expect", "jest"]
+  },
+  "include": ["test/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
