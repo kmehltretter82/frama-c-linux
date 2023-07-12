@@ -122,12 +122,6 @@ module Make_Dataflow
 
   let active_behaviors = Logic.create AnalysisParam.initial_state kf
 
-  (* Compute the locals that we must enter in scope when we start the analysis
-     of [block]. The other ones will be introduced on the fly, when we
-     encounter a [Local_init] instruction. *)
-  let block_toplevel_locals block =
-    List.filter (fun vi -> not vi.vdefined) block.blocals
-
   let initial_states =
     let state = AnalysisParam.initial_state
     and call_kinstr = AnalysisParam.call_kinstr
@@ -267,8 +261,15 @@ module Make_Dataflow
     : transfer_function =
     lift' (fun s -> Transfer.assign s (Kstmt stmt) dest exp)
 
+  (* All variables local to a block are introduced in domain states when
+     entering the block. Variables explicitly initialized at declaration time
+     (for which vi.vdefined is true) enter the scope too early, as they should
+     be introduced on the fly when encountering their [Local_init] instruction.
+     However, goto statements can skip their declaration/initialization, so it
+     is safer to always introduce all local variables (without initialize them)
+     when entering a block. *)
   let transfer_enter (block : block) : transfer_function =
-    let vars = block_toplevel_locals block in
+    let vars = block.blocals in
     if vars = [] then id else lift (Transfer.enter_scope kf vars)
 
   let transfer_leave (block : block) : transfer_function =
@@ -289,20 +290,12 @@ module Make_Dataflow
   let transfer_instr (stmt : stmt) (instr : instr) : transfer_function =
     match instr with
     | Local_init (vi, AssignInit exp, _loc) ->
-      let kind = Abstract_domain.Local kf in
       let transfer state =
-        let state = Domain.enter_scope kind [vi] state in
         Init.initialize_local_variable stmt vi exp state
       in
       lift' transfer
     | Local_init (vi, ConsInit (f, args, k), loc) ->
-      let kind = Abstract_domain.Local kf in
       let as_func dest callee args _loc (key, state) =
-        (* This variable enters the scope too early, as it should
-           be introduced after the call to [f] but before the assignment
-           to [v]. This is currently not possible, at least without
-           splitting Transfer.call in two. *)
-        let state = Domain.enter_scope kind [vi] state in
         transfer_call stmt dest callee args (key, state)
       in
       Cil.treat_constructor_as_func as_func vi f args k loc
