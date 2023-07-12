@@ -76,6 +76,13 @@ type ival =
   | Real
   | Nan
 
+let pp_ival fmt = function
+  | Ival i -> Ival.pretty fmt i
+  | Float _ -> Format.fprintf fmt "F"
+  | Rational -> Format.fprintf fmt "Q"
+  | Real -> Format.fprintf fmt "R"
+  | Nan -> Format.fprintf fmt "Nan"
+
 (** Type of types inferred by the type inference for types representing
     numbers *)
 type number_ty =
