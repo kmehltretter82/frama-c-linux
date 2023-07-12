@@ -170,7 +170,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     let ty_op = Typing.get_typ ~logic_env t in
     let ty_k = match Typing.get_cast ~logic_env t_min with
       | Some e -> e
-      | _ -> Options.fatal "unexpected error in \\sum translation"
+      | _ -> Options.fatal ~dkey "unexpected error in \\sum translation"
     in
     let e_min, adata, env = to_exp ~adata kf env t_min in
     let e_max, adata, env = to_exp ~adata kf env t_max in
@@ -865,37 +865,43 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
    constructs. *)
 and to_exp ~adata ?inplace kf env t =
   let generate_rte = Env.generate_rte env in
-  Options.feedback ~dkey ~level:4 "translating term %a (rte? %b)in local \
+  Options.feedback ~dkey ~level:5 "translating term %a (rte? %b) in local \
                                    environment '%a'"
     Printer.pp_term t generate_rte Profile.pretty
     (Env.Logic_env.get_profile env);
   let logic_env = Env.Logic_env.get env in
   let t = Logic_normalizer.get_term t in
-  Extlib.flatten
-    (Env.with_params_and_result
-       ~rte:false
-       ~f:(fun env ->
-           let e, adata, env, sty, name =
-             context_insensitive_term_to_exp ?inplace ~adata kf env t
-           in
-           let env =
-             if generate_rte then !translate_rte_exp_ref kf env e else env
-           in
-           let cast = Typing.get_cast ~logic_env t in
-           let name = if name = "" then None else Some name in
-           Extlib.nest
-             adata
-             (Typed_number.add_cast
-                ~loc:t.term_loc
-                ?name
-                env
-                kf
-                cast
-                sty
-                (Some t)
-                e)
-         )
-       env)
+  let (rexp, _, _) as result =
+    Extlib.flatten
+      (Env.with_params_and_result
+         ~rte:false
+         ~f:(fun env ->
+             let e, adata, env, sty, name =
+               context_insensitive_term_to_exp ?inplace ~adata kf env t
+             in
+             let env =
+               if generate_rte then !translate_rte_exp_ref kf env e else env
+             in
+             let cast = Typing.get_cast ~logic_env t in
+             let name = if name = "" then None else Some name in
+             Extlib.nest
+               adata
+               (Typed_number.add_cast
+                  ~loc:t.term_loc
+                  ?name
+                  env
+                  kf
+                  cast
+                  sty
+                  (Some t)
+                  e)
+           )
+         env)
+  in
+  Options.debug ~dkey ~level:4 "to_exp %a = %a"
+    Printer.pp_term t Printer.pp_exp rexp;
+  result
+
 
 let term_to_exp_without_inplace ~adata kf env t = to_exp ~adata kf env t
 
