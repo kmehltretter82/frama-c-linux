@@ -33,6 +33,7 @@
 { tests-name
 , tests-command
 , has-wp-proofs ? false
+, cover ? true
 } :
 
 stdenvNoCC.mkDerivation {
@@ -68,14 +69,28 @@ stdenvNoCC.mkDerivation {
     else "" ;
 
   preBuild =
-    if has-wp-proofs
+    (if has-wp-proofs
+     then ''
+         mkdir home
+         HOME=$(pwd)/home
+         why3 config detect
+         export FRAMAC_WP_CACHE=offline
+         export FRAMAC_WP_CACHEDIR=$wp_cache
+     ''
+     else "") +
+    (if cover
+     then ''
+         mkdir coverage
+         export DUNE_WORKSPACE="dev/dune-workspace.cover"
+         export BISECT_FILE="$(pwd)/coverage/bisect-"
+     ''
+     else "");
+
+  postBuild =
+    if cover
     then ''
-        mkdir home
-        HOME=$(pwd)/home
-        why3 config detect
-        export FRAMAC_WP_CACHE=offline
-        export FRAMAC_WP_CACHEDIR=$wp_cache
-      ''
+      bisect-ppx-report cobertura --coverage-path=coverage coverage.xml
+    ''
     else "" ;
 
   buildPhase = ''
@@ -87,6 +102,7 @@ stdenvNoCC.mkDerivation {
 
   # No installation required
   installPhase = ''
-    touch $out
+    mkdir $out
+    cp -r coverage.xml $out
   '';
 }
