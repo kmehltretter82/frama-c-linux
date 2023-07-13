@@ -30,6 +30,9 @@
   q ∈ {{ &__malloc_main1_l10[0] }}
   r ∈ {{ &__malloc_main1_l8[0] ; &__malloc_main1_l10[0] }}
   tmp_1 ∈ {{ &__malloc_main1_l8[0] ; &__malloc_main1_l10[0] }}
+  u ∈ UNINITIALIZED
+  t ∈ UNINITIALIZED
+  s ∈ UNINITIALIZED
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   __malloc_main1_l8[0] ∈ UNINITIALIZED

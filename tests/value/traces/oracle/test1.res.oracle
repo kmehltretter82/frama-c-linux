@@ -27,11 +27,11 @@ c -> 5
     8 -> Assign: tmp = g -> 9
     9 -> EnterScope: i -> 12
     10 -> Assign: tmp = 2 -> 11
-    11 -> EnterScope: i -> 15
-    12 -> initialize variable: i -> 13
-    13 -> Assign: i = 0 -> 14
-    14 -> enter_loop -> 19
-    15 -> initialize variable: i -> 16
+    11 -> EnterScope: i -> 13
+    12 -> initialize variable: i -> 14
+    13 -> initialize variable: i -> 16
+    14 -> Assign: i = 0 -> 15
+    15 -> enter_loop -> 19
     16 -> Assign: i = 0 -> 17
     17 -> enter_loop -> 18
     18 -> Assume: i < 3 true -> 20
