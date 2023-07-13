@@ -6,7 +6,7 @@ WebdriverIO and its plugin `wdio-electron-service` require the Ivette electron b
 - Therefore build Ivette binary first. From frama-c repertory : `make -C ivette dist` ;
 
 WebdriverIO prefers pnpm
-- install pnpm : `npm install -g pnpm` ;
+- install pnpm : `  ` ;
 
 Build `e2e-wdio` project : 
 - in `e2e-wdio` repertory : `npm install` ;

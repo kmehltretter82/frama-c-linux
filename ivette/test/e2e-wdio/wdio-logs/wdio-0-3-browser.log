@@ -1,2 +1,0 @@
-{"level":"WARNING","message":"file:///home/user01/Documents/sources/wdio-electron-service-main/example/app/dist/linux-unpacked/resources/app.asar/dist/index.html 7:14 \"render warn\"","source":"console-api","timestamp":1687514109609}
-{"level":"SEVERE","message":"file:///home/user01/Documents/sources/wdio-electron-service-main/example/app/dist/linux-unpacked/resources/app.asar/dist/index.html 8:14 \"render error\"","source":"console-api","timestamp":1687514109609}
