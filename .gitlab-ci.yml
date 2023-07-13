@@ -219,12 +219,12 @@ e2e-tests:
     - export NVM_DIR="$HOME/.nvm"
     - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
     - '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
-    - nvm install node 16
+    - nvm install 16
+    - nvm use node 16
   cache:
     paths:
       - ivette/node_modules/
   script:
-    - nvm use node 16
     - node --version
     - npm --version
     - yarn --version
