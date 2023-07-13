@@ -211,10 +211,11 @@ wp-tests:
 
 e2e-tests:
   stage: tests
-  image: node:lts-gallium
+  image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
   before_script:
     - apt update
-    - apt install -y xvfb
+    - apt install -y nodejs xvfb build-essential
+    - npm install -g pnpm
   cache:
     paths:
       - ivette/node_modules/
@@ -222,7 +223,6 @@ e2e-tests:
     - node --version
     - npm --version
     - yarn --version
-    - npm install -g pnpm
     - pnpm --version
     - make -C ivette dist
     - cd ivette/test/e2e-wdio
