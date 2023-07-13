@@ -274,7 +274,7 @@
   resolved_name ∈
                {{ NULL ; &__malloc_main_l44[0] ; &__malloc_realpath_l224[0] ;
                   &__malloc_realpath_l224_0[0] }}
-  realpath_len ∈ [1..4096]
+  realpath_len ∈ [1..4096] or UNINITIALIZED
   __retres ∈
           {{ NULL ; &__malloc_main_l44[0] ; &__malloc_realpath_l224[0] ;
              &__malloc_realpath_l224_0[0] }}

@@ -25,7 +25,7 @@
       .events ∈ {3}
       .revents ∈ [--..--]
   r ∈ {-1; 0; 1}
-  can_read ∈ {0; 1}
-  can_read_out_of_band ∈ {0; 2}
-  invalid_fd ∈ {0; 32}
+  can_read ∈ {0; 1} or UNINITIALIZED
+  can_read_out_of_band ∈ {0; 2} or UNINITIALIZED
+  invalid_fd ∈ {0; 32} or UNINITIALIZED
   __retres ∈ [0..127]

@@ -291,7 +291,7 @@
   __fc_env[0..4095] ∈
           {{ NULL ; &s[0] ; &__fc_env_strings + [0..63] ; "BLA=1" }}
   Frama_C_entropy_source ∈ [--..--]
-  namelen ∈ [0..63]
+  namelen ∈ [0..63] or UNINITIALIZED
   __fc_env_strings[0..62] ∈ [--..--]
                   [63] ∈ {0}
   __retres ∈ {-1; 0}
@@ -299,7 +299,7 @@
   __fc_env[0..4095] ∈
           {{ NULL ; &s[0] ; &__fc_env_strings + [0..63] ; "BLA=1" }}
   Frama_C_entropy_source ∈ [--..--]
-  namelen ∈ [0..63]
+  namelen ∈ [0..63] or UNINITIALIZED
   __retres ∈ {-1; 0}
 [eva:final-states] Values at end of function main:
   __fc_env[0..4095] ∈
