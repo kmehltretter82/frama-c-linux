@@ -229,7 +229,7 @@ e2e-tests:
     - node --version
     - npm --version
     - yarn --version
-    - sudo npm install -g pnpm
+    - npm install -g pnpm
     - pnpm --version
     - make -C ivette dist
     - cd ivette/test/e2e-wdio
