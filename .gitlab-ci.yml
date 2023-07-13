@@ -129,36 +129,54 @@ ivette:
 ################################################################################
 ### TESTS
 
+.build_template: &coverage_artifacts
+  artifacts:
+    name: coverage-$CI_JOB_NAME
+    paths:
+      - coverage/coverage.tar.xz
+    expire_in: 24h
+
+.build_template: &coverage
+  variables:
+    OUT: "coverage"
+  <<: *coverage_artifacts
+
 check-ts-api:
   stage: tests
   script:
     - ./nix/build-proxy.sh ts-api
+  <<: *coverage
 
 e-acsl-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh e-acsl-tests
+  <<: *coverage
 
 e-acsl-dev-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh e-acsl-dev-tests
+  <<: *coverage
   allow_failure: true
 
 .build_template: &eva_template
   stage: tests
   script:
     - ./nix/build-proxy.sh eva-$CONFIG-tests
+  <<: *coverage_artifacts
 
 eva-default-tests:
   variables:
     CONFIG: "default"
+    OUT:    "coverage"
   <<: *eva_template
 
 .build_template: &eva_domains
   parallel:
     matrix:
-      - CONFIG: [
+      - OUT: "coverage"
+        CONFIG: [
           "apron",
           "bitwise",
           "equality",
@@ -195,16 +213,19 @@ kernel-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh kernel-tests
+  <<: *coverage
 
 plugins-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh plugins-tests
+  <<: *coverage
 
 wp-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh wp-tests
+  <<: *coverage
 
 external-plugins:
   stage: tests
@@ -212,7 +233,8 @@ external-plugins:
     - ./nix/external-plugin-ci.sh $PLUGIN
   parallel:
     matrix:
-      - PLUGIN: [
+      - OUT: "coverage"
+        PLUGIN: [
           "acsl-importer",
           "caveat-importer",
           "context-from-precondition",
@@ -226,6 +248,7 @@ external-plugins:
           "security",
           "volatile"
         ]
+  <<: *coverage
 
 ################################################################################
 ### DISTRIB
