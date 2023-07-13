@@ -90,6 +90,7 @@ stdenvNoCC.mkDerivation {
     if cover
     then ''
       bisect-ppx-report cobertura --coverage-path=coverage coverage.xml
+      tar cfJ coverage.tar.xz coverage.xml
     ''
     else "" ;
 
@@ -103,6 +104,6 @@ stdenvNoCC.mkDerivation {
   # No installation required
   installPhase = ''
     mkdir $out
-    cp -r coverage.xml $out
+    cp -r coverage.tar.xz $out
   '';
 }
