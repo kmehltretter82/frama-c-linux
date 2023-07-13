@@ -215,7 +215,6 @@ e2e-tests:
   before_script:
     - sudo apt update
     - sudo apt install -y nodejs xvfb build-essential
-    - sudo npm install -g pnpm
   cache:
     paths:
       - ivette/node_modules/
@@ -223,6 +222,7 @@ e2e-tests:
     - node --version
     - npm --version
     - yarn --version
+    - sudo npm install -g pnpm
     - pnpm --version
     - make -C ivette dist
     - cd ivette/test/e2e-wdio
