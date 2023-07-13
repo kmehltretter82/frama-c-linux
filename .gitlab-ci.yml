@@ -213,9 +213,9 @@ e2e-tests:
   stage: tests
   image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
   before_script:
-    - apt update
-    - apt install -y nodejs xvfb build-essential
-    - npm install -g pnpm
+    - sudo apt update
+    - sudo apt install -y nodejs xvfb build-essential
+    - sudo npm install -g pnpm
   cache:
     paths:
       - ivette/node_modules/
