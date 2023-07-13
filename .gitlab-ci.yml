@@ -221,6 +221,7 @@ e2e-tests:
     - '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
     - nvm install 16
     - nvm use node 16
+    - corepack enable
   cache:
     paths:
       - ivette/node_modules/
