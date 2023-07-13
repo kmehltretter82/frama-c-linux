@@ -655,13 +655,21 @@ let rec type_term
            | [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ] ->
              let range = Interval.(plus_one (get_from_profile ~profile t2)) in
              let range = Interval.(join range (get_from_profile ~profile t1)) in
-             let range = ty_of_interv range in
+             let ty_range = ty_of_interv range in
              ignore
                (type_term
-                  ~use_gmp_opt:true ~arith_operand:true ~ctx:range ~profile t1);
+                  ~use_gmp_opt:true
+                  ~arith_operand:true
+                  ~profile
+                  ~ctx:ty_range
+                  t1);
              ignore
                (type_term
-                  ~use_gmp_opt:true ~arith_operand:true ~ctx:range ~profile t2);
+                  ~use_gmp_opt
+                  ~arith_operand
+                  ~profile
+                  ~ctx:ty_range
+                  t2);
              let ival = Interval.get_from_profile ~profile t in
              let ty = ty_of_interv ival ~use_gmp_opt:true ?ctx in
              ignore (type_term ~use_gmp_opt:true ?ctx ~profile lambda);
