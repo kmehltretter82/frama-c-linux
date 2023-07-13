@@ -691,6 +691,15 @@ let rec type_term
     | Tempty_set  -> Nan
   in
   let t = Logic_normalizer.get_term t in
+  let pp_call_with_result fmt result =
+    Format.fprintf fmt "type_term ~use_gmp_opt:%b" use_gmp_opt;
+    Option.iter (Format.fprintf fmt " ~ctx:%a" Number_ty.pretty) ctx;
+    if not @@ Profile.is_empty profile then
+      Format.fprintf fmt " ~profile:%a" Profile.pretty profile;
+    if under_lambda then Format.fprintf fmt " ~under_lambda:true";
+    if arith_operand then Format.fprintf fmt " ~arith_operand:true";
+    Format.fprintf fmt " %a = %a" Printer.pp_term t pp_computed_info result;
+  in
   match
     Memo.memo ~profile
       (fun t ->
@@ -701,8 +710,7 @@ let rec type_term
       t
   with
   | Result.Ok result ->
-    Options.debug ~dkey "type_term ~ctx:%a %a = %a"
-      (Pretty_utils.pp_opt Number_ty.pretty) ctx Printer.pp_term t pp_computed_info result;
+    Options.debug ~dkey ~level:5 "%a" pp_call_with_result result;
     result
   | Result.Error exn -> raise exn
 
