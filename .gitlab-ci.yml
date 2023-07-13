@@ -214,11 +214,14 @@ e2e-tests:
   image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
   before_script:
     - sudo apt update
-    - sudo apt install -y nodejs xvfb build-essential
+    - sudo apt install -y xvfb curl
+    - sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
   cache:
     paths:
       - ivette/node_modules/
   script:
+    - nvm install node 16
+    - nvm use node 16
     - node --version
     - npm --version
     - yarn --version
