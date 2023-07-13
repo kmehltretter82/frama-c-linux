@@ -66,7 +66,7 @@ let record_callwise_dependencies_in_db call_site froms =
 
 let call_for_individual_froms callstack _kf call_type value_initial_state =
   if From_parameters.ForceCallDeps.get () then begin
-    let current_function, call_site = List.hd callstack in
+    let current_function, call_site = Eva.Callstack.top_call callstack in
     let register_from froms =
       record_callwise_dependencies_in_db call_site froms;
       match !call_froms_stack with
@@ -102,7 +102,7 @@ let call_for_individual_froms callstack _kf call_type value_initial_state =
   end
 
 let end_record call_stack froms =
-  let (current_function_value, call_site) = List.hd call_stack in
+  let current_function_value, call_site = Eva.Callstack.top_call call_stack in
   record_callwise_dependencies_in_db call_site froms;
   (* pop + record in top of stack the froms of function that just finished *)
   match !call_froms_stack with

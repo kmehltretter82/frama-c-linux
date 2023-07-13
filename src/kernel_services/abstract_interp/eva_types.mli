@@ -20,36 +20,44 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+(** This module is here for compatibility reasons only and will be removed in
+    future versions. Use [Eva.Callstack] instead *)
 
-(** This modules stores the alarms and properties for which a red status has
-    been emitted. *)
+module Callstack :
+sig
+  type call = Cil_types.kernel_function * Cil_types.stmt
 
-(* Remembers that a red status has been emitted for an alarm or a property at
-   the given kinstr. *)
-val add_red_alarm:    kinstr -> Alarms.t -> unit
-val add_red_property: kinstr -> Property.t -> unit
+  module Call : Datatype.S with type t = call
 
-type alarm_or_property = Alarm of Alarms.t | Prop of Property.t
+  type callstack = {
+    thread: int;
+    entry_point: Cil_types.kernel_function;
+    stack: call list;
+  }
 
-module AlarmOrProp : Datatype.S with type t := alarm_or_property
+  include Datatype.S_with_collections with type t = callstack
 
-(* Whether a red status has been emitted for a property in any callstack. *)
-val is_red: Property.t -> bool
+  val pretty_hash : Format.formatter -> t -> unit
+  val pretty_short : Format.formatter -> t -> unit
+  val pretty_debug : Format.formatter -> t -> unit
 
-(* Whether a red status has been emitted for an alarm or a property at the given
-   kinstr in the given callstack. *)
-val is_red_in_callstack:
-  kinstr -> alarm_or_property -> Callstack.t -> bool
+  val compare_lex : t -> t -> int
 
-(* Returns the unsorted list of all alarms and properties for which a red status
-   has been emitted during the analysis. Also returns the kinstr of the alarm or
-   property, and the number of callstacks in which is was invalid.*)
-val get_all: unit -> (kinstr * alarm_or_property * int) list
+  val init : ?thread:int -> Cil_types.kernel_function -> t
 
-(* If option -eva-report-red-statuses has been set, reports red statuses in
-   a csv file. *)
-val report: unit -> unit
+  val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t
+  val pop : t -> t option
+  val top : t -> (Cil_types.kernel_function * Cil_types.stmt) option
+  val top_kf : t -> Cil_types.kernel_function
+  val top_callsite : t -> Cil_types.kinstr
+  val top_call : t -> Cil_types.kernel_function * Cil_types.kinstr
+  val top_caller : t -> Cil_types.kernel_function option
 
-(* Register a hook that is called each time a red status is set *)
-val register_hook: (alarm_or_property -> unit) -> unit
+  val to_kf_list : t -> Cil_types.kernel_function list
+  val to_stmt_list : t -> Cil_types.stmt list
+  val to_call_list : t -> (Cil_types.kernel_function * Cil_types.kinstr) list
+end
+[@@alert db_deprecated
+    "Eva_types is only provided for compatibility reason and will be removed \
+     in a future version of Frama-C. Please use the Eva.Callstack in the \
+     public API instead."]

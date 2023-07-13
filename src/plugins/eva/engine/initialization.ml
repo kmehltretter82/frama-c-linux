@@ -309,14 +309,18 @@ module Make
   let initialize_global_variable ~lib_entry vi init state =
     Cil.CurrentLoc.set vi.vdecl;
     let state = Domain.enter_scope Abstract_domain.Global [vi] state in
-    if vi.vsource then
-      let initialize =
-        if lib_entry || (vi.vstorage = Extern)
-        then initialize_var_lib_entry
-        else initialize_var_not_lib_entry ~local:false
-      in
-      initialize Kglobal vi init.init state
-    else state
+    let state = if vi.vsource then
+        let initialize =
+          if lib_entry || (vi.vstorage = Extern)
+          then initialize_var_lib_entry
+          else initialize_var_not_lib_entry ~local:false
+        in
+        initialize Kglobal vi init.init state
+      else state
+    in
+    state
+
+
 
   (* Compute the initial state with all global variable initialized. *)
   let compute_global_state ~lib_entry () =

@@ -31,13 +31,13 @@ module type Results = sig
   val get_global_state: unit -> state or_top_bottom
   val get_stmt_state : after:bool -> stmt -> state or_top_bottom
   val get_stmt_state_by_callstack:
-    ?selection:callstack list ->
-    after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_bottom
+    ?selection:Callstack.t list ->
+    after:bool -> stmt -> state Callstack.Hashtbl.t or_top_bottom
   val get_initial_state:
     kernel_function -> state or_top_bottom
   val get_initial_state_by_callstack:
-    ?selection:callstack list ->
-    kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_bottom
+    ?selection:Callstack.t list ->
+    kernel_function -> state Callstack.Hashtbl.t or_top_bottom
 
   val eval_expr : state -> exp -> value evaluated
   val copy_lvalue: state -> lval -> value flagged_value evaluated

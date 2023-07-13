@@ -49,15 +49,16 @@ let compute_users _ =
     if Eva.Results.is_called kf
     then
       let callstacks = Eva.Results.(at_start_of kf |> callstacks) in
-      let process_callstack list =
-        let process_element (user, _call_site) =
+      let process_callstack callstack =
+        let users = List.tl (List.rev (Eva.Callstack.to_kf_list callstack)) in
+        let process_element user =
           ignore
             (Users.memo
                ~change:(Kernel_function.Hptset.add kf)
                (fun _ -> Kernel_function.Hptset.singleton kf)
                user)
         in
-        List.iter process_element (List.tl list)
+        List.iter process_element users
       in
       List.iter process_callstack callstacks
   in

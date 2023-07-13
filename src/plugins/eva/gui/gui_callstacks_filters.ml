@@ -22,17 +22,19 @@
 
 open Cil_types
 
-type rcallstack = Value_types.callstack
+type rcallstack = (Cil_types.kernel_function * Cil_types.kinstr) list
 
 let empty = []
 
-let from_callstack = List.rev
+let from_callstack cs = Callstack.to_call_list cs
 
 let callstack_matches_callstack (rcs1:rcallstack) (rcs2:rcallstack) =
   let rec aux q1 q2 = match q1, q2 with
     | [], _ | _, [] -> true
-    | call1 :: q1, call2 :: q2 ->
-      Value_types.Callsite.equal call1 call2 && aux q1 q2
+    | (kf1, kinstr1) :: q1, (kf2, kinstr2) :: q2 ->
+      Kernel_function.equal kf1 kf2
+      && Cil_datatype.Kinstr.equal kinstr1 kinstr2
+      && aux q1 q2
   in
   aux rcs1 rcs2
 
@@ -62,7 +64,7 @@ let has_matching_callstack ~after csf stmt =
   | `Bottom -> false
   | `Value h ->
     try
-      Value_types.Callstack.Hashtbl.iter
+      Callstack.Hashtbl.iter
         (fun cs' _state ->
            let rcs' = from_callstack cs' in
            if callstack_matches csf rcs' then raise Exit
@@ -95,7 +97,7 @@ let register_to_zone_functions (module Eval: Gui_eval.S) =
   let eval_filter csf stmt ev v =
     match Eval.Analysis.get_stmt_state_by_callstack ~after:false stmt with
     | `Value h ->
-      Value_types.Callstack.Hashtbl.fold
+      Callstack.Hashtbl.fold
         (fun cs state acc ->
            let rcs' = from_callstack cs in
            if callstack_matches csf rcs' then

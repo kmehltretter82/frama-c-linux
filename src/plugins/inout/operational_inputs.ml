@@ -207,13 +207,16 @@ module Internals =
       let size = 17
     end)
 
-module CallsiteHash = Value_types.Callsite.Hashtbl
+module Callsite =
+  Datatype.Pair_with_collections (Kernel_function) (Cil_datatype.Kinstr)
+    (struct let module_name = "From.Callsite" end)
+module CallsiteHash = Callsite.Hashtbl
 
 (* Results of an an entire call, represented by a pair (stmt, kernel_function).
 *)
 module CallwiseResults =
   State_builder.Hashtbl
-    (Value_types.Callsite.Hashtbl)
+    (Callsite.Hashtbl)
     (Inout_type)
     (struct
       let size = 17
@@ -569,7 +572,7 @@ module Callwise = struct
   let call_inout_stack = ref []
 
   let call_for_callwise_inout callstack _kf call_type state =
-    let (current_function, ki as call_site) = List.hd callstack in
+    let current_function, ki as call_site = Eva.Callstack.top_call callstack in
     let merge_inout inout =
       Db.Operational_inputs.Record_Inout_Callbacks.apply (callstack, inout);
       if ki = Kglobal
@@ -618,8 +621,7 @@ module Callwise = struct
 
   let end_record call_stack inout =
     merge_local_table_in_global_ones (snd (List.hd !call_inout_stack));
-
-    let (current_function, _ as call_site) = List.hd call_stack in
+    let (current_function, _) as call = Eva.Callstack.top_call call_stack in
     (* pop + record in top of stack the inout of function that just finished*)
     match !call_inout_stack with
     | (current_function2, _) :: (((_caller, table) :: _) as tail) ->
@@ -628,10 +630,10 @@ module Callwise = struct
           Kernel_function.pretty current_function (* g *)
           Kernel_function.pretty current_function2 (* f *);
       call_inout_stack := tail;
-      merge_call_in_local_table call_site table inout;
+      merge_call_in_local_table call table inout;
 
     | _ ->  (* the entry point, probably *)
-      merge_call_in_global_tables call_site inout;
+      merge_call_in_global_tables call inout;
       call_inout_stack := [];
       CallwiseResults.mark_as_computed ()
 

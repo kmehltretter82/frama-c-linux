@@ -39,22 +39,22 @@ module type S = sig
       false, register functions do nothing, and get functions return Top. *)
   val register_global_state: bool -> t or_bottom -> unit
 
-  val register_initial_state: Value_types.callstack -> t -> unit
-  val register_state_before_stmt: Value_types.callstack -> stmt -> t -> unit
-  val register_state_after_stmt: Value_types.callstack -> stmt -> t -> unit
+  val register_initial_state: Callstack.t -> kernel_function -> t -> unit
+  val register_state_before_stmt: Callstack.t -> stmt -> t -> unit
+  val register_state_after_stmt: Callstack.t -> stmt -> t -> unit
 
   (** Allows accessing the states inferred by an Eva analysis after it has
       been computed with the domain enabled. *)
   val get_global_state: unit -> t or_bottom
   val get_initial_state: kernel_function -> t or_bottom
   val get_initial_state_by_callstack:
-    ?selection:callstack list ->
-    kernel_function -> t Value_types.Callstack.Hashtbl.t or_top_bottom
+    ?selection:Callstack.t list ->
+    kernel_function -> t Callstack.Hashtbl.t or_top_bottom
 
   val get_stmt_state: after:bool -> stmt -> t or_bottom
   val get_stmt_state_by_callstack:
-    ?selection:callstack list ->
-    after:bool -> stmt -> t Value_types.Callstack.Hashtbl.t or_top_bottom
+    ?selection:Callstack.t list ->
+    after:bool -> stmt -> t Callstack.Hashtbl.t or_top_bottom
 
   val mark_as_computed: unit -> unit
   val is_computed: unit -> bool

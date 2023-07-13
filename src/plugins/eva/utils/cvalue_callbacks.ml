@@ -24,7 +24,6 @@ open Cil_types
 
 let dkey = Self.dkey_callbacks
 
-type callstack = (kernel_function * kinstr) list
 type state = Cvalue.Model.t
 
 type analysis_kind =
@@ -35,7 +34,7 @@ type analysis_kind =
 
 module Call =
   Hook.Build
-    (struct type t = callstack * kernel_function * analysis_kind * state end)
+    (struct type t = Callstack.t * kernel_function * analysis_kind * state end)
 
 let register_call_hook f =
   Call.extend (fun (callstack, kf, kind, state) -> f callstack kf kind state)
@@ -53,7 +52,7 @@ type call_results =
   | Reuse of int
 
 module Call_Results =
-  Hook.Build (struct type t = callstack * kernel_function * call_results end)
+  Hook.Build (struct type t = Callstack.t * kernel_function * call_results end)
 
 let register_call_results_hook f =
   Call_Results.extend (fun (callstack, kf, results) -> f callstack kf results)
@@ -74,7 +73,7 @@ let apply_call_results_hooks callstack kf call_results =
 
 
 module Statement =
-  Hook.Build (struct type t = callstack * stmt * state list end)
+  Hook.Build (struct type t = Callstack.t * stmt * state list end)
 
 let register_statement_hook f =
   Statement.extend (fun (callstack, stmt, states) -> f callstack stmt states)

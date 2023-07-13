@@ -610,8 +610,8 @@ module Restrict
 
     let lift_register f state = f (get_state state)
 
-    let register_initial_state callstack =
-      lift_register (Domain.Store.register_initial_state callstack)
+    let register_initial_state callstack kf =
+      lift_register (Domain.Store.register_initial_state callstack kf)
     let register_state_before_stmt callstack stmt =
       lift_register (Domain.Store.register_state_before_stmt callstack stmt)
     let register_state_after_stmt callstack stmt =
@@ -628,7 +628,7 @@ module Restrict
       | `Top -> `Top
       | `Bottom -> `Bottom
       | `Value t ->
-        let module Hashtbl = Value_types.Callstack.Hashtbl in
+        let module Hashtbl = Callstack.Hashtbl in
         let table = Hashtbl.create (Hashtbl.length t) in
         Hashtbl.iter (fun key s -> Hashtbl.add table key (inject s)) t;
         `Value table

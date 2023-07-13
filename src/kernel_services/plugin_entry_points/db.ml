@@ -127,7 +127,8 @@ module Operational_inputs = struct
   let get_external = mk_fun "Operational_inputs.get_external"
 
   module Record_Inout_Callbacks =
-    Hook.Build (struct type t = Value_types.callstack * Inout_type.t end)
+    Hook.Build (struct type t = Eva_types.Callstack.t * Inout_type.t end)
+  [@@alert "-db_deprecated"]
 
   let pretty fmt x =
     Format.fprintf fmt "@[<v>";
@@ -236,8 +237,11 @@ module Value = struct
 
   let size = 256
 
+  [@@@ alert "-db_deprecated"]
+  type callstack = Eva_types.Callstack.callstack
+
   module States_by_callstack =
-    Value_types.Callstack.Hashtbl.Make(Cvalue.Model)
+    Eva_types.Callstack.Hashtbl.Make(Cvalue.Model)
 
   module Table_By_Callstack =
     Cil_state_builder.Stmt_hashtbl(States_by_callstack)
@@ -365,19 +369,17 @@ module Value = struct
            Cvalue.Model.pretty v)
 *)
 
-  type callstack = (kernel_function * kinstr) list
-
   module Record_Value_Callbacks =
     Hook.Build
       (struct
-        type t = (kernel_function * kinstr) list * (state Stmt.Hashtbl.t) Lazy.t
+        type t = callstack * (state Stmt.Hashtbl.t) Lazy.t
       end)
 
   module Record_Value_Callbacks_New =
     Hook.Build
       (struct
         type t =
-          (kernel_function * kinstr) list *
+          callstack *
           ((state Stmt.Hashtbl.t) Lazy.t  * (state Stmt.Hashtbl.t) Lazy.t)
             Value_types.callback_result
       end)
@@ -385,24 +387,24 @@ module Value = struct
   module Record_Value_After_Callbacks =
     Hook.Build
       (struct
-        type t = (kernel_function * kinstr) list * (state Stmt.Hashtbl.t) Lazy.t
+        type t = callstack * (state Stmt.Hashtbl.t) Lazy.t
       end)
 
   module Record_Value_Superposition_Callbacks =
     Hook.Build
       (struct
-        type t = (kernel_function * kinstr) list * (state list Stmt.Hashtbl.t) Lazy.t
+        type t = callstack * (state list Stmt.Hashtbl.t) Lazy.t
       end)
 
   module Call_Value_Callbacks =
     Hook.Build
-      (struct type t = state * (kernel_function * kinstr) list end)
+      (struct type t = state * callstack end)
 
   module Call_Type_Value_Callbacks =
     Hook.Build(struct
       type t = [`Builtin of Value_types.call_froms | `Spec of funspec
                | `Def | `Memexec]
-               * state * (kernel_function * kinstr) list end)
+               * state * callstack end)
   ;;
 
 
@@ -418,7 +420,7 @@ module Value = struct
   let no_results = mk_fun "Value.no_results"
 
   let update_callstack_table ~after stmt callstack v =
-    let open Value_types in
+    let open Eva_types in
     let find,add =
       if after
       then AfterTable_By_Callstack.find, AfterTable_By_Callstack.add
@@ -437,9 +439,8 @@ module Value = struct
       Callstack.Hashtbl.add r callstack v;
       add stmt r
 
-  let merge_initial_state cs state =
-    let open Value_types in
-    let kf = match cs with (kf, _) :: _ -> kf | _ -> assert false in
+  let merge_initial_state cs kf state =
+    let open Eva_types in
     let by_callstack =
       try Called_Functions_By_Callstack.find kf
       with Not_found ->
@@ -459,7 +460,7 @@ module Value = struct
     with Not_found ->
       let state =
         try
-          let open Value_types in
+          let open Eva_types in
           let by_callstack = Called_Functions_By_Callstack.find kf in
           Callstack.Hashtbl.fold
             (fun _cs state acc -> Cvalue.Model.join acc state)
@@ -507,7 +508,7 @@ module Value = struct
           match ho with
           | None -> Cvalue.Model.bottom
           | Some h ->
-            Value_types.Callstack.Hashtbl.fold (fun _cs state acc ->
+            Eva_types.Callstack.Hashtbl.fold (fun _cs state acc ->
                 Cvalue.Model.join acc state
               ) h Cvalue.Model.bottom
         in
@@ -539,7 +540,7 @@ module Value = struct
     assert (is_computed ()); (* this assertion fails during Eva analysis *)
     match get_stmt_state_callstack ~after stmt with
     | None -> acc
-    | Some h -> Value_types.Callstack.Hashtbl.fold (fun _ -> f) h acc
+    | Some h -> Eva_types.Callstack.Hashtbl.fold (fun _ -> f) h acc
 
   let fold_state_callstack f acc ~after ki =
     assert (is_computed ()); (* this assertion fails during Eva analysis *)
@@ -559,7 +560,7 @@ module Value = struct
       | None -> false
       | Some h ->
         try
-          Value_types.Callstack.Hashtbl.iter
+          Eva_types.Callstack.Hashtbl.iter
             (fun _cs state ->
                if Cvalue.Model.is_reachable state
                then raise Is_reachable) h;
