@@ -227,7 +227,8 @@ e2e-tests:
     - make -C ivette dist
     - cd ivette/test/e2e-wdio
     - npm install
-    - pwd
+    - export MONKEY=true 
+    - xvfb-run pnpm test
   tags:
     - docker
 

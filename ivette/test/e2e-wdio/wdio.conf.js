@@ -43,7 +43,7 @@ export const config = {
       {
         appPath: join(dirname, '..', '..', '..', 'ivette', 'dist'),
         appName: 'ivette',
-        appArgs: ['command /home/user01/git/frama-c/bin/frama-c'],
+        appArgs: ['command /builds/frama-c/frama-c/bin/frama-c'],
         chromedriver: {
           port: 9519,
           logFileName: 'wdio-chromedriver.log'
