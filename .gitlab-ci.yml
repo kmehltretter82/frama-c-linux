@@ -213,6 +213,7 @@ e2e-tests:
   stage: tests
   image: node:lts-gallium
   before_script:
+    - apt update
     - apt install -y xvfb
   cache:
     paths:
