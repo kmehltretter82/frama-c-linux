@@ -1,4 +1,4 @@
-627a628,964
+632a633,969
 > [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
 > [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
@@ -336,7 +336,7 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-694a1032,1096
+699a1037,1101
 > [eva] realloc.c:167: Call to builtin reallocarray
 > [eva] realloc.c:167: Call to builtin reallocarray
 > [eva] computing for function Frama_C_interval <- main11 <- main.
@@ -402,7 +402,7 @@
 > [eva:malloc] bases_to_realloc: {}
 > [eva:malloc] realloc.c:171: strong free on bases: {}
 > [eva] realloc.c:172: Frama_C_show_each_p: {{ NULL ; &__realloc_w_main11_l171 }}
-762,763c1164,1166
+767,768c1169,1171
 <   p ∈ {{ NULL ; &__malloc_main11_l160 ; (int *)&__realloc_main11_l171 }}
 <   q ∈ {0} or UNINITIALIZED or ESCAPINGADDR
 ---
