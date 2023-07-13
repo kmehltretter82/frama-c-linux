@@ -27,6 +27,7 @@
   (virtual_modules gui_init)
   (libraries threads)
   (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx))
 )
 
 (include_subdirs no)

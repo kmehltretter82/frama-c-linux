@@ -44,7 +44,8 @@
     (select wp_eva.ml from
       (frama-c-eva.core -> wp_eva.enabled.ml)
       (  -> wp_eva.disabled.ml)))
-  (instrumentation (backend landmarks)))
+  (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx)))
 
 (plugin (optional) (name wp) (libraries frama-c-wp.core) (site (frama-c plugins)))
 

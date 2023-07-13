@@ -33,4 +33,5 @@
   (public_name qed)
   (flags (-open Frama_c_kernel :standard -w -9))
   (libraries frama-c.kernel zarith)
-  (instrumentation (backend landmarks)))
+  (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx)))

@@ -30,6 +30,8 @@ frama_c_journal.ml
 /distributed
 _build
 *.install
+*.coverage
+_coverage
 
 # This file is generated (on need) during configure
 /src/plugins/dune
