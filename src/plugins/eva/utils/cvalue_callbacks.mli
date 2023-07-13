@@ -37,13 +37,15 @@ type analysis_kind =
   | `Reuse (** The results of a previous analysis of the function are reused. *)
   ]
 
-(** Registers a function to be applied at the beginning of the analysis of each
-    function call. Arguments of the callback are the callstack of the call,
-    the function called, the kind of analysis performed by Eva for this call,
-    and the cvalue state at the beginning of the call. *)
-val register_call_hook:
-  (Callstack.t -> Cil_types.kernel_function -> state -> analysis_kind -> unit)
-  -> unit
+(** Signature of a hook to be called before the analysis of each function call.
+    Arguments are the callstack of the call, the function called, the initial
+    cvalue state, and the kind of analysis performed by Eva for this call. *)
+type call_hook =
+  Callstack.t -> Cil_types.kernel_function -> state -> analysis_kind -> unit
+
+(** Registers a function to be applied at the start of the analysis of each
+    function call. *)
+val register_call_hook: call_hook -> unit
 
 
 type state_by_stmt = (state Cil_datatype.Stmt.Hashtbl.t) Lazy.t
@@ -63,13 +65,15 @@ type call_results =
         previously recorded with the [Def] constructor. *)
   ]
 
+(** Signature of a hook to be called after the analysis of each function call.
+    Arguments are the callstack of the call, the function called, the initial
+    cvalue state at the start of the call, and the results from its analysis. *)
+type call_results_hook =
+  Callstack.t -> Cil_types.kernel_function -> state -> call_results -> unit
+
 (** Registers a function to be applied at the end of the analysis of each
-    function call. Arguments of the callback are the callstack of the call,
-    the function called, the initial cvalue state at the start of the call,
-    and the cvalue states resulting from its analysis. *)
-val register_call_results_hook:
-  (Callstack.t -> Cil_types.kernel_function -> state -> call_results -> unit)
-  -> unit
+    function call. *)
+val register_call_results_hook: call_results_hook -> unit
 
 [@@@ api_end]
 

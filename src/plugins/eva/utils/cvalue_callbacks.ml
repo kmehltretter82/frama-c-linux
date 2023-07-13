@@ -28,6 +28,9 @@ type state = Cvalue.Model.t
 
 type analysis_kind = [ `Builtin | `Spec | `Def | `Reuse ]
 
+type call_hook =
+  Callstack.t -> Cil_types.kernel_function -> state -> analysis_kind -> unit
+
 module Call =
   Hook.Build
     (struct type t = Callstack.t * kernel_function * state * analysis_kind end)
@@ -49,6 +52,9 @@ type call_results =
   | `Def of results * int
   | `Reuse of int
   ]
+
+type call_results_hook =
+  Callstack.t -> Cil_types.kernel_function -> state -> call_results -> unit
 
 module Call_Results =
   Hook.Build
