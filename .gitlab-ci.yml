@@ -216,11 +216,14 @@ e2e-tests:
     - sudo apt update
     - sudo apt install -y xvfb curl
     - sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+    - export NVM_DIR="$HOME/.nvm"
+    - [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    - [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+    - nvm install node 16
   cache:
     paths:
       - ivette/node_modules/
   script:
-    - nvm install node 16
     - nvm use node 16
     - node --version
     - npm --version
