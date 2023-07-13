@@ -686,17 +686,18 @@ module Cvalue_callbacks: sig
   type state = Cvalue.Model.t
 
   type analysis_kind =
-    [ `Builtin of Value_types.call_froms
-    | `Spec of Cil_types.funspec
-    | `Def
-    | `Memexec ]
+    [ `Builtin (** A cvalue builtin is used to interpret the function. *)
+    | `Spec  (** The specification is used to interpret the function. *)
+    | `Def   (** The function body is analyzed. This is the standard case. *)
+    | `Reuse (** The results of a previous analysis of the function are reused. *)
+    ]
 
   (** Registers a function to be applied at the beginning of the analysis of each
       function call. Arguments of the callback are the callstack of the call,
       the function called, the kind of analysis performed by Eva for this call,
       and the cvalue state at the beginning of the call. *)
   val register_call_hook:
-    (Callstack.t -> Cil_types.kernel_function -> analysis_kind -> state -> unit)
+    (Callstack.t -> Cil_types.kernel_function -> state -> analysis_kind -> unit)
     -> unit
 
 
@@ -705,18 +706,24 @@ module Cvalue_callbacks: sig
 
   (** Results of a function call. *)
   type call_results =
-    | Store of results * int
+    [ `Builtin of state list * Value_types.call_froms
+    (** List of cvalue states at the end of the builtin. *)
+    | `Spec of state list
+    (** List of cvalue states at the end of the call. *)
+    | `Def of results * int
     (** Cvalue states before and after each statement of the given function,
         plus a unique integer id for the call. *)
-    | Reuse of int
-    (** The results are the same as a previous call with the given integer id,
-        previously recorded with the [Store] constructor. *)
+    | `Reuse of int
+      (** The results are the same as a previous call with the given integer id,
+          previously recorded with the [Def] constructor. *)
+    ]
 
   (** Registers a function to be applied at the end of the analysis of each
       function call. Arguments of the callback are the callstack of the call,
-      the function called and the cvalue states resulting from its analysis. *)
+      the function called, the initial cvalue state at the start of the call,
+      and the cvalue states resulting from its analysis. *)
   val register_call_results_hook:
-    (Callstack.t -> Cil_types.kernel_function -> call_results -> unit)
+    (Callstack.t -> Cil_types.kernel_function -> state -> call_results -> unit)
     -> unit
 
 end

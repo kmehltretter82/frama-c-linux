@@ -571,41 +571,13 @@ module Callwise = struct
 
   let call_inout_stack = ref []
 
-  let call_for_callwise_inout callstack _kf call_type state =
-    let current_function, ki as call_site = Eva.Callstack.top_call callstack in
-    let merge_inout inout =
-      Db.Operational_inputs.Record_Inout_Callbacks.apply (callstack, inout);
-      if ki = Kglobal
-      then merge_call_in_global_tables call_site inout
-      else
-        let _above_function, table =
-          try List.hd !call_inout_stack
-          with Failure _ -> assert false
-        in
-        merge_call_in_local_table call_site table inout
-    in
-    match call_type with
-    | `Builtin (Some (froms,sure_out)) ->
-      let in_, out_ = extract_inout_from_froms froms in
-      let inout = {
-        over_inputs_if_termination = in_;
-        over_inputs = in_;
-        over_logic_inputs = Zone.bottom;
-        over_outputs_if_termination = out_ ;
-        over_outputs = out_;
-        under_outputs_if_termination = sure_out;
-      } in
-      merge_inout inout
-    | `Def | `Memexec ->
+  let call_for_callwise_inout _callstack current_function _state = function
+    | `Def | `Reuse ->
       let table_current_function = CallsiteHash.create 7 in
       call_inout_stack :=
         (current_function, table_current_function) :: !call_inout_stack
-    | `Spec spec ->
-      let inout =compute_using_given_spec_state state spec current_function in
-      merge_inout inout
-    | `Builtin None ->
-      let inout = compute_using_prototype_state state current_function in
-      merge_inout inout
+    | `Spec -> ()
+    | `Builtin -> ()
 
 
   module MemExec =
@@ -675,23 +647,53 @@ module Callwise = struct
     in
     Computer.end_dataflow ()
 
-  let record_for_callwise_inout callstack kf value_res =
-    let inout = match value_res with
-      | Eva.Cvalue_callbacks.Store ({before_stmts}, memexec_counter) ->
-        let inout =
-          if Eva.Analysis.save_results kf
-          then
-            let cvalue_states = Lazy.force before_stmts in
-            compute_call_from_value_states kf callstack cvalue_states
-          else top
+  let record_for_callwise_inout callstack kf state value_res =
+    let current_function, ki as call_site = Eva.Callstack.top_call callstack in
+    let merge_inout inout =
+      Db.Operational_inputs.Record_Inout_Callbacks.apply (callstack, inout);
+      if ki = Kglobal
+      then merge_call_in_global_tables call_site inout
+      else
+        let _above_function, table =
+          try List.hd !call_inout_stack
+          with Failure _ -> assert false
         in
-        MemExec.replace memexec_counter inout;
-        inout
-      | Reuse counter ->
-        MemExec.find counter
+        merge_call_in_local_table call_site table inout
     in
-    Db.Operational_inputs.Record_Inout_Callbacks.apply (callstack, inout);
-    end_record callstack inout
+    match value_res with
+    | `Def (Eva.Cvalue_callbacks.{before_stmts}, memexec_counter) ->
+      let inout =
+        if Eva.Analysis.save_results kf
+        then
+          let cvalue_states = Lazy.force before_stmts in
+          compute_call_from_value_states kf callstack cvalue_states
+        else top
+      in
+      MemExec.replace memexec_counter inout;
+      Db.Operational_inputs.Record_Inout_Callbacks.apply (callstack, inout);
+      end_record callstack inout
+    | `Reuse counter ->
+      let inout = MemExec.find counter in
+      Db.Operational_inputs.Record_Inout_Callbacks.apply (callstack, inout);
+      end_record callstack inout
+    | `Spec _states ->
+      let spec = Annotations.funspec current_function in
+      let inout =compute_using_given_spec_state state spec current_function in
+      merge_inout inout
+    | `Builtin (_states, Some (froms,sure_out)) ->
+      let in_, out_ = extract_inout_from_froms froms in
+      let inout = {
+        over_inputs_if_termination = in_;
+        over_inputs = in_;
+        over_logic_inputs = Zone.bottom;
+        over_outputs_if_termination = out_ ;
+        over_outputs = out_;
+        under_outputs_if_termination = sure_out;
+      } in
+      merge_inout inout
+    | `Builtin (_states, None) ->
+      let inout = compute_using_prototype_state state current_function in
+      merge_inout inout
 
 
   (* Register our callbacks inside the value analysis *)

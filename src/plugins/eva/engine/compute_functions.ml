@@ -168,6 +168,14 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     | None -> fun _ -> assert false
     | Some get -> fun location -> get location
 
+  let apply_call_hooks call state =
+    let cvalue_state = get_cvalue_or_top state in
+    Cvalue_callbacks.apply_call_hooks call.callstack call.kf cvalue_state
+
+  let apply_call_results_hooks call state =
+    let cvalue_state = get_cvalue_or_top state in
+    Cvalue_callbacks.apply_call_results_hooks call.callstack call.kf cvalue_state
+
   (* ----- Mem Exec cache --------------------------------------------------- *)
 
   module MemExec = Mem_exec.Make (Abstract.Val) (Abstract.Dom)
@@ -187,8 +195,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       in
       call_result
     | Some (states, i) ->
-      let cvalue = get_cvalue_or_top init_state in
-      Cvalue_callbacks.apply_call_hooks call.callstack call.kf `Memexec cvalue;
+      apply_call_hooks call init_state `Reuse;
       (* Evaluate the preconditions of kf, to update the statuses
          at this call. *)
       let spec = Annotations.funspec call.kf in
@@ -204,8 +211,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         Self.debug ~dkey
           "calling Record_Value_New callbacks on saved previous result";
       end;
-      let reuse = Cvalue_callbacks.Reuse i in
-      Cvalue_callbacks.apply_call_results_hooks call.callstack call.kf reuse;
+      apply_call_results_hooks call init_state (`Reuse i);
       (* call can be cached since it was cached once *)
       Transfer.{states; cacheable = Cacheable; builtin=false}
 
@@ -228,8 +234,12 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let vi = Kernel_function.get_vi call.kf in
     if Cil.is_in_libc vi.vattr then
       Library_functions.warn_unsupported_spec vi.vorig_name;
-    Spec.compute_using_specification ~warn:true kinstr call spec state,
-    Eval.Cacheable
+    let states =
+      Spec.compute_using_specification ~warn:true kinstr call spec state
+    in
+    let cvalue_states = List.map (fun (_, s) -> get_cvalue_or_top s) states in
+    apply_call_results_hooks call state (`Spec cvalue_states);
+    states, Eval.Cacheable
 
   (* Interprets a [call] at callsite [kinstr] in state [state], using its
      specification or body according to [target]. If [-eva-show-progress] is
@@ -242,15 +252,14 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         "@[computing for function %a.@\nCalled from %a.@]"
         Callstack.pretty_short call.callstack
         Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc kinstr);
-    let cvalue_state = get_cvalue_or_top state in
     let compute, kind =
       match target with
       | `Def (fundec, save_results) ->
         compute_using_body fundec ~save_results, `Def
       | `Spec funspec ->
-        compute_using_spec funspec, `Spec funspec
+        compute_using_spec funspec, `Spec
     in
-    Cvalue_callbacks.apply_call_hooks call.callstack call.kf kind cvalue_state;
+    apply_call_hooks call state kind;
     let resulting_states, cacheable = compute kinstr call state in
     if pp then
       Self.feedback
@@ -284,6 +293,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     then
       Self.feedback ~current:true "Call to builtin %s%s"
         name (if kf_name = name then "" else " for function " ^ kf_name);
+    apply_call_hooks call state `Builtin;
     (* Do not track garbled mixes created when interpreting the specification,
        as the result of the cvalue builtin will overwrite them. *)
     Locations.Location_Bytes.do_track_garbled_mix false;
@@ -292,18 +302,17 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     in
     Locations.Location_Bytes.do_track_garbled_mix true;
     let final_state = join_states states in
-    let cvalue_state = get_cvalue_or_top state in
     match final_state with
     | `Bottom ->
-      let kind = `Spec spec in
-      Cvalue_callbacks.apply_call_hooks call.callstack call.kf kind cvalue_state;
+      apply_call_results_hooks call state (`Builtin ([], None));
       let cacheable = Eval.Cacheable in
       Transfer.{states; cacheable; builtin=true}
     | `Value final_state ->
       let cvalue_call = get_cvalue_call call in
       let post = get_cvalue_or_top final_state in
+      let pre = get_cvalue_or_top state in
       let cvalue_states =
-        Builtins.apply_builtin builtin cvalue_call ~pre:cvalue_state ~post
+        Builtins.apply_builtin builtin cvalue_call ~pre ~post
       in
       let insert cvalue_state =
         Partition.Key.empty,
