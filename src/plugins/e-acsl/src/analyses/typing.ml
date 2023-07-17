@@ -645,7 +645,11 @@ let rec type_term
              let ty = ty_of_interv ival ~use_gmp_opt:true ?ctx in
              ignore (type_term ~use_gmp_opt:true ?ctx ~profile lambda);
              ty
-           | [ ] | [ _ ] | [ _; _ ] | _ :: _ :: _ :: _ ->
+           | [] | _ :: _ ->
+             let type_arg arg =
+               ignore @@ type_term ~use_gmp_opt:true ~arith_operand:false ~profile arg
+             in
+             List.iter type_arg args;
              (* TODO : improve error message to distinguish error messages
                 corresponding to unsupported primitives and wrong application
                 of supported primitive
