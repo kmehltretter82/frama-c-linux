@@ -104,6 +104,11 @@ let debug fmt =
 
 let has_no_warning_nor_error = ref true
 
+let info fmt =
+  pp_job_first_line ();
+  Format.printf "- [info] ";
+  Format.printf fmt
+
 let warn fmt =
   pp_job_first_line ();
   if !exit_on_warning then
@@ -355,10 +360,10 @@ let get_header_files ?directories:(dirs=(get_header_dirs ())) () :
                      (* Ctrl+C pressed; abort execution *)
                      exit 255
                    else
-                     warn "%s: duplicated license name (same contents as file: %s)@." filepath previous_entry
+                     error ~exit_value:7
+                       "%s: duplicated license name (contents differs to file: %s)@." filepath previous_entry
                  else
-                   error ~exit_value:7
-                     "%s: duplicated license name (contents differs to file: %s)@." filepath previous_entry
+                   info "%s: duplicated license name (same contents as file: %s)@." filepath previous_entry
                with Not_found -> ());
               Hashtbl.add license_path_tbl license_name filepath;
            )
@@ -713,9 +718,8 @@ let _ =
       | Update ->
         update_headers ~config_file_opts specified_files;
   end;
-  if !exit_on_warning && not !has_no_warning_nor_error then
-    exit 8 ;
+  if !exit_on_warning && not !has_no_warning_nor_error then exit 8
 
-  (* Local Variables: *)
-  (* compile-command: "ocamlc -o hdrck unix.cma str.cma hdrck.ml" *)
-  (* End: *)
+(* Local Variables: *)
+(* compile-command: "ocamlc -o hdrck unix.cma str.cma hdrck.ml" *)
+(* End: *)
