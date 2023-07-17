@@ -289,7 +289,7 @@
   s ∈ [--..--]
   uninit ∈ UNINITIALIZED
   old ∈ [--..--] or UNINITIALIZED
-  kill_res ∈ {-1; 0}
+  kill_res ∈ {-1; 0} or UNINITIALIZED
   sa1 ∈
      {{ garbled mix of &{__fc_sigaction}
       (origin: Library function {signal_h.c:45}) }} or UNINITIALIZED

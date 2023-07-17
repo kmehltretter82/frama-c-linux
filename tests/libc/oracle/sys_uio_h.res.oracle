@@ -103,6 +103,6 @@
    [3].iov_base ∈ {{ (void *)&buf2 }}
    [3].iov_len ∈ {14}
   fd ∈ [-1..1023]
-  w ∈ [-1..2147483647]
-  r ∈ [-1..2147483647]
+  w ∈ [-1..2147483647] or UNINITIALIZED
+  r ∈ [-1..2147483647] or UNINITIALIZED
   __retres ∈ [-2..2147483647]

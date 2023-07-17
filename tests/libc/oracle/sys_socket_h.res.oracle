@@ -61,5 +61,5 @@
      .msg_iovlen ∈ {5; 6}
      {.msg_control; .msg_controllen; .msg_flags} ∈ UNINITIALIZED
   sockfd ∈ [-1..1023]
-  r ∈ [-1..2147483647]
+  r ∈ [-1..2147483647] or UNINITIALIZED
   __retres ∈ {0; 1}

@@ -70,6 +70,6 @@
   fd ∈ [-1..1023]
   tio ∈ [--..--] or UNINITIALIZED
   res ∈ {-1; 0}
-  sp1 ∈ [--..--]
-  sp2 ∈ [--..--]
+  sp1 ∈ [--..--] or UNINITIALIZED
+  sp2 ∈ [--..--] or UNINITIALIZED
   __retres ∈ {-1; 0; 1; 8}

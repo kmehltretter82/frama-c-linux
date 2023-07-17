@@ -73,8 +73,8 @@
   __fc_fds[0..1023] ∈ [--..--]
   out_fd ∈ [-1..1023] or UNINITIALIZED
   in_fd ∈ [-1..1023]
-  offset ∈ [--..--]
+  offset ∈ [--..--] or UNINITIALIZED
   r1 ∈ [-1..42] or UNINITIALIZED
   r3 ∈ [-1..42] or UNINITIALIZED
-  r ∈ {-1; 0}
+  r ∈ {-1; 0} or UNINITIALIZED
   __retres ∈ {0; 1}

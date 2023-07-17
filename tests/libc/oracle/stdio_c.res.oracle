@@ -361,7 +361,7 @@
 [eva:final-states] Values at end of function fgets:
   Frama_C_entropy_source ∈ [--..--]
   __fc_errno ∈ [--..--]
-  i ∈ [0..9]
+  i ∈ [0..9] or UNINITIALIZED
   buf[0..8] ∈ [--..--] or UNINITIALIZED
      [9] ∈ {0} or UNINITIALIZED
   __retres ∈ {{ NULL ; &buf[0] }}
@@ -389,7 +389,7 @@
   __fc_heap_status ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   __fc_errno ∈ [--..--]
-  cur ∈ [0..2147483647]
+  cur ∈ [0..2147483647] or UNINITIALIZED
   line ∈
       {{ NULL ; &__malloc_w_getline_l73[0] ; &__realloc_w_getline_l104[0] }}
   len ∈ [0..2147483647]
@@ -410,10 +410,10 @@
   len ∈ [0..2147483647]
   total_len ∈ [--..--]
   read ∈ {-1} or UNINITIALIZED
-  c ∈ [-1..255]
+  c ∈ [-1..255] or UNINITIALIZED
   buf[0..8] ∈ [--..--] or UNINITIALIZED
      [9] ∈ {0} or UNINITIALIZED
-  r_1 ∈ {{ NULL ; &buf[0] }}
+  r_1 ∈ {{ NULL ; &buf[0] }} or UNINITIALIZED
   __retres ∈ {0; 1}
   __malloc_w_getline_l73[0..1] ∈ [--..--] or UNINITIALIZED
   __realloc_w_getline_l104[0..2147483645] ∈ [--..--] or UNINITIALIZED

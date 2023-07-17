@@ -16,6 +16,7 @@
   # cvalue:
   f1 ∈ [0x1.16c2000000000p-133 .. 0x1.16c3000000000p-133]
   d0 ∈ [0x1.16c262777579cp-133 .. 0x1.16c262777579dp-133]
+  d1 ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] Recording results for main

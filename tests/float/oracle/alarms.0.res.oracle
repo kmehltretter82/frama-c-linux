@@ -29,7 +29,12 @@
   ull ∈ {0}
   rand ∈ [--..--]
   l ∈ [--..--]
+  vf ∈ UNINITIALIZED
   tmp ∈ UNINITIALIZED
+  vd ∈ UNINITIALIZED
+  i ∈ UNINITIALIZED
+  j ∈ UNINITIALIZED
+  mvd ∈ UNINITIALIZED
   l ∈ [--..--]
   ==END OF DUMP==
 [kernel:annot:missing-spec] alarms.i:21: Warning: 
