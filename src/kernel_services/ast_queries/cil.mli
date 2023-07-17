@@ -862,6 +862,80 @@ val isIntegerConstant: ?is_varinfo_cst:(varinfo -> bool) -> exp -> bool
 *)
 val isConstantOffset: ?is_varinfo_cst:(varinfo -> bool) -> offset -> bool
 
+
+exception Cannot_combine of string
+
+
+type combineWhat =
+    CombineFundef of bool
+  (* The new definition is for a function definition. The old
+   * is for a prototype. arg is [true] for an old-style declaration *)
+  | CombineFunarg of bool
+  (* Comparing a function argument type with an old prototype argument.
+     arg is [true] for an old-style declaration, which
+     triggers some ad hoc treatment in GCC mode. *)
+  | CombineFunret (* Comparing the return of a function with that from an old
+                   * prototype *)
+  | CombineOther
+
+(** [combineAttributes what olda a] combines the attributes in [olda] and [a]
+    according to [what]:
+    - if [what == CombineFunarg], then override old attributes;
+      this is used to ensure that attributes from formal argument types in a
+      function definition are not mixed with attributes from arguments in other
+      (compatible, but with different qualifiers) declarations;
+    - else, perform the union of old and new attributes. **)
+val combineAttributes : combineWhat -> attribute list -> attributes -> attributes
+
+
+(** [combineFunction] contains informations about how enum, struct/union and typedef
+    should be handled. *)
+type combineFunction =
+  {
+    typ_combine :
+      combineFunction -> bool -> combineWhat -> int -> typ -> int -> typ -> typ;
+    enum_combine :
+      combineFunction -> int -> enuminfo -> int -> enuminfo -> enuminfo;
+    comp_combine :
+      combineFunction -> int -> compinfo -> int -> compinfo -> compinfo;
+    name_combine :
+      combineFunction -> combineWhat -> int -> typeinfo -> int -> typeinfo -> typeinfo;
+  }
+
+(** [combineTypesGen] combine two types accordingly to the combineFunction argument.
+    If types cannot be combine, it throw an exception. *)
+val combineTypesGen : combineFunction -> ?strictInteger:bool ->
+  ?strictReturnTypes:bool -> combineWhat -> int -> typ -> int -> typ -> typ
+
+(** Specialized verison of [combineTypesGen], we suppore here that
+    if two global symbols are equal, then they are the same object. *)
+val combineTypes : ?strictReturnTypes:bool -> combineWhat -> typ -> typ -> typ
+
+(* how type qualifiers must be checked *)
+type qualifier_check_context =
+  | Identical (* identical qualifiers. *)
+  | IdenticalToplevel (* ignore at toplevel, use Identical when going under a
+                         pointer. *)
+  | Covariant (* first type can have const-qualifications
+                 the second doesn't have. *)
+  | CovariantToplevel
+  (* accepts everything for current type, use Covariant when going under a
+     pointer. *)
+  | Contravariant (* second type can have const-qualifications
+                     the first doesn't have. *)
+  | ContravariantToplevel
+  (* accepts everything for current type, use Contravariant when going under
+     a pointer. *)
+
+(** [areCompatibleTypes] returns [true] if two types are compatible *)
+val areCompatibleTypes :
+  ?strictReturnTypes:bool -> ?context:qualifier_check_context -> typ -> typ -> bool
+
+(** same as [areCompatibleTypes] but returns the combined version *)
+val compatibleTypes :
+  ?strictReturnTypes:bool -> ?context:qualifier_check_context -> typ -> typ -> typ
+
+
 (** True if the given expression is a (possibly cast'ed) integer or character
     constant with value zero *)
 val isZero: exp -> bool
@@ -929,6 +1003,13 @@ val constFoldBinOp: loc:location -> bool -> binop -> exp -> exp -> typ -> exp
     @since Nitrogen-20111001
 *)
 val compareConstant: constant -> constant -> bool
+
+
+(** [true] if two kinds have the same size independently of the machine.*)
+val sameSizeInt : ikind -> ikind -> bool
+
+(** [true] if the result of two expressions are two equal integers. *)
+val same_int64 : ?machdep:bool -> exp -> exp -> bool
 
 (** Increment an expression. Can be arithmetic or pointer type *)
 val increm: exp -> int -> exp
@@ -1338,7 +1419,8 @@ val typeAttr: typ -> attribute list
 val setTypeAttrs: typ -> attributes -> typ
 
 (** Add some attributes to a type *)
-val typeAddAttributes: attribute list -> typ -> typ
+val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->
+  attribute list -> typ -> typ
 
 (** Remove all attributes with the given names from a type. Note that this
     does not remove attributes from typedef and tag definitions, just from

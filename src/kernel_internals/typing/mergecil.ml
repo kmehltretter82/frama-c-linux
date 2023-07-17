@@ -561,10 +561,6 @@ module ModelMerging =
         Format.fprintf fmt "model@ %a@ { %s }" Cil_printer.pp_typ t s
     end)
 
-let same_int64 e1 e2 =
-  match constFoldToInt e1, constFoldToInt e2 with
-  | Some i, Some i' -> Integer.equal i i'
-  | _ -> false
 
 let compare_int e1 e2 =
   match (constFold true e1), (constFold true e2) with
@@ -959,180 +955,17 @@ let intEnumInfoNode =
   EnumMerging.getNode eEq eSyn 0 intEnumInfo intEnumInfo
     (Some (Cil_datatype.Location.unknown, 0))
 
-(* Combine the types. Raises the Failure exception with an error message.
- * isdef says whether the new type is for a definition *)
-type combineWhat =
-    CombineFundef (* The new definition is for a function definition. The old
-                   * is for a prototype *)
-  | CombineFunarg (* Comparing a function argument type with an old prototype
-                   * arg *)
-  | CombineFunret (* Comparing the return of a function with that from an old
-                   * prototype *)
-  | CombineOther
-
-let rec combineTypes (what: combineWhat)
-    (oldfidx: int)  (oldt: typ)
-    (fidx: int) (t: typ)  : typ =
-  match oldt, t with
-  | TVoid olda, TVoid a -> TVoid (addAttributes olda a)
-  | TInt (oldik, olda), TInt (ik, a) ->
-    let combineIK oldk k =
-      if oldk == k
-      then oldk
-      else
-      if bytesSizeOfInt oldk=bytesSizeOfInt k && isSigned oldk=isSigned k
-      then
-        (* the types contain the same sort of values but are not equal.
-           For example on x86_16 machdep unsigned short and unsigned int. *)
-        if rank oldk<rank k then k else oldk
-      else
-        (* GCC allows a function definition to have a more precise integer
-         * type than a prototype that says "int" *)
-      if Cil.gccMode () && oldk = IInt && bitsSizeOf t <= 32
-         && (what = CombineFunarg || what = CombineFunret)
-      then
-        k
-      else (
-        let msg =
-          Format.asprintf
-            "different integer types %a and %a"
-            Cil_printer.pp_typ oldt Cil_printer.pp_typ t
-        in
-        raise (Failure msg))
-    in
-    TInt (combineIK oldik ik, addAttributes olda a)
-
-  | TFloat (oldfk, olda), TFloat (fk, a) ->
-    let combineFK oldk k =
-      if oldk == k then oldk else
-        (* GCC allows a function definition to have a more precise integer
-         * type than a prototype that says "double" *)
-      if Cil.gccMode () && oldk = FDouble && k = FFloat &&
-         (what = CombineFunarg || what = CombineFunret)
-      then
-        k
-      else
-        raise (Failure "different floating point types")
-    in
-    TFloat (combineFK oldfk fk, addAttributes olda a)
-
-  | TEnum (oldei, olda), TEnum (ei, a) ->
-    (* Matching enumerations always succeeds. But sometimes it maps both
-     * enumerations to integers *)
-    matchEnumInfo oldfidx oldei fidx ei;
-    TEnum (oldei, addAttributes olda a)
-
-
-  (* Strange one. But seems to be handled by GCC *)
-  | TEnum (oldei, olda) , TInt(IInt, a) -> TEnum(oldei,
-                                                 addAttributes olda a)
-
-  (* Strange one. But seems to be handled by GCC. Warning. Here we are
-   * leaking types from new to old  *)
-  | TInt(IInt, olda), TEnum (ei, a) -> TEnum(ei, addAttributes olda a)
-
-  | TComp (oldci, olda) , TComp (ci, a) ->
-    matchCompInfo oldfidx oldci fidx ci;
-    (* If we get here we were successful *)
-    TComp (oldci, addAttributes olda a)
-
-  | TArray (oldbt, oldsz, olda), TArray (bt, sz, a) ->
-    let combbt = combineTypes CombineOther oldfidx oldbt fidx bt in
-    let combinesz =
-      match oldsz, sz with
-        None, Some _ -> sz
-      | Some _, None -> oldsz
-      | None, None -> oldsz
-      | Some oldsz', Some sz' ->
-        if same_int64 oldsz' sz' then oldsz else
-          raise (Failure "different array sizes")
-    in
-    TArray (combbt, combinesz, addAttributes olda a)
-
-  | TPtr (oldbt, olda), TPtr (bt, a) ->
-    TPtr (combineTypes CombineOther oldfidx oldbt fidx bt,
-          addAttributes olda a)
-
-  | TFun (oldrt, oldargs, oldva, olda), TFun (rt, args, va, a) ->
-    let newrt =
-      combineTypes
-        (if what = CombineFundef then CombineFunret else CombineOther)
-        oldfidx oldrt fidx rt
-    in
-    if oldva != va then
-      raise (Failure "different vararg specifiers");
-    (* If one does not have arguments, believe the one with the
-     * arguments *)
-    let newargs =
-      if oldargs = None then args else
-      if args = None then oldargs else
-        let oldargslist = argsToList oldargs in
-        let argslist = argsToList args in
-        if List.length oldargslist <> List.length argslist then
-          raise (Failure "different number of arguments")
-        else begin
-          (* Go over the arguments and update the old ones with the
-           * adjusted types *)
-          Some
-            (List.map2
-               (fun (on, ot, oa) (an, at, aa) ->
-                  let n = if an <> "" then an else on in
-                  let t =
-                    combineTypes
-                      (if what = CombineFundef then CombineFunarg
-                       else CombineOther)
-                      oldfidx ot fidx at
-                  in
-                  let a = addAttributes oa aa in
-                  (n, t, a))
-               oldargslist argslist)
-        end
-    in
-    let olda =
-      if Cil.hasAttribute "missingproto" a then olda
-      else Cil.dropAttribute "missingproto" olda
-    in
-    let a =
-      if Cil.hasAttribute "missingproto" olda then a
-      else Cil.dropAttribute "missingproto" a
-    in
-    TFun (newrt, newargs, oldva, addAttributes olda a)
-
-  | TBuiltin_va_list olda, TBuiltin_va_list a ->
-    TBuiltin_va_list (addAttributes olda a)
-
-  | TNamed (oldt, olda), TNamed (t, a) ->
-    matchTypeInfo oldfidx oldt fidx t;
-    (* If we get here we were able to match *)
-    TNamed(oldt, addAttributes olda a)
-
-  (* Unroll first the new type *)
-  | _, TNamed (t, a) ->
-    let res = combineTypes what oldfidx oldt fidx t.ttype in
-    typeAddAttributes a res
-
-  (* And unroll the old type as well if necessary *)
-  | TNamed (oldt, a), _ ->
-    let res = combineTypes what oldfidx oldt.ttype fidx t in
-    typeAddAttributes a res
-
-  | _ -> (
-      (* raise (Failure "different type constructors") *)
-      let msg:string =
-        Format.asprintf
-          "different type constructors: %a vs. %a"
-          Cil_printer.pp_typ oldt Cil_printer.pp_typ t
-      in
-      raise (Failure msg))
 
 (* When comparing composite types for equality, we tolerate
    some differences related to packed/aligned attributes:
    if the offsets of each field are the same regardless of these
    attributes, we allow them to merge (arbitrarily choosing whether
    to keep or to drop such attributes). *)
-and equalModuloPackedAlign attrs1 attrs2 =
+let equalModuloPackedAlign attrs1 attrs2 =
   let drop = Cil.dropAttributes ["packed"; "aligned"] in
   equal_attributes_for_merge (drop attrs1) (drop attrs2)
+
+
 
 (* Checks if fields [f1] and [f2] (contained in the composite types
    [typ_ci1] and [typ_ci2] respectively) are equal except for
@@ -1140,36 +973,71 @@ and equalModuloPackedAlign attrs1 attrs2 =
    Raises [Failure] if the fields are not equivalent.
    If [mustCheckOffsets] is true, then there is already a difference in the
    composite type, so each field must be checked. *)
-and checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f1 f2 =
+let checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f1 f2 =
   if f1.fbitfield <> f2.fbitfield then
     raise (Failure "different bitfield info");
   if mustCheckOffsets || not (equal_attributes_for_merge f1.fattr f2.fattr) then
     (* different attributes: check if the difference is only due
        to aligned/packed attributes, and if the offsets are the same,
        in which case the difference may be safely ignored *)
-    begin
-      try
-        let offs1, width1 = Cil.fieldBitsOffset f1
-        and offs2, width2 = Cil.fieldBitsOffset f2
-        in
-        if not (equalModuloPackedAlign f1.fattr f2.fattr)
-        || offs1 <> offs2 || width1 <> width2 then
-          if mustCheckOffsets then
-            let err = "incompatible attributes in composite types "
-                      ^ "and/or field " ^ f1.fname in
-            raise (Failure err)
-          else
-            let err = "incompatible attributes for field " ^ f1.fname in
-            raise (Failure err)
-      with Not_found ->
-        Kernel.fatal
-          "field offset not found in table: %a or %a"
-          Printer.pp_field f1 Printer.pp_field f2
-    end
+    try
+      let offs1, width1 = Cil.fieldBitsOffset f1
+      and offs2, width2 = Cil.fieldBitsOffset f2
+      in
+      if not (equalModuloPackedAlign f1.fattr f2.fattr)
+      || offs1 <> offs2 || width1 <> width2 then
+        if mustCheckOffsets then
+          let err = "incompatible attributes in composite types and/or field "
+                    ^ f1.fname in
+          raise (Failure err)
+        else
+          let err = "incompatible attributes for field " ^ f1.fname in
+          raise (Failure err)
+    with Not_found ->
+      Kernel.fatal
+        "field offset not found in table: %a or %a"
+        Printer.pp_field f1 Printer.pp_field f2
 
-(* Match two compinfos and throw a Failure if they do not match *)
-and matchCompInfo (oldfidx: int) (oldci: compinfo)
-    (fidx: int)    (ci: compinfo) : unit =
+
+(* Match two enuminfos and throw a Failure if they do not match *)
+let matchEnumInfo (oldfidx: int) (oldei: enuminfo)
+    (fidx: int)    (ei: enuminfo) : unit =
+  (* Find the node for this enum, no path compression. *)
+  let oldeinode = EnumMerging.getNode eEq eSyn oldfidx oldei oldei None in
+  let einode = EnumMerging.getNode eEq eSyn fidx ei ei None in
+  if oldeinode == einode then (* We already know they are the same *)
+    ()
+  else
+    (* Replace with the representative data *)
+    let oldei = oldeinode.ndata in
+    let ei = einode.ndata in
+    (* Try to match them. But if you cannot just make them both integers *)
+    try
+      have_same_enum_items oldei ei;
+      (* Set the representative *)
+      let newrep, _ = EnumMerging.union oldeinode einode in
+      (* We get here if the enumerations match *)
+      newrep.ndata.eattr <- addAttributes oldei.eattr ei.eattr
+    with (Cannot_combine msg | Failure msg) ->
+      let pp_items = Pretty_utils.pp_list ~pre:"{" ~suf:"}" ~sep:",@ "
+          (fun fmt item ->
+             Format.fprintf fmt "%s=%a" item.eiorig_name
+               Cil_printer.pp_exp item.eival)
+      in
+      if oldeinode != intEnumInfoNode && einode != intEnumInfoNode then
+        Kernel.warning
+          "@[merging definitions of enum %s using int type@ (%s);@ items %a and@ %a@]"
+          oldei.ename msg
+          pp_items oldei.eitems pp_items ei.eitems;
+      (* Get here if you cannot merge two enumeration nodes *)
+      if oldeinode != intEnumInfoNode then
+        ignore(EnumMerging.union oldeinode intEnumInfoNode);
+      if einode != intEnumInfoNode then
+        ignore(EnumMerging.union einode intEnumInfoNode)
+
+
+let matchCompInfoGen (combineF : combineFunction) (oldfidx: int) (oldci: compinfo)
+    (fidx: int) (ci: compinfo) : unit =
   let cstruct = oldci.cstruct in
   if cstruct <> ci.cstruct then
     raise (Failure "different struct/union types");
@@ -1182,7 +1050,7 @@ and matchCompInfo (oldfidx: int) (oldci: compinfo)
   let cinode = PlainMerging.getNode sEq sSyn fidx ci.cname ci None in
   if oldcinode == cinode then (* We already know they are the same *)
     ()
-  else begin
+  else
     (* Replace with the representative data *)
     let oldci = oldcinode.ndata in
     let oldfidx = oldcinode.nfidx in
@@ -1245,12 +1113,12 @@ and matchCompInfo (oldfidx: int) (oldci: compinfo)
                    should be the same.
                    We do not force this for now, but could do it. *)
                 let newtype =
-                  combineTypes CombineOther oldfidx oldf.ftype fidx f.ftype
-                in
+                  combineF.typ_combine combineF true
+                    CombineOther oldfidx oldf.ftype fidx f.ftype in
                 (* Change the type in the representative *)
                 oldf.ftype <- newtype)
              oldfields fields
-         with Failure reason ->
+         with (Cannot_combine reason | Failure reason) ->
            (* Our assumption was wrong. Forget the isomorphism *)
            undo ();
            let fields_old =
@@ -1295,53 +1163,10 @@ and matchCompInfo (oldfidx: int) (oldci: compinfo)
     (* We get here when we succeeded checking that they are equal, or one of
      * them was empty *)
     newrep.ndata.cattr <- addAttributes oldci.cattr ci.cattr
-  end
-
-(* Match two enuminfos and throw a Failure if they do not match *)
-and matchEnumInfo (oldfidx: int) (oldei: enuminfo)
-    (fidx: int)    (ei: enuminfo) : unit =
-  (* Find the node for this enum, no path compression. *)
-  let oldeinode = EnumMerging.getNode eEq eSyn oldfidx oldei oldei None
-  in
-  let einode = EnumMerging.getNode eEq eSyn fidx ei ei None in
-  if oldeinode == einode then (* We already know they are the same *)
-    ()
-  else begin
-    (* Replace with the representative data *)
-    let oldei = oldeinode.ndata in
-    let ei = einode.ndata in
-    (* Try to match them. But if you cannot just make them both integers *)
-    try
-      have_same_enum_items oldei ei;
-      (* Set the representative *)
-      let newrep, _ = EnumMerging.union oldeinode einode in
-      (* We get here if the enumerations match *)
-      newrep.ndata.eattr <- addAttributes oldei.eattr ei.eattr;
-      ()
-    with Failure msg -> begin
-        let pp_items = Pretty_utils.pp_list ~pre:"{" ~suf:"}" ~sep:",@ "
-            (fun fmt item ->
-               Format.fprintf fmt "%s=%a" item.eiorig_name
-                 Cil_printer.pp_exp item.eival)
-        in
-        if oldeinode != intEnumInfoNode && einode != intEnumInfoNode then
-          Kernel.warning
-            "@[merging definitions of enum %s using int type@ (%s);@ items %a and@ %a@]"
-            oldei.ename msg
-            pp_items oldei.eitems pp_items ei.eitems;
-        (* Get here if you cannot merge two enumeration nodes *)
-        if oldeinode != intEnumInfoNode then begin
-          let _ = EnumMerging.union oldeinode intEnumInfoNode in ()
-        end;
-        if einode != intEnumInfoNode then begin
-          let _ = EnumMerging.union einode intEnumInfoNode in ()
-        end;
-      end
-  end
 
 
 (* Match two typeinfos and throw a Failure if they do not match *)
-and matchTypeInfo (oldfidx: int) (oldti: typeinfo)
+let matchTypeInfoGen (combineF : combineFunction) (oldfidx: int) (oldti: typeinfo)
     (fidx: int)      (ti: typeinfo) : unit =
   if oldti.tname = "" || ti.tname = "" then
     Kernel.fatal "matchTypeInfo for anonymous type";
@@ -1350,7 +1175,7 @@ and matchTypeInfo (oldfidx: int) (oldti: typeinfo)
   let tnode = PlainMerging.getNode tEq tSyn    fidx ti.tname    ti None in
   if oldtnode == tnode then (* We already know they are the same *)
     ()
-  else begin
+  else
     (* Replace with the representative data *)
     let oldti = oldtnode.ndata in
     let oldfidx = oldtnode.nfidx in
@@ -1358,27 +1183,46 @@ and matchTypeInfo (oldfidx: int) (oldti: typeinfo)
     let fidx = tnode.nfidx in
     (* Check that they are the same *)
     (try
-       ignore (combineTypes CombineOther oldfidx oldti.ttype fidx ti.ttype);
-     with Failure reason -> begin
-         let msg =
-           let oldname = oldti.tname in
-           let name = ti.tname in
-           if oldname = name
-           then
-             Format.sprintf
-               "Definitions of type %s are not isomorphic. \
-                Reason follows:@\n@?%s"
-               oldname reason
-           else
-             Format.sprintf
-               "Types %s and %s are not isomorphic. Reason follows:@\n@?%s"
-               oldname name reason
-         in
-         raise (Failure msg)
-       end);
-    let _ = union oldtnode tnode in
-    ()
-  end
+       ignore (combineF.typ_combine combineF true
+                 CombineOther oldfidx oldti.ttype fidx ti.ttype);
+     with (Cannot_combine reason | Failure reason) ->
+       let msg =
+         let oldname = oldti.tname in
+         let name = ti.tname in
+         if oldname = name
+         then
+           Format.sprintf
+             "Definitions of type %s are not isomorphic. \
+              Reason follows:@\n@?%s"
+             oldname reason
+         else
+           Format.sprintf
+             "Types %s and %s are not isomorphic. Reason follows:@\n@?%s"
+             oldname name reason
+       in
+       raise (Failure msg));
+    ignore(union oldtnode tnode)
+
+let combines = {
+  typ_combine = (fun a b -> combineTypesGen a ~strictInteger:false ~strictReturnTypes:b);
+  enum_combine = (fun _ oldfidx oldei fidx ei ->
+      matchEnumInfo oldfidx oldei fidx ei;
+      oldei);
+  comp_combine = (fun c oldfidx oldei fidx ei ->
+      matchCompInfoGen c oldfidx oldei fidx ei;
+      oldei);
+  name_combine = (fun c _ oldfidx oldei fidx ei ->
+      matchTypeInfoGen c oldfidx oldei fidx ei;
+      oldei);
+}
+
+let matchCompInfo = matchCompInfoGen combines
+
+let matchTypeInfo = matchTypeInfoGen combines
+
+let combineTypes = combines.typ_combine combines true
+
+(* Match two compinfos and throw a Failure if they do not match *)
 
 let update_compinfo ci =
   let node =
@@ -1701,7 +1545,7 @@ let oneFilePass1 (f:file) : unit =
           combineTypes CombineOther
             oldvinode.nfidx oldvi.vtype
             !currentFidx vi.vtype, fst (union oldvinode vinode);
-        with (Failure reason) -> begin
+        with (Cannot_combine reason | Failure reason) -> begin
             (* If one of the variable is currently unused, we can ignore it.
                If both are unused and only one is defined, we keep this one.
                Otherwise, we keep the old variable by default. *)
