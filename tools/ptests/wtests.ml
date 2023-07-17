@@ -211,7 +211,8 @@ let wrapper json test =
   let error = ret_code <> test.ret_code in
   if error || !verbosity > 0 then begin
     if test.out <> "" then print_file test.dir (if test.tmpout = "" then test.out else test.tmpout) ;
-    if test.err <> "" then print_file test.dir (if test.tmperr = "" then test.err else test.tmperr)
+    if test.err <> "" then print_file test.dir (if test.tmperr = "" then test.err else test.tmperr) ;
+    List.iter (print_file test.dir) test.log
   end;
   if error then begin
     Format.printf "%a: return code (%d) differs from the requested code (%d) for the command:%s@."

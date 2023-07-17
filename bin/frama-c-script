@@ -279,6 +279,11 @@ case "$command" in
         shift;
         ${FRAMAC_LIB}/analysis-scripts/creduce.sh "$@";
         ;;
+    "make-machdep")
+        shift;
+        ${FRAMAC_LIB}/make_machdep/make_machdep.py \
+          --machdep-schema ${FRAMAC_SHARE}/machdeps/machdep-schema.yaml "$@"
+        ;;
     *)
         echo "error: unrecognized command: $command";
         exit 1
