@@ -3372,7 +3372,7 @@ let rec collectInitializer
         Cil_datatype.Typ.pretty thistype !pMaxIdx;
       (* Find the field to initialize *)
       let rec findField (idx: int) = function
-        | [] -> abort_context "collectInitializer: union"
+        | [] -> Kernel.fatal ~current:true "collectInitializer: union"
         | _ :: rest when idx < !pMaxIdx && !pArray.(idx) = NoInitPre ->
           findField (idx + 1) rest
         | f :: _ when idx = !pMaxIdx ->
@@ -3492,7 +3492,7 @@ and normalSubobj (so: subobj) : unit =
 
 (* Advance to the next subobject. Always apply to a normalized object *)
 and advanceSubobj (so: subobj) : unit =
-  if so.eof then abort_context "advanceSubobj past end";
+  if so.eof then Kernel.fatal ~current:true "advanceSubobj past end";
   match so.stack with
   | [] ->
     Kernel.debug ~dkey:Kernel.dkey_typing_init "Setting eof to true";
@@ -3509,7 +3509,7 @@ and advanceSubobj (so: subobj) : unit =
     let fi, flds' =
       match nextflds with
       | Field (fi,_) :: flds' -> fi, flds'
-      | _ -> abort_context "advanceSubobj"
+      | _ -> Kernel.fatal ~current:true "advanceSubobj"
     in
     Kernel.debug ~dkey:Kernel.dkey_typing_init
       "Advancing past .%s" fi.fname;
@@ -4341,7 +4341,8 @@ let rec doSpecList ghost (suggestedAnonName: string)
     | Cabs.SpecCV cv -> cvattrs := cv :: !cvattrs; acc
     | Cabs.SpecAttr a -> attrs := a :: !attrs; acc
     | Cabs.SpecType ts -> ts :: acc
-    | Cabs.SpecPattern _ -> abort_context "SpecPattern in cabs2cil input"
+    | Cabs.SpecPattern _ ->
+      Kernel.fatal ~current:true "SpecPattern in cabs2cil input"
   in
   (* Now scan the list and collect the type specifiers. Preserve the order *)
   let tspecs = List.fold_right doSpecElem specs [] in
@@ -7496,7 +7497,8 @@ and doExp local_env
           (makeCast ~e:(integer ~loc addrval) ~newt:voidPtrType) voidPtrType
       end
 
-    | Cabs.EXPR_PATTERN _ -> abort_context "EXPR_PATTERN in cabs2cil input"
+    | Cabs.EXPR_PATTERN _ ->
+      Kernel.fatal ~current:true "EXPR_PATTERN in cabs2cil input"
 
 
     | Cabs.GENERIC (ce, assocs) ->
@@ -8477,7 +8479,8 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
             | _ -> abort_context "INDEX designator for a non-array"
           end
 
-        | Cabs.ATINDEXRANGE_INIT _ -> abort_context "addressSubobj: INDEXRANGE"
+        | Cabs.ATINDEXRANGE_INIT _ ->
+          Kernel.fatal ~current:true "addressSubobj: INDEXRANGE"
       in
       address what acc
     in
@@ -9058,7 +9061,7 @@ and doAliasFun ghost vtype (thisname:string) (othername:string)
   (* get the new function *)
   let v,_ =
     try lookupGlobalVar ghost thisname
-    with Not_found -> abort_context "error in doDecl"
+    with Not_found -> Kernel.fatal ~current:true "error in doDecl"
   in
   v.vattr <- dropAttribute "alias" v.vattr
 
@@ -9572,7 +9575,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
       (fun d ->
          let s = doDecl local_env isglobal d in
          if isNotEmpty s then
-           abort_context "doDecl returns non-empty statement for global")
+           Kernel.fatal ~current:true "doDecl returns non-empty statement for global")
       dl;
     empty
 
@@ -10395,7 +10398,8 @@ let convFile (path, f) =
     let local_env = ghost_local_env ghost in
     let s = doDecl local_env true d in
     if isNotEmpty s then
-      abort_context "doDecl returns non-empty statement for global";
+      Kernel.fatal ~current:true
+        "doDecl returns non-empty statement for global";
   in
   List.iter doOneGlobal f;
   let globals = fileGlobals () in
