@@ -3181,7 +3181,7 @@ let rec setOneInit this o preinit =
           try
             ref idx, ref (Array.make (max 32 (idx + 1)) NoInitPre)
           with Invalid_argument _ | Out_of_memory ->
-            Kernel.abort ~current:true
+            abort_context
               "array length too large: %d" ((max 32 (idx + 1)))
         end
 
@@ -3197,7 +3197,7 @@ let rec setOneInit this o preinit =
               Array.blit !pArray 0 newarray 0 l;
               pArray := newarray
             with Invalid_argument _ | Out_of_memory ->
-              Kernel.abort ~current:true
+              abort_context
                 "array length too large for Frama-C: %d" (idx)
           end
         end;
@@ -3568,7 +3568,7 @@ let integerArrayLength (leno: exp option) : int =
     try lenOfArray leno
     with
     | LenOfArray cause ->
-      Kernel.abort ~current:true
+      abort_context
         "Array length %a is %a: no explicit initializer allowed."
         Cil_printer.pp_exp len Cil.pp_incorrect_array_length cause
 
@@ -4176,7 +4176,7 @@ let get_lval_compound_assigned op expr =
      The result is also of the cast type *)
   | CastE (_, {enode = Lval x}) ->
     if Cil.is_modifiable_lval x then x else
-      Kernel.abort ~current:true
+      abort_context
         "Cannot assign to non-modifiable lval %a"
         Cil_printer.pp_lval x
   | _ -> Kernel.fatal ~current:true "Expected lval for %s" op
@@ -5372,7 +5372,7 @@ and makeCompType ghost (isstruct: bool)
           if Cil_datatype.Compinfo.equal comp comp' then begin
             (* abort and not error, as this circularity could lead
                to infinite recursion... *)
-            Kernel.abort ~current:true
+            abort_context
               "type %s %s is circular"
               (if comp.cstruct then "struct" else "union")
               comp.cname;
@@ -5683,18 +5683,18 @@ and doExp local_env
           | _ -> raise Not_found
         with Not_found -> begin
             if isOldStyleVarArgName n then
-              Kernel.abort ~current:true
+              abort_context
                 "Cannot resolve variable %s. \
                  This could be a CIL bug due to \
                  the handling of old-style variable argument functions"
                 n
             else if only_ghost_symbol n then
-              Kernel.abort ~current:true
+              abort_context
                 "Variable %s is a ghost symbol. \
                  It cannot be used in non-ghost context. \
                  Did you forget a /*@@ ghost ... /?" n
             else
-              Kernel.abort ~current:true "Cannot resolve variable %s" n
+              abort_context "Cannot resolve variable %s" n
           end
       end
     | Cabs.INDEX (e1, e2) -> begin
@@ -6257,14 +6257,14 @@ and doExp local_env
               match e1'.enode with
               | Lval x when Cil.is_modifiable_lval x -> x
               | Lval x ->
-                Kernel.abort ~current:true
+                abort_context
                   "Cannot assign to non-modifiable lval %a"
                   Cil_printer.pp_lval x
               | StartOf lv ->
-                Kernel.abort ~current:true
+                abort_context
                   "Cannot assign array %a" Cil_printer.pp_lval lv
               | _ ->
-                Kernel.abort ~current:true
+                abort_context
                   "Expected lval for assignment. Got %a"
                   Cil_printer.pp_exp e1'
             in
@@ -6530,7 +6530,7 @@ and doExp local_env
             (* Found. Do not use finishExp. Simulate what = AExp None  *)
             with Not_found -> begin
                 if only_ghost_symbol n then
-                  Kernel.abort ~current:true
+                  abort_context
                     "Function %s is a ghost symbol. \
                      It cannot be used in non-ghost context. \
                      Did you forget a /*@@ ghost ... /?" n ;
@@ -7024,7 +7024,7 @@ and doExp local_env
                        s;
                  end
                | _ ->
-                 Kernel.abort ~current:true "Invalid call to builtin_offsetof"
+                 abort_context "Invalid call to builtin_offsetof"
              end
            | "__builtin_types_compatible_p" ->
              begin
@@ -7501,28 +7501,28 @@ and doExp local_env
     | Cabs.GENERIC (ce, assocs) ->
       let (_, _, control_exp, control_t) = doExp local_env asconst ce AType in
       match Cil.lvalue_conversion control_t with
-      | Error msg -> Kernel.abort ~current:true "%s" msg
+      | Error msg -> abort_context "%s" msg
       | Ok control_t ->
         let has_default, assocs =
           List.fold_left (fun (has_default, acc) (type_name, expr) ->
               match type_name with
               | None -> (* default *)
                 if has_default then
-                  Kernel.abort ~current:true
+                  abort_context
                     "multiple default clauses in _Generic selection";
                 true, ((None, expr) :: acc)
               | Some (spec, dt) ->
                 let t = doOnlyType ghost spec dt in
                 if not (Cil.isCompleteType t) then
-                  Kernel.abort ~current:true
+                  abort_context
                     "generic association with incomplete type '%a'"
                     Cil_datatype.Typ.pretty t
                 else if (Cil.isFunctionType t) then
-                  Kernel.abort ~current:true
+                  abort_context
                     "generic association with function type '%a'"
                     Cil_datatype.Typ.pretty t
                 else if (Cil.is_variably_modified_type t) then
-                  Kernel.abort ~current:true
+                  abort_context
                     "generic association with variably modified type '%a'"
                     Cil_datatype.Typ.pretty t
                 else begin
@@ -7535,7 +7535,7 @@ and doExp local_env
                       | None -> ()
                       | Some t' ->
                         if areCompatibleTypes ~strictReturnTypes:true t t' then
-                          Kernel.abort ~current:true
+                          abort_context
                             "multiple compatible types in _Generic selection:@ \
                              '%a' and '%a'"
                             Cil_printer.pp_typ t'
@@ -7554,7 +7554,7 @@ and doExp local_env
             ) assocs
         in
         if List.length candidates > 1 then
-          Kernel.abort ~current:true
+          abort_context
             "controlling expression compatible with more than one association \
              type in _Generic selection:@ \
              controlling expression: '%a' (type: %a);@ \
@@ -7569,7 +7569,7 @@ and doExp local_env
           let types =
             List.map (fun (type_name, _) -> Option.get type_name) assocs
           in
-          Kernel.abort ~current:true
+          abort_context
             "no compatible types and no default type in _Generic selection:@ \
              controlling expression: '%a' (type: %a);@ \
              candidate types: %a"
