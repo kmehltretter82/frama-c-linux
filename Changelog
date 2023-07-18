@@ -19,6 +19,15 @@ Open Source Release <next-release>
 ###############################################################################
 
 ###############################################################################
+Open Source Release 27.1 (Cobalt)
+###############################################################################
+
+-   Kernel    [2023-07-17] New frama-c-script wrapper for make_machdep.py
+-*  Ivette    [2023-07-06] Fixes crash with multiple instances
+-*  GUI       [2023-07-05] Fixes freeze when a plugin aborts during splash screen
+-*  GUI       [2023-07-05] Fixes crash related to tags and undefined types
+
+###############################################################################
 Open Source Release 27.0 (Cobalt)
 ###############################################################################
 

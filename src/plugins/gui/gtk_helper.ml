@@ -738,6 +738,7 @@ class error_manager ?reset (o_parent:GWindow.window_skel) : host =
           ~title:"Error"
           ~position:`CENTER_ALWAYS
           ~modal:true
+          ~destroy_with_parent:true
           ()
       in
       ignore (w#connect#response ~callback:(fun _ -> w#destroy ()));

@@ -1977,10 +1977,14 @@ let warn_if_not_enabled =
   let dune_cond_regexp = Str.regexp "^(\\(.*\\))" in
   let doublequote_regexp = Str.regexp "\"" in
   let dune_var_regexp = Str.regexp "%{" in
+  let paren_regexp = Str.regexp "[()]" in
   let dune_cond_item s = Str.global_replace dune_cond_regexp "\\1" s in
   let escaped_cond s =
     let s = Str.global_replace dune_var_regexp "\\%{" s in
     Str.global_replace doublequote_regexp "\\\"" s
+  in
+  let safe_cond s =
+    Str.global_replace paren_regexp "\"\\0\"" s
   in
   fun ~env ~suite fmt enabled_if ->
     if not (StringSet.is_empty enabled_if) then begin
@@ -2000,7 +2004,7 @@ let warn_if_not_enabled =
       let pp_enabled  fmt cond =
         let cond = dune_cond_item cond in
         Format.fprintf fmt "              (echo \"- %s: \" %s \"\\n\")\n  "
-          (escaped_cond cond) cond
+          (escaped_cond cond) (safe_cond cond)
       in
       let conds = StringSet.elements enabled_if in
       Format.fprintf fmt

@@ -1,7 +1,7 @@
 (subdir
  result/utils
- (copy_files ../../utils/*))
+ (copy_files ../../../utils/*))
 
 (subdir
  result_dev/utils
- (copy_files ../../utils/*))
+ (copy_files ../../../utils/*))
