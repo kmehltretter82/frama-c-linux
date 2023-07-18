@@ -209,7 +209,7 @@ wp-tests:
     - ./nix/build-proxy.sh wp-tests
   <<: *coverage
 
-e2e-tests:
+e2e-webdriverio-tests:
   stage: tests
   image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
   before_script:
@@ -235,6 +235,32 @@ e2e-tests:
     - npm install
     - export MONKEY=true 
     - xvfb-run pnpm test
+  tags:
+    - docker
+
+e2e-playwright-tests:
+  stage: tests
+  image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
+  before_script:
+    - sudo apt update
+    - sudo apt install -y xvfb curl
+    - sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+    - export NVM_DIR="$HOME/.nvm"
+    - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
+    - '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+    - nvm install 16
+    - nvm use node 16
+    - corepack enable
+  cache:
+    paths:
+      - ivette/node_modules/
+  script:
+    - node --version
+    - npm --version
+    - yarn --version
+    - cd ivette
+    - yarn
+    - xvfb-run yarn playwright test
   tags:
     - docker
 
