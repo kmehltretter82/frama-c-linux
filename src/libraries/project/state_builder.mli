@@ -119,7 +119,7 @@ module type Ref = sig
   (** Reset the reference to its default value. *)
 
   val add_hook_on_change: (data -> unit) -> unit
-  (** Add an hook which applied each time (just after) the value of the state
+  (** Add an hook which is applied each time (just after) the value of the state
       changes inside the current project.
       @since Frama-C+dev *)
 end
@@ -150,7 +150,7 @@ module type Option_ref = sig
   (** @since Beryllium-20090901 *)
 
   val add_hook_on_change: (data option -> unit) -> unit
-  (** Add an hook which applied each time (just after) the value of the state
+  (** Add an hook which is applied each time (just after) the value of the state
       changes inside the current project.
       @since Frama-C+dev *)
 end
@@ -386,7 +386,7 @@ module type Hashtbl = sig
       @since 27.0-Cobalt *)
 
   val add_hook_on_change: ((key, data) hashtbl_event -> unit) -> unit
-  (** Add an hook which applied each time (just after) a (key,value) pair in
+  (** Add an hook which is applied each time (just after) a (key,value) pair in
       the hashtable changes inside the current project.
       @since Frama-C+dev *)
 end
