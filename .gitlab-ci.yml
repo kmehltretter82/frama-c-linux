@@ -261,7 +261,9 @@ e2e-playwright-tests:
     - opam switch create 4.13.0
     - eval $(opam env)
     - ocaml -version
-    - opam install -y dune merlin ocaml-lsp-server odoc ocamlformat utop dune-release UnionFind ppx_import dune-site
+    - opam update
+    - opam install -y dune merlin ocaml-lsp-server odoc ocamlformat utop dune-release UnionFind headache
+    - opam install --deps-only .
     - make clean && make && make -C ivette dist
     - cd ivette
     - cp dist/renderer/* dist/main/
