@@ -482,7 +482,7 @@ end
 (* ************************************************************************* *)
 
 type ('k,'v) hashtbl_event =
-  | Update of ('k * 'v)
+  | Update of 'k * 'v
   | Remove of 'k
   | Clear
 
