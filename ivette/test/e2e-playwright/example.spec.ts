@@ -24,7 +24,7 @@ import { expect, test } from '@playwright/test';
 import { _electron as electron } from 'playwright-core';
 
 test('launch app', async () => {
-    const electronApp = await electron.launch({ args: ['main.js', '--command', '/home/user01/artal/git/frama-c/bin/frama-c'] , cwd: "dist/main/"})
+    const electronApp = await electron.launch({ args: ['main.js', '--command', '/builds/frama-c/frama-c/bin/frama-c'] , cwd: "dist/main/"})
 
     // Evaluation expression in the Electron context.
     const appPath = await electronApp.evaluate(async ({ app }) => {
@@ -41,7 +41,7 @@ test('launch app', async () => {
     await window.getByText("Console").nth(1).click();
 
     // Await manual input by user to resume the test
-    await window.pause()
+    // await window.pause()
     
     // Check the server status in the header's button bar
     await expect(window.locator(".dome-xToolBar").getByRole("button", { name: "Start the server" , exact: true})).toBeDisabled();
@@ -55,7 +55,7 @@ test('launch app', async () => {
     await expect(window.getByTitle("Server is running")).toHaveText("ON");
     
     // Capture a screenshot.
-    await window.screenshot({ path: 'ivette.png' });
+    // await window.screenshot({ path: 'ivette.png' });
 
 
     // Exit app.

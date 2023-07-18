@@ -258,8 +258,9 @@ e2e-playwright-tests:
     - node --version
     - npm --version
     - yarn --version
+    - make clean && make && make -C ivette dist
     - cd ivette
-    - yarn
+    - cp dist/renderer/* dist/main/
     - xvfb-run yarn playwright test
   tags:
     - docker
