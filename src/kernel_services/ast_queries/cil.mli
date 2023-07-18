@@ -665,6 +665,106 @@ val splitFunctionTypeVI:
   typ * (string * typ * attributes) list option * bool * attributes
 
 
+exception Cannot_combine of string
+
+(** Used in {!combineTypes} and {!combineTypesGen} to indicate what we want to
+    combine.
+
+    @since Frama-C+dev
+*)
+type combineWhat =
+  | CombineFundef of bool
+  (** The new definition is for a function definition. The old is for a
+      prototype. arg is [true] for an old-style declaration.
+  *)
+  | CombineFunarg of bool
+  (** Comparing a function argument type with an old prototype argument. arg is
+      [true] for an old-style declaration, which triggers some ad hoc treatment
+      in GCC mode.
+  *)
+  | CombineFunret
+  (** Comparing the return of a function with that from an old prototype *)
+  | CombineOther
+
+(** [combineAttributes what olda a] combines the attributes in [olda] and [a]
+    according to [what]:
+    - if [what == CombineFunarg], then override old attributes;
+      this is used to ensure that attributes from formal argument types in a
+      function definition are not mixed with attributes from arguments in other
+      (compatible, but with different qualifiers) declarations;
+    - else, perform the union of old and new attributes.
+
+    @since Frama-C+dev
+*)
+val combineAttributes : combineWhat -> attribute list -> attributes -> attributes
+
+(** [combineFunction] contains informations about how enum, struct/union and
+    typedef should be handled when combining with {!combineTypes} and
+    {!combineTypesGen}
+
+    @since Frama-C+dev
+*)
+type combineFunction =
+  {
+    typ_combine :
+      combineFunction -> bool -> combineWhat -> int -> typ -> int -> typ -> typ;
+    enum_combine :
+      combineFunction -> int -> enuminfo -> int -> enuminfo -> enuminfo;
+    comp_combine :
+      combineFunction -> int -> compinfo -> int -> compinfo -> compinfo;
+    name_combine :
+      combineFunction -> combineWhat -> int -> typeinfo -> int -> typeinfo -> typeinfo;
+  }
+
+(** [combineTypesGen] combine two types accordingly to the combineFunction argument.
+    If types cannot be combine, it throw an exception.
+
+    @since Frama-C+dev
+*)
+val combineTypesGen : combineFunction -> ?strictInteger:bool ->
+  ?strictReturnTypes:bool -> combineWhat -> int -> typ -> int -> typ -> typ
+
+(** Specialized verison of [combineTypesGen], we suppore here that
+    if two global symbols are equal, then they are the same object.
+
+    @since Frama-C+dev
+*)
+val combineTypes : ?strictReturnTypes:bool -> combineWhat -> typ -> typ -> typ
+
+(** How type qualifiers must be checked when chechking for types compatibility
+    with {!areCompatibleTypes} and {!compatibleTypes}.
+
+    @since Frama-C+dev
+*)
+type qualifier_check_context =
+  | Identical (** Identical qualifiers. *)
+  | IdenticalToplevel
+  (** Ignore at toplevel, use Identical when going under a pointer. *)
+  | Covariant
+  (** First type can have const-qualifications the second doesn't have. *)
+  | CovariantToplevel
+  (** Accepts everything for current type, use Covariant when going under a
+      pointer. *)
+  | Contravariant
+  (** Second type can have const-qualifications the first doesn't have. *)
+  | ContravariantToplevel
+  (** Accepts everything for current type, use Contravariant when going under
+      a pointer. *)
+
+(** [areCompatibleTypes] returns [true] if two types are compatible
+
+    @since Frama-C+dev
+*)
+val areCompatibleTypes :
+  ?strictReturnTypes:bool -> ?context:qualifier_check_context -> typ -> typ -> bool
+
+(** Same as [areCompatibleTypes] but returns the combined version
+
+    @since Frama-C+dev
+*)
+val compatibleTypes :
+  ?strictReturnTypes:bool -> ?context:qualifier_check_context -> typ -> typ -> typ
+
 (*********************************************************)
 (**  LVALUES *)
 
@@ -861,80 +961,6 @@ val isIntegerConstant: ?is_varinfo_cst:(varinfo -> bool) -> exp -> bool
     @before Frama-C+dev [is_varinfo_cst] does not exist
 *)
 val isConstantOffset: ?is_varinfo_cst:(varinfo -> bool) -> offset -> bool
-
-
-exception Cannot_combine of string
-
-
-type combineWhat =
-    CombineFundef of bool
-  (* The new definition is for a function definition. The old
-   * is for a prototype. arg is [true] for an old-style declaration *)
-  | CombineFunarg of bool
-  (* Comparing a function argument type with an old prototype argument.
-     arg is [true] for an old-style declaration, which
-     triggers some ad hoc treatment in GCC mode. *)
-  | CombineFunret (* Comparing the return of a function with that from an old
-                   * prototype *)
-  | CombineOther
-
-(** [combineAttributes what olda a] combines the attributes in [olda] and [a]
-    according to [what]:
-    - if [what == CombineFunarg], then override old attributes;
-      this is used to ensure that attributes from formal argument types in a
-      function definition are not mixed with attributes from arguments in other
-      (compatible, but with different qualifiers) declarations;
-    - else, perform the union of old and new attributes. **)
-val combineAttributes : combineWhat -> attribute list -> attributes -> attributes
-
-
-(** [combineFunction] contains informations about how enum, struct/union and typedef
-    should be handled. *)
-type combineFunction =
-  {
-    typ_combine :
-      combineFunction -> bool -> combineWhat -> int -> typ -> int -> typ -> typ;
-    enum_combine :
-      combineFunction -> int -> enuminfo -> int -> enuminfo -> enuminfo;
-    comp_combine :
-      combineFunction -> int -> compinfo -> int -> compinfo -> compinfo;
-    name_combine :
-      combineFunction -> combineWhat -> int -> typeinfo -> int -> typeinfo -> typeinfo;
-  }
-
-(** [combineTypesGen] combine two types accordingly to the combineFunction argument.
-    If types cannot be combine, it throw an exception. *)
-val combineTypesGen : combineFunction -> ?strictInteger:bool ->
-  ?strictReturnTypes:bool -> combineWhat -> int -> typ -> int -> typ -> typ
-
-(** Specialized verison of [combineTypesGen], we suppore here that
-    if two global symbols are equal, then they are the same object. *)
-val combineTypes : ?strictReturnTypes:bool -> combineWhat -> typ -> typ -> typ
-
-(* how type qualifiers must be checked *)
-type qualifier_check_context =
-  | Identical (* identical qualifiers. *)
-  | IdenticalToplevel (* ignore at toplevel, use Identical when going under a
-                         pointer. *)
-  | Covariant (* first type can have const-qualifications
-                 the second doesn't have. *)
-  | CovariantToplevel
-  (* accepts everything for current type, use Covariant when going under a
-     pointer. *)
-  | Contravariant (* second type can have const-qualifications
-                     the first doesn't have. *)
-  | ContravariantToplevel
-  (* accepts everything for current type, use Contravariant when going under
-     a pointer. *)
-
-(** [areCompatibleTypes] returns [true] if two types are compatible *)
-val areCompatibleTypes :
-  ?strictReturnTypes:bool -> ?context:qualifier_check_context -> typ -> typ -> bool
-
-(** same as [areCompatibleTypes] but returns the combined version *)
-val compatibleTypes :
-  ?strictReturnTypes:bool -> ?context:qualifier_check_context -> typ -> typ -> typ
-
 
 (** True if the given expression is a (possibly cast'ed) integer or character
     constant with value zero *)
