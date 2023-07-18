@@ -251,9 +251,6 @@ e2e-playwright-tests:
     - nvm install 16
     - nvm use node 16
     - corepack enable
-  cache:
-    paths:
-      - ivette/node_modules/
   script:
     - node --version
     - npm --version
@@ -264,6 +261,7 @@ e2e-playwright-tests:
     - opam update
     - opam install -y dune merlin ocaml-lsp-server odoc ocamlformat utop dune-release UnionFind headache
     - opam install --deps-only .
+    - rm -rf ivette/node_modules
     - make clean && make && make -C ivette dist
     - cd ivette
     - cp dist/renderer/* dist/main/
