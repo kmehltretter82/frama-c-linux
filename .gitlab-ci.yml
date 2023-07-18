@@ -243,7 +243,7 @@ e2e-playwright-tests:
   image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
   before_script:
     - sudo apt update
-    - sudo apt install -y xvfb curl
+    - sudo apt install -y xvfb curl bubblewrap unzip
     - sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
     - export NVM_DIR="$HOME/.nvm"
     - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
@@ -258,6 +258,10 @@ e2e-playwright-tests:
     - node --version
     - npm --version
     - yarn --version
+    - opam switch create 4.13.0
+    - eval $(opam env)
+    - ocaml -version
+    - opam install -y dune merlin ocaml-lsp-server odoc ocamlformat utop dune-release
     - make clean && make && make -C ivette dist
     - cd ivette
     - cp dist/renderer/* dist/main/
