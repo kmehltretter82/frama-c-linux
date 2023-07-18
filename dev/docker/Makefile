@@ -23,6 +23,12 @@
 .ONESHELL:
 .PHONY: dev* custom* help push
 
+ifneq (, $(shell which podman))
+DOCKER=podman
+else
+DOCKER=docker
+endif
+
 help:
 	@echo "Available targets are:"
 	echo "- dev.*: public Git development version (no gui)"
@@ -49,19 +55,23 @@ DEPS=../../reference-configuration.md Dockerfile *.sh
 version=$(shell grep -o "^- OCaml [0-9.]\+" "../../reference-configuration.md" | grep -o "[0-9.]\+")
 BUILD_ARGS += --build-arg=OCAML_VERSION=$(version)
 
-%.debian: BUILD_ARGS += --build-arg=DISTRO=debian:bullseye-slim
-%.fedora: BUILD_ARGS += --build-arg=DISTRO=fedora:36
-%.alpine: BUILD_ARGS += --build-arg=DISTRO=alpine:3.16
+%.debian: BUILD_ARGS += --build-arg=DISTRO=debian:bookworm-slim
+%.fedora: BUILD_ARGS += --build-arg=DISTRO=fedora:38
+%.alpine: BUILD_ARGS += --build-arg=DISTRO=alpine:3.18
+
+dev-all: dev.debian dev-stripped.debian dev-gui.debian \
+         dev.fedora dev-stripped.fedora dev-gui.fedora \
+         dev.alpine dev-stripped.alpine dev-gui.alpine
 
 dev.%: $(DEPS)
 	cp ../../reference-configuration.md .
-	docker build . -t framac/frama-c:$@ $(BUILD_ARGS) --target frama-c-slim
+	$(DOCKER) build . -t framac/frama-c:$@ $(BUILD_ARGS) --target frama-c-slim
 
 dev-gui.%: dev.%
-	docker build . -t framac/frama-c-gui:dev.$* $(BUILD_ARGS) --target frama-c-gui-slim
+	$(DOCKER) build . -t framac/frama-c-gui:dev.$* $(BUILD_ARGS) --target frama-c-gui-slim
 
 dev-stripped.%: dev.%
-	docker build . -t framac/frama-c:$@ $(BUILD_ARGS) --target frama-c-stripped
+	$(DOCKER) build . -t framac/frama-c:$@ $(BUILD_ARGS) --target frama-c-stripped
 
 ifeq ($(FRAMAC_ARCHIVE),)
 custom.% custom-gui.% custom-stripped.%:
@@ -74,13 +84,13 @@ else
 BUILD_ARGS += --build-arg=from_archive=$(FRAMAC_ARCHIVE)
 custom.%: $(DEPS)
 	cp ../../reference-configuration.md .
-	docker build . -t frama-c-$@ $(BUILD_ARGS) --target frama-c-slim
+	$(DOCKER) build . -t frama-c-$@ $(BUILD_ARGS) --target frama-c-slim
 
 custom-gui.%: custom.%
-	docker build . -t frama-c-$@ $(BUILD_ARGS) --target frama-c-gui-slim
+	$(DOCKER) build . -t frama-c-$@ $(BUILD_ARGS) --target frama-c-gui-slim
 
 custom-stripped.%: custom.%
-	docker build . -t frama-c-$@ $(BUILD_ARGS) --target frama-c-stripped
+	$(DOCKER) build . -t frama-c-$@ $(BUILD_ARGS) --target frama-c-stripped
 endif
 
 # check if either TAG or AS are empty
@@ -93,6 +103,23 @@ push:
 	echo "(if you supplied identical tags, just run 'docker push $(TAG)')"
 else
 push:
-	docker tag $(TAG) $(AS)
-	docker push $(AS)
+	$(DOCKER) tag $(TAG) $(AS)
+	$(DOCKER) push $(AS)
 endif
+
+dev-push-all:
+	$(DOCKER) push framac/frama-c:dev.debian
+	$(DOCKER) push framac/frama-c:dev-stripped.debian
+	$(DOCKER) push framac/frama-c-gui:dev.debian
+	$(DOCKER) push framac/frama-c:dev.fedora
+	$(DOCKER) push framac/frama-c:dev-stripped.fedora
+	$(DOCKER) push framac/frama-c-gui:dev.fedora
+	$(DOCKER) push framac/frama-c:dev.alpine
+	$(DOCKER) push framac/frama-c:dev-stripped.alpine
+	$(DOCKER) push framac/frama-c-gui:dev.alpine
+	$(DOCKER) tag framac/frama-c:dev.debian framac/frama-c:dev
+	$(DOCKER) tag framac/frama-c:dev-stripped.debian framac/frama-c:dev-stripped
+	$(DOCKER) tag framac/frama-c-gui:dev.debian framac/frama-c-gui:dev
+	$(DOCKER) push framac/frama-c:dev
+	$(DOCKER) push framac/frama-c:dev-stripped
+	$(DOCKER) push framac/frama-c-gui:dev
