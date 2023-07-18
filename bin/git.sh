@@ -136,7 +136,7 @@ do
     echo "-- Repository $plugin"
     echo "--------------------------------------------------"
 
-    if [ "$TARGET" != "" ] && [ -f $TARGET ]
+    if [ "$COMMAND" != "" ]
     then
         cd $plugin
         if [ "$TARGET" != "" ]
