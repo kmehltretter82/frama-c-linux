@@ -6,19 +6,24 @@
    DONTRUN:
 */
 
-int x0, y0, z0, *p0;
+int x0, y0;
+const int z0 = 0;
+int *p0;
 int x1=1, y1=1, z1=z0, *q0=(int*)0, *q1=&y0, *p1=&y1;
 
 struct s { int c; int* cp; } ;
 
-int a0, a1;
-struct s s0, v0, w0;
-struct s s1=s0;
+int a0;
+const int a1 = 1;
+struct s s0={0,(int*)0};
+struct s v0;
+struct s w0={0,(int*)0};
+struct s s1={0,(int*)0};
 struct s s2={1,(int*)0};
 struct s s3={1,&a0};
 struct s s4={a1,(int*)0};
 struct s s5={1,&v0.c};
-struct s s6={w0.c,(int*)0};
+struct s s6={0,(int*)0};
 
 
 void f(void) {

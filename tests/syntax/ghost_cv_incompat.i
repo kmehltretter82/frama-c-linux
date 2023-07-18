@@ -23,12 +23,12 @@ void def_not_ghost(void) /*@ ghost (int * p) */ {}
 //
 
 int ng ;
-//@ ghost int * gl_gp ;
+//@ ghost int * const gl_gp = 0;
 //@ ghost int \ghost * gl_gpg_1 = &ng ;   // error: address of non-ghost integer into pointer to ghost
 //@ ghost int \ghost * gl_gpg_2 = gl_gp ; // error: pointer to a non-ghost location into pointer to ghost
 
 
-int *gl_p00, *gl_p01 ;
+int * const gl_p00 = 0; int * const gl_p01 = 0 ;
 // error: we transform pointer to non-ghost into pointer to ghosts
 //@ ghost int \ghost * gl_array[3] = { gl_p00, gl_p00, gl_p01 };
 
@@ -100,7 +100,7 @@ void call_ng_to_g(void){
 //
 
 //@ ghost int g ;
-//@ ghost int \ghost * gl_gpg ;
+//@ ghost int \ghost * const gl_gpg = 0;
 //@ ghost int * gl_gp_1 = &g ;     // error: address of ghost integer into pointer to non-ghost
 //@ ghost int * gl_gp_2 = gl_gpg ; // error: pointer to a ghost location into pointer to non-ghost
 

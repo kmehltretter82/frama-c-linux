@@ -5,14 +5,14 @@
 volatile v;
 
 struct st1 {
-  int a;
-  int b;
+  long a;
+  long b;
   int *pp;
   int *p;
 };
 int *outp;
 int x,y,z1,z2,z3,z4;
-struct st1 T[22] = { {1,2,0,&x}, {(int)&z1,(int)&z2,&z3,&y},{(int)&z4,2,0,&x},{1,2,0,&x} };
+struct st1 T[22] = { {1,2,0,&x}, {(long)&z1,(long)&z2,&z3,&y},{(long)&z4,2,0,&x},{1,2,0,&x} };
 
 struct S {
   int a;
