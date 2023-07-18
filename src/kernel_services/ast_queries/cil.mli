@@ -841,14 +841,26 @@ val kfloat: loc:location -> fkind -> float -> exp
     character or an integer constant *)
 val isInteger: exp -> Integer.t option
 
-(** True if the expression is a compile-time constant *)
-val isConstant: exp -> bool
+(** True if the expression is a compile-time constant.
+    [is_varinfo_cst] indicates whether a variable should
+    be considered as having a constant content. Defaults to
+    [false].
 
-(** True if the expression is a compile-time integer constant *)
-val isIntegerConstant: exp -> bool
+    @before Frama-C+dev [is_varinfo_cst] does not exist
+*)
+val isConstant: ?is_varinfo_cst:(varinfo -> bool) -> exp -> bool
 
-(** True if the given offset contains only field names or constant indices. *)
-val isConstantOffset: offset -> bool
+(** True if the expression is a compile-time integer constant
+
+    @before Frama-C+dev [is_varinfo_cst] does not exist
+*)
+val isIntegerConstant: ?is_varinfo_cst:(varinfo -> bool) -> exp -> bool
+
+(** True if the given offset contains only field names or constant indices.
+
+    @before Frama-C+dev [is_varinfo_cst] does not exist
+*)
+val isConstantOffset: ?is_varinfo_cst:(varinfo -> bool) -> offset -> bool
 
 (** True if the given expression is a (possibly cast'ed) integer or character
     constant with value zero *)

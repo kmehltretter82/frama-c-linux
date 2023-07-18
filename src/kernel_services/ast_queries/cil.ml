@@ -830,6 +830,7 @@ let id = Fun.id
 let alphabetabeta _ x = x
 let alphabetafalse _ _ = false
 let alphatrue _ = true
+let alphafalse _ = false
 
 module Extensions = struct
   let initialized = ref false
@@ -5802,32 +5803,53 @@ let isVariadicListType t = match unrollTypeSkel t with
   | TBuiltin_va_list _ -> true
   | _ -> false
 
-let rec isConstantGen f e = match e.enode with
+let rec isConstantGen lit_only is_varinfo_cst f e = match e.enode with
   | Const c -> f c
-  | UnOp (_, e, _) -> isConstantGen f e
-  | BinOp (_, e1, e2, _) -> isConstantGen f e1 && isConstantGen f e2
-  | Lval (Var vi, NoOffset) ->
-    (vi.vglob && isArrayType vi.vtype || isFunctionType vi.vtype)
+  | UnOp (_, e, _) -> isConstantGen lit_only is_varinfo_cst f e
+  | BinOp (_, e1, e2, _) ->
+    isConstantGen lit_only is_varinfo_cst f e1 &&
+    isConstantGen lit_only is_varinfo_cst f e2
+  | Lval (Var vi, _) ->
+    is_varinfo_cst vi ||
+    (vi.vglob && isArrayType vi.vtype) ||
+    isFunctionType vi.vtype
   | Lval _ -> false
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> true
   (* see ISO 6.6.6 *)
   | CastE(t,{ enode = Const(CReal _)}) when isIntegralType t -> true
-  | CastE (_, e) -> isConstantGen f e
-  | AddrOf (Var vi, off) | StartOf (Var vi, off)
-    -> vi.vglob && isConstantOffsetGen f off
-  | AddrOf (Mem e, off) | StartOf(Mem e, off)
-    -> isConstantGen f e && isConstantOffsetGen f off
+  | CastE(t, e) ->
+    begin
+      match t, typeOf e with
+      | TInt (i, _), TPtr _ ->
+        (* gcc/clang/ccomp consider a non-truncated pointer to be a constant.
+           If it is truncated, we check whether we already know its value. *)
+        bytesSizeOfInt theMachine.upointKind <= bytesSizeOfInt i ||
+        isConstantGen true is_varinfo_cst f e
+      | _ -> isConstantGen lit_only is_varinfo_cst f e
+    end
+  | AddrOf (Var vi, off) | StartOf (Var vi, off) ->
+    not lit_only &&
+    vi.vglob &&
+    isConstantOffsetGen lit_only is_varinfo_cst f off
+  | AddrOf (Mem e, off) | StartOf(Mem e, off) ->
+    isConstantGen lit_only is_varinfo_cst f e &&
+    isConstantOffsetGen lit_only is_varinfo_cst f off
 
-and isConstantOffsetGen f = function
+and isConstantOffsetGen lit_only is_varinfo_cst f = function
     NoOffset -> true
-  | Field(_fi, off) -> isConstantOffsetGen f off
-  | Index(e, off) -> isConstantGen f e && isConstantOffsetGen f off
+  | Field(_fi, off) -> isConstantOffsetGen lit_only is_varinfo_cst f off
+  | Index(e, off) ->
+    isConstantGen lit_only is_varinfo_cst f e &&
+    isConstantOffsetGen lit_only is_varinfo_cst f off
 
-let isConstant e = isConstantGen alphatrue e
-let isConstantOffset o = isConstantOffsetGen alphatrue o
+let isConstant ?(is_varinfo_cst = alphafalse) e =
+  isConstantGen false is_varinfo_cst alphatrue e
+let isConstantOffset ?(is_varinfo_cst = alphafalse) o =
+  isConstantOffsetGen false is_varinfo_cst alphatrue o
 
-let isIntegerConstant e =
-  isConstantGen
+let isIntegerConstant ?(is_varinfo_cst = alphafalse) e =
+  isConstantGen false
+    is_varinfo_cst
     (function
       | CInt64 _ | CChr _ | CEnum _ -> true
       | CStr _ | CWStr _ | CReal _ -> false)

@@ -818,20 +818,7 @@ let get_formals vi =
 let initGlobals () =
   theFile := [];
   theFileTypes := [];
-  Cil_datatype.Varinfo.Hashtbl.clear theFileVars;
-;;
-
-let cabsPushGlobal (g: global) =
-  pushGlobal g ~types:theFileTypes ~variables:theFile;
-  (match g with
-   | GVar (vi, _, _) | GVarDecl (vi, _)
-   | GFun ({svar = vi}, _) | GFunDecl (_, vi, _) ->
-     (* Do 'add' and not 'replace' here, as we may store both
-        declarations and definitions for the same varinfo *)
-     Cil_datatype.Varinfo.Hashtbl.add theFileVars vi g
-   | _ -> ()
-  );
-;;
+  Cil_datatype.Varinfo.Hashtbl.clear theFileVars
 
 
 (* Keep track of some variable ids that must be turned into definitions. We
@@ -844,6 +831,8 @@ let mustTurnIntoDef: bool IH.t = IH.create 117
 
 (* Globals that have already been defined. Indexed by the variable name. *)
 let alreadyDefined: (string, location) H.t = H.create 117
+
+let isDefined vi = H.mem alreadyDefined vi.vorig_name
 
 (* Globals that were created due to static local variables. We chose their
  * names to be distinct from any global encountered at the time. But we might
@@ -874,6 +863,54 @@ let fileGlobals () =
     | x :: rest -> revonto (x :: tail) rest
   in
   revonto (revonto [] !theFile) !theFileTypes
+
+
+class checkGlobal = object
+  inherit nopCilVisitor
+
+
+  method! vglob = function
+    | GVar _ -> DoChildren
+    | _ -> SkipChildren
+
+  method! vexpr exp =
+    begin
+      match exp.enode with
+      | SizeOfE _ ->
+        (* sizeOf doesn't depend on the definitions *)
+        ()
+      | _ ->
+        let problematic_var : string option ref = ref None in
+        let is_varinfo_cst vi =
+          let res = Cil.isConstType vi.vtype && isDefined vi in
+          if not res then problematic_var := Some vi.vorig_name;
+          res
+        in
+        if not(isConstant ~is_varinfo_cst exp)
+        then
+          match !problematic_var with
+          | Some name ->
+            Kernel.error ~once:true ~current:true
+              ("%s is not a compile-time constant") name
+          | None ->
+            Kernel.error ~once:true ~current:true
+              "Initializer element is not a compile-time constant";
+    end;
+    SkipChildren
+
+end
+
+let cabsPushGlobal (g: global) =
+  ignore (visitCilGlobal (new checkGlobal) g);
+  pushGlobal g ~types:theFileTypes ~variables:theFile;
+  (match g with
+   | GVar (vi, _, _) | GVarDecl (vi, _)
+   | GFun ({svar = vi}, _) | GFunDecl (_, vi, _) ->
+     (* Do 'add' and not 'replace' here, as we may store both
+        declarations and definitions for the same varinfo *)
+     Cil_datatype.Varinfo.Hashtbl.add theFileVars vi g
+   | _ -> ()
+  )
 
 
 (********* ENVIRONMENTS ***************)
@@ -8899,9 +8936,9 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * C
         if vi.vstorage = Extern then
           vi.vstorage <- NoStorage;     (* equivalent and canonical *)
 
-        H.add alreadyDefined vi.vname (CurrentLoc.get ());
         IH.remove mustTurnIntoDef vi.vid;
         cabsPushGlobal (GVar(vi, {init = init}, CurrentLoc.get ()));
+        H.add alreadyDefined vi.vname (CurrentLoc.get ());
         vi
       end else begin
         if not (isFunctionType vi.vtype) &&
