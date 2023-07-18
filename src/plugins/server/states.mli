@@ -183,7 +183,7 @@ val register_array :
   'a model -> 'a array
 
 (** Sub-signature of [State_builder.Hashtbl] for [register_framac_array] *)
-module type HashtblState = sig
+module type TableState = sig
   type key
   type data
   val iter: (key -> data -> unit) -> unit
@@ -201,7 +201,7 @@ val register_framac_array :
   ?keyName:string ->
   ?keyType:jtype ->
   ('k * 'd) model ->
-  (module HashtblState with type key = 'k and type data = 'd) ->
+  (module TableState with type key = 'k and type data = 'd) ->
   ('k * 'd) array
 
 (* -------------------------------------------------------------------------- *)

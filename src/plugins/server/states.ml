@@ -421,7 +421,7 @@ let register_array ~package ~name ~descr ~key
   Option.iter (install_hook signal (fun () -> reload array)) add_reload_hook ;
   array
 
-module type HashtblState = sig
+module type TableState = sig
   type key
   type data
   val iter: (key -> data -> unit) -> unit
@@ -432,7 +432,7 @@ end
 let register_framac_array (type key) (type data) ~package ~name ~descr ~key
     ?keyName ?keyType
     (model : (key * data) model)
-    (table : (module HashtblState with type key = key and type data = data)) =
+    (table : (module TableState with type key = key and type data = data)) =
   let module Table = (val table) in
   let array = register_array ~package ~name ~descr ?keyName ?keyType
       ~key:(fun (k,_d) -> key k)
