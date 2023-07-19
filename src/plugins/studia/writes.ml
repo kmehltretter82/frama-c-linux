@@ -42,7 +42,6 @@ let (<?>) c lcmp =
 
 let compare w1 w2 =
   let open Cil_datatype in
-  let module List = Transitioning.List in
   match w1, w2 with
   | Assign s1, Assign s2
   | CallDirect s1, CallDirect s2

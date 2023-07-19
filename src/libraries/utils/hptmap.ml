@@ -343,7 +343,7 @@ module Shape(Key: Id_Datatype) = struct
     | Empty -> Seq.Nil
     | Leaf (key, data, _) -> Seq.Cons ((key, data), Seq.empty)
     | Branch (_, _, tree0, tree1, _) ->
-      Transitioning.Seq.append (to_seq tree0) (to_seq tree1) ()
+      Seq.append (to_seq tree0) (to_seq tree1) ()
 
   (* This reference will contain a list of functions that will clear
      all the transient caches used in this module *)

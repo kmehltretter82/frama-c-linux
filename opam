@@ -126,10 +126,10 @@ depends: [
   "conf-graphviz" { post }
   "conf-time" { with-test }
   "menhir" { >= "20181006" & build }
-  "ocaml" { >= "4.11.1" }
-  "ocamlfind" # needed beyond build stage, used by -load-module
+  "ocaml" { >= "4.13.1" }
   "ocamlgraph" { >= "1.8.8" }
   "odoc" { with-doc }
+  "unionFind" { >= "20220107" }
   "why3" { >= "1.6.0" }
   "yaml" { >= "3.0.0" }
   "yojson" {>= "1.6.0" & (>= "2.0.1" | !with-test)}
