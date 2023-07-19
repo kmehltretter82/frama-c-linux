@@ -220,10 +220,6 @@ struct
   struct
     module Info = struct let module_name = "Abstract_memory.Disjunction.Map" end
     include Datatype.Map (Map.Make (Valuation)) (Valuation) (Info)
-
-    (* Defined only for Ocaml >= 4.11 *)
-    let filter_map f m =
-      fold (fun k x m -> match f k x with None -> m | Some y -> add k y m) m empty
   end
 
   module S = (* Structures in the disjunction *)
