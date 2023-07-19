@@ -56,6 +56,7 @@ let show main_ui =
     "Melody Méaulle";
     "Benjamin Monate";
     "Yannick Moy";
+    "Pierre Nigron";
     "Anne Pacalet";
     "Valentin Perrelle";
     "Guillaume Petiot";
