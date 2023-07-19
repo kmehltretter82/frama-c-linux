@@ -271,7 +271,7 @@ header-check:
 lint:
   stage: distrib
   script:
-    - ./nix/shell-checkers.sh "make -f share/Makefile.linting check-lint"
+    - ./nix/shell-checkers.sh "make -f share/Makefile.linting check-lint LINTCK_EXTRA=-s"
 
 # Manuals
 
