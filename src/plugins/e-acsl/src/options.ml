@@ -134,6 +134,20 @@ module Instrument =
                   Be aware that runtime verdicts may become partial."
     end)
 
+module Interlang =
+  False
+    (struct
+      let option_name = "-e-acsl-interlang"
+      let help = "try compilation based on intermediate language"
+    end)
+
+module Interlang_force =
+  False
+    (struct
+      let option_name = "-e-acsl-interlang-force"
+      let help = "crash if interlang compilation fails"
+    end)
+
 module Widening_arguments_base =
   Int
     (struct
@@ -245,6 +259,12 @@ module Dkey = struct
   let labels = register_category "analysis:labels"
   let translation = register_category "translation"
   let env = register_category "translation:env"
+  let interlang_translation =
+    let help = "translation from the intermediate language to Cil" in
+    register_category ~help "interlang:translation"
+  let interlang_not_covered =
+    let help = "encountered constructs unsupported by indirect compilation scheme" in
+    register_category ~help "interlang:not_covered"
 end
 
 let setup ?(rtl=false) () =

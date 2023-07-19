@@ -100,3 +100,8 @@ type strnum =
   | Str_Z         (* integers *)
   | Str_R         (* reals *)
   | C_number      (* integers and floats included *)
+
+let pp_strnum fmt = function
+  | Str_Z -> Format.pp_print_string fmt "Str_Z"
+  | Str_R -> Format.pp_print_string fmt "Str_R"
+  | C_number -> Format.pp_print_string fmt "C_number"

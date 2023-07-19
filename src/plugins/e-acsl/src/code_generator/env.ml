@@ -278,6 +278,12 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
 
 exception No_term
 
+let assigned_var_of_term ~env t =
+  let local_env, _ = top env in
+  match Term.Map.find_opt t local_env.mp_tbl.new_exps with
+  | None -> Term.Map.find_opt t env.global_mp_tbl.new_exps
+  | Some ve -> Some ve
+
 let new_var ~loc ?(scope=Varname.Block) ?name env kf t ty mk_stmts =
   let local_env, _ = top env in
   let memo tbl =

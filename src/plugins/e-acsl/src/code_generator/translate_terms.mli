@@ -41,6 +41,10 @@ val to_exp:
     - [env]: The current environment.
     - [t]: The term to translate. *)
 
+val to_exp_il : ?inplace:bool -> term -> Interlang.exp Interlang_gen.m
+(** a version of [to_exp] that translates ACSL terms to the intermediate
+    language instead to Cil. *)
+
 exception No_simple_translation of term
 (** Exceptin raised if [untyped_to_exp] would generate new statements in
     the environment *)

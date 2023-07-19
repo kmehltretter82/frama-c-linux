@@ -20,21 +20,35 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** E-ACSL. *)
+(** The compilation of E-ACSL to Cil currently has two different compilation
+    schemes, the original direct-to-Cil compilation scheme, and the new
+    compilation scheme, in which E-ACSL is first translated into an
+    intermediate language {!Interlang} and only then into Cil.
+    The implementation of the new compilation scheme is not yet complete and
+    will fail on many E-ACSL expressions. Therefore we supply in this module a
+    function that tries first the new compilation schemes and only in case of
+    failure applies the older one. *)
 
-module Options = Options
-module Error = Error
+open Cil_types
 
-module Translate_terms = Translate_terms
-module Translate_predicates = Translate_predicates
+(** a compiler that translates E-ACSL predicates to an expression of the E-ACSL
+    intermediate language (see {!Interlang}) using the {!Interlang_gen.m} monad. *)
+type 'a il_compiler = 'a -> Interlang.exp Interlang_gen.m
 
-module Functions = Functions
-module Interlang = Interlang
-module Interlang_trans = Interlang_trans
-module Interlang_build = Interlang_build
+(** a direct-to-Cil compiler that compiles E-ACSL predicates directly to Cil. *)
+type 'a compiler =
+  loc:location ->
+  adata:Assert.t ->
+  env:Env.t ->
+  kf:kernel_function ->
+  'a ->
+  exp * Assert.t * Env.t
 
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)
+(** compile a predicate to a Cil expression by first trying the new
+    compilation scheme via the E-ACSL intermediate language (see {!Interlang});
+    if that fails raising {!Interlang_gen.Not_covered}, fall back to the old
+    direct-to-Cil compilation scheme. *)
+val try_il_compiler :
+  'a il_compiler ->
+  'a compiler ->
+  'a compiler

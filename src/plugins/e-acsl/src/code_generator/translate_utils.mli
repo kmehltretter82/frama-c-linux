@@ -57,7 +57,7 @@ val comparison_to_exp :
   Env.t ->
   number_ty ->
   binop -> exp -> exp -> ?name:string -> term option -> exp * Env.t
-(** [comparison_to_exp ~loc kf env ity ?name bop t1 t2 topt] generates
+(** [comparison_to_exp ~loc kf env ity ?name bop e1 e2 topt] generates
     the C code equivalent to [e1 bop e2] in the given environment.
     [ity] is the number type of the comparison when comparing scalar numbers.
     [name] is used to generate temporary variable names.

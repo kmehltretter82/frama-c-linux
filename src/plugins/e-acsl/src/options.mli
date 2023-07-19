@@ -33,6 +33,8 @@ module Validate_format_strings: Parameter_sig.Bool
 module Replace_libc_functions: Parameter_sig.Bool
 module Assert_print_data: Parameter_sig.Bool
 module Concurrency: Parameter_sig.Bool
+module Interlang: Parameter_sig.Bool
+module Interlang_force: Parameter_sig.Bool
 
 module Functions: Parameter_sig.Kernel_function_set
 module Instrument: Parameter_sig.Kernel_function_set
@@ -59,6 +61,8 @@ module Dkey: sig
   val labels: category
   val translation: category
   val env: category
+  val interlang_translation: category
+  val interlang_not_covered: category
 end
 
 val setup: ?rtl:bool -> unit -> unit

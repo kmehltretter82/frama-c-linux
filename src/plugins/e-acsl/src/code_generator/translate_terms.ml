@@ -27,6 +27,13 @@ open Analyses_types
 open Analyses_datatype
 let dkey = Options.Dkey.translation
 
+module IL = struct
+  include Interlang
+  include Interlang_build
+end
+module M = Interlang_gen.M
+open Interlang_gen.M.Operators
+
 (**************************************************************************)
 (********************** Forward references ********************************)
 (**************************************************************************)
@@ -44,6 +51,12 @@ let translate_rte_exp_ref
 (* ************************************************************************** *)
 (* Transforming terms into C expressions (if any) *)
 (* ************************************************************************** *)
+
+let constant_to_exp_il t c =
+  match c with
+  | Integer (n, _) ->
+    M.return @@ IL.Exp.of_integer ~origin:t n
+  | _ -> M.not_covered Printer.pp_term t
 
 let constant_to_exp ~loc env t c =
   let mk_real s =
@@ -141,6 +154,23 @@ let rec thost_to_host kf env th = match th with
     let e, _, env = to_exp ~adata:Assert.no_data kf env t in
     Mem e, env, ""
 
+and thost_to_host_il host =
+  let* {env; kf} = M.read in
+  match host with
+  | TVar {lv_origin = Some v} ->
+    M.return @@ IL.Lhost.of_varinfo v
+  | TVar ({lv_origin = None} as logic_v) ->
+    let v' = Env.Logic_binding.get env logic_v in
+    M.return @@ IL.Lhost.of_varinfo ~name:logic_v.lv_name v'
+  | TResult _typ ->
+    let lhost = Misc.result_lhost kf in
+    (match lhost with
+     | Var v -> M.return @@ IL.Lhost.of_varinfo ~name:"result" v
+     | _ -> assert false)
+  | TMem t ->
+    let* e = to_exp_il t in
+    M.return (IL.Mem e)
+
 and toffset_to_offset kf env = function
   | TNoOffset -> NoOffset, env
   | TField(f, offset) ->
@@ -151,6 +181,22 @@ and toffset_to_offset kf env = function
     let offset, env = toffset_to_offset kf env offset in
     Index(e, offset), env
   | TModel _ -> Env.not_yet env "model"
+
+and toffset_to_offset_il = function
+  | TNoOffset -> M.return IL.NoOffset
+  | TField(f, offset) ->
+    let offset = toffset_to_offset_il offset in
+    M.map (fun offset -> IL.Field(f, offset)) offset
+  | TIndex(t, offset) ->
+    let* e = to_exp_il t in
+    let* offset = toffset_to_offset_il offset in
+    M.return @@ IL.Index (e, offset)
+  | TModel _ as offset -> M.not_covered Printer.pp_term_offset offset
+
+and tlval_to_lval_il (host, offset) =
+  let* host_res = thost_to_host_il host in
+  let* offset_res = toffset_to_offset_il offset in
+  M.return (host_res, offset_res)
 
 and tlval_to_lval kf env (host, offset) =
   let host, env, name = thost_to_host kf env host in
@@ -261,7 +307,55 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
   | _ ->
     assert false
 
-and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
+and context_insensitive_term_to_exp_il ?inplace t =
+  ignore inplace; (* will be required for implementing Tat *)
+  let t = Logic_normalizer.get_term t in
+  match t.term_node with
+  | TConst c -> constant_to_exp_il t c
+  | TLval lv ->
+    let* l = tlval_to_lval_il lv in
+    M.return @@ IL.Exp.of_lval ~origin:t l
+  | TSizeOf ty -> M.return @@ IL.Exp.of_sizeof ~origin:t ty
+  | TCast (true, _, t) -> context_insensitive_term_to_exp_il t
+  | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
+    let* logic_env = M.read_logic_env in
+    let* e1 = to_exp_il t1 in
+    let* e2 = to_exp_il t2 in
+    let ity = Typing.get_number_ty ~logic_env t in
+    let bop = Interlang_gen.binop bop in
+    let ty = Typing.get_typ ~logic_env t in
+    if not (Gmp_types.Z.is_t ty) && not (Gmp_types.Q.is_t ty) then
+      assert (Logic_typing.is_integral_type t.term_type);
+    M.return @@ IL.(Exp.of_exp_node ~origin:t @@
+                    BinOp {ity; binop = bop; op1 = e1; op2 = e2})
+  | TBinOp((Lt | Gt | Le | Ge | Eq | Ne) as bop, t1, t2) ->
+    let* logic_env = M.read_logic_env in
+    let ity =
+      let t1 = Logic_normalizer.get_term t1 in
+      let t2 = Logic_normalizer.get_term t2 in
+      Typing.join
+        (Typing.get_effective_ty ~logic_env t1)
+        (Typing.get_effective_ty ~logic_env t2)
+    in
+    let* e1 = to_exp_il t1 in
+    let* e2 = to_exp_il t2 in
+    let bop = Interlang_gen.binop bop in
+    M.return @@ IL.(Exp.of_exp_node ~origin:t @@
+                    BinOp {ity; binop = bop; op1 = e1; op2 = e2})
+  | TBinOp(Div | Mod as binop, t1, t2) ->
+    let* logic_env = M.read_logic_env in
+    let ty = Typing.get_typ ~logic_env t in
+    let* e1 = to_exp_il t1 in
+    let* e2 = to_exp_il t2 in
+    let ity = Typing.get_number_ty ~logic_env t in
+    let bop = Interlang_gen.binop binop in
+    if not (Gmp_types.Z.is_t ty || Gmp_types.Q.is_t ty) then
+      assert (Logic_typing.is_integral_type t.term_type);
+    M.return @@ IL.(Exp.of_exp_node ~origin:t @@
+                    BinOp {ity; binop = bop; op1 = e1; op2 = e2})
+  | _ -> M.not_covered Printer.pp_term t
+
+and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
   let loc = t.term_loc in
   let open Current_loc.Operators in
   let<> UpdatedCurrentLoc = loc in
@@ -741,7 +835,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         e
     in
     e, adata, env, Analyses_types.C_number, ""
-  | TCast (true, _, t) -> context_insensitive_term_to_exp ~adata kf env t
+  | TCast (true, _, t) -> context_insensitive_term_to_exp_old ~adata kf env t
   | TCast (false, _,_) -> assert false
   | TAddrOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
@@ -865,10 +959,24 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let env = Env.Logic_scope.remove env lvs in
     e, adata, env, Analyses_types.C_number, ""
 
+and to_exp_il ?inplace t =
+  let* {env} = M.read in
+  let* () =
+    M.Bool.only_if
+      (Env.generate_rte env)
+      (M.not_covered ~pre:"with RTE" Printer.pp_term t)
+  in
+  let t = Logic_normalizer.get_term t in
+  let* e = context_insensitive_term_to_exp_il ?inplace t in
+  Options.debug ~dkey ~level:4 "to_exp_il {%a} %a = %a"
+    Profile.pretty (Env.Logic_env.get_profile env)
+    Printer.pp_term t Interlang.Pretty.pp_exp e;
+  M.return e
+
 (* Convert an ACSL term into a corresponding C expression (if any) in the given
    environment. Also extend this environment in order to include the generating
    constructs. *)
-and to_exp ~adata ?inplace kf env t =
+and to_exp_old ?inplace ~loc:_ ~adata ~env ~kf t =
   let generate_rte = Env.generate_rte env in
   Options.feedback ~dkey ~level:5 "translating term %a (rte? %b) in local \
                                    environment '%a'"
@@ -881,7 +989,7 @@ and to_exp ~adata ?inplace kf env t =
       ~rte:false
       ~f:(fun env ->
           let e, adata, env, sty, name =
-            context_insensitive_term_to_exp ?inplace ~adata kf env t
+            context_insensitive_term_to_exp_old ?inplace ~adata kf env t
           in
           let env =
             if generate_rte then !translate_rte_exp_ref kf env e else env
@@ -902,11 +1010,17 @@ and to_exp ~adata ?inplace kf env t =
         )
       env
   in
-  Options.debug ~dkey ~level:4 "to_exp %a {%a} %a = %a"
+  Options.debug ~dkey ~level:4 "to_exp_old %a {%a} %a = %a"
     Kernel_function.pretty kf Profile.pretty (Env.Logic_env.get_profile env)
     Printer.pp_term t Printer.pp_exp rexp;
   Extlib.flatten result
 
+and to_exp ~adata ?inplace kf env t =
+  let loc = t.term_loc in
+  Interlang_trans.try_il_compiler ~loc ~adata ~env ~kf
+    (to_exp_il ?inplace)
+    (to_exp_old ?inplace)
+    t
 
 let term_to_exp_without_inplace ~adata kf env t = to_exp ~adata kf env t
 

@@ -27,6 +27,13 @@ open Cil_datatype
 open Analyses_types
 let dkey = Options.Dkey.translation
 
+module IL = struct
+  include Interlang
+  include Interlang_build
+end
+module M = Interlang_gen.M
+open M.Operators
+
 (**************************************************************************)
 (********************** Forward references ********************************)
 (**************************************************************************)
@@ -56,6 +63,14 @@ let translate_rte_exp_ref
 (* Transforming predicates into C expressions (if any) *)
 (* ************************************************************************** *)
 
+let relation_to_binop_il = function
+  | Rlt -> Interlang.Lt
+  | Rgt -> Gt
+  | Rle -> Le
+  | Rge -> Ge
+  | Req -> Eq
+  | Rneq -> Ne
+
 let relation_to_binop = function
   | Rlt -> Lt
   | Rgt -> Gt
@@ -64,14 +79,32 @@ let relation_to_binop = function
   | Req -> Eq
   | Rneq -> Ne
 
+let predicate_content_to_exp_il p =
+  match p.pred_content with
+  | Ptrue -> M.return @@ IL.Exp.of_exp_node True
+  | Pfalse -> M.return @@ IL.Exp.of_exp_node False
+  | Prel(rel, t1, t2) ->
+    let* logic_env = M.read_logic_env in
+    let t1 = Logic_normalizer.get_term t1 in
+    let t2 = Logic_normalizer.get_term t2 in
+    let ity =
+      Typing.join
+        (Typing.get_effective_ty ~logic_env t1)
+        (Typing.get_effective_ty ~logic_env t2)
+    in
+    let binop = relation_to_binop_il rel in
+    let* op1 = Translate_terms.to_exp_il t1 in
+    let* op2 = Translate_terms.to_exp_il t2 in
+    M.return @@ IL.Exp.of_exp_node @@ BinOp {ity; binop; op1; op2}
+  | _ -> M.not_covered Printer.pp_predicate p
+
 (* Convert an ACSL predicate into a corresponding C expression (if any) in the
    given environment. Also extend this environment which includes the generating
    constructs.
    If [inplace] is true, then the root predicate is immediately translated
    regardless of its label. Otherwise [Translate_ats] is used to retrieve the
    translation. *)
-let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
-  let loc = p.pred_loc in
+let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf p =
   let logic_env = Env.Logic_env.get env in
   let open Current_loc.Operators in
   let<> UpdatedCurrentLoc = loc in
@@ -323,6 +356,30 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
   | Pfreeable _ -> Env.not_yet env "labeled \\freeable"
   | Pfresh _ -> Env.not_yet env "\\fresh"
 
+and predicate_content_to_exp ~adata ?inplace ?name kf env p =
+  let loc = p.pred_loc in
+  Interlang_trans.try_il_compiler ~loc ~adata ~env ~kf
+    predicate_content_to_exp_il
+    (predicate_content_to_exp_old ?inplace ?name)
+    p
+
+and to_exp_old ~rte ~loc:_ ?inplace ?name ~adata ~env ~kf p =
+  Extlib.flatten @@
+  Env.with_params_and_result
+    ~rte:false
+    ~f:(fun env ->
+        let e, adata, env =
+          predicate_content_to_exp ?inplace ~adata ?name kf env p
+        in
+        let env = if rte then !translate_rte_exp_ref kf env e else env in
+        (e, adata), env)
+    env
+
+and to_exp_il ~rte p =
+  if rte
+  then M.not_covered ~pre:"with RTE" Printer.pp_predicate p
+  else predicate_content_to_exp_il p
+
 (** [to_exp ~adata ?inplace ?name kf ?rte env p] converts an ACSL predicate into
     a corresponding C expression.
     - [adata]: assertion context.
@@ -337,22 +394,19 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
     - [p]: the predicate to translate. *)
 and to_exp ~adata ?inplace ?name kf ?rte env p =
   let open Current_loc.Operators in
-  let<> UpdatedCurrentLoc = p.pred_loc in
+  let loc = p.pred_loc in
+  let<> UpdatedCurrentLoc = loc in
   Assert.push_pending_register_data();
   let p = Logic_normalizer.get_pred p in
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
-  Extlib.flatten
-    (Env.with_params_and_result
-       ~rte:false
-       ~f:(fun env ->
-           let e, adata, env =
-             predicate_content_to_exp ?inplace ~adata ?name kf env p
-           in
-           let env = if rte then !translate_rte_exp_ref kf env e else env in
-           let env = Assert.do_pending_register_data env in
-           (e, adata), env
-         )
-       env)
+  let e, adata, env =
+    Interlang_trans.try_il_compiler ~loc ~adata ~env ~kf
+      (to_exp_il ~rte)
+      (to_exp_old ~rte ?name ?inplace)
+      (Logic_normalizer.get_pred p)
+  in
+  let env = Assert.do_pending_register_data env in
+  e, adata, env
 
 let generalized_untyped_to_exp ~adata ?name kf ?rte env p =
   (* If [rte] is true, it means we're translating the root predicate of an

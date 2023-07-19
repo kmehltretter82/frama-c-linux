@@ -406,7 +406,6 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
   {
     __e_acsl_mpz_t __gen_e_acsl_n;
     unsigned long __gen_e_acsl_size;
-    __e_acsl_mpz_t __gen_e_acsl_n_2;
     __e_acsl_mpz_t __gen_e_acsl_;
     __e_acsl_mpz_t __gen_e_acsl_sub;
     __e_acsl_mpz_t __gen_e_acsl__2;
@@ -442,11 +441,10 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
-    __gmpz_init_set_ui(__gen_e_acsl_n_2,n);
     __gmpz_init_set_si(__gen_e_acsl_,1L);
     __gmpz_init(__gen_e_acsl_sub);
     __gmpz_sub(__gen_e_acsl_sub,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl_n_2),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_n),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __gmpz_init_set_si(__gen_e_acsl__2,0L);
     __gmpz_init(__gen_e_acsl_sub_2);
@@ -596,7 +594,6 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     __e_acsl_assert(__gen_e_acsl_separated,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
     __gmpz_clear(__gen_e_acsl_n);
-    __gmpz_clear(__gen_e_acsl_n_2);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_sub);
     __gmpz_clear(__gen_e_acsl__2);
