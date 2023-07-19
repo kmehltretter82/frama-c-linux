@@ -366,7 +366,7 @@ for target, sources in sources_map.items():
             main,
             prettify(target),
         )
-        for (filename, line, _) in main_definitions[target]:
+        for filename, line, _ in main_definitions[target]:
             print(f"- definition at {filename}:{line}")
 
 # End of checks; start writing GNUmakefile and stubs from templates ###########

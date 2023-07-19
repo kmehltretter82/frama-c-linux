@@ -59,7 +59,7 @@ for f in files:
     defs_and_decls = function_finder.find_definitions_and_declarations(
         want_defs, want_decls, f, file_content, file_lines, newlines
     )
-    for (funcname, is_def, start, end, _offset) in defs_and_decls:
+    for funcname, is_def, start, end, _offset in defs_and_decls:
         if is_def:
             print(f"{os.path.relpath(f)}:{start}:{end}: {funcname} (definition)")
         else:
