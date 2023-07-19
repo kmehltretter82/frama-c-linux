@@ -211,19 +211,10 @@ module FunctionStats = struct
         let size = 17
       end)
 
-  module Hook = Hook.Build (struct
-      type t = Cil_types.fundec * fun_stats
-    end)
-
-  let compute kf =
-    let stats = compute_fun_stats kf in
-    Hook.apply (kf,stats);
-    stats
   let get kf =
     try Some (find kf)
     with Not_found -> None
-  let recompute kf = replace kf (compute kf)
-  let register_hook = Hook.extend
+  let recompute kf = replace kf (compute_fun_stats kf)
 end
 
 

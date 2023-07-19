@@ -51,6 +51,23 @@ val register_value :
   ?add_hook:('b callback) ->
   unit -> Request.signal
 
+(** Sub-signature of [State_builder.Ref] for [register_framac_value] *)
+module type Value = sig
+  type data
+  val get: unit -> data
+  val add_hook_on_change: (data -> unit) -> unit
+end
+
+(** Same as [register_value] but takes a [State_builder.Ref] module as
+    parameter. *)
+val register_framac_value :
+  package:package ->
+  name:string ->
+  descr:Markdown.text ->
+  output:'a Request.output ->
+  (module Value with type data = 'a) ->
+  Request.signal
+
 (** Register a (projectified) state and generates the associated signal and
     requests:
     - Signal [<name>.sig] is emitted on value updates;
@@ -73,6 +90,24 @@ val register_state :
   set:('a -> unit) ->
   ?add_hook:('b callback) ->
   unit -> Request.signal
+
+(** Sub-signature of [State_builder.Ref] for [register_framac_state] *)
+module type State = sig
+  type data
+  val set: data -> unit
+  val get: unit -> data
+  val add_hook_on_change: (data -> unit) -> unit
+end
+
+(** Same as [register_state] but takes a [State_builder.Ref] module as
+    parameter. *)
+val register_framac_state :
+  package:package ->
+  name:string ->
+  descr:Markdown.text ->
+  data:'a Data.data ->
+  (module State with type data = 'a) ->
+  Request.signal
 
 type 'a model (** Columns array model *)
 
@@ -146,5 +181,27 @@ val register_array :
   ?add_remove_hook:('a callback) ->
   ?add_reload_hook:(unit callback) ->
   'a model -> 'a array
+
+(** Sub-signature of [State_builder.Hashtbl] for [register_framac_array] *)
+module type TableState = sig
+  type key
+  type data
+  val iter: (key -> data -> unit) -> unit
+  val add_hook_on_change:
+    ((key, data) State_builder.hashtbl_event -> unit) -> unit
+end
+
+(** Same as [register_array] but takes a [State_builder.Hashtbl] module as
+    parameter. *)
+val register_framac_array :
+  package:package ->
+  name:string ->
+  descr:Markdown.text ->
+  key:('k -> string) ->
+  ?keyName:string ->
+  ?keyType:jtype ->
+  ('k * 'd) model ->
+  (module TableState with type key = 'k and type data = 'd) ->
+  ('k * 'd) array
 
 (* -------------------------------------------------------------------------- *)
