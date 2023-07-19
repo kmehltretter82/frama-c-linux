@@ -51,7 +51,7 @@ val register_value :
   ?add_hook:('b callback) ->
   unit -> Request.signal
 
-(** Sub-signature of [State_builder.Ref] for [register_framac_value] *)
+(** Sub-signature of [State_builder.Ref] for [register_framac_value]. *)
 module type Value = sig
   type data
   val get: unit -> data
@@ -91,7 +91,7 @@ val register_state :
   ?add_hook:('b callback) ->
   unit -> Request.signal
 
-(** Sub-signature of [State_builder.Ref] for [register_framac_state] *)
+(** Sub-signature of [State_builder.Ref] for [register_framac_state]. *)
 module type State = sig
   type data
   val set: data -> unit
@@ -182,7 +182,7 @@ val register_array :
   ?add_reload_hook:(unit callback) ->
   'a model -> 'a array
 
-(** Sub-signature of [State_builder.Hashtbl] for [register_framac_array] *)
+(** Sub-signature of [State_builder.Hashtbl] for [register_framac_array]. *)
 module type TableState = sig
   type key
   type data

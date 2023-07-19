@@ -327,11 +327,11 @@ module Hashconsing_tbl: Hashconsing_tbl
 (** Events emitted when an [Hashtbl] state changes. *)
 type ('k,'v) hashtbl_event =
   | Update of 'k * 'v
-  (** A bidning in the hashtable has been added or modified *)
+  (** A binding in the hashtable has been added or modified. *)
   | Remove of 'k
-  (** A biding in the hashtable has been removed *)
+  (** A binding in the hashtable has been removed. *)
   | Clear
-  (** The hashtabl has been cleared *)
+  (** The hashtable has been cleared. *)
 
 (** Output signature of builders of hashtables. *)
 module type Hashtbl = sig
