@@ -58,7 +58,7 @@ struct
   let schar = Single, Ctype (TInt (ISChar, []))
   let uchar = Single, Ctype (TInt (IUChar, []))
   let int = Single, Ctype (TInt (IInt, []))
-  let unit = Single, Ctype (TInt (IUInt, []))
+  let uint = Single, Ctype (TInt (IUInt, []))
   let short = Single, Ctype (TInt (IShort, []))
   let ushort = Single, Ctype (TInt (IUShort, []))
   let long = Single, Ctype (TInt (ILong, []))

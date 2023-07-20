@@ -44,7 +44,7 @@ sig
   val schar : ('v,'v) typ
   val uchar : ('v,'v) typ
   val int : ('v,'v) typ
-  val unit : ('v,'v) typ
+  val uint : ('v,'v) typ
   val short : ('v,'v) typ
   val ushort : ('v,'v) typ
   val long : ('v,'v) typ
