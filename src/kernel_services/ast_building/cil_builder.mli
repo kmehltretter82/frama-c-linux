@@ -44,7 +44,7 @@ sig
   val schar : ('v,'v) typ
   val uchar : ('v,'v) typ
   val int : ('v,'v) typ
-  val unit : ('v,'v) typ
+  val uint : ('v,'v) typ
   val short : ('v,'v) typ
   val ushort : ('v,'v) typ
   val long : ('v,'v) typ
@@ -107,9 +107,22 @@ sig
 
   (* Constants *)
 
-  val of_constant : Cil_types.constant -> [> const]
+  (** Implicitly converted to type [int] when converted into C constant *)
   val of_int : int -> [> const]
+
+  (** Implicitly converted to type [int] when converted into C constant *)
   val of_integer : Integer.t -> [> const]
+
+  (** Default kind is [int]. Value is truncated if necessary. *)
+  val of_cint :
+    ?kind:Cil_types.ikind -> Integer.t -> [> const]
+
+  (** Default kind is [double].
+      Value is rounded to simple precision if necessary. *)
+  val of_cfloat :
+    ?kind:Cil_types.fkind -> float -> [> const]
+
+  val of_constant : Cil_types.constant -> [> const]
   val zero : [> const]
   val one : [> const]
 
