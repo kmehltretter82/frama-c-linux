@@ -490,11 +490,12 @@ struct
     with Not_found ->
       typing_error ("no field " ^ s ^ " in " ^ ci.Cil_types.cname)
 
-
   let rec build_constant = function
     | CilConstant const -> const
     | Int i -> build_constant (Integer (Integer.of_int i))
-    | Integer i -> Cil_types.(CInt64 (i, IInt, None))
+    | Integer i ->
+      let i,_ = Cil.truncateInteger64 IInt i in
+      Cil_types.(CInt64(i, IInt, None))
 
   and build_var ~scope = function
     | CilVar vi -> vi
