@@ -32,6 +32,7 @@ _build
 *.install
 *.coverage
 _coverage
+_bisect
 
 # This file is generated (on need) during configure
 /src/plugins/dune

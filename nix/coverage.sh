@@ -21,7 +21,12 @@
 #                                                                        #
 ##########################################################################
 
-for i in coverage/*.tar.xz ; do
+if [ -z ${BISECT_DIR+x} ]; then
+  echo "BISECT_DIR variable must indicate the reports directory"
+  exit 2
+fi
+
+for i in _bisect/*.tar.xz ; do
   tar xfJ "$i" ;
 done
 

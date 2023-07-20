@@ -133,12 +133,12 @@ ivette:
   artifacts:
     name: coverage-$CI_JOB_NAME
     paths:
-      - coverage/*.tar.xz
+      - _bisect/*.tar.xz
     expire_in: 24h
 
 .build_template: &coverage
   variables:
-    OUT: "coverage"
+    OUT: "_bisect"
   <<: *coverage_artifacts
 
 check-ts-api:
@@ -169,13 +169,13 @@ e-acsl-dev-tests:
 eva-default-tests:
   variables:
     CONFIG: "default"
-    OUT:    "coverage"
+    OUT:    "_bisect"
   <<: *eva_template
 
 .build_template: &eva_domains
   parallel:
     matrix:
-      - OUT: "coverage"
+      - OUT: "_bisect"
         CONFIG: [
           "apron",
           "bitwise",
@@ -233,7 +233,7 @@ external-plugins:
     - ./nix/external-plugin-ci.sh $PLUGIN
   parallel:
     matrix:
-      - OUT: "coverage"
+      - OUT: "_bisect"
         PLUGIN: [
           "acsl-importer",
           "caveat-importer",
@@ -286,6 +286,8 @@ build-distrib-tarball:
 
 coverage:
   stage: distrib
+  variables:
+    BISECT_DIR: "_bisect"
   script:
     - ./nix/shell-checkers.sh "./nix/coverage.sh"
   coverage: '/Coverage: \d+\.\d+\%/'

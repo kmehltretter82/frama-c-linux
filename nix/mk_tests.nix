@@ -82,16 +82,16 @@ stdenvNoCC.mkDerivation {
      else "") +
     (if cover
      then ''
-         mkdir coverage
+         mkdir -p _bisect
          export DUNE_WORKSPACE="dev/dune-workspace.cover"
-         export BISECT_FILE="$(pwd)/coverage/bisect-"
+         export BISECT_FILE="$(pwd)/_bisect/bisect-"
      ''
      else "");
 
   postBuild =
     if cover
     then ''
-      bisect-ppx-report cobertura --coverage-path=coverage coverage-$pname.xml
+      bisect-ppx-report cobertura --coverage-path=_bisect coverage-$pname.xml
       tar cfJ coverage.tar.xz coverage-$pname.xml
     ''
     else "" ;
