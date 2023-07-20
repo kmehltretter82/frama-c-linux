@@ -107,9 +107,22 @@ sig
 
   (* Constants *)
 
-  val of_constant : Cil_types.constant -> [> const]
+  (** Implicitly typed [int] when converted into C constant *)
   val of_int : int -> [> const]
+
+  (** Implicitly typed [int] when converted into C constant *)
   val of_integer : Integer.t -> [> const]
+
+  (** Default kind is [int]. Value is truncated if necessary. *)
+  val of_cint :
+    ?kind:Cil_types.ikind -> Integer.t -> [> const]
+
+  (** Default kind is [double].
+      Value is rounded to simple precision if necessary. *)
+  val of_cfloat :
+    ?kind:Cil_types.fkind -> float -> [> const]
+
+  val of_constant : Cil_types.constant -> [> const]
   val zero : [> const]
   val one : [> const]
 

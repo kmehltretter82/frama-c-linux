@@ -339,11 +339,23 @@ struct
 
   (* Constants *)
 
-  let of_constant c = `const (CilConstant c)
-  let of_integer i = `const (Integer i)
   let of_int i = `const (Int i)
+  let of_integer i = `const (Integer i)
+  let of_constant c = `const (CilConstant c)
+
   let zero = of_int 0
   let one = of_int 1
+
+  let of_cint ?(kind=Cil_types.IInt) iv =
+    let iv = fst @@ Cil.truncateInteger64 kind iv in
+    `const (CilConstant (CInt64(iv,kind,None)))
+
+  let of_cfloat ?(kind=Cil_types.FDouble) fv =
+    let fv =
+      match kind with
+      | FFloat -> Floating_point.round_to_single_precision_float fv
+      | FDouble | FLongDouble -> fv
+    in `const (CilConstant (CReal(fv,kind,None)))
 
   (* Lvalues *)
 
