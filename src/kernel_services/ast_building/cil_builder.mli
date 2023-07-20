@@ -107,10 +107,10 @@ sig
 
   (* Constants *)
 
-  (** Implicitly typed [int] when converted into C constant *)
+  (** Implicitly converted to type [int] when converted into C constant *)
   val of_int : int -> [> const]
 
-  (** Implicitly typed [int] when converted into C constant *)
+  (** Implicitly converted to type [int] when converted into C constant *)
   val of_integer : Integer.t -> [> const]
 
   (** Default kind is [int]. Value is truncated if necessary. *)
