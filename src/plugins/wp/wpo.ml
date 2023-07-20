@@ -100,9 +100,11 @@ struct
   let file_logout ~pid ~model ~prover =
     let id = WpPropId.get_propid pid in
     file ~id ~model ~prover ~ext:"out" ()
+
   let file_logerr ~pid ~model ~prover =
     let id = WpPropId.get_propid pid in
     file ~id ~model ~prover ~ext:"err" ()
+
   let file_goal ~pid ~model ~prover =
     let ext = match prover with
       | Qed -> "qed"

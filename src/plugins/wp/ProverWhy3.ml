@@ -1244,7 +1244,12 @@ let digest_task wpo drv ?script prover task =
       begin fun fmt ->
         Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
           (Why3Provers.ident_why3 prover) ;
-        let old = Option.map open_in script in
+        let old = Option.map
+            (fun fscript ->
+               let hash = Digest.file fscript |> Digest.to_hex in
+               Format.fprintf fmt "(* WP Script %s *)@\n" hash ;
+               open_in fscript
+            ) script in
         let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
         Option.iter close_in old ;
       end ;
@@ -1316,11 +1321,8 @@ let editor ~script ~merge ~config pconf driver task =
       if merge then updatescript ~script driver task ;
       let command = editor_command pconf in
       Wp_parameters.debug ~dkey "Editor command %S" command ;
-      let call =
-        Why3.Call_provers.call_editor
-          ~command ~config script
-      in
-      call_prover_task ~config ~timeout:None ~steps:None pconf.prover call
+      call_prover_task ~config ~timeout:None ~steps:None pconf.prover @@
+      Why3.Call_provers.call_editor ~command ~config script
     end
 
 let compile ~script ~timeout ~config wpo pconf driver prover task =
