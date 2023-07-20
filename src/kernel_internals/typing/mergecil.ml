@@ -1086,7 +1086,7 @@ let matchCompInfoGen (combineF : combineFunction) (oldfidx: int) (oldci: compinf
         * old compinfo. *)
        begin
          try
-           (* must_check_offsets indicates that composite type attributes are
+           (* mustCheckOffsets indicates that composite type attributes are
               different, which may impact field offsets *)
            let mustCheckOffsets =
              if equal_attributes_for_merge ci.cattr oldci.cattr then false
@@ -1203,8 +1203,31 @@ let matchTypeInfoGen (combineF : combineFunction) (oldfidx: int) (oldti: typeinf
        raise (Failure msg));
     ignore(union oldtnode tnode)
 
+let conflict_detected = ref false
+
 let combines = {
-  typ_combine = (fun a b -> combineTypesGen a ~strictInteger:false ~strictReturnTypes:b);
+  typ_combine = (fun combF b what oldfidx oldt fidx t ->
+      let find_names_file = H.find fileNames in
+      let old_file = find_names_file oldfidx in
+      let new_file = find_names_file fidx in
+      let old_name_file = Filepath.Normalized.to_pretty_string old_file in
+      let new_name_file = Filepath.Normalized.to_pretty_string new_file in
+      let pre_msg = "Conflicting definitions are between files "^
+                    old_name_file^" and "^new_name_file  in
+      let emitwith _ =
+          let msg =
+            if (not !conflict_detected) && oldfidx <> fidx
+            then
+              begin
+                conflict_detected := true;
+                pre_msg
+              end
+            else "" in
+          Kernel.warning "%s" msg in
+      combineTypesGen
+        ~emitwith
+        combF ~strictInteger:false ~strictReturnTypes:b
+        what oldfidx oldt fidx t);
   enum_combine = (fun _ oldfidx oldei fidx ei ->
       matchEnumInfo oldfidx oldei fidx ei;
       oldei);
@@ -1212,8 +1235,8 @@ let combines = {
       matchCompInfoGen c oldfidx oldei fidx ei;
       oldei);
   name_combine = (fun c _ oldfidx oldei fidx ei ->
-      matchTypeInfoGen c oldfidx oldei fidx ei;
-      oldei);
+    matchTypeInfoGen c oldfidx oldei fidx ei;
+    oldei);
 }
 
 let matchCompInfo = matchCompInfoGen combines

@@ -5931,9 +5931,10 @@ type combineFunction =
    Note: we cannot force the qualifiers of oldt and t to be the same here,
    because in some cases (e.g. string literals and char pointers) it is
    allowed to have differences, while in others we want to be more strict. *)
-let combineTypesGen (combineF : combineFunction)
+let combineTypesGen ?emitwith (combineF : combineFunction)
     ?(strictInteger=true) ?(strictReturnTypes=false)
     (what : combineWhat) (oldfidx : int) (oldt : typ) (fidx : int) (t : typ) : typ =
+  let warning = Kernel.warning ?emitwith in
   match oldt, t with
   | TVoid olda, TVoid a -> TVoid (combineAttributes what olda a)
 
@@ -5966,7 +5967,7 @@ let combineTypesGen (combineF : combineFunction)
         if bytesSizeOfInt oldk == bytesSizeOfInt k && isSigned oldk == isSigned k
         then
           begin
-            Kernel.warning ~current:true
+            warning ~current:true
               "Integer compatibily is machine-dependant : %a and %a\n"
               Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t;
             result k oldk
@@ -6022,7 +6023,7 @@ let combineTypesGen (combineF : combineFunction)
         if same_int64 ~machdep:false oldsz' sz' then
           oldsz
         else if same_int64 ~machdep:true oldsz' sz' then begin
-          Kernel.warning ~current:true
+          warning ~current:true
             "Array type comparison succeeds only based on machine-dependent \
              constant evaluation: %a and %a\n"
             Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t;
