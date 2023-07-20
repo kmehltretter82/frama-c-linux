@@ -368,10 +368,10 @@ ocaml-versions:
   except:
     - schedules
 
-ocaml-versions-more:
-  <<: *ocaml_versions_template
-# Uncomment below when there are intermediate versions to check manully
-#  <<: *ocaml_manual_additional_versions_template
+# Uncomment this section when there are additional versions of OCaml to test
+# ocaml-versions-more:
+#   <<: *ocaml_versions_template
+#   <<: *ocaml_manual_additional_versions_template
 
 ocaml-versions-nightly:
   <<: *ocaml_versions_template
