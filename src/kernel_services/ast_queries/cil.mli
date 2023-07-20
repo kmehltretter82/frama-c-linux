@@ -722,7 +722,7 @@ type combineFunction =
       typeinfo -> typeinfo -> typeinfo;
   }
 
-(** [combineTypesGen combF combW oldfidx oldt fidx newt] combine [oldt] and
+(** [combineTypesGen combF combW oldt newt] combine [oldt] and
     [newt] accordingly to [combF].
     Warning : this is not commutative.
     Indeed, excluding enum, struct/union and typedef which depend on [combF],
@@ -749,7 +749,7 @@ val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
 *)
 val combineTypes : ?strictReturnTypes:bool -> combineWhat -> typ -> typ -> typ
 
-(** How type qualifiers must be checked when chechking for types compatibility
+(** How type qualifiers must be checked when checking for types compatibility
     with {!areCompatibleTypes} and {!compatibleTypes}.
 
     @since Frama-C+dev
@@ -1467,7 +1467,7 @@ val typeAttr: typ -> attribute list
 val setTypeAttrs: typ -> attributes -> typ
 
 (** Add some attributes to a type.
-    [combine] explains how combines attributes. Default is [addAttributes].
+    [combine] explains how to combine attributes. Default is [addAttributes].
 
     @before Frama-C+dev [combine] does not exist *)
 val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->
