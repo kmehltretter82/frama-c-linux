@@ -2,6 +2,7 @@
 , stdenv
 , black
 , clang_10
+, combinetura
 , frama-c-hdrck
 , frama-c-lint
 , git
@@ -16,6 +17,7 @@ stdenv.mkDerivation rec {
   buildInputs = [
     black
     clang_10
+    combinetura
     frama-c-hdrck
     frama-c-lint
     git

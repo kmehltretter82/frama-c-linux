@@ -282,6 +282,19 @@ build-distrib-tarball:
       - ./*.tar.gz
     expire_in: 1 week
 
+# Coverage
+
+coverage:
+  stage: distrib
+  script:
+    - ./nix/shell-checkers.sh "./nix/coverage.sh"
+  coverage: '/Coverage: \d+\.\d+\%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: report.xml
+
 # Check files header
 
 header-check:
