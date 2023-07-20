@@ -998,13 +998,14 @@ let checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f1 f2 =
         "field offset not found in table: %a or %a"
         Printer.pp_field f1 Printer.pp_field f2
 
+let oldfidx = ref 0
+let fidx = ref 0
 
 (* Match two enuminfos and throw a Failure if they do not match *)
-let matchEnumInfo (oldfidx: int) (oldei: enuminfo)
-    (fidx: int)    (ei: enuminfo) : unit =
+let matchEnumInfoGen (oldei: enuminfo) (ei: enuminfo) : unit =
   (* Find the node for this enum, no path compression. *)
-  let oldeinode = EnumMerging.getNode eEq eSyn oldfidx oldei oldei None in
-  let einode = EnumMerging.getNode eEq eSyn fidx ei ei None in
+  let oldeinode = EnumMerging.getNode eEq eSyn !oldfidx oldei oldei None in
+  let einode = EnumMerging.getNode eEq eSyn !fidx ei ei None in
   if oldeinode == einode then (* We already know they are the same *)
     ()
   else
@@ -1036,8 +1037,8 @@ let matchEnumInfo (oldfidx: int) (oldei: enuminfo)
         ignore(EnumMerging.union einode intEnumInfoNode)
 
 
-let matchCompInfoGen (combineF : combineFunction) (oldfidx: int) (oldci: compinfo)
-    (fidx: int) (ci: compinfo) : unit =
+let matchCompInfoGen (combineF : combineFunction)
+    (oldci: compinfo) (ci: compinfo) : unit =
   let cstruct = oldci.cstruct in
   if cstruct <> ci.cstruct then
     raise (Failure "different struct/union types");
@@ -1045,17 +1046,17 @@ let matchCompInfoGen (combineF : combineFunction) (oldfidx: int) (oldci: compinf
   (* Make the nodes if not already made. Actually return the
    * representatives *)
   let oldcinode =
-    PlainMerging.getNode sEq sSyn oldfidx oldci.cname oldci None
+    PlainMerging.getNode sEq sSyn !oldfidx oldci.cname oldci None
   in
-  let cinode = PlainMerging.getNode sEq sSyn fidx ci.cname ci None in
+  let cinode = PlainMerging.getNode sEq sSyn !fidx ci.cname ci None in
   if oldcinode == cinode then (* We already know they are the same *)
     ()
   else
     (* Replace with the representative data *)
     let oldci = oldcinode.ndata in
-    let oldfidx = oldcinode.nfidx in
+    oldfidx := oldcinode.nfidx;
     let ci = cinode.ndata in
-    let fidx = cinode.nfidx in
+    fidx := cinode.nfidx;
     (* We check that they are defined in the same way. While doing this there
      * might be recursion and we have to watch for going into an infinite
      * loop. So we add the assumption that they are equal *)
@@ -1114,7 +1115,7 @@ let matchCompInfoGen (combineF : combineFunction) (oldfidx: int) (oldci: compinf
                    We do not force this for now, but could do it. *)
                 let newtype =
                   combineF.typ_combine combineF true
-                    CombineOther oldfidx oldf.ftype fidx f.ftype in
+                    CombineOther oldf.ftype f.ftype in
                 (* Change the type in the representative *)
                 oldf.ftype <- newtype)
              oldfields fields
@@ -1166,25 +1167,25 @@ let matchCompInfoGen (combineF : combineFunction) (oldfidx: int) (oldci: compinf
 
 
 (* Match two typeinfos and throw a Failure if they do not match *)
-let matchTypeInfoGen (combineF : combineFunction) (oldfidx: int) (oldti: typeinfo)
-    (fidx: int)      (ti: typeinfo) : unit =
+let matchTypeInfoGen (combineF : combineFunction)
+    (oldti: typeinfo) (ti: typeinfo) : unit =
   if oldti.tname = "" || ti.tname = "" then
     Kernel.fatal "matchTypeInfo for anonymous type";
   (* Find the node for this enum, no path compression. *)
-  let oldtnode = PlainMerging.getNode tEq tSyn oldfidx oldti.tname oldti None in
-  let tnode = PlainMerging.getNode tEq tSyn    fidx ti.tname    ti None in
+  let oldtnode = PlainMerging.getNode tEq tSyn !oldfidx oldti.tname oldti None in
+  let tnode = PlainMerging.getNode tEq tSyn !fidx ti.tname    ti None in
   if oldtnode == tnode then (* We already know they are the same *)
     ()
   else
     (* Replace with the representative data *)
     let oldti = oldtnode.ndata in
-    let oldfidx = oldtnode.nfidx in
+    oldfidx := oldtnode.nfidx;
     let ti = tnode.ndata in
-    let fidx = tnode.nfidx in
+    fidx := tnode.nfidx;
     (* Check that they are the same *)
     (try
        ignore (combineF.typ_combine combineF true
-                 CombineOther oldfidx oldti.ttype fidx ti.ttype);
+                 CombineOther oldti.ttype ti.ttype);
      with (Cannot_combine reason | Failure reason) ->
        let msg =
          let oldname = oldti.tname in
@@ -1206,44 +1207,50 @@ let matchTypeInfoGen (combineF : combineFunction) (oldfidx: int) (oldti: typeinf
 let conflict_detected = ref false
 
 let combines = {
-  typ_combine = (fun combF b what oldfidx oldt fidx t ->
+  typ_combine = (fun combF b what oldt t ->
       let find_names_file = H.find fileNames in
-      let old_file = find_names_file oldfidx in
-      let new_file = find_names_file fidx in
+      let old_file = find_names_file !oldfidx in
+      let new_file = find_names_file !fidx in
       let old_name_file = Filepath.Normalized.to_pretty_string old_file in
       let new_name_file = Filepath.Normalized.to_pretty_string new_file in
       let pre_msg = "Conflicting definitions are between files "^
-                    old_name_file^" and "^new_name_file  in
+                    old_name_file^" and "^new_name_file in
       let emitwith _ =
-          let msg =
-            if (not !conflict_detected) && oldfidx <> fidx
-            then
-              begin
-                conflict_detected := true;
-                pre_msg
-              end
-            else "" in
-          Kernel.warning "%s" msg in
-      combineTypesGen
-        ~emitwith
+        let msg =
+          if (not !conflict_detected) && oldfidx <> fidx
+          then
+            begin
+              conflict_detected := true;
+              pre_msg
+            end
+          else "" in
+        Kernel.warning "%s" msg in
+      combineTypesGen ~emitwith
         combF ~strictInteger:false ~strictReturnTypes:b
-        what oldfidx oldt fidx t);
-  enum_combine = (fun _ oldfidx oldei fidx ei ->
-      matchEnumInfo oldfidx oldei fidx ei;
+        what oldt t);
+  enum_combine = (fun _ oldei ei ->
+      matchEnumInfoGen oldei ei;
       oldei);
-  comp_combine = (fun c oldfidx oldei fidx ei ->
-      matchCompInfoGen c oldfidx oldei fidx ei;
-      oldei);
-  name_combine = (fun c _ oldfidx oldei fidx ei ->
-    matchTypeInfoGen c oldfidx oldei fidx ei;
-    oldei);
+  comp_combine = (fun c oldci ci ->
+      matchCompInfoGen c oldci ci;
+      oldci);
+  name_combine = (fun c _ oldti ti ->
+      matchTypeInfoGen c oldti ti;
+      oldti);
 }
 
-let matchCompInfo = matchCompInfoGen combines
+let setFidCall f oldfid oldt fid t =
+  oldfidx := oldfid;
+  fidx := fid;
+  f oldt t
 
-let matchTypeInfo = matchTypeInfoGen combines
+let matchEnumInfo = setFidCall matchEnumInfoGen
 
-let combineTypes = combines.typ_combine combines true
+let matchCompInfo = setFidCall (matchCompInfoGen combines)
+
+let matchTypeInfo = setFidCall (matchTypeInfoGen combines)
+
+let combineTypes what = setFidCall (combines.typ_combine combines true what)
 
 (* Match two compinfos and throw a Failure if they do not match *)
 

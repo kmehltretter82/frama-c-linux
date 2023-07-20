@@ -702,24 +702,24 @@ val combineAttributes : combineWhat -> attribute list -> attributes -> attribute
     typedef are to be handled when combining with {!combineTypes} and
     {!combineTypesGen}.
     In pratice, the first argument of each field is a recursive definition.
-    [oldfidx] and [fidx] are the identifiers of the files containing the
-    definition.
 
     @since Frama-C+dev
 *)
 type combineFunction =
   {
     typ_combine : combineFunction ->
-      bool -> combineWhat -> int -> typ -> int -> typ -> typ;
+      bool -> combineWhat -> typ -> typ -> typ;
+    (** [bool] is about strictness in return context.
+        See [StrictReturnTypes] in [combineTypeGen] *)
 
     enum_combine : combineFunction ->
-      int -> enuminfo -> int -> enuminfo -> enuminfo;
+      enuminfo -> enuminfo -> enuminfo;
 
     comp_combine : combineFunction ->
-      int -> compinfo -> int -> compinfo -> compinfo;
+      compinfo -> compinfo -> compinfo;
 
     name_combine : combineFunction -> combineWhat ->
-      int -> typeinfo -> int -> typeinfo -> typeinfo;
+      typeinfo -> typeinfo -> typeinfo;
   }
 
 (** [combineTypesGen combF combW oldfidx oldt fidx newt] combine [oldt] and
@@ -734,15 +734,13 @@ type combineFunction =
     A warning is sent if [false] and the compatibility is machine-dependent.
     [strictReturnTypes] is [false] (default) if a non-void type is compatible
     with void in a return case.
-    [oldfidx] and [fidx] are the identifiers of the files containing the [oldt]
-    and [newt] types.
     Notice that the [~emitwith] action is called iff a warning is logged.
 
     @since Frama-C+dev
 *)
 val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
   ?strictInteger:bool -> ?strictReturnTypes:bool ->
-  combineWhat -> int -> typ -> int -> typ -> typ
+  combineWhat -> typ -> typ -> typ
 
 (** Specialized verison of [combineTypesGen], we suppore here that
     if two global symbols are equal, then they are the same object.
@@ -1056,7 +1054,7 @@ val compareConstant: constant -> constant -> bool
 
 
 (** [true] if two kinds have the same size independently of the machine.*)
-val sameSizeInt : ikind -> ikind -> bool
+val sameSizeInt : ?machdep:bool -> ikind -> ikind -> bool
 
 (** [true] if the result of two expressions are two equal integers. *)
 val same_int64 : ?machdep:bool -> exp -> exp -> bool

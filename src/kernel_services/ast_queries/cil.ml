@@ -5860,14 +5860,16 @@ let getCompField cinfo fieldName =
     (fun fi -> fi.fname = fieldName)
     (Option.value ~default:[] cinfo.cfields)
 
-let sameSizeInt (ik1 : ikind) (ik2 : ikind) =
-  match ik1, ik2 with
-  | (IChar | ISChar | IUChar), (IChar | ISChar | IUChar) -> true
-  | (IShort | IUShort), (IShort | IUShort) -> true
-  | (IInt | IUInt), (IInt | IUInt) -> true
-  | (ILong | IULong), (ILong | IULong) -> true
-  | (ILongLong | IULongLong), (ILongLong | IULongLong) -> true
-  | _ -> false
+let sameSizeInt ?(machdep=false) (ik1 : ikind) (ik2 : ikind) =
+  if machdep then bytesSizeOfInt ik1 == bytesSizeOfInt ik2
+  else
+    match ik1, ik2 with
+    | (IChar | ISChar | IUChar), (IChar | ISChar | IUChar) -> true
+    | (IShort | IUShort), (IShort | IUShort) -> true
+    | (IInt | IUInt), (IInt | IUInt) -> true
+    | (ILong | IULong), (ILong | IULong) -> true
+    | (ILongLong | IULongLong), (ILongLong | IULongLong) -> true
+    | _ -> false
 
 
 let sameSign ?(machdep=false) (ik1 : ikind) (ik2 : ikind) =
@@ -5913,16 +5915,16 @@ let combineAttributes what olda a =
 type combineFunction =
   {
     typ_combine : combineFunction ->
-      bool -> combineWhat -> int -> typ -> int -> typ -> typ;
+      bool -> combineWhat -> typ -> typ -> typ;
 
     enum_combine : combineFunction ->
-      int -> enuminfo -> int -> enuminfo -> enuminfo;
+      enuminfo -> enuminfo -> enuminfo;
 
     comp_combine : combineFunction ->
-      int -> compinfo -> int -> compinfo -> compinfo;
+      compinfo -> compinfo -> compinfo;
 
     name_combine : combineFunction -> combineWhat ->
-      int -> typeinfo -> int -> typeinfo -> typeinfo;
+      typeinfo -> typeinfo -> typeinfo;
   }
 
 (* Combine the types. Raises the Cannot_combine exception with an error message.
@@ -5931,9 +5933,9 @@ type combineFunction =
    Note: we cannot force the qualifiers of oldt and t to be the same here,
    because in some cases (e.g. string literals and char pointers) it is
    allowed to have differences, while in others we want to be more strict. *)
-let combineTypesGen ?emitwith (combineF : combineFunction)
+let combineTypesGen ?emitwith (combF : combineFunction)
     ?(strictInteger=true) ?(strictReturnTypes=false)
-    (what : combineWhat) (oldfidx : int) (oldt : typ) (fidx : int) (t : typ) : typ =
+    (what : combineWhat) (oldt : typ) (t : typ) : typ =
   let warning = Kernel.warning ?emitwith in
   match oldt, t with
   | TVoid olda, TVoid a -> TVoid (combineAttributes what olda a)
@@ -5958,13 +5960,13 @@ let combineTypesGen ?emitwith (combineF : combineFunction)
       if oldk == k then oldk else
       if not strictInteger
       then
-        if sameSizeInt oldk k && sameSign ~machdep:false oldk k
+        if sameSizeInt ~machdep:false oldk k && sameSign ~machdep:false oldk k
         then
           (* The types contain the same sort of values but are not equal.
              For example on x86_16 machdep unsigned short and unsigned int. *)
           result k oldk
         else
-        if bytesSizeOfInt oldk == bytesSizeOfInt k && isSigned oldk == isSigned k
+        if sameSizeInt ~machdep:true oldk k && sameSign ~machdep:true oldk k
         then
           begin
             warning ~current:true
@@ -5993,7 +5995,7 @@ let combineTypesGen ?emitwith (combineF : combineFunction)
   | TEnum (oldei, olda), TEnum (ei, a) ->
     (* Matching enumerations always succeeds. But sometimes it maps both
      * enumerations to integers *)
-    TEnum (combineF.enum_combine combineF oldfidx oldei fidx ei,
+    TEnum (combF.enum_combine combF oldei ei,
            combineAttributes what olda a)
 
   (* Strange one. But seems to be handled by GCC *)
@@ -6006,12 +6008,12 @@ let combineTypesGen ?emitwith (combineF : combineFunction)
     TEnum(ei, combineAttributes what olda a)
 
   | TComp (oldci, olda) , TComp (ci, a) ->
-    TComp(combineF.comp_combine combineF oldfidx oldci fidx ci,
+    TComp(combF.comp_combine combF oldci ci,
           combineAttributes what olda a)
 
   | TArray (oldbt, oldsz, olda), TArray (bt, sz, a) ->
-    let newbt = combineF.typ_combine combineF strictReturnTypes
-        CombineOther oldfidx oldbt fidx bt in
+    let newbt = combF.typ_combine combF strictReturnTypes CombineOther
+        oldbt bt in
     let newsz =
       match oldsz, sz with
       | None, Some _ -> sz
@@ -6034,13 +6036,12 @@ let combineTypesGen ?emitwith (combineF : combineFunction)
     TArray (newbt, newsz, combineAttributes what olda a)
 
   | TPtr (oldbt, olda), TPtr (bt, a) ->
-    TPtr (combineF.typ_combine combineF strictReturnTypes
-            CombineOther oldfidx oldbt fidx bt,
+    TPtr (combF.typ_combine combF strictReturnTypes CombineOther oldbt bt,
           combineAttributes what olda a)
 
   | TFun (oldrt, oldargs, oldva, olda), TFun (rt, args, va, a) ->
-    let newrt = combineF.typ_combine combineF strictReturnTypes
-        CombineFunret oldfidx oldrt fidx rt in
+    let newrt = combF.typ_combine combF strictReturnTypes
+        CombineFunret oldrt rt in
     if oldva != va then
       raise (Cannot_combine "different vararg specifiers");
     (* If one does not have arguments, believe the one with the
@@ -6054,7 +6055,7 @@ let combineTypesGen ?emitwith (combineF : combineFunction)
           raise (Cannot_combine "different number of arguments")
         else if List.length oldghostargslist <> List.length ghostargslist then
           raise (Cannot_combine "different number of ghost arguments")
-        else begin
+        else
           let oldargslist = oldargslist @ oldghostargslist in
           let argslist = argslist @ ghostargslist in
           (* Go over the arguments and update the old ones with the
@@ -6069,16 +6070,14 @@ let combineTypesGen ?emitwith (combineF : combineFunction)
             (List.map2
                (fun (on, ot, oa) (an, at, aa) ->
                   (* Update the names. Always prefer the new name. This is
-                   * very important if the prototype uses different names than
-                   * the function definition. *)
+                     very important if the prototype uses different names than
+                     the function definition. *)
                   let n = if an <> "" then an else on in
-                  let t = combineF.typ_combine combineF strictReturnTypes
-                      what oldfidx ot fidx at in
+                  let t = combF.typ_combine combF strictReturnTypes what ot at in
                   let a = addAttributes oa aa in
                   (n, t, a))
                oldargslist argslist),
           olda
-        end
     in
     (* Drop missingproto as soon as one of the type is a properly declared one*)
     let olda =
@@ -6097,47 +6096,49 @@ let combineTypesGen ?emitwith (combineF : combineFunction)
     TBuiltin_va_list (combineAttributes what olda a)
 
   | TNamed (oldt, olda), TNamed (t, a) ->
-    TNamed (combineF.name_combine combineF what oldfidx oldt fidx t,
+    TNamed (combF.name_combine combF what oldt t,
             combineAttributes what olda a)
 
   | _, TNamed (t, a) ->
-    let res = combineF.typ_combine combineF strictReturnTypes what oldfidx oldt fidx t.ttype in
+    let res = combF.typ_combine combF strictReturnTypes what oldt t.ttype in
     typeAddAttributes ~combine:(combineAttributes what) a res
 
   | TNamed (oldt, olda), _ ->
-    let res = combineF.typ_combine combineF strictReturnTypes what oldfidx oldt.ttype fidx t in
+    let res = combF.typ_combine combF strictReturnTypes what oldt.ttype t in
     typeAddAttributes ~combine:(combineAttributes what) olda res
 
-  | _ -> raise (Cannot_combine
-                  (Format.asprintf "different type constructors:@ %a and %a"
-                     Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t))
+  | _ ->
+    raise
+      (Cannot_combine
+         (Format.asprintf "different type constructors:@ %a and %a"
+            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t))
 
 
 let default_combines = {
-  typ_combine = (fun c b -> combineTypesGen c ~strictInteger:true ~strictReturnTypes:b);
-  enum_combine = (fun _ _ _ _ ei -> ei);
-  comp_combine = (fun _ _ oldci _ ci ->
+  typ_combine = (fun c b ->
+      combineTypesGen c ~strictInteger:true ~strictReturnTypes:b);
+  enum_combine = (fun _ _ ei -> ei);
+  comp_combine = (fun _ oldci ci ->
       if oldci.cstruct <> ci.cstruct then
         raise (Cannot_combine "different struct/union types");
       if oldci.cname = ci.cname then
         oldci
       else
-        raise (Cannot_combine (Format.sprintf "%ss with different tags"
-                                 (if oldci.cstruct then "struct" else "union"))));
-  name_combine = (fun c what oldfidx oldt fidx t ->
+        raise (Cannot_combine
+                 (Format.sprintf "%ss with different tags"
+                    (if oldci.cstruct then "struct" else "union"))));
+  name_combine = (fun c what oldt t ->
       if oldt.tname = t.tname then oldt
       else
         begin
-          ignore (c.typ_combine c false what oldfidx oldt.ttype fidx t.ttype);
+          ignore (c.typ_combine c false what oldt.ttype t.ttype);
           oldt
-        end
-    );
+        end);
 }
 
 
-let combineTypes ?(strictReturnTypes=false) (what: combineWhat) (oldt: typ) (t: typ) : typ =
-  let useless = 0 in
-  combineTypesGen default_combines ~strictReturnTypes what useless oldt useless t
+let combineTypes ?(strictReturnTypes=false) what (oldt: typ) (t: typ) : typ =
+  combineTypesGen default_combines ~strictReturnTypes what oldt t
 
 (***************** Compatibility ******)
 
