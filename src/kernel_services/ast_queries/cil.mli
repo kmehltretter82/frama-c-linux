@@ -698,31 +698,51 @@ type combineWhat =
 *)
 val combineAttributes : combineWhat -> attribute list -> attributes -> attributes
 
-(** [combineFunction] contains informations about how enum, struct/union and
-    typedef should be handled when combining with {!combineTypes} and
-    {!combineTypesGen}
+(** [combineFunction] contains information on how enum, struct/union and
+    typedef are to be handled when combining with {!combineTypes} and
+    {!combineTypesGen}.
+    In pratice, the first argument of each field is a recursive definition.
+    [oldfidx] and [fidx] are the identifiers of the files containing the
+    definition.
 
     @since Frama-C+dev
 *)
 type combineFunction =
   {
-    typ_combine :
-      combineFunction -> bool -> combineWhat -> int -> typ -> int -> typ -> typ;
-    enum_combine :
-      combineFunction -> int -> enuminfo -> int -> enuminfo -> enuminfo;
-    comp_combine :
-      combineFunction -> int -> compinfo -> int -> compinfo -> compinfo;
-    name_combine :
-      combineFunction -> combineWhat -> int -> typeinfo -> int -> typeinfo -> typeinfo;
+    typ_combine : combineFunction ->
+      bool -> combineWhat -> int -> typ -> int -> typ -> typ;
+
+    enum_combine : combineFunction ->
+      int -> enuminfo -> int -> enuminfo -> enuminfo;
+
+    comp_combine : combineFunction ->
+      int -> compinfo -> int -> compinfo -> compinfo;
+
+    name_combine : combineFunction -> combineWhat ->
+      int -> typeinfo -> int -> typeinfo -> typeinfo;
   }
 
-(** [combineTypesGen] combine two types accordingly to the combineFunction argument.
-    If types cannot be combine, it throw an exception.
+(** [combineTypesGen combF combW oldfidx oldt fidx newt] combine [oldt] and
+    [newt] accordingly to [combF].
+    Warning : this is not commutative.
+    Indeed, excluding enum, struct/union and typedef which depend on [combF],
+    the resulting type is as close as possible to [newt].
+    If the types cannot be combined, it throws [Cannot_combine] with an
+    explication.
+    [strictInteger] is [true] (default) if two integers with same size and sign
+    but with different types cannot be combined.
+    A warning is sent if [false] and the compatibility is machine-dependent.
+    [strictReturnTypes] is [false] (default) if a non-void type is compatible
+    with void in a return case.
+    [oldfidx] and [fidx] are the identifiers of the files containing the [oldt]
+    and [newt] types.
+    Notice that the [~emitwith] action is called iff a warning is logged.
 
     @since Frama-C+dev
 *)
-val combineTypesGen : combineFunction -> ?strictInteger:bool ->
-  ?strictReturnTypes:bool -> combineWhat -> int -> typ -> int -> typ -> typ
+val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
+  ?strictInteger:bool -> ?strictReturnTypes:bool ->
+  combineWhat -> int -> typ -> int -> typ -> typ
 
 (** Specialized verison of [combineTypesGen], we suppore here that
     if two global symbols are equal, then they are the same object.
@@ -751,14 +771,18 @@ type qualifier_check_context =
   (** Accepts everything for current type, use Contravariant when going under
       a pointer. *)
 
-(** [areCompatibleTypes] returns [true] if two types are compatible
+(** [areCompatibleTypes] returns [true] if two types are compatible.
+    [context] indicates how check the compatibility of qualifiers.
+    Other arguments are the same than [combineTypes].
 
     @since Frama-C+dev
 *)
 val areCompatibleTypes :
   ?strictReturnTypes:bool -> ?context:qualifier_check_context -> typ -> typ -> bool
 
-(** Same as [areCompatibleTypes] but returns the combined version
+(** Same as [areCompatibleTypes old newt] but combine [oldt] and [newt].
+    [context] does not impact the qualifiers of the result.
+    Raise [Cannot_combine] if [oldt] and [newt] are not compatible.
 
     @since Frama-C+dev
 *)
@@ -1444,7 +1468,10 @@ val typeAttr: typ -> attribute list
     are discarded. *)
 val setTypeAttrs: typ -> attributes -> typ
 
-(** Add some attributes to a type *)
+(** Add some attributes to a type.
+    [combine] explains how combines attributes. Default is [addAttributes].
+
+    @before Frama-C+dev [combine] does not exist *)
 val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->
   attribute list -> typ -> typ
 
