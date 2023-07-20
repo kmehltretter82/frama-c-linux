@@ -233,8 +233,7 @@ external-plugins:
     - ./nix/external-plugin-ci.sh $PLUGIN
   parallel:
     matrix:
-      - OUT: "_bisect"
-        PLUGIN: [
+      - PLUGIN: [
           "acsl-importer",
           "caveat-importer",
           "context-from-precondition",
@@ -248,7 +247,6 @@ external-plugins:
           "security",
           "volatile"
         ]
-  <<: *coverage
 
 ################################################################################
 ### DISTRIB
