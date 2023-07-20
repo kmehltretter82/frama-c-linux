@@ -346,16 +346,23 @@ struct
   let zero = of_int 0
   let one = of_int 1
 
-  let of_cint ?(kind=Cil_types.IInt) iv =
-    let iv = fst @@ Cil.truncateInteger64 kind iv in
-    `const (CilConstant (CInt64(iv,kind,None)))
+  let mk_cint kind iv =
+    let iv, _ = Cil.truncateInteger64 kind iv in
+    Cil_types.CInt64(iv,kind,None)
 
-  let of_cfloat ?(kind=Cil_types.FDouble) fv =
+  let mk_cfloat kind fv =
+    let open Cil_types in
     let fv =
       match kind with
       | FFloat -> Floating_point.round_to_single_precision_float fv
       | FDouble | FLongDouble -> fv
-    in `const (CilConstant (CReal(fv,kind,None)))
+    in CReal(fv,kind,None)
+
+  let of_cint ?(kind=Cil_types.IInt) iv =
+    `const (CilConstant (mk_cint kind iv))
+
+  let of_cfloat ?(kind=Cil_types.FDouble) fv =
+    `const (CilConstant (mk_cfloat kind fv))
 
   (* Lvalues *)
 
@@ -492,10 +499,8 @@ struct
 
   let rec build_constant = function
     | CilConstant const -> const
-    | Int i -> build_constant (Integer (Integer.of_int i))
-    | Integer i ->
-      let i,_ = Cil.truncateInteger64 IInt i in
-      Cil_types.(CInt64(i, IInt, None))
+    | Int i -> mk_cint IInt (Integer.of_int i)
+    | Integer i -> mk_cint IInt i
 
   and build_var ~scope = function
     | CilVar vi -> vi
