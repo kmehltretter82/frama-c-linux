@@ -93,7 +93,7 @@ def compute(files):
 
 def print_edge(cg: Callgraph, caller, called, padding="", end="\n") -> None:
     locs = cg.edges[(caller, called)]
-    for (filename, line) in locs:
+    for filename, line in locs:
         print(
             f"{padding}{os.path.relpath(filename)}:{line}: {caller} -> {called}",
             end=end,
@@ -101,14 +101,14 @@ def print_edge(cg: Callgraph, caller, called, padding="", end="\n") -> None:
 
 
 def print_cg(cg: Callgraph) -> None:
-    for (caller, called) in cg.edges:
+    for caller, called in cg.edges:
         print_edge(cg, caller, called)
 
 
 # note: out _must_ exist (the caller must create it if needed)
 def print_cg_dot(cg: Callgraph, out=sys.stdout) -> None:
     print("digraph callgraph {", file=out)
-    for (caller, called) in cg.edges:
+    for caller, called in cg.edges:
         print(f"  {caller} -> {called};", file=out)
     print("}", file=out)
 
@@ -177,7 +177,7 @@ def detect_recursion(cg) -> None:
         if cycle:
             has_cycle = True
             print("recursive cycle detected: ")
-            for (caller, called) in cycle:
+            for caller, called in cycle:
                 print_edge(cg, caller, called, padding="  ")
         to_visit -= visited
     if not has_cycle:

@@ -7,7 +7,6 @@ let
     headache = oself.callPackage ./headache.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
     why3 = oself.callPackage ./why3.nix {};
-    yaml = oself.callPackage ./yaml.nix {};
     ppx_deriving_yaml = oself.callPackage ./ppx_deriving_yaml.nix {};
 
     # Helpers

@@ -30,7 +30,7 @@ def load(filename):
     try:
         with open(filename, "r") as file:
             content = file.read()
-            for (key, value) in stat_file_re.findall(content):
+            for key, value in stat_file_re.findall(content):
                 data[key] = value
     except OSError:
         pass
