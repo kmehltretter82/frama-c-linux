@@ -247,12 +247,12 @@ let rec pp fmt (a : ast) =
     List.iter (Format.fprintf fmt " ;@ %a" pp) vs ;
     Format.fprintf fmt " |]@]"
   | Field(v,id) -> Format.fprintf fmt "%a.%s" pp v id
-  | Call(id,[],true) -> Format.fprintf fmt "%s(..)" id
+  | Call(id,[],true) -> Format.fprintf fmt "%s((..))" id
   | Call(id,[],false) -> Format.fprintf fmt "%s()" id
   | Call(id,v::vs,trail) ->
     Format.fprintf fmt "@[<hov 2>%s(%a" id pp v ;
     List.iter (Format.fprintf fmt ",@ %a" pp) vs ;
-    if trail then Format.fprintf fmt ",@ .." ;
+    if trail then Format.fprintf fmt ",@ (..)" ;
     Format.fprintf fmt ")@]"
   | Pany [] -> Format.pp_print_string fmt "\\never"
   | Pany (v::vs) ->
