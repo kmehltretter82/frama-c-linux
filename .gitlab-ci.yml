@@ -296,6 +296,7 @@ coverage:
       coverage_report:
         coverage_format: cobertura
         path: report.xml
+    expire_in: 1 week
 
 # Check files header
 
