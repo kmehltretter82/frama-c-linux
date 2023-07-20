@@ -46,7 +46,6 @@
 , doxygen
 , python3
 , python3Packages
-, yq
 , cover ? true
 , release_mode ? false
 }:

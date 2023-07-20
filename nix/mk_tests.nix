@@ -26,6 +26,7 @@
 , stdenvNoCC
 , time
 , unixtools
+, yq
 , which
 , wp-cache
 } :
@@ -50,6 +51,7 @@ stdenvNoCC.mkDerivation {
     perl
     time
     unixtools.getopt
+    yq
     which
   ] ++
   (if has-wp-proofs then [ alt-ergo ] else []);
