@@ -292,7 +292,8 @@ struct
     match Int_val.min_int (to_int_val ~oracle b) with
     | Some l -> `Value l
     | None ->
-      Self.warning ~current:true "cannot retrieve a lower bound for %a"
+      Self.warning ~current:true ~once:true
+        "Multidim domain: cannot retrieve a lower bound for %a"
         pretty b;
       `Top
 
@@ -300,7 +301,8 @@ struct
     match Int_val.max_int (to_int_val ~oracle b) with
     | Some u -> `Value u
     | None ->
-      Self.warning ~current:true "cannot retrieve an upper bound for %a"
+      Self.warning ~current:true ~once:true
+        "Multidim domain: cannot retrieve an upper bound for %a"
         pretty b;
       `Top
 
@@ -870,8 +872,8 @@ struct
       | `Value m -> m
       | `Bottom -> assert false
       | `Top ->
-        Self.warning ~current:true
-          "failed to introduce %a inside the array segmentation"
+        Self.warning ~current:true ~once:true
+          "Multidim domain: failed to introduce %a inside the array segmentation"
           Bound.pretty b;
         m
     in
