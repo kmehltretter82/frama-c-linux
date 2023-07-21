@@ -890,21 +890,16 @@ struct
 
   let relate _kf _bases _state = Base.SetLattice.empty
 
-  let filter _kind bases (base_map,tracked : t) =
-    BaseMap.filter (fun elt -> Base.Hptset.mem elt bases) base_map,
+  let filter _kind bases (base_map, tracked : t) =
+    BaseMap.inter_with_shape bases base_map,
     Option.map (Tracking.inter bases) tracked
 
-  let reuse _kf bases =
-    let open BaseMap in
-    let cache = Hptmap_sig.NoCache in
-    let decide_both _key _v1 v2 = Some v2 in
-    let decide_left key v1 =
-      if Base.Hptset.mem key bases then None else Some v1
-    in
-    let reuse = merge ~cache ~symmetric:false ~idempotent:true
-        ~decide_both ~decide_left:(Traversing decide_left) ~decide_right:Neutral
-    in
-    fun ~current_input:(m1,t1)  ~previous_output:(m2,t2) ->
+  let reuse =
+    let cache = cache_name "reuse" in
+    let decide _key _v1 v2 = v2 in
+    let reuse = BaseMap.join ~cache ~symmetric:false ~idempotent:true ~decide in
+    fun _kf bases ~current_input:(m1,t1)  ~previous_output:(m2,t2) ->
+      let m1 = BaseMap.diff_with_shape bases m1 in
       reuse m1 m2, join_tracked t1 t2
 end
 
