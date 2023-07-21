@@ -64,7 +64,8 @@ sig
   (** dot printer; first argument is a file name *)
   val print_dot : string -> t -> unit
 
-  (** finds the vertex corresponding to a lval. May raise @Not_found
+  (** finds the vertex corresponding to a lval.
+      @raise Not_found if such a vertex does not exist
   *)
   val find_vertex : lval -> t -> G.V.t
 
