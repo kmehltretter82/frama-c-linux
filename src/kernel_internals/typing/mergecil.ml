@@ -1216,15 +1216,15 @@ let combines = {
       let pre_msg = "Conflicting definitions are between files "^
                     old_name_file^" and "^new_name_file in
       let emitwith _ =
-        let msg =
-          if (not !conflict_detected) && oldfidx <> fidx
-          then
-            begin
-              conflict_detected := true;
-              pre_msg
-            end
-          else "" in
-        Kernel.warning "%s" msg in
+        if (not !conflict_detected) && oldfidx <> fidx
+        then
+          begin
+            conflict_detected := true;
+            Kernel.warning
+              ~wkey:Kernel.wkey_merge_conversion
+              "%s" pre_msg
+          end
+      in
       combineTypesGen ~emitwith
         combF ~strictInteger:false ~strictReturnTypes:b
         what oldt t);

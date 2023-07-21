@@ -5969,7 +5969,9 @@ let combineTypesGen ?emitwith (combF : combineFunction)
         if sameSizeInt ~machdep:true oldk k && sameSign ~machdep:true oldk k
         then
           begin
-            warning ~current:true
+            warning
+              ~wkey:Kernel.wkey_int_conversion
+              ~current:true
               "Integer compatibily is machine-dependent : %a and %a\n"
               Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t;
             result k oldk
@@ -6025,7 +6027,9 @@ let combineTypesGen ?emitwith (combF : combineFunction)
         if same_int64 ~machdep:false oldsz' sz' then
           oldsz
         else if same_int64 ~machdep:true oldsz' sz' then begin
-          warning ~current:true
+          warning
+            ~wkey:Kernel.wkey_int_conversion
+            ~current:true
             "Array type comparison succeeds only based on machine-dependent \
              constant evaluation: %a and %a\n"
             Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t;
