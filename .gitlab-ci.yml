@@ -189,25 +189,6 @@ eva-default-tests:
 eva-domains:
   <<: *eva_template
   <<: *eva_domains
-  only:
-    variables:
-      - $CI_COMMIT_BRANCH =~ /.*[-_\/.][Ee]va[-_\/.].*/
-      - $CI_COMMIT_BRANCH =~ /^[Ee]va[-_\/.].*/
-      - $CI_COMMIT_BRANCH =~ /.*[-_\/.][Ee]va$/
-
-eva-domains-nightly:
-  <<: *eva_template
-  <<: *eva_domains
-  only:
-    refs:
-      - schedules
-
-eva-domains-release:
-  <<: *eva_template
-  <<: *eva_domains
-  only:
-    variables:
-      - $RELEASE == "yes"
 
 kernel-tests:
   stage: tests
