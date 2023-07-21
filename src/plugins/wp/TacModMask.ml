@@ -78,9 +78,9 @@ class modmask =
             let power_of_2 =
               let v = Lang.freshvar ~basename:"n" Lang.t_int in
               let tv = e_var v in
-              p_exists [v] (e_zero <= tv && m = Cint.l_lsl e_one tv)
+              p_exists [v] ((e_zero <= tv) &&: (m = Cint.l_lsl e_one tv))
             in
-            let cond = (a >= e_zero && e_zero < m && power_of_2) in
+            let cond = ((a >= e_zero) &&: (e_zero < m) &&: power_of_2) in
             let n = Cint.l_and a (m - e_one) in
 
             update_display ~hard:true ~active_field:false ;
@@ -106,9 +106,10 @@ class modmask =
             let plus_1_power_of_2 =
               let v = Lang.freshvar ~basename:"n" Lang.t_int in
               let tv = e_var v in
-              p_exists [v] (e_zero <= tv && m + e_one = Cint.l_lsl e_one tv)
+              p_exists [v] (e_zero <= tv &&: (m + e_one = Cint.l_lsl e_one tv))
             in
-            let cond = (a >= e_zero && e_zero <= m && plus_1_power_of_2) in
+            let cond =
+              ((a >= e_zero) &&: (e_zero <= m) &&: (plus_1_power_of_2)) in
             let n = a mod (m + e_one) in
 
             update_display ~hard:true ~active_field:true ;

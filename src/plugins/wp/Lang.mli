@@ -575,8 +575,11 @@ module N: sig
   val ( - ): F.binop
   (** {! F.p_sub } *)
 
-  val ( ~- ): F.unop
-  (** [fun x -> p_sub 0 x] *)
+  val ( ~-: ): F.unop
+  (** [fun x -> p_sub 0 x]
+      Beware that the operator does not have the same precedence as [~-] in
+      standard OCaml.
+  *)
 
   val ( * ): F.binop
   (** {! F.p_mul} *)
@@ -610,11 +613,17 @@ module N: sig
   val ( ==> ): F.operator
   (** {! F.p_imply } *)
 
-  val ( && ): F.operator
-  (** {! F.p_and } *)
+  val ( &&: ): F.operator
+  (** {! F.p_and }
+      Beware that the operator does not have the same precedence as [&&]
+      in standard OCaml.
+  *)
 
-  val ( || ): F.operator
-  (** {! F.p_or } *)
+  val ( ||: ): F.operator
+  (** {! F.p_or }
+      Beware that the operator does not have the same precedence as [||]
+      in standard OCaml.
+  *)
 
   val not: F.pred -> F.pred
   (** {! F.p_not } *)

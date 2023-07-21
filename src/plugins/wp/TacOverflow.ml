@@ -37,24 +37,25 @@ class overflow =
       match F.repr e with
       | Fun(f,[v]) ->
         let open Lang.F in
+        let open Lang.N in
         let min, max = Ctypes.bounds @@ Cint.to_cint f in
         let min, max = e_zint min, e_zint max in
 
-        let lower = p_lt v min and upper = p_lt max v in
-        let in_range = p_not (p_or lower upper) in
+        let lower = v < min and upper = max < v in
+        let in_range = not (lower ||: upper) in
 
-        let length = e_add (e_sub max min) e_one in
-        let overflow = e_add min (e_mod (e_sub v min) length) in
+        let length = (max - min) + e_one in
+        let overflow = min + ((v - min) mod length) in
 
         let replace_with v = fun u -> if u == e then v else raise Not_found in
 
         Applicable(fun (hs,g) -> [
               "In-Range",
-              Conditions.subst (replace_with v) (hs , p_imply in_range g) ;
+              Conditions.subst (replace_with v) (hs , in_range ==> g) ;
               "Lower",
-              Conditions.subst (replace_with overflow) (hs , p_imply lower g) ;
+              Conditions.subst (replace_with overflow) (hs , lower ==> g) ;
               "Upper",
-              Conditions.subst (replace_with overflow) (hs , p_imply upper g)
+              Conditions.subst (replace_with overflow) (hs , upper ==> g)
             ])
       | _ -> Not_applicable
 
