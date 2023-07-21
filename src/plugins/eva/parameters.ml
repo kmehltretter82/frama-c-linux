@@ -355,6 +355,15 @@ module MultidimDisjunctiveInvariants = False
     end)
 let () = add_precision_dep MultidimDisjunctiveInvariants.parameter
 
+let () = Parameter_customize.set_group domains
+let () = Parameter_customize.is_invisible ()
+module MultidimFastImprecise = False
+    (struct
+      let option_name = "-eva-multidim-fast-imprecise"
+      let help = "Makes the multidim domain faster but less precise: \
+                  the domain can lose more information when joining states."
+    end)
+let () = add_precision_dep MultidimFastImprecise.parameter
 
 (* -------------------------------------------------------------------------- *)
 (* --- Performance options                                                --- *)

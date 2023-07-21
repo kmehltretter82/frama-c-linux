@@ -611,7 +611,8 @@ struct
     let narrow = join ~cache ~symmetric:false ~idempotent:true ~decide in
     fun (m1,t1) (m2,t2) -> `Value (narrow m1 m2, join_tracked t1 t2)
 
-  let join' ~oracle (m1,t1) (m2,t2) =
+  (* Precise join with oracle, but cannot be cached. *)
+  let precise_join ~oracle m1 m2 =
     let open BaseMap in
     let cache = Hptmap_sig.NoCache
     and decide _ x1 x2 =
@@ -619,8 +620,27 @@ struct
       and m2,r2 = Option.value ~default:V.top x2 in
       Memory.join ~oracle m1 m2, Referers.union r1 r2 (* TODO: Remove tops *)
     in
-    generic_join ~cache ~symmetric:false ~idempotent:true ~decide m1 m2,
-    join_tracked t1 t2
+    generic_join ~cache ~symmetric:false ~idempotent:true ~decide m1 m2
+
+  (* Optimized join without oracle. *)
+  let fast_join =
+    let open BaseMap in
+    let oracle _ _ = Int_val.top in
+    let cache = cache_name "fast_join"
+    and decide _ x1 x2 =
+      let m1, r1 = Option.value ~default:V.top x1
+      and m2, r2 = Option.value ~default:V.top x2 in
+      Memory.join ~oracle m1 m2, Referers.union r1 r2 (* TODO: Remove tops *)
+    in
+    generic_join ~cache ~symmetric:true ~idempotent:true ~decide
+
+  let join' ~oracle (m1, t1) (m2, t2) =
+    let m =
+      if Parameters.MultidimFastImprecise.get ()
+      then fast_join m1 m2
+      else precise_join ~oracle m1 m2
+    in
+    m, join_tracked t1 t2
 
   let join s1 s2 =
     let oracle = mk_bioracle s1 s2 in
