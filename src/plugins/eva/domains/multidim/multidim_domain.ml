@@ -918,15 +918,22 @@ let multidim_hook (module Abstract: Abstractions.S) : (module Abstractions.S) =
 
       let join a b =
         let r = join (set key Domain.top a) (set key Domain.top b) in
-        let oracle state exp = (* TODO: cache results *)
-          let v, _alarms = Eval.evaluate state exp in
-          match v with
-          | `Bottom -> Cvalue.V.top
-          | `Value (_valuation,v) -> get_cval v
+        let oracle state =
+          let valuation_ref = ref Eval.Valuation.empty in
+          fun exp ->
+            let valuation = !valuation_ref in
+            let v, _alarms = Eval.evaluate ~valuation state exp in
+            match v with
+            | `Bottom -> Cvalue.V.top
+            | `Value (valuation, v) ->
+              valuation_ref := valuation;
+              get_cval v
         in
+        let left_oracle = oracle a
+        and right_oracle = oracle b in
         let oracle = function
-          | Abstract_memory.Left ->  convert_oracle (oracle a)
-          | Abstract_memory.Right -> convert_oracle (oracle b)
+          | Abstract_memory.Left ->  convert_oracle left_oracle
+          | Abstract_memory.Right -> convert_oracle right_oracle
         in
         let multidim = Domain.join' ~oracle (get_multidim a) (get_multidim b) in
         set key multidim r
