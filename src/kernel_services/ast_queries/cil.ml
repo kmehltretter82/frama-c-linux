@@ -5970,7 +5970,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
         then
           begin
             warning ~current:true
-              "Integer compatibily is machine-dependant : %a and %a\n"
+              "Integer compatibily is machine-dependent : %a and %a\n"
               Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t;
             result k oldk
           end
