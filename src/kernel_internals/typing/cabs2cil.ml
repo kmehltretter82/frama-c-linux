@@ -2677,8 +2677,8 @@ let rec castTo ?context ?(fromsource=false)
     let result = (nt, if theMachine.insertImplicitCasts || fromsource then
                     Cil.mkCastT ~force:true ~oldt:ot ~newt:nt e else e)
     in
-    let error s =
-      if fromsource then abort_context s else Kernel.fatal ~current:true s
+    let origin_error =
+      if fromsource then "castTo from source:" else "castTo from Frama-C:"
     in
     (*  [BM] uncomment the following line to enable attributes static typing
         ignore (check_strict_attributes true ot nt  && check_strict_attributes false nt ot);*)
@@ -2712,9 +2712,10 @@ let rec castTo ?context ?(fromsource=false)
       if (va <> va' || bigger_length_args args args') &&
          (args <> None && args' <> None)
       then
-        error
-          "conversion between function types with \
+        abort_context
+          "%s conversion between function types with \
            different number of arguments:@ %a@ and@ %a"
+          origin_error
           Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt;
       if not (areCompatibleTypes ?context ot nt) then
         Kernel.warning
@@ -2768,7 +2769,8 @@ let rec castTo ?context ?(fromsource=false)
         "casting function from %a" Cil_datatype.Typ.pretty ot;
       result
     | _, TPtr (TFun _, _) ->
-      error "cannot cast %a to function type" Cil_datatype.Typ.pretty ot
+      abort_context "%s cannot cast %a to function type"
+        origin_error Cil_datatype.Typ.pretty ot
     | TPtr _, TPtr _ -> result
 
     | TInt _, TPtr _ -> result
@@ -2788,7 +2790,8 @@ let rec castTo ?context ?(fromsource=false)
       when Cil_datatype.Typ.equal t1 t2 -> (nt, e)
 
     | TPtr _, TArray(_,_,_) ->
-      error "Cast over a non-scalar type %a" Cil_datatype.Typ.pretty nt;
+      abort_context "%s cast over a non-scalar type %a"
+        origin_error Cil_datatype.Typ.pretty nt;
 
     | TEnum _, TInt _ -> result
     | TFloat _, (TInt _|TEnum _) -> result
@@ -2836,8 +2839,8 @@ let rec castTo ?context ?(fromsource=false)
     | TComp(_, _), _ -> begin
         match isTransparentUnion ot with
         | None ->
-          Kernel.fatal ~current:true "castTo %a -> %a"
-            Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
+          abort_context "%s %a -> %a"
+            origin_error Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
         | Some fstfield -> begin
             (* We do it now only if the expression is an lval *)
             let e' =
@@ -2846,8 +2849,9 @@ let rec castTo ?context ?(fromsource=false)
                 new_exp ~loc:e.eloc
                   (Lval (addOffsetLval (Field(fstfield, NoOffset)) lv))
               | _ ->
-                Kernel.fatal ~current:true
-                  "castTo: transparent union expression is not an lval: %a\n"
+                abort_context
+                  "%s transparent union expression is not an lval: %a\n"
+                  origin_error
                   Cil_printer.pp_exp e
             in
             (* Continue casting *)
@@ -2855,7 +2859,8 @@ let rec castTo ?context ?(fromsource=false)
           end
       end
     | _ ->
-      error "cannot cast from %a to %a@\n" Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
+      abort_context "%s cannot cast from %a to %a@\n"
+        origin_error Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
   end
 
 (* Create and cache varinfo's for globals. Starts with a varinfo but if the
