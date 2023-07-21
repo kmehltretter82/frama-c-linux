@@ -722,19 +722,25 @@ type combineFunction =
       typeinfo -> typeinfo -> typeinfo;
   }
 
-(** [combineTypesGen combF combW oldt newt] combine [oldt] and
-    [newt] accordingly to [combF].
-    Warning : this is not commutative.
-    Indeed, excluding enum, struct/union and typedef which depend on [combF],
-    the resulting type is as close as possible to [newt].
-    If the types cannot be combined, it throws [Cannot_combine] with an
-    explication.
+(** [combineTypesGen combF combW oldt newt]
+    Combine [oldt] and [newt] accordingly to [combF], [combW] indicates what we
+    are combinining.
+
+    Warning : this is not commutative. Indeed, excluding enum, struct/union and
+    typedef which depend on [combF], the resulting type is as close as possible
+    to [newt].
+
     [strictInteger] is [true] (default) if two integers with same size and sign
-    but with different types cannot be combined.
-    A warning is sent if [false] and the compatibility is machine-dependent.
+    but with different types cannot be combined. A warning is sent if it is
+    [false] and the compatibility is machine-dependent.
+
     [strictReturnTypes] is [false] (default) if a non-void type is compatible
     with void in a return case.
+
     Notice that the [~emitwith] action is called iff a warning is logged.
+
+    @raise Cannot_combine with an explanation when the type cannot be
+           combined.
 
     @since Frama-C+dev
 *)
@@ -780,7 +786,8 @@ val areCompatibleTypes :
 
 (** Same as [areCompatibleTypes old newt] but combine [oldt] and [newt].
     [context] does not impact the qualifiers of the result.
-    Raise [Cannot_combine] if [oldt] and [newt] are not compatible.
+
+    @raise Cannot_combine if [oldt] and [newt] are not compatible.
 
     @since Frama-C+dev
 *)
