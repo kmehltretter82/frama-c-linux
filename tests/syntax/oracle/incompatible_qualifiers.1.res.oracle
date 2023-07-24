@@ -17,7 +17,7 @@ void k(int *(*f)(int volatile ));
 
 fp1 *l(int *(*f)(int ));
 
-int (***m(int *(*f)(int volatile )))(char const );
+fp1 **m(int *(*f)(int volatile ));
 
 fp1 * const *n(int *(*f)(int , fp1 **));
 

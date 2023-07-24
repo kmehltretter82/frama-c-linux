@@ -400,7 +400,7 @@ let splitArrayAttributes =
   List.partition
     (fun a -> List.mem (attributeName a) qualifier_attributes)
 
-let rec typeAddAttributes a0 t =
+let rec typeAddAttributes ?(combine=addAttributes) a0 t =
   begin
     match a0 with
     | [] ->
@@ -408,7 +408,7 @@ let rec typeAddAttributes a0 t =
       t
     | _ ->
       (* anything else: add a0 to existing attributes *)
-      let add (a: attributes) = addAttributes a0 a in
+      let add (a: attributes) = combine a0 a in
       match t with
         TVoid a -> TVoid (add a)
       | TInt (ik, a) -> TInt (ik, add a)
@@ -5859,6 +5859,375 @@ let getCompField cinfo fieldName =
   List.find
     (fun fi -> fi.fname = fieldName)
     (Option.value ~default:[] cinfo.cfields)
+
+let sameSizeInt ?(machdep=false) (ik1 : ikind) (ik2 : ikind) =
+  if machdep then bytesSizeOfInt ik1 == bytesSizeOfInt ik2
+  else
+    match ik1, ik2 with
+    | (IChar | ISChar | IUChar), (IChar | ISChar | IUChar) -> true
+    | (IShort | IUShort), (IShort | IUShort) -> true
+    | (IInt | IUInt), (IInt | IUInt) -> true
+    | (ILong | IULong), (ILong | IULong) -> true
+    | (ILongLong | IULongLong), (ILongLong | IULongLong) -> true
+    | _ -> false
+
+
+let sameSign ?(machdep=false) (ik1 : ikind) (ik2 : ikind) =
+  if machdep then isSigned ik1 = isSigned ik2
+  else
+    match ik1, ik2 with
+    | IChar, (ISChar | IUChar)
+    | ISChar, (IChar | IUChar)
+    | IUChar, (IChar | ISChar) -> false
+    | _ -> isSigned ik1 = isSigned ik2
+
+let same_int64 ?(machdep=true) e1 e2 =
+  match constFoldToInt ~machdep e1, constFoldToInt ~machdep e2 with
+  | Some i, Some i' -> Integer.equal i i'
+  | _ -> false
+
+exception Cannot_combine of string
+
+type combineWhat =
+    CombineFundef of bool
+  (* The new definition is for a function definition. The old
+   * is for a prototype. arg is [true] for an old-style declaration *)
+  | CombineFunarg of bool
+  (* Comparing a function argument type with an old prototype argument.
+     arg is [true] for an old-style declaration, which
+     triggers some ad hoc treatment in GCC mode. *)
+  | CombineFunret (* Comparing the return of a function with that from an old
+                   * prototype *)
+  | CombineOther
+
+(* [combineAttributes what olda a] combines the attributes in [olda] and [a]
+   according to [what]:
+   - if [what == CombineFunarg], then override old attributes;
+     this is used to ensure that attributes from formal argument types in a
+     function definition are not mixed with attributes from arguments in other
+     (compatible, but with different qualifiers) declarations;
+   - else, perform the union of old and new attributes. *)
+let combineAttributes what olda a =
+  match what with
+  | CombineFunarg _ -> a (* override old attributes with new ones *)
+  | _ -> addAttributes olda a (* union of attributes *)
+
+type combineFunction =
+  {
+    typ_combine : combineFunction ->
+      bool -> combineWhat -> typ -> typ -> typ;
+
+    enum_combine : combineFunction ->
+      enuminfo -> enuminfo -> enuminfo;
+
+    comp_combine : combineFunction ->
+      compinfo -> compinfo -> compinfo;
+
+    name_combine : combineFunction -> combineWhat ->
+      typeinfo -> typeinfo -> typeinfo;
+  }
+
+(* Combine the types. Raises the Cannot_combine exception with an error message.
+   [what] is used to recursively deal with function return types and function
+   arguments in special ways.
+   Note: we cannot force the qualifiers of oldt and t to be the same here,
+   because in some cases (e.g. string literals and char pointers) it is
+   allowed to have differences, while in others we want to be more strict. *)
+let combineTypesGen ?emitwith (combF : combineFunction)
+    ?(strictInteger=true) ?(strictReturnTypes=false)
+    (what : combineWhat) (oldt : typ) (t : typ) : typ =
+  let warning = Kernel.warning ?emitwith in
+  match oldt, t with
+  | TVoid olda, TVoid a -> TVoid (combineAttributes what olda a)
+
+  | _, TVoid _ when what = CombineFunret && not strictReturnTypes -> t
+
+  | TInt (oldik, olda), TInt (ik, a) ->
+    let result k oldk = if rank oldk<rank k then k else oldk in
+    let check_gcc_mode oldk k =
+      if gccMode () && oldk == IInt &&
+         bytesSizeOf t <= bytesSizeOfInt IInt &&
+         (what = CombineFunarg true || what = CombineFunret)
+      then k
+      else
+        let msg =
+          Format.asprintf
+            "different integer types:@ '%a' and '%a'"
+            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t in
+        raise (Cannot_combine msg)
+    in
+    let combineIK oldk k =
+      if oldk == k then oldk else
+      if not strictInteger
+      then
+        if sameSizeInt ~machdep:false oldk k && sameSign ~machdep:false oldk k
+        then
+          (* The types contain the same sort of values but are not equal.
+             For example on x86_16 machdep unsigned short and unsigned int. *)
+          result k oldk
+        else
+        if sameSizeInt ~machdep:true oldk k && sameSign ~machdep:true oldk k
+        then
+          begin
+            warning
+              ~wkey:Kernel.wkey_int_conversion
+              ~current:true
+              "Integer compatibily is machine-dependent : %a and %a\n"
+              Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t;
+            result k oldk
+          end
+        else
+          check_gcc_mode oldk k
+      else
+        check_gcc_mode oldk k
+    in
+    TInt (combineIK oldik ik, combineAttributes what olda a)
+
+  | TFloat (oldfk, olda), TFloat (fk, a) ->
+    let combineFK oldk k =
+      if oldk == k then oldk else
+      if gccMode () && oldk == FDouble && k == FFloat
+         && (what = CombineFunarg true || what = CombineFunret)
+      then k
+      else
+        raise (Cannot_combine "different floating point types")
+    in
+    TFloat (combineFK oldfk fk, combineAttributes what olda a)
+
+  | TEnum (oldei, olda), TEnum (ei, a) ->
+    (* Matching enumerations always succeeds. But sometimes it maps both
+     * enumerations to integers *)
+    TEnum (combF.enum_combine combF oldei ei,
+           combineAttributes what olda a)
+
+  (* Strange one. But seems to be handled by GCC *)
+  | TEnum (oldei, olda) , TInt(IInt, a) ->
+    TEnum(oldei, combineAttributes what olda a)
+
+  (* Strange one. But seems to be handled by GCC. Warning. Here we are
+   * leaking types from new to old  *)
+  | TInt(IInt, olda), TEnum (ei, a) ->
+    TEnum(ei, combineAttributes what olda a)
+
+  | TComp (oldci, olda) , TComp (ci, a) ->
+    TComp(combF.comp_combine combF oldci ci,
+          combineAttributes what olda a)
+
+  | TArray (oldbt, oldsz, olda), TArray (bt, sz, a) ->
+    let newbt = combF.typ_combine combF strictReturnTypes CombineOther
+        oldbt bt in
+    let newsz =
+      match oldsz, sz with
+      | None, Some _ -> sz
+      | Some _, None -> oldsz
+      | None, None -> sz
+      | Some oldsz', Some sz' ->
+        (* They are not structurally equal. But perhaps they are equal if we
+           evaluate them. Check first machine independent comparison. *)
+        if same_int64 ~machdep:false oldsz' sz' then
+          oldsz
+        else if same_int64 ~machdep:true oldsz' sz' then begin
+          warning
+            ~wkey:Kernel.wkey_int_conversion
+            ~current:true
+            "Array type comparison succeeds only based on machine-dependent \
+             constant evaluation: %a and %a\n"
+            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t;
+          oldsz
+        end else
+          raise (Cannot_combine "different array lengths")
+    in
+    TArray (newbt, newsz, combineAttributes what olda a)
+
+  | TPtr (oldbt, olda), TPtr (bt, a) ->
+    TPtr (combF.typ_combine combF strictReturnTypes CombineOther oldbt bt,
+          combineAttributes what olda a)
+
+  | TFun (oldrt, oldargs, oldva, olda), TFun (rt, args, va, a) ->
+    let newrt = combF.typ_combine combF strictReturnTypes
+        CombineFunret oldrt rt in
+    if oldva != va then
+      raise (Cannot_combine "different vararg specifiers");
+    (* If one does not have arguments, believe the one with the
+     * arguments *)
+    let newargs, olda' =
+      if oldargs = None then args, olda else
+      if args = None then oldargs, olda else
+        let (oldargslist, oldghostargslist) = argsToPairOfLists oldargs in
+        let (argslist, ghostargslist) = argsToPairOfLists args in
+        if List.length oldargslist <> List.length argslist then
+          raise (Cannot_combine "different number of arguments")
+        else if List.length oldghostargslist <> List.length ghostargslist then
+          raise (Cannot_combine "different number of ghost arguments")
+        else
+          let oldargslist = oldargslist @ oldghostargslist in
+          let argslist = argslist @ ghostargslist in
+          (* Go over the arguments and update the old ones with the
+           * adjusted types *)
+          (* Format.printf "new type is %a@." Cil_datatype.Typ.pretty t; *)
+          let what =
+            match what with
+            | CombineFundef b -> CombineFunarg b
+            | _ -> CombineOther
+          in
+          Some
+            (List.map2
+               (fun (on, ot, oa) (an, at, aa) ->
+                  (* Update the names. Always prefer the new name. This is
+                     very important if the prototype uses different names than
+                     the function definition. *)
+                  let n = if an <> "" then an else on in
+                  let t = combF.typ_combine combF strictReturnTypes what ot at in
+                  let a = addAttributes oa aa in
+                  (n, t, a))
+               oldargslist argslist),
+          olda
+    in
+    (* Drop missingproto as soon as one of the type is a properly declared one*)
+    let olda =
+      if not (hasAttribute "missingproto" a) then
+        dropAttribute "missingproto" olda'
+      else olda'
+    in
+    let a =
+      if not (hasAttribute "missingproto" olda') then
+        dropAttribute "missingproto" a
+      else a
+    in
+    TFun (newrt, newargs, oldva, combineAttributes what olda a)
+
+  | TBuiltin_va_list olda, TBuiltin_va_list a ->
+    TBuiltin_va_list (combineAttributes what olda a)
+
+  | TNamed (oldt, olda), TNamed (t, a) ->
+    TNamed (combF.name_combine combF what oldt t,
+            combineAttributes what olda a)
+
+  | _, TNamed (t, a) ->
+    let res = combF.typ_combine combF strictReturnTypes what oldt t.ttype in
+    typeAddAttributes ~combine:(combineAttributes what) a res
+
+  | TNamed (oldt, olda), _ ->
+    let res = combF.typ_combine combF strictReturnTypes what oldt.ttype t in
+    typeAddAttributes ~combine:(combineAttributes what) olda res
+
+  | _ ->
+    raise
+      (Cannot_combine
+         (Format.asprintf "different type constructors:@ %a and %a"
+            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t))
+
+
+let default_combines = {
+  typ_combine = (fun c b ->
+      combineTypesGen c ~strictInteger:true ~strictReturnTypes:b);
+  enum_combine = (fun _ _ ei -> ei);
+  comp_combine = (fun _ oldci ci ->
+      if oldci.cstruct <> ci.cstruct then
+        raise (Cannot_combine "different struct/union types");
+      if oldci.cname = ci.cname then
+        oldci
+      else
+        raise (Cannot_combine
+                 (Format.sprintf "%ss with different tags"
+                    (if oldci.cstruct then "struct" else "union"))));
+  name_combine = (fun c what oldt t ->
+      if oldt.tname = t.tname then oldt
+      else
+        begin
+          ignore (c.typ_combine c false what oldt.ttype t.ttype);
+          oldt
+        end);
+}
+
+
+let combineTypes ?(strictReturnTypes=false) what (oldt: typ) (t: typ) : typ =
+  combineTypesGen default_combines ~strictReturnTypes what oldt t
+
+(***************** Compatibility ******)
+
+
+(* how type qualifiers must be checked *)
+type qualifier_check_context =
+  | Identical (* identical qualifiers. *)
+  | IdenticalToplevel (* ignore at toplevel, use Identical when going under a
+                         pointer. *)
+  | Covariant (* first type can have const-qualifications
+                 the second doesn't have. *)
+  | CovariantToplevel
+  (* accepts everything for current type, use Covariant when going under a
+     pointer. *)
+  | Contravariant (* second type can have const-qualifications
+                     the first doesn't have. *)
+  | ContravariantToplevel
+  (* accepts everything for current type, use Contravariant when going under
+     a pointer. *)
+
+let qualifier_context_fun_arg = function
+  | Identical | IdenticalToplevel -> IdenticalToplevel
+  | Covariant | CovariantToplevel -> ContravariantToplevel
+  | Contravariant | ContravariantToplevel -> CovariantToplevel
+
+let qualifier_context_fun_ret = function
+  | Identical | IdenticalToplevel -> IdenticalToplevel
+  | Covariant | CovariantToplevel -> CovariantToplevel
+  | Contravariant | ContravariantToplevel -> ContravariantToplevel
+
+let qualifier_context_ptr = function
+  | Identical | IdenticalToplevel -> Identical
+  | Covariant | CovariantToplevel -> Covariant
+  | Contravariant | ContravariantToplevel -> Contravariant
+
+let included_qualifiers ?(context=Identical) a1 a2 =
+  let a1 = filter_qualifier_attributes a1 in
+  let a2 = filter_qualifier_attributes a2 in
+  let a1 = dropAttribute "restrict" a1 in
+  let a2 = dropAttribute "restrict" a2 in
+  let a1_no_cv = dropAttributes ["const"; "volatile"] a1 in
+  let a2_no_cv = dropAttributes ["const"; "volatile"] a2 in
+  let is_equal = Cil_datatype.Attributes.equal a1 a2 in
+  if is_equal then true
+  else begin
+    match context with
+    | Identical -> false
+    | Covariant -> Cil_datatype.Attributes.equal a1_no_cv a2
+    | Contravariant -> Cil_datatype.Attributes.equal a1 a2_no_cv
+    | CovariantToplevel | ContravariantToplevel | IdenticalToplevel -> true
+  end
+
+(* precondition: t1 and t2 must be "compatible" as per combineTypes, i.e.
+   you must have called [combineTypes t1 t2] before calling this function. *)
+let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
+  match unrollType t1, unrollType t2 with
+  | TFun (tres1, Some args1, _, _), TFun (tres2, Some args2, _, _) ->
+    have_compatible_qualifiers_deep
+      ~context:(qualifier_context_fun_ret context) tres1 tres2 &&
+    let context = qualifier_context_fun_arg context in
+    List.for_all2 (fun (_, t1', a1) (_, t2', a2) ->
+        have_compatible_qualifiers_deep ~context t1' t2' &&
+        included_qualifiers ~context a1 a2)
+      args1 args2
+  | TPtr (t1', a1), TPtr (t2', a2)
+  | TArray (t1', _, a1), TArray (t2', _, a2) ->
+    (included_qualifiers ~context a1 a2) &&
+    let context = qualifier_context_ptr context in
+    have_compatible_qualifiers_deep ~context t1' t2'
+  | _, _ -> included_qualifiers ~context (typeAttrs t1) (typeAttrs t2)
+
+let compatibleTypes ?strictReturnTypes ?context t1 t2 =
+  let r = combineTypes ?strictReturnTypes CombineOther t1 t2 in
+  (* C99, 6.7.3 §9: "... to be compatible, both shall have the identically
+     qualified version of a compatible type;" *)
+  if not (have_compatible_qualifiers_deep ?context t1 t2) then
+    raise (Cannot_combine "different qualifiers");
+  (* Note: different non-qualifier attributes will be silently dropped. *)
+  r
+
+let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
+  try
+    ignore (compatibleTypes ?strictReturnTypes ?context t1 t2); true
+  with Cannot_combine _ -> false
+
 
 let mkCastT ?(force=false) ~(oldt: typ) ~(newt: typ) e =
   let loc = e.eloc in
