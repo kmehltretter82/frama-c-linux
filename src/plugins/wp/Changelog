@@ -24,6 +24,8 @@
 Plugin WP <next-release>
 ###############################################################################
 
+- WP          [2023-07-24] New option -wp-memlimit for provers
+- WP          [2023-07-24] Fixed cache for interactive provers
 - WP          [2023-06-05] Tactic Compute (new, generalize Definition and Split)
 - WP          [2023-06-05] Tactic Absurd now also applies to proof goal
 - WP          [2023-06-05] Option -wp-prop extended to lemma and function names

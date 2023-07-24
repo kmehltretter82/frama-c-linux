@@ -881,10 +881,21 @@ module Timeout =
   Int(struct
     let option_name = "-wp-timeout"
     let default = 2
-    let arg_name = "n"
+    let arg_name = "t"
     let help =
       Printf.sprintf
         "Set the timeout (in seconds) for provers (default: %d)." default
+  end)
+
+let () = Parameter_customize.set_group wp_prover
+module Memlimit =
+  Int(struct
+    let option_name = "-wp-memlimit"
+    let default = 1000
+    let arg_name = "m"
+    let help =
+      Printf.sprintf
+        "Set the memory limit (in Mb) for provers (default: %d)." default
   end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -926,7 +937,7 @@ module InteractiveTimeout =
   Int(struct
     let option_name = "-wp-interactive-timeout"
     let default = 30
-    let arg_name = "n"
+    let arg_name = "time"
     let help =
       Printf.sprintf
         "Set the timeout (in seconds) for checking scripts\n\
