@@ -164,12 +164,12 @@ do
             VERBOSE=yes
             ;;
         "-j"|"--jobs")
-            if [[ $2 != \-* ]] && [ "$2" -ge 1 ]; then
+            if [[ $2 == "auto" ]] || ([[ $2 != \-* ]] && [[ $2 -ge 1 ]]); then
                 DUNE_OPT+="-j $2 "
                 shift
             else
                 ErrorUsage \
-                    "wrong argument ('$2') for '-j|--jobs', int >= 1 expected"
+                    "wrong opt ('$2') for '-j|--jobs', value 'auto' or >= 1 expected"
             fi
             ;;
         "-l"|"--logs")
