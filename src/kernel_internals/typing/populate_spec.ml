@@ -23,6 +23,15 @@
 open Cil_types
 
 type mode = ACSL | Safe | Frama_C | Other of string
+[@@ warning "-37"] (* TODO: to build Other value *)
+
+type config = {
+  exits: mode;
+  assigns: mode;
+  allocates: mode;
+  terminates: mode;
+}
+
 type 'a result = Kept | Generated of 'a
 
 let default = Cil.default_behavior_name
@@ -66,39 +75,6 @@ struct
         | ACSL | Safe | Frama_C -> assert false
         | Other mode ->
           Generated(G.custom_default mode kf spec)
-end
-
-module Terminates_generator =
-struct
-
-  type clause = identified_predicate option
-  type behaviors = bool
-
-  let has_behavior name behaviors =
-    if name = default then behaviors else false
-
-  let collect_behaviors spec =
-    None <> spec.spec_terminates
-
-  let completes _ _ = None
-
-  let acsl_default () =
-    Some(Logic_const.(new_predicate ptrue))
-
-  let safe_default has_body =
-    if has_body
-    then Some(Logic_const.(new_predicate ptrue))
-    else Some(Logic_const.(new_predicate pfalse))
-
-  let frama_c_default () =
-    acsl_default ()
-
-  let combine_default _ =
-    acsl_default ()
-
-  let custom_default _mode _kf _spec =
-    acsl_default ()
-
 end
 
 module Exits_generator =
@@ -226,7 +202,7 @@ struct
 
 end
 
-module Allocation_generator =
+module Allocates_generator =
 struct
   type clause = allocation
   type behaviors = (string, allocation) Hashtbl.t
@@ -284,20 +260,87 @@ struct
 
 end
 
-module Terminates = Make(Terminates_generator)
+module Terminates_generator =
+struct
+
+  type clause = identified_predicate option
+  type behaviors = bool
+
+  let has_behavior name behaviors =
+    if name = default then behaviors else false
+
+  let collect_behaviors spec =
+    None <> spec.spec_terminates
+
+  let completes _ _ = None
+
+  let acsl_default () =
+    Some(Logic_const.(new_predicate ptrue))
+
+  let safe_default has_body =
+    if has_body
+    then Some(Logic_const.(new_predicate ptrue))
+    else Some(Logic_const.(new_predicate pfalse))
+
+  let frama_c_default () =
+    acsl_default ()
+
+  let combine_default _ =
+    acsl_default ()
+
+  let custom_default _mode _kf _spec =
+    acsl_default ()
+
+end
+
 module Exits = Make(Exits_generator)
 module Assigns = Make(Assigns_generator)
-module Allocation = Make(Allocation_generator)
+module Allocates = Make(Allocates_generator)
+module Terminates = Make(Terminates_generator)
 
 let emitter = Emitter.create "gen" [ Funspec ] ~correctness:[] ~tuning:[]
 
-let do_populate kf original_spec =
-  let mode = Frama_C in
+let get_mode = function
+  | "frama-c" -> Frama_C
+  | "acsl" -> ACSL
+  | "safe" -> Safe
+  | s ->
+    Kernel.abort "\'%s\' is not a valid mode for spec generation, accepted values \
+                  are 'frama-c', 'acsl' and 'safe'" s
 
-  let exits = Exits.get_default mode kf original_spec in
-  let assigns = Assigns.get_default mode kf original_spec in
-  let allocation = Allocation.get_default mode kf original_spec in
-  let terminates = Terminates.get_default mode kf original_spec in
+let build_config mode = {
+  exits = mode;
+  assigns = mode;
+  allocates = mode;
+  terminates = mode;
+}
+
+let get_config_default () =
+  build_config @@ get_mode @@ Kernel.GeneratedSpecMode.get ()
+
+let get_config () =
+  let default = get_config_default () in
+  let custom_map = Kernel.GeneratedSpecCustom.get () in
+  let apply_custom k v conf =
+    let mode = get_mode v in
+    match k with
+    | "exits" -> {conf with exits = mode}
+    | "assigns" -> {conf with assigns = mode}
+    | "allocates" -> {conf with allocates = mode}
+    | "terminates" -> {conf with terminates = mode}
+    | s ->
+      Kernel.abort "\'%s\' is not a valid clause for spec generation, accepted \
+      values are 'exits', 'assigns', 'allocates' and 'terminates'" s
+  in
+  Datatype.String.Map.fold apply_custom custom_map default
+
+let do_populate kf original_spec =
+  let config = get_config () in
+
+  let exits = Exits.get_default config.exits kf original_spec in
+  let assigns = Assigns.get_default config.assigns kf original_spec in
+  let allocates = Allocates.get_default config.allocates kf original_spec in
+  let terminates = Terminates.get_default config.terminates kf original_spec in
 
   let generated original = function
     | Kept -> original
@@ -307,7 +350,7 @@ let do_populate kf original_spec =
   let bhv = Cil.mk_behavior () in
   let bhv = { bhv with b_post_cond = generated bhv.b_post_cond exits } in
   let bhv = { bhv with b_assigns = generated bhv.b_assigns assigns } in
-  let bhv = { bhv with b_allocation = generated bhv.b_allocation allocation } in
+  let bhv = { bhv with b_allocation = generated bhv.b_allocation allocates } in
 
   let spec = Cil.empty_funspec () in
   let spec = { spec with spec_behavior = [ bhv ] } in

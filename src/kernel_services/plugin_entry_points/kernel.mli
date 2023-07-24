@@ -556,6 +556,11 @@ module DoCollapseCallCast: Parameter_sig.Bool
     This is false by default.  Set to true to replicate the behavior
     of CIL 1.3.5 and earlier. *)
 
+
+module GeneratedSpecMode: Parameter_sig.String
+module GeneratedSpecCustom:
+  Parameter_sig.Map with type t = string Datatype.String.Map.t
+
 (* ************************************************************************* *)
 (** {2 Analysis Behavior of options} *)
 (* ************************************************************************* *)

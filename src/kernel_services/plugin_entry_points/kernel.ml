@@ -1455,6 +1455,40 @@ module DoCollapseCallCast =
        and the lvalue it is assigned to."
   end)
 
+let () = Parameter_customize.set_group normalisation
+let () = Parameter_customize.do_not_reset_on_copy ()
+module GeneratedSpecMode =
+  String
+    (struct
+      let module_name = "GeneratedSpecMode"
+      let option_name = "-generated-spec-mode"
+      let default = "frama-c"
+      let arg_name = "mode"
+      let help =
+        "Select which mode will be used to generate missing specs \
+        (defaults to frama-c), see user manual for more informations"
+    end)
+let () = GeneratedSpecMode.set_possible_values ["frama-c"; "acsl"; "safe"]
+
+let () = Parameter_customize.set_group normalisation
+let () = Parameter_customize.do_not_reset_on_copy ()
+module GeneratedSpecCustom =
+  P.String_map
+    (struct
+      include Datatype.String
+      type key = string
+      let of_string ~key:_ ~prev:_ s = s
+      let to_string ~key:_ s = s
+    end)
+    (struct
+      let option_name = "-generated-spec-custom"
+      let arg_name = "exits|assigns|allocates|terminates:frama-c|acsl|safe"
+      let default = Datatype.String.Map.empty
+      let help =
+        "Fine-tune missing specs configuration by manually choosing modes for\
+         each clause, see user manual for more informations"
+    end)
+
 let normalization_parameters () =
   let norm = Cmdline.Group.name normalisation in
   let kernel = Plugin.get_from_name "" in
