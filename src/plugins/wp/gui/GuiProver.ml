@@ -87,10 +87,12 @@ class prover ~(console:Wtext.text) ~prover =
     method private run wpo =
       begin
         let spinner = function None -> None | Some s -> Some s#get in
+        let m = Wp_parameters.Memlimit.get () in
         let config = {
           VCS.valid = false ;
           VCS.timeout = Option.map float @@ spinner timeout ;
           VCS.stepout = spinner stepout ;
+          VCS.memlimit = if m > 0 then Some m else None ;
         } in
         let result wpo _prv _res = self#update wpo in
         let task = Prover.prove ~config ~result wpo prover in

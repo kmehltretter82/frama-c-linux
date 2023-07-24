@@ -20,14 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Equality used in the goal, simpler to prove than polymorphic equality *)
 val add_specific_equality:
   for_tau:(Lang.tau -> bool) ->
   mk_new_eq:Lang.F.binop ->
   unit
-(** Equality used in the goal, simpler to prove than polymorphic equality *)
 
-val prove : ?mode:VCS.mode -> ?timeout:float -> ?steplimit:int ->
-  prover:Why3Provers.t -> Wpo.t -> VCS.result Task.task
 (** Return NoResult if it is already proved by Qed *)
+val prove :
+  ?mode:VCS.mode ->
+  ?timeout:float ->
+  ?steplimit:int ->
+  ?memlimit:int ->
+  prover:Why3Provers.t -> Wpo.t -> VCS.result Task.task
 
 (**************************************************************************)

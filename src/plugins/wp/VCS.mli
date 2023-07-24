@@ -67,6 +67,7 @@ type config = {
   valid : bool ;
   timeout : float option ;
   stepout : int option ;
+  memlimit : int option ;
 }
 
 val current : unit -> config (** Current parameters *)
@@ -76,7 +77,11 @@ val default : config (** all None *)
 val get_timeout : ?kf:Kernel_function.t -> smoke:bool -> config -> float
 (** 0.0 means no-timeout *)
 
-val get_stepout : config -> int (** 0 means no-stepout *)
+val get_stepout : config -> int
+(** 0 means no-stepout *)
+
+val get_memlimit : config -> int
+(** 0 means no-memlimit *)
 
 (** {2 Results} *)
 

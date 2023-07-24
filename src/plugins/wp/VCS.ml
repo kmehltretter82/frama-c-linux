@@ -157,18 +157,22 @@ type config = {
   valid : bool ;
   timeout : float option ;
   stepout : int option ;
+  memlimit : int option ;
 }
 
 let current () =
   let t = Wp_parameters.Timeout.get () in
   let s = Wp_parameters.Steps.get () in
+  let m = Wp_parameters.Memlimit.get () in
   {
     valid = false ;
     timeout = if t > 0 then Some (float t) else None ;
     stepout = if s > 0 then Some s else None ;
+    memlimit = if m > 0 then Some m else None ;
   }
 
-let default = { valid = false ; timeout = None ; stepout = None }
+let default =
+  { valid = false ; timeout = None ; stepout = None ; memlimit = None }
 
 let get_timeout ?kf ~smoke = function
   | { timeout = None } ->
@@ -185,6 +189,10 @@ let get_timeout ?kf ~smoke = function
 let get_stepout = function
   | { stepout = None } -> Wp_parameters.Steps.get ()
   | { stepout = Some t } -> t
+
+let get_memlimit = function
+  | { memlimit = None } -> Wp_parameters.Memlimit.get ()
+  | { memlimit = Some t } -> t
 
 (* -------------------------------------------------------------------------- *)
 (* --- Results                                                            --- *)
@@ -239,10 +247,14 @@ let configure r =
       let margin = 1000 in
       Some(max stepout margin)
     else None in
+  let memlimit =
+    let m = Wp_parameters.Memlimit.get () in
+    if m > 0 then Some m else None in
   {
     valid ;
     timeout ;
     stepout ;
+    memlimit ;
   }
 
 let time_fits t =
