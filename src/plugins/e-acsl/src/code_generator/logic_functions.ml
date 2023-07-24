@@ -139,7 +139,9 @@ let generate_kf ~loc fname env ret_ty params_ty params_ival li =
              (* GMP's integer are arrays: consider them as pointers in function's
                 parameters *)
              Gmp_types.Z.t_as_ptr ()
+           | C_integer _ when Options.Gmp_only.get () -> Gmp_types.Z.t_as_ptr ()
            | C_integer ik -> TInt(ik, [])
+           | C_float _ when Options.Gmp_only.get () -> Gmp_types.Q.t_as_ptr ()
            | C_float ik -> TFloat(ik, [])
            (* for the time being, no reals but rationals instead *)
            | Rational -> Gmp_types.Q.t ()
