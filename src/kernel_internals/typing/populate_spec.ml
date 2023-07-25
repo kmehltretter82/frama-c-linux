@@ -36,6 +36,13 @@ type 'a result = Kept | Generated of 'a
 
 let default = Cil.default_behavior_name
 
+let emitter =
+  Emitter.create "gen"
+    [ Funspec ; Property_status ] ~correctness:[] ~tuning:[]
+
+let emit_status status ppt =
+  Property_status.emit emitter ~hyps:[] ppt status
+
 module type Generator =
 sig
 
@@ -51,6 +58,8 @@ sig
   val frama_c_default : kernel_function -> clause
   val combine_default : clause list -> clause
   val custom_default : string -> kernel_function -> spec -> clause
+
+  val emit : mode -> kernel_function -> funbehavior -> clause result -> unit
 
 end
 
@@ -75,6 +84,9 @@ struct
         | ACSL | Safe | Frama_C -> assert false
         | Other mode ->
           Generated(G.custom_default mode kf spec)
+
+  let emit = G.emit
+
 end
 
 module Exits_generator =
@@ -126,6 +138,20 @@ struct
 
   let custom_default  _mode _kf _spec =
     acsl_default ()
+
+  let emit_status kf bhv exits status =
+    let ppt_l =
+      List.map (fun e -> Property.ip_of_ensures kf Kglobal bhv e) exits
+    in
+    List.iter (emit_status status) ppt_l
+
+  let emit mode kf bhv = function
+    | Kept -> ()
+    | Generated _ when Kernel_function.has_definition kf -> ()
+    | Generated exits ->
+      match mode with
+      | Frama_C -> emit_status kf bhv exits Property_status.Dont_know
+      | ACSL | Safe | Other _ -> ()
 
 end
 
@@ -202,6 +228,33 @@ struct
   let custom_default _mode _kf _spec =
     acsl_default ()
 
+  let emit_status kf bhv assigns status =
+    let ppt_opt =
+      Property.ip_of_assigns kf Kglobal
+        (Property.Id_contract (Datatype.String.Set.empty,bhv)) assigns
+    in
+    Option.iter (emit_status status) ppt_opt;
+    match assigns with
+    | WritesAny -> ()
+    | Writes froms ->
+      let emit from =
+        let ppt_opt =
+          Property.ip_of_from
+            kf Kglobal
+            (Property.Id_contract (Datatype.String.Set.empty,bhv)) from
+        in
+        Option.iter (emit_status status) ppt_opt
+      in
+      List.iter emit froms
+
+  let emit mode kf bhv = function
+    | Kept -> ()
+    | Generated _ when Kernel_function.has_definition kf -> ()
+    | Generated assigns ->
+      match mode with
+      | Frama_C -> emit_status kf bhv assigns Property_status.Dont_know
+      | ACSL | Safe | Other _ -> ()
+
 end
 
 module Allocates_generator =
@@ -260,6 +313,24 @@ struct
   let custom_default _mode _kf _spec =
     acsl_default ()
 
+  let emit_status kf bhv allocates status =
+    let ppt_opt =
+      Property.ip_of_allocation kf Kglobal
+        (Property.Id_contract (Datatype.String.Set.empty,bhv)) allocates
+    in
+    Option.iter (emit_status status) ppt_opt
+
+  let emit mode kf bhv = function
+    | Kept -> ()
+    | Generated _ when Kernel_function.has_definition kf -> ()
+    | Generated allocates ->
+      match mode with
+      | ACSL ->
+        emit_status kf bhv allocates Property_status.True
+      | Frama_C ->
+        emit_status kf bhv allocates Property_status.Dont_know
+      | Other _ | Safe -> ()
+
 end
 
 module Terminates_generator =
@@ -293,14 +364,30 @@ struct
   let custom_default _mode _kf _spec =
     acsl_default ()
 
+  let emit_status kf _ terminates status =
+    match terminates with
+    | None -> ()
+    | Some terminates ->
+      Property.ip_of_terminates kf Kglobal terminates
+      |> emit_status status
+
+  let emit mode kf bhv = function
+    | Kept -> ()
+    | Generated _ when Kernel_function.has_definition kf -> ()
+    | Generated terminates ->
+      match mode with
+      | ACSL ->
+        emit_status kf bhv terminates Property_status.True
+      | Safe | Frama_C ->
+        emit_status kf bhv terminates Property_status.Dont_know
+      | Other _ -> ()
+
 end
 
 module Exits = Make(Exits_generator)
 module Assigns = Make(Assigns_generator)
 module Allocates = Make(Allocates_generator)
 module Terminates = Make(Terminates_generator)
-
-let emitter = Emitter.create "gen" [ Funspec ] ~correctness:[] ~tuning:[]
 
 let get_mode = function
   | "frama-c" -> Frama_C
@@ -360,7 +447,11 @@ let do_populate kf original_spec =
   let spec = { spec with spec_behavior = [ bhv ] } in
   let spec =
     { spec with spec_terminates = generated spec.spec_terminates terminates } in
-  Annotations.add_spec emitter kf spec
+  Annotations.add_spec emitter kf spec;
+  Exits.emit config.exits kf bhv exits;
+  Assigns.emit config.assigns kf bhv assigns;
+  Allocates.emit config.allocates kf bhv allocates;
+  Terminates.emit config.terminates kf bhv terminates
 
 module Is_populated =
   State_builder.Hashtbl
