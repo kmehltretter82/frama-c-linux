@@ -74,6 +74,7 @@ function Usage
     echo "  -u|--update         run tests and update oracles (and WP-cache)"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
+    echo "  -j|--jobs <jobs>    Run no more than <jobs> commands simultaneously."
     echo "  -h|--help           print this help"
     echo ""
     echo "VARIABLES"
@@ -155,12 +156,21 @@ do
             PULLCACHE=yes
             ;;
         "-u"|"--update")
-            DUNE_OPT+="--auto-promote"
+            DUNE_OPT+="--auto-promote "
             UPDATE=yes
             ;;
         "-v"|"--verbose")
-            DUNE_OPT+="--display=short"
+            DUNE_OPT+="--display=short "
             VERBOSE=yes
+            ;;
+        "-j"|"--jobs")
+            if [[ $2 == "auto" ]] || ([[ $2 != \-* ]] && [[ $2 -ge 1 ]]); then
+                DUNE_OPT+="-j $2 "
+                shift
+            else
+                ErrorUsage \
+                    "wrong opt ('$2') for '-j|--jobs', value 'auto' or >= 1 expected"
+            fi
             ;;
         "-l"|"--logs")
             LOGS=yes
