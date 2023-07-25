@@ -48,7 +48,7 @@ sig
 
   val acsl_default : unit -> clause
   val safe_default : bool -> clause
-  val frama_c_default : unit -> clause
+  val frama_c_default : kernel_function -> clause
   val combine_default : clause list -> clause
   val custom_default : string -> kernel_function -> spec -> clause
 
@@ -69,7 +69,7 @@ struct
       | None when mode = Safe ->
         Generated(G.safe_default @@ Kernel_function.has_definition kf)
       | None when mode = Frama_C ->
-        Generated(G.frama_c_default ())
+        Generated(G.frama_c_default kf)
       | None ->
         match mode with
         | ACSL | Safe | Frama_C -> assert false
@@ -111,7 +111,7 @@ struct
     then [ Exits, Logic_const.(new_predicate pfalse) ]
     else []
 
-  let frama_c_default () =
+  let frama_c_default _ =
     [ Exits, Logic_const.(new_predicate pfalse) ]
 
   let combine_default (clauses : clause list) =
@@ -166,8 +166,10 @@ struct
     then Writes []
     else WritesAny
 
-  let frama_c_default () =
-    acsl_default () (* todo : port infer annotations *)
+  let frama_c_default kf =
+    if Kernel_function.has_definition kf then
+      acsl_default () (* TODO: use genassigns *)
+    else Writes (Infer_annotations.assigns_from_prototype kf)
 
   let compare_deps d1 d2 =
     match d1, d2 with
@@ -239,7 +241,7 @@ struct
     then FreeAlloc([],[])
     else FreeAllocAny
 
-  let frama_c_default () =
+  let frama_c_default _ =
     acsl_default ()
 
   let combine_default clauses =
@@ -282,7 +284,7 @@ struct
     then Some(Logic_const.(new_predicate ptrue))
     else Some(Logic_const.(new_predicate pfalse))
 
-  let frama_c_default () =
+  let frama_c_default _ =
     acsl_default ()
 
   let combine_default _ =
@@ -305,8 +307,9 @@ let get_mode = function
   | "acsl" -> ACSL
   | "safe" -> Safe
   | s ->
-    Kernel.abort "\'%s\' is not a valid mode for spec generation, accepted values \
-                  are 'frama-c', 'acsl' and 'safe'" s
+    Kernel.abort
+      "\'%s\' is not a valid mode for spec generation, accepted values \
+       are 'frama-c', 'acsl' and 'safe'" s
 
 let build_config mode = {
   exits = mode;
@@ -329,8 +332,9 @@ let get_config () =
     | "allocates" -> {conf with allocates = mode}
     | "terminates" -> {conf with terminates = mode}
     | s ->
-      Kernel.abort "\'%s\' is not a valid clause for spec generation, accepted \
-      values are 'exits', 'assigns', 'allocates' and 'terminates'" s
+      Kernel.abort
+        "\'%s\' is not a valid clause for spec generation, accepted \
+         values are 'exits', 'assigns', 'allocates' and 'terminates'" s
   in
   Datatype.String.Map.fold apply_custom custom_map default
 
