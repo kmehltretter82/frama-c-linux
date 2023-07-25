@@ -49,8 +49,8 @@ let concurrent_writes analysis_state =
 let shared_bases analysis_state =
   let shared_zones = analysis_state.MtThread.precise_concurrent_accesses in
   match Locations.Zone.get_bases shared_zones with
-   | Top -> assert false 
-   | Set zones ->  zones
+  | Top -> assert false
+  | Set zones ->  zones
 
 let add_last_analysis analysis_state interferences =
   let writes = concurrent_writes analysis_state in

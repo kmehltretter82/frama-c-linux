@@ -118,4 +118,6 @@ module Register (Key : Key_sig) (Status : Status_sig) : sig
   val is_included : t -> t -> bool
   val narrow : t -> t -> t
   val join : t -> t -> t
+
+  val fold : (key -> status -> 'a -> 'a) -> t -> 'a -> 'a
 end

@@ -42,7 +42,7 @@ struct
     with Invalid_argument _ ->
       Self.abort
         "Arguments mismatch in thread creation; function %s expected %d \
-        arguments, but %d were given"
+         arguments, but %d were given"
         (Kernel_function.get_name kf) (List.length formals) (List.length args)
 
   let spawn name stmt kf args =
@@ -68,25 +68,37 @@ module AnalysisLocation =
 (* Interferences type *)
 
 module ThreadTable = MtThread.Hashtbl
+module MutexSet = MtMutex.Set
+module MutexesMap =
+struct
+  include Map.Make (MutexSet)
+
+  let pretty pp_state =
+    Pretty_utils.pp_iter2 ~sep:"@ " ~between:" -> "
+      iter MutexSet.pretty (Top.pretty pp_state)
+end
 
 type 'a interferences = {
-  states : ('a or_top) ThreadTable.t;
+  states : (('a or_top) MutexesMap.t) ThreadTable.t;
   structure : 'a Abstract.Domain.structure;
+  mutable shared_bases : Base.Hptset.t;
 }
 
 type t = Interferences : 'a interferences -> t
+
 
 let initial () =
   let module Analyzer = (val Analysis.current_analyzer ()) in
   Interferences {
     states = ThreadTable.create 13;
-    structure = Analyzer.Dom.structure
+    structure = Analyzer.Dom.structure;
+    shared_bases = Base.Hptset.empty;
   }
 
 let structure_mismatch () =
-  Self.abort 
+  Self.abort
     "different sets of abstract domains or structure used between two thread \
-    analyses"
+     analyses"
 
 
 (* Interference registration *)
@@ -94,33 +106,49 @@ let structure_mismatch () =
 let add_last_analysis interferences thread concurrent_writes shared_bases =
   let module Analyzer = (val Analysis.current_analyzer ()) in
   let module Dom = Analyzer.Dom in
+  let dom_join s1 s2 = `Value (Dom.join s1 s2) in
   (* Add interferences one by one *)
-  let add acc_state (cs,stmt) =
+  let add_to_map acc_map (cs,stmt) =
     let open TopBottom.Operators in
     let state =
+      (* Retrieve state at analysis location *)
       let+ state_table =
         Analyzer.get_stmt_state_by_callstack ~selection:[cs] ~after:true stmt
       in
       let state = Callstack.Hashtbl.find state_table cs in
-      Dom.filter `Print shared_bases state
+      let mutexes = match Dom.get MtDomain.Domain.key with
+        (* Domain disabled, consider that no mutexe is protecting this access *)
+        | None -> MutexSet.empty
+        | Some extract ->
+          let mutexes_status = MtDomain.Domain.mutexes (extract state) in
+          MtMutex.Register.locked_mutexes mutexes_status
+      in
+      Dom.filter `Print shared_bases state, mutexes
     in
-    let dom_join s1 s2 = `Value (Dom.join s1 s2) in
-    TopBottom.join dom_join acc_state state
+    match state with
+    | `Bottom -> acc_map (* no interference to add *)
+    | `Top ->
+      MutexesMap.add MutexSet.empty `Top acc_map
+    | `Value (state, mutexes) ->
+      let update = function
+        | None -> Some (`Value state)
+        | Some previous -> Some (Top.join dom_join previous (`Value state))
+      in
+      MutexesMap.update mutexes update acc_map
   in
-  let new_interference_state = List.fold_left add `Bottom concurrent_writes in
-  Self.result "concurrent writes: @[%a@]@.abstract value: @[%a@]@."
+  let new_interferences =
+    List.fold_left add_to_map MutexesMap.empty concurrent_writes
+  in
+  Self.result "concurrent writes: @[%a@]@.interferences: @[%a@]@."
     (Pretty_utils.pp_list AnalysisLocation.pretty) concurrent_writes
-    (TopBottom.pretty Dom.pretty) new_interference_state;
+    (MutexesMap.pretty Dom.pretty) new_interferences;
   (* Add the computed interferences to the table *)
-  let Interferences { states; structure } = interferences in
+  let Interferences ({ states; structure } as interferences) = interferences in
   match Abstract.Domain.eq_structure structure Dom.structure with
   | None -> structure_mismatch ()
   | Some Eq ->
-    match new_interference_state with
-    | `Bottom -> 
-      ThreadTable.remove states thread
-    | (`Top | `Value _ as new_interference_state) -> 
-      ThreadTable.replace states thread new_interference_state
+    ThreadTable.replace states thread new_interferences;
+    interferences.shared_bases <- shared_bases
 
 
 (* Interference injection *)
@@ -130,34 +158,79 @@ let applicable_interferences
     (interferences : t)
     (analyzer : (module Analysis.S with type Dom.state = a))
     (state : a)
-    : a or_top_bottom =
+  : a or_top_bottom =
   let module Analyzer = (val analyzer : Analysis.S with type Dom.state = a) in
   let module Dom = Analyzer.Dom in
+  let threads, mutexes = match Dom.get MtDomain.Domain.key with
+    (* Domain disabled, no information about threads and mutexes *)
+    | None -> MtThread.Register.empty, MtMutex.Set.empty
+    (* Domain enabled *)
+    | Some extract ->
+      let mt_state = extract state in
+      MtDomain.Domain.threads mt_state,
+      MtDomain.Domain.mutexes mt_state |> MtMutex.Register.locked_mutexes
+  in
   let Interferences { states; structure } = interferences in
   match Abstract.Domain.eq_structure structure Dom.structure with
   | None -> structure_mismatch ()
   | Some Eq ->
     let dom_join s1 s2 = `Value (Dom.join s1 s2) in
-    let add thread thread_state acc_state =
-      let can_thread_interfere =
-        not (MtThread.equal thread (MtDomain.current ())) &&
-        match Dom.get MtDomain.Domain.key with
-        (* Domain disabled, consider that every interference is potentially
-           applicable *)
-        | None -> true
-        (* Domain enabled *)
-        | Some extract ->
-          let threads = MtDomain.Domain.threads (extract state) in
-          match MtThread.Register.find thread threads with
-          (* Thread status is uknown; this can happen for several reason,
-             consider that the thread is running*)
-          | None -> true
-          (* Thread status is known *)
-          | Some status -> MtUtils.Trilean.maybe_true status.running
-      in
-      if can_thread_interfere
-      then TopBottom.join dom_join acc_state (thread_state :> _ or_top_bottom)
+    let add mutexes' state' acc_state =
+      if MutexSet.disjoint mutexes mutexes'
+      (* No mutexes in common, this interference is applicable *)
+      then TopBottom.join dom_join acc_state (state' :> _ or_top_bottom)
+      (* At least one mutex in common, this interfence cannot apply *)
       else acc_state
     in
-    ThreadTable.fold add states `Bottom
+    let add_thread thread state_map acc_state =
+      let is_current_thread = MtThread.equal thread (MtDomain.current ()) in
+      let maybe_running =
+        match MtThread.Register.find thread threads with
+        (* Thread status is uknown, consider that the thread might be running*)
+        | None -> true
+        (* Thread status is known *)
+        | Some status -> MtUtils.Trilean.maybe_true status.running
+      in
+      let can_thread_interfere = maybe_running && not is_current_thread in
+      if can_thread_interfere
+      then MutexesMap.fold add state_map acc_state
+      else acc_state
+    in
+    ThreadTable.fold add_thread states `Bottom
 
+let inject_interferences
+    (type a)
+    (interferences : t)
+    (analyzer : (module Analysis.S with type Dom.state = a))
+    (state : a)
+  : a =
+  let module Analyzer = (val analyzer : Analysis.S with type Dom.state = a) in
+  let module Dom = Analyzer.Dom in
+  let Interferences { shared_bases } = interferences in
+  let need_injection =
+    match Dom.get MtDomain.Domain.key with
+    (* Domain disabled, no information about memory read/written, always inject *)
+    | None -> true
+    (* Domain enabled *)
+    | Some extract ->
+      let mt_state = extract state in
+      let memory = MtDomain.Domain.memory mt_state in
+      let zone = Locations.Zone.join memory.read memory.written in
+      match Locations.Zone.get_bases zone with
+      | Top -> true
+      | Set bases ->
+        Base.Hptset.intersects bases shared_bases
+  in
+  if not need_injection
+  then state
+  else
+    match applicable_interferences interferences analyzer state with
+    | `Top -> Dom.top
+    | `Bottom -> state
+    | `Value interferences_state ->
+      let dummy_kf = Kernel_function.dummy () in
+      let result =
+        Dom.reuse dummy_kf shared_bases
+          ~current_input:state ~previous_output:interferences_state
+      in
+      Dom.join state result

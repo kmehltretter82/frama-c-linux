@@ -20,4 +20,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val add_last_analysis : MtThread.analysis_state -> Interferences.t -> unit
+val add_last_analysis :
+  MtThread.analysis_state -> Interferences.t -> unit

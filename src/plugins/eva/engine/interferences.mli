@@ -20,22 +20,20 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Lattice_bounds
-
 (* This module is out of place but is kept here for simplicity. *)
 module Thread :
 sig
-    type t
+  type t
 
-    val main: unit -> t
+  val main: unit -> t
 
-    val spawn:
-        Cvalue.V.t ->
-        Cil_types.stmt ->
-        Cil_types.kernel_function ->
-        Cvalue.V.t list -> t
+  val spawn:
+    Cvalue.V.t ->
+    Cil_types.stmt ->
+    Cil_types.kernel_function ->
+    Cvalue.V.t list -> t
 
-    val set_current: t -> unit
+  val set_current: t -> unit
 end
 
 
@@ -44,13 +42,12 @@ type thread_id = int
 type t
 
 module AnalysisLocation : Datatype.S_with_collections
-    with type t = analysis_location
+  with type t = analysis_location
 
 val initial : unit -> t
 
-val add_last_analysis : 
-    t -> Thread.t -> analysis_location list -> Base.Hptset.t -> unit
+val add_last_analysis :
+  t -> Thread.t -> analysis_location list -> Base.Hptset.t -> unit
 
-val applicable_interferences :
-    t -> (module Analysis.S with type Dom.state = 'a) -> 'a -> 'a or_top_bottom
-
+val inject_interferences :
+  t -> (module Analysis.S with type Dom.state = 'a) -> 'a -> 'a

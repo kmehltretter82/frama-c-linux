@@ -55,7 +55,7 @@ module Mutex = struct
 end
 
 type mutex = Mutex.t
-
+include Mutex
 
 
 let id = Mutex.key_id
@@ -105,6 +105,7 @@ module Status = struct
   let default = Unlocked
 end
 
+module MSet = Set
 
 
 (* A register of all the program's mutexes and their current status. A mutex is
@@ -116,4 +117,12 @@ module Register = struct
   let check bad msg st = if Status.equal bad st then Invalid (msg, true) else Ok
   let lock = update (fun _ -> Locked) (check Locked "locked")
   let unlock = update (fun _ -> Unlocked) (check Unlocked "unlocked")
+
+  let locked_mutexes register =
+    let add mutex status acc =
+      match status with
+      | Locked -> Mutex.Set.add mutex acc
+      | Unlocked -> acc
+    in
+    fold add register Mutex.Set.empty
 end

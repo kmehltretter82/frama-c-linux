@@ -49,7 +49,7 @@ sig
     with module Access = MtCfgTypes.NodeIdAccess
      and module Set = MtCfgTypes.SetNodeIdAccess
 
-  val display_shared_vars_value : ZoneMap.map -> unit 
+  val display_shared_vars_value : ZoneMap.map -> unit
   val enumerate_written_vars_value :
     ZoneMap.map ->
     (MtIds.Id.t * Base.t * Cvalue.V_Offsetmap.t) list
@@ -58,7 +58,7 @@ sig
   val remove_non_concur_zones_from_cfg :
     Locations.Zone.t -> MtCfgTypes.CfgNode.t -> unit
   val mark_concur_access_in_cfg :
-  ('a * Set.t) list -> unit
+    ('a * Set.t) list -> unit
 end
 
 
