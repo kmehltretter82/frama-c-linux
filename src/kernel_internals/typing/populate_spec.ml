@@ -129,7 +129,7 @@ struct
   let combine_default (clauses : clause list) =
     let collect acc clauses = List.rev_append (List.rev clauses) acc in
     let preds =
-      List.sort_uniq (Cil_datatype.Predicate.compare) @@
+      List.sort_uniq (Cil_datatype.PredicateStructEq.compare) @@
       List.map
         (fun p -> p.ip_content.tp_statement)
         (snd @@ List.split @@ List.fold_left collect [] clauses)
