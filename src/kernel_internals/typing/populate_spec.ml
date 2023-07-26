@@ -28,6 +28,7 @@ type mode = ACSL | Safe | Frama_C | Other of string
 type config = {
   exits: mode;
   assigns: mode;
+  requires: mode;
   allocates: mode;
   terminates: mode;
 }
@@ -37,11 +38,20 @@ type 'a result = Kept | Generated of 'a
 let default = Cil.default_behavior_name
 
 let emitter =
-  Emitter.create "gen"
-    [ Funspec ; Property_status ] ~correctness:[] ~tuning:[]
+  Emitter.create "PopulateSpec"
+    [ Funspec; Property_status ] ~correctness:[] ~tuning:[]
 
 let emit_status status ppt =
   Property_status.emit emitter ~hyps:[] ppt status
+
+let completes_generic (type clause) completes table =
+  let exception Ok of clause list in
+  let collect l b = Hashtbl.find table b :: l in
+  let collect bhvs =
+    try let r = List.fold_left collect [] bhvs in raise (Ok r)
+    with Not_found -> ()
+  in
+  try List.iter collect completes; None with Ok l -> Some l
 
 module type Generator =
 sig
@@ -104,17 +114,10 @@ struct
       let exits = List.filter (fun (k, _ ) -> Exits = k) b.b_post_cond in
       if exits <> [] then Hashtbl.add table b.b_name exits
     in
-    List.iter iter spec.spec_behavior ;
+    List.iter iter spec.spec_behavior;
     table
 
-  let completes completes table =
-    let exception Ok of clause list in
-    let collect l b = Hashtbl.find table b :: l in
-    let collect bhvs =
-      try let r = List.fold_left collect [] bhvs in raise (Ok r)
-      with Not_found -> ()
-    in
-    try List.iter collect completes ; None with Ok l -> Some l
+  let completes = completes_generic
 
   let acsl_default () = []
 
@@ -165,24 +168,13 @@ struct
 
   let collect_behaviors spec =
     let table = Hashtbl.create 17 in
-    let iter { b_name ; b_assigns } =
+    let iter { b_name; b_assigns } =
       if b_assigns <> WritesAny then Hashtbl.add table b_name b_assigns
     in
-    List.iter iter spec.spec_behavior ;
+    List.iter iter spec.spec_behavior;
     table
 
-  let completes (completes : string list list) (table : behaviors) =
-    let assigns = function
-      | WritesAny -> raise Not_found
-      | Writes l -> Writes l
-    in
-    let exception Ok of assigns list in
-    let collect l b = (assigns @@ Hashtbl.find table b) :: l in
-    let collect bhvs =
-      try let r = List.fold_left collect [] bhvs in raise (Ok r)
-      with Not_found -> ()
-    in
-    try List.iter collect completes ; None with Ok l -> Some l
+  let completes = completes_generic
 
   let acsl_default () =
     WritesAny
@@ -257,6 +249,54 @@ struct
 
 end
 
+module Requires_generator =
+struct
+
+  type clause = identified_predicate list
+  type behaviors = (string, clause) Hashtbl.t
+
+  let has_behavior name behaviors =
+    Hashtbl.mem behaviors name
+
+  let collect_behaviors spec =
+    let table = Hashtbl.create 17 in
+    let iter { b_name; b_requires } =
+      if b_requires <> [] then Hashtbl.add table b_name b_requires
+    in
+    List.iter iter spec.spec_behavior;
+    table
+
+  let completes = completes_generic
+
+  let acsl_default () = []
+
+  let safe_default has_body =
+    if has_body
+    then []
+    else [ Logic_const.(new_predicate pfalse) ]
+
+  let frama_c_default _ =
+    acsl_default ()
+
+  let combine_default (clauses : clause list) =
+    let flatten_require clause =
+      List.map (fun p -> p.ip_content.tp_statement) clause
+      |> List.sort_uniq Cil_datatype.PredicateStructEq.compare
+      |> Logic_const.pands
+    in
+    let preds =
+      List.map flatten_require clauses
+      |> Logic_const.pors
+    in
+    [ Logic_const.new_predicate preds ]
+
+  let custom_default  _mode _kf _spec =
+    acsl_default ()
+
+  let emit _ _ _ _ = ()
+
+end
+
 module Allocates_generator =
 struct
   type clause = allocation
@@ -267,24 +307,13 @@ struct
 
   let collect_behaviors spec =
     let table = Hashtbl.create 17 in
-    let iter { b_name ; b_allocation } =
+    let iter { b_name; b_allocation } =
       if b_allocation <> FreeAllocAny then Hashtbl.add table b_name b_allocation
     in
-    List.iter iter spec.spec_behavior ;
+    List.iter iter spec.spec_behavior;
     table
 
-  let completes (completes : string list list) (table : behaviors) =
-    let allocation = function
-      | FreeAllocAny -> raise Not_found
-      | alloc -> alloc
-    in
-    let exception Ok of allocation list in
-    let collect l b = (allocation @@ Hashtbl.find table b) :: l in
-    let collect bhvs =
-      try let r = List.fold_left collect [] bhvs in raise (Ok r)
-      with Not_found -> ()
-    in
-    try List.iter collect completes ; None with Ok l -> Some l
+  let completes = completes_generic
 
   let acsl_default () =
     FreeAlloc([],[])
@@ -359,7 +388,7 @@ struct
     acsl_default ()
 
   let combine_default _ =
-    acsl_default ()
+    assert false
 
   let custom_default _mode _kf _spec =
     acsl_default ()
@@ -386,6 +415,7 @@ end
 
 module Exits = Make(Exits_generator)
 module Assigns = Make(Assigns_generator)
+module Requires = Make(Requires_generator)
 module Allocates = Make(Allocates_generator)
 module Terminates = Make(Terminates_generator)
 
@@ -401,6 +431,7 @@ let get_mode = function
 let build_config mode = {
   exits = mode;
   assigns = mode;
+  requires = mode;
   allocates = mode;
   terminates = mode;
 }
@@ -416,6 +447,7 @@ let get_config () =
     match k with
     | "exits" -> {conf with exits = mode}
     | "assigns" -> {conf with assigns = mode}
+    | "requires" -> {conf with requires = mode}
     | "allocates" -> {conf with allocates = mode}
     | "terminates" -> {conf with terminates = mode}
     | s ->
@@ -430,6 +462,7 @@ let do_populate kf original_spec =
 
   let exits = Exits.get_default config.exits kf original_spec in
   let assigns = Assigns.get_default config.assigns kf original_spec in
+  let requires = Requires.get_default config.requires kf original_spec in
   let allocates = Allocates.get_default config.allocates kf original_spec in
   let terminates = Terminates.get_default config.terminates kf original_spec in
 
@@ -441,6 +474,7 @@ let do_populate kf original_spec =
   let bhv = Cil.mk_behavior () in
   let bhv = { bhv with b_post_cond = generated bhv.b_post_cond exits } in
   let bhv = { bhv with b_assigns = generated bhv.b_assigns assigns } in
+  let bhv = { bhv with b_requires = generated bhv.b_requires requires } in
   let bhv = { bhv with b_allocation = generated bhv.b_allocation allocates } in
 
   let spec = Cil.empty_funspec () in
@@ -468,8 +502,8 @@ let () = Ast.add_linked_state Is_populated.self
 let populate_funspec kf spec =
   if Is_populated.mem kf then false
   else begin
-    do_populate kf spec ;
-    Is_populated.add kf () ;
+    do_populate kf spec;
+    Is_populated.add kf ();
     true
   end
 
