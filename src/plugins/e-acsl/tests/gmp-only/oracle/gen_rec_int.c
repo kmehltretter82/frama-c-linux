@@ -20,14 +20,15 @@ int main(void)
   __e_acsl_memory_init((int *)0,(char ***)0,8UL);
   int i = 1;
   {
+    __e_acsl_mpz_t __gen_e_acsl_;
     __e_acsl_mpz_t __gen_e_acsl_identity_4;
-    __e_acsl_mpz_t __gen_e_acsl_i;
     int __gen_e_acsl_eq;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __gen_e_acsl_identity(& __gen_e_acsl_identity_4,(__e_acsl_mpz_struct *)i);
-    __gmpz_init_set_si(__gen_e_acsl_i,(long)i);
+    __gmpz_init_set_si(__gen_e_acsl_,(long)i);
+    __gen_e_acsl_identity(& __gen_e_acsl_identity_4,
+                          (__e_acsl_mpz_struct *)__gen_e_acsl_);
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_identity_4),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_i));
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"i",0,i);
     __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data,"identity(i)",0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_identity_4));
@@ -40,8 +41,8 @@ int main(void)
     __gen_e_acsl_assert_data.line = 9;
     __e_acsl_assert(__gen_e_acsl_eq == 0,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+    __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_identity_4);
-    __gmpz_clear(__gen_e_acsl_i);
   }
   /*@ assert identity(i) == i; */ ;
   __retres = 0;
@@ -55,23 +56,23 @@ int main(void)
 void __gen_e_acsl_identity(__e_acsl_mpz_t *__retres_arg,
                            __e_acsl_mpz_struct * n)
 {
-  __e_acsl_mpz_t __gen_e_acsl_;
+  __e_acsl_mpz_t __gen_e_acsl__2;
   int __gen_e_acsl_le;
   __e_acsl_mpz_t __gen_e_acsl_if;
-  __gmpz_init_set_si(__gen_e_acsl_,0L);
+  __gmpz_init_set_si(__gen_e_acsl__2,0L);
   __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(n),
-                               (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
+                               (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
   if (__gen_e_acsl_le <= 0) __gmpz_init_set(__gen_e_acsl_if,
                                             (__e_acsl_mpz_struct const *)(n));
   else {
-    __e_acsl_mpz_t __gen_e_acsl__2;
+    __e_acsl_mpz_t __gen_e_acsl__3;
     __e_acsl_mpz_t __gen_e_acsl_sub;
     __e_acsl_mpz_t __gen_e_acsl_identity_3;
     __e_acsl_mpz_t __gen_e_acsl_add;
-    __gmpz_init_set_si(__gen_e_acsl__2,1L);
+    __gmpz_init_set_si(__gen_e_acsl__3,1L);
     __gmpz_init(__gen_e_acsl_sub);
     __gmpz_sub(__gen_e_acsl_sub,(__e_acsl_mpz_struct const *)(n),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__3));
     /*@ assert
         Eva: initialization:
           \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_sub);
@@ -81,17 +82,17 @@ void __gen_e_acsl_identity(__e_acsl_mpz_t *__retres_arg,
     __gmpz_init(__gen_e_acsl_add);
     __gmpz_add(__gen_e_acsl_add,
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_identity_3),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl__3));
     __gmpz_init_set(__gen_e_acsl_if,
                     (__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
-    __gmpz_clear(__gen_e_acsl__2);
+    __gmpz_clear(__gen_e_acsl__3);
     __gmpz_clear(__gen_e_acsl_sub);
     __gmpz_clear(__gen_e_acsl_identity_3);
     __gmpz_clear(__gen_e_acsl_add);
   }
   __gmpz_init_set(*__retres_arg,
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
-  __gmpz_clear(__gen_e_acsl_);
+  __gmpz_clear(__gen_e_acsl__2);
   __gmpz_clear(__gen_e_acsl_if);
   return;
 }

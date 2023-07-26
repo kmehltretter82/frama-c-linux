@@ -97,7 +97,9 @@ let join ty1 ty2 =
 
 exception Not_a_number
 let typ_of_number_ty = function
+  | C_integer _ when Options.Gmp_only.get () -> Gmp_types.Z.t ()
   | C_integer ik -> TInt(ik, [])
+  | C_float _ when Options.Gmp_only.get () -> Gmp_types.Q.t ()
   | C_float fk -> TFloat(fk, [])
   | Gmpz -> Gmp_types.Z.t ()
   (* for the time being, no reals but rationals instead *)
