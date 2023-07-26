@@ -898,7 +898,8 @@ and to_exp ~adata ?inplace kf env t =
            )
          env)
   in
-  Options.debug ~dkey ~level:4 "to_exp %a = %a"
+  Options.debug ~dkey ~level:4 "to_exp %a {%a} %a = %a"
+    Kernel_function.pretty kf Profile.pretty (Env.Logic_env.get_profile env)
     Printer.pp_term t Printer.pp_exp rexp;
   result
 
