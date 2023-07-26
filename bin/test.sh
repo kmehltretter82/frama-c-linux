@@ -32,6 +32,7 @@ LOGS=
 COMMIT=
 TESTS=
 SAVE=
+COVER=
 
 DUNE_ALIAS=
 DUNE_OPT=
@@ -188,6 +189,11 @@ do
             CONFIG=$2
             shift
             ;;
+        "--coverage")
+            COVER=yes
+            DUNE_OPT+="--workspace dev/dune-workspace.cover "
+            shift
+            ;;
         "-n"|"--name")
             ALIAS_NAME=$2
             shift
@@ -262,6 +268,30 @@ function PullCache
         Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
         RequiredTools git
         Run git -C $FRAMAC_WP_CACHEDIR pull --rebase
+    fi
+}
+
+# --------------------------------------------------------------------------
+# ---  Coverage
+# --------------------------------------------------------------------------
+
+function PrepareCoverage
+{
+    export BISECT_FILE="$(pwd -P)/_bisect/bisect-"
+    if [ "$COVER" = "yes" ] ;
+    then
+        Cmd rm -rf _coverage
+        Cmd rm -rf _bisect
+        Cmd mkdir _bisect
+    fi
+}
+
+function GenerateCoverage
+{
+    if [ "$COVER" = "yes" ] ;
+    then
+        Head "Generating coverage in _coverage ..."
+        Cmd bisect-ppx-report html --coverage-path=_bisect
     fi
 }
 
@@ -446,10 +476,12 @@ function Status
 
 SetEnv
 PullCache
+PrepareCoverage
 PrepareTests
 Register $TESTS
 RunAlias ${DUNE_ALIAS}
 Commits ${COMMITS}
 Status $DUNE_LOG
+GenerateCoverage
 
 # --------------------------------------------------------------------------
