@@ -58,6 +58,7 @@ module Dkey: sig
   val typing: category
   val labels: category
   val translation: category
+  val env: category
 end
 
 val setup: ?rtl:bool -> unit -> unit

@@ -264,6 +264,7 @@ module Dkey = struct
   let typing = register_category "analysis:typing"
   let labels = register_category "analysis:labels"
   let translation = register_category "translation"
+  let env = register_category "translation:env"
 end
 
 let setup ?(rtl=false) () =

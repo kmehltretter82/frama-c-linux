@@ -25,6 +25,7 @@ open Cil_datatype
 open Analyses_types
 open Contract_types
 module Error = Translation_error
+let dkey = Options.Dkey.env
 
 
 (**************************************************************************)
@@ -219,6 +220,8 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
   (*  Options.feedback "new variable %a (global? %b)" Varinfo.pretty v global;*)
   let e = Cil.evar v in
   let stmts = mk_stmts v e in
+  Options.debug ~level:5 ~dkey "stmts:@ %a"
+    (Pretty_utils.pp_list ~sep:"@ " Printer.pp_stmt) stmts;
   let new_stmts = acc_list_rev local_block.new_stmts stmts in
   let new_block_vars = match scope with
     | Varname.Global | Varname.Function -> local_block.new_block_vars
