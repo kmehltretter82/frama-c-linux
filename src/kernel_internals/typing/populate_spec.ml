@@ -441,9 +441,8 @@ let get_config_default () =
 
 let get_config () =
   let default = get_config_default () in
-  let custom_map = Kernel.GeneratedSpecCustom.get () in
-  let apply_custom k v conf =
-    let mode = get_mode v in
+  let collect (k,v) conf =
+    let mode = get_mode (Option.get v) in
     match k with
     | "exits" -> {conf with exits = mode}
     | "assigns" -> {conf with assigns = mode}
@@ -452,10 +451,10 @@ let get_config () =
     | "terminates" -> {conf with terminates = mode}
     | s ->
       Kernel.abort
-        "\'%s\' is not a valid clause for spec generation, accepted \
-         values are 'exits', 'assigns', 'allocates' and 'terminates'" s
+        "\'%s\' is not a valid key for -generated-spec-custom, accepted keys \
+         are 'exits', 'assigns', 'requires', 'allocates' and 'terminates'" s
   in
-  Datatype.String.Map.fold apply_custom custom_map default
+  Kernel.GeneratedSpecCustom.fold collect default
 
 let do_populate kf original_spec =
   let config = get_config () in
@@ -500,7 +499,7 @@ module Is_populated =
 let () = Ast.add_linked_state Is_populated.self
 
 let populate_funspec kf spec =
-  if Is_populated.mem kf then false
+  if not @@ Kernel.GenerateDefaultSpec.get() || Is_populated.mem kf then false
   else begin
     do_populate kf spec;
     Is_populated.add kf ();

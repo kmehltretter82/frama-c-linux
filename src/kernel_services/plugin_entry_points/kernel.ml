@@ -1455,8 +1455,22 @@ module DoCollapseCallCast =
        and the lvalue it is assigned to."
   end)
 
+
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.do_not_reset_on_copy ()
+module GenerateDefaultSpec =
+  Bool
+    (struct
+      let module_name = "GenerateDefaultSpec"
+      let option_name = "-generate-default-spec"
+      let default = true
+      let help = "Generates missing specifications according to options \
+                  -generated-spec-mode and -generated-spec-custom (activated \
+                  by default)"
+    end)
+let () = Parameter_customize.set_group normalisation
+let () = Parameter_customize.do_not_reset_on_copy ()
+
 module GeneratedSpecMode =
   String
     (struct

@@ -164,7 +164,8 @@ let () =
 
 let populate_spec_ref = Extlib.mk_fun "Annotations.populate_spec"
 
-let populate_spec populate kf spec = match kf.fundec with
+let populate_spec populate kf spec =
+  match kf.fundec with
   | Definition _ -> false
   | Declaration _ ->
     if populate then begin
