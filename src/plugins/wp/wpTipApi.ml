@@ -64,7 +64,7 @@ let () =
       set_proved rq (ProofEngine.proved node) ;
       set_pending rq (ProofEngine.pending node) ;
       let s = ProofEngine.stats node in
-      set_size rq (Stats.proofs s) ;
+      set_size rq (Stats.subgoals s) ;
       set_stats rq (Pretty_utils.to_string Stats.pretty s) ;
     end
 

@@ -117,7 +117,7 @@ struct
           "total", Jnumber;
         ])
   let to_json (smoke,cs) : Json.t =
-    let verdict = match cs.Stats.verdict with
+    let verdict = match cs.Stats.best with
       | VCS.Valid -> if smoke then "Doomed" else "Valid"
       | VCS.Unknown -> if smoke then "Passed" else "Unknown"
       | Failed -> "Failure"
@@ -125,7 +125,6 @@ struct
       | Computing _ -> "Computing"
       | Timeout -> "Timeout"
       | Stepout -> "Stepout"
-      | Invalid -> "Invalid"
     in
     let summary = Format.asprintf "%s%a" verdict
         (Stats.pp_stats ~shell:false ~cache:Update) cs
@@ -133,7 +132,7 @@ struct
       "summary", `String summary ;
       "tactics", `Int cs.tactics ;
       "proved", `Int cs.proved ;
-      "total", `Int (Stats.proofs cs) ;
+      "total", `Int (Stats.subgoals cs) ;
     ]
 end
 
