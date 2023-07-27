@@ -33,15 +33,9 @@ let main () =
 
 let () = Db.Main.extend main
 
-
-let () =
-  Db.Value.is_called := Function_calls.is_called;
-  Db.Value.callers := Function_calls.callsites;
-
-
-  (* -------------------------------------------------------------------------- *)
-  (*                    Register Evaluation Functions                           *)
-  (* -------------------------------------------------------------------------- *)
+(* -------------------------------------------------------------------------- *)
+(*                    Register Evaluation Functions                           *)
+(* -------------------------------------------------------------------------- *)
 
 open Eval
 

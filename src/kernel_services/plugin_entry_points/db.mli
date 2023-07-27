@@ -254,15 +254,6 @@ module Value : sig
 
   val is_reachable_stmt : stmt -> bool
 
-  (** {3 About kernel functions} *)
-
-  val is_called: (kernel_function -> bool) ref
-
-  val callers: (kernel_function -> (kernel_function*stmt list) list) ref
-  (** @return the list of callers with their call sites. Each function is
-      present only once in the list. *)
-
-
   (** {3 Locations of left values} *)
 
   val lval_to_loc :

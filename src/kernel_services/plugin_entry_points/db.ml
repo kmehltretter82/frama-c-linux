@@ -511,9 +511,6 @@ module Value = struct
     | Kglobal -> Cvalue.Model.is_reachable (globals_state ())
     | Kstmt stmt -> is_reachable_stmt stmt
 
-  let is_called = mk_fun "Value.is_called"
-  let callers = mk_fun "Value.callers"
-
   let eval_lval =
     ref (fun ?with_alarms:_ _ -> mk_labeled_fun "Value.eval_lval")
   let eval_expr =
