@@ -212,6 +212,8 @@ wp-tests:
 e2e-playwright-tests:
   stage: tests
   image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
+  volumes:
+    - /tmp/.X11-unix:/tmp/.X11-unix
   before_script:
     - sudo apt update
     - sudo apt install -y xvfb curl bubblewrap unzip pkg-config autoconf graphviz libcairo2-dev libexpat1-dev libgmp-dev libgtk-3-dev libgtksourceview-3.0-dev zlib1g-dev
@@ -237,11 +239,7 @@ e2e-playwright-tests:
     - cd ivette
     - ls dist/renderer
     - cp dist/renderer/* dist/main/
-    - Xvfb :1 -screen 0 1920x1080x16 &
-    - ps aux | grep X
-    - DISPLAY=:1.0
-    - export DISPLAY
-    - npx playwright test
+    - xvfb-run -e /dev/stdout -s "-screen 0 1280x1024x24 -ac -nolisten tcp -nolisten unix" npx playwright test
   tags:
     - docker
 
