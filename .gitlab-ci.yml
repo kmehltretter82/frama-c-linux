@@ -233,7 +233,7 @@ e2e-playwright-tests:
     - opam install -y dune merlin ocaml-lsp-server odoc ocamlformat utop dune-release UnionFind headache
     - opam install --deps-only .
     - rm -rf ivette/node_modules
-    - make clean && make && make -C ivette dist
+    - make clean && make -C ivette dist
     - cd ivette
     - ls dist/renderer
     - cp dist/renderer/* dist/main/
