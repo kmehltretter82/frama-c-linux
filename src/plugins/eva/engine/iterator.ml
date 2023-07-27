@@ -724,7 +724,7 @@ module Make_Dataflow
                          after_stmts = merged_post_cvalues }
     in
     let cvalue_init = get_cvalue_or_top initial_state in
-    let results = `Def (states, Mem_exec.new_counter ()) in
+    let results = `Body (states, Mem_exec.new_counter ()) in
     Cvalue_callbacks.apply_call_results_hooks callstack kf cvalue_init results;
     if not (Db.Value.Record_Value_After_Callbacks.is_empty ())
     then begin

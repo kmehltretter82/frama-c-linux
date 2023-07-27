@@ -65,7 +65,7 @@ let record_callwise_dependencies_in_db call_site froms =
 let call_for_individual_froms _callstack current_function _state call_type =
   if From_parameters.ForceCallDeps.get () then begin
     match call_type with
-    | `Def ->
+    | `Body ->
       let table_for_calls = Kinstr.Hashtbl.create 7 in
       call_froms_stack :=
         { current_function; table_for_calls } :: !call_froms_stack
@@ -131,7 +131,7 @@ let record_for_individual_froms callstack kf pre_state value_res =
   if From_parameters.ForceCallDeps.get () then begin
     let froms =
       match value_res with
-      | `Def (Eva.Cvalue_callbacks.{before_stmts}, memexec_counter) ->
+      | `Body (Eva.Cvalue_callbacks.{before_stmts}, memexec_counter) ->
         let froms =
           if Eva.Analysis.save_results kf
           then compute_call_from_value_states kf (Lazy.force before_stmts)

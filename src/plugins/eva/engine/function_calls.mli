@@ -37,7 +37,7 @@ val partial_results: unit -> bool
 type analysis_target =
   [ `Builtin of string * Builtins.builtin * Eval.cacheable * funspec
   | `Spec of Cil_types.funspec
-  | `Def of Cil_types.fundec * bool ]
+  | `Body of Cil_types.fundec * bool ]
 
 (** Define the analysis target of a function according to Eva parameters.
     Also registers the call in tables for the functions below. *)

@@ -26,7 +26,7 @@ let dkey = Self.dkey_callbacks
 
 type state = Cvalue.Model.t
 
-type analysis_kind = [ `Builtin | `Spec | `Def | `Reuse ]
+type analysis_kind = [ `Builtin | `Spec | `Body | `Reuse ]
 
 type call_hook =
   Callstack.t -> Cil_types.kernel_function -> state -> analysis_kind -> unit
@@ -49,7 +49,7 @@ type results = { before_stmts: state_by_stmt; after_stmts: state_by_stmt }
 type call_results =
   [ `Builtin of state list * Value_types.call_froms
   | `Spec of state list
-  | `Def of results * int
+  | `Body of results * int
   | `Reuse of int
   ]
 
@@ -74,7 +74,7 @@ let apply_call_results_hooks callstack kf state call_results =
     match call_results with
     | `Builtin _ | `Spec _ -> None
     | `Reuse i -> Some (Value_types.Reuse i)
-    | `Def ({before_stmts; after_stmts}, i) ->
+    | `Body ({before_stmts; after_stmts}, i) ->
       Some (Value_types.NormalStore ((before_stmts, after_stmts), i))
   in
   Option.iter

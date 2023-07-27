@@ -403,7 +403,7 @@ module Value = struct
   module Call_Type_Value_Callbacks =
     Hook.Build(struct
       type t = [`Builtin | `Spec
-               | `Def | `Reuse]
+               | `Body | `Reuse]
                * state * callstack end)
   ;;
 

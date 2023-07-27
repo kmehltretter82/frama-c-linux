@@ -33,7 +33,7 @@ type state = Cvalue.Model.t
 type analysis_kind =
   [ `Builtin (** A cvalue builtin is used to interpret the function. *)
   | `Spec  (** The specification is used to interpret the function. *)
-  | `Def   (** The function body is analyzed. This is the standard case. *)
+  | `Body  (** The function body is analyzed. This is the standard case. *)
   | `Reuse (** The results of a previous analysis of the function are reused. *)
   ]
 
@@ -57,12 +57,12 @@ type call_results =
   (** List of cvalue states at the end of the builtin. *)
   | `Spec of state list
   (** List of cvalue states at the end of the call. *)
-  | `Def of results * int
+  | `Body of results * int
   (** Cvalue states before and after each statement of the given function,
       plus a unique integer id for the call. *)
   | `Reuse of int
     (** The results are the same as a previous call with the given integer id,
-        previously recorded with the [Def] constructor. *)
+        previously recorded with the [`Body] constructor. *)
   ]
 
 (** Signature of a hook to be called after the analysis of each function call.

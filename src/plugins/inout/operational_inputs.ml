@@ -564,7 +564,7 @@ module Callwise = struct
   let call_inout_stack = ref []
 
   let call_for_callwise_inout _callstack kf _state = function
-    | `Def ->
+    | `Body ->
       let table_current_function = CallsiteHash.create 7 in
       call_inout_stack := (kf, table_current_function) :: !call_inout_stack
     | `Reuse | `Spec | `Builtin -> ()
@@ -645,7 +645,7 @@ module Callwise = struct
   let record_for_callwise_inout callstack kf pre_state value_res =
     let inout =
       match value_res with
-      | `Def (Eva.Cvalue_callbacks.{before_stmts}, memexec_counter) ->
+      | `Body (Eva.Cvalue_callbacks.{before_stmts}, memexec_counter) ->
         let inout =
           if Eva.Analysis.save_results kf
           then

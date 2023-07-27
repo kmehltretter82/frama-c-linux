@@ -452,7 +452,7 @@ module Value : sig
       @since Aluminium-20160501  *)
   module Call_Type_Value_Callbacks:
     Hook.Iter_hook with type param =
-                          [`Builtin | `Spec | `Def | `Reuse]
+                          [`Builtin | `Spec | `Body | `Reuse]
                           * state * callstack
 
 

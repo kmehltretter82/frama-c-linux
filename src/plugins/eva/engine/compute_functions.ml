@@ -254,8 +254,8 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc kinstr);
     let compute, kind =
       match target with
-      | `Def (fundec, save_results) ->
-        compute_using_body fundec ~save_results, `Def
+      | `Body (fundec, save_results) ->
+        compute_using_body fundec ~save_results, `Body
       | `Spec funspec ->
         compute_using_spec funspec, `Spec
     in
@@ -343,7 +343,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     match target with
     | `Builtin builtin_info -> compute_builtin builtin_info kinstr call state
     | `Spec _ as spec -> compute_using_spec_or_body spec kinstr call state
-    | `Def _ as def ->
+    | `Body _ as def ->
       let compute = compute_using_spec_or_body def in
       if Parameters.MemExecAll.get ()
       then compute_and_cache_call compute kinstr call state
