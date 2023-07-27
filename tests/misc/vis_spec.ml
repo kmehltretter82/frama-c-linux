@@ -5,18 +5,27 @@ class pathcrawlerVisitor prj =
   object(self)
     inherit Visitor.frama_c_copy prj
 
+    method! vfunc fundec =
+      Format.printf "Considering sspec of function %s@." fundec.svar.vname;
+      Format.printf "@[Funspec of %s is@ @['%a'@]@ through visitor@]@."
+        fundec.svar.vname
+        Printer.pp_funspec fundec.sspec;
+      Format.printf "@[It is@ @['%a'@]@ through get_spec@]@."
+        Printer.pp_funspec
+        (Annotations.funspec (Globals.Functions.get fundec.svar));
+      DoChildren
+
     method! vspec sp =
-      Format.printf "Considering spec of function %s@."
+      Format.printf "Considering vspec of function %s@."
         (Kernel_function.get_name (Option.get self#current_kf));
       (match self#current_func with
-       | Some f ->
-         if  f.svar.vname ="f" then (
-           Format.printf "@[Funspec of f is@ @['%a'@]@ through visitor@]@."
-             Printer.pp_funspec sp;
-           Format.printf "@[It is@ @['%a'@]@ through get_spec@]@."
-             Printer.pp_funspec
-             (Annotations.funspec (Globals.Functions.get f.svar));
-         )
+       | Some fundec ->
+         Format.printf "@[Funspec of %s is@ @['%a'@]@ through visitor@]@."
+           fundec.svar.vname
+           Printer.pp_funspec sp;
+         Format.printf "@[It is@ @['%a'@]@ through get_spec@]@."
+           Printer.pp_funspec
+           (Annotations.funspec (Globals.Functions.get fundec.svar));
        | None ->
          Format.printf "@[Function prototype;@ Funspec is@ @['%a'@]@]@."
            Printer.pp_funspec sp;

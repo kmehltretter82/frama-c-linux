@@ -1,8 +1,25 @@
 [kernel] Parsing vis_spec.i (no preprocessing)
 Starting visit
-Considering spec of function g
-Function prototype; Funspec is 'assigns \nothing;'
-Considering spec of function f
-Funspec of f is 'assigns \nothing;' through visitor
-It is 'assigns \nothing;' through get_spec
+Considering vspec of function g
+Function prototype; Funspec is
+'terminates \true;
+ exits \false;
+ allocates \nothing;'
+Considering sspec of function f
+Funspec of f is '' through visitor
+It is 'terminates \true;
+       exits \false;
+       assigns \nothing;
+       allocates \nothing;'
+through get_spec
+Considering vspec of function f
+Funspec of f is 'terminates \true;
+                 exits \false;
+                 allocates \nothing;'
+through visitor
+It is 'terminates \true;
+       exits \false;
+       assigns \nothing;
+       allocates \nothing;'
+through get_spec
 End visit
