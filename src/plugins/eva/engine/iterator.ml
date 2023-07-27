@@ -74,24 +74,25 @@ let record_fireable edge =
 
 
 module Make_Dataflow
-    (Abstract : Abstractions.S_with_evaluation)
-    (States : Powerset.S with type state = Abstract.Dom.t)
-    (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
-    (Init: Initialization.S with type state := Abstract.Dom.t)
-    (Logic : Transfer_logic.S with type state = Abstract.Dom.t
+    (Abstractions : Abstractions.S_with_evaluation)
+    (States : Powerset.S with type state = Abstractions.Dom.t)
+    (Transfer : Transfer_stmt.S with type state = Abstractions.Dom.t)
+    (Init: Initialization.S with type state := Abstractions.Dom.t)
+    (Logic : Transfer_logic.S with type state = Abstractions.Dom.t
                                and type states = States.t)
     (Spec: sig
-       val treat_statement_assigns: assigns -> Abstract.Dom.t -> Abstract.Dom.t
+       val treat_statement_assigns:
+         assigns -> Abstractions.Dom.t -> Abstractions.Dom.t
      end)
     (AnalysisParam : sig
        val kf: kernel_function
        val call_kinstr: kinstr
-       val initial_state : Abstract.Dom.t
+       val initial_state : Abstractions.Dom.t
      end)
     ()
 = struct
 
-  module Domain = Abstract.Dom
+  module Domain = Abstractions.Dom
   include Cvalue_domain.Getters (Domain)
 
   (* --- Analysis parameters --- *)
@@ -111,7 +112,7 @@ module Make_Dataflow
 
   (* --- Abstract values storage --- *)
 
-  module Partitioning = Trace_partitioning.Make (Abstract) (AnalysisParam)
+  module Partitioning = Trace_partitioning.Make (Abstractions) (AnalysisParam)
 
   type store = Partitioning.store
   type flow = Partitioning.flow
@@ -389,6 +390,13 @@ module Make_Dataflow
       List.filter check states
     | _ -> states
 
+  (* For now, as long as an Interferences module is not passed as a parameter to
+     the Iterator, we have to rebuild the following function *)
+  let inject_interferences =
+    let domain =
+      (module Domain : Abstract.Domain.External with type state = 'a)
+    in
+    Interferences.inject ~domain !Interferences.current
 
   (* --- Iteration strategy ---*)
 
@@ -430,6 +438,7 @@ module Make_Dataflow
     let open Current_loc.Operators in
     let<> UpdatedCurrentLoc = e.edge_loc in
     let flow = Partitioning.transfer (transfer_transition transition) flow in
+    let flow = Partitioning.transfer (lift inject_interferences) flow in
     let flow = process_partitioning_transitions v1 v2 transition flow in
     if not (Partitioning.is_empty_flow flow) then
       record_fireable e;

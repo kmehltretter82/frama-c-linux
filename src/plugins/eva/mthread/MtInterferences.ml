@@ -20,6 +20,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let initial () =
+  let module Analyzer = (val Analysis.current_analyzer ()) in
+  let domain =
+    (module Analyzer.Dom : Abstract.Domain.External
+      with type state = Analyzer.Dom.state)
+  in
+  let interferences = Interferences.initial domain in
+  Interferences.current := interferences; (* For Iterator *)
+  interferences
+
+
 let concurrent_writes analysis_state =
   let module ALSet = Interferences.AnalysisLocation.Set in
   let open MtCfgTypes in
@@ -53,7 +64,20 @@ let shared_bases analysis_state =
   | Set zones ->  zones
 
 let add_last_analysis analysis_state interferences =
+  let module Analyzer = (val Analysis.current_analyzer ()) in
+  let domain =
+    (module Analyzer.Dom : Abstract.Domain.External
+      with type state = Analyzer.Dom.state)
+  in
+  let get_state (cs,stmt) =
+    let open Lattice_bounds.TopBottom.Operators in
+    let+ state_table =
+      Analyzer.get_stmt_state_by_callstack ~selection:[cs] ~after:true stmt
+    in
+    Callstack.Hashtbl.find state_table cs
+  in
   let writes = concurrent_writes analysis_state in
   let bases = shared_bases analysis_state in
   let thread = analysis_state.curr_thread.th_eva_thread in
-  Interferences.add_last_analysis interferences thread writes bases
+  Interferences.add_last_analysis ~domain ~get_state
+    interferences thread writes bases

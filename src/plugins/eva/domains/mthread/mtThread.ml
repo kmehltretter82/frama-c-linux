@@ -165,7 +165,7 @@ end
 
 
 module Register = struct
-  include Register (Thread) (Status)
+  include MtUtils.Register (Thread) (Status)
 
   let change_running ok msg =
     let after = Trilean.not ok in

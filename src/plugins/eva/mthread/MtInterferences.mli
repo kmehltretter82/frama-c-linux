@@ -20,5 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val initial : unit -> Interferences.t
+
 val add_last_analysis :
   MtThread.analysis_state -> Interferences.t -> unit

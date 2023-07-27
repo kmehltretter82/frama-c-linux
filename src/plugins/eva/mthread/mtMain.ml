@@ -138,7 +138,7 @@ let mthread_run project =
     concurrent_accesses_by_nodes = [];
     known_ids = MtIds.no_known_ids;
   } in
-  let interferences = Interferences.initial () in
+  let interferences = MtInterferences.initial () in
 
   (* We register our callback function *)
   hook_builtins (Some analysis);

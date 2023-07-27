@@ -22,8 +22,11 @@
 
 open Lattice_bounds
 
+type 'a domain = (module Abstract.Domain.External with type state = 'a)
 type analysis_location = Callstack.t * Cil_types.stmt
 type thread_id = int
+
+let dkey = Self.register_category "interferences"
 
 
 (* Threads modelization *)
@@ -87,13 +90,20 @@ type 'a interferences = {
 type t = Interferences : 'a interferences -> t
 
 
-let initial () =
-  let module Analyzer = (val Analysis.current_analyzer ()) in
+let initial (type a) (domain : a domain) =
+  let module Domain = (val domain) in
   Interferences {
     states = ThreadTable.create 13;
-    structure = Analyzer.Dom.structure;
+    structure = Domain.structure;
     shared_bases = Base.Hptset.empty;
   }
+
+let current =
+  ref (Interferences {
+      states = ThreadTable.create 13;
+      structure = Abstract.Domain.Unit;
+      shared_bases = Base.Hptset.empty;
+    })
 
 let structure_mismatch () =
   Self.abort
@@ -103,19 +113,19 @@ let structure_mismatch () =
 
 (* Interference registration *)
 
-let add_last_analysis interferences thread concurrent_writes shared_bases =
-  let module Analyzer = (val Analysis.current_analyzer ()) in
-  let module Dom = Analyzer.Dom in
+let add_last_analysis
+    (type a)
+    ~(domain: a domain)
+    ~(get_state : analysis_location -> a or_top_bottom)
+    interferences thread concurrent_writes shared_bases =
+  let module Dom = (val domain) in
   let dom_join s1 s2 = `Value (Dom.join s1 s2) in
   (* Add interferences one by one *)
-  let add_to_map acc_map (cs,stmt) =
+  let add_to_map acc_map aloc =
     let open TopBottom.Operators in
     let state =
       (* Retrieve state at analysis location *)
-      let+ state_table =
-        Analyzer.get_stmt_state_by_callstack ~selection:[cs] ~after:true stmt
-      in
-      let state = Callstack.Hashtbl.find state_table cs in
+      let+ state = get_state aloc in
       let mutexes = match Dom.get MtDomain.Domain.key with
         (* Domain disabled, consider that no mutexe is protecting this access *)
         | None -> MutexSet.empty
@@ -153,14 +163,9 @@ let add_last_analysis interferences thread concurrent_writes shared_bases =
 
 (* Interference injection *)
 
-let applicable_interferences
-    (type a)
-    (interferences : t)
-    (analyzer : (module Analysis.S with type Dom.state = a))
-    (state : a)
+let applicable (type a) ~(domain : a domain) (interferences : t) (state : a)
   : a or_top_bottom =
-  let module Analyzer = (val analyzer : Analysis.S with type Dom.state = a) in
-  let module Dom = Analyzer.Dom in
+  let module Dom = (val domain) in
   let threads, mutexes = match Dom.get MtDomain.Domain.key with
     (* Domain disabled, no information about threads and mutexes *)
     | None -> MtThread.Register.empty, MtMutex.Set.empty
@@ -198,39 +203,44 @@ let applicable_interferences
     in
     ThreadTable.fold add_thread states `Bottom
 
-let inject_interferences
-    (type a)
-    (interferences : t)
-    (analyzer : (module Analysis.S with type Dom.state = a))
-    (state : a)
-  : a =
-  let module Analyzer = (val analyzer : Analysis.S with type Dom.state = a) in
-  let module Dom = Analyzer.Dom in
+let inject (type a) ~(domain : a domain) (interferences : t) (state : a) : a =
+  let module Dom = (val domain) in
   let Interferences { shared_bases } = interferences in
-  let need_injection =
-    match Dom.get MtDomain.Domain.key with
-    (* Domain disabled, no information about memory read/written, always inject *)
-    | None -> true
-    (* Domain enabled *)
-    | Some extract ->
-      let mt_state = extract state in
-      let memory = MtDomain.Domain.memory mt_state in
-      let zone = Locations.Zone.join memory.read memory.written in
-      match Locations.Zone.get_bases zone with
-      | Top -> true
-      | Set bases ->
-        Base.Hptset.intersects bases shared_bases
-  in
-  if not need_injection
+  if is_empty interferences
+  (* No interferences computed, single threaded analysis *)
   then state
-  else
-    match applicable_interferences interferences analyzer state with
-    | `Top -> Dom.top
-    | `Bottom -> state
-    | `Value interferences_state ->
-      let dummy_kf = Kernel_function.dummy () in
-      let result =
-        Dom.reuse dummy_kf shared_bases
-          ~current_input:state ~previous_output:interferences_state
-      in
-      Dom.join state result
+  else begin
+    let need_injection =
+      match Dom.get MtDomain.Domain.key with
+      (* Domain disabled, no information about memory read/written, always inject *)
+      | None -> true
+      (* Domain enabled *)
+      | Some extract ->
+        let mt_state = extract state in
+        let memory = MtDomain.Domain.memory mt_state in
+        let zone = Locations.Zone.join memory.read memory.written in
+        match Locations.Zone.get_bases zone with
+        | Top ->
+          (* Shared memory is Top, always inject *)
+          true
+        | Set bases ->
+          (* Inject only if the read/written memory intersects shared memory *)
+          Base.Hptset.intersects bases shared_bases
+    in
+    if not need_injection
+    then state
+    else begin
+      Self.debug ~dkey ~current:true ~once:true
+        "inject threads interferences at this point";
+      match applicable ~domain interferences state with
+      | `Top -> Dom.top
+      | `Bottom -> state
+      | `Value interferences_state ->
+        let dummy_kf = Kernel_function.dummy () in
+        let result =
+          Dom.reuse dummy_kf shared_bases
+            ~current_input:state ~previous_output:interferences_state
+        in
+        Dom.join state result
+    end
+  end

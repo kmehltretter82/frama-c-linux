@@ -113,7 +113,7 @@ module MSet = Set
    It is indeed necessary to ensure soundness, as it will trigger more
    interferences as necessary. *)
 module Register = struct
-  include Register (Mutex) (Status)
+  include MtUtils.Register (Mutex) (Status)
   let check bad msg st = if Status.equal bad st then Invalid (msg, true) else Ok
   let lock = update (fun _ -> Locked) (check Locked "locked")
   let unlock = update (fun _ -> Unlocked) (check Unlocked "unlocked")
