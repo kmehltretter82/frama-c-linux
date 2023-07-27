@@ -204,10 +204,7 @@ let actualize_formals state arguments =
   List.fold_left treat_one_formal state arguments
 
 let start_call _stmt call _recursion _valuation state =
-  let with_formals = actualize_formals state call.arguments in
-  let stack_with_call = Eva_utils.current_call_stack () in
-  Db.Value.Call_Value_Callbacks.apply (with_formals, stack_with_call);
-  `Value with_formals
+  `Value (actualize_formals state call.arguments)
 
 let finalize_call stmt call _recursion ~pre:_ ~post:state =
   (* Deallocate memory allocated via alloca().

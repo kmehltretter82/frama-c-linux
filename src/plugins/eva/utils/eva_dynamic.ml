@@ -62,5 +62,6 @@ module RteGen = struct
   let mark_generated_rte () =
     let list = all_statuses () in
     let mark kf = List.iter (fun (_kind, set, _get) -> set kf true) list in
-    Globals.Functions.iter (fun kf -> if !Db.Value.is_called kf then mark kf)
+    Globals.Functions.iter
+      (fun kf -> if Function_calls.is_called kf then mark kf)
 end

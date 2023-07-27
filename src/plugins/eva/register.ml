@@ -33,63 +33,9 @@ let main () =
 
 let () = Db.Main.extend main
 
-
-(* "access" functions before evaluation, registered in Db.Value *)
-let access_value_of_lval kinstr lv =
-  let state = Db.Value.get_state kinstr in
-  snd (!Db.Value.eval_lval None state lv)
-
-let access_value_of_expr kinstr e =
-  let state = Db.Value.get_state kinstr in
-  !Db.Value.eval_expr state e
-
-let access_value_of_location kinstr loc =
-  let state = Db.Value.get_state kinstr in
-  Db.Value.find state loc
-
-let find_deps_term_no_transitivity_state state t =
-  try
-    let env = Eval_terms.env_only_here state in
-    let r = Eval_terms.eval_term ~alarm_mode:Eval_terms.Ignore env t in
-    r.Eval_terms.ldeps
-  with Eval_terms.LogicEvalError _ -> raise Db.From.Not_lval
-
-let find_deps_no_transitivity stmt expr =
-  Results.(before stmt |> expr_deps expr)
-
-let find_deps_no_transitivity_state state expr =
-  Results.(in_cvalue_state state |> expr_deps expr)
-
-let eval_predicate ~pre ~here p =
-  let open Eval_terms in
-  let env = env_annot ~pre ~here () in
-  match eval_predicate env p with
-  | True -> Property_status.True
-  | False -> Property_status.False_if_reachable
-  | Unknown -> Property_status.Dont_know
-
-let () =
-  Db.Value.is_called := Function_calls.is_called;
-  Db.Value.callers := Function_calls.callsites;
-  Db.Value.use_spec_instead_of_definition :=
-    Function_calls.use_spec_instead_of_definition;
-  Db.Value.assigns_outputs_to_zone :=
-    (fun s ~result a -> Logic_inout.assigns_outputs_to_zone ~result s a);
-  Db.Value.assigns_inputs_to_zone := Logic_inout.assigns_inputs_to_zone;
-  Db.Value.access := access_value_of_lval;
-  Db.Value.access_location := access_value_of_location;
-  Db.Value.access_expr := access_value_of_expr;
-  Db.Value.Logic.eval_predicate := eval_predicate;
-  Db.Value.valid_behaviors := Logic_inout.valid_behaviors;
-  Db.From.find_deps_term_no_transitivity_state :=
-    find_deps_term_no_transitivity_state;
-  Db.From.find_deps_no_transitivity := find_deps_no_transitivity;
-  Db.From.find_deps_no_transitivity_state := find_deps_no_transitivity_state;
-
-
-  (* -------------------------------------------------------------------------- *)
-  (*                    Register Evaluation Functions                           *)
-  (* -------------------------------------------------------------------------- *)
+(* -------------------------------------------------------------------------- *)
+(*                    Register Evaluation Functions                           *)
+(* -------------------------------------------------------------------------- *)
 
 open Eval
 
@@ -371,28 +317,6 @@ module Export (Eval : Eval) = struct
 
   let lval_to_offsetmap_state state lv =
     lval_to_offsetmap_aux state lv
-
-
-  let expr_to_kernel_function_state ?with_alarms state ~deps exp =
-    let r, deps = resolv_func_vinfo ?with_alarms deps state exp in
-    Option.value ~default:Locations.Zone.bottom deps, r
-
-  let expr_to_kernel_function kinstr ?with_alarms ~deps exp =
-    let state_to_joined_kernel_function state (z_acc, kf_acc) =
-      let z, kf =
-        expr_to_kernel_function_state ?with_alarms state ~deps exp
-      in
-      Locations.Zone.join z z_acc,
-      Kernel_function.Hptset.union kf kf_acc
-    in
-    Db.Value.fold_state_callstack
-      state_to_joined_kernel_function
-      ((match deps with None -> Locations.Zone.bottom | Some z -> z),
-       Kernel_function.Hptset.empty)
-      ~after:false kinstr
-
-  let expr_to_kernel_function_state =
-    expr_to_kernel_function_state ?with_alarms:None
 end
 
 
@@ -425,14 +349,10 @@ let register (module Eval: Eval) (module Export: Export) =
     lval_to_precise_loc_with_deps_state;
   Db.Value.lval_to_offsetmap := lval_to_offsetmap;
   Db.Value.lval_to_offsetmap_state := lval_to_offsetmap_state;
-  Db.Value.expr_to_kernel_function := expr_to_kernel_function;
-  Db.Value.expr_to_kernel_function_state := expr_to_kernel_function_state;
   ()
 
 
 let () = Db.Value.initial_state_only_globals := Analysis.cvalue_initial_state
-
-let () = Db.Value.verify_assigns_froms := Logic_inout.verify_assigns
 
 let () =
   let eval = (module Eval : Eval) in

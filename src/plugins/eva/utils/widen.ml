@@ -561,7 +561,7 @@ let extract_per_function_hints fdec =
 
 let per_function_hints = Per_Function_Hints.memo extract_per_function_hints
 
-let dynamic_widen_hints_hook (stmt, _callstack, states) =
+let dynamic_widen_hints_hook _callstack stmt states =
   if Annotations.has_code_annot stmt then
     let hs = parsed_dynamic_hints stmt in
     if hs <> [] then
@@ -602,8 +602,7 @@ let dynamic_widen_hints_hook (stmt, _callstack, states) =
         Dynamic_Hints.set hints;
       end
 
-let () =
-  Db.Value.Compute_Statement_Callbacks.extend_once dynamic_widen_hints_hook
+let () = Cvalue_callbacks.register_statement_hook dynamic_widen_hints_hook
 
 let getWidenHints (kf:kernel_function) (stmt:stmt) =
   let hints =
