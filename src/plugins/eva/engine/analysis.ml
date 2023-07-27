@@ -187,6 +187,8 @@ let cvalue_initial_state () =
   let _, lib_entry = Globals.entry_point () in
   G.get_cvalue_or_bottom (A.initial_state ~lib_entry)
 
+let () = Db.Value.initial_state_only_globals := cvalue_initial_state
+
 (* Builds the Analyzer module corresponding to a given configuration,
    and sets it as the current analyzer. *)
 let make_analyzer config =
@@ -206,6 +208,12 @@ let reset_analyzer () =
      the reference instead. *)
   if not (Abstractions.Config.equal config (fst !ref_analyzer))
   then make_analyzer config
+
+(* Resets the Analyzer when the current project is changed. *)
+let () =
+  Project.register_after_set_current_hook
+    ~user_only:true (fun _ -> reset_analyzer ());
+  Project.register_after_global_load_hook reset_analyzer
 
 (* Builds the analyzer if needed, and run the analysis. *)
 let force_compute () =
@@ -230,8 +238,12 @@ let compute =
   let name = "Eva.Analysis.compute" in
   fst (State_builder.apply_once name [ Self.state ] compute)
 
-(* Resets the Analyzer when the current project is changed. *)
-let () =
-  Project.register_after_set_current_hook
-    ~user_only:true (fun _ -> reset_analyzer ());
-  Project.register_after_global_load_hook reset_analyzer
+let () = Db.Value.compute := compute
+let () = Parameters.ForceValues.set_output_dependencies [Self.state]
+
+let main () =
+  (* Value computations *)
+  if Parameters.ForceValues.get () then compute ();
+  if is_computed () then Red_statuses.report ()
+
+let () = Db.Main.extend main

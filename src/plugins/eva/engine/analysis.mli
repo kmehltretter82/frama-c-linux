@@ -154,6 +154,3 @@ val use_spec_instead_of_definition: Cil_types.kernel_function -> bool
     to known whether results are available for a given function. *)
 val save_results: Cil_types.kernel_function -> bool
 [@@@ api_end]
-
-val cvalue_initial_state: unit -> Cvalue.Model.t
-(** Return the initial state of the cvalue domain only. *)

@@ -216,36 +216,6 @@ module Value : sig
   (** [after] is false by default.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
-  val fold_stmt_state_callstack :
-    (state -> 'a -> 'a) -> 'a -> after:bool -> stmt -> 'a
-
-  val fold_state_callstack :
-    (state -> 'a -> 'a) -> 'a -> after:bool -> kinstr -> 'a
-
-  (** {3 Evaluations} *)
-
-  val eval_lval :
-    (?with_alarms:CilE.warn_mode ->
-     Locations.Zone.t option ->
-     state ->
-     lval ->
-     Locations.Zone.t option * t) ref
-
-  val eval_expr :
-    (?with_alarms:CilE.warn_mode -> state -> exp -> t) ref
-
-  val eval_expr_with_state :
-    (?with_alarms:CilE.warn_mode -> state -> exp -> state * t) ref
-
-  val reduce_by_cond:
-    (state -> exp -> bool -> state) ref
-
-  val find_lv_plus :
-    (Cvalue.Model.t -> Cil_types.exp ->
-     (Cil_types.lval * Ival.t) list) ref
-  (** returns the list of all decompositions of [expr] into the sum an lvalue
-      and an interval. *)
-
   (** {3 Reachability} *)
 
   val is_accessible : kinstr -> bool
@@ -253,61 +223,6 @@ module Value : sig
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val is_reachable_stmt : stmt -> bool
-
-  (** {3 Locations of left values} *)
-
-  val lval_to_loc :
-    (kinstr -> ?with_alarms:CilE.warn_mode -> lval -> Locations.location) ref
-
-  val lval_to_loc_with_deps :
-    (kinstr
-     -> ?with_alarms:CilE.warn_mode
-     -> deps:Locations.Zone.t
-     -> lval
-     -> Locations.Zone.t * Locations.location) ref
-
-  val lval_to_loc_with_deps_state :
-    (state
-     -> deps:Locations.Zone.t
-     -> lval
-     -> Locations.Zone.t * Locations.location) ref
-
-  val lval_to_loc_state :
-    (state -> lval -> Locations.location) ref
-
-  val lval_to_offsetmap :
-    ( kinstr -> ?with_alarms:CilE.warn_mode -> lval ->
-      Cvalue.V_Offsetmap.t option) ref
-
-  val lval_to_offsetmap_state :
-    (state -> lval -> Cvalue.V_Offsetmap.t option) ref
-  (** @since Carbon-20110201 *)
-
-  val lval_to_zone :
-    (kinstr -> ?with_alarms:CilE.warn_mode -> lval -> Locations.Zone.t) ref
-
-  val lval_to_zone_state :
-    (state -> lval -> Locations.Zone.t) ref
-  (** Does not emit alarms. *)
-
-  val lval_to_zone_with_deps_state:
-    (state -> for_writing:bool -> deps:Locations.Zone.t option -> lval ->
-     Locations.Zone.t * Locations.Zone.t * bool) ref
-  (** [lval_to_zone_with_deps_state state ~for_writing ~deps lv] computes
-      [res_deps, zone_lv, exact], where [res_deps] are the memory zones needed
-      to evaluate [lv] in [state] joined  with [deps]. [zone_lv] contains the
-      valid memory zones that correspond to the location that [lv] evaluates
-      to in [state]. If [for_writing] is true, [zone_lv] is restricted to
-      memory zones that are writable. [exact] indicates that [lv] evaluates
-      to a valid location of cardinal at most one. *)
-
-  val lval_to_precise_loc_state:
-    (?with_alarms:CilE.warn_mode -> state -> lval ->
-     state * Precise_locs.precise_location * typ) ref
-
-  val lval_to_precise_loc_with_deps_state:
-    (state -> deps:Locations.Zone.t option -> lval ->
-     Locations.Zone.t * Precise_locs.precise_location) ref
 
 
   val no_results: (fundec -> bool) ref

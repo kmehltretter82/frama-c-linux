@@ -20,9 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Functions of the Value plugin registered in {!Db}. Only three functions
-    are exported. *)
+(** Implementation of domain queries for the cvalue domain. *)
+include Abstract_domain.Queries
+  with type state = Cvalue.Model.t
+   and type value = Main_values.CVal.t
+   and type location = Main_locations.PLoc.location
+   and type origin = Main_values.CVal.t
 
-val eval_deps : Cvalue_domain.State.t -> Cil_types.exp -> Locations.Zone.t
-val eval_deps_lval : Cvalue_domain.State.t -> Cil_types.lval -> Locations.Zone.t
-val eval_deps_addr : Cvalue_domain.State.t -> Cil_types.lval -> Locations.Zone.t
+(** Evaluation engine specific to the cvalue domain. *)
+include Evaluation_sig.S with type state := state
+                          and type value := value
+                          and type loc := location
+                          and type origin := origin
+
+(** Evaluates the location of a lvalue in a given cvalue state. *)
+val lval_to_loc: state -> Cil_types.lval -> Locations.location

@@ -470,18 +470,6 @@ module Value = struct
               Table_By_Callstack.find stmt)
     with Not_found -> None
 
-  let fold_stmt_state_callstack f acc ~after stmt =
-    assert (is_computed ()); (* this assertion fails during Eva analysis *)
-    match get_stmt_state_callstack ~after stmt with
-    | None -> acc
-    | Some h -> Eva_types.Callstack.Hashtbl.fold (fun _ -> f) h acc
-
-  let fold_state_callstack f acc ~after ki =
-    assert (is_computed ()); (* this assertion fails during Eva analysis *)
-    match ki with
-    | Kglobal -> f (globals_state ()) acc
-    | Kstmt stmt -> fold_stmt_state_callstack f acc ~after stmt
-
   let is_reachable = Cvalue.Model.is_reachable
 
   exception Is_reachable
@@ -506,34 +494,7 @@ module Value = struct
     | Kglobal -> Cvalue.Model.is_reachable (globals_state ())
     | Kstmt stmt -> is_reachable_stmt stmt
 
-  let eval_lval =
-    ref (fun ?with_alarms:_ _ -> mk_labeled_fun "Value.eval_lval")
-  let eval_expr =
-    ref (fun ?with_alarms:_ _ -> mk_labeled_fun "Value.eval_expr")
-
-  let eval_expr_with_state =
-    ref (fun ?with_alarms:_ _ -> mk_labeled_fun "Value.eval_expr_with_state")
-
-  let reduce_by_cond = mk_fun "Value.reduce_by_cond"
-
-  let find_lv_plus = mk_fun "Value.find_lv_plus"
-
   let compute = mk_fun "Value.compute"
-
-
-  let lval_to_loc_with_deps = mk_fun "Value.lval_to_loc_with_deps"
-  let lval_to_loc_with_deps_state = mk_fun "Value.lval_to_loc_with_deps_state"
-  let lval_to_loc = mk_fun "Value.lval_to_loc"
-  let lval_to_offsetmap = mk_fun "Value.lval_to_offsetmap"
-  let lval_to_offsetmap_state = mk_fun "Value.lval_to_offsetmap_state"
-  let lval_to_loc_state = mk_fun "Value.lval_to_loc_state"
-  let lval_to_zone = mk_fun "Value.lval_to_zone"
-  let lval_to_zone_state = mk_fun "Value.lval_to_zone_state"
-  let lval_to_zone_with_deps_state = mk_fun "Value.lval_to_zone_with_deps_state"
-  let lval_to_precise_loc_state =
-    ref (fun ?with_alarms:_ _ -> mk_labeled_fun "Value.lval_to_precise_loc")
-  let lval_to_precise_loc_with_deps_state =
-    mk_fun "Value.lval_to_precise_loc_with_deps_state"
 
 end
 
