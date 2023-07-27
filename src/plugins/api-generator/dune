@@ -26,6 +26,7 @@
   (public_name frama-c-api-generator.core)
   (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel frama-c-server.core)
-)
+  (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx)))
 
 (plugin (optional) (name api_generator) (libraries frama-c-api-generator.core) (site (frama-c plugins)))
