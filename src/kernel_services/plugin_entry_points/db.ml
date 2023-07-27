@@ -470,18 +470,6 @@ module Value = struct
               Table_By_Callstack.find stmt)
     with Not_found -> None
 
-  let fold_stmt_state_callstack f acc ~after stmt =
-    assert (is_computed ()); (* this assertion fails during Eva analysis *)
-    match get_stmt_state_callstack ~after stmt with
-    | None -> acc
-    | Some h -> Eva_types.Callstack.Hashtbl.fold (fun _ -> f) h acc
-
-  let fold_state_callstack f acc ~after ki =
-    assert (is_computed ()); (* this assertion fails during Eva analysis *)
-    match ki with
-    | Kglobal -> f (globals_state ()) acc
-    | Kstmt stmt -> fold_stmt_state_callstack f acc ~after stmt
-
   let is_reachable = Cvalue.Model.is_reachable
 
   exception Is_reachable

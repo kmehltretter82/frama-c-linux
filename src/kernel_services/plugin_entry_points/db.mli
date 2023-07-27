@@ -216,12 +216,6 @@ module Value : sig
   (** [after] is false by default.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
-  val fold_stmt_state_callstack :
-    (state -> 'a -> 'a) -> 'a -> after:bool -> stmt -> 'a
-
-  val fold_state_callstack :
-    (state -> 'a -> 'a) -> 'a -> after:bool -> kinstr -> 'a
-
   (** {3 Reachability} *)
 
   val is_accessible : kinstr -> bool
