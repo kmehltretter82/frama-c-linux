@@ -402,8 +402,8 @@ module Value = struct
 
   module Call_Type_Value_Callbacks =
     Hook.Build(struct
-      type t = [`Builtin of Value_types.call_froms | `Spec of funspec
-               | `Def | `Memexec]
+      type t = [`Builtin | `Spec
+               | `Body | `Reuse]
                * state * callstack end)
   ;;
 

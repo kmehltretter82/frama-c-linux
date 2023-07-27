@@ -31,18 +31,21 @@
 type state = Cvalue.Model.t
 
 type analysis_kind =
-  [ `Builtin of Value_types.call_froms
-  | `Spec of Cil_types.funspec
-  | `Def
-  | `Memexec ]
+  [ `Builtin (** A cvalue builtin is used to interpret the function. *)
+  | `Spec  (** The specification is used to interpret the function. *)
+  | `Body  (** The function body is analyzed. This is the standard case. *)
+  | `Reuse (** The results of a previous analysis of the function are reused. *)
+  ]
 
-(** Registers a function to be applied at the beginning of the analysis of each
-    function call. Arguments of the callback are the callstack of the call,
-    the function called, the kind of analysis performed by Eva for this call,
-    and the cvalue state at the beginning of the call. *)
-val register_call_hook:
-  (Callstack.t -> Cil_types.kernel_function -> analysis_kind -> state -> unit)
-  -> unit
+(** Signature of a hook to be called before the analysis of each function call.
+    Arguments are the callstack of the call, the function called, the initial
+    cvalue state, and the kind of analysis performed by Eva for this call. *)
+type call_hook =
+  Callstack.t -> Cil_types.kernel_function -> state -> analysis_kind -> unit
+
+(** Registers a function to be applied at the start of the analysis of each
+    function call. *)
+val register_call_hook: call_hook -> unit
 
 
 type state_by_stmt = (state Cil_datatype.Stmt.Hashtbl.t) Lazy.t
@@ -50,19 +53,27 @@ type results = { before_stmts: state_by_stmt; after_stmts: state_by_stmt }
 
 (** Results of a function call. *)
 type call_results =
-  | Store of results * int
+  [ `Builtin of state list * Value_types.call_froms
+  (** List of cvalue states at the end of the builtin. *)
+  | `Spec of state list
+  (** List of cvalue states at the end of the call. *)
+  | `Body of results * int
   (** Cvalue states before and after each statement of the given function,
       plus a unique integer id for the call. *)
-  | Reuse of int
-  (** The results are the same as a previous call with the given integer id,
-      previously recorded with the [Store] constructor. *)
+  | `Reuse of int
+    (** The results are the same as a previous call with the given integer id,
+        previously recorded with the [`Body] constructor. *)
+  ]
+
+(** Signature of a hook to be called after the analysis of each function call.
+    Arguments are the callstack of the call, the function called, the initial
+    cvalue state at the start of the call, and the results from its analysis. *)
+type call_results_hook =
+  Callstack.t -> Cil_types.kernel_function -> state -> call_results -> unit
 
 (** Registers a function to be applied at the end of the analysis of each
-    function call. Arguments of the callback are the callstack of the call,
-    the function called and the cvalue states resulting from its analysis. *)
-val register_call_results_hook:
-  (Callstack.t -> Cil_types.kernel_function -> call_results -> unit)
-  -> unit
+    function call. *)
+val register_call_results_hook: call_results_hook -> unit
 
 [@@@ api_end]
 
@@ -70,8 +81,8 @@ val register_statement_hook:
   (Callstack.t -> Cil_types.stmt -> state list -> unit) -> unit
 
 val apply_call_hooks:
-  Callstack.t -> Cil_types.kernel_function -> analysis_kind -> state -> unit
+  Callstack.t -> Cil_types.kernel_function -> state -> analysis_kind -> unit
 val apply_call_results_hooks:
-  Callstack.t -> Cil_types.kernel_function -> call_results -> unit
+  Callstack.t -> Cil_types.kernel_function -> state -> call_results -> unit
 val apply_statement_hooks:
   Callstack.t -> Cil_types.stmt -> state list -> unit

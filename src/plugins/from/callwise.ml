@@ -44,8 +44,6 @@ let merge_call_froms table callsite froms =
 (** State for the analysis of one function call *)
 type from_state = {
   current_function: Kernel_function.t (** Function being analyzed *);
-  value_initial_state: Cvalue.Model.t (** State of Eva at the beginning of
-                                          the call *);
   table_for_calls: Function_Froms.t Kinstr.Hashtbl.t
 (** State of the From plugin for each statement containing a function call
     in the body of [current_function]. Updated incrementally each time
@@ -64,59 +62,36 @@ let record_callwise_dependencies_in_db call_site froms =
     Tbl.replace call_site (Function_Froms.join previous froms)
   with Not_found -> Tbl.add call_site froms
 
-let call_for_individual_froms callstack _kf call_type value_initial_state =
+let call_for_individual_froms _callstack current_function _state call_type =
   if From_parameters.ForceCallDeps.get () then begin
-    let current_function, call_site = Eva.Callstack.top_call callstack in
-    let register_from froms =
-      record_callwise_dependencies_in_db call_site froms;
-      match !call_froms_stack with
-      | { table_for_calls } :: _ ->
-        merge_call_froms table_for_calls call_site froms;
-      | [] ->
-        (* Empty call stack: this is the main entry point with no call site. *)
-        assert (call_site = Cil_types.Kglobal);
-    in
-    let compute_from_behaviors bhv =
-      let assigns = Ast_info.merge_assigns bhv in
-      let froms =
-        From_compute.compute_using_prototype_for_state
-          value_initial_state current_function assigns
-      in
-      register_from froms
-    in
     match call_type with
-    | `Def | `Memexec ->
+    | `Body ->
       let table_for_calls = Kinstr.Hashtbl.create 7 in
       call_froms_stack :=
-        { current_function; value_initial_state; table_for_calls } ::
-        !call_froms_stack
-    | `Builtin (Some (result,_)) ->
-      register_from result
-    | `Builtin None ->
-      let behaviors =
-        Eva.Logic_inout.valid_behaviors current_function value_initial_state
-      in
-      compute_from_behaviors behaviors
-    | `Spec spec ->
-      compute_from_behaviors spec.Cil_types.spec_behavior
+        { current_function; table_for_calls } :: !call_froms_stack
+    | `Reuse | `Builtin | `Spec -> ()
   end
 
-let end_record call_stack froms =
-  let current_function_value, call_site = Eva.Callstack.top_call call_stack in
-  record_callwise_dependencies_in_db call_site froms;
-  (* pop + record in top of stack the froms of function that just finished *)
+let pop_local_table kf =
   match !call_froms_stack with
-  | {current_function} :: ({table_for_calls = table} :: _ as tail) ->
-    if current_function_value != current_function then
+  | { current_function } :: tail ->
+    if kf != current_function then
       From_parameters.fatal "calldeps %a != %a@."
-        Kernel_function.pretty current_function
-        Kernel_function.pretty current_function_value;
-    call_froms_stack := tail;
-    merge_call_froms table call_site froms
+        Kernel_function.pretty current_function Kernel_function.pretty kf;
+    call_froms_stack := tail
+  | _ -> From_parameters.fatal "calldeps: internal stack is empty"
 
-  | _ ->  (* the entry point, probably *)
-    Tbl.mark_as_computed ();
-    call_froms_stack := []
+let end_record callstack froms =
+  let callsite = Eva.Callstack.top_callsite callstack in
+  record_callwise_dependencies_in_db callsite froms;
+  match callsite, !call_froms_stack with
+  | Kstmt _, { table_for_calls } :: _ ->
+    merge_call_froms table_for_calls callsite froms
+  | Kglobal, [] ->  (* the entry point *)
+    Tbl.mark_as_computed ()
+  | _ ->
+    From_parameters.fatal
+      "calldeps: internal stack is inconsistent with Eva callstack"
 
 
 module MemExec =
@@ -152,29 +127,31 @@ let compute_call_from_value_states current_function states =
   Callwise_Froms.compute_and_return current_function
 
 
-let record_for_individual_froms callstack cur_kf value_res =
+let record_for_individual_froms callstack kf pre_state value_res =
   if From_parameters.ForceCallDeps.get () then begin
-    let froms = match value_res with
-      | Eva.Cvalue_callbacks.Store ({before_stmts}, memexec_counter) ->
+    let froms =
+      match value_res with
+      | `Body (Eva.Cvalue_callbacks.{before_stmts}, memexec_counter) ->
         let froms =
-          if Eva.Analysis.save_results cur_kf
-          then compute_call_from_value_states cur_kf (Lazy.force before_stmts)
+          if Eva.Analysis.save_results kf
+          then compute_call_from_value_states kf (Lazy.force before_stmts)
           else Function_Froms.top
         in
-        let pre_state = match !call_froms_stack with
-          | [] -> assert false
-          | { value_initial_state } :: _ -> value_initial_state
-        in
         if From_parameters.VerifyAssigns.get () then
-          Eva.Logic_inout.verify_assigns cur_kf ~pre:pre_state froms;
+          Eva.Logic_inout.verify_assigns kf ~pre:pre_state froms;
         MemExec.replace memexec_counter froms;
+        pop_local_table kf;
         froms
-
-      | Reuse counter ->
-        MemExec.find counter
+      | `Reuse counter -> MemExec.find counter
+      | `Builtin (_states, Some (result,_)) -> result
+      | `Builtin (_states, None)
+      | `Spec _states ->
+        let bhv = Eva.Logic_inout.valid_behaviors kf pre_state in
+        let assigns = Ast_info.merge_assigns bhv in
+        From_compute.compute_using_prototype_for_state
+          pre_state kf assigns
     in
     end_record callstack froms
-
   end
 
 

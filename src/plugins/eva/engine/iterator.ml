@@ -723,8 +723,9 @@ module Make_Dataflow
       Cvalue_callbacks.{ before_stmts = merged_pre_cvalues;
                          after_stmts = merged_post_cvalues }
     in
-    let results = Cvalue_callbacks.Store (states, Mem_exec.new_counter ()) in
-    Cvalue_callbacks.apply_call_results_hooks callstack kf results;
+    let cvalue_init = get_cvalue_or_top initial_state in
+    let results = `Body (states, Mem_exec.new_counter ()) in
+    Cvalue_callbacks.apply_call_results_hooks callstack kf cvalue_init results;
     if not (Db.Value.Record_Value_After_Callbacks.is_empty ())
     then begin
       if Parameters.ValShowProgress.get () then

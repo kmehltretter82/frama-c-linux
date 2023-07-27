@@ -266,13 +266,15 @@ let apply_builtin (builtin:builtin) call ~pre ~post =
   let arguments = compute_arguments call.arguments call.rest in
   try
     let call_result = builtin pre arguments in
+    let states = process_result call post call_result in
     let froms =
       match call_result with
-      | Full result -> `Builtin result.c_from
-      | States _ | Result _ -> `Builtin None
+      | Full result -> result.c_from
+      | States _ | Result _ -> None
     in
-    Cvalue_callbacks.apply_call_hooks call.callstack call.kf froms pre;
-    process_result call post call_result
+    let result = `Builtin (List.map fst states, froms) in
+    Cvalue_callbacks.apply_call_results_hooks call.callstack call.kf pre result;
+    states
   with
   | Invalid_nb_of_args n ->
     Self.abort ~current:true

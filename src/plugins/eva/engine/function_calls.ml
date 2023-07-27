@@ -93,7 +93,7 @@ let nb_callsites () =
 type analysis_target =
   [ `Builtin of string * Builtins.builtin * cacheable * funspec
   | `Spec of Cil_types.funspec
-  | `Def of Cil_types.fundec * bool ]
+  | `Body of Cil_types.fundec * bool ]
 
 type results = Complete | Partial | NoResults
 type analysis_status =
@@ -138,7 +138,7 @@ let register_status kf kind =
     match kind with
     | `Builtin (name, _, _, _) -> Builtin name
     | `Spec _ -> SpecUsed
-    | `Def (_, results) -> Analyzed (if results then Complete else NoResults)
+    | `Body (_, results) -> Analyzed (if results then Complete else NoResults)
   in
   let change prev_status = merge_status prev_status status in
   ignore (StatusTable.memo ~change (fun _ -> status) kf)
@@ -169,7 +169,7 @@ let analysis_target ~recursion_depth callsite kf =
       | Definition (def, _) ->
         if Kernel_function.Set.mem kf (Parameters.UsePrototype.get ())
         then `Spec (Annotations.funspec kf)
-        else `Def (def, save_results def)
+        else `Body (def, save_results def)
 
 let define_analysis_target ?(recursion_depth = -1) callsite kf  =
   let kind = analysis_target callsite kf ~recursion_depth in
