@@ -212,8 +212,6 @@ wp-tests:
 e2e-playwright-tests:
   stage: tests
   image: 'ocaml/opam:ubuntu-lts-ocaml-$OCAML'
-  volumes:
-    - /tmp/.X11-unix:/tmp/.X11-unix
   before_script:
     - sudo apt update
     - sudo apt install -y xvfb curl bubblewrap unzip pkg-config autoconf graphviz libcairo2-dev libexpat1-dev libgmp-dev libgtk-3-dev libgtksourceview-3.0-dev zlib1g-dev
