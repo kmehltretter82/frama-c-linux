@@ -125,4 +125,13 @@ module Simple : Simpler_domains.Simple_Cvalue = struct
     state
 end
 
-include Domain_builder.Complete_Simple_Cvalue (Simple)
+module Domain = Domain_builder.Complete_Simple_Cvalue (Simple)
+include Domain
+
+let registered =
+  let name = "printer"
+  and descr =
+    "Debug domain, only useful for developers. Prints the transfer functions \
+     used during the analysis."
+  in
+  Abstractions.Domain.register ~name ~descr ~priority:2 (module Domain)

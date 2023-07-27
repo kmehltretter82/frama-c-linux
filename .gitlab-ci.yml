@@ -22,7 +22,7 @@ default:
 
 variables:
   DEFAULT: "master"
-  OCAML: "4.11"
+  OCAML: "4.13"
   PUBLISH: "no"
   RELEASE: "no"
   WEEKLY: "no"
@@ -271,7 +271,7 @@ header-check:
 lint:
   stage: distrib
   script:
-    - ./nix/shell-checkers.sh "make -f share/Makefile.linting check-lint"
+    - ./nix/shell-checkers.sh "make -f share/Makefile.linting check-lint LINTCK_EXTRA=-s"
 
 # Manuals
 
@@ -349,11 +349,12 @@ internal_nightly:
     matrix:
       - OCAML: ["4.14"]
 
-.build_template: &ocaml_manual_additional_versions_template
-  parallel:
-    matrix:
-      - OCAML: ["4.12", "4.13"]
-  when: manual
+# Uncomment this block when there are intermediate versions to check manully
+#.build_template: &ocaml_manual_additional_versions_template
+#  parallel:
+#    matrix:
+#      - OCAML: ["4.14"]
+#  when: manual
 
 .build_template: &ocaml_versions_template
   stage: compatibility
@@ -367,9 +368,10 @@ ocaml-versions:
   except:
     - schedules
 
-ocaml-versions-more:
-  <<: *ocaml_versions_template
-  <<: *ocaml_manual_additional_versions_template
+# Uncomment this section when there are additional versions of OCaml to test
+# ocaml-versions-more:
+#   <<: *ocaml_versions_template
+#   <<: *ocaml_manual_additional_versions_template
 
 ocaml-versions-nightly:
   <<: *ocaml_versions_template
@@ -388,7 +390,7 @@ ocaml-versions-nightly:
     - sudo apt update
     - opam pin . -n
     - opam depext frama-c --with-test
-    - opam install --jobs 2 frama-c --with-test
+    - opam install --jobs 2 frama-c --with-test --with-doc
     - frama-c -version
   tags:
     - docker

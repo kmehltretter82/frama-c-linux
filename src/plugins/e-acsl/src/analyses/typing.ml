@@ -117,8 +117,12 @@ let typ_of_lty = function
 type computed_info =
   { ty: Number_ty.t;  (* type required for the term *)
     cast: Number_ty.t option; (* if not [None], type of the context which the term
-                                 must be casted to. If [None], no cast needed. *)
+                                 must be cast to. If [None], no cast needed. *)
   }
+
+let pp_computed_info fmt ci =
+  let pp_cast fmt c = Format.fprintf fmt "(%a)" Number_ty.pretty c in
+  Format.fprintf fmt "%a%a" (Pretty_utils.pp_opt pp_cast) ci.cast Number_ty.pretty ci.ty
 
 (* Memoization module which retrieves the computed info of some terms. If the
    info is already computed for a term, it is never recomputed *)
@@ -357,6 +361,7 @@ let rec type_term
     ?ctx
     ~profile
     t =
+  Options.feedback ~dkey ~level:5 "typing (sub-)term %a" Printer.pp_term t;
   let ctx = Option.map (mk_ctx ~use_gmp_opt) ctx in
   let compute_ctx ?ctx i =
     (* in order to get a minimal amount of generated casts for operators, the
@@ -650,13 +655,21 @@ let rec type_term
            | [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ] ->
              let range = Interval.(plus_one (get_from_profile ~profile t2)) in
              let range = Interval.(join range (get_from_profile ~profile t1)) in
-             let range = ty_of_interv range in
+             let ty_range = ty_of_interv range in
              ignore
                (type_term
-                  ~use_gmp_opt:true ~arith_operand:true ~ctx:range ~profile t1);
+                  ~use_gmp_opt:true
+                  ~arith_operand:true
+                  ~profile
+                  ~ctx:ty_range
+                  t1);
              ignore
                (type_term
-                  ~use_gmp_opt:true ~arith_operand:true ~ctx:range ~profile t2);
+                  ~use_gmp_opt
+                  ~arith_operand
+                  ~profile
+                  ~ctx:ty_range
+                  t2);
              let ival = Interval.get_from_profile ~profile t in
              let ty = ty_of_interv ival ~use_gmp_opt:true ?ctx in
              ignore (type_term ~use_gmp_opt:true ?ctx ~profile lambda);
@@ -712,7 +725,10 @@ let rec type_term
          | Some ctx -> coerce ~arith_operand ~ctx ty)
       t
   with
-  | Result.Ok res -> res
+  | Result.Ok result ->
+    Options.debug ~dkey "type_term ~ctx:%a %a = %a"
+      (Pretty_utils.pp_opt Number_ty.pretty) ctx Printer.pp_term t pp_computed_info result;
+    result
   | Result.Error exn -> raise exn
 
 and type_term_lval ~profile (host, offset) =

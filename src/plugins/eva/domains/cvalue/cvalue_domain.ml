@@ -187,6 +187,9 @@ module State = struct
   type value = Model.value
   type location = Model.location
 
+  let value_dependencies = Main_values.cval
+  let location_dependencies = Main_locations.ploc
+
   let top = Model.top, Locals_scoping.bottom ()
   let is_included (a, _) (b, _) = Model.is_included a b
   let join (a, clob) (b, _) = Model.join a b, clob
@@ -457,8 +460,8 @@ module State = struct
         end)
 
     let register_global_state b _ = Storage.set b
-    let register_initial_state callstack (state, _clob) =
-      Db.Value.merge_initial_state callstack state
+    let register_initial_state callstack kf (state, _clob) =
+      Db.Value.merge_initial_state callstack kf state
     let register_state_before_stmt callstack stmt (state, _clob) =
       Db.Value.update_callstack_table ~after:false stmt callstack state
     let register_state_after_stmt callstack stmt (state, _clob) =
@@ -470,7 +473,6 @@ module State = struct
       else `Value (state, Locals_scoping.top ())
 
     let lift_tbl tbl =
-      let open Value_types in
       let h = Callstack.Hashtbl.create 7 in
       let process callstack state =
         Callstack.Hashtbl.replace h callstack (state, Locals_scoping.top ())
@@ -482,10 +484,10 @@ module State = struct
       match selection with
       | None -> tbl
       | Some list ->
-        let new_tbl = Value_types.Callstack.Hashtbl.create (List.length list) in
+        let new_tbl = Callstack.Hashtbl.create (List.length list) in
         let add cs =
-          let s = Value_types.Callstack.Hashtbl.find_opt tbl cs in
-          Option.iter (Value_types.Callstack.Hashtbl.replace new_tbl cs) s
+          let s = Callstack.Hashtbl.find_opt tbl cs in
+          Option.iter (Callstack.Hashtbl.replace new_tbl cs) s
         in
         List.iter add list;
         new_tbl
@@ -585,6 +587,14 @@ end
 let () = Db.Value.display := (fun fmt kf -> State.display ~fmt kf)
 
 
+let registered =
+  let name = "cvalue"
+  and descr =
+    "Main analysis domain, enabled by default. Should not be disabled."
+  in
+  Abstractions.Domain.register ~name ~descr ~priority:9 (module State)
+
+
 type prefix = Hptmap.prefix
 module Subpart = struct
   type t = Model.subtree
@@ -597,6 +607,23 @@ let distinct_subpart (a, _) (b, _) =
     try Model.comp_prefixes a b; None
     with Model.Found_prefix (p, s1, s2) -> Some (p, s1, s2)
 let find_subpart (s, _) prefix = Model.find_prefix s prefix
+
+
+module Getters (Dom : Abstract.Domain.External) = struct
+  let get_cvalue =
+    match Dom.get State.key with
+    | None -> None
+    | Some get -> Some (fun s -> fst (get s))
+
+  let get_cvalue_or_top =
+    match Dom.get State.key with
+    | None -> fun _ -> Cvalue.Model.top
+    | Some get -> fun s -> fst (get s)
+
+  let get_cvalue_or_bottom = function
+    | `Bottom -> Cvalue.Model.bottom
+    | `Value state -> get_cvalue_or_top state
+end
 
 (*
 Local Variables:

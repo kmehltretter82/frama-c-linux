@@ -665,6 +665,135 @@ val splitFunctionTypeVI:
   typ * (string * typ * attributes) list option * bool * attributes
 
 
+exception Cannot_combine of string
+
+(** Used in {!combineTypes} and {!combineTypesGen} to indicate what we want to
+    combine.
+
+    @since Frama-C+dev
+*)
+type combineWhat =
+  | CombineFundef of bool
+  (** The new definition is for a function definition. The old is for a
+      prototype. arg is [true] for an old-style declaration.
+  *)
+  | CombineFunarg of bool
+  (** Comparing a function argument type with an old prototype argument. arg is
+      [true] for an old-style declaration, which triggers some ad hoc treatment
+      in GCC mode.
+  *)
+  | CombineFunret
+  (** Comparing the return of a function with that from an old prototype *)
+  | CombineOther
+
+(** [combineAttributes what olda a] combines the attributes in [olda] and [a]
+    according to [what]:
+    - if [what == CombineFunarg], then override old attributes;
+      this is used to ensure that attributes from formal argument types in a
+      function definition are not mixed with attributes from arguments in other
+      (compatible, but with different qualifiers) declarations;
+    - else, perform the union of old and new attributes.
+
+    @since Frama-C+dev
+*)
+val combineAttributes : combineWhat -> attribute list -> attributes -> attributes
+
+(** [combineFunction] contains information on how enum, struct/union and
+    typedef are to be handled when combining with {!combineTypes} and
+    {!combineTypesGen}.
+    In pratice, the first argument of each field is a recursive definition.
+
+    @since Frama-C+dev
+*)
+type combineFunction =
+  {
+    typ_combine : combineFunction ->
+      bool -> combineWhat -> typ -> typ -> typ;
+    (** [bool] is about strictness in return context.
+        See [StrictReturnTypes] in [combineTypeGen] *)
+
+    enum_combine : combineFunction ->
+      enuminfo -> enuminfo -> enuminfo;
+
+    comp_combine : combineFunction ->
+      compinfo -> compinfo -> compinfo;
+
+    name_combine : combineFunction -> combineWhat ->
+      typeinfo -> typeinfo -> typeinfo;
+  }
+
+(** [combineTypesGen combF combW oldt newt]
+    Combine [oldt] and [newt] accordingly to [combF], [combW] indicates what we
+    are combinining.
+
+    Warning : this is not commutative. Indeed, excluding enum, struct/union and
+    typedef which depend on [combF], the resulting type is as close as possible
+    to [newt].
+
+    [strictInteger] is [true] (default) if two integers with same size and sign
+    but with different types cannot be combined. A warning is sent if it is
+    [false] and the compatibility is machine-dependent.
+
+    [strictReturnTypes] is [false] (default) if a non-void type is compatible
+    with void in a return case.
+
+    Notice that the [~emitwith] action is called iff a warning is logged.
+
+    @raise Cannot_combine with an explanation when the type cannot be
+           combined.
+
+    @since Frama-C+dev
+*)
+val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
+  ?strictInteger:bool -> ?strictReturnTypes:bool ->
+  combineWhat -> typ -> typ -> typ
+
+(** Specialized verison of [combineTypesGen], we suppore here that
+    if two global symbols are equal, then they are the same object.
+
+    @since Frama-C+dev
+*)
+val combineTypes : ?strictReturnTypes:bool -> combineWhat -> typ -> typ -> typ
+
+(** How type qualifiers must be checked when checking for types compatibility
+    with {!areCompatibleTypes} and {!compatibleTypes}.
+
+    @since Frama-C+dev
+*)
+type qualifier_check_context =
+  | Identical (** Identical qualifiers. *)
+  | IdenticalToplevel
+  (** Ignore at toplevel, use Identical when going under a pointer. *)
+  | Covariant
+  (** First type can have const-qualifications the second doesn't have. *)
+  | CovariantToplevel
+  (** Accepts everything for current type, use Covariant when going under a
+      pointer. *)
+  | Contravariant
+  (** Second type can have const-qualifications the first doesn't have. *)
+  | ContravariantToplevel
+  (** Accepts everything for current type, use Contravariant when going under
+      a pointer. *)
+
+(** [areCompatibleTypes] returns [true] if two types are compatible.
+    [context] indicates how check the compatibility of qualifiers.
+    Other arguments are the same than [combineTypes].
+
+    @since Frama-C+dev
+*)
+val areCompatibleTypes :
+  ?strictReturnTypes:bool -> ?context:qualifier_check_context -> typ -> typ -> bool
+
+(** Same as [areCompatibleTypes old newt] but combine [oldt] and [newt].
+    [context] does not impact the qualifiers of the result.
+
+    @raise Cannot_combine if [oldt] and [newt] are not compatible.
+
+    @since Frama-C+dev
+*)
+val compatibleTypes :
+  ?strictReturnTypes:bool -> ?context:qualifier_check_context -> typ -> typ -> typ
+
 (*********************************************************)
 (**  LVALUES *)
 
@@ -841,14 +970,26 @@ val kfloat: loc:location -> fkind -> float -> exp
     character or an integer constant *)
 val isInteger: exp -> Integer.t option
 
-(** True if the expression is a compile-time constant *)
-val isConstant: exp -> bool
+(** True if the expression is a compile-time constant.
+    [is_varinfo_cst] indicates whether a variable should
+    be considered as having a constant content. Defaults to
+    [false].
 
-(** True if the expression is a compile-time integer constant *)
-val isIntegerConstant: exp -> bool
+    @before Frama-C+dev [is_varinfo_cst] does not exist
+*)
+val isConstant: ?is_varinfo_cst:(varinfo -> bool) -> exp -> bool
 
-(** True if the given offset contains only field names or constant indices. *)
-val isConstantOffset: offset -> bool
+(** True if the expression is a compile-time integer constant
+
+    @before Frama-C+dev [is_varinfo_cst] does not exist
+*)
+val isIntegerConstant: ?is_varinfo_cst:(varinfo -> bool) -> exp -> bool
+
+(** True if the given offset contains only field names or constant indices.
+
+    @before Frama-C+dev [is_varinfo_cst] does not exist
+*)
+val isConstantOffset: ?is_varinfo_cst:(varinfo -> bool) -> offset -> bool
 
 (** True if the given expression is a (possibly cast'ed) integer or character
     constant with value zero *)
@@ -917,6 +1058,13 @@ val constFoldBinOp: loc:location -> bool -> binop -> exp -> exp -> typ -> exp
     @since Nitrogen-20111001
 *)
 val compareConstant: constant -> constant -> bool
+
+
+(** [true] if two kinds have the same size independently of the machine.*)
+val sameSizeInt : ?machdep:bool -> ikind -> ikind -> bool
+
+(** [true] if the result of two expressions are two equal integers. *)
+val same_int64 : ?machdep:bool -> exp -> exp -> bool
 
 (** Increment an expression. Can be arithmetic or pointer type *)
 val increm: exp -> int -> exp
@@ -1325,8 +1473,12 @@ val typeAttr: typ -> attribute list
     are discarded. *)
 val setTypeAttrs: typ -> attributes -> typ
 
-(** Add some attributes to a type *)
-val typeAddAttributes: attribute list -> typ -> typ
+(** Add some attributes to a type.
+    [combine] explains how to combine attributes. Default is [addAttributes].
+
+    @before Frama-C+dev [combine] does not exist *)
+val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->
+  attribute list -> typ -> typ
 
 (** Remove all attributes with the given names from a type. Note that this
     does not remove attributes from typedef and tag definitions, just from

@@ -260,14 +260,14 @@ let buffer_formatter state source =
   let emit_open_tag s =
     let s = Extlib.format_string_of_stag s in
     (* Ignore tags that are not ours *)
-    if Extlib.string_prefix "guitag:" s then
+    if String.starts_with ~prefix:"guitag:" s then
       Stack.push (source#end_iter#offset, Tag.find s) starts ;
     ""
   in
   let emit_close_tag s =
     let s = Extlib.format_string_of_stag s in
     (try
-       if Extlib.string_prefix "guitag:" s then
+       if String.starts_with ~prefix:"guitag:" s then
          let (p,sid) = Stack.pop starts in
          Locs.add state (p, source#end_iter#offset) sid
      with Stack.Empty -> (* This should probably be a hard error *)

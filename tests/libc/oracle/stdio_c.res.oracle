@@ -108,14 +108,7 @@
   Called from FRAMAC_SHARE/libc/stdio.c:82.
 [eva] Done for function feof
 [eva] FRAMAC_SHARE/libc/stdio.c:84: Reusing old results for call to fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:84: Reusing old results for call to fgetc
 [eva] FRAMAC_SHARE/libc/stdio.c:104: Call to builtin realloc
-[eva] computing for function ferror <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:82.
-[eva] Done for function ferror
-[eva] computing for function feof <- getline <- main.
-  Called from FRAMAC_SHARE/libc/stdio.c:82.
-[eva] Done for function feof
 [eva:alarm] FRAMAC_SHARE/libc/stdio.c:93: Warning: 
   out of bounds write. assert \valid(*lineptr + cur);
 [eva] Recording results for getline
@@ -368,7 +361,7 @@
 [eva:final-states] Values at end of function fgets:
   Frama_C_entropy_source ∈ [--..--]
   __fc_errno ∈ [--..--]
-  i ∈ [0..9]
+  i ∈ [0..9] or UNINITIALIZED
   buf[0..8] ∈ [--..--] or UNINITIALIZED
      [9] ∈ {0} or UNINITIALIZED
   __retres ∈ {{ NULL ; &buf[0] }}
@@ -396,7 +389,7 @@
   __fc_heap_status ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   __fc_errno ∈ [--..--]
-  cur ∈ [0..2147483647]
+  cur ∈ [0..2147483647] or UNINITIALIZED
   line ∈
       {{ NULL ; &__malloc_w_getline_l73[0] ; &__realloc_w_getline_l104[0] }}
   len ∈ [0..2147483647]
@@ -417,10 +410,10 @@
   len ∈ [0..2147483647]
   total_len ∈ [--..--]
   read ∈ {-1} or UNINITIALIZED
-  c ∈ [-1..255]
+  c ∈ [-1..255] or UNINITIALIZED
   buf[0..8] ∈ [--..--] or UNINITIALIZED
      [9] ∈ {0} or UNINITIALIZED
-  r_1 ∈ {{ NULL ; &buf[0] }}
+  r_1 ∈ {{ NULL ; &buf[0] }} or UNINITIALIZED
   __retres ∈ {0; 1}
   __malloc_w_getline_l73[0..1] ∈ [--..--] or UNINITIALIZED
   __realloc_w_getline_l104[0..2147483645] ∈ [--..--] or UNINITIALIZED

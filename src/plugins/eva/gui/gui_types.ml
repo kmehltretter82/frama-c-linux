@@ -25,20 +25,20 @@ open Cil_types
 type gui_callstack =
   | GC_Filtered (* Some results have been hidden by a filter *)
   | GC_Consolidated (* Join of all possible callstacks *)
-  | GC_Single of Value_types.callstack (* Only one callstack possible here *)
-  | GC_Callstack of Value_types.callstack (* One of multiple callstacks *)
+  | GC_Single of Callstack.t (* Only one callstack possible here *)
+  | GC_Callstack of Callstack.t (* One of multiple callstacks *)
 
 let hash_gui_callstack = function
   | GC_Filtered -> 0
   | GC_Consolidated -> 1
-  | GC_Single cs -> 2 * Value_types.Callstack.hash cs
-  | GC_Callstack cs -> 4 * Value_types.Callstack.hash cs
+  | GC_Single cs -> 2 * Callstack.hash cs
+  | GC_Callstack cs -> 4 * Callstack.hash cs
 
 let compare_gui_callstack cs1 cs2 = match cs1, cs2 with
   | GC_Filtered, GC_Filtered -> 0
   | GC_Consolidated, GC_Consolidated -> 0
   | GC_Single cs1, GC_Single cs2 | GC_Callstack cs1, GC_Callstack cs2 ->
-    Value_types.Callstack.compare cs1 cs2
+    Callstack.compare cs1 cs2
   | _, GC_Filtered -> 1
   | GC_Filtered, _ -> -1
   | _, GC_Consolidated -> 1
@@ -135,7 +135,7 @@ module type S = sig
   val equal_gui_after : value gui_after -> value gui_after -> bool
 end
 
-module Make (V: Abstractions.Value) = struct
+module Make (V: Abstract.Value.External) = struct
 
   let pretty_gui_res fmt = function
     | GR_Empty -> ()
@@ -227,44 +227,45 @@ let gui_loc_loc = function
 let kf_of_gui_loc = function
   | GL_Stmt (kf, _) | GL_Pre kf | GL_Post kf -> kf
 
+let pop_last_call cs =
+  match cs.Callstack.stack with
+  | (_, stmt) :: ((kf, _) :: _ as stack)-> Some (stmt, kf, { cs with stack })
+  | [_, stmt] -> Some (stmt, cs.entry_point, { cs with stack = [] })
+  | [] -> None
+
 (* This pretty-printer drops the toplevel kf, which is always the function
    in which we are pretty-printing the expression/term *)
 let pretty_callstack fmt cs =
-  match cs with
-  | [_, Kglobal] -> ()
-  | (_kf_cur, Kstmt callsite) :: q -> begin
-      let rec aux callsite = function
-        | (kf, callsite') :: q -> begin
-            Format.fprintf fmt "%a (%a%t)"
-              Kernel_function.pretty kf
-              Cil_datatype.Location.pretty (Cil_datatype.Stmt.loc callsite)
-              (fun fmt ->
-                 if Gui_parameters.debug_atleast 1 then
-                   Format.fprintf fmt ", %d" callsite.sid);
-            match callsite' with
-            | Kglobal -> ()
-            | Kstmt callsite' ->
-              Format.fprintf fmt " ←@ ";
-              aux callsite' q
-          end
-        | _ -> assert false
-      in
-      Format.fprintf fmt "@[<hv>%a" Value_types.Callstack.pretty_hash cs;
-      aux callsite q;
-      Format.fprintf fmt "@]"
-    end
-  | _ -> assert false
+  match pop_last_call cs with
+  | None -> ()
+  | Some (stmt, caller, q) ->
+    let rec aux stmt caller cs =
+      Format.fprintf fmt "%a (%a%t)"
+        Kernel_function.pretty caller
+        Cil_datatype.Location.pretty (Cil_datatype.Stmt.loc stmt)
+        (fun fmt ->
+           if Gui_parameters.debug_atleast 1 then
+             Format.fprintf fmt ", %d" stmt.sid);
+      match pop_last_call cs with
+      | None -> ()
+      | Some (stmt, caller, q) ->
+        Format.fprintf fmt " ←@ ";
+        aux stmt caller q
+    in
+    Format.fprintf fmt "@[<hv>%a" Callstack.pretty_hash cs;
+    aux stmt caller q;
+    Format.fprintf fmt "@]"
 
 (* This pretty-printer prints only the lists of the functions, not
    the locations *)
 let pretty_callstack_short fmt cs =
-  match cs with
-  | [_, Kglobal] -> ()
-  | (_kf_cur, Kstmt _callsite) :: q ->
-    Format.fprintf fmt "%a" Value_types.Callstack.pretty_hash cs;
+  match Callstack.pop cs with
+  | None -> ()
+  | Some q ->
+    Format.fprintf fmt "%a" Callstack.pretty_hash cs;
+    let list = List.rev (Callstack.to_kf_list q) in
     Pretty_utils.pp_flowlist ~left:"@[" ~sep:" ←@ " ~right:"@]"
-      (fun fmt (kf, _) -> Kernel_function.pretty fmt kf) fmt q
-  | _ -> assert false
+      Kernel_function.pretty fmt list
 
 
 (*

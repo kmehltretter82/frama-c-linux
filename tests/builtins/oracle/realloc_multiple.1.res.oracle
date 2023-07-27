@@ -44,6 +44,7 @@
   r ∈ {{ &__malloc_main1_l12[0] }}
   p ∈ {{ &__malloc_main1_l9[0] ; &__malloc_main1_l12[0] }}
   x ∈ {0; 1}
+  s ∈ UNINITIALIZED
   v ∈ {1}
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
@@ -165,6 +166,7 @@
   r ∈ {{ &__malloc_main2_l33[0] }}
   p ∈ {{ NULL ; &__malloc_main2_l30[0] ; &__malloc_main2_l33[0] }}
   x ∈ {0; 1; 2}
+  s ∈ UNINITIALIZED
   v ∈ {2}
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]

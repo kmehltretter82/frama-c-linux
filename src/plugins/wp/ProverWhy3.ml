@@ -1185,13 +1185,13 @@ let ping_prover_call ~config p =
   | ProverFinished _ when p.killed -> Task.(Return Canceled)
   | ProverFinished pr ->
     let r =
+      let time = max Rformat.epsilon pr.pr_time in
       match pr.pr_answer with
-      | Timeout -> VCS.timeout pr.pr_time
-      | Valid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Valid
-      | Invalid -> VCS.result ~time:pr.pr_time ~steps:pr.pr_steps VCS.Invalid
+      | Timeout -> VCS.timeout time
+      | Valid -> VCS.result ~time ~steps:pr.pr_steps VCS.Valid
       | OutOfMemory -> VCS.failed "out of memory"
       | StepLimitExceeded -> VCS.result ?steps:p.steps VCS.Stepout
-      | Unknown _ -> VCS.unknown
+      | Unknown _ | Invalid -> VCS.unknown
       | _ when p.interrupted -> VCS.timeout p.timeout
       | Failure s -> VCS.failed s
       | HighFailure ->
@@ -1244,22 +1244,30 @@ let digest_task wpo drv ?script prover task =
       begin fun fmt ->
         Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
           (Why3Provers.ident_why3 prover) ;
-        let old = Option.map open_in script in
+        let old = Option.map
+            (fun fscript ->
+               let hash = Digest.file fscript |> Digest.to_hex in
+               Format.fprintf fmt "(* WP Script %s *)@\n" hash ;
+               open_in fscript
+            ) script in
         let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
         Option.iter close_in old ;
       end ;
     Digest.file file |> Digest.to_hex
   end
 
-let run_batch pconf driver ~config ?script ~timeout ~steplimit prover task =
+let run_batch pconf driver ~config ?script ~timeout ~steplimit ~memlimit
+    prover task =
   let steps = match steplimit with Some 0 -> None | _ -> steplimit in
   let limit =
     let config = Why3.Whyconf.get_main @@ Why3Provers.config () in
-    let memlimit = Why3.Whyconf.memlimit config in
-    let def = Why3.Call_provers.empty_limit in
-    { Why3.Call_provers.limit_time = Why3.Opt.get_def def.limit_time timeout;
-      Why3.Call_provers.limit_steps = Why3.Opt.get_def def.limit_steps steps;
-      Why3.Call_provers.limit_mem = memlimit;
+    let config_mem = Why3.Whyconf.memlimit config in
+    let config_time = Why3.Whyconf.timelimit config in
+    let config_steps = Why3.Call_provers.empty_limit.limit_steps in
+    Why3.Call_provers.{
+      limit_time = Why3.Opt.get_def config_time timeout;
+      limit_steps = Why3.Opt.get_def config_steps steps;
+      limit_mem = Why3.Opt.get_def config_mem memlimit;
     } in
   let with_steps = match steps, pconf.Why3.Whyconf.command_steps with
     | None, _ -> false
@@ -1268,8 +1276,7 @@ let run_batch pconf driver ~config ?script ~timeout ~steplimit prover task =
       Wp_parameters.warning ~once:true ~current:false
         "%a does not support steps limit (ignored option)"
         Why3.Whyconf.print_prover prover ;
-      false
-  in
+      false in
   let steps = if with_steps then steps else None in
   let command = Why3.Whyconf.get_complete_command pconf ~with_steps in
   Wp_parameters.debug ~dkey "Prover command %S" command ;
@@ -1316,16 +1323,13 @@ let editor ~script ~merge ~config pconf driver task =
       if merge then updatescript ~script driver task ;
       let command = editor_command pconf in
       Wp_parameters.debug ~dkey "Editor command %S" command ;
-      let call =
-        Why3.Call_provers.call_editor
-          ~command ~config script
-      in
-      call_prover_task ~config ~timeout:None ~steps:None pconf.prover call
+      call_prover_task ~config ~timeout:None ~steps:None pconf.prover @@
+      Why3.Call_provers.call_editor ~command ~config script
     end
 
-let compile ~script ~timeout ~config wpo pconf driver prover task =
+let compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task =
   let digest = digest_task wpo driver ~script in
-  let runner = run_batch ~config pconf driver ~script in
+  let runner = run_batch ~config pconf driver ~script ~memlimit in
   Cache.get_result ~digest ~runner ~timeout ~steplimit:None prover task
 
 let prepare ~mode wpo driver task =
@@ -1345,7 +1349,9 @@ let prepare ~mode wpo driver task =
 
 let interactive ~mode wpo pconf ~config driver prover task =
   let time = Wp_parameters.InteractiveTimeout.get () in
+  let mem = Wp_parameters.Memlimit.get () in
   let timeout = if time <= 0 then None else Some (float time) in
+  let memlimit = if mem <= 0 then None else Some mem in
   match prepare ~mode wpo driver task with
   | None ->
     Wp_parameters.warning ~once:true ~current:false
@@ -1359,28 +1365,30 @@ let interactive ~mode wpo pconf ~config driver prover task =
       Why3.Whyconf.print_prover prover script ;
     match mode with
     | VCS.Batch ->
-      compile ~script ~timeout ~config wpo pconf driver prover task
+      compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task
     | VCS.Update ->
       if merge then updatescript ~script driver task ;
-      compile ~script ~timeout ~config wpo pconf driver prover task
+      compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task
     | VCS.Edit ->
       let open Task in
       editor ~script ~merge ~config pconf driver task >>= fun _ ->
-      compile ~script ~timeout ~config wpo pconf driver prover task
+      compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task
     | VCS.Fix ->
       let open Task in
-      compile ~script ~timeout ~config wpo pconf driver prover task >>= fun r ->
+      compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task
+      >>= fun r ->
       if VCS.is_valid r then return r else
         editor ~script ~merge ~config pconf driver task >>= fun _ ->
-        compile ~script ~timeout ~config wpo pconf driver prover task
+        compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task
     | VCS.FixUpdate ->
       let open Task in
       if merge then updatescript ~script driver task ;
-      compile ~script ~timeout ~config wpo pconf driver prover task >>= fun r ->
+      compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task
+      >>= fun r ->
       if VCS.is_valid r then return r else
         let merge = false in
         editor ~script ~merge ~config pconf driver task >>= fun _ ->
-        compile ~script ~timeout ~config wpo pconf driver prover task
+        compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prove WPO                                                          --- *)
@@ -1390,7 +1398,8 @@ let is_trivial (t : Why3.Task.task) =
   let goal = Why3.Task.task_goal_fmla t in
   Why3.Term.t_equal goal Why3.Term.t_true
 
-let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ~prover wpo () =
+let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ?memlimit
+    ~prover wpo () =
   try
     (* Always generate common task *)
     let context = Wpo.get_context wpo in
@@ -1408,7 +1417,7 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ~prover wpo () =
       else
         Cache.get_result
           ~digest:(digest_task wpo drv)
-          ~runner:(run_batch ~config pconf drv ?script:None)
+          ~runner:(run_batch ~config pconf ~memlimit drv ?script:None)
           ~timeout ~steplimit prover task
   with exn ->
     if Wp_parameters.has_dkey dkey_api then
@@ -1418,7 +1427,8 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ~prover wpo () =
     else
       Task.failed "[Why3 Error] %a" Why3.Exn_printer.exn_printer exn
 
-let prove ?mode ?timeout ?steplimit ~prover wpo =
-  Task.later (build_proof_task ?mode ?timeout ?steplimit ~prover wpo) ()
+let prove ?mode ?timeout ?steplimit ?memlimit ~prover wpo =
+  Task.later
+    (build_proof_task ?mode ?timeout ?steplimit ?memlimit ~prover wpo) ()
 
 (* -------------------------------------------------------------------------- *)

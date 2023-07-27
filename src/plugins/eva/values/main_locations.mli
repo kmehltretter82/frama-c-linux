@@ -20,18 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Main memory locations of Eva: *)
+(** Main memory locations of Eva that can be used by abstract domains. *)
 
 (** Abstract locations built over Precise_locs. *)
 module PLoc : sig
-
   include Abstract_location.Leaf
     with type value = Cvalue.V.t
      and type location = Precise_locs.precise_location
 
   val make: Locations.location -> location
-
 end
+
+val ploc: PLoc.location Abstract_location.dependencies
 
 (*
 Local Variables:

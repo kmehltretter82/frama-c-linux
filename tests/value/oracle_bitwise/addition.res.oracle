@@ -4,9 +4,9 @@
 <   The imprecision originates from Arithmetic {addition.i:52}
 ---
 > [eva] addition.i:52: Assigning imprecise value to p10.
-163a162
+162a161
 >   {{ garbled mix of &{p1} (origin: Misaligned {addition.i:52}) }}
-165a165
+163a163
 >   {{ garbled mix of &{p2} (origin: Misaligned {addition.i:56}) }}
 186c186
 <   p10 ∈ {{ garbled mix of &{p1} (origin: Arithmetic {addition.i:52}) }}

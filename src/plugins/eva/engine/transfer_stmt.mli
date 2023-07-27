@@ -58,7 +58,7 @@ module type S = sig
     (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
 end
 
-module Make (Abstract: Abstractions.Eva)
+module Make (Abstract: Abstractions.S_with_evaluation)
   : S with type state = Abstract.Dom.t
        and type value = Abstract.Val.t
        and type loc = Abstract.Loc.location

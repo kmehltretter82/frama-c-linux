@@ -113,16 +113,16 @@
   __fc_fds[0..1023] ∈ [--..--]
   fd ∈ [-1..1023]
   st ∈ [--..--] or UNINITIALIZED
-  r ∈ {-1; 0}
-  r_mkdir ∈ {-1; 0}
-  old_mask ∈ [--..--]
-  r2 ∈ {-1; 0}
-  r3 ∈ {-1; 0}
-  r4 ∈ {-1; 0}
-  r5 ∈ {-1; 0}
-  r6 ∈ {-1; 0}
-  r7 ∈ {-1; 0}
+  r ∈ {-1; 0} or UNINITIALIZED
+  r_mkdir ∈ {-1; 0} or UNINITIALIZED
+  old_mask ∈ [--..--] or UNINITIALIZED
+  r2 ∈ {-1; 0} or UNINITIALIZED
+  r3 ∈ {-1; 0} or UNINITIALIZED
+  r4 ∈ {-1; 0} or UNINITIALIZED
+  r5 ∈ {-1; 0} or UNINITIALIZED
+  r6 ∈ {-1; 0} or UNINITIALIZED
+  r7 ∈ {-1; 0} or UNINITIALIZED
   buf ∈ [--..--] or UNINITIALIZED
-  r8 ∈ {-1; 0}
-  r9 ∈ {-1; 0}
+  r8 ∈ {-1; 0} or UNINITIALIZED
+  r9 ∈ {-1; 0} or UNINITIALIZED
   __retres ∈ {-1; 0; 1; 2; 3}

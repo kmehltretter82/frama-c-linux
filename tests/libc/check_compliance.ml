@@ -19,7 +19,7 @@ class stdlib_visitor = object
       Cil.SkipChildren
     | attrparams ->
       let when_header = function
-        | AStr s when Extlib.string_suffix ".h" s -> Some s
+        | AStr s when String.ends_with ~suffix:".h" s -> Some s
         | _ -> None
       in
       let headers = List.filter_map when_header attrparams
@@ -81,9 +81,9 @@ struct
 end
 
 let ident_to_be_ignored id headers =
-  Extlib.string_prefix "__" id ||
-  Extlib.string_prefix "Frama_C" id ||
-  List.filter (fun h -> not (Extlib.string_prefix "__fc" h)) headers = []
+  String.starts_with ~prefix:"__" id ||
+  String.starts_with ~prefix:"Frama_C" id ||
+  List.filter (fun h -> not (String.starts_with ~prefix:"__fc" h)) headers = []
 
 let check_ident c11 posix glibc nonstandard c11_headers id headers =
   if ident_to_be_ignored id headers then (* nothing to check *) ()

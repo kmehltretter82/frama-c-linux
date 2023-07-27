@@ -179,6 +179,7 @@ module Make
 
   module Domain = Abstract.Dom
   module Location = Abstract.Loc
+  include Cvalue_domain.Getters (Domain)
 
   (* Most transfer functions about logic return a set of states instead of a
      single state, and States.empty instead of bottom. We thus use this monad
@@ -239,7 +240,7 @@ module Make
   let set_location loc = set_ploc (Main_locations.PLoc.make loc)
 
   let make_env state =
-    Eval_terms.env_assigns ~pre:(Domain.get_cvalue_or_top state)
+    Eval_terms.env_assigns ~pre:(get_cvalue_or_top state)
 
   (* Evaluates the location affected by an assigns, allocates, frees or \from
      clause. Returns None if the clause cannot be interpreted. *)
@@ -322,7 +323,7 @@ module Make
           end
     in
     let check_one_state state =
-      let cvalue_state = Domain.get_cvalue_or_top state in
+      let cvalue_state = get_cvalue_or_top state in
       List.iter (check_one_assign cvalue_state) assigns
     in
     States.iter check_one_state states

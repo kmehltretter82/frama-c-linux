@@ -100,9 +100,11 @@ struct
   let file_logout ~pid ~model ~prover =
     let id = WpPropId.get_propid pid in
     file ~id ~model ~prover ~ext:"out" ()
+
   let file_logerr ~pid ~model ~prover =
     let id = WpPropId.get_propid pid in
     file ~id ~model ~prover ~ext:"err" ()
+
   let file_goal ~pid ~model ~prover =
     let ext = match prover with
       | Qed -> "qed"
@@ -496,7 +498,7 @@ module ResultType =
       let name = "Wpo.result"
       let reprs =
         List.map VCS.result
-          [ Valid ; Invalid ; Unknown ; Timeout ; Failed ]
+          [ Valid ; Unknown ; Timeout ; Failed ]
     end)
 (* to get a "reasonable" API doc *)
 let () = Type.set_ml_name ResultType.ty (Some "Wpo.result")

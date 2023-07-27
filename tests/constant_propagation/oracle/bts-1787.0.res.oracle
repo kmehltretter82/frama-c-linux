@@ -53,7 +53,7 @@ int main(int c)
   return __retres;
 }
 
-int a = 0;
+int const a = 0;
 int b = a;
 
 [scf] constant propagation done

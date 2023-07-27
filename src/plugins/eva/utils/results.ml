@@ -28,10 +28,7 @@ let are_available kf =
   | Analyzed (Complete | Partial) -> true
   | SpecUsed | Builtin _ | Unreachable | Analyzed NoResults -> false
 
-module Callstack = Value_types.Callstack
-
-type callstack = Callstack.t
-type 'a by_callstack = (callstack * 'a) list
+type 'a by_callstack = (Callstack.t * 'a) list
 
 type control_point =
   | Initial
@@ -41,8 +38,8 @@ type control_point =
 
 type context = {
   control_point : control_point;
-  selector : callstack list option;
-  filter: (callstack -> bool) list;
+  selector : Callstack.t list option;
+  filter: (Callstack.t -> bool) list;
 }
 
 type request =
@@ -133,7 +130,7 @@ struct
     | `Value state -> ByCallstack [cs,state]
 
   let by_callstack : context ->
-    [< `Bottom | `Top | `Value of 'a Value_types.Callstack.Hashtbl.t ] ->
+    [< `Bottom | `Top | `Value of 'a Callstack.Hashtbl.t ] ->
     ('a, restricted_to_callstack) t =
     fun req -> function
       | `Top -> Top
@@ -149,13 +146,13 @@ struct
 
   (* Accessors *)
 
-  let callstacks : ('a, restricted_to_callstack) t -> callstack list = function
+  let callstacks: ('a, restricted_to_callstack) t -> Callstack.t list = function
     | Top | Bottom -> [] (* What else to do when Top is given ? *)
     | ByCallstack l -> List.map fst l
 
   (* Fold *)
 
-  let fold (f  : callstack -> 'a -> 'b -> 'b) (acc : 'b) :
+  let fold (f  : Callstack.t -> 'a -> 'b -> 'b) (acc : 'b) :
     ('a, restricted_to_callstack) t -> 'b =
     function
     | Top | Bottom -> acc (* What else to do when Top is given ? *)
@@ -245,7 +242,8 @@ struct
       A.get_stmt_state_by_callstack ?selection ~after:true stmt
       |> by_callstack ctx
     | Initial ->
-      A.get_global_state () |> singleton []
+      let cs = Callstack.init (fst (Globals.entry_point ())) in
+      A.get_global_state () |> singleton cs
     | Start kf ->
       A.get_initial_state_by_callstack ?selection kf |> by_callstack ctx
 
@@ -314,10 +312,11 @@ struct
       convert r
 
   let get_cvalue_model req =
-    match A.Dom.get_cvalue with
+    match A.Dom.get Cvalue_domain.State.key with
     | None ->
       Result.error DisabledDomain
     | Some extract ->
+      let extract s = extract s |> fst in
       convert (Response.map_join extract Cvalue.Model.join (get req))
 
   let get_state req key join =

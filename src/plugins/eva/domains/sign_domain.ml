@@ -34,4 +34,11 @@ module Sign_Value = struct
   let builtins = []
 end
 
-include Simple_memory.Make_Domain (struct let name = "sign" end) (Sign_Value)
+module Name = struct let name = "sign" end
+module Domain = Simple_memory.Make_Domain (Name) (Sign_Value)
+include Domain
+
+let registered =
+  let name = "sign"
+  and descr = "Infers the sign of program variables." in
+  Abstractions.Domain.register ~name ~descr ~priority:4 (module Domain)

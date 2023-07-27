@@ -93,7 +93,7 @@ module type S = sig
 
   type ('env, 'expr, 'v) evaluation_functions = {
     eval_and_warn: 'env -> 'expr -> 'v * bool (* alarm *) * bool (* red *);
-    env: Analysis.Dom.t -> Value_types.callstack -> 'env;
+    env: Analysis.Dom.t -> Callstack.t -> 'env;
     equal: 'v -> 'v -> bool;
     bottom: 'v;
     join: 'v -> 'v -> 'v;
@@ -124,7 +124,7 @@ module type S = sig
 
   val predicate_with_red:
     gui_loc ->
-    (Eval_terms.eval_env * (kinstr * Value_types.callstack),
+    (Eval_terms.eval_env * (kinstr * Callstack.t),
      Red_statuses.alarm_or_property * predicate,
      Eval_terms.predicate_status or_bottom
     ) evaluation_functions
@@ -139,6 +139,7 @@ end
 module Make (X: Analysis.S) = struct
 
   module Analysis = X
+  include Cvalue_domain.Getters (X.Dom)
 
   let get_precise_loc =
     match X.Loc.get Main_locations.PLoc.key with
@@ -151,7 +152,7 @@ module Make (X: Analysis.S) = struct
 
   type ('env, 'expr, 'v) evaluation_functions = {
     eval_and_warn: 'env -> 'expr -> 'v * bool * bool;
-    env: X.Dom.t -> Value_types.callstack -> 'env;
+    env: X.Dom.t -> Callstack.t -> 'env;
     equal: 'v -> 'v -> bool;
     bottom: 'v;
     join: 'v -> 'v -> 'v;
@@ -202,7 +203,7 @@ module Make (X: Analysis.S) = struct
   let lval_to_offsetmap state lv =
     let loc, alarms = X.eval_lval_to_loc state lv in
     let ok = Alarmset.is_empty alarms in
-    let state = X.Dom.get_cvalue_or_top state in
+    let state = get_cvalue_or_top state in
     let aux loc (acc_res, acc_ok) =
       let res, ok =
         match lv with (* catch simplest pattern *)
@@ -265,7 +266,7 @@ module Make (X: Analysis.S) = struct
     }
 
   let null_to_offsetmap state (_:unit) =
-    let state = X.Dom.get_cvalue_or_top state in
+    let state = get_cvalue_or_top state in
     match Cvalue.Model.find_base_or_default Base.null state with
     | `Bottom -> GO_InvalidLoc, false, false
     | `Top -> GO_Top, false, false
@@ -322,22 +323,22 @@ module Make (X: Analysis.S) = struct
     match Db.Value.get_initial_state_callstack kf with
     | None -> Cvalue.Model.top (* should not happen *)
     | Some h ->
-      try Value_types.Callstack.Hashtbl.find h callstack
+      try Callstack.Hashtbl.find h callstack
       with Not_found -> Cvalue.Model.top (* should not happen either *)
 
   let env_here kf here callstack =
     let pre = pre_kf kf callstack in
-    let here = X.Dom.get_cvalue_or_top here in
+    let here = get_cvalue_or_top here in
     let c_labels = Eval_annots.c_labels kf callstack in
     Eval_terms.env_annot ~c_labels ~pre ~here ()
 
   let env_pre _kf here _callstack =
-    let here = X.Dom.get_cvalue_or_top here in
+    let here = get_cvalue_or_top here in
     Eval_terms.env_pre_f ~pre:here ()
 
   let env_post kf post callstack =
     let pre = pre_kf kf callstack in
-    let post = X.Dom.get_cvalue_or_top post in
+    let post = get_cvalue_or_top post in
     let result =
       if Function_calls.use_spec_instead_of_definition kf then
         None
@@ -354,8 +355,8 @@ module Make (X: Analysis.S) = struct
   (* Maps from callstacks to Value states before and after a GUI location.
      The 'after' map is not always available. *)
   type states_by_callstack = {
-    states_before: X.Dom.t Value_types.Callstack.Hashtbl.t or_top_bottom;
-    states_after: X.Dom.t Value_types.Callstack.Hashtbl.t or_top_bottom;
+    states_before: X.Dom.t Callstack.Hashtbl.t or_top_bottom;
+    states_after: X.Dom.t Callstack.Hashtbl.t or_top_bottom;
   }
 
   let top_states_by_callstacks = { states_before = `Top; states_after = `Top }
@@ -541,7 +542,7 @@ module Make (X: Analysis.S) = struct
 
   let make_data_all_callstacks_from_states ev ~before ~after expr =
     let exn = ref [] in
-    let single_callstack = (Value_types.Callstack.Hashtbl.length before) = 1 in
+    let single_callstack = (Callstack.Hashtbl.length before) = 1 in
     let v_join_before = ref ev.bottom in
     let v_join_after = ref ev.bottom in
     let ok_join = ref true in
@@ -564,14 +565,14 @@ module Make (X: Analysis.S) = struct
     let ev = { ev with eval_and_warn } in
     (* Rows by callstack *)
     let list =
-      Value_types.Callstack.Hashtbl.fold
+      Callstack.Hashtbl.fold
         (fun callstack before acc ->
            let before = ev.env before callstack in
            let after = match after with
              | `Top | `Bottom as x -> x
              | `Value after ->
                try
-                 let after = Value_types.Callstack.Hashtbl.find after callstack in
+                 let after = Callstack.Hashtbl.find after callstack in
                  `Value (ev.env after callstack)
                (* If a callstack exists before the statement but is not found
                   after, then the post state for this callstack is bottom.  *)

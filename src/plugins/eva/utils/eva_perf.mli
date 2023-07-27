@@ -22,11 +22,11 @@
 
 (** Call [start_doing] when starting analyzing a new function. The new
     function is on the top of the call stack.*)
-val start_doing: Value_types.callstack -> unit
+val start_doing: Callstack.t -> unit
 
 (** Call [start_doing] when finishing analyzing a function. The
     function must still be on the top of the call stack. *)
-val stop_doing: Value_types.callstack -> unit
+val stop_doing: Callstack.t -> unit
 
 (** Display a complete summary of performance informations. Can be
     called during the analysis. *)

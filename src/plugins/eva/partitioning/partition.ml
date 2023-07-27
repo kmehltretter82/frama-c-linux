@@ -322,7 +322,7 @@ exception InvalidAction
 
 (* --- Flows --- *)
 
-module MakeFlow (Abstract: Abstractions.Eva) =
+module MakeFlow (Abstract: Abstractions.S_with_evaluation) =
 struct
   type state = Abstract.Dom.t
   type t =  (key * state) list
@@ -536,19 +536,19 @@ struct
       let key = { key with dynamic_splits } in
       split_state ~monitor term (key, state)
     in
-    Transitioning.List.concat_map add_split p
+    List.concat_map add_split p
 
   let update_dynamic_splits p =
     (* Update one state *)
     let update_state (key, state) =
       (* Split the states in the list l for the given exp *)
       let update_exp term monitor l =
-        Transitioning.List.concat_map (split_state ~monitor term) l
+        List.concat_map (split_state ~monitor term) l
       in
       (* Foreach exp in original state: split *)
       SplitMap.fold update_exp key.dynamic_splits [(key,state)]
     in
-    Transitioning.List.concat_map update_state p
+    List.concat_map update_state p
 
   let map_keys (f : key -> state -> key) (p : t) : t =
     List.map (fun (k,x) -> f k x, x) p

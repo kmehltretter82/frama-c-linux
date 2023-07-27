@@ -194,11 +194,14 @@ val opt_map2: ('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c option
 (* ************************************************************************* *)
 
 val string_prefix: ?strict:bool -> string -> string -> bool
+[@@alert deprecated "Use String.starts_with instead"]
 (** [string_prefix ~strict p s] returns [true] if and only if [p] is a
     prefix of the string [s]. If [strict] is true, the prefix must be strict
     (that is, [s] must moreover be strictly longer than [p]). [strict]
     is false by default.
-    @since Boron-20100401 *)
+    @since Boron-20100401
+    @deprecated Frama-C+dev use 'String.starts_with' instead
+*)
 
 val string_del_prefix: ?strict:bool -> string -> string -> string option
 (** [string_del_prefix ~strict p s] returns [None] if [p] is not a prefix of
@@ -206,10 +209,12 @@ val string_del_prefix: ?strict:bool -> string -> string -> string option
     @since Oxygen-20120901 *)
 
 val string_suffix: ?strict:bool -> string -> string -> bool
+[@@alert deprecated "Use String.ends_with instead"]
 (** [string_suffix ~strict suf s] returns [true] iff [suf] is a suffix of
     string [s]. [strict], which defaults to [false], indicates whether [s]
     should be strictly longer than [p].
     @since Aluminium-20160501
+    @deprecated Frama-C+dev use 'String.ends_with' instead
 *)
 
 val string_del_suffix: ?strict:bool -> string -> string -> string option

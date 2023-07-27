@@ -12,5 +12,5 @@ extern int baz;
 
 
 //#line 23  "merge_loc.i"
-int z = (int)(& baz);
+long z = (long)(& baz);
 

@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "frama-c"
 synopsis: "Platform dedicated to the analysis of source code written in C"
-version: "27.0+dev"
+version: "27.1+dev"
 description:"""
 Frama-C gathers several analysis techniques in a single collaborative
 framework, based on analyzers (called "plug-ins") that can build upon the
@@ -53,6 +53,7 @@ authors: [
   "Melody Méaulle"
   "Benjamin Monate"
   "Yannick Moy"
+  "Pierre Nigron"
   "Anne Pacalet"
   "Valentin Perrelle"
   "Guillaume Petiot"
@@ -71,7 +72,7 @@ authors: [
 homepage: "https://frama-c.com/"
 license: "LGPL-2.1-only"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
-doc: "http://frama-c.com/download/user-manual-27.0-Cobalt.pdf"
+doc: "http://frama-c.com/download/user-manual-27.1-Cobalt.pdf"
 bug-reports: "https://git.frama-c.com/pub/frama-c/issues"
 tags: [
   "deductive"
@@ -91,13 +92,18 @@ tags: [
 
 build: [
   ["bash" "dev/disable-plugins.sh" "e-acsl"] { os-family = "windows" }
-  ["dune" "build" "-j%{jobs}%" "--release" "--promote-install-files=false" "@install"]
-  [make "-C" "doc" "download"] {with-doc}
+  ["dune" "build" "-j%{jobs}%" "--release" "--promote-install-files=false"
+   "@install"
+   "@doc" { with-doc }
+  ]
 ]
 
 install: [
-  [make "PREFIX=%{prefix}%" "MANDIR=%{mandir}%" "install"]
-  [make "PREFIX=%{prefix}%" "-C" "doc" "install"] {with-doc}
+  [make
+   "RELEASE=yes" "PREFIX=%{prefix}%" "MANDIR=%{man}%"
+   "DOCDIR=%{doc}%" { with-doc }
+   "install"
+  ]
 ]
 
 remove: [
@@ -120,8 +126,9 @@ depends: [
   "conf-graphviz" { post }
   "conf-time" { with-test }
   "menhir" { >= "20181006" & build }
-  "ocaml" { >= "4.11.1" }
+  "ocaml" { >= "4.13.1" }
   "ocamlgraph" { >= "1.8.8" }
+  "odoc" { with-doc }
   "unionFind" { >= "20220107" }
   "why3" { >= "1.6.0" }
   "yaml" { >= "3.0.0" }

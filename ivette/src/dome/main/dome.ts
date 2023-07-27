@@ -483,17 +483,14 @@ function createBrowserWindow(
     theWindow.off('close', closeHandler);
     // Do not close the window yet
     event.preventDefault();
-
+    // Save state
     handle.frame = theWindow.getBounds();
     handle.devtools = webContents.isDevToolsOpened();
-    webContents.send('dome.ipc.closing');
+    // Start closing process
+    webContents.send('dome.ipc.closing', wid);
   };
 
   theWindow.on('close', closeHandler);
-
-  ipcMain.on('dome.ipc.closing.done', () => {
-    theWindow.close();
-  });
 
   // Keep track of frame positions (in DEVEL)
   if (DEVEL) {
@@ -508,6 +505,11 @@ function createBrowserWindow(
 
   return theWindow;
 }
+
+ipcMain.on('dome.ipc.closing.done', (_event, wid:number) => {
+  const handle = WindowHandles.get(wid);
+  if (handle !== undefined) handle.window.close();
+});
 
 // --------------------------------------------------------------------------
 // --- Application Window(s) & Command Line

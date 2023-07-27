@@ -36,9 +36,9 @@
   AA ∈ {0}
   AR ∈ {0}
   AS ∈ {0}
-  At[0] ∈ {{ (int)&AA }}
+  At[0] ∈ {{ (long)&AA }}
     [1] ∈ {0}
-  Ar[0] ∈ {{ (int)&AA }}
+  Ar[0] ∈ {{ (long)&AA }}
     [1] ∈ {0}
   Ap ∈ {{ &At[0] }}
   f_previous ∈ {{ &a }}

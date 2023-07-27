@@ -509,11 +509,10 @@ let pretty_used_files used_files =
         Datatype.Filepath.Set.mem path cmdline_files
       ) used_files
   in
+  let is_c_file s = String.ends_with ~suffix:".c" s && s <> ".c" in
   let used_included_c_files =
     Datatype.Filepath.Set.filter
-      (fun f ->
-         Extlib.string_suffix ~strict:true ".c"
-           (f : Filepath.Normalized.t :> string))
+      (fun f -> is_c_file (f : Filepath.Normalized.t :> string))
       used_included_files
   in
   let used_implicitly_included_c_files =

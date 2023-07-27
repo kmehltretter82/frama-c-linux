@@ -21,7 +21,7 @@
 [eva] done for function main_fail
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function sum_nospec:
-  res ∈ [--..--]
+  res ∈ [--..--] or UNINITIALIZED
   __retres ∈ [--..--]
 [eva:final-states] Values at end of function main_fail:
   Frama_C_entropy_source ∈ [--..--]

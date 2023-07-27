@@ -22,35 +22,53 @@
 
 open Cil_types
 
-(* Callstacks related types and functions *)
+(* Callstacks related functions *)
 
-let call_stack : Value_types.callstack ref = ref []
-(* let call_stack_for_callbacks : (kernel_function * kinstr) list ref = ref [] *)
+let current_callstack : Callstack.t option ref = ref None
 
 let clear_call_stack () =
-  call_stack := []
+  match !current_callstack with
+  | None -> ()
+  | Some cs ->
+    Eva_perf.stop_doing cs;
+    current_callstack := None
 
-let pop_call_stack () =
-  Eva_perf.stop_doing !call_stack;
-  call_stack := List.tl !call_stack
-;;
+let init_call_stack kf =
+  assert (!current_callstack = None);
+  let cs = Callstack.init kf in
+  current_callstack := Some cs;
+  Eva_perf.start_doing cs;
+  cs
 
-let push_call_stack kf ki =
-  call_stack := (kf,ki) :: !call_stack;
-  Eva_perf.start_doing !call_stack
-;;
+let current_call_stack_opt () = !current_callstack
 
+let current_call_stack () =
+  match !current_callstack with
+  | None -> Self.fatal "Callstack not initialized"
+  | Some cs -> cs
 
 let current_kf () =
-  let (kf,_) = (List.hd !call_stack) in kf;;
+  let cs = current_call_stack () in
+  Callstack.top_kf cs
 
-let call_stack () = !call_stack
+let push_call_stack kf stmt =
+  let cs = current_call_stack () in
+  let new_cs = Callstack.push kf stmt cs in
+  current_callstack := Some new_cs;
+  Eva_perf.start_doing new_cs
+
+let pop_call_stack () =
+  let cs = current_call_stack () in
+  Eva_perf.stop_doing cs;
+  current_callstack := Callstack.pop cs
 
 let pp_callstack fmt =
   if Parameters.PrintCallstacks.get () then
-    Format.fprintf fmt "@ stack: %a"
-      Value_types.Callstack.pretty (call_stack())
-;;
+    match !current_callstack with
+    | None -> () (* Stack not initialized; happens when handling global initializations *)
+    | Some cs ->
+      Format.fprintf fmt "@ stack: %a" Callstack.pretty cs
+
 
 (* Assertions emitted during the analysis *)
 

@@ -45,7 +45,7 @@ let blocks_share_locals b1 b2 =
   | _, _ -> false
 
 module Make_Dataflow
-    (Abstract : Abstractions.Eva)
+    (Abstract : Abstractions.S_with_evaluation)
     (States : Powerset.S with type state = Abstract.Dom.t)
     (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
     (Init: Initialization.S with type state := Abstract.Dom.t)
@@ -63,6 +63,7 @@ module Make_Dataflow
 = struct
 
   module Domain = Abstract.Dom
+  include Cvalue_domain.Getters (Domain)
 
   (* --- Analysis parameters --- *)
 
@@ -120,12 +121,6 @@ module Make_Dataflow
   (* --- Initial state --- *)
 
   let active_behaviors = Logic.create AnalysisParam.initial_state kf
-
-  (* Compute the locals that we must enter in scope when we start the analysis
-     of [block]. The other ones will be introduced on the fly, when we
-     encounter a [Local_init] instruction. *)
-  let block_toplevel_locals block =
-    List.filter (fun vi -> not vi.vdefined) block.blocals
 
   let initial_states =
     let state = AnalysisParam.initial_state
@@ -266,8 +261,15 @@ module Make_Dataflow
     : transfer_function =
     lift' (fun s -> Transfer.assign s (Kstmt stmt) dest exp)
 
+  (* All variables local to a block are introduced in domain states when
+     entering the block. Variables explicitly initialized at declaration time
+     (for which vi.vdefined is true) enter the scope too early, as they should
+     be introduced on the fly when encountering their [Local_init] instruction.
+     However, goto statements can skip their declaration/initialization, so it
+     is safer to always introduce all local variables (without initialize them)
+     when entering a block. *)
   let transfer_enter (block : block) : transfer_function =
-    let vars = block_toplevel_locals block in
+    let vars = block.blocals in
     if vars = [] then id else lift (Transfer.enter_scope kf vars)
 
   let transfer_leave (block : block) : transfer_function =
@@ -288,20 +290,12 @@ module Make_Dataflow
   let transfer_instr (stmt : stmt) (instr : instr) : transfer_function =
     match instr with
     | Local_init (vi, AssignInit exp, _loc) ->
-      let kind = Abstract_domain.Local kf in
       let transfer state =
-        let state = Domain.enter_scope kind [vi] state in
         Init.initialize_local_variable stmt vi exp state
       in
       lift' transfer
     | Local_init (vi, ConsInit (f, args, k), loc) ->
-      let kind = Abstract_domain.Local kf in
       let as_func dest callee args _loc (key, state) =
-        (* This variable enters the scope too early, as it should
-           be introduced after the call to [f] but before the assignment
-           to [v]. This is currently not possible, at least without
-           splitting Transfer.call in two. *)
-        let state = Domain.enter_scope kind [vi] state in
         transfer_call stmt dest callee args (key, state)
       in
       Cil.treat_constructor_as_func as_func vi f args k loc
@@ -441,7 +435,7 @@ module Make_Dataflow
       edge_info.fireable <- true;
     flow
 
-  let gather_cvalues states = match Domain.get_cvalue with
+  let gather_cvalues states = match get_cvalue with
     | Some get -> List.map get states
     | None -> []
 
@@ -449,7 +443,7 @@ module Make_Dataflow
     (* TODO: apply on all domains. *)
     let states = Partitioning.contents f in
     let cvalue_states = gather_cvalues states in
-    let callstack = Eva_utils.call_stack () in
+    let callstack = Eva_utils.current_call_stack () in
     Cvalue_callbacks.apply_statement_hooks callstack stmt cvalue_states
 
   let update_vertex ?(widening : bool = false) (v : vertex)
@@ -681,7 +675,7 @@ module Make_Dataflow
         then VertexTable.memo merged_states v get_smashed_store
         else `Bottom
     and lift_to_cvalues table =
-      StmtTable.map (fun _ s -> Domain.get_cvalue_or_top s) (Lazy.force table)
+      StmtTable.map (fun _ s -> get_cvalue_or_top s) (Lazy.force table)
     in
     let merged_pre_states = lazy
       (StmtTable.map' (fun s (v,_) -> get_merged_states ~all:true s v) automaton.stmt_table)
@@ -696,12 +690,12 @@ module Make_Dataflow
       (StmtTable.map (fun _stmt (v,_) ->
            let store = get_vertex_store v in
            let states = Partitioning.expanded store in
-           List.map (fun (_k,x) -> Domain.get_cvalue_or_top x) states)
+           List.map (fun (_k,x) -> get_cvalue_or_top x) states)
           automaton.stmt_table)
     in
     let merged_pre_cvalues = lazy (lift_to_cvalues merged_pre_states)
     and merged_post_cvalues = lazy (lift_to_cvalues merged_post_states) in
-    let callstack = Eva_utils.call_stack () in
+    let callstack = Eva_utils.current_call_stack () in
     if save_results then begin
       let register_pre = Domain.Store.register_state_before_stmt callstack
       and register_post = Domain.Store.register_state_after_stmt callstack in
@@ -729,8 +723,9 @@ module Make_Dataflow
       Cvalue_callbacks.{ before_stmts = merged_pre_cvalues;
                          after_stmts = merged_post_cvalues }
     in
-    let results = Cvalue_callbacks.Store (states, Mem_exec.new_counter ()) in
-    Cvalue_callbacks.apply_call_results_hooks callstack kf results;
+    let cvalue_init = get_cvalue_or_top initial_state in
+    let results = `Body (states, Mem_exec.new_counter ()) in
+    Cvalue_callbacks.apply_call_results_hooks callstack kf cvalue_init results;
     if not (Db.Value.Record_Value_After_Callbacks.is_empty ())
     then begin
       if Parameters.ValShowProgress.get () then
@@ -744,7 +739,7 @@ end
 
 
 module Computer
-    (Abstract : Abstractions.Eva)
+    (Abstract : Abstractions.S_with_evaluation)
     (States : Powerset.S with type state = Abstract.Dom.t)
     (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
     (Init: Initialization.S with type state := Abstract.Dom.t)

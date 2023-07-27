@@ -40,7 +40,7 @@ val is_red: Property.t -> bool
 (* Whether a red status has been emitted for an alarm or a property at the given
    kinstr in the given callstack. *)
 val is_red_in_callstack:
-  kinstr -> alarm_or_property -> Value_types.callstack -> bool
+  kinstr -> alarm_or_property -> Callstack.t -> bool
 
 (* Returns the unsorted list of all alarms and properties for which a red status
    has been emitted during the analysis. Also returns the kinstr of the alarm or

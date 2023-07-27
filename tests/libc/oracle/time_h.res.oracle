@@ -263,12 +263,12 @@
   r ∈ {-1; 0; 4; 22}
   creq.tv_sec ∈ [--..--] or UNINITIALIZED
       .tv_nsec ∈ [0..999999999] or UNINITIALIZED
-  tt ∈ {42}
-  time_str ∈ {{ &__fc_ctime[0] }}
-  mytime ∈ [--..--]
-  t ∈ [--..--]
+  tt ∈ {42} or UNINITIALIZED
+  time_str ∈ {{ &__fc_ctime[0] }} or UNINITIALIZED
+  mytime ∈ [--..--] or UNINITIALIZED
+  t ∈ [--..--] or UNINITIALIZED
   res_time ∈ {{ NULL ; &mytime2 }} or UNINITIALIZED
   mytime2 ∈ [--..--] or UNINITIALIZED
-  localp ∈ {{ NULL ; &localr }}
+  localp ∈ {{ NULL ; &localr }} or UNINITIALIZED
   localr ∈ [--..--] or UNINITIALIZED
   __retres ∈ {0; 1; 2}

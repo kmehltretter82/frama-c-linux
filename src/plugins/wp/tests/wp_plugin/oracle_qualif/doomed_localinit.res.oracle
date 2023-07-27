@@ -9,9 +9,10 @@
 [wp] [Unsuccess] typed_access_assert_rte_mem_access (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_access_assert_rte_mem_access_2 (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 4
-  Qed:             1
   Alt-Ergo:        1
+  Failed:          1
   Unsuccess:       2
+  Smoke Tests:     1 / 2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   access                    -        1        4      25.0%

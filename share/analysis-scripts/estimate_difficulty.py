@@ -176,7 +176,7 @@ with open(framac_share / "compliance" / "posix_identifiers.json", encoding="utf-
 recursive_cycles: list[tuple[tuple[str, int], list[tuple[str, str]]]] = []
 reported_recursive_pairs = set()
 build_callgraph.compute_recursive_cycles(cg, recursive_cycles)
-for (cycle_start_loc, cycle) in recursive_cycles:
+for cycle_start_loc, cycle in recursive_cycles:
     # Note: in larger code bases, many cycles are reported for the same final
     # function (e.g. for the calls 'g -> g', we may have 'f -> g -> g',
     # 'h -> g -> g', etc; to minimize this, we print just the first one.
@@ -188,7 +188,7 @@ for (cycle_start_loc, cycle) in recursive_cycles:
     (filename, line) = cycle_start_loc
     (x, y) = cycle[0]
     pretty_cycle = f"{x} -> {y}"
-    for (x, y) in cycle[1:]:
+    for x, y in cycle[1:]:
         pretty_cycle += f" -> {y}"
     print(f"[recursion] found recursive cycle near {filename}:{line}: {pretty_cycle}")
 

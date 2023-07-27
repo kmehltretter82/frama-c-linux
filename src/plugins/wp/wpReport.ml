@@ -94,11 +94,13 @@ let result ~status ~smoke (r:VCS.result) =
   match status with
   | `Passed when smoke -> VALID
   | _ ->
-    match VCS.verdict ~smoke r with
+    match r.VCS.verdict with
     | VCS.NoResult | VCS.Computing _ -> NORESULT
     | VCS.Failed -> INCONCLUSIVE
-    | VCS.Invalid | VCS.Unknown | VCS.Timeout | VCS.Stepout -> UNSUCCESS
-    | VCS.Valid -> VALID
+    | VCS.Unknown | VCS.Timeout | VCS.Stepout ->
+      if smoke then VALID else UNSUCCESS
+    | VCS.Valid ->
+      if smoke then UNSUCCESS else VALID
 
 let best_result a b = match a,b with
   | NORESULT,c | c,NORESULT -> c

@@ -68,21 +68,32 @@ one.
 
 \section{Version}
 
-Execute the script:
+On the new \texttt{stable} branch, execute the script:
 \begin{verbatim}
 ./dev/set-version.sh NN.M # to be replaced with actual major/minor version
 \end{verbatim}
 This will:
 \begin{itemize}
   \item update the \texttt{Changelog}s
-  \item update the changes in the manuals (excluding ACSL and E-ACSL references)
+  \item update the changes in the manuals \textbf{(excluding ACSL and E-ACSL references)}
   \item update the \texttt{VERSION} and \texttt{VERSION\_CODENAME} files
-  \item update the \texttt{opam} file
+  \item update the \texttt{opam} files (Frama-C, lint, hdrck)
   \item update the API doc
 \end{itemize}
 
-Merge the branch in \texttt{master} and add a commit to \texttt{master} by
-adding \texttt{"+dev"} in the \texttt{VERSION} file.
+Merge the \texttt{stable} branch in the \texttt{master} branch.
+
+On the \texttt{master} branch, execute the script:
+\begin{verbatim}
+  ./dev/set-version.sh dev
+\end{verbatim}
+This will:
+\begin{itemize}
+  \item update the \texttt{VERSION} file
+  \item update the \texttt{opam} files (Frama-C, lint, hdrck)
+\end{itemize}
+
+Commit this change and push.
 
 \section{Copyright}
 

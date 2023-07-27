@@ -134,15 +134,19 @@ module Value : sig
   (** Return [true] iff the value analysis has been done.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
+  [@@@alert "-db_deprecated"]
+
+  type callstack = Eva_types.Callstack.callstack
+
   module Table_By_Callstack:
     State_builder.Hashtbl with type key = stmt
-                           and type data = state Value_types.Callstack.Hashtbl.t
+                           and type data = state Eva_types.Callstack.Hashtbl.t
   (** Table containing the results of the value analysis, ie.
       the state before the evaluation of each reachable statement. *)
 
   module AfterTable_By_Callstack:
     State_builder.Hashtbl with type key = stmt
-                           and type data = state Value_types.Callstack.Hashtbl.t
+                           and type data = state Eva_types.Callstack.Hashtbl.t
   (** Table containing the state of the value analysis after the evaluation
       of each reachable and evaluable statement. Filled only if
       [Value_parameters.ResultsAfter] is set. *)
@@ -216,12 +220,12 @@ module Value : sig
 
   val get_initial_state : kernel_function -> state
   val get_initial_state_callstack :
-    kernel_function -> state Value_types.Callstack.Hashtbl.t option
+    kernel_function -> state Eva_types.Callstack.Hashtbl.t option
   val get_state : ?after:bool -> kinstr -> state
   (** [after] is false by default. *)
 
   val get_stmt_state_callstack:
-    after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t option
+    after:bool -> stmt -> state Eva_types.Callstack.Hashtbl.t option
 
   val get_stmt_state : ?after:bool -> stmt -> state
   (** [after] is false by default.
@@ -406,19 +410,20 @@ module Value : sig
 
   (** {3 Callbacks} *)
 
-  type callstack = Value_types.callstack
-
   (** Actions to perform at end of each function analysis. Not compatible with
       option [-memexec-all] *)
 
   module Record_Value_Callbacks:
-    Hook.Iter_hook with type param = callstack * (state Stmt.Hashtbl.t) Lazy.t
+    Hook.Iter_hook
+    with type param = callstack * (state Stmt.Hashtbl.t) Lazy.t
 
   module Record_Value_Superposition_Callbacks:
-    Hook.Iter_hook with type param = callstack * (state list Stmt.Hashtbl.t) Lazy.t
+    Hook.Iter_hook
+    with type param = callstack * (state list Stmt.Hashtbl.t) Lazy.t
 
   module Record_Value_After_Callbacks:
-    Hook.Iter_hook with type param = callstack * (state Stmt.Hashtbl.t) Lazy.t
+    Hook.Iter_hook
+    with type param = callstack * (state Stmt.Hashtbl.t) Lazy.t
 
   (**/**)
   (* Temporary API, do not use *)
@@ -447,7 +452,7 @@ module Value : sig
       @since Aluminium-20160501  *)
   module Call_Type_Value_Callbacks:
     Hook.Iter_hook with type param =
-                          [`Builtin of Value_types.call_froms | `Spec of funspec | `Def | `Memexec]
+                          [`Builtin | `Spec | `Body | `Reuse]
                           * state * callstack
 
 
@@ -493,7 +498,7 @@ module Value : sig
       (kernel_function -> call_kinstr:kinstr -> state ->  (exp*t) list
          -> Cvalue.V_Offsetmap.t option (** returned value of [kernel_function] *) * state) ref
   *)
-  val merge_initial_state : callstack -> state -> unit
+  val merge_initial_state : callstack -> kernel_function -> state -> unit
   (** Store an additional possible initial state for the given callstack as
       well as its values for actuals. *)
 
@@ -657,8 +662,9 @@ module Operational_inputs : sig
   (**/**)
   (* Internal use *)
   module Record_Inout_Callbacks:
-    Hook.Iter_hook with type param = Value_types.callstack * Inout_type.t
-  (**/**)
+    Hook.Iter_hook with type param = Eva_types.Callstack.t * Inout_type.t
+    [@@alert "-db_deprecated"]
+    (**/**)
 end
 
 

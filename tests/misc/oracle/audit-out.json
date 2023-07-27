@@ -64,7 +64,7 @@
         "typing:implicit-function-declaration",
         "typing:incompatible-pointer-types",
         "typing:incompatible-types-call", "typing:inconsistent-specifier",
-        "typing:int-conversion", "typing:no-proto"
+        "typing:int-conversion", "typing:merge-conversion", "typing:no-proto"
       ],
       "disabled": [
         "CERT:EXP:10", "acsl-float-compare", "c11", "file:not-found",

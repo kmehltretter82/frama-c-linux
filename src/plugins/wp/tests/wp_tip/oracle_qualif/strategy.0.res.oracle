@@ -20,6 +20,7 @@ Assume {
 }
 Prove: P_P(to_sint32(t + to_uint32(z + to_uint32(x + y)))).
 Prover Alt-Ergo returns Unsuccess
+Prover Script returns Unsuccess
 
 ------------------------------------------------------------
 ------------------------------------------------------------

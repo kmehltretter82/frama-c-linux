@@ -239,13 +239,9 @@ type ('loc, 'value) argument = {
   avalue: ('loc, 'value) assigned;
 }
 
-
-type call_site = kernel_function * kinstr
-type callstack = call_site list
-
 type ('loc, 'value) call = {
   kf: kernel_function;
-  callstack: callstack;
+  callstack: Callstack.t;
   arguments: ('loc, 'value) argument list;
   rest: (exp * ('loc, 'value) assigned) list;
   return: varinfo option;

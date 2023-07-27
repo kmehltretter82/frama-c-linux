@@ -528,3 +528,20 @@ module Make
     | ISEmpty | ISFormals -> Base.SetLattice.empty
     | ISCaller -> Base.SetLattice.top
 end
+
+
+
+module Functor = struct
+  type location = Precise_locs.precise_location
+  let location_dependencies = Main_locations.ploc
+  module Make (V : Abstract.Value.External) = Make (V)
+end
+
+let registered =
+  let name = "equality" and priority = 8 in
+  let descr =
+    "Infers equalities between syntactic C expressions. \
+     Makes the analysis less dependent on temporary variables and \
+     intermediate computations."
+  in
+  Abstractions.Domain.register_functor ~name ~priority ~descr (module Functor)

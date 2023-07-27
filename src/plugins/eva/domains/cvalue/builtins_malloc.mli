@@ -23,7 +23,7 @@
 (** Dynamic allocation related builtins.
     Most functionality is exported as builtins. *)
 
-val fold_dynamic_bases: (Base.t -> Value_types.Callstack.t -> 'a -> 'a) -> 'a -> 'a
+val fold_dynamic_bases: (Base.t -> Callstack.t -> 'a -> 'a) -> 'a -> 'a
 (** [fold_dynamic_bases f init] folds [f] to each dynamically allocated base,
     with initial accumulator [init].
     Note that this also includes bases created by [alloca] and [VLAs]. *)
@@ -34,7 +34,7 @@ val alloc_size_ok: Cvalue.V.t -> Alarmset.status
    small enough, [False] that the allocation is guaranteed to fail (because
    the size is always greater than SIZE_MAX). *)
 
-val free_automatic_bases: Value_types.Callstack.t -> Cvalue.Model.t -> Cvalue.Model.t
+val free_automatic_bases: Callstack.t -> Cvalue.Model.t -> Cvalue.Model.t
 (** Performs the equivalent of [free] for each location that was allocated via
     [alloca()] in the current function (as per [Eva_utils.call_stack ()]).
     This function must be called during finalization of a function call. *)
@@ -44,7 +44,3 @@ val freeable: Cvalue.V.t -> Abstract_interp.truth
     value points to an allocated memory block that can be safely released using
     the C function free. Note that \freeable(\null) does not hold, despite NULL
     being a valid argument to the C function free. *)
-
-(**/**)
-val register_malloced_base: ?stack:Value_types.Callstack.t -> Base.t -> unit
-(* Should not be used by casual users. *)

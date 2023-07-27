@@ -66,10 +66,10 @@
 [eva] Done for function h
 [eva] computing for function j <- main1 <- main.
   Called from assigns.i:54.
+[eva] using specification for function j
 [eva] assigns.i:32: 
   Cannot evaluate range bound foo(*p)
   (unsupported ACSL construct: logic function foo). Approximating
-[eva] using specification for function j
 [eva] Done for function j
 [eva] computing for function assigns_post <- main1 <- main.
   Called from assigns.i:56.
@@ -140,11 +140,11 @@
   Called from assigns.i:113.
 [eva] computing for function f_main4_1 <- main4 <- main.
   Called from assigns.i:104.
-[kernel] assigns.i:104: 
-  more than 200(1000) elements to enumerate. Approximating.
 [eva] using specification for function f_main4_1
 [kernel] assigns.i:104: 
   more than 200(1000) locations to update in array. Approximating.
+[kernel] assigns.i:104: 
+  more than 200(1000) elements to enumerate. Approximating.
 [eva] Done for function f_main4_1
 [eva] computing for function f_main4_2 <- main4 <- main.
   Called from assigns.i:105.

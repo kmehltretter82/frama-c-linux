@@ -459,7 +459,32 @@ struct
       if something_done then
         widened
       else
-        join_widen (`Widen wh_hints) m1 m2
+        let r = join_widen (`Widen wh_hints) m1 m2 in
+        (* If [r] is equal to [m2], the widening had no effect.
+           If [m1] was not equal to [m2], either [m2] has reached some widening
+           threshold (and the widening is postponed), or there is a convergence
+           issue, for instance if the size of an allocated base is increased at
+           each loop iteration. To avoid such issue, we widen the size of weak
+           bases whose offsetmaps have changed between [m1] and [m2]. *)
+        if equal r m2 && not (equal m1 m2) then begin
+          let update_weak_base_validity base o1 o2 =
+            if Base.is_weak base && not (Offsetmap.equal o1 o2) then
+              match Base.validity base with
+              | Base.Variable v when Int.lt v.max_alloc v.max_allocable ->
+                (* Increasing [max_alloc] is never unsound as any access beyond
+                   [min_alloc] will generate an alarm anyway. *)
+                Base.update_variable_validity v ~weak:true
+                  ~min_alloc:v.min_alloc ~max_alloc:v.max_allocable
+              | _ -> ()
+          in
+          fold2_join_heterogeneous
+            ~cache:Hptmap_sig.NoCache
+            ~join:(fun () () -> ()) ~empty:()
+            ~empty_left:(fun _ -> ()) ~empty_right:(fun _ -> ())
+            ~both:update_weak_base_validity
+            m1 m2
+        end;
+        r
 
     let paste_offsetmap ~from ~dst_loc ~size ~exact m =
       let loc_dst = make_loc dst_loc (Int_Base.inject size) in

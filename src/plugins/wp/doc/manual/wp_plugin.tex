@@ -1366,8 +1366,10 @@ See \texttt{-wp-interactive <mode>} option for details.
   No truncation is performed when the value equals zero. (default is: 60)
 \item[\tt -wp-(no)-proof-trace] asks for provers to output extra information
   on proved goals when available (default is: \texttt{no}).
-\item[\tt -wp-timeout <n>] sets the timeout (in seconds) for the calls
+\item[\tt -wp-timeout <t>] sets the timeout (in seconds) for the calls
   to the decision prover (defaults to 2 seconds).
+\item[\tt -wp-memlimit <m>] sets the memory-limit (in Mb) for the calls
+  to the decision prover (defaults to 1000 Mb).
 \item[\tt -wp-fct-timeout <f1:t1,f2:t2,...>] customize the timeout for each
   specified function (\texttt{t1} for \texttt{f1}, \texttt{t2} for \texttt{f2},
   etc).

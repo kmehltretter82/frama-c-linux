@@ -31,7 +31,7 @@ let package =
     ()
 
 module ComputationState = struct
-  type t = Analysis.computation_state
+  type t = Self.computation_state
   let jtype =
     Data.declare ~package
       ~name:"computationStateType"
@@ -42,20 +42,18 @@ module ComputationState = struct
           Jtag "computed" ;
           Jtag "aborted" ])
   let to_json = function
-    | Analysis.NotComputed -> `String "not_computed"
+    | Self.NotComputed -> `String "not_computed"
     | Computing -> `String "computing"
     | Computed -> `String "computed"
     | Aborted -> `String "aborted"
 end
 
 let computation_signal =
-  States.register_value ~package
+  States.register_framac_value ~package
     ~name:"computationState"
     ~descr:(Markdown.plain "The current computation state of the analysis.")
     ~output:(module ComputationState)
-    ~get:Analysis.current_computation_state
-    ~add_hook:Analysis.register_computation_hook
-    ()
+    (module Self.ComputationState)
 
 (* ----- Callsites ---------------------------------------------------------- *)
 
@@ -747,16 +745,15 @@ let _array =
     ~data:(module Statuses)
     ~get:(fun (_kf,stats) -> stats.fun_alarm_statuses);
 
-  States.register_array
+  States.register_framac_array
     ~package
     ~name:"functionStats"
     ~descr:(Markdown.plain
               "Statistics about the last Eva analysis for each function")
-    ~key:(fun (fundec,_stats) -> fundec.svar.vname)
+    ~key:(fun fundec -> fundec.svar.vname)
     ~keyType:Kernel_ast.Fundec.jtype
-    ~iter:(fun f -> FunctionStats.iter (fun fundec s -> f (fundec,s)))
-    ~add_update_hook:FunctionStats.register_hook
     model
+    (module FunctionStats)
 
 
 

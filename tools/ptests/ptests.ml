@@ -202,7 +202,6 @@ let example_msg =
      STDOPT: #<extra>    @[<v 0># Defines a sub-test and prepend the extra to the current option.@]@  \
      PLUGIN: <plugin>... @[<v 0># Adds a dependency and set the macro @@PTEST_PLUGIN@@ defining the '-load-plugins' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
      LIBRARY: <pkg.lib>... @[<v 0># Adds a dependency and set the macro @@PTEST_LIBRARY@@ defining the '-load-library' option used in the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
-     CMXS: <module>...   @[<v 0># Defines dune targets without dependency to tests so use '-load-module %%{dep:<module>.cmxs}' into the test options.@]@  \
      MODULE: <module>... @[<v 0># Adds a dependency and adds the corresponding '-load-module' option into the macro @@PTEST_LOAD_OPTIONS@@.@]@  \
      SCRIPT: <module>... @[alias 'MODULE' directive.@]@  \
      LIBS: <module>...   @[<v 0># Like 'MODULE' directive but for modules that can be shared between several test files.@]@  \
@@ -762,7 +761,7 @@ end = struct
              aux { s with ex_cmd = cmd; ex_log = name :: s.ex_log })
       with Scanf.Scan_failure _ ->
       try
-        Scanf.sscanf s.ex_cmd "%_[ ]BIN%_[ ]%[A-Za-z0-9_.\\-@@]%_[ ]%s@\n"
+        Scanf.sscanf s.ex_cmd "%_[ ]BIN%_[ ]%[A-Za-z0-9_.\\\"-@@]%_[ ]%s@\n"
           (fun name cmd ->
              if name = "" then fail (file ^": EXEC"^ (if once then "NOW" else "") ^ " directive with an invalid BIN filename: " ^ s.ex_cmd);
              aux { s with ex_cmd = cmd; ex_bin = name :: s.ex_bin })
@@ -1978,10 +1977,14 @@ let warn_if_not_enabled =
   let dune_cond_regexp = Str.regexp "^(\\(.*\\))" in
   let doublequote_regexp = Str.regexp "\"" in
   let dune_var_regexp = Str.regexp "%{" in
+  let paren_regexp = Str.regexp "[()]" in
   let dune_cond_item s = Str.global_replace dune_cond_regexp "\\1" s in
   let escaped_cond s =
     let s = Str.global_replace dune_var_regexp "\\%{" s in
     Str.global_replace doublequote_regexp "\\\"" s
+  in
+  let safe_cond s =
+    Str.global_replace paren_regexp "\"\\0\"" s
   in
   fun ~env ~suite fmt enabled_if ->
     if not (StringSet.is_empty enabled_if) then begin
@@ -2001,7 +2004,7 @@ let warn_if_not_enabled =
       let pp_enabled  fmt cond =
         let cond = dune_cond_item cond in
         Format.fprintf fmt "              (echo \"- %s: \" %s \"\\n\")\n  "
-          (escaped_cond cond) cond
+          (escaped_cond cond) (safe_cond cond)
       in
       let conds = StringSet.elements enabled_if in
       Format.fprintf fmt

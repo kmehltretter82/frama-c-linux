@@ -26,7 +26,7 @@ include Abstract_domain.Leaf
   with type value = Cvalue.V.t
    and type location = Precise_locs.precise_location
 
-val flag: Abstractions.flag
+val registered: Abstractions.Domain.registered
 
 type taint = | Direct | Indirect | Untainted
 

@@ -32,17 +32,6 @@
 
 (** {1 OCaml} *)
 
-module List: sig
-  (** since 4.10.0 *)
-  val concat_map: ('a -> 'b list) -> 'a list -> 'b list
-
-  (** since 4.12.0 *)
-  val equal: ('a -> 'a -> bool) -> 'a list -> 'a list -> bool
-
-  (** since 4.12.0 *)
-  val compare: ('a -> 'a -> int) -> 'a list -> 'a list -> int
-end
-
 module Seq: sig
   open Stdlib.Seq
 
@@ -54,9 +43,6 @@ module Seq: sig
 
   (** since 4.14.0 *)
   val unzip : ('a * 'b) t -> 'a t * 'b t
-
-  (** since 4.11.0 *)
-  val append : 'a t -> 'a t -> 'a t
 
   (** since 4.14.0 *)
   val drop : int -> 'a t -> 'a t

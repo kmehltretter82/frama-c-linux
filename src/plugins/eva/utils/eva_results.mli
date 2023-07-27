@@ -44,7 +44,7 @@ val merge: results -> results -> results
     For technical reasons, the top of the callstack must currently
     be preserved. *)
 val change_callstacks:
-  (Value_types.callstack -> Value_types.callstack) -> results -> results
+  (Callstack.t -> Callstack.t) -> results -> results
 
 val eval_tlval_as_location :
   ?result:Cil_types.varinfo ->

@@ -240,7 +240,7 @@ void reference_functions(){
 
 //@ ghost int x ;
 int i ;
-int * p ;
+int * const p = &i;
 
 //@ ghost int * gp1 = &i ;
 //@ ghost int * gp2 = p ;

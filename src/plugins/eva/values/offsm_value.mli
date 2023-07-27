@@ -27,5 +27,3 @@ val cast :
   Cvalue.V_Offsetmap.t -> Cvalue.V_Offsetmap.t
 
 module Offsm : Abstract_value.Leaf with type t = offsm_or_top
-
-module CvalueOffsm : Abstract.Value.Internal with type t = Cvalue.V.t * offsm_or_top

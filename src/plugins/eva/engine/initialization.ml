@@ -82,8 +82,8 @@ let counter = ref 0
 
 module Make
     (Domain: Abstract.Domain.External)
-    (Eva: Evaluation.S with type state = Domain.state
-                        and type loc = Domain.location)
+    (Eva: Evaluation_sig.S with type state = Domain.state
+                            and type loc = Domain.location)
     (Transfer: Transfer_stmt.S with type state = Domain.t)
 = struct
 
@@ -95,6 +95,7 @@ module Make
     fst (Eva.lvaluate ~for_writing:false Domain.top lval)
     >>> fun (_valuation, loc, _typ) -> loc
 
+  include Cvalue_domain.Getters (Domain)
 
   (* ------------------------- Apply initializer ---------------------------- *)
 
@@ -272,7 +273,7 @@ module Make
   (* Use the values supplied in [actuals] for the formals of [kf], and
      bind them in [state] *)
   let add_supplied_main_formals kf actuals state =
-    match Domain.get_cvalue with
+    match get_cvalue with
     | None -> Self.abort "Function Db.Value.fun_set_args cannot be \
                           used without the Cvalue domain"
     | Some get_cvalue ->
@@ -308,14 +309,18 @@ module Make
   let initialize_global_variable ~lib_entry vi init state =
     Cil.CurrentLoc.set vi.vdecl;
     let state = Domain.enter_scope Abstract_domain.Global [vi] state in
-    if vi.vsource then
-      let initialize =
-        if lib_entry || (vi.vstorage = Extern)
-        then initialize_var_lib_entry
-        else initialize_var_not_lib_entry ~local:false
-      in
-      initialize Kglobal vi init.init state
-    else state
+    let state = if vi.vsource then
+        let initialize =
+          if lib_entry || (vi.vstorage = Extern)
+          then initialize_var_lib_entry
+          else initialize_var_not_lib_entry ~local:false
+        in
+        initialize Kglobal vi init.init state
+      else state
+    in
+    state
+
+
 
   (* Compute the initial state with all global variable initialized. *)
   let compute_global_state ~lib_entry () =
@@ -366,7 +371,7 @@ module Make
     else global_state ~lib_entry
 
   let print_initial_cvalue_state state =
-    let cvalue_state = Domain.get_cvalue_or_bottom state in
+    let cvalue_state = get_cvalue_or_bottom state in
     (* Do not show variables from the frama-c libc specifications. *)
     let print_base base =
       try

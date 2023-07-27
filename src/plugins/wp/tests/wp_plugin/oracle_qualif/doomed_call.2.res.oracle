@@ -44,8 +44,10 @@
 [wp] [Failed] (Doomed) typed_f5_ko_wp_smoke_dead_code_s36 (Qed)
 [wp] [Valid] typed_f5_ko_ensures (Qed)
 [wp] Proved goals:   31 / 36
-  Qed:            18
+  Qed:            13
   Alt-Ergo:       18
+  Failed:          5
+  Smoke Tests:    18 / 23
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   f1_ok                     3        3        6       100%

@@ -372,8 +372,6 @@ module Datatype_Offsm_or_top = Datatype.Make_with_collections(struct
 module Offsm : Abstract_value.Leaf with type t = offsm_or_top = struct
   include Datatype_Offsm_or_top
 
-  let key = Structure.Key_Value.create_key "offsetmap_value"
-
   let pretty_typ typ fmt = function
     | Top as o -> pretty fmt o
     | O o ->
@@ -469,75 +467,84 @@ module Offsm : Abstract_value.Leaf with type t = offsm_or_top = struct
       `Value (O (cast ~old_size ~new_size ~signed o))
     | _ -> `Value Top
 
+  let key = Structure.Key_Value.create_key "offsetmap_value"
 end
 
+(* -------------------------------------------------------------------------- *)
+(*          Reduced product between Cvalues and Offsetmaps values             *)
+(* -------------------------------------------------------------------------- *)
 
-module CvalueOffsm : Abstract.Value.Internal with type t = V.t * offsm_or_top
-= struct
-  include Value_product.Make (Main_values.CVal) (Offsm)
+let size typ = Integer.of_int (Cil.bitsSizeOf typ)
 
-  let structure =
-    Abstract.Value.(Node (Leaf (Main_values.CVal.key, (module Main_values.CVal)),
-                          Leaf (Offsm.key, (module Offsm))))
+(* Extract an offsetmap from a pair, by converting the value when needed. *)
+let to_offsm typ v = function
+  | Top -> inject ~size:(size typ) v
+  | O o -> o
 
-  let size typ = Integer.of_int (Cil.bitsSizeOf typ)
+(* Refine the cvalue according to the contents of the offsetmap. *)
+let strengthen_v typ v offsm : Cvalue.V.t or_bottom =
+  let size = size typ in
+  (* TODO: this should be done by the transfer function itself... *)
+  let v = Cvalue_forward.reinterpret typ v in
+  let v_o = V_Or_Uninitialized.get_v (basic_find ~size offsm) in
+  let v_o = Cvalue_forward.reinterpret typ v_o in
+  let v = V.narrow v v_o in
+  if V.is_bottom v then `Bottom else `Value v
 
-  (* Extract an offsetmap from a pair, by converting the value when needed. *)
-  let to_offsm typ (v, o : t) =
-    match o with
-    | Top -> inject ~size:(size typ) v
-    | O o -> o
+let () = Abstractions.Hooks.register @@ fun (module Abstraction) ->
+  let module Val = Abstraction.Val in
+  match Val.get Main_values.CVal.key, Val.get Offsm.key with
+  | None, _ | _, None -> (module Abstraction)
+  | Some get_cvalue, Some get_offsm ->
+    let module Value = struct
+      include Abstraction.Val
 
-  (* Ensure that the offsetmap component is not empty *)
-  let strengthen_offsm typ (v, o as p : t) : t =
-    if o = Top then
-      (v, O (to_offsm typ p))
-    else p
+      let set_cvalue = set Main_values.CVal.key
+      let set_offsm = set Offsm.key
 
-  (* Refine the value component according to the contents of the offsetmap *)
-  let strengthen_v typ (v, o as p : t) : t or_bottom =
-    match o with
-    | Top -> `Value p
-    | O o' ->
-      let size = size typ in
-      (* TODO: this should be done by the transfer function itself... *)
-      let v = Cvalue_forward.reinterpret typ v in
-      let v_o = V_Or_Uninitialized.get_v (basic_find ~size o') in
-      let v_o = Cvalue_forward.reinterpret typ v_o in
-      let v = V.narrow v v_o in
-      if V.is_bottom v then `Bottom else `Value (v, o)
+      let to_offsm typ t = to_offsm typ (get_cvalue t) (get_offsm t)
 
-  let forward_unop typ op p =
-    match op with
-    | BNot ->
-      let p' = strengthen_offsm typ p in
-      forward_unop typ op p' >>- fun p'' ->
-      strengthen_v typ p''
-    | _ -> forward_unop typ op p
+      (* Ensure that the offsetmap component is not empty. *)
+      let strengthen_offsm typ t = set_offsm (O (to_offsm typ t)) t
 
-  let forward_binop typ op l r =
-    match op with
-    | BAnd | BOr | BXor ->
-      let l = strengthen_offsm typ l in
-      let r = strengthen_offsm typ r in
-      forward_binop typ op l r >>- fun p ->
-      strengthen_v typ p
-    | Shiftlt | Shiftrt ->
-      let (v_r, _) = r in
-      let (v_l, _) = l in
-      begin
-        try
-          let i = V.project_ival v_r in
-          let i = Ival.project_int i in
-          let size = size typ in
-          let signed = Bit_utils.is_signed_int_enum_pointer typ in
-          let dir = if op = Shiftlt then Left else Right in
-          let o = shift ~size ~signed (to_offsm typ l) dir i in
-          Main_values.CVal.forward_binop typ op v_l v_r >>-: fun v ->
-          v, O o
-        with V.Not_based_on_null | Ival.Not_Singleton_Int ->
-          forward_binop typ op l r
-      end
-    | _ -> forward_binop typ op l r
+      (* Refine the cvalue component according to the offsetmap component. *)
+      let strengthen_v typ t =
+        match get_offsm t with
+        | Top -> `Value t
+        | O o ->
+          let* v = strengthen_v typ (get_cvalue t) o in
+          `Value (set_cvalue v t)
 
-end
+      let forward_unop typ op t =
+        match op with
+        | BNot ->
+          let t = strengthen_offsm typ t in
+          let* t = forward_unop typ op t in
+          strengthen_v typ t
+        | _ -> forward_unop typ op t
+
+      let forward_binop typ op l r =
+        match op with
+        | BAnd | BOr | BXor ->
+          let l = strengthen_offsm typ l
+          and r = strengthen_offsm typ r in
+          let* t = forward_binop typ op l r in
+          strengthen_v typ t
+        | Shiftlt | Shiftrt ->
+          let* p = forward_binop typ op l r in
+          begin
+            try
+              let i = get_cvalue r |> V.project_ival |> Ival.project_int in
+              let size = size typ in
+              let signed = Bit_utils.is_signed_int_enum_pointer typ in
+              let dir = if op = Shiftlt then Left else Right in
+              let offsm = shift ~size ~signed (to_offsm typ l) dir i in
+              `Value (set_offsm (O offsm) p)
+            with V.Not_based_on_null | Ival.Not_Singleton_Int -> `Value p
+          end
+        | _ -> forward_binop typ op l r
+    end in
+    (module struct
+      include Abstraction
+      module Val = Value
+    end)

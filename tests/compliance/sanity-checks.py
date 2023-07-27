@@ -22,7 +22,7 @@ with open(posix_ids_path) as data:
     posix_headers = set(js["headers"].keys())
     extension_names = set(js["extension_names"].keys())
     unique_ids = set()
-    for (i, v) in posix_dict.items():
+    for i, v in posix_dict.items():
         if i in unique_ids:
             sys.exit("duplicate id {i}")
         unique_ids.add(i)
@@ -50,7 +50,7 @@ with open(c11_funs_path) as data:
     js = json.load(data)
     c11_funs = js["data"]
 
-for (i, v) in c11_funs.items():
+for i, v in c11_funs.items():
     header = v["header"]
     if header not in c11_headers:
         sys.exit(f"error: unknown header {header} for id {i}")

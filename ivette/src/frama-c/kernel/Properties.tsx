@@ -627,7 +627,6 @@ function PropertyColumns(): JSX.Element {
       <ColumnTag
         id="status"
         label="Status"
-        fixed
         width={100}
         align="center"
         getter={getStatus}

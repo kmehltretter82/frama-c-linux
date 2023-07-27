@@ -122,14 +122,15 @@
     let content = Buffer.create 80 in
     let rec ignore_content () =
       let s = input_line file in
-      if not (Extlib.string_prefix annot_beg s) then ignore_content ()
+      if not (String.starts_with ~prefix:annot_beg s) then ignore_content ()
     in
     let rec get_annot first =
       let s = input_line file in
-      if Extlib.string_prefix annot_end s then false, Buffer.contents content
-      else if Extlib.string_prefix annot_end_nl s then
+      if String.starts_with ~prefix:annot_end s then
+        false, Buffer.contents content
+      else if String.starts_with ~prefix:annot_end_nl s then
         true, Buffer.contents content
-      else if Extlib.string_prefix annot_end_comment s then begin
+      else if String.starts_with ~prefix:annot_end_comment s then begin
         Buffer.add_char content '\n';
         false, Buffer.contents content
       end else begin

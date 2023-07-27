@@ -21,20 +21,19 @@
 (**************************************************************************)
 
 module type Conversion = sig
-  type extended_value
-  type internal_value
-
-  val extend_val : internal_value -> extended_value
-  val replace_val : internal_value -> extended_value -> extended_value
-  val restrict_val : extended_value -> internal_value
+  type extended
+  type internal
+  val extend : internal -> extended
+  val replace : internal -> extended -> extended
+  val restrict : extended -> internal
 end
 
 module Make
     (Loc: Abstract_location.Leaf)
-    (Convert : Conversion with type internal_value := Loc.value)
+    (Convert : Conversion with type internal := Loc.value)
   : Abstract.Location.Internal with type location = Loc.location
                                 and type offset = Loc.offset
-                                and type value = Convert.extended_value
+                                and type value = Convert.extended
 
 
 (*

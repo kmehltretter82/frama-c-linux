@@ -22,6 +22,28 @@
 
 open Eval
 
+(* Intersects the truth values [t1] and [t2] coming from [assume_] functions
+   from both abstract values. [v1] and [v2] are the initial values leading to
+   these truth values, that may be reduced by the assumption. [combine]
+   combines values from both abstract values into values of the product. *)
+let narrow_any_truth combine (v1, t1) (v2, t2) = match t1, t2 with
+  | `Unreachable, _ | _, `Unreachable
+  | (`True | `TrueReduced _), `False
+  | `False, (`True | `TrueReduced _) -> `Unreachable
+  | `False, _ | _, `False -> `False
+  | `Unknown v1, `Unknown v2 -> `Unknown (combine v1 v2)
+  | (`Unknown v1 | `TrueReduced v1), `True -> `TrueReduced (combine v1 v2)
+  | `True, (`Unknown v2 | `TrueReduced v2) -> `TrueReduced (combine v1 v2)
+  | (`Unknown v1 | `TrueReduced v1),
+    (`Unknown v2 | `TrueReduced v2) -> `TrueReduced (combine v1 v2)
+  | `True, `True -> `True
+
+let narrow_truth x y = narrow_any_truth (fun left right -> left, right) x y
+
+let narrow_truth_pair x y =
+  let combine (l1, l2) (r1, r2) = (l1, r1), (l2, r2) in
+  narrow_any_truth combine x y
+
 module Make
     (Left: Abstract_value.S)
     (Right: Abstract_value.S)
@@ -48,24 +70,6 @@ module Make
   let top_int = Left.top_int, Right.top_int
   let inject_int typ i = Left.inject_int typ i, Right.inject_int typ i
 
-  (* Intersects the truth values [t1] and [t2] coming from [assume_] functions
-     from both abstract values. [v1] and [v2] are the initial values leading to
-     these truth values, that may be reduced by the assumption. [combine]
-     combines values from both abstract values into values of the product. *)
-  let narrow_any_truth combine (v1, t1) (v2, t2) = match t1, t2 with
-    | `Unreachable, _ | _, `Unreachable
-    | (`True | `TrueReduced _), `False
-    | `False, (`True | `TrueReduced _) -> `Unreachable
-    | `False, _ | _, `False -> `False
-    | `Unknown v1, `Unknown v2 -> `Unknown (combine v1 v2)
-    | (`Unknown v1 | `TrueReduced v1), `True -> `TrueReduced (combine v1 v2)
-    | `True, (`Unknown v2 | `TrueReduced v2) -> `TrueReduced (combine v1 v2)
-    | (`Unknown v1 | `TrueReduced v1),
-      (`Unknown v2 | `TrueReduced v2) -> `TrueReduced (combine v1 v2)
-    | `True, `True -> `True
-
-  let narrow_truth = narrow_any_truth (fun left right -> left, right)
-
   let assume_non_zero (left, right) =
     let left_truth = Left.assume_non_zero left
     and right_truth = Right.assume_non_zero right in
@@ -89,8 +93,7 @@ module Make
   let assume_comparable op (l1, r1) (l2, r2) =
     let left_truth = Left.assume_comparable op l1 l2
     and right_truth = Right.assume_comparable op r1 r2 in
-    let combine (l1, l2) (r1, r2) = (l1, r1), (l2, r2) in
-    narrow_any_truth combine ((l1, l2), left_truth) ((r1, r2), right_truth)
+    narrow_truth_pair ((l1, l2), left_truth) ((r1, r2), right_truth)
 
   let constant expr constant =
     let left = Left.constant expr constant

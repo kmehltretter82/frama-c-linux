@@ -28,8 +28,6 @@ module PLoc = struct
     | Precise of Precise_locs.precise_offset
     | Imprecise of Cvalue.V.t (* when the offset contains addresses *)
 
-  let key = Structure.Key_Location.create_key "precise_locs"
-
   let equal_loc = Precise_locs.equal_loc
   let equal_offset o1 o2 = match o1, o2 with
     | Precise o1, Precise o2 -> Precise_locs.equal_offset o1 o2
@@ -43,7 +41,7 @@ module PLoc = struct
 
   let to_value t =
     let loc = Precise_locs.imprecise_location t in
-    Locations.loc_to_loc_without_size loc
+    `Value (Locations.loc_to_loc_without_size loc)
 
   let size loc = Precise_locs.loc_size loc
 
@@ -236,8 +234,12 @@ module PLoc = struct
     (* No reduction if the offsets are not arithmetics. *)
     with Cvalue.V.Not_based_on_null -> `Value (index, remaining)
 
+  let key = Structure.Key_Location.create_key "precise_locs"
+
+  let value = Abstract_value.Leaf (module Main_values.CVal)
 end
 
+let ploc = Abstract_location.Leaf (module PLoc)
 
 (*
 Local Variables:

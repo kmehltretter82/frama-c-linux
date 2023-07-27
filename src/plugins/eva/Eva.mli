@@ -115,6 +115,75 @@ module Analysis: sig
   val save_results: Cil_types.kernel_function -> bool
 end
 
+module Callstack: sig
+  [@@@ alert "-db_deprecated"]
+
+  (** A call is identified by the function called and the call statement *)
+  type call = Cil_types.kernel_function * Cil_types.stmt
+
+  module Call : Datatype.S with type t = call
+
+  (** Eva callstacks. *)
+  type callstack = Eva_types.Callstack.callstack = {
+    thread: int;
+    (* An identifier of the thread's callstack. *)
+    entry_point: Cil_types.kernel_function;
+    (** The first function function of the callstack. *)
+    stack: call list;
+    (** A call stack is a list of calls. The head is the latest call. *)
+  }
+
+  include Datatype.S_with_collections
+    with type t = callstack
+     and module Hashtbl = Eva_types.Callstack.Hashtbl
+
+  (** Prints a callstack without displaying call sites. *)
+  val pretty_short : Format.formatter -> t -> unit
+
+  (** Prints a hash of the callstack when '-kernel-msg-key callstack'
+      is enabled (prints nothing otherwise). *)
+  val pretty_hash : Format.formatter -> t -> unit
+
+  (** [compare_lex] compares callstack lexicographically, slightly slower
+      than [compare] but in a more natural order, giving more importance
+      to the function at bottom of the callstack - the first functions called. *)
+  val compare_lex : t -> t -> int
+
+  (*** {2 Stack manipulation} *)
+
+  (*** Constructor *)
+  val init : ?thread:int -> Cil_types.kernel_function -> t
+
+  (** Adds a new call to the top of the callstack. *)
+  val push : Cil_types.kernel_function -> Cil_types.stmt -> t -> t
+
+  (** Removes the topmost call from the callstack. *)
+  val pop : t -> t option
+
+  val top : t -> (Cil_types.kernel_function * Cil_types.stmt) option
+  val top_kf : t -> Cil_types.kernel_function
+  val top_callsite : t -> Cil_types.kinstr
+  val top_call : t -> Cil_types.kernel_function * Cil_types.kinstr
+
+  (** Returns the function that called the topmost function of the callstack. *)
+  val top_caller : t -> Cil_types.kernel_function option
+
+  (** {2 Conversion} *)
+
+  (** Gives the list of kf in the callstack from the entry point to the top of the
+      callstack (i.e. reverse order of the call stack). *)
+  val to_kf_list : t -> Cil_types.kernel_function list
+
+  (** Gives the list of call statements from the bottom to the top of the
+      callstack (i.e. reverse order of the call stack). *)
+  val to_stmt_list : t -> Cil_types.stmt list
+
+  (** Gives the list of call from the bottom to the top of the callstack
+      (i.e. reverse order of the call stack). *)
+  val to_call_list : t -> (Cil_types.kernel_function * Cil_types.kinstr) list
+
+end
+
 module Results: sig
 
   (** Eva's result API is a new interface to access the results of an analysis,
@@ -157,8 +226,6 @@ module Results: sig
       - results have not been saved, due to the [-eva-no-results] parameter:
         all requests in the function will lead to a Top error. *)
   val are_available : Cil_types.kernel_function -> bool
-
-  type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
 
   type request
 
@@ -222,16 +289,16 @@ module Results: sig
 
   (** Only consider the given callstack.
       Replaces previous calls to [in_callstack] or [in_callstacks]. *)
-  val in_callstack : callstack -> request -> request
+  val in_callstack : Callstack.t -> request -> request
 
   (** Only consider the callstacks from the given list.
       Replaces previous calls to [in_callstack] or [in_callstacks]. *)
-  val in_callstacks : callstack list -> request -> request
+  val in_callstacks : Callstack.t list -> request -> request
 
   (** Only consider callstacks satisfying the given predicate. Several filters
       can be added. If callstacks are also selected with [in_callstack] or
       [in_callstacks], only the selected callstacks will be filtered. *)
-  val filter_callstack : (callstack -> bool) -> request -> request
+  val filter_callstack : (Callstack.t -> bool) -> request -> request
 
 
   (** Working with callstacks *)
@@ -241,11 +308,11 @@ module Results: sig
       reached by the analysis, or if no information has been saved at this point
       (for instance with the -eva-no-results option).
       Use [is_empty request] to distinguish these two cases. *)
-  val callstacks : request -> callstack list
+  val callstacks : request -> Callstack.t list
 
   (** Returns a list of subrequests for each reachable callstack from
       the given request. *)
-  val by_callstack : request -> (callstack * request) list
+  val by_callstack : request -> (Callstack.t * request) list
 
 
   (** State requests *)
@@ -616,22 +683,24 @@ module Cvalue_callbacks: sig
       in a future version. Please contact us if you need to register callbacks
       to be executed during an Eva analysis. *)
 
-  type callstack = (Cil_types.kernel_function * Cil_types.kinstr) list
   type state = Cvalue.Model.t
 
   type analysis_kind =
-    [ `Builtin of Value_types.call_froms
-    | `Spec of Cil_types.funspec
-    | `Def
-    | `Memexec ]
+    [ `Builtin (** A cvalue builtin is used to interpret the function. *)
+    | `Spec  (** The specification is used to interpret the function. *)
+    | `Body  (** The function body is analyzed. This is the standard case. *)
+    | `Reuse (** The results of a previous analysis of the function are reused. *)
+    ]
 
-  (** Registers a function to be applied at the beginning of the analysis of each
-      function call. Arguments of the callback are the callstack of the call,
-      the function called, the kind of analysis performed by Eva for this call,
-      and the cvalue state at the beginning of the call. *)
-  val register_call_hook:
-    (callstack -> Cil_types.kernel_function -> analysis_kind -> state -> unit)
-    -> unit
+  (** Signature of a hook to be called before the analysis of each function call.
+      Arguments are the callstack of the call, the function called, the initial
+      cvalue state, and the kind of analysis performed by Eva for this call. *)
+  type call_hook =
+    Callstack.t -> Cil_types.kernel_function -> state -> analysis_kind -> unit
+
+  (** Registers a function to be applied at the start of the analysis of each
+      function call. *)
+  val register_call_hook: call_hook -> unit
 
 
   type state_by_stmt = (state Cil_datatype.Stmt.Hashtbl.t) Lazy.t
@@ -639,19 +708,27 @@ module Cvalue_callbacks: sig
 
   (** Results of a function call. *)
   type call_results =
-    | Store of results * int
+    [ `Builtin of state list * Value_types.call_froms
+    (** List of cvalue states at the end of the builtin. *)
+    | `Spec of state list
+    (** List of cvalue states at the end of the call. *)
+    | `Body of results * int
     (** Cvalue states before and after each statement of the given function,
         plus a unique integer id for the call. *)
-    | Reuse of int
-    (** The results are the same as a previous call with the given integer id,
-        previously recorded with the [Store] constructor. *)
+    | `Reuse of int
+      (** The results are the same as a previous call with the given integer id,
+          previously recorded with the [`Body] constructor. *)
+    ]
+
+  (** Signature of a hook to be called after the analysis of each function call.
+      Arguments are the callstack of the call, the function called, the initial
+      cvalue state at the start of the call, and the results from its analysis. *)
+  type call_results_hook =
+    Callstack.t -> Cil_types.kernel_function -> state -> call_results -> unit
 
   (** Registers a function to be applied at the end of the analysis of each
-      function call. Arguments of the callback are the callstack of the call,
-      the function called and the cvalue states resulting from its analysis. *)
-  val register_call_results_hook:
-    (callstack -> Cil_types.kernel_function -> call_results -> unit)
-    -> unit
+      function call. *)
+  val register_call_results_hook: call_results_hook -> unit
 
 end
 
@@ -733,7 +810,7 @@ module Eva_results: sig
       For technical reasons, the top of the callstack must currently
       be preserved. *)
   val change_callstacks:
-    (Value_types.callstack -> Value_types.callstack) -> results -> results
+    (Callstack.t -> Callstack.t) -> results -> results
 
   val eval_tlval_as_location :
     ?result:Cil_types.varinfo ->

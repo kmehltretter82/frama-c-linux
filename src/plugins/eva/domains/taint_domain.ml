@@ -295,11 +295,14 @@ module QueriesTaint = struct
 end
 
 
-module TaintDomain = struct
+module Domain = struct
   type state = taint_state
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
   type origin
+
+  let value_dependencies = Main_values.cval
+  let location_dependencies = Main_locations.ploc
 
   include (LatticeTaint: sig
              include Datatype.S_with_collections with type t = state
@@ -380,7 +383,13 @@ module TaintDomain = struct
     join state previous_output
 end
 
-include TaintDomain
+include Domain
+
+(* Registers the domain. *)
+let registered =
+  let name = "taint"
+  and descr = "Taint analysis" in
+  Abstractions.Domain.register ~name ~descr ~experimental:true (module Domain)
 
 
 (* Registers ACSL builtin predicate \tainted. *)
@@ -581,18 +590,7 @@ let interpret_taint_logic
       module Dom = Dom
     end)
 
-(* Registers the domain. *)
-let flag =
-  let name = "taint"
-  and descr = "Taint analysis"
-  and experimental = true
-  and abstraction =
-    Abstractions.{ values = Single (module Main_values.CVal);
-                   domain = Domain (module TaintDomain); }
-  in
-  Abstractions.register ~name ~descr ~experimental abstraction
-
-let () = Abstractions.register_hook interpret_taint_logic
+let () = Abstractions.Hooks.register interpret_taint_logic
 
 
 type taint = Direct | Indirect | Untainted

@@ -20,6 +20,7 @@
 
 { lib
 , alt-ergo
+, clang
 , frama-c
 , perl
 , stdenvNoCC
@@ -43,6 +44,7 @@ stdenvNoCC.mkDerivation {
   sourceRoot = ".";
 
   buildInputs = frama-c.buildInputs ++ [
+    clang
     frama-c
     perl
     time

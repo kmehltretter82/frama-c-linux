@@ -365,6 +365,9 @@ struct
 
   let name = "multidim"
 
+  let value_dependencies = Main_values.cval
+  let location_dependencies = Main_locations.ploc
+
   type state = t
   type value = Value.t
   type value_or_uninitialized = Value_or_Uninitialized.t
@@ -941,15 +944,11 @@ let multidim_hook (module Abstract: Abstractions.S) : (module Abstractions.S) =
     end)
 
 (* Registers the domain. *)
-let flag =
+let registered =
   let name = "multidim"
   and descr = "Improve the precision over arrays of structures \
                or multidimensional arrays."
-  and experimental = true
-  and abstraction =
-    Abstractions.{ values = Single (module Main_values.CVal);
-                   domain = Domain (module Domain); }
   in
-  Abstractions.register ~name ~descr ~experimental abstraction
+  Abstractions.Domain.register ~name ~descr ~experimental:true (module Domain)
 
-let () = Abstractions.register_hook multidim_hook
+let () = Abstractions.Hooks.register multidim_hook

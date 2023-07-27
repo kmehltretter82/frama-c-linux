@@ -35,7 +35,7 @@ let partition_terminating_instr stmt =
     let terminating = ref [] in
     let non_terminating = ref [] in
     let add x xs = xs := x :: !xs in
-    Value_types.Callstack.Hashtbl.iter (fun cs state ->
+    Callstack.Hashtbl.iter (fun cs state ->
         if Db.Value.is_reachable state
         then add cs terminating
         else add cs non_terminating) h;
@@ -49,7 +49,7 @@ let is_non_terminating_instr stmt =
 
 (* {2 Saving and restoring state} *)
 
-type stmt_by_callstack = Cvalue.Model.t Value_types.Callstack.Hashtbl.t
+type stmt_by_callstack = Cvalue.Model.t Callstack.Hashtbl.t
 
 module AlarmsStmt =
   Datatype.Pair_with_collections (Alarms) (Stmt)
@@ -72,7 +72,7 @@ type results = {
 let get_results () =
   let vue = Emitter.get Eva_utils.emitter in
   let main = Some (fst (Globals.entry_point ())) in
-  let module CS = Value_types.Callstack in
+  let module CS = Callstack in
   let copy_states iter =
     let h = Stmt.Hashtbl.create 128 in
     let copy stmt hstack = Stmt.Hashtbl.add h stmt (CS.Hashtbl.copy hstack) in
@@ -144,16 +144,16 @@ let set_results results =
     let aux_callstack callstack state =
       Db.Value.update_callstack_table ~after stmt callstack state;
     in
-    Value_types.Callstack.Hashtbl.iter aux_callstack h
+    Callstack.Hashtbl.iter aux_callstack h
   in
   Stmt.Hashtbl.iter (aux_states ~after:false) results.before_states;
   Stmt.Hashtbl.iter (aux_states ~after:true) results.after_states;
   (* Kf initial state *)
-  let aux_initial_state _kf h =
+  let aux_initial_state kf h =
     let aux_callstack callstack state =
-      Db.Value.merge_initial_state callstack state
+      Db.Value.merge_initial_state callstack kf state
     in
-    Value_types.Callstack.Hashtbl.iter aux_callstack h
+    Callstack.Hashtbl.iter aux_callstack h
   in
   Kernel_function.Hashtbl.iter aux_initial_state results.kf_initial_states;
   Function_calls.set_results results.kf_callers;
@@ -171,7 +171,7 @@ let set_results results =
   let b = Parameters.ResultsAll.get () in
   Cvalue_domain.State.Store.register_global_state b
     (`Value Cvalue_domain.State.top);
-  Self.set_computation_state Computed;
+  Self.ComputationState.set Computed;
   Db.Value.mark_as_computed ();
 ;;
 
@@ -204,7 +204,7 @@ struct
 
 end
 
-module CallstackH = HExt(Value_types.Callstack.Hashtbl)
+module CallstackH = HExt(Callstack.Hashtbl)
 module StmtH = HExt(Stmt.Hashtbl)
 module KfH = HExt(Kernel_function.Hashtbl)
 module PropertyH = HExt(Property.Hashtbl)

@@ -333,7 +333,7 @@ let get_current_stdheader () =
   let rec aux = function
     | [] -> ""
     | [ s ] -> s
-    | s :: l when Extlib.string_prefix ~strict:true "__fc_" s -> aux l
+    | s :: l when String.starts_with ~prefix:"__fc_" s -> aux l
     | s :: _ -> s
   in
   aux !current_stdheader
@@ -818,20 +818,7 @@ let get_formals vi =
 let initGlobals () =
   theFile := [];
   theFileTypes := [];
-  Cil_datatype.Varinfo.Hashtbl.clear theFileVars;
-;;
-
-let cabsPushGlobal (g: global) =
-  pushGlobal g ~types:theFileTypes ~variables:theFile;
-  (match g with
-   | GVar (vi, _, _) | GVarDecl (vi, _)
-   | GFun ({svar = vi}, _) | GFunDecl (_, vi, _) ->
-     (* Do 'add' and not 'replace' here, as we may store both
-        declarations and definitions for the same varinfo *)
-     Cil_datatype.Varinfo.Hashtbl.add theFileVars vi g
-   | _ -> ()
-  );
-;;
+  Cil_datatype.Varinfo.Hashtbl.clear theFileVars
 
 
 (* Keep track of some variable ids that must be turned into definitions. We
@@ -844,6 +831,8 @@ let mustTurnIntoDef: bool IH.t = IH.create 117
 
 (* Globals that have already been defined. Indexed by the variable name. *)
 let alreadyDefined: (string, location) H.t = H.create 117
+
+let isDefined vi = H.mem alreadyDefined vi.vorig_name
 
 (* Globals that were created due to static local variables. We chose their
  * names to be distinct from any global encountered at the time. But we might
@@ -874,6 +863,54 @@ let fileGlobals () =
     | x :: rest -> revonto (x :: tail) rest
   in
   revonto (revonto [] !theFile) !theFileTypes
+
+
+class checkGlobal = object
+  inherit nopCilVisitor
+
+
+  method! vglob = function
+    | GVar _ -> DoChildren
+    | _ -> SkipChildren
+
+  method! vexpr exp =
+    begin
+      match exp.enode with
+      | SizeOfE _ ->
+        (* sizeOf doesn't depend on the definitions *)
+        ()
+      | _ ->
+        let problematic_var : string option ref = ref None in
+        let is_varinfo_cst vi =
+          let res = Cil.isConstType vi.vtype && isDefined vi in
+          if not res then problematic_var := Some vi.vorig_name;
+          res
+        in
+        if not(isConstant ~is_varinfo_cst exp)
+        then
+          match !problematic_var with
+          | Some name ->
+            Kernel.error ~once:true ~current:true
+              ("%s is not a compile-time constant") name
+          | None ->
+            Kernel.error ~once:true ~current:true
+              "Initializer element is not a compile-time constant";
+    end;
+    SkipChildren
+
+end
+
+let cabsPushGlobal (g: global) =
+  ignore (visitCilGlobal (new checkGlobal) g);
+  pushGlobal g ~types:theFileTypes ~variables:theFile;
+  (match g with
+   | GVar (vi, _, _) | GVarDecl (vi, _)
+   | GFun ({svar = vi}, _) | GFunDecl (_, vi, _) ->
+     (* Do 'add' and not 'replace' here, as we may store both
+        declarations and definitions for the same varinfo *)
+     Cil_datatype.Varinfo.Hashtbl.add theFileVars vi g
+   | _ -> ()
+  )
 
 
 (********* ENVIRONMENTS ***************)
@@ -2531,30 +2568,6 @@ let cabsAddAttributes al0 (al: attributes) : attributes =
       al
       al0
 
-type combineWhat =
-    CombineFundef of bool
-  (* The new definition is for a function definition. The old
-   * is for a prototype. arg is [true] for an old-style declaration *)
-  | CombineFunarg of bool
-  (* Comparing a function argument type with an old prototype argument.
-     arg is [true] for an old-style declaration, which
-     triggers some ad hoc treatment in GCC mode. *)
-  | CombineFunret (* Comparing the return of a function with that from an old
-                   * prototype *)
-  | CombineOther
-
-(* [combineAttributes what olda a] combines the attributes in [olda] and [a]
-   according to [what]:
-   - if [what == CombineFunarg], then override old attributes;
-     this is used to ensure that attributes from formal argument types in a
-     function definition are not mixed with attributes from arguments in other
-     (compatible, but with different qualifiers) declarations;
-   - else, perform the union of old and new attributes. *)
-let combineAttributes what olda a =
-  match what with
-  | CombineFunarg _ -> a (* override old attributes with new ones *)
-  | _ -> cabsAddAttributes olda a (* union of attributes *)
-
 (* BY: nothing cabs here, plus seems to duplicate most of Cil.typeAddAttributes *)
 (* see [combineAttributes] above for details about the [what] argument *)
 let rec cabsTypeCombineAttributes what a0 t =
@@ -2642,265 +2655,10 @@ and cabsArrayPushAttributes what al = function
 let cabsTypeAddAttributes =
   cabsTypeCombineAttributes CombineOther
 
-exception Cannot_combine of string
 
 (* Do types *)
-(* Combine the types. Raises the Cannot_combine exception with an error message.
-   [what] is used to recursively deal with function return types and function
-   arguments in special ways.
-   Note: we cannot force the qualifiers of oldt and t to be the same here,
-   because in some cases (e.g. string literals and char pointers) it is
-   allowed to have differences, while in others we want to be more strict. *)
-let rec combineTypes ?(strictReturnTypes=false) (what: combineWhat) (oldt: typ) (t: typ) : typ =
-  match oldt, t with
-  | TVoid olda, TVoid a -> TVoid (combineAttributes what olda a)
-  (* allows ignoring a returned value *)
-  | _ , TVoid _ when what = CombineFunret && not strictReturnTypes -> t
-  | TInt (oldik, olda), TInt (ik, a) ->
-    let combineIK oldk k =
-      if oldk = k then oldk else
-        (match what with
-         | CombineFunarg b when
-             Cil.gccMode () && oldk = IInt
-             && bytesSizeOf t <= (bytesSizeOfInt IInt) && b ->
-           (* GCC allows a function definition to have a more precise integer
-            * type than a prototype that says "int" *)
-           k
-         | _ ->
-           raise (Cannot_combine
-                    (Format.asprintf
-                       "different integer types:@ '%a' and '%a'"
-                       Cil_printer.pp_ikind oldk Cil_printer.pp_ikind k)))
-    in
-    TInt (combineIK oldik ik, combineAttributes what olda a)
-  | TFloat (oldfk, olda), TFloat (fk, a) ->
-    let combineFK oldk k =
-      if oldk = k then oldk else
-        ( match what with
-          | CombineFunarg b when
-              Cil.gccMode () && oldk = FDouble && k = FFloat && b ->
-            (* GCC allows a function definition to have a more precise float
-             * type than a prototype that says "double" *)
-            k
-          | _ ->
-            raise (Cannot_combine "different floating point types"))
-    in
-    TFloat (combineFK oldfk fk, combineAttributes what olda a)
-  | TEnum (_, olda), TEnum (ei, a) ->
-    TEnum (ei, combineAttributes what olda a)
-
-  (* Strange one. But seems to be handled by GCC *)
-  | TEnum (oldei, olda) , TInt(IInt, a) -> TEnum(oldei,
-                                                 combineAttributes what olda a)
-  (* Strange one. But seems to be handled by GCC *)
-  | TInt(IInt, olda), TEnum (ei, a) -> TEnum(ei, combineAttributes what olda a)
-
-
-  | TComp (oldci, olda) , TComp (ci, a) ->
-    if oldci.cstruct <> ci.cstruct then
-      raise (Cannot_combine "different struct/union types");
-    let comb_a = combineAttributes what olda a in
-    if oldci.cname = ci.cname then
-      TComp (oldci, comb_a)
-    else
-      raise (Cannot_combine (Format.sprintf "%ss with different tags"
-                               (if oldci.cstruct then "struct" else "union")))
-
-  | TArray (oldbt, oldsz, olda), TArray (bt, sz, a) ->
-    let newbt = combineTypes ~strictReturnTypes CombineOther oldbt bt in
-    let newsz =
-      match oldsz, sz with
-      | None, Some _ -> sz
-      | Some _, None -> oldsz
-      | None, None -> sz
-      | Some oldsz', Some sz' ->
-        (* They are not structurally equal. But perhaps they are equal if we
-           evaluate them. Check first machine independent comparison. *)
-        let checkEqualSize (machdep: bool) =
-          let size_t = Cil.theMachine.Cil.typeOfSizeOf in
-          let size_t_oldsz' = Cil.mkCast ~force:false ~newt:size_t oldsz' in
-          let size_t_sz' = Cil.mkCast ~force:false ~newt:size_t sz' in
-          ExpStructEq.equal
-            (constFold machdep size_t_oldsz')
-            (constFold machdep size_t_sz')
-        in
-        if checkEqualSize false then
-          oldsz
-        else if checkEqualSize true then begin
-          Kernel.warning ~current:true
-            "Array type comparison succeeds only based on machine-dependent \
-             constant evaluation: %a and %a\n"
-            Cil_printer.pp_exp oldsz' Cil_printer.pp_exp sz';
-          oldsz
-        end else
-          raise (Cannot_combine "different array lengths")
-
-    in
-    TArray (newbt, newsz, combineAttributes what olda a)
-
-  | TPtr (oldbt, olda), TPtr (bt, a) ->
-    TPtr (combineTypes ~strictReturnTypes CombineOther oldbt bt, combineAttributes what olda a)
-
-  | TFun (oldrt, oldargs, oldva, olda), TFun (rt, args, va, a) ->
-    let newrt = combineTypes ~strictReturnTypes CombineFunret oldrt rt in
-    if oldva != va then
-      raise (Cannot_combine "different vararg specifiers");
-    (* If one does not have arguments, believe the one with the
-     * arguments *)
-    let newargs, olda' =
-      if oldargs = None then args, olda else
-      if args = None then oldargs, olda else
-        let (oldargslist, oldghostargslist) = argsToPairOfLists oldargs in
-        let (argslist, ghostargslist) = argsToPairOfLists args in
-        if List.length oldargslist <> List.length argslist then
-          raise (Cannot_combine "different number of arguments")
-        else if List.length oldghostargslist <> List.length ghostargslist then
-          raise (Cannot_combine "different number of ghost arguments")
-        else begin
-          let oldargslist = oldargslist @ oldghostargslist in
-          let argslist = argslist @ ghostargslist in
-          (* Construct a mapping between old and new argument names. *)
-          let map = H.create 5 in
-          List.iter2
-            (fun (on, _, _) (an, _, _) -> H.replace map on an)
-            oldargslist argslist;
-          (* Go over the arguments and update the old ones with the
-           * adjusted types *)
-          (* Format.printf "new type is %a@." Cil_datatype.Typ.pretty t; *)
-          let what =
-            match what with
-            | CombineFundef b -> CombineFunarg b
-            | _ -> CombineOther
-          in
-          Some
-            (List.map2
-               (fun (on, ot, oa) (an, at, aa) ->
-                  (* Update the names. Always prefer the new name. This is
-                   * very important if the prototype uses different names than
-                   * the function definition. *)
-                  let n = if an <> "" then an else on in
-                  let t = combineTypes ~strictReturnTypes what ot at in
-                  let a = addAttributes oa aa in
-                  (n, t, a))
-               oldargslist argslist),
-          olda
-        end
-    in
-    (* Drop missingproto as soon as one of the type is a properly declared one*)
-    let olda =
-      if not (Cil.hasAttribute "missingproto" a) then
-        Cil.dropAttribute "missingproto" olda'
-      else olda'
-    in
-    let a =
-      if not (Cil.hasAttribute "missingproto" olda') then
-        Cil.dropAttribute "missingproto" a
-      else a
-    in
-    TFun (newrt, newargs, oldva, combineAttributes what olda a)
-
-  | TNamed (oldt, olda), TNamed (t, a) when oldt.tname = t.tname ->
-    TNamed (oldt, combineAttributes what olda a)
-
-  | TBuiltin_va_list olda, TBuiltin_va_list a ->
-    TBuiltin_va_list (combineAttributes what olda a)
-
-  (* Unroll first the new type *)
-  | _, TNamed (t, a) ->
-    let res = combineTypes what oldt t.ttype in
-    cabsTypeCombineAttributes what a res
-
-  (* And unroll the old type as well if necessary *)
-  | TNamed (oldt, a), _ ->
-    let res = combineTypes what oldt.ttype t in
-    cabsTypeCombineAttributes what a res
-
-  | _ -> raise (Cannot_combine
-                  (Format.asprintf "different type constructors:@ %a and %a"
-                     Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t))
 
 let get_qualifiers t = Cil.filter_qualifier_attributes (Cil.typeAttrs t)
-
-(* how type qualifiers must be checked *)
-type qualifier_check_context =
-  | Identical (* identical qualifiers. *)
-  | IdenticalToplevel (* ignore at toplevel, use Identical when going under a
-                         pointer. *)
-  | Covariant (* first type can have const-qualifications
-                 the second doesn't have. *)
-  | CovariantToplevel
-  (* accepts everything for current type, use Covariant when going under a
-     pointer. *)
-  | Contravariant (* second type can have const-qualifications
-                     the first doesn't have. *)
-  | ContravariantToplevel
-  (* accepts everything for current type, use Contravariant when going under
-     a pointer. *)
-
-let qualifier_context_fun_arg = function
-  | Identical | IdenticalToplevel -> IdenticalToplevel
-  | Covariant | CovariantToplevel -> ContravariantToplevel
-  | Contravariant | ContravariantToplevel -> CovariantToplevel
-
-let qualifier_context_fun_ret = function
-  | Identical | IdenticalToplevel -> IdenticalToplevel
-  | Covariant | CovariantToplevel -> CovariantToplevel
-  | Contravariant | ContravariantToplevel -> ContravariantToplevel
-
-let qualifier_context_ptr = function
-  | Identical | IdenticalToplevel -> Identical
-  | Covariant | CovariantToplevel -> Covariant
-  | Contravariant | ContravariantToplevel -> Contravariant
-
-let included_qualifiers ?(context=Identical) a1 a2 =
-  let a1 = Cil.filter_qualifier_attributes a1 in
-  let a2 = Cil.filter_qualifier_attributes a2 in
-  let a1 = Cil.dropAttribute "restrict" a1 in
-  let a2 = Cil.dropAttribute "restrict" a2 in
-  let a1_no_cv = Cil.dropAttributes ["const"; "volatile"] a1 in
-  let a2_no_cv = Cil.dropAttributes ["const"; "volatile"] a2 in
-  let is_equal = Cil_datatype.Attributes.equal a1 a2 in
-  if is_equal then true
-  else begin
-    match context with
-    | Identical -> false
-    | Covariant -> Cil_datatype.Attributes.equal a1_no_cv a2
-    | Contravariant -> Cil_datatype.Attributes.equal a1 a2_no_cv
-    | CovariantToplevel | ContravariantToplevel | IdenticalToplevel -> true
-  end
-
-(* precondition: t1 and t2 must be "compatible" as per combineTypes, i.e.
-   you must have called [combineTypes t1 t2] before calling this function. *)
-let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
-  match unrollType t1, unrollType t2 with
-  | TFun (tres1, Some args1, _, _), TFun (tres2, Some args2, _, _) ->
-    have_compatible_qualifiers_deep
-      ~context:(qualifier_context_fun_ret context) tres1 tres2 &&
-    let context = qualifier_context_fun_arg context in
-    List.for_all2 (fun (_, t1', a1) (_, t2', a2) ->
-        have_compatible_qualifiers_deep ~context t1' t2' &&
-        included_qualifiers ~context a1 a2)
-      args1 args2
-  | TPtr (t1', a1), TPtr (t2', a2)
-  | TArray (t1', _, a1), TArray (t2', _, a2) ->
-    (included_qualifiers ~context a1 a2) &&
-    let context = qualifier_context_ptr context in
-    have_compatible_qualifiers_deep ~context t1' t2'
-  | _, _ -> included_qualifiers ~context (Cil.typeAttrs t1) (Cil.typeAttrs t2)
-
-let compatibleTypes ?strictReturnTypes ?context t1 t2 =
-  let r = combineTypes ?strictReturnTypes CombineOther t1 t2 in
-  (* C99, 6.7.3 §9: "... to be compatible, both shall have the identically
-     qualified version of a compatible type;" *)
-  if not (have_compatible_qualifiers_deep ?context t1 t2) then
-    raise (Cannot_combine "different qualifiers");
-  (* Note: different non-qualifier attributes will be silently dropped. *)
-  r
-
-let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
-  try
-    ignore (compatibleTypes ?strictReturnTypes ?context t1 t2); true
-  with Cannot_combine _ -> false
 
 (* Specify whether the cast is from the source code *)
 let rec castTo ?context ?(fromsource=false)
@@ -8899,9 +8657,9 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * C
         if vi.vstorage = Extern then
           vi.vstorage <- NoStorage;     (* equivalent and canonical *)
 
-        H.add alreadyDefined vi.vname (CurrentLoc.get ());
         IH.remove mustTurnIntoDef vi.vid;
         cabsPushGlobal (GVar(vi, {init = init}, CurrentLoc.get ()));
+        H.add alreadyDefined vi.vname (CurrentLoc.get ());
         vi
       end else begin
         if not (isFunctionType vi.vtype) &&
@@ -9066,7 +8824,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     let full_name =
       (* Mangled symbols (that is, starting with '_Z') are unique by
          construction. No need to add current function name as prefix. *)
-      if Extlib.string_prefix ~strict:true "_Z" n
+      if String.starts_with ~prefix:"_Z" n && n <> "_Z"
       then n
       else !currentFunctionFDEC.svar.vname ^ "_" ^ n
     in
