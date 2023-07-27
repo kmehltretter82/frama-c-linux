@@ -22,7 +22,7 @@
 
 open Cil_types
 
-type mode = ACSL | Safe | Frama_C | Other of string
+type mode = ACSL | Safe | Frama_C | Skip | Other of string
 [@@ warning "-37"] (* TODO: to build Other value *)
 
 type config = {
@@ -77,7 +77,7 @@ module Make(G : Generator) =
 struct
   let get_default mode kf spec =
     let table = G.collect_behaviors spec in
-    if G.has_behavior default table then
+    if mode = Skip || G.has_behavior default table then
       Kept
     else if mode = ACSL then
       Generated (G.acsl_default ())
@@ -91,7 +91,7 @@ struct
         Generated(G.frama_c_default kf)
       | None ->
         match mode with
-        | ACSL | Safe | Frama_C -> assert false
+        | ACSL | Safe | Frama_C | Skip -> assert false
         | Other mode ->
           Generated(G.custom_default mode kf spec)
 
@@ -154,7 +154,7 @@ struct
     | Generated exits ->
       match mode with
       | Frama_C -> emit_status kf bhv exits Property_status.Dont_know
-      | ACSL | Safe | Other _ -> ()
+      | Skip | ACSL | Safe | Other _ -> ()
 
 end
 
@@ -245,7 +245,7 @@ struct
     | Generated assigns ->
       match mode with
       | Frama_C -> emit_status kf bhv assigns Property_status.Dont_know
-      | ACSL | Safe | Other _ -> ()
+      | ACSL | Safe | Skip | Other _ -> ()
 
 end
 
@@ -358,7 +358,7 @@ struct
         emit_status kf bhv allocates Property_status.True
       | Frama_C ->
         emit_status kf bhv allocates Property_status.Dont_know
-      | Other _ | Safe -> ()
+      | Other _ | Safe | Skip -> ()
 
 end
 
@@ -409,7 +409,7 @@ struct
         emit_status kf bhv terminates Property_status.True
       | Safe | Frama_C ->
         emit_status kf bhv terminates Property_status.Dont_know
-      | Other _ -> ()
+      | Skip | Other _ -> ()
 
 end
 
@@ -423,10 +423,12 @@ let get_mode = function
   | "frama-c" -> Frama_C
   | "acsl" -> ACSL
   | "safe" -> Safe
+  | "skip" -> Skip
   | s ->
+    (* TODO: to build Other value *)
     Kernel.abort
-      "\'%s\' is not a valid mode for spec generation, accepted values \
-       are 'frama-c', 'acsl' and 'safe'" s
+      "@[@['%s'@] is not a supported mode for -generated-spec-mode.@ Accepted \
+      keys are 'acsl', 'frama-c', 'safe' and 'skip'.@]@." s
 
 let build_config mode = {
   exits = mode;
@@ -451,8 +453,9 @@ let get_config () =
     | "terminates" -> {conf with terminates = mode}
     | s ->
       Kernel.abort
-        "\'%s\' is not a valid key for -generated-spec-custom, accepted keys \
-         are 'exits', 'assigns', 'requires', 'allocates' and 'terminates'" s
+        "@[@['%s'@] is not a valid key for -generated-spec-custom.@ Accepted \
+        keys are 'exits', 'assigns', 'requires', 'allocates' and \
+        'terminates'.@]@." s
   in
   Kernel.GeneratedSpecCustom.fold collect default
 

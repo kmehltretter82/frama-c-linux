@@ -1482,7 +1482,6 @@ module GeneratedSpecMode =
         "Select which mode will be used to generate missing specs \
         (defaults to frama-c), see user manual for more informations"
     end)
-let () = GeneratedSpecMode.set_possible_values ["frama-c"; "acsl"; "safe"]
 
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.do_not_reset_on_copy ()
@@ -1496,7 +1495,7 @@ module GeneratedSpecCustom =
     end)
     (struct
       let option_name = "-generated-spec-custom"
-      let arg_name = "exits|assigns|allocates|terminates:frama-c|acsl|safe"
+      let arg_name = "c1:m1,c2:m2,..."
       let default = Datatype.String.Map.empty
       let help =
         "Fine-tune missing specs configuration by manually choosing modes for\
