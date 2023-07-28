@@ -342,25 +342,25 @@ export const reloadStatus: Server.GetRequest<null,null>= reloadStatus_internal;
 
 const fetchStatus_internal: Server.GetRequest<
   number,
-  { pending: number, updated: statusData[], removed: marker[],
-    reload: boolean }
+  { reload: boolean, removed: marker[], updated: statusData[],
+    pending: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.properties.fetchStatus',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jStatusData),
-            removed: Json.jArray(jMarker),
             reload: Json.jBoolean,
+            removed: Json.jArray(jMarker),
+            updated: Json.jArray(jStatusData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`status`](#status)  */
 export const fetchStatus: Server.GetRequest<
   number,
-  { pending: number, updated: statusData[], removed: marker[],
-    reload: boolean }
+  { reload: boolean, removed: marker[], updated: statusData[],
+    pending: number }
   >= fetchStatus_internal;
 
 const status_internal: State.Array<marker,statusData> = {

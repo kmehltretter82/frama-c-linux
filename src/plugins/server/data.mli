@@ -122,6 +122,9 @@ val jalist : 'a data -> 'a list data
 val jarray : 'a data -> 'a array data
 val joption : 'a data -> 'a option data
 
+val data_of_json : 'a data -> json -> 'a
+val data_to_json : 'a data -> 'a -> json
+
 (**
    Declare the derived names for the provided type.
    Shall not be used directely.
@@ -330,6 +333,7 @@ end
     - [Index()] for projectified datatypes,
     - [Static()] for project independant datatypes,
     - [Identified()] for projectified values already identified by integers.
+    - [Tagged()] for projectified values already identified by strings.
 
 *)
 (* -------------------------------------------------------------------------- *)
@@ -354,8 +358,9 @@ end
 module type Index =
 sig
   include S
-  val get : t -> int
-  val find : int -> t
+  type tag
+  val get : t -> tag
+  val find : tag -> t
   (** @raise Not_found if not registered. *)
 
   val clear : unit -> unit
@@ -363,10 +368,12 @@ sig
 end
 
 (** Builds an indexer that {i does not} depend on current project. *)
-module Static(M : Map)(I : Info) : Index with type t = M.key
+module Static(M : Map)(I : Info) :
+  Index with type t = M.key and type tag := int
 
 (** Builds a {i projectified} index. *)
-module Index(M : Map)(I : Info) : Index with type t = M.key
+module Index(M : Map)(I : Info) :
+  Index with type t = M.key and type tag := int
 
 (** Datatype already identified by unique integers. *)
 module type IdentifiedType =
@@ -376,7 +383,19 @@ sig
 end
 
 (** Builds a {i projectified} index on types with {i unique} identifiers. *)
-module Identified(A : IdentifiedType)(I : Info) : Index with type t = A.t
+module Identified(A : IdentifiedType)(I : Info) :
+  Index with type t = A.t and type tag := int
+
+(** Datatype already identified by unique integers. *)
+module type TaggedType =
+sig
+  type t
+  val id : t -> string
+end
+
+(** Builds a {i projectified} index on types with {i unique} identifiers. *)
+module Tagged(A : TaggedType)(I : Info) :
+  Index with type t = A.t and type tag := string
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Error handling}

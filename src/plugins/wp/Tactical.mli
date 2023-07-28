@@ -58,6 +58,7 @@ val get_bool : selection -> bool option
 val destruct : selection -> selection list
 
 val head : clause -> pred
+val equal : selection -> selection -> bool
 val is_empty : selection -> bool
 val selected : selection -> term
 val subclause : clause -> pred -> bool
@@ -257,8 +258,9 @@ val register : #tactical -> unit
 val export : #tactical -> tactical
 (** Register and returns the tactical *)
 
-val lookup : id:string -> tactical
 val iter : (tactical -> unit) -> unit
+val lookup : id:string -> tactical
+val lookup_param : tactical -> id:string -> parameter
 
 type computer = term list -> term
 val add_computer : string -> computer -> unit

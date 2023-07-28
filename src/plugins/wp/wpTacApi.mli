@@ -21,14 +21,5 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Sequent Pretty-Printer                                             --- *)
+(** Server API for Tactics *)
 (* -------------------------------------------------------------------------- *)
-
-class focused : Wtext.text ->
-  object
-    inherit Ptip.pseq
-    method popup : unit
-    method on_popup : (Widget.popup -> unit) -> unit
-    method button : title:string -> callback:(unit -> unit) ->
-      Format.formatter -> unit
-  end

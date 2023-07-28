@@ -244,6 +244,12 @@ let jpretty = Jbuffer.to_json
 
 type 'a data = (module S with type t = 'a)
 
+let data_of_json (type a) (d : a data) (js : json) : a =
+  let module M : S with type t = a = (val d) in M.of_json js
+
+let data_to_json (type a) (d : a data) (v : a) : json =
+  let module M : S with type t = a = (val d) in M.to_json v
+
 let junit : unit data = (module Junit)
 let jany : json data = (module Jany)
 let jbool : bool data = (module Jbool)
@@ -589,8 +595,9 @@ end
 module type Index =
 sig
   include S
-  val get : t -> int
-  val find : int -> t
+  type tag
+  val get : t -> tag
+  val find : tag -> t
   val clear : unit -> unit
 end
 
@@ -645,7 +652,7 @@ struct
 end
 
 module Static(M : Map)(I : Info)
-  : Index with type t = M.key =
+  : Index with type t = M.key and type tag := int =
 struct
   module INDEX = INDEXER(M)(I)
   let index = INDEX.create ()
@@ -662,7 +669,7 @@ struct
 end
 
 module Index(M : Map)(I : Info)
-  : Index with type t = M.key =
+  : Index with type t = M.key and type tag := int =
 struct
   module INDEX = INDEXER(M)(I)
   module TYPE : Datatype.S with type t = INDEX.index =
@@ -697,16 +704,30 @@ struct
 
 end
 
-module type IdentifiedType =
+(* -------------------------------------------------------------------------- *)
+(* --- Identified & Tagged Indexers                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+module type HASH =
 sig
   type t
-  val id : t -> int
+  type tag
+  val id : t -> tag
 end
 
-module Identified(A : IdentifiedType)(I : Info) : Index with type t = A.t =
+module type TAG =
+sig
+  type tag
+  val jtype : string -> jtype
+  val to_json : tag -> Json.t
+  val of_json : Json.t -> tag
+end
+
+module HASHED(T : TAG)(A : HASH with type tag := T.tag)(I : Info) :
+  Index with type t = A.t and type tag := T.tag =
 struct
 
-  type index = (int,A.t) Hashtbl.t
+  type index = (T.tag,A.t) Hashtbl.t
 
   module TYPE : Datatype.S with type t = index =
     Datatype.Make
@@ -728,20 +749,57 @@ struct
   let lookup () = STATE.get ()
   let clear () = Hashtbl.clear (lookup())
 
-  let get = A.id
   let find id = Hashtbl.find (lookup()) id
+
+  let get x =
+    let tag = A.id x in
+    let hash = lookup () in
+    if not (Hashtbl.mem hash tag) then
+      Hashtbl.add hash tag x ;
+    tag
 
   include
     (struct
       type t = A.t
-      let jtype = Jindex I.name
-      let to_json a = `Int (get a)
+      let jtype = T.jtype I.name
+      let to_json a = T.to_json (get a)
       let of_json js =
-        let k = Ju.to_int js in
+        let k = T.of_json js in
         try find k
-        with Not_found -> failure "[%s] No registered id #%d" I.name k
+        with Not_found ->
+          failure "[%s] Not registered tag (%a)" I.name Json.pp js
     end)
 
 end
+
+module type IdentifiedType =
+sig
+  type t
+  val id : t -> int
+end
+
+module Identified(A : IdentifiedType)(I : Info)
+  : Index with type t = A.t and type tag := int =
+  HASHED
+    (struct
+      include Jint
+      type tag = int
+      let jtype a = Jindex a
+    end)(A)(I)
+
+module type TaggedType =
+sig
+  type t
+  val id : t -> string
+end
+
+module Tagged(A : TaggedType)(I : Info)
+  : Index with type t = A.t and type tag := string =
+  HASHED
+    (struct
+      include Jstring
+      type tag = string
+      let jtype a = Jkey a
+    end)(A)(I)
 
 (* -------------------------------------------------------------------------- *)

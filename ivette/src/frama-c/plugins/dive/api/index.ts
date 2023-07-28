@@ -493,25 +493,25 @@ export const reloadGraph: Server.GetRequest<null,null>= reloadGraph_internal;
 
 const fetchGraph_internal: Server.GetRequest<
   number,
-  { pending: number, updated: graphData[], removed: Json.key<'#graph'>[],
-    reload: boolean }
+  { reload: boolean, removed: Json.key<'#graph'>[], updated: graphData[],
+    pending: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.dive.fetchGraph',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jGraphData),
-            removed: Json.jArray(Json.jKey<'#graph'>('#graph')),
             reload: Json.jBoolean,
+            removed: Json.jArray(Json.jKey<'#graph'>('#graph')),
+            updated: Json.jArray(jGraphData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`graph`](#graph)  */
 export const fetchGraph: Server.GetRequest<
   number,
-  { pending: number, updated: graphData[], removed: Json.key<'#graph'>[],
-    reload: boolean }
+  { reload: boolean, removed: Json.key<'#graph'>[], updated: graphData[],
+    pending: number }
   >= fetchGraph_internal;
 
 const graph_internal: State.Array<Json.key<'#graph'>,graphData> = {

@@ -24,8 +24,8 @@ type state =
   | Empty
   | Proof of ProofEngine.tree
   | Forking of ProofEngine.tree * ProofEngine.fork * Task.pool
-  | Composer of ProofEngine.tree * GuiTactic.composer * GuiSequent.target
-  | Browser of ProofEngine.tree * GuiTactic.browser * GuiSequent.target
+  | Composer of ProofEngine.tree * GuiTactic.composer * Ptip.target
+  | Browser of ProofEngine.tree * GuiTactic.browser * Ptip.target
 
 let on_proof_context proof job data =
   let ctxt = ProofEngine.tree_context proof in
@@ -561,7 +561,7 @@ class pane (gprovers : GuiConfig.provers) =
             text#hrule ;
             scripter#tree proof ;
             text#hrule ;
-            text#printf "%t@." (printer#goal (ProofEngine.head_goal proof)) ;
+            text#printf "%a@." printer#pp_goal (ProofEngine.head_goal proof) ;
             text#printf "@{<bf>Goal id:@}  %s@." main.po_gid ;
             text#printf "@{<bf>Short id:@} %s@." main.po_sid ;
             text#hrule ;
@@ -573,11 +573,11 @@ class pane (gprovers : GuiConfig.provers) =
             text#clear ;
             let quit () =
               state <- Proof proof ;
-              printer#restore tgt ;
+              printer#restore ~focus:`Select tgt ;
               self#update in
             text#printf "%t@." (composer#print cc ~quit) ;
             text#hrule ;
-            text#printf "%t@." (printer#goal (ProofEngine.head_goal proof)) ;
+            text#printf "%a@." printer#pp_goal (ProofEngine.head_goal proof) ;
           end ()
       | Browser(proof,cc,tgt) ->
         on_proof_context proof
@@ -585,11 +585,11 @@ class pane (gprovers : GuiConfig.provers) =
             text#clear ;
             let quit () =
               state <- Proof proof ;
-              printer#restore tgt ;
+              printer#restore ~focus:`Select tgt ;
               self#update in
             text#printf "%t@." (browser#print cc ~quit) ;
             text#hrule ;
-            text#printf "%t@." (printer#goal (ProofEngine.head_goal proof)) ;
+            text#printf "%a@." printer#pp_goal (ProofEngine.head_goal proof) ;
           end ()
       | Forking _ -> ()
 

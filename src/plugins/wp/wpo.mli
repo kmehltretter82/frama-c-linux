@@ -53,6 +53,7 @@ sig
   val dummy : t
   val trivial : t
   val is_trivial : t -> bool
+  val is_computed : t -> bool
   val make : Conditions.sequent -> t
   val compute : pid:WpPropId.prop_id -> t -> unit
   val compute_proof : pid:WpPropId.prop_id -> t -> F.pred
@@ -116,14 +117,7 @@ module S : Datatype.S_with_collections with type t = po
 module Index : Map.OrderedType with type t = index
 module Gmap : Map.S with type key = index
 
-(** Dynamically exported
-    @since Nitrogen-20111001
-*)
 val get_gid: t -> string
-
-(** Dynamically exported
-    @since Oxygen-20120901
-*)
 val get_property: t -> Property.t
 val get_index : t -> index
 val get_label : t -> string
@@ -168,6 +162,8 @@ val add_removed_hook : (t -> unit) -> unit
 val add_cleared_hook : (unit -> unit) -> unit
 (** Register a hook when the entire table is cleared. *)
 
+val modified : t -> unit
+val computed : t -> bool
 val compute : t -> Definitions.axioms option * Conditions.sequent
 
 (** Warning: Prover results are stored as they are from prover output,
@@ -221,15 +217,7 @@ val iter :
   ?on_goal:(t -> unit) ->
   unit -> unit
 
-(** Dynamically exported.
-    @since Nitrogen-20111001
-*)
 val iter_on_goals: (t -> unit) -> unit
-
-(** All POs related to a given property.
-    Dynamically exported
-    @since Oxygen-20120901
-*)
 val goals_of_property: Property.t -> t list
 
 val bar : string
@@ -247,9 +235,6 @@ val pp_axiomatics : Format.formatter -> string option -> unit
 val pp_function : Format.formatter -> Kernel_function.t -> string option -> unit
 val pp_goal_flow : Format.formatter -> t -> unit
 val pp_flow : Format.formatter -> unit
-
-(** Dynamically exported. *)
-val prover_of_name : string -> prover option
 
 (* -------------------------------------------------------------------------- *)
 (* --- Generators                                                         --- *)

@@ -447,8 +447,8 @@ let iter f =
 (* --- JSON To MarkDown                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let key kd = Md.plain (Printf.sprintf "`#%s`" kd)
-let index kd = Md.plain (Printf.sprintf "`#0%s`" kd)
+let key kd = Md.plain (Printf.sprintf "`$%s`" kd)
+let index kd = Md.plain (Printf.sprintf "`#%s`" kd)
 let litteral tag = Md.plain (Printf.sprintf "`\"%s\"`" tag)
 
 type pp = {

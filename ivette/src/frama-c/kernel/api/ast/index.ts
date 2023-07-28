@@ -210,25 +210,25 @@ export const reloadMarkerAttributes: Server.GetRequest<null,null>= reloadMarkerA
 
 const fetchMarkerAttributes_internal: Server.GetRequest<
   number,
-  { pending: number, updated: markerAttributesData[], removed: marker[],
-    reload: boolean }
+  { reload: boolean, removed: marker[], updated: markerAttributesData[],
+    pending: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.fetchMarkerAttributes',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jMarkerAttributesData),
-            removed: Json.jArray(jMarker),
             reload: Json.jBoolean,
+            removed: Json.jArray(jMarker),
+            updated: Json.jArray(jMarkerAttributesData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`markerAttributes`](#markerattributes)  */
 export const fetchMarkerAttributes: Server.GetRequest<
   number,
-  { pending: number, updated: markerAttributesData[], removed: marker[],
-    reload: boolean }
+  { reload: boolean, removed: marker[], updated: markerAttributesData[],
+    pending: number }
   >= fetchMarkerAttributes_internal;
 
 const markerAttributes_internal: State.Array<marker,markerAttributesData> = {
@@ -348,25 +348,25 @@ export const reloadFunctions: Server.GetRequest<null,null>= reloadFunctions_inte
 
 const fetchFunctions_internal: Server.GetRequest<
   number,
-  { pending: number, updated: functionsData[],
-    removed: Json.key<'#functions'>[], reload: boolean }
+  { reload: boolean, removed: Json.key<'#functions'>[],
+    updated: functionsData[], pending: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.fetchFunctions',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jFunctionsData),
-            removed: Json.jArray(Json.jKey<'#functions'>('#functions')),
             reload: Json.jBoolean,
+            removed: Json.jArray(Json.jKey<'#functions'>('#functions')),
+            updated: Json.jArray(jFunctionsData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`functions`](#functions)  */
 export const fetchFunctions: Server.GetRequest<
   number,
-  { pending: number, updated: functionsData[],
-    removed: Json.key<'#functions'>[], reload: boolean }
+  { reload: boolean, removed: Json.key<'#functions'>[],
+    updated: functionsData[], pending: number }
   >= fetchFunctions_internal;
 
 const functions_internal: State.Array<Json.key<'#functions'>,functionsData> = {
@@ -453,18 +453,18 @@ const setFiles_internal: Server.SetRequest<string[],null> = {
 export const setFiles: Server.SetRequest<string[],null>= setFiles_internal;
 
 const parseExpr_internal: Server.GetRequest<
-  { term: string, stmt: marker },
+  { stmt: marker, term: string },
   marker
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.parseExpr',
-  input:  Json.jObject({ term: Json.jString, stmt: jMarker,}),
+  input:  Json.jObject({ stmt: jMarker, term: Json.jString,}),
   output: jMarker,
   signals: [],
 };
 /** Parse a C expression and returns the associated marker */
 export const parseExpr: Server.GetRequest<
-  { term: string, stmt: marker },
+  { stmt: marker, term: string },
   marker
   >= parseExpr_internal;
 

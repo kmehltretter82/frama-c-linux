@@ -21,14 +21,13 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Sequent Pretty-Printer                                             --- *)
+(** Server API for WP *)
 (* -------------------------------------------------------------------------- *)
 
-class focused : Wtext.text ->
-  object
-    inherit Ptip.pseq
-    method popup : unit
-    method on_popup : (Widget.popup -> unit) -> unit
-    method button : title:string -> callback:(unit -> unit) ->
-      Format.formatter -> unit
-  end
+val package : Server.Package.package
+
+module Prover : Server.Data.S with type t = VCS.prover
+module Result : Server.Data.S with type t = VCS.result
+module Goal : Server.Data.S with type t = Wpo.t
+
+(* -------------------------------------------------------------------------- *)

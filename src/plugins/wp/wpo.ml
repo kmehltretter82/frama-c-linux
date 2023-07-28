@@ -186,6 +186,7 @@ struct
     obligation = F.p_false ;
   }
 
+  let is_computed g = g.simplified
   let is_trivial g = Conditions.is_trivial g.sequent
 
   let dkey = Wp_parameters.register_category "qed"
@@ -506,17 +507,8 @@ let () = Type.set_ml_name ResultType.ty (Some "Wpo.result")
 (* --- Getters                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let get_gid =
-  Dynamic.register
-    ~plugin:"Wp" "Wpo.get_gid"
-    (Datatype.func WpoType.ty Datatype.string)
-    (fun g -> g.po_gid)
-
-let get_property =
-  Dynamic.register
-    ~plugin:"Wp" "Wpo.get_property"
-    (Datatype.func WpoType.ty Property.ty)
-    (fun g -> WpPropId.property_of_id g.po_pid)
+let get_gid g = g.po_gid
+let get_property g = WpPropId.property_of_id g.po_pid
 
 let qed_time wpo =
   match wpo.po_formula with
@@ -578,6 +570,12 @@ let cleared_hooks : (unit -> unit) list ref = ref []
 let add_modified_hook f = modified_hooks := !modified_hooks @ [f]
 let add_removed_hook f = removed_hooks := !removed_hooks @ [f]
 let add_cleared_hook f = cleared_hooks := !cleared_hooks @ [f]
+
+let modified g =
+  List.iter (fun f -> f g) !modified_hooks
+
+let removed g =
+  List.iter (fun f -> f g) !removed_hooks
 
 (* -------------------------------------------------------------------------- *)
 (* --- Wpo Database                                                       --- *)
@@ -698,7 +696,7 @@ let add g =
           Wp_parameters.feedback ~ontty:`Feedback "Computing [%d goals...]" !added ;
         added := 0 ;
       end ;
-    List.iter (fun f -> f g) !modified_hooks ;
+    modified g ;
   end
 
 let remove g =
@@ -715,7 +713,7 @@ let remove g =
     end ;
     system.results <- WPOmap.remove g system.results ;
     Hproof.remove system.proofs (proof g ip) ;
-    List.iter (fun f -> f g) !removed_hooks ;
+    removed g ;
   end
 
 let warnings = function
@@ -751,7 +749,7 @@ let clear_results g =
   try
     let rs = WPOmap.find g system.results in
     Results.clear rs ;
-    List.iter (fun f -> f g) !modified_hooks ;
+    modified g ;
   with Not_found -> ()
 
 let set_result g p r =
@@ -797,7 +795,7 @@ let set_result g p r =
       if smoke && unproved && proved then
         WpReached.set_doomed emitter g.po_pid ;
     end ;
-  List.iter (fun f -> f g) !modified_hooks
+  modified g
 
 let has_verdict g p =
   let system = SYSTEM.get () in
@@ -834,12 +832,21 @@ let resolve g =
     ( set_result g VCS.Qed result ; true )
   else false
 
+let computed g =
+  match g.po_formula with
+  | GoalAnnot { VC_Annot.goal = goal } ->
+    GOAL.is_computed goal
+  | GoalLemma _ -> false
+
 let compute g =
   let ctxt = get_context g in
   match g.po_formula with
   | GoalAnnot { VC_Annot.axioms ; VC_Annot.goal = goal } ->
     let pid = g.po_pid in
-    axioms , WpContext.on_context ctxt (GOAL.compute_descr ~pid) goal
+    axioms ,
+    let qed = GOAL.is_computed goal in
+    let seq = WpContext.on_context ctxt (GOAL.compute_descr ~pid) goal in
+    if not qed then modified g ; seq
   | GoalLemma ({ VC_Lemma.depends = depends ; VC_Lemma.lemma = lemma } as w) ->
     let open Definitions in
     Some( lemma.l_cluster , depends ) ,
@@ -950,10 +957,7 @@ let iter ?ip ?index ?on_axiomatics ?on_behavior ?on_goal () =
       with Not_found -> ()
     end
 
-let iter_on_goals =
-  Dynamic.register ~plugin:"Wp" "Wpo.iter_on_goals"
-    (Datatype.func (Datatype.func WpoType.ty Datatype.unit) Datatype.unit)
-    (fun on_goal -> iter ~on_goal ())
+let iter_on_goals f = iter ~on_goal:f ()
 
 let goals_of_property prop =
   let system = SYSTEM.get () in
@@ -962,16 +966,6 @@ let goals_of_property prop =
     with Not_found -> WPOset.empty
   in
   WPOset.elements poset
-
-let goals_of_property =
-  Dynamic.register ~plugin:"Wp" "Wpo.goals_of_property"
-    (Datatype.func Property.ty (Datatype.list WpoType.ty))
-    goals_of_property
-
-let prover_of_name =
-  Dynamic.register ~plugin:"Wp" "Wpo.prover_of_name"
-    (Datatype.func Datatype.string (Datatype.option ProverType.ty))
-    VCS.parse_prover
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover and Files                                                   --- *)
@@ -982,15 +976,6 @@ let get_model w = w.po_model
 let get_logfile w prover result =
   let model = get_model w in
   DISK.cache_log ~pid:w.po_pid ~model ~prover ~result
-
-let _ignore =
-  Dynamic.register ~plugin:"Wp" "Wpo.file_for_log_proof"
-    (Datatype.func2
-       WpoType.ty ProverType.ty
-       (Datatype.pair Datatype.string Datatype.string))
-    (fun w p ->
-       (DISK.file_logout ~pid:w.po_pid ~model:(get_model w) ~prover:p,
-        DISK.file_logerr ~pid:w.po_pid ~model:(get_model w) ~prover:p))
 
 let pp_logfile fmt w prover =
   let model = get_model w in

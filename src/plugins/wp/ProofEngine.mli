@@ -30,10 +30,19 @@ type tree
 (** A proof node *)
 type node
 
+module Node :
+sig
+  type t = node
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+  val pretty : Format.formatter -> t -> unit
+end
+
 val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
 val proof : main:Wpo.t -> tree
 val reset : tree -> unit
-val remove : Wpo.t -> unit
+val clear : Wpo.t -> unit
 
 (** Re-compute stats & set status of the entire script *)
 val validate : tree -> unit
@@ -61,9 +70,10 @@ val set_saved : tree -> bool -> unit
 val status : tree -> status
 val current : tree -> current
 val goto : tree -> position -> unit
-
+val root : tree -> node
 val main : tree -> Wpo.t
 val goal : node -> Wpo.t
+val tree : node -> tree
 val head : tree -> node option
 val head_goal : tree -> Wpo.t
 val tree_context : tree -> WpContext.t
@@ -84,6 +94,7 @@ val set_hint : node -> string -> unit
 
 val forward : tree -> unit
 val cancel : tree -> unit
+val remove : tree -> node -> unit
 
 type fork
 val anchor : tree -> ?node:node -> unit -> node

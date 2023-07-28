@@ -72,22 +72,22 @@ import { tagDefault } from 'frama-c/kernel/api/data';
 
 const getConfig_internal: Server.GetRequest<
   null,
-  { pluginpath: string[], datadir: string[], version: string }
+  { version: string, datadir: string[], pluginpath: string[] }
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.services.getConfig',
   input:  Json.jNull,
   output: Json.jObject({
-            pluginpath: Json.jArray(Json.jString),
-            datadir: Json.jArray(Json.jString),
             version: Json.jString,
+            datadir: Json.jArray(Json.jString),
+            pluginpath: Json.jArray(Json.jString),
           }),
   signals: [],
 };
 /** Frama-C Kernel configuration */
 export const getConfig: Server.GetRequest<
   null,
-  { pluginpath: string[], datadir: string[], version: string }
+  { version: string, datadir: string[], pluginpath: string[] }
   >= getConfig_internal;
 
 const load_internal: Server.SetRequest<string,string | undefined> = {
@@ -211,25 +211,25 @@ export const reloadMessage: Server.GetRequest<null,null>= reloadMessage_internal
 
 const fetchMessage_internal: Server.GetRequest<
   number,
-  { pending: number, updated: messageData[], removed: Json.key<'#message'>[],
-    reload: boolean }
+  { reload: boolean, removed: Json.key<'#message'>[], updated: messageData[],
+    pending: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.services.fetchMessage',
   input:  Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jMessageData),
-            removed: Json.jArray(Json.jKey<'#message'>('#message')),
             reload: Json.jBoolean,
+            removed: Json.jArray(Json.jKey<'#message'>('#message')),
+            updated: Json.jArray(jMessageData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`message`](#message)  */
 export const fetchMessage: Server.GetRequest<
   number,
-  { pending: number, updated: messageData[], removed: Json.key<'#message'>[],
-    reload: boolean }
+  { reload: boolean, removed: Json.key<'#message'>[], updated: messageData[],
+    pending: number }
   >= fetchMessage_internal;
 
 const message_internal: State.Array<Json.key<'#message'>,messageData> = {

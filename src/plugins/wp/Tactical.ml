@@ -105,6 +105,33 @@ let head = function
 
 let is_empty = function Empty -> true | _ -> false
 
+let eq_clause a b =
+  a == b ||
+  match a, b with
+  | Goal p, Goal q -> Lang.F.eqp p q
+  | Step u, Step v -> u == v
+  | Goal _, Step _ | Step _, Goal _ -> false
+
+let eq_compose a b =
+  a == b ||
+  match a,b with
+  | Cint n, Cint m -> Integer.equal n m
+  | Range(a,b) , Range(p,q) -> a = b && p = q
+  | Code(ta,_,_), Code(tb,_,_) -> Lang.F.equal ta tb
+  | (Cint _ | Range _ | Code _), (Cint _ | Range _ | Code _) -> false
+
+let rec equal a b =
+  a == b ||
+  match a,b with
+  | Empty,Empty -> true
+  | Clause ca, Clause cb -> eq_clause ca cb
+  | Inside(ca,ta), Inside(cb,tb) -> eq_clause ca cb && Lang.F.equal ta tb
+  | Compose ca, Compose cb -> eq_compose ca cb
+  | Multi sa , Multi sb -> Qed.Hcons.equal_list equal sa sb
+  | (Empty | Clause _ | Inside _ | Compose _ | Multi _) ,
+    (Empty | Clause _ | Inside _ | Compose _ | Multi _)
+    -> false
+
 let composed = function
   | Cint a -> e_zint a
   | Range(a,_) -> e_int a
@@ -476,6 +503,8 @@ let register t =
 let export t = register t ; (t :> t)
 let iter f = Tmap.iter (fun _id t -> f t) !tacticals
 let lookup ~id = Tmap.find id !tacticals
+let lookup_param tactic ~id =
+  List.find (fun p -> pident p = id) tactic#params
 
 (* -------------------------------------------------------------------------- *)
 (* --- Default Composers                                                  --- *)

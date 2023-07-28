@@ -40,6 +40,15 @@ and script =
   | Script of ProofScript.jscript (* to replay *)
   | Tactic of ProofScript.jtactic * (string * node) list (* played *)
 
+module Node =
+struct
+  type t = node
+  let hash t = Wpo.S.hash t.goal
+  let equal a b = Wpo.S.equal a.goal b.goal
+  let compare a b = Wpo.S.compare a.goal b.goal
+  let pretty fmt a = Wpo.S.pretty fmt a.goal
+end
+
 type tree = {
   main : Wpo.t ; (* Main goal to be proved. *)
   mutable pool : Lang.F.pool option ; (* Global pool variable *)
@@ -102,7 +111,8 @@ let rec reset_node n =
   n.strategy <- None ;
   match n.script with
   | Opened | Script _ -> ()
-  | Tactic(_,children) -> iter_all reset_node children
+  | Tactic(_,children) ->
+    n.script <- Opened ; iter_all reset_node children
 
 let reset_root = function None -> () | Some n -> reset_node n
 
@@ -116,7 +126,7 @@ let reset t =
     t.saved <- false ;
   end
 
-let remove w = if PROOFS.mem w then reset (PROOFS.get w)
+let clear w = if PROOFS.mem w then reset (PROOFS.get w)
 
 let saved t = t.saved
 let set_saved t s = t.saved <- s
@@ -200,7 +210,9 @@ let head t = t.head
 let head_goal t = match t.head with
   | None -> t.main
   | Some n -> n.goal
+let tree n = proof ~main:n.tree
 let goal n = n.goal
+
 let stats n = n.stats
 let tree_context t = Wpo.get_context t.main
 let node_context n = Wpo.get_context n.goal
@@ -284,20 +296,18 @@ let rec forward t =
         forward t ;
       end
 
+let remove t node =
+  begin
+    Wpo.clear_results node.goal ;
+    t.head <- node.parent ;
+    if t.head = None then t.root <- None ;
+    reset_node node ;
+  end
+
 let cancel t =
   match t.head with
   | None -> ()
-  | Some node ->
-    begin
-      Wpo.clear_results node.goal ;
-      match node.script with
-      | Opened ->
-        t.head <- node.parent ;
-        if t.head = None then t.root <- None ;
-      | Tactic _ | Script _ ->
-        (*TODO: save the current script *)
-        node.script <- Opened ;
-    end
+  | Some node -> remove t node
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sub-Goal                                                           --- *)
@@ -359,6 +369,11 @@ let mk_root ~tree =
   tree.root <- root ;
   tree.head <- root ;
   node
+
+let root tree =
+  match tree.root with
+  | Some node -> node
+  | None -> mk_root ~tree
 
 (* -------------------------------------------------------------------------- *)
 (* --- Forking                                                            --- *)

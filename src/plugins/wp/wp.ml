@@ -227,9 +227,10 @@ module Wp_error = Wp_error
 
 (** {2 Printers and Reporting} *)
 
+module Plang = Plang
 module Pcfg = Pcfg
 module Pcond = Pcond
-module Plang = Plang
+module Ptip = Ptip
 module Rformat = Rformat
 module Stats = Stats
 module WpReport = WpReport
