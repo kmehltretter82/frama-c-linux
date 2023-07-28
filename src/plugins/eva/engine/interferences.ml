@@ -105,6 +105,9 @@ let current =
       shared_bases = Base.Hptset.empty;
     })
 
+let is_empty (Interferences { states }) =
+  ThreadTable.length states = 0
+
 let structure_mismatch () =
   Self.abort
     "different sets of abstract domains or structure used between two thread \
@@ -209,7 +212,7 @@ let inject (type a) ~(domain : a domain) (interferences : t) (state : a) : a =
   if is_empty interferences
   (* No interferences computed, single threaded analysis *)
   then state
-  else begin
+  else begin    
     let need_injection =
       match Dom.get MtDomain.Domain.key with
       (* Domain disabled, no information about memory read/written, always inject *)
