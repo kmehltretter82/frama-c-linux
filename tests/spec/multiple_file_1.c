@@ -10,4 +10,8 @@ extern int f(int x);
 /*@ requires x >= 0; */
 extern int g(int x);
 
-int main () { g(0); return f(0); }
+extern int t1[sizeof(long)];
+extern int t2[sizeof(int)];
+extern int t3[sizeof(long long)];
+
+int main () { g(0); t1[0] = 0; t2[0] = 0; t3[0] = 0; return f(0); }
