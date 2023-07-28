@@ -20,4 +20,59 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val populate_funspec : Cil_types.kernel_function -> Cil_types.spec -> bool
+open Cil_types
+
+type mode = ACSL | Safe | Frama_C | Skip | Other of string
+
+type 'a result = Kept | Generated of 'a
+
+type exits = (termination_kind * identified_predicate) list
+type requires = identified_predicate list
+type terminates = identified_predicate option
+
+type 'a gen = (kernel_function -> spec -> 'a)
+type status = Property_status.emitted_status
+
+type 'a elem = {
+  gen: 'a gen option;
+  status : status option;
+}
+
+type custom_mode = {
+  custom_exits: exits elem;
+  custom_assigns: assigns elem;
+  custom_requires: requires elem;
+  custom_allocates: allocation elem;
+  custom_terminates: terminates elem;
+}
+
+val custom_empty : custom_mode
+
+module type Generator =
+sig
+
+  type clause
+  type behaviors
+
+  val has_behavior : string -> behaviors -> bool
+  val collect_behaviors : spec -> behaviors
+  val completes : string list list -> behaviors -> clause list option
+
+  val acsl_default : unit -> clause
+  val safe_default : bool -> clause
+  val frama_c_default : kernel_function -> clause
+  val combine_default : clause list -> clause
+  val custom_default : string -> kernel_function -> spec -> clause
+
+  val emit : mode -> kernel_function -> funbehavior -> clause result -> unit
+end
+
+val register :
+  ?gen_exits:exits gen -> ?status_exits:status ->
+  ?gen_assigns:assigns gen -> ?status_assigns:status ->
+  ?gen_requires:requires gen -> ?gen_allocates:allocation gen ->
+  ?status_allocates:status -> ?gen_terminates:terminates gen ->
+  ?status_terminates:status ->
+  string -> unit
+
+val populate_funspec : kernel_function -> spec -> bool

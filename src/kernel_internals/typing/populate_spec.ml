@@ -23,7 +23,6 @@
 open Cil_types
 
 type mode = ACSL | Safe | Frama_C | Skip | Other of string
-[@@ warning "-37"] (* TODO: to build Other value *)
 
 type config = {
   exits: mode;
@@ -34,6 +33,37 @@ type config = {
 }
 
 type 'a result = Kept | Generated of 'a
+
+type exits = (termination_kind * identified_predicate) list
+type requires = identified_predicate list
+type terminates = identified_predicate option
+
+type 'a gen = (kernel_function -> spec -> 'a)
+type status = Property_status.emitted_status
+
+type 'a elem = {
+  gen: 'a gen option;
+  status : status option;
+}
+
+type custom_mode = {
+  custom_exits: exits elem;
+  custom_assigns: assigns elem;
+  custom_requires: requires elem;
+  custom_allocates: allocation elem;
+  custom_terminates: terminates elem;
+}
+
+let custom_empty =
+  let gen, status = None, None in {
+    custom_exits = {gen; status};
+    custom_assigns = {gen; status};
+    custom_requires = {gen; status};
+    custom_allocates = {gen; status};
+    custom_terminates = {gen; status};
+  }
+
+let custom_modes = Hashtbl.create 17
 
 let default = Cil.default_behavior_name
 
@@ -52,6 +82,24 @@ let completes_generic (type clause) completes table =
     with Not_found -> ()
   in
   try List.iter collect completes; None with Ok l -> Some l
+
+let register ?gen_exits ?status_exits ?gen_assigns ?status_assigns
+    ?gen_requires ?gen_allocates ?status_allocates ?gen_terminates
+    ?status_terminates name =
+  let f gen status = {gen; status} in
+  let mode = {
+    custom_exits = f gen_exits status_exits;
+    custom_assigns = f gen_assigns status_assigns;
+    custom_requires = f gen_requires None;
+    custom_allocates = f gen_allocates status_allocates;
+    custom_terminates = f gen_terminates status_terminates;
+  } in
+  Hashtbl.replace custom_modes name mode
+
+let get_custom_mode mode =
+  match Hashtbl.find_opt custom_modes mode with
+  | None -> Kernel.abort "Mode %s is not registered" mode
+  | Some custom_mode -> custom_mode
 
 module type Generator =
 sig
@@ -75,6 +123,7 @@ end
 
 module Make(G : Generator) =
 struct
+
   let get_default mode kf spec =
     let table = G.collect_behaviors spec in
     if mode = Skip || G.has_behavior default table then
@@ -102,7 +151,7 @@ end
 module Exits_generator =
 struct
 
-  type clause = (termination_kind * identified_predicate) list
+  type clause = exits
   type behaviors = (string, clause) Hashtbl.t
 
   let has_behavior name behaviors =
@@ -139,8 +188,15 @@ struct
     in
     [ Exits, Logic_const.new_predicate @@ Logic_const.pors preds ]
 
-  let custom_default  _mode _kf _spec =
-    acsl_default ()
+  let custom_default mode kf spec =
+    let custom_mode = get_custom_mode mode in
+    match custom_mode.custom_exits.gen with
+    | None ->
+      Kernel.warning
+        "Custom generation from mode %s not defined for exits, using \
+         frama-c mode instead" mode;
+      frama_c_default kf
+    | Some f -> f kf spec
 
   let emit_status kf bhv exits status =
     let ppt_l =
@@ -153,8 +209,16 @@ struct
     | Generated _ when Kernel_function.has_definition kf -> ()
     | Generated exits ->
       match mode with
+      | Skip | ACSL | Safe -> ()
       | Frama_C -> emit_status kf bhv exits Property_status.Dont_know
-      | Skip | ACSL | Safe | Other _ -> ()
+      | Other mode ->
+        let custom_mode = get_custom_mode mode in
+        match custom_mode.custom_exits.status with
+        | None ->
+          Kernel.warning
+            "Custom status from mode %s not defined for exits" mode;
+          ()
+        | Some pst -> emit_status kf bhv exits pst
 
 end
 
@@ -217,8 +281,15 @@ struct
     in
     Writes (List.sort_uniq compare_from froms)
 
-  let custom_default _mode _kf _spec =
-    acsl_default ()
+  let custom_default mode kf spec =
+    let custom_mode = get_custom_mode mode in
+    match custom_mode.custom_assigns.gen with
+    | None ->
+      Kernel.warning
+        "Custom generation from mode %s not defined for assigns, using \
+         frama-c mode instead" mode;
+      frama_c_default kf
+    | Some f -> f kf spec
 
   let emit_status kf bhv assigns status =
     let ppt_opt =
@@ -244,15 +315,23 @@ struct
     | Generated _ when Kernel_function.has_definition kf -> ()
     | Generated assigns ->
       match mode with
+      | ACSL | Safe | Skip -> ()
       | Frama_C -> emit_status kf bhv assigns Property_status.Dont_know
-      | ACSL | Safe | Skip | Other _ -> ()
+      | Other mode ->
+        let custom_mode = get_custom_mode mode in
+        match custom_mode.custom_assigns.status with
+        | None ->
+          Kernel.warning
+            "Custom status from mode %s not defined for assigns" mode;
+          ()
+        | Some pst -> emit_status kf bhv assigns pst
 
 end
 
 module Requires_generator =
 struct
 
-  type clause = identified_predicate list
+  type clause = requires
   type behaviors = (string, clause) Hashtbl.t
 
   let has_behavior name behaviors =
@@ -290,8 +369,15 @@ struct
     in
     [ Logic_const.new_predicate preds ]
 
-  let custom_default  _mode _kf _spec =
-    acsl_default ()
+  let custom_default mode kf spec =
+    let custom_mode = get_custom_mode mode in
+    match custom_mode.custom_requires.gen with
+    | None ->
+      Kernel.warning
+        "Custom generation from mode %s not defined for requires, using \
+         frama-c mode instead" mode;
+      frama_c_default kf
+    | Some f -> f kf spec
 
   let emit _ _ _ _ = ()
 
@@ -339,8 +425,15 @@ struct
     let a = List.sort_uniq Cil_datatype.Identified_term.compare a in
     FreeAlloc(f, a)
 
-  let custom_default _mode _kf _spec =
-    acsl_default ()
+  let custom_default mode kf spec =
+    let custom_mode = get_custom_mode mode in
+    match custom_mode.custom_allocates.gen with
+    | None ->
+      Kernel.warning
+        "Custom generation from mode %s not defined for allocates, using \
+         frama-c mode instead" mode;
+      frama_c_default kf
+    | Some f -> f kf spec
 
   let emit_status kf bhv allocates status =
     let ppt_opt =
@@ -354,18 +447,26 @@ struct
     | Generated _ when Kernel_function.has_definition kf -> ()
     | Generated allocates ->
       match mode with
+      | Skip | Safe -> ()
       | ACSL ->
         emit_status kf bhv allocates Property_status.True
       | Frama_C ->
         emit_status kf bhv allocates Property_status.Dont_know
-      | Other _ | Safe | Skip -> ()
+      | Other mode ->
+        let custom_mode = get_custom_mode mode in
+        match custom_mode.custom_allocates.status with
+        | None ->
+          Kernel.warning
+            "Custom status from mode %s not defined for allocates" mode;
+          ()
+        | Some pst -> emit_status kf bhv allocates pst
 
 end
 
 module Terminates_generator =
 struct
 
-  type clause = identified_predicate option
+  type clause = terminates
   type behaviors = bool
 
   let has_behavior name behaviors =
@@ -390,8 +491,15 @@ struct
   let combine_default _ =
     assert false
 
-  let custom_default _mode _kf _spec =
-    acsl_default ()
+  let custom_default mode kf spec =
+    let custom_mode = get_custom_mode mode in
+    match custom_mode.custom_terminates.gen with
+    | None ->
+      Kernel.warning
+        "Custom generation from mode %s not defined for terminates, using \
+         frama-c mode instead" mode;
+      frama_c_default kf
+    | Some f -> f kf spec
 
   let emit_status kf _ terminates status =
     match terminates with
@@ -405,11 +513,19 @@ struct
     | Generated _ when Kernel_function.has_definition kf -> ()
     | Generated terminates ->
       match mode with
+      | Skip -> ()
       | ACSL ->
         emit_status kf bhv terminates Property_status.True
       | Safe | Frama_C ->
         emit_status kf bhv terminates Property_status.Dont_know
-      | Skip | Other _ -> ()
+      | Other mode ->
+        let custom_mode = get_custom_mode mode in
+        match custom_mode.custom_terminates.status with
+        | None ->
+          Kernel.warning
+            "Custom status from mode %s not defined for terminates" mode;
+          ()
+        | Some pst -> emit_status kf bhv terminates pst
 
 end
 
@@ -424,11 +540,7 @@ let get_mode = function
   | "acsl" -> ACSL
   | "safe" -> Safe
   | "skip" -> Skip
-  | s ->
-    (* TODO: to build Other value *)
-    Kernel.abort
-      "@[@['%s'@] is not a supported mode for -generated-spec-mode.@ Accepted \
-      keys are 'acsl', 'frama-c', 'safe' and 'skip'.@]@." s
+  | s -> Other s
 
 let build_config mode = {
   exits = mode;
@@ -454,8 +566,8 @@ let get_config () =
     | s ->
       Kernel.abort
         "@[@['%s'@] is not a valid key for -generated-spec-custom.@ Accepted \
-        keys are 'exits', 'assigns', 'requires', 'allocates' and \
-        'terminates'.@]@." s
+         keys are 'exits', 'assigns', 'requires', 'allocates' and \
+         'terminates'.@]@." s
   in
   Kernel.GeneratedSpecCustom.fold collect default
 
