@@ -58,8 +58,8 @@ test("launch app", async () => {
     console.log("Screenshot taken");
 
     // Click on the Console tab in the right menu.
-    // await window.getByText("Console").nth(1).click();
-    // console.log("Console tab clicked");
+    await window.getByText("Console").nth(1).click();
+    console.log("Console tab clicked");
 
     await window.screenshot({ path: "screenshots/console.png" });
 
