@@ -41,5 +41,12 @@
         "rev": "49c0c5193ef945f1a3dca30b59fa093a7b43437d",
         "type": "git",
         "version": "1.6.0"
+    },
+    "combinetura": {
+        "branch": "master",
+        "repo": "git@git.frama-c.com:dev/combinetura.git",
+        "rev": "7e44888e80c34d560da20a220c0ac1ab2126ff0f",
+        "type": "git",
+        "version": "0.0"
     }
 }

@@ -908,7 +908,7 @@ open F
 module N = struct
 
   let ( + ) = e_add
-  let ( ~- ) x = e_sub e_zero x
+  let ( ~-: ) x = e_sub e_zero x
   let ( - ) = e_sub
   let ( * ) = e_mul
   let ( / ) = e_div
@@ -922,8 +922,8 @@ module N = struct
   let ( <> ) = p_neq
 
   let ( ==> ) = p_imply
-  let ( && ) = p_and
-  let ( || ) = p_or
+  let ( &&: ) = p_and
+  let ( ||: ) = p_or
   let not = p_not
 
   let ( $ ) = e_fun

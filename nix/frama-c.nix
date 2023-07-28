@@ -11,6 +11,7 @@
 , findlib
 # Frama-C build
 , apron
+, bisect_ppx
 , camlzip
 , camomile
 , dune_3
@@ -45,7 +46,7 @@
 , doxygen
 , python3
 , python3Packages
-, yq
+, cover ? true
 , release_mode ? false
 }:
 
@@ -71,6 +72,7 @@ stdenvNoCC.mkDerivation rec {
 
   buildInputs = [
     apron
+    bisect_ppx
     camlzip
     camomile
     dune_3
@@ -105,8 +107,6 @@ stdenvNoCC.mkDerivation rec {
     dos2unix
     doxygen
     python3
-    python3Packages.pyaml
-    yq
   ];
 
   outputs = [ "out" "build_dir" ];
@@ -121,11 +121,15 @@ stdenvNoCC.mkDerivation rec {
   enableParallelBuilding = false;
   dune_opt = if release_mode then "--release" else "" ;
 
-  buildPhase = ''
-    dune build -j2 --display short --error-reporting=twice $release_mode @install
-    make tools/ptests/ptests.exe
-    make tools/ptests/wtests.exe
-  '';
+  buildPhase = (if cover then ''
+      export DUNE_WORKSPACE="dev/dune-workspace.cover"
+    '' else "") +
+    ''
+      dune build -j2 --display short --error-reporting=twice $dune_opt @install
+
+      make tools/ptests/ptests.exe
+      make tools/ptests/wtests.exe
+    '';
 
   installFlags = [
     "PREFIX=$(out)"

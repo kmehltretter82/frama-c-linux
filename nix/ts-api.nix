@@ -28,11 +28,16 @@ stdenv.mkDerivation rec {
   '';
 
   buildPhase = ''
+    mkdir coverage
+    export BISECT_FILE="$(pwd)/coverage/bisect-"
     make -C ivette check-api
+    bisect-ppx-report cobertura --coverage-path=coverage coverage-$pname.xml
+    tar cfJ coverage.tar.xz coverage-$pname.xml
   '';
 
   # No installation required
   installPhase = ''
-    touch $out
+    mkdir -p $out
+    cp -r coverage.tar.xz $out/$pname.tar.xz
   '';
 }

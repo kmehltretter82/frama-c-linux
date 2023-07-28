@@ -77,8 +77,8 @@ struct
 
   let is_included is_included x y =
     match x, y with
-    | `Bottom, _ | _, `Top -> true
-    | _, `Bottom | `Top, _ -> false
+    | `Bottom, #or_top_bottom | #or_top_bottom, `Top -> true
+    | #or_top_bottom, `Bottom | `Top, #or_top_bottom -> false
     | `Value vx, `Value vy -> is_included vx vy
 
   (* Iterator *)
@@ -142,7 +142,7 @@ module Bottom = struct
 
   let zip x y =
     match x, y with
-    | `Bottom, _ | _, `Bottom -> `Bottom
+    | `Bottom, #t | #t, `Bottom -> `Bottom
     | `Value x, `Value y -> `Value (x,y)
 
   (** Conversion *)
@@ -265,7 +265,7 @@ struct
 
   let zip x y =
     match x, y with
-    | `Top, _ | _, `Top -> `Top
+    | `Top, #t | #t, `Top -> `Top
     | `Value x, `Value y -> `Value (x,y)
 
   (** Conversion. *)
@@ -327,8 +327,8 @@ struct
 
   let zip x y =
     match x, y with
-    | `Bottom, _ | _, `Bottom -> `Bottom
-    | `Top, _ | _, `Top -> `Top
+    | `Bottom, #t | #t, `Bottom -> `Bottom
+    | `Top, #t | #t, `Top -> `Top
     | `Value x, `Value y -> `Value (x,y)
 
   (** Operators *)

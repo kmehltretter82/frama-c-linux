@@ -25,4 +25,5 @@
   (public_name frama-c.init.cmdline)
   (implements frama-c.init)
   (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx))
 )

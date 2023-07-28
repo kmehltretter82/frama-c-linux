@@ -1,3 +1,4 @@
+(lang dune 3.2)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                        ;;
 ;;  This file is part of Frama-C.                                         ;;
@@ -20,26 +21,6 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(rule
- (alias frama-c-configure)
- (deps (universe))
- (action (progn
-          (echo "From:" %{lib-available:frama-c-from.core} "\n")
-          (echo "  - Callgraph:" %{lib-available:frama-c-callgraph.core} "\n")
-          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
-          (echo "  - Postdominators:" %{lib-available:frama-c-postdominators.core} "\n")
-  )
-  )
-)
-
-( library
- (name from)
-  (optional)
-  (public_name frama-c-from.core)
-  (flags -open Frama_c_kernel :standard -w -9)
-  (libraries frama-c.kernel frama-c-callgraph.core frama-c-eva.core frama-c-postdominators.core)
-  (instrumentation (backend landmarks))
-  (instrumentation (backend bisect_ppx))
-)
-
-(plugin (optional) (name from) (libraries frama-c-from.core) (site (frama-c plugins)))
+(context
+ (default
+  (instrument_with bisect_ppx)))

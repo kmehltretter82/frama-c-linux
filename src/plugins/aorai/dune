@@ -45,6 +45,7 @@
   )
  )
  (instrumentation (backend landmarks))
+ (instrumentation (backend bisect_ppx))
 )
 
 (ocamllex yalexer)
