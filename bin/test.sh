@@ -73,6 +73,7 @@ function Usage
     echo "  -w|--wp-cache       prepare (pull) WP-cache"
     echo "  -l|--logs           print output of tests (single file, no diff)"
     echo "  -u|--update         run tests and update oracles (and WP-cache)"
+    echo "  -k|--commit         commit new test oracles"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
     echo "  -j|--jobs <jobs>    run no more than <jobs> commands simultaneously."
