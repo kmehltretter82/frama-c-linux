@@ -1,4 +1,8 @@
 [kernel] Checking handler of exception occurring in extension typing
 [kernel] Parsing extend_extern.i (no preprocessing)
 [kernel] Failure: Typechecking ACSL extension why3 raised exception Not_found
+[kernel:annot-error] extend_extern.i:6: Warning: 
+  Logic typing error. Ignoring global annotation
+[kernel] User Error: warning annot-error treated as fatal error.
+[kernel] User Error: stopping on file "extend_extern.i" that has errors.
 [kernel] Extension typing failed as expected
