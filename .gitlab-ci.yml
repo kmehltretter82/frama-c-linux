@@ -236,7 +236,7 @@ e2e-playwright-tests:
     - make clean && make && make -C ivette dist
     - cd ivette
     - cp dist/renderer/* dist/main/
-    # - npx playwright install chromium
+    - npx playwright install chromium
     # - sudo chown root:root node_modules/electron/dist/chrome-sandbox
     # - sudo chmod 4755 node_modules/electron/dist/chrome-sandbox
     - xvfb-run --auto-servernum -e /dev/stdout -s "-screen 0 1280x1024x24 -ac -nolisten tcp -nolisten unix" npx playwright test --headed
