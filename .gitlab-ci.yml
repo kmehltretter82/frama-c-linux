@@ -246,7 +246,6 @@ e2e-playwright-tests:
     paths:
       - ivette/test-results
       - ivette/screenshots
-    when: on_failure
     expire_in: 1 day
   tags:
     - docker
