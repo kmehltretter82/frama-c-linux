@@ -38,6 +38,7 @@
   (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel frama-c-eva.core frama-c-pdg.core)
   (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx))
 )
 
 (plugin (optional) (name security_slicing) (libraries frama-c-security_slicing.core) (site (frama-c plugins)))

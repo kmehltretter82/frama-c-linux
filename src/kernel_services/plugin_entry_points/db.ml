@@ -319,20 +319,6 @@ module Value = struct
       ((i land mask_then) <> 0, (i land mask_else) <> 0)
     with Not_found -> false, false
 
-  module RecursiveCallsFound =
-    State_builder.Set_ref
-      (Kernel_function.Set)
-      (struct
-        let name = "Db.Value.RecursiveCallsFound"
-        let dependencies = only_self
-      end)
-
-  let ignored_recursive_call kf =
-    RecursiveCallsFound.mem kf
-
-  let recursive_call_occurred kf =
-    RecursiveCallsFound.add kf
-
   module Called_Functions_By_Callstack =
     State_builder.Hashtbl(Kernel_function.Hashtbl)
       (States_by_callstack)
@@ -368,54 +354,6 @@ module Value = struct
            Kinstr.pretty k
            Cvalue.Model.pretty v)
 *)
-
-  module Record_Value_Callbacks =
-    Hook.Build
-      (struct
-        type t = callstack * (state Stmt.Hashtbl.t) Lazy.t
-      end)
-
-  module Record_Value_Callbacks_New =
-    Hook.Build
-      (struct
-        type t =
-          callstack *
-          ((state Stmt.Hashtbl.t) Lazy.t  * (state Stmt.Hashtbl.t) Lazy.t)
-            Value_types.callback_result
-      end)
-
-  module Record_Value_After_Callbacks =
-    Hook.Build
-      (struct
-        type t = callstack * (state Stmt.Hashtbl.t) Lazy.t
-      end)
-
-  module Record_Value_Superposition_Callbacks =
-    Hook.Build
-      (struct
-        type t = callstack * (state list Stmt.Hashtbl.t) Lazy.t
-      end)
-
-  module Call_Value_Callbacks =
-    Hook.Build
-      (struct type t = state * callstack end)
-
-  module Call_Type_Value_Callbacks =
-    Hook.Build(struct
-      type t = [`Builtin | `Spec
-               | `Body | `Reuse]
-               * state * callstack end)
-  ;;
-
-
-  module Compute_Statement_Callbacks =
-    Hook.Build
-      (struct type t = stmt * callstack * state list end)
-
-  (* -remove-redundant-alarms feature, applied at the end of an Eva analysis,
-     fulfilled by the Scope plugin that also depends on Eva. We thus use a
-     reference here to avoid a cyclic dependency. *)
-  let rm_asserts = mk_fun "Value.rm_asserts"
 
   let no_results = mk_fun "Value.no_results"
 
@@ -476,10 +414,6 @@ module Value = struct
     try Some (Called_Functions_By_Callstack.find kf)
     with Not_found -> None
 
-  let valid_behaviors = mk_fun "Value.get_valid_behaviors"
-
-  let add_formals_to_state = mk_fun "add_formals_to_state"
-
   let get_fundec_from_stmt stmt =
     let kf =
       try
@@ -536,18 +470,6 @@ module Value = struct
               Table_By_Callstack.find stmt)
     with Not_found -> None
 
-  let fold_stmt_state_callstack f acc ~after stmt =
-    assert (is_computed ()); (* this assertion fails during Eva analysis *)
-    match get_stmt_state_callstack ~after stmt with
-    | None -> acc
-    | Some h -> Eva_types.Callstack.Hashtbl.fold (fun _ -> f) h acc
-
-  let fold_state_callstack f acc ~after ki =
-    assert (is_computed ()); (* this assertion fails during Eva analysis *)
-    match ki with
-    | Kglobal -> f (globals_state ()) acc
-    | Kstmt stmt -> fold_stmt_state_callstack f acc ~after stmt
-
   let is_reachable = Cvalue.Model.is_reachable
 
   exception Is_reachable
@@ -572,116 +494,8 @@ module Value = struct
     | Kglobal -> Cvalue.Model.is_reachable (globals_state ())
     | Kstmt stmt -> is_reachable_stmt stmt
 
-  let is_called = mk_fun "Value.is_called"
-  let callers = mk_fun "Value.callers"
-
-  let access_location = mk_fun "Value.access_location"
-
-  let find state loc = Cvalue.Model.find state loc
-
-  let access =  mk_fun "Value.access"
-  let access_expr =  mk_fun "Value.access_expr"
-
-  let use_spec_instead_of_definition =
-    mk_fun "Value.use_spec_instead_of_definition"
-
-  let eval_lval =
-    ref (fun ?with_alarms:_ _ -> mk_labeled_fun "Value.eval_lval")
-  let eval_expr =
-    ref (fun ?with_alarms:_ _ -> mk_labeled_fun "Value.eval_expr")
-
-  let eval_expr_with_state =
-    ref (fun ?with_alarms:_ _ -> mk_labeled_fun "Value.eval_expr_with_state")
-
-  let reduce_by_cond = mk_fun "Value.reduce_by_cond"
-
-  let find_lv_plus = mk_fun "Value.find_lv_plus"
-
-  let pretty_state = Cvalue.Model.pretty
-
-  let pretty = Cvalue.V.pretty
-
   let compute = mk_fun "Value.compute"
 
-  let memoize = mk_fun "Value.memoize"
-  let expr_to_kernel_function = mk_fun "Value.expr_to_kernel_function"
-  let expr_to_kernel_function_state =
-    mk_fun "Value.expr_to_kernel_function_state"
-
-  exception Not_a_call
-
-  let call_to_kernel_function call_stmt = match call_stmt.skind with
-    | Instr (Call (_, fexp, _, _)) ->
-      let _, called_functions =
-        !expr_to_kernel_function ?with_alarms:None ~deps:None
-          (Kstmt call_stmt) fexp
-      in called_functions
-    | Instr(Local_init(_, ConsInit(f,_,_),_)) ->
-      Kernel_function.Hptset.singleton (Globals.Functions.get f)
-    | _ -> raise Not_a_call
-
-
-  let lval_to_loc_with_deps = mk_fun "Value.lval_to_loc_with_deps"
-  let lval_to_loc_with_deps_state = mk_fun "Value.lval_to_loc_with_deps_state"
-  let lval_to_loc = mk_fun "Value.lval_to_loc"
-  let lval_to_offsetmap = mk_fun "Value.lval_to_offsetmap"
-  let lval_to_offsetmap_state = mk_fun "Value.lval_to_offsetmap_state"
-  let lval_to_loc_state = mk_fun "Value.lval_to_loc_state"
-  let lval_to_zone = mk_fun "Value.lval_to_zone"
-  let lval_to_zone_state = mk_fun "Value.lval_to_zone_state"
-  let lval_to_zone_with_deps_state = mk_fun "Value.lval_to_zone_with_deps_state"
-  let lval_to_precise_loc_state =
-    ref (fun ?with_alarms:_ _ -> mk_labeled_fun "Value.lval_to_precise_loc")
-  let lval_to_precise_loc_with_deps_state =
-    mk_fun "Value.lval_to_precise_loc_with_deps_state"
-  let assigns_inputs_to_zone = mk_fun "Value.assigns_inputs_to_zone"
-  let assigns_outputs_to_zone = mk_fun "Value.assigns_outputs_to_zone"
-  let assigns_outputs_to_locations = mk_fun "Value.assigns_outputs_to_locations"
-  let verify_assigns_froms = mk_fun "Value.verify_assigns_froms"
-
-  module Logic = struct
-    let eval_predicate =
-      ref (fun ~pre:_ ~here:_ _ ->
-          raise
-            (Extlib.Unregistered_function
-               "Function 'Value.Logic.eval_predicate' not registered yet"))
-
-  end
-
-  exception Void_Function
-
-  let find_return_loc kf =
-    try
-      let ki = Kernel_function.find_return kf in
-      let lval = match ki with
-        | { skind = Return (Some ({enode = Lval ((_ , offset) as lval)}), _) }
-          ->
-          assert (offset = NoOffset) ;
-          lval
-        | { skind = Return (None, _) } -> raise Void_Function
-        | _ -> assert false
-      in
-      !lval_to_loc (Kstmt ki) ?with_alarms:None lval
-    with Kernel_function.No_Statement ->
-      (* [JS 2011/05/17] should be better to have another name for this
-         exception or another one since it is possible to have no return without
-         returning void (the case when the kf corresponds to a declaration *)
-      raise Void_Function
-
-  let display = mk_fun "Value.display"
-
-  let emitter = ref Emitter.dummy
-
-end
-
-module From = struct
-  exception Not_lval
-
-  let find_deps_no_transitivity = mk_fun "From.find_deps_no_transitivity"
-  let find_deps_no_transitivity_state =
-    mk_fun "From.find_deps_no_transitivity_state"
-  let find_deps_term_no_transitivity_state =
-    mk_fun "From.find_deps_term_no_transitivity_state"
 end
 
 (* ************************************************************************* *)

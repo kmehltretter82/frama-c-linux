@@ -45,6 +45,11 @@ fi
 # Normalize version for Nix
 OCAML=${OCAML/./_}
 
+OUTOPT="--no-out-link"
+if [ ! -z ${OUT+x} ]; then
+  OUTOPT="-o $(pwd)/$OUT"
+fi
+
 DEFAULT=${DEFAULT:-master}
 
 # prints
@@ -118,7 +123,7 @@ if [[ -f "./nix/dependencies" ]]; then
 fi
 
 # run the build
-nix-build --no-out-link "./nix/pkgs.nix" $OPTS -A ocaml-ng.ocamlPackages_$OCAML."$plugin"
+nix-build $OUTOPT "./nix/pkgs.nix" $OPTS -A ocaml-ng.ocamlPackages_$OCAML."$plugin"
 
 cd "$fc_dir"
 

@@ -129,36 +129,54 @@ ivette:
 ################################################################################
 ### TESTS
 
+.build_template: &coverage_artifacts
+  artifacts:
+    name: coverage-$CI_JOB_NAME
+    paths:
+      - _bisect/*.tar.xz
+    expire_in: 24h
+
+.build_template: &coverage
+  variables:
+    OUT: "_bisect"
+  <<: *coverage_artifacts
+
 check-ts-api:
   stage: tests
   script:
     - ./nix/build-proxy.sh ts-api
+  <<: *coverage
 
 e-acsl-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh e-acsl-tests
+  <<: *coverage
 
 e-acsl-dev-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh e-acsl-dev-tests
+  <<: *coverage
   allow_failure: true
 
 .build_template: &eva_template
   stage: tests
   script:
     - ./nix/build-proxy.sh eva-$CONFIG-tests
+  <<: *coverage_artifacts
 
 eva-default-tests:
   variables:
     CONFIG: "default"
+    OUT:    "_bisect"
   <<: *eva_template
 
 .build_template: &eva_domains
   parallel:
     matrix:
-      - CONFIG: [
+      - OUT: "_bisect"
+        CONFIG: [
           "apron",
           "bitwise",
           "equality",
@@ -171,40 +189,24 @@ eva-default-tests:
 eva-domains:
   <<: *eva_template
   <<: *eva_domains
-  only:
-    variables:
-      - $CI_COMMIT_BRANCH =~ /.*[-_\/.][Ee]va[-_\/.].*/
-      - $CI_COMMIT_BRANCH =~ /^[Ee]va[-_\/.].*/
-      - $CI_COMMIT_BRANCH =~ /.*[-_\/.][Ee]va$/
-
-eva-domains-nightly:
-  <<: *eva_template
-  <<: *eva_domains
-  only:
-    refs:
-      - schedules
-
-eva-domains-release:
-  <<: *eva_template
-  <<: *eva_domains
-  only:
-    variables:
-      - $RELEASE == "yes"
 
 kernel-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh kernel-tests
+  <<: *coverage
 
 plugins-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh plugins-tests
+  <<: *coverage
 
 wp-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh wp-tests
+  <<: *coverage
 
 external-plugins:
   stage: tests
@@ -257,6 +259,22 @@ build-distrib-tarball:
   artifacts:
     paths:
       - ./*.tar.gz
+    expire_in: 1 week
+
+# Coverage
+
+coverage:
+  stage: distrib
+  variables:
+    BISECT_DIR: "_bisect"
+  script:
+    - ./nix/shell-checkers.sh "./nix/coverage.sh"
+  coverage: '/Coverage: \d+\.\d+\%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: report.xml
     expire_in: 1 week
 
 # Check files header

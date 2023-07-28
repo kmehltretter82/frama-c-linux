@@ -52,6 +52,7 @@
   (flags :standard -w -9)
   (libraries frama-c.init fpath str unix zarith ocamlgraph dynlink bytes yaml.unix yojson menhirLib dune-site dune-site.plugins)
   (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx))
   (preprocess (staged_pps ppx_import ppx_deriving.eq ppx_deriving.ord ppx_deriving_yaml))
 )
 

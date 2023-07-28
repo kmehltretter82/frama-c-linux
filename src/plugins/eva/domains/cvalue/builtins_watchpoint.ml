@@ -96,7 +96,7 @@ let () =
   Builtins.register_builtin "Frama_C_watch_cardinal" Cacheable
     (add_watch make_watch_cardinal)
 
-let watch_hook (stmt, _callstack, states) =
+let watch_hook _callstack stmt states =
   let treat ({name_lv = name; loc=loc; v=wa; remaining_count=current; stmts=set} as w) =
     List.iter
       (fun state ->
@@ -132,7 +132,7 @@ let watch_hook (stmt, _callstack, states) =
   in
   List.iter treat !watch_table
 
-let () = Db.Value.Compute_Statement_Callbacks.extend_once watch_hook
+let () = Cvalue_callbacks.register_statement_hook watch_hook
 
 (*
 Local Variables:

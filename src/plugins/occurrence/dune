@@ -37,6 +37,7 @@
   (flags -open Frama_c_kernel :standard -w -9)
   (libraries frama-c.kernel frama-c-eva.core)
   (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx))
 )
 
 (plugin (optional) (name occurrence) (libraries frama-c-occurrence.core) (site (frama-c plugins)))

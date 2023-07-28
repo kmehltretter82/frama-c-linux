@@ -36,6 +36,7 @@
   (flags -open Frama_c_kernel :standard)
   (libraries frama-c.kernel ocamlgraph unionFind)
   (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx))
 )
 
 ( plugin

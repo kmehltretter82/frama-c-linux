@@ -353,16 +353,11 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   (* ----- Main call -------------------------------------------------------- *)
 
-  let store_initial_state callstack kf init_state =
-    Abstract.Dom.Store.register_initial_state callstack kf init_state;
-    let cvalue_state = get_cvalue_or_top init_state in
-    Db.Value.Call_Value_Callbacks.apply (cvalue_state, callstack)
-
   let compute kf init_state =
     let restore_signals = register_signal_handler () in
     let compute () =
       let callstack = Eva_utils.init_call_stack kf in
-      store_initial_state callstack kf init_state;
+      Abstract.Dom.Store.register_initial_state callstack kf init_state;
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
       let final_result = compute_call Kglobal call None init_state in
       let final_states = List.map snd (final_result.Transfer.states) in

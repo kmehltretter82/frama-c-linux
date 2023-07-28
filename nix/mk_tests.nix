@@ -26,6 +26,7 @@
 , stdenvNoCC
 , time
 , unixtools
+, yq
 , which
 , wp-cache
 } :
@@ -33,6 +34,7 @@
 { tests-name
 , tests-command
 , has-wp-proofs ? false
+, cover ? true
 } :
 
 stdenvNoCC.mkDerivation {
@@ -49,6 +51,7 @@ stdenvNoCC.mkDerivation {
     perl
     time
     unixtools.getopt
+    yq
     which
   ] ++
   (if has-wp-proofs then [ alt-ergo ] else []);
@@ -68,14 +71,29 @@ stdenvNoCC.mkDerivation {
     else "" ;
 
   preBuild =
-    if has-wp-proofs
+    (if has-wp-proofs
+     then ''
+         mkdir home
+         HOME=$(pwd)/home
+         why3 config detect
+         export FRAMAC_WP_CACHE=offline
+         export FRAMAC_WP_CACHEDIR=$wp_cache
+     ''
+     else "") +
+    (if cover
+     then ''
+         mkdir -p _bisect
+         export DUNE_WORKSPACE="dev/dune-workspace.cover"
+         export BISECT_FILE="$(pwd)/_bisect/bisect-"
+     ''
+     else "");
+
+  postBuild =
+    if cover
     then ''
-        mkdir home
-        HOME=$(pwd)/home
-        why3 config detect
-        export FRAMAC_WP_CACHE=offline
-        export FRAMAC_WP_CACHEDIR=$wp_cache
-      ''
+      bisect-ppx-report cobertura --coverage-path=_bisect coverage-$pname.xml
+      tar cfJ coverage.tar.xz coverage-$pname.xml
+    ''
     else "" ;
 
   buildPhase = ''
@@ -86,7 +104,13 @@ stdenvNoCC.mkDerivation {
   '';
 
   # No installation required
-  installPhase = ''
-    touch $out
-  '';
+  installPhase =
+    if cover
+    then ''
+      mkdir -p $out
+      cp -r coverage.tar.xz $out/$pname.tar.xz
+    ''
+    else ''
+      touch $out
+    '';
 }

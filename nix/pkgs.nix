@@ -4,6 +4,7 @@ let
     # External Packages
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
     camlp5 = oself.callPackage ./camlp5.nix {};
+    combinetura = oself.callPackage ./combinetura.nix {};
     headache = oself.callPackage ./headache.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
     why3 = oself.callPackage ./why3.nix {};
@@ -23,11 +24,16 @@ let
 
     # Builds
     frama-c = oself.callPackage ./frama-c.nix {};
+    frama-c-no-cover = oself.callPackage ./frama-c.nix { cover = false ; };
     frama-c-hdrck = oself.callPackage ./frama-c-hdrck.nix {};
     frama-c-lint = oself.callPackage ./frama-c-lint.nix {};
 
     # Tests
-    default-config-tests = oself.callPackage ./default-config-tests.nix {};
+    default-config-tests = oself.callPackage ./default-config-tests.nix {
+      frama-c-nocover = oself.frama-c.override {
+        cover = false ;
+      } ;
+    };
     e-acsl-tests = oself.callPackage ./e-acsl-tests.nix { config = ""; };
     e-acsl-dev-tests = oself.callPackage ./e-acsl-tests.nix { config = "dev"; };
     eva-default-tests = oself.callPackage ./eva-tests.nix { config = ""; };
@@ -52,7 +58,10 @@ let
     api-doc = oself.callPackage ./api-doc.nix {};
     manuals = oself.callPackage ./manuals.nix {};
     src-distrib-tests = oself.callPackage ./src-distrib-tests.nix {
-      frama-c-release = oself.frama-c.override { release_mode = true ; } ;
+      frama-c-release = oself.frama-c.override {
+        release_mode = true ;
+        cover = false ;
+      } ;
     };
   };
   overlay = self: super: {

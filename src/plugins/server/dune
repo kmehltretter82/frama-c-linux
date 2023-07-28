@@ -41,6 +41,7 @@
      (    -> server_zmq.ko.ml)
  ))
  (instrumentation (backend landmarks))
+ (instrumentation (backend bisect_ppx))
 )
 
 (plugin (optional) (name server) (libraries frama-c-server.core) (site (frama-c plugins)))

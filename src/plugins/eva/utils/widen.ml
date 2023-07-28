@@ -499,7 +499,7 @@ module Parsed_Dynamic_Hints =
 let dynamic_bases_of_lval states e offset =
   let lv = (Mem e, offset) in
   List.fold_left (fun acc' state ->
-      let location = !Db.Value.lval_to_loc_state state lv in
+      let location = Cvalue_queries.lval_to_loc state lv in
       Locations.Location_Bits.fold_bases
         (fun base acc'' -> Base.Hptset.add base acc'')
         location.Locations.loc acc'
@@ -561,7 +561,7 @@ let extract_per_function_hints fdec =
 
 let per_function_hints = Per_Function_Hints.memo extract_per_function_hints
 
-let dynamic_widen_hints_hook (stmt, _callstack, states) =
+let dynamic_widen_hints_hook _callstack stmt states =
   if Annotations.has_code_annot stmt then
     let hs = parsed_dynamic_hints stmt in
     if hs <> [] then
@@ -602,8 +602,7 @@ let dynamic_widen_hints_hook (stmt, _callstack, states) =
         Dynamic_Hints.set hints;
       end
 
-let () =
-  Db.Value.Compute_Statement_Callbacks.extend_once dynamic_widen_hints_hook
+let () = Cvalue_callbacks.register_statement_hook dynamic_widen_hints_hook
 
 let getWidenHints (kf:kernel_function) (stmt:stmt) =
   let hints =

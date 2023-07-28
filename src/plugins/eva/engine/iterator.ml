@@ -35,7 +35,6 @@ let check_signals, signal_abort =
   (fun () -> signal_emitted := true)
 
 let dkey = Self.dkey_iterator
-let dkey_callbacks = Self.dkey_callbacks
 let stat_iterations = Statistics.register_statement_stat "iterations"
 
 let blocks_share_locals b1 b2 =
@@ -686,13 +685,6 @@ module Make_Dataflow
     let merged_post_states = lazy
       (states_after_stmt merged_pre_states merged_post_states)
     in
-    let unmerged_pre_cvalues = lazy
-      (StmtTable.map (fun _stmt (v,_) ->
-           let store = get_vertex_store v in
-           let states = Partitioning.expanded store in
-           List.map (fun (_k,x) -> get_cvalue_or_top x) states)
-          automaton.stmt_table)
-    in
     let merged_pre_cvalues = lazy (lift_to_cvalues merged_pre_states)
     and merged_post_cvalues = lazy (lift_to_cvalues merged_post_states) in
     let callstack = Eva_utils.current_call_stack () in
@@ -703,22 +695,6 @@ module Make_Dataflow
       StmtTable.iter register_post (Lazy.force merged_post_states);
       merge_conditions ();
     end;
-    if not (Db.Value.Record_Value_Superposition_Callbacks.is_empty ())
-    then begin
-      if Parameters.ValShowProgress.get () then
-        Self.debug ~dkey:dkey_callbacks
-          "now calling Record_Value_Superposition callbacks";
-      Db.Value.Record_Value_Superposition_Callbacks.apply
-        (callstack, unmerged_pre_cvalues);
-    end;
-    if not (Db.Value.Record_Value_Callbacks.is_empty ())
-    then begin
-      if Parameters.ValShowProgress.get () then
-        Self.debug ~dkey:dkey_callbacks
-          "now calling Record_Value callbacks";
-      Db.Value.Record_Value_Callbacks.apply
-        (callstack, merged_pre_cvalues)
-    end;
     let states =
       Cvalue_callbacks.{ before_stmts = merged_pre_cvalues;
                          after_stmts = merged_post_cvalues }
@@ -726,14 +702,6 @@ module Make_Dataflow
     let cvalue_init = get_cvalue_or_top initial_state in
     let results = `Body (states, Mem_exec.new_counter ()) in
     Cvalue_callbacks.apply_call_results_hooks callstack kf cvalue_init results;
-    if not (Db.Value.Record_Value_After_Callbacks.is_empty ())
-    then begin
-      if Parameters.ValShowProgress.get () then
-        Self.debug ~dkey:dkey_callbacks
-          "now calling Record_After_Value callbacks";
-      Db.Value.Record_Value_After_Callbacks.apply
-        (callstack, merged_post_cvalues);
-    end;
 
 end
 
