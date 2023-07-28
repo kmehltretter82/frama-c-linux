@@ -26,7 +26,7 @@ variables:
   PUBLISH: "no"
   RELEASE: "no"
   WEEKLY: "no"
-
+  DEBUG: "pw:browser*"
 ################################################################################
 ### PREPARE
 
@@ -236,9 +236,9 @@ e2e-playwright-tests:
     - rm -rf ivette/node_modules
     - make clean && make && make -C ivette dist
     - cd ivette
-    - ls dist/renderer
     - cp dist/renderer/* dist/main/
-    - xvfb-run --auto-servernum -e /dev/stdout -s "-screen 0 1280x1024x24 -ac -nolisten tcp -nolisten unix" npx playwright test --headed
+    - npx playwright install chromium
+    - xvfb-run --auto-servernum -e /dev/stdout -s "-screen 0 1280x1024x24 -ac -nolisten tcp -nolisten unix" npx playwright test
     - npx playwright show-trace
   artifacts:
     paths:
