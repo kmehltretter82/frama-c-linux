@@ -50,7 +50,7 @@ val new_file_type:
   string -> (string -> Cil_types.file * Cabs.file) -> unit
 (** [new_file_type suffix func funcname] registers a new type of files (with
     corresponding suffix) as recognized by Frama-C through [func].
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 val list_available_machdeps: unit -> string list
@@ -92,7 +92,7 @@ val add_code_transformation_before_cleanup:
     At this level, globals and ACSL annotations have not been registered.
 
     @since Neon-20140301
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val add_code_transformation_after_cleanup:
   ?deps:(module Parameter_sig.S) list ->
@@ -106,7 +106,7 @@ val add_code_transformation_after_cleanup:
     Note that it is the responsibility of the hook to use
     {!Ast.mark_as_changed} or {!Ast.mark_as_grown} whenever it is the case.
     @since Neon-20140301
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val constfold: code_transformation_category
 (** category for syntactic constfolding (done after cleanup)
@@ -117,7 +117,7 @@ val must_recompute_cfg: Cil_types.fundec -> unit
     when they modify statements in function [f]. This will trigger a
     recomputation of the cfg of [f] after the transformation.
     @since Neon-20140301
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val get_suffixes: unit -> string list
 (** @return the list of accepted suffixes of input source files
@@ -154,14 +154,14 @@ val init_from_c_files: t list -> unit
 (** Initialize the cil file representation of the current project.
     Should be called at most once per project.
     @raise File_types.Bad_Initialization if called more than once.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val init_project_from_cil_file: Project.t -> Cil_types.file -> unit
 (** Initialize the cil file representation with the given file for the
     given project from the current one.
     Should be called at most once per project.
     @raise File_types.Bad_Initialization if called more than once.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val init_project_from_visitor:
   ?reorder:bool -> Project.t -> Visitor.frama_c_visitor -> unit
@@ -172,7 +172,7 @@ val init_project_from_visitor:
     if [reorder] is [true] (default is [false]) the new AST in [prj]
     will be reordered.
     @since Oxygen-20120901
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 val create_project_from_visitor:
@@ -189,7 +189,7 @@ val create_project_from_visitor:
     file (i.e. it should use {!Visitor_behavior.copy} at some point).
     @raise File_types.Bad_Initialization if called more than once.
     @since Beryllium-20090601-beta1
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val create_rebuilt_project_from_visitor:
   ?reorder:bool -> ?last:bool -> ?preprocess:bool ->
@@ -215,7 +215,7 @@ val init_from_cmdline: unit -> unit
     command line.
     Should be called at most once per project.
     @raise File_types.Bad_Initialization if called more than once.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val reorder_ast: unit -> unit
 (** reorder globals so that all uses of an identifier are preceded by its

@@ -22,7 +22,7 @@
 
 (** A state is a project-compliant mutable value.
     @since Carbon-20101201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 open Project_skeleton
 
@@ -100,7 +100,7 @@ val unique_name_from_name: string -> string
 val dummy: t
 (** A dummy state.
     @since Carbon-20101201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val dummy_unique_name: string
 

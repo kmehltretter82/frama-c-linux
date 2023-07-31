@@ -59,17 +59,17 @@ class type frama_c_visitor = object
 
   method vstmt_aux: stmt -> stmt Cil.visitAction
   (** Replacement of vstmt.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide*)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>*)
 
   method vglob_aux: global -> global list Cil.visitAction
   (** Replacement of vglob.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide*)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>*)
 
   method current_kf: kernel_function option
   (** link to the kernel function currently being visited.
       {b NB:} for copy visitors, the link is to the original kf (anyway,
       the new kf is created only after the visit is over).
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method set_current_kf: kernel_function -> unit
   (** Internal use only. *)
@@ -80,7 +80,7 @@ end
 
 class frama_c_inplace: frama_c_visitor
 (** in-place visitor; always act in the current project.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 class frama_c_copy: Project.t -> frama_c_visitor
 (** Copying visitor. The [Project.t] argument specifies in which project the
@@ -97,7 +97,7 @@ class frama_c_refresh: Project.t -> frama_c_visitor
 class generic_frama_c_visitor:
   Visitor_behavior.t ->  frama_c_visitor
 (** Generic class that abstracts over [frama_c_inplace] and [frama_c_copy].
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (** Visit a file. This will re-cons all globals TWICE (so that it is
     tail-recursive). Use {!Cil.visitCilFileSameGlobals} if your visitor will
@@ -112,7 +112,7 @@ val visitFramacFile: frama_c_visitor -> file -> unit
     changes things inside the globals). Use this function instead of
     {!Visitor.visitFramacFile} whenever appropriate because it is more
     efficient for long files.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 val visitFramacFileSameGlobals: frama_c_visitor -> file -> unit
 
 (** Visit all function definitions of a file. Use this function instead of
@@ -142,7 +142,7 @@ val visitFramacGlobal: frama_c_visitor -> global -> global list
 val visitFramacKf: frama_c_visitor -> Kernel_function.t -> Kernel_function.t
 
 (** Visit a function definition.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide  *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>  *)
 val visitFramacFunction: frama_c_visitor -> fundec -> fundec
 
 (** Visit an expression *)

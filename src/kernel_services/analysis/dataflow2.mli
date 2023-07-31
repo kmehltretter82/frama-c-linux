@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Implementation of data flow analyses over user-supplied domains.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 (** possible kinds of action for backward analysis *)

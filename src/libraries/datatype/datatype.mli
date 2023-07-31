@@ -23,7 +23,7 @@
 (** A datatype provides useful values for types. It is a high-level API on top
     of module {!Type}.
     @since Carbon-20101201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (* ********************************************************************** *)
 (** {2 Type declarations} *)
@@ -45,10 +45,10 @@ type 'a t = private
 (** A type with its type value. *)
 module type Ty = sig
   type t
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   val ty: t Type.t
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 end
 
 (** All values associated to a datatype, excepted [copy].
@@ -73,7 +73,7 @@ module type S_no_copy = sig
 
   val equal: t -> t -> bool
   (** Equality: same spec than [Stdlib.(=)].
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
   *)
 
   val compare: t -> t -> int
@@ -84,7 +84,7 @@ module type S_no_copy = sig
 
   val pretty: Format.formatter -> t -> unit
   (** Pretty print each value in an user-friendly way.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
   *)
 
   val mem_project: (Project_skeleton.t -> bool) -> t -> bool
@@ -118,12 +118,12 @@ val mem_project: 'a Type.t -> (Project_skeleton.t -> bool) -> 'a -> bool
 
 val undefined: 'a -> 'b
 (** Must be used if you don't want to implement a required function.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val identity: 'a -> 'a
 (** Must be used if you want to implement a required function by [fun x ->
     x]. Only useful for implementing [rehash] and [copy].
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val from_compare: 'a -> 'a -> bool
 (** Must be used for [equal] in order to implement it by [compare x y = 0]
@@ -132,10 +132,10 @@ val from_compare: 'a -> 'a -> bool
 val never_any_project: (Project_skeleton.t -> bool) -> 'a -> bool
 (** Must be used for [mem_project] if values of your type does never contain
     any project.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (** Sub-signature of {!S}.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 
     @before 26.0-Iron there was several additional values only used for
             Journalization that has been removed.
@@ -165,7 +165,7 @@ module Undefined: Undefined
 (** Same as {!Undefined}, but the type is supposed to be marshallable by the
     standard OCaml way (in particular, no hash-consing or projects inside
     the type).
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Serializable_undefined: Undefined
 
 (* ********************************************************************** *)
@@ -212,7 +212,7 @@ module type Make_input = sig
 end
 
 (** Generic datatype builder.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Make(X: Make_input): S with type t = X.t
 
 (** Additional info for building [Set], [Map] and [Hashtbl]. *)
@@ -270,16 +270,16 @@ end
 (** A datatype for a type [t] extended with predefined set, map and hashtbl
     over [t].
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 module type S_with_collections = sig
   include S
   module Set: Set with type elt = t
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   module Map: Map with type key = t
   module Hashtbl: Hashtbl with type key = t
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 end
 
 (** Generic comparable datatype builder: functions [equal], [compare] and
@@ -299,17 +299,17 @@ module With_collections(X: S)(_: Functor_info):
 
 module Unit: S_with_collections with type t = unit
 val unit: unit Type.t
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Bool: S_with_collections with type t = bool
 val bool: bool Type.t
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Int: S_with_collections with type t = int
 val int: int Type.t
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 module Int32: S_with_collections with type t = int32
 val int32: int32 Type.t
@@ -325,12 +325,12 @@ val float: float Type.t
 
 module Char: S_with_collections with type t = char
 val char: char Type.t
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module String: S_with_collections with type t = string
 val string: string Type.t
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 module Formatter: S with type t = Format.formatter
 val formatter: Format.formatter Type.t
@@ -362,7 +362,7 @@ module type Polymorphic = sig
 end
 
 (** Functor for polymorphic types with only 1 type variable.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 
     @before 26.0-Iron the functor had several additional values only used for
             Journalization that has been removed.
@@ -389,7 +389,7 @@ module type Polymorphic2 = sig
 end
 
 (** Functor for polymorphic types with 2 type variables.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 
     @before 26.0-Iron the functor had several additional values only used for
             Journalization that has been removed.
@@ -423,7 +423,7 @@ end
 
 (** Functor for polymorphic types with 3 type variables.
     @since Oxygen-20120901
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @before 26.0-Iron the functor had several additional values only used for
             Journalization that has been removed.
 *)
@@ -464,7 +464,7 @@ end
 
 (** Functor for polymorphic types with 4 type variables.
     @since Oxygen-20120901
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @before 26.0-Iron the functor had several additional values only used for
             Journalization that has been removed.
 *)
@@ -507,7 +507,7 @@ module Polymorphic4
 
 module Poly_pair: Polymorphic2 with type ('a, 'b) poly = 'a * 'b
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Pair(T1: S)(T2: S): S with type t = T1.t * T2.t
 module Pair_with_collections(T1: S)(T2: S)(_: Functor_info):
   S_with_collections with type t = T1.t * T2.t
@@ -515,7 +515,7 @@ val pair: 'a Type.t -> 'b Type.t -> ('a * 'b) Type.t
 
 module Poly_ref: Polymorphic with type 'a poly = 'a ref
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Ref(T: S) : S with type t = T.t ref
 val t_ref: 'a Type.t -> 'a ref Type.t
 
@@ -530,7 +530,7 @@ val option: 'a Type.t -> 'a option Type.t
 
 module Poly_list: Polymorphic with type 'a poly = 'a list
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module List(T: S) : S with type t = T.t list
 
 module List_with_collections(T:S)(_:Functor_info):
@@ -538,7 +538,7 @@ module List_with_collections(T:S)(_:Functor_info):
 (** @since Fluorine-20130401 *)
 
 val list: 'a Type.t -> 'a list Type.t
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 module Poly_array: Polymorphic with type 'a poly = 'a array
 (** @since Neon-20140301 *)
@@ -577,7 +577,7 @@ module Quadruple_with_collections
     (T1: S)(T2: S)(T3: S)(T4:S)(_: Functor_info):
   S_with_collections with type t = T1.t * T2.t * T3.t * T4.t
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Function
     (T1: sig include S val label: (string * (unit -> t) option) option end)
     (T2: S)
@@ -587,7 +587,7 @@ val func:
   ?label:string * (unit -> 'a) option -> 'a Type.t ->
   'b Type.t ->
   ('a -> 'b) Type.t
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val optlabel_func:
   string -> (unit -> 'a) -> 'a Type.t -> 'b Type.t -> ('a -> 'b) Type.t
@@ -599,7 +599,7 @@ val func2:
   ?label2:string * (unit -> 'b) option -> 'b Type.t ->
   'c Type.t ->
   ('a -> 'b -> 'c) Type.t
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val func3:
   ?label1:string * (unit -> 'a) option -> 'a Type.t ->
@@ -607,7 +607,7 @@ val func3:
   ?label3:string * (unit -> 'c) option -> 'c Type.t ->
   'd Type.t ->
   ('a -> 'b -> 'c -> 'd) Type.t
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val func4:
   ?label1:string * (unit -> 'a) option -> 'a Type.t ->

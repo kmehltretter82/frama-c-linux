@@ -23,7 +23,7 @@
 (** A state selection is a set of states with operations for easy handling of
     state dependencies.
     @since Carbon-20101201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (* ************************************************************************** *)
 (** {2 Type declarations} *)
@@ -32,7 +32,7 @@
 type t
 (** Type of a state selection.
     @since Carbon-20101201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 val ty: t Type.t
@@ -85,13 +85,13 @@ val mem: t -> State.t -> bool
 val with_dependencies: State.t -> t
 (** The selection containing the given state and all its dependencies.
     @since Carbon-20101201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val only_dependencies: State.t -> t
 (** The selection containing all the dependencies of the given state (but not
     this state itself).
     @since Carbon-20101201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val with_codependencies: State.t -> t
 (** The selection containing the given state and all its co-dependencies.

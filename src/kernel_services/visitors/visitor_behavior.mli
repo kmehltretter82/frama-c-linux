@@ -32,11 +32,11 @@ type t
 (** How the visitor should behave in front of mutable fields: in
     place modification or copy of the structure. This type is abstract.
     Use one of the two values below in your classes.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val inplace: unit -> t
 (** In-place modification. Behavior of the original cil visitor.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val copy: Project.t -> t
 (** Makes fresh copies of the mutable structures.
@@ -46,7 +46,7 @@ val copy: Project.t -> t
       AST. This allows for instance to copy a function with its
       formals and local variables, and to keep the references to other
       globals in the function's body.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val refresh: Project.t -> t
 (** Makes fresh copies of the mutable structures and provides fresh id
@@ -74,7 +74,7 @@ val get_project: t -> Project.t option
     AST elements in [vis]. For example for {!Cil_types.varinfo}: [Reset.varinfo vis].
 
     @since 20.0-Calcium
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 module Reset: sig
   val varinfo: t -> unit
@@ -99,7 +99,7 @@ module type Get = sig
   val enumitem: t -> enumitem -> enumitem
   val typeinfo: t -> typeinfo -> typeinfo
   val stmt: t -> stmt -> stmt
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   val logic_info: t -> logic_info -> logic_info
   val logic_type_info: t -> logic_type_info -> logic_type_info
@@ -107,7 +107,7 @@ module type Get = sig
   val model_info: t -> model_info -> model_info
   val logic_var: t -> logic_var -> logic_var
   val kernel_function: t -> kernel_function -> kernel_function
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   val fundec: t -> fundec -> fundec
 end
@@ -120,7 +120,7 @@ end
     [Get.varinfo vis vi].
 
     @since 20.0-Calcium
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 module Get: Get
 
@@ -132,7 +132,7 @@ module Get: Get
     {!Cil_types.varinfo}: [Get_orig.varinfo vis new_vi].
 
     @since 20.0-Calcium
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 module Get_orig: Get
 
@@ -145,7 +145,7 @@ module Get_orig: Get
     {!Cil_types.varinfo}: [Memo.varinfo vis vi].
 
     @since 20.0-Calcium
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 module Memo: Get
 
@@ -178,7 +178,7 @@ end
     {!Cil_types.varinfo}: [Set.varinfo vis vi new_representative].
 
     @since 20.0-Calcium
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 module Set: Set
 
@@ -191,7 +191,7 @@ module Set: Set
     {!Cil_types.varinfo}: [Set_orig.varinfo vis vi new_original_repr].
 
     @since 20.0-Calcium
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 module Set_orig: Set
 

@@ -216,7 +216,7 @@ end
 (* ************************************************************************** *)
 
 (** Signature for a boolean parameter.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module type Bool = sig
 
   include S with type t = bool
@@ -230,7 +230,7 @@ module type Bool = sig
 end
 
 (** Signature for an integer parameter.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module type Int = sig
 
   include S with type t = int
@@ -437,7 +437,7 @@ module type String_set =
 (** Set of defined kernel functions. If you want to also include pure
     prototype, use {!Parameter_customize.argument_may_be_fundecl}.
     @since Sodium-20150201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module type Kernel_function_set =
   Set with type elt = Cil_types.kernel_function
        and type t = Cil_datatype.Kf.Set.t
@@ -515,7 +515,7 @@ module type Filepath_map =
 
 (** Signatures containing the different functors which may be used to generate
     new command line options.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module type Builder = sig
 
   val no_element_of_string: string -> 'a
@@ -526,26 +526,26 @@ module type Builder = sig
   module Bool(_:sig include Input val default: bool end): Bool
   module Action(_: Input) : Bool
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module False(_: Input) : Bool
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module True(_: Input) : Bool
 
   module WithOutput
       (_: sig include Input val output_by_default: bool end):
     With_output
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module Int(_: sig include Input_with_arg val default: int end): Int
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module Zero(_: Input_with_arg): Int
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module String(_: sig include Input_with_arg val default: string end): String
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module Empty_string(_: Input_with_arg): String
 
   module Fc_Filepath = Filepath
@@ -568,7 +568,7 @@ module type Builder = sig
       (_: sig include Input_collection val default: E.Set.t end):
     Set with type elt = E.t and type t = E.Set.t
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module String_set(_: Input_with_arg): String_set
 
   module Filled_string_set
@@ -577,7 +577,7 @@ module type Builder = sig
          val default: Datatype.String.Set.t
        end): String_set
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module Kernel_function_set(_: Input_with_arg): Kernel_function_set
   module Fundec_set(_: Input_with_arg): Fundec_set
 

@@ -22,7 +22,7 @@
 
 (** Maps from bases to memory maps. The memory maps are those of the
     [Offsetmap] module.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (** Contents of a variable when it is not present in the state.
     See function [default_contents] in the signature below *)

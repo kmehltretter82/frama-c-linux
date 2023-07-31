@@ -21,12 +21,12 @@
 (**************************************************************************)
 
 (** Memory locations.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 open Cil_types
 
 (** Association between bases and offsets in byte.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Location_Bytes : sig
   (* TODOBY: write an mli for MapLattice, and name the result. Use it there,
      and simplify *)
@@ -233,12 +233,12 @@ module Location_Bytes : sig
 end
 
 (** Association between bases and offsets in bits.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Location_Bits : module type of Location_Bytes
 
 
 (** Association between bases and ranges of bits.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Zone : sig
 
   type map_t
@@ -325,13 +325,13 @@ end
 (** {2 Locations} *)
 
 (** A {!Location_Bits.t} and a size in bits.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 type location = private {
   loc : Location_Bits.t;
   size : Int_Base.t;
 }
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Location: Datatype.S with type t = location
 
 val loc_top : location
@@ -399,7 +399,7 @@ val enumerate_bits : location -> Zone.t
 val enumerate_bits_under : location -> Zone.t
 
 val enumerate_valid_bits : access -> location -> Zone.t
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val enumerate_valid_bits_under : access -> location -> Zone.t
 

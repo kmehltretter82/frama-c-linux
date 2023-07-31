@@ -23,8 +23,7 @@
 (** Occurrence plug-in. *)
 open Cil_types
 
-(** Interface for the occurrence plugin.
-    @see <../occurrence/index.html> internal documentation. *)
+(** Interface for the occurrence plugin. *)
 module Register: sig
   val self: State.t
   val get_last_result:

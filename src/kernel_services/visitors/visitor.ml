@@ -35,7 +35,7 @@ class type frama_c_visitor = object
   method vstmt_aux: Cil_types.stmt -> Cil_types.stmt visitAction
   method vglob_aux: Cil_types.global -> Cil_types.global list visitAction
   method current_kf: kernel_function option
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method set_current_kf: kernel_function -> unit
   method reset_current_kf: unit -> unit

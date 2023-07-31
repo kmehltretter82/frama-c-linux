@@ -23,7 +23,7 @@
 (**************************************************************************)
 
 (** Utilities for ACSL constructs.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 open Cil_types
 
@@ -33,7 +33,7 @@ exception Not_well_formed of location * string
 
 (** basic utilities for logic terms and predicates. See also {! Logic_const}
     to build terms and predicates.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (** add a logic function in the environment.
     See {!Logic_env.add_logic_function_gen}*)
@@ -170,7 +170,7 @@ val expr_to_term : ?coerce:bool -> exp -> term
     [expr_to_predicate] instead.
 
     @before 21.0-Scandium was unsound in many cases.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 val expr_to_predicate: exp -> predicate

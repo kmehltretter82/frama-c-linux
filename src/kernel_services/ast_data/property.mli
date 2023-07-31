@@ -22,7 +22,7 @@
 
 (** ACSL comparable property.
     @since Carbon-20101201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 open Cil_types
 

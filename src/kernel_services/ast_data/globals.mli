@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Operations on globals.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 open Cil_types
 
@@ -102,7 +102,7 @@ module Functions: sig
   val get: varinfo -> kernel_function
   (** @raise Not_found if the given varinfo has no associated kernel function
       and is not a built-in.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   val get_params: kernel_function -> varinfo list
   val get_vi: kernel_function -> varinfo
@@ -300,7 +300,7 @@ val set_entry_point : string -> bool -> unit
     [Kernel.LibEntry] to [lib].
     Moreover, clear the results of all the analysis which depend on
     [Kernel.MainFunction] or [Kernel.LibEntry].
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (* ************************************************************************* *)
 (** {2 Comments} *)

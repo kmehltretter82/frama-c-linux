@@ -42,7 +42,7 @@
 (****************************************************************************)
 
 (** Untyped AST.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide **)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> **)
 
 (*
 ** Types
@@ -175,7 +175,7 @@ and definition =
   | GLOBANNOT of Logic_ptree.decl list
 
 (** the file name, and then the list of toplevel forms.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and file = Datatype.Filepath.t * (bool * definition) list
 
 
