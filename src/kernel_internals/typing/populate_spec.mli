@@ -33,21 +33,6 @@ type terminates = identified_predicate option
 type 'a gen = (kernel_function -> spec -> 'a)
 type status = Property_status.emitted_status
 
-type 'a elem = {
-  gen: 'a gen option;
-  status : status option;
-}
-
-type custom_mode = {
-  custom_exits: exits elem;
-  custom_assigns: assigns elem;
-  custom_requires: requires elem;
-  custom_allocates: allocation elem;
-  custom_terminates: terminates elem;
-}
-
-val custom_empty : custom_mode
-
 module type Generator =
 sig
 

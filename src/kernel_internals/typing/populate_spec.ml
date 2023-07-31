@@ -54,15 +54,6 @@ type custom_mode = {
   custom_terminates: terminates elem;
 }
 
-let custom_empty =
-  let gen, status = None, None in {
-    custom_exits = {gen; status};
-    custom_assigns = {gen; status};
-    custom_requires = {gen; status};
-    custom_allocates = {gen; status};
-    custom_terminates = {gen; status};
-  }
-
 let custom_modes = Hashtbl.create 17
 
 let default = Cil.default_behavior_name
@@ -131,18 +122,17 @@ struct
     else if mode = ACSL then
       Generated (G.acsl_default ())
     else
-      match G.completes spec.spec_complete_behaviors table with
-      | Some l ->
-        Generated (G.combine_default l)
-      | None when mode = Safe ->
+      let completes_opt = G.completes spec.spec_complete_behaviors table in
+      match mode, completes_opt with
+      | _, Some completes_clauses ->
+        Generated (G.combine_default completes_clauses)
+      | Safe, None ->
         Generated(G.safe_default @@ Kernel_function.has_definition kf)
-      | None when mode = Frama_C ->
+      | Frama_C, None ->
         Generated(G.frama_c_default kf)
-      | None ->
-        match mode with
-        | ACSL | Safe | Frama_C | Skip -> assert false
-        | Other mode ->
-          Generated(G.custom_default mode kf spec)
+      | Other mode, None ->
+        Generated(G.custom_default mode kf spec)
+      | _, None -> assert false
 
   let emit = G.emit
 
