@@ -180,8 +180,9 @@ let stmt_mt_status subtrace get_state stmt =
       MtOptions.not_yet_implemented "try finally/except/throw/catch"
 ;;
 
+let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
+  let f = Callstack.top_kf callstack in
 
-let rec make_cfg_aux ~eop ~subtrace ~caller_succ ((f, _) as top, stack) =
   (* Mapping between statements and automata nodes. We store all nodes
      that are not basic instr (for which we are sure they are never
      visited twice *)
@@ -191,7 +192,7 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ ((f, _) as top, stack) =
     | None -> (* Can happen in the root thread function, if
                  nothing multithreaded happens, but we handle this case
                  explicitly *)
-      MtOptions.fatal "No events at subtrace %a" Stack.pretty (top :: stack)
+      MtOptions.fatal "No events at subtrace %a" Callstack.pretty callstack
     | Some { Trace.trace_states = states;
              Trace.trace_states_after = states_after } ->
       assert (Stmt.Map.cardinal states > 0);
@@ -208,7 +209,7 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ ((f, _) as top, stack) =
       (* Fresh node, containing a dummy content at first, and a function
          updating the action and setting the preds field of the other nodes *)
       let tg () =
-        let r = CfgNode.new_node (top :: stack) (* XXX *) in
+        let r = CfgNode.new_node callstack (* XXX *) in
         Cil_datatype.Stmt.Hashtbl.add node_tbl stmt r;
         r.cfgn_value_state <- {
           state_before = get_state stmt;
@@ -269,12 +270,16 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ ((f, _) as top, stack) =
         let nwhole, set = tg () in
         let n = next_call () in
         let sub_cfgs = List.map
-            (fun callsite ->
-               let kf = fst callsite in
-               let subtrace = Trace.subtrace_at_call subtrace callsite in
+            (fun (kf,kinstr as call) ->
+               let callsite = match kinstr with
+                 | Kglobal -> assert false
+                 | Kstmt stmt -> stmt
+               in
+               let callstack' = Callstack.push kf callsite callstack in
+               let subtrace = Trace.subtrace_at_call subtrace call in
                if Analysis.use_spec_instead_of_definition kf then
                  let evts, access, stmts = all_events subtrace in
-                 let node = CfgNode.new_node (callsite :: top :: stack)
+                 let node = CfgNode.new_node callstack'
                  and stmts = Cil_datatype.Stmt.Set.elements stmts in
                  node.cfgn_value_state <- nwhole.cfgn_value_state;
                  node.cfgn_kind <- NWholeCall (kf, stmts, evts, n);
@@ -283,8 +288,7 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ ((f, _) as top, stack) =
                  kf, node
                else
                  kf,
-                 make_cfg_aux ~eop ~subtrace ~caller_succ:n
-                   (callsite, top :: stack)
+                 make_cfg_aux ~eop ~subtrace ~caller_succ:n callstack'
             ) callstacks
         in
         set (NCall (stmt, List.split sub_cfgs))
@@ -550,11 +554,12 @@ let remove_superfluous_nodes ~keep start =
 let make_cfg th =
   let events = th.th_amap in
   let init_call = th.th_fun, Kglobal in
-  let tg = CfgNode.new_node [] in
+  let callstack = Callstack.init th.th_fun in
+  let tg = CfgNode.new_node callstack in (* Originally an empty stack, is that important ? *)
   tg.cfgn_kind <- NEOP;
   let subtrace = Trace.subtrace_at_call events init_call in
-  let tg = make_cfg_aux ~eop:tg ~subtrace ~caller_succ:tg (init_call, []) in
-  let start = CfgNode.new_node [init_call] in
+  let tg = make_cfg_aux ~eop:tg ~subtrace ~caller_succ:tg callstack in
+  let start = CfgNode.new_node callstack in
   start.cfgn_kind <- NStart (th.th_fun, tg);
   start.cfgn_value_state <- {
     state_before = th.th_init_state;

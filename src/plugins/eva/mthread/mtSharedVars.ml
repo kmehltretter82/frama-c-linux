@@ -650,7 +650,7 @@ module Precise = struct
   let pp_stack fmt node =
     Format.fprintf fmt "@ // %a" CfgNode.pretty_stmts node;
     if MtOptions.DumpSharedVarsValues.get () > 1 then
-      Format.fprintf fmt "@ %a" Stack.pretty node.cfgn_stack
+      Format.fprintf fmt "@ %a" Callstack.pretty node.cfgn_stack
 
   let pp_access (op, node, thid) base offsm =
     if MtOptions.DumpSharedVarsValues.get () > 0 then

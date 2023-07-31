@@ -64,7 +64,7 @@ let pretty_with_mutexes =
           Format.fprintf fmt ",@ @[<hov>protected by %a@]"
             Presence.pretty mutexes ;
         if MtOptions.PrintCallstacks.get ()
-        then Format.fprintf fmt ",@ // %a" MtCil.Stack.pretty node.cfgn_stack
+        then Format.fprintf fmt ",@ // %a" Callstack.pretty node.cfgn_stack
       ) ();
 ;;
 

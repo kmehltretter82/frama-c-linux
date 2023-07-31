@@ -103,7 +103,7 @@ end
 
 type node = {
   cfgn_id : int;
-  mutable cfgn_stack: MtCil.stack;
+  mutable cfgn_stack: Callstack.t;
   mutable cfgn_var_access: cfg_concur;
   mutable cfgn_kind : node_kind;
   mutable cfgn_preds: node list;
@@ -146,7 +146,7 @@ module CfgNode : sig
   (** Fresh node generator. The initial content of the node is
       unspecified. The nodes are guaranteed to be different from
       [dummy] and [dead] *)
-  val new_node: MtCil.stack -> t
+  val new_node: Callstack.t -> t
 
 
   val node_kind_stmt: node_kind -> stmt list

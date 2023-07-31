@@ -168,7 +168,7 @@ end
 
 type node = {
   cfgn_id : int;
-  mutable cfgn_stack: MtCil.stack;
+  mutable cfgn_stack: Callstack.t;
   mutable cfgn_var_access: cfg_concur;
   mutable cfgn_kind : node_kind;
   mutable cfgn_preds: node list;
@@ -211,7 +211,9 @@ module CfgNode = struct
     cfgn_context = Context.empty;
   }
 
-  let dead = make_aux (-1) [] NDead
+  let dead =
+    let stack = Callstack.init (Kernel_function.dummy ()) in
+    make_aux (-1) stack NDead
 
   include Datatype.Make_with_collections(
     struct
