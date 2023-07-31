@@ -182,7 +182,7 @@ struct
     let custom_mode = get_custom_mode mode in
     match custom_mode.custom_exits.gen with
     | None ->
-      Kernel.warning
+      Kernel.warning ~once:true
         "Custom generation from mode %s not defined for exits, using \
          frama-c mode instead" mode;
       frama_c_default kf
@@ -205,7 +205,7 @@ struct
         let custom_mode = get_custom_mode mode in
         match custom_mode.custom_exits.status with
         | None ->
-          Kernel.warning
+          Kernel.warning ~once:true
             "Custom status from mode %s not defined for exits" mode;
           ()
         | Some pst -> emit_status kf bhv exits pst
@@ -275,7 +275,7 @@ struct
     let custom_mode = get_custom_mode mode in
     match custom_mode.custom_assigns.gen with
     | None ->
-      Kernel.warning
+      Kernel.warning  ~once:true
         "Custom generation from mode %s not defined for assigns, using \
          frama-c mode instead" mode;
       frama_c_default kf
@@ -311,7 +311,7 @@ struct
         let custom_mode = get_custom_mode mode in
         match custom_mode.custom_assigns.status with
         | None ->
-          Kernel.warning
+          Kernel.warning ~once:true
             "Custom status from mode %s not defined for assigns" mode;
           ()
         | Some pst -> emit_status kf bhv assigns pst
@@ -363,7 +363,7 @@ struct
     let custom_mode = get_custom_mode mode in
     match custom_mode.custom_requires.gen with
     | None ->
-      Kernel.warning
+      Kernel.warning ~once:true
         "Custom generation from mode %s not defined for requires, using \
          frama-c mode instead" mode;
       frama_c_default kf
@@ -419,7 +419,7 @@ struct
     let custom_mode = get_custom_mode mode in
     match custom_mode.custom_allocates.gen with
     | None ->
-      Kernel.warning
+      Kernel.warning ~once:true
         "Custom generation from mode %s not defined for allocates, using \
          frama-c mode instead" mode;
       frama_c_default kf
@@ -446,7 +446,7 @@ struct
         let custom_mode = get_custom_mode mode in
         match custom_mode.custom_allocates.status with
         | None ->
-          Kernel.warning
+          Kernel.warning ~once:true
             "Custom status from mode %s not defined for allocates" mode;
           ()
         | Some pst -> emit_status kf bhv allocates pst
@@ -485,7 +485,7 @@ struct
     let custom_mode = get_custom_mode mode in
     match custom_mode.custom_terminates.gen with
     | None ->
-      Kernel.warning
+      Kernel.warning ~once:true
         "Custom generation from mode %s not defined for terminates, using \
          frama-c mode instead" mode;
       frama_c_default kf
@@ -512,7 +512,7 @@ struct
         let custom_mode = get_custom_mode mode in
         match custom_mode.custom_terminates.status with
         | None ->
-          Kernel.warning
+          Kernel.warning ~once:true
             "Custom status from mode %s not defined for terminates" mode;
           ()
         | Some pst -> emit_status kf bhv terminates pst
