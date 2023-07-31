@@ -411,7 +411,17 @@ module Domain = struct
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
 
-  let empty () = default
+  let create_main_thread state =
+    let open Result in
+    let threads = state.threads in
+    let main_thread = MtThread.main () in
+    let* (threads, _) = MtThread.Register.register main_thread threads in
+    let+ (threads, _) = MtThread.Register.start main_thread threads in
+    { state with threads }
+
+  let empty () =
+    let state = default in
+    create_main_thread state |> Result.log ~error:state
   let logic_assign _ _ state = state
   let initialize_variable _ _ ~initialized:_ _ state = state
   let initialize_variable_using_type _ _ state  = state
