@@ -124,7 +124,7 @@ struct
     else
       let completes_opt = G.completes spec.spec_complete_behaviors table in
       match mode, completes_opt with
-      | _, Some completes_clauses ->
+      | (Safe | Frama_C | Other _), Some completes_clauses ->
         Generated (G.combine_default completes_clauses)
       | Safe, None ->
         Generated(G.safe_default @@ Kernel_function.has_definition kf)
@@ -132,7 +132,7 @@ struct
         Generated(G.frama_c_default kf)
       | Other mode, None ->
         Generated(G.custom_default mode kf spec)
-      | _, None -> assert false
+      | (Skip | ACSL), _ -> assert false
 
   let emit = G.emit
 
@@ -195,11 +195,12 @@ struct
     List.iter (emit_status status) ppt_l
 
   let emit mode kf bhv = function
-    | Kept -> ()
+    | Kept | Generated [] -> ()
     | Generated _ when Kernel_function.has_definition kf -> ()
     | Generated exits ->
       match mode with
-      | Skip | ACSL | Safe -> ()
+      | Skip | ACSL -> assert false
+      | Safe -> ()
       | Frama_C -> emit_status kf bhv exits Property_status.Dont_know
       | Other mode ->
         let custom_mode = get_custom_mode mode in
@@ -288,7 +289,7 @@ struct
     in
     Option.iter (emit_status status) ppt_opt;
     match assigns with
-    | WritesAny -> ()
+    | WritesAny -> assert false
     | Writes froms ->
       let emit from =
         let ppt_opt =
@@ -301,11 +302,12 @@ struct
       List.iter emit froms
 
   let emit mode kf bhv = function
-    | Kept -> ()
+    | Kept | Generated WritesAny -> ()
     | Generated _ when Kernel_function.has_definition kf -> ()
     | Generated assigns ->
       match mode with
-      | ACSL | Safe | Skip -> ()
+      | Skip | ACSL -> assert false
+      | Safe -> ()
       | Frama_C -> emit_status kf bhv assigns Property_status.Dont_know
       | Other mode ->
         let custom_mode = get_custom_mode mode in
@@ -433,11 +435,12 @@ struct
     Option.iter (emit_status status) ppt_opt
 
   let emit mode kf bhv = function
-    | Kept -> ()
+    | Kept | Generated FreeAllocAny -> ()
     | Generated _ when Kernel_function.has_definition kf -> ()
     | Generated allocates ->
       match mode with
-      | Skip | Safe -> ()
+      | Skip -> assert false
+      | Safe -> ()
       | ACSL ->
         emit_status kf bhv allocates Property_status.True
       | Frama_C ->
@@ -459,8 +462,8 @@ struct
   type clause = terminates
   type behaviors = bool
 
-  let has_behavior name behaviors =
-    if name = default then behaviors else false
+  let has_behavior _ behaviors =
+    behaviors
 
   let collect_behaviors spec =
     None <> spec.spec_terminates
@@ -493,17 +496,17 @@ struct
 
   let emit_status kf _ terminates status =
     match terminates with
-    | None -> ()
+    | None -> assert false
     | Some terminates ->
       Property.ip_of_terminates kf Kglobal terminates
       |> emit_status status
 
   let emit mode kf bhv = function
-    | Kept -> ()
+    | Kept | Generated None -> ()
     | Generated _ when Kernel_function.has_definition kf -> ()
     | Generated terminates ->
       match mode with
-      | Skip -> ()
+      | Skip -> assert false
       | ACSL ->
         emit_status kf bhv terminates Property_status.True
       | Safe | Frama_C ->
@@ -588,6 +591,7 @@ let do_populate kf original_spec =
   Annotations.add_spec emitter kf spec;
   Exits.emit config.exits kf bhv exits;
   Assigns.emit config.assigns kf bhv assigns;
+  Requires.emit config.assigns kf bhv requires;
   Allocates.emit config.allocates kf bhv allocates;
   Terminates.emit config.terminates kf bhv terminates
 
