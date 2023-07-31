@@ -13,7 +13,7 @@
   Frama_C_show_each: {{ "%zu %zu %zu %zu\n" }}, {8}, {4}, {8}, {4}
 [eva] bitfield_longlong.c:31: Frama_C_show_each: {{ "%d %d\n" }}, {1}, {0}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x ∈ {1}

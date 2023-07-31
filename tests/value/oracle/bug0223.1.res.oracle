@@ -27,7 +27,7 @@
 [eva] Recording results for h2
 [eva] Done for function h2
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function h2:
   test ∈ {0; 1}

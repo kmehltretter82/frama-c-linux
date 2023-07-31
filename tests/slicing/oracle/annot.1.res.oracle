@@ -9,7 +9,7 @@
   t[0..9] ∈ {0}
 [eva] annot.i:23: assertion got status valid.
 [eva] Recording results for f2
-[eva] done for function f2
+[eva] Done for function f2
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function f2

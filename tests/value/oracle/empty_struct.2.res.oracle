@@ -6,7 +6,7 @@
   s2 ∈ [--..--]
   pgs ∈ {{ NULL ; &S_pgs[-1] }}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p ∈ {{ (void *)&s }}

@@ -6,7 +6,7 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] test.c:17: starting to merge loop iterations
-[eva] done for function main
+[eva] Done for function main
 [eva] Warning: The scope plugin is missing: cannot remove redundant alarms.
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------

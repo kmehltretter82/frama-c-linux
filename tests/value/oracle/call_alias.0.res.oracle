@@ -16,7 +16,7 @@
 [eva] Recording results for incr
 [eva] Done for function incr
 [eva] Recording results for main0
-[eva] done for function main0
+[eva] Done for function main0
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function incr:
   G ∈ {1}

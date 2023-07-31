@@ -9,7 +9,7 @@
           [0].next ∈ {{ &S_next_0_S_next_s[0] }}
   S_next_0_S_next_s[0].v ∈ [--..--]
                    [0].next ∈ {0}
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   

@@ -77,7 +77,7 @@
   Assigning imprecise value to \result<origin>.
   The imprecision originates from Misaligned {origin.i:126}
 [eva] Recording results for origin
-[eva] done for function origin
+[eva] Done for function origin
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function origin:
   r.c ∈ [--..--]

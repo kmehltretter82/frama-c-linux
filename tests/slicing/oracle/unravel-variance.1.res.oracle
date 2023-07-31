@@ -177,7 +177,7 @@
 [eva] using specification for function printf5
 [eva] Done for function printf5
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [scope:rm_asserts] removing 2 assertion(s)
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...

@@ -150,7 +150,7 @@
 [eva] Recording results for null_index
 [eva] Done for function null_index
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] reduce_index.i:126: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f10:

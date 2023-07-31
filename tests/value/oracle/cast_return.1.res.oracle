@@ -60,7 +60,7 @@
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] cast_return.c:31: assertion 'Eva,mem_access' got final status invalid.
 [eva] cast_return.c:50: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

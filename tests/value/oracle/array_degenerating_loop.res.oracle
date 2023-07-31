@@ -13,7 +13,7 @@
 [eva] array_degenerating_loop.i:10: 
   Frama_C_show_each: [55..2147483647], [-2147483648..99]
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   G ∈ [55..2147483647]

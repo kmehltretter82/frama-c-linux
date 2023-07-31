@@ -20,7 +20,7 @@
 [eva] Recording results for main5
 [from] Computing for function main5
 [from] Done for function main5
-[eva] done for function main5
+[eva] Done for function main5
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to f5 at bts336.i:98 (by main5):
   x5 FROM q; b1
@@ -69,7 +69,7 @@
 [eva] Recording results for main5
 [from] Computing for function main5
 [from] Done for function main5
-[eva] done for function main5
+[eva] Done for function main5
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to f5_slice_1 at bts336.i:98 (by main5):
   a1 FROM p; a1

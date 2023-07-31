@@ -20,7 +20,7 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] Recording results for large_ilevel
-[eva] done for function large_ilevel
+[eva] Done for function large_ilevel
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function large_ilevel:
   Frama_C_entropy_source ∈ [--..--]

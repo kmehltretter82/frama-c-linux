@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:alarm] global.i:11: Warning: 
   non-finite float value. assert \is_finite(\add_float(g, x));
-[eva] done for function main
+[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   1 function analyzed (out of 1): 100% coverage.

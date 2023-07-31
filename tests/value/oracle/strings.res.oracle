@@ -177,7 +177,7 @@
 [eva] Recording results for long_chain
 [eva] Done for function long_chain
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] strings.i:23: assertion 'Eva,mem_access' got final status invalid.
 [eva] strings.i:39: assertion 'Eva,mem_access' got final status invalid.
 [eva] strings.i:42: assertion 'Eva,mem_access' got final status invalid.

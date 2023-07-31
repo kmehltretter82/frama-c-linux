@@ -50,7 +50,7 @@
 [eva] alloca_h.c:46: freeing automatic bases: {__alloca_f2_l16}
 [eva] alloca_h.c:48: assertion got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f2:
   __fc_stack_status ∈ [--..--]

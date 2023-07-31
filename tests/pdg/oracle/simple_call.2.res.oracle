@@ -16,7 +16,7 @@
 [eva:alarm] simple_call.c:31: Warning: 
   signed overflow. assert x1 + x2 ≤ 2147483647;
 [eva] Recording results for call_mix_G1_G2
-[eva] done for function call_mix_G1_G2
+[eva] Done for function call_mix_G1_G2
 [pdg] computing for function call_mix_G1_G2
 [from] Computing for function mix_G1_G2
 [from] Done for function mix_G1_G2

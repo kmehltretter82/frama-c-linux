@@ -125,7 +125,7 @@
   Ignoring.
 [eva] using specification for function printf_va_27
 [eva] using specification for function printf_va_28
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_initial_stdout.__fc_FILE_id ∈ {1}

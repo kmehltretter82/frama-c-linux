@@ -809,7 +809,7 @@
 [eva] Done for function toupper
 [eva] ctype.c:238: assertion got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   r ∈ {90}

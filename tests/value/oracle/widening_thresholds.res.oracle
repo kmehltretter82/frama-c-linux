@@ -27,7 +27,7 @@
 [eva] Recording results for modulo
 [eva] Done for function modulo
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function incr_modulo:
   g ∈ [0..999]

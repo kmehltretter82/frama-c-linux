@@ -29,7 +29,7 @@
 [eva] Recording results for send_msg
 [eva] Done for function send_msg
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function host_address:
   i ∈ {4}

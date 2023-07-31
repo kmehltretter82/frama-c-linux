@@ -81,7 +81,7 @@
 [eva] Recording results for test_too_much_benign
 [eva] Done for function test_too_much_benign
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] fun_ptr.i:38: assertion 'Eva,function_pointer' got final status invalid.
 [eva] fun_ptr.i:73: assertion 'Eva,function_pointer' got final status invalid.
 [eva] fun_ptr.i:83: assertion 'Eva,function_pointer' got final status invalid.

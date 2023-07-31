@@ -16,7 +16,7 @@
    [10] ∈ {29}
    [11] ∈ {31}
 [eva] using specification for function Frama_C_interval
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]

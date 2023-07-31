@@ -15,7 +15,7 @@
 [eva] keep_annot.i:27: assertion got status valid.
 [eva:alarm] keep_annot.i:28: Warning: assertion got status unknown.
 [eva] Recording results for f
-[eva] done for function f
+[eva] Done for function f
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function f

@@ -74,7 +74,7 @@
 [eva] Recording results for cent_onze_9
 [eva] Done for function cent_onze_9
 [eva] Recording results for test_cent_onzes
-[eva] done for function test_cent_onzes
+[eva] Done for function test_cent_onzes
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cent_onze_0:
   cent_onze ∈ {111}

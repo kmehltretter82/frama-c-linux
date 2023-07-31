@@ -32,7 +32,7 @@
 [eva] using specification for function __e_acsl_assert_clean
 [eva] using specification for function __e_acsl_delete_block
 [eva] using specification for function __e_acsl_memory_clean
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------

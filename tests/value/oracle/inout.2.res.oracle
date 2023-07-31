@@ -21,7 +21,7 @@
       [7] ∈ {40}
   I5_nt ∈ {0}
 [eva] Recording results for never_terminate
-[eva] done for function never_terminate
+[eva] Done for function never_terminate
 [from] Computing for function never_terminate
 [from] Non-terminating function never_terminate (no dependencies)
 [from] Done for function never_terminate

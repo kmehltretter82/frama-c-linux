@@ -21,7 +21,7 @@
 [eva] Done for function enum1_sgn1_positif
 [eva] enum2.c:35: Frama_C_show_each_sizeof_enum1: {8}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function enum1_sgn1_inf_sgn0:
   res ∈ {0}

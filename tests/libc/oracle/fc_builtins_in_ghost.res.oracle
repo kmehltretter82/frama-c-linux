@@ -12,7 +12,7 @@
   function Frama_C_int_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_int_interval
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]

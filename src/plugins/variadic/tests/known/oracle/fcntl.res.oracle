@@ -49,7 +49,7 @@
 [kernel:annot:missing-spec] fcntl.c:28: Warning: 
   Neither code nor specification for function fcntl_fallback_2, generating default assigns from the prototype
 [eva] using specification for function fcntl_fallback_2
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   fl ∈ [--..--] or UNINITIALIZED

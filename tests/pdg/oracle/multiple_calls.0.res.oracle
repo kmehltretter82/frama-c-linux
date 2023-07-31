@@ -22,7 +22,7 @@
 [eva:alarm] multiple_calls.c:24: Warning: 
   signed overflow. assert (int)(x + G1) + G2 ≤ 2147483647;
 [eva] Recording results for appel_ptr_fct
-[eva] done for function appel_ptr_fct
+[eva] Done for function appel_ptr_fct
 [from] Computing for function fct1
 [from] Done for function fct1
 [from] Computing for function fct2

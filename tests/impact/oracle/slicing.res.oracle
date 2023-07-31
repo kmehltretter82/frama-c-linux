@@ -23,7 +23,7 @@
   signed overflow. assert -2147483648 ≤ y + f;
 [eva:alarm] slicing.i:18: Warning: signed overflow. assert y + f ≤ 2147483647;
 [eva] Recording results for impact
-[eva] done for function impact
+[eva] Done for function impact
 [pdg] computing for function impact
 [pdg] done for function impact
 [impact] impacted statements of stmt(s) 6 are:

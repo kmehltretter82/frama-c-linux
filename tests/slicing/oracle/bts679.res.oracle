@@ -12,7 +12,7 @@
 [eva] bts679.i:8: cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva:alarm] bts679.i:8: Warning: assertion got status unknown.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] bts679.i:8: assertion got final status valid.
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...

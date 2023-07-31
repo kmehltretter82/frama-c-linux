@@ -94,7 +94,7 @@
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] alarms.i:39: assertion 'Eva,is_nan' got final status invalid.
 [eva] alarms.i:50: assertion 'Eva,is_nan' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

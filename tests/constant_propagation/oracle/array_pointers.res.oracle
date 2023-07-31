@@ -6,7 +6,7 @@
   p ∈ {0}
 [kernel] array_pointers.i:10: Warning: using size of 'void'
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   q ∈ {{ &p + {4} }}

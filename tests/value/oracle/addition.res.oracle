@@ -147,7 +147,7 @@
 [eva] addition.i:87: Frama_C_show_each_1: [-10..15]
 [eva] addition.i:88: assertion got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva:garbled-mix] Warning: 
   Garbled mix generated during analysis:
   {{ garbled mix of &{p3} (origin: Arithmetic {addition.i:34}) }}
@@ -389,7 +389,7 @@
   out of bounds read. assert \valid_read(*((int **)45));
 [eva] addition.i:87: Frama_C_show_each_1: [-10..15]
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva:garbled-mix] Warning: 
   Garbled mix generated during analysis:
   {{ garbled mix of &{p3} (origin: Arithmetic {addition.i:34}) }}

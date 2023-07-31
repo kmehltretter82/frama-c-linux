@@ -18,7 +18,7 @@
   function printf_va_1: precondition valid_read_string(format) got status unknown.
 [eva] Done for function printf_va_1
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function addressee:
   result.a[0] ∈ {119}

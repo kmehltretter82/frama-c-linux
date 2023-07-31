@@ -19,7 +19,7 @@
 [eva] cond2.i:27: starting to merge loop iterations
 [eva:alarm] cond2.i:27: Warning: signed overflow. assert y + 5 ≤ 2147483647;
 [eva] Recording results for zero_ou_un_0
-[eva] done for function zero_ou_un_0
+[eva] Done for function zero_ou_un_0
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function zero_ou_un_0:
   x ∈ {0; 2}

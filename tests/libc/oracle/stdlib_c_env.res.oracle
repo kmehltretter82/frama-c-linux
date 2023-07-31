@@ -267,7 +267,7 @@
 [eva] Recording results for getenv
 [eva] Done for function getenv
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function __fc_initenv:
   __fc_env[0..4095] ∈ {{ NULL ; &__fc_env_strings + [0..63] ; "BLA=1" }}

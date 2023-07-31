@@ -11,7 +11,7 @@
 [eva:alarm] pointer4.i:15: Warning: 
   out of bounds write. assert \valid((int *)0x0 + c);
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

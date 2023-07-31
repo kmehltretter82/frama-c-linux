@@ -30,7 +30,7 @@
 [eva:invalid-assigns] exec.c:15: 
   Completely invalid destination for assigns clause *(param1 + (0 ..)).
   Ignoring.
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   env[0] ∈ {{ "VAR=42" }}

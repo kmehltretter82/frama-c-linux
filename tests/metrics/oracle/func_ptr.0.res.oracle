@@ -49,7 +49,7 @@
 [eva:initial-state] Values of globals at initialization
   bar ∈ {0}
   bar_extern ∈ {0}
-[eva] done for function main
+[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   1 function analyzed (out of 4): 25% coverage.

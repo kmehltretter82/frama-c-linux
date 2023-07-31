@@ -52,7 +52,7 @@
 [eva] Recording results for test_ctime
 [eva] Done for function test_ctime
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test_ctime:
   __fc_ctime[0..25] ∈ [--..--]

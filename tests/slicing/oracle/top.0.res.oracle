@@ -15,7 +15,7 @@
 [eva] Recording results for strlen
 [eva] Done for function strlen
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [slicing] Nothing to select for an unreachable stmt of uncalled

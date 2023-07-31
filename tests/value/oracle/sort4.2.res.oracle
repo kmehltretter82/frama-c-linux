@@ -14,7 +14,7 @@
 [eva:alarm] sort4.i:61: Warning: 
   function sort4_3: postcondition got status unknown.
 [eva] Recording results for sort4_3
-[eva] done for function sort4_3
+[eva] Done for function sort4_3
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function sort4_3:
   tmp ∈ [-2147483647..2147483647] or UNINITIALIZED

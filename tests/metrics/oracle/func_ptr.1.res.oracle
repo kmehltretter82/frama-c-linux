@@ -49,7 +49,7 @@
 [eva:initial-state] Values of globals at initialization
   bar ∈ {0}
   bar_extern ∈ {0}
-[eva] done for function foobar
+[eva] Done for function foobar
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   2 functions analyzed (out of 4): 50% coverage.

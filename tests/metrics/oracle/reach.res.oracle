@@ -86,7 +86,7 @@
   bar ∈ {0}
   t[0] ∈ {{ &baz }}
    [1] ∈ {0}
-[eva] done for function main
+[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   1 function analyzed (out of 3): 33% coverage.

@@ -39,7 +39,7 @@
 [eva:alarm] postcond_leaf.c:92: Warning: 
   function h4: postcondition got status invalid.
 [eva] using specification for function k
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function h1:
   

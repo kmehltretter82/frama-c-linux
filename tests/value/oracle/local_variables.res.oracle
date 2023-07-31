@@ -43,7 +43,7 @@
 [eva:alarm] local_variables.i:47: Warning: 
   out of bounds read. assert \valid_read(p);
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function w:
   B ∈ {0}

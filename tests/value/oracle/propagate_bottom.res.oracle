@@ -29,7 +29,7 @@
   non-finite double value.
   assert \is_finite(\div_double((double)1., (double)0.));
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] propagate_bottom.i:5: 
   assertion 'Eva,division_by_zero' got final status invalid.
 [eva] propagate_bottom.i:8: 

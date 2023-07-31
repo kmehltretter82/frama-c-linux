@@ -26,7 +26,7 @@
 [eva] Recording results for main3
 [from] Computing for function main3
 [from] Done for function main3
-[eva] done for function main3
+[eva] Done for function main3
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to f3 at bts336.i:53 (by main3):
   a FROM p; a

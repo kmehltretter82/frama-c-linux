@@ -10,7 +10,7 @@
    [1].[bits 8 to 31] ∈ {0}
    [1].b ∈ {4}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {2}

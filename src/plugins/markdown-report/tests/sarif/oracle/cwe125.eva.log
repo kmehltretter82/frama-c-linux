@@ -8,7 +8,7 @@
   out of bounds read. assert \valid_read(array + index);
 [eva:alarm] cwe125.c:27: Warning: 
   out of bounds read. assert \valid_read(array + index);
-[eva] done for function main
+[eva] Done for function main
 [eva] cwe125.c:27: assertion 'Eva,mem_access' got final status invalid.
 [kernel:annot:missing-spec] cwe125.c:27: Warning: 
   Neither code nor specification for function printf, generating default assigns from the prototype

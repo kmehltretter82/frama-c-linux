@@ -1894,7 +1894,7 @@
 [eva] Recording results for test_uninit
 [eva] Done for function test_uninit
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] math_builtins.c:728: 
   assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

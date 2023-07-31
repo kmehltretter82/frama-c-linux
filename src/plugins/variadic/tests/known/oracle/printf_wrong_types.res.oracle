@@ -94,7 +94,7 @@
 [eva] using specification for function printf_va_13
 [eva:alarm] printf_wrong_types.c:30: Warning: 
   function printf_va_13: precondition valid_read_string(param0) got status invalid.
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION
@@ -356,7 +356,7 @@ int main(void)
 [kernel:annot:missing-spec] printf_wrong_types.c:18: Warning: 
   Neither code nor specification for function printf, generating default assigns from the prototype
 [eva] using specification for function printf
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {42}
@@ -506,7 +506,7 @@ int main(void)
 [eva] using specification for function printf_va_13
 [eva:alarm] printf_wrong_types.c:30: Warning: 
   function printf_va_13: precondition valid_read_string(param0) got status invalid.
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

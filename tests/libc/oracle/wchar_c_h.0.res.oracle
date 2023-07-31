@@ -209,7 +209,7 @@
 [eva] wchar_c_h.c:76: Call to builtin free
 [eva] wchar_c_h.c:76: function free: precondition 'freeable' got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function wcscpy:
   i ∈ {8}

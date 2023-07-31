@@ -14,7 +14,7 @@
 [eva] copy_logic.i:18: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function f
 [eva:alarm] copy_logic.i:18: Warning: assertion got status unknown.
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   y ∈ [-2147483606..2147483647]

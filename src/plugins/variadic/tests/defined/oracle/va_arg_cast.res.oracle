@@ -6,7 +6,7 @@
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function b:
   a ∈ {4619679907765970542}

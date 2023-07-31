@@ -42,7 +42,7 @@
 [eva:alarm] array_bounds.i:20: Warning: 
   accessing out of bounds index. assert j < 12;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   s.a ∈ {9}

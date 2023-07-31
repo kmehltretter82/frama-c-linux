@@ -75,7 +75,7 @@
   assertion 'sampling,unknown' got status unknown.
 [eva] fc_builtin_c.c:43: assertion '__WORDSIZE_is_defined' got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function Frama_C_update_entropy:
   Frama_C_entropy_source ∈ [--..--]

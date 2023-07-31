@@ -132,7 +132,7 @@
   The imprecision originates from Library function {library.i:45}
 [eva:alarm] library.i:46: Warning: out of bounds write. assert \valid(pd);
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] library.i:38: assertion 'Eva,function_pointer' got final status invalid.
 [eva] library.i:39: assertion 'Eva,function_pointer' got final status invalid.
 [eva] library.i:40: assertion 'Eva,function_pointer' got final status invalid.
@@ -280,7 +280,7 @@
 [eva:alarm] library.i:81: Warning: 
   assertion 'Unknown_Invalid' got status invalid (stopping propagation).
 [eva] Recording results for main2
-[eva] done for function main2
+[eva] Done for function main2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main2:
   
@@ -571,7 +571,7 @@
   assertion 'Unknown_Invalid' got status unknown.
 [eva] library.i:82: Frama_C_show_each_reached_3:
 [eva] Recording results for main2
-[eva] done for function main2
+[eva] Done for function main2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main2:
   

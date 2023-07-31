@@ -7,7 +7,7 @@
   entropy_source ∈ [--..--]
   g ∈ {42}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   g ∈ {5; 45}
@@ -82,7 +82,7 @@ c -> 5
 [eva:initial-state] Values of globals at initialization
   entropy_source ∈ [--..--]
   g ∈ {42}
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   g ∈ {5; 45}

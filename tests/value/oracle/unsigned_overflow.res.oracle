@@ -9,7 +9,7 @@
 [eva:alarm] unsigned_overflow.c:5: Warning: assertion got status unknown.
 [eva] unsigned_overflow.c:10: Frama_C_show_each_dead:
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   v ∈ [--..--]

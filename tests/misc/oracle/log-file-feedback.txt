@@ -12,4 +12,4 @@ Called from tests/misc/log-file.i:21.
 [eva] Done for function g
 tests/misc/log-file.i:22:[eva] starting to merge loop iterations
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main

@@ -29,7 +29,7 @@
   invalid LHS operand for left shift. assert 0 ≤ (int)(-44);
 [eva] shift_neg.c:36: Frama_C_show_each_neg_right_shift: {-1}, {-6}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] shift_neg.c:29: assertion 'Eva,shift' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

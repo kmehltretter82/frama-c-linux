@@ -2,7 +2,7 @@
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
-[eva] done for function main
+[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   3 functions analyzed (out of 3): 100% coverage.

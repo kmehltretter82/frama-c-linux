@@ -363,7 +363,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       let final_states = List.map snd (final_result.Transfer.states) in
       let final_state = PowersetDomain.(final_states |> of_list |> join) in
       Eva_utils.clear_call_stack ();
-      Self.feedback "done for function %a" Kernel_function.pretty kf;
+      Self.feedback "Done for function %a" Kernel_function.pretty kf;
       Abstract.Dom.Store.mark_as_computed ();
       Self.(ComputationState.set Computed);
       post_analysis ();

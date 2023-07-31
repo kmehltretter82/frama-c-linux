@@ -46,7 +46,7 @@
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] imprecise_invalid_write.i:5: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] imprecise_invalid_write.i:10: 

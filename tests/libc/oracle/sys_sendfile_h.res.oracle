@@ -66,7 +66,7 @@
   function close: precondition 'valid_fd' got status valid.
 [eva] Done for function close
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ [--..--]

@@ -8,7 +8,7 @@
   
 [eva] loop_wvar.i:27: starting to merge loop iterations
 [eva] Recording results for main_err1
-[eva] done for function main_err1
+[eva] Done for function main_err1
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main_err1:
   n ∈ {13}

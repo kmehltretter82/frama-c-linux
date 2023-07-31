@@ -41,7 +41,7 @@
   fp ∈ {{ &g }}
 [eva] using specification for function isalpha
 [eva] using specification for function isblank
-[eva] done for function main
+[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   5 functions analyzed (out of 6): 83% coverage.

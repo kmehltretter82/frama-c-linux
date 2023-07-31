@@ -157,7 +157,7 @@
   G7[0..160] ∈ [--..--]
 [eva] dur.i:167: starting to merge loop iterations
 [eva] Recording results for F2
-[eva] done for function F2
+[eva] Done for function F2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function F2:
   G5.M75 ∈ [0..255]

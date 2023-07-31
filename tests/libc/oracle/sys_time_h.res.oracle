@@ -62,7 +62,7 @@
   function utimes: precondition 'valid_times_or_null' got status valid.
 [eva] Done for function utimes
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i1.it_interval.tv_sec ∈ {1}

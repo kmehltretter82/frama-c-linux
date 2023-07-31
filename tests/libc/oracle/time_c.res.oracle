@@ -18,7 +18,7 @@
 [eva] Done for function ctime
 [eva] time_c.c:9: assertion got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function ctime:
   __fc_ctime[0..24] ∈ [--..--]

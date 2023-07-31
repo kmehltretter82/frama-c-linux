@@ -133,7 +133,7 @@
 [eva] Recording results for main4
 [from] Computing for function main4
 [from] Done for function main4
-[eva] done for function main4
+[eva] Done for function main4
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to f4 at bts336.i:78 (by main4):
   a1 FROM p; a1

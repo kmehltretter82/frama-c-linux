@@ -8,7 +8,7 @@
   aorai_CurOpStatus ∈ {aorai_Called}
   aorai_CurStates ∈ {init}
 [aorai] saveload.i:14: accept
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f_post_func:
   aorai_CurOperation ∈ {op_f}

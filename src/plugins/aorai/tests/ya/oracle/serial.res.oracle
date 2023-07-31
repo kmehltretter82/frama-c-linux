@@ -31,7 +31,7 @@
 [eva] serial.c:63: Trace partitioning superposing up to 900 states
 [eva] serial.c:63: Trace partitioning superposing up to 1000 states
 [eva] serial.c:63: Trace partitioning superposing up to 1100 states
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function input_data_post_func:
   aorai_x1 ∈ [0..127]

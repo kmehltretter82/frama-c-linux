@@ -13,7 +13,7 @@
 [eva:alarm] assert_ptr.i:12: Warning: assertion got status unknown.
 [eva] assert_ptr.i:13: Frama_C_show_each_q: {{ &a }}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   ptr ∈ {{ NULL ; &a }}

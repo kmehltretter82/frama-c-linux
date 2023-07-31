@@ -10,7 +10,7 @@
 [eva:alarm] pb_infinite_loop.c:35: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
 [eva] Recording results for test_infinite_loop_2
-[eva] done for function test_infinite_loop_2
+[eva] Done for function test_infinite_loop_2
 [pdg] computing for function test_infinite_loop_2
 [pdg] pb_infinite_loop.c:37: Warning: no final state. Probably unreachable...
 [pdg] done for function test_infinite_loop_2

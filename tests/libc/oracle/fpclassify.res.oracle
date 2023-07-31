@@ -94,7 +94,7 @@
 [eva] Done for function __fc_fpclassifyf
 [eva] fpclassify.c:67: assertion got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   d ∈ [-1e-309 .. 0.]

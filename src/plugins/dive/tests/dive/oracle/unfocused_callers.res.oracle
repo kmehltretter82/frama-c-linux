@@ -10,7 +10,7 @@
   non-finite float value.
   assert \is_finite(\add_float(\add_float(tmp, tmp_0), tmp_1));
   (tmp from f1(x), tmp_0 from f2(x), tmp_1 from f3(x))
-[eva] done for function main
+[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   5 functions analyzed (out of 5): 100% coverage.

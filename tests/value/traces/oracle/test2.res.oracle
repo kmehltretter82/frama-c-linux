@@ -14,7 +14,7 @@
 [eva] Recording results for loop
 [eva] Done for function loop
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function loop:
   j ∈ {4; 5}
@@ -107,7 +107,7 @@ c -> 1
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __traces_domain_return ∈ {4; 5}

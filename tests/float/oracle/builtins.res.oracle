@@ -24,7 +24,7 @@
   function Frama_C_double_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
@@ -137,7 +137,7 @@
 [eva:alarm] builtins.c:111: Warning: 
   accessing uninitialized left-value. assert \initialized(&x);
 [eva] Recording results for main_log_exp
-[eva] done for function main_log_exp
+[eva] Done for function main_log_exp
 [eva] builtins.c:111: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main_log_exp:

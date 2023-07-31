@@ -83,7 +83,7 @@
 [eva] Done for function multiple_update_safe
 [eva] undefined_sequence2.i:68: Frama_C_show_each_passed7:
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] undefined_sequence2.i:11: 
   assertion 'Eva,separation' got final status invalid.
 [eva] undefined_sequence2.i:18: 

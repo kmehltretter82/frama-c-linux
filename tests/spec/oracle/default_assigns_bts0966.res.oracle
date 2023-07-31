@@ -9,7 +9,7 @@
 [eva] using specification for function copy
 [eva] default_assigns_bts0966.i:20: Warning: 
   no \from part for clause 'assigns auto_states[Init], auto_states[Copy];'
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   auto_states[0] ∈ {0}

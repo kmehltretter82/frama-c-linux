@@ -5,7 +5,7 @@
 [eva] Computing initial state
 [eva] Initial state computed
 [eva] multiple-va_start.c:20: allocating variable __malloc_pack_l20
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function pack:
   __fc_heap_status ∈ [--..--]

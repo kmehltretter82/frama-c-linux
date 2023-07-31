@@ -14,7 +14,7 @@
   overflow in conversion from floating-point to integer.
   assert -2147483649 < dd;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] overflow_cast_float_int.i:16: 
   assertion 'Eva,float_to_int' got final status invalid.
 [eva] overflow_cast_float_int.i:20: 

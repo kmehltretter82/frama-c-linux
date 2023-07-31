@@ -13,7 +13,7 @@
 [eva:alarm] unroll.i:34: Warning: signed overflow. assert -2147483648 ≤ j - 1;
 [eva:alarm] unroll.i:32: Warning: signed overflow. assert G + i ≤ 2147483647;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   c ∈ {0}

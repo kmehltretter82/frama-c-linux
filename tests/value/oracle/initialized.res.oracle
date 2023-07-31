@@ -233,7 +233,7 @@
 [eva] Recording results for reduce_by_negation
 [eva] Done for function reduce_by_negation
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] initialized.c:93: assertion 'Eva,initialization' got final status invalid.
 [eva] initialized.c:104: 
   assertion 'Eva,initialization' got final status invalid.

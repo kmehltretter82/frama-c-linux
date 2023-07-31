@@ -9,7 +9,7 @@
 [eva] ptr_assert.i:11: assertion got status valid.
 [eva] ptr_assert.i:16: assertion got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [occurrence] analysis done
 [occurrence] variable x (global):
     sid 1: x

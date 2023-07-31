@@ -287,7 +287,7 @@
 [eva] Recording results for subdivide_strategy
 [eva] Done for function subdivide_strategy
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function access_bits:
   rbits1 ∈ {0; 1; 2}

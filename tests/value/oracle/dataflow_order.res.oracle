@@ -97,7 +97,7 @@
 [eva] Done for function g
 [eva] dataflow_order.i:28: Frama_C_show_each_end:
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   j ∈ [--..--]

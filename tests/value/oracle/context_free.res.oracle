@@ -104,7 +104,7 @@
 [eva:alarm] context_free.i:62: Warning: 
   pointer to function with incompatible type. assert \valid_function(g);
 [eva] Recording results for f
-[eva] done for function f
+[eva] Done for function f
 [eva] context_free.i:62: 
   assertion 'Eva,function_pointer' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

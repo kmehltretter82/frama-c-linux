@@ -24,7 +24,7 @@
   Called from n5.i:23.
 [eva] Done for function never_terminates
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   NON TERMINATING FUNCTION

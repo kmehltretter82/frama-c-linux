@@ -25,7 +25,7 @@
 [eva] Initial state computed
 [eva:alarm] scanf_wrong.c:8: Warning: 
   accessing uninitialized left-value. assert \initialized(&d);
-[eva] done for function main
+[eva] Done for function main
 [eva] scanf_wrong.c:8: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

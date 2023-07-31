@@ -114,7 +114,7 @@
   Assigning imprecise value to e.
   The imprecision originates from Arithmetic {div.i:37}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] div.i:22: assertion 'rte,signed_overflow' got final status valid.
 [eva] div.i:25: assertion 'rte,signed_overflow' got final status valid.
 [eva] div.i:28: assertion 'rte,signed_overflow' got final status valid.

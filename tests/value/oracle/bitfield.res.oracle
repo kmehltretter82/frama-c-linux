@@ -205,7 +205,7 @@
 [eva] Recording results for char_short
 [eva] Done for function char_short
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] bitfield.i:102: assertion 'Eva,initialization' got final status invalid.
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======

@@ -9,7 +9,7 @@
 [eva:alarm] globals.c:28: Warning: 
   signed overflow. assert s2.a2 + s2.b2 ≤ 2147483647;
 [eva] Recording results for h
-[eva] done for function h
+[eva] Done for function h
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function h:
   s2.a2 ∈ [-2147483648..2147483644]

@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:alarm] callstack_strategy.i:11: Warning: 
   non-finite float value. assert \is_finite(\add_float(y, z));
-[eva] done for function main
+[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   5 functions analyzed (out of 5): 100% coverage.

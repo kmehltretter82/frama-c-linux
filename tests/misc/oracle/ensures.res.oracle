@@ -6,7 +6,7 @@
   
 [eva:alarm] ensures.i:8: Warning: 
   function main: postcondition got status invalid.
-[eva] done for function main
+[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   1 function analyzed (out of 1): 100% coverage.

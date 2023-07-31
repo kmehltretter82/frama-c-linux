@@ -818,7 +818,7 @@
 [eva] Recording results for main
 [kernel] linked_list.c:44: 
   more than 100(128) elements to enumerate. Approximating.
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function malloc:
   malloc_next_free ∈ [-0x80000000..0x7FFFFFF8],0%8

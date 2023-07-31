@@ -36,7 +36,7 @@
 [eva] bts709.c:46: starting to merge loop iterations
 [eva] bts709.c:47: Reusing old results for call to inputsOf_testcase_func
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function func

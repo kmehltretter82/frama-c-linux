@@ -37,7 +37,7 @@
 [eva] sum_with_unspecified_sequence.c:17: 
   Assigning imprecise value to \result<sum>.
   The imprecision originates from Well
-[eva] done for function sum
+[eva] Done for function sum
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function sum:
   ret ∈

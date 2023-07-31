@@ -6,7 +6,7 @@
   
 [eva:alarm] well_typed_alarm.i:16: Warning: 
   pointer comparison. assert \pointer_comparable((void *)p, (void *)q);
-[eva] done for function main
+[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   1 function analyzed (out of 1): 100% coverage.

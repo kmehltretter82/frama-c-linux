@@ -184,7 +184,7 @@
 [eva] Recording results for taint_infinite_while
 [eva] Done for function taint_infinite_while
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function taint_assume_1:
   x ∈ {3}

@@ -31,7 +31,7 @@
                    (tmp from call(i, c))
 [eva] simple_call.c:52: Reusing old results for call to call
 [eva] Recording results for call_in_loop
-[eva] done for function call_in_loop
+[eva] Done for function call_in_loop
 [pdg] computing for function call_in_loop
 [from] Computing for function call
 [from] Done for function call

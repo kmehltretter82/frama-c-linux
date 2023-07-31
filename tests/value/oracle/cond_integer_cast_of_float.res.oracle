@@ -123,7 +123,7 @@
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva] Analyzing a complete application starting at mainbis
 [eva] Computing initial state
@@ -233,5 +233,5 @@
 [eva] Recording results for main
 [eva] Done for function main
 [eva] Recording results for mainbis
-[eva] done for function mainbis
+[eva] Done for function mainbis
 [eva] ====== VALUES COMPUTED ======

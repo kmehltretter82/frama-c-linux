@@ -34,7 +34,7 @@
 [eva] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] done for function main
+[eva] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to g at bts335b.i:17 (by f):
   X FROM c; x

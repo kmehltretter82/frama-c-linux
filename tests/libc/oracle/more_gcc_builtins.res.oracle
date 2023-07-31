@@ -234,7 +234,7 @@
 [eva] using specification for function __atomic_is_lock_free
 [eva] Done for function __atomic_is_lock_free
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   res ∈ [0..64]

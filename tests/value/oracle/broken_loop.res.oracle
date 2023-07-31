@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   X ∈ {0}
 [eva] Recording results for loop
-[eva] done for function loop
+[eva] Done for function loop
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function loop:
   X ∈ {2}

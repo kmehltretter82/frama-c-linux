@@ -22,7 +22,7 @@
 [eva] Computing initial state
 [eva] Initial state computed
 [eva] using specification for function scanf_va_1
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   c[0] ∈ [--..--]

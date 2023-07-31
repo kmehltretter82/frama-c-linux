@@ -220,7 +220,7 @@
 [eva:alarm] pwd_c.c:35: Warning: assertion 'unknown_for_now' got status unknown.
 [eva:alarm] pwd_c.c:36: Warning: assertion 'unknown_for_now' got status unknown.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function __fc_getpw_r:
   Frama_C_entropy_source ∈ [--..--]

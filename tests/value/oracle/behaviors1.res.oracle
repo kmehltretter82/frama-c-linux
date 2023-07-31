@@ -446,7 +446,7 @@
 [eva] Recording results for test_narrow
 [eva] Done for function test_narrow
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test_123_comp_2345_comp_disj:
   a ∈ [--..--]

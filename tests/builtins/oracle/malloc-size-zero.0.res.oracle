@@ -102,7 +102,7 @@
   weak free on bases: {__malloc_my_calloc_l10_0, __malloc_my_calloc_l10_1,
                        __malloc_my_calloc_l10_2, __malloc_w_my_calloc_l10_3}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] malloc-size-zero.c:35: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] malloc-size-zero.c:42: 

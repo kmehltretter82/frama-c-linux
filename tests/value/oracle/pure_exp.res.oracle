@@ -6,7 +6,7 @@
   t ∈ {0}
 [eva:alarm] pure_exp.i:8: Warning: out of bounds read. assert \valid_read(t);
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] pure_exp.i:8: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

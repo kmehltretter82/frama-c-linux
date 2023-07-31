@@ -16,7 +16,7 @@
 [eva] Done for function main_top
 [eva] top.i:33: Reusing old results for call to f
 [eva] Recording results for main_top_not_used
-[eva] done for function main_top_not_used
+[eva] Done for function main_top_not_used
 [pdg] computing for function main_top_not_used
 [from] Computing for function main_top
 [from] Computing for function f <-main_top

@@ -25,7 +25,7 @@
   Frama_C_show_each_F: [-2147483648..2147483647], {0; 1; 2}
 [eva] reading_null.i:25: Frama_C_show_each_F: [-2147483648..2147483647], [0..9]
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   X ∈ [--..--]

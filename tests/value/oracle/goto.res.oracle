@@ -21,7 +21,7 @@
 [eva] Recording results for skip_declaration
 [eva] Done for function skip_declaration
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function skip_declaration:
   y ∈ {2}

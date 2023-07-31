@@ -7,7 +7,7 @@
 [eva:alarm] deps.i:11: Warning: 
   accessing uninitialized left-value. assert \initialized(&w);
 [eva] Recording results for f
-[eva] done for function f
+[eva] Done for function f
 [eva] deps.i:11: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:

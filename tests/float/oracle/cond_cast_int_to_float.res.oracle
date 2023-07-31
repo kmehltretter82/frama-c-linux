@@ -83,7 +83,7 @@
 [eva] Done for function __assert
 [eva] cond_cast_int_to_float.c:24: Frama_C_show_each_else: {24}, [-10000..-30]
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   

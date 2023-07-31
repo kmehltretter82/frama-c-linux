@@ -14,7 +14,7 @@
 [eva:alarm] loop3.c:11: Warning: signed overflow. assert j + 3 ≤ 2147483647;
 [eva:alarm] loop3.c:11: Warning: signed overflow. assert k + 8 ≤ 2147483647;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {100}

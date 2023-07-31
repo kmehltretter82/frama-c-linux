@@ -10,7 +10,7 @@
   for loop without unroll annotation
 [eva:loop-unroll:missing] loopfun.i:27: dowhile loop without unroll annotation
 [eva] Recording results for main2
-[eva] done for function main2
+[eva] Done for function main2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main2:
   

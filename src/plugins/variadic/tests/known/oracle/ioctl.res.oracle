@@ -17,7 +17,7 @@
   Completely invalid destination for assigns clause *((char *)argp + (0 ..)).
   Ignoring.
 [eva] using specification for function __va_ioctl_int
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   fd1 ∈ {1}

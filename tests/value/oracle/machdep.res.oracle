@@ -9,7 +9,7 @@
 [eva] Recording results for test1
 [eva] Done for function test1
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test1:
   u ∈ {18446744073709551615}
@@ -30,7 +30,7 @@
 [eva] Recording results for test1
 [eva] Done for function test1
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test1:
   u ∈ {18446744073709551615}
@@ -51,7 +51,7 @@
 [eva] Recording results for test1
 [eva] Done for function test1
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test1:
   u ∈ {18446744073709551615}

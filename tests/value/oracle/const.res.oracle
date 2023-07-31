@@ -135,7 +135,7 @@
 [eva] Done for function mutable_test
 [eva] const.i:130: Frama_C_show_each_S2: {45}, {2}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] const.i:21: assertion 'Eva,mem_access' got final status invalid.
 [eva] const.i:26: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

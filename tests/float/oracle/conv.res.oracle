@@ -51,7 +51,7 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] conv.i:32: assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] conv.i:41: assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] conv.i:49: assertion 'Eva,is_nan_or_infinite' got final status invalid.

@@ -10,7 +10,7 @@
 [eva] Recording results for detect_video
 [eva] Done for function detect_video
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function detect_video:
   NULL[rbits 256 to 287] ∈ [--..--]

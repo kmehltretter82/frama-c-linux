@@ -45,7 +45,7 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] arith_pointer.c:30: 
   assertion 'Eva,differing_blocks' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
@@ -159,7 +159,7 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   t[0..1] ∈ {-3}

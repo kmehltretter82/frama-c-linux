@@ -20,7 +20,7 @@
 [eva:alarm] mini_pointrer.i:10: Warning: 
   accessing out of bounds index. assert c2 < 2;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   T[0..1] ∈ {0; 4; 9}
