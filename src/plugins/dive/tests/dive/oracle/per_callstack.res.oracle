@@ -1,12 +1,9 @@
 [kernel] Parsing per_callstack.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:alarm] per_callstack.i:15: Warning: 
   non-finite float value. assert \is_finite(\add_float(x, y));
 [eva:alarm] per_callstack.i:15: Warning: 
   non-finite float value. assert \is_finite(\add_float(\add_float(x, y), z));
-[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   2 functions analyzed (out of 2): 100% coverage.

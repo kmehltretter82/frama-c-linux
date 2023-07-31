@@ -397,9 +397,10 @@ module Make
         supplied_state ()
       end
       else begin
-        Self.feedback "Computing initial state";
+        let pp = Parameters.ValShowProgress.get () in
+        if pp then Self.feedback "Computing initial state";
         let state = global_state ~lib_entry in
-        Self.feedback "Initial state computed";
+        if pp then Self.feedback "Initial state computed";
         state
       end
     in

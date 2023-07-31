@@ -19,14 +19,11 @@
 [variadic] open.c:9: 
   Fallback translation of call open to a call to the specialized version open_fallback_1.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva] using specification for function __va_open_mode_t
 [eva] using specification for function __va_open_void
 [kernel:annot:missing-spec] open.c:9: Warning: 
   Neither code nor specification for function open_fallback_1, generating default assigns from the prototype
 [eva] using specification for function open_fallback_1
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   flag ∈ {0}

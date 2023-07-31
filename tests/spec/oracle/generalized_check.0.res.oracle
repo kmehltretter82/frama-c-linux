@@ -1,7 +1,5 @@
 [kernel] Parsing generalized_check.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:alarm] generalized_check.i:23: Warning: 
@@ -19,7 +17,6 @@
 [eva] generalized_check.i:35: starting to merge loop iterations
 [eva:alarm] generalized_check.i:36: Warning: 
   check 'implied_by_false_invariant' got status invalid.
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function loop:
   j ∈ {10}

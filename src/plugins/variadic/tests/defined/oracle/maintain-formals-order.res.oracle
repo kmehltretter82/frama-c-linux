@@ -7,9 +7,6 @@
 [variadic] maintain-formals-order.i:15: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   g_0 ∈ {0}

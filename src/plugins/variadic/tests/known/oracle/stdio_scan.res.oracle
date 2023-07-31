@@ -35,11 +35,8 @@
 [variadic] stdio_scan.c:16: 
   Translating call to sscanf to a call to the specialized version sscanf_va_2.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:alarm] stdio_scan.c:10: Warning: 
   accessing uninitialized left-value. assert \initialized(&s);
-[eva] Done for function main
 [eva] stdio_scan.c:10: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

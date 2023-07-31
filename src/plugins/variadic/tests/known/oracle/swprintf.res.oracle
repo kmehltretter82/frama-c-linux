@@ -33,8 +33,6 @@
 [variadic] swprintf.c:15: 
   Translating call to swprintf to a call to the specialized version swprintf_va_2.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva] using specification for function wmemset
 [eva] using specification for function swprintf_va_1
 [eva] FRAMAC_SHARE/libc/wchar.h:274: 
@@ -47,7 +45,6 @@
 [eva:alarm] swprintf.c:13: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] using specification for function swprintf_va_2
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   data[0..98] ∈ {65}

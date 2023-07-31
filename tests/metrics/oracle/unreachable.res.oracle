@@ -34,11 +34,8 @@
   Pointer dereferencing = 0
   Cyclomatic complexity = 3
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   1 function analyzed (out of 2): 50% coverage.
@@ -66,11 +63,8 @@
   10 stmts in analyzed functions, 6 stmts analyzed (60.0%)
   main: 6 stmts out of 10 (60.0%)
 [eva] Analyzing a complete application starting at foo
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] Done for function foo
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   1 function analyzed (out of 2): 50% coverage.

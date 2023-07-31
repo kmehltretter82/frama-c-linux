@@ -47,11 +47,8 @@
 [variadic] stdio_print.c:19: 
   Translating call to dprintf to a call to the specialized version dprintf_va_2.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:alarm] stdio_print.c:9: Warning: 
   accessing uninitialized left-value. assert \initialized(&format);
-[eva] Done for function main
 [eva] stdio_print.c:9: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

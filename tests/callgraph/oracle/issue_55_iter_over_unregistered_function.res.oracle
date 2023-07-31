@@ -1,12 +1,9 @@
 [kernel] Parsing issue_55_iter_over_unregistered_function.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:alarm] issue_55_iter_over_unregistered_function.i:12: Warning: 
   accessing uninitialized left-value. assert \initialized(&q);
-[eva] Done for function main
 [eva] issue_55_iter_over_unregistered_function.i:12: 
   assertion 'Eva,initialization' got final status invalid.
 [eva:summary] ====== ANALYSIS SUMMARY ======

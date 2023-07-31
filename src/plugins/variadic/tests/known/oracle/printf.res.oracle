@@ -89,8 +89,6 @@
 [variadic] printf.c:75: 
   Translating call to printf to a call to the specialized version printf_va_28.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva] using specification for function printf_va_1
 [eva] using specification for function printf_va_2
 [eva] using specification for function printf_va_3
@@ -125,7 +123,6 @@
   Ignoring.
 [eva] using specification for function printf_va_27
 [eva] using specification for function printf_va_28
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_initial_stdout.__fc_FILE_id ∈ {1}

@@ -7,12 +7,9 @@
 [variadic] exec_failed_requirement.c:7: 
   Translating call to execl to a call to execv.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva] using specification for function execv
 [eva:alarm] exec_failed_requirement.c:7: Warning: 
   function execv: precondition 'valid_string_argv0' got status invalid.
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

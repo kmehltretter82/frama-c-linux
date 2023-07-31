@@ -1,14 +1,11 @@
 [kernel:annot:missing-spec] saveload.i:12: Warning: 
   Neither code nor specification for function Frama_C_show_aorai_state, generating default assigns from the prototype
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   aorai_CurOperation ∈ {op_main}
   aorai_CurOpStatus ∈ {aorai_Called}
   aorai_CurStates ∈ {init}
 [aorai] saveload.i:14: accept
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f_post_func:
   aorai_CurOperation ∈ {op_f}

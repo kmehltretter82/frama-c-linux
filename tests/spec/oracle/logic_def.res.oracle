@@ -1,11 +1,8 @@
 [kernel] Parsing logic_def.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] logic_def.c:9: assertion got status valid.
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x ∈ {42}

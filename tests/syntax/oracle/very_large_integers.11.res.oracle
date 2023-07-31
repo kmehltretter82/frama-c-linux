@@ -7,15 +7,12 @@
 [kernel:annot-error] very_large_integers.c:132: Warning: 
   Invalid slevel directive. Ignoring code annotation
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [kernel:annot-error] very_large_integers.c:129: Warning: 
   invalid loop unrolling parameter; ignoring
 [kernel:annot-error] very_large_integers.c:131: Warning: 
   invalid loop unrolling parameter; ignoring
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}

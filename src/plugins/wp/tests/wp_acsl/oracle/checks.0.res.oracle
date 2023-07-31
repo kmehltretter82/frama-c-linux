@@ -26,15 +26,12 @@ Prove: true.
 
 ------------------------------------------------------------
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:alarm] checks.i:14: Warning: check 'c1' got status unknown.
 [eva:alarm] checks.i:15: Warning: assertion 'a1' got status unknown.
 [eva:alarm] checks.i:16: Warning: check 'c2' got status unknown.
 [eva:alarm] checks.i:17: Warning: assertion 'a2' got status unknown.
-[eva] Done for function main
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

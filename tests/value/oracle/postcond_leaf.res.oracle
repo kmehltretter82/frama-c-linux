@@ -1,7 +1,5 @@
 [kernel] Parsing postcond_leaf.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   i ∈ [--..--]
   j ∈ [--..--]
@@ -39,7 +37,6 @@
 [eva:alarm] postcond_leaf.c:92: Warning: 
   function h4: postcondition got status invalid.
 [eva] using specification for function k
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function h1:
   

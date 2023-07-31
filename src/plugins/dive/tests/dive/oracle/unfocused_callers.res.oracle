@@ -1,7 +1,5 @@
 [kernel] Parsing unfocused_callers.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:alarm] unfocused_callers.i:16: Warning: 
   non-finite float value.
   assert \is_finite(\add_float(tmp, tmp_0));
@@ -10,7 +8,6 @@
   non-finite float value.
   assert \is_finite(\add_float(\add_float(tmp, tmp_0), tmp_1));
   (tmp from f1(x), tmp_0 from f2(x), tmp_1 from f3(x))
-[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   5 functions analyzed (out of 5): 100% coverage.

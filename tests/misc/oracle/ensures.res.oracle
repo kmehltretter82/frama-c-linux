@@ -1,12 +1,9 @@
 [kernel] Parsing ensures.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:alarm] ensures.i:8: Warning: 
   function main: postcondition got status invalid.
-[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   1 function analyzed (out of 1): 100% coverage.

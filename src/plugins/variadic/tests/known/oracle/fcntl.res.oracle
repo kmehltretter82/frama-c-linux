@@ -34,8 +34,6 @@
 [variadic] fcntl.c:28: 
   Fallback translation of call fcntl to a call to the specialized version fcntl_fallback_2.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva] using specification for function __va_fcntl_void
 [eva] using specification for function __va_fcntl_int
 [eva] using specification for function __va_fcntl_flock
@@ -49,7 +47,6 @@
 [kernel:annot:missing-spec] fcntl.c:28: Warning: 
   Neither code nor specification for function fcntl_fallback_2, generating default assigns from the prototype
 [eva] using specification for function fcntl_fallback_2
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   fl ∈ [--..--] or UNINITIALIZED

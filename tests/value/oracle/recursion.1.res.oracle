@@ -1,7 +1,5 @@
 [kernel] Parsing recursion.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   p ∈ {0}
@@ -124,7 +122,6 @@
   Analysis of function decr is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function decr
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function alarm:
   res ∈ [2..2147483647] or UNINITIALIZED

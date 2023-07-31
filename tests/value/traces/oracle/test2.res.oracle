@@ -103,11 +103,8 @@ c -> 1
 [inout] Inputs for function main:
     \nothing
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __traces_domain_return ∈ {4; 5}

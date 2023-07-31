@@ -2,9 +2,6 @@
 [variadic] va_list-as-arg.c:25: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function vsum:
   list ∈ {{ &__va_args[8] }}

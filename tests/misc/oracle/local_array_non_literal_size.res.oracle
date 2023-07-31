@@ -3,11 +3,8 @@
   declaration of array of 'zero-length arrays' ('int [0]`);
   zero-length arrays are a compiler extension
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function one_dim:
   normal_array[0] ∈ {0}
