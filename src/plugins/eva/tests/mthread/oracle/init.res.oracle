@@ -1,0 +1,45 @@
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[kernel] Parsing init.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
+[mt] ******* Starting mthread
+[mt] *** Computing value analysis for main thread
+[mt] New thread: main, fun main
+[mt] init.c:24: Initializing mutex &locks[0]
+[mt] init.c:24: Initializing mutex &locks[1]
+[mt] init.c:24: Initializing mutex &locks[2]
+[mt] init.c:27: Initializing mutex mu1
+[mt] init.c:27: Initializing mutex mu2
+[mt] init.c:27: Initializing mutex mu3
+[mt] init.c:31: Initializing mutex mutex_7
+[mt] init.c:32: Mutex mutex_7 will now be named mu4
+[mt] init.c:31: Initializing mutex mutex_8
+[mt] init.c:32: Mutex mutex_8 will now be named mu5
+[mt] init.c:31: Initializing mutex mutex_9
+[mt] init.c:32: Mutex mutex_9 will now be named mu6
+[mt] init.c:37: Initializing mutex mutex_10
+[mt] init.c:37: Warning: 
+  During mutex initialization. Mutex mutex_10 initialized more than once by
+  thread _main_ at same statement. Ignoring.
+[mt] *** First value analysis for main thread done.
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+[mt] * shared variables computed
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] ******* Starting to iterate
+[mt] ***** Iteration 1
+[mt] ***** Threads computed for iteration 1.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: \nothing
+[mt] Possible read/write data races:
+  none
+[mt] Shared memory: \nothing
+[mt] Mutexes for concurrent accesses:
+[mt] Detailed shared zones protections
+[mt] ***** Shared variables computed
+[mt] ******* Analysis performed, 1 iterations

@@ -1,0 +1,30 @@
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[kernel] Parsing unhandled_calls.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
+[mt] ******* Starting mthread
+[mt] *** Computing value analysis for main thread
+[mt] New thread: main, fun main
+[kernel:annot:missing-spec] unhandled_calls.c:30: Warning: 
+  Neither code nor specification for function random,
+   generating default assigns. See -generated-spec-* options for more info
+[mt] unhandled_calls.c:18: New thread: &th2, fun t, parent _main_, args {0}
+[mt] unhandled_calls.c:18: Start thread &th2
+[mt] unhandled_calls.c:23: New thread: &th1, fun t, parent _main_, args {0}
+[mt] unhandled_calls.c:23: Start thread &th1
+[mt] unhandled_calls.c:23: Thread &th1, fun t, parent _main_, args {0}
+[mt] unhandled_calls.c:23: New context for &th1, fun t, parent _main_, args {0}
+[mt] Warning: Queue &q might be already initialized
+[mt] *** First value analysis for main thread done.
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  th1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
+  th2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:20
+[mt] * shared variables computed
+[mt] * Computing cfg
+[mt] unhandled_calls.c:42: User Error: 
+  simultaneous call to a mthread function and to another function: very
+  strangely written mthread binding?
+[kernel] Plug-in mt aborted: invalid user input.

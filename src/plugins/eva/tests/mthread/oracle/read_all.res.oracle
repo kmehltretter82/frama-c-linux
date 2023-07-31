@@ -1,0 +1,141 @@
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[kernel] Parsing read_all.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
+[mt] ******* Starting mthread
+[mt] *** Computing value analysis for main thread
+[mt] New thread: main, fun main
+[kernel:annot:missing-spec] read_all.c:25: Warning: 
+  Neither code nor specification for function random,
+   generating default assigns. See -generated-spec-* options for more info
+[mt] read_all.c:27: 
+  New thread: &jobs, fun f, parent _main_, args [0..18446744073709551615]
+[mt] read_all.c:27: Start thread &jobs
+[mt] read_all.c:29: User Error: 
+  read of the whole memory. Ignoring to allow Mthread to continue, but the
+  analysis will not be correct.
+[eva:assigns:missing-result] read_all.c:16: Warning: 
+  no 'assigns \result \from ...' clause specified for function g
+[eva:assigns:missing] read_all.c:15: Warning: 
+  no \from part for clause 'assigns *p, r;'.
+  Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
+[mt] *** First value analysis for main thread done.
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  r: write by _main_ at read_all.c:29
+[mt] * shared variables computed
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] ******* Starting to iterate
+[mt] ***** Iteration 1
+[mt] *** Computing thread &jobs, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread &jobs
+[mt] read_all.c:19: User Error: 
+  read of the whole memory. Ignoring to allow Mthread to continue, but the
+  analysis will not be correct.
+[eva:assigns:missing] read_all.c:15: Warning: 
+  no \from part for clause 'assigns *p, r;'.
+  Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  r: write by &jobs at read_all.c:19
+[mt] * shared variables computed
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread &jobs computed
+[mt] ***** Threads computed for iteration 1.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: r
+[mt] Concurrent imprecise accesses have changed: before
+    \nothing
+  vs.
+    r
+[mt] Possible read/write data races:
+  none
+[mt] Possible write/write data races:
+  none
+[mt] Shared memory: \nothing
+[mt] Mutexes for concurrent accesses:
+[mt] Detailed shared zones protections
+[mt] ***** Shared variables computed
+[mt] ***** Iteration 2
+[mt] *** Computing thread _main_, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread _main_
+[mt] Thread main, fun main
+[mt] read_all.c:27: 
+  Thread &jobs, fun f, parent _main_, args [0..18446744073709551615]
+[mt] read_all.c:27: Start thread &jobs
+[mt] read_all.c:29: User Error: 
+  read of the whole memory. Ignoring to allow Mthread to continue, but the
+  analysis will not be correct.
+[eva:assigns:missing-result] read_all.c:16: Warning: 
+  no 'assigns \result \from ...' clause specified for function g
+[eva:assigns:missing] read_all.c:15: Warning: 
+  no \from part for clause 'assigns *p, r;'.
+  Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  r: write by _main_ at read_all.c:29
+[mt] * shared variables computed
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread _main_ computed
+[mt] *** Computing thread &jobs, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread &jobs
+[mt] read_all.c:19: User Error: 
+  read of the whole memory. Ignoring to allow Mthread to continue, but the
+  analysis will not be correct.
+[eva:assigns:missing] read_all.c:15: Warning: 
+  no \from part for clause 'assigns *p, r;'.
+  Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  r: write by &jobs at read_all.c:19
+[mt] * shared variables computed
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread &jobs computed
+[mt] ***** Threads computed for iteration 2.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: r
+[mt] _main_ writes  r ∈ [--..--]  // read_all.c:29 main (read_all.c:23)
+[mt] _main_ writes  r ∈ [--..--]  // read_all.c:29
+  g (read_all.c:29) <- main (read_all.c:23)
+[mt] &jobs writes  r ∈ [--..--]  // read_all.c:19
+  g (read_all.c:19) <- f (read_all.c:18)
+[mt] Possible read/write data races:
+  none
+[mt] Possible write/write data races:
+  r:
+    write by _main_ at read_all.c:29, unprotected
+    write by _main_ at read_all.c:29, unprotected
+    write by &jobs at read_all.c:19, unprotected
+[mt] Shared memory: r
+[mt] Concurrent precise var accesses have changed: before
+    \nothing
+  vs.
+    r
+[mt] Write summary for _main_ (updated): r ∈ [--..--]
+[mt] Write summary for &jobs (updated): r ∈ [--..--]
+[mt] Mutexes for concurrent accesses:
+  r  write unprotected, read unaccessed
+[mt] Detailed shared zones protections
+  r:
+[mt] ***** Shared variables computed
+[mt] ******* Analysis performed, 2 iterations
+[mt] Deferred error message was emitted during execution:
+  read_all.c:29: read of the whole memory. Ignoring to allow Mthread to continue, but the
+  analysis will not be correct.
+[kernel] Plug-in mt aborted: invalid user input.
