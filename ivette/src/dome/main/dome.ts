@@ -37,22 +37,22 @@
    @module dome(main)
 */
 
-import _ from 'lodash';
-import fs from 'fs';
-import path from 'path';
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/devtools';
+import SYS, * as System from 'dome/system';
 import {
-  app,
-  ipcMain,
   BrowserWindow,
   BrowserWindowConstructorOptions,
   IpcMainEvent,
-  shell,
-  dialog,
-  nativeTheme,
   Rectangle,
+  app,
+  dialog,
+  ipcMain,
+  nativeTheme,
+  shell,
 } from 'electron';
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/devtools';
-import SYS, * as System from 'dome/system';
+import fs from 'fs';
+import _ from 'lodash';
+import path from 'path';
 
 // --------------------------------------------------------------------------
 // --- Main Window Web Navigation
@@ -539,12 +539,25 @@ function createPrimaryWindow(): void {
   const wdir = cwd === '/' ? app.getPath('home') : cwd;
   const cmd = stripElectronArgv({ wdir, argv: process.argv });
 
+  // Reset Settings if the associated argument is provided
+  const initSettings = cmd.argv.includes("--init-settings");
+  if(initSettings) {
+    restoreAllDefaultSettings();
+    cmd.argv = cmd.argv.filter((p) => !!p && p !== "--init-settings");
+  }
+
   // Initialize Theme
   const globals = obtainGlobalSettings();
   applyThemeSettings(globals);
 
+
   // Create Window
   createBrowserWindow(true, { title: appName }, cmd.argv, cmd.wdir);
+
+  // Reset Settings if the associated argument is provided
+  if(initSettings) {
+    restoreAllDefaultSettings();
+  }
 }
 
 let appCount = 1;
@@ -627,6 +640,21 @@ function restoreDefaultSettings(): void {
   });
 
   broadcast('dome.ipc.settings.defaults');
+}
+
+/**
+ * Resets the Global setting file and delete the Window setting file
+ * (which will be recreated in a default state when needed)
+ */
+function restoreAllDefaultSettings(): void {
+  GlobalSettings = {};
+  nativeTheme.themeSource = 'system';
+  saveGlobalSettings();
+  try {
+    fs.rmSync(PATH_WINDOW_SETTINGS);
+  } catch (_error ) {
+    console.warn(_error);
+  }
 }
 
 ipcMain.on('dome.menu.settings', showSettingsWindow);

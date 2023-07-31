@@ -83,6 +83,7 @@
     "cytoscape-panzoom": "",
     "cytoscape-popper": "",
     "diff": "",
+    "gremlins.js": "^2.2.0",
     "immutable": "",
     "lodash": "^4.17.21",
     "react": "^16",
