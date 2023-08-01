@@ -1,16 +1,4 @@
 [e-acsl] beginning translation.
-[e-acsl] functions.c:44: Warning: 
-  no assigns clause generated for function p1 because pointers as arguments is not yet supported
-[e-acsl] functions.c:56: Warning: 
-  no assigns clause generated for function g because pointers as arguments is not yet supported
-[e-acsl] functions.c:56: Warning: 
-  no assigns clause generated for function g_hidden because pointers as arguments is not yet supported
-[e-acsl] functions.c:59: Warning: 
-  no assigns clause generated for function h_char because pointers as arguments is not yet supported
-[e-acsl] functions.c:61: Warning: 
-  no assigns clause generated for function h_short because pointers as arguments is not yet supported
-[e-acsl] functions.c:71: Warning: 
-  no assigns clause generated for function f2 because pointers as arguments is not yet supported
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] functions.c:44: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
