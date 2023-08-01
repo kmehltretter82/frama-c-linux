@@ -1,6 +1,8 @@
 import { test } from "@playwright/test";
 import * as e2eService from "./libs/e2eService";
 
+let gremlins: any;
+
 test('run gremlins.js', async () => {
     const launchAppResult = await e2eService.launchAppWithTestFileAndInitSettings();
     const electronApp = launchAppResult.app;

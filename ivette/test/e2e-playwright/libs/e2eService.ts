@@ -11,7 +11,7 @@ export async function launchApp(): Promise <{app: ElectronApplication, page: Pag
         args: [
             'dist/main/main.js', 
             '--command', 
-            '../bin/frama-c',
+            '/builds/frama-c/frama-c/bin/frama-c',
         ],
     });
 
@@ -42,7 +42,7 @@ export async function launchAppInitSettings(): Promise <{app: ElectronApplicatio
         args: [
             'dist/main/main.js', 
             '--command', 
-            '../bin/frama-c', 
+            '/builds/frama-c/frama-c/bin/frama-c', 
             '--init-settings'
         ],
     });
@@ -74,7 +74,7 @@ export async function launchAppWithTestFile(): Promise <{app: ElectronApplicatio
         args: [
             'dist/main/main.js', 
             '--command',
-            '../bin/frama-c', 
+            '/builds/frama-c/frama-c/bin/frama-c', 
             '../tests/test/adpcm.c'
         ],
     });
@@ -106,7 +106,7 @@ export async function launchAppWithTestFileAndInitSettings(): Promise <{app: Ele
         args: [
             'dist/main/main.js', 
             '--command',
-            '../bin/frama-c', 
+            '/builds/frama-c/frama-c/bin/frama-c', 
             '--init-settings',
             '../tests/test/adpcm.c'
         ],
