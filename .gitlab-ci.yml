@@ -165,6 +165,7 @@ e-acsl-dev-tests:
   script:
     - ./nix/build-proxy.sh eva-$CONFIG-tests
   <<: *coverage_artifacts
+  # Do not add OUT here, the parallel rule in Eva domains overload variables
 
 eva-default-tests:
   variables:
@@ -353,7 +354,7 @@ internal:
   except:
     - schedules
 
-internal_nightly:
+internal-nightly:
   <<: *internal_template
   # The Opam target may affect this job
   timeout: 2h
