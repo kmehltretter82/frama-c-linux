@@ -17,7 +17,6 @@ test('check server connection', async () => {
     const launchAppResult = await e2eService.launchApp();
     const electronApp = launchAppResult.app;
     const window = launchAppResult.page;
-
     // Await manual input by user to resume the test
     // await window.pause();
 
