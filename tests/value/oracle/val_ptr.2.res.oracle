@@ -17,7 +17,7 @@
   p ∈ {0}
   T[0..7] ∈ {0}
 [eva] Recording results for f3
-[eva] done for function f3
+[eva] Done for function f3
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f3:
   p ∈ {{ &T[0] }}

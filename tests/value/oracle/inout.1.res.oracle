@@ -24,7 +24,7 @@
 [eva:alarm] inout.i:42: Warning: 
   accessing uninitialized left-value. assert \initialized(&r);
 [eva] Recording results for inout_11_3
-[eva] done for function inout_11_3
+[eva] Done for function inout_11_3
 [from] Computing for function inout_11_3
 [from] Done for function inout_11_3
 [from] ====== DEPENDENCIES COMPUTED ======

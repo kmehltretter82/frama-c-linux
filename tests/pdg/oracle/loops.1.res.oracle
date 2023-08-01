@@ -7,7 +7,7 @@
 [eva] loops.c:51: starting to merge loop iterations
 [eva:alarm] loops.c:53: Warning: signed overflow. assert s + 2 ≤ 2147483647;
 [eva] Recording results for simple_with_break
-[eva] done for function simple_with_break
+[eva] Done for function simple_with_break
 [pdg] computing for function simple_with_break
 [pdg] done for function simple_with_break
 [pdg] PDG for simple_with_break

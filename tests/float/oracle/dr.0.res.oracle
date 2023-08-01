@@ -24,7 +24,7 @@
   e2 ∈ {0}
 [eva] dr.i:26: Frama_C_show_each: {1}, {0}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   e1 ∈ {1}

@@ -6,7 +6,7 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [pdg] computing for function main
 [pdg] done for function main
 [sparecode] unsupported.i:11: Warning: Dropping annotation

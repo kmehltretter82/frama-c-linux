@@ -11,7 +11,7 @@
   d ∈ {0}
   T[0..9] ∈ {0}
 [eva] Recording results for main4
-[eva] done for function main4
+[eva] Done for function main4
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main4:
   T[0..9] ∈ {0}

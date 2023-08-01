@@ -9,7 +9,7 @@
 [eva] unroll_labels.i:33: starting to merge loop iterations
 [eva] unroll_labels.i:53: starting to merge loop iterations
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   j ∈ {-1; 5}

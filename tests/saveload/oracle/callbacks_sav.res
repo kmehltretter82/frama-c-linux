@@ -32,7 +32,7 @@
 [eva] Recording results for main1
 [from] Computing for function main1
 [from] Done for function main1
-[eva] done for function main1
+[eva] Done for function main1
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   4 functions analyzed (out of 6): 66% coverage.

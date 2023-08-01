@@ -43,7 +43,7 @@
   Called from select_calls.i:35.
 [eva] Done for function send
 [eva] Recording results for f
-[eva] done for function f
+[eva] Done for function f
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function f

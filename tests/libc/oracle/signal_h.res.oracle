@@ -152,7 +152,7 @@
 [eva] signal_h.c:60: assertion 'sigsuspend_errno_eintr' got status valid.
 [eva] signal_h.c:61: assertion 'sigsuspend_return' got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ [--..--]

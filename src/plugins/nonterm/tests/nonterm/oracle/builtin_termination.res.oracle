@@ -13,7 +13,7 @@
 [eva:alarm] builtin_termination.c:16: Warning: 
   function strlen: precondition 'valid_string_s' got status invalid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   str1[0] ∈ {111}

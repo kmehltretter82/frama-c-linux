@@ -6,8 +6,6 @@
   Calling undeclared function DPRINTFrama_C_domain_show_each_ex10. Old style K&R code?
 [eva:experimental] Warning: The numerors domain is experimental.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] using specification for function Frama_C_double_interval
@@ -203,7 +201,6 @@
                        Approx  : [-0.17261767499011627E1 ; -0.42246764007909610E-1] :: Double
                        Abs Err : [-0.5867853536391490212420248588143346856126E-15 ; 0.5570994050918043816793619293944153365339E-15]
                        Rel Err : [-0.1075409232850577199876876365727845835922E-13 ; 0.1099687719037347795339717936867396431953E-13]
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function ex0:
   x ∈ [0.5 .. 1.]

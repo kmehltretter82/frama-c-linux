@@ -675,7 +675,7 @@
 [eva] Recording results for encode
 [eva] Done for function encode
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function abs:
   m ∈ {0; 1; 2}

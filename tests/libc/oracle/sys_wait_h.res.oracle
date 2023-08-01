@@ -33,7 +33,7 @@
   function waitpid, behavior stat_loc_non_null: precondition 'valid_stat_loc' got status valid.
 [eva] Done for function waitpid
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   r ∈ [-1..2147483647]

@@ -20,7 +20,7 @@
 [eva] postdom.c:23: Reusing old results for call to __VERIFIER_assert
 [eva] postdom.c:23: Reusing old results for call to __VERIFIER_assert
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [pdg] computing for function __VERIFIER_assert
 [pdg] done for function __VERIFIER_assert
 [pdg] computing for function main

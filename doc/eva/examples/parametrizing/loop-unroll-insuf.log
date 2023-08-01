@@ -6,7 +6,7 @@
   
 [eva:loop-unroll:partial] loop-unroll-insuf.c:4: loop not completely unrolled
 [eva] loop-unroll-insuf.c:4: starting to merge loop iterations
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {21}

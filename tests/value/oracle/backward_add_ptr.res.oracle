@@ -180,7 +180,7 @@
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva:garbled-mix] Warning: 
   Garbled mix generated during analysis:
   {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:25}) }}

@@ -38,7 +38,7 @@
 [eva:alarm] sort4.i:26: Warning: 
   function sort4_4: postcondition got status unknown.
 [eva] Recording results for sort4_4
-[eva] done for function sort4_4
+[eva] Done for function sort4_4
 [scope:rm_asserts] removing 13 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function sort4_4:

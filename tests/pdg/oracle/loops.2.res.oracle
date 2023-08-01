@@ -8,7 +8,7 @@
 [eva:alarm] loops.c:66: Warning: signed overflow. assert s + 2 ≤ 2147483647;
 [eva:alarm] loops.c:67: Warning: signed overflow. assert i + 1 ≤ 2147483647;
 [eva] Recording results for infinite
-[eva] done for function infinite
+[eva] Done for function infinite
 [pdg] computing for function infinite
 [pdg] loops.c:70: Warning: no final state. Probably unreachable...
 [pdg] done for function infinite

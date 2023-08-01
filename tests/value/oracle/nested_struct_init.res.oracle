@@ -62,7 +62,7 @@
      .f7 ∈ {8}
      .[bits 944 to 959] ∈ {0}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}
@@ -131,7 +131,7 @@
      .f7 ∈ {8}
      .[bits 944 to 959] ∈ UNINITIALIZED
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}
@@ -200,7 +200,7 @@
      .f7 ∈ {8}
      .[bits 944 to 959] ∈ {0} or UNINITIALIZED
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}
@@ -251,7 +251,7 @@
      .f7 ∈ {8}
      .[bits 944 to 959] ∈ [--..--] or UNINITIALIZED
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}
@@ -302,7 +302,7 @@
      .f7 ∈ {8}
      .[bits 944 to 959] ∈ UNINITIALIZED
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}
@@ -324,7 +324,7 @@
      .f7 ∈ {8}
      .[bits 944 to 959] ∈ [--..--]
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}

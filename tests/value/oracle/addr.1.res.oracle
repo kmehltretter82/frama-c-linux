@@ -8,7 +8,7 @@
   p ∈ {0}
   q ∈ {0}
 [eva] Recording results for f
-[eva] done for function f
+[eva] Done for function f
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   p ∈ {{ &t + [-8589934592..8589934588],0%4 }}

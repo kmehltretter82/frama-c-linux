@@ -13,7 +13,7 @@
   function mxml: precondition got status invalid.
 [eva] Done for function mxml
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

@@ -43,7 +43,7 @@
 [eva] Recording results for should_never_end
 [eva] Done for function should_never_end
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function never_ends:
   NON TERMINATING FUNCTION

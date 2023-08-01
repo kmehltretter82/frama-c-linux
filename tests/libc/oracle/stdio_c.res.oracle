@@ -352,7 +352,7 @@
 [eva:alarm] stdio_c.c:53: Warning: 
   assertion 'at_least_one_char' got status unknown.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function fgetc:
   Frama_C_entropy_source ∈ [--..--]

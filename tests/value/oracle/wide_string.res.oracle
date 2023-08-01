@@ -9,7 +9,7 @@
 [eva:alarm] wide_string.c:19: Warning: 
   accessing out of bounds index. assert 4 < 4;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] wide_string.c:16: assertion 'Eva,index_bound' got final status invalid.
 [eva] wide_string.c:19: assertion 'Eva,index_bound' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

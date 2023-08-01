@@ -17,7 +17,7 @@
   signed overflow. assert j + ecart ≤ 2147483647;
 [eva] test.i:9: starting to merge loop iterations
 [eva] Recording results for inst_F6
-[eva] done for function inst_F6
+[eva] Done for function inst_F6
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function inst_F6:

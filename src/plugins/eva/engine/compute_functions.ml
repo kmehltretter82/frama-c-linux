@@ -245,9 +245,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
      specification or body according to [target]. If [-eva-show-progress] is
      true, the callstack and additional information are printed. *)
   let compute_using_spec_or_body target kinstr call state =
-    let global = match kinstr with Kglobal -> true | _ -> false in
-    let pp = not global && Parameters.ValShowProgress.get () in
-    if pp then
+    if kinstr <> Kglobal && Parameters.ValShowProgress.get () then
       Self.feedback
         "@[computing for function %a.@\nCalled from %a.@]"
         Callstack.pretty_short call.callstack
@@ -261,7 +259,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     in
     apply_call_hooks call state kind;
     let resulting_states, cacheable = compute kinstr call state in
-    if pp then
+    if Parameters.ValShowProgress.get () then
       Self.feedback
         "Done for function %a" Kernel_function.pretty call.kf;
     Transfer.{ states = resulting_states; cacheable; builtin=false }
@@ -363,7 +361,6 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       let final_states = List.map snd (final_result.Transfer.states) in
       let final_state = PowersetDomain.(final_states |> of_list |> join) in
       Eva_utils.clear_call_stack ();
-      Self.feedback "done for function %a" Kernel_function.pretty kf;
       Abstract.Dom.Store.mark_as_computed ();
       Self.(ComputationState.set Computed);
       post_analysis ();

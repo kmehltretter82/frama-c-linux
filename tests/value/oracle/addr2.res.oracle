@@ -11,7 +11,7 @@
 [eva] addr2.i:19: Frama_C_show_each_F: {0; 1; 2}
 [eva] addr2.i:19: Frama_C_show_each_F: [0..12]
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {13}

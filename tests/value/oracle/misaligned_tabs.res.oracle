@@ -37,7 +37,7 @@
 [eva] Done for function misaligned_struct
 [eva] misaligned_tabs.i:64: Frama_C_show_each_g: {1}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function misaligned_struct:
   S1.i1[bits 0 to 7] ∈ {17}

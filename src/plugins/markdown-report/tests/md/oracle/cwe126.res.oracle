@@ -1,7 +1,5 @@
 [kernel] Parsing cwe126.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] cwe126.c:77: allocating variable __malloc_goodG2B_l77
@@ -14,7 +12,6 @@
 [eva] cwe126.c:27: starting to merge loop iterations
 [eva:alarm] cwe126.c:29: Warning: 
   out of bounds read. assert \valid_read(data + i);
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] 
   Values at end of function CWE126_Buffer_Overread__malloc_char_loop_64b_badSink:

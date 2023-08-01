@@ -88,7 +88,7 @@
 [eva] Recording results for main10_loop
 [eva] Done for function main10_loop
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] downcast.i:37: assertion 'Eva,unsigned_downcast' got final status invalid.
 [eva] downcast.i:85: assertion 'Eva,unsigned_downcast' got final status invalid.
 [eva] downcast.i:90: assertion 'Eva,unsigned_downcast' got final status invalid.

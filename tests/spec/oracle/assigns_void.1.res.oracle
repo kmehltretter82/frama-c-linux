@@ -11,7 +11,7 @@
 [eva] using specification for function f
 [eva] Done for function f
 [eva] Recording results for g
-[eva] done for function g
+[eva] Done for function g
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function g:
   y ∈ [--..--] or UNINITIALIZED

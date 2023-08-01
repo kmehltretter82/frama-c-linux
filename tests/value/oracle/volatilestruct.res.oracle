@@ -22,7 +22,7 @@
 [eva:alarm] volatilestruct.c:34: Warning: 
   signed overflow. assert (int)(&y - p->f4.f2) + 3 ≤ 2147483647;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p ∈ {{ &s2 }}
@@ -62,7 +62,7 @@
 [eva:signed-overflow] volatilestruct.c:34: Warning: 
   2's complement assumed for overflow
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p ∈ {{ &s2 }}

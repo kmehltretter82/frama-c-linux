@@ -14,7 +14,7 @@
 [eva] Done for function fsize3
 [eva] sizeof.c:14: freeing automatic bases: {__malloc_fsize3_l9}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function fsize3:
   b ∈ ESCAPINGADDR

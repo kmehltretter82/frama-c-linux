@@ -2,8 +2,6 @@
 [kernel:annot:missing-spec] serial.c:56: Warning: 
   Neither code nor specification for function Frama_C_show_aorai_state, generating default assigns from the prototype
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   indefinitely ∈ [--..--]
   buffer[0..4] ∈ {0}
@@ -31,7 +29,6 @@
 [eva] serial.c:63: Trace partitioning superposing up to 900 states
 [eva] serial.c:63: Trace partitioning superposing up to 1000 states
 [eva] serial.c:63: Trace partitioning superposing up to 1100 states
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function input_data_post_func:
   aorai_x1 ∈ [0..127]

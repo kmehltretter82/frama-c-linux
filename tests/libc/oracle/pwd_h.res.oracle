@@ -22,7 +22,7 @@
 [eva:alarm] pwd_h.c:23: Warning: assertion got status unknown.
 [eva:alarm] pwd_h.c:24: Warning: assertion got status unknown.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_pwd.pw_name ∈ {{ NULL + [--..--] ; &__fc_getpw_pw_name[0] }}

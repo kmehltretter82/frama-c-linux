@@ -31,7 +31,7 @@
 [eva] Recording results for h
 [eva] Done for function h
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] inout_on_alarms.i:17: 
   assertion 'Eva,index_bound' got final status invalid.
 [eva] inout_on_alarms.i:21: 

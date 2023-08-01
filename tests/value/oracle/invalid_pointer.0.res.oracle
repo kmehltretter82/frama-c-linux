@@ -165,7 +165,7 @@
   Called from invalid_pointer.c:201.
 [eva] Done for function signal
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] invalid_pointer.c:20: 
   assertion 'Eva,pointer_value' got final status invalid.
 [eva] invalid_pointer.c:23: 

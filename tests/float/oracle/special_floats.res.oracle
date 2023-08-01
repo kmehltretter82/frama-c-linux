@@ -71,7 +71,7 @@
 [eva] Recording results for macro_nan
 [eva] Done for function macro_nan
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function is_infinite:
   zero ∈ {-0.}

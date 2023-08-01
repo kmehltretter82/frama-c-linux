@@ -47,7 +47,7 @@
   more than 1(350) elements to enumerate. Approximating.
 [eva] Done for function use_array
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function init_array:
   t[0]{.kind; .[bits 8 to 31]#} ∈ {0; 1} repeated %8 

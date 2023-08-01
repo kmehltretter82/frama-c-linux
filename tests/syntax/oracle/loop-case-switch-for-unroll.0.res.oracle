@@ -1,7 +1,5 @@
 [kernel] Parsing loop-case-switch-for-unroll.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   gen_nondet_vals[0] ∈ {1}
                  [1] ∈ {42}
@@ -70,7 +68,6 @@
 [eva] loop-case-switch-for-unroll.c:53: Frama_C_show_each_nondet_: {0}
 [eva] loop-case-switch-for-unroll.c:84: Frama_C_show_each_y_: {32}
 [eva] loop-case-switch-for-unroll.c:85: Frama_C_show_each_x_: {32}
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function gen_nondet:
   gen_nondet_i ∈ [0..31]

@@ -38,7 +38,7 @@
 [eva:alarm] dr_infinity.i:41: Warning: 
   non-finite double value. assert \is_finite(\div_double(d, (double)0.));
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] dr_infinity.i:11: 
   assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] dr_infinity.i:16: 

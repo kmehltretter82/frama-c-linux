@@ -7,10 +7,7 @@
 [variadic] redefine_anonymous_parameters.i:4: 
   Translating call to printf to a call to the specialized version printf_va_1.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva] using specification for function printf_va_1
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   

@@ -3,8 +3,6 @@
   Floating-point constant 0.001 is not represented exactly. Will use 0x1.0624dd2f1a9fcp-10.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   aorai_CurOperation ∈ {op_square_root_aux}
   aorai_CurOpStatus ∈ {aorai_Called}
@@ -25,7 +23,6 @@
   non-finite float value.
   assert \is_finite(tmp);
   (tmp from square_root_aux(y, n))
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main_post_func:
   aorai_CurOperation ∈ {op_main}

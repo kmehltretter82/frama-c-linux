@@ -14,7 +14,7 @@
 [eva] partitioning-annots.c:228: Frama_C_show_each: {0}, {0}
 [eva] partitioning-annots.c:228: Frama_C_show_each: {1}, {1}
 [eva] Recording results for test_history
-[eva] done for function test_history
+[eva] Done for function test_history
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test_history:
   Frama_C_entropy_source ∈ [--..--]

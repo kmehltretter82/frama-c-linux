@@ -13,7 +13,7 @@
 [eva] loops.i:176: starting to merge loop iterations
 [eva:alarm] loops.i:179: Warning: signed overflow. assert X + 1 ≤ 2147483647;
 [eva] Recording results for loop
-[eva] done for function loop
+[eva] Done for function loop
 [from] Computing for function loop
 [from] Done for function loop
 [from] ====== DEPENDENCIES COMPUTED ======

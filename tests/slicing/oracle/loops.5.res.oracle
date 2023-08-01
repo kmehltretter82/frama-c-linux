@@ -27,7 +27,7 @@
 [eva:alarm] loops.i:133: Warning: 
   signed overflow. assert G + no_data ≤ 2147483647;
 [eva] Recording results for test_infinite_loop_4
-[eva] done for function test_infinite_loop_4
+[eva] Done for function test_infinite_loop_4
 [from] Computing for function test_infinite_loop_4
 [from] Done for function test_infinite_loop_4
 [from] ====== DEPENDENCIES COMPUTED ======

@@ -9,7 +9,7 @@
 [eva:alarm] empty_struct.c:70: Warning: 
   out of bounds read. assert \valid_read(ptr_ret);
 [eva] Recording results for main2
-[eva] done for function main2
+[eva] Done for function main2
 [eva] empty_struct.c:70: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main2:

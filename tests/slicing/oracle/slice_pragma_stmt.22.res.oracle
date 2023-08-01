@@ -9,7 +9,7 @@
 [eva:alarm] slice_pragma_stmt.i:160: Warning: 
   signed overflow. assert c2 + 1 ≤ 2147483647;
 [eva] Recording results for test9
-[eva] done for function test9
+[eva] Done for function test9
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function test9

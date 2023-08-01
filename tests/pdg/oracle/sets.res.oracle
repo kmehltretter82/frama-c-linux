@@ -11,7 +11,7 @@
   t ∈ [--..--]
 [eva:alarm] sets.c:15: Warning: signed overflow. assert b + y ≤ 2147483647;
 [eva] Recording results for f
-[eva] done for function f
+[eva] Done for function f
 [inout] InOut (internal) for function f:
   Operational inputs:
     a

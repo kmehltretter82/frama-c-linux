@@ -51,7 +51,7 @@
 [eva:pointer-comparison] pointer_comparison.c:23: 
   evaluating condition to {0; 1} instead of {1} because of UPCPA
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p ∈ {{ &x + [20..--],0%4 }}
@@ -128,7 +128,7 @@
 [eva] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
 [eva] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p ∈ {{ &x + [20..--],0%4 }}
@@ -228,7 +228,7 @@
 [eva] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
 [eva] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + [20..--],0%4 }}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p ∈ {{ &x + [20..--],0%4 }}

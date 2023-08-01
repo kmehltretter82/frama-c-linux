@@ -15,7 +15,7 @@
 [eva] Recording results for main
 [eva] Done for function main
 [eva] Recording results for main1
-[eva] done for function main1
+[eva] Done for function main1
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function foo:
   __retres ∈ {1}
@@ -71,7 +71,7 @@
 [eva] Recording results for main
 [eva] Done for function main
 [eva] Recording results for main2
-[eva] done for function main2
+[eva] Done for function main2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function foo:
   __retres ∈ {1}

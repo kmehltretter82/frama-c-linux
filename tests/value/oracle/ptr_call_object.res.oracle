@@ -26,7 +26,7 @@
 [eva] Done for function next_1
 [eva] ptr_call_object.c:35: Frama_C_show_each_x: {{ &o1 }}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function next_0:
   __retres ∈ {0}

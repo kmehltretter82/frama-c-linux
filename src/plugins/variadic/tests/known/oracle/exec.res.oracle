@@ -19,8 +19,6 @@
 [variadic] exec.c:15: 
   Fallback translation of call execlp to a call to the specialized version execlp_fallback_1.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva] using specification for function execve
 [eva] using specification for function execv
 [eva] using specification for function execvp
@@ -30,7 +28,6 @@
 [eva:invalid-assigns] exec.c:15: 
   Completely invalid destination for assigns clause *(param1 + (0 ..)).
   Ignoring.
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   env[0] ∈ {{ "VAR=42" }}

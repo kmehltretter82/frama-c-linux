@@ -45,7 +45,7 @@
 [eva] using specification for function ret_ptr_empty
 [eva] Done for function ret_ptr_empty
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   res.a ∈ {87}

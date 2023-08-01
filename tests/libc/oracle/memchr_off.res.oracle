@@ -17,7 +17,7 @@
 [eva] memchr_off.c:19: check 'valid' got status valid.
 [eva] memchr_off.c:20: check 'valid' got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   s ∈ {{ "abc" }}

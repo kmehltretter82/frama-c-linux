@@ -15,7 +15,7 @@
 [eva:alarm] struct.i:47: Warning: signed overflow. assert -2147483648 ≤ a + b;
 [eva:alarm] struct.i:47: Warning: signed overflow. assert a + b ≤ 2147483647;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   w ∈ [--..--]

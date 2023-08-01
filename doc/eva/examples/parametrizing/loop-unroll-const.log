@@ -6,7 +6,7 @@
   
 [eva] loop-unroll-const.c:8: Trace partitioning superposing up to 100 states
 [eva] loop-unroll-const.c:8: Trace partitioning superposing up to 200 states
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   a[0][0] ∈ {0}

@@ -6,7 +6,7 @@
   
 [eva] div_strange.i:7: Frama_C_show_each_F: {1073741823}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x ∈ {1073741823}

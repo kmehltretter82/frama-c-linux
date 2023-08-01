@@ -8,7 +8,7 @@
 [kernel:annot:missing-spec] summary.i:19: Warning: 
   Neither code nor specification for function minimalist, generating default assigns from the prototype
 [eva] using specification for function minimalist
-[eva] done for function minimalist
+[eva] Done for function minimalist
 [eva] ====== VALUES COMPUTED ======
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------

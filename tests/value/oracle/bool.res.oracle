@@ -38,7 +38,7 @@
 [eva] Recording results for invalid_bool
 [eva] Done for function invalid_bool
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] bool.i:43: assertion 'Eva,bool_value' got final status invalid.
 [eva] bool.i:52: assertion 'Eva,bool_value' got final status invalid.
 [eva] bool.i:62: assertion 'Eva,bool_value' got final status invalid.

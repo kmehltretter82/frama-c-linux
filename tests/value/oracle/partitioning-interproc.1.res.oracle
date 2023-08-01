@@ -9,7 +9,7 @@
 [eva] Recording results for fabs
 [eva] Done for function fabs
 [eva] Recording results for fabs_test
-[eva] done for function fabs_test
+[eva] Done for function fabs_test
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function fabs:
   __retres ∈ [-0. .. 1.79769313486e+308]

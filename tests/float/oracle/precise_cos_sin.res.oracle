@@ -173,7 +173,7 @@
 [eva] precise_cos_sin.c:16: 
   Frama_C_show_each_c: [-1.0000000000000000 .. 1.0000000000000000]
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]

@@ -9,7 +9,7 @@
 [eva:alarm] with_comment.i:21: Warning: 
   signed overflow. assert G + 1 ≤ 2147483647;
 [eva] Recording results for main2
-[eva] done for function main2
+[eva] Done for function main2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main2:
   i ∈ {11}

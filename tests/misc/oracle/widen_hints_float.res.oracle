@@ -133,7 +133,7 @@
 [eva] Recording results for newton_sqrt
 [eva] Done for function newton_sqrt
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function first_order_filter:
   Frama_C_entropy_source ∈ [--..--]

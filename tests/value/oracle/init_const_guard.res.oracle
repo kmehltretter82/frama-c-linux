@@ -15,7 +15,7 @@
 [eva] init_const_guard.i:17: 
   function f: postcondition 'Q_NotWrite' got status valid.
 [eva] Recording results for f
-[eva] done for function f
+[eva] Done for function f
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   __retres ∈ {0}
@@ -85,7 +85,7 @@
 [eva] init_const_guard.i:27: 
   function g: postcondition 'P_not_Const' got status valid.
 [eva] Recording results for g
-[eva] done for function g
+[eva] Done for function g
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function g:
   x ∈ {0; 2}
@@ -145,7 +145,7 @@
   v ∈ [--..--]
   S_p[0..1] ∈ [--..--]
 [eva] Recording results for f
-[eva] done for function f
+[eva] Done for function f
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   __retres ∈ {0}
@@ -216,7 +216,7 @@
   v ∈ [--..--]
   S_p_0[0..1] ∈ [--..--]
 [eva] Recording results for g
-[eva] done for function g
+[eva] Done for function g
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function g:
   x ∈ [--..--]

@@ -18,7 +18,7 @@
 [eva] empty_struct.c:86: 
   function free: precondition 'freeable' got status valid.
 [eva] Recording results for main3
-[eva] done for function main3
+[eva] Done for function main3
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main3:
   __fc_heap_status ∈ [--..--]

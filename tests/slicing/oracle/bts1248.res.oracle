@@ -6,7 +6,7 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] Recording results for f
-[eva] done for function f
+[eva] Done for function f
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [slicing] Warning: No internal slicing request from the command line.

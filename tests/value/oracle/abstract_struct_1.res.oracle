@@ -22,7 +22,7 @@
 [eva] abstract_struct_1.c:13: Call to builtin calloc
 [eva] abstract_struct_1.c:13: allocating variable __calloc_main_l13
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]

@@ -132,7 +132,7 @@
 [eva:alarm] undefined_sequence.i:67: Warning: 
   undefined multiple accesses in expression. assert \separated(&my_f, &my_f);
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] undefined_sequence.i:16: 
   assertion 'Eva,separation' got final status invalid.
 [eva] undefined_sequence.i:28: 

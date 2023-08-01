@@ -10,7 +10,7 @@
 [eva:alarm] se.i:12: Warning: out of bounds write. assert \valid(tab + e1);
 [eva:alarm] se.i:14: Warning: out of bounds read. assert \valid_read(es);
 [eva] Recording results for Se
-[eva] done for function Se
+[eva] Done for function Se
 [pdg] computing for function Se
 [pdg] done for function Se
 [sparecode] add selection in function 'Se'

@@ -15,7 +15,7 @@
 [eva] using specification for function __builtin_next_arg
 [eva] Done for function __builtin_next_arg
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   vlParameters ∈ [--..--]

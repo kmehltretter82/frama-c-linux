@@ -78,7 +78,7 @@
 [eva:alarm] dpds_intra.c:134: Warning: 
   signed overflow. assert *p + res ≤ 2147483647;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [pdg] computing for function test_struct
 [pdg] done for function test_struct
 [pdg] PDG for test_struct

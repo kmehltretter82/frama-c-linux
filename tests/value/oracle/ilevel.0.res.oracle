@@ -14,7 +14,7 @@
 [eva:alarm] ilevel.c:28: Warning: assertion got status unknown.
 [eva] ilevel.c:30: Frama_C_show_each: [0..9]
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {0; 1; 2; 3; 4; 5; 6; 7}
@@ -53,7 +53,7 @@
 [eva:alarm] ilevel.c:32: Warning: 
   signed overflow. assert (int)((int)(i + j) + k) + l ≤ 2147483647;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {0; 1; 2; 3; 4; 5; 6; 7}
@@ -72,7 +72,7 @@
   l ∈ {0}
 [eva] ilevel.c:30: Frama_C_show_each: {0; 1; 2; 3; 4; 6; 7; 8; 9}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {0; 1; 2; 3; 4; 5; 6; 7}
@@ -91,7 +91,7 @@
   l ∈ {0}
 [eva] ilevel.c:30: Frama_C_show_each: {0; 1; 2; 3; 4; 6; 7; 8; 9}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {0; 1; 2; 3; 4; 5; 6; 7}

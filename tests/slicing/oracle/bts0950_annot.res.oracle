@@ -11,7 +11,7 @@
 [eva] Recording results for cpy
 [eva] Done for function cpy
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cpy:
   a ∈ {2}
@@ -68,7 +68,7 @@ void main(void)
 [eva] Recording results for cpy
 [eva] Done for function cpy
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cpy:
   a ∈ {2}

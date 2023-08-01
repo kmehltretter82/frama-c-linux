@@ -25,7 +25,7 @@
 [eva] Recording results for test2
 [eva] Done for function test2
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   i ∈ [10..2147483647]

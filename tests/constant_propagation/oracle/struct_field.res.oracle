@@ -6,7 +6,7 @@
   S ∈ {0}
   v ∈ {0}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p1 ∈ {{ &S.f0 }}

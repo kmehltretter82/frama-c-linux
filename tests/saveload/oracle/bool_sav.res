@@ -38,7 +38,7 @@
 [eva] bool.c:37: function printf_va_5: precondition got status valid.
 [eva] Done for function printf_va_5
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   i ∈ [-2147483648..9]

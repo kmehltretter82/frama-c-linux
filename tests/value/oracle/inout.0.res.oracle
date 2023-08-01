@@ -25,7 +25,7 @@
 [eva:alarm] inout.i:16: Warning: signed overflow. assert i1 + i2 ≤ 2147483647;
 [eva:alarm] inout.i:18: Warning: out of bounds write. assert \valid(i);
 [eva] Recording results for inout_11_0
-[eva] done for function inout_11_0
+[eva] Done for function inout_11_0
 [from] Computing for function inout_11_0
 [from] Done for function inout_11_0
 [from] ====== DEPENDENCIES COMPUTED ======

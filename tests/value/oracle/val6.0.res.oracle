@@ -12,7 +12,7 @@
 [eva:alarm] val6.i:13: Warning: 
   pointer downcast. assert (unsigned int)c ≤ 2147483647;
 [eva] Recording results for f
-[eva] done for function f
+[eva] Done for function f
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   NULL[rbits 8 to 143] ∈ [--..--]

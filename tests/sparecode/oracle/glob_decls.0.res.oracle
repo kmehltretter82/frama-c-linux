@@ -35,7 +35,7 @@
 [eva:alarm] glob_decls.i:49: Warning: 
   signed overflow. assert X + x ≤ 2147483647;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [pdg] computing for function main
 [pdg] done for function main
 [sparecode] add selection in function 'main'

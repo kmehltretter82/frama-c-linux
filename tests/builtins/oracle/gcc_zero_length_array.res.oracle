@@ -16,7 +16,7 @@
 [eva:malloc] gcc_zero_length_array.c:26: 
   strong free on bases: {__malloc_make_fam_l15}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function make_fam:
   __fc_heap_status ∈ [--..--]

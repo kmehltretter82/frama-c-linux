@@ -1,10 +1,7 @@
 [kernel] Parsing libc.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------

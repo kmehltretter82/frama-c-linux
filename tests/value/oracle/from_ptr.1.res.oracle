@@ -20,7 +20,7 @@
 [eva:alarm] from_ptr.i:25: Warning: 
   pointer downcast. assert (unsigned int)((int (*)[10][10])p) ≤ 2147483647;
 [eva] Recording results for main1
-[eva] done for function main1
+[eva] Done for function main1
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   i ∈ {{ (long)&p }}

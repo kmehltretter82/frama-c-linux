@@ -42,7 +42,7 @@
 [eva] Recording results for initialized_p
 [eva] Done for function initialized_p
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function compute_n:
   n ∈ [1..2147483647]
@@ -176,7 +176,7 @@
 [eva] Recording results for initialized_p
 [eva] Done for function initialized_p
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] reevaluate_alarms.i:14: 
   assertion 'Eva,signed_overflow' got final status valid.
 [eva] reevaluate_alarms.i:14: assertion 'Eva,mem_access' got final status valid.

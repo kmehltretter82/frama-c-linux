@@ -13,7 +13,7 @@
 [eva:alarm] alias.i:15: Warning: out of bounds read. assert \valid_read(x + 1);
 [eva:alarm] alias.i:18: Warning: out of bounds read. assert \valid_read(y);
 [eva] Recording results for f
-[eva] done for function f
+[eva] Done for function f
 [eva] alias.i:18: assertion 'Eva,mem_access' got final status invalid.
 [scope:rm_asserts] removing 2 assertion(s)
 [pdg] computing for function f

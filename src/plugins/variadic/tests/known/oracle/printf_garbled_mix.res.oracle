@@ -19,8 +19,6 @@
 [variadic] printf_garbled_mix.c:7: 
   Translating call to printf to a call to the specialized version printf_va_1.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva] printf_garbled_mix.c:6: 
   Assigning imprecise value to b.
   The imprecision originates from Arithmetic {printf_garbled_mix.c:6}
@@ -29,7 +27,6 @@
 [eva] using specification for function printf_va_1
 [eva] printf_garbled_mix.c:8: 
   Frama_C_show_each_nb_printed: [-2147483648..2147483647]
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   a[0] ∈ {1}

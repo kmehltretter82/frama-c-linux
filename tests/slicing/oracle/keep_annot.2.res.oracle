@@ -18,7 +18,7 @@
                                           (double)2.0)));
 [eva:alarm] keep_annot.i:42: Warning: assertion got status unknown.
 [eva] Recording results for L
-[eva] done for function L
+[eva] Done for function L
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function L

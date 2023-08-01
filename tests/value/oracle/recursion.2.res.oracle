@@ -1,7 +1,5 @@
 [kernel] Parsing recursion.c (with preprocessing)
 [eva] Analyzing a complete application starting at main_fail
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   p ∈ {0}
@@ -18,7 +16,6 @@
   Neither code nor specification for function sum_nospec, generating default assigns from the prototype
 [eva] using specification for function sum_nospec
 [eva] recursion.c:442: Frama_C_show_each_unreachable: [-2147483648..2147483647]
-[eva] done for function main_fail
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function sum_nospec:
   res ∈ [--..--] or UNINITIALIZED

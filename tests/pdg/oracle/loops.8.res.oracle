@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   after ∈ [--..--]
 [eva] Recording results for dead_code
-[eva] done for function dead_code
+[eva] Done for function dead_code
 [pdg] computing for function dead_code
 [pdg] done for function dead_code
 [pdg] PDG for dead_code

@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {-1}

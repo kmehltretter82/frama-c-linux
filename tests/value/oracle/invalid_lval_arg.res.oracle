@@ -12,7 +12,7 @@
 [eva:alarm] invalid_lval_arg.i:19: Warning: 
   out of bounds read. assert \valid_read((int **)0);
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] invalid_lval_arg.i:15: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] invalid_lval_arg.i:17: 

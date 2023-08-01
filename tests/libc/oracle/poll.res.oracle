@@ -17,7 +17,7 @@
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_stdout ∈ {{ NULL + [--..--] ; &S___fc_stdout[0] }}

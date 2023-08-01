@@ -67,7 +67,7 @@
 [eva] Recording results for test_join
 [eva] Done for function test_join
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function assign_by_copy:
   Frama_C_entropy_source ∈ [--..--]

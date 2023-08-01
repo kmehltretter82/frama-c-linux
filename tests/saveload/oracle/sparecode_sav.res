@@ -18,7 +18,7 @@
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   2 functions analyzed (out of 2): 100% coverage.

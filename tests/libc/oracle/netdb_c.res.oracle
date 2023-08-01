@@ -270,7 +270,7 @@
 [eva] Recording results for gethostbyname
 [eva] Done for function gethostbyname
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function res_search:
   Frama_C_entropy_source ∈ [--..--]

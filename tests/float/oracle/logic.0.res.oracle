@@ -349,7 +349,7 @@
 [eva] Recording results for test_is_finite
 [eva] Done for function test_is_finite
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] logic.i:45: assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] logic.i:133: assertion 'Eva,is_nan_or_infinite' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

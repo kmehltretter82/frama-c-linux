@@ -105,7 +105,7 @@
 [eva] Done for function f
 [eva:malloc] vla.c:20: strong free on bases: {__malloc_f_l6}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   t ∈ ESCAPINGADDR

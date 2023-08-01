@@ -30,7 +30,7 @@
 [eva:alarm] alloc.c:56: Warning: signed overflow. assert -2147483648 ≤ *q + 1;
 [eva:alarm] alloc.c:56: Warning: signed overflow. assert *q + 1 ≤ 2147483647;
 [eva] Recording results for main_abs
-[eva] done for function main_abs
+[eva] Done for function main_abs
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main_abs:
   NULL[rbits 2048 to 4103] ∈

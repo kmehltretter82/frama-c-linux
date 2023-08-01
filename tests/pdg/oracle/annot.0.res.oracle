@@ -7,7 +7,7 @@
 [eva:alarm] annot.c:12: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva] annot.c:13: assertion got status valid.
 [eva] Recording results for f1
-[eva] done for function f1
+[eva] Done for function f1
 [pdg] computing for function f1
 [pdg] done for function f1
 [pdg] PDG for f1

@@ -633,7 +633,7 @@
 [eva] argz_c.c:71: Call to builtin free
 [eva] argz_c.c:71: function free: precondition 'freeable' got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function mempcpy:
   i ∈ {0; 3}

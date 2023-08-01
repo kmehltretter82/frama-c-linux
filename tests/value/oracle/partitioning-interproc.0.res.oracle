@@ -23,7 +23,7 @@
 [eva] Done for function cassign
 [eva] partitioning-interproc.c:32: Frama_C_show_each: {1}
 [eva] Recording results for cassign_test
-[eva] done for function cassign_test
+[eva] Done for function cassign_test
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cassign:
   Frama_C_entropy_source ∈ [--..--]

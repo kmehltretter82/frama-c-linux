@@ -335,7 +335,7 @@
 [eva] Recording results for strrchr
 [eva] Done for function strrchr
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function memcmp:
   p1 ∈ {{ (unsigned char const *)&b }}

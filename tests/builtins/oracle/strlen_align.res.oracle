@@ -8,7 +8,7 @@
 [eva] strlen_align.c:24: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   o.e ∈ UNINITIALIZED

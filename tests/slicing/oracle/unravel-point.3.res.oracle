@@ -78,7 +78,7 @@
 [eva] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] done for function main
+[eva] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to printf at unravel-point.i:36 (by send1):
   \result FROM __x1; "%d\n"

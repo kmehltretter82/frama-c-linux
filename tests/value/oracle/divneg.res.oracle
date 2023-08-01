@@ -41,7 +41,7 @@
   ==END OF DUMP==
 [eva] divneg.i:52: Frama_C_show_each_should: {-1}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   r0 ∈ [-100..100],0%5

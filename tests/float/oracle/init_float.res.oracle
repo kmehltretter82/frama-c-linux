@@ -18,7 +18,7 @@
 [eva:alarm] init_float.i:17: Warning: 
   function main: precondition 0.0 ≤ s.y ≤ 0.0 got status unknown.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   s.y ∈ [-0.0000000000000000 .. 0.0000000000000000]

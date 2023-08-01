@@ -1,8 +1,6 @@
 [variadic] sum_with_unspecified_sequence.c:8: 
   Declaration of variadic function sum.
 [eva] Analyzing a complete application starting at sum
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   out of bounds read. assert \valid_read(list);
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
@@ -37,7 +35,6 @@
 [eva] sum_with_unspecified_sequence.c:17: 
   Assigning imprecise value to \result<sum>.
   The imprecision originates from Well
-[eva] done for function sum
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function sum:
   ret ∈
