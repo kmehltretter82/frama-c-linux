@@ -6,30 +6,30 @@ import * as locs from "./locatorsUtil";
  * Basic Electron launch of Ivette for Playwright e2e tests
  */
 export async function launchApp(): Promise<{ app: ElectronApplication, page: Page }> {
-    let cwd = process.cwd();
-    const electronApp = await electron.launch({
-        args: [
-            'dist/main/main.js',
-            '--command',
-            '/builds/frama-c/frama-c/bin/frama-c',
-        ],
-    });
+    try {
 
-    // Evaluation expression in the Electron context.
-    const appPath = await electronApp.evaluate(async ({ app }) => {
-        // This runs in the main Electron process, parameter here is always
-        // the result of the require('electron') in the main app script.
-        return app.getAppPath();
-    });
+        const electronApp = await electron.launch({
+            env: {
+                ...process.env,
+                NODE_ENV: "development",
+            },
+            args: [
+                'dist/main/main.js',
+                '--command',
+                '/builds/frama-c/frama-c/bin/frama-c',
+            ],
+        });
 
-    // console.log("appPath: ", appPath);
+        // Get the first window that the app opens, wait if necessary.
+        const window = await electronApp.firstWindow();
 
-    // Get the first window that the app opens, wait if necessary.
-    const window = await electronApp.firstWindow();
-
-    return {
-        app: electronApp,
-        page: window
+        return {
+            app: electronApp,
+            page: window
+        }
+    } catch (error) {
+        console.log("------> Error: ", error);
+        throw error;
     }
 }
 
@@ -37,37 +37,32 @@ export async function launchApp(): Promise<{ app: ElectronApplication, page: Pag
  * Electron launch of Ivette for Playwright e2e tests using Ivette's default settings
  */
 export async function launchAppInitSettings(): Promise<{ app: ElectronApplication, page: Page }> {
-    let cwd = process.cwd();
-    const electronApp = await electron.launch({
-        env: {
-            ...process.env,
-            NODE_ENV: "development",
-        },
-        args: [
-            "dist/main/main.js",
-            "--enable-logging",
-            "--no-sandbox",
-            "--command",
-            "/builds/frama-c/frama-c/bin/frama-c",
-            "--init-settings"
-        ],
-    });
+    try {
+        const electronApp = await electron.launch({
+            env: {
+                ...process.env,
+                NODE_ENV: "development",
+            },
+            args: [
+                "dist/main/main.js",
+                "--enable-logging",
+                "--no-sandbox",
+                "--command",
+                "/builds/frama-c/frama-c/bin/frama-c",
+                "--init-settings"
+            ],
+        });
 
-    // Evaluation expression in the Electron context.
-    const appPath = await electronApp.evaluate(async ({ app }) => {
-        // This runs in the main Electron process, parameter here is always
-        // the result of the require('electron') in the main app script.
-        return app.getAppPath();
-    });
+        const window = await electronApp.firstWindow();
 
-    // console.log("appPath: ", appPath);
-
-    // Get the first window that the app opens, wait if necessary.
-    const window = await electronApp.firstWindow();
-
-    return {
-        app: electronApp,
-        page: window
+        return {
+            app: electronApp,
+            page: window
+        }
+    }
+    catch (error) {
+        console.log("------> Error: ", error);
+        throw error;
     }
 }
 
