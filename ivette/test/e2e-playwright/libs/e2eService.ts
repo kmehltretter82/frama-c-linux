@@ -14,10 +14,11 @@ export async function launchApp(): Promise<{ app: ElectronApplication, page: Pag
                 NODE_ENV: "development",
             },
             args: [
-                'dist/main/main.js',
+                'main.js',
                 '--command',
                 '/builds/frama-c/frama-c/bin/frama-c',
             ],
+            cwd: "dist/main/",
         });
 
         // Get the first window that the app opens, wait if necessary.
@@ -44,13 +45,14 @@ export async function launchAppInitSettings(): Promise<{ app: ElectronApplicatio
                 NODE_ENV: "development",
             },
             args: [
-                "dist/main/main.js",
+                "main.js",
                 "--enable-logging",
                 "--no-sandbox",
                 "--command",
                 "/builds/frama-c/frama-c/bin/frama-c",
                 "--init-settings"
             ],
+            cwd: "dist/main/",
         });
 
         const window = await electronApp.firstWindow();
@@ -77,13 +79,14 @@ export async function launchAppWithTestFile(): Promise<{ app: ElectronApplicatio
                 NODE_ENV: "development",
             },
             args: [
-                "dist/main/main.js",
+                "main.js",
                 "--enable-logging",
                 "--no-sandbox",
                 "--command",
                 "/builds/frama-c/frama-c/bin/frama-c",
-                "../tests/test/adpcm.c"
+                "/builds/frama-c/frama-c/tests/test/adpcm.c"
             ],
+            cwd: "dist/main/",
         });
 
         // Get the first window that the app opens, wait if necessary.
@@ -104,21 +107,21 @@ export async function launchAppWithTestFile(): Promise<{ app: ElectronApplicatio
  */
 export async function launchAppWithTestFileAndInitSettings(): Promise<{ app: ElectronApplication, page: Page }> {
     try {
-
         const electronApp = await electron.launch({
             env: {
                 ...process.env,
                 NODE_ENV: "development",
             },
             args: [
-                "dist/main/main.js",
+                "main.js",
                 "--enable-logging",
                 "--no-sandbox",
                 "--command",
                 "/builds/frama-c/frama-c/bin/frama-c",
                 '--init-settings',
-                '../tests/test/adpcm.c'
+                "/builds/frama-c/frama-c/tests/test/adpcm.c"
             ],
+            cwd: "dist/main/",
         });
 
         // Get the first window that the app opens, wait if necessary.
