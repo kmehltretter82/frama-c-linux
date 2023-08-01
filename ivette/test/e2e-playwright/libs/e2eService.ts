@@ -42,44 +42,6 @@ export async function launchAppInitSettings(): Promise<{ app: ElectronApplicatio
         env: {
             ...process.env,
             NODE_ENV: "development",
-          },
-          args: [
-            "dist/main/main.js",
-            "--enable-logging",
-            "--no-sandbox",
-            "--command",
-            "/builds/frama-c/frama-c/bin/frama-c",
-            "--init-settings"
-          ],
-    });
-
-    // Evaluation expression in the Electron context.
-    const appPath = await electronApp.evaluate(async ({ app }) => {
-        // This runs in the main Electron process, parameter here is always
-        // the result of the require('electron') in the main app script.
-        return app.getAppPath();
-    });
-
-    // console.log("appPath: ", appPath);
-
-    // Get the first window that the app opens, wait if necessary.
-    const window = await electronApp.firstWindow();
-
-    return {
-        app: electronApp,
-        page: window
-    }
-}
-
-/**
- * Electron launch of Ivette for Playwright e2e tests using an additional C file loaded
- */
-export async function launchAppWithTestFile(): Promise<{ app: ElectronApplication, page: Page }> {
-    let cwd = process.cwd();
-    const electronApp = await electron.launch({
-        env: {
-            ...process.env,
-            NODE_ENV: "development",
         },
         args: [
             "dist/main/main.js",
@@ -87,7 +49,7 @@ export async function launchAppWithTestFile(): Promise<{ app: ElectronApplicatio
             "--no-sandbox",
             "--command",
             "/builds/frama-c/frama-c/bin/frama-c",
-            "../tests/test/adpcm.c"
+            "--init-settings"
         ],
     });
 
@@ -112,39 +74,68 @@ export async function launchAppWithTestFile(): Promise<{ app: ElectronApplicatio
 /**
  * Electron launch of Ivette for Playwright e2e tests using an additional C file loaded
  */
+export async function launchAppWithTestFile(): Promise<{ app: ElectronApplication, page: Page }> {
+    try {
+        const electronApp = await electron.launch({
+            env: {
+                ...process.env,
+                NODE_ENV: "development",
+            },
+            args: [
+                "dist/main/main.js",
+                "--enable-logging",
+                "--no-sandbox",
+                "--command",
+                "/builds/frama-c/frama-c/bin/frama-c",
+                "../tests/test/adpcm.c"
+            ],
+        });
+
+        // Get the first window that the app opens, wait if necessary.
+        const window = await electronApp.firstWindow();
+
+        return {
+            app: electronApp,
+            page: window
+        }
+    } catch (error) {
+        console.log("------> Error: ", error);
+        throw error;
+    }
+}
+
+/**
+ * Electron launch of Ivette for Playwright e2e tests using an additional C file loaded
+ */
 export async function launchAppWithTestFileAndInitSettings(): Promise<{ app: ElectronApplication, page: Page }> {
-    let cwd = process.cwd();
-    const electronApp = await electron.launch({
-        env: {
-            ...process.env,
-            NODE_ENV: "development",
-          },
-          args: [
-            "dist/main/main.js",
-            "--enable-logging",
-            "--no-sandbox",
-            "--command",
-            "/builds/frama-c/frama-c/bin/frama-c",
-            '--init-settings',
-            '../tests/test/adpcm.c'
-          ],
-    });
+    try {
 
-    // Evaluation expression in the Electron context.
-    const appPath = await electronApp.evaluate(async ({ app }) => {
-        // This runs in the main Electron process, parameter here is always
-        // the result of the require('electron') in the main app script.
-        return app.getAppPath();
-    });
+        const electronApp = await electron.launch({
+            env: {
+                ...process.env,
+                NODE_ENV: "development",
+            },
+            args: [
+                "dist/main/main.js",
+                "--enable-logging",
+                "--no-sandbox",
+                "--command",
+                "/builds/frama-c/frama-c/bin/frama-c",
+                '--init-settings',
+                '../tests/test/adpcm.c'
+            ],
+        });
 
-    // console.log("appPath: ", appPath);
+        // Get the first window that the app opens, wait if necessary.
+        const window = await electronApp.firstWindow();
 
-    // Get the first window that the app opens, wait if necessary.
-    const window = await electronApp.firstWindow();
-
-    return {
-        app: electronApp,
-        page: window
+        return {
+            app: electronApp,
+            page: window
+        }
+    } catch (error) {
+        console.log("------> Error: ", error);
+        throw error;
     }
 }
 
