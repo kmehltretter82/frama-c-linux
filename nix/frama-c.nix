@@ -1,4 +1,10 @@
-# Nix
+# Frama-C build derivation
+# Input variables:
+# - `cover` (defaults to `true`) that indicates whether Frama-C should be
+#   compiled with coverage instrumentation,
+# - `release_mode` (defaults to `false`) that indicates whether Frama-C should
+#   be compiled in release mode.
+
 { lib
 , stdenvNoCC # for E-ACSL
 , fetchurl
