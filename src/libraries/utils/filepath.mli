@@ -209,15 +209,8 @@ type position =
 val pp_pos : Format.formatter -> position -> unit
 
 (** Return the current working directory.
-    Currently uses the environment's PWD instead of Sys.getcwd () because OCaml
-    has no function in its stdlib to resolve symbolic links (e.g. realpath)
-    for a given path. 'getcwd' always resolves them, but if the user
-    supplies a path with symbolic links, this may cause issues.
-    Instead of forcing the user to always provide resolved paths, we
-    currently choose to never resolve them.
-    We only resort to getcwd() to avoid issues when PWD does not exist.
-    Note that this function does not validate that PWD has not been tampered
-    with.
+    Implicitly uses {!Unix.realpath} to normalize paths and avoid issues with
+    symbolic links in directory names.
 
     @since 25.0-Manganese
 *)

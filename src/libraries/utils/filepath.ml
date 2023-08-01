@@ -125,22 +125,15 @@ let insert base path_name =
       Array.set cache (hash land 255) (Some (path_name, path));
       path
 
-(* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
-   no function in its stdlib to resolve symbolic links (e.g. realpath)
-   for a given path. 'getcwd' always resolves them, but if the user
-   supplies a path with symbolic links, this may cause issues.
-   Instead of forcing the user to always provide resolved paths, we
-   currently choose to never resolve them.
-   Note that, in rare situations (e.g. some Docker images), PWD does not
-   exist in the environment, so in that case, we fallback to Sys.getcwd.
-
-   REMARK[LC]: when the Frama-C binary is directly invoked by Node without
-   going through a shell script wrapper like ./bin/frama-c, the environment
-   variable "PWD" is _no more_ synchronized with Sys.getcwd.
-   This problem has been solved in `Dome.spawn()` by forcing the `PWD`
-   environement variable accordingly.
+(* Note: the call to Unix.realpath prevents some issues with symbolic links
+   in directory names. If you have problems with this, please contact us.
+   For the same reason, Sys.getcwd should _not_ be called directly, but only
+   via this function, to avoid conflicting results in case the user forgot
+   to call Unix.realpath.
 *)
-let cwd = insert dummy (try Sys.getenv "PWD" with Not_found -> Sys.getcwd ())
+let pwd () = Unix.(realpath (getcwd ()))
+
+let cwd = insert dummy (pwd ())
 
 type existence =
   | Must_exist
@@ -335,8 +328,6 @@ type position =
 
 let pp_pos fmt pos =
   Format.fprintf fmt "%a:%d" Normalized.pretty pos.pos_path pos.pos_lnum
-
-let pwd () = try Unix.getenv "PWD" with Not_found -> Sys.getcwd ()
 
 (*
 Local Variables:
