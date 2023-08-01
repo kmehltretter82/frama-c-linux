@@ -2,8 +2,8 @@
 
    MODULE: @PTEST_NAME@
    STDOPT: +"-generated-spec-mode donothing"
-   STDOPT: +"-generated-spec-mode safe"
-   STDOPT: +"-generated-spec-mode frama-c"
+   STDOPT: +"-generated-spec-mode safe -generated-spec-custom allocates:safe"
+   STDOPT: +"-generated-spec-mode frama-c -generated-spec-custom allocates:frama-c"
 */
 
 /*@ axiomatic a {

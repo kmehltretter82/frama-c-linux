@@ -538,13 +538,16 @@ let get_mode = function
   | "skip" -> Skip
   | s -> Other s
 
-let build_config mode = {
-  exits = mode;
-  assigns = mode;
-  requires = mode;
-  allocates = mode;
-  terminates = mode;
-}
+let build_config mode =
+  (* For now Allocates are skipped by default *)
+  let skip_mode = match mode with Other _ -> mode | _ -> Skip in
+  {
+    exits = mode;
+    assigns = mode;
+    requires = mode;
+    allocates = skip_mode;
+    terminates = mode;
+  }
 
 let get_config_default () =
   build_config @@ get_mode @@ Kernel.GeneratedSpecMode.get ()
