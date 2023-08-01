@@ -92,6 +92,9 @@ let get_custom_mode mode =
   | None -> Kernel.abort "Mode %s is not registered" mode
   | Some custom_mode -> custom_mode
 
+let compare_it it1 it2 =
+  Cil_datatype.Term.compare it1.it_content it2.it_content
+
 module type Generator =
 sig
 
@@ -250,11 +253,11 @@ struct
     | FromAny, _ -> 1
     | _, FromAny -> -1
     | From l1, From l2 ->
-      Extlib.list_compare Cil_datatype.Identified_term.compare l1 l2
+      Extlib.list_compare compare_it l1 l2
 
   let compare_from (f1, d1) (f2, d2) =
-    let r = Cil_datatype.Identified_term.compare f1 f2 in
-    if r <> 0 then compare_deps d1 d2 else r
+    let r = compare_it f1 f2 in
+    if r <> 0 then r else compare_deps d1 d2
 
   let combine_default clauses =
     (* Note: combination is made on a set of complete behaviors in the sens of
@@ -265,7 +268,7 @@ struct
     in
     let deps = function
       | FromAny -> FromAny
-      | From l -> From (List.sort_uniq Cil_datatype.Identified_term.compare l)
+      | From l -> From (List.sort_uniq compare_it l)
     in
     let froms =
       List.map (fun (e, ds) -> e, deps ds) @@ List.fold_left collect [] clauses
@@ -413,8 +416,8 @@ struct
       | _ -> assert false
     in
     let f, a = List.fold_left collect ([],[]) clauses in
-    let f = List.sort_uniq Cil_datatype.Identified_term.compare f in
-    let a = List.sort_uniq Cil_datatype.Identified_term.compare a in
+    let f = List.sort_uniq compare_it f in
+    let a = List.sort_uniq compare_it a in
     FreeAlloc(f, a)
 
   let custom_default mode kf spec =
