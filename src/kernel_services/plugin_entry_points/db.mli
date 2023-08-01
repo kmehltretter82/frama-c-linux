@@ -206,8 +206,6 @@ module Value : sig
   val get_initial_state : kernel_function -> state
   val get_initial_state_callstack :
     kernel_function -> state Eva_types.Callstack.Hashtbl.t option
-  val get_state : ?after:bool -> kinstr -> state
-  (** [after] is false by default. *)
 
   val get_stmt_state_callstack:
     after:bool -> stmt -> state Eva_types.Callstack.Hashtbl.t option
@@ -218,7 +216,6 @@ module Value : sig
 
   (** {3 Reachability} *)
 
-  val is_accessible : kinstr -> bool
   val is_reachable : state -> bool
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
@@ -234,10 +231,6 @@ module Value : sig
 
   (**/**)
   (** {3 Internal use only} *)
-
-  val noassert_get_state : ?after:bool -> kinstr -> state
-  (** To be used during the value analysis itself (instead of
-      {!get_state}). [after] is false by default. *)
 
   val merge_conditions: int Cil_datatype.Stmt.Hashtbl.t -> unit
   val mask_then: int

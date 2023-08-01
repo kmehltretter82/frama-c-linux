@@ -449,19 +449,9 @@ module Value = struct
         add s state;
         state
 
-  let noassert_get_state ?(after=false) k =
-    match k with
-    | Kglobal -> globals_state ()
-    | Kstmt s ->
-      noassert_get_stmt_state ~after s
-
   let get_stmt_state ?(after=false) s =
     assert (is_computed ()); (* this assertion fails during Eva analysis *)
     noassert_get_stmt_state ~after s
-
-  let get_state ?(after=false) k =
-    assert (is_computed ()); (* this assertion fails during Eva analysis *)
-    noassert_get_state ~after k
 
   let get_stmt_state_callstack ~after stmt =
     assert (is_computed ()); (* this assertion fails during Eva analysis *)
@@ -488,11 +478,6 @@ module Value = struct
                then raise Is_reachable) h;
           false
         with Is_reachable -> true
-
-  let is_accessible ki =
-    match ki with
-    | Kglobal -> Cvalue.Model.is_reachable (globals_state ())
-    | Kstmt stmt -> is_reachable_stmt stmt
 
   let compute = mk_fun "Value.compute"
 
