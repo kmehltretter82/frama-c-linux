@@ -549,11 +549,11 @@ let build_config mode =
     terminates = mode;
   }
 
-let get_config_default () =
+let get_config_mode () =
   build_config @@ get_mode @@ Kernel.GeneratedSpecMode.get ()
 
 let get_config () =
-  let default = get_config_default () in
+  let default = get_config_mode () in
   let collect (k,v) conf =
     let mode = get_mode (Option.get v) in
     match k with
@@ -572,7 +572,6 @@ let get_config () =
 
 let do_populate kf original_spec =
   let config = get_config () in
-
   let exits = Exits.get_default config.exits kf original_spec in
   let assigns = Assigns.get_default config.assigns kf original_spec in
   let requires = Requires.get_default config.requires kf original_spec in
@@ -613,12 +612,22 @@ module Is_populated =
 
 let () = Ast.add_linked_state Is_populated.self
 
-let populate_funspec kf spec =
-  if not @@ Kernel.GenerateDefaultSpec.get() || Is_populated.mem kf then false
+let populate_funspec ~force kf spec =
+  let is_proto = not @@ Kernel_function.has_definition kf in
+  let skip_generation = not @@ Kernel.GenerateDefaultSpec.get () in
+  let is_empty_spec = Cil.is_empty_funspec spec in
+  let skip_proto = is_proto && not force && is_empty_spec in
+  if (not force && skip_generation) || Is_populated.mem kf || skip_proto
+  then false
   else begin
+    if is_proto && is_empty_spec then
+      Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
+        "Neither code nor specification for function %a, \
+        generating default specs from the prototype"
+        Kernel_function.pretty kf;
     do_populate kf spec;
     Is_populated.add kf ();
     true
   end
 
-let () = Annotations.populate_spec_ref := populate_funspec
+let () = Annotations.populate_spec_ref := populate_funspec ~force:true

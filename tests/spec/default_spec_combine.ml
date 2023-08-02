@@ -14,6 +14,12 @@ let status_allocates = Property_status.Dont_know
 let gen_terminates _ _ = None
 let status_terminates = Property_status.Dont_know
 
+let run () =
+  let get_spec kf =
+    ignore(Annotations.funspec kf)
+  in
+  Globals.Functions.iter get_spec
+
 let populate () =
   Format.printf "Registering an mode that does nothing@.";
   Populate_spec.register
@@ -25,4 +31,4 @@ let populate () =
     "donothing"
 
 
-  let () = Cmdline.run_after_configuring_stage populate
+let () = Cmdline.run_after_configuring_stage populate

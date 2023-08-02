@@ -1189,7 +1189,8 @@ let () =
 
 let populate_spec () =
   let add_spec kf =
-    ignore @@ Populate_spec.populate_funspec kf (Annotations.funspec kf)
+    ignore @@ Populate_spec.populate_funspec ~force:false kf
+      (Annotations.funspec ~populate:false kf)
   in
   Globals.Functions.iter add_spec
 

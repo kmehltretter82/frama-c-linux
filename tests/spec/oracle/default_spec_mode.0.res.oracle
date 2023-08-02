@@ -8,6 +8,7 @@ void f2(void)
   return;
 }
 
+/*@ requires \true; */
 int f3(int *a);
 
 /*@ requires \true;

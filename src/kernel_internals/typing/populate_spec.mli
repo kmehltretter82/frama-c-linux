@@ -60,4 +60,4 @@ val register :
   ?status_terminates:status ->
   string -> unit
 
-val populate_funspec : kernel_function -> spec -> bool
+val populate_funspec : force:bool -> kernel_function -> spec -> bool

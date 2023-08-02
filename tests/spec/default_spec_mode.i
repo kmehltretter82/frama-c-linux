@@ -21,6 +21,7 @@ void f2(){
 }
 
 // Test for automatic assigns
+//@ requires \true;
 int f3(int* a);
 
 // Has behavior by default

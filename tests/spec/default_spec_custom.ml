@@ -26,6 +26,12 @@ let status_assigns = Property_status.True
 let status_allocates = Property_status.Dont_know
 let status_terminates = Property_status.Dont_know
 
+let run () =
+  let get_spec kf =
+    ignore(Annotations.funspec kf)
+  in
+  Globals.Functions.iter get_spec
+
 let populate () =
   Format.printf "Registering an empty spec generation mode@.";
   Populate_spec.register "emptymode";
@@ -39,4 +45,6 @@ let populate () =
     "mymode"
 
 
-  let () = Cmdline.run_after_configuring_stage populate
+let () = Cmdline.run_after_configuring_stage populate
+
+let () = Db.Main.extend run
