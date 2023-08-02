@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+
 type scope =
   | Global
   | Function
@@ -44,6 +46,19 @@ let get ~scope s =
   u
 
 let clear_locals () = H.clear tbl
+
+let rec of_exp ?default exp = match exp.enode with
+  | Lval (Var {vorig_name}, NoOffset) -> vorig_name
+  | Const (CInt64 (i, _, _)) -> "const_" ^ Integer.to_string i
+  | BinOp (MinusA, x, y, _) -> "minus_" ^ of_exp x ^ "_" ^ of_exp y
+  | BinOp (PlusA, x, y, _) -> "plus_" ^ of_exp x ^ "_" ^ of_exp y
+  | e ->
+    match default with
+    | None ->
+      Options.debug "Varname.of_exp: supply default or extend this function \
+                     to handle enodes like: %a" Cil_types_debug.pp_exp_node e;
+      "exp"
+    | Some default -> default
 
 (*
 Local Variables:

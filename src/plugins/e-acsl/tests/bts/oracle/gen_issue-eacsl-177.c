@@ -44,18 +44,19 @@ int main(void)
   /*@ assert f(0) == 0; */ ;
   {
     long __gen_e_acsl_n;
-    __e_acsl_mpz_t __gen_e_acsl__6;
+    __e_acsl_mpz_t __gen_e_acsl_n_2;
     __e_acsl_mpz_t __gen_e_acsl_f_6;
-    __e_acsl_mpz_t __gen_e_acsl__7;
+    __e_acsl_mpz_t __gen_e_acsl__6;
     int __gen_e_acsl_ne;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __gen_e_acsl_n = 9223372036854775807L;
-    __gmpz_init_set_si(__gen_e_acsl__6,__gen_e_acsl_n);
-    __gen_e_acsl_f(& __gen_e_acsl_f_6,(__e_acsl_mpz_struct *)__gen_e_acsl__6);
-    __gmpz_init_set_si(__gen_e_acsl__7,0L);
+    __gmpz_init_set_si(__gen_e_acsl_n_2,__gen_e_acsl_n);
+    __gen_e_acsl_f(& __gen_e_acsl_f_6,
+                   (__e_acsl_mpz_struct *)__gen_e_acsl_n_2);
+    __gmpz_init_set_si(__gen_e_acsl__6,0L);
     __gen_e_acsl_ne = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_f_6),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__7));
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__6));
     __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_2,"n",0,
                                   __gen_e_acsl_n);
     __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_2,"f(n)",0,
@@ -68,9 +69,9 @@ int main(void)
     __gen_e_acsl_assert_data_2.line = 14;
     __e_acsl_assert(__gen_e_acsl_ne != 0,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    __gmpz_clear(__gen_e_acsl__6);
+    __gmpz_clear(__gen_e_acsl_n_2);
     __gmpz_clear(__gen_e_acsl_f_6);
-    __gmpz_clear(__gen_e_acsl__7);
+    __gmpz_clear(__gen_e_acsl__6);
   }
   /*@ assert \let n = 0 == 0? 9223372036854775807L: -1; f(n) != 0; */ ;
   __retres = 0;
