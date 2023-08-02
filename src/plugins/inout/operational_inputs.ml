@@ -580,7 +580,7 @@ module Callwise = struct
     | [] -> Inout_parameters.fatal "callwise: internal stack is empty"
 
   let end_record callstack kf inout =
-    Db.Operational_inputs.Record_Inout_Callbacks.apply (callstack, inout);
+    Db.Operational_inputs.Record_Inout_Callbacks.apply inout;
     let callsite = Eva.Callstack.top_callsite callstack in
     match callsite, !call_inout_stack with
     | Kstmt _, (_caller, table) :: _ ->

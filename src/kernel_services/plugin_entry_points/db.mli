@@ -319,10 +319,8 @@ module Operational_inputs : sig
 
   (**/**)
   (* Internal use *)
-  module Record_Inout_Callbacks:
-    Hook.Iter_hook with type param = Eva_types.Callstack.t * Inout_type.t
-    [@@alert "-db_deprecated"]
-    (**/**)
+  module Record_Inout_Callbacks: Hook.Iter_hook with type param = Inout_type.t
+  (**/**)
 end
 
 

@@ -126,9 +126,7 @@ module Operational_inputs = struct
       failwith ("Db.Operational_inputs.get_internal_precise not implemented"))
   let get_external = mk_fun "Operational_inputs.get_external"
 
-  module Record_Inout_Callbacks =
-    Hook.Build (struct type t = Eva_types.Callstack.t * Inout_type.t end)
-  [@@alert "-db_deprecated"]
+  module Record_Inout_Callbacks = Hook.Build (struct type t = Inout_type.t end)
 
   let pretty fmt x =
     Format.fprintf fmt "@[<v>";
