@@ -36,7 +36,7 @@ let partition_terminating_instr stmt =
     let non_terminating = ref [] in
     let add x xs = xs := x :: !xs in
     Callstack.Hashtbl.iter (fun cs state ->
-        if Db.Value.is_reachable state
+        if Cvalue.Model.is_reachable state
         then add cs terminating
         else add cs non_terminating) h;
     (!terminating, !non_terminating)

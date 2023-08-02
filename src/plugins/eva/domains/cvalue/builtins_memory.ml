@@ -216,7 +216,7 @@ let frama_c_memcpy state actuals =
                 Cvalue.Model.paste_offsetmap
                   ~from:offsetmap ~dst_loc:dst ~size:diff ~exact:false state
               in
-              if Db.Value.is_reachable new_state then
+              if Cvalue.Model.is_reachable new_state then
                 let diffi = Ival.inject_singleton diff in
                 let dst = Location_Bits.shift diffi dst in
                 let src = Location_Bits.shift diffi src in

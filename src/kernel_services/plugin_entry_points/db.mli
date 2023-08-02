@@ -216,9 +216,6 @@ module Value : sig
 
   (** {3 Reachability} *)
 
-  val is_reachable : state -> bool
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-
   val is_reachable_stmt : stmt -> bool
 
 

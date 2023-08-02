@@ -460,8 +460,6 @@ module Value = struct
               Table_By_Callstack.find stmt)
     with Not_found -> None
 
-  let is_reachable = Cvalue.Model.is_reachable
-
   exception Is_reachable
   let is_reachable_stmt stmt =
     if !no_results (get_fundec_from_stmt stmt)
