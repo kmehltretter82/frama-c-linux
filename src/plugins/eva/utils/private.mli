@@ -34,6 +34,7 @@ module Alarmset = Alarmset
 module Analysis = Analysis
 module Callstack = Callstack
 module Cvalue_domain = Cvalue_domain
+module Cvalue_results = Cvalue_results
 module Domain_builder = Domain_builder
 module Eva_dynamic = Eva_dynamic
 module Eva_results = Eva_results

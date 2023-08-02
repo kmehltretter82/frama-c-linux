@@ -115,9 +115,6 @@ module Value : sig
   (** Internal state of the value analysis from projects viewpoint.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
-  val mark_as_computed: unit -> unit
-  (** Indicate that the value analysis has been done already. *)
-
   val compute : (unit -> unit) ref
   (** Compute the value analysis using the entry point of the current
       project. You may set it with {!Globals.set_entry_point}.
@@ -126,27 +123,6 @@ module Value : sig
       specified for the entry point using {!Db.Value.fun_set_args}, and
       an incorrect number of them is given.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-
-  val is_computed: unit -> bool
-  (** Return [true] iff the value analysis has been done.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-
-  [@@@alert "-db_deprecated"]
-
-  type callstack = Eva_types.Callstack.callstack
-
-  module Table_By_Callstack:
-    State_builder.Hashtbl with type key = stmt
-                           and type data = state Eva_types.Callstack.Hashtbl.t
-  (** Table containing the results of the value analysis, ie.
-      the state before the evaluation of each reachable statement. *)
-
-  module AfterTable_By_Callstack:
-    State_builder.Hashtbl with type key = stmt
-                           and type data = state Eva_types.Callstack.Hashtbl.t
-  (** Table containing the state of the value analysis after the evaluation
-      of each reachable and evaluable statement. Filled only if
-      [Value_parameters.ResultsAfter] is set. *)
 
   val condition_truth_value: stmt -> bool * bool
   (** Provided [stmt] is an 'if' construct, [fst (condition_truth_value stmt)]
@@ -199,26 +175,6 @@ module Value : sig
       computed by the value analysis *)
   val globals_use_supplied_state : unit -> bool
 
-
-  (** {3 Getters} *)
-  (** State of the analysis at various points *)
-
-  val get_initial_state : kernel_function -> state
-  val get_initial_state_callstack :
-    kernel_function -> state Eva_types.Callstack.Hashtbl.t option
-
-  val get_stmt_state_callstack:
-    after:bool -> stmt -> state Eva_types.Callstack.Hashtbl.t option
-
-  val get_stmt_state : ?after:bool -> stmt -> state
-  (** [after] is false by default.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-
-  (** {3 Reachability} *)
-
-  val is_reachable_stmt : stmt -> bool
-
-
   val no_results: (fundec -> bool) ref
   (** Returns [true] if the user has requested that no results should
       be recorded for this function. If possible, hooks registered
@@ -234,13 +190,6 @@ module Value : sig
   val mask_else: int
 
   val initial_state_only_globals : (unit -> state) ref
-
-  val update_callstack_table: after:bool -> stmt -> callstack -> state -> unit
-  (* Merge a new state in the table indexed by callstacks. *)
-
-  val merge_initial_state : callstack -> kernel_function -> state -> unit
-  (** Store an additional possible initial state for the given callstack as
-      well as its values for actuals. *)
 
   val initial_state_changed: (unit -> unit) ref
 end

@@ -322,26 +322,15 @@ module State = struct
   (* ------------------------------------------------------------------------ *)
 
   module Store = struct
-    module Storage =
-      State_builder.Ref (Datatype.Bool)
-        (struct
-          let dependencies = [Self.state]
-          let name = name ^ ".Storage"
-          let default () = false
-        end)
 
-    let register_global_state b _ = Storage.set b
+    let register_global_state b s =
+      Cvalue_results.register_global_state b (Bottom.map fst s)
     let register_initial_state callstack kf (state, _clob) =
-      Db.Value.merge_initial_state callstack kf state
+      Cvalue_results.register_initial_state callstack kf state
     let register_state_before_stmt callstack stmt (state, _clob) =
-      Db.Value.update_callstack_table ~after:false stmt callstack state
+      Cvalue_results.register_state_before_stmt callstack stmt state
     let register_state_after_stmt callstack stmt (state, _clob) =
-      Db.Value.update_callstack_table ~after:true stmt callstack state
-
-    let return state =
-      if Cvalue.Model.(equal state bottom)
-      then `Bottom
-      else `Value (state, Locals_scoping.top ())
+      Cvalue_results.register_state_after_stmt callstack stmt state
 
     let lift_tbl tbl =
       let h = Callstack.Hashtbl.create 7 in
@@ -363,30 +352,38 @@ module State = struct
         List.iter add list;
         new_tbl
 
-    let get_global_state () = return (Db.Value.globals_state ())
-    let get_initial_state kf = return (Db.Value.get_initial_state kf)
+    let get_global_state () =
+      let+ state = Cvalue_results.get_global_state () in
+      state, Locals_scoping.top ()
+
+    let get_initial_state kf =
+      let+ state = Cvalue_results.get_initial_state kf in
+      state, Locals_scoping.top ()
+
     let get_initial_state_by_callstack ?selection kf =
-      if Storage.get ()
-      then
-        match Db.Value.get_initial_state_callstack kf with
-        | Some tbl -> `Value (lift_tbl (select ?selection tbl))
-        | None -> `Bottom
-      else `Top
+      match Cvalue_results.get_initial_state_by_callstack ?selection kf with
+      | `Top -> `Top
+      | `Bottom -> `Bottom
+      | `Value tbl -> `Value (lift_tbl (select ?selection tbl))
 
     let get_stmt_state ~after stmt =
-      return (Db.Value.get_stmt_state ~after stmt)
+      let+ state = Cvalue_results.get_stmt_state ~after stmt in
+      state, Locals_scoping.top ()
 
     let get_stmt_state_by_callstack ?selection ~after stmt =
-      if Storage.get ()
-      then
-        match Db.Value.get_stmt_state_callstack ~after stmt with
-        | Some tbl -> `Value (lift_tbl (select ?selection tbl))
-        | None -> `Bottom
-      else `Top
+      match Cvalue_results.get_stmt_state_by_callstack ?selection ~after stmt with
+      | `Top -> `Top
+      | `Bottom -> `Bottom
+      | `Value tbl -> `Value (lift_tbl (select ?selection tbl))
 
-    let mark_as_computed = Db.Value.mark_as_computed
-    let is_computed = Db.Value.is_computed
+    let mark_as_computed = Cvalue_results.mark_as_computed
+    let is_computed = Cvalue_results.is_computed
   end
+
+  let get_state_before stmt =
+    match Cvalue_results.get_stmt_state ~after:false stmt with
+    | `Bottom -> Cvalue.Model.bottom
+    | `Value v -> v
 
   let display ?fmt kf =
     let open Cil_types in
@@ -403,10 +400,8 @@ module State = struct
       | _ -> true
     in
     try
-      let values = Db.Value.get_stmt_state (Kernel_function.find_return kf) in
-      let fst_values =
-        Db.Value.get_stmt_state (Kernel_function.find_first_stmt kf)
-      in
+      let values = get_state_before (Kernel_function.find_return kf) in
+      let fst_values = get_state_before (Kernel_function.find_first_stmt kf) in
       if Cvalue.Model.is_reachable fst_values
       && not (Cvalue.Model.is_top fst_values)
       then begin
