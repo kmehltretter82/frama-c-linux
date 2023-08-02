@@ -175,13 +175,6 @@ module Value : sig
       computed by the value analysis *)
   val globals_use_supplied_state : unit -> bool
 
-  val no_results: (fundec -> bool) ref
-  (** Returns [true] if the user has requested that no results should
-      be recorded for this function. If possible, hooks registered
-      on [Record_Value_Callbacks] and [Record_Value_Callbacks_New]
-      should not force their lazy argument *)
-
-
   (**/**)
   (** {3 Internal use only} *)
 

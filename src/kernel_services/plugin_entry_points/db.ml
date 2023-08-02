@@ -263,8 +263,6 @@ module Value = struct
       ((i land mask_then) <> 0, (i land mask_else) <> 0)
     with Not_found -> false, false
 
-  let no_results = mk_fun "Value.no_results"
-
   let compute = mk_fun "Value.compute"
 
 end
