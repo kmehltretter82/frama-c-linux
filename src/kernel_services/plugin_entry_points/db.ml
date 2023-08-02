@@ -257,19 +257,6 @@ module Value = struct
         let size = size
         let dependencies = [ self ]
       end)
-  (* Clear Value's various caches each time [Db.Value.is_computed] is updated,
-     including when it is set, reset, or during project change. Some operations
-     of Value depend on -ilevel, -plevel, etc, so clearing those caches when
-     Value ends ensures that those options will have an effect between two runs
-     of Value. *)
-  let () = Table_By_Callstack.add_hook_on_update
-      (fun _ ->
-         Cvalue.V_Offsetmap.clear_caches ();
-         Cvalue.Model.clear_caches ();
-         Locations.Location_Bytes.clear_caches ();
-         Locations.Zone.clear_caches ();
-         Function_Froms.Memory.clear_caches ();
-      )
 
   module AfterTable_By_Callstack =
     Cil_state_builder.Stmt_hashtbl(States_by_callstack)
