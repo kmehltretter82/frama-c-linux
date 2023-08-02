@@ -162,8 +162,8 @@ char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
   __gen_e_acsl_strcat_dest_size = __e_acsl_builtin_strlen((char const *)dest);
   __retres = strncat(dest,src,n);
   {
-    __e_acsl_mpz_t __gen_e_acsl___gen_e_acsl_strcat_src_size;
-    __e_acsl_mpz_t __gen_e_acsl___gen_e_acsl_strcat_dest_size;
+    __e_acsl_mpz_t __gen_e_acsl_strcat_src_size_2;
+    __e_acsl_mpz_t __gen_e_acsl_strcat_dest_size_2;
     __e_acsl_mpz_t __gen_e_acsl_add;
     __e_acsl_mpz_t __gen_e_acsl_;
     __e_acsl_mpz_t __gen_e_acsl_add_2;
@@ -172,14 +172,14 @@ char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
     unsigned long __gen_e_acsl_size;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_5 =
       {.values = (void *)0};
-    __gmpz_init_set_ui(__gen_e_acsl___gen_e_acsl_strcat_src_size,
+    __gmpz_init_set_ui(__gen_e_acsl_strcat_src_size_2,
                        __gen_e_acsl_strcat_src_size);
-    __gmpz_init_set_ui(__gen_e_acsl___gen_e_acsl_strcat_dest_size,
+    __gmpz_init_set_ui(__gen_e_acsl_strcat_dest_size_2,
                        __gen_e_acsl_strcat_dest_size);
     __gmpz_init(__gen_e_acsl_add);
     __gmpz_add(__gen_e_acsl_add,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl___gen_e_acsl_strcat_src_size),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl___gen_e_acsl_strcat_dest_size));
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_strcat_src_size_2),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_strcat_dest_size_2));
     __gmpz_init_set_si(__gen_e_acsl_,1L);
     __gmpz_init(__gen_e_acsl_add_2);
     __gmpz_add(__gen_e_acsl_add_2,
@@ -205,8 +205,8 @@ char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
     __gen_e_acsl_size = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_2));
     __e_acsl_initialize((void *)dest,__gen_e_acsl_size);
-    __gmpz_clear(__gen_e_acsl___gen_e_acsl_strcat_src_size);
-    __gmpz_clear(__gen_e_acsl___gen_e_acsl_strcat_dest_size);
+    __gmpz_clear(__gen_e_acsl_strcat_src_size_2);
+    __gmpz_clear(__gen_e_acsl_strcat_dest_size_2);
     __gmpz_clear(__gen_e_acsl_add);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_add_2);
@@ -266,8 +266,8 @@ char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src)
   __gen_e_acsl_strcat_dest_size = __e_acsl_builtin_strlen((char const *)dest);
   __retres = strcat(dest,src);
   {
-    __e_acsl_mpz_t __gen_e_acsl___gen_e_acsl_strcat_src_size;
-    __e_acsl_mpz_t __gen_e_acsl___gen_e_acsl_strcat_dest_size;
+    __e_acsl_mpz_t __gen_e_acsl_strcat_src_size_2;
+    __e_acsl_mpz_t __gen_e_acsl_strcat_dest_size_2;
     __e_acsl_mpz_t __gen_e_acsl_add;
     __e_acsl_mpz_t __gen_e_acsl_;
     __e_acsl_mpz_t __gen_e_acsl_add_2;
@@ -276,14 +276,14 @@ char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src)
     unsigned long __gen_e_acsl_size;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
-    __gmpz_init_set_ui(__gen_e_acsl___gen_e_acsl_strcat_src_size,
+    __gmpz_init_set_ui(__gen_e_acsl_strcat_src_size_2,
                        __gen_e_acsl_strcat_src_size);
-    __gmpz_init_set_ui(__gen_e_acsl___gen_e_acsl_strcat_dest_size,
+    __gmpz_init_set_ui(__gen_e_acsl_strcat_dest_size_2,
                        __gen_e_acsl_strcat_dest_size);
     __gmpz_init(__gen_e_acsl_add);
     __gmpz_add(__gen_e_acsl_add,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl___gen_e_acsl_strcat_src_size),
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl___gen_e_acsl_strcat_dest_size));
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_strcat_src_size_2),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_strcat_dest_size_2));
     __gmpz_init_set_si(__gen_e_acsl_,1L);
     __gmpz_init(__gen_e_acsl_add_2);
     __gmpz_add(__gen_e_acsl_add_2,
@@ -309,8 +309,8 @@ char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
     __gen_e_acsl_size = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_2));
     __e_acsl_initialize((void *)dest,__gen_e_acsl_size);
-    __gmpz_clear(__gen_e_acsl___gen_e_acsl_strcat_src_size);
-    __gmpz_clear(__gen_e_acsl___gen_e_acsl_strcat_dest_size);
+    __gmpz_clear(__gen_e_acsl_strcat_src_size_2);
+    __gmpz_clear(__gen_e_acsl_strcat_dest_size_2);
     __gmpz_clear(__gen_e_acsl_add);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_add_2);
@@ -669,7 +669,7 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
   __gen_e_acsl_strcpy_src_size = __e_acsl_builtin_strlen(src);
   __retres = strcpy(dest,src);
   {
-    __e_acsl_mpz_t __gen_e_acsl___gen_e_acsl_strcpy_src_size;
+    __e_acsl_mpz_t __gen_e_acsl_strcpy_src_size_2;
     __e_acsl_mpz_t __gen_e_acsl_;
     __e_acsl_mpz_t __gen_e_acsl_add;
     __e_acsl_mpz_t __gen_e_acsl__2;
@@ -677,12 +677,12 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
     unsigned long __gen_e_acsl_size;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
       {.values = (void *)0};
-    __gmpz_init_set_ui(__gen_e_acsl___gen_e_acsl_strcpy_src_size,
+    __gmpz_init_set_ui(__gen_e_acsl_strcpy_src_size_2,
                        __gen_e_acsl_strcpy_src_size);
     __gmpz_init_set_si(__gen_e_acsl_,1L);
     __gmpz_init(__gen_e_acsl_add);
     __gmpz_add(__gen_e_acsl_add,
-               (__e_acsl_mpz_struct const *)(__gen_e_acsl___gen_e_acsl_strcpy_src_size),
+               (__e_acsl_mpz_struct const *)(__gen_e_acsl_strcpy_src_size_2),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
     __gmpz_init_set_ui(__gen_e_acsl__2,18446744073709551615UL);
     __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add),
@@ -701,7 +701,7 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
     __gen_e_acsl_size = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_add));
     __e_acsl_initialize((void *)dest,__gen_e_acsl_size);
-    __gmpz_clear(__gen_e_acsl___gen_e_acsl_strcpy_src_size);
+    __gmpz_clear(__gen_e_acsl_strcpy_src_size_2);
     __gmpz_clear(__gen_e_acsl_);
     __gmpz_clear(__gen_e_acsl_add);
     __gmpz_clear(__gen_e_acsl__2);
