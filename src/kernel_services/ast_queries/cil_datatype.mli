@@ -159,6 +159,22 @@ module ExpStructEq: S_with_collections with type t = exp
 *)
 module ExpStructEqStrict: S_with_collections with type t = exp
 
+(**
+   structural equality, with internal comparaison of struct/union in case of
+   sizeof (instead of id)
+
+   @since Frama-C+dev
+*)
+module ExpStructEqInternal: S_with_collections with type t = exp
+
+(**
+   structural equality, with strict constant comparison as in {!ConstantStrict}
+   and with internal comparaison of struct/union in case of sizeof
+
+   @since Frama-C+dev
+*)
+module ExpStructEqStrictInternal: S_with_collections with type t = exp
+
 module Fieldinfo: S_with_collections_pretty with type t = fieldinfo
 
 module File: S with type t = file

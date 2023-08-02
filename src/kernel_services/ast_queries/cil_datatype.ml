@@ -923,42 +923,97 @@ let hash_const c =
 
 module type Make_cmp_input = sig
   include Datatype.Make_input
-  val compare: strict:bool -> t -> t -> int
+  val compare: internal:bool -> strict:bool -> t -> t -> int
 end
 
 module Make_compare_non_strict(M: Make_cmp_input) =
   Datatype.Make_with_collections(
   struct
     include M
-    let compare = M.compare ~strict:false
+    let compare = M.compare ~internal:false ~strict:false
   end)
 
 module Make_compare_strict(M: Make_cmp_input) =
   Datatype.Make_with_collections(
   struct
     include M
-    let compare = M.compare ~strict:true
+    let compare = M.compare ~internal:false ~strict:true
     let name = M.name ^ "Strict"
+  end)
+
+module Make_compare_strict_internal(M: Make_cmp_input) =
+  Datatype.Make_with_collections(
+  struct
+    include M
+    let compare = M.compare ~internal:true ~strict:true
+    let name = M.name ^ "StrictInternal"
+  end)
+
+module Make_compare_non_strict_internal(M: Make_cmp_input) =
+  Datatype.Make_with_collections(
+  struct
+    include M
+    let compare = M.compare ~internal:true ~strict:false
+    let name = M.name ^ "Internal"
   end)
 
 module StructEq =
 struct
+
+  (* Return true if the types have the same size, machine-indepently *)
+  let rec compare_internal_typ (t1 : typ) (t2 : typ) : int =
+    let comp_attr f v1 v2 a1 a2 =
+      compare_chain f v1 v2 Attributes.compare a1 a2 in
+    match !punrollType t1, !punrollType t2 with
+    | TVoid a1, TVoid a2 -> Attributes.compare a1 a2
+    | TInt (ik1, a1), TInt (ik2, a2) ->
+      comp_attr (=?=) ik1 ik2 a1 a2
+    | TFloat (fk1, a1), TFloat (fk2, a2) ->
+      comp_attr (=?=) fk1 fk2 a1 a2
+    | TPtr _, TPtr _ -> 0
+    | TArray _, TArray _
+    | TFun _, TFun _
+    | TNamed _, TNamed _
+    | TBuiltin_va_list _, TBuiltin_va_list _ ->
+      assert false (* shouldn't happen *)
+    | TComp (c1, _), TComp (c2, _) when c1.cstruct == c2.cstruct ->
+      begin
+        match c1.cfields, c2.cfields with
+        | Some c1f, Some c2f ->
+          List.fold_left2
+            (fun res f1 f2 ->
+               if res <> 0 then res
+               else compare_internal_typ f1.ftype f2.ftype)
+            0 c1f c2f
+        | _ -> 1
+      end
+    | TEnum (e1, a1), TEnum (e2, a2) ->
+      comp_attr (=?=) e1.ekind e2.ekind a1 a2
+    | _ -> -1
+
   (* If [strict] is true, the comparaison of integer and floating-point constants
      takes into account their textual representation (if any). Otherwise,
      constants with the same type and value are equal even if their textual
-     representations differ. *)
-  let rec compare_exp ~strict e1 e2 =
-    let compare_exp = compare_exp ~strict in
+     representations differ.
+     If [internal] is true, the comparaison of type into sizeof takes only account
+     the size. Otherwise, we use the usual type comparaison.
+  *)
+  let rec compare_exp ~internal ~strict e1 e2 =
+    let compare_exp = compare_exp ~internal ~strict in
+    let compare_lval = compare_lval ~internal ~strict in
     match e1.enode, e2.enode with
     | Const (CStr _), Const (CStr _)
     | Const (CWStr _), Const (CWStr _) -> compare e1.eid e2.eid
     | Const c1, Const c2 -> compare_constant ~strict c1 c2
     | Const _, _ -> 1
     | _, Const _ -> -1
-    | Lval lv1, Lval lv2 -> compare_lval ~strict lv1 lv2
+    | Lval lv1, Lval lv2 -> compare_lval lv1 lv2
     | Lval _, _ -> 1
     | _, Lval _ -> -1
-    | SizeOf t1, SizeOf t2 -> Typ.compare t1 t2
+    | SizeOf t1, SizeOf t2 ->
+      if internal
+      then compare_internal_typ t1 t2
+      else Typ.compare t1 t2
     | SizeOf _, _  -> 1
     | _, SizeOf _ -> -1
     | SizeOfE e1, SizeOfE e2 -> compare_exp e1 e2
@@ -997,35 +1052,35 @@ struct
       if res = 0 then compare_exp e1 e2 else res
     | CastE _, _ -> 1
     | _, CastE _ -> -1
-    | AddrOf lv1, AddrOf lv2 -> compare_lval ~strict lv1 lv2
+    | AddrOf lv1, AddrOf lv2 -> compare_lval lv1 lv2
     | AddrOf _, _ -> 1
     | _, AddrOf _ -> -1
-    | StartOf lv1, StartOf lv2 -> compare_lval ~strict lv1 lv2
+    | StartOf lv1, StartOf lv2 -> compare_lval lv1 lv2
 
-  and compare_lval ~strict (h1,o1) (h2,o2) =
-    let res = compare_lhost ~strict h1 h2 in
-    if res = 0 then compare_offset ~strict o1 o2 else res
+  and compare_lval ~internal ~strict (h1,o1) (h2,o2) =
+    let res = compare_lhost ~internal ~strict h1 h2 in
+    if res = 0 then compare_offset ~internal ~strict o1 o2 else res
 
-  and compare_lhost ~strict h1 h2 =
+  and compare_lhost ~internal ~strict h1 h2 =
     match h1, h2 with
     | Var v1, Var v2 -> Varinfo.compare v1 v2
     | Var _, Mem _ -> 1
-    | Mem e1, Mem e2 -> compare_exp ~strict e1 e2
+    | Mem e1, Mem e2 -> compare_exp ~internal ~strict e1 e2
     | Mem _, Var _ -> -1
 
-  and compare_offset ~strict o1 o2 =
+  and compare_offset ~internal ~strict o1 o2 =
     match o1, o2 with
     | NoOffset, NoOffset -> 0
     | NoOffset, _ -> 1
     | _, NoOffset -> -1
     | Field(f1,o1), Field(f2, o2) ->
       let res = Fieldinfo.compare f1 f2 in
-      if res = 0 then compare_offset ~strict o1 o2 else res
+      if res = 0 then compare_offset ~internal ~strict o1 o2 else res
     | Field _, _ -> 1
     | _, Field _ -> -1
     | Index(e1, o1), Index(e2, o2) ->
-      let res = compare_exp ~strict e1 e2 in
-      if res = 0 then compare_offset ~strict o1 o2 else res
+      let res = compare_exp ~internal ~strict e1 e2 in
+      if res = 0 then compare_offset ~internal ~strict o1 o2 else res
 
   let prime = 83047
   let rec hash_exp acc e =
@@ -1071,7 +1126,7 @@ struct
   type t = constant
   let name = "Constant"
   let reprs = [ CInt64(Integer.zero, IInt, Some "0") ]
-  let compare = compare_constant
+  let compare ~internal = (fun _ -> compare_constant) internal
   let hash = hash_const
   let equal = Datatype.from_compare
   let pretty fmt t = !pretty_ref fmt t
@@ -1101,6 +1156,11 @@ end
 module ExpStructEq = Make_compare_non_strict(ExpStructEq_input)
 let () = compare_exp_struct_eq := ExpStructEq.compare
 module ExpStructEqStrict = Make_compare_strict(ExpStructEq_input)
+module ExpStructEqInternal =
+  Make_compare_non_strict_internal(ExpStructEq_input)
+module ExpStructEqStrictInternal =
+  Make_compare_strict_internal(ExpStructEq_input)
+
 
 module Block = struct
   let pretty_ref = Extlib.mk_fun "Cil_datatype.Block.pretty_ref"

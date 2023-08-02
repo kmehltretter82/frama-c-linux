@@ -6065,7 +6065,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
           let size_t = theMachine.typeOfSizeOf in
           let size_t_oldsz' = mkCast ~force:false ~newt:size_t oldsz' in
           let size_t_sz' = mkCast ~force:false ~newt:size_t sz' in
-          ExpStructEq.equal
+          ExpStructEqInternal.equal
             (constFold machdep size_t_oldsz')
             (constFold machdep size_t_sz')
         in
