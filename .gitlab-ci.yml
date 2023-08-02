@@ -227,7 +227,7 @@ e2e-playwright-tests:
     - node --version
     - npm --version
     - yarn --version
-    - opam switch create 4.13.0
+    - opam switch create 4.13.1
     - eval $(opam env)
     - ocaml -version
     - opam update
