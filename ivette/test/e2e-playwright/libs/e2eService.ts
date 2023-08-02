@@ -12,9 +12,11 @@ export async function launchApp(): Promise<{ app: ElectronApplication, page: Pag
             NODE_ENV: "development",
         },
         args: [
-            'main.js',
-            '--command',
-            '/builds/frama-c/frama-c/bin/frama-c',
+            "main.js",
+            "--enable-logging",
+            "--no-sandbox",
+            "--command",
+            "/builds/frama-c/frama-c/bin/frama-c",
         ],
         cwd: "dist/main/",
     });

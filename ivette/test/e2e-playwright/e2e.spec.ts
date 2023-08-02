@@ -20,42 +20,48 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import { test } from "@playwright/test";
-import { _electron as electron } from "playwright-core";
+import { test } from '@playwright/test';
+import * as e2eService from "./libs/e2eService";
 
-test("launch app", async () => {
-  const electronApp = await electron.launch({
-    env: {
-      ...process.env,
-      NODE_ENV: "development",
-    },
-    args: [
-      "main.js",
-      "--enable-logging",
-      "--no-sandbox",
-      "--command",
-      "/builds/frama-c/frama-c/bin/frama-c",
-    ],
-    cwd: "dist/main/",
-  });
+test('launch app', async () => {
+    const launchAppResult = await e2eService.launchApp();
+    const electronApp = launchAppResult.app;
+    const window = launchAppResult.page;
 
-  // // Get the first window that the app opens, wait if necessary.
-  const window = await electronApp.firstWindow();
+    await window.screenshot({ path: 'screenshots/e2e-app-launch.png' });
 
-  await window.screenshot({ path: "screenshots/start.png" });
-  console.log("Screenshot taken");
+    // Exit app.
+    await electronApp.close();
+});
 
-  // // Click on the Console tab in the right menu.
-  // await window.getByText("Console").nth(1).click();
-  // console.log("Console tab clicked");
 
-  // await window.screenshot({ path: "screenshots/console.png" });
+test('check server connection', async () => {
+    const launchAppResult = await e2eService.launchApp();
+    const electronApp = launchAppResult.app;
+    const window = launchAppResult.page;
 
-  // // Capture a screenshot.
-  // await window.screenshot({ path: "screenshots/end.png" });
-  console.log("Done");
+    await e2eService.testServerIsStarted(window);
+    
+    // Capture a screenshot.
+    await window.screenshot({ path: 'screenshots/e2e-server-status.png' });
 
-  // Exit app.
-  await electronApp.close();
+    // Exit app.
+    await electronApp.close();
+});
 
+test('launch app with file', async () => {    
+    const launchAppResult = await e2eService.launchAppWithTestFile();
+    const electronApp = launchAppResult.app;
+    const window = launchAppResult.page;
+
+    await window.waitForTimeout(1000);
+
+    await window.screenshot({ path: 'screenshots/e2e-file-load.png' });
+
+    await e2eService.testFileIsLoaded(window);
+
+    await window.screenshot({ path: 'screenshots/e2e-file-loaded.png' });
+
+    // Exit app.
+    await electronApp.close();
 });
