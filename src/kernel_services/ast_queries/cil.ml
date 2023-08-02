@@ -528,10 +528,6 @@ let rec typeRemoveAttributesDeep (anl: string list) t =
     else
       typeAddAttributes (dropAttributes anl a) tn'
 
-(* JS: build an attribute annotation from [s]. *)
-let mkAttrAnnot s = "/*@ " ^ s ^ " */"
-
-
 let type_remove_qualifier_attributes =
   typeRemoveAttributes qualifier_attributes
 

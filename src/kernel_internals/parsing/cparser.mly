@@ -1608,8 +1608,7 @@ attribute:
 |   RESTRICT              { ("restrict",[]), $1 }
 |   VOLATILE              { ("volatile",[]), $1 }
 |   GHOST                 { ("ghost",[]), $1 }
-|   ATTRIBUTE_ANNOT       { let annot, loc = $1 in
-			    (Cil.mkAttrAnnot annot, []), loc }
+|   ATTRIBUTE_ANNOT       { let annot, loc = $1 in (mk_attr_annot annot), loc }
 ;
 
 /* (* sm: I need something that just includes __attribute__ and nothing more,

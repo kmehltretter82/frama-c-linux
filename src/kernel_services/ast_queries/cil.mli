@@ -1472,9 +1472,6 @@ val filterAttributes: string -> attributes -> attributes
     attributes must be sorted.  *)
 val hasAttribute: string -> attributes -> bool
 
-(** returns the complete name for an attribute annotation. *)
-val mkAttrAnnot: string -> string
-
 (** Returns the name of an attribute. *)
 val attributeName: attribute -> string
 
