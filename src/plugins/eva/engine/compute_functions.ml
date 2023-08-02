@@ -109,10 +109,6 @@ let pre_analysis () =
 
 let post_analysis_cleanup ~aborted =
   Eva_utils.clear_call_stack ();
-  (* Precompute consolidated states if required *)
-  if Parameters.JoinResults.get () then
-    Db.Value.Table_By_Callstack.iter
-      (fun s _ -> ignore (Db.Value.get_stmt_state s));
   if not aborted then
     (* Keep memexec results for users that want to resume the analysis *)
     Mem_exec.cleanup_results ()
