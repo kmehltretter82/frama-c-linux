@@ -29,7 +29,7 @@ type call = Cil_types.kernel_function * Cil_types.stmt
 module Call : Datatype.S with type t = call
 
 (** Eva callstacks. *)
-type callstack = Eva_types.Callstack.callstack = {
+type callstack = {
   thread: int;
   (* An identifier of the thread's callstack. *)
   entry_point: Cil_types.kernel_function;
@@ -38,9 +38,7 @@ type callstack = Eva_types.Callstack.callstack = {
   (** A call stack is a list of calls. The head is the latest call. *)
 }
 
-include Datatype.S_with_collections
-  with type t = callstack
-   and module Hashtbl = Eva_types.Callstack.Hashtbl
+include Datatype.S_with_collections with type t = callstack
 
 (** Prints a callstack without displaying call sites. *)
 val pretty_short : Format.formatter -> t -> unit
