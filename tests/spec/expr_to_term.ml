@@ -50,8 +50,8 @@ let treat_fct check fct =
         | _ -> false)
       stmts
   in
-  let ensures = (List.hd (Annotations.funspec fct).spec_behavior).b_post_cond
-  in
+  let ensures = (List.hd (Annotations.funspec fct).spec_behavior).b_post_cond in
+  let ensures = List.filter (fun (kind,_) -> kind = Normal) ensures in
   (* A bit fragile, but should do the trick as long as the test itself does
      not get too complicated (regarding the C code at least). *)
   if not (List.length stmts = List.length ensures) then
@@ -70,6 +70,7 @@ let treat_fct_pred fct =
       stmts
   in
   let ensures = (List.hd (Annotations.funspec fct).spec_behavior).b_post_cond in
+  let ensures = List.filter (fun (kind,_) -> kind = Normal) ensures in
   if List.length stmts <> List.length ensures then
     Kernel.fatal "ill-formed test in function %a" Kernel_function.pretty fct;
   List.iter2 (check_expr_pred fct) stmts ensures;
