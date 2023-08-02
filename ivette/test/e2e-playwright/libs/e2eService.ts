@@ -13,10 +13,11 @@ export async function launchApp(): Promise<{ app: ElectronApplication, page: Pag
         },
         args: [
             "main.js",
-            "--enable-logging",
+            // "--enable-logging",
             "--no-sandbox",
             "--command",
             "/builds/frama-c/frama-c/bin/frama-c",
+            // "/home/user01/git/frama-c/bin/frama-c",
         ],
         cwd: "dist/main/",
     });
@@ -41,10 +42,11 @@ export async function launchAppInitSettings(): Promise<{ app: ElectronApplicatio
         },
         args: [
             "main.js",
-            "--enable-logging",
+            // "--enable-logging",
             "--no-sandbox",
             "--command",
             "/builds/frama-c/frama-c/bin/frama-c",
+            // "/home/user01/git/frama-c/bin/frama-c",
             "--init-settings"
         ],
         cwd: "dist/main/",
@@ -69,11 +71,13 @@ export async function launchAppWithTestFile(): Promise<{ app: ElectronApplicatio
         },
         args: [
             "main.js",
-            "--enable-logging",
+            // "--enable-logging",
             "--no-sandbox",
             "--command",
             "/builds/frama-c/frama-c/bin/frama-c",
+            // "/home/user01/git/frama-c/bin/frama-c",
             "/builds/frama-c/frama-c/tests/test/adpcm.c"
+            // "/home/user01/git/frama-c/tests/test/adpcm.c"
         ],
         cwd: "dist/main/",
     });
@@ -98,11 +102,13 @@ export async function launchAppWithTestFileAndInitSettings(): Promise<{ app: Ele
         },
         args: [
             "main.js",
-            "--enable-logging",
+            // "--enable-logging",
             "--no-sandbox",
             "--command",
             "/builds/frama-c/frama-c/bin/frama-c",
+            // "/home/user01/git/frama-c/bin/frama-c",
             "--init-settings",
+            // "/home/user01/git/frama-c/tests/test/adpcm.c"
             "/builds/frama-c/frama-c/tests/test/adpcm.c"
         ],
         cwd: "dist/main/",
@@ -120,6 +126,9 @@ export async function launchAppWithTestFileAndInitSettings(): Promise<{ app: Ele
 export async function testServerIsStarted(window: Page) {
     // Click on the Console tab in the right menu.
     await locs.getConsoleMenuItem(window).click();
+
+    window.waitForTimeout(5000);
+    window.screenshot({ path: `./screenshots/${Date.now()}-console.png` });
 
     // Check the server status in the header's button bar
     await expect(locs.getStartServerButton(window)).toBeDisabled();
