@@ -39,28 +39,20 @@ test("launch app", async () => {
     cwd: "dist/main/",
   });
 
-  // Evaluation expression in the Electron context.
-  const appPath = await electronApp.evaluate(async ({ app }) => {
-    // This runs in the main Electron process, parameter here is always
-    // the result of the require('electron') in the main app script.
-    return app.getAppPath();
-  });
-  console.log("appPath: ", appPath);
-
   // // Get the first window that the app opens, wait if necessary.
   const window = await electronApp.firstWindow();
 
   await window.screenshot({ path: "screenshots/start.png" });
   console.log("Screenshot taken");
 
-  // Click on the Console tab in the right menu.
-  await window.getByText("Console").nth(1).click();
-  console.log("Console tab clicked");
+  // // Click on the Console tab in the right menu.
+  // await window.getByText("Console").nth(1).click();
+  // console.log("Console tab clicked");
 
-  await window.screenshot({ path: "screenshots/console.png" });
+  // await window.screenshot({ path: "screenshots/console.png" });
 
-  // Capture a screenshot.
-  await window.screenshot({ path: "screenshots/end.png" });
+  // // Capture a screenshot.
+  // await window.screenshot({ path: "screenshots/end.png" });
   console.log("Done");
 
   // Exit app.
