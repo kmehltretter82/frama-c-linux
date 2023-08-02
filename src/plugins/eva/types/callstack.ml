@@ -22,7 +22,7 @@
 
 let stable_hash x = Hashtbl.seeded_hash 0 x
 
-let dkey_callstack = Kernel.register_category "callstack"
+let dkey_callstack = Self.register_category "callstack"
 
 module Thread = Int (* Threads are identified by integers *)
 module Kf = Kernel_function
@@ -168,7 +168,7 @@ let base58_of_int n =
   Bytes.to_string buf
 
 let pretty_hash fmt callstack =
-  if Kernel.is_debug_key_enabled dkey_callstack then
+  if Self.is_debug_key_enabled dkey_callstack then
     Format.fprintf fmt "<%s> " (base58_of_int (stable_hash callstack))
   else Format.ifprintf fmt ""
 
