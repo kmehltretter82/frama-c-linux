@@ -166,64 +166,7 @@ module Value = struct
   type state = Cvalue.Model.t
   type t = Cvalue.V.t
 
-  (* This function is responsible for clearing completely Value's state
-     when the user-supplied initial state or main arguments are changed.
-     It is set deep inside Value  for technical reasons *)
-  let initial_state_changed = mk_fun "Value.initial_state_changed"
-
-  (* Arguments of the root function of the value analysis *)
-  module ListArgs = Datatype.List(Cvalue.V)
-  module FunArgs =
-    State_builder.Option_ref
-      (ListArgs)
-      (struct
-        let name = "Db.Value.fun_args"
-        let dependencies =
-          [ Ast.self; Kernel.LibEntry.self; Kernel.MainFunction.self]
-      end)
-  let () = Ast.add_monotonic_state FunArgs.self
-
-
-  exception Incorrect_number_of_arguments
-
-  let fun_get_args () = FunArgs.get_option ()
-
-  let fun_set_args l =
-    if not (Option.equal ListArgs.equal (Some l) (FunArgs.get_option ())) then
-      (!initial_state_changed (); FunArgs.set l)
-
-  let fun_use_default_args () =
-    if FunArgs.get_option () <> None then
-      (!initial_state_changed (); FunArgs.clear ())
-
-  (* Initial memory state of the value analysis *)
-  module VGlobals =
-    State_builder.Option_ref
-      (Cvalue.Model)
-      (struct
-        let name = "Db.Value.Vglobals"
-        let dependencies = [Ast.self]
-      end)
-
-  let globals_set_initial_state state =
-    if not (Option.equal Cvalue.Model.equal
-              (Some state)
-              (VGlobals.get_option ()))
-    then begin
-      !initial_state_changed ();
-      VGlobals.set state
-    end
-
-
-  let globals_use_default_initial_state () =
-    if VGlobals.get_option () <> None then
-      (!initial_state_changed (); VGlobals.clear ())
-
-  let globals_state () = VGlobals.get_option ()
-
-  let globals_use_supplied_state () = not (VGlobals.get_option () = None)
-
-  let dependencies = [ FunArgs.self; VGlobals.self ]
+  let dependencies = [ ]
   let proxy = State_builder.Proxy.(create "eva_db" Forward dependencies)
   let self = State_builder.Proxy.get proxy
 

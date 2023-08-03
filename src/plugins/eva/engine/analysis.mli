@@ -82,9 +82,6 @@ val compute : unit -> unit
 (** Computes the Eva analysis, if not already computed, using the entry point
     of the current project. You may set it with {!Globals.set_entry_point}.
     @raise Globals.No_such_entry_point if the entry point is incorrect
-    @raise Db.Value.Incorrect_number_of_arguments if some arguments are
-    specified for the entry point using {!Db.Value.fun_set_args}, and
-    an incorrect number of them is given.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val is_computed : unit -> bool

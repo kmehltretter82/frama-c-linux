@@ -273,12 +273,15 @@ module Make
      bind them in [state] *)
   let add_supplied_main_formals kf actuals state =
     match get_cvalue with
-    | None -> Self.abort "Function Db.Value.fun_set_args cannot be \
+    | None -> Self.abort "API function [set_main_args] cannot be \
                           used without the Cvalue domain"
     | Some get_cvalue ->
       let formals = Kernel_function.get_formals kf in
       if (List.length formals) <> List.length actuals then
-        raise Db.Value.Incorrect_number_of_arguments;
+        Self.abort
+          "Incorrect number of arguments for the main function %a \
+           provided via the API function [set_main_args]"
+          Kernel_function.pretty kf;
       let cvalue_state = get_cvalue state in
       let add_actual state actual formal =
         let actual = Eval_op.offsetmap_of_v ~typ:formal.vtype actual in
@@ -291,7 +294,7 @@ module Make
       set_domain (cvalue_state, Locals_scoping.bottom ()) state
 
   let add_main_formals kf state =
-    match Db.Value.fun_get_args () with
+    match Eva_results.get_main_args () with
     | None -> compute_main_formals kf state
     | Some actuals -> add_supplied_main_formals kf actuals state
 
@@ -384,7 +387,7 @@ module Make
 
   let initial_state_with_formals ~lib_entry kf =
     let init_state =
-      match Db.Value.globals_state () with
+      match Eva_results.get_initial_state () with
       | Some state ->
         Self.feedback "Initial state supplied by user";
         supplied_state state

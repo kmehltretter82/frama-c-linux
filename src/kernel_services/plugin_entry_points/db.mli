@@ -123,58 +123,6 @@ module Value : sig
       specified for the entry point using {!Db.Value.fun_set_args}, and
       an incorrect number of them is given.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-
-
-  (** {4 Arguments of the main function} *)
-
-  (** The functions below are related to the arguments that are passed to the
-      function that is analysed by the value analysis. Specific arguments
-      are set by [fun_set_args]. Arguments reset to default values when
-      [fun_use_default_args] is called, when the ast is changed, or
-      if the options [-libentry] or [-main] are changed. *)
-
-  (** Specify the arguments to use. *)
-  val fun_set_args : t list -> unit
-
-  val fun_use_default_args : unit -> unit
-
-  (** For this function, the result [None] means that
-      default values are used for the arguments. *)
-  val fun_get_args : unit -> t list option
-
-  exception Incorrect_number_of_arguments
-  (** Raised by [Db.Compute] when the arguments set by [fun_set_args]
-      are not coherent with the prototype of the function (if there are
-      too few or too many of them) *)
-
-
-  (** {4 Initial state of the analysis} *)
-
-  (** The functions below are related to the value of the global variables
-      when the value analysis is started. If [globals_set_initial_state] has not
-      been called, the given state is used. A default state (which depends on
-      the option [-libentry]) is used when [globals_use_default_initial_state]
-      is called, or when the ast changes. *)
-
-  (** Specify the initial state to use. *)
-  val globals_set_initial_state : state -> unit
-
-  val globals_use_default_initial_state : unit -> unit
-
-  (** Initial state provided by [globals_set_initial_state], if any. *)
-  val globals_state : unit -> state option
-
-
-  (** @return [true] if the initial state for globals used by the value
-      analysis has been supplied by the user (through
-      [globals_set_initial_state]), or [false] if it is automatically
-      computed by the value analysis *)
-  val globals_use_supplied_state : unit -> bool
-
-  (**/**)
-  (** {3 Internal use only} *)
-
-  val initial_state_changed: (unit -> unit) ref
 end
 [@@alert db_deprecated
     "Db.Value is deprecated and will be removed in a future version \

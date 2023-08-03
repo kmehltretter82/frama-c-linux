@@ -42,6 +42,53 @@ let is_non_terminating_instr stmt =
   | [], _ -> true
   | _, _ -> false
 
+(* {2 Global state.} *)
+
+(* Option_ref that calls [Parameters.change_correctness] when its state
+   is modified. *)
+module Correctness_option_ref (Data: Datatype.S) (Info: State_builder.Info)
+= struct
+  include State_builder.Option_ref (Data) (Info)
+
+  let set x =
+    if not (Option.equal Data.equal (Some x) (get_option ())) then
+      (Parameters.change_correctness (); set x)
+
+  let clear () =
+    if get_option () <> None then
+      (Parameters.change_correctness (); clear ())
+end
+
+(* Values of the arguments of the main function of the analysis. *)
+module ListArgs = Datatype.List (Cvalue.V)
+module MainArgs =
+  Correctness_option_ref
+    (ListArgs)
+    (struct
+      let name = "Eva.Eva_results.MainArgs"
+      let dependencies =
+        [ Ast.self; Kernel.LibEntry.self; Kernel.MainFunction.self]
+    end)
+let () = Ast.add_monotonic_state MainArgs.self
+let () = State_builder.Proxy.extend [MainArgs.self] Self.proxy
+
+let get_main_args = MainArgs.get_option
+let set_main_args = MainArgs.set
+let use_default_main_args = MainArgs.clear
+
+(* Initial cvalue state of the analysis. *)
+module VGlobals =
+  Correctness_option_ref
+    (Cvalue.Model)
+    (struct
+      let name = "Eva.Eva_results.VGlobals"
+      let dependencies = [Ast.self]
+    end)
+let () = State_builder.Proxy.extend [VGlobals.self] Self.proxy
+
+let get_initial_state = VGlobals.get_option
+let set_initial_state = VGlobals.set
+let use_default_initial_state = VGlobals.clear
 
 (* {2 Saving and restoring state} *)
 
@@ -94,7 +141,7 @@ let get_results () =
   Globals.Functions.iter copy_kf;
   let kf_callers = Function_calls.get_results () in
   let initial_state = Cvalue_results.get_global_state () in
-  let initial_args = Db.Value.fun_get_args () in
+  let initial_args = get_main_args () in
   let aux_statuses f_status ip =
     let aux_any_status e status =
       if Emitter.Usable_emitter.equal vue e.Property_status.emitter then
@@ -136,8 +183,8 @@ let set_results results =
   Cvalue_results.register_global_state true results.initial_state;
   (* Initial args *)
   begin match results.initial_args with
-    | None -> Db.Value.fun_use_default_args ()
-    | Some l -> Db.Value.fun_set_args l
+    | None -> use_default_main_args ()
+    | Some l -> set_main_args l
   end;
   (* Pre- and post-states *)
   let register_states register (tbl: stmt_by_callstack Stmt.Hashtbl.t) =

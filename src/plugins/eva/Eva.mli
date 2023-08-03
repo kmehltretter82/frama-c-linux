@@ -42,9 +42,6 @@ module Analysis: sig
   (** Computes the Eva analysis, if not already computed, using the entry point
       of the current project. You may set it with {!Globals.set_entry_point}.
       @raise Globals.No_such_entry_point if the entry point is incorrect
-      @raise Db.Value.Incorrect_number_of_arguments if some arguments are
-      specified for the entry point using {!Db.Value.fun_set_args}, and
-      an incorrect number of them is given.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
   val is_computed : unit -> bool
@@ -802,6 +799,26 @@ module Eva_results: sig
 
   (** Internal temporary API: please do not use it, as it should be removed in a
       future version. *)
+
+  (** {2 Initial cvalue state} *)
+
+  (** Specifies the initial cvalue state to use. *)
+  val set_initial_state: Cvalue.Model.t -> unit
+
+  (** Ignores previous calls to [set_initial_state] above, and uses the default
+      initial state instead. *)
+  val use_default_initial_state: unit -> unit
+
+  (** Specifies the values of the main function arguments. Beware that the
+      analysis fails if the number of given values is different from the number
+      of arguments of the entry point of the analysis. *)
+  val set_main_args: Cvalue.V.t list -> unit
+
+  (** Ignores previous calls to [set_main_args] above, and uses the default
+      main argument values instead. *)
+  val use_default_main_args: unit -> unit
+
+  (** {2 Results} *)
 
   type results
 
