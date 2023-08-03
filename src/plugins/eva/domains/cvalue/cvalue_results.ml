@@ -20,33 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Abstract_domain = Abstract_domain
-module Abstract_value = Abstract_value
-module Abstract_location = Abstract_location
-module Abstract = Abstract
-module Abstractions = Abstractions
-module Active_behaviors = Active_behaviors
-module Alarmset = Alarmset
-module Analysis = Analysis
-module Callstack = Callstack
-module Cvalue_domain = Cvalue_domain
-module Cvalue_results = Cvalue_results
-module Domain_builder = Domain_builder
-module Eva_dynamic = Eva_dynamic
-module Eva_results = Eva_results
-module Eva_utils = Eva_utils
-module Eval = Eval
-module Eval_annots = Eval_annots
-module Eval_op = Eval_op
-module Eval_terms = Eval_terms
-module Eval_typ = Eval_typ
-module Function_calls = Function_calls
-module Logic_inout = Logic_inout
-module Main_locations = Main_locations
-module Main_values = Main_values
-module Parameters = Parameters
-module Red_statuses = Red_statuses
-module Results = Results
-module Self = Self
-module Simple_memory = Simple_memory
-module Structure = Structure
+include Domain_store.Make (Cvalue.Model)
+
+let is_reachable stmt =
+  match get_stmt_state_by_callstack ~after:false stmt with
+  | `Top -> true
+  | `Bottom -> false
+  | `Value h ->
+    let exception Reachable in
+    try
+      let raise_if_reachable _cs state =
+        if Cvalue.Model.is_reachable state then raise Reachable
+      in
+      Callstack.Hashtbl.iter raise_if_reachable h;
+      false
+    with Reachable -> true

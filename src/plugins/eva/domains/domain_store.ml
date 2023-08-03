@@ -283,6 +283,12 @@ module Make (Domain: InputDomain) = struct
     if Storage.get ()
     then update_callstack_table ~after:true stmt callstack state
 
-  let mark_as_computed () = Table_By_Callstack.mark_as_computed ()
+  let mark_as_computed () =
+    (* Precompute consolidated states if required. *)
+    if Storage.get () && Parameters.JoinResults.get () then
+      Table_By_Callstack.iter
+        (fun s _ -> ignore (get_stmt_state ~after:false s));
+    Table_By_Callstack.mark_as_computed ()
+
   let is_computed () = Storage.get () && Table_By_Callstack.is_computed ()
 end

@@ -59,7 +59,7 @@ let mark_unreachable () =
   in
   (* Mark standard code annotations *)
   let do_code_annot stmt _emit ca =
-    if not (Db.Value.is_reachable_stmt stmt) then begin
+    if not (Cvalue_results.is_reachable stmt) then begin
       let kf = Kernel_function.find_englobing_kf stmt in
       let ppts = Property.ip_of_code_annot kf stmt ca in
       List.iter mark ppts;
@@ -70,7 +70,7 @@ let mark_unreachable () =
     inherit Visitor.frama_c_inplace
 
     method! vstmt_aux stmt =
-      if not (Db.Value.is_reachable_stmt stmt) then begin
+      if not (Cvalue_results.is_reachable stmt) then begin
         let mark_status kf =
           (* Do not mark preconditions as dead if they are not analyzed in
              non-dead code. Otherwise, the consolidation does strange things. *)
@@ -115,11 +115,13 @@ let c_labels kf cs =
     let fdec = Kernel_function.get_definition kf in
     let aux acc stmt =
       if stmt.labels != [] then
-        try
-          let hstate = Db.Value.Table_By_Callstack.find stmt in
-          let state = Callstack.Hashtbl.find hstate cs in
-          Cil_datatype.Logic_label.Map.add (StmtLabel (ref stmt)) state acc
-        with Not_found -> acc
+        match Cvalue_results.get_stmt_state_by_callstack ~after:false stmt with
+        | `Bottom | `Top -> acc
+        | `Value hstate ->
+          try
+            let state = Callstack.Hashtbl.find hstate cs in
+            Cil_datatype.Logic_label.Map.add (StmtLabel (ref stmt)) state acc
+          with Not_found -> acc
       else acc
     in
     List.fold_left aux Cil_datatype.Logic_label.Map.empty fdec.sallstmts
@@ -128,20 +130,23 @@ let c_labels kf cs =
 (* TODO: we can probably factor some code with the GUI *)
 let eval_by_callstack kf stmt p =
   (* This is actually irrelevant for alarms: they never use \old *)
-  let pre = Db.Value.get_initial_state kf in
-  let aux_callstack callstack state acc_status =
-    let c_labels = c_labels kf callstack in
-    let env = Eval_terms.env_annot ~c_labels ~pre ~here:state () in
-    let status = Eval_terms.eval_predicate env p in
-    let join = Eval_terms.join_predicate_status in
-    match Bottom.join join acc_status (`Value status) with
-    | `Value Unknown -> raise Exit (* shortcut *)
-    | _ as r -> r
-  in
-  match Db.Value.get_stmt_state_callstack ~after:false stmt with
-  | None -> (* dead; ignore, those will be marked 'unreachable' elsewhere *)
+  let pre = Cvalue_results.get_initial_state kf in
+  let here = Cvalue_results.get_stmt_state_by_callstack ~after:false stmt in
+  match pre, here with
+  | `Bottom, _
+  | _, (`Top | `Bottom) ->
+    (* Ignore dead statements, those will be marked 'unreachable' elsewhere *)
     Unknown
-  | Some states ->
+  | `Value pre, `Value states ->
+    let aux_callstack callstack state acc_status =
+      let c_labels = c_labels kf callstack in
+      let env = Eval_terms.env_annot ~c_labels ~pre ~here:state () in
+      let status = Eval_terms.eval_predicate env p in
+      let join = Eval_terms.join_predicate_status in
+      match Bottom.join join acc_status (`Value status) with
+      | `Value Unknown -> raise Exit (* shortcut *)
+      | _ as r -> r
+    in
     try
       match Callstack.Hashtbl.fold aux_callstack states `Bottom with
       | `Bottom -> Eval_terms.Unknown (* probably never reached *)

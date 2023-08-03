@@ -25,6 +25,20 @@ open Eval
 
 let dkey = Self.register_category "callbacks"
 
+(* Clear Eva's various caches. Some operations of Eva depend on parameters,
+   such as -ilevel or -plevel, so clearing those caches ensures that those
+   options have the expected effect.
+   Caches are cleared at the beginning of each analysis, and whenever the
+   Frama-C project library changes the local state of Eva. *)
+let clear_caches () =
+  Cvalue.V_Offsetmap.clear_caches ();
+  Cvalue.Model.clear_caches ();
+  Locations.Location_Bytes.clear_caches ();
+  Locations.Zone.clear_caches ();
+  Function_Froms.Memory.clear_caches ()
+
+let () = State.add_hook_on_update Self.state clear_caches
+
 let floats_ok () =
   let u = min_float /. 2. in
   let u = u /. 2. in
@@ -86,6 +100,7 @@ let pre_analysis () =
   Builtins.prepare_builtins ();
   Eva_perf.reset ();
   Statistics.reset_all ();
+  clear_caches ();
   (* We may be resuming Value from a previously crashed analysis. Clear
      degeneration states *)
   Eva_utils.DegenerationPoints.clear ();
@@ -94,10 +109,6 @@ let pre_analysis () =
 
 let post_analysis_cleanup ~aborted =
   Eva_utils.clear_call_stack ();
-  (* Precompute consolidated states if required *)
-  if Parameters.JoinResults.get () then
-    Db.Value.Table_By_Callstack.iter
-      (fun s _ -> ignore (Db.Value.get_stmt_state s));
   if not aborted then
     (* Keep memexec results for users that want to resume the analysis *)
     Mem_exec.cleanup_results ()

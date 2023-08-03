@@ -320,9 +320,10 @@ module Make (X: Analysis.S) = struct
     }
 
   let pre_kf kf callstack =
-    match Db.Value.get_initial_state_callstack kf with
-    | None -> Cvalue.Model.top (* should not happen *)
-    | Some h ->
+    match Cvalue_results.get_initial_state_by_callstack kf with
+    | `Top -> Cvalue.Model.top (* should not happen *)
+    | `Bottom -> Cvalue.Model.bottom
+    | `Value h ->
       try Callstack.Hashtbl.find h callstack
       with Not_found -> Cvalue.Model.top (* should not happen either *)
 

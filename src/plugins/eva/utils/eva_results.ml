@@ -25,18 +25,14 @@ open Cil_datatype
 (* {2 Termination.} *)
 
 let partition_terminating_instr stmt =
-  let ho =
-    try Some (Db.Value.AfterTable_By_Callstack.find stmt)
-    with Not_found -> None
-  in
-  match ho with
-  | None -> ([], [])
-  | Some h ->
+  match Cvalue_results.get_stmt_state_by_callstack ~after:true stmt with
+  | `Bottom | `Top -> ([], [])
+  | `Value h ->
     let terminating = ref [] in
     let non_terminating = ref [] in
     let add x xs = xs := x :: !xs in
     Callstack.Hashtbl.iter (fun cs state ->
-        if Db.Value.is_reachable state
+        if Cvalue.Model.is_reachable state
         then add cs terminating
         else add cs non_terminating) h;
     (!terminating, !non_terminating)
@@ -73,25 +69,29 @@ let get_results () =
   let vue = Emitter.get Eva_utils.emitter in
   let main = Some (fst (Globals.entry_point ())) in
   let module CS = Callstack in
-  let copy_states iter =
-    let h = Stmt.Hashtbl.create 128 in
-    let copy stmt hstack = Stmt.Hashtbl.add h stmt (CS.Hashtbl.copy hstack) in
-    iter copy;
-    h
-  in
-  let before_states = copy_states Db.Value.Table_By_Callstack.iter in
-  let after_states = copy_states Db.Value.AfterTable_By_Callstack.iter in
-  let kf_initial_states =
-    let h = Kernel_function.Hashtbl.create 128 in
-    let copy kf =
-      match Db.Value.get_initial_state_callstack kf with
-      | None -> ()
-      | Some hstack ->
-        Kernel_function.Hashtbl.add h kf (CS.Hashtbl.copy hstack)
+  let before_states = Stmt.Hashtbl.create 128 in
+  let after_states = Stmt.Hashtbl.create 128 in
+  let kf_initial_states = Kernel_function.Hashtbl.create 128 in
+  let copy_states stmt =
+    let copy h ~after stmt =
+      match Cvalue_results.get_stmt_state_by_callstack ~after stmt with
+      | `Top | `Bottom -> ()
+      | `Value states -> Stmt.Hashtbl.add h stmt (CS.Hashtbl.copy states)
     in
-    Globals.Functions.iter copy;
-    h
+    copy before_states ~after:false stmt;
+    copy after_states ~after:true stmt;
   in
+  let copy_kf kf =
+    match Cvalue_results.get_initial_state_by_callstack kf with
+    | `Top | `Bottom -> ()
+    | `Value hstack ->
+      Kernel_function.Hashtbl.add kf_initial_states kf (CS.Hashtbl.copy hstack);
+      try
+        let fundec = Kernel_function.get_definition kf in
+        List.iter copy_states fundec.sallstmts
+      with Kernel_function.No_Definition -> ()
+  in
+  Globals.Functions.iter copy_kf;
   let kf_callers = Function_calls.get_results () in
   let initial_state = Db.Value.globals_state () in
   let initial_args = Db.Value.fun_get_args () in
@@ -140,18 +140,21 @@ let set_results results =
     | Some l -> Db.Value.fun_set_args l
   end;
   (* Pre- and post-states *)
-  let aux_states ~after stmt (h:stmt_by_callstack) =
-    let aux_callstack callstack state =
-      Db.Value.update_callstack_table ~after stmt callstack state;
+  let register_states register (tbl: stmt_by_callstack Stmt.Hashtbl.t) =
+    let copy stmt (h:stmt_by_callstack) =
+      let aux_callstack callstack state =
+        register callstack stmt state;
+      in
+      Callstack.Hashtbl.iter aux_callstack h
     in
-    Callstack.Hashtbl.iter aux_callstack h
+    Stmt.Hashtbl.iter copy tbl
   in
-  Stmt.Hashtbl.iter (aux_states ~after:false) results.before_states;
-  Stmt.Hashtbl.iter (aux_states ~after:true) results.after_states;
+  register_states Cvalue_results.register_state_before_stmt results.before_states;
+  register_states Cvalue_results.register_state_after_stmt results.after_states;
   (* Kf initial state *)
   let aux_initial_state kf h =
     let aux_callstack callstack state =
-      Db.Value.merge_initial_state callstack kf state
+      Cvalue_results.register_initial_state callstack kf state
     in
     Callstack.Hashtbl.iter aux_callstack h
   in
@@ -172,7 +175,7 @@ let set_results results =
   Cvalue_domain.State.Store.register_global_state b
     (`Value Cvalue_domain.State.top);
   Self.ComputationState.set Computed;
-  Db.Value.mark_as_computed ();
+  Cvalue_results.mark_as_computed ();
 ;;
 
 module HExt (H: Hashtbl.S) =
