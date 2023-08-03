@@ -157,23 +157,6 @@ module Derefs = struct
   let pretty = Locations.Zone.pretty
 end
 
-
-(* ************************************************************************* *)
-(** {2 Values} *)
-(* ************************************************************************* *)
-
-module Value = struct
-  type state = Cvalue.Model.t
-  type t = Cvalue.V.t
-
-  let dependencies = [ ]
-  let proxy = State_builder.Proxy.(create "eva_db" Forward dependencies)
-  let self = State_builder.Proxy.get proxy
-
-  let compute = mk_fun "Value.compute"
-
-end
-
 (* ************************************************************************* *)
 (** {2 Others plugins} *)
 (* ************************************************************************* *)

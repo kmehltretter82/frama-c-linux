@@ -229,7 +229,6 @@ let compute =
   let name = "Eva.Analysis.compute" in
   fst (State_builder.apply_once name [ Self.state ] compute)
 
-let () = Db.Value.compute := compute
 let () = Parameters.ForceValues.set_output_dependencies [Self.state]
 
 let main () =

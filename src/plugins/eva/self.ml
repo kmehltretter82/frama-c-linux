@@ -38,13 +38,8 @@ let kernel_dependencies =
     Alarms.self;
     Annotations.code_annot_state; ]
 
-let dependencies = Db.Value.self :: kernel_dependencies
-
-let proxy = State_builder.Proxy.(create "eva" Forward dependencies)
+let proxy = State_builder.Proxy.(create "eva" Forward kernel_dependencies)
 let state = State_builder.Proxy.get proxy
-
-let () = State_builder.Proxy.extend [state] Db.Value.proxy
-
 
 (* Current state of the analysis *)
 type computation_state = NotComputed | Computing | Computed | Aborted

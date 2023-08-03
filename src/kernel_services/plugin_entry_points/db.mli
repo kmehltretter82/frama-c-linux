@@ -97,38 +97,6 @@ module Toplevel: sig
 end
 
 (* ************************************************************************* *)
-(** {2 Values} *)
-(* ************************************************************************* *)
-
-(** Deprecated module: use the Eva.mli API instead. *)
-module Value : sig
-
-  type state = Cvalue.Model.t
-  (** Internal state of the value analysis. *)
-
-  type t = Cvalue.V.t
-  (** Internal representation of a value. *)
-
-  val proxy: State_builder.Proxy.t
-
-  val self : State.t
-  (** Internal state of the value analysis from projects viewpoint.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-
-  val compute : (unit -> unit) ref
-  (** Compute the value analysis using the entry point of the current
-      project. You may set it with {!Globals.set_entry_point}.
-      @raise Globals.No_such_entry_point if the entry point is incorrect
-      @raise Db.Value.Incorrect_number_of_arguments if some arguments are
-      specified for the entry point using {!Db.Value.fun_set_args}, and
-      an incorrect number of them is given.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-end
-[@@alert db_deprecated
-    "Db.Value is deprecated and will be removed in a future version \
-     of Frama-C. Please use the Eva.mli public API instead."]
-
-(* ************************************************************************* *)
 (** {2 Plugins} *)
 (* ************************************************************************* *)
 
