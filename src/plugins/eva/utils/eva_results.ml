@@ -57,7 +57,7 @@ type results = {
   after_states: stmt_by_callstack Stmt.Hashtbl.t;
   kf_initial_states: stmt_by_callstack Kernel_function.Hashtbl.t;
   kf_callers: Function_calls.t;
-  initial_state: Cvalue.Model.t;
+  initial_state: Cvalue.Model.t Lattice_bounds.or_bottom;
   initial_args: Cvalue.V.t list option;
   alarms: Property_status.emitted_status AlarmsStmt.Hashtbl.t;
   statuses: Property_status.emitted_status Property.Hashtbl.t
@@ -93,7 +93,7 @@ let get_results () =
   in
   Globals.Functions.iter copy_kf;
   let kf_callers = Function_calls.get_results () in
-  let initial_state = Db.Value.globals_state () in
+  let initial_state = Cvalue_results.get_global_state () in
   let initial_args = Db.Value.fun_get_args () in
   let aux_statuses f_status ip =
     let aux_any_status e status =
@@ -133,7 +133,7 @@ let set_results results =
   Project.clear ~selection ();
   (* Those two functions may clear Self.state. Start by them *)
   (* Initial state *)
-  Db.Value.globals_set_initial_state results.initial_state;
+  Cvalue_results.register_global_state true results.initial_state;
   (* Initial args *)
   begin match results.initial_args with
     | None -> Db.Value.fun_use_default_args ()
@@ -254,7 +254,9 @@ let merge r1 r2 =
   let kf_callers = Function_calls.merge_results r1.kf_callers r2.kf_callers in
   let alarms = AlarmsStmtH.merge merge_statuses r1.alarms r2.alarms in
   let statuses = PropertyH.merge merge_statuses r1.statuses r2.statuses in
-  let initial_state = Cvalue.Model.join r1.initial_state r2.initial_state in
+  let initial_state =
+    Lattice_bounds.Bottom.join Cvalue.Model.join r1.initial_state r2.initial_state
+  in
   let initial_args =
     match main, r1.initial_args, r2.initial_args with
     | None, _, _ | _, None, _ | _, _, None -> None

@@ -219,12 +219,7 @@ module Value = struct
     if VGlobals.get_option () <> None then
       (!initial_state_changed (); VGlobals.clear ())
 
-  let initial_state_only_globals = mk_fun "Value.initial_state_only_globals"
-
-  let globals_state () =
-    match VGlobals.get_option () with
-    | Some v -> v
-    | None -> !initial_state_only_globals ()
+  let globals_state () = VGlobals.get_option ()
 
   let globals_use_supplied_state () = not (VGlobals.get_option () = None)
 

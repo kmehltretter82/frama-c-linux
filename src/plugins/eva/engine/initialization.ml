@@ -27,7 +27,6 @@ open Eval
 
 module type S = sig
   type state
-  val initial_state : lib_entry:bool -> state or_bottom
   val initial_state_with_formals :
     lib_entry:bool -> kernel_function -> state or_bottom
   val initialize_local_variable:
@@ -357,18 +356,12 @@ module Make
     InitialState.memo (compute_global_state ~lib_entry)
 
   (* The global cvalue state may be supplied by the user. *)
-  let supplied_state () =
-    let cvalue_state = Db.Value.globals_state () in
+  let supplied_state cvalue_state =
     if Cvalue.Model.is_reachable cvalue_state
     then
       let cvalue_state = cvalue_state, Locals_scoping.bottom () in
       `Value (Domain.set Cvalue_domain.State.key cvalue_state Domain.top)
     else `Bottom
-
-  let initial_state ~lib_entry =
-    if Db.Value.globals_use_supplied_state ()
-    then supplied_state ()
-    else global_state ~lib_entry
 
   let print_initial_cvalue_state state =
     let cvalue_state = get_cvalue_or_bottom state in
@@ -391,18 +384,16 @@ module Make
 
   let initial_state_with_formals ~lib_entry kf =
     let init_state =
-      if Db.Value.globals_use_supplied_state ()
-      then begin
+      match Db.Value.globals_state () with
+      | Some state ->
         Self.feedback "Initial state supplied by user";
-        supplied_state ()
-      end
-      else begin
+        supplied_state state
+      | None ->
         let pp = Parameters.ValShowProgress.get () in
         if pp then Self.feedback "Computing initial state";
         let state = global_state ~lib_entry in
         if pp then Self.feedback "Initial state computed";
         state
-      end
     in
     let b = Parameters.ResultsAll.get () in
     Domain.Store.register_global_state b init_state;

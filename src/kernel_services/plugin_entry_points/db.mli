@@ -161,8 +161,8 @@ module Value : sig
 
   val globals_use_default_initial_state : unit -> unit
 
-  (** Initial state used by the analysis *)
-  val globals_state : unit -> state
+  (** Initial state provided by [globals_set_initial_state], if any. *)
+  val globals_state : unit -> state option
 
 
   (** @return [true] if the initial state for globals used by the value
@@ -173,9 +173,6 @@ module Value : sig
 
   (**/**)
   (** {3 Internal use only} *)
-
-
-  val initial_state_only_globals : (unit -> state) ref
 
   val initial_state_changed: (unit -> unit) ref
 end

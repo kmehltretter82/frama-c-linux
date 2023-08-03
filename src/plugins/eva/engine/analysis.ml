@@ -88,7 +88,6 @@ module type Analyzer = sig
   include S
   val compute_from_entry_point : kernel_function -> lib_entry:bool -> unit
   (* val compute_from_init_state: kernel_function -> Dom.t -> unit *)
-  val initial_state: lib_entry:bool -> Dom.t or_bottom
 end
 
 
@@ -180,14 +179,6 @@ let register_hook = Analyzer_Hook.extend
 let set_current_analyzer config (analyzer: (module Analyzer)) =
   Analyzer_Hook.apply (module (val analyzer): S);
   ref_analyzer := (config, analyzer)
-
-let cvalue_initial_state () =
-  let module A = (val snd !ref_analyzer) in
-  let module G = (Cvalue_domain.Getters (A.Dom)) in
-  let _, lib_entry = Globals.entry_point () in
-  G.get_cvalue_or_bottom (A.initial_state ~lib_entry)
-
-let () = Db.Value.initial_state_only_globals := cvalue_initial_state
 
 (* Builds the Analyzer module corresponding to a given configuration,
    and sets it as the current analyzer. *)
