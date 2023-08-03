@@ -194,7 +194,6 @@ do
         "--coverage")
             COVER=yes
             DUNE_OPT+="--workspace dev/dune-workspace.cover "
-            shift
             ;;
         "-n"|"--name")
             ALIAS_NAME=$2
