@@ -95,6 +95,9 @@ let get_custom_mode mode =
 let compare_it it1 it2 =
   Cil_datatype.Term.compare it1.it_content it2.it_content
 
+let is_frama_c_builtin kf =
+  Kernel_function.get_name kf |> Ast_info.is_frama_c_builtin
+
 module type Generator =
 sig
 
@@ -108,7 +111,7 @@ sig
   val completes : string list list -> behaviors -> clause list option
 
   val acsl_default : unit -> clause
-  val safe_default : bool -> clause
+  val safe_default : kernel_function -> clause
   val frama_c_default : kernel_function -> clause
   val combine_default : clause list -> clause
   val custom_default : string -> kernel_function -> spec -> clause
@@ -128,34 +131,38 @@ struct
       | (Safe | Frama_C | Other _), Some completes_clauses ->
         true, G.combine_default completes_clauses
       | Safe, None ->
-        false, G.safe_default @@ Kernel_function.has_definition kf
+        false, G.safe_default kf
       | Frama_C, None ->
         false, G.frama_c_default kf
       | Other mode, None ->
         false, G.custom_default mode kf spec
       | (Skip | ACSL), _ -> assert false
 
+  let warn ~combined ~warned ~empty kf name =
+    let has_body = Kernel_function.has_definition kf in
+    let is_builtin = is_frama_c_builtin kf in
+    if not has_body && not is_builtin then
+      if combined then
+        Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
+          "Missing %s in default behavior of prototype %a,@, \
+           generating default specification from complete behaviors"
+          name Kernel_function.pretty kf
+      else if not warned && not empty then
+        Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
+          "Missing %s in specification of prototype %a,@, \
+           generating default specification, see -generated-spec-* options\
+           for more info"
+          name Kernel_function.pretty kf
+
   let get_default ~warned mode kf spec =
     let table = G.collect_behaviors spec in
     if mode = Skip || G.has_behavior default table then Kept
     else
       let combined, g = combine_or_default mode kf spec table in
-      if not @@ Kernel_function.has_definition kf then begin
-        if combined then
-          Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
-            "Missing %s in default behavior of prototype %a,@, \
-             generating default specification from complete behaviors"
-            G.name Kernel_function.pretty kf
-        else if not warned && not @@ G.is_empty g then
-          Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
-            "Missing %s in specification of prototype %a,@, \
-             generating default specification, see -generated-spec-* options\
-             for more info"
-            G.name Kernel_function.pretty kf
-      end;
+      warn ~warned ~combined ~empty:(G.is_empty g) kf G.name;
       Generated g
 
-  let emit = G.emit
+let emit = G.emit
 
 end
 
@@ -185,8 +192,8 @@ struct
 
   let acsl_default () = []
 
-  let safe_default has_body =
-    if has_body
+  let safe_default kf =
+    if Kernel_function.has_definition kf
     then [ Exits, Logic_const.(new_predicate pfalse) ]
     else []
 
@@ -196,10 +203,10 @@ struct
   let combine_default (clauses : clause list) =
     let collect acc clauses = List.rev_append (List.rev clauses) acc in
     let preds =
-      List.sort_uniq (Cil_datatype.PredicateStructEq.compare) @@
       List.map
         (fun p -> p.ip_content.tp_statement)
-        (snd @@ List.split @@ List.fold_left collect [] clauses)
+        (List.fold_left collect [] clauses |> List.split |> snd)
+      |> List.sort_uniq (Cil_datatype.PredicateStructEq.compare)
     in
     [ Exits, Logic_const.new_predicate @@ Logic_const.pors preds ]
 
@@ -263,8 +270,8 @@ struct
   let acsl_default () =
     WritesAny
 
-  let safe_default has_body =
-    if has_body
+  let safe_default kf =
+    if Kernel_function.has_definition kf
     then Writes []
     else WritesAny
 
@@ -297,7 +304,8 @@ struct
       | From l -> From (List.sort_uniq compare_it l)
     in
     let froms =
-      List.map (fun (e, ds) -> e, deps ds) @@ List.fold_left collect [] clauses
+      List.fold_left collect [] clauses
+      |> List.map (fun (e, ds) -> e, deps ds)
     in
     Writes (List.sort_uniq compare_from froms)
 
@@ -374,8 +382,8 @@ struct
 
   let acsl_default () = []
 
-  let safe_default has_body =
-    if has_body
+  let safe_default kf =
+    if Kernel_function.has_definition kf
     then []
     else [ Logic_const.(new_predicate pfalse) ]
 
@@ -433,8 +441,8 @@ struct
   let acsl_default () =
     FreeAlloc([],[])
 
-  let safe_default has_body =
-    if has_body
+  let safe_default kf =
+    if Kernel_function.has_definition kf
     then FreeAlloc([],[])
     else FreeAllocAny
 
@@ -514,8 +522,8 @@ struct
   let acsl_default () =
     Some(Logic_const.(new_predicate ptrue))
 
-  let safe_default has_body =
-    if has_body
+  let safe_default kf =
+    if Kernel_function.has_definition kf
     then Some(Logic_const.(new_predicate ptrue))
     else Some(Logic_const.(new_predicate pfalse))
 
@@ -588,7 +596,7 @@ let build_config mode =
   }
 
 let get_config_mode () =
-  build_config @@ get_mode @@ Kernel.GeneratedSpecMode.get ()
+  Kernel.GeneratedSpecMode.get () |> get_mode |> build_config
 
 let get_config () =
   let default = get_config_mode () in
@@ -668,7 +676,11 @@ let populate_funspec ~force kf spec =
   if (not force && skip_generation) || Is_populated.mem kf || skip_proto
   then false
   else begin
-    let warned = if is_proto && is_empty_spec then warn_empty kf else false in
+    let warned =
+      if not @@ is_frama_c_builtin kf && is_proto && is_empty_spec
+      then warn_empty kf
+      else false
+    in
     do_populate ~warned kf spec;
     Is_populated.add kf ();
     true
