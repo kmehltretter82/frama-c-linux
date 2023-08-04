@@ -452,7 +452,7 @@ struct
                                     Clabels.post, post_normal_behavior] in
       let post_at_exit_behavior = Cfg.node () in
       let post_at_exit_env = env @* [Clabels.here, nassigns;
-                                     Clabels.post, post_at_exit_behavior] in
+                                     Clabels.exit, post_at_exit_behavior] in
       assume,
       sequence
         (fun env ip ->

@@ -154,3 +154,22 @@ int compare(int a, int b, int c, int d) {
   /*@ assert (a < b) ==> r == 1; @*/
   return r;
 }
+
+/*@ exits \true ;
+    ensures \false ;
+    assigns \nothing ;
+*/
+void exit(int);
+
+/*@ ensures foo == 0 ;
+    exits   foo == 1 ;
+*/
+void exits_and_ensures(void){
+  if(foo){
+    foo = 0 ;
+    return ;
+  } else {
+    foo = 1 ;
+    exit(0) ;
+  }
+}
