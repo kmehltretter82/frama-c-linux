@@ -101,6 +101,8 @@ sig
   type clause
   type behaviors
 
+  val name : string
+  val is_empty : clause -> bool
   val has_behavior : string -> behaviors -> bool
   val collect_behaviors : spec -> behaviors
   val completes : string list list -> behaviors -> clause list option
@@ -118,24 +120,40 @@ end
 module Make(G : Generator) =
 struct
 
-  let get_default mode kf spec =
-    let table = G.collect_behaviors spec in
-    if mode = Skip || G.has_behavior default table then
-      Kept
-    else if mode = ACSL then
-      Generated (G.acsl_default ())
+  let combine_or_default mode kf spec table =
+    if mode = ACSL then false, G.acsl_default ()
     else
       let completes_opt = G.completes spec.spec_complete_behaviors table in
       match mode, completes_opt with
       | (Safe | Frama_C | Other _), Some completes_clauses ->
-        Generated (G.combine_default completes_clauses)
+        true, G.combine_default completes_clauses
       | Safe, None ->
-        Generated(G.safe_default @@ Kernel_function.has_definition kf)
+        false, G.safe_default @@ Kernel_function.has_definition kf
       | Frama_C, None ->
-        Generated(G.frama_c_default kf)
+        false, G.frama_c_default kf
       | Other mode, None ->
-        Generated(G.custom_default mode kf spec)
+        false, G.custom_default mode kf spec
       | (Skip | ACSL), _ -> assert false
+
+  let get_default ~warned mode kf spec =
+    let table = G.collect_behaviors spec in
+    if mode = Skip || G.has_behavior default table then Kept
+    else
+      let combined, g = combine_or_default mode kf spec table in
+      if not @@ Kernel_function.has_definition kf then begin
+        if combined then
+          Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
+            "Missing %s in default behavior of prototype %a,@, \
+             generating default specification from complete behaviors"
+            G.name Kernel_function.pretty kf
+        else if not warned && not @@ G.is_empty g then
+          Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
+            "Missing %s in specification of prototype %a,@, \
+             generating default specification, see -generated-spec-* options\
+             for more info"
+            G.name Kernel_function.pretty kf
+      end;
+      Generated g
 
   let emit = G.emit
 
@@ -146,6 +164,10 @@ struct
 
   type clause = exits
   type behaviors = (string, clause) Hashtbl.t
+
+  let name = "exits"
+
+  let is_empty c = c = []
 
   let has_behavior name behaviors =
     Hashtbl.mem behaviors name
@@ -220,6 +242,10 @@ module Assigns_generator =
 struct
   type clause = assigns
   type behaviors = (string, assigns) Hashtbl.t
+
+  let name = "assigns"
+
+  let is_empty c = c = WritesAny
 
   let has_behavior name behaviors =
     Hashtbl.mem behaviors name
@@ -329,6 +355,10 @@ struct
   type clause = requires
   type behaviors = (string, clause) Hashtbl.t
 
+  let name = "requires"
+
+  let is_empty c = c = []
+
   let has_behavior name behaviors =
     Hashtbl.mem behaviors name
 
@@ -382,6 +412,10 @@ module Allocates_generator =
 struct
   type clause = allocation
   type behaviors = (string, allocation) Hashtbl.t
+
+  let name = "allocates"
+
+  let is_empty c = c = FreeAllocAny
 
   let has_behavior name behaviors =
     Hashtbl.mem behaviors name
@@ -464,6 +498,10 @@ struct
 
   type clause = terminates
   type behaviors = bool
+
+  let name = "terminates"
+
+  let is_empty c = c = None
 
   let has_behavior _ behaviors =
     behaviors
@@ -564,19 +602,22 @@ let get_config () =
     | "terminates" -> {conf with terminates = mode}
     | s ->
       Kernel.abort
-        "@[@['%s'@] is not a valid key for -generated-spec-custom.@ Accepted \
+        "@['%s'@] is not a valid key for -generated-spec-custom.@, Accepted \
          keys are 'exits', 'assigns', 'requires', 'allocates' and \
-         'terminates'.@]@." s
+         'terminates'." s
   in
   Kernel.GeneratedSpecCustom.fold collect default
 
-let do_populate kf original_spec =
+let do_populate ~warned kf original_spec =
   let config = get_config () in
-  let exits = Exits.get_default config.exits kf original_spec in
-  let assigns = Assigns.get_default config.assigns kf original_spec in
-  let requires = Requires.get_default config.requires kf original_spec in
-  let allocates = Allocates.get_default config.allocates kf original_spec in
-  let terminates = Terminates.get_default config.terminates kf original_spec in
+  let apply get_default mode =
+    get_default ~warned mode kf original_spec
+  in
+  let exits = apply Exits.get_default config.exits in
+  let assigns = apply Assigns.get_default config.assigns in
+  let requires = apply Requires.get_default config.requires in
+  let allocates = apply Allocates.get_default config.allocates in
+  let terminates = apply Terminates.get_default config.terminates in
 
   let generated original = function
     | Kept -> original
@@ -612,6 +653,13 @@ module Is_populated =
 
 let () = Ast.add_linked_state Is_populated.self
 
+let warn_empty kf =
+  Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
+    "Neither code nor specification for function %a,@, \
+     generating default specifications from the prototype"
+    Kernel_function.pretty kf;
+  true
+
 let populate_funspec ~force kf spec =
   let is_proto = not @@ Kernel_function.has_definition kf in
   let skip_generation = not @@ Kernel.GenerateDefaultSpec.get () in
@@ -620,12 +668,8 @@ let populate_funspec ~force kf spec =
   if (not force && skip_generation) || Is_populated.mem kf || skip_proto
   then false
   else begin
-    if is_proto && is_empty_spec then
-      Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
-        "Neither code nor specification for function %a, \
-        generating default specs from the prototype"
-        Kernel_function.pretty kf;
-    do_populate kf spec;
+    let warned = if is_proto && is_empty_spec then warn_empty kf else false in
+    do_populate ~warned kf spec;
     Is_populated.add kf ();
     true
   end
