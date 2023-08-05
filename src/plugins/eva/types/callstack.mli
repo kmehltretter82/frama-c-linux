@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 [@@@ api_start]
-[@@@ alert "-db_deprecated"]
 
 (** A call is identified by the function called and the call statement *)
 type call = Cil_types.kernel_function * Cil_types.stmt

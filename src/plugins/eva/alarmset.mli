@@ -104,10 +104,6 @@ val fold : (alarm -> status -> 'a -> 'a) -> 'a -> t -> 'a
     instruction. *)
 val emit: Cil_types.kinstr -> t -> unit
 
-(** Calls the functions registered in the [warn_mode] according to the
-    set of alarms. *)
-val notify: CilE.warn_mode -> t -> unit
-
 val pretty : Format.formatter -> t -> unit
 val pretty_status : Format.formatter -> status -> unit
 

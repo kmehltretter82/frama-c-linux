@@ -167,8 +167,6 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   include Cvalue_domain.Getters (Abstract.Dom)
 
-  let initial_state = Init.initial_state
-
   let get_cval =
     match Abstract.Val.get Main_values.CVal.key with
     | None -> fun _ -> assert false

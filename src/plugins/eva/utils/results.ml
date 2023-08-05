@@ -774,7 +774,7 @@ let is_reachable_kinstr kinstr =
   let module M = Make () in
   M.is_reachable (before_kinstr kinstr)
 
-let condition_truth_value = Db.Value.condition_truth_value
+let condition_truth_value = Iterator.condition_truth_value
 
 (* Callers / callsites *)
 

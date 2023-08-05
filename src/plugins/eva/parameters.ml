@@ -1131,23 +1131,20 @@ let () = StopAtNthAlarm.set_range ~min:0 ~max:max_int
 (* -------------------------------------------------------------------------- *)
 
 let () = Parameter_customize.is_invisible ()
-module InitialStateChanged =
+module CorrectnessChanged =
   Int (struct
     let option_name = "-eva-new-initial-state"
     let default = 0
     let arg_name = "n"
     let help = ""
   end)
-(* Changing the user-supplied initial state (or the arguments of main) through
-   the API of Db.Value does reset the state of Value, but *not* the property
-   statuses that Value has positioned. Currently, statuses can only depend
-   on a command-line parameter. We use the dummy one above to force a reset
-   when needed. *)
-let () =
-  add_correctness_dep InitialStateChanged.parameter;
-  Db.Value.initial_state_changed :=
-    (fun () -> InitialStateChanged.set (InitialStateChanged.get () + 1))
+let () = add_correctness_dep CorrectnessChanged.parameter
 
+(* Changing the user-supplied initial state (or the arguments of main) through
+   the API does reset the state of Eva, but *not* the property statuses set by
+   Eva. Currently, statuses can only depend on command-line parameters.
+   We use the dummy one above to force a reset when needed. *)
+let change_correctness = CorrectnessChanged.incr
 
 (* -------------------------------------------------------------------------- *)
 (* --- Eva options                                                        --- *)
