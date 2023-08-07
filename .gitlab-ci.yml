@@ -26,7 +26,6 @@ variables:
   PUBLISH: "no"
   RELEASE: "no"
   WEEKLY: "no"
-  DEBUG: "pw:browser*" # "pw:browser*" to debug playwright tests
 ################################################################################
 ### PREPARE
 
@@ -226,7 +225,6 @@ e2e-monkey-tests:
   script:
     - opam switch create 4.13.1
     - eval $(opam env)
-    - ocaml -version
     - opam pin . -n
     - opam depext frama-c --with-test
     - opam install --deps-only .
