@@ -435,13 +435,13 @@ let clear_all () =
 
 exception IOError = Sys_error
 
-module Before_load = Hook.Make(struct end)
+module Before_load = Hook.Make()
 let register_before_load_hook = Before_load.extend
 
-module After_load = Hook.Make(struct end)
+module After_load = Hook.Make()
 let register_after_load_hook = After_load.extend
 
-module After_global_load = Hook.Make(struct end)
+module After_global_load = Hook.Make()
 let register_after_global_load_hook = After_global_load.extend
 
 let magic = 9 (* magic number *)

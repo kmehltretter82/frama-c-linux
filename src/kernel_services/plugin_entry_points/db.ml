@@ -37,7 +37,7 @@ let register_guarded_compute is_computed r f =
   r := compute
 
 module Main = struct
-  include Hook.Make(struct end)
+  include Hook.Make()
   let play = mk_fun "Main.play"
 end
 

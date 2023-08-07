@@ -287,7 +287,7 @@ module Lock = struct
 end
 module Unlock = struct
   let first = ref (fun () -> ())
-  module H = Hook.Make(struct end)
+  module H = Hook.Make()
   let extend is_first f = if is_first then first := f else H.extend f
   let apply () = !first (); H.apply ()
 end
