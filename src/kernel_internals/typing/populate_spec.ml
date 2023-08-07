@@ -101,6 +101,9 @@ let is_frama_c_builtin kf =
 let is_frama_c_stdlib kf =
   (Kernel_function.get_vi kf).vattr |> Cil.is_in_libc
 
+let is_part_of_frama_c kf =
+  is_frama_c_builtin kf || is_frama_c_stdlib kf
+
 module type Generator =
 sig
 
@@ -143,9 +146,7 @@ struct
 
   let warn ~combined ~warned ~empty kf name =
     let has_body = Kernel_function.has_definition kf in
-    let is_builtin = is_frama_c_builtin kf in
-    let is_fc_stdlib = is_frama_c_stdlib kf in
-    if not has_body && not is_builtin  && not is_fc_stdlib then
+    if not has_body && not @@ is_part_of_frama_c kf then
       if combined then
         Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
           "Missing %s in default behavior of prototype %a,@, \
@@ -194,7 +195,8 @@ struct
 
   let completes = completes_generic
 
-  let acsl_default () = []
+  let acsl_default () =
+    [ Exits, Logic_const.(new_predicate pfalse) ]
 
   let safe_default kf =
     if Kernel_function.has_definition kf
@@ -202,7 +204,7 @@ struct
     else []
 
   let frama_c_default _ =
-    [ Exits, Logic_const.(new_predicate pfalse) ]
+    acsl_default ()
 
   let combine_default (clauses : clause list) =
     let collect acc clauses = List.rev_append (List.rev clauses) acc in
@@ -235,9 +237,9 @@ struct
     | Generated _ when Kernel_function.has_definition kf -> ()
     | Generated exits ->
       match mode with
-      | Skip | ACSL -> assert false
+      | Skip -> assert false
       | Safe -> ()
-      | Frama_C -> emit_status kf bhv exits Property_status.Dont_know
+      | ACSL | Frama_C -> emit_status kf bhv exits Property_status.Dont_know
       | Other mode ->
         let custom_mode = get_custom_mode mode in
         match custom_mode.custom_exits.status with
@@ -621,7 +623,11 @@ let get_config () =
   Kernel.GeneratedSpecCustom.fold collect default
 
 let do_populate ~warned kf original_spec =
-  let config = get_config () in
+  let config =
+    if is_frama_c_builtin kf then build_config Frama_C
+    else if is_frama_c_stdlib kf then build_config ACSL
+    else get_config ()
+  in
   let apply get_default mode =
     get_default ~warned mode kf original_spec
   in
@@ -681,9 +687,7 @@ let populate_funspec ~force kf spec =
   then false
   else begin
     let warned =
-      let is_builtin = is_frama_c_builtin kf in
-      let is_stdlib = is_frama_c_stdlib kf in
-      if not is_builtin && not is_stdlib && is_proto && is_empty_spec
+      if not @@ is_part_of_frama_c kf && is_proto && is_empty_spec
       then warn_empty kf
       else false
     in

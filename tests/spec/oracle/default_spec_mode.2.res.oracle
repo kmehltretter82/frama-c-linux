@@ -1,5 +1,8 @@
 [kernel] Parsing default_spec_mode.i (no preprocessing)
 [kernel:annot:missing-spec] default_spec_mode.i:31: Warning: 
+  Missing exits in specification of prototype f3,
+   generating default specification, see -generated-spec-* optionsfor more info
+[kernel:annot:missing-spec] default_spec_mode.i:31: Warning: 
   Missing allocates in specification of prototype f3,
    generating default specification, see -generated-spec-* optionsfor more info
 [kernel:annot:missing-spec] default_spec_mode.i:31: Warning: 
@@ -9,6 +12,7 @@
 void f1(void);
 
 /*@ terminates \true;
+    exits \false;
     allocates \nothing; */
 void f2(void)
 {
@@ -18,13 +22,16 @@ void f2(void)
 
 /*@ requires \true;
     terminates \true;
+    exits \false;
     allocates \nothing; */
 int f3(int *a);
 
 /*@ requires \true;
     terminates \true;
+    exits \false;
     assigns *b;
-    allocates \nothing; */
+    allocates \nothing;
+ */
 int f4(int *b)
 {
   int tmp;
