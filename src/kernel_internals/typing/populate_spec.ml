@@ -98,6 +98,9 @@ let compare_it it1 it2 =
 let is_frama_c_builtin kf =
   Kernel_function.get_name kf |> Ast_info.is_frama_c_builtin
 
+let is_frama_c_stdlib kf =
+  (Kernel_function.get_vi kf).vattr |> Cil.is_in_libc
+
 module type Generator =
 sig
 
@@ -141,7 +144,8 @@ struct
   let warn ~combined ~warned ~empty kf name =
     let has_body = Kernel_function.has_definition kf in
     let is_builtin = is_frama_c_builtin kf in
-    if not has_body && not is_builtin then
+    let is_fc_stdlib = is_frama_c_stdlib kf in
+    if not has_body && not is_builtin  && not is_fc_stdlib then
       if combined then
         Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
           "Missing %s in default behavior of prototype %a,@, \
@@ -677,7 +681,9 @@ let populate_funspec ~force kf spec =
   then false
   else begin
     let warned =
-      if not @@ is_frama_c_builtin kf && is_proto && is_empty_spec
+      let is_builtin = is_frama_c_builtin kf in
+      let is_stdlib = is_frama_c_stdlib kf in
+      if not is_builtin && not is_stdlib && is_proto && is_empty_spec
       then warn_empty kf
       else false
     in
