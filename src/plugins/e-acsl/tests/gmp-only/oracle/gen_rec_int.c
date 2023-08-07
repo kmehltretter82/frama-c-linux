@@ -73,10 +73,6 @@ void __gen_e_acsl_identity(__e_acsl_mpz_t *__retres_arg,
     __gmpz_init(__gen_e_acsl_sub);
     __gmpz_sub(__gen_e_acsl_sub,(__e_acsl_mpz_struct const *)(n),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
-    /*@ assert
-        Eva: initialization:
-          \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_sub);
-    */
     __gen_e_acsl_identity(& __gen_e_acsl_identity_3,
                           (__e_acsl_mpz_struct *)__gen_e_acsl_sub);
     __gmpz_init(__gen_e_acsl_add);

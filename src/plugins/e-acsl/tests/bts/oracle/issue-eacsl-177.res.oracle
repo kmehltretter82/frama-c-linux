@@ -1,8 +1,5 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] issue-eacsl-177.c:9: Warning: 
-  accessing uninitialized left-value.
-  assert \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_add);
 [eva] issue-eacsl-177.c:9: Warning: 
   Using specification of function __gen_e_acsl_f
   for recursive calls of depth 100. Analysis of function __gen_e_acsl_f

@@ -169,6 +169,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__e_acsl_mpz_struct const
 /*@ requires \valid(z1);
     requires \valid_read(z2);
     requires \valid_read(z3);
+    ensures \initialized(\old(z1));
     assigns *z1;
     assigns *z1 \from *z2, *z3;
  */

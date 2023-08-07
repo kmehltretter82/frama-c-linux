@@ -117,10 +117,6 @@ void __gen_e_acsl_f(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * n)
     __gmpz_init(__gen_e_acsl_add);
     __gmpz_add(__gen_e_acsl_add,(__e_acsl_mpz_struct const *)(n),
                (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
-    /*@ assert
-        Eva: initialization:
-          \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_add);
-    */
     __gen_e_acsl_f(& __gen_e_acsl_f_3,
                    (__e_acsl_mpz_struct *)__gen_e_acsl_add);
     __gmpz_init(__gen_e_acsl_add_2);

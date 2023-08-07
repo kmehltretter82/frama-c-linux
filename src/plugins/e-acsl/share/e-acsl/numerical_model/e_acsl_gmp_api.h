@@ -238,6 +238,7 @@ extern int __gmpq_cmp(const eacsl_mpq_t q1, const eacsl_mpq_t q2)
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
+  @ ensures \initialized(z1);
   @ assigns *z1 \from *z2; */
 extern void __gmpz_neg(eacsl_mpz_t z1, const eacsl_mpz_t z2)
     __attribute__((FC_BUILTIN));
@@ -245,6 +246,7 @@ extern void __gmpz_neg(eacsl_mpz_t z1, const eacsl_mpz_t z2)
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
+  @ ensures \initialized(z1);
   @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_add(eacsl_mpz_t z1, const eacsl_mpz_t z2,
                        const eacsl_mpz_t z3) __attribute__((FC_BUILTIN));
@@ -252,6 +254,7 @@ extern void __gmpz_add(eacsl_mpz_t z1, const eacsl_mpz_t z2,
 /*@ requires \valid(q1);
   @ requires \valid_read(q2);
   @ requires \valid_read(q3);
+  @ ensures \initialized(q1);
   @ assigns *q1 \from *q2, *q3; */
 extern void __gmpq_add(eacsl_mpq_t q1, const eacsl_mpq_t q2,
                        const eacsl_mpq_t q3) __attribute__((FC_BUILTIN));
@@ -259,6 +262,7 @@ extern void __gmpq_add(eacsl_mpq_t q1, const eacsl_mpq_t q2,
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
+  @ ensures \initialized(z1);
   @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_sub(eacsl_mpz_t z1, const eacsl_mpz_t z2,
                        const eacsl_mpz_t z3) __attribute__((FC_BUILTIN));
@@ -266,6 +270,7 @@ extern void __gmpz_sub(eacsl_mpz_t z1, const eacsl_mpz_t z2,
 /*@ requires \valid(q1);
   @ requires \valid_read(q2);
   @ requires \valid_read(q3);
+  @ ensures \initialized(q1);
   @ assigns *q1 \from *q2, *q3; */
 extern void __gmpq_sub(eacsl_mpq_t q1, const eacsl_mpq_t q2,
                        const eacsl_mpq_t q3) __attribute__((FC_BUILTIN));
@@ -273,12 +278,14 @@ extern void __gmpq_sub(eacsl_mpq_t q1, const eacsl_mpq_t q2,
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
+  @ ensures \initialized(z1);
   @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_mul(eacsl_mpz_t z1, const eacsl_mpz_t z2,
                        const eacsl_mpz_t z3) __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
+  @ ensures \initialized(z1);
   @ assigns *z1 \from *z2, n; */
 extern void __gmpz_mul_2exp(eacsl_mpz_t z1, const eacsl_mpz_t z2,
                             eacsl_mp_bitcnt_t n) __attribute__((FC_BUILTIN));
@@ -286,6 +293,7 @@ extern void __gmpz_mul_2exp(eacsl_mpz_t z1, const eacsl_mpz_t z2,
 /*@ requires \valid(q1);
   @ requires \valid_read(q2);
   @ requires \valid_read(q3);
+  @ ensures \initialized(q1);
   @ assigns *q1 \from *q2, *q3; */
 extern void __gmpq_mul(eacsl_mpq_t q1, const eacsl_mpq_t q2,
                        const eacsl_mpq_t q3) __attribute__((FC_BUILTIN));
@@ -293,6 +301,7 @@ extern void __gmpq_mul(eacsl_mpq_t q1, const eacsl_mpq_t q2,
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
+  @ ensures \initialized(z1);
   @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_tdiv_q(eacsl_mpz_t z1, const eacsl_mpz_t z2,
                           const eacsl_mpz_t z3) __attribute__((FC_BUILTIN));
@@ -300,12 +309,14 @@ extern void __gmpz_tdiv_q(eacsl_mpz_t z1, const eacsl_mpz_t z2,
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
+  @ ensures \initialized(z1);
   @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_tdiv_r(eacsl_mpz_t z1, const eacsl_mpz_t z2,
                           const eacsl_mpz_t z3) __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
+  @ ensures \initialized(z1);
   @ assigns *z1 \from *z2, n; */
 extern void __gmpz_tdiv_q_2exp(eacsl_mpz_t z1, const eacsl_mpz_t z2,
                                eacsl_mp_bitcnt_t n) __attribute__((FC_BUILTIN));
@@ -313,6 +324,7 @@ extern void __gmpz_tdiv_q_2exp(eacsl_mpz_t z1, const eacsl_mpz_t z2,
 /*@ requires \valid(q1);
   @ requires \valid_read(q2);
   @ requires \valid_read(q3);
+  @ ensures \initialized(q1);
   @ assigns *q1 \from *q2, *q3; */
 extern void __gmpq_div(eacsl_mpq_t q1, const eacsl_mpq_t q2,
                        const eacsl_mpq_t q3) __attribute__((FC_BUILTIN));
@@ -324,6 +336,7 @@ extern void __gmpq_div(eacsl_mpq_t q1, const eacsl_mpq_t q2,
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
+  @ ensures \initialized(z1);
   @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_and(eacsl_mpz_t z1, const eacsl_mpz_t z2,
                        const eacsl_mpz_t z3) __attribute__((FC_BUILTIN));
@@ -331,6 +344,7 @@ extern void __gmpz_and(eacsl_mpz_t z1, const eacsl_mpz_t z2,
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
+  @ ensures \initialized(z1);
   @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_ior(eacsl_mpz_t z1, const eacsl_mpz_t z2,
                        const eacsl_mpz_t z3) __attribute__((FC_BUILTIN));
@@ -338,6 +352,7 @@ extern void __gmpz_ior(eacsl_mpz_t z1, const eacsl_mpz_t z2,
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ requires \valid_read(z3);
+  @ ensures \initialized(z1);
   @ assigns *z1 \from *z2, *z3; */
 extern void __gmpz_xor(eacsl_mpz_t z1, const eacsl_mpz_t z2,
                        const eacsl_mpz_t z3) __attribute__((FC_BUILTIN));
@@ -345,6 +360,7 @@ extern void __gmpz_xor(eacsl_mpz_t z1, const eacsl_mpz_t z2,
 /*@ requires \valid(z1);
   @ requires \valid_read(z2);
   @ assigns *z1 \from *z2;
+  @ ensures \initialized(z1);
   @ assigns \result \from *z1,*z2; */
 extern int __gmpz_com(eacsl_mpz_t z1, const eacsl_mpz_t z2)
     __attribute__((FC_BUILTIN));
