@@ -227,10 +227,6 @@ int main(void)
                       (__e_acsl_mpz_struct *)__gen_e_acsl__7,
                       (__e_acsl_mpz_struct *)__gen_e_acsl__6);
     __gmpz_init_set_si(__gen_e_acsl_x_3,(long)x);
-    /*@ assert
-        Eva: initialization:
-          \initialized((__e_acsl_mpz_struct *)__gen_e_acsl_f1_4);
-    */
     __gen_e_acsl_p2_6 = __gen_e_acsl_p2_5((__e_acsl_mpz_struct *)__gen_e_acsl_x_3,
                                           (__e_acsl_mpz_struct *)__gen_e_acsl_f1_4);
     __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_5,"f1(3, 4)",0,
@@ -445,10 +441,6 @@ int main(void)
       {.values = (void *)0};
     __gmpq_init(__gen_e_acsl_d);
     __gmpq_set_d(__gen_e_acsl_d,d);
-    /*@ assert
-        Eva: initialization:
-          \initialized((__e_acsl_mpq_struct *)__gen_e_acsl_d);
-    */
     __gen_e_acsl_f2(& __gen_e_acsl_f2_2,
                     (__e_acsl_mpq_struct *)__gen_e_acsl_d);
     __gmpq_init(__gen_e_acsl__18);
