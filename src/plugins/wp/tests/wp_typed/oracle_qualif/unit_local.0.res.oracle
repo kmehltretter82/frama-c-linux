@@ -1,12 +1,18 @@
 # frama-c -wp [...]
 [kernel] Parsing unit_local.c (with preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal bar_exits : Valid (Unreachable)
+[wp] [CFG] Goal bar_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal foo_exits : Valid (Unreachable)
+[wp] [CFG] Goal foo_terminates : Valid (Trivial)
 [wp] 3 goals scheduled
 [wp] [Valid] typed_foo_assigns_part1 (Qed)
 [wp] [Valid] typed_foo_assigns_part2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_bar_assigns (Qed)
-[wp] Proved goals:    3 / 3
+[wp] Proved goals:    7 / 7
+  Terminating:     2
+  Unreachable:     2
   Qed:             2
   Alt-Ergo:        1
 ------------------------------------------------------------

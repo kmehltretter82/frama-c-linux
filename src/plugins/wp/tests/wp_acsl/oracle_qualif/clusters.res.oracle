@@ -1,24 +1,9 @@
 # frama-c -wp [...]
 [kernel] Parsing clusters.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] clusters.i:40: Warning: 
-  Missing terminates clause for callee_no_r, populates 'terminates \true'
+[wp] [CFG] Goal callee_no_r_exits : Valid (Unreachable)
 [wp] [CFG] Goal callee_no_r_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] clusters.i:45: Warning: 
-  Missing terminates clause for caller_no_cluster, populates 'terminates \true'
-[wp] clusters.i:60: Warning: 
-  Missing terminates clause for fp, populates 'terminates \true'
-[wp] clusters.i:54: Warning: 
-  Missing terminates clause for function, populates 'terminates \true'
-[wp] clusters.i:28: Warning: 
-  Missing terminates clause for mutual_1, populates 'terminates \true'
-[wp] clusters.i:35: Warning: 
-  Missing terminates clause for mutual_2, populates 'terminates \true'
-[wp] clusters.i:11: Warning: 
-  Missing terminates clause for simpl_r, populates 'terminates \true'
-[wp] clusters.i:15: Warning: 
-  Missing terminates clause for simpl_rf, populates 'terminates \true'
 [wp] clusters.i:16: Warning: 
   Missing decreases clause on recursive function simpl_rf, call must be unreachable
 [wp] clusters.i:29: Warning: 
@@ -29,37 +14,46 @@
 [wp] clusters.i:55: Warning: No decreases clause for fp
 [wp] clusters.i:71: Warning: 
   Missing decreases clause on recursive function no_decr_ok_term, call must be unreachable
-[wp] 17 goals scheduled
+[wp] 25 goals scheduled
 [wp] [Valid] typed_simpl_r_terminates (Qed)
+[wp] [Valid] typed_simpl_r_exits (Qed)
 [wp] [Valid] typed_simpl_r_variant (Alt-Ergo) (Cached)
 [wp] [Valid] typed_simpl_rf_terminates_part1 (Qed)
 [wp] [Unsuccess] typed_simpl_rf_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_simpl_rf_exits (Qed)
 [wp] [Valid] typed_mutual_1_terminates_part1 (Qed)
 [wp] [Unsuccess] typed_mutual_1_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_mutual_1_exits (Qed)
 [wp] [Valid] typed_mutual_2_terminates (Qed)
+[wp] [Valid] typed_mutual_2_exits (Qed)
 [wp] [Unsuccess] typed_mutual_2_variant (Alt-Ergo) (Cached) (Degenerated)
 [wp] [Valid] typed_caller_no_cluster_terminates (Qed)
+[wp] [Valid] typed_caller_no_cluster_exits (Qed)
 [wp] [Valid] typed_fp_call_point_function_s41 (Qed)
 [wp] [Valid] typed_fp_terminates_part1 (Qed)
 [wp] [Unsuccess] typed_fp_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_fp_exits (Qed)
 [wp] [Valid] typed_function_terminates (Qed)
+[wp] [Valid] typed_function_exits (Qed)
 [wp] [Unsuccess] typed_function_variant (Alt-Ergo) (Cached) (Degenerated)
 [wp] [Valid] typed_function_call_fp_requires (Qed)
 [wp] [Valid] typed_no_decr_ok_term_terminates_part1 (Qed)
 [wp] [Valid] typed_no_decr_ok_term_terminates_part2 (Qed)
-[wp] Proved goals:   13 / 18
+[wp] [Valid] typed_no_decr_ok_term_exits (Qed)
+[wp] Proved goals:   22 / 27
   Terminating:     1
-  Qed:            11
+  Unreachable:     1
+  Qed:            19
   Alt-Ergo:        1
   Unsuccess:       5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  simpl_r                   1        1        2       100%
-  simpl_rf                  1        -        2      50.0%
-  mutual_1                  1        -        2      50.0%
-  mutual_2                  1        -        2      50.0%
-  caller_no_cluster         1        -        1       100%
-  fp                        2        -        3      66.7%
-  function                  2        -        3      66.7%
-  no_decr_ok_term           2        -        2       100%
+  simpl_r                   2        1        3       100%
+  simpl_rf                  2        -        3      66.7%
+  mutual_1                  2        -        3      66.7%
+  mutual_2                  2        -        3      66.7%
+  caller_no_cluster         2        -        2       100%
+  fp                        3        -        4      75.0%
+  function                  3        -        4      75.0%
+  no_decr_ok_term           3        -        3       100%
 ------------------------------------------------------------

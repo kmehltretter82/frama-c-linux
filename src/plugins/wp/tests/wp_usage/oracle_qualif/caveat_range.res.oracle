@@ -1,8 +1,10 @@
 # frama-c -wp -wp-model 'Typed (Caveat)' [...]
 [kernel] Parsing caveat_range.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal reset_exits : Valid (Unreachable)
+[wp] [CFG] Goal reset_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] 12 goals scheduled
+[wp] 14 goals scheduled
 [wp] [Valid] typed_caveat_reset_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] typed_caveat_reset_ensures_2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_caveat_reset_loop_invariant_preserved (Qed)
@@ -15,12 +17,16 @@
 [wp] [Valid] typed_caveat_reset_loop_assigns_part2 (Qed)
 [wp] [Valid] typed_caveat_reset_loop_assigns_part3 (Qed)
 [wp] [Valid] typed_caveat_reset_assigns (Qed)
-[wp] Proved goals:   12 / 12
-  Qed:             8
+[wp] [Valid] typed_caveat_reset_loop_variant_decrease (Qed)
+[wp] [Valid] typed_caveat_reset_loop_variant_positive (Qed)
+[wp] Proved goals:   16 / 16
+  Terminating:     1
+  Unreachable:     1
+  Qed:            10
   Alt-Ergo:        4
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  reset                     8        4       12       100%
+  reset                    10        4       14       100%
 ------------------------------------------------------------
 [wp] caveat_range.i:16: Warning: 
   Memory model hypotheses for function 'reset':

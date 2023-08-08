@@ -1,9 +1,20 @@
 # frama-c -wp [...]
 [kernel] Parsing flash.c (with preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] flash.c:64: Warning: 
+  Neither code nor explicit exits and terminates for function RD,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] flash.c:90: Warning: 
+  Neither code nor explicit exits and terminates for function WR,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function job
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'job':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Post-condition 'Events' in 'job':
@@ -259,5 +270,10 @@ Assume {
       (L_RD_update(a_6, a) = L_RD_current(RD_time_0)).
 }
 Prove: (L_RD_value(a, 0) + L_RD_value(a_2, 0)) = L_WR_value(a_2, 0).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job':
+Prove: true.
 
 ------------------------------------------------------------

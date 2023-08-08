@@ -88,7 +88,6 @@ int zloop(int x){
   return x;
 }
 
-
 /*@
   behavior zero:
     assumes x == 0;

@@ -1,7 +1,12 @@
 # frama-c -wp [...]
 [kernel] Parsing logic.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] logic.i:17: Warning: 
+  Neither code nor explicit exits and terminates for function f,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal main_exits : Valid (Unreachable)
+[wp] [CFG] Goal main_terminates : Valid (Trivial)
 [wp] logic.i:65: Warning: 
   Cast with incompatible pointers types (source: __anonstruct_Buint_4*)
      (target: uint32*)
@@ -24,8 +29,10 @@
   Logic cast to struct (Point) from (int [2]) not implemented yet
 [wp] logic.i:50: Warning: Logic cast from struct (Point) not implemented yet
 [wp] logic.i:49: Warning: Logic cast from struct (Tint2) not implemented yet
-[wp] 21 goals scheduled
+[wp] 23 goals scheduled
+[wp] [Valid] typed_h_terminates (Qed)
 [wp] [Valid] typed_h_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_h_exits (Qed)
 [wp] [Valid] typed_h_assigns_exit (Qed)
 [wp] [Valid] typed_h_assigns_normal (Qed)
 [wp] [Valid] typed_main_requires_qed_ok (Qed)
@@ -46,12 +53,14 @@
 [wp] [Unsuccess] typed_main_requires_qed_ok_16 (Alt-Ergo) (Cached) (Stronger)
 [wp] [Unsuccess] typed_main_requires_qed_ok_17 (Alt-Ergo) (Cached) (Stronger)
 [wp] [Unsuccess] typed_main_requires_qed_ok_18 (Alt-Ergo) (Cached) (Stronger)
-[wp] Proved goals:    7 / 21
-  Qed:             3
+[wp] Proved goals:   11 / 25
+  Terminating:     1
+  Unreachable:     1
+  Qed:             5
   Alt-Ergo:        4
   Unsuccess:      14
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  h                         2        1        3       100%
+  h                         4        1        5       100%
   main                      1        3       18      22.2%
 ------------------------------------------------------------

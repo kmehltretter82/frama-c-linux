@@ -1,6 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing frama_c_exo3_solved.simplified.c (with preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal pair_exits : Valid (Unreachable)
+[wp] [CFG] Goal pair_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 26 goals scheduled
 [wp] [Valid] typed_pair_complete_has_pair_no_pair (Qed)
@@ -29,7 +31,9 @@
 [wp] [Valid] typed_pair_loop_variant_2_positive (Qed)
 [wp] [Valid] typed_pair_no_pair_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] typed_pair_has_pair_ensures (Alt-Ergo) (Cached)
-[wp] Proved goals:   26 / 26
+[wp] Proved goals:   28 / 28
+  Terminating:     1
+  Unreachable:     1
   Qed:            18
   Alt-Ergo:        8
 ------------------------------------------------------------
@@ -38,6 +42,7 @@
 ------------------------------------------------------------
 [wp] Running WP plugin...
 [rte:annot] annotating function pair
+[wp] [CFG] Goal pair_terminates : Valid (Trivial)
 [wp] 9 goals scheduled
 [wp] [Valid] typed_pair_assert_rte_index_bound (Qed)
 [wp] [Valid] typed_pair_assert_rte_index_bound_2 (Qed)
@@ -48,7 +53,8 @@
 [wp] [Valid] typed_pair_assert_rte_index_bound_5 (Qed)
 [wp] [Valid] typed_pair_assert_rte_index_bound_6 (Qed)
 [wp] [Valid] typed_pair_assert_rte_signed_overflow_2 (Qed)
-[wp] Proved goals:    9 / 9
+[wp] Proved goals:   10 / 10
+  Terminating:     1
   Qed:             6
   Alt-Ergo:        3
 ------------------------------------------------------------

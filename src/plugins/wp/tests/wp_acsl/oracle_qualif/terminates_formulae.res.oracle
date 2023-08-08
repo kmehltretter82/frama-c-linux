@@ -1,21 +1,38 @@
 # frama-c -wp [...]
 [kernel] Parsing terminates_formulae.i (no preprocessing)
+[kernel:annot:missing-spec] terminates_formulae.i:100: Warning: 
+  Missing exits in specification of prototype call_param,
+   generating default specification, see -generated-spec-* options for more info
+[kernel:annot:missing-spec] terminates_formulae.i:100: Warning: 
+  Missing exits in specification of prototype local_init_P,
+   generating default specification, see -generated-spec-* options for more info
+[kernel:annot:missing-spec] terminates_formulae.i:100: Warning: 
+  Missing exits in specification of prototype terminates_P,
+   generating default specification, see -generated-spec-* options for more info
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp:hypothesis] terminates_formulae.i:84: Warning: 
   'Rel' relation must be well-founded
 [wp:hypothesis] terminates_formulae.i:67: Warning: 
   'Rel' relation must be well-founded
+[wp] [CFG] Goal general_variant_exits : Valid (Unreachable)
 [wp] [CFG] Goal general_variant_terminates : Valid (Trivial)
+[wp] [CFG] Goal no_variant_exits : Valid (Unreachable)
+[wp] [CFG] Goal variant_exits : Valid (Unreachable)
 [wp] [CFG] Goal variant_terminates : Valid (Trivial)
 [wp] terminates_formulae.i:91: Warning: 
   Missing decreases clause on recursive function no_decreases, call must be unreachable
-[wp] 19 goals scheduled
+[wp] 28 goals scheduled
 [wp] [Unsuccess] typed_base_call_terminates (Alt-Ergo) (Cached)
+[wp] [Valid] typed_base_call_exits (Qed)
 [wp] [Valid] typed_call_same_terminates (Qed)
+[wp] [Valid] typed_call_same_exits (Qed)
 [wp] [Unsuccess] typed_call_change_terminates (Alt-Ergo) (Cached)
+[wp] [Valid] typed_call_change_exits (Qed)
 [wp] [Valid] typed_call_param_same_terminates (Qed)
+[wp] [Valid] typed_call_param_same_exits (Qed)
 [wp] [Unsuccess] typed_call_param_change_terminates (Alt-Ergo) (Cached)
+[wp] [Valid] typed_call_param_change_exits (Qed)
 [wp] [Valid] typed_variant_loop_assigns (Qed)
 [wp] [Valid] typed_variant_loop_variant_decrease (Alt-Ergo) (Cached)
 [wp] [Valid] typed_variant_loop_variant_positive (Qed)
@@ -24,29 +41,34 @@
 [wp] [Unsuccess] typed_no_variant_terminates (Alt-Ergo) (Cached)
 [wp] [Valid] typed_no_variant_loop_assigns (Qed)
 [wp] [Valid] typed_decreases_terminates (Qed)
+[wp] [Valid] typed_decreases_exits (Qed)
 [wp] [Valid] typed_decreases_variant (Alt-Ergo) (Cached)
 [wp] [Valid] typed_general_decreases_terminates (Qed)
+[wp] [Valid] typed_general_decreases_exits (Qed)
 [wp] [Valid] typed_general_decreases_variant (Alt-Ergo) (Cached)
 [wp] [Valid] typed_no_decreases_terminates_part1 (Qed)
 [wp] [Unsuccess] typed_no_decreases_terminates_part2 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_no_decreases_exits (Qed)
 [wp] [Unsuccess] typed_local_init_call_terminates (Alt-Ergo) (Cached)
-[wp] Proved goals:   15 / 21
+[wp] [Valid] typed_local_init_call_exits (Qed)
+[wp] Proved goals:   27 / 33
   Terminating:     2
-  Qed:             9
+  Unreachable:     3
+  Qed:            18
   Alt-Ergo:        4
   Unsuccess:       6
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  base_call                 -        -        1       0.0%
-  call_same                 1        -        1       100%
-  call_change               -        -        1       0.0%
-  call_param_same           1        -        1       100%
-  call_param_change         -        -        1       0.0%
+  base_call                 1        -        2      50.0%
+  call_same                 2        -        2       100%
+  call_change               1        -        2      50.0%
+  call_param_same           2        -        2       100%
+  call_param_change         1        -        2      50.0%
   variant                   2        1        3       100%
   general_variant           1        1        2       100%
   no_variant                1        -        2      50.0%
-  decreases                 1        1        2       100%
-  general_decreases         1        1        2       100%
-  no_decreases              1        -        2      50.0%
-  local_init_call           -        -        1       0.0%
+  decreases                 2        1        3       100%
+  general_decreases         2        1        3       100%
+  no_decreases              2        -        3      66.7%
+  local_init_call           1        -        2      50.0%
 ------------------------------------------------------------

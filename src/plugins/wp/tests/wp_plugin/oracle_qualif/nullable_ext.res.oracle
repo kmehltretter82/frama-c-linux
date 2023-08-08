@@ -2,7 +2,13 @@
 [kernel] Parsing nullable_ext.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: In caveat model with nullable arguments, -wp-(no)-rte shall be explicitly positioned.
+[wp] [CFG] Goal nullable_coherence_exits : Valid (Unreachable)
+[wp] [CFG] Goal nullable_coherence_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal nullable_in_context_exits : Valid (Unreachable)
+[wp] [CFG] Goal nullable_in_context_terminates : Valid (Trivial)
+[wp] [CFG] Goal with_declaration_exits : Valid (Unreachable)
+[wp] [CFG] Goal with_declaration_terminates : Valid (Trivial)
 [wp] 6 goals scheduled
 [wp] [Unsuccess] typed_caveat_nullable_coherence_check_must_fail (Alt-Ergo) (Cached)
 [wp] [Valid] typed_caveat_nullable_coherence_check (Qed)
@@ -10,7 +16,9 @@
 [wp] [Valid] typed_caveat_nullable_in_context_assigns_part1 (Qed)
 [wp] [Valid] typed_caveat_nullable_in_context_assigns_part2 (Qed)
 [wp] [Valid] typed_caveat_with_declaration_assigns (Qed)
-[wp] Proved goals:    5 / 6
+[wp] Proved goals:   11 / 12
+  Terminating:     3
+  Unreachable:     3
   Qed:             5
   Unsuccess:       1
 ------------------------------------------------------------

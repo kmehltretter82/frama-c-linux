@@ -1,17 +1,21 @@
 # frama-c -wp [...]
 [kernel] Parsing issue_825.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal issue_exits : Valid (Unreachable)
+[wp] [CFG] Goal issue_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal job_exits : Valid (Unreachable)
+[wp] [CFG] Goal job_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function issue
 ------------------------------------------------------------
 
-Goal Check 'ko' (file issue_825.i, line 18):
+Goal Check 'ko' (file issue_825.i, line 19):
 Prove: false.
 
 ------------------------------------------------------------
 
-Goal Check 'ko' (file issue_825.i, line 19):
+Goal Check 'ko' (file issue_825.i, line 20):
 Assume { Type: is_sint32(a). }
 Prove: a = 0.
 
@@ -42,14 +46,24 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Loop assigns (file issue_825.i, line 10) (2/2):
-Effect at line 13
+Effect at line 14
 Assume { Type: is_sint32(i). (* Then *) Have: i <= 9. }
 Prove: false.
 
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'job':
-Effect at line 12
+Effect at line 13
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file issue_825.i, line 13):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file issue_825.i, line 13):
 Prove: true.
 
 ------------------------------------------------------------

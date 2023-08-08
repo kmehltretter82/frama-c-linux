@@ -1,8 +1,59 @@
 # frama-c -wp [...]
 [kernel] Parsing split.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] split.i:27: Warning: 
+  Neither code nor explicit exits and terminates for function gen_P,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] split.i:31: Warning: 
+  Neither code nor explicit exits and terminates for function gen_Q,
+   generating default clauses. See -generated-spec-* options for more info
+[wp] [CFG] Goal test_goal_and_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_goal_and_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] 23 goals scheduled
+[wp] [CFG] Goal test_goal_eq_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_goal_eq_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_goal_ex_and_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_goal_ex_and_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_goal_ex_if_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_goal_ex_if_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_goal_ex_imply_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_goal_ex_imply_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_goal_ex_or_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_goal_ex_or_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_goal_if_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_goal_if_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_goal_neq_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_goal_neq_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_inside_leq_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_inside_leq_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_inside_lt_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_inside_lt_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_inside_neq_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_inside_neq_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_step_and_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_step_and_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_step_fa_and_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_step_fa_and_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_step_fa_if_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_step_fa_if_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_step_fa_or_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_step_fa_or_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_step_if_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_step_if_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_step_leq_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_step_leq_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_step_lt_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_step_lt_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_step_neq_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_step_neq_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_step_or_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_step_or_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_step_peq_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_step_peq_terminates : Valid (Trivial)
+[wp] [CFG] Goal test_step_pneq_exits : Valid (Unreachable)
+[wp] [CFG] Goal test_step_pneq_terminates : Valid (Trivial)
+[wp] 25 goals scheduled
+[wp] [Valid] typed_test_step_branch_terminates (Qed)
 [wp:script:allgoals] 
   Goal Post-condition (file split.i, line 37) in 'test_step_branch':
   Assume {
@@ -14,6 +65,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
+[wp] [Valid] typed_test_step_branch_exits (Qed)
 [wp:script:allgoals] 
   Goal Post-condition (file split.i, line 47) in 'test_step_or':
   Assume { (* Pre-condition *) Have: P_P \/ P_Q \/ P_R. }
@@ -703,5 +755,8 @@
   
   ------------------------------------------------------------
 [wp] [Unsuccess] typed_test_goal_ex_imply_ensures (Tactic) (Qed)
-[wp] Proved goals:    0 / 23
+[wp] Proved goals:   46 / 69
+  Terminating:    22
+  Unreachable:    22
+  Qed:             2
   Unsuccess:      23

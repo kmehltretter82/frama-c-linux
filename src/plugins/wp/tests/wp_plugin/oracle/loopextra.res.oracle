@@ -1,26 +1,56 @@
 # frama-c -wp [...]
 [kernel] Parsing loopextra.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal f_exits : Valid (Unreachable)
+[wp] [CFG] Goal f_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] loopextra.i:6: Warning: 
+[wp] loopextra.i:8: Warning: 
   Missing assigns clause (assigns 'everything' instead)
-[wp] loopextra.i:3: Warning: 
+[wp] loopextra.i:4: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 ------------------------------------------------------------
   Function f
 ------------------------------------------------------------
 
-Goal Assertion (file loopextra.i, line 4):
+Goal Assertion (file loopextra.i, line 5):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file loopextra.i, line 7):
+Goal Assertion (file loopextra.i, line 9):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file loopextra.i, line 8):
+Goal Assertion (file loopextra.i, line 10):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file loopextra.i, line 4):
+Assume {
+  Type: is_sint32(i) /\ is_sint32(i_1) /\ is_sint32(j) /\ is_sint32(n_1) /\
+      is_sint32(n) /\ is_sint32(1 + i_1).
+  (* Then *)
+  Have: i < n_1.
+  (* Else *)
+  Have: i_1 <= j.
+}
+Prove: (i + n) <= (i_1 + n_1).
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file loopextra.i, line 4):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file loopextra.i, line 8):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file loopextra.i, line 8):
 Prove: true.
 
 ------------------------------------------------------------

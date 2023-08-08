@@ -1,6 +1,7 @@
 # frama-c -wp [...]
 [kernel] Parsing doomed_axioms.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal foo_exits : Valid (Unreachable)
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function foo
@@ -67,6 +68,11 @@ Assume {
   Have: x <= 0.
 }
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Termination-condition (file doomed_axioms.i, line 19) in 'foo':
+Prove: true.
 
 ------------------------------------------------------------
 

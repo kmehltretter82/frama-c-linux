@@ -1,6 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing user_string.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal strlen_exits : Valid (Unreachable)
+[wp] [CFG] Goal strlen_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 13 goals scheduled
 [wp] [Valid] typed_strlen_ensures (Qed)
@@ -16,7 +18,9 @@
 [wp] [Valid] typed_strlen_assigns_part2 (Qed)
 [wp] [Valid] typed_strlen_loop_variant_decrease (Qed)
 [wp] [Valid] typed_strlen_loop_variant_positive (Alt-Ergo) (Cached)
-[wp] Proved goals:   13 / 13
+[wp] Proved goals:   15 / 15
+  Terminating:     1
+  Unreachable:     1
   Qed:             8
   Alt-Ergo:        5
 ------------------------------------------------------------

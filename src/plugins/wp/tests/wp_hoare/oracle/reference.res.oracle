@@ -1,12 +1,30 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing reference.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] reference.i:30: Warning: 
+  Neither code nor explicit exits and terminates for function f2,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] reference.i:14: Warning: 
+  Neither code nor explicit exits and terminates for function f,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal write_exits : Valid (Unreachable)
+[wp] [CFG] Goal write_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function call_f2
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_f2':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file reference.i, line 35) in 'call_f2':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_f2':
 Prove: true.
 
 ------------------------------------------------------------
@@ -60,7 +78,17 @@ Prove: true.
   Function call_global
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_global':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file reference.i, line 46) in 'call_global':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_global':
 Prove: true.
 
 ------------------------------------------------------------
@@ -90,7 +118,17 @@ Prove: true.
   Function g
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file reference.i, line 18) in 'g':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
 Prove: true.
 
 ------------------------------------------------------------

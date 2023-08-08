@@ -10,8 +10,26 @@
 [kernel:dyncalls] dynamic.i:89: Calls  h1
 [kernel:dyncalls] dynamic.i:102: Calls  unreachable_g
 [kernel:dyncalls] Dynamic call(s): 6.
+[kernel:annot:missing-spec] dynamic.i:52: Warning: 
+  Neither code nor explicit exits and terminates for function h1,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] dynamic.i:56: Warning: 
+  Neither code nor explicit exits and terminates for function h2,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] dynamic.i:16: Warning: 
+  Neither code nor explicit exits and terminates for function f1,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] dynamic.i:19: Warning: 
+  Neither code nor explicit exits and terminates for function f2,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] dynamic.i:94: Warning: 
+  Neither code nor explicit terminates for function unreachable_g,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 [wp] dynamic.i:80: Warning: Missing 'calls' for default behavior
+[wp] dynamic.i:80: Warning: Unknown callee, considering non-terminating call
+[wp] dynamic.i:80: Warning: 
+  Missing decreases clause on recursive function some_behaviors, call must be unreachable
 
 Goal Call point f1 f2 in 'call' at instruction (file dynamic.i, line 32):
 Let a = Mptr_0[shiftfield_F1_S_f(closure_0)].
@@ -29,6 +47,11 @@ Prove: (a = a_2) \/ (a = a_1).
 
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file dynamic.i, line 28) in 'call' (1/2):
 Tags: Call f1.
 Prove: true.
@@ -36,6 +59,18 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition (file dynamic.i, line 28) in 'call' (2/2):
+Tags: Call f2.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call' (1/2):
+Tags: Call f1.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call' (2/2):
 Tags: Call f2.
 Prove: true.
 
@@ -56,12 +91,6 @@ Assume {
   Have: Mptr_0[shiftfield_F1_S_f(closure_0)] = global(G_f1_22).
 }
 Prove: ((-10) <= x) /\ (x <= 10).
-
-------------------------------------------------------------
-
-Goal Call point h1 h2 in 'behavior' at instruction (file dynamic.i, line 67):
-Assume { (* Heap *) Type: region(p.base) <= 0. }
-Prove: (global(G_h1_61) = p) \/ (global(G_h2_67) = p).
 
 ------------------------------------------------------------
 
@@ -115,6 +144,29 @@ Prove: true.
 
 Goal Assigns for 'bhv1' (file dynamic.i, line 63) in 'behavior' (4/4):
 Call Result at line 67
+Tags: Call h2.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Call point h1 h2 in 'behavior' at instruction (file dynamic.i, line 67):
+Assume { (* Heap *) Type: region(p.base) <= 0. }
+Prove: (global(G_h1_61) = p) \/ (global(G_h2_67) = p).
+
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'behavior':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'behavior' (1/2):
+Tags: Call h1.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'behavior' (2/2):
 Tags: Call h2.
 Prove: true.
 
@@ -270,13 +322,41 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'some_behaviors' (1/2):
+Call terminates (missing decreases) at line 80
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'some_behaviors' (2/2):
+Call terminates (missing terminates) at line 80
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'some_behaviors':
+Prove: false.
+
+------------------------------------------------------------
+
 Goal Call point h1 in 'missing_context' at instruction (file dynamic.i, line 89):
 Assume { (* Heap *) Type: region(p.base) <= 0. }
 Prove: global(G_h1_61) = p.
 
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'missing_context':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file dynamic.i, line 84) in 'missing_context':
+Tags: Call h1.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'missing_context':
 Tags: Call h1.
 Prove: true.
 
@@ -304,12 +384,23 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'no_call':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file dynamic.i, line 96) in 'no_call' (1/2):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Post-condition (file dynamic.i, line 96) in 'no_call' (2/2):
+Tags: Call unreachable_g.
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'no_call':
 Tags: Call unreachable_g.
 Prove: true.
 

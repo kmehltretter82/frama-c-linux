@@ -21,7 +21,15 @@
 [kernel:annot-error] precedence.i:176: Warning: 
   P is not a logic variable. Ignoring code annotation
 [wp] Running WP plugin...
+[wp] [CFG] Goal bitwise_exits : Valid (Unreachable)
+[wp] [CFG] Goal bitwise_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal comparison_exits : Valid (Unreachable)
+[wp] [CFG] Goal comparison_terminates : Valid (Trivial)
+[wp] [CFG] Goal predicate_exits : Valid (Unreachable)
+[wp] [CFG] Goal predicate_terminates : Valid (Trivial)
+[wp] [CFG] Goal predicate_bitwise_exits : Valid (Unreachable)
+[wp] [CFG] Goal predicate_bitwise_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function bitwise
 ------------------------------------------------------------
@@ -554,7 +562,9 @@ axiomatic PredXY {
   
   }
  */
-/*@ ensures r_precedence_and_xor: (P ∧ Q) ⊻ R ⇔ (P ∧ Q) ⊻ R;
+/*@ terminates \true;
+    exits \false;
+    ensures r_precedence_and_xor: (P ∧ Q) ⊻ R ⇔ (P ∧ Q) ⊻ R;
     ensures l_precedence_and_xor: P ⊻ (Q ∧ R) ⇔ P ⊻ (Q ∧ R);
     ensures ko: l_precedence_xor_and: (P ∧ Q) ⊻ R ⇔ P ∧ (Q ⊻ R);
     ensures ko: r_precedence_xor_and: P ⊻ (Q ∧ R) ⇔ (P ⊻ Q) ∧ R;
@@ -737,7 +747,9 @@ void predicate(int x, int a, int b)
   return;
 }
 
-/*@ ensures
+/*@ terminates \true;
+    exits \false;
+    ensures
       chainable_lt_lt:
         \old(p) < \old(q) < \old(r) ⇔ \old(p) < \old(q) < \old(r);
     ensures
@@ -794,7 +806,9 @@ void comparison(int p, int q, int r)
   return;
 }
 
-/*@ ensures
+/*@ terminates \true;
+    exits \false;
+    ensures
       r_precedence_and_xor:
         ((\old(p) & \old(q)) ^ \old(r)) ≡ ((\old(p) & \old(q)) ^ \old(r));
     ensures
@@ -863,7 +877,9 @@ void bitwise(int p, int q, int r)
   return;
 }
 
-/*@ ensures
+/*@ terminates \true;
+    exits \false;
+    ensures
       r_precedence_equiv_Pand:
         (~\old(p) ^ \old(q)) ≢ 0 ∧ R ⇔ (~\old(p) ^ \old(q)) ≢ 0 ∧ R;
     ensures

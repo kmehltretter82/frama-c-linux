@@ -2,6 +2,8 @@
 [kernel] Parsing frama_c_exo3_solved.simplified.c (with preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function pair
+[wp] [CFG] Goal pair_exits : Valid (Unreachable)
+[wp] [CFG] Goal pair_terminates : Valid (Trivial)
 [wp] Goal typed_pair_complete_has_pair_no_pair : trivial
 [wp] Goal typed_pair_disjoint_has_pair_no_pair : trivial
 [wp] Goal typed_pair_loop_invariant_preserved : not tried

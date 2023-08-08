@@ -1,7 +1,11 @@
 # frama-c -wp [...]
 [kernel] Parsing float_driver.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal for_double_exits : Valid (Unreachable)
+[wp] [CFG] Goal for_double_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal for_float_exits : Valid (Unreachable)
+[wp] [CFG] Goal for_float_terminates : Valid (Trivial)
 [wp] 20 goals scheduled
 [wp:print-generated] 
   theory WP

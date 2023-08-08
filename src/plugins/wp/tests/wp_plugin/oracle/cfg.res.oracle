@@ -1,13 +1,28 @@
 # frama-c -wp [...]
 [kernel] Parsing cfg.c (with preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] cfg.c:2: Warning: 
+  Neither code nor explicit exits and terminates for function foo,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal f1_simpler_exits : Valid (Unreachable)
+[wp] [CFG] Goal f1_simpler_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function f1
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f1':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'BUG_LEGACY_WP' in 'f1':
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f1':
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -22,23 +37,53 @@ Prove: false.
   Function f1_variant
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f1_variant':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'BUG_LEGACY_WP' in 'f1_variant':
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f1_variant':
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function f1_variant_invert
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f1_variant_invert':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'FAILS_AS_EXPECTED' in 'f1_variant_invert':
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f1_variant_invert':
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function f2
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f2':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'BUG_LEGACY_WP' in 'f2':
 Prove: false.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f2':
+Prove: true.
 
 ------------------------------------------------------------

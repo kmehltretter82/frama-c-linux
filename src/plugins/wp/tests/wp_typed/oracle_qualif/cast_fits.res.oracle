@@ -1,7 +1,23 @@
 # frama-c -wp [...]
 [kernel] Parsing cast_fits.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal fits1_exits : Valid (Unreachable)
+[wp] [CFG] Goal fits1_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal fits2_exits : Valid (Unreachable)
+[wp] [CFG] Goal fits2_terminates : Valid (Trivial)
+[wp] [CFG] Goal fits3_exits : Valid (Unreachable)
+[wp] [CFG] Goal fits3_terminates : Valid (Trivial)
+[wp] [CFG] Goal fits4_exits : Valid (Unreachable)
+[wp] [CFG] Goal fits4_terminates : Valid (Trivial)
+[wp] [CFG] Goal fits5_exits : Valid (Unreachable)
+[wp] [CFG] Goal fits5_terminates : Valid (Trivial)
+[wp] [CFG] Goal mismatch1_exits : Valid (Unreachable)
+[wp] [CFG] Goal mismatch1_terminates : Valid (Trivial)
+[wp] [CFG] Goal mismatch2_exits : Valid (Unreachable)
+[wp] [CFG] Goal mismatch2_terminates : Valid (Trivial)
+[wp] [CFG] Goal mismatch3_exits : Valid (Unreachable)
+[wp] [CFG] Goal mismatch3_terminates : Valid (Trivial)
 [wp] cast_fits.i:13: Warning: 
   Cast with incompatible pointers types (source: __anonstruct_L2_2*)
      (target: sint32*)
@@ -29,7 +45,9 @@
 [wp] [Valid] typed_fits5_ensures (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_mismatch2_ensures (Alt-Ergo) (Cached) (Stronger)
 [wp] [Unsuccess] typed_mismatch3_ensures (Alt-Ergo) (Cached) (Stronger)
-[wp] Proved goals:    5 / 8
+[wp] Proved goals:   21 / 24
+  Terminating:     8
+  Unreachable:     8
   Alt-Ergo:        5
   Unsuccess:       3
 ------------------------------------------------------------

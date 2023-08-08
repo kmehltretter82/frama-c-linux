@@ -2,8 +2,15 @@
 [kernel] Parsing frame.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal f_exits : Valid (Unreachable)
+[wp] [CFG] Goal f_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function alias
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'alias':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Post-condition 'KO' in 'alias':
@@ -14,8 +21,18 @@ Assume { Type: is_sint32(x) /\ is_sint32(x_1). }
 Prove: x_1 = x.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'alias':
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function global
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'global':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Post-condition 'KO' in 'global':
@@ -23,8 +40,18 @@ Assume { Type: is_sint32(g) /\ is_sint32(global_0). }
 Prove: global_0 = g.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'global':
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function local
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'local':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Post-condition 'FRAMED' in 'local':
@@ -37,8 +64,18 @@ Assume { Type: is_sint32(g) /\ is_sint32(local_0). }
 Prove: local_0 = g.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'local':
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function localref
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'localref':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Post-condition 'KO' in 'localref':
@@ -50,6 +87,11 @@ Assume {
   Type: region(p.base) <= 0.
 }
 Prove: x_1 = x.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'localref':
+Prove: true.
 
 ------------------------------------------------------------
 

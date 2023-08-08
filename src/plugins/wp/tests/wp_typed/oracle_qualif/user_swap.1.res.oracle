@@ -2,19 +2,25 @@
 [kernel] Parsing user_swap.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] 6 goals scheduled
+[wp] [CFG] Goal swap_exits : Valid (Unreachable)
+[wp] [CFG] Goal swap_terminates : Valid (Trivial)
+[wp] 8 goals scheduled
 [wp] [Valid] typed_ref_swap_ensures_A (Qed)
 [wp] [Valid] typed_ref_swap_ensures_B (Qed)
 [wp] [Valid] typed_ref_swap_assigns (Qed)
+[wp] [Valid] typed_ref_main_terminates (Qed)
+[wp] [Valid] typed_ref_main_exits (Qed)
 [wp] [Valid] typed_ref_main_assert (Qed)
 [wp] [Valid] typed_ref_main_call_swap_requires (Qed)
 [wp] [Valid] typed_ref_main_call_swap_requires_2 (Qed)
-[wp] Proved goals:    6 / 6
-  Qed:             6
+[wp] Proved goals:   10 / 10
+  Terminating:     1
+  Unreachable:     1
+  Qed:             8
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   swap                      3        -        3       100%
-  main                      3        -        3       100%
+  main                      5        -        5       100%
 ------------------------------------------------------------
 [wp] user_swap.i:13: Warning: 
   Memory model hypotheses for function 'swap':

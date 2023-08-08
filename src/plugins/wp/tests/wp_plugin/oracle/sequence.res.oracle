@@ -1,9 +1,22 @@
 # frama-c -wp -wp-model 'Typed (Caveat)' [...]
 [kernel] Parsing sequence.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] sequence.i:23: Warning: 
+  Neither code nor explicit exits and terminates for function f,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] sequence.i:29: Warning: 
+  Neither code nor explicit exits and terminates for function g,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal no_calls_exits : Valid (Unreachable)
+[wp] [CFG] Goal no_calls_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function loops
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'loops':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Post-condition 'ok,first' in 'loops':
@@ -35,6 +48,11 @@ Assume {
   Have: L_call_obs(call_seq_3) = a_1.
 }
 Prove: nth(a_1, 1 + i) = z.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'loops':
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -105,13 +123,13 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Assigns (file sequence.i, line 79) in 'loops' (2/3):
-Effect at line 100
+Effect at line 101
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Assigns (file sequence.i, line 79) in 'loops' (3/3):
-Effect at line 100
+Effect at line 101
 Prove: true.
 
 ------------------------------------------------------------
@@ -122,13 +140,23 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Assigns (file sequence.i, line 79) in 'loops' (2/3):
-Effect at line 100
+Effect at line 101
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Assigns (file sequence.i, line 79) in 'loops' (3/3):
-Effect at line 100
+Effect at line 101
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file sequence.i, line 101):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file sequence.i, line 101):
 Prove: true.
 
 ------------------------------------------------------------
@@ -293,6 +321,16 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function sequence
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'sequence':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'sequence':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assigns (file sequence.i, line 54) in 'sequence':

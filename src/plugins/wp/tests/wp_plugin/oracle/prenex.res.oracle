@@ -1,6 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing prenex.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal diag_exits : Valid (Unreachable)
+[wp] [CFG] Goal diag_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function diag
@@ -8,8 +10,8 @@
 
 Goal Post-condition (file prenex.i, line 11) in 'diag':
 Assume {
-  Type: is_sint32(diag_0) /\ is_sint32(i) /\ is_sint32(i_1) /\
-      is_sint32(j) /\ is_sint32(m) /\ is_sint32(n).
+  Type: is_sint32(diag_0) /\ is_sint32(i) /\ is_sint32(j) /\ is_sint32(m) /\
+      is_sint32(n).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0).
   (* Pre-condition *)
@@ -17,32 +19,31 @@ Assume {
   (* Invariant 'I' *)
   Have: 0 <= n.
   (* Invariant 'I' *)
-  Have: (0 <= i_1) /\ (i_1 <= n).
+  Have: (0 <= i) /\ (i <= n).
   (* Invariant 'PI' *)
-  Have: forall i_3,i_2 : Z. ((0 <= i_3) -> ((i_3 < i_1) -> ((0 <= i_2) ->
-      ((i_2 < m) ->
-      (Mint_0[shift_sint32(p, i_3)] < Mint_0[shift_sint32(q, i_2)]))))).
-  If i_1 < n
+  Have: forall i_2,i_1 : Z. ((0 <= i_2) -> ((i_2 < i) -> ((0 <= i_1) ->
+      ((i_1 < m) ->
+      (Mint_0[shift_sint32(p, i_2)] < Mint_0[shift_sint32(q, i_1)]))))).
+  If i < n
   Then {
     Let x = Mint_0[shift_sint32(p, i)].
     Have: (ta_j_0=false).
     (* Invariant 'J' *)
     Have: (0 <= j) /\ (j <= m).
     (* Invariant 'PJ' *)
-    Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < j) ->
-        (x < Mint_0[shift_sint32(q, i_2)]))).
+    Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < j) ->
+        (x < Mint_0[shift_sint32(q, i_1)]))).
     (* Then *)
     Have: j < m.
-    Have: i_1 = i.
     (* Then *)
     Have: Mint_0[shift_sint32(q, j)] <= x.
     Have: diag_0 = 0.
   }
   Else { Have: diag_0 = 1. }
 }
-Prove: (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < n) ->
-        (forall i_3 : Z. ((0 <= i_3) -> ((i_3 < m) ->
-         (Mint_0[shift_sint32(p, i_2)] < Mint_0[shift_sint32(q, i_3)]))))))) <->
+Prove: (forall i_1 : Z. ((0 <= i_1) -> ((i_1 < n) ->
+        (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < m) ->
+         (Mint_0[shift_sint32(p, i_1)] < Mint_0[shift_sint32(q, i_2)]))))))) <->
     (diag_0 != 0).
 
 ------------------------------------------------------------
@@ -96,17 +97,17 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'J' (file prenex.i, line 28):
+Goal Preservation of Invariant 'J' (file prenex.i, line 29):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'J' (file prenex.i, line 28):
+Goal Establishment of Invariant 'J' (file prenex.i, line 29):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'PJ' (file prenex.i, line 30):
+Goal Preservation of Invariant 'PJ' (file prenex.i, line 31):
 Let x = Mint_0[shift_sint32(p, i)].
 Let x_1 = Mint_0[shift_sint32(q, j)].
 Assume {
@@ -144,7 +145,7 @@ Prove: x < Mint_0[shift_sint32(q, i_1)].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'PJ' (file prenex.i, line 30):
+Goal Establishment of Invariant 'PJ' (file prenex.i, line 31):
 Prove: true.
 
 ------------------------------------------------------------
@@ -155,12 +156,32 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Loop assigns (file prenex.i, line 24) (2/2):
-Effect at line 34
+Effect at line 36
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file prenex.i, line 32):
+Goal Loop assigns (file prenex.i, line 33):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file prenex.i, line 27):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file prenex.i, line 27):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file prenex.i, line 36):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file prenex.i, line 36):
 Prove: true.
 
 ------------------------------------------------------------

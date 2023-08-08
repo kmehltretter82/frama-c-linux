@@ -2,10 +2,10 @@
 [kernel] Parsing stmtcompiler_test.i (no preprocessing)
 [kernel:CERT:MSC:37] stmtcompiler_test.i:136: Warning: 
   Body of function if_assert falls-through. Adding a return statement
+[kernel:annot:missing-spec] stmtcompiler_test.i:166: Warning: 
+  Missing assigns in specification of prototype behavior1,
+   generating default specification, see -generated-spec-* options for more info
 [wp] Running WP plugin...
-[kernel:annot:missing-spec] stmtcompiler_test.i:104: Warning: 
-  Neither code nor explicit assigns for function behavior1,
-   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 [wp] stmtcompiler_test.i:81: Warning: 
   Missing assigns clause (assigns 'everything' instead)
@@ -13,7 +13,7 @@
   Function behavior2
 ------------------------------------------------------------
 
-Goal Assertion (file stmtcompiler_test.i, line 109):
+Goal Assertion (file stmtcompiler_test.i, line 108):
 Prove: true.
 
 ------------------------------------------------------------
@@ -21,7 +21,7 @@ Prove: true.
   Function behavior3
 ------------------------------------------------------------
 
-Goal Assertion (file stmtcompiler_test.i, line 116):
+Goal Assertion (file stmtcompiler_test.i, line 115):
 Prove: true.
 
 ------------------------------------------------------------
@@ -29,7 +29,7 @@ Prove: true.
   Function behavior4
 ------------------------------------------------------------
 
-Goal Assertion (file stmtcompiler_test.i, line 123):
+Goal Assertion (file stmtcompiler_test.i, line 122):
 Prove: true.
 
 ------------------------------------------------------------
@@ -37,7 +37,7 @@ Prove: true.
   Function behavior5
 ------------------------------------------------------------
 
-Goal Assertion 'bad' (file stmtcompiler_test.i, line 131):
+Goal Assertion 'bad' (file stmtcompiler_test.i, line 130):
 Assume { Type: is_sint32(x). (* Call 'behavior1' *) Have: 0 <= x. }
 Prove: false.
 
@@ -46,7 +46,7 @@ Prove: false.
   Function compare
 ------------------------------------------------------------
 
-Goal Assertion (file stmtcompiler_test.i, line 154):
+Goal Assertion (file stmtcompiler_test.i, line 153):
 Prove: true.
 
 ------------------------------------------------------------
@@ -62,12 +62,12 @@ Prove: true.
   Function exits_and_ensures
 ------------------------------------------------------------
 
-Goal Post-condition (file stmtcompiler_test.i, line 164) in 'exits_and_ensures':
+Goal Post-condition (file stmtcompiler_test.i, line 163) in 'exits_and_ensures':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Exit-condition (file stmtcompiler_test.i, line 165) in 'exits_and_ensures':
+Goal Exit-condition (file stmtcompiler_test.i, line 164) in 'exits_and_ensures':
 Prove: true.
 
 ------------------------------------------------------------
@@ -75,13 +75,13 @@ Prove: true.
   Function if_assert
 ------------------------------------------------------------
 
-Goal Assertion (file stmtcompiler_test.i, line 137):
+Goal Assertion (file stmtcompiler_test.i, line 136):
 Assume { Type: is_sint32(x) /\ is_sint32(y). (* Then *) Have: x < 0. }
 Prove: x < (y * y).
 
 ------------------------------------------------------------
 
-Goal Assertion (file stmtcompiler_test.i, line 140):
+Goal Assertion (file stmtcompiler_test.i, line 139):
 Assume {
   Type: is_sint32(x) /\ is_sint32(y) /\ is_sint32(-x).
   (* Else *)
@@ -91,12 +91,12 @@ Prove: 0 < (x + (y * y)).
 
 ------------------------------------------------------------
 
-Goal Assertion (file stmtcompiler_test.i, line 142):
+Goal Assertion (file stmtcompiler_test.i, line 141):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'missing_return' (file stmtcompiler_test.i, line 143):
+Goal Assertion 'missing_return' (file stmtcompiler_test.i, line 142):
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2) /\ is_sint32(y).
   If x_2 < 0
@@ -329,7 +329,7 @@ Prove: true.
 [Qed] Valid
 
 ------------------------------------------------------------
-[wp] stmtcompiler_test.i:167: Warning: void object
+[wp] stmtcompiler_test.i:166: Warning: void object
 new way
 main sequent: Assume { Have: foo_0 = 42. }
 Prove: foo_0 = 42.
@@ -339,17 +339,17 @@ Prove: true.
 [Qed] Valid
 
 ------------------------------------------------------------
-[wp] stmtcompiler_test.i:167: Warning: void object
+[wp] stmtcompiler_test.i:166: Warning: void object
 new way
 not_main sequent: Assume { Have: foo_1 = 42. }
 Prove: foo_0 = 42.
 
 Goal Assertion 'bad' (file stmtcompiler_test.i, line 54):
 Prove: foo_0 = 42.
-[Qed] Unsuccess
+[Qed] No Result
 
 ------------------------------------------------------------
-[wp] stmtcompiler_test.i:167: Warning: void object
+[wp] stmtcompiler_test.i:166: Warning: void object
 new way
 main_assigns_global sequent:
    Assume {
@@ -366,7 +366,7 @@ Prove: foo_0 = 1.
 
 Goal Assertion 'bad' (file stmtcompiler_test.i, line 69):
 Prove: foo_0 = 1.
-[Qed] Unsuccess
+[Qed] No Result
 
 ------------------------------------------------------------
 main_assigns_global sequent:
@@ -422,7 +422,7 @@ Prove: i = 1.
 Goal Assertion 'bad' (file stmtcompiler_test.i, line 87):
 Assume { Have: 0 <= x. }
 Prove: false.
-[Qed] Unsuccess
+[Qed] No Result
 
 ------------------------------------------------------------
 zloop sequent:
@@ -532,7 +532,7 @@ behavior2 sequent:
    }
 Prove: x < 0.
 
-Goal Assertion (file stmtcompiler_test.i, line 109):
+Goal Assertion (file stmtcompiler_test.i, line 108):
 Prove: true.
 [Qed] Valid
 
@@ -548,7 +548,7 @@ behavior3 sequent:
    }
 Prove: 0 <= x.
 
-Goal Assertion (file stmtcompiler_test.i, line 116):
+Goal Assertion (file stmtcompiler_test.i, line 115):
 Prove: true.
 [Qed] Valid
 
@@ -565,7 +565,7 @@ behavior4 sequent:
    }
 Prove: x = 0.
 
-Goal Assertion (file stmtcompiler_test.i, line 123):
+Goal Assertion (file stmtcompiler_test.i, line 122):
 Prove: true.
 [Qed] Valid
 
@@ -581,10 +581,10 @@ behavior5 sequent:
    }
 Prove: x < 0.
 
-Goal Assertion 'bad' (file stmtcompiler_test.i, line 131):
+Goal Assertion 'bad' (file stmtcompiler_test.i, line 130):
 Assume { Have: 0 <= x. }
 Prove: false.
-[Qed] Unsuccess
+[Qed] No Result
 
 ------------------------------------------------------------
 new way
@@ -605,7 +605,7 @@ if_assert sequent:
    }
 Prove: false.
 
-Goal Assertion 'missing_return' (file stmtcompiler_test.i, line 143):
+Goal Assertion 'missing_return' (file stmtcompiler_test.i, line 142):
 Assume {
   If x < 0
   Then { Have: x = x_1. }
@@ -614,7 +614,7 @@ Assume {
   Have: x_1 < (y * y).
 }
 Prove: false.
-[Qed] Unsuccess
+[Qed] No Result
 
 ------------------------------------------------------------
 if_assert sequent:
@@ -633,7 +633,7 @@ if_assert sequent:
    }
 Prove: x < (y * y).
 
-Goal Assertion (file stmtcompiler_test.i, line 142):
+Goal Assertion (file stmtcompiler_test.i, line 141):
 Prove: true.
 [Qed] Valid
 
@@ -648,10 +648,10 @@ if_assert sequent:
    }
 Prove: x < (y * y).
 
-Goal Assertion (file stmtcompiler_test.i, line 140):
+Goal Assertion (file stmtcompiler_test.i, line 139):
 Assume { Have: 0 <= x. }
 Prove: 0 < (x + (y * y)).
-[Qed] Unsuccess
+[Qed] No Result
 
 ------------------------------------------------------------
 if_assert sequent:
@@ -663,10 +663,10 @@ if_assert sequent:
    }
 Prove: x < (y * y).
 
-Goal Assertion (file stmtcompiler_test.i, line 137):
+Goal Assertion (file stmtcompiler_test.i, line 136):
 Assume { Have: x < 0. }
 Prove: x < (y * y).
-[Qed] Unsuccess
+[Qed] No Result
 
 ------------------------------------------------------------
 new way
@@ -718,13 +718,13 @@ compare sequent:
    }
 Prove: ((a < b) -> (r = 1)).
 
-Goal Assertion (file stmtcompiler_test.i, line 154):
+Goal Assertion (file stmtcompiler_test.i, line 153):
 Prove: true.
 [Qed] Valid
 
 ------------------------------------------------------------
-[wp] stmtcompiler_test.i:167: Warning: void object
-[wp] stmtcompiler_test.i:167: Warning: void object
+[wp] stmtcompiler_test.i:166: Warning: void object
+[wp] stmtcompiler_test.i:166: Warning: void object
 new way
 exits_and_ensures sequent:
    Assume {
@@ -736,7 +736,7 @@ exits_and_ensures sequent:
    }
 Prove: foo_0 = 0.
 
-Goal Post-condition (file stmtcompiler_test.i, line 164) in 'exits_and_ensures':
+Goal Post-condition (file stmtcompiler_test.i, line 163) in 'exits_and_ensures':
 Prove: true.
 [Qed] Valid
 

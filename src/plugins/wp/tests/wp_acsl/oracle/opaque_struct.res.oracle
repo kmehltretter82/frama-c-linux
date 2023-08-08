@@ -2,14 +2,23 @@
 [kernel] Parsing opaque_struct.i (no preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function assigned_via_pointer
+[kernel:annot:missing-spec] opaque_struct.i:31: Warning: 
+  Neither code nor explicit exits and terminates for function g,
+   generating default clauses. See -generated-spec-* options for more info
 [rte:annot] annotating function assigns
+[kernel:annot:missing-spec] opaque_struct.i:20: Warning: 
+  Neither code nor explicit exits and terminates for function f,
+   generating default clauses. See -generated-spec-* options for more info
 [rte:annot] annotating function assigns_effect
+[kernel:annot:missing-spec] opaque_struct.i:64: Warning: 
+  Neither code nor explicit exits and terminates for function assign,
+   generating default clauses. See -generated-spec-* options for more info
 [rte:annot] annotating function chunk_typing
-[rte:annot] annotating function initialized_assigns
-[rte:annot] annotating function uninitialized_assigns
 [kernel:annot:missing-spec] opaque_struct.i:76: Warning: 
   Neither code nor specification for function use,
-   generating default assigns. See -generated-spec-* options for more info
+   generating default exits, assigns and terminates. See -generated-spec-* options for more info
+[rte:annot] annotating function initialized_assigns
+[rte:annot] annotating function uninitialized_assigns
 ------------------------------------------------------------
   Axiomatic 'test'
 ------------------------------------------------------------
@@ -30,6 +39,16 @@ Prove: 0 <= BytesLength_of_S1_S.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function assigned_via_pointer
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'assigned_via_pointer':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'assigned_via_pointer':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Check 'fail' (file opaque_struct.i, line 60):
@@ -66,6 +85,16 @@ Prove: EqS1_S(Load_S1_S(p, a, a_8, a_4, a_5, a_1, a_6, a_2, a_7, a_3,
   Function assigns
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'assigns':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'assigns':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Check 'fail' (file opaque_struct.i, line 24):
 Prove: EqS1_S(S1_0, S1_1).
 
@@ -77,6 +106,16 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function assigns_effect
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'assigns_effect':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'assigns_effect':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Check 'fail' (file opaque_struct.i, line 69):
@@ -128,6 +167,16 @@ Prove: a_2 = x.
   Function chunk_typing
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'chunk_typing':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'chunk_typing':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assertion 'rte,mem_access' (file opaque_struct.i, line 81):
 Prove: true.
 
@@ -139,6 +188,16 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function initialized_assigns
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'initialized_assigns':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'initialized_assigns':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Check 'fails' (file opaque_struct.i, line 38):
@@ -170,6 +229,16 @@ Prove: 0 <= (BytesLength_of_S1_S * (Malloc_0[x] / Length_of_S1_S)).
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function uninitialized_assigns
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'uninitialized_assigns':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'uninitialized_assigns':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Check 'fail' (file opaque_struct.i, line 54):

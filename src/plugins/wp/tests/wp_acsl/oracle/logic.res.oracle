@@ -1,7 +1,12 @@
 # frama-c -wp [...]
 [kernel] Parsing logic.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] logic.i:17: Warning: 
+  Neither code nor explicit exits and terminates for function f,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal main_exits : Valid (Unreachable)
+[wp] [CFG] Goal main_terminates : Valid (Trivial)
 [wp] logic.i:65: Warning: 
   Cast with incompatible pointers types (source: __anonstruct_Buint_4*)
      (target: uint32*)
@@ -28,6 +33,11 @@
   Function h
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'h':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file logic.i, line 21) in 'h':
 Let a = global(G_t_29).
 Let m = Array_S1(shift_S1(a, 0), 3, Mint_0).
@@ -35,6 +45,11 @@ Let m_1 = Array_S1(a, 3, Mint_0).
 Assume { Type: IsArray_S1(m_1) /\ IsArray_S1(m). (* Call 'f' *) Have: P_P(m).
 }
 Prove: P_P(m_1).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'h':
+Prove: true.
 
 ------------------------------------------------------------
 

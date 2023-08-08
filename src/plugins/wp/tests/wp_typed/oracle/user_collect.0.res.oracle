@@ -2,8 +2,19 @@
 [kernel] Parsing user_collect.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal job_exits : Valid (Unreachable)
+[wp] [CFG] Goal job_terminates : Valid (Trivial)
+[wp] [CFG] Goal job2_exits : Valid (Unreachable)
+[wp] [CFG] Goal job2_terminates : Valid (Trivial)
+[wp] [CFG] Goal job3_exits : Valid (Unreachable)
+[wp] [CFG] Goal job3_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function caller
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'caller':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Post-condition 'K' in 'caller':
@@ -49,6 +60,11 @@ Prove: x2_0 = v.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'caller':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Instance of 'Pre-condition (file user_collect.i, line 15) in 'job'' in 'caller' at call 'job' (file user_collect.i, line 57)
 :
 Prove: true.
@@ -62,6 +78,11 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function caller2
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'caller2':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Post-condition 'K' in 'caller2':
@@ -127,6 +148,11 @@ Prove: EqArray_S1_S(10, m_1, m_2[k <- s2_0]).
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'caller2':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Instance of 'Pre-condition (file user_collect.i, line 26) in 'job2'' in 'caller2' at call 'job2' (file user_collect.i, line 70)
 :
 Prove: true.
@@ -140,6 +166,11 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function caller3
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'caller3':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Post-condition 'K' in 'caller3':
@@ -202,6 +233,11 @@ Assume {
   Have: EqArray_S1_S(10, m_1, m[k <- s2_0]).
 }
 Prove: EqArray_S1_S(10, m_1, m_2[k <- s2_0]).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'caller3':
+Prove: true.
 
 ------------------------------------------------------------
 

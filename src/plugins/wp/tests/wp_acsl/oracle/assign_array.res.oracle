@@ -1,9 +1,22 @@
 # frama-c -wp [...]
 [kernel] Parsing assign_array.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] assign_array.i:8: Warning: 
+  Neither code nor explicit exits and terminates for function f,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function jobA
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'jobA':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'jobA':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assigns (file assign_array.i, line 11) in 'jobA':
@@ -17,6 +30,16 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function jobG
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'jobG':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'jobG':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assigns (file assign_array.i, line 19) in 'jobG':

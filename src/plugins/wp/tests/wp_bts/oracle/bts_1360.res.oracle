@@ -3,6 +3,10 @@
 [wp] Running WP plugin...
 [rte:annot] annotating function foo_correct
 [rte:annot] annotating function foo_wrong
+[wp] [CFG] Goal foo_correct_exits : Valid (Unreachable)
+[wp] [CFG] Goal foo_correct_terminates : Valid (Trivial)
+[wp] [CFG] Goal foo_wrong_exits : Valid (Unreachable)
+[wp] [CFG] Goal foo_wrong_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function foo_correct
 ------------------------------------------------------------

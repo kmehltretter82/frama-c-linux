@@ -1,18 +1,27 @@
 # frama-c -wp [...]
 [kernel] Parsing loopextra.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal f_exits : Valid (Unreachable)
+[wp] [CFG] Goal f_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] loopextra.i:6: Warning: 
+[wp] loopextra.i:8: Warning: 
   Missing assigns clause (assigns 'everything' instead)
-[wp] loopextra.i:3: Warning: 
+[wp] loopextra.i:4: Warning: 
   Missing assigns clause (assigns 'everything' instead)
-[wp] 3 goals scheduled
+[wp] 7 goals scheduled
 [wp] [Valid] typed_f_assert (Qed)
 [wp] [Valid] typed_f_assert_2 (Qed)
 [wp] [Valid] typed_f_assert_3 (Qed)
-[wp] Proved goals:    3 / 3
-  Qed:             3
+[wp] [Unsuccess] typed_f_loop_variant_decrease (Alt-Ergo) (Cached)
+[wp] [Valid] typed_f_loop_variant_positive (Qed)
+[wp] [Valid] typed_f_loop_variant_2_decrease (Qed)
+[wp] [Valid] typed_f_loop_variant_2_positive (Qed)
+[wp] Proved goals:    8 / 9
+  Terminating:     1
+  Unreachable:     1
+  Qed:             6
+  Unsuccess:       1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  f                         3        -        3       100%
+  f                         6        -        7      85.7%
 ------------------------------------------------------------

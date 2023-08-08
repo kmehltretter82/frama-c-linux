@@ -1,7 +1,19 @@
 # frama-c -wp [...]
 [kernel] Parsing alias_escapes_hypotheses.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal f1_exits : Valid (Unreachable)
+[wp] [CFG] Goal f1_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal f2_exits : Valid (Unreachable)
+[wp] [CFG] Goal f2_terminates : Valid (Trivial)
+[wp] [CFG] Goal f3_exits : Valid (Unreachable)
+[wp] [CFG] Goal f3_terminates : Valid (Trivial)
+[wp] [CFG] Goal fp1_exits : Valid (Unreachable)
+[wp] [CFG] Goal fp1_terminates : Valid (Trivial)
+[wp] [CFG] Goal fp2_exits : Valid (Unreachable)
+[wp] [CFG] Goal fp2_terminates : Valid (Trivial)
+[wp] [CFG] Goal fp3_exits : Valid (Unreachable)
+[wp] [CFG] Goal fp3_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function f1
 ------------------------------------------------------------

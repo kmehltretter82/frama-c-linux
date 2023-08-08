@@ -1,11 +1,13 @@
 # frama-c -wp [...]
 [kernel] Parsing doomed_report_ok.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal foo_exits : Valid (Unreachable)
 [wp] Warning: Missing RTE guards
-[wp] 10 goals scheduled
+[wp] 11 goals scheduled
 [wp] [Passed] (Unsuccess) typed_foo_wp_smoke_dead_loop_s2 (Alt-Ergo) (Cached)
 [wp] [Passed] (Unsuccess) typed_foo_wp_smoke_dead_code_s7 (Alt-Ergo) (Cached)
 [wp] [Passed] (Unsuccess) typed_foo_wp_smoke_dead_code_s9 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_foo_terminates (Alt-Ergo) (Cached)
 [wp] [Valid] typed_foo_loop_invariant_A_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_foo_loop_invariant_A_established (Alt-Ergo) (Cached)
 [wp] [Valid] typed_foo_loop_invariant_B_preserved (Alt-Ergo) (Cached)
@@ -13,15 +15,18 @@
 [wp] [Valid] typed_foo_loop_invariant_C_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_foo_loop_invariant_C_established (Alt-Ergo) (Cached)
 [wp] [Valid] typed_foo_loop_assigns (Qed)
-[wp] Proved goals:   10 / 10
+[wp] Proved goals:   11 / 12
+  Unreachable:     1
   Qed:             1
   Alt-Ergo:        9
+  Unsuccess:       1
   Smoke Tests:     3 / 3
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  foo                       1        9       10       100%
+  foo                       1        9       11      90.9%
 ------------------------------------------------------------
                                  Qed Ergo Failed
+  foo_terminates                  -    -    1
   foo_loop_assigns                1    -    -
   foo_loop_invariant_A            -    2    -
   foo_loop_invariant_B            -    2    -
@@ -30,8 +35,8 @@
   foo_wp_smoke_dead_code_s9       -    1    -
   foo_wp_smoke_dead_loop_s2       -    1    -
 -------------------------------------------------------------
-Success:   100%
-   Total  :     7 properties
+Success:  87.5%
+   Total  :     8 properties
    Valid  :     7
-   Failed :     -
+   Failed :     1
 -------------------------------------------------------------

@@ -21,7 +21,15 @@
 [kernel:annot-error] precedence.i:176: Warning: 
   P is not a logic variable. Ignoring code annotation
 [wp] Running WP plugin...
+[wp] [CFG] Goal bitwise_exits : Valid (Unreachable)
+[wp] [CFG] Goal bitwise_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal comparison_exits : Valid (Unreachable)
+[wp] [CFG] Goal comparison_terminates : Valid (Trivial)
+[wp] [CFG] Goal predicate_exits : Valid (Unreachable)
+[wp] [CFG] Goal predicate_terminates : Valid (Trivial)
+[wp] [CFG] Goal predicate_bitwise_exits : Valid (Unreachable)
+[wp] [CFG] Goal predicate_bitwise_terminates : Valid (Trivial)
 [wp] 52 goals scheduled
 [wp] [Valid] typed_predicate_ensures_r_precedence_and_xor (Qed)
 [wp] [Valid] typed_predicate_ensures_l_precedence_and_xor (Qed)
@@ -75,7 +83,9 @@
 [wp] [Valid] typed_bitwise_ensures_l_precedence_implies_equiv (Qed)
 [wp] [Valid] typed_predicate_bitwise_ensures_r_precedence_equiv_Pand (Qed)
 [wp] [Valid] typed_predicate_bitwise_ensures_l_precedence_equiv_Pand (Qed)
-[wp] Proved goals:   52 / 52
+[wp] Proved goals:   60 / 60
+  Terminating:     4
+  Unreachable:     4
   Qed:            51
   Alt-Ergo:        1
 ------------------------------------------------------------

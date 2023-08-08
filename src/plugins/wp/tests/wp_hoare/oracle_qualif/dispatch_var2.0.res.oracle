@@ -2,20 +2,30 @@
 [kernel] Parsing dispatch_var2.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] 34 goals scheduled
+[wp] [CFG] Goal incr_exits : Valid (Unreachable)
+[wp] [CFG] Goal incr_terminates : Valid (Trivial)
+[wp] [CFG] Goal load_exits : Valid (Unreachable)
+[wp] [CFG] Goal load_terminates : Valid (Trivial)
+[wp] [CFG] Goal reset_exits : Valid (Unreachable)
+[wp] [CFG] Goal reset_terminates : Valid (Trivial)
+[wp] 42 goals scheduled
 [wp] [Valid] typed_ref_reset_ensures (Qed)
 [wp] [Valid] typed_ref_reset_assigns (Qed)
 [wp] [Valid] typed_ref_incr_ensures (Qed)
 [wp] [Valid] typed_ref_incr_assigns (Qed)
 [wp] [Valid] typed_ref_load_ensures (Qed)
 [wp] [Valid] typed_ref_load_assigns (Qed)
+[wp] [Valid] typed_ref_call_global_terminates (Qed)
 [wp] [Valid] typed_ref_call_global_ensures (Qed)
+[wp] [Valid] typed_ref_call_global_exits (Qed)
 [wp] [Valid] typed_ref_call_global_assigns_exit (Qed)
 [wp] [Valid] typed_ref_call_global_assigns_normal_part1 (Qed)
 [wp] [Valid] typed_ref_call_global_assigns_normal_part2 (Qed)
 [wp] [Valid] typed_ref_call_global_call_reset_requires (Qed)
 [wp] [Valid] typed_ref_call_global_call_load_requires (Qed)
+[wp] [Valid] typed_ref_call_param_terminates (Qed)
 [wp] [Valid] typed_ref_call_param_ensures (Qed)
+[wp] [Valid] typed_ref_call_param_exits (Qed)
 [wp] [Valid] typed_ref_call_param_assigns_exit_part1 (Qed)
 [wp] [Valid] typed_ref_call_param_assigns_exit_part2 (Qed)
 [wp] [Valid] typed_ref_call_param_assigns_normal_part1 (Qed)
@@ -23,7 +33,9 @@
 [wp] [Valid] typed_ref_call_param_assigns_normal_part3 (Qed)
 [wp] [Valid] typed_ref_call_param_call_reset_requires (Qed)
 [wp] [Valid] typed_ref_call_param_call_load_requires (Qed)
+[wp] [Valid] typed_ref_call_local_terminates (Qed)
 [wp] [Valid] typed_ref_call_local_ensures (Qed)
+[wp] [Valid] typed_ref_call_local_exits (Qed)
 [wp] [Valid] typed_ref_call_local_assigns_exit_part1 (Qed)
 [wp] [Valid] typed_ref_call_local_assigns_exit_part2 (Qed)
 [wp] [Valid] typed_ref_call_local_assigns_normal_part1 (Qed)
@@ -31,23 +43,27 @@
 [wp] [Valid] typed_ref_call_local_assigns_normal_part3 (Qed)
 [wp] [Valid] typed_ref_call_local_call_reset_requires (Qed)
 [wp] [Valid] typed_ref_call_local_call_load_requires (Qed)
+[wp] [Valid] typed_ref_call_param_ref_terminates (Qed)
 [wp] [Valid] typed_ref_call_param_ref_ensures (Qed)
+[wp] [Valid] typed_ref_call_param_ref_exits (Qed)
 [wp] [Valid] typed_ref_call_param_ref_assigns_exit (Qed)
 [wp] [Valid] typed_ref_call_param_ref_assigns_normal_part1 (Qed)
 [wp] [Valid] typed_ref_call_param_ref_assigns_normal_part2 (Qed)
 [wp] [Valid] typed_ref_call_param_ref_call_reset_requires (Qed)
 [wp] [Valid] typed_ref_call_param_ref_call_load_requires (Qed)
-[wp] Proved goals:   34 / 34
-  Qed:            34
+[wp] Proved goals:   48 / 48
+  Terminating:     3
+  Unreachable:     3
+  Qed:            42
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   reset                     2        -        2       100%
   incr                      2        -        2       100%
   load                      2        -        2       100%
-  call_global               6        -        6       100%
-  call_param                8        -        8       100%
-  call_local                8        -        8       100%
-  call_param_ref            6        -        6       100%
+  call_global               8        -        8       100%
+  call_param               10        -       10       100%
+  call_local               10        -       10       100%
+  call_param_ref            8        -        8       100%
 ------------------------------------------------------------
 [wp] dispatch_var2.i:16: Warning: 
   Memory model hypotheses for function 'reset':

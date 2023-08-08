@@ -2,12 +2,17 @@
 [kernel] Parsing user_init.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] [CFG] Goal init_exits : Valid (Unreachable)
+[wp] [CFG] Goal init_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] [CFG] Goal init_t1_exits : Valid (Unreachable)
+[wp] [CFG] Goal init_t1_terminates : Valid (Trivial)
 [wp] [CFG] Goal init_t2_v1_exits : Valid (Unreachable)
+[wp] [CFG] Goal init_t2_v1_terminates : Valid (Trivial)
 [wp] [CFG] Goal init_t2_v2_exits : Valid (Unreachable)
+[wp] [CFG] Goal init_t2_v2_terminates : Valid (Trivial)
 [wp] [CFG] Goal init_t2_v3_exits : Valid (Unreachable)
-[wp] 92 goals scheduled
+[wp] [CFG] Goal init_t2_v3_terminates : Valid (Trivial)
+[wp] 94 goals scheduled
 [wp] [Valid] typed_init_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] typed_init_loop_invariant_Partial_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_init_loop_invariant_Partial_established (Qed)
@@ -78,6 +83,7 @@
 [wp] [Valid] typed_init_t2_v3_loop_variant_positive (Qed)
 [wp] [Valid] typed_init_t2_v3_loop_variant_2_decrease (Alt-Ergo) (Cached)
 [wp] [Valid] typed_init_t2_v3_loop_variant_2_positive (Qed)
+[wp] [Valid] typed_init_t2_bis_v1_terminates (Qed)
 [wp] [Valid] typed_init_t2_bis_v1_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] typed_init_t2_bis_v1_exits (Qed)
 [wp] [Valid] typed_init_t2_bis_v1_loop_invariant_Partial_preserved (Alt-Ergo) (Cached)
@@ -89,6 +95,7 @@
 [wp] [Valid] typed_init_t2_bis_v1_loop_variant_positive (Qed)
 [wp] [Valid] typed_init_t2_bis_v1_call_init_requires (Qed)
 [wp] [Valid] typed_init_t2_bis_v1_call_init_requires_2 (Qed)
+[wp] [Valid] typed_init_t2_bis_v2_terminates (Qed)
 [wp] [Valid] typed_init_t2_bis_v2_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] typed_init_t2_bis_v2_exits (Qed)
 [wp] [Valid] typed_init_t2_bis_v2_loop_invariant_Partial_preserved (Alt-Ergo) (Cached)
@@ -100,9 +107,10 @@
 [wp] [Valid] typed_init_t2_bis_v2_loop_variant_positive (Qed)
 [wp] [Valid] typed_init_t2_bis_v2_call_init_requires (Qed)
 [wp] [Valid] typed_init_t2_bis_v2_call_init_requires_2 (Qed)
-[wp] Proved goals:   97 / 97
+[wp] Proved goals:  104 / 104
+  Terminating:     5
   Unreachable:     5
-  Qed:            53
+  Qed:            55
   Alt-Ergo:       39
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
@@ -111,6 +119,6 @@
   init_t2_v1                9        8       17       100%
   init_t2_v2                9        8       17       100%
   init_t2_v3                7        8       15       100%
-  init_t2_bis_v1            7        4       11       100%
-  init_t2_bis_v2            7        4       11       100%
+  init_t2_bis_v1            8        4       12       100%
+  init_t2_bis_v2            8        4       12       100%
 ------------------------------------------------------------

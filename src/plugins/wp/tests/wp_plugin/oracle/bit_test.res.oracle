@@ -1,7 +1,13 @@
 # frama-c -wp [...]
 [kernel] Parsing bit_test.c (with preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal check1_exits : Valid (Unreachable)
+[wp] [CFG] Goal check1_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal check2_exits : Valid (Unreachable)
+[wp] [CFG] Goal check2_terminates : Valid (Trivial)
+[wp] [CFG] Goal check3_exits : Valid (Unreachable)
+[wp] [CFG] Goal check3_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function check1
 ------------------------------------------------------------

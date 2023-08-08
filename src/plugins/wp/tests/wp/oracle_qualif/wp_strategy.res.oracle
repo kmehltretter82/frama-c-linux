@@ -3,12 +3,18 @@
 [rte:annot] annotating function bts0513
 [rte:annot] annotating function bts0513_bis
 [wp] Running WP plugin...
+[wp] [CFG] Goal bts0513_exits : Valid (Unreachable)
+[wp] [CFG] Goal bts0513_terminates : Valid (Trivial)
+[wp] [CFG] Goal bts0513_bis_exits : Valid (Unreachable)
+[wp] [CFG] Goal bts0513_bis_terminates : Valid (Trivial)
 [wp] 4 goals scheduled
 [wp] [Unsuccess] hoare_bts0513_ensures_qed_ko_ko1 (Alt-Ergo) (Cached)
 [wp] [Unsuccess] hoare_bts0513_ensures_qed_ko_ko2 (Alt-Ergo) (Cached)
 [wp] [Unsuccess] hoare_bts0513_bis_assert_qed_ko_ko1 (Alt-Ergo) (Cached)
 [wp] [Valid] hoare_bts0513_bis_assert_qed_ok_ok (Qed)
-[wp] Proved goals:    1 / 4
+[wp] Proved goals:    5 / 8
+  Terminating:     2
+  Unreachable:     2
   Qed:             1
   Unsuccess:       3
 ------------------------------------------------------------

@@ -11,7 +11,9 @@ void init( int * t , int a , int b , int e )
 {
   /*@ loop invariant qed_ok: a <= i <= b+1 ;
     @ loop invariant qed_ok: \forall int j ; a <= j < i ==> t[j] == e ;
-    @ loop assigns qed_ok: i,t[a..i-1] ; */
+    @ loop assigns qed_ok: i,t[a..i-1] ; 
+    @ loop variant b - i;
+    @*/
   for ( int i = a ; i <= b ; i ++ ) 
     t[i] = e ;
 }

@@ -1,7 +1,13 @@
 # frama-c -wp [...]
 [kernel] Parsing bitwise_idemp.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal land_exits : Valid (Unreachable)
+[wp] [CFG] Goal land_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal lor_exits : Valid (Unreachable)
+[wp] [CFG] Goal lor_terminates : Valid (Trivial)
+[wp] [CFG] Goal lxor_exits : Valid (Unreachable)
+[wp] [CFG] Goal lxor_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function land
 ------------------------------------------------------------

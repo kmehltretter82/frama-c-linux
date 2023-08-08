@@ -1,10 +1,13 @@
 # frama-c -wp [...]
 [kernel] Parsing init_label.i (no preprocessing)
 [wp] Running WP plugin...
-[kernel:annot:missing-spec] init_label.i:14: Warning: 
-  Neither code nor explicit assigns for function main,
-   generating default clauses. See -generated-spec-* options for more info
+[wp] [CFG] Goal extra_exits : Valid (Unreachable)
+[wp] [CFG] Goal extra_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal foreign_exits : Valid (Unreachable)
+[wp] [CFG] Goal foreign_terminates : Valid (Trivial)
+[wp] [CFG] Goal job_exits : Valid (Unreachable)
+[wp] [CFG] Goal job_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function extra
 ------------------------------------------------------------

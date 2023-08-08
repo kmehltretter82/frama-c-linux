@@ -2,8 +2,20 @@
 [kernel] Parsing bts_1776.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal g_exits : Valid (Unreachable)
+[wp] [CFG] Goal g_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function f
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assertion 'KO,ax2' (file bts_1776.i, line 14):

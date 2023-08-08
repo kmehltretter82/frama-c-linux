@@ -96,6 +96,7 @@ void loops(int n, int x, int y, int z)
       loop invariant ok: id_min: 0 <= i;
       loop invariant ok: id_max: (0 <= n ? i <= n : i <= 0);
       loop invariant ok: inv: call_obs == (\at(call_obs,LoopEntry) ^ ([| y |] *^ i)) ;
+      loop variant n - i;
   */
   for (i=0; i<n; i++)
     g(y);

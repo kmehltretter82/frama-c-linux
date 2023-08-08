@@ -1,8 +1,20 @@
 # frama-c -wp [...]
 [kernel] Parsing wp_behav.c (with preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal assert_needed_exits : Valid (Unreachable)
+[wp] [CFG] Goal assert_needed_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] wp_behav.c:82: Warning: 
+[wp] [CFG] Goal bhv_exits : Valid (Unreachable)
+[wp] [CFG] Goal bhv_terminates : Valid (Trivial)
+[wp] [CFG] Goal bts0513_exits : Valid (Unreachable)
+[wp] [CFG] Goal bts0513_terminates : Valid (Trivial)
+[wp] [CFG] Goal f_exits : Valid (Unreachable)
+[wp] [CFG] Goal f_terminates : Valid (Trivial)
+[wp] [CFG] Goal min_exits : Valid (Unreachable)
+[wp] [CFG] Goal min_terminates : Valid (Trivial)
+[wp] [CFG] Goal razT_exits : Valid (Unreachable)
+[wp] [CFG] Goal razT_terminates : Valid (Trivial)
+[wp] wp_behav.c:84: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 ------------------------------------------------------------
   Function assert_needed
@@ -161,9 +173,9 @@ Prove: false.
 
 Goal Preservation of Invariant 'qed_ok' (file wp_behav.c, line 81):
 Assume {
-  Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(n_1).
+  Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(n_1) /\ is_sint32(1 + i).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 <= i).
+  When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
   Have: n_1 <= 9.
   (* Invariant 'qed_ok' *)
@@ -176,6 +188,16 @@ Prove: T[i <- 0][i_1] = 0.
 ------------------------------------------------------------
 
 Goal Establishment of Invariant 'qed_ok' (file wp_behav.c, line 81):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file wp_behav.c, line 84):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file wp_behav.c, line 84):
 Prove: true.
 
 ------------------------------------------------------------

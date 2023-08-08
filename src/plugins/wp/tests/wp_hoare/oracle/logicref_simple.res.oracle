@@ -10,7 +10,15 @@ Function fsimple_array: { &t __retres }
 Function ftwo_star: { d __retres }
 Function fvpositive: { b }
 .................................................
+[wp] [CFG] Goal fsimple_exits : Valid (Unreachable)
+[wp] [CFG] Goal fsimple_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal fsimple_array_exits : Valid (Unreachable)
+[wp] [CFG] Goal fsimple_array_terminates : Valid (Trivial)
+[wp] [CFG] Goal ftwo_star_exits : Valid (Unreachable)
+[wp] [CFG] Goal ftwo_star_terminates : Valid (Trivial)
+[wp] [CFG] Goal fvpositive_exits : Valid (Unreachable)
+[wp] [CFG] Goal fvpositive_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function fsimple
 ------------------------------------------------------------

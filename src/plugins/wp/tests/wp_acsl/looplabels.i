@@ -18,6 +18,7 @@ void copy( int * a , int * b , int n )
   /*@ loop invariant 0 <= i <= n ;
     @ loop invariant IsEqual(a,b,i) ;
     @ loop assigns i , b[0..n-1] ;
+    @ loop variant n - i;
     @ */
   for (int i = 0 ; i < n ; i++) {
     b[i] = a[i] ;

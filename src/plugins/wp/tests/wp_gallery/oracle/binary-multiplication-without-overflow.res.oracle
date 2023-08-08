@@ -2,6 +2,8 @@
 [kernel] Parsing binary-multiplication-without-overflow.c (with preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function BinaryMultiplication
+[wp] [CFG] Goal BinaryMultiplication_exits : Valid (Unreachable)
+[wp] [CFG] Goal BinaryMultiplication_terminates : Valid (Trivial)
 [wp] Goal typed_lemma_half : not tried
 [wp] Goal typed_lemma_size : trivial
 [wp] Goal typed_BinaryMultiplication_ensures_product : not tried

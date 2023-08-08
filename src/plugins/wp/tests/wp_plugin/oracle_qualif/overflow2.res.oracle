@@ -1,7 +1,11 @@
 # frama-c -wp [...]
 [kernel] Parsing overflow2.c (with preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal pointers_and_companions_exits : Valid (Unreachable)
+[wp] [CFG] Goal pointers_and_companions_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal pointers_and_companions_ulong_exits : Valid (Unreachable)
+[wp] [CFG] Goal pointers_and_companions_ulong_terminates : Valid (Trivial)
 [wp] 14 goals scheduled
 [wp] [Valid] typed_pointers_and_companions_ensures_post (Qed)
 [wp] [Valid] typed_pointers_and_companions_assert_a01 (Qed)
@@ -17,7 +21,9 @@
 [wp] [Valid] typed_pointers_and_companions_ulong_assert_a09 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_pointers_and_companions_ulong_assert_a10 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_pointers_and_companions_ulong_assigns (Qed)
-[wp] Proved goals:   14 / 14
+[wp] Proved goals:   18 / 18
+  Terminating:     2
+  Unreachable:     2
   Qed:            10
   Alt-Ergo:        4
 ------------------------------------------------------------

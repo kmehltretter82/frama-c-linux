@@ -1,7 +1,17 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing memory_hypotheses_checking.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal add_return_ok_exits : Valid (Unreachable)
+[wp] [CFG] Goal add_return_ok_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal assigns_ptr_exits : Valid (Unreachable)
+[wp] [CFG] Goal assigns_ptr_terminates : Valid (Trivial)
+[wp] [CFG] Goal bad_return_formal_exits : Valid (Unreachable)
+[wp] [CFG] Goal bad_return_formal_terminates : Valid (Trivial)
+[wp] [CFG] Goal gptr_sep_exits : Valid (Unreachable)
+[wp] [CFG] Goal gptr_sep_terminates : Valid (Trivial)
+[wp] [CFG] Goal sep_exits : Valid (Unreachable)
+[wp] [CFG] Goal sep_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function add_return_ok
 ------------------------------------------------------------
@@ -53,6 +63,16 @@ Prove: false.
   Function call_add_return_bad
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_add_return_bad':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_add_return_bad':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns (file memory_hypotheses_checking.i, line 90) in 'call_add_return_bad':
 Prove: true.
 
@@ -88,6 +108,16 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function call_add_return_ok
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'call_add_return_ok':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_add_return_ok':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assigns (file memory_hypotheses_checking.i, line 83) in 'call_add_return_ok':
@@ -130,6 +160,16 @@ Prove: true.
   Function call_assigns_ptr_bad
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_assigns_ptr_bad':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_assigns_ptr_bad':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns (file memory_hypotheses_checking.i, line 68) in 'call_assigns_ptr_bad':
 Prove: true.
 
@@ -153,6 +193,16 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function call_assigns_ptr_ok
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'call_assigns_ptr_ok':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_assigns_ptr_ok':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'call_assigns_ptr_ok':
@@ -182,6 +232,16 @@ Prove: true.
   Function call_gptr_sep_bad
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_gptr_sep_bad':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_gptr_sep_bad':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns (file memory_hypotheses_checking.i, line 50) in 'call_gptr_sep_bad':
 Prove: true.
 
@@ -206,6 +266,16 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function call_gptr_sep_ok
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'call_gptr_sep_ok':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_gptr_sep_ok':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assigns (file memory_hypotheses_checking.i, line 43) in 'call_gptr_sep_ok':
@@ -234,6 +304,16 @@ Prove: true.
   Function call_sep_bad_sep
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_sep_bad_sep':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_sep_bad_sep':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'call_sep_bad_sep':
 Prove: true.
 
@@ -257,6 +337,16 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function call_sep_bad_valid
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'call_sep_bad_valid':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_sep_bad_valid':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'call_sep_bad_valid' (1/2):
@@ -295,6 +385,16 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function call_sep_ok
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'call_sep_ok':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_sep_ok':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'call_sep_ok':
@@ -338,7 +438,9 @@ Prove: true.
 ------------------------------------------------------------
 /* Generated by Frama-C */
 int g;
-/*@ assigns \nothing;
+/*@ terminates \true;
+    exits \false;
+    assigns \nothing;
     
     behavior wp_typed_ref:
       requires \valid(p_0);
@@ -351,7 +453,9 @@ int sep(int *p_0)
   return __retres;
 }
 
-/*@ assigns \nothing; */
+/*@ terminates \true;
+    exits \false;
+    assigns \nothing; */
 void call_sep_ok(void)
 {
   int l = 42;
@@ -359,14 +463,18 @@ void call_sep_ok(void)
   return;
 }
 
-/*@ assigns \nothing; */
+/*@ terminates \true;
+    exits \false;
+    assigns \nothing; */
 void call_sep_bad_sep(void)
 {
   sep(& g);
   return;
 }
 
-/*@ assigns \nothing; */
+/*@ terminates \true;
+    exits \false;
+    assigns \nothing; */
 void call_sep_bad_valid(void)
 {
   int *p_0;
@@ -379,7 +487,9 @@ void call_sep_bad_valid(void)
 }
 
 int *p;
-/*@ assigns \nothing;
+/*@ terminates \true;
+    exits \false;
+    assigns \nothing;
     
     behavior wp_typed_ref:
       requires \valid(p);
@@ -392,7 +502,9 @@ int gptr_sep(void)
   return __retres;
 }
 
-/*@ assigns p;
+/*@ terminates \true;
+    exits \false;
+    assigns p;
     assigns p \from \nothing; */
 void call_gptr_sep_ok(void)
 {
@@ -402,7 +514,9 @@ void call_gptr_sep_ok(void)
   return;
 }
 
-/*@ assigns p;
+/*@ terminates \true;
+    exits \false;
+    assigns p;
     assigns p \from &g; */
 void call_gptr_sep_bad(void)
 {
@@ -411,7 +525,9 @@ void call_gptr_sep_bad(void)
   return;
 }
 
-/*@ assigns *p_0;
+/*@ terminates \true;
+    exits \false;
+    assigns *p_0;
     
     behavior wp_typed_ref:
       requires \valid(p_0);
@@ -423,7 +539,9 @@ void assigns_ptr(int *p_0)
   return;
 }
 
-/*@ assigns \nothing; */
+/*@ terminates \true;
+    exits \false;
+    assigns \nothing; */
 void call_assigns_ptr_ok(void)
 {
   int l = 42;
@@ -431,14 +549,18 @@ void call_assigns_ptr_ok(void)
   return;
 }
 
-/*@ assigns g; */
+/*@ terminates \true;
+    exits \false;
+    assigns g; */
 void call_assigns_ptr_bad(void)
 {
   assigns_ptr(& g);
   return;
 }
 
-/*@ ensures \result ≡ \old(p_0);
+/*@ terminates \true;
+    exits \false;
+    ensures \result ≡ \old(p_0);
     assigns \result, *p_0;
     assigns \result \from p_0;
     
@@ -453,7 +575,9 @@ int *add_return_ok(int *p_0)
   return p_0;
 }
 
-/*@ assigns g; */
+/*@ terminates \true;
+    exits \false;
+    assigns g; */
 void call_add_return_ok(void)
 {
   int l = 0;
@@ -462,7 +586,9 @@ void call_add_return_ok(void)
   return;
 }
 
-/*@ assigns g; */
+/*@ terminates \true;
+    exits \false;
+    assigns g; */
 void call_add_return_bad(void)
 {
   int *p_0 = add_return_ok(& g);
@@ -470,7 +596,9 @@ void call_add_return_bad(void)
   return;
 }
 
-/*@ assigns \result;
+/*@ terminates \true;
+    exits \false;
+    assigns \result;
     assigns \result \from &x;
     
     behavior wp_typed_ref:

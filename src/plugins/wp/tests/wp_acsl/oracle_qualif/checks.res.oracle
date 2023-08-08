@@ -1,13 +1,17 @@
 # frama-c -wp -wp-steps 5 [...]
 [kernel] Parsing checks.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal main_exits : Valid (Unreachable)
+[wp] [CFG] Goal main_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 4 goals scheduled
 [wp] [Unsuccess] typed_main_check_c1 (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_main_assert_a1 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_main_check_c2 (Qed)
 [wp] [Valid] typed_main_assert_a2 (Qed)
-[wp] Proved goals:    2 / 4
+[wp] Proved goals:    4 / 6
+  Terminating:     1
+  Unreachable:     1
   Qed:             2
   Unsuccess:       2
 ------------------------------------------------------------
@@ -26,6 +30,10 @@
 --- Properties of Function 'main'
 --------------------------------------------------------------------------------
 
+[  Valid  ] Exit-condition (generated)
+            by Unreachable Annotations.
+[  Valid  ] Termination-condition (generated)
+            by Trivial Termination.
 [    -    ] Check 'c1' (file checks.i, line 14)
             tried with Wp.typed.
 [    -    ] Assertion 'a1' (file checks.i, line 15)
@@ -36,12 +44,14 @@
 [ Partial ] Assertion 'a2' (file checks.i, line 17)
             By Wp.typed, with pending:
              - Assertion 'a1' (file checks.i, line 15)
+[  Valid  ] Default behavior
+            by Frama-C kernel.
 
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-     1 Completely validated
+     4 Completely validated
      2 Locally validated
      2 To be validated
-     5 Total
+     8 Total
 --------------------------------------------------------------------------------

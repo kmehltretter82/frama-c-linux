@@ -1,7 +1,17 @@
 # frama-c -wp -wp-no-volatile [...]
 [kernel] Parsing volatile.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal default_init_exits : Valid (Unreachable)
+[wp] [CFG] Goal default_init_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal job_assigns_exits : Valid (Unreachable)
+[wp] [CFG] Goal job_assigns_terminates : Valid (Trivial)
+[wp] [CFG] Goal job_read_exits : Valid (Unreachable)
+[wp] [CFG] Goal job_read_terminates : Valid (Trivial)
+[wp] [CFG] Goal job_struct_exits : Valid (Unreachable)
+[wp] [CFG] Goal job_struct_terminates : Valid (Trivial)
+[wp] [CFG] Goal job_struct_assigns_exits : Valid (Unreachable)
+[wp] [CFG] Goal job_struct_assigns_terminates : Valid (Trivial)
 [wp] volatile.i:16: Warning: unsafe volatile access to (term) l-value
 [wp] volatile.i:15: Warning: unsafe write-access to volatile l-value
 [wp] volatile.i:22: Warning: unsafe volatile access to (term) l-value
@@ -17,7 +27,9 @@
 [wp] [Valid] typed_job_struct_assert_ok_dead_code (Qed)
 [wp] [Valid] typed_job_struct_assigns_assert_KO_WHEN_VOLATILE (Qed) (Stronger, 4 warnings)
 [wp] [Valid] typed_default_init_check_KO_WHEN_VOLATILE (Alt-Ergo) (Cached) (Stronger)
-[wp] Proved goals:    5 / 5
+[wp] Proved goals:   15 / 15
+  Terminating:     5
+  Unreachable:     5
   Qed:             4
   Alt-Ergo:        1
 ------------------------------------------------------------

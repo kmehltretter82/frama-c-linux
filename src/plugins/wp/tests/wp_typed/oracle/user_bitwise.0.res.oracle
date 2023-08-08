@@ -1,7 +1,19 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing user_bitwise.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal rl1_exits : Valid (Unreachable)
+[wp] [CFG] Goal rl1_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [CFG] Goal rln32_exits : Valid (Unreachable)
+[wp] [CFG] Goal rln32_terminates : Valid (Trivial)
+[wp] [CFG] Goal rln64_exits : Valid (Unreachable)
+[wp] [CFG] Goal rln64_terminates : Valid (Trivial)
+[wp] [CFG] Goal rr1_exits : Valid (Unreachable)
+[wp] [CFG] Goal rr1_terminates : Valid (Trivial)
+[wp] [CFG] Goal rrn32_exits : Valid (Unreachable)
+[wp] [CFG] Goal rrn32_terminates : Valid (Trivial)
+[wp] [CFG] Goal rrn64_exits : Valid (Unreachable)
+[wp] [CFG] Goal rrn64_terminates : Valid (Trivial)
 ------------------------------------------------------------
   Function rl1
 ------------------------------------------------------------

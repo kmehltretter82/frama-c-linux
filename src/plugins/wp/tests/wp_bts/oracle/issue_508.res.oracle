@@ -1,6 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing issue_508.c (with preprocessing)
 [wp] Running WP plugin...
+[wp] [CFG] Goal add_exits : Valid (Unreachable)
+[wp] [CFG] Goal add_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function add

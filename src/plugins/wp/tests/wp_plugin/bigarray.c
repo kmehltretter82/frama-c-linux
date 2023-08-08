@@ -24,7 +24,9 @@ int f(int *p, int n)
 {
   int s = 0;
   int tmp[SIZE];
-  /*@ loop assigns i,s, tmp[..]; */
+  /*@ loop assigns i,s, tmp[..];
+    @ loop variant n - i;
+    @ */
   for (int i = 0; i < n; i++) {
     s+= p[i]; tmp[i] = s;
   }

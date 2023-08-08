@@ -1,9 +1,25 @@
 # frama-c -wp [...]
 [kernel] Parsing sqrt_builtins.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] sqrt_builtins.i:21: Warning: 
+  Neither code nor explicit exits and terminates for function sqrt,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] sqrt_builtins.i:12: Warning: 
+  Neither code nor explicit exits and terminates for function sqrtf,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function test_sqrt
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'test_sqrt':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'test_sqrt':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assertion 'KO' (file sqrt_builtins.i, line 25):
@@ -13,6 +29,16 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function test_sqrtf
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'test_sqrtf':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'test_sqrtf':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assertion 'KO' (file sqrt_builtins.i, line 16):

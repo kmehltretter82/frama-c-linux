@@ -29,11 +29,14 @@ void call_definition(void){
   definition();
 }
 
+//@ terminates \false ;
 void no_spec_generates_goal(void){
   for(;;);
 }
 
-//@ terminates \true ;
+/*@ terminates \true ;
+  @ exits \true ;
+*/
 void libc_call(void){
   (void) div(4,3);
   exit(0);

@@ -2,6 +2,8 @@
 [kernel] Parsing frama_c_exo3_solved.old.c (with preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function equal_elements
+[wp] [CFG] Goal equal_elements_exits : Valid (Unreachable)
+[wp] [CFG] Goal equal_elements_terminates : Valid (Trivial)
 [wp] Goal typed_ref_equal_elements_ensures : not tried
 [wp] Goal typed_ref_equal_elements_ensures_2 : not tried
 [wp] Goal typed_ref_equal_elements_ensures_3 : not tried

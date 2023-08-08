@@ -2,14 +2,16 @@
 [kernel] Parsing decreases.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp:hypothesis] decreases.i:44: Warning: 'Rel' relation must be well-founded
 [wp:hypothesis] decreases.i:25: Warning: 'Rel' relation must be well-founded
+[wp:hypothesis] decreases.i:44: Warning: 'Rel' relation must be well-founded
 [wp:hypothesis] decreases.i:30: Warning: 'Rel' relation must be well-founded
-[wp] decreases.i:71: Warning: No decreases clause for missing_2
+[wp:hypothesis] decreases.i:103: Warning: 'Rel' relation must be well-founded
 [wp:hypothesis] decreases.i:107: Warning: 'Wrong' relation must be well-founded
+[wp] decreases.i:76: Warning: 
+  Missing decreases clause on recursive function missing_2, call must be unreachable
+[wp] decreases.i:71: Warning: No decreases clause for missing_2
 [wp] decreases.i:109: Warning: 
   On call to mw1, relation (Wrong) does not match caller (Rel)
-[wp:hypothesis] decreases.i:103: Warning: 'Rel' relation must be well-founded
 [wp] decreases.i:105: Warning: 
   On call to mw2, relation (Rel) does not match caller (Wrong)
 ------------------------------------------------------------
@@ -17,6 +19,11 @@
 ------------------------------------------------------------
 
 Goal Termination-condition (file decreases.i, line 14) in 'fact':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fact':
 Prove: true.
 
 ------------------------------------------------------------
@@ -49,6 +56,11 @@ Prove: 0 < n.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'fact_i':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Recursion variant:
 Call decreases at line 40
 Prove: true.
@@ -56,6 +68,16 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function facto_gen
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'facto_gen':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'facto_gen':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Recursion variant:
@@ -66,6 +88,16 @@ Prove: P_Rel(n, to_uint32(n - 1)).
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function fails_fact
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fails_fact':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fails_fact':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Recursion variant:
@@ -96,6 +128,11 @@ Prove: 0 <= n.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'fails_fact_i':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Recursion variant:
 Call decreases at line 46
 Assume {
@@ -112,6 +149,16 @@ Prove: P_Rel(n, n - 1).
   Function fails_facto_gen
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'fails_facto_gen':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fails_facto_gen':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Recursion variant:
 Call decreases at line 32
 Assume { Type: is_uint32(n). (* Else *) Have: n != 0. }
@@ -122,6 +169,16 @@ Prove: P_Rel(n, n).
   Function m1
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'm1':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'm1':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Recursion variant:
 Call decreases at line 55
 Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
@@ -130,6 +187,16 @@ Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function m2
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'm2':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'm2':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Recursion variant (1/2):
@@ -149,6 +216,16 @@ Prove: (0 <= x) /\ (to_uint32(x - 1) < x).
   Function missing
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'missing':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'missing':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Recursion variant (1/2):
 Call decreases at line 71
 decreases.i:71: warning from wp:
@@ -166,6 +243,26 @@ Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
+  Function missing_2
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'missing_2' (1/2):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'missing_2' (2/2):
+Call terminates (missing decreases) at line 76
+Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
+Prove: false.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'missing_2':
+Prove: true.
+
+------------------------------------------------------------
+------------------------------------------------------------
   Function mt1
 ------------------------------------------------------------
 
@@ -178,6 +275,11 @@ Goal Termination-condition (file decreases.i, line 83) in 'mt1' (2/2):
 Call terminates at line 86
 Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
 Prove: to_uint32(n - 1) <= 10.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'mt1':
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -198,6 +300,11 @@ Prove: true.
 
 Goal Termination-condition (file decreases.i, line 88) in 'mt2' (2/2):
 Call terminates at line 92
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'mt2':
 Prove: true.
 
 ------------------------------------------------------------
@@ -224,6 +331,16 @@ Prove: true.
   Function mw1
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'mw1':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'mw1':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Recursion variant:
 Call decreases at line 105
 decreases.i:105: warning from wp:
@@ -235,6 +352,16 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function mw2
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'mw2':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'mw2':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Recursion variant (1/2):
@@ -255,6 +382,16 @@ Prove: P_Wrong(x, to_uint32(x - 1)).
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function se
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'se':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'se':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Recursion variant:

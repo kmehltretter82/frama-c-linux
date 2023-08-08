@@ -1,12 +1,24 @@
 # frama-c -wp [...]
 [kernel] Parsing terminates_formulae.i (no preprocessing)
+[kernel:annot:missing-spec] terminates_formulae.i:100: Warning: 
+  Missing exits in specification of prototype call_param,
+   generating default specification, see -generated-spec-* options for more info
+[kernel:annot:missing-spec] terminates_formulae.i:100: Warning: 
+  Missing exits in specification of prototype local_init_P,
+   generating default specification, see -generated-spec-* options for more info
+[kernel:annot:missing-spec] terminates_formulae.i:100: Warning: 
+  Missing exits in specification of prototype terminates_P,
+   generating default specification, see -generated-spec-* options for more info
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp:hypothesis] terminates_formulae.i:84: Warning: 
   'Rel' relation must be well-founded
 [wp:hypothesis] terminates_formulae.i:67: Warning: 
   'Rel' relation must be well-founded
+[wp] [CFG] Goal general_variant_exits : Valid (Unreachable)
 [wp] [CFG] Goal general_variant_terminates : Valid (Trivial)
+[wp] [CFG] Goal no_variant_exits : Valid (Unreachable)
+[wp] [CFG] Goal variant_exits : Valid (Unreachable)
 [wp] [CFG] Goal variant_terminates : Valid (Trivial)
 [wp] terminates_formulae.i:91: Warning: 
   Missing decreases clause on recursive function no_decreases, call must be unreachable
@@ -20,6 +32,11 @@ Assume { (* Heap *) Type: is_sint32(a). (* Goal *) When: P_Q. }
 Prove: P_P(a).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'base_call':
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function call_change
 ------------------------------------------------------------
@@ -28,6 +45,11 @@ Goal Termination-condition (file terminates_formulae.i, line 32) in 'call_change
 Call terminates at line 35
 Assume { (* Heap *) Type: is_sint32(a). (* Goal *) When: P_P(a). }
 Prove: P_P(0).
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_change':
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -47,12 +69,22 @@ Assume {
 Prove: false.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_param_change':
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function call_param_same
 ------------------------------------------------------------
 
 Goal Termination-condition (file terminates_formulae.i, line 43) in 'call_param_same':
 Call terminates at line 45
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_param_same':
 Prove: true.
 
 ------------------------------------------------------------
@@ -65,11 +97,21 @@ Call terminates at line 29
 Prove: true.
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_same':
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function decreases
 ------------------------------------------------------------
 
 Goal Termination-condition (file terminates_formulae.i, line 77) in 'decreases':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'decreases':
 Prove: true.
 
 ------------------------------------------------------------
@@ -85,6 +127,11 @@ Prove: (0 <= n) /\ (to_uint32(n - 1) < n).
 ------------------------------------------------------------
 
 Goal Termination-condition (file terminates_formulae.i, line 83) in 'general_decreases':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'general_decreases':
 Prove: true.
 
 ------------------------------------------------------------
@@ -119,6 +166,11 @@ Assume { (* Heap *) Type: is_sint32(a). (* Goal *) When: P_Q. }
 Prove: P_P(a).
 
 ------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'local_init_call':
+Prove: true.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function no_decreases
 ------------------------------------------------------------
@@ -132,6 +184,11 @@ Goal Termination-condition (file terminates_formulae.i, line 89) in 'no_decrease
 Call terminates (missing decreases) at line 91
 Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
 Prove: !P_Q.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'no_decreases':
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

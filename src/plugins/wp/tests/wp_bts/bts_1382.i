@@ -12,7 +12,9 @@ int dest, src;
 void loop (void) {
   int i ;
   i=0 ;
-  //@ loop assigns i, dest;
+  /*@ loop assigns i, dest;
+      loop variant 100 - i;
+  */
   while (i<100) {
     f((unsigned char*)&dest);
     copy(&dest, &src, sizeof(dest));

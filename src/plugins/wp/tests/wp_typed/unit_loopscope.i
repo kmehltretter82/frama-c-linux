@@ -10,7 +10,9 @@ void f(unsigned int * written)
 {
  int n = 1;
  *written = (unsigned int)0;
- /*@ loop invariant \false ; */
+ /*@ loop invariant \false ; 
+   @ loop variant 10 - n;
+ */
  while (n < 10) {
    n++;
  }
