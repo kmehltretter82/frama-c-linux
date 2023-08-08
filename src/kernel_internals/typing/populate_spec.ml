@@ -155,7 +155,7 @@ struct
       else if not warned && not empty then
         Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
           "Missing %s in specification of prototype %a,@, \
-           generating default specification, see -generated-spec-* options\
+           generating default specification, see -generated-spec-* options \
            for more info"
           name Kernel_function.pretty kf
 
