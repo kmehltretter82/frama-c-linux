@@ -1,7 +1,0 @@
-/* run.config*
-COMMENT: Explicits the dependencies of {bin:frama-c-script} execution:
- PLUGIN: variadic,instantiate
-COMMENT: The library frama-c.analysis_scripts is part of the package frama-c
-COMMENT: and this dependency is implicit as the one to the needed python files.
-ENABLED_IF: %{read:../../../python-3.7-available}
-*/
