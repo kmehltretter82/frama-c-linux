@@ -481,6 +481,9 @@ struct
   let add_vc
       target ?(warn=Warning.Set.empty) ?(deps=Property.Set.empty) pred vcs =
     let xs , hs , goal = introduction pred in
+    if Gmap.mem target vcs then
+      Wp_parameters.failure
+        "Multiple goals for the same target (%a)" TARGET.pretty target ;
     let hyps = Conditions.intros hs Conditions.nil in
     let vc = { empty_vc with goal ; vars=xs ; hyps ; warn ; deps } in
     Gmap.add target (Splitter.singleton vc) vcs
