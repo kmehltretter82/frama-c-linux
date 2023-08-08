@@ -16,5 +16,7 @@ mk_tests {
       @tests/syntax/ptests \
       @tests/test/ptests \
       @src/kernel_internals/parsing/tests/ptests
+    dune runtest \
+      tests/fc_script
   '';
 }

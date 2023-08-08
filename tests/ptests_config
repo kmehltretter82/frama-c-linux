@@ -4,7 +4,7 @@
 
 ### Tests of kernel
 
-DEFAULT_SUITES= cil compliance dynamic fc_script jcdb libc misc
+DEFAULT_SUITES= cil compliance dynamic jcdb libc misc
 DEFAULT_SUITES= pretty_printing saveload spec syntax test
 
 ### Tests of small plugins
