@@ -221,7 +221,6 @@ external-plugins:
           "context-from-precondition",
           "frama-clang",
           "genassigns",
-          "linea-cabs",
           "meta",
           "minimal",
           "mthread",
