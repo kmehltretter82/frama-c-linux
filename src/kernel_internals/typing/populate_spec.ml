@@ -96,7 +96,8 @@ let compare_it it1 it2 =
   Cil_datatype.Term.compare it1.it_content it2.it_content
 
 let is_frama_c_builtin kf =
-  Kernel_function.get_name kf |> Ast_info.is_frama_c_builtin
+  Kernel_function.get_vi kf |> Cil_builtins.is_builtin
+  ||Kernel_function.get_name kf |> Cil_builtins.is_special_builtin
 
 let is_frama_c_stdlib kf =
   (Kernel_function.get_vi kf).vattr |> Cil.is_in_libc
