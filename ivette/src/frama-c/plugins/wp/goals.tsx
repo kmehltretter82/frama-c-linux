@@ -21,23 +21,55 @@
 /* ************************************************************************ */
 
 import React from 'react';
-import { Table, Column } from 'dome/table/views';
+import { Icon } from 'dome/controls/icons';
+import { Table, Column, Renderer } from 'dome/table/views';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
 
+const renderPassed: Renderer<boolean> =
+  (passed: boolean): JSX.Element =>
+  (<Icon
+    id={passed ? 'CIRC.CHECK' : 'CIRC.QUESTION'}
+    fill={passed ? `var(--positive-button-color)` : `var(--negative-button-color)`}
+  />);
+
 function WPGoals(): JSX.Element {
   const model = States.useSyncArrayModel(WP.goals);
+
+  // TODO: from AST selection, find WPO
+  const [_astSelection, updateAstSelection] = States.useSelection();
+  const [wpoSelection, setWpoSelection] = React.useState(WP.goalDefault);
+
+  const onWpoSelection = React.useCallback(
+    ({ wpo, property: marker, fct }: WP.goalsData) => {
+      const location = { fct, marker };
+      updateAstSelection({ location });
+      setWpoSelection(wpo);
+    }, [updateAstSelection],
+  );
+
   return (
-    <Table model={model} settings='wp.goals'>
+    <Table
+      model={model}
+      settings='wp.goals'
+      onSelection={onWpoSelection}
+      selection={wpoSelection}
+    >
+      <Column id='fct' label='Function' />
       <Column id='name' label='Names' />
+      <Column
+        id='passed'
+        label='Success'
+        render={renderPassed}
+      />
     </Table>
   );
 }
 
 
 Ivette.registerComponent({
-  id: 'frama-c.plugins.wp.vcs',
+  id: 'frama-c.plugins.wp.goals',
   group: 'frama-c.plugins',
   rank: 10,
   label: 'WP Goals',

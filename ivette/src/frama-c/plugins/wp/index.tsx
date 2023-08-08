@@ -25,7 +25,7 @@
 // --------------------------------------------------------------------------
 
 import * as Ivette from 'ivette';
-import './vcs';
+import './goals';
 import './style.css';
 
 // --------------------------------------------------------------------------
@@ -38,7 +38,7 @@ Ivette.registerView({
   label: 'WP View',
   layout: [
     ['frama-c.astview', 'frama-c.astinfo'],
-    'frama-c.plugins.wp.vcs',
+    'frama-c.plugins.wp.goals',
   ],
 });
 

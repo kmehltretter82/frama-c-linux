@@ -214,7 +214,7 @@ let _ = S.register_array ~package ~name:"goals"
     ~descr:(Md.plain "Generated Goals")
     ~key:(fun g -> g.Wpo.po_gid)
     ~keyName:"wpo"
-    ~keyType:(Jkey "wpo")
+    ~keyType:Goal.jtype
     ~iter:Wpo.iter_on_goals
     ~add_update_hook:Wpo.add_modified_hook
     ~add_remove_hook:Wpo.add_removed_hook

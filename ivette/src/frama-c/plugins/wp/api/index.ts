@@ -152,7 +152,7 @@ export const getAvailableProvers: Server.GetRequest<null,prover[]>= getAvailable
 /** Data for array rows [`goals`](#goals)  */
 export interface goalsData {
   /** Entry identifier. */
-  wpo: Json.key<'#wpo'>;
+  wpo: goal;
   /** Property Marker */
   property: marker;
   /** Informal name */
@@ -178,7 +178,7 @@ export interface goalsData {
 /** Decoder for `goalsData` */
 export const jGoalsData: Json.Decoder<goalsData> =
   Json.jObject({
-    wpo: Json.jKey<'#wpo'>('#wpo'),
+    wpo: jGoal,
     property: jMarker,
     name: Json.jString,
     fct: Json.jOption(jFct),
@@ -194,10 +194,10 @@ export const jGoalsData: Json.Decoder<goalsData> =
 /** Natural order for `goalsData` */
 export const byGoalsData: Compare.Order<goalsData> =
   Compare.byFields
-    <{ wpo: Json.key<'#wpo'>, property: marker, name: string, fct?: fct,
-       bhv?: string, thy?: string, smoke: boolean, passed: boolean,
-       stats: stats, script?: string, saved: boolean }>({
-    wpo: Compare.string,
+    <{ wpo: goal, property: marker, name: string, fct?: fct, bhv?: string,
+       thy?: string, smoke: boolean, passed: boolean, stats: stats,
+       script?: string, saved: boolean }>({
+    wpo: byGoal,
     property: byMarker,
     name: Compare.string,
     fct: Compare.defined(byFct),
@@ -227,15 +227,14 @@ export const reloadGoals: Server.GetRequest<null,null>= reloadGoals_internal;
 
 const fetchGoals_internal: Server.GetRequest<
   number,
-  { reload: boolean, removed: Json.key<'#wpo'>[], updated: goalsData[],
-    pending: number }
+  { reload: boolean, removed: goal[], updated: goalsData[], pending: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.wp.fetchGoals',
   input:  Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
-            removed: Json.jArray(Json.jKey<'#wpo'>('#wpo')),
+            removed: Json.jArray(jGoal),
             updated: Json.jArray(jGoalsData),
             pending: Json.jNumber,
           }),
@@ -244,11 +243,10 @@ const fetchGoals_internal: Server.GetRequest<
 /** Data fetcher for array [`goals`](#goals)  */
 export const fetchGoals: Server.GetRequest<
   number,
-  { reload: boolean, removed: Json.key<'#wpo'>[], updated: goalsData[],
-    pending: number }
+  { reload: boolean, removed: goal[], updated: goalsData[], pending: number }
   >= fetchGoals_internal;
 
-const goals_internal: State.Array<Json.key<'#wpo'>,goalsData> = {
+const goals_internal: State.Array<goal,goalsData> = {
   name: 'plugins.wp.goals',
   getkey: ((d:goalsData) => d.wpo),
   signal: signalGoals,
@@ -257,13 +255,13 @@ const goals_internal: State.Array<Json.key<'#wpo'>,goalsData> = {
   order: byGoalsData,
 };
 /** Generated Goals */
-export const goals: State.Array<Json.key<'#wpo'>,goalsData> = goals_internal;
+export const goals: State.Array<goal,goalsData> = goals_internal;
 
 /** Default value for `goalsData` */
 export const goalsDataDefault: goalsData =
-  { wpo: Json.jKey<'#wpo'>('#wpo')(''), property: markerDefault, name: '',
-    fct: undefined, bhv: undefined, thy: undefined, smoke: false,
-    passed: false, stats: statsDefault, script: undefined, saved: false };
+  { wpo: goalDefault, property: markerDefault, name: '', fct: undefined,
+    bhv: undefined, thy: undefined, smoke: false, passed: false,
+    stats: statsDefault, script: undefined, saved: false };
 
 /** Proof Server Activity */
 export const serverActivity: Server.Signal = {
