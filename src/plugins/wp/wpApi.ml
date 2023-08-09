@@ -185,13 +185,12 @@ let () = S.option gmodel ~name:"thy"
     ~descr:(Md.plain "Associated axiomatic, if any")
     ~data:(module D.Jstring) ~get:get_thy
 
-let () = S.column gmodel ~name:"smoke"
-    ~descr:(Md.plain "Smoke Test Goal")
-    ~data:(module D.Jbool) ~get:Wpo.is_smoke_test
+let get_result g =
+  Wpo.is_smoke_test g, Wpo.is_passed g
 
-let () = S.column gmodel ~name:"passed"
-    ~descr:(Md.plain "Successfull Goal")
-    ~data:(module D.Jbool) ~get:Wpo.is_passed
+let () = S.column gmodel ~name:"result"
+    ~descr:(Md.plain "Smoking (or not) goal and result")
+    ~data:(module D.Jpair (D.Jbool)(D.Jbool)) ~get:get_result
 
 let () = S.column gmodel ~name:"stats"
     ~descr:(Md.plain "Verdict Details")

@@ -27,11 +27,17 @@ import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
 
-const renderPassed: Renderer<boolean> =
-  (passed: boolean): JSX.Element =>
+const renderResult: Renderer<[boolean, boolean]> =
+  ([smoking, passed]): JSX.Element =>
   (<Icon
-    id={passed ? 'CIRC.CHECK' : 'CIRC.QUESTION'}
-    fill={passed ? `var(--positive-button-color)` : `var(--negative-button-color)`}
+    id=
+    {passed ? 'CIRC.CHECK' :
+      (smoking ? 'CIRC.CLOSE' : 'CIRC.QUESTION')
+    }
+    fill=
+    {passed ? `var(--positive-button-color)` :
+      (smoking ? `var(--negative-button-color)` : `var(--warning-button-color)`)
+    }
   />);
 
 function WPGoals(): JSX.Element {
@@ -59,9 +65,9 @@ function WPGoals(): JSX.Element {
       <Column id='fct' label='Function' />
       <Column id='name' label='Names' />
       <Column
-        id='passed'
-        label='Success'
-        render={renderPassed}
+        id='result'
+        label='Result'
+        render={renderResult}
       />
     </Table>
   );

@@ -163,10 +163,8 @@ export interface goalsData {
   bhv?: string;
   /** Associated axiomatic, if any */
   thy?: string;
-  /** Smoke Test Goal */
-  smoke: boolean;
-  /** Successfull Goal */
-  passed: boolean;
+  /** Smoking (or not) goal and result */
+  result: [ boolean, boolean ];
   /** Verdict Details */
   stats: stats;
   /** Script File */
@@ -184,8 +182,7 @@ export const jGoalsData: Json.Decoder<goalsData> =
     fct: Json.jOption(jFct),
     bhv: Json.jOption(Json.jString),
     thy: Json.jOption(Json.jString),
-    smoke: Json.jBoolean,
-    passed: Json.jBoolean,
+    result: Json.jPair( Json.jBoolean, Json.jBoolean,),
     stats: jStats,
     script: Json.jOption(Json.jString),
     saved: Json.jBoolean,
@@ -195,7 +192,7 @@ export const jGoalsData: Json.Decoder<goalsData> =
 export const byGoalsData: Compare.Order<goalsData> =
   Compare.byFields
     <{ wpo: goal, property: marker, name: string, fct?: fct, bhv?: string,
-       thy?: string, smoke: boolean, passed: boolean, stats: stats,
+       thy?: string, result: [ boolean, boolean ], stats: stats,
        script?: string, saved: boolean }>({
     wpo: byGoal,
     property: byMarker,
@@ -203,8 +200,7 @@ export const byGoalsData: Compare.Order<goalsData> =
     fct: Compare.defined(byFct),
     bhv: Compare.defined(Compare.string),
     thy: Compare.defined(Compare.string),
-    smoke: Compare.boolean,
-    passed: Compare.boolean,
+    result: Compare.pair(Compare.boolean,Compare.boolean,),
     stats: byStats,
     script: Compare.defined(Compare.string),
     saved: Compare.boolean,
@@ -260,7 +256,7 @@ export const goals: State.Array<goal,goalsData> = goals_internal;
 /** Default value for `goalsData` */
 export const goalsDataDefault: goalsData =
   { wpo: goalDefault, property: markerDefault, name: '', fct: undefined,
-    bhv: undefined, thy: undefined, smoke: false, passed: false,
+    bhv: undefined, thy: undefined, result: [ false, false ],
     stats: statsDefault, script: undefined, saved: false };
 
 /** Proof Server Activity */
