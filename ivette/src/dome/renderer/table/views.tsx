@@ -268,7 +268,8 @@ function makeDataRenderer(
   return function TableCell(props: TableCellProps) {
     const { cellData } = props;
     try {
-      const contents = cellData ? render(cellData) : null;
+      const undef = cellData === null || cellData === undefined;
+      const contents =  undef ? null : render(cellData);
       if (onContextMenu) {
         const callback = (evt: React.MouseEvent): void => {
           evt.stopPropagation();
