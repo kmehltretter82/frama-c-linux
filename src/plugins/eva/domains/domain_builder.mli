@@ -94,6 +94,8 @@ module Complete_Simple_Cvalue
                           and type location = Precise_locs.precise_location
                           and type state = Domain.t
 
+[@@@warning "-67"]
+
 (* Restricts an abstract domain on specific functions. The domain will only be
    enabled on the given functions. Moreover, a mode is associated to each of
    these functions, allowing (or not) the domain to infer or use properties
@@ -105,3 +107,5 @@ module Restrict
     (Scope: sig val functions: Domain_mode.function_mode list end)
   : Abstract.Domain.Internal with type value = Value.t
                               and type location = Domain.location
+
+[@@@warning "+67"]

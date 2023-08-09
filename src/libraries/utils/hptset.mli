@@ -105,6 +105,8 @@ module type S = sig
   val pretty_debug: t Pretty_utils.formatter
 end
 
+[@@@warning "-67"]
+
 module Make(X: Hptmap.Id_Datatype)
     (Initial_Values : sig val v : X.t list list end)
     (Datatype_deps: sig val l : State.t list end) :
@@ -113,6 +115,8 @@ sig
              and type 'a map = 'a Hptmap.Shape(X).map
   val self : State.t
 end
+
+[@@@warning "+67"]
 
 (*
 Local Variables:

@@ -109,7 +109,7 @@ val register_kernel: unit -> unit
     services.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Register
-    (P: sig
+    (_: sig
        val name: string
        (** Name of the module. Arbitrary non-empty string. *)
 

@@ -30,6 +30,8 @@ val signal_abort: unit -> unit
     evaluated to true (resp. false) at least once during the analysis. *)
 val condition_truth_value: stmt -> bool * bool
 
+[@@@warning "-67"]
+
 module Computer
     (* Abstractions with the evaluator. *)
     (Abstract: Abstractions.S_with_evaluation)
@@ -55,6 +57,7 @@ module Computer
 
   end
 
+[@@@warning "+67"]
 
 (*
 Local Variables:

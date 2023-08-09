@@ -45,6 +45,8 @@ module Shape (Key : Id_Datatype): sig
   type 'a t = 'a map
 end
 
+[@@@warning "-67"]
+
 (** This functor builds the complete module of maps indexed by keys [Key]
     to values [V]. *)
 module Make
@@ -81,6 +83,8 @@ module Make
                   and type v = V.t
                   and type 'v map = 'v Shape(Key).map
                   and type prefix = prefix
+
+[@@@warning "+67"]
 
 (** Default implementation for the [Compositional_bool] argument of the functor
     {!Make}. To be used when no interesting compositional bit can be computed. *)

@@ -801,7 +801,7 @@ module type Hashconsing_tbl =
        val hash_internal: t -> int
        val initial_values: t list
      end) ->
-  functor (Info: Info_with_size) ->
+  functor (_: Info_with_size) ->
     Weak_hashtbl with type data = Data.t
 
 module Hashconsing_tbl =

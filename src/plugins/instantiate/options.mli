@@ -33,6 +33,6 @@ module Kfs : Parameter_sig.Kernel_function_set
     to true.
 *)
 module NewInstantiator
-    (B : sig val function_name: string end) : Parameter_sig.Bool
+    (_ : sig val function_name: string end) : Parameter_sig.Bool
 
 val emitter: Emitter.t

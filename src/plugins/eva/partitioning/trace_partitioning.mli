@@ -22,7 +22,7 @@
 
 module Make
     (Abstract : Abstractions.S_with_evaluation)
-    (Kf : sig val kf: Cil_types.kernel_function end) :
+    (_ : sig val kf: Cil_types.kernel_function end) :
 sig
   (** The states being partitioned *)
   type state = Abstract.Dom.t

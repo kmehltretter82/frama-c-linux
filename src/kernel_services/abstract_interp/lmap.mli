@@ -32,6 +32,8 @@ type 'a default_contents =
   | Constant of 'a
   | Other
 
+[@@@warning "-67"]
+
 module Make_LOffset
     (V: sig
        include Offsetmap_lattice_with_isotropy.S
@@ -74,6 +76,8 @@ module Make_LOffset
   with type v = V.t
    and type widen_hint_base = V.numerical_widen_hint
    and type offsetmap = Offsetmap.t
+
+[@@@warning "+67"]
 
 (*
 Local Variables:

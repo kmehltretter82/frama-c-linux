@@ -108,7 +108,7 @@ exception No_abstract_type of string
     @raise No_abstract_type if no such abstract type was registered.
     @since Nitrogen-20111001
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-module Abstract(T: sig val name: string end): sig
+module Abstract(_: sig val name: string end): sig
   type t
   val ty: t ty
 end

@@ -71,7 +71,7 @@ include S
 val add_state: State.t -> State.t list -> unit
 
 module Attributes: Attributes
-module Dot(A: Attributes) : sig val dump: string -> unit end
+module Dot(_: Attributes) : sig val dump: string -> unit end
 val dump: string -> unit
 
 (*
