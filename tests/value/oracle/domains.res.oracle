@@ -1,12 +1,126 @@
 [kernel] Parsing domains.i (no preprocessing)
-[eva:experimental] Warning: The multidim domain is experimental.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[eva:partition] domains.i:12: starting to merge loop iterations
-[eva:partition] domains.i:30: starting to merge loop iterations
+[eva:partition] domains.i:16: starting to merge loop iterations
+[eva:partition] domains.i:34: starting to merge loop iterations
+[eva] domains.i:50: 
+  Frama_C_domain_show_each:
+  a : # cvalue: {8}
+      # equality: 
+      # symbolic-locations: (not implemented)
+      # octagon: (not implemented)
+      # gauges: (not implemented)
+      # sign: +
+      # bitwise: (not implemented)
+      # multidim: {8}
+  i : # cvalue: [1..99]
+      # equality: 
+      # symbolic-locations: (not implemented)
+      # octagon: (not implemented)
+      # gauges: (not implemented)
+      # sign: +
+      # bitwise: (not implemented)
+      # multidim: [1..99]
+  j : # cvalue: [10..210]
+      # equality: 
+      # symbolic-locations: (not implemented)
+      # octagon: (not implemented)
+      # gauges: (not implemented)
+      # sign: +
+      # bitwise: (not implemented)
+      # multidim: [10..210]
+  k : # cvalue: [2..100]
+      # equality: {k = ((i - j) + 1) + j}
+      # symbolic-locations: (not implemented)
+      # octagon: (not implemented)
+      # gauges: (not implemented)
+      # sign: -0+
+      # bitwise: (not implemented)
+      # multidim: [2..100]
+  r : # cvalue: {1}
+      # equality: 
+      # symbolic-locations: (not implemented)
+      # octagon: (not implemented)
+      # gauges: (not implemented)
+      # sign: 0+
+      # bitwise: (not implemented)
+      # multidim: {1}
+[eva] domains.i:51: 
+  Frama_C_dump_each:
+  # cvalue:
+  nondet ∈ [--..--]
+  a ∈ {8}
+  i ∈ [1..99]
+  j ∈ [10..210]
+  k ∈ [2..100]
+  r ∈ {1}
+  t[0..63] ∈ [--..--] or UNINITIALIZED
+   [64] ∈ [--..--]
+   [65..99] ∈ [--..--] or UNINITIALIZED
+  b1 ∈ {0; 1}
+  b2 ∈ {0; 1}
+  # equality:
+  {k = ((i - j) + 1) + j}
+  # symbolic-locations:
+  V: {[ t[i] -> [-2147483648..2147483647]
+        t[i] / i -> [-2147483648..2147483647]
+        i - j -> [-209..89]
+        t[k - 1] -> [-2147483648..2147483647] ]}
+  Z: {[ t[i] -> i; t[1..99]
+        t[i] / i -> i; t[1..99]
+        i - j -> i; j
+        t[k - 1] -> k; t[1..99] ]}
+  I: {[ i -> {t[i], t[i] / i, i - j}
+        j -> {i - j}
+        k -> {t[k - 1]}
+        t -> {t[i], t[i] / i, t[k - 1]} ]}
+  S: {[ i -> {t[i], t[i] / i, i - j}
+        j -> {i - j}
+        k -> {t[k - 1]}
+        t -> {t[i], t[i] / i, t[k - 1]} ]}
+  # octagon:
+  {[ i + j ∈ [11..309]
+     j + k ∈ [12..310]
+     j - k ∈ [-90..208]
+      ]}
+  # gauges:
+  V: [{[ a -> {8}
+         i -> [-2147483648..2147483647]
+         j -> [10..210]
+         k -> [-2147483847..2147483848]
+         r -> {1}
+         b1 -> {0; 1}
+         b2 -> {0; 1} ]}]
+  
+  # sign:
+  {[ a -> +
+     i -> +
+     j -> +
+     r -> 0+ ]}
+  # bitwise:
+  a[bits 0 to 2] ∈ {0}
+   [bits 3 to 3] ∈ {1}
+   [bits 4 to 31] ∈ {0}
+  # multidim:
+  ({[ a -> ({8}, {})
+      i -> ([1..99], {t})
+      j -> ([10..210], {})
+      k -> ([2..100], {t})
+      r -> ({1}, {})
+      t -> ({
+              [0 .. k - 2] = [-2147483648..2147483647],
+              [k - 1] = [-2147483648..2147483647],
+              [k .. 99] = [-2147483648..2147483647]
+            },
+              {})
+      b1 -> ({0; 1}, {})
+      b2 -> ({0; 1}, {}) ]},
+     None)
+  ==END OF DUMP==
+[eva] domains.i:52: Dumping state in file 'domains_dump_0'
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

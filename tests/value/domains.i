@@ -1,5 +1,9 @@
+/* run.config
+   LOG: domains_dump_0
+   STDOPT: #"-eva-domains sign,equality,bitwise,symbolic-locations,gauges,octagon,multidim -eva-msg-key=d-equality,d-symbolic-locations,d-gauges,d-octagon,d-multidim,d-bitwise,d-sign -eva-warn-key experimental=inactive"
+*/
 /* run.config*
-   STDOPT: #"-eva-domains sign,equality,bitwise,symbolic-locations,gauges,octagon,multidim"
+   DONTRUN: avoids duplication of domains_dump oracle
 */
 
 volatile int nondet;
@@ -41,4 +45,9 @@ void main (int a) {
   /* Tests the bitwise domain: a == 8, no division by zero. */
   a = (a | 8) & 8;
   r = 10 / a;
+
+  /* Tests printing of domains. */
+  Frama_C_domain_show_each(a, i, j, k, r);
+  Frama_C_dump_each();
+  Frama_C_dump_each_file_domains_dump();
 }
