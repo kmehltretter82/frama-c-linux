@@ -680,15 +680,13 @@ let warn_empty kf =
   true
 
 let populate_funspec ~force kf spec =
-  let is_proto = not @@ Kernel_function.has_definition kf in
-  let skip_generation = not @@ Kernel.GenerateDefaultSpec.get () in
+  let has_body = Kernel_function.has_definition kf in
   let is_empty_spec = Cil.is_empty_funspec spec in
-  let skip_proto = is_proto && not force && is_empty_spec in
-  if (not force && skip_generation) || Is_populated.mem kf || skip_proto
-  then false
-  else begin
+  if (force || Kernel.GenerateDefaultSpec.get ())
+  && not @@ Is_populated.mem kf
+  && (force || has_body || not @@ is_empty_spec) then begin
     let warned =
-      if not @@ is_part_of_frama_c kf && is_proto && is_empty_spec
+      if not @@ is_part_of_frama_c kf && not @@ has_body && is_empty_spec
       then warn_empty kf
       else false
     in
@@ -696,5 +694,6 @@ let populate_funspec ~force kf spec =
     Is_populated.add kf ();
     true
   end
+  else false
 
 let () = Annotations.populate_spec_ref := populate_funspec ~force:true
