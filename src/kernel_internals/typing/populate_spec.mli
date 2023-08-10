@@ -20,15 +20,46 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** This module is used to generate missing specifications Options
+    {!Kernel.GeneratedDefaultSpec}, {!Kernel.GeneratedSpecMode} and
+    {!Kernel.GeneratedSpecCustom} can be used to chose in details which clause
+    to generate in which cases.
+    *)
+
 open Cil_types
 
+(** Represents exits clause in the sense of
+    {!Cil_types.behavior.b_post_cond}. *)
 type exits = (termination_kind * identified_predicate) list
+
+(** Assigns clause *)
+type assigns = Cil_types.assigns
+
+(** Allocation clause *)
+type allocation = Cil_types.allocation
+
+(** Represents requires clause in the sense of
+    {!Cil_types.behavior.b_requires}. *)
 type requires = identified_predicate list
+
+(** Represents terminates clause in the sense of
+    {!Cil_types.spec.spec_terminates}. *)
 type terminates = identified_predicate option
 
+(** Type of a function that, given a {!Kernel_function.t} and a
+    {!Cil_types.spec}, returns a clause. Accepted clause types includes
+    {!exits}, {!assigns}, {!requires}, {!allocation} and {!terminates}. *)
 type 'a gen = (kernel_function -> spec -> 'a)
+
+(** Short name for clarity, status emitted for properties. *)
 type status = Property_status.emitted_status
 
+(** [register ?gen_exits ?gen_requires ?status_allocates ... name] registers a
+    new mode called [name] which can then be used for specification generation
+    (see {!Kernel.GeneratedSpecMode} and {!Kernel.GeneratedSpecCustom}). All
+    parameters except [name] are optionals, meaning default action will be
+    performed if left unspecified (can trigger a warnings).
+*)
 val register :
   ?gen_exits:exits gen -> ?status_exits:status ->
   ?gen_assigns:assigns gen -> ?status_assigns:status ->
@@ -37,4 +68,11 @@ val register :
   ?status_terminates:status ->
   string -> unit
 
+(** [populate_funspec ~force kf spec] generates missing specifications for the
+    kernel_function [kf] and its current specification [spec].
+    [force] is used in certain context to force specification generation.
+    if [force] is false :
+      + {!Kernel.GenerateDefaultSpec} can be used to turn off the generation.
+      + Generation will be skipped for prototypes with empty specifications.
+    *)
 val populate_funspec : force:bool -> kernel_function -> spec -> bool

@@ -22,8 +22,11 @@
 
 open Cil_types
 
-type mode = ACSL | Safe | Frama_C | Skip | Other of string
-
+type mode =
+  | ACSL | Safe | Frama_C (* Modes available for specification generation. *)
+  | Skip (* Internally used to skip generation. *)
+  | Other of string (* Allow user to use a custom mode, see {!register}. *)
+(* Allow customization, each clause can be handled with a different [mode]. *)
 type config = {
   exits: mode;
   assigns: mode;
@@ -32,20 +35,28 @@ type config = {
   terminates: mode;
 }
 
+(* Either keep old specification or generate a new one. Existing specification
+   from complete behaviors can be combined and used for default behavior. *)
 type 'a result = Kept | Generated of 'a
 
 type exits = (termination_kind * identified_predicate) list
+type assigns = Cil_types.assigns
 type requires = identified_predicate list
+type allocation = Cil_types.allocation
 type terminates = identified_predicate option
 
+(* Generation function type and status. *)
 type 'a gen = (kernel_function -> spec -> 'a)
 type status = Property_status.emitted_status
 
+(* For each clause, we need a generation function and a status to be emitted. *)
 type 'a elem = {
   gen: 'a gen option;
   status : status option;
 }
 
+(* Allow user to create a mode by choosing how each clause should be generated
+   and which status to emit. *)
 type custom_mode = {
   custom_exits: exits elem;
   custom_assigns: assigns elem;
@@ -54,6 +65,7 @@ type custom_mode = {
   custom_terminates: terminates elem;
 }
 
+(* Used to store custom modes. *)
 let custom_modes = Hashtbl.create 17
 
 let default = Cil.default_behavior_name
@@ -62,9 +74,11 @@ let emitter =
   Emitter.create "PopulateSpec"
     [ Funspec; Property_status ] ~correctness:[] ~tuning:[]
 
+(* Emit [status] on the property [ppt]. *)
 let emit_status status ppt =
   Property_status.emit emitter ~hyps:[] ppt status
 
+(* Generic completes function for {!Generator.completes}. *)
 let completes_generic (type clause) completes table =
   let exception Ok of clause list in
   let collect l b = Hashtbl.find table b :: l in
@@ -74,6 +88,7 @@ let completes_generic (type clause) completes table =
   in
   try List.iter collect completes; None with Ok l -> Some l
 
+(* Register a new mode (or replace an existing one). *)
 let register ?gen_exits ?status_exits ?gen_assigns ?status_assigns
     ?gen_requires ?gen_allocates ?status_allocates ?gen_terminates
     ?status_terminates name =
@@ -87,49 +102,74 @@ let register ?gen_exits ?status_exits ?gen_assigns ?status_assigns
   } in
   Hashtbl.replace custom_modes name mode
 
+(* Return a mode from the registered ones if it exists. *)
 let get_custom_mode mode =
   match Hashtbl.find_opt custom_modes mode with
   | None -> Kernel.abort "Mode %s is not registered" mode
   | Some custom_mode -> custom_mode
 
+(* Use this instead of Identified_term.compare. *)
 let compare_it it1 it2 =
   Cil_datatype.Term.compare it1.it_content it2.it_content
 
+(* Return true if [kf] is a builtin of Frama-C. *)
 let is_frama_c_builtin kf =
   Kernel_function.get_vi kf |> Cil_builtins.is_builtin
   ||Kernel_function.get_name kf |> Cil_builtins.is_special_builtin
 
+(* Return true if [kf] is a from the stdblib of Frama-C. *)
 let is_frama_c_stdlib kf =
   (Kernel_function.get_vi kf).vattr |> Cil.is_in_libc
 
+(* Return true if [kf] is either from frama-c's stdlib or builtinds. *)
 let is_part_of_frama_c kf =
   is_frama_c_builtin kf || is_frama_c_stdlib kf
 
+(* This module is used to define clauses generators. *)
 module type Generator =
 sig
 
+  (* Generator's clause : exits, assigns, requires, allocation or terminates. *)
   type clause
+  (* Store informations regarding original specification clauses. *)
   type behaviors
 
+  (* Used for messages in logs/warnings, etc. *)
   val name : string
+  (* Used to check if we actually generated something. *)
   val is_empty : clause -> bool
-  val has_behavior : string -> behaviors -> bool
+
+  (* Return true if default behavior contains this Generator's clause. *)
+  val has_default_behavior : behaviors -> bool
+  (* Collect all clauses from function specification. *)
   val collect_behaviors : spec -> behaviors
+  (* Collect all clauses from complete behaviors. *)
   val completes : string list list -> behaviors -> clause list option
 
+  (* Generate a default clause in ACSL mode. *)
   val acsl_default : unit -> clause
+  (* Generate a default clause in Safe mode. *)
   val safe_default : kernel_function -> clause
+  (* Generate a default clause in Frama_C mode. *)
   val frama_c_default : kernel_function -> clause
-  val combine_default : clause list -> clause
+  (* Generate a default clause in Other mode. *)
   val custom_default : string -> kernel_function -> spec -> clause
 
+  (* Combine clauses from completes behaviors to generate clauses inside
+     default behavior. *)
+  val combine_default : clause list -> clause
+
+  (* Emit property status depending on the selected mode. *)
   val emit : mode -> kernel_function -> funbehavior -> clause result -> unit
 
 end
 
+(* Build Generators. *)
 module Make(G : Generator) =
 struct
 
+  (* Either combine existing clauses or generate new ones depending on the
+     selected mode and original specification. *)
   let combine_or_default mode kf spec table =
     if mode = ACSL then false, G.acsl_default ()
     else
@@ -145,33 +185,58 @@ struct
         false, G.custom_default mode kf spec
       | (Skip | ACSL), _ -> assert false
 
-  let warn ~combined ~warned ~empty kf name =
+  (* Emit warnings depending on performed actions. *)
+  let warn ~combined ~warned kf g =
     let has_body = Kernel_function.has_definition kf in
+    (* Only warn for prototypes not in frama-c's stdlib and builtins. *)
     if not has_body && not @@ is_part_of_frama_c kf then
-      if combined then
+      let is_empty = G.is_empty g in
+      let name = G.name in
+      if combined then begin
+        if is_empty || warned then assert false; (* Should not happen *)
         Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
           "Missing %s in default behavior of prototype %a,@, \
            generating default specification from complete behaviors"
           name Kernel_function.pretty kf
-      else if not warned && not empty then
+      end
+      else if not warned && not is_empty then
         Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
           "Missing %s in specification of prototype %a,@, \
            generating default specification, see -generated-spec-* options \
            for more info"
           name Kernel_function.pretty kf
 
+  (* Returns a new clause as [Generated g] of [Kept] is no action is needed. *)
   let get_default ~warned mode kf spec =
     let table = G.collect_behaviors spec in
-    if mode = Skip || G.has_behavior default table then Kept
+    if mode = Skip || G.has_default_behavior table then Kept
     else
       let combined, g = combine_or_default mode kf spec table in
-      warn ~warned ~combined ~empty:(G.is_empty g) kf G.name;
+      warn ~warned ~combined kf g;
       Generated g
 
-let emit = G.emit
+  (* Interface to call [G.emit]. *)
+  let emit = G.emit
 
 end
 
+(*******************************************************************)
+(* *********************** Exits generator *********************** *)
+(* |-------------------------------------------------------------| *)
+(* |     ACSL      |    Frama-c   |     Safe      |     Other    | *)
+(* |-------|-------|-------|------|-------|-------|-------|------| *)
+(* | Proto | Body  | Proto | Body | Proto | Body  | Proto | Body | *)
+(* |-------|-------|-------|------|-------|-------|-------|------| *)
+(* | false | false | ACSL  | ACSL | ----- | false |  ???  |  ??  | *)
+(* |-------------------------------------------------------------| *)
+(* *****************************************************************)
+(* *** Status emitted on prototypes ****)
+(* |---------------------------------| *)
+(* | ACSL |  Frama-c  | Safe | Other | *)
+(* |------|-----------|------|-------| *)
+(* | True | Dont_know | ---- |  ???  | *)
+(* |---------------------------------| *)
+(***************************************)
 module Exits_generator =
 struct
 
@@ -182,8 +247,8 @@ struct
 
   let is_empty c = c = []
 
-  let has_behavior name behaviors =
-    Hashtbl.mem behaviors name
+  let has_default_behavior behaviors =
+    Hashtbl.mem behaviors default
 
   let collect_behaviors spec =
     let table = Hashtbl.create 17 in
@@ -252,8 +317,27 @@ struct
 
 end
 
+
+(*********************************************************************)
+(* *********************** Assigns generator *********************** *)
+(* |---------------------------------------------------------------| *)
+(* |     ACSL      |    Frama-c   |      Safe       |     Other    | *)
+(* |-------|-------|-------|------|-------|---------|-------|------| *)
+(* | Proto | Body  | Proto | Body | Proto |  Body   | Proto | Body | *)
+(* |-------|-------|-------|------|-------|---------|-------|------| *)
+(* |  Any  |  Any  | Auto  | ACSL |  Any  | Nothing |  ???  |  ??  | *)
+(* |---------------------------------------------------------------| *)
+(* *******************************************************************)
+(* *** Status emitted on prototypes ****)
+(* |---------------------------------| *)
+(* | ACSL |  Frama-c  | Safe | Other | *)
+(* |------|-----------|------|-------| *)
+(* | ---- | Dont_know | ---- |  ???  | *)
+(* |---------------------------------| *)
+(***************************************)
 module Assigns_generator =
 struct
+
   type clause = assigns
   type behaviors = (string, assigns) Hashtbl.t
 
@@ -261,8 +345,8 @@ struct
 
   let is_empty c = c = WritesAny
 
-  let has_behavior name behaviors =
-    Hashtbl.mem behaviors name
+  let has_default_behavior behaviors =
+    Hashtbl.mem behaviors default
 
   let collect_behaviors spec =
     let table = Hashtbl.create 17 in
@@ -364,6 +448,24 @@ struct
 
 end
 
+
+(*****************************************************************)
+(* ********************* Requires generator ******************** *)
+(* |-----------------------------------------------------------| *)
+(* |     ACSL     |    Frama-c   |     Safe     |     Other    | *)
+(* |-------|------|-------|------|-------|------|-------|------| *)
+(* | Proto | Body | Proto | Body | Proto | Body | Proto | Body | *)
+(* |-------|------|-------|------|-------|------|-------|------| *)
+(* | ----- | ---- | ----- | ---- | false | ---- |  ???  |  ??  | *)
+(* |-----------------------------------------------------------| *)
+(* ***************************************************************)
+(* ** Status emitted on prototypes ***)
+(* |-------------------------------| *)
+(* | ACSL | Frama-c | Safe | Other | *)
+(* |------|---------|------|-------| *)
+(* | ---- | ------- | ---- | ----- | *)
+(* |-------------------------------| *)
+(*************************************)
 module Requires_generator =
 struct
 
@@ -374,8 +476,8 @@ struct
 
   let is_empty c = c = []
 
-  let has_behavior name behaviors =
-    Hashtbl.mem behaviors name
+  let has_default_behavior behaviors =
+    Hashtbl.mem behaviors default
 
   let collect_behaviors spec =
     let table = Hashtbl.create 17 in
@@ -423,8 +525,27 @@ struct
 
 end
 
+
+(*************************************************************************)
+(* ************************* Allocates generator *********************** *)
+(* |-------------------------------------------------------------------| *)
+(* |       ACSL        |    Frama-c   |      Safe       |     Other    | *)
+(* |---------|---------|-------|------|-------|---------|-------|------| *)
+(* |  Proto  |  Body   | Proto | Body | Proto |  Body   | Proto | Body | *)
+(* |---------|---------|-------|------|-------|---------|-------|------| *)
+(* | Nothing | Nothing | ACSL  | ACSL |  Any  | Nothing |  ???  |  ??  | *)
+(* |-------------------------------------------------------------------| *)
+(* ***********************************************************************)
+(* **** Status emitted on prototypes ***)
+(* |---------------------------------| *)
+(* | ACSL |  Frama-c  | Safe | Other | *)
+(* |------|-----------|------|-------| *)
+(* | True | Dont_know | ---- |  ???  | *)
+(* |---------------------------------| *)
+(***************************************)
 module Allocates_generator =
 struct
+
   type clause = allocation
   type behaviors = (string, allocation) Hashtbl.t
 
@@ -432,8 +553,8 @@ struct
 
   let is_empty c = c = FreeAllocAny
 
-  let has_behavior name behaviors =
-    Hashtbl.mem behaviors name
+  let has_default_behavior behaviors =
+    Hashtbl.mem behaviors default
 
   let collect_behaviors spec =
     let table = Hashtbl.create 17 in
@@ -508,6 +629,23 @@ struct
 
 end
 
+(*****************************************************************)
+(* ******************** Terminates generated ******************* *)
+(* |-----------------------------------------------------------| *)
+(* |     ACSL     |    Frama-c   |     Safe     |     Other    | *)
+(* |-------|------|-------|------|-------|------|-------|------| *)
+(* | Proto | Body | Proto | Body | Proto | Body | Proto | Body | *)
+(* |-------|------|-------|------|-------|------|-------|------| *)
+(* | true  | true | ACSL  | ACSL | false | true |  ???  |  ??  | *)
+(* |-----------------------------------------------------------| *)
+(* ***************************************************************)
+(* ****** Status emitted on prototypes ******)
+(* |--------------------------------------| *)
+(* | ACSL |  Frama-c  |    Safe   | Other | *)
+(* |------|-----------|-----------|-------| *)
+(* | True | Dont_know | Dont_know |  ???  | *)
+(* |--------------------------------------| *)
+(********************************************)
 module Terminates_generator =
 struct
 
@@ -518,7 +656,7 @@ struct
 
   let is_empty c = c = None
 
-  let has_behavior _ behaviors =
+  let has_default_behavior behaviors =
     behaviors
 
   let collect_behaviors spec =
@@ -584,6 +722,7 @@ module Requires = Make(Requires_generator)
 module Allocates = Make(Allocates_generator)
 module Terminates = Make(Terminates_generator)
 
+(* Convert string from parameter [-generated-spec-mode] to [mode]. *)
 let get_mode = function
   | "frama-c" -> Frama_C
   | "acsl" -> ACSL
@@ -591,6 +730,7 @@ let get_mode = function
   | "skip" -> Skip
   | s -> Other s
 
+(* Given a [mode], returns the configuration for each clause. *)
 let build_config mode =
   (* For now Allocates are skipped by default *)
   let skip_mode = match mode with Other _ -> mode | _ -> Skip in
@@ -602,9 +742,12 @@ let build_config mode =
     terminates = mode;
   }
 
+(* Build configuration from parameter [-generated-spec-mode]. *)
 let get_config_mode () =
   Kernel.GeneratedSpecMode.get () |> get_mode |> build_config
 
+(* Build the default configuration, then select modes depending on the
+   parameter [-generated-spec-custom]. *)
 let get_config () =
   let default = get_config_mode () in
   let collect (k,v) conf =
@@ -623,6 +766,8 @@ let get_config () =
   in
   Kernel.GeneratedSpecCustom.fold collect default
 
+(* Perform generation of all clauses, adds them to the original specification,
+   and emit property status for each of them. *)
 let do_populate ~warned kf original_spec =
   let config =
     if is_frama_c_builtin kf then build_config Frama_C
@@ -660,6 +805,7 @@ let do_populate ~warned kf original_spec =
   Allocates.emit config.allocates kf bhv allocates;
   Terminates.emit config.terminates kf bhv terminates
 
+(* Hashtbl used to memorize which kernel function has been populated. *)
 module Is_populated =
   State_builder.Hashtbl
     (Kernel_function.Hashtbl)
@@ -679,6 +825,17 @@ let warn_empty kf =
     Kernel_function.pretty kf;
   true
 
+(* Performs specification on [kf] if all requirements are met :
+   - force is [true]
+     OR
+     [-generate-default-spec] is [true] (by default).
+   - Function has not been populated yet.
+   - force is [true]
+     OR
+     [kf] is not a prototype
+     OR
+     [kf]'s specification is empty
+*)
 let populate_funspec ~force kf spec =
   let has_body = Kernel_function.has_definition kf in
   let is_empty_spec = Cil.is_empty_funspec spec in
@@ -696,4 +853,6 @@ let populate_funspec ~force kf spec =
   end
   else false
 
+(* Annotations always force specification generation when calling for
+   populate_funspec. *)
 let () = Annotations.populate_spec_ref := populate_funspec ~force:true

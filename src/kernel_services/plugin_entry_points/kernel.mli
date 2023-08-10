@@ -557,10 +557,15 @@ module DoCollapseCallCast: Parameter_sig.Bool
     of CIL 1.3.5 and earlier. *)
 
 module GenerateDefaultSpec: Parameter_sig.Bool
+(** Behavior of option "-generate-default-spec". *)
+
 module GeneratedSpecMode: Parameter_sig.String
+(** Behavior of option "-generated-spec-mode". *)
+
 module GeneratedSpecCustom: Parameter_sig.Map
   with type key = string
    and type value = string
+(** Behavior of option "-generated-spec-custom". *)
 
 (* ************************************************************************* *)
 (** {2 Analysis Behavior of options} *)
