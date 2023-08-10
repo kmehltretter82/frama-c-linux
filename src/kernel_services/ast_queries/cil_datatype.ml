@@ -966,18 +966,33 @@ struct
       compare_chain f v1 v2 Attributes.compare a1 a2 in
     match !punrollType t1, !punrollType t2 with
     | TVoid a1, TVoid a2 -> Attributes.compare a1 a2
-    | TInt (ik1, a1), TInt (ik2, a2) ->
-      comp_attr (=?=) ik1 ik2 a1 a2
-    | TFloat (fk1, a1), TFloat (fk2, a2) ->
-      comp_attr (=?=) fk1 fk2 a1 a2
+    | TVoid _, _ -> -1
+    | _, TVoid _ -> 1
+    | TInt (ik1, a1), TInt (ik2, a2) -> comp_attr (=?=) ik1 ik2 a1 a2
+    | TInt _, _ -> -1
+    | _, TInt _ -> 1
+    | TFloat (fk1, a1), TFloat (fk2, a2) -> comp_attr (=?=) fk1 fk2 a1 a2
+    | TFloat _, _ -> -1
+    | _, TFloat _ -> 1
     | TPtr _, TPtr _ -> 0
+    | TPtr _, _ -> -1
+    | _, TPtr _ -> 1
     | TArray _, TArray _
     | TFun _, TFun _
     | TNamed _, TNamed _
     | TBuiltin_va_list _, TBuiltin_va_list _ ->
       assert false (* shouldn't happen *)
-    | TComp (c1, _), TComp (c2, _) when c1.cstruct == c2.cstruct ->
-      begin
+    | TArray _, _ -> -1
+    | _, TArray _ -> 1
+    | TFun _, _ -> -1
+    | _, TFun _ -> 1
+    | TNamed _, _ -> -1
+    | _, TNamed _ -> 1
+    | TBuiltin_va_list _, _ -> -1
+    | _, TBuiltin_va_list _ -> 1
+    | TComp (c1, _), TComp (c2, _) ->
+      if c1.cstruct == c2.cstruct
+      then
         match c1.cfields, c2.cfields with
         | Some c1f, Some c2f ->
           List.fold_left2
@@ -985,11 +1000,15 @@ struct
                if res <> 0 then res
                else compare_internal_typ f1.ftype f2.ftype)
             0 c1f c2f
-        | _ -> 1
-      end
-    | TEnum (e1, a1), TEnum (e2, a2) ->
-      comp_attr (=?=) e1.ekind e2.ekind a1 a2
-    | _ -> -1
+        | None, Some _ -> -1
+        | Some _, None -> 1
+        | None, None -> compare c1.ckey c2.ckey
+      else
+        Bool.compare c1.cstruct c2.cstruct
+    | TComp _, _ -> -1
+    | _, TComp _ -> 1
+    | TEnum (e1, a1), TEnum (e2, a2) -> comp_attr (=?=) e1.ekind e2.ekind a1 a2
+
 
   (* If [strict] is true, the comparaison of integer and floating-point constants
      takes into account their textual representation (if any). Otherwise,
