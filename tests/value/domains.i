@@ -1,25 +1,40 @@
 /* run.config*
-   STDOPT: #"-eva-domains sign,equality,bitwise,symbolic-locations,gauges -eva-slevel 2"
+   STDOPT: #"-eva-domains sign,equality,bitwise,symbolic-locations,gauges,octagon,multidim"
 */
 
-/*  Tests five domains together. */
+volatile int nondet;
+
+/*  Tests multiple domains together. */
 void main (int a) {
-  int b, i, k, r;
-  /* Tests the equality domain: b is reduced after the condition, no overflow. */
-  b = a;
-  if (a < 10)
-    r = b + 1;
-  /* Tests the symbolic locations domain: t[i] is smaller than 10, no overflow. */
-  int t[2] = {a, a};
-  i = a > 0;
-  if (t[i] < 10)
-    r = t[i] + 1;
+  int i, j, k, r;
+  int t[100];
+  /* Tests the multidim domain: the array is initialized after the loop. */
+  for (i = 0; i < 100; i++) {
+    t[i] = nondet;
+  }
+  i = t[64];
+  /* Tests the equality domain: i is reduced through the condition,
+     no invalid read. */
+  int b1 = i <= 0;
+  int b2 = i >= 100;
+  if (b1 || b2)
+    i = 1;
+  r = t[i];
+  /* Tests the symbolic locations domain: t[i]/i is smaller than 1000,
+     no overflow. */
+  if (t[i] / i < 1000)
+    r = t[i] / i + 1;
   /* Tests the gauges domain: k==i during the loop, no overflow. */
   k = 0;
-  while (k < 12) {
+  j = 10;
+  while (k < 200 && nondet) {
     k++;
-    i++;
+    j++;
   }
+  /* Tests the octagon domain. */
+  r = i - j + 1;
+  k = r + j;
+  r = t[k-1];
   /* Tests the sign domain: no division by zero. */
   if (a != 0)
     r = 100 / a;

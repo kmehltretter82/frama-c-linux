@@ -1,20 +1,26 @@
 [kernel] Parsing domains.i (no preprocessing)
+[eva:experimental] Warning: The multidim domain is experimental.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
-  
-[eva:partition] domains.i:19: starting to merge loop iterations
+  nondet ∈ [--..--]
+[eva:partition] domains.i:12: starting to merge loop iterations
+[eva:partition] domains.i:30: starting to merge loop iterations
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   a ∈ {8}
-  b ∈ [--..--]
-  i ∈ [1..2147483647]
-  k ∈ {12}
+  i ∈ [1..99]
+  j ∈ [10..210]
+  k ∈ [2..100]
   r ∈ {1}
-  t[0..1] ∈ [--..--]
+  t[0..63] ∈ [--..--] or UNINITIALIZED
+   [64] ∈ [--..--]
+   [65..99] ∈ [--..--] or UNINITIALIZED
+  b1 ∈ {0; 1}
+  b2 ∈ {0; 1}
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -23,6 +29,6 @@
   NO EFFECTS
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    a; b; i; k; r; t[0..1]
+    a; i; j; k; r; t[0..99]; b1; b2
 [inout] Inputs for function main:
-    \nothing
+    nondet
