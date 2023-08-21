@@ -35,7 +35,7 @@ sig
   val all_zones_accessed : list_accesses -> Locations.Zone.t
 
   val concurrent_accesses_all_threads :
-    MtThread.Thread.t list ->
+    MtThread.ThreadState.t list ->
     (list_accesses * list_accesses) * ZoneMap.map
 end
 
@@ -52,7 +52,7 @@ sig
   val display_shared_vars_value : ZoneMap.map -> unit
   val enumerate_written_vars_value :
     ZoneMap.map ->
-    (MtIds.Id.t * Base.t * Cvalue.V_Offsetmap.t) list
+    (Thread.t * Base.t * Cvalue.V_Offsetmap.t) list
   val join_shared_values :
     ('a * Base.t * Cvalue.Model.offsetmap) list -> Cvalue.Model.t
   val remove_non_concur_zones_from_cfg :
@@ -64,7 +64,7 @@ end
 
 val read_written_by_function :
   (Cil_types.stmt -> bool) ->
-  MtIds.id ->
+  Thread.t ->
   MtMemory.Types.state_accesser ->
   ?watch_only:Locations.Zone.t ->
   Kernel_function.Hptset.elt ->

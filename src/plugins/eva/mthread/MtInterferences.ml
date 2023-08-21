@@ -32,7 +32,7 @@ let initial () =
 
 
 let concurrent_writes analysis_state =
-  let module ALSet = Interferences.AnalysisLocation.Set in
+  let module ALSet = Analysis_location.Local.Set in
   let open MtCfgTypes in
   let is_write = function
     | MtTypes.Read -> false
@@ -45,7 +45,7 @@ let concurrent_writes analysis_state =
       let seq =
         CfgNode.node_stmt node |>
         List.to_seq |>
-        Seq.map (fun stmt -> node.cfgn_stack, stmt)
+        Seq.map (fun stmt -> stmt, node.cfgn_stack)
       in
       ALSet.add_seq seq acc
   in
@@ -69,7 +69,7 @@ let add_last_analysis analysis_state interferences =
     (module Analyzer.Dom : Abstract.Domain.External
       with type state = Analyzer.Dom.state)
   in
-  let get_state (cs,stmt) =
+  let get_state (stmt, cs) =
     let open Lattice_bounds.TopBottom.Operators in
     let* state_table =
       Analyzer.get_stmt_state_by_callstack ~selection:[cs] ~after:true stmt

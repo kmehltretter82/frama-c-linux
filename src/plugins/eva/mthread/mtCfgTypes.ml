@@ -21,18 +21,19 @@
 (**************************************************************************)
 
 open Cil_types
-open MtIds
 open MtTypes
 open MtMemory.Types
 open MtSharedVarsTypes
+
+type thread = Thread.t
 
 (* -------------------------------------------------------------------------- *)
 (* --- Live threads/taken mutexes at a given point of execution           --- *)
 (* -------------------------------------------------------------------------- *)
 
 type context = {
-  started_threads : presence;
-  locked_mutexes : presence;
+  started_threads : ThreadPresence.t;
+  locked_mutexes : MutexPresence.t;
 }
 
 module Context = struct
@@ -40,16 +41,16 @@ module Context = struct
   type t = context
 
   let pretty fmt c =
-    if not (Presence.is_empty c.started_threads) then
+    if not (ThreadPresence.is_empty c.started_threads) then
       Format.fprintf fmt "@[<h>Threads: %a@]"
-        Presence.pretty c.started_threads;
-    if not (Presence.is_empty c.locked_mutexes) then
-      Format.fprintf fmt "@[<h>Mutexes: %a@]"Presence.pretty c.locked_mutexes;
+        ThreadPresence.pretty c.started_threads;
+    if not (MutexPresence.is_empty c.locked_mutexes) then
+      Format.fprintf fmt "@[<h>Mutexes: %a@]"MutexPresence.pretty c.locked_mutexes;
   ;;
 
   let empty = {
-    started_threads = Presence.empty;
-    locked_mutexes = Presence.empty;
+    started_threads = ThreadPresence.empty;
+    locked_mutexes = MutexPresence.empty;
   }
 
 end
@@ -122,8 +123,8 @@ module NodeValueState = struct
     state_after  = Cvalue.Model.bottom;
   }
 
-  let aux_presence default f id state : _ MtLib.conversion_with_warning =
-    match MtIds.read_id_state_enumerate 4 state id with
+  let aux_presence default raw_id f state : _ MtLib.conversion_with_warning =
+    match MtIds.read_id_state_enumerate 4 state raw_id with
     | `Failure mess | `WithWarning (mess, _) ->
       `WithWarning(mess, default)
     | `Success l ->
@@ -132,23 +133,23 @@ module NodeValueState = struct
         `WithWarning (
           (fun fmt -> Format.fprintf fmt
               "@[Id %a@ contains@ strange@ state@ {%a}@]"
-              Id.pretty id
+              MtIds.RawId.pretty raw_id
               (Pretty_utils.pp_list ~sep:"@ " ~pre:"" ~suf:""
                  Format.pp_print_int) l;
           ),
           default)
       | `Ok v -> `Success v
 
-  let mutex_presence =
-    aux_presence NotPresent
+  let mutex_presence m =
+    aux_presence NotPresent (MtIds.of_mutex m)
       (function
         | [0] |[1] | [0;1] -> `Ok NotPresent
         | [2] -> `Ok Present
         | [0;2] | [1;2] | [0;1;2] -> `Ok MaybePresent
         | _ -> `Warn)
 
-  let threads_presence started =
-    aux_presence MaybePresent
+  let threads_presence started th =
+    aux_presence MaybePresent (MtIds.of_thread th)
       (fun l -> match l, started with
          | [0], (`Prior | `Started) -> `Ok Present
          | [0], `MaybeStarted -> `Ok MaybePresent
@@ -373,11 +374,11 @@ end
 
 module NodeIdAccess = struct
 
-  include Datatype.Triple_with_collections (RW) (CfgNode) (Id)
+  include Datatype.Triple_with_collections (RW) (CfgNode) (Thread)
 
   let pretty_aux f fmt ((op, node, th) as v : t) =
     Format.fprintf fmt "@[<hov 3>%a@ by %a@ at %a%a@]"
-      RW.pretty op Id.pretty th CfgNode.pretty_stmts node f v
+      RW.pretty op Thread.pretty th CfgNode.pretty_stmts node f v
 
   let pretty = pretty_aux (fun _fmt _v -> ())
 

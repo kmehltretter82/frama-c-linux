@@ -22,7 +22,6 @@
 
 open Cil_types
 open MtTypes
-open MtIds
 open MtThread
 open MtCfgTypes
 open MtMutexesTypes
@@ -58,32 +57,32 @@ let pretty_with_mutexes =
   MtSharedVars.Precise.pretty_concurrent_accesses
     ~f:(fun fmt (_, node, _) ->
         let mutexes = node.cfgn_context.locked_mutexes in
-        if Presence.is_empty mutexes then
+        if MutexPresence.is_empty mutexes then
           Format.fprintf fmt ",@ unprotected"
         else
           Format.fprintf fmt ",@ @[<hov>protected by %a@]"
-            Presence.pretty mutexes ;
+            MutexPresence.pretty mutexes ;
         if MtOptions.PrintCallstacks.get ()
         then Format.fprintf fmt ",@ // %a" Callstack.pretty node.cfgn_stack
       ) ();
 ;;
 
-type protection = Unprotected | Priority | Protected of Id.Set.t
+type protection = Unprotected | Priority | Protected of Mutex.Set.t
 
 let pretty_protection fmt = function
   | Unprotected -> Format.fprintf fmt "unprotected"
   | Priority -> Format.fprintf fmt "protected by priorities"
   | Protected set ->
     Format.fprintf fmt "@[<hov 2>protected by %a@]"
-      (Pretty_utils.pp_iter Id.Set.iter Id.pretty) set
+      (Pretty_utils.pp_iter Mutex.Set.iter Mutex.pretty) set
 
 let pretty_protection_per_thread fmt (th_read, th_write, protection) =
   Format.fprintf fmt "@[<hov 2>Read by %a,@ Write by %a:@ %a@]"
-    Id.pretty th_read.th_id Id.pretty th_write.th_id
+    Thread.pretty th_read Thread.pretty th_write
     pretty_protection protection
 
 type zone_protection =
-  (Locations.Zone.t * (MtThread.thread * MtThread.thread * protection) list) list
+  (Locations.Zone.t * (Thread.t * Thread.t * protection) list) list
 
 let pretty_zone_protection fmt (z, l) =
   Format.fprintf fmt "@[<hv 2>@[%a@]:@ %a@]"
@@ -92,36 +91,36 @@ let pretty_zone_protection fmt (z, l) =
 
 let check_protection analysis (l: MtSharedVars.Precise.list_accesses) : zone_protection =
   let aux (z, s) =
-    let m_read = ref Id.Map.empty in
-    let m_write = ref Id.Map.empty in
+    let m_read = ref Thread.Map.empty in
+    let m_write = ref Thread.Map.empty in
     (* YYY: we disregard information about accesses that may not be possibly
        simultaneous *)
-    let add id node map =
-      let mutexes' = Presence.only_present node.cfgn_context.locked_mutexes in
+    let add th node map =
+      let mutexes' = MutexPresence.only_present node.cfgn_context.locked_mutexes in
       try
-        let mutexes = Id.Map.find id map in
-        let inter = Id.Set.inter mutexes mutexes' in
-        Id.Map.add id inter map
-      with Not_found -> Id.Map.add id mutexes' map
+        let mutexes = Thread.Map.find th map in
+        let inter = Mutex.Set.inter mutexes mutexes' in
+        Thread.Map.add th inter map
+      with Not_found -> Thread.Map.add th mutexes' map
     in
-    let aux_nodes (op, n, thid) =
+    let aux_nodes (op, n, th) =
       match op with
-      | Read ->    m_read  := add thid n !m_read
-      | Write _ -> m_write := add thid n !m_write
+      | Read ->    m_read  := add th n !m_read
+      | Write _ -> m_write := add th n !m_write
     in
     SetNodeIdAccess.iter aux_nodes s;
-    let classify_access id_read read id_write write classified =
-      if not (Id.equal id_read id_write) then begin
-        let th_read = MtThread.thread_of_id analysis id_read in
-        let th_write = MtThread.thread_of_id analysis id_write in
+    let classify_access th_read read th_write write classified =
+      if not (Thread.equal th_read th_write) then begin
+        let th_read_state = MtThread.thread_state analysis th_read in
+        let th_write_state = MtThread.thread_state analysis th_write in
         let protection =
-          match th_read.th_priority, th_write.th_priority with
+          match th_read_state.th_priority, th_write_state.th_priority with
           | PPriority p1, PPriority p2 when p1 > p2 ->
             (* Protection by mutexes not needed, th_read cannot be preempted *)
             Priority
           | _ ->
-            let both_mutexes = Id.Set.inter read write in
-            if Id.Set.is_empty both_mutexes
+            let both_mutexes = Mutex.Set.inter read write in
+            if Mutex.Set.is_empty both_mutexes
             then Unprotected
             else Protected both_mutexes
         in
@@ -130,9 +129,9 @@ let check_protection analysis (l: MtSharedVars.Precise.list_accesses) : zone_pro
       else classified
     in
     let protections =
-      Id.Map.fold (fun id_read read acc ->
-          Id.Map.fold (fun id_write write acc ->
-              classify_access id_read read id_write write acc
+      Thread.Map.fold (fun th_read read acc ->
+          Thread.Map.fold (fun th_write write acc ->
+              classify_access th_read read th_write write acc
             ) !m_write acc
         ) !m_read []
     in
@@ -150,8 +149,8 @@ let ill_protected (accesses: MtSharedVars.Precise.list_accesses) (protections: z
     assert (z == z');
     let aux (th_read, _th_write, protect) =
       if protect = Unprotected then
-        let aux (op, node, thid) =
-          if Id.equal thid th_read.th_id && op = Read then begin
+        let aux (op, node, th) =
+          if Thread.equal th th_read && op = Read then begin
             let stmts = CfgNode.node_stmt node in
             let aux stmt =
               let prev =

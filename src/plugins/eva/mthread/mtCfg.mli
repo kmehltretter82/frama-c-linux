@@ -24,7 +24,7 @@ open MtCfgTypes
 open MtThread
 
 
-val make_cfg: thread -> cfg
+val make_cfg: thread_state -> cfg
 
 (** Remove nodes without multi-thread contents in the automata given by
     the start node, and returns the new start node. Nodes that are concurrent
@@ -47,4 +47,4 @@ val cfg_accesses: thread -> cfg -> AccessesByZoneNode.map
 
 
 
-val update_cfg_contexts: analysis_state -> thread -> unit
+val update_cfg_contexts: analysis_state -> thread_state -> unit

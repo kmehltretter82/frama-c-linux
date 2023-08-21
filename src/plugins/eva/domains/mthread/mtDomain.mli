@@ -23,9 +23,6 @@
 open MtUtils
 open Locations
 
-val current : unit -> MtThread.thread
-val set_current : MtThread.thread -> unit
-
 type memory = { read : Zone.t ; written : Zone.t }
 type return = { standard : Value.t }
 

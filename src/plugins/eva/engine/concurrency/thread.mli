@@ -20,26 +20,34 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open MtUtils
+include Datatype.S_with_collections
 
-type value = Value.t
-type thread = Thread.t
-type status = { running : Trilean.t ; canceled : Trilean.t }
+val main : t
+val is_main : t -> bool
 
-val return_lval : Thread.t -> Eva_ast.lval option
+val id : t -> int
+val label : t -> string
+val find : int -> t option
 
-module Register : sig
-  include Datatype.S_with_collections
-  val id : t -> int
-  val empty : t
-  val top : t
-  val is_included : t -> t -> bool
-  val join : t -> t -> t
-  val narrow : t -> t -> t
-  val find : thread -> t -> status option
+(** [spawn al name kfl args] registers the creation of a thread encountered
+    in Eva analysis, and either add this spawn to an existing thread analysis
+    or create a new thread analysis.
+    @param al the stmt and callstack of the thread creation
+    @param name an optional name often defined by the memory location where the
+         thread identifier will be stored
+    @param kfl the list of possibly used entry points for the new thread
+    @param args the list of arguments used for the thread invocation *)
+val spawn :
+  Analysis_location.local ->
+  Concurency.Name.t option ->
+  Cil_types.kernel_function list ->
+  Cvalue.V.t list ->
+  t list
 
-  val register : thread list -> t -> (t * value) Result.t
-  val start    : value -> t -> (t * value) Result.t
-  val suspend  : value -> t -> (t * value) Result.t
-  val cancel   : value -> t -> (t * value) Result.t
-end
+(* Internal state of the current analysis *)
+
+val reset_state : unit -> unit
+val current : unit -> t
+val set_current : t -> unit
+
+val entry_point : t -> Kernel_function.t

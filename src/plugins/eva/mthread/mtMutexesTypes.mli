@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type access_or_protection = Unaccessed | Mutexes of MtTypes.presence
+type access_or_protection = Unaccessed | Mutexes of MtTypes.MutexPresence.t
 
 type mutexes_by_access = {
   mutexes_for_read: access_or_protection;

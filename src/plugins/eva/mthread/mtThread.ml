@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open MtIds
 open MtTypes
 open MtSharedVarsTypes
 open MtCfgTypes
@@ -91,13 +90,13 @@ module Priority = Datatype.Make_with_collections(struct
     let hash = Hashtbl.hash
   end)
 
+type thread = Thread.t
 
-type thread = {
-  th_id: MtIds.id;
-  th_parent : thread option;
+type thread_state = {
+  th_eva_thread : Thread.t;
+  th_parent : thread_state option;
   th_fun : kernel_function;
   th_stack : Callstack.t;
-  th_eva_thread : Interferences.Thread.t; (* Thread as represented in Eva's engine *)
   mutable th_init_state : Cvalue.Model.t;
   mutable th_params : Cvalue.V.t list;
   mutable th_amap : Trace.t;
@@ -111,8 +110,8 @@ type thread = {
   mutable th_priority: priority;
 }
 
-module Thread = struct
-  type t = thread
+module ThreadState = struct
+  type t = thread_state
 
 (*
   open Unmarshal
@@ -134,35 +133,32 @@ module Thread = struct
     descr
 *)
 
-  let pretty_parent_id fmt = function
-    | None -> Format.fprintf fmt "Main"
-    | Some { th_id = id } -> Format.fprintf fmt "%a" Id.pretty id
+  let label th = Thread.label th.th_eva_thread
+  let is_main th = Thread.is_main th.th_eva_thread
+  let pretty fmt th = Thread.pretty fmt th.th_eva_thread
+  let equal th1 th2 = Thread.equal th1.th_eva_thread th2.th_eva_thread
+  let compare th1 th2 = Thread.compare th1.th_eva_thread th2.th_eva_thread
+  let hash th = Thread.hash th.th_eva_thread
 
-  let pretty fmt th =
-    match th.th_parent with
-    | None ->
-      Format.fprintf fmt "main,@ fun %s"
-        (Kernel_function.get_name th.th_fun)
-    | Some p ->
-      Format.fprintf fmt "%a,@ fun %s,@ parent %a,@ args %a"
-        Id.pretty th.th_id
-        (Kernel_function.get_name th.th_fun)
-        Id.pretty p.th_id
-        (Pretty_utils.pp_list ~sep:",@ " Cvalue.V.pretty) th.th_params
-
-
-  let equal th1 th2 = Id.equal th1.th_id th2.th_id
-  let compare th1 th2 = Id.compare th1.th_id th2.th_id
-  let hash th = Id.hash th.th_id
-
+  let pretty_detailed fmt th =
+    let pp_parent fmt = function
+      | None -> ()
+      | Some p ->
+        Format.fprintf fmt ",@ parent %a,@ args %a"
+          pretty p
+          (Pretty_utils.pp_list ~sep:",@ " Cvalue.V.pretty) th.th_params
+    in
+    Format.fprintf fmt "%a,@ fun %s%a"
+      pretty th
+      (Kernel_function.get_name th.th_fun)
+      pp_parent th.th_parent
 
   let one_creates_other th1 th2 =
     let creates thp ths =
       let rec in_parents ths' = match ths'.th_parent with
         | None -> `Unrelated
-        | Some th ->
-          if Id.equal thp.th_id th.th_id then `Creates (thp, ths)
-          else in_parents th
+        | Some th when equal thp th -> `Creates (thp, ths)
+        | Some th -> in_parents th
       in
       in_parents ths
     in
@@ -171,13 +167,13 @@ module Thread = struct
     | _ as r -> r
 
 
-  module Set = Set.Make(struct type t = thread
+  module Set = Set.Make(struct type t = thread_state
       let compare = compare
     end)
-  module Map = Map.Make(struct type t = thread
+  module Map = Map.Make(struct type t = thread_state
       let compare = compare
     end)
-  module Hashtbl = Hashtbl.Make(struct type t = thread
+  module Hashtbl = FCHashtbl.Make(struct type t = thread_state
       let hash = hash
       let equal = equal
     end)
@@ -198,17 +194,21 @@ end
 (* -------------------------------------------------------------------------- *)
 
 
-type threads_table = thread Id.Hashtbl.t
+type threads_table = thread_state Thread.Hashtbl.t
 
 type analysis_state = {
   all_threads : threads_table (* List of all threads. Is kept (and can thus
                                  increase) from one iteration to the next *);
 
+  all_mutexes: Mutex.Set.t; (** Information on the known mutexes *)
+
+  all_queues: Mqueue.Set.t; (** Information on the known queues *)
+
   mutable iteration: int (* Current iteration of the analysis *);
 
-  mutable main_thread: thread (* Starting thread *);
+  mutable main_thread: thread_state (* Starting thread *);
 
-  mutable curr_thread: thread (* Thread currently running. *);
+  mutable curr_thread: thread_state (* Thread currently running. *);
 
   mutable curr_events_stack: Trace.t list (* Mthread events that have been
                                              found during the current analysis of the current thread. The list
@@ -238,11 +238,6 @@ type analysis_state = {
     (Locations.Zone.t * SetNodeIdAccess.t) list
 (* List of concurrent accesses that have been found. Used to
    compute the field [precise_concurrent_accesses] *);
-
-  mutable known_ids: MtIds.known_ids
-(* Information on the known threads, mutexes and queues found so
-   far *);
-
 }
 
 (* Iterators on threads. We presave the current list of threads so that
@@ -250,25 +245,21 @@ type analysis_state = {
    important for correctness, but is slightly cleaner.). Threads are sorted,
    agains for cleanliness reasons. *)
 let threads analysis =
-  let not_main =
-    Id.Hashtbl.fold_sorted
-      (fun _id th acc ->
-         if not (Thread.equal th analysis.main_thread) then th :: acc else acc)
-      analysis.all_threads []
-  in
-  analysis.main_thread :: List.rev not_main
+  (* the main thread always have the least id and will always be in front of the
+     list *)
+  Thread.Hashtbl.fold_sorted
+    (fun _ th l -> th :: l)
+    analysis.all_threads []
+  |> List.rev
 
-let thread_of_id analysis id =
-  try Id.Hashtbl.find analysis.all_threads id
-  with Not_found -> MtOptions.fatal "Unknown thread %a" Id.pretty id
+let thread_state analysis th =
+  try Thread.Hashtbl.find analysis.all_threads th
+  with Not_found -> MtOptions.fatal "Unknown thread %a" Thread.pretty th
 
 let fold_threads analysis v f =
   List.fold_left (fun acc th -> f th acc) v (threads analysis)
 let iter_threads analysis f =
   List.iter (fun th -> f th) (threads analysis)
-
-let mutexes_ids analysis = MtIds.all_mutexes analysis.known_ids
-let queues_ids analysis = MtIds.all_queues analysis.known_ids
 
 
 let calling_ki analysis = Callstack.top_callsite analysis.curr_stack
@@ -323,61 +314,61 @@ let pop_function_call analysis =
 
 module OrderedThreads = struct
 
-  let threads_children analysis =
+  let family_tree analysis =
     let th_tbl = analysis.all_threads in
     (* The inheritance table has at most as many entries as the general
        thread table *)
-    let thread_creation = Id.Hashtbl.create (Id.Hashtbl.length th_tbl) in
-    Id.Hashtbl.iter_sorted
-      (fun _id thread ->
-         match thread.th_parent with
+    let tree = Thread.Hashtbl.(create (length th_tbl)) in
+    Thread.Hashtbl.iter_sorted
+      (fun th state ->
+         match state.th_parent with
          | None -> () (* This is the main thread *)
-         | Some { th_id = parent } ->
+         | Some parent ->
            let children =
-             try Id.Hashtbl.find thread_creation parent
+             try Thread.Hashtbl.find tree parent.th_eva_thread
              with Not_found -> []
            in
-           Id.Hashtbl.replace thread_creation parent (thread :: children)
+           Thread.Hashtbl.replace tree parent.th_eva_thread (th :: children)
       ) th_tbl;
-    thread_creation
+    tree
   ;;
 
   let creation_map analysis =
-    let h = threads_children analysis in
+    let tree = family_tree analysis in
     (* Not really optimized, but we don't really care here. Mostly,
        threads are created by one single thread, the main one *)
     let rec all_children acc th =
-      let immediate_children = try Id.Hashtbl.find h th.th_id with Not_found -> []
+      let immediate_children = try Thread.Hashtbl.find tree th with Not_found -> []
       and do_child acc th' =
-        let acc' = Id.Set.add th'.th_id acc in
+        let acc' = Thread.Set.add th' acc in
         all_children acc' th'
       in
       List.fold_left do_child acc immediate_children
     in
-    fold_threads analysis Id.Map.empty
+    fold_threads analysis Thread.Map.empty
       (fun th map ->
-         let children = all_children Id.Set.empty th in
-         Id.Map.add th.th_id children map
+         let children = all_children Thread.Set.empty th.th_eva_thread in
+         Thread.Map.add th.th_eva_thread children map
       )
 
   (* Iter a function f over program threads following the an order compatible
      with the partial order induced by thread creation *)
   let ordered_iter analysis =
-    let creation_tbl = threads_children analysis in
+    let tree = family_tree analysis in
     fun f initial ->
       let rec do_thread value th =
         let v = f th value in
         try
-          let children = Id.Hashtbl.find creation_tbl th.th_id in
+          let children = Thread.Hashtbl.find tree th in
           List.iter (do_thread v) children;
         with Not_found -> ()
 
       in
-      do_thread initial analysis.main_thread
+      do_thread initial Thread.main
   ;;
 
   let ordered_fold f acc analysis =
-    let creation_tbl = threads_children analysis in
+    let tree = family_tree analysis in
     let rec do_thread_id_list acc thlist =
       match thlist with
       | [] -> acc
@@ -386,19 +377,19 @@ module OrderedThreads = struct
           List.fold_left
             (fun (glob_acc, next_acc) th ->
                let children =
-                 try Id.Hashtbl.find creation_tbl th.th_id
+                 try Thread.Hashtbl.find tree th
                  with Not_found -> [] in
                (f glob_acc th, children @ next_acc)
             ) (acc, []) thlist in
         do_thread_id_list new_acc next_level
-    in do_thread_id_list acc [analysis.main_thread]
+    in do_thread_id_list acc [Thread.main]
   ;;
 end
 
 
 let should_compute_thread th =
-  (Id.equal th.th_id MtIds.id_main_thread)  ||
-  (let name = th.th_id.id_name in
+  (Thread.is_main th.th_eva_thread) ||
+  (let name = ThreadState.label th in
    (not (Datatype.String.Set.mem name (MtOptions.SkipThreads.get ()))) &&
    let only = MtOptions.OnlyThreads.get () in
    Datatype.String.Set.is_empty only || Datatype.String.Set.mem name only

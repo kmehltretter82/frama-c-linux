@@ -25,7 +25,6 @@ open Visitor
 open Locations
 open MtCil
 open MtMemory.Types
-open MtIds
 open MtTypes
 open MtSharedVarsTypes
 open MtCfgTypes
@@ -73,7 +72,7 @@ type mode = VLocal | VGlobal
 
 type collect_params = {
   stmt_multithread: stmt -> bool;
-  thread_id: id;
+  thread: thread;
   mode: mode;
   iter_requests: stmt -> (Results.request -> unit) -> unit;
   watch_only: Locations.Zone.t;
@@ -112,7 +111,7 @@ class do_it cp =
           let concurrent = Locations.Zone.narrow interesting cp.watch_only in
           let state = AccessesByZone.Map result in
           let v =
-            SetStmtIdAccess.inject_singleton (op, stmt, cp.thread_id)
+            SetStmtIdAccess.inject_singleton (op, stmt, cp.thread)
           in
           match AccessesByZone.add_binding state ~exact:false concurrent v with
           | AccessesByZone.Bottom -> assert false (* state is not Bottom *)
@@ -288,10 +287,10 @@ class do_it cp =
       )
   end
 
-let aux_visitor sm thid sa watch_only =
+let aux_visitor sm th sa watch_only =
   let cp = {
     stmt_multithread = sm;
-    thread_id = thid;
+    thread = th;
     mode = (match sa with Global -> VGlobal | Local _ -> VLocal);
     iter_requests = iter_requests sa;
     watch_only = watch_only;
@@ -304,8 +303,8 @@ let _read_written_by_statement sm thid sa ?(watch_only=Locations.Zone.top) stmt 
   comp#accesses;
 ;;
 
-let read_written_by_function sm thid sa ?(watch_only=Locations.Zone.top) kf ki =
-  let comp = aux_visitor sm thid sa watch_only in
+let read_written_by_function sm th sa ?(watch_only=Locations.Zone.top) kf ki =
+  let comp = aux_visitor sm th sa watch_only in
   (* We position the current statement for calls to leaf functions *)
   (match ki with
    | Kglobal -> ()
@@ -325,8 +324,8 @@ let var_thread_created =
 exception Stmt_is_multithreaded
 let stmt_is_multithreaded analysis sa =
   let iter_requests = iter_requests sa in
-  let main = analysis.main_thread and th = analysis.curr_thread in
-  if MtThread.Thread.equal main th then
+  let th = analysis.curr_thread in
+  if Thread.is_main th.th_eva_thread then
     let v = var_thread_created () in
     (fun stmt ->
        try
@@ -361,7 +360,7 @@ sig
   val all_zones_accessed : list_accesses -> Locations.Zone.t
 
   val concurrent_accesses_all_threads :
-    MtThread.Thread.t list ->
+    MtThread.ThreadState.t list ->
     (list_accesses * list_accesses) * ZoneMap.map
 end
 
@@ -375,16 +374,16 @@ module Aux(X:
            sig
              type info
 
-             module Access: Datatype.S with type t = rw * info * id
+             module Access: Datatype.S with type t = rw * info * Thread.t
              module Set: sig
                include Lattice_type.Lattice_Set with type O.elt = Access.t
                val pretty_aux: Access.t Pretty_utils.formatter -> t Pretty_utils.formatter
              end
              module ZoneMap: Lmap_bitwise.Location_map_bitwise with type v = Set.t
 
-             val thread_data: thread -> ZoneMap.map
+             val thread_data: thread_state -> ZoneMap.map
 
-             val running_concurrently: thp:thread -> ths:thread -> infop:info -> bool
+             val running_concurrently: thp:thread_state -> ths:thread_state -> infop:info -> bool
            end) =
 struct
   include X
@@ -431,7 +430,7 @@ struct
      accesses to a variable need to be considered (ie. if they are really
      concurrent wrt. the calling structure of the threads). *)
   let consider_vars_accesses th1 th2 =
-    match Thread.one_creates_other th1 th2 with
+    match ThreadState.one_creates_other th1 th2 with
     | `Unrelated ->
       (* The two threads are independent, so we have no better choice
          than to assume that all their variable accesses are concurrent *)
@@ -442,7 +441,7 @@ struct
          can occur after [ths] is created, but we do not necessarily
          have this information available  *)
       let before info = X.running_concurrently ~thp ~ths ~infop:info in
-      if Id.equal thp.th_id th1.th_id then
+      if ThreadState.equal thp th1 then
         (fun (_, info, _ : X.Access.t) _ -> before info)
       else
         (fun _ (_, info, _ : X.Access.t) -> before info)
@@ -480,7 +479,7 @@ struct
      [concurrent_accesses_sets] above) *)
   let concurrent_accesses_two_threads th1 th2 =
     MtOptions.debug ~level:2 "Concurrent accessses in threads %a and %a"
-      Id.pretty th1.th_id Id.pretty th2.th_id;
+      ThreadState.pretty th1 ThreadState.pretty th2;
     let consider = consider_vars_accesses th1 th2 in
     (* not a global cache: we have a dependency on [Thread.one_creates_other],
        which is not a pure function. *)
@@ -606,7 +605,7 @@ module Precise = struct
 
       let running_concurrently ~thp:_ ~ths ~infop =
         let context = infop.cfgn_context in
-        match Presence.find context.started_threads ths.th_id with
+        match ThreadPresence.find context.started_threads ths.th_eva_thread with
         | NotPresent -> false
         | MaybePresent | Present -> true
 
@@ -652,10 +651,10 @@ module Precise = struct
     if MtOptions.DumpSharedVarsValues.get () > 1 then
       Format.fprintf fmt "@ %a" Callstack.pretty node.cfgn_stack
 
-  let pp_access (op, node, thid) base offsm =
+  let pp_access (op, node, th) base offsm =
     if MtOptions.DumpSharedVarsValues.get () > 0 then
       MtOptions.result ~once:true "@[%a %as @ @[%a%a@]@ %a@]"
-        Id.pretty thid MtTypes.RW.pretty op Base.pretty base
+        Thread.pretty th MtTypes.RW.pretty op Base.pretty base
         (Cvalue.V_Offsetmap.pretty_generic ?typ:(Base.typeof base) ()) offsm
         pp_stack node
 
@@ -677,21 +676,21 @@ module Precise = struct
       ()
 
   module WriteSeen =
-    Datatype.Triple_with_collections(CfgNode)(Id)(Locations.Location)
+    Datatype.Triple_with_collections(CfgNode)(Thread)(Locations.Location)
 
   let enumerate_written_vars_value m =
     let aux _b _itvs s acc =
-      let aux_nodes (op, node, thid as access) (seen, _wr as acc) =
+      let aux_nodes (op, node, th as access) (seen, _wr as acc) =
         match op with
         | Read -> acc
         | Write loc ->
-          if not (WriteSeen.Set.mem (node, thid, loc) seen) then
+          if not (WriteSeen.Set.mem (node, th, loc) seen) then
             let state = node.cfgn_value_state.state_after in
             let shared = extract_shared_value node op loc state in
             List.fold_left (fun (seen,wr) (base, offsm) ->
                 pp_access access base offsm;
-                let seen = WriteSeen.Set.add (node, thid, loc) seen in
-                (seen, (thid, base, offsm) :: wr))
+                let seen = WriteSeen.Set.add (node, th, loc) seen in
+                (seen, (th, base, offsm) :: wr))
               acc
               shared
           else acc
@@ -779,7 +778,7 @@ let register_concurrent_var_accesses analysis states =
         h
   in
   let accesses = read_written_by_function
-      is_multithreaded analysis.curr_thread.th_id (Local sa)
+      is_multithreaded analysis.curr_thread.th_eva_thread (Local sa)
       ~watch_only:analysis.concurrent_accesses kf ki
   in
   (* We transform the various accesses into mthread events *)

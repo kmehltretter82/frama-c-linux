@@ -22,9 +22,7 @@
 
 open Cil_types
 open MtTypes
-open MtIds
 open MtThread
-;;
 
 module Utilities = struct
 
@@ -92,23 +90,12 @@ end
 (** Module to produce HTML output *)
 module Html = struct
 
-  let translate_string s =
-    let translation_table =
-      Utilities.mk_translation_tbl
-        [ (">", "&gt;")  ;
-          ("<", "&lt;") ;
-          ("&", "&amp;") ;
-        ]
-    in
-    Buffer.contents (Utilities.replace_chars translation_table s)
-  ;;
+  let escape = Extlib.html_escape
 
   let pretty_escaped pp fmt v =
     let s = Format.asprintf "%a" pp v in
-    let s = translate_string s in
+    let s = escape s in
     Format.pp_print_string fmt s
-
-  let pretty_id = pretty_escaped Id.pretty
 
   let dot_escape s =
     let translation_table =
@@ -160,30 +147,7 @@ module Html = struct
     }
   ;;
 
-  let html_fname html_page = translate_string html_page.page_name ^ ".html";;
-
-  (* Bidirectional association tables *)
-  type 'a id_biassoc = {
-    to_id : 'a Id.Hashtbl.t;
-    from_id : ('a, Id.t) Hashtbl.t;
-  }
-  ;;
-
-  let mk_id_biassoc n =
-    { to_id = Id.Hashtbl.create n;
-      from_id = Hashtbl.create n;
-    }
-  ;;
-
-
-  type 'a html_table = {
-    rows : int id_biassoc;
-    columns : int id_biassoc;
-    tbl_contents : 'a array array;
-    row_size : int;
-    col_size : int;
-  }
-  ;;
+  let html_fname html_page = escape html_page.page_name ^ ".html";;
 
 
   type html_div = {
@@ -211,42 +175,147 @@ module Html = struct
       (Buffer.contents div.contents)
   ;;
 
-  let mk_html_table row_list col_list =
-    let row_length = List.length row_list in
-    let rows = mk_id_biassoc row_length in
-    let col_length = List.length col_list in
-    let cols = mk_id_biassoc col_length in
-
-    List.iteri
-      (fun i id ->
-         Id.Hashtbl.add rows.to_id id i;
-         Hashtbl.add rows.from_id i id;
-      ) row_list;
-
-    List.iteri
-      (fun i id ->
-         Id.Hashtbl.add cols.to_id id i;
-         Hashtbl.add cols.from_id i id;
-      ) col_list;
-
-    { rows = rows;
-      columns = cols;
-      tbl_contents = Array.make_matrix row_length col_length empty_string ;
-      row_size = row_length;
-      col_size = col_length;
+  module Biassoc (K : Datatype.S_with_collections) =
+  struct
+    (* Bidirectional association tables *)
+    type 'a t = {
+      to_id : 'a K.Hashtbl.t;
+      from_id : ('a,K.t) Hashtbl.t;
     }
-  ;;
 
+    let mk n =
+      { to_id = K.Hashtbl.create n;
+        from_id = Hashtbl.create n;
+      }
+  end
+
+  module Table (Row : Datatype.S_with_collections) (Col : Datatype.S_with_collections) =
+  struct
+    module Rows = Biassoc (Row)
+    module Cols = Biassoc (Col)
+
+    type 'a html_table = {
+      rows : int Rows.t;
+      columns : int Cols.t;
+      tbl_contents : 'a array array;
+      row_size : int;
+      col_size : int;
+    }
+
+    let mk row_list col_list =
+      let row_length = List.length row_list in
+      let rows = Rows.mk row_length in
+      let col_length = List.length col_list in
+      let cols = Cols.mk col_length in
+
+      List.iteri
+        (fun i k ->
+           Row.Hashtbl.add rows.to_id k i;
+           Hashtbl.add rows.from_id i k;
+        ) row_list;
+
+      List.iteri
+        (fun i k ->
+           Col.Hashtbl.add cols.to_id k i;
+           Hashtbl.add cols.from_id i k;
+        ) col_list;
+
+      { rows = rows;
+        columns = cols;
+        tbl_contents = Array.make_matrix row_length col_length empty_string ;
+        row_size = row_length;
+        col_size = col_length;
+      }
+    ;;
+
+    (* Mark a set of actions according to a marking function
+       in a HTML table
+    *)
+    let mark_action_set mark_fun table action_idtbl =
+      Col.Hashtbl.iter_sorted
+        (fun k aset ->
+           try
+             let col = Col.Hashtbl.find table.columns.to_id k in
+             EventsSet.iter
+               (fun a ->
+                  let id, mark = mark_fun a in
+                  let row = Row.Hashtbl.find table.rows.to_id id in
+                  table.tbl_contents.(row).(col) <-
+                    table.tbl_contents.(row).(col) ^ mark;
+               ) aset
+           with
+           | Not_found -> assert false
+        ) action_idtbl
+
+    (* Pretty print a html table *)
+    let pretty ~pp_row_head ~pp_col_head ~pp_cell ~caption ~legend fmt table =
+      let pp_row fmt i =
+        let row =
+          try
+            Hashtbl.find table.rows.from_id i
+          with
+          | Not_found ->
+            MtOptions.fatal "@[Row %d not found@]@." i
+        in
+
+        let pp_cells fmt cell_array =
+          Array.iter
+            (Format.fprintf fmt "@ @[@{<td class=\"plop\">@ %a@ @}@]" pp_cell)
+            cell_array
+
+        in Format.fprintf fmt
+          "@[<v 1>\
+           @{<tr>@ \
+           @{<th>%a@}\
+           %a\
+           @}\
+           @]"
+          pp_row_head row
+          pp_cells table.tbl_contents.(i)
+      in
+
+      let rec pp_rows fmt i  =
+        if i = table.row_size then Format.fprintf fmt ""
+        else Format.fprintf fmt "@[<v 0>%a@ %a@]"
+            pp_row i
+            pp_rows (i+1)
+      in
+
+      let pp_headers fmt =
+        let rec aux_pp_hdr fmt i =
+          if i = table.col_size then Format.fprintf fmt ""
+          else Format.fprintf fmt "@ @{<th>%a@}%a"
+              pp_col_head (Hashtbl.find table.columns.from_id i)
+              aux_pp_hdr (i+1)
+        in Format.fprintf fmt
+          "@[<v 1>@{<tr>@ \
+           @{<td>%s@}%a\
+           @}@]"
+          legend
+          aux_pp_hdr 0
+
+      in
+      Format.pp_set_tags fmt true;
+      Format.pp_set_formatter_stag_functions fmt html_stag_functions;
+      Format.fprintf fmt "@[<hov 1>@[@{<caption>%s@ @}@ @[%t@]@ %a@]@]@?"
+        caption
+        pp_headers
+        pp_rows 0
+  end
+
+  module LockTable = Table (Mutex) (Thread)
+  module MutexTable = Table (Mutex) (Thread)
+  module QueueTable = Table (Mqueue) (Thread)
 
   (* Generate the set of lock taken in the program by all threads/processes
      And a hash table associating threads to locking procedures (take, release
      ...)
   *)
   let gen_locks_summary th_list =
-    let idlock_tbl = Id.Hashtbl.create (List.length th_list) in
+    let lock_table = Thread.Hashtbl.create (List.length th_list) in
     let lockset =
       List.fold_left
-        (fun lockset (id, th)  ->
+        (fun lockset th ->
            let th_lockset = ref EventsSet.empty in
            let global_lockset =
              Trace.fold' th.th_amap
@@ -255,20 +324,22 @@ module Html = struct
                   | MutexRelease id
                   | MutexLock id ->
                     th_lockset := EventsSet.add action !th_lockset;
-                    Id.Set.add id lockset
+                    Mutex.Set.add id lockset
                   | _ -> lockset
                ) lockset
-           in Id.Hashtbl.add idlock_tbl id !th_lockset;
+           in Thread.Hashtbl.add lock_table th.th_eva_thread !th_lockset;
            global_lockset
-        )  Id.Set.empty th_list
+        )  Mutex.Set.empty th_list
     in
-    if Id.Set.is_empty lockset then None
+    if Mutex.Set.is_empty lockset then None
     else begin
       let lock_olist =
-        List.sort Id.compare_by_name
-          (Id.Set.fold (fun x l -> x :: l) lockset []) in
-      let th_idlist =  List.map fst th_list in
-      Some (idlock_tbl, mk_html_table lock_olist th_idlist)
+        Mutex.Set.elements lockset |>
+        List.map (fun m -> Mutex.label m, m) |>
+        List.fast_sort (fun (s1,_) (s2,_) -> String.compare s1 s2) |>
+        List.map snd
+      in
+      Some (lock_table, LockTable.mk lock_olist (List.map (fun th -> th.th_eva_thread) th_list))
     end
   ;;
 
@@ -277,66 +348,49 @@ module Html = struct
      Also yields a hash table id -> fifo uses
   *)
   let gen_mqueues_summary th_list =
-    let mq_idtbl = Id.Hashtbl.create (List.length th_list) in
-    let queueset =
+    let mq_table = Thread.Hashtbl.create (List.length th_list) in
+    let queue_set =
       List.fold_left
-        (fun queueset (id, th)  ->
-           let th_queueset = ref EventsSet.empty in
-           let global_queueset =
+        (fun queue_set th ->
+           let th_queue_set = ref EventsSet.empty in
+           let global_queue_set =
              Trace.fold' th.th_amap
-               (fun action queueset ->
+               (fun action queue_set ->
                   match action with
-                  | SendMsg (id, _)
-                  | CreateQueue (id, _)
-                  | ReceiveMsg (id, _, _) ->
-                    th_queueset := EventsSet.add action !th_queueset;
-                    MtIds.Id.Set.add id queueset
-                  | _ -> queueset
-               ) queueset
-           in Id.Hashtbl.add mq_idtbl id !th_queueset;
-           global_queueset
-        ) MtIds.Id.Set.empty th_list
+                  | SendMsg (q, _)
+                  | CreateQueue (q, _)
+                  | ReceiveMsg (q, _, _) ->
+                    th_queue_set := EventsSet.add action !th_queue_set;
+                    Mqueue.Set.add q queue_set
+                  | _ -> queue_set
+               ) queue_set
+           in Thread.Hashtbl.add mq_table th.th_eva_thread !th_queue_set;
+           global_queue_set
+        ) Mqueue.Set.empty th_list
     in
     (* Returns mothing when there is no queue in the program *)
-    if Id.Set.is_empty queueset then None
+    if Mqueue.Set.is_empty queue_set then None
     else begin
       let queue_olist =
-        List.sort MtIds.Id.compare_by_name
-          (MtIds.Id.Set.fold (fun x l -> x :: l) queueset []) in
-      let th_list =  List.map fst th_list in
-      assert ((MtIds.Id.Hashtbl.length mq_idtbl) > 0);
-      MtOptions.debug "%d queues found@." (MtIds.Id.Hashtbl.length mq_idtbl);
-      Some (mq_idtbl, mk_html_table queue_olist th_list);
+        Mqueue.Set.elements queue_set |>
+        List.map (fun m -> Mqueue.label m, m) |>
+        List.fast_sort (fun (s1,_) (s2,_) -> String.compare s1 s2) |>
+        List.map snd
+      in
+      assert ((Thread.Hashtbl.length mq_table) > 0);
+      MtOptions.debug "%d queues found@." (Thread.Hashtbl.length mq_table);
+      Some (mq_table, QueueTable.mk queue_olist (List.map (fun th -> th.th_eva_thread) th_list));
     end
   ;;
 
-  (* Mark a set of actions according to a marking function
-     in a HTML table
-  *)
-  let mark_action_set mark_fun html_tbl action_idtbl =
-    Id.Hashtbl.iter_sorted
-      (fun id aset ->
-         try
-           let col = Id.Hashtbl.find html_tbl.columns.to_id id in
-           EventsSet.iter
-             (fun a ->
-                let id, mark = mark_fun a in
-                let row = Id.Hashtbl.find html_tbl.rows.to_id id in
-                html_tbl.tbl_contents.(row).(col) <-
-                  html_tbl.tbl_contents.(row).(col) ^ mark;
-             ) aset
-         with
-         | Not_found -> assert false
-      ) action_idtbl;
-  ;;
 
   (* Columns are thread name, rows are locks *)
   let mark_lock_actions =
-    mark_action_set
+    MutexTable.mark_action_set
       (fun action ->
          match action with
-         | MutexRelease id -> id, "V"
-         | MutexLock id -> id, "P"
+         | MutexRelease m -> m, "V"
+         | MutexLock m -> m, "P"
          | _ -> assert false
          (* This action set is generated by gen_locks_summary
             and should only containt lock-related constructors
@@ -345,7 +399,7 @@ module Html = struct
   ;;
 
   let mark_mqueue_actions =
-    mark_action_set
+    QueueTable.mark_action_set
       (fun action ->
          match action with
          | SendMsg (id, _) -> id, "S"
@@ -358,127 +412,80 @@ module Html = struct
       )
   ;;
 
-
-  (* Pretty print a html table *)
-  let pp_html_tbl pretty_row caption legend  fmt html_tbl  =
-    let pp_row fmt i =
-      let row_thread =
-        try
-          Hashtbl.find html_tbl.rows.from_id i
-        with
-        | Not_found ->
-          MtOptions.fatal "@[Row %d not found@]@." i
-      in
-
-      let pp_cells fmt () =
-        Array.iter
-          (fun s ->
-             Format.fprintf fmt "@ @[@{<td class=\"plop\">@ %s@ @}@]" s
-          ) html_tbl.tbl_contents.(i)
-
-      in Format.fprintf fmt
-        "@[<v 1>\
-         @{<tr>@ \
-         @{<th>%a@}\
-         %a\
-         @}\
-         @]"
-        pretty_row row_thread
-        pp_cells ()
-    in
-
-    let rec pp_rows fmt i  =
-      if i = html_tbl.row_size then Format.fprintf fmt ""
-      else Format.fprintf fmt "@[<v 0>%a@ %a@]"
-          pp_row i
-          pp_rows (i+1)
-    in
-
-    let pp_headers fmt () =
-      let rec aux_pp_hdr fmt i =
-        if i = html_tbl.col_size then Format.fprintf fmt ""
-        else Format.fprintf fmt "@ @{<th>%a@}%a"
-            pretty_row (Hashtbl.find html_tbl.columns.from_id i)
-            aux_pp_hdr (i+1)
-      in Format.fprintf fmt
-        "@[<v 1>@{<tr>@ \
-         @{<td>%s@}%a\
-         @}@]"
-        legend
-        aux_pp_hdr 0
-
-    in
-    Format.pp_set_tags fmt true;
-    Format.pp_set_formatter_stag_functions fmt html_stag_functions;
-    Format.fprintf fmt "@[<hov 1>@[@{<caption>%s@ @}@ @[%a@]@ %a@]@]@?"
-      caption
-      pp_headers ()
-      pp_rows 0
-  ;;
-
-  let pp_id_html_tbl = pp_html_tbl pretty_id;;
-
   (* Generate the html table for lock take/release actions *)
-  let mk_locks_summary div th_idlist =
+  let mk_locks_summary div th_list =
     let b, fmt = div.contents, div.div_fmt in
     Format.pp_set_tags fmt true;
-    match gen_locks_summary th_idlist with
+    match gen_locks_summary th_list with
     | None -> b
-    | Some(idlock_tbl, html_table) ->
-      let html_legend = "uses lock &larr;<br/> &darr;" in
-      mark_lock_actions html_table idlock_tbl;
+    | Some(lock_table, html_table) ->
+      mark_lock_actions html_table lock_table;
+      let pp_table =
+        LockTable.pretty
+          ~pp_row_head:Mutex.pretty
+          ~pp_col_head:Thread.pretty
+          ~pp_cell: Format.pp_print_string
+          ~caption: "P = lock taken, V = lock released"
+          ~legend: "uses lock &larr;<br/> &darr;"
+      in
       Format.fprintf fmt
         "@[<v 1>\
          @{<h3>%s@}@ \
          @{<table>@ %a@ @}</table>\
          @]@?"
         div.title
-        (pp_id_html_tbl "P = lock taken, V = lock released" html_legend) html_table;
+        pp_table html_table;
       b
   ;;
 
   (* Generate the html table for write/receive fifo summaries *)
-  let mk_mqueues_summary div th_idlist =
-    let html_legend = "uses lock &larr;<br/> &darr;" in
-    match gen_mqueues_summary th_idlist with
+  let mk_mqueues_summary div th_list =
+    match gen_mqueues_summary th_list with
     | None -> div.contents
     | Some (queue_idtbl, html_table) ->
       (* Only print when there is something to be said *)
       Format.pp_set_tags div.div_fmt true;
       mark_mqueue_actions html_table queue_idtbl;
+      let pp_table =
+        QueueTable.pretty
+          ~pp_row_head:Mqueue.pretty
+          ~pp_col_head:Thread.pretty
+          ~pp_cell: Format.pp_print_string
+          ~caption: "R = queue read, S = queue written, C = queue created"
+          ~legend: "uses lock &larr;<br/> &darr;"
+      in
       Format.fprintf div.div_fmt
         "@[<v 1>@ \
          @{<h3>%s@}@ \
          @{<table>@ %a@ @}</table>@]@?"
         div.title
-        (pp_id_html_tbl "R = queue read, S = queue written, C = queue created"
-           html_legend) html_table;
+        pp_table html_table;
       div.contents;
   ;;
 
   (* Output a small global summary :
      number of threads and their names
   *)
-  let mk_global_summary th_idlist html_idtbl =
+  let mk_global_summary th_list page_table =
     let b, fmt = Utilities.mk_buffer_formatter () in
     let th_buf, th_fmt = Utilities.mk_buffer_formatter () in
     Format.pp_set_tags fmt true;
     Format.pp_set_tags th_fmt true;
     Format.fprintf th_fmt "@[<v>";
     List.iter
-      (fun (th_id, _) ->
+      (fun th ->
          Format.fprintf th_fmt
            "@[ <li><a href=\"%s\">%a</a></li>@]@ "
-           (html_fname (Id.Hashtbl.find html_idtbl th_id))
-           pretty_id th_id;
-      ) th_idlist;
+           (html_fname (Thread.Hashtbl.find page_table th.th_eva_thread))
+           (pretty_escaped ThreadState.pretty) th;
+      ) th_list;
     Format.fprintf th_fmt "@]@.";
     Format.fprintf fmt "@[<v 1>@[\
                         @{<h1> Summary @}@ \
                         <br/>@ \
                         This program has %d thread(s)@ \
                         @ @{<ul>@ %s @}@]@]@?"
-      (List.length th_idlist)
+      (List.length th_list)
       (Buffer.contents th_buf);
     b
   ;;
@@ -501,7 +508,7 @@ module Html = struct
   let mk_graph_img th =
     let unicode = suspend_unicode () in
     let f_stmt s = Format.sprintf "code.html#%s" (stmt_link s) in
-    let thread_name = Id.sanitize_name th.th_id in
+    let thread_name = Thread.label th.th_eva_thread |> MtLib.sanitize_filename in
     let tmp_file, otmp =  Filename.open_temp_file (thread_name ^ "-") ".dot" in
     let fmt = Format.formatter_of_out_channel otmp in
     MtCfg.dot_fprint_graph fmt th.th_cfg f_stmt;
@@ -514,7 +521,7 @@ module Html = struct
     let fail s =
       MtOptions.error "%s when generating graph for thread %a. \
                        Run 'dot %s' to restart generation"
-        s Id.pretty th.th_id (String.concat " " args)
+        s ThreadState.pretty th (String.concat " " args)
     in
     begin
       try
@@ -538,29 +545,29 @@ module Html = struct
     link_fname
   ;;
 
-  let mk_thread_graph th_idlist =
+  let mk_thread_graph th_list =
     let module ThreadInheritanceGraph = struct
-      include (Graph.Imperative.Digraph.Concrete(MtIds.Id))
+      include (Graph.Imperative.Digraph.Concrete(Thread))
       let graph_attributes _ = []
       let default_vertex_attributes _ = []
       let vertex_name v =
-        let s = Format.asprintf "%a" Id.pretty v in
+        let s = Format.asprintf "%a" Thread.pretty v in
         Buffer.contents (dot_escape s)
       let vertex_attributes v =
-        let s = Format.asprintf "%a" Id.pretty v in
+        let s = Format.asprintf "%a" Thread.pretty v in
         [ `Label (MtLib.escape_non_utf8 s)]
       let get_subgraph _ = None
       let default_edge_attributes _ = [`Style(`Solid);]
       let edge_attributes _ = []
     end
     in
-    let graph = ThreadInheritanceGraph.create ~size:(List.length th_idlist) () in
+    let graph = ThreadInheritanceGraph.create ~size:(List.length th_list) () in
     List.iter
-      (fun (id, th) ->
+      (fun th ->
          match th.th_parent with
-         | None -> ThreadInheritanceGraph.add_vertex graph id;
-         | Some p_id -> ThreadInheritanceGraph.add_edge graph p_id.th_id id
-      ) th_idlist;
+         | None -> ThreadInheritanceGraph.add_vertex graph th.th_eva_thread;
+         | Some parent -> ThreadInheritanceGraph.add_edge graph parent.th_eva_thread th.th_eva_thread
+      ) th_list;
     let module TGDot = Graph.Graphviz.Dot(ThreadInheritanceGraph) in
     let unicode = suspend_unicode () in
     let name = "thread_inheritance_graph" in
@@ -583,9 +590,9 @@ module Html = struct
     link_fname
   ;;
 
-  let mk_thread_graph_div div th_idlist =
+  let mk_thread_graph_div div th_list =
     let b, fmt = div.contents, div.div_fmt in
-    let img = mk_thread_graph th_idlist in
+    let img = mk_thread_graph th_list in
     Format.fprintf fmt "@[<v 0>@{<div> \
                         @{<h3>%s@}\
                         @{<object data=\"%s\" width=\"700\" \
@@ -619,8 +626,8 @@ module Html = struct
        <br/>@ %a@ \
        <br/>@ @{<h3 class=\"back\">Back to @{<a href=\"%s\">index@}@}\
        @]@]@?"
-      (translate_string html_page.page_name)
-      pretty_id th.th_id
+      (escape html_page.page_name)
+      ThreadState.pretty th
       pp_image_link th
       pp_div footer_links
       (html_fname main_page)
@@ -675,19 +682,19 @@ module Html = struct
     close_out ofile;
   ;;
 
-  let mk_main_page page html_idtbl th_idlist =
+  let mk_main_page page page_table th_list =
     (* Do the main page *)
     let buf_init, _fmt_init = page.page_buffer, page.page_fmt in
     let buf_append = Buffer.add_buffer buf_init in
     (* Generate the main page *)
     Buffer.add_string buf_init "<!--(* Generated my mthread *)-->";
-    buf_append (mk_global_summary th_idlist html_idtbl);
+    buf_append (mk_global_summary th_list page_table);
     (* Graph for thread creation *)
-    buf_append (mk_thread_graph_div (mk_div "Thread creation graph") th_idlist);
+    buf_append (mk_thread_graph_div (mk_div "Thread creation graph") th_list);
     (* Table for lock uses *)
-    buf_append (mk_locks_summary (mk_div "Lock operations") th_idlist);
+    buf_append (mk_locks_summary (mk_div "Lock operations") th_list);
     (* Table for queue uses *)
-    buf_append (mk_mqueues_summary (mk_div "Queue operations") th_idlist);
+    buf_append (mk_mqueues_summary (mk_div "Queue operations") th_list);
   ;;
 
   class tagPrinterClass = object(self)
@@ -740,10 +747,13 @@ module Html = struct
   ;;
 
   let output_threads analysis =
-    let ths = List.filter should_compute_thread (threads analysis) in
-    let ths = List.map (fun th -> th.th_id, th) ths in
-    let html_idtbl =
-      Id.Hashtbl.create (List.length ths) in
+    let th_list = List.filter should_compute_thread (threads analysis) in
+    let page_table, add_page, find_page =
+      let module PageTable = Thread.Hashtbl in
+      let page_table =
+        PageTable.create (List.length th_list) in
+      page_table, PageTable.add page_table, PageTable.find page_table
+    in
 
     (try Unix.mkdir default_dir 0o777; with _ -> ());
 
@@ -751,25 +761,18 @@ module Html = struct
     (* Initialize one page with a buffer, a link name, a formatter
        for every thread
     *)
-    let th_ord_list =
-      (* We keep the first separately, as it is the main one *)
-      (List.hd ths) ::
-      List.sort
-        (fun (id1, _) (id2, _) -> Id.compare_by_name id1 id2)
-        (List.tl ths)
-    in
     List.iter
-      (fun (id, _) ->
+      (fun th ->
          let thread_name =
-           Format.asprintf "%a" pretty_id id in
+           Format.asprintf "%a" ThreadState.pretty th in
          let html_page = mk_html_page
              (Format.asprintf "Summary for thread %s" thread_name)
-             (Format.asprintf "%a" Id.pretty id) in
-         Id.Hashtbl.add html_idtbl id html_page;
+             (Format.asprintf "%a" ThreadState.pretty th) in
+         add_page th.th_eva_thread html_page;
          Format.pp_set_formatter_stag_functions
            html_page.page_fmt html_stag_functions;
          Format.pp_set_tags html_page.page_fmt true;
-      ) th_ord_list;
+      ) th_list;
 
     (* Do back links *)
     let mk_footer_links () =
@@ -779,11 +782,11 @@ module Html = struct
       Format.fprintf footer_links.div_fmt
         "@[ <ul class=\"horizontal\">@]";
       List.iter
-        (fun (id, _) ->
-           let hpage = Id.Hashtbl.find html_idtbl id in
+        (fun th ->
+           let hpage = find_page th.th_eva_thread in
            Format.fprintf footer_links.div_fmt
              "@[@{<li class=\"horizontal\">@{<a href=\"%s\">@ %s@}@}@]"
-             (html_fname hpage) (translate_string hpage.page_name)) th_ord_list;
+             (html_fname hpage) (escape hpage.page_name)) th_list;
       Format.fprintf footer_links.div_fmt
         "@[ </ul>@]@.";
     in
@@ -791,15 +794,15 @@ module Html = struct
 
     (* Print pages *)
     List.iter
-      (fun (id, th) ->
-         let details = Id.Hashtbl.find html_idtbl id in
+      (fun th ->
+         let details = find_page th.th_eva_thread in
          pp_thread_details details main_page th
-      ) th_ord_list;
+      ) th_list;
 
-    mk_main_page main_page html_idtbl th_ord_list;
+    mk_main_page main_page page_table th_list;
 
     (* Generate per thread files *)
-    Id.Hashtbl.iter_sorted (fun _id html_page -> pp_page html_page) html_idtbl;
+    Thread.Hashtbl.iter_sorted (fun _th html_page -> pp_page html_page) page_table;
     pp_page main_page;
     ast_to_html "code";
   ;;
@@ -812,16 +815,15 @@ module Eva_results = struct
      results, and set the result as Value's results. *)
   let display analysis =
     let ths = analysis.all_threads in
-    let aux_th _ th acc =
+    let aux_th eva_th th acc =
       match th.th_value_results with
       | None -> acc (* Analysis skipped *)
       | Some results ->
-        let thread = snd th.th_id.id_raw in
-        let change cs = Callstack.{ cs with thread } in
+        let change cs = Callstack.{ cs with thread = Thread.id eva_th } in
         let results' = Eva_results.change_callstacks change results in
         results' :: acc
     in
-    let all_results = MtIds.Id.Hashtbl.fold aux_th ths [] in
+    let all_results = Thread.Hashtbl.fold aux_th ths [] in
     match all_results with
     | [] -> MtOptions.error "No results recorded. Nothing to display"
     | r :: qr ->

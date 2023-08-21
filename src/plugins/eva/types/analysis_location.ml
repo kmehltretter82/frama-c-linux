@@ -20,26 +20,27 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open MtUtils
+module Local =
+struct
+  module Prototype =
+  struct
+    open Cil_datatype
+    include Datatype.Serializable_undefined
 
-type value = Value.t
-type thread = Thread.t
-type status = { running : Trilean.t ; canceled : Trilean.t }
+    type t = Stmt.t * Callstack.t [@@deriving eq, ord]
 
-val return_lval : Thread.t -> Eva_ast.lval option
+    let name = "Analysis_location.Local"
+    let reprs =
+      List.concat_map
+        (fun stmt -> List.map (fun cs -> (stmt,cs)) Callstack.reprs)
+        Stmt.reprs
+    let hash (stmt, cs) =
+      Hashtbl.hash (Stmt.hash stmt, Callstack.hash cs)
+    let pretty fmt (stmt,cs) =
+      Format.fprintf fmt "%a <-@ %a" Stmt.pretty stmt Callstack.pretty cs
+  end
 
-module Register : sig
-  include Datatype.S_with_collections
-  val id : t -> int
-  val empty : t
-  val top : t
-  val is_included : t -> t -> bool
-  val join : t -> t -> t
-  val narrow : t -> t -> t
-  val find : thread -> t -> status option
-
-  val register : thread list -> t -> (t * value) Result.t
-  val start    : value -> t -> (t * value) Result.t
-  val suspend  : value -> t -> (t * value) Result.t
-  val cancel   : value -> t -> (t * value) Result.t
+  include Datatype.Make_with_collections (Prototype)
 end
+
+type local = Local.t

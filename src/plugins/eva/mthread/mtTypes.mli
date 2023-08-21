@@ -24,7 +24,6 @@ open Cil_types
 open Cil_datatype
 open MtCil
 open MtMemory.Types
-open MtIds
 
 
 (** Kind of access to zones *)
@@ -36,23 +35,23 @@ module RW: Datatype.S with type t = rw
 (** Multithread events *)
 
 type event =
-  | CreateThread of id
-  | StartThread of id
-  | SuspendThread of id
-  | CancelThread of id
+  | CreateThread of Thread.t
+  | StartThread of Thread.t
+  | SuspendThread of Thread.t
+  | CancelThread of Thread.t
   | ThreadExit of value
-  | MutexLock of id
-  | MutexRelease of id
-  | CreateQueue of id * int option
-  | SendMsg of id * (slice * int)
-  (** [SendMsg(id, (msg, size))]
-      - [id]: id of the queue
+  | MutexLock of Mutex.t
+  | MutexRelease of Mutex.t
+  | CreateQueue of Mqueue.t * int option
+  | SendMsg of Mqueue.t * (slice * int)
+  (** [SendMsg(q, (msg, size))]
+      - [q]: the queue
       - [msg]: content of the message
       - [size]: size of the message
   *)
-  | ReceiveMsg of id * pointer * int
-  (** [ReceiveMsg(id, ptr, size)]
-      - [id]: id of the queue
+  | ReceiveMsg of Mqueue.t * pointer * int
+  (** [ReceiveMsg(q, ptr, size)]
+      - [q]: the queue
       - [ptr]: loc to which the message must be written
       - [size]: max size to read
   *)
@@ -75,7 +74,7 @@ module EventsSet : sig
   include Set.S with type elt = event
 
   val pretty: ?sep:Pretty_utils.sformat -> unit -> Format.formatter -> t -> unit
-  val threads_created : t -> id list
+  val threads_created : t -> Thread.t list
 end
 type events_set = EventsSet.t
 
@@ -127,10 +126,11 @@ end
 
 type presence_flag = NotPresent | Present | MaybePresent
 
-type presence
+module type Presence = sig
+  type key
+  type t
 
-module Presence: sig
-  type t = presence
+  module KeySet: Set.S with type elt = key
 
   val pretty: t Pretty_utils.formatter
 
@@ -141,12 +141,19 @@ module Presence: sig
   val empty: t
   val is_empty: t -> bool
 
-  val find: t -> id -> presence_flag
+  val find: t -> key -> presence_flag
 
-  val add: id -> presence_flag -> t -> t
+  val add: key -> presence_flag -> t -> t
 
   val combine: t -> t -> t
 
-  val only_present: t -> Id.Set.t
-
+  val only_present: t -> KeySet.t
 end
+
+module ThreadPresence: Presence
+  with type key = Thread.t
+   and module KeySet = Thread.Set
+
+module MutexPresence: Presence
+  with type key = Mutex.t
+   and module KeySet = Mutex.Set

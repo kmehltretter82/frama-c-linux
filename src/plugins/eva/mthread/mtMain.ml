@@ -126,7 +126,9 @@ let mthread_run project =
   let dummy_main_thread =
     MtAnalysisHooks.main_thread f_main Cvalue.Model.empty_map in
   let analysis = {
-    all_threads = MtIds.Id.Hashtbl.create 17;
+    all_threads = Thread.Hashtbl.create 17;
+    all_mutexes = Mutex.Set.empty;
+    all_queues = Mqueue.Set.empty;
     iteration = 0;
     curr_thread = dummy_main_thread;
     main_thread = dummy_main_thread;
@@ -136,7 +138,6 @@ let mthread_run project =
     concurrent_accesses = Locations.Zone.bottom;
     precise_concurrent_accesses = Locations.Zone.bottom;
     concurrent_accesses_by_nodes = [];
-    known_ids = MtIds.no_known_ids;
   } in
 
   (* We register our callback function *)
@@ -155,6 +156,8 @@ let mthread_run project =
   try
     (* We analyse the main thread *)
     MtLib.clear_value_results ();
+    Eva__Private.Thread.reset_state ();
+    Eva__Private.Mutex.reset_state ();
     MtOptions.feedback "*** Computing value analysis for main thread";
     Analysis.compute ();
     MtOptions.feedback "*** First value analysis for main thread done." ;

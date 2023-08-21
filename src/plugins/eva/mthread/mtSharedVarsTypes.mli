@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open MtIds
 open MtTypes
 
 
@@ -37,7 +36,7 @@ end
 
 (** Type of a full access operation to a variable : read or write, statement at
     which the access takes place, thread that does the operation *)
-module StmtIdAccess : Datatype.S with type t = rw * stmt * id
+module StmtIdAccess : Datatype.S with type t = rw * stmt * Thread.t
 
 (** More than one full access to a variable. The boolean indicates
     whether all accesses are dummy ones, ie present just to ensure

@@ -25,7 +25,6 @@ open Cil_datatype
 open MtCil
 open MtMemory.Types
 open MtLib
-open MtIds
 
 
 (* -------------------------------------------------------------------------- *)
@@ -66,16 +65,16 @@ module RW = Datatype.Make(
 (* -------------------------------------------------------------------------- *)
 
 type event =
-  | CreateThread of id
-  | StartThread of id
-  | SuspendThread of id
-  | CancelThread of id
+  | CreateThread of Thread.t
+  | StartThread of Thread.t
+  | SuspendThread of Thread.t
+  | CancelThread of Thread.t
   | ThreadExit of value
-  | MutexLock of id
-  | MutexRelease of id
-  | CreateQueue of id * int option
-  | SendMsg of id * (slice * int)
-  | ReceiveMsg of id * pointer * int
+  | MutexLock of Mutex.t
+  | MutexRelease of Mutex.t
+  | CreateQueue of Mqueue.t * int option
+  | SendMsg of Mqueue.t * (slice * int)
+  | ReceiveMsg of Mqueue.t * pointer * int
   | VarAccess of rw * Locations.Zone.t
   | Dummy of string * value list
 
@@ -83,24 +82,24 @@ module Event = struct
   type t = event
 
   let pretty fmt = function
-    | CreateThread id -> Format.fprintf fmt "Create thread %a" Id.pretty id
-    | StartThread id -> Format.fprintf fmt "Start thread %a" Id.pretty id
-    | SuspendThread id -> Format.fprintf fmt "Suspend thread %a" Id.pretty id
-    | CancelThread id -> Format.fprintf fmt "Cancel thread %a" Id.pretty id
+    | CreateThread th -> Format.fprintf fmt "Create thread %a" Thread.pretty th
+    | StartThread th -> Format.fprintf fmt "Start thread %a" Thread.pretty th
+    | SuspendThread th -> Format.fprintf fmt "Suspend thread %a" Thread.pretty th
+    | CancelThread th -> Format.fprintf fmt "Cancel thread %a" Thread.pretty th
     | ThreadExit v -> Format.fprintf fmt "Thread exit, with code %a"
                         Cvalue.V.pretty v
-    | MutexLock id -> Format.fprintf fmt "Lock %a" Id.pretty id
-    | MutexRelease id -> Format.fprintf fmt "Release %a" Id.pretty id
-    | CreateQueue (id, s) ->
-      Format.fprintf fmt "Creating queue %a%a" Id.pretty id
+    | MutexLock m -> Format.fprintf fmt "Lock %a" Mutex.pretty m
+    | MutexRelease m -> Format.fprintf fmt "Release %a" Mutex.pretty m
+    | CreateQueue (q, s) ->
+      Format.fprintf fmt "Creating queue %a%a" Mqueue.pretty q
         (fun fmt -> function None -> ()
                            | Some s -> Format.fprintf fmt " (size %d)" s) s
-    | SendMsg (id, (v, _s)) -> Format.fprintf fmt
-                                 "Sending@ message@ on %a,@ content@ %a"
-                                 Id.pretty id MtMemory.pretty_slice v
-    | ReceiveMsg (id, loc, size) -> Format.fprintf fmt
-                                      "Receiving@ message@ on %a,@ max size %d,@ stored in %a."
-                                      Id.pretty id size Pointer.pretty loc
+    | SendMsg (q, (v, _s)) -> Format.fprintf fmt
+                                "Sending@ message@ on %a,@ content@ %a"
+                                Mqueue.pretty q MtMemory.pretty_slice v
+    | ReceiveMsg (q, loc, size) -> Format.fprintf fmt
+                                     "Receiving@ message@ on %a,@ max size %d,@ stored in %a."
+                                     Mqueue.pretty q size Pointer.pretty loc
     | VarAccess (rw, loc) ->
       Format.fprintf fmt "Var access@ %a@ of %a"
         RW.pretty rw Locations.Zone.pretty loc
@@ -109,18 +108,18 @@ module Event = struct
         (Pretty_utils.pp_list ~sep:"@ " Cvalue.V.pretty) l
 
   let equal a1 a2 = match a1, a2 with
-    | CreateThread i1, CreateThread i2
-    | StartThread i1, StartThread i2
-    | SuspendThread i1, SuspendThread i2
-    | CancelThread i1, CancelThread i2
-    | MutexLock i1, MutexLock i2
-    | MutexRelease i1, MutexRelease i2 -> Id.equal i1 i2
-    | CreateQueue (i1, s1), CreateQueue (i2, s2) ->
-      Id.equal i1 i2 && s1 = s2
-    | SendMsg (i1, (v1, s1)), SendMsg (i2, (v2, s2)) ->
-      Id.equal i1 i2 && Cvalue.V_Offsetmap.equal v1 v2 && s1 = s2
-    | ReceiveMsg (i1, l1, s1), ReceiveMsg (i2, l2, s2) ->
-      s1 = s2 && Id.equal i1 i2 && Pointer.equal l1 l2
+    | CreateThread th1, CreateThread th2
+    | StartThread th1, StartThread th2
+    | SuspendThread th1, SuspendThread th2
+    | CancelThread th1, CancelThread th2 -> Thread.equal th1 th2
+    | MutexLock m1, MutexLock m2
+    | MutexRelease m1, MutexRelease m2 -> Mutex.equal m1 m2
+    | CreateQueue (q1, s1), CreateQueue (q2, s2) ->
+      Mqueue.equal q1 q2 && s1 = s2
+    | SendMsg (q1, (v1, s1)), SendMsg (q2, (v2, s2)) ->
+      Mqueue.equal q1 q2 && Cvalue.V_Offsetmap.equal v1 v2 && s1 = s2
+    | ReceiveMsg (q1, l1, s1), ReceiveMsg (q2, l2, s2) ->
+      s1 = s2 && Mqueue.equal q1 q2 && Pointer.equal l1 l2
     | VarAccess (rw1, z1), VarAccess (rw2, z2) ->
       RW.equal rw1 rw2 && Locations.Zone.equal z1 z2
     | (CreateThread _ | StartThread _ | SuspendThread _ | CancelThread _
@@ -131,23 +130,23 @@ module Event = struct
 
 
   let compare a1 a2 = match a1, a2 with
-    | CreateThread i1, CreateThread i2
-    | StartThread i1, StartThread i2
-    | SuspendThread i1, SuspendThread i2
-    | CancelThread i1, CancelThread i2
-    | MutexLock i1, MutexLock i2
-    | MutexRelease i1, MutexRelease i2 -> Id.compare i1 i2
+    | CreateThread th1, CreateThread th2
+    | StartThread th1, StartThread th2
+    | SuspendThread th1, SuspendThread th2
+    | CancelThread th1, CancelThread th2 -> Thread.compare th1 th2
+    | MutexLock m1, MutexLock m2
+    | MutexRelease m1, MutexRelease m2 -> Mutex.compare m1 m2
     | ThreadExit v1, ThreadExit v2 -> Cvalue.V.compare v1 v2
-    | CreateQueue (i1, s1), CreateQueue (i2, s2) ->
-      comp compare s1 s2 Id.compare i1 i2
-    | SendMsg (i1, (v1, s1)), SendMsg (i2, (v2, s2)) ->
+    | CreateQueue (q1, s1), CreateQueue (q2, s2) ->
+      comp compare s1 s2 Mqueue.compare q1 q2
+    | SendMsg (q1, (v1, s1)), SendMsg (q2, (v2, s2)) ->
       comp Stdlib.compare s1 s2
-        (comp Cvalue.V_Offsetmap.compare v1 v2 Id.compare)
-        i1 i2
-    | ReceiveMsg (i1, l1, s1), ReceiveMsg (i2, l2, s2) ->
+        (comp Cvalue.V_Offsetmap.compare v1 v2 Mqueue.compare)
+        q1 q2
+    | ReceiveMsg (q1, l1, s1), ReceiveMsg (q2, l2, s2) ->
       comp Stdlib.compare s1 s2
-        (comp Pointer.compare l1 l2 Id.compare)
-        i1 i2
+        (comp Pointer.compare l1 l2 Mqueue.compare)
+        q1 q2
     | VarAccess (rw1, z1), VarAccess (rw2, z2) ->
       comp RW.compare rw1 rw2 Locations.Zone.compare z1 z2
     | Dummy (s1, l1), Dummy (s2, l2) ->
@@ -160,20 +159,20 @@ module Event = struct
       MtLib.compare_tag a1 a2
 
   let hash = function
-    | CreateThread i -> Hashtbl.hash (Id.hash i, 0)
-    | CancelThread i -> Hashtbl.hash (Id.hash i, 1)
-    | MutexLock i -> Hashtbl.hash (Id.hash i, 2)
-    | MutexRelease i -> Hashtbl.hash (Id.hash i, 3)
-    | CreateQueue (i, s) -> Hashtbl.hash (Id.hash i, s, 4)
-    | SendMsg (i, (v, s)) ->
-      Hashtbl.hash (Id.hash i, Cvalue.V_Offsetmap.hash v, s, 5)
-    | ReceiveMsg (i, l, size) ->
-      Hashtbl.hash (Id.hash i, Pointer.hash l, size, 6)
+    | CreateThread th -> Hashtbl.hash (Thread.hash th, 0)
+    | CancelThread th -> Hashtbl.hash (Thread.hash th, 1)
+    | MutexLock m -> Hashtbl.hash (Mutex.hash m, 2)
+    | MutexRelease m -> Hashtbl.hash (Mutex.hash m, 3)
+    | CreateQueue (q, s) -> Hashtbl.hash (Mqueue.hash q, s, 4)
+    | SendMsg (q, (v, s)) ->
+      Hashtbl.hash (Mqueue.hash q, Cvalue.V_Offsetmap.hash v, s, 5)
+    | ReceiveMsg (q, l, size) ->
+      Hashtbl.hash (Mqueue.hash q, Pointer.hash l, size, 6)
     | VarAccess (rw, z) -> Hashtbl.hash (RW.hash rw, Locations.Zone.hash z, 7)
     | ThreadExit v -> Hashtbl.hash (Cvalue.V.hash v, 8)
     | Dummy (s, l) -> Hashtbl.hash (s, List.map Cvalue.V.hash l, 9)
-    | StartThread i -> Hashtbl.hash (Id.hash i, 10)
-    | SuspendThread i -> Hashtbl.hash (Id.hash i, 11)
+    | StartThread th -> Hashtbl.hash (Thread.hash th, 10)
+    | SuspendThread th -> Hashtbl.hash (Thread.hash th, 11)
 
 end
 
@@ -337,22 +336,48 @@ module PresenceFlag = struct
 end
 
 
+module type Presence = sig
+  type key
+  type t
 
-module Presence = struct
+  module KeySet: Set.S with type elt = key
 
-  (* Implementation of maps on ids with hashing information. Invariant:
+  val pretty: t Pretty_utils.formatter
+
+  val equal: t -> t -> bool
+  val hash: t -> int
+  val compare: t -> t -> int
+
+  val empty: t
+  val is_empty: t -> bool
+
+  val find: t -> key -> presence_flag
+
+  val add: key -> presence_flag -> t -> t
+
+  val combine: t -> t -> t
+
+  val only_present: t -> KeySet.t
+end
+
+
+module MakePresence (Key: Datatype.S_with_collections) = struct
+  (* Implementation of maps on threads with hashing information. Invariant:
      we never store [NotPresent] inside the table, as it is the default
      value, and this introduces non-canonicity problems. (This is not
      disastrous per se, but this also implies that [equal m1 m2] does not
      imply [hash m1 = hash m2], a bad idea...) *)
-  module M = Rangemap.Make(Id)(PresenceFlag)
+  module M = Rangemap.Make(Key)(PresenceFlag)
 
   type t = M.t
+  type key = Key.t
 
-  let pretty_with_flag fmt (id, p) = match p with
+  module KeySet = Key.Set
+
+  let pretty_with_flag fmt (th, p) = match p with
     | NotPresent -> ()
-    | MaybePresent -> Format.fprintf fmt "(?)%a" Id.pretty id
-    | Present -> Format.fprintf fmt "%a" Id.pretty id
+    | MaybePresent -> Format.fprintf fmt "(?)%a" Key.pretty th
+    | Present -> Format.fprintf fmt "%a" Key.pretty th
 
   let pretty = Pretty_utils.pp_iter ~pre:"" ~suf:"" ~sep:"@ "
       (fun f -> M.iter (fun k v -> f (k, v))) pretty_with_flag
@@ -391,11 +416,13 @@ module Presence = struct
 
   let only_present m =
     let aux id flag acc =
-      if flag = Present then Id.Set.add id acc else acc
+      if flag = Present then Key.Set.add id acc else acc
     in
-    M.fold aux m Id.Set.empty
+    M.fold aux m KeySet.empty
 
 
 end
 
-type presence = Presence.t
+
+module ThreadPresence = MakePresence (Thread)
+module MutexPresence = MakePresence (Mutex)

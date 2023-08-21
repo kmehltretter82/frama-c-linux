@@ -26,7 +26,6 @@ open MtCil
 open MtTypes
 open MtSharedVarsTypes
 open MtCfgTypes
-open MtIds
 open MtThread
 
 
@@ -813,7 +812,7 @@ let cfg_accesses th node =
     SetZoneAccess.iter
       (fun (rw, z) ->
          let m = AccessesByZoneNode.Map !r in
-         let v = SetNodeIdAccess.inject_singleton (rw, n, th.th_id) in
+         let v = SetNodeIdAccess.inject_singleton (rw, n, th) in
          let m' = AccessesByZoneNode.add_binding m ~exact:false z v in
          match m' with
          | AccessesByZoneNode.Map m -> r := m
@@ -827,28 +826,24 @@ let cfg_accesses th node =
   !r
 
 
-let compute_node_context th_id mutexes iter state node =
+let compute_node_context th mutexes iter state node =
   let extract v = match v with
     | `Success v -> v
     | `WithWarning (mess, v) ->
       MtOptions.warning "%a: %t" CfgNode.pretty_with_stmts node mess; v
   in
   let mutexes =
-    Id.Set.fold
-      (fun id acc ->
-         match id.id_raw with
-         | (IdQueue | IdThread), _ -> acc
-         | IdMutex, _ ->
-           let p = extract (NodeValueState.mutex_presence id state) in
-           Presence.add id p acc
-      ) mutexes Presence.empty
+    Mutex.Set.fold
+      (fun m acc ->
+         let p = extract (NodeValueState.mutex_presence m state) in
+         MutexPresence.add m p acc
+      ) mutexes MutexPresence.empty
   and threads =
-    let presence = ref Presence.empty in
-    let save id v = presence := Presence.add id v !presence in
+    let presence = ref ThreadPresence.empty in
+    let save th v = presence := ThreadPresence.add th v !presence in
     iter
       (fun th' started ->
-         let th' = th'.th_id in
-         if Id.equal th_id th' then `NotStarted
+         if Thread.equal th th' then `NotStarted
          else
            let r = extract (NodeValueState.threads_presence started th' state) in
            save th' r;
@@ -867,11 +862,10 @@ let compute_node_context th_id mutexes iter state node =
   }
 
 let update_cfg_contexts analysis th =
-  let id = th.th_id
-  and mutexes = mutexes_ids analysis
+  let mutexes = analysis.all_mutexes
   and iter = OrderedThreads.ordered_iter analysis
   in
-  let compute_context = compute_node_context id mutexes iter in
+  let compute_context = compute_node_context th.th_eva_thread mutexes iter in
   CfgNode.iter ~f_before:
     (fun node ->
        let state_after = node.cfgn_value_state.state_after in

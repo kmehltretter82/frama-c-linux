@@ -24,7 +24,6 @@ open Eva_ast
 open MtLib
 open MtCil
 open MtMemory.Types
-open MtIds
 open MtTypes
 open MtSharedVarsTypes
 open MtThread
@@ -34,6 +33,11 @@ let no_res = (None : value option)
 
 type hook_sig = (exp * value) list ->  state * value option
 
+let current_loc analysis =
+  match Callstack.top_callsite analysis.curr_stack with
+  | Kglobal -> assert false (* The current stack must contain the call to the builting creating the thread *)
+  | Kstmt stmt ->
+    stmt, Option.get (Callstack.pop analysis.curr_stack)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Specialized logging functions                                      --- *)
@@ -91,22 +95,29 @@ let catch_conversion analysis msg_main v ?(pop_stack=true) ?(code=default_err_co
 (* --- Specialization of id function                                          *)
 (* -------------------------------------------------------------------------- *)
 
-let register_id analysis conv idt p =
-  let v =
-    MtIds.register_new_id analysis.known_ids idt p analysis.curr_stack
-      analysis.curr_thread.th_id analysis.iteration
+let find_failure kind id =
+  let pp fmt =
+    Format.fprintf fmt
+      "Id %d for %s does not exists@ (incrementation@ inside@ program?)."
+      id kind
   in
-  let id, known = conv v () in
-  analysis.known_ids <- known;
-  id
+  `Failure pp
 
-let find_id analysis = MtIds.find_id analysis.known_ids
+let find_thread id =
+  match Thread.find id with
+  | Some th -> `Success th
+  | None -> find_failure "thread" id
 
-let give_name_to_id analysis conv id name =
-  let v = MtIds.give_name_to_id analysis.known_ids id name in
-  let r, known = conv v () in
-  analysis.known_ids <- known;
-  r
+let find_mutex id =
+  match Mutex.find id with
+  | Some m -> `Success m
+  | None -> find_failure "mutex" id
+
+let find_queue id =
+  match Mqueue.find id with
+  | Some q -> `Success q
+  | None -> find_failure "queue" id
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Constants written in memory to store states                        --- *)
@@ -135,7 +146,7 @@ let _queue_init = 1
 (* Auxiliary function which extracts the information into the id and
    call dispatch functions, or return errors when the information is
    not of the proper form *)
-let check_id_content default_msg msg_int (id, state) =
+let check_id_content default_msg msg_int id state =
   let pb pp v = default_msg.pf pp v in
   let value = MtIds.read_id_state state id in
   match Locations.Location_Bytes.fold_i (fun b i l -> (b,i) :: l) value [] with
@@ -156,8 +167,8 @@ let check_id_content default_msg msg_int (id, state) =
     of mutexes. This function sets all mutexes passed as argument to 1
     (unlocked). *)
 let reset_mutexes mutexes state =
-  Id.Set.fold
-    (fun mutex state -> MtIds.replace_id_value state mutex ~before:2 ~after:1)
+  Mutex.Set.fold
+    (fun mutex state -> MtIds.replace_id_value state (MtIds.of_mutex mutex) ~before:2 ~after:1)
     mutexes state
 
 let _mutex_state fmt = function
@@ -174,137 +185,126 @@ let _thread_state fmt = function
   | k -> Format.fprintf fmt "in an@ unknown@ state (%d)" k
 
 
-(** This function checks that the thread we are supposed to create has
-    not already been started in the current thread. *)
-let check_thread_not_already_created id log exn =
-  check_id_content
-    { pf = fun pp v -> log.ppp
-          "Unable to determine that thread %a@ has not already been created.@ \
-           %a should be 0@." Id.pretty id pp v;
-        raise exn
-    }
-    (function
-      | 0 -> ()
-      | _ ->
-        log.ppp "Thread %a@ might have been created previously@ in the \
-                 current thread.@." Id.pretty id;
-        raise exn
-    )
-
-let check_thread_not_already_started warn id =
+let check_thread_not_already_started warn th state =
   check_id_content
     { pf = fun pp v -> warn.ppp
           "Unable to determine that thread %a@ has not already been started.@ \
-           %a should be 0@." Id.pretty id pp v;
+           %a should be 0@." Thread.pretty th pp v;
     }
     (function
       | 2 -> ()
       | 0 ->
-        warn.ppp "Thread %a@ might not be created yet@." Id.pretty id;
+        warn.ppp "Thread %a@ might not be created yet@." Thread.pretty th;
       | 1 ->
         warn.ppp "Thread %a@ might have already been started@ by the \
-                  current thread.@." Id.pretty id;
+                  current thread.@." Thread.pretty th;
       | 3 ->
         warn.ppp "Thread %a@ might have been cancelled @ by the \
-                  current thread.@." Id.pretty id;
+                  current thread.@." Thread.pretty th;
       | _ -> raise Not_found)
+    (MtIds.of_thread th) state
 
-let check_thread_not_already_suspended warn id =
+let check_thread_not_already_suspended warn th state =
   check_id_content
     { pf = fun pp v -> warn.ppp
           "Unable to determine that thread %a@ has not already been suspended.@ \
-           %a should be 0@." Id.pretty id pp v;
+           %a should be 0@." Thread.pretty th pp v;
     }
     (function
       | 1 -> ()
       | 0 ->
-        warn.ppp "Thread %a@ might not be created yet@." Id.pretty id;
+        warn.ppp "Thread %a@ might not be created yet@." Thread.pretty th;
       | 2 ->
         warn.ppp "Thread %a@ might have already been suspended@ by the \
-                  current thread.@." Id.pretty id;
+                  current thread.@." Thread.pretty th;
       | 3 ->
         warn.ppp "Thread %a@ might have been cancelled @ by the \
-                  current thread.@." Id.pretty id;
+                  current thread.@." Thread.pretty th;
       | _ -> raise Not_found)
+    (MtIds.of_thread th) state
 
-let check_thread_not_already_cancelled warn id =
+let check_thread_not_already_cancelled warn th state =
   check_id_content
     { pf = fun pp v -> warn.ppp
           "Unable to determine that thread %a@ has not already been cancelled.@ \
-           %a should be 0@." Id.pretty id pp v;
+           %a should be 0@." Thread.pretty th pp v;
     }
     (function
       | 1 | 2 -> ()
       | 0 ->
-        warn.ppp "Thread %a@ might not be created yet@." Id.pretty id;
+        warn.ppp "Thread %a@ might not be created yet@." Thread.pretty th;
       | 3 ->
         warn.ppp "Thread %a@ might have been already cancelled @ by the \
-                  current thread.@." Id.pretty id;
+                  current thread.@." Thread.pretty th;
       | _ -> raise Not_found)
+    (MtIds.of_thread th) state
 
 
 
-let check_mutex_not_already_initialized warn id =
+let check_mutex_not_already_initialized warn m state =
   check_id_content
     { pf = fun pp v -> warn.ppp
           "@[<hov>Unable to check that mutex %a@ has not been already \
-           initialized;@ %a should be 0@]@." Id.pretty id pp v }
+           initialized;@ %a should be 0@]@." Mutex.pretty m pp v }
     (function
       | 0 -> ()
       | 1 -> warn.ppp "@[<hov>Mutex %a@ might be already initialized@]@."
-               Id.pretty id
+               Mutex.pretty m
       | 2 -> warn.ppp "@[<hov>Mutex %a@ might be already initialized \
-                       (and locked)@]@." Id.pretty id
+                       (and locked)@]@." Mutex.pretty m
       | _ -> raise Not_found)
+    (MtIds.of_mutex m) state
 
-let check_mutex_not_already_locked _analysis warn id =
+let check_mutex_not_already_locked warn m state =
   check_id_content
     { pf = fun pp v -> warn.ppp
           "@[<hov>Unable to check that mutex %a@ has not already been locked;@ \
-           %a should be 1@]@." Id.pretty id pp v }
+           %a should be 1@]@." Mutex.pretty m pp v }
     (function
       | 1 -> ()
       | 0 -> warn.ppp "@[<hov>Mutex %a@ might have not been initialized@]@."
-               Id.pretty id
+               Mutex.pretty m
       | 2 -> warn.ppp "@[<hov>Mutex %a@ might have already been locked@]@."
-               Id.pretty id
+               Mutex.pretty m
       | _ -> raise Not_found)
+    (MtIds.of_mutex m) state
 
-let check_mutex_locked _analysis warn id =
+let check_mutex_locked warn m state =
   check_id_content
     { pf = fun pp v -> warn.ppp
           "@[<hov>Unable to check that mutex %a@ has already been locked;@ \
-           %a should be 2@]@." Id.pretty id pp v }
+           %a should be 2@]@." Mutex.pretty m pp v }
     (function
       | 2 -> ()
       | 0 -> warn.ppp "@[<hov>Mutex %a@ might be uninitialized@]@."
-               Id.pretty id
+               Mutex.pretty m
       | 1 -> warn.ppp "@[<hov>Mutex %a@ might not be locked@]@."
-               Id.pretty id
+               Mutex.pretty m
       | _ -> raise Not_found)
+    (MtIds.of_mutex m) state
 
-
-let check_queue_not_already_initialized warn id =
+let check_queue_not_already_initialized warn q state =
   check_id_content
     { pf = fun pp v -> warn.ppp
           "@[<hov>Unable to check that queue %a@ has not been already \
-           initialized;@ %a should be 0@]@." Id.pretty id pp v }
+           initialized;@ %a should be 0@]@." Mqueue.pretty q pp v }
     (function
       | 0 -> ()
       | 1 -> warn.ppp "@[<hov>Queue %a@ might be@ already@ initialized@]@."
-               Id.pretty id
-      | _ -> raise Not_found)
+               Mqueue.pretty q       | _ -> raise Not_found)
+    (MtIds.of_queue q) state
 
-let check_queue_already_initialized warn id =
+let check_queue_already_initialized warn q state =
   check_id_content
     { pf = fun pp v -> warn.ppp
           "@[<hov>Unable to check that queue %a@ is@ already \
-           initialized;@ %a should be 0@]@." Id.pretty id pp v }
+           initialized;@ %a should be 0@]@." Mqueue.pretty q pp v }
     (function
       | 1 -> ()
       | 0 -> warn.ppp "@[<hov>Queue %a@ might be@ uninitialized@]@."
-               Id.pretty id
+               Mqueue.pretty q
       | _ -> raise Not_found)
+    (MtIds.of_queue q) state
 
 (* -------------------------------------------------------------------------- *)
 (* --- External values for shared zones                                   --- *)
@@ -338,7 +338,7 @@ let sync_values analysis state =
          | Cvalue.Model.Bottom -> state
          | Cvalue.Model.Top -> Cvalue.Model.top
          | Cvalue.Model.Map written ->
-           if not (Thread.equal analysis.curr_thread th) then
+           if not (ThreadState.equal analysis.curr_thread th) then
              join ~written ~state
            else state
       )
@@ -351,14 +351,13 @@ let hook_sync analysis state : hook_sig = function _ ->
 (* --- Creation of a thread                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let basic_thread id stack func state params parent eva_thread = {
-  th_id = id;
+let basic_thread eva_thread stack func state params parent = {
+  th_eva_thread = eva_thread;
   th_stack = stack;
   th_init_state = state;
   th_fun = func;
   th_params = params;
   th_parent = parent;
-  th_eva_thread = eva_thread;
   th_to_recompute = SetRecomputeReason.empty;
   th_read_written = AccessesByZone.empty_map;
   th_amap = Trace.empty;
@@ -370,24 +369,25 @@ let basic_thread id stack func state params parent eva_thread = {
   th_priority= PDefault;
 }
 
-let spawn_thread analysis id stack func state params parent eva_thread =
+let spawn_thread analysis eva_thread stack func state params parent =
   try
-    let th' = Id.Hashtbl.find analysis.all_threads id in
+    let th' = Thread.Hashtbl.find analysis.all_threads eva_thread in
 
-    if Option.equal (fun th th' -> Id.equal th.th_id th'.th_id)
-        parent th'.th_parent = false
+    if Option.equal ThreadState.equal parent th'.th_parent = false
     then (
+      let pp_parent = Pretty_utils.pp_opt ~none:"<none>" ThreadState.pretty in
       log ~kind:Log.Error analysis "Thread '%a' is launched@ by two different \
                                     threads@ (%a and %a).@ Ignoring"
-        Id.pretty id
-        Thread.pretty_parent_id parent Thread.pretty_parent_id th'.th_parent;
+        Thread.pretty eva_thread
+        pp_parent parent
+        pp_parent th'.th_parent;
       hook_fail ())
 
     else if Callstack.equal stack th'.th_stack = false then (
       log ~kind:Log.Error analysis
         "Thread '%a' is launched in two different contexts:@.\
          Context 1:@.@[<hov 2>  %a@]@.Context 2:@.@[<hov 2>  %a@]@.Ignoring"
-        Id.pretty id
+        Thread.pretty eva_thread
         Callstack.pretty stack
         Callstack.pretty th'.th_stack;
       hook_fail ())
@@ -397,7 +397,7 @@ let spawn_thread analysis id stack func state params parent eva_thread =
       log ~kind:Log.Error analysis
         "Thread '%a' can be two different functions@ \
          (%s and %s).@ Imprecise pointer?@ Ignoring."
-        Id.pretty id
+        Thread.pretty eva_thread
         (Kernel_function.get_name func)
         (Kernel_function.get_name th'.th_fun);
       hook_fail ())
@@ -409,18 +409,18 @@ let spawn_thread analysis id stack func state params parent eva_thread =
       in
       th'.th_init_state <- init_state';
       th'.th_params <- args;
-      if ris then Thread.recompute_because th' InitialEnvChanged;
-      if ra  then Thread.recompute_because th' InitialArgsChanged;
+      if ris then ThreadState.recompute_because th' InitialEnvChanged;
+      if ra  then ThreadState.recompute_because th' InitialArgsChanged;
       let text =
         if ris || ra then "New context for" else "Thread" in
-      log ~kind:Log.Result analysis "@[<hov 2>%s@ %a@]" text Thread.pretty th';
+      log ~kind:Log.Result analysis "@[<hov 2>%s@ %a@]" text ThreadState.pretty th';
       th'
     )
   with Not_found ->
-    let th = basic_thread id stack func state params parent eva_thread in
+    let th = basic_thread eva_thread stack func state params parent in
     th.th_to_recompute <- SetRecomputeReason.singleton FirstIteration;
-    Id.Hashtbl.add analysis.all_threads id th;
-    log ~kind:Log.Result analysis "@[<hov>New thread: %a@]" Thread.pretty th;
+    Thread.Hashtbl.add analysis.all_threads eva_thread th;
+    log ~kind:Log.Result analysis "@[<hov>New thread: %a@]" ThreadState.pretty_detailed th;
     th
 
 
@@ -436,8 +436,7 @@ let main_thread k_main initial_state =
     in
     let args = List.map eval_arg formals in
     let stack = Callstack.init k_main in
-    let eva_thread = Interferences.Thread.main () in 
-    basic_thread id_main_thread stack k_main initial_state args None eva_thread
+    basic_thread Thread.main stack k_main initial_state args None
 
 
 (** Set the global variable that indicates that at least one thread is running
@@ -452,13 +451,8 @@ let hook_thread_creation analysis state : hook_sig = function
   | (_, name) :: (_, f) :: params ->
     let conv v = catch_conversion analysis "During@ thread@ creation" v in
     (* We clean the state that will be used by the created thread *)
-    let name' = conv (MtIds.extract_name_hint name)
-        ~msg:"invalid@ thread@ identifier" ()
-    and kf = conv (MtMemory.extract_fun f)
+    let kf = conv (MtMemory.extract_fun f)
         ~msg:"invalid@ thread@ function" () in
-    let id = register_id analysis (fun v () -> conv v ()) IdThread name' in
-    check_thread_not_already_created id (log_poly ~kind:Log.Error analysis)
-      (Hook_failure default_err_code) (id, state);
     let formals = Kernel_function.get_formals kf in
     let rec trunc_params = function
       | [], [] -> []
@@ -466,51 +460,51 @@ let hook_thread_creation analysis state : hook_sig = function
       | [], (_ :: _ as params) ->
         if MtOptions.ModerateWarnings.get () then
           log ~kind:Log.Warning analysis
-            "@[During thread %a@ creation,@ mismatch@ between@ function \
+            "@[During thread@ creation,@ mismatch@ between@ function \
              '%s'@ signature and@ actual arguments.@ Ignoring@ last \
              %d argument(s)@ and@ continuing.@]"
-            Id.pretty id (Kernel_function.get_name kf) (List.length params);
+            (Kernel_function.get_name kf) (List.length params);
         []
       | _ :: _, [] ->
         log ~kind:Log.Error analysis
-          "@[When creating@ thread %a@ from@ function %s:@ too@ few@ \
+          "@[When creating@ thread@ from@ function %s:@ too@ few@ \
            arguments,@ %d expected@ but@ %d given.@ Ignoring.@]"
-          Id.pretty id (Kernel_function.get_name kf)
+          (Kernel_function.get_name kf)
           (List.length formals) (List.length params);
         hook_fail ()
     in
     let params = List.map snd (trunc_params (formals, params)) in
     let eva_thread =
-      match Callstack.top_callsite analysis.curr_stack with
-      | Kglobal -> assert false (* The current stack must contain the call to the builting creating the thread *)
-      | Kstmt stmt ->
-        Interferences.Thread.spawn name stmt kf params
+      let name = Concurency.Name.of_cvalue name in
+      let aloc = current_loc analysis in
+      Thread.spawn aloc name [kf] params |> List.hd
     in
-    ignore (spawn_thread analysis id analysis.curr_stack kf
-              Cvalue.Model.bottom params (Some analysis.curr_thread) eva_thread);
-    register_event analysis (CreateThread id);
+    ignore (spawn_thread analysis eva_thread analysis.curr_stack kf
+              Cvalue.Model.bottom params (Some analysis.curr_thread));
+    register_event analysis (CreateThread eva_thread);
     (* Thread is started as suspended *)
-    MtIds.write_id_state state id 2, wrap_res (id_offset id)
+    MtIds.write_id_state state (MtIds.of_thread eva_thread) 2,
+    wrap_res (Thread.id eva_thread)
 
   | _ -> MtOptions.fatal "Incorrect mthread binding for thread creation"
 (* By typing, __FRAMAC_THREAD_CREATE must receive at least those
    arguments *)
 
 
-let update_initial_state analysis thid state =
+let update_initial_state analysis th state =
   (* From now on, at least two threads are running *)
   let state = thread_is_running state in
   (* Remove references local to the parent thread *)
   let state_started = MtMemory.clear_non_globals state in
   (* Mutexes should be unlocked in the new threads *)
-  let state_started = reset_mutexes (mutexes_ids analysis) state_started in
-  let th = Id.Hashtbl.find analysis.all_threads thid in
+  let state_started = reset_mutexes analysis.all_mutexes state_started in
+  let th =  Thread.Hashtbl.find analysis.all_threads th in
   let initial, changed = MtMemory.join_state th.th_init_state state_started in
   if changed then (
-    Thread.recompute_because th MtThread.InitialEnvChanged;
+    ThreadState.recompute_because th MtThread.InitialEnvChanged;
     if Cvalue.Model.is_reachable th.th_init_state then
       log ~kind:Log.Result analysis "@[<hov 2>New context for@ %a@]"
-        Thread.pretty th;
+        ThreadState.pretty th;
   );
   th.th_init_state <- initial;
   (* Update the state of the creator too: more than one thread is running,
@@ -523,14 +517,14 @@ let hook_thread_start_suspend fname check v aux_state evt analysis state : hook_
     let offset = conv (MtMemory.extract_int offset)
         ~msg:"invalid@ thread@ id" () in
     if offset <> 0 then
-      let id = conv (find_id analysis (IdThread, offset))
+      let th = conv (find_thread offset)
           ~msg:"unkonwn@ thread" () in
-      (check (log_poly ~kind:Log.Warning analysis) id (id, state) : unit);
-      let evt = evt id in
+      (check (log_poly ~kind:Log.Warning analysis) th state : unit);
+      let evt = evt th in
       log ~kind:Log.Result analysis "@[%a@]" Event.pretty evt;
       register_event analysis evt;
-      let state_started = aux_state analysis id (state:state) in
-      MtIds.write_id_state state_started id v, wrap_res 0
+      let state_started = aux_state analysis th (state:state) in
+      MtIds.write_id_state state_started (MtIds.of_thread th) v, wrap_res 0
     else (
       log ~kind:Log.Warning analysis
         "Trying to@ %(%)@ unknown thread.@ Ignoring." fname;
@@ -557,12 +551,12 @@ let hook_thread_cancellation analysis state : hook_sig = function
     let offset = conv (MtMemory.extract_int offset)
         ~msg:"invalid@ thread@ id" () in
     if offset <> 0 then
-      let id = conv (find_id analysis (IdThread, offset))
+      let th = conv (find_thread offset)
           ~msg:"unkonwn@ thread" () in
       check_thread_not_already_cancelled
-        (log_poly ~kind:Log.Warning analysis) id (id, state);
-      register_event analysis (CancelThread id);
-      MtIds.write_id_state state id 2, wrap_res 0
+        (log_poly ~kind:Log.Warning analysis) th state;
+      register_event analysis (CancelThread th);
+      MtIds.write_id_state state (MtIds.of_thread th) 2, wrap_res 0
     else (
       log ~kind:Log.Warning analysis
         "Trying to@ cancel@ unknown thread.@ Ignoring.";
@@ -573,7 +567,7 @@ let hook_thread_cancellation analysis state : hook_sig = function
 
 let hook_thread_exit analysis (_state: state) : hook_sig = function
   | [_, v]  ->
-    if Id.equal analysis.curr_thread.th_id id_main_thread then (
+    if ThreadState.is_main analysis.curr_thread then (
       log ~kind:Log.Error analysis
         "Call@ to@ thread@ exit@ primitive@ inside@ main@ thread. Ignoring";
       hook_fail ())
@@ -587,7 +581,7 @@ let hook_thread_exit analysis (_state: state) : hook_sig = function
                           (only the return value is expected)"
 
 let hook_thread_id analysis state : hook_sig = fun _ ->
-  state, wrap_res (id_offset analysis.curr_thread.th_id)
+  state, wrap_res (Thread.id analysis.curr_thread.th_eva_thread)
 
 
 let hook_thread_priority analysis state : hook_sig = function
@@ -601,9 +595,11 @@ let hook_thread_priority analysis state : hook_sig = function
         match analysis.curr_thread.th_priority with
         | PPriority p' ->
           if p <> p' then begin
-            log ~kind:Log.Warning analysis "Conflicting priorities \
-                                            (previous: %d, new %d) for thread '%a'." p p' Id.pretty
-              analysis.curr_thread.th_id;
+            log ~kind:Log.Warning analysis
+              "Conflicting priorities (previous: %d, new %d) for thread '%a'."
+              p
+              p'
+              ThreadState.pretty analysis.curr_thread;
             (* TODO: add an event + add a recompute reason *)
             analysis.curr_thread.th_priority <- PUnknown;
           end
@@ -623,17 +619,19 @@ let hook_thread_priority analysis state : hook_sig = function
 
 let hook_queue_init analysis state : hook_sig = function
   | [_, name; _, size] ->
-    let conv v = catch_conversion analysis
-        "During@ queue@ initialization" v in
-    let name = conv (MtIds.extract_name_hint name)
-        ~msg:"invalid@ queue@ name" ()
+    let conv v =
+      catch_conversion analysis "During@ queue@ initialization" v
+    in
+    let aloc = current_loc analysis
+    and name = Concurency.Name.of_cvalue name
     and size = conv (MtMemory.extract_int size) ~msg:"invalid@ size" () in
-    let id = register_id analysis (fun v () -> conv v ()) IdQueue name in
+    let q = Mqueue.create aloc name in
     check_queue_not_already_initialized
-      (log_poly ~kind:Log.Warning analysis) id (id, state);
+      (log_poly ~kind:Log.Warning analysis) q state;
     let size = if size < 0 then None else Some size in
-    register_event analysis (CreateQueue (id, size));
-    MtIds.write_id_state state id 1, wrap_res (id_offset id)
+    register_event analysis (CreateQueue (q, size));
+    MtIds.write_id_state state (MtIds.of_queue q) 1,
+    wrap_res (Mqueue.id q)
 
   | _ -> MtOptions.fatal "Incorrect mthread binding for queue creation"
 
@@ -648,12 +646,11 @@ let hook_send_msg analysis state : hook_sig = function
       if sbytes <= 0 then
         conv (`Failure (fun fmt -> Format.fprintf fmt
                            "Invalid message length %d." sbytes)) ();
-      let id_raw = MtIds.IdQueue, offset in
-      let id = conv (find_id analysis id_raw) () in
+      let q = conv (find_queue offset) () in
       let content = MtMemory.read_slice ~p:content ~sbytes state in
       check_queue_already_initialized
-        (log_poly ~kind:Log.Warning analysis) id (id, state);
-      let action = SendMsg (id, (content, sbytes)) in
+        (log_poly ~kind:Log.Warning analysis) q state;
+      let action = SendMsg (q, (content, sbytes)) in
       log ~kind:Log.Result analysis "@[%a@]" Event.pretty action;
       register_event analysis action;
       state, wrap_res 0
@@ -666,14 +663,14 @@ let hook_send_msg analysis state : hook_sig = function
   | _ -> MtOptions.fatal "Incorrect mthread binding for message sending"
 
 
-let find_msg_content analysis queue_id =
+let find_msg_content analysis q =
   let extract_action th acc = function
-    | SendMsg (id, (v, size)) ->
-      if Id.equal id queue_id then (th, v, size) :: acc else acc
+    | SendMsg (q', (v, size)) ->
+      if Mqueue.equal q q' then (th, v, size) :: acc else acc
     | _ -> acc
   in
   fold_threads analysis []
-    (fun { th_id = th; th_amap = m } ->
+    (fun { th_eva_thread = th; th_amap = m } ->
        Trace.fold' m (fun a r -> extract_action th r a))
 
 let hook_receive_msg analysis state : hook_sig = function
@@ -685,13 +682,12 @@ let hook_receive_msg analysis state : hook_sig = function
       let smax = conv (MtMemory.extract_int size) ~msg:"invalid@ size" ()
       and p = conv (MtMemory.extract_pointer loc)
           ~msg:"invalid@ destination@ buffer" () in
-      let id_raw = (MtIds.IdQueue, offset) in
-      let id = conv (find_id analysis id_raw) () in
+      let q = conv (find_queue offset) () in
       check_queue_already_initialized
-        (log_poly ~kind:Log.Warning analysis) id (id, state);
-      let action = ReceiveMsg (id, p, smax) in
+        (log_poly ~kind:Log.Warning analysis) q state;
+      let action = ReceiveMsg (q, p, smax) in
       register_event analysis action;
-      let contents = find_msg_content analysis id in
+      let contents = find_msg_content analysis q in
       let state, res, pp =
         if contents <> [] then
           let length, kept_mess, _, state =
@@ -730,7 +726,7 @@ let hook_receive_msg analysis state : hook_sig = function
                 (Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@,"
                    (fun fmt (th, v, _) ->
                       Format.fprintf fmt "@[From thread %a:@ %a@]"
-                        Id.pretty th
+                        Thread.pretty th
                         MtMemory.pretty_slice v
                    )) kept_mess
             in
@@ -765,13 +761,12 @@ let aux_mutex ~operation:op ~check ~event analysis state : hook_sig = function
     if exact = `WithZero then log ~kind:Log.Warning analysis
         "@[<hov>Trying to@ %(%)@ a possibly@ uninitialized@ mutex.@]" op;
     if offset <> 0 then
-      let id_raw = (IdMutex, offset) in
-      let id = conv (find_id analysis id_raw) () in
-      f_check analysis (log_poly ~kind:Log.Warning analysis) id (id, state);
-      let evt : event = event id in
+      let m = conv (find_mutex offset) () in
+      f_check (log_poly ~kind:Log.Warning analysis) m state;
+      let evt : event = event m in
       log ~kind:Log.Result analysis "%a" Event.pretty evt;
       register_event analysis evt;
-      let state_op = MtIds.write_id_state state id value in
+      let state_op = MtIds.write_id_state state (MtIds.of_mutex m) value in
       (* XXX: take which mutex is locked into account, and update only
          those values *)
       let with_external = sync_values analysis state_op in
@@ -787,15 +782,14 @@ let aux_mutex ~operation:op ~check ~event analysis state : hook_sig = function
 
 let hook_init_mutex analysis state : hook_sig = function
   | [_, name] ->
-    let conv v = catch_conversion analysis
-        "During@ mutex@ initialization" v in
-    let name = conv (MtIds.extract_name_hint name)
-        ~msg:"invalid@ mutex@ name" () in
-    let id = register_id analysis (fun v ()-> conv v ()) MtIds.IdMutex name in
+    let aloc = current_loc analysis
+    and name = Concurency.Name.of_cvalue name in
+    let mutex = Mutex.create aloc name in
     check_mutex_not_already_initialized
-      (log_poly ~kind:Log.Warning analysis) id (id, state);
-    log ~kind:Log.Result analysis "Initializing mutex %a" Id.pretty id;
-    MtIds.write_id_state state id 1, wrap_res (id_offset id)
+      (log_poly ~kind:Log.Warning analysis) mutex state;
+    log ~kind:Log.Result analysis "Initializing mutex %a" Mutex.pretty mutex;
+    MtIds.write_id_state state (MtIds.of_mutex mutex) 1,
+    wrap_res (Mutex.id mutex)
 
   | _ -> (* really unlikely unless the code and/or the C binding
             are really strange *)
@@ -831,34 +825,6 @@ let hook_dummy_message analysis state : hook_sig = function
   | _ -> MtOptions.fatal "Incorrect mthread binding for unknown event"
 
 
-let hook_name_object idt analysis state : hook_sig =
-  let format = IdType.format_lc idt in
-  function
-  | [_, offset; _, name] ->
-    let conv v = catch_conversion analysis ~pop_stack:false
-        ("During@ " ^^ format ^^ "@ naming") v in
-    let name = conv (MtIds.extract_name_hint name)
-        ~msg:("Invalid@ " ^^ format ^^ "@ name") () in
-    let offset = conv (MtMemory.extract_int offset)
-        ~msg:"invalid@ mutex@ id" () in
-    if offset <> 0 then
-      let id_raw = (idt, offset) in
-      let id = conv (find_id analysis id_raw) () in
-      let prev_name = id.id_name in
-      (match give_name_to_id analysis (fun v () -> conv v ()) id name
-       with
-       | None -> ()
-       | Some name -> log ~kind:Log.Result analysis ~pop_stack:false
-                        "%a %s will now be named %s" IdType.pretty idt prev_name name
-      );
-      state, no_res
-    else (
-      log ~pop_stack:false ~kind:Log.Warning analysis
-        "@[<hov>Trying to@ name@ unknown@ %{%}.@ Ignoring@]" format;
-      state, no_res)
-
-  | _ -> MtOptions.fatal "Incorrect mthread binding for %{%} naming" format
-
 (* -------------------------------------------------------------------------- *)
 (** --- Main declarations                                                 --- *)
 (* -------------------------------------------------------------------------- *)
@@ -886,9 +852,6 @@ let mthread_builtins =
     "__FRAMAC_MESSAGE_RECEIVE", hook_receive_msg, `Pop;
     (* Misc *)
     "__FRAMAC_MTHREAD_SHOW", hook_dummy_message, `NoPop;
-    "__FRAMAC_MTHREAD_NAME_THREAD", hook_name_object IdThread, `NoPop;
-    "__FRAMAC_MTHREAD_NAME_MUTEX",  hook_name_object IdMutex,  `NoPop;
-    "__FRAMAC_MTHREAD_NAME_QUEUE",  hook_name_object IdQueue,  `NoPop;
     (* Shared values *)
     "__FRAMAC_MTHREAD_SYNC", hook_sync, `Pop;
   ]
@@ -935,9 +898,8 @@ let catch_functions_calls analysis stack kf state kind =
       let th = main_thread kf state in
       (* This call registers the main thread on the first run, and essentially
          does nothing afterwards *)
-      let th = spawn_thread analysis id_main_thread
-          th.th_stack th.th_fun th.th_init_state th.th_params None
-          th.th_eva_thread in
+      let th = spawn_thread analysis th.th_eva_thread
+          th.th_stack th.th_fun th.th_init_state th.th_params None in
       if analysis.main_thread != th then begin
         (* On the first run, the record [th] is created. It is not contained
            anywhere else, so we update the fields below. *)

@@ -164,15 +164,6 @@ module Id = struct
 
   let id_type id = fst id.id_raw
 
-  let sanitize_name ?(char='_') id =
-    let s = Format.asprintf "%a" pretty id in
-    let is_invalid c =
-      match c with
-      | '&' | '+' | '[' | ']' | '.' -> true
-      | _ -> false
-    in
-    String.map (fun c -> if is_invalid c then char else c) s
-
 end
 
 
@@ -448,14 +439,14 @@ let extract_name_hint value =
 
 
 
-let read_id_state state id =
-  let p = pointer_of_id id.id_raw in
+let read_id_state state raw_id =
+  let p = pointer_of_id raw_id in
   MtMemory.read_int_pointer p state
 
-let read_id_state_enumerate card state id : _ MtLib.conversion =
-  let value = read_id_state state id in
+let read_id_state_enumerate card state raw_id : _ MtLib.conversion =
+  let value = read_id_state state raw_id in
   let failure fmt = Format.fprintf fmt "Id %a contains garbled state %a"
-      Id.pretty id Cvalue.V.pretty value
+      RawId.pretty raw_id Cvalue.V.pretty value
   in
   try
     match Locations.Location_Bytes.fold_i (fun b i l -> (b,i) :: l) value []
@@ -471,12 +462,14 @@ let read_id_state_enumerate card state id : _ MtLib.conversion =
   with Not_found -> `Failure failure
 
 
-let write_id_state state id v =
-  let p = pointer_of_id id.id_raw in
+let write_id_state state raw_id v =
+  let p = pointer_of_id raw_id in
   MtMemory.write_int_pointer p v state
 
-let replace_id_value state id ~before ~after =
-  let p = pointer_of_id id.id_raw in
+let replace_id_value state raw_id ~before ~after =
+  let p = pointer_of_id raw_id in
   MtMemory.replace_value_at_int_pointer p ~before ~after state
 
-let id_offset id = snd id.id_raw
+let of_thread th = IdThread, Thread.id th
+let of_mutex m = IdMutex, Mutex.id m
+let of_queue q = IdQueue, Mqueue.id q

@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open MtCil
-open MtIds
 open MtTypes
 
 
@@ -59,11 +58,11 @@ end
 
 module StmtIdAccess = struct
 
-  include Datatype.Triple_with_collections(RW)(Cil_datatype.Stmt)(Id)
+  include Datatype.Triple_with_collections(RW)(Cil_datatype.Stmt)(Thread)
 
   let pretty fmt ((op, stmt, th) : t) =
     Format.fprintf fmt "%a@ by %a@ at %a"
-      RW.pretty op Id.pretty th pretty_stmt stmt
+      RW.pretty op Thread.pretty th pretty_stmt stmt
 
 end
 

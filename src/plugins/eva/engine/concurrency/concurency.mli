@@ -20,26 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open MtUtils
+(* Name of concurency primitives. Used for display to the user and
+   identifying threads between analyses. *)
 
-type value = Value.t
-type thread = Thread.t
-type status = { running : Trilean.t ; canceled : Trilean.t }
-
-val return_lval : Thread.t -> Eva_ast.lval option
-
-module Register : sig
+module Name : sig
   include Datatype.S_with_collections
-  val id : t -> int
-  val empty : t
-  val top : t
-  val is_included : t -> t -> bool
-  val join : t -> t -> t
-  val narrow : t -> t -> t
-  val find : thread -> t -> status option
-
-  val register : thread list -> t -> (t * value) Result.t
-  val start    : value -> t -> (t * value) Result.t
-  val suspend  : value -> t -> (t * value) Result.t
-  val cancel   : value -> t -> (t * value) Result.t
+  val of_cvalue : Cvalue.V.t -> t option
+  val of_string : string -> t
+  val to_string : t -> string
 end

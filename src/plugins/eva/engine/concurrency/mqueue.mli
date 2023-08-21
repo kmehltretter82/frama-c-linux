@@ -20,26 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open MtUtils
+include Datatype.S_with_collections
 
-type value = Value.t
-type thread = Thread.t
-type status = { running : Trilean.t ; canceled : Trilean.t }
-
-val return_lval : Thread.t -> Eva_ast.lval option
-
-module Register : sig
-  include Datatype.S_with_collections
-  val id : t -> int
-  val empty : t
-  val top : t
-  val is_included : t -> t -> bool
-  val join : t -> t -> t
-  val narrow : t -> t -> t
-  val find : thread -> t -> status option
-
-  val register : thread list -> t -> (t * value) Result.t
-  val start    : value -> t -> (t * value) Result.t
-  val suspend  : value -> t -> (t * value) Result.t
-  val cancel   : value -> t -> (t * value) Result.t
-end
+val id : t -> int
+val label : t -> string
+val find : int -> t option
+val create : Analysis_location.local -> Concurency.Name.t option -> t
+val reset_state : unit -> unit

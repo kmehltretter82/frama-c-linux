@@ -22,19 +22,11 @@
 
 open MtUtils
 
-type name = Name.t
 type value = Value.t
-type mutex
+
 type status =
   | Locked (* Surely locked *)
   | Unlocked (* Maybe unlocked *)
-
-include Datatype.S_with_collections with type t = mutex
-
-val create : name -> mutex
-val id : mutex -> value
-val of_cvalue : value -> mutex Result.t
-val to_cvalue : mutex -> value
 
 module Register : sig
   include Datatype.S
@@ -45,9 +37,9 @@ module Register : sig
   val join : t -> t -> t
   val narrow : t -> t -> t
 
-  val register : mutex -> t -> (t * value) Result.t
-  val lock     : mutex -> t -> (t * value) Result.t
-  val unlock   : mutex -> t -> (t * value) Result.t
+  val register : Mutex.t list -> t -> (t * value) Result.t
+  val lock     : value -> t -> (t * value) Result.t
+  val unlock   : value -> t -> (t * value) Result.t
 
-  val locked_mutexes : t -> Set.t
+  val locked_mutexes : t -> Mutex.Set.t
 end

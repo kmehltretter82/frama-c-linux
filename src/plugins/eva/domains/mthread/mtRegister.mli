@@ -22,24 +22,41 @@
 
 open MtUtils
 
-type value = Value.t
-type thread = Thread.t
-type status = { running : Trilean.t ; canceled : Trilean.t }
 
-val return_lval : Thread.t -> Eva_ast.lval option
+type update_check = Ok | Invalid of (string * bool)
 
-module Register : sig
+module type Key_sig = sig
+  include Hptmap.Id_Datatype
+  val key_name : string
+  val of_value : Value.t -> t list Result.t
+  val to_value : t -> Value.t
+end
+
+module type Status_sig = sig
+  include Lattice_type.Join_Semi_Lattice
+  val default : t
+end
+
+module Make (Key : Key_sig) (Status : Status_sig) : sig
   include Datatype.S_with_collections
-  val id : t -> int
+  type status = Status.t
+  type key = Key.t
+
   val empty : t
+  val id : t -> int
+
+  val mem : key -> t -> bool
+  val find : key -> t -> status option
+  val add : key -> status -> t -> t
+
+  val register : key list -> t -> (t * Value.t) Result.t
+  val update : (status -> status) -> (status -> update_check) ->
+    Value.t -> t -> (t * Value.t) Result.t
+
   val top : t
   val is_included : t -> t -> bool
-  val join : t -> t -> t
   val narrow : t -> t -> t
-  val find : thread -> t -> status option
+  val join : t -> t -> t
 
-  val register : thread list -> t -> (t * value) Result.t
-  val start    : value -> t -> (t * value) Result.t
-  val suspend  : value -> t -> (t * value) Result.t
-  val cancel   : value -> t -> (t * value) Result.t
+  val fold : (key -> status -> 'a -> 'a) -> t -> 'a -> 'a
 end

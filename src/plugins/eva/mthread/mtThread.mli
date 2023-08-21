@@ -23,7 +23,6 @@
 open Cil_types
 open MtMemory.Types
 open MtCil
-open MtIds
 open MtTypes
 open MtSharedVarsTypes
 open MtCfgTypes
@@ -54,15 +53,16 @@ type priority =
 module Priority: Datatype.S with type t = priority
 
 
+type thread = Thread.t
+
 (** The representation of a thread *)
-type thread = {
-  th_id: MtIds.id (** Id of the thread for mthread *);
-  th_parent : thread option (** Thread in which the thread is created. [None]
-                                for the root thread *);
+type thread_state = {
+  th_eva_thread : Thread.t; (* Thread as represented in Eva's engine*)
+  th_parent : thread_state option (** Thread in which the thread is created. [None]
+                                      for the root thread *);
   th_fun : kernel_function (** Function which the thread executes *);
   th_stack : Callstack.t
 (** Call stack resulting in the creation of the thread *);
-  th_eva_thread : Interferences.Thread.t; (* Thread as represented in Eva's engine*)
 
   mutable th_init_state : Cvalue.Model.t
 (** Memory state at the moment the thread is created *);
@@ -100,19 +100,24 @@ type thread = {
     preempted by another thread. *);
 }
 
-module Thread : sig
-  type t = thread
+module ThreadState : sig
+  type t = thread_state
 
+  val is_main: t -> bool
+
+  (** The name of the thread *)
+  val label: t -> string
+
+  (** Prints the name of the thread *)
   val pretty: t Pretty_utils.formatter
 
-  (** The functions below act on [th_id] *)
+  (** Prints the name of the thread with detailed informations *)
+  val pretty_detailed: t Pretty_utils.formatter
+
+  (** The functions below act on thread id *)
   val equal: t -> t -> bool
   val compare: t -> t -> int
   val hash: t -> int
-
-  (** Auxiliary function that can be used to display a field [th_parent]
-      in a consistent way *)
-  val pretty_parent_id : Format.formatter -> thread option -> unit
 
   (** [one_creates_other th1 th2] returns [`Creates (th1, th2)]
       if [th1] creates [the] directly or through another threads,
@@ -120,26 +125,28 @@ module Thread : sig
       otherwise *)
   val one_creates_other: t -> t -> [`Creates of t * t | `Unrelated]
 
-  val recompute_because: thread -> recompute_reason -> unit
+  val recompute_because: t -> recompute_reason -> unit
 
   module Set: Set.S with type elt = t
   module Map: Map.S with type key = t
-  module Hashtbl: Hashtbl.S with type key = t
+  module Hashtbl: FCHashtbl.S with type key = t
 end
 
 
-type threads_table = thread MtIds.Id.Hashtbl.t
-
 type analysis_state = {
-  all_threads : threads_table
+  all_threads : thread_state Thread.Hashtbl.t
 (** List of all threads. Is kept (and can thus increase) from one
     iteration to the next *);
 
+  all_mutexes: Mutex.Set.t; (** Information on the known mutexes *)
+
+  all_queues: Mqueue.Set.t; (** Information on the known queues *)
+
   mutable iteration: int (** Current iteration of the analysis *);
 
-  mutable main_thread: thread (** Starting thread *);
+  mutable main_thread: thread_state (** Starting thread *);
 
-  mutable curr_thread: thread (** Thread currently running. *);
+  mutable curr_thread: thread_state (** Thread currently running. *);
 
   mutable curr_events_stack: Trace.t list (** Mthread events that have been
                                               found during the current analysis of the current thread. The list
@@ -170,16 +177,12 @@ type analysis_state = {
     (Locations.Zone.t * SetNodeIdAccess.t) list
 (** List of concurrent accesses that have been found. Used to
     compute the field [precise_concurrent_accesses] *);
-
-  mutable known_ids: MtIds.known_ids
-(** Information on the known threads, mutexes and queues found so
-    far *);
 }
 
-val threads: analysis_state -> thread list
-val thread_of_id: analysis_state -> id -> thread
-val fold_threads: analysis_state -> 'a -> (thread -> 'a -> 'a) -> 'a
-val iter_threads: analysis_state -> (thread -> unit) -> unit
+val threads: analysis_state -> thread_state list
+val thread_state: analysis_state -> thread -> thread_state
+val fold_threads: analysis_state -> 'a -> (thread_state -> 'a -> 'a) -> 'a
+val iter_threads: analysis_state -> (thread_state -> unit) -> unit
 
 val calling_ki: analysis_state -> kinstr
 val current_fun: analysis_state -> kernel_function
@@ -196,19 +199,16 @@ val push_function_call: analysis_state -> unit
 val pop_function_call: analysis_state -> unit
 
 
-val should_compute_thread: thread -> bool
-
-val mutexes_ids: analysis_state -> Id.Set.t
-val queues_ids: analysis_state -> Id.Set.t
+val should_compute_thread: thread_state -> bool
 
 module OrderedThreads : sig
 
 
-  val threads_children: analysis_state -> thread list Id.Hashtbl.t
+  val family_tree: analysis_state -> thread list Thread.Hashtbl.t
   (** Create a table mapping each thread that creates a thread
       to the threads it creates *)
 
-  val creation_map: analysis_state -> Id.set Id.map
+  val creation_map: analysis_state -> Thread.Set.t Thread.Map.t
   (** Map each existing threads to the id of the threads it recursively
       creates *)
 

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,62 +23,21 @@
 open Lattice_bounds
 
 type 'a domain = (module Abstract.Domain.External with type state = 'a)
-type analysis_location = Callstack.t * Cil_types.stmt
 type thread_id = int
 
 let dkey = Self.register_category "interferences"
 
 
-(* Threads modelization *)
-
-module Thread =
-struct
-  type t = MtThread.thread
-
-  let main () =
-    MtThread.main ()
-
-  let map_arguments kf args =
-    let formals = Kernel_function.get_formals kf in
-    try
-      List.combine formals args
-    with Invalid_argument _ ->
-      Self.abort
-        "Arguments mismatch in thread creation; function %s expected %d \
-         arguments, but %d were given"
-        (Kernel_function.get_name kf) (List.length formals) (List.length args)
-
-  let spawn name stmt kf args =
-    let name = MtUtils.Name.extract_of_cvalue name in
-    let name = MtUtils.Result.value name in
-    let args = map_arguments kf args in
-    MtThread.create name stmt kf args
-
-  let set_current thread =
-    MtDomain.set_current thread
-end
-
-
-(* Analysis location *)
-
-module AnalysisLocation =
-  Datatype.Pair_with_collections
-    (Callstack)
-    (Cil_datatype.Stmt)
-    (struct let module_name = "ProgramLocation" end)
-
-
 (* Interferences type *)
 
-module ThreadTable = MtThread.Hashtbl
-module MutexSet = MtMutex.Set
+module ThreadTable = Thread.Hashtbl
 module MutexesMap =
 struct
-  include Map.Make (MutexSet)
+  include Map.Make (Mutex.Set)
 
   let pretty pp_state =
     Pretty_utils.pp_iter2 ~sep:"@ " ~between:" -> "
-      iter MutexSet.pretty (Top.pretty pp_state)
+      iter Mutex.Set.pretty (Top.pretty pp_state)
 end
 
 type 'a interferences = {
@@ -119,7 +78,7 @@ let structure_mismatch () =
 let add_last_analysis
     (type a)
     ~(domain: a domain)
-    ~(get_state : analysis_location -> a or_top_bottom)
+    ~(get_state : Analysis_location.local -> a or_top_bottom)
     interferences thread concurrent_writes shared_bases =
   let module Dom = (val domain) in
   let dom_join s1 s2 = `Value (Dom.join s1 s2) in
@@ -131,7 +90,7 @@ let add_last_analysis
       let+ state = get_state aloc in
       let mutexes = match Dom.get MtDomain.Domain.key with
         (* Domain disabled, consider that no mutexe is protecting this access *)
-        | None -> MutexSet.empty
+        | None -> Mutex.Set.empty
         | Some extract ->
           let mutexes_status = MtDomain.Domain.mutexes (extract state) in
           MtMutex.Register.locked_mutexes mutexes_status
@@ -141,7 +100,7 @@ let add_last_analysis
     match state with
     | `Bottom -> acc_map (* no interference to add *)
     | `Top ->
-      MutexesMap.add MutexSet.empty `Top acc_map
+      MutexesMap.add Mutex.Set.empty `Top acc_map
     | `Value (state, mutexes) ->
       let update = function
         | None -> Some (`Value state)
@@ -153,7 +112,7 @@ let add_last_analysis
     List.fold_left add_to_map MutexesMap.empty concurrent_writes
   in
   Self.result "concurrent writes: @[%a@]@.interferences: @[%a@]@."
-    (Pretty_utils.pp_list AnalysisLocation.pretty) concurrent_writes
+    (Pretty_utils.pp_list Analysis_location.Local.pretty) concurrent_writes
     (MutexesMap.pretty Dom.pretty) new_interferences;
   (* Add the computed interferences to the table *)
   let Interferences ({ states; structure } as interferences) = interferences in
@@ -171,7 +130,7 @@ let applicable (type a) ~(domain : a domain) (interferences : t) (state : a)
   let module Dom = (val domain) in
   let threads, mutexes = match Dom.get MtDomain.Domain.key with
     (* Domain disabled, no information about threads and mutexes *)
-    | None -> MtThread.Register.empty, MtMutex.Set.empty
+    | None -> MtThread.Register.empty, Mutex.Set.empty
     (* Domain enabled *)
     | Some extract ->
       let mt_state = extract state in
@@ -184,14 +143,14 @@ let applicable (type a) ~(domain : a domain) (interferences : t) (state : a)
   | Some Eq ->
     let dom_join s1 s2 = `Value (Dom.join s1 s2) in
     let add mutexes' state' acc_state =
-      if MutexSet.disjoint mutexes mutexes'
+      if Mutex.Set.disjoint mutexes mutexes'
       (* No mutexes in common, this interference is applicable *)
       then TopBottom.join dom_join acc_state (state' :> _ or_top_bottom)
       (* At least one mutex in common, this interfence cannot apply *)
       else acc_state
     in
     let add_thread thread state_map acc_state =
-      let is_current_thread = MtThread.equal thread (MtDomain.current ()) in
+      let is_current_thread = Thread.(equal thread (current ())) in
       let maybe_running =
         match MtThread.Register.find thread threads with
         (* Thread status is uknown, consider that the thread might be running*)
@@ -212,7 +171,7 @@ let inject (type a) ~(domain : a domain) (interferences : t) (state : a) : a =
   if is_empty interferences
   (* No interferences computed, single threaded analysis *)
   then state
-  else begin    
+  else begin
     let need_injection =
       match Dom.get MtDomain.Domain.key with
       (* Domain disabled, no information about memory read/written, always inject *)

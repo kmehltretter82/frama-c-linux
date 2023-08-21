@@ -105,6 +105,7 @@ type offset_match =
   | MatchType of typ (** Offset that has this type (modulo attributes) *)
   | MatchSize of Integer.t (** Offset that has a type of this size *)
   | MatchFirst (** Return first symbolic offset that matches *)
+  | MatchLast (** Return the longest offset that matches*)
 
 exception NoMatchingOffset
 

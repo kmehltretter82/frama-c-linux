@@ -131,3 +131,12 @@ let clear_value_results () =
 
 let mthread_h () =
   MtOptions.MThread.Share.get_file "mthread.h";;
+
+
+let sanitize_filename ?(char='_') s =
+  let is_invalid c =
+    match c with
+    | '&' | '+' | '[' | ']' | '.' -> true
+    | _ -> false
+  in
+  String.map (fun c -> if is_invalid c then char else c) s

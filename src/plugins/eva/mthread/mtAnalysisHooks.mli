@@ -24,7 +24,7 @@ open MtMemory.Types
 open MtThread
 
 (** A correct value for the main thread *)
-val main_thread: Cil_types.kernel_function -> state -> thread
+val main_thread: Cil_types.kernel_function -> state -> thread_state
 
 
 (** Exception to be returned when a hook did not process fully correctly, to be

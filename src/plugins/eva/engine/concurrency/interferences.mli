@@ -20,26 +20,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open MtUtils
+type 'a domain = (module Abstract.Domain.External with type state = 'a)
+type thread_id = int
+type t
 
-type value = Value.t
-type thread = Thread.t
-type status = { running : Trilean.t ; canceled : Trilean.t }
+(** Current interferences, set by Mthread *)
+val current : t ref
 
-val return_lval : Thread.t -> Eva_ast.lval option
+(** Create a new interferences abstract representation, fitted for the given
+    domain*)
+val initial : 'a domain -> t
 
-module Register : sig
-  include Datatype.S_with_collections
-  val id : t -> int
-  val empty : t
-  val top : t
-  val is_included : t -> t -> bool
-  val join : t -> t -> t
-  val narrow : t -> t -> t
-  val find : thread -> t -> status option
+(** Add the last Eva analysis results to the given interferences abstract
+    representation. *)
+val add_last_analysis :
+  domain:'a domain ->
+  get_state:(Analysis_location.local -> 'a Lattice_bounds.or_top_bottom) ->
+  t -> Thread.t -> Analysis_location.local list -> Base.Hptset.t -> unit
 
-  val register : thread list -> t -> (t * value) Result.t
-  val start    : value -> t -> (t * value) Result.t
-  val suspend  : value -> t -> (t * value) Result.t
-  val cancel   : value -> t -> (t * value) Result.t
-end
+(** Inject applicable interferences to an abstract state. If activated,
+    the Mthread domain helps filtering applicable interferences. This function
+    is the identity if the Mthread domain can infer that no shared memory has
+    been read or written during the last transfer function. *)
+val inject : domain:'a domain -> t -> 'a -> 'a

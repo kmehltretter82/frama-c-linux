@@ -73,3 +73,6 @@ val clear_value_results: unit -> unit
 
 (** Location of the header file "mthread.h" *)
 val mthread_h: unit -> Filepath.Normalized.t
+
+(** Remove specialchars forbidden in file names *)
+val sanitize_filename: ?char:char -> string -> string

@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-type id_type = IdThread | IdMutex | IdQueue
+type id_type
 
 module IdType :
 sig
@@ -64,7 +64,6 @@ sig
   type 'a map = 'a Map.t
   val compare_by_name : t -> t -> int
   val id_type : id -> id_type
-  val sanitize_name : ?char:char -> t -> string
 end
 
 type known_ids = {
@@ -119,12 +118,15 @@ val pointer_of_id : raw_id -> MtMemory.Types.pointer
 exception NoNiceName
 val nice_offset : Cil_types.typ -> int -> string -> string
 val extract_name_hint : Cvalue.V.t -> id_name_hint MtLib.conversion
-val read_id_state : MtMemory.Types.state -> id -> MtMemory.Types.value
+val read_id_state : MtMemory.Types.state -> raw_id -> MtMemory.Types.value
 val read_id_state_enumerate :
-  int -> MtMemory.Types.state -> Id.t -> int list MtLib.conversion
+  int -> MtMemory.Types.state -> raw_id -> int list MtLib.conversion
 val write_id_state :
-  MtMemory.Types.state -> id -> int -> MtMemory.Types.state
+  MtMemory.Types.state -> raw_id -> int -> MtMemory.Types.state
 val replace_id_value :
   MtMemory.Types.state ->
-  id -> before:int -> after:int -> MtMemory.Types.state
-val id_offset : id -> int
+  raw_id -> before:int -> after:int -> MtMemory.Types.state
+
+val of_thread : Thread.t -> raw_id
+val of_mutex: Mutex.t -> raw_id
+val of_queue: Mqueue.t -> raw_id

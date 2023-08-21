@@ -24,12 +24,7 @@ open Eval
 open MtUtils
 open Eva_ast
 open Locations
-
-
-
-let current, set_current =
-  let thread = ref MtThread.main in
-  (fun () -> !thread ()), (fun new_thread -> thread := fun () -> new_thread)
+open Concurency
 
 
 
@@ -340,7 +335,7 @@ module Transfer = struct
     { read ; written }
 
   let assign_return lval result return =
-    let main_return = MtThread.return_lval (current ()) in
+    let main_return = MtThread.return_lval (Thread.current ()) in
     if Option.equal Eva_ast.Lval.equal main_return (Some lval) then
       let bottom = Value.{ standard = bottom } in
       let f value = { standard = value } in
@@ -414,9 +409,8 @@ module Domain = struct
   let create_main_thread state =
     let open Result in
     let threads = state.threads in
-    let main_thread = MtThread.main () in
-    let* (threads, _) = MtThread.Register.register main_thread threads in
-    let+ (threads, _) = MtThread.Register.start main_thread threads in
+    let* (threads, r) = MtThread.Register.register [Thread.main] threads in
+    let+ (threads, _) = MtThread.Register.start r threads in
     { state with threads }
 
   let empty () =
@@ -445,32 +439,22 @@ module Domain = struct
     let results = BuiltinsResults.leave_scope kf vars state.results in
     { state with results }
 
-  let build_args name func formals params =
-    let zip formal (param, _) = (formal, param) in
-    try Result.ok (List.map2 zip formals params)
-    with Invalid_argument _ ->
-      Result.error
-        "@[During thread %a creation,@ mismatch@ between@ function \
-         '%a' signature and@ actual arguments.@]"
-        Name.pretty name Kernel_function.pretty func
-
   let thread_create state stmt = function
-    | (name, _) :: (func, _) :: params ->
+    | (name, _) :: (func, _) :: args ->
       let open Result in
-      let* name = Name.extract_of_cvalue name in
+      let name = Name.of_cvalue name in
       let* func = Value.extract_fun func in
-      let formals = Kernel_function.get_formals func in
-      let* args = build_args name func formals params in
-      let th = MtThread.create name stmt func args in
-      let+ (threads, return) = MtThread.Register.register th state.threads in
+      let args = List.map fst args in
+      let aloc = (stmt, Eva_utils.current_call_stack ()) in
+      let th_list = Thread.spawn aloc name func args in
+      let+ threads, return = MtThread.Register.register th_list state.threads in
       { state with threads }, return
     | _ -> Result.error "Invalid parameters@."
 
   let thread_update f state _ = function
     | (id, _) :: [] ->
       let open Result in
-      let* thread = MtThread.of_cvalue id in
-      let+ (threads, return) = f thread state.threads in
+      let+ (threads, return) = f id state.threads in
       { state with threads }, return
     | _ -> Result.error "Invalid parameters@."
 
@@ -479,31 +463,30 @@ module Domain = struct
   let thread_cancel  = thread_update MtThread.Register.cancel
 
   let thread_id state _ = function
-    | [] -> Result.ok (state, current () |> MtThread.to_cvalue)
+    | [] -> Result.ok (state, Thread.current () |> Thread.id |> Value.of_int)
     | _ -> Result.error "Invalid parameters@."
 
-  let mutex_init state _ = function
+  let mutex_init state stmt = function
     | (name, _) :: [] ->
       let open Result in
-      let* name = Name.extract_of_cvalue name in
-      let mutex = MtMutex.create name in
-      let+ (mutexes, return) = MtMutex.Register.register mutex state.mutexes in
+      let name = Name.of_cvalue name in
+      let aloc = (stmt, Eva_utils.current_call_stack ()) in
+      let mutex = Mutex.create aloc name in
+      let+ (mutexes, return) = MtMutex.Register.register [mutex] state.mutexes in
       { state with mutexes }, return
     | _ -> Result.error "Invalid parameters@."
 
   let mutex_lock state _ = function
     | (id, _) :: [] ->
       let open Result in
-      let* mutex = MtMutex.of_cvalue id in
-      let+ (mutexes, return) = MtMutex.Register.lock mutex state.mutexes in
+      let+ (mutexes, return) = MtMutex.Register.lock id state.mutexes in
       { state with mutexes }, return
     | _ -> Result.error "Invalid parameters@."
 
   let mutex_unlock state _ = function
     | (id, _) :: [] ->
       let open Result in
-      let* mutex = MtMutex.of_cvalue id in
-      let+ (mutexes, return) = MtMutex.Register.unlock mutex state.mutexes in
+      let+ (mutexes, return) = MtMutex.Register.unlock id state.mutexes in
       { state with mutexes }, return
     | _ -> Result.error "Invalid parameters@."
 

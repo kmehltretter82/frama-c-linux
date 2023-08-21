@@ -25,7 +25,7 @@ val mutexes_protecting_zones' :
   MtMutexesTypes.MutexesByZone.t
 val pretty_with_mutexes :
   Format.formatter -> MtSharedVars.Precise.list_accesses -> unit
-type protection = Unprotected | Priority | Protected of MtIds.Id.Set.t
+type protection = Unprotected | Priority | Protected of Mutex.Set.t
 val pretty_protection : Format.formatter -> protection -> unit
 val pretty_protection_per_thread :
   Format.formatter -> MtThread.thread * MtThread.thread * protection -> unit

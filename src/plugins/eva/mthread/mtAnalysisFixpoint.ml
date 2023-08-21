@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open MtIds
 open MtTypes
 open MtSharedVarsTypes
 open MtMutexesTypes
@@ -38,23 +37,23 @@ let mark_new_messages_received analysis =
   (* YYY Not monotonic *)
   let diff = EventsSet.diff send_after send_before in
   if not (EventsSet.is_empty diff) then
-    let ids = EventsSet.fold
-        (fun evt ids -> match evt with
-           | SendMsg (id, _) -> Id.Set.add id ids
-           | _ -> ids) diff Id.Set.empty
+    let queues = EventsSet.fold
+        (fun evt queues -> match evt with
+           | SendMsg (q, _) -> Mqueue.Set.add q queues
+           | _ -> queues) diff Mqueue.Set.empty
     in
     MtOptions.debug "@[New message(s) sent@ on@ queue(s) %a@]"
-      (Pretty_utils.pp_iter Id.Set.iter Id.pretty) ids;
+      (Pretty_utils.pp_iter Mqueue.Set.iter Mqueue.pretty) queues;
     iter_threads analysis
       (fun th ->
          let should_recompute _stack = function
-           | ReceiveMsg (id, _, _) -> Id.Set.mem id ids
+           | ReceiveMsg (q, _, _) -> Mqueue.Set.mem q queues
            | _ -> false
          in
          if Trace.exists th.th_amap should_recompute
          then (MtOptions.debug "Marking %a as having received new message(s)"
-                 Id.pretty th.th_id;
-               Thread.recompute_because th NewMsgReceived)
+                 ThreadState.pretty th;
+               ThreadState.recompute_because th NewMsgReceived)
       );
 ;;
 
@@ -69,7 +68,7 @@ let record_end_of_thread_analysis analysis interferences =
   th.th_value_results <- Some results;
 
   if MtOptions.ToDisk.get () then
-    let th = MtIds.Id.sanitize_name th.th_id in
+    let th = ThreadState.label th |> MtLib.sanitize_filename in
     let name = Format.sprintf "%s%s_iteration_%d.sav"
         (MtOptions.ToDiskPrefix.get ())
         th analysis.iteration in
@@ -77,7 +76,7 @@ let record_end_of_thread_analysis analysis interferences =
   else begin
     let p = lazy(
       let pname = Format.asprintf "%a, iteration %d"
-          Id.pretty th.th_id analysis.iteration
+          ThreadState.pretty th analysis.iteration
       in
       Project.create_by_copy ~last:false pname)
     in
@@ -99,7 +98,7 @@ let record_end_of_thread_analysis analysis interferences =
   let state_accesser = MtMemory.Types.Global in
   let read_written = MtSharedVars.read_written_by_function
       (MtSharedVars.stmt_is_multithreaded analysis state_accesser)
-      th.th_id state_accesser th.th_fun Kglobal in
+      th.th_eva_thread state_accesser th.th_fun Kglobal in
   th.th_read_written <- read_written;
   MtOptions.result ~level:3 "@[<v 0>Globals accessed by thread:@ %a@]"
     AccessesByZone.pretty_map read_written;
@@ -114,7 +113,7 @@ let record_end_of_thread_analysis analysis interferences =
   (* Compute the concurrent graph of this thread *)
   MtOptions.feedback ~level:2 "* Computing cfg";
   th.th_cfg <- MtCfg.make_cfg th;
-  th.th_read_written_cfg <- MtCfg.cfg_accesses th th.th_cfg;
+  th.th_read_written_cfg <- MtCfg.cfg_accesses th.th_eva_thread th.th_cfg;
   MtOptions.feedback ~level:2 "* Cfg computed";
 ;;
 
@@ -127,7 +126,7 @@ let compute_thread analysis th =
   Messages.reset_once_flag ();
 
   MtOptions.feedback ~level:2 "* Computing value analysis for thread %a"
-    Id.pretty th.th_id;
+    Thread.pretty th.th_eva_thread;
   MtOptions.debug "@[<hov>Arguments@ %a@]"
     (Pretty_utils.pp_list Cvalue.V.pretty) th.th_params;
   MtOptions.debug ~level:2 "Initial state %a"
@@ -147,14 +146,14 @@ let compute_thread analysis th =
   Globals.set_entry_point (Kernel_function.get_name th.th_fun) false;
   Eva_results.set_initial_state th.th_init_state;
   Eva_results.set_main_args th.th_params;
-  Interferences.Thread.set_current th.th_eva_thread;
+  Eva__Private.Thread.set_current th.th_eva_thread;
 
   Analysis.compute ();
 
   if MtOptions.ShowTime.get () then
     MtOptions.feedback ~level:2
       "* Value analysis computed for thread %a, %f sec"
-      Id.pretty th.th_id (Sys.time () -. time);
+      ThreadState.pretty th (Sys.time () -. time);
 ;;
 
 let recompute_shared_vars_changed analysis before =
@@ -164,7 +163,7 @@ let recompute_shared_vars_changed analysis before =
              (fun z _ () ->
                 if not (Locations.Zone.is_included z before) then raise Exit)
              th.th_read_written ()
-       with Exit -> Thread.recompute_because th PotentialSharedVarsChanged
+       with Exit -> ThreadState.recompute_because th PotentialSharedVarsChanged
     )
 ;;
 
@@ -195,7 +194,7 @@ let recompute_shared_vars_values_changed analysis th before now =
     in
     iter_threads analysis
       (fun th' ->
-         if not (Id.equal th'.th_id th.th_id) then
+         if not (ThreadState.equal th' th) then
            try
              AccessesByZone.fold
                (fun z accesses () ->
@@ -203,7 +202,7 @@ let recompute_shared_vars_values_changed analysis th before now =
                      (* YYY: recompute also threads that only write the variable?*)
                      (SetStmtIdAccess.exists (fun (op, _,_) -> op = Read) accesses)
                   then (
-                    Thread.recompute_because th' SharedVarsValuesChanged;
+                    ThreadState.recompute_because th' SharedVarsValuesChanged;
                     raise Exit (* Speed up things, th' will be recomputed *) )
                ) th'.th_read_written ()
            with Exit -> ()
@@ -286,7 +285,7 @@ let compute_shared_vars analysis =
    updated to ensure correct convergence *)
 let store_written_value analysis lw =
   let aux th =
-    let l = List.filter (fun (id, _, _) -> Id.equal id th.th_id) lw in
+    let l = List.filter (fun (id, _, _) -> Thread.equal id th.th_eva_thread) lw in
     let old_written = th.th_values_written in
     let written = MtSharedVars.Precise.join_shared_values l in
     (* XXX: temporary *)
@@ -301,7 +300,7 @@ let store_written_value analysis lw =
        not (Cvalue.Model.equal Cvalue.Model.empty_map written)
     then
       MtOptions.result "@[Write summary for %a%t:@ %a@]"
-        Id.pretty th.th_id
+        ThreadState.pretty th
         (fun fmt -> if changed then Format.fprintf fmt " (updated)")
         Cvalue.Model.pretty written;
     th.th_values_written <- written
@@ -320,7 +319,7 @@ let one_iteration analysis interferences =
            if Cvalue.Model.is_reachable th.th_init_state then (
              MtOptions.feedback
                "@[<hov 2>*** Computing thread %a,@ iteration %d@ (%a)@]"
-               Id.pretty th.th_id analysis.iteration
+               ThreadState.pretty th analysis.iteration
                (Pretty_utils.pp_iter ~sep:",@ "
                   SetRecomputeReason.iter RecomputeReason.pretty)
                th.th_to_recompute;
@@ -329,18 +328,18 @@ let one_iteration analysis interferences =
 
              (* We save all our results *)
              record_end_of_thread_analysis analysis interferences;
-             MtOptions.feedback "*** Thread %a computed" Id.pretty th.th_id;
+             MtOptions.feedback "*** Thread %a computed" ThreadState.pretty th;
            ) else (
              MtOptions.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
-                                 not started. Skipping.@]"  Id.pretty th.th_id
+                                 not started. Skipping.@]"  ThreadState.pretty th
            )
          else (
            MtOptions.feedback "*** Skipping thread %a as requested"
-             Id.pretty th.th_id;
+             ThreadState.pretty th;
          );
          th.th_to_recompute <- SetRecomputeReason.empty;
        ) else
-         MtOptions.debug "No need to recompute thread %a" Id.pretty th.th_id
+         MtOptions.debug "No need to recompute thread %a" ThreadState.pretty th
     );
   MtOptions.feedback "***** Threads computed for iteration %d."
     analysis.iteration;
@@ -447,7 +446,7 @@ let reach_fixpoint analysis interferences =
         (fun fmt () -> iter_threads analysis
             (fun th -> if not (SetRecomputeReason.is_empty th.th_to_recompute) then
                 Format.fprintf fmt "@[<hov 2>Thread %a:@ %a@]@ "
-                  Id.pretty th.th_id
+                  ThreadState.pretty_detailed th
                   (Pretty_utils.pp_iter ~sep:",@ " ~pre:"" ~suf:""
                      SetRecomputeReason.iter RecomputeReason.pretty)
                   th.th_to_recompute

@@ -21,103 +21,32 @@
 (**************************************************************************)
 
 open MtUtils
-open Cil_types
 
-
-
-type name = Name.t
-type value = Value.t
-type args  = (varinfo * value) list
-
-module Thread = struct
-  type thread' =
-    { name: name ; stmt: stmt ; func: kernel_function ; args: args }
-
-  let dummy_unhashconsed =
-    let name = Name.of_string "dummy" in
-    let stmt = Cil.dummyStmt in
-    let func = List.hd (Cil_datatype.Kf.reprs) in
-    { name ; stmt ; func ; args = [] }
-
-  module Thread' = Datatype.Make_with_collections (struct
-      include Datatype.Serializable_undefined
-      type t = thread'
-      let name = "Mthread.thread"
-      let reprs = [ dummy_unhashconsed ]
-      let compare x y =
-        let cmp_var = Cil_datatype.Varinfo.compare in
-        let cmp_val = Value.compare in
-        let cmp_arg (ix, vx) (iy, vy) = cmp_var ix iy <?> lazy (cmp_val vx vy) in
-        Name.compare x.name y.name
-        <?> lazy (Cil_datatype.Stmt.compare x.stmt y.stmt)
-        <?> lazy (Kernel_function.compare x.func y.func)
-        <?> lazy (List.compare cmp_arg x.args y.args)
-      let equal x y = compare x y = 0
-      let hash = Hashtbl.hash
-      let pretty fmt { name ; stmt ; func ; args } =
-        let pp_sep fmt () = Format.fprintf fmt ";@ " in
-        let pp_var = Cil_datatype.Varinfo.pretty in
-        let pp_val = Value.pretty in
-        let pp fmt (var, v) = Format.fprintf fmt "%a <- %a" pp_var var pp_val v in
-        Format.fprintf fmt
-          "@[<v 2>Thread name :@ @[<hov>%a@]@]@\n\
-           @[<v 2>At statement:@ @[<hov>%a@]@]@\n\
-           @[<v 2>Executing   :@ @[<hov>%a@]@]@\n\
-           @[<v 2>With args   :@ @[<hov>%a@]@]"
-          Name.pretty name
-          Cil_datatype.Stmt.pretty stmt
-          Kernel_function.pretty func
-          Format.(pp_print_list ~pp_sep pp) args
-    end)
-
-  module ThreadInfos = struct
-    let name = "Mthread.thread.hashconsed"
-    let dependencies = []
-    let initial_values = Thread'.reprs
-  end
-
-  include State_builder.Hashcons (Thread') (ThreadInfos)
-  let key_name = "thread"
-  let key_id thread = id thread + 1 |> Z.of_int |> Value.inject_int
-  let pretty_msg fmt t = get t |> fun { name } -> Name.pretty fmt name
-end
-
+type value = Cvalue.V.t
 type thread = Thread.t
-include Thread
 
-let id = key_id
-
-let hashcons, of_cvalue =
-  let module Cache = Datatype.Int.Hashtbl in
-  let cache : t Cache.t = Cache.create 10 in
-  let hashcons thread =
-    let hashconsed = Thread.hashcons thread in
-    let id = Thread.id hashconsed + 1 in
-    Cache.add cache id hashconsed ;
-    hashconsed
-  and of_cvalue cvalue =
-    match Value.extract_singleton cvalue with
-    | None -> Result.error "Not a singleton value."
-    | Some id ->
-      match Cache.find_opt cache id with
-      | None -> Result.error "Not a valid thread id."
-      | Some thread -> Result.ok thread
-  in
-  hashcons, of_cvalue
-
-let create name stmt func args = hashcons { name ; stmt ; func ; args }
-let dummy = hashcons Thread.dummy_unhashconsed
-let to_cvalue thread = Thread.id thread |> Z.of_int |> Value.inject_int
-let main () =
-  let name = Name.of_string "main" in
-  let stmt = Cil.dummyStmt in
-  let f () = Globals.entry_point () |> fst in
-  try hashcons { name ; stmt ; func = f () ; args = [] }
-  with Globals.No_such_entry_point m -> Self.fatal "%s Mthread cannot run" m
 
 let return_lval thread =
-  let { func } = get thread in
-  Option.map Eva_ast.Build.var (Library_functions.get_retres_vi func)
+  let kf = Thread.entry_point thread in
+  Option.map Eva_ast.Build.var (Library_functions.get_retres_vi kf)
+
+module Thread =
+struct
+  include Thread
+  let name = "MtThread.Thread"
+  let key_name = "thread"
+  let of_value x =
+    let open Result in
+    let* l = Value.to_int_list x in
+    let convert_one acc id =
+      let* acc = acc in
+      match find id with
+      | None -> Result.error "Not a valid thread id '%d'." id
+      | Some th -> Result.ok (th :: acc)
+    in
+    List.fold_left convert_one (Result.ok []) l
+  let to_value th = Value.of_int (id th)
+end
 
 
 
@@ -165,11 +94,10 @@ end
 
 
 module Register = struct
-  include MtUtils.Register (Thread) (Status)
+  include MtRegister.Make (Thread) (Status)
 
   let change_running ok msg =
-    let after = Trilean.not ok in
-    let new_status status = { status with running = after } in
+    let new_status status = { status with running = ok } in
     update new_status @@ fun { running } ->
     if Trilean.equal running ok then Ok
     else Invalid (msg, Trilean.equal running after)

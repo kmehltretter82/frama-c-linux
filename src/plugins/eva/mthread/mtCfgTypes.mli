@@ -22,16 +22,16 @@
 
 open Cil_types
 open MtMemory.Types
-open MtIds
 open MtTypes
 open MtSharedVarsTypes
 
+type thread = Thread.t
 
 (** Live threads/taken mutexes at a given point of execution *)
 
 type context = {
-  started_threads : presence;
-  locked_mutexes : presence;
+  started_threads : ThreadPresence.t;
+  locked_mutexes : MutexPresence.t;
 }
 
 module Context: sig
@@ -94,9 +94,9 @@ module NodeValueState: sig
 
   val threads_presence:
     [> `NotStarted | `Prior | `Started | `MaybeStarted]
-    -> id -> state -> presence_flag MtLib.conversion_with_warning
+    -> Thread.t -> state -> presence_flag MtLib.conversion_with_warning
 
-  val mutex_presence: id -> state -> presence_flag MtLib.conversion_with_warning
+  val mutex_presence: Mutex.t -> state -> presence_flag MtLib.conversion_with_warning
 
 end
 
@@ -201,7 +201,7 @@ module CfgNode : sig
 end
 
 
-module NodeIdAccess : Datatype.S with type t = rw * node * id
+module NodeIdAccess : Datatype.S with type t = rw * node * thread
 
 module SetNodeIdAccess: sig
   include Lattice_type.Lattice_Set with type O.elt = NodeIdAccess.t
