@@ -8013,9 +8013,22 @@ and doInitializer local_env (vi: varinfo) (inite: Cabs.init_expression)
   *)
   : chunk * init * typ * Cil_datatype.Lval.Set.t =
 
+  let checkArrayInit ty init =
+    match ty, init with
+    | TArray _,
+      (COMPOUND_INIT _
+      | SINGLE_INIT {expr_node = CONSTANT (CONST_STRING _
+                                          | CONST_WSTRING _)}) -> ()
+    | TArray _, _ ->
+      Kernel.error ~current:true ~once:true
+        "Array initializer must be an initializer list or string literal"
+    | _ ->
+      ()
+  in
   Kernel.debug ~dkey:Kernel.dkey_typing_init
     "@\nStarting a new initializer for %s : %a@\n"
     vi.vname Cil_datatype.Typ.pretty vi.vtype;
+  checkArrayInit vi.vtype inite;
   let acc, preinit, restl =
     let so = makeSubobj vi vi.vtype NoOffset in
     let asconst = if vi.vglob then CConst else CNoConst in
@@ -8796,6 +8809,16 @@ and createLocal ghost ((_, sto, _, _) as specs)
       (inite: Cabs.init_expression)) as init_name)
   : chunk =
   let loc = convLoc cloc in
+  let checkArray init vi =
+    if init == Cabs.NO_INIT
+    then
+      match vi.vtype with
+      | TArray (_, None, _) ->
+        Kernel.error ~once:true ~current:true
+          "variable %s with array type needs an explicit size or an initializer"
+          vi.vorig_name
+      | _ -> ()
+  in
   (* Check if we are declaring a function *)
   let rec isProto (dt: decl_type) : bool =
     match dt with
@@ -8833,6 +8856,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     let vi = makeVarInfoCabs ~ghost ~isformal:false
         ~isglobal:true
         loc specs (n, ndt, a) in
+    checkArray inite vi;
     vi.vname <- newname;
     let attrs = Cil.addAttribute (Attr (fc_local_static,[])) vi.vattr in
     vi.vattr <- fc_stdlib_attribute attrs;
@@ -8879,6 +8903,8 @@ and createLocal ghost ((_, sto, _, _) as specs)
 
   (* Maybe we have an extern declaration. Make it a global *)
   | _ when sto = Extern ->
+    if inite <> Cabs.NO_INIT
+    then Kernel.error ~current:true "\'extern\' variable cannot have an initializer";
     let vi = createGlobal ghost None specs init_name in
     (* Add it to the local environment to ensure that it shadows previous
      * local variables *)
@@ -8891,6 +8917,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     let vi,se0,len,isvarsize =
       makeVarSizeVarInfo ghost loc specs (n, ndt, a) in
 
+    checkArray inite vi;
     let vi = alphaConvertVarAndAddToEnv true vi in        (* Replace vi *)
     if isvarsize then begin
       let free = vla_free_fun () in
