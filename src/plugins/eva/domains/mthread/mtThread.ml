@@ -96,11 +96,12 @@ end
 module Register = struct
   include MtRegister.Make (Thread) (Status)
 
-  let change_running ok msg =
-    let new_status status = { status with running = ok } in
-    update new_status @@ fun { running } ->
-    if Trilean.equal running ok then Ok
-    else Invalid (msg, Trilean.equal running after)
+  let change_running running msg =
+    let new_status status = { status with running } in
+    update new_status @@ fun { running=previous } ->
+    if Trilean.intersects running previous
+    then Invalid (msg, Trilean.equal running previous)
+    else Ok
 
   let start = change_running True "running"
   let suspend = change_running False "suspended"

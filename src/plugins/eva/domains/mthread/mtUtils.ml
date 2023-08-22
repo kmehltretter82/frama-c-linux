@@ -114,6 +114,7 @@ module Trilean = struct
   let top = Unknown
   let is_unknown = function Unknown -> true | _ -> false
   let is_included x y = is_unknown y || equal x y
+  let intersects x y = is_unknown x || is_unknown y || equal x y
   let join x y = if equal x y then x else Unknown
   let narrow = join
 

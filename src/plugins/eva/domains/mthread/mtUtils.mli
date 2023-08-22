@@ -52,6 +52,7 @@ module Trilean : sig
   include Datatype.S_with_collections with type t = trilean
   val top : t
   val is_included : t -> t -> bool
+  val intersects : t -> t -> bool
   val join : t -> t -> t
   val narrow : t -> t -> t
   val maybe_true  : t -> bool

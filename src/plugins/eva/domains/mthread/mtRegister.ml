@@ -60,15 +60,15 @@ module Make (Key : Key_sig) (Status : Status_sig) = struct
     | AlreadyRegistered ->
       Result.warning (register, Key.to_value key)
         "The %s %a is already registered."
-        Key.name Key.pretty key
+        Key.key_name Key.pretty key
     | NotRegistered ->
       Result.warning (register, Value.of_int 1)
         "The %s %a is not registered."
-        Key.name Key.pretty key
+        Key.key_name Key.pretty key
     | MayBeInState (state, sure) ->
       Result.warning (register, Value.of_int 2)
         "The %s %a %s already %s."
-        Key.name Key.pretty key
+        Key.key_name Key.pretty key
         (if sure then "is" else "may be") state
 
   let fold_keys f keys register =
