@@ -332,7 +332,7 @@ void pre_decl(void);
 
 extern int x;
 
-int y;
+extern int y;
 
 void post_decl(void);
 
@@ -349,7 +349,6 @@ void middle_decl(void)
 
 void post_decl(void);
 
-int y = 23;
 void pre_decl(void)
 {
   x ++;
