@@ -45,6 +45,8 @@ end
 
 
 module Make (Key : Key_sig) (Status : Status_sig) = struct
+  open Result
+
   module Info = struct
     let initial_values = [ ]
     let dependencies = [ Ast.self ]
@@ -91,7 +93,10 @@ module Make (Key : Key_sig) (Status : Status_sig) = struct
   let update new_status check keys_value register =
     let update_one key register =
       match find key register with
-      | None -> warning key register NotRegistered
+      | None ->
+        let+ (register, result) = warning key register NotRegistered in
+        let register = add key (new_status Status.default) register in
+        register, result
       | Some status ->
         let register = add key (new_status status) register in
         match check status with
