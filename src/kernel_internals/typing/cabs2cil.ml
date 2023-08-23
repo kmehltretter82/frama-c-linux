@@ -1904,7 +1904,7 @@ struct
 
   (* Append two chunks. Never refer to the original chunks after you call
    * this. And especially never share c2 with somebody else *)
-  let (@@) (c1: chunk) (c2, ghost) =
+  let (@@@) (c1: chunk) (c2, ghost) =
     let r =
       if (c1.unspecified_order && c2.unspecified_order) ||
          (not c1.unspecified_order && not c2.unspecified_order)
@@ -4061,14 +4061,14 @@ let has_local_init chunk =
 
 let append_chunk_to_annot ~ghost annot_chunk current_chunk =
   match current_chunk.stmts with
-  | [] -> annot_chunk @@ (current_chunk, ghost)
+  | [] -> annot_chunk @@@ (current_chunk, ghost)
   (* don't forget locals of current_chunk *)
 
   (* if we have a single statement,
      we can avoid enclosing it into a block. *)
   | [ (_s,_,_,_,_) ] ->
     (*     Format.eprintf "Statement is: %a@." d_stmt _s;  *)
-    annot_chunk @@ (current_chunk, ghost)
+    annot_chunk @@@ (current_chunk, ghost)
   (* Make a block, and put labels of the first statement
      on the block itself, so as to respect scoping rules
      for \at in further annotations. *)
@@ -4092,7 +4092,7 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
         | _ -> None
       in
       match res with
-      | Some s -> annot_chunk @@ ({current_chunk with stmts = [s]}, ghost)
+      | Some s -> annot_chunk @@@ ({current_chunk with stmts = [s]}, ghost)
       | None ->
         Kernel.warning ~wkey:Kernel.wkey_annot_error ~current:true
           "Statement contract and ACSL pragmas over a local definition \
@@ -4112,8 +4112,8 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
       let block = mkStmt ~ghost ~valid_sid (Block b) in
       let chunk = s2c block in
       let chunk = { chunk with cases = current_chunk.cases } in
-      annot_chunk @@ (List.fold_left
-                        local_var_chunk chunk (List.rev locals), ghost)
+      annot_chunk @@@ (List.fold_left
+                         local_var_chunk chunk (List.rev locals), ghost)
     end
 
 let default_argument_promotion idx exp =
@@ -5615,7 +5615,7 @@ and doExp local_env
           (*Kernel.debug "finishExp: e = %a\n  e'' = %a\n" Cil_printer.pp_exp e Cil_printer.pp_exp e'';*)
           let writes = if is_real_write then [lv] else [] in
           ([], (* the reads are incorporated in the chunk. *)
-           ((unspecified_chunk empty) @@ (remove_reads lv se, ghost))
+           ((unspecified_chunk empty) @@@ (remove_reads lv se, ghost))
            +++
            (mkStmtOneInstr ~ghost ~valid_sid (Set(lv, e'', CurrentLoc.get ())),
             writes,writes,
@@ -5703,7 +5703,7 @@ and doExp local_env
           doExp (no_paren_local_env local_env) CNoConst e1 (AExp None) in
         let (r2,se2, e2', t2) =
           doExp (no_paren_local_env local_env) CNoConst e2 (AExp None) in
-        let se = se1 @@ (se2, ghost) in
+        let se = se1 @@@ (se2, ghost) in
         let (e1'', t1, e2'', tresult) =
           (* Either e1 or e2 can be the pointer *)
           match unrollType t1, unrollType t2 with
@@ -6009,7 +6009,7 @@ and doExp local_env
              * type of the expression e2, so we do not need a cast. We have
              * to worry about this because otherwise, we might need to cast
              * between arrays or structures. *)
-            (r, se1 @@ (se, ghost), e2, t2), false
+            (r, se1 @@@ (se, ghost), e2, t2), false
           end
       in
       let (t'', e'') =
@@ -6308,10 +6308,10 @@ and doExp local_env
             let (r2,se2, _, _) =
               doExp local_env CNoConst e2 (ASet (not needsTemp, tmplv,  r1, lvt))
             in
-            let (@@) s1 s2 = s1 @@ (s2, ghost) in
+            let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
             (* Format.eprintf "chunk for assigns is %a@." d_chunk se2; *)
             (* r1 is read in the assignment part itself *)
-            finishExp r2  ((empty @@ ((se0 @@ se1') @@ se2)) @@ se3)
+            finishExp r2  ((empty @@@ ((se0 @@@ se1') @@@ se2)) @@@ se3)
               (new_exp ~loc (Lval tmplv)) lvt
           end
         | _ -> Kernel.fatal ~current:true "Invalid left operand for ASSIGN"
@@ -6333,8 +6333,8 @@ and doExp local_env
         check_logical_operand e2 t2;
       end;
       let tresult, result = doBinOp loc bop' e1' t1 e2' t2 in
-      let (@@) s1 s2 = s1 @@ (s2, ghost) in
-      finishExp (r1 @ r2) ((se0 @@ se1) @@ se2) result tresult
+      let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
+      finishExp (r1 @ r2) ((se0 @@@ se1) @@@ se2) result tresult
 
     (* assignment operators *)
     | Cabs.BINARY((Cabs.ADD_ASSIGN|Cabs.SUB_ASSIGN|Cabs.MUL_ASSIGN|Cabs.DIV_ASSIGN|
@@ -6379,13 +6379,13 @@ and doExp local_env
              * different than t1 if lv1 was a Cast *)
             let _, result' = castTo tresult (typeOfLval lv1) result in
             (* The type of the result is the type of the left-hand side  *)
-            let (@@) s1 s2 = s1 @@ (s2, ghost) in
+            let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
             finishExp []
-              (se0 @@
-               (empty @@ (se1' @@ se2) +++
-                         (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
-                            (Set(lv1, result', loc)),
-                          [lv1],[lv1], r1' @ r2)))
+              (se0 @@@
+               (empty @@@ (se1' @@@ se2) +++
+                          (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
+                             (Set(lv1, result', loc)),
+                           [lv1],[lv1], r1' @ r2)))
               e1'
               t1
           end
@@ -6706,7 +6706,7 @@ and doExp local_env
               "expected '%a' but got argument of type '%a': %a"
               Cil_datatype.Typ.pretty texpected Cil_datatype.Typ.pretty att
               Cil_printer.pp_exp a';
-          (ss @@ (sa, ghost), a'' :: args')
+          (ss @@@ (sa, ghost), a'' :: args')
 
         | ([], args) -> (* No more types *)
           if not isvar && argTypes != None && not isSpecialBuiltin then
@@ -6724,7 +6724,7 @@ and doExp local_env
                 in
                 (add_reads ~ghost:local_env.is_ghost loc r c, e, t)
               in
-              (ss @@ (sa, ghost), a' :: args')
+              (ss @@@ (sa, ghost), a' :: args')
           in
           let (chunk,args as res) = loop args in
           (match argTypes, f''.enode with
@@ -6771,7 +6771,7 @@ and doExp local_env
       let (sghost, ghosts') = loopArgs ~are_ghost:true (ghostArgTypes, ghost_args) in
       let (sargs, args') = loopArgs (argTypes, args) in
 
-      let sargs = sghost @@ (sargs, false) in
+      let sargs = sghost @@@ (sargs, false) in
 
       let (sargs, args') = (sargs, args' @ ghosts') in
       (* Setup some pointer to the elements of the call. We may change
@@ -6783,7 +6783,7 @@ and doExp local_env
          The call must thus be in the unspecified chunk
       *)
       let sargs = if isEmpty sargs then empty else sargs in
-      let prechunk = ref ((s0 @@ (sf, ghost)) @@ (sargs, ghost)) in
+      let prechunk = ref ((s0 @@@ (sf, ghost)) @@@ (sargs, ghost)) in
       (* Do we actually have a call, or an expression? *)
       let piscall: bool ref = ref true in
 
@@ -7087,12 +7087,12 @@ and doExp local_env
                     piscall := false;
                     if isZero constfolded then begin
                     (* Keep only 3rd arg side effects *)
-                      (*TODO: prechunk := sf @@ (List.nth sargsl 2);*)
+                      (*TODO: prechunk := sf @@@ (List.nth sargsl 2);*)
                       pres := e2;
                       prestype := typeOf e2
                     end else begin
                     (* Keep only 2nd arg side effects *)
-                      (*TODO prechunk := sf @@ (List.nth sargsl 1);*)
+                      (*TODO prechunk := sf @@@ (List.nth sargsl 1);*)
                       pres := e1;
                       prestype := typeOf e1
                     end
@@ -7127,7 +7127,7 @@ and doExp local_env
             | Some _ -> []
           in
           prechunk :=
-            (empty @@ (!prechunk, ghost)) +++
+            (empty @@@ (!prechunk, ghost)) +++
             (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
                (Call(calldest,!pf,!pargs,loc)),
              [],my_write, rf);
@@ -7203,12 +7203,12 @@ and doExp local_env
             doExp (no_paren_local_env local_env) CNoConst e what
           in
           (* Pass on the action *)
-          (r, sofar @@ (se, ghost), e', t')
+          (r, sofar @@@ (se, ghost), e', t')
         | e :: rest ->
           let (_, se, _, _) =
             doExp (no_paren_local_env local_env) CNoConst e ADrop
           in
-          loop (sofar @@ (se, ghost)) rest
+          loop (sofar @@@ (se, ghost)) rest
         | [] -> Kernel.fatal ~current:true "empty COMMA expression"
       in
       loop empty el
@@ -7272,7 +7272,7 @@ and doExp local_env
           | CEExp (se1, e1')
             when isExpTrueFalse e1' = `CFalse && canDrop se2 ->
             clean_up_chunk_locals se2;
-            finishExp r3 ((empty @@ (se1, ghost)) @@ (se3, ghost))
+            finishExp r3 ((empty @@@ (se1, ghost)) @@@ (se3, ghost))
               (snd (castTo t3 tresult e3')) tresult
           | CEExp (se1, e1')
             when isExpTrueFalse e1' = `CTrue && canDrop se3 ->
@@ -7281,11 +7281,11 @@ and doExp local_env
               match e2'o with
               | None -> (* use e1' *)
                 finishExp r2
-                  ((empty @@ (se1, ghost)) @@ (se2, ghost))
+                  ((empty @@@ (se1, ghost)) @@@ (se2, ghost))
                   (snd (castTo t2 tresult e1')) tresult
               | Some e2' ->
                 finishExp r2
-                  ((empty @@ (se1, ghost)) @@ (se2, ghost))
+                  ((empty @@@ (se1, ghost)) @@@ (se2, ghost))
                   (snd (castTo t2 tresult e2')) tresult
             end
           | _ when what = ADrop ->
@@ -7313,9 +7313,9 @@ and doExp local_env
                  else skipChunk
                in
                finishExp (r1@r3)
-                 ((empty @@ (se1, ghost)) @@
+                 ((empty @@@ (se1, ghost)) @@@
                   (ifChunk ~ghost tmp_lval loc skipChunk
-                     (se3 @@ (dangerous, ghost)), ghost))
+                     (se3 @@@ (dangerous, ghost)), ghost))
                  res
                  tresult
              | None ->
@@ -7329,7 +7329,7 @@ and doExp local_env
                  else skipChunk
                in
                finishExp
-                 (r1@r3) (se1 @@ (dangerous, ghost)) res tresult
+                 (r1@r3) (se1 @@@ (dangerous, ghost)) res tresult
              | Some e2'
                when is_dangerous e2' || is_dangerous e3'
                     || not (isEmpty se2) || not (isEmpty se3) ->
@@ -7337,13 +7337,13 @@ and doExp local_env
                   dangerous expression is to be evaluated *)
                let se2 =
                  if is_dangerous e2' then
-                   se2 @@
+                   se2 @@@
                    (keepPureExpr ~ghost e2' loc, ghost)
                  else se2
                in
                let se3 =
                  if is_dangerous e3' then
-                   se3 @@ (keepPureExpr ~ghost e3' loc, ghost)
+                   se3 @@@ (keepPureExpr ~ghost e3' loc, ghost)
                  else se3
                in
                let cond = compileCondExp ~ghost ce1 se2 se3 in
@@ -7360,7 +7360,7 @@ and doExp local_env
                  else skipChunk
                in
                finishExp
-                 (r1@r2@r3) (se1 @@ (dangerous, ghost)) res tresult)
+                 (r1@r2@r3) (se1 @@@ (dangerous, ghost)) res tresult)
           | _ -> (* Use a conditional *) begin
               match e2'o with
               | None -> (* has form "e1 ? : e3"  *)
@@ -7380,7 +7380,7 @@ and doExp local_env
                 let r3,se3,_,_ = finishExp ~newWhat r3 se3 e3' t3 in
                 finishExp
                   (r1@r3)
-                  ((empty @@ (se1, ghost)) @@
+                  ((empty @@@ (se1, ghost)) @@@
                    (ifChunk ~ghost tmp_lval loc skipChunk se3, ghost))
                   tmp_lval
                   tresult
@@ -7412,7 +7412,7 @@ and doExp local_env
                 let cond = compileCondExp ~ghost ce1 se2 se3 in
                 finishExp
                   (r2@r3)
-                  (scope_chunk @@ (cond, ghost))
+                  (scope_chunk @@@ (cond, ghost))
                   (new_exp ~loc (Lval lv)) tresult
             end
         end
@@ -7794,7 +7794,7 @@ and doCondExp local_env asconst
   let rec addChunkBeforeCE (c0: chunk) ce =
     let c0 = remove_effects c0 in
     match ce with
-    | CEExp (c, e) -> CEExp ((empty @@ (c0, ghost)) @@ (c, ghost), e)
+    | CEExp (c, e) -> CEExp ((empty @@@ (c0, ghost)) @@@ (c, ghost), e)
     | CEAnd (ce1, ce2) -> CEAnd (addChunkBeforeCE c0 ce1, ce2)
     | CEOr (ce1, ce2) -> CEOr (addChunkBeforeCE c0 ce1, ce2)
     | CENot ce1 -> CENot (addChunkBeforeCE c0 ce1)
@@ -7910,9 +7910,9 @@ and compileCondExp ~ghost ce st sf =
           consLabel ~ghost lab empty loc false
         else skipChunk
       in
-      let (@@) s1 s2 = s1 @@ (s2, ghost) in
+      let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
       (compileCondExp ~ghost ce1 st' sf')
-      @@ gotostmt @@ sf2 @@ labstmt
+      @@@ gotostmt @@@ sf2 @@@ labstmt
     else
       let sf' = sf2 in
       compileCondExp ~ghost ce1 st' sf'
@@ -7941,9 +7941,9 @@ and compileCondExp ~ghost ce st sf =
           consLabel ~ghost lab empty (CurrentLoc.get ()) false
         else skipChunk
       in
-      let (@@) s1 s2 = s1 @@ (s2, ghost) in
+      let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
       (compileCondExp ~ghost ce1 st' sf')
-      @@ gotostmt @@ st2 @@ labstmt
+      @@@ gotostmt @@@ st2 @@@ labstmt
     else
       let st' = st1 in
       let sf' = compileCondExp ~ghost ce2 st2 sf in
@@ -7959,12 +7959,12 @@ and compileCondExp ~ghost ce st sf =
       | Const(CInt64(i,_,_))
         when (not (Integer.equal i Integer.zero)) && canDrop sf ->
         full_clean_up_chunk_locals sf;
-        se @@ (st, ghost)
+        se @@@ (st, ghost)
       | Const(CInt64(z,_,_))
         when (Integer.equal z Integer.zero) && canDrop st ->
         full_clean_up_chunk_locals st;
-        se @@ (sf, ghost)
-      | _ -> (empty @@ (se, ghost)) @@ (ifChunk ~ghost e e.eloc st sf, ghost)
+        se @@@ (sf, ghost)
+      | _ -> (empty @@@ (se, ghost)) @@@ (ifChunk ~ghost e e.eloc st sf, ghost)
     end
 
 
@@ -7979,7 +7979,7 @@ and doCondition local_env asconst
       let (_, se,e,_) = doExp local_env CNoConst e ADrop in
       if is_dangerous e then begin
         let ghost = local_env.is_ghost in
-        se @@ (keepPureExpr ~ghost e e.eloc, ghost)
+        se @@@ (keepPureExpr ~ghost e e.eloc, ghost)
       end else begin
         if (isEmpty se) then begin
           let name = !currentFunctionFDEC.svar.vorig_name in
@@ -8004,7 +8004,7 @@ and doFullExp local_env const e what =
   let (r, se,e,t) = doExp local_env const e what in
   let se' = add_reads ~ghost:local_env.is_ghost e.eloc r se in
   (* there is a sequence point after a full exp *)
-  empty @@ (se', local_env.is_ghost),e,t
+  empty @@@ (se', local_env.is_ghost),e,t
 
 and doInitializer local_env (vi: varinfo) (inite: Cabs.init_expression)
   (* Return the accumulated chunk, the initializer and the new type (might be
@@ -8037,7 +8037,7 @@ and doInitializer local_env (vi: varinfo) (inite: Cabs.init_expression)
   Kernel.debug ~dkey:Kernel.dkey_typing_init
     "Finished the initializer for %s@\n  init=%a@\n  typ=%a@\n  acc=%a@\n"
     vi.vname Cil_printer.pp_init init Cil_datatype.Typ.pretty typ' d_chunk acc;
-  empty @@ (acc, local_env.is_ghost), init, typ'', reads
+  empty @@@ (acc, local_env.is_ghost), init, typ'', reads
 
 (* Consume some initializers. This is used by both global and local variables
    initialization.
@@ -8275,7 +8275,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
       let preinit = setOneInit preinit so.soOff (SinglePre (oneinit', r)) in
       (* Advance to the next subobject *)
       advanceSubobj so;
-      let se = acc @@ (se, ghost) in
+      let se = acc @@@ (se, ghost) in
       doInit local_env asconst add_implicit_ensures preinit so se restil
     end else begin (* Try to initialize fields *)
       let toinit = fieldsToInit comp None in
@@ -8300,7 +8300,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     let preinit' = setOneInit preinit so.soOff (SinglePre (init_expr,r)) in
     (* Move on *)
     advanceSubobj so;
-    let se = acc @@ (se,ghost) in
+    let se = acc @@@ (se,ghost) in
     doInit local_env asconst add_implicit_ensures preinit' so se restil
   (* An array with a compound initializer. The initializer is for the
    * array elements *)
@@ -8410,7 +8410,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         let preinit' = setOneInit preinit so.soOff (SinglePre (init_expr, r)) in
         (* Move on *)
         advanceSubobj so;
-        let se = acc @@ (se, ghost) in
+        let se = acc @@@ (se, ghost) in
         doInit local_env asconst add_implicit_ensures preinit' so se restil
       with Not_found ->
         abort_context
@@ -8471,7 +8471,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
               so.stack <-
                 InArray(so.soOff, bt, ilen, ref nextidx') :: so.stack;
               normalSubobj so;
-              address whatnext (acc @@ (doidx, ghost))
+              address whatnext (acc @@@ (doidx, ghost))
 
             | _ -> abort_context "INDEX designator for a non-array"
           end
@@ -9025,8 +9025,8 @@ and createLocal ghost ((_, sto, _, _) as specs)
        | _, _, _ -> ());
 
       (* Now create assignments instead of the initialization *)
-      (se1 @@ (se4, ghost))
-      @@
+      (se1 @@@ (se4, ghost))
+      @@@
       (i2c
          (Cil.mkStmtOneInstr
             ~ghost ~valid_sid (Local_init(vi,AssignInit ie',loc)),
@@ -9099,7 +9099,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
              "Bad alias attribute at %a" Cil_printer.pp_location (CurrentLoc.get()));
         acc
       end else
-        acc @@ (createLocal ghost spec_res name, ghost)
+        acc @@@ (createLocal ghost spec_res name, ghost)
     in
     let res = List.fold_left doOneDeclarator empty nl in
     if isglobal then res
@@ -9439,7 +9439,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
                 bodychunk :=
                   caseRangeChunk ~ghost
                     [integer ~loc laddr] loc
-                    (gotoChunk ~ghost lname loc @@ (!bodychunk, ghost)))
+                    (gotoChunk ~ghost lname loc @@@ (!bodychunk, ghost)))
              gotoTargetHash;
            (* Now recreate the switch *)
            let newswitch = switchChunk ~ghost switche !bodychunk loc in
@@ -9826,7 +9826,7 @@ and doBody local_env (blk: Cabs.block) : chunk =
                let chunk =
                  if keep_block then
                    append_chunk_to_annot ~ghost prev res
-                 else prev @@ (res, ghost)
+                 else prev @@@ (res, ghost)
                in ((new_behaviors, keep_next), chunk))
             (([],false),empty)
             blk.Cabs.bstmts))
@@ -9880,7 +9880,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       *)
       if isEmpty s' && is_dangerous e'
       then
-        s' @@ (keepPureExpr ~ghost e' loc, ghost)
+        s' @@@ (keepPureExpr ~ghost e' loc, ghost)
       else
         begin
           if (isEmpty s') then begin
@@ -9901,7 +9901,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
   | Cabs.SEQUENCE (s1, s2, _) ->
     let c1 = doStatement local_env s1 in
     let c2 = doStatement local_env s2 in
-    c1 @@ (c2, ghost)
+    c1 @@@ (c2, ghost)
 
   | Cabs.IF(e,st,sf,loc) ->
     let st' = doStatement local_env st in
@@ -9915,7 +9915,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     let s' = doStatement local_env s in
     let s' =
       if !doTransformWhile then
-        s' @@ (consLabContinue ~ghost skipChunk, ghost)
+        s' @@@ (consLabContinue ~ghost skipChunk, ghost)
       else s'
     in
     let loc' = convLoc loc in
@@ -9924,7 +9924,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     CurrentLoc.set loc';
     loopChunk ~ghost ~sattr:[Attr("while",[])] a
       ((doCondition local_env CNoConst e skipChunk break_cond)
-       @@ (s', ghost))
+       @@@ (s', ghost))
 
   | Cabs.DOWHILE(a, e,s,loc) ->
     startLoop false;
@@ -9957,7 +9957,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
              CNoConst e skipChunk (breakChunk ~ghost loc'))
       in
       exitLoop ();
-      loopChunk ~ghost ~sattr:[Attr("dowhile",[])] a (s' @@ (s'', ghost))
+      loopChunk ~ghost ~sattr:[Attr("dowhile",[])] a (s' @@@ (s'', ghost))
 
   | Cabs.FOR(a,fc1,e2,e3,s,loc) -> begin
       let loc' = convLoc loc in
@@ -9979,15 +9979,15 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       let s'' = consLabContinue ~ghost se3 in
       let break_cond = breakChunk ~ghost loc' in
       exitLoop ();
-      let c = s' @@ (s'', ghost) in
+      let c = s' @@@ (s'', ghost) in
       let c =
         match e2.expr_node with
         | Cabs.NOTHING -> (* This means true *)
           c
         | _ ->
-          doCondition local_env CNoConst e2 skipChunk break_cond @@ (c, ghost)
+          doCondition local_env CNoConst e2 skipChunk break_cond @@@ (c, ghost)
       in
-      let res = se1 @@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a c, ghost) in
+      let res = se1 @@@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a c, ghost) in
       exitScope ();
       if has_decl then begin
         let chunk = s2c (mkStmt ~ghost ~valid_sid (Block (c2block ~ghost res)))
@@ -10023,7 +10023,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       Kernel.error ~current:true
         "Return statement with a value in function returning void";
       let (se, _, _) = doFullExp local_env CNoConst e ADrop in
-      se @@ (returnChunk ~ghost None loc', ghost)
+      se @@@ (returnChunk ~ghost None loc', ghost)
     end else begin
       let rt =
         typeRemoveAttributes ["warn_unused_result"] !currentReturnType
@@ -10031,7 +10031,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       let (se, e', et) =
         doFullExp local_env CNoConst e (AExp (Some rt)) in
       let (_, e'') = castTo et rt e' in
-      se @@ (returnChunk ~ghost (Some e'') loc', ghost)
+      se @@@ (returnChunk ~ghost (Some e'') loc', ghost)
     end
 
   | Cabs.SWITCH (e, s, loc) ->
@@ -10045,7 +10045,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     enter_break_env ();
     let s' = doStatement local_env s in
     exit_break_env ();
-    se @@ (switchChunk ~ghost e' s' loc', ghost)
+    se @@@ (switchChunk ~ghost e' s' loc', ghost)
 
   | Cabs.CASE (e, s, loc) ->
     let loc' = convLoc loc in
@@ -10061,7 +10061,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     in
     (* se has no statement, but can contain local variables, in
        particular in the case of a sizeof with side-effects. *)
-    se @@ (chunk,ghost)
+    se @@@ (chunk,ghost)
 
   | Cabs.CASERANGE (el, eh, s, loc) ->
     let loc' = convLoc loc in
@@ -10084,7 +10084,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     let rec mkAll (i: int) =
       if i > ih then [] else integer ~loc i :: mkAll (i + 1)
     in
-    (sel @@ (seh,ghost)) @@
+    (sel @@@ (seh,ghost)) @@@
     (caseRangeChunk ~ghost (mkAll il) loc' (doStatement local_env s),
      ghost)
 
@@ -10119,10 +10119,10 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       match !gotoTargetData with
       | Some (switchv, switch) -> (* We have already generated this one  *)
         (se
-         @@ (i2c(mkStmtOneInstr ~ghost ~valid_sid
-                   (Set (var switchv, makeCast ~e:e' ~newt:intType, loc')),
-                 [],[],[]), ghost))
-        @@ (s2c(mkStmt ~ghost ~valid_sid (Goto (ref switch, loc'))), ghost)
+         @@@ (i2c(mkStmtOneInstr ~ghost ~valid_sid
+                    (Set (var switchv, makeCast ~e:e' ~newt:intType, loc')),
+                  [],[],[]), ghost))
+        @@@ (s2c(mkStmt ~ghost ~valid_sid (Goto (ref switch, loc'))), ghost)
 
       | None -> begin
           (* Make a temporary variable *)
@@ -10148,13 +10148,13 @@ and doStatement local_env (s : Cabs.statement) : chunk =
           (* And make a label for it since we'll goto it *)
           switch.labels <- [Label ("__docompgoto", loc', false)];
           gotoTargetData := Some (switchv, switch);
-          (se @@
+          (se @@@
            (i2c
               (mkStmtOneInstr ~ghost ~valid_sid
                  (Set (var switchv, makeCast ~e:e' ~newt:intType, loc')),
                [],[],[]),
             ghost))
-          @@ (s2c switch, ghost)
+          @@@ (s2c switch, ghost)
         end
     end
 
@@ -10184,7 +10184,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
                      "Expected lval for ASM outputs"
                in
                if not (isEmpty se) then
-                 stmts := !stmts @@ (se, ghost);
+                 stmts := !stmts @@@ (se, ghost);
                (id, c, lv)) aoutputs
         in
         (* Get the side-effects out of expressions *)
@@ -10196,7 +10196,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
                in
                let se = add_reads ~ghost e'.eloc r se in
                if not (isEmpty se) then
-                 stmts := !stmts @@ (se, ghost);
+                 stmts := !stmts @@@ (se, ghost);
                (id, c, e'))
             ainputs
         in
@@ -10212,7 +10212,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
         in
         Some { asm_outputs; asm_inputs; asm_clobbers; asm_gotos }
     in
-    !stmts @@
+    !stmts @@@
     (i2c(mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
            (Asm(attr', tmpls, ext_asm, loc')),[],[],[]),
      ghost)
@@ -10223,7 +10223,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
      | None -> s2c (mkStmt ~ghost ~valid_sid (Throw (None,loc')))
      | Some e ->
        let se,e,t = doFullExp local_env CNoConst e (AExp None) in
-       se @@
+       se @@@
        (s2c (mkStmt ~ghost ~valid_sid (Throw (Some (e,t),loc'))),ghost))
   | TRY_CATCH(stry,l,loc) ->
     let loc' = convLoc loc in
