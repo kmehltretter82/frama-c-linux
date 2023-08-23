@@ -4,11 +4,10 @@ Official documentation:
 - Playwright: https://playwright.dev/
 - Gremlins.js: https://github.com/marmelab/gremlins.js
 
-Playwright has native support for Electron applications. Examples on how to launch Ivette with Frama-c server are provided in `e2eService.ts` file, along with an example loading a C File.
+Playwright has native support for Electron applications. Examples on how to launch Ivette with Frama-C's server are provided in `e2eService.ts` file, along with an example loading a C file.
 
-Playwright does no require the binaries of Ivette to be built.
-However :
-- to have electron support (neeeded for Ivette), you need to build the `dist` directory using `make dist` from the `ivette` directory then copy the entirety of `dist/renderer` to `dist/main`
+However:
+- to have electron support (needed for Ivette), you need to build the `dist` directory using `make dist` from the `ivette` directory then copy the entirety of `dist/renderer` to `dist/main`
 - if you want to connect to the Frama-C server, Frama-C needs to be built using `make` from the `frama-c` directory.
 
 In the provided tests, various path are provided within `e2eService.ts` to launch Ivette with Frama-C or with additionnal C files. Those can be modified at will, however it is recommanded to stick with relative paths for maintenability.
@@ -18,29 +17,29 @@ Playwright can be installed using Yarn (already done for ivette):
 Be mindful of the different options asked by the installer.
 
 If you wish to run monkey testing, Gremlins.js also need to be installed (already done for ivette):
-- `yarn install gremlins.js`
+- `yarn add gremlins.js`
 
-Launch tests : 
-- in `ivette` directory, launch a specific test with `yarn playwright test <file-name>` ;
-- in `ivette` directory, launch e2e test with `yarn playwright test e2e.spec.ts` ;
-- in `ivette` directory, launch monkey testing (gremlins.js) with `yarn playwright test monkey-testing.spec.ts` ;
-- in `ivette` directory, launch ALL tests with `yarn playwright test` ;
+## Launching tests : 
+- From `ivette` directory, launch a specific test with `yarn playwright test <file-name>` ;
+- From `ivette` directory, launch e2e test with `yarn playwright test e2e.spec.ts` ;
+- From `ivette` directory, launch monkey testing (gremlins.js) with `yarn playwright test monkey-testing.spec.ts` ;
+- From `ivette` directory, launch ALL tests with `yarn playwright test` ;
 
-Access report:
+## Accessing tests report
 If the test fails, Playwright will automatically open its report. To manually access the last report: 
-- in `ivette` directory, use `yarn playwright show-report`, then access `localhost:9323` in a browser ;
+- From `ivette` directory, use `yarn playwright show-report`, then access `localhost:9323` in a browser ;
 
 Playwright options can me modified within its configuration file `playwright.config.ts`. The `fullyParallel` option has been set to false, as this feature resulted in concurency issues with Electron.
 
-Writing test files:
-Playwright uses its Locator system to select html element. You can type your own, but Playwright can help with that aswell. Inside a test, add `await window.pause()` where required, then run said test. Doing so will open ivette, and, when the instruction is reached, an additional Playwright window. On the bottom of said window is a `Pick locator` button, which will provides the necessary locator for the selected element (works similarly to the inspect functionnality of most browser developper tools).
-The `locatorsUti.ts` files comes with several locators prewritten.
+# Writing test files:
+Playwright uses its Locator system to select html elements. You can type your own, but Playwright can help with that as well. Inside a test, add `await window.pause()` where required, then run said test. Doing so will open ivette, and, when the instruction is reached, an additional Playwright window. On the bottom of said window, there is a `Pick locator` button, which will provide the necessary locator for the selected element (works similarly to the inspect functionality of most browser developer tools).
+The `locatorsUti.ts` files comes with several default locators.
 
 Once the element selected, multiple operations can be realized. Refer to the Playwright documentation for the complete list. Examples are provided in `e2eService.ts`.
 
-Complete tests scenarios are provided in `e2e.spec.ts`
+Complete tests scenarios are provided in `e2e.spec.ts`.
 
-Monkey Testing:
-- in `ivette` directory, launch monkey testing (gremlins.js) with `yarn playwright test monkey-testing.spec.ts` ;
-If is possible to seed a randomizer in order to obtain reproductible tests (see the randomizer value in `monkey-testing.spec.ts`). However for the test to be fully reproductible, Ivette also need to be launch with its default configuration. An additional argument `--init-settings` has been added to Ivette for this purpose. An example on how to do so is available in `e2eService.ts`.
+## Monkey Testing
+- from `ivette` directory, launch monkey testing (gremlins.js) with `yarn playwright test monkey-testing.spec.ts` ;
+It is possible to seed a randomizer in order to obtain reproductible tests (see the randomizer value in `monkey-testing.spec.ts`). However for the test to be fully reproductible, Ivette also need to be launch with its default configuration. An additional argument `--init-settings` has been added to Ivette for this purpose. An example on how to do so is available in `e2eService.ts`.
 

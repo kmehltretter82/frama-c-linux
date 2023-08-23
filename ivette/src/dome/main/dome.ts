@@ -541,7 +541,7 @@ function createPrimaryWindow(): void {
 
   // Reset Settings if the associated argument is provided
   const initSettings = cmd.argv.includes("--init-settings");
-  if(initSettings) {
+  if (initSettings) {
     restoreAllDefaultSettings();
     cmd.argv = cmd.argv.filter((p) => !!p && p !== "--init-settings");
   }
@@ -555,7 +555,7 @@ function createPrimaryWindow(): void {
   createBrowserWindow(true, { title: appName }, cmd.argv, cmd.wdir);
 
   // Reset Settings if the associated argument is provided
-  if(initSettings) {
+  if (initSettings) {
     restoreAllDefaultSettings();
   }
 }
@@ -652,7 +652,7 @@ function restoreAllDefaultSettings(): void {
   saveGlobalSettings();
   try {
     fs.rmSync(PATH_WINDOW_SETTINGS);
-  } catch (_error ) {
+  } catch (_error) {
     console.warn(_error);
   }
 }

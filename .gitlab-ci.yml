@@ -208,7 +208,7 @@ wp-tests:
     - ./nix/build-proxy.sh wp-tests
   <<: *coverage
 
-e2e-monkey-tests:
+ivette-tests:
   stage: tests
   allow_failure: true
   image: "ocaml/opam:ubuntu-lts-ocaml-$OCAML"
