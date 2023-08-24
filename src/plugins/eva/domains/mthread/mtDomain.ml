@@ -432,10 +432,12 @@ module Domain = struct
     Cache.iter pp Cache.cache
 
   let enter_scope kind vars state =
+    let state = reset state in
     let results = BuiltinsResults.enter_scope kind vars state.results in
     { state with results }
 
   let leave_scope kf vars state =
+    let state = reset state in
     let results = BuiltinsResults.leave_scope kf vars state.results in
     { state with results }
 

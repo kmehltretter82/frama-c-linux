@@ -185,6 +185,8 @@ let inject (type a) ~(domain : a domain) (state : a) : a =
         match Locations.Zone.get_bases zone with
         | Top ->
           (* Shared memory is Top, always inject *)
+          Self.warning ~current:true ~once:true
+            "imprecise memory footprint computed at this point";
           true
         | Set bases ->
           (* Inject only if the read/written memory intersects shared memory *)
