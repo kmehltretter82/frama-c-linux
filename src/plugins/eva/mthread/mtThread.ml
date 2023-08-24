@@ -200,9 +200,9 @@ type analysis_state = {
   all_threads : threads_table (* List of all threads. Is kept (and can thus
                                  increase) from one iteration to the next *);
 
-  all_mutexes: Mutex.Set.t; (** Information on the known mutexes *)
+  mutable all_mutexes: Mutex.Set.t; (** Set of all mutexes of the analysis *)
 
-  all_queues: Mqueue.Set.t; (** Information on the known queues *)
+  mutable all_queues: Mqueue.Set.t; (** Set of all queues of the analysis *)
 
   mutable iteration: int (* Current iteration of the analysis *);
 

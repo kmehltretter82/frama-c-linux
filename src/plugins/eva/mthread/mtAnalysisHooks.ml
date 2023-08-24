@@ -626,6 +626,7 @@ let hook_queue_init analysis state : hook_sig = function
     and name = Concurency.Name.of_cvalue name
     and size = conv (MtMemory.extract_int size) ~msg:"invalid@ size" () in
     let q = Mqueue.create aloc name in
+    analysis.all_queues <- Mqueue.Set.add q analysis.all_queues;
     check_queue_not_already_initialized
       (log_poly ~kind:Log.Warning analysis) q state;
     let size = if size < 0 then None else Some size in
@@ -785,6 +786,7 @@ let hook_init_mutex analysis state : hook_sig = function
     let aloc = current_loc analysis
     and name = Concurency.Name.of_cvalue name in
     let mutex = Mutex.create aloc name in
+    analysis.all_mutexes <- Mutex.Set.add mutex analysis.all_mutexes;
     check_mutex_not_already_initialized
       (log_poly ~kind:Log.Warning analysis) mutex state;
     log ~kind:Log.Result analysis "Initializing mutex %a" Mutex.pretty mutex;
