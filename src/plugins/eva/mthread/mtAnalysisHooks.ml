@@ -413,7 +413,7 @@ let spawn_thread analysis eva_thread stack func state params parent =
       if ra  then ThreadState.recompute_because th' InitialArgsChanged;
       let text =
         if ris || ra then "New context for" else "Thread" in
-      log ~kind:Log.Result analysis "@[<hov 2>%s@ %a@]" text ThreadState.pretty th';
+      log ~kind:Log.Result analysis "@[<hov 2>%s@ %a@]" text ThreadState.pretty_detailed th';
       th'
     )
   with Not_found ->
