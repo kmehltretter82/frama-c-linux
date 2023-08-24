@@ -111,11 +111,9 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: r
-[mt] <main> writes  r ∈ [--..--]  // read_all.c:29 main (read_all.c:23)
-[mt] <main> writes  r ∈ [--..--]  // read_all.c:29
-  g (read_all.c:29) <- main (read_all.c:23)
-[mt] jobs writes  r ∈ [--..--]  // read_all.c:19
-  g (read_all.c:19) <- f (read_all.c:18)
+[mt] <main> writes  r ∈ [--..--]  // read_all.c:29 main
+[mt] <main> writes  r ∈ [--..--]  // read_all.c:29 g :: read_all.c:29 <- main
+[mt] jobs writes  r ∈ [--..--]  // read_all.c:19 g :: read_all.c:19 <- f
 [mt] Possible read/write data races:
   none
 [mt] Possible write/write data races:

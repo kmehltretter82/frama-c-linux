@@ -134,12 +134,12 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: a; b; c; d
-[mt] tjob1 reads  a ∈ {3}  // memcpy.c:26 job1 (memcpy.c:25)
-[mt] tjob2 reads  b ∈ {3}  // memcpy.c:31 job2 (memcpy.c:30)
+[mt] tjob1 reads  a ∈ {3}  // memcpy.c:26 job1
+[mt] tjob2 reads  b ∈ {3}  // memcpy.c:31 job2
 [mt] <main> writes  a# ∈ {0; 3} repeated %8   // memcpy.c:48
-  memcpy (memcpy.c:48) <- main (memcpy.c:35)
+  memcpy :: memcpy.c:48 <- main
 [mt] <main> writes  b# ∈ {0; 3} repeated %8   // memcpy.c:49
-  memcpy (memcpy.c:49) <- main (memcpy.c:35)
+  memcpy :: memcpy.c:49 <- main
 [mt] Possible read/write data races:
   b:
     read by tjob2 at memcpy.c:31, unprotected
@@ -194,12 +194,12 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: a; b; c; d
-[mt] tjob1 reads  a ∈ [0..50529027],0%3  // memcpy.c:26 job1 (memcpy.c:25)
-[mt] tjob2 reads  b ∈ {3}  // memcpy.c:31 job2 (memcpy.c:30)
+[mt] tjob1 reads  a ∈ [0..50529027],0%3  // memcpy.c:26 job1
+[mt] tjob2 reads  b ∈ {3}  // memcpy.c:31 job2
 [mt] <main> writes  a# ∈ {0; 3} repeated %8   // memcpy.c:48
-  memcpy (memcpy.c:48) <- main (memcpy.c:35)
+  memcpy :: memcpy.c:48 <- main
 [mt] <main> writes  b# ∈ {0; 3} repeated %8   // memcpy.c:49
-  memcpy (memcpy.c:49) <- main (memcpy.c:35)
+  memcpy :: memcpy.c:49 <- main
 [mt] Possible read/write data races:
   b:
     read by tjob2 at memcpy.c:31, unprotected

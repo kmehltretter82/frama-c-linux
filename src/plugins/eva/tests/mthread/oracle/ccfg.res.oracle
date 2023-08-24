@@ -175,24 +175,21 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: global1; global2[0..1]
-[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[2] reads  global1 ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[3] reads  global1 ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] <main> writes  global1 ∈ {1}  // ccfg.c:19
-  g1 (ccfg.c:37) <- main (ccfg.c:29)
-[mt] <main> writes  global2[0] ∈ {1}  // ccfg.c:24
-  g2 (ccfg.c:38) <- main (ccfg.c:29)
-[mt] <main> writes  global2[1] ∈ {2}  // ccfg.c:26
-  g2 (ccfg.c:38) <- main (ccfg.c:29)
+[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[2] reads  global1 ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[3] reads  global1 ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:11 fjob
+[mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:11 fjob
+[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:11 fjob
+[mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:11 fjob
+[mt] <main> writes  global1 ∈ {1}  // ccfg.c:19 g1 :: ccfg.c:37 <- main
+[mt] <main> writes  global2[0] ∈ {1}  // ccfg.c:24 g2 :: ccfg.c:38 <- main
+[mt] <main> writes  global2[1] ∈ {2}  // ccfg.c:26 g2 :: ccfg.c:38 <- main
 [mt] Possible read/write data races:
   global2[1]:
     read by jobs[0] at ccfg.c:11, unprotected
@@ -297,24 +294,21 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: global1; global2[0..1]
-[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[2] reads  global1 ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[3] reads  global1 ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] <main> writes  global1 ∈ {1}  // ccfg.c:19
-  g1 (ccfg.c:37) <- main (ccfg.c:29)
-[mt] <main> writes  global2[0] ∈ {1}  // ccfg.c:24
-  g2 (ccfg.c:38) <- main (ccfg.c:29)
-[mt] <main> writes  global2[1] ∈ {2}  // ccfg.c:26
-  g2 (ccfg.c:38) <- main (ccfg.c:29)
+[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[2] reads  global1 ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[3] reads  global1 ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:11 fjob
+[mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:11 fjob
+[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:11 fjob
+[mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:11 fjob
+[mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:11 fjob
+[mt] <main> writes  global1 ∈ {1}  // ccfg.c:19 g1 :: ccfg.c:37 <- main
+[mt] <main> writes  global2[0] ∈ {1}  // ccfg.c:24 g2 :: ccfg.c:38 <- main
+[mt] <main> writes  global2[1] ∈ {2}  // ccfg.c:26 g2 :: ccfg.c:38 <- main
 [mt] Possible read/write data races:
   global2[1]:
     read by jobs[0] at ccfg.c:11, unprotected

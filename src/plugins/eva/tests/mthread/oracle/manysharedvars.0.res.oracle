@@ -417,7 +417,7 @@
    [125].data ∈ {0}
    [126].data ∈ {0}
    [127].data ∈ {0}
-   // manysharedvars.c:47 main (manysharedvars.c:39)
+   // manysharedvars.c:47 main
 [mt] jobs reads 
   s[0].data ∈ [0..2147483647]
    [1].data ∈ [0..2147483647]
@@ -547,7 +547,7 @@
    [125].data ∈ [0..2147483647]
    [126].data ∈ [0..2147483647]
    [127].data ∈ [0..2147483647]
-   // manysharedvars.c:29 f (manysharedvars.c:26)
+   // manysharedvars.c:29 f
 [mt] <main> reads 
   s[0].data2 ∈ {0}
    [1].data2 ∈ {0}
@@ -677,7 +677,7 @@
    [125].data2 ∈ {0}
    [126].data2 ∈ {0}
    [127].data2 ∈ {0}
-   // manysharedvars.c:48 main (manysharedvars.c:39)
+   // manysharedvars.c:48 main
 [mt] jobs reads 
   s[0].data2 ∈ [0..2147483646],0%3
    [1].data2 ∈ [0..2147483646],0%3
@@ -807,7 +807,7 @@
    [125].data2 ∈ [0..2147483646],0%3
    [126].data2 ∈ [0..2147483646],0%3
    [127].data2 ∈ [0..2147483646],0%3
-   // manysharedvars.c:30 f (manysharedvars.c:26)
+   // manysharedvars.c:30 f
 [mt] jobs writes 
   s[0].data ∈ [0..2147483647]
    [1].data ∈ [0..2147483647]
@@ -937,7 +937,7 @@
    [125].data ∈ [0..2147483647]
    [126].data ∈ [0..2147483647]
    [127].data ∈ [0..2147483647]
-   // manysharedvars.c:29 f (manysharedvars.c:26)
+   // manysharedvars.c:29 f
 [mt] jobs writes 
   s[0].data2 ∈ [0..2147483646],0%3
    [1].data2 ∈ [0..2147483646],0%3
@@ -1067,7 +1067,7 @@
    [125].data2 ∈ [0..2147483646],0%3
    [126].data2 ∈ [0..2147483646],0%3
    [127].data2 ∈ [0..2147483646],0%3
-   // manysharedvars.c:30 f (manysharedvars.c:26)
+   // manysharedvars.c:30 f
 [mt] Possible read/write data races:
   s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
     [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
@@ -1634,7 +1634,7 @@
    [125].data ∈ [0..2147483647]
    [126].data ∈ [0..2147483647]
    [127].data ∈ [0..2147483647]
-   // manysharedvars.c:29 f (manysharedvars.c:26)
+   // manysharedvars.c:29 f
 [mt] <main> reads 
   s[0].data ∈ [0..2147483647]
    [1].data ∈ [0..2147483647]
@@ -1764,7 +1764,7 @@
    [125].data ∈ [0..2147483647]
    [126].data ∈ [0..2147483647]
    [127].data ∈ [0..2147483647]
-   // manysharedvars.c:47 main (manysharedvars.c:39)
+   // manysharedvars.c:47 main
 [mt] jobs reads 
   s[0].data2 ∈ [0..2147483646],0%3
    [1].data2 ∈ [0..2147483646],0%3
@@ -1894,7 +1894,7 @@
    [125].data2 ∈ [0..2147483646],0%3
    [126].data2 ∈ [0..2147483646],0%3
    [127].data2 ∈ [0..2147483646],0%3
-   // manysharedvars.c:30 f (manysharedvars.c:26)
+   // manysharedvars.c:30 f
 [mt] <main> reads 
   s[0].data2 ∈ [0..2147483646],0%3
    [1].data2 ∈ [0..2147483646],0%3
@@ -2024,7 +2024,7 @@
    [125].data2 ∈ [0..2147483646],0%3
    [126].data2 ∈ [0..2147483646],0%3
    [127].data2 ∈ [0..2147483646],0%3
-   // manysharedvars.c:48 main (manysharedvars.c:39)
+   // manysharedvars.c:48 main
 [mt] jobs writes 
   s[0].data ∈ [0..2147483647]
    [1].data ∈ [0..2147483647]
@@ -2154,7 +2154,7 @@
    [125].data ∈ [0..2147483647]
    [126].data ∈ [0..2147483647]
    [127].data ∈ [0..2147483647]
-   // manysharedvars.c:29 f (manysharedvars.c:26)
+   // manysharedvars.c:29 f
 [mt] jobs writes 
   s[0].data2 ∈ [0..2147483646],0%3
    [1].data2 ∈ [0..2147483646],0%3
@@ -2284,7 +2284,7 @@
    [125].data2 ∈ [0..2147483646],0%3
    [126].data2 ∈ [0..2147483646],0%3
    [127].data2 ∈ [0..2147483646],0%3
-   // manysharedvars.c:30 f (manysharedvars.c:26)
+   // manysharedvars.c:30 f
 [mt] Possible read/write data races:
   s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
     [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;

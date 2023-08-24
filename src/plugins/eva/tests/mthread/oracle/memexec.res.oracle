@@ -84,22 +84,22 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: a; c
-[mt] <main> reads  a ∈ {0}  // memexec.c:33 main (memexec.c:31)
-[mt] <main> reads  c ∈ {0}  // memexec.c:33 main (memexec.c:31)
-[mt] th1 writes  a ∈ {1}  // memexec.c:14 f (memexec.c:27) <- t1 (memexec.c:23)
-[mt] th1 writes  a ∈ {1}  // memexec.c:14 f (memexec.c:25) <- t1 (memexec.c:23)
+[mt] <main> reads  a ∈ {0}  // memexec.c:33 main
+[mt] <main> reads  c ∈ {0}  // memexec.c:33 main
+[mt] th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:27 <- t1
+[mt] th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:25 <- t1
 [mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g (memexec.c:19) <- f (memexec.c:27) <- t1 (memexec.c:23)
+  g :: memexec.c:19 <- f :: memexec.c:27 <- t1
 [mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g (memexec.c:18) <- f (memexec.c:27) <- t1 (memexec.c:23)
+  g :: memexec.c:18 <- f :: memexec.c:27 <- t1
 [mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g (memexec.c:16) <- f (memexec.c:27) <- t1 (memexec.c:23)
+  g :: memexec.c:16 <- f :: memexec.c:27 <- t1
 [mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g (memexec.c:19) <- f (memexec.c:25) <- t1 (memexec.c:23)
+  g :: memexec.c:19 <- f :: memexec.c:25 <- t1
 [mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g (memexec.c:18) <- f (memexec.c:25) <- t1 (memexec.c:23)
+  g :: memexec.c:18 <- f :: memexec.c:25 <- t1
 [mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g (memexec.c:16) <- f (memexec.c:25) <- t1 (memexec.c:23)
+  g :: memexec.c:16 <- f :: memexec.c:25 <- t1
 [mt] Possible read/write data races:
   c:
     read by <main> at memexec.c:33, unprotected
@@ -150,22 +150,22 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: a; c
-[mt] <main> reads  a ∈ {0; 1}  // memexec.c:33 main (memexec.c:31)
-[mt] <main> reads  c ∈ {0; 2}  // memexec.c:33 main (memexec.c:31)
-[mt] th1 writes  a ∈ {1}  // memexec.c:14 f (memexec.c:27) <- t1 (memexec.c:23)
-[mt] th1 writes  a ∈ {1}  // memexec.c:14 f (memexec.c:25) <- t1 (memexec.c:23)
+[mt] <main> reads  a ∈ {0; 1}  // memexec.c:33 main
+[mt] <main> reads  c ∈ {0; 2}  // memexec.c:33 main
+[mt] th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:27 <- t1
+[mt] th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:25 <- t1
 [mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g (memexec.c:19) <- f (memexec.c:27) <- t1 (memexec.c:23)
+  g :: memexec.c:19 <- f :: memexec.c:27 <- t1
 [mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g (memexec.c:18) <- f (memexec.c:27) <- t1 (memexec.c:23)
+  g :: memexec.c:18 <- f :: memexec.c:27 <- t1
 [mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g (memexec.c:16) <- f (memexec.c:27) <- t1 (memexec.c:23)
+  g :: memexec.c:16 <- f :: memexec.c:27 <- t1
 [mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g (memexec.c:19) <- f (memexec.c:25) <- t1 (memexec.c:23)
+  g :: memexec.c:19 <- f :: memexec.c:25 <- t1
 [mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g (memexec.c:18) <- f (memexec.c:25) <- t1 (memexec.c:23)
+  g :: memexec.c:18 <- f :: memexec.c:25 <- t1
 [mt] th1 writes  c ∈ {2}  // memexec.c:10
-  g (memexec.c:16) <- f (memexec.c:25) <- t1 (memexec.c:23)
+  g :: memexec.c:16 <- f :: memexec.c:25 <- t1
 [mt] Possible read/write data races:
   c:
     read by <main> at memexec.c:33, unprotected

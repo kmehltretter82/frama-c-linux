@@ -360,15 +360,11 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: end2
-[mt] <main> reads  end2 ∈ {0}  // philo.c:53 main (philo.c:40)
-[mt] jobs[0] writes  end2 ∈ {1}  // philo.c:24
-  aux (philo.c:37) <- job (philo.c:31)
-[mt] jobs[2] writes  end2 ∈ {1}  // philo.c:24
-  aux (philo.c:37) <- job (philo.c:31)
-[mt] jobs[3] writes  end2 ∈ {1}  // philo.c:24
-  aux (philo.c:37) <- job (philo.c:31)
-[mt] jobs[4] writes  end2 ∈ {1}  // philo.c:24
-  aux (philo.c:37) <- job (philo.c:31)
+[mt] <main> reads  end2 ∈ {0}  // philo.c:53 main
+[mt] jobs[0] writes  end2 ∈ {1}  // philo.c:24 aux :: philo.c:37 <- job
+[mt] jobs[2] writes  end2 ∈ {1}  // philo.c:24 aux :: philo.c:37 <- job
+[mt] jobs[3] writes  end2 ∈ {1}  // philo.c:24 aux :: philo.c:37 <- job
+[mt] jobs[4] writes  end2 ∈ {1}  // philo.c:24 aux :: philo.c:37 <- job
 [mt] Possible read/write data races:
   end2:
     read by <main> at philo.c:53, unprotected
@@ -531,15 +527,11 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: end2
-[mt] <main> reads  end2 ∈ {0; 1}  // philo.c:53 main (philo.c:40)
-[mt] jobs[0] writes  end2 ∈ {1}  // philo.c:24
-  aux (philo.c:37) <- job (philo.c:31)
-[mt] jobs[2] writes  end2 ∈ {1}  // philo.c:24
-  aux (philo.c:37) <- job (philo.c:31)
-[mt] jobs[3] writes  end2 ∈ {1}  // philo.c:24
-  aux (philo.c:37) <- job (philo.c:31)
-[mt] jobs[4] writes  end2 ∈ {1}  // philo.c:24
-  aux (philo.c:37) <- job (philo.c:31)
+[mt] <main> reads  end2 ∈ {0; 1}  // philo.c:53 main
+[mt] jobs[0] writes  end2 ∈ {1}  // philo.c:24 aux :: philo.c:37 <- job
+[mt] jobs[2] writes  end2 ∈ {1}  // philo.c:24 aux :: philo.c:37 <- job
+[mt] jobs[3] writes  end2 ∈ {1}  // philo.c:24 aux :: philo.c:37 <- job
+[mt] jobs[4] writes  end2 ∈ {1}  // philo.c:24 aux :: philo.c:37 <- job
 [mt] Possible read/write data races:
   end2:
     read by <main> at philo.c:53, unprotected

@@ -575,19 +575,19 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: end
-[mt] <main> reads  end ∈ {0}  // recreation.c:68 main (recreation.c:58)
-[mt] jobs[0] reads  end ∈ {0}  // recreation.c:28 job (recreation.c:17)
-[mt] jobs[1] reads  end ∈ {0}  // recreation.c:28 job (recreation.c:17)
-[mt] jobs[2] reads  end ∈ {0}  // recreation.c:28 job (recreation.c:17)
-[mt] jobs[3] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[4] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[5] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[6] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[7] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[8] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[9] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[10] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[11] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
+[mt] <main> reads  end ∈ {0}  // recreation.c:68 main
+[mt] jobs[0] reads  end ∈ {0}  // recreation.c:28 job
+[mt] jobs[1] reads  end ∈ {0}  // recreation.c:28 job
+[mt] jobs[2] reads  end ∈ {0}  // recreation.c:28 job
+[mt] jobs[3] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[4] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[5] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[6] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[7] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[8] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[9] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[10] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[11] writes  end ∈ {1}  // recreation.c:40 job
 [mt] Possible read/write data races:
   end:
     read by <main> at recreation.c:68, unprotected
@@ -938,19 +938,19 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: end
-[mt] <main> reads  end ∈ {0; 1}  // recreation.c:68 main (recreation.c:58)
-[mt] jobs[0] reads  end ∈ {0; 1}  // recreation.c:28 job (recreation.c:17)
-[mt] jobs[1] reads  end ∈ {0; 1}  // recreation.c:28 job (recreation.c:17)
-[mt] jobs[2] reads  end ∈ {0; 1}  // recreation.c:28 job (recreation.c:17)
-[mt] jobs[3] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[4] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[5] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[6] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[7] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[8] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[9] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[10] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
-[mt] jobs[11] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
+[mt] <main> reads  end ∈ {0; 1}  // recreation.c:68 main
+[mt] jobs[0] reads  end ∈ {0; 1}  // recreation.c:28 job
+[mt] jobs[1] reads  end ∈ {0; 1}  // recreation.c:28 job
+[mt] jobs[2] reads  end ∈ {0; 1}  // recreation.c:28 job
+[mt] jobs[3] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[4] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[5] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[6] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[7] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[8] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[9] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[10] writes  end ∈ {1}  // recreation.c:40 job
+[mt] jobs[11] writes  end ∈ {1}  // recreation.c:40 job
 [mt] Possible read/write data races:
   end:
     read by <main> at recreation.c:68, unprotected

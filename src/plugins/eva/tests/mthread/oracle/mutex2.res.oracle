@@ -218,12 +218,12 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: s1; s2
-[mt] <main> reads  s1 ∈ {0}  // mutex2.c:58 main (mutex2.c:46)
-[mt] <main> reads  s2 ∈ {0}  // mutex2.c:59 main (mutex2.c:46)
-[mt] jobs1 writes  s1 ∈ {1}  // mutex2.c:21 f1 (mutex2.c:19)
-[mt] jobs2 writes  s1 ∈ {2}  // mutex2.c:28 f2 (mutex2.c:26)
-[mt] jobs3 writes  s2 ∈ {3}  // mutex2.c:34 f3 (mutex2.c:33)
-[mt] jobs4 writes  s2 ∈ {3}  // mutex2.c:41 f4 (mutex2.c:39)
+[mt] <main> reads  s1 ∈ {0}  // mutex2.c:58 main
+[mt] <main> reads  s2 ∈ {0}  // mutex2.c:59 main
+[mt] jobs1 writes  s1 ∈ {1}  // mutex2.c:21 f1
+[mt] jobs2 writes  s1 ∈ {2}  // mutex2.c:28 f2
+[mt] jobs3 writes  s2 ∈ {3}  // mutex2.c:34 f3
+[mt] jobs4 writes  s2 ∈ {3}  // mutex2.c:41 f4
 [mt] Possible read/write data races:
   s2:
     read by <main> at mutex2.c:59, protected by m1 m2
@@ -344,12 +344,12 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: s1; s2
-[mt] <main> reads  s1 ∈ {0; 1; 2}  // mutex2.c:58 main (mutex2.c:46)
-[mt] <main> reads  s2 ∈ {0; 3}  // mutex2.c:59 main (mutex2.c:46)
-[mt] jobs1 writes  s1 ∈ {1}  // mutex2.c:21 f1 (mutex2.c:19)
-[mt] jobs2 writes  s1 ∈ {2}  // mutex2.c:28 f2 (mutex2.c:26)
-[mt] jobs3 writes  s2 ∈ {3}  // mutex2.c:34 f3 (mutex2.c:33)
-[mt] jobs4 writes  s2 ∈ {3}  // mutex2.c:41 f4 (mutex2.c:39)
+[mt] <main> reads  s1 ∈ {0; 1; 2}  // mutex2.c:58 main
+[mt] <main> reads  s2 ∈ {0; 3}  // mutex2.c:59 main
+[mt] jobs1 writes  s1 ∈ {1}  // mutex2.c:21 f1
+[mt] jobs2 writes  s1 ∈ {2}  // mutex2.c:28 f2
+[mt] jobs3 writes  s2 ∈ {3}  // mutex2.c:34 f3
+[mt] jobs4 writes  s2 ∈ {3}  // mutex2.c:41 f4
 [mt] Possible read/write data races:
   s2:
     read by <main> at mutex2.c:59, protected by m1 m2

@@ -108,14 +108,10 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: a; b
-[mt] jobs2 reads  a ∈ {0}  // assigns.c:25
-  g2 (assigns.c:25) <- f2 (assigns.c:24)
-[mt] jobs1 reads  b ∈ {0}  // assigns.c:20
-  g1 (assigns.c:20) <- f1 (assigns.c:19)
-[mt] jobs1 writes  a ∈ [--..--]  // assigns.c:20
-  g1 (assigns.c:20) <- f1 (assigns.c:19)
-[mt] jobs2 writes  b ∈ [--..--]  // assigns.c:25
-  g2 (assigns.c:25) <- f2 (assigns.c:24)
+[mt] jobs2 reads  a ∈ {0}  // assigns.c:25 g2 :: assigns.c:25 <- f2
+[mt] jobs1 reads  b ∈ {0}  // assigns.c:20 g1 :: assigns.c:20 <- f1
+[mt] jobs1 writes  a ∈ [--..--]  // assigns.c:20 g1 :: assigns.c:20 <- f1
+[mt] jobs2 writes  b ∈ [--..--]  // assigns.c:25 g2 :: assigns.c:25 <- f2
 [mt] Possible read/write data races:
   b:
     read by jobs1 at assigns.c:20, unprotected
@@ -170,14 +166,10 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: a; b
-[mt] jobs2 reads  a ∈ {0}  // assigns.c:25
-  g2 (assigns.c:25) <- f2 (assigns.c:24)
-[mt] jobs1 reads  b ∈ {0}  // assigns.c:20
-  g1 (assigns.c:20) <- f1 (assigns.c:19)
-[mt] jobs1 writes  a ∈ [--..--]  // assigns.c:20
-  g1 (assigns.c:20) <- f1 (assigns.c:19)
-[mt] jobs2 writes  b ∈ [--..--]  // assigns.c:25
-  g2 (assigns.c:25) <- f2 (assigns.c:24)
+[mt] jobs2 reads  a ∈ {0}  // assigns.c:25 g2 :: assigns.c:25 <- f2
+[mt] jobs1 reads  b ∈ {0}  // assigns.c:20 g1 :: assigns.c:20 <- f1
+[mt] jobs1 writes  a ∈ [--..--]  // assigns.c:20 g1 :: assigns.c:20 <- f1
+[mt] jobs2 writes  b ∈ [--..--]  // assigns.c:25 g2 :: assigns.c:25 <- f2
 [mt] Possible read/write data races:
   b:
     read by jobs1 at assigns.c:20, unprotected

@@ -86,10 +86,8 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: NULL[100..200]
-[mt] <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:26
-  main (null.c:20)
-[mt] tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:15
-  job0 (null.c:13)
+[mt] <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:26 main
+[mt] tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:15 job0
 [mt] Possible read/write data races:
   NULL[100..200]:
     read by <main> at null.c:26, unprotected
@@ -128,10 +126,8 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: NULL[100..200]
-[mt] <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:26
-  main (null.c:20)
-[mt] tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:15
-  job0 (null.c:13)
+[mt] <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:26 main
+[mt] tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:15 job0
 [mt] Possible read/write data races:
   NULL[100..200]:
     read by <main> at null.c:26, unprotected

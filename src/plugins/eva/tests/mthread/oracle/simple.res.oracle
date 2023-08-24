@@ -160,18 +160,18 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: a; b; c; v
-[mt] <main> reads  a ∈ {0}  // simple.c:44 main (simple.c:37)
-[mt] <main> reads  b ∈ {0}  // simple.c:44 main (simple.c:37)
-[mt] <main> reads  c ∈ {0}  // simple.c:44 main (simple.c:37)
-[mt] <main> reads  v ∈ {0}  // simple.c:44 main (simple.c:37)
-[mt] job1 writes  a ∈ {1}  // simple.c:17 f1 (simple.c:15)
-[mt] job2 writes  a ∈ {2}  // simple.c:29 f2 (simple.c:26)
-[mt] job1 writes  b ∈ {1}  // simple.c:18 f1 (simple.c:15)
-[mt] job2 writes  b ∈ {2}  // simple.c:28 f2 (simple.c:26)
-[mt] job1 writes  c ∈ {1}  // simple.c:19 f1 (simple.c:15)
-[mt] job2 writes  c ∈ {2}  // simple.c:30 f2 (simple.c:26)
-[mt] job1 writes  v ∈ {1}  // simple.c:20 g1 (simple.c:20) <- f1 (simple.c:15)
-[mt] job2 writes  v ∈ {2}  // simple.c:31 g2 (simple.c:31) <- f2 (simple.c:26)
+[mt] <main> reads  a ∈ {0}  // simple.c:44 main
+[mt] <main> reads  b ∈ {0}  // simple.c:44 main
+[mt] <main> reads  c ∈ {0}  // simple.c:44 main
+[mt] <main> reads  v ∈ {0}  // simple.c:44 main
+[mt] job1 writes  a ∈ {1}  // simple.c:17 f1
+[mt] job2 writes  a ∈ {2}  // simple.c:29 f2
+[mt] job1 writes  b ∈ {1}  // simple.c:18 f1
+[mt] job2 writes  b ∈ {2}  // simple.c:28 f2
+[mt] job1 writes  c ∈ {1}  // simple.c:19 f1
+[mt] job2 writes  c ∈ {2}  // simple.c:30 f2
+[mt] job1 writes  v ∈ {1}  // simple.c:20 g1 :: simple.c:20 <- f1
+[mt] job2 writes  v ∈ {2}  // simple.c:31 g2 :: simple.c:31 <- f2
 [mt] Possible read/write data races:
   v:
     read by <main> at simple.c:44, protected by lock
@@ -275,18 +275,18 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: a; b; c; v
-[mt] <main> reads  a ∈ {0; 1; 2}  // simple.c:44 main (simple.c:37)
-[mt] <main> reads  b ∈ {0; 1; 2}  // simple.c:44 main (simple.c:37)
-[mt] <main> reads  c ∈ {0; 1; 2}  // simple.c:44 main (simple.c:37)
-[mt] <main> reads  v ∈ {0; 1; 2}  // simple.c:44 main (simple.c:37)
-[mt] job1 writes  a ∈ {1}  // simple.c:17 f1 (simple.c:15)
-[mt] job2 writes  a ∈ {2}  // simple.c:29 f2 (simple.c:26)
-[mt] job1 writes  b ∈ {1}  // simple.c:18 f1 (simple.c:15)
-[mt] job2 writes  b ∈ {2}  // simple.c:28 f2 (simple.c:26)
-[mt] job1 writes  c ∈ {1}  // simple.c:19 f1 (simple.c:15)
-[mt] job2 writes  c ∈ {2}  // simple.c:30 f2 (simple.c:26)
-[mt] job1 writes  v ∈ {1}  // simple.c:20 g1 (simple.c:20) <- f1 (simple.c:15)
-[mt] job2 writes  v ∈ {2}  // simple.c:31 g2 (simple.c:31) <- f2 (simple.c:26)
+[mt] <main> reads  a ∈ {0; 1; 2}  // simple.c:44 main
+[mt] <main> reads  b ∈ {0; 1; 2}  // simple.c:44 main
+[mt] <main> reads  c ∈ {0; 1; 2}  // simple.c:44 main
+[mt] <main> reads  v ∈ {0; 1; 2}  // simple.c:44 main
+[mt] job1 writes  a ∈ {1}  // simple.c:17 f1
+[mt] job2 writes  a ∈ {2}  // simple.c:29 f2
+[mt] job1 writes  b ∈ {1}  // simple.c:18 f1
+[mt] job2 writes  b ∈ {2}  // simple.c:28 f2
+[mt] job1 writes  c ∈ {1}  // simple.c:19 f1
+[mt] job2 writes  c ∈ {2}  // simple.c:30 f2
+[mt] job1 writes  v ∈ {1}  // simple.c:20 g1 :: simple.c:20 <- f1
+[mt] job2 writes  v ∈ {2}  // simple.c:31 g2 :: simple.c:31 <- f2
 [mt] Possible read/write data races:
   v:
     read by <main> at simple.c:44, protected by lock

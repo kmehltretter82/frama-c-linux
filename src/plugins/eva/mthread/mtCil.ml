@@ -73,11 +73,13 @@ module StackElt = struct
   include Datatype.Pair(Kernel_function)(Cil_datatype.Kinstr)
 
   let pretty fmt (f, ki) =
-    Format.fprintf fmt "@[<hov 2>%s (%t)@]"
+    Format.fprintf fmt "@[<hov 2>%s%t@]"
       (Ast_info.Function.get_name f.fundec)
       (fun fmt -> match ki with
-         | Kstmt stmt -> pretty_stmt fmt stmt
-         | Kglobal -> Printer.pp_location fmt (Kernel_function.get_location f)
+         | Kstmt stmt ->
+           let loc = Cil_datatype.Stmt.loc stmt in
+           Format.fprintf fmt " :: %a" Cil_datatype.Location.pretty loc
+         | Kglobal -> ()
       )
 
 end

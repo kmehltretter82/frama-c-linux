@@ -266,13 +266,13 @@
     s4; s6
   vs.
     u3; s4; s5; s6
-[mt] jobs4 reads  s4 ∈ {-1}  // sharedvars.c:53 f4 (sharedvars.c:52)
-[mt] jobs4 reads  s6 ∈ {0}  // sharedvars.c:56 f4 (sharedvars.c:52)
-[mt] jobs6 reads  s6 ∈ {0}  // sharedvars.c:75 f6 (sharedvars.c:74)
-[mt] <main> writes  s4 ∈ {1}  // sharedvars.c:100 main (sharedvars.c:80)
-[mt] jobs4 writes  s4 ∈ {4}  // sharedvars.c:54 f4 (sharedvars.c:52)
-[mt] jobs4 writes  s6 ∈ {4}  // sharedvars.c:57 f4 (sharedvars.c:52)
-[mt] jobs6 writes  s6 ∈ {6}  // sharedvars.c:76 f6 (sharedvars.c:74)
+[mt] jobs4 reads  s4 ∈ {-1}  // sharedvars.c:53 f4
+[mt] jobs4 reads  s6 ∈ {0}  // sharedvars.c:56 f4
+[mt] jobs6 reads  s6 ∈ {0}  // sharedvars.c:75 f6
+[mt] <main> writes  s4 ∈ {1}  // sharedvars.c:100 main
+[mt] jobs4 writes  s4 ∈ {4}  // sharedvars.c:54 f4
+[mt] jobs4 writes  s6 ∈ {4}  // sharedvars.c:57 f4
+[mt] jobs6 writes  s6 ∈ {6}  // sharedvars.c:76 f6
 [mt] Possible read/write data races:
   s6:
     read by jobs4 at sharedvars.c:56, unprotected
@@ -459,16 +459,16 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: u3; s4; s5; s6
-[mt] jobs4 reads  s4 ∈ {-1}  // sharedvars.c:53 f4 (sharedvars.c:52)
-[mt] jobs51 reads  s5 ∈ {0}  // sharedvars.c:62 f51 (sharedvars.c:61)
-[mt] jobs4 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:56 f4 (sharedvars.c:52)
-[mt] jobs6 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:75 f6 (sharedvars.c:74)
-[mt] <main> writes  s4 ∈ {1}  // sharedvars.c:100 main (sharedvars.c:80)
-[mt] jobs4 writes  s4 ∈ {4}  // sharedvars.c:54 f4 (sharedvars.c:52)
-[mt] jobs5 writes  s5 ∈ {5}  // sharedvars.c:69 f5 (sharedvars.c:67)
-[mt] jobs51 writes  s5 ∈ {51}  // sharedvars.c:63 f51 (sharedvars.c:61)
-[mt] jobs4 writes  s6 ∈ {4}  // sharedvars.c:57 f4 (sharedvars.c:52)
-[mt] jobs6 writes  s6 ∈ {6}  // sharedvars.c:76 f6 (sharedvars.c:74)
+[mt] jobs4 reads  s4 ∈ {-1}  // sharedvars.c:53 f4
+[mt] jobs51 reads  s5 ∈ {0}  // sharedvars.c:62 f51
+[mt] jobs4 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:56 f4
+[mt] jobs6 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:75 f6
+[mt] <main> writes  s4 ∈ {1}  // sharedvars.c:100 main
+[mt] jobs4 writes  s4 ∈ {4}  // sharedvars.c:54 f4
+[mt] jobs5 writes  s5 ∈ {5}  // sharedvars.c:69 f5
+[mt] jobs51 writes  s5 ∈ {51}  // sharedvars.c:63 f51
+[mt] jobs4 writes  s6 ∈ {4}  // sharedvars.c:57 f4
+[mt] jobs6 writes  s6 ∈ {6}  // sharedvars.c:76 f6
 [mt] Possible read/write data races:
   s6:
     read by jobs4 at sharedvars.c:56, unprotected
@@ -528,16 +528,16 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: u3; s4; s5; s6
-[mt] jobs4 reads  s4 ∈ {-1}  // sharedvars.c:53 f4 (sharedvars.c:52)
-[mt] jobs51 reads  s5 ∈ {0}  // sharedvars.c:62 f51 (sharedvars.c:61)
-[mt] jobs4 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:56 f4 (sharedvars.c:52)
-[mt] jobs6 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:75 f6 (sharedvars.c:74)
-[mt] <main> writes  s4 ∈ {1}  // sharedvars.c:100 main (sharedvars.c:80)
-[mt] jobs4 writes  s4 ∈ {4}  // sharedvars.c:54 f4 (sharedvars.c:52)
-[mt] jobs5 writes  s5 ∈ {5}  // sharedvars.c:69 f5 (sharedvars.c:67)
-[mt] jobs51 writes  s5 ∈ {51}  // sharedvars.c:63 f51 (sharedvars.c:61)
-[mt] jobs4 writes  s6 ∈ {4}  // sharedvars.c:57 f4 (sharedvars.c:52)
-[mt] jobs6 writes  s6 ∈ {6}  // sharedvars.c:76 f6 (sharedvars.c:74)
+[mt] jobs4 reads  s4 ∈ {-1}  // sharedvars.c:53 f4
+[mt] jobs51 reads  s5 ∈ {0}  // sharedvars.c:62 f51
+[mt] jobs4 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:56 f4
+[mt] jobs6 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:75 f6
+[mt] <main> writes  s4 ∈ {1}  // sharedvars.c:100 main
+[mt] jobs4 writes  s4 ∈ {4}  // sharedvars.c:54 f4
+[mt] jobs5 writes  s5 ∈ {5}  // sharedvars.c:69 f5
+[mt] jobs51 writes  s5 ∈ {51}  // sharedvars.c:63 f51
+[mt] jobs4 writes  s6 ∈ {4}  // sharedvars.c:57 f4
+[mt] jobs6 writes  s6 ∈ {6}  // sharedvars.c:76 f6
 [mt] Possible read/write data races:
   s6:
     read by jobs4 at sharedvars.c:56, unprotected

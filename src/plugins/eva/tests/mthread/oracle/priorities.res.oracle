@@ -221,11 +221,11 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: s1; s2
-[mt] jobs1 reads  s1 ∈ {0}  // priorities.c:22 f1 (priorities.c:19)
-[mt] <main> reads  s2 ∈ {0}  // priorities.c:64 main (priorities.c:49)
-[mt] <main> writes  s1 ∈ {1}  // priorities.c:63 main (priorities.c:49)
-[mt] jobs3 writes  s2 ∈ {3}  // priorities.c:36 f3 (priorities.c:34)
-[mt] jobs4 writes  s2 ∈ {3}  // priorities.c:44 f4 (priorities.c:41)
+[mt] jobs1 reads  s1 ∈ {0}  // priorities.c:22 f1
+[mt] <main> reads  s2 ∈ {0}  // priorities.c:64 main
+[mt] <main> writes  s1 ∈ {1}  // priorities.c:63 main
+[mt] jobs3 writes  s2 ∈ {3}  // priorities.c:36 f3
+[mt] jobs4 writes  s2 ∈ {3}  // priorities.c:44 f4
 [mt] Possible read/write data races:
   s2:
     read by <main> at priorities.c:64, protected by m1 m2
@@ -355,11 +355,11 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: s1; s2
-[mt] jobs1 reads  s1 ∈ {0; 1}  // priorities.c:22 f1 (priorities.c:19)
-[mt] <main> reads  s2 ∈ {0; 3}  // priorities.c:64 main (priorities.c:49)
-[mt] <main> writes  s1 ∈ {1}  // priorities.c:63 main (priorities.c:49)
-[mt] jobs3 writes  s2 ∈ {3}  // priorities.c:36 f3 (priorities.c:34)
-[mt] jobs4 writes  s2 ∈ {3}  // priorities.c:44 f4 (priorities.c:41)
+[mt] jobs1 reads  s1 ∈ {0; 1}  // priorities.c:22 f1
+[mt] <main> reads  s2 ∈ {0; 3}  // priorities.c:64 main
+[mt] <main> writes  s1 ∈ {1}  // priorities.c:63 main
+[mt] jobs3 writes  s2 ∈ {3}  // priorities.c:36 f3
+[mt] jobs4 writes  s2 ∈ {3}  // priorities.c:44 f4
 [mt] Possible read/write data races:
   s2:
     read by <main> at priorities.c:64, protected by m1 m2
