@@ -504,7 +504,7 @@ let update_initial_state analysis th state =
     ThreadState.recompute_because th MtThread.InitialEnvChanged;
     if Cvalue.Model.is_reachable th.th_init_state then
       log ~kind:Log.Result analysis "@[<hov 2>New context for@ %a@]"
-        ThreadState.pretty th;
+        ThreadState.pretty_detailed th;
   );
   th.th_init_state <- initial;
   (* Update the state of the creator too: more than one thread is running,
