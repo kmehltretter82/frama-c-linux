@@ -31,7 +31,7 @@ module Name = struct
     type t =
       | String of string
       | Integer of Integer.t
-      | Pointer of Varinfo.t * Offset.t
+      | Pointer of Varinfo.t * OffsetStructEq.t
       | RawPointer of Varinfo.t * Integer.t (* Offset in bits *)
     [@@deriving eq, ord]
 
@@ -42,15 +42,15 @@ module Name = struct
       | String s -> Format.pp_print_string fmt s
       | Integer i -> Integer.pretty fmt i
       | Pointer (v, o) ->
-        Format.fprintf fmt "%a%a" Varinfo.pretty v Offset.pretty o
+        Format.fprintf fmt "%a%a" Varinfo.pretty v OffsetStructEq.pretty o
       | RawPointer (v, o) ->
         Format.fprintf fmt "&%a + %a" Varinfo.pretty v Integer.pretty o
 
     let hash = function
       | String s -> Hashtbl.hash (1, s)
       | Integer i -> Hashtbl.hash (2, Integer.hash i)
-      | Pointer (v, o) -> Hashtbl.hash (3, Varinfo.hash v, Offset.hash o)
-      | RawPointer (v, o) -> Hashtbl.hash (3, Varinfo.hash v, Integer.hash o)
+      | Pointer (v, o) -> Hashtbl.hash (3, Varinfo.hash v, OffsetStructEq.hash o)
+      | RawPointer (v, o) -> Hashtbl.hash (4, Varinfo.hash v, Integer.hash o)
   end
 
   include Prototype
