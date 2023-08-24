@@ -38,8 +38,11 @@ val add_last_analysis :
   get_state:(Analysis_location.local -> 'a Lattice_bounds.or_top_bottom) ->
   t -> Thread.t -> Analysis_location.local list -> Base.Hptset.t -> unit
 
-(** Inject applicable interferences to an abstract state. If activated,
+(** Inject current interferences to an abstract state. If activated,
     the Mthread domain helps filtering applicable interferences. This function
     is the identity if the Mthread domain can infer that no shared memory has
     been read or written during the last transfer function. *)
-val inject : domain:'a domain -> t -> 'a -> 'a
+val inject : domain:'a domain -> 'a -> 'a
+
+(** Are there any current interferences to inject? *)
+val is_empty : unit -> bool

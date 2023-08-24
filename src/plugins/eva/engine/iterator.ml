@@ -396,7 +396,7 @@ module Make_Dataflow
     let domain =
       (module Domain : Abstract.Domain.External with type state = 'a)
     in
-    Interferences.inject ~domain !Interferences.current
+    Interferences.inject ~domain
 
   (* --- Iteration strategy ---*)
 
@@ -438,7 +438,11 @@ module Make_Dataflow
     let open Current_loc.Operators in
     let<> UpdatedCurrentLoc = e.edge_loc in
     let flow = Partitioning.transfer (transfer_transition transition) flow in
-    let flow = Partitioning.transfer (lift inject_interferences) flow in
+    let flow =
+      if Interferences.is_empty ()
+      then flow
+      else Partitioning.transfer (lift inject_interferences) flow
+    in
     let flow = process_partitioning_transitions v1 v2 transition flow in
     if not (Partitioning.is_empty_flow flow) then
       record_fireable e;

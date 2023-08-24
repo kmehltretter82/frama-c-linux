@@ -165,8 +165,9 @@ let applicable (type a) ~(domain : a domain) (interferences : t) (state : a)
     in
     ThreadTable.fold add_thread states `Bottom
 
-let inject (type a) ~(domain : a domain) (interferences : t) (state : a) : a =
+let inject (type a) ~(domain : a domain) (state : a) : a =
   let module Dom = (val domain) in
+  let interferences = !current in
   let Interferences { shared_bases } = interferences in
   if is_empty interferences
   (* No interferences computed, single threaded analysis *)
@@ -206,3 +207,5 @@ let inject (type a) ~(domain : a domain) (interferences : t) (state : a) : a =
         Dom.join state result
     end
   end
+
+let is_empty () = is_empty !current
