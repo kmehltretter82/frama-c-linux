@@ -6,16 +6,16 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main
-[mt] mutex.c:51: Initializing mutex &m1
-[mt] mutex.c:52: Initializing mutex &m2
-[mt] mutex.c:54: New thread: &jobs1, fun f1, parent _main_, args {0}
-[mt] mutex.c:54: Start thread &jobs1
-[mt] mutex.c:55: New thread: &jobs2, fun f2, parent _main_, args {0}
-[mt] mutex.c:55: Start thread &jobs2
-[mt] mutex.c:56: New thread: &jobs3, fun f3, parent _main_, args {0}
-[mt] mutex.c:56: Start thread &jobs3
-[mt] mutex.c:57: New thread: &jobs4, fun f4, parent _main_, args {0}
-[mt] mutex.c:57: Start thread &jobs4
+[mt] mutex.c:51: Initializing mutex m1
+[mt] mutex.c:52: Initializing mutex m2
+[mt] mutex.c:54: New thread: jobs1, fun f1, parent _main_, args {0}
+[mt] mutex.c:54: Start thread jobs1
+[mt] mutex.c:55: New thread: jobs2, fun f2, parent _main_, args {0}
+[mt] mutex.c:55: Start thread jobs2
+[mt] mutex.c:56: New thread: jobs3, fun f3, parent _main_, args {0}
+[mt] mutex.c:56: Start thread jobs3
+[mt] mutex.c:57: New thread: jobs4, fun f4, parent _main_, args {0}
+[mt] mutex.c:57: Start thread jobs4
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -30,57 +30,57 @@
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
-[mt] *** Computing thread &jobs1, iteration 1 (first iteration)
-[mt] * Computing value analysis for thread &jobs1
-[mt] mutex.c:23: Lock &m1
-[mt] mutex.c:24: Lock &m2
-[mt] mutex.c:26: Release &m2
-[mt] mutex.c:27: Release &m1
+[mt] *** Computing thread jobs1, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread jobs1
+[mt] mutex.c:23: Lock m1
+[mt] mutex.c:24: Lock m2
+[mt] mutex.c:26: Release m2
+[mt] mutex.c:27: Release m1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s1: write by &jobs1 at mutex.c:25
+  s1: write by jobs1 at mutex.c:25
   m1:
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
   m2:
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &jobs1 computed
-[mt] *** Computing thread &jobs2, iteration 1 (first iteration)
-[mt] * Computing value analysis for thread &jobs2
-[mt] mutex.c:32: Lock &m1
-[mt] mutex.c:35: Release &m1
+[mt] *** Thread jobs1 computed
+[mt] *** Computing thread jobs2, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread jobs2
+[mt] mutex.c:32: Lock m1
+[mt] mutex.c:35: Release m1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s1: read by &jobs2 at mutex.c:33
-  s2: read by &jobs2 at mutex.c:34
+  s1: read by jobs2 at mutex.c:33
+  s2: read by jobs2 at mutex.c:34
   m1:
-    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:56
-    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &jobs2 computed
-[mt] *** Computing thread &jobs3, iteration 1 (first iteration)
-[mt] * Computing value analysis for thread &jobs3
+[mt] *** Thread jobs2 computed
+[mt] *** Computing thread jobs3, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread jobs3
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s2: write by &jobs3 at mutex.c:40
+  s2: write by jobs3 at mutex.c:40
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &jobs3 computed
-[mt] *** Computing thread &jobs4, iteration 1 (first iteration)
-[mt] * Computing value analysis for thread &jobs4
+[mt] *** Thread jobs3 computed
+[mt] *** Computing thread jobs4, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread jobs4
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -88,7 +88,7 @@
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &jobs4 computed
+[mt] *** Thread jobs4 computed
 [mt] ***** Threads computed for iteration 1.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
@@ -108,16 +108,16 @@
 [mt] *** Computing thread _main_, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread _main_
 [mt] Thread main, fun main
-[mt] mutex.c:51: Initializing mutex &m1
-[mt] mutex.c:52: Initializing mutex &m2
-[mt] mutex.c:54: Thread &jobs1, fun f1, parent _main_, args {0}
-[mt] mutex.c:54: Start thread &jobs1
-[mt] mutex.c:55: Thread &jobs2, fun f2, parent _main_, args {0}
-[mt] mutex.c:55: Start thread &jobs2
-[mt] mutex.c:56: Thread &jobs3, fun f3, parent _main_, args {0}
-[mt] mutex.c:56: Start thread &jobs3
-[mt] mutex.c:57: Thread &jobs4, fun f4, parent _main_, args {0}
-[mt] mutex.c:57: Start thread &jobs4
+[mt] mutex.c:51: Initializing mutex m1
+[mt] mutex.c:52: Initializing mutex m2
+[mt] mutex.c:54: Thread jobs1, fun f1, parent _main_, args {0}
+[mt] mutex.c:54: Start thread jobs1
+[mt] mutex.c:55: Thread jobs2, fun f2, parent _main_, args {0}
+[mt] mutex.c:55: Start thread jobs2
+[mt] mutex.c:56: Thread jobs3, fun f3, parent _main_, args {0}
+[mt] mutex.c:56: Start thread jobs3
+[mt] mutex.c:57: Thread jobs4, fun f4, parent _main_, args {0}
+[mt] mutex.c:57: Start thread jobs4
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -130,130 +130,130 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread _main_ computed
-[mt] *** Computing thread &jobs1, iteration 2 (potential shared vars changed)
-[mt] * Computing value analysis for thread &jobs1
-[mt] mutex.c:23: Lock &m1
-[mt] mutex.c:24: Lock &m2
-[mt] mutex.c:26: Release &m2
-[mt] mutex.c:27: Release &m1
+[mt] *** Computing thread jobs1, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread jobs1
+[mt] mutex.c:23: Lock m1
+[mt] mutex.c:24: Lock m2
+[mt] mutex.c:26: Release m2
+[mt] mutex.c:27: Release m1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s1: write by &jobs1 at mutex.c:25
+  s1: write by jobs1 at mutex.c:25
   m1:
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
   m2:
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
-    read by &jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &jobs1 computed
-[mt] *** Computing thread &jobs2, iteration 2 (potential shared vars changed)
-[mt] * Computing value analysis for thread &jobs2
-[mt] mutex.c:32: Lock &m1
-[mt] mutex.c:35: Release &m1
+[mt] *** Thread jobs1 computed
+[mt] *** Computing thread jobs2, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread jobs2
+[mt] mutex.c:32: Lock m1
+[mt] mutex.c:35: Release m1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s1: read by &jobs2 at mutex.c:33
-  s2: read by &jobs2 at mutex.c:34
+  s1: read by jobs2 at mutex.c:33
+  s2: read by jobs2 at mutex.c:34
   m1:
-    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:56
-    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &jobs2 computed
-[mt] *** Computing thread &jobs3, iteration 2 (potential shared vars changed)
-[mt] * Computing value analysis for thread &jobs3
+[mt] *** Thread jobs2 computed
+[mt] *** Computing thread jobs3, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread jobs3
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s2: write by &jobs3 at mutex.c:40
+  s2: write by jobs3 at mutex.c:40
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &jobs3 computed
+[mt] *** Thread jobs3 computed
 [mt] ***** Threads computed for iteration 2.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: s1; s2
-[mt] &jobs2 reads  s1 ∈ {0}  // mutex.c:33 f2 (mutex.c:31)
-[mt] &jobs2 reads  s2 ∈ {0}  // mutex.c:34 f2 (mutex.c:31)
-[mt] &jobs1 writes  s1 ∈ {1}  // mutex.c:25 f1 (mutex.c:22)
-[mt] &jobs3 writes  s2 ∈ {3}  // mutex.c:40 f3 (mutex.c:39)
+[mt] jobs2 reads  s1 ∈ {0}  // mutex.c:33 f2 (mutex.c:31)
+[mt] jobs2 reads  s2 ∈ {0}  // mutex.c:34 f2 (mutex.c:31)
+[mt] jobs1 writes  s1 ∈ {1}  // mutex.c:25 f1 (mutex.c:22)
+[mt] jobs3 writes  s2 ∈ {3}  // mutex.c:40 f3 (mutex.c:39)
 [mt] Possible read/write data races:
   s2:
-    read by &jobs2 at mutex.c:34, protected by &m1
-    write by &jobs3 at mutex.c:40, unprotected
+    read by jobs2 at mutex.c:34, protected by m1
+    write by jobs3 at mutex.c:40, unprotected
   s1:
-    read by &jobs2 at mutex.c:33, protected by &m1
-    write by &jobs1 at mutex.c:25, protected by &m1 &m2
+    read by jobs2 at mutex.c:33, protected by m1
+    write by jobs1 at mutex.c:25, protected by m1 m2
 [mt] Shared memory: s1; s2
 [mt] Concurrent precise var accesses have changed: before
     \nothing
   vs.
     s1; s2
-[mt] Write summary for &jobs1 (updated): s1 ∈ {1}
-[mt] Write summary for &jobs3 (updated): s2 ∈ {3}
+[mt] Write summary for jobs1 (updated): s1 ∈ {1}
+[mt] Write summary for jobs3 (updated): s2 ∈ {3}
 [mt] Mutexes for concurrent accesses:
-  s1  write protected by &m1 &m2, read protected by &m1
-  s2  write unprotected, read protected by &m1
+  s1  write protected by m1 m2, read protected by m1
+  s2  write unprotected, read protected by m1
 [mt] Detailed shared zones protections
-  s2: Read by &jobs2, Write by &jobs3: unprotected
-  s1: Read by &jobs2, Write by &jobs1: protected by &m1
+  s2: Read by jobs2, Write by jobs3: unprotected
+  s1: Read by jobs2, Write by jobs1: protected by m1
 [mt] Statements needing manual synchronisation
   mutex.c:34 (for s2)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread &jobs2, iteration 3 (shared vars values changed)
-[mt] * Computing value analysis for thread &jobs2
-[mt] mutex.c:32: Lock &m1
-[mt] mutex.c:35: Release &m1
+[mt] *** Computing thread jobs2, iteration 3 (shared vars values changed)
+[mt] * Computing value analysis for thread jobs2
+[mt] mutex.c:32: Lock m1
+[mt] mutex.c:35: Release m1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s1: read by &jobs2 at mutex.c:33
-  s2: read by &jobs2 at mutex.c:34
+  s1: read by jobs2 at mutex.c:33
+  s2: read by jobs2 at mutex.c:34
   m1:
-    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:56
-    read by &jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &jobs2 computed
+[mt] *** Thread jobs2 computed
 [mt] ***** Threads computed for iteration 3.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: s1; s2
-[mt] &jobs2 reads  s1 ∈ {0; 1}  // mutex.c:33 f2 (mutex.c:31)
-[mt] &jobs2 reads  s2 ∈ {0; 3}  // mutex.c:34 f2 (mutex.c:31)
-[mt] &jobs1 writes  s1 ∈ {1}  // mutex.c:25 f1 (mutex.c:22)
-[mt] &jobs3 writes  s2 ∈ {3}  // mutex.c:40 f3 (mutex.c:39)
+[mt] jobs2 reads  s1 ∈ {0; 1}  // mutex.c:33 f2 (mutex.c:31)
+[mt] jobs2 reads  s2 ∈ {0; 3}  // mutex.c:34 f2 (mutex.c:31)
+[mt] jobs1 writes  s1 ∈ {1}  // mutex.c:25 f1 (mutex.c:22)
+[mt] jobs3 writes  s2 ∈ {3}  // mutex.c:40 f3 (mutex.c:39)
 [mt] Possible read/write data races:
   s2:
-    read by &jobs2 at mutex.c:34, protected by &m1
-    write by &jobs3 at mutex.c:40, unprotected
+    read by jobs2 at mutex.c:34, protected by m1
+    write by jobs3 at mutex.c:40, unprotected
   s1:
-    read by &jobs2 at mutex.c:33, protected by &m1
-    write by &jobs1 at mutex.c:25, protected by &m1 &m2
+    read by jobs2 at mutex.c:33, protected by m1
+    write by jobs1 at mutex.c:25, protected by m1 m2
 [mt] Shared memory: s1; s2
-[mt] Write summary for &jobs1: s1 ∈ {1}
-[mt] Write summary for &jobs3: s2 ∈ {3}
+[mt] Write summary for jobs1: s1 ∈ {1}
+[mt] Write summary for jobs3: s2 ∈ {3}
 [mt] Mutexes for concurrent accesses:
-  s1  write protected by &m1 &m2, read protected by &m1
-  s2  write unprotected, read protected by &m1
+  s1  write protected by m1 m2, read protected by m1
+  s2  write unprotected, read protected by m1
 [mt] Detailed shared zones protections
-  s2: Read by &jobs2, Write by &jobs3: unprotected
-  s1: Read by &jobs2, Write by &jobs1: protected by &m1
+  s2: Read by jobs2, Write by jobs3: unprotected
+  s1: Read by jobs2, Write by jobs1: protected by m1
 [mt] Statements needing manual synchronisation
   mutex.c:34 (for s2)
 [mt] ***** Shared variables computed

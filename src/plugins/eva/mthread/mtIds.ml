@@ -416,7 +416,7 @@ let extract_name_hint value =
          then `Success (Hint_pointer (v, i))
          else
            try
-             let prefix = "&" ^ v.vname in
+             let prefix = v.vname in
              `Success (Hint_string (nice_offset v.vtype (i*8) prefix))
            with _ ->
              MtOptions.warning "Unable to@ give@ a good name@ to@ \

@@ -6,8 +6,8 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main
-[mt] model.c:20: New thread: &job1, fun f1, parent _main_, args {0}
-[mt] model.c:20: Start thread &job1
+[mt] model.c:20: New thread: job1, fun f1, parent _main_, args {0}
+[mt] model.c:20: Start thread job1
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -18,8 +18,8 @@
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
-[mt] *** Computing thread &job1, iteration 1 (first iteration)
-[mt] * Computing value analysis for thread &job1
+[mt] *** Computing thread job1, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread job1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -27,7 +27,7 @@
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &job1 computed
+[mt] *** Thread job1 computed
 [mt] ***** Threads computed for iteration 1.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed

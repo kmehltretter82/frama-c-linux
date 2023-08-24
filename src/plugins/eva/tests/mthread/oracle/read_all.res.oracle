@@ -10,8 +10,8 @@
   Neither code nor specification for function random,
    generating default assigns. See -generated-spec-* options for more info
 [mt] read_all.c:27: 
-  New thread: &jobs, fun f, parent _main_, args [0..18446744073709551615]
-[mt] read_all.c:27: Start thread &jobs
+  New thread: jobs, fun f, parent _main_, args [0..18446744073709551615]
+[mt] read_all.c:27: Start thread jobs
 [mt] read_all.c:29: User Error: 
   read of the whole memory. Ignoring to allow Mthread to continue, but the
   analysis will not be correct.
@@ -31,8 +31,8 @@
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
-[mt] *** Computing thread &jobs, iteration 1 (first iteration)
-[mt] * Computing value analysis for thread &jobs
+[mt] *** Computing thread jobs, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread jobs
 [mt] read_all.c:19: User Error: 
   read of the whole memory. Ignoring to allow Mthread to continue, but the
   analysis will not be correct.
@@ -43,11 +43,11 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  r: write by &jobs at read_all.c:19
+  r: write by jobs at read_all.c:19
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &jobs computed
+[mt] *** Thread jobs computed
 [mt] ***** Threads computed for iteration 1.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
@@ -70,8 +70,8 @@
 [mt] * Computing value analysis for thread _main_
 [mt] Thread main, fun main
 [mt] read_all.c:27: 
-  Thread &jobs, fun f, parent _main_, args [0..18446744073709551615]
-[mt] read_all.c:27: Start thread &jobs
+  Thread jobs, fun f, parent _main_, args [0..18446744073709551615]
+[mt] read_all.c:27: Start thread jobs
 [mt] read_all.c:29: User Error: 
   read of the whole memory. Ignoring to allow Mthread to continue, but the
   analysis will not be correct.
@@ -89,8 +89,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread _main_ computed
-[mt] *** Computing thread &jobs, iteration 2 (potential shared vars changed)
-[mt] * Computing value analysis for thread &jobs
+[mt] *** Computing thread jobs, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread jobs
 [mt] read_all.c:19: User Error: 
   read of the whole memory. Ignoring to allow Mthread to continue, but the
   analysis will not be correct.
@@ -101,11 +101,11 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  r: write by &jobs at read_all.c:19
+  r: write by jobs at read_all.c:19
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &jobs computed
+[mt] *** Thread jobs computed
 [mt] ***** Threads computed for iteration 2.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
@@ -114,7 +114,7 @@
 [mt] _main_ writes  r ∈ [--..--]  // read_all.c:29 main (read_all.c:23)
 [mt] _main_ writes  r ∈ [--..--]  // read_all.c:29
   g (read_all.c:29) <- main (read_all.c:23)
-[mt] &jobs writes  r ∈ [--..--]  // read_all.c:19
+[mt] jobs writes  r ∈ [--..--]  // read_all.c:19
   g (read_all.c:19) <- f (read_all.c:18)
 [mt] Possible read/write data races:
   none
@@ -122,14 +122,14 @@
   r:
     write by _main_ at read_all.c:29, unprotected
     write by _main_ at read_all.c:29, unprotected
-    write by &jobs at read_all.c:19, unprotected
+    write by jobs at read_all.c:19, unprotected
 [mt] Shared memory: r
 [mt] Concurrent precise var accesses have changed: before
     \nothing
   vs.
     r
 [mt] Write summary for _main_ (updated): r ∈ [--..--]
-[mt] Write summary for &jobs (updated): r ∈ [--..--]
+[mt] Write summary for jobs (updated): r ∈ [--..--]
 [mt] Mutexes for concurrent accesses:
   r  write unprotected, read unaccessed
 [mt] Detailed shared zones protections

@@ -6,8 +6,8 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main
-[mt] null.c:23: New thread: &tjob0, fun job0, parent _main_, args {0}
-[mt] null.c:23: Start thread &tjob0
+[mt] null.c:23: New thread: tjob0, fun job0, parent _main_, args {0}
+[mt] null.c:23: Start thread tjob0
 [eva:alarm] null.c:26: Warning: 
   out of bounds read. assert \valid_read((char *)i);
 [mt] *** First value analysis for main thread done.
@@ -22,19 +22,19 @@
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
-[mt] *** Computing thread &tjob0, iteration 1 (first iteration)
-[mt] * Computing value analysis for thread &tjob0
+[mt] *** Computing thread tjob0, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread tjob0
 [eva:alarm] null.c:15: Warning: out of bounds write. assert \valid((char *)i);
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  NULL[100..200]: write by &tjob0 at null.c:15
-  v: read by &tjob0 at null.c:14
+  NULL[100..200]: write by tjob0 at null.c:15
+  v: read by tjob0 at null.c:14
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &tjob0 computed
+[mt] *** Thread tjob0 computed
 [mt] ***** Threads computed for iteration 1.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
@@ -54,8 +54,8 @@
 [mt] *** Computing thread _main_, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread _main_
 [mt] Thread main, fun main
-[mt] null.c:23: Thread &tjob0, fun job0, parent _main_, args {0}
-[mt] null.c:23: Start thread &tjob0
+[mt] null.c:23: Thread tjob0, fun job0, parent _main_, args {0}
+[mt] null.c:23: Start thread tjob0
 [eva:alarm] null.c:26: Warning: 
   out of bounds read. assert \valid_read((char *)i);
 [mt] * Starting to save the state of the value analysis
@@ -68,19 +68,19 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread _main_ computed
-[mt] *** Computing thread &tjob0, iteration 2 (potential shared vars changed)
-[mt] * Computing value analysis for thread &tjob0
+[mt] *** Computing thread tjob0, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread tjob0
 [eva:alarm] null.c:15: Warning: out of bounds write. assert \valid((char *)i);
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  NULL[100..200]: write by &tjob0 at null.c:15
-  v: read by &tjob0 at null.c:14
+  NULL[100..200]: write by tjob0 at null.c:15
+  v: read by tjob0 at null.c:14
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &tjob0 computed
+[mt] *** Thread tjob0 computed
 [mt] ***** Threads computed for iteration 2.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
@@ -88,29 +88,29 @@
 [mt] Imprecise locations to watch: NULL[100..200]
 [mt] _main_ reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:26
   main (null.c:20)
-[mt] &tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:15
+[mt] tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:15
   job0 (null.c:13)
 [mt] Possible read/write data races:
   NULL[100..200]:
     read by _main_ at null.c:26, unprotected
-    write by &tjob0 at null.c:15, unprotected
+    write by tjob0 at null.c:15, unprotected
 [mt] Shared memory: NULL[100..200]
 [mt] Concurrent precise var accesses have changed: before
     \nothing
   vs.
     NULL[100..200]
-[mt] Write summary for &tjob0 (updated): NULL[rbits 800 to 1607] ∈ [--..--]
+[mt] Write summary for tjob0 (updated): NULL[rbits 800 to 1607] ∈ [--..--]
 [mt] Mutexes for concurrent accesses:
   NULL[100..200]  unprotected
 [mt] Detailed shared zones protections
-  NULL[100..200]: Read by _main_, Write by &tjob0: unprotected
+  NULL[100..200]: Read by _main_, Write by tjob0: unprotected
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
 [mt] *** Computing thread _main_, iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread _main_
 [mt] Thread main, fun main
-[mt] null.c:23: Thread &tjob0, fun job0, parent _main_, args {0}
-[mt] null.c:23: Start thread &tjob0
+[mt] null.c:23: Thread tjob0, fun job0, parent _main_, args {0}
+[mt] null.c:23: Start thread tjob0
 [eva:alarm] null.c:26: Warning: 
   out of bounds read. assert \valid_read((char *)i);
 [mt] * Starting to save the state of the value analysis
@@ -130,17 +130,17 @@
 [mt] Imprecise locations to watch: NULL[100..200]
 [mt] _main_ reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:26
   main (null.c:20)
-[mt] &tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:15
+[mt] tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:15
   job0 (null.c:13)
 [mt] Possible read/write data races:
   NULL[100..200]:
     read by _main_ at null.c:26, unprotected
-    write by &tjob0 at null.c:15, unprotected
+    write by tjob0 at null.c:15, unprotected
 [mt] Shared memory: NULL[100..200]
-[mt] Write summary for &tjob0: NULL[rbits 800 to 1607] ∈ [--..--]
+[mt] Write summary for tjob0: NULL[rbits 800 to 1607] ∈ [--..--]
 [mt] Mutexes for concurrent accesses:
   NULL[100..200]  unprotected
 [mt] Detailed shared zones protections
-  NULL[100..200]: Read by _main_, Write by &tjob0: unprotected
+  NULL[100..200]: Read by _main_, Write by tjob0: unprotected
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 3 iterations

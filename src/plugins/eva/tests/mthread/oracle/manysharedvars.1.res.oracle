@@ -6,11 +6,11 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main
-[mt] manysharedvars.c:42: Initializing mutex &lock
-[mt] manysharedvars.c:43: New thread: &jobs, fun f, parent _main_, args {0}
-[mt] manysharedvars.c:43: Start thread &jobs
-[mt] manysharedvars.c:46: Lock &lock
-[mt] manysharedvars.c:49: Release &lock
+[mt] manysharedvars.c:42: Initializing mutex lock
+[mt] manysharedvars.c:43: New thread: jobs, fun f, parent _main_, args {0}
+[mt] manysharedvars.c:43: Start thread jobs
+[mt] manysharedvars.c:46: Lock lock
+[mt] manysharedvars.c:49: Release lock
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -69,10 +69,10 @@
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
-[mt] *** Computing thread &jobs, iteration 1 (first iteration)
-[mt] * Computing value analysis for thread &jobs
-[mt] manysharedvars.c:28: Lock &lock
-[mt] manysharedvars.c:31: Release &lock
+[mt] *** Computing thread jobs, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread jobs
+[mt] manysharedvars.c:28: Lock lock
+[mt] manysharedvars.c:31: Release lock
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -98,8 +98,8 @@
     [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
     [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
     [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
-    read by &jobs at manysharedvars.c:29
-    write by &jobs at manysharedvars.c:29
+    read by jobs at manysharedvars.c:29
+    write by jobs at manysharedvars.c:29
   s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
     [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
     [12].data2; [13].data2; [14].data2; [15].data2; [16].data2; [17].data2;
@@ -123,15 +123,15 @@
     [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
     [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
     [127].data2}:
-    read by &jobs at manysharedvars.c:30
-    write by &jobs at manysharedvars.c:30
+    read by jobs at manysharedvars.c:30
+    write by jobs at manysharedvars.c:30
   lock:
-    read by &jobs at FRAMAC_SHARE/mthread_pthread.c:56
-    read by &jobs at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &jobs computed
+[mt] *** Thread jobs computed
 [mt] ***** Threads computed for iteration 1.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
@@ -151,11 +151,11 @@
 [mt] *** Computing thread _main_, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread _main_
 [mt] Thread main, fun main
-[mt] manysharedvars.c:42: Initializing mutex &lock
-[mt] manysharedvars.c:43: Thread &jobs, fun f, parent _main_, args {0}
-[mt] manysharedvars.c:43: Start thread &jobs
-[mt] manysharedvars.c:46: Lock &lock
-[mt] manysharedvars.c:49: Release &lock
+[mt] manysharedvars.c:42: Initializing mutex lock
+[mt] manysharedvars.c:43: Thread jobs, fun f, parent _main_, args {0}
+[mt] manysharedvars.c:43: Start thread jobs
+[mt] manysharedvars.c:46: Lock lock
+[mt] manysharedvars.c:49: Release lock
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -212,10 +212,10 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread _main_ computed
-[mt] *** Computing thread &jobs, iteration 2 (potential shared vars changed)
-[mt] * Computing value analysis for thread &jobs
-[mt] manysharedvars.c:28: Lock &lock
-[mt] manysharedvars.c:31: Release &lock
+[mt] *** Computing thread jobs, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread jobs
+[mt] manysharedvars.c:28: Lock lock
+[mt] manysharedvars.c:31: Release lock
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -241,8 +241,8 @@
     [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
     [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
     [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
-    read by &jobs at manysharedvars.c:29
-    write by &jobs at manysharedvars.c:29
+    read by jobs at manysharedvars.c:29
+    write by jobs at manysharedvars.c:29
   s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
     [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
     [12].data2; [13].data2; [14].data2; [15].data2; [16].data2; [17].data2;
@@ -266,15 +266,15 @@
     [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
     [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
     [127].data2}:
-    read by &jobs at manysharedvars.c:30
-    write by &jobs at manysharedvars.c:30
+    read by jobs at manysharedvars.c:30
+    write by jobs at manysharedvars.c:30
   lock:
-    read by &jobs at FRAMAC_SHARE/mthread_pthread.c:56
-    read by &jobs at FRAMAC_SHARE/mthread_pthread.c:66
+    read by jobs at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &jobs computed
+[mt] *** Thread jobs computed
 [mt] ***** Threads computed for iteration 2.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
@@ -410,7 +410,7 @@
    [126].data ∈ {0}
    [127].data ∈ {0}
    // manysharedvars.c:47 main (manysharedvars.c:39)
-[mt] &jobs reads 
+[mt] jobs reads 
   s[0].data ∈ {0; 1}
    [1].data ∈ {0; 1}
    [2].data ∈ {0; 1}
@@ -670,7 +670,7 @@
    [126].data2 ∈ {0}
    [127].data2 ∈ {0}
    // manysharedvars.c:48 main (manysharedvars.c:39)
-[mt] &jobs reads 
+[mt] jobs reads 
   s[0].data2 ∈ {0; 3}
    [1].data2 ∈ {0; 3}
    [2].data2 ∈ {0; 3}
@@ -800,7 +800,7 @@
    [126].data2 ∈ {0; 3}
    [127].data2 ∈ {0; 3}
    // manysharedvars.c:30 f (manysharedvars.c:26)
-[mt] &jobs writes 
+[mt] jobs writes 
   s[0].data ∈ {0; 1}
    [1].data ∈ {0; 1}
    [2].data ∈ {0; 1}
@@ -930,7 +930,7 @@
    [126].data ∈ {0; 1}
    [127].data ∈ {0; 1}
    // manysharedvars.c:29 f (manysharedvars.c:26)
-[mt] &jobs writes 
+[mt] jobs writes 
   s[0].data2 ∈ {0; 3}
    [1].data2 ∈ {0; 3}
    [2].data2 ∈ {0; 3}
@@ -1084,9 +1084,9 @@
     [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
     [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
     [127].data2}:
-    read by _main_ at manysharedvars.c:48, protected by &lock
-    read by &jobs at manysharedvars.c:30, protected by &lock
-    write by &jobs at manysharedvars.c:30, protected by &lock
+    read by _main_ at manysharedvars.c:48, protected by lock
+    read by jobs at manysharedvars.c:30, protected by lock
+    write by jobs at manysharedvars.c:30, protected by lock
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
     [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
     [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
@@ -1108,15 +1108,15 @@
     [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
     [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
     [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
-    read by _main_ at manysharedvars.c:47, protected by &lock
-    read by &jobs at manysharedvars.c:29, protected by &lock
-    write by &jobs at manysharedvars.c:29, protected by &lock
+    read by _main_ at manysharedvars.c:47, protected by lock
+    read by jobs at manysharedvars.c:29, protected by lock
+    write by jobs at manysharedvars.c:29, protected by lock
 [mt] Shared memory: s[0..127]
 [mt] Concurrent precise var accesses have changed: before
     \nothing
   vs.
     s[0..127]
-[mt] Write summary for &jobs (updated):
+[mt] Write summary for jobs (updated):
   s[0].data ∈ {0; 1}
    [0].data2 ∈ {0; 3}
    [1].data ∈ {0; 1}
@@ -1374,7 +1374,7 @@
    [127].data ∈ {0; 1}
    [127].data2 ∈ {0; 3}
 [mt] Mutexes for concurrent accesses:
-  s[0..127]  protected by &lock
+  s[0..127]  protected by lock
 [mt] Detailed shared zones protections
   s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
     [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
@@ -1399,7 +1399,7 @@
     [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
     [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
     [127].data2}:
-    Read by _main_, Write by &jobs: protected by &lock
+    Read by _main_, Write by jobs: protected by lock
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
     [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
     [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
@@ -1421,17 +1421,17 @@
     [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
     [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
     [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
-    Read by _main_, Write by &jobs: protected by &lock
+    Read by _main_, Write by jobs: protected by lock
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
 [mt] *** Computing thread _main_, iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread _main_
 [mt] Thread main, fun main
-[mt] manysharedvars.c:42: Initializing mutex &lock
-[mt] manysharedvars.c:43: Thread &jobs, fun f, parent _main_, args {0}
-[mt] manysharedvars.c:43: Start thread &jobs
-[mt] manysharedvars.c:46: Lock &lock
-[mt] manysharedvars.c:49: Release &lock
+[mt] manysharedvars.c:42: Initializing mutex lock
+[mt] manysharedvars.c:43: Thread jobs, fun f, parent _main_, args {0}
+[mt] manysharedvars.c:43: Start thread jobs
+[mt] manysharedvars.c:46: Lock lock
+[mt] manysharedvars.c:49: Release lock
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -1493,7 +1493,7 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: s[0..127]
-[mt] &jobs reads 
+[mt] jobs reads 
   s[0].data ∈ {0; 1}
    [1].data ∈ {0; 1}
    [2].data ∈ {0; 1}
@@ -1753,7 +1753,7 @@
    [126].data ∈ {0; 1}
    [127].data ∈ {0; 1}
    // manysharedvars.c:47 main (manysharedvars.c:39)
-[mt] &jobs reads 
+[mt] jobs reads 
   s[0].data2 ∈ {0; 3}
    [1].data2 ∈ {0; 3}
    [2].data2 ∈ {0; 3}
@@ -2013,7 +2013,7 @@
    [126].data2 ∈ {0; 3}
    [127].data2 ∈ {0; 3}
    // manysharedvars.c:48 main (manysharedvars.c:39)
-[mt] &jobs writes 
+[mt] jobs writes 
   s[0].data ∈ {0; 1}
    [1].data ∈ {0; 1}
    [2].data ∈ {0; 1}
@@ -2143,7 +2143,7 @@
    [126].data ∈ {0; 1}
    [127].data ∈ {0; 1}
    // manysharedvars.c:29 f (manysharedvars.c:26)
-[mt] &jobs writes 
+[mt] jobs writes 
   s[0].data2 ∈ {0; 3}
    [1].data2 ∈ {0; 3}
    [2].data2 ∈ {0; 3}
@@ -2297,9 +2297,9 @@
     [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
     [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
     [127].data2}:
-    read by &jobs at manysharedvars.c:30, protected by &lock
-    read by _main_ at manysharedvars.c:48, protected by &lock
-    write by &jobs at manysharedvars.c:30, protected by &lock
+    read by jobs at manysharedvars.c:30, protected by lock
+    read by _main_ at manysharedvars.c:48, protected by lock
+    write by jobs at manysharedvars.c:30, protected by lock
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
     [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
     [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
@@ -2321,11 +2321,11 @@
     [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
     [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
     [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
-    read by &jobs at manysharedvars.c:29, protected by &lock
-    read by _main_ at manysharedvars.c:47, protected by &lock
-    write by &jobs at manysharedvars.c:29, protected by &lock
+    read by jobs at manysharedvars.c:29, protected by lock
+    read by _main_ at manysharedvars.c:47, protected by lock
+    write by jobs at manysharedvars.c:29, protected by lock
 [mt] Shared memory: s[0..127]
-[mt] Write summary for &jobs:
+[mt] Write summary for jobs:
   s[0].data ∈ {0; 1}
    [0].data2 ∈ {0; 3}
    [1].data ∈ {0; 1}
@@ -2583,7 +2583,7 @@
    [127].data ∈ {0; 1}
    [127].data2 ∈ {0; 3}
 [mt] Mutexes for concurrent accesses:
-  s[0..127]  protected by &lock
+  s[0..127]  protected by lock
 [mt] Detailed shared zones protections
   s{[0].data2; [1].data2; [2].data2; [3].data2; [4].data2; [5].data2;
     [6].data2; [7].data2; [8].data2; [9].data2; [10].data2; [11].data2;
@@ -2608,7 +2608,7 @@
     [117].data2; [118].data2; [119].data2; [120].data2; [121].data2;
     [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
     [127].data2}:
-    Read by _main_, Write by &jobs: protected by &lock
+    Read by _main_, Write by jobs: protected by lock
   s{[0].data; [1].data; [2].data; [3].data; [4].data; [5].data; [6].data;
     [7].data; [8].data; [9].data; [10].data; [11].data; [12].data; [13].data;
     [14].data; [15].data; [16].data; [17].data; [18].data; [19].data;
@@ -2630,6 +2630,6 @@
     [110].data; [111].data; [112].data; [113].data; [114].data; [115].data;
     [116].data; [117].data; [118].data; [119].data; [120].data; [121].data;
     [122].data; [123].data; [124].data; [125].data; [126].data; [127].data}:
-    Read by _main_, Write by &jobs: protected by &lock
+    Read by _main_, Write by jobs: protected by lock
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 3 iterations

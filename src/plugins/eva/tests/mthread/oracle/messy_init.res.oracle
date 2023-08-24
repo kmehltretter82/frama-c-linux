@@ -9,12 +9,12 @@
 [kernel:annot:missing-spec] messy_init.c:15: Warning: 
   Neither code nor specification for function random,
    generating default assigns. See -generated-spec-* options for more info
-[mt] messy_init.c:16: Initializing mutex &lock
-[mt] messy_init.c:19: Lock &lock
-[mt] messy_init.c:22: New thread: &job, fun fjob, parent _main_, args {0}
-[mt] messy_init.c:22: Start thread &job
-[mt] messy_init.c:22: Thread &job, fun fjob, parent _main_, args {0}
-[mt] messy_init.c:22: New context for &job, fun fjob, parent _main_, args {0}
+[mt] messy_init.c:16: Initializing mutex lock
+[mt] messy_init.c:19: Lock lock
+[mt] messy_init.c:22: New thread: job, fun fjob, parent _main_, args {0}
+[mt] messy_init.c:22: Start thread job
+[mt] messy_init.c:22: Thread job, fun fjob, parent _main_, args {0}
+[mt] messy_init.c:22: New context for job, fun fjob, parent _main_, args {0}
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -25,22 +25,22 @@
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
-[mt] *** Computing thread &job, iteration 1 (first iteration)
-[mt] * Computing value analysis for thread &job
+[mt] *** Computing thread job, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread job
 [mt] messy_init.c:10: Warning: Trying to lock a possibly uninitialized mutex.
 [mt] messy_init.c:10: Warning: 
-  Unable to check that mutex &lock has not already been locked;
+  Unable to check that mutex lock has not already been locked;
   {0; 1} should be 1
-[mt] messy_init.c:10: Lock &lock
+[mt] messy_init.c:10: Lock lock
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  lock: read by &job at FRAMAC_SHARE/mthread_pthread.c:56
+  lock: read by job at FRAMAC_SHARE/mthread_pthread.c:56
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &job computed
+[mt] *** Thread job computed
 [mt] ***** Threads computed for iteration 1.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed

@@ -6,9 +6,9 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main
-[mt] late_start.c:31: New thread: &job1, fun f1, parent _main_, args {0}
-[mt] late_start.c:32: New thread: &job2, fun f2, parent _main_, args {0}
-[mt] Start thread &job2
+[mt] late_start.c:31: New thread: job1, fun f1, parent _main_, args {0}
+[mt] late_start.c:32: New thread: job2, fun f2, parent _main_, args {0}
+[mt] Start thread job2
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -19,19 +19,19 @@
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
 [mt] ***** Iteration 1
-[mt] *** Thread &job1 has been created but not started. Skipping.
-[mt] *** Computing thread &job2, iteration 1 (first iteration)
-[mt] * Computing value analysis for thread &job2
-[mt] late_start.c:26: Start thread &job1
+[mt] *** Thread job1 has been created but not started. Skipping.
+[mt] *** Computing thread job2, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread job2
+[mt] late_start.c:26: Start thread job1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  job1: read by &job2 at late_start.c:26
+  job1: read by job2 at late_start.c:26
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &job2 computed
+[mt] *** Thread job2 computed
 [mt] ***** Threads computed for iteration 1.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
@@ -44,8 +44,8 @@
 [mt] Detailed shared zones protections
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 2
-[mt] *** Computing thread &job1, iteration 2 (thread initial memory state changed)
-[mt] * Computing value analysis for thread &job1
+[mt] *** Computing thread job1, iteration 2 (thread initial memory state changed)
+[mt] * Computing value analysis for thread job1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -53,7 +53,7 @@
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread &job1 computed
+[mt] *** Thread job1 computed
 [mt] ***** Threads computed for iteration 2.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed

@@ -6,10 +6,10 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main
-[mt] nice_offsets.c:20: Initializing mutex &t[0].a1
-[mt] nice_offsets.c:21: Initializing mutex &t[1].b1[2].a0
-[mt] nice_offsets.c:22: Initializing mutex &t[1].b1[4].b0
-[mt] nice_offsets.c:23: Initializing mutex &t[2].c1
+[mt] nice_offsets.c:20: Initializing mutex t[0].a1
+[mt] nice_offsets.c:21: Initializing mutex t[1].b1[2].a0
+[mt] nice_offsets.c:22: Initializing mutex t[1].b1[4].b0
+[mt] nice_offsets.c:23: Initializing mutex t[2].c1
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

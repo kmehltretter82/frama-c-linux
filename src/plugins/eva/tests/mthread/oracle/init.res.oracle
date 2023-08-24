@@ -6,9 +6,9 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main
-[mt] init.c:24: Initializing mutex &locks[0]
-[mt] init.c:24: Initializing mutex &locks[1]
-[mt] init.c:24: Initializing mutex &locks[2]
+[mt] init.c:24: Initializing mutex locks[0]
+[mt] init.c:24: Initializing mutex locks[1]
+[mt] init.c:24: Initializing mutex locks[2]
 [mt] init.c:27: Initializing mutex mu1
 [mt] init.c:27: Initializing mutex mu2
 [mt] init.c:27: Initializing mutex mu3
