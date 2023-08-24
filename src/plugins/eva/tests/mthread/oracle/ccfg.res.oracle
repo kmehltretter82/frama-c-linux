@@ -6,28 +6,28 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main
-[mt] ccfg.c:17: New thread: jobs[0], fun fjob, parent _main_, args {0}
+[mt] ccfg.c:17: New thread: jobs[0], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:17: Start thread jobs[0]
 [kernel:annot:missing-spec] ccfg.c:23: Warning: 
   Neither code nor specification for function random,
    generating default assigns. See -generated-spec-* options for more info
-[mt] ccfg.c:17: New thread: jobs[1], fun fjob, parent _main_, args {0}
+[mt] ccfg.c:17: New thread: jobs[1], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:17: Start thread jobs[1]
-[mt] ccfg.c:17: New thread: jobs[2], fun fjob, parent _main_, args {0}
+[mt] ccfg.c:17: New thread: jobs[2], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:17: Start thread jobs[2]
-[mt] ccfg.c:17: New thread: jobs[3], fun fjob, parent _main_, args {0}
+[mt] ccfg.c:17: New thread: jobs[3], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:17: Start thread jobs[3]
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  jobs[0]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs[1..3]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  x: read by _main_ at ccfg.c:36
-  global1: write by _main_ at ccfg.c:19
-  global2[0]: write by _main_ at ccfg.c:24
-  global2[1]: write by _main_ at ccfg.c:26
+  jobs[0]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs[1..3]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  x: read by <main> at ccfg.c:36
+  global1: write by <main> at ccfg.c:19
+  global2[0]: write by <main> at ccfg.c:24
+  global2[1]: write by <main> at ccfg.c:26
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -97,31 +97,31 @@
 [mt] Detailed shared zones protections
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 2
-[mt] *** Computing thread _main_, iteration 2 (potential shared vars changed)
-[mt] * Computing value analysis for thread _main_
+[mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread <main>
 [mt] Thread main, fun main
-[mt] ccfg.c:17: Thread jobs[0], fun fjob, parent _main_, args {0}
+[mt] ccfg.c:17: Thread jobs[0], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:17: Start thread jobs[0]
-[mt] ccfg.c:17: Thread jobs[1], fun fjob, parent _main_, args {0}
+[mt] ccfg.c:17: Thread jobs[1], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:17: Start thread jobs[1]
-[mt] ccfg.c:17: Thread jobs[2], fun fjob, parent _main_, args {0}
+[mt] ccfg.c:17: Thread jobs[2], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:17: Start thread jobs[2]
-[mt] ccfg.c:17: Thread jobs[3], fun fjob, parent _main_, args {0}
+[mt] ccfg.c:17: Thread jobs[3], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:17: Start thread jobs[3]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  jobs[0]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs[1..3]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  x: read by _main_ at ccfg.c:36
-  global1: write by _main_ at ccfg.c:19
-  global2[0]: write by _main_ at ccfg.c:24
-  global2[1]: write by _main_ at ccfg.c:26
+  jobs[0]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs[1..3]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  x: read by <main> at ccfg.c:36
+  global1: write by <main> at ccfg.c:19
+  global2[0]: write by <main> at ccfg.c:24
+  global2[1]: write by <main> at ccfg.c:26
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread _main_ computed
+[mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread jobs[0]
 [mt] * Starting to save the state of the value analysis
@@ -187,11 +187,11 @@
 [mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
 [mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:11 fjob (ccfg.c:10)
 [mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] _main_ writes  global1 ∈ {1}  // ccfg.c:19
+[mt] <main> writes  global1 ∈ {1}  // ccfg.c:19
   g1 (ccfg.c:37) <- main (ccfg.c:29)
-[mt] _main_ writes  global2[0] ∈ {1}  // ccfg.c:24
+[mt] <main> writes  global2[0] ∈ {1}  // ccfg.c:24
   g2 (ccfg.c:38) <- main (ccfg.c:29)
-[mt] _main_ writes  global2[1] ∈ {2}  // ccfg.c:26
+[mt] <main> writes  global2[1] ∈ {2}  // ccfg.c:26
   g2 (ccfg.c:38) <- main (ccfg.c:29)
 [mt] Possible read/write data races:
   global2[1]:
@@ -199,25 +199,25 @@
     read by jobs[1] at ccfg.c:11, unprotected
     read by jobs[2] at ccfg.c:11, unprotected
     read by jobs[3] at ccfg.c:11, unprotected
-    write by _main_ at ccfg.c:26, unprotected
+    write by <main> at ccfg.c:26, unprotected
   global2[0]:
     read by jobs[0] at ccfg.c:11, unprotected
     read by jobs[1] at ccfg.c:11, unprotected
     read by jobs[2] at ccfg.c:11, unprotected
     read by jobs[3] at ccfg.c:11, unprotected
-    write by _main_ at ccfg.c:24, unprotected
+    write by <main> at ccfg.c:24, unprotected
   global1:
     read by jobs[0] at ccfg.c:11, unprotected
     read by jobs[1] at ccfg.c:11, unprotected
     read by jobs[2] at ccfg.c:11, unprotected
     read by jobs[3] at ccfg.c:11, unprotected
-    write by _main_ at ccfg.c:19, unprotected
+    write by <main> at ccfg.c:19, unprotected
 [mt] Shared memory: global1; global2[0..1]
 [mt] Concurrent precise var accesses have changed: before
     \nothing
   vs.
     global1; global2[0..1]
-[mt] Write summary for _main_ (updated):
+[mt] Write summary for <main> (updated):
   global1 ∈ {1}
   global2[0] ∈ {1}
          [1] ∈ {2}
@@ -226,20 +226,20 @@
   global2[0..1]  unprotected
 [mt] Detailed shared zones protections
   global2[1]:
-    Read by jobs[3], Write by _main_: unprotected
-    Read by jobs[2], Write by _main_: unprotected
-    Read by jobs[1], Write by _main_: unprotected
-    Read by jobs[0], Write by _main_: unprotected
+    Read by jobs[3], Write by <main>: unprotected
+    Read by jobs[2], Write by <main>: unprotected
+    Read by jobs[1], Write by <main>: unprotected
+    Read by jobs[0], Write by <main>: unprotected
   global2[0]:
-    Read by jobs[3], Write by _main_: unprotected
-    Read by jobs[2], Write by _main_: unprotected
-    Read by jobs[1], Write by _main_: unprotected
-    Read by jobs[0], Write by _main_: unprotected
+    Read by jobs[3], Write by <main>: unprotected
+    Read by jobs[2], Write by <main>: unprotected
+    Read by jobs[1], Write by <main>: unprotected
+    Read by jobs[0], Write by <main>: unprotected
   global1:
-    Read by jobs[3], Write by _main_: unprotected
-    Read by jobs[2], Write by _main_: unprotected
-    Read by jobs[1], Write by _main_: unprotected
-    Read by jobs[0], Write by _main_: unprotected
+    Read by jobs[3], Write by <main>: unprotected
+    Read by jobs[2], Write by <main>: unprotected
+    Read by jobs[1], Write by <main>: unprotected
+    Read by jobs[0], Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
   ccfg.c:11 (for global1; global2[0..1])
 [mt] ***** Shared variables computed
@@ -309,11 +309,11 @@
 [mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:11 fjob (ccfg.c:10)
 [mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:11 fjob (ccfg.c:10)
 [mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:11 fjob (ccfg.c:10)
-[mt] _main_ writes  global1 ∈ {1}  // ccfg.c:19
+[mt] <main> writes  global1 ∈ {1}  // ccfg.c:19
   g1 (ccfg.c:37) <- main (ccfg.c:29)
-[mt] _main_ writes  global2[0] ∈ {1}  // ccfg.c:24
+[mt] <main> writes  global2[0] ∈ {1}  // ccfg.c:24
   g2 (ccfg.c:38) <- main (ccfg.c:29)
-[mt] _main_ writes  global2[1] ∈ {2}  // ccfg.c:26
+[mt] <main> writes  global2[1] ∈ {2}  // ccfg.c:26
   g2 (ccfg.c:38) <- main (ccfg.c:29)
 [mt] Possible read/write data races:
   global2[1]:
@@ -321,21 +321,21 @@
     read by jobs[1] at ccfg.c:11, unprotected
     read by jobs[2] at ccfg.c:11, unprotected
     read by jobs[3] at ccfg.c:11, unprotected
-    write by _main_ at ccfg.c:26, unprotected
+    write by <main> at ccfg.c:26, unprotected
   global2[0]:
     read by jobs[0] at ccfg.c:11, unprotected
     read by jobs[1] at ccfg.c:11, unprotected
     read by jobs[2] at ccfg.c:11, unprotected
     read by jobs[3] at ccfg.c:11, unprotected
-    write by _main_ at ccfg.c:24, unprotected
+    write by <main> at ccfg.c:24, unprotected
   global1:
     read by jobs[0] at ccfg.c:11, unprotected
     read by jobs[1] at ccfg.c:11, unprotected
     read by jobs[2] at ccfg.c:11, unprotected
     read by jobs[3] at ccfg.c:11, unprotected
-    write by _main_ at ccfg.c:19, unprotected
+    write by <main> at ccfg.c:19, unprotected
 [mt] Shared memory: global1; global2[0..1]
-[mt] Write summary for _main_: global1 ∈ {1}
+[mt] Write summary for <main>: global1 ∈ {1}
                             global2[0] ∈ {1}
                                    [1] ∈ {2}
 [mt] Mutexes for concurrent accesses:
@@ -343,20 +343,20 @@
   global2[0..1]  unprotected
 [mt] Detailed shared zones protections
   global2[1]:
-    Read by jobs[3], Write by _main_: unprotected
-    Read by jobs[2], Write by _main_: unprotected
-    Read by jobs[1], Write by _main_: unprotected
-    Read by jobs[0], Write by _main_: unprotected
+    Read by jobs[3], Write by <main>: unprotected
+    Read by jobs[2], Write by <main>: unprotected
+    Read by jobs[1], Write by <main>: unprotected
+    Read by jobs[0], Write by <main>: unprotected
   global2[0]:
-    Read by jobs[3], Write by _main_: unprotected
-    Read by jobs[2], Write by _main_: unprotected
-    Read by jobs[1], Write by _main_: unprotected
-    Read by jobs[0], Write by _main_: unprotected
+    Read by jobs[3], Write by <main>: unprotected
+    Read by jobs[2], Write by <main>: unprotected
+    Read by jobs[1], Write by <main>: unprotected
+    Read by jobs[0], Write by <main>: unprotected
   global1:
-    Read by jobs[3], Write by _main_: unprotected
-    Read by jobs[2], Write by _main_: unprotected
-    Read by jobs[1], Write by _main_: unprotected
-    Read by jobs[0], Write by _main_: unprotected
+    Read by jobs[3], Write by <main>: unprotected
+    Read by jobs[2], Write by <main>: unprotected
+    Read by jobs[1], Write by <main>: unprotected
+    Read by jobs[0], Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
   ccfg.c:11 (for global1; global2[0..1])
 [mt] ***** Shared variables computed

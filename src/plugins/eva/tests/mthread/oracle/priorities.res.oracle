@@ -8,13 +8,13 @@
 [mt] New thread: main, fun main
 [mt] priorities.c:51: Initializing mutex m1
 [mt] priorities.c:52: Initializing mutex m2
-[mt] priorities.c:54: New thread: jobs1, fun f1, parent _main_, args {0}
+[mt] priorities.c:54: New thread: jobs1, fun f1, parent <main>, args {0}
 [mt] priorities.c:54: Start thread jobs1
-[mt] priorities.c:55: New thread: jobs2, fun f2, parent _main_, args {0}
+[mt] priorities.c:55: New thread: jobs2, fun f2, parent <main>, args {0}
 [mt] priorities.c:55: Start thread jobs2
-[mt] priorities.c:56: New thread: jobs3, fun f3, parent _main_, args {0}
+[mt] priorities.c:56: New thread: jobs3, fun f3, parent <main>, args {0}
 [mt] priorities.c:56: Start thread jobs3
-[mt] priorities.c:57: New thread: jobs4, fun f4, parent _main_, args {0}
+[mt] priorities.c:57: New thread: jobs4, fun f4, parent <main>, args {0}
 [mt] priorities.c:57: Start thread jobs4
 [mt] Setting priority to 1
 [mt] priorities.c:61: Lock m1
@@ -26,18 +26,18 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s1: write by _main_ at priorities.c:63
-  s2: read by _main_ at priorities.c:64
-  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  s1: write by <main> at priorities.c:63
+  s2: read by <main> at priorities.c:64
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   m1:
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:56
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:66
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
   m2:
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:56
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:66
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -121,18 +121,18 @@
 [mt] Detailed shared zones protections
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 2
-[mt] *** Computing thread _main_, iteration 2 (potential shared vars changed)
-[mt] * Computing value analysis for thread _main_
+[mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread <main>
 [mt] Thread main, fun main
 [mt] priorities.c:51: Initializing mutex m1
 [mt] priorities.c:52: Initializing mutex m2
-[mt] priorities.c:54: Thread jobs1, fun f1, parent _main_, args {0}
+[mt] priorities.c:54: Thread jobs1, fun f1, parent <main>, args {0}
 [mt] priorities.c:54: Start thread jobs1
-[mt] priorities.c:55: Thread jobs2, fun f2, parent _main_, args {0}
+[mt] priorities.c:55: Thread jobs2, fun f2, parent <main>, args {0}
 [mt] priorities.c:55: Start thread jobs2
-[mt] priorities.c:56: Thread jobs3, fun f3, parent _main_, args {0}
+[mt] priorities.c:56: Thread jobs3, fun f3, parent <main>, args {0}
 [mt] priorities.c:56: Start thread jobs3
-[mt] priorities.c:57: Thread jobs4, fun f4, parent _main_, args {0}
+[mt] priorities.c:57: Thread jobs4, fun f4, parent <main>, args {0}
 [mt] priorities.c:57: Start thread jobs4
 [mt] priorities.c:61: Lock m1
 [mt] priorities.c:62: Lock m2
@@ -142,22 +142,22 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s1: write by _main_ at priorities.c:63
-  s2: read by _main_ at priorities.c:64
-  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  s1: write by <main> at priorities.c:63
+  s2: read by <main> at priorities.c:64
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   m1:
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:56
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:66
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
   m2:
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:56
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:66
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread _main_ computed
+[mt] *** Thread <main> computed
 [mt] *** Computing thread jobs1, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread jobs1
 [mt] priorities.c:21: Lock m1
@@ -222,24 +222,24 @@
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: s1; s2
 [mt] jobs1 reads  s1 ∈ {0}  // priorities.c:22 f1 (priorities.c:19)
-[mt] _main_ reads  s2 ∈ {0}  // priorities.c:64 main (priorities.c:49)
-[mt] _main_ writes  s1 ∈ {1}  // priorities.c:63 main (priorities.c:49)
+[mt] <main> reads  s2 ∈ {0}  // priorities.c:64 main (priorities.c:49)
+[mt] <main> writes  s1 ∈ {1}  // priorities.c:63 main (priorities.c:49)
 [mt] jobs3 writes  s2 ∈ {3}  // priorities.c:36 f3 (priorities.c:34)
 [mt] jobs4 writes  s2 ∈ {3}  // priorities.c:44 f4 (priorities.c:41)
 [mt] Possible read/write data races:
   s2:
-    read by _main_ at priorities.c:64, protected by m1 m2
+    read by <main> at priorities.c:64, protected by m1 m2
     write by jobs3 at priorities.c:36, unprotected
     write by jobs4 at priorities.c:44, protected by m2
   s1:
     read by jobs1 at priorities.c:22, protected by m1
-    write by _main_ at priorities.c:63, protected by m1 m2
+    write by <main> at priorities.c:63, protected by m1 m2
 [mt] Shared memory: s1; s2
 [mt] Concurrent precise var accesses have changed: before
     \nothing
   vs.
     s1; s2
-[mt] Write summary for _main_ (updated): s1 ∈ {1}
+[mt] Write summary for <main> (updated): s1 ∈ {1}
 [mt] Write summary for jobs3 (updated): s2 ∈ {3}
 [mt] Write summary for jobs4 (updated): s2 ∈ {3}
 [mt] Mutexes for concurrent accesses:
@@ -247,27 +247,27 @@
   s2  write protected by (?)m2, read protected by m1 m2
 [mt] Detailed shared zones protections
   s2:
-    Read by _main_, Write by jobs4: protected by priorities
-    Read by _main_, Write by jobs3: protected by priorities
-  s1: Read by jobs1, Write by _main_: protected by m1
+    Read by <main>, Write by jobs4: protected by priorities
+    Read by <main>, Write by jobs3: protected by priorities
+  s1: Read by jobs1, Write by <main>: protected by m1
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread _main_, iteration 3 (shared vars values changed)
-[mt] * Computing value analysis for thread _main_
+[mt] *** Computing thread <main>, iteration 3 (shared vars values changed)
+[mt] * Computing value analysis for thread <main>
 [mt] Thread main, fun main
 [mt] priorities.c:51: Initializing mutex m1
 [mt] priorities.c:52: Initializing mutex m2
-[mt] priorities.c:54: Thread jobs1, fun f1, parent _main_, args {0}
+[mt] priorities.c:54: Thread jobs1, fun f1, parent <main>, args {0}
 [mt] priorities.c:54: Start thread jobs1
-[mt] priorities.c:55: Thread jobs2, fun f2, parent _main_, args {0}
+[mt] priorities.c:55: Thread jobs2, fun f2, parent <main>, args {0}
 [mt] priorities.c:55: Start thread jobs2
-[mt] priorities.c:55: New context for jobs2, fun f2, parent _main_, args {0}
-[mt] priorities.c:56: Thread jobs3, fun f3, parent _main_, args {0}
+[mt] priorities.c:55: New context for jobs2, fun f2, parent <main>, args {0}
+[mt] priorities.c:56: Thread jobs3, fun f3, parent <main>, args {0}
 [mt] priorities.c:56: Start thread jobs3
-[mt] priorities.c:56: New context for jobs3, fun f3, parent _main_, args {0}
-[mt] priorities.c:57: Thread jobs4, fun f4, parent _main_, args {0}
+[mt] priorities.c:56: New context for jobs3, fun f3, parent <main>, args {0}
+[mt] priorities.c:57: Thread jobs4, fun f4, parent <main>, args {0}
 [mt] priorities.c:57: Start thread jobs4
-[mt] priorities.c:57: New context for jobs4, fun f4, parent _main_, args {0}
+[mt] priorities.c:57: New context for jobs4, fun f4, parent <main>, args {0}
 [mt] priorities.c:61: Lock m1
 [mt] priorities.c:62: Lock m2
 [mt] priorities.c:65: Release m1
@@ -276,22 +276,22 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s1: write by _main_ at priorities.c:63
-  s2: read by _main_ at priorities.c:64
-  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  s1: write by <main> at priorities.c:63
+  s2: read by <main> at priorities.c:64
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   m1:
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:56
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:66
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
   m2:
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:56
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:66
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread _main_ computed
+[mt] *** Thread <main> computed
 [mt] *** Computing thread jobs1, iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread jobs1
 [mt] priorities.c:21: Lock m1
@@ -356,20 +356,20 @@
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: s1; s2
 [mt] jobs1 reads  s1 ∈ {0; 1}  // priorities.c:22 f1 (priorities.c:19)
-[mt] _main_ reads  s2 ∈ {0; 3}  // priorities.c:64 main (priorities.c:49)
-[mt] _main_ writes  s1 ∈ {1}  // priorities.c:63 main (priorities.c:49)
+[mt] <main> reads  s2 ∈ {0; 3}  // priorities.c:64 main (priorities.c:49)
+[mt] <main> writes  s1 ∈ {1}  // priorities.c:63 main (priorities.c:49)
 [mt] jobs3 writes  s2 ∈ {3}  // priorities.c:36 f3 (priorities.c:34)
 [mt] jobs4 writes  s2 ∈ {3}  // priorities.c:44 f4 (priorities.c:41)
 [mt] Possible read/write data races:
   s2:
-    read by _main_ at priorities.c:64, protected by m1 m2
+    read by <main> at priorities.c:64, protected by m1 m2
     write by jobs3 at priorities.c:36, unprotected
     write by jobs4 at priorities.c:44, protected by m2
   s1:
     read by jobs1 at priorities.c:22, protected by m1
-    write by _main_ at priorities.c:63, protected by m1 m2
+    write by <main> at priorities.c:63, protected by m1 m2
 [mt] Shared memory: s1; s2
-[mt] Write summary for _main_: s1 ∈ {1}
+[mt] Write summary for <main>: s1 ∈ {1}
 [mt] Write summary for jobs3: s2 ∈ {3}
 [mt] Write summary for jobs4: s2 ∈ {3}
 [mt] Mutexes for concurrent accesses:
@@ -377,8 +377,8 @@
   s2  write protected by (?)m2, read protected by m1 m2
 [mt] Detailed shared zones protections
   s2:
-    Read by _main_, Write by jobs4: protected by priorities
-    Read by _main_, Write by jobs3: protected by priorities
-  s1: Read by jobs1, Write by _main_: protected by m1
+    Read by <main>, Write by jobs4: protected by priorities
+    Read by <main>, Write by jobs3: protected by priorities
+  s1: Read by jobs1, Write by <main>: protected by m1
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 3 iterations

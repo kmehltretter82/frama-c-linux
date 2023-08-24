@@ -6,29 +6,29 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main
-[mt] sharedarray.c:55: New thread: jobs1, fun f1, parent _main_, args {0}
+[mt] sharedarray.c:55: New thread: jobs1, fun f1, parent <main>, args {0}
 [mt] sharedarray.c:55: Start thread jobs1
-[mt] sharedarray.c:56: New thread: jobs2, fun f2, parent _main_, args {0}
+[mt] sharedarray.c:56: New thread: jobs2, fun f2, parent <main>, args {0}
 [mt] sharedarray.c:56: Start thread jobs2
-[mt] sharedarray.c:57: New thread: jobs3, fun f3, parent _main_, args {0}
+[mt] sharedarray.c:57: New thread: jobs3, fun f3, parent <main>, args {0}
 [mt] sharedarray.c:57: Start thread jobs3
-[mt] sharedarray.c:58: New thread: jobs4, fun f4, parent _main_, args {0}
+[mt] sharedarray.c:58: New thread: jobs4, fun f4, parent <main>, args {0}
 [mt] sharedarray.c:58: Start thread jobs4
-[mt] sharedarray.c:59: New thread: jobs5, fun f5, parent _main_, args {0}
+[mt] sharedarray.c:59: New thread: jobs5, fun f5, parent <main>, args {0}
 [mt] sharedarray.c:59: Start thread jobs5
-[mt] sharedarray.c:60: New thread: jobs6, fun f6, parent _main_, args {0}
+[mt] sharedarray.c:60: New thread: jobs6, fun f6, parent <main>, args {0}
 [mt] sharedarray.c:60: Start thread jobs6
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs5: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs6: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs5: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed

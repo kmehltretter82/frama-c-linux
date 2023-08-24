@@ -21,7 +21,7 @@
 [mt] init.c:37: Initializing mutex mutex_10
 [mt] init.c:37: Warning: 
   During mutex initialization. Mutex mutex_10 initialized more than once by
-  thread _main_ at same statement. Ignoring.
+  thread <main> at same statement. Ignoring.
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

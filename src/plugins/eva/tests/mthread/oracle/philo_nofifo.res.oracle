@@ -11,22 +11,22 @@
 [mt] philo_nofifo.c:31: Initializing mutex locks[2]
 [mt] philo_nofifo.c:31: Initializing mutex locks[3]
 [mt] philo_nofifo.c:31: Initializing mutex locks[4]
-[mt] philo_nofifo.c:37: New thread: jobs[0], fun job, parent _main_, args {0}
+[mt] philo_nofifo.c:37: New thread: jobs[0], fun job, parent <main>, args {0}
 [mt] philo_nofifo.c:37: Start thread jobs[0]
-[mt] philo_nofifo.c:37: New thread: jobs[1], fun job, parent _main_, args {1}
+[mt] philo_nofifo.c:37: New thread: jobs[1], fun job, parent <main>, args {1}
 [mt] philo_nofifo.c:37: Start thread jobs[1]
-[mt] philo_nofifo.c:37: New thread: jobs[2], fun job, parent _main_, args {2}
+[mt] philo_nofifo.c:37: New thread: jobs[2], fun job, parent <main>, args {2}
 [mt] philo_nofifo.c:37: Start thread jobs[2]
-[mt] philo_nofifo.c:37: New thread: jobs[3], fun job, parent _main_, args {3}
+[mt] philo_nofifo.c:37: New thread: jobs[3], fun job, parent <main>, args {3}
 [mt] philo_nofifo.c:37: Start thread jobs[3]
-[mt] philo_nofifo.c:37: New thread: jobs[4], fun job, parent _main_, args {4}
+[mt] philo_nofifo.c:37: New thread: jobs[4], fun job, parent <main>, args {4}
 [mt] philo_nofifo.c:37: Start thread jobs[4]
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  jobs[0..4]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed

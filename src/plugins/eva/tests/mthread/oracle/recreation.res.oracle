@@ -18,19 +18,19 @@
 [mt] recreation.c:63: Initializing mutex locks[9]
 [mt] recreation.c:63: Initializing mutex locks[10]
 [mt] recreation.c:63: Initializing mutex locks[11]
-[mt] recreation.c:66: New thread: jobs[0], fun job, parent _main_, args {0}
+[mt] recreation.c:66: New thread: jobs[0], fun job, parent <main>, args {0}
 [mt] recreation.c:66: Start thread jobs[0]
-[mt] recreation.c:66: New thread: jobs[1], fun job, parent _main_, args {1}
+[mt] recreation.c:66: New thread: jobs[1], fun job, parent <main>, args {1}
 [mt] recreation.c:66: Start thread jobs[1]
-[mt] recreation.c:66: New thread: jobs[2], fun job, parent _main_, args {2}
+[mt] recreation.c:66: New thread: jobs[2], fun job, parent <main>, args {2}
 [mt] recreation.c:66: Start thread jobs[2]
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end: read by _main_ at recreation.c:68
-  jobs[0..2]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  end: read by <main> at recreation.c:68
+  jobs[0..2]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -303,8 +303,8 @@
 [mt] Detailed shared zones protections
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread _main_, iteration 3 (potential shared vars changed)
-[mt] * Computing value analysis for thread _main_
+[mt] *** Computing thread <main>, iteration 3 (potential shared vars changed)
+[mt] * Computing value analysis for thread <main>
 [mt] Thread main, fun main
 [mt] recreation.c:63: Initializing mutex locks[0]
 [mt] recreation.c:63: Initializing mutex locks[1]
@@ -318,22 +318,22 @@
 [mt] recreation.c:63: Initializing mutex locks[9]
 [mt] recreation.c:63: Initializing mutex locks[10]
 [mt] recreation.c:63: Initializing mutex locks[11]
-[mt] recreation.c:66: Thread jobs[0], fun job, parent _main_, args {0}
+[mt] recreation.c:66: Thread jobs[0], fun job, parent <main>, args {0}
 [mt] recreation.c:66: Start thread jobs[0]
-[mt] recreation.c:66: Thread jobs[1], fun job, parent _main_, args {1}
+[mt] recreation.c:66: Thread jobs[1], fun job, parent <main>, args {1}
 [mt] recreation.c:66: Start thread jobs[1]
-[mt] recreation.c:66: Thread jobs[2], fun job, parent _main_, args {2}
+[mt] recreation.c:66: Thread jobs[2], fun job, parent <main>, args {2}
 [mt] recreation.c:66: Start thread jobs[2]
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end: read by _main_ at recreation.c:68
-  jobs[0..2]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  end: read by <main> at recreation.c:68
+  jobs[0..2]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread _main_ computed
+[mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 3 (potential shared vars changed)
 [mt] * Computing value analysis for thread jobs[0]
 [mt] recreation.c:25: Thread jobs[3], fun job, parent jobs[0], args {3}
@@ -575,7 +575,7 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: end
-[mt] _main_ reads  end ∈ {0}  // recreation.c:68 main (recreation.c:58)
+[mt] <main> reads  end ∈ {0}  // recreation.c:68 main (recreation.c:58)
 [mt] jobs[0] reads  end ∈ {0}  // recreation.c:28 job (recreation.c:17)
 [mt] jobs[1] reads  end ∈ {0}  // recreation.c:28 job (recreation.c:17)
 [mt] jobs[2] reads  end ∈ {0}  // recreation.c:28 job (recreation.c:17)
@@ -590,7 +590,7 @@
 [mt] jobs[11] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
 [mt] Possible read/write data races:
   end:
-    read by _main_ at recreation.c:68, unprotected
+    read by <main> at recreation.c:68, unprotected
     read by jobs[0] at recreation.c:28, unprotected
     read by jobs[1] at recreation.c:28, unprotected
     read by jobs[2] at recreation.c:28, unprotected
@@ -650,22 +650,22 @@
     Read by jobs[0], Write by jobs[5]: unprotected
     Read by jobs[0], Write by jobs[4]: unprotected
     Read by jobs[0], Write by jobs[3]: unprotected
-    Read by _main_, Write by jobs[11]: unprotected
-    Read by _main_, Write by jobs[10]: unprotected
-    Read by _main_, Write by jobs[9]: unprotected
-    Read by _main_, Write by jobs[8]: unprotected
-    Read by _main_, Write by jobs[7]: unprotected
-    Read by _main_, Write by jobs[6]: unprotected
-    Read by _main_, Write by jobs[5]: unprotected
-    Read by _main_, Write by jobs[4]: unprotected
-    Read by _main_, Write by jobs[3]: unprotected
+    Read by <main>, Write by jobs[11]: unprotected
+    Read by <main>, Write by jobs[10]: unprotected
+    Read by <main>, Write by jobs[9]: unprotected
+    Read by <main>, Write by jobs[8]: unprotected
+    Read by <main>, Write by jobs[7]: unprotected
+    Read by <main>, Write by jobs[6]: unprotected
+    Read by <main>, Write by jobs[5]: unprotected
+    Read by <main>, Write by jobs[4]: unprotected
+    Read by <main>, Write by jobs[3]: unprotected
 [mt] Statements needing manual synchronisation
   recreation.c:28 (for end)
   recreation.c:68 (for end)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
-[mt] *** Computing thread _main_, iteration 4 (shared vars values changed)
-[mt] * Computing value analysis for thread _main_
+[mt] *** Computing thread <main>, iteration 4 (shared vars values changed)
+[mt] * Computing value analysis for thread <main>
 [mt] Thread main, fun main
 [mt] recreation.c:63: Initializing mutex locks[0]
 [mt] recreation.c:63: Initializing mutex locks[1]
@@ -679,24 +679,24 @@
 [mt] recreation.c:63: Initializing mutex locks[9]
 [mt] recreation.c:63: Initializing mutex locks[10]
 [mt] recreation.c:63: Initializing mutex locks[11]
-[mt] recreation.c:66: Thread jobs[0], fun job, parent _main_, args {0}
+[mt] recreation.c:66: Thread jobs[0], fun job, parent <main>, args {0}
 [mt] recreation.c:66: Start thread jobs[0]
-[mt] recreation.c:66: Thread jobs[1], fun job, parent _main_, args {1}
+[mt] recreation.c:66: Thread jobs[1], fun job, parent <main>, args {1}
 [mt] recreation.c:66: Start thread jobs[1]
-[mt] recreation.c:66: New context for jobs[1], fun job, parent _main_, args {1}
-[mt] recreation.c:66: Thread jobs[2], fun job, parent _main_, args {2}
+[mt] recreation.c:66: New context for jobs[1], fun job, parent <main>, args {1}
+[mt] recreation.c:66: Thread jobs[2], fun job, parent <main>, args {2}
 [mt] recreation.c:66: Start thread jobs[2]
-[mt] recreation.c:66: New context for jobs[2], fun job, parent _main_, args {2}
+[mt] recreation.c:66: New context for jobs[2], fun job, parent <main>, args {2}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end: read by _main_ at recreation.c:68
-  jobs[0..2]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  end: read by <main> at recreation.c:68
+  jobs[0..2]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread _main_ computed
+[mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 4 (shared vars values changed)
 [mt] * Computing value analysis for thread jobs[0]
 [mt] recreation.c:25: Thread jobs[3], fun job, parent jobs[0], args {3}
@@ -938,7 +938,7 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: end
-[mt] _main_ reads  end ∈ {0; 1}  // recreation.c:68 main (recreation.c:58)
+[mt] <main> reads  end ∈ {0; 1}  // recreation.c:68 main (recreation.c:58)
 [mt] jobs[0] reads  end ∈ {0; 1}  // recreation.c:28 job (recreation.c:17)
 [mt] jobs[1] reads  end ∈ {0; 1}  // recreation.c:28 job (recreation.c:17)
 [mt] jobs[2] reads  end ∈ {0; 1}  // recreation.c:28 job (recreation.c:17)
@@ -953,7 +953,7 @@
 [mt] jobs[11] writes  end ∈ {1}  // recreation.c:40 job (recreation.c:17)
 [mt] Possible read/write data races:
   end:
-    read by _main_ at recreation.c:68, unprotected
+    read by <main> at recreation.c:68, unprotected
     read by jobs[0] at recreation.c:28, unprotected
     read by jobs[1] at recreation.c:28, unprotected
     read by jobs[2] at recreation.c:28, unprotected
@@ -1009,15 +1009,15 @@
     Read by jobs[0], Write by jobs[5]: unprotected
     Read by jobs[0], Write by jobs[4]: unprotected
     Read by jobs[0], Write by jobs[3]: unprotected
-    Read by _main_, Write by jobs[11]: unprotected
-    Read by _main_, Write by jobs[10]: unprotected
-    Read by _main_, Write by jobs[9]: unprotected
-    Read by _main_, Write by jobs[8]: unprotected
-    Read by _main_, Write by jobs[7]: unprotected
-    Read by _main_, Write by jobs[6]: unprotected
-    Read by _main_, Write by jobs[5]: unprotected
-    Read by _main_, Write by jobs[4]: unprotected
-    Read by _main_, Write by jobs[3]: unprotected
+    Read by <main>, Write by jobs[11]: unprotected
+    Read by <main>, Write by jobs[10]: unprotected
+    Read by <main>, Write by jobs[9]: unprotected
+    Read by <main>, Write by jobs[8]: unprotected
+    Read by <main>, Write by jobs[7]: unprotected
+    Read by <main>, Write by jobs[6]: unprotected
+    Read by <main>, Write by jobs[5]: unprotected
+    Read by <main>, Write by jobs[4]: unprotected
+    Read by <main>, Write by jobs[3]: unprotected
 [mt] Statements needing manual synchronisation
   recreation.c:28 (for end)
   recreation.c:68 (for end)

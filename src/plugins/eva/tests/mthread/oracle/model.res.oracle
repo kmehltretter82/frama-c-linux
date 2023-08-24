@@ -6,7 +6,7 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main
-[mt] model.c:20: New thread: job1, fun f1, parent _main_, args {0}
+[mt] model.c:20: New thread: job1, fun f1, parent <main>, args {0}
 [mt] model.c:20: Start thread job1
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis

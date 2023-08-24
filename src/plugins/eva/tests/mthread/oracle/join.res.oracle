@@ -6,17 +6,17 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main
-[mt] join.c:20: New thread: th1, fun t1, parent _main_, args {0}
+[mt] join.c:20: New thread: th1, fun t1, parent <main>, args {0}
 [mt] join.c:20: Start thread th1
-[mt] join.c:21: New thread: th2, fun t2, parent _main_, args {0}
+[mt] join.c:21: New thread: th2, fun t2, parent <main>, args {0}
 [mt] join.c:21: Start thread th2
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  th1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  th2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  th1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  th2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed

@@ -8,13 +8,13 @@
 [mt] New thread: main, fun main
 [mt] mutex2.c:48: Initializing mutex m1
 [mt] mutex2.c:49: Initializing mutex m2
-[mt] mutex2.c:51: New thread: jobs1, fun f1, parent _main_, args {0}
+[mt] mutex2.c:51: New thread: jobs1, fun f1, parent <main>, args {0}
 [mt] mutex2.c:51: Start thread jobs1
-[mt] mutex2.c:52: New thread: jobs2, fun f2, parent _main_, args {0}
+[mt] mutex2.c:52: New thread: jobs2, fun f2, parent <main>, args {0}
 [mt] mutex2.c:52: Start thread jobs2
-[mt] mutex2.c:53: New thread: jobs3, fun f3, parent _main_, args {0}
+[mt] mutex2.c:53: New thread: jobs3, fun f3, parent <main>, args {0}
 [mt] mutex2.c:53: Start thread jobs3
-[mt] mutex2.c:54: New thread: jobs4, fun f4, parent _main_, args {0}
+[mt] mutex2.c:54: New thread: jobs4, fun f4, parent <main>, args {0}
 [mt] mutex2.c:54: Start thread jobs4
 [mt] mutex2.c:56: Lock m1
 [mt] mutex2.c:57: Lock m2
@@ -25,18 +25,18 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s1: read by _main_ at mutex2.c:58
-  s2: read by _main_ at mutex2.c:59
-  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  s1: read by <main> at mutex2.c:58
+  s2: read by <main> at mutex2.c:59
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   m1:
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:56
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:66
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
   m2:
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:56
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:66
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -117,18 +117,18 @@
 [mt] Detailed shared zones protections
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 2
-[mt] *** Computing thread _main_, iteration 2 (potential shared vars changed)
-[mt] * Computing value analysis for thread _main_
+[mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread <main>
 [mt] Thread main, fun main
 [mt] mutex2.c:48: Initializing mutex m1
 [mt] mutex2.c:49: Initializing mutex m2
-[mt] mutex2.c:51: Thread jobs1, fun f1, parent _main_, args {0}
+[mt] mutex2.c:51: Thread jobs1, fun f1, parent <main>, args {0}
 [mt] mutex2.c:51: Start thread jobs1
-[mt] mutex2.c:52: Thread jobs2, fun f2, parent _main_, args {0}
+[mt] mutex2.c:52: Thread jobs2, fun f2, parent <main>, args {0}
 [mt] mutex2.c:52: Start thread jobs2
-[mt] mutex2.c:53: Thread jobs3, fun f3, parent _main_, args {0}
+[mt] mutex2.c:53: Thread jobs3, fun f3, parent <main>, args {0}
 [mt] mutex2.c:53: Start thread jobs3
-[mt] mutex2.c:54: Thread jobs4, fun f4, parent _main_, args {0}
+[mt] mutex2.c:54: Thread jobs4, fun f4, parent <main>, args {0}
 [mt] mutex2.c:54: Start thread jobs4
 [mt] mutex2.c:56: Lock m1
 [mt] mutex2.c:57: Lock m2
@@ -138,22 +138,22 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s1: read by _main_ at mutex2.c:58
-  s2: read by _main_ at mutex2.c:59
-  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  s1: read by <main> at mutex2.c:58
+  s2: read by <main> at mutex2.c:59
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   m1:
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:56
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:66
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
   m2:
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:56
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:66
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread _main_ computed
+[mt] *** Thread <main> computed
 [mt] *** Computing thread jobs1, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread jobs1
 [mt] mutex2.c:20: Lock m1
@@ -218,19 +218,19 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: s1; s2
-[mt] _main_ reads  s1 ∈ {0}  // mutex2.c:58 main (mutex2.c:46)
-[mt] _main_ reads  s2 ∈ {0}  // mutex2.c:59 main (mutex2.c:46)
+[mt] <main> reads  s1 ∈ {0}  // mutex2.c:58 main (mutex2.c:46)
+[mt] <main> reads  s2 ∈ {0}  // mutex2.c:59 main (mutex2.c:46)
 [mt] jobs1 writes  s1 ∈ {1}  // mutex2.c:21 f1 (mutex2.c:19)
 [mt] jobs2 writes  s1 ∈ {2}  // mutex2.c:28 f2 (mutex2.c:26)
 [mt] jobs3 writes  s2 ∈ {3}  // mutex2.c:34 f3 (mutex2.c:33)
 [mt] jobs4 writes  s2 ∈ {3}  // mutex2.c:41 f4 (mutex2.c:39)
 [mt] Possible read/write data races:
   s2:
-    read by _main_ at mutex2.c:59, protected by m1 m2
+    read by <main> at mutex2.c:59, protected by m1 m2
     write by jobs3 at mutex2.c:34, unprotected
     write by jobs4 at mutex2.c:41, protected by m2
   s1:
-    read by _main_ at mutex2.c:58, protected by m1 m2
+    read by <main> at mutex2.c:58, protected by m1 m2
     write by jobs1 at mutex2.c:21, protected by m1
     write by jobs2 at mutex2.c:28, protected by m2
 [mt] Shared memory: s1; s2
@@ -247,31 +247,31 @@
   s2  write protected by (?)m2, read protected by m1 m2
 [mt] Detailed shared zones protections
   s2:
-    Read by _main_, Write by jobs4: protected by m2
-    Read by _main_, Write by jobs3: unprotected
+    Read by <main>, Write by jobs4: protected by m2
+    Read by <main>, Write by jobs3: unprotected
   s1:
-    Read by _main_, Write by jobs2: protected by m2
-    Read by _main_, Write by jobs1: protected by m1
+    Read by <main>, Write by jobs2: protected by m2
+    Read by <main>, Write by jobs1: protected by m1
 [mt] Statements needing manual synchronisation
   mutex2.c:59 (for s2)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread _main_, iteration 3 (shared vars values changed)
-[mt] * Computing value analysis for thread _main_
+[mt] *** Computing thread <main>, iteration 3 (shared vars values changed)
+[mt] * Computing value analysis for thread <main>
 [mt] Thread main, fun main
 [mt] mutex2.c:48: Initializing mutex m1
 [mt] mutex2.c:49: Initializing mutex m2
-[mt] mutex2.c:51: Thread jobs1, fun f1, parent _main_, args {0}
+[mt] mutex2.c:51: Thread jobs1, fun f1, parent <main>, args {0}
 [mt] mutex2.c:51: Start thread jobs1
-[mt] mutex2.c:52: Thread jobs2, fun f2, parent _main_, args {0}
+[mt] mutex2.c:52: Thread jobs2, fun f2, parent <main>, args {0}
 [mt] mutex2.c:52: Start thread jobs2
-[mt] mutex2.c:52: New context for jobs2, fun f2, parent _main_, args {0}
-[mt] mutex2.c:53: Thread jobs3, fun f3, parent _main_, args {0}
+[mt] mutex2.c:52: New context for jobs2, fun f2, parent <main>, args {0}
+[mt] mutex2.c:53: Thread jobs3, fun f3, parent <main>, args {0}
 [mt] mutex2.c:53: Start thread jobs3
-[mt] mutex2.c:53: New context for jobs3, fun f3, parent _main_, args {0}
-[mt] mutex2.c:54: Thread jobs4, fun f4, parent _main_, args {0}
+[mt] mutex2.c:53: New context for jobs3, fun f3, parent <main>, args {0}
+[mt] mutex2.c:54: Thread jobs4, fun f4, parent <main>, args {0}
 [mt] mutex2.c:54: Start thread jobs4
-[mt] mutex2.c:54: New context for jobs4, fun f4, parent _main_, args {0}
+[mt] mutex2.c:54: New context for jobs4, fun f4, parent <main>, args {0}
 [mt] mutex2.c:56: Lock m1
 [mt] mutex2.c:57: Lock m2
 [mt] mutex2.c:60: Release m1
@@ -280,22 +280,22 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  s1: read by _main_ at mutex2.c:58
-  s2: read by _main_ at mutex2.c:59
-  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  s1: read by <main> at mutex2.c:58
+  s2: read by <main> at mutex2.c:59
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   m1:
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:56
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:66
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
   m2:
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:56
-    read by _main_ at FRAMAC_SHARE/mthread_pthread.c:66
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread _main_ computed
+[mt] *** Thread <main> computed
 [mt] *** Computing thread jobs2, iteration 3 (thread initial memory state changed)
 [mt] * Computing value analysis for thread jobs2
 [mt] mutex2.c:27: Lock m2
@@ -344,19 +344,19 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: s1; s2
-[mt] _main_ reads  s1 ∈ {0; 1; 2}  // mutex2.c:58 main (mutex2.c:46)
-[mt] _main_ reads  s2 ∈ {0; 3}  // mutex2.c:59 main (mutex2.c:46)
+[mt] <main> reads  s1 ∈ {0; 1; 2}  // mutex2.c:58 main (mutex2.c:46)
+[mt] <main> reads  s2 ∈ {0; 3}  // mutex2.c:59 main (mutex2.c:46)
 [mt] jobs1 writes  s1 ∈ {1}  // mutex2.c:21 f1 (mutex2.c:19)
 [mt] jobs2 writes  s1 ∈ {2}  // mutex2.c:28 f2 (mutex2.c:26)
 [mt] jobs3 writes  s2 ∈ {3}  // mutex2.c:34 f3 (mutex2.c:33)
 [mt] jobs4 writes  s2 ∈ {3}  // mutex2.c:41 f4 (mutex2.c:39)
 [mt] Possible read/write data races:
   s2:
-    read by _main_ at mutex2.c:59, protected by m1 m2
+    read by <main> at mutex2.c:59, protected by m1 m2
     write by jobs3 at mutex2.c:34, unprotected
     write by jobs4 at mutex2.c:41, protected by m2
   s1:
-    read by _main_ at mutex2.c:58, protected by m1 m2
+    read by <main> at mutex2.c:58, protected by m1 m2
     write by jobs1 at mutex2.c:21, protected by m1
     write by jobs2 at mutex2.c:28, protected by m2
 [mt] Shared memory: s1; s2
@@ -369,11 +369,11 @@
   s2  write protected by (?)m2, read protected by m1 m2
 [mt] Detailed shared zones protections
   s2:
-    Read by _main_, Write by jobs4: protected by m2
-    Read by _main_, Write by jobs3: unprotected
+    Read by <main>, Write by jobs4: protected by m2
+    Read by <main>, Write by jobs3: unprotected
   s1:
-    Read by _main_, Write by jobs2: protected by m2
-    Read by _main_, Write by jobs1: protected by m1
+    Read by <main>, Write by jobs2: protected by m2
+    Read by <main>, Write by jobs1: protected by m1
 [mt] Statements needing manual synchronisation
   mutex2.c:59 (for s2)
 [mt] ***** Shared variables computed

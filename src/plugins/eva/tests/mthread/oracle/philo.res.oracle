@@ -11,15 +11,15 @@
 [mt] philo.c:46: Initializing mutex locks[2]
 [mt] philo.c:46: Initializing mutex locks[3]
 [mt] philo.c:46: Initializing mutex locks[4]
-[mt] philo.c:51: New thread: jobs[0], fun job, parent _main_, args {0}
+[mt] philo.c:51: New thread: jobs[0], fun job, parent <main>, args {0}
 [mt] philo.c:51: Start thread jobs[0]
-[mt] philo.c:51: New thread: jobs[1], fun job, parent _main_, args {1}
+[mt] philo.c:51: New thread: jobs[1], fun job, parent <main>, args {1}
 [mt] philo.c:51: Start thread jobs[1]
-[mt] philo.c:51: New thread: jobs[2], fun job, parent _main_, args {2}
+[mt] philo.c:51: New thread: jobs[2], fun job, parent <main>, args {2}
 [mt] philo.c:51: Start thread jobs[2]
-[mt] philo.c:51: New thread: jobs[3], fun job, parent _main_, args {3}
+[mt] philo.c:51: New thread: jobs[3], fun job, parent <main>, args {3}
 [mt] philo.c:51: Start thread jobs[3]
-[mt] philo.c:51: New thread: jobs[4], fun job, parent _main_, args {4}
+[mt] philo.c:51: New thread: jobs[4], fun job, parent <main>, args {4}
 [mt] philo.c:51: Start thread jobs[4]
 [mt] philo.c:54: 
   Receiving message on queue, max size 2, stored in &end. No value
@@ -29,8 +29,8 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  jobs[0..4]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  queue: read by _main_ at philo.c:54
+  jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  queue: read by <main> at philo.c:54
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -156,23 +156,23 @@
 [mt] Detailed shared zones protections
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 2
-[mt] *** Computing thread _main_, iteration 2 (new message received)
-[mt] * Computing value analysis for thread _main_
+[mt] *** Computing thread <main>, iteration 2 (new message received)
+[mt] * Computing value analysis for thread <main>
 [mt] Thread main, fun main
 [mt] philo.c:46: Initializing mutex locks[0]
 [mt] philo.c:46: Initializing mutex locks[1]
 [mt] philo.c:46: Initializing mutex locks[2]
 [mt] philo.c:46: Initializing mutex locks[3]
 [mt] philo.c:46: Initializing mutex locks[4]
-[mt] philo.c:51: Thread jobs[0], fun job, parent _main_, args {0}
+[mt] philo.c:51: Thread jobs[0], fun job, parent <main>, args {0}
 [mt] philo.c:51: Start thread jobs[0]
-[mt] philo.c:51: Thread jobs[1], fun job, parent _main_, args {1}
+[mt] philo.c:51: Thread jobs[1], fun job, parent <main>, args {1}
 [mt] philo.c:51: Start thread jobs[1]
-[mt] philo.c:51: Thread jobs[2], fun job, parent _main_, args {2}
+[mt] philo.c:51: Thread jobs[2], fun job, parent <main>, args {2}
 [mt] philo.c:51: Start thread jobs[2]
-[mt] philo.c:51: Thread jobs[3], fun job, parent _main_, args {3}
+[mt] philo.c:51: Thread jobs[3], fun job, parent <main>, args {3}
 [mt] philo.c:51: Start thread jobs[3]
-[mt] philo.c:51: Thread jobs[4], fun job, parent _main_, args {4}
+[mt] philo.c:51: Thread jobs[4], fun job, parent <main>, args {4}
 [mt] philo.c:51: Start thread jobs[4]
 [mt] philo.c:54: 
   Receiving message on queue, max size 2, stored in &end. Possible  values:
@@ -188,13 +188,13 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: read by _main_ at philo.c:53
-  jobs[0..4]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  queue: read by _main_ at philo.c:54
+  end2: read by <main> at philo.c:53
+  jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  queue: read by <main> at philo.c:54
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread _main_ computed
+[mt] *** Thread <main> computed
 [mt] ***** Threads computed for iteration 2.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
@@ -211,23 +211,23 @@
 [mt] Detailed shared zones protections
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread _main_, iteration 3 (potential shared vars changed)
-[mt] * Computing value analysis for thread _main_
+[mt] *** Computing thread <main>, iteration 3 (potential shared vars changed)
+[mt] * Computing value analysis for thread <main>
 [mt] Thread main, fun main
 [mt] philo.c:46: Initializing mutex locks[0]
 [mt] philo.c:46: Initializing mutex locks[1]
 [mt] philo.c:46: Initializing mutex locks[2]
 [mt] philo.c:46: Initializing mutex locks[3]
 [mt] philo.c:46: Initializing mutex locks[4]
-[mt] philo.c:51: Thread jobs[0], fun job, parent _main_, args {0}
+[mt] philo.c:51: Thread jobs[0], fun job, parent <main>, args {0}
 [mt] philo.c:51: Start thread jobs[0]
-[mt] philo.c:51: Thread jobs[1], fun job, parent _main_, args {1}
+[mt] philo.c:51: Thread jobs[1], fun job, parent <main>, args {1}
 [mt] philo.c:51: Start thread jobs[1]
-[mt] philo.c:51: Thread jobs[2], fun job, parent _main_, args {2}
+[mt] philo.c:51: Thread jobs[2], fun job, parent <main>, args {2}
 [mt] philo.c:51: Start thread jobs[2]
-[mt] philo.c:51: Thread jobs[3], fun job, parent _main_, args {3}
+[mt] philo.c:51: Thread jobs[3], fun job, parent <main>, args {3}
 [mt] philo.c:51: Start thread jobs[3]
-[mt] philo.c:51: Thread jobs[4], fun job, parent _main_, args {4}
+[mt] philo.c:51: Thread jobs[4], fun job, parent <main>, args {4}
 [mt] philo.c:51: Start thread jobs[4]
 [mt] philo.c:54: 
   Receiving message on queue, max size 2, stored in &end. Possible  values:
@@ -243,13 +243,13 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: read by _main_ at philo.c:53
-  jobs[0..4]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  queue: read by _main_ at philo.c:54
+  end2: read by <main> at philo.c:53
+  jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  queue: read by <main> at philo.c:54
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread _main_ computed
+[mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 3 (potential shared vars changed)
 [mt] * Computing value analysis for thread jobs[0]
 [mt] philo.c:19: Lock locks[4]
@@ -360,7 +360,7 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: end2
-[mt] _main_ reads  end2 ∈ {0}  // philo.c:53 main (philo.c:40)
+[mt] <main> reads  end2 ∈ {0}  // philo.c:53 main (philo.c:40)
 [mt] jobs[0] writes  end2 ∈ {1}  // philo.c:24
   aux (philo.c:37) <- job (philo.c:31)
 [mt] jobs[2] writes  end2 ∈ {1}  // philo.c:24
@@ -371,7 +371,7 @@
   aux (philo.c:37) <- job (philo.c:31)
 [mt] Possible read/write data races:
   end2:
-    read by _main_ at philo.c:53, unprotected
+    read by <main> at philo.c:53, unprotected
     write by jobs[0] at philo.c:24, protected by locks[1] locks[4]
     write by jobs[2] at philo.c:24, protected by locks[1] locks[3]
     write by jobs[3] at philo.c:24, protected by locks[2] locks[4]
@@ -390,34 +390,34 @@
         (?)locks[4], read unprotected
 [mt] Detailed shared zones protections
   end2:
-    Read by _main_, Write by jobs[4]: unprotected
-    Read by _main_, Write by jobs[3]: unprotected
-    Read by _main_, Write by jobs[2]: unprotected
-    Read by _main_, Write by jobs[0]: unprotected
+    Read by <main>, Write by jobs[4]: unprotected
+    Read by <main>, Write by jobs[3]: unprotected
+    Read by <main>, Write by jobs[2]: unprotected
+    Read by <main>, Write by jobs[0]: unprotected
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
-[mt] *** Computing thread _main_, iteration 4 (shared vars values changed)
-[mt] * Computing value analysis for thread _main_
+[mt] *** Computing thread <main>, iteration 4 (shared vars values changed)
+[mt] * Computing value analysis for thread <main>
 [mt] Thread main, fun main
 [mt] philo.c:46: Initializing mutex locks[0]
 [mt] philo.c:46: Initializing mutex locks[1]
 [mt] philo.c:46: Initializing mutex locks[2]
 [mt] philo.c:46: Initializing mutex locks[3]
 [mt] philo.c:46: Initializing mutex locks[4]
-[mt] philo.c:51: Thread jobs[0], fun job, parent _main_, args {0}
+[mt] philo.c:51: Thread jobs[0], fun job, parent <main>, args {0}
 [mt] philo.c:51: Start thread jobs[0]
-[mt] philo.c:51: Thread jobs[1], fun job, parent _main_, args {1}
+[mt] philo.c:51: Thread jobs[1], fun job, parent <main>, args {1}
 [mt] philo.c:51: Start thread jobs[1]
-[mt] philo.c:51: New context for jobs[1], fun job, parent _main_, args {1}
-[mt] philo.c:51: Thread jobs[2], fun job, parent _main_, args {2}
+[mt] philo.c:51: New context for jobs[1], fun job, parent <main>, args {1}
+[mt] philo.c:51: Thread jobs[2], fun job, parent <main>, args {2}
 [mt] philo.c:51: Start thread jobs[2]
-[mt] philo.c:51: New context for jobs[2], fun job, parent _main_, args {2}
-[mt] philo.c:51: Thread jobs[3], fun job, parent _main_, args {3}
+[mt] philo.c:51: New context for jobs[2], fun job, parent <main>, args {2}
+[mt] philo.c:51: Thread jobs[3], fun job, parent <main>, args {3}
 [mt] philo.c:51: Start thread jobs[3]
-[mt] philo.c:51: New context for jobs[3], fun job, parent _main_, args {3}
-[mt] philo.c:51: Thread jobs[4], fun job, parent _main_, args {4}
+[mt] philo.c:51: New context for jobs[3], fun job, parent <main>, args {3}
+[mt] philo.c:51: Thread jobs[4], fun job, parent <main>, args {4}
 [mt] philo.c:51: Start thread jobs[4]
-[mt] philo.c:51: New context for jobs[4], fun job, parent _main_, args {4}
+[mt] philo.c:51: New context for jobs[4], fun job, parent <main>, args {4}
 [mt] philo.c:54: 
   Receiving message on queue, max size 2, stored in &end. Possible  values:
   From thread jobs[0]: [0] ∈ {1}
@@ -432,13 +432,13 @@
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  end2: read by _main_ at philo.c:53
-  jobs[0..4]: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  queue: read by _main_ at philo.c:54
+  end2: read by <main> at philo.c:53
+  jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  queue: read by <main> at philo.c:54
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread _main_ computed
+[mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[1], iteration 4
     (thread initial memory state changed)
 [mt] * Computing value analysis for thread jobs[1]
@@ -531,7 +531,7 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: end2
-[mt] _main_ reads  end2 ∈ {0; 1}  // philo.c:53 main (philo.c:40)
+[mt] <main> reads  end2 ∈ {0; 1}  // philo.c:53 main (philo.c:40)
 [mt] jobs[0] writes  end2 ∈ {1}  // philo.c:24
   aux (philo.c:37) <- job (philo.c:31)
 [mt] jobs[2] writes  end2 ∈ {1}  // philo.c:24
@@ -542,7 +542,7 @@
   aux (philo.c:37) <- job (philo.c:31)
 [mt] Possible read/write data races:
   end2:
-    read by _main_ at philo.c:53, unprotected
+    read by <main> at philo.c:53, unprotected
     write by jobs[0] at philo.c:24, protected by locks[1] locks[4]
     write by jobs[2] at philo.c:24, protected by locks[1] locks[3]
     write by jobs[3] at philo.c:24, protected by locks[2] locks[4]
@@ -557,9 +557,9 @@
         (?)locks[4], read unprotected
 [mt] Detailed shared zones protections
   end2:
-    Read by _main_, Write by jobs[4]: unprotected
-    Read by _main_, Write by jobs[3]: unprotected
-    Read by _main_, Write by jobs[2]: unprotected
-    Read by _main_, Write by jobs[0]: unprotected
+    Read by <main>, Write by jobs[4]: unprotected
+    Read by <main>, Write by jobs[3]: unprotected
+    Read by <main>, Write by jobs[2]: unprotected
+    Read by <main>, Write by jobs[0]: unprotected
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 4 iterations

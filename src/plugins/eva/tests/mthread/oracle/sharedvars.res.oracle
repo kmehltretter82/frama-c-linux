@@ -6,33 +6,33 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main
-[mt] sharedvars.c:90: New thread: jobs1, fun f1, parent _main_, args {0}
+[mt] sharedvars.c:90: New thread: jobs1, fun f1, parent <main>, args {0}
 [mt] sharedvars.c:90: Start thread jobs1
-[mt] sharedvars.c:95: New thread: jobs2, fun f2, parent _main_, args {0}
+[mt] sharedvars.c:95: New thread: jobs2, fun f2, parent <main>, args {0}
 [mt] sharedvars.c:95: Start thread jobs2
-[mt] sharedvars.c:96: New thread: jobs3, fun f3, parent _main_, args {0}
+[mt] sharedvars.c:96: New thread: jobs3, fun f3, parent <main>, args {0}
 [mt] sharedvars.c:96: Start thread jobs3
-[mt] sharedvars.c:99: New thread: jobs4, fun f4, parent _main_, args {0}
+[mt] sharedvars.c:99: New thread: jobs4, fun f4, parent <main>, args {0}
 [mt] sharedvars.c:99: Start thread jobs4
-[mt] sharedvars.c:102: New thread: jobs5, fun f5, parent _main_, args {0}
+[mt] sharedvars.c:102: New thread: jobs5, fun f5, parent <main>, args {0}
 [mt] sharedvars.c:102: Start thread jobs5
-[mt] sharedvars.c:103: New thread: jobs6, fun f6, parent _main_, args {0}
+[mt] sharedvars.c:103: New thread: jobs6, fun f6, parent <main>, args {0}
 [mt] sharedvars.c:103: Start thread jobs6
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u2: read by _main_ at sharedvars.c:93
-      write by _main_ at sharedvars.c:92
-  s4: write by _main_ at sharedvars.c:98
-      write by _main_ at sharedvars.c:100
-  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs5: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs6: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  u2: read by <main> at sharedvars.c:93
+      write by <main> at sharedvars.c:92
+  s4: write by <main> at sharedvars.c:98
+      write by <main> at sharedvars.c:100
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs5: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
@@ -132,39 +132,39 @@
 [mt] Detailed shared zones protections
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 2
-[mt] *** Computing thread _main_, iteration 2 (potential shared vars changed)
-[mt] * Computing value analysis for thread _main_
+[mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread <main>
 [mt] Thread main, fun main
-[mt] sharedvars.c:90: Thread jobs1, fun f1, parent _main_, args {0}
+[mt] sharedvars.c:90: Thread jobs1, fun f1, parent <main>, args {0}
 [mt] sharedvars.c:90: Start thread jobs1
-[mt] sharedvars.c:95: Thread jobs2, fun f2, parent _main_, args {0}
+[mt] sharedvars.c:95: Thread jobs2, fun f2, parent <main>, args {0}
 [mt] sharedvars.c:95: Start thread jobs2
-[mt] sharedvars.c:96: Thread jobs3, fun f3, parent _main_, args {0}
+[mt] sharedvars.c:96: Thread jobs3, fun f3, parent <main>, args {0}
 [mt] sharedvars.c:96: Start thread jobs3
-[mt] sharedvars.c:99: Thread jobs4, fun f4, parent _main_, args {0}
+[mt] sharedvars.c:99: Thread jobs4, fun f4, parent <main>, args {0}
 [mt] sharedvars.c:99: Start thread jobs4
-[mt] sharedvars.c:102: Thread jobs5, fun f5, parent _main_, args {0}
+[mt] sharedvars.c:102: Thread jobs5, fun f5, parent <main>, args {0}
 [mt] sharedvars.c:102: Start thread jobs5
-[mt] sharedvars.c:103: Thread jobs6, fun f6, parent _main_, args {0}
+[mt] sharedvars.c:103: Thread jobs6, fun f6, parent <main>, args {0}
 [mt] sharedvars.c:103: Start thread jobs6
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u2: read by _main_ at sharedvars.c:93
-      write by _main_ at sharedvars.c:92
-  s4: write by _main_ at sharedvars.c:98
-      write by _main_ at sharedvars.c:100
-  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs5: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs6: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  u2: read by <main> at sharedvars.c:93
+      write by <main> at sharedvars.c:92
+  s4: write by <main> at sharedvars.c:98
+      write by <main> at sharedvars.c:100
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs5: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread _main_ computed
+[mt] *** Thread <main> computed
 [mt] *** Computing thread jobs1, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread jobs1
 [mt] * Starting to save the state of the value analysis
@@ -269,7 +269,7 @@
 [mt] jobs4 reads  s4 ∈ {-1}  // sharedvars.c:53 f4 (sharedvars.c:52)
 [mt] jobs4 reads  s6 ∈ {0}  // sharedvars.c:56 f4 (sharedvars.c:52)
 [mt] jobs6 reads  s6 ∈ {0}  // sharedvars.c:75 f6 (sharedvars.c:74)
-[mt] _main_ writes  s4 ∈ {1}  // sharedvars.c:100 main (sharedvars.c:80)
+[mt] <main> writes  s4 ∈ {1}  // sharedvars.c:100 main (sharedvars.c:80)
 [mt] jobs4 writes  s4 ∈ {4}  // sharedvars.c:54 f4 (sharedvars.c:52)
 [mt] jobs4 writes  s6 ∈ {4}  // sharedvars.c:57 f4 (sharedvars.c:52)
 [mt] jobs6 writes  s6 ∈ {6}  // sharedvars.c:76 f6 (sharedvars.c:74)
@@ -281,14 +281,14 @@
     write by jobs6 at sharedvars.c:76, unprotected
   s4:
     read by jobs4 at sharedvars.c:53, unprotected
-    write by _main_ at sharedvars.c:100, unprotected
+    write by <main> at sharedvars.c:100, unprotected
     write by jobs4 at sharedvars.c:54, unprotected
 [mt] Shared memory: s4; s6
 [mt] Concurrent precise var accesses have changed: before
     \nothing
   vs.
     s4; s6
-[mt] Write summary for _main_ (updated): s4 ∈ {1}
+[mt] Write summary for <main> (updated): s4 ∈ {1}
 [mt] Write summary for jobs4 (updated): s4 ∈ {4}
                                      s6 ∈ {4}
 [mt] Write summary for jobs6 (updated): s6 ∈ {6}
@@ -299,51 +299,51 @@
   s6:
     Read by jobs6, Write by jobs4: unprotected
     Read by jobs4, Write by jobs6: unprotected
-  s4: Read by jobs4, Write by _main_: unprotected
+  s4: Read by jobs4, Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
   sharedvars.c:53 (for s4)
   sharedvars.c:75 (for s6)
   sharedvars.c:56 (for s6)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread _main_, iteration 3 (potential shared vars changed)
-[mt] * Computing value analysis for thread _main_
+[mt] *** Computing thread <main>, iteration 3 (potential shared vars changed)
+[mt] * Computing value analysis for thread <main>
 [mt] Thread main, fun main
-[mt] sharedvars.c:90: Thread jobs1, fun f1, parent _main_, args {0}
+[mt] sharedvars.c:90: Thread jobs1, fun f1, parent <main>, args {0}
 [mt] sharedvars.c:90: Start thread jobs1
-[mt] sharedvars.c:95: Thread jobs2, fun f2, parent _main_, args {0}
+[mt] sharedvars.c:95: Thread jobs2, fun f2, parent <main>, args {0}
 [mt] sharedvars.c:95: Start thread jobs2
-[mt] sharedvars.c:95: New context for jobs2, fun f2, parent _main_, args {0}
-[mt] sharedvars.c:96: Thread jobs3, fun f3, parent _main_, args {0}
+[mt] sharedvars.c:95: New context for jobs2, fun f2, parent <main>, args {0}
+[mt] sharedvars.c:96: Thread jobs3, fun f3, parent <main>, args {0}
 [mt] sharedvars.c:96: Start thread jobs3
-[mt] sharedvars.c:96: New context for jobs3, fun f3, parent _main_, args {0}
-[mt] sharedvars.c:99: Thread jobs4, fun f4, parent _main_, args {0}
+[mt] sharedvars.c:96: New context for jobs3, fun f3, parent <main>, args {0}
+[mt] sharedvars.c:99: Thread jobs4, fun f4, parent <main>, args {0}
 [mt] sharedvars.c:99: Start thread jobs4
-[mt] sharedvars.c:99: New context for jobs4, fun f4, parent _main_, args {0}
-[mt] sharedvars.c:102: Thread jobs5, fun f5, parent _main_, args {0}
+[mt] sharedvars.c:99: New context for jobs4, fun f4, parent <main>, args {0}
+[mt] sharedvars.c:102: Thread jobs5, fun f5, parent <main>, args {0}
 [mt] sharedvars.c:102: Start thread jobs5
-[mt] sharedvars.c:102: New context for jobs5, fun f5, parent _main_, args {0}
-[mt] sharedvars.c:103: Thread jobs6, fun f6, parent _main_, args {0}
+[mt] sharedvars.c:102: New context for jobs5, fun f5, parent <main>, args {0}
+[mt] sharedvars.c:103: Thread jobs6, fun f6, parent <main>, args {0}
 [mt] sharedvars.c:103: Start thread jobs6
-[mt] sharedvars.c:103: New context for jobs6, fun f6, parent _main_, args {0}
+[mt] sharedvars.c:103: New context for jobs6, fun f6, parent <main>, args {0}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  u2: read by _main_ at sharedvars.c:93
-      write by _main_ at sharedvars.c:92
-  s4: write by _main_ at sharedvars.c:98
-      write by _main_ at sharedvars.c:100
-  jobs1: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs2: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs3: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs4: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs5: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
-  jobs6: write by _main_ at FRAMAC_SHARE/mthread_pthread.c:29
+  u2: read by <main> at sharedvars.c:93
+      write by <main> at sharedvars.c:92
+  s4: write by <main> at sharedvars.c:98
+      write by <main> at sharedvars.c:100
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs5: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [mt] * Computing cfg
 [mt] * Cfg computed
-[mt] *** Thread _main_ computed
+[mt] *** Thread <main> computed
 [mt] *** Computing thread jobs1, iteration 3 (potential shared vars changed)
 [mt] * Computing value analysis for thread jobs1
 [mt] * Starting to save the state of the value analysis
@@ -463,7 +463,7 @@
 [mt] jobs51 reads  s5 ∈ {0}  // sharedvars.c:62 f51 (sharedvars.c:61)
 [mt] jobs4 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:56 f4 (sharedvars.c:52)
 [mt] jobs6 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:75 f6 (sharedvars.c:74)
-[mt] _main_ writes  s4 ∈ {1}  // sharedvars.c:100 main (sharedvars.c:80)
+[mt] <main> writes  s4 ∈ {1}  // sharedvars.c:100 main (sharedvars.c:80)
 [mt] jobs4 writes  s4 ∈ {4}  // sharedvars.c:54 f4 (sharedvars.c:52)
 [mt] jobs5 writes  s5 ∈ {5}  // sharedvars.c:69 f5 (sharedvars.c:67)
 [mt] jobs51 writes  s5 ∈ {51}  // sharedvars.c:63 f51 (sharedvars.c:61)
@@ -481,14 +481,14 @@
     write by jobs51 at sharedvars.c:63, unprotected
   s4:
     read by jobs4 at sharedvars.c:53, unprotected
-    write by _main_ at sharedvars.c:100, unprotected
+    write by <main> at sharedvars.c:100, unprotected
     write by jobs4 at sharedvars.c:54, unprotected
 [mt] Shared memory: s4; s5; s6
 [mt] Concurrent precise var accesses have changed: before
     s4; s6
   vs.
     s4; s5; s6
-[mt] Write summary for _main_: s4 ∈ {1}
+[mt] Write summary for <main>: s4 ∈ {1}
 [mt] Write summary for jobs4: s4 ∈ {4}
                            s6 ∈ {4}
 [mt] Write summary for jobs5 (updated): s5 ∈ {5}
@@ -503,7 +503,7 @@
     Read by jobs6, Write by jobs4: unprotected
     Read by jobs4, Write by jobs6: unprotected
   s5: Read by jobs51, Write by jobs5: unprotected
-  s4: Read by jobs4, Write by _main_: unprotected
+  s4: Read by jobs4, Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
   sharedvars.c:53 (for s4)
   sharedvars.c:75 (for s6)
@@ -532,7 +532,7 @@
 [mt] jobs51 reads  s5 ∈ {0}  // sharedvars.c:62 f51 (sharedvars.c:61)
 [mt] jobs4 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:56 f4 (sharedvars.c:52)
 [mt] jobs6 reads  s6 ∈ {0; 4; 6}  // sharedvars.c:75 f6 (sharedvars.c:74)
-[mt] _main_ writes  s4 ∈ {1}  // sharedvars.c:100 main (sharedvars.c:80)
+[mt] <main> writes  s4 ∈ {1}  // sharedvars.c:100 main (sharedvars.c:80)
 [mt] jobs4 writes  s4 ∈ {4}  // sharedvars.c:54 f4 (sharedvars.c:52)
 [mt] jobs5 writes  s5 ∈ {5}  // sharedvars.c:69 f5 (sharedvars.c:67)
 [mt] jobs51 writes  s5 ∈ {51}  // sharedvars.c:63 f51 (sharedvars.c:61)
@@ -550,10 +550,10 @@
     write by jobs51 at sharedvars.c:63, unprotected
   s4:
     read by jobs4 at sharedvars.c:53, unprotected
-    write by _main_ at sharedvars.c:100, unprotected
+    write by <main> at sharedvars.c:100, unprotected
     write by jobs4 at sharedvars.c:54, unprotected
 [mt] Shared memory: s4; s5; s6
-[mt] Write summary for _main_: s4 ∈ {1}
+[mt] Write summary for <main>: s4 ∈ {1}
 [mt] Write summary for jobs4: s4 ∈ {4}
                            s6 ∈ {4}
 [mt] Write summary for jobs5: s5 ∈ {5}
@@ -568,7 +568,7 @@
     Read by jobs6, Write by jobs4: unprotected
     Read by jobs4, Write by jobs6: unprotected
   s5: Read by jobs51, Write by jobs5: unprotected
-  s4: Read by jobs4, Write by _main_: unprotected
+  s4: Read by jobs4, Write by <main>: unprotected
 [mt] Statements needing manual synchronisation
   sharedvars.c:53 (for s4)
   sharedvars.c:75 (for s6)

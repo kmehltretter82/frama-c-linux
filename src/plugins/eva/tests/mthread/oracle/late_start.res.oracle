@@ -6,8 +6,8 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: main, fun main
-[mt] late_start.c:31: New thread: job1, fun f1, parent _main_, args {0}
-[mt] late_start.c:32: New thread: job2, fun f2, parent _main_, args {0}
+[mt] late_start.c:31: New thread: job1, fun f1, parent <main>, args {0}
+[mt] late_start.c:32: New thread: job2, fun f2, parent <main>, args {0}
 [mt] Start thread job2
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis

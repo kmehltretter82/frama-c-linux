@@ -11,10 +11,10 @@
    generating default assigns. See -generated-spec-* options for more info
 [mt] messy_init.c:16: Initializing mutex lock
 [mt] messy_init.c:19: Lock lock
-[mt] messy_init.c:22: New thread: job, fun fjob, parent _main_, args {0}
+[mt] messy_init.c:22: New thread: job, fun fjob, parent <main>, args {0}
 [mt] messy_init.c:22: Start thread job
-[mt] messy_init.c:22: Thread job, fun fjob, parent _main_, args {0}
-[mt] messy_init.c:22: New context for job, fun fjob, parent _main_, args {0}
+[mt] messy_init.c:22: Thread job, fun fjob, parent <main>, args {0}
+[mt] messy_init.c:22: New context for job, fun fjob, parent <main>, args {0}
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

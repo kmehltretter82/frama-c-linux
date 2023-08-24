@@ -127,8 +127,8 @@ let raw_id_main_thread = IdThread, 1
 
 let rec id_main_thread = {
   id_raw = raw_id_main_thread;
-  id_name = "_main_";
-  id_name_hint = Hint_string "_main_";
+  id_name = "<main>";
+  id_name_hint = Hint_string "<main>";
   id_creator = id_main_thread;
   id_updated = 0;
 }
