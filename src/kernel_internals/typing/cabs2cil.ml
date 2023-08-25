@@ -8903,7 +8903,9 @@ and createLocal ghost ((_, sto, _, _) as specs)
   (* Maybe we have an extern declaration. Make it a global *)
   | _ when sto = Extern ->
     if inite <> Cabs.NO_INIT
-    then Kernel.error ~current:true "\'extern\' variable cannot have an initializer";
+    then
+      Kernel.error ~current:true
+        "\'extern\' local variable cannot have an initializer";
     let vi = createGlobal ghost None specs init_name in
     (* Add it to the local environment to ensure that it shadows previous
      * local variables *)
