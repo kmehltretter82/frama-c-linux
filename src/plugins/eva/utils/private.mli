@@ -59,6 +59,7 @@ module Main_locations = Main_locations
 module Main_values = Main_values
 module Mutex = Mutex
 module Mqueue = Mqueue
+module MtDomain = MtDomain
 module Parameters = Parameters
 module Red_statuses = Red_statuses
 module Results = Results

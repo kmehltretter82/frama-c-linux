@@ -30,35 +30,43 @@ let initial () =
   Interferences.current := interferences; (* For Iterator *)
   interferences
 
-
-let concurrent_writes analysis_state =
-  let module ALSet = Analysis_location.Local.Set in
-  let open MtCfgTypes in
-  let is_write = function
-    | MtTypes.Read -> false
-    | Write _ -> true
-  in
-  let add_accesses (rw, node, _id) (acc : ALSet.t) =
-    if not (is_write rw)
-    then acc
-    else
-      let seq =
-        CfgNode.node_stmt node |>
-        List.to_seq |>
-        Seq.map (fun stmt -> stmt, node.cfgn_stack)
+let concurrent_writes shared_bases =
+  let module Analyzer = (val Analysis.current_analyzer ()) in
+  match Analyzer.Dom.get MtDomain.Domain.key with
+  (* Domain disabled, no information about writes *)
+  | None -> []
+  (* Domain enabled *)
+  | Some extract ->
+    let add_aloc stmt cs state acc =
+      let mt_state = extract state in
+      let { MtDomain.written } = MtDomain.Domain.memory mt_state in
+      let written_bases = Locations.Zone.get_bases written in
+      if Base.SetLattice.(intersects (inject shared_bases) written_bases)
+      then (stmt, cs) :: acc
+      else acc
+    in
+    let add_stmt acc stmt =
+      let is_write_stmt = match stmt.Cil_types.skind with
+        | Cil_types.Instr (Set _ | Call _ | Local_init _) -> true
+        | _ -> false
       in
-      ALSet.add_seq seq acc
-  in
-  let add_zone_accesses acc (_zone, node_id_set) =
-    MtCfgTypes.SetNodeIdAccess.fold add_accesses node_id_set acc
-  in
-  analysis_state.MtThread.concurrent_accesses_by_nodes |>
-  List.fold_left add_zone_accesses ALSet.empty |>
-  ALSet.to_seq |>
-  List.of_seq
+      if is_write_stmt
+      then match Analyzer.get_stmt_state_by_callstack ~after:true stmt with
+        | `Top | `Bottom -> acc (* TODO: handle Tops *)
+        | `Value table ->
+          Callstack.Hashtbl.fold (add_aloc stmt) table acc
+      else acc
+    in
+    let add_kf kf acc =
+      match kf.Cil_types.fundec with
+      | Declaration _ -> acc
+      | Definition (fundec,_) ->
+        List.fold_left add_stmt acc fundec.Cil_types.sallstmts
+    in
+    Globals.Functions.fold add_kf []
 
 let shared_bases analysis_state =
-  let shared_zones = analysis_state.MtThread.precise_concurrent_accesses in
+  let shared_zones = analysis_state.MtThread.concurrent_accesses in
   match Locations.Zone.get_bases shared_zones with
   | Top -> assert false
   | Set zones ->  zones
@@ -82,8 +90,8 @@ let add_last_analysis analysis_state interferences =
         Printer.pp_location (Cil_datatype.Stmt.loc stmt);
       Analyzer.get_stmt_state ~after:true stmt
   in
-  let writes = concurrent_writes analysis_state in
   let bases = shared_bases analysis_state in
+  let writes = concurrent_writes bases in
   let thread = analysis_state.curr_thread.th_eva_thread in
   Interferences.add_last_analysis ~domain ~get_state
     interferences thread writes bases

@@ -98,6 +98,8 @@ let add_last_analysis
       match state with
       | `Bottom -> acc_map (* no interference to add *)
       | `Top ->
+        Self.warning ~once:false ~source:(fst (Cil_datatype.Stmt.loc (fst aloc)))
+          "Imprecise interference computed";
         MutexesMap.add Mutex.Set.empty `Top acc_map
       | `Value (state, mutexes) ->
         let update = function
@@ -109,8 +111,11 @@ let add_last_analysis
     let new_interferences =
       List.fold_left add_to_map MutexesMap.empty concurrent_writes
     in
-    Self.result "concurrent writes: @[%a@]@.interferences: @[%a@]@."
-      (Pretty_utils.pp_list Analysis_location.Local.pretty) concurrent_writes
+    let pp_aloc = Analysis_location.Local.pretty in
+    Self.result
+      "concurrent writes: @[%a@]@.shared bases: @[%a@]@.interferences: @[%a@]@."
+      (Pretty_utils.pp_list ~sep:",@ " pp_aloc) concurrent_writes
+      Base.Hptset.pretty shared_bases
       (MutexesMap.pretty Dom.pretty) new_interferences;
     (* Add the computed interferences to the table *)
     let Interferences ({ states; structure } as interferences) = interferences in
