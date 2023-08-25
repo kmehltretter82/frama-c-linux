@@ -8,7 +8,7 @@
 [kernel] init_call_ko.c:10: User Error: 
   Array initializer must be an initializer list or string literal
 [kernel] init_call_ko.c:11: User Error: 
-  'extern' variable cannot have an initializer
+  'extern' local variable cannot have an initializer
 [kernel] init_call_ko.c:12: User Error: 
   variable f with array type needs an explicit size or an initializer
 [kernel] init_call_ko.c:13: User Error: 
