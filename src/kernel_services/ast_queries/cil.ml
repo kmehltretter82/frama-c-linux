@@ -5787,6 +5787,10 @@ let isArrayType t = match unrollTypeSkel t with
   | TArray _ -> true
   | _ -> false
 
+let isUnsizedArrayType t = match unrollTypeSkel t with
+  | TArray (_, None, _) -> true
+  | _ -> false
+
 let isAnyCharArrayType t = match unrollTypeSkel t with
   | TArray(tau,_,_) when isAnyCharType tau -> true
   | _ -> false

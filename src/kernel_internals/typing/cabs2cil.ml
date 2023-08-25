@@ -8014,16 +8014,16 @@ and doInitializer local_env (vi: varinfo) (inite: Cabs.init_expression)
   : chunk * init * typ * Cil_datatype.Lval.Set.t =
 
   let checkArrayInit ty init =
-    match ty, init with
-    | TArray _,
-      (COMPOUND_INIT _
-      | SINGLE_INIT {expr_node = CONSTANT (CONST_STRING _
-                                          | CONST_WSTRING _)}) -> ()
-    | TArray _, _ ->
-      Kernel.error ~current:true ~once:true
-        "Array initializer must be an initializer list or string literal"
-    | _ ->
-      ()
+    if Cil.isArrayType ty then
+      match init with
+      | COMPOUND_INIT _
+      | SINGLE_INIT
+          { expr_node =
+              CONSTANT (CONST_STRING _
+                       | CONST_WSTRING _)} -> ()
+      | _ ->
+        Kernel.error ~current:true ~once:true
+          "Array initializer must be an initializer list or string literal"
   in
   Kernel.debug ~dkey:Kernel.dkey_typing_init
     "@\nStarting a new initializer for %s : %a@\n"
@@ -8812,12 +8812,11 @@ and createLocal ghost ((_, sto, _, _) as specs)
   let checkArray init vi =
     if init == Cabs.NO_INIT
     then
-      match vi.vtype with
-      | TArray (_, None, _) ->
+      if Cil.isUnsizedArrayType vi.vtype
+      then
         Kernel.error ~once:true ~current:true
           "variable %s with array type needs an explicit size or an initializer"
           vi.vorig_name
-      | _ -> ()
   in
   (* Check if we are declaring a function *)
   let rec isProto (dt: decl_type) : bool =

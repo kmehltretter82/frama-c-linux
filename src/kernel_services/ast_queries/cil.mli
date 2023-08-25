@@ -608,6 +608,9 @@ val argsToPairOfLists:
 (** True if the argument is an array type *)
 val isArrayType: typ -> bool
 
+(** True if the argument is an unsized array type *)
+val isUnsizedArrayType: typ -> bool
+
 (** True if the argument is a struct of union type *)
 val isStructOrUnionType: typ -> bool
 
