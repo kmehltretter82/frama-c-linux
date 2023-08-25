@@ -36,7 +36,7 @@ test('launch app', async () => {
 
 
 test('check server connection', async () => {
-    const launchAppResult = await e2eService.launchApp(e2eService.argsDefaultLaunch);
+    const launchAppResult = await e2eService.launchApp(e2eService.argsLaunchWithDefaultSettings);
     const electronApp = launchAppResult.app;
     const window = launchAppResult.page;
 
@@ -50,7 +50,7 @@ test('check server connection', async () => {
 });
 
 test('launch app with file', async () => {    
-    const launchAppResult = await e2eService.launchApp(e2eService.argsLaunchWithTestFile);
+    const launchAppResult = await e2eService.launchApp(e2eService.argsLaunchWithTestFileAndDefaultSettings);
     const electronApp = launchAppResult.app;
     const window = launchAppResult.page;
 

@@ -19,6 +19,6 @@ yarn-error.log
 
 # --------------------------------------------------------------------------
 /test-results/
-/test/screenshots/
+/screenshots/*
 /playwright-report/
 /playwright/.cache/

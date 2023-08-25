@@ -13,12 +13,12 @@ However:
 In the provided tests, various path are provided within `e2eService.ts` to launch Ivette with Frama-C or with additionnal C files. Those can be modified at will, however it is recommanded to stick with relative paths for maintenability.
 
 ## Installation
-If you're accessing this readme, if means that Playwright is already installed for this project in `test/e2e-playwright`. The following instructions are provided if you wish to do a fresh install.
+If you're accessing this readme, if means that Playwright is already installed for this project in `tests/e2e-playwright`. The following instructions are provided if you wish to do a fresh install.
 
 Playwright can be installed using Yarn (already done for ivette):
 - `yarn create playwright` ;
 Be mindful of the different options asked by the installer:
-- "Where to put your end-to-end tests" -> Directory that will create Playwright, eg `test/e2e-playwright`
+- "Where to put your end-to-end tests" -> Directory that will create Playwright, eg `tests/e2e-playwright`
 - "Add a Github Actions worflow (y/N)" -> CI/CD feayures for GitHub. Not needed since GitLab is used.
 - "Install Playwright browsers (can be done manullay via 'yarn playwright install')? (y/N)" -> Playwright will install it owns browsers for its tests instead of using those installed. No needed since we use Electron instead of native browsers.
 - "Install Playwright operating system dependencies (y/N)" -> Not needed
@@ -39,7 +39,7 @@ If the test fails, Playwright will automatically open its report. To manually ac
 Playwright options can me modified within its configuration file `playwright.config.ts`. The `fullyParallel` option has been set to false, as this feature resulted in concurency issues with Electron.
 
 # Writing test files:
-Playwright uses its Locator system to select html elements. You can type your own, but Playwright can help with that as well. Inside a test, add `await window.pause()` where required, then run said test. Doing so will open ivette, and, when the instruction is reached, an additional Playwright window. On the bottom of said window, there is a `Pick locator` button, which will provide the necessary locator for the selected element (works similarly to the inspect functionality of most browser developer tools).
+Playwright uses its Locator system to select html elements. You can type your own, but Playwright can help with that aswell. Inside a test, add `await window.pause()` where required, then run said test. Doing so will open ivette, and, when the instruction is reached, an additional Playwright window. On the bottom of said window, there is a `Pick locator` button, which will provide the necessary locator for the selected element (works similarly to the inspect functionality of most browser developer tools).
 The `locatorsUti.ts` files comes with several default locators.
 
 Once the element selected, multiple operations can be realized. Refer to the Playwright documentation for the complete list. Examples are provided in `e2eService.ts`.
