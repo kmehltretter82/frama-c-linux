@@ -154,26 +154,28 @@ end
 module ExpStructEq: S_with_collections with type t = exp
 
 (**
-   structural equality, with strict constant comparison as in {!ConstantStrict}
+   Structural equality, with strict constant comparison as in {!ConstantStrict}
    @since 24.0-Chromium
 *)
 module ExpStructEqStrict: S_with_collections with type t = exp
 
 (**
-   structural equality, with internal comparaison of struct/union in case of
-   sizeof (instead of id)
+   Structural equality, with structural comparaison in case of sizeof
+   (instead of id).
+   Different expressions with the same size winthin sizeof are equal.
 
    @since Frama-C+dev
 *)
-module ExpStructEqInternal: S_with_collections with type t = exp
+module ExpStructEqSized: S_with_collections with type t = exp
 
 (**
-   structural equality, with strict constant comparison as in {!ConstantStrict}
-   and with internal comparaison of struct/union in case of sizeof
+   Structural equality, with strict constant comparison as in {!ConstantStrict}
+   and with structural comparaison in case of sizeof (instead of id).
+   Different expressions with the same size winthin sizeof are equal.
 
    @since Frama-C+dev
 *)
-module ExpStructEqStrictInternal: S_with_collections with type t = exp
+module ExpStructEqStrictSized: S_with_collections with type t = exp
 
 module Fieldinfo: S_with_collections_pretty with type t = fieldinfo
 
