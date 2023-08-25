@@ -26,7 +26,7 @@ import * as e2eService from "./libs/e2eService";
 let gremlins: any;
 
 test('run gremlins.js', async () => {
-    const launchAppResult = await e2eService.launchAppWithTestFileAndInitSettings();
+    const launchAppResult = await e2eService.launchApp(e2eService.argsLaunchWithTestFileAndDefaultSettings);
     const electronApp = launchAppResult.app;
     const window = launchAppResult.page;
 

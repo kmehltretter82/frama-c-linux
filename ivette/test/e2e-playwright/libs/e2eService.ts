@@ -24,106 +24,57 @@ import { ElectronApplication, Page, expect } from '@playwright/test';
 import { _electron as electron } from 'playwright-core';
 import * as locs from "./locatorsUtil";
 
+
+// Basic Electron launch of Ivette for Playwright e2e tests
+export const argsDefaultLaunch: string[] = [
+    "./dist/main/main.js",
+    // "--enable-logging",
+    "--no-sandbox",
+    "--command",
+    "../bin/frama-c",
+];
+
+// Electron launch of Ivette for Playwright e2e tests using Ivette's default settings
+export const argsLaunchWithDefaultSettings: string[] = [
+    "./dist/main/main.js",
+    // "--enable-logging",
+    "--no-sandbox",
+    "--command",
+    "../bin/frama-c",
+    "--init-settings"
+];
+
+// Electron launch of Ivette for Playwright e2e tests using an additional C file loaded
+export const argsLaunchWithTestFile: string[] = [
+    "./dist/main/main.js",
+    // "--enable-logging",
+    "--no-sandbox",
+    "--command",
+    "../bin/frama-c",
+    "../tests/test/adpcm.c"
+];
+
+// Electron launch of Ivette for Playwright e2e tests using an additional C file loaded
+export const argsLaunchWithTestFileAndDefaultSettings: string[] = [
+    "./dist/main/main.js",
+    // "--enable-logging",
+    "--no-sandbox",
+    "--command",
+    "../bin/frama-c",
+    "../tests/test/adpcm.c",
+    "--init-settings"
+]
+
 /**
  * Basic Electron launch of Ivette for Playwright e2e tests
  */
-export async function launchApp(): Promise<{ app: ElectronApplication, page: Page }> {
+export async function launchApp(params: string[]): Promise<{ app: ElectronApplication, page: Page }> {
     const electronApp = await electron.launch({
         env: {
             ...process.env,
             NODE_ENV: "development",
         },
-        args: [
-            "./dist/main/main.js",
-            // "--enable-logging",
-            "--no-sandbox",
-            "--command",
-            "../bin/frama-c",
-        ],
-    });
-
-    // Get the first window that the app opens, wait if necessary.
-    const window = await electronApp.firstWindow();
-
-    return {
-        app: electronApp,
-        page: window
-    }
-}
-
-/**
- * Electron launch of Ivette for Playwright e2e tests using Ivette's default settings
- */
-export async function launchAppInitSettings(): Promise<{ app: ElectronApplication, page: Page }> {
-    const electronApp = await electron.launch({
-        env: {
-            ...process.env,
-            NODE_ENV: "development",
-        },
-        args: [
-            "./dist/main/main.js",
-            // "--enable-logging",
-            "--no-sandbox",
-            "--command",
-            "../bin/frama-c",
-            "--init-settings"
-        ],
-    });
-
-    const window = await electronApp.firstWindow();
-
-    return {
-        app: electronApp,
-        page: window
-    }
-}
-
-/**
- * Electron launch of Ivette for Playwright e2e tests using an additional C file loaded
- */
-export async function launchAppWithTestFile(): Promise<{ app: ElectronApplication, page: Page }> {
-    const electronApp = await electron.launch({
-        env: {
-            ...process.env,
-            NODE_ENV: "development",
-        },
-        args: [
-            "./dist/main/main.js",
-            // "--enable-logging",
-            "--no-sandbox",
-            "--command",
-            "../bin/frama-c",
-            "../tests/test/adpcm.c"
-        ],
-    });
-
-    // Get the first window that the app opens, wait if necessary.
-    const window = await electronApp.firstWindow();
-
-    return {
-        app: electronApp,
-        page: window
-    }
-}
-
-/**
- * Electron launch of Ivette for Playwright e2e tests using an additional C file loaded
- */
-export async function launchAppWithTestFileAndInitSettings(): Promise<{ app: ElectronApplication, page: Page }> {
-    const electronApp = await electron.launch({
-        env: {
-            ...process.env,
-            NODE_ENV: "development",
-        },
-        args: [
-            "./dist/main/main.js",
-            // "--enable-logging",
-            "--no-sandbox",
-            "--command",
-            "../bin/frama-c",
-            "../tests/test/adpcm.c",
-            "--init-settings"
-        ],
+        args: params,
     });
 
     // Get the first window that the app opens, wait if necessary.

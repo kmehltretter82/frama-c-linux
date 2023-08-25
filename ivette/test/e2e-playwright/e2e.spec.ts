@@ -24,7 +24,7 @@ import { test } from '@playwright/test';
 import * as e2eService from "./libs/e2eService";
 
 test('launch app', async () => {
-    const launchAppResult = await e2eService.launchApp();
+    const launchAppResult = await e2eService.launchApp(e2eService.argsDefaultLaunch);
     const electronApp = launchAppResult.app;
     const window = launchAppResult.page;
 
@@ -36,7 +36,7 @@ test('launch app', async () => {
 
 
 test('check server connection', async () => {
-    const launchAppResult = await e2eService.launchApp();
+    const launchAppResult = await e2eService.launchApp(e2eService.argsDefaultLaunch);
     const electronApp = launchAppResult.app;
     const window = launchAppResult.page;
 
@@ -50,7 +50,7 @@ test('check server connection', async () => {
 });
 
 test('launch app with file', async () => {    
-    const launchAppResult = await e2eService.launchAppWithTestFile();
+    const launchAppResult = await e2eService.launchApp(e2eService.argsLaunchWithTestFile);
     const electronApp = launchAppResult.app;
     const window = launchAppResult.page;
 
