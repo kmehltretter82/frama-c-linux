@@ -9049,15 +9049,15 @@ and createLocal ghost ((_, sto, _, _) as specs)
         (* We have a length now *)
         Cil.update_var_type vi et
       else
-        (match vi.vtype, ie', et with
+        (match vi.vtype, ie' with
          (* Initializing a local array *)
          | TArray(TInt((IChar|IUChar|ISChar), _) as bt, None, a),
-           SingleInit({enode = Const(CStr s);eloc=loc}), _ ->
+           SingleInit({enode = Const(CStr s);eloc=loc}) ->
            Cil.update_var_type vi
              (TArray(bt,
                      Some (integer ~loc (String.length s + 1)),
                      a))
-         | _, _, _ -> ());
+         | _, _ -> ());
       (* Now create assignments instead of the initialization *)
       (se1 @@@ (se4, ghost))
       @@@
