@@ -613,13 +613,19 @@ val isArrayType: typ -> bool
 *)
 val isUnsizedArrayType: typ -> bool
 
-(** True if the argument is a sized array type *)
+(** True if the argument is a sized array type
+    @since Frama-C+dev
+*)
 val isSizedArrayType: typ -> bool
 
-(** True if the argument is a struct *)
+(** True if the argument is a struct
+    @since Frama-C+dev
+*)
 val isStructType: typ -> bool
 
-(** True if the argument is a union type *)
+(** True if the argument is a union type
+    @since Frama-C+dev
+*)
 val isUnionType: typ -> bool
 
 (** True if the argument is a struct or union type *)
