@@ -608,7 +608,9 @@ val argsToPairOfLists:
 (** True if the argument is an array type *)
 val isArrayType: typ -> bool
 
-(** True if the argument is an unsized array type *)
+(** True if the argument is an array type without size
+    @since Frama-C+dev
+*)
 val isUnsizedArrayType: typ -> bool
 
 (** True if the argument is a sized array type *)
