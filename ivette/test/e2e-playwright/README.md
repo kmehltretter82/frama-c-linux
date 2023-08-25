@@ -12,9 +12,16 @@ However:
 
 In the provided tests, various path are provided within `e2eService.ts` to launch Ivette with Frama-C or with additionnal C files. Those can be modified at will, however it is recommanded to stick with relative paths for maintenability.
 
+## Installation
+If you're accessing this readme, if means that Playwright is already installed for this project in `test/e2e-playwright`. The following instructions are provided if you wish to do a fresh install.
+
 Playwright can be installed using Yarn (already done for ivette):
 - `yarn create playwright` ;
-Be mindful of the different options asked by the installer.
+Be mindful of the different options asked by the installer:
+- "Where to put your end-to-end tests" -> Directory that will create Playwright, eg `test/e2e-playwright`
+- "Add a Github Actions worflow (y/N)" -> CI/CD feayures for GitHub. Not needed since GitLab is used.
+- "Install Playwright browsers (can be done manullay via 'yarn playwright install')? (y/N)" -> Playwright will install it owns browsers for its tests instead of using those installed. No needed since we use Electron instead of native browsers.
+- "Install Playwright operating system dependencies (y/N)" -> Not needed
 
 If you wish to run monkey testing, Gremlins.js also need to be installed (already done for ivette):
 - `yarn add gremlins.js`
