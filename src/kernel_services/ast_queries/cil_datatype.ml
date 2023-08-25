@@ -1014,8 +1014,8 @@ struct
      takes into account their textual representation (if any). Otherwise,
      constants with the same type and value are equal even if their textual
      representations differ.
-     If [internal] is true, the comparaison of type into sizeof takes only account
-     the size. Otherwise, we use the usual type comparaison.
+     If [internal] is true, the comparaison of type into sizeof takes only
+     the size into account. Otherwise, we use the usual type comparaison.
   *)
   let rec compare_exp ~internal ~strict e1 e2 =
     let compare_exp = compare_exp ~internal ~strict in
