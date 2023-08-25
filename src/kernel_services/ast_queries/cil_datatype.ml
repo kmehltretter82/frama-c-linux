@@ -995,11 +995,9 @@ struct
       then
         match c1.cfields, c2.cfields with
         | Some c1f, Some c2f ->
-          List.fold_left2
-            (fun res f1 f2 ->
-               if res <> 0 then res
-               else compare_internal_typ f1.ftype f2.ftype)
-            0 c1f c2f
+          Extlib.list_compare
+            (fun f1 f2 -> compare_internal_typ f1.ftype f2.ftype)
+            c1f c2f
         | None, Some _ -> -1
         | Some _, None -> 1
         | None, None -> compare c1.ckey c2.ckey
