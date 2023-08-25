@@ -34,9 +34,41 @@ struct typ2 {
     int tab[sizeof(struct i_s2)];
 };
 
-int init_typ2(struct typ2* s);
+int init_typ2(struct typ2*);
 
 struct typ2 h;
+
+struct typ3 {
+    int tab[sizeof(void*)];
+};
+
+int init_typ3(struct typ3*);
+
+struct typ3 l;
+
+struct typ4 {
+    int tab[sizeof(void*)];
+};
+
+int init_typ4(struct typ4*);
+
+struct typ4 m;
+
+struct typ5 {
+    int tab[sizeof(unsigned char*)];
+};
+
+int init_typ5(struct typ5*);
+
+struct typ5 n;
+
+union typ6 {
+    int tab[sizeof(long)];
+};
+
+int init_typ6(union typ6);
+
+union typ6 o;
 
 int t = sizeof(h.tab);
 
