@@ -658,11 +658,11 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
         if Cil.hasAttribute "packed" cattr then (dropAttribute "aligned" fattrs)
         else begin
           let sizeof_type =
-            match Cil.unrollType fi.ftype with
-            | TArray (_, None, _) ->
+            if Cil.isUnsizedArrayType fi.ftype
+            then
               (* flexible array member: use size of pointer *)
               Cil.bitsSizeOf theMachine.upointType
-            | _ ->
+            else
               Cil.bytesSizeOf fi.ftype
           in
           let align = Integer.(min n (of_int sizeof_type)) in
@@ -3305,25 +3305,30 @@ let rec collectInitializer
       in
       let newtype =
         (* detect flexible array member initialization *)
-        match thistype, Cil.unrollType parenttype with
-        | TArray (_, None, _), TComp (comp, _)
-          when comp.cstruct && len > 0 ->
-          (* incomplete array type inside a struct => FAM, with
-             a non-empty initializer (len > 0)
-          *)
-          Kernel.debug ~dkey
-            "Detected initialization of a flexible array member \
-             (length %d, parenttype %a)" len Cil_datatype.Typ.pretty parenttype;
-          Kernel.error ~once:true ~current:true
-            "static initialization of flexible array members is an \
-             unsupported GNU extension";
-          TArray (typ, None, at)
-        | _ -> (* not a flexible array member *)
-          if len = 0 && not (Cil.gccMode() || Cil.msvcMode ()) then
+        if Cil.isUnsizedArrayType thistype &&
+           Cil.isStructType parenttype &&
+           len > 0
+        then
+          begin
+            (* incomplete array type inside a struct => FAM, with
+               a non-empty initializer (len > 0) *)
+            Kernel.debug ~dkey
+              "Detected initialization of a flexible array member \
+               (length %d, parenttype %a)" len Cil_datatype.Typ.pretty parenttype;
             Kernel.error ~once:true ~current:true
-              "arrays of size zero not supported in C99@ \
-               (only allowed as compiler extensions)";
-          TArray (typ, Some (integer ~loc len), at)
+              "static initialization of flexible array members is an \
+               unsupported GNU extension";
+            TArray (typ, None, at)
+          end
+        else
+          begin
+            (* not a flexible array member *)
+            if len = 0 && not (Cil.gccMode() || Cil.msvcMode ()) then
+              Kernel.error ~once:true ~current:true
+                "arrays of size zero not supported in C99@ \
+                 (only allowed as compiler extensions)";
+            TArray (typ, Some (integer ~loc len), at)
+          end
       in
       CompoundInit (newtype, (* collect [] endAt*)init),
       (* If the sizes of the initializers have not been used anywhere,
@@ -5287,19 +5292,17 @@ and makeCompType ghost (isstruct: bool)
       end
       else if not (Cil.isCompleteType ~allowZeroSizeArrays ftype)
       then begin
-        match Cil.unrollType ftype with
-        | TArray(_,None,_) when last_group && last_field ->
-          begin
-            (* possible flexible array member; check if struct contains at least
+        if Cil.isUnsizedArrayType ftype && last_group && last_field
+        then
+          (* possible flexible array member; check if struct contains at least
                one other field *)
-            if flds = [] then (* struct is empty *)
-              Kernel.error ~source
-                "flexible array member '%s' (type %a) \
-                 not allowed in otherwise empty struct"
-                n Cil_datatype.Typ.pretty ftype
-            else (* valid flexible array member *) ()
-          end
-        | _ ->
+          if flds = [] then (* struct is empty *)
+            Kernel.error ~source
+              "flexible array member '%s' (type %a) \
+               not allowed in otherwise empty struct"
+              n Cil_datatype.Typ.pretty ftype
+          else (* valid flexible array member *) ()
+        else
           Kernel.error ~source
             "field `%s' is declared with incomplete type %a"
             n Cil_datatype.Typ.pretty ftype
@@ -5349,21 +5352,23 @@ and makeCompType ghost (isstruct: bool)
       (* If the field is unnamed and its type is a structure of union type
        * then give it a distinguished name  *)
       let fname =
-        if n = missingFieldName then begin
-          match unrollType ftype with
-          | TComp _ -> begin
+        if n = missingFieldName then
+          if isStructOrUnionType ftype then
+            begin
               Kernel.warning ~wkey:Kernel.wkey_c11 ~once:true ~current:true
                 "unnamed fields are a C11 extension";
               incr anonCompFieldNameId;
               anonCompFieldName ^ (string_of_int !anonCompFieldNameId)
             end
-          | _ -> n
-        end else begin
-          if fbitfield = Some 0 then
-            Kernel.error ~source:(fst cloc)
-              "named bitfield (%s) with zero width" n;
-          n
-        end
+          else
+            n
+        else
+          begin
+            if fbitfield = Some 0 then
+              Kernel.error ~source:(fst cloc)
+                "named bitfield (%s) with zero width" n;
+            n
+          end
       in
       let rec is_circular t =
         match Cil.unrollType t with
@@ -9039,19 +9044,20 @@ and createLocal ghost ((_, sto, _, _) as specs)
       let se4, ie', et, r = doInitializer (ghost_local_env ghost) vi inite in
       let se4 = cleanup_autoreference vi se4 in
       (* Fix the length *)
-      (match vi.vtype, ie', et with
-       (* We have a length now *)
-       | TArray(_,None, _), _, TArray(_, Some _, _) ->
-         Cil.update_var_type vi et
-       (* Initializing a local array *)
-       | TArray(TInt((IChar|IUChar|ISChar), _) as bt, None, a),
-         SingleInit({enode = Const(CStr s);eloc=loc}), _ ->
-         Cil.update_var_type vi
-           (TArray(bt,
-                   Some (integer ~loc (String.length s + 1)),
-                   a))
-       | _, _, _ -> ());
-
+      if Cil.isUnsizedArrayType vi.vtype && Cil.isSizedArrayType et
+      then
+        (* We have a length now *)
+        Cil.update_var_type vi et
+      else
+        (match vi.vtype, ie', et with
+         (* Initializing a local array *)
+         | TArray(TInt((IChar|IUChar|ISChar), _) as bt, None, a),
+           SingleInit({enode = Const(CStr s);eloc=loc}), _ ->
+           Cil.update_var_type vi
+             (TArray(bt,
+                     Some (integer ~loc (String.length s + 1)),
+                     a))
+         | _, _, _ -> ());
       (* Now create assignments instead of the initialization *)
       (se1 @@@ (se4, ghost))
       @@@

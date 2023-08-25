@@ -5791,6 +5791,10 @@ let isUnsizedArrayType t = match unrollTypeSkel t with
   | TArray (_, None, _) -> true
   | _ -> false
 
+let isSizedArrayType t = match unrollTypeSkel t with
+  | TArray (_, Some _, _) -> true
+  | _ -> false
+
 let isAnyCharArrayType t = match unrollTypeSkel t with
   | TArray(tau,_,_) when isAnyCharType tau -> true
   | _ -> false
@@ -5799,9 +5803,15 @@ let isCharArrayType t = match unrollTypeSkel t with
   | TArray(tau,_,_) when isCharType tau -> true
   | _ -> false
 
-let isStructOrUnionType t = match unrollTypeSkel t with
-  | TComp _ -> true
+let isStructType t = match unrollTypeSkel t with
+  | TComp (comp, _) -> comp.cstruct
   | _ -> false
+
+let isUnionType t = match unrollTypeSkel t with
+  | TComp (comp, _) -> not comp.cstruct
+  | _ -> false
+
+let isStructOrUnionType t = isStructType t || isUnionType t
 
 let isVariadicListType t = match unrollTypeSkel t with
   | TBuiltin_va_list _ -> true
