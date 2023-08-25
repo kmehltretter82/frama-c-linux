@@ -81,46 +81,44 @@ let add_last_analysis
     ~(get_state : Analysis_location.local -> a or_top_bottom)
     interferences thread concurrent_writes shared_bases =
   let module Dom = (val domain) in
-  let dom_join s1 s2 = `Value (Dom.join s1 s2) in
-  (* Add interferences one by one *)
-  let add_to_map acc_map aloc =
-    let open TopBottom.Operators in
-    let state =
-      (* Retrieve state at analysis location *)
-      let+ state = get_state aloc in
-      let mutexes = match Dom.get MtDomain.Domain.key with
-        (* Domain disabled, consider that no mutexe is protecting this access *)
-        | None -> Mutex.Set.empty
-        | Some extract ->
-          let mutexes_status = MtDomain.Domain.mutexes (extract state) in
-          MtMutex.Register.locked_mutexes mutexes_status
+  match Dom.get MtDomain.Domain.key with
+  | None -> () (* Domain disabled, no interference computation *)
+  | Some extract ->
+    let dom_join s1 s2 = `Value (Dom.join s1 s2) in
+    (* Add interferences one by one *)
+    let add_to_map acc_map aloc =
+      let open TopBottom.Operators in
+      let state =
+        (* Retrieve state at analysis location *)
+        let+ state = get_state aloc in
+        let mutexes_status = MtDomain.Domain.mutexes (extract state) in
+        let mutexes = MtMutex.Register.locked_mutexes mutexes_status in
+        Dom.filter `Print shared_bases state, mutexes
       in
-      Dom.filter `Print shared_bases state, mutexes
+      match state with
+      | `Bottom -> acc_map (* no interference to add *)
+      | `Top ->
+        MutexesMap.add Mutex.Set.empty `Top acc_map
+      | `Value (state, mutexes) ->
+        let update = function
+          | None -> Some (`Value state)
+          | Some previous -> Some (Top.join dom_join previous (`Value state))
+        in
+        MutexesMap.update mutexes update acc_map
     in
-    match state with
-    | `Bottom -> acc_map (* no interference to add *)
-    | `Top ->
-      MutexesMap.add Mutex.Set.empty `Top acc_map
-    | `Value (state, mutexes) ->
-      let update = function
-        | None -> Some (`Value state)
-        | Some previous -> Some (Top.join dom_join previous (`Value state))
-      in
-      MutexesMap.update mutexes update acc_map
-  in
-  let new_interferences =
-    List.fold_left add_to_map MutexesMap.empty concurrent_writes
-  in
-  Self.result "concurrent writes: @[%a@]@.interferences: @[%a@]@."
-    (Pretty_utils.pp_list Analysis_location.Local.pretty) concurrent_writes
-    (MutexesMap.pretty Dom.pretty) new_interferences;
-  (* Add the computed interferences to the table *)
-  let Interferences ({ states; structure } as interferences) = interferences in
-  match Abstract.Domain.eq_structure structure Dom.structure with
-  | None -> structure_mismatch ()
-  | Some Eq ->
-    ThreadTable.replace states thread new_interferences;
-    interferences.shared_bases <- shared_bases
+    let new_interferences =
+      List.fold_left add_to_map MutexesMap.empty concurrent_writes
+    in
+    Self.result "concurrent writes: @[%a@]@.interferences: @[%a@]@."
+      (Pretty_utils.pp_list Analysis_location.Local.pretty) concurrent_writes
+      (MutexesMap.pretty Dom.pretty) new_interferences;
+    (* Add the computed interferences to the table *)
+    let Interferences ({ states; structure } as interferences) = interferences in
+    match Abstract.Domain.eq_structure structure Dom.structure with
+    | None -> structure_mismatch ()
+    | Some Eq ->
+      ThreadTable.replace states thread new_interferences;
+      interferences.shared_bases <- shared_bases
 
 
 (* Interference injection *)
@@ -175,8 +173,8 @@ let inject (type a) ~(domain : a domain) (state : a) : a =
   else begin
     let need_injection =
       match Dom.get MtDomain.Domain.key with
-      (* Domain disabled, no information about memory read/written, always inject *)
-      | None -> true
+      (* Domain disabled, no interference injection *)
+      | None -> false
       (* Domain enabled *)
       | Some extract ->
         let mt_state = extract state in
