@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [mt] recreation.c:63: Initializing mutex locks[0]
 [mt] recreation.c:63: Initializing mutex locks[1]
 [mt] recreation.c:63: Initializing mutex locks[2]
@@ -32,6 +32,10 @@
   end: read by <main> at recreation.c:68
   jobs[0..2]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -51,6 +55,10 @@
   end: read by jobs[0] at recreation.c:28
   jobs[3..5]: write by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -69,6 +77,10 @@
   end: read by jobs[1] at recreation.c:28
   jobs[6..8]: write by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -87,6 +99,10 @@
   end: read by jobs[2] at recreation.c:28
   jobs[9..11]: write by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -122,6 +138,10 @@
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -142,6 +162,10 @@
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -162,6 +186,10 @@
     read by jobs[5] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[5] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[5] computed
@@ -182,6 +210,10 @@
     read by jobs[6] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[6] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[6] computed
@@ -202,6 +234,10 @@
     read by jobs[7] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[7] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[7] computed
@@ -222,6 +258,10 @@
     read by jobs[8] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[8] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[8] computed
@@ -242,6 +282,10 @@
     read by jobs[9] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[9] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[9] computed
@@ -262,6 +306,10 @@
     read by jobs[10] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[10] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[10] computed
@@ -271,10 +319,14 @@
 [mt] recreation.c:38: Lock locks[0]
 [mt] recreation.c:44: Warning: Mutex locks[0] might have already been locked
 [mt] recreation.c:44: Lock locks[0]
+[eva] FRAMAC_SHARE/mthread_pthread.c:56: Warning: 
+  The mutex locks[0] is already locked.
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[10]
-[mt] recreation.c:49: Release locks[0]
 [mt] recreation.c:49: Warning: Mutex locks[0] might not be locked
+[mt] recreation.c:49: Release locks[0]
+[eva] FRAMAC_SHARE/mthread_pthread.c:66: Warning: 
+  The mutex locks[0] is already unlocked.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -284,6 +336,10 @@
     read by jobs[11] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[11] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[11] computed
@@ -305,7 +361,7 @@
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
 [mt] recreation.c:63: Initializing mutex locks[0]
 [mt] recreation.c:63: Initializing mutex locks[1]
 [mt] recreation.c:63: Initializing mutex locks[2]
@@ -331,6 +387,10 @@
   end: read by <main> at recreation.c:68
   jobs[0..2]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -342,6 +402,9 @@
 [mt] recreation.c:25: Start thread jobs[4]
 [mt] recreation.c:25: Thread jobs[5], fun job, parent jobs[0], args {5}
 [mt] recreation.c:25: Start thread jobs[5]
+[eva:interferences] recreation.c:28: inject threads interferences at this point
+[eva:interferences] <unknown location>: 
+  inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -349,6 +412,10 @@
   end: read by jobs[0] at recreation.c:28
   jobs[3..5]: write by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -360,6 +427,9 @@
 [mt] recreation.c:25: Start thread jobs[7]
 [mt] recreation.c:25: Thread jobs[8], fun job, parent jobs[1], args {8}
 [mt] recreation.c:25: Start thread jobs[8]
+[eva:interferences] recreation.c:28: inject threads interferences at this point
+[eva:interferences] <unknown location>: 
+  inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -367,6 +437,10 @@
   end: read by jobs[1] at recreation.c:28
   jobs[6..8]: write by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -378,6 +452,9 @@
 [mt] recreation.c:25: Start thread jobs[10]
 [mt] recreation.c:25: Thread jobs[11], fun job, parent jobs[2], args {11}
 [mt] recreation.c:25: Start thread jobs[11]
+[eva:interferences] recreation.c:28: inject threads interferences at this point
+[eva:interferences] <unknown location>: 
+  inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -385,6 +462,10 @@
   end: read by jobs[2] at recreation.c:28
   jobs[9..11]: write by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -392,6 +473,7 @@
 [mt] * Computing value analysis for thread jobs[3]
 [mt] recreation.c:37: Lock locks[2]
 [mt] recreation.c:38: Lock locks[4]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[2]
@@ -405,6 +487,10 @@
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: { locks[2]; locks[4] } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -412,6 +498,7 @@
 [mt] * Computing value analysis for thread jobs[4]
 [mt] recreation.c:37: Lock locks[3]
 [mt] recreation.c:38: Lock locks[5]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[3]
@@ -425,6 +512,10 @@
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -432,6 +523,7 @@
 [mt] * Computing value analysis for thread jobs[5]
 [mt] recreation.c:37: Lock locks[4]
 [mt] recreation.c:38: Lock locks[6]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[4]
@@ -445,6 +537,10 @@
     read by jobs[5] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[5] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[5] computed
@@ -452,6 +548,7 @@
 [mt] * Computing value analysis for thread jobs[6]
 [mt] recreation.c:37: Lock locks[5]
 [mt] recreation.c:38: Lock locks[7]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[5]
@@ -465,6 +562,10 @@
     read by jobs[6] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[6] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[6] computed
@@ -472,6 +573,7 @@
 [mt] * Computing value analysis for thread jobs[7]
 [mt] recreation.c:37: Lock locks[6]
 [mt] recreation.c:38: Lock locks[8]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[6]
@@ -485,6 +587,10 @@
     read by jobs[7] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[7] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[7] computed
@@ -492,6 +598,7 @@
 [mt] * Computing value analysis for thread jobs[8]
 [mt] recreation.c:37: Lock locks[7]
 [mt] recreation.c:38: Lock locks[9]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[7]
@@ -505,6 +612,10 @@
     read by jobs[8] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[8] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[8] computed
@@ -512,6 +623,7 @@
 [mt] * Computing value analysis for thread jobs[9]
 [mt] recreation.c:37: Lock locks[8]
 [mt] recreation.c:38: Lock locks[10]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[8]
@@ -525,6 +637,10 @@
     read by jobs[9] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[9] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[9] computed
@@ -532,6 +648,7 @@
 [mt] * Computing value analysis for thread jobs[10]
 [mt] recreation.c:37: Lock locks[9]
 [mt] recreation.c:38: Lock locks[11]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[9]
@@ -545,6 +662,10 @@
     read by jobs[10] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[10] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[10] computed
@@ -552,12 +673,17 @@
 [mt] * Computing value analysis for thread jobs[11]
 [mt] recreation.c:37: Lock locks[10]
 [mt] recreation.c:38: Lock locks[0]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Warning: Mutex locks[0] might have already been locked
 [mt] recreation.c:44: Lock locks[0]
+[eva] FRAMAC_SHARE/mthread_pthread.c:56: Warning: 
+  The mutex locks[0] is already locked.
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[10]
-[mt] recreation.c:49: Release locks[0]
 [mt] recreation.c:49: Warning: Mutex locks[0] might not be locked
+[mt] recreation.c:49: Release locks[0]
+[eva] FRAMAC_SHARE/mthread_pthread.c:66: Warning: 
+  The mutex locks[0] is already unlocked.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -567,6 +693,10 @@
     read by jobs[11] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[11] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[11] computed
@@ -666,7 +796,7 @@
 [mt] ***** Iteration 4
 [mt] *** Computing thread <main>, iteration 4 (shared vars values changed)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
 [mt] recreation.c:63: Initializing mutex locks[0]
 [mt] recreation.c:63: Initializing mutex locks[1]
 [mt] recreation.c:63: Initializing mutex locks[2]
@@ -687,6 +817,10 @@
 [mt] recreation.c:66: Thread jobs[2], fun job, parent <main>, args {2}
 [mt] recreation.c:66: Start thread jobs[2]
 [mt] recreation.c:66: New context for jobs[2], fun job, parent <main>, args {2}
+[eva:interferences] recreation.c:68: inject threads interferences at this point
+[eva:interferences] <unknown location>: 
+  inject threads interferences at this point
+[eva:interferences] recreation.c:68: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -694,6 +828,10 @@
   end: read by <main> at recreation.c:68
   jobs[0..2]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -707,6 +845,10 @@
 [mt] recreation.c:25: Thread jobs[5], fun job, parent jobs[0], args {5}
 [mt] recreation.c:25: Start thread jobs[5]
 [mt] recreation.c:25: New context for jobs[5], fun job, parent jobs[0], args {5}
+[eva:interferences] recreation.c:28: inject threads interferences at this point
+[eva:interferences] <unknown location>: 
+  inject threads interferences at this point
+[eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -714,6 +856,10 @@
   end: read by jobs[0] at recreation.c:28
   jobs[3..5]: write by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -729,6 +875,10 @@
 [mt] recreation.c:25: Thread jobs[8], fun job, parent jobs[1], args {8}
 [mt] recreation.c:25: Start thread jobs[8]
 [mt] recreation.c:25: New context for jobs[8], fun job, parent jobs[1], args {8}
+[eva:interferences] recreation.c:28: inject threads interferences at this point
+[eva:interferences] <unknown location>: 
+  inject threads interferences at this point
+[eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -736,6 +886,10 @@
   end: read by jobs[1] at recreation.c:28
   jobs[6..8]: write by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -753,6 +907,10 @@
 [mt] recreation.c:25: Start thread jobs[11]
 [mt] recreation.c:25: 
   New context for jobs[11], fun job, parent jobs[2], args {11}
+[eva:interferences] recreation.c:28: inject threads interferences at this point
+[eva:interferences] <unknown location>: 
+  inject threads interferences at this point
+[eva:interferences] recreation.c:28: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -760,6 +918,10 @@
   end: read by jobs[2] at recreation.c:28
   jobs[9..11]: write by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -768,6 +930,7 @@
 [mt] * Computing value analysis for thread jobs[4]
 [mt] recreation.c:37: Lock locks[3]
 [mt] recreation.c:38: Lock locks[5]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[3]
@@ -781,6 +944,10 @@
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -789,6 +956,7 @@
 [mt] * Computing value analysis for thread jobs[5]
 [mt] recreation.c:37: Lock locks[4]
 [mt] recreation.c:38: Lock locks[6]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[4]
@@ -802,6 +970,10 @@
     read by jobs[5] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[5] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[5] computed
@@ -810,6 +982,7 @@
 [mt] * Computing value analysis for thread jobs[6]
 [mt] recreation.c:37: Lock locks[5]
 [mt] recreation.c:38: Lock locks[7]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[5]
@@ -823,6 +996,10 @@
     read by jobs[6] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[6] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[6] computed
@@ -831,6 +1008,7 @@
 [mt] * Computing value analysis for thread jobs[7]
 [mt] recreation.c:37: Lock locks[6]
 [mt] recreation.c:38: Lock locks[8]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[6]
@@ -844,6 +1022,10 @@
     read by jobs[7] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[7] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[7] computed
@@ -852,6 +1034,7 @@
 [mt] * Computing value analysis for thread jobs[8]
 [mt] recreation.c:37: Lock locks[7]
 [mt] recreation.c:38: Lock locks[9]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[7]
@@ -865,6 +1048,10 @@
     read by jobs[8] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[8] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[8] computed
@@ -873,6 +1060,7 @@
 [mt] * Computing value analysis for thread jobs[9]
 [mt] recreation.c:37: Lock locks[8]
 [mt] recreation.c:38: Lock locks[10]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[8]
@@ -886,6 +1074,10 @@
     read by jobs[9] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[9] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[9] computed
@@ -894,6 +1086,7 @@
 [mt] * Computing value analysis for thread jobs[10]
 [mt] recreation.c:37: Lock locks[9]
 [mt] recreation.c:38: Lock locks[11]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Lock locks[0]
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[9]
@@ -907,6 +1100,10 @@
     read by jobs[10] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[10] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[10] computed
@@ -915,12 +1112,17 @@
 [mt] * Computing value analysis for thread jobs[11]
 [mt] recreation.c:37: Lock locks[10]
 [mt] recreation.c:38: Lock locks[0]
+[eva:interferences] recreation.c:40: inject threads interferences at this point
 [mt] recreation.c:44: Warning: Mutex locks[0] might have already been locked
 [mt] recreation.c:44: Lock locks[0]
+[eva] FRAMAC_SHARE/mthread_pthread.c:56: Warning: 
+  The mutex locks[0] is already locked.
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[10]
-[mt] recreation.c:49: Release locks[0]
 [mt] recreation.c:49: Warning: Mutex locks[0] might not be locked
+[mt] recreation.c:49: Release locks[0]
+[eva] FRAMAC_SHARE/mthread_pthread.c:66: Warning: 
+  The mutex locks[0] is already unlocked.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -930,6 +1132,10 @@
     read by jobs[11] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[11] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end = 1; <- job
+  shared bases: {end}
+  interferences: {  } -> # cvalue: end ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[11] computed

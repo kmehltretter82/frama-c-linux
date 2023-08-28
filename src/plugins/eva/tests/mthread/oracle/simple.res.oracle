@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [mt] simple.c:38: Initializing mutex lock
 [mt] simple.c:40: New thread: job1, fun f1, parent <main>, args {{ &b }}
 [mt] simple.c:40: Start thread job1
@@ -28,6 +28,10 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -49,6 +53,10 @@
     read by job1 at FRAMAC_SHARE/mthread_pthread.c:56
     read by job1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job1 computed
@@ -69,6 +77,10 @@
     read by job2 at FRAMAC_SHARE/mthread_pthread.c:56
     read by job2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job2 computed
@@ -90,7 +102,7 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
 [mt] simple.c:38: Initializing mutex lock
 [mt] simple.c:40: Thread job1, fun f1, parent <main>, args {{ &b }}
 [mt] simple.c:40: Start thread job1
@@ -112,12 +124,19 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {a, b, c, v}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread job1, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread job1
 [mt] simple.c:16: Lock lock
+[eva:interferences] simple.c:17: inject threads interferences at this point
+[eva:interferences] simple.c:18: inject threads interferences at this point
+[eva:interferences] simple.c:19: inject threads interferences at this point
 [mt] simple.c:21: Release lock
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -132,12 +151,23 @@
     read by job1 at FRAMAC_SHARE/mthread_pthread.c:56
     read by job1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: c = 1; <- f1, *((int *)p) = 1; <- f1, a = 1; <- f1
+  shared bases: {a, b, c, v}
+  interferences: { lock } -> # cvalue:
+                 a ∈ {1}
+                 b ∈ {0; 1}
+                 c ∈ {0; 1}
+                 v ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job1 computed
 [mt] *** Computing thread job2, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread job2
 [mt] simple.c:27: Lock lock
+[eva:interferences] simple.c:28: inject threads interferences at this point
+[eva:interferences] simple.c:29: inject threads interferences at this point
+[eva:interferences] simple.c:30: inject threads interferences at this point
 [mt] simple.c:32: Release lock
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -152,6 +182,14 @@
     read by job2 at FRAMAC_SHARE/mthread_pthread.c:56
     read by job2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: c = 2; <- f2, *((int *)p) = 2; <- f2, b = 2; <- f2
+  shared bases: {a, b, c, v}
+  interferences: { lock } -> # cvalue:
+                 a ∈ {0; 2}
+                 b ∈ {2}
+                 c ∈ {0; 2}
+                 v ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job2 computed
@@ -224,7 +262,7 @@
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
 [mt] simple.c:38: Initializing mutex lock
 [mt] simple.c:40: Thread job1, fun f1, parent <main>, args {{ &b }}
 [mt] simple.c:40: Start thread job1
@@ -232,6 +270,7 @@
 [mt] simple.c:41: Start thread job2
 [mt] simple.c:41: New context for job2, fun f2, parent <main>, args {{ &a }}
 [mt] simple.c:43: Lock lock
+[eva:interferences] simple.c:44: inject threads interferences at this point
 [mt] simple.c:45: Release lock
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -247,12 +286,19 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {a, b, c, v}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread job2, iteration 3 (thread initial memory state changed)
 [mt] * Computing value analysis for thread job2
 [mt] simple.c:27: Lock lock
+[eva:interferences] simple.c:28: inject threads interferences at this point
+[eva:interferences] simple.c:29: inject threads interferences at this point
+[eva:interferences] simple.c:30: inject threads interferences at this point
 [mt] simple.c:32: Release lock
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -267,6 +313,14 @@
     read by job2 at FRAMAC_SHARE/mthread_pthread.c:56
     read by job2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: c = 2; <- f2, *((int *)p) = 2; <- f2, b = 2; <- f2
+  shared bases: {a, b, c, v}
+  interferences: { lock } -> # cvalue:
+                 a ∈ {0; 1; 2}
+                 b ∈ {2}
+                 c ∈ {0; 1; 2}
+                 v ∈ {0; 1; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job2 computed

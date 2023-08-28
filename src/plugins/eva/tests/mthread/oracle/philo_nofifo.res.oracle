@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [mt] philo_nofifo.c:31: Initializing mutex locks[0]
 [mt] philo_nofifo.c:31: Initializing mutex locks[1]
 [mt] philo_nofifo.c:31: Initializing mutex locks[2]
@@ -28,6 +28,10 @@
 [mt] Globals accessed by thread:
   jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -46,6 +50,10 @@
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -63,6 +71,10 @@
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -80,6 +92,10 @@
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -97,6 +113,10 @@
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -114,6 +134,10 @@
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed

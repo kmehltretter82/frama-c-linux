@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [kernel:annot:missing-spec] messy_init.c:15: Warning: 
   Neither code nor specification for function random,
    generating default assigns. See -generated-spec-* options for more info
@@ -21,6 +21,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -32,12 +36,17 @@
   Unable to check that mutex lock has not already been locked;
   {0; 1} should be 1
 [mt] messy_init.c:10: Lock lock
+[eva] FRAMAC_SHARE/mthread_pthread.c:56: Warning: Not a valid mutex id '0'.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   lock: read by job at FRAMAC_SHARE/mthread_pthread.c:56
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job computed

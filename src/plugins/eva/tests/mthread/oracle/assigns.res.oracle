@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [mt] assigns.c:30: New thread: jobs1, fun f1, parent <main>, args {0}
 [mt] assigns.c:30: Start thread jobs1
 [mt] assigns.c:31: New thread: jobs2, fun f2, parent <main>, args {0}
@@ -18,6 +18,10 @@
   jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -31,6 +35,10 @@
   a: write by jobs1 at assigns.c:20
   b: read by jobs1 at assigns.c:20
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -43,6 +51,10 @@
   a: read by jobs2 at assigns.c:25
   b: write by jobs2 at assigns.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -64,7 +76,9 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
+[eva] assigns.c:30: Warning: imprecise memory footprint computed at this point
+[eva:interferences] assigns.c:30: inject threads interferences at this point
 [mt] assigns.c:30: Thread jobs1, fun f1, parent <main>, args {0}
 [mt] assigns.c:30: Start thread jobs1
 [mt] assigns.c:31: Thread jobs2, fun f2, parent <main>, args {0}
@@ -76,6 +90,10 @@
   jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {a, b}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -88,6 +106,10 @@
   a: write by jobs1 at assigns.c:20
   b: read by jobs1 at assigns.c:20
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {a, b}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -100,6 +122,10 @@
   a: read by jobs2 at assigns.c:25
   b: write by jobs2 at assigns.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {a, b}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -146,6 +172,10 @@
   a: write by jobs1 at assigns.c:20
   b: read by jobs1 at assigns.c:20
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {a, b}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -158,6 +188,10 @@
   a: read by jobs2 at assigns.c:25
   b: write by jobs2 at assigns.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {a, b}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed

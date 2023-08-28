@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [mt] model.c:20: New thread: job1, fun f1, parent <main>, args {0}
 [mt] model.c:20: Start thread job1
 [mt] *** First value analysis for main thread done.
@@ -14,6 +14,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -25,6 +29,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job1 computed

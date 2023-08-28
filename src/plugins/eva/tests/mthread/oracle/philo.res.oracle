@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [mt] philo.c:46: Initializing mutex locks[0]
 [mt] philo.c:46: Initializing mutex locks[1]
 [mt] philo.c:46: Initializing mutex locks[2]
@@ -32,6 +32,10 @@
   jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   queue: read by <main> at philo.c:54
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -58,6 +62,10 @@
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by jobs[0] at philo.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -75,6 +83,10 @@
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -97,6 +109,10 @@
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by jobs[2] at philo.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -119,6 +135,10 @@
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by jobs[3] at philo.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -141,6 +161,10 @@
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by jobs[4] at philo.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -158,7 +182,7 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (new message received)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
 [mt] philo.c:46: Initializing mutex locks[0]
 [mt] philo.c:46: Initializing mutex locks[1]
 [mt] philo.c:46: Initializing mutex locks[2]
@@ -192,6 +216,10 @@
   jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   queue: read by <main> at philo.c:54
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -213,7 +241,7 @@
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
 [mt] philo.c:46: Initializing mutex locks[0]
 [mt] philo.c:46: Initializing mutex locks[1]
 [mt] philo.c:46: Initializing mutex locks[2]
@@ -247,6 +275,10 @@
   jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   queue: read by <main> at philo.c:54
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end2}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -254,6 +286,7 @@
 [mt] * Computing value analysis for thread jobs[0]
 [mt] philo.c:19: Lock locks[4]
 [mt] philo.c:20: Lock locks[1]
+[eva:interferences] philo.c:24: inject threads interferences at this point
 [mt] philo.c:25: 
   Sending message on queue, content [0] ∈ {1}
                                     [1] ∈ UNINITIALIZED
@@ -269,6 +302,10 @@
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by jobs[0] at philo.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end2 = 1; <- aux :: philo.c:37 <- job
+  shared bases: {end2}
+  interferences: { locks[1]; locks[4] } -> # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -286,6 +323,10 @@
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end2}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -293,6 +334,7 @@
 [mt] * Computing value analysis for thread jobs[2]
 [mt] philo.c:19: Lock locks[1]
 [mt] philo.c:20: Lock locks[3]
+[eva:interferences] philo.c:24: inject threads interferences at this point
 [mt] philo.c:25: 
   Sending message on queue, content [0] ∈ {3}
                                     [1] ∈ UNINITIALIZED
@@ -308,6 +350,10 @@
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by jobs[2] at philo.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end2 = 1; <- aux :: philo.c:37 <- job
+  shared bases: {end2}
+  interferences: { locks[1]; locks[3] } -> # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -315,6 +361,7 @@
 [mt] * Computing value analysis for thread jobs[3]
 [mt] philo.c:19: Lock locks[2]
 [mt] philo.c:20: Lock locks[4]
+[eva:interferences] philo.c:24: inject threads interferences at this point
 [mt] philo.c:25: 
   Sending message on queue, content [0] ∈ {4}
                                     [1] ∈ UNINITIALIZED
@@ -330,6 +377,10 @@
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by jobs[3] at philo.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end2 = 1; <- aux :: philo.c:37 <- job
+  shared bases: {end2}
+  interferences: {  } -> # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -337,6 +388,7 @@
 [mt] * Computing value analysis for thread jobs[4]
 [mt] philo.c:19: Lock locks[3]
 [mt] philo.c:20: Lock locks[0]
+[eva:interferences] philo.c:24: inject threads interferences at this point
 [mt] philo.c:25: 
   Sending message on queue, content [0] ∈ {5}
                                     [1] ∈ UNINITIALIZED
@@ -352,6 +404,10 @@
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by jobs[4] at philo.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end2 = 1; <- aux :: philo.c:37 <- job
+  shared bases: {end2}
+  interferences: {  } -> # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -394,7 +450,7 @@
 [mt] ***** Iteration 4
 [mt] *** Computing thread <main>, iteration 4 (shared vars values changed)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
 [mt] philo.c:46: Initializing mutex locks[0]
 [mt] philo.c:46: Initializing mutex locks[1]
 [mt] philo.c:46: Initializing mutex locks[2]
@@ -424,6 +480,10 @@
                        [1] ∈ UNINITIALIZED
   From thread jobs[4]: [0] ∈ {5}
                        [1] ∈ UNINITIALIZED
+[eva:interferences] philo.c:53: inject threads interferences at this point
+[eva:interferences] <unknown location>: 
+  inject threads interferences at this point
+[eva:interferences] philo.c:53: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -432,6 +492,10 @@
   jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   queue: read by <main> at philo.c:54
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end2}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -450,6 +514,10 @@
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end2}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -458,6 +526,7 @@
 [mt] * Computing value analysis for thread jobs[2]
 [mt] philo.c:19: Lock locks[1]
 [mt] philo.c:20: Lock locks[3]
+[eva:interferences] philo.c:24: inject threads interferences at this point
 [mt] philo.c:25: 
   Sending message on queue, content [0] ∈ {3}
                                     [1] ∈ UNINITIALIZED
@@ -473,6 +542,10 @@
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by jobs[2] at philo.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end2 = 1; <- aux :: philo.c:37 <- job
+  shared bases: {end2}
+  interferences: {  } -> # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -481,6 +554,7 @@
 [mt] * Computing value analysis for thread jobs[3]
 [mt] philo.c:19: Lock locks[2]
 [mt] philo.c:20: Lock locks[4]
+[eva:interferences] philo.c:24: inject threads interferences at this point
 [mt] philo.c:25: 
   Sending message on queue, content [0] ∈ {4}
                                     [1] ∈ UNINITIALIZED
@@ -496,6 +570,10 @@
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by jobs[3] at philo.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end2 = 1; <- aux :: philo.c:37 <- job
+  shared bases: {end2}
+  interferences: {  } -> # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -504,6 +582,7 @@
 [mt] * Computing value analysis for thread jobs[4]
 [mt] philo.c:19: Lock locks[3]
 [mt] philo.c:20: Lock locks[0]
+[eva:interferences] philo.c:24: inject threads interferences at this point
 [mt] philo.c:25: 
   Sending message on queue, content [0] ∈ {5}
                                     [1] ∈ UNINITIALIZED
@@ -519,6 +598,10 @@
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
   queue: read by jobs[4] at philo.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end2 = 1; <- aux :: philo.c:37 <- job
+  shared bases: {end2}
+  interferences: {  } -> # cvalue: end2 ∈ {1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed

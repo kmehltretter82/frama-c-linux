@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [kernel:annot:missing-spec] read_all.c:25: Warning: 
   Neither code nor specification for function random,
    generating default assigns. See -generated-spec-* options for more info
@@ -27,6 +27,10 @@
 [mt] Globals accessed by thread:
   r: write by <main> at read_all.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -45,6 +49,10 @@
 [mt] Globals accessed by thread:
   r: write by jobs at read_all.c:19
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed
@@ -68,7 +76,7 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
 [mt] read_all.c:27: 
   Thread jobs, fun f, parent <main>, args [0..18446744073709551615]
 [mt] read_all.c:27: Start thread jobs
@@ -86,6 +94,10 @@
 [mt] Globals accessed by thread:
   r: write by <main> at read_all.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {r}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -103,6 +115,10 @@
 [mt] Globals accessed by thread:
   r: write by jobs at read_all.c:19
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {r}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs computed

@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [mt] join.c:20: New thread: th1, fun t1, parent <main>, args {0}
 [mt] join.c:20: Start thread th1
 [mt] join.c:21: New thread: th2, fun t2, parent <main>, args {0}
@@ -18,6 +18,10 @@
   th1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   th2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -30,6 +34,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread th1 computed
@@ -41,6 +49,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread th2 computed

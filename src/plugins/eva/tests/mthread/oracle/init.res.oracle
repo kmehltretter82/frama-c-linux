@@ -5,29 +5,28 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [mt] init.c:24: Initializing mutex locks[0]
 [mt] init.c:24: Initializing mutex locks[1]
 [mt] init.c:24: Initializing mutex locks[2]
 [mt] init.c:27: Initializing mutex mu1
 [mt] init.c:27: Initializing mutex mu2
 [mt] init.c:27: Initializing mutex mu3
-[mt] init.c:31: Initializing mutex mutex_7
-[mt] init.c:32: Mutex mutex_7 will now be named mu4
-[mt] init.c:31: Initializing mutex mutex_8
-[mt] init.c:32: Mutex mutex_8 will now be named mu5
-[mt] init.c:31: Initializing mutex mutex_9
-[mt] init.c:32: Mutex mutex_9 will now be named mu6
-[mt] init.c:37: Initializing mutex mutex_10
-[mt] init.c:37: Warning: 
-  During mutex initialization. Mutex mutex_10 initialized more than once by
-  thread <main> at same statement. Ignoring.
+[mt] init.c:31: Initializing mutex 0
+[mt] init.c:31: Warning: Mutex 0 might be already initialized
+[eva] init.c:17: Warning: The mutex 0 is already registered.
+[mt] init.c:37: Warning: Mutex 0 might be already initialized
+[mt] init.c:37: Initializing mutex 0
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate

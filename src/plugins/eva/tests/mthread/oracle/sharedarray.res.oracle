@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [mt] sharedarray.c:55: New thread: jobs1, fun f1, parent <main>, args {0}
 [mt] sharedarray.c:55: Start thread jobs1
 [mt] sharedarray.c:56: New thread: jobs2, fun f2, parent <main>, args {0}
@@ -30,6 +30,10 @@
   jobs5: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -43,6 +47,10 @@
   t[1]: write by jobs1 at sharedarray.c:22
   t[2]: write by jobs1 at sharedarray.c:23
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -54,6 +62,10 @@
 [mt] Globals accessed by thread:
   t[1]: write by jobs2 at sharedarray.c:28
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -65,6 +77,10 @@
 [mt] Globals accessed by thread:
   t[0..3]: write by jobs3 at sharedarray.c:33
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -76,6 +92,10 @@
 [mt] Globals accessed by thread:
   tt[0..25]: write by jobs4 at sharedarray.c:39
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -87,6 +107,10 @@
 [mt] Globals accessed by thread:
   tt[0..25]: write by jobs5 at sharedarray.c:45
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -97,6 +121,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed

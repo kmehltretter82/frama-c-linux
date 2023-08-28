@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [kernel:annot:missing-spec] unhandled_calls.c:30: Warning: 
   Neither code nor specification for function random,
    generating default assigns. See -generated-spec-* options for more info
@@ -24,6 +24,10 @@
   th1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
   th2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] unhandled_calls.c:42: User Error: 
   simultaneous call to a mthread function and to another function: very

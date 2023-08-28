@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [mt] matrix.c:38: Initializing mutex locks[0]
 [mt] matrix.c:38: Initializing mutex locks[1]
 [mt] matrix.c:38: Initializing mutex locks[2]
@@ -135,6 +135,10 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
   jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -167,6 +171,10 @@
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -195,6 +203,10 @@
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -223,6 +235,10 @@
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -251,6 +267,10 @@
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -279,6 +299,10 @@
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -300,7 +324,7 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
 [mt] matrix.c:38: Initializing mutex locks[0]
 [mt] matrix.c:38: Initializing mutex locks[1]
 [mt] matrix.c:38: Initializing mutex locks[2]
@@ -429,6 +453,10 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
   jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: matrix[i][j] = (unsigned int)0; <- main
+  shared bases: {matrix}
+  interferences: {  } -> # cvalue: matrix[0..29][0..99] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -457,6 +485,10 @@
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {matrix}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -485,6 +517,10 @@
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {matrix}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -513,6 +549,10 @@
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {matrix}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -541,6 +581,10 @@
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {matrix}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -569,6 +613,10 @@
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {matrix}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed
@@ -854,12 +902,13 @@
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
 [mt] matrix.c:38: Initializing mutex locks[0]
 [mt] matrix.c:38: Initializing mutex locks[1]
 [mt] matrix.c:38: Initializing mutex locks[2]
 [mt] matrix.c:38: Initializing mutex locks[3]
 [mt] matrix.c:38: Initializing mutex locks[4]
+[eva:interferences] matrix.c:43: inject threads interferences at this point
 [mt] matrix.c:46: Thread jobs[0], fun job, parent <main>, args {0}
 [mt] matrix.c:46: Start thread jobs[0]
 [mt] matrix.c:46: Thread jobs[1], fun job, parent <main>, args {1}
@@ -875,6 +924,7 @@
 [mt] matrix.c:46: Start thread jobs[4]
 [mt] matrix.c:46: New context for jobs[4], fun job, parent <main>, args {4}
 [mt] matrix.c:55: Lock locks[0]
+[eva:interferences] matrix.c:59: inject threads interferences at this point
 [mt] matrix.c:60: Release locks[0]
 [mt] matrix.c:55: Lock locks[1]
 [mt] matrix.c:60: Release locks[1]
@@ -987,6 +1037,10 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
   jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: matrix[i][j] = (unsigned int)0; <- main
+  shared bases: {matrix}
+  interferences: {  } -> # cvalue: matrix[0..29][0..99] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -1015,6 +1069,10 @@
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {matrix}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -1044,6 +1102,10 @@
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {matrix}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -1073,6 +1135,10 @@
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[2] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {matrix}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -1102,6 +1168,10 @@
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[3] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {matrix}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -1131,6 +1201,10 @@
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:56
     read by jobs[4] at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {matrix}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[4] computed

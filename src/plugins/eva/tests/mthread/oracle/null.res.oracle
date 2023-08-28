@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [mt] null.c:23: New thread: tjob0, fun job0, parent <main>, args {0}
 [mt] null.c:23: Start thread tjob0
 [eva:alarm] null.c:26: Warning: 
@@ -18,6 +18,10 @@
   NULL[100..200]: read by <main> at null.c:26
   v: read by <main> at null.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -32,6 +36,10 @@
   NULL[100..200]: write by tjob0 at null.c:15
   v: read by tjob0 at null.c:14
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob0 computed
@@ -53,7 +61,7 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
 [mt] null.c:23: Thread tjob0, fun job0, parent <main>, args {0}
 [mt] null.c:23: Start thread tjob0
 [eva:alarm] null.c:26: Warning: 
@@ -65,12 +73,17 @@
   NULL[100..200]: read by <main> at null.c:26
   v: read by <main> at null.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {NULL}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread tjob0, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread tjob0
 [eva:alarm] null.c:15: Warning: out of bounds write. assert \valid((char *)i);
+[eva:interferences] null.c:15: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -78,6 +91,11 @@
   NULL[100..200]: write by tjob0 at null.c:15
   v: read by tjob0 at null.c:14
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: /*@ assert Eva: mem_access: \valid((char *)i); */
+                     *((char *)i) = (char)1; <- job0
+  shared bases: {NULL}
+  interferences: {  } -> # cvalue: NULL[rbits 800 to 1607] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob0 computed
@@ -106,11 +124,12 @@
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
 [mt] null.c:23: Thread tjob0, fun job0, parent <main>, args {0}
 [mt] null.c:23: Start thread tjob0
 [eva:alarm] null.c:26: Warning: 
   out of bounds read. assert \valid_read((char *)i);
+[eva:interferences] null.c:26: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -118,6 +137,11 @@
   NULL[100..200]: read by <main> at null.c:26
   v: read by <main> at null.c:25
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: /*@ assert Eva: mem_access: \valid_read((char *)i); */
+                     x = (int)*((char *)i); <- main
+  shared bases: {NULL}
+  interferences: {  } -> # cvalue: NULL[rbits 800 to 1607] ∈ [--..--]
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed

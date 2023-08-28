@@ -5,17 +5,11 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [mt] New thread: <main>, fun main
 [mt] interrupt.c:22: 
   New thread: interrupt_thread, fun interrupt_stub_loop, parent <main>,
   args {0}
 [mt] interrupt.c:22: Start thread interrupt_thread
-[eva] interrupt.c:25: Frama_C_show_each_locked: {0}
-[eva] interrupt.c:25: Frama_C_show_each_locked: {0}
-[eva] done for function main
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -25,7 +19,8 @@
     read by <main> at interrupt.c:25
     read by <main> at interrupt.c:26
 [mt] * shared variables computed
-[eva] concurrent writes: 
+[eva:interferences] 
+  concurrent writes: 
   shared bases: {}
   interferences:
 [mt] * Computing cfg
@@ -34,16 +29,14 @@
 [mt] ***** Iteration 1
 [mt] *** Computing thread interrupt_thread, iteration 1 (first iteration)
 [mt] * Computing value analysis for thread interrupt_thread
-[eva] Analyzing a complete application starting at interrupt_stub_loop
-[eva] Initial state supplied by user
-[eva] done for function interrupt_stub_loop
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received: write by interrupt_thread at interrupt.c:7
 [mt] * shared variables computed
-[eva] concurrent writes: 
+[eva:interferences] 
+  concurrent writes: 
   shared bases: {}
   interferences:
 [mt] * Computing cfg
@@ -67,15 +60,10 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] interrupt.c:22: 
   Thread interrupt_thread, fun interrupt_stub_loop, parent <main>, args {0}
 [mt] interrupt.c:22: Start thread interrupt_thread
-[eva] interrupt.c:25: Frama_C_show_each_locked: {0}
-[eva] interrupt.c:25: Frama_C_show_each_locked: {0}
-[eva] done for function main
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -84,7 +72,8 @@
     read by <main> at interrupt.c:25
     read by <main> at interrupt.c:26
 [mt] * shared variables computed
-[eva] concurrent writes: 
+[eva:interferences] 
+  concurrent writes: 
   shared bases: {interrupt_received}
   interferences:
 [mt] * Computing cfg
@@ -93,18 +82,16 @@
 [mt] *** Computing thread interrupt_thread, iteration 2
     (potential shared vars changed)
 [mt] * Computing value analysis for thread interrupt_thread
-[eva] Analyzing a complete application starting at interrupt_stub_loop
-[eva] Initial state supplied by user
 [eva:interferences] interrupt.c:7: inject threads interferences at this point
 [eva:interferences] interrupt.c:8: inject threads interferences at this point
-[eva] done for function interrupt_stub_loop
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   interrupt_received: write by interrupt_thread at interrupt.c:7
 [mt] * shared variables computed
-[eva] concurrent writes: interrupt_received = 1; <-
+[eva:interferences] 
+  concurrent writes: interrupt_received = 1; <-
                      interrupt :: interrupt.c:12 <- interrupt_stub_loop
   shared bases: {interrupt_received}
   interferences: {  } -> # cvalue: interrupt_received ∈ {1}
@@ -142,23 +129,17 @@
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread <main>
-[eva] Analyzing a complete application starting at main
-[eva] Initial state supplied by user
 [mt] Thread <main>, fun main
 [mt] interrupt.c:22: 
   Thread interrupt_thread, fun interrupt_stub_loop, parent <main>, args {0}
 [mt] interrupt.c:22: Start thread interrupt_thread
-[eva] interrupt.c:25: Frama_C_show_each_locked: {0; 1}
 [eva:interferences] interrupt.c:26: inject threads interferences at this point
 [eva:interferences] interrupt.c:27: inject threads interferences at this point
-[eva] interrupt.c:27: Frama_C_show_each: {1}
 [eva:interferences] interrupt.c:28: inject threads interferences at this point
-[eva] interrupt.c:29: Frama_C_show_each: {0; 1}
 [eva:interferences] interrupt.c:29: inject threads interferences at this point
-[eva:interferences] :0: inject threads interferences at this point
+[eva:interferences] <unknown location>: 
+  inject threads interferences at this point
 [eva:interferences] interrupt.c:25: inject threads interferences at this point
-[eva] interrupt.c:25: Frama_C_show_each_locked: {0; 1}
-[eva] done for function main
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -170,7 +151,8 @@
     read by <main> at interrupt.c:29
     write by <main> at interrupt.c:28
 [mt] * shared variables computed
-[eva] concurrent writes: Frama_C_show_each(interrupt_received); <- main,
+[eva:interferences] 
+  concurrent writes: Frama_C_show_each(interrupt_received); <- main,
                      interrupt_received = 0; <- main,
                      Frama_C_show_each(interrupt_received); <- main,
                      Frama_C_show_each_locked(interrupt_received); <- main
@@ -207,9 +189,9 @@
 [mt] Detailed shared zones protections
   interrupt_received: Read by <main>, Write by interrupt_thread: unprotected
 [mt] Statements needing manual synchronisation
+  interrupt.c:27 (for interrupt_received)
   interrupt.c:26 (for interrupt_received)
   interrupt.c:25 (for interrupt_received)
   interrupt.c:29 (for interrupt_received)
-  interrupt.c:27 (for interrupt_received)
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 3 iterations

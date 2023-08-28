@@ -5,7 +5,7 @@
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
-[mt] New thread: main, fun main
+[mt] New thread: <main>, fun main
 [mt] ccfg.c:17: New thread: jobs[0], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:17: Start thread jobs[0]
 [kernel:annot:missing-spec] ccfg.c:23: Warning: 
@@ -29,6 +29,10 @@
   global2[0]: write by <main> at ccfg.c:24
   global2[1]: write by <main> at ccfg.c:26
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -42,6 +46,10 @@
   global1: read by jobs[0] at ccfg.c:11
   global2[0..1]: read by jobs[0] at ccfg.c:11
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -54,6 +62,10 @@
   global1: read by jobs[1] at ccfg.c:11
   global2[0..1]: read by jobs[1] at ccfg.c:11
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -66,6 +78,10 @@
   global1: read by jobs[2] at ccfg.c:11
   global2[0..1]: read by jobs[2] at ccfg.c:11
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -78,6 +94,10 @@
   global1: read by jobs[3] at ccfg.c:11
   global2[0..1]: read by jobs[3] at ccfg.c:11
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -99,7 +119,7 @@
 [mt] ***** Iteration 2
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
-[mt] Thread main, fun main
+[mt] Thread <main>, fun main
 [mt] ccfg.c:17: Thread jobs[0], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:17: Start thread jobs[0]
 [mt] ccfg.c:17: Thread jobs[1], fun fjob, parent <main>, args {0}
@@ -119,11 +139,21 @@
   global2[0]: write by <main> at ccfg.c:24
   global2[1]: write by <main> at ccfg.c:26
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: *(v + 1) = 2; <- g2 :: ccfg.c:38 <- main, *v = 1; <-
+                     g2 :: ccfg.c:38 <- main, *v = 1; <-
+                     g1 :: ccfg.c:37 <- main
+  shared bases: {global1, global2}
+  interferences: {  } -> # cvalue:
+                 global1 ∈ {0; 1}
+                 global2[0] ∈ {0; 1}
+                        [1] ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread jobs[0]
+[eva:interferences] ccfg.c:11: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -131,11 +161,19 @@
   global1: read by jobs[0] at ccfg.c:11
   global2[0..1]: read by jobs[0] at ccfg.c:11
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  shared bases: {global1, global2}
+  interferences: {  } -> # cvalue:
+                 global1 ∈ {0; 1}
+                 global2[0] ∈ {0; 1}
+                        [1] ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread jobs[1]
+[eva:interferences] ccfg.c:11: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -143,11 +181,19 @@
   global1: read by jobs[1] at ccfg.c:11
   global2[0..1]: read by jobs[1] at ccfg.c:11
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  shared bases: {global1, global2}
+  interferences: {  } -> # cvalue:
+                 global1 ∈ {0; 1}
+                 global2[0] ∈ {0; 1}
+                        [1] ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
 [mt] *** Computing thread jobs[2], iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread jobs[2]
+[eva:interferences] ccfg.c:11: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -155,11 +201,19 @@
   global1: read by jobs[2] at ccfg.c:11
   global2[0..1]: read by jobs[2] at ccfg.c:11
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  shared bases: {global1, global2}
+  interferences: {  } -> # cvalue:
+                 global1 ∈ {0; 1}
+                 global2[0] ∈ {0; 1}
+                        [1] ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
 [mt] *** Computing thread jobs[3], iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread jobs[3]
+[eva:interferences] ccfg.c:11: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -167,6 +221,13 @@
   global1: read by jobs[3] at ccfg.c:11
   global2[0..1]: read by jobs[3] at ccfg.c:11
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  shared bases: {global1, global2}
+  interferences: {  } -> # cvalue:
+                 global1 ∈ {0; 1}
+                 global2[0] ∈ {0; 1}
+                        [1] ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -243,6 +304,7 @@
 [mt] ***** Iteration 3
 [mt] *** Computing thread jobs[0], iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread jobs[0]
+[eva:interferences] ccfg.c:11: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -250,11 +312,19 @@
   global1: read by jobs[0] at ccfg.c:11
   global2[0..1]: read by jobs[0] at ccfg.c:11
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  shared bases: {global1, global2}
+  interferences: {  } -> # cvalue:
+                 global1 ∈ {0; 1}
+                 global2[0] ∈ {0; 1}
+                        [1] ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread jobs[1]
+[eva:interferences] ccfg.c:11: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -262,11 +332,19 @@
   global1: read by jobs[1] at ccfg.c:11
   global2[0..1]: read by jobs[1] at ccfg.c:11
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  shared bases: {global1, global2}
+  interferences: {  } -> # cvalue:
+                 global1 ∈ {0; 1}
+                 global2[0] ∈ {0; 1}
+                        [1] ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
 [mt] *** Computing thread jobs[2], iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread jobs[2]
+[eva:interferences] ccfg.c:11: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -274,11 +352,19 @@
   global1: read by jobs[2] at ccfg.c:11
   global2[0..1]: read by jobs[2] at ccfg.c:11
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  shared bases: {global1, global2}
+  interferences: {  } -> # cvalue:
+                 global1 ∈ {0; 1}
+                 global2[0] ∈ {0; 1}
+                        [1] ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
 [mt] *** Computing thread jobs[3], iteration 3 (shared vars values changed)
 [mt] * Computing value analysis for thread jobs[3]
+[eva:interferences] ccfg.c:11: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -286,6 +372,13 @@
   global1: read by jobs[3] at ccfg.c:11
   global2[0..1]: read by jobs[3] at ccfg.c:11
 [mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  shared bases: {global1, global2}
+  interferences: {  } -> # cvalue:
+                 global1 ∈ {0; 1}
+                 global2[0] ∈ {0; 1}
+                        [1] ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
