@@ -139,6 +139,7 @@ class Dive {
     // Add new listeners
     enableDoubleClickEvents(this.cy);
     this.cy.on('click', 'node', (event) => this.clickNode(event.target));
+    this.cy.on('click', 'edge', (event) => this.clickEdge(event.target));
     this.cy.on('double-click', '$node > node', // compound nodes
       (event) => this.doubleClickNode(event.target));
 
@@ -525,6 +526,18 @@ class Dive {
        nodes and edges. As we want some incoming edges to remain selected, we
        make the node unselectable, preventing cytoscape to select it. */
     node.unselectify();
+  }
+
+  async clickEdge(edge: Cytoscape.EdgeSingular): Promise<void> {
+    // Unselect everything
+    this.cy.$(':selected').forEach(unselect);
+    this.cy.$('.multiple-selection').removeClass('multiple-selection');
+    this.cy.$('.selection').removeClass('selection');
+
+    // Update Ivette selection
+    const origins = edge.data()?.origins;
+    if (origins && origins.length)
+      this.onSelect?.(origins);
   }
 
   doubleClickNode(node: Cytoscape.NodeSingular): void {
