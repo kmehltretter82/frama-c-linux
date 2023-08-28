@@ -112,7 +112,7 @@ let add_last_analysis
       List.fold_left add_to_map MutexesMap.empty concurrent_writes
     in
     let pp_aloc = Analysis_location.Local.pretty in
-    Self.result
+    Self.debug ~dkey
       "concurrent writes: @[%a@]@.shared bases: @[%a@]@.interferences: @[%a@]@."
       (Pretty_utils.pp_list ~sep:",@ " pp_aloc) concurrent_writes
       Base.Hptset.pretty shared_bases
