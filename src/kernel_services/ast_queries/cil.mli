@@ -608,7 +608,27 @@ val argsToPairOfLists:
 (** True if the argument is an array type *)
 val isArrayType: typ -> bool
 
-(** True if the argument is a struct of union type *)
+(** True if the argument is an array type without size
+    @since Frama-C+dev
+*)
+val isUnsizedArrayType: typ -> bool
+
+(** True if the argument is a sized array type
+    @since Frama-C+dev
+*)
+val isSizedArrayType: typ -> bool
+
+(** True if the argument is a struct
+    @since Frama-C+dev
+*)
+val isStructType: typ -> bool
+
+(** True if the argument is a union type
+    @since Frama-C+dev
+*)
+val isUnionType: typ -> bool
+
+(** True if the argument is a struct or union type *)
 val isStructOrUnionType: typ -> bool
 
 (** possible causes for raising {!Cil.LenOfArray} *)
