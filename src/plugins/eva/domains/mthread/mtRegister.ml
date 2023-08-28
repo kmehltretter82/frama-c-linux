@@ -64,9 +64,15 @@ module Make (Key : Key_sig) (Status : Status_sig) = struct
         "The %s %a is already registered."
         Key.key_name Key.pretty key
     | NotRegistered ->
-      Result.warning (register, Value.of_int 1)
-        "The %s %a is not registered."
-        Key.key_name Key.pretty key
+      (* Temporary: do not emit warning when a key has not been registered.
+         As Mthread does not inject the initial domain state at the start
+         of a thread analysis, this is bound to happen (for now). *)
+      if true
+      then Result.ok (register, Value.of_int 1)
+      else
+        Result.warning (register, Value.of_int 1)
+          "The %s %a is not registered."
+          Key.key_name Key.pretty key
     | MayBeInState (state, sure) ->
       Result.warning (register, Value.of_int 2)
         "The %s %a %s already %s."
