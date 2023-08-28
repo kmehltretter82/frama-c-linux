@@ -9,7 +9,7 @@
   "description": "Frama-C GUI",
   "homepage": "https://frama-c.com/html/ivette.html",
   "scripts": {
-    "lint": "eslint --ext .ts,.tsx --format=compact ./src",
+    "lint": "eslint --ext .ts,.tsx --format=compact ./src ./tests",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "yarn run typecheck -- --watch",
     "build": "tsc",
