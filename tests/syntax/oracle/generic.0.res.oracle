@@ -1,6 +1,4 @@
 [kernel] Parsing generic.c (with preprocessing)
 [kernel:c11] Warning: _Generic is a C11 keyword
 [kernel] User Error: warning c11 treated as fatal error.
-[kernel] User Error: stopping on file "generic.c" that has errors. Add '-kernel-msg-key pp'
-  for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.
