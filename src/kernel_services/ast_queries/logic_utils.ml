@@ -292,7 +292,7 @@ let lconstant_to_constant c = match c with
       try
         CInt64(i,Cil.intKindForValue i false,s)
       with Cil.Not_representable ->
-        Kernel.fatal
+        Kernel.abort
           "Cannot represent logical integer in C: %a"
           Integer.pretty i
     end

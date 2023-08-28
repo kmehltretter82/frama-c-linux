@@ -1478,7 +1478,8 @@ let is_scalar_type t =
    Abort if invalid *)
 let checkBool (ot : typ) (_ : exp) =
   if not (is_scalar_type ot) then
-    abort_context "castToBool %a" Cil_datatype.Typ.pretty ot
+    abort_context "cannot cast expr of type %a into a boolean value"
+      Cil_datatype.Typ.pretty ot
 
 (* Evaluate constants to CTrue (non-zero) or CFalse (zero) *)
 let rec isConstTrueFalse c: [ `CTrue | `CFalse ] =
@@ -1493,7 +1494,7 @@ let rec isConstTrueFalse c: [ `CTrue | `CFalse ] =
   | CEnum {eival = e} ->
     match isExpTrueFalse e with
     | `CTrue | `CFalse as r -> r
-    | `CUnknown -> abort_context "Non-constant enum"
+    | `CUnknown -> Kernel.fatal ~current:true "Non-constant enum"
 (* Evaluate expressions to `CTrue, `CFalse or `CUnknown *)
 and isExpTrueFalse e: [ `CTrue | `CFalse | `CUnknown ] =
   match e.enode with
@@ -2678,7 +2679,7 @@ let rec castTo ?context ?(fromsource=false)
                     Cil.mkCastT ~force:true ~oldt:ot ~newt:nt e else e)
     in
     let origin_error =
-      if fromsource then "castTo from source:" else "castTo from Frama-C:"
+      if fromsource then "explicit cast:" else " implicit cast:"
     in
     (*  [BM] uncomment the following line to enable attributes static typing
         ignore (check_strict_attributes true ot nt  && check_strict_attributes false nt ot);*)
@@ -5751,7 +5752,7 @@ and doExp local_env
         | TPtr(te, _) -> te
         | _ ->
           abort_context
-            "Expecting a pointer type in *. Got %a."
+            "attempted to dereference an expression of non-pointer type %a"
             Cil_datatype.Typ.pretty t
       in
       let res = mkMem ~addr:e' ~off:NoOffset in
@@ -5775,7 +5776,8 @@ and doExp local_env
         | Lval x -> x
         | CastE(_, { enode = Lval x}) -> x
         | _ ->
-          abort_context "Expected an lval in MEMBEROF (field %s)" str
+          Kernel.fatal ~current:true
+            "expected an lvalue as left-hand side of access to field %s" str
       in
       (* We're not reading the whole lval, just a chunk of it. *)
       let r =
@@ -6148,7 +6150,7 @@ and doExp local_env
               finishExp r se e' t
 
             | _ ->
-              abort_context "Expected lval for ADDROF. Got %a"
+              abort_context "Expected lval for addrof. Got %a"
                 Cil_printer.pp_exp e'
           end
         | _ -> abort_context "Unexpected operand for addrof"
@@ -7779,7 +7781,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
 
   | _ ->
     abort_context
-      "doBinOp: %a"
+      "cannot perform the following comparison %a"
       Cil_printer.pp_exp (dummy_exp(BinOp(bop,e1,e2,intType)))
 
 (* Constant fold a conditional. This is because we want to avoid having
@@ -9578,7 +9580,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
       (fun d ->
          let s = doDecl local_env isglobal d in
          if isNotEmpty s then
-           Kernel.fatal ~current:true "doDecl returns non-empty statement for global")
+           abort_context "global initializer with side-effects")
       dl;
     empty
 
@@ -10082,7 +10084,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       match constFoldToInteger el', constFoldToInteger eh' with
       | Some il, Some ih -> il, ih
       | _ ->
-        abort_context "Cannot understand the constants in case range"
+        abort_context "non-constant expression(s) in case-range"
     in
     if il > ih then Kernel.error ~once:true ~current:true "Empty case range";
     (* Arbitrary limit to avoid building an impractical AST. *)
@@ -10401,8 +10403,7 @@ let convFile (path, f) =
     let local_env = ghost_local_env ghost in
     let s = doDecl local_env true d in
     if isNotEmpty s then
-      Kernel.fatal ~current:true
-        "doDecl returns non-empty statement for global";
+      abort_context "global initializer with side-effects";
   in
   List.iter doOneGlobal f;
   let globals = fileGlobals () in
