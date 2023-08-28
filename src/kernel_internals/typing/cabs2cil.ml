@@ -9340,7 +9340,10 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
               vi.vid
               (Cil.create_alpha_renaming
                  (Cil.getFormalsDecl vi) formals)
-          with Not_found ->
+          with
+          | Invalid_argument _ ->
+            abort_context "Inconsistent formals"
+          | Not_found ->
             (* the declaration comes from an
                implicit prototype. We do not have
                any spec anyway. However, we will have a declaration
