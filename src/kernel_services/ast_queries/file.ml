@@ -656,25 +656,20 @@ let parse_cabs cpp_command = function
          Filepath.Normalized.pretty f)
 
 let to_cil_cabs cpp_cmds_and_args f =
-  try
-    let cpp_command = List.assoc f cpp_cmds_and_args in
-    let a,c = parse_cabs cpp_command f in
-    Kernel.debug ~dkey:Kernel.dkey_file_print_one "result of parsing %s:@\n%a"
-      (get_name f) Cil_printer.pp_file a;
-    if Errorloc.had_errors () then raise Exit;
-    a, c
-  with exn when Errorloc.had_errors () ->
-    if Kernel.Debug.get () >= 1 then raise exn
-    else
-      Kernel.abort "@[stopping on@ file %S@ that@ has@ errors.%t@]"
-        (get_name f)
-        (fun fmt ->
-           if Filename.check_suffix (get_name f :> string) ".c" &&
-              not (Kernel.is_debug_key_enabled Kernel.dkey_pp)
-           then
-             Format.fprintf fmt "@ Add@ '-kernel-msg-key pp'@ \
-                                 for preprocessing command.")
-
+  let cpp_command = List.assoc f cpp_cmds_and_args in
+  let a,c = parse_cabs cpp_command f in
+  Kernel.debug ~dkey:Kernel.dkey_file_print_one "result of parsing %s:@\n%a"
+    (get_name f) Cil_printer.pp_file a;
+  if Errorloc.had_errors () then
+    Kernel.abort "@[stopping on@ file %S@ that@ has@ errors.%t@]"
+      (get_name f)
+      (fun fmt ->
+         if Filename.check_suffix (get_name f :> string) ".c" &&
+            not (Kernel.is_debug_key_enabled Kernel.dkey_pp)
+         then
+           Format.fprintf fmt "@ Add@ '-kernel-msg-key pp'@ \
+                               for preprocessing command.");
+  a, c
 
 let () =
   let handle f =
