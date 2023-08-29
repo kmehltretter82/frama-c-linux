@@ -998,25 +998,44 @@ let checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f1 f2 =
         "field offset not found in table: %a or %a"
         Printer.pp_field f1 Printer.pp_field f2
 
-let oldfidx = ref 0
-let fidx = ref 0
+module Fidx: sig
+  val get_oldfidx : unit -> int
+  val get_fidx : unit -> int
+  val setTempFidx: oldfidx:int -> fidx:int -> (unit -> 'a) -> 'a
+end
+=
+struct
 
-let setTempFidx noldfidx nfidx f =
-  let oldfidx_before = !oldfidx in
-  let fidx_before = !fidx in
-  let finally () =
-    oldfidx := oldfidx_before;
-    fidx := fidx_before
-  in
-  oldfidx := noldfidx;
-  fidx := nfidx;
-  Fun.protect ~finally f
+  let ref_oldfidx = ref 0
+  let ref_fidx = ref 0
+
+  let get_oldfidx () = !ref_oldfidx
+  let get_fidx () = !ref_fidx
+
+  let set_oldfidx v = ref_oldfidx := v
+  let set_fidx v = ref_fidx := v
+
+  let setTempFidx ~oldfidx ~fidx f =
+    let oldfidx_before = get_oldfidx () in
+    let fidx_before = get_fidx () in
+    let finally () =
+      set_oldfidx oldfidx_before;
+      set_fidx fidx_before
+    in
+    set_oldfidx oldfidx;
+    set_fidx fidx;
+    Fun.protect ~finally f
+
+end
+
+
+
 
 (* Match two enuminfos and throw a Failure if they do not match *)
 let matchEnumInfoGen (oldei: enuminfo) (ei: enuminfo) : unit =
   (* Find the node for this enum, no path compression. *)
-  let oldeinode = EnumMerging.getNode eEq eSyn !oldfidx oldei oldei None in
-  let einode = EnumMerging.getNode eEq eSyn !fidx ei ei None in
+  let oldeinode = EnumMerging.getNode eEq eSyn (Fidx.get_oldfidx ()) oldei oldei None in
+  let einode = EnumMerging.getNode eEq eSyn (Fidx.get_fidx ()) ei ei None in
   if oldeinode == einode then (* We already know they are the same *)
     ()
   else
@@ -1057,9 +1076,9 @@ let matchCompInfoGen (combineF : combineFunction)
   (* Make the nodes if not already made. Actually return the
    * representatives *)
   let oldcinode =
-    PlainMerging.getNode sEq sSyn !oldfidx oldci.cname oldci None
+    PlainMerging.getNode sEq sSyn (Fidx.get_oldfidx ()) oldci.cname oldci None
   in
-  let cinode = PlainMerging.getNode sEq sSyn !fidx ci.cname ci None in
+  let cinode = PlainMerging.getNode sEq sSyn (Fidx.get_fidx ()) ci.cname ci None in
   if oldcinode == cinode then (* We already know they are the same *)
     ()
   else
@@ -1070,7 +1089,7 @@ let matchCompInfoGen (combineF : combineFunction)
      * might be recursion and we have to watch for going into an infinite
      * loop. So we add the assumption that they are equal *)
     let newrep, undo = union oldcinode cinode in
-    setTempFidx oldcinode.nfidx cinode.nfidx (fun _ ->
+    Fidx.setTempFidx ~oldfidx:oldcinode.nfidx ~fidx:cinode.nfidx (fun _ ->
         (match oldci.cfields, ci.cfields with
          | _, None -> () (* new struct is not defined, just keep using the old one *)
          | None, Some fields ->
@@ -1182,8 +1201,8 @@ let matchTypeInfoGen (combineF : combineFunction)
   if oldti.tname = "" || ti.tname = "" then
     Kernel.fatal "matchTypeInfo for anonymous type";
   (* Find the node for this enum, no path compression. *)
-  let oldtnode = PlainMerging.getNode tEq tSyn !oldfidx oldti.tname oldti None in
-  let tnode = PlainMerging.getNode tEq tSyn !fidx ti.tname    ti None in
+  let oldtnode = PlainMerging.getNode tEq tSyn (Fidx.get_oldfidx ()) oldti.tname oldti None in
+  let tnode = PlainMerging.getNode tEq tSyn (Fidx.get_fidx ()) ti.tname    ti None in
   if oldtnode == tnode then (* We already know they are the same *)
     ()
   else
@@ -1191,7 +1210,7 @@ let matchTypeInfoGen (combineF : combineFunction)
     let oldti = oldtnode.ndata in
     let ti = tnode.ndata in
     (* Check that they are the same *)
-    setTempFidx oldtnode.nfidx tnode.nfidx (fun _ ->
+    Fidx.setTempFidx ~oldfidx:oldtnode.nfidx ~fidx:tnode.nfidx (fun _ ->
         (try
            ignore (combineF.typ_combine combineF true
                      CombineOther oldti.ttype ti.ttype);
@@ -1218,8 +1237,10 @@ let conflict_detected = ref false
 let combines = {
   typ_combine = (fun combF b what oldt t ->
       let find_names_file = H.find fileNames in
-      let old_file = find_names_file !oldfidx in
-      let new_file = find_names_file !fidx in
+      let oldfidx = Fidx.get_oldfidx () in
+      let fidx = Fidx.get_fidx () in
+      let old_file = find_names_file oldfidx in
+      let new_file = find_names_file fidx in
       let old_name_file = Filepath.Normalized.to_pretty_string old_file in
       let new_name_file = Filepath.Normalized.to_pretty_string new_file in
       let pre_msg = "Conflicting definitions are between files "^
@@ -1248,10 +1269,8 @@ let combines = {
       oldti);
 }
 
-let setFidCall f oldfid oldt fid t =
-  oldfidx := oldfid;
-  fidx := fid;
-  f oldt t
+let setFidCall f oldfidx oldt fidx t =
+  Fidx.setTempFidx ~oldfidx ~fidx (fun _ -> f oldt t)
 
 let matchEnumInfo = setFidCall matchEnumInfoGen
 
