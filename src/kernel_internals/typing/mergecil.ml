@@ -1089,7 +1089,7 @@ let matchCompInfoGen (combineF : combineFunction)
      * might be recursion and we have to watch for going into an infinite
      * loop. So we add the assumption that they are equal *)
     let newrep, undo = union oldcinode cinode in
-    Fidx.setTempFidx ~oldfidx:oldcinode.nfidx ~fidx:cinode.nfidx (fun _ ->
+    Fidx.setTempFidx ~oldfidx:oldcinode.nfidx ~fidx:cinode.nfidx (fun () ->
         (match oldci.cfields, ci.cfields with
          | _, None -> () (* new struct is not defined, just keep using the old one *)
          | None, Some fields ->
@@ -1210,7 +1210,7 @@ let matchTypeInfoGen (combineF : combineFunction)
     let oldti = oldtnode.ndata in
     let ti = tnode.ndata in
     (* Check that they are the same *)
-    Fidx.setTempFidx ~oldfidx:oldtnode.nfidx ~fidx:tnode.nfidx (fun _ ->
+    Fidx.setTempFidx ~oldfidx:oldtnode.nfidx ~fidx:tnode.nfidx (fun () ->
         (try
            ignore (combineF.typ_combine combineF true
                      CombineOther oldti.ttype ti.ttype);
@@ -1270,7 +1270,7 @@ let combines = {
 }
 
 let setFidCall f oldfidx oldt fidx t =
-  Fidx.setTempFidx ~oldfidx ~fidx (fun _ -> f oldt t)
+  Fidx.setTempFidx ~oldfidx ~fidx (fun () -> f oldt t)
 
 let matchEnumInfo = setFidCall matchEnumInfoGen
 
