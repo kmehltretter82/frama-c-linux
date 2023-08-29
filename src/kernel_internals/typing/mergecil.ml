@@ -1004,19 +1004,13 @@ let fidx = ref 0
 let setTempFidx noldfidx nfidx f =
   let oldfidx_before = !oldfidx in
   let fidx_before = !fidx in
-  let restore () =
+  let finally () =
     oldfidx := oldfidx_before;
     fidx := fidx_before
   in
   oldfidx := noldfidx;
   fidx := nfidx;
-  try
-    let v = f () in
-    restore ();
-    v
-  with e ->
-    restore ();
-    raise e
+  Fun.protect ~finally f
 
 (* Match two enuminfos and throw a Failure if they do not match *)
 let matchEnumInfoGen (oldei: enuminfo) (ei: enuminfo) : unit =
