@@ -1000,7 +1000,7 @@ struct
      constants with the same type and value are equal even if their textual
      representations differ.
      If [structural] is true, the comparaison of type into sizeof takes only
-     the size into account. Otherwise, we use the usual type comparaison.
+     the size into account. Otherwise, we use the usual type comparison.
   *)
   let rec compare_exp ~structural ~strict e1 e2 =
     let compare_exp = compare_exp ~structural ~strict in
