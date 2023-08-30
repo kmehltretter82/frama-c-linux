@@ -44,5 +44,4 @@
   29    
   30    int f(int); //error: conflicting decls
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[kernel] User Error: stopping on file "syntactic_hook.i" that has errors.
 [kernel] Frama-C aborted: invalid user input.

@@ -3272,7 +3272,7 @@ let parseIntRes s = fst (parseIntAux s)
 let parseInt s =
   match parseIntRes s with
   | Ok i -> i
-  | Error msg -> Kernel.fatal ~current:true "%s" msg
+  | Error msg -> Kernel.abort ~current:true "%s" msg
 
 let parseIntLogic ~loc str =
   let i = parseInt str in

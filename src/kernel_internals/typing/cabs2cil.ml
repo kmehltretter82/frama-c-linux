@@ -1331,7 +1331,7 @@ let lookupType ghost kind name =
   try
     lookupTypeNoError ghost kind name
   with Not_found ->
-    Kernel.fatal ~current:true "Cannot find type %s (kind:%s)" name kind
+    abort_context "Cannot find type %s (kind:%s)" name kind
 
 (* Create the self ref cell and add it to the map. Return also an indication
  * if this is a new one. *)
@@ -1478,7 +1478,8 @@ let is_scalar_type t =
    Abort if invalid *)
 let checkBool (ot : typ) (_ : exp) =
   if not (is_scalar_type ot) then
-    Kernel.fatal ~current:true "castToBool %a" Cil_datatype.Typ.pretty ot
+    abort_context "cannot cast expr of type %a into a boolean value"
+      Cil_datatype.Typ.pretty ot
 
 (* Evaluate constants to CTrue (non-zero) or CFalse (zero) *)
 let rec isConstTrueFalse c: [ `CTrue | `CFalse ] =
@@ -2677,8 +2678,8 @@ let rec castTo ?context ?(fromsource=false)
     let result = (nt, if theMachine.insertImplicitCasts || fromsource then
                     Cil.mkCastT ~force:true ~oldt:ot ~newt:nt e else e)
     in
-    let error s =
-      if fromsource then abort_context s else Kernel.fatal ~current:true s
+    let origin_error =
+      if fromsource then "explicit cast:" else " implicit cast:"
     in
     (*  [BM] uncomment the following line to enable attributes static typing
         ignore (check_strict_attributes true ot nt  && check_strict_attributes false nt ot);*)
@@ -2712,9 +2713,10 @@ let rec castTo ?context ?(fromsource=false)
       if (va <> va' || bigger_length_args args args') &&
          (args <> None && args' <> None)
       then
-        error
-          "conversion between function types with \
+        abort_context
+          "%s conversion between function types with \
            different number of arguments:@ %a@ and@ %a"
+          origin_error
           Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt;
       if not (areCompatibleTypes ?context ot nt) then
         Kernel.warning
@@ -2768,7 +2770,8 @@ let rec castTo ?context ?(fromsource=false)
         "casting function from %a" Cil_datatype.Typ.pretty ot;
       result
     | _, TPtr (TFun _, _) ->
-      error "cannot cast %a to function type" Cil_datatype.Typ.pretty ot
+      abort_context "%s cannot cast %a to function type"
+        origin_error Cil_datatype.Typ.pretty ot
     | TPtr _, TPtr _ -> result
 
     | TInt _, TPtr _ -> result
@@ -2788,7 +2791,8 @@ let rec castTo ?context ?(fromsource=false)
       when Cil_datatype.Typ.equal t1 t2 -> (nt, e)
 
     | TPtr _, TArray(_,_,_) ->
-      error "Cast over a non-scalar type %a" Cil_datatype.Typ.pretty nt;
+      abort_context "%s cast over a non-scalar type %a"
+        origin_error Cil_datatype.Typ.pretty nt;
 
     | TEnum _, TInt _ -> result
     | TFloat _, (TInt _|TEnum _) -> result
@@ -2836,8 +2840,8 @@ let rec castTo ?context ?(fromsource=false)
     | TComp(_, _), _ -> begin
         match isTransparentUnion ot with
         | None ->
-          Kernel.fatal ~current:true "castTo %a -> %a"
-            Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
+          abort_context "%s %a -> %a"
+            origin_error Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
         | Some fstfield -> begin
             (* We do it now only if the expression is an lval *)
             let e' =
@@ -2846,8 +2850,9 @@ let rec castTo ?context ?(fromsource=false)
                 new_exp ~loc:e.eloc
                   (Lval (addOffsetLval (Field(fstfield, NoOffset)) lv))
               | _ ->
-                Kernel.fatal ~current:true
-                  "castTo: transparent union expression is not an lval: %a\n"
+                abort_context
+                  "%s transparent union expression is not an lval: %a\n"
+                  origin_error
                   Cil_printer.pp_exp e
             in
             (* Continue casting *)
@@ -2855,7 +2860,8 @@ let rec castTo ?context ?(fromsource=false)
           end
       end
     | _ ->
-      error "cannot cast from %a to %a@\n" Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
+      abort_context "%s cannot cast from %a to %a@\n"
+        origin_error Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
   end
 
 (* Create and cache varinfo's for globals. Starts with a varinfo but if the
@@ -3112,7 +3118,7 @@ let conditionalConversion (t2: typ) (t3: typ) : typ =
           end
       end
     | _, _ ->
-      Kernel.fatal ~current:true "invalid implicit conversion from %a to %a"
+      abort_context "invalid implicit conversion from %a to %a"
         Cil_datatype.Typ.pretty t2 Cil_datatype.Typ.pretty t3
   in
   tresult
@@ -3120,7 +3126,7 @@ let conditionalConversion (t2: typ) (t3: typ) : typ =
 let logicConditionalConversion t1 t2 =
   match unrollType t1, unrollType t2 with
   | TPtr _ , TInt _ | TInt _, TPtr _ ->
-    Kernel.fatal ~current:true "invalid implicit conversion from %a to %a"
+    abort_context "invalid implicit conversion from %a to %a"
       Cil_datatype.Typ.pretty t2 Cil_datatype.Typ.pretty t1
   | _ -> conditionalConversion t1 t2
 
@@ -3181,7 +3187,7 @@ let rec setOneInit this o preinit =
           try
             ref idx, ref (Array.make (max 32 (idx + 1)) NoInitPre)
           with Invalid_argument _ | Out_of_memory ->
-            Kernel.abort ~current:true
+            abort_context
               "array length too large: %d" ((max 32 (idx + 1)))
         end
 
@@ -3197,7 +3203,7 @@ let rec setOneInit this o preinit =
               Array.blit !pArray 0 newarray 0 l;
               pArray := newarray
             with Invalid_argument _ | Out_of_memory ->
-              Kernel.abort ~current:true
+              abort_context
                 "array length too large for Frama-C: %d" (idx)
           end
         end;
@@ -3247,7 +3253,7 @@ let rec collectInitializer
             match constFoldToInt len with
             | Some ni when Integer.ge ni Integer.zero -> to_integer ni, false
             | _ ->
-              Kernel.fatal ~current:true
+              abort_context
                 "Array length %a is not a compile-time constant: \
                  no explicit initializer allowed."
                 Cil_printer.pp_exp len
@@ -3372,7 +3378,7 @@ let rec collectInitializer
         Cil_datatype.Typ.pretty thistype !pMaxIdx;
       (* Find the field to initialize *)
       let rec findField (idx: int) = function
-        | [] -> abort_context "collectInitializer: union"
+        | [] -> Kernel.fatal ~current:true "collectInitializer: union"
         | _ :: rest when idx < !pMaxIdx && !pArray.(idx) = NoInitPre ->
           findField (idx + 1) rest
         | f :: _ when idx = !pMaxIdx ->
@@ -3382,7 +3388,7 @@ let rec collectInitializer
           (Field(f, NoOffset), init), reads
 
         | _ ->
-          Kernel.fatal ~current:true "Can initialize only one field for union"
+          abort_context "Can initialize only one field for union"
       in
       if Cil.msvcMode () && !pMaxIdx != 0 then
         Kernel.warning ~current:true
@@ -3492,7 +3498,7 @@ and normalSubobj (so: subobj) : unit =
 
 (* Advance to the next subobject. Always apply to a normalized object *)
 and advanceSubobj (so: subobj) : unit =
-  if so.eof then abort_context "advanceSubobj past end";
+  if so.eof then Kernel.fatal ~current:true "advanceSubobj past end";
   match so.stack with
   | [] ->
     Kernel.debug ~dkey:Kernel.dkey_typing_init "Setting eof to true";
@@ -3509,7 +3515,7 @@ and advanceSubobj (so: subobj) : unit =
     let fi, flds' =
       match nextflds with
       | Field (fi,_) :: flds' -> fi, flds'
-      | _ -> abort_context "advanceSubobj"
+      | _ -> Kernel.fatal ~current:true "advanceSubobj"
     in
     Kernel.debug ~dkey:Kernel.dkey_typing_init
       "Advancing past .%s" fi.fname;
@@ -3562,7 +3568,7 @@ let fieldsToInit
   let found, r = add_comp NoOffset comp (designator = None, []) in
   begin if not found then
       let fn = Option.get designator in
-      Kernel.fatal ~current:true "Cannot find designated field %s" fn;
+      abort_context "Cannot find designated field %s" fn;
   end;
   List.rev r
 
@@ -3573,7 +3579,7 @@ let integerArrayLength (leno: exp option) : int =
     try lenOfArray leno
     with
     | LenOfArray cause ->
-      Kernel.abort ~current:true
+      abort_context
         "Array length %a is %a: no explicit initializer allowed."
         Cil_printer.pp_exp len Cil.pp_incorrect_array_length cause
 
@@ -4181,10 +4187,10 @@ let get_lval_compound_assigned op expr =
      The result is also of the cast type *)
   | CastE (_, {enode = Lval x}) ->
     if Cil.is_modifiable_lval x then x else
-      Kernel.abort ~current:true
+      abort_context
         "Cannot assign to non-modifiable lval %a"
         Cil_printer.pp_lval x
-  | _ -> Kernel.fatal ~current:true "Expected lval for %s" op
+  | _ -> abort_context "Expected lval for %s" op
 
 (* The way formals are handled now might generate incorrect types, in the
    sense that they refer to a varinfo (in the case of VLA depending on a
@@ -4341,7 +4347,8 @@ let rec doSpecList ghost (suggestedAnonName: string)
     | Cabs.SpecCV cv -> cvattrs := cv :: !cvattrs; acc
     | Cabs.SpecAttr a -> attrs := a :: !attrs; acc
     | Cabs.SpecType ts -> ts :: acc
-    | Cabs.SpecPattern _ -> abort_context "SpecPattern in cabs2cil input"
+    | Cabs.SpecPattern _ ->
+      Kernel.fatal ~current:true "SpecPattern in cabs2cil input"
   in
   (* Now scan the list and collect the type specifiers. Preserve the order *)
   let tspecs = List.fold_right doSpecElem specs [] in
@@ -4574,7 +4581,7 @@ let rec doSpecList ghost (suggestedAnonName: string)
           let e' = getIntConstExp ghost e in
           let e' = match constFoldToInt e' with
             | None ->
-              Kernel.fatal ~current:true
+              abort_context
                 "Constant initializer %a not an integer"
                 Cil_printer.pp_exp e'
             | Some i ->
@@ -4648,7 +4655,7 @@ let rec doSpecList ghost (suggestedAnonName: string)
       doOnlyType ghost specs dt
 
     | l ->
-      Kernel.fatal ~current:true
+      abort_context
         "Invalid combination of type specifiers:@ %a"
         (pp_list ~sep:"@ " Cprint.print_type_spec) l;
   in
@@ -5377,7 +5384,7 @@ and makeCompType ghost (isstruct: bool)
           if Cil_datatype.Compinfo.equal comp comp' then begin
             (* abort and not error, as this circularity could lead
                to infinite recursion... *)
-            Kernel.abort ~current:true
+            abort_context
               "type %s %s is circular"
               (if comp.cstruct then "struct" else "union")
               comp.cname;
@@ -5534,7 +5541,7 @@ and getIntConstExp ghost (aexp) : exp =
 
   (* other Const expressions are not ok *)
   | Const _ ->
-    Kernel.fatal ~current:true "Expected integer constant and got %a"
+    abort_context "Expected integer constant and got %a"
       Cil_printer.pp_exp e
 
   (* now, anything else that 'doExp true' returned is ok (provided
@@ -5567,8 +5574,7 @@ and doExp local_env
   CurrentLoc.set loc;
   let checkVoidLval e t =
     if (match e.enode with Lval _ -> true | _ -> false) && isVoidType t then
-      Kernel.fatal ~current:true
-        "lvalue of type void: %a@\n" Cil_printer.pp_exp e
+      abort_context "lvalue of type void: %a@\n" Cil_printer.pp_exp e
   in
   (* A subexpression of array type is automatically turned into StartOf(e).
    * Similarly an expression of function type is turned into AddrOf. So
@@ -5582,7 +5588,7 @@ and doExp local_env
     | (Lval(lv) | CastE(_, {enode = Lval lv})), TFun _  ->
       mkAddrOfAndMark loc lv, TPtr(t, [])
     | _, (TArray _ | TFun _) ->
-      Kernel.fatal ~current:true
+      abort_context
         "Array or function expression is not lval: %a@\n"
         Cil_printer.pp_exp e
     | _ -> e, t
@@ -5688,18 +5694,18 @@ and doExp local_env
           | _ -> raise Not_found
         with Not_found -> begin
             if isOldStyleVarArgName n then
-              Kernel.abort ~current:true
+              abort_context
                 "Cannot resolve variable %s. \
                  This could be a CIL bug due to \
                  the handling of old-style variable argument functions"
                 n
             else if only_ghost_symbol n then
-              Kernel.abort ~current:true
+              abort_context
                 "Variable %s is a ghost symbol. \
                  It cannot be used in non-ghost context. \
                  Did you forget a /*@@ ghost ... /?" n
             else
-              Kernel.abort ~current:true "Cannot resolve variable %s" n
+              abort_context "Cannot resolve variable %s" n
           end
       end
     | Cabs.INDEX (e1, e2) -> begin
@@ -5715,7 +5721,7 @@ and doExp local_env
           | TPtr(t1e,_), (TInt _|TEnum _) -> e1', t1, e2', t1e
           | (TInt _|TEnum _), TPtr(t2e,_) -> e2', t2, e1', t2e
           | _ ->
-            Kernel.fatal ~current:true
+            abort_context
               "Expecting exactly one pointer type in array access %a[%a] (%a \
                and %a)"
               Cil_printer.pp_exp e1' Cil_printer.pp_exp e2'
@@ -5750,8 +5756,8 @@ and doExp local_env
         match unrollType t with
         | TPtr(te, _) -> te
         | _ ->
-          Kernel.fatal ~current:true
-            "Expecting a pointer type in *. Got %a."
+          abort_context
+            "attempted to dereference an expression of non-pointer type %a"
             Cil_datatype.Typ.pretty t
       in
       let res = mkMem ~addr:e' ~off:NoOffset in
@@ -5776,8 +5782,7 @@ and doExp local_env
         | CastE(_, { enode = Lval x}) -> x
         | _ ->
           Kernel.fatal ~current:true
-            "Expected an lval in MEMBEROF (field %s)"
-            str
+            "expected an lvalue as left-hand side of access to field %s" str
       in
       (* We're not reading the whole lval, just a chunk of it. *)
       let r =
@@ -5787,7 +5792,7 @@ and doExp local_env
         match unrollType t' with
         | TComp (comp, _) -> findField str comp
         | _ ->
-          Kernel.fatal ~current:true "expecting a struct with field %s" str
+          abort_context "expecting a struct with field %s" str
       in
       let lv' = addOffsetLval field_offset lv in
       let field_type = typeOfLval lv' in
@@ -5808,12 +5813,12 @@ and doExp local_env
       let pointedt = match unrollType t' with
         | TPtr(t1, _) -> t1
         | TArray(t1,_,_) -> t1
-        | _ -> Kernel.fatal ~current:true "expecting a pointer to a struct"
+        | _ -> abort_context "expecting a pointer to a struct"
       in
       let field_offset = match unrollType pointedt with
         | TComp (comp, _) -> findField str comp
         | x ->
-          Kernel.fatal ~current:true
+          abort_context
             "expecting a struct with field %s. Found %a. t1 is %a"
             str Cil_datatype.Typ.pretty x Cil_datatype.Typ.pretty t'
       in
@@ -5974,7 +5979,7 @@ and doExp local_env
         | Cabs.SINGLE_INIT e ->
           doExp (no_paren_local_env local_env) asconst e what', true
 
-        | Cabs.NO_INIT -> Kernel.fatal ~current:true "missing expression in cast"
+        | Cabs.NO_INIT -> abort_context "missing expression in cast"
 
         | Cabs.COMPOUND_INIT _ -> begin
             (* Pretend that we are declaring and initializing a brand new
@@ -6047,7 +6052,7 @@ and doExp local_env
       if isArithmeticType t then
         finishExp r se (new_exp ~loc:e'.eloc (UnOp(Neg,e',t))) t
       else
-        Kernel.fatal ~current:true "Unary - on a non-arithmetic type"
+        abort_context "Unary - on a non-arithmetic type"
 
     | Cabs.UNARY(Cabs.BNOT, e) ->
       let (r, se, e', t) =
@@ -6060,7 +6065,7 @@ and doExp local_env
         in
         finishExp r se e'' tres
       else
-        Kernel.fatal ~current:true "Unary ~ on a non-integral type"
+        abort_context "Unary ~ on a non-integral type"
 
     | Cabs.UNARY(Cabs.PLUS, e) -> doExp (no_paren_local_env local_env) asconst e what
 
@@ -6083,7 +6088,7 @@ and doExp local_env
           if Cil.msvcMode () then begin
             let rec getLast = function
               | [] ->
-                Kernel.fatal ~current:true
+                abort_context
                   "old-style variable argument function without real \
                    arguments"
               | [ a ] -> a
@@ -6150,10 +6155,10 @@ and doExp local_env
               finishExp r se e' t
 
             | _ ->
-              Kernel.fatal ~current:true "Expected lval for ADDROF. Got %a"
+              abort_context "Expected lval for addrof. Got %a"
                 Cil_printer.pp_exp e'
           end
-        | _ -> Kernel.fatal ~current:true "Unexpected operand for addrof"
+        | _ -> abort_context "Unexpected operand for addrof"
       in
       normalize_unop Cabs.ADDROF action CNoConst
         (no_paren_local_env local_env) e what
@@ -6186,7 +6191,7 @@ and doExp local_env
               t
           end
         | _ ->
-          Kernel.fatal ~current:true "Unexpected operand for prefix -- or ++"
+          abort_context "Unexpected operand for prefix -- or ++"
       in
       normalize_unop uop action asconst (no_paren_local_env local_env) e what
 
@@ -6242,7 +6247,7 @@ and doExp local_env
               t
           end
         | _ ->
-          Kernel.fatal ~current:true "Unexpected operand for suffix ++ or --"
+          abort_context "Unexpected operand for suffix ++ or --"
       in
       normalize_unop uop action asconst (no_paren_local_env local_env) e what
 
@@ -6262,14 +6267,14 @@ and doExp local_env
               match e1'.enode with
               | Lval x when Cil.is_modifiable_lval x -> x
               | Lval x ->
-                Kernel.abort ~current:true
+                abort_context
                   "Cannot assign to non-modifiable lval %a"
                   Cil_printer.pp_lval x
               | StartOf lv ->
-                Kernel.abort ~current:true
+                abort_context
                   "Cannot assign array %a" Cil_printer.pp_lval lv
               | _ ->
-                Kernel.abort ~current:true
+                abort_context
                   "Expected lval for assignment. Got %a"
                   Cil_printer.pp_exp e1'
             in
@@ -6319,7 +6324,7 @@ and doExp local_env
             finishExp r2  ((empty @@@ ((se0 @@@ se1') @@@ se2)) @@@ se3)
               (new_exp ~loc (Lval tmplv)) lvt
           end
-        | _ -> Kernel.fatal ~current:true "Invalid left operand for ASSIGN"
+        | _ -> abort_context "Invalid left operand for ASSIGN"
       in
       normalize_binop
         Cabs.ASSIGN action (no_paren_local_env local_env) asconst e1 e2 what
@@ -6366,7 +6371,7 @@ and doExp local_env
               | Cabs.XOR_ASSIGN -> BXor
               | Cabs.SHL_ASSIGN -> Shiftlt
               | Cabs.SHR_ASSIGN -> Shiftrt
-              | _ -> Kernel.fatal ~current:true "binary +="
+              | _ -> assert false
             in
             let (r1,se1, e1', t1) = doExp local_env CNoConst e (AExp None) in
             let lv1 = get_lval_compound_assigned "assignment with arith" e1' in
@@ -6395,8 +6400,7 @@ and doExp local_env
               t1
           end
         | _ ->
-          Kernel.fatal ~current:true
-            "Unexpected left operand for assignment with arith"
+          abort_context "Unexpected left operand for assignment with arith"
       in
       normalize_binop
         bop action (no_paren_local_env local_env) asconst e1 e2 what
@@ -6535,7 +6539,7 @@ and doExp local_env
             (* Found. Do not use finishExp. Simulate what = AExp None  *)
             with Not_found -> begin
                 if only_ghost_symbol n then
-                  Kernel.abort ~current:true
+                  abort_context
                     "Function %s is a ghost symbol. \
                      It cannot be used in non-ghost context. \
                      Did you forget a /*@@ ghost ... /?" n ;
@@ -6577,12 +6581,12 @@ and doExp local_env
               in
               (rt,at,isvar, f'',[])
             | x ->
-              Kernel.fatal ~current:true
+              abort_context
                 "Unexpected type of the called function %a: %a"
                 Cil_printer.pp_exp f' Cil_datatype.Typ.pretty x
           end
         | x ->
-          Kernel.fatal ~current:true
+          abort_context
             "Unexpected type of the called function %a: %a"
             Cil_printer.pp_exp f' Cil_datatype.Typ.pretty x
       in
@@ -7029,7 +7033,7 @@ and doExp local_env
                        s;
                  end
                | _ ->
-                 Kernel.abort ~current:true "Invalid call to builtin_offsetof"
+                 abort_context "Invalid call to builtin_offsetof"
              end
            | "__builtin_types_compatible_p" ->
              begin
@@ -7500,34 +7504,35 @@ and doExp local_env
           (makeCast ~e:(integer ~loc addrval) ~newt:voidPtrType) voidPtrType
       end
 
-    | Cabs.EXPR_PATTERN _ -> abort_context "EXPR_PATTERN in cabs2cil input"
+    | Cabs.EXPR_PATTERN _ ->
+      Kernel.fatal ~current:true "EXPR_PATTERN in cabs2cil input"
 
 
     | Cabs.GENERIC (ce, assocs) ->
       let (_, _, control_exp, control_t) = doExp local_env asconst ce AType in
       match Cil.lvalue_conversion control_t with
-      | Error msg -> Kernel.abort ~current:true "%s" msg
+      | Error msg -> abort_context "%s" msg
       | Ok control_t ->
         let has_default, assocs =
           List.fold_left (fun (has_default, acc) (type_name, expr) ->
               match type_name with
               | None -> (* default *)
                 if has_default then
-                  Kernel.abort ~current:true
+                  abort_context
                     "multiple default clauses in _Generic selection";
                 true, ((None, expr) :: acc)
               | Some (spec, dt) ->
                 let t = doOnlyType ghost spec dt in
                 if not (Cil.isCompleteType t) then
-                  Kernel.abort ~current:true
+                  abort_context
                     "generic association with incomplete type '%a'"
                     Cil_datatype.Typ.pretty t
                 else if (Cil.isFunctionType t) then
-                  Kernel.abort ~current:true
+                  abort_context
                     "generic association with function type '%a'"
                     Cil_datatype.Typ.pretty t
                 else if (Cil.is_variably_modified_type t) then
-                  Kernel.abort ~current:true
+                  abort_context
                     "generic association with variably modified type '%a'"
                     Cil_datatype.Typ.pretty t
                 else begin
@@ -7540,7 +7545,7 @@ and doExp local_env
                       | None -> ()
                       | Some t' ->
                         if areCompatibleTypes ~strictReturnTypes:true t t' then
-                          Kernel.abort ~current:true
+                          abort_context
                             "multiple compatible types in _Generic selection:@ \
                              '%a' and '%a'"
                             Cil_printer.pp_typ t'
@@ -7559,7 +7564,7 @@ and doExp local_env
             ) assocs
         in
         if List.length candidates > 1 then
-          Kernel.abort ~current:true
+          abort_context
             "controlling expression compatible with more than one association \
              type in _Generic selection:@ \
              controlling expression: '%a' (type: %a);@ \
@@ -7574,7 +7579,7 @@ and doExp local_env
           let types =
             List.map (fun (type_name, _) -> Option.get type_name) assocs
           in
-          Kernel.abort ~current:true
+          abort_context
             "no compatible types and no default type in _Generic selection:@ \
              controlling expression: '%a' (type: %a);@ \
              candidate types: %a"
@@ -7696,7 +7701,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
         (makeCastT ~e:e2 ~oldt:t2 ~newt:tres)
         tres
     | _ ->
-      Kernel.fatal ~current:true "%a operator on non-integer type %a"
+      abort_context "%a operator on non-integer type %a"
         Cil_printer.pp_binop bop Cil_datatype.Typ.pretty tres
   in
   (* Invariant: t1 and t2 are pointers types *)
@@ -7775,13 +7780,13 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
 
   | (Eq|Ne|Le|Lt|Ge|Gt) when (isPointerType t1 && isArithmeticType t2 ||
                               isArithmeticType t1 && isPointerType t2 ) ->
-    Kernel.fatal ~current:true
+    abort_context
       "comparison between pointer and non-pointer: %a"
       Cil_printer.pp_exp (dummy_exp(BinOp(bop,e1,e2,intType)))
 
   | _ ->
-    Kernel.fatal ~current:true
-      "doBinOp: %a"
+    abort_context
+      "cannot perform the following comparison %a"
       Cil_printer.pp_exp (dummy_exp(BinOp(bop,e1,e2,intType)))
 
 (* Constant fold a conditional. This is because we want to avoid having
@@ -8144,7 +8149,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         | TInt((IChar|IUChar|ISChar), _) -> true
         | TInt _ ->
           (*Base type is a scalar other than char. Maybe a wchar_t?*)
-          Kernel.fatal ~current:true
+          abort_context
             "Using a string literal to initialize something other than \
              a character array"
         | _ ->  false (* OK, this is probably an array of strings. Handle *)
@@ -8212,7 +8217,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
        | TInt _ ->
          (*Base type is a scalar other than wchar_t.
            Maybe a char?*)
-         Kernel.fatal ~current:true
+         abort_context
            "Using a wide string literal to initialize \
             something other than a wchar_t array"
        | _ -> false
@@ -8367,7 +8372,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     let t'noattr = Cil.typeDeepDropAllAttributes t' in
     let rec findField = function
       | [] ->
-        Kernel.fatal ~current:true "Cannot find matching union field in cast"
+        abort_context "Cannot find matching union field in cast"
       | fi :: _rest when
           Typ.equal (Cil.typeDeepDropAllAttributes fi.ftype) t'noattr -> fi
       | _ :: rest -> findField rest
@@ -8456,8 +8461,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
               normalSubobj so;
               address whatnext acc
             | _ ->
-              Kernel.fatal ~current:true
-                "Field designator %s not in a struct " fn
+              abort_context "Field designator %s not in a struct " fn
           end
 
         | Cabs.ATINDEX_INIT(idx, whatnext) -> begin
@@ -8477,8 +8481,9 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
                   begin
                     match Integer.to_int_opt x with
                     | Some x' -> x', doidx
-                    | None -> abort_context
-                                "INDEX initialization designator overflows"
+                    | None ->
+                      abort_context
+                        "INDEX initialization designator overflows"
                   end
                 | _ ->
                   abort_context
@@ -8494,7 +8499,8 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
             | _ -> abort_context "INDEX designator for a non-array"
           end
 
-        | Cabs.ATINDEXRANGE_INIT _ -> abort_context "addressSubobj: INDEXRANGE"
+        | Cabs.ATINDEXRANGE_INIT _ ->
+          Kernel.fatal ~current:true "addressSubobj: INDEXRANGE"
       in
       address what acc
     in
@@ -8514,12 +8520,12 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         let doidxs = add_reads ~ghost idxs'.eloc rs doidxs in
         let doidxe = add_reads ~ghost idxe'.eloc re doidxe in
         if isNotEmpty doidxs || isNotEmpty doidxe then
-          Kernel.fatal ~current:true "Range designators are not constants";
+          abort_context "Range designators are not constants";
         let first, last =
           match constFoldToInteger idxs', constFoldToInteger idxe' with
           | Some s, Some e -> s, e
           | _ ->
-            Kernel.fatal ~current:true
+            abort_context
               "INDEX_RANGE initialization designator is not a valid constant"
         in
         if first < 0 || first > last then
@@ -8527,7 +8533,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
             "start index larger than end index in range initializer";
         (* Arbitrary limit to avoid building an impractical AST. *)
         if last - first > 100_000 then
-          Kernel.fatal ~current:true "INDEX_RANGE too large";
+          abort_context "INDEX_RANGE too large";
         let rec loop (i: int) =
           if i > last then restil
           else
@@ -9091,7 +9097,7 @@ and doAliasFun ghost vtype (thisname:string) (othername:string)
   (* get the new function *)
   let v,_ =
     try lookupGlobalVar ghost thisname
-    with Not_found -> abort_context "error in doDecl"
+    with Not_found -> Kernel.fatal ~current:true "error in doDecl"
   in
   v.vattr <- dropAttribute "alias" v.vattr
 
@@ -9188,7 +9194,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
           a'';
         empty
 
-      | _ -> Kernel.fatal ~current:true "Too many attributes in pragma"
+      | _ -> abort_context "Too many attributes in pragma"
     end
 
   | Cabs.STATIC_ASSERT (e, s, loc) -> begin
@@ -9370,7 +9376,10 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
               vi.vid
               (Cil.create_alpha_renaming
                  (Cil.getFormalsDecl vi) formals)
-          with Not_found ->
+          with
+          | Invalid_argument _ ->
+            abort_context "Inconsistent formals"
+          | Not_found ->
             (* the declaration comes from an
                implicit prototype. We do not have
                any spec anyway. However, we will have a declaration
@@ -9605,7 +9614,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
       (fun d ->
          let s = doDecl local_env isglobal d in
          if isNotEmpty s then
-           abort_context "doDecl returns non-empty statement for global")
+           abort_context "global initializer with side-effects")
       dl;
     empty
 
@@ -9632,7 +9641,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
     empty
 
   | Cabs.GLOBANNOT _ | Cabs.PRAGMA _ | Cabs.GLOBASM _ | Cabs.FUNDEF _ ->
-    Kernel.fatal ~current:true "this form of declaration must be global"
+    abort_context "this form of declaration must be global"
 
 and doTypedef ghost ((specs, nl): Cabs.name_group) =
   (* Do the specifiers exactly once *)
@@ -10109,12 +10118,11 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       match constFoldToInteger el', constFoldToInteger eh' with
       | Some il, Some ih -> il, ih
       | _ ->
-        Kernel.fatal ~current:true
-          "Cannot understand the constants in case range"
+        abort_context "non-constant expression(s) in case-range"
     in
     if il > ih then Kernel.error ~once:true ~current:true "Empty case range";
     (* Arbitrary limit to avoid building an impractical AST. *)
-    if ih - il > 100_000 then Kernel.fatal ~current:true "Case range too large";
+    if ih - il > 100_000 then abort_context "Case range too large";
     let rec mkAll (i: int) =
       if i > ih then [] else integer ~loc i :: mkAll (i + 1)
     in
@@ -10214,8 +10222,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
                  | Lval lval
                  | StartOf lval -> lval
                  | _ ->
-                   Kernel.fatal ~current:true
-                     "Expected lval for ASM outputs"
+                   abort_context "Expected lval for ASM outputs"
                in
                if not (isEmpty se) then
                  stmts := !stmts @@@ (se, ghost);
@@ -10315,8 +10322,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
         (function (s,_,_,_,_) -> match s.skind with
             | Instr s -> s
             | _ ->
-              Kernel.fatal ~current:true
-                "Except expression contains unexpected statement")
+              abort_context "Except expression contains unexpected statement")
         s
     in
     let il' = stmt_to_instrs se.stmts in
@@ -10431,7 +10437,7 @@ let convFile (path, f) =
     let local_env = ghost_local_env ghost in
     let s = doDecl local_env true d in
     if isNotEmpty s then
-      abort_context "doDecl returns non-empty statement for global";
+      abort_context "global initializer with side-effects";
   in
   List.iter doOneGlobal f;
   let globals = fileGlobals () in

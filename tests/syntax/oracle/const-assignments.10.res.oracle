@@ -2,6 +2,4 @@
 [kernel:typing:incompatible-types-call] const-assignments.c:110: Warning: 
   expected 'int *' but got argument of type 'int const *': & (s->z[0])->y
 [kernel] User Error: warning typing:incompatible-types-call treated as fatal error.
-[kernel] User Error: stopping on file "const-assignments.c" that has errors. Add
-  '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

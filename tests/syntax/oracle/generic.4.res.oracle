@@ -2,6 +2,10 @@
 [kernel] generic.c:47: User Error: 
   multiple compatible types in _Generic selection:
   'void (*)()' and 'void (*)(void)'
-[kernel] User Error: stopping on file "generic.c" that has errors. Add '-kernel-msg-key pp'
-  for preprocessing command.
+  45    #ifdef TOO_MANY_COMPATIBLE2
+  46      // compatibility modulo implicit arguments
+  47      int a = _Generic(0,
+        ^^^^^^^^^^^^^^^^^^^^^
+  48          void (*)():     0,
+  49          void (*)(void): 0);
 [kernel] Frama-C aborted: invalid user input.

@@ -67,9 +67,14 @@ val is_singleton_int: t -> bool
 (** assume [Ival _] as argument *)
 val extract_ival: t -> Ival.t
 
+exception Not_representable_ival
+(** raised by {!ikind_of_ival].
+    @since Frama-C+dev
+*)
+
 val ikind_of_ival: Ival.t -> Cil_types.ikind
 (** @return the smallest ikind that contains the given interval.
-    @raise Cil.Not_representable if the given interval does not fit into any C
+    @raise Not_representable_ival if the given interval does not fit into any C
     integral type. *)
 
 val interv_of_typ: Cil_types.typ -> t

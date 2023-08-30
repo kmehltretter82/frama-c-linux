@@ -319,24 +319,30 @@ let interv_of_logic_typ = function
   | Lvar _ -> Error.not_yet "type variable"
   | Larrow _ -> Nan
 
+exception Not_representable_ival
 let ikind_of_ival iv =
   if Ival.is_bottom iv then IInt
   else match Ival.min_and_max iv with
     | Some l, Some u ->
-      let is_pos = Integer.ge l Integer.zero in
-      let lkind = Cil.intKindForValue l is_pos in
-      let ukind = Cil.intKindForValue u is_pos in
-      (* kind corresponding to the interval *)
-      let kind = if Cil.intTypeIncluded lkind ukind then ukind else lkind in
-      (* convert the kind to [IInt] whenever smaller. *)
-      if Cil.intTypeIncluded kind IInt then IInt else kind
-    | None, None -> raise Cil.Not_representable (* GMP *)
+      begin
+        try
+          let is_pos = Integer.ge l Integer.zero in
+          let lkind = Cil.intKindForValue l is_pos in
+          let ukind = Cil.intKindForValue u is_pos in
+          (* kind corresponding to the interval *)
+          let kind = if Cil.intTypeIncluded lkind ukind then ukind else lkind in
+          (* convert the kind to [IInt] whenever smaller. *)
+          if Cil.intTypeIncluded kind IInt then IInt else kind
+        with Cil.Not_representable ->
+          raise Not_representable_ival
+      end
+    | None, None -> raise Not_representable_ival (* GMP *)
     (* TODO: do not raise an exception, but returns a value instead *)
     | None, Some _ | Some _, None ->
       (* Semi-open interval that can happen when computing the interval of shift
          operations if the computation overflows *)
       (* TODO: do not raise an exception, but returns a value instead *)
-      raise Cil.Not_representable (* GMP *)
+      raise Not_representable_ival (* GMP *)
 
 
 let interv_of_typ_containing_interv = function
@@ -346,7 +352,7 @@ let interv_of_typ_containing_interv = function
     try
       let kind = ikind_of_ival i in
       interv_of_typ (TInt(kind, []))
-    with Cil.Not_representable ->
+    with Not_representable_ival ->
       top_ival
 
 let widen_profile =

@@ -3,6 +3,10 @@
   controlling expression compatible with more than one association type in _Generic selection:
   controlling expression: '(void (*)())0' (type: void (*)());
   compatible types: void (*)(void), void (*)(int )
-[kernel] User Error: stopping on file "generic.c" that has errors. Add '-kernel-msg-key pp'
-  for preprocessing command.
+  52      // implicit arguments compatible between first and second selector,
+  53      // but the selectors themselves are not compatible between them
+  54      int a = _Generic((void (*)()) 0,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  55                       void (*)(int):  0,
+  56                       void (*)(void): 0);
 [kernel] Frama-C aborted: invalid user input.
