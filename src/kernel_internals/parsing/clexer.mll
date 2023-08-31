@@ -161,6 +161,7 @@ let init_lexicon _ =
          STATIC_ASSERT loc);
       ("__attribute__", fun loc -> ATTRIBUTE loc);
       ("__attribute", fun loc -> ATTRIBUTE loc);
+      ("_Nullable", fun loc -> NOP_ATTRIBUTE loc);
       ("__blockattribute__", fun _ -> BLOCKATTRIBUTE);
       ("__blockattribute", fun _ -> BLOCKATTRIBUTE);
       ("__asm__", fun loc -> ASM loc);
