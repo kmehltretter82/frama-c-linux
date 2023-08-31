@@ -47,8 +47,10 @@ import { Space } from 'dome/frame/toolbars';
 import '@fortawesome/fontawesome-free/js/all';
 
 import EvaReady from 'frama-c/plugins/eva/EvaReady';
+import Legend from './legend';
 import style from './style.json';
 import layouts from './layouts.json';
+import './dive.css';
 
 const Debug = new Dome.Debug('dive');
 
@@ -655,6 +657,8 @@ function DiveView(): JSX.Element {
     Dome.useStringSettings('dive.selectionMode', 'follow');
   const [layout, setLayout] =
     Dome.useStringSettings('dive.layout', 'dagre');
+  const [showLegend, flipShowLegend] =
+    Dome.useFlipSettings('dive.legend', true);
 
   // Selection mode
   const selectMode = (id?: string) => void (id && setSelectionMode(id));
@@ -706,6 +710,14 @@ function DiveView(): JSX.Element {
           onClick={() => graph.current?.clear()}
           title="Clear the graph"
         />
+        <IconButton
+          icon="HELP"
+          onClick={flipShowLegend}
+          kind={showLegend ? 'positive' : 'negative'}
+          title={showLegend ?
+            'Hide legend' :
+            'Show legend'}
+        />
       </Ivette.TitleBar>
       <EvaReady>
         <GraphView
@@ -713,6 +725,7 @@ function DiveView(): JSX.Element {
           layout={layout}
           selectionMode={selectionMode}
           ref={graph}/>
+        { showLegend ? <Legend /> : null }
       </EvaReady>
     </>
   );
