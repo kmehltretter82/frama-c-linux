@@ -160,18 +160,6 @@ val fc_local_static: string
     types of cabs2cil-introduced temp variables. *)
 val typeForInsertedVar: (Cil_types.typ -> Cil_types.typ) ref
 
-(** Like [typeForInsertedVar], but for casts.
-    [typeForInsertedCast expr original_type destination_type]
-    returns the type into which [expr], which has type [original_type] and
-    whose type must be converted into [destination_type], must be casted.
-
-    By default, returns [destination_type].
-
-    This applies only to implicit casts. Casts already present
-    in the source code are exempt from this hook. *)
-val typeForInsertedCast:
-  (Cil_types.exp -> Cil_types.typ -> Cil_types.typ -> Cil_types.typ) ref
-
 (** [fresh_global prefix] creates a variable name not clashing with any other
     globals and starting with [prefix] *)
 val fresh_global : string -> string

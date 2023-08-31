@@ -587,6 +587,11 @@ val isFunPtrType: typ -> bool
     @since 18.0-Argon *)
 val isLogicFunPtrType: logic_type -> bool
 
+(** Check if a type is a transparent union, and return the first field
+
+    @since Frama-C+dev *)
+val isTransparentUnion : typ -> fieldinfo option
+
 (** True if the argument is the type for reified C types. *)
 val isTypeTagType: logic_type -> bool
 
@@ -1150,17 +1155,49 @@ val mkString: loc:location -> string -> exp
 *)
 val need_cast: ?force:bool -> typ -> typ -> bool
 
+(** [typeForInsertedCast expr original_type destination_type]
+    returns the type into which [expr], which has type [original_type] and
+    whose type must be converted into [destination_type], must be casted.
+
+    By default, returns [destination_type].
+
+    This applies only to implicit casts. Casts already present
+    in the source code are exempt from this hook.
+
+    @since Frama-C+dev*)
+val typeForInsertedCast:
+  (Cil_types.exp -> Cil_types.typ -> Cil_types.typ -> Cil_types.typ) ref
+
+(** Generic version of {!Cil.mkCastT}.
+    Construct a cast when having the old type of the expression.
+    [fromsource] is [false] (default) if the cast is not from the source.
+    If [check] is [true] (default), we check that the cast is valid,
+    fail if the cast is invalid.
+    If the new type is the same as the old type, then no cast is added,
+    unless [force] is [true] (default is [false]).
+    Casting from [oldt] to [newt].
+    Take the expression as argument and can modify it.
+    Return the new type and the new expression.
+
+    @since Frama-C+dev
+*)
+val mkCastTGen: ?check:bool -> ?context:qualifier_check_context ->
+  ?fromsource:bool -> ?force:bool -> oldt:typ -> newt:typ -> exp -> typ * exp
+
 (** Construct a cast when having the old type of the expression. If the new
     type is the same as the old type, then no cast is added, unless [force]
-    is [true] (default is [false])
+    is [true] (default is [false]).
+    Fail if the cast is invalid.
     @before 23.0-Vanadium different order of arguments.
+    @before Frama-C+dev no [check] argument, it was always [false].
 *)
-val mkCastT: ?force:bool -> oldt:typ -> newt:typ -> exp -> exp
+val mkCastT: ?check:bool -> ?force:bool -> oldt:typ -> newt:typ -> exp -> exp
 
 (** Like {!Cil.mkCastT} but uses typeOf to get [oldt]
     @before 23.0-Vanadium different order of arguments.
+    @before Frama-C+dev no [check] argument, it was always [false].
 *)
-val mkCast: ?force:bool -> newt:typ -> exp -> exp
+val mkCast: ?check:bool -> ?force:bool -> newt:typ -> exp -> exp
 
 (** Equivalent to [stripCasts] for terms. *)
 val stripTermCasts: term -> term
