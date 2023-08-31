@@ -62,7 +62,7 @@ let warn_imprecise_lval_read lv loc contents =
     in
     if something_to_warn
     then
-      Self.result ~current:true ~once:true
+      Self.warning ~wkey:Self.wkey_garbled_mix_read ~current:true ~once:true
         "@[<v>@[Reading left-value %a.@]@ %t%t%t@]"
         Printer.pp_lval lv
         (fun fmt ->
@@ -100,7 +100,7 @@ let warn_imprecise_lval_read lv loc contents =
 let warn_right_exp_imprecision lv loc_lv exp_val =
   match exp_val with
   | Location_Bytes.Top(_topparam,origin) ->
-    Self.result ~once:true ~current:true
+    Self.warning ~wkey:Self.wkey_garbled_mix_write ~once:true ~current:true
       "@[<v>@[Assigning imprecise value to %a%t.@]%a%t@]"
       Printer.pp_lval lv
       (fun fmt -> match lv with

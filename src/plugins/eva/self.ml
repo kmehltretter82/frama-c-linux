@@ -93,8 +93,14 @@ let () =
 (* Warning categories. *)
 let wkey_alarm = register_warn_category "alarm"
 let wkey_locals_escaping = register_warn_category "locals-escaping"
-let wkey_garbled_mix = register_warn_category "garbled-mix"
-let () = set_warn_status wkey_garbled_mix Log.Winactive
+let wkey_garbled_mix_read = register_warn_category "garbled-mix:read"
+let () = set_warn_status wkey_garbled_mix_read Log.Wfeedback
+let wkey_garbled_mix_write = register_warn_category "garbled-mix:write"
+let () = set_warn_status wkey_garbled_mix_write Log.Wfeedback
+let wkey_garbled_mix_assigns = register_warn_category "garbled-mix:assigns"
+let () = set_warn_status wkey_garbled_mix_assigns Log.Winactive
+let wkey_garbled_mix_summary = register_warn_category "garbled-mix:summary"
+let () = set_warn_status wkey_garbled_mix_summary Log.Winactive
 let wkey_builtins_missing_spec = register_warn_category "builtins:missing-spec"
 let wkey_builtins_override = register_warn_category "builtins:override"
 let wkey_libc_unsupported_spec = register_warn_category "libc:unsupported-spec"

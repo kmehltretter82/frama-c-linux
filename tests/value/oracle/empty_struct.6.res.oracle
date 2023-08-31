@@ -9,7 +9,7 @@
   Called from empty_struct.c:99.
 [eva] using specification for function f
 [eva] Done for function f
-[eva] empty_struct.c:99: 
+[eva:garbled-mix:write] empty_struct.c:99: 
   Assigning imprecise value to r.
   The imprecision originates from Library function {empty_struct.c:99}
 [kernel:annot:missing-spec] empty_struct.c:100: Warning: 

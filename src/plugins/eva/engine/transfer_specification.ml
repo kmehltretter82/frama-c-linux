@@ -316,7 +316,7 @@ module Make
           begin
             ignore (Locations.Location_Bytes.track_garbled_mix cvalue);
             Self.warning ~current:true ~once:true
-              ~wkey:Self.wkey_garbled_mix
+              ~wkey:Self.wkey_garbled_mix_assigns
               "The specification of function %a has generated a garbled mix \
                for %a."
               Kernel_function.pretty kf pp_assign_clause (Assign, assign)

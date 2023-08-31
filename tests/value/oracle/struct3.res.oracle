@@ -23,12 +23,12 @@
   pointer downcast. assert (unsigned int)s2.c ≤ 2147483647;
 [eva:alarm] struct3.i:46: Warning: 
   pointer downcast. assert (unsigned int)(s2.c + (int)s2.c) ≤ 2147483647;
-[eva] struct3.i:46: 
+[eva:garbled-mix:write] struct3.i:46: Warning: 
   Assigning imprecise value to s2.a.
   The imprecision originates from Arithmetic {struct3.i:46}
 [eva] Recording results for main
 [eva] Done for function main
-[eva:garbled-mix] Warning: 
+[eva:garbled-mix:summary] Warning: 
   Garbled mix generated during analysis:
   {{ garbled mix of &{s1} (origin: Arithmetic {struct3.i:46}) }}
 [eva] struct3.i:42: assertion 'Eva,index_bound' got final status invalid.
