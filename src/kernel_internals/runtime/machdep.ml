@@ -68,6 +68,47 @@ let pp_of_kind =
     "long long", "ll"
   ]
 
+let gen_precise_size_type fmt mach =
+  let open struct type ty = CHAR | SHORT | INT | LONG | LONGLONG end in
+  let all = [CHAR; SHORT; INT; LONG; LONGLONG] in
+  let size_of_ty t =
+    match t with
+    | CHAR -> 1
+    | SHORT -> mach.sizeof_short
+    | INT -> mach.sizeof_int
+    | LONG -> mach.sizeof_long
+    | LONGLONG -> mach.sizeof_longlong
+  in
+  let suffix_of_ty is_signed t =
+    let suff = try
+        List.assoc
+          (match t with
+           | CHAR -> "char"
+           | SHORT -> "short"
+           | INT -> "int"
+           | LONG -> "long"
+           | LONGLONG -> "long long") suff_of_kind
+      with Not_found -> Kernel.fatal "Undefined suffix type"
+    in
+    let suff = (if is_signed then "" else "U")^suff in
+    if suff = "" then "" else "## "^suff
+  in
+  let suffix is_signed n =
+    let t =
+      try
+        List.find (fun i -> size_of_ty i * 8 == n) all
+      with Not_found -> LONGLONG in
+    suffix_of_ty is_signed t
+  in
+  gen_define_string fmt "INT8_C(c)"   ("(c"^(suffix true   8)^")");
+  gen_define_string fmt "INT16_C(c)"  ("(c"^(suffix true  16)^")");
+  gen_define_string fmt "INT32_C(c)"  ("(c"^(suffix true  32)^")");
+  gen_define_string fmt "INT64_C(c)"  ("(c"^(suffix true  64)^")");
+  gen_define_string fmt "UINT8_C(c)"  ("(c"^(suffix false  8)^")");
+  gen_define_string fmt "UINT16_C(c)" ("(c"^(suffix false 16)^")");
+  gen_define_string fmt "UINT32_C(c)" ("(c"^(suffix false 32)^")");
+  gen_define_string fmt "UINT64_C(c)" ("(c"^(suffix false 64)^")")
+
 let max_val bitsize is_signed kind =
   let suff = List.assoc kind suff_of_kind in
   let suff = if is_signed then suff else "U" ^ suff in
@@ -249,6 +290,7 @@ let gen_all_defines fmt mach =
   gen_char_unsigned_flag fmt mach;
   gen_sizeof_std fmt mach;
   gen_char_bit fmt mach;
+  gen_precise_size_type fmt mach;
   gen_define_string fmt "__PTRDIFF_T" mach.ptrdiff_t;
   gen_define_string fmt "__SIZE_T" mach.size_t;
   gen_define_string fmt "__WCHAR_T" mach.wchar_t;

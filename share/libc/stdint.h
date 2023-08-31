@@ -163,16 +163,6 @@ typedef __UINTMAX_T uintmax_t;
 #define WINT_MIN __FC_WINT_MIN
 #define WINT_MAX __FC_WINT_MAX
 
-/* ISO C: 7.18.4 */
-#define INT8_C(c) c
-#define UINT8_C(c) c
-#define INT16_C(c) c
-#define UINT16_C(c) c
-#define INT32_C(c) (c ## L)
-#define UINT32_C(c) (c ## UL)
-#define INT64_C(c) (c ## LL)
-#define UINT64_C(c) (c ## ULL)
-
 #define INTMAX_C(c) (c ## LL)
 #define UINTMAX_C(c) (c ## ULL)
 
