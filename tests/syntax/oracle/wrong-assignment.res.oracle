@@ -1,6 +1,6 @@
 [kernel] Parsing wrong-assignment.i (no preprocessing)
 [kernel] wrong-assignment.i:13: User Error: 
-  implicit cast: ebool -> _Bool
+  cast from ebool to _Bool
   11    void d() {
   12      // this assignment should be rejected
   13      c.a = b;

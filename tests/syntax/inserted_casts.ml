@@ -11,4 +11,4 @@ let print_warning e ot nt =
   nt
 ;;
 
-Cabs2cil.typeForInsertedCast := print_warning
+Cil.typeForInsertedCast := print_warning
