@@ -5924,42 +5924,8 @@ let same_int64 ?(machdep=true) e1 e2 =
   | Some i, Some i' -> Integer.equal i i'
   | _ -> false
 
-
-let mkCastT ?(force=false) ~(oldt: typ) ~(newt: typ) e =
-  let loc = e.eloc in
-  (* Issue #!1546
-     let force = force ||
-      (* see warning of need_cast function:
-         [false] as default value for that option is not safe... *)
-      (match e.enode with | Const(CEnum _) -> false | _ -> true)
-     in *)
-  if need_cast ~force oldt newt then begin
-    let mk_cast exp = (* to new type [newt] *)
-      new_exp ~loc (CastE(type_remove_qualifier_attributes newt,exp))
-    in
-    let normalized_type = type_remove_attributes_for_c_cast (unrollType newt) in
-    (* Watch out for constants and cast of cast to pointer *)
-    match normalized_type, e.enode with
-    (* In the case were we have a representation for the literal,
-       explicitly add the cast. *)
-    | TInt(newik, []), Const(CInt64(i, _, None)) ->
-      kinteger64 ~loc ~kind:newik i
-    | TPtr _, CastE (_, e') ->
-      (match unrollType (typeOf e'), e'.enode with
-       | (TPtr _ as typ''), _ ->
-         (* Old cast can be removed...*)
-         if need_cast ~force newt typ'' then mk_cast e'
-         else (* In fact, both casts can be removed. *) e'
-       | _, Const(CInt64 (i, _, _)) when Integer.is_zero i -> mk_cast e'
-       | _ -> mk_cast e)
-    | _ ->
-      (* Do not remove old casts because they are conversions !!! *)
-      mk_cast e
-  end else
-    e
-
-let mkCast ?force ~(newt: typ) e =
-  mkCastT ?force ~oldt:(typeOf e) ~newt e
+let mkCast_ref : (bool -> typ -> exp -> exp) ref =
+  ref (fun _ _ _ -> assert false)
 
 exception Cannot_combine of string
 
@@ -6101,8 +6067,8 @@ let combineTypesGen ?emitwith (combF : combineFunction)
            evaluate them. Check first machine independent comparison. *)
         let checkEqualSize (machdep: bool) =
           let size_t = theMachine.typeOfSizeOf in
-          let size_t_oldsz' = mkCast ~force:false ~newt:size_t oldsz' in
-          let size_t_sz' = mkCast ~force:false ~newt:size_t sz' in
+          let size_t_oldsz' = !mkCast_ref false size_t oldsz' in
+          let size_t_sz' = !mkCast_ref false size_t sz' in
           ExpStructEqSized.equal
             (constFold machdep size_t_oldsz')
             (constFold machdep size_t_sz')
@@ -6711,6 +6677,8 @@ let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
     | _ -> e1, e2
   in
   mkBinOp ~loc op e1 e2
+
+let () = mkCast_ref := fun force newt e -> mkCast ~check:true ~force ~newt e
 
 type existsAction =
     ExistsTrue                          (* We have found it *)
