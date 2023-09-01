@@ -118,8 +118,8 @@ let setCurrentFile n =
   && n <> "<command line>" (* Clang syntax *)
   && not (Sys.file_exists norm)
   then
-    Kernel.warning ~once:true "file '%s' in line directive not found, ignoring"
-      norm
+    Kernel.warning ~wkey:Kernel.wkey_line_directive ~once:true
+      "ignoring non-existing file '%s', referenced in a line directive" norm
   else begin
     let pos = current.lexbuf.Lexing.lex_curr_p in
     current.lexbuf.Lexing.lex_curr_p <- {
