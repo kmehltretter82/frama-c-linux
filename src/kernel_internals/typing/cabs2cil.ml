@@ -1933,6 +1933,38 @@ struct
   let remove_effects c =
     { c with stmts = List.map remove_effects_stmt c.stmts }
 
+  (* Put chunk inside a block. Optionnaly take a list of varinfo to add to
+     the newly created block. *)
+  let enclose_chunk ~ghost ?(locals=[]) se =
+    let block_chunk = c2stmt_effect ~ghost se in
+    {empty with stmts = [ block_chunk ]; locals}
+
+  (* This function is used to hide a chunk se inside a block and only make
+     visible its result (expr e).
+     We first create a new tmp variable which will store e, we concat both
+     chunks, enclosed it inside a block, and return the resulting chunk and our
+     tmp variable as the new result.
+
+     se : struct X tmp; tmp = ...;
+     e : tmp.arr
+     becomes
+     se' : struct X tmp; tmp = ...; tmp_res = tmp.arr;
+     e' : tmp_res
+  *)
+  let hide_chunk ~ghost ~loc read se e t =
+    let descr =
+      Format.asprintf "%a" Cil_descriptive_printer.pp_exp e
+    in
+    let tmp_res = newTempVar ~ghost loc descr true t in
+    let tmp_res_lv = (Var tmp_res, NoOffset) in
+    let res_instr = Set(tmp_res_lv, e, loc) in
+    let res_stmt = Cil.mkStmtOneInstr ~ghost ~valid_sid res_instr in
+    let res_chunk = i2c (res_stmt, [], [tmp_res_lv], read) in
+    let se_res_chunk = se @@@ (res_chunk, ghost) in
+    let se' = enclose_chunk ~ghost ~locals:[tmp_res] se_res_chunk in
+    let e' = new_exp ~loc (Lval tmp_res_lv) in
+    se', e'
+
   (* the chunks below are used in statements translation. Hence,
      their order of evaluation is always specified, and we can forget their
      effects.
@@ -3387,7 +3419,7 @@ let convBinOp (bop: Cabs.binary_operator) : binop =
 (**** PEEP-HOLE optimizations ***)
 
 (* Should we collapse [tmp = f(); lv = tmp;] where the result type of [f]
-   is [tf], and the [lv] has type [tlv *)
+   is [tf], and the [lv] has type [tlv] *)
 let allow_return_collapse ~tlv ~tf =
   Cil_datatype.Typ.equal tlv tf ||
   Kernel.DoCollapseCallCast.get () &&
@@ -4041,6 +4073,17 @@ let rec checkRestrictQualifierDeep t =
           List.iter (fun (_, t, _) -> checkRestrictQualifierDeep t) args
       end
     | _ -> ()
+
+(* Return true if the given expression is a call or a struct-returning call. *)
+let rec nested_call e =
+  match e.expr_node with
+  | CALL _ -> true
+  | MEMBEROF (e, _ ) -> nested_call e
+  | _ -> false
+
+(* Used to remember if we encountered a access to a field of type array from
+   a struct-returning call. *)
+let contains_problem = ref false
 
 let rec doSpecList ghost (suggestedAnonName: string)
     (* This string will be part of
@@ -5544,6 +5587,7 @@ and doExp local_env
         then r
         else lv':: r
       in
+      contains_problem := (Cil.isArrayType field_type && nested_call e);
       finishExp reads se (new_exp ~loc (Lval lv')) (dropQualifiers field_type)
 
     (* e->str = * (e + off(str)) *)
@@ -8811,6 +8855,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     else begin
       (* TODO: if vi occurs in se4, this is not a real initialization. *)
       vi.vdefined <- true;
+      contains_problem := false;
       let se4, ie', et, r = doInitializer (ghost_local_env ghost) vi inite in
       let se4 = cleanup_autoreference vi se4 in
       (* Fix the length *)
@@ -8829,12 +8874,41 @@ and createLocal ghost ((_, sto, _, _) as specs)
                      a))
          | _, _ -> ());
       (* Now create assignments instead of the initialization *)
-      (se1 @@@ (se4, ghost))
-      @@@
-      (i2c
-         (Cil.mkStmtOneInstr
-            ~ghost ~valid_sid (Local_init(vi,AssignInit ie',loc)),
-          [], [(Var vi,NoOffset)], Cil_datatype.Lval.Set.elements r), ghost)
+      let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
+      let read = Cil_datatype.Lval.Set.elements r in
+      let normal_init_chunk () =
+        let normal_init = Local_init(vi, AssignInit ie', loc) in
+        let normal_stmt = Cil.mkStmtOneInstr ~ghost ~valid_sid normal_init in
+        i2c (normal_stmt, [ ], [ var vi ], read)
+      in
+      let se4', chunk_init =
+        if not !contains_problem then se4, normal_init_chunk ()
+        else begin
+          contains_problem := false;
+          match ie' with
+          (* If ie' is already a tmp variable, enclose the chunk and extract tmp
+             from inner locals to the new block locals.
+          *)
+          | SingleInit {enode=Lval(Var tmp, NoOffset)} when tmp.vtemp ->
+            let locals_no_tmp = List.filter (fun v -> v <> tmp) se4.locals in
+            let se4_without_tmp = {se4 with locals = locals_no_tmp} in
+            let enclosed = enclose_chunk ~ghost ~locals:[tmp] se4_without_tmp in
+            enclosed, normal_init_chunk ()
+          (* In other cases we hide the chunk and use the new tmp variable for
+             the initialization. *)
+          | SingleInit old_e ->
+            let hidden_chunk, new_e =
+              hide_chunk ~ghost ~loc read se4 old_e vi.vtype
+            in
+            let init_exp = SingleInit new_e in
+            let init_instr = Local_init(vi, AssignInit init_exp, loc) in
+            let init_stmt = Cil.mkStmtOneInstr ~ghost ~valid_sid init_instr in
+            let init_vi_chunk = i2c (init_stmt, [ ], [ var vi ], [ ]) in
+            hidden_chunk, init_vi_chunk
+          | _ -> assert false
+        end
+      in
+      (se1 @@@ se4') @@@ chunk_init
     end
 
 and doAliasFun ghost vtype (thisname:string) (othername:string)
