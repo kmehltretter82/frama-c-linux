@@ -2003,7 +2003,7 @@ struct
       { empty with
         stmts = List.map (fun s -> (s,[],[],[],[])) b.bstmts;
         locals = b.blocals }
-    | _ ->i2c (s,[],[],[])
+    | _ -> assert false
 
   (* We can duplicate a chunk if it has a few simple statements, and if
    * it does not have cases, locals or statics *)
@@ -7819,11 +7819,35 @@ and doPureExp local_env (e : Cabs.expression) : exp =
       ~once:true ~current:true "%a has side-effects" Cprint.print_expression e;
   e'
 
+(* If we have a problem :
+    if e result is dropped, then just enclose the block :
+    p = get_x().arr;
+    //becomes
+    {
+      struct X tmp;
+      tmp = get_x();
+      p = tmp.arr
+    }
+    else hide the chunk by creating a new variable to
+    store its result, enclosing it inside a block, and use this tmp as a result.
+   else proceed as usual.
+*)
 and doFullExp local_env const e what =
+  contains_problem := false;
   let (r, se,e,t) = doExp local_env const e what in
-  let se' = add_reads ~ghost:local_env.is_ghost e.eloc r se in
+  let ghost = local_env.is_ghost in
+  let loc = e.eloc in
+  let se', e' =
+    if !contains_problem then begin
+      contains_problem := false;
+      if what = ADrop
+      then enclose_chunk ~ghost (add_reads ~ghost loc r se), e
+      else hide_chunk ~ghost ~loc r se e t
+    end
+    else add_reads ~ghost loc r se, e
+  in
   (* there is a sequence point after a full exp *)
-  empty @@@ (se', local_env.is_ghost),e,t
+  empty @@@ (se', ghost), e',t
 
 and doInitializer local_env (vi: varinfo) (inite: Cabs.init_expression)
   (* Return the accumulated chunk, the initializer and the new type (might be
