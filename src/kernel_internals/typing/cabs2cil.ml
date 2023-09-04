@@ -7788,28 +7788,48 @@ and compileCondExp ~ghost ce st sf =
 
 
 (* A special case for conditionals *)
-and doCondition local_env asconst
+and doCondition ~is_loop local_env asconst
     (* If we are in constants, we do our best to eliminate the conditional *)
     (e: Cabs.expression)
     (st: chunk)
     (sf: chunk) : chunk =
+  let ghost = local_env.is_ghost in
+  contains_problem := false;
   if isEmpty st && isEmpty sf(*TODO: ignore attribute FRAMA_C_KEEP_BLOCK*) then
     begin
-      let (_, se,e,_) = doExp local_env CNoConst e ADrop in
-      if is_dangerous e then begin
-        let ghost = local_env.is_ghost in
-        se @@@ (keepPureExpr ~ghost e e.eloc, ghost)
-      end else begin
-        if (isEmpty se) then begin
-          let name = !currentFunctionFDEC.svar.vorig_name in
-          IgnorePureExpHook.apply (name, e)
-        end;
-        se
+      let (_, se, e, _) = doExp local_env CNoConst e ADrop in
+      let se' =
+        if is_dangerous e then begin
+          se @@@ (keepPureExpr ~ghost e e.eloc, ghost)
+        end else begin
+          if (isEmpty se) then begin
+            let name = !currentFunctionFDEC.svar.vorig_name in
+            IgnorePureExpHook.apply (name, e)
+          end;
+          se
+        end
+      in
+      if !contains_problem then begin
+        contains_problem := false;
+        enclose_chunk ~ghost se'
       end
-    end else begin
+      else se'
+    end
+  else begin
     let ce = doCondExp (no_paren_local_env local_env) asconst e in
-    let chunk = compileCondExp ~ghost:local_env.is_ghost ce st sf in
-    chunk
+    if !contains_problem then begin
+      contains_problem := false;
+      if is_loop then
+        (* enclose our problematic chunk and the break condition. *)
+        enclose_chunk ~ghost (compileCondExp ~ghost ce st sf)
+      else match ce with
+        | CEExp (c, e) ->
+          (* Else if it's a IF, hide chunk result. *)
+          let c', e' = hide_chunk ~ghost ~loc:e.eloc [] c e (typeOf e) in
+          compileCondExp ~ghost (CEExp (c', e')) st sf
+        | _ -> assert false
+    end
+    else compileCondExp ~ghost ce st sf
   end
 
 and doPureExp local_env (e : Cabs.expression) : exp =
@@ -9811,7 +9831,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     let st' = doStatement local_env st in
     let sf' = doStatement local_env sf in
     CurrentLoc.set (convLoc loc);
-    doCondition local_env CNoConst e st' sf'
+    doCondition ~is_loop:false local_env CNoConst e st' sf'
 
   | Cabs.WHILE(a,e,s,loc) ->
     startLoop true;
@@ -9827,7 +9847,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     exitLoop ();
     CurrentLoc.set loc';
     loopChunk ~ghost ~sattr:[Attr("while",[])] a
-      ((doCondition local_env CNoConst e skipChunk break_cond)
+      ((doCondition ~is_loop:true local_env CNoConst e skipChunk break_cond)
        @@@ (s', ghost))
 
   | Cabs.DOWHILE(a, e,s,loc) ->
@@ -9857,6 +9877,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       let s'' =
         consLabContinue ~ghost
           (doCondition
+             ~is_loop:true
              local_env
              CNoConst e skipChunk (breakChunk ~ghost loc'))
       in
@@ -9889,7 +9910,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
         | Cabs.NOTHING -> (* This means true *)
           c
         | _ ->
-          doCondition local_env CNoConst e2 skipChunk break_cond @@@ (c, ghost)
+          doCondition ~is_loop:true local_env CNoConst e2 skipChunk break_cond @@@ (c, ghost)
       in
       let res = se1 @@@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a c, ghost) in
       exitScope ();
