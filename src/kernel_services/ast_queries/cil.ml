@@ -5924,8 +5924,101 @@ let same_int64 ?(machdep=true) e1 e2 =
   | Some i, Some i' -> Integer.equal i i'
   | _ -> false
 
-let mkCast_ref : (bool -> typ -> exp -> exp) ref =
-  ref (fun _ _ _ -> assert false)
+(* how type qualifiers must be checked *)
+type qualifier_check_context =
+  | Identical (* identical qualifiers. *)
+  | IdenticalToplevel (* ignore at toplevel, use Identical when going under a
+                         pointer. *)
+  | Covariant (* first type can have const-qualifications
+                 the second doesn't have. *)
+  | CovariantToplevel
+  (* accepts everything for current type, use Covariant when going under a
+     pointer. *)
+  | Contravariant (* second type can have const-qualifications
+                     the first doesn't have. *)
+  | ContravariantToplevel
+  (* accepts everything for current type, use Contravariant when going under
+     a pointer. *)
+
+let qualifier_context_fun_arg = function
+  | Identical | IdenticalToplevel -> IdenticalToplevel
+  | Covariant | CovariantToplevel -> ContravariantToplevel
+  | Contravariant | ContravariantToplevel -> CovariantToplevel
+
+let qualifier_context_fun_ret = function
+  | Identical | IdenticalToplevel -> IdenticalToplevel
+  | Covariant | CovariantToplevel -> CovariantToplevel
+  | Contravariant | ContravariantToplevel -> ContravariantToplevel
+
+let qualifier_context_ptr = function
+  | Identical | IdenticalToplevel -> Identical
+  | Covariant | CovariantToplevel -> Covariant
+  | Contravariant | ContravariantToplevel -> Contravariant
+
+let included_qualifiers ?(context=Identical) a1 a2 =
+  let a1 = filter_qualifier_attributes a1 in
+  let a2 = filter_qualifier_attributes a2 in
+  let a1 = dropAttribute "restrict" a1 in
+  let a2 = dropAttribute "restrict" a2 in
+  let a1_no_cv = dropAttributes ["const"; "volatile"] a1 in
+  let a2_no_cv = dropAttributes ["const"; "volatile"] a2 in
+  let is_equal = Cil_datatype.Attributes.equal a1 a2 in
+  if is_equal then true
+  else begin
+    match context with
+    | Identical -> false
+    | Covariant -> Cil_datatype.Attributes.equal a1_no_cv a2
+    | Contravariant -> Cil_datatype.Attributes.equal a1 a2_no_cv
+    | CovariantToplevel | ContravariantToplevel | IdenticalToplevel -> true
+  end
+
+(* precondition: t1 and t2 must be "compatible" as per combineTypes, i.e.
+   you must have called [combineTypes t1 t2] before calling this function. *)
+let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
+  match unrollType t1, unrollType t2 with
+  | TFun (tres1, Some args1, _, _), TFun (tres2, Some args2, _, _) ->
+    have_compatible_qualifiers_deep
+      ~context:(qualifier_context_fun_ret context) tres1 tres2 &&
+    let context = qualifier_context_fun_arg context in
+    List.for_all2 (fun (_, t1', a1) (_, t2', a2) ->
+        have_compatible_qualifiers_deep ~context t1' t2' &&
+        included_qualifiers ~context a1 a2)
+      args1 args2
+  | TPtr (t1', a1), TPtr (t2', a2)
+  | TArray (t1', _, a1), TArray (t2', _, a2) ->
+    (included_qualifiers ~context a1 a2) &&
+    let context = qualifier_context_ptr context in
+    have_compatible_qualifiers_deep ~context t1' t2'
+  | _, _ -> included_qualifiers ~context (typeAttrs t1) (typeAttrs t2)
+
+
+(* true if the expression is known to be a boolean result, i.e. 0 or 1. *)
+let rec is_boolean_result e =
+  (isBoolType (typeOf e)) ||
+  match e.enode with
+  | Const _ ->
+    (match isInteger e with
+     | Some i ->
+       Integer.equal i Integer.zero || Integer.equal i Integer.one
+     | None -> false)
+  | CastE (_, e) -> is_boolean_result e
+  | BinOp ((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), _, _, _) -> true
+  | BinOp
+      ((PlusA | PlusPI | MinusA | MinusPI | MinusPP | Mult
+       | Div | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr), _, _, _) -> false
+  | UnOp (LNot, _, _) -> true
+  | UnOp ((Neg | BNot), _, _) -> false
+  | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
+  | AlignOfE _ | AddrOf _ | StartOf _ -> false
+
+
+(** A hook into the code that creates casts.  By default this
+    returns the new type.
+    Casts in the source code are exempt from this hook. *)
+let typeForInsertedCast:
+  (Cil_types.exp -> Cil_types.typ -> Cil_types.typ -> Cil_types.typ) ref =
+  ref (fun _ _ t -> t)
+
 
 exception Cannot_combine of string
 
@@ -5974,7 +6067,7 @@ type combineFunction =
    Note: we cannot force the qualifiers of oldt and t to be the same here,
    because in some cases (e.g. string literals and char pointers) it is
    allowed to have differences, while in others we want to be more strict. *)
-let combineTypesGen ?emitwith (combF : combineFunction)
+let rec combineTypesGen ?emitwith (combF : combineFunction)
     ?(strictInteger=true) ?(strictReturnTypes=false)
     (what : combineWhat) (oldt : typ) (t : typ) : typ =
   let warning = Kernel.warning ?emitwith in
@@ -6067,8 +6160,8 @@ let combineTypesGen ?emitwith (combF : combineFunction)
            evaluate them. Check first machine independent comparison. *)
         let checkEqualSize (machdep: bool) =
           let size_t = theMachine.typeOfSizeOf in
-          let size_t_oldsz' = !mkCast_ref false size_t oldsz' in
-          let size_t_sz' = !mkCast_ref false size_t sz' in
+          let size_t_oldsz' = mkCast ~force:false ~newt:size_t oldsz' in
+          let size_t_sz' = mkCast ~force:false ~newt:size_t sz' in
           ExpStructEqSized.equal
             (constFold machdep size_t_oldsz')
             (constFold machdep size_t_sz')
@@ -6167,7 +6260,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
             Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t))
 
 
-let default_combines = {
+and default_combines = {
   typ_combine = (fun c b ->
       combineTypesGen c ~strictInteger:true ~strictReturnTypes:b);
   enum_combine = (fun _ _ ei -> ei);
@@ -6190,80 +6283,12 @@ let default_combines = {
 }
 
 
-let combineTypes ?(strictReturnTypes=false) what (oldt: typ) (t: typ) : typ =
+and combineTypes ?(strictReturnTypes=false) what (oldt: typ) (t: typ) : typ =
   combineTypesGen default_combines ~strictReturnTypes what oldt t
 
 (***************** Compatibility ******)
 
-
-(* how type qualifiers must be checked *)
-type qualifier_check_context =
-  | Identical (* identical qualifiers. *)
-  | IdenticalToplevel (* ignore at toplevel, use Identical when going under a
-                         pointer. *)
-  | Covariant (* first type can have const-qualifications
-                 the second doesn't have. *)
-  | CovariantToplevel
-  (* accepts everything for current type, use Covariant when going under a
-     pointer. *)
-  | Contravariant (* second type can have const-qualifications
-                     the first doesn't have. *)
-  | ContravariantToplevel
-  (* accepts everything for current type, use Contravariant when going under
-     a pointer. *)
-
-let qualifier_context_fun_arg = function
-  | Identical | IdenticalToplevel -> IdenticalToplevel
-  | Covariant | CovariantToplevel -> ContravariantToplevel
-  | Contravariant | ContravariantToplevel -> CovariantToplevel
-
-let qualifier_context_fun_ret = function
-  | Identical | IdenticalToplevel -> IdenticalToplevel
-  | Covariant | CovariantToplevel -> CovariantToplevel
-  | Contravariant | ContravariantToplevel -> ContravariantToplevel
-
-let qualifier_context_ptr = function
-  | Identical | IdenticalToplevel -> Identical
-  | Covariant | CovariantToplevel -> Covariant
-  | Contravariant | ContravariantToplevel -> Contravariant
-
-let included_qualifiers ?(context=Identical) a1 a2 =
-  let a1 = filter_qualifier_attributes a1 in
-  let a2 = filter_qualifier_attributes a2 in
-  let a1 = dropAttribute "restrict" a1 in
-  let a2 = dropAttribute "restrict" a2 in
-  let a1_no_cv = dropAttributes ["const"; "volatile"] a1 in
-  let a2_no_cv = dropAttributes ["const"; "volatile"] a2 in
-  let is_equal = Cil_datatype.Attributes.equal a1 a2 in
-  if is_equal then true
-  else begin
-    match context with
-    | Identical -> false
-    | Covariant -> Cil_datatype.Attributes.equal a1_no_cv a2
-    | Contravariant -> Cil_datatype.Attributes.equal a1 a2_no_cv
-    | CovariantToplevel | ContravariantToplevel | IdenticalToplevel -> true
-  end
-
-(* precondition: t1 and t2 must be "compatible" as per combineTypes, i.e.
-   you must have called [combineTypes t1 t2] before calling this function. *)
-let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
-  match unrollType t1, unrollType t2 with
-  | TFun (tres1, Some args1, _, _), TFun (tres2, Some args2, _, _) ->
-    have_compatible_qualifiers_deep
-      ~context:(qualifier_context_fun_ret context) tres1 tres2 &&
-    let context = qualifier_context_fun_arg context in
-    List.for_all2 (fun (_, t1', a1) (_, t2', a2) ->
-        have_compatible_qualifiers_deep ~context t1' t2' &&
-        included_qualifiers ~context a1 a2)
-      args1 args2
-  | TPtr (t1', a1), TPtr (t2', a2)
-  | TArray (t1', _, a1), TArray (t2', _, a2) ->
-    (included_qualifiers ~context a1 a2) &&
-    let context = qualifier_context_ptr context in
-    have_compatible_qualifiers_deep ~context t1' t2'
-  | _, _ -> included_qualifiers ~context (typeAttrs t1) (typeAttrs t2)
-
-let compatibleTypes ?strictReturnTypes ?context t1 t2 =
+and compatibleTypes ?strictReturnTypes ?context t1 t2 =
   let r = combineTypes ?strictReturnTypes CombineOther t1 t2 in
   (* C99, 6.7.3 §9: "... to be compatible, both shall have the identically
      qualified version of a compatible type;" *)
@@ -6272,42 +6297,15 @@ let compatibleTypes ?strictReturnTypes ?context t1 t2 =
   (* Note: different non-qualifier attributes will be silently dropped. *)
   r
 
-let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
+and areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
   try
     ignore (compatibleTypes ?strictReturnTypes ?context t1 t2); true
   with Cannot_combine _ -> false
 
 (******************** CASTING *****)
 
-(* true if the expression is known to be a boolean result, i.e. 0 or 1. *)
-let rec is_boolean_result e =
-  (isBoolType (typeOf e)) ||
-  match e.enode with
-  | Const _ ->
-    (match isInteger e with
-     | Some i ->
-       Integer.equal i Integer.zero || Integer.equal i Integer.one
-     | None -> false)
-  | CastE (_, e) -> is_boolean_result e
-  | BinOp ((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), _, _, _) -> true
-  | BinOp
-      ((PlusA | PlusPI | MinusA | MinusPI | MinusPP | Mult
-       | Div | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr), _, _, _) -> false
-  | UnOp (LNot, _, _) -> true
-  | UnOp ((Neg | BNot), _, _) -> false
-  | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
-  | AlignOfE _ | AddrOf _ | StartOf _ -> false
 
-
-(** A hook into the code that creates casts.  By default this
-    returns the new type.
-    Casts in the source code are exempt from this hook. *)
-let typeForInsertedCast:
-  (Cil_types.exp -> Cil_types.typ -> Cil_types.typ -> Cil_types.typ) ref =
-  ref (fun _ _ t -> t)
-
-
-let checkCast ?context ?(fromsource=false) =
+and checkCast ?context ?(fromsource=false) =
   let rec default_rec oldt newt =
     let dkey = Kernel.dkey_typing_cast in
     let result = newt in
@@ -6469,7 +6467,7 @@ let checkCast ?context ?(fromsource=false) =
         Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
   in default_rec
 
-let rec castReduce fromsource force =
+and castReduce fromsource force =
   let dkey = Kernel.dkey_typing_cast in
   let rec rec_default oldt newt e =
     let loc = e.eloc in
@@ -6677,8 +6675,6 @@ let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
     | _ -> e1, e2
   in
   mkBinOp ~loc op e1 e2
-
-let () = mkCast_ref := fun force newt e -> mkCast ~check:true ~force ~newt e
 
 type existsAction =
     ExistsTrue                          (* We have found it *)
