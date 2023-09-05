@@ -91,7 +91,7 @@ let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
          if Cil.intTypeIncluded kind ik then ctx else C_integer kind
        | Some (C_float _ | Rational | Real as ty) ->
          ty)
-    with Cil.Not_representable ->
+    with Interval_utils.Not_representable_ival ->
     match ctx with
     | None | Some(C_integer _ | Gmpz | Nan) -> Gmpz
     | Some (C_float _ | Rational) -> Rational

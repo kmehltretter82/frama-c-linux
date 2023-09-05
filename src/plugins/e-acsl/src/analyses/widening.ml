@@ -48,12 +48,12 @@ let widen_ival_default i1 i2 =
     let lmask = if is_lower l1 l2 then l1 else None in
     let umask = if is_higher u1 u2  then u1 else None in
     Ival (Ival.meet i (Ival.inject_range lmask umask))
-  with Cil.Not_representable -> top_ival
+  with Interval_utils.Not_representable_ival -> top_ival
 
 let widen_ival_precise i1 i2 =
   let i = Ival.join i1 i2 in
   try ignore (ikind_of_ival i); Ival i
-  with Cil.Not_representable -> top_ival
+  with Interval_utils.Not_representable_ival -> top_ival
 
 let chose_widen n i1 i2 =
   match n with
