@@ -169,6 +169,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __gmpz_cmp(__e_acsl_mpz_struct const
 /*@ requires \valid(z1);
     requires \valid_read(z2);
     requires \valid_read(z3);
+    ensures \initialized(\old(z1));
     assigns *z1;
     assigns *z1 \from *z2, *z3;
  */
@@ -397,23 +398,23 @@ int main(void)
     {
       size_t __gen_e_acsl_;
       __e_acsl_mpz_t __gen_e_acsl_tmp_0;
-      __e_acsl_mpz_t __gen_e_acsl___gen_e_acsl_;
-      __e_acsl_mpz_t __gen_e_acsl_mul;
       __e_acsl_mpz_t __gen_e_acsl__2;
+      __e_acsl_mpz_t __gen_e_acsl_mul;
+      __e_acsl_mpz_t __gen_e_acsl__3;
       int __gen_e_acsl_le;
       unsigned long __gen_e_acsl_size;
       __gen_e_acsl_ = (size_t)1;
       __e_acsl_assert_data_t __gen_e_acsl_assert_data =
         {.values = (void *)0};
       __gmpz_init_set_ui(__gen_e_acsl_tmp_0,tmp_0);
-      __gmpz_init_set_ui(__gen_e_acsl___gen_e_acsl_,__gen_e_acsl_);
+      __gmpz_init_set_ui(__gen_e_acsl__2,__gen_e_acsl_);
       __gmpz_init(__gen_e_acsl_mul);
       __gmpz_mul(__gen_e_acsl_mul,
                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_tmp_0),
-                 (__e_acsl_mpz_struct const *)(__gen_e_acsl___gen_e_acsl_));
-      __gmpz_init_set_ui(__gen_e_acsl__2,18446744073709551615UL);
+                 (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
+      __gmpz_init_set_ui(__gen_e_acsl__3,18446744073709551615UL);
       __gen_e_acsl_le = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_mul),
-                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__2));
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl__3));
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"tmp_0",0,
                                      tmp_0);
       __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
@@ -430,9 +431,9 @@ int main(void)
       __gen_e_acsl_size = __gmpz_get_ui((__e_acsl_mpz_struct const *)(__gen_e_acsl_mul));
       __e_acsl_initialize((void *)(buf_0),__gen_e_acsl_size);
       __gmpz_clear(__gen_e_acsl_tmp_0);
-      __gmpz_clear(__gen_e_acsl___gen_e_acsl_);
-      __gmpz_clear(__gen_e_acsl_mul);
       __gmpz_clear(__gen_e_acsl__2);
+      __gmpz_clear(__gen_e_acsl_mul);
+      __gmpz_clear(__gen_e_acsl__3);
     }
     int res = (int)tmp_0;
     if (res == 4) {

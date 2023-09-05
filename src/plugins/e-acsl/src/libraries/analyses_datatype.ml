@@ -250,57 +250,72 @@ module At_data = struct
 end
 
 module Ival_datatype =
-  Datatype.Make_with_collections
-    (struct
-      type t = ival
-      let name = "E_ACSL.Interval.t"
-      let reprs = [ Float (FFloat, Some 0.); Rational; Real; Nan ]
-      include Datatype.Undefined
+struct
+  include
+    Datatype.Make_with_collections
+      (struct
+        type t = ival
+        let name = "E_ACSL.Interval.t"
+        let reprs = [ Float (FFloat, Some 0.); Rational; Real; Nan ]
+        include Datatype.Undefined
 
-      let compare i1 i2 =
-        if i1 == i2 then 0
-        else
-          match i1, i2 with
-          | Ival i1, Ival i2 ->
-            Ival.compare i1 i2
-          | Float (k1, f1), Float (k2, f2) ->
-            (* faster to compare a kind than a float *)
-            let n = Stdlib.compare k1 k2 in
-            if n = 0 then Stdlib.compare f1 f2 else n
-          | Ival _, (Float _ | Rational | Real | Nan)
-          | Float _, (Rational | Real | Nan)
-          | Rational, (Real | Nan)
-          | Real, Nan ->
-            -1
-          | Nan, (Ival _ | Float _ | Rational | Real)
-          | Real, (Ival _ | Float _ | Rational)
-          | Rational, (Ival _ | Float _)
-          | Float _, Ival _ ->
-            1
-          | Rational, Rational | Real, Real | Nan, Nan ->
-            assert false
+        let compare i1 i2 =
+          if i1 == i2 then 0
+          else
+            match i1, i2 with
+            | Ival i1, Ival i2 ->
+              Ival.compare i1 i2
+            | Float (k1, f1), Float (k2, f2) ->
+              (* faster to compare a kind than a float *)
+              let n = Stdlib.compare k1 k2 in
+              if n = 0 then Stdlib.compare f1 f2 else n
+            | Ival _, (Float _ | Rational | Real | Nan)
+            | Float _, (Rational | Real | Nan)
+            | Rational, (Real | Nan)
+            | Real, Nan ->
+              -1
+            | Nan, (Ival _ | Float _ | Rational | Real)
+            | Real, (Ival _ | Float _ | Rational)
+            | Rational, (Ival _ | Float _)
+            | Float _, Ival _ ->
+              1
+            | Rational, Rational | Real, Real | Nan, Nan ->
+              assert false
 
-      let equal = Datatype.from_compare
+        let equal = Datatype.from_compare
 
-      let hash = function
-        | Ival i -> 7 * Ival.hash i
-        | Float(k, f) -> 17 * Hashtbl.hash f + 97 * Hashtbl.hash k
-        | Rational -> 787
-        | Real -> 1011
-        | Nan -> 1277
+        let hash = function
+          | Ival i -> 7 * Ival.hash i
+          | Float(k, f) -> 17 * Hashtbl.hash f + 97 * Hashtbl.hash k
+          | Rational -> 787
+          | Real -> 1011
+          | Nan -> 1277
 
-      let pretty fmt = function
-        | Ival i -> Ival.pretty fmt i
-        | Float(_, Some f) -> Format.pp_print_float fmt f
-        | Float(FFloat, None) -> Format.pp_print_string fmt "float"
-        | Float(FDouble, None) -> Format.pp_print_string fmt "double"
-        | Float(FLongDouble, None) -> Format.pp_print_string fmt "long double"
-        | Rational -> Format.pp_print_string fmt "Rational"
-        | Real -> Format.pp_print_string fmt "Real"
-        | Nan -> Format.pp_print_string fmt "NaN"
+        let pretty fmt = function
+          | Ival i -> Ival.pretty fmt i
+          | Float(_, Some f) -> Format.pp_print_float fmt f
+          | Float(FFloat, None) -> Format.pp_print_string fmt "float"
+          | Float(FDouble, None) -> Format.pp_print_string fmt "double"
+          | Float(FLongDouble, None) -> Format.pp_print_string fmt "long double"
+          | Rational -> Format.pp_print_string fmt "Rational"
+          | Real -> Format.pp_print_string fmt "Real"
+          | Nan -> Format.pp_print_string fmt "NaN"
 
-    end)
+      end)
 
+  let is_included i1 i2 =
+    match i1, i2 with
+    | Ival i1, Ival i2 -> Ival.is_included i1 i2
+    | Float(_k1, _f1), Float(_k2, _f2) -> assert false
+    | Rational, (Rational | Real)
+    | Real, Real
+    | Nan, Nan -> true
+    | Ival _, (Float _ | Rational | Real | Nan)
+    | Float _, (Ival _ | Rational | Real | Nan)
+    | Rational, (Ival _ | Float _ | Nan)
+    | Real, (Ival _ | Float _ | Rational | Nan)
+    | Nan, (Ival _ | Float _ | Rational | Real) -> false
+end
 (* Profiles of functions are the interval ranges of their arguments. For
    memoization purposes, we need need them as keys of hashtables, even though
    they are implemented as maps. Functions typically do not have many arguments
@@ -337,6 +352,7 @@ struct
         let structural_descr = Structural_descr.t_abstract
         let rehash = Datatype.identity
         let name = "E-ACSL.Profile"
+
         let pretty fmt m =
           let first = ref true in
           let pp_vi v i =
@@ -347,11 +363,20 @@ struct
               Logic_var.pretty v Analyses_types.pp_ival i
           in
           Logic_var.Map.iter pp_vi  m
+
       end)
 
   let is_empty = Logic_var.Map.is_empty
 
   let empty = Logic_var.Map.empty
+
+  let is_included p q =
+    Logic_var.Map.for_all
+      (fun lv ival_p ->
+         match Logic_var.Map.find_opt lv q with
+         | None -> false
+         | Some ival_q -> Ival_datatype.is_included ival_p ival_q)
+      p
 end
 
 module Id_term_in_profile =
@@ -418,20 +443,74 @@ module Logic_env
 end
 
 (* Imperative environment to perform fixpoint algorithm for recursive
-   functions *)
+   functions. This environnement store four pieces of information associated
+   to every logic_info:
+   - the current profile in which the interval for the logic_info is infered.
+   - the current interval that it is infered to.
+   - a map associating to each parameter all the arguments in their profiles
+     that this parameter has been called with up until now.
+   - the depth of calls to the fixpoint algorithm associated to the logic_info.
+     When this depth reaches 0, the entry corresponding to the logic_info is
+     cleared thus avoiding unification between two independent calls to the same
+     logic function, which is unsafe.
+
+   The third argument is used so that whenever a parameter of a logic_info is
+   unified by widening with a new value, the interval inference algorithm
+   updates all the arguments that this parameter have been called with, to
+   assign the new interval to it *)
 module LF_env
 = struct
 
-  let tbl = LFProf.Hashtbl.create 17
+  let tbl = Logic_info.Hashtbl.create 17
 
-  let clear () = LFProf.Hashtbl.clear tbl
+  let clear () = Logic_info.Hashtbl.clear tbl
 
-  let find li profile = LFProf.Hashtbl.find tbl (li,profile)
+  let find_profile li =
+    let profile, _, _, _ = Logic_info.Hashtbl.find tbl li in profile
 
-  let add li profile ival = LFProf.Hashtbl.add tbl (li,profile) ival
+  let find_ival li =
+    let _, ival, _, _ = Logic_info.Hashtbl.find tbl li in ival
 
-  let add_pred li profile =
-    LFProf.Hashtbl.add tbl (li,profile) (Ival Ival.zero_or_one)
+  let find_profile_ival li =
+    let profile, ival, _, _ = Logic_info.Hashtbl.find tbl li in profile, ival
+
+  let find_args li =
+    let _, _, args, _ = Logic_info.Hashtbl.find tbl li in args
+
+  let build_map ~profile li args map =
+    List.fold_left2
+      (fun map lv t ->
+         Logic_var.Map.update
+           lv
+           (fun m -> match m with
+              | Some m ->
+                Some (Misc.Id_term.Map.update t (fun _ -> Some profile) m)
+              | None -> Some (Misc.Id_term.Map.(add t profile empty)))
+           map)
+      map
+      li.l_profile
+      args
+
+  let add ~logic_env li args_ival ival args =
+    let profile = Logic_env.get_profile logic_env in
+    let map, n =
+      match Logic_info.Hashtbl.find_opt tbl li with
+      | Some (_,_,map,n) -> map, n
+      | None -> Logic_var.Map.empty, 0
+    in
+    let map = build_map ~profile li args map in
+    Logic_info.Hashtbl.replace tbl li (args_ival, ival, map, n+1)
+
+  let update_ival li ival =
+    let profile, _, args_list, n = Logic_info.Hashtbl.find tbl li in
+    Logic_info.Hashtbl.replace tbl li (profile, ival, args_list, n + 1)
+
+  let decrease li =
+    let profile, ival, args_list, n = Logic_info.Hashtbl.find tbl li in
+    if(n - 1 <= 0) then
+      Logic_info.Hashtbl.remove tbl li
+    else
+      Logic_info.Hashtbl.replace tbl li (profile, ival, args_list, n - 1)
 
   exception Recursive
 
@@ -463,8 +542,6 @@ module LF_env
        with Recursive -> true)
     | LBreads _ | LBnone -> false
     | LBinductive _ -> Error.not_yet "Inductive"
-
-  let replace li args_ival ival = LFProf.Hashtbl.replace tbl (li, args_ival) ival
 
 end
 

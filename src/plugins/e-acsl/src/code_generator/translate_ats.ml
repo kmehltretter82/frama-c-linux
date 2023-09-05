@@ -118,7 +118,7 @@ let rec sizes_and_shifts_from_quantifs ~loc ~logic_env kf lscope sizes_and_shift
         Options.fatal "Unexpected comparison operator"
     in
     Interval.(preprocess_term ~logic_env t_size);
-    let iv = Interval.(extract_ival (get ~logic_env t_size)) in
+    let iv = (Interval.get_ival ~logic_env t_size) in
     (* The EXACT amount of memory that is needed can be known at runtime. This
        is because the tightest bounds for the variables can be known at runtime.
        Example: In the following predicate
@@ -306,11 +306,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
     | [] -> env
     | Lvs_quantif(t1,_,x,_,t2)::lscope ->
       let logic_env = Env.Logic_env.get env in
-      let i =
-        Interval.join
-          (Interval.get ~logic_env t1)
-          (Interval.get ~logic_env t2)
-      in
+      let i = Interval.joins ~logic_env [t2; t1] in
       add_lscope_to_logic_env
         (Env.Logic_env.add env x i)
         lscope

@@ -69,7 +69,7 @@ let rec get_assigns_from ~loc env lprofile lv =
       Smart_exp.lval ~loc (Cil.var var) :: get_assigns_from ~loc env lvars lv
       (* If the argument contains a pointer, but is an integer, then it is
          necessarily a GMP type *)
-    else if lvar.lv_type = Linteger then
+    else if lvar.lv_type = Linteger || Gmp_types.is_t var.vtype then
       (deref_gmp_arg ~loc var) :: (get_assigns_from ~loc env lvars lv)
     else begin
       Options.warning ~current:true "no assigns clause generated for \

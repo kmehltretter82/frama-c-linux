@@ -23,6 +23,8 @@
 open Cil_types
 open Analyses_types
 open Analyses_datatype
+open Interval_utils
+open Cil_datatype
 
 (* Implements Figure 3 of J. Signoles' JFLA'15 paper "Rester statique pour
    devenir plus rapide, plus précis et plus mince".
@@ -33,194 +35,6 @@ module Error = Error.Make(struct let phase = dkey end)
 (* ********************************************************************* *)
 (* Basic datatypes and operations *)
 (* ********************************************************************* *)
-
-let is_included i1 i2 = match i1, i2 with
-  | Ival i1, Ival i2 -> Ival.is_included i1 i2
-  | Float(k1, f1), Float(k2, f2) ->
-    Stdlib.compare k1 k2 <= 0
-    && (match f1, f2 with
-        | None, None | Some _, None -> true
-        | None, Some _ -> false
-        | Some f1, Some f2 -> f1 = f2)
-  | (Ival _ | Float _ | Rational), (Rational | Real)
-  | Real, Real
-  | Nan, Nan ->
-    true
-  (* floats and integer are not comparable: *)
-  | Ival _, Float _ | Float _, Ival _
-  (* nan is comparable to noone, but itself: *)
-  | (Ival _ | Float _ | Rational | Real), Nan
-  | Nan, (Ival _ | Float _ | Rational | Real)
-  (* cases for reals and rationals: *)
-  | Real, (Ival _ | Float _ | Rational)
-  | Rational, (Ival _ | Float _) ->
-    false
-
-let widen = function
-  | Ival iv ->
-    let min, max = Ival.min_and_max iv in
-    Ival (Ival.inject_range min max)
-  | Float _ | Rational | Real | Nan as i -> i
-
-let lift_unop f = function
-  | Ival iv -> Ival (f iv)
-  | Float _ ->
-    (* any unary operator over a float generates a rational
-       TODO: actually, certainly possible to generate a float *)
-    Rational
-  | Rational | Real | Nan as i ->
-    i
-
-let lift_arith_binop f i1 i2 = match i1, i2 with
-  | Ival i1, Ival i2 ->
-    Ival (f i1 i2)
-  | (Ival _ | Float _), Float _
-  | Float _, Ival _
-  | (Ival _ | Float _ | Rational), Rational
-  | Rational, (Ival _ | Float _) ->
-    Rational
-  | (Ival _ | Float _ | Rational | Real), Real
-  | Real, (Ival _ | Float _ | Rational) ->
-    Real
-  | (Ival _ | Float _ | Rational | Real | Nan), Nan
-  | Nan, (Ival _ | Float _ | Rational | Real) ->
-    Nan
-
-let join i1 i2 = match i1, i2 with
-  | Ival iv, i when Ival.is_bottom iv -> i
-  | i, Ival iv when Ival.is_bottom iv -> i
-  | Ival i1, Ival i2 ->
-    Ival (Ival.join i1 i2)
-  | Float(k1, _), Float(k2, _) ->
-    let k = if Cil.frank k1 >= Cil.frank k2 then k1 else k2 in
-    Float(k, None (* lost value, if any before *))
-  | Ival iv, Float(k, _)
-  | Float(k, _), Ival iv ->
-    begin
-      match Ival.min_and_max iv with
-      | None, None ->
-        (* unbounded integers *)
-        Rational
-      | Some min, Some max ->
-        (* if the interval of integers fits into the float types, then return
-           this float type; otherwise return Rational *)
-        (try
-           let to_float n = Int64.to_float (Integer.to_int64_exn n) in
-           let mini, maxi = to_float min, to_float max in
-           let minf, maxf = match k with
-             | FFloat ->
-               Floating_point.most_negative_single_precision_float,
-               Floating_point.max_single_precision_float
-             | FDouble ->
-               -. Float.max_float,
-               Float.max_float
-             | FLongDouble ->
-               raise Exit
-           in
-           if mini >= minf && maxi <= maxf then Float(k, None) else Rational
-         with Z.Overflow | Exit ->
-           Rational)
-      | None, Some _ | Some _, None ->
-        assert false
-    end
-  | (Ival _ | Float _ | Rational), (Float _ | Rational)
-  | Rational, Ival _ ->
-    Rational
-  | (Ival _ | Float _ | Rational | Real), Real
-  | Real, (Ival _ | Float _ | Rational) ->
-    Real
-  | (Ival _ | Float _ | Rational | Real | Nan), Nan
-  | Nan, (Ival _ | Float _ | Rational | Real) ->
-    Nan
-
-let meet i1 i2 = match i1, i2 with
-  | Ival iv, _ when Ival.is_bottom iv -> Ival iv
-  | _, Ival iv when Ival.is_bottom iv -> Ival iv
-  | Ival i1, Ival i2 ->
-    Ival (Ival.meet i1 i2)
-  | Float(k1, Some f1), Float(k2, Some f2) ->
-    if Float.equal f1 f2 then
-      let k = if Cil.frank k1 >= Cil.frank k2 then k2 else k1 in
-      Float (k, Some f1)
-    else Ival Ival.bottom
-  | Float(k, Some f), Float(k', None)
-  | Float(k',None), Float(k, Some f) ->
-    let f_in_k' = match k' with
-      | FFloat ->
-        let minf,maxf =
-          Floating_point.most_negative_single_precision_float,
-          Floating_point.max_single_precision_float
-        in minf <= f && f <= maxf
-      | FDouble
-      | FLongDouble ->
-        true
-    in if f_in_k' then Float(k, Some f) else Ival Ival.bottom
-  | Float(k1, None), Float(k2, None) ->
-    let k = if Cil.frank k1 >= Cil.frank k2 then k2 else k1 in
-    Float(k, None)
-  | Float(k, Some f), Ival iv
-  | Ival iv, Float(k, Some f) ->
-    begin
-      match Ival.min_and_max iv with
-      | None, None ->
-        (* unbounded integers *)
-        Float(k, Some f)
-      | Some min, Some max ->
-        (* if the float type fits into the interval of integers, then return
-           this float type; otherwise return Rational *)
-        (try
-           let to_float n = Int64.to_float (Integer.to_int64_exn n) in
-           let mini, maxi = to_float min, to_float max in
-           if mini <= f && maxi >= f then Float(k, Some f) else Ival Ival.bottom
-         with Z.Overflow | Exit ->
-           Rational)
-      | None, Some _ | Some _, None ->
-        assert false
-    end
-  | Ival iv, Float(k, None)
-  | Float(k, None), Ival iv ->
-    begin
-      match Ival.min_and_max iv with
-      | None, None ->
-        (* unbounded integers *)
-        Float(k, None)
-      | Some min, Some max ->
-        (* if the float type fits into the interval of integers, then return
-           this float type; otherwise return Rational *)
-        (try
-           let to_float n = Int64.to_float (Integer.to_int64_exn n) in
-           let mini, maxi = to_float min, to_float max in
-           let minf, maxf = match k with
-             | FFloat ->
-               Floating_point.most_negative_single_precision_float,
-               Floating_point.max_single_precision_float
-             | FDouble ->
-               -. Float.max_float,
-               Float.max_float
-             | FLongDouble ->
-               raise Exit
-           in
-           if mini <= minf && maxi >= maxf then Float(k, None) else Rational
-         with Z.Overflow | Exit ->
-           Rational)
-      | None, Some _ | Some _, None ->
-        assert false
-    end
-  | (Ival _ | Float _ | Rational), (Float _ | Rational)
-  | Rational, Ival _ ->
-    Rational
-  | (Ival _ | Float _ | Rational | Real), Real
-  | Real, (Ival _ | Float _ | Rational) ->
-    Real
-  | (Ival _ | Float _ | Rational | Real | Nan), Nan
-  | Nan, (Ival _ | Float _ | Rational | Real) ->
-    Nan
-
-let () = Logic_env.ival_meet_ref := meet
-
-let is_singleton_int = function
-  | Ival iv -> Ival.is_singleton_int iv
-  | Float _ | Rational | Real | Nan -> false
 
 (* TODO: soundness of any downcast is not checked *)
 let cast ~src ~dst = match src, dst with
@@ -255,139 +69,46 @@ let max_delta (min1, _) (_, max2) = match min1, max2 with
   | Some m1, Some m2 -> Some (length m2 m1)
   | _, None | None, _ -> None
 
-(* ********************************************************************* *)
-(* constructors and destructors *)
-(* ********************************************************************* *)
+(* Compute the smallest type (bigger than [int]) which can contain the whole
+   interval. It is the \theta operator of the JFLA's paper. *)
+let ty_of_interv ?ctx ?(use_gmp_opt = false) = function
+  | Float(fk, _) -> C_float fk
+  | Rational -> Rational
+  | Real -> Real
+  | Nan -> Nan
+  | Ival iv ->
+    try
+      let kind = ikind_of_ival iv in
+      (match ctx with
+       | None
+       | Some Nan ->
+         C_integer kind
+       | Some Gmpz ->
+         if use_gmp_opt then Gmpz else C_integer kind
+       | Some (C_integer ik as ctx) ->
+         (* return [ctx] type for types smaller than int to prevent superfluous
+            casts in the generated code *)
+         if Cil.intTypeIncluded kind ik then ctx else C_integer kind
+       | Some (C_float _ | Rational | Real as ty) ->
+         ty)
+    with Interval_utils.Not_representable_ival ->
+    match ctx with
+    | None | Some(C_integer _ | Gmpz | Nan) -> Gmpz
+    | Some (C_float _ | Rational) -> Rational
+    | Some Real -> Real
 
-let extract_ival = function
-  | Ival iv -> iv
-  | Float _ | Rational | Real | Nan -> assert false
-
-let bottom = Ival Ival.bottom
-let top_ival = Ival (Ival.inject_range None None)
-let singleton n = Ival (Ival.inject_singleton n)
-let singleton_of_int n = singleton (Integer.of_int n)
-let ival min max = Ival (Ival.inject_range (Some min) (Some max))
-
-let interv_of_unknown_block =
-  (* since we have no idea of the size of this block, we take the largest
-     possible one which is unfortunately quite large *)
-  lazy (ival Integer.zero (Bit_utils.max_byte_address ()))
+let is_included_in_typ i typ = is_included i (interv_of_typ typ)
 
 (* ********************************************************************* *)
 (* main algorithm *)
 (* ********************************************************************* *)
-
-(* The boolean indicates whether we have real numbers *)
-let rec interv_of_typ ty = match Cil.unrollType ty with
-  | TInt (k,_) as ty ->
-    let n = Cil.bitsSizeOf ty in
-    let l, u =
-      if Cil.isSigned k then Cil.min_signed_number n, Cil.max_signed_number n
-      else Integer.zero, Cil.max_unsigned_number n
-    in
-    ival l u
-  | TEnum(enuminfo, _) ->
-    interv_of_typ (TInt(enuminfo.ekind, []))
-  | _ when Gmp_types.Z.is_t ty ->
-    top_ival
-  | TFloat (k, _) ->
-    Float(k, None)
-  | _ when Gmp_types.Q.is_t ty ->
-    Rational (* only rationals are implemented *)
-  | TVoid _ | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list _ ->
-    Nan
-  | TNamed _ ->
-    assert false
-
-let extended_interv_of_typ ty = match interv_of_typ ty with
-  | Ival iv ->
-    let l,u = Ival.min_int iv, Ival.max_int iv in
-    let u = match u with
-      | Some u -> Some (Integer.add u Integer.one)
-      | None -> None
-    in
-    Ival (Ival.inject_range l u);
-  | Rational | Real | Nan | Float (_,_) as i
-    -> i
-
-let interv_of_logic_typ = function
-  | Ctype ty -> interv_of_typ ty
-  | Linteger -> top_ival
-  | Lreal -> Real
-  | Ltype _ -> Error.not_yet "user-defined logic type"
-  | Lvar _ -> Error.not_yet "type variable"
-  | Larrow _ -> Nan
-
-exception Not_representable_ival
-let ikind_of_ival iv =
-  if Ival.is_bottom iv then IInt
-  else match Ival.min_and_max iv with
-    | Some l, Some u ->
-      begin
-        try
-          let is_pos = Integer.ge l Integer.zero in
-          let lkind = Cil.intKindForValue l is_pos in
-          let ukind = Cil.intKindForValue u is_pos in
-          (* kind corresponding to the interval *)
-          let kind = if Cil.intTypeIncluded lkind ukind then ukind else lkind in
-          (* convert the kind to [IInt] whenever smaller. *)
-          if Cil.intTypeIncluded kind IInt then IInt else kind
-        with Cil.Not_representable ->
-          raise Not_representable_ival
-      end
-    | None, None -> raise Not_representable_ival (* GMP *)
-    (* TODO: do not raise an exception, but returns a value instead *)
-    | None, Some _ | Some _, None ->
-      (* Semi-open interval that can happen when computing the interval of shift
-         operations if the computation overflows *)
-      (* TODO: do not raise an exception, but returns a value instead *)
-      raise Not_representable_ival (* GMP *)
-
-
-let interv_of_typ_containing_interv = function
-  | Float _ | Rational | Real | Nan as x ->
-    x
-  | Ival i ->
-    try
-      let kind = ikind_of_ival i in
-      interv_of_typ (TInt(kind, []))
-    with Not_representable_ival ->
-      top_ival
-
-let widen_profile =
-  Cil_datatype.Logic_var.Map.map interv_of_typ_containing_interv
-
-let rec fixpoint ~(infer : force:bool ->
-                   logic_env:Logic_env.t ->
-                   term ->
-                   ival Error.result)
-    li args_ival t' ival =
-  let get_res = Error.map (fun x -> x) in
-  let logic_env = Logic_env.make args_ival in
-  (* If the logic function has a given C type, we use this type to infer the
-     interval. Otherwise we compute this interval as a fixpoint *)
-  match li.l_type with
-  | Some (Ctype typ) ->
-    let ival = interv_of_typ typ in
-    LF_env.add li args_ival ival;
-    ignore (infer ~force:true ~logic_env t');
-    ival
-  | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
-    LF_env.replace li args_ival ival;
-    let inferred_ival = get_res (infer ~force:true ~logic_env t') in
-    if is_included inferred_ival ival
-    then
-      ival
-    else
-      let assumed_ival = interv_of_typ_containing_interv inferred_ival in
-      fixpoint ~infer li args_ival t' assumed_ival
 
 (* Memoization module which retrieves the computed info of some terms *)
 module Memo: sig
   val memo:
     force_infer:bool -> Profile.t -> (term -> ival) -> term -> ival Error.result
   val get: Profile.t -> term -> ival Error.result
+  val replace : Profile.t -> term -> ival -> unit
   val clear: unit -> unit
 end = struct
   (* The comparison over terms is the physical equality. It cannot be the
@@ -423,6 +144,7 @@ end = struct
       val get : X.Hashtbl.key -> ival Error.result
       val memo : force_infer:bool -> (term -> ival) -> term -> X.Hashtbl.key ->
         (ival, exn) Result.t
+      val replace : X.Hashtbl.key -> ival -> unit
     end = struct
     let get k =
       try X.Hashtbl.find Tbl.tbl k
@@ -441,10 +163,14 @@ end = struct
         with Not_found ->
           let x =
             try Result.Ok (f t);
-            with Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
+            with
+              Error.Not_yet _ | Error.Typing_error _ as exn -> Result.Error exn
           in
           X.Hashtbl.add Tbl.tbl k x;
           x
+
+    let replace x i =
+      X.Hashtbl.replace Tbl.tbl x (Ok i)
   end
 
   module Nondep = Accesses (Misc.Id_term) (struct let tbl = nondep_tbl end)
@@ -460,37 +186,41 @@ end = struct
     then Nondep.memo ~force_infer f t t
     else Dep.memo ~force_infer f t (t,profile)
 
+  let replace profile t i =
+    if Profile.is_empty profile
+    then Nondep.replace t i
+    else Dep.replace (t,profile) i
+
   let clear () =
     Options.feedback ~level:4 "clearing the typing tables";
     Misc.Id_term.Hashtbl.clear nondep_tbl;
     Id_term_in_profile.Hashtbl.clear dep_tbl
 end
 
-(* For recursive functions, it is necessary to use a widened profile to query
-   the table (because of the fixpoint algorithm). This module associates to a
-   term in a profile, the profile that should be used to query the table *)
-module Widened_profile: sig
-  val get: Profile.t -> logic_info -> Profile.t
-  val add: Profile.t -> logic_info -> Profile.t -> unit
-  val clear: unit -> unit
-end = struct
+(* When performing fixpoint algorithm on function arguments, we may want to
+   forcefully replace the interval inferred by the algorithm with a larger
+   interval
+   -[replace_args_ival] performs this operation for a given list of arguments
+   corresponding to a particular call
+   - [replace_all_args_ival] performs this operation for all arguments that have
+     been called by this function during the same recursive calls. *)
 
-  let widened_profile_tbl : Profile.t LFProf.Hashtbl.t
-    = LFProf.Hashtbl.create 97
+let replace_args_ival ~logic_env li args args_ival =
+  let profile = Logic_env.get_profile logic_env in
+  List.iter2
+    (fun x t -> Memo.replace profile t (Logic_var.Map.find x args_ival))
+    li.l_profile
+    args
 
-  let get profile li =
-    LFProf.Hashtbl.find_def widened_profile_tbl (li, profile) profile
-
-  let add profile i args_ival =
-    LFProf.Hashtbl.add widened_profile_tbl (i, profile) args_ival
-
-  let clear () =
-    Options.feedback ~level:4 "clearing the typing tables";
-    LFProf.Hashtbl.clear widened_profile_tbl
-end
-
-let plus_one i =
-  lift_arith_binop Ival.add_int i (singleton Integer.one)
+let replace_all_args_ival li args_ival =
+  let args_map = LF_env.find_args li in
+  List.iter
+    (fun x ->
+       let i = Logic_var.Map.find x args_ival in
+       (Misc.Id_term.Map.iter
+          (fun t profile -> Memo.replace profile t i)
+          (Logic_var.Map.find x args_map)))
+    li.l_profile
 
 (* ********************************************************************* *)
 (* Main functions *)
@@ -604,6 +334,19 @@ let rec infer ~force ~logic_env t =
   let get_cty t = match t.term_type with Ctype ty -> ty | _ -> assert false in
   let get_res = Error.map (fun x -> x) in
   let t = Logic_normalizer.get_term t in
+  let ival_arith_binop = function
+    | PlusA -> Ival.add_int
+    | MinusA -> Ival.sub_int
+    | Mult -> Ival.mul
+    | Div -> Ival.div
+    | Mod -> Ival.c_rem
+    | Shiftlt -> Ival.shift_left
+    | Shiftrt -> Ival.shift_right
+    | BAnd -> Ival.bitwise_and
+    | BXor -> Ival.bitwise_xor
+    | BOr -> Ival.bitwise_or
+    | _ -> assert false
+  in
   let compute t =
     match t.term_node with
     | TConst (Integer (n, _)) -> singleton n
@@ -643,46 +386,12 @@ let rec infer ~force ~logic_env t =
       ignore (infer ~force ~logic_env t2);
       Ival Ival.zero_or_one
 
-    | TBinOp (PlusA, t1, t2) ->
+    | TBinOp ((PlusA | MinusA | Mult | Div | Mod | Shiftlt
+              | Shiftrt | BAnd | BXor | BOr) as op , t1, t2) ->
       let i1 = infer ~force ~logic_env t1 in
       let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.add_int) i1 i2
-    | TBinOp (MinusA, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.sub_int) i1 i2
-    | TBinOp (Mult, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.mul) i1 i2
-    | TBinOp (Div, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.div) i1 i2
-    | TBinOp (Mod, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.c_rem) i1 i2
-    | TBinOp (Shiftlt, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.shift_left) i1 i2
-    | TBinOp (Shiftrt, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.shift_right) i1 i2
-    | TBinOp (BAnd, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.bitwise_and) i1 i2
-    | TBinOp (BXor, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.bitwise_xor) i1 i2
-    | TBinOp (BOr, t1, t2) ->
-      let i1 = infer ~force ~logic_env t1 in
-      let i2 = infer ~force ~logic_env t2 in
-      Error.map2 (lift_arith_binop Ival.bitwise_or) i1 i2
+      Error.map2 (lift_arith_binop (ival_arith_binop op)) i1 i2
+
     | TCastE (ty, t) ->
       let src = infer ~force ~logic_env t in
       let dst = interv_of_typ ty in
@@ -735,7 +444,7 @@ let rec infer ~force ~logic_env t =
     | Tapp (li,_,args) ->
       (match li.l_body with
        | LBpred _ | LBterm _ ->
-         let profile =
+         let call_profile =
            Profile.make
              li.l_profile
              (List.map
@@ -743,22 +452,30 @@ let rec infer ~force ~logic_env t =
                 args)
          in
          if LF_env.is_rec li then
-           let widened_profile = widen_profile profile in
-           Widened_profile.add profile li widened_profile;
-           try LF_env.find li widened_profile
-           with
-           | Not_found ->
-             (match li.l_body with
-              | LBpred p ->
-                LF_env.add_pred li widened_profile;
-                infer_predicate
-                  ~logic_env:(Logic_env.make widened_profile) p;
-                Ival Ival.zero_or_one
-              | LBterm t' ->
-                fixpoint ~infer li widened_profile t' (Ival Ival.bottom)
-              | _ -> assert false)
+           try
+             let known_profile, ival = LF_env.find_profile_ival li in
+             if Profile.is_included call_profile known_profile
+             then
+               (replace_args_ival ~logic_env li args known_profile;
+                ival)
+             else
+               let
+                 ext_profile =
+                 Widening.widen_profile li known_profile call_profile
+               in
+               initiate_fixpoint ~logic_env li ext_profile args
+           with Not_found ->
+             let known_profile = Profile.make
+                 li.l_profile
+                 (List.init (List.length li.l_profile) (fun _ -> bottom))
+             in
+             let
+               ext_profile =
+               Widening.widen_profile li known_profile call_profile
+             in
+             initiate_fixpoint ~logic_env li ext_profile args
          else
-           let logic_env = Logic_env.make profile in
+           let logic_env = Logic_env.make call_profile in
            (match li.l_body with
             | LBpred p ->
               ignore (infer_predicate ~logic_env p);
@@ -858,6 +575,40 @@ let rec infer ~force ~logic_env t =
     (Logic_env.get_profile logic_env)
     compute
     t
+
+and initiate_fixpoint ~logic_env li args_ival args =
+  let logic_env_call = Logic_env.make args_ival in
+  let ival, pot = match li.l_body with
+    | LBpred p -> Ival (Ival.zero_or_one), PoT_pred p
+    | LBterm t ->
+      (match li.l_type with
+       | Some (Ctype typ) ->
+         interv_of_typ typ, PoT_term t
+       | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
+         Ival (Ival.bottom), PoT_term t)
+    | _ -> assert false
+  in
+  LF_env.add ~logic_env li args_ival ival args;
+  replace_all_args_ival li args_ival;
+  let res = fixpoint logic_env_call li pot in
+  LF_env.decrease li;
+  res
+
+and fixpoint logic_env li pot =
+  let get_res = Error.map (fun x -> x) in
+  let ival = LF_env.find_ival li in
+  let inferred_ival =
+    match pot with
+    | PoT_term t -> get_res (infer ~force:true ~logic_env t)
+    | PoT_pred p -> infer_predicate ~logic_env p; Ival Ival.zero_or_one
+  in
+  if is_included inferred_ival ival
+  then
+    ival
+  else
+    (LF_env.update_ival li (Widening.widen li ival inferred_ival);
+     let ival = fixpoint logic_env li pot
+     in LF_env.decrease li; ival)
 
 and infer_term_lval ~force ~logic_env (host, offset as tlv) =
   match offset with
@@ -959,7 +710,7 @@ and compute_logic_env_if_branches logic_env t =
     end
   | _ -> t_branch, f_branch
 
-(* [type_bound_variables] infers an interval associated with each of
+(* [infer_bound_variables] infers an interval associated with each of
    the provided bounds of a quantified variable, and provides a term
    accordingly. It could happen that the bounds provided for a quantifier
    [lv] are bigger than its type. [type_bound_variables] handles such cases
@@ -978,7 +729,7 @@ and infer_bound_variable ~loc ~logic_env (t1, lv, t2) =
   let get_res = Error.map (fun x -> x) in
   let i1 = get_res (infer ~force:false ~logic_env t1) in
   let i2 = get_res (infer ~force:false ~logic_env t2) in
-  let i = widen (join i1 i2) in
+  let i = unify (join i1 i2) in
   let t1, t2, i =
     match lv.lv_type with
     | Ltype _ | Lvar _ | Lreal | Larrow _ ->
@@ -1031,13 +782,16 @@ and infer_predicate ~logic_env p =
            args)
     in
     (match li.l_body with
-     | LBpred p when LF_env.is_rec li ->
-       let widened_profile = widen_profile profile in
-       Widened_profile.add profile li widened_profile;
-       (try ignore (LF_env.find li widened_profile)
-        with Not_found ->
-          LF_env.add_pred li widened_profile;
-          infer_predicate ~logic_env:(Logic_env.make widened_profile) p)
+     | LBpred _ when LF_env.is_rec li ->
+       (try
+          let known_profile = LF_env.find_profile li in
+          if Profile.is_included profile known_profile
+          then
+            replace_args_ival ~logic_env li args known_profile
+          else
+            let ext_profile = Widening.widen_profile li known_profile profile in
+            ignore (initiate_fixpoint ~logic_env li ext_profile args)
+        with Not_found -> ignore (initiate_fixpoint ~logic_env li profile args))
      | LBpred p ->
        let logic_env = Logic_env.make profile in
        ignore (infer_predicate ~logic_env p)
@@ -1160,11 +914,22 @@ let get_from_profile ~profile t =
 let get ~logic_env =
   get_from_profile ~profile:(Logic_env.get_profile logic_env)
 
-let get_widened_profile = Widened_profile.get
+let joins ~logic_env terms =
+  List.fold_right (fun t acc -> join (get ~logic_env t) acc) terms bottom
+
+let joins_from_profile ~profile terms =
+  List.fold_right (fun t acc -> join (get_from_profile ~profile t) acc) terms bottom
+
+let join_plus_one ~profile t1 t2 =
+  let plus_one i = lift_arith_binop Ival.add_int i (singleton Integer.one)
+  in
+  join (plus_one (get_from_profile ~profile t1)) (get_from_profile ~profile t2)
+
+let get_ival ~logic_env t =
+  extract_ival (get ~logic_env t)
 
 let clear () =
   Memo.clear();
-  Widened_profile.clear();
   LF_env.clear()
 
 (*
