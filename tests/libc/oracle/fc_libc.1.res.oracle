@@ -6594,7 +6594,7 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream)
       _LOR_1:
       {
         *lineptr = (char *)malloc((size_t)2);
-        if (! lineptr) {
+        if (! *lineptr) {
           __fc_errno = 12;
           __retres = -1;
           goto return_label;
