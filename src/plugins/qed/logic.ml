@@ -485,6 +485,17 @@ sig
       @before 22.0-Titanium the optional [force] parameter does not exist
   *)
 
+  val set_builtin_field :
+    ?force: bool -> Fun.t -> Field.t -> (term list -> term) -> unit
+  (** Register a builtin for simplifying [(f e…).fd] expressions.
+        {b Must} only use recursive comparison for strictly smaller terms.
+
+        The [force] parameters defaults to [false], when it is [true], if there
+        exist another builtin, it is replaced with the new one. Use with care.
+
+        @since Frama-C+dev
+  *)
+
   val set_builtin_eq :
     ?force: bool -> Fun.t -> (term -> term -> term) -> unit
   (** Register a builtin equality for comparing any term with head-symbol.
