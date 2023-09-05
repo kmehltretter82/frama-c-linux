@@ -6067,7 +6067,7 @@ type combineFunction =
    Note: we cannot force the qualifiers of oldt and t to be the same here,
    because in some cases (e.g. string literals and char pointers) it is
    allowed to have differences, while in others we want to be more strict. *)
-let rec combineTypesGen ?emitwith (combF : combineFunction)
+let combineTypesGen ?emitwith (combF : combineFunction)
     ?(strictInteger=true) ?(strictReturnTypes=false)
     (what : combineWhat) (oldt : typ) (t : typ) : typ =
   let warning = Kernel.warning ?emitwith in
@@ -6159,12 +6159,9 @@ let rec combineTypesGen ?emitwith (combF : combineFunction)
         (* They are not structurally equal. But perhaps they are equal if we
            evaluate them. Check first machine independent comparison. *)
         let checkEqualSize (machdep: bool) =
-          let size_t = theMachine.typeOfSizeOf in
-          let size_t_oldsz' = mkCast ~force:false ~newt:size_t oldsz' in
-          let size_t_sz' = mkCast ~force:false ~newt:size_t sz' in
-          ExpStructEqSized.equal
-            (constFold machdep size_t_oldsz')
-            (constFold machdep size_t_sz')
+          match constFoldToInt ~machdep oldsz', constFoldToInt ~machdep sz' with
+          | Some m, Some n -> m = n
+          | _ -> ExpStructEqSized.equal oldsz' sz'
         in
         if checkEqualSize false then
           oldsz
@@ -6260,7 +6257,7 @@ let rec combineTypesGen ?emitwith (combF : combineFunction)
             Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t))
 
 
-and default_combines = {
+let default_combines = {
   typ_combine = (fun c b ->
       combineTypesGen c ~strictInteger:true ~strictReturnTypes:b);
   enum_combine = (fun _ _ ei -> ei);
@@ -6283,12 +6280,12 @@ and default_combines = {
 }
 
 
-and combineTypes ?(strictReturnTypes=false) what (oldt: typ) (t: typ) : typ =
+let combineTypes ?(strictReturnTypes=false) what (oldt: typ) (t: typ) : typ =
   combineTypesGen default_combines ~strictReturnTypes what oldt t
 
 (***************** Compatibility ******)
 
-and compatibleTypes ?strictReturnTypes ?context t1 t2 =
+let compatibleTypes ?strictReturnTypes ?context t1 t2 =
   let r = combineTypes ?strictReturnTypes CombineOther t1 t2 in
   (* C99, 6.7.3 §9: "... to be compatible, both shall have the identically
      qualified version of a compatible type;" *)
@@ -6297,7 +6294,7 @@ and compatibleTypes ?strictReturnTypes ?context t1 t2 =
   (* Note: different non-qualifier attributes will be silently dropped. *)
   r
 
-and areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
+let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
   try
     ignore (compatibleTypes ?strictReturnTypes ?context t1 t2); true
   with Cannot_combine _ -> false
@@ -6305,7 +6302,7 @@ and areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
 (******************** CASTING *****)
 
 
-and checkCast ?context ?(fromsource=false) =
+let checkCast ?context ?(fromsource=false) =
   let rec default_rec oldt newt =
     let dkey = Kernel.dkey_typing_cast in
     let result = newt in
@@ -6467,7 +6464,7 @@ and checkCast ?context ?(fromsource=false) =
         Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
   in default_rec
 
-and castReduce fromsource force =
+let rec castReduce fromsource force =
   let dkey = Kernel.dkey_typing_cast in
   let rec rec_default oldt newt e =
     let loc = e.eloc in
