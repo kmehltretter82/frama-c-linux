@@ -91,3 +91,7 @@ val mk_behavior :
 
 val mk_asm_templates : string list -> string list
 val mk_attr_annot : string -> Cabs.attribute
+(** builds a Cabs attribute annotation
+
+    @since Frama-C+dev 
+*)
