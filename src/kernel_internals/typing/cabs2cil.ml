@@ -3909,7 +3909,7 @@ let continueUsed () =
 (* JS: return [Some s] if the attribute string is the attribute annotation [s]
    and [None] if it is not an annotation. *)
 let attrAnnot s =
-  let r = Str.regexp "/\\*@ \\(.+\\) \\*/" in
+  let r = Str.regexp "~attrannot:\\(.+\\)" in
   if Str.string_match r s 0 then
     try Some (Str.matched_group 1 s) with Not_found -> assert false
   else
@@ -4669,7 +4669,7 @@ and convertCVtoAttr (src: Cabs.cvspec list) : Cabs.attribute list =
   | CV_CONST    :: tl -> ("const",[])    :: (convertCVtoAttr tl)
   | CV_VOLATILE :: tl -> ("volatile",[]) :: (convertCVtoAttr tl)
   | CV_RESTRICT :: tl -> ("restrict",[]) :: (convertCVtoAttr tl)
-  | CV_ATTRIBUTE_ANNOT a :: tl -> (mkAttrAnnot a, []) :: convertCVtoAttr tl
+  | CV_ATTRIBUTE_ANNOT a :: tl -> (Cabshelper.mk_attr_annot a) :: convertCVtoAttr tl
   | CV_GHOST    :: tl -> ("ghost",[]) :: (convertCVtoAttr tl)
 
 and makeVarInfoCabs

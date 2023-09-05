@@ -2237,7 +2237,13 @@ class cil_printer () = object (self)
               (Pretty_utils.pp_list ~sep:"," self#attrparam) args);
          true)
     | AttrAnnot s ->
-      fprintf fmt "%s" (Cil.mkAttrAnnot s); false
+      let block = false in
+      fprintf fmt "%t %s %t"
+        (fun fmt -> self#pp_open_annotation ~block fmt)
+        s
+        (fun fmt -> self#pp_close_annotation ~block fmt);
+
+      false
 
   method private attribute_prec (contextprec: int) fmt (a: attrparam) =
     let thisLevel = Precedence.getParenthLevelAttrParam a in
