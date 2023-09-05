@@ -6541,7 +6541,12 @@ and mkCastTGen ?(check=true) ?context ?(fromsource=false) ?(force=false)
   then
     begin
       Kernel.debug ~dkey "no cast to perform";
-      (oldt, e)
+      let returned_type =
+        match newt with
+        | TNamed _ -> newt
+        | _ -> oldt
+      in
+      (returned_type, e)
     end
   else
     let newt = if fromsource then newt else !typeForInsertedCast e oldt newt in
