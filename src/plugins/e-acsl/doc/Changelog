@@ -25,6 +25,12 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
+- E-ACSL        [2023-09-05] Generate more efficient code for arithmetic
+	        calculations. This is achieved by appraising more precisely the
+	        possible values an arithmetic variable can take. This allows in many
+	        cases for native computations instead of generating slower GMP code.
+	        Introduces new flags: -e-acsl-widening-*
+
 ###############################################################################
 Plugin E-ACSL 27.1 (Cobalt)
 ###############################################################################
