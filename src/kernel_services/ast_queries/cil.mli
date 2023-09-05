@@ -1165,8 +1165,18 @@ val need_cast: ?force:bool -> typ -> typ -> bool
     in the source code are exempt from this hook.
 
     @since Frama-C+dev*)
-val typeForInsertedCast:
-  (Cil_types.exp -> Cil_types.typ -> Cil_types.typ -> Cil_types.typ) ref
+val typeForInsertedCast: (exp -> typ -> typ -> typ) ref
+
+(** [checkCast context fromsource oldt newt] throw a warning or an error
+    if the cast from [oldt] to [newt] is invalid.
+    Otherwise, doesn't make anything.
+    [fromsource] is [false] (default) if the cast is not from the source.
+    Check [areCompatibleTypes] documentation for [context].
+
+    @since Frama-C+dev*)
+val checkCast:
+  ?context:qualifier_check_context -> ?fromsource:bool -> typ -> typ -> unit
+
 
 (** Generic version of {!Cil.mkCastT}.
     Construct a cast when having the old type of the expression.

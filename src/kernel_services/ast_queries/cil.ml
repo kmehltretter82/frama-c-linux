@@ -6305,7 +6305,6 @@ let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
 let checkCast ?context ?(fromsource=false) =
   let rec default_rec oldt newt =
     let dkey = Kernel.dkey_typing_cast in
-    let result = newt in
     let error s =
       if fromsource
       then abort_context s
@@ -6314,39 +6313,38 @@ let checkCast ?context ?(fromsource=false) =
     match unrollType oldt, unrollType newt with
     | TNamed _, _
     | _, TNamed _ -> Kernel.fatal ~current:true "unrollType failed in checkCast"
-    | t, TInt (IBool, _) when isScalarType t -> result
-    | TInt _, TInt _ -> result
-    | TFloat _, TInt _ -> (* ISO 6.3.1.4.1 *) result
-    | TInt _, TFloat _ -> (* ISO 6.3.1.4.2 *) result
-    | TFloat _, TFloat _ -> (* ISO 6.3.1.5.1 *) result
+    | t, TInt (IBool, _) when isScalarType t -> ()
+    | TInt _, TInt _ -> ()
+    | TFloat _, TInt _ -> (* ISO 6.3.1.4.1 *) ()
+    | TInt _, TFloat _ -> (* ISO 6.3.1.4.2 *) ()
+    | TFloat _, TFloat _ -> (* ISO 6.3.1.5.1 *) ()
 
     (* ISO 6.4.4.3 is only about enum constant but ccomp is more permissive. *)
     | TEnum _, (TInt _ | TFloat _ | TPtr _ | TEnum _)
-    | TFloat _ , TEnum _ -> result
+    | TFloat _ , TEnum _ -> ()
     | TPtr _, TEnum _ ->
       Kernel.debug ~dkey ~current:true
-        "Casting a pointer into an enumeration type" ;
-      result
-    | TInt _, TEnum _ -> result
+        "Casting a pointer into an enumeration type"
+    | TInt _, TEnum _ -> ()
 
     | _, TVoid _ ->
       (* ISO 6.3.2.2 *)
       Kernel.debug ~level:3
-        "Casting a value into void: expr is evaluated for side effects";
-      result
-    | TPtr (t, _), TPtr (TVoid _, _) when isObjectType t -> (* ISO 6.3.2.3.1 *) result
-    | TPtr (TVoid _, _), TPtr (t, _) when isObjectType t -> (* ISO 6.3.2.3.1 *) result
-    | TInt _, TPtr _ -> (* ISO 6.3.2.3.5 *) result
+        "Casting a value into void: expr is evaluated for side effects"
+    | TPtr (t, _), TPtr (TVoid _, _) when isObjectType t ->
+      (* ISO 6.3.2.3.1 *) ()
+    | TPtr (TVoid _, _), TPtr (t, _) when isObjectType t ->
+      (* ISO 6.3.2.3.1 *) ()
+    | TInt _, TPtr _ -> (* ISO 6.3.2.3.5 *) ()
     | TPtr _, TInt _ -> (* ISO 6.3.2.3.6 *)
       if not fromsource && newt != theMachine.upointType
       then
         Kernel.warning
           ~wkey:Kernel.wkey_int_conversion
           ~current:true
-          "Conversion from a pointer to an integer without an explicit cast";
-      result
+          "Conversion from a pointer to an integer without an explicit cast"
     | TPtr (t1, _), TPtr (t2, _) when isObjectType t1 && isObjectType t2 ->
-      (* ISO 6.3.2.3.7 *) result
+      (* ISO 6.3.2.3.7 *) ()
     | TPtr (t1, _), TPtr (t2, _) when isFunctionType t1 && isFunctionType t2 ->
       (* ISO 6.3.2.3.8 *)
       if not (areCompatibleTypes ?context oldt newt)
@@ -6356,17 +6354,15 @@ let checkCast ?context ?(fromsource=false) =
           ~current:true
           "implicit conversion between incompatible function types:@ \
            %a@ and@ %a"
-          Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt;
-      result
+          Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
 
     (* accept converting a ptr to function to/from a ptr to void, even though
        not really accepted by the standard.
        Main compilers supports it. *)
-    | TPtr (TFun _, _), TPtr (TVoid _, _) -> result
-    | TPtr (TVoid _, _), TPtr (TFun _, _) -> result
+    | TPtr (TFun _, _), TPtr (TVoid _, _) -> ()
+    | TPtr (TVoid _, _), TPtr (TFun _, _) -> ()
 
-    | TFun _, TPtr (TFun _, _) ->
-      (* ISO 6.3.2.1.4 *) result
+    | TFun _, TPtr (TFun _, _) -> (* ISO 6.3.2.1.4 *) ()
 
     | TArray (t1, _, _), TPtr (t2, _) ->
       (* ISO 6.3.2.1.3 *)
@@ -6377,8 +6373,7 @@ let checkCast ?context ?(fromsource=false) =
           ~current:true
           "conversion between incompatible from array type to pointer type:@ \
            %a@ and@ %a"
-          Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt;
-      result
+          Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
 
     | TArray (t1, _, _), TArray (t2, _, _) ->
       if not (areCompatibleTypes ?context t1 t2)
@@ -6388,8 +6383,7 @@ let checkCast ?context ?(fromsource=false) =
           ~current:true
           "conversion between incompatible array types :@ \
            %a@ and@ %a"
-          Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt;
-      result
+          Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
 
     (* pointer to potential function type. Note that we do not
        use unrollTypeDeep above in order to avoid needless divergence with
@@ -6411,14 +6405,12 @@ let checkCast ?context ?(fromsource=false) =
       Kernel.warning
         ~wkey:Kernel.wkey_incompatible_pointer_types
         ~current:true
-        "casting function to %a" Cil_datatype.Typ.pretty newt;
-      result
+        "casting function to %a" Cil_datatype.Typ.pretty newt
     | TPtr (t1, _), TPtr (t2, _) when isFunctionType t2 && isObjectType t1 ->
       Kernel.warning
         ~wkey:Kernel.wkey_incompatible_pointer_types
         ~current:true
-        "casting function from %a" Cil_datatype.Typ.pretty oldt;
-      result
+        "casting function from %a" Cil_datatype.Typ.pretty oldt
 
 
     | _, TPtr (t1, _) when isFunctionType t1 ->
@@ -6426,11 +6418,11 @@ let checkCast ?context ?(fromsource=false) =
         Cil_datatype.Typ.pretty oldt
 
     | t1, t2 when isArithmeticType t1 && isArithmeticType t2 ->
-      (* ISO 6.5.16.1.1#1 *) result
+      (* ISO 6.5.16.1.1#1 *) ()
 
 
     | TComp _, TComp _ when areCompatibleTypes oldt newt ->
-      (* ISO 6.5.16.1.1#2*) result
+      (* ISO 6.5.16.1.1#2*) ()
 
     (* If we try to pass a transparent union value to a function
        expecting a transparent union argument, the argument type would
@@ -6443,16 +6435,14 @@ let checkCast ?context ?(fromsource=false) =
         | None ->
           abort_context "cast from %a to %a"
             Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
-        | Some _ -> result
+        | Some _ -> ()
       end
 
-    | TBuiltin_va_list _, (TInt _ | TPtr _) ->
-      result
+    | TBuiltin_va_list _, (TInt _ | TPtr _) -> ()
 
     | (TInt _ | TPtr _), TBuiltin_va_list _ ->
       Kernel.debug ~dkey ~current:true
-        "Casting %a to __builtin_va_list" Cil_datatype.Typ.pretty oldt ;
-      result
+        "Casting %a to __builtin_va_list" Cil_datatype.Typ.pretty oldt
 
     | _, t1 when fromsource && not (isScalarType t1) ->
       (* ISO 6.5.4.2 *)
@@ -6550,13 +6540,7 @@ and mkCastTGen ?(check=true) ?context ?(fromsource=false) ?(force=false)
     end
   else
     let newt = if fromsource then newt else !typeForInsertedCast e oldt newt in
-    let newt =
-      if check
-      then
-        checkCast ?context ~fromsource oldt newt
-      else
-        newt
-    in
+    if check then checkCast ?context ~fromsource oldt newt;
     (newt, castReduce fromsource force oldt newt e)
 
 and mkCastT ?(check=true) ?(force=false) ~(oldt: typ) ~(newt: typ) e =
