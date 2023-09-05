@@ -871,37 +871,36 @@ and to_exp ~adata ?inplace kf env t =
     (Env.Logic_env.get_profile env);
   let logic_env = Env.Logic_env.get env in
   let t = Logic_normalizer.get_term t in
-  let (rexp, _, _) as result =
-    Extlib.flatten
-      (Env.with_params_and_result
-         ~rte:false
-         ~f:(fun env ->
-             let e, adata, env, sty, name =
-               context_insensitive_term_to_exp ?inplace ~adata kf env t
-             in
-             let env =
-               if generate_rte then !translate_rte_exp_ref kf env e else env
-             in
-             let cast = Typing.get_cast ~logic_env t in
-             let name = if name = "" then None else Some name in
-             Extlib.nest
-               adata
-               (Typed_number.add_cast
-                  ~loc:t.term_loc
-                  ?name
-                  env
-                  kf
-                  cast
-                  sty
-                  (Some t)
-                  e)
-           )
-         env)
+  let ((rexp, _), _) as result =
+    Env.with_params_and_result
+      ~rte:false
+      ~f:(fun env ->
+          let e, adata, env, sty, name =
+            context_insensitive_term_to_exp ?inplace ~adata kf env t
+          in
+          let env =
+            if generate_rte then !translate_rte_exp_ref kf env e else env
+          in
+          let cast = Typing.get_cast ~logic_env t in
+          let name = if name = "" then None else Some name in
+          Extlib.nest
+            adata
+            (Typed_number.add_cast
+               ~loc:t.term_loc
+               ?name
+               env
+               kf
+               cast
+               sty
+               (Some t)
+               e)
+        )
+      env
   in
   Options.debug ~dkey ~level:4 "to_exp %a {%a} %a = %a"
     Kernel_function.pretty kf Profile.pretty (Env.Logic_env.get_profile env)
     Printer.pp_term t Printer.pp_exp rexp;
-  result
+  Extlib.flatten result
 
 
 let term_to_exp_without_inplace ~adata kf env t = to_exp ~adata kf env t
