@@ -71,7 +71,7 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream) {
   }
   if (!*lineptr || *n == 0) {
     *lineptr = malloc(2);
-    if (!lineptr) {
+    if (!*lineptr) {
       errno = ENOMEM;
       //TODO: set error indicator for stream
       return -1;
