@@ -18,6 +18,7 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Kernel    [2023-09-04] Fix #@846 (printing ACSL attribute in ghost code)
 o   Kernel    [2023-07-24] Expose Cil functions for type compatibility
 
 ###############################################################################
