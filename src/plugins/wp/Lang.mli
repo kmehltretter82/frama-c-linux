@@ -387,6 +387,9 @@ sig
 
   val p_call : lfun -> term list -> pred
 
+  val e_lambda : var list -> term -> term
+  val e_apply : term -> term list -> term
+
   val p_forall : var list -> pred -> pred
   val p_exists : var list -> pred -> pred
   val p_bind : binder -> var -> pred -> pred
