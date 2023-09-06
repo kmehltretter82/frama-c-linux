@@ -1,9 +1,10 @@
 /* run.config
    OPT: -wp-prover qed
+   OPT: -wp-prover none
 */
 
 /* run.config_qualif
-   OPT: -wp-prover qed
+   DONTRUN:
 */
 
 /*@ lemma ko: \false; */
