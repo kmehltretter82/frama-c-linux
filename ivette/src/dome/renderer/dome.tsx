@@ -748,13 +748,172 @@ export function useClock(period: number, initStart = false): Timer {
   return { running, time, periods, blink, start, stop, clear };
 }
 
+/**
+   Register a polling callback on the given period.
+   The polling is synchronized with all clocks and timers
+   using the same period.
+ */
+export function useTimer(period: number, callback: () => void): void
+{
+  React.useEffect(() => {
+    const event = INC_CLOCK(period);
+    System.emitter.on(event, callback);
+    return () => {
+      System.emitter.off(event, callback);
+      DEC_CLOCK(period);
+    };
+  }, [period, callback]);
+}
+
+// --------------------------------------------------------------------------
+// --- Sampling Hookds
+// --------------------------------------------------------------------------
+
+export type range = [number, number];
+const NORANGE: range = [0, 0];
+
+/**
+   Static sampler. Accumulates instant values and compute their mean,
+   min and max values.
+ */
+export class Sampler {
+  private samples: number[];
+  private range: [number, number] | undefined;
+  private total = 0;
+  private index = 0;
+  private values = 0;
+  private current = 0;
+
+  /** @param n - maximum number of sampled values */
+  constructor(n: number) {
+    this.samples = new Array(n).fill(0);
+  }
+
+  /** Resets the sampler. Forgets all previous measures. */
+  reset(): void
+  {
+    this.index = 0;
+    this.values = 0;
+    this.current = 0;
+    this.total = 0;
+    this.range = undefined;
+    this.samples.fill(0);
+  }
+
+  /** Set the current instant value. */
+  setValue(m: number): void { this.current = m; }
+
+  /** Add or remove the given amount to the current instant value. */
+  addValue(d: number): void { this.current += d; }
+
+  /**
+     Register the given instant value `v` to the sampler.
+     This is a shortcut to `setValue(v)` followed by `flush()`.
+   */
+  pushValue(v: number): void {
+    this.current = v;
+    this.flush();
+  }
+
+  /**
+     Register the current instant value to the sampler.
+     The current instant value is left unchanged.
+   */
+  flush(): void {
+    const v = this.current;
+    const n = this.values;
+    const size = this.samples.length;
+    const rg = this.range;
+    if (rg) {
+      const [a, b] = rg;
+      if (v < a || b < v) this.range = undefined;
+    }
+    if (n < size) {
+      this.samples[n] = v;
+      this.total += v;
+      this.values++;
+    } else {
+      const k = this.index;
+      if (k + 1 < size) {
+        const v0 = this.samples[k];
+        this.samples[k] = v;
+        this.total += v - v0;
+        this.index++;
+      } else {
+        this.samples[k] = v;
+        this.index = 0;
+        this.total = this.samples.reduce((s, x) => s + x, 0);
+      }
+    }
+  }
+
+  /**
+     Returns the sum of all sampled values.
+     In case the sampler is empty, returns `0`.
+   */
+  getTotal(): number { return this.total; }
+
+  /**
+     Returns the mean of sampled values.
+     In case the sampler is empty, returns `undefined`.
+   */
+  getMean(): number | undefined {
+    const n = this.values;
+    return n > 0 ? this.total / n : undefined;
+  }
+
+  /**
+     Returns the `[min,max]` range of sampled values.
+     In case the sampler is empty, returns `[0,0]`.
+   */
+  getRange(): range {
+    const rg = this.range;
+    if (rg !== undefined) return rg;
+    const n = this.values;
+    if (n <= 0) return NORANGE;
+    let a = +Infinity;
+    let b = -Infinity;
+    for (let k = 0; k < n; k++) {
+      const s = this.samples[k];
+      if (s < a) a = s;
+      if (s > b) b = s;
+    }
+    const newrg: range = [a, b];
+    this.range = newrg;
+    return newrg;
+  }
+
+}
+
+export interface Sample {
+  max: number;
+  min: number;
+  value: number | undefined;
+}
+
+/**
+   Hook to periodically listen on a global sampler.
+ */
+export function useSampler(S: Sampler, polling: number): Sample {
+  const [sample, setSample] = React.useState<Sample>(
+    { min: 0, value: undefined, max: 0 }
+  );
+  useTimer(polling, () => {
+    const m = S.getMean();
+    const [a, b] = S.getRange();
+    if (m !== sample.value || a !== sample.min || b !== sample.max)
+      setSample({ value: m, min: a, max: b });
+  });
+  return sample;
+}
+
 // --------------------------------------------------------------------------
 // --- Settings Hookds
 // --------------------------------------------------------------------------
 
 /**
    Bool window settings helper. Default is `false` unless specified.
-*/
+ */
 export function useBoolSettings(
   key: string | undefined,
   defaultValue = false,
