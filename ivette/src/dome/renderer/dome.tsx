@@ -753,7 +753,8 @@ export function useClock(period: number, initStart = false): Timer {
    The polling is synchronized with all clocks and timers
    using the same period.
  */
-export function useTimer(period: number, callback: () => void) {
+export function useTimer(period: number, callback: () => void): void
+{
   React.useEffect(() => {
     const event = INC_CLOCK(period);
     System.emitter.on(event, callback);
@@ -789,7 +790,8 @@ export class Sampler {
   }
 
   /** Resets the sampler. Forgets all previous measures. */
-  reset() {
+  reset(): void
+  {
     this.index = 0;
     this.values = 0;
     this.current = 0;
@@ -799,16 +801,16 @@ export class Sampler {
   }
 
   /** Set the current instant value. */
-  setValue(m: number) { this.current = m; }
+  setValue(m: number): void { this.current = m; }
 
   /** Add or remove the given amount to the current instant value. */
-  addValue(d: number) { this.current += d; }
+  addValue(d: number): void { this.current += d; }
 
   /**
      Register the given instant value `v` to the sampler.
      This is a shortcut to `setValue(v)` followed by `flush()`.
    */
-  pushValue(v: number) {
+  pushValue(v: number): void {
     this.current = v;
     this.flush();
   }
@@ -817,7 +819,7 @@ export class Sampler {
      Register the current instant value to the sampler.
      The current instant value is left unchanged.
    */
-  flush() {
+  flush(): void {
     const v = this.current;
     const n = this.values;
     const size = this.samples.length;
@@ -849,15 +851,15 @@ export class Sampler {
      Returns the sum of all sampled values.
      In case the sampler is empty, returns `0`.
    */
-  getTotal() { return this.total; }
+  getTotal(): number { return this.total; }
 
   /**
      Returns the mean of sampled values.
-     In case the sampler is empty, returns `0`.
+     In case the sampler is empty, returns `undefined`.
    */
-  getMean() {
+  getMean(): number | undefined {
     const n = this.values;
-    return n > 0 ? this.total / n : 0;
+    return n > 0 ? this.total / n : undefined;
   }
 
   /**
@@ -886,14 +888,16 @@ export class Sampler {
 export interface Sample {
   max: number;
   min: number;
-  value: number;
+  value: number | undefined;
 }
 
 /**
    Hook to periodically listen on a global sampler.
  */
 export function useSampler(S: Sampler, polling: number): Sample {
-  const [sample, setSample] = React.useState({ min: 0, value: 0, max: 0 });
+  const [sample, setSample] = React.useState<Sample>(
+    { min: 0, value: undefined, max: 0 }
+  );
   useTimer(polling, () => {
     const m = S.getMean();
     const [a, b] = S.getRange();
