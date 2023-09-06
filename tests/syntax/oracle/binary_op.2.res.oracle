@@ -1,0 +1,3 @@
+[kernel] Parsing binary_op.c (with preprocessing)
+[kernel:typing:int-conversion] binary_op.c:19: Warning: 
+  Conversion from a pointer to an integer without an explicit cast
