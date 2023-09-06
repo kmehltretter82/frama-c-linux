@@ -699,7 +699,6 @@ let get_mode = function
   | "frama-c" -> Frama_C
   | "acsl" -> ACSL
   | "safe" -> Safe
-  | "skip" -> Skip
   | s -> Other s
 
 (* Given a [mode], returns the configuration for each clause. *)
