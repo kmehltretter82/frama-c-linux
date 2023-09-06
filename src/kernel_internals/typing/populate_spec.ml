@@ -824,10 +824,26 @@ let do_populate clauses kf original_spec =
   Allocates.emit config.allocates kf bhv allocates;
   Terminates.emit config.terminates kf bhv terminates
 
+module Clauses =
+  Datatype.Make
+    (struct
+      include Datatype.Serializable_undefined
+      type t = clause
+      let name = "clause"
+      let reprs = [`Exits; `Assigns; `Requires; `Allocates; `Terminates]
+      let equal a b = a = b
+      let compare = Stdlib.compare
+      let hash = Hashtbl.hash
+    end)
+
+module Key =
+  Datatype.Pair_with_collections (Kernel_function) (Clauses)
+    (struct let module_name = "Populate_spec.Key.t" end)
+
 (* Hashtbl used to memorize which kernel function has been populated. *)
 module Is_populated =
   State_builder.Hashtbl
-    (Kernel_function.Hashtbl)
+    (Key.Hashtbl)
     (Datatype.Unit)
     (struct
       let size = 17
@@ -837,26 +853,24 @@ module Is_populated =
 
 let () = Ast.add_linked_state Is_populated.self
 
-
-(* Performs specification on [kf] if all requirements are met :
-   - force is [true]
+(* Perform specification generation for [kf] if all requirements are met :
+   - [clauses] is not empty
+     AND
+     [clauses] contains clauses not already generated for [kf]
+   - [kf] is a prototype
      OR
-     [-generate-default-spec] is [true] (by default).
-   - Function has not been populated yet.
-   - force is [true]
-     OR
-     [kf] is not a prototype
-     OR
-     [kf]'s specification is empty
+     [do_body] is true
 *)
 let populate_funspec ?(do_body=false) ?funspec kf clauses =
   let funspec = match funspec with
     | None -> Annotations.funspec kf
     | Some funspec -> funspec
   in
-  if not @@ Is_populated.mem kf then
+  let not_populated c = not @@ Is_populated.mem (kf, c) in
+  let todo_clauses = List.filter not_populated clauses in
+  if todo_clauses <> [] then
     let is_proto = not @@ Kernel_function.has_definition kf in
     if is_proto || do_body then begin
-      do_populate clauses kf funspec;
-      Is_populated.add kf ();
+      do_populate todo_clauses kf funspec;
+      List.iter (fun c -> Is_populated.add (kf, c) ()) todo_clauses
     end
