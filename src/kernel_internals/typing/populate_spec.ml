@@ -185,35 +185,16 @@ struct
         false, G.custom_default mode kf spec
       | (Skip | ACSL), _ -> assert false
 
-  (* Emit warnings depending on performed actions. *)
-  let warn ~combined ~warned kf g =
-    let has_body = Kernel_function.has_definition kf in
-    (* Only warn for prototypes not in frama-c's stdlib and builtins. *)
-    if not has_body && not @@ is_part_of_frama_c kf then
-      let is_empty = G.is_empty g in
-      let name = G.name in
-      if combined then begin
-        if is_empty || warned then assert false; (* Should not happen *)
-        Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
-          "Missing %s in default behavior of prototype %a,@, \
-           generating default specification from complete behaviors"
-          name Kernel_function.pretty kf
-      end
-      else if not warned && not is_empty then
-        Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
-          "Missing %s in specification of prototype %a,@, \
-           generating default specification, see -generated-spec-* options \
-           for more info"
-          name Kernel_function.pretty kf
-
-  (* Returns a new clause as [Generated g] of [Kept] is no action is needed. *)
-  let get_default ~warned mode kf spec =
+  (* Return a new clause as [Generated g] of [Kept] if no action is needed. *)
+  let get_default mode kf spec =
     let table = G.collect_behaviors spec in
-    if mode = Skip || G.has_default_behavior table then Kept
+    if mode = Skip || G.has_default_behavior table then Kept, None
     else
       let combined, g = combine_or_default mode kf spec table in
-      warn ~warned ~combined kf g;
-      Generated g
+      let has_body = Kernel_function.has_definition kf in
+      if G.is_empty g then Kept, None
+      else if has_body then Generated g, None
+      else Generated g, Some(combined, G.name)
 
   (* Interface to call [G.emit]. *)
   let emit mode kf bhv = function
@@ -757,22 +738,50 @@ let get_config () =
   in
   Kernel.GeneratedSpecCustom.fold collect default
 
+let do_warning ~empty (combined, clauses) kf =
+  if clauses <> [] then
+    let clauses = String.concat ", " clauses in
+    if empty then
+      Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
+        "Neither code nor specification for function %a,@, \
+         generating default specifications (%s) from the prototype"
+        Kernel_function.pretty kf clauses
+    else
+      let combined =
+        if combined then " (some combined from existing behaviors)" else ""
+      in
+      Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
+        "Missing clauses (%s) in specification of prototype %a,@, \
+         generating default specification%s,@, see -generated-spec-* options \
+         for more info"
+        clauses Kernel_function.pretty kf combined
 (* Perform generation of all clauses, adds them to the original specification,
    and emit property status for each of them. *)
-let do_populate ~warned kf original_spec =
+let do_populate kf original_spec =
   let config =
     if is_frama_c_builtin kf then build_config Frama_C
     else if is_frama_c_stdlib kf then build_config ACSL
     else get_config ()
   in
-  let apply get_default mode =
-    get_default ~warned mode kf original_spec
+  let apply (combined, clauses) get_default mode =
+    let g, to_warn = get_default mode kf original_spec in
+    match g, to_warn with
+    | Kept, None -> g, (combined, clauses)
+    | Kept, _ -> assert false
+    | Generated _, None -> g, (combined, clauses)
+    | Generated _, Some (combined', clause) ->
+      g, (combined || combined', clause :: clauses)
   in
-  let exits = apply Exits.get_default config.exits in
-  let assigns = apply Assigns.get_default config.assigns in
-  let requires = apply Requires.get_default config.requires in
-  let allocates = apply Allocates.get_default config.allocates in
-  let terminates = apply Terminates.get_default config.terminates in
+  let exits, w = apply (false, []) Exits.get_default config.exits in
+  let assigns, w = apply w Assigns.get_default config.assigns in
+  let requires, w = apply w Requires.get_default config.requires in
+  let allocates, w = apply w Allocates.get_default config.allocates in
+  let terminates, w = apply w Terminates.get_default config.terminates in
+
+  let is_empty_spec = Cil.is_empty_funspec original_spec in
+  let is_proto = not @@ Kernel_function.has_definition kf in
+  let empty = not @@ is_part_of_frama_c kf && is_proto && is_empty_spec in
+  do_warning ~empty w kf;
 
   let generated original = function
     | Kept -> original
@@ -809,12 +818,6 @@ module Is_populated =
 
 let () = Ast.add_linked_state Is_populated.self
 
-let warn_empty kf =
-  Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
-    "Neither code nor specification for function %a,@, \
-     generating default specifications from the prototype"
-    Kernel_function.pretty kf;
-  true
 
 (* Performs specification on [kf] if all requirements are met :
    - force is [true]
@@ -833,12 +836,7 @@ let populate_funspec ~force kf spec =
   if (force || Kernel.GenerateDefaultSpec.get ())
   && not @@ Is_populated.mem kf
   && (force || has_body || not @@ is_empty_spec) then begin
-    let warned =
-      if not @@ is_part_of_frama_c kf && not @@ has_body && is_empty_spec
-      then warn_empty kf
-      else false
-    in
-    do_populate ~warned kf spec;
+    do_populate kf spec;
     Is_populated.add kf ();
     true
   end
