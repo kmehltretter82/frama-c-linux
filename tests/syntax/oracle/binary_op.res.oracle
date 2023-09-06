@@ -1,0 +1,8 @@
+[kernel] Parsing binary_op.i (no preprocessing)
+[kernel] binary_op.i:6: User Error: 
+  & operator on non-integer type(s) int and int (*)(void)
+  4     */
+  5     
+  6     int v(void) { return 0 & v; }
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[kernel] Frama-C aborted: invalid user input.
