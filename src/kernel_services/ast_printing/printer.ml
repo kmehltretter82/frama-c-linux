@@ -115,7 +115,7 @@ class printer_with_annot () = object (self)
     super#may_be_skipped s && not (Annotations.has_code_annot s)
 
   method private pretty_funspec fmt kf =
-    let spec = Annotations.funspec ~populate:false kf in
+    let spec = Annotations.funspec kf in
     self#opt_funspec fmt spec
 
   method! private stmt_has_annot s = Annotations.has_code_annot s

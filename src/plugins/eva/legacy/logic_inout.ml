@@ -46,6 +46,7 @@ let compute_term_deps stmt t =
 let () = Logic_deps.compute_term_deps := compute_term_deps
 
 let valid_behaviors kf state =
+  Populate_spec.(populate_funspec kf [`Assigns]);
   let funspec = Annotations.funspec kf in
   let eval_predicate pred =
     match Eval_terms.(eval_predicate (env_pre_f ~pre:state ()) pred) with
@@ -210,6 +211,7 @@ let conv_status = function
 let check_fct_assigns kf ab ~pre_state found_froms =
   let open Locations in
   let open Alarmset in
+  Populate_spec.(populate_funspec kf [`Assigns]);
   let behaviors = Annotations.behaviors kf in
   (* Under-approximation of the union. *)
   let link zones = List.fold_left Zone.link Zone.bottom zones in
@@ -280,6 +282,7 @@ let check_fct_assigns kf ab ~pre_state found_froms =
   in List.iter check_for_behavior behaviors
 
 let verify_assigns kf ~pre froms =
+  Populate_spec.(populate_funspec kf [`Assigns]);
   let funspec = Annotations.funspec kf in
   let env = Eval_terms.env_pre_f ~pre () in
   let eval_predicate pred =

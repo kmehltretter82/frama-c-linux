@@ -556,9 +556,6 @@ module DoCollapseCallCast: Parameter_sig.Bool
     This is false by default.  Set to true to replicate the behavior
     of CIL 1.3.5 and earlier. *)
 
-module GenerateDefaultSpec: Parameter_sig.Bool
-(** Behavior of option "-generate-default-spec". *)
-
 module GeneratedSpecMode: Parameter_sig.String
 (** Behavior of option "-generated-spec-mode". *)
 

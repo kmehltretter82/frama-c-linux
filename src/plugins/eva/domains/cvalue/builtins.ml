@@ -118,6 +118,7 @@ let () =
 (* Returns the specification of a builtin, used to evaluate preconditions
    and to transfer the states of other domains. *)
 let find_builtin_specification kf =
+  Populate_spec.(populate_funspec kf [`Assigns]);
   let spec = Annotations.funspec kf in
   (* The specification can be empty if [kf] has a body but no specification,
      in which case [Annotations.funspec] does not generate a specification.

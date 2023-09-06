@@ -50,6 +50,7 @@ let treat_fct check fct =
         | _ -> false)
       stmts
   in
+  Populate_spec.(populate_funspec fct [`Assigns]);
   let ensures = (List.hd (Annotations.funspec fct).spec_behavior).b_post_cond in
   let ensures = List.filter (fun (kind,_) -> kind = Normal) ensures in
   (* A bit fragile, but should do the trick as long as the test itself does
@@ -69,6 +70,7 @@ let treat_fct_pred fct =
       (fun x -> match x.skind with Instr(Call _) -> true | _ -> false)
       stmts
   in
+  Populate_spec.(populate_funspec fct [`Assigns]);
   let ensures = (List.hd (Annotations.funspec fct).spec_behavior).b_post_cond in
   let ensures = List.filter (fun (kind,_) -> kind = Normal) ensures in
   if List.length stmts <> List.length ensures then

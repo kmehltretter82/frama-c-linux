@@ -438,6 +438,7 @@ class visitor cat
         (* Analyze the funspec before visiting the first statement *)
         if Annotations.has_funspec kf then begin
           let old_kinstr_stmts = self#set_global_kinstr () in
+          Populate_spec.(populate_funspec kf [`Assigns]);
           self#process_spec (Annotations.funspec kf);
           self#reset_kinstr old_kinstr_stmts
         end

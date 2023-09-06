@@ -35,6 +35,7 @@ let compute kf =
       Wp.feedback ~ontty:`Transient "[region] Analyzing %a" Kf.pretty kf ;
       let def = Kf.get_definition kf in
       RegionAccess.cc_fundec map def ;
+      Populate_spec.(populate_funspec kf [`Assigns]);
       let spec = Annotations.funspec kf in
       RegionAccess.cc_spec map spec ;
       List.iter

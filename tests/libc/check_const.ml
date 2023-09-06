@@ -62,7 +62,7 @@ let check_annot kf _ (a: identified_predicate) =
 
 let check () =
   let check_kf kf =
-    let bhvs = Annotations.behaviors ~populate:false kf in
+    let bhvs = Annotations.behaviors kf in
     List.iter (fun bhv ->
         Annotations.iter_requires (check_annot kf) kf bhv.b_name) bhvs
   in

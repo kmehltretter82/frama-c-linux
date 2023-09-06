@@ -10,9 +10,11 @@ class pathcrawlerVisitor prj =
       Format.printf "@[Funspec of %s is@ @['%a'@]@ through visitor@]@."
         fundec.svar.vname
         Printer.pp_funspec fundec.sspec;
+      let kf = Globals.Functions.get fundec.svar in
+      Populate_spec.(populate_funspec kf [`Assigns]);
       Format.printf "@[It is@ @['%a'@]@ through get_spec@]@."
         Printer.pp_funspec
-        (Annotations.funspec (Globals.Functions.get fundec.svar));
+        (Annotations.funspec kf);
       DoChildren
 
     method! vspec sp =
@@ -23,9 +25,11 @@ class pathcrawlerVisitor prj =
          Format.printf "@[Funspec of %s is@ @['%a'@]@ through visitor@]@."
            fundec.svar.vname
            Printer.pp_funspec sp;
+         let kf = Globals.Functions.get fundec.svar in
+         Populate_spec.(populate_funspec kf [`Assigns]);
          Format.printf "@[It is@ @['%a'@]@ through get_spec@]@."
            Printer.pp_funspec
-           (Annotations.funspec (Globals.Functions.get fundec.svar));
+           (Annotations.funspec kf);
        | None ->
          Format.printf "@[Function prototype;@ Funspec is@ @['%a'@]@]@."
            Printer.pp_funspec sp;

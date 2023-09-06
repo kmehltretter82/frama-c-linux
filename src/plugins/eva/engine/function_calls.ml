@@ -164,7 +164,10 @@ let analysis_target ~recursion_depth callsite kf =
       | Declaration (_,_,_,_) -> `Spec (Annotations.funspec kf)
       | Definition (def, _) ->
         if Kernel_function.Set.mem kf (Parameters.UsePrototype.get ())
-        then `Spec (Annotations.funspec kf)
+        then begin
+           Populate_spec.(populate_funspec kf [`Assigns]);
+          `Spec (Annotations.funspec kf)
+        end
         else `Body (def, save_results def)
 
 let define_analysis_target ?(recursion_depth = -1) callsite kf  =

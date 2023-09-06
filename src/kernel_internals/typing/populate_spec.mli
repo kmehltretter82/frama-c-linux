@@ -78,11 +78,11 @@ val register :
   ?status_terminates:status ->
   string -> unit
 
-(** [populate_funspec ~do_body ?funspec kf] generates missing
-    specifications for the [kf].
-    By default ~do_body is false, meaning only specification of prototypes will
+(** [populate_funspec ~do_body ?funspec kf] generates missing specifications for
+    [kf].
+    By default [do_body] is false, meaning only specification of prototypes will
     be generated.
-    If None, [Annotations.funspec kf] will be used to get kf's funspec.
+    If [funspec] is None, [Annotations.funspec kf] will be used to get kf's funspec.
     *)
 val populate_funspec :
   ?do_body:bool -> ?funspec:funspec -> kernel_function -> clause list -> unit

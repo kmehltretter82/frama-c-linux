@@ -146,6 +146,7 @@ let code_annot kf stmt s =
       (function (_, Logic_ptree.Acode_annot (_,a)) -> Some a | _ -> None)
   in
   let parse pa =
+    Populate_spec.(populate_funspec kf [`Assigns]);
     LT.code_annot
       (Stmt.loc stmt)
       (Logic_utils.get_behavior_names (Annotations.funspec kf))

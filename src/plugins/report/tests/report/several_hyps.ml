@@ -45,11 +45,13 @@ let main () =
   let hyps = [ g; h ] in
   let ensures =
     let kf = Globals.Functions.find_by_name "f" in
+    Populate_spec.(populate_funspec kf [`Assigns]);
     let spec = Annotations.funspec kf in
     Property.ip_post_cond_of_spec kf Kglobal ~active:[] spec
   in
   let ensures2 =
     let kf = Globals.Functions.find_by_name "f2" in
+    Populate_spec.(populate_funspec kf [`Assigns]);
     let spec = Annotations.funspec kf in
     Property.ip_post_cond_of_spec kf Kglobal ~active:[] spec
   in

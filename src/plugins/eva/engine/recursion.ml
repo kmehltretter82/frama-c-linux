@@ -50,7 +50,7 @@ let need_assigns funspec =
   | Some bhv -> bhv.b_assigns = WritesAny
 
 let get_spec kinstr kf =
-  let funspec = Annotations.funspec ~populate:false kf in
+  let funspec = Annotations.funspec kf in
   if List.for_all (fun b -> b.b_assigns = WritesAny) funspec.spec_behavior
   then begin
     Self.error ~current:true
@@ -66,7 +66,7 @@ let get_spec kinstr kf =
       Kernel_function.pretty kf
       Eva_utils.pp_callstack;
     Cil.CurrentLoc.set (Kernel_function.get_location kf);
-    ignore (!Annotations.populate_spec_ref kf funspec);
+    Populate_spec.(populate_funspec ~funspec kf [`Assigns]);
     Annotations.funspec kf
   end
   else
@@ -84,8 +84,8 @@ let get_spec kinstr kf =
       if need_assigns funspec
       then
         begin
-          ignore (!Annotations.populate_spec_ref kf funspec);
-          Annotations.funspec ~populate:false kf
+          Populate_spec.(populate_funspec ~funspec kf [`Assigns]);
+          Annotations.funspec kf
         end
       else funspec
     in
@@ -96,7 +96,7 @@ let get_spec kinstr kf =
    has no existing specification, generate (an incorrect) one, and warn
    loudly. *)
 let _spec_for_recursive_call kf =
-  let initial_spec = Annotations.funspec ~populate:false kf in
+  let initial_spec = Annotations.funspec kf in
   match Cil.find_default_behavior initial_spec with
   | Some bhv when bhv.b_assigns <> WritesAny -> initial_spec
   | _ ->
