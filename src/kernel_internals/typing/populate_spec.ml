@@ -160,7 +160,7 @@ sig
   val combine_default : clause list -> clause
 
   (* Emit property status depending on the selected mode. *)
-  val emit : mode -> kernel_function -> funbehavior -> clause result -> unit
+  val emit : mode -> kernel_function -> funbehavior -> clause -> unit
 
 end
 
@@ -216,8 +216,11 @@ struct
       Generated g
 
   (* Interface to call [G.emit]. *)
-  let emit = G.emit
-
+  let emit mode kf bhv = function
+    | Kept -> ()
+    | Generated _ when Kernel_function.has_definition kf -> ()
+    | Generated clauses ->
+      G.emit mode kf bhv clauses
 end
 
 (*******************************************************************)
@@ -298,22 +301,19 @@ struct
     in
     List.iter (emit_status status) ppt_l
 
-  let emit mode kf bhv = function
-    | Kept | Generated [] -> ()
-    | Generated _ when Kernel_function.has_definition kf -> ()
-    | Generated exits ->
-      match mode with
-      | Skip -> assert false
-      | Safe -> ()
-      | ACSL | Frama_C -> emit_status kf bhv exits Property_status.Dont_know
-      | Other mode ->
-        let custom_mode = get_custom_mode mode in
-        match custom_mode.custom_exits.status with
-        | None ->
-          Kernel.warning ~once:true
-            "Custom status from mode %s not defined for exits" mode;
-          ()
-        | Some pst -> emit_status kf bhv exits pst
+  let emit mode kf bhv exits =
+    match mode with
+    | Skip -> assert false
+    | Safe -> ()
+    | ACSL | Frama_C -> emit_status kf bhv exits Property_status.Dont_know
+    | Other mode ->
+      let custom_mode = get_custom_mode mode in
+      match custom_mode.custom_exits.status with
+      | None ->
+        Kernel.warning ~once:true
+          "Custom status from mode %s not defined for exits" mode;
+        ()
+      | Some pst -> emit_status kf bhv exits pst
 
 end
 
@@ -429,22 +429,19 @@ struct
       in
       List.iter emit froms
 
-  let emit mode kf bhv = function
-    | Kept | Generated WritesAny -> ()
-    | Generated _ when Kernel_function.has_definition kf -> ()
-    | Generated assigns ->
-      match mode with
-      | Skip | ACSL -> assert false
-      | Safe -> ()
-      | Frama_C -> emit_status kf bhv assigns Property_status.Dont_know
-      | Other mode ->
-        let custom_mode = get_custom_mode mode in
-        match custom_mode.custom_assigns.status with
-        | None ->
-          Kernel.warning ~once:true
-            "Custom status from mode %s not defined for assigns" mode;
-          ()
-        | Some pst -> emit_status kf bhv assigns pst
+  let emit mode kf bhv assigns =
+    match mode with
+    | Skip | ACSL -> assert false
+    | Safe -> ()
+    | Frama_C -> emit_status kf bhv assigns Property_status.Dont_know
+    | Other mode ->
+      let custom_mode = get_custom_mode mode in
+      match custom_mode.custom_assigns.status with
+      | None ->
+        Kernel.warning ~once:true
+          "Custom status from mode %s not defined for assigns" mode;
+        ()
+      | Some pst -> emit_status kf bhv assigns pst
 
 end
 
@@ -607,25 +604,22 @@ struct
     in
     Option.iter (emit_status status) ppt_opt
 
-  let emit mode kf bhv = function
-    | Kept | Generated FreeAllocAny -> ()
-    | Generated _ when Kernel_function.has_definition kf -> ()
-    | Generated allocates ->
-      match mode with
-      | Skip -> assert false
-      | Safe -> ()
-      | ACSL ->
-        emit_status kf bhv allocates Property_status.True
-      | Frama_C ->
-        emit_status kf bhv allocates Property_status.Dont_know
-      | Other mode ->
-        let custom_mode = get_custom_mode mode in
-        match custom_mode.custom_allocates.status with
-        | None ->
-          Kernel.warning ~once:true
-            "Custom status from mode %s not defined for allocates" mode;
-          ()
-        | Some pst -> emit_status kf bhv allocates pst
+  let emit mode kf bhv allocates =
+    match mode with
+    | Skip -> assert false
+    | Safe -> ()
+    | ACSL ->
+      emit_status kf bhv allocates Property_status.True
+    | Frama_C ->
+      emit_status kf bhv allocates Property_status.Dont_know
+    | Other mode ->
+      let custom_mode = get_custom_mode mode in
+      match custom_mode.custom_allocates.status with
+      | None ->
+        Kernel.warning ~once:true
+          "Custom status from mode %s not defined for allocates" mode;
+        ()
+      | Some pst -> emit_status kf bhv allocates pst
 
 end
 
@@ -695,24 +689,21 @@ struct
       Property.ip_of_terminates kf Kglobal terminates
       |> emit_status status
 
-  let emit mode kf bhv = function
-    | Kept | Generated None -> ()
-    | Generated _ when Kernel_function.has_definition kf -> ()
-    | Generated terminates ->
-      match mode with
-      | Skip -> assert false
-      | ACSL ->
-        emit_status kf bhv terminates Property_status.True
-      | Safe | Frama_C ->
-        emit_status kf bhv terminates Property_status.Dont_know
-      | Other mode ->
-        let custom_mode = get_custom_mode mode in
-        match custom_mode.custom_terminates.status with
-        | None ->
-          Kernel.warning ~once:true
-            "Custom status from mode %s not defined for terminates" mode;
-          ()
-        | Some pst -> emit_status kf bhv terminates pst
+  let emit mode kf bhv terminates =
+    match mode with
+    | Skip -> assert false
+    | ACSL ->
+      emit_status kf bhv terminates Property_status.True
+    | Safe | Frama_C ->
+      emit_status kf bhv terminates Property_status.Dont_know
+    | Other mode ->
+      let custom_mode = get_custom_mode mode in
+      match custom_mode.custom_terminates.status with
+      | None ->
+        Kernel.warning ~once:true
+          "Custom status from mode %s not defined for terminates" mode;
+        ()
+      | Some pst -> emit_status kf bhv terminates pst
 
 end
 
