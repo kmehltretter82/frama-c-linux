@@ -26,6 +26,15 @@ type mode =
   | ACSL | Safe | Frama_C (* Modes available for specification generation. *)
   | Skip (* Internally used to skip generation. *)
   | Other of string (* Allow user to use a custom mode, see {!register}. *)
+
+type clause = [
+  | `Exits
+  | `Assigns
+  | `Requires
+  | `Allocates
+  | `Terminates
+]
+
 (* Allow customization, each clause can be handled with a different [mode]. *)
 type config = {
   exits: mode;
@@ -703,13 +712,11 @@ let get_mode = function
 
 (* Given a [mode], returns the configuration for each clause. *)
 let build_config mode =
-  (* For now Allocates are skipped by default *)
-  let skip_mode = match mode with Other _ -> mode | _ -> Skip in
   {
     exits = mode;
     assigns = mode;
     requires = mode;
-    allocates = skip_mode;
+    allocates = mode;
     terminates = mode;
   }
 
@@ -719,16 +726,16 @@ let get_config_mode () =
 
 (* Build the default configuration, then select modes depending on the
    parameter [-generated-spec-custom]. *)
-let get_config () =
+let get_config_custom () =
   let default = get_config_mode () in
-  let collect (k,v) conf =
+  let collect (k,v) config =
     let mode = get_mode (Option.get v) in
     match k with
-    | "exits" -> {conf with exits = mode}
-    | "assigns" -> {conf with assigns = mode}
-    | "requires" -> {conf with requires = mode}
-    | "allocates" -> {conf with allocates = mode}
-    | "terminates" -> {conf with terminates = mode}
+    | "exits" -> {config with exits = mode}
+    | "assigns" -> {config with assigns = mode}
+    | "requires" -> {config with requires = mode}
+    | "allocates" -> {config with allocates = mode}
+    | "terminates" -> {config with terminates = mode}
     | s ->
       Kernel.abort
         "@['%s'@] is not a valid key for -generated-spec-custom.@, Accepted \
@@ -736,6 +743,17 @@ let get_config () =
          'terminates'." s
   in
   Kernel.GeneratedSpecCustom.fold collect default
+
+let activated_config clauses default =
+  let collect config clause =
+    match clause with
+    | `Exits -> {config with exits = default.exits}
+    | `Assigns -> {config with assigns = default.assigns}
+    | `Requires -> {config with requires = default.requires}
+    | `Allocates -> {config with allocates = default.allocates}
+    | `Terminates -> {config with terminates = default.terminates}
+  in
+  List.fold_left collect (build_config Skip) clauses
 
 let do_warning ~empty (combined, clauses) kf =
   if clauses <> [] then
@@ -754,13 +772,15 @@ let do_warning ~empty (combined, clauses) kf =
          generating default specification%s,@, see -generated-spec-* options \
          for more info"
         clauses Kernel_function.pretty kf combined
+
 (* Perform generation of all clauses, adds them to the original specification,
    and emit property status for each of them. *)
-let do_populate kf original_spec =
+let do_populate clauses kf original_spec =
   let config =
+    activated_config clauses @@
     if is_frama_c_builtin kf then build_config Frama_C
     else if is_frama_c_stdlib kf then build_config ACSL
-    else get_config ()
+    else get_config_custom ()
   in
   let apply (combined, clauses) get_default mode =
     let g, to_warn = get_default mode kf original_spec in
@@ -829,18 +849,14 @@ let () = Ast.add_linked_state Is_populated.self
      OR
      [kf]'s specification is empty
 *)
-let populate_funspec ~force kf spec =
-  let has_body = Kernel_function.has_definition kf in
-  let is_empty_spec = Cil.is_empty_funspec spec in
-  if (force || Kernel.GenerateDefaultSpec.get ())
-  && not @@ Is_populated.mem kf
-  && (force || has_body || not @@ is_empty_spec) then begin
-    do_populate kf spec;
-    Is_populated.add kf ();
-    true
-  end
-  else false
-
-(* Annotations always force specification generation when calling for
-   populate_funspec. *)
-let () = Annotations.populate_spec_ref := populate_funspec ~force:true
+let populate_funspec ?(do_body=false) ?funspec kf clauses =
+  let funspec = match funspec with
+    | None -> Annotations.funspec kf
+    | Some funspec -> funspec
+  in
+  if not @@ Is_populated.mem kf then
+    let is_proto = not @@ Kernel_function.has_definition kf in
+    if is_proto || do_body then begin
+      do_populate clauses kf funspec;
+      Is_populated.add kf ();
+    end

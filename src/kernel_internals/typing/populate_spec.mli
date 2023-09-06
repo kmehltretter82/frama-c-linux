@@ -28,6 +28,16 @@
 
 open Cil_types
 
+(** Different types of clauses which can be generated via
+    {!populate_funspec}. *)
+type clause = [
+  | `Exits
+  | `Assigns
+  | `Requires
+  | `Allocates
+  | `Terminates
+]
+
 (** Represents exits clause in the sense of
     {!Cil_types.behavior.b_post_cond}. *)
 type exits = (termination_kind * identified_predicate) list
@@ -68,11 +78,11 @@ val register :
   ?status_terminates:status ->
   string -> unit
 
-(** [populate_funspec ~force kf spec] generates missing specifications for the
-    kernel_function [kf] and its current specification [spec].
-    [force] is used in certain context to force specification generation.
-    if [force] is false :
-      + {!Kernel.GenerateDefaultSpec} can be used to turn off the generation.
-      + Generation will be skipped for prototypes with empty specifications.
+(** [populate_funspec ~do_body ?funspec kf] generates missing
+    specifications for the [kf].
+    By default ~do_body is false, meaning only specification of prototypes will
+    be generated.
+    If None, [Annotations.funspec kf] will be used to get kf's funspec.
     *)
-val populate_funspec : force:bool -> kernel_function -> spec -> bool
+val populate_funspec :
+  ?do_body:bool -> ?funspec:funspec -> kernel_function -> clause list -> unit
