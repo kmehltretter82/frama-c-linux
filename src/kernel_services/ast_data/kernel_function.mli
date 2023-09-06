@@ -182,6 +182,11 @@ val is_in_libc : t -> bool
 (** @return true iff the given function attributes contain libc indicators.
     @since 24.0-Chromium *)
 
+val is_not_called_function: t -> bool
+(** @return true if the given function is not called in the program.
+    Warning, @return false do not ensure that the function is called.
+    @since Frama-C+dev *)
+
 val is_entry_point: t -> bool
 (** @return true iff the given function is the main of the program (as stated by
     option -main).
