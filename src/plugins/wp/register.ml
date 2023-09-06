@@ -357,14 +357,14 @@ let do_report_stats ~shell ~cache ~smoke goal (stats : Stats.stats) =
       match stats.best with
       | Valid -> "[Failed] (Doomed)"
       | Failed ->  "[Failure] (Solver Error)"
-      | NoResult | Computing _ -> "[Unknown] (Incomplete)"
+      | NoResult | Computing _ -> "[NoResult] (Unknown)"
       | (Unknown | Timeout | Stepout) when shell -> "[Passed] (Unsuccess)"
       | Unknown -> "[Passed] (Unknown)"
       | Timeout -> "[Passed] (Timeout)"
       | Stepout -> "[Passed] (Stepout)"
     else
       match stats.best with
-      | NoResult when shell -> "[CacheMiss]"
+      | NoResult when shell -> "[NoResult]"
       | NoResult | Computing _ -> ""
       | Valid -> "[Valid]"
       | Failed ->  "[Failure]"
