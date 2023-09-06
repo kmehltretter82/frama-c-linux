@@ -76,17 +76,19 @@ let run_prover wpo ?config ?(mode=Batch) ?progress ?result prover =
   update ?result wpo prover res ;
   Task.return (VCS.is_valid res)
 
-let simplify ?start ?result wpo =
+let simplify ?start ?result ?(commit=false) wpo =
   Server.Main.async
     (fun wpo ->
        let r = Wpo.get_result wpo VCS.Qed in
        VCS.( r.verdict == Valid ) ||
        begin
          started ?start wpo ;
-         if Wpo.reduce wpo then
+         let ok = Wpo.reduce wpo in
+         if commit || ok then
            let time = qed_time wpo in
-           let res = VCS.result ~time VCS.Valid in
-           (update ?result wpo VCS.Qed res ; true)
+           let verdict = if ok then VCS.Valid else VCS.Unknown in
+           let presult = VCS.result ~time verdict in
+           (update ?result wpo VCS.Qed presult ; ok)
          else false
        end)
     wpo
@@ -99,6 +101,7 @@ let prove wpo ?config ?mode ?start ?progress ?result prover =
 
 let spawn wpo ~delayed
     ?config ?start ?progress ?result ?success ?pool provers =
+  let provers = List.filter (fun (_,p) -> p <> Qed) provers in
   if provers<>[] then
     let monitor = match success with
       | None -> None
@@ -124,7 +127,7 @@ let spawn wpo ~delayed
             prover , task
          ) provers)
   else
-    let process = simplify ?start ?result wpo >>= fun ok ->
+    let process = simplify ?start ?result ~commit:true wpo >>= fun ok ->
       begin
         match success with
         | None -> ()

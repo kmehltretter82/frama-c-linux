@@ -372,7 +372,8 @@ let do_report_stats ~shell ~cache ~smoke goal (stats : Stats.stats) =
       | Unknown -> "[Unknown]"
       | Timeout -> "[Timeout]"
       | Stepout -> "[Stepout]"
-  in if status <> "" then
+  in
+  if status <> "" then
     Wp_parameters.feedback "%s %s%a%a"
       status (Wpo.get_gid goal) (Stats.pp_stats ~shell ~cache) stats
       pp_warnings goal
