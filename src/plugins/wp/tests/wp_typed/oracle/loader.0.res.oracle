@@ -1,0 +1,27 @@
+# frama-c -wp [...]
+[kernel] Parsing loader.i (no preprocessing)
+[kernel] loader.i:5: Warning: 
+  parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
+[wp] Running WP plugin...
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Function load
+------------------------------------------------------------
+
+Goal Post-condition 'F' in 'load':
+Let a = Load_S1_S(x, Mint_0).
+Assume { Type: IsS1_S(a). (* Heap *) Type: region(x.base) <= 0. }
+Prove: P_P(a.F1_S_f).
+
+------------------------------------------------------------
+
+Goal Post-condition 'G' in 'load':
+Let a = Load_S1_S(x, Mint_0).
+Assume {
+  Type: is_sint32(k) /\ IsS1_S(a).
+  (* Heap *)
+  Type: region(x.base) <= 0.
+}
+Prove: P_P((a.F1_S_g)[k]).
+
+------------------------------------------------------------
