@@ -27,32 +27,24 @@ type mode =
   | Skip (* Internally used to skip generation. *)
   | Other of string (* Allow user to use a custom mode, see {!register}. *)
 
-type clause = [
-  | `Exits
-  | `Assigns
-  | `Requires
-  | `Allocates
-  | `Terminates
-]
-
 (* Allow customization, each clause can be handled with a different [mode]. *)
 type config = {
-  exits: mode;
-  assigns: mode;
-  requires: mode;
-  allocates: mode;
-  terminates: mode;
+  c_exits: mode;
+  c_assigns: mode;
+  c_requires: mode;
+  c_allocates: mode;
+  c_terminates: mode;
 }
 
 (* Either keep old specification or generate a new one. Existing specification
    from complete behaviors can be combined and used for default behavior. *)
 type 'a result = Kept | Generated of 'a
 
-type exits = (termination_kind * identified_predicate) list
-type assigns = Cil_types.assigns
-type requires = identified_predicate list
-type allocation = Cil_types.allocation
-type terminates = identified_predicate option
+type t_exits = (termination_kind * identified_predicate) list
+type t_assigns = Cil_types.assigns
+type t_requires = identified_predicate list
+type t_allocates = Cil_types.allocation
+type t_terminates = identified_predicate option
 
 (* Generation function type and status. *)
 type 'a gen = (kernel_function -> spec -> 'a)
@@ -67,11 +59,11 @@ type 'a elem = {
 (* Allow user to create a mode by choosing how each clause should be generated
    and which status to emit. *)
 type custom_mode = {
-  custom_exits: exits elem;
-  custom_assigns: assigns elem;
-  custom_requires: requires elem;
-  custom_allocates: allocation elem;
-  custom_terminates: terminates elem;
+  custom_exits: t_exits elem;
+  custom_assigns: t_assigns elem;
+  custom_requires: t_requires elem;
+  custom_allocates: t_allocates elem;
+  custom_terminates: t_terminates elem;
 }
 
 (* Used to store custom modes. *)
@@ -79,13 +71,17 @@ let custom_modes = Hashtbl.create 17
 
 let default = Cil.default_behavior_name
 
-let emitter =
+let emitter_populate =
   Emitter.create "PopulateSpec"
-    [ Funspec; Property_status ] ~correctness:[] ~tuning:[]
+    [ Funspec ] ~correctness:[] ~tuning:[]
+
+let emitter_status =
+  Emitter.create "PopulateStatus"
+    [ Property_status ] ~correctness:[] ~tuning:[]
 
 (* Emit [status] on the property [ppt]. *)
 let emit_status status ppt =
-  Property_status.emit emitter ~hyps:[] ppt status
+  Property_status.emit emitter_status ~hyps:[] ppt status
 
 (* Generic completes function for {!Generator.completes}. *)
 let completes_generic (type clause) completes table =
@@ -233,7 +229,7 @@ end
 module Exits_generator =
 struct
 
-  type clause = exits
+  type clause = t_exits
   type behaviors = (string, clause) Hashtbl.t
 
   let name = "exits"
@@ -273,7 +269,7 @@ struct
         (List.fold_left collect [] clauses |> List.split |> snd)
       |> List.sort_uniq (Cil_datatype.PredicateStructEq.compare)
     in
-    [ Exits, Logic_const.new_predicate @@ Logic_const.pors preds ]
+    [ Exits, Logic_const.new_predicate (Logic_const.pors preds) ]
 
   let custom_default mode kf spec =
     let custom_mode = get_custom_mode mode in
@@ -328,7 +324,7 @@ end
 module Assigns_generator =
 struct
 
-  type clause = assigns
+  type clause = t_assigns
   type behaviors = (string, assigns) Hashtbl.t
 
   let name = "assigns"
@@ -456,7 +452,7 @@ end
 module Requires_generator =
 struct
 
-  type clause = requires
+  type clause = t_requires
   type behaviors = (string, clause) Hashtbl.t
 
   let name = "requires"
@@ -533,7 +529,7 @@ end
 module Allocates_generator =
 struct
 
-  type clause = allocation
+  type clause = t_allocates
   type behaviors = (string, allocation) Hashtbl.t
 
   let name = "allocates"
@@ -633,7 +629,7 @@ end
 module Terminates_generator =
 struct
 
-  type clause = terminates
+  type clause = t_terminates
   type behaviors = bool
 
   let name = "terminates"
@@ -713,11 +709,11 @@ let get_mode = function
 (* Given a [mode], returns the configuration for each clause. *)
 let build_config mode =
   {
-    exits = mode;
-    assigns = mode;
-    requires = mode;
-    allocates = mode;
-    terminates = mode;
+    c_exits = mode;
+    c_assigns = mode;
+    c_requires = mode;
+    c_allocates = mode;
+    c_terminates = mode;
   }
 
 (* Build configuration from parameter [-generated-spec-mode]. *)
@@ -731,11 +727,11 @@ let get_config_custom () =
   let collect (k,v) config =
     let mode = get_mode (Option.get v) in
     match k with
-    | "exits" -> {config with exits = mode}
-    | "assigns" -> {config with assigns = mode}
-    | "requires" -> {config with requires = mode}
-    | "allocates" -> {config with allocates = mode}
-    | "terminates" -> {config with terminates = mode}
+    | "exits" -> {config with c_exits = mode}
+    | "assigns" -> {config with c_assigns = mode}
+    | "requires" -> {config with c_requires = mode}
+    | "allocates" -> {config with c_allocates = mode}
+    | "terminates" -> {config with c_terminates = mode}
     | s ->
       Kernel.abort
         "@['%s'@] is not a valid key for -generated-spec-custom.@, Accepted \
@@ -744,19 +740,28 @@ let get_config_custom () =
   in
   Kernel.GeneratedSpecCustom.fold collect default
 
-let activated_config clauses default =
+let activated_config kf clauses =
+  let default =
+    if is_frama_c_builtin kf then build_config Frama_C
+    else if is_frama_c_stdlib kf then build_config ACSL
+    else get_config_custom ()
+  in
   let collect config clause =
     match clause with
-    | `Exits -> {config with exits = default.exits}
-    | `Assigns -> {config with assigns = default.assigns}
-    | `Requires -> {config with requires = default.requires}
-    | `Allocates -> {config with allocates = default.allocates}
-    | `Terminates -> {config with terminates = default.terminates}
+    | `Exits -> {config with c_exits = default.c_exits}
+    | `Assigns -> {config with c_assigns = default.c_assigns}
+    | `Requires -> {config with c_requires = default.c_requires}
+    | `Allocates -> {config with c_allocates = default.c_allocates}
+    | `Terminates -> {config with c_terminates = default.c_terminates}
   in
   List.fold_left collect (build_config Skip) clauses
 
-let do_warning ~empty (combined, clauses) kf =
-  if clauses <> [] then
+let do_warning kf funspec (combined, clauses) =
+  if clauses <> [] && not (is_part_of_frama_c kf) then
+    let empty =
+      not (Kernel_function.has_definition kf)
+      && Cil.is_empty_funspec funspec
+    in
     let clauses = String.concat ", " clauses in
     if empty then
       Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
@@ -775,13 +780,13 @@ let do_warning ~empty (combined, clauses) kf =
 
 (* Perform generation of all clauses, adds them to the original specification,
    and emit property status for each of them. *)
-let do_populate clauses kf original_spec =
-  let config =
-    activated_config clauses @@
-    if is_frama_c_builtin kf then build_config Frama_C
-    else if is_frama_c_stdlib kf then build_config ACSL
-    else get_config_custom ()
+let do_populate ?funspec kf clauses =
+  let original_spec = match funspec with
+    | None -> Annotations.funspec kf
+    | Some funspec -> funspec
   in
+  let config = activated_config kf clauses in
+
   let apply (combined, clauses) get_default mode =
     let g, to_warn = get_default mode kf original_spec in
     match g, to_warn with
@@ -791,16 +796,14 @@ let do_populate clauses kf original_spec =
     | Generated _, Some (combined', clause) ->
       g, (combined || combined', clause :: clauses)
   in
-  let exits, w = apply (false, []) Exits.get_default config.exits in
-  let assigns, w = apply w Assigns.get_default config.assigns in
-  let requires, w = apply w Requires.get_default config.requires in
-  let allocates, w = apply w Allocates.get_default config.allocates in
-  let terminates, w = apply w Terminates.get_default config.terminates in
+  let no_warn = (false, []) in
+  let exits, warn = apply no_warn Exits.get_default config.c_exits in
+  let assigns, warn = apply warn Assigns.get_default config.c_assigns in
+  let requires, warn = apply warn Requires.get_default config.c_requires in
+  let allocates, warn = apply warn Allocates.get_default config.c_allocates in
+  let terminates, warn = apply warn Terminates.get_default config.c_terminates in
 
-  let is_empty_spec = Cil.is_empty_funspec original_spec in
-  let is_proto = not @@ Kernel_function.has_definition kf in
-  let empty = not @@ is_part_of_frama_c kf && is_proto && is_empty_spec in
-  do_warning ~empty w kf;
+  do_warning kf original_spec warn;
 
   let generated original = function
     | Kept -> original
@@ -817,12 +820,20 @@ let do_populate clauses kf original_spec =
   let spec = { spec with spec_behavior = [ bhv ] } in
   let spec =
     { spec with spec_terminates = generated spec.spec_terminates terminates } in
-  Annotations.add_spec emitter kf spec;
-  Exits.emit config.exits kf bhv exits;
-  Assigns.emit config.assigns kf bhv assigns;
-  Requires.emit config.assigns kf bhv requires;
-  Allocates.emit config.allocates kf bhv allocates;
-  Terminates.emit config.terminates kf bhv terminates
+  Annotations.add_spec emitter_populate kf spec;
+  Exits.emit config.c_exits kf bhv exits;
+  Assigns.emit config.c_assigns kf bhv assigns;
+  Requires.emit config.c_assigns kf bhv requires;
+  Allocates.emit config.c_allocates kf bhv allocates;
+  Terminates.emit config.c_terminates kf bhv terminates
+
+type clause = [
+  | `Exits
+  | `Assigns
+  | `Requires
+  | `Allocates
+  | `Terminates
+]
 
 module Clauses =
   Datatype.Make
@@ -853,6 +864,10 @@ module Is_populated =
 
 let () = Ast.add_linked_state Is_populated.self
 
+let todo_clauses kf clauses =
+  let not_populated c = not (Is_populated.mem (kf, c)) in
+  List.filter not_populated clauses
+
 (* Perform specification generation for [kf] if all requirements are met :
    - [clauses] is not empty
      AND
@@ -862,15 +877,14 @@ let () = Ast.add_linked_state Is_populated.self
      [do_body] is true
 *)
 let populate_funspec ?(do_body=false) ?funspec kf clauses =
-  let funspec = match funspec with
-    | None -> Annotations.funspec kf
-    | Some funspec -> funspec
-  in
-  let not_populated c = not @@ Is_populated.mem (kf, c) in
-  let todo_clauses = List.filter not_populated clauses in
-  if todo_clauses <> [] then
-    let is_proto = not @@ Kernel_function.has_definition kf in
-    if is_proto || do_body then begin
-      do_populate todo_clauses kf funspec;
-      List.iter (fun c -> Is_populated.add (kf, c) ()) todo_clauses
+  let todo = todo_clauses kf clauses in
+  if todo <> [] then
+    let has_body = Kernel_function.has_definition kf in
+    if not has_body || do_body then begin
+      do_populate ?funspec kf todo;
+      List.iter (fun c -> Is_populated.add (kf, c) ()) todo
     end
+
+let () =
+  let f kf funspec = populate_funspec ~funspec kf [`Assigns]; true in
+  Annotations.populate_spec_ref := f [@@ warning "-3"]

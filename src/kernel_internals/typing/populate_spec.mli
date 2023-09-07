@@ -24,7 +24,7 @@
     {!Kernel.GeneratedDefaultSpec}, {!Kernel.GeneratedSpecMode} and
     {!Kernel.GeneratedSpecCustom} can be used to chose in details which clause
     to generate in which cases.
-    *)
+*)
 
 open Cil_types
 
@@ -40,21 +40,21 @@ type clause = [
 
 (** Represents exits clause in the sense of
     {!Cil_types.behavior.b_post_cond}. *)
-type exits = (termination_kind * identified_predicate) list
+type t_exits = (termination_kind * identified_predicate) list
 
 (** Assigns clause *)
-type assigns = Cil_types.assigns
+type t_assigns = Cil_types.assigns
 
 (** Allocation clause *)
-type allocation = Cil_types.allocation
+type t_allocates = Cil_types.allocation
 
 (** Represents requires clause in the sense of
     {!Cil_types.behavior.b_requires}. *)
-type requires = identified_predicate list
+type t_requires = identified_predicate list
 
 (** Represents terminates clause in the sense of
     {!Cil_types.spec.spec_terminates}. *)
-type terminates = identified_predicate option
+type t_terminates = identified_predicate option
 
 (** Type of a function that, given a {!Kernel_function.t} and a
     {!Cil_types.spec}, returns a clause. Accepted clause types includes
@@ -71,18 +71,17 @@ type status = Property_status.emitted_status
     performed if left unspecified (can trigger a warnings).
 *)
 val register :
-  ?gen_exits:exits gen -> ?status_exits:status ->
-  ?gen_assigns:assigns gen -> ?status_assigns:status ->
-  ?gen_requires:requires gen -> ?gen_allocates:allocation gen ->
-  ?status_allocates:status -> ?gen_terminates:terminates gen ->
+  ?gen_exits:t_exits gen -> ?status_exits:status ->
+  ?gen_assigns:t_assigns gen -> ?status_assigns:status ->
+  ?gen_requires:t_requires gen -> ?gen_allocates:t_allocates gen ->
+  ?status_allocates:status -> ?gen_terminates:t_terminates gen ->
   ?status_terminates:status ->
   string -> unit
 
-(** [populate_funspec ~do_body ?funspec kf] generates missing specifications for
-    [kf].
+(** [populate_funspec ~do_body kf clauses] generates missing specifications for
+    [kf] according to selected [clauses].
     By default [do_body] is false, meaning only specification of prototypes will
     be generated.
-    If [funspec] is None, [Annotations.funspec kf] will be used to get kf's funspec.
-    *)
+*)
 val populate_funspec :
   ?do_body:bool -> ?funspec:funspec -> kernel_function -> clause list -> unit

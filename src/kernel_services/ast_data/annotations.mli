@@ -586,6 +586,9 @@ val global_state: State.t
 (** {2 Internal stuff} *)
 (**************************************************************************)
 
+val populate_spec_ref: (kernel_function -> funspec -> bool) ref
+[@@ deprecated "Uses Populate_spec.populate_funspec instead."]
+
 val unsafe_add_global: Emitter.t -> global_annotation -> unit
 val register_funspec:
   ?emitter:Emitter.t -> ?force:bool -> kernel_function -> unit
