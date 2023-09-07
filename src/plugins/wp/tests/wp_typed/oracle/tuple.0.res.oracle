@@ -7,30 +7,11 @@
 ------------------------------------------------------------
 
 Goal Post-condition 'P' in 'negate':
-Let a = Load_S1_S(x, Mint_0).
-Let x_1 = Mint_0[shiftfield_F1_S_p(x)].
-Let x_2 = a.F1_S_p.
-Assume {
-  Type: IsS1_S(a) /\ is_sint32(x_1) /\
-      is_sint32(Mint_0[shiftfield_F1_S_q(x)]) /\ is_sint32(x_2) /\
-      IsS1_S({ a with F1_S_p = -x_2 }).
-  (* Heap *)
-  Type: region(x.base) <= 0.
-}
-Prove: x_2 = x_1.
+Prove: true.
 
 ------------------------------------------------------------
 
 Goal Post-condition 'Q' in 'negate':
-Let a = Load_S1_S(x, Mint_0).
-Let x_1 = Mint_0[shiftfield_F1_S_q(x)].
-Let x_2 = a.F1_S_p.
-Assume {
-  Type: IsS1_S(a) /\ is_sint32(Mint_0[shiftfield_F1_S_p(x)]) /\
-      is_sint32(x_1) /\ is_sint32(x_2) /\ IsS1_S({ a with F1_S_p = -x_2 }).
-  (* Heap *)
-  Type: region(x.base) <= 0.
-}
-Prove: (a.F1_S_q) = x_1.
+Prove: true.
 
 ------------------------------------------------------------

@@ -9,19 +9,13 @@
 ------------------------------------------------------------
 
 Goal Post-condition 'F' in 'load':
-Let a = Load_S1_S(x, Mint_0).
-Assume { Type: IsS1_S(a). (* Heap *) Type: region(x.base) <= 0. }
-Prove: P_P(a.F1_S_f).
+Assume { (* Heap *) Type: region(x.base) <= 0. }
+Prove: P_P(Mint_0[shiftfield_F1_S_f(x)]).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'G' in 'load':
-Let a = Load_S1_S(x, Mint_0).
-Assume {
-  Type: is_sint32(k) /\ IsS1_S(a).
-  (* Heap *)
-  Type: region(x.base) <= 0.
-}
-Prove: P_P((a.F1_S_g)[k]).
+Assume { Type: is_sint32(k). (* Heap *) Type: region(x.base) <= 0. }
+Prove: P_P(Array_sint32(shiftfield_F1_S_g(x), 4, Mint_0)[k]).
 
 ------------------------------------------------------------

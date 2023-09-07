@@ -280,6 +280,8 @@ struct
                      let fd = cfield ~kind:Info.kind f in
                      let ft = (object_of f.ftype) in
                      let fv = Info.load sigma ft (M.field loc f) in
+                     let pr = F.e_apply (F.e_lambda prms fv) in
+                     F.set_builtin_field lfun fd pr ;
                      fd,fv
                   ) fields
               in Definitions.Function( result , Def , e_record def )
