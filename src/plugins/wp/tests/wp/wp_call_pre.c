@@ -1,11 +1,14 @@
 /* run.config
+EXIT: 1
 OPT: -wp-model Hoare -wp-no-simpl -wp-prop Rmain
 OPT: -wp-model Hoare -wp-no-simpl -wp-fct main
 OPT: -wp-model Hoare -wp-no-simpl -wp-prop Rf
+EXIT: 0
 OPT: -wp-model Hoare -wp-no-simpl -wp-fct double_call
 */
 
 /* run.config_qualif
+EXIT: 1
 OPT: -wp -wp-par 1
 */
 

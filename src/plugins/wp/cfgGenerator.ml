@@ -220,27 +220,41 @@ struct
         (fun kf modes ->
            List.iter
              begin fun (mode: CfgCalculus.mode) ->
-               WpContext.on_context (model,WpContext.Kf mode.kf)
+               WpContext.on_context (model,WpContext.Kf kf)
                  begin fun () ->
-                   LogicUsage.iter_lemmas
-                     (fun (l : LogicUsage.logic_lemma) ->
-                        if Logic_utils.use_predicate l.lem_predicate.tp_kind
-                        then VCG.register_lemma l) ;
-                   let bhv =
-                     if Cil.is_default_behavior mode.bhv then None
-                     else Some mode.bhv.b_name in
-                   let index = Wpo.Function(mode.kf,bhv) in
-                   let props = pool.props in
-                   try
-                     let wp = WP.compute ~mode ~props in
-                     let wcs = VCG.compile_wp index wp in
-                     collection := Bag.concat !collection wcs
-                   with WP.NonNaturalLoop loc ->
+                   if Kernel_function.is_entry_point kf &&
+                      not @@ Kernel_function.is_not_called kf
+                   then
                      Wp_parameters.error
-                       ~source:(fst loc)
-                       "Non natural loop detected.@\n\
-                        WP for function '%a' aborted."
+                       "Main entry point function '%a' is (potentially) \
+                        recursive.@\n\
+                        This case is not supported yet \
+                        (skipped verification)."
                        Kernel_function.pretty kf
+                   else
+                     begin
+                       (* ensures lemmas are already compiled in context *)
+                       LogicUsage.iter_lemmas
+                         (fun (l : LogicUsage.logic_lemma) ->
+                            if Logic_utils.use_predicate l.lem_predicate.tp_kind
+                            then VCG.register_lemma l) ;
+                       let bhv =
+                         if Cil.is_default_behavior mode.bhv then None
+                         else Some mode.bhv.b_name in
+                       let index = Wpo.Function(kf,bhv) in
+                       let props = pool.props in
+                       try
+                         let wp = WP.compute ~mode ~props in
+                         let wcs = VCG.compile_wp index wp in
+                         collection := Bag.concat !collection wcs
+                       with WP.NonNaturalLoop loc ->
+                         Wp_parameters.error
+                           ~source:(fst loc)
+                           "Non-natural loop detected in function '%a'.@\n\
+                            This case is not supported yet \
+                            (skipped verification)."
+                           Kernel_function.pretty kf
+                     end
                  end ()
              end
              (List.rev modes)

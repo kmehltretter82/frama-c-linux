@@ -142,7 +142,7 @@ let is_ptr x = Cil.isPointerType x.Cil_types.vtype
 let is_fun_ptr x = Cil.isFunctionType x.Cil_types.vtype
 let is_formal_ptr x = x.Cil_types.vformal && is_ptr x
 let is_init kf x =
-  Globals.is_entry_point ~when_lib_entry:false kf ||
+  CfgInfos.is_entry_point kf ||
   Wp_parameters.AliasInit.get () ||
   ( Wp_parameters.Init.get () && Cil.isGlobalInitConst x )
 

@@ -40,6 +40,12 @@ val smoking : t -> Cil_types.stmt -> bool
 val unreachable : t -> Cfg.vertex -> bool
 val terminates_deps : t -> Property.Set.t
 
+val is_entry_point : Kernel_function.t -> bool
+(** @return true iff the given argument should always be considered as the main
+            entry point, in particular: lib-entry is inactive.
+    @since Frama-C+dev
+*)
+
 val is_recursive : Kernel_function.t -> bool
 val in_cluster : caller:Kernel_function.t -> Kernel_function.t -> bool
 
