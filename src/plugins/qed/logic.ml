@@ -474,15 +474,15 @@ sig
   *)
 
   val set_builtin_get :
-    ?force: bool -> Fun.t -> (term list -> tau option -> term -> term) -> unit
+    ?force: bool -> Fun.t -> (term list -> term list -> term) -> unit
   (** [set_builtin_get f rewrite] register a builtin
-      for rewriting [(f a1..an)[k]] into [rewrite (a1..an) k].
-      The type given is the type of (f a1..an).
+      for rewriting [(f a1..an)[k1]..[km]] into [rewrite (a1..an) (k1..km)].
 
       The [force] parameters defaults to [false], when it is [true], if there
       exist another builtin, it is replaced with the new one. Use with care.
 
       @before 22.0-Titanium the optional [force] parameter does not exist
+      @before Frama-C+dev one-dimensional access only
   *)
 
   val set_builtin_field :

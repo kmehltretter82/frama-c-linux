@@ -10,12 +10,22 @@
 
 Goal Post-condition 'F' in 'load':
 Assume { (* Heap *) Type: region(x.base) <= 0. }
-Prove: P_P(Mint_0[shiftfield_F1_S_f(x)]).
+Prove: P_Obs(Mint_0[shiftfield_F1_S_f(x)]).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'G' in 'load':
 Assume { Type: is_sint32(k). (* Heap *) Type: region(x.base) <= 0. }
-Prove: P_P(Mint_0[shift_sint32(shiftfield_F1_S_g(x), k)]).
+Prove: P_Obs(Mint_0[shift_sint32(shiftfield_F1_S_g(x), k)]).
+
+------------------------------------------------------------
+
+Goal Post-condition 'H' in 'load':
+Assume {
+  Type: is_sint32(i) /\ is_sint32(j).
+  (* Heap *)
+  Type: region(x.base) <= 0.
+}
+Prove: P_Obs(Mint_0[shift_sint32(shiftfield_F1_S_m(x), i + (5 * j))]).
 
 ------------------------------------------------------------

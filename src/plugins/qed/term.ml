@@ -733,7 +733,7 @@ struct
     weak : W.t ;
     cache : term C.cache ;
     mutable builtins_fun : (term list -> tau option -> term) BUILTIN.t ;
-    mutable builtins_get : (term list -> tau option -> term -> term) BUILTIN.t ;
+    mutable builtins_get : (term list -> term list -> term) BUILTIN.t ;
     mutable builtins_eq  : (term -> term -> term) BUILTIN.t ;
     mutable builtins_leq : (term -> term -> term) BUILTIN.t ;
     mutable builtins_fld : (term list -> term) FIELD.t BUILTIN.t ;
@@ -2047,9 +2047,15 @@ struct
         | No -> e_get m0 k
         | Maybe -> c_get m k
       end
-    | Fun (g,xs) ->
+    | (Fun _ | Aget _) ->
       begin
-        try (BUILTIN.find g !state.builtins_get) xs m.tau k
+        try
+          let rec getmatrix m0 ks =
+            match m0.repr with
+            | Aget(m0,k) -> getmatrix m0 (k::ks)
+            | Fun(f,es) -> (BUILTIN.find f !state.builtins_get) es (List.rev ks)
+            | _ -> raise Not_found
+          in getmatrix m [k]
         with Not_found -> c_get m k
       end
     | _ -> c_get m k

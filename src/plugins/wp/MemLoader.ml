@@ -348,13 +348,15 @@ struct
             l_lemma = lemma ;
             l_cluster = cluster ;
           } ;
-          begin
-            match env.index_var with
-            | [k] ->
-              let pr = F.e_lambda (k::prms) vm in
-              Lang.F.set_builtin_get lfun (fun es _r e -> F.e_apply pr (e::es))
-            | _ -> ()
-          end ;
+          let pr = F.e_lambda (prms @ env.index_var) vm in
+          let nk = List.length env.index_var in
+          Lang.F.set_builtin_get lfun
+            (fun es ks ->
+               if List.length ks = nk then
+                 F.e_apply pr (es @ ks)
+               else
+                 raise Not_found
+            ) ;
           if env.length <> None then
             begin
               let ns = List.map F.e_var env.size_var in
