@@ -269,8 +269,8 @@ struct
           let lfun =
             Lang.generated_f ~context:true ~result "Load%a_%s"
               pp_rid r (Info.comp_id c) in
-          let ms,chunks,sigma = signature domain in
-          let prms = x :: ms in
+          let xms,chunks,sigma = signature domain in
+          let prms = x :: xms in
           let dfun =
             match c.cfields with
             | None -> Definitions.Logic result
@@ -324,17 +324,19 @@ struct
               pp_rid r (Info.array_id a) Matrix.pp_suffix_id ds in
           let prefix = Lang.Fun.debug lfun in
           let name = prefix ^ "_access" in
-          let xmem,chunks,sigma = signature domain in
+          let xms,chunks,sigma = signature domain in
           let env = Matrix.cc_env ds in
-          let phi = e_fun lfun (v :: env.size_val @ List.map e_var xmem) in
+          let prms = x :: env.size_var @ xms in
+          let phi = e_fun lfun (v :: env.size_val @ List.map e_var xms) in
           let va = List.fold_left e_get phi env.index_val in
           let ofs = e_sum env.index_offset in
           let vm = Info.load sigma obj (M.shift loc obj ofs) in
           let lemma = p_hyps env.index_range (p_equal va vm) in
           let cluster = cluster () in
           Definitions.define_symbol {
-            d_lfun = lfun ; d_types = 0 ;
-            d_params = x :: env.size_var @ xmem ;
+            d_lfun = lfun ;
+            d_types = 0 ;
+            d_params = prms ;
             d_definition = Logic result ;
             d_cluster = cluster ;
           } ;
@@ -346,6 +348,13 @@ struct
             l_lemma = lemma ;
             l_cluster = cluster ;
           } ;
+          begin
+            match env.index_var with
+            | [k] ->
+              let pr = F.e_lambda (k::prms) vm in
+              Lang.F.set_builtin_get lfun (fun es _r e -> F.e_apply pr (e::es))
+            | _ -> ()
+          end ;
           if env.length <> None then
             begin
               let ns = List.map F.e_var env.size_var in
