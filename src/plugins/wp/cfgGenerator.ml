@@ -226,7 +226,7 @@ struct
                       not @@ Kernel_function.is_not_called kf
                    then
                      Wp_parameters.error
-                       "Main entry point function '%a' is (potentially)\
+                       "Main entry point function '%a' is (potentially) \
                         recursive.@\n\
                         This case is not supported yet \
                         (skipped verification)."

@@ -2,7 +2,7 @@
 [kernel] Parsing wp_call_pre.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] User Error: Main entry point function 'main' is (potentially)recursive.
+[wp] User Error: Main entry point function 'main' is (potentially) recursive.
   This case is not supported yet (skipped verification).
 [wp] No proof obligations
 [wp] User Error: Deferred error message was emitted during execution. See above messages for more information.
