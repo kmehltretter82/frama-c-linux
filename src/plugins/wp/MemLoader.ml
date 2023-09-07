@@ -267,25 +267,26 @@ struct
           let domain = Info.footprint obj loc in
           let result = Info.t_comp c in
           let lfun =
-            Lang.generated_f ~result "Load%a_%s" pp_rid r (Info.comp_id c)
-          in
-          (* Since its a generated it is the unique name given *)
-          let xms,chunks,sigma = signature domain in
+            Lang.generated_f ~context:true ~result "Load%a_%s"
+              pp_rid r (Info.comp_id c) in
+          let ms,chunks,sigma = signature domain in
+          let prms = x :: ms in
           let dfun =
             match c.cfields with
             | None -> Definitions.Logic result
             | Some fields ->
               let def = List.map
                   (fun f ->
-                     cfield ~kind:Info.kind f,
-                     Info.load sigma (object_of f.ftype) (M.field loc f)
+                     let fd = cfield ~kind:Info.kind f in
+                     let ft = (object_of f.ftype) in
+                     let fv = Info.load sigma ft (M.field loc f) in
+                     fd,fv
                   ) fields
-              in
-              Definitions.Function( result , Def , e_record def )
+              in Definitions.Function( result , Def , e_record def )
           in
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
-            d_params = x :: xms ;
+            d_params = prms ;
             d_definition = dfun ;
             d_cluster = cluster () ;
           } ;
@@ -317,7 +318,7 @@ struct
           let domain = Info.footprint obj loc in
           let result = Matrix.cc_tau (Info.t_array a) ds in
           let lfun =
-            Lang.generated_f ~result "Array%a_%s%a"
+            Lang.generated_f ~result ~context:true "Array%a_%s%a"
               pp_rid r (Info.array_id a) Matrix.pp_suffix_id ds in
           let prefix = Lang.Fun.debug lfun in
           let name = prefix ^ "_access" in
