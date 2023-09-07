@@ -7674,13 +7674,18 @@ and normalize_binop binop action local_env asconst le re what =
  * version if necessary *)
 and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
   let doArithmetic () =
-    let tres = arithmeticConversion t1 t2 in
-    (* Keep the operator since it is arithmetic *)
-    tres,
-    optConstFoldBinOp loc false bop
-      (makeCastT ~e:e1 ~oldt:t1 ~newt:tres)
-      (makeCastT ~e:e2 ~oldt:t2 ~newt:tres)
-      tres
+    if isArithmeticType t1 && isArithmeticType t2 then begin
+      let tres = arithmeticConversion t1 t2 in
+      (* Keep the operator since it is arithmetic *)
+      tres,
+      optConstFoldBinOp loc false bop
+        (makeCastT ~e:e1 ~oldt:t1 ~newt:tres)
+        (makeCastT ~e:e2 ~oldt:t2 ~newt:tres)
+        tres
+    end else
+      abort_context
+        "%a operator on non-arithmetic type(s) %a and %a"
+        Cil_printer.pp_binop bop Cil_printer.pp_typ t1 Cil_printer.pp_typ t2
   in
   let doArithmeticComp () =
     let tres = arithmeticConversion t1 t2 in
@@ -7692,17 +7697,22 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
       intType
   in
   let doIntegralArithmetic () =
-    let tres = unrollType (arithmeticConversion t1 t2) in
-    match tres with
-    | TInt _ ->
-      tres,
-      optConstFoldBinOp loc false bop
-        (makeCastT ~e:e1 ~oldt:t1 ~newt:tres)
-        (makeCastT ~e:e2 ~oldt:t2 ~newt:tres)
-        tres
-    | _ ->
-      abort_context "%a operator on non-integer type %a"
-        Cil_printer.pp_binop bop Cil_datatype.Typ.pretty tres
+    if isIntegralType t1 && isIntegralType t2 then begin
+      let tres = unrollType (arithmeticConversion t1 t2) in
+      match tres with
+      | TInt _ ->
+        tres,
+        optConstFoldBinOp loc false bop
+          (makeCastT ~e:e1 ~oldt:t1 ~newt:tres)
+          (makeCastT ~e:e2 ~oldt:t2 ~newt:tres)
+          tres
+      | _ ->
+        Kernel.fatal
+          "conversion of integer types %a and %a returned a non-integer type %a"
+          Cil_printer.pp_typ t1 Cil_printer.pp_typ t2 Cil_printer.pp_typ tres
+    end else
+      abort_context "%a operator on non-integer type(s) %a and %a"
+        Cil_printer.pp_binop bop Cil_printer.pp_typ t1 Cil_printer.pp_typ t2
   in
   (* Invariant: t1 and t2 are pointers types *)
   let pointerComparison e1 t1 e2 t2 =

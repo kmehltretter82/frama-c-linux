@@ -1,0 +1,10 @@
+[kernel] Parsing binary_op.c (with preprocessing)
+[kernel] binary_op.c:15: User Error: 
+  * operator on non-arithmetic type(s) int and int (*)(void)
+  13    
+  14    #ifdef MULT
+  15    int w(void) { return 0 * w; }
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  16    #endif
+  17
+[kernel] Frama-C aborted: invalid user input.
