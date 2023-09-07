@@ -1,0 +1,7 @@
+[kernel] Parsing origin_simpl.c (with preprocessing)
+[alias] analysing function: f
+[alias] analysing instruction: tmp = (void *)*((int *)(t));
+[alias:unsafe-cast] origin_simpl.c:9: Warning: unsafe cast from int to void *
+[alias:unsafe-cast] origin_simpl.c:9: Warning: unsafe cast from char * to int *
+[alias] May-aliases after instruction  tmp = (void *)*((int *)(t));  are  {t, tmp}
+[alias] May-aliases at the end of function f: {t, tmp}

@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Alias     [2023-09-07] New alias plugin that implements a points-to
+              analysis and an alias analysis based on Steensgaard's algorithm.
+              For these purposes it presents a more efficient (albeit less
+              precise) alternative to Eva. See src/plugins/alias/README.md.
 -   Kernel    [2023-09-04] Fix #@846 (printing ACSL attribute in ghost code)
 o   Kernel    [2023-07-24] Expose Cil functions for type compatibility
 

@@ -452,12 +452,13 @@ let rec create_vertex lv x =
   begin
     match lv with
       (Mem e, NoOffset) ->
-      (* special case, when we also add another vertex and a points-to edge*)
+      (* special case, when we also add another vertex and a points-to edge *)
       begin
         (* first find the vertex corresponding to e *)
         match LvalOrRef.from_exp e with
         | None -> Options.fatal "unexpected result: Lval.from (%a) = None" Exp.pretty e
-        | Some (LvalOrRef.Ref _) -> Options.fatal "unexpected: *(&x)"
+        | Some (LvalOrRef.Ref lv1) ->
+          find_or_create_vertex (LvalOrRef.Lval lv1) x
         | Some (LvalOrRef.Lval lv1) ->
           (* find the vertex *)
           let v1, x = find_or_create_vertex (LvalOrRef.Lval lv1) x in

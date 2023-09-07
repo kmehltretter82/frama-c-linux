@@ -13,6 +13,9 @@ changes the value of the other pointer and vice versa.
 
 The plugin implements a variant of « Steensgaard's algorithm ».
 
+Note that the Eva plugin also implements a points-to analysis, which is much
+more precise but also much less efficient than this plugin.
+
 ## Usage
 
 To run the may-alias analysis either:
