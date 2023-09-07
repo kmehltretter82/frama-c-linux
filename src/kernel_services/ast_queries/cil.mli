@@ -1167,11 +1167,19 @@ val need_cast: ?force:bool -> typ -> typ -> bool
     @since Frama-C+dev*)
 val typeForInsertedCast: (exp -> typ -> typ -> typ) ref
 
-(** [checkCast context fromsource oldt newt] throw a warning or an error
+(** [checkCast context fromsource oldt newt] emits a warning or an error
     if the cast from [oldt] to [newt] is invalid.
     Otherwise, doesn't make anything.
     [fromsource] is [false] (default) if the cast is not from the source.
     Check [areCompatibleTypes] documentation for [context].
+
+    Suspicious cases that only emits a warning :
+    - Implicit cast from a pointer to an integer.
+    - Cast from a pointer to a function type to another pointer to a function
+      type when the function types are not compatible.
+    - Cast from an array to a pointer/array when types are not compatible.
+    - Cast, in both directions, between pointer to an object type and pointer
+      to a function type.
 
     @since Frama-C+dev*)
 val checkCast:
