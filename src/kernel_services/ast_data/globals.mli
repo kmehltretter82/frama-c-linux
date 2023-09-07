@@ -302,14 +302,6 @@ val set_entry_point : string -> bool -> unit
     [Kernel.MainFunction] or [Kernel.LibEntry].
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
-val is_entry_point : ?when_lib_entry:bool -> kernel_function -> bool
-(** @return [true] iff the given kernel function is the entry point.
-    The optional parameter [when_lib_entry] overrides the result if we are
-    in -lib-entry mode.
-
-    @since 25.0-Manganese
-*)
-
 (* ************************************************************************* *)
 (** {2 Comments} *)
 (* ************************************************************************* *)

@@ -299,6 +299,9 @@ end
 let is_recursive = RecursiveClusters.is_recursive
 let in_cluster = RecursiveClusters.in_cluster
 
+let is_entry_point kf =
+  not @@ Kernel.LibEntry.get () && Kernel_function.is_entry_point kf
+
 (* -------------------------------------------------------------------------- *)
 (* --- No variant loops                                                   --- *)
 (* -------------------------------------------------------------------------- *)
@@ -434,7 +437,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
   } in
   let behaviors = Annotations.behaviors kf in
   (* Inits *)
-  if Globals.is_entry_point ~when_lib_entry:false kf then
+  if is_entry_point kf then
     infos.annots <- List.exists (selected_main_bhv ~bhv ~prop) behaviors ;
   (* Function Body *)
   Option.iter

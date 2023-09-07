@@ -771,7 +771,7 @@ struct
     let env = empty_env kf @* [Clabels.pre,pres.post;Clabels.post,posts.pre] in
     (* initialization *)
     let init =
-      init ~is_pre_main:(Globals.is_entry_point ~when_lib_entry:false kf)
+      init ~is_pre_main:(CfgInfos.is_entry_point kf)
         (env @* [Clabels.here,pres.pre]) in
     (* pre-condition *)
     let pre =
