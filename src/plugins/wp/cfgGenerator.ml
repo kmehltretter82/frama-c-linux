@@ -223,7 +223,7 @@ struct
                WpContext.on_context (model,WpContext.Kf kf)
                  begin fun () ->
                    if Kernel_function.is_entry_point kf &&
-                      not @@ Kernel_function.is_not_called_function kf
+                      not @@ Kernel_function.is_not_called kf
                    then
                      Wp_parameters.error
                        "Main entry point function '%a' is (potentially)\
