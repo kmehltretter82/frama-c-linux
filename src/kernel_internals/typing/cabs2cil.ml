@@ -6067,7 +6067,17 @@ and doExp local_env
       else
         abort_context "Unary ~ on a non-integral type"
 
-    | Cabs.UNARY(Cabs.PLUS, e) -> doExp (no_paren_local_env local_env) asconst e what
+    | Cabs.UNARY(Cabs.PLUS, e) ->
+      let (r, se, e, t as v) = doExp (no_paren_local_env local_env) asconst e what in
+      if isIntegralType t then
+        let newt = integralPromotion t in
+        let e' = makeCastT ~e ~oldt:t ~newt in
+        finishExp r se e' newt
+      else
+      if isArithmeticType t then
+        v
+      else
+        abort_context "Unary + on a non-arithmetic type"
 
     | Cabs.UNARY(Cabs.ADDROF, e) ->
       (* some normalization is needed here to remove potential COMMA, QUESTION
