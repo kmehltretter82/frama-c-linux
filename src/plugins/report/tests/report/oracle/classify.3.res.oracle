@@ -7,8 +7,8 @@
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
-[wp] [Valid] typed_f_assigns (Qed)
 [wp] [Valid] typed_f_ensures (Qed)
+[wp] [Valid] typed_f_assigns (Qed)
 [wp] Proved goals:    2 / 2
   Qed:             2
 [report] Classification
