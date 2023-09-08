@@ -39,6 +39,8 @@ let term_to_exp_ref
   =
   ref (fun ~adata:_ _kf _env _t -> Extlib.mk_labeled_fun "term_to_exp_ref")
 
+let term_to_exp ~adata kf env t = !term_to_exp_ref ~adata kf env t
+
 let predicate_to_exp_ref
   : (adata:Assert.t ->
      ?name:string ->
@@ -50,6 +52,9 @@ let predicate_to_exp_ref
   =
   ref (fun ~adata:_ ?name:_ _kf ?rte:_ _env _p ->
       Extlib.mk_labeled_fun "predicate_to_exp_ref")
+
+let predicate_to_exp ~adata ?name kf ?rte env p =
+  !predicate_to_exp_ref ~adata ?name kf ?rte env p
 
 (**************************************************************************)
 (********************** Utility functions *********************************)
@@ -97,7 +102,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
       Typing.preprocess_predicate ~logic_env lower_guard;
       let adata_lower_guard, env = Assert.empty ~loc kf env in
       let lower_guard, adata_lower_guard, env =
-        !predicate_to_exp_ref ~adata:adata_lower_guard kf env lower_guard
+        predicate_to_exp ~adata:adata_lower_guard kf env lower_guard
       in
       let assertion, env =
         Assert.runtime_check
@@ -127,7 +132,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
   Typing.preprocess_predicate ~logic_env upper_guard;
   let adata_upper_guard, env = Assert.empty ~loc kf env in
   let upper_guard, adata_upper_guard, env =
-    !predicate_to_exp_ref ~adata:adata_upper_guard kf env upper_guard
+    predicate_to_exp ~adata:adata_upper_guard kf env upper_guard
   in
   let assertion, env =
     Assert.runtime_check
@@ -141,7 +146,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
   in
   let stmts = assertion :: stmts in
   (* Translate term [t] into an exp of type [size_t] *)
-  let gmp_e, adata, env = !term_to_exp_ref ~adata kf env t in
+  let gmp_e, adata, env = term_to_exp ~adata kf env t in
   let  _, e, env = Env.new_var
       ~loc
       ~name:"size"
@@ -180,13 +185,13 @@ let comparison_to_exp
   let e1, adata, env =
     match e1 with
     | None ->
-      let e1, adata, env = !term_to_exp_ref ~adata kf env t1 in
+      let e1, adata, env = term_to_exp ~adata kf env t1 in
       e1, adata, env
     | Some e1 ->
       e1, adata, env
   in
   let ty1 = Cil.typeOf e1 in
-  let e2, adata, env = !term_to_exp_ref ~adata kf env t2 in
+  let e2, adata, env = term_to_exp ~adata kf env t2 in
   let ty2 = Cil.typeOf e2 in
   let e, env =
     match Logic_aggr.get_t ty1, Logic_aggr.get_t ty2 with
@@ -265,7 +270,7 @@ let env_of_li ~adata ~loc kf env li =
     let logic_env = Env.Logic_env.get env in
     let ty = Typing.get_typ ~logic_env t in
     let vi, vi_e, env = Env.Logic_binding.add ~ty env kf li.l_var_info in
-    let e, adata, env = !term_to_exp_ref ~adata kf env t in
+    let e, adata, env = term_to_exp ~adata kf env t in
     let stmt = match Typing.get_number_ty ~logic_env t with
       | C_integer _ | C_float _ | Nan ->
         Smart_stmt.assigns ~loc ~result:(Cil.var vi) e
