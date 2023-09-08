@@ -27,8 +27,10 @@ let status_allocates = Property_status.Dont_know
 let status_terminates = Property_status.Dont_know
 
 let run () =
+  let open Populate_spec in
   let get_spec kf =
-    ignore(Annotations.funspec kf)
+    populate_funspec ~do_body:true kf
+      [`Exits; `Assigns; `Requires; `Allocates; `Terminates]
   in
   Globals.Functions.iter get_spec
 

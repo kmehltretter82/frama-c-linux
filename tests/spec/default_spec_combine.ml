@@ -15,8 +15,9 @@ let gen_terminates _ _ = None
 let status_terminates = Property_status.Dont_know
 
 let run () =
+  let open Populate_spec in
   let get_spec kf =
-    ignore(Annotations.funspec kf)
+    populate_funspec kf [`Exits; `Assigns; `Requires; `Allocates; `Terminates]
   in
   Globals.Functions.iter get_spec
 
@@ -32,3 +33,5 @@ let populate () =
 
 
 let () = Cmdline.run_after_configuring_stage populate
+
+let () = Db.Main.extend run

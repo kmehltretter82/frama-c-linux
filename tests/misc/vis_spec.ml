@@ -11,7 +11,6 @@ class pathcrawlerVisitor prj =
         fundec.svar.vname
         Printer.pp_funspec fundec.sspec;
       let kf = Globals.Functions.get fundec.svar in
-      Populate_spec.(populate_funspec kf [`Assigns]);
       Format.printf "@[It is@ @['%a'@]@ through get_spec@]@."
         Printer.pp_funspec
         (Annotations.funspec kf);
@@ -26,7 +25,6 @@ class pathcrawlerVisitor prj =
            fundec.svar.vname
            Printer.pp_funspec sp;
          let kf = Globals.Functions.get fundec.svar in
-         Populate_spec.(populate_funspec kf [`Assigns]);
          Format.printf "@[It is@ @['%a'@]@ through get_spec@]@."
            Printer.pp_funspec
            (Annotations.funspec kf);

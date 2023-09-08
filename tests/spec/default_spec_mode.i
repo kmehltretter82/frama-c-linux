@@ -1,9 +1,8 @@
 /* run.config
-   STDOPT: +"-no-generate-default-spec"
-   STDOPT: +"-generated-spec-mode skip"
-   STDOPT: +"-generated-spec-mode acsl -generated-spec-custom allocates:acsl"
-   STDOPT: +"-generated-spec-mode safe -generated-spec-custom allocates:safe"
-   STDOPT: +"-generated-spec-mode frama-c -generated-spec-custom allocates:frama-c"
+   MODULE: @PTEST_NAME@
+   STDOPT: +"-generated-spec-mode acsl"
+   STDOPT: +"-generated-spec-mode safe"
+   STDOPT: +"-generated-spec-mode frama-c"
    STDOPT: +"-generated-spec-custom exits:acsl,assigns:frama-c,requires:safe,allocates:safe,terminates:acsl"
 
    EXIT: 1
