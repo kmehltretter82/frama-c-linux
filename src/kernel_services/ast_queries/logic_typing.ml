@@ -1351,53 +1351,21 @@ struct
 
     end
 
-  let rec c_cast_to ot nt e =
+  let c_cast_to ot nt e =
     if is_same_c_type ot nt then (ot, e)
-    else begin
-      let result = (nt, mk_cast e (Ctype nt)) in
-      match ot, nt with
-      | TNamed(r, _), _ -> c_cast_to r.ttype nt e
-      | _, TNamed(r, _) -> c_cast_to ot r.ttype e
-      | TInt(_ikindo,_), TInt(_ikindn,_) ->
-        result
-      | TInt _, TPtr _ -> result
-      | TPtr _, TInt _ -> result
-      | ((TArray (told,_,_) | TPtr (told,_)),
-         (TPtr (tnew,_) | TArray(tnew,_,_)))
-        when is_same_c_type told tnew -> result
-      | (TPtr _ | TArray _), (TPtr _ | TArray _)
-        when isLogicNull e -> result
-      | TPtr _, TPtr _ when isVoidPtrType nt -> (nt, e)
-      | TPtr (t1,_), TPtr (t2,_) when
-          Cil.isFunctionType t1 &&
-          Cil.isFunctionType t2 &&
-          is_compatible_funtype t1 t2 -> result
-      | TEnum _, TInt _ -> result
-      | TFloat _, (TInt _|TEnum _) -> result
-      | (TInt _|TEnum _), TFloat _ -> result
-      | TFloat _, TFloat _ -> result
-      | TInt _, TEnum _ -> result
-      | TEnum _, TEnum _ -> result
-      | TEnum _, TPtr _ -> result
-      | TBuiltin_va_list _, (TInt _ | TPtr _) ->
-        result
-      | (TInt _ | TPtr _), TBuiltin_va_list _ ->
-        Kernel.debug ~level:3 "Casting %a to __builtin_va_list"
-          Cil_printer.pp_typ ot;
-        result
-      | TPtr _, TEnum _ ->
-        Kernel.debug ~level:3 "Casting a pointer into an enumeration type";
-        result
-      | (TInt _ | TEnum _ | TPtr _ ), TVoid _ ->
-        (ot, e)
-      | TComp (comp1, _), TComp (comp2, _)
-        when comp1.ckey = comp2.ckey ->
-        nt, e
-      | _ ->
-        Kernel.fatal ~current:true
-          "Logic_typing.c_cast_to: %a -> %a@."
-          Cil_printer.pp_typ ot Cil_printer.pp_typ nt
-    end
+    else
+      begin
+        Cil.checkCast ot nt;
+        match Cil.unrollType ot, Cil.unrollType nt with
+        | TPtr _, TPtr _ when isVoidPtrType nt ->
+          nt, e
+        | (TInt _ | TEnum _ | TPtr _ ), TVoid _ ->
+          ot, e
+        | TComp (comp1, _), TComp (comp2, _) when comp1.ckey = comp2.ckey ->
+          nt, e
+        | _ -> nt, mk_cast e (Ctype nt)
+      end
+
 
   (* for overloading: raised when an arguments list does not fit a
      formal parameter list *)

@@ -125,19 +125,7 @@ let () = Cil_printer.register_shallow_attribute frama_c_destructor
     types of cabs2cil-introduced temp variables. *)
 let typeForInsertedVar: (Cil_types.typ -> Cil_types.typ) ref = ref (fun t -> t)
 
-(** Like [typeForInsertedVar], but for casts.
-  * Casts in the source code are exempt from this hook. *)
-let typeForInsertedCast:
-  (Cil_types.exp -> Cil_types.typ -> Cil_types.typ -> Cil_types.typ) ref =
-  ref (fun _ _ t -> t)
-
-
 let cabs_exp loc node = { expr_loc = loc; expr_node = node }
-
-let bigger_length_args l1 l2 =
-  match l1, l2 with
-  | None, _ | _, None -> false
-  | Some l1, Some l2 -> List.length l1 > List.length l2
 
 let abort_context msg =
   let pos = fst (Cil.CurrentLoc.get ()) in
@@ -707,23 +695,6 @@ let gotoTargetData: (varinfo * stmt) option ref = ref None
 let gotoTargetHash: (string, int) H.t = H.create 13
 let gotoTargetNextAddr: int ref = ref 0
 
-
-(********** TRANSPARENT UNION ******)
-(* Check if a type is a transparent union, and return the first field if it
- * is *)
-let isTransparentUnion (t: typ) : fieldinfo option =
-  match unrollType t with
-  | TComp (comp, _) when not comp.cstruct ->
-    (* Turn transparent unions into the type of their first field *)
-    if typeHasAttribute "transparent_union" t then begin
-      match comp.cfields with
-      | Some [] | None ->
-        abort_context
-          "Empty transparent union: %s" (compFullName comp)
-      | Some (f :: _) -> Some f
-    end else
-      None
-  | _ -> None
 
 (* When we process an argument list, remember the argument index which has a
  * transparent union type, along with the original type. We need this to
@@ -1438,33 +1409,6 @@ let integralPromotion = Cil.integralPromotion
    we drop qualifiers, and recover them for the few operators that are
    exceptions, also listed in 6.3.2.1:2 *)
 let dropQualifiers = Cil.type_remove_qualifier_attributes
-
-(* true if the expression is known to be a boolean result, i.e. 0 or 1. *)
-let rec is_boolean_result e =
-  Cil.(isBoolType (typeOf e)) ||
-  match e.enode with
-  | Const _ ->
-    (match Cil.isInteger e with
-     | Some i ->
-       Integer.equal i Integer.zero || Integer.equal i Integer.one
-     | None -> false)
-  | CastE (_,e) -> is_boolean_result e
-  | BinOp((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr),_,_,_) -> true
-  | BinOp((PlusA | PlusPI | MinusA | MinusPI | MinusPP | Mult
-          | Div | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr),_,_,_) -> false
-  | UnOp(LNot,_,_) -> true
-  | UnOp ((Neg | BNot),_,_) -> false
-  | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
-  | AlignOfE _ | AddrOf _ | StartOf _ -> false
-
-(* Like Cil.mkCastT, but it calls typeForInsertedCast *)
-let makeCastT ~(e: exp) ~(oldt: typ) ~(newt: typ) =
-  if need_cast oldt newt then
-    Cil.mkCastT ~oldt ~newt:(!typeForInsertedCast e oldt newt) e
-  else e
-
-let makeCast ~(e: exp) ~(newt: typ) =
-  makeCastT ~e ~oldt:(typeOf e) ~newt
 
 let is_scalar_type t =
   match unrollType t with
@@ -2182,7 +2126,7 @@ struct
       | Case (e, loc) ->
         (* If needed, convert e to type t, and check in case the label
            was too big *)
-        let e' = makeCast ~e ~newt:t in
+        let e' = mkCast ~newt:t e in
         let constFold = constFold true in
         let e'' = if theMachine.lowerConstants then constFold e' else e' in
         (match constFoldToInt e, constFoldToInt e'' with
@@ -2661,208 +2605,9 @@ let cabsTypeAddAttributes =
 
 let get_qualifiers t = Cil.filter_qualifier_attributes (Cil.typeAttrs t)
 
-(* Specify whether the cast is from the source code *)
-let rec castTo ?context ?(fromsource=false)
-    (ot : typ) (nt : typ) (e : exp) : (typ * exp ) =
-  let dkey = Kernel.dkey_typing_cast in
-  Kernel.debug ~dkey "@[%t: castTo:%s %a->%a@\n@]"
-    Cil.pp_thisloc (if fromsource then "(source)" else "")
-    Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt;
-  if not fromsource && not (need_cast ot nt) then begin
-    (* Do not put the cast if it is not necessary, unless it is from the
-     * source. *)
-    Kernel.debug ~dkey "no cast to perform";
-    (ot, e)
-  end else begin
-    let nt = if fromsource then nt else !typeForInsertedCast e ot nt in
-    let result = (nt, if theMachine.insertImplicitCasts || fromsource then
-                    Cil.mkCastT ~force:true ~oldt:ot ~newt:nt e else e)
-    in
-    let origin_error =
-      if fromsource then "explicit cast:" else " implicit cast:"
-    in
-    (*  [BM] uncomment the following line to enable attributes static typing
-        ignore (check_strict_attributes true ot nt  && check_strict_attributes false nt ot);*)
-    Kernel.debug ~dkey "@[castTo: ot=%a nt=%a\n  result is %a@\n@]"
-      Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
-      Cil_printer.pp_exp (snd result);
-    (* Now see if we can have a cast here *)
-    match Cil.unrollType ot, Cil.unrollType nt with
-    | TNamed _, _
-    | _, TNamed _ -> Kernel.fatal ~current:true "unrollType failed in castTo"
-    | t, TInt(IBool,_) when is_scalar_type t ->
-      if is_boolean_result e then begin
-        Kernel.debug ~dkey "Explicit cast to Boolean: %a" Cil_printer.pp_exp e;
-        result
-      end else begin
-        Kernel.debug ~dkey
-          "bool conversion by checking !=0: %a" Cil_printer.pp_exp e;
-        let cmp = Cil.mkBinOp ~loc:e.eloc Ne e (Cil.integer ~loc:e.eloc 0) in
-        let oldt = Cil.typeOf cmp in
-        nt, Cil.mkCastT ~oldt ~newt:nt cmp
-      end
-    | TInt(_,_), TInt(_,_) ->
-      (* We used to ignore attributes on integer-integer casts. Not anymore *)
-      (* if ikindo = ikindn then (nt, e) else *)
-      result
-    | TPtr (TFun (_,args,va,_),_), TPtr(TFun (_,args',va',_),_) ->
-      (* Checks on casting from a function type into another one.
-         We enforce at least the same number of arguments, and emit a warning
-         if types do not match. Note that empty argument lists are always
-         compatible. *)
-      if (va <> va' || bigger_length_args args args') &&
-         (args <> None && args' <> None)
-      then
-        abort_context
-          "%s conversion between function types with \
-           different number of arguments:@ %a@ and@ %a"
-          origin_error
-          Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt;
-      if not (areCompatibleTypes ?context ot nt) then
-        Kernel.warning
-          ~wkey:Kernel.wkey_incompatible_types_call
-          ~current:true
-          "implicit conversion between incompatible function types:@ \
-           %a@ and@ %a"
-          Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt;
-      result
-
-    | TFun _, TPtr(TFun _, _) ->
-      let clean_e =
-        match e.enode with
-        | Lval lv ->  Cil.mkAddrOf ~loc:e.eloc lv
-        | _ -> e (* function decay into pointer anyway *)
-      in
-      castTo ?context ~fromsource (TPtr (ot, [])) nt clean_e
-
-    (* accept converting a ptr to function to/from a ptr to void, even though
-       not really accepted by the standard. gcc supports it. though
-    *)
-    | TPtr (TFun _,_), TPtr (TVoid _, _) -> result
-    | TPtr (TVoid _, _), TPtr (TFun _,_) -> result
-    (* Taking numerical address or calling an absolute location. Also
-       accepted by gcc albeit with a warning. *)
-    | TInt _, TPtr (TFun _, _) -> result
-
-    (* pointer to potential function type. Note that we do not
-       use unrollTypeDeep above in order to avoid needless divergence with
-       original type in the sources.
-    *)
-    | TPtr(TFun _,_), TPtr(TNamed(ti,nattr),pattr) ->
-      castTo ?context
-        ~fromsource ot (TPtr (Cil.typeAddAttributes nattr ti.ttype, pattr)) e
-    | TPtr(TNamed(ti,nattr),pattr), TPtr(TFun _,_) ->
-      castTo ?context
-        ~fromsource (TPtr (Cil.typeAddAttributes nattr ti.ttype, pattr)) nt e
-
-    (* No other conversion implying a pointer to function
-       and a pointer to object are supported. *)
-    | TPtr (TFun _,_), TPtr _ ->
-      Kernel.warning
-        ~wkey:Kernel.wkey_incompatible_pointer_types
-        ~current:true
-        "casting function to %a" Cil_datatype.Typ.pretty nt;
-      result
-    | TPtr _, TPtr (TFun _,_) ->
-      Kernel.warning
-        ~wkey:Kernel.wkey_incompatible_pointer_types
-        ~current:true
-        "casting function from %a" Cil_datatype.Typ.pretty ot;
-      result
-    | _, TPtr (TFun _, _) ->
-      abort_context "%s cannot cast %a to function type"
-        origin_error Cil_datatype.Typ.pretty ot
-    | TPtr _, TPtr _ -> result
-
-    | TInt _, TPtr _ -> result
-
-    | TPtr _, TInt _ ->
-      if not fromsource
-      then
-        Kernel.warning
-          ~wkey:Kernel.wkey_int_conversion
-          ~current:true
-          "Conversion from a pointer to an integer without an explicit cast";
-      result
-
-    | TArray _, TPtr _ -> result
-
-    | TArray(t1,_,_), TArray(t2,None,_)
-      when Cil_datatype.Typ.equal t1 t2 -> (nt, e)
-
-    | TPtr _, TArray(_,_,_) ->
-      abort_context "%s cast over a non-scalar type %a"
-        origin_error Cil_datatype.Typ.pretty nt;
-
-    | TEnum _, TInt _ -> result
-    | TFloat _, (TInt _|TEnum _) -> result
-    | (TInt _|TEnum _), TFloat _ -> result
-    | TFloat _, TFloat _ -> result
-    | TInt (ik,_), TEnum (ei,_) ->
-      (match e.enode with
-       | Const (CEnum { eihost = ei'})
-         when ei.ename = ei'.ename && not fromsource &&
-              Cil.bytesSizeOfInt ik = Cil.bytesSizeOfInt ei'.ekind
-         -> (nt,e)
-       | _ -> result)
-    | TEnum _, TEnum _ -> result
-
-    | TEnum _, TPtr _ -> result
-    | TBuiltin_va_list _, (TInt _ | TPtr _) ->
-      result
-
-    | (TInt _ | TPtr _), TBuiltin_va_list _ ->
-      Kernel.debug ~dkey ~current:true
-        "Casting %a to __builtin_va_list" Cil_datatype.Typ.pretty ot ;
-      result
-
-    | TPtr _, TEnum _ ->
-      Kernel.debug ~dkey ~current:true
-        "Casting a pointer into an enumeration type" ;
-      result
-
-    (* The expression is evaluated for its effects *)
-    | (TInt _ | TEnum _ | TPtr _ ), TVoid _ ->
-      Kernel.debug ~level:3
-        "Casting a value into void: expr is evaluated for side effects";
-      result
-
-    (* Even casts between structs are allowed when we are only
-     * modifying some attributes *)
-    | TComp (comp1, _), TComp (comp2, _) when comp1.ckey = comp2.ckey ->
-      result
-
-    (* If we try to pass a transparent union value to a function
-     * expecting a transparent union argument, the argument type would
-     * have been changed to the type of the first argument, and we'll
-     * see a cast from a union to the type of the first argument. Turn
-     * that into a field access *)
-    | TComp(_, _), _ -> begin
-        match isTransparentUnion ot with
-        | None ->
-          abort_context "%s %a -> %a"
-            origin_error Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
-        | Some fstfield -> begin
-            (* We do it now only if the expression is an lval *)
-            let e' =
-              match e.enode with
-              | Lval lv ->
-                new_exp ~loc:e.eloc
-                  (Lval (addOffsetLval (Field(fstfield, NoOffset)) lv))
-              | _ ->
-                abort_context
-                  "%s transparent union expression is not an lval: %a\n"
-                  origin_error
-                  Cil_printer.pp_exp e
-            in
-            (* Continue casting *)
-            castTo ?context ~fromsource:fromsource fstfield.ftype nt e'
-          end
-      end
-    | _ ->
-      abort_context "%s cannot cast from %a to %a@\n"
-        origin_error Cil_datatype.Typ.pretty ot Cil_datatype.Typ.pretty nt
-  end
+let castTo ?context ?(fromsource=false)
+    (oldt : typ) (newt : typ) (e : exp) : (typ * exp) =
+  mkCastTGen ?context ~force:fromsource ~fromsource ~oldt ~newt e
 
 (* Create and cache varinfo's for globals. Starts with a varinfo but if the
  * global has been declared already it might come back with another varinfo.
@@ -3057,7 +2802,6 @@ let setupBuiltin ?(force_keep=false) name ?spec (resTyp, args_or_argtypes, isva)
   if force_keep then
     v.vattr <- Cil.addAttribute (Attr ("FC_BUILTIN",[])) v.vattr;
   v
-;;
 
 (*  builtin is never ghost *)
 let memoBuiltin ?force_keep ?spec name proto =
@@ -6045,7 +5789,7 @@ and doExp local_env
       if isIntegralType t then
         let tres = integralPromotion t in
         let e'' =
-          new_exp ~loc (UnOp(Neg, makeCastT ~e:e' ~oldt:t ~newt:tres, tres))
+          new_exp ~loc (UnOp(Neg, mkCastT ~oldt:t ~newt:tres e', tres))
         in
         finishExp r se e'' tres
       else
@@ -6061,7 +5805,7 @@ and doExp local_env
       if isIntegralType t then
         let tres = integralPromotion t in
         let e'' =
-          new_exp ~loc (UnOp(BNot, makeCastT ~e:e' ~oldt:t ~newt:tres, tres))
+          new_exp ~loc (UnOp(BNot, mkCastT ~oldt:t ~newt:tres e', tres))
         in
         finishExp r se e'' tres
       else
@@ -6071,7 +5815,7 @@ and doExp local_env
       let (r, se, e, t as v) = doExp (no_paren_local_env local_env) asconst e what in
       if isIntegralType t then
         let newt = integralPromotion t in
-        let e' = makeCastT ~e ~oldt:t ~newt in
+        let e' = mkCastT ~oldt:t ~newt e in
         finishExp r se e' newt
       else
       if isArithmeticType t then
@@ -7511,7 +7255,7 @@ and doExp local_env
             end
         in
         finishExp [] (unspecified_chunk empty)
-          (makeCast ~e:(integer ~loc addrval) ~newt:voidPtrType) voidPtrType
+          (mkCast ~newt:voidPtrType (integer ~loc addrval)) voidPtrType
       end
 
     | Cabs.EXPR_PATTERN _ ->
@@ -7689,8 +7433,8 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
       (* Keep the operator since it is arithmetic *)
       tres,
       optConstFoldBinOp loc false bop
-        (makeCastT ~e:e1 ~oldt:t1 ~newt:tres)
-        (makeCastT ~e:e2 ~oldt:t2 ~newt:tres)
+        (mkCastT ~oldt:t1 ~newt:tres e1)
+        (mkCastT ~oldt:t2 ~newt:tres e2)
         tres
     end else
       abort_context
@@ -7702,8 +7446,8 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
     (* Keep the operator since it is arithmetic *)
     intType,
     optConstFoldBinOp loc false bop
-      (makeCastT ~e:e1 ~oldt:t1 ~newt:tres)
-      (makeCastT ~e:e2 ~oldt:t2 ~newt:tres)
+      (mkCastT ~oldt:t1 ~newt:tres e1)
+      (mkCastT ~oldt:t2 ~newt:tres e2)
       intType
   in
   let doIntegralArithmetic () =
@@ -7713,8 +7457,8 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
       | TInt _ ->
         tres,
         optConstFoldBinOp loc false bop
-          (makeCastT ~e:e1 ~oldt:t1 ~newt:tres)
-          (makeCastT ~e:e2 ~oldt:t2 ~newt:tres)
+          (mkCastT ~oldt:t1 ~newt:tres e1)
+          (mkCastT ~oldt:t2 ~newt:tres e2)
           tres
       | _ ->
         Kernel.fatal
@@ -7735,8 +7479,8 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
        arguments with incompatible types to a common type *)
     let e1', e2' =
       if not (areCompatibleTypes t1p t2p) then
-        makeCastT ~e:e1 ~oldt:t1 ~newt:Cil.voidPtrType,
-        makeCastT ~e:e2 ~oldt:t2 ~newt:Cil.voidPtrType
+        mkCastT ~oldt:t1 ~newt:Cil.voidPtrType e1,
+        mkCastT ~oldt:t2 ~newt:Cil.voidPtrType e2
       else e1, e2
     in
     intType,
@@ -7748,7 +7492,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
       { e1 with enode = AddrOf (addOffsetLval (Index (e2,NoOffset)) lv) }
     | _ ->
       optConstFoldBinOp loc false PlusPI e1
-        (makeCastT ~e:e2 ~oldt:t2 ~newt:(integralPromotion t2)) t1
+        (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
   in
   match bop with
   | (Mult|Div) -> doArithmetic ()
@@ -7763,8 +7507,8 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
       let t2' = integralPromotion t2 in
       t1',
       optConstFoldBinOp loc false bop
-        (makeCastT ~e:e1 ~oldt:t1 ~newt:t1')
-        (makeCastT ~e:e2 ~oldt:t2 ~newt:t2')
+        (mkCastT ~oldt:t1 ~newt:t1' e1)
+        (mkCastT ~oldt:t2 ~newt:t2' e2)
         t1'
   | (PlusA|MinusA)
     when isArithmeticType t1 && isArithmeticType t2 -> doArithmetic ()
@@ -7778,7 +7522,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
   | MinusA when isPointerType t1 && isIntegralType t2 ->
     t1,
     optConstFoldBinOp loc false MinusPI e1
-      (makeCastT ~e:e2 ~oldt:t2 ~newt:(integralPromotion t2)) t1
+      (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
   | MinusA when isPointerType t1 && isPointerType t2 ->
     if areCompatibleTypes (* C99 6.5.6:3 *)
         (Cil.type_remove_qualifier_attributes_deep t1)
@@ -7791,9 +7535,9 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
   (* Two special cases for comparisons with the NULL pointer. We are a bit
      more permissive. *)
   | (Le|Lt|Ge|Gt|Eq|Ne) when isPointerType t1 && isZero e2 ->
-    pointerComparison e1 t1 (makeCast ~e:e2 ~newt:t1) t1
+    pointerComparison e1 t1 (mkCast ~newt:t1 e2) t1
   | (Le|Lt|Ge|Gt|Eq|Ne) when isPointerType t2 && isZero e1 ->
-    pointerComparison (makeCast ~e:e1 ~newt:t2) t2 e2 t2
+    pointerComparison (mkCast ~newt:t2 e1) t2 e2 t2
 
   | (Le|Lt|Ge|Gt|Eq|Ne) when isPointerType t1 && isPointerType t2 ->
     pointerComparison e1 t1 e2 t2
@@ -8449,7 +8193,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
             asconst oneinit (AExp(Some so.soTyp))
         in
         let r = Cil_datatype.Lval.Set.of_list r in
-        let init_expr = makeCastT ~e:oneinit' ~oldt:t' ~newt:so.soTyp in
+        let init_expr = mkCastT ~oldt:t' ~newt:so.soTyp oneinit' in
         let preinit' = setOneInit preinit so.soOff (SinglePre (init_expr, r)) in
         (* Move on *)
         advanceSubobj so;
@@ -9024,7 +8768,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
         in
         let setlen =  se0 +++
                       (mkStmtOneInstr ~ghost ~valid_sid
-                         (Set(var savelen, makeCast ~e:len ~newt:savelen.vtype,
+                         (Set(var savelen, mkCast ~newt:savelen.vtype len,
                               CurrentLoc.get ())),
                        [],[],[])
         in
@@ -9054,8 +8798,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
                  (Local_init
                     (vi,AssignInit
                        (SingleInit
-                          (makeCast ~e:(new_exp ~loc (Lval(var tmp)))
-                             ~newt:vi.vtype)),
+                          (mkCast ~newt:vi.vtype (new_exp ~loc (Lval(var tmp))))),
                      CurrentLoc.get ())),
                [],[var vi],[var tmp])
         end
@@ -9491,8 +9234,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
              defaultChunk ~ghost
                loc
                (i2c (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
-                       (Set ((Mem (makeCast ~e:(integer ~loc 0)
-                                     ~newt:intPtrType),
+                       (Set ((Mem (mkCast ~newt:intPtrType (integer ~loc 0)),
                               NoOffset),
                              integer ~loc 0, loc)),[],[],[]))
            in
@@ -9580,7 +9322,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
           match unrollType !currentReturnType with
           | TVoid _ -> [], None
           | (TInt _ | TEnum _ | TFloat _ | TPtr _) as rt ->
-            let res = Some (makeCastT ~e:(zero ~loc) ~oldt:intType ~newt:rt) in
+            let res = Some (mkCastT ~oldt:intType ~newt:rt (zero ~loc)) in
             if !currentFunctionFDEC.svar.vname = "main" then
               [],res
             else begin
@@ -9595,7 +9337,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
                On the other hand, *( T* )0 is. We're not supposed
                to get there anyway. *)
             let null_ptr =
-              makeCastT ~e:(zero ~loc) ~oldt:intType ~newt:(TPtr(rt,[]))
+              mkCastT ~oldt:intType ~newt:(TPtr(rt,[])) (zero ~loc)
             in
             let res =
               Some (new_exp ~loc (Lval (mkMem ~addr:null_ptr ~off:NoOffset)))
@@ -10104,7 +9846,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     if not (Cil.isIntegralType et) then
       Kernel.error ~once:true ~current:true "Switch on a non-integer expression.";
     let et' = Cil.integralPromotion et in
-    let e' = makeCastT ~e:e' ~oldt:et ~newt:et' in
+    let e' = mkCastT ~oldt:et ~newt:et' e' in
     enter_break_env ();
     let s' = doStatement local_env s in
     exit_break_env ();
@@ -10182,7 +9924,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       | Some (switchv, switch) -> (* We have already generated this one  *)
         (se
          @@@ (i2c(mkStmtOneInstr ~ghost ~valid_sid
-                    (Set (var switchv, makeCast ~e:e' ~newt:intType, loc')),
+                    (Set (var switchv, mkCast ~newt:intType e', loc')),
                   [],[],[]), ghost))
         @@@ (s2c(mkStmt ~ghost ~valid_sid (Goto (ref switch, loc'))), ghost)
 
@@ -10213,7 +9955,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
           (se @@@
            (i2c
               (mkStmtOneInstr ~ghost ~valid_sid
-                 (Set (var switchv, makeCast ~e:e' ~newt:intType, loc')),
+                 (Set (var switchv, mkCast ~newt:intType e', loc')),
                [],[],[]),
             ghost))
           @@@ (s2c switch, ghost)

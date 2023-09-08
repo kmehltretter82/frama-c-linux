@@ -138,7 +138,7 @@ let cast_arg i paramtyp exp =
           (i + 1)
           pretty_typ argtyp pretty_typ paramtyp
     end;
-  Cil.mkCast ~force:false ~newt:paramtyp exp
+  Cil.mkCast ~check:false ~force:false ~newt:paramtyp exp
 
 
 (* cast a list of args to the tparams list of types and remove unused args *)
