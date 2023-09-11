@@ -193,6 +193,8 @@ export interface goalsData {
   name: string;
   /** Smoking (or not) goal */
   smoke: boolean;
+  /** Valid or Passed goal */
+  passed: boolean;
   /** Verdict, Status */
   status: status;
   /** Prover Stats Summary */
@@ -213,6 +215,7 @@ export const jGoalsData: Json.Decoder<goalsData> =
     thy: Json.jOption(Json.jString),
     name: Json.jString,
     smoke: Json.jBoolean,
+    passed: Json.jBoolean,
     status: jStatus,
     stats: jStats,
     script: Json.jOption(Json.jString),
@@ -223,8 +226,8 @@ export const jGoalsData: Json.Decoder<goalsData> =
 export const byGoalsData: Compare.Order<goalsData> =
   Compare.byFields
     <{ wpo: goal, property: marker, fct?: fct, bhv?: string, thy?: string,
-       name: string, smoke: boolean, status: status, stats: stats,
-       script?: string, saved: boolean }>({
+       name: string, smoke: boolean, passed: boolean, status: status,
+       stats: stats, script?: string, saved: boolean }>({
     wpo: byGoal,
     property: byMarker,
     fct: Compare.defined(byFct),
@@ -232,6 +235,7 @@ export const byGoalsData: Compare.Order<goalsData> =
     thy: Compare.defined(Compare.string),
     name: Compare.string,
     smoke: Compare.boolean,
+    passed: Compare.boolean,
     status: byStatus,
     stats: byStats,
     script: Compare.defined(Compare.string),
@@ -288,7 +292,7 @@ export const goals: State.Array<goal,goalsData> = goals_internal;
 /** Default value for `goalsData` */
 export const goalsDataDefault: goalsData =
   { wpo: goalDefault, property: markerDefault, fct: undefined,
-    bhv: undefined, thy: undefined, name: '', smoke: false,
+    bhv: undefined, thy: undefined, name: '', smoke: false, passed: false,
     status: statusDefault, stats: statsDefault, script: undefined,
     saved: false };
 

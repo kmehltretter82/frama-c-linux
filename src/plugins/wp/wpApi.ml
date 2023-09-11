@@ -213,6 +213,10 @@ let () = S.column gmodel ~name:"smoke"
     ~descr:(Md.plain "Smoking (or not) goal")
     ~data:(module D.Jbool) ~get:Wpo.is_smoke_test
 
+let () = S.column gmodel ~name:"passed"
+    ~descr:(Md.plain "Valid or Passed goal")
+    ~data:(module D.Jbool) ~get:Wpo.is_passed
+
 let () = S.column gmodel ~name:"status"
     ~descr:(Md.plain "Verdict, Status")
     ~data:(module STATUS) ~get:get_status

@@ -22,8 +22,8 @@
 
 import React from 'react';
 import { IconKind, Cell } from 'dome/controls/labels';
+import { Filter } from 'dome/table/models';
 import { Table, Column } from 'dome/table/views';
-import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
 
@@ -63,13 +63,32 @@ function renderStatus(s : Status): JSX.Element {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Goals Filter                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+function filterGoal(
+  failed: boolean,
+  scope: string | undefined,
+): Filter<WP.goal, WP.goalsData> {
+  return (goal: WP.goalsData): boolean => {
+    if (failed && goal.passed) return false;
+    if (scope && scope && goal.fct !== scope) return false;
+    return true;
+  };
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Goals Table                                                        --- */
 /* -------------------------------------------------------------------------- */
 
-function WPGoals(): JSX.Element {
-  const model = States.useSyncArrayModel(WP.goals);
+export interface GoalTableProps {
+  scope: string | undefined;
+  failed: boolean;
+}
 
-  // TODO: from AST selection, find WPO
+export function GoalTable(props: GoalTableProps): JSX.Element {
+  const { scope, failed } = props;
+  const model = States.useSyncArrayModel(WP.goals);
   const [_, updateAstSelection] = States.useSelection();
   const [wpoSelection, setWpoSelection] = React.useState(WP.goalDefault);
 
@@ -80,6 +99,14 @@ function WPGoals(): JSX.Element {
       setWpoSelection(wpo);
     }, [updateAstSelection],
   );
+
+  React.useEffect(() => {
+    if (failed || !!scope) {
+      model.setFilter(filterGoal(failed, scope));
+    } else {
+      model.setFilter();
+    }
+  }, [model, scope, failed]);
 
   return (
     <Table
@@ -94,18 +121,5 @@ function WPGoals(): JSX.Element {
     </Table>
   );
 }
-
-/* -------------------------------------------------------------------------- */
-/* --- Goals Component                                                    --- */
-/* -------------------------------------------------------------------------- */
-
-Ivette.registerComponent({
-  id: 'frama-c.plugins.wp.goals',
-  group: 'frama-c.plugins',
-  rank: 10,
-  label: 'WP Goals',
-  title: 'WP Generated Verification Conditions',
-  children: <WPGoals />,
-});
 
 /* -------------------------------------------------------------------------- */

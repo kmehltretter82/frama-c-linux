@@ -24,13 +24,50 @@
 // --- Eva Values
 // --------------------------------------------------------------------------
 
+import React from 'react';
+import * as Dome from 'dome';
+import { IconButton } from 'dome/controls/buttons';
 import * as Ivette from 'ivette';
-import './goals';
+import * as States from 'frama-c/states';
+import { GoalTable } from './goals';
 import './style.css';
 
-// --------------------------------------------------------------------------
-// --- Export Component
-// --------------------------------------------------------------------------
+/* -------------------------------------------------------------------------- */
+/* --- Goal Component                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+function WPGoals(): JSX.Element {
+  const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped');
+  const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed');
+  const [selection] = States.useSelection();
+  const fct = selection?.current?.fct;
+  const scope = scoped ? fct : undefined;
+  return (
+    <>
+      <Ivette.TitleBar>
+        <IconButton icon='COMPONENT' title='Current Scope Only'
+                    enabled={!!fct}
+                    selected={scoped} onClick={flipScoped} />
+        <IconButton icon='CIRC.QUESTION' title='Unresolved Goals Only'
+                    selected={failed} onClick={flipFailed} />
+      </Ivette.TitleBar>
+      <GoalTable scope={scope} failed={failed} />
+    </>
+  );
+}
+
+Ivette.registerComponent({
+  id: 'frama-c.plugins.wp.goals',
+  group: 'frama-c.plugins',
+  rank: 10,
+  label: 'WP Goals',
+  title: 'WP Generated Verification Conditions',
+  children: <WPGoals />,
+});
+
+/* -------------------------------------------------------------------------- */
+/* --- WP View                                                            --- */
+/* -------------------------------------------------------------------------- */
 
 Ivette.registerView({
   id: 'wp.main',
