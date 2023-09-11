@@ -14,7 +14,7 @@ let gen_requires _ _ = [ Logic_const.(new_predicate pfalse) ]
 let gen_allocates kf _ =
   if Kernel_function.has_definition kf
   then FreeAlloc([],[])
-  else FreeAllocAny
+  else FreeAlloc([],[])
 
 let gen_terminates kf _ =
   if Kernel_function.has_definition kf then

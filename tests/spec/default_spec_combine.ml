@@ -11,13 +11,10 @@ let gen_requires _ _ = [ ]
 let gen_allocates _ _ = FreeAllocAny
 let status_allocates = Property_status.Dont_know
 
-let gen_terminates _ _ = None
-let status_terminates = Property_status.Dont_know
-
 let run () =
   let open Populate_spec in
   let get_spec kf =
-    populate_funspec kf [`Exits; `Assigns; `Requires; `Allocates; `Terminates]
+    populate_funspec kf [`Exits; `Assigns; `Requires; `Allocates]
   in
   Globals.Functions.iter get_spec
 
@@ -28,9 +25,7 @@ let populate () =
     ~gen_assigns ~status_assigns
     ~gen_requires
     ~gen_allocates ~status_allocates
-    ~gen_terminates ~status_terminates
     "donothing"
-
 
 let () = Cmdline.run_after_configuring_stage populate
 

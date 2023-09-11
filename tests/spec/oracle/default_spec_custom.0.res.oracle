@@ -25,6 +25,7 @@ void f1(void);
 
 /*@ terminates \true;
     exits \false;
+    assigns \nothing;
     allocates \nothing; */
 void f2(void)
 {
@@ -43,7 +44,11 @@ int f3(int *a);
 
 /*@ terminates \true;
     exits \false;
-    allocates \nothing; */
+    assigns \result, *b;
+    assigns \result \from *b;
+    assigns *b \from *b;
+    allocates \nothing;
+ */
 int f4(int *b)
 {
   int tmp;
