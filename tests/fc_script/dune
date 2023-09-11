@@ -1,0 +1,9 @@
+; Almost all frama-c-script commands require Python
+(cram
+  (enabled_if %{read:../../python-3.7-available})
+)
+
+(cram
+  (applies_to make-machdep)
+  (enabled_if (and %{bin-available:clang} %{bin-available:yq}))
+)
