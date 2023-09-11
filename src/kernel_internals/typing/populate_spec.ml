@@ -198,7 +198,7 @@ struct
       let combined, g = combine_or_default mode kf spec table in
       let has_body = Kernel_function.has_definition kf in
       if G.is_empty g then Kept, None
-      else if has_body then Generated g, None
+      else if has_body || is_part_of_frama_c kf then Generated g, None
       else Generated g, Some(combined, G.name)
 
   (* Interface to call [G.emit]. Only emit properties for non empty clauses
@@ -755,14 +755,17 @@ let activated_config kf clauses =
   in
   List.fold_left collect (build_config Skip) clauses
 
-let do_warning kf funspec (combined, clauses) =
-  if clauses <> [] && not (is_part_of_frama_c kf) then
-    let empty =
-      not (Kernel_function.has_definition kf)
-      && Cil.is_empty_funspec funspec
-    in
+(* Emit warnings if :
+   - we generated some clauses (cf. {!Make.get_default}).
+   - [kf] is a declaration and not part of frama-c (cf. {!Make.get_default}).
+     The message varies depending on if the spec was empty or if we combined
+     existing clauses.
+*)
+let do_warning kf funspec = function
+  | None -> ()
+  | Some (combined, clauses) ->
     let clauses = String.concat ", " clauses in
-    if empty then
+    if Cil.is_empty_funspec funspec then
       Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
         "Neither code nor specification for function %a,@, \
          generating default specifications (%s) from the prototype"
@@ -773,7 +776,7 @@ let do_warning kf funspec (combined, clauses) =
       in
       Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
         "Missing clauses (%s) in specification of prototype %a,@, \
-         generating default specification%s,@, see -generated-spec-* options \
+         generating default specification%s, see -generated-spec-* options \
          for more info"
         clauses Kernel_function.pretty kf combined
 
@@ -786,17 +789,18 @@ let do_populate ?funspec kf clauses =
   in
   let config = activated_config kf clauses in
 
-  let apply (combined, clauses) get_default mode =
-    let g, to_warn = get_default mode kf original_spec in
-    match g, to_warn with
-    | Kept, None -> g, (combined, clauses)
-    | Kept, _ -> assert false
-    | Generated _, None -> g, (combined, clauses)
-    | Generated _, Some (combined', clause) ->
-      g, (combined || combined', clause :: clauses)
+  let apply warn_acc get_default mode =
+    let g, warn = get_default mode kf original_spec in
+    match g, warn with
+    | Kept, _ -> g, warn_acc
+    | Generated _, None -> g, warn_acc
+    | Generated _, Some (c, clause) ->
+      match warn_acc with
+      | None -> g, Some (c, [clause])
+      | Some (c', clauses) ->
+        g, Some (c || c', clause :: clauses)
   in
-  let no_warn = (false, []) in
-  let exits, warn = apply no_warn Exits.get_default config.c_exits in
+  let exits, warn = apply None Exits.get_default config.c_exits in
   let assigns, warn = apply warn Assigns.get_default config.c_assigns in
   let requires, warn = apply warn Requires.get_default config.c_requires in
   let allocates, warn = apply warn Allocates.get_default config.c_allocates in
