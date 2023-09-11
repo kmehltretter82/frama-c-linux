@@ -239,11 +239,18 @@ class engine =
 
     (* --- Higher Order --- *)
 
-    method pp_apply (_:cmode) (_:term) (_:formatter) (_:term list) =
-      failwith "Qed: higher-order application"
+    method pp_apply (_:cmode) e fmt es =
+      fprintf fmt "@[<hov 2>%a" self#pp_atom e ;
+      List.iter (fprintf fmt "@ @@@@ %a" self#pp_atom) es ;
+      fprintf fmt "@]"
 
-    method pp_lambda (_:formatter) (_: (string * tau) list) =
-      failwith "Qed: lambda abstraction"
+    method pp_lambda fmt vs =
+      fprintf fmt "@[<hov 2>fun" ;
+      List.iter
+        (fun (x,t) ->
+           fprintf fmt "@ @[<hov 2>(%a: %a)@]" self#pp_var x self#pp_tau t
+        ) vs ;
+      fprintf fmt "@ ->@]"
 
     (* --- Binders --- *)
 

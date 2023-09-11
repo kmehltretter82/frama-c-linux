@@ -738,7 +738,7 @@ struct
   let set_builtin_eq f = QZERO.set_builtin_eq f
   let set_builtin_leq f = QZERO.set_builtin_leq f
   let set_builtin_get f = QZERO.set_builtin_get f
-
+  let set_builtin_field f = QZERO.set_builtin_field f
 
   (* -------------------------------------------------------------------------- *)
   (* --- Term Extensions                                                    --- *)

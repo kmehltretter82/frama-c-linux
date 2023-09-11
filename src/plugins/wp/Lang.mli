@@ -387,6 +387,9 @@ sig
 
   val p_call : lfun -> term list -> pred
 
+  val e_lambda : var list -> term -> term
+  val e_apply : term -> term list -> term
+
   val p_forall : var list -> pred -> pred
   val p_exists : var list -> pred -> pred
   val p_bind : binder -> var -> pred -> pred
@@ -553,7 +556,8 @@ sig
       smaller terms. *)
 
   val set_builtin : lfun -> (term list -> term) -> unit
-  val set_builtin_get : lfun -> (term list -> tau option -> term-> term) -> unit
+  val set_builtin_get : lfun -> (term list -> term list -> term) -> unit
+  val set_builtin_field : lfun -> field -> (term list -> term) -> unit
   val set_builtin_1 : lfun -> unop -> unit
   val set_builtin_2 : lfun -> binop -> unit
   val set_builtin_2' : lfun -> (term -> term -> tau option -> term) -> unit

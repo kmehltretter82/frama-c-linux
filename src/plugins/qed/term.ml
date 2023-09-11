@@ -690,6 +690,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   module BUILTIN = Map.Make(Fun)
+  module FIELD = Map.Make(Field)
 
   (* -------------------------------------------------------------------------- *)
   (* --- Cache                                                              --- *)
@@ -732,9 +733,10 @@ struct
     weak : W.t ;
     cache : term C.cache ;
     mutable builtins_fun : (term list -> tau option -> term) BUILTIN.t ;
-    mutable builtins_get : (term list -> tau option -> term -> term) BUILTIN.t ;
+    mutable builtins_get : (term list -> term list -> term) BUILTIN.t ;
     mutable builtins_eq  : (term -> term -> term) BUILTIN.t ;
     mutable builtins_leq : (term -> term -> term) BUILTIN.t ;
+    mutable builtins_fld : (term list -> term) FIELD.t BUILTIN.t ;
   }
 
   let empty () = {
@@ -745,6 +747,7 @@ struct
     builtins_get = BUILTIN.empty ;
     builtins_eq  = BUILTIN.empty ;
     builtins_leq = BUILTIN.empty ;
+    builtins_fld = BUILTIN.empty ;
   }
 
   let state = ref (empty ())
@@ -778,6 +781,7 @@ struct
     st.builtins_get <- BUILTIN.empty ;
     st.builtins_eq  <- BUILTIN.empty ;
     st.builtins_leq <- BUILTIN.empty ;
+    st.builtins_fld <- BUILTIN.empty ;
     let add s c = W.add s.weak c ; s.kid <- max s.kid (succ c.id) in
     Tset.iter (add st) !constants
 
@@ -1027,6 +1031,22 @@ struct
 
   let set_builtin_map ?force f phi =
     set_builtin' ?force f (fun es tau -> c_fun f (phi es) tau)
+
+  let set_builtin_field ?(force=false) f fd p =
+    begin
+      let fmap =
+        try BUILTIN.find f !state.builtins_fld
+        with Not_found -> FIELD.empty in
+      begin
+        if not force && FIELD.mem fd fmap then
+          let msg = Printf.sprintf
+              "Builtin already registered for '(%s …).%s'"
+              (Fun.debug f) (Field.debug fd) in
+          raise (Failure msg)
+      end ;
+      let fmap = FIELD.add fd p fmap in
+      !state.builtins_fld <- BUILTIN.add f fmap !state.builtins_fld
+    end
 
   (* -------------------------------------------------------------------------- *)
   (* --- Negation                                                           --- *)
@@ -2027,9 +2047,15 @@ struct
         | No -> e_get m0 k
         | Maybe -> c_get m k
       end
-    | Fun (g,xs) ->
+    | (Fun _ | Aget _) ->
       begin
-        try (BUILTIN.find g !state.builtins_get) xs m.tau k
+        try
+          let rec getmatrix m0 ks =
+            match m0.repr with
+            | Aget(m0,k) -> getmatrix m0 (k::ks)
+            | Fun(f,es) -> (BUILTIN.find f !state.builtins_get) es (List.rev ks)
+            | _ -> raise Not_found
+          in getmatrix m [k]
         with Not_found -> c_get m k
       end
     | _ -> c_get m k
@@ -2063,6 +2089,11 @@ struct
   let e_getfield m f =
     match m.repr with
     | Rdef gys -> get_field m f gys
+    | Fun(lf,es) ->
+      begin
+        try FIELD.find f (BUILTIN.find lf !state.builtins_fld) es
+        with Not_found -> c_getfield m f
+      end
     | _ -> c_getfield m f
 
   let e_record fxs = c_record fxs
