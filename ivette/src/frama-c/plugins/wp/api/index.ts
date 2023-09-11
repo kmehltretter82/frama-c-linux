@@ -112,6 +112,34 @@ export const resultDefault: result =
   { descr: '', cached: false, verdict: '', solverTime: 0, proverTime: 0,
     proverSteps: 0 };
 
+/** Test Status */
+export type status =
+  Json.key<'#NORESULT'> | Json.key<'#COMPUTING'> | Json.key<'#FAILED'> |
+  Json.key<'#STEPOUT'> | Json.key<'#UNKNOWN'> | Json.key<'#PASSED'> |
+  Json.key<'#VALID'> | Json.key<'#INVALID'>;
+
+/** Decoder for `status` */
+export const jStatus: Json.Decoder<status> =
+  Json.jUnion<Json.key<'#NORESULT'> | Json.key<'#COMPUTING'> |
+              Json.key<'#FAILED'> | Json.key<'#STEPOUT'> |
+              Json.key<'#UNKNOWN'> | Json.key<'#PASSED'> |
+              Json.key<'#VALID'> | Json.key<'#INVALID'>>(
+    Json.jKey<'#NORESULT'>('#NORESULT'),
+    Json.jKey<'#COMPUTING'>('#COMPUTING'),
+    Json.jKey<'#FAILED'>('#FAILED'),
+    Json.jKey<'#STEPOUT'>('#STEPOUT'),
+    Json.jKey<'#UNKNOWN'>('#UNKNOWN'),
+    Json.jKey<'#PASSED'>('#PASSED'),
+    Json.jKey<'#VALID'>('#VALID'),
+    Json.jKey<'#INVALID'>('#INVALID'),
+  );
+
+/** Natural order for `status` */
+export const byStatus: Compare.Order<status> = Compare.structural;
+
+/** Default value for `status` */
+export const statusDefault: status = Json.jKey<'#NORESULT'>('#NORESULT')('');
+
 /** Prover Result */
 export type stats =
   { summary: string, tactics: number, proved: number, total: number };
@@ -155,17 +183,19 @@ export interface goalsData {
   wpo: goal;
   /** Property Marker */
   property: marker;
-  /** Informal name */
-  name: string;
   /** Associated function, if any */
   fct?: fct;
   /** Associated behavior, if any */
   bhv?: string;
   /** Associated axiomatic, if any */
   thy?: string;
-  /** Smoking (or not) goal and result */
-  result: [ boolean, boolean ];
-  /** Verdict Details */
+  /** Informal Property Name */
+  name: string;
+  /** Smoking (or not) goal */
+  smoke: boolean;
+  /** Verdict, Status */
+  status: status;
+  /** Prover Stats Summary */
   stats: stats;
   /** Script File */
   script?: string;
@@ -178,11 +208,12 @@ export const jGoalsData: Json.Decoder<goalsData> =
   Json.jObject({
     wpo: jGoal,
     property: jMarker,
-    name: Json.jString,
     fct: Json.jOption(jFct),
     bhv: Json.jOption(Json.jString),
     thy: Json.jOption(Json.jString),
-    result: Json.jPair( Json.jBoolean, Json.jBoolean,),
+    name: Json.jString,
+    smoke: Json.jBoolean,
+    status: jStatus,
     stats: jStats,
     script: Json.jOption(Json.jString),
     saved: Json.jBoolean,
@@ -191,16 +222,17 @@ export const jGoalsData: Json.Decoder<goalsData> =
 /** Natural order for `goalsData` */
 export const byGoalsData: Compare.Order<goalsData> =
   Compare.byFields
-    <{ wpo: goal, property: marker, name: string, fct?: fct, bhv?: string,
-       thy?: string, result: [ boolean, boolean ], stats: stats,
+    <{ wpo: goal, property: marker, fct?: fct, bhv?: string, thy?: string,
+       name: string, smoke: boolean, status: status, stats: stats,
        script?: string, saved: boolean }>({
     wpo: byGoal,
     property: byMarker,
-    name: Compare.string,
     fct: Compare.defined(byFct),
     bhv: Compare.defined(Compare.string),
     thy: Compare.defined(Compare.string),
-    result: Compare.pair(Compare.boolean,Compare.boolean,),
+    name: Compare.string,
+    smoke: Compare.boolean,
+    status: byStatus,
     stats: byStats,
     script: Compare.defined(Compare.string),
     saved: Compare.boolean,
@@ -255,9 +287,10 @@ export const goals: State.Array<goal,goalsData> = goals_internal;
 
 /** Default value for `goalsData` */
 export const goalsDataDefault: goalsData =
-  { wpo: goalDefault, property: markerDefault, name: '', fct: undefined,
-    bhv: undefined, thy: undefined, result: [ false, false ],
-    stats: statsDefault, script: undefined, saved: false };
+  { wpo: goalDefault, property: markerDefault, fct: undefined,
+    bhv: undefined, thy: undefined, name: '', smoke: false,
+    status: statusDefault, stats: statsDefault, script: undefined,
+    saved: false };
 
 /** Proof Server Activity */
 export const serverActivity: Server.Signal = {

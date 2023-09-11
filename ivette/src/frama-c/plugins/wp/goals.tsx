@@ -21,30 +21,20 @@
 /* ************************************************************************ */
 
 import React from 'react';
-import { Icon } from 'dome/controls/icons';
-import { Table, Column, Renderer } from 'dome/table/views';
+import { Table, Column } from 'dome/table/views';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
 
-const renderResult: Renderer<[boolean, boolean]> =
-  ([smoking, passed]): JSX.Element =>
-  (<Icon
-    id=
-    {passed ? 'CIRC.CHECK' :
-      (smoking ? 'CIRC.CLOSE' : 'CIRC.QUESTION')
-    }
-    fill=
-    {passed ? `var(--positive-button-color)` :
-      (smoking ? `var(--negative-button-color)` : `var(--warning-button-color)`)
-    }
-  />);
+/* -------------------------------------------------------------------------- */
+/* --- Goals Table                                                        --- */
+/* -------------------------------------------------------------------------- */
 
 function WPGoals(): JSX.Element {
   const model = States.useSyncArrayModel(WP.goals);
 
   // TODO: from AST selection, find WPO
-  const [_astSelection, updateAstSelection] = States.useSelection();
+  const [_, updateAstSelection] = States.useSelection();
   const [wpoSelection, setWpoSelection] = React.useState(WP.goalDefault);
 
   const onWpoSelection = React.useCallback(
@@ -62,17 +52,15 @@ function WPGoals(): JSX.Element {
       onSelection={onWpoSelection}
       selection={wpoSelection}
     >
-      <Column id='fct' label='Function' />
-      <Column id='name' label='Names' />
-      <Column
-        id='result'
-        label='Result'
-        render={renderResult}
-      />
+      <Column id='status' label='Status' fixed={true} width={80} />
+      <Column id='name' label='Property' />
     </Table>
   );
 }
 
+/* -------------------------------------------------------------------------- */
+/* --- Goals Component                                                    --- */
+/* -------------------------------------------------------------------------- */
 
 Ivette.registerComponent({
   id: 'frama-c.plugins.wp.goals',
@@ -82,3 +70,5 @@ Ivette.registerComponent({
   title: 'WP Generated Verification Conditions',
   children: <WPGoals />,
 });
+
+/* -------------------------------------------------------------------------- */
