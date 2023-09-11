@@ -354,9 +354,8 @@ struct
     else WritesAny
 
   let frama_c_default kf =
-    if Kernel_function.has_definition kf then
-      acsl_default () (* TODO: use genassigns *)
-    else Writes (Infer_annotations.assigns_from_prototype kf)
+    (* TODO: use genassigns for Definitions. *)
+    Writes (Infer_annotations.assigns_from_prototype kf)
 
   let compare_deps d1 d2 =
     match d1, d2 with
