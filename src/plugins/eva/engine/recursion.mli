@@ -28,7 +28,7 @@ open Eval
 (* Returns the specification for a recursive call to the given function. Fails
    if the function has no specification. Marks the preconditions of the call
    as unknowns. *)
-val get_spec: kinstr -> kernel_function -> funspec
+val check_spec: kinstr -> kernel_function -> unit
 
 (** Creates the information about a recursive call. *)
 val make: ('v, 'loc) call -> recursion option

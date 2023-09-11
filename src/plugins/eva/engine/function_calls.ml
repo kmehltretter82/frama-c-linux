@@ -152,22 +152,28 @@ let use_spec_instead_of_definition ?(recursion_depth = -1) kf =
   not (Kernel_function.is_definition kf) ||
   Kernel_function.Set.mem kf (Parameters.UsePrototype.get ())
 
+(* Returns the function specification of [kf], with generated assigns clauses
+   if they are missing. *)
+let get_funspec kf =
+  Populate_spec.populate_funspec ~do_body:true kf [`Assigns];
+  Annotations.funspec kf
+
 let analysis_target ~recursion_depth callsite kf =
   match Builtins.find_builtin_override kf with
   | Some (name, builtin, cache, spec) ->
     `Builtin (name, builtin, cache, spec)
   | None ->
     if recursion_depth >= Parameters.RecursiveUnroll.get ()
-    then `Spec (Recursion.get_spec callsite kf)
+    then begin
+      Recursion.check_spec callsite kf;
+      `Spec (get_funspec kf)
+    end
     else
       match kf.fundec with
-      | Declaration (_,_,_,_) -> `Spec (Annotations.funspec kf)
+      | Declaration _ -> `Spec (get_funspec kf)
       | Definition (def, _) ->
         if Kernel_function.Set.mem kf (Parameters.UsePrototype.get ())
-        then begin
-           Populate_spec.(populate_funspec kf [`Assigns]);
-          `Spec (Annotations.funspec kf)
-        end
+        then `Spec (get_funspec kf)
         else `Body (def, save_results def)
 
 let define_analysis_target ?(recursion_depth = -1) callsite kf  =

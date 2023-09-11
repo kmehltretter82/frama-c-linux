@@ -285,7 +285,6 @@ module Make
     Active_behaviors.create eval_predicate funspec
 
   let create init_state kf =
-    Populate_spec.(populate_funspec kf [`Assigns]);
     let funspec = Annotations.funspec kf in
     create_from_spec init_state funspec
 
@@ -475,7 +474,6 @@ module Make
       The postcondition of the global behavior is applied for each behavior,
       to help reduce the final state. *)
   let check_fct_postconditions kf ab kind ~pre_state ~post_states ~result =
-    Populate_spec.(populate_funspec kf [`Assigns]);
     let behaviors = Annotations.behaviors kf in
     let is_active = Active_behaviors.is_active ab in
     let states =
@@ -522,7 +520,6 @@ module Make
       into multiple states if the precondition contains disjunctions. *)
   let check_fct_preconditions call_ki kf ab init_state =
     let init_states = States.singleton init_state in
-    Populate_spec.(populate_funspec kf [`Assigns]);
     let behaviors = Annotations.behaviors kf in
     let is_active = Active_behaviors.is_active ab in
     let states =
