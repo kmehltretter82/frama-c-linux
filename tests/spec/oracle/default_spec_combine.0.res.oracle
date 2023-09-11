@@ -1,41 +1,41 @@
 Registering an mode that does nothing
 [kernel] Parsing default_spec_combine.i (no preprocessing)
 [kernel:annot:missing-spec] default_spec_combine.i:194: Warning: 
-  Missing clauses (exits) in specification of prototype f1_complete,
-   generating default specification (some combined from existing behaviors), see -generated-spec-* options for more info
+  Neither code nor explicit exits for function f1_complete,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [kernel:annot:missing-spec] default_spec_combine.i:194: Warning: 
-  Missing clauses (exits) in specification of prototype f1_guarded,
-   generating default specification (some combined from existing behaviors), see -generated-spec-* options for more info
+  Neither code nor explicit exits for function f1_guarded,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [kernel:annot:missing-spec] default_spec_combine.i:194: Warning: 
-  Missing clauses (exits) in specification of prototype f1_unguarded,
-   generating default specification (some combined from existing behaviors), see -generated-spec-* options for more info
+  Neither code nor explicit exits for function f1_unguarded,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [kernel:annot:missing-spec] default_spec_combine.i:194: Warning: 
-  Missing clauses (assigns) in specification of prototype f2_complete,
-   generating default specification (some combined from existing behaviors), see -generated-spec-* options for more info
+  Neither code nor explicit assigns for function f2_complete,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [kernel:annot:missing-spec] default_spec_combine.i:194: Warning: 
-  Missing clauses (assigns) in specification of prototype f2_guarded,
-   generating default specification (some combined from existing behaviors), see -generated-spec-* options for more info
+  Neither code nor explicit assigns for function f2_guarded,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [kernel:annot:missing-spec] default_spec_combine.i:194: Warning: 
-  Missing clauses (assigns) in specification of prototype f2_unguarded,
-   generating default specification (some combined from existing behaviors), see -generated-spec-* options for more info
+  Neither code nor explicit assigns for function f2_unguarded,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [kernel:annot:missing-spec] default_spec_combine.i:194: Warning: 
-  Missing clauses (requires) in specification of prototype f3_complete,
-   generating default specification (some combined from existing behaviors), see -generated-spec-* options for more info
+  Neither code nor explicit requires for function f3_complete,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [kernel:annot:missing-spec] default_spec_combine.i:194: Warning: 
-  Missing clauses (requires) in specification of prototype f3_guarded,
-   generating default specification (some combined from existing behaviors), see -generated-spec-* options for more info
+  Neither code nor explicit requires for function f3_guarded,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [kernel:annot:missing-spec] default_spec_combine.i:194: Warning: 
-  Missing clauses (requires) in specification of prototype f3_unguarded,
-   generating default specification (some combined from existing behaviors), see -generated-spec-* options for more info
+  Neither code nor explicit requires for function f3_unguarded,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [kernel:annot:missing-spec] default_spec_combine.i:194: Warning: 
-  Missing clauses (allocates) in specification of prototype f4_complete,
-   generating default specification (some combined from existing behaviors), see -generated-spec-* options for more info
+  Neither code nor explicit allocates for function f4_complete,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [kernel:annot:missing-spec] default_spec_combine.i:194: Warning: 
-  Missing clauses (allocates) in specification of prototype f4_guarded,
-   generating default specification (some combined from existing behaviors), see -generated-spec-* options for more info
+  Neither code nor explicit allocates for function f4_guarded,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [kernel:annot:missing-spec] default_spec_combine.i:194: Warning: 
-  Missing clauses (allocates) in specification of prototype f4_unguarded,
-   generating default specification (some combined from existing behaviors), see -generated-spec-* options for more info
+  Neither code nor explicit allocates for function f4_unguarded,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 /* Generated by Frama-C */
 /*@
 axiomatic a {

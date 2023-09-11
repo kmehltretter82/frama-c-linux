@@ -794,6 +794,10 @@ let activated_config kf clauses =
   in
   List.fold_left collect (build_config Skip) clauses
 
+let clauses_fmt =
+  Pretty_utils.pp_list ~pre:"" ~sep:", " ~last:" and " ~suf:""
+    Format.pp_print_string
+
 (* Emit warnings if :
    - we generated some clauses (cf. {!Make.get_default}).
    - [kf] is a declaration and not part of frama-c (cf. {!Make.get_default}).
@@ -803,21 +807,29 @@ let activated_config kf clauses =
 let do_warning kf funspec = function
   | None -> ()
   | Some (combined, clauses) ->
-    let clauses = String.concat ", " clauses in
-    if Cil.is_empty_funspec funspec then
-      Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
-        "Neither code nor specification for function %a,@, \
-         generating default specifications (%s) from the prototype"
-        Kernel_function.pretty kf clauses
-    else
-      let combined =
-        if combined then " (some combined from existing behaviors)" else ""
-      in
-      Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
-        "Missing clauses (%s) in specification of prototype %a,@, \
-         generating default specification%s, see -generated-spec-* options \
-         for more info"
-        clauses Kernel_function.pretty kf combined
+    let n = List.length clauses in
+    let clauses = Format.asprintf "%a" clauses_fmt (List.rev clauses) in
+    let msg =
+      if Cil.is_empty_funspec funspec then
+        Format.asprintf
+          "Neither code nor specification for function %a,@, \
+           generating default %s"
+          Kernel_function.pretty kf clauses
+      else
+        let source =
+          if combined then
+            if n = 1 then " from the specification"
+            else " (some from the specification)"
+          else ""
+        in
+        Format.asprintf
+          "Neither code nor explicit %s for function %a,@, generating default \
+           clauses%s"
+          clauses Kernel_function.pretty kf source
+    in
+    Kernel.warning
+      ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
+      "%s. See -generated-spec-* options for more info" msg
 
 (* Perform generation of all clauses, adds them to the original specification,
    and emit property status for each of them. *)
