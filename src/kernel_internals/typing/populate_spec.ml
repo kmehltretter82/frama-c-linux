@@ -25,7 +25,7 @@ open Cil_types
 type mode =
   | ACSL | Safe | Frama_C (* Modes available for specification generation. *)
   | Skip (* Internally used to skip generation. *)
-  | Other of string (* Allow user to use a custom mode, see {!register}. *)
+  | Other of string (* Allow user to use a custom mode, see [register]. *)
 
 (* Allow customization, each clause can be handled with a different [mode]. *)
 type config = {
@@ -201,7 +201,8 @@ struct
       else if has_body then Generated g, None
       else Generated g, Some(combined, G.name)
 
-  (* Interface to call [G.emit]. *)
+  (* Interface to call [G.emit]. Only emit properties for non empty clauses
+     generated for a prototype. *)
   let emit mode kf bhv = function
     | Kept -> ()
     | Generated _ when Kernel_function.has_definition kf -> ()
@@ -219,13 +220,13 @@ end
 (* | false | false | ACSL  | ACSL | ----- | false |  ???  |  ??  | *)
 (* |-------------------------------------------------------------| *)
 (* *****************************************************************)
-(* *** Status emitted on prototypes ****)
-(* |---------------------------------| *)
-(* | ACSL |  Frama-c  | Safe | Other | *)
-(* |------|-----------|------|-------| *)
-(* | True | Dont_know | ---- |  ???  | *)
-(* |---------------------------------| *)
-(***************************************)
+(* ****** Status emitted on prototypes ******)
+(* |--------------------------------------| *)
+(* | ACSL |  Frama-c  |   Safe    | Other | *)
+(* |------|-----------|-----------|-------| *)
+(* | True | Dont_know | Dont_know |  ???  | *)
+(* |--------------------------------------| *)
+(********************************************)
 module Exits_generator =
 struct
 
@@ -290,8 +291,8 @@ struct
   let emit mode kf bhv exits =
     match mode with
     | Skip -> assert false
-    | Safe -> ()
-    | ACSL | Frama_C -> emit_status kf bhv exits Property_status.Dont_know
+    | ACSL | Safe | Frama_C ->
+      emit_status kf bhv exits Property_status.Dont_know
     | Other mode ->
       let custom_mode = get_custom_mode mode in
       match custom_mode.custom_exits.status with
@@ -314,13 +315,13 @@ end
 (* |  Any  |  Any  | Auto  | ACSL |  Any  | Nothing |  ???  |  ??  | *)
 (* |---------------------------------------------------------------| *)
 (* *******************************************************************)
-(* *** Status emitted on prototypes ****)
-(* |---------------------------------| *)
-(* | ACSL |  Frama-c  | Safe | Other | *)
-(* |------|-----------|------|-------| *)
-(* | ---- | Dont_know | ---- |  ???  | *)
-(* |---------------------------------| *)
-(***************************************)
+(* ****** Status emitted on prototypes ******)
+(* |--------------------------------------| *)
+(* | ACSL |  Frama-c  |   Safe    | Other | *)
+(* |------|-----------|-----------|-------| *)
+(* | ---- | Dont_know | Dont_know |  ???  | *)
+(* |--------------------------------------| *)
+(********************************************)
 module Assigns_generator =
 struct
 
@@ -418,8 +419,7 @@ struct
   let emit mode kf bhv assigns =
     match mode with
     | Skip | ACSL -> assert false
-    | Safe -> ()
-    | Frama_C -> emit_status kf bhv assigns Property_status.Dont_know
+    | Safe | Frama_C -> emit_status kf bhv assigns Property_status.Dont_know
     | Other mode ->
       let custom_mode = get_custom_mode mode in
       match custom_mode.custom_assigns.status with
@@ -519,13 +519,13 @@ end
 (* | Nothing | Nothing | ACSL  | ACSL |  Any  | Nothing |  ???  |  ??  | *)
 (* |-------------------------------------------------------------------| *)
 (* ***********************************************************************)
-(* **** Status emitted on prototypes ***)
-(* |---------------------------------| *)
-(* | ACSL |  Frama-c  | Safe | Other | *)
-(* |------|-----------|------|-------| *)
-(* | True | Dont_know | ---- |  ???  | *)
-(* |---------------------------------| *)
-(***************************************)
+(* ****** Status emitted on prototypes ******)
+(* |--------------------------------------| *)
+(* | ACSL |  Frama-c  |   Safe    | Other | *)
+(* |------|-----------|-----------|-------| *)
+(* | True | Dont_know | Dont_know |  ???  | *)
+(* |--------------------------------------| *)
+(********************************************)
 module Allocates_generator =
 struct
 
@@ -593,10 +593,9 @@ struct
   let emit mode kf bhv allocates =
     match mode with
     | Skip -> assert false
-    | Safe -> ()
     | ACSL ->
       emit_status kf bhv allocates Property_status.True
-    | Frama_C ->
+    | Safe | Frama_C ->
       emit_status kf bhv allocates Property_status.Dont_know
     | Other mode ->
       let custom_mode = get_custom_mode mode in
