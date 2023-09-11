@@ -72,11 +72,11 @@ let custom_modes = Hashtbl.create 17
 let default = Cil.default_behavior_name
 
 let emitter_populate =
-  Emitter.create "PopulateSpec"
+  Emitter.create "Populated spec"
     [ Funspec ] ~correctness:[] ~tuning:[]
 
 let emitter_status =
-  Emitter.create "PopulateStatus"
+  Emitter.create "Populated status"
     [ Property_status ] ~correctness:[] ~tuning:[]
 
 (* Emit [status] on the property [ppt]. *)
