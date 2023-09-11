@@ -116,14 +116,14 @@ struct
           Jkey "FAILED" ;
           Jkey "STEPOUT" ;
           Jkey "UNKNOWN" ;
-          Jkey "PASSED" ;
           Jkey "VALID" ;
-          Jkey "INVALID" ;
+          Jkey "PASSED" ;
+          Jkey "DOOMED" ;
         ])
   let to_json { smoke ; verdict } =
     `String begin
       match verdict with
-      | VCS.Valid -> if smoke then "INVALID" else "VALID"
+      | VCS.Valid -> if smoke then "DOOMED" else "VALID"
       | VCS.Unknown -> if smoke then "PASSED" else "UNKNOWN"
       | Failed -> "FAILED"
       | NoResult -> "NORESULT"

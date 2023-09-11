@@ -115,23 +115,23 @@ export const resultDefault: result =
 /** Test Status */
 export type status =
   Json.key<'#NORESULT'> | Json.key<'#COMPUTING'> | Json.key<'#FAILED'> |
-  Json.key<'#STEPOUT'> | Json.key<'#UNKNOWN'> | Json.key<'#PASSED'> |
-  Json.key<'#VALID'> | Json.key<'#INVALID'>;
+  Json.key<'#STEPOUT'> | Json.key<'#UNKNOWN'> | Json.key<'#VALID'> |
+  Json.key<'#PASSED'> | Json.key<'#DOOMED'>;
 
 /** Decoder for `status` */
 export const jStatus: Json.Decoder<status> =
   Json.jUnion<Json.key<'#NORESULT'> | Json.key<'#COMPUTING'> |
               Json.key<'#FAILED'> | Json.key<'#STEPOUT'> |
-              Json.key<'#UNKNOWN'> | Json.key<'#PASSED'> |
-              Json.key<'#VALID'> | Json.key<'#INVALID'>>(
+              Json.key<'#UNKNOWN'> | Json.key<'#VALID'> |
+              Json.key<'#PASSED'> | Json.key<'#DOOMED'>>(
     Json.jKey<'#NORESULT'>('#NORESULT'),
     Json.jKey<'#COMPUTING'>('#COMPUTING'),
     Json.jKey<'#FAILED'>('#FAILED'),
     Json.jKey<'#STEPOUT'>('#STEPOUT'),
     Json.jKey<'#UNKNOWN'>('#UNKNOWN'),
-    Json.jKey<'#PASSED'>('#PASSED'),
     Json.jKey<'#VALID'>('#VALID'),
-    Json.jKey<'#INVALID'>('#INVALID'),
+    Json.jKey<'#PASSED'>('#PASSED'),
+    Json.jKey<'#DOOMED'>('#DOOMED'),
   );
 
 /** Natural order for `status` */

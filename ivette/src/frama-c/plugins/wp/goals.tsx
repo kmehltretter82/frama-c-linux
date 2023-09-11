@@ -21,10 +21,46 @@
 /* ************************************************************************ */
 
 import React from 'react';
+import { IconKind, Cell } from 'dome/controls/labels';
 import { Table, Column } from 'dome/table/views';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
+
+/* -------------------------------------------------------------------------- */
+/* --- Status Column                                                      --- */
+/* -------------------------------------------------------------------------- */
+
+interface IconStatus {
+  icon: string;
+  kind: IconKind;
+  title: string;
+}
+
+interface Status extends IconStatus { label: string }
+
+const noResult : IconStatus =
+  { icon: 'MINUS', kind: 'disabled', title: 'No Result' };
+
+const baseStatus : { [key:string]: IconStatus } = {
+  'VALID': { icon: 'CHECK', kind: 'positive', title: 'Valid Goal' },
+  'PASSED': { icon: 'CHECK', kind: 'positive', title: 'Passed Test' },
+  'DOOMED': { icon: 'CROSS', kind: 'negative', title: 'Doomed Test' },
+  'FAILED': { icon: 'WARNING', kind: 'negative', title: 'Prover Failure' },
+  'UNKNOWN': { icon: 'ATTENTION', kind: 'warning', title: 'Prover Stucked' },
+  'TIMEOUT': { icon: 'HELP', kind: 'warning', title: 'Prover Timeout' },
+  'STEPOUT': { icon: 'HELP', kind: 'warning', title: 'Prover Stepout' },
+  'COMPUTING': { icon: 'EXECUTE', kind: 'default', title: 'Computing…' },
+};
+
+function getStatus(g : WP.goalsData): Status {
+  const base = baseStatus[g.status] ?? noResult;
+  return { ...base, label: g.stats.summary };
+}
+
+function renderStatus(s : Status): JSX.Element {
+  return <Cell {...s} />;
+}
 
 /* -------------------------------------------------------------------------- */
 /* --- Goals Table                                                        --- */
@@ -52,8 +88,9 @@ function WPGoals(): JSX.Element {
       onSelection={onWpoSelection}
       selection={wpoSelection}
     >
-      <Column id='status' label='Status' fixed={true} width={80} />
-      <Column id='name' label='Property' />
+      <Column id='name' label='Property' width={200} />
+      <Column id='status' label='Status' fill={true}
+              getter={getStatus} render={renderStatus} />
     </Table>
   );
 }
