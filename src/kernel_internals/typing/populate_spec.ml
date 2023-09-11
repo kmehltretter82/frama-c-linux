@@ -83,15 +83,70 @@ let emitter_status =
 let emit_status status ppt =
   Property_status.emit emitter_status ~hyps:[] ppt status
 
-(* Generic completes function for {!Generator.completes}. *)
-let completes_generic (type clause) completes table =
+(* Generic function to fill the clause hashtbl.
+   [filter] returns all the clauses of behavior [b] and depend on the type of
+   clause. [is_empty] correspond to each [Generator.is_empty] function.
+   The table also remembers for each behavior if it has assumes clause or not.
+*)
+let collect_behaviors_generic filter is_empty spec =
+  let table = Hashtbl.create 17 in
+  let iter b =
+    let clauses = filter b in
+    if not (is_empty clauses) then
+      Hashtbl.add table b.b_name (b.b_assumes = [], clauses)
+  in
+  List.iter iter spec.spec_behavior;
+  table
+
+(* Filter [table] to keep behaviors without guard (assume) clause. *)
+let unguarded table =
+  let filter _ (unguarded, clause) acc =
+    if unguarded then clause :: acc else acc
+  in
+  match Hashtbl.fold filter table [] with
+  | [] -> None
+  | l -> Some l
+
+(* Find the first group of complete behaviors in which all behaviors are in our
+   table. *)
+let completes (type clause) completes table =
   let exception Ok of clause list in
-  let collect l b = Hashtbl.find table b :: l in
+  let collect l b =
+    let _, c = Hashtbl.find table b in
+    c :: l
+  in
   let collect bhvs =
     try let r = List.fold_left collect [] bhvs in raise (Ok r)
     with Not_found -> ()
   in
-  try List.iter collect completes; None with Ok l -> Some l
+  try
+    List.iter collect completes; None
+  with Ok l -> Some l
+
+(* Concat all clauses from the table into a list. *)
+let get_all_clauses table =
+  let clauses =
+    Hashtbl.fold
+      (fun _ (_,clause) clauses -> clause :: clauses) table []
+  in
+  match clauses with
+  | [] -> None
+  | l -> Some l
+
+(* This function search for existing clauses inside our table. The search is
+   done in a specific order and stops when some clauses are found :
+   - unguarded behaviors (no assumes).
+   - complete behaviors (each one of them needs to be in our table).
+   - all behaviors in our table.
+     It is a generic function used by {!Generator.get_clauses}.
+*)
+let get_clauses_generic spec table =
+  match unguarded table with
+  | Some l -> Some l
+  | None ->
+    match completes spec.spec_complete_behaviors table with
+    | Some l -> Some l
+    | None -> get_all_clauses table
 
 (* Register a new mode (or replace an existing one). *)
 let register ?gen_exits ?status_exits ?gen_assigns ?status_assigns
@@ -148,8 +203,8 @@ sig
   val has_default_behavior : behaviors -> bool
   (* Collect all clauses from function specification. *)
   val collect_behaviors : spec -> behaviors
-  (* Collect all clauses from complete behaviors. *)
-  val completes : string list list -> behaviors -> clause list option
+  (* Collect clauses given a [spec] and result of [collect_behaviors]. *)
+  val get_clauses : spec -> behaviors -> clause list option
 
   (* Generate a default clause in ACSL mode. *)
   val acsl_default : unit -> clause
@@ -178,8 +233,8 @@ struct
   let combine_or_default mode kf spec table =
     if mode = ACSL then false, G.acsl_default ()
     else
-      let completes_opt = G.completes spec.spec_complete_behaviors table in
-      match mode, completes_opt with
+      let clauses_opt = G.get_clauses spec table in
+      match mode, clauses_opt with
       | (Safe | Frama_C | Other _), Some completes_clauses ->
         true, G.combine_default completes_clauses
       | Safe, None ->
@@ -231,7 +286,7 @@ module Exits_generator =
 struct
 
   type clause = t_exits
-  type behaviors = (string, clause) Hashtbl.t
+  type behaviors = (string, (bool * clause)) Hashtbl.t
 
   let name = "exits"
 
@@ -241,15 +296,10 @@ struct
     Hashtbl.mem behaviors default
 
   let collect_behaviors spec =
-    let table = Hashtbl.create 17 in
-    let iter b =
-      let exits = List.filter (fun (k, _ ) -> Exits = k) b.b_post_cond in
-      if exits <> [] then Hashtbl.add table b.b_name exits
-    in
-    List.iter iter spec.spec_behavior;
-    table
+    let filter b = List.filter (fun (k, _ ) -> Exits = k) b.b_post_cond in
+    collect_behaviors_generic filter is_empty spec
 
-  let completes = completes_generic
+  let get_clauses = get_clauses_generic
 
   let acsl_default () =
     [ Exits, Logic_const.(new_predicate pfalse) ]
@@ -326,7 +376,7 @@ module Assigns_generator =
 struct
 
   type clause = t_assigns
-  type behaviors = (string, assigns) Hashtbl.t
+  type behaviors = (string, (bool * clause)) Hashtbl.t
 
   let name = "assigns"
 
@@ -336,14 +386,10 @@ struct
     Hashtbl.mem behaviors default
 
   let collect_behaviors spec =
-    let table = Hashtbl.create 17 in
-    let iter { b_name; b_assigns } =
-      if b_assigns <> WritesAny then Hashtbl.add table b_name b_assigns
-    in
-    List.iter iter spec.spec_behavior;
-    table
+    let filter b = b.b_assigns in
+    collect_behaviors_generic filter is_empty spec
 
-  let completes = completes_generic
+  let get_clauses = get_clauses_generic
 
   let acsl_default () =
     WritesAny
@@ -370,8 +416,9 @@ struct
     if r <> 0 then r else compare_deps d1 d2
 
   let combine_default clauses =
-    (* Note: combination is made on a set of complete behaviors in the sens of
-       [completes], thus here all clauses are [Writes ...] *)
+    (* Note: combination is made on a set of behaviors in the sens of
+       [get_clauses] and [collect_behaviors], thus here all clauses are
+       [Writes ...]. *)
     let collect acc = function
       | Writes l -> List.rev_append (List.rev l) acc
       | _ -> assert false
@@ -452,7 +499,7 @@ module Requires_generator =
 struct
 
   type clause = t_requires
-  type behaviors = (string, clause) Hashtbl.t
+  type behaviors = (string, (bool * clause)) Hashtbl.t
 
   let name = "requires"
 
@@ -462,14 +509,10 @@ struct
     Hashtbl.mem behaviors default
 
   let collect_behaviors spec =
-    let table = Hashtbl.create 17 in
-    let iter { b_name; b_requires } =
-      if b_requires <> [] then Hashtbl.add table b_name b_requires
-    in
-    List.iter iter spec.spec_behavior;
-    table
+    let filter b = b.b_requires in
+    collect_behaviors_generic filter is_empty spec
 
-  let completes = completes_generic
+  let get_clauses = get_clauses_generic
 
   let acsl_default () = []
 
@@ -529,7 +572,7 @@ module Allocates_generator =
 struct
 
   type clause = t_allocates
-  type behaviors = (string, allocation) Hashtbl.t
+  type behaviors = (string, (bool * clause)) Hashtbl.t
 
   let name = "allocates"
 
@@ -539,14 +582,10 @@ struct
     Hashtbl.mem behaviors default
 
   let collect_behaviors spec =
-    let table = Hashtbl.create 17 in
-    let iter { b_name; b_allocation } =
-      if b_allocation <> FreeAllocAny then Hashtbl.add table b_name b_allocation
-    in
-    List.iter iter spec.spec_behavior;
-    table
+    let filter b = b.b_allocation in
+    collect_behaviors_generic filter is_empty spec
 
-  let completes = completes_generic
+  let get_clauses = get_clauses_generic
 
   let acsl_default () =
     FreeAlloc([],[])
@@ -560,8 +599,9 @@ struct
     acsl_default ()
 
   let combine_default clauses =
-    (* Note: combination is made on a set of complete behaviors in the sens of
-       [completes], thus here all clauses are [FreeAlloc ...] *)
+    (* Note: combination is made on a set of behaviors in the sens of
+       [get_clauses] and [collect_behaviors], thus here all clauses are
+       [FreeAlloc ...]. *)
     let collect (facc, aacc) = function
       | FreeAlloc(f, a) ->
         List.rev_append (List.rev f) facc, List.rev_append (List.rev a) aacc
@@ -640,7 +680,7 @@ struct
   let collect_behaviors spec =
     None <> spec.spec_terminates
 
-  let completes _ _ = None
+  let get_clauses _ _ = None
 
   let acsl_default () =
     Some(Logic_const.(new_predicate ptrue))
