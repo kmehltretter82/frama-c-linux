@@ -96,7 +96,8 @@ export function SVG(props: SVGprops): null | JSX.Element {
 // --- Icon Component
 // --------------------------------------------------------------------------
 
-export type IconKind = 'disabled' | 'warning' | 'positive' | 'negative';
+export type IconKind =
+  'disabled' | 'selected' | 'positive' | 'negative' | 'warning';
 
 /** Icon Component Properties */
 export interface IconProps extends SVGprops {
