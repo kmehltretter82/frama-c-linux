@@ -25,4 +25,10 @@ No external plug-in impacted
 
 ### Proposed Changelog Entry
 
-Your entry here
+<!-- Only if needed. The list of changes that warrant a Changelog entry is not completely fixed, but includes at least
+  - Bug fix on pub/frama-c (use `##nnnn` to refer to the issue)
+  - Modification that is visible to the end-user
+  - API change, notably function deprecation
+
+   See [Changelog](https://git.frama-c.com/frama-c/frama-c/-/blob/master/Changelog) for how to format an entry. 
+-->
