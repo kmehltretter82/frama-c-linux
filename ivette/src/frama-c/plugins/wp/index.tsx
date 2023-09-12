@@ -26,6 +26,7 @@
 
 import React from 'react';
 import * as Dome from 'dome';
+import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
@@ -40,18 +41,27 @@ function WPGoals(): JSX.Element {
   const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped');
   const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed');
   const [selection] = States.useSelection();
+  const [goals,setGoals] = React.useState(0);
+  const [total,setTotal] = React.useState(0);
+  const onFilter = React.useCallback((goals, total) => {
+    setGoals(goals);
+    setTotal(total);
+  }, [setGoals, setTotal]);
   const fct = selection?.current?.fct;
   const scope = scoped ? fct : undefined;
   return (
     <>
       <Ivette.TitleBar>
+        <Label display={goals < total}>
+          {goals} / {total}
+        </Label>
         <IconButton icon='COMPONENT' title='Current Scope Only'
                     enabled={!!fct}
                     selected={scoped} onClick={flipScoped} />
         <IconButton icon='CIRC.QUESTION' title='Unresolved Goals Only'
                     selected={failed} onClick={flipFailed} />
       </Ivette.TitleBar>
-      <GoalTable scope={scope} failed={failed} />
+      <GoalTable scope={scope} failed={failed} onFilter={onFilter} />
     </>
   );
 }

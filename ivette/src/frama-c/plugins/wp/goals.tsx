@@ -84,10 +84,11 @@ function filterGoal(
 export interface GoalTableProps {
   scope: string | undefined;
   failed: boolean;
+  onFilter: (goals: number, total: number) => void;
 }
 
 export function GoalTable(props: GoalTableProps): JSX.Element {
-  const { scope, failed } = props;
+  const { scope, failed, onFilter } = props;
   const model = States.useSyncArrayModel(WP.goals);
   const [_, updateAstSelection] = States.useSelection();
   const [wpoSelection, setWpoSelection] = React.useState(WP.goalDefault);
@@ -106,7 +107,10 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
     } else {
       model.setFilter();
     }
-  }, [model, scope, failed]);
+    const goals = model.getRowCount();
+    const total = model.getTotalRowCount();
+    onFilter(goals, total);
+  }, [model, scope, failed, onFilter]);
 
   return (
     <Table
