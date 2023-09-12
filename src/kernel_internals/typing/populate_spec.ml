@@ -181,10 +181,6 @@ let is_frama_c_builtin kf =
 let is_frama_c_stdlib kf =
   (Kernel_function.get_vi kf).vattr |> Cil.is_in_libc
 
-(* Return true if [kf] is either from frama-c's stdlib or builtinds. *)
-let is_part_of_frama_c kf =
-  is_frama_c_builtin kf || is_frama_c_stdlib kf
-
 (* This module is used to define clauses generators. *)
 module type Generator =
 sig
@@ -253,7 +249,7 @@ struct
       let combined, g = combine_or_default mode kf spec table in
       let has_body = Kernel_function.has_definition kf in
       if G.is_empty g then Kept, None
-      else if has_body || is_part_of_frama_c kf then Generated g, None
+      else if has_body || is_frama_c_builtin kf then Generated g, None
       else Generated g, Some(combined, G.name)
 
   (* Interface to call [G.emit]. Only emit properties for non empty clauses
@@ -798,11 +794,12 @@ let clauses_fmt =
   Pretty_utils.pp_list ~pre:"" ~sep:", " ~last:" and " ~suf:""
     Format.pp_print_string
 
-(* Emit warnings if :
-   - we generated some clauses (cf. {!Make.get_default}).
-   - [kf] is a declaration and not part of frama-c (cf. {!Make.get_default}).
-     The message varies depending on if the spec was empty or if we combined
-     existing clauses.
+(* Emit warnings if we genareted some clauses and if [kf] is a declaration
+   and not a builtin of frama-c (cf. {!Make.get_default}).
+   The message varies depending on
+   - if the spec was empty.
+   - if we used existing specification.
+   - the number of generated clause types.
 *)
 let do_warning kf funspec = function
   | None -> ()
