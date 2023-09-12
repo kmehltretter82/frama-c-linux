@@ -70,15 +70,26 @@ import './style.css';
 // --------------------------------------------------------------------------
 
 /** Div properties that you can also use in boxes. */
-export type DivProps = React.HTMLAttributes<HTMLDivElement>;
+export interface DivProps extends React.HTMLAttributes<HTMLDivElement> {
+  visible?: boolean;
+  display?: boolean;
+}
 
 const makeBox = (
   boxClasses: string,
   props: DivProps,
   morestyle?: React.CSSProperties,
 ): JSX.Element => {
-  const { children, className, style, ...others } = props;
-  const allClasses = classes(className, boxClasses);
+  const {
+    className, style, children,
+    visible=true, display=true,
+    ...others
+  } = props;
+  const allClasses = classes(
+    className, boxClasses,
+    !visible && 'dome-hidden',
+    !display && 'dome-erased',
+  );
   const allStyles = styles(style, morestyle);
   return (
     <div className={allClasses} style={allStyles} {...others}>
