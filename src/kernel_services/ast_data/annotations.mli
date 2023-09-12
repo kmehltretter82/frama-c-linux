@@ -342,7 +342,7 @@ val add_spec:
   ?register_children:bool -> ?force:bool -> spec contract_component_addition
 (** Add new spec into the given contract. The [force] (which defaults to
     [false]) parameter is used to determine whether [decreases] and [terminates]
-    clauses mùst be relaced if they already exists and a new one is provided.
+    clauses must be replaced if they already exist and a new one is provided.
 
     More precisely, if [force] is [true] *and* the new contract has
     [Some terminates], the old one is removed and the new clause is used
