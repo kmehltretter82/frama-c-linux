@@ -29,7 +29,7 @@ import * as Dome from 'dome';
 import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { LED, Meter } from 'dome/controls/displays';
-import { Inset } from 'dome/frame/toolbars';
+import { Group, Inset } from 'dome/frame/toolbars';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
 import { GoalTable } from './goals';
@@ -91,12 +91,12 @@ function ServerActivity(): JSX.Element {
   const todo = rq ? rq.todo : 0;
   const total = done + todo;
   return (
-    <>
+    <Group display={total > 0}>
       <LED status={status} />
-      <Label>WP {done} / {total}</Label>
+      <Label>WP</Label>
       <Meter value={done} min={0} max={done + total} />
       <Inset />
-    </>
+    </Group>
   );
 }
 
