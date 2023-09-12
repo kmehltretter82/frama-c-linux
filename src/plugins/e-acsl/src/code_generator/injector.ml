@@ -465,7 +465,6 @@ and inject_in_stmt env kf stmt =
   (* translate the precondition of the function *)
   let env =
     if translate_pre_funspec then begin
-      Populate_spec.(populate_funspec kf [`Assigns]);
       let funspec = Annotations.funspec kf in
       Translate_annots.pre_funspec kf env funspec
     end
