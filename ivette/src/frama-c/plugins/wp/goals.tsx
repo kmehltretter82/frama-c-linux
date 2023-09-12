@@ -28,6 +28,17 @@ import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
 
 /* -------------------------------------------------------------------------- */
+/* --- Scope Column                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+function getScope(g : WP.goalsData): string {
+  if (g.bhv && g.fct) return `${g.fct}@{g.bhv}}`;
+  if (g.fct) return g.fct;
+  if (g.thy) return g.thy;
+  return '';
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Status Column                                                      --- */
 /* -------------------------------------------------------------------------- */
 
@@ -119,8 +130,13 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
       onSelection={onWpoSelection}
       selection={wpoSelection}
     >
-      <Column id='name' label='Property' width={200} />
-      <Column id='status' label='Status' fill={true}
+      <Column id='scope' label='Scope'
+              width={150}
+              getter={getScope} />
+      <Column id='name' label='Property'
+              width={150} />
+      <Column id='status' label='Status'
+              fill={true}
               getter={getStatus} render={renderStatus} />
     </Table>
   );
