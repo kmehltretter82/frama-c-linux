@@ -10,6 +10,212 @@
 char *__gen_e_acsl_literal_string;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
+/*@ requires valid_file_name: valid_read_string(file_name);
+    requires
+      resolved_name_null_or_allocated:
+        resolved_name == \null || \valid(resolved_name + (0 .. 4096 - 1));
+    assigns __fc_heap_status, \result, *(resolved_name + (0 .. 4096 - 1));
+    assigns __fc_heap_status
+      \from (indirect: resolved_name), __fc_heap_status;
+    assigns \result
+      \from (indirect: __fc_heap_status), (indirect: resolved_name),
+            (indirect: *(file_name + (0 ..)));
+    assigns *(resolved_name + (0 .. 4096 - 1))
+      \from (indirect: __fc_heap_status), (indirect: resolved_name),
+            (indirect: *(file_name + (0 ..)));
+    
+    behavior allocate_resolved_name:
+      assumes resolved_name_null: resolved_name == \null;
+      assumes can_allocate: is_allocable(4096);
+      ensures allocation: \fresh{Old, Here}(\result,4096);
+      assigns __fc_heap_status, \result;
+      assigns __fc_heap_status \from __fc_heap_status;
+      assigns \result \from (indirect: __fc_heap_status);
+    
+    behavior not_enough_memory:
+      assumes resolved_name_null: resolved_name == \null;
+      ensures null_result: \result == \null;
+      assigns \result;
+      assigns \result \from \nothing;
+      allocates \nothing;
+    
+    behavior resolved_name_buffer:
+      assumes
+        allocated_resolved_name_or_fail:
+          \valid(resolved_name + (0 .. 4096 - 1));
+      ensures valid_string_resolved_name: valid_string(\old(resolved_name));
+      ensures resolved_result: \result == \old(resolved_name);
+      assigns \result, *(resolved_name + (0 .. 4096 - 1));
+      assigns \result \from \nothing;
+      assigns *(resolved_name + (0 .. 4096 - 1))
+        \from (indirect: *(file_name + (0 ..)));
+      allocates \nothing;
+ */
+char *__gen_e_acsl_realpath(char const * restrict file_name,
+                            char * restrict resolved_name);
+
+/*@ requires valid_file_name: valid_read_string(file_name);
+    requires
+      resolved_name_null_or_allocated:
+        resolved_name == \null || \valid(resolved_name + (0 .. 4096 - 1));
+    assigns __fc_heap_status, \result, *(resolved_name + (0 .. 4096 - 1));
+    assigns __fc_heap_status
+      \from (indirect: resolved_name), __fc_heap_status;
+    assigns \result
+      \from (indirect: __fc_heap_status), (indirect: resolved_name),
+            (indirect: *(file_name + (0 ..)));
+    assigns *(resolved_name + (0 .. 4096 - 1))
+      \from (indirect: __fc_heap_status), (indirect: resolved_name),
+            (indirect: *(file_name + (0 ..)));
+    
+    behavior allocate_resolved_name:
+      assumes resolved_name_null: resolved_name == \null;
+      assumes can_allocate: is_allocable(4096);
+      ensures allocation: \fresh{Old, Here}(\result,4096);
+      assigns __fc_heap_status, \result;
+      assigns __fc_heap_status \from __fc_heap_status;
+      assigns \result \from (indirect: __fc_heap_status);
+    
+    behavior not_enough_memory:
+      assumes resolved_name_null: resolved_name == \null;
+      ensures null_result: \result == \null;
+      assigns \result;
+      assigns \result \from \nothing;
+      allocates \nothing;
+    
+    behavior resolved_name_buffer:
+      assumes
+        allocated_resolved_name_or_fail:
+          \valid(resolved_name + (0 .. 4096 - 1));
+      ensures valid_string_resolved_name: valid_string(\old(resolved_name));
+      ensures resolved_result: \result == \old(resolved_name);
+      assigns \result, *(resolved_name + (0 .. 4096 - 1));
+      assigns \result \from \nothing;
+      assigns *(resolved_name + (0 .. 4096 - 1))
+        \from (indirect: *(file_name + (0 ..)));
+      allocates \nothing;
+ */
+char *__gen_e_acsl_realpath(char const * restrict file_name,
+                            char * restrict resolved_name)
+{
+  __e_acsl_contract_t *__gen_e_acsl_contract;
+  char *__gen_e_acsl_at;
+  char *__retres;
+  __e_acsl_store_block((void *)(& __retres),8UL);
+  {
+    int __gen_e_acsl_or;
+    int __gen_e_acsl_size_2;
+    int __gen_e_acsl_if_2;
+    int __gen_e_acsl_valid_2;
+    __e_acsl_store_block((void *)(& resolved_name),8UL);
+    __e_acsl_temporal_pull_parameter((void *)(& resolved_name),1U,8UL);
+    __gen_e_acsl_at = resolved_name;
+    __gen_e_acsl_contract = __e_acsl_contract_init(3UL);
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+      {.values = (void *)0};
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
+                                 "resolved_name",(void *)resolved_name);
+    if (resolved_name == (char *)0) __gen_e_acsl_or = 1;
+    else {
+      int __gen_e_acsl_size;
+      int __gen_e_acsl_if;
+      int __gen_e_acsl_valid;
+      __gen_e_acsl_size = 1 * (((4096 - 1) - 0) + 1);
+      if (__gen_e_acsl_size <= 0) __gen_e_acsl_if = 0;
+      else __gen_e_acsl_if = __gen_e_acsl_size;
+      __gen_e_acsl_valid = __e_acsl_valid((void *)(resolved_name + 1 * 0),
+                                          (size_t)__gen_e_acsl_if,
+                                          (void *)resolved_name,
+                                          (void *)(& resolved_name));
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,
+                                   "resolved_name",(void *)resolved_name);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                   "sizeof(char)",0,1);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                   "sizeof(char)",0,1);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"size",0,
+                                   __gen_e_acsl_size);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"size",0,
+                                   __gen_e_acsl_size);
+      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
+                                   "\\valid(resolved_name + (0 .. 4096 - 1))",
+                                   0,__gen_e_acsl_valid);
+      __gen_e_acsl_or = __gen_e_acsl_valid;
+    }
+    __gen_e_acsl_assert_data_2.blocking = 1;
+    __gen_e_acsl_assert_data_2.kind = "Precondition";
+    __gen_e_acsl_assert_data_2.pred_txt = "resolved_name == \\null || \\valid(resolved_name + (0 .. 4096 - 1))";
+    __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdlib.h";
+    __gen_e_acsl_assert_data_2.fct = "realpath";
+    __gen_e_acsl_assert_data_2.line = 757;
+    __gen_e_acsl_assert_data_2.name = "resolved_name_null_or_allocated";
+    __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,
+                                           resolved_name == (char *)0);
+    __gen_e_acsl_size_2 = 1 * (((4096 - 1) - 0) + 1);
+    if (__gen_e_acsl_size_2 <= 0) __gen_e_acsl_if_2 = 0;
+    else __gen_e_acsl_if_2 = __gen_e_acsl_size_2;
+    __gen_e_acsl_valid_2 = __e_acsl_valid((void *)(resolved_name + 1 * 0),
+                                          (size_t)__gen_e_acsl_if_2,
+                                          (void *)resolved_name,
+                                          (void *)(& resolved_name));
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,2UL,
+                                           __gen_e_acsl_valid_2);
+    __e_acsl_temporal_reset_parameters();
+    __e_acsl_temporal_reset_return();
+    __e_acsl_temporal_save_nreferent_parameter((void *)(& resolved_name),1U);
+  }
+  __retres = realpath(file_name,resolved_name);
+  __e_acsl_temporal_store_nblock((void *)(& __retres),(void *)*(& __retres));
+  {
+    int __gen_e_acsl_assumes_value;
+    __e_acsl_temporal_save_return((void *)(& __retres));
+    __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
+    if (__gen_e_acsl_assumes_value) {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,"\\result",
+                                   (void *)__retres);
+      __gen_e_acsl_assert_data_4.blocking = 1;
+      __gen_e_acsl_assert_data_4.kind = "Postcondition";
+      __gen_e_acsl_assert_data_4.pred_txt = "\\result == \\null";
+      __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/stdlib.h";
+      __gen_e_acsl_assert_data_4.fct = "realpath";
+      __gen_e_acsl_assert_data_4.line = 771;
+      __gen_e_acsl_assert_data_4.name = "not_enough_memory/null_result";
+      __e_acsl_assert(__retres == (char *)0,& __gen_e_acsl_assert_data_4);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
+    }
+    __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,2UL);
+    if (__gen_e_acsl_assumes_value) {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_6 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,"\\result",
+                                   (void *)__retres);
+      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_6,
+                                   "\\old(resolved_name)",
+                                   (void *)__gen_e_acsl_at);
+      __gen_e_acsl_assert_data_6.blocking = 1;
+      __gen_e_acsl_assert_data_6.kind = "Postcondition";
+      __gen_e_acsl_assert_data_6.pred_txt = "\\result == \\old(resolved_name)";
+      __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/stdlib.h";
+      __gen_e_acsl_assert_data_6.fct = "realpath";
+      __gen_e_acsl_assert_data_6.line = 780;
+      __gen_e_acsl_assert_data_6.name = "resolved_name_buffer/resolved_result";
+      __e_acsl_assert(__retres == __gen_e_acsl_at,
+                      & __gen_e_acsl_assert_data_6);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
+    }
+    __e_acsl_contract_clean(__gen_e_acsl_contract);
+    __e_acsl_delete_block((void *)(& resolved_name));
+    __e_acsl_delete_block((void *)(& __retres));
+    return __retres;
+  }
+}
+
 void __e_acsl_globals_init(void)
 {
   static char __e_acsl_already_run = 0;
@@ -111,16 +317,16 @@ int main(void)
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nreferent_parameter((void *)(& q),1U);
-  char *path = realpath((char const *)c,q);
-  __e_acsl_temporal_store_nblock((void *)(& path),(void *)*(& path));
+  char *path = __gen_e_acsl_realpath((char const *)c,q);
+  __e_acsl_temporal_pull_return((void *)(& path));
   __e_acsl_store_block((void *)(& path),8UL);
   __e_acsl_full_init((void *)(& path));
   __e_acsl_full_init((void *)(& path));
   __e_acsl_temporal_reset_parameters();
   __e_acsl_temporal_reset_return();
   __e_acsl_temporal_save_nreferent_parameter((void *)(& q),1U);
-  path = realpath((char const *)c,q);
-  __e_acsl_temporal_store_nblock((void *)(& path),(void *)*(& path));
+  path = __gen_e_acsl_realpath((char const *)c,q);
+  __e_acsl_temporal_pull_return((void *)(& path));
   {
     int __gen_e_acsl_initialized_3;
     int __gen_e_acsl_and_4;

@@ -748,9 +748,38 @@ extern int mkstemp(char *templat);
  */
 extern int mkstemps(char *templat, int suffixlen);
 
-// This function may allocate memory for the result, which is not supported by
+// 'realpath' may allocate memory for the result, which is not supported by
 // some plugins such as Eva. In such cases, it is preferable to use the stub
 // provided in stdlib.c.
+/*@
+  requires valid_file_name: valid_read_string(file_name);
+  requires resolved_name_null_or_allocated:
+    resolved_name == \null || \valid(resolved_name+(0 .. PATH_MAX-1));
+  assigns __fc_heap_status \from indirect:resolved_name, __fc_heap_status;
+  assigns \result, resolved_name[0 .. PATH_MAX-1] \from
+    indirect:__fc_heap_status, indirect:resolved_name, indirect:file_name[0..];
+  behavior allocate_resolved_name:
+    assumes resolved_name_null: resolved_name == \null;
+    assumes can_allocate: is_allocable(PATH_MAX);
+    assigns __fc_heap_status \from __fc_heap_status;
+    assigns \result \from indirect:__fc_heap_status;
+    ensures allocation: \fresh(\result,PATH_MAX);
+  behavior not_enough_memory:
+    assumes resolved_name_null: resolved_name == \null;
+    assigns \result \from \nothing;
+    allocates \nothing;
+    ensures null_result: \result == \null;
+  behavior resolved_name_buffer:
+    assumes allocated_resolved_name_or_fail:
+      \valid(resolved_name+(0 .. PATH_MAX-1));
+    assigns \result \from \nothing;
+    assigns resolved_name[0 .. PATH_MAX-1] \from indirect:file_name[0..];
+    ensures valid_string_resolved_name: valid_string(resolved_name);
+    // missing: assigns \result,
+    //                  resolved_name[0 .. PATH_MAX-1] \from 'filesystem';
+    ensures resolved_result: \result == resolved_name;
+    allocates \nothing;
+ */
 extern char *realpath(const char *restrict file_name,
                       char *restrict resolved_name);
 

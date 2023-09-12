@@ -16,6 +16,7 @@
   \return(reallocarray) == 0 (auto)
   \return(getenv) == 0 (auto)
   \return(bsearch) == 0 (auto)
+  \return(realpath) == 0 (auto)
   \return(getcwd) == 0 (auto)
   \return(ttyname) == 0 (auto)
   \return(memchr) == 0 (auto)

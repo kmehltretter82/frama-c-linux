@@ -14186,6 +14186,676 @@
           "ruleId": "user-spec",
           "kind": "pass",
           "level": "none",
+          "message": {
+            "text": "behavior allocate_resolved_name in function realpath."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 783,
+                  "startColumn": 12,
+                  "endLine": 783,
+                  "endColumn": 13,
+                  "byteLength": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "behavior default! in function realpath." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 783,
+                  "startColumn": 12,
+                  "endLine": 783,
+                  "endColumn": 13,
+                  "byteLength": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "behavior not_enough_memory in function realpath."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 783,
+                  "startColumn": 12,
+                  "endLine": 783,
+                  "endColumn": 13,
+                  "byteLength": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "behavior resolved_name_buffer in function realpath."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 783,
+                  "startColumn": 12,
+                  "endLine": 783,
+                  "endColumn": 13,
+                  "byteLength": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "valid_file_name." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 755,
+                  "startColumn": 28,
+                  "endLine": 755,
+                  "endColumn": 56,
+                  "byteLength": 28
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "resolved_name_null_or_allocated." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 757,
+                  "startColumn": 4,
+                  "endLine": 757,
+                  "endColumn": 66,
+                  "byteLength": 62
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "resolved_name_null." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 762,
+                  "startColumn": 32,
+                  "endLine": 762,
+                  "endColumn": 54,
+                  "byteLength": 22
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "can_allocate." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 763,
+                  "startColumn": 26,
+                  "endLine": 763,
+                  "endColumn": 44,
+                  "byteLength": 18
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "resolved_name_null." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 768,
+                  "startColumn": 32,
+                  "endLine": 768,
+                  "endColumn": 54,
+                  "byteLength": 22
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "allocated_resolved_name_or_fail." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 774,
+                  "startColumn": 6,
+                  "endLine": 774,
+                  "endColumn": 42,
+                  "byteLength": 36
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "allocation." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 766,
+                  "startColumn": 24,
+                  "endLine": 766,
+                  "endColumn": 44,
+                  "byteLength": 20
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "null_result." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 771,
+                  "startColumn": 25,
+                  "endLine": 771,
+                  "endColumn": 41,
+                  "byteLength": 16
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "valid_string_resolved_name." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 777,
+                  "startColumn": 40,
+                  "endLine": 777,
+                  "endColumn": 67,
+                  "byteLength": 27
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "resolved_result." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 780,
+                  "startColumn": 29,
+                  "endLine": 780,
+                  "endColumn": 53,
+                  "byteLength": 24
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "assigns clause in function realpath." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 764,
+                  "startColumn": 12,
+                  "endLine": 764,
+                  "endColumn": 28,
+                  "byteLength": 16
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "assigns clause in function realpath." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 758,
+                  "startColumn": 10,
+                  "endLine": 758,
+                  "endColumn": 26,
+                  "byteLength": 16
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "assigns clause in function realpath." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 783,
+                  "startColumn": 12,
+                  "endLine": 783,
+                  "endColumn": 13,
+                  "byteLength": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "assigns clause in function realpath." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 775,
+                  "startColumn": 12,
+                  "endLine": 775,
+                  "endColumn": 19,
+                  "byteLength": 7
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "from clause of term __fc_heap_status in function realpath."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 764,
+                  "startColumn": 12,
+                  "endLine": 764,
+                  "endColumn": 28,
+                  "byteLength": 16
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "from clause of term \\result in function realpath."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 765,
+                  "startColumn": 12,
+                  "endLine": 765,
+                  "endColumn": 19,
+                  "byteLength": 7
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "from clause of term __fc_heap_status in function realpath."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 758,
+                  "startColumn": 10,
+                  "endLine": 758,
+                  "endColumn": 26,
+                  "byteLength": 16
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "from clause of term \\result in function realpath."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 759,
+                  "startColumn": 10,
+                  "endLine": 759,
+                  "endColumn": 17,
+                  "byteLength": 7
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "from clause of term *(resolved_name + (0 .. 4096 - 1)) in function realpath."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 759,
+                  "startColumn": 19,
+                  "endLine": 759,
+                  "endColumn": 46,
+                  "byteLength": 27
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "from clause of term \\result in function realpath."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 769,
+                  "startColumn": 12,
+                  "endLine": 769,
+                  "endColumn": 19,
+                  "byteLength": 7
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "from clause of term \\result in function realpath."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 775,
+                  "startColumn": 12,
+                  "endLine": 775,
+                  "endColumn": 19,
+                  "byteLength": 7
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "from clause of term *(resolved_name + (0 .. 4096 - 1)) in function realpath."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 776,
+                  "startColumn": 12,
+                  "endLine": 776,
+                  "endColumn": 39,
+                  "byteLength": 27
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "allocates/frees clause in function realpath."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 783,
+                  "startColumn": 12,
+                  "endLine": 783,
+                  "endColumn": 13,
+                  "byteLength": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "allocates/frees clause in function realpath."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 783,
+                  "startColumn": 12,
+                  "endLine": 783,
+                  "endColumn": 13,
+                  "byteLength": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
           "message": { "text": "behavior default! in function seed48." },
           "locations": [
             {
