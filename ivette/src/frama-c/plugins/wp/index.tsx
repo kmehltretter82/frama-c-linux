@@ -28,9 +28,12 @@ import React from 'react';
 import * as Dome from 'dome';
 import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
+import { LED, Meter } from 'dome/controls/displays';
+import { Inset } from 'dome/frame/toolbars';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
 import { GoalTable } from './goals';
+import * as WP from 'frama-c/plugins/wp/api';
 import './style.css';
 
 /* -------------------------------------------------------------------------- */
@@ -41,29 +44,30 @@ function WPGoals(): JSX.Element {
   const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped');
   const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed');
   const [selection] = States.useSelection();
-  const [goals,setGoals] = React.useState(0);
-  const [total,setTotal] = React.useState(0);
+  const [goals, setGoals] = React.useState(0);
+  const [total, setTotal] = React.useState(0);
   const onFilter = React.useCallback((goals, total) => {
     setGoals(goals);
     setTotal(total);
   }, [setGoals, setTotal]);
   const fct = selection?.current?.fct;
   const scope = scoped ? fct : undefined;
-  return (
-    <>
-      <Ivette.TitleBar>
-        <Label display={goals < total}>
-          {goals} / {total}
-        </Label>
-        <IconButton icon='COMPONENT' title='Current Scope Only'
-                    enabled={!!fct}
-                    selected={scoped} onClick={flipScoped} />
-        <IconButton icon='CIRC.QUESTION' title='Unresolved Goals Only'
-                    selected={failed} onClick={flipFailed} />
-      </Ivette.TitleBar>
-      <GoalTable scope={scope} failed={failed} onFilter={onFilter} />
-    </>
-  );
+    return (
+      <>
+        <Ivette.TitleBar>
+          <Label display={goals < total}>
+            {goals} / {total}
+          </Label>
+          <Inset />
+          <IconButton icon='COMPONENT' title='Current Scope Only'
+                      enabled={!!fct}
+                      selected={scoped} onClick={flipScoped} />
+          <IconButton icon='CIRC.QUESTION' title='Unresolved Goals Only'
+                      selected={failed} onClick={flipFailed} />
+        </Ivette.TitleBar>
+        <GoalTable scope={scope} failed={failed} onFilter={onFilter} />
+      </>
+    );
 }
 
 Ivette.registerComponent({
@@ -76,11 +80,37 @@ Ivette.registerComponent({
 });
 
 /* -------------------------------------------------------------------------- */
+/* --- WP Server Activity                                                 --- */
+/* -------------------------------------------------------------------------- */
+
+function ServerActivity(): JSX.Element {
+  const rq = States.useRequest(WP.getScheduledTasks, null);
+  const active = rq ? rq.active > 0 : false;
+  const status = active ? 'active' : 'inactive';
+  const done = rq ? rq.done : 0;
+  const todo = rq ? rq.todo : 0;
+  const total = done + todo;
+  return (
+    <>
+      <LED status={status} />
+      <Label>WP {done} / {total}</Label>
+      <Meter value={done} min={0} max={done + total} />
+      <Inset />
+    </>
+  );
+}
+
+Ivette.registerStatusbar({
+  id: 'frama-c.plugins.wp.server',
+  children: <ServerActivity />,
+});
+
+/* -------------------------------------------------------------------------- */
 /* --- WP View                                                            --- */
 /* -------------------------------------------------------------------------- */
 
 Ivette.registerView({
-  id: 'wp.main',
+  id: 'frama-c.plugins.wp.main',
   rank: 5,
   label: 'WP View',
   layout: [
