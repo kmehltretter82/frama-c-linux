@@ -3,11 +3,11 @@
 -->
 Close frama-c/frama-c#NNNN
 
-### Description
+## Description
 
 Your description here
 
-### Companion MRs
+## Companion MRs
 
 No external plug-in impacted
 
@@ -15,7 +15,7 @@ No external plug-in impacted
 - Plugin: link to MR
 -->
 
-### Tasks
+## Tasks
 
 - [ ] API documentation is up-to-date, or no need to update
 - [ ] Manuals are up-to-date (and the CI manuals target has been run), or no
@@ -23,7 +23,7 @@ No external plug-in impacted
 - [ ] Opam dependencies versions are up-to-date (and CI Opam targets have been
       run), or no changes
 
-### Proposed Changelog Entry
+## Proposed Changelog Entry
 
 <!-- Only if needed. The list of changes that warrant a Changelog entry is not completely fixed, but includes at least
   - Bug fix on pub/frama-c (use `##nnnn` to refer to the issue)
