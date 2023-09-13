@@ -774,10 +774,17 @@ let get_config_custom () =
   in
   Kernel.GeneratedSpecCustom.fold collect default
 
+(* Create the final configuration used for the specification.
+   First we create the configuration to be used (either from command line
+   parameters, or specific modes for builtins and frama-c's stdlib).
+   Then we activate clauses selected for the generation, skiping all other
+   clauses.
+*)
 let activated_config kf clauses =
   let default =
     if is_frama_c_builtin kf then build_config Frama_C
-    else if is_frama_c_stdlib kf then build_config ACSL
+    (* TODO: Use ACSL mode for frama-c's libc once all assigns are written. *)
+    else if is_frama_c_stdlib kf then build_config Frama_C
     else get_config_custom ()
   in
   let collect config clause =
