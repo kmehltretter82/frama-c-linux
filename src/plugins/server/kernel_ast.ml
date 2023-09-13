@@ -361,7 +361,7 @@ struct
   let () =
     States.column
       ~name:"name"
-      ~descr:(Md.plain "Marker short name  or identifier when relevant.")
+      ~descr:(Md.plain "Marker short name or identifier when relevant.")
       ~data:(module Jalpha)
       ~get:(fun (tag, _) -> Printer_tag.label tag)
       model
@@ -369,9 +369,9 @@ struct
   let () =
     States.column
       ~name:"descr"
-      ~descr:(Md.plain "Marker declaration or description")
+      ~descr:(Md.plain "Marker description")
       ~data:(module Jstring)
-      ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pretty tag)
+      ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pp_localizable tag)
       model
 
   let () =
@@ -487,11 +487,11 @@ struct
   let key kf = Printf.sprintf "kf#%d" (Kernel_function.get_id kf)
 
   let signature kf =
-    let global = Kernel_function.get_global kf in
+    let g = Kernel_function.get_global kf in
     let libc = Kernel.PrintLibc.get () in
     try
       if not libc then Kernel.PrintLibc.set true ;
-      let txt = Rich_text.to_string Printer_tag.pretty (PGlobal global) in
+      let txt = Rich_text.to_string Printer_tag.pp_localizable (PGlobal g) in
       if not libc then Kernel.PrintLibc.set false ;
       if Kernel_function.is_entry_point kf then (txt ^ " /* main */") else txt
     with err ->

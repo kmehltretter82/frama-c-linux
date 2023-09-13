@@ -53,8 +53,8 @@ val label: localizable -> string
 (** Name (or category). *)
 val glabel: global -> string
 
-(** Description of a localizable. *)
-val pretty: Format.formatter -> localizable -> unit
+(** Complete printing of a localizable. *)
+val pp_localizable: Format.formatter -> localizable -> unit
 
 (** Debugging. *)
 val pp_debug: Format.formatter -> localizable -> unit

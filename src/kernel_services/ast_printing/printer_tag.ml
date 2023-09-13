@@ -76,7 +76,7 @@ let decl_of = function
   | ( GType _ | GCompTagDecl _ | GEnumTagDecl _
     | GVarDecl _ | GText _ | GPragma _) as g -> g
 
-let pretty fmt = function
+let pp_localizable fmt = function
   | PVDecl (_, _, vi) -> Printer.pp_vdecl fmt vi
   | PLval (_, _, lval) -> Printer.pp_lval fmt lval
   | PExp  (_, _, expr) -> Printer.pp_exp fmt expr
