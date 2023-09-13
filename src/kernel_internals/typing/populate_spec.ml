@@ -25,9 +25,9 @@ open Cil_types
 type mode =
   | ACSL | Safe | Frama_C (* Modes available for specification generation. *)
   | Skip (* Internally used to skip generation. *)
-  | Other of string (* Allow user to use a custom mode, see [register]. *)
+  | Other of string (* Allow user to use a custom mode, see {!register}. *)
 
-(* Allow customization, each clause can be handled with a different [mode]. *)
+(* Allow customization, each clause can be handled with a different {!mode}. *)
 type config = {
   c_exits: mode;
   c_assigns: mode;
@@ -85,7 +85,7 @@ let emit_status status ppt =
 
 (* Generic function to fill the clause hashtbl.
    [filter] returns all the clauses of behavior [b] and depend on the type of
-   clause. [is_empty] correspond to each [Generator.is_empty] function.
+   clause. [is_empty] correspond to each {!Generator.is_empty} function.
    The table also remembers for each behavior if it has assumes clause or not.
 *)
 let collect_behaviors_generic filter is_empty spec =
@@ -199,7 +199,7 @@ sig
   val has_default_behavior : behaviors -> bool
   (* Collect all clauses from function specification. *)
   val collect_behaviors : spec -> behaviors
-  (* Collect clauses given a [spec] and result of [collect_behaviors]. *)
+  (* Collect clauses given a [spec] and result of {!collect_behaviors}. *)
   val get_clauses : spec -> behaviors -> clause list option
 
   (* Generate a default clause in ACSL mode. *)
@@ -252,7 +252,7 @@ struct
       else if has_body || is_frama_c_builtin kf then Generated g, None
       else Generated g, Some(combined, G.name)
 
-  (* Interface to call [G.emit]. Only emit properties for non empty clauses
+  (* Interface to call {!G.emit}. Only emit properties for non empty clauses
      generated for a prototype. *)
   let emit mode kf bhv = function
     | Kept -> ()
@@ -413,7 +413,7 @@ struct
 
   let combine_default clauses =
     (* Note: combination is made on a set of behaviors in the sens of
-       [get_clauses] and [collect_behaviors], thus here all clauses are
+       {!get_clauses} and {!collect_behaviors}, thus here all clauses are
        [Writes ...]. *)
     let collect acc = function
       | Writes l -> List.rev_append (List.rev l) acc
@@ -596,7 +596,7 @@ struct
 
   let combine_default clauses =
     (* Note: combination is made on a set of behaviors in the sens of
-       [get_clauses] and [collect_behaviors], thus here all clauses are
+       {!get_clauses} and {!collect_behaviors}, thus here all clauses are
        [FreeAlloc ...]. *)
     let collect (facc, aacc) = function
       | FreeAlloc(f, a) ->
