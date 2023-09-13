@@ -24,6 +24,19 @@
 
 open Cil_types
 
+(** The kind of AST declarations that can be printed. *)
+type scope =
+  | SEnum of enuminfo
+  | SComp of compinfo
+  | SType of typeinfo
+  | SGlobal of varinfo
+  | SFunction of kernel_function
+
+(** Prints a concise label of the scope *)
+val pp_scope : Format.formatter -> scope -> unit
+
+module Scope: Datatype.S_with_collections with type t = scope
+
 (** The kind of object that can be selected in the source viewer. *)
 type localizable =
   | PStmt of (kernel_function * stmt)
@@ -61,6 +74,9 @@ val pp_debug: Format.formatter -> localizable -> unit
 
 module Localizable: Datatype.S_with_collections with type t = localizable
 
+val scope_of_type : typ -> scope option
+val scope_of_global : global -> scope option
+val scope_of_localizable : localizable -> scope option
 val localizable_of_global : global -> localizable
 val localizable_of_kf : kernel_function -> localizable
 

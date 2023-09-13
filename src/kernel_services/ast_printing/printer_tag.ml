@@ -20,12 +20,78 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+open Cil_datatype
+
+(* -------------------------------------------------------------------------- *)
+(* --- Scope API                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+type scope =
+  | SEnum of enuminfo
+  | SComp of compinfo
+  | SType of typeinfo
+  | SGlobal of varinfo
+  | SFunction of kernel_function
+
+let pp_scope fmt = function
+  | SEnum e -> Format.fprintf fmt "enum %s" e.ename
+  | SComp { cstruct = true ; cname } -> Format.fprintf fmt "struct %s" cname
+  | SComp { cstruct = false ; cname } -> Format.fprintf fmt "union %s" cname
+  | SType t -> Format.fprintf fmt "type %s" t.tname
+  | SGlobal v -> Format.fprintf fmt "global %s" v.vname
+  | SFunction kf ->
+    Format.fprintf fmt "function %s" @@ Kernel_function.get_name kf
+
+module Scope =
+  Datatype.Make_with_collections
+    (struct
+      include Datatype.Undefined
+      type t = scope
+
+      let name = "Printer_tag.Scope"
+      let reprs = List.map (fun g -> SGlobal g) Varinfo.reprs
+      let mem_project = Datatype.never_any_project
+
+      let hash = function
+        | SEnum e -> Hashtbl.hash( 0, Enuminfo.hash e )
+        | SComp c -> Hashtbl.hash( 1, Compinfo.hash c )
+        | SType t -> Hashtbl.hash( 2, Typeinfo.hash t )
+        | SGlobal g -> Hashtbl.hash( 3, Varinfo.hash g )
+        | SFunction kf -> Hashtbl.hash( 4, Kernel_function.hash kf )
+
+      let equal a b =
+        match a,b with
+        | SEnum u, SEnum v -> Enuminfo.equal u v
+        | SComp u, SComp v -> Compinfo.equal u v
+        | SType u, SType v -> Typeinfo.equal u v
+        | SGlobal u, SGlobal v -> Varinfo.equal u v
+        | SFunction f, SFunction g -> Kernel_function.equal f g
+        | (SEnum _, _) | (SComp _, _) | (SType _, _) | (SGlobal _, _)
+        | (SFunction _, _) -> false
+
+      let compare a b =
+        match a,b with
+        | SEnum u, SEnum v -> Enuminfo.compare u v
+        | SEnum _, _ -> (-1)
+        | _, SEnum _ -> (+1)
+        | SComp u, SComp v -> Compinfo.compare u v
+        | SComp _, _ -> (-1)
+        | _, SComp _ -> (+1)
+        | SType u, SType v -> Typeinfo.compare u v
+        | SType _, _ -> (-1)
+        | _, SType _ -> (+1)
+        | SGlobal u, SGlobal v -> Varinfo.compare u v
+        | SGlobal _, _ -> (-1)
+        | _, SGlobal _ -> (+1)
+        | SFunction f, SFunction g -> Kernel_function.compare f g
+
+      let pretty = pp_scope
+    end)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Localizable API                                                    --- *)
 (* -------------------------------------------------------------------------- *)
-
-open Cil_types
-open Cil_datatype
 
 type localizable =
   | PStmt of (kernel_function * stmt)
@@ -201,7 +267,7 @@ module Localizable =
         | _, PType _ -> 1
         | PGlobal g1 , PGlobal g2 -> Global.compare g1 g2
 
-      let pretty = pretty (* defined above *)
+      let pretty = pp_localizable
 
     end)
 
@@ -209,8 +275,38 @@ module Localizable =
 (* --- Utility Accessors                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-let kf_of_localizable loc =
-  match loc with
+let scope_of_kfopt = function None -> None | Some kf -> Some (SFunction kf)
+
+let scope_of_global = function
+  | GType(ti, _) -> Some (SType ti)
+  | GCompTag(ci, _) | GCompTagDecl (ci, _) -> Some (SComp ci)
+  | GEnumTag(ei, _) | GEnumTagDecl (ei, _) -> Some (SEnum ei)
+  | GVar(vi, _, _) | GVarDecl(vi, _) -> Some (SGlobal vi)
+  | GFun({svar = vi}, _) | GFunDecl(_,vi,_) ->
+    Some(SFunction (Globals.Functions.get vi))
+  | GAsm _ | GPragma _ | GText _ | GAnnot _ -> None
+
+let scope_of_type = function
+  | TVoid _ | TInt _ | TFloat _ | TPtr _
+  | TArray _ | TFun _ | TBuiltin_va_list _ -> None
+  | TNamed(ti, _) -> Some (SType ti)
+  | TComp (ci, _) -> Some (SComp ci)
+  | TEnum (ei, _) -> Some (SEnum ei)
+
+let scope_of_localizable = function
+  | PStmt(kf,_) | PStmtStart(kf,_) -> Some (SFunction kf)
+  | PLval(_,_,(Var vi,NoOffset))
+  | PTermLval (_, _, _, (TVar { lv_origin = Some vi }, TNoOffset))
+    when vi.vglob -> Some (SGlobal vi)
+  | PLval(okf,_,_)
+  | PExp(okf,_,_)
+  | PTermLval(okf,_,_,_)
+  | PVDecl(okf,_,_) -> scope_of_kfopt okf
+  | PGlobal g -> scope_of_global g
+  | PType ty -> scope_of_type ty
+  | PIP _ -> None
+
+let kf_of_localizable = function
   | PLval (kf_opt, _, _)
   | PExp (kf_opt,_,_)
   | PTermLval(kf_opt, _,_,_)
@@ -222,7 +318,7 @@ let kf_of_localizable loc =
   | PGlobal _ -> None
   | PType _ -> None
 
-let ki_of_localizable loc = match loc with
+let ki_of_localizable = function
   | PLval (_, ki, _)
   | PExp (_, ki, _)
   | PTermLval(_, ki,_,_)
