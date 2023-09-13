@@ -883,7 +883,7 @@ class visit_adding_pre_post_from_buch treatloops =
     method! vfunc f =
       let my_kf = Option.get self#current_kf in
       let vi = Kernel_function.get_vi my_kf in
-      Populate_spec.(populate_funspec my_kf [`Assigns]);
+      Populate_spec.populate_funspec my_kf [`Assigns];
       let spec = Annotations.funspec my_kf in
       let loc = Kernel_function.get_location my_kf in
       (match Aux_funcs.kind vi with

@@ -114,7 +114,7 @@ let section_stubs env =
                let intro = Markdown.text @@ Markdown.format
                    "`%s` has the following specification" s in
                let funspec =
-                 Populate_spec.(populate_funspec kf [`Assigns]);
+                 Populate_spec.populate_funspec kf [`Assigns];
                  Markdown.codeblock ~lang:"acsl" "%a"
                    Printer.pp_funspec (Annotations.funspec kf) in
                Block ( intro @ funspec ) :: insert_remark env anchor

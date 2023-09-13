@@ -159,7 +159,7 @@ let get_requires ~goal kf bhv =
 let get_preconditions ~goal kf =
   let module L = NormAtLabels in
   let mk_pre = L.preproc_annot L.labels_fct_pre in
-  Populate_spec.(populate_funspec kf [`Assigns]);
+  Populate_spec.populate_funspec kf [`Assigns];
   List.map
     (fun bhv ->
        let p = Ast_info.behavior_precondition ~goal bhv in
@@ -168,7 +168,7 @@ let get_preconditions ~goal kf =
     ) (Annotations.behaviors kf)
 
 let get_complete_behaviors kf =
-  Populate_spec.(populate_funspec kf [`Assigns]);
+  Populate_spec.populate_funspec kf [`Assigns];
   let spec = Annotations.funspec kf in
   let module L = NormAtLabels in
   List.map
@@ -178,7 +178,7 @@ let get_complete_behaviors kf =
     ) spec.spec_complete_behaviors
 
 let get_disjoint_behaviors kf =
-  Populate_spec.(populate_funspec kf [`Assigns]);
+  Populate_spec.populate_funspec kf [`Assigns];
   let spec = Annotations.funspec kf in
   let module L = NormAtLabels in
   List.map
@@ -223,7 +223,7 @@ let get_terminates_clause kf =
   in
   let kf_vi = Kernel_function.get_vi kf in
   let kf_name = Kernel_function.get_name kf in
-  Populate_spec.(populate_funspec kf [`Assigns]);
+  Populate_spec.populate_funspec kf [`Assigns];
   match Annotations.terminates kf with
   | None
     when Cil_builtins.is_builtin kf_vi
@@ -340,7 +340,7 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
         let wpost : WpPropId.pred_info list ref = ref [] in
         let wexit : WpPropId.pred_info list ref = ref [] in
         let add w f x = match f x with Some y -> w := y :: !w | None -> () in
-        Populate_spec.(populate_funspec kf [`Assigns]);
+        Populate_spec.populate_funspec kf [`Assigns];
         let behaviors = Annotations.behaviors kf in
         setup_preconditions kf ;
         List.iter

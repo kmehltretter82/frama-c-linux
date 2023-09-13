@@ -67,8 +67,8 @@ type status = Property_status.emitted_status
 (** [register ?gen_exits ?gen_requires ?status_allocates ... name] registers a
     new mode called [name] which can then be used for specification generation
     (see {!Kernel.GeneratedSpecMode} and {!Kernel.GeneratedSpecCustom}). All
-    parameters except [name] are optionals, meaning default action will be
-    performed if left unspecified (can trigger a warnings).
+    parameters except [name] are optionals, meaning default action (mode
+    Frama-C) will be performed if left unspecified (triggers a warnings).
 *)
 val register :
   ?gen_exits:t_exits gen -> ?status_exits:status ->

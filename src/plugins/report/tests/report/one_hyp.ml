@@ -44,7 +44,7 @@ let main () =
   in
   let ensures =
     let kf = Globals.Functions.find_by_name "f" in
-    Populate_spec.(populate_funspec kf [`Assigns]);
+    Populate_spec.populate_funspec kf [`Assigns];
     let spec = Annotations.funspec kf in
     Property.ip_post_cond_of_spec kf Kglobal ~active:[] spec
   in

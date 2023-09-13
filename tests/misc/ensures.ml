@@ -6,7 +6,7 @@ let run () =
   Globals.Functions.iter
     (fun kf ->
        let kf_name = Kernel_function.get_name kf in
-       Populate_spec.(populate_funspec kf [`Assigns]);
+       Populate_spec.populate_funspec kf [`Assigns];
        let spec = Annotations.funspec kf in
        let ip = Property.ip_of_spec kf Kglobal ~active:[] spec in
        List.iter

@@ -84,7 +84,7 @@ let generate_specs () =
         Kernel_function.pretty kf Parameters.UsePrototype.option_name;
       (* The function populate_funspec may emit a warning. Position a loc. *)
       Cil.CurrentLoc.set (Kernel_function.get_location kf);
-      Populate_spec.(populate_funspec ~do_body:true kf [`Assigns]);
+      Populate_spec.populate_funspec ~do_body:true kf [`Assigns];
     end
   in
   Parameters.UsePrototype.iter aux
@@ -206,7 +206,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       apply_call_hooks call init_state `Reuse;
       (* Evaluate the preconditions of kf, to update the statuses
          at this call. *)
-      Populate_spec.(populate_funspec call.kf [`Assigns]);
+      Populate_spec.populate_funspec call.kf [`Assigns];
       let spec = Annotations.funspec call.kf in
       if not (Eva_utils.skip_specifications call.kf) &&
          Eval_annots.has_requires spec

@@ -102,7 +102,7 @@ let check_properties behaviors props kf =
   in
   let check_complete_disjoint kf kinstr =
     try
-      Populate_spec.(populate_funspec kf [`Assigns]);
+      Populate_spec.populate_funspec kf [`Assigns];
       let spec = Annotations.funspec kf in
       let comp = ip_complete_of_spec kf kinstr ~active:[] spec in
       let disj = ip_disjoint_of_spec kf kinstr ~active:[] spec in
@@ -126,7 +126,7 @@ let check_properties behaviors props kf =
     in
     let check_call stmt =
       let check_callee kf =
-        Populate_spec.(populate_funspec kf [`Assigns]);
+        Populate_spec.populate_funspec kf [`Assigns];
         let kf_behaviors = Annotations.behaviors kf in
         List.iter (check_bhv_requires kf Kglobal) kf_behaviors
       in

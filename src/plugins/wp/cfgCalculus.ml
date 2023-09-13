@@ -51,7 +51,7 @@ type props = [ `All | `Names of string list | `PropId of Property.t ]
 let default_requires mode kf =
   if Cil.is_default_behavior mode.bhv then [] else
     try
-      Populate_spec.(populate_funspec kf [`Assigns]);
+      Populate_spec.populate_funspec kf [`Assigns];
       let bhv = List.find Cil.is_default_behavior (Annotations.behaviors kf) in
       CfgAnnot.get_requires ~goal:false kf bhv
     with Not_found -> []
