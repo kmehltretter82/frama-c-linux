@@ -39,7 +39,8 @@
 [eva:alarm] bts383.c:35: Warning: out of bounds read. assert \valid_read(value);
 [eva:alarm] bts383.c:36: Warning: out of bounds read. assert \valid_read(value);
 [kernel:annot:missing-spec] bts383.c:36: Warning: 
-  Neither code nor specification for function out_char, generating default assigns from the prototype
+  Neither code nor specification for function out_char,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function out_char <- out_string <- main.
   Called from bts383.c:36.
 [eva] using specification for function out_char

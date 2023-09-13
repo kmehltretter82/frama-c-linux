@@ -8,7 +8,8 @@
   out of bounds read. assert \valid_read(array + index);
 [eva] cwe125.c:27: assertion 'Eva,mem_access' got final status invalid.
 [kernel:annot:missing-spec] cwe125.c:27: Warning: 
-  Neither code nor specification for function printf, generating default assigns from the prototype
+  Neither code nor specification for function printf,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function getValueFromArray:
   value ∈ {0}

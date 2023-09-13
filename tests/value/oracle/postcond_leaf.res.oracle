@@ -4,7 +4,8 @@
   i ∈ [--..--]
   j ∈ [--..--]
 [kernel:annot:missing-spec] postcond_leaf.c:109: Warning: 
-  Neither code nor implicit assigns clause for function f1, generating default assigns from the prototype
+  Neither code nor explicit assigns for function f1,
+   generating default clauses. See -generated-spec-* options for more info
 [eva] using specification for function f1
 [eva:ensures-false] postcond_leaf.c:21: Warning: 
   function f1: this postcondition evaluates to false in this context.
@@ -57,7 +58,7 @@
 [ Extern  ] Post-condition (file postcond_leaf.c, line 21)
             Unverifiable but considered Valid.
 [    -    ] Assigns nothing
-            tried with Inferred annotations.
+            tried with Populated status.
 [    -    ] Default behavior
             tried with Frama-C kernel.
 

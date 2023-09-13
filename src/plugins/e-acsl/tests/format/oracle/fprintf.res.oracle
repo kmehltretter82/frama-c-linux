@@ -48,5 +48,3 @@
 [eva:alarm] FRAMAC_SHARE/libc/unistd.h:854: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[kernel:annot:missing-spec] fprintf.c:22: Warning: 
-  Neither code nor specification for function __e_acsl_builtin_fprintf, generating default assigns from the prototype

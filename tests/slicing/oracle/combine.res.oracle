@@ -122,7 +122,8 @@ int main(int x)
 [eva] computing for function f <- main.
   Called from combine.i:24.
 [kernel:annot:missing-spec] combine.i:17: Warning: 
-  Neither code nor specification for function g, generating default assigns from the prototype
+  Neither code nor specification for function g,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function g <- f <- main.
   Called from combine.i:17.
 [eva] using specification for function g

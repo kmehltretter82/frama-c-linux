@@ -11,7 +11,8 @@
 [eva] computing for function lecture <- main.
   Called from bts1768.i:45.
 [kernel:annot:missing-spec] bts1768.i:18: Warning: 
-  Neither code nor implicit assigns clause for function choisir, generating default assigns from the prototype
+  Neither code nor explicit assigns for function choisir,
+   generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function choisir <- lecture <- main.
   Called from bts1768.i:18.
 [eva] using specification for function choisir

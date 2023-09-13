@@ -56,7 +56,8 @@
 [eva] Recording results for fn1
 [eva] Done for function fn1
 [kernel:annot:missing-spec] volatile.c:40: Warning: 
-  Neither code nor specification for function fn2, generating default assigns from the prototype
+  Neither code nor specification for function fn2,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function fn2 <- main1 <- main.
   Called from volatile.c:40.
 [eva] using specification for function fn2

@@ -1,6 +1,7 @@
 [kernel] Parsing assert_builtin.i (no preprocessing)
 [kernel:annot:missing-spec] assert_builtin.i:5: Warning: 
-  Neither code nor specification for function Frama_C_assert, generating default assigns from the prototype
+  Neither code nor specification for function Frama_C_assert,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

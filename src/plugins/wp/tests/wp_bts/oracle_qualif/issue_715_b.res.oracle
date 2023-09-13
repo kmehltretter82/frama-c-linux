@@ -2,7 +2,8 @@
 [kernel] Parsing issue_715_b.i (no preprocessing)
 [wp] Running WP plugin...
 [kernel:annot:missing-spec] issue_715_b.i:9: Warning: 
-  Neither code nor implicit assigns clause for function dummy, generating default assigns from the prototype
+  Neither code nor explicit assigns for function dummy,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
 [wp] [Valid] typed_foo_call_dummy_requires (Alt-Ergo) (Cached)

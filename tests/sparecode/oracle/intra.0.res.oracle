@@ -50,7 +50,8 @@
 [eva] Recording results for assign
 [eva] Done for function assign
 [kernel:annot:missing-spec] intra.i:91: Warning: 
-  Neither code nor specification for function stop, generating default assigns from the prototype
+  Neither code nor specification for function stop,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function stop <- main.
   Called from intra.i:91.
 [eva] using specification for function stop

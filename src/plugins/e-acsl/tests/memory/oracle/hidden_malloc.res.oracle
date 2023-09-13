@@ -1,4 +1,5 @@
 [e-acsl] beginning translation.
 [e-acsl] translation done in project "e-acsl".
 [kernel:annot:missing-spec] hidden_malloc.c:11: Warning: 
-  Neither code nor specification for function realpath, generating default assigns from the prototype
+  Neither code nor specification for function realpath,
+   generating default assigns. See -generated-spec-* options for more info

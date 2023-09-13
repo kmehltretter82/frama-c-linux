@@ -12,7 +12,8 @@
 [eva] computing for function unspec <- main.
   Called from filter.i:43.
 [kernel:annot:missing-spec] filter.i:36: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- unspec <- main.
   Called from filter.i:36.
 [eva] using specification for function f

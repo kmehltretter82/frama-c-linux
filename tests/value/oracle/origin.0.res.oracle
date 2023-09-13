@@ -111,7 +111,8 @@
 [eva] computing for function origin_leaf_1 <- main.
   Called from origin.i:97.
 [kernel:annot:missing-spec] origin.i:38: Warning: 
-  Neither code nor specification for function g, generating default assigns from the prototype
+  Neither code nor specification for function g,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function g <- origin_leaf_1 <- main.
   Called from origin.i:38.
 [eva] using specification for function g

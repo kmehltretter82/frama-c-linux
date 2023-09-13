@@ -37,7 +37,8 @@
 [eva] computing for function send1 <- main.
   Called from unravel-point.i:75.
 [kernel:annot:missing-spec] unravel-point.i:36: Warning: 
-  Neither code nor specification for function printf, generating default assigns from the prototype
+  Neither code nor specification for function printf,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function printf <- send1 <- main.
   Called from unravel-point.i:36.
 [eva] using specification for function printf
@@ -140,7 +141,8 @@
 [eva:initial-state] Values of globals at initialization
   
 [kernel:annot:missing-spec] unravel-point.i:59: Warning: 
-  Neither code nor specification for function scanf, generating default assigns from the prototype
+  Neither code nor specification for function scanf,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function scanf <- main.
   Called from unravel-point.i:59.
 [eva] using specification for function scanf

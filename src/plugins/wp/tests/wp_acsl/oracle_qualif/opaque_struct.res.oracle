@@ -8,7 +8,8 @@
 [rte:annot] annotating function initialized_assigns
 [rte:annot] annotating function uninitialized_assigns
 [kernel:annot:missing-spec] opaque_struct.i:79: Warning: 
-  Neither code nor specification for function use, generating default assigns from the prototype
+  Neither code nor specification for function use,
+   generating default assigns. See -generated-spec-* options for more info
 [wp] 15 goals scheduled
 [wp] [Unsuccess] typed_check_lemma_fail (Alt-Ergo) (Cached)
 [wp] [Valid] typed_check_lemma_succeed_L1 (Qed)

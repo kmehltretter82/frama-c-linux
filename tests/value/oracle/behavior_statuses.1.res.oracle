@@ -13,6 +13,9 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
+[kernel:prop-status:emit] 
+  Frama-C kernel emits status unknown for property default behavior
+  under 2 hypothesis
 [eva] computing for function f <- main.
   Called from behavior_statuses.i:26.
 [eva] using specification for function f

@@ -28,7 +28,8 @@
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
 [kernel:annot:missing-spec] t_fun_lib.c:19: Warning: 
-  Neither code nor specification for function realpath, generating default assigns from the prototype
+  Neither code nor specification for function realpath,
+   generating default assigns. See -generated-spec-* options for more info
 [eva:alarm] t_fun_lib.c:22: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.

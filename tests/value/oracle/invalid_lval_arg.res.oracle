@@ -20,7 +20,8 @@
 [eva] invalid_lval_arg.i:19: 
   assertion 'Eva,mem_access' got final status invalid.
 [kernel:annot:missing-spec] invalid_lval_arg.i:15: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

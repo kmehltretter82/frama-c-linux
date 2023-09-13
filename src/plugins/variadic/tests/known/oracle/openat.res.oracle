@@ -21,7 +21,8 @@
 [eva] Analyzing a complete application starting at main
 [eva] using specification for function __va_openat_mode_t
 [kernel:annot:missing-spec] openat.c:10: Warning: 
-  Neither code nor specification for function openat_fallback_1, generating default assigns from the prototype
+  Neither code nor specification for function openat_fallback_1,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function openat_fallback_1
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

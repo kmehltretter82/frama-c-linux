@@ -18,7 +18,8 @@
 [eva] postcondition.i:84: function get_index: precondition got status valid.
 [eva] postcondition.i:17: Frama_C_show_each_cmd: {1}
 [kernel:annot:missing-spec] postcondition.i:20: Warning: 
-  Neither code nor implicit assigns clause for function u, generating default assigns from the prototype
+  Neither code nor explicit assigns for function u,
+   generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function u <- get_index <- main.
   Called from postcondition.i:20.
 [eva] using specification for function u
@@ -75,7 +76,8 @@
   Called from postcondition.i:88.
 [eva] Done for function u
 [kernel:annot:missing-spec] postcondition.i:89: Warning: 
-  Neither code nor implicit assigns clause for function cap, generating default assigns from the prototype
+  Neither code nor explicit assigns for function cap,
+   generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function cap <- main.
   Called from postcondition.i:89.
 [eva] using specification for function cap

@@ -116,7 +116,8 @@
 [eva] using specification for function printf_va_25
 [eva] using specification for function printf_va_26
 [kernel:annot:missing-spec] printf.c:71: Warning: 
-  Neither code nor specification for function printf_fallback_1, generating default assigns from the prototype
+  Neither code nor specification for function printf_fallback_1,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function printf_fallback_1
 [eva:invalid-assigns] printf.c:71: 
   Completely invalid destination for assigns clause *(param1 + (0 ..)).

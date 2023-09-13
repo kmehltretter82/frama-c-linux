@@ -7,7 +7,8 @@
   c ∈ [--..--]
   d ∈ [--..--]
 [kernel:annot:missing-spec] select_calls.i:22: Warning: 
-  Neither code nor specification for function send, generating default assigns from the prototype
+  Neither code nor specification for function send,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function send <- f.
   Called from select_calls.i:22.
 [eva] using specification for function send
@@ -16,7 +17,8 @@
   Called from select_calls.i:23.
 [eva] Done for function send
 [kernel:annot:missing-spec] select_calls.i:24: Warning: 
-  Neither code nor specification for function crypt, generating default assigns from the prototype
+  Neither code nor specification for function crypt,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function crypt <- f.
   Called from select_calls.i:24.
 [eva] using specification for function crypt
@@ -28,7 +30,8 @@
   Called from select_calls.i:28.
 [eva] Done for function send
 [kernel:annot:missing-spec] select_calls.i:30: Warning: 
-  Neither code nor specification for function uncrypt, generating default assigns from the prototype
+  Neither code nor specification for function uncrypt,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function uncrypt <- f.
   Called from select_calls.i:30.
 [eva] using specification for function uncrypt

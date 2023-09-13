@@ -8,8 +8,6 @@
   creating variable S_0_S___va_params with imprecise size (type void)
 [eva:initial-state] 
   creating variable S_1_S___va_params with imprecise size (type void)
-[kernel:annot:missing-spec] va_list.c:14: Warning: 
-  Neither code nor specification for function __builtin_next_arg, generating default assigns from the prototype
 [eva] computing for function __builtin_next_arg <- main.
   Called from va_list.c:14.
 [eva] using specification for function __builtin_next_arg

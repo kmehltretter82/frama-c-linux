@@ -32,7 +32,8 @@
   l ∈ [--..--]
   ==END OF DUMP==
 [kernel:annot:missing-spec] alarms.i:21: Warning: 
-  Neither code nor specification for function fd, generating default assigns from the prototype
+  Neither code nor specification for function fd,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function fd <- main1 <- main.
   Called from alarms.i:21.
 [eva] using specification for function fd

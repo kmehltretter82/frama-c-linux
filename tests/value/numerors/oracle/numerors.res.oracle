@@ -73,7 +73,8 @@
                       Abs Err : [-0.3330669073875469621270895004272460937500E-14 ; 0.3330669073875469621270895004272460937500E-14]
                       Rel Err : {NaN}[-@Inf@ ; @Inf@]
 [kernel:annot:missing-spec] numerors.c:246: Warning: 
-  Neither code nor specification for function DPRINTFrama_C_domain_show_each_ex10, generating default assigns from the prototype
+  Neither code nor specification for function DPRINTFrama_C_domain_show_each_ex10,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function DPRINTFrama_C_domain_show_each_ex10
 [eva] numerors.c:253: 
   Frama_C_domain_show_each_ex11:

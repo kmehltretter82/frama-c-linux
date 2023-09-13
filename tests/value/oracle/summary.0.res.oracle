@@ -6,7 +6,8 @@
   undet ∈ [--..--]
   volatile_d ∈ [--..--]
 [kernel:annot:missing-spec] summary.i:19: Warning: 
-  Neither code nor specification for function minimalist, generating default assigns from the prototype
+  Neither code nor specification for function minimalist,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function minimalist
 [eva] Done for function minimalist
 [eva] ====== VALUES COMPUTED ======

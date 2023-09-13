@@ -7,7 +7,8 @@
 [eva] computing for function f1 <- main.
   Called from variadic.c:37.
 [kernel:annot:missing-spec] variadic.c:23: Warning: 
-  Neither code nor specification for function lib_f, generating default assigns from the prototype
+  Neither code nor specification for function lib_f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function lib_f <- f1 <- main.
   Called from variadic.c:23.
 [eva] using specification for function lib_f
