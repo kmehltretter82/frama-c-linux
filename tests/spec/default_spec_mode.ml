@@ -14,6 +14,6 @@ let run () =
       [`Exits; `Assigns; `Requires; `Allocates; `Terminates]
   in
   Globals.Functions.iter get_spec
-  [@@ warning "-3"]
+[@@ warning "-3"]
 
 let () = Db.Main.extend run

@@ -305,7 +305,7 @@ struct
     then [ Exits, Logic_const.(new_predicate pfalse) ]
     else []
 
-  let frama_c_default _ =
+  let frama_c_default _kf =
     acsl_default ()
 
   let combine_default (clauses : clause list) =
@@ -402,8 +402,8 @@ struct
   let compare_deps d1 d2 =
     match d1, d2 with
     | FromAny, FromAny -> 0
-    | FromAny, _ -> 1
-    | _, FromAny -> -1
+    | FromAny, From _ -> 1
+    | From _, FromAny -> -1
     | From l1, From l2 ->
       Extlib.list_compare compare_it l1 l2
 
@@ -417,7 +417,7 @@ struct
        [Writes ...]. *)
     let collect acc = function
       | Writes l -> List.rev_append (List.rev l) acc
-      | _ -> assert false
+      | WritesAny -> assert false
     in
     let deps = function
       | FromAny -> FromAny
@@ -517,7 +517,7 @@ struct
     then []
     else [ Logic_const.(new_predicate pfalse) ]
 
-  let frama_c_default _ =
+  let frama_c_default _kf =
     acsl_default ()
 
   let combine_default (clauses : clause list) =
@@ -542,7 +542,7 @@ struct
       frama_c_default kf
     | Some f -> f kf spec
 
-  let emit _ _ _ _ = ()
+  let emit _mode _kf _bhv _requires = ()
 
 end
 
@@ -591,7 +591,7 @@ struct
     then FreeAlloc([],[])
     else FreeAllocAny
 
-  let frama_c_default _ =
+  let frama_c_default _kf =
     acsl_default ()
 
   let combine_default clauses =
@@ -601,7 +601,7 @@ struct
     let collect (facc, aacc) = function
       | FreeAlloc(f, a) ->
         List.rev_append (List.rev f) facc, List.rev_append (List.rev a) aacc
-      | _ -> assert false
+      | FreeAllocAny -> assert false
     in
     let f, a = List.fold_left collect ([],[]) clauses in
     let f = List.sort_uniq compare_it f in
@@ -676,7 +676,7 @@ struct
   let collect_behaviors spec =
     None <> spec.spec_terminates
 
-  let get_clauses _ _ = None
+  let get_clauses _spec _table = None
 
   let acsl_default () =
     Some(Logic_const.(new_predicate ptrue))
@@ -686,10 +686,10 @@ struct
     then Some(Logic_const.(new_predicate ptrue))
     else Some(Logic_const.(new_predicate pfalse))
 
-  let frama_c_default _ =
+  let frama_c_default _kf =
     acsl_default ()
 
-  let combine_default _ =
+  let combine_default _clauses =
     assert false
 
   let custom_default mode kf spec =
@@ -702,7 +702,7 @@ struct
       frama_c_default kf
     | Some f -> f kf spec
 
-  let emit_status kf _ terminates status =
+  let emit_status kf _bhv terminates status =
     match terminates with
     | None -> assert false
     | Some terminates ->
@@ -944,7 +944,7 @@ let populate_funspec ?(do_body=false) kf clauses =
 let () =
   (* This function is deprecated. Until removed, populate assigns and
      returns true if spec generation was performed. *)
-  let f kf _ =
+  let f kf _funspec =
     let before = Is_populated.mem (kf, `Assigns) in
     populate_funspec kf [`Assigns];
     not before && Is_populated.mem (kf, `Assigns)

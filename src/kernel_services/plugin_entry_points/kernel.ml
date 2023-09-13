@@ -1466,7 +1466,7 @@ module GeneratedSpecMode =
       let arg_name = "mode"
       let help =
         "Select which mode will be used to generate missing specifications \
-        (defaults to frama-c), see user manual for more informations."
+         (defaults to frama-c), see user manual for more informations."
     end)
 
 let () = Parameter_customize.set_group normalisation
