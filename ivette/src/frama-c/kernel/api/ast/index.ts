@@ -100,6 +100,18 @@ export const byFct: Compare.Order<fct> = Compare.string;
 /** Default value for `fct` */
 export const fctDefault: fct = Json.jKey<'#fct'>('#fct')('');
 
+/** AST Declarations markers */
+export type scope = Json.key<'#scope'>;
+
+/** Decoder for `scope` */
+export const jScope: Json.Decoder<scope> = Json.jKey<'#scope'>('#scope');
+
+/** Natural order for `scope` */
+export const byScope: Compare.Order<scope> = Compare.string;
+
+/** Default value for `scope` */
+export const scopeDefault: scope = Json.jKey<'#scope'>('#scope')('');
+
 /** Localizable AST markers */
 export type marker = Json.key<'#marker'>;
 
@@ -139,9 +151,9 @@ export interface markerAttributesData {
   labelKind: string;
   /** Marker kind (long) */
   titleKind: string;
-  /** Marker short name  or identifier when relevant. */
+  /** Marker short name or identifier when relevant. */
   name: string;
-  /** Marker declaration or description */
+  /** Marker description */
   descr: string;
   /** Whether it is an l-value */
   isLval: boolean;

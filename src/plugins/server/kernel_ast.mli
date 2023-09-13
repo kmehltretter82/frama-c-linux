@@ -42,19 +42,22 @@ module Fundec : Data.S with type t = fundec
 (** Ast Markers *)
 (* -------------------------------------------------------------------------- *)
 
-(** Exported as Json string with their unique tag. *)
-module Marker :
+module type Tag =
 sig
-  include Data.S with type t = Printer_tag.localizable
+  (** Exported as Json string with their unique tag. *)
+  include Data.S
 
-  val tag : t -> string
+  val index : t -> string
   (** Memoized unique identifier. *)
 
   val find : string -> t
-  (** Get back the localizable, if any.
-      @raises Not_found if marker is not defined yet *)
+  (** Get back the scope, if any.
+      @raises Not_found if the marker is not defined yet *)
 
 end
+
+module Scope : (Tag with type t = Printer_tag.scope)
+module Marker : (Tag with type t = Printer_tag.localizable)
 
 (* -------------------------------------------------------------------------- *)
 (** Ast Markers of Specific Kinds *)

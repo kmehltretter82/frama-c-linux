@@ -538,7 +538,7 @@ module PropertiesData = struct
       ~package
       ~name:"properties"
       ~descr:(Markdown.plain "Status of Registered Properties")
-      ~key:(fun ip -> Kernel_ast.Marker.tag (PIP ip))
+      ~key:(fun ip -> Kernel_ast.Marker.index (PIP ip))
       ~keyType:Kernel_ast.Marker.jtype
       ~iter:Property_status.iter
       ~add_update_hook

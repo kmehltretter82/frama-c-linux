@@ -343,7 +343,7 @@ let array =
     ~package
     ~name:"status"
     ~descr:(Md.plain "Status of Registered Properties")
-    ~key:(fun ip -> Kernel_ast.Marker.tag (PIP ip))
+    ~key:(fun ip -> Kernel_ast.Marker.index (PIP ip))
     ~keyType:Kernel_ast.Marker.jtype
     ~iter
     ~add_reload_hook

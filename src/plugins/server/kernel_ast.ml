@@ -131,25 +131,46 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
-(* ---  Printers                                                          --- *)
+(* ---  Generic Markers                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Marker =
+module type TagInfo =
+sig
+  type t
+  val name : string
+  val descr : string
+  val create : t -> string
+  module H : Hashtbl.S with type key = t
+end
+
+module type Tag =
+sig
+  include Data.S
+  val index : t -> string
+  val find : string -> t
+end
+
+module MakeTag(T : TagInfo) :
+sig
+  include Tag with type t = T.t
+  val iter : (t * string -> unit) -> unit
+  val hook : (t * string -> unit) -> unit
+end =
 struct
 
-  open Printer_tag
+  type t = T.t
 
   type index = {
-    tags : string Localizable.Hashtbl.t ;
-    locs : (string,localizable) Hashtbl.t ;
+    tags : string T.H.t ;
+    items : (string,T.t) Hashtbl.t ;
   }
-
-  let kid = ref 0
 
   let index () = {
-    tags = Localizable.Hashtbl.create 0 ;
-    locs = Hashtbl.create 0 ;
+    tags = T.H.create 0 ;
+    items = Hashtbl.create 0 ;
   }
+
+  let module_name = String.capitalize_ascii T.name
 
   module TYPE : Datatype.S with type t = index =
     Datatype.Make
@@ -157,60 +178,84 @@ struct
         type t = index
         include Datatype.Undefined
         let reprs = [index()]
-        let name = "Server.Jprinter.Index"
+        let name = Printf.sprintf "Server.Kernel_ast.%s.TYPE" module_name
         let mem_project = Datatype.never_any_project
       end)
 
   module STATE = State_builder.Ref(TYPE)
       (struct
-        let name = "Server.Jprinter.State"
+        let name = Printf.sprintf "Server.Kernel_ast.%s.STATE" module_name
         let dependencies = []
         let default = index
       end)
 
   let iter f =
-    Localizable.Hashtbl.iter (fun key str -> f (key, str)) (STATE.get ()).tags
-
-  let create_tag = function
-    | PStmt(_,s) -> Printf.sprintf "#s%d" s.sid
-    | PStmtStart(_,s) -> Printf.sprintf "#k%d" s.sid
-    | PVDecl(_,_,v) -> Printf.sprintf "#v%d" v.vid
-    | PLval _ -> Printf.sprintf "#l%d" (incr kid ; !kid)
-    | PExp(_,_,e) -> Printf.sprintf "#e%d" e.eid
-    | PTermLval _ -> Printf.sprintf "#t%d" (incr kid ; !kid)
-    | PGlobal _ -> Printf.sprintf "#g%d" (incr kid ; !kid)
-    | PIP _ -> Printf.sprintf "#p%d" (incr kid ; !kid)
-    | PType _ -> Printf.sprintf "#y%d" (incr kid ; !kid)
+    T.H.iter (fun key str -> f (key, str)) (STATE.get ()).tags
 
   let hooks = ref []
   let hook f = hooks := !hooks @ [f]
 
-  let tag loc =
-    let { tags ; locs } = STATE.get () in
-    try Localizable.Hashtbl.find tags loc
+  let index item =
+    let { tags ; items } = STATE.get () in
+    try T.H.find tags item
     with Not_found ->
-      let tag = create_tag loc in
-      Localizable.Hashtbl.add tags loc tag ;
-      Hashtbl.add locs tag loc ;
-      List.iter (fun fn -> fn (loc,tag)) !hooks ; tag
+      let tag = T.create item in
+      T.H.add tags item tag ;
+      Hashtbl.add items tag item ;
+      List.iter (fun fn -> fn (item,tag)) !hooks ; tag
 
-  let find tag = Hashtbl.find (STATE.get()).locs tag
+  let find tag = Hashtbl.find (STATE.get()).items tag
 
-  type t = localizable
+  let jtype = Data.declare ~package ~name:T.name
+      ~descr:(Md.plain T.descr)
+      (Pkg.Jkey T.name)
 
-  let jtype = Data.declare ~package ~name:"marker"
-      ~descr:(Md.plain "Localizable AST markers")
-      (Pkg.Jkey "marker")
-
-  let to_json loc = `String (tag loc)
+  let to_json item = `String (index item)
   let of_json js =
     try find (Js.to_string js)
     with Not_found ->
-      Data.failure "invalid marker (%a)" Json.pp_dump js
+      Data.failure "invalid %s (%a)" T.name Json.pp_dump js
 
 end
 
-module Printer = Printer_tag.Make(Marker)
+module Scope = MakeTag
+    (struct
+      open Printer_tag
+      type t = scope
+      let name = "scope"
+      let descr = "AST Declarations markers"
+      module H = Scope.Hashtbl
+      let kid = ref 0
+      let create = function
+        | SEnum _ -> Printf.sprintf "#E%d" (incr kid ; !kid)
+        | SComp _ -> Printf.sprintf "#C%d" (incr kid ; !kid)
+        | SType _ -> Printf.sprintf "#T%d" (incr kid ; !kid)
+        | SGlobal vi -> Printf.sprintf "#G%d" vi.vid
+        | SFunction kf ->
+          Printf.sprintf "#F%d" (Globals.Functions.get_vi kf).vid
+    end)
+
+module Marker = MakeTag
+    (struct
+      open Printer_tag
+      type t = localizable
+      let name = "marker"
+      let descr = "Localizable AST markers"
+      module H = Localizable.Hashtbl
+      let kid = ref 0
+      let create = function
+        | PStmt(_,s) -> Printf.sprintf "#s%d" s.sid
+        | PStmtStart(_,s) -> Printf.sprintf "#k%d" s.sid
+        | PVDecl(_,_,v) -> Printf.sprintf "#v%d" v.vid
+        | PLval _ -> Printf.sprintf "#l%d" (incr kid ; !kid)
+        | PExp(_,_,e) -> Printf.sprintf "#e%d" e.eid
+        | PTermLval _ -> Printf.sprintf "#t%d" (incr kid ; !kid)
+        | PGlobal _ -> Printf.sprintf "#g%d" (incr kid ; !kid)
+        | PIP _ -> Printf.sprintf "#p%d" (incr kid ; !kid)
+        | PType _ -> Printf.sprintf "#y%d" (incr kid ; !kid)
+    end)
+
+module Printer = Printer_tag.Make(struct let tag = Marker.index end)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Ast Data                                                           --- *)
@@ -772,7 +817,7 @@ let () = Information.register
     ~title:"Ivette marker (for debugging)"
     ~enable:(fun _ -> Server_parameters.debug_atleast 1)
     begin fun fmt loc ->
-      let tag = Marker.create_tag loc in
+      let tag = Marker.index loc in
       Format.fprintf fmt "%S" tag
     end
 
