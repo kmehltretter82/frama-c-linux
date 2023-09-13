@@ -830,11 +830,8 @@ let do_warning kf funspec = function
 
 (* Perform generation of all clauses, adds them to the original specification,
    and emit property status for each of them. *)
-let do_populate ?funspec kf clauses =
-  let original_spec = match funspec with
-    | None -> Annotations.funspec kf
-    | Some funspec -> funspec
-  in
+let do_populate kf clauses =
+  let original_spec =  Annotations.funspec kf in
   let config = activated_config kf clauses in
 
   let apply warn_acc get_default mode =
@@ -915,6 +912,7 @@ module Is_populated =
 
 let () = Ast.add_linked_state Is_populated.self
 
+(* Return the list of clauses not already done for function [kf]. *)
 let todo_clauses kf clauses =
   let not_populated c = not (Is_populated.mem (kf, c)) in
   List.filter not_populated clauses
@@ -927,15 +925,21 @@ let todo_clauses kf clauses =
      OR
      [do_body] is true
 *)
-let populate_funspec ?(do_body=false) ?funspec kf clauses =
+let populate_funspec ?(do_body=false) kf clauses =
   let todo = todo_clauses kf clauses in
   if todo <> [] then
     let has_body = Kernel_function.has_definition kf in
     if not has_body || do_body then begin
-      do_populate ?funspec kf todo;
+      do_populate kf todo;
       List.iter (fun c -> Is_populated.add (kf, c) ()) todo
     end
 
 let () =
-  let f kf funspec = populate_funspec ~funspec kf [`Assigns]; true in
+  (* This function is deprecated. Until removed, populate assigns and
+     returns true if spec generation was performed. *)
+  let f kf _ =
+    let before = Is_populated.mem (kf, `Assigns) in
+    populate_funspec kf [`Assigns];
+    not before && Is_populated.mem (kf, `Assigns)
+  in
   Annotations.populate_spec_ref := f [@@ warning "-3"]

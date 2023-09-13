@@ -84,4 +84,4 @@ val register :
     be generated.
 *)
 val populate_funspec :
-  ?do_body:bool -> ?funspec:funspec -> kernel_function -> clause list -> unit
+  ?do_body:bool -> kernel_function -> clause list -> unit

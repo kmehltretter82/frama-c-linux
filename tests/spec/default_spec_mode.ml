@@ -2,7 +2,7 @@ let run () =
   let open Populate_spec in
   let get_spec kf =
     let funspec = Annotations.funspec kf in
-    populate_funspec ~do_body:true ~funspec kf [`Exits];
+    populate_funspec ~do_body:true kf [`Exits];
     populate_funspec ~do_body:true kf [`Assigns];
     populate_funspec ~do_body:true kf [`Requires];
     populate_funspec ~do_body:true kf [`Allocates];
