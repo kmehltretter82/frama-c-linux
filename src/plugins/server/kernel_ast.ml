@@ -231,8 +231,7 @@ module Scope = MakeTag
         | SComp _ -> Printf.sprintf "#C%d" (incr kid ; !kid)
         | SType _ -> Printf.sprintf "#T%d" (incr kid ; !kid)
         | SGlobal vi -> Printf.sprintf "#G%d" vi.vid
-        | SFunction kf ->
-          Printf.sprintf "#F%d" (Globals.Functions.get_vi kf).vid
+        | SFunction kf -> Printf.sprintf "#F%d" @@ Kernel_function.get_id kf
     end)
 
 module Marker = MakeTag
@@ -336,10 +335,91 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Scope Attributes                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+
+module ScopeKind =
+struct
+  type t = Printer_tag.scope
+  let jtype = Data.declare
+      ~package ~name:"scopeKind"
+      ~descr:(Md.plain "Scope marker kind")
+      (Junion [
+          Jkey "ENUM";
+          Jkey "UNION";
+          Jkey "STRUCT";
+          Jkey "TYPEDEF";
+          Jkey "GLOBAL";
+          Jkey "FUNCTION";
+        ])
+  let to_json (scope : t) = match scope with
+    | SEnum _ -> `String "ENUM"
+    | SComp { cstruct = true } -> `String "STRUCT"
+    | SComp { cstruct = false } -> `String "UNION"
+    | SType _ -> `String "TYPEDEF"
+    | SGlobal _ -> `String "GLOBAL"
+    | SFunction _ -> `String "FUNCTION"
+end
+
+module ScopeAttributes =
+struct
+  module P = Printer_tag
+
+  let model = States.model ()
+
+  let () =
+    States.column
+      ~name:"kind"
+      ~descr:(Md.plain "Scope kind")
+      ~data:(module ScopeKind)
+      ~get:fst
+      model
+
+  let () =
+    States.column
+      ~name:"name"
+      ~descr:(Md.plain "Scope identifier")
+      ~data:(module Jstring)
+      ~get:(fun (scope,_) -> P.name_of_scope scope)
+      model
+
+  let () =
+    States.column
+      ~name:"label"
+      ~descr:(Md.plain "Scope label (uncapitalized kind & name)")
+      ~data:(module Jstring)
+      ~get:(fun (scope,_) -> Pretty_utils.to_string P.pp_scope scope)
+      model
+
+  let () =
+    States.column
+      ~name:"source"
+      ~descr:(Md.plain "Source location")
+      ~data:(module Position)
+      ~get:(fun (scope,_) -> fst @@ P.loc_of_scope scope)
+      model
+
+  let array = States.register_array
+      ~package
+      ~name:"scopeAttributes"
+      ~descr:(Md.plain "Scope attributes")
+      ~key:snd
+      ~keyName:"marker"
+      ~keyType:Scope.jtype
+      ~iter:Scope.iter
+      ~add_reload_hook:ast_update_hook
+      model
+
+  let () = Scope.hook (States.update array)
+
+end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Marker Attributes                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Attributes =
+module MarkerAttributes =
 struct
   open Printer_tag
 

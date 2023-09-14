@@ -66,7 +66,14 @@ val label: localizable -> string
 (** Name (or category). *)
 val glabel: global -> string
 
-(** Complete printing of a localizable. *)
+
+(** Prints the global declaration of the scope. *)
+val pp_declaration : Format.formatter -> scope -> unit
+
+(** Prints the global definition of the scope. *)
+val pp_definition : Format.formatter -> scope -> unit
+
+(** Prints the signature of the localizable. *)
 val pp_localizable: Format.formatter -> localizable -> unit
 
 (** Debugging. *)
@@ -77,6 +84,12 @@ module Localizable: Datatype.S_with_collections with type t = localizable
 val scope_of_type : typ -> scope option
 val scope_of_global : global -> scope option
 val scope_of_localizable : localizable -> scope option
+
+val loc_of_scope : scope -> location
+val name_of_scope : scope -> string
+val declaration_of_scope : scope -> global
+val definition_of_scope : scope -> global
+
 val localizable_of_global : global -> localizable
 val localizable_of_kf : kernel_function -> localizable
 

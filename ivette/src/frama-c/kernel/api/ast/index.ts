@@ -143,6 +143,120 @@ export const byLocation: Compare.Order<location> =
 export const locationDefault: location =
   { fct: fctDefault, marker: markerDefault };
 
+/** Scope marker kind */
+export type scopeKind =
+  Json.key<'#ENUM'> | Json.key<'#UNION'> | Json.key<'#STRUCT'> |
+  Json.key<'#TYPEDEF'> | Json.key<'#GLOBAL'> | Json.key<'#FUNCTION'>;
+
+/** Decoder for `scopeKind` */
+export const jScopeKind: Json.Decoder<scopeKind> =
+  Json.jUnion<Json.key<'#ENUM'> | Json.key<'#UNION'> | Json.key<'#STRUCT'> |
+              Json.key<'#TYPEDEF'> | Json.key<'#GLOBAL'> |
+              Json.key<'#FUNCTION'>>(
+    Json.jKey<'#ENUM'>('#ENUM'),
+    Json.jKey<'#UNION'>('#UNION'),
+    Json.jKey<'#STRUCT'>('#STRUCT'),
+    Json.jKey<'#TYPEDEF'>('#TYPEDEF'),
+    Json.jKey<'#GLOBAL'>('#GLOBAL'),
+    Json.jKey<'#FUNCTION'>('#FUNCTION'),
+  );
+
+/** Natural order for `scopeKind` */
+export const byScopeKind: Compare.Order<scopeKind> = Compare.structural;
+
+/** Default value for `scopeKind` */
+export const scopeKindDefault: scopeKind = Json.jKey<'#ENUM'>('#ENUM')('');
+
+/** Data for array rows [`scopeAttributes`](#scopeattributes)  */
+export interface scopeAttributesData {
+  /** Entry identifier. */
+  marker: scope;
+  /** Scope kind */
+  kind: scopeKind;
+  /** Scope identifier */
+  name: string;
+  /** Scope label (uncapitalized kind & name) */
+  label: string;
+  /** Source location */
+  source: source;
+}
+
+/** Decoder for `scopeAttributesData` */
+export const jScopeAttributesData: Json.Decoder<scopeAttributesData> =
+  Json.jObject({
+    marker: jScope,
+    kind: jScopeKind,
+    name: Json.jString,
+    label: Json.jString,
+    source: jSource,
+  });
+
+/** Natural order for `scopeAttributesData` */
+export const byScopeAttributesData: Compare.Order<scopeAttributesData> =
+  Compare.byFields
+    <{ marker: scope, kind: scopeKind, name: string, label: string,
+       source: source }>({
+    marker: byScope,
+    kind: byScopeKind,
+    name: Compare.string,
+    label: Compare.string,
+    source: bySource,
+  });
+
+/** Signal for array [`scopeAttributes`](#scopeattributes)  */
+export const signalScopeAttributes: Server.Signal = {
+  name: 'kernel.ast.signalScopeAttributes',
+};
+
+const reloadScopeAttributes_internal: Server.GetRequest<null,null> = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.ast.reloadScopeAttributes',
+  input:  Json.jNull,
+  output: Json.jNull,
+  signals: [],
+};
+/** Force full reload for array [`scopeAttributes`](#scopeattributes)  */
+export const reloadScopeAttributes: Server.GetRequest<null,null>= reloadScopeAttributes_internal;
+
+const fetchScopeAttributes_internal: Server.GetRequest<
+  number,
+  { reload: boolean, removed: scope[], updated: scopeAttributesData[],
+    pending: number }
+  > = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.ast.fetchScopeAttributes',
+  input:  Json.jNumber,
+  output: Json.jObject({
+            reload: Json.jBoolean,
+            removed: Json.jArray(jScope),
+            updated: Json.jArray(jScopeAttributesData),
+            pending: Json.jNumber,
+          }),
+  signals: [],
+};
+/** Data fetcher for array [`scopeAttributes`](#scopeattributes)  */
+export const fetchScopeAttributes: Server.GetRequest<
+  number,
+  { reload: boolean, removed: scope[], updated: scopeAttributesData[],
+    pending: number }
+  >= fetchScopeAttributes_internal;
+
+const scopeAttributes_internal: State.Array<scope,scopeAttributesData> = {
+  name: 'kernel.ast.scopeAttributes',
+  getkey: ((d:scopeAttributesData) => d.marker),
+  signal: signalScopeAttributes,
+  fetch: fetchScopeAttributes,
+  reload: reloadScopeAttributes,
+  order: byScopeAttributesData,
+};
+/** Scope attributes */
+export const scopeAttributes: State.Array<scope,scopeAttributesData> = scopeAttributes_internal;
+
+/** Default value for `scopeAttributesData` */
+export const scopeAttributesDataDefault: scopeAttributesData =
+  { marker: scopeDefault, kind: scopeKindDefault, name: '', label: '',
+    source: sourceDefault };
+
 /** Data for array rows [`markerAttributes`](#markerattributes)  */
 export interface markerAttributesData {
   /** Entry identifier. */

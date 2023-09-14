@@ -130,7 +130,7 @@ let label = function
   | PIP _ -> "(property)"
   | PType ty -> Pretty_utils.to_string Printer.pp_typ ty
 
-let decl_of = function
+let declaration = function
   | GCompTag(comp,loc) -> GCompTagDecl(comp,loc)
   | GEnumTag(enum,loc) -> GEnumTagDecl(enum,loc)
   | GFunDecl(_,vi,loc) | GVar(vi,_,loc) | GFun({ svar=vi },loc)
@@ -142,13 +142,34 @@ let decl_of = function
   | ( GType _ | GCompTagDecl _ | GEnumTagDecl _
     | GVarDecl _ | GText _ | GPragma _) as g -> g
 
+let declaration_of_scope = function
+  | SEnum ei -> GEnumTagDecl(ei,Location.unknown)
+  | SComp ci -> GCompTagDecl(ci,Location.unknown)
+  | SType ti -> GType(ti,Location.unknown)
+  | SGlobal vi -> GVarDecl(vi,vi.vdecl)
+  | SFunction kf -> let vi = Kernel_function.get_vi kf in GVarDecl(vi,vi.vdecl)
+
+let definition_of_scope = function
+  | SEnum ei -> GEnumTag(ei,Location.unknown)
+  | SComp ci -> GCompTag(ci,Location.unknown)
+  | SType ti -> GType(ti,Location.unknown)
+  | SGlobal vi ->
+    begin
+      try GVar(vi,Globals.Vars.find vi,vi.vdecl)
+      with Not_found -> GVarDecl(vi,vi.vdecl)
+    end
+  | SFunction kf -> Kernel_function.get_global kf
+
+let pp_declaration fmt s = Printer.pp_global fmt @@ declaration_of_scope s
+let pp_definition fmt s = Printer.pp_global fmt @@ definition_of_scope s
+
 let pp_localizable fmt = function
   | PVDecl (_, _, vi) -> Printer.pp_vdecl fmt vi
   | PLval (_, _, lval) -> Printer.pp_lval fmt lval
   | PExp  (_, _, expr) -> Printer.pp_exp fmt expr
   | PTermLval (_, _, _, lv) -> Printer.pp_term_lval fmt lv
   | PIP prop -> Description.pp_property fmt prop
-  | PGlobal g -> Printer.pp_global fmt (decl_of g)
+  | PGlobal g -> Printer.pp_global fmt (declaration g)
   | PStmt(_,stmt) | PStmtStart (_, stmt) ->
     Printer.(without_annot pp_stmt) fmt stmt
   | PType t -> Printer.pp_typ fmt t
@@ -305,6 +326,18 @@ let scope_of_localizable = function
   | PGlobal g -> scope_of_global g
   | PType ty -> scope_of_type ty
   | PIP _ -> None
+
+let name_of_scope = function
+  | SEnum ei -> ei.ename
+  | SComp ci -> ci.cname
+  | SType ti -> ti.tname
+  | SGlobal vi -> vi.vname
+  | SFunction kf -> Kernel_function.get_name kf
+
+let loc_of_scope = function
+  | SEnum _ | SComp _ | SType _ -> Location.unknown
+  | SGlobal vi -> vi.vdecl
+  | SFunction kf -> Kernel_function.get_location kf
 
 let kf_of_localizable = function
   | PLval (kf_opt, _, _)
