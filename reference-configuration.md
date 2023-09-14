@@ -10,7 +10,7 @@ compiling Frama-C+dev.
 - lablgtk3-sourceview3.3.1.3
 - menhir.20211128
 - ocamlfind.1.9.6
-- ocamlgraph.2.0.0
+- ocamlgraph.2.1.0
 - ppx_deriving_yaml.0.2.1
 - ppx_deriving_yojson.3.7.0
 - ppx_import.1.10.0
