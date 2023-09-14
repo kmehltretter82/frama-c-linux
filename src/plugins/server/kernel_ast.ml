@@ -37,10 +37,10 @@ let () = Request.register ~package
     ~descr:(Md.plain "Ensures that AST is computed")
     ~input:(module Junit) ~output:(module Junit) Ast.compute
 
-let changed_signal = Request.signal ~package ~name:"changed"
+let ast_changed_signal = Request.signal ~package ~name:"changed"
     ~descr:(Md.plain "Emitted when the AST has been changed")
 
-let ast_changed () = Request.emit changed_signal
+let ast_changed () = Request.emit ast_changed_signal
 
 let ast_update_hook f =
   begin
@@ -431,6 +431,27 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Decl Printer                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let print_global_ast global =
+  let stacked_libc = Kernel.PrintLibc.get () in
+  try
+    if not stacked_libc then Kernel.PrintLibc.set true ;
+    let printer = Printer.(with_unfold_precond (fun _ -> true) pp_global) in
+    let ast = Jbuffer.to_json printer global in
+    if not stacked_libc then Kernel.PrintLibc.set false ; ast
+  with err ->
+    if not stacked_libc then Kernel.PrintLibc.set false ; raise err
+
+let () = Request.register ~package
+    ~kind:`GET ~name:"printDeclaration"
+    ~descr:(Md.plain "Prints an AST Declaration")
+    ~signals:[ast_changed_signal]
+    ~input:(module Decl) ~output:(module Jtext)
+    (fun d -> print_global_ast @@ Printer_tag.definition_of_declaration d)
+
+(* -------------------------------------------------------------------------- *)
 (* --- Marker Attributes                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -502,7 +523,7 @@ struct
   let () =
     States.column
       ~name:"name"
-      ~descr:(Md.plain "Marker short name or identifier when relevant.")
+      ~descr:(Md.plain "Marker short name (identifier if any)")
       ~data:(module Jalpha)
       ~get:(fun (tag, _) -> Printer_tag.label tag)
       model
@@ -518,7 +539,7 @@ struct
   let () =
     States.option
       ~name:"decl"
-      ~descr:(Md.plain "Associated declaration")
+      ~descr:(Md.plain "Declaration scope")
       ~data:(module Decl)
       ~get:(fun (tag, _) -> Printer_tag.declaration_of_localizable tag)
       model
@@ -616,19 +637,9 @@ let () = Request.register ~package
 let () = Request.register ~package
     ~kind:`GET ~name:"printFunction"
     ~descr:(Md.plain "Print the AST of a function")
-    ~signals:[changed_signal]
+    ~signals:[ast_changed_signal]
     ~input:(module Function) ~output:(module Jtext)
-    begin fun kf ->
-      let libc = Kernel.PrintLibc.get () in
-      try
-        if not libc then Kernel.PrintLibc.set true ;
-        let global = Kernel_function.get_global kf in
-        let pp_glb = Printer.(with_unfold_precond (fun _ -> true) pp_global) in
-        let ast = Jbuffer.to_json pp_glb global in
-        if not libc then Kernel.PrintLibc.set false ; ast
-      with err ->
-        if not libc then Kernel.PrintLibc.set false ; raise err
-    end
+    (fun kf -> print_global_ast @@ Kernel_function.get_global kf)
 
 module Functions =
 struct

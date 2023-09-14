@@ -257,6 +257,16 @@ export const declAttributesDataDefault: declAttributesData =
   { marker: declDefault, kind: declKindDefault, name: '', label: '',
     source: sourceDefault };
 
+const printDeclaration_internal: Server.GetRequest<decl,text> = {
+  kind: Server.RqKind.GET,
+  name:   'kernel.ast.printDeclaration',
+  input:  jDecl,
+  output: jText,
+  signals: [ { name: 'kernel.ast.changed' } ],
+};
+/** Prints an AST Declaration */
+export const printDeclaration: Server.GetRequest<decl,text>= printDeclaration_internal;
+
 /** Data for array rows [`markerAttributes`](#markerattributes)  */
 export interface markerAttributesData {
   /** Entry identifier. */
@@ -265,11 +275,11 @@ export interface markerAttributesData {
   labelKind: string;
   /** Marker kind (long) */
   titleKind: string;
-  /** Marker short name or identifier when relevant. */
+  /** Marker short name (identifier if any) */
   name: string;
   /** Marker description */
   descr: string;
-  /** Associated declaration */
+  /** Declaration scope */
   decl?: decl;
   /** Whether it is an l-value */
   isLval: boolean;
