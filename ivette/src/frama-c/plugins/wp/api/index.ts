@@ -112,6 +112,34 @@ export const resultDefault: result =
   { descr: '', cached: false, verdict: '', solverTime: 0, proverTime: 0,
     proverSteps: 0 };
 
+/** Test Status */
+export type status =
+  Json.key<'#NORESULT'> | Json.key<'#COMPUTING'> | Json.key<'#FAILED'> |
+  Json.key<'#STEPOUT'> | Json.key<'#UNKNOWN'> | Json.key<'#VALID'> |
+  Json.key<'#PASSED'> | Json.key<'#DOOMED'>;
+
+/** Decoder for `status` */
+export const jStatus: Json.Decoder<status> =
+  Json.jUnion<Json.key<'#NORESULT'> | Json.key<'#COMPUTING'> |
+              Json.key<'#FAILED'> | Json.key<'#STEPOUT'> |
+              Json.key<'#UNKNOWN'> | Json.key<'#VALID'> |
+              Json.key<'#PASSED'> | Json.key<'#DOOMED'>>(
+    Json.jKey<'#NORESULT'>('#NORESULT'),
+    Json.jKey<'#COMPUTING'>('#COMPUTING'),
+    Json.jKey<'#FAILED'>('#FAILED'),
+    Json.jKey<'#STEPOUT'>('#STEPOUT'),
+    Json.jKey<'#UNKNOWN'>('#UNKNOWN'),
+    Json.jKey<'#VALID'>('#VALID'),
+    Json.jKey<'#PASSED'>('#PASSED'),
+    Json.jKey<'#DOOMED'>('#DOOMED'),
+  );
+
+/** Natural order for `status` */
+export const byStatus: Compare.Order<status> = Compare.structural;
+
+/** Default value for `status` */
+export const statusDefault: status = Json.jKey<'#NORESULT'>('#NORESULT')('');
+
 /** Prover Result */
 export type stats =
   { summary: string, tactics: number, proved: number, total: number };
@@ -152,22 +180,24 @@ export const getAvailableProvers: Server.GetRequest<null,prover[]>= getAvailable
 /** Data for array rows [`goals`](#goals)  */
 export interface goalsData {
   /** Entry identifier. */
-  wpo: Json.key<'#wpo'>;
+  wpo: goal;
   /** Property Marker */
   property: marker;
-  /** Informal name */
-  name: string;
   /** Associated function, if any */
   fct?: fct;
   /** Associated behavior, if any */
   bhv?: string;
   /** Associated axiomatic, if any */
   thy?: string;
-  /** Smoke Test Goal */
+  /** Informal Property Name */
+  name: string;
+  /** Smoking (or not) goal */
   smoke: boolean;
-  /** Successfull Goal */
+  /** Valid or Passed goal */
   passed: boolean;
-  /** Verdict Details */
+  /** Verdict, Status */
+  status: status;
+  /** Prover Stats Summary */
   stats: stats;
   /** Script File */
   script?: string;
@@ -178,14 +208,15 @@ export interface goalsData {
 /** Decoder for `goalsData` */
 export const jGoalsData: Json.Decoder<goalsData> =
   Json.jObject({
-    wpo: Json.jKey<'#wpo'>('#wpo'),
+    wpo: jGoal,
     property: jMarker,
-    name: Json.jString,
     fct: Json.jOption(jFct),
     bhv: Json.jOption(Json.jString),
     thy: Json.jOption(Json.jString),
+    name: Json.jString,
     smoke: Json.jBoolean,
     passed: Json.jBoolean,
+    status: jStatus,
     stats: jStats,
     script: Json.jOption(Json.jString),
     saved: Json.jBoolean,
@@ -194,17 +225,18 @@ export const jGoalsData: Json.Decoder<goalsData> =
 /** Natural order for `goalsData` */
 export const byGoalsData: Compare.Order<goalsData> =
   Compare.byFields
-    <{ wpo: Json.key<'#wpo'>, property: marker, name: string, fct?: fct,
-       bhv?: string, thy?: string, smoke: boolean, passed: boolean,
+    <{ wpo: goal, property: marker, fct?: fct, bhv?: string, thy?: string,
+       name: string, smoke: boolean, passed: boolean, status: status,
        stats: stats, script?: string, saved: boolean }>({
-    wpo: Compare.string,
+    wpo: byGoal,
     property: byMarker,
-    name: Compare.string,
     fct: Compare.defined(byFct),
     bhv: Compare.defined(Compare.string),
     thy: Compare.defined(Compare.string),
+    name: Compare.string,
     smoke: Compare.boolean,
     passed: Compare.boolean,
+    status: byStatus,
     stats: byStats,
     script: Compare.defined(Compare.string),
     saved: Compare.boolean,
@@ -227,15 +259,14 @@ export const reloadGoals: Server.GetRequest<null,null>= reloadGoals_internal;
 
 const fetchGoals_internal: Server.GetRequest<
   number,
-  { reload: boolean, removed: Json.key<'#wpo'>[], updated: goalsData[],
-    pending: number }
+  { reload: boolean, removed: goal[], updated: goalsData[], pending: number }
   > = {
   kind: Server.RqKind.GET,
   name:   'plugins.wp.fetchGoals',
   input:  Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
-            removed: Json.jArray(Json.jKey<'#wpo'>('#wpo')),
+            removed: Json.jArray(jGoal),
             updated: Json.jArray(jGoalsData),
             pending: Json.jNumber,
           }),
@@ -244,11 +275,10 @@ const fetchGoals_internal: Server.GetRequest<
 /** Data fetcher for array [`goals`](#goals)  */
 export const fetchGoals: Server.GetRequest<
   number,
-  { reload: boolean, removed: Json.key<'#wpo'>[], updated: goalsData[],
-    pending: number }
+  { reload: boolean, removed: goal[], updated: goalsData[], pending: number }
   >= fetchGoals_internal;
 
-const goals_internal: State.Array<Json.key<'#wpo'>,goalsData> = {
+const goals_internal: State.Array<goal,goalsData> = {
   name: 'plugins.wp.goals',
   getkey: ((d:goalsData) => d.wpo),
   signal: signalGoals,
@@ -257,13 +287,14 @@ const goals_internal: State.Array<Json.key<'#wpo'>,goalsData> = {
   order: byGoalsData,
 };
 /** Generated Goals */
-export const goals: State.Array<Json.key<'#wpo'>,goalsData> = goals_internal;
+export const goals: State.Array<goal,goalsData> = goals_internal;
 
 /** Default value for `goalsData` */
 export const goalsDataDefault: goalsData =
-  { wpo: Json.jKey<'#wpo'>('#wpo')(''), property: markerDefault, name: '',
-    fct: undefined, bhv: undefined, thy: undefined, smoke: false,
-    passed: false, stats: statsDefault, script: undefined, saved: false };
+  { wpo: goalDefault, property: markerDefault, fct: undefined,
+    bhv: undefined, thy: undefined, name: '', smoke: false, passed: false,
+    status: statusDefault, stats: statsDefault, script: undefined,
+    saved: false };
 
 /** Proof Server Activity */
 export const serverActivity: Server.Signal = {

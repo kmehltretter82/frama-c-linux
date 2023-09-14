@@ -197,7 +197,7 @@ export const CircButton = (props: ButtonProps): JSX.Element => {
 // --------------------------------------------------------------------------
 
 export type IconButtonKind =
-  undefined | 'selected' | 'default' | 'negative' | 'positive' | 'warning';
+  'default' | 'positive' | 'negative' | 'warning';
 
 export interface IconButtonProps {
   /** Icon identifier. Displayed on the left side of the label. */

@@ -105,9 +105,37 @@ struct
     ]
 end
 
+module STATUS =
+struct
+  type t = { smoke : bool ; verdict : VCS.verdict }
+  let jtype = D.declare ~package ~name:"status"
+      ~descr:(Md.plain "Test Status")
+      (Junion [
+          Jkey "NORESULT" ;
+          Jkey "COMPUTING" ;
+          Jkey "FAILED" ;
+          Jkey "STEPOUT" ;
+          Jkey "UNKNOWN" ;
+          Jkey "VALID" ;
+          Jkey "PASSED" ;
+          Jkey "DOOMED" ;
+        ])
+  let to_json { smoke ; verdict } =
+    `String begin
+      match verdict with
+      | VCS.Valid -> if smoke then "DOOMED" else "VALID"
+      | VCS.Unknown -> if smoke then "PASSED" else "UNKNOWN"
+      | Failed -> "FAILED"
+      | NoResult -> "NORESULT"
+      | Computing _ -> "COMPUTING"
+      | Timeout -> "TIMEOUT"
+      | Stepout -> "STEPOUT"
+    end
+end
+
 module STATS =
 struct
-  type t = bool * Stats.stats
+  type t = Stats.stats
   let jtype = D.declare ~package ~name:"stats"
       ~descr:(Md.plain "Prover Result")
       (Jrecord [
@@ -116,17 +144,8 @@ struct
           "proved", Jnumber;
           "total", Jnumber;
         ])
-  let to_json (smoke,cs) : Json.t =
-    let verdict = match cs.Stats.best with
-      | VCS.Valid -> if smoke then "Doomed" else "Valid"
-      | VCS.Unknown -> if smoke then "Passed" else "Unknown"
-      | Failed -> "Failure"
-      | NoResult -> "No Result"
-      | Computing _ -> "Computing"
-      | Timeout -> "Timeout"
-      | Stepout -> "Stepout"
-    in
-    let summary = Format.asprintf "%s%a" verdict
+  let to_json cs : Json.t =
+    let summary = Pretty_utils.to_string
         (Stats.pp_stats ~shell:false ~cache:Update) cs
     in `Assoc [
       "summary", `String summary ;
@@ -150,11 +169,6 @@ let () = R.register ~package ~kind:`GET ~name:"getAvailableProvers"
 
 let gmodel : Wpo.t S.model = S.model ()
 
-let () = S.column gmodel ~name:"property"
-    ~descr:(Md.plain "Property Marker")
-    ~data:(module AST.Marker)
-    ~get:(fun g -> Printer_tag.PIP (WpPropId.property_of_id g.Wpo.po_pid))
-
 let get_kf g = match g.Wpo.po_idx with
   | Function(kf,_) -> Some kf
   | Axiomatic _ -> None
@@ -167,11 +181,16 @@ let get_thy g = match g.Wpo.po_idx with
   | Function _ -> None
   | Axiomatic ax -> ax
 
-let get_stats g = Wpo.is_smoke_test g, ProofEngine.consolidated g
+let get_status g =
+  STATUS.{
+    smoke = Wpo.is_smoke_test g ;
+    verdict = (ProofEngine.consolidated g).best ;
+  }
 
-let () = S.column gmodel ~name:"name"
-    ~descr:(Md.plain "Informal name") ~data:(module D.Jstring)
-    ~get:(fun g -> g.Wpo.po_name)
+let () = S.column gmodel ~name:"property"
+    ~descr:(Md.plain "Property Marker")
+    ~data:(module AST.Marker)
+    ~get:(fun g -> Printer_tag.PIP (WpPropId.property_of_id g.Wpo.po_pid))
 
 let () = S.column gmodel ~name:"fct"
     ~descr:(Md.plain "Associated function, if any")
@@ -185,17 +204,26 @@ let () = S.option gmodel ~name:"thy"
     ~descr:(Md.plain "Associated axiomatic, if any")
     ~data:(module D.Jstring) ~get:get_thy
 
+let () = S.column gmodel ~name:"name"
+    ~descr:(Md.plain "Informal Property Name")
+    ~data:(module D.Jstring)
+    ~get:(fun g -> g.Wpo.po_name)
+
 let () = S.column gmodel ~name:"smoke"
-    ~descr:(Md.plain "Smoke Test Goal")
+    ~descr:(Md.plain "Smoking (or not) goal")
     ~data:(module D.Jbool) ~get:Wpo.is_smoke_test
 
 let () = S.column gmodel ~name:"passed"
-    ~descr:(Md.plain "Successfull Goal")
+    ~descr:(Md.plain "Valid or Passed goal")
     ~data:(module D.Jbool) ~get:Wpo.is_passed
 
+let () = S.column gmodel ~name:"status"
+    ~descr:(Md.plain "Verdict, Status")
+    ~data:(module STATUS) ~get:get_status
+
 let () = S.column gmodel ~name:"stats"
-    ~descr:(Md.plain "Verdict Details")
-    ~data:(module STATS) ~get:get_stats
+    ~descr:(Md.plain "Prover Stats Summary")
+    ~data:(module STATS) ~get:ProofEngine.consolidated
 
 let () = S.option gmodel ~name:"script"
     ~descr:(Md.plain "Script File")
@@ -214,7 +242,7 @@ let _ = S.register_array ~package ~name:"goals"
     ~descr:(Md.plain "Generated Goals")
     ~key:(fun g -> g.Wpo.po_gid)
     ~keyName:"wpo"
-    ~keyType:(Jkey "wpo")
+    ~keyType:Goal.jtype
     ~iter:Wpo.iter_on_goals
     ~add_update_hook:Wpo.add_modified_hook
     ~add_remove_hook:Wpo.add_removed_hook

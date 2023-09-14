@@ -96,6 +96,9 @@ export function SVG(props: SVGprops): null | JSX.Element {
 // --- Icon Component
 // --------------------------------------------------------------------------
 
+export type IconKind =
+  'disabled' | 'selected' | 'positive' | 'negative' | 'warning';
+
 /** Icon Component Properties */
 export interface IconProps extends SVGprops {
   /** Additional class name(s). */
@@ -108,6 +111,8 @@ export interface IconProps extends SVGprops {
   style?: React.CSSProperties;
   /** Fill style property. */
   fill?: string;
+  /** Icon Kind. */
+  kind?: IconKind;
   /** Click callback. */
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
@@ -118,7 +123,7 @@ export interface IconProps extends SVGprops {
  */
 export function Icon(props: IconProps): JSX.Element {
   const {
-    id, title, onClick, fill,
+    id, title, onClick, fill, kind,
     size, className, offset, style,
     visible = true, display = true,
   } = props;
@@ -126,6 +131,7 @@ export function Icon(props: IconProps): JSX.Element {
     'dome-xIcon',
     !visible && 'dome-control-hidden',
     !display && 'dome-control-erased',
+    kind && ('dome-xIcon-' + kind),
     className
   );
   const divStyle = styles(fill && { fill }, style);

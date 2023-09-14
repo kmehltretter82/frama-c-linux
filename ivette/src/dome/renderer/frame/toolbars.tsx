@@ -94,6 +94,39 @@ export const Separator = (): JSX.Element => (
   </div>
 );
 
+// --------------------------------------------------------------------------
+// --- ToolBar Group
+// --------------------------------------------------------------------------
+
+export interface GroupProps {
+  className?: string;
+  style?: React.CSSProperties;
+  visible?: boolean;
+  display?: boolean;
+  title?: string;
+  children?: React.ReactNode;
+}
+
+/** Groups other ToolBar controls together in a tied box. */
+export function Group(props: GroupProps): JSX.Element {
+  const { visible=true, display=true } = props;
+  const allClasses = classes(
+    'dome-xToolBar-group',
+    props.className,
+    !visible && 'dome-hidden',
+    !display && 'dome-erased',
+  );
+  return (
+    <div className={allClasses} style={props.style} title={props.title}>
+      {props.children}
+    </div>
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- ToolBar Controls
+// --------------------------------------------------------------------------
+
 const SELECT = 'dome-xToolBar-control dome-selected';
 const BUTTON = 'dome-xToolBar-control dome-color-frame';
 const KIND = (kind: undefined | string): string => (
@@ -231,7 +264,7 @@ export function ButtonGroup<A>(props: ButtonGroupProps<A>): JSX.Element {
     selection: value,
     onClick: onChange,
   };
-  const className = classes('dome-xToolBar-group', props.className);
+  const className = classes('dome-xToolBar-buttongroup', props.className);
   return (
     <div className={className} style={props.style}>
       {React.Children.map(children, (elt) => React.cloneElement(

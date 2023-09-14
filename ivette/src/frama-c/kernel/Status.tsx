@@ -25,10 +25,8 @@
 /* --------------------------------------------------------------------------*/
 
 import React from 'react';
-import { Code } from 'dome/controls/labels';
+import { Code, IconKind } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
-import { LED } from 'dome/controls/displays';
-import { Icon } from 'dome/controls/icons';
 import * as Toolbars from 'dome/frame/toolbars';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 import * as Server from 'frama-c/server';
@@ -44,31 +42,42 @@ export interface MessageProps {
 
 const emptyMessage: MessageProps = { text: '', kind: 'none' };
 
+
 const GlobalMessage = new GlobalState(emptyMessage);
 
 export function setMessage(message: MessageProps): void {
   GlobalMessage.setValue(message);
 }
 
+const msgIcon: { [kind: string]: string } = {
+  'progress': 'EXECUTE',
+  'success': 'CHECK',
+  'warning': 'WARNING',
+  'error': 'CROSS',
+  'info': 'HELP',
+};
+
+const msgKind: { [kind: string]: IconKind } = {
+  'success': 'positive',
+  'warning': 'warning',
+  'error': 'negative',
+};
+
 export default function Message(): JSX.Element {
   const [message] = useGlobalState(GlobalMessage);
+  const icon = msgIcon[message.kind];
+  const kind = msgKind[message.kind];
   return (
-    <>
-      <Toolbars.Space />
-      {message.kind === 'progress' && <LED status="active" blink />}
-      {message.kind === 'success' && <Icon id="CHECK" fill="green" />}
-      {message.kind === 'warning' && <Icon id="ATTENTION" />}
-      {message.kind === 'error' && <Icon id="CROSS" fill="red" />}
-      {message.kind === 'info' && <Icon id="CIRC.INFO" />}
-      <Code label={message.text} title={message.title} />
+    <Toolbars.Group display={message.kind !== 'none'} >
+      <Code icon={icon} kind={kind}
+            label={message.text} title={message.title} />
       <IconButton
         icon="CIRC.CLOSE"
         onClick={() => setMessage(emptyMessage)}
         visible={message !== emptyMessage}
         title="Hide current message"
       />
-      <Toolbars.Space />
-    </>
+    </Toolbars.Group>
   );
 }
 

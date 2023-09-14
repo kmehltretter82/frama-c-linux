@@ -38,6 +38,9 @@ import './style.css';
 // --- Generic Label
 // --------------------------------------------------------------------------
 
+export type IconKind =
+  'default' | 'disabled' | 'warning' | 'positive' | 'negative';
+
 /** Labels support fowarding refs to their inner [<label/>] element. */
 export interface LabelProps {
   /** Text of the label. Prepend to other children elements. */
@@ -46,8 +49,12 @@ export interface LabelProps {
   icon?: string;
   /** Tool-tip description. */
   title?: string;
+  /** Icon kind. */
+  kind?: IconKind,
   /** Additional class. */
   className?: string;
+  /** Additional class for icon. */
+  iconClassName?: string;
   /** Additional style. */
   style?: React.CSSProperties;
   /** If `false`, do not display the label. Default to `true`. */
@@ -64,14 +71,18 @@ export interface LabelProps {
 
 const makeLabel = (className: string) =>
   function Label(
-      props: LabelProps,
-      ref: LegacyRef<HTMLLabelElement> | undefined
-    ): JSX.Element {
-    const { display = true } = props;
+    props: LabelProps,
+    ref: LegacyRef<HTMLLabelElement> | undefined
+  ): JSX.Element {
+    const { display = true, kind = 'default' } = props;
     const allClasses = classes(
       className,
       !display && 'dome-control-erased',
       props.className,
+    );
+    const iconClass = classes(
+      'dome-xIcon-' + kind,
+      props.iconClassName,
     );
     return (
       <label
@@ -83,7 +94,8 @@ const makeLabel = (className: string) =>
         onDoubleClick={props.onDoubleClick}
         onContextMenu={props.onContextMenu}
       >
-        {props.icon && <Icon title={props.title} id={props.icon} />}
+        {props.icon &&
+         <Icon title={props.title} id={props.icon} className={iconClass} />}
         {props.label}
         {props.children}
       </label>
