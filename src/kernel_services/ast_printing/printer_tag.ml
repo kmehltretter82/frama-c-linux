@@ -334,8 +334,14 @@ let name_of_declaration = function
   | SGlobal vi -> vi.vname
   | SFunction kf -> Kernel_function.get_name kf
 
+let loc_of_type space name =
+  try Global.loc @@ Globals.Types.global space name
+  with Not_found -> Location.unknown
+
 let loc_of_declaration = function
-  | SEnum _ | SComp _ | SType _ -> Location.unknown
+  | SEnum ei -> loc_of_type Enum ei.ename
+  | SComp ci -> loc_of_type (if ci.cstruct then Struct else Union) ci.cname
+  | SType ti -> loc_of_type Typedef ti.tname
   | SGlobal vi -> vi.vdecl
   | SFunction kf -> Kernel_function.get_location kf
 
