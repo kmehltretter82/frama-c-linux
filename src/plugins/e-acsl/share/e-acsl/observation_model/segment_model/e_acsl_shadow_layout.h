@@ -120,7 +120,7 @@ size_t get_heap_size();
 size_t get_tls_size();
 
 /*! \brief Return start address of a program's TLS */
-uintptr_t get_tls_start(int main_thread);
+uintptr_t get_tls_start();
 /** }}} */
 
 /** Shadow Layout {{{ */

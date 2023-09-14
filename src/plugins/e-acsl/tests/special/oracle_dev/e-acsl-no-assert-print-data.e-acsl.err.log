@@ -1,4 +1,5 @@
-e-acsl-no-assert-print-data.c: In function 'main'
-e-acsl-no-assert-print-data.c:14: Error: Assertion failed:
-	The failing predicate is:
-	\let x = value; \false.
+Error while executing ./e-acsl-no-assert-print-data.e-acsl
+
+STDOUT:
+
+STDERR:
