@@ -101,16 +101,16 @@ export const byFct: Compare.Order<fct> = Compare.string;
 export const fctDefault: fct = Json.jKey<'#fct'>('#fct')('');
 
 /** AST Declarations markers */
-export type scope = Json.key<'#scope'>;
+export type decl = Json.key<'#decl'>;
 
-/** Decoder for `scope` */
-export const jScope: Json.Decoder<scope> = Json.jKey<'#scope'>('#scope');
+/** Decoder for `decl` */
+export const jDecl: Json.Decoder<decl> = Json.jKey<'#decl'>('#decl');
 
-/** Natural order for `scope` */
-export const byScope: Compare.Order<scope> = Compare.string;
+/** Natural order for `decl` */
+export const byDecl: Compare.Order<decl> = Compare.string;
 
-/** Default value for `scope` */
-export const scopeDefault: scope = Json.jKey<'#scope'>('#scope')('');
+/** Default value for `decl` */
+export const declDefault: decl = Json.jKey<'#decl'>('#decl')('');
 
 /** Localizable AST markers */
 export type marker = Json.key<'#marker'>;
@@ -143,13 +143,13 @@ export const byLocation: Compare.Order<location> =
 export const locationDefault: location =
   { fct: fctDefault, marker: markerDefault };
 
-/** Scope marker kind */
-export type scopeKind =
+/** Declaration kind */
+export type declKind =
   Json.key<'#ENUM'> | Json.key<'#UNION'> | Json.key<'#STRUCT'> |
   Json.key<'#TYPEDEF'> | Json.key<'#GLOBAL'> | Json.key<'#FUNCTION'>;
 
-/** Decoder for `scopeKind` */
-export const jScopeKind: Json.Decoder<scopeKind> =
+/** Decoder for `declKind` */
+export const jDeclKind: Json.Decoder<declKind> =
   Json.jUnion<Json.key<'#ENUM'> | Json.key<'#UNION'> | Json.key<'#STRUCT'> |
               Json.key<'#TYPEDEF'> | Json.key<'#GLOBAL'> |
               Json.key<'#FUNCTION'>>(
@@ -161,100 +161,100 @@ export const jScopeKind: Json.Decoder<scopeKind> =
     Json.jKey<'#FUNCTION'>('#FUNCTION'),
   );
 
-/** Natural order for `scopeKind` */
-export const byScopeKind: Compare.Order<scopeKind> = Compare.structural;
+/** Natural order for `declKind` */
+export const byDeclKind: Compare.Order<declKind> = Compare.structural;
 
-/** Default value for `scopeKind` */
-export const scopeKindDefault: scopeKind = Json.jKey<'#ENUM'>('#ENUM')('');
+/** Default value for `declKind` */
+export const declKindDefault: declKind = Json.jKey<'#ENUM'>('#ENUM')('');
 
-/** Data for array rows [`scopeAttributes`](#scopeattributes)  */
-export interface scopeAttributesData {
+/** Data for array rows [`declAttributes`](#declattributes)  */
+export interface declAttributesData {
   /** Entry identifier. */
-  marker: scope;
-  /** Scope kind */
-  kind: scopeKind;
-  /** Scope identifier */
+  marker: decl;
+  /** Declaration kind */
+  kind: declKind;
+  /** Declaration identifier */
   name: string;
-  /** Scope label (uncapitalized kind & name) */
+  /** Declaration label (uncapitalized kind & name) */
   label: string;
   /** Source location */
   source: source;
 }
 
-/** Decoder for `scopeAttributesData` */
-export const jScopeAttributesData: Json.Decoder<scopeAttributesData> =
+/** Decoder for `declAttributesData` */
+export const jDeclAttributesData: Json.Decoder<declAttributesData> =
   Json.jObject({
-    marker: jScope,
-    kind: jScopeKind,
+    marker: jDecl,
+    kind: jDeclKind,
     name: Json.jString,
     label: Json.jString,
     source: jSource,
   });
 
-/** Natural order for `scopeAttributesData` */
-export const byScopeAttributesData: Compare.Order<scopeAttributesData> =
+/** Natural order for `declAttributesData` */
+export const byDeclAttributesData: Compare.Order<declAttributesData> =
   Compare.byFields
-    <{ marker: scope, kind: scopeKind, name: string, label: string,
+    <{ marker: decl, kind: declKind, name: string, label: string,
        source: source }>({
-    marker: byScope,
-    kind: byScopeKind,
+    marker: byDecl,
+    kind: byDeclKind,
     name: Compare.string,
     label: Compare.string,
     source: bySource,
   });
 
-/** Signal for array [`scopeAttributes`](#scopeattributes)  */
-export const signalScopeAttributes: Server.Signal = {
-  name: 'kernel.ast.signalScopeAttributes',
+/** Signal for array [`declAttributes`](#declattributes)  */
+export const signalDeclAttributes: Server.Signal = {
+  name: 'kernel.ast.signalDeclAttributes',
 };
 
-const reloadScopeAttributes_internal: Server.GetRequest<null,null> = {
+const reloadDeclAttributes_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.reloadScopeAttributes',
+  name:   'kernel.ast.reloadDeclAttributes',
   input:  Json.jNull,
   output: Json.jNull,
   signals: [],
 };
-/** Force full reload for array [`scopeAttributes`](#scopeattributes)  */
-export const reloadScopeAttributes: Server.GetRequest<null,null>= reloadScopeAttributes_internal;
+/** Force full reload for array [`declAttributes`](#declattributes)  */
+export const reloadDeclAttributes: Server.GetRequest<null,null>= reloadDeclAttributes_internal;
 
-const fetchScopeAttributes_internal: Server.GetRequest<
+const fetchDeclAttributes_internal: Server.GetRequest<
   number,
-  { reload: boolean, removed: scope[], updated: scopeAttributesData[],
+  { reload: boolean, removed: decl[], updated: declAttributesData[],
     pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.fetchScopeAttributes',
+  name:   'kernel.ast.fetchDeclAttributes',
   input:  Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
-            removed: Json.jArray(jScope),
-            updated: Json.jArray(jScopeAttributesData),
+            removed: Json.jArray(jDecl),
+            updated: Json.jArray(jDeclAttributesData),
             pending: Json.jNumber,
           }),
   signals: [],
 };
-/** Data fetcher for array [`scopeAttributes`](#scopeattributes)  */
-export const fetchScopeAttributes: Server.GetRequest<
+/** Data fetcher for array [`declAttributes`](#declattributes)  */
+export const fetchDeclAttributes: Server.GetRequest<
   number,
-  { reload: boolean, removed: scope[], updated: scopeAttributesData[],
+  { reload: boolean, removed: decl[], updated: declAttributesData[],
     pending: number }
-  >= fetchScopeAttributes_internal;
+  >= fetchDeclAttributes_internal;
 
-const scopeAttributes_internal: State.Array<scope,scopeAttributesData> = {
-  name: 'kernel.ast.scopeAttributes',
-  getkey: ((d:scopeAttributesData) => d.marker),
-  signal: signalScopeAttributes,
-  fetch: fetchScopeAttributes,
-  reload: reloadScopeAttributes,
-  order: byScopeAttributesData,
+const declAttributes_internal: State.Array<decl,declAttributesData> = {
+  name: 'kernel.ast.declAttributes',
+  getkey: ((d:declAttributesData) => d.marker),
+  signal: signalDeclAttributes,
+  fetch: fetchDeclAttributes,
+  reload: reloadDeclAttributes,
+  order: byDeclAttributesData,
 };
-/** Scope attributes */
-export const scopeAttributes: State.Array<scope,scopeAttributesData> = scopeAttributes_internal;
+/** Declaration attributes */
+export const declAttributes: State.Array<decl,declAttributesData> = declAttributes_internal;
 
-/** Default value for `scopeAttributesData` */
-export const scopeAttributesDataDefault: scopeAttributesData =
-  { marker: scopeDefault, kind: scopeKindDefault, name: '', label: '',
+/** Default value for `declAttributesData` */
+export const declAttributesDataDefault: declAttributesData =
+  { marker: declDefault, kind: declKindDefault, name: '', label: '',
     source: sourceDefault };
 
 /** Data for array rows [`markerAttributes`](#markerattributes)  */

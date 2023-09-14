@@ -25,17 +25,17 @@
 open Cil_types
 
 (** The kind of AST declarations that can be printed. *)
-type scope =
+type declaration =
   | SEnum of enuminfo
   | SComp of compinfo
   | SType of typeinfo
   | SGlobal of varinfo
   | SFunction of kernel_function
 
-(** Prints a concise label of the scope *)
-val pp_scope : Format.formatter -> scope -> unit
+(** Prints a concise label of the declaration *)
+val pp_declaration : Format.formatter -> declaration -> unit
 
-module Scope: Datatype.S_with_collections with type t = scope
+module Declaration: Datatype.S_with_collections with type t = declaration
 
 (** The kind of object that can be selected in the source viewer. *)
 type localizable =
@@ -67,11 +67,11 @@ val label: localizable -> string
 val glabel: global -> string
 
 
-(** Prints the global declaration of the scope. *)
-val pp_declaration : Format.formatter -> scope -> unit
+(** Prints the global declaration of the declaration. *)
+val pp_signature : Format.formatter -> declaration -> unit
 
-(** Prints the global definition of the scope. *)
-val pp_definition : Format.formatter -> scope -> unit
+(** Prints the global definition of the declaration. *)
+val pp_definition : Format.formatter -> declaration -> unit
 
 (** Prints the signature of the localizable. *)
 val pp_localizable: Format.formatter -> localizable -> unit
@@ -81,14 +81,14 @@ val pp_debug: Format.formatter -> localizable -> unit
 
 module Localizable: Datatype.S_with_collections with type t = localizable
 
-val scope_of_type : typ -> scope option
-val scope_of_global : global -> scope option
-val scope_of_localizable : localizable -> scope option
+val declaration_of_type : typ -> declaration option
+val declaration_of_global : global -> declaration option
+val declaration_of_localizable : localizable -> declaration option
 
-val loc_of_scope : scope -> location
-val name_of_scope : scope -> string
-val declaration_of_scope : scope -> global
-val definition_of_scope : scope -> global
+val loc_of_declaration : declaration -> location
+val name_of_declaration : declaration -> string
+val signature_of_declaration : declaration -> global
+val definition_of_declaration : declaration -> global
 
 val localizable_of_global : global -> localizable
 val localizable_of_kf : kernel_function -> localizable

@@ -218,13 +218,13 @@ struct
 
 end
 
-module Scope = MakeTag
+module Decl = MakeTag
     (struct
       open Printer_tag
-      type t = scope
-      let name = "scope"
+      type t = declaration
+      let name = "decl"
       let descr = "AST Declarations markers"
-      module H = Scope.Hashtbl
+      module H = Declaration.Hashtbl
       let kid = ref 0
       let create = function
         | SEnum _ -> Printf.sprintf "#E%d" (incr kid ; !kid)
@@ -335,16 +335,17 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Scope Attributes                                                  --- *)
+(* --- Declaration Attributes                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
 
-module ScopeKind =
+module DeclKind =
 struct
-  type t = Printer_tag.scope
+  open Printer_tag
+  type t = declaration
   let jtype = Data.declare
-      ~package ~name:"scopeKind"
-      ~descr:(Md.plain "Scope marker kind")
+      ~package ~name:"declKind"
+      ~descr:(Md.plain "Declaration kind")
       (Junion [
           Jkey "ENUM";
           Jkey "UNION";
@@ -353,7 +354,7 @@ struct
           Jkey "GLOBAL";
           Jkey "FUNCTION";
         ])
-  let to_json (scope : t) = match scope with
+  let to_json = function
     | SEnum _ -> `String "ENUM"
     | SComp { cstruct = true } -> `String "STRUCT"
     | SComp { cstruct = false } -> `String "UNION"
@@ -362,7 +363,7 @@ struct
     | SFunction _ -> `String "FUNCTION"
 end
 
-module ScopeAttributes =
+module DeclAttributes =
 struct
   module P = Printer_tag
 
@@ -371,25 +372,25 @@ struct
   let () =
     States.column
       ~name:"kind"
-      ~descr:(Md.plain "Scope kind")
-      ~data:(module ScopeKind)
+      ~descr:(Md.plain "Declaration kind")
+      ~data:(module DeclKind)
       ~get:fst
       model
 
   let () =
     States.column
       ~name:"name"
-      ~descr:(Md.plain "Scope identifier")
+      ~descr:(Md.plain "Declaration identifier")
       ~data:(module Jstring)
-      ~get:(fun (scope,_) -> P.name_of_scope scope)
+      ~get:(fun (decl,_) -> P.name_of_declaration decl)
       model
 
   let () =
     States.column
       ~name:"label"
-      ~descr:(Md.plain "Scope label (uncapitalized kind & name)")
+      ~descr:(Md.plain "Declaration label (uncapitalized kind & name)")
       ~data:(module Jstring)
-      ~get:(fun (scope,_) -> Pretty_utils.to_string P.pp_scope scope)
+      ~get:(fun (decl,_) -> Pretty_utils.to_string P.pp_declaration decl)
       model
 
   let () =
@@ -397,21 +398,21 @@ struct
       ~name:"source"
       ~descr:(Md.plain "Source location")
       ~data:(module Position)
-      ~get:(fun (scope,_) -> fst @@ P.loc_of_scope scope)
+      ~get:(fun (decl,_) -> fst @@ P.loc_of_declaration decl)
       model
 
   let array = States.register_array
       ~package
-      ~name:"scopeAttributes"
-      ~descr:(Md.plain "Scope attributes")
+      ~name:"declAttributes"
+      ~descr:(Md.plain "Declaration attributes")
       ~key:snd
       ~keyName:"marker"
-      ~keyType:Scope.jtype
-      ~iter:Scope.iter
+      ~keyType:Decl.jtype
+      ~iter:Decl.iter
       ~add_reload_hook:ast_update_hook
       model
 
-  let () = Scope.hook (States.update array)
+  let () = Decl.hook (States.update array)
 
 end
 
@@ -462,6 +463,7 @@ struct
     | PVDecl(Some _,Kglobal,vi) -> vi.vglob && Globals.Functions.mem vi
     | _ -> false
 
+  (*TODO: decprecated, to be changed to declaration tag *)
   let scope tag =
     Option.map Kernel_function.get_name @@ Printer_tag.kf_of_localizable tag
 

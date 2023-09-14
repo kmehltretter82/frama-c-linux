@@ -27,14 +27,14 @@ open Cil_datatype
 (* --- Scope API                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-type scope =
+type declaration =
   | SEnum of enuminfo
   | SComp of compinfo
   | SType of typeinfo
   | SGlobal of varinfo
   | SFunction of kernel_function
 
-let pp_scope fmt = function
+let pp_declaration fmt = function
   | SEnum e -> Format.fprintf fmt "enum %s" e.ename
   | SComp { cstruct = true ; cname } -> Format.fprintf fmt "struct %s" cname
   | SComp { cstruct = false ; cname } -> Format.fprintf fmt "union %s" cname
@@ -43,13 +43,13 @@ let pp_scope fmt = function
   | SFunction kf ->
     Format.fprintf fmt "function %s" @@ Kernel_function.get_name kf
 
-module Scope =
+module Declaration =
   Datatype.Make_with_collections
     (struct
       include Datatype.Undefined
-      type t = scope
+      type t = declaration
 
-      let name = "Printer_tag.Scope"
+      let name = "Printer_tag.Declaration"
       let reprs = List.map (fun g -> SGlobal g) Varinfo.reprs
       let mem_project = Datatype.never_any_project
 
@@ -86,7 +86,7 @@ module Scope =
         | _, SGlobal _ -> (+1)
         | SFunction f, SFunction g -> Kernel_function.compare f g
 
-      let pretty = pp_scope
+      let pretty = pp_declaration
     end)
 
 (* -------------------------------------------------------------------------- *)
@@ -142,14 +142,14 @@ let declaration = function
   | ( GType _ | GCompTagDecl _ | GEnumTagDecl _
     | GVarDecl _ | GText _ | GPragma _) as g -> g
 
-let declaration_of_scope = function
+let signature_of_declaration = function
   | SEnum ei -> GEnumTagDecl(ei,Location.unknown)
   | SComp ci -> GCompTagDecl(ci,Location.unknown)
   | SType ti -> GType(ti,Location.unknown)
   | SGlobal vi -> GVarDecl(vi,vi.vdecl)
   | SFunction kf -> let vi = Kernel_function.get_vi kf in GVarDecl(vi,vi.vdecl)
 
-let definition_of_scope = function
+let definition_of_declaration = function
   | SEnum ei -> GEnumTag(ei,Location.unknown)
   | SComp ci -> GCompTag(ci,Location.unknown)
   | SType ti -> GType(ti,Location.unknown)
@@ -160,8 +160,8 @@ let definition_of_scope = function
     end
   | SFunction kf -> Kernel_function.get_global kf
 
-let pp_declaration fmt s = Printer.pp_global fmt @@ declaration_of_scope s
-let pp_definition fmt s = Printer.pp_global fmt @@ definition_of_scope s
+let pp_signature fmt d = Printer.pp_global fmt @@ signature_of_declaration d
+let pp_definition fmt d = Printer.pp_global fmt @@ definition_of_declaration d
 
 let pp_localizable fmt = function
   | PVDecl (_, _, vi) -> Printer.pp_vdecl fmt vi
@@ -296,9 +296,9 @@ module Localizable =
 (* --- Utility Accessors                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-let scope_of_kfopt = function None -> None | Some kf -> Some (SFunction kf)
+let declaration_of_kfopt = function None -> None | Some kf -> Some (SFunction kf)
 
-let scope_of_global = function
+let declaration_of_global = function
   | GType(ti, _) -> Some (SType ti)
   | GCompTag(ci, _) | GCompTagDecl (ci, _) -> Some (SComp ci)
   | GEnumTag(ei, _) | GEnumTagDecl (ei, _) -> Some (SEnum ei)
@@ -307,14 +307,14 @@ let scope_of_global = function
     Some(SFunction (Globals.Functions.get vi))
   | GAsm _ | GPragma _ | GText _ | GAnnot _ -> None
 
-let scope_of_type = function
+let declaration_of_type = function
   | TVoid _ | TInt _ | TFloat _ | TPtr _
   | TArray _ | TFun _ | TBuiltin_va_list _ -> None
   | TNamed(ti, _) -> Some (SType ti)
   | TComp (ci, _) -> Some (SComp ci)
   | TEnum (ei, _) -> Some (SEnum ei)
 
-let scope_of_localizable = function
+let declaration_of_localizable = function
   | PStmt(kf,_) | PStmtStart(kf,_) -> Some (SFunction kf)
   | PLval(_,_,(Var vi,NoOffset))
   | PTermLval (_, _, _, (TVar { lv_origin = Some vi }, TNoOffset))
@@ -322,19 +322,19 @@ let scope_of_localizable = function
   | PLval(okf,_,_)
   | PExp(okf,_,_)
   | PTermLval(okf,_,_,_)
-  | PVDecl(okf,_,_) -> scope_of_kfopt okf
-  | PGlobal g -> scope_of_global g
-  | PType ty -> scope_of_type ty
+  | PVDecl(okf,_,_) -> declaration_of_kfopt okf
+  | PGlobal g -> declaration_of_global g
+  | PType ty -> declaration_of_type ty
   | PIP _ -> None
 
-let name_of_scope = function
+let name_of_declaration = function
   | SEnum ei -> ei.ename
   | SComp ci -> ci.cname
   | SType ti -> ti.tname
   | SGlobal vi -> vi.vname
   | SFunction kf -> Kernel_function.get_name kf
 
-let loc_of_scope = function
+let loc_of_declaration = function
   | SEnum _ | SComp _ | SType _ -> Location.unknown
   | SGlobal vi -> vi.vdecl
   | SFunction kf -> Kernel_function.get_location kf

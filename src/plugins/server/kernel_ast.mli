@@ -56,7 +56,7 @@ sig
 
 end
 
-module Scope : (Tag with type t = Printer_tag.scope)
+module Decl : (Tag with type t = Printer_tag.declaration)
 module Marker : (Tag with type t = Printer_tag.localizable)
 
 (* -------------------------------------------------------------------------- *)
