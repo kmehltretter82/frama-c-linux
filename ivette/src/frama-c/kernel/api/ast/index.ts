@@ -269,6 +269,8 @@ export interface markerAttributesData {
   name: string;
   /** Marker description */
   descr: string;
+  /** Associated declaration */
+  decl?: decl;
   /** Whether it is an l-value */
   isLval: boolean;
   /** Whether it is a function symbol */
@@ -291,6 +293,7 @@ export const jMarkerAttributesData: Json.Decoder<markerAttributesData> =
     titleKind: Json.jString,
     name: Json.jString,
     descr: Json.jString,
+    decl: Json.jOption(jDecl),
     isLval: Json.jBoolean,
     isFunction: Json.jBoolean,
     isFunctionPointer: Json.jBoolean,
@@ -303,7 +306,7 @@ export const jMarkerAttributesData: Json.Decoder<markerAttributesData> =
 export const byMarkerAttributesData: Compare.Order<markerAttributesData> =
   Compare.byFields
     <{ marker: marker, labelKind: string, titleKind: string, name: string,
-       descr: string, isLval: boolean, isFunction: boolean,
+       descr: string, decl?: decl, isLval: boolean, isFunction: boolean,
        isFunctionPointer: boolean, isFunDecl: boolean, scope?: string,
        sloc?: source }>({
     marker: byMarker,
@@ -311,6 +314,7 @@ export const byMarkerAttributesData: Compare.Order<markerAttributesData> =
     titleKind: Compare.alpha,
     name: Compare.alpha,
     descr: Compare.string,
+    decl: Compare.defined(byDecl),
     isLval: Compare.boolean,
     isFunction: Compare.boolean,
     isFunctionPointer: Compare.boolean,
@@ -371,8 +375,9 @@ export const markerAttributes: State.Array<marker,markerAttributesData> = marker
 /** Default value for `markerAttributesData` */
 export const markerAttributesDataDefault: markerAttributesData =
   { marker: markerDefault, labelKind: '', titleKind: '', name: '', descr: '',
-    isLval: false, isFunction: false, isFunctionPointer: false,
-    isFunDecl: false, scope: undefined, sloc: undefined };
+    decl: undefined, isLval: false, isFunction: false,
+    isFunctionPointer: false, isFunDecl: false, scope: undefined,
+    sloc: undefined };
 
 const getMainFunction_internal: Server.GetRequest<null,fct | undefined> = {
   kind: Server.RqKind.GET,

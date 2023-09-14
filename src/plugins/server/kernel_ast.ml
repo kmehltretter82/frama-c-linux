@@ -365,9 +365,23 @@ end
 
 module DeclAttributes =
 struct
-  module P = Printer_tag
+  open Printer_tag
 
   let model = States.model ()
+
+  let iter_declaration f =
+    let marked = Declaration.Hashtbl.create 0 in
+    Cil.iterGlobals
+      (Ast.get())
+      (fun g ->
+         match declaration_of_global g with
+         | None -> ()
+         | Some d ->
+           if not @@ Declaration.Hashtbl.mem marked d then
+             begin
+               Declaration.Hashtbl.add marked d () ;
+               f (d,Decl.index d)
+             end)
 
   let () =
     States.column
@@ -382,7 +396,7 @@ struct
       ~name:"name"
       ~descr:(Md.plain "Declaration identifier")
       ~data:(module Jstring)
-      ~get:(fun (decl,_) -> P.name_of_declaration decl)
+      ~get:(fun (decl,_) -> name_of_declaration decl)
       model
 
   let () =
@@ -390,7 +404,7 @@ struct
       ~name:"label"
       ~descr:(Md.plain "Declaration label (uncapitalized kind & name)")
       ~data:(module Jstring)
-      ~get:(fun (decl,_) -> Pretty_utils.to_string P.pp_declaration decl)
+      ~get:(fun (decl,_) -> Pretty_utils.to_string pp_declaration decl)
       model
 
   let () =
@@ -398,7 +412,7 @@ struct
       ~name:"source"
       ~descr:(Md.plain "Source location")
       ~data:(module Position)
-      ~get:(fun (decl,_) -> fst @@ P.loc_of_declaration decl)
+      ~get:(fun (decl,_) -> fst @@ loc_of_declaration decl)
       model
 
   let array = States.register_array
@@ -408,7 +422,7 @@ struct
       ~key:snd
       ~keyName:"marker"
       ~keyType:Decl.jtype
-      ~iter:Decl.iter
+      ~iter:iter_declaration
       ~add_reload_hook:ast_update_hook
       model
 
@@ -499,6 +513,14 @@ struct
       ~descr:(Md.plain "Marker description")
       ~data:(module Jstring)
       ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pp_localizable tag)
+      model
+
+  let () =
+    States.option
+      ~name:"decl"
+      ~descr:(Md.plain "Associated declaration")
+      ~data:(module Decl)
+      ~get:(fun (tag, _) -> Printer_tag.declaration_of_localizable tag)
       model
 
   let () =
