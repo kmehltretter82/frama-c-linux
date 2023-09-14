@@ -24,6 +24,7 @@
 Plugin WP <next-release>
 ###############################################################################
 
+- Gui         [2023-09-14] Basic WP goals component for Ivette
 - WP          [2023-07-24] New option -wp-memlimit for provers
 - WP          [2023-07-24] Fixed cache for interactive provers
 - WP          [2023-06-05] Tactic Compute (new, generalize Definition and Split)
@@ -37,10 +38,6 @@ Plugin WP <next-release>
 - WP          [2023-06-05] New option -wp-strategy s,... for default strategies
 - WP          [2023-06-05] ACSL extension 'strategy' for proof strategies
 - WP          [2023-06-05] ACSL extension 'proof' for proof resolution hints
-
-###############################################################################
-Plugin WP 27.1 (Cobalt)
-###############################################################################
 
 ###############################################################################
 Plugin WP 27.1 (Cobalt)
