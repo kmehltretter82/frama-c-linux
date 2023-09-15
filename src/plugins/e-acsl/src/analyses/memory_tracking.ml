@@ -39,6 +39,9 @@ let must_never_monitor vi =
   ||
   (* incomplete types cannot be properly monitored. See BTS #2406. *)
   not (Cil.isCompleteType vi.vtype)
+  ||
+  (* function pointers are not yet supported. *)
+  Cil.isFunctionType vi.vtype
 
 (* ********************************************************************** *)
 (* Backward dataflow analysis to compute a sound over-approximation of what

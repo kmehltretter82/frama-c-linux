@@ -485,12 +485,6 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_join),1UL);
-    __e_acsl_full_init((void *)(& __gen_e_acsl_pthread_join));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_create),1UL);
-    __e_acsl_full_init((void *)(& __gen_e_acsl_pthread_create));
-    __e_acsl_store_block((void *)(& thread_start),1UL);
-    __e_acsl_full_init((void *)(& thread_start));
     __e_acsl_store_block((void *)(& __fc_p_tmpnam),8UL);
     __e_acsl_full_init((void *)(& __fc_p_tmpnam));
     __e_acsl_store_block((void *)(__fc_tmpnam),20UL);
@@ -521,10 +515,6 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& __fc_p_sigaction));
     __e_acsl_store_block((void *)(sigaction),2080UL);
     __e_acsl_full_init((void *)(& sigaction));
-    __e_acsl_store_block((void *)(& pthread_join),1UL);
-    __e_acsl_full_init((void *)(& pthread_join));
-    __e_acsl_store_block((void *)(& pthread_create),1UL);
-    __e_acsl_full_init((void *)(& pthread_create));
     __e_acsl_store_block((void *)(& errno),4UL);
     __e_acsl_full_init((void *)(& errno));
   }
@@ -533,9 +523,6 @@ void __e_acsl_globals_init(void)
 
 void __e_acsl_globals_clean(void)
 {
-  __e_acsl_delete_block((void *)(& __gen_e_acsl_pthread_join));
-  __e_acsl_delete_block((void *)(& __gen_e_acsl_pthread_create));
-  __e_acsl_delete_block((void *)(& thread_start));
   __e_acsl_delete_block((void *)(& __fc_p_tmpnam));
   __e_acsl_delete_block((void *)(__fc_tmpnam));
   __e_acsl_delete_block((void *)(& __fc_p_fopen));
@@ -551,8 +538,6 @@ void __e_acsl_globals_clean(void)
   __e_acsl_delete_block((void *)(& __fc_time));
   __e_acsl_delete_block((void *)(& __fc_p_sigaction));
   __e_acsl_delete_block((void *)(sigaction));
-  __e_acsl_delete_block((void *)(& pthread_join));
-  __e_acsl_delete_block((void *)(& pthread_create));
   __e_acsl_delete_block((void *)(& errno));
   return;
 }
