@@ -370,18 +370,19 @@ struct
   let model = States.model ()
 
   let iter_declaration f =
-    let marked = Declaration.Hashtbl.create 0 in
-    Cil.iterGlobals
-      (Ast.get())
-      (fun g ->
-         match declaration_of_global g with
-         | None -> ()
-         | Some d ->
-           if not @@ Declaration.Hashtbl.mem marked d then
-             begin
-               Declaration.Hashtbl.add marked d () ;
-               f (d,Decl.index d)
-             end)
+    if Ast.is_computed () then
+      let marked = Declaration.Hashtbl.create 0 in
+      Cil.iterGlobals
+        (Ast.get())
+        (fun g ->
+           match declaration_of_global g with
+           | None -> ()
+           | Some d ->
+             if not @@ Declaration.Hashtbl.mem marked d then
+               begin
+                 Declaration.Hashtbl.add marked d () ;
+                 f (d,Decl.index d)
+               end)
 
   let () =
     States.column
