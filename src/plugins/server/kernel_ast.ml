@@ -420,7 +420,7 @@ struct
       ~name:"declAttributes"
       ~descr:(Md.plain "Declaration attributes")
       ~key:snd
-      ~keyName:"marker"
+      ~keyName:"decl"
       ~keyType:Decl.jtype
       ~iter:iter_declaration
       ~add_reload_hook:ast_update_hook

@@ -170,7 +170,7 @@ export const declKindDefault: declKind = Json.jKey<'#ENUM'>('#ENUM')('');
 /** Data for array rows [`declAttributes`](#declattributes)  */
 export interface declAttributesData {
   /** Entry identifier. */
-  marker: decl;
+  decl: decl;
   /** Declaration kind */
   kind: declKind;
   /** Declaration identifier */
@@ -184,7 +184,7 @@ export interface declAttributesData {
 /** Decoder for `declAttributesData` */
 export const jDeclAttributesData: Json.Decoder<declAttributesData> =
   Json.jObject({
-    marker: jDecl,
+    decl: jDecl,
     kind: jDeclKind,
     name: Json.jString,
     label: Json.jString,
@@ -194,9 +194,9 @@ export const jDeclAttributesData: Json.Decoder<declAttributesData> =
 /** Natural order for `declAttributesData` */
 export const byDeclAttributesData: Compare.Order<declAttributesData> =
   Compare.byFields
-    <{ marker: decl, kind: declKind, name: string, label: string,
+    <{ decl: decl, kind: declKind, name: string, label: string,
        source: source }>({
-    marker: byDecl,
+    decl: byDecl,
     kind: byDeclKind,
     name: Compare.string,
     label: Compare.string,
@@ -243,7 +243,7 @@ export const fetchDeclAttributes: Server.GetRequest<
 
 const declAttributes_internal: State.Array<decl,declAttributesData> = {
   name: 'kernel.ast.declAttributes',
-  getkey: ((d:declAttributesData) => d.marker),
+  getkey: ((d:declAttributesData) => d.decl),
   signal: signalDeclAttributes,
   fetch: fetchDeclAttributes,
   reload: reloadDeclAttributes,
@@ -254,7 +254,7 @@ export const declAttributes: State.Array<decl,declAttributesData> = declAttribut
 
 /** Default value for `declAttributesData` */
 export const declAttributesDataDefault: declAttributesData =
-  { marker: declDefault, kind: declKindDefault, name: '', label: '',
+  { decl: declDefault, kind: declKindDefault, name: '', label: '',
     source: sourceDefault };
 
 const printDeclaration_internal: Server.GetRequest<decl,text> = {
