@@ -7,6 +7,7 @@ let
     combinetura = oself.callPackage ./combinetura.nix {};
     headache = oself.callPackage ./headache.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
+    ocamlgraph = oself.callPackage ./ocamlgraph.nix {};
     why3 = oself.callPackage ./why3.nix {};
     ppx_deriving_yaml = oself.callPackage ./ppx_deriving_yaml.nix {};
 

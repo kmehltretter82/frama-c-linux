@@ -128,6 +128,7 @@ depends: [
   "menhir" { >= "20181006" & build }
   "ocaml" { >= "4.13.1" }
   "ocamlgraph" { >= "1.8.8" }
+  "ocamlgraph" { with-test & >= "2.1.0" }
   "odoc" { with-doc }
   "unionFind" { >= "20220107" }
   "why3" { >= "1.6.0" }
