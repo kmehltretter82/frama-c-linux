@@ -397,7 +397,7 @@ struct
 
   let frama_c_default kf =
     (* TODO: use genassigns for Definitions. *)
-    Writes (Infer_annotations.assigns_from_prototype kf)
+    Writes (Infer_assigns.from_prototype kf)
 
   let compare_deps d1 d2 =
     match d1, d2 with

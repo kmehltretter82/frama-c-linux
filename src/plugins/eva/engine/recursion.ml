@@ -79,7 +79,7 @@ let _spec_for_recursive_call kf =
   match Cil.find_default_behavior initial_spec with
   | Some bhv when bhv.b_assigns <> WritesAny -> initial_spec
   | _ ->
-    let assigns = Infer_annotations.assigns_from_prototype kf in
+    let assigns = Infer_assigns.from_prototype kf in
     let bhv = Cil.mk_behavior ~assigns:(Writes assigns) () in
     let spec = { (Cil.empty_funspec ()) with spec_behavior = [bhv] } in
     Self.error ~once:true

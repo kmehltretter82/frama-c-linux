@@ -7,7 +7,7 @@ let gen_exits _ _ =
 let gen_assigns kf _ =
   if Kernel_function.has_definition kf then
     WritesAny
-  else Writes (Infer_annotations.assigns_from_prototype kf)
+  else Writes (Infer_assigns.from_prototype kf)
 
 let gen_requires _ _ = [ Logic_const.(new_predicate pfalse) ]
 

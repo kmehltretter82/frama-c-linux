@@ -24,7 +24,7 @@ open Cil
 open Cil_types
 open Logic_const
 
-let assigns_from_prototype kf =
+let from_prototype kf =
   let vi = Kernel_function.get_vi kf in
   let formals =
     try
