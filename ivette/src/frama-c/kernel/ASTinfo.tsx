@@ -124,12 +124,12 @@ function MarkButton(props: MarkButtonProps): JSX.Element {
 // --------------------------------------------------------------------------
 
 interface InfoSectionProps {
-  fct: string | undefined;
   scroll: React.RefObject<HTMLDivElement> | undefined;
-  marker: AST.marker;
-  scrolled: AST.marker | undefined;
-  selected: AST.marker | undefined;
-  hovered: AST.marker | undefined;
+  current: AST.decl | undefined; // current selection
+  marker: AST.marker; // of the info-section
+  scrolled: AST.marker | undefined; // among info-sections
+  selected: AST.marker | undefined; // in current selection
+  hovered: AST.marker | undefined;  // in current selection
   marked: boolean;
   excluded: string[];
   setPinned: (m: AST.marker) => void;
@@ -137,10 +137,10 @@ interface InfoSectionProps {
 }
 
 function MarkInfos(props: InfoSectionProps): JSX.Element {
-  const { marker, fct, scrolled, selected, hovered, excluded } = props;
-  const attrs = States.useMarker(marker);
-  const scope = attrs.scope ?? fct;
-  const foreign = !!scope && fct !== scope;
+  const { current, marker, scrolled, selected, hovered, excluded } = props;
+  const { decl, labelKind, titleKind, name, descr } = States.useMarker(marker);
+  const { label } = States.useDeclaration(decl);
+  const foreign = !!current && !!decl && current !== decl;
   const [unfold, setUnfold] = React.useState(true);
   const [expand, setExpand] = React.useState(false);
   const req = React.useMemo(() =>
@@ -153,7 +153,6 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
     isSelected && 'selected',
     isHovered && 'hovered',
   );
-  const { labelKind, titleKind, name, descr } = attrs;
   const filtered = markerFields.filter((fd) => !excluded.includes(fd.id));
   const hasMore = filtered.length < markerFields.length;
   const displayed = expand ? markerFields : filtered;
@@ -161,34 +160,30 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
     evt.stopPropagation();
     setUnfold(!unfold);
   };
-  const onChildSelected = (m: AST.marker, meta: Modifier): void => {
+  const onChildSelected = (m: AST.marker, modifier: Modifier): void => {
     props.setPinned(marker);
-    switch (meta) {
+    switch (modifier) {
       case 'NORMAL':
-        States.setSelection({ fct, marker: m });
+        States.gotoLocalMarker(m);
         break;
       case 'META':
-        States.setSelection({ fct, marker: m }, m !== marker);
+        States.gotoLocalMarker(m, m !== marker);
         break;
       case 'DOUBLE':
-        States.setSelection({ fct: scope, marker: m });
+        States.gotoGlobalMarker(m);
         break;
     }
   };
   const onChildHovered = (m: AST.marker | undefined): void => {
-    if (m) {
-      States.setHovered({ fct, marker: m });
-    } else {
-      States.setHovered({ fct, marker });
-    }
+    States.setHovered(m || marker);
   };
   return (
     <div
       ref={isScrolled ? props.scroll : undefined}
       className={`astinfo-section ${highlight}`}
-      onMouseEnter={() => States.setHovered({ fct, marker })}
+      onMouseEnter={() => States.setHovered(marker)}
       onMouseLeave={() => States.setHovered(undefined)}
-      onClick={() => onChildSelected(marker, foreign ? 'DOUBLE' : 'NORMAL')}
+      onClick={() => onChildSelected(marker, 'NORMAL')}
       onDoubleClick={() => onChildSelected(marker, 'DOUBLE')}
     >
       <div
@@ -210,9 +205,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
             {labelKind}
           </span> {name}
         </Code>
-        <Code key="SCOPE" className="" display={foreign}>
-          [in: {scope}]
-        </Code>
+        <Code key="SCOPE" className="" display={foreign}>[in {label}]</Code>
         <MarkButton
           key="MORE"
           icon="CIRC.PLUS"
@@ -280,8 +273,8 @@ export default function ASTinfo(): JSX.Element {
   // Selection Hooks
   const [markers, setMarkers] = React.useState<AST.marker[]>([]);
   const [setting, setSetting] = Dome.useStringSettings(filterSettings, '');
-  const [selection] = States.useSelection();
-  const [hovering] = States.useHovered();
+  const { decl: current, marker: selected } = States.useCurrent();
+  const hovered = States.useHovered();
   const allFields = States.useRequest(AST.getInformation, null) ?? [];
   const excluded = React.useMemo(() => makeFilter(setting), [setting]);
   Dome.useEvent(States.MetaSelection, (loc: States.Location) => {
@@ -295,9 +288,6 @@ export default function ASTinfo(): JSX.Element {
     scrollDiv?.scrollIntoView({ block: 'nearest' });
   }, [scrollDiv]);
   // Derived
-  const fct = selection?.current?.fct;
-  const selected = selection?.current?.marker;
-  const hovered = hovering?.marker;
   const allMarkers = addMarker(addMarker(markers, selected), hovered);
   const scrolled = inside ? selected : (hovered || selected);
   // Callbacks
@@ -312,7 +302,7 @@ export default function ASTinfo(): JSX.Element {
     return (
       <MarkInfos
         key={marker}
-        fct={fct}
+        current={current}
         scroll={scroll}
         marker={marker}
         scrolled={scrolled}

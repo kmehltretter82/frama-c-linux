@@ -20,7 +20,7 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import _ from 'lodash';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
@@ -36,7 +36,7 @@ import 'cytoscape-panzoom/cytoscape.js-panzoom.css';
 import style from './graph-style.json';
 
 import { useGlobalState } from 'dome/data/states';
-import { useRequest, useSelection, useSyncValue } from 'frama-c/states';
+import * as States from 'frama-c/states';
 
 import gearsIcon from 'frama-c/plugins/eva/images/gears.svg';
 import { CallstackState } from 'frama-c/plugins/eva/valuetable';
@@ -123,13 +123,14 @@ function selectCallstack(cy: Cy.Core, callstack: callstack | undefined): void {
 }
 
 function Callgraph() : JSX.Element {
-  const isComputed = useSyncValue(CgAPI.isComputed);
-  const graph = useSyncValue(CgAPI.callgraph);
-  const [cy, setCy] = useState<Cy.Core>();
+  const isComputed = States.useSyncValue(CgAPI.isComputed);
+  const graph = States.useSyncValue(CgAPI.callgraph);
+  const [cy, setCy] = React.useState<Cy.Core>();
   const [cs] = useGlobalState(CallstackState);
-  const [selection, setSelection] = useSelection();
-  const callstack = useRequest(ValuesAPI.getCallstackInfo, cs);
-
+  const callstack = States.useRequest(ValuesAPI.getCallstackInfo, cs);
+  const { decl } = States.useCurrent();
+  const { kind, name } = States.useDeclaration(decl);
+  const fct = kind === 'FUNCTION' ? name : undefined;
   const layout = { name: 'cola', nodeSpacing: 32 };
   const computedStyle = getComputedStyle(document.documentElement);
   const styleVariables =
@@ -144,26 +145,23 @@ function Callgraph() : JSX.Element {
   ];
 
   // Marker selection
-  useEffect(() => {
-    cy && selectFct(cy, selection.current?.fct);
-  }, [cy, selection]);
+  React.useEffect(() => { cy && selectFct(cy, fct); }, [cy, fct]);
 
   // Callstack selection
-  useEffect(() => {
+  React.useEffect(() => {
     cy && selectCallstack(cy, callstack);
   }, [cy, callstack]);
 
   // Click on graph
-  useEffect(() => {
+  React.useEffect(() => {
     if (cy) {
       cy.off('click');
       cy.on('click', 'node', (event) => {
-        const fct = event.target.id() as string;
-        setSelection({ location: { fct } });
+        const { decl } = event.target.data;
+        States.setCurrent({ decl });
       });
     }
-  }, [cy, setSelection]);
-
+  }, [cy]);
 
   if (isComputed === false) {
     Server.send(CgAPI.compute, null);

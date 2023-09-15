@@ -675,6 +675,11 @@ struct
     begin
       let model = States.model () in
       States.column model
+        ~name:"decl"
+        ~descr:(Md.plain "Declaration Tag")
+        ~data:(module Decl)
+        ~get:(fun kf -> Printer_tag.SFunction kf) ;
+      States.column model
         ~name:"name"
         ~descr:(Md.plain "Name")
         ~data:(module Data.Jalpha)
@@ -944,14 +949,12 @@ let () = Server_parameters.Debug.add_hook_on_update
 (* --- Marker at a position                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let get_kf_marker (file, line, col) =
+let get_marker_at ~file ~line ~col =
   let pos_path = Filepath.Normalized.of_string file in
   let pos =
     Filepath.{ pos_path; pos_lnum = line; pos_cnum = col; pos_bol = 0; }
   in
-  let tag = Printer_tag.loc_to_localizable ~precise_col:true pos in
-  let kf = Option.bind tag Printer_tag.kf_of_localizable in
-  kf, tag
+  Printer_tag.loc_to_localizable ~precise_col:true pos
 
 let () =
   let descr =
@@ -959,11 +962,19 @@ let () =
       "Returns the marker and function at a source file position, if any. \
        Input: file path, line and column."
   in
-  Request.register
+  let signature = Request.signature
+      ~output:(module Joption(Marker)) () in
+  let get_file = Request.param signature
+      ~name:"file" ~descr:(Md.plain "File path") (module Jstring) in
+  let get_line = Request.param signature
+      ~name:"line" ~descr:(Md.plain "Line number") (module Jint) in
+  let get_col = Request.param signature
+      ~name:"column" ~descr:(Md.plain "Column number") (module Jint) in
+  Request.register_sig signature
     ~package ~descr ~kind:`GET ~name:"getMarkerAt"
-    ~input:(module Jtriple (Jstring) (Jint) (Jint))
-    ~output:(module Jpair (Joption (Function)) (Joption (Marker)))
-    get_kf_marker
+    ~signals:[ast_changed_signal]
+    (fun rq () ->
+       get_marker_at ~file:(get_file rq) ~line:(get_line rq) ~col:(get_col rq))
 
 (* -------------------------------------------------------------------------- *)
 (* --- Files                                                              --- *)

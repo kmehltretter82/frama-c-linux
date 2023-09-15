@@ -38,11 +38,19 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
+import { byDecl } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { byFct } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { decl } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { declDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { fct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { fctDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { jDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jFct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -57,6 +65,8 @@ import { tagDefault } from 'frama-c/kernel/api/data';
 export interface vertex {
   /** The function represented by the node */
   kf: fct;
+  /** The declaration tag of the function */
+  decl: decl;
   /** whether this node is the root of a service */
   is_root: boolean;
   /** the root of this node's service */
@@ -65,20 +75,21 @@ export interface vertex {
 
 /** Decoder for `vertex` */
 export const jVertex: Json.Decoder<vertex> =
-  Json.jObject({ kf: jFct, is_root: Json.jBoolean, root: jFct,});
+  Json.jObject({ kf: jFct, decl: jDecl, is_root: Json.jBoolean, root: jFct,});
 
 /** Natural order for `vertex` */
 export const byVertex: Compare.Order<vertex> =
   Compare.byFields
-    <{ kf: fct, is_root: boolean, root: fct }>({
+    <{ kf: fct, decl: decl, is_root: boolean, root: fct }>({
     kf: byFct,
+    decl: byDecl,
     is_root: Compare.boolean,
     root: byFct,
   });
 
 /** Default value for `vertex` */
 export const vertexDefault: vertex =
-  { kf: fctDefault, is_root: false, root: fctDefault };
+  { kf: fctDefault, decl: declDefault, is_root: false, root: fctDefault };
 
 /** Whether the call goes through services or not */
 export enum edgeKind {

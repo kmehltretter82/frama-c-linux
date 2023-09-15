@@ -38,17 +38,17 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byFct } from 'frama-c/kernel/api/ast';
+import { byDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { bySource } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fct } from 'frama-c/kernel/api/ast';
+import { decl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fctDefault } from 'frama-c/kernel/api/ast';
+import { declDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jFct } from 'frama-c/kernel/api/ast';
+import { jDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -161,8 +161,8 @@ export interface messageData {
   source?: source;
   /** Marker at the message position (if any) */
   marker?: marker;
-  /** Function containing the message position (if any) */
-  fct?: fct;
+  /** Declaration containing the message position (if any) */
+  decl?: decl;
 }
 
 /** Decoder for `messageData` */
@@ -175,7 +175,7 @@ export const jMessageData: Json.Decoder<messageData> =
     category: Json.jOption(Json.jString),
     source: Json.jOption(jSource),
     marker: Json.jOption(jMarker),
-    fct: Json.jOption(jFct),
+    decl: Json.jOption(jDecl),
   });
 
 /** Natural order for `messageData` */
@@ -183,7 +183,7 @@ export const byMessageData: Compare.Order<messageData> =
   Compare.byFields
     <{ key: Json.key<'#message'>, kind: logkind, plugin: string,
        message: string, category?: string, source?: source, marker?: marker,
-       fct?: fct }>({
+       decl?: decl }>({
     key: Compare.string,
     kind: byLogkind,
     plugin: Compare.alpha,
@@ -191,7 +191,7 @@ export const byMessageData: Compare.Order<messageData> =
     category: Compare.defined(Compare.string),
     source: Compare.defined(bySource),
     marker: Compare.defined(byMarker),
-    fct: Compare.defined(byFct),
+    decl: Compare.defined(byDecl),
   });
 
 /** Signal for array [`message`](#message)  */
@@ -247,7 +247,7 @@ export const message: State.Array<Json.key<'#message'>,messageData> = message_in
 export const messageDataDefault: messageData =
   { key: Json.jKey<'#message'>('#message')(''), kind: logkindDefault,
     plugin: '', message: '', category: undefined, source: undefined,
-    marker: undefined, fct: undefined };
+    marker: undefined, decl: undefined };
 
 /** Message event record. */
 export interface log {

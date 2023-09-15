@@ -38,7 +38,6 @@ import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from './server';
-import * as Status from 'frama-c/kernel/Status';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -519,303 +518,134 @@ export function onSyncArray<K, A>(
 // --- Selection
 // --------------------------------------------------------------------------
 
-/** An AST location.
- *
- *  Properties [[function]] and [[marker]] are optional,
- *  but at least one of the two must be set.
- */
-export type Location = {
-  fct?: string;
+/**
+   A global Ivette selection.
+
+   There is no expected relation between the current marker and declaration:
+
+   - current marker is used to synchronize selection in components;
+   - current declaration is used to synchronize filtering in components;
+   - some components might display markers from different declarations.
+
+*/
+export interface Location {
+  decl?: Ast.decl;
   marker?: Ast.marker;
-};
-
-export interface HistorySelection {
-  /** Previous locations with respect to the [[current]] one. */
-  prevSelections: Location[];
-  /** Next locations with respect to the [[current]] one. */
-  nextSelections: Location[];
 }
 
-/** Actions on history selections:
- * - `HISTORY_PREV` jumps to previous history location
- *   (first in [[prevSelections]]).
- * - `HISTORY_NEXT` jumps to next history location
- *   (first in [[nextSelections]]).
- */
-export type HistorySelectActions = 'HISTORY_PREV' | 'HISTORY_NEXT';
-
-/** A selection of multiple locations. */
-export interface MultipleSelection {
-  /** Name of the multiple selection.  */
-  name: string;
-  /** Explanatory description of the multiple selection.  */
-  title: string;
-  /** The index of the current selected location in [[allSelections]]. */
-  index: number;
-  /** All locations forming a multiple selection. */
-  allSelections: Location[];
-}
-
-/** A select action on multiple locations. */
-export interface MultipleSelect {
-  readonly name: string;
-  readonly title: string;
-  readonly index: number;
-  readonly locations: Location[];
-}
-
-/** Select the [[index]]-nth location of the current multiple selection. */
-export interface NthSelect {
-  readonly index: number;
-}
-
-/** Actions on multiple selections:
- * - [[MultipleSelect]].
- * - [[NthSelect]].
- * - `MULTIPLE_PREV` jumps to previous location of the multiple selections.
- * - `MULTIPLE_NEXT` jumps to next location of the multiple selections.
- * - `MULTIPLE_CYCLE` cycles between the multiple selections.
- * - `MULTIPLE_CLEAR` clears the multiple selection.
- */
-export type MultipleSelectActions =
-  MultipleSelect | NthSelect
-  | 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CYCLE' | 'MULTIPLE_CLEAR';
-
+/** Global current selection & history. */
 export interface Selection {
-  /** Current selection. May be one in [[history]] or [[multiple]]. */
-  current?: Location;
-  /** History of selections. */
-  history: HistorySelection;
-  /** Multiple selections at once. */
-  multiple: MultipleSelection;
+  curr: Location; // might be empty
+  prev: Location[]; // last first, no empty locs
+  next: Location[]; // next first, no empty locs
 }
 
-/** A select action on a location. */
-export interface SingleSelect {
-  readonly location: Location;
-}
+const emptySelection: Selection = { curr: {}, prev: [], next: [] };
+const isEmpty = (l: Location): boolean => (!l.decl && !l.marker);
+const pushLoc = (l: Location, ls: Location[]): Location[] =>
+  (isEmpty(l) ? ls : [l, ...ls]);
 
-/** Actions on selection:
- * - [[SingleSelect]].
- * - [[HistorySelectActions]].
- * - [[MultipleSelectActions]].
- */
-export type SelectionActions =
-  SingleSelect | HistorySelectActions | MultipleSelectActions;
-
-function isSingleSelect(a: SelectionActions): a is SingleSelect {
-  return (a as SingleSelect).location !== undefined;
-}
-
-function isMultipleSelect(a: SelectionActions): a is MultipleSelect {
-  return (
-    (a as MultipleSelect).locations !== undefined &&
-    (a as MultipleSelect).index !== undefined
-  );
-}
-
-function isNthSelect(a: SelectionActions): a is NthSelect {
-  return (a as NthSelect).index !== undefined;
-}
-
-/** Update selection to the given location. */
-function selectLocation(s: Selection, location: Location): Selection {
-  const [prevSelections, nextSelections] =
-    s.current && s.current.fct !== location.fct ?
-      [[s.current, ...s.history.prevSelections], []] :
-      [s.history.prevSelections, s.history.nextSelections];
-  return {
-    ...s,
-    current: location,
-    history: { prevSelections, nextSelections },
-  };
-}
-
-/** Compute the next selection picking from the current history, depending on
- *  action.
- */
-function fromHistory(s: Selection, action: HistorySelectActions): Selection {
-  switch (action) {
-    case 'HISTORY_PREV': {
-      const [pS, ...prevS] = s.history.prevSelections;
-      return {
-        ...s,
-        current: pS,
-        history: {
-          prevSelections: prevS,
-          nextSelections:
-            [(s.current as Location), ...s.history.nextSelections],
-        },
-      };
-    }
-    case 'HISTORY_NEXT': {
-      const [nS, ...nextS] = s.history.nextSelections;
-      return {
-        ...s,
-        current: nS,
-        history: {
-          prevSelections:
-            [(s.current as Location), ...s.history.prevSelections],
-          nextSelections: nextS,
-        },
-      };
-    }
-    default:
-      return s;
-  }
-}
-
-/** Compute the next selection picking from the current multiple, depending on
- *  action.
- */
-function fromMultipleSelections(
-  s: Selection,
-  a: 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CYCLE' | 'MULTIPLE_CLEAR',
-): Selection {
-  switch (a) {
-    case 'MULTIPLE_PREV':
-    case 'MULTIPLE_NEXT':
-    case 'MULTIPLE_CYCLE': {
-      const idx =
-        a === 'MULTIPLE_PREV' ?
-          s.multiple.index - 1 :
-          s.multiple.index + 1;
-      const index =
-        a === 'MULTIPLE_CYCLE' && idx >= s.multiple.allSelections.length ?
-          0 :
-          idx;
-      if (0 <= index && index < s.multiple.allSelections.length) {
-        const multiple = { ...s.multiple, index };
-        return selectLocation(
-          { ...s, multiple },
-          s.multiple.allSelections[index],
-        );
-      }
-      return s;
-    }
-    case 'MULTIPLE_CLEAR':
-      return {
-        ...s,
-        multiple: {
-          name: '',
-          title: '',
-          index: 0,
-          allSelections: [],
-        },
-      };
-    default:
-      return s;
-  }
-}
-
-/** Compute the next selection based on the current one and the given action. */
-function reducer(s: Selection, action: SelectionActions): Selection {
-  if (isSingleSelect(action)) {
-    return selectLocation(s, action.location);
-  }
-  if (isMultipleSelect(action)) {
-    const index = action.index > 0 ? action.index : 0;
-    const selection =
-      action.locations.length === 0 ? s :
-        selectLocation(s, action.locations[index]);
-    return {
-      ...selection,
-      multiple: {
-        name: action.name,
-        title: action.title,
-        allSelections: action.locations,
-        index,
-      },
-    };
-  }
-  if (isNthSelect(action)) {
-    const { index } = action;
-    if (0 <= index && index < s.multiple.allSelections.length) {
-      const location = s?.multiple.allSelections[index];
-      const selection = selectLocation(s, location);
-      const multiple = { ...selection.multiple, index };
-      return { ...selection, multiple };
-    }
-    return s;
-  }
-  switch (action) {
-    case 'HISTORY_PREV':
-    case 'HISTORY_NEXT':
-      return fromHistory(s, action);
-    case 'MULTIPLE_PREV':
-    case 'MULTIPLE_NEXT':
-    case 'MULTIPLE_CYCLE':
-    case 'MULTIPLE_CLEAR':
-      return fromMultipleSelections(s, action);
-    default:
-      return s;
-  }
-}
-
-/** The initial selection is empty. */
-const emptySelection = {
-  current: undefined,
-  history: {
-    prevSelections: [],
-    nextSelections: [],
-  },
-  multiple: {
-    name: '',
-    title: '',
-    index: 0,
-    allSelections: [],
-  },
-};
-
-export type Hovered = Location | undefined;
+export type Hovered = Ast.marker | undefined
 export const MetaSelection = new Dome.Event<Location>('frama-c-meta-selection');
 export const GlobalHovered = new GlobalState<Hovered>(undefined);
 export const GlobalSelection = new GlobalState<Selection>(emptySelection);
 
 Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
 
-export function setHovered(h: Hovered): void { GlobalHovered.setValue(h); }
-export function useHovered(): [Hovered, (h: Hovered) => void] {
-  return useGlobalState(GlobalHovered);
+export function setHovered(h: Hovered = undefined): void {
+  GlobalHovered.setValue(h);
 }
 
-export function setSelection(location: Location, meta = false): void {
-  const s = GlobalSelection.getValue();
-  GlobalSelection.setValue(reducer(s, { location }));
-  if (meta) MetaSelection.emit(location);
+export function useHovered(): Hovered {
+  const [h] = useGlobalState(GlobalHovered);
+  return h;
 }
 
-/** Current selection. */
-export function useSelection(): [Selection, (a: SelectionActions) => void] {
-  const [current, setCurrent] = useGlobalState(GlobalSelection);
-  const callback = React.useCallback((action) => {
-    setCurrent(reducer(current, action));
-    if (isMultipleSelect(action)) {
-      const l = action.locations.length;
-      const markers =
-        (l > 1) ? `${l} markers selected, listed in the 'Locations' panel` :
-          (l === 1) ? `1 marker selected` : `no markers selected`;
-      const text = `${action.name}: ${markers}`;
-      Status.setMessage({ text, title: action.title, kind: 'success' });
-    }
-  }, [current, setCurrent]);
-  return [current, callback];
+export function useSelection(): Selection {
+  const [current] = useGlobalState(GlobalSelection);
+  return current;
 }
 
-/** Resets the selected locations. */
-export async function resetSelection(): Promise<void> {
+export function clearSelection(): void {
+  GlobalHovered.setValue(undefined);
   GlobalSelection.setValue(emptySelection);
-  if (Server.isRunning()) {
-    try {
-      const main = await Server.send(Ast.getMainFunction, {});
-      // If the selection has already been modified, do not change it.
-      if (main && GlobalSelection.getValue() === emptySelection) {
-        GlobalSelection.setValue({ ...emptySelection, current: { fct: main } });
-      }
-    } catch (err) {
-      if (err) D.warn('Request error', err);
-    }
+}
+
+export function getCurrent(): Location {
+  return GlobalSelection.getValue().curr;
+}
+
+export function useCurrent(): Location {
+  const [{ curr }] = useGlobalState(GlobalSelection);
+  return curr;
+}
+
+/** Move both current declaration and marker. */
+export function setCurrent(l: Location, meta = false): void {
+  const s = GlobalSelection.getValue();
+  const empty = isEmpty(l);
+  GlobalSelection.setValue({
+    curr: l,
+    next: empty ? s.next : [],
+    prev: pushLoc(s.curr, s.prev)
+  });
+  if (meta && !empty) MetaSelection.emit(l);
+}
+
+/** Move to marker in current declaration. */
+export function gotoLocalMarker(
+  marker : Ast.marker | undefined,
+  meta = false
+): void
+{
+  const s = GlobalSelection.getValue();
+  setCurrent({ decl: s.curr.decl, marker }, meta);
+}
+
+/** Move to marker in its own declaration (if any). */
+export function gotoGlobalMarker(marker : Ast.marker, meta = false): void
+{
+  const st = currentSyncArray(Ast.markerAttributes);
+  const attr = st.model.getData(marker);
+  const decl = attr?.decl;
+  if (decl) setCurrent({ decl, marker }, meta);
+  else gotoLocalMarker(marker, meta);
+}
+
+/** Move to declaration. */
+export function gotoDeclaration(decl: Ast.decl | undefined): void
+{
+  setCurrent({ decl });
+}
+
+/** Move forward in history. */
+export function gotoNext(): void {
+  const s = GlobalSelection.getValue();
+  if (s.next.length > 0) {
+    const [curr, ...next] = s.next;
+    GlobalSelection.setValue({ curr, next, prev: pushLoc(s.curr, s.prev) });
   }
+}
+
+/** Move backward in history. */
+export function gotoPrev(): void {
+  const s = GlobalSelection.getValue();
+  if (s.prev.length > 0) {
+    const [curr, ...prev] = s.prev;
+    GlobalSelection.setValue({ curr, next: pushLoc(s.curr, s.next), prev });
+  }
+}
+
+// --------------------------------------------------------------------------
+// --- Declarations
+// --------------------------------------------------------------------------
+
+export type declaration = Ast.declAttributesData;
+
+/** Access the marker attributes from AST. */
+export function useDeclaration(decl: Ast.decl | undefined): declaration {
+  const data = useSyncArrayElt(Ast.declAttributes, decl);
+  return data ?? Ast.declAttributesDataDefault;
 }
 
 // --------------------------------------------------------------------------
@@ -826,8 +656,8 @@ export type attributes = Ast.markerAttributesData;
 
 /** Access the marker attributes from AST. */
 export function useMarker(marker: Ast.marker | undefined): attributes {
-  const marks = useSyncArrayElt(Ast.markerAttributes, marker);
-  return marks ?? Ast.markerAttributesDataDefault;
+  const data = useSyncArrayElt(Ast.markerAttributes, marker);
+  return data ?? Ast.markerAttributesDataDefault;
 }
 
 // --------------------------------------------------------------------------
@@ -835,8 +665,9 @@ export function useMarker(marker: Ast.marker | undefined): attributes {
 // --------------------------------------------------------------------------
 
 Server.onReady(() => {
-  if (GlobalSelection.getValue() === emptySelection)
-    resetSelection();
+  const s = GlobalSelection.getValue();
+  if (s.curr.decl || s.curr.marker || s.next.length > 0 || s.prev.length > 0)
+    clearSelection();
 });
 
 // --------------------------------------------------------------------------

@@ -62,6 +62,8 @@ struct
 
   let kf = field "kf" (module Kernel_ast.Function)
       ~descr: "The function represented by the node"
+  let decl = field "decl" (module Kernel_ast.Decl)
+      ~descr: "The declaration tag of the function"
   let is_root = field "is_root" Data.jbool
       ~descr: "whether this node is the root of a service"
   let root = field "root" (module Kernel_ast.Function)
@@ -73,6 +75,7 @@ struct
   let to_json (v : Cil_types.kernel_function Service_graph.vertex) =
     default |>
     set kf v.node |>
+    set decl (Printer_tag.SFunction v.node) |>
     set is_root v.is_root |>
     set root v.root.node |>
     to_json

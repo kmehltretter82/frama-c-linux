@@ -38,13 +38,21 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
+import { byDecl } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { byFct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
+import { decl } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { declDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { fct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { fctDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { jDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jFct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -183,6 +191,8 @@ export interface goalsData {
   wpo: goal;
   /** Property Marker */
   property: marker;
+  /** Associated declaration, if any */
+  scope?: decl;
   /** Associated function, if any */
   fct?: fct;
   /** Associated behavior, if any */
@@ -210,6 +220,7 @@ export const jGoalsData: Json.Decoder<goalsData> =
   Json.jObject({
     wpo: jGoal,
     property: jMarker,
+    scope: Json.jOption(jDecl),
     fct: Json.jOption(jFct),
     bhv: Json.jOption(Json.jString),
     thy: Json.jOption(Json.jString),
@@ -225,11 +236,12 @@ export const jGoalsData: Json.Decoder<goalsData> =
 /** Natural order for `goalsData` */
 export const byGoalsData: Compare.Order<goalsData> =
   Compare.byFields
-    <{ wpo: goal, property: marker, fct?: fct, bhv?: string, thy?: string,
-       name: string, smoke: boolean, passed: boolean, status: status,
-       stats: stats, script?: string, saved: boolean }>({
+    <{ wpo: goal, property: marker, scope?: decl, fct?: fct, bhv?: string,
+       thy?: string, name: string, smoke: boolean, passed: boolean,
+       status: status, stats: stats, script?: string, saved: boolean }>({
     wpo: byGoal,
     property: byMarker,
+    scope: Compare.defined(byDecl),
     fct: Compare.defined(byFct),
     bhv: Compare.defined(Compare.string),
     thy: Compare.defined(Compare.string),
@@ -291,10 +303,10 @@ export const goals: State.Array<goal,goalsData> = goals_internal;
 
 /** Default value for `goalsData` */
 export const goalsDataDefault: goalsData =
-  { wpo: goalDefault, property: markerDefault, fct: undefined,
-    bhv: undefined, thy: undefined, name: '', smoke: false, passed: false,
-    status: statusDefault, stats: statsDefault, script: undefined,
-    saved: false };
+  { wpo: goalDefault, property: markerDefault, scope: undefined,
+    fct: undefined, bhv: undefined, thy: undefined, name: '', smoke: false,
+    passed: false, status: statusDefault, stats: statsDefault,
+    script: undefined, saved: false };
 
 /** Proof Server Activity */
 export const serverActivity: Server.Signal = {

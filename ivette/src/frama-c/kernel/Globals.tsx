@@ -34,7 +34,7 @@ import { Button } from 'dome/controls/buttons';
 import * as Toolbars from 'dome/frame/toolbars';
 
 import * as States from 'frama-c/states';
-import * as Kernel from 'frama-c/kernel/api/ast';
+import * as Ast from 'frama-c/kernel/api/ast';
 import { computationState } from 'frama-c/plugins/eva/api/general';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 
@@ -42,21 +42,17 @@ import * as Eva from 'frama-c/plugins/eva/api/general';
 // --- Global Search Hints
 // --------------------------------------------------------------------------
 
-function makeFunctionHint(fct: functionsData): Toolbars.Hint {
-  return {
-    id: fct.key,
-    label: fct.name,
-    title: fct.signature,
-    value: () => States.setSelection({ fct: fct.name }),
-  };
-}
-
 async function lookupGlobals(pattern: string): Promise<Toolbars.Hint[]> {
   const lookup = pattern.toLowerCase();
-  const fcts = States.getSyncArray(Kernel.functions).getArray();
-  return fcts.filter((fn) => (
-    0 <= fn.name.toLowerCase().indexOf(lookup)
-  )).map(makeFunctionHint);
+  const globals = States.getSyncArray(Ast.declAttributes).getArray();
+  return globals.filter((g) => (
+    0 <= g.name.toLowerCase().indexOf(lookup)
+  )).map((g : Ast.declAttributesData) => ({
+    id: g.decl,
+    label: g.name,
+    title: g.label,
+    value: () => States.gotoDeclaration(g.decl)
+  }));
 }
 
 Toolbars.registerSearchHints('frama-c.globals', lookupGlobals);
@@ -68,11 +64,10 @@ Toolbars.registerSearchHints('frama-c.globals', lookupGlobals);
 interface FctItemProps {
   fct: functionsData;
   current: string | undefined;
-  onSelection: (name: string) => void;
 }
 
 function FctItem(props: FctItemProps): JSX.Element {
-  const { name, signature, main, stdlib, builtin, defined } = props.fct;
+  const { name, signature, main, stdlib, builtin, defined, decl } = props.fct;
   const className = classes(
     main && 'globals-main',
     (stdlib || builtin) && 'globals-stdlib',
@@ -87,7 +82,7 @@ function FctItem(props: FctItemProps): JSX.Element {
       label={name}
       title={signature}
       selected={name === props.current}
-      onSelection={() => props.onSelection(name)}
+      onSelection={() => States.gotoDeclaration(decl)}
     >
       {attributes && <span className="globals-attr">{attributes}</span>}
     </Item>
@@ -99,12 +94,12 @@ function FctItem(props: FctItemProps): JSX.Element {
 // --------------------------------------------------------------------------
 
 type functionsData =
-  Kernel.functionsData | (Kernel.functionsData & Eva.functionsData);
+  Ast.functionsData | (Ast.functionsData & Eva.functionsData);
 
 type FctKey = Json.key<'#functions'>;
 
 function computeFcts(
-  ker: States.ArrayProxy<FctKey, Kernel.functionsData>,
+  ker: States.ArrayProxy<FctKey, Ast.functionsData>,
   eva: States.ArrayProxy<FctKey, Eva.functionsData>,
 ): functionsData[] {
   const arr: functionsData[] = [];
@@ -118,8 +113,9 @@ function computeFcts(
 export default function Globals(): JSX.Element {
 
   // Hooks
-  const [selection, updateSelection] = States.useSelection();
-  const ker = States.useSyncArrayProxy(Kernel.functions);
+  const { decl } = States.useCurrent();
+  const { kind, name } = States.useDeclaration(decl);
+  const ker = States.useSyncArrayProxy(Ast.functions);
   const eva = States.useSyncArrayProxy(Eva.functions);
   const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
   const { useFlipSettings } = Dome;
@@ -139,20 +135,10 @@ export default function Globals(): JSX.Element {
     useFlipSettings('ivette.globals.eva-analyzed', true);
   const [evaUnreached, flipEvaUnreached] =
     useFlipSettings('ivette.globals.eva-unreached', true);
-    const [selected, flipSelected] =
-      useFlipSettings('ivette.globals.selected', false);
-  const multipleSelection = selection?.multiple;
-  const multipleSelectionActive = multipleSelection?.allSelections.length > 0;
   const evaComputed = States.useSyncValue(computationState) === 'computed';
 
-  function isSelected(fct: functionsData): boolean {
-    return multipleSelection?.allSelections.some(
-      (l) => fct.name === l?.fct,
-    );
-  }
-
   // Currently selected function.
-  const current: undefined | string = selection?.current?.fct;
+  const current = (decl && kind === 'FUNCTION') ? name : undefined;
 
   function showFunction(fct: functionsData): boolean {
     const visible =
@@ -165,13 +151,8 @@ export default function Globals(): JSX.Element {
       && (evaAnalyzed || !evaComputed ||
         !('eva_analyzed' in fct && fct.eva_analyzed === true))
       && (evaUnreached || !evaComputed ||
-        ('eva_analyzed' in fct && fct.eva_analyzed === true))
-      && (!selected || !multipleSelectionActive || isSelected(fct));
+        ('eva_analyzed' in fct && fct.eva_analyzed === true));
     return !!visible;
-  }
-
-  function onSelection(name: string): void {
-    updateSelection({ location: { fct: name } });
   }
 
   async function onContextMenu(): Promise<void> {
@@ -221,13 +202,6 @@ export default function Globals(): JSX.Element {
         checked: evaUnreached,
         onClick: flipEvaUnreached,
       },
-      'separator',
-      {
-        label: 'Selected only',
-        enabled: multipleSelectionActive,
-        checked: selected,
-        onClick: flipSelected,
-      },
     ];
     Dome.popupMenu(items);
   }
@@ -248,10 +222,9 @@ export default function Globals(): JSX.Element {
   const filteredFunctions =
     filtered.map((fct) => (
       <FctItem
-        key={fct.name}
+        key={fct.key}
         fct={fct}
         current={current}
-        onSelection={onSelection}
       />
     ));
 

@@ -423,6 +423,8 @@ export const printFunction: Server.GetRequest<fct,text>= printFunction_internal;
 export interface functionsData {
   /** Entry identifier. */
   key: Json.key<'#functions'>;
+  /** Declaration Tag */
+  decl: decl;
   /** Name */
   name: string;
   /** Signature */
@@ -445,6 +447,7 @@ export interface functionsData {
 export const jFunctionsData: Json.Decoder<functionsData> =
   Json.jObject({
     key: Json.jKey<'#functions'>('#functions'),
+    decl: jDecl,
     name: Json.jString,
     signature: Json.jString,
     main: Json.jOption(Json.jBoolean),
@@ -458,10 +461,11 @@ export const jFunctionsData: Json.Decoder<functionsData> =
 /** Natural order for `functionsData` */
 export const byFunctionsData: Compare.Order<functionsData> =
   Compare.byFields
-    <{ key: Json.key<'#functions'>, name: string, signature: string,
-       main?: boolean, defined?: boolean, stdlib?: boolean,
-       builtin?: boolean, extern?: boolean, sloc: source }>({
+    <{ key: Json.key<'#functions'>, decl: decl, name: string,
+       signature: string, main?: boolean, defined?: boolean,
+       stdlib?: boolean, builtin?: boolean, extern?: boolean, sloc: source }>({
     key: Compare.string,
+    decl: byDecl,
     name: Compare.alpha,
     signature: Compare.string,
     main: Compare.defined(Compare.boolean),
@@ -523,9 +527,10 @@ export const functions: State.Array<Json.key<'#functions'>,functionsData> = func
 
 /** Default value for `functionsData` */
 export const functionsDataDefault: functionsData =
-  { key: Json.jKey<'#functions'>('#functions')(''), name: '', signature: '',
-    main: undefined, defined: undefined, stdlib: undefined,
-    builtin: undefined, extern: undefined, sloc: sourceDefault };
+  { key: Json.jKey<'#functions'>('#functions')(''), decl: declDefault,
+    name: '', signature: '', main: undefined, defined: undefined,
+    stdlib: undefined, builtin: undefined, extern: undefined,
+    sloc: sourceDefault };
 
 /** Updated AST information */
 export const getInformationUpdate: Server.Signal = {
@@ -558,19 +563,25 @@ export const getInformation: Server.GetRequest<
   >= getInformation_internal;
 
 const getMarkerAt_internal: Server.GetRequest<
-  [ string, number, number ],
-  [ fct | undefined, marker | undefined ]
+  { file: string, line: number, column: number },
+  marker |
+  undefined
   > = {
   kind: Server.RqKind.GET,
   name:   'kernel.ast.getMarkerAt',
-  input:  Json.jTriple( Json.jString, Json.jNumber, Json.jNumber,),
-  output: Json.jPair( Json.jOption(jFct), Json.jOption(jMarker),),
-  signals: [],
+  input:  Json.jObject({
+            file: Json.jString,
+            line: Json.jNumber,
+            column: Json.jNumber,
+          }),
+  output: Json.jOption(jMarker),
+  signals: [ { name: 'kernel.ast.changed' } ],
 };
 /** Returns the marker and function at a source file position, if any. Input: file path, line and column. */
 export const getMarkerAt: Server.GetRequest<
-  [ string, number, number ],
-  [ fct | undefined, marker | undefined ]
+  { file: string, line: number, column: number },
+  marker |
+  undefined
   >= getMarkerAt_internal;
 
 const getFiles_internal: Server.GetRequest<null,string[]> = {

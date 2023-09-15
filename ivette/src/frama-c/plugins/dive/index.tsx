@@ -581,7 +581,7 @@ const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
   const { lock, layout, selectionMode } = props;
 
   const [dive, setDive] = useState(() => new Dive());
-  const [selection, updateSelection] = States.useSelection();
+  const selection = States.useCurrent();
   const graph = States.useSyncArrayData(API.graph);
 
   function setCy(cy: Cytoscape.Core): void {
@@ -609,19 +609,9 @@ const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
   }, [dive, selectionMode]);
 
   useEffect(() => {
-    /* When clicking on a node, select its writes locations as a multiple
-       selection. If these locations were already selected, select the next
-       location in the multiple selection. */
-    dive.onSelect = (locations) => {
-      if (_.isEqual(locations, selection?.multiple?.allSelections))
-        updateSelection('MULTIPLE_CYCLE');
-      else
-        updateSelection({ locations, index: 0 });
-    };
-
     // Updates the graph according to the selected marker.
-    dive.selectLocation(selection?.current, !lock);
-  }, [dive, lock, selection, updateSelection]);
+    dive.selectLocation(selection, !lock);
+  }, [dive, lock, selection]);
 
   return (
     <CytoscapeComponent

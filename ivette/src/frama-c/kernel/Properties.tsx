@@ -680,14 +680,16 @@ export default function RenderProperties(): JSX.Element {
     populateModel(model, props, evaps);
   }, [model, props, evaps]);
 
-  const [selection, updateSelection] = States.useSelection();
+  const { marker } = States.useCurrent();
+  const { scope } = States.useMarker(marker);
+  const propertySelection = marker;
+  const selectedFunction = marker && scope;
 
   const [showFilter, flipFilter] =
     Dome.useFlipSettings('ivette.properties.showFilter', true);
 
   // Updating the filter
   Dome.useEvent(Reload, model.reload);
-  const selectedFunction = selection?.current?.fct;
   React.useEffect(() => {
     model.setFilterFunction(selectedFunction);
   }, [model, selectedFunction]);
@@ -695,13 +697,8 @@ export default function RenderProperties(): JSX.Element {
   // Callbacks
 
   const onPropertySelection = React.useCallback(
-    ({ key: marker, fct }: Property) => {
-      const location = { fct, marker };
-      updateSelection({ location });
-    }, [updateSelection],
+    (p: Property) => States.gotoGlobalMarker(p.key), []
   );
-
-  const propertySelection = selection?.current?.marker;
 
   return (
     <>

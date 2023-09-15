@@ -84,11 +84,6 @@ async function edit(file: string, pos: Position, cmd: string): Promise<void> {
 //  Fields declarations
 // -----------------------------------------------------------------------------
 
-// The Ivette selection must be updated by the CodeMirror plugin. This field
-// adds the callback in the CodeMirror internal state.
-type UpdateSelection = (a: States.SelectionActions) => void;
-const UpdateSelection = Editor.createField<UpdateSelection>(() => { return; });
-
 // Those fields contain the source code and the file name.
 const Source = Editor.createTextField<string>('', (s) => s);
 const File = Editor.createField<string>('');
@@ -104,19 +99,19 @@ const GetSource = Editor.createField<GetSource>(() => undefined);
 // current CodeMirror cursor) and the ivette location (i.e the locations as
 // seen by the outside world). Keeping track of both of them together force
 // their update in one dispatch, which prevents strange bugs.
-interface Locations { cursor?: States.Location, ivette: States.Location }
+interface Locations { cursor?: States.Location, current: States.Location }
 
 // The Locations field. When given Locations, it will update the cursor field if
 // and only if the new cursor location is not undefined. It simplifies the
 // update in the SourceCode component itself.
 const Locations = createLocationsField();
 function createLocationsField(): Editor.Field<Locations> {
-  const noField = { cursor: undefined, ivette: {} };
+  const noField = { cursor: undefined, current: {} };
   const field = Editor.createField<Locations>(noField);
   const set: Editor.Set<Locations> = (view, toBe) => {
     const hasBeen = field.get(view?.state);
     const cursor = toBe.cursor ?? hasBeen.cursor;
-    field.set(view, { cursor, ivette: toBe.ivette });
+    field.set(view, { cursor, current: toBe.current });
   };
   return { ...field, set };
 }
@@ -132,21 +127,21 @@ function createLocationsField(): Editor.Field<Locations> {
 // Update the outside world when the user click somewhere in the source code.
 const SyncOnUserSelection = createSyncOnUserSelection();
 function createSyncOnUserSelection(): Editor.Extension {
-  const actions = { cmd: Command, update: UpdateSelection };
+  const actions = { cmd: Command };
   const deps = { file: File, selection: Selection, doc: Document, ...actions };
   return Editor.createEventHandler(deps, {
-    mouseup: async ({ file, cmd, update }, view, event) => {
+    mouseup: async ({ file, cmd }, view, event) => {
       if (!view || file === '') return;
       const pos = getCursorPosition(view);
-      const cursor = [file, pos.line, pos.column];
+      const cursor = { file, line: pos.line, column: pos.column };
       try {
-        const [fct, marker] = await Server.send(Ast.getMarkerAt, cursor);
-        if (fct || marker) {
+        const marker = await Server.send(Ast.getMarkerAt, cursor);
+        if (marker) {
           // The forced reload should NOT be necessary but... It is...
           await Server.send(Ast.reloadMarkerAttributes, null);
-          const location = { fct, marker };
-          update({ location });
-          Locations.set(view, { cursor: location, ivette: location });
+          States.gotoGlobalMarker(marker);
+          const location = States.getCurrent();
+          Locations.set(view, { cursor: location, current: location });
         }
       } catch {
         setError('Failure');
@@ -162,12 +157,13 @@ const SyncOnOutsideSelection = createSyncOnOutsideSelection();
 function createSyncOnOutsideSelection(): Editor.Extension {
   const deps = { locations: Locations, get: GetSource };
   return Editor.createViewUpdater(deps, ({ locations, get }, view) => {
-    const { cursor, ivette } = locations;
-    if (ivette === undefined || ivette === cursor) return;
-    const source = get(ivette); if (!source) return;
-    const newFct = ivette.fct !== cursor?.fct && ivette.marker === undefined;
-    const onTop = cursor === undefined || newFct;
-    Locations.set(view, { cursor: ivette, ivette });
+    const { cursor, current } = locations;
+    if (current === undefined || current === cursor) return;
+    const source = get(current); if (!source) return;
+    const newDecl =
+      current.decl !== cursor?.decl && current.marker === undefined;
+    const onTop = cursor === undefined || newDecl;
+    Locations.set(view, { cursor: current, current });
     Editor.selectLine(view, source.line, onTop);
   });
 }
@@ -183,7 +179,7 @@ function createSyncOnOutsideSelection(): Editor.Extension {
 // This events handler takes care of the context menu.
 const ContextMenu = createContextMenu();
 function createContextMenu(): Editor.Extension {
-  const deps = { file: File, command: Command, update: UpdateSelection };
+  const deps = { file: File, command: Command };
   return Editor.createEventHandler(deps, {
     contextmenu: ({ file, command }, view) => {
       if (file === '') return;
@@ -212,13 +208,13 @@ function useFctSource(file: string): string {
 // Build a callback that retrieves a location's source information.
 function useSourceGetter(): GetSource {
   const getAttr = States.useSyncArrayGetter(Ast.markerAttributes);
-  const functionsData = States.useSyncArrayData(Ast.functions);
-  return React.useCallback(({ fct, marker }) => {
-    const markerSloc = getAttr(marker)?.sloc;
-    const fctSloc = (fct !== undefined && fct !== '') ?
-      functionsData.find((e) => e.name === fct)?.sloc : undefined;
-    return markerSloc ?? fctSloc;
-  }, [getAttr, functionsData]);
+  const getDecl = States.useSyncArrayGetter(Ast.declAttributes);
+  return React.useCallback(({ decl, marker }) => {
+    const { sloc, decl: markerDecl } = getAttr(marker) ?? {};
+    if (sloc) return sloc;
+    const { source } = getDecl(decl ?? markerDecl) ?? {};
+    return source;
+  }, [getAttr, getDecl]);
 }
 
 // -----------------------------------------------------------------------------
@@ -249,20 +245,18 @@ export default function SourceCode(): JSX.Element {
   const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
   const { view, Component } = Editor.Editor(extensions);
-  const [selection, update] = States.useSelection();
-  const loc = React.useMemo(() => selection?.current ?? {}, [selection]);
+  const current = States.useCurrent();
   const getSource = useSourceGetter();
-  const file = getSource(loc)?.file ?? '';
+  const file = getSource(current)?.file ?? '';
   const filename = Path.parse(file).base;
   const pos = getCursorPosition(view);
   const source = useFctSource(file);
 
-  React.useEffect(() => UpdateSelection.set(view, update), [view, update]);
   React.useEffect(() => GetSource.set(view, getSource), [view, getSource]);
   React.useEffect(() => File.set(view, file), [view, file]);
   React.useEffect(() => Source.set(view, source), [view, source]);
   React.useEffect(() => Command.set(view, command), [view, command]);
-  React.useEffect(() => Locations.set(view, { ivette: loc }), [view, loc]);
+  React.useEffect(() => Locations.set(view, { current }), [view, current]);
 
   const externalEditorTitle =
     'Open the source file in an external editor.';

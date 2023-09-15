@@ -726,9 +726,14 @@ let _computed_signal =
     ~add_hook:(Analysis.register_computation_hook ~on:Computed)
     ()
 
-let _array =
+let _functionStats =
   let open Summary in
   let model = States.model () in
+
+  States.column model ~name:"decl"
+    ~descr:(Markdown.plain "Function declaration tag")
+    ~data:(module Kernel_ast.Decl)
+    ~get:(fun (kf,_) -> Printer_tag.SFunction (Globals.Functions.get kf.svar));
 
   States.column model ~name:"coverage"
     ~descr:(Markdown.plain "Coverage of the Eva analysis")

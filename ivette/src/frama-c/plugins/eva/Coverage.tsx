@@ -76,16 +76,18 @@ export function CoverageTable(): JSX.Element {
     model.setSorting({ sortBy: 'coverage', sortDirection: 'ASC' });
   }, [model]);
 
-  const [selection, updateSelection] = States.useSelection();
-  const onSelection = ({ key }: stats): void => {
-    updateSelection({ location: { fct: key } });
+  const { decl } = States.useCurrent();
+  const { kind, name } = States.useDeclaration(decl);
+  const selection = kind==='FUNCTION' ? name : undefined;
+  const onSelection = ({ decl }: stats): void => {
+    States.gotoDeclaration(decl);
   };
 
   return (
     <Table
       model={model}
       sorting={model}
-      selection={selection?.current?.fct}
+      selection={selection}
       onSelection={onSelection}
       settings="ivette.coverage.table"
     >

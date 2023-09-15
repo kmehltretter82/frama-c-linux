@@ -169,6 +169,10 @@ let () = R.register ~package ~kind:`GET ~name:"getAvailableProvers"
 
 let gmodel : Wpo.t S.model = S.model ()
 
+let get_decl g = match g.Wpo.po_idx with
+  | Function(kf,_) -> Some (Printer_tag.SFunction kf)
+  | Axiomatic _ -> None (* TODO *)
+
 let get_kf g = match g.Wpo.po_idx with
   | Function(kf,_) -> Some kf
   | Axiomatic _ -> None
@@ -191,6 +195,10 @@ let () = S.column gmodel ~name:"property"
     ~descr:(Md.plain "Property Marker")
     ~data:(module AST.Marker)
     ~get:(fun g -> Printer_tag.PIP (WpPropId.property_of_id g.Wpo.po_pid))
+
+let () = S.column gmodel ~name:"scope"
+    ~descr:(Md.plain "Associated declaration, if any")
+    ~data:(module D.Joption(AST.Decl)) ~get:get_decl
 
 let () = S.column gmodel ~name:"fct"
     ~descr:(Md.plain "Associated function, if any")

@@ -25,132 +25,161 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
+import { GlobalState, useGlobalState } from 'dome/data/states';
 import * as States from 'frama-c/states';
 
 import { CompactModel } from 'dome/table/arrays';
-import { Table, Column, Renderer } from 'dome/table/views';
+import { Table, Column } from 'dome/table/views';
 import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
 import { TitleBar } from 'ivette';
-import { marker, jMarker } from 'frama-c/kernel/api/ast';
+import * as Ast from 'frama-c/kernel/api/ast';
+
+// --------------------------------------------------------------------------
+// --- Global Multi-Selection
+// --------------------------------------------------------------------------
+
+export interface MultiSelection {
+  label: string;
+  title: string;
+  markers: Ast.marker[];
+  index?: number;
+}
+
+export interface MultiSelectionState {
+  label: string;
+  title: string;
+  markers: Ast.marker[];
+  index: number;
+}
+
+const emptySelection = { label: '', title: '', markers: [], index: 0 };
+const MultiSelection = new GlobalState<MultiSelectionState>(emptySelection);
+
+export function useSelection(): MultiSelectionState {
+  const [s] = useGlobalState(MultiSelection);
+  return s;
+}
+
+export function setSelection(s: MultiSelection): void
+{
+  const { index=0, ...data } = s;
+  MultiSelection.setValue({ ...data, index });
+  States.gotoGlobalMarker(data.markers[index]);
+}
+
+export function setIndex(index: number): void {
+  const s = MultiSelection.getValue();
+  setSelection({ ...s, index });
+}
+
+/**
+   Update the list of markers and select its first element,
+   or cycle to the next element wrt current selection.
+ */
+export function setNextSelection(locs: Ast.marker[]): void {
+  const selection = MultiSelection.getValue();
+  const { markers, index } = selection;
+  if (markers === locs) {
+    const target = index+1;
+    const select = target < locs.length ? target : 0;
+    setSelection({ ...selection, index: select });
+  } else {
+    setSelection({ ...selection, markers: locs, index: 0 });
+  }
+}
+
+export function clear(): void {
+  MultiSelection.setValue(emptySelection);
+}
+
+function gotoIndex(index: number): void {
+  const selection = MultiSelection.getValue();
+  if (0 <= index && index <= selection.markers.length)
+    MultiSelection.setValue({ ...selection, index });
+}
 
 // --------------------------------------------------------------------------
 // --- Locations Panel
 // --------------------------------------------------------------------------
 
-type LocationId = States.Location & { id: number };
-
-function SourceLoc(props: { marker: marker }): JSX.Element {
-  const { sloc, descr } = States.useMarker(props.marker);
-  const position = `${sloc?.base}:${sloc?.line}`;
-  return <Label label={position} title={descr} />;
+interface Data {
+  index: number,
+  marker: Ast.marker,
 }
+
+class Model extends CompactModel<Ast.marker, Data> {
+  constructor() { super(({ marker }) => marker); }
+}
+
+const getIndex = (d : Data): number => d.index + 1;
 
 export default function LocationsTable(): JSX.Element {
 
   // Hooks
-  const [selection, updateSelection] = States.useSelection();
-  const model = React.useMemo(() => (
-    new CompactModel<number, LocationId>(({ id }: LocationId) => id)
-  ), []);
-  const multipleSelections = selection?.multiple;
-  const numberOfSelections = multipleSelections?.allSelections?.length;
-
-  // Renderer for statement markers.
-  const renderMarker: Renderer<string> = (loc: string) => (
-    <SourceLoc marker={jMarker(loc)} />
-  );
-
-  // Updates [[model]] with the current multiple selections.
+  const model = React.useMemo(() => new Model(), []);
+  const getDecl = States.useSyncArrayGetter(Ast.declAttributes);
+  const getAttr = States.useSyncArrayGetter(Ast.markerAttributes);
+  const { label, title, markers, index } = useSelection();
   React.useEffect(() => {
-    if (numberOfSelections > 0) {
-      const data: LocationId[] =
-        multipleSelections.allSelections.map((d, i) => ({ ...d, id: i }));
-      model.replaceAllDataWith(data);
-    } else
-      model.clear();
-  }, [numberOfSelections, multipleSelections, model]);
+    model.replaceAllDataWith(
+      markers.map((marker, index): Data => ({ index, marker }))
+    );
+  }, [model, markers]);
+  const selected = markers[index];
+  const size = markers.length;
 
-  // Callbacks
-  const onTableSelection = React.useCallback(
-    ({ id }) => updateSelection({ index: id }),
-    [updateSelection],
-  );
+  const indexLabel = `${index+1} / ${size}`;
 
-  const reload = (): void => {
-    const location = multipleSelections.allSelections[multipleSelections.index];
-    updateSelection({ location });
-  };
+  const getLocation = React.useCallback((d: Data): string => {
+    const attr = getAttr(d.marker);
+    if (!attr) return '';
+    const decl = getDecl(attr.decl);
+    if (!decl) return '';
+    return `${decl.label} ${attr.descr}`;
+  }, [getDecl, getAttr]);
 
   // Component
   return (
     <>
       <TitleBar>
         <IconButton
-          icon="RELOAD"
-          onClick={reload}
-          enabled={numberOfSelections > 0}
-          title="Reload the current location"
+          icon='ANGLE.LEFT'
+          title='Previous location'
+          enabled={0 < index}
+          onClick={() => gotoIndex(index-1)}
         />
         <IconButton
-          icon="ANGLE.LEFT"
-          onClick={() => updateSelection('MULTIPLE_PREV')}
-          enabled={numberOfSelections > 1 && multipleSelections?.index > 0}
-          title="Previous location"
-        />
-        <IconButton
-          icon="ANGLE.RIGHT"
-          onClick={() => updateSelection('MULTIPLE_NEXT')}
-          enabled={
-            numberOfSelections > 1 &&
-            multipleSelections?.index < numberOfSelections - 1
-          }
-          title="Next location"
+          icon='ANGLE.RIGHT'
+          title='Next location'
+          enabled={index + 1 < size}
+          onClick={() => gotoIndex(index+1)}
         />
         <Space />
         <Label
-          className="component-info"
-          title={
-            `${numberOfSelections} selected ` +
-            `location${numberOfSelections > 1 ? 's' : ''}`
-          }
-        >
-          {multipleSelections?.allSelections.length === 0 ?
-            '0 / 0' :
-            `${multipleSelections?.index + 1} / ${numberOfSelections}`}
-        </Label>
+          className='component-info'
+          display={0 <= index && index < size}
+          label={indexLabel}
+          title='Current location index / Number of locations' />
         <Space />
         <IconButton
-          icon="TRASH"
-          onClick={() => updateSelection('MULTIPLE_CLEAR')}
-          enabled={numberOfSelections > 0}
-          title={`Clear location${numberOfSelections > 1 ? 's' : ''}`}
+          icon='TRASH'
         />
       </TitleBar>
-      <Label
-        label={multipleSelections?.name}
-        title={multipleSelections?.title}
-        style={{ textAlign: 'center' }}
-      />
-      <Table
+      <Label label={label} title={title} style={{ textAlign: 'center' }} />
+      <Table<Ast.marker, Data>
         model={model}
-        selection={multipleSelections?.index}
-        onSelection={onTableSelection}
+        selection={selected}
+        onSelection={(_marker, _data, index) => gotoIndex(index)}
       >
         <Column
-          id="id"
-          label="#"
-          align="center"
-          width={25}
-          getter={(r: { id: number }) => r.id + 1}
+          id='index' label='#' align='center' width={25}
+          getter={getIndex}
         />
-        <Column id="fct" label="Function" width={120} />
         <Column
-          id="marker"
-          label="Statement"
-          fill
-          render={renderMarker}
+          id='marker' label='Location' fill
+          getter={getLocation}
         />
       </Table>
     </>

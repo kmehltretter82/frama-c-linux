@@ -38,13 +38,21 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
+import { byDecl } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { byFct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
+import { decl } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { declDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { fct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { fctDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { jDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jFct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -607,6 +615,8 @@ export const programStats: State.Value<programStatsType> = programStats_internal
 export interface functionStatsData {
   /** Entry identifier. */
   key: fct;
+  /** Function declaration tag */
+  decl: decl;
   /** Coverage of the Eva analysis */
   coverage: { reachable: number, dead: number };
   /** Alarms raised by the Eva analysis by category */
@@ -619,6 +629,7 @@ export interface functionStatsData {
 export const jFunctionStatsData: Json.Decoder<functionStatsData> =
   Json.jObject({
     key: jFct,
+    decl: jDecl,
     coverage: Json.jObject({ reachable: Json.jNumber, dead: Json.jNumber,}),
     alarmCount: Json.jArray(jAlarmEntry),
     alarmStatuses: jStatusesEntry,
@@ -627,9 +638,10 @@ export const jFunctionStatsData: Json.Decoder<functionStatsData> =
 /** Natural order for `functionStatsData` */
 export const byFunctionStatsData: Compare.Order<functionStatsData> =
   Compare.byFields
-    <{ key: fct, coverage: { reachable: number, dead: number },
+    <{ key: fct, decl: decl, coverage: { reachable: number, dead: number },
        alarmCount: alarmEntry[], alarmStatuses: statusesEntry }>({
     key: byFct,
+    decl: byDecl,
     coverage: Compare.byFields
                 <{ reachable: number, dead: number }>({
                 reachable: Compare.number,
@@ -690,8 +702,8 @@ export const functionStats: State.Array<fct,functionStatsData> = functionStats_i
 
 /** Default value for `functionStatsData` */
 export const functionStatsDataDefault: functionStatsData =
-  { key: fctDefault, coverage: { reachable: 0, dead: 0 }, alarmCount: [],
-    alarmStatuses: statusesEntryDefault };
+  { key: fctDefault, decl: declDefault, coverage: { reachable: 0, dead: 0 },
+    alarmCount: [], alarmStatuses: statusesEntryDefault };
 
 const getStates_internal: Server.GetRequest<
   [ marker, boolean ],
