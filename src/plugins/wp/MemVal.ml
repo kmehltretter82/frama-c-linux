@@ -379,7 +379,7 @@ struct
            * end; *)
           Definitions.define_lemma {
             l_kind = Cil_types.Admit;
-            l_name = name; l_types = 0;
+            l_name = name;
             l_triggers = [];
             l_forall = [xw; xo; xv];
             l_lemma = lemma;
@@ -408,7 +408,7 @@ struct
           let cluster = cluster () in
           Definitions.define_lemma {
             l_kind = Cil_types.Admit;
-            l_name = name; l_types = 0;
+            l_name = name;
             l_triggers = [];
             l_forall = [xw; xwo; xro; xv];
             l_lemma = lemma;
