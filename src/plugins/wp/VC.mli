@@ -38,11 +38,6 @@ val get_description : t -> string
 val get_property : t -> Property.t
 val get_result : t -> prover -> result
 val get_results : t -> (prover * result) list
-val get_logout : t -> prover -> string
-(** only file name, might not exists *)
-
-val get_logerr : t -> prover -> string
-(** only file name, might not exists *)
 
 val get_sequent : t -> Conditions.sequent
 val get_formula: t -> Lang.F.pred
