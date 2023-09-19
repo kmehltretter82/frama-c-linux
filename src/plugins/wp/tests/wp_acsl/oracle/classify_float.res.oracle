@@ -5,19 +5,19 @@
   Global
 ------------------------------------------------------------
 
-Lemma InfN_not_finite:
-Assume: 'InfP_not_finite' 'NaN_not_finite'
-Prove: (not (is_finite_f64 x_0)) \/ (not (is_negative_infinite_f64 x_0))
+Goal Lemma 'InfN_not_finite':
+Assume Lemmas: 'InfP_not_finite' 'NaN_not_finite'
+Prove: (!is_finite_f64(x)) \/ (!is_negative_infinite_f64(x)).
 
 ------------------------------------------------------------
 
-Lemma InfP_not_finite:
-Assume: 'NaN_not_finite'
-Prove: (not (is_finite_f64 x_0)) \/ (not (is_positive_infinite_f64 x_0))
+Goal Lemma 'InfP_not_finite':
+Assume Lemmas: 'NaN_not_finite'
+Prove: (!is_finite_f64(x)) \/ (!is_positive_infinite_f64(x)).
 
 ------------------------------------------------------------
 
-Lemma NaN_not_finite:
-Prove: (not (is_finite_f64 x_0)) \/ (not (is_NaN_f64 x_0))
+Goal Lemma 'NaN_not_finite':
+Prove: (!is_finite_f64(x)) \/ (!is_NaN_f64(x)).
 
 ------------------------------------------------------------

@@ -216,19 +216,22 @@ end
   Global
 ------------------------------------------------------------
 
-Lemma LA:
-Prove: (is_InAxiomatic a_0) -> (P_P a_0)
+Goal Lemma 'LA':
+Assume { Have: is_InAxiomatic(a). }
+Prove: P_P(a).
 
 ------------------------------------------------------------
 
-Lemma LB:
-Assume: 'LA'
-Prove: (is_AtTopLevel a_0) -> (P_Q a_0)
+Goal Lemma 'LB':
+Assume Lemmas: 'LA'
+Assume { Have: is_AtTopLevel(a). }
+Prove: P_Q(a).
 
 ------------------------------------------------------------
 
-Lemma LC:
-Assume: 'LB' 'LA'
-Prove: (is_Rec a_0) -> (P_R a_0)
+Goal Lemma 'LC':
+Assume Lemmas: 'LB' 'LA'
+Assume { Have: is_Rec(a). }
+Prove: P_R(a).
 
 ------------------------------------------------------------

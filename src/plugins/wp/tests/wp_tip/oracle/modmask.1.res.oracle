@@ -3,15 +3,16 @@
 [wp] Running WP plugin...
 [wp] 2 goals scheduled
 [wp:script:allgoals] 
-  Lemma and_modulo_u:
-  Prove: let x_0 = (lsl 1 shift_0) in
-         (0<=shift_0) -> (shift_0<=31) -> (is_uint32 us_0)
-         -> ((us_0 mod x_0)=(land us_0 (x_0-1)))
+  Goal Check Lemma 'and_modulo_u':
+  Let x = lsl(1, shift_0).
+  Assume { Have: 0 <= shift_0. Have: shift_0 <= 31. Have: is_uint32(us_0). }
+  Prove: (us_0 % x) = land(us_0, x - 1).
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
-  Lemma and_modulo_us_255:
-  Prove: (is_uint16 us_0) -> ((us_0 mod 256)=(land 255 us_0))
+  Goal Check Lemma 'and_modulo_us_255':
+  Assume { Have: is_uint16(us_0). }
+  Prove: (us_0 % 256) = land(255, us_0).
   
   ------------------------------------------------------------
 [wp] [Valid] typed_check_lemma_and_modulo_us_255 (Tactic) (Qed 2/2)

@@ -5,13 +5,13 @@
   Axiomatic 'Event'
 ------------------------------------------------------------
 
-Lemma cons:
-Prove: true
+Goal Lemma 'cons':
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma diff:
-Assume: 'cons'
-Prove: true
+Goal Lemma 'diff':
+Assume Lemmas: 'cons'
+Prove: true.
 
 ------------------------------------------------------------

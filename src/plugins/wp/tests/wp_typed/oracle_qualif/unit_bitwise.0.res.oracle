@@ -9,7 +9,7 @@
 [wp] [Valid] typed_lemma_blsr_uint8 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_lemma_bnot_sint8 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_lemma_bor_sint8 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_lemma_bor_uint8 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lemma_bor_uint8 (Qed)
 [wp] [Valid] typed_lemma_bxor_sint8 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_lemma_land_abs (Qed)
 [wp] [Valid] typed_lemma_land_assoc (Qed)
@@ -65,11 +65,11 @@
 [wp] [Valid] typed_cast_assert_ok_6 (Qed)
 [wp] [Valid] typed_cast_assert_ok_7 (Qed)
 [wp] Proved goals:   61 / 61
-  Qed:            45
-  Alt-Ergo:       16
+  Qed:            46
+  Alt-Ergo:       15
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
-  Lemma                    10        8       18       100%
+  Lemma                    11        7       18       100%
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   band_int                  2        -        2       100%

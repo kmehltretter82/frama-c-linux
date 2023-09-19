@@ -13,18 +13,18 @@
   Axiomatic 'test'
 ------------------------------------------------------------
 
-Lemma fail:
-Prove: (EqS1_S S1_0 S2_0)
+Goal Check Lemma 'fail':
+Prove: EqS1_S(S1_0, S2_0).
 
 ------------------------------------------------------------
 
-Lemma succeed_L1:
-Prove: true
+Goal Check Lemma 'succeed_L1':
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma succeed_L2:
-Prove: 0<=BytesLength_of_S1_S
+Goal Check Lemma 'succeed_L2':
+Prove: 0 <= BytesLength_of_S1_S.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
