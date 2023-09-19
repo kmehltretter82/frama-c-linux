@@ -64,19 +64,6 @@ let pp_function fmt kf bhv =
 let pp_warnings fmt ws =
   List.iter (fun w -> Format.fprintf fmt "%a@\n" Warning.pretty w) ws
 
-let kf_context = function Axiomatic _ -> `Always | Function(kf,_) -> `Context kf
-
-let pp_dependency context fmt d =
-  Format.fprintf fmt " - Assumes %a"
-    (Description.pp_localized ~kf:context ~ki:false ~kloc:true) d
-
-let pp_dependencies context fmt ds =
-  List.iter (fun d -> Format.fprintf fmt "%a@\n" (pp_dependency context) d) ds
-
-let pp_depend fmt d =
-  Format.fprintf fmt " - Assumes %a"
-    (Description.pp_localized ~kf:`Always ~ki:false ~kloc:true) d
-
 (* ------------------------------------------------------------------------ *)
 (* ---  Proof Obligations Definition                                    --- *)
 (* ------------------------------------------------------------------------ *)

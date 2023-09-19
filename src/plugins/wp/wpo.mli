@@ -87,8 +87,6 @@ type po = t and t = {
   }
 
 module S : Datatype.S_with_collections with type t = po
-module Index : Map.OrderedType with type t = index
-module Gmap : Map.S with type key = index
 
 val get_gid: t -> string
 val get_property: t -> Property.t
@@ -191,12 +189,7 @@ val iter :
 val iter_on_goals: (t -> unit) -> unit
 val goals_of_property: Property.t -> t list
 
-val kf_context : index -> Description.kf
 val pp_index : Format.formatter -> index -> unit
-val pp_warnings : Format.formatter -> Warning.t list -> unit
-val pp_depend : Format.formatter -> Property.t -> unit
-val pp_dependency : Description.kf -> Format.formatter -> Property.t -> unit
-val pp_dependencies : Description.kf -> Format.formatter -> Property.t list -> unit
 val pp_goal : Format.formatter -> t -> unit
 val pp_title : Format.formatter -> t -> unit
 
