@@ -3,8 +3,31 @@
     z-index: 4;
     right: 10px;
     top: 30px;
-    width: 160px;
-    height: 400px;
+    width: 170px;
+    height: 420px;
     box-shadow: 3px 3px 2px rgba(0, 0, 0, .4);
     background-color: var(--background-profound);
+}
+
+.diveTree ul
+{
+    list-style: none;
+    border-left: 1px dotted black;
+    margin-left: 8px;
+    padding-left: 12px;
+}
+
+.diveTree .folder
+{
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    /* border: 1px solid var(--text); */
+}
+
+.diveTree .exploration
+{
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
 }

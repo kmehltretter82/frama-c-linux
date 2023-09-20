@@ -1,0 +1,732 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2023                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
+import React, { useState, useEffect, useImperativeHandle, useRef } from 'react';
+import _ from 'lodash';
+import { renderToString } from 'react-dom/server';
+import * as Dome from 'dome';
+import * as Ivette from 'ivette';
+import * as Server from 'frama-c/server';
+import * as States from 'frama-c/states';
+
+import * as API from './api';
+
+import Cytoscape from 'cytoscape';
+import CytoscapeComponent from 'react-cytoscapejs';
+import './cytoscape_libs';
+import 'cytoscape-panzoom/cytoscape.js-panzoom.css';
+
+import tippy, * as Tippy from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
+import 'tippy.js/themes/light-border.css';
+import 'tippy.js/animations/shift-away.css';
+import './tippy.css';
+
+import { IconButton } from 'dome/controls/buttons';
+import { Space } from 'dome/frame/toolbars';
+
+import '@fortawesome/fontawesome-free/js/all';
+
+import EvaReady from 'frama-c/plugins/eva/EvaReady';
+import Legend from './legend';
+import style from './style.json';
+import layouts from './layouts.json';
+import './dive.css';
+
+const Debug = new Dome.Debug('dive');
+
+interface Cxtcommand {
+  content: string;
+  select: () => void;
+  enabled: boolean;
+}
+
+interface CytoscapeExtended extends Cytoscape.Core {
+  cxtmenu(options: unknown): void;
+  panzoom(options: unknown): void;
+}
+
+type Identified = { id: string }
+type NodeData = Cytoscape.NodeDataDefinition & Identified
+type EdgeData = { id: string;[key: string]: unknown }
+type NodeOrId = string | Cytoscape.NodeSingular
+
+function callstackToString(callstack: API.callstack): string {
+  return callstack.map((cs) => `${cs.fun}:${cs.instr}`).join('/');
+}
+
+function buildCxtMenu(
+  commands: Cxtcommand[],
+  content?: JSX.Element,
+  action?: () => void,
+): void {
+  commands.push({
+    content: content ? renderToString(content) : '',
+    select: action || (() => { /* Do nothing */ }),
+    enabled: !!action,
+  });
+}
+
+/* double click events for Cytoscape */
+
+function enableDoubleClickEvents(cy: Cytoscape.Core, delay = 350): void {
+  let last: Cytoscape.EventObject | undefined;
+  cy.on('click', (e) => {
+    if (last && last.target === e.target &&
+      e.timeStamp - last.timeStamp < delay) {
+      e.target.trigger('double-click', e);
+    }
+    last = e;
+  });
+}
+
+/* The Dive class handles the selection of nodes according to user actions.
+   To prevent cytoscape to automatically select (and unselect) nodes wrongly,
+   we make some nodes unselectable. We then use the functions below to make
+   the nodes selectable before (un)selecting them. */
+
+function select(node: Cytoscape.NodeSingular): void {
+  node.selectify();
+  node.select();
+}
+
+function unselect(node: Cytoscape.NodeSingular): void {
+  node.selectify();
+  node.unselect();
+}
+
+export type mode = 'explore' | 'overview';
+
+class Dive {
+  headless: boolean;
+  cy: Cytoscape.Core;
+  mode: mode = 'explore';
+  _layout = '';
+  layoutOptions: Cytoscape.LayoutOptions | undefined;
+  currentSelection: string | null = null;
+  onSelect: ((_: States.Location[]) => void) | null = null;
+  selectedLocation: (States.Location | undefined) = undefined;
+
+  constructor(cy: Cytoscape.Core | null = null) {
+    this.cy = cy || Cytoscape();
+    this.headless = this.cy.container() === null;
+    this.cy.elements().remove();
+
+    this.cy.minZoom(1e-1);
+    this.cy.maxZoom(1.0);
+
+    // Remove previous listeners
+    this.cy.off('click');
+    this.cy.off('double-click');
+
+    // Add new listeners
+    enableDoubleClickEvents(this.cy);
+    this.cy.on('click', 'node', (event) => this.clickNode(event.target));
+    this.cy.on('click', 'edge', (event) => this.clickEdge(event.target));
+    this.cy.on('double-click', '$node > node', // compound nodes
+      (event) => this.doubleClickNode(event.target));
+
+    // Set zoom limits
+    const panzoomDefaults = {
+      minZoom: this.cy.minZoom(),
+      maxZoom: this.cy.maxZoom(),
+    };
+    (this.cy as CytoscapeExtended).panzoom(panzoomDefaults);
+
+    // Default layout
+    this.layout = 'dagre';
+
+    // Contextual menu
+    if (!this.headless) {
+      this.cy.scratch('cxtmenu')?.destroy?.(); // Remove previous menu
+      this.cy.scratch('cxtmenu', (this.cy as CytoscapeExtended).cxtmenu({
+        selector: 'node',
+        commands: (node: Cytoscape.NodeSingular) => this.onCxtMenu(node),
+      }));
+    }
+
+    // Node width hack
+    const padding = 10;
+    const min = 50;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    if (this.cy.style() && !this.headless) {
+      const canvas = document.querySelector('canvas[data-id="layer2-node"]');
+      if (canvas instanceof HTMLCanvasElement) {
+        const context = canvas.getContext('2d');
+        if (context) {
+          (this.cy.style() as any).selector('node').style('width',
+            (node: any) => {
+              const fStyle = node.pstyle('font-style').strValue;
+              const weight = node.pstyle('font-weight').strValue;
+              const size = node.pstyle('font-size').pfValue;
+              const family = node.pstyle('font-family').strValue;
+              context.font = `${fStyle} ${weight} ${size}px ${family}`;
+              const width = context.measureText(node.data('label')).width;
+              return `${Math.max(min, width + padding)}px`;
+            });
+        }
+      }
+    }
+    /* eslint-enable @typescript-eslint/no-explicit-any */
+  }
+
+  onCxtMenu(node: Cytoscape.NodeSingular): Cxtcommand[] {
+    const data = node.data();
+    const commands = [] as Cxtcommand[];
+    buildCxtMenu(commands,
+      <><div className="fas fa-binoculars fa-2x" />Explore</>,
+      () => { this.explore(node); });
+    if (data.nkind === 'composite')
+      buildCxtMenu(commands,
+        <><div className="fa fa-expand-arrows-alt fa-2x" />Unfold</>);
+    else
+      buildCxtMenu(commands);
+    if (data.backward_explored === 'no')
+      buildCxtMenu(commands,
+        <div><div className="fa fa-eye fa-2x" />Show</div>,
+        () => this.show(node));
+    else
+      buildCxtMenu(commands,
+        <><div className="fa fa-eye-slash fa-2x" />Hide</>,
+        () => this.hide(node));
+    return commands;
+  }
+
+  remove(node: Cytoscape.NodeSingular): void {
+    const parent = node.parent();
+    node.remove();
+    this.cy.$id(`${node.id()}-more`).remove();
+    if (parent.nonempty() && parent.children().empty())
+      this.remove(parent as Cytoscape.NodeSingular); // Recursively remove parents
+  }
+
+  referenceFile(fileName: string): Cytoscape.NodeSingular {
+    const id = `file_${fileName}`;
+    const node = this.cy.$id(id);
+    if (node.nonempty()) {
+      return node;
+    }
+
+    return this.cy.add({ data: { id, label: fileName }, classes: 'file' });
+  }
+
+  referenceCallstack(callstack: API.callstack): Cytoscape.NodeSingular | null {
+    const name = callstackToString(callstack);
+    const elt = callstack.shift();
+
+    if (!elt)
+      return null;
+
+    const id = `callstack_${name}`;
+    const node = this.cy.$id(id);
+    if (node.nonempty()) {
+      return node;
+    }
+
+    const parentNode = this.referenceCallstack(callstack);
+    const parent = parentNode?.id();
+    const label = elt.fun;
+    return this.cy.add({ data: { id, label, parent }, classes: 'function' });
+  }
+
+  createTips(node: Cytoscape.NodeSingular): Tippy.Instance[] {
+    const container = this.cy.container();
+    if (!container)
+      return [];
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ref = (node as any).popperRef();
+    const common = {
+      getReferenceClientRect: ref.getBoundingClientRect,
+      interactive: true,
+      animation: 'shift-away',
+      duration: 500,
+      trigger: 'manual',
+      appendTo: document.body,
+    };
+
+    const tips = [];
+
+    if (node.data().values) {
+      tips.push(tippy(container, {
+        ...common,
+        content: node.data().values,
+        placement: 'top',
+        offset: [0, 20],
+        arrow: true,
+      }));
+    }
+
+    if (node.data().type) {
+      tips.push(tippy(container, {
+        ...common,
+        content: node.data().type,
+        placement: 'bottom',
+        offset: [0, 20],
+        theme: 'light-border',
+        arrow: false,
+      }));
+    }
+
+    return tips;
+  }
+
+  addTips(node: Cytoscape.NodeSingular): void {
+    let timeout: NodeJS.Timeout;
+    let tips: Tippy.Instance[] | null = null;
+
+    node.on('mouseover', () => {
+      if (tips === null) {
+        tips = this.createTips(node);
+        tips.forEach((tip) => tip.props.onHidden = (() => tip.destroy()));
+      }
+      clearTimeout(timeout);
+      timeout = setTimeout(() => tips?.forEach((tip) => {
+        tip.show();
+      }), 200);
+    });
+
+    node.on('mouseout', () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        tips?.forEach((tip) => tip.hide());
+        tips = null; // Force rebuilding tips in case they changed
+      }, 0);
+    });
+  }
+
+  updateElement(group: Cytoscape.ElementGroup, data: NodeData | EdgeData):
+    Cytoscape.CollectionReturnValue {
+    let element = this.cy.$id(data.id);
+    if (element.nonempty()) {
+      element.removeData();
+      element.data(data);
+    }
+    else {
+      element = this.cy.add({ group, data });
+      element.addClass("new");
+    }
+    element.removeClass("stale");
+    return element;
+  }
+
+  updateNode(data: NodeData):
+    Cytoscape.NodeSingular {
+      const element = this.updateElement("nodes", data);
+      element.addClass('node');
+      return element;
+  }
+
+  updateEdge(src: NodeOrId, dst: NodeOrId, data: EdgeData):
+    Cytoscape.EdgeSingular {
+    const source = typeof src === "string" ? src : src.id();
+    const target = typeof dst === "string" ? dst : dst.id();
+    data = { ...data, source, target };
+    const element = this.updateElement("edges", data);
+    element.addClass('dependency');
+    return element;
+  }
+
+  updateNodeData(node: API.node): void {
+    const data = { ...node, id: `${node.id}` } as NodeData;
+
+    // Interval range visualization (see cytoscape stops style property)
+    if (typeof node.range === 'number')
+      data.stops = `0% ${node.range}% ${node.range}% 100%`;
+
+    // Build clusters for this node if needed
+    if (node.locality.callstack)
+      data.parent = this.referenceCallstack(node.locality.callstack)?.id();
+    else
+      data.parent = this.referenceFile(node.locality.file).id();
+
+    // Add new node or update existing node
+    const ele = this.updateNode(data);
+    if (ele.hasClass("new"))
+      this.addTips(ele);
+
+    // Add a node for the user to ask for more dependencies
+    const idmore = `${node.id}-more`;
+    if (node.backward_explored === 'partial') {
+      const elemore = this.updateNode({ id: idmore, parent: data.parent });
+      elemore.addClass("more");
+      this.updateEdge(elemore, ele, { id: `e${node.id}-more` });
+    }
+    else {
+      this.cy.$id(idmore).remove();
+    }
+  }
+
+  updateEdgeData(edge: API.dependency): void {
+    const data = { ...edge, id: `e${edge.id}` } as EdgeData;
+    this.updateEdge(`${edge.src}`, `${edge.dst}`, data);
+  }
+
+  updateGraph(data: API.graphData[]): void {
+    this.cy.startBatch();
+    this.cy.$('.node, .dependency').addClass('stale');
+
+    // Update vertices
+    for (const d of data) {
+      if ('nkind' in d.element) // Node
+        this.updateNodeData(d.element);
+    }
+
+    // Edges must be updated after vertices since their sources and destination
+    // must have been created beforhand
+    for (const d of data) {
+      if ('dkind' in d.element) // Dependency
+        this.updateEdgeData(d.element);
+    }
+
+    // Remove nodes that are not present anymore
+    this.cy.$('.stale').forEach(n => this.remove(n));
+
+    this.cy.endBatch();
+
+    this.recomputeLayout(this.cy.$('node.new'));
+  }
+
+  get layout(): string {
+    return this._layout;
+  }
+
+  set layout(layout: string) {
+    if (layout === this._layout)
+      return;
+    let extendedOptions = {};
+    if (layout in layouts)
+      extendedOptions = (layouts as { [key: string]: object })[layout];
+    this._layout = layout;
+    this.layoutOptions = {
+      name: layout,
+      fit: true,
+      animate: true,
+      randomize: false, /* Keep previous positions if layout supports it */
+      ...extendedOptions,
+    };
+
+    this.recomputeLayout();
+  }
+
+  recomputeLayout(newNodes?: Cytoscape.Collection): void {
+    if (this.layoutOptions && this.cy.container() &&
+      (newNodes === undefined || !newNodes.empty())) {
+      this.cy.layout({
+        animationEasing: 'ease-in-out-quad',
+        /* Do not move new nodes */
+        animateFilter: (node: Cytoscape.Singular) => newNodes === undefined ||
+          !newNodes.contains(node),
+        stop: () => {
+          this.cy.$('.new').addClass('old').removeClass('new');
+        },
+        ...this.layoutOptions,
+      } as unknown as Cytoscape.LayoutOptions).run();
+    }
+  }
+
+  async exec<In>(
+    request: Server.ExecRequest<In, number | undefined | null>,
+    param: In): Promise<Cytoscape.NodeSingular | undefined> {
+    try {
+      if (Server.isRunning()) {
+        await this.setMode();
+        const r = await Server.send(request, param);
+        if (r) {
+          return undefined;
+        }
+      }
+    }
+    catch (err) {
+      Debug.error(err);
+    }
+
+    return undefined;
+  }
+
+  static async setWindow(window: API.explorationWindow): Promise<void> {
+    if (Server.isRunning())
+      await Server.send(API.window, window);
+  }
+
+  async setMode(): Promise<void> {
+    switch (this.mode) {
+      case 'explore':
+        await Dive.setWindow({
+          perception: { backward: 3, forward: 1 },
+          horizon: { backward: 3, forward: 1 },
+        });
+        break;
+      case 'overview':
+        await Dive.setWindow({
+          perception: { backward: 4, forward: 1 },
+          horizon: { backward: undefined, forward: undefined },
+        });
+        break;
+      default: /* This is useless and impossible if the program is correctly
+                  typed, but the linter wants it */
+    }
+  }
+
+  clear(): void {
+    this.cy.elements().remove();
+    this.exec(API.clear, null);
+  }
+
+  async add(marker: string): Promise<void> {
+    const node = await this.exec(API.add, marker);
+    if (node)
+      this.updateNodeSelection(node);
+  }
+
+  async explore(node: Cytoscape.NodeSingular): Promise<void> {
+    const id = parseInt(node.id(), 10);
+    if (id)
+      await this.exec(API.explore, id);
+  }
+
+  show(node: Cytoscape.NodeSingular): void {
+    const id = parseInt(node.id(), 10);
+    if (id)
+      this.exec(API.show, id);
+  }
+
+  hide(node: Cytoscape.NodeSingular): void {
+    const id = parseInt(node.id(), 10);
+    if (id)
+      this.exec(API.hide, id);
+  }
+
+  async clickNode(node: Cytoscape.NodeSingular): Promise<void> {
+    this.updateNodeSelection(node);
+    await this.explore(node);
+
+    const writes = node.data()?.writes;
+    if (writes && writes.length)
+      this.onSelect?.(writes);
+
+    /* Cytoscape automatically selects the node clicked, and unselects all other
+       nodes and edges. As we want some incoming edges to remain selected, we
+       make the node unselectable, preventing cytoscape to select it. */
+    node.unselectify();
+  }
+
+  async clickEdge(edge: Cytoscape.EdgeSingular): Promise<void> {
+    // Unselect everything
+    this.cy.$(':selected').forEach(unselect);
+    this.cy.$('.multiple-selection').removeClass('multiple-selection');
+    this.cy.$('.selection').removeClass('selection');
+
+    // Update Ivette selection
+    const origins = edge.data()?.origins;
+    if (origins && origins.length)
+      this.onSelect?.(origins);
+  }
+
+  doubleClickNode(node: Cytoscape.NodeSingular): void {
+    this.cy.animate({ fit: { eles: node, padding: 10 } });
+  }
+
+  selectLocation(
+    location: States.Location | undefined,
+    doExplore: boolean): void {
+    if (!location) {
+      // Reset whole graph if no location is selected.
+      this.clear();
+    } else if (location !== this.selectedLocation) {
+      this.selectedLocation = location;
+      const selectNode = this.cy.$('node:selected');
+      const writes = selectNode?.data()?.writes;
+      if (doExplore && location.marker && !_.some(writes, location)) {
+        this.add(location.marker);
+      }
+      else {
+        this.updateNodeSelection(selectNode);
+      }
+    }
+  }
+
+  updateNodeSelection(node: Cytoscape.NodeSingular): void {
+    const hasOrigin = (ele: Cytoscape.NodeSingular): boolean => (
+      _.some(ele.data().origins, this.selectedLocation)
+    );
+    this.cy.$(':selected').forEach(unselect);
+    this.cy.$('.multiple-selection').removeClass('multiple-selection');
+    this.cy.$('.selection').removeClass('selection');
+    select(node);
+    const edges = node.incomers('edge');
+    const relevantEdges = edges.filter(hasOrigin);
+    edges.addClass('multiple-selection');
+    relevantEdges.addClass('selection');
+  }
+}
+
+
+type GraphViewProps = {
+  lock: boolean;
+  layout: string;
+  selectionMode: string;
+}
+
+type GraphViewRef = {
+  clear: () => void;
+}
+
+const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
+  (props: GraphViewProps, ref) => {
+  const { lock, layout, selectionMode } = props;
+
+  const [dive, setDive] = useState(() => new Dive());
+  const [selection, updateSelection] = States.useSelection();
+  const graph = States.useSyncArrayData(API.graph);
+
+  function setCy(cy: Cytoscape.Core): void {
+    if (cy !== dive.cy)
+      setDive(new Dive(cy));
+  }
+
+  useImperativeHandle(ref, () => ({ clear: () => dive.clear() }));
+
+  useEffect(() => {
+    setDive(new Dive(dive.cy)); // On hot reload, setup a new instance
+  }, [Dive]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    dive.layout = layout;
+  }, [dive, layout]);
+
+  useEffect(() => {
+    dive.updateGraph(graph);
+  }, [dive, graph]);
+
+  // Follow mode
+  useEffect(() => {
+    dive.mode = selectionMode === 'follow' ? 'explore' : 'overview';
+  }, [dive, selectionMode]);
+
+  useEffect(() => {
+    /* When clicking on a node, select its writes locations as a multiple
+       selection. If these locations were already selected, select the next
+       location in the multiple selection. */
+    dive.onSelect = (locations) => {
+      if (_.isEqual(locations, selection?.multiple?.allSelections))
+        updateSelection('MULTIPLE_CYCLE');
+      else
+        updateSelection({ locations, index: 0 });
+    };
+
+    // Updates the graph according to the selected marker.
+    dive.selectLocation(selection?.current, !lock);
+  }, [dive, lock, selection, updateSelection]);
+
+  return (
+    <CytoscapeComponent
+      stylesheet={style}
+      cy={setCy}
+      style={{ width: '100%', height: '100%' }}
+    />);
+});
+
+GraphView.displayName = "GraphView";
+
+
+export default function GraphComponent(): JSX.Element {
+  const graph = useRef<GraphViewRef>();
+  const [lock, flipLock] =
+    Dome.useFlipSettings('dive.lock');
+  const [selectionMode, setSelectionMode] =
+    Dome.useStringSettings('dive.selectionMode', 'follow');
+  const [layout, setLayout] =
+    Dome.useStringSettings('dive.layout', 'dagre');
+  const [showLegend, flipShowLegend] =
+    Dome.useFlipSettings('dive.legend', true);
+
+  // Selection mode
+  const selectMode = (id?: string) => void (id && setSelectionMode(id));
+  const modes = [
+    { id: 'follow', label: 'Follow selection' },
+    { id: 'add', label: 'Add selection to the graph' },
+  ];
+  const checkMode =
+    (item: { id: string; label: string }): Dome.PopupMenuItem => (
+      { checked: item.id === selectionMode, ...item }
+    );
+  const modeMenu = (): void => {
+    Dome.popupMenu(modes.map(checkMode), selectMode);
+  };
+
+  // Layout selection
+  const selectLayout = (layout?: string) => void (layout && setLayout(layout));
+  const layoutsNames = ['cose-bilkent', 'dagre', 'cola', 'klay'];
+  const layoutItem = (id: string): Dome.PopupMenuItem =>
+    ({ id, label: id, checked: (id === layout) });
+  const layoutMenu = () =>
+    void Dome.popupMenu(layoutsNames.map(layoutItem), selectLayout);
+
+  // Component
+  return (
+    <>
+      <Ivette.TitleBar>
+        <IconButton
+          icon="LOCK"
+          onClick={flipLock}
+          kind={lock ? 'negative' : 'positive'}
+          title={lock ?
+            'Unlock the graph: update the graph with the selection' :
+            'Lock the graph: do not update the graph with the selection'}
+        />
+        <IconButton
+          icon="SETTINGS"
+          onClick={modeMenu}
+          title="Choose the selection mode"
+        />
+        <IconButton
+          icon="DISPLAY"
+          onClick={layoutMenu}
+          title="Choose the graph layout"
+        />
+        <Space />
+        <IconButton
+          icon="TRASH"
+          onClick={() => graph.current?.clear()}
+          title="Clear the graph"
+        />
+        <IconButton
+          icon="HELP"
+          onClick={flipShowLegend}
+          kind={showLegend ? 'positive' : 'negative'}
+          title={showLegend ?
+            'Hide legend' :
+            'Show legend'}
+        />
+      </Ivette.TitleBar>
+      <EvaReady>
+        <GraphView
+          lock={lock}
+          layout={layout}
+          selectionMode={selectionMode}
+          ref={graph}/>
+        { showLegend ? <Legend /> : null }
+      </EvaReady>
+    </>
+  );
+}

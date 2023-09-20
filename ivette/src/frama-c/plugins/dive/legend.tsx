@@ -27,33 +27,147 @@ import CytoscapeComponent from 'react-cytoscapejs';
 import stylesheet from './style.json';
 
 const elements = [
-  { data: { label: "constant", nkind: 'const' } },
-  { data: { label: "scalar memory" } },
-  { data: { label: "structured memory", nkind: 'composite' } },
-  { data: { label: "set of addresses", nkind: 'scattered' } },
-  { data: { label: "analysis alarm", nkind: 'alarm' } },
-  { data: { label: "unique value", range: 'singleton' } },
-  { data: { label: "small range of values", stops: '0% 20% 20% 100%' } },
-  { data: { label: "large range of values", stops: '0% 80% 80% 100%' } },
-  { data: { label: "extreme range of values", range: 'wide' } },
-  { data: { label: "directly tainted", taint: 'direct' } },
-  { data: { label: "indirectly tainted", taint: 'indirect' } },
+  {
+    data: {
+      id: "shape",
+      label: "Node shape: memory"
+    },
+    classes: ["group"],
+  },
+  {
+    data: {
+      parent: "shape",
+      label: "constant",
+      nkind: 'const'
+    },
+    position: { x: 0, y: 0 }
+  },
+  {
+    data: {
+      parent: "shape",
+      label: "scalar type"
+    },
+    position: { x: 0, y: 40 }
+  },
+  {
+    data: {
+      parent: "shape",
+      label: "aggregate type",
+      nkind: 'composite'
+    },
+    position: { x: 0, y: 80 }
+  },
+  {
+    data: {
+      parent: "shape",
+      label: "set of addresses",
+      nkind: 'scattered'
+    },
+    position: { x: 0, y: 120 }
+  },
+  {
+    data: {
+      parent: "shape",
+      label: "analysis alarm",
+      nkind: 'alarm'
+    },
+    position: { x: 0, y: 160 }
+  },
+  {
+    data: {
+      id: "color",
+      label: "Node color: value cardinality"
+    },
+    classes: ["group"]
+  },
+  {
+    data: {
+      parent: "color",
+      label: "unique value",
+      range: 'singleton'
+    },
+    position: { x: 0, y: 230 }
+  },
+  {
+    data: {
+      parent: "color",
+      label: "small range of values",
+      stops: '0% 20% 20% 100%'
+    },
+    position: { x: 0, y: 270 }
+  },
+  {
+    data: {
+      parent: "color",
+      label: "large range of values",
+      stops: '0% 80% 80% 100%'
+    },
+    position: { x: 0, y: 310 }
+  },
+  {
+    data: {
+      parent: "color",
+      label: "extreme range of values",
+      range: 'wide'
+    },
+    position: { x: 0, y: 350 }
+  },
+  {
+    data: {
+      id: "outline",
+      label: "Node outline color: taint analysis",
+    },
+    classes: ["group"]
+  },
+  {
+    data: {
+      parent: "outline",
+      label: "directly tainted",
+      taint: 'direct'
+    },
+    position: { x: 0, y: 420 }
+  },
+  {
+    data: {
+      parent: "outline",
+      label: "indirectly tainted",
+      taint: 'indirect'
+    },
+    position: { x: 0, y: 480 }
+  },
 ];
 
 const layout = {
-  name: 'grid',
+  name: 'preset',
   fit: true,
-  padding: 5,
-  avoidOverlapPadding: 15,
-  cols: 1,
+  padding: 0,
 };
 
 const completeStylecheet = [
   ...stylesheet,
   {
     "selector": "node",
-    "style": { "width": 'label', }
-  }
+    "style": {
+      "width": '140',
+      "height": '20',
+      "font-size": "14px",
+    }
+  },
+  {
+    "selector": ".group",
+    "style": {
+      "shape": "rectangle",
+      "background-opacity": 0.0,
+      "text-valign": "top",
+      "text-halign": "center",
+      "padding": "4px",
+      "border-width": 0,
+    }
+  },
+  {
+    "selector": "#outline",
+    "style": { "padding": "10px", }
+  },
 ];
 
 function Legend() : JSX.Element {
