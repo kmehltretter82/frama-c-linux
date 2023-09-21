@@ -1,16 +1,6 @@
-123d122
-<   The imprecision originates from Arithmetic {addition.i:52}
-162a162
+162a163
 >   {{ garbled mix of &{p1} (origin: Misaligned {addition.i:52}) }}
-163a164
+163a165
 >   {{ garbled mix of &{p2} (origin: Misaligned {addition.i:56}) }}
-186c187
-<   p10 ∈ {{ garbled mix of &{p1} (origin: Arithmetic {addition.i:52}) }}
----
->   p10 ∈ {{ garbled mix of &{p1} }}
-405a407
+405a408
 >   {{ garbled mix of &{p1} (origin: Misaligned {addition.i:52}) }}
-429c431
-<   p10 ∈ {{ garbled mix of &{p1} (origin: Arithmetic {addition.i:52}) }}
----
->   p10 ∈ {{ garbled mix of &{p1} }}

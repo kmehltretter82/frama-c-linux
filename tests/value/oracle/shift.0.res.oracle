@@ -60,7 +60,7 @@
   assert (long)r + (long)((long)((char *)t) << 8) ≤ 2147483647;
 [eva:garbled-mix:write] shift.i:53: 
   Assigning imprecise value to r.
-  The imprecision originates from Arithmetic
+  The imprecision originates from Arithmetic {shift.i:52}
 [eva:alarm] shift.i:58: Warning: 
   unsigned overflow. assert 2U << 31 ≤ 4294967295;
 [eva] Recording results for main

@@ -1144,7 +1144,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
           pretty_int abs_min pretty_int abs_max pretty_int rem1 pretty_int
           modu1 V.pretty v1 pretty_int rem2 pretty_int modu2 V.pretty v2 ; *)
     else
-      let topify = Origin.K_Merge in
+      let topify = Origin.Merge in
       let offset = abs_min in
       let size = Integer.length abs_min abs_max in
       let v1_fit = modu1 =~ size && Rel.is_zero rem1
@@ -1174,7 +1174,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
   (* similar to [f_aux_merge_generic], but we perform a reinterpretation in
      all cases. This is to ensure that [V.narrow] can be applied soundly. *)
   let f_aux_merge_narrow merge_v abs_min abs_max rem1 modu1 v1 rem2 modu2 v2 =
-    let topify = Origin.K_Merge in
+    let topify = Origin.Merge in
     let offset = abs_min in
     let size = Integer.length abs_min abs_max in
     let v1' =
@@ -1380,7 +1380,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
           if V.is_isotropic v
           then v
           else
-            let origin = Origin.(current K_Misalign_read) in
+            let origin = Origin.(current Misalign_read) in
             V.topify_with_origin origin v
         in
         V.join subl_value (V.join subr_value current_node_value)
@@ -1523,7 +1523,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
   (*  Finds the value associated to some offsets represented as an ival. *)
   let find ~validity ?(conflate_bottom=true) ~offsets ~size tree =
     let offsets = Tr_offset.trim_by_validity offsets size validity in
-    let topify = Origin.K_Misalign_read in
+    let topify = Origin.Misalign_read in
     let read_one_node ~offset node ~start ~size acc =
       extract_bits_and_stitch ~topify ~conflate_bottom
         ~offset:start ~size
@@ -1666,7 +1666,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
               else if V.is_isotropic v_node
               then rem, size, V.anisotropic_cast ~size joined_value
               else
-                let origin = Origin.(current K_Merge) in
+                let origin = Origin.(current Merge) in
                 let new_value = V.topify_with_origin origin joined_value in
                 let new_rem = Rel.zero and new_modu = Integer.one in
                 new_rem, new_modu, new_value
@@ -1849,7 +1849,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
       let origin =
         match origin with
         | Some origin -> origin
-        | None -> Origin.(current K_Misalign_read)
+        | None -> Origin.(current Misalign_read)
       in
       let v = V.topify_with_origin origin v in
       (* TODO: check *)
@@ -1872,7 +1872,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
         let v =
           if Int.is_zero (period %~ size) then v
           else
-            let origin = Origin.(current K_Misalign_read) in
+            let origin = Origin.(current Misalign_read) in
             let v' = V.topify_with_origin origin v in
             if not (V.equal v v') then
               Lattice_messages.emit_approximation msg_emitter

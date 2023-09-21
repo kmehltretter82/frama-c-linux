@@ -178,7 +178,7 @@
                 [9]{.sa_mask; .sa_flags} ∈ [--..--]
                 [10] ∈
                 {{ garbled mix of &{__fc_sigaction}
-                 (origin: Library function) }}
+                 (origin: Library function {signal_h.c:48}) }}
                 [11]{.sa_handler; .sa_sigaction} ∈ {0}
                 [11]{.sa_mask; .sa_flags} ∈ [--..--]
                 [12]{.sa_handler; .sa_sigaction} ∈ {0}
@@ -193,7 +193,7 @@
                 {[16]{.sa_mask; .sa_flags}; [17]} ∈ [--..--]
                 [18] ∈
                 {{ garbled mix of &{__fc_sigaction}
-                 (origin: Library function) }}
+                 (origin: Library function {signal_h.c:45}) }}
                 [19]{.sa_handler; .sa_sigaction} ∈ {0}
                 [19]{.sa_mask; .sa_flags} ∈ [--..--]
                 [20]{.sa_handler; .sa_sigaction} ∈ {0}

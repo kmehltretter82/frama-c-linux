@@ -28,43 +28,26 @@
     ie. a numeric value that contains bits extracted from at least one
     pointer, and that are not the result of a translation *)
 
-
-(** Lattice of source locations. *)
-module LocationLattice : Datatype.S
-
-(** List of possible origins. Most of them also include the set of
-    source locations where the operation took place. *)
-type origin
-
-include Datatype.S with type t = origin
-
+include Datatype.S
 
 type kind =
-  | K_Misalign_read
-  | K_Leaf
-  | K_Merge
-  | K_Arith
+  | Misalign_read
+  | Leaf
+  | Merge
+  | Arith
 
-val current: kind -> origin
+val current: kind -> t
 (** This is automatically extracted from [Cil.CurrentLoc] *)
 
-val well: origin
-(** Creates a well origin. *)
+val well: t
+val top: t
+val is_top: t -> bool
 
 val pretty_as_reason: Format.formatter -> t -> unit
 (** Pretty-print [because of <origin>] if the origin is not {!Unknown}, or
     nothing otherwise *)
 
-val top: t
-val is_top: t -> bool
-
-val bottom: t
-
 val join: t -> t -> t
-val link: t -> t -> t
-val meet: t -> t -> t
-val narrow: t -> t -> t
-
 val is_included: t -> t -> bool
 
 val is_precise: t -> bool

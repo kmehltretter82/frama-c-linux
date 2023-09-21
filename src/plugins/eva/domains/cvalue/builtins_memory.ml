@@ -596,7 +596,7 @@ let frama_c_memset state actuals =
       let dst = V.filter_base (fun b -> not (Base.is_read_only b)) dst in
       (* Keep only the first byte of the value argument *)
       let _, v = Cvalue.V.extract_bits
-          ~topify:Origin.K_Misalign_read
+          ~topify:Origin.Misalign_read
           ~start:Int.zero ~stop:(Int.pred (Bit_utils.sizeofchar ()))
           ~size:(Int.of_int (Cil.bitsSizeOfInt IInt))
           v

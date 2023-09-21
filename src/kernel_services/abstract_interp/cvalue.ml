@@ -510,7 +510,7 @@ module V = struct
           (topify_with_origin_kind topify e2)
       end
 
-  let arithmetic_function = import_function ~topify:Origin.K_Arith
+  let arithmetic_function = import_function ~topify:Origin.Arith
 
   (* Compute the pointwise difference between two Locations_Bytes.t. *)
   let sub_untyped_pointwise = sub_pointwise
@@ -600,13 +600,13 @@ module V = struct
     else if equal singleton_zero v2 then v1
     else if equal v1 v2 && cardinal_zero_or_one v1 then v1
     else
-      import_function ~topify:Origin.K_Arith Ival.bitwise_or v1 v2
+      import_function ~topify:Origin.Arith Ival.bitwise_or v1 v2
 
   let bitwise_and v1 v2 =
     if equal v1 v2 && cardinal_zero_or_one v1 then v1
     else
       let f i1 i2 = Ival.bitwise_and i1 i2 in
-      import_function ~topify:Origin.K_Arith f v1 v2
+      import_function ~topify:Origin.Arith f v1 v2
 
   let shift_right e1 e2 =
     arithmetic_function Ival.shift_right e1 e2
@@ -706,7 +706,7 @@ module V = struct
       Int.min card (Int.two_power size)
 
   let add_untyped ~factor v1 v2 =
-    add_untyped ~topify:Origin.K_Arith ~factor v1 v2
+    add_untyped ~topify:Origin.Arith ~factor v1 v2
 
 end
 

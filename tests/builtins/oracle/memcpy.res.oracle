@@ -568,7 +568,7 @@
   v4.x ∈ [--..--]
     .y ∈ {{ (int)&t }}
     {.p; .padding[0..23]} ∈ [--..--]
-  v5 ∈ {{ garbled mix of &{t} (origin: Misaligned {memcpy.c:91}) }}
+  v5 ∈ {{ garbled mix of &{t} (origin: Arithmetic {memcpy.c:91}) }}
   t{[0]; [1]{.x; .y}} ∈ {0}
    [1].p ∈ {{ &v1.y }}
    {[1].padding[0..23]; [2]; [3]{.x; .y}} ∈ {0}

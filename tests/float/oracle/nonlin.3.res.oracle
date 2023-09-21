@@ -244,7 +244,7 @@
   non-finite float value. assert \is_finite(\add_float(a_0, a_0));
 [eva:garbled-mix:write] nonlin.c:99: 
   Assigning imprecise value to f.
-  The imprecision originates from Arithmetic
+  The imprecision originates from Arithmetic {nonlin.c:98}
 [eva] Recording results for garbled
 [eva] Done for function garbled
 [eva] computing for function around_zeros <- main.
@@ -299,7 +299,7 @@
   res ∈ [-0x1.fffffe0000000p127 .. 0x1.fffffe0000000p127]
 [eva:final-states] Values at end of function garbled:
   a_0 ∈ {{ garbled mix of &{x_0} (origin: Arithmetic {nonlin.c:98}) }}
-  f ∈ {{ garbled mix of &{x_0} (origin: Arithmetic) }}
+  f ∈ {{ garbled mix of &{x_0} (origin: Arithmetic {nonlin.c:98}) }}
 [eva:final-states] Values at end of function nonlin_f:
   Frama_C_entropy_source ∈ [--..--]
   a ∈ [0x1.4000000000000p2 .. 0x1.c000000000000p2]

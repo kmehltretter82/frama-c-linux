@@ -3,10 +3,18 @@
 <   signed overflow. assert -2147483648 ≤ (int)*((char *)(&q1)) + 2;
 < [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert (int)*((char *)(&q1)) + 2 ≤ 2147483647;
+144c140
+<   The imprecision originates from Misaligned {addition.i:61}
+---
+>   The imprecision originates from Misaligned {addition.i:59}
 168c164
 < [scope:rm_asserts] removing 9 assertion(s)
 ---
 > [scope:rm_asserts] removing 7 assertion(s)
+190c186
+<   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:61}) }}
+---
+>   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:59}) }}
 384,387d379
 < [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert -2147483648 ≤ (int)*((char *)(&q1)) + 2;
@@ -16,3 +24,7 @@
 < [scope:rm_asserts] removing 9 assertion(s)
 ---
 > [scope:rm_asserts] removing 7 assertion(s)
+433c425
+<   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:61}) }}
+---
+>   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:59}) }}

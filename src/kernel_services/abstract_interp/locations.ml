@@ -287,16 +287,16 @@ module Location_Bytes = struct
     with Not_found -> false
 
   let topify_merge_origin v =
-    topify_with_origin_kind Origin.K_Merge v
+    topify_with_origin_kind Origin.Merge v
 
   let topify_misaligned_read_origin v =
-    topify_with_origin_kind Origin.K_Misalign_read v
+    topify_with_origin_kind Origin.Misalign_read v
 
   let topify_arith_origin v =
-    topify_with_origin_kind Origin.K_Arith v
+    topify_with_origin_kind Origin.Arith v
 
   let topify_leaf_origin v =
-    topify_with_origin_kind Origin.K_Leaf v
+    topify_with_origin_kind Origin.Leaf v
 
   let may_reach base loc =
     if Base.is_null base then true

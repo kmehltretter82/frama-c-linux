@@ -150,11 +150,9 @@
   signed overflow. assert -2147483648 ≤ p2 - p1;
 [eva:alarm] arith_pointer.c:56: Warning: 
   signed overflow. assert p2 - p1 ≤ 2147483647;
-[eva:garbled-mix:write] arith_pointer.c:56: 
-  Assigning imprecise value to d.
-  The imprecision originates from Arithmetic
 [eva] arith_pointer.c:57: 
-  Frama_C_show_each: {{ garbled mix of &{x} (origin: Arithmetic) }}
+  Frama_C_show_each:
+  {{ garbled mix of &{x} (origin: Arithmetic {arith_pointer.c:54}) }}
 [eva] arith_pointer.c:64: Frama_C_show_each: [-3..5]
 [eva] Recording results for main2
 [eva] Done for function main2

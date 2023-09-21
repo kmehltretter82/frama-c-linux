@@ -129,7 +129,7 @@
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈
                      {{ garbled mix of &{"Hello world !\n"}
-                      (origin: Library function) }}
+                      (origin: Library function {printf.c:68}) }}
   string ∈ {{ "Hello world !\n" }}
   wstring ∈ {{ L"Hello world !\n" }}
   c ∈ {52}

@@ -366,12 +366,12 @@ module Make_MapSet_Lattice
     match t1, t2 with
     | Top _ as x, Map _
     | Map _, (Top _ as x) -> x (* arbitrary, may be approximated *)
-    | Top (s1, o1), Top (s2, o2) -> Top (KSet.link s1 s2, Origin.link o1 o2)
+    | Top (s1, o1), Top (s2, o2) -> Top (KSet.link s1 s2, Origin.join o1 o2)
     | Map m1, Map m2 -> Map (KVMap.link m1 m2)
 
   let meet t1 t2 =
     match t1, t2 with
-    | Top (s1, o1), Top (s2, o2) -> Top (KSet.meet s1 s2, Origin.meet o1 o2)
+    | Top (s1, o1), Top (s2, o2) -> Top (KSet.meet s1 s2, Origin.join o1 o2)
     | Top (KSet.Top, _), (Map _ as m)
     | (Map _ as m), Top (KSet.Top, _) -> m
     | Top (KSet.Set s, _), (Map m)
@@ -382,7 +382,7 @@ module Make_MapSet_Lattice
   let narrow t1 t2 =
     match t1, t2 with
     | Top (s1, o1), Top (s2, o2) ->
-      Top (KSet.narrow s1 s2, Origin.narrow o1 o2)
+      Top (KSet.narrow s1 s2, Origin.join o1 o2)
     | Top (KSet.Top, _), (Map _ as m)
     | (Map _ as m), Top (KSet.Top, _) -> m
     | Top (KSet.Set set, _), (Map m)
