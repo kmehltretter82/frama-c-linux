@@ -34,15 +34,7 @@ module LocationLattice : Datatype.S
 
 (** List of possible origins. Most of them also include the set of
     source locations where the operation took place. *)
-type origin = private
-  | Misalign_read of LocationLattice.t (** Read of not all the bits of a
-                                           pointer, typically through a pointer cast *)
-  | Leaf of LocationLattice.t (** Result of a function without a body *)
-  | Merge of LocationLattice.t (** Join between two control-flows *)
-  | Arith of LocationLattice.t (** Arithmetic operation that cannot be
-                                      represented, eg. ['&x * 2'] *)
-  | Well (** Imprecise variables of the initial state *)
-  | Unknown
+type origin
 
 include Datatype.S with type t = origin
 
@@ -74,6 +66,8 @@ val meet: t -> t -> t
 val narrow: t -> t -> t
 
 val is_included: t -> t -> bool
+
+val is_precise: t -> bool
 
 (*
 Local Variables:

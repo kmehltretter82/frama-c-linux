@@ -211,16 +211,12 @@ module Location_Bytes = struct
     SetGarbledMix.clear ();
   ;;
 
-  (* We skip Well origins, because they have no location information and can be
-     tracked in the initial state. Unknown origins have no location, and are
-     only built as a side-product of the analysis. Leaf origins are also
-     skipped, because we may create tons of those, that get reduced to precise
-     values by the specifications of the function. *)
-  let is_gm_to_log m =
-    let open Origin in
-    match m with
-    | Map _ | Top (_, (Well | Unknown | Leaf _)) -> false
-    | Top (_, (Misalign_read _ | Merge _ | Arith _)) -> true
+  (* We skip imprecise origins: origins that have no location information,
+     and leaf origins, because we may create tons of those, that get reduced
+     to precise values by the specifications of the function. *)
+  let is_gm_to_log = function
+    | Top (_, origin) -> Origin.is_precise origin
+    | Map _ -> false
 
   let ref_track_garbled_mix = ref true
   let do_track_garbled_mix b = ref_track_garbled_mix := b

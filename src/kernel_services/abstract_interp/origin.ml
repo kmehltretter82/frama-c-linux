@@ -266,6 +266,14 @@ let is_included o1 o2 =
   (equal o1 (meet o1 o2))
 
 
+(* Well and Unknown origins have no location information.
+   Leaf origins are also imprecise, because we may create tons of those,
+   that get reduced to precise values by the specifications of the function. *)
+let is_precise = function
+  | Well | Unknown | Leaf _ -> false
+  | Misalign_read _ | Merge _ | Arith _ -> true
+
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."
