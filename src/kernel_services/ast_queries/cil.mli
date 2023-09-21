@@ -1020,6 +1020,14 @@ val isConstantOffset: ?is_varinfo_cst:(varinfo -> bool) -> offset -> bool
     constant with value zero *)
 val isZero: exp -> bool
 
+(** True if the given expression is a null pointer, i.e. [0], [(void * )0],
+    which are the two null pointer constants in the norm, or the cast of
+    a null pointer (constant or not) into a pointer type.
+
+    @since Frama-C+dev
+*)
+val is_nullptr: exp -> bool
+
 (** True if the term is the constant 0 *)
 val isLogicZero: term -> bool
 
@@ -1167,9 +1175,11 @@ val need_cast: ?force:bool -> typ -> typ -> bool
     @since Frama-C+dev*)
 val typeForInsertedCast: (exp -> typ -> typ -> typ) ref
 
-(** [checkCast context fromsource oldt newt] emits a warning or an error
-    if the cast from [oldt] to [newt] is invalid.
+(** [checkCast context fromsource nullptr_cast oldt newt] emits a warning
+    or an error if the cast from [oldt] to [newt] is invalid.
     Otherwise, doesn't make anything.
+    [nullptr_cast] is [true] iff the expression being casted is a null pointer.
+    Default is false.
     [fromsource] is [false] (default) if the cast is not from the source.
     Check [areCompatibleTypes] documentation for [context].
 
@@ -1183,7 +1193,10 @@ val typeForInsertedCast: (exp -> typ -> typ -> typ) ref
 
     @since Frama-C+dev*)
 val checkCast:
-  ?context:qualifier_check_context -> ?fromsource:bool -> typ -> typ -> unit
+  ?context:qualifier_check_context ->
+  ?nullptr_cast:bool ->
+  ?fromsource:bool ->
+  typ -> typ -> unit
 
 
 (** Generic version of {!Cil.mkCastT}.

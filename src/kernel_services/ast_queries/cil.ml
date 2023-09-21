@@ -5992,14 +5992,19 @@ let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
   | _, _ -> included_qualifiers ~context (typeAttrs t1) (typeAttrs t2)
 
 
+let rec is_nullptr e =
+  match e.enode with
+  | Const (CInt64 (i,_,_)) -> Integer.is_zero i
+  | CastE (t,e) when isPointerType t -> is_nullptr e
+  | _ -> false
+
 (* true if the expression is known to be a boolean result, i.e. 0 or 1. *)
 let rec is_boolean_result e =
   (isBoolType (typeOf e)) ||
   match e.enode with
   | Const _ ->
     (match isInteger e with
-     | Some i ->
-       Integer.equal i Integer.zero || Integer.equal i Integer.one
+     | Some i -> Integer.is_zero i || Integer.is_one i
      | None -> false)
   | CastE (_, e) -> is_boolean_result e
   | BinOp ((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), _, _, _) -> true
@@ -6301,8 +6306,7 @@ let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
 
 (******************** CASTING *****)
 
-
-let checkCast ?context ?(fromsource=false) =
+let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
   let rec default_rec oldt newt =
     let dkey = Kernel.dkey_typing_cast in
     let error s =
@@ -6402,16 +6406,17 @@ let checkCast ?context ?(fromsource=false) =
     (* No other conversion implying a pointer to function
           and a pointer to object are supported. *)
     | TPtr (t1, _), TPtr (t2, _) when isFunctionType t1 && isObjectType t2 ->
-      Kernel.warning
-        ~wkey:Kernel.wkey_incompatible_pointer_types
-        ~current:true
-        "casting function to %a" Cil_datatype.Typ.pretty newt
+      if not nullptr_cast then
+        Kernel.warning
+          ~wkey:Kernel.wkey_incompatible_pointer_types
+          ~current:true
+          "casting function to %a" Cil_datatype.Typ.pretty newt
     | TPtr (t1, _), TPtr (t2, _) when isFunctionType t2 && isObjectType t1 ->
-      Kernel.warning
-        ~wkey:Kernel.wkey_incompatible_pointer_types
-        ~current:true
-        "casting function from %a" Cil_datatype.Typ.pretty oldt
-
+      if not nullptr_cast then
+        Kernel.warning
+          ~wkey:Kernel.wkey_incompatible_pointer_types
+          ~current:true
+          "casting function from %a" Cil_datatype.Typ.pretty oldt
 
     | _, TPtr (t1, _) when isFunctionType t1 ->
       error "cannot cast %a to function type"
@@ -6540,7 +6545,8 @@ and mkCastTGen ?(check=true) ?context ?(fromsource=false) ?(force=false)
     end
   else
     let newt = if fromsource then newt else !typeForInsertedCast e oldt newt in
-    if check then checkCast ?context ~fromsource oldt newt;
+    let nullptr_cast = is_nullptr e in
+    if check then checkCast ?context ~nullptr_cast ~fromsource oldt newt;
     (newt, castReduce fromsource force oldt newt e)
 
 and mkCastT ?(check=true) ?(force=false) ~(oldt: typ) ~(newt: typ) e =
