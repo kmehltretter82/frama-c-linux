@@ -23,7 +23,16 @@ Open Source Release <next-release>
               For these purposes it presents a more efficient (albeit less
               precise) alternative to Eva. See src/plugins/alias/README.md.
 -   Kernel    [2023-09-04] Fix #@846 (printing ACSL attribute in ghost code)
+-   Eva       [2023-08-31] Adds warning key "garbled-mix" to all log messages
+              related to garbled mix (degenerated imprecise values).
+o   Eva       [2023-08-05] Remove deprecated API Db.Value.
+-   Eva       [2023-08-01] Print less messages unless -eva-show-progress is set.
 o   Kernel    [2023-07-24] Expose Cil functions for type compatibility
+-*  Eva       [2023-07-17] Fix unsound behavior on goto or switch statements
+              skipping local variable declarations: initialization alarms about
+              such variables are now properly emitted.
+-*  Eva       [2023-06-21] Fix convergence issue on dynamic memory allocation
+              in some loops.
 
 ###############################################################################
 Open Source Release 27.1 (Cobalt)
