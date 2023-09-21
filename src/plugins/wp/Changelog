@@ -24,6 +24,7 @@
 Plugin WP <next-release>
 ###############################################################################
 
+- WP          [2023-09-21] Sequent simplification now applies to lemmas
 - Gui         [2023-09-14] Basic WP goals component for Ivette
 - WP          [2023-07-24] New option -wp-memlimit for provers
 - WP          [2023-07-24] Fixed cache for interactive provers
