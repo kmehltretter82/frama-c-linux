@@ -58,7 +58,7 @@ int main() {
   wchar_t wdst2[20] = {0};
   wcsncat(wdst2, wsrc, 11); // no warning
   wcsncat(wdst2, wsrc, 10); // no warning (if wdst2 is precise)
-  //@ loop unroll 10;
+  //@ loop \eva::unroll 10;
   for (int i = 0; i < 10; i++)
     wdst2[i] = L'A';
   wdst2[10] = L'\0'; // wdst2 now has length 10

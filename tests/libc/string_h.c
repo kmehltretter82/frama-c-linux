@@ -30,7 +30,7 @@ void test_strncat(void)
   char data[100];
   data[0] = '\0';
   char source[100];
-  //@ slevel 99;
+  //@ \eva::slevel 99;
   for (int i = 0; i < 99; i++) source[i] = 'Z';
   source[99] = '\0';
   strncat(data, source, 100);
@@ -46,7 +46,7 @@ struct s {
 void crashes_gcc() {
   struct s s;
   char *ss = "ABCDEFGHIJKLMNOPQRSTUVWXYZ012";
-  //@ slevel 30;
+  //@ \eva::slevel 30;
   for (int i = 0; i < 30; i++) s.s1[i] = ss[i];
   char *dest = s.s1+29;
   char *src = s.s1;

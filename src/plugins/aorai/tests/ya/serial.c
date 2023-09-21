@@ -71,7 +71,7 @@ void main(void)
           n = 0;
           continue;
         }
-        //@ split data & 0x40;
+        //@ \eva::split data & 0x40;
       }
       else { // data receieved
         if (n == 0) { // but status was expected}

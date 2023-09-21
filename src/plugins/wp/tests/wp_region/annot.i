@@ -31,7 +31,7 @@ typedef struct Block {
   SN sum ;
 } FB ;
 
-//@ region *fb ;
+//@ \wp::region *fb ;
 void fb_ADD(FB *fb)
 {
   fb->out1->v = fb->out1->v + fb->out2->v ;
@@ -39,9 +39,9 @@ void fb_ADD(FB *fb)
 }
 
 /*@
-  region IN:   (fb->inp1 .. fb->inp3), \pattern{PMEM} ;
-  region OUT:  (fb->out1 .. fb->out3), \pattern{PVECTOR} ;
-  region IDX:  (fb->idx1 .. fb->idx3), \pattern{PVECTOR} ;
+  \wp::region IN:   (fb->inp1 .. fb->inp3), \pattern{PMEM} ;
+  \wp::region OUT:  (fb->out1 .. fb->out3), \pattern{PVECTOR} ;
+  \wp::region IDX:  (fb->idx1 .. fb->idx3), \pattern{PVECTOR} ;
  */
 void fb_SORT(FB *fb)
 {

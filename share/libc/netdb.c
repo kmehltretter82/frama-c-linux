@@ -58,11 +58,11 @@ int getaddrinfo(
       struct sockaddr* sa = malloc(sizeof(*sa));
       if (!sa) return EAI_MEMORY;
       sa -> sa_family = Frama_C_interval(0,AF_MAX);
-      //@ slevel 15;
+      //@ \eva::slevel 15;
       for (int i = 0; i < 14; i++) {
         sa -> sa_data[i] = Frama_C_interval(CHAR_MIN,CHAR_MAX);
       }
-      //@ slevel default;
+      //@ \eva::slevel default;
       ai -> ai_flags = 0;
       ai -> ai_family = sa -> sa_family;
       ai -> ai_socktype = Frama_C_interval(0,SOCK_SEQPACKET);
