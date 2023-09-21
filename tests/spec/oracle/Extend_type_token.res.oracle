@@ -1,0 +1,6 @@
+[kernel:acsl-extension] Warning: 
+  Trying to register ACSL extension foo twice. Ignoring second extension
+[kernel] Parsing Extend_type_token.i (no preprocessing)
+[kernel] Extend_type_token.i:7: User Error: 
+  Type token 'integer' received instead of extension identifier
+[kernel] Frama-C aborted: invalid user input.
