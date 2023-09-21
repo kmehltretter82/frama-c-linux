@@ -311,16 +311,18 @@ module Make
       | Some location ->
         let loc = Precise_locs.imprecise_location (get_ploc location) in
         let cvalue = Cvalue.Model.find cvalue_state loc in
-        if Cvalue.V.is_imprecise cvalue
-        then
-          begin
+        begin
+          match cvalue with
+          | Top (bases, origin) ->
             ignore (Locations.Location_Bytes.track_garbled_mix cvalue);
+            Origin.register_write bases origin;
             Self.warning ~current:true ~once:true
               ~wkey:Self.wkey_garbled_mix_assigns
               "The specification of function %a has generated a garbled mix \
                for %a."
               Kernel_function.pretty kf pp_assign_clause (Assign, assign)
-          end
+          | _ -> ()
+        end
     in
     let check_one_state state =
       let cvalue_state = get_cvalue_or_top state in

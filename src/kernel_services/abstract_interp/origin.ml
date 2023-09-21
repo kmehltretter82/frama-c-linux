@@ -88,7 +88,7 @@ module Prototype = struct
       Format.fprintf fmt "%s@ {%a}" (kind_label kind) pretty_loc loc
 end
 
-include Datatype.Make (Prototype)
+include Datatype.Make_with_collections (Prototype)
 
 let pretty_as_reason fmt org =
   if not (is_unknown org)
@@ -103,12 +103,77 @@ let join t1 t2 =
 
 let is_included = equal
 
+let is_current = function
+  | Unknown | Well -> false
+  | Origin { loc } -> Cil_datatype.Location.equal loc (Cil.CurrentLoc.get ())
+
 (* Well and Unknown origins have no location information.
    Leaf origins are also imprecise, because we may create tons of those,
    that get reduced to precise values by the specifications of the function. *)
 let is_precise = function
   | Unknown | Well -> false
   | Origin { kind } -> kind <> Leaf
+
+
+module History_Info = struct
+  let name = "Origin.History"
+  let dependencies = []
+  let size = 32
+end
+
+module History_Data =
+  Datatype.Triple (Datatype.Int) (Datatype.Int) (Base.SetLattice)
+module History = State_builder.Hashtbl (Hashtbl) (History_Data) (History_Info)
+
+let clear () = Id.reset (); History.clear ()
+
+let register_write bases t =
+  if not (is_unknown t) then
+    let change (w, r, b) = w+1, r, Base.SetLattice.join b bases in
+    ignore (History.memo ~change (fun _ -> 1, 0, bases) t)
+
+let register_read bases t =
+  if not (is_unknown t || is_current t) then
+    let change (w, r, b) = w, r+1, Base.SetLattice.join b bases in
+    ignore (History.memo ~change (fun _ -> 0, 1, bases) t)
+
+
+let get_history () =
+  let list = List.of_seq (History.to_seq ()) in
+  let list = List.filter (fun (_origin, (_, r, _)) -> r > 0) list in
+  let cmp (origin1, (_, r1, _)) (origin2, (_, r2, _)) =
+    let r = r2 - r1 in
+    if r <> 0 then r else compare origin1 origin2
+  in
+  List.sort cmp list
+
+let pretty_origin fmt origin =
+  match origin with
+  | Unknown -> Format.fprintf fmt "Unknown origin"
+  | Well -> Format.fprintf fmt "Initial state"
+  | Origin { kind; loc; } ->
+    let kind =
+      match kind with
+      | Misalign_read -> "misaligned read of addresses"
+      | Leaf -> "interpretation of assigns clause"
+      | Merge -> "imprecise merge of addresses"
+      | Arith -> "arithmetic operation on addresses"
+    in
+    Format.fprintf fmt "%a: %s" Cil_datatype.Location.pretty loc kind
+
+let pretty_history fmt =
+  let list = get_history () in
+  let pp_origin fmt (origin, (w, r, bases)) =
+    let bases = Base.SetLattice.filter (fun b -> not (Base.is_null b)) bases in
+    Format.fprintf fmt
+      "@[<hov 2>%a@ (read %i times, propagated %i times)@ \
+       garbled mix of &%a@]"
+      pretty_origin origin r w Base.SetLattice.pretty bases
+  in
+  if list <> [] then
+    Format.fprintf fmt
+      "@[<v 2>Origins of garbled mix generated during analysis:@,%a@]"
+      (Pretty_utils.pp_list ~sep:"@," pp_origin) list
 
 (*
 Local Variables:

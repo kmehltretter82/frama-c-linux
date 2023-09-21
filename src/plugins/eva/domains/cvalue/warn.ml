@@ -99,7 +99,8 @@ let warn_imprecise_lval_read lv loc contents =
    [exp_val] is the part of the evaluation of [exp] that is imprecise. *)
 let warn_right_exp_imprecision lv loc_lv exp_val =
   match exp_val with
-  | Location_Bytes.Top(_topparam,origin) ->
+  | Location_Bytes.Top(topparam, origin) ->
+    Origin.register_write topparam origin;
     Self.warning ~wkey:Self.wkey_garbled_mix_write ~once:true ~current:true
       "@[<v>@[Assigning imprecise value to %a%t.@]%a%t@]"
       Printer.pp_lval lv

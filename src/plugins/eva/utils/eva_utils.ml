@@ -286,6 +286,7 @@ let lval_to_exp =
     (fun lv -> Cil.new_exp ~loc:Cil_datatype.Location.unknown (Lval lv))
 
 let dump_garbled_mix () =
+  Self.warning ~wkey:Self.wkey_garbled_mix_summary "%t" Origin.pretty_history;
   let l = Cvalue.V.get_garbled_mix () in
   if l <> [] then
     let pp_one fmt v = Format.fprintf fmt "@[<hov 2>%a@]" Cvalue.V.pretty v in

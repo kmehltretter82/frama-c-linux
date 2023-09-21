@@ -102,6 +102,7 @@ let pre_analysis () =
      degeneration states *)
   Eva_utils.DegenerationPoints.clear ();
   Cvalue.V.clear_garbled_mix ();
+  Origin.clear ();
   Eva_utils.clear_call_stack ()
 
 let post_analysis_cleanup ~aborted =

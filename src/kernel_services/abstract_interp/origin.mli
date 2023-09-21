@@ -52,6 +52,22 @@ val is_included: t -> t -> bool
 
 val is_precise: t -> bool
 
+(** Records the write of an imprecise value of the given bases,
+    with the given origin. *)
+val register_write: Base.SetLattice.t -> t -> unit
+
+(** Records the read of an imprecise value of the given bases,
+    with the given origin. *)
+val register_read: Base.SetLattice.t -> t -> unit
+
+(** Pretty-print a summary of the origins of imprecise values recorded
+    by [register_write] and [register_read] above. *)
+val pretty_history: Format.formatter -> unit
+
+(** Clears the history of origins saved by [register_write] and
+    [register_read] above. *)
+val clear: unit -> unit
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."
