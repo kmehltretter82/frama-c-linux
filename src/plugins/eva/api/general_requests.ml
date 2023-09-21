@@ -138,6 +138,7 @@ end
 
 type dead_code =
   { kf: Kernel_function.t;
+    reached : stmt list;
     unreachable : stmt list;
     non_terminating : stmt list; }
 
@@ -146,6 +147,10 @@ module DeadCode = struct
 
   type record
   let record : record Record.signature = Record.signature ()
+
+  let reached = Record.field record ~name:"reached"
+      ~descr:(Markdown.plain "List of statements reached by the analysis.")
+      (module Data.Jlist (Kernel_ast.Marker))
 
   let unreachable = Record.field record ~name:"unreachable"
       ~descr:(Markdown.plain "List of unreachable statements.")
@@ -163,31 +168,36 @@ module DeadCode = struct
   let jtype = R.jtype
 
   let to_json (dead_code) =
-    let make_unreachable stmt = Printer_tag.PStmt (dead_code.kf, stmt)
+    let make_stmt stmt = Printer_tag.PStmt (dead_code.kf, stmt)
     and make_non_term stmt = Printer_tag.PStmtStart (dead_code.kf, stmt) in
     R.default |>
-    R.set unreachable (List.map make_unreachable dead_code.unreachable) |>
+    R.set reached (List.map make_stmt dead_code.reached) |>
+    R.set unreachable (List.map make_stmt dead_code.unreachable) |>
     R.set non_terminating (List.map make_non_term dead_code.non_terminating) |>
     R.to_json
 end
 
 let dead_code kf =
-  let empty = { kf; unreachable = []; non_terminating = [] } in
+  let empty =
+    { kf; reached = []; unreachable = []; non_terminating = []; }
+  in
   if Analysis.is_computed ()
   then
     try
       let fundec = Kernel_function.get_definition kf in
       match Analysis.status kf with
       | Unreachable | SpecUsed | Builtin _ ->
-        { kf; unreachable = fundec.sallstmts; non_terminating = [] }
+        { empty with unreachable = fundec.sallstmts; }
       | Analyzed NoResults -> empty
       | Analyzed (Partial | Complete) ->
         let classify acc stmt =
           if Results.(before stmt |> is_empty)
           then { acc with unreachable = stmt :: acc.unreachable }
-          else if Results.(after stmt |> is_empty)
-          then { acc with non_terminating = stmt :: acc.non_terminating }
-          else acc
+          else
+            let acc = { acc with reached = stmt :: acc.reached } in
+            if Results.(after stmt |> is_empty)
+            then { acc with non_terminating = stmt :: acc.non_terminating }
+            else acc
         in
         List.fold_left classify empty fundec.sallstmts
     with Kernel_function.No_Definition -> empty

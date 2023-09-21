@@ -322,14 +322,34 @@ function createMultipleDecorator(): Editor.Extension {
 // -----------------------------------------------------------------------------
 
 // This field contains the dead code information as inferred by Eva.
-const emptyDeadCode = { unreachable: [], nonTerminating: [] };
+const emptyDeadCode = { reached: [], unreachable: [], nonTerminating: [] };
 const Dead = Editor.createField<Eva.deadCode>(emptyDeadCode);
+
+function diffRanges(a: Editor.Range[], b: Editor.Range[]): Editor.Range[] {
+  const cmp = (x: Editor.Range, y: Editor.Range): number => {
+    return (x.from !== y.from) ? (x.from - y.from) : (y.to - x.to);
+  };
+  a.sort(cmp);
+  b.sort(cmp);
+  function split(x: Editor.Range): Editor.Range[] {
+    const y = b.find((r) => r.from >= x.from && r.from < x.to);
+    if (y === undefined) return [x];
+    const t = [];
+    if (x.from < y.from) t.push({ from: x.from, to: y.from - 1 });
+    if (y.to < x.to) return t.concat(split({ from: y.to + 1, to: x.to }));
+    return t;
+  }
+  return a.flatMap(split);
+}
 
 const UnreachableRanges = createUnreachableRanges();
 function createUnreachableRanges(): Editor.Aspect<Editor.Range[]> {
   const deps = { dead: Dead, ranges: Ranges };
   return Editor.createAspect(deps, ({ dead, ranges }) => {
-    return mapFilter(dead.unreachable, m => ranges.get(m)).flat();
+    const unreachable = mapFilter(dead.unreachable, m => ranges.get(m)).flat();
+    const reached = mapFilter(dead.reached, m => ranges.get(m)).flat();
+    const r = diffRanges(unreachable, reached);
+    return r;
   });
 }
 
@@ -677,8 +697,7 @@ function useFctText(fct: Fct): text {
 
 // Server request handler returning the given function's dead code information.
 function useFctDead(fct: Fct): Eva.deadCode {
-  const empty = { unreachable: [], nonTerminating: [] };
-  return States.useRequest(Eva.getDeadCode, fct) ?? empty;
+  return States.useRequest(Eva.getDeadCode, fct) ?? emptyDeadCode;
 }
 
 // Server request handler returning the given function's callers.
