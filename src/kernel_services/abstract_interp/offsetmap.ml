@@ -1846,9 +1846,10 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
   let update_aux_tr_offsets ~exact ~offsets ~size v curr_off t =
     match offsets with
     | Tr_offset.Overlap (mn, mx, origin) ->
-      let origin = if origin = Origin.Unknown
-        then Origin.(current K_Misalign_read)
-        else origin
+      let origin =
+        match origin with
+        | Some origin -> origin
+        | None -> Origin.(current K_Misalign_read)
       in
       let v = V.topify_with_origin origin v in
       (* TODO: check *)

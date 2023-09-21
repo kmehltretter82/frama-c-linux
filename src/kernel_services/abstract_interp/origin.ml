@@ -98,6 +98,7 @@ type origin =
   | Well
   | Unknown
 
+let well = Well
 
 let current = function
   | K_Misalign_read -> Misalign_read (LocationLattice.current_loc ())

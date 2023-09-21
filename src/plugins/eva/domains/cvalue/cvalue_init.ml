@@ -33,7 +33,7 @@ let add_initialized state loc v =
 let make_well hidden_base state loc =
   let size = Bit_utils.max_bit_size () in
   let well =
-    Cvalue.V.inject_top_origin Origin.Well (Base.Hptset.singleton hidden_base)
+    Cvalue.V.inject_top_origin Origin.well (Base.Hptset.singleton hidden_base)
   in
   let well_loc =
     Locations.make_loc

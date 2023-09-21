@@ -34,7 +34,7 @@ module LocationLattice : Datatype.S
 
 (** List of possible origins. Most of them also include the set of
     source locations where the operation took place. *)
-type origin =
+type origin = private
   | Misalign_read of LocationLattice.t (** Read of not all the bits of a
                                            pointer, typically through a pointer cast *)
   | Leaf of LocationLattice.t (** Result of a function without a body *)
@@ -55,6 +55,9 @@ type kind =
 
 val current: kind -> origin
 (** This is automatically extracted from [Cil.CurrentLoc] *)
+
+val well: origin
+(** Creates a well origin. *)
 
 val pretty_as_reason: Format.formatter -> t -> unit
 (** Pretty-print [because of <origin>] if the origin is not {!Unknown}, or
