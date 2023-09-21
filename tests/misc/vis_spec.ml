@@ -36,7 +36,11 @@ class pathcrawlerVisitor prj =
   end
 
 let startup () =
-  ignore(Ast.get ());
+  let open Populate_spec in
+  let get_spec kf =
+    populate_funspec ~do_body:true kf [`Exits]
+  in
+  Globals.Functions.iter get_spec;
   Format.printf "Starting visit@.";
   let prj = File.create_project_from_visitor "pcanalyzer"
       (fun prj -> new pathcrawlerVisitor prj)
