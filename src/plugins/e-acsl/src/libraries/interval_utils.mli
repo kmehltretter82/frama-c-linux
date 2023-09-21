@@ -63,7 +63,7 @@ val interv_of_logic_typ : logic_type -> ival
 (** @return the smallest interval which contains the given logic type. *)
 
 exception Not_representable_ival
-(** raised by {!ikind_of_ival].
+(** raised by {!ikind_of_ival}.
     @since Frama-C+dev
 *)
 
