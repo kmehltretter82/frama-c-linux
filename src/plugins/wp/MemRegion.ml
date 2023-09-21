@@ -195,14 +195,14 @@ let constructor ~basename ~params ~index ~addrof ~consistent =
         l_cluster = cluster ;
         l_kind = Admit ;
         l_name = Printf.sprintf "addrof_%s_%d" basename id ;
-        l_forall = params ; l_types = 0 ; l_triggers = [] ;
+        l_forall = params ; l_triggers = [] ;
         l_lemma = p_addrof ;
       } ;
       Definitions.define_lemma {
         l_cluster = cluster ;
         l_kind = Admit ;
         l_name = Printf.sprintf "consistent_%s_%d" basename id ;
-        l_forall = params ; l_types = 0 ; l_triggers = [] ;
+        l_forall = params ; l_triggers = [] ;
         l_lemma = p_consistent ;
       } ;
       if p_index != F.p_true then
@@ -210,7 +210,7 @@ let constructor ~basename ~params ~index ~addrof ~consistent =
           l_cluster = cluster ;
           l_kind = Admit ;
           l_name = Printf.sprintf "index_%s_%d" basename id ;
-          l_forall = params @ [k] ; l_types = 0 ; l_triggers = [] ;
+          l_forall = params @ [k] ; l_triggers = [] ;
           l_lemma = p_index ;
         } ;
       lfun

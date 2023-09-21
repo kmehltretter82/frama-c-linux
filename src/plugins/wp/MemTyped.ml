@@ -239,7 +239,7 @@ module OPAQUE_COMP_LENGTH = WpContext.Generator(Cil_datatype.Compinfo)
         Definitions.define_lemma {
           l_kind = Admit ;
           l_name = "Positive_Length_of_" ^ Lang.comp_id c ;
-          l_types = 0 ; l_triggers = [] ; l_forall = [] ;
+          l_triggers = [] ; l_forall = [] ;
           l_cluster = Definitions.compinfo c ;
           l_lemma = Lang.F.(p_lt e_zero (e_fun size []))
         } ;
@@ -460,7 +460,7 @@ module STRING = WpContext.Generator(LITERAL)
         let sized = Cstring.str_len cst (F.e_add alloc F.e_minus_one) in
         Definitions.define_lemma {
           l_kind = Admit ;
-          l_name = name ; l_types = 0 ;
+          l_name = name ;
           l_triggers = [] ; l_forall = [] ;
           l_lemma = p_forall [a] (p_imply m_linked sized) ;
           l_cluster = Cstring.cluster () ;
@@ -471,7 +471,7 @@ module STRING = WpContext.Generator(LITERAL)
         let re = - Cstring.str_id cst in
         Definitions.define_lemma {
           l_kind = Admit ;
-          l_name = name ; l_types = 0 ; l_triggers = [] ; l_forall = [] ;
+          l_name = name ; l_triggers = [] ; l_forall = [] ;
           l_lemma = p_equal (e_fun f_region [base]) (e_int re) ;
           l_cluster = Cstring.cluster () ;
         }
@@ -490,7 +490,7 @@ module STRING = WpContext.Generator(LITERAL)
         let read = F.p_equal c v in
         Definitions.define_lemma {
           l_kind = Admit ;
-          l_name = name ; l_types = 0 ; l_triggers = [] ;
+          l_name = name ; l_triggers = [] ;
           l_forall = [m;i] ;
           l_cluster = Cstring.cluster () ;
           l_lemma = F.p_imply m_sconst read ;
@@ -514,7 +514,7 @@ module STRING = WpContext.Generator(LITERAL)
         Definitions.define_lemma {
           l_name = prefix ^ "_base" ;
           l_kind = Admit ;
-          l_types = 0 ; l_triggers = [] ; l_forall = [] ;
+          l_triggers = [] ; l_forall = [] ;
           l_lemma = F.p_lt base F.e_zero ;
           l_cluster = Cstring.cluster () ;
         } ;
@@ -548,7 +548,7 @@ module BASE = WpContext.Generator(Varinfo)
         let re = if x.vglob then 0 else if x.vformal then 1 else 2 in
         Definitions.define_lemma {
           l_kind = Admit ;
-          l_name = name ; l_types = 0 ; l_triggers = [] ; l_forall = [] ;
+          l_name = name ; l_triggers = [] ; l_forall = [] ;
           l_lemma = p_equal (e_fun f_region [base]) (e_int re) ;
           l_cluster = cluster_globals () ;
         }
@@ -572,7 +572,7 @@ module BASE = WpContext.Generator(Varinfo)
           let base_size = p_equal (F.e_get m base) size in
           Definitions.define_lemma {
             l_kind = Admit ;
-            l_name = name ; l_types = 0 ;
+            l_name = name ;
             l_triggers = [] ; l_forall = [] ;
             l_lemma = p_forall [a] (p_imply m_linked base_size) ;
             l_cluster = cluster_globals () ;
@@ -593,7 +593,7 @@ module BASE = WpContext.Generator(Varinfo)
           let init_prop = p_forall [a] (p_imply m_init init_access) in
           Definitions.define_lemma {
             l_kind = Admit ;
-            l_name = prefix ^ "_init" ; l_types = 0 ;
+            l_name = prefix ^ "_init" ;
             l_triggers = [] ; l_forall = [] ;
             l_lemma = init_prop ;
             l_cluster = cluster_globals () ;

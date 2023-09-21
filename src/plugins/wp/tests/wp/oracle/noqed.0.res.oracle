@@ -9,8 +9,8 @@
   Global
 ------------------------------------------------------------
 
-Lemma ko:
-Prove: false
+Goal Lemma 'ko':
+Prove: false.
 Prover Qed returns Unsuccess
 
 ------------------------------------------------------------

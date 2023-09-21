@@ -64,19 +64,6 @@ let pp_function fmt kf bhv =
 let pp_warnings fmt ws =
   List.iter (fun w -> Format.fprintf fmt "%a@\n" Warning.pretty w) ws
 
-let kf_context = function Axiomatic _ -> `Always | Function(kf,_) -> `Context kf
-
-let pp_dependency context fmt d =
-  Format.fprintf fmt " - Assumes %a"
-    (Description.pp_localized ~kf:context ~ki:false ~kloc:true) d
-
-let pp_dependencies context fmt ds =
-  List.iter (fun d -> Format.fprintf fmt "%a@\n" (pp_dependency context) d) ds
-
-let pp_depend fmt d =
-  Format.fprintf fmt " - Assumes %a"
-    (Description.pp_localized ~kf:`Always ~ki:false ~kloc:true) d
-
 (* ------------------------------------------------------------------------ *)
 (* ---  Proof Obligations Definition                                    --- *)
 (* ------------------------------------------------------------------------ *)
@@ -113,44 +100,6 @@ struct
     in
     let id = WpPropId.get_propid pid in
     file ~id ~model ~prover ~ext ()
-
-  let file_kf ~kf ~model ~prover =
-    let ext = match prover with
-      | Qed -> "qed"
-      | Why3 _ -> "why"
-      | Tactical -> "tac"
-    in
-    let id = (Kf.vi kf).vname in
-    file ~id ~model ~prover ~ext ()
-
-  let dump_file fmt title file =
-    if Sys.file_exists file then
-      begin
-        Format.fprintf fmt "--- %s ---------------------------------@\n" title ;
-        Command.pp_from_file fmt file
-      end
-
-  let pretty ~pid ~model ~prover ~result fmt =
-    begin
-      Format.fprintf fmt "[%a] Goal %a : %a@\n"
-        pp_prover prover WpPropId.pp_propid pid pp_result result ;
-      dump_file fmt "StdOut" (file_logout ~pid ~model ~prover) ;
-      dump_file fmt "StdErr" (file_logerr ~pid ~model ~prover) ;
-    end
-
-  let cache_log ~pid ~model ~prover ~result =
-    (*TODO: put a cache here *)
-    let dir = Wp_parameters.get_output () in
-    let file = Printf.sprintf "%s/log.txt" (dir :> string) in
-    Command.print_file file (pretty ~pid ~model ~prover ~result) ;
-    file
-
-  let cache_descr pretty =
-    (*TODO: put a cache here *)
-    let dir = Wp_parameters.get_output () in
-    let file = Printf.sprintf "%s/goal.txt" (dir :> string) in
-    Command.print_file file (fun fmt -> pretty fmt) ; file
-
 end
 
 module GOAL =
@@ -194,7 +143,7 @@ struct
   let apply option phi g =
     try
       Db.yield () ;
-      Wp_parameters.debug ~dkey "Appy %s" option ;
+      Wp_parameters.debug ~dkey "Apply %s" option ;
       g.sequent <- phi g.sequent ;
     with exn when Wp_parameters.protect exn ->
       Wp_parameters.warning ~current:false ~once:true
@@ -256,57 +205,11 @@ struct
 
 end
 
-module VC_Lemma =
-struct
-
-  open Definitions
-
-  type t = {
-    lemma : Definitions.dlemma ;
-    depends : logic_lemma list ;
-    mutable sequent : Conditions.sequent option ;
-  }
-
-  let is_trivial vc = vc.lemma.l_lemma == F.p_true
-
-  let sequent vc =
-    match vc.sequent with
-    | Some s -> s
-    | None ->
-      let s = Conditions.lemma vc.lemma.l_lemma in
-      vc.sequent <- Some s ; s
-
-  let pretty fmt vc results =
-    begin
-      Format.fprintf fmt "Lemma %s:@\n" vc.lemma.l_name ;
-      if vc.depends <> [] then
-        begin
-          Format.fprintf fmt "@[<hov 2>@{<bf>Assume@}:" ;
-          List.iter
-            (fun a -> Format.fprintf fmt "@ '%s'" a.lem_name)
-            vc.depends ;
-          Format.fprintf fmt "@]@." ;
-        end ;
-      let env = F.env (List.fold_right F.Vars.add vc.lemma.l_forall F.Vars.empty) in
-      Format.fprintf fmt "@{<bf>Prove@}: @[<hov 2>%a@]@." (F.pp_epred env) vc.lemma.l_lemma ;
-      List.iter
-        (fun (prover,result) ->
-           if result.verdict <> NoResult then
-             Format.fprintf fmt "Prover %a returns %t@\n"
-               pp_prover prover (pp_result_qualif prover result)
-        ) results ;
-    end
-
-  let cache_descr vc results =
-    DISK.cache_descr (fun fmt -> pretty fmt vc results)
-
-end
-
 module VC_Annot =
 struct
 
   type t = {
-    (* Generally empty, but for Lemma sub-goals *)
+    (* Generally empty, but for Lemmas *)
     axioms : Definitions.axioms option ;
     goal : GOAL.t ;
     tags : Splitter.tag list ;
@@ -367,6 +270,15 @@ struct
           List.iter (fun tg -> Format.fprintf fmt "@ %a" Splitter.pretty tg) vc.tags ;
           Format.fprintf fmt "@].@\n" ;
         end ;
+      begin match vc.axioms with
+        | Some (_, depends) when depends <> [] ->
+          Format.fprintf fmt "@[<hov 2>@{<bf>Assume Lemmas@}:" ;
+          List.iter
+            (fun a -> Format.fprintf fmt "@ '%s'" a.lem_name)
+            depends ;
+          Format.fprintf fmt "@]@." ;
+        | _ -> ()
+      end ;
       pp_warnings fmt vc.warn ;
       Pcond.pretty fmt (GOAL.compute_descr ~pid vc.goal) ;
       List.iter
@@ -378,18 +290,11 @@ struct
         ) results ;
     end
 
-  let cache_descr ~pid vc results =
-    DISK.cache_descr (fun fmt -> pretty fmt pid vc results)
-
 end
 
 (* ------------------------------------------------------------------------ *)
 (* ---  Proof Obligations Database                                      --- *)
 (* ------------------------------------------------------------------------ *)
-
-type formula =
-  | GoalLemma of VC_Lemma.t
-  | GoalAnnot of VC_Annot.t
 
 type po = t and t = {
     po_gid   : string ;  (* goal identifier *)
@@ -398,7 +303,7 @@ type po = t and t = {
     po_idx   : index ;   (* goal index *)
     po_model : WpContext.model ;
     po_pid   : WpPropId.prop_id ; (* goal target property *)
-    po_formula : formula ; (* proof obligation *)
+    po_formula : VC_Annot.t ; (* proof obligation *)
   }
 
 let get_index w = w.po_idx
@@ -409,11 +314,13 @@ let get_scope w = match w.po_idx with
   | Function(kf,_) -> WpContext.Kf kf
 let get_context w = w.po_model , get_scope w
 
-let get_depend = function
-  | { po_formula = GoalAnnot { VC_Annot.deps = ips } } ->
-    Property.Set.elements ips
-  | { po_formula = GoalLemma { VC_Lemma.depends = ips } } ->
-    List.map LogicUsage.ip_lemma ips
+let get_depend wpo =
+  let open LogicUsage in
+  let deps = wpo.po_formula.deps in
+  let axioms = wpo.po_formula.axioms in
+  List.rev_append
+    (Option.fold ~none:[] ~some:(fun (_, l) -> List.map ip_lemma l) axioms)
+    (Property.Set.elements deps)
 
 let get_file_logout w prover =
   DISK.file_logout ~pid:w.po_pid ~model:(get_model w) ~prover
@@ -472,7 +379,7 @@ module S =
           po_gid = "";
           po_model = WpContext.MODEL.repr ;
           po_name = "dummy";
-          po_formula = GoalAnnot VC_Annot.repr ;
+          po_formula = VC_Annot.repr ;
         }]
     end)
 (* to get a "reasonable" API doc: *)
@@ -511,9 +418,7 @@ let get_gid g = g.po_gid
 let get_property g = WpPropId.property_of_id g.po_pid
 
 let qed_time wpo =
-  match wpo.po_formula with
-  | GoalLemma _ -> 0.0
-  | GoalAnnot { VC_Annot.goal = g } -> GOAL.qed_time g
+  GOAL.qed_time wpo.po_formula.goal
 
 (* -------------------------------------------------------------------------- *)
 (* --- Proof Collector                                                    --- *)
@@ -716,9 +621,7 @@ let remove g =
     removed g ;
   end
 
-let warnings = function
-  | { po_formula = GoalAnnot vcq } -> vcq.VC_Annot.warn
-  | { po_formula = GoalLemma _ } -> []
+let warnings wpo = wpo.po_formula.VC_Annot.warn
 
 let get_target g = WpPropId.property_of_id g.po_pid
 
@@ -813,17 +716,11 @@ let get_results g =
   with Not_found -> []
 
 let is_trivial g =
-  match g.po_formula with
-  | GoalLemma vc -> VC_Lemma.is_trivial vc
-  | GoalAnnot vc -> VC_Annot.is_trivial vc
+  VC_Annot.is_trivial g.po_formula
 
 let reduce g =
-  match g.po_formula with
-  | GoalLemma vc ->
-    WpContext.on_context (get_context g) VC_Lemma.is_trivial vc
-  | GoalAnnot vc ->
-    let pid = g.po_pid in
-    WpContext.on_context (get_context g) (VC_Annot.resolve ~pid) vc
+  let pid = g.po_pid in
+  WpContext.on_context (get_context g) (VC_Annot.resolve ~pid) g.po_formula
 
 let resolve g =
   let valid = reduce g in
@@ -833,24 +730,16 @@ let resolve g =
   else false
 
 let computed g =
-  match g.po_formula with
-  | GoalAnnot { VC_Annot.goal = goal } ->
-    GOAL.is_computed goal
-  | GoalLemma _ -> false
+  GOAL.is_computed g.po_formula.goal
 
 let compute g =
   let ctxt = get_context g in
-  match g.po_formula with
-  | GoalAnnot { VC_Annot.axioms ; VC_Annot.goal = goal } ->
-    let pid = g.po_pid in
-    axioms ,
-    let qed = GOAL.is_computed goal in
-    let seq = WpContext.on_context ctxt (GOAL.compute_descr ~pid) goal in
-    if not qed then modified g ; seq
-  | GoalLemma ({ VC_Lemma.depends = depends ; VC_Lemma.lemma = lemma } as w) ->
-    let open Definitions in
-    Some( lemma.l_cluster , depends ) ,
-    WpContext.on_context ctxt VC_Lemma.sequent w
+  let pid = g.po_pid in
+  g.po_formula.axioms ,
+  let goal = g.po_formula.goal in
+  let qed = GOAL.is_computed goal in
+  let seq = WpContext.on_context ctxt (GOAL.compute_descr ~pid) goal in
+  if not qed then modified g ; seq
 
 let is_valid g =
   is_trivial g || List.exists (fun (_,r) -> VCS.is_valid r) (get_results g)
@@ -878,13 +767,7 @@ let has_unknown g =
 let pp_title fmt w = Format.pp_print_string fmt w.po_name
 
 let pp_goal_model fmt w =
-  begin
-    match w.po_formula with
-    | GoalAnnot vcq ->
-      VC_Annot.pretty fmt w.po_pid vcq (get_results w)
-    | GoalLemma vca ->
-      VC_Lemma.pretty fmt vca (get_results w)
-  end
+  VC_Annot.pretty fmt w.po_pid w.po_formula (get_results w)
 
 let pp_goal fmt w = WpContext.on_context (get_context w) (pp_goal_model fmt) w
 
@@ -972,39 +855,6 @@ let goals_of_property prop =
 (* -------------------------------------------------------------------------- *)
 
 let get_model w = w.po_model
-
-let get_logfile w prover result =
-  let model = get_model w in
-  DISK.cache_log ~pid:w.po_pid ~model ~prover ~result
-
-let pp_logfile fmt w prover =
-  let model = get_model w in
-  let result = get_result w prover in
-  DISK.pretty ~pid:w.po_pid ~model ~prover ~result fmt
-
-let is_computing = function VCS.Computing _ -> true | _ -> false
-
-let get_files w =
-  let results = get_results w in
-  let descr_files = match w.po_formula with
-    | GoalAnnot vcq ->
-      [ "Goal" , VC_Annot.cache_descr ~pid:w.po_pid vcq results ]
-    | GoalLemma vca ->
-      [ "Lemma" , VC_Lemma.cache_descr vca results ]
-  in
-  let result_files =
-    List.fold_right
-      (fun (prover,result) files ->
-         if prover <> VCS.Qed && not (is_computing result.verdict) then
-           let filename = get_logfile w prover result in
-           if filename <> "" && Sys.file_exists filename then
-             let title = title_of_prover prover in
-             (title,filename) :: files
-           else files
-         else files
-      ) results []
-  in
-  descr_files @ result_files
 
 (* -------------------------------------------------------------------------- *)
 (* --- Generators                                                         --- *)

@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open LogicUsage
 open VCS
 open Cil_types
 open Cil_datatype
@@ -36,14 +35,7 @@ type index =
 
 module DISK :
 sig
-  val cache_log : pid:prop_id -> model:WpContext.model ->
-    prover:prover -> result:result -> string
-  val pretty : pid:prop_id -> model:WpContext.model ->
-    prover:prover -> result:result -> Format.formatter -> unit
-  val file_kf : kf:kernel_function -> model:WpContext.model -> prover:prover -> string
   val file_goal : pid:prop_id -> model:WpContext.model -> prover:prover -> string
-  val file_logout : pid:prop_id -> model:WpContext.model -> prover:prover -> string
-  val file_logerr : pid:prop_id -> model:WpContext.model -> prover:prover -> string
 end
 
 module GOAL :
@@ -62,24 +54,10 @@ sig
   val qed_time : t -> float
 end
 
-module VC_Lemma :
-sig
-
-  type t = {
-    lemma : Definitions.dlemma ;
-    depends : logic_lemma list ;
-    mutable sequent : Conditions.sequent option ;
-  }
-
-  val is_trivial : t -> bool
-  val cache_descr : t -> (prover * result) list -> string
-
-end
-
 module VC_Annot :
 sig
-
   type t = {
+    (* Generally empty, but for Lemmas *)
     axioms : Definitions.axioms option ;
     goal : GOAL.t ;
     tags : Splitter.tag list ;
@@ -91,17 +69,12 @@ sig
 
   val is_trivial : t -> bool
   val resolve : pid:prop_id -> t -> bool
-  val cache_descr : pid:prop_id -> t -> (prover * result) list -> string
 
 end
 
 (* ------------------------------------------------------------------------ *)
 (**{1 Proof Obligations}                                                    *)
 (* ------------------------------------------------------------------------ *)
-
-type formula =
-  | GoalLemma of VC_Lemma.t
-  | GoalAnnot of VC_Annot.t
 
 type po = t and t = {
     po_gid   : string ;  (** goal identifier *)
@@ -110,12 +83,10 @@ type po = t and t = {
     po_idx   : index ;   (** goal index *)
     po_model : WpContext.model ;
     po_pid   : WpPropId.prop_id ; (* goal target property *)
-    po_formula : formula ; (* proof obligation *)
+    po_formula : VC_Annot.t ; (* proof obligation *)
   }
 
 module S : Datatype.S_with_collections with type t = po
-module Index : Map.OrderedType with type t = index
-module Gmap : Map.S with type key = index
 
 val get_gid: t -> string
 val get_property: t -> Property.t
@@ -129,8 +100,6 @@ val get_file_logout : t -> prover -> string
 
 val get_file_logerr : t -> prover -> string
 (** only filename, might not exists *)
-
-val get_files : t -> (string * string) list
 
 val qed_time : t -> float
 
@@ -220,16 +189,9 @@ val iter :
 val iter_on_goals: (t -> unit) -> unit
 val goals_of_property: Property.t -> t list
 
-val bar : string
-val kf_context : index -> Description.kf
 val pp_index : Format.formatter -> index -> unit
-val pp_warnings : Format.formatter -> Warning.t list -> unit
-val pp_depend : Format.formatter -> Property.t -> unit
-val pp_dependency : Description.kf -> Format.formatter -> Property.t -> unit
-val pp_dependencies : Description.kf -> Format.formatter -> Property.t list -> unit
 val pp_goal : Format.formatter -> t -> unit
 val pp_title : Format.formatter -> t -> unit
-val pp_logfile : Format.formatter -> t -> prover -> unit
 
 val pp_axiomatics : Format.formatter -> string option -> unit
 val pp_function : Format.formatter -> Kernel_function.t -> string option -> unit

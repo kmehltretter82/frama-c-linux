@@ -6,15 +6,17 @@
   Axiomatic 'Th'
 ------------------------------------------------------------
 
-Lemma C:
-Assume: 'A'
-Prove: (P_Q x_0) -> (P_R x_0)
+Goal Check Lemma 'C':
+Assume Lemmas: 'A'
+Assume { Have: P_Q(x). }
+Prove: P_R(x).
 
 ------------------------------------------------------------
 
-Lemma L:
-Assume: 'A'
-Prove: (P_P x_0) -> (P_R x_0)
+Goal Lemma 'L':
+Assume Lemmas: 'A'
+Assume { Have: P_P(x). }
+Prove: P_R(x).
 
 ------------------------------------------------------------
 ------------------------------------------------------------

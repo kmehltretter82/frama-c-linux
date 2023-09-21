@@ -313,20 +313,8 @@ let cancel t =
 (* --- Sub-Goal                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let mk_annot axioms goal vc =
-  let open Wpo.VC_Annot in
-  match vc with
-  | Wpo.GoalAnnot annot -> { annot with goal ; axioms }
-  | _ -> {
-      axioms ; goal ;
-      tags = [] ; warn = [] ;
-      deps = Property.Set.empty ;
-      path = Cil_datatype.Stmt.Set.empty ;
-      source = None ;
-    }
-
 let mk_formula ~main axioms sequent =
-  Wpo.(GoalAnnot (mk_annot axioms (GOAL.make sequent) main))
+  Wpo.VC_Annot.{ main with goal = Wpo.GOAL.make sequent ; axioms }
 
 let mk_goal t ~title ~part ~axioms sequent =
   let id = t.gid in t.gid <- succ id ;

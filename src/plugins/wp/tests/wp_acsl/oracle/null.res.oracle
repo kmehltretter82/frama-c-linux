@@ -6,27 +6,27 @@
   Global
 ------------------------------------------------------------
 
-Lemma prover_not_valid_null:
-Assume: 'qed_not_valid_read_null' 'qed_not_valid_null'
-Prove: not (valid_rw Malloc_0 L_GET 1)
+Goal Lemma 'prover_not_valid_null':
+Assume Lemmas: 'qed_not_valid_read_null' 'qed_not_valid_null'
+Prove: !valid_rw(Malloc_0, L_GET, 1).
 
 ------------------------------------------------------------
 
-Lemma prover_not_valid_read_null:
-Assume: 'prover_not_valid_null' 'qed_not_valid_read_null'
+Goal Lemma 'prover_not_valid_read_null':
+Assume Lemmas: 'prover_not_valid_null' 'qed_not_valid_read_null'
   'qed_not_valid_null'
-Prove: not (valid_rd Malloc_0 L_GET 1)
+Prove: !valid_rd(Malloc_0, L_GET, 1).
 
 ------------------------------------------------------------
 
-Lemma qed_not_valid_null:
-Prove: true
+Goal Lemma 'qed_not_valid_null':
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma qed_not_valid_read_null:
-Assume: 'qed_not_valid_null'
-Prove: true
+Goal Lemma 'qed_not_valid_read_null':
+Assume Lemmas: 'qed_not_valid_null'
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

@@ -514,7 +514,6 @@ struct
     let lemma = if weak then prop else F.p_hyps domain prop in
     {
       l_name = name ;
-      l_types = List.length types ;
       l_kind = kind ;
       l_triggers = [tgs] ;
       l_forall = xs ;
@@ -547,7 +546,6 @@ struct
         Definitions.define_lemma {
           l_name = name ;
           l_kind = Admit ;
-          l_types = ldef.d_types ;
           l_forall = ldef.d_params ;
           l_triggers = [[trigger]] ;
           l_cluster = ldef.d_cluster ;
@@ -783,7 +781,6 @@ struct
                 let is_lt = F.p_call lfun [const] in
                 {
                   l_name ;
-                  l_types = 0 ;
                   l_kind = Admit ;
                   l_triggers = [frame.triggers] ;
                   l_forall = vs ;

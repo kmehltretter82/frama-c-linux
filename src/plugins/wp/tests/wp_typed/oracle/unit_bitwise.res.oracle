@@ -6,135 +6,138 @@
   Global
 ------------------------------------------------------------
 
-Lemma band_sint8:
-Assume: 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
-Prove: let x_1 = (land x_0 y_0) in
-       (is_sint8 x_0) -> (is_sint8 y_0) -> ((to_sint8 x_1)=x_1)
+Goal Lemma 'band_sint8':
+Assume Lemmas: 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
+Let x_1 = land(x, y). Assume { Have: is_sint8(x). Have: is_sint8(y). }
+Prove: to_sint8(x_1) = x_1.
 
 ------------------------------------------------------------
 
-Lemma band_uint8:
-Assume: 'bor_uint8' 'blsr_sint8' 'band_sint8' 'bor_sint8' 'bxor_sint8'
+Goal Lemma 'band_uint8':
+Assume Lemmas: 'bor_uint8' 'blsr_sint8' 'band_sint8' 'bor_sint8' 'bxor_sint8'
   'bnot_sint8'
-Prove: let x_1 = (land x_0 y_0) in
-       (is_uint8 x_0) -> (is_uint8 y_0) -> ((to_uint8 x_1)=x_1)
+Let x_1 = land(x, y). Assume { Have: is_uint8(x). Have: is_uint8(y). }
+Prove: to_uint8(x_1) = x_1.
 
 ------------------------------------------------------------
 
-Lemma blsr_sint8:
-Assume: 'band_sint8' 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
-Prove: let x_1 = (lsr x_0 y_0) in
-       (0<=y_0) -> (is_sint8 x_0) -> (is_sint8 y_0) -> ((to_sint8 x_1)=x_1)
+Goal Lemma 'blsr_sint8':
+Assume Lemmas: 'band_sint8' 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
+Let x_1 = lsr(x, y).
+Assume { Have: 0 <= y. Have: is_sint8(x). Have: is_sint8(y). }
+Prove: to_sint8(x_1) = x_1.
 
 ------------------------------------------------------------
 
-Lemma blsr_uint8:
-Assume: 'band_uint8' 'bor_uint8' 'blsr_sint8' 'band_sint8' 'bor_sint8'
+Goal Lemma 'blsr_uint8':
+Assume Lemmas: 'band_uint8' 'bor_uint8' 'blsr_sint8' 'band_sint8' 'bor_sint8'
   'bxor_sint8' 'bnot_sint8'
-Prove: let x_1 = (lsr x_0 y_0) in
-       (0<=y_0) -> (is_uint8 x_0) -> (is_uint8 y_0) -> ((to_uint8 x_1)=x_1)
+Let x_1 = lsr(x, y).
+Assume { Have: 0 <= y. Have: is_uint8(x). Have: is_uint8(y). }
+Prove: to_uint8(x_1) = x_1.
 
 ------------------------------------------------------------
 
-Lemma bnot_sint8:
-Prove: let x_1 = (lnot x_0) in (is_sint8 x_0) -> ((to_sint8 x_1)=x_1)
+Goal Lemma 'bnot_sint8':
+Let x_1 = lnot(x). Assume { Have: is_sint8(x). }
+Prove: to_sint8(x_1) = x_1.
 
 ------------------------------------------------------------
 
-Lemma bor_sint8:
-Assume: 'bxor_sint8' 'bnot_sint8'
-Prove: let x_1 = (lor x_0 y_0) in
-       (is_sint8 x_0) -> (is_sint8 y_0) -> ((to_sint8 x_1)=x_1)
+Goal Lemma 'bor_sint8':
+Assume Lemmas: 'bxor_sint8' 'bnot_sint8'
+Let x_1 = lor(x, y). Assume { Have: is_sint8(x). Have: is_sint8(y). }
+Prove: to_sint8(x_1) = x_1.
 
 ------------------------------------------------------------
 
-Lemma bor_uint8:
-Assume: 'blsr_sint8' 'band_sint8' 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
-Prove: (is_uint8 x_0) -> (is_uint8 y_0)
-       -> ((lor (to_uint8 x_0) (to_uint8 y_0))=(lor x_0 y_0))
+Goal Lemma 'bor_uint8':
+Assume Lemmas: 'blsr_sint8' 'band_sint8' 'bor_sint8' 'bxor_sint8'
+  'bnot_sint8'
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma bxor_sint8:
-Assume: 'bnot_sint8'
-Prove: let x_1 = (lxor x_0 y_0) in
-       (is_sint8 x_0) -> (is_sint8 y_0) -> ((to_sint8 x_1)=x_1)
+Goal Lemma 'bxor_sint8':
+Assume Lemmas: 'bnot_sint8'
+Let x_1 = lxor(x, y). Assume { Have: is_sint8(x). Have: is_sint8(y). }
+Prove: to_sint8(x_1) = x_1.
 
 ------------------------------------------------------------
 
-Lemma land_abs:
-Assume: 'land_com' 'land_assoc' 'blsr_uint8' 'band_uint8' 'bor_uint8'
+Goal Lemma 'land_abs':
+Assume Lemmas: 'land_com' 'land_assoc' 'blsr_uint8' 'band_uint8' 'bor_uint8'
   'blsr_sint8' 'band_sint8' 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
-Prove: true
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma land_assoc:
-Assume: 'blsr_uint8' 'band_uint8' 'bor_uint8' 'blsr_sint8' 'band_sint8'
-  'bor_sint8' 'bxor_sint8' 'bnot_sint8'
-Prove: true
-
-------------------------------------------------------------
-
-Lemma land_com:
-Assume: 'land_assoc' 'blsr_uint8' 'band_uint8' 'bor_uint8' 'blsr_sint8'
+Goal Lemma 'land_assoc':
+Assume Lemmas: 'blsr_uint8' 'band_uint8' 'bor_uint8' 'blsr_sint8'
   'band_sint8' 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
-Prove: true
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma land_stb:
-Assume: 'land_abs' 'land_com' 'land_assoc' 'blsr_uint8' 'band_uint8'
+Goal Lemma 'land_com':
+Assume Lemmas: 'land_assoc' 'blsr_uint8' 'band_uint8' 'bor_uint8'
+  'blsr_sint8' 'band_sint8' 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Lemma 'land_stb':
+Assume Lemmas: 'land_abs' 'land_com' 'land_assoc' 'blsr_uint8' 'band_uint8'
   'bor_uint8' 'blsr_sint8' 'band_sint8' 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
-Prove: true
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma lor_assoc:
-Assume: 'land_stb' 'land_abs' 'land_com' 'land_assoc' 'blsr_uint8'
+Goal Lemma 'lor_assoc':
+Assume Lemmas: 'land_stb' 'land_abs' 'land_com' 'land_assoc' 'blsr_uint8'
   'band_uint8' 'bor_uint8' 'blsr_sint8' 'band_sint8' 'bor_sint8' 'bxor_sint8'
   'bnot_sint8'
-Prove: true
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma lor_com:
-Assume: 'lor_assoc' 'land_stb' 'land_abs' 'land_com' 'land_assoc'
+Goal Lemma 'lor_com':
+Assume Lemmas: 'lor_assoc' 'land_stb' 'land_abs' 'land_com' 'land_assoc'
   'blsr_uint8' 'band_uint8' 'bor_uint8' 'blsr_sint8' 'band_sint8' 'bor_sint8'
   'bxor_sint8' 'bnot_sint8'
-Prove: true
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma lor_neu:
-Assume: 'lor_com' 'lor_assoc' 'land_stb' 'land_abs' 'land_com' 'land_assoc'
-  'blsr_uint8' 'band_uint8' 'bor_uint8' 'blsr_sint8' 'band_sint8' 'bor_sint8'
-  'bxor_sint8' 'bnot_sint8'
-Prove: true
-
-------------------------------------------------------------
-
-Lemma lor_stb:
-Assume: 'lor_neu' 'lor_com' 'lor_assoc' 'land_stb' 'land_abs' 'land_com'
+Goal Lemma 'lor_neu':
+Assume Lemmas: 'lor_com' 'lor_assoc' 'land_stb' 'land_abs' 'land_com'
   'land_assoc' 'blsr_uint8' 'band_uint8' 'bor_uint8' 'blsr_sint8'
   'band_sint8' 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
-Prove: true
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma lxor_assoc:
-Assume: 'lor_stb' 'lor_neu' 'lor_com' 'lor_assoc' 'land_stb' 'land_abs'
+Goal Lemma 'lor_stb':
+Assume Lemmas: 'lor_neu' 'lor_com' 'lor_assoc' 'land_stb' 'land_abs'
   'land_com' 'land_assoc' 'blsr_uint8' 'band_uint8' 'bor_uint8' 'blsr_sint8'
   'band_sint8' 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
-Prove: true
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma lxor_com:
-Assume: 'lxor_assoc' 'lor_stb' 'lor_neu' 'lor_com' 'lor_assoc' 'land_stb'
+Goal Lemma 'lxor_assoc':
+Assume Lemmas: 'lor_stb' 'lor_neu' 'lor_com' 'lor_assoc' 'land_stb'
   'land_abs' 'land_com' 'land_assoc' 'blsr_uint8' 'band_uint8' 'bor_uint8'
   'blsr_sint8' 'band_sint8' 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
-Prove: true
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Lemma 'lxor_com':
+Assume Lemmas: 'lxor_assoc' 'lor_stb' 'lor_neu' 'lor_com' 'lor_assoc'
+  'land_stb' 'land_abs' 'land_com' 'land_assoc' 'blsr_uint8' 'band_uint8'
+  'bor_uint8' 'blsr_sint8' 'band_sint8' 'bor_sint8' 'bxor_sint8' 'bnot_sint8'
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

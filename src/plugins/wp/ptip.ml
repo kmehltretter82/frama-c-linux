@@ -579,16 +579,9 @@ class pseq
       pcond#pp_esequent env fmt s
 
     method pp_goal fmt w =
-      let open Wpo in
-      match w.po_formula with
-      | GoalLemma _ ->
-        Format.fprintf fmt "@\n@{<wp:clause>Lemma@} %a:@\n" Wpo.pp_title w ;
-        let _,sequent = Wpo.compute w in
-        self#pp_sequent fmt sequent
-      | GoalAnnot _ ->
-        Format.fprintf fmt "@\n@{<wp:clause>Goal@} %a:@\n" Wpo.pp_title w ;
-        let _,sequent = Wpo.compute w in
-        self#pp_sequent fmt sequent
+      Format.fprintf fmt "@\n@{<wp:clause>Goal@} %a:@\n" Wpo.pp_title w ;
+      let _,sequent = Wpo.compute w in
+      self#pp_sequent fmt sequent
 
   end
 

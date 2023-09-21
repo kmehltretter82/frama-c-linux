@@ -1100,20 +1100,12 @@ let prove_prop ?axioms ~pid prop =
   Why3.Task.add_decl t decl
 
 let task_of_wpo wpo =
+  let v = wpo.Wpo.po_formula in
   let pid = wpo.Wpo.po_pid in
-  match wpo.Wpo.po_formula with
-  | Wpo.GoalAnnot v ->
-    let pid = wpo.Wpo.po_pid in
-    let axioms = v.Wpo.VC_Annot.axioms in
-    let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
-    (* Format.printf "Goal: %a@." Lang.F.pp_pred prop; *)
-    prove_prop ~pid prop ?axioms
-  | Wpo.GoalLemma v ->
-    let lemma = v.Wpo.VC_Lemma.lemma in
-    let depends = v.Wpo.VC_Lemma.depends in
-    let prop = Lang.F.p_forall lemma.l_forall lemma.l_lemma in
-    let axioms = Some(lemma.l_cluster,depends) in
-    prove_prop ~pid prop ?axioms
+  let axioms = v.Wpo.VC_Annot.axioms in
+  let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
+  (* Format.printf "Goal: %a@." Lang.F.pp_pred prop; *)
+  prove_prop ~pid prop ?axioms
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Task                                                        --- *)

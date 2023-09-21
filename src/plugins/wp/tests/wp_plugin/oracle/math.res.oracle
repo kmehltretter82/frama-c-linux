@@ -6,132 +6,140 @@
   Global
 ------------------------------------------------------------
 
-Lemma abs_neg:
-Assume: 'abs_pos'
-Prove: (y_0<=0) -> (x_0<y_0) -> ((\rabs y_0)<(\rabs x_0))
+Goal Lemma 'abs_neg':
+Assume Lemmas: 'abs_pos'
+Assume { Have: y <= .0. Have: x < y. }
+Prove: RAbs.abs(y) < RAbs.abs(x).
 
 ------------------------------------------------------------
 
-Lemma abs_pos:
-Prove: (0<=x_0) -> (x_0<y_0) -> ((\rabs x_0)<(\rabs y_0))
+Goal Lemma 'abs_pos':
+Assume { Have: .0 <= x. Have: x < y. }
+Prove: RAbs.abs(x) < RAbs.abs(y).
 
 ------------------------------------------------------------
 
-Lemma atan_sin_cos:
-Assume: 'pow_2' 'exp_log_add_mul' 'log_exp_mul_add' 'exp_pos' 'sqrt_mono'
-  'sqrt_pos' 'max_ac' 'min_ac' 'max_or' 'max_inf' 'min_or' 'min_inf'
-  'abs_neg' 'abs_pos'
-Prove: let r_0 = (\atan x_0) in ((\sin r_0) div (\cos r_0))=x_0
-
-------------------------------------------------------------
-
-Lemma cosh_opp:
-Assume: 'sinh_opp' 'atan_sin_cos' 'pow_2' 'exp_log_add_mul' 'log_exp_mul_add'
-  'exp_pos' 'sqrt_mono' 'sqrt_pos' 'max_ac' 'min_ac' 'max_or' 'max_inf'
-  'min_or' 'min_inf' 'abs_neg' 'abs_pos'
-Prove: (\cosh (-x_0))=(\cosh x_0)
-
-------------------------------------------------------------
-
-Lemma distance:
-Assume: 'tanh_opp' 'cosh_opp' 'sinh_opp' 'atan_sin_cos' 'pow_2'
-  'exp_log_add_mul' 'log_exp_mul_add' 'exp_pos' 'sqrt_mono' 'sqrt_pos'
-  'max_ac' 'min_ac' 'max_or' 'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
-Prove: (\sqrt ((x_0*x_0)+(y_0*y_0)))=(\hypot x_0 y_0)
-
-------------------------------------------------------------
-
-Lemma exp_log_add_mul:
-Assume: 'log_exp_mul_add' 'exp_pos' 'sqrt_mono' 'sqrt_pos' 'max_ac' 'min_ac'
-  'max_or' 'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
-Prove: (0<a_0) -> (0<b_0) -> ((a_0*b_0)=(\exp ((\log a_0)+(\log b_0))))
-
-------------------------------------------------------------
-
-Lemma exp_pos:
-Assume: 'sqrt_mono' 'sqrt_pos' 'max_ac' 'min_ac' 'max_or' 'max_inf' 'min_or'
-  'min_inf' 'abs_neg' 'abs_pos'
-Prove: true
-
-------------------------------------------------------------
-
-Lemma log_exp_mul_add:
-Assume: 'exp_pos' 'sqrt_mono' 'sqrt_pos' 'max_ac' 'min_ac' 'max_or' 'max_inf'
-  'min_or' 'min_inf' 'abs_neg' 'abs_pos'
-Prove: (a_0+b_0)=(\log ((\exp a_0)*(\exp b_0)))
-
-------------------------------------------------------------
-
-Lemma max_ac:
-Assume: 'min_ac' 'max_or' 'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
-Prove: true
-
-------------------------------------------------------------
-
-Lemma max_inf:
-Assume: 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
-Prove: let r_0 = (\max x_0 y_0) in (x_0<=r_0) /\ (y_0<=r_0)
-
-------------------------------------------------------------
-
-Lemma max_or:
-Assume: 'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
-Prove: let r_0 = (\max x_0 y_0) in (r_0=x_0) \/ (r_0=y_0)
-
-------------------------------------------------------------
-
-Lemma min_ac:
-Assume: 'max_or' 'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
-Prove: true
-
-------------------------------------------------------------
-
-Lemma min_inf:
-Assume: 'abs_neg' 'abs_pos'
-Prove: let r_0 = (\min x_0 y_0) in (r_0<=x_0) /\ (r_0<=y_0)
-
-------------------------------------------------------------
-
-Lemma min_or:
-Assume: 'min_inf' 'abs_neg' 'abs_pos'
-Prove: let r_0 = (\min x_0 y_0) in (r_0=x_0) \/ (r_0=y_0)
-
-------------------------------------------------------------
-
-Lemma pow_2:
-Assume: 'exp_log_add_mul' 'log_exp_mul_add' 'exp_pos' 'sqrt_mono' 'sqrt_pos'
-  'max_ac' 'min_ac' 'max_or' 'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
-Prove: (0<a_0) -> ((a_0*a_0)=(\pow a_0 2))
-
-------------------------------------------------------------
-
-Lemma sinh_opp:
-Assume: 'atan_sin_cos' 'pow_2' 'exp_log_add_mul' 'log_exp_mul_add' 'exp_pos'
+Goal Lemma 'atan_sin_cos':
+Assume Lemmas: 'pow_2' 'exp_log_add_mul' 'log_exp_mul_add' 'exp_pos'
   'sqrt_mono' 'sqrt_pos' 'max_ac' 'min_ac' 'max_or' 'max_inf' 'min_or'
   'min_inf' 'abs_neg' 'abs_pos'
-Prove: ((\sinh x_0)+(\sinh (-x_0)))=0
+Let r = atan(x). Prove: (sin(r) / cos(r)) = x.
 
 ------------------------------------------------------------
 
-Lemma sqrt_mono:
-Assume: 'sqrt_pos' 'max_ac' 'min_ac' 'max_or' 'max_inf' 'min_or' 'min_inf'
-  'abs_neg' 'abs_pos'
-Prove: (0<=x_0) -> (x_0<y_0) -> ((\sqrt x_0)<(\sqrt y_0))
-
-------------------------------------------------------------
-
-Lemma sqrt_pos:
-Assume: 'max_ac' 'min_ac' 'max_or' 'max_inf' 'min_or' 'min_inf' 'abs_neg'
-  'abs_pos'
-Prove: (0<=x_0) -> (0<=(\sqrt x_0))
-
-------------------------------------------------------------
-
-Lemma tanh_opp:
-Assume: 'cosh_opp' 'sinh_opp' 'atan_sin_cos' 'pow_2' 'exp_log_add_mul'
+Goal Lemma 'cosh_opp':
+Assume Lemmas: 'sinh_opp' 'atan_sin_cos' 'pow_2' 'exp_log_add_mul'
   'log_exp_mul_add' 'exp_pos' 'sqrt_mono' 'sqrt_pos' 'max_ac' 'min_ac'
   'max_or' 'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
-Prove: ((\tanh x_0)+(\tanh (-x_0)))=0
+Prove: cosh(-x) = cosh(x).
+
+------------------------------------------------------------
+
+Goal Lemma 'distance':
+Assume Lemmas: 'tanh_opp' 'cosh_opp' 'sinh_opp' 'atan_sin_cos' 'pow_2'
+  'exp_log_add_mul' 'log_exp_mul_add' 'exp_pos' 'sqrt_mono' 'sqrt_pos'
+  'max_ac' 'min_ac' 'max_or' 'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
+Prove: sqrt((x * x) + (y * y)) = hypot(x, y).
+
+------------------------------------------------------------
+
+Goal Lemma 'exp_log_add_mul':
+Assume Lemmas: 'log_exp_mul_add' 'exp_pos' 'sqrt_mono' 'sqrt_pos' 'max_ac'
+  'min_ac' 'max_or' 'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
+Assume { Have: .0 < a. Have: .0 < b. }
+Prove: (a * b) = exp(log(a) + log(b)).
+
+------------------------------------------------------------
+
+Goal Lemma 'exp_pos':
+Assume Lemmas: 'sqrt_mono' 'sqrt_pos' 'max_ac' 'min_ac' 'max_or' 'max_inf'
+  'min_or' 'min_inf' 'abs_neg' 'abs_pos'
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Lemma 'log_exp_mul_add':
+Assume Lemmas: 'exp_pos' 'sqrt_mono' 'sqrt_pos' 'max_ac' 'min_ac' 'max_or'
+  'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
+Prove: (a + b) = log(exp(a) * exp(b)).
+
+------------------------------------------------------------
+
+Goal Lemma 'max_ac':
+Assume Lemmas: 'min_ac' 'max_or' 'max_inf' 'min_or' 'min_inf' 'abs_neg'
+  'abs_pos'
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Lemma 'max_inf':
+Assume Lemmas: 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
+Let r = Rg.max(x, y). Prove: (x <= r) /\ (y <= r).
+
+------------------------------------------------------------
+
+Goal Lemma 'max_or':
+Assume Lemmas: 'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
+Let r = Rg.max(x, y). Prove: (r = x) \/ (r = y).
+
+------------------------------------------------------------
+
+Goal Lemma 'min_ac':
+Assume Lemmas: 'max_or' 'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Lemma 'min_inf':
+Assume Lemmas: 'abs_neg' 'abs_pos'
+Let r = Rg.min(x, y). Prove: (r <= x) /\ (r <= y).
+
+------------------------------------------------------------
+
+Goal Lemma 'min_or':
+Assume Lemmas: 'min_inf' 'abs_neg' 'abs_pos'
+Let r = Rg.min(x, y). Prove: (r = x) \/ (r = y).
+
+------------------------------------------------------------
+
+Goal Lemma 'pow_2':
+Assume Lemmas: 'exp_log_add_mul' 'log_exp_mul_add' 'exp_pos' 'sqrt_mono'
+  'sqrt_pos' 'max_ac' 'min_ac' 'max_or' 'max_inf' 'min_or' 'min_inf'
+  'abs_neg' 'abs_pos'
+Assume { Have: .0 < a. }
+Prove: (a * a) = pow(a, 2.0).
+
+------------------------------------------------------------
+
+Goal Lemma 'sinh_opp':
+Assume Lemmas: 'atan_sin_cos' 'pow_2' 'exp_log_add_mul' 'log_exp_mul_add'
+  'exp_pos' 'sqrt_mono' 'sqrt_pos' 'max_ac' 'min_ac' 'max_or' 'max_inf'
+  'min_or' 'min_inf' 'abs_neg' 'abs_pos'
+Prove: (sinh(x) + sinh(-x)) = .0.
+
+------------------------------------------------------------
+
+Goal Lemma 'sqrt_mono':
+Assume Lemmas: 'sqrt_pos' 'max_ac' 'min_ac' 'max_or' 'max_inf' 'min_or'
+  'min_inf' 'abs_neg' 'abs_pos'
+Assume { Have: .0 <= x. Have: x < y. }
+Prove: sqrt(x) < sqrt(y).
+
+------------------------------------------------------------
+
+Goal Lemma 'sqrt_pos':
+Assume Lemmas: 'max_ac' 'min_ac' 'max_or' 'max_inf' 'min_or' 'min_inf'
+  'abs_neg' 'abs_pos'
+Assume { Have: .0 <= x. }
+Prove: .0 <= sqrt(x).
+
+------------------------------------------------------------
+
+Goal Lemma 'tanh_opp':
+Assume Lemmas: 'cosh_opp' 'sinh_opp' 'atan_sin_cos' 'pow_2' 'exp_log_add_mul'
+  'log_exp_mul_add' 'exp_pos' 'sqrt_mono' 'sqrt_pos' 'max_ac' 'min_ac'
+  'max_or' 'max_inf' 'min_or' 'min_inf' 'abs_neg' 'abs_pos'
+Prove: (tanh(x) + tanh(-x)) = .0.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

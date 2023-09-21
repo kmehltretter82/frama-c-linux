@@ -6,43 +6,43 @@
   Global
 ------------------------------------------------------------
 
-Lemma test2_ko:
-Prove: (L_x_bar i_0 s_0)!=(concat (elt i_0) s_0)
+Goal Check Lemma 'test2_ko':
+Prove: L_x_bar(i, s) != [ i ] ^ s.
 
 ------------------------------------------------------------
 
-Lemma test2_ok:
-Prove: (L_x_bar i_0 s_0)=(concat (elt i_0) s_0)
+Goal Check Lemma 'test2_ok':
+Prove: L_x_bar(i, s) = [ i ] ^ s.
 
 ------------------------------------------------------------
 
-Lemma test_ko:
-Prove: (L_bar i_0 s_0)!=(concat (elt i_0) s_0)
+Goal Check Lemma 'test_ko':
+Prove: L_bar(i, s) != [ i ] ^ s.
 
 ------------------------------------------------------------
 
-Lemma test_ok:
-Prove: (L_bar i_0 s_0)=(concat (elt i_0) s_0)
+Goal Check Lemma 'test_ok':
+Prove: L_bar(i, s) = [ i ] ^ s.
 
 ------------------------------------------------------------
 
-Lemma testp2_ko:
-Prove: (L_x_foo a_0 s_0)!=(concat (elt a_0) s_0)
+Goal Check Lemma 'testp2_ko':
+Prove: L_x_foo(a, s) != [ a ] ^ s.
 
 ------------------------------------------------------------
 
-Lemma testp2_ok:
-Prove: (L_x_foo a_0 s_0)=(concat (elt a_0) s_0)
+Goal Check Lemma 'testp2_ok':
+Prove: L_x_foo(a, s) = [ a ] ^ s.
 
 ------------------------------------------------------------
 
-Lemma testp_ko:
-Prove: (L_foo a_0 s_0)!=(concat (elt a_0) s_0)
+Goal Check Lemma 'testp_ko':
+Prove: L_foo(a, s) != [ a ] ^ s.
 
 ------------------------------------------------------------
 
-Lemma testp_ok:
-Prove: (L_foo a_0 s_0)=(concat (elt a_0) s_0)
+Goal Check Lemma 'testp_ok':
+Prove: L_foo(a, s) = [ a ] ^ s.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

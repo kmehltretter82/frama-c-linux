@@ -154,7 +154,7 @@ struct
                 let l_lemma = F.p_hyps conditions (p_equal value1 value2) in
                 Definitions.define_lemma {
                   l_kind = Admit ;
-                  l_name ; l_types = 0 ;
+                  l_name ;
                   l_triggers ;
                   l_forall = F.p_vars l_lemma ;
                   l_lemma = l_lemma ;
@@ -342,7 +342,7 @@ struct
           } ;
           Definitions.define_lemma {
             l_kind = Admit ;
-            l_name = name ; l_types = 0 ;
+            l_name = name ;
             l_forall = F.p_vars lemma ;
             l_triggers = [[Trigger.of_term va]] ;
             l_lemma = lemma ;
@@ -475,7 +475,7 @@ struct
           let lemma = p_equiv is_init_p is_init_r in
           Definitions.define_lemma {
             l_kind = Admit ;
-            l_name = name ^ "_range" ; l_types = 0 ;
+            l_name = name ^ "_range" ;
             l_forall = params ;
             l_triggers = [] ;
             l_lemma = lemma ;
@@ -523,7 +523,7 @@ struct
             let lemma = p_equiv is_init_p is_init_r in
             Definitions.define_lemma {
               l_kind = Admit ;
-              l_name = name ^ "_range" ; l_types = 0 ;
+              l_name = name ^ "_range" ;
               l_forall = params ;
               l_triggers = [] ;
               l_lemma = lemma ;

@@ -443,22 +443,26 @@ end
     
     goal wp_goal :
       forall t:addr2 -> int, i:int, a:addr2, i1:int, i2:int, i3:int.
-       i2 <='' i3 ->
        i1 <='' i2 ->
+       i <='' i1 ->
        is_sint32_chunk2 t ->
-       is_sint322 i ->
-       (L_occ2 t i a i1 i2 +'' L_occ2 t i a i2 i3) = L_occ2 t i a i1 i3
+       is_sint322 i3 ->
+       (L_occ2 t i3 a i i1 +'' L_occ2 t i3 a i1 i2) = L_occ2 t i3 a i i2
   end
 [wp] 3 goals generated
 ------------------------------------------------------------
   Global
 ------------------------------------------------------------
 
-Lemma provable_lemma:
-Prove: (f_0<=s_0) -> (s_0<=t_0) -> (is_sint32_chunk Mint_0)
-       -> (is_sint32 v_0)
-       -> (((L_occ Mint_0 v_0 p_0 f_0 s_0)+(L_occ Mint_0 v_0 p_0 s_0 t_0))=
-           (L_occ Mint_0 v_0 p_0 f_0 t_0))
+Goal Lemma 'provable_lemma':
+Assume {
+  Have: f <= s.
+  Have: s <= t.
+  Have: is_sint32_chunk(Mint_0).
+  Have: is_sint32(v).
+}
+Prove: (L_occ(Mint_0, v, p, f, s) + L_occ(Mint_0, v, p, s, t))
+         = L_occ(Mint_0, v, p, f, t).
 
 ------------------------------------------------------------
 ------------------------------------------------------------

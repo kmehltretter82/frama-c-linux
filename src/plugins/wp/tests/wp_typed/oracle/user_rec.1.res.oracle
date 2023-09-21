@@ -6,16 +6,15 @@
   Global
 ------------------------------------------------------------
 
-Lemma fact_ge1:
-Prove: 0<(L_fact n_0)
+Goal Lemma 'fact_ge1':
+Prove: 0 < L_fact(n).
 
 ------------------------------------------------------------
 
-Lemma fact_next:
-Assume: 'fact_ge1'
-Prove: let x_0 = (L_fact m_0) in
-       (0<n_0) -> (n_0<=m_0)
-       -> ((x_0 div (L_fact (n_0-1)))=(n_0*(x_0 div (L_fact n_0))))
+Goal Lemma 'fact_next':
+Assume Lemmas: 'fact_ge1'
+Let x = L_fact(m). Assume { Have: 0 < n. Have: n <= m. }
+Prove: (x / L_fact(n - 1)) = (n * (x / L_fact(n))).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
