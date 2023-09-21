@@ -120,7 +120,7 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
    @/
   void f_pre_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
@@ -189,7 +189,7 @@ check lemma aorai_intermediate_state_deterministic_trans{L}:
    @/
   void f_post_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
@@ -276,7 +276,7 @@ void f(void)
    @/
   void g_pre_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_g;
@@ -345,7 +345,7 @@ void f(void)
    @/
   void g_post_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_g;
@@ -427,7 +427,7 @@ void g(void)
    @/
   void main_pre_func(int c)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
@@ -487,7 +487,7 @@ void g(void)
    @/
   void main_post_func(int res)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;
@@ -508,10 +508,10 @@ int main(int c)
   int __retres;
   /*@ ghost main_pre_func(c); */
   if (c) pf = & f; else pf = & g;
-  /*@ calls f, g; */
+  /*@ \kernel::calls f, g; */
   (*pf)();
   if (c) pf = & g; else pf = & f;
-  /*@ calls f, g; */
+  /*@ \kernel::calls f, g; */
   (*pf)();
   __retres = 0;
   /*@ ghost main_post_func(__retres); */

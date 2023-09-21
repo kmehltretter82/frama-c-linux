@@ -73,7 +73,7 @@ int X;
     int S_in_f_tmp;
     int Sf_tmp;
     int in_main_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
@@ -153,7 +153,7 @@ int X;
     int S_in_f_tmp;
     int Sf_tmp;
     int in_main_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
@@ -248,7 +248,7 @@ void f(void)
     int S_in_f_tmp;
     int Sf_tmp;
     int in_main_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
@@ -328,7 +328,7 @@ void f(void)
     int S_in_f_tmp;
     int Sf_tmp;
     int in_main_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;

@@ -71,7 +71,7 @@ check lemma I_deterministic_trans{L}:
    @/
   void main_pre_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
@@ -107,7 +107,7 @@ check lemma I_deterministic_trans{L}:
    @/
   void main_post_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;

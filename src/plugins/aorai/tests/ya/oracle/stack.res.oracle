@@ -96,7 +96,7 @@ check lemma emptying_stack_deterministic_trans{L}:
    @/
   void push_pre_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_push;
@@ -155,7 +155,7 @@ check lemma emptying_stack_deterministic_trans{L}:
    @/
   void push_post_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_push;
@@ -236,7 +236,7 @@ void push(void)
    @/
   void pop_pre_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_pop;
@@ -303,7 +303,7 @@ void push(void)
    @/
   void pop_post_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_pop;
@@ -401,7 +401,7 @@ void pop(void)
    @/
   void main_pre_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
@@ -455,7 +455,7 @@ void pop(void)
    @/
   void main_post_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;

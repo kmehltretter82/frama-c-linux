@@ -130,7 +130,7 @@ void call_builtin_acsl(void)
 
 void f_slevel(void)
 {
-  /*@ slevel 0; */ ;
+  /*@ \eva::slevel 0; */ ;
   return;
 }
 
