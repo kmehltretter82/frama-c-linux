@@ -27,7 +27,6 @@ import * as locs from "./locatorsUtil";
 // Basic Electron launch of Ivette for Playwright e2e tests
 export const argsDefaultLaunch: string[] = [
   "./dist/main/main.js",
-  // "--enable-logging",
   "--no-sandbox",
   "--command",
   "../bin/frama-c",
@@ -37,36 +36,23 @@ export const argsDefaultLaunch: string[] = [
 // e2e tests using Ivette's default settings
 export const argsLaunchWithDefaultSettings: string[] = [
   "./dist/main/main.js",
-  // "--enable-logging",
   "--no-sandbox",
   "--command",
   "../bin/frama-c",
-  "--init-settings",
+  "--init-settings"
 ];
 
 // Electron launch of Ivette for Playwright
 // e2e tests using an additional C file loaded
 export const argsLaunchWithTestFile: string[] = [
   "./dist/main/main.js",
-  // "--enable-logging",
-  "--no-sandbox",
+  "--with-fixed-settings",
+  "./tests/settings.json",
   "--command",
   "../bin/frama-c",
-  "../tests/test/adpcm.c",
-];
+  "../tests/test/adpcm.c"
 
-// Electron launch of Ivette for Playwright
-// e2e tests using an additional C file loaded
-export const argsLaunchWithTestFileAndDefaultSettings: string[] = [
-  "./dist/main/main.js",
-  // "--enable-logging",
-  "--no-sandbox",
-  "--command",
-  "../bin/frama-c",
-  "../tests/test/adpcm.c",
-  "--init-settings",
 ];
-
 /**
  * Basic Electron launch of Ivette for Playwright e2e tests
  */
@@ -113,6 +99,8 @@ export async function testServerIsStarted(window: Page): Promise<void> {
 }
 
 export async function testFileIsLoaded(window: Page): Promise<void> {
+  await locs.getConsoleMenuItem(window).click();
+  
   // check if a message is present in the console view
   // to confirm the file loaded
   await expect(

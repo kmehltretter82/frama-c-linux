@@ -1,0 +1,41 @@
+{
+    "frame": {
+        "x": 100,
+        "y": 100,
+        "width": 1000,
+        "height": 750
+    },
+    "settings": {
+        "frama-c.labview.shape": {
+            "kind": "VBOX",
+            "content": [
+                {
+                    "kind": "HBOX",
+                    "content": [
+                        {
+                            "kind": "ITEM",
+                            "id": "frama-c.astview"
+                        },
+                        {
+                            "kind": "ITEM",
+                            "id": "frama-c.sourcecode"
+                        }
+                    ]
+                },
+                {
+                    "kind": "ITEM",
+                    "id": "frama-c.astinfo"
+                }
+            ]
+        },
+        "frama-c.labview.panel.views.current": "builtin.views.source"
+    },
+    "storage": {
+        "Controller.history": [
+            "--working /home/damien/git/frama-c\n--command /home/damien/git/frama-c/bin/frama-c\n--with-fixed-settings test-settings.json",
+            "--working /home/damien/git/frama-c\n--command /home/damien/git/frama-c/bin/frama-c",
+            "--working /home/damien/git/frama-c\n--command /home/damien/git/frama-c/bin/frama-c\n-server-debug 1"
+        ]
+    },
+    "devtools": false
+}

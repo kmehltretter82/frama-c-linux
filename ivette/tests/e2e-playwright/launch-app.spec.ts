@@ -35,38 +35,3 @@ test("launch app", async () => {
   // Exit app.
   await electronApp.close();
 });
-
-test("check server connection", async () => {
-  const launchAppResult = await e2eService.launchApp(
-    e2eService.argsLaunchWithDefaultSettings,
-  );
-  const electronApp = launchAppResult.app;
-  const window = launchAppResult.page;
-
-  await e2eService.testServerIsStarted(window);
-
-  // Capture a screenshot.
-  await window.screenshot({ path: "screenshots/e2e-server-status.png" });
-
-  // Exit app.
-  await electronApp.close();
-});
-
-test("launch app with file", async () => {
-  const launchAppResult = await e2eService.launchApp(
-    e2eService.argsLaunchWithTestFileAndDefaultSettings,
-  );
-  const electronApp = launchAppResult.app;
-  const window = launchAppResult.page;
-
-  await window.waitForTimeout(1000);
-
-  await window.screenshot({ path: "screenshots/e2e-file-load.png" });
-
-  await e2eService.testFileIsLoaded(window);
-
-  await window.screenshot({ path: "screenshots/e2e-file-loaded.png" });
-
-  // Exit app.
-  await electronApp.close();
-});

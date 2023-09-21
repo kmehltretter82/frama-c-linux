@@ -215,7 +215,10 @@ function saveWindowConfig(handle: Handle): void {
     storage: handle.storage,
     devtools: handle.devtools,
   };
-  saveSettings(handle.config, configData);
+
+  if (!process.argv.includes("--with-fixed-settings")) {
+    saveSettings(handle.config, configData);
+  }
 }
 
 function windowSyncSettings(event: IpcMainEvent): void {
@@ -402,7 +405,17 @@ function createBrowserWindow(
     ...config,
   };
 
-  const configFile = isAppWindow ? lookupConfig(wdir) : PATH_WINDOW_SETTINGS;
+  let configFile = PATH_WINDOW_SETTINGS;
+  if (argv && argv.includes('--with-fixed-settings')) {
+    configFile =
+      argv[process.argv.indexOf('--with-fixed-settings') + 1];
+    argv = process.argv.filter((p) => !!p && p !== "--with-fixed-settings");
+  } else if (isAppWindow) {
+    configFile = lookupConfig(wdir);
+  }
+
+  console.log('[Dome] Loading config file', configFile);
+
   const configData = loadSettings(configFile);
 
   const frame = jFrame(configData.frame);
@@ -550,14 +563,8 @@ function createPrimaryWindow(): void {
   const globals = obtainGlobalSettings();
   applyThemeSettings(globals);
 
-
   // Create Window
   createBrowserWindow(true, { title: appName }, cmd.argv, cmd.wdir);
-
-  // Reset Settings if the associated argument is provided
-  if (initSettings) {
-    restoreAllDefaultSettings();
-  }
 }
 
 let appCount = 1;
