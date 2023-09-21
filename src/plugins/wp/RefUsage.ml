@@ -851,7 +851,7 @@ struct
   end
 
   let () =
-    Acsl_extension.register_behavior
+    Acsl_extension.register_behavior ~plugin:"wp"
       "wp_nullable_args" Nullable_extension.typer false
 
   module HasNullable =

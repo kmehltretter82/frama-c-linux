@@ -98,7 +98,8 @@ type extension_printer =
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_behavior:
-  string -> ?preprocessor:extension_preprocessor -> extension_typer ->
+  plugin:string -> string ->
+  ?preprocessor:extension_preprocessor -> extension_typer ->
   ?visitor:extension_visitor ->
   ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
   unit
@@ -108,7 +109,8 @@ val register_behavior:
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_global:
-  string -> ?preprocessor:extension_preprocessor -> extension_typer ->
+  plugin:string -> string ->
+  ?preprocessor:extension_preprocessor -> extension_typer ->
   ?visitor:extension_visitor ->
   ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
   unit
@@ -118,7 +120,8 @@ val register_global:
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_global_block:
-  string -> ?preprocessor:extension_preprocessor_block -> extension_typer_block ->
+  plugin:string -> string ->
+  ?preprocessor:extension_preprocessor_block -> extension_typer_block ->
   ?visitor:extension_visitor ->
   ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
   unit
@@ -129,7 +132,8 @@ val register_global_block:
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_code_annot:
-  string -> ?preprocessor:extension_preprocessor -> extension_typer ->
+  plugin:string -> string ->
+  ?preprocessor:extension_preprocessor -> extension_typer ->
   ?visitor:extension_visitor ->
   ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
   unit
@@ -140,7 +144,8 @@ val register_code_annot:
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_code_annot_next_stmt:
-  string -> ?preprocessor:extension_preprocessor -> extension_typer ->
+  plugin:string -> string ->
+  ?preprocessor:extension_preprocessor -> extension_typer ->
   ?visitor:extension_visitor ->
   ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
   unit
@@ -150,7 +155,8 @@ val register_code_annot_next_stmt:
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_code_annot_next_loop:
-  string -> ?preprocessor:extension_preprocessor -> extension_typer ->
+  plugin:string -> string ->
+  ?preprocessor:extension_preprocessor -> extension_typer ->
   ?visitor:extension_visitor ->
   ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
   unit
@@ -161,7 +167,8 @@ val register_code_annot_next_loop:
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_code_annot_next_both:
-  string -> ?preprocessor:extension_preprocessor -> extension_typer ->
+  plugin:string -> string ->
+  ?preprocessor:extension_preprocessor -> extension_typer ->
   ?visitor:extension_visitor ->
   ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
   unit
