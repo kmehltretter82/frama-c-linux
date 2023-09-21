@@ -226,7 +226,15 @@ class Dive {
       return node;
     }
 
-    return this.cy.add({ data: { id, label: fileName }, classes: 'file' });
+    const nodeDefinition = {
+      data: { id, label: fileName },
+      classes: 'file',
+      pannable: true,
+    };
+    // cytoscape.add type declaration is missing the 'pannable' field
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return this.cy.add(nodeDefinition);
   }
 
   referenceCallstack(callstack: API.callstack): Cytoscape.NodeSingular | null {
@@ -243,9 +251,15 @@ class Dive {
     }
 
     const parentNode = this.referenceCallstack(callstack);
-    const parent = parentNode?.id();
-    const label = elt.fun;
-    return this.cy.add({ data: { id, label, parent }, classes: 'function' });
+    const nodeDefinition = {
+      data: { id, label: elt.fun, parent: parentNode?.id() },
+      classes: 'function',
+      pannable: true
+    };
+    // cytoscape.add type declaration is missing the 'pannable' field
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return this.cy.add(nodeDefinition);
   }
 
   createTips(node: Cytoscape.NodeSingular): Tippy.Instance[] {
@@ -582,7 +596,8 @@ class Dive {
 
 
 type GraphViewProps = {
-  lock: boolean;
+  addSelection: boolean;
+  grabbable: boolean;
   layout: string;
   selectionMode: string;
 }
@@ -593,7 +608,7 @@ type GraphViewRef = {
 
 const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
   (props: GraphViewProps, ref) => {
-  const { lock, layout, selectionMode } = props;
+  const { addSelection, grabbable, layout, selectionMode } = props;
 
   const [dive, setDive] = useState(() => new Dive());
   const [selection, updateSelection] = States.useSelection();
@@ -635,13 +650,14 @@ const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
     };
 
     // Updates the graph according to the selected marker.
-    dive.selectLocation(selection?.current, !lock);
-  }, [dive, lock, selection, updateSelection]);
+    dive.selectLocation(selection?.current, addSelection);
+  }, [dive, addSelection, selection, updateSelection]);
 
   return (
     <CytoscapeComponent
       stylesheet={style}
       cy={setCy}
+      autoungrabify={grabbable}
       style={{ width: '100%', height: '100%' }}
     />);
 });
@@ -651,8 +667,10 @@ GraphView.displayName = "GraphView";
 
 export default function GraphComponent(): JSX.Element {
   const graph = useRef<GraphViewRef>();
-  const [lock, flipLock] =
-    Dome.useFlipSettings('dive.lock');
+  const [addSelection, flipAddSelection] =
+    Dome.useFlipSettings('dive.addSelection', true);
+  const [grabbable, flipGrabbable] =
+    Dome.useFlipSettings('dive.grabbable', false);
   const [selectionMode, setSelectionMode] =
     Dome.useStringSettings('dive.selectionMode', 'follow');
   const [layout, setLayout] =
@@ -687,12 +705,20 @@ export default function GraphComponent(): JSX.Element {
     <>
       <Ivette.TitleBar>
         <IconButton
+          icon="PIN"
+          onClick={flipAddSelection}
+          kind={addSelection ? 'negative' : 'positive'}
+          title={addSelection ?
+            'Update the graph with the selection' :
+            'Do not update the graph with the selection'}
+        />
+        <IconButton
           icon="LOCK"
-          onClick={flipLock}
-          kind={lock ? 'negative' : 'positive'}
-          title={lock ?
-            'Unlock the graph: update the graph with the selection' :
-            'Lock the graph: do not update the graph with the selection'}
+          onClick={flipGrabbable}
+          kind={grabbable ? 'negative' : 'positive'}
+          title={grabbable ?
+            'Allow nodes to be moved' :
+            'Disallow nodes to be moved'}
         />
         <IconButton
           icon="SETTINGS"
@@ -721,7 +747,8 @@ export default function GraphComponent(): JSX.Element {
       </Ivette.TitleBar>
       <EvaReady>
         <GraphView
-          lock={lock}
+          addSelection={addSelection}
+          grabbable={grabbable}
           layout={layout}
           selectionMode={selectionMode}
           ref={graph}/>
