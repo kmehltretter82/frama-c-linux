@@ -27,6 +27,7 @@ open Logic_const
 open Cil_types
 
 exception Not_well_formed of Cil_types.location * string
+exception Unknown_ext
 
 let rec unroll_type ?(unroll_typedef=true) = function
   | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->

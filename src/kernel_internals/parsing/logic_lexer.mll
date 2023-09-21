@@ -305,6 +305,37 @@
     | ADMIT, INVARIANT -> true, ADMIT_INVARIANT
     | ADMIT, LEMMA -> true, ADMIT_LEMMA
     | _ -> false, current
+
+  let type_to_string = function
+    | TYPENAME s -> s
+    | REAL -> "real"
+    | BOOLEAN -> "boolean"
+    | INTEGER -> "integer"
+    | _ -> assert false
+
+  let check_ext_plugin source plugin tok =
+    match tok with
+    | IDENTIFIER s ->
+      if Plugin.is_present plugin then
+        Kernel.warning ~once:true ~wkey:Kernel.wkey_extension_unknown ~source
+          "Unregistered extension %s for plug-in %s" s plugin
+      else
+        Kernel.warning ~once:true ~wkey:Kernel.wkey_plugin_not_loaded ~source
+          "Ignored extensions for unregistered plug-in %s" plugin;
+      IDENTIFIER_EXT s
+    | EXT_CODE_ANNOT s
+    | EXT_GLOBAL s
+    | EXT_GLOBAL_BLOCK s
+    | EXT_CONTRACT s ->
+      let plugin_from = Logic_env.extension_from s in
+      if plugin_from <> plugin then
+        Kernel.abort ~source
+          "Extension %s is from %s and not %s" s plugin_from plugin;
+      tok
+    | _ ->
+      Kernel.abort ~source
+        "Type token \'%s\' received instead of extension identifier"
+        (type_to_string tok)
 }
 
 let space = [' ' '\t' '\012' '\r' '@' ]
@@ -341,7 +372,12 @@ rule token = parse
            then comment lexbuf
            else lex_error lexbuf "unexpected block-comment opening"
          }
-
+  | '\\' ((rL (rL | rD)*) as plugin) "::" ((rL (rL | rD)*) as name) {
+     let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
+     let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
+     let tok = identifier name cabsloc in
+     check_ext_plugin (fst cabsloc) plugin tok
+     }
   | '\\' rL (rL | rD)* { bs_identifier lexbuf }
   | rL (rL | rD)*       {
       let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
@@ -558,9 +594,12 @@ and comment = parse
       | Logic_utils.Not_well_formed (loc, m) ->
         output ~source:(fst loc) "%s" m;
         None
+      | Logic_utils.Unknown_ext ->
+        None
       | Log.FeatureRequest(source,_,msg) ->
         let source = Option.value ~default:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) source in
         output ~source "unimplemented ACSL feature: %s" msg; None
+      | Log.AbortError _ as exn -> raise exn
       | exn ->
         Kernel.fatal ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "Unknown error (%s)"
           (Printexc.to_string exn)

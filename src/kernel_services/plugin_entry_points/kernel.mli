@@ -143,6 +143,12 @@ val dkey_visitor: category
 val wkey_annot_error: warn_category
 (** error in annotation. If only a warning, annotation will just be ignored. *)
 
+val wkey_plugin_not_loaded: warn_category
+(** Warning related to unloaded plugin. *)
+
+val wkey_extension_unknown: warn_category
+(** Warning related to the use of an unregistered ACSL extension. *)
+
 val wkey_ghost_already_ghost: warn_category
 (** ghost element is qualified with \ghost while this is already the case
     by default *)

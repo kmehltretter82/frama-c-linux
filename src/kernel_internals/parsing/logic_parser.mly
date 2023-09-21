@@ -254,7 +254,7 @@
 
 %token MODULE FUNCTION CONTRACT INCLUDE EXT_AT EXT_LET
 /* ACSL extension for external spec  file */
-%token <string> IDENTIFIER TYPENAME
+%token <string> IDENTIFIER TYPENAME IDENTIFIER_EXT
 %token <bool*string> STRING_LITERAL
 %token <string> INT_CONSTANT
 %token <string> FLOAT_CONSTANT
@@ -917,7 +917,12 @@ full_identifier:
 | id = EXT_CONTRACT { id }
 | id = EXT_GLOBAL { id }
 | id = EXT_GLOBAL_BLOCK { id }
+| id = IDENTIFIER_EXT { id }
 ;
+
+%inline unknown_extension:
+| id=IDENTIFIER_EXT content=extension_content { (id,content) }
+
 
 /*** ACSL extension for external spec file ***/
 
@@ -1052,7 +1057,7 @@ spec:
 contract:
 | requires terminates decreases simple_clauses behaviors complete_or_disjoint
     { let requires=$1 in
-      let (allocation,assigns,post_cond,extended) = $4 in
+      let (empty,(allocation,assigns,post_cond,extended)) = $4 in
       let behaviors = $5 in
       let (completes,disjoints) = $6 in
       let behaviors =
@@ -1066,7 +1071,11 @@ contract:
         else if $2<>None || $3<>None ||
                 behaviors<>[] || completes<>[] ||disjoints<>[]
         then behaviors
-        else raise (Not_well_formed (loc $sloc,"Empty annotation is not allowed"))
+        else
+          if empty then
+            raise (Not_well_formed (loc $sloc,"Empty annotation is not allowed"))
+          else
+            raise Unknown_ext
       in
         { spec_terminates = $2;
           spec_variant = $3;
@@ -1137,6 +1146,7 @@ clause_kw:
 | COMPLETE {"complete"}
 | DISJOINT {"disjoint"}
 | EXT_CONTRACT { $1 }
+| id=IDENTIFIER_EXT { id }
 | EOF { "end of annotation" }
 ;
 
@@ -1180,8 +1190,8 @@ variant:
 ;
 
 simple_clauses:
-| /* epsilon */ { FreeAllocAny,WritesAny,[],[] }
-| ne_simple_clauses { $1 }
+| /* epsilon */ { true,(FreeAllocAny,WritesAny,[],[]) }
+| ne_simple_clauses { false,$1 }
 ;
 
 allocation:
@@ -1191,21 +1201,22 @@ allocation:
 ne_simple_clauses:
 | post_cond_kind lexpr SEMICOLON simple_clauses
     { let tp_kind, kind = $1 in
-      let allocation,assigns,post_cond,extended = $4 in
+      let allocation,assigns,post_cond,extended = snd $4 in
       allocation,assigns,
       ((kind,toplevel_pred tp_kind $2)::post_cond),extended }
 | allocation SEMICOLON simple_clauses
-    { let allocation,assigns,post_cond,extended = $3 in
+    { let allocation,assigns,post_cond,extended = snd $3 in
       let a = concat_allocation allocation $1 in
       a,assigns,post_cond,extended
     }
 | ASSIGNS assigns SEMICOLON simple_clauses
-    { let allocation,assigns,post_cond,extended = $4 in
+    { let allocation,assigns,post_cond,extended = snd $4 in
       let a = concat_assigns $sloc assigns $2
       in allocation,a,post_cond,extended
     }
+| unknown_extension SEMICOLON simple_clauses { snd $3 }
 | EXT_CONTRACT extension_content SEMICOLON simple_clauses
-    { let allocation,assigns,post_cond,extended = $4 in
+    { let allocation,assigns,post_cond,extended = snd $4 in
       let processed = Logic_env.preprocess_extension $1 $2 in
       allocation,assigns,post_cond,($1,processed)::extended
     }
@@ -1246,7 +1257,7 @@ ne_behaviors:
 ;
 
 behavior_body:
-| assumes requires simple_clauses { $1,$2,$3 }
+| assumes requires simple_clauses { $1,$2,snd $3 }
 | assumes ne_requires ASSUMES
       { clause_order $loc($3) "assumes" "requires" }
 | assumes requires ne_simple_clauses ASSUMES
@@ -1319,6 +1330,7 @@ annotation:
       }
 | identifier { Aattribute_annot (loc $sloc, $1) }
 | BSGHOST { Aattribute_annot(loc $sloc,"\\ghost") }
+| unknown_extension SEMICOLON { raise Unknown_ext }
 ;
 
 contract_or_code_annotation:
@@ -1396,6 +1408,7 @@ loop_annot_stack:
     let (i,fa,a,b,v,p,e) = $2 in
     (i,fa,a,b,v,p, $1::e)
   }
+| LOOP unknown_extension SEMICOLON loop_annot_opt { $4 }
 ;
 
 loop_annot_opt:
@@ -1542,7 +1555,7 @@ impact_pragma:
 
 decl_list:
 | decl            { [loc_decl $sloc $1] }
-| decl decl_list  { (loc_decl $loc($1) $1) :: $2 }
+| decl decl_list  { (loc_decl $sloc $1) :: $2 }
 ;
 
 decl:
@@ -1572,6 +1585,7 @@ ext_decl:
 ext_decls:
 | /* epsilon */
     { [] }
+| unknown_extension SEMICOLON ext_decls { $3 }
 | ext_decl_loc ext_decls
     { $1::$2 }
 ;
@@ -1932,7 +1946,7 @@ post_cond:
 
 is_acsl_spec:
 | post_cond  { snd $1 }
-| EXT_CONTRACT   { $1 }
+| EXT_CONTRACT { $1 }
 | ASSIGNS    { "assigns" }
 | ALLOCATES  { "allocates" }
 | FREES      { "frees" }
@@ -1948,8 +1962,9 @@ is_acsl_spec:
 
 is_acsl_decl_or_code_annot:
 | EXT_CODE_ANNOT { $1 }
-| EXT_GLOBAL     { $1 }
-| EXT_GLOBAL_BLOCK     { $1 }
+| EXT_GLOBAL { $1 }
+| EXT_GLOBAL_BLOCK { $1 }
+| IDENTIFIER_EXT { $1 }
 | ASSUMES   { "assumes" }
 | ASSERT    { "assert" }
 | CHECK     { "check" }
