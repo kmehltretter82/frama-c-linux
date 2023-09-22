@@ -186,7 +186,7 @@ val create_project_from_visitor:
     [true] (by default), remember than the returned project is the last
     created one.
     The visitor is responsible to avoid sharing between old file and new
-    file (i.e. it should use {!Cil.copy_visit} at some point).
+    file (i.e. it should use {!Visitor_behavior.copy} at some point).
     @raise File_types.Bad_Initialization if called more than once.
     @since Beryllium-20090601-beta1
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
@@ -197,7 +197,7 @@ val create_rebuilt_project_from_visitor:
 (** Like {!create_project_from_visitor}, but the new generated cil file is
     generated into a temp .i or .c file according to [preprocess], then re-built
     by Frama-C in the returned project. For instance, use this function if the
-    new cil file contains a constructor {!GText} as global.
+    new cil file contains a constructor {!Cil_types.GText} as global.
 
     Note that the generation of a preprocessed C file may fail in some cases
     (e.g. if it includes headers already included). Thus the generated file is

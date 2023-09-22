@@ -179,7 +179,7 @@ and global =
     CIL is configured at build-time with the sizes and alignments of the
     underlying compiler (GCC or MSVC). CIL contains functions that can compute
     the size of a type (in bits) {!Cil.bitsSizeOf}, the alignment of a type (in
-    bytes) {!Cil.alignOf_int}, and can convert an offset into a start and width
+    bytes) {!Cil.bytesAlignOf}, and can convert an offset into a start and width
     (both in bits) using the function {!Cil.bitsOffset}. At the moment these
     functions do not take into account the [packed] attributes and pragmas. *)
 
@@ -332,12 +332,13 @@ and attrparam =
     Constructing a {!Cil_types.compinfo} can be tricky since it must contain
     fields that might refer to the host {!Cil_types.compinfo} and furthermore
     the type of the field might need to refer to the {!Cil_types.compinfo} for
-    recursive types.  Use the {!Cil.mkCompInfo} function to create a
+    recursive types.  Use the {!Cil_const.mkCompInfo} function to create a
     {!Cil_types.compinfo}. You can easily fetch the {!Cil_types.fieldinfo} for a
     given field in a structure with {!Cil.getCompField}. *)
 
-(** The definition of a structure or union type. Use {!Cil.mkCompInfo} to make
-    one and use {!Cil.copyCompInfo} to copy one (this ensures that a new key is
+(** The definition of a structure or union type. Use {!Cil_const.mkCompInfo} to
+    make one and use {!Cil_const.copyCompInfo} to copy one (this ensures that
+    a new key is
     assigned and that the fields have the right pointers to parents.).
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
