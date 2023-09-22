@@ -22,6 +22,7 @@
 
 import React, { useEffect } from 'react';
 
+import { classes } from 'dome/misc/utils';
 import { IconButton } from 'dome/controls/buttons';
 import * as Ivette from 'ivette';
 
@@ -30,6 +31,7 @@ import * as States from 'frama-c/states';
 
 import EvaReady from 'frama-c/plugins/eva/EvaReady';
 import * as API from './api';
+import type { marker, location } from 'frama-c/kernel/api/ast';
 import gearsIcon from '../eva/images/gears.svg';
 
 import './dive.css';
@@ -75,16 +77,43 @@ function Exploring(): JSX.Element {
   return <><img src={gearsIcon} className="exploration" />Exploring...</>;
 }
 
-type withKey<P> = P & {key: string | number | null}
+function Marker(props: {location: location}): JSX.Element {
+  const location = props.location;
+  const marker = location.marker;
+  const { descr } = States.useMarker(marker);
+  const [selection, updateSelection] = States.useSelection();
+  const [hovering, updateHovered] = States.useHovered();
+  const classeName = classes(
+    'marker',
+    selection.current?.marker === marker && 'selected',
+    hovering?.marker === marker && 'hovered'
+  );
+
+  return <span
+    className={classeName}
+    onClick={() => updateSelection({ location: location })}
+    onMouseEnter={() => updateHovered(location)}
+    onMouseLeave={() => updateHovered(undefined)}>
+      {descr}
+  </span>;
+}
+
+
+type WithKey<P> = P & {key: string | number | null}
+
+type WithItemChildren<P> =
+  P & {
+    children?: WithKey<React.ReactElement> | WithKey<React.ReactElement>[]
+  }
 
 type TreeNodeProps = {
   label: React.ReactNode,
+  className?: string,
   unfolded?: boolean,
   onunfold?: () => void,
-  children?: withKey<React.ReactElement> | withKey<React.ReactElement>[]
 }
 
-function TreeNode(props: TreeNodeProps): JSX.Element {
+function TreeNode(props: WithItemChildren<TreeNodeProps>): JSX.Element {
   const [unfolded, setUnfolded] = React.useState(props.unfolded === true);
   const children =
     props.children ?
@@ -96,21 +125,33 @@ function TreeNode(props: TreeNodeProps): JSX.Element {
     setUnfolded(!unfolded);
   };
 
-  return <div>
-    {children.length > 0 ?
-      <Folder unfolded={unfolded} onclick={toggle} /> : <></>
-    }
-    <span>{props.label}</span>
+  return <div className={props.className}>
+    <span className="label">
+      {children.length > 0 ?
+        <Folder unfolded={unfolded} onclick={toggle} /> : <></>
+      }
+      {props.label}
+    </span>
     {unfolded ?
       <ul>
         {children.map((element) => <li key={element.key}>{element}</li>)}
       </ul> :
         null
-      }
+    }
     </div>;
 }
 
-function Node(props: {nodeId: number, unfolded?: boolean}): JSX.Element {
+function MarkerNode(props: WithItemChildren<{location: location}>):
+    JSX.Element {
+  return <TreeNode
+    unfolded={true}
+    label={<Marker location={props.location} />}
+    className="marker">
+      {props.children}
+  </TreeNode>;
+}
+
+function GraphNode(props: {nodeId: number, unfolded?: boolean}): JSX.Element {
   const graphData = States.useSyncArrayElt(API.graph, `n${props.nodeId}`);
   const graph = States.useSyncArrayData(API.graph);
 
@@ -121,13 +162,31 @@ function Node(props: {nodeId: number, unfolded?: boolean}): JSX.Element {
       .filter(isDependency)
       .filter((d) => d.dst === node.id);
 
+    // Transform dependencies into a map 'statement' -> 'memory location read
+    // at this statement'
+    const map = new Map<marker, [location, Set<API.nodeId>]>();
+    deps.forEach((d) => {
+      d.origins.forEach((loc) => {
+        let entry = map.get(loc.marker);
+        if (entry === undefined) {
+          entry = [loc, new Set()];
+          map.set(loc.marker, entry);
+        }
+        entry[1].add(d.src);
+     });
+    });
+
     return <TreeNode
         unfolded={props.unfolded}
         onunfold={() => explore(node)}
         label={node.label}>
           {node.backward_explored ?
-            deps.map((element) =>
-              <Node nodeId={element.src} key={element.src} />
+            Array.from(map.entries()).map(([m, [loc, sources]]) =>
+              <MarkerNode location={loc} key={m}>
+                {Array.from(sources.values()).map((src) =>
+                  <GraphNode nodeId={src} key={src} />
+                ) }
+              </MarkerNode>
             ) :
             <Exploring key={null} />
           }
@@ -165,7 +224,7 @@ export default function TreeComponent(): JSX.Element {
           <>Select an expression to investigate</>
         :
           <div className="diveTree">
-            <Node nodeId={root} unfolded={true} />
+            <GraphNode nodeId={root} unfolded={true} />
           </div>
       }
     </EvaReady>
