@@ -759,7 +759,7 @@ class registerLabelsVisitor : cilVisitor = object
   method! vattr _ = Cil.SkipChildren (* via block stmt *)
 end
 
-(* prepare a function for computeCFGInfo by removing break, continue,
+(* prepare a function for cfgFun by removing break, continue,
  * default and switch statements/labels and replacing them with Ifs and
  * Gotos. *)
 let prepareCFG ?(keepSwitch=false) (fd : fundec) : unit =

@@ -964,10 +964,10 @@ and fundec = {
   mutable smaxstmtid: int option;
   (** max id of a (reachable) statement in this function, if we have
       computed it. range = 0 ...  (smaxstmtid-1). This is computed by
-      {!Cfg.computeCFGInfo}. *)
+      {!Cfg.cfgFun}. *)
 
   mutable sallstmts: stmt list;
-  (** After you call {!Cfg.computeCFGInfo} this field is set to contain all
+  (** After you call {!Cfg.cfgFun} this field is set to contain all
       statements in the function. *)
 
   mutable sspec: funspec;
@@ -1019,8 +1019,8 @@ and block = {
     [stmt] can be used to give unique numbers to statements, and the [succs] and
     [preds] fields can be used to maintain a list of successors and predecessors
     for every statement. The CFG information is not computed by default. Instead
-    you must explicitly use the functions {!Cfg.prepareCFG} and
-    {!Cfg.computeCFGInfo} to do it. *)
+    you must explicitly use functions {!Cfg.prepareCFG} and {!Cfg.cfgFun}
+    to do it. *)
 
 (** Statements.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
