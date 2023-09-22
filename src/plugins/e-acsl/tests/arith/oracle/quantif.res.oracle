@@ -76,7 +76,6 @@
 [eva:alarm] quantif.i:32: Warning: assertion got status unknown.
 [eva:alarm] quantif.i:47: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] quantif.i:54: Warning: assertion got status unknown.
 [eva:alarm] quantif.i:63: Warning: 
   assertion 'forall_multiple_binders_2' got status unknown.
 [eva:alarm] quantif.i:66: Warning: 
