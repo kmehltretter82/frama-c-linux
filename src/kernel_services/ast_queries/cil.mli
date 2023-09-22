@@ -1020,6 +1020,14 @@ val isConstantOffset: ?is_varinfo_cst:(varinfo -> bool) -> offset -> bool
     constant with value zero *)
 val isZero: exp -> bool
 
+(** True if the given expression is a null pointer, i.e. [0], [(void * )0],
+    which are the two null pointer constants in the standard, or the cast of
+    a null pointer (constant or not) into a pointer type.
+
+    @since Frama-C+dev
+*)
+val is_nullptr: exp -> bool
+
 (** True if the term is the constant 0 *)
 val isLogicZero: term -> bool
 
@@ -1164,16 +1172,20 @@ val need_cast: ?force:bool -> typ -> typ -> bool
     This applies only to implicit casts. Casts already present
     in the source code are exempt from this hook.
 
-    @since Frama-C+dev*)
+    @since Frama-C+dev
+*)
 val typeForInsertedCast: (exp -> typ -> typ -> typ) ref
 
-(** [checkCast context fromsource oldt newt] emits a warning or an error
-    if the cast from [oldt] to [newt] is invalid.
-    Otherwise, doesn't make anything.
-    [fromsource] is [false] (default) if the cast is not from the source.
+(** [checkCast context fromsource nullptr_cast oldt newt] emits a warning
+    or an error if the cast from [oldt] to [newt] is invalid (does nothing
+    otherwise).
+    [nullptr_cast] is [true] iff the expression being casted is a null pointer.
+    Default is false.
+    [fromsource] is [false] (default) if the cast is not present in the source
+    code.
     Check [areCompatibleTypes] documentation for [context].
 
-    Suspicious cases that only emits a warning :
+    Suspicious cases that only emit a warning:
     - Implicit cast from a pointer to an integer.
     - Cast from a pointer to a function type to another pointer to a function
       type when the function types are not compatible.
@@ -1181,21 +1193,24 @@ val typeForInsertedCast: (exp -> typ -> typ -> typ) ref
     - Cast, in both directions, between pointer to an object type and pointer
       to a function type.
 
-    @since Frama-C+dev*)
+    @since Frama-C+dev
+*)
 val checkCast:
-  ?context:qualifier_check_context -> ?fromsource:bool -> typ -> typ -> unit
+  ?context:qualifier_check_context ->
+  ?nullptr_cast:bool ->
+  ?fromsource:bool ->
+  typ -> typ -> unit
 
 
 (** Generic version of {!Cil.mkCastT}.
     Construct a cast when having the old type of the expression.
-    [fromsource] is [false] (default) if the cast is not from the source.
+    [fromsource] is [false] (default) if the cast is not present in the source
+    code.
     If [check] is [true] (default), we check that the cast is valid,
-    fail if the cast is invalid.
+    emitting an error or warning if the cast is invalid.
     If the new type is the same as the old type, then no cast is added,
     unless [force] is [true] (default is [false]).
-    Casting from [oldt] to [newt].
-    Take the expression as argument and can modify it.
-    Return the new type and the new expression.
+    Cast from [oldt] to [newt], returning the new type and the new expression.
 
     @since Frama-C+dev
 *)
@@ -1205,13 +1220,13 @@ val mkCastTGen: ?check:bool -> ?context:qualifier_check_context ->
 (** Construct a cast when having the old type of the expression. If the new
     type is the same as the old type, then no cast is added, unless [force]
     is [true] (default is [false]).
-    Fail if the cast is invalid.
+    Emit an error or warning if [check] is true and the cast is invalid.
     @before 23.0-Vanadium different order of arguments.
     @before Frama-C+dev no [check] argument, it was always [false].
 *)
 val mkCastT: ?check:bool -> ?force:bool -> oldt:typ -> newt:typ -> exp -> exp
 
-(** Like {!Cil.mkCastT} but uses typeOf to get [oldt]
+(** Like {!Cil.mkCastT}, but uses [typeOf] to get [oldt].
     @before 23.0-Vanadium different order of arguments.
     @before Frama-C+dev no [check] argument, it was always [false].
 *)
