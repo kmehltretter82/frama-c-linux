@@ -79,8 +79,7 @@ type file = {
   (** An optional global initializer function. This is a function where you
       can put stuff that must be executed before the program is
       started. This function, is conceptually at the end of the file,
-      although it is not part of the globals list. Use {!Cil.getGlobInit} to
-      create/get one. *)
+      although it is not part of the globals list. *)
 
   mutable globinitcalled: bool;
   (** Whether the global initialization function is called in main. This

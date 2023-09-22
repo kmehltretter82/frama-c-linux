@@ -159,7 +159,7 @@ val create_by_copy:
     the copy function of the copied state is implemented. All the hooks
     applied when loading a project are applied (see {!load}).
     If [last], then remember that the returned project is the last created
-    one (see {!last_created_by_copy}).
+    one.
 *)
 
 val create_by_copy_hook: (t -> t -> unit) -> unit
