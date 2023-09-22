@@ -448,9 +448,9 @@ val use_predicate : predicate_kind -> bool
     It is true for `Assert` and `Check`, and false for `Admit`. *)
 val verify_predicate : predicate_kind -> bool
 
-(** Functions below allows to test a special kind of code_annotation.
-    Use them in conjunction with {!Annotations.get_filter} to retrieve
-    a particular kind of annotations associated to a statement. *)
+(** The functions below allow testing for specific kinds of [code_annotation].
+    Use them in conjunction with iterators in {!Annotations} to retrieve
+    a particular kind of annotation associated to a statement. *)
 
 val is_assert : code_annotation -> bool
 val is_check : code_annotation -> bool
