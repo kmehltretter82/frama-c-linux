@@ -1021,7 +1021,7 @@ val isConstantOffset: ?is_varinfo_cst:(varinfo -> bool) -> offset -> bool
 val isZero: exp -> bool
 
 (** True if the given expression is a null pointer, i.e. [0], [(void * )0],
-    which are the two null pointer constants in the norm, or the cast of
+    which are the two null pointer constants in the standard, or the cast of
     a null pointer (constant or not) into a pointer type.
 
     @since Frama-C+dev
