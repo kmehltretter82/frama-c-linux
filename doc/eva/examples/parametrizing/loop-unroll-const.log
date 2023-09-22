@@ -1,12 +1,9 @@
 [kernel] Parsing loop-unroll-const.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] loop-unroll-const.c:8: Trace partitioning superposing up to 100 states
 [eva] loop-unroll-const.c:8: Trace partitioning superposing up to 200 states
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   a[0][0] ∈ {0}
