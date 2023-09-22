@@ -80,8 +80,8 @@ endif
 SED_UNBUFFERED:=sed$(shell sed --unbuffered //p /dev/null 2>/dev/null && echo " --unbuffered" || true)
 
 # If there is a GNU time in the PATH, which contains the desired options
-# (-f and -o), use them; otherwise, use any time (be it a shell builtin
-# or a command). 'env' allows bypassing shell builtins (if they exist),
+# (-f and -o), use them; otherwise, ignore it.
+# 'env' allows bypassing shell builtins (if they exist),
 # since they usually don't have the required options.
 ifeq (OK,$(shell env time -f 'test' -o '/dev/null' echo OK || echo KO))
 define time_with_output
@@ -89,7 +89,6 @@ define time_with_output
 endef
 else
 define time_with_output
-  time
 endef
 endif
 
