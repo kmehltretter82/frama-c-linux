@@ -126,8 +126,7 @@ let completes (type clause) completes table =
 (* Concat all clauses from the table into a list. *)
 let get_all_clauses table =
   let clauses =
-    Hashtbl.fold
-      (fun _ (_,clause) clauses -> clause :: clauses) table []
+    Hashtbl.fold (fun _ (_,clause) clauses -> clause :: clauses) table []
   in
   match clauses with
   | [] -> None
@@ -138,7 +137,8 @@ let get_all_clauses table =
    - unguarded behaviors (no assumes).
    - complete behaviors (each one of them needs to be in our table).
    - all behaviors in our table.
-     It is a generic function used by {!Generator.get_clauses}.
+
+   It is a generic function used by {!Generator.get_clauses}.
 *)
 let get_clauses_generic spec table =
   match unguarded table with
@@ -148,7 +148,7 @@ let get_clauses_generic spec table =
     | Some l -> Some l
     | None -> get_all_clauses table
 
-(* Register a new mode (or replace an existing one). *)
+(* Register a new custom mode (or replace an existing one). *)
 let register ?gen_exits ?status_exits ?gen_assigns ?status_assigns
     ?gen_requires ?gen_allocates ?status_allocates ?gen_terminates
     ?status_terminates name =
@@ -162,7 +162,7 @@ let register ?gen_exits ?status_exits ?gen_assigns ?status_assigns
   } in
   Hashtbl.replace custom_modes name mode
 
-(* Return a mode from the registered ones if it exists. *)
+(* Return a custom mode from the registered ones if it exists. *)
 let get_custom_mode mode =
   match Hashtbl.find_opt custom_modes mode with
   | None -> Kernel.abort "Mode %s is not registered" mode
@@ -175,7 +175,7 @@ let compare_it it1 it2 =
 (* Return true if [kf] is a builtin of Frama-C. *)
 let is_frama_c_builtin kf =
   Kernel_function.get_vi kf |> Cil_builtins.is_builtin
-  ||Kernel_function.get_name kf |> Cil_builtins.is_special_builtin
+  || Kernel_function.get_name kf |> Cil_builtins.is_special_builtin
 
 (* Return true if [kf] is a from the stdblib of Frama-C. *)
 let is_frama_c_stdlib kf =
@@ -185,7 +185,7 @@ let is_frama_c_stdlib kf =
 module type Generator =
 sig
 
-  (* Generator's clause : exits, assigns, requires, allocation or terminates. *)
+  (* Generator's clause : exits, assigns, requires, allocates or terminates. *)
   type clause
   (* Store informations regarding original specification clauses. *)
   type behaviors
@@ -199,7 +199,7 @@ sig
   val has_default_behavior : behaviors -> bool
   (* Collect all clauses from function specification. *)
   val collect_behaviors : spec -> behaviors
-  (* Collect clauses given a [spec] and result of {!collect_behaviors}. *)
+  (* Collect clauses given a [spec] and the result of {!collect_behaviors}. *)
   val get_clauses : spec -> behaviors -> clause list option
 
   (* Generate a default clause in ACSL mode. *)
@@ -208,10 +208,10 @@ sig
   val safe_default : kernel_function -> clause
   (* Generate a default clause in Frama_C mode. *)
   val frama_c_default : kernel_function -> clause
-  (* Generate a default clause in Other mode. *)
+  (* Generate a default clause in Other (custom) modes. *)
   val custom_default : string -> kernel_function -> spec -> clause
 
-  (* Combine clauses from completes behaviors to generate clauses inside
+  (* Combine clauses from existing behaviors to generate clauses inside
      default behavior. *)
   val combine_default : clause list -> clause
 
@@ -231,8 +231,8 @@ struct
     else
       let clauses_opt = G.get_clauses spec table in
       match mode, clauses_opt with
-      | (Safe | Frama_C | Other _), Some completes_clauses ->
-        true, G.combine_default completes_clauses
+      | (Safe | Frama_C | Other _), Some clauses ->
+        true, G.combine_default clauses
       | Safe, None ->
         false, G.safe_default kf
       | Frama_C, None ->
@@ -241,7 +241,10 @@ struct
         false, G.custom_default mode kf spec
       | (Skip | ACSL), _ -> assert false
 
-  (* Return a new clause as [Generated g] of [Kept] if no action is needed. *)
+  (* Return a new clause as [Generated g] or [Kept] (if no action is needed),
+     and an option used for warnings. [combined] is true if the generated
+     clause comes from existing ones.
+  *)
   let get_default mode kf spec =
     let table = G.collect_behaviors spec in
     if mode = Skip || G.has_default_behavior table then Kept, None
@@ -253,7 +256,7 @@ struct
       else Generated g, Some(combined, G.name)
 
   (* Interface to call {!G.emit}. Only emit properties for non empty clauses
-     generated for a prototype. *)
+     generated for a declaration. *)
   let emit mode kf bhv = function
     | Kept -> ()
     | Generated _ when Kernel_function.has_definition kf -> ()
@@ -801,11 +804,11 @@ let clauses_fmt =
   Pretty_utils.pp_list ~pre:"" ~sep:", " ~last:" and " ~suf:""
     Format.pp_print_string
 
-(* Emit warnings if we genareted some clauses and if [kf] is a declaration
+(* Emit warnings if we generated some clauses and if [kf] is a declaration
    and not a builtin of frama-c (cf. {!Make.get_default}).
    The message varies depending on
    - if the spec was empty.
-   - if we used existing specification.
+   - if we used existing clauses.
    - the number of generated clause types.
 *)
 let do_warning kf funspec = function
@@ -835,10 +838,10 @@ let do_warning kf funspec = function
       ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
       "%s. See -generated-spec-* options for more info" msg
 
-(* Perform generation of all clauses, adds them to the original specification,
+(* Perform generation of all clauses, add them to the original specification,
    and emit property status for each of them. *)
 let do_populate kf clauses =
-  let original_spec =  Annotations.funspec kf in
+  let original_spec = Annotations.funspec kf in
   let config = activated_config kf clauses in
 
   let apply warn_acc get_default mode =
@@ -906,7 +909,7 @@ module Key =
   Datatype.Pair_with_collections (Kernel_function) (Clauses)
     (struct let module_name = "Populate_spec.Key.t" end)
 
-(* Hashtbl used to memorize which kernel function has been populated. *)
+(* Hashtbl used to memoize which kernel function has been populated. *)
 module Is_populated =
   State_builder.Hashtbl
     (Key.Hashtbl)
