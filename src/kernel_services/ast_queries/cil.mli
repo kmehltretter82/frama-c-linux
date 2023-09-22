@@ -2097,7 +2097,7 @@ val visitCilFile: cilVisitor -> file -> unit
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 val visitCilFileSameGlobals: cilVisitor -> file -> unit
 
-(** Same as {!visitCilFilesSameGlobals}, but only visits function definitions
+(** Same as {!Cil.visitCilFileSameGlobals}, but only visits function definitions
     (i.e. behaves as if all globals but [GFun] return [SkipChildren]).
     @since 25.0-Manganese
 *)

@@ -53,8 +53,8 @@ module type S = sig
     start:Integer.t -> stop:Integer.t -> size:Integer.t ->
     t ->
     bool * t
-  (** Extract the bits between {!start} and {!stop} in the value of type [t],
-      assuming this value has {!size} bits. Return the corresponding value, and
+  (** Extract the bits between [start] and [stop] in the value of type [t],
+      assuming this value has [size] bits. Return the corresponding value, and
       a boolean indicating that an imprecision occurred during the operation.
       In the latter case, the origin of the imprecision is flagged as having kind
       [topify]. *)
