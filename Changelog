@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Eva       [2023-09-26] Support evaluation of simple \let bindings in
+              ACSL terms and predicates.
 -   Alias     [2023-09-07] New alias plugin that implements a points-to
               analysis and an alias analysis based on Steensgaard's algorithm.
               For these purposes it presents a more efficient (albeit less
