@@ -3091,7 +3091,7 @@ prototype of \lstinline|main| is:
 \cwithrange{1-1}{examples/parametrizing/simple-main.c}
 The types of arguments \lstinline|argc| and \lstinline|argv|
 translate into the following initial values:
-\logwithrange{10-16}{examples/parametrizing/simple-main.log}
+\logwithrange{8-14}{examples/parametrizing/simple-main.log}
 
 This is generally not what is wanted, but then again, embedded applications
 are generally not written against the POSIX interface. If the analyzed
@@ -3198,7 +3198,7 @@ also decided by the value of option \lstinline|-eva-context-width|.
 Example: with the default value \lstinline|2| for option
 \lstinline|-eva-context-width|, the declaration \lstinline|int *(t[5]);|
 causes the following array to be allocated:
-\logwithrange{10-15}{examples/parametrizing/context-width.log}
+\logwithrange{8-13}{examples/parametrizing/context-width.log}
 
 Note that for both arrays of pointers and pointers to pointers,
 using option \lstinline|-eva-context-width 1| corresponds to a very strong
@@ -3223,7 +3223,7 @@ two is plenty for most programs.
 For instance, here is part of the initial state displayed by \Eva{}
 in \lstinline|-lib-entry| mode if a global variable \lstinline|s|
 has the type \lstinline|struct S| defined above:
-\logwithrange{6-17}{examples/parametrizing/context-depth.1.log}
+\logwithrange{4-15}{examples/parametrizing/context-depth.1.log}
 
 In this case, if variable \lstinline|s| is the only one which
 is automatically allocated, it makes sense to set the option
@@ -3237,7 +3237,7 @@ Below are the initial contents for a variable \lstinline|s| of type \lstinline|s
 with options \lstinline|-eva-context-width 1|
 \lstinline|-eva-context-depth 1|:
 
-\logwithrange{6-16}{examples/parametrizing/context-depth.2.log}
+\logwithrange{4-14}{examples/parametrizing/context-depth.2.log}
 
 \subsubsection{The possibility of invalid pointers}
 
@@ -3271,7 +3271,7 @@ a variable \lstinline|s| of
 type \lstinline|struct S| receives  the following initial contents,
 modeling a chained list of length exactly 3:
 
-\logwithrange{6-11}{examples/parametrizing/context-depth.3.log}
+\logwithrange{4-9}{examples/parametrizing/context-depth.3.log}
 
 \subsection{State of the IEEE 754 environment}
 
@@ -3395,7 +3395,7 @@ alarm. This leads to an alarm on the following example:
 \Eva{} assumes that writing \lstinline|t[0][...]|, the programmer
 intended the memory access to be inside \lstinline|t[0]|. Consequently,
 it emits an alarm:
-\logwithrange{8-8}{examples/parametrizing/out-of-bound.log}
+\logwithrange{5-6}{examples/parametrizing/out-of-bound.log}
 The option \lstinline|-unsafe-arrays| tells \Eva{} to warn
 only if the address as computed using its modeling of pointer arithmetics
 is invalid. With the option, \Eva{} does not warn about line 4
@@ -3503,7 +3503,7 @@ in the general case and will instead rely on the \lstinline|mod3| specification,
 as it cannot reduce the new argument value of the recursive calls, as shown
 by the successive values printed by the \lstinline|Frama_C_show_each| directive:
 
-\logwithrange{12-19}{examples/parametrizing/recursion-imprecise.log}
+\logwithrange{10-17}{examples/parametrizing/recursion-imprecise.log}
 
 Finally, note that the unrolling of a very large number of recursive calls can
 considerably slow down the analysis.
@@ -3672,10 +3672,10 @@ the specified unrolling value is insufficient to unroll the loop entirely:
 
 \csource{examples/parametrizing/loop-unroll-insuf.c}
 
-\logwithrange{7-7}
+\logwithrange{5-5}
   {examples/parametrizing/loop-unroll-insuf.log}
 
-The message can be deactived via \lstinline|-eva-warn-key loop-unroll=inactive|.
+The message can be disabled via \lstinline|-eva-warn-key loop-unroll=inactive|.
 
 Note that using an unrolling parameter which is higher than the actual number
 of iterations of a loop doesn't generally have an effect on the analysis.
@@ -3711,7 +3711,7 @@ option \lstinline|-eva-slevel 55| in order to be completely unrolled:
 
 When the loops are sufficiently unrolled, the result obtained for the
 contents of array \lstinline|t| are the optimally precise:
-\logwithrange{14-14}{examples/parametrizing/slevel.1.log}
+\logwithrange{11-11}{examples/parametrizing/slevel.1.log}
 
 The number to pass the option \lstinline|-eva-slevel|  is of the magnitude of
 the number of values for \lstinline|i| (the 6 integers between 0 and 5)
@@ -3720,7 +3720,7 @@ integers comprised between 0 and 10). If a value much lower than
 this is passed, the result of the initialization of array \lstinline|t|
 will only be precise for the first cells. The option \lstinline|-eva-slevel 28|
 gives for instance the following result for array \lstinline|t|:
-\logwithrange{15-16}{examples/parametrizing/slevel.2.log}
+\logwithrange{12-13}{examples/parametrizing/slevel.2.log}
 
 In this result, the effects of the first iterations of the loops
 (for the whole of \lstinline|t[0]|, the whole of \lstinline|t[1]| and the first
@@ -3994,7 +3994,7 @@ evaluated by \Eva{} as a singleton in each case, which enables the use of a
 the function can be exactly computed as the set of three possible values instead
 of an imprecise interval.
 
-\logwithrange{25-26}{examples/parametrizing/split-array.log}
+\logwithrange{22-23}{examples/parametrizing/split-array.log}
 
 A \lstinline|split| annotation can be used on any expression that evaluates to a
 {\it small} number of integer values. In particular, the expression can be a C
@@ -4129,13 +4129,13 @@ Example:
 With the default limit of 8 elements for sets of integers, the
 analysis of the program shows a correct but approximated result:
 
-\logwithrange{23-23}{examples/parametrizing/ilevel.1.log}
+\logwithrange{20-20}{examples/parametrizing/ilevel.1.log}
 
 Studying the program, the user may decide to improve the precision of
 the result by adding \verb|-eva-ilevel 16| to the command line. The
 analysis result then becomes:
 
-\logwithrange{23-23}{examples/parametrizing/ilevel.2.log}
+\logwithrange{20-20}{examples/parametrizing/ilevel.2.log}
 
 \subsection{Maximum number of precise items in arrays}
 

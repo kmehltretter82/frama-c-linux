@@ -1,7 +1,5 @@
 [kernel] Parsing simple-main.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] simple-main.c:3: 
@@ -15,7 +13,6 @@
   S_0_S_argv[0..1] ∈ [--..--]
   S_1_S_argv[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}

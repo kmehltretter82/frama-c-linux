@@ -1,7 +1,5 @@
 [kernel] Parsing context-width.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva] context-width.c:3: 
@@ -14,7 +12,6 @@
   S_0_S_t[0..1] ∈ [--..--]
   S_1_S_t[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   
