@@ -46,12 +46,6 @@ val register:
 exception Incompatible_type of string
 exception Unbound_value of string
 
-exception Unloadable of string
-(** Exception that a plug-in can throw if it detects that it
-    can't be loaded. It is caught by {!Dynamic.load_module} and
-    {!Dynamic.load_script}
-    @since Oxygen-20120901 *)
-
 val get: plugin:string -> string -> 'a Type.t -> 'a
 (** [get ~plugin name ty] returns the value registered with the name
     [name], the type [ty] and the plug-in [plugin]. This plug-in will be

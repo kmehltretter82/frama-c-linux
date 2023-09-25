@@ -37,8 +37,6 @@ let error ~name ~message ~details =
 (* --- Dynlink Common Interface & Dynamic Library                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-exception Unloadable of string
-
 module Tbl = Type.String_tbl(struct type 'a t = 'a end)
 
 let dynlib_init = ref false
@@ -57,8 +55,6 @@ let dynlib_error name = function
     error ~name ~message:"cannot load module" ~details:(Dynlink.error_message e) ;
   | Sys_error _ as e ->
     error ~name ~message:"system error" ~details:(Printexc.to_string e)
-  | Unloadable details ->
-    error ~name ~message:"incompatible with current set-up" ~details
   (* the three next errors may be raised in case of incompatibilities with
      another plug-in *)
   | Incompatible_type s ->
