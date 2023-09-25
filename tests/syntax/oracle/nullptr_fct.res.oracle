@@ -5,6 +5,7 @@ void wrap(void (*f)(void))
   if (f != (void (*)(void))0) (*f)();
   if (f != (void (*)(void))0) (*f)();
   if (f != (void (*)(void))0) (*f)();
+  if (f != (void (*)(void))0) (*f)();
   return;
 }
 
