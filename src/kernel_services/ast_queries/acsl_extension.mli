@@ -52,9 +52,15 @@ type extension_printer =
   acsl_extension_kind -> unit
 
 
-(** [register_behavior name ~preprocessor typer ~visitor ~printer ~short_printer status]
+(** [register_behavior
+      ~plugin name ~preprocessor typer ~visitor ~printer ~short_printer status]
     registers new ACSL extension to be used in function contracts with name
-    [name].
+    [name] and plugin [plugin].
+
+    The labelled parameter [plugin] is used to specify which plugin registers
+    this new extension. It can be used, together with the syntax
+    [\plugin::name _] in ACSL annotations (instead of just [name _]), to do some
+    verifications and get better warnings/errors messages.
 
     The optional [preprocessor] is a function to be applied by the parser on the
     untyped content of the extension before parsing the rest of the processed
@@ -93,8 +99,10 @@ type extension_printer =
              p)])
       | [] -> let id = !count in incr count; Ext_id id
       | _ -> typing_context.error loc "expecting a predicate after keyword FOO"
-    let () = Acsl_extension.register_behavior "FOO" foo_typer false
+    let () =
+      Acsl_extension.register_behavior ~pugin:"myplugin" "FOO" foo_typer false
     ]
+    @before Frama-C+dev the parameter [plugin] was not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_behavior:
@@ -104,8 +112,9 @@ val register_behavior:
   ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
   unit
 
-(** Registers extension for global annotation. See [register_behavior].
+(** Registers extension for global annotation. See {!register_behavior}.
 
+    @before Frama-C+dev the parameter [plugin] was not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_global:
@@ -115,8 +124,9 @@ val register_global:
   ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
   unit
 
-(** Registers extension for global block annotation. See [register_behavior].
+(** Registers extension for global block annotation. See {!register_behavior}.
 
+    @before Frama-C+dev the parameter [plugin] was not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_global_block:
@@ -127,8 +137,9 @@ val register_global_block:
   unit
 
 (** Registers extension for code annotation to be evaluated at _current_
-    program point. See [register_behavior].
+    program point. See {!register_behavior}.
 
+    @before Frama-C+dev the parameter [plugin] was not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_code_annot:
@@ -139,8 +150,9 @@ val register_code_annot:
   unit
 
 (** Registers extension for code annotation to be evaluated for the _next_
-    statement. See [register_behavior].
+    statement. See {!register_behavior}.
 
+    @before Frama-C+dev the parameter [plugin] was not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_code_annot_next_stmt:
@@ -150,8 +162,9 @@ val register_code_annot_next_stmt:
   ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
   unit
 
-(** Registers extension for loop annotation. See [register_behavior].
+(** Registers extension for loop annotation. See {!register_behavior}.
 
+    @before Frama-C+dev the parameter [plugin] was not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_code_annot_next_loop:
@@ -162,8 +175,9 @@ val register_code_annot_next_loop:
   unit
 
 (** Registers extension both for code and loop annotations.
-    See [register_behavior].
+    See {!register_behavior}.
 
+    @before Frama-C+dev the parameter [plugin] was not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_code_annot_next_both:
