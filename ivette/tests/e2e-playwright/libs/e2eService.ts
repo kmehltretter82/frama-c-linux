@@ -39,7 +39,7 @@ export const argsLaunchWithDefaultSettings: string[] = [
   "--no-sandbox",
   "--command",
   "../bin/frama-c",
-  "--init-settings"
+  "--init-settings",
 ];
 
 // Electron launch of Ivette for Playwright
@@ -50,14 +50,13 @@ export const argsLaunchWithTestFile: string[] = [
   "./tests/settings.json",
   "--command",
   "../bin/frama-c",
-  "../tests/test/adpcm.c"
-
+  "../tests/test/adpcm.c",
 ];
 /**
  * Basic Electron launch of Ivette for Playwright e2e tests
  */
 export async function launchApp(
-  params: string[],
+  params: string[]
 ): Promise<{ app: ElectronApplication; page: Page }> {
   const electronApp = await electron.launch({
     env: {
@@ -91,7 +90,7 @@ export async function testServerIsStarted(window: Page): Promise<void> {
 
   // Check the server status in the console view
   await expect(
-    locs.getConsoleView(window).getByText("[server] Socket server running."),
+    locs.getConsoleView(window).getByText("[server] Socket server running.")
   ).toBeVisible();
 
   // Check the server status in the footer
@@ -100,15 +99,14 @@ export async function testServerIsStarted(window: Page): Promise<void> {
 
 export async function testFileIsLoaded(window: Page): Promise<void> {
   await locs.getConsoleMenuItem(window).click();
-  
   // check if a message is present in the console view
   // to confirm the file loaded
   await expect(
-    locs.getConsoleView(window).getByText("adpcm.c (with preprocessing)"),
+    locs.getConsoleView(window).getByText("adpcm.c (with preprocessing)")
   ).toBeVisible();
 
   // check if the main function is visible in the functions view
   await expect(
-    locs.getFunctionsSideBar(window).getByText("main", { exact: true }),
+    locs.getFunctionsSideBar(window).getByText("main", { exact: true })
   ).toBeVisible();
 }
