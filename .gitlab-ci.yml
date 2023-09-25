@@ -26,7 +26,8 @@ variables:
   PUBLISH: "no"
   RELEASE: "no"
   WEEKLY: "no"
-  
+  DEBUG: "pw:browser*"
+
 ################################################################################
 ### PREPARE
 
