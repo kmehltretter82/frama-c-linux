@@ -12,9 +12,11 @@
  MODULE: check_compliance
    OPT: -kernel-msg-key printer:attrs
  MODULE:
-   OPT: -load %{dep:@PTEST_NAME@.sav} -metrics -metrics-libc -then -lib-entry -metrics-no-libc | %{dep:./check_some_metrics.sh} "> 100" "> 400" "< 2" "> 0" "= 1" "= 1" "= 0" "= 0" "= 0" "= 1"
  CMD: %{dep:./check_full_libc.sh} @FRAMAC_SHARE@/libc
    OPT:
+ CMD: @frama-c@
+ ENABLED_IF: %{read:../../../python-3.7-available}
+   OPT: -load %{dep:@PTEST_NAME@.sav} -metrics -metrics-libc -then -lib-entry -metrics-no-libc | python3 %{dep:./check_some_metrics.py} "> 100" "> 400" "< 2" "> 0" "== 1" "== 1" "== 0" "== 0" "== 0" "== 1"
 **/
 
 
