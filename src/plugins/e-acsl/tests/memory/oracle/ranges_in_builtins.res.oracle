@@ -76,7 +76,6 @@
 [eva:alarm] ranges_in_builtins.c:57: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] ranges_in_builtins.c:57: Warning: assertion got status unknown.
 [eva:alarm] ranges_in_builtins.c:62: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.

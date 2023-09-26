@@ -1321,12 +1321,15 @@ let rec eval_term ~alarm_mode env t =
     in
     { r with empty = true; ldeps }
 
+  | Tlet (li, t') ->
+    let env = eval_let_binding ~alarm_mode env li in
+    eval_term ~alarm_mode env t'
+
   | Tlambda _ -> unsupported "logic functions or predicates"
   | TUpdate _ -> unsupported "functional updates"
   | Ttype _ -> unsupported "\\type operator"
   | Ttypeof _ -> unsupported "\\typeof operator"
   | Tinter _ -> unsupported "set intersection"
-  | Tlet _ -> unsupported "\\let bindings"
   | TConst (LStr _) -> unsupported "constant strings"
   | TConst (LWStr _) -> unsupported "wide constant strings"
 
@@ -1632,6 +1635,15 @@ and bind_comprehension_quantifiers env quantifiers predicate =
     with LogicEvalError error ->
       display_evaluation_error ~loc:pred.pred_loc error;
       env
+
+and eval_let_binding ~alarm_mode env logic_info =
+  match logic_info with
+  | { l_labels = []; l_tparams = []; l_profile = []; l_body = LBterm term } ->
+    let var = logic_info.l_var_info in
+    let env = bind_logic_vars env [var] in
+    let var_term = Logic_const.tvar var in
+    reduce_by_left_relation ~alarm_mode env true var_term Req term
+  | _ -> unsupported "\\let binding"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Evaluation of term lval and of terms as location                   --- *)
@@ -2284,6 +2296,16 @@ and reduce_by_predicate ~alarm_mode env positive p =
           unbind_logic_vars env_result varl
         with LogicEvalError _ -> env
       end
+
+    | _, Plet (li, p') ->
+      begin
+        try
+          let env = eval_let_binding ~alarm_mode env li in
+          let env_result = reduce_by_predicate ~alarm_mode env positive p' in
+          unbind_logic_vars env_result [li.l_var_info]
+        with LogicEvalError _ -> env
+      end
+
     | _,Papp (li, labels, args) -> begin
         if is_known_predicate li.l_var_info then
           try reduce_by_known_papp ~alarm_mode env positive li labels args
@@ -2316,7 +2338,6 @@ and reduce_by_predicate ~alarm_mode env positive p =
         | false, false -> assert false (* a logic alarm would have been raised*)
       end
     | true, Pexists (_, _) | false, Pforall (_, _)
-    | _,Plet (_, _)
     | _,Pallocable (_,_) | _,Pfreeable (_,_) | _,Pfresh (_,_,_,_)
     | _, Pseparated _
       -> env
@@ -2513,6 +2534,10 @@ and eval_predicate env pred =
           | _ -> Unknown
       end
 
+    | Plet (li, p') ->
+      let env = eval_let_binding ~alarm_mode env li in
+      do_eval env p'
+
     | Pnot p ->  begin match do_eval env p with
         | True -> False
         | False -> True
@@ -2586,10 +2611,7 @@ and eval_predicate env pred =
     | Pfreeable (BuiltinLabel Here, t) ->
       let r = eval_term ~alarm_mode env t in
       Builtins_malloc.freeable r.eover
-    | Pfresh (_,_,_,_)
-    | Pallocable _ | Pfreeable _
-    | Plet (_,_)
-      -> Unknown
+    | Pfresh _ | Pallocable _ | Pfreeable _ -> Unknown
 
   (* Logic predicates. Update the list known_predicates above if you
      add something here. *)
@@ -2690,6 +2712,13 @@ and predicate_deps env pred =
   let rec do_eval env p =
     let term_deps term = (eval_term ~alarm_mode env term).ldeps in
     let tsets_deps lbl tsets = eval_tsets_deps ~alarm_mode env lbl tsets in
+    let logic_info_deps li =
+      match li.l_body with
+      | LBnone -> empty_logic_deps
+      | LBterm t -> term_deps t
+      | LBpred p -> do_eval env p
+      | _ -> unsupported (Format.asprintf "%a" Printer.pp_logic_info li)
+    in
     match p.pred_content with
     | Ptrue | Pfalse -> empty_logic_deps
 
@@ -2727,8 +2756,9 @@ and predicate_deps env pred =
          Logic_interp.do_term_lval. *)
       do_eval env p
 
-    | Plet (_v, p) -> do_eval env p (* will this work when when we need [_v]
-                                       to evaluate [p] ?.. *)
+    | Plet (li, p) ->
+      let env = eval_let_binding ~alarm_mode env li in
+      join_logic_deps (logic_info_deps li) (do_eval env p)
 
     | Papp (li, _labels, args) -> begin
         if is_known_predicate li.l_var_info then

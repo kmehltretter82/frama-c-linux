@@ -34,11 +34,6 @@ val predicate_deps:
   pre:Cvalue.Model.t -> here:Cvalue.Model.t ->
   Cil_types.predicate -> Locations.Zone.t option
 
-(** [term_deps state t] computes the logic dependencies needed to evaluate
-    the term [t] in cvalue state [state].
-    Returns None on either an evaluation error or on unsupported construct. *)
-val term_deps: Cvalue.Model.t -> Cil_types.term -> Locations.Zone.t option
-
 (** Returns the list of behaviors of the given function that are active for
     the given initial state. *)
 val valid_behaviors:

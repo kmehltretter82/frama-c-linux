@@ -104,8 +104,6 @@
 [eva:alarm] at_on-purely-logic-variables.c:8: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] at_on-purely-logic-variables.c:8: Warning: 
-  function __gen_e_acsl_f: postcondition got status unknown.
 [eva:alarm] at_on-purely-logic-variables.c:16: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
