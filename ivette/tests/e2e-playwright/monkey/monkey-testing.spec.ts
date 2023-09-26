@@ -28,7 +28,7 @@ let gremlins: any;
 
 test("run gremlins.js", async () => {
   const launchAppResult = await e2eService.launchApp(
-    e2eService.argsLaunchWithDefaultSettings,
+    e2eService.argsLaunchWithTestFile,
   );
   const electronApp = launchAppResult.app;
   const window = launchAppResult.page;
