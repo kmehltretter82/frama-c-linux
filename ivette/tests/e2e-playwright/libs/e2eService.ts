@@ -46,7 +46,8 @@ export const argsLaunchWithDefaultSettings: string[] = [
 // e2e tests using an additional C file loaded
 export const argsLaunchWithTestFile: string[] = [
   "./dist/main/main.js",
-  "--no-sandbox",
+  "--with-fixed-settings",
+  "./tests/settings.json",
   "--command",
   "../bin/frama-c",
   "../tests/test/adpcm.c",

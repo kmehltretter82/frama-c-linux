@@ -25,7 +25,7 @@ import * as e2eService from "./libs/e2eService";
 
 test("check server connection", async () => {
   const launchAppResult = await e2eService.launchApp(
-    e2eService.argsDefaultLaunch,
+    e2eService.argsLaunchWithDefaultSettings,
   );
   const electronApp = launchAppResult.app;
   const window = launchAppResult.page;

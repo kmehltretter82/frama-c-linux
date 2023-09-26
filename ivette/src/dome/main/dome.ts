@@ -408,8 +408,8 @@ function createBrowserWindow(
   let configFile = PATH_WINDOW_SETTINGS;
   if (argv && argv.includes('--with-fixed-settings')) {
     configFile =
-      argv[process.argv.indexOf('--with-fixed-settings') + 1];
-    argv = process.argv.filter((p) => !!p && p !== "--with-fixed-settings");
+      argv[argv.indexOf('--with-fixed-settings') + 1];
+    argv = argv.filter((p) => !!p && p !== "--with-fixed-settings" && p !== configFile);
   } else if (isAppWindow) {
     configFile = lookupConfig(wdir);
   }
