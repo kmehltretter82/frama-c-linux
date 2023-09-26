@@ -1,7 +1,7 @@
 /* run.config*
-PLUGIN: @EVA_PLUGINS@
-   EXIT: 1
-   STDOPT:
+
+ EXIT: 1
+   OPT:
 */
 
 void f(void) { }
