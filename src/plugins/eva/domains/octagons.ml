@@ -56,7 +56,7 @@ let typ_kind typ =
   | TFloat _ -> Float
   | _ -> assert false
 
-type dependencies = Eva_utils.deps = {
+type dependencies = Deps.t = {
   data: Locations.Zone.t;
   indirect: Locations.Zone.t;
 }
@@ -836,12 +836,6 @@ end
 
 module VariableToDeps =
 struct
-  module Deps =
-  struct
-    include Function_Froms.Deps
-    let pretty_debug = pretty_precise
-  end
-
   let cache_prefix = "Eva.Octagons.VariableToDeps"
 
   include Hptmap.Make (Variable) (Deps) (Hptmap.Comp_unused)
@@ -1040,7 +1034,7 @@ module Deps = struct
       BaseToVariables.add_deps var deps i
     in
     match VariableToDeps.find_opt var m with
-    | Some previous_deps when Function_Froms.Deps.equal previous_deps deps ->
+    | Some previous_deps when Deps.equal previous_deps deps ->
       m, i
     | Some previous_deps when not (are_bases_increasing previous_deps deps) ->
       (* If [var] already exists in the state and had bigger dependencies (a
@@ -1053,7 +1047,7 @@ module Deps = struct
      contain variables that do not appear in [m]. *)
   let add var deps (m, i: t): t =
     match VariableToDeps.find_opt var m with
-    | Some d when Function_Froms.Deps.equal d deps -> m, i
+    | Some d when Deps.equal d deps -> m, i
     | _ ->
       VariableToDeps.add var deps m,
       BaseToVariables.add_deps var deps i

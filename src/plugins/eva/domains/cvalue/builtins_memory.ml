@@ -148,9 +148,7 @@ let frama_c_memcpy name state actuals =
           let (deps_table, sure_zone) =
             let zone_dst = enumerate_valid_bits Locations.Write  loc_dst in
             let zone_src = enumerate_valid_bits Locations.Read loc_src in
-            let deps =
-              Function_Froms.(Deps.add_data_dep Deps.bottom zone_src)
-            in
+            let deps = Deps.data zone_src in
             (* Note: actually a part may be written for sure (if the
                difference between the offsets in loc_dst is smaller
                than size), but keeping it imprecise reflects more the
@@ -192,10 +190,10 @@ let frama_c_memcpy name state actuals =
       let loc_src = make_loc (Location_Bits.shift range src) size_char in
       let loc_dst = make_loc (Location_Bits.shift range dst) size_char in
       let c_from =
-        let open Function_Froms in
         let zone_src = enumerate_valid_bits Locations.Read loc_src in
         let zone_dst = enumerate_valid_bits Locations.Write  loc_dst in
-        let deps = Deps.add_data_dep Deps.bottom zone_src in
+        let deps = Deps.data zone_src in
+        let open Function_Froms in
         let deps_table =
           Memory.add_binding ~exact:false precise_deps_table zone_dst deps
         in
