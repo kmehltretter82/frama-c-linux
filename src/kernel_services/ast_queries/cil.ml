@@ -160,7 +160,8 @@ let copyMachine src dst =
 let theMachine = createMachine ()
 
 let msvcMode () = (theMachine.theMachine.compiler = "msvc")
-let gccMode () = (theMachine.theMachine.compiler = "gcc")
+let gccMode () = (theMachine.theMachine.compiler = "gcc"
+                  || theMachine.theMachine.compiler = "clang")
 
 let acceptEmptyCompinfo = ref false
 
