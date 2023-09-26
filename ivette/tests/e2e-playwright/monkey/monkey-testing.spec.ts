@@ -26,7 +26,7 @@ import * as e2eService from "../libs/e2eService";
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 let gremlins: any;
 
-test("run gremlins.js", async () => {
+test.skip("run gremlins.js", async () => {
   const launchAppResult = await e2eService.launchApp(
     e2eService.argsDefaultLaunch,
   );

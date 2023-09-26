@@ -661,9 +661,11 @@ function restoreAllDefaultSettings(): void {
   nativeTheme.themeSource = 'system';
   saveGlobalSettings();
   try {
-    fs.rmSync(PATH_WINDOW_SETTINGS);
-  } catch (_error) {
-    console.warn(_error);
+    if (fs.existsSync(PATH_WINDOW_SETTINGS)) {
+      fs.rmSync(PATH_WINDOW_SETTINGS);
+    }
+  } catch (error) {
+    console.warn(error);
   }
 }
 
