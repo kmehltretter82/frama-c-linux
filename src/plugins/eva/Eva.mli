@@ -178,6 +178,47 @@ module Callstack: sig
 
 end
 
+module Deps: sig
+
+  (** Memory dependencies of an expression. *)
+  type t = Function_Froms.Deps.deps = {
+    data: Locations.Zone.t;
+    (** Memory zone directly required to evaluate the given expression. *)
+    indirect: Locations.Zone.t;
+    (** Memory zone read to compute data addresses. *)
+  }
+
+  include Datatype.S with type t := t
+
+  val pretty_debug: Format.formatter -> t -> unit
+
+  (* Constructors *)
+
+  val top : t
+  val bottom : t
+  val data : Locations.Zone.t -> t
+  val indirect : Locations.Zone.t -> t
+
+  (* Conversion *)
+
+  val to_zone : t -> Locations.Zone.t
+
+  (* Mutators *)
+
+  val add_data : t -> Locations.Zone.t -> t
+  val add_indirect : t -> Locations.Zone.t -> t
+
+  (* Map *)
+
+  val map : (Locations.Zone.t -> Locations.Zone.t) -> t -> t
+
+  (* Lattice operators *)
+
+  val is_included : t -> t -> bool
+  val join : t -> t -> t
+  val narrow : t -> t -> t
+end
+
 module Results: sig
 
   (** Eva's result API is a new interface to access the results of an analysis,
@@ -335,14 +376,6 @@ module Results: sig
       evaluate the given lvalue, excluding the lvalue zone itself. *)
   val address_deps : Cil_types.lval -> request -> Locations.Zone.t
 
-  (** Memory dependencies of an expression. *)
-  type deps = Function_Froms.Deps.deps = {
-    data: Locations.Zone.t;
-    (** Memory zone directly required to evaluate the given expression. *)
-    indirect: Locations.Zone.t;
-    (** Memory zone read to compute data addresses. *)
-  }
-
   (** Taint of a memory zone, according to the taint domain. *)
   type taint =
     | Direct
@@ -361,7 +394,7 @@ module Results: sig
 
   (** Computes (an overapproximation of) the memory dependencies of an
       expression. *)
-  val expr_dependencies : Cil_types.exp -> request -> deps
+  val expr_dependencies : Cil_types.exp -> request -> Deps.t
 
   (** Evaluation *)
 

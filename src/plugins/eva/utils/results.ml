@@ -733,11 +733,6 @@ let address_deps lval request =
   let lval_to_loc lv = eval_address lv request |> as_precise_loc in
   Eva_utils.indirect_zone_of_lval lval_to_loc lval
 
-type deps = Function_Froms.Deps.deps = {
-  data: Locations.Zone.t;
-  indirect: Locations.Zone.t;
-}
-
 let expr_dependencies expr request =
   let lval_to_loc lv = eval_address lv request |> as_precise_loc in
   Eva_utils.deps_of_expr lval_to_loc expr
