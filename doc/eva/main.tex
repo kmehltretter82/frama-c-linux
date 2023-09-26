@@ -3976,6 +3976,7 @@ most cases, and a greater value is rarely needed.
 
 
 \subsection{Value partitioning}
+\label{value-partitioning}
 
 \subsubsection{Principle}
 
@@ -4168,6 +4169,7 @@ with large arrays and matrices, it is worth considering its usage.
 
 
 \subsection{Subdividing the evaluation of non-linear expressions}
+\label{subdividing-evaluation}
 
 Option \verb|-eva-subdivide-non-linear| improves the analysis precision on
 non-linear expressions, such as \lstinline|x * x|,
@@ -5427,6 +5429,82 @@ implementation and the specification, using option
 not set, even user-written specifications are skipped (for functions
 of the standard library).
 
+\section{Directives guiding the analysis}
+
+The precision of the \Eva{} analysis can often be locally improved on some code
+patterns by writing directives as special ACSL annotations in the analyzed code.
+These directives allow the user to fine-tune the behavior of the analysis by
+locally enabling some features that would be too costly to apply on the whole
+program.
+This section lists such directives supported by \Eva{}, with a short description
+of their behavior and a reference to the relevant section of this manual that
+explains in more details their effect on the analysis.
+
+\subsection{Directives guiding trace partitioning}
+
+\begin{center}
+  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}>{\raggedright}m{6cm}>{\raggedright}m{8cm}c}
+    Syntax & Description & Ref
+  \tabularnewline
+  \midrule
+  \midrule
+    \texttt{//@ loop unroll <N>;}
+  & Loop unrolling: analyze separately each of the \texttt{<N>} first
+    iterations of the given loop.
+  & \ref{loop-unroll}
+  \tabularnewline
+  \midrule
+    \texttt{//@ split <e>;}~\\
+    \texttt{//@ dynamic\_split <e>;}
+  & Case-based reasoning: separate the analysis for each possible value of expression \texttt{<e>}.
+  & \multirow{2}{*}{\ref{value-partitioning}}
+  \tabularnewline
+  \cmidrule{1-2} \cmidrule{2-2}
+    \texttt{//@ merge <e>;}
+  & Stop any split about expression \texttt{<e>}.
+  & \tabularnewline
+  \midrule
+    \texttt{//@ slevel <N>;}
+  & Locally set the value of \texttt{-eva-slevel} to \texttt{<N>}.
+  & \multirow{4}{*}{\ref{slevel}}
+  \tabularnewline
+  \cmidrule{1-2} \cmidrule{2-2}
+    \texttt{//@ slevel full;}
+  & Locally remove the limit of \texttt{-eva-slevel}.
+  & \tabularnewline
+  \cmidrule{1-2} \cmidrule{2-2}
+    \texttt{//@ slevel default;}
+  & Reset \texttt{-eva-slevel} to its default value.
+  & \tabularnewline
+  \cmidrule{1-2} \cmidrule{2-2}
+    \texttt{//@ slevel merge;}
+  & Merge all states kept separate by \texttt{-eva-slevel}.
+  & \tabularnewline
+  \bottomrule
+  \end{tabular*}
+  \par
+\end{center}
+
+\subsection{Other directives improving precision}
+
+\begin{center}
+  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}>{\raggedright}p{6cm}>{\raggedright}p{8cm}c}
+  Syntax & Description & Ref\tabularnewline
+  \midrule
+  \midrule
+  \texttt{//@ widen\_hints <v>, <N>;} & Use constant \texttt{<N>} as a possible threshold for the widening
+  of variable \texttt{<v>}. & \ref{subsub:widen-hints}\tabularnewline
+  \midrule
+  \texttt{//@ subdivide <N>;} & Subdivides up to \texttt{<N>} times the evaluation of non-linear expressions
+  in the next statement. & \ref{subdividing-evaluation}\tabularnewline
+  \midrule
+  \texttt{//@ eva\_allocate <s>;} & Select a strategy to model dynamic allocation at the next statement. & \ref{malloc}\tabularnewline
+  \midrule
+  \texttt{//@ array\_partition <t>\dots ;} & Propose a segmentation to represent array \texttt{<t>} in the \texttt{multidim}
+  domain. & \ref{sec:multidim}\tabularnewline
+  \bottomrule
+  \end{tabular*}
+  \par\end{center}
 
 
 \chapter{Primitives}\label{primitives}
