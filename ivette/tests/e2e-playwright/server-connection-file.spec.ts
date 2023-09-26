@@ -32,9 +32,11 @@ test("server connection with a C file to analyze", async () => {
 
   await window.waitForTimeout(1000);
 
+  await window.screenshot({ path: "screenshots/e2e-file-loaded-before.png" });
+
   await e2eService.testFileIsLoaded(window);
 
-  await window.screenshot({ path: "screenshots/e2e-file-loaded.png" });
+  await window.screenshot({ path: "screenshots/e2e-file-loaded-after.png" });
 
   // Exit app.
   await electronApp.close();
