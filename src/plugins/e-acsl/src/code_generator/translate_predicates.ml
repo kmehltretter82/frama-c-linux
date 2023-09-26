@@ -335,7 +335,7 @@ and to_exp ~adata ?inplace ?name kf ?rte env p =
                 env
                 kf
                 None
-                Typed_number.C_number
+                Analyses_types.C_number
                 None
                 e)
          )

@@ -22,12 +22,8 @@
 
 (** Manipulate the type of numbers. *)
 
-type strnum =
-  | Str_Z         (* integers *)
-  | Str_R         (* reals *)
-  | C_number      (* integers and floats included *)
-
 let add_cast ~loc ?name env kf ctx strnum t_opt e =
+  let open Analyses_types in
   let e, env = match strnum with
     | Str_Z -> Gmp.Z.create ~loc ?name t_opt env kf e
     | Str_R -> Gmp.Q.create ~loc ?name t_opt env kf e
