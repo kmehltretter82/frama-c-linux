@@ -321,7 +321,7 @@
           "Unregistered extension %s for plug-in %s" s plugin
       else
         Kernel.warning ~once:true ~wkey:Kernel.wkey_plugin_not_loaded ~source
-          "Ignored extensions for unregistered plug-in %s" plugin;
+          "Ignored extensions for unloaded plug-in %s" plugin;
       IDENTIFIER_EXT s
     | EXT_CODE_ANNOT s
     | EXT_GLOBAL s
@@ -594,8 +594,7 @@ and comment = parse
       | Logic_utils.Not_well_formed (loc, m) ->
         output ~source:(fst loc) "%s" m;
         None
-      | Logic_utils.Unknown_ext ->
-        None
+      | Logic_utils.Unknown_ext -> None
       | Log.FeatureRequest(source,_,msg) ->
         let source = Option.value ~default:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) source in
         output ~source "unimplemented ACSL feature: %s" msg; None
