@@ -120,20 +120,35 @@ const computationState_internal: State.Value<computationStateType> = {
 /** The current computation state of the analysis. */
 export const computationState: State.Value<computationStateType> = computationState_internal;
 
+/** Callee, combining function and decl */
+export type Callee = { fct: fct, decl: decl };
+
+/** Decoder for `Callee` */
+export const jCallee: Json.Decoder<Callee> =
+  Json.jObject({ fct: jFct, decl: jDecl,});
+
+/** Natural order for `Callee` */
+export const byCallee: Compare.Order<Callee> =
+  Compare.byFields<{ fct: fct, decl: decl }>({ fct: byFct, decl: byDecl, });
+
+/** Default value for `Callee` */
+export const CalleeDefault: Callee = { fct: fctDefault, decl: declDefault };
+
 /** Call site, combining function and stmt */
-export type CallSite = { kf: fct, stmt: marker };
+export type CallSite = { fct: fct, stmt: marker };
 
 /** Decoder for `CallSite` */
 export const jCallSite: Json.Decoder<CallSite> =
-  Json.jObject({ kf: jFct, stmt: jMarker,});
+  Json.jObject({ fct: jFct, stmt: jMarker,});
 
 /** Natural order for `CallSite` */
 export const byCallSite: Compare.Order<CallSite> =
-  Compare.byFields<{ kf: fct, stmt: marker }>({ kf: byFct, stmt: byMarker, });
+  Compare.byFields<{ fct: fct, stmt: marker }>({ fct: byFct, stmt: byMarker,
+  });
 
 /** Default value for `CallSite` */
 export const CallSiteDefault: CallSite =
-  { kf: fctDefault, stmt: markerDefault };
+  { fct: fctDefault, stmt: markerDefault };
 
 const getCallers_internal: Server.GetRequest<fct,CallSite[]> = {
   kind: Server.RqKind.GET,
@@ -145,15 +160,15 @@ const getCallers_internal: Server.GetRequest<fct,CallSite[]> = {
 /** Get the list of call site of a function */
 export const getCallers: Server.GetRequest<fct,CallSite[]>= getCallers_internal;
 
-const getCallees_internal: Server.GetRequest<marker,fct[]> = {
+const getCallees_internal: Server.GetRequest<marker,Callee[]> = {
   kind: Server.RqKind.GET,
   name: 'plugins.eva.general.getCallees',
   input: jMarker,
-  output: Json.jArray(jFct),
+  output: Json.jArray(jCallee),
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Return the functions pointed to by a function pointer */
-export const getCallees: Server.GetRequest<marker,fct[]>= getCallees_internal;
+export const getCallees: Server.GetRequest<marker,Callee[]>= getCallees_internal;
 
 /** Data for array rows [`functions`](#functions)  */
 export interface functionsData {

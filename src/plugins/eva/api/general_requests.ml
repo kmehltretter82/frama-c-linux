@@ -55,7 +55,24 @@ let computation_signal =
     ~output:(module ComputationState)
     (module Self.ComputationState)
 
-(* ----- Callsites ---------------------------------------------------------- *)
+(* ----- Callers & Callees -------------------------------------------------- *)
+
+module Callee =
+struct
+  type t = kernel_function
+  let jtype = Data.declare ~package ~name:"Callee"
+      ~descr:(Markdown.plain "Callee, combining function and decl")
+      (Jrecord [
+          "fct", Kernel_ast.Function.jtype;
+          "decl", Kernel_ast.Decl.jtype;
+        ])
+  let to_json kf = `Assoc [
+      "fct", Kernel_ast.Function.to_json kf;
+      "decl", Kernel_ast.Decl.to_json (SFunction kf);
+    ]
+  let of_json js =
+    Json.field "fct" js |> Kernel_ast.Function.of_json
+end
 
 module CallSite =
 struct
@@ -63,11 +80,11 @@ struct
   let jtype = Data.declare ~package ~name:"CallSite"
       ~descr:(Markdown.plain "Call site, combining function and stmt")
       (Jrecord [
-          "kf", Kernel_ast.Function.jtype;
+          "fct", Kernel_ast.Function.jtype;
           "stmt", Kernel_ast.Stmt.jtype;
         ])
   let to_json (kf,stmt) = `Assoc [
-      "kf", Kernel_ast.Function.to_json kf;
+      "fct", Kernel_ast.Function.to_json kf;
       "stmt", Kernel_ast.Stmt.to_json stmt;
     ]
   let of_json js =
@@ -104,7 +121,7 @@ let () = Request.register ~package
     ~descr:(Markdown.plain
               "Return the functions pointed to by a function pointer")
     ~input:(module Kernel_ast.Marker)
-    ~output:(module Data.Jlist (Kernel_ast.Function))
+    ~output:(module Data.Jlist(Callee))
     ~signals:[computation_signal]
     callees
 

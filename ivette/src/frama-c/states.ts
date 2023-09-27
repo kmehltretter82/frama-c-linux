@@ -607,7 +607,7 @@ export function gotoGlobalMarker(marker : Ast.marker, meta = false): void
 {
   const st = currentSyncArray(Ast.markerAttributes);
   const attr = st.model.getData(marker);
-  const decl = attr?.decl;
+  const decl = attr?.scope;
   if (decl) setCurrent({ decl, marker }, meta);
   else gotoLocalMarker(marker, meta);
 }

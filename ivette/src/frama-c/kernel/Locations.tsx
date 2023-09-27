@@ -135,7 +135,7 @@ export default function LocationsTable(): JSX.Element {
   const getLocation = React.useCallback((d: Data): string => {
     const attr = getAttr(d.marker);
     if (!attr) return '';
-    const decl = getDecl(attr.decl);
+    const decl = getDecl(attr.scope);
     if (!decl) return '';
     return `${decl.label} ${attr.descr}`;
   }, [getDecl, getAttr]);

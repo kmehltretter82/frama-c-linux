@@ -173,6 +173,8 @@ export interface declAttributesData {
   decl: decl;
   /** Declaration kind */
   kind: declKind;
+  /** Declaration's marker */
+  self: marker;
   /** Declaration identifier */
   name: string;
   /** Declaration label (uncapitalized kind & name) */
@@ -186,6 +188,7 @@ export const jDeclAttributesData: Json.Decoder<declAttributesData> =
   Json.jObject({
     decl: jDecl,
     kind: jDeclKind,
+    self: jMarker,
     name: Json.jString,
     label: Json.jString,
     source: jSource,
@@ -194,10 +197,11 @@ export const jDeclAttributesData: Json.Decoder<declAttributesData> =
 /** Natural order for `declAttributesData` */
 export const byDeclAttributesData: Compare.Order<declAttributesData> =
   Compare.byFields
-    <{ decl: decl, kind: declKind, name: string, label: string,
+    <{ decl: decl, kind: declKind, self: marker, name: string, label: string,
        source: source }>({
     decl: byDecl,
     kind: byDeclKind,
+    self: byMarker,
     name: Compare.string,
     label: Compare.string,
     source: bySource,
@@ -254,8 +258,8 @@ export const declAttributes: State.Array<decl,declAttributesData> = declAttribut
 
 /** Default value for `declAttributesData` */
 export const declAttributesDataDefault: declAttributesData =
-  { decl: declDefault, kind: declKindDefault, name: '', label: '',
-    source: sourceDefault };
+  { decl: declDefault, kind: declKindDefault, self: markerDefault, name: '',
+    label: '', source: sourceDefault };
 
 const printDeclaration_internal: Server.GetRequest<decl,text> = {
   kind: Server.RqKind.GET,
@@ -267,10 +271,48 @@ const printDeclaration_internal: Server.GetRequest<decl,text> = {
 /** Prints an AST Declaration */
 export const printDeclaration: Server.GetRequest<decl,text>= printDeclaration_internal;
 
+/** Marker kind */
+export type markerKind =
+  Json.key<'#STMT'> | Json.key<'#LFUN'> | Json.key<'#DFUN'> |
+  Json.key<'#LVAR'> | Json.key<'#DVAR'> | Json.key<'#LVAL'> |
+  Json.key<'#EXP'> | Json.key<'#TERM'> | Json.key<'#TYPE'> |
+  Json.key<'#PROPERTY'> | Json.key<'#DECLARATION'>;
+
+/** Decoder for `markerKind` */
+export const jMarkerKind: Json.Decoder<markerKind> =
+  Json.jUnion<Json.key<'#STMT'> | Json.key<'#LFUN'> | Json.key<'#DFUN'> |
+              Json.key<'#LVAR'> | Json.key<'#DVAR'> | Json.key<'#LVAL'> |
+              Json.key<'#EXP'> | Json.key<'#TERM'> | Json.key<'#TYPE'> |
+              Json.key<'#PROPERTY'> | Json.key<'#DECLARATION'>>(
+    Json.jKey<'#STMT'>('#STMT'),
+    Json.jKey<'#LFUN'>('#LFUN'),
+    Json.jKey<'#DFUN'>('#DFUN'),
+    Json.jKey<'#LVAR'>('#LVAR'),
+    Json.jKey<'#DVAR'>('#DVAR'),
+    Json.jKey<'#LVAL'>('#LVAL'),
+    Json.jKey<'#EXP'>('#EXP'),
+    Json.jKey<'#TERM'>('#TERM'),
+    Json.jKey<'#TYPE'>('#TYPE'),
+    Json.jKey<'#PROPERTY'>('#PROPERTY'),
+    Json.jKey<'#DECLARATION'>('#DECLARATION'),
+  );
+
+/** Natural order for `markerKind` */
+export const byMarkerKind: Compare.Order<markerKind> = Compare.structural;
+
+/** Default value for `markerKind` */
+export const markerKindDefault: markerKind = Json.jKey<'#STMT'>('#STMT')('');
+
 /** Data for array rows [`markerAttributes`](#markerattributes)  */
 export interface markerAttributesData {
   /** Entry identifier. */
   marker: marker;
+  /** Marker kind (key) */
+  kind: markerKind;
+  /** Marker Scope (where it is printed in) */
+  scope?: decl;
+  /** Marker's Target Definition (when applicable) */
+  definition?: marker;
   /** Marker kind (short) */
   labelKind: string;
   /** Marker kind (long) */
@@ -279,18 +321,6 @@ export interface markerAttributesData {
   name: string;
   /** Marker description */
   descr: string;
-  /** Declaration scope */
-  decl?: decl;
-  /** Whether it is an l-value */
-  isLval: boolean;
-  /** Whether it is a function symbol */
-  isFunction: boolean;
-  /** Whether it is a function pointer */
-  isFunctionPointer: boolean;
-  /** Whether it is a function declaration */
-  isFunDecl: boolean;
-  /** Function scope of the marker, if applicable */
-  scope?: string;
   /** Source location */
   sloc?: source;
 }
@@ -299,37 +329,30 @@ export interface markerAttributesData {
 export const jMarkerAttributesData: Json.Decoder<markerAttributesData> =
   Json.jObject({
     marker: jMarker,
+    kind: jMarkerKind,
+    scope: Json.jOption(jDecl),
+    definition: Json.jOption(jMarker),
     labelKind: Json.jString,
     titleKind: Json.jString,
     name: Json.jString,
     descr: Json.jString,
-    decl: Json.jOption(jDecl),
-    isLval: Json.jBoolean,
-    isFunction: Json.jBoolean,
-    isFunctionPointer: Json.jBoolean,
-    isFunDecl: Json.jBoolean,
-    scope: Json.jOption(Json.jString),
     sloc: Json.jOption(jSource),
   });
 
 /** Natural order for `markerAttributesData` */
 export const byMarkerAttributesData: Compare.Order<markerAttributesData> =
   Compare.byFields
-    <{ marker: marker, labelKind: string, titleKind: string, name: string,
-       descr: string, decl?: decl, isLval: boolean, isFunction: boolean,
-       isFunctionPointer: boolean, isFunDecl: boolean, scope?: string,
+    <{ marker: marker, kind: markerKind, scope?: decl, definition?: marker,
+       labelKind: string, titleKind: string, name: string, descr: string,
        sloc?: source }>({
     marker: byMarker,
+    kind: byMarkerKind,
+    scope: Compare.defined(byDecl),
+    definition: Compare.defined(byMarker),
     labelKind: Compare.alpha,
     titleKind: Compare.alpha,
     name: Compare.alpha,
     descr: Compare.string,
-    decl: Compare.defined(byDecl),
-    isLval: Compare.boolean,
-    isFunction: Compare.boolean,
-    isFunctionPointer: Compare.boolean,
-    isFunDecl: Compare.boolean,
-    scope: Compare.defined(Compare.string),
     sloc: Compare.defined(bySource),
   });
 
@@ -384,9 +407,8 @@ export const markerAttributes: State.Array<marker,markerAttributesData> = marker
 
 /** Default value for `markerAttributesData` */
 export const markerAttributesDataDefault: markerAttributesData =
-  { marker: markerDefault, labelKind: '', titleKind: '', name: '', descr: '',
-    decl: undefined, isLval: false, isFunction: false,
-    isFunctionPointer: false, isFunDecl: false, scope: undefined,
+  { marker: markerDefault, kind: markerKindDefault, scope: undefined,
+    definition: undefined, labelKind: '', titleKind: '', name: '', descr: '',
     sloc: undefined };
 
 const getMainFunction_internal: Server.GetRequest<null,fct | undefined> = {

@@ -138,9 +138,9 @@ interface InfoSectionProps {
 
 function MarkInfos(props: InfoSectionProps): JSX.Element {
   const { current, marker, scrolled, selected, hovered, excluded } = props;
-  const { decl, labelKind, titleKind, name, descr } = States.useMarker(marker);
-  const { label } = States.useDeclaration(decl);
-  const foreign = !!current && !!decl && current !== decl;
+  const { scope, labelKind, titleKind, name, descr } = States.useMarker(marker);
+  const { label } = States.useDeclaration(scope);
+  const foreign = !!current && !!scope && current !== scope;
   const [unfold, setUnfold] = React.useState(true);
   const [expand, setExpand] = React.useState(false);
   const req = React.useMemo(() =>

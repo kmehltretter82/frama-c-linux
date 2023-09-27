@@ -296,8 +296,6 @@ module Localizable =
 (* --- Utility Accessors                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-let declaration_of_kfopt = function None -> None | Some kf -> Some (SFunction kf)
-
 let declaration_of_global = function
   | GType(ti, _) -> Some (SType ti)
   | GCompTag(ci, _) | GCompTagDecl (ci, _) -> Some (SComp ci)
@@ -315,17 +313,41 @@ let declaration_of_type = function
   | TEnum (ei, _) -> Some (SEnum ei)
 
 let declaration_of_localizable = function
-  | PStmt(kf,_) | PStmtStart(kf,_) -> Some (SFunction kf)
-  | PLval(_,_,(Var vi,NoOffset))
-  | PTermLval (_, _, _, (TVar { lv_origin = Some vi }, TNoOffset))
-    when vi.vglob -> Some (SGlobal vi)
-  | PLval(okf,_,_)
-  | PExp(okf,_,_)
-  | PTermLval(okf,_,_,_)
-  | PVDecl(okf,_,_) -> declaration_of_kfopt okf
+  | PStmt(kf,_) | PStmtStart(kf,_)
+  | PVDecl(Some kf,_,_)
+  | PTermLval(Some kf,_,_,_)
+  | PLval(Some kf,_,_)
+  | PExp(Some kf,_,_)
+    -> Some (SFunction kf)
+  | PVDecl(None,_,vi) ->
+    Some(
+      try SFunction(Globals.Functions.get vi)
+      with Not_found -> SGlobal vi
+    )
   | PGlobal g -> declaration_of_global g
-  | PType ty -> declaration_of_type ty
-  | PIP _ -> None
+  | PTermLval(None,_,_,_)
+  | PLval(None,_,_) | PExp(None,_,_)
+  | PType _ | PIP _ -> None
+
+let definition_of_type = function
+  | TVoid _ | TInt _ | TFloat _ | TPtr _
+  | TArray _ | TFun _ | TBuiltin_va_list _ -> None
+  | TNamed(ti, _) -> Some (PGlobal(GType(ti,Location.unknown)))
+  | TComp (ci, _) -> Some (PGlobal(GCompTag(ci,Location.unknown)))
+  | TEnum (ei, _) -> Some (PGlobal(GEnumTag(ei,Location.unknown)))
+
+let definition_of_localizable = function
+  | PLval(kf,ki,(Var vi,NoOffset))
+  | PTermLval(kf,ki,_,(TVar { lv_origin = Some vi },TNoOffset)) ->
+    if vi.vglob then
+      let kf = try Some(Globals.Functions.get vi) with Not_found -> None in
+      Some (PVDecl(kf,Kglobal,vi))
+    else
+      Some (PVDecl(kf,ki,vi))
+  | PType ty -> definition_of_type ty
+  | PStmt _ | PStmtStart _ | PVDecl _
+  | PExp _ | PLval _ | PTermLval _ | PGlobal _ | PIP _
+    -> None
 
 let name_of_declaration = function
   | SEnum ei -> ei.ename
@@ -407,8 +429,7 @@ let loc_of_localizable = function
 (* -------------------------------------------------------------------------- *)
 
 let localizable_of_kf kf =
-  let vi = Globals.Functions.get_vi kf in
-  PVDecl(Some kf,Kglobal,vi)
+  PVDecl(Some kf,Kglobal,Globals.Functions.get_vi kf)
 
 let localizable_of_global g =
   match g with
@@ -418,6 +439,13 @@ let localizable_of_global g =
     (try PVDecl(Some (Globals.Functions.get vi) , Kglobal, vi)
      with Not_found -> PGlobal g)
   | _ -> PGlobal g
+
+let localizable_of_declaration = function
+  | SFunction kf -> localizable_of_kf kf
+  | SGlobal vi -> PVDecl(None,Kglobal,vi)
+  | SComp ci -> PType(TComp(ci,[]))
+  | SEnum ei -> PType(TEnum(ei,[]))
+  | SType ti -> PType(TNamed(ti,[]))
 
 (* -------------------------------------------------------------------------- *)
 (* --- Find localizable at a Filepath.position                            --- *)

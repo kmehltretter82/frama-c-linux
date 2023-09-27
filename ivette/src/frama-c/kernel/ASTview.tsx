@@ -479,24 +479,22 @@ type access = 'Reads' | 'Writes';
 
 interface StudiaProps {
   marker: string,
-  attrs: Ast.markerAttributesData,
+  descr: string,
   kind: access,
 }
 
 async function invokeStudia(props: StudiaProps): Promise<void> {
-  const { marker, attrs, kind } = props;
+  const { marker, descr, kind } = props;
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
   const data = await Server.send(request, marker);
   const markers = data.direct.map(([_, marker]) => marker);
-  const lval = attrs.name;
   let label;
   if (markers.length > 0)
-    label = `${kind} of ${lval}`;
+    label = `${kind} to ${descr}`;
   else
-    label = `No ${kind.toLowerCase()} of ${lval}`;
+    label = `No ${kind.toLowerCase()} of ${descr}`;
   const acc = (kind === 'Reads') ? 'accessing' : 'modifying';
-  const title =
-    `List of statements ${acc} the memory location pointed by ${lval}.`;
+  const title = `Statements ${acc} ${descr}.`;
   Locations.setSelection({ label, title, markers });
 }
 
@@ -513,7 +511,7 @@ const Callers = Editor.createField<Eva.CallSite[]>([]);
 
 // This field contains the function pointed to by the current hovered marker,
 // as inferred by Eva.
-const Callees = Editor.createField<Fct[]>([]);
+const Callees = Editor.createField<Eva.Callee[]>([]);
 
 // This field contains information on markers.
 type GetMarkerData = (key: Ast.marker) => Ast.markerAttributesData | undefined;
@@ -535,40 +533,38 @@ function createContextMenuHandler(): Editor.Extension {
       const node = coveringNode(tree, position);
       if (!node || !node.marker) return;
       const items: Dome.PopupMenuItem[] = [];
-      const attrs = getData(node.marker);
-      if (attrs?.isFunDecl) {
-        const groupedCallers = Lodash.groupBy(callers, (cs) => cs.kf);
+      const { kind, labelKind, name, definition, descr } =
+        getData(node.marker) ?? Ast.markerAttributesDataDefault;
+      if (kind === 'DFUN') {
+        const groupedCallers = Lodash.groupBy(callers, ({ fct }) => fct);
         Lodash.forEach(groupedCallers, (group) => {
           const n = group.length;
-          const site = group[0];
-          const call = `Go to caller ${site.kf}`;
+          const { fct } : Eva.CallSite = group[0];
+          const call = `Go to caller ${fct}`;
           const label = n > 1 ? `${call} (${n} call sites)` : call;
-          const markers = callers.map(cs => cs.stmt);
-          const index = callers.findIndex(cs => cs.kf === site.kf);
-          const title = `Call sites of function ${attrs.name}`;
+          const markers = callers.map(({ stmt }) => stmt);
+          const index = callers.findIndex(({ fct: f }) => f === fct);
+          const title = `Call sites of function ${name}`;
           const onClick = (): void => Locations.setSelection({
             label, title, markers, index
           });
           items.push({ label, onClick });
         });
-      } else if (attrs?.isFunction) {
-        const label = `Go to definition of ${attrs.name}`;
-        // TODO: use declaration of pointed function (not available yet)
-        const onClick = (): void => States.gotoDeclaration(attrs.decl);
+      } else if (definition) {
+        const label = `Go to ${labelKind} ${name}`;
+        const onClick = (): void => States.gotoGlobalMarker(definition);
         items.push({ label, onClick });
-      }
-      else if (attrs?.isFunctionPointer) {
-        Lodash.forEach(callees, (fct) => {
-          // TODO: use declaration of pointed function (not available yet)
-          const onClick = (): void => States.gotoDeclaration(attrs.decl);
+      } else if (callees.length > 0) {
+        callees.forEach(({ fct, decl }) => {
+          const onClick = (): void => States.gotoDeclaration(decl);
           const label = `Go to definition of ${fct} (indirect)`;
           items.push({ label, onClick });
         });
       }
-      const enabled = attrs?.isLval;
+      const enabled = (kind==='LVAR' || kind==='LVAL');
       const onClick = (kind: access): void => {
-        if (attrs && node.marker)
-          invokeStudia({ marker: node.marker, attrs, kind });
+        if (node.marker)
+          invokeStudia({ marker: node.marker, descr, kind });
       };
       const reads = 'Studia: select reads';
       const writes = 'Studia: select writes';
@@ -669,7 +665,7 @@ function useFctCallers(fct: Fct): Eva.CallSite[] {
 }
 
 // Server request handler returning the given function's callers.
-function useCallees(marker: Marker): Fct[] {
+function useCallees(marker: Marker): Eva.Callee[] {
   return States.useRequest(Eva.getCallees, marker || undefined) ?? [];
 }
 

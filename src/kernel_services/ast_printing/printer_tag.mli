@@ -81,17 +81,43 @@ val pp_debug: Format.formatter -> localizable -> unit
 
 module Localizable: Datatype.S_with_collections with type t = localizable
 
+(** {2 Declaration of Localizable}
+
+    Localizable items are always printed under a certain global scole
+    identified by a declaration that can be retrieved from
+    {!declaration_of_type}, {!declaration_of_global}
+    and {!declaration_of_localizable} functions below.
+
+    Moreoever, each declarated item can be identified in two different ways: a
+    declaration scope and its own localizable inside this scope. Functions
+    {!localizable_of_kf}, {!localizable_of_global} and
+    {!localizable_of_declaration} can be used to obtain the self-localization of
+    declarations.
+
+    Differently, some localizable refer to some global declaration, eg.
+    a variable or a function inside an expression or the compound name
+    of a type. In such a case, functions {!definition_of_type} and
+    {!definition_of_localizable} returns the localization of the referenced
+    declaration. It is returned as a localization to the associated declaration,
+    which scope can be obtained in turn with {!declaration_of_localizable}.
+
+*)
+
 val declaration_of_type : typ -> declaration option
 val declaration_of_global : global -> declaration option
 val declaration_of_localizable : localizable -> declaration option
+
+val definition_of_type : typ -> localizable option
+val definition_of_localizable : localizable -> localizable option
 
 val loc_of_declaration : declaration -> location
 val name_of_declaration : declaration -> string
 val signature_of_declaration : declaration -> global
 val definition_of_declaration : declaration -> global
 
-val localizable_of_global : global -> localizable
 val localizable_of_kf : kernel_function -> localizable
+val localizable_of_global : global -> localizable
+val localizable_of_declaration : declaration -> localizable
 
 val kf_of_localizable : localizable -> kernel_function option
 val ki_of_localizable : localizable -> kinstr

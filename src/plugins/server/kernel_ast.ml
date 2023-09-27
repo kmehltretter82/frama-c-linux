@@ -335,9 +335,8 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Declaration Attributes                                                  --- *)
+(* --- Declaration Attributes                                             --- *)
 (* -------------------------------------------------------------------------- *)
-
 
 module DeclKind =
 struct
@@ -390,6 +389,14 @@ struct
       ~descr:(Md.plain "Declaration kind")
       ~data:(module DeclKind)
       ~get:fst
+      model
+
+  let () =
+    States.column
+      ~name:"self"
+      ~descr:(Md.plain "Declaration's marker")
+      ~data:(module Marker)
+      ~get:(fun (decl,_) -> localizable_of_declaration decl)
       model
 
   let () =
@@ -456,6 +463,39 @@ let () = Request.register ~package
 (* --- Marker Attributes                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
+module MarkerKind =
+struct
+  open Printer_tag
+  type t = localizable
+  let jtype = Data.declare
+      ~package ~name:"markerKind"
+      ~descr:(Md.plain "Marker kind")
+      (Junion [
+          Jkey "STMT";
+          Jkey "LFUN"; Jkey "DFUN";
+          Jkey "LVAR"; Jkey "DVAR";
+          Jkey "LVAL"; Jkey "EXP";
+          Jkey "TERM";
+          Jkey "TYPE";
+          Jkey "PROPERTY";
+          Jkey "DECLARATION";
+        ])
+  let to_json = function
+    | PStmt _ | PStmtStart _ -> `String "STMT"
+    | PVDecl(None,Kglobal,vi) ->
+      `String (if Globals.Functions.mem vi then "DFUN" else "DVAR")
+    | PVDecl _ -> `String "DVAR"
+    | PTermLval(_,_,_,(TVar { lv_origin = Some vi },TNoOffset))
+    | PLval(_,_,(Var vi,NoOffset)) ->
+      `String (if Globals.Functions.mem vi then "LFUN" else "LVAR")
+    | PLval _ -> `String "LVAL"
+    | PExp _ -> `String "EXP"
+    | PTermLval _ -> `String "TERM"
+    | PType _ -> `String "TYPE"
+    | PIP _ -> `String "PROPERTY"
+    | PGlobal _ -> `String "DECLARATION"
+end
+
 module MarkerAttributes =
 struct
   open Printer_tag
@@ -483,27 +523,30 @@ struct
       | PGlobal _ -> if short then "Decl" else "Declaration"
       | PType _ -> "Type"
 
-  let is_function tag =
-    match varinfo_of_localizable tag with
-    | Some vi -> Globals.Functions.mem vi
-    | None -> false
-
-  let is_function_pointer = function
-    | PLval (_, _, (Mem _, NoOffset as lval))
-      when Cil.(isFunctionType (typeOfLval lval)) -> true
-    | PLval (_, _, lval)
-      when Cil.(isFunPtrType (Cil.typeOfLval lval)) -> true
-    | _ -> false
-
-  let is_fundecl = function
-    | PVDecl(Some _,Kglobal,vi) -> vi.vglob && Globals.Functions.mem vi
-    | _ -> false
-
-  (*TODO: decprecated, to be changed to declaration tag *)
-  let scope tag =
-    Option.map Kernel_function.get_name @@ Printer_tag.kf_of_localizable tag
-
   let model = States.model ()
+
+  let () =
+    States.column
+      ~name:"kind"
+      ~descr:(Md.plain "Marker kind (key)")
+      ~data:(module MarkerKind) ~get:fst
+      model
+
+  let () =
+    States.option
+      ~name:"scope"
+      ~descr:(Md.plain "Marker Scope (where it is printed in)")
+      ~data:(module Decl)
+      ~get:(fun (tag,_) -> declaration_of_localizable tag)
+      model
+
+  let () =
+    States.option
+      ~name:"definition"
+      ~descr:(Md.plain "Marker's Target Definition (when applicable)")
+      ~data:(module Marker)
+      ~get:(fun (tag,_) -> definition_of_localizable tag)
+      model
 
   let () =
     States.column
@@ -535,54 +578,6 @@ struct
       ~descr:(Md.plain "Marker description")
       ~data:(module Jstring)
       ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pp_localizable tag)
-      model
-
-  let () =
-    States.option
-      ~name:"decl"
-      ~descr:(Md.plain "Declaration scope")
-      ~data:(module Decl)
-      ~get:(fun (tag, _) -> Printer_tag.declaration_of_localizable tag)
-      model
-
-  let () =
-    States.column
-      ~name:"isLval"
-      ~descr:(Md.plain "Whether it is an l-value")
-      ~data:(module Jbool)
-      ~get:(fun (tag, _) -> Lval.mem tag)
-      model
-
-  let () =
-    States.column
-      ~name:"isFunction"
-      ~descr:(Md.plain "Whether it is a function symbol")
-      ~data:(module Jbool)
-      ~get:(fun (tag, _) -> is_function tag)
-      model
-
-  let () =
-    States.column
-      ~name:"isFunctionPointer"
-      ~descr:(Md.plain "Whether it is a function pointer")
-      ~data:(module Jbool)
-      ~get:(fun (tag, _) -> is_function_pointer tag)
-      model
-
-  let () =
-    States.column
-      ~name:"isFunDecl"
-      ~descr:(Md.plain "Whether it is a function declaration")
-      ~data:(module Jbool)
-      ~get:(fun (tag, _) -> is_fundecl tag)
-      model
-
-  let () =
-    States.option
-      ~name:"scope"
-      ~descr:(Md.plain "Function scope of the marker, if applicable")
-      ~data:(module Jstring)
-      ~get:(fun (tag, _) -> scope tag)
       model
 
   let () =

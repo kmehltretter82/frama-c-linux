@@ -210,7 +210,7 @@ function useSourceGetter(): GetSource {
   const getAttr = States.useSyncArrayGetter(Ast.markerAttributes);
   const getDecl = States.useSyncArrayGetter(Ast.declAttributes);
   return React.useCallback(({ decl, marker }) => {
-    const { sloc, decl: markerDecl } = getAttr(marker) ?? {};
+    const { sloc, scope: markerDecl } = getAttr(marker) ?? {};
     if (sloc) return sloc;
     const { source } = getDecl(decl ?? markerDecl) ?? {};
     return source;
