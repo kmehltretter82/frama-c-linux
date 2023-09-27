@@ -350,6 +350,7 @@ let rP = ['P''p']['+''-']? rD+
 let rFS	= ('f'|'F'|'l'|'L'|'d'|'D')
 let rIS = ('u'|'U'|'l'|'L')*
 let comment_line = "//" [^'\n']*
+let rIdentifier = rL (rL | rD)*
 
 (* Do not forget to update also the corresponding chr rule if you add
    a supported escape sequence here. *)
@@ -372,14 +373,14 @@ rule token = parse
            then comment lexbuf
            else lex_error lexbuf "unexpected block-comment opening"
          }
-  | '\\' ((rL (rL | rD)*) as plugin) "::" ((rL (rL | rD)*) as name) {
+  | '\\' (rIdentifier as plugin) "::" (rIdentifier as name) {
      let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
      let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
      let tok = identifier name cabsloc in
      check_ext_plugin (fst cabsloc) plugin tok
      }
-  | '\\' rL (rL | rD)* { bs_identifier lexbuf }
-  | rL (rL | rD)*       {
+  | '\\' rIdentifier { bs_identifier lexbuf }
+  | rIdentifier       {
       let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
       let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
       let s = lexeme lexbuf in
