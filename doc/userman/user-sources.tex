@@ -451,7 +451,7 @@ By default, \FramaC's preprocessing will include the headers of its own standard
 library, instead of those installed in the user's machine. This avoids issues
 with non-portable, compiler-specific features.
 Option \optiondef{-}{frama-c-stdlib} (set by default)
-adds \texttt{-I\$FRAMAC\_SHARE/libc} to the preprocessor command, as well as
+adds \texttt{-I<installation_directory>/libc} to the preprocessor command, as well as
 GCC-specific option \texttt{-nostdinc}. If the latter is not recognized by
 your preprocessor,
 \optionuse{-}{no-cpp-frama-c-compliant} can be given to \FramaC
