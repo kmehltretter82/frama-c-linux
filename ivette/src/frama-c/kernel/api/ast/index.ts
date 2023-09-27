@@ -48,8 +48,8 @@ import { textDefault } from 'frama-c/kernel/api/data';
 
 const compute_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
-  name:   'kernel.ast.compute',
-  input:  Json.jNull,
+  name: 'kernel.ast.compute',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -210,8 +210,8 @@ export const signalDeclAttributes: Server.Signal = {
 
 const reloadDeclAttributes_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.reloadDeclAttributes',
-  input:  Json.jNull,
+  name: 'kernel.ast.reloadDeclAttributes',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -224,8 +224,8 @@ const fetchDeclAttributes_internal: Server.GetRequest<
     pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.fetchDeclAttributes',
-  input:  Json.jNumber,
+  name: 'kernel.ast.fetchDeclAttributes',
+  input: Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
             removed: Json.jArray(jDecl),
@@ -259,8 +259,8 @@ export const declAttributesDataDefault: declAttributesData =
 
 const printDeclaration_internal: Server.GetRequest<decl,text> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.printDeclaration',
-  input:  jDecl,
+  name: 'kernel.ast.printDeclaration',
+  input: jDecl,
   output: jText,
   signals: [ { name: 'kernel.ast.changed' } ],
 };
@@ -340,8 +340,8 @@ export const signalMarkerAttributes: Server.Signal = {
 
 const reloadMarkerAttributes_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.reloadMarkerAttributes',
-  input:  Json.jNull,
+  name: 'kernel.ast.reloadMarkerAttributes',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -354,8 +354,8 @@ const fetchMarkerAttributes_internal: Server.GetRequest<
     pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.fetchMarkerAttributes',
-  input:  Json.jNumber,
+  name: 'kernel.ast.fetchMarkerAttributes',
+  input: Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
             removed: Json.jArray(jMarker),
@@ -391,8 +391,8 @@ export const markerAttributesDataDefault: markerAttributesData =
 
 const getMainFunction_internal: Server.GetRequest<null,fct | undefined> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.getMainFunction',
-  input:  Json.jNull,
+  name: 'kernel.ast.getMainFunction',
+  input: Json.jNull,
   output: Json.jOption(jFct),
   signals: [],
 };
@@ -401,8 +401,8 @@ export const getMainFunction: Server.GetRequest<null,fct | undefined>= getMainFu
 
 const getFunctions_internal: Server.GetRequest<null,fct[]> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.getFunctions',
-  input:  Json.jNull,
+  name: 'kernel.ast.getFunctions',
+  input: Json.jNull,
   output: Json.jArray(jFct),
   signals: [],
 };
@@ -411,8 +411,8 @@ export const getFunctions: Server.GetRequest<null,fct[]>= getFunctions_internal;
 
 const printFunction_internal: Server.GetRequest<fct,text> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.printFunction',
-  input:  jFct,
+  name: 'kernel.ast.printFunction',
+  input: jFct,
   output: jText,
   signals: [ { name: 'kernel.ast.changed' } ],
 };
@@ -483,8 +483,8 @@ export const signalFunctions: Server.Signal = {
 
 const reloadFunctions_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.reloadFunctions',
-  input:  Json.jNull,
+  name: 'kernel.ast.reloadFunctions',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -497,8 +497,8 @@ const fetchFunctions_internal: Server.GetRequest<
     updated: functionsData[], pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.fetchFunctions',
-  input:  Json.jNumber,
+  name: 'kernel.ast.fetchFunctions',
+  input: Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
             removed: Json.jArray(Json.jKey<'#functions'>('#functions')),
@@ -543,8 +543,8 @@ const getInformation_internal: Server.GetRequest<
   { id: string, label: string, title: string, descr: string, text: text }[]
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.getInformation',
-  input:  Json.jOption(jMarker),
+  name: 'kernel.ast.getInformation',
+  input: Json.jOption(jMarker),
   output: Json.jArray(
             Json.jObject({
               id: Json.jString,
@@ -568,12 +568,12 @@ const getMarkerAt_internal: Server.GetRequest<
   undefined
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.getMarkerAt',
-  input:  Json.jObject({
-            file: Json.jString,
-            line: Json.jNumber,
-            column: Json.jNumber,
-          }),
+  name: 'kernel.ast.getMarkerAt',
+  input: Json.jObject({
+           file: Json.jString,
+           line: Json.jNumber,
+           column: Json.jNumber,
+         }),
   output: Json.jOption(jMarker),
   signals: [ { name: 'kernel.ast.changed' } ],
 };
@@ -586,8 +586,8 @@ export const getMarkerAt: Server.GetRequest<
 
 const getFiles_internal: Server.GetRequest<null,string[]> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.getFiles',
-  input:  Json.jNull,
+  name: 'kernel.ast.getFiles',
+  input: Json.jNull,
   output: Json.jArray(Json.jString),
   signals: [],
 };
@@ -596,8 +596,8 @@ export const getFiles: Server.GetRequest<null,string[]>= getFiles_internal;
 
 const setFiles_internal: Server.SetRequest<string[],null> = {
   kind: Server.RqKind.SET,
-  name:   'kernel.ast.setFiles',
-  input:  Json.jArray(Json.jString),
+  name: 'kernel.ast.setFiles',
+  input: Json.jArray(Json.jString),
   output: Json.jNull,
   signals: [],
 };
@@ -609,8 +609,8 @@ const parseExpr_internal: Server.GetRequest<
   marker
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.ast.parseExpr',
-  input:  Json.jObject({ stmt: jMarker, term: Json.jString,}),
+  name: 'kernel.ast.parseExpr',
+  input: Json.jObject({ stmt: jMarker, term: Json.jString,}),
   output: jMarker,
   signals: [],
 };

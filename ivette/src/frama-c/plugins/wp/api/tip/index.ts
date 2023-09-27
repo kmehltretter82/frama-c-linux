@@ -81,8 +81,8 @@ const getNodeInfos_internal: Server.GetRequest<
     stats: string }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.wp.tip.getNodeInfos',
-  input:  Json.jIndex<'#node'>('#node'),
+  name: 'plugins.wp.tip.getNodeInfos',
+  input: Json.jIndex<'#node'>('#node'),
   output: Json.jObject({
             result: Json.jString,
             proved: Json.jBoolean,
@@ -106,8 +106,8 @@ const getProofState_internal: Server.GetRequest<
     tactic: string, children: [ string, Json.index<'#node'> ][] }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.wp.tip.getProofState',
-  input:  jGoal,
+  name: 'plugins.wp.tip.getProofState',
+  input: jGoal,
   output: Json.jObject({
             current: Json.jIndex<'#node'>('#node'),
             parents: Json.jArray(Json.jIndex<'#node'>('#node')),
@@ -133,8 +133,8 @@ export const getProofState: Server.GetRequest<
 
 const goForward_internal: Server.SetRequest<goal,null> = {
   kind: Server.RqKind.SET,
-  name:   'plugins.wp.tip.goForward',
-  input:  jGoal,
+  name: 'plugins.wp.tip.goForward',
+  input: jGoal,
   output: Json.jNull,
   signals: [],
 };
@@ -143,8 +143,8 @@ export const goForward: Server.SetRequest<goal,null>= goForward_internal;
 
 const goToRoot_internal: Server.SetRequest<goal,null> = {
   kind: Server.RqKind.SET,
-  name:   'plugins.wp.tip.goToRoot',
-  input:  jGoal,
+  name: 'plugins.wp.tip.goToRoot',
+  input: jGoal,
   output: Json.jNull,
   signals: [],
 };
@@ -153,8 +153,8 @@ export const goToRoot: Server.SetRequest<goal,null>= goToRoot_internal;
 
 const goToIndex_internal: Server.SetRequest<[ goal, number ],null> = {
   kind: Server.RqKind.SET,
-  name:   'plugins.wp.tip.goToIndex',
-  input:  Json.jPair( jGoal, Json.jNumber,),
+  name: 'plugins.wp.tip.goToIndex',
+  input: Json.jPair( jGoal, Json.jNumber,),
   output: Json.jNull,
   signals: [],
 };
@@ -163,8 +163,8 @@ export const goToIndex: Server.SetRequest<[ goal, number ],null>= goToIndex_inte
 
 const goToNode_internal: Server.SetRequest<Json.index<'#node'>,null> = {
   kind: Server.RqKind.SET,
-  name:   'plugins.wp.tip.goToNode',
-  input:  Json.jIndex<'#node'>('#node'),
+  name: 'plugins.wp.tip.goToNode',
+  input: Json.jIndex<'#node'>('#node'),
   output: Json.jNull,
   signals: [],
 };
@@ -173,8 +173,8 @@ export const goToNode: Server.SetRequest<Json.index<'#node'>,null>= goToNode_int
 
 const removeNode_internal: Server.SetRequest<Json.index<'#node'>,null> = {
   kind: Server.RqKind.SET,
-  name:   'plugins.wp.tip.removeNode',
-  input:  Json.jIndex<'#node'>('#node'),
+  name: 'plugins.wp.tip.removeNode',
+  input: Json.jIndex<'#node'>('#node'),
   output: Json.jNull,
   signals: [],
 };
@@ -227,16 +227,16 @@ const printSequent_internal: Server.ExecRequest<
   text
   > = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.wp.tip.printSequent',
-  input:  Json.jObject({
-            node: Json.jIndex<'#node'>('#node'),
-            indent: Json.jOption(Json.jNumber),
-            margin: Json.jOption(Json.jNumber),
-            iformat: Json.jOption(jIformat),
-            rformat: Json.jOption(jRformat),
-            autofocus: Json.jOption(Json.jBoolean),
-            unmangled: Json.jOption(Json.jBoolean),
-          }),
+  name: 'plugins.wp.tip.printSequent',
+  input: Json.jObject({
+           node: Json.jIndex<'#node'>('#node'),
+           indent: Json.jOption(Json.jNumber),
+           margin: Json.jOption(Json.jNumber),
+           iformat: Json.jOption(jIformat),
+           rformat: Json.jOption(jRformat),
+           autofocus: Json.jOption(Json.jBoolean),
+           unmangled: Json.jOption(Json.jBoolean),
+         }),
   output: jText,
   signals: [ { name: 'plugins.wp.tip.printStatus' } ],
 };
@@ -250,8 +250,8 @@ export const printSequent: Server.ExecRequest<
 
 const clearSelection_internal: Server.SetRequest<Json.index<'#node'>,null> = {
   kind: Server.RqKind.SET,
-  name:   'plugins.wp.tip.clearSelection',
-  input:  Json.jIndex<'#node'>('#node'),
+  name: 'plugins.wp.tip.clearSelection',
+  input: Json.jIndex<'#node'>('#node'),
   output: Json.jNull,
   signals: [],
 };
@@ -264,13 +264,13 @@ const setSelection_internal: Server.SetRequest<
   null
   > = {
   kind: Server.RqKind.SET,
-  name:   'plugins.wp.tip.setSelection',
-  input:  Json.jObject({
-            node: Json.jIndex<'#node'>('#node'),
-            part: Json.jOption(Json.jKey<'#part'>('#part')),
-            term: Json.jOption(Json.jKey<'#term'>('#term')),
-            extend: Json.jOption(Json.jBoolean),
-          }),
+  name: 'plugins.wp.tip.setSelection',
+  input: Json.jObject({
+           node: Json.jIndex<'#node'>('#node'),
+           part: Json.jOption(Json.jKey<'#part'>('#part')),
+           term: Json.jOption(Json.jKey<'#term'>('#term')),
+           extend: Json.jOption(Json.jBoolean),
+         }),
   output: Json.jNull,
   signals: [],
 };

@@ -112,8 +112,8 @@ export const edgeKindDefault: edgeKind = edgeKind.inter_services;
 
 const edgeKindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.callgraph.edgeKindTags',
-  input:  Json.jNull,
+  name: 'plugins.callgraph.edgeKindTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -176,8 +176,8 @@ export const signalCallgraph: Server.Signal = {
 
 const getCallgraph_internal: Server.GetRequest<null,graph | undefined> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.callgraph.getCallgraph',
-  input:  Json.jNull,
+  name: 'plugins.callgraph.getCallgraph',
+  input: Json.jNull,
   output: Json.jOption(jGraph),
   signals: [],
 };
@@ -199,8 +199,8 @@ export const signalIsComputed: Server.Signal = {
 
 const getIsComputed_internal: Server.GetRequest<null,boolean> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.callgraph.getIsComputed',
-  input:  Json.jNull,
+  name: 'plugins.callgraph.getIsComputed',
+  input: Json.jNull,
   output: Json.jBoolean,
   signals: [],
 };
@@ -217,8 +217,8 @@ export const isComputed: State.Value<boolean> = isComputed_internal;
 
 const compute_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.callgraph.compute',
-  input:  Json.jNull,
+  name: 'plugins.callgraph.compute',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };

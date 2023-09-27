@@ -153,8 +153,8 @@ export const propKindDefault: propKind = propKind.behavior;
 
 const propKindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.properties.propKindTags',
-  input:  Json.jNull,
+  name: 'kernel.properties.propKindTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -199,8 +199,8 @@ export const propStatusDefault: propStatus = propStatus.unknown;
 
 const propStatusTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.properties.propStatusTags',
-  input:  Json.jNull,
+  name: 'kernel.properties.propStatusTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -256,8 +256,8 @@ export const alarmsDefault: alarms = alarms.division_by_zero;
 
 const alarmsTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.properties.alarmsTags',
-  input:  Json.jNull,
+  name: 'kernel.properties.alarmsTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -332,8 +332,8 @@ export const signalStatus: Server.Signal = {
 
 const reloadStatus_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.properties.reloadStatus',
-  input:  Json.jNull,
+  name: 'kernel.properties.reloadStatus',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -346,8 +346,8 @@ const fetchStatus_internal: Server.GetRequest<
     pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.properties.fetchStatus',
-  input:  Json.jNumber,
+  name: 'kernel.properties.fetchStatus',
+  input: Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
             removed: Json.jArray(jMarker),

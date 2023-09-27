@@ -82,8 +82,8 @@ export const effectsDefault: effects = { direct: [], indirect: [] };
 
 const getReadsLval_internal: Server.GetRequest<marker,effects> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.studia.studia.getReadsLval',
-  input:  jMarker,
+  name: 'plugins.studia.studia.getReadsLval',
+  input: jMarker,
   output: jEffects,
   signals: [],
 };
@@ -92,8 +92,8 @@ export const getReadsLval: Server.GetRequest<marker,effects>= getReadsLval_inter
 
 const getWritesLval_internal: Server.GetRequest<marker,effects> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.studia.studia.getWritesLval',
-  input:  jMarker,
+  name: 'plugins.studia.studia.getWritesLval',
+  input: jMarker,
   output: jEffects,
   signals: [],
 };

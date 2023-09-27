@@ -217,8 +217,8 @@ export const nodeKindDefault: nodeKind = nodeKind.scalar;
 
 const nodeKindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.dive.nodeKindTags',
-  input:  Json.jNull,
+  name: 'plugins.dive.nodeKindTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -246,8 +246,8 @@ export const taintDefault: taint = taint.untainted;
 
 const taintTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.dive.taintTags',
-  input:  Json.jNull,
+  name: 'plugins.dive.taintTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -277,8 +277,8 @@ export const explorationDefault: exploration = exploration.yes;
 
 const explorationTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.dive.explorationTags',
-  input:  Json.jNull,
+  name: 'plugins.dive.explorationTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -309,8 +309,8 @@ export const nodeSpecialRangeDefault: nodeSpecialRange =
 
 const nodeSpecialRangeTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.dive.nodeSpecialRangeTags',
-  input:  Json.jNull,
+  name: 'plugins.dive.nodeSpecialRangeTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -483,8 +483,8 @@ export const signalGraph: Server.Signal = {
 
 const reloadGraph_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.dive.reloadGraph',
-  input:  Json.jNull,
+  name: 'plugins.dive.reloadGraph',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -497,8 +497,8 @@ const fetchGraph_internal: Server.GetRequest<
     pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.dive.fetchGraph',
-  input:  Json.jNumber,
+  name: 'plugins.dive.fetchGraph',
+  input: Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
             removed: Json.jArray(Json.jKey<'#graph'>('#graph')),
@@ -531,8 +531,8 @@ export const graphDataDefault: graphData =
 
 const window_internal: Server.SetRequest<explorationWindow,null> = {
   kind: Server.RqKind.SET,
-  name:   'plugins.dive.window',
-  input:  jExplorationWindow,
+  name: 'plugins.dive.window',
+  input: jExplorationWindow,
   output: Json.jNull,
   signals: [],
 };
@@ -541,8 +541,8 @@ export const window: Server.SetRequest<explorationWindow,null>= window_internal;
 
 const clear_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.dive.clear',
-  input:  Json.jNull,
+  name: 'plugins.dive.clear',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -551,8 +551,8 @@ export const clear: Server.ExecRequest<null,null>= clear_internal;
 
 const add_internal: Server.ExecRequest<marker,nodeId | undefined> = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.dive.add',
-  input:  jMarker,
+  name: 'plugins.dive.add',
+  input: jMarker,
   output: Json.jOption(jNodeId),
   signals: [],
 };
@@ -561,8 +561,8 @@ export const add: Server.ExecRequest<marker,nodeId | undefined>= add_internal;
 
 const explore_internal: Server.ExecRequest<nodeId,null> = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.dive.explore',
-  input:  jNodeId,
+  name: 'plugins.dive.explore',
+  input: jNodeId,
   output: Json.jNull,
   signals: [],
 };
@@ -571,8 +571,8 @@ export const explore: Server.ExecRequest<nodeId,null>= explore_internal;
 
 const show_internal: Server.ExecRequest<nodeId,null> = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.dive.show',
-  input:  jNodeId,
+  name: 'plugins.dive.show',
+  input: jNodeId,
   output: Json.jNull,
   signals: [],
 };
@@ -581,8 +581,8 @@ export const show: Server.ExecRequest<nodeId,null>= show_internal;
 
 const hide_internal: Server.ExecRequest<nodeId,null> = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.dive.hide',
-  input:  jNodeId,
+  name: 'plugins.dive.hide',
+  input: jNodeId,
   output: Json.jNull,
   signals: [],
 };

@@ -177,8 +177,8 @@ export const statsDefault: stats =
 
 const getAvailableProvers_internal: Server.GetRequest<null,prover[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.wp.getAvailableProvers',
-  input:  Json.jNull,
+  name: 'plugins.wp.getAvailableProvers',
+  input: Json.jNull,
   output: Json.jArray(jProver),
   signals: [],
 };
@@ -261,8 +261,8 @@ export const signalGoals: Server.Signal = {
 
 const reloadGoals_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.wp.reloadGoals',
-  input:  Json.jNull,
+  name: 'plugins.wp.reloadGoals',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -274,8 +274,8 @@ const fetchGoals_internal: Server.GetRequest<
   { reload: boolean, removed: goal[], updated: goalsData[], pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.wp.fetchGoals',
-  input:  Json.jNumber,
+  name: 'plugins.wp.fetchGoals',
+  input: Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
             removed: Json.jArray(jGoal),
@@ -318,8 +318,8 @@ const getScheduledTasks_internal: Server.GetRequest<
   { procs: number, active: number, done: number, todo: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.wp.getScheduledTasks',
-  input:  Json.jNull,
+  name: 'plugins.wp.getScheduledTasks',
+  input: Json.jNull,
   output: Json.jObject({
             procs: Json.jNumber,
             active: Json.jNumber,
@@ -336,8 +336,8 @@ export const getScheduledTasks: Server.GetRequest<
 
 const cancelProofTasks_internal: Server.SetRequest<null,null> = {
   kind: Server.RqKind.SET,
-  name:   'plugins.wp.cancelProofTasks',
-  input:  Json.jNull,
+  name: 'plugins.wp.cancelProofTasks',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };

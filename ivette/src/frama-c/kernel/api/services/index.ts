@@ -75,8 +75,8 @@ const getConfig_internal: Server.GetRequest<
   { version: string, datadir: string[], pluginpath: string[] }
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.services.getConfig',
-  input:  Json.jNull,
+  name: 'kernel.services.getConfig',
+  input: Json.jNull,
   output: Json.jObject({
             version: Json.jString,
             datadir: Json.jArray(Json.jString),
@@ -92,8 +92,8 @@ export const getConfig: Server.GetRequest<
 
 const load_internal: Server.SetRequest<string,string | undefined> = {
   kind: Server.RqKind.SET,
-  name:   'kernel.services.load',
-  input:  Json.jString,
+  name: 'kernel.services.load',
+  input: Json.jString,
   output: Json.jOption(Json.jString),
   signals: [],
 };
@@ -102,8 +102,8 @@ export const load: Server.SetRequest<string,string | undefined>= load_internal;
 
 const save_internal: Server.SetRequest<string,string | undefined> = {
   kind: Server.RqKind.SET,
-  name:   'kernel.services.save',
-  input:  Json.jString,
+  name: 'kernel.services.save',
+  input: Json.jString,
   output: Json.jOption(Json.jString),
   signals: [],
 };
@@ -137,8 +137,8 @@ export const logkindDefault: logkind = logkind.ERROR;
 
 const logkindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.services.logkindTags',
-  input:  Json.jNull,
+  name: 'kernel.services.logkindTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -201,8 +201,8 @@ export const signalMessage: Server.Signal = {
 
 const reloadMessage_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.services.reloadMessage',
-  input:  Json.jNull,
+  name: 'kernel.services.reloadMessage',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -215,8 +215,8 @@ const fetchMessage_internal: Server.GetRequest<
     pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.services.fetchMessage',
-  input:  Json.jNumber,
+  name: 'kernel.services.fetchMessage',
+  input: Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
             removed: Json.jArray(Json.jKey<'#message'>('#message')),
@@ -292,8 +292,8 @@ export const logDefault: log =
 
 const setLogs_internal: Server.SetRequest<boolean,null> = {
   kind: Server.RqKind.SET,
-  name:   'kernel.services.setLogs',
-  input:  Json.jBoolean,
+  name: 'kernel.services.setLogs',
+  input: Json.jBoolean,
   output: Json.jNull,
   signals: [],
 };
@@ -302,8 +302,8 @@ export const setLogs: Server.SetRequest<boolean,null>= setLogs_internal;
 
 const getLogs_internal: Server.GetRequest<null,log[]> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.services.getLogs',
-  input:  Json.jNull,
+  name: 'kernel.services.getLogs',
+  input: Json.jNull,
   output: Json.jArray(jLog),
   signals: [],
 };

@@ -74,8 +74,8 @@ export const callstackDefault: callstack =
 
 const getCallstacks_internal: Server.GetRequest<marker[],callstack[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.values.getCallstacks',
-  input:  Json.jArray(jMarker),
+  name: 'plugins.eva.values.getCallstacks',
+  input: Json.jArray(jMarker),
   output: Json.jArray(jCallstack),
   signals: [],
 };
@@ -87,8 +87,8 @@ const getCallstackInfo_internal: Server.GetRequest<
   { callee: fct, caller?: fct, stmt?: marker, rank?: number }[]
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.values.getCallstackInfo',
-  input:  jCallstack,
+  name: 'plugins.eva.values.getCallstackInfo',
+  input: jCallstack,
   output: Json.jArray(
             Json.jObject({
               callee: jFct,
@@ -109,8 +109,8 @@ const getStmtInfo_internal: Server.GetRequest<
   { fct: fct, rank: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.values.getStmtInfo',
-  input:  jMarker,
+  name: 'plugins.eva.values.getStmtInfo',
+  input: jMarker,
   output: Json.jObject({ fct: jFct, rank: Json.jNumber,}),
   signals: [],
 };
@@ -126,8 +126,8 @@ const getProbeInfo_internal: Server.GetRequest<
     condition: boolean }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.values.getProbeInfo',
-  input:  jMarker,
+  name: 'plugins.eva.values.getProbeInfo',
+  input: jMarker,
   output: Json.jObject({
             evaluable: Json.jBoolean,
             code: Json.jOption(Json.jString),
@@ -190,11 +190,9 @@ const getValues_internal: Server.GetRequest<
     vElse?: evaluation }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.values.getValues',
-  input:  Json.jObject({
-            target: jMarker,
-            callstack: Json.jOption(jCallstack),
-          }),
+  name: 'plugins.eva.values.getValues',
+  input: Json.jObject({ target: jMarker, callstack: Json.jOption(jCallstack),
+         }),
   output: Json.jObject({
             vBefore: Json.jOption(jEvaluation),
             vAfter: Json.jOption(jEvaluation),

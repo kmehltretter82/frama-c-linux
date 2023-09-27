@@ -101,8 +101,8 @@ const getComputationState_internal: Server.GetRequest<
   computationStateType
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.getComputationState',
-  input:  Json.jNull,
+  name: 'plugins.eva.general.getComputationState',
+  input: Json.jNull,
   output: jComputationStateType,
   signals: [],
 };
@@ -137,8 +137,8 @@ export const CallSiteDefault: CallSite =
 
 const getCallers_internal: Server.GetRequest<fct,CallSite[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.getCallers',
-  input:  jFct,
+  name: 'plugins.eva.general.getCallers',
+  input: jFct,
   output: Json.jArray(jCallSite),
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
@@ -147,8 +147,8 @@ export const getCallers: Server.GetRequest<fct,CallSite[]>= getCallers_internal;
 
 const getCallees_internal: Server.GetRequest<marker,fct[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.getCallees',
-  input:  jMarker,
+  name: 'plugins.eva.general.getCallees',
+  input: jMarker,
   output: Json.jArray(jFct),
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
@@ -185,8 +185,8 @@ export const signalFunctions: Server.Signal = {
 
 const reloadFunctions_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.reloadFunctions',
-  input:  Json.jNull,
+  name: 'plugins.eva.general.reloadFunctions',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -199,8 +199,8 @@ const fetchFunctions_internal: Server.GetRequest<
     updated: functionsData[], pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.fetchFunctions',
-  input:  Json.jNumber,
+  name: 'plugins.eva.general.fetchFunctions',
+  input: Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
             removed: Json.jArray(Json.jKey<'#functions'>('#functions')),
@@ -260,8 +260,8 @@ export const deadCodeDefault: deadCode =
 
 const getDeadCode_internal: Server.GetRequest<fct,deadCode> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.getDeadCode',
-  input:  jFct,
+  name: 'plugins.eva.general.getDeadCode',
+  input: jFct,
   output: jDeadCode,
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
@@ -301,8 +301,8 @@ export const taintStatusDefault: taintStatus = taintStatus.not_computed;
 
 const taintStatusTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.taintStatusTags',
-  input:  Json.jNull,
+  name: 'plugins.eva.general.taintStatusTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -335,8 +335,8 @@ export const LvalueTaintsDefault: LvalueTaints =
 
 const taintedLvalues_internal: Server.GetRequest<fct,LvalueTaints[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.taintedLvalues',
-  input:  jFct,
+  name: 'plugins.eva.general.taintedLvalues',
+  input: jFct,
   output: Json.jArray(jLvalueTaints),
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
@@ -374,8 +374,8 @@ export const signalProperties: Server.Signal = {
 
 const reloadProperties_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.reloadProperties',
-  input:  Json.jNull,
+  name: 'plugins.eva.general.reloadProperties',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -388,8 +388,8 @@ const fetchProperties_internal: Server.GetRequest<
     pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.fetchProperties',
-  input:  Json.jNumber,
+  name: 'plugins.eva.general.fetchProperties',
+  input: Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
             removed: Json.jArray(jMarker),
@@ -458,8 +458,8 @@ export const alarmCategoryDefault: alarmCategory =
 
 const alarmCategoryTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.alarmCategoryTags',
-  input:  Json.jNull,
+  name: 'plugins.eva.general.alarmCategoryTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -595,8 +595,8 @@ export const signalProgramStats: Server.Signal = {
 
 const getProgramStats_internal: Server.GetRequest<null,programStatsType> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.getProgramStats',
-  input:  Json.jNull,
+  name: 'plugins.eva.general.getProgramStats',
+  input: Json.jNull,
   output: jProgramStatsType,
   signals: [],
 };
@@ -658,8 +658,8 @@ export const signalFunctionStats: Server.Signal = {
 
 const reloadFunctionStats_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.reloadFunctionStats',
-  input:  Json.jNull,
+  name: 'plugins.eva.general.reloadFunctionStats',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -672,8 +672,8 @@ const fetchFunctionStats_internal: Server.GetRequest<
     pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.fetchFunctionStats',
-  input:  Json.jNumber,
+  name: 'plugins.eva.general.fetchFunctionStats',
+  input: Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
             removed: Json.jArray(jFct),
@@ -710,8 +710,8 @@ const getStates_internal: Server.GetRequest<
   [ string, string, string ][]
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.eva.general.getStates',
-  input:  Json.jPair( jMarker, Json.jBoolean,),
+  name: 'plugins.eva.general.getStates',
+  input: Json.jPair( jMarker, Json.jBoolean,),
   output: Json.jArray(
             Json.jTriple( Json.jString, Json.jString, Json.jString,)),
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
