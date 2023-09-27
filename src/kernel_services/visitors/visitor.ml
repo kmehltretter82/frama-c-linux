@@ -713,8 +713,6 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
                       let spec = Option.value ~default:dft spec in
                       Globals.Functions.register new_kf;
                       Globals.Functions.replace_by_declaration spec v l;
-                      (* Format.printf "registered spec:@\n%a@." Printer.pp_funspec
-                         (Annotations.funspec new_kf) *)
                     end else begin
                       Globals.Functions.replace_by_declaration
                         (Cil.empty_funspec()) v l
