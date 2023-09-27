@@ -174,12 +174,8 @@ let compare_it it1 it2 =
 
 (* Return true if [kf] is a builtin of Frama-C. *)
 let is_frama_c_builtin kf =
-  Kernel_function.get_vi kf |> Cil_builtins.is_builtin
-  || Kernel_function.get_name kf |> Cil_builtins.is_special_builtin
-
-(* Return true if [kf] is a from the stdblib of Frama-C. *)
-let is_frama_c_stdlib kf =
-  (Kernel_function.get_vi kf).vattr |> Cil.is_in_libc
+  let v = Kernel_function.get_vi kf in
+  Cil_builtins.is_builtin v || Cil_builtins.is_special_builtin v.vname
 
 (* This module is used to define clauses generators. *)
 module type Generator =
@@ -787,7 +783,7 @@ let activated_config kf clauses =
   let default =
     if is_frama_c_builtin kf then build_config Frama_C
     (* TODO: Use ACSL mode for frama-c's libc once all assigns are written. *)
-    else if is_frama_c_stdlib kf then build_config Frama_C
+    else if Kernel_function.is_in_libc kf then build_config Frama_C
     else get_config_custom ()
   in
   let collect config clause =
