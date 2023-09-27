@@ -1,0 +1,281 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of Frama-C.                                         *)
+(*                                                                        *)
+(*  Copyright (C) 2007-2023                                               *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+open Cil_types
+open Evast
+
+(* --- Vertices and Edges types --- *)
+
+type vertex = {
+  vertex_key : int;
+  mutable vertex_start_of : Cil_types.stmt option;
+}
+
+type guard_kind = Interpreted_automata.guard_kind = Then | Else
+
+type transition =
+  | Skip
+  | Enter of block
+  | Leave of block
+  | Return of exp option * stmt
+  | Guard of exp * guard_kind * stmt
+  | Assign of lval * exp * stmt
+  | Call of lval option * exp * exp list * stmt
+  | Local_init of varinfo * local_init * stmt
+  | Asm of attributes * string list * extended_asm option * stmt
+
+type edge = {
+  edge_key : int;
+  edge_kinstr : kinstr;
+  edge_transition : transition;
+  edge_loc : location;
+}
+
+let dummy_vertex = {
+  vertex_key = -1;
+  vertex_start_of = None;
+}
+
+let dummy_edge = {
+  edge_key = -1;
+  edge_kinstr = Kglobal;
+  edge_transition = Skip;
+  edge_loc = Cil_datatype.Location.unknown;
+}
+
+module Vertex = Datatype.Make_with_collections (struct
+    include Datatype.Serializable_undefined
+    type t = vertex
+    let reprs = [dummy_vertex]
+    let name = "Eva_automata.Vertex"
+    let compare v1 v2 = v1.vertex_key - v2.vertex_key
+    let hash v = v.vertex_key
+    let equal v1 v2 = v1.vertex_key = v2.vertex_key
+    let pretty fmt v = Format.pp_print_int fmt v.vertex_key
+  end)
+
+module Transition = Datatype.Make (struct
+    include Datatype.Serializable_undefined
+    type t = transition
+    let name = "Eva_automaton.Transition"
+    let reprs = [Skip]
+    let pretty fmt =
+      let open Format in
+      let print_var_list fmt l =
+        Pretty_utils.pp_list ~sep:", " Printer.pp_varinfo fmt l
+      in
+      function
+      | Skip -> ()
+      | Return (None,_) -> fprintf fmt "return"
+      | Return (Some exp,_) -> fprintf fmt "return %a" Evast_printer.pp_exp exp
+      | Guard (exp,Then,_) -> Evast_printer.pp_exp fmt exp
+      | Guard (exp,Else,_) -> fprintf fmt "!(%a)" Evast_printer.pp_exp exp
+      | Assign (_,_,stmt)
+      | Call (_,_,_,stmt)
+      | Local_init (_,_,stmt)
+      | Asm (_,_,_,stmt) -> Printer.pp_stmt fmt stmt
+      | Enter (b) -> fprintf fmt "Enter %a" print_var_list b.blocals
+      | Leave (b)  -> fprintf fmt "Exit %a" print_var_list b.blocals
+  end)
+
+module Edge =
+struct
+  include Datatype.Make_with_collections
+      (struct
+        include Datatype.Serializable_undefined
+        type t = edge
+        let reprs = [dummy_edge]
+        let name = "Eva_automata.Edge"
+        let compare e1 e2 = e1.edge_key - e2.edge_key
+        let hash e = e.edge_key
+        let equal e1 e2 = e1.edge_key = e2.edge_key
+        let pretty fmt e = Format.pp_print_int fmt e.edge_key
+      end)
+  let default = dummy_edge
+end
+
+
+(* --- Automata types --- *)
+
+module G = Graph.Imperative.Digraph.ConcreteBidirectionalLabeled
+    (Vertex)
+    (Edge)
+
+type graph = G.t
+
+type wto = vertex Wto.partition
+
+module StmtTable = Cil_datatype.Stmt.Hashtbl
+
+type automaton = {
+  graph : graph;
+  wto : wto;
+  entry_point : vertex;
+  return_point : vertex;
+  stmt_table : (vertex * vertex) StmtTable.t;
+}
+
+module Automaton = Datatype.Make
+    (struct
+      include Datatype.Serializable_undefined
+      type t = automaton
+      let reprs = [{
+          graph=G.create ();
+          wto=[];
+          entry_point=dummy_vertex;
+          return_point=dummy_vertex;
+          stmt_table=StmtTable.create 0;
+        }]
+      let name = "Eva_automata.Automaton"
+      let pretty : t Pretty_utils.formatter = fun fmt g ->
+        Pretty_utils.pp_iter G.iter_vertex ~pre:"@[" ~suf:"@]" ~sep:";@ "
+          (fun fmt v ->
+             Format.fprintf fmt "@[<2>@[%a ->@]@ %a@]"
+               Vertex.pretty v
+               (Pretty_utils.pp_iter (fun f -> G.iter_succ f g.graph) ~sep:",@ " Vertex.pretty)
+               v
+          )
+          fmt g.graph
+    end)
+
+
+(* Wto *)
+
+module Scheduler = Wto.Make (Vertex)
+
+let build_wto graph entry_point =
+  let init = entry_point
+  and succs = fun v -> G.succ graph v
+  and pref v1 v2 =
+    match v1.vertex_start_of, v2.vertex_start_of with
+    | None, None -> 0
+    | None, _ -> -1
+    | _ , None -> 1
+    | Some _, Some _ -> 0
+  in
+  Scheduler.partition ~pref ~init ~succs
+
+
+(* Automata translation *)
+
+let translate_instr stmt = function
+  | Cil_types.Set (lval, exp, _loc) ->
+    let lval' = Evast_builder.translate_lval lval in
+    let exp' = Evast_builder.translate_exp exp in
+    Assign (lval', exp', stmt)
+  | Call (lval_opt, exp, exp_list, _loc) ->
+    let lval_opt' = Option.map Evast_builder.translate_lval lval_opt in
+    let exp' = Evast_builder.translate_exp exp in
+    let exp_list' = List.map Evast_builder.translate_exp exp_list in
+    Call (lval_opt', exp', exp_list', stmt)
+  | Local_init (vi, local_init, _loc) ->
+    Local_init (vi, local_init, stmt)
+  | Asm (attributes, string_list, ext_asm_opt, _loc) ->
+    Asm (attributes, string_list, ext_asm_opt, stmt)
+  | Skip (_loc) | Code_annot (_, _loc) ->
+    Skip
+
+let translate_transition = function
+  | Interpreted_automata.Skip -> Skip
+  | Return (exp_opt, stmt) ->
+    Return (Option.map Evast_builder.translate_exp exp_opt, stmt)
+  | Guard (exp, guard_kind, stmt) ->
+    Guard (Evast_builder.translate_exp exp, guard_kind, stmt)
+  | Prop _ ->
+    Skip
+  | Instr (inst, stmt) ->
+    translate_instr stmt inst
+  | Enter block ->
+    Enter block
+  | Leave block ->
+    Leave block
+
+let translate_automaton kf =
+  let module Src = Interpreted_automata in
+  let module VertexTable = Src.Vertex.Hashtbl in
+  let src = Interpreted_automata.get_automaton kf in
+  let size = Src.(G.nb_vertex src.graph) in
+  let graph = G.create ~size () in
+  let table = VertexTable.create size in
+  let translate_vertex (v : Src.vertex) =
+    let v' = {
+      vertex_key = v.vertex_key;
+      vertex_start_of = v.vertex_start_of;
+    }
+    in
+    G.add_vertex graph v';
+    VertexTable.add table v v'
+  and translate_edge (v, e, w) =
+    let v' = VertexTable.find table v
+    and w' = VertexTable.find table w
+    and e' = {
+      edge_key = e.Src.edge_key;
+      edge_kinstr = e.Src.edge_kinstr;
+      edge_transition = translate_transition e.Src.edge_transition;
+      edge_loc = e.Src.edge_loc;
+    }
+    in
+    G.add_edge_e graph (v',e',w')
+  and translate_stmt_table t =
+    let module T = Cil_datatype.Stmt.Hashtbl in
+    let t' = T.create (T.length t) in
+    let translate_pair (v1, v2) =
+      VertexTable.find table v1, VertexTable.find table v2
+    in
+    T.iter (fun stmt (v1, v2) -> T.add t' stmt (translate_pair (v1, v2))) t;
+    t'
+  in
+  Src.G.iter_vertex translate_vertex src.graph;
+  Src.G.iter_edges_e translate_edge src.graph;
+  let entry_point = VertexTable.find table src.entry_point
+  and return_point = VertexTable.find table src.return_point
+  and stmt_table = translate_stmt_table src.stmt_table in
+  let wto = build_wto graph entry_point in
+  { graph; wto; entry_point; return_point; stmt_table }
+
+
+(* Automata memoization *)
+
+module State = Kernel_function.Make_Table (Automaton)
+    (struct
+      let size = 97
+      let name = "Eva_automata.State"
+      let dependencies = [Ast.self]
+    end)
+
+let get_automaton = State.memo translate_automaton
+
+
+(* Algorithms *)
+
+let exit_strategy =
+  let module Algorithms = Interpreted_automata.Algorithms (G) in
+  Algorithms.exit_strategy
+
+let output_to_dot =
+  let module Vertex = struct
+    include Vertex
+    let start_of v = v.vertex_start_of end
+  in
+  let module Dot = Interpreted_automata.Dot (Vertex) (Edge) (G) in
+  fun out automaton ->
+    Dot.output_to_dot out ~labeling:`Both ~wto:automaton.wto automaton.graph
