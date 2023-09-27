@@ -163,6 +163,16 @@ val bitwise_xor: t -> t -> t
 val bitwise_signed_not: t -> t
 val bitwise_unsigned_not: size:int -> t -> t
 
+(** {2 Comparisons} *)
+
+(** [forward_comp op l r] returns the result of the comparison [l op r]. *)
+val forward_comp:
+  Abstract_interp.Comp.t -> t -> t -> Abstract_interp.Comp.result
+
+(** [backward_comp_left op l r] reduces [l] by assuming [l op r] holds. *)
+val backward_comp_left: Abstract_interp.Comp.t -> t -> t -> t or_bottom
+
+
 (** {2 Misc} *)
 
 val cast_int_to_int: size:Integer.t -> signed:bool -> t -> t
