@@ -225,9 +225,7 @@ end
 
 let consider_function vi =
   vi.Cil_types.vdefined &&
-  not (Cil_builtins.has_fc_builtin_attr vi
-       || Cil_builtins.is_special_builtin vi.vname
-       || Cil.is_in_libc vi.vattr)
+  not (Cil_builtins.is_builtin vi || Cil.is_in_libc vi.vattr)
 
 let compute_events () =
   let eva = Events.make () and kernel = Events.make () in

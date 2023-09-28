@@ -56,9 +56,14 @@ open Cil_types
 module Frama_c_builtins:
   State_builder.Hashtbl with type key = string and type data = varinfo
 
-val is_frama_c_builtin: varinfo -> bool
-(** @return true if the given variable refers to a Frama-C builtin.
+val is_builtin: varinfo -> bool
+(** @return true if {!has_fc_builtin_attr} or {!is_special_builtin} are true.
+    @before Frama-C+dev Only check for {!has_fc_builtin_attr}.
     @since Fluorine-20130401 *)
+
+val has_fc_builtin_attr: varinfo -> bool
+(** @return true if the given variable refers to a Frama-C builtin.
+    @since Frama-C+dev *)
 
 val is_unused_builtin: varinfo -> bool
 (** @return true if the given variable refers to a Frama-C builtin that

@@ -68,6 +68,9 @@ let special_builtins = Queue.create ()
 let is_special_builtin s =
   Queue.fold (fun res f -> res || f s) false special_builtins
 
+let is_builtin v =
+  has_fc_builtin_attr v || is_special_builtin v.vname
+
 let add_special_builtin_family f = Queue.add f special_builtins
 
 let add_special_builtin s =
