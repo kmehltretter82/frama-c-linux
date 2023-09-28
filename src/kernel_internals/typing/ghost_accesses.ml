@@ -174,7 +174,7 @@ class visitor = object(self)
       in
       let is_builtin vi =
         Ast_info.start_with_frama_c_builtin vi.vname ||
-        Cil_builtins.is_builtin vi
+        Cil_builtins.has_fc_builtin_attr vi
       in
       let failed = match i with
         | Call(_, fexp, _, _) ->

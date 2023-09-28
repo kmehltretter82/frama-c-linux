@@ -608,7 +608,7 @@ struct
       if not libc then Kernel.PrintLibc.set false ; raise err
 
   let is_builtin kf =
-    Cil_builtins.is_builtin (Kernel_function.get_vi kf)
+    Cil_builtins.has_fc_builtin_attr (Kernel_function.get_vi kf)
 
   let is_extern kf =
     let vi = Kernel_function.get_vi kf in

@@ -5,7 +5,7 @@ let emitter =
 let run () =
   Globals.Functions.iter
     (fun kf ->
-       if not (Cil_builtins.is_builtin (Kernel_function.get_vi kf)) then begin
+       if not (Cil_builtins.has_fc_builtin_attr (Kernel_function.get_vi kf)) then begin
          Globals.set_entry_point (Kernel_function.get_name kf) true;
          Eva.Analysis.compute();
          let hyps =

@@ -101,7 +101,7 @@ class visitor = object
     else begin
       if Cil.isFunctionType vi.vtype then begin
         if vi.vname <> "main"
-        && not (Cil_builtins.is_builtin vi)
+        && not (Cil_builtins.has_fc_builtin_attr vi)
         && not (Cil_builtins.is_special_builtin vi.vname)
         && not (Cil.is_in_libc vi.vattr) then
           vi.vname <- Dictionary.fresh Obfuscator_kind.Function vi.vname

@@ -56,9 +56,9 @@ module Frama_c_builtins =
       let size = 3
     end)
 
-let is_builtin v = Cil.hasAttribute "FC_BUILTIN" v.vattr
+let has_fc_builtin_attr v = Cil.hasAttribute "FC_BUILTIN" v.vattr
 
-let is_unused_builtin v = is_builtin v && not v.vreferenced
+let is_unused_builtin v = has_fc_builtin_attr v && not v.vreferenced
 
 
 (* [VP] Should we projectify this ?*)
