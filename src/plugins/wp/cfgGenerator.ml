@@ -69,13 +69,11 @@ let empty_default_behavior : funbehavior = {
 }
 
 let default kf =
-  Populate_spec.populate_funspec kf [`Assigns];
   match Annotations.behaviors kf with
   | [] -> [empty_default_behavior]
   | bhvs -> List.filter Cil.is_default_behavior bhvs
 
 let select kf bnames =
-  Populate_spec.populate_funspec kf [`Assigns];
   match Annotations.behaviors kf with
   | [] -> if bnames = [] then [empty_default_behavior] else []
   | bhvs -> if bnames = [] then bhvs else
@@ -99,7 +97,6 @@ let add_fun_task model pool ~kf ?infos ?bhvs ?target () =
   let bhvs = match bhvs with
     | Some bhvs -> bhvs
     | None ->
-      Populate_spec.populate_funspec kf [`Assigns];
       let bhvs = Annotations.behaviors kf in
       if List.exists (Cil.is_default_behavior) bhvs then bhvs
       else empty_default_behavior :: bhvs in

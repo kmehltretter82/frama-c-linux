@@ -776,14 +776,26 @@ let do_cache_cleanup () =
 (* ---  Command-line Entry Points                                       --- *)
 (* ------------------------------------------------------------------------ *)
 
+let dkey_builtins = Wp_parameters.register_category "builtins"
 let dkey_logicusage = Wp_parameters.register_category "logicusage"
 let dkey_refusage = Wp_parameters.register_category "refusage"
-let dkey_builtins = Wp_parameters.register_category "builtins"
+let dkey_wp_rte = Wp_parameters.register_category "wp-rte"
+
+let wkey_option_deprecated =
+  Wp_parameters.register_warn_category "deprecated"
 
 let cmdline_run () =
   begin
     if Wp_parameters.CachePrint.get () then
       Wp_parameters.feedback "Cache directory: %s" (Cache.get_dir ()) ;
+    if Wp_parameters.TerminatesDefinitions.get ()
+    || Wp_parameters.TerminatesExtDeclarations.get ()
+    || Wp_parameters.TerminatesStdlibDeclarations.get ()
+    then
+      Wp_parameters.warning ~wkey:wkey_option_deprecated
+        "Options -wp-declarations-terminate, -wp-definitions-terminate and \
+         -wp-frama-c-stdlib-terminate are deprecated. See -generated-spec-* \
+         options for more info." ;
     let fct = Wp_parameters.get_fct () in
     if fct <> Wp_parameters.Fct_none then
       begin
@@ -792,8 +804,11 @@ let cmdline_run () =
         let model = generator#model in
         Ast.compute ();
         Dyncall.compute ();
-        if Wp_parameters.RTE.get () then
-          WpRTE.generate_all model ;
+        if Wp_parameters.has_dkey dkey_wp_rte then
+          begin
+            if Wp_parameters.RTE.get () then
+              WpRTE.generate_all model ;
+          end ;
         if Wp_parameters.has_dkey dkey_logicusage then
           begin
             LogicUsage.compute ();
@@ -998,7 +1013,8 @@ let tracelog () =
         (Format.pp_print_list ~pp_sep pp_category) active_keys)
   end
 
-let main = sequence [
+let main = 
+  sequence [
     (fun () -> Wp_parameters.debug ~dkey:dkey_main "Start WP plugin...@.") ;
     do_prover_detect ;
     do_search_tactics ;

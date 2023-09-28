@@ -37,8 +37,7 @@ let get_called_stmt stmt =
   | Instr (Call(_, fct, _, _)) ->
     begin match Kernel_function.get_called fct with
       | Some kf -> [kf]
-      | None -> Option.value ~default:[]
-                  (Option.map snd (Dyncall.get stmt))
+      | None -> Option.value ~default:[] @@ Option.map snd (Dyncall.get stmt)
     end
   | Instr (Local_init (_,ConsInit(vi,_,_),_)) -> [ Globals.Functions.get vi ]
   | _ -> []
@@ -72,8 +71,20 @@ let with_callees kf =
 
 let with_callees = Callees.memo with_callees
 
-let add_with_callees kf =
-  Fct.iter TargetKfs.add (with_callees kf)
+let add_with_callees ~populate_spec kf =
+  let add kf =
+    let insert_spec kf =
+      let specs =
+        if Kernel_function.has_definition kf
+        then [ `Exits ; `Terminates ]
+        else [ `Exits ; `Terminates ; `Assigns ]
+      in
+      Populate_spec.populate_funspec ~do_body:true kf specs
+    in
+    if populate_spec then insert_spec kf ;
+    TargetKfs.add kf
+  in
+  Fct.iter add (with_callees kf)
 
 exception Found
 
@@ -102,7 +113,6 @@ let check_properties behaviors props kf =
   in
   let check_complete_disjoint kf kinstr =
     try
-      Populate_spec.populate_funspec kf [`Assigns];
       let spec = Annotations.funspec kf in
       let comp = ip_complete_of_spec kf kinstr ~active:[] spec in
       let disj = ip_disjoint_of_spec kf kinstr ~active:[] spec in
@@ -128,7 +138,6 @@ let check_properties behaviors props kf =
     in
     let check_call stmt =
       let check_callee kf =
-        Populate_spec.populate_funspec kf [`Assigns];
         let kf_behaviors = Annotations.behaviors kf in
         List.iter (check_bhv_requires kf Kglobal) kf_behaviors
       in
@@ -146,10 +155,10 @@ let check_properties behaviors props kf =
 
 let add_with_behaviors behaviors props kf =
   if behaviors = [] && props = [] then
-    add_with_callees kf
+    add_with_callees ~populate_spec:true kf
   else begin
     try check_properties behaviors props kf
-    with Found -> add_with_callees kf
+    with Found -> add_with_callees ~populate_spec:true kf
   end
 
 let compute model =

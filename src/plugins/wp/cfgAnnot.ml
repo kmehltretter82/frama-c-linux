@@ -159,7 +159,6 @@ let get_requires ~goal kf bhv =
 let get_preconditions ~goal kf =
   let module L = NormAtLabels in
   let mk_pre = L.preproc_annot L.labels_fct_pre in
-  Populate_spec.populate_funspec kf [`Assigns];
   List.map
     (fun bhv ->
        let p = Ast_info.behavior_precondition ~goal bhv in
@@ -168,7 +167,6 @@ let get_preconditions ~goal kf =
     ) (Annotations.behaviors kf)
 
 let get_complete_behaviors kf =
-  Populate_spec.populate_funspec kf [`Assigns];
   let spec = Annotations.funspec kf in
   let module L = NormAtLabels in
   List.map
@@ -178,7 +176,6 @@ let get_complete_behaviors kf =
     ) spec.spec_complete_behaviors
 
 let get_disjoint_behaviors kf =
-  Populate_spec.populate_funspec kf [`Assigns];
   let spec = Annotations.funspec kf in
   let module L = NormAtLabels in
   List.map
@@ -192,67 +189,15 @@ let normalize_terminates p =
   L.preproc_annot L.labels_fct_pre @@
   Logic_const.pat (p.ip_content.tp_statement, BuiltinLabel Pre)
 
-let wp_populate_terminates =
-  Emitter.create
-    "Populate terminates"
-    [Emitter.Property_status]
-    ~correctness:[] (* TBC *)
-    ~tuning:[] (* TBC *)
-
-type terminates_clause =
-  | Defined of WpPropId.prop_id * predicate
-  | Assumed of predicate
-
-let get_terminates_clause kf =
-  (* Note:
-   *  - user-defined terminates always returns Defined
-   *  - generated "terminates \true" are:
-   *      - first handled in a None case and returns Defined
-   *      - then handled in a Some case (as user defined) and returns Defined *)
-  let defined p =
-    Defined (WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p) in
-  let populate_true ?(silence=false) () =
-    let p = Logic_const.new_predicate @@ Logic_const.ptrue in
-    if not silence then
-      Wp_parameters.warning
-        ~source:(fst @@ Kernel_function.get_location kf) ~once:true
-        "Missing terminates clause for %a, populates 'terminates \\true'"
-        Kernel_function.pretty kf ;
-    Annotations.add_terminates wp_populate_terminates kf p ;
-    defined p
-  in
-  let kf_vi = Kernel_function.get_vi kf in
-  let kf_name = Kernel_function.get_name kf in
-  Populate_spec.populate_funspec kf [`Assigns];
-  match Annotations.terminates kf with
-  | None
-    when Cil_builtins.is_builtin kf_vi
-      || Cil_builtins.is_special_builtin kf_name ->
-    populate_true ~silence:true ()
-  | None when Kernel_function.is_in_libc kf ->
-    if not @@ Wp_parameters.TerminatesStdlibDeclarations.get ()
-    then Assumed Logic_const.pfalse
-    else populate_true ()
-  | None when Kernel_function.is_definition kf ->
-    if not @@ Wp_parameters.TerminatesDefinitions.get ()
-    then Assumed Logic_const.pfalse
-    else populate_true ()
-  | None ->
-    if not @@ Wp_parameters.TerminatesExtDeclarations.get ()
-    then Assumed Logic_const.pfalse
-    else populate_true ()
-  | Some p ->
-    defined p
-
 let get_terminates_goal kf =
-  match get_terminates_clause kf with
-  | Assumed _ -> None
-  | Defined (id, p) -> Some (id, p)
+  let make_pred_info p =
+    WpPropId.mk_terminates_id kf Kglobal p, normalize_terminates p in
+  Option.map make_pred_info @@ Annotations.terminates kf
 
 let get_terminates_hyp kf =
-  match get_terminates_clause kf with
-  | Defined (_, p) -> false, p
-  | Assumed p -> true, p
+  match get_terminates_goal kf with
+  | None -> true, Logic_const.pfalse
+  | Some (_, p) -> false, p
 
 let check_variant_relation = function
   | (_, None) -> ()
@@ -340,7 +285,6 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
         let wpost : WpPropId.pred_info list ref = ref [] in
         let wexit : WpPropId.pred_info list ref = ref [] in
         let add w f x = match f x with Some y -> w := y :: !w | None -> () in
-        Populate_spec.populate_funspec kf [`Assigns];
         let behaviors = Annotations.behaviors kf in
         setup_preconditions kf ;
         List.iter
