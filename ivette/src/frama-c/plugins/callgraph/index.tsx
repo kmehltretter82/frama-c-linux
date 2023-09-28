@@ -128,8 +128,8 @@ function Callgraph() : JSX.Element {
   const [cy, setCy] = React.useState<Cy.Core>();
   const [cs] = useGlobalState(CallstackState);
   const callstack = States.useRequest(ValuesAPI.getCallstackInfo, cs);
-  const { decl } = States.useCurrent();
-  const { kind, name } = States.useDeclaration(decl);
+  const scope = States.useCurrentScope();
+  const { kind, name } = States.useDeclaration(scope);
   const fct = kind === 'FUNCTION' ? name : undefined;
   const layout = { name: 'cola', nodeSpacing: 32 };
   const computedStyle = getComputedStyle(document.documentElement);
@@ -158,7 +158,7 @@ function Callgraph() : JSX.Element {
       cy.off('click');
       cy.on('click', 'node', (event) => {
         const { decl } = event.target.data;
-        States.setCurrent({ decl });
+        States.setCurrentScope(decl);
       });
     }
   }, [cy]);

@@ -139,8 +139,8 @@ function createSyncOnUserSelection(): Editor.Extension {
         if (marker) {
           // The forced reload should NOT be necessary but... It is...
           await Server.send(Ast.reloadMarkerAttributes, null);
-          States.gotoGlobalMarker(marker);
-          const location = States.getCurrent();
+          States.setSelected(marker);
+          const location = States.getCurrentLocation();
           Locations.set(view, { cursor: location, current: location });
         }
       } catch {
@@ -161,7 +161,7 @@ function createSyncOnOutsideSelection(): Editor.Extension {
     if (current === undefined || current === cursor) return;
     const source = get(current); if (!source) return;
     const newDecl =
-      current.decl !== cursor?.decl && current.marker === undefined;
+      current.scope !== cursor?.scope && current.marker === undefined;
     const onTop = cursor === undefined || newDecl;
     Locations.set(view, { cursor: current, current });
     Editor.selectLine(view, source.line, onTop);
@@ -209,10 +209,10 @@ function useFctSource(file: string): string {
 function useSourceGetter(): GetSource {
   const getAttr = States.useSyncArrayGetter(Ast.markerAttributes);
   const getDecl = States.useSyncArrayGetter(Ast.declAttributes);
-  return React.useCallback(({ decl, marker }) => {
+  return React.useCallback(({ scope, marker }) => {
     const { sloc, scope: markerDecl } = getAttr(marker) ?? {};
     if (sloc) return sloc;
-    const { source } = getDecl(decl ?? markerDecl) ?? {};
+    const { source } = getDecl(scope ?? markerDecl) ?? {};
     return source;
   }, [getAttr, getDecl]);
 }
@@ -245,7 +245,7 @@ export default function SourceCode(): JSX.Element {
   const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
   const [command] = Settings.useGlobalSettings(Preferences.EditorCommand);
   const { view, Component } = Editor.Editor(extensions);
-  const current = States.useCurrent();
+  const current = States.useCurrentLocation();
   const getSource = useSourceGetter();
   const file = getSource(current)?.file ?? '';
   const filename = Path.parse(file).base;

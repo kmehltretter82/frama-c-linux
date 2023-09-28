@@ -76,11 +76,11 @@ export function CoverageTable(): JSX.Element {
     model.setSorting({ sortBy: 'coverage', sortDirection: 'ASC' });
   }, [model]);
 
-  const { decl } = States.useCurrent();
-  const { kind, name } = States.useDeclaration(decl);
+  const scope = States.useCurrentScope();
+  const { kind, name } = States.useDeclaration(scope);
   const selection = kind==='FUNCTION' ? name : undefined;
   const onSelection = ({ decl }: stats): void => {
-    States.gotoDeclaration(decl);
+    States.setCurrentScope(decl);
   };
 
   return (

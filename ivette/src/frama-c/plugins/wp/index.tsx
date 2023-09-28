@@ -43,14 +43,14 @@ import './style.css';
 function WPGoals(): JSX.Element {
   const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped');
   const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed');
-  const { decl } = States.useCurrent();
+  const scope = States.useCurrentScope();
   const [goals, setGoals] = React.useState(0);
   const [total, setTotal] = React.useState(0);
   const onFilter = React.useCallback((goals, total) => {
     setGoals(goals);
     setTotal(total);
   }, [setGoals, setTotal]);
-  const scope = scoped ? decl : undefined;
+  const current = scoped ? scope : undefined;
     return (
       <>
         <Ivette.TitleBar>
@@ -59,7 +59,7 @@ function WPGoals(): JSX.Element {
           </Label>
           <Inset />
           <IconButton icon='COMPONENT' title='Current Scope Only'
-                      enabled={!!scope}
+                      enabled={!!current}
                       selected={scoped} onClick={flipScoped} />
           <IconButton icon='CIRC.QUESTION' title='Unresolved Goals Only'
                       selected={failed} onClick={flipFailed} />

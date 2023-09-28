@@ -439,7 +439,7 @@ export default function RenderMessages(): JSX.Element {
 
   const filterState = useGlobalState(globalFilterState);
   const [filter] = filterState;
-  const { decl: selectedDecl } = States.useCurrent();
+  const selectedDecl = States.useCurrentScope();
   const [selectedMsg, selectMsg] = React.useState<Message|undefined>(undefined);
   const [text, setText] = React.useState('');
 
@@ -457,7 +457,7 @@ export default function RenderMessages(): JSX.Element {
       selectMsg(msg);
       setText(msg.message);
       if (msg.decl || msg.marker) {
-        States.setCurrent({ decl: msg.decl, marker: msg.marker });
+        States.setCurrentLocation({ scope: msg.decl, marker: msg.marker });
       }
     }, []
   );

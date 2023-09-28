@@ -51,7 +51,7 @@ async function lookupGlobals(pattern: string): Promise<Toolbars.Hint[]> {
     id: g.decl,
     label: g.name,
     title: g.label,
-    value: () => States.gotoDeclaration(g.decl)
+    value: () => States.setCurrentScope(g.decl)
   }));
 }
 
@@ -82,7 +82,7 @@ function FctItem(props: FctItemProps): JSX.Element {
       label={name}
       title={signature}
       selected={name === props.current}
-      onSelection={() => States.gotoDeclaration(decl)}
+      onSelection={() => States.setCurrentScope(decl)}
     >
       {attributes && <span className="globals-attr">{attributes}</span>}
     </Item>
@@ -113,8 +113,8 @@ function computeFcts(
 export default function Globals(): JSX.Element {
 
   // Hooks
-  const { decl } = States.useCurrent();
-  const { kind, name } = States.useDeclaration(decl);
+  const scope = States.useCurrentScope();
+  const { kind, name } = States.useDeclaration(scope);
   const ker = States.useSyncArrayProxy(Ast.functions);
   const eva = States.useSyncArrayProxy(Eva.functions);
   const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
@@ -138,7 +138,7 @@ export default function Globals(): JSX.Element {
   const evaComputed = States.useSyncValue(computationState) === 'computed';
 
   // Currently selected function.
-  const current = (decl && kind === 'FUNCTION') ? name : undefined;
+  const current = (scope && kind === 'FUNCTION') ? name : undefined;
 
   function showFunction(fct: functionsData): boolean {
     const visible =

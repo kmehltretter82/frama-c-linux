@@ -57,7 +57,7 @@ type Property =
 // --------------------------------------------------------------------------
 
 const DEFAULTS: { [key: string]: boolean } = {
-  currentFunction: false,
+  'currentScope': false,
   'status.valid': true,
   'status.valid_hyp': true,
   'status.unknown': true,
@@ -370,15 +370,15 @@ class PropertyModel extends Arrays.CompactModel<PropKey, Property> {
     this.setFilter(this.filterItem.bind(this));
   }
 
-  setFilterFunction(kf?: string): void {
+  setFilterScope(kf?: string): void {
     this.filterFun = kf;
-    if (filter('currentFunction')) this.reload();
+    if (filter('currentScope')) this.reload();
   }
 
   filterItem(prop: Property): boolean {
     const kf = prop.fct;
     const cf = this.filterFun;
-    const filteringFun = cf && filter('currentFunction');
+    const filteringFun = cf && filter('currentScope');
     const filterFunction = filteringFun ? kf === cf : true;
     return filterFunction && filterProperty(prop);
   }
@@ -470,7 +470,7 @@ function CheckField(props: CheckFieldProps): JSX.Element {
 function PropertyFilter(): JSX.Element {
   return (
     <Scroll>
-      <CheckField label="Current function" path="currentFunction" />
+      <CheckField label="Current scope" path="currentScope" />
       <FilterSection label="Status" prefix="status" unfold>
         <CheckField label="Valid" path="status.valid" />
         <CheckField label="Valid under hyp." path="status.valid_hyp" />
@@ -680,10 +680,10 @@ export default function RenderProperties(): JSX.Element {
     populateModel(model, props, evaps);
   }, [model, props, evaps]);
 
-  const { marker } = States.useCurrent();
+  const marker = States.useSelected();
   const { scope } = States.useMarker(marker);
   const propertySelection = marker;
-  const selectedFunction = marker && scope;
+  const selectedScope = marker && scope;
 
   const [showFilter, flipFilter] =
     Dome.useFlipSettings('ivette.properties.showFilter', true);
@@ -691,13 +691,13 @@ export default function RenderProperties(): JSX.Element {
   // Updating the filter
   Dome.useEvent(Reload, model.reload);
   React.useEffect(() => {
-    model.setFilterFunction(selectedFunction);
-  }, [model, selectedFunction]);
+    model.setFilterScope(selectedScope);
+  }, [model, selectedScope]);
 
   // Callbacks
 
   const onPropertySelection = React.useCallback(
-    (p: Property) => States.gotoGlobalMarker(p.key), []
+    (p: Property) => States.setSelected(p.key), []
   );
 
   return (

@@ -106,7 +106,7 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
 
   const onWpoSelection = React.useCallback(
     ({ wpo, property }: WP.goalsData) => {
-      States.gotoGlobalMarker(property);
+      States.setSelected(property);
       setWpoSelection(wpo);
     }, []);
 

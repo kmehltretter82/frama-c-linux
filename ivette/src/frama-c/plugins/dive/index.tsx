@@ -581,7 +581,7 @@ const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
   const { lock, layout, selectionMode } = props;
 
   const [dive, setDive] = useState(() => new Dive());
-  const selection = States.useCurrent();
+  const selection = States.useCurrentLocation();
   const graph = States.useSyncArrayData(API.graph);
 
   function setCy(cy: Cytoscape.Core): void {

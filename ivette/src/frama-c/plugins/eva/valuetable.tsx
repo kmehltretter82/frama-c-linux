@@ -151,7 +151,6 @@ function useCallsitesCache(): Request<callstack, Callsite[]> {
 /* A Location is a marker in a function */
 interface Location {
   fct: string;
-  decl: Ast.decl;
   marker: Ast.marker;
 }
 
@@ -277,7 +276,7 @@ async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
     if (!caller || !stmt) return <></>;
     const key = `${caller}@${stmt}`;
     const select = (meta: boolean): void => {
-      States.gotoGlobalMarker(stmt, meta);
+      States.setSelected(stmt, meta);
     };
     const onClick = (evt: React.MouseEvent): void => { select(evt.altKey); };
     const onDoubleClick = (evt: React.MouseEvent): void => {
@@ -333,7 +332,7 @@ interface ProbeHeaderProps {
 
 function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
   const { probe, status, locEvt } = props;
-  const { code = '(error)', stmt, marker, decl, fct } = probe;
+  const { code = '(error)', stmt, marker, fct } = probe;
   const color = classes(MarkerStatusClass(status), 'eva-table-header-sticky');
   const { selectProbe, removeProbe, pinProbe } = props;
   const span = 1 + (probe.effects ? 1 : 0) + (probe.condition ? 2 : 0);
@@ -347,7 +346,7 @@ function ProbeHeader(props: ProbeHeaderProps): JSX.Element {
   const isPinned = isPinnedMarker(status);
   const pinText = isPinned ? 'Unpin' : 'Pin';
   const onClick = (): void => {
-    States.setCurrent({ marker, decl });
+    States.setSelected(marker);
     selectProbe();
   };
   const onDoubleClick = (): void => pinProbe(!isPinned);
@@ -470,7 +469,7 @@ interface ProbeValuesProps {
 
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   const { probe, addLoc, isSelectedCallstack } = props;
-  const { fct, decl } = probe;
+  const { fct } = probe;
 
   // Building common parts
   const onContextMenu = (evaluation?: Values.evaluation) => (): void => {
@@ -482,7 +481,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     pointedVars.forEach((lval) => {
       const [text, lvalMarker] = lval;
       const label = `Display values for ${text}`;
-      const location = { decl, fct, marker: lvalMarker };
+      const location = { fct, marker: lvalMarker };
       const onItemClick = (): void => addLoc(location);
       items.push({ label, onClick: onItemClick });
     });
@@ -583,7 +582,6 @@ async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
 
 interface FunctionProps {
   fct: string;
-  decl: Ast.decl;
   markers: Map<Ast.marker, MarkerStatus>;
   close: () => void;
   getProbe: Request<Location, Probe>;
@@ -607,7 +605,7 @@ interface FunctionProps {
 const PageSize = 99;
 
 async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
-  const { fct, decl, folded, isSelectedCallstack, locEvt } = props;
+  const { fct, folded, isSelectedCallstack, locEvt } = props;
   const { byCallstacks, getCallsites } = props;
   const { addLoc, getCallstacks: getCS } = props;
   const { setFolded, setByCallstacks, close } = props;
@@ -631,7 +629,7 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   interface Data { probe: Probe; summary: Evaluation; status: MarkerStatus }
   const entries = Array.from(props.markers.entries());
   const data = await Promise.all(entries.map(async ([ marker, status ]) => {
-    const probe = await props.getProbe({ marker, decl, fct });
+    const probe = await props.getProbe({ marker, fct });
     const summary = await probe.evaluate('Summary');
     return { probe, summary, status } as Data;
   }));
@@ -765,16 +763,14 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
 class FunctionInfos {
 
   readonly fct: string;                     // Function's name
-  readonly decl: Ast.decl;                  // Function's declaration
   readonly pinned = new Set<Ast.marker>();  // Pinned markers
   readonly tracked = new Set<Ast.marker>(); // Tracked markers
   startingCallstack = 1;                    // First displayed callstack
   byCallstacks = false;                     // True if displayed by callstacks
   folded = false;                           // True if folded
 
-  constructor(fct: string, decl: Ast.decl) {
+  constructor(fct: string) {
     this.fct = fct;
-    this.decl = decl;
   }
 
   has(marker: Ast.marker): boolean {
@@ -832,14 +828,14 @@ class FunctionsManager {
     this.map = this.map.bind(this);
   }
 
-  newFunction(fct: string, decl: Ast.decl): void {
-    if (!this.cache.has(fct)) this.cache.set(fct, new FunctionInfos(fct, decl));
+  newFunction(fct: string): void {
+    if (!this.cache.has(fct)) this.cache.set(fct, new FunctionInfos(fct));
   }
 
-  private getInfos(fct: string, decl: Ast.decl): FunctionInfos {
+  private getInfos(fct: string): FunctionInfos {
     const { cache } = this;
     if (cache.has(fct)) return cache.get(fct) as FunctionInfos;
-    const infos = new FunctionInfos(fct, decl);
+    const infos = new FunctionInfos(fct);
     this.cache.set(fct, infos);
     return infos;
   }
@@ -865,8 +861,8 @@ class FunctionsManager {
   }
 
   pin(loc: Location): void {
-    const { marker, fct, decl } = loc;
-    this.getInfos(fct, decl).pin(marker);
+    const { marker, fct } = loc;
+    this.getInfos(fct).pin(marker);
   }
 
   unpin(loc: Location): void {
@@ -875,8 +871,8 @@ class FunctionsManager {
   }
 
   track(loc: Location): void {
-    const { marker, fct, decl } = loc;
-    this.getInfos(fct, decl).track(marker);
+    const { marker, fct } = loc;
+    this.getInfos(fct).track(marker);
   }
 
   removeLocation(loc: Location): void {
@@ -984,13 +980,13 @@ const FocusState = new GlobalState<Probe | undefined>(undefined);
 function EvaTable(): JSX.Element {
 
   /* Component state */
-  const { marker, decl } = States.useCurrent();
-  const { kind, name } = States.useDeclaration(decl);
+  const { marker, scope } = States.useCurrentLocation();
+  const { kind, name } = States.useDeclaration(scope);
   const fct = kind === 'FUNCTION' ? name : undefined;
   const current: Location | undefined = React.useMemo(
     (): Location | undefined =>
-      ((marker && decl && fct) ? { marker, decl, fct } : undefined)
-    , [marker, decl, fct]);
+      ((marker && fct) ? { marker, fct } : undefined)
+    , [marker, fct]);
     const [ cs, setCS ] = useGlobalState(CallstackState);
   const [ fcts ] = useGlobalState(FunctionsManagerState);
   const [ focus, setFocus ] = useGlobalState(FocusState);
@@ -1031,12 +1027,12 @@ function EvaTable(): JSX.Element {
     fcts.clean(current);
     const doUpdate = (p: Probe): void => {
       if (!p.evaluable) { setFocus(undefined); return; }
-      if (fct && decl && p.code) fcts.newFunction(fct, decl);
+      if (fct && scope && p.code) fcts.newFunction(fct);
       setFocus(p); locEvt.emit(p);
     };
     if (current) getProbe(current).then(doUpdate);
     else setFocus(undefined);
-  }, [ fcts, current, fct, decl, getProbe, setFocus, locEvt ]);
+  }, [ fcts, current, fct, scope, getProbe, setFocus, locEvt ]);
 
   /* Callback used to pin or unpin a location */
   const setLocPin = React.useCallback((loc: Location, pin: boolean): void => {
@@ -1048,8 +1044,8 @@ function EvaTable(): JSX.Element {
   /* On meta-selection, pin the selected location. */
   React.useEffect(() => {
     const pin = (loc: States.Location): void => {
-      const { marker, decl } = loc;
-      if (marker && decl && fct) setLocPin({ marker, decl, fct }, true);
+      const { marker } = loc;
+      if (marker && fct) setLocPin({ marker, fct }, true);
     };
     States.MetaSelection.on(pin);
     return () => States.MetaSelection.off(pin);
@@ -1073,7 +1069,7 @@ function EvaTable(): JSX.Element {
    * memoize the promises building. */
   const functionsPromise = React.useMemo(() => {
     const ps = fcts.map((infos, fct) => {
-      const { byCallstacks, folded, decl } = infos;
+      const { byCallstacks, folded } = infos;
       const isSelectedCallstack = (c: callstack): boolean => c === cs;
       const setFolded = (folded: boolean): void => {
         fcts.setFolded(fct, folded);
@@ -1094,7 +1090,6 @@ function EvaTable(): JSX.Element {
       };
       return {
         fct,
-        decl,
         markers: infos.markers(focus),
         close,
         pinProbe: setLocPin,

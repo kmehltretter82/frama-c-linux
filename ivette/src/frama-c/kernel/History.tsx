@@ -29,19 +29,19 @@ import * as Toolbar from 'dome/frame/toolbars';
 import * as States from 'frama-c/states';
 
 export default function History(): JSX.Element {
-  const selection = States.useSelection();
+  const history = States.useHistory();
   return (
     <Toolbar.ButtonGroup>
       <Toolbar.Button
         icon="ANGLE.LEFT"
         onClick={States.gotoNext}
-        enabled={selection.next.length > 0}
+        enabled={history.next.length > 0}
         title="Previous location"
       />
       <Toolbar.Button
         icon="ANGLE.RIGHT"
         onClick={States.gotoPrev}
-        enabled={selection.prev.length > 0}
+        enabled={history.prev.length > 0}
         title="Next location"
       />
     </Toolbar.ButtonGroup>

@@ -57,7 +57,7 @@ async function setFiles(): Promise<void> {
   });
   if (files) {
     await parseFiles(files);
-    States.clearSelection();
+    States.clearHistory();
   }
   return;
 }
@@ -90,7 +90,7 @@ async function loadSession(): Promise<void> {
   const file = await Dialogs.showOpenFile({ title: 'Load a saved session' });
   Status.setMessage({ text: 'Loading session…', kind: 'progress' });
   const error = await Server.send(Services.load, file);
-  States.clearSelection();
+  States.clearHistory();
   if (error) {
     Status.setMessage({
       text: 'Error when loading the session',

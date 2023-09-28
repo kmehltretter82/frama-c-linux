@@ -164,13 +164,13 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
     props.setPinned(marker);
     switch (modifier) {
       case 'NORMAL':
-        States.gotoLocalMarker(m);
+        States.setMarked(m);
         break;
       case 'META':
-        States.gotoLocalMarker(m, m !== marker);
+        States.setMarked(m, m !== marker);
         break;
       case 'DOUBLE':
-        States.gotoGlobalMarker(m);
+        States.setSelected(m);
         break;
     }
   };
@@ -273,7 +273,7 @@ export default function ASTinfo(): JSX.Element {
   // Selection Hooks
   const [markers, setMarkers] = React.useState<AST.marker[]>([]);
   const [setting, setSetting] = Dome.useStringSettings(filterSettings, '');
-  const { decl: current, marker: selected } = States.useCurrent();
+  const { scope: current, marker: selected } = States.useCurrentLocation();
   const hovered = States.useHovered();
   const allFields = States.useRequest(AST.getInformation, null) ?? [];
   const excluded = React.useMemo(() => makeFilter(setting), [setting]);

@@ -49,7 +49,6 @@ import * as Preferences from 'ivette/prefs';
 
 // An alias type for functions and locations.
 type Fct = string | undefined;
-type Decl = Ast.decl | undefined;
 type Marker = Ast.marker | undefined;
 
 // A range is just a pair of position in the code.
@@ -174,9 +173,6 @@ const Ranges = Editor.createAspect({ t: Tree }, ({ t }) => markersRanges(t));
 //  Selected marker representation
 // -----------------------------------------------------------------------------
 
-// This field contains the currently selected function.
-const Decl = Editor.createField<Decl>(undefined);
-
 // This field contains the currently selected marker.
 const Marker = Editor.createField<Marker>(undefined);
 
@@ -190,12 +186,12 @@ const Multiple = Editor.createField<Marker[]>([]);
 // component's render and thus update everything else.
 const MarkerUpdater = createMarkerUpdater();
 function createMarkerUpdater(): Editor.Extension {
-  const deps = { decl: Decl, tree: Tree };
+  const deps = { tree: Tree };
   return Editor.createEventHandler(deps, {
-    mouseup: ({ decl, tree }, view, event) => {
+    mouseup: ({ tree }, view, event) => {
       const main = view.state.selection.main;
       const marker = coveringNode(tree, main.from)?.marker;
-      States.setCurrent({ decl, marker }, event.altKey);
+      States.setMarked(marker, event.altKey);
     }
   });
 }
@@ -552,11 +548,11 @@ function createContextMenuHandler(): Editor.Extension {
         });
       } else if (definition) {
         const label = `Go to ${labelKind} ${name}`;
-        const onClick = (): void => States.gotoGlobalMarker(definition);
+        const onClick = (): void => States.setSelected(definition);
         items.push({ label, onClick });
       } else if (callees.length > 0) {
         callees.forEach(({ fct, decl }) => {
-          const onClick = (): void => States.gotoDeclaration(decl);
+          const onClick = (): void => States.setCurrentScope(decl);
           const label = `Go to definition of ${fct} (indirect)`;
           items.push({ label, onClick });
         });
@@ -707,8 +703,7 @@ export default function ASTview(): JSX.Element {
   const { view, Component } = Editor.Editor(extensions);
 
   // Current selection
-  const { decl, marker } = States.useCurrent();
-  React.useEffect(() => Decl.set(view, decl), [view, decl]);
+  const { scope, marker } = States.useCurrentLocation();
   React.useEffect(() => Marker.set(view, marker), [view, marker]);
   const hovered = States.useHovered();
   React.useEffect(() => Hovered.set(view, hovered), [view, hovered]);
@@ -730,11 +725,11 @@ export default function ASTview(): JSX.Element {
   React.useEffect(() => GetMarkerData.set(view, getData), [view, getData]);
 
   // Printed AST
-  const text = useAST(decl);
+  const text = useAST(scope);
   React.useEffect(() => Text.set(view, text), [view, text]);
 
   // EVA Callbacks
-  const { kind, name } = States.useDeclaration(decl);
+  const { kind, name } = States.useDeclaration(scope);
   const fct = kind==='FUNCTION' ? name : undefined;
   const dead = useFctDead(fct);
   React.useEffect(() => Dead.set(view, dead), [view, dead]);

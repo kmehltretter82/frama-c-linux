@@ -515,76 +515,151 @@ export function onSyncArray<K, A>(
 }
 
 // --------------------------------------------------------------------------
-// --- Selection
+// --- Selection & History
 // --------------------------------------------------------------------------
 
+export type Scope = Ast.decl | undefined
+export type Marker = Ast.marker | undefined
+
 /**
-   A global Ivette selection.
 
-   There is no expected relation between the current marker and declaration:
+   The current scope and the currently selected marker can updated in different
+   ways. They are generally related to each other, however this is not always
+   the case. The three different way of updating the current location are:
 
-   - current marker is used to synchronize selection in components;
-   - current declaration is used to synchronize filtering in components;
-   - some components might display markers from different declarations.
+   - `setCurrentScope` changes the currently printed declaration and sets
+     the current marker to itself.
+
+   - `setMarked` only updates the currently selected marker, without changing
+     the current scope.
+
+   - `setSelected` updates the currently selected marker and change the current
+     scope accordingly, when available.
 
 */
 export interface Location {
-  decl?: Ast.decl;
+  scope?: Ast.decl;
   marker?: Ast.marker;
 }
 
 /** Global current selection & history. */
-export interface Selection {
+export interface History {
   curr: Location; // might be empty
   prev: Location[]; // last first, no empty locs
   next: Location[]; // next first, no empty locs
 }
 
-const emptySelection: Selection = { curr: {}, prev: [], next: [] };
-const isEmpty = (l: Location): boolean => (!l.decl && !l.marker);
+const emptyHistory: History = { curr: {}, prev: [], next: [] };
+const isEmpty = (l: Location): boolean => (!l.scope && !l.marker);
 const pushLoc = (l: Location, ls: Location[]): Location[] =>
   (isEmpty(l) ? ls : [l, ...ls]);
 
-export type Hovered = Ast.marker | undefined
 export const MetaSelection = new Dome.Event<Location>('frama-c-meta-selection');
-export const GlobalHovered = new GlobalState<Hovered>(undefined);
-export const GlobalSelection = new GlobalState<Selection>(emptySelection);
+export const GlobalHovered = new GlobalState<Marker>(undefined);
+export const GlobalHistory = new GlobalState<History>(emptyHistory);
 
-Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
+// --------------------------------------------------------------------------
+// --- Global Update & Synchronisation
+// --------------------------------------------------------------------------
 
-export function setHovered(h: Hovered = undefined): void {
+// Sycnhronisation of current selection.
+// Low level access only
+function syncCurrent(): void {
+  const s = GlobalHistory.getValue();
+  const { curr: { scope, marker } } = s;
+  if (scope === undefined && marker !== undefined) {
+    // Try to update decl.
+    const st = currentSyncArray(Ast.markerAttributes);
+    const { scope: decl } = st.model.getData(marker) ?? {};
+    if (decl) GlobalHistory.setValue({ ...s, curr: { scope, marker } });
+    return;
+  }
+  if (scope !== undefined && marker === undefined) {
+    // Try to update mark.
+    const st = currentSyncArray(Ast.declAttributes);
+    const { self: marker } = st.model.getData(scope) ?? {};
+    if (marker) GlobalHistory.setValue({ ...s, curr: { scope, marker } });
+  }
+}
+
+{
+
+  Server.onReady(clearHistory);
+  Server.onShutdown(clearHistory);
+  onSyncArray(Ast.markerAttributes, syncCurrent);
+  onSyncArray(Ast.declAttributes, syncCurrent);
+}
+
+// --------------------------------------------------------------------------
+// --- Selection API
+// --------------------------------------------------------------------------
+
+export function setHovered(h: Marker = undefined): void {
   GlobalHovered.setValue(h);
 }
 
-export function useHovered(): Hovered {
+export function useHovered(): Marker {
   const [h] = useGlobalState(GlobalHovered);
   return h;
 }
 
-export function useSelection(): Selection {
-  const [current] = useGlobalState(GlobalSelection);
-  return current;
+export function useSelected(): Marker {
+  const [{ curr: { marker } }] = useGlobalState(GlobalHistory);
+  return marker;
 }
 
-export function clearSelection(): void {
-  GlobalHovered.setValue(undefined);
-  GlobalSelection.setValue(emptySelection);
+/** Does not modify current scope, only current marker. */
+export function setMarked(marker: Marker = undefined, meta = false): void {
+  const scope = GlobalHistory.getValue().curr.scope;
+  setCurrentLocation({ scope, marker }, meta);
 }
 
-export function getCurrent(): Location {
-  return GlobalSelection.getValue().curr;
+/** Set selected marker and update scope accordingly. */
+export function setSelected(marker: Marker = undefined, meta = false): void {
+  if (marker === undefined) {
+    const { curr: { scope } } = GlobalHistory.getValue();
+    setCurrentLocation({ scope });
+  } else {
+    const st = currentSyncArray(Ast.markerAttributes);
+    const { scope } = st.model.getData(marker) ?? {};
+    if (scope)
+      setCurrentLocation({ scope, marker }, meta);
+    else {
+      const { curr: { scope } } = GlobalHistory.getValue();
+      setCurrentLocation({ scope, marker }, meta);
+    }
+  }
 }
 
-export function useCurrent(): Location {
-  const [{ curr }] = useGlobalState(GlobalSelection);
+/** Set current scope and move current marker to its declaration. */
+export function setCurrentScope(scope: Scope): void {
+  if (scope === undefined) {
+    setCurrentLocation({});
+  } else {
+    const st = currentSyncArray(Ast.declAttributes);
+    const { self: marker } = st.model.getData(scope) ?? {};
+    setCurrentLocation({ scope, marker });
+  }
+}
+
+export function useCurrentScope(): Scope {
+  const [{ curr: { scope } }] = useGlobalState(GlobalHistory);
+  return scope;
+}
+
+export function getCurrentLocation(): Location {
+  return GlobalHistory.getValue().curr;
+}
+
+export function useCurrentLocation(): Location {
+  const [{ curr }] = useGlobalState(GlobalHistory);
   return curr;
 }
 
-/** Move both current declaration and marker. */
-export function setCurrent(l: Location, meta = false): void {
-  const s = GlobalSelection.getValue();
+export function setCurrentLocation(l: Location, meta = false): void {
+  const s = GlobalHistory.getValue();
   const empty = isEmpty(l);
-  GlobalSelection.setValue({
+  GlobalHistory.setValue({
     curr: l,
     next: empty ? s.next : [],
     prev: pushLoc(s.curr, s.prev)
@@ -592,48 +667,30 @@ export function setCurrent(l: Location, meta = false): void {
   if (meta && !empty) MetaSelection.emit(l);
 }
 
-/** Move to marker in current declaration. */
-export function gotoLocalMarker(
-  marker : Ast.marker | undefined,
-  meta = false
-): void
-{
-  const s = GlobalSelection.getValue();
-  setCurrent({ decl: s.curr.decl, marker }, meta);
+export function useHistory(): History {
+  const [h] = useGlobalState(GlobalHistory);
+  return h;
 }
 
-/** Move to marker in its own declaration (if any). */
-export function gotoGlobalMarker(marker : Ast.marker, meta = false): void
-{
-  const st = currentSyncArray(Ast.markerAttributes);
-  const attr = st.model.getData(marker);
-  const decl = attr?.scope;
-  if (decl) setCurrent({ decl, marker }, meta);
-  else gotoLocalMarker(marker, meta);
-}
-
-/** Move to declaration. */
-export function gotoDeclaration(decl: Ast.decl | undefined): void
-{
-  setCurrent({ decl });
-}
-
-/** Move forward in history. */
 export function gotoNext(): void {
-  const s = GlobalSelection.getValue();
+  const s = GlobalHistory.getValue();
   if (s.next.length > 0) {
     const [curr, ...next] = s.next;
-    GlobalSelection.setValue({ curr, next, prev: pushLoc(s.curr, s.prev) });
+    GlobalHistory.setValue({ curr, next, prev: pushLoc(s.curr, s.prev) });
   }
 }
 
-/** Move backward in history. */
 export function gotoPrev(): void {
-  const s = GlobalSelection.getValue();
+  const s = GlobalHistory.getValue();
   if (s.prev.length > 0) {
     const [curr, ...prev] = s.prev;
-    GlobalSelection.setValue({ curr, next: pushLoc(s.curr, s.next), prev });
+    GlobalHistory.setValue({ curr, next: pushLoc(s.curr, s.next), prev });
   }
+}
+
+export function clearHistory(): void {
+  GlobalHovered.setValue(undefined);
+  GlobalHistory.setValue(emptyHistory);
 }
 
 // --------------------------------------------------------------------------
@@ -659,15 +716,5 @@ export function useMarker(marker: Ast.marker | undefined): attributes {
   const data = useSyncArrayElt(Ast.markerAttributes, marker);
   return data ?? Ast.markerAttributesDataDefault;
 }
-
-// --------------------------------------------------------------------------
-// --- General Synchro
-// --------------------------------------------------------------------------
-
-Server.onReady(() => {
-  const s = GlobalSelection.getValue();
-  if (s.curr.decl || s.curr.marker || s.next.length > 0 || s.prev.length > 0)
-    clearSelection();
-});
 
 // --------------------------------------------------------------------------

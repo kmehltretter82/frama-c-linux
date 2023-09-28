@@ -66,7 +66,7 @@ export function setSelection(s: MultiSelection): void
 {
   const { index=0, ...data } = s;
   MultiSelection.setValue({ ...data, index });
-  States.gotoGlobalMarker(data.markers[index]);
+  States.setSelected(data.markers[index]);
 }
 
 export function setIndex(index: number): void {
