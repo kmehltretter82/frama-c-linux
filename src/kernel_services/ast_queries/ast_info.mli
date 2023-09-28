@@ -275,6 +275,12 @@ val start_with_frama_c_builtin: string -> bool
     @since Frama-C+dev
 *)
 
+val is_frama_c_builtin: varinfo -> bool
+(** @return true if {!start_with_frama_c_builtin} or
+    {!Cil_builtins.has_fc_builtin_attr} are true.
+    @before Frama-C+dev Behave like {!start_with_frama_c_builtin}.
+*)
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."
