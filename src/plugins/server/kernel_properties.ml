@@ -308,7 +308,7 @@ let is_relevant ip =
   match Property.get_kf ip with
   | None -> true
   | Some kf ->
-    not (Ast_info.is_frama_c_builtin (Kernel_function.get_name kf)
+    not (Ast_info.start_with_frama_c_builtin (Kernel_function.get_name kf)
          || Cil_builtins.is_unused_builtin (Kernel_function.get_vi kf))
 
 let iter f =

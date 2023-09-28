@@ -85,7 +85,7 @@ let do_copy_at = function
 let is_determinate kf =
   let name = Kernel_function.get_name kf in
   (warn_indeterminate kf || Function_calls.use_spec_instead_of_definition kf)
-  && not (Ast_info.is_frama_c_builtin name)
+  && not (Ast_info.start_with_frama_c_builtin name)
 
 let subdivide_stmt = Eva_utils.get_subdivision
 
@@ -708,15 +708,15 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   (** Applies the show_each or dump_each directives. *)
   let apply_special_directives ~subdivnb kf arguments state =
     let name = Kernel_function.get_name kf in
-    if Ast_info.can_be_cea_function name
+    if Ast_info.start_with_frama_c name
     then
-      if Ast_info.is_cea_function name
+      if Ast_info.is_show_each_builtin name
       then (show_each ~subdivnb name arguments state; true)
-      else if Ast_info.is_cea_domain_function name
+      else if Ast_info.is_domain_show_each_builtin name
       then (domain_show_each ~subdivnb name arguments state; true)
-      else if Ast_info.is_cea_dump_file_function name
+      else if Ast_info.is_dump_file_builtin name
       then (dump_state_file ~subdivnb name arguments state; true)
-      else if Ast_info.is_cea_dump_function name
+      else if Ast_info.is_dump_each_builtin name
       then (dump_state name state; true)
       else false
     else false

@@ -177,7 +177,7 @@ module Base_checker = struct
         let unknown () =
           check_abort "variable %s(%d) is not declared" v.vname v.vid
         in
-        if not v.vglob || not (Ast_info.is_frama_c_builtin v.vname) then
+        if not v.vglob || not (Ast_info.start_with_frama_c_builtin v.vname) then
           (try
              if Varinfo.Hashtbl.find known_vars v != v then not_shared ()
            with Not_found -> unknown ()

@@ -173,7 +173,7 @@ class visitor = object(self)
           Error.assigns_non_ghost_lvalue ~current:true lv
       in
       let is_builtin vi =
-        Ast_info.is_frama_c_builtin vi.vname ||
+        Ast_info.start_with_frama_c_builtin vi.vname ||
         Cil_builtins.is_builtin vi
       in
       let failed = match i with

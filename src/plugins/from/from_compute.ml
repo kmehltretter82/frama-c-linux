@@ -346,7 +346,7 @@ struct
       let states_with_formals = ref [] in
       let do_on kf =
         let called_vinfo = Kernel_function.get_vi kf in
-        if Ast_info.is_frama_c_builtin called_vinfo.vname then
+        if Ast_info.start_with_frama_c_builtin called_vinfo.vname then
           state
         else
           let froms_call = To_Use.get_from_call kf stmt in

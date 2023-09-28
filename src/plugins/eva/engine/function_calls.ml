@@ -146,7 +146,7 @@ let analysis_status kf =
 
 (* Must be consistent with the choice made by [analysis_target] below. *)
 let use_spec_instead_of_definition ?(recursion_depth = -1) kf =
-  Ast_info.is_frama_c_builtin (Kernel_function.get_name kf) ||
+  Ast_info.start_with_frama_c_builtin (Kernel_function.get_name kf) ||
   Builtins.is_builtin_overridden kf ||
   recursion_depth >= Parameters.RecursiveUnroll.get () ||
   not (Kernel_function.is_definition kf) ||

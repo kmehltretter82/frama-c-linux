@@ -618,7 +618,7 @@ struct
     Globals.Functions.iter
       (fun kf ->
          let name = Kernel_function.get_name kf in
-         if not (Ast_info.is_frama_c_builtin name) then f kf)
+         if not (Ast_info.start_with_frama_c_builtin name) then f kf)
 
   let array : kernel_function States.array =
     begin
