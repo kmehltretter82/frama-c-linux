@@ -38,10 +38,8 @@ COPYRIGHT=CEA LIST / LSL
 .PHONY: all app dev
 
 all: pkg check-lint app
-dome-app: api
-dome-dev: api
 app: dome-app
-dev: dome-dev
+dev: dome-dev api
 
 # --------------------------------------------------------------------------
 # --- Ivette Linting
