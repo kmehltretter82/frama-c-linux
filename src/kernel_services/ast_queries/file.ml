@@ -486,6 +486,22 @@ let adjust_pwd fp cpp_command =
     else None, cpp_command
   else None, cpp_command
 
+(* Prevent gcc/clang from emitting warnings during preprocessing,
+   related to builtin macro definitions from machdeps.
+   Returns a (possibly empty) list of flags to be added to the command line. *)
+let silence_cpp_machdep_warnings cmdl =
+  let exe = cpp_name cmdl in
+  if exe = "clang" || exe = "gcc" then
+    (* NB: For gcc, only old versions (still found in Ubuntu 18.04,
+       supported until 2028, though) activate builtin-macro-redefined.
+       This is also the case for newer clangs, while older ones will
+       complain about the unknown warning (gcc does not seem to care,
+       so that it is safe to keep the unknown-warning-option in every
+       case). *)
+    ["-Wno-builtin-macro-redefined"; "-Wno-unknown-warning-option"]
+  else
+    []
+
 let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
   | NeedCPP (f, cmdl, extra_for_this_file, is_gnu_like) ->
@@ -520,19 +536,7 @@ let build_cpp_cmd = function
       else []
     in
     let fc_define_args = ["__FRAMAC__"] in
-    let exe = cpp_name cmdl in
-    let clang_no_warn =
-      if exe = "clang" || exe = "gcc" then
-        (* NB: For gcc, only old versions (still found in Ubuntu 18.04,
-           supported until 2028, though) activate builtin-macro-redefined.
-           This is also the case for newer clangs, while older ones will
-           complain about the unknown warning (gcc does not seem to care,
-           so that it is safe to keep the unknown-warning-option in every
-           case). *)
-        ["-Wno-builtin-macro-redefined"; "-Wno-unknown-warning-option"]
-      else
-        []
-    in
+    let clang_no_warn = silence_cpp_machdep_warnings cmdl in
     let nostdinc_arg =
       if Kernel.FramaCStdLib.get() then add_if_gnu "-nostdinc"
       else []
@@ -625,6 +629,10 @@ let parse_cabs cpp_command = function
                   "trying to preprocess annotation with an unknown \
                    preprocessor."; true))
       then begin
+        let clang_no_warn = silence_cpp_machdep_warnings cmdl in
+        let cmdl =
+          List.fold_left (fun acc s -> acc ^ " " ^ s) cmdl clang_no_warn
+        in
         let ppf' =
           try Logic_preprocess.file ".c"
                 (replace_in_cpp_cmd cmdl "")
