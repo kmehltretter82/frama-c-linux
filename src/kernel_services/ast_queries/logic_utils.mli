@@ -145,12 +145,6 @@ val numeric_coerce: logic_type -> term -> term
 
 (** {2 Predicates} *)
 
-(** \valid_index *)
-(* val mk_pvalid_index: ?loc:location -> term * term -> predicate *)
-
-(** \valid_range *)
-(* val mk_pvalid_range: ?loc:location -> term * term * term -> predicate *)
-
 val pointer_comparable:
   ?loc:location -> ?label:logic_label -> term -> term -> predicate
 (** \pointer_comparable. [label] defaults to {!Logic_const.here_label}
