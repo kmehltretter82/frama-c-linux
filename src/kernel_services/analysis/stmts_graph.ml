@@ -36,8 +36,10 @@ struct
       (Cil_datatype.Stmt_Id)
       (struct include Datatype.Bool let pretty_debug = pretty end)
       (Hptmap.Comp_unused)
-      (struct let v = [ [] ] end)
-      (struct let l = [ Ast.self ] end)
+      (struct
+        let initial_values = []
+        let dependencies = [ Ast.self ]
+      end)
   (* Clear the (non-project compliant) internal caches each time the ast
      changes, which includes every time we switch project. *)
   let () = Ast.add_hook_on_update (fun _ -> HptmapStmtBool.clear_caches ())

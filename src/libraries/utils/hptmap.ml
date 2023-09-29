@@ -597,14 +597,11 @@ module type Compositional_bool = sig
   val compose : bool -> bool -> bool
 end
 
-module type Initial_values = sig
+module type Info = sig
   type key
   type v
-  val v : (key*v) list list
-end
-
-module type Datatype_deps = sig
-  val l : State.t list
+  val initial_values : (key * v) list list
+  val dependencies : State.t list
 end
 
 module Make
@@ -612,9 +609,8 @@ module Make
     (V : V)
     (Compositional_bool : Compositional_bool with type key := Key.t
                                               and type v := V.t)
-    (Initial_Values: Initial_values with type key := Key.t
-                                     and type v := V.t)
-    (Datatype_deps: Datatype_deps)
+    (Info: Info with type key := Key.t
+                 and type v := V.t)
 =
 struct
 
@@ -668,11 +664,18 @@ struct
       incr current_tag;
       Tag_comp.encode tag b
     in
+    (* If required, add the empty map to the initial values, as it is always
+       exported by the functor at Caml link-time. *)
+    let initial_values =
+      if List.mem [] Info.initial_values
+      then Info.initial_values
+      else [] :: Info.initial_values
+    in
     List.map
       (function [k,v] -> Leaf (k, v, tc k v)
               | [] -> Empty
               | _ -> assert false)
-      Initial_Values.v
+      initial_values
 
   let rehash_ref = ref (fun _ -> assert false)
 
@@ -741,7 +744,7 @@ struct
       end)
       (struct
         let name = Type.name ty ^ " hashconsing table"
-        let dependencies = Datatype_deps.l
+        let dependencies = Info.dependencies
         let size = 137
       end)
 

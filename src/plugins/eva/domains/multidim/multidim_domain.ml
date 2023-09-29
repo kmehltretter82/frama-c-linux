@@ -330,8 +330,6 @@ struct
   module Tracking = Base.Hptset
 
   (* The domain is essentially a map from bases to individual memory abstractions *)
-  module Initial_Values = struct let v = [[]] end
-  module Deps = struct let l = [Ast.self] end
   module V =
   struct
     include Datatype.Pair (Memory) (Referers)
@@ -340,12 +338,15 @@ struct
     let is_top (m,r) = Memory.is_top m && Referers.is_empty r
   end
 
+  module Hptmap_Info =
+  struct
+    let initial_values = []
+    let dependencies = [ Ast.self ]
+  end
+
   module BaseMap =
   struct
-    include
-      Hptmap.Make
-        (Base.Base) (V)
-        (Hptmap.Comp_unused) (Initial_Values) (Deps)
+    include Hptmap.Make (Base.Base) (V) (Hptmap.Comp_unused) (Hptmap_Info)
 
     let find_or_top (state : t) (b : Base.t) =
       try find b state with Not_found -> V.top

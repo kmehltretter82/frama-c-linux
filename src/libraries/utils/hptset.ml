@@ -92,34 +92,35 @@ module type S = sig
   val pretty_debug: t Pretty_utils.formatter
 end
 
-module type Initial_values = sig
+module type Info = sig
   type elt
-  val v : elt list list
+  val initial_values : elt list list
+  val dependencies : State.t list
 end
 
-module type Datatype_deps = sig
-  val l : State.t list
-end
-
-module Make(X: Hptmap.Id_Datatype)
-    (Initial_values : Initial_values with type elt := X.t)
-    (Datatype_deps : Datatype_deps) :   sig
-  include S with type elt = X.t
-             and type 'a map = 'a Hptmap.Shape(X).t
-  val self : State.t
-end
+module Make
+    (X: Hptmap.Id_Datatype)
+    (Info : Info with type elt := X.t)
+  : sig
+    include S with type elt = X.t
+               and type 'a map = 'a Hptmap.Shape(X).t
+    val self : State.t
+  end
 = struct
 
   type elt = X.t
 
-  module M =
-    Hptmap.Make
-      (X)
-      (struct include Datatype.Unit let pretty_debug = pretty end)
-      (Hptmap.Comp_unused)
-      (struct let v = List.map (List.map (fun k -> k, ())) Initial_values.v end)
-      (Datatype_deps)
+  module Unit = struct
+    include Datatype.Unit
+    let pretty_debug = pretty
+  end
 
+  module Hptmap_Info = struct
+    let initial_values = List.map (List.map (fun k -> k, ())) Info.initial_values
+    let dependencies = Info.dependencies
+  end
+
+  module M = Hptmap.Make (X) (Unit) (Hptmap.Comp_unused) (Hptmap_Info)
   include M
 
   let add k s = add k () s

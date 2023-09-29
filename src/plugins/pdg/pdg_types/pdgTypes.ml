@@ -99,9 +99,11 @@ end
 
 end
 
-module NodeSet = Hptset.Make(Node)
-    (struct let v = [ [ ] ] end)
-    (struct let l = [ Ast.self ] end)
+module Hptset_Info = struct
+  let initial_values = []
+  let dependencies = [ Ast.self ]
+end
+module NodeSet = Hptset.Make(Node) (Hptset_Info)
 (* Clear the (non-project compliant) internal caches each time the ast
    is updated, which includes every time we switch project. *)
 let () = Ast.add_hook_on_update NodeSet.clear_caches
@@ -274,8 +276,12 @@ module G = struct
     let label (_, l, _) = l
   end
 
-  module To = Hptmap.Make(Node)(DpdZone)(Hptmap.Comp_unused)
-      (struct let v = [[]] end)(struct let l = [Ast.self] end)
+  module Hptmap_Info = struct
+    let initial_values = []
+    let dependencies = [ Ast.self ]
+  end
+
+  module To = Hptmap.Make (Node) (DpdZone) (Hptmap.Comp_unused) (Hptmap_Info)
   let () = Ast.add_hook_on_update (fun _ -> To.clear_caches ())
   (* See comment on previous call to Ast.add_hook_on_update *)
 

@@ -26,13 +26,17 @@ open Locations
 
 type node = PdgTypes.Node.t * Zone.t
 
+module Hptmap_Info = struct
+  let initial_values = []
+  let dependencies = [ Ast.self ]
+end
+
 module NS = struct
   include Hptmap.Make
       (PdgTypes.Node)
       (Locations.Zone)
       (Hptmap.Comp_unused)
-      (struct let v = [[]] end)
-      (struct let l = [Ast.self] end)
+      (Hptmap_Info)
 
   let intersects =
     let name = "Impact.Pdg_aux.NS.intersects" in

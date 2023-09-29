@@ -45,7 +45,7 @@ module Shape (Key : Id_Datatype): sig
   type 'a t = 'a map
 end
 
-(** A boolean information is maintained for each tree, by composing the
+(** A optional boolean information is maintained for each tree, by composing the
     boolean on the subtrees and the value information present on each leaf.
     Use {!Comp_unused} for a default implementation. *)
 module type Compositional_bool = sig
@@ -62,19 +62,18 @@ module type Compositional_bool = sig
   (** Composition of the values of two subtrees *)
 end
 
-module type Initial_values = sig
+(** Required information for the correctness of the hptmaps. *)
+module type Info = sig
   type key
   type v
-  val v : (key*v) list list
+
+  val initial_values : (key * v) list list
   (** List of the maps that must be shared between all instances of Frama-C
       (the maps being described by the list of their elements).
       Must include all maps that are exported at Caml link-time when the
-      functor is applied. This usually includes at least the empty map, hence
-      [v] nearly always contains [[]]. *)
-end
+      functor is applied. *)
 
-module type Datatype_deps = sig
-  val l : State.t list
+  val dependencies : State.t list
   (** Dependencies of the hash-consing table. The table will be cleared
       whenever one of those dependencies is cleared. *)
 end
@@ -86,9 +85,8 @@ module Make
     (V : V)
     (_ : Compositional_bool with type key := Key.t
                              and type v := V.t)
-    (_ : Initial_values with type key := Key.t
-                         and type v := V.t)
-    (_ : Datatype_deps)
+    (_ : Info with type key := Key.t
+               and type v := V.t)
   : Hptmap_sig.S with type key = Key.t
                   and type v = V.t
                   and type 'v map = 'v Shape(Key).map

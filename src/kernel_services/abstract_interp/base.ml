@@ -461,8 +461,10 @@ module Hptshape = Hptmap.Shape (Base)
 
 module Hptset = Hptset.Make
     (Base)
-    (struct let v = [ [ ]; [Null] ] end)
-    (struct let l = [ Ast.self ] end)
+    (struct
+      let initial_values = [ [Null] ]
+      let dependencies = [ Ast.self ]
+    end)
 let () = Ast.add_monotonic_state Hptset.self
 let () = Ast.add_hook_on_update Hptset.clear_caches
 
@@ -554,8 +556,10 @@ module SetLattice = Make_Hashconsed_Lattice_Set(Base)(Hptset)
 
 module BMap =
   Hptmap.Make (Base) (Base) (Hptmap.Comp_unused)
-    (struct let v = [ [] ] end)
-    (struct let l = [ Ast.self ] end)
+    (struct
+      let initial_values = []
+      let dependencies = [ Ast.self ]
+    end)
 
 type substitution = base Hptshape.map
 

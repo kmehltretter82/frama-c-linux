@@ -24,15 +24,17 @@ open Cil_types
 open Cil
 open Abstract_interp
 
-module Initial_Values = struct
-  let v = [ [Base.null,Ival.zero];
-            [Base.null,Ival.one];
-            [Base.null,Ival.zero_or_one];
-            [Base.null,Ival.top];
-            [Base.null,Ival.top_float];
-            [Base.null,Ival.top_single_precision_float];
-            [Base.null,Ival.float_zeros];
-          ]
+module Hptmap_Info = struct
+  let initial_values = [ [Base.null,Ival.zero];
+                         [Base.null,Ival.one];
+                         [Base.null,Ival.zero_or_one];
+                         [Base.null,Ival.top];
+                         [Base.null,Ival.top_float];
+                         [Base.null,Ival.top_single_precision_float];
+                         [Base.null,Ival.float_zeros];
+                       ]
+
+  let dependencies = [ Ast.self ]
 end
 
 (* Store the information that the location has at most cardinal 1, ignoring
@@ -55,13 +57,10 @@ module Comp_exact = struct
 end
 
 
-
 module Location_Bytes = struct
 
   module M = struct
-    include Hptmap.Make
-        (Base.Base) (Ival) (Comp_exact) (Initial_Values)
-        (struct let l = [ Ast.self ] end)
+    include Hptmap.Make (Base.Base) (Ival) (Comp_exact) (Hptmap_Info)
     let shape x = x
   end
   let () = Ast.add_monotonic_state M.self
@@ -372,12 +371,12 @@ module Location_Bits = Location_Bytes
 
 module Zone = struct
 
-  module Initial_Values = struct let v = [  ] end
+  module Info = struct
+    let initial_values = []
+    let dependencies = [ Ast.self ]
+  end
 
-  module M =
-    Hptmap.Make
-      (Base.Base) (Int_Intervals) (Hptmap.Comp_unused) (Initial_Values)
-      (struct let l = [ Ast.self ] end)
+  module M = Hptmap.Make (Base.Base) (Int_Intervals) (Hptmap.Comp_unused) (Info)
   let () = Ast.add_monotonic_state M.self
   let clear_caches = M.clear_caches
 

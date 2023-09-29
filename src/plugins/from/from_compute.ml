@@ -142,10 +142,13 @@ let compute_using_prototype_for_state state kf assigns =
   Eva.Assigns.{ return = return_deps; memory = deps }
 
 module ZoneStmtMap = struct
-  include
-    Hptmap.Make(Stmt_Id)(Zone)(Hptmap.Comp_unused)
-      (struct let v = [[]] end)
-      (struct let l = [Ast.self] end)
+
+  module Hptmap_Info = struct
+    let initial_values = []
+    let dependencies = [ Ast.self ]
+  end
+
+  include Hptmap.Make (Stmt_Id) (Zone) (Hptmap.Comp_unused) (Hptmap_Info)
 
   let join =
     let decide _k z1 z2 = Zone.join z1 z2 in

@@ -63,9 +63,6 @@ type equality = Equality.t
 
 module Set = struct
 
-  module Initial_Values = struct let v = [[]] end
-  module Dependencies = struct let l = [ HCE.self ] end
-
   (* A set of equalities between lvalues and expressions is encoded as a map
      from each lvalue or expression to:
      - the equality in which it is involved;
@@ -97,8 +94,11 @@ module Set = struct
       HCESet.union left_set' right_set'
   end
 
-  include Hptmap.Make (HCE) (Data)
-      (Hptmap.Comp_unused) (Initial_Values) (Dependencies)
+  module Hptmap_Info = struct
+    let initial_values = []
+    let dependencies = [ Ast.self ]
+  end
+  include Hptmap.Make (HCE) (Data) (Hptmap.Comp_unused) (Hptmap_Info)
 
   let find_option elt map =
     try

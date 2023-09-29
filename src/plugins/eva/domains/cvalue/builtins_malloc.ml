@@ -36,12 +36,14 @@ let wkey_imprecise_alloc = Self.register_warn_category
 
 (* ---------------------- Dynamically allocated bases ----------------------- *)
 
-module Base_hptmap = Hptmap.Make
-    (Base.Base)
-    (Callstack)
-    (Hptmap.Comp_unused)
-    (struct let v = [ [ ] ] end)
-    (struct let l = [ Ast.self ] end)
+
+module Hptmap_Info = struct
+  let initial_values = []
+  let dependencies = [ Ast.self ]
+end
+
+module Base_hptmap =
+  Hptmap.Make (Base.Base) (Callstack) (Hptmap.Comp_unused) (Hptmap_Info)
 
 module Dynamic_Alloc_Bases =
   State_builder.Ref

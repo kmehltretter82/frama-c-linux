@@ -227,9 +227,12 @@ module EdgeList = struct
 end
 
 module Graph = struct
-  include Hptmap.Make(Node)(EdgeList)(Hptmap.Comp_unused)
-      (struct let v = [[]] end)
-      (struct let l = [Ast.self] end)
+
+  module Hptmap_Info = struct
+    let initial_values = []
+    let dependencies = [ Ast.self ]
+  end
+  include Hptmap.Make (Node) (EdgeList) (Hptmap.Comp_unused) (Hptmap_Info)
 
   let is_included =
     let cache = Hptmap_sig.NoCache in
