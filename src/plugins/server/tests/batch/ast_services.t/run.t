@@ -19,6 +19,7 @@
         "updated": [
           {
             "key": "kf#24",
+            "decl": "#F24",
             "name": "g",
             "signature": "int g(int y);",
             "defined": true,
@@ -31,6 +32,7 @@
           },
           {
             "key": "kf#20",
+            "decl": "#F20",
             "name": "f",
             "signature": "int f(int x);",
             "defined": true,
