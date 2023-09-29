@@ -27,7 +27,8 @@ open Evast
 
 type vertex = {
   vertex_key : int;
-  mutable vertex_start_of : Cil_types.stmt option;
+  vertex_start_of : Cil_types.stmt option;
+  mutable vertex_wto_index : vertex list
 }
 
 type guard_kind = Interpreted_automata.guard_kind = Then | Else
@@ -53,6 +54,7 @@ type edge = {
 let dummy_vertex = {
   vertex_key = -1;
   vertex_start_of = None;
+  vertex_wto_index = [];
 }
 
 let dummy_edge = {
@@ -209,6 +211,19 @@ let translate_transition = function
   | Leave block ->
     Leave block
 
+(* Fill the wto index of the vertices *)
+let build_wto_index wto =
+  let rec iter_wto index w =
+    List.iter (iter_element index) w
+  and iter_element index = function
+    | Wto.Node v ->
+      v.vertex_wto_index <- index
+    | Wto.Component (h, w) ->
+      let new_index = h :: index in
+      iter_wto new_index (Wto.Node h :: w)
+  in
+  iter_wto [] wto
+
 let translate_automaton kf =
   let module Src = Interpreted_automata in
   let module VertexTable = Src.Vertex.Hashtbl in
@@ -220,6 +235,7 @@ let translate_automaton kf =
     let v' = {
       vertex_key = v.vertex_key;
       vertex_start_of = v.vertex_start_of;
+      vertex_wto_index = [];
     }
     in
     G.add_vertex graph v';
@@ -250,6 +266,7 @@ let translate_automaton kf =
   and return_point = VertexTable.find table src.return_point
   and stmt_table = translate_stmt_table src.stmt_table in
   let wto = build_wto graph entry_point in
+  build_wto_index wto;
   { graph; wto; entry_point; return_point; stmt_table }
 
 
@@ -279,3 +296,25 @@ let output_to_dot =
   let module Dot = Interpreted_automata.Dot (Vertex) (Edge) (G) in
   fun out automaton ->
     Dot.output_to_dot out ~labeling:`Both ~wto:automaton.wto automaton.graph
+
+let wto_index_diff v1 v2 =
+  let index1 = v1.vertex_wto_index and index2 = v2.vertex_wto_index in
+  let rec remove_common_prefix l1 l2 =
+    match l1, l2 with
+    | x :: l1, y :: l2 when Vertex.equal x y ->
+      remove_common_prefix l1 l2
+    | l1, l2 -> l1, l2
+  in
+  let l1 = List.rev index1
+  and l2 = List.rev index2
+  in
+  let left, entered = remove_common_prefix l1 l2 in
+  List.rev left, entered
+
+let is_wto_head v =
+  match v.vertex_wto_index with
+  | v' :: _ -> Vertex.equal v v'
+  | [] -> false
+
+let is_back_edge (v1,v2) =
+  List.exists (Vertex.equal v2) (v1.vertex_wto_index)
