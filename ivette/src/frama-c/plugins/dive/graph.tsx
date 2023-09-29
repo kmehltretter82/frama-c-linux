@@ -732,17 +732,18 @@ export default function GraphComponent(): JSX.Element {
         />
         <Space />
         <IconButton
-          icon="TRASH"
-          onClick={() => graph.current?.clear()}
-          title="Clear the graph"
-        />
-        <IconButton
           icon="HELP"
           onClick={flipShowLegend}
-          kind={showLegend ? 'positive' : 'negative'}
+          kind={showLegend ? 'positive' : 'default'}
           title={showLegend ?
             'Hide legend' :
             'Show legend'}
+        />
+        <Space />
+        <IconButton
+          icon="TRASH"
+          onClick={() => graph.current?.clear()}
+          title="Clear the graph"
         />
       </Ivette.TitleBar>
       <EvaReady>
