@@ -88,6 +88,11 @@ let origin_lval = function
   | Var v, o -> Cil_types.Var v, origin_offset o
   | Mem e, o -> Cil_types.Mem (origin_exp e), origin_offset o
 
+let loc exp =
+  match exp.origin with
+  | Exp exp -> Some (exp.Cil_types.eloc)
+  | Built | Term _ -> None
+
 
 (* --- Rewriting --- *)
 
@@ -211,6 +216,27 @@ and offset_contains_volatile : offset -> bool = function
   | NoOffset -> false
   | Field (_, o) -> offset_contains_volatile o
   | Index (e, o) -> offset_contains_volatile o || exp_contains_volatile e
+
+
+(* --- Vars lookup --- *)
+
+module VarSet = Cil_datatype.Varinfo.Set
+
+let rec vars_in_exp (exp : exp) : VarSet.t =
+  match exp.node with
+  | Lval lv | AddrOf lv | StartOf lv  -> vars_in_lval lv
+  | UnOp (_, e, _) | CastE (_, e) -> vars_in_exp e
+  | BinOp (_, e1, e2, _) -> VarSet.union (vars_in_exp e1) (vars_in_exp e2)
+  | _ -> VarSet.empty
+and vars_in_lval (lhost, offset : lval) : VarSet.t =
+  VarSet.union (vars_in_lhost lhost) (vars_in_offset offset)
+and vars_in_lhost : lhost -> VarSet.t = function
+  | Var vi -> VarSet.singleton vi
+  | Mem e -> vars_in_exp e
+and vars_in_offset : offset -> VarSet.t = function
+  | NoOffset -> VarSet.empty
+  | Field (_, o) -> vars_in_offset o
+  | Index (e, o) -> VarSet.union (vars_in_offset o) (vars_in_exp e)
 
 
 (* Dependencies *)

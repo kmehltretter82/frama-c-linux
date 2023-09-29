@@ -31,6 +31,7 @@ val type_of_lval : lval -> typ
 val origin_exp : exp -> Cil_types.exp
 val origin_lval : lval -> Cil_types.lval
 val origin_offset : offset -> Cil_types.offset
+val loc : exp -> Cil_types.location option
 
 (** [rewrite f exp] rewrites [exp] by calling [f ~descent node] on root exp. [f]
     can call [descent e] to rewrite recursively subexpressions of [e]. *)
@@ -59,6 +60,8 @@ val invert_relation : binop -> binop
 val exp_contains_volatile : exp -> bool
 val lval_contains_volatile : lval -> bool
 
+val vars_in_exp : exp -> Cil_datatype.Varinfo.Set.t
+val vars_in_lval : lval -> Cil_datatype.Varinfo.Set.t
 
 (** Dependences of expressions and lvalues. *)
 
