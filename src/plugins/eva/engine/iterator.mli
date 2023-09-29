@@ -37,12 +37,12 @@ module Computer
     (States : Powerset.S with type state = Abstract.Dom.t)
     (* Transfer functions for statement on the abstract domain. *)
     (_ : Transfer_stmt.S with type state = Abstract.Dom.t
-                                 and type value = Abstract.Val.t)
+                          and type value = Abstract.Val.t)
     (* Initialization of local variables. *)
     (_: Initialization.S with type state := Abstract.Dom.t)
     (* Transfer functions for the logic on the abstract domain. *)
     (_ : Transfer_logic.S with type state = Abstract.Dom.t
-                               and type states = States.t)
+                           and type states = States.t)
     (_: sig
        val treat_statement_assigns: assigns -> Abstract.Dom.t -> Abstract.Dom.t
      end)
