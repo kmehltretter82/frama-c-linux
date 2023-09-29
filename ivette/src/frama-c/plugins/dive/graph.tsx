@@ -645,8 +645,10 @@ const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
     dive.onSelect = (locations) => {
       if (_.isEqual(locations, selection?.multiple?.allSelections))
         updateSelection('MULTIPLE_CYCLE');
-      else
-        updateSelection({ locations, index: 0 });
+      else {
+        const name = "Dive graph";
+        updateSelection({ name, locations, index: 0 });
+      }
     };
 
     // Updates the graph according to the selected marker.
