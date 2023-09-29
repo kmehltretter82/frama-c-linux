@@ -826,7 +826,7 @@ end = struct
       enabled_if = select ~prev:deps.enabled_if ~config:config.dc_enabled_if
     }
 
-  let config_exec ~once ~drop:_ ~file ~dir:_ s current =
+  let config_exec ~once ~drop:_ ~file s current =
     let s = Macros.expand ~file current.dc_macros s in
     { current with
       dc_execnow =
@@ -1016,8 +1016,12 @@ end = struct
       (fun ~drop:_ ~file:_ ~dir:_ _ current ->
          { current with dc_dont_run = true });
 
-      "EXECNOW", config_exec ~once:true;
-      "EXEC", config_exec ~once:false;
+      "EXECNOW",
+      (fun ~drop ~file ~dir:_ s acc ->
+         config_exec ~once:true ~file ~drop s acc);
+      "EXEC",
+      (fun ~drop ~file ~dir:_ s acc ->
+         config_exec ~once:false ~file ~drop s acc);
 
       "MACRO", config_macro;
       "LIBS", config_libs;
