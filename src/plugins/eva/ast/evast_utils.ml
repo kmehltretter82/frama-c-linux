@@ -22,54 +22,10 @@
 
 open Evast
 
-type typ = Cil_types.typ
 
 (* --- Type of --- *)
 
-let rec type_of_offset (basetyp : typ) : offset -> typ = function
-  | NoOffset -> basetyp
-  | Index (_, o) ->
-    type_of_offset (Cil.typeOf_array_elem basetyp) o
-  | Field (fi, o) ->
-    let base_attrs = Cil.filter_qualifier_attributes (Cil.typeAttrs basetyp) in
-    let base_attrs =
-      if Cil.hasAttribute Cil.frama_c_mutable fi.fattr then
-        Cil.dropAttribute "const" base_attrs
-      else
-        base_attrs
-    in
-    type_of_offset (Cil.typeAddAttributes base_attrs fi.ftype) o
-
-let rec type_of_lval (host, offset : lval) : typ =
-  let basetyp = match host with
-    | Var vi -> vi.vtype
-    | Mem addr -> Cil.typeOf_pointed (type_of_exp addr)
-  in
-  type_of_offset basetyp offset
-
-and type_of_exp (exp : exp) : typ =
-  match exp.node with (* TODO: rely more on Cil by storing the Frama-C infered type on Evast const nodes ? *)
-  | Const c -> type_of_const c
-  | Lval lv -> Cil.type_remove_qualifier_attributes (type_of_lval lv)
-  | SizeOf _ | SizeOfE _ | SizeOfStr _ -> Cil.theMachine.typeOfSizeOf
-  | AlignOf _ | AlignOfE _ -> Cil.theMachine.typeOfSizeOf
-  | UnOp (_, _, t) -> t
-  | BinOp (_, _, _, t) -> t
-  | CastE (t, _) -> t
-  | AddrOf (lv) -> TPtr (type_of_lval lv, [])
-  | StartOf (lv) ->
-    match Cil.unrollType (type_of_lval lv) with
-    | TArray (t,_,attrs) -> TPtr(t, attrs)
-    | _ ->  assert false
-
-and type_of_const : constant -> typ = function
-  | CInt64 (_, ik, _) -> Cil_types.TInt (ik, [])
-  | CChr _ -> Cil.intType
-  | CString (String (_, Base.CSString _)) -> Cil.theMachine.stringLiteralType
-  | CString (String (_, Base.CSWstring _)) -> TPtr (Cil.theMachine.wcharType, [])
-  | CString (_) -> assert false (* it must be a String base*)
-  | CReal (_, fk, _) -> TFloat (fk, [])
-  | CEnum {eival=e} -> Cil.typeOf e
+include Evast_typing
 
 
 (* --- Origins --- *)
@@ -206,7 +162,7 @@ let rec exp_contains_volatile (exp : exp) : bool =
   | BinOp (_, e1, e2, _) -> exp_contains_volatile e1 || exp_contains_volatile e2
   | _ -> false
 and lval_contains_volatile (lhost, offset as lval : lval) : bool =
-  Cil.isVolatileType (type_of_lval lval) ||
+  Cil.isVolatileType (Evast_typing.type_of_lval lval) ||
   lhost_contains_volatile lhost ||
   offset_contains_volatile offset
 and lhost_contains_volatile : lhost -> bool = function

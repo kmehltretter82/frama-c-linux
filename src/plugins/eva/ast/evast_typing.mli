@@ -22,12 +22,6 @@
 
 open Evast
 
-val translate_exp: Cil_types.exp -> exp
-val translate_lval: Cil_types.lval -> lval
-
-val mk: exp_node -> exp (* Does not assign origin. Should not be used. *)
-
-val int: ?kind:Cil_types.ikind -> int -> exp
-val integer: ?kind:Cil_types.ikind -> Integer.t -> exp
-val binop: binop -> exp -> exp -> exp
-val add: exp -> exp -> exp
+val type_of_exp : exp -> typ
+val type_of_lval : lval -> typ
+val type_of_lhost : lhost -> typ

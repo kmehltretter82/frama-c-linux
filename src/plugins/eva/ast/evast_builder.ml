@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Evast
+open Evast_typing
 
 let translate_unop = function
   | Cil_types.Neg -> Neg
@@ -94,3 +95,27 @@ and translate_lval (host, offset) = translate_host host, translate_offset offset
 
 let mk node =
   { node ; origin = Built }
+
+let integer ?kind i = (* TODO: mathematical unbounded integer *)
+  let kind = match kind with
+    | Some k -> k
+    | None ->
+      if Cil.fitsInInt IInt i
+      then Cil_types.IInt
+      else Cil.intKindForValue i false
+  in
+  mk (Const (CInt64 (i, kind, None)))
+
+let int ?kind i =
+  integer ?kind (Integer.of_int i)
+
+let binop op e1 e2 =
+  (* TODO: const folding *)
+  let t1 = type_of_exp e1 and t2 = type_of_exp e2 in
+  let t = Cil.arithmeticConversion t1 t2 in
+  match op with
+  | PlusA | MinusA | Mult | Div ->
+    mk (BinOp (op,e1,e2,t))
+  | _ -> invalid_arg "unsupported construction"
+
+let add = binop PlusA
