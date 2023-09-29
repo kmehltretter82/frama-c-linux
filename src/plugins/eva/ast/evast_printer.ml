@@ -87,15 +87,15 @@ and pp_exp fmt exp =
       (pp_exp' ~precedence) e2
   | CastE(t,e) ->
     Format.fprintf fmt "(%a)%a" Printer.pp_typ t (pp_exp' ~precedence) e
-  | SizeOf t ->
+  | SizeOf (t,_) ->
     Format.fprintf fmt "sizeof(%a)" Printer.pp_typ t
-  | SizeOfE e ->
+  | SizeOfE (e,_) ->
     Format.fprintf fmt "sizeof(%a)" pp_exp e
-  | SizeOfStr s ->
+  | SizeOfStr (s,_) ->
     Format.fprintf fmt "sizeof(%a)" pp_string s
-  | AlignOf t ->
+  | AlignOf (t,_) ->
     Format.fprintf fmt "__alignof__(%a)" Printer.pp_typ t
-  | AlignOfE e ->
+  | AlignOfE (e,_) ->
     Format.fprintf fmt "__alignof__(%a)" pp_exp e
   | AddrOf lv ->
     Format.fprintf fmt "& %a" (pp_lval' ~precedence) lv

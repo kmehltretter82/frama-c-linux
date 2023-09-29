@@ -101,19 +101,19 @@ struct
       | Lval lv1, Lval lv2 -> Lval.compare lv1 lv2
       | Lval _, _ -> 1
       | _, Lval _ -> -1
-      | SizeOf t1, SizeOf t2 -> Cil_datatype.Typ.compare t1 t2
+      | SizeOf (t1,_), SizeOf (t2,_) -> Cil_datatype.Typ.compare t1 t2
       | SizeOf _, _  -> 1
       | _, SizeOf _ -> -1
-      | SizeOfE e1, SizeOfE e2 -> compare e1 e2
+      | SizeOfE (e1,_), SizeOfE (e2,_) -> compare e1 e2
       | SizeOfE _, _ -> 1
       | _, SizeOfE _ -> -1
-      | SizeOfStr s1, SizeOfStr s2 -> String.compare s1 s2
+      | SizeOfStr (s1,_), SizeOfStr (s2,_) -> String.compare s1 s2
       | SizeOfStr _, _ -> 1
       | _, SizeOfStr _ -> -1
-      | AlignOf ty1, AlignOf ty2 -> Cil_datatype.Typ.compare ty1 ty2
+      | AlignOf (ty1,_), AlignOf (ty2,_) -> Cil_datatype.Typ.compare ty1 ty2
       | AlignOf _, _ -> 1
       | _, AlignOf _ -> -1
-      | AlignOfE e1, AlignOfE e2 -> compare e1 e2
+      | AlignOfE (e1,_), AlignOfE (e2,_) -> compare e1 e2
       | AlignOfE _, _ -> 1
       | _, AlignOfE _ -> -1
       | UnOp (op1, e1, ty1), UnOp (op2, e2, ty2) ->
@@ -143,11 +143,11 @@ struct
       match e.node with
       | Const c -> Hashtbl.hash (1, Constant.hash c)
       | Lval lv -> Hashtbl.hash (2, Lval.hash lv)
-      | SizeOf ty -> Hashtbl.hash (3, Cil_datatype.Typ.hash ty)
-      | SizeOfE e -> Hashtbl.hash (4, hash e)
-      | SizeOfStr s -> Hashtbl.hash (5, s)
-      | AlignOf ty -> Hashtbl.hash (6, Cil_datatype.Typ.hash ty)
-      | AlignOfE e -> Hashtbl.hash (7, hash e)
+      | SizeOf (ty,_) -> Hashtbl.hash (3, Cil_datatype.Typ.hash ty)
+      | SizeOfE (e,_) -> Hashtbl.hash (4, hash e)
+      | SizeOfStr (s,_) -> Hashtbl.hash (5, s)
+      | AlignOf (ty,_) -> Hashtbl.hash (6, Cil_datatype.Typ.hash ty)
+      | AlignOfE (e,_) -> Hashtbl.hash (7, hash e)
       | UnOp (op, e, ty) ->
         Hashtbl.hash (8, op, hash e, Cil_datatype.Typ.hash ty)
       | BinOp (op, e1, e2, ty) ->

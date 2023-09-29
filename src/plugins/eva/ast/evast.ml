@@ -34,11 +34,11 @@ type exp =
 and exp_node =
   | Const      of constant
   | Lval       of lval
-  | SizeOf     of typ
-  | SizeOfE    of exp
-  | SizeOfStr  of string
-  | AlignOf    of typ
-  | AlignOfE   of exp
+  | SizeOf     of typ * Integer.t option
+  | SizeOfE    of exp * Integer.t option
+  | SizeOfStr  of string * Integer.t option
+  | AlignOf    of typ * Integer.t option
+  | AlignOfE   of exp * Integer.t option
   | UnOp       of unop * exp * typ
   | BinOp      of binop * exp * exp * typ
   | CastE      of typ * exp

@@ -78,12 +78,12 @@ and descend f exp =
   | CastE (t, e) ->
     let e' = rewrite_exp f e in
     replace_if (e' != e) (CastE (t, e'))
-  | SizeOfE e ->
+  | SizeOfE (e,size_opt) ->
     let e' = rewrite_exp f e in
-    replace_if (e' != e)  (SizeOfE e')
-  | AlignOfE e ->
+    replace_if (e' != e)  (SizeOfE (e',size_opt))
+  | AlignOfE (e,size_opt) ->
     let e' = rewrite_exp f e in
-    replace_if (e' != e) (AlignOfE e')
+    replace_if (e' != e) (AlignOfE (e',size_opt))
   | SizeOf _ | Const _ | SizeOfStr _ | AlignOf _ ->
     exp
 and rewrite_lval f (lhost, offset) =
@@ -124,7 +124,7 @@ let rec height_exp exp =
   match exp.node with
   | Const _ | SizeOf _ | SizeOfStr _ | AlignOf _ -> 0
   | Lval lv | AddrOf lv | StartOf lv  -> height_lval lv + 1
-  | UnOp (_,e,_) | CastE (_, e) | SizeOfE e | AlignOfE e
+  | UnOp (_,e,_) | CastE (_, e) | SizeOfE (e,_) | AlignOfE (e,_)
     -> height_exp e + 1
   | BinOp (_,e1,e2,_) -> max (height_exp e1) (height_exp e2) + 1
 

@@ -60,16 +60,17 @@ let translate_constant = function
 
 
 let rec translate_exp e =
+  let eval_size e = Cil.constFoldToInt e in
   let node = match e.Cil_types.enode with
     | Cil_types.Const (Cil_types.CStr _ | Cil_types.CWStr _) ->
       Const (CString (Base.of_string_exp e))
     | Cil_types.Const cst -> Const (translate_constant cst)
     | Cil_types.Lval lval -> Lval (translate_lval lval)
-    | Cil_types.SizeOf typ -> SizeOf typ
-    | Cil_types.SizeOfE expr -> SizeOfE (translate_exp expr)
-    | Cil_types.SizeOfStr str -> SizeOfStr str
-    | Cil_types.AlignOf typ -> AlignOf typ
-    | Cil_types.AlignOfE expr -> AlignOfE (translate_exp expr)
+    | Cil_types.SizeOf typ -> SizeOf (typ, eval_size e)
+    | Cil_types.SizeOfE expr -> SizeOfE (translate_exp expr, eval_size e)
+    | Cil_types.SizeOfStr str -> SizeOfStr (str, eval_size e)
+    | Cil_types.AlignOf typ -> AlignOf (typ, eval_size e)
+    | Cil_types.AlignOfE expr -> AlignOfE (translate_exp expr, eval_size e)
     | Cil_types.UnOp (unop, expr, typ) ->
       UnOp (translate_unop unop, translate_exp expr, typ)
     | Cil_types.BinOp (binop, e1, e2, typ) ->
