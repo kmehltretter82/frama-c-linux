@@ -105,6 +105,25 @@ and rewrite_offset f offset =
     and o' = rewrite_offset f o in
     if e != e' || o' != o then Index (e', o') else offset
 
+(* --- Iteration --- *)
+
+let rec iter_lvals_in_exp (f : lval -> unit) (exp : exp) : unit =
+  match exp.node with
+  | Lval lv | AddrOf lv | StartOf lv  -> f lv; iter_lvals_in_lval f lv
+  | UnOp (_, e, _) | CastE (_, e) -> iter_lvals_in_exp f e
+  | BinOp (_, e1, e2, _) -> iter_lvals_in_exp f e1; iter_lvals_in_exp f e2
+  | _ -> ()
+and iter_lvals_in_lval f (lhost, offset : lval) : unit =
+  iter_lvals_in_lhost f lhost;
+  iter_lvals_in_offset f offset
+and iter_lvals_in_lhost f : lhost -> unit = function
+  | Var _ -> ()
+  | Mem e -> iter_lvals_in_exp f e
+and iter_lvals_in_offset f : offset -> unit = function
+  | NoOffset -> ()
+  | Field (_, o) -> iter_lvals_in_offset f o
+  | Index (e, o) -> iter_lvals_in_exp f e; iter_lvals_in_offset f o
+
 
 (* --- Heights --- *)
 

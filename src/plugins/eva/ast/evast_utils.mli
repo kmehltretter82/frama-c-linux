@@ -39,6 +39,9 @@ val rewrite_exp : (descend:(exp -> exp) -> exp -> exp) -> exp -> exp
 
 val rewrite_lval : (descend:(exp -> exp) -> exp -> exp) -> lval -> lval
 
+(** [iter_lvals_in_exp f exp] calls [f] from every lvalue contained in [exp] *)
+val iter_lvals_in_exp : (lval -> unit) -> exp -> unit
+
 (** Computes the height of an expression, that is the maximum number of nested
     operations in this expression. *)
 val height_exp : exp -> int
