@@ -43,10 +43,10 @@ int* cond(void) {
     int *p;
 
     if(get_x().arr);
-    if((char*)get_x().arr) return 1; // OK
-    if(*(get_x().arr + 0)) return 2; // OK
+    if((char*)get_x().arr) return (int*)1; // OK
+    if(*(get_x().arr + 0)) return (int*)2; // OK
 
-    if(*(get_x().arr + 0) || (p = get_x().arr, *(p + 1))) return 3; // OK
+    if(*(get_x().arr + 0) || (p = get_x().arr, *(p + 1))) return (int*)3; // OK
 
     for (int i = 0; get_x().arr; i++); // OK
     do{} while (*(get_x().arr + 0) && *(get_x().arr + 1)); // OK
