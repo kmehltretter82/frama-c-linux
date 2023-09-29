@@ -49,6 +49,10 @@ val height_lval : lval -> int
 (** Inverse a relation, op must be a comparison operator *)
 val invert_relation : binop -> binop
 
+(** Convert a relation to Abstract_interp.Comp, op must be a comparison
+    operator *)
+val conv_relation : binop -> Abstract_interp.Comp.t
+
 (** [exp_contains_volatile e] (resp. [lval_contains_volatile lv] is true
     whenever one l-value contained inside the expression [e] (resp. the lvalue
     [lv]) has volatile qualifier. Relational analyses should not learn

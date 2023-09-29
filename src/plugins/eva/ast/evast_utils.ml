@@ -131,7 +131,7 @@ and height_offset = function
 
 (* --- Relation inversion --- *)
 
-let invert_relation : Evast.binop -> Evast.binop = function
+let invert_relation : binop -> binop = function
   | Gt -> Le
   | Lt -> Ge
   | Le -> Gt
@@ -139,6 +139,16 @@ let invert_relation : Evast.binop -> Evast.binop = function
   | Eq -> Ne
   | Ne -> Eq
   | _ -> assert false
+
+let conv_relation : binop -> Abstract_interp.Comp.t =
+  function
+  | Eq -> Eq
+  | Ne -> Ne
+  | Le -> Le
+  | Lt -> Lt
+  | Ge -> Ge
+  | Gt -> Gt
+  | _ -> invalid_arg "conv_relation: must be given a comparison operator"
 
 
 (* --- Volatiles lookup --- *)
