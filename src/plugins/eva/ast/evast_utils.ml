@@ -220,6 +220,8 @@ and deps_of_lval find_loc lval =
   let data = Precise_locs.enumerate_valid_bits Read ploc in
   { Deps.data ; indirect }
 
+and zone_of_lval find_loc lval = Deps.to_zone (deps_of_lval find_loc lval)
+
 (* Computations of the inputs of a lvalue : union of the "host" part and
    the offset. *)
 and indirect_zone_of_lval find_loc (lhost, offset) =

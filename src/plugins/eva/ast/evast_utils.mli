@@ -70,6 +70,11 @@ val zone_of_exp:
 (** Given a function computing the location of lvalues, computes the memory zone
     on which the value of an expression depends. *)
 
+val zone_of_lval:
+  (lval -> Precise_locs.precise_location) -> lval -> Locations.Zone.t
+(** Given a function computing the location of lvalues, computes the memory zone
+    on which the value of an lvalue depends. *)
+
 val indirect_zone_of_lval:
   (lval -> Precise_locs.precise_location) -> lval -> Locations.Zone.t
 (** Given a function computing the location of lvalues, computes the memory zone
