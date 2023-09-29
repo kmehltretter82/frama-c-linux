@@ -106,18 +106,6 @@ and rewrite_offset f offset =
     if e != e' || o' != o then Index (e', o') else offset
 
 
-let const_fold exp =
-  let f ~descend exp =
-    match exp.origin with
-    | Exp e ->
-      let e' = Cil.constFold true e in
-      Evast_builder.translate_exp e'
-    | _ ->
-      descend exp
-  in
-  rewrite_exp f exp
-
-
 (* --- Heights --- *)
 
 let rec height_exp exp =
@@ -241,3 +229,215 @@ and zone_of_offset find_loc = function
   | Index (e, o) ->
     Locations.Zone.join
       (zone_of_exp find_loc e) (zone_of_offset find_loc o)
+
+
+(* Constant folding *)
+
+(* This function is largely based on Cil.constFold. See there for details. *)
+let rec const_fold (exp: exp) : exp =
+  let open Evast_builder in
+  match exp.node with
+  | Const (CChr c) -> integer (Cil.charConstToInt c)
+  | Const (CEnum {eival = v}) -> const_fold (translate_exp v)
+  | Const (CReal _ | CString _ | CInt64 _) -> exp
+  | Lval lv -> mk (Lval (const_fold_lval lv))
+  | AddrOf lv -> mk (AddrOf (const_fold_lval lv))
+  | StartOf lv -> mk (StartOf (const_fold_lval lv))
+  | SizeOf (_, size_opt) | SizeOfE (_, size_opt) | SizeOfStr (_, size_opt)
+  | AlignOf (_, size_opt) | AlignOfE (_, size_opt) ->
+    begin match size_opt with
+      | None -> exp
+      | Some i ->
+        integer ~kind:Cil.theMachine.kindOfSizeOf i
+    end
+  | CastE (t, e) -> const_fold_cast t e
+  | UnOp (op, e, t) -> const_fold_unop op e t
+  | BinOp (op, e1, e2, t) -> const_fold_binop op e1 e2 t
+
+and const_fold_cast t e =
+  let open Evast_builder in
+  let e' = const_fold e in
+  let t' = Cil.(type_remove_attributes_for_c_cast (unrollType t)) in
+  match e'.node, t' with
+  (* integer -> integer *)
+  | Const (CInt64 (i,_k,_)), (TInt (ik, a) | TEnum ({ekind = ik}, a))
+    when a = [] ->
+    integer ~kind:ik i
+  (* real -> integer *)
+  | Const (CReal (f,_,_)), (TInt(kind, a) | TEnum ({ekind = kind}, a))
+    when a = [] ->
+    begin try
+        let i = Floating_point.truncate_to_integer f in
+        if Cil.fitsInInt kind i
+        then integer ~kind i
+        else mk (CastE (t, e'))
+      with Floating_point.Float_Non_representable_as_Int64 _ ->
+        mk (CastE (t, e'))
+    end
+  (* real -> float *)
+  | Const (CReal (f,_,_)), TFloat (kind, a) when a = [] ->
+    float ~kind f
+  (* int -> float *)
+  | Const (CInt64(i,_,_)), (TFloat (kind, a)) when a = [] ->
+    let f = Integer.to_float i in
+    float ~kind f
+  | _, _ ->
+    mk (CastE (t, e'))
+
+and const_fold_unop op e t =
+  let open Evast_builder in
+  let e' = const_fold e in
+  let default () = if e' == e then e else mk (UnOp (op, e', t)) in
+  match e'.node, Cil.unrollType t with
+  (* Integer operations *)
+  | Const (CInt64 (i,_ik,_repr)), (TInt (ik, _) | TEnum ({ekind=ik},_)) ->
+    begin match op with
+      | Neg -> integer ~kind:ik (Integer.neg i)
+      | BNot -> integer ~kind:ik (Integer.lognot i)
+      | LNot -> if Integer.(equal i zero) then int 1 else int 0
+    end
+  (* Float operations*)
+  | Const (CReal(f,_,_)), TFloat (fk,_) ->
+    begin match op with
+      | Neg ->
+        let f = match fk with
+          | FFloat -> Floating_point.round_to_single_precision_float f
+          | FDouble | FLongDouble -> f
+        in
+        mk (Const (CReal(-.f,fk,None)))
+      | _ -> default ()
+    end
+  (* No possible folding *)
+  | _ -> default ()
+
+and const_fold_binop op e1 e2 t =
+  (* TODO: float comparisons *)
+  let open Evast_builder in
+  let e1' = const_fold e1 in
+  let e2' = const_fold e2 in
+  let default () = mk (BinOp (op, e1', e2', t)) in
+  (* Can a shift operation be safely computed ? *)
+  let shift_in_bounds i2 =
+    try
+      let size = Integer.of_int (Cil.bitsSizeOf (type_of_exp e1')) in
+      Integer.(ge i2 zero && lt i2 size)
+    with Cil.SizeOfError _ -> false
+  in
+  match Cil.unrollType t with
+  (* Integer operations *)
+  | TInt (kind, _) | TEnum ({ekind=kind},_) ->
+    begin match op, to_integer e1', to_integer e2' with
+      | PlusA, Some z, _ when Integer.is_zero z -> e2'
+      | (PlusA | MinusA), _, Some z when Integer.is_zero z -> e1'
+      | PlusPI, _, Some z when Integer.is_zero z -> e1'
+      | MinusPI, _, Some z when Integer.is_zero z -> e1'
+      | PlusA, Some i1, Some i2 ->
+        integer ~kind (Integer.add i1 i2)
+      | MinusA, Some i1, Some i2 ->
+        integer ~kind (Integer.sub i1 i2)
+      | Mult, Some i1, Some i2 ->
+        integer ~kind (Integer.mul i1 i2)
+      | Mult, Some z, _ when Integer.is_zero z -> e1'
+      | Mult, Some i1, _ when Integer.is_one i1 -> e2'
+      | Mult, _, Some z when Integer.is_zero z -> e2'
+      | Mult, _, Some i2 when Integer.is_one i2 -> e1'
+      | Div, Some i1, Some i2  ->
+        begin
+          try integer ~kind (Integer.c_div i1 i2)
+          with Division_by_zero -> default ()
+        end
+      | Div, _, Some i2 when Integer.is_one i2 -> e1'
+      | Mod, Some i1, Some i2 ->
+        begin
+          try integer ~kind (Integer.c_rem i1 i2)
+          with Division_by_zero -> default ()
+        end
+      | BAnd, Some i1, Some i2 ->
+        integer ~kind (Integer.logand i1 i2)
+      | BAnd, Some z, _ when Integer.is_zero z -> e1'
+      | BAnd, _, Some z when Integer.is_zero z -> e2'
+      | BOr, Some i1, Some i2 ->
+        integer ~kind (Integer.logor i1 i2)
+      | BOr, Some z, _ when Integer.is_zero z -> e2'
+      | BOr, _, Some z when Integer.is_zero z -> e1'
+      | BXor, Some i1, Some i2 ->
+        integer ~kind (Integer.logxor i1 i2)
+      | Shiftlt, Some i1, Some i2 when shift_in_bounds i2 ->
+        integer ~kind (Integer.shift_left i1 i2)
+      | Shiftlt, Some z, _ when Integer.is_zero z -> e1'
+      | Shiftlt, _, Some z when Integer.is_zero z -> e1'
+      | Shiftrt, Some i1, Some i2 when shift_in_bounds i2 ->
+        if Cil.isSigned kind then
+          integer ~kind (Integer.shift_right i1 i2)
+        else
+          integer ~kind (Integer.shift_right_logical i1 i2)
+      | Shiftrt, Some z, _ when Integer.is_zero z -> e1'
+      | Shiftrt, _, Some z when Integer.is_zero z -> e1'
+      | Eq, Some i1, Some i2 ->
+        bool (Integer.equal i1 i2)
+      | Ne, Some i1, Some i2 ->
+        bool (not (Integer.equal i1 i2))
+      | Le, Some i1, Some i2 ->
+        bool (Integer.le i1 i2)
+      | Ge, Some i1, Some i2 ->
+        bool (Integer.ge i1 i2)
+      | Lt, Some i1, Some i2 ->
+        bool (Integer.lt i1 i2)
+      | Gt, Some i1, Some i2 ->
+        bool (Integer.gt i1 i2)
+      | LAnd, Some i1, _ ->
+        if Integer.is_zero i1 then zero else e2'
+      | LAnd, _, Some i2 ->
+        if Integer.is_zero i2 then zero else e1'
+      | LOr, Some i1, _ ->
+        if Integer.is_zero i1 then e2' else one
+      | LOr, _, Some i2 ->
+        if Integer.is_zero i2 then e1' else one
+      | _ -> default ()
+    end
+  (* Floating-point operation *)
+  | TFloat (fk, _) ->
+    begin match op, to_float e1', to_float e2' with
+      | PlusA, Some f1, Some f2 ->
+        float ~kind:fk (f1 +. f2)
+      | MinusA, Some f1, Some f2 ->
+        float ~kind:fk (f1 -. f2)
+      | Mult, Some f1, Some f2 ->
+        float ~kind:fk (f1 *. f2)
+      | Div, Some f1, Some f2 ->
+        float ~kind:fk (f1 /. f2)
+      | _ -> default ()
+    end
+  | _ -> default ()
+
+and const_fold_lval (host, offset) =
+  const_fold_lhost host, const_fold_offset offset
+
+and const_fold_lhost = function
+  | Mem e -> Mem (const_fold e)
+  | Var _ as host -> host
+
+and const_fold_offset = function
+  | NoOffset -> NoOffset
+  | Field (fi, offset) -> Field (fi, const_fold_offset offset)
+  | Index (exp, offset) -> Index (const_fold exp, const_fold_offset offset)
+
+and to_integer e =
+  match e.node with
+  | Const (CInt64 (n,_,_)) -> Some n
+  | Const (CChr c) -> Some (Cil.charConstToInt c)
+  | Const (CEnum {eival = v}) -> Cil.isInteger v
+  | CastE (typ, e) when Cil.isPointerType typ ->
+    begin match to_integer e with
+      | Some i as r when Cil.fitsInInt Cil.theMachine.upointKind i -> r
+      | _ -> None
+    end
+  | _ -> None
+
+and to_float e =
+  match e.node with
+  | Const (CReal (f,_,_)) -> Some f
+  | _ -> None
+
+let fold_to_integer e =
+  to_integer (const_fold e)

@@ -27,7 +27,13 @@ val translate_lval: Cil_types.lval -> lval
 
 val mk: exp_node -> exp (* Does not assign origin. Should not be used. *)
 
+val zero: exp
+val one: exp
+
 val int: ?kind:Cil_types.ikind -> int -> exp
+val float: kind:Cil_types.fkind -> float -> exp
 val integer: ?kind:Cil_types.ikind -> Integer.t -> exp
+val bool: bool -> exp (* convert booleans to an expression 0 or 1 *)
+
 val binop: binop -> exp -> exp -> exp
 val add: exp -> exp -> exp

@@ -39,10 +39,6 @@ val rewrite_exp : (descend:(exp -> exp) -> exp -> exp) -> exp -> exp
 
 val rewrite_lval : (descend:(exp -> exp) -> exp -> exp) -> lval -> lval
 
-(** [cost_fold exp] will only replace expressions which originates from Cil
-    by calling Cil.constFold on them *)
-val const_fold : exp -> exp
-
 (** Computes the height of an expression, that is the maximum number of nested
     operations in this expression. *)
 val height_exp : exp -> int
@@ -84,3 +80,9 @@ val deps_of_exp:
 val deps_of_lval: (lval -> Precise_locs.precise_location) -> lval -> Deps.t
 (** Given a function computing the location of lvalues, computes the memory
     dependencies of an lvalue. *)
+
+
+(** Constant folding. *)
+
+val const_fold: exp -> exp
+val fold_to_integer: exp -> Integer.t option

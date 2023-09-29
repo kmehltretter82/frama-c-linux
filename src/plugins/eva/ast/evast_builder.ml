@@ -110,6 +110,18 @@ let integer ?kind i = (* TODO: mathematical unbounded integer *)
 let int ?kind i =
   integer ?kind (Integer.of_int i)
 
+let zero = int 0
+let one = int 1
+let bool = function false -> zero | true -> one
+
+let float ~kind f =
+  let f =
+    if kind = Cil_types.FFloat
+    then Floating_point.round_to_single_precision_float f
+    else f
+  in
+  mk (Const (CReal(f,kind,None)))
+
 let binop op e1 e2 =
   (* TODO: const folding *)
   let t1 = type_of_exp e1 and t2 = type_of_exp e2 in
