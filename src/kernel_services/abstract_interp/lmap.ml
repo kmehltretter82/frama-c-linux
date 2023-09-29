@@ -32,6 +32,16 @@ type 'a default_contents =
   | Constant of 'a
   | Other
 
+
+module type Default_offsetmap = sig
+  type v
+  type offsetmap
+
+  val name: string
+  val default_offsetmap : Base.t -> offsetmap Lattice_bounds.or_bottom
+  val default_contents: v default_contents
+end
+
 module Make_LOffset
     (V: sig
        include Offsetmap_lattice_with_isotropy.S
@@ -40,11 +50,8 @@ module Make_LOffset
     (Offsetmap: Offsetmap_sig.S
      with type v = V.t
       and type widen_hint = V.numerical_widen_hint)
-    (Default_offsetmap: sig
-       val name: string
-       val default_offsetmap : Base.t -> Offsetmap.t or_bottom
-       val default_contents: V.t default_contents
-     end)
+    (Default_offsetmap: Default_offsetmap with type v := V.t
+                                           and type offsetmap := Offsetmap.t)
 =
 struct
 
