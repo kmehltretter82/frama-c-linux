@@ -132,3 +132,6 @@ let binop op e1 e2 =
   | _ -> invalid_arg "unsupported construction"
 
 let add = binop PlusA
+
+let var vi = Var vi, NoOffset
+let var_exp vi = mk (Lval (var vi))

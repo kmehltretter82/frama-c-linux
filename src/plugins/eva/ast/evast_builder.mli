@@ -24,6 +24,8 @@ open Evast
 
 val translate_exp: Cil_types.exp -> exp
 val translate_lval: Cil_types.lval -> lval
+val translate_unop: Cil_types.unop -> unop
+val translate_binop: Cil_types.binop -> binop
 
 val mk: exp_node -> exp (* Does not assign origin. Should not be used. *)
 
@@ -37,3 +39,6 @@ val bool: bool -> exp (* convert booleans to an expression 0 or 1 *)
 
 val binop: binop -> exp -> exp -> exp
 val add: exp -> exp -> exp
+
+val var: Cil_types.varinfo -> lval
+val var_exp: Cil_types.varinfo -> exp
