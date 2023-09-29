@@ -159,7 +159,7 @@ val create_by_copy:
     the copy function of the copied state is implemented. All the hooks
     applied when loading a project are applied (see {!load}).
     If [last], then remember that the returned project is the last created
-    one (see {!last_created_by_copy}).
+    one.
 *)
 
 val create_by_copy_hook: (t -> t -> unit) -> unit
@@ -170,7 +170,7 @@ val create_by_copy_hook: (t -> t -> unit) -> unit
 val clear: ?selection:State_selection.t -> ?project:t -> unit -> unit
 (** Clear the given project. Default project is [current ()]. All the
     internal states of the given project are now empty (wrt the action
-    registered with {!register_todo_on_clear}).
+    registered with {!register_todo_before_clear}).
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val register_todo_before_clear: (t -> unit) -> unit

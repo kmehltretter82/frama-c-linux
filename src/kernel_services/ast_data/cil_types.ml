@@ -79,8 +79,7 @@ type file = {
   (** An optional global initializer function. This is a function where you
       can put stuff that must be executed before the program is
       started. This function, is conceptually at the end of the file,
-      although it is not part of the globals list. Use {!Cil.getGlobInit} to
-      create/get one. *)
+      although it is not part of the globals list. *)
 
   mutable globinitcalled: bool;
   (** Whether the global initialization function is called in main. This
@@ -180,7 +179,7 @@ and global =
     CIL is configured at build-time with the sizes and alignments of the
     underlying compiler (GCC or MSVC). CIL contains functions that can compute
     the size of a type (in bits) {!Cil.bitsSizeOf}, the alignment of a type (in
-    bytes) {!Cil.alignOf_int}, and can convert an offset into a start and width
+    bytes) {!Cil.bytesAlignOf}, and can convert an offset into a start and width
     (both in bits) using the function {!Cil.bitsOffset}. At the moment these
     functions do not take into account the [packed] attributes and pragmas. *)
 
@@ -333,12 +332,13 @@ and attrparam =
     Constructing a {!Cil_types.compinfo} can be tricky since it must contain
     fields that might refer to the host {!Cil_types.compinfo} and furthermore
     the type of the field might need to refer to the {!Cil_types.compinfo} for
-    recursive types.  Use the {!Cil.mkCompInfo} function to create a
+    recursive types.  Use the {!Cil_const.mkCompInfo} function to create a
     {!Cil_types.compinfo}. You can easily fetch the {!Cil_types.fieldinfo} for a
     given field in a structure with {!Cil.getCompField}. *)
 
-(** The definition of a structure or union type. Use {!Cil.mkCompInfo} to make
-    one and use {!Cil.copyCompInfo} to copy one (this ensures that a new key is
+(** The definition of a structure or union type. Use {!Cil_const.mkCompInfo} to
+    make one and use {!Cil_const.copyCompInfo} to copy one (this ensures that
+    a new key is
     assigned and that the fields have the right pointers to parents.).
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
 *)
@@ -964,10 +964,10 @@ and fundec = {
   mutable smaxstmtid: int option;
   (** max id of a (reachable) statement in this function, if we have
       computed it. range = 0 ...  (smaxstmtid-1). This is computed by
-      {!Cfg.computeCFGInfo}. *)
+      {!Cfg.cfgFun}. *)
 
   mutable sallstmts: stmt list;
-  (** After you call {!Cfg.computeCFGInfo} this field is set to contain all
+  (** After you call {!Cfg.cfgFun} this field is set to contain all
       statements in the function. *)
 
   mutable sspec: funspec;
@@ -1019,8 +1019,8 @@ and block = {
     [stmt] can be used to give unique numbers to statements, and the [succs] and
     [preds] fields can be used to maintain a list of successors and predecessors
     for every statement. The CFG information is not computed by default. Instead
-    you must explicitly use the functions {!Cfg.prepareCFG} and
-    {!Cfg.computeCFGInfo} to do it. *)
+    you must explicitly use functions {!Cfg.prepareCFG} and {!Cfg.cfgFun}
+    to do it. *)
 
 (** Statements.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)

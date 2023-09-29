@@ -142,8 +142,8 @@ module Location_Bytes : sig
   (** [fold_enum f loc acc] enumerates the locations in [acc], and passes
       them to [f]. Make sure to call {!cardinal_less_than} before calling
       this function, as all possible combinations of bases/offsets are
-      presented to [f]. Raises {!Error_Top} if [loc] is [Top _] or if
-      one offset cannot be enumerated. *)
+      presented to [f]. Raises {!Abstract_interp.Error_Top} if [loc] is
+      [Top _] or if one offset cannot be enumerated. *)
 
   val to_seq_i : t -> (Base.t * Ival.t) Seq.t
   (** Builds a sequence of all bases (with their offsets) of the location.

@@ -32,15 +32,15 @@ val use_monitoring: unit -> bool
 (** Is one variable monitored (at least)? *)
 
 val must_monitor_vi: ?kf:kernel_function -> ?stmt:stmt -> varinfo -> bool
-(** [must_model_vi ?kf ?stmt vi] returns [true] if the varinfo [vi] at the given
+(** [must_monitor_vi ?kf ?stmt vi] returns [true] if the varinfo [vi] at the given
     [stmt] in the given function [kf] must be tracked by the memory model
     library. *)
 
 val must_monitor_lval: ?kf:kernel_function -> ?stmt:stmt -> lval -> bool
-(** Same as {!must_model_vi}, for left-values *)
+(** Same as {!must_monitor_vi}, for left-values *)
 
 val must_monitor_exp: ?kf:kernel_function -> ?stmt:stmt -> exp -> bool
-(** Same as {!must_model_vi}, for expressions *)
+(** Same as {!must_monitor_vi}, for expressions *)
 
 val found_concurrent_function: loc:location -> varinfo -> unit
 (** [found_concurrent_function ~loc fvi] signals to the memory tracking
