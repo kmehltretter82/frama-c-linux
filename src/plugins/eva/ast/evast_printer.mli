@@ -20,7 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val pp_lval : Format.formatter -> Evast.lval -> unit
-val pp_offset : Format.formatter -> Evast.offset -> unit
-val pp_exp : Format.formatter -> Evast.exp -> unit
-val pp_constant : Format.formatter -> Evast.constant -> unit
+open Evast
+
+val pp_lval : Format.formatter -> lval -> unit
+val pp_offset : Format.formatter -> offset -> unit
+val pp_exp : Format.formatter -> exp -> unit
+val pp_constant : Format.formatter -> constant -> unit
+val pp_unop : Format.formatter -> unop -> unit
+val pp_binop : Format.formatter -> binop -> unit
