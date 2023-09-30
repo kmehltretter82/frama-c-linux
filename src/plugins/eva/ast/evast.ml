@@ -23,22 +23,27 @@
 (** Eva AST. *)
 
 type origin =
+  | Lval of Cil_types.lval
   | Exp of Cil_types.exp
   | Term of Cil_types.identified_term
   | Built (* Not present in the original source code *)
 
-type exp =
-  { node: exp_node;
-    origin: origin }
+type 'a tag = {
+  node: 'a;
+  typ: Cil_types.typ;
+  origin: origin;
+}
+
+type exp = exp_node tag
 
 and exp_node =
   | Const      of constant
   | Lval       of lval
-  | SizeOf     of typ * Integer.t option
-  | SizeOfE    of exp * Integer.t option
-  | SizeOfStr  of string * Integer.t option
-  | AlignOf    of typ * Integer.t option
-  | AlignOfE   of exp * Integer.t option
+  | SizeOf     of (typ * Integer.t option)
+  | SizeOfE    of (exp * Integer.t option)
+  | SizeOfStr  of (string * Integer.t option)
+  | AlignOf    of (typ * Integer.t option)
+  | AlignOfE   of (exp * Integer.t option)
   | UnOp       of unop * exp * typ
   | BinOp      of binop * exp * exp * typ
   | CastE      of typ * exp
@@ -53,7 +58,9 @@ and constant =
   | CReal of float * fkind * string option
   | CEnum of enumitem
 
-and lval = lhost * offset
+and lval_node = lhost * offset
+
+and lval = lval_node tag
 
 and lhost =
   | Var of Cil_types.varinfo

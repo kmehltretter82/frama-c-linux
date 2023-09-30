@@ -23,16 +23,12 @@
 open Evast
 
 
-(* --- Type of --- *)
-
-include Evast_typing
-
-
 (* --- Origins --- *)
 
 let origin_exp e =
   match e.origin with
   | Exp exp -> exp
+  | Lval lval -> Cil.new_exp ~loc:Cil_datatype.Location.unknown (Lval lval)
   | Built | Term _ -> invalid_arg "origin is not an expression"
 
 let [@tail_mod_cons] rec origin_offset = function
@@ -40,14 +36,18 @@ let [@tail_mod_cons] rec origin_offset = function
   | Index (e, o) -> Cil_types.Index (origin_exp e, origin_offset o)
   | Field (fi, o) -> Cil_types.Field (fi, origin_offset o)
 
-let origin_lval = function
-  | Var v, o -> Cil_types.Var v, origin_offset o
-  | Mem e, o -> Cil_types.Mem (origin_exp e), origin_offset o
+let origin_lval lv =
+  match lv.origin with
+  | Lval lv -> lv
+  | _ ->
+    match lv.node with
+    | Var v, o -> Cil_types.Var v, origin_offset o
+    | Mem e, o -> Cil_types.Mem (origin_exp e), origin_offset o
 
 let loc exp =
   match exp.origin with
   | Exp exp -> Some (exp.Cil_types.eloc)
-  | Built | Term _ -> None
+  | Lval _ | Built | Term _ -> None
 
 
 (* --- Rewriting --- *)
@@ -58,16 +58,17 @@ and descend f exp =
   let replace_if condition node =
     if condition then Evast_builder.mk node else exp
   in
+  let lval_diff lv1 lv2 = not (Evast_datatype.Lval.equal lv1 lv2) in
   match exp.node with
-  | Lval (lh, o as lv) ->
-    let (lh', o' as lv') = rewrite_lval f lv in
-    replace_if (lh' != lh || o' != o) (Lval lv')
-  | AddrOf (lh, o as lv) ->
-    let (lh', o' as lv') = rewrite_lval f lv in
-    replace_if (lh' != lh || o' != o) (AddrOf lv')
-  | StartOf (lh, o as lv) ->
-    let (lh', o' as lv') = rewrite_lval f lv in
-    replace_if (lh' != lh || o' != o) (StartOf lv')
+  | Lval lv ->
+    let lv' = rewrite_lval f lv in
+    replace_if (lval_diff lv lv') (Lval lv')
+  | AddrOf lv ->
+    let lv' = rewrite_lval f lv in
+    replace_if (lval_diff lv lv') (AddrOf lv')
+  | StartOf lv ->
+    let lv' = rewrite_lval f lv in
+    replace_if (lval_diff lv lv') (StartOf lv')
   | UnOp (op, e, t) ->
     let e' = rewrite_exp f e in
     replace_if (e' != e) (UnOp (op, e', t))
@@ -86,8 +87,12 @@ and descend f exp =
     replace_if (e' != e) (AlignOfE (e',size_opt))
   | SizeOf _ | Const _ | SizeOfStr _ | AlignOf _ ->
     exp
-and rewrite_lval f (lhost, offset) =
-  rewrite_lhost f lhost, rewrite_offset f offset
+and rewrite_lval f lval =
+  let lh, o = lval.node in
+  let lh' = rewrite_lhost f lh and o' = rewrite_offset f o in
+  if lh' != lh || o' != o
+  then Evast_builder.mk_lval (lh', o')
+  else lval
 and rewrite_lhost f lhost =
   match lhost with
   | Var _ -> lhost
@@ -113,7 +118,8 @@ let rec iter_lvals_in_exp (f : lval -> unit) (exp : exp) : unit =
   | UnOp (_, e, _) | CastE (_, e) -> iter_lvals_in_exp f e
   | BinOp (_, e1, e2, _) -> iter_lvals_in_exp f e1; iter_lvals_in_exp f e2
   | _ -> ()
-and iter_lvals_in_lval f (lhost, offset : lval) : unit =
+and iter_lvals_in_lval f (lval : lval) : unit =
+  let lhost, offset = lval.node in
   iter_lvals_in_lhost f lhost;
   iter_lvals_in_offset f offset
 and iter_lvals_in_lhost f : lhost -> unit = function
@@ -135,7 +141,8 @@ let rec height_exp exp =
     -> height_exp e + 1
   | BinOp (_,e1,e2,_) -> max (height_exp e1) (height_exp e2) + 1
 
-and height_lval (host, offset) =
+and height_lval lv =
+  let host, offset = lv.node in
   let h1 = match host with
     | Var _ -> 0
     | Mem e -> height_exp e + 1
@@ -178,8 +185,9 @@ let rec exp_contains_volatile (exp : exp) : bool =
   | UnOp (_, e, _) | CastE (_, e) -> exp_contains_volatile e
   | BinOp (_, e1, e2, _) -> exp_contains_volatile e1 || exp_contains_volatile e2
   | _ -> false
-and lval_contains_volatile (lhost, offset as lval : lval) : bool =
-  Cil.isVolatileType (Evast_typing.type_of_lval lval) ||
+and lval_contains_volatile (lval : lval) : bool =
+  let lhost, offset = lval.node in
+  Cil.isVolatileType (lval.typ) ||
   lhost_contains_volatile lhost ||
   offset_contains_volatile offset
 and lhost_contains_volatile : lhost -> bool = function
@@ -201,7 +209,8 @@ let rec vars_in_exp (exp : exp) : VarSet.t =
   | UnOp (_, e, _) | CastE (_, e) -> vars_in_exp e
   | BinOp (_, e1, e2, _) -> VarSet.union (vars_in_exp e1) (vars_in_exp e2)
   | _ -> VarSet.empty
-and vars_in_lval (lhost, offset : lval) : VarSet.t =
+and vars_in_lval (lval : lval) : VarSet.t =
+  let lhost, offset = lval.node in
   VarSet.union (vars_in_lhost lhost) (vars_in_offset offset)
 and vars_in_lhost : lhost -> VarSet.t = function
   | Var vi -> VarSet.singleton vi
@@ -243,9 +252,11 @@ and zone_of_lval find_loc lval = Deps.to_zone (deps_of_lval find_loc lval)
 
 (* Computations of the inputs of a lvalue : union of the "host" part and
    the offset. *)
-and indirect_zone_of_lval find_loc (lhost, offset) =
-  Locations.Zone.join
-    (zone_of_lhost find_loc lhost) (zone_of_offset find_loc offset)
+and indirect_zone_of_lval find_loc lval =
+  let lhost, offset = lval.node in
+  let lhost_zone = zone_of_lhost find_loc lhost
+  and offset_zone = zone_of_offset find_loc offset in
+  Locations.Zone.join lhost_zone offset_zone
 
 (* Computation of the inputs of a host. Nothing for a variable, and the
    inputs of [e] for a dereference [*e]. *)
@@ -350,7 +361,7 @@ and const_fold_binop op e1 e2 t =
   (* Can a shift operation be safely computed ? *)
   let shift_in_bounds i2 =
     try
-      let size = Integer.of_int (Cil.bitsSizeOf (type_of_exp e1')) in
+      let size = Integer.of_int (Cil.bitsSizeOf e1'.typ) in
       Integer.(ge i2 zero && lt i2 size)
     with Cil.SizeOfError _ -> false
   in
@@ -441,8 +452,9 @@ and const_fold_binop op e1 e2 t =
     end
   | _ -> default ()
 
-and const_fold_lval (host, offset) =
-  const_fold_lhost host, const_fold_offset offset
+and const_fold_lval lval =
+  let lhost, offset = lval.node in
+  Evast_builder.mk_lval (const_fold_lhost lhost, const_fold_offset offset)
 
 and const_fold_lhost = function
   | Mem e -> Mem (const_fold e)

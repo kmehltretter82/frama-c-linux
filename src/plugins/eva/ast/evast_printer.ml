@@ -24,7 +24,7 @@ open Evast
 
 module Precedence =
 struct
-  let lval_level = function
+  let lval_level lv = match lv.node with
     | Mem _, _
     | Var _, (Field _|Index _) -> 20
     | Var _, NoOffset -> 0
@@ -48,7 +48,7 @@ let pp_string fmt s =
 
 let rec pp_lval fmt lval =
   let precedence = Precedence.lval_level lval in
-  match lval with
+  match lval.node with
   | Var vi, o ->
     Format.fprintf fmt "%s%a" vi.vname pp_offset o
   | Mem e, Field(fi, o) ->

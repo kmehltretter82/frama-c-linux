@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Evast
-open Evast_typing
 
 let translate_unop = function
   | Cil_types.Neg -> Neg
@@ -79,7 +78,8 @@ let rec translate_exp e =
     | Cil_types.AddrOf lval -> AddrOf (translate_lval lval)
     | Cil_types.StartOf lval -> StartOf (translate_lval lval)
   in
-  { node; origin = Exp e }
+  let typ = Evast_typing.type_of_exp node in
+  { node ; origin = Exp e ; typ }
 
 and translate_host = function
   | Cil_types.Var vi -> Var vi
@@ -92,10 +92,17 @@ and translate_offset = function
   | Cil_types.Field (fieldinfo, offset) ->
     Field (fieldinfo, translate_offset offset)
 
-and translate_lval (host, offset) = translate_host host, translate_offset offset
+and translate_lval (host, offset as lval) =
+  let node = translate_host host, translate_offset offset in
+  let typ = Evast_typing.type_of_lval node in
+  { node ; origin = Lval lval ; typ }
+
 
 let mk node =
-  { node ; origin = Built }
+  { node ; origin = Built ; typ = Evast_typing.type_of_exp node }
+
+let mk_lval node =
+  { node ; origin = Built ; typ = Evast_typing.type_of_lval node }
 
 let integer ?kind i = (* TODO: mathematical unbounded integer *)
   let kind = match kind with
@@ -124,8 +131,7 @@ let float ~kind f =
 
 let binop op e1 e2 =
   (* TODO: const folding *)
-  let t1 = type_of_exp e1 and t2 = type_of_exp e2 in
-  let t = Cil.arithmeticConversion t1 t2 in
+  let t = Cil.arithmeticConversion e1.typ e2.typ in
   match op with
   | PlusA | MinusA | Mult | Div ->
     mk (BinOp (op,e1,e2,t))
@@ -133,5 +139,7 @@ let binop op e1 e2 =
 
 let add = binop PlusA
 
-let var vi = Var vi, NoOffset
+let var vi = mk_lval (Var vi, NoOffset)
 let var_exp vi = mk (Lval (var vi))
+
+let lval lv = { lv with node=Lval lv }

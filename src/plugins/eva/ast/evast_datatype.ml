@@ -43,10 +43,12 @@ struct
   struct
     type t = lval
 
-    let compare (h1,o1) (h2,o2) =
+    let compare lv1 lv2 =
+      let (h1,o1) = lv1.node and (h2,o2) = lv2.node in
       Lhost.compare h1 h2 <?> lazy (Offset.compare o1 o2)
 
-    let hash (h,o) =
+    let hash lv =
+      let (h,o) = lv.node in
       Hashtbl.hash (Lhost.hash h, Offset.hash o)
   end
 
@@ -193,13 +195,21 @@ struct
   end
 end
 
+
+(* Tag utility *)
+
+let reprs_tag = List.map (fun node -> {node; typ=Cil.voidType; origin=Built})
+
+
+(* Exported modules *)
+
 module Lval =
   Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
     include Prototypes.Lval
-
     let name = "Eva.Evast_datatype.Lval"
-    let reprs = List.map (fun v -> Var v, NoOffset) Cil_datatype.Varinfo.reprs
+    let reprs =
+      reprs_tag (List.map (fun v -> Var v, NoOffset) Cil_datatype.Varinfo.reprs)
     let pretty = Evast_printer.pp_lval
     let equal = Datatype.from_compare
   end)
@@ -211,7 +221,9 @@ module Lhost =
 
     let name = "Eva.Evast_datatype.Lhost"
     let reprs = List.map (fun v -> Var v) Cil_datatype.Varinfo.reprs
-    let pretty fmt h = Evast_printer.pp_lval fmt (h, NoOffset)
+    let pretty fmt h =
+      let lv = Evast_builder.mk_lval (h, NoOffset) in
+      Evast_printer.pp_lval fmt lv
     let equal = Datatype.from_compare
   end)
 
