@@ -4083,7 +4083,7 @@ let rec nested_call e =
 
 (* Used to remember if we encountered a access to a field of type array from
    a struct-returning call. *)
-let contains_problem = ref false
+let contains_temp_subarray = ref false
 
 let rec doSpecList ghost (suggestedAnonName: string)
     (* This string will be part of
@@ -5587,7 +5587,7 @@ and doExp local_env
         then r
         else lv':: r
       in
-      contains_problem := (Cil.isArrayType field_type && nested_call e);
+      contains_temp_subarray := (Cil.isArrayType field_type && nested_call e);
       finishExp reads se (new_exp ~loc (Lval lv')) (dropQualifiers field_type)
 
     (* e->str = * (e + off(str)) *)
@@ -7794,7 +7794,7 @@ and doCondition ~is_loop local_env asconst
     (st: chunk)
     (sf: chunk) : chunk =
   let ghost = local_env.is_ghost in
-  contains_problem := false;
+  contains_temp_subarray := false;
   if isEmpty st && isEmpty sf(*TODO: ignore attribute FRAMA_C_KEEP_BLOCK*) then
     begin
       let (_, se, e, _) = doExp local_env CNoConst e ADrop in
@@ -7809,16 +7809,16 @@ and doCondition ~is_loop local_env asconst
           se
         end
       in
-      if !contains_problem then begin
-        contains_problem := false;
+      if !contains_temp_subarray then begin
+        contains_temp_subarray := false;
         enclose_chunk ~ghost se'
       end
       else se'
     end
   else begin
     let ce = doCondExp (no_paren_local_env local_env) asconst e in
-    if !contains_problem then begin
-      contains_problem := false;
+    if !contains_temp_subarray then begin
+      contains_temp_subarray := false;
       if is_loop then
         (* enclose our problematic chunk and the break condition. *)
         enclose_chunk ~ghost (compileCondExp ~ghost ce st sf)
@@ -7853,13 +7853,13 @@ and doPureExp local_env (e : Cabs.expression) : exp =
    else proceed as usual.
 *)
 and doFullExp local_env const e what =
-  contains_problem := false;
+  contains_temp_subarray := false;
   let (r, se,e,t) = doExp local_env const e what in
   let ghost = local_env.is_ghost in
   let loc = e.eloc in
   let se', e' =
-    if !contains_problem then begin
-      contains_problem := false;
+    if !contains_temp_subarray then begin
+      contains_temp_subarray := false;
       if what = ADrop
       then enclose_chunk ~ghost (add_reads ~ghost loc r se), e
       else hide_chunk ~ghost ~loc r se e t
@@ -8899,7 +8899,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     else begin
       (* TODO: if vi occurs in se4, this is not a real initialization. *)
       vi.vdefined <- true;
-      contains_problem := false;
+      contains_temp_subarray := false;
       let se4, ie', et, r = doInitializer (ghost_local_env ghost) vi inite in
       let se4 = cleanup_autoreference vi se4 in
       (* Fix the length *)
@@ -8926,9 +8926,9 @@ and createLocal ghost ((_, sto, _, _) as specs)
         i2c (normal_stmt, [ ], [ var vi ], read)
       in
       let se4', chunk_init =
-        if not !contains_problem then se4, normal_init_chunk ()
+        if not !contains_temp_subarray then se4, normal_init_chunk ()
         else begin
-          contains_problem := false;
+          contains_temp_subarray := false;
           match ie' with
           (* If ie' is already a tmp variable, enclose the chunk and extract tmp
              from inner locals to the new block locals.
