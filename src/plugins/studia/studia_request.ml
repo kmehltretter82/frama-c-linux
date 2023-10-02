@@ -26,9 +26,9 @@ open Cil_types
 let package =
   Package.package ~plugin:"studia" ~name:"studia" ~title:"Studia" ()
 
-type effects =
-  { direct: stmt list;
-    indirect: stmt list; }
+type effects = { direct: stmt list; indirect: stmt list }
+
+let empty = { direct = []; indirect = []; }
 
 module Effects = struct
   open Server.Data
@@ -64,29 +64,37 @@ module Effects = struct
 end
 
 let compute_writes zone =
-  let reads = Writes.compute zone in
-  let add acc = function
-    | Writes.Assign stmt | CallDirect stmt ->
-      { acc with direct = stmt :: acc.direct }
-    | CallIndirect stmt ->
-      { acc with indirect = stmt :: acc.indirect }
-    | FormalInit (_vi, callsites) ->
-      let calls = List.flatten (List.map snd callsites) in
-      { acc with direct = calls @ acc.direct }
-    | GlobalInit (_vi, _initinfo) ->
-      acc (* for now ignore global initializations *)
-  in
-  let empty = { direct = []; indirect = []; } in
-  List.fold_left add empty reads
+  try
+    let reads = Writes.compute zone in
+    let add acc = function
+      | Writes.Assign stmt | CallDirect stmt ->
+        { acc with direct = stmt :: acc.direct }
+      | CallIndirect stmt ->
+        { acc with indirect = stmt :: acc.indirect }
+      | FormalInit (_vi, callsites) ->
+        let calls = List.flatten (List.map snd callsites) in
+        { acc with direct = calls @ acc.direct }
+      | GlobalInit (_vi, _initinfo) ->
+        acc (* for now ignore global initializations *)
+    in
+    List.fold_left add empty reads
+  with exn ->
+    Options.warning "Error when computing writes (%s)"
+      (Printexc.to_string exn) ;
+    empty
 
 let compute_reads zone =
-  let reads = Reads.compute zone in
-  let add acc = function
-    | Reads.Direct stmt -> { acc with direct = stmt :: acc.direct }
-    | Indirect stmt -> { acc with indirect = stmt :: acc.indirect }
-  in
-  let empty = { direct = []; indirect = []; } in
-  List.fold_left add empty reads
+  try
+    let reads = Reads.compute zone in
+    let add acc = function
+      | Reads.Direct stmt -> { acc with direct = stmt :: acc.direct }
+      | Indirect stmt -> { acc with indirect = stmt :: acc.indirect }
+    in
+    List.fold_left add empty reads
+  with exn ->
+    Options.warning "Error when computing reads (%s)"
+      (Printexc.to_string exn) ;
+    empty
 
 let lval_location kinstr lval =
   Eva.Results.(before_kinstr kinstr |> eval_address lval |> as_zone)
