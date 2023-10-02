@@ -312,6 +312,11 @@ let declaration_of_type = function
   | TComp (ci, _) -> Some (SComp ci)
   | TEnum (ei, _) -> Some (SEnum ei)
 
+let declaration_of_property ip =
+  match Property.get_kf ip with
+  | None -> None
+  | Some kf -> Some (SFunction kf)
+
 let declaration_of_localizable = function
   | PStmt(kf,_) | PStmtStart(kf,_)
   | PVDecl(Some kf,_,_)
@@ -325,9 +330,10 @@ let declaration_of_localizable = function
       with Not_found -> SGlobal vi
     )
   | PGlobal g -> declaration_of_global g
+  | PIP p -> declaration_of_property p
   | PTermLval(None,_,_,_)
   | PLval(None,_,_) | PExp(None,_,_)
-  | PType _ | PIP _ -> None
+  | PType _ -> None
 
 let definition_of_type = function
   | TVoid _ | TInt _ | TFloat _ | TPtr _

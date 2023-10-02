@@ -85,7 +85,7 @@ module Localizable: Datatype.S_with_collections with type t = localizable
 
     Localizable items are always printed under a certain global scole
     identified by a declaration that can be retrieved from
-    {!declaration_of_type}, {!declaration_of_global}
+    {!declaration_of_type}, {!declaration_of_global}, {!declaration_of_property}
     and {!declaration_of_localizable} functions below.
 
     Moreoever, each declarated item can be identified in two different ways: a
@@ -105,6 +105,7 @@ module Localizable: Datatype.S_with_collections with type t = localizable
 
 val declaration_of_type : typ -> declaration option
 val declaration_of_global : global -> declaration option
+val declaration_of_property : Property.t -> declaration option
 val declaration_of_localizable : localizable -> declaration option
 
 val definition_of_type : typ -> localizable option
