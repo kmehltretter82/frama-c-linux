@@ -47,26 +47,19 @@ export interface MultiSelection {
   index?: number;
 }
 
-export interface MultiSelectionState {
-  label: string;
-  title: string;
-  markers: Ast.marker[];
-  index: number;
-}
-
 const emptySelection = { label: '', title: '', markers: [], index: 0 };
-const MultiSelection = new GlobalState<MultiSelectionState>(emptySelection);
+const MultiSelection = new GlobalState<MultiSelection>(emptySelection);
 
-export function useSelection(): MultiSelectionState {
+export function useSelection(): MultiSelection {
   const [s] = useGlobalState(MultiSelection);
   return s;
 }
 
 export function setSelection(s: MultiSelection): void
 {
-  const { index=0, ...data } = s;
-  MultiSelection.setValue({ ...data, index });
-  States.setSelected(data.markers[index]);
+  MultiSelection.setValue(s);
+  const marker = s.index !== undefined ? s.markers[s.index] : undefined;
+  if (marker) States.setSelected(marker);
 }
 
 export function setIndex(index: number): void {
@@ -82,7 +75,7 @@ export function setNextSelection(locs: Ast.marker[]): void {
   const selection = MultiSelection.getValue();
   const { markers, index } = selection;
   if (markers === locs) {
-    const target = index+1;
+    const target = index === undefined ? 0 : index+1;
     const select = target < locs.length ? target : 0;
     setSelection({ ...selection, index: select });
   } else {
@@ -90,7 +83,7 @@ export function setNextSelection(locs: Ast.marker[]): void {
   }
 }
 
-export function clear(): void {
+export function clearSelection(): void {
   MultiSelection.setValue(emptySelection);
 }
 
@@ -127,10 +120,12 @@ export default function LocationsTable(): JSX.Element {
       markers.map((marker, index): Data => ({ index, marker }))
     );
   }, [model, markers]);
-  const selected = markers[index];
+  const selected = index !== undefined ? markers[index] : undefined;
   const size = markers.length;
 
-  const indexLabel = `${index+1} / ${size}`;
+  const kindex = index === undefined ? -1 : index;
+  const indexLabel = index === undefined ? '…' : index+1;
+  const positionLabel = `${indexLabel} / ${size}`;
 
   const getLocation = React.useCallback((d: Data): string => {
     const attr = getAttr(d.marker);
@@ -147,24 +142,26 @@ export default function LocationsTable(): JSX.Element {
         <IconButton
           icon='ANGLE.LEFT'
           title='Previous location'
-          enabled={0 < index}
-          onClick={() => gotoIndex(index-1)}
+          enabled={0 < kindex}
+          onClick={() => gotoIndex(kindex-1)}
         />
         <IconButton
           icon='ANGLE.RIGHT'
           title='Next location'
-          enabled={index + 1 < size}
-          onClick={() => gotoIndex(index+1)}
+          enabled={0 <= kindex && kindex + 1 < size}
+          onClick={() => gotoIndex(kindex+1)}
         />
         <Space />
         <Label
           className='component-info'
-          display={0 <= index && index < size}
-          label={indexLabel}
+          display={0 < size}
+          label={positionLabel}
           title='Current location index / Number of locations' />
         <Space />
         <IconButton
           icon='TRASH'
+          title='Cancel selected locations'
+          onClick={clearSelection}
         />
       </TitleBar>
       <Label label={label} title={title} style={{ textAlign: 'center' }} />
