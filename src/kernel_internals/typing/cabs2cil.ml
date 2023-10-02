@@ -2003,7 +2003,7 @@ struct
       { empty with
         stmts = List.map (fun s -> (s,[],[],[],[])) b.bstmts;
         locals = b.blocals }
-    | _ -> assert false
+    | _ -> i2c (s,[],[],[])
 
   (* We can duplicate a chunk if it has a few simple statements, and if
    * it does not have cases, locals or statics *)
@@ -8934,7 +8934,8 @@ and createLocal ghost ((_, sto, _, _) as specs)
              from inner locals to the new block locals.
           *)
           | SingleInit {enode=Lval(Var tmp, NoOffset)} when tmp.vtemp ->
-            let locals_no_tmp = List.filter (fun v -> v <> tmp) se4.locals in
+            let f v = not @@ Cil_datatype.Varinfo.equal v tmp in
+            let locals_no_tmp = List.filter f se4.locals in
             let se4_without_tmp = {se4 with locals = locals_no_tmp} in
             let enclosed = enclose_chunk ~ghost ~locals:[tmp] se4_without_tmp in
             enclosed, normal_init_chunk ()
