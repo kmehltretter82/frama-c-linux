@@ -90,7 +90,7 @@ function FctItem(props: FctItemProps): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
-// --- Globals Section(s)
+// --- Functions Section
 // --------------------------------------------------------------------------
 
 type functionsData =
@@ -110,7 +110,7 @@ function computeFcts(
   return arr.sort((f, g) => alpha(f.name, g.name));
 }
 
-export default function Globals(): JSX.Element {
+export function Functions(): JSX.Element {
 
   // Hooks
   const scope = States.useCurrentScope();
@@ -248,15 +248,115 @@ export default function Globals(): JSX.Element {
       label="Functions"
       title={title}
       defaultUnfold
-      settings="frama-c.sidebar.globals"
+      settings="frama-c.sidebar.functions"
       rightButtonProps={filterButtonProps}
       summary={[nFilter]}
-      className='globals-function-section'
+      className='globals-section'
     >
       {nFilter > 0 ? filteredFunctions : nTotal > 0 ? allFiltered : noFunction}
     </Section>
   );
 
+}
+
+// --------------------------------------------------------------------------
+// --- Generic Declaration Section
+// --------------------------------------------------------------------------
+
+interface DeclarationsProps {
+  id: string;
+  label: string;
+  title: string;
+  filter: (props: Ast.declAttributesData) => boolean;
+  defaultUnfold?: boolean;
+}
+
+function makeItem(
+  scope: States.Scope,
+  attributes: Ast.declAttributesData
+): JSX.Element {
+  const { decl, name, label } = attributes;
+  return (
+    <Item
+      key={decl}
+      label={name}
+      title={label}
+      selected={decl === scope}
+      onSelection={() => States.setCurrentScope(decl)}
+    />
+  );
+}
+
+export function Declarations(props: DeclarationsProps): JSX.Element {
+  const { id, label, title, filter, defaultUnfold=false } = props;
+  const settings = React.useMemo(() => `frama-c.sidebar.${id}`, [id]);
+  const data = States.useSyncArrayData(Ast.declAttributes);
+  const scope = States.useCurrentScope();
+  const items = React.useMemo(
+    () =>
+      data
+        .filter(filter)
+        .map((d) => makeItem(scope, d))
+    , [scope, data, filter]
+  );
+  return (
+    <Section
+      label={label}
+      title={title}
+      defaultUnfold={defaultUnfold}
+      settings={settings}
+      summary={[items.length]}
+      className='globals-section'
+    >
+      {items}
+    </Section>
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Global Variables Section
+// --------------------------------------------------------------------------
+
+const filterGlobals = (d: Ast.declAttributesData): boolean => (
+  d.kind === 'GLOBAL'
+);
+
+export function Globals(): JSX.Element {
+  return (
+    <Declarations
+      id='globals'
+      label='Globals'
+      title='Global Variables'
+      filter={filterGlobals}
+    />
+  );
+}
+
+const filterTypes = (d: Ast.declAttributesData): boolean => {
+  switch(d.kind) {
+    case 'TYPE':
+    case 'ENUM':
+    case 'UNION':
+    case 'STRUCT':
+      return true;
+    default:
+      return false;
+  }
+};
+
+// --------------------------------------------------------------------------
+// --- Types Section
+// --------------------------------------------------------------------------
+
+export function Types(): JSX.Element {
+  return (
+    <Declarations
+      id='types'
+      label='Types'
+      title='Typedefs, Structs, Unions and Enums'
+      filter={filterTypes}
+    />
+  );
 }
 
 // --------------------------------------------------------------------------

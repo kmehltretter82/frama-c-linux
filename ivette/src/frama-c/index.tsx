@@ -28,7 +28,7 @@ import React from 'react';
 import * as Ivette from 'ivette';
 
 import History from 'frama-c/kernel/History';
-import Globals from 'frama-c/kernel/Globals';
+import { Functions, Globals, Types } from 'frama-c/kernel/Globals';
 import Status from 'frama-c/kernel/Status';
 import ASTview from 'frama-c/kernel/ASTview';
 import ASTinfo from 'frama-c/kernel/ASTinfo';
@@ -52,7 +52,9 @@ Ivette.registerGroup({
   id: 'frama-c.kernel',
   label: 'Frama-C Kernel',
 }, () => {
+  Ivette.registerSidebar({ id: 'frama-c.types', children: <Types /> });
   Ivette.registerSidebar({ id: 'frama-c.globals', children: <Globals /> });
+  Ivette.registerSidebar({ id: 'frama-c.functions', children: <Functions /> });
   Ivette.registerToolbar({ id: 'frama-c.history', children: <History /> });
   Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
   Ivette.registerComponent({
