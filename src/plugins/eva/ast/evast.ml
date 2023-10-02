@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_datatype
+
 (** Eva AST. *)
 
 type origin =
@@ -34,7 +36,11 @@ type 'a tag = {
   origin: origin;
 }
 
-type varinfo = Cil_types.varinfo
+let equal_tag equal_node t1 t2 = equal_node t1.node t2.node
+let compare_tag compare_node t1 t2 = compare_node t1.node t2.node
+
+type typ = Typ.t [@@deriving eq,ord]
+type varinfo = Varinfo.t [@@deriving eq,ord]
 
 type exp = exp_node tag
 
@@ -58,7 +64,7 @@ and constant =
   | CString of Base.t (* Base must be String *)
   | CChr of char
   | CReal of float * fkind * string option
-  | CEnum of enumitem
+  | CEnum of Enumitem.t
 
 and lval_node = lhost * offset
 
@@ -70,13 +76,13 @@ and lhost =
 
 and offset =
   | NoOffset
-  | Field of Cil_types.fieldinfo * offset
+  | Field of Fieldinfo.t * offset
   | Index of exp * offset
 
-and typ = Cil_types.typ
-and ikind = Cil_types.ikind
-and fkind = Cil_types.fkind
-and enumitem = Cil_types.enumitem
+and ikind = Cil_types.ikind [@equal (=)] [@compare Stdlib.compare]
+and fkind = Cil_types.fkind [@equal (=)] [@compare Stdlib.compare]
+[@@deriving eq,ord]
+
 
 and unop = Neg | BNot | LNot
 
