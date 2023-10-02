@@ -90,7 +90,7 @@ export function clearSelection(): void {
 function gotoIndex(index: number): void {
   const selection = MultiSelection.getValue();
   if (0 <= index && index <= selection.markers.length)
-    MultiSelection.setValue({ ...selection, index });
+    setSelection({ ...selection, index });
 }
 
 // --------------------------------------------------------------------------
@@ -123,7 +123,7 @@ export default function LocationsTable(): JSX.Element {
   const selected = index !== undefined ? markers[index] : undefined;
   const size = markers.length;
 
-  const kindex = index === undefined ? -1 : index;
+  const kindex = index === undefined ? (-1) : index;
   const indexLabel = index === undefined ? '…' : index+1;
   const positionLabel = `${indexLabel} / ${size}`;
 
@@ -148,7 +148,7 @@ export default function LocationsTable(): JSX.Element {
         <IconButton
           icon='ANGLE.RIGHT'
           title='Next location'
-          enabled={0 <= kindex && kindex + 1 < size}
+          enabled={(-1) <= kindex && kindex + 1 < size}
           onClick={() => gotoIndex(kindex+1)}
         />
         <Space />
