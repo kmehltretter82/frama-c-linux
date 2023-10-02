@@ -929,6 +929,18 @@ let () = Information.register
     end
 
 let () = Information.register
+    ~id:"kernel.ast.propertyStatus"
+    ~label:"Status"
+    ~title:"Property Consolidated Status"
+    begin fun fmt loc ->
+      match loc with
+      | PIP prop ->
+        Property_status.Feedback.pretty fmt @@
+        Property_status.Feedback.get prop
+      | _ -> raise Not_found
+    end
+
+let () = Information.register
     ~id:"kernel.ast.marker"
     ~label:"Marker"
     ~title:"Ivette marker (for debugging)"
