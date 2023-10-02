@@ -479,7 +479,12 @@ export function Editor(extensions: Extension[]): Editor {
   React.useEffect(() => {
     if (!parent.current) return;
     const state = EditorState.create({ extensions });
-    editor.current = new EditorView({ state, parent: parent.current });
+    const eview = new EditorView({ state, parent: parent.current });
+    editor.current = eview;
+    return () => {
+      eview.destroy();
+      editor.current = null;
+    };
   }, [parent, extensions]);
   return { view: editor.current, Component };
 }
