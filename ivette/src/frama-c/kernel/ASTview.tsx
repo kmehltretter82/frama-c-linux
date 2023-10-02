@@ -703,9 +703,9 @@ export default function ASTview(): JSX.Element {
   const { view, Component } = Editor.Editor(extensions);
 
   // Current selection
-  const { scope, marker } = States.useCurrentLocation();
+  const { scope, marker = Ast.markerDefault } = States.useCurrentLocation();
   React.useEffect(() => Marker.set(view, marker), [view, marker]);
-  const hovered = States.useHovered();
+  const hovered = States.useHovered() ?? Ast.markerDefault;
   React.useEffect(() => Hovered.set(view, hovered), [view, hovered]);
 
   // Multiple selection
