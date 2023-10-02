@@ -25,19 +25,13 @@
 open Evast
 
 (** These functions are given here as a temporary stub and should not be used *)
+
 val origin_exp : exp -> Cil_types.exp
 val origin_lval : lval -> Cil_types.lval
 val origin_offset : offset -> Cil_types.offset
 val loc : exp -> Cil_types.location option
 
-(** [rewrite f exp] rewrites [exp] by calling [f ~descent node] on root exp. [f]
-    can call [descent e] to rewrite recursively subexpressions of [e]. *)
-val rewrite_exp : (descend:(exp -> exp) -> exp -> exp) -> exp -> exp
-
-val rewrite_lval : (descend:(exp -> exp) -> exp -> exp) -> lval -> lval
-
-(** [iter_lvals_in_exp f exp] calls [f] from every lvalue contained in [exp] *)
-val iter_lvals_in_exp : (lval -> unit) -> exp -> unit
+(** Expressions/Lvalue heights *)
 
 (** Computes the height of an expression, that is the maximum number of nested
     operations in this expression. *)
@@ -46,12 +40,19 @@ val height_exp : exp -> int
 (** Computes the height of an lvalue. *)
 val height_lval : lval -> int
 
+(** Relations *)
+
 (** Inverse a relation, op must be a comparison operator *)
 val invert_relation : binop -> binop
 
 (** Convert a relation to Abstract_interp.Comp, op must be a comparison
     operator *)
 val conv_relation : binop -> Abstract_interp.Comp.t
+
+(** Specialized visitors *)
+
+(** [iter_lvals f exp] calls [f] from every lvalue contained in [exp] *)
+val iter_lvals : (lval -> unit) -> exp -> unit
 
 (** [exp_contains_volatile e] (resp. [lval_contains_volatile lv] is true
     whenever one l-value contained inside the expression [e] (resp. the lvalue
@@ -89,7 +90,6 @@ val deps_of_exp:
 val deps_of_lval: (lval -> Precise_locs.precise_location) -> lval -> Deps.t
 (** Given a function computing the location of lvalues, computes the memory
     dependencies of an lvalue. *)
-
 
 (** Constant folding. *)
 

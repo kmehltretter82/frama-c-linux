@@ -50,87 +50,6 @@ let loc exp =
   | Lval _ | Built | Term _ -> None
 
 
-(* --- Rewriting --- *)
-
-let rec rewrite_exp f exp =
-  f ~descend:(descend f) exp
-and descend f exp =
-  let replace_if condition node =
-    if condition then Evast_builder.mk node else exp
-  in
-  let lval_diff lv1 lv2 = not (Evast_datatype.Lval.equal lv1 lv2) in
-  match exp.node with
-  | Lval lv ->
-    let lv' = rewrite_lval f lv in
-    replace_if (lval_diff lv lv') (Lval lv')
-  | AddrOf lv ->
-    let lv' = rewrite_lval f lv in
-    replace_if (lval_diff lv lv') (AddrOf lv')
-  | StartOf lv ->
-    let lv' = rewrite_lval f lv in
-    replace_if (lval_diff lv lv') (StartOf lv')
-  | UnOp (op, e, t) ->
-    let e' = rewrite_exp f e in
-    replace_if (e' != e) (UnOp (op, e', t))
-  | BinOp (op, e1, e2, t) ->
-    let e1' = rewrite_exp f e1
-    and e2' = rewrite_exp f e2 in
-    replace_if (e1' != e1 || e2' != e2) (BinOp (op, e1', e2', t))
-  | CastE (t, e) ->
-    let e' = rewrite_exp f e in
-    replace_if (e' != e) (CastE (t, e'))
-  | SizeOfE (e,size_opt) ->
-    let e' = rewrite_exp f e in
-    replace_if (e' != e)  (SizeOfE (e',size_opt))
-  | AlignOfE (e,size_opt) ->
-    let e' = rewrite_exp f e in
-    replace_if (e' != e) (AlignOfE (e',size_opt))
-  | SizeOf _ | Const _ | SizeOfStr _ | AlignOf _ ->
-    exp
-and rewrite_lval f lval =
-  let lh, o = lval.node in
-  let lh' = rewrite_lhost f lh and o' = rewrite_offset f o in
-  if lh' != lh || o' != o
-  then Evast_builder.mk_lval (lh', o')
-  else lval
-and rewrite_lhost f lhost =
-  match lhost with
-  | Var _ -> lhost
-  | Mem e ->
-    let e' = rewrite_exp f e in
-    if e' != e then Mem e' else lhost
-and rewrite_offset f offset =
-  match offset with
-  | NoOffset -> offset
-  | Field (fi, o) ->
-    let o' = rewrite_offset f o in
-    if o' != o then Field (fi, o') else offset
-  | Index (e, o) ->
-    let e' = rewrite_exp f  e
-    and o' = rewrite_offset f o in
-    if e != e' || o' != o then Index (e', o') else offset
-
-(* --- Iteration --- *)
-
-let rec iter_lvals_in_exp (f : lval -> unit) (exp : exp) : unit =
-  match exp.node with
-  | Lval lv | AddrOf lv | StartOf lv  -> f lv; iter_lvals_in_lval f lv
-  | UnOp (_, e, _) | CastE (_, e) -> iter_lvals_in_exp f e
-  | BinOp (_, e1, e2, _) -> iter_lvals_in_exp f e1; iter_lvals_in_exp f e2
-  | _ -> ()
-and iter_lvals_in_lval f (lval : lval) : unit =
-  let lhost, offset = lval.node in
-  iter_lvals_in_lhost f lhost;
-  iter_lvals_in_offset f offset
-and iter_lvals_in_lhost f : lhost -> unit = function
-  | Var _ -> ()
-  | Mem e -> iter_lvals_in_exp f e
-and iter_lvals_in_offset f : offset -> unit = function
-  | NoOffset -> ()
-  | Field (_, o) -> iter_lvals_in_offset f o
-  | Index (e, o) -> iter_lvals_in_exp f e; iter_lvals_in_offset f o
-
-
 (* --- Heights --- *)
 
 let rec height_exp exp =
@@ -177,48 +96,39 @@ let conv_relation : binop -> Abstract_interp.Comp.t =
   | _ -> invalid_arg "conv_relation: must be given a comparison operator"
 
 
-(* --- Volatiles lookup --- *)
+(* --- Specialized visitors --- *)
 
-let rec exp_contains_volatile (exp : exp) : bool =
-  match exp.node with
-  | Lval lv | AddrOf lv | StartOf lv  -> lval_contains_volatile lv
-  | UnOp (_, e, _) | CastE (_, e) -> exp_contains_volatile e
-  | BinOp (_, e1, e2, _) -> exp_contains_volatile e1 || exp_contains_volatile e2
-  | _ -> false
-and lval_contains_volatile (lval : lval) : bool =
-  let lhost, offset = lval.node in
-  Cil.isVolatileType (lval.typ) ||
-  lhost_contains_volatile lhost ||
-  offset_contains_volatile offset
-and lhost_contains_volatile : lhost -> bool = function
-  | Var _ -> false
-  | Mem e -> exp_contains_volatile e
-and offset_contains_volatile : offset -> bool = function
-  | NoOffset -> false
-  | Field (_, o) -> offset_contains_volatile o
-  | Index (e, o) -> offset_contains_volatile o || exp_contains_volatile e
+let iter_lvals f =
+  let open Evast_visitor.Fold in
+  let neutral = () and combine () () = () in
+  visit_exp ~neutral ~combine {
+    default with
+    fold_lval = fun ~visitor lval -> f lval; default.fold_lval ~visitor lval
+  }
 
+let exp_contains_volatile, lval_contains_volatile =
+  let open Evast_visitor.Fold in
+  let neutral = false and combine b1 b2 = b1 || b2 in
+  let fold_lval ~visitor lval =
+    Cil.isVolatileType (lval.typ) || default.fold_lval ~visitor lval
+  in
+  let folder = { default with fold_lval } in
+  visit_exp ~neutral ~combine folder, visit_lval ~neutral ~combine folder
 
-(* --- Vars lookup --- *)
-
-module VarSet = Cil_datatype.Varinfo.Set
-
-let rec vars_in_exp (exp : exp) : VarSet.t =
-  match exp.node with
-  | Lval lv | AddrOf lv | StartOf lv  -> vars_in_lval lv
-  | UnOp (_, e, _) | CastE (_, e) -> vars_in_exp e
-  | BinOp (_, e1, e2, _) -> VarSet.union (vars_in_exp e1) (vars_in_exp e2)
-  | _ -> VarSet.empty
-and vars_in_lval (lval : lval) : VarSet.t =
-  let lhost, offset = lval.node in
-  VarSet.union (vars_in_lhost lhost) (vars_in_offset offset)
-and vars_in_lhost : lhost -> VarSet.t = function
-  | Var vi -> VarSet.singleton vi
-  | Mem e -> vars_in_exp e
-and vars_in_offset : offset -> VarSet.t = function
-  | NoOffset -> VarSet.empty
-  | Field (_, o) -> vars_in_offset o
-  | Index (e, o) -> VarSet.union (vars_in_offset o) (vars_in_exp e)
+let vars_in_exp, vars_in_lval =
+  let module VarSet = Cil_datatype.Varinfo.Set in
+  let open Evast_visitor.Fold in
+  let neutral = VarSet.empty and combine = VarSet.union in
+  let fold_lval ~visitor lval =
+    let set =
+      match lval.node with
+      | Var vi, _ -> VarSet.singleton vi
+      | Mem e, _ -> visitor.exp e
+    in
+    VarSet.union set (default.fold_lval ~visitor lval)
+  in
+  let folder = { default with fold_lval } in
+  visit_exp ~neutral ~combine folder, visit_lval ~neutral ~combine folder
 
 
 (* Dependencies *)

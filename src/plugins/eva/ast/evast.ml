@@ -34,6 +34,8 @@ type 'a tag = {
   origin: origin;
 }
 
+type varinfo = Cil_types.varinfo
+
 type exp = exp_node tag
 
 and exp_node =
@@ -63,7 +65,7 @@ and lval_node = lhost * offset
 and lval = lval_node tag
 
 and lhost =
-  | Var of Cil_types.varinfo
+  | Var of varinfo
   | Mem of exp
 
 and offset =
