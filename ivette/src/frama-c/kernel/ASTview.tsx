@@ -208,7 +208,7 @@ function createMarkerScroller(): Editor.Extension {
     if (markerRanges.length !== 1) return;
     const { from: anchor } = markerRanges[0];
     const line = view.state.doc.lineAt(anchor).number;
-    Editor.selectLine(view, line, false);
+    Editor.selectLine(view, line, false, false);
   });
 }
 

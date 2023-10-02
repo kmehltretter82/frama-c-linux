@@ -445,13 +445,18 @@ function isVisible(view: View, line: number): boolean {
 }
 
 // Move to the given line. The indexation starts at 1.
-export function selectLine(view: View, line: number, atTop: boolean): void {
+export function selectLine(
+  view: View,
+  line: number,
+  atTop: boolean,
+  focus = true,
+): void {
   if (!view || view.state.doc.lines < line) return;
   const doc = view.state.doc;
   const { from: here } = doc.lineAt(view.state.selection.main.from);
   const { from: goto } = doc.line(Math.max(line, 1));
   if (here === goto) return;
-  view.dispatch({ selection: { anchor: goto } });
+  if (focus) view.dispatch({ selection: { anchor: goto } });
   if (isVisible(view, line)) return;
   const verticalScroll = atTop ? 'start' : 'center';
   const effects = EditorView.scrollIntoView(goto, { y: verticalScroll });

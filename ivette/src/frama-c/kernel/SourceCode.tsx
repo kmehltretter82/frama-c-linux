@@ -164,7 +164,7 @@ function createSyncOnOutsideSelection(): Editor.Extension {
       current.scope !== cursor?.scope && current.marker === undefined;
     const onTop = cursor === undefined || newDecl;
     Locations.set(view, { cursor: current, current });
-    Editor.selectLine(view, source.line, onTop);
+    Editor.selectLine(view, source.line, onTop, false);
   });
 }
 
