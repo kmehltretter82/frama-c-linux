@@ -313,12 +313,12 @@ export interface markerAttributesData {
   scope?: decl;
   /** Marker's Target Definition (when applicable) */
   definition?: marker;
-  /** Marker kind (short) */
+  /** Marker kind label */
   labelKind: string;
-  /** Marker kind (long) */
+  /** Marker kind title */
   titleKind: string;
-  /** Marker short name (identifier if any) */
-  name: string;
+  /** Marker identifier (when applicable) */
+  name?: string;
   /** Marker description */
   descr: string;
   /** Source location */
@@ -334,7 +334,7 @@ export const jMarkerAttributesData: Json.Decoder<markerAttributesData> =
     definition: Json.jOption(jMarker),
     labelKind: Json.jString,
     titleKind: Json.jString,
-    name: Json.jString,
+    name: Json.jOption(Json.jString),
     descr: Json.jString,
     sloc: Json.jOption(jSource),
   });
@@ -343,7 +343,7 @@ export const jMarkerAttributesData: Json.Decoder<markerAttributesData> =
 export const byMarkerAttributesData: Compare.Order<markerAttributesData> =
   Compare.byFields
     <{ marker: marker, kind: markerKind, scope?: decl, definition?: marker,
-       labelKind: string, titleKind: string, name: string, descr: string,
+       labelKind: string, titleKind: string, name?: string, descr: string,
        sloc?: source }>({
     marker: byMarker,
     kind: byMarkerKind,
@@ -351,7 +351,7 @@ export const byMarkerAttributesData: Compare.Order<markerAttributesData> =
     definition: Compare.defined(byMarker),
     labelKind: Compare.alpha,
     titleKind: Compare.alpha,
-    name: Compare.alpha,
+    name: Compare.defined(Compare.alpha),
     descr: Compare.string,
     sloc: Compare.defined(bySource),
   });
@@ -408,8 +408,8 @@ export const markerAttributes: State.Array<marker,markerAttributesData> = marker
 /** Default value for `markerAttributesData` */
 export const markerAttributesDataDefault: markerAttributesData =
   { marker: markerDefault, kind: markerKindDefault, scope: undefined,
-    definition: undefined, labelKind: '', titleKind: '', name: '', descr: '',
-    sloc: undefined };
+    definition: undefined, labelKind: '', titleKind: '', name: undefined,
+    descr: '', sloc: undefined };
 
 const getMainFunction_internal: Server.GetRequest<null,fct | undefined> = {
   kind: Server.RqKind.GET,

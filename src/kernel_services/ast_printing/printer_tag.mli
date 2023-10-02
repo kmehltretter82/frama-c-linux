@@ -60,13 +60,6 @@ type localizable =
   | PIP of Property.t
   | PType of typ
 
-(** Name (or category). *)
-val label: localizable -> string
-
-(** Name (or category). *)
-val glabel: global -> string
-
-
 (** Prints the global declaration of the declaration. *)
 val pp_signature : Format.formatter -> declaration -> unit
 
@@ -112,7 +105,12 @@ val definition_of_type : typ -> localizable option
 val definition_of_localizable : localizable -> localizable option
 
 val loc_of_declaration : declaration -> location
+
+val name_of_type : typ -> string option
+val name_of_global : global -> string option
 val name_of_declaration : declaration -> string
+val name_of_localizable : localizable -> string option
+
 val signature_of_declaration : declaration -> global
 val definition_of_declaration : declaration -> global
 

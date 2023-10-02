@@ -500,7 +500,7 @@ module MarkerAttributes =
 struct
   open Printer_tag
 
-  let descr ~short m =
+  let label_kind ~short m =
     match varinfo_of_localizable m with
     | Some vi ->
       if Globals.Functions.mem vi then "Function" else
@@ -551,25 +551,26 @@ struct
   let () =
     States.column
       ~name:"labelKind"
-      ~descr:(Md.plain "Marker kind (short)")
+      ~descr:(Md.plain "Marker kind label")
       ~data:(module Jalpha)
-      ~get:(fun (tag,_) -> descr ~short:true tag)
+      ~get:(fun (tag,_) -> label_kind ~short:true tag)
       model
 
   let () =
     States.column
       ~name:"titleKind"
-      ~descr:(Md.plain "Marker kind (long)")
+      ~descr:(Md.plain "Marker kind title")
       ~data:(module Jalpha)
-      ~get:(fun (tag,_) -> descr ~short:false tag)
+      ~get:(fun (tag,_) -> label_kind ~short:false tag)
       model
 
+
   let () =
-    States.column
+    States.option
       ~name:"name"
-      ~descr:(Md.plain "Marker short name (identifier if any)")
+      ~descr:(Md.plain "Marker identifier (when applicable)")
       ~data:(module Jalpha)
-      ~get:(fun (tag, _) -> Printer_tag.label tag)
+      ~get:(fun (tag, _) -> Printer_tag.name_of_localizable tag)
       model
 
   let () =

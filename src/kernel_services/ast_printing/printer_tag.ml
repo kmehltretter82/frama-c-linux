@@ -104,32 +104,6 @@ type localizable =
   | PIP of Property.t
   | PType of typ
 
-let glabel = function
-  | GType(tinfo,_) -> tinfo.tname
-  | GCompTag(comp, _) | GCompTagDecl(comp, _) ->
-    Printf.sprintf "%s %s"
-      (if comp.cstruct then "struct" else "union")
-      comp.cname
-  | GEnumTag(enum, _) | GEnumTagDecl(enum, _) ->
-    Printf.sprintf "enum %s" enum.ename
-  | GVarDecl(vi,_) | GVar(vi, _, _)
-  | GFun( { svar=vi }, _) | GFunDecl(_,vi,_) -> vi.vname
-  | GPragma((Attr(a,_) | AttrAnnot a),_) -> a
-  | GAnnot _ -> "(annotation)"
-  | GAsm _ -> "(assembly)"
-  | GText _ -> "(text)"
-
-let label = function
-  | PVDecl(_,_,vi) -> vi.vname
-  | PLval (_, _, (Var vi, NoOffset)) -> vi.vname
-  | PLval _ -> "(l-value)"
-  | PExp  _ -> "(expression)"
-  | PStmt _ | PStmtStart _ -> "(statement)"
-  | PTermLval _ -> "(term)"
-  | PGlobal g -> glabel g
-  | PIP _ -> "(property)"
-  | PType ty -> Pretty_utils.to_string Printer.pp_typ ty
-
 let declaration = function
   | GCompTag(comp,loc) -> GCompTagDecl(comp,loc)
   | GEnumTag(enum,loc) -> GEnumTagDecl(enum,loc)
@@ -361,6 +335,27 @@ let name_of_declaration = function
   | SType ti -> ti.tname
   | SGlobal vi -> vi.vname
   | SFunction kf -> Kernel_function.get_name kf
+
+let name_of_type = function
+  | TVoid _ | TInt _ | TFloat _ | TPtr _
+  | TArray _ | TFun _ | TBuiltin_va_list _ -> None
+  | TNamed(ti, _) -> Some ti.tname
+  | TComp (ci, _) -> Some ci.cname
+  | TEnum (ei, _) -> Some ei.ename
+
+let name_of_global g =
+  Option.map name_of_declaration @@ declaration_of_global g
+
+let name_of_localizable = function
+  | PVDecl(_,_,vi)
+  | PLval(_,_,(Var vi,NoOffset))
+  | PTermLval(_,_,_,(TVar { lv_origin = Some vi },TNoOffset)) ->
+    Some vi.vname
+  | PGlobal g -> name_of_global g
+  | PType ty -> name_of_type ty
+  | PStmt _ | PStmtStart _
+  | PExp _ | PLval _ | PTermLval _ | PIP _
+    -> None
 
 let loc_of_type space name =
   try Global.loc @@ Globals.Types.global space name
