@@ -3,7 +3,7 @@
 */
 
 struct X {
-     int arr[1];
+     int arr[2];
 };
 
 struct S {
@@ -11,9 +11,9 @@ struct S {
 };
 
 
-struct X get_x(void) { return (struct X){42}; }
+struct X get_x(void) { return (struct X){42,16}; }
 
-struct S get_s(void) { return (struct S){ (struct X){42} }; }
+struct S get_s(void) { return (struct S){ (struct X){42,16} }; }
 
 int init(void) {
     int *p = get_x().arr; // OK
@@ -26,7 +26,7 @@ int g1(int* x) { return *x; }
 void g2(int* x) { *x = 1; }
 
 //from issue 1220
-void calls(void) {
+int* calls(void) {
     // C99: UB access to a[0] in g1 whose lifetime ended
     //      at the sequence point at the start of g1
     // C11: OK, d is 2.0
@@ -36,20 +36,22 @@ void calls(void) {
     // C11: UB attempt to modify a temporary object
     g2(get_x().arr); // OK
 
-    return;
+    return get_x().arr; // OK
 }
 
 int* cond(void) {
+    int *p;
 
     if(get_x().arr);
     if((char*)get_x().arr) return 1; // OK
     if(*(get_x().arr + 0)) return 2; // OK
 
+    if(*(get_x().arr + 0) || (p = get_x().arr, *(p + 1))) return 3; // OK
 
     for (int i = 0; get_x().arr; i++); // OK
-    do{} while (get_x().arr); // OK
+    do{} while (*(get_x().arr + 0) && *(get_x().arr + 1)); // OK
 
-    return get_x().arr; // OK
+    return p; // UB
 }
 
 int paren_return(void){

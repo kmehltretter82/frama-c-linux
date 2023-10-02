@@ -7702,7 +7702,7 @@ and doCondExp local_env asconst
   in
   result
 
-and compileCondExp ~ghost ce st sf =
+and compileCondExp ?(hide=false) ~ghost ce st sf =
   match ce with
   | CEAnd (ce1, ce2) ->
     let loc = CurrentLoc.get () in
@@ -7713,7 +7713,7 @@ and compileCondExp ~ghost ce st sf =
         let lab = newLabelName ghost "_LAND" in
         (false, gotoChunk ~ghost lab loc, consLabel ~ghost lab sf loc false)
     in
-    let st' = compileCondExp ~ghost ce2 st sf1 in
+    let st' = compileCondExp ~hide ~ghost ce2 st sf1 in
     if not duplicable && !doAlternateConditional then
       let st_fall_through = chunkFallsThrough st' in
       (* if st does not fall through, we do not need to add a goto
@@ -7730,11 +7730,11 @@ and compileCondExp ~ghost ce st sf =
         else skipChunk
       in
       let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
-      (compileCondExp ~ghost ce1 st' sf')
+      (compileCondExp ~hide ~ghost ce1 st' sf')
       @@@ gotostmt @@@ sf2 @@@ labstmt
     else
       let sf' = sf2 in
-      compileCondExp ~ghost ce1 st' sf'
+      compileCondExp ~hide ~ghost ce1 st' sf'
 
   | CEOr (ce1, ce2) ->
     let loc = CurrentLoc.get () in
@@ -7747,7 +7747,7 @@ and compileCondExp ~ghost ce st sf =
     in
     if not duplicable && !doAlternateConditional then
       let st' = duplicateChunk st1 in
-      let sf' = compileCondExp ~ghost ce2 st1 sf in
+      let sf' = compileCondExp ~hide ~ghost ce2 st1 sf in
       let sf_fall_through = chunkFallsThrough sf' in
       let lab = newLabelName ghost "_LOR" in
       let gotostmt =
@@ -7761,17 +7761,14 @@ and compileCondExp ~ghost ce st sf =
         else skipChunk
       in
       let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
-      (compileCondExp ~ghost ce1 st' sf')
+      (compileCondExp ~hide ~ghost ce1 st' sf')
       @@@ gotostmt @@@ st2 @@@ labstmt
     else
       let st' = st1 in
-      let sf' = compileCondExp ~ghost ce2 st2 sf in
-      (*Format.eprintf
-        "result:@\nchunk then:@\n  @[%a@]@\nchunk else:  @[%a@]@."
-        d_chunk st d_chunk sf;*)
-      compileCondExp ~ghost ce1 st' sf'
+      let sf' = compileCondExp ~hide ~ghost ce2 st2 sf in
+      compileCondExp ~hide ~ghost ce1 st' sf'
 
-  | CENot ce1 -> compileCondExp ~ghost ce1 sf st
+  | CENot ce1 -> compileCondExp ~hide ~ghost ce1 sf st
 
   | CEExp (se, e) -> begin
       match e.enode with
@@ -7783,7 +7780,12 @@ and compileCondExp ~ghost ce st sf =
         when (Integer.equal z Integer.zero) && canDrop st ->
         full_clean_up_chunk_locals st;
         se @@@ (sf, ghost)
-      | _ -> (empty @@@ (se, ghost)) @@@ (ifChunk ~ghost e e.eloc st sf, ghost)
+      | _ ->
+        let se', e' =
+          if hide then hide_chunk ~ghost ~loc:e.eloc [] se e (typeOf e)
+          else se, e
+        in
+        (empty @@@ (se', ghost)) @@@ (ifChunk ~ghost e' e'.eloc st sf, ghost)
     end
 
 
@@ -7822,12 +7824,8 @@ and doCondition ~is_loop local_env asconst
       if is_loop then
         (* enclose our problematic chunk and the break condition. *)
         enclose_chunk ~ghost (compileCondExp ~ghost ce st sf)
-      else match ce with
-        | CEExp (c, e) ->
-          (* Else if it's a IF, hide chunk result. *)
-          let c', e' = hide_chunk ~ghost ~loc:e.eloc [] c e (typeOf e) in
-          compileCondExp ~ghost (CEExp (c', e')) st sf
-        | _ -> assert false
+      else
+        compileCondExp ~hide:true ~ghost ce st sf
     end
     else compileCondExp ~ghost ce st sf
   end
