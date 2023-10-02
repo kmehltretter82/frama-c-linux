@@ -564,7 +564,7 @@ export const GlobalHistory = new GlobalState<History>(emptyHistory);
 
 // Sycnhronisation of current selection.
 // Low level access only
-function syncCurrent(): void {
+function syncCurrentSelection(): void {
   const s = GlobalHistory.getValue();
   const { curr: { scope, marker } } = s;
   if (scope === undefined && marker !== undefined) {
@@ -586,8 +586,8 @@ function syncCurrent(): void {
 
   Server.onReady(clearHistory);
   Server.onShutdown(clearHistory);
-  onSyncArray(Ast.markerAttributes, syncCurrent);
-  onSyncArray(Ast.declAttributes, syncCurrent);
+  onSyncArray(Ast.markerAttributes, syncCurrentSelection);
+  onSyncArray(Ast.declAttributes, syncCurrentSelection);
 }
 
 // --------------------------------------------------------------------------
