@@ -142,7 +142,7 @@ let pp_localizable fmt = function
   | PLval (_, _, lval) -> Printer.pp_lval fmt lval
   | PExp  (_, _, expr) -> Printer.pp_exp fmt expr
   | PTermLval (_, _, _, lv) -> Printer.pp_term_lval fmt lv
-  | PIP prop -> Description.pp_property fmt prop
+  | PIP prop -> Description.pp_local fmt prop
   | PGlobal g -> Printer.pp_global fmt (declaration g)
   | PStmt(_,stmt) | PStmtStart (_, stmt) ->
     Printer.(without_annot pp_stmt) fmt stmt
