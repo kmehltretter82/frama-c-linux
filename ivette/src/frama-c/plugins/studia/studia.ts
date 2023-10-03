@@ -37,28 +37,32 @@ ipcRenderer.on('dome.ipc.studia.writes', () => studiaWritesEvent.emit());
 ipcRenderer.on('dome.ipc.studia.reads', () => studiaReadsEvent.emit());
 
 type access = 'Reads' | 'Writes';
+type Selections = Promise<States.MultipleSelect>;
 
-async function compute(marker: Ast.marker, label: string, kind: access)
-  : Promise<States.MultipleSelect> {
+interface ComputatationProps {
+  marker: Ast.marker,
+  label: string,
+  kind: access,
+}
+
+async function compute(props: ComputatationProps): Selections {
+  const { marker, label, kind } = props;
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
   const data = await Server.send(request, marker);
   const locations = data.direct.map(([f, m]) => ({ fct: f, marker: m }));
-  if (locations.length > 0) {
-    const name = `${kind} of ${label}`;
-    const acc = (kind === 'Reads') ? 'accessing' : 'modifying';
-    const title =
-      `List of statements ${acc} the memory location pointed by ${label}.`;
-    return { name, title, locations, index: 0 };
-  }
-  const name = `No ${kind.toLowerCase()} of ${label}`;
-  return { name, title: '', locations: [], index: 0 };
+  const asLocs = locations.length > 0;
+  const name = `${asLocs ? kind : `No ${kind.toLowerCase}`} of ${label}`;
+  const access = kind === 'Reads' ? 'accessing' : 'modifying';
+  const tail = `the memory location pointed by ${label}`;
+  const title = asLocs ? `List of statements ${access} ${tail}.` : '';
+  return { name, title, locations, index: 0 };
 }
 
 interface MenuProps {
   /** The marker on which the menu is applied. */
   marker: Ast.marker,
   /** Attributes of the marker. */
-  attrs: Ast.markerAttributesData,
+  attrs: Ast.markerAttributesData | undefined,
   /** Function to update the selection. */
   update: (a: States.SelectionActions) => void,
   /** Array to which studia menu entries are added. */
@@ -68,22 +72,18 @@ interface MenuProps {
 /** Builds the Studia entries in the contextual menu about a given marker.  */
 export function buildMenu(props: MenuProps) : void {
   const { update, marker, attrs, menu } = props;
+  if (!attrs || !marker) return;
+  const reads = 'Studia: select reads';
+  const writes = 'Studia: select writes';
   if (attrs.isLval && !attrs.isFunction) {
-    const onClick = (kind: access): void => {
-      if (marker && attrs)
-        compute(marker, attrs.name, kind).then(update);
-    };
-    const reads = 'Studia: select reads';
-    const writes = 'Studia: select writes';
+    const data = { marker, label: attrs.name };
+    const select = (k: access): Selections => compute({ ...data, kind: k });
+    const onClick = (k: access): void => { select(k).then(update); };
     menu.push({ label: reads, onClick: () => onClick('Reads') });
     menu.push({ label: writes, onClick: () => onClick('Writes') });
   } else {
-    const onClick = (event: Dome.Event): void => {
-      update({ location: { fct: attrs.scope, marker } });
-      event.emit();
-    };
-    const reads = 'Studia: select reads…';
-    const writes = 'Studia: select writes…';
+    const location = { location: { fct: attrs.scope, marker } };
+    const onClick = (e: Dome.Event): void => { update(location); e.emit(); };
     menu.push({ label: reads, onClick: () => onClick(studiaReadsEvent) });
     menu.push({ label: writes, onClick: () => onClick(studiaWritesEvent) });
   }
@@ -100,7 +100,7 @@ export function useStudiaMode(): void {
     const data = { stmt, term: label };
     const marker = await Server.send(Ast.parseLval, data).catch(handleError);
     if (!marker) return;
-    compute(marker, label, kind).then(setSelection).catch(handleError);
+    compute({ marker, label, kind }).then(setSelection).catch(handleError);
   }
   const shared = {
     placeholder: "lvalue",

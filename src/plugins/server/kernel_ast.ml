@@ -839,6 +839,10 @@ let () =
 (* --- Build a marker from an ACSL term                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
+let environment () =
+  let open Logic_typing in
+  Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
+
 let parse_expr env kf stmt term =
   let term = Logic_parse_string.term ~env kf term in
   let exp = Logic_to_c.term_to_exp term in
@@ -853,17 +857,12 @@ let build_marker parse marker term =
   match Printer_tag.ki_of_localizable marker with
   | Kglobal -> Data.failure "No statement at selection point"
   | Kstmt stmt ->
-    let env =
-      let open Logic_typing in
-      Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
-    in
-    try
-      let kf = Kernel_function.find_englobing_kf stmt in
-      parse env kf stmt term
-    with Not_found
-       | Logic_parse_string.Error _
-       | Logic_parse_string.Unbound _
-       | Logic_to_c.No_conversion -> Data.failure "Invalid term"
+    let module C = Logic_to_c in
+    let module Parser = Logic_parse_string in
+    let kf () = Kernel_function.find_englobing_kf stmt in
+    try parse (environment ()) (kf ()) stmt term
+    with Not_found | Parser.(Error _ | Unbound _) | C.No_conversion ->
+      Data.failure "Invalid term"
 
 let () =
   let module Md = Markdown in
