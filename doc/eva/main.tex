@@ -4202,9 +4202,9 @@ to apply up to $N$ subdivisions when evaluating the following statement,
 regardless of option \verb|-eva-subdivide-non-linear|.
 
 Finally, \Eva is also able to subdivide the evaluation of an expression
-according to the values off an arbitrary number of lvalues;
+according to the values of an arbitrary number of lvalues;
 thus, this subdivision mechanism can also improve the precision on expressions
-non-linear on several lvalues, such as \lstinline|x*x - 2*x*y + y*y|.
+that are non-linear on several lvalues, such as \lstinline|x*x - 2*x*y + y*y|.
 
 \section{Analysis domains}
 \label{sec:eva}
@@ -5503,7 +5503,7 @@ the \verb|-no-autoload-plugins| parameter).
   \texttt{//@ widen\_hints <v>, <N>;} & Use constant \texttt{<N>} as a possible threshold for the widening
   of variable \texttt{<v>}. & \ref{subsub:widen-hints}\tabularnewline
   \midrule
-  \texttt{//@ subdivide <N>;} & Subdivides up to \texttt{<N>} times the evaluation of non-linear expressions
+  \texttt{//@ subdivide <N>;} & Subdivide up to \texttt{<N>} times the evaluation of non-linear expressions
   in the next statement. & \ref{subdividing-evaluation}\tabularnewline
   \midrule
   \texttt{//@ eva\_allocate <s>;} & Select a strategy to model dynamic allocation at the next statement. & \ref{malloc}\tabularnewline
