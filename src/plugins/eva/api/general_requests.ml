@@ -168,8 +168,8 @@ module DeadCode = struct
   let jtype = R.jtype
 
   let to_json (dead_code) =
-    let make_stmt stmt = Printer_tag.PStmt (dead_code.kf, stmt)
-    and make_non_term stmt = Printer_tag.PStmtStart (dead_code.kf, stmt) in
+    let make_stmt stmt = Printer_tag.PStmt (dead_code.kf, stmt) in
+    let make_non_term stmt = Printer_tag.PStmtStart (dead_code.kf, stmt) in
     R.default |>
     R.set reached (List.map make_stmt dead_code.reached) |>
     R.set unreachable (List.map make_stmt dead_code.unreachable) |>
@@ -177,30 +177,26 @@ module DeadCode = struct
     R.to_json
 end
 
+let all_statements kf =
+  try (Kernel_function.get_definition kf).sallstmts
+  with Kernel_function.No_Definition -> []
+
 let dead_code kf =
-  let empty =
-    { kf; reached = []; unreachable = []; non_terminating = []; }
-  in
-  if Analysis.is_computed ()
-  then
-    try
-      let fundec = Kernel_function.get_definition kf in
-      match Analysis.status kf with
-      | Unreachable | SpecUsed | Builtin _ ->
-        { empty with unreachable = fundec.sallstmts; }
-      | Analyzed NoResults -> empty
-      | Analyzed (Partial | Complete) ->
-        let classify acc stmt =
-          if Results.(before stmt |> is_empty)
-          then { acc with unreachable = stmt :: acc.unreachable }
-          else
-            let acc = { acc with reached = stmt :: acc.reached } in
-            if Results.(after stmt |> is_empty)
-            then { acc with non_terminating = stmt :: acc.non_terminating }
-            else acc
-        in
-        List.fold_left classify empty fundec.sallstmts
-    with Kernel_function.No_Definition -> empty
+  let empty = { kf ; reached = [] ; unreachable = [] ; non_terminating = [] } in
+  if Analysis.is_computed () then
+    let body = all_statements kf in
+    match Analysis.status kf with
+    | Unreachable | SpecUsed | Builtin _ -> { empty with unreachable = body }
+    | Analyzed NoResults -> empty
+    | Analyzed (Partial | Complete) ->
+      let classify { kf ; reached ; unreachable ; non_terminating = nt } stmt =
+        let before = Results.(before stmt |> is_empty) in
+        let after = Results.(after stmt |> is_empty) in
+        let unreachable = if before then stmt :: unreachable else unreachable in
+        let reached = if not before then stmt :: reached else reached in
+        let non_terminating = if not before && after then stmt :: nt else nt in
+        { kf ; reached ; unreachable ; non_terminating }
+      in List.fold_left classify empty body
   else empty
 
 let () = Request.register ~package

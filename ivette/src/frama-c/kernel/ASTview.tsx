@@ -325,31 +325,29 @@ function createMultipleDecorator(): Editor.Extension {
 const emptyDeadCode = { reached: [], unreachable: [], nonTerminating: [] };
 const Dead = Editor.createField<Eva.deadCode>(emptyDeadCode);
 
-function diffRanges(a: Editor.Range[], b: Editor.Range[]): Editor.Range[] {
-  const cmp = (x: Editor.Range, y: Editor.Range): number => {
-    return (x.from !== y.from) ? (x.from - y.from) : (y.to - x.to);
-  };
-  a.sort(cmp);
-  b.sort(cmp);
-  function split(x: Editor.Range): Editor.Range[] {
-    const y = b.find((r) => r.from >= x.from && r.from < x.to);
-    if (y === undefined) return [x];
-    const t = [];
-    if (x.from < y.from) t.push({ from: x.from, to: y.from - 1 });
-    if (y.to < x.to) return t.concat(split({ from: y.to + 1, to: x.to }));
-    return t;
+// The unreachable statements given by the server may contain reachable
+// statements. This function is used to filter those reached statements.
+function filterReached(unreachables: Range[], reachables: Range[]): Range[] {
+  function keepTrulyUnreached(unreached: Range): Range[] {
+    const reached = reachables.find((r) => Editor.startInto(r, unreached));
+    if (reached === undefined) return [unreached];
+    const next = { from: reached.to + 1, to: unreached.to };
+    const result = (reached.to < unreached.to) ? keepTrulyUnreached(next) : [];
+    const reallyUnreached = { from: unreached.from, to: reached.from - 1 };
+    if (unreached.from < reached.from) result.unshift(reallyUnreached);
+    return result;
   }
-  return a.flatMap(split);
+  return unreachables.map(keepTrulyUnreached).flat();
 }
 
 const UnreachableRanges = createUnreachableRanges();
 function createUnreachableRanges(): Editor.Aspect<Editor.Range[]> {
   const deps = { dead: Dead, ranges: Ranges };
-  return Editor.createAspect(deps, ({ dead, ranges }) => {
-    const unreachable = mapFilter(dead.unreachable, m => ranges.get(m)).flat();
-    const reached = mapFilter(dead.reached, m => ranges.get(m)).flat();
-    const r = diffRanges(unreachable, reached);
-    return r;
+  return Editor.createAspect(deps, ({ dead, ranges: rs }) => {
+    const get = (ms: Ast.marker[]): Range[][] => mapFilter(ms, m => rs.get(m));
+    const unreachable = get(dead.unreachable).flat().sort(Editor.compareRange);
+    const reached = get(dead.reached).flat().sort(Editor.compareRange);
+    return filterReached(unreachable, reached);
   });
 }
 

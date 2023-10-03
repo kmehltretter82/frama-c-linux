@@ -49,12 +49,32 @@ export { RangeSet } from '@codemirror/state';
 
 
 // -----------------------------------------------------------------------------
+// Ranges definition and interface
+// -----------------------------------------------------------------------------
+
+// Type definition.
+export type Range = { from: number, to: number };
+
+// Comparison function
+export function compareRange(x: Range, y: Range): number {
+  return (x.from !== y.from) ? (x.from - y.from) : (y.to - x.to);
+}
+
+// Checks if the start of the range x belongs in y.
+export function startInto(x: Range, y: Range): boolean {
+  return y.from <= x.from && x.from < y.to;
+}
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
 //  CodeMirror state's extensions types definitions
 // -----------------------------------------------------------------------------
 
 // Helper types definitions.
 export type View = EditorView | null;
-export type Range = { from: number, to: number };
 export type Set<A> = (view: View, value: A) => void;
 export type Get<A> = (state: EditorState | undefined) => A;
 export type IsUpdated = (update: ViewUpdate) => boolean;
