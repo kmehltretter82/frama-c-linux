@@ -325,16 +325,24 @@ function createMultipleDecorator(): Editor.Extension {
 const emptyDeadCode = { reached: [], unreachable: [], nonTerminating: [] };
 const Dead = Editor.createField<Eva.deadCode>(emptyDeadCode);
 
+// Comparison function on ranges
+export function compareRange(x: Range, y: Range): number {
+  return (x.from !== y.from) ? (x.from - y.from) : (y.to - x.to);
+}
+
 // The unreachable statements given by the server may contain reachable
 // statements. This function is used to filter those reached statements.
 function filterReached(unreachables: Range[], reachables: Range[]): Range[] {
+  /* Sort [reachables] to always find the first largest reachable statement
+     within an unreachable one (if any). */
+  reachables.sort(compareRange);
   function keepTrulyUnreached(unreached: Range): Range[] {
     const reached = reachables.find((r) => Editor.startInto(r, unreached));
     if (reached === undefined) return [unreached];
+    const firstUnreached = { from: unreached.from, to: reached.from - 1 };
     const next = { from: reached.to + 1, to: unreached.to };
     const result = (reached.to < unreached.to) ? keepTrulyUnreached(next) : [];
-    const reallyUnreached = { from: unreached.from, to: reached.from - 1 };
-    if (unreached.from < reached.from) result.unshift(reallyUnreached);
+    if (unreached.from < reached.from) result.unshift(firstUnreached);
     return result;
   }
   return unreachables.map(keepTrulyUnreached).flat();
@@ -345,8 +353,8 @@ function createUnreachableRanges(): Editor.Aspect<Editor.Range[]> {
   const deps = { dead: Dead, ranges: Ranges };
   return Editor.createAspect(deps, ({ dead, ranges: rs }) => {
     const get = (ms: Ast.marker[]): Range[][] => mapFilter(ms, m => rs.get(m));
-    const unreachable = get(dead.unreachable).flat().sort(Editor.compareRange);
-    const reached = get(dead.reached).flat().sort(Editor.compareRange);
+    const unreachable = get(dead.unreachable).flat();
+    const reached = get(dead.reached).flat();
     return filterReached(unreachable, reached);
   });
 }

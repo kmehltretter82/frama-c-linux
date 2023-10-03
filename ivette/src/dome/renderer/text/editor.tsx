@@ -55,11 +55,6 @@ export { RangeSet } from '@codemirror/state';
 // Type definition.
 export type Range = { from: number, to: number };
 
-// Comparison function
-export function compareRange(x: Range, y: Range): number {
-  return (x.from !== y.from) ? (x.from - y.from) : (y.to - x.to);
-}
-
 // Checks if the start of the range x belongs in y.
 export function startInto(x: Range, y: Range): boolean {
   return y.from <= x.from && x.from < y.to;
