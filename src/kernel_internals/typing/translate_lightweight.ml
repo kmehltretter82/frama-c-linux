@@ -193,7 +193,7 @@ class annotateFunFromDeclspec =
         behavior.b_post_cond <- ens;
         List.iter Property_status.register (ppt_ensures behavior);
       in
-      let spec = Annotations.funspec ~populate:false kf in
+      let spec = Annotations.funspec kf in
       List.iter insert_spec spec.spec_behavior
   in
   object

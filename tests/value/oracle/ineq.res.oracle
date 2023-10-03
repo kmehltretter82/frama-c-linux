@@ -13,7 +13,8 @@
   m ∈ {-1}
   n ∈ {-1}
 [kernel:annot:missing-spec] ineq.c:6: Warning: 
-  Neither code nor specification for function any_int, generating default assigns from the prototype
+  Neither code nor specification for function any_int,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function any_int <- main.
   Called from ineq.c:6.
 [eva] using specification for function any_int

@@ -5,25 +5,29 @@
 [eva:initial-state] Values of globals at initialization
   
 [kernel:annot:missing-spec] leaf_spec.i:19: Warning: 
-  Neither code nor specification for function f1, generating default assigns from the prototype
+  Neither code nor specification for function f1,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f1 <- main.
   Called from leaf_spec.i:19.
 [eva] using specification for function f1
 [eva] Done for function f1
 [kernel:annot:missing-spec] leaf_spec.i:20: Warning: 
-  Neither code nor specification for function g, generating default assigns from the prototype
+  Neither code nor specification for function g,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function g <- main.
   Called from leaf_spec.i:20.
 [eva] using specification for function g
 [eva] Done for function g
 [kernel:annot:missing-spec] leaf_spec.i:21: Warning: 
-  Neither code nor specification for function h, generating default assigns from the prototype
+  Neither code nor specification for function h,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function h <- main.
   Called from leaf_spec.i:21.
 [eva] using specification for function h
 [eva] Done for function h
 [kernel:annot:missing-spec] leaf_spec.i:22: Warning: 
-  Neither code nor specification for function k, generating default assigns from the prototype
+  Neither code nor specification for function k,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function k <- main.
   Called from leaf_spec.i:22.
 [eva] using specification for function k
@@ -31,7 +35,8 @@
   Completely invalid destination for assigns clause *l. Ignoring.
 [eva] Done for function k
 [kernel:annot:missing-spec] leaf_spec.i:22: Warning: 
-  Neither code nor specification for function k0, generating default assigns from the prototype
+  Neither code nor specification for function k0,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function k0 <- main.
   Called from leaf_spec.i:22.
 [eva] using specification for function k0

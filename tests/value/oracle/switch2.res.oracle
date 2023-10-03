@@ -9,7 +9,8 @@
 [eva] Recording results for f
 [eva] Done for function f
 [kernel:annot:missing-spec] switch2.i:13: Warning: 
-  Neither code nor specification for function g, generating default assigns from the prototype
+  Neither code nor specification for function g,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function g <- main.
   Called from switch2.i:13.
 [eva] using specification for function g

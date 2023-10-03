@@ -457,7 +457,7 @@ end
 
 let get_filenames_in_funspec kf =
   try
-    let spec = Annotations.funspec ~populate:false kf in
+    let spec = Annotations.funspec kf in
     Metrics_parameters.feedback ~dkey "looking for files in the spec of: %a"
       Kernel_function.pretty kf;
     List.fold_left (fun acc b ->

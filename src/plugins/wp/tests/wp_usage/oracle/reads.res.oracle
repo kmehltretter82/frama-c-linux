@@ -2,7 +2,8 @@
 [kernel] Parsing reads.i (no preprocessing)
 [wp] Running WP plugin...
 [kernel:annot:missing-spec] reads.i:86: Warning: 
-  Neither code nor implicit assigns clause for function recursive_usage, generating default assigns from the prototype
+  Neither code nor explicit assigns for function recursive_usage,
+   generating default clauses. See -generated-spec-* options for more info
 .................................................
 ... Ref Usage
 .................................................

@@ -41,7 +41,8 @@
 [pdg] computing for function stop
 [from] Computing for function stop
 [kernel:annot:missing-spec] intra.i:93: Warning: 
-  Neither code nor specification for function stop, generating default assigns from the prototype
+  Neither code nor specification for function stop,
+   generating default assigns. See -generated-spec-* options for more info
 [from] Done for function stop
 [pdg] done for function stop
 [pdg] computing for function tmp

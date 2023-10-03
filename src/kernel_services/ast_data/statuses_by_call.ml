@@ -248,7 +248,7 @@ and add_call_precondition precondition call_precondition =
   Property_status.logical_consequence preconditions_emitter precondition all
 
 let fold_requires f kf acc =
-  let bhvs = Annotations.behaviors ~populate:false kf in
+  let bhvs = Annotations.behaviors kf in
   List.fold_right
     (fun bhv acc -> List.fold_right (f bhv) bhv.b_requires acc) bhvs acc
 

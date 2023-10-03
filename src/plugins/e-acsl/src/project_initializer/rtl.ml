@@ -360,7 +360,7 @@ let get_formals_and_spec prj vi =
     (fun vi ->
        let kf = get_kf vi in
        Kernel_function.get_formals kf,
-       Annotations.funspec ~populate:false kf)
+       Annotations.funspec kf)
     vi
 
 (** Visitor to replace [varinfo] and [logic_info] leaves of an AST with

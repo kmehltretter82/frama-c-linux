@@ -5,7 +5,8 @@
 [eva:initial-state] Values of globals at initialization
   
 [kernel:annot:missing-spec] copy_stdin.i:4: Warning: 
-  Neither code nor specification for function leaf, generating default assigns from the prototype
+  Neither code nor specification for function leaf,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function leaf <- main.
   Called from copy_stdin.i:4.
 [eva] using specification for function leaf

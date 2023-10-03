@@ -2,9 +2,11 @@
 [kernel] Parsing wp_call_pre.c (with preprocessing)
 [wp] Running WP plugin...
 [kernel:annot:missing-spec] wp_call_pre.c:47: Warning: 
-  Neither code nor implicit assigns clause for function f, generating default assigns from the prototype
+  Neither code nor explicit assigns for function f,
+   generating default clauses. See -generated-spec-* options for more info
 [kernel:annot:missing-spec] wp_call_pre.c:47: Warning: 
-  Neither code nor implicit assigns clause for function g, generating default assigns from the prototype
+  Neither code nor explicit assigns for function g,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 [wp] User Error: Main entry point function 'main' is (potentially) recursive.
   This case is not supported yet (skipped verification).

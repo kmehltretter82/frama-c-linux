@@ -8,7 +8,8 @@
   
 [eva] widen_overflow.i:6: Frama_C_show_each: {4}
 [kernel:annot:missing-spec] widen_overflow.i:9: Warning: 
-  Neither code nor specification for function u, generating default assigns from the prototype
+  Neither code nor specification for function u,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function u <- main.
   Called from widen_overflow.i:9.
 [eva] using specification for function u

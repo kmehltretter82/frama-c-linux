@@ -729,6 +729,9 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   (* Legacy callbacks for the cvalue domain, usually called by
      {Cvalue_transfer.start_call}. *)
   let apply_cvalue_callback kf stmt state =
+    (* Generates assigns clauses for other plugins, as they may use
+       the directive specification. *)
+    Populate_spec.populate_funspec kf [`Assigns];
     let call_stack = Eva_utils.current_call_stack () in
     let stack_with_call = Callstack.push kf stmt call_stack in
     let cvalue_state = get_cvalue_or_top state in

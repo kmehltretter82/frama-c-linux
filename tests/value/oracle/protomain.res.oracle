@@ -5,7 +5,8 @@
 [eva:initial-state] Values of globals at initialization
   
 [kernel:annot:missing-spec] :0: Warning: 
-  Neither code nor specification for function main, generating default assigns from the prototype
+  Neither code nor specification for function main,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

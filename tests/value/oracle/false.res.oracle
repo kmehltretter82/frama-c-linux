@@ -5,7 +5,8 @@
 [eva:initial-state] Values of globals at initialization
   
 [kernel:annot:missing-spec] false.i:18: Warning: 
-  Neither code nor implicit assigns clause for function f, generating default assigns from the prototype
+  Neither code nor explicit assigns for function f,
+   generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f <- main.
   Called from false.i:18.
 [eva] using specification for function f

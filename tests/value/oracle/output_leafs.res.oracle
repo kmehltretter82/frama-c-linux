@@ -44,7 +44,8 @@
 [eva] computing for function main3 <- main.
   Called from output_leafs.i:47.
 [kernel:annot:missing-spec] output_leafs.i:40: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- main3 <- main.
   Called from output_leafs.i:40.
 [eva] using specification for function f

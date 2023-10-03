@@ -1,7 +1,7 @@
-45a46,47
+47a48,49
 > [eva] computing for function f <- main.
 >   Called from precond.c:39.
-48c50,51
+50c52,53
 < [eva] precond.c:39: Reusing old results for call to f
 ---
 > [eva] Recording results for f

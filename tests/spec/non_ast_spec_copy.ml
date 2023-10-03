@@ -3,7 +3,7 @@ let add_terminates_true _ =
     Logic_const.(new_predicate { ptrue with pred_loc })
   in
   let add_terminates kf =
-    if Annotations.terminates ~populate:false kf = None then
+    if Annotations.terminates kf = None then
       Annotations.add_terminates
         Emitter.kernel kf (terminates @@ Kernel_function.get_location kf)
   in

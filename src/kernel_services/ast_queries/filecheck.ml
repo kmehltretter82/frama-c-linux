@@ -269,7 +269,7 @@ module Base_checker = struct
               "Body of %a is not shared between kernel function and AST"
               Kernel_function.pretty kf;
           return_stmt <- Some (Kernel_function.find_return kf);
-          let spec = Annotations.funspec ~populate:false kf in
+          let spec = Annotations.funspec kf in
           self#add_spec_behavior_names spec;
         end else begin self#add_spec_behavior_names f.sspec; end;
         labelled_stmt <- [];

@@ -36,7 +36,8 @@
 [eva:alarm] search_h.c:32: Warning: 
   out of bounds write. assert \valid(&elementptr->count);
 [kernel:annot:missing-spec] search_h.c:34: Warning: 
-  Neither code nor specification for function tsearch, generating default assigns from the prototype
+  Neither code nor specification for function tsearch,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function tsearch <- main.
   Called from search_h.c:34.
 [eva] using specification for function tsearch
@@ -55,7 +56,8 @@
 [eva:alarm] search_h.c:40: Warning: 
   out of bounds read. assert \valid_read((struct element **)node);
 [kernel:annot:missing-spec] search_h.c:46: Warning: 
-  Neither code nor specification for function twalk, generating default assigns from the prototype
+  Neither code nor specification for function twalk,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function twalk <- main.
   Called from search_h.c:46.
 [eva] using specification for function twalk

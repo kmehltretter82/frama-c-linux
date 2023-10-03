@@ -103,19 +103,22 @@
 [eva] assigns.i:68: Warning: no \from part for clause 'assigns y1, y3;'
 [eva] Done for function ff3
 [kernel:annot:missing-spec] assigns.i:79: Warning: 
-  Neither code nor specification for function ff4, generating default assigns from the prototype
+  Neither code nor specification for function ff4,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function ff4 <- main2 <- main.
   Called from assigns.i:79.
 [eva] using specification for function ff4
 [eva] Done for function ff4
 [kernel:annot:missing-spec] assigns.i:80: Warning: 
-  Neither code nor specification for function ff5, generating default assigns from the prototype
+  Neither code nor specification for function ff5,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function ff5 <- main2 <- main.
   Called from assigns.i:80.
 [eva] using specification for function ff5
 [eva] Done for function ff5
 [kernel:annot:missing-spec] assigns.i:82: Warning: 
-  Neither code nor specification for function ff2, generating default assigns from the prototype
+  Neither code nor specification for function ff2,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function ff2 <- main2 <- main.
   Called from assigns.i:82.
 [eva] using specification for function ff2
@@ -131,7 +134,8 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [kernel:annot:missing-spec] assigns.i:112: Warning: 
-  Neither code nor specification for function main3, generating default assigns from the prototype
+  Neither code nor specification for function main3,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function main3 <- main.
   Called from assigns.i:112.
 [eva] using specification for function main3

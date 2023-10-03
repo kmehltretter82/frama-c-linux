@@ -1,6 +1,7 @@
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] no-va.i:4: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function f
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

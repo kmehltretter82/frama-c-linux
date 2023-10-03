@@ -9,7 +9,8 @@
 [eva] computing for function g <- h.
   Called from ptr_fct.i:23.
 [kernel:annot:missing-spec] ptr_fct.i:17: Warning: 
-  Neither code nor specification for function f2, generating default assigns from the prototype
+  Neither code nor specification for function f2,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f2 <- g <- h.
   Called from ptr_fct.i:17.
 [eva] using specification for function f2

@@ -118,7 +118,7 @@ let inline_call loc caller callee return args =
                (Local_init (vi,AssignInit (SingleInit arg),loc))
            in
            let inits = List.map2 add_init fd.sformals args in
-           let spec = Annotations.funspec ~populate:false callee in
+           let spec = Annotations.funspec callee in
            if Cil.is_empty_funspec spec then begin
              fd.sbody.blocals <- fd.sformals @ fd.sbody.blocals;
              fd.sbody.bstmts <- inits @ fd.sbody.bstmts;

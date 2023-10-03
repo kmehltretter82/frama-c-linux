@@ -1,5 +1,6 @@
 [kernel:annot:missing-spec] saveload.i:12: Warning: 
-  Neither code nor specification for function Frama_C_show_aorai_state, generating default assigns from the prototype
+  Neither code nor specification for function Frama_C_show_aorai_state,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] Analyzing a complete application starting at main
 [eva:initial-state] Values of globals at initialization
   aorai_CurOperation ∈ {op_main}

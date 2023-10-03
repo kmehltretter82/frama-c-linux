@@ -4,7 +4,8 @@
   Body of function if_assert falls-through. Adding a return statement
 [wp] Running WP plugin...
 [kernel:annot:missing-spec] stmtcompiler_test.i:167: Warning: 
-  Neither code nor implicit assigns clause for function behavior1, generating default assigns from the prototype
+  Neither code nor explicit assigns for function behavior1,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 [wp] stmtcompiler_test.i:81: Warning: 
   Missing assigns clause (assigns 'everything' instead)

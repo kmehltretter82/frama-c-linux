@@ -45,7 +45,7 @@ let floats_ok () =
   assert (0. < u && u < min_float)
 
 let need_assigns kf =
-  let spec = Annotations.funspec ~populate:false kf in
+  let spec = Annotations.funspec kf in
   match Cil.find_default_behavior spec with
   | None -> true
   | Some bhv -> bhv.b_assigns = WritesAny
@@ -79,13 +79,12 @@ let plugins_ok () =
 let generate_specs () =
   let aux kf =
     if need_assigns kf then begin
-      let spec = Annotations.funspec ~populate:false kf in
       Self.warning "Generating potentially incorrect assigns \
                     for function '%a' for which option %s is set"
         Kernel_function.pretty kf Parameters.UsePrototype.option_name;
-      (* The function populate_spec may emit a warning. Position a loc. *)
+      (* The function populate_funspec may emit a warning. Position a loc. *)
       Cil.CurrentLoc.set (Kernel_function.get_location kf);
-      ignore (!Annotations.populate_spec_ref kf spec)
+      Populate_spec.populate_funspec ~do_body:true kf [`Assigns];
     end
   in
   Parameters.UsePrototype.iter aux
@@ -207,6 +206,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       apply_call_hooks call init_state `Reuse;
       (* Evaluate the preconditions of kf, to update the statuses
          at this call. *)
+      Populate_spec.populate_funspec call.kf [`Assigns];
       let spec = Annotations.funspec call.kf in
       if not (Eva_utils.skip_specifications call.kf) &&
          Eval_annots.has_requires spec

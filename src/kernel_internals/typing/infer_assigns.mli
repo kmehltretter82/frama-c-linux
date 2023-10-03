@@ -22,4 +22,4 @@
 
 (** Generation of possible assigns from the C prototype of a function. *)
 
-val assigns_from_prototype: Kernel_function.t -> Cil_types.from list
+val from_prototype: Kernel_function.t -> Cil_types.from list

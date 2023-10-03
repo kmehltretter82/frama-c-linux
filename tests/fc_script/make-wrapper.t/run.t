@@ -27,8 +27,11 @@ verbose output for Make.
             large_name_to_force_line_break_in_stack_msg :: make-wrapper.c:21 <-
             rec :: make-wrapper.c:26 <-
             main
-  [kernel:annot:missing-spec] make-wrapper.c:16: Warning: 
-    Neither code nor specification for function large_name_to_force_line_break_in_stack_msg, generating default assigns from the prototype
+  [eva] using specification for function large_name_to_force_line_break_in_stack_msg
+  [eva] using specification for function specified
+  [kernel:annot:missing-spec] make-wrapper.c:29: Warning: 
+    Neither code nor specification for function external,
+     generating default assigns. See -generated-spec-* options for more info
   [kernel] User Error: warning annot:missing-spec treated as fatal error.
   [kernel] Frama-C aborted: invalid user input.
   
@@ -45,7 +48,7 @@ verbose output for Make.
   Consider patching, stubbing or adding an ACSL specification to the recursive call, then re-run the analysis.
   
   *** recommendation #2 ***
-  2. Found function with missing specification: large_name_to_force_line_break_in_stack_msg
+  2. Found function with missing specification: external
      Looking for files defining it...
   Add the following file to the list of sources to be parsed:
-    make-wrapper.c
+    make-wrapper3.c

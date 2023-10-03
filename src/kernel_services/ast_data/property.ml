@@ -1351,12 +1351,14 @@ let ip_assigns_of_code_annot kf st ca = match ca.annot_content with
 let ip_from_of_code_annot kf st ca = match ca.annot_content with
   | AAssigns(_,WritesAny) -> []
   | AAssigns (_,Writes l) ->
-    let treat_from acc (out, froms) = match froms with FromAny -> acc
-                                                     | From _ ->
-                                                       let ip =
-                                                         Option.get (ip_of_from kf st (Id_loop ca) (out, froms))
-                                                       in
-                                                       ip::acc
+    let treat_from acc (out, froms) =
+      match froms with
+      | FromAny -> acc
+      | From _ ->
+        let ip =
+          Option.get (ip_of_from kf st (Id_loop ca) (out, froms))
+        in
+        ip::acc
     in
     List.fold_left treat_from [] l
   | _ -> []
