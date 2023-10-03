@@ -1,5 +1,5 @@
 /* run.config
-   OPT: -check -generated-spec-mode mymode -then-last -print
+   OPT: -check -generated-spec-mode mymode -print
 */
 
 /*@ behavior A:

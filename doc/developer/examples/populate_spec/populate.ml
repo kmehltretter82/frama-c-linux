@@ -15,14 +15,14 @@ let gen_exits _ _ =
 (* Generate assigns for prototypes. *)
 let gen_assigns kf _ =
   if Kernel_function.has_definition kf then
-    WritesAny
+    Writes []
   else Writes (Infer_assigns.from_prototype kf)
 
 (* Generate requires \false clauses. *)
 let gen_requires _ _ = [ Logic_const.(new_predicate pfalse) ]
 
 (* Generate allocates \nothing clauses. *)
-let gen_allocates kf _ =
+let gen_allocates _ _ =
   FreeAlloc([],[])
 
 (* Generate terminates \false for prototypes. *)
