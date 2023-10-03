@@ -18,10 +18,14 @@
 Open Source Release <next-release>
 ###############################################################################
 
-o!  Kernel    [2023-09-25] Remove Dynamic.Unloadable exception, useless since
-              the move from dynamic to static API for plug-ins.
+o!  Kernel    [2023-10-03] New mechanism for generating default specifications
+-   Kernel    [2023-10-03] New options -generated-spec-mode and
+              -generated-spec-custom for configuring how default specifications
+              are generated
 -   Eva       [2023-09-26] Support evaluation of simple \let bindings in
               ACSL terms and predicates.
+o!  Kernel    [2023-09-25] Remove Dynamic.Unloadable exception, useless since
+              the move from dynamic to static API for plug-ins.
 -   Alias     [2023-09-07] New alias plugin that implements a points-to
               analysis and an alias analysis based on Steensgaard's algorithm.
               For these purposes it presents a more efficient (albeit less
