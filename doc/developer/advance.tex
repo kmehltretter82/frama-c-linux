@@ -3814,7 +3814,7 @@ When the default behavior is missing in a function contract but needed by either
 \scodeidxdef{Populate\_spec}{populate\_funspec} as follows:
 
 \begin{ocamlcode}
-  Populate_spec.populate_funspec ~do_body:true kf [`Exits; `Assigns]
+Populate_spec.populate_funspec ~do_body:true kf [`Exits; `Assigns]
 \end{ocamlcode}
 
 This code will generate specifications for the function \verb+kf+ using the
@@ -3836,28 +3836,28 @@ a customized mode. For this, we need to define generation functions for each
 clause:
 
 \begin{ocamlcode}
-  (* Generate exits \false clauses. *)
-  let gen_exits _ _ =
-    [ Exits, Logic_const.(new_predicate pfalse) ]
+(* Generate exits \false clauses. *)
+let gen_exits _ _ =
+  [ Exits, Logic_const.(new_predicate pfalse) ]
 
-  (* Generate assigns for prototypes. *)
-  let gen_assigns kf _ =
-    if Kernel_function.has_definition kf then
-      WritesAny
-    else Writes (Infer_assigns.from_prototype kf)
+(* Generate assigns for prototypes. *)
+let gen_assigns kf _ =
+  if Kernel_function.has_definition kf then
+    WritesAny
+  else Writes (Infer_assigns.from_prototype kf)
 
-  (* Do not generate requires. *)
-  let gen_requires _ _ = [ ]
+(* Do not generate requires. *)
+let gen_requires _ _ = [ ]
 
-  (* Do not generate allocates. *)
-  let gen_allocates _ _ = FreeAllocAny
+(* Do not generate allocates. *)
+let gen_allocates _ _ = FreeAllocAny
 
-  (* Do not generate terminates. *)
-  let gen_terminates _ _ = None
+(* Do not generate terminates. *)
+let gen_terminates _ _ = None
 
-  (* Property status to be emitted for the generated clauses. *)
-  let status_exits = Property_status.Dont_know
-  let status_assigns = Property_status.True
+(* Property status to be emitted for the generated clauses. *)
+let status_exits = Property_status.Dont_know
+let status_assigns = Property_status.True
 \end{ocamlcode}
 
 Each function takes 2 parameters:
@@ -3877,23 +3877,23 @@ Then we need to register the mode using \verb+Populate_spec.register+%
 
 \begin{ocamlcode}
 let create_mode () =
-  Populate_spec.register
-      ~gen_exits ~status_exits
-      ~gen_assigns ~status_assigns
-      ~gen_requires
-      ~gen_allocates
-      ~gen_terminates
-      "mymode"
+Populate_spec.register
+    ~gen_exits ~status_exits
+    ~gen_assigns ~status_assigns
+    ~gen_requires
+    ~gen_allocates
+    ~gen_terminates
+    "mymode"
 \end{ocamlcode}
 
 This function registers a new mode \verb+mymode+ which can be selected using
 command line options \verb+-generated-spec-mode mymode+. All parameters are
-optionnals and, if a generation function is left unspecified, \verb+Frama_C+
-mode (see the user manual~\cite{userman}) will be used instead to generate the
+optional and, if a generation function is left unspecified, \verb+Frama_C+ mode
+(see the user manual~\cite{userman}) will be used instead to generate the
 corresponding clauses (emits a warning). It is also possible to specify a
 property status\codeidx{Property\_status} to be emitted when a clause is
-generated (emits a warning if omitted). Requires is the only clause for which it
-is not possible to specify a status, because
+generated (emits a warning if omitted). Requires are the only clause for which
+it is not possible to specify a status, because
 \texttt{Populate\_spec}\codeidx{Populate\_spec} will never try to emit status of
 requires.
 
