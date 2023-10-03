@@ -766,11 +766,12 @@ class FunctionInfos {
   readonly pinned = new Set<Ast.marker>();  // Pinned markers
   readonly tracked = new Set<Ast.marker>(); // Tracked markers
   startingCallstack = 1;                    // First displayed callstack
-  byCallstacks = false;                     // True if displayed by callstacks
+  byCallstacks: boolean;                    // True if displayed by callstacks
   folded = false;                           // True if folded
 
-  constructor(fct: string) {
+  constructor(fct: string, byCallstacks: boolean) {
     this.fct = fct;
+    this.byCallstacks = byCallstacks;
   }
 
   has(marker: Ast.marker): boolean {
@@ -814,6 +815,7 @@ class FunctionInfos {
 class FunctionsManager {
 
   private readonly cache = new Map<string, FunctionInfos>();
+  private byCallstacks = false;
 
   constructor() {
     this.newFunction = this.newFunction.bind(this);
@@ -829,13 +831,14 @@ class FunctionsManager {
   }
 
   newFunction(fct: string): void {
-    if (!this.cache.has(fct)) this.cache.set(fct, new FunctionInfos(fct));
+    if (!this.cache.has(fct))
+      this.cache.set(fct, new FunctionInfos(fct, this.byCallstacks));
   }
 
   private getInfos(fct: string): FunctionInfos {
     const { cache } = this;
     if (cache.has(fct)) return cache.get(fct) as FunctionInfos;
-    const infos = new FunctionInfos(fct);
+    const infos = new FunctionInfos(fct, this.byCallstacks);
     this.cache.set(fct, infos);
     return infos;
   }
@@ -848,6 +851,11 @@ class FunctionsManager {
   setByCallstacks(fct: string, byCallstacks: boolean): void {
     const infos = this.cache.get(fct);
     if (infos) infos.byCallstacks = byCallstacks;
+  }
+
+  setGlobalByCallstacks(byCallstacks: boolean): void {
+    this.byCallstacks = byCallstacks;
+    this.cache.forEach((infos) => infos.byCallstacks = byCallstacks);
   }
 
   setFolded(fct: string, folded: boolean): void {
@@ -979,6 +987,9 @@ const FocusState = new GlobalState<Probe | undefined>(undefined);
 /* Component */
 function EvaTable(): JSX.Element {
 
+  const [showCallstacks, flipCallstacks] =
+    Dome.useFlipSettings('ivette.eva.showCallstacks', false);
+
   /* Component state */
   const [ selection, select ] = States.useSelection();
   const [ cs, setCS ] = useGlobalState(CallstackState);
@@ -1000,6 +1011,12 @@ function EvaTable(): JSX.Element {
   const getProbe = useProbeCache();
   const getCallsites = useCallsitesCache();
   const getCallstacks = useCallstacksCache();
+
+  /* Updates the function manager when the showCallstacks state changes. */
+  React.useEffect(() => {
+    fcts.setGlobalByCallstacks(showCallstacks);
+    setTic(tac => tac + 1);
+  }, [fcts, showCallstacks]);
 
   /* Computing the function corresponding to the selected callstack */
   const csFctPromise = React.useMemo(async () => {
@@ -1138,7 +1155,14 @@ function EvaTable(): JSX.Element {
   /* Builds the component */
   return (
     <>
-      <Ivette.TitleBar />
+      <Ivette.TitleBar>
+        <IconButton
+          icon="ITEMS.LIST"
+          title="Show values by callstack by default"
+          selected={showCallstacks}
+          onClick={flipCallstacks}
+        />
+      </Ivette.TitleBar>
       <EvaReady>
         <div className='eva-functions-section'>
           {React.Children.toArray(functions)}
