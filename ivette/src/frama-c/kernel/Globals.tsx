@@ -35,6 +35,7 @@ import * as Toolbars from 'dome/frame/toolbars';
 
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
+import * as Locations from 'frama-c/kernel/Locations';
 import { computationState } from 'frama-c/plugins/eva/api/general';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 
@@ -117,6 +118,7 @@ export function Functions(): JSX.Element {
   const { kind, name } = States.useDeclaration(scope);
   const ker = States.useSyncArrayProxy(Ast.functions);
   const eva = States.useSyncArrayProxy(Eva.functions);
+  const getMarker = States.useSyncArrayGetter(Ast.markerAttributes);
   const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
   const { useFlipSettings } = Dome;
   const [stdlib, flipStdlib] =
@@ -135,10 +137,23 @@ export function Functions(): JSX.Element {
     useFlipSettings('ivette.globals.eva-analyzed', true);
   const [evaUnreached, flipEvaUnreached] =
     useFlipSettings('ivette.globals.eva-unreached', true);
+  const [selected, flipSelected] =
+    useFlipSettings('ivette.globals.selected', false);
+  const { markers } = Locations.useSelection();
+  const multipleSelection: States.Scope[] =
+    React.useMemo(
+      () => markers.map((m) => getMarker(m)?.scope)
+      , [ getMarker, markers ]);
+  const multipleSelectionActive = multipleSelection.length > 0;
   const evaComputed = States.useSyncValue(computationState) === 'computed';
 
   // Currently selected function.
   const current = (scope && kind === 'FUNCTION') ? name : undefined;
+
+  function isSelected(fct: functionsData): boolean {
+    const idx = multipleSelection.findIndex((s) => s === fct.decl);
+    return 0 <= idx;
+  }
 
   function showFunction(fct: functionsData): boolean {
     const visible =
@@ -148,10 +163,11 @@ export function Functions(): JSX.Element {
       && (undef || fct.defined)
       && (intern || fct.extern)
       && (extern || !fct.extern)
+      && (!selected || isSelected(fct))
       && (evaAnalyzed || !evaComputed ||
-        !('eva_analyzed' in fct && fct.eva_analyzed === true))
+          !('eva_analyzed' in fct && fct.eva_analyzed === true))
       && (evaUnreached || !evaComputed ||
-        ('eva_analyzed' in fct && fct.eva_analyzed === true));
+          ('eva_analyzed' in fct && fct.eva_analyzed === true));
     return !!visible;
   }
 
@@ -201,6 +217,13 @@ export function Functions(): JSX.Element {
         enabled: evaComputed,
         checked: evaUnreached,
         onClick: flipEvaUnreached,
+      },
+      'separator',
+      {
+        label: 'Selected only',
+        enabled: multipleSelectionActive,
+        checked: selected,
+        onClick: flipSelected,
       },
     ];
     Dome.popupMenu(items);
