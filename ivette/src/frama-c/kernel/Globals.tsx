@@ -163,7 +163,7 @@ export function Functions(): JSX.Element {
       && (undef || fct.defined)
       && (intern || fct.extern)
       && (extern || !fct.extern)
-      && (!selected || isSelected(fct))
+      && (!multipleSelectionActive || !selected || isSelected(fct))
       && (evaAnalyzed || !evaComputed ||
           !('eva_analyzed' in fct && fct.eva_analyzed === true))
       && (evaUnreached || !evaComputed ||
