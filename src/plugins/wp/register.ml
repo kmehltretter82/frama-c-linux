@@ -795,10 +795,8 @@ let cmdline_run () =
         let model = generator#model in
         Ast.compute ();
         Dyncall.compute ();
-        (*
         if Wp_parameters.RTE.get () then
           WpRTE.generate_all model ;
-        *)
         if Wp_parameters.has_dkey dkey_logicusage then
           begin
             LogicUsage.compute ();
