@@ -20,10 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This module is used to generate missing specifications Options
+(** This module is used to generate missing specifications. Options
     {!Kernel.GeneratedDefaultSpec}, {!Kernel.GeneratedSpecMode} and
-    {!Kernel.GeneratedSpecCustom} can be used to chose in details which clause
-    to generate in which cases.
+    {!Kernel.GeneratedSpecCustom} can be used to choose precisely which clause
+    to generate in which case.
     @since Frama-C+dev
 *)
 
@@ -58,7 +58,7 @@ type t_requires = identified_predicate list
 type t_terminates = identified_predicate option
 
 (** Type of a function that, given a {!Kernel_function.t} and a
-    {!Cil_types.spec}, returns a clause. Accepted clause types includes
+    {!Cil_types.spec}, returns a clause. Accepted clause types include
     {!t_exits}, {!t_assigns}, {!t_requires}, {!t_allocates} and {!t_terminates}.
 *)
 type 'a gen = (kernel_function -> spec -> 'a)
@@ -69,8 +69,8 @@ type status = Property_status.emitted_status
 (** [register ?gen_exits ?gen_requires ?status_allocates ... name] registers a
     new mode called [name] which can then be used for specification generation
     (see {!Kernel.GeneratedSpecMode} and {!Kernel.GeneratedSpecCustom}). All
-    parameters except [name] are optionals, meaning default action (mode
-    Frama-C) will be performed if left unspecified (triggers a warnings).
+    parameters except [name] are optional, meaning default action (mode
+    Frama-C) will be performed if left unspecified (triggers a warning).
 *)
 val register :
   ?gen_exits:t_exits gen -> ?status_exits:status ->
