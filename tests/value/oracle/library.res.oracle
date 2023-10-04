@@ -76,7 +76,7 @@
   S_1_0_S_q_ss[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
   S_0_1_S_q_ss[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
   S_1_1_S_q_ss[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
-[kernel:annot:missing-spec] library.i:30: Warning: 
+[kernel:annot:missing-spec] library.i:5: Warning: 
   Neither code nor specification for function f_int,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f_int <- main.
@@ -96,7 +96,7 @@
 [eva:alarm] library.i:33: Warning: 
   out of bounds read. assert \valid_read(*(*G));
 [eva:alarm] library.i:33: Warning: out of bounds write. assert \valid(*(*(*G)));
-[kernel:annot:missing-spec] library.i:37: Warning: 
+[kernel:annot:missing-spec] library.i:18: Warning: 
   Neither code nor specification for function gen,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function gen <- main.

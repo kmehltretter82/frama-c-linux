@@ -7,7 +7,7 @@
   pf ∈ {0}
 [eva] computing for function g <- main.
   Called from fct_ptr.i:15.
-[kernel:annot:missing-spec] fct_ptr.i:8: Warning: 
+[kernel:annot:missing-spec] fct_ptr.i:11: Warning: 
   Neither code nor specification for function f,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- g <- main.

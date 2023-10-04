@@ -12,7 +12,7 @@
   s1 ∈ {0}
   si[0..1] ∈ {0}
   so[0..1] ∈ {0}
-[kernel:annot:missing-spec] bts334.i:66: Warning: 
+[kernel:annot:missing-spec] bts334.i:61: Warning: 
   Neither code nor explicit assigns for function init,
    generating default clauses from the specification. See -generated-spec-* options for more info
 [eva] computing for function init <- main_init.

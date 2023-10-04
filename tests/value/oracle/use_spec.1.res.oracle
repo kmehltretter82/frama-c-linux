@@ -14,7 +14,7 @@
   Called from use_spec.i:25.
 [eva] using specification for function f
 [eva] Done for function f
-[kernel:annot:missing-spec] use_spec.i:26: Warning: 
+[kernel:annot:missing-spec] use_spec.i:13: Warning: 
   Neither code nor specification for function g,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function g <- main.

@@ -17,7 +17,7 @@
   function f: precondition 'i' got status invalid.
 [eva] Recording results for f
 [eva] Done for function f
-[kernel:annot:missing-spec] precond2.c:24: Warning: 
+[kernel:annot:missing-spec] precond2.c:17: Warning: 
   Neither code nor explicit assigns for function g,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function g <- main.

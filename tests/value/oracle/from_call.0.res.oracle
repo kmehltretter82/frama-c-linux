@@ -44,7 +44,7 @@
   f_previous ∈ {{ &a }}
 [eva] computing for function f <- main.
   Called from from_call.i:81.
-[kernel:annot:missing-spec] from_call.i:20: Warning: 
+[kernel:annot:missing-spec] from_call.i:13: Warning: 
   Neither code nor specification for function h,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function h <- f <- main.

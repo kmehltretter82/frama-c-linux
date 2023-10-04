@@ -11,7 +11,7 @@
 [eva:garbled-mix:write] spawn_h.c:36: 
   Assigning imprecise value to opt.
   The imprecision originates from Library function {spawn_h.c:36}
-[kernel:annot:missing-spec] spawn_h.c:43: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/spawn.h:72: Warning: 
   Neither code nor specification for function posix_spawn_file_actions_init,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawn_file_actions_init <- main.
@@ -28,7 +28,7 @@
   Called from spawn_h.c:45.
 [eva] using specification for function exit
 [eva] Done for function exit
-[kernel:annot:missing-spec] spawn_h.c:47: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/spawn.h:55: Warning: 
   Neither code nor specification for function posix_spawn_file_actions_addclose,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawn_file_actions_addclose <- main.
@@ -43,7 +43,7 @@
 [eva] computing for function exit <- main.
   Called from spawn_h.c:50.
 [eva] Done for function exit
-[kernel:annot:missing-spec] spawn_h.c:60: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/spawn.h:97: Warning: 
   Neither code nor specification for function posix_spawnattr_init,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawnattr_init <- main.
@@ -58,7 +58,7 @@
 [eva] computing for function exit <- main.
   Called from spawn_h.c:62.
 [eva] Done for function exit
-[kernel:annot:missing-spec] spawn_h.c:63: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/spawn.h:99: Warning: 
   Neither code nor specification for function posix_spawnattr_setflags,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawnattr_setflags <- main.
@@ -79,7 +79,7 @@
 [eva] spawn_h.c:67: 
   function sigfillset: precondition 'valid_set' got status valid.
 [eva] Done for function sigfillset
-[kernel:annot:missing-spec] spawn_h.c:68: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/spawn.h:113: Warning: 
   Neither code nor specification for function posix_spawnattr_setsigmask,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawnattr_setsigmask <- main.
@@ -148,7 +148,7 @@
 [eva] Done for function exit
 [eva:alarm] spawn_h.c:82: Warning: 
   out of bounds read. assert \valid_read(argv + optind);
-[kernel:annot:missing-spec] spawn_h.c:82: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/spawn.h:116: Warning: 
   Neither code nor specification for function posix_spawnp,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawnp <- main.
@@ -163,7 +163,7 @@
 [eva] computing for function exit <- main.
   Called from spawn_h.c:85.
 [eva] Done for function exit
-[kernel:annot:missing-spec] spawn_h.c:90: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/spawn.h:75: Warning: 
   Neither code nor specification for function posix_spawnattr_destroy,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawnattr_destroy <- main.
@@ -178,7 +178,7 @@
 [eva] computing for function exit <- main.
   Called from spawn_h.c:92.
 [eva] Done for function exit
-[kernel:annot:missing-spec] spawn_h.c:96: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/spawn.h:69: Warning: 
   Neither code nor specification for function posix_spawn_file_actions_destroy,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawn_file_actions_destroy <- main.

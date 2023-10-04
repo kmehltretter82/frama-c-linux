@@ -129,7 +129,7 @@
 [eva] Done for function cast_address
 [eva] computing for function garbled_mix_null <- main.
   Called from imprecise.c:148.
-[kernel:annot:missing-spec] imprecise.c:75: Warning: 
+[kernel:annot:missing-spec] imprecise.c:72: Warning: 
   Neither code nor specification for function gm_f1,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function gm_f1 <- garbled_mix_null <- main.

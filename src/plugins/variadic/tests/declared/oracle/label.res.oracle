@@ -1,7 +1,7 @@
 [variadic] label.i:4: Declaration of variadic function f.
 [variadic] label.i:8: Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
-[kernel:annot:missing-spec] label.i:8: Warning: 
+[kernel:annot:missing-spec] label.i:4: Warning: 
   Neither code nor specification for function f,
    generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function f
