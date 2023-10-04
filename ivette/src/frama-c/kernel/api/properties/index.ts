@@ -38,17 +38,17 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byFct } from 'frama-c/kernel/api/ast';
+import { byDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { bySource } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fct } from 'frama-c/kernel/api/ast';
+import { decl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fctDefault } from 'frama-c/kernel/api/ast';
+import { declDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jFct } from 'frama-c/kernel/api/ast';
+import { jDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -276,8 +276,8 @@ export interface statusData {
   names: string[];
   /** Status */
   status: propStatus;
-  /** Function */
-  fct?: fct;
+  /** Declaration Scope */
+  scope?: decl;
   /** Instruction */
   kinstr?: marker;
   /** Position */
@@ -298,7 +298,7 @@ export const jStatusData: Json.Decoder<statusData> =
     kind: jPropKind,
     names: Json.jArray(Json.jString),
     status: jPropStatus,
-    fct: Json.jOption(jFct),
+    scope: Json.jOption(jDecl),
     kinstr: Json.jOption(jMarker),
     source: jSource,
     alarm: Json.jOption(Json.jString),
@@ -310,14 +310,14 @@ export const jStatusData: Json.Decoder<statusData> =
 export const byStatusData: Compare.Order<statusData> =
   Compare.byFields
     <{ key: marker, descr: string, kind: propKind, names: string[],
-       status: propStatus, fct?: fct, kinstr?: marker, source: source,
+       status: propStatus, scope?: decl, kinstr?: marker, source: source,
        alarm?: string, alarm_descr?: string, predicate?: string }>({
     key: byMarker,
     descr: Compare.string,
     kind: byPropKind,
     names: Compare.array(Compare.string),
     status: byPropStatus,
-    fct: Compare.defined(byFct),
+    scope: Compare.defined(byDecl),
     kinstr: Compare.defined(byMarker),
     source: bySource,
     alarm: Compare.defined(Compare.string),
@@ -377,7 +377,7 @@ export const status: State.Array<marker,statusData> = status_internal;
 /** Default value for `statusData` */
 export const statusDataDefault: statusData =
   { key: markerDefault, descr: '', kind: propKindDefault, names: [],
-    status: propStatusDefault, fct: undefined, kinstr: undefined,
+    status: propStatusDefault, scope: undefined, kinstr: undefined,
     source: sourceDefault, alarm: undefined, alarm_descr: undefined,
     predicate: undefined };
 
