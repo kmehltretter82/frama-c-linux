@@ -998,7 +998,7 @@ function EvaTable(): JSX.Element {
     (): Location | undefined =>
       ((marker && fct) ? { marker, fct } : undefined)
     , [marker, fct]);
-    const [ cs, setCS ] = useGlobalState(CallstackState);
+  const [ cs, setCS ] = useGlobalState(CallstackState);
   const [ fcts ] = useGlobalState(FunctionsManagerState);
   const [ focus, setFocus ] = useGlobalState(FocusState);
 
