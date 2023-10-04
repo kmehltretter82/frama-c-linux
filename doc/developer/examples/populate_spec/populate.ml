@@ -4,6 +4,7 @@ open Cil_types
    parameters:
    - the current kernel_function for which we want to generate specifications.
    - this kernel function specifications.
+
    And returns a new clause, which needs to match the type of clause we are
    currently generating (See Populate_spec.mli for more details.)
 *)
