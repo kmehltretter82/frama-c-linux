@@ -1,6 +1,3 @@
 [kernel] Parsing serial.c (with preprocessing)
 [kernel] Parsing TMPDIR/aorai_serial_0_prove.i (no preprocessing)
 [wp] Warning: Missing RTE guards
-[kernel:annot:missing-spec] TMPDIR/aorai_serial_0_prove.i:1291: Warning: 
-  Neither code nor specification for function Frama_C_show_aorai_state,
-   generating default assigns. See -generated-spec-* options for more info
