@@ -23,9 +23,11 @@
 open Cil_types
 
 type mode =
-  | ACSL | Safe | Frama_C (* Modes available for specification generation. *)
-  | Skip (* Internally used to skip generation. *)
-  | Other of string (* Allow user to use a custom mode, see {!register}. *)
+  (* Modes available for specification generation. Skip is only available via
+     -generated-spec-custom (cf. option description). *)
+  | ACSL | Safe | Frama_C | Skip
+  (* Allow user to use a custom mode, see {!register}. *)
+  | Other of string
 
 (* Allow customization, each clause can be handled with a different {!mode}. *)
 type config = {
@@ -733,10 +735,16 @@ module Allocates = Make(Allocates_generator)
 module Terminates = Make(Terminates_generator)
 
 (* Convert string from parameter [-generated-spec-mode] to [mode]. *)
-let get_mode = function
+let get_mode ~allow_skip = function
   | "frama-c" -> Frama_C
   | "acsl" -> ACSL
   | "safe" -> Safe
+  | "skip" when allow_skip -> Skip
+  | "skip" ->
+    Kernel.warning ~once:true
+      "Mode skip is only available via -generated-spec-custom.@, The mode \
+       frama-c will be used instead";
+    Frama_C
   | s -> Other s
 
 (* Given a [mode], returns the configuration for each clause. *)
@@ -751,14 +759,14 @@ let build_config mode =
 
 (* Build configuration from parameter [-generated-spec-mode]. *)
 let get_config_mode () =
-  Kernel.GeneratedSpecMode.get () |> get_mode |> build_config
+  Kernel.GeneratedSpecMode.get () |> get_mode ~allow_skip:false |> build_config
 
 (* Build the default configuration, then select modes depending on the
    parameter [-generated-spec-custom]. *)
 let get_config_custom () =
   let default = get_config_mode () in
   let collect (k,v) config =
-    let mode = get_mode (Option.get v) in
+    let mode = get_mode ~allow_skip:true (Option.get v) in
     match k with
     | "exits" -> {config with c_exits = mode}
     | "assigns" -> {config with c_assigns = mode}
