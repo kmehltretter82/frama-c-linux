@@ -73,19 +73,27 @@ interface MenuProps {
 export function buildMenu(props: MenuProps) : void {
   const { update, marker, attrs, menu } = props;
   if (!attrs || !marker) return;
-  const reads = 'Studia: select reads';
-  const writes = 'Studia: select writes';
+  const reads = 'Studia: select reads ';
+  const writes = 'Studia: select writes ';
   if (attrs.isLval && !attrs.isFunction) {
     const data = { marker, label: attrs.name };
     const select = (k: access): Selections => compute({ ...data, kind: k });
     const onClick = (k: access): void => { select(k).then(update); };
-    menu.push({ label: reads, onClick: () => onClick('Reads') });
-    menu.push({ label: writes, onClick: () => onClick('Writes') });
+    const suffix = `of ${attrs.name}`;
+    const createMenuItem = (label: string, kind: access): void => {
+      menu.push({ label: label + suffix, onClick: () => onClick(kind) });
+    };
+    createMenuItem(reads, 'Reads');
+    createMenuItem(writes, 'Writes');
   } else {
     const location = { location: { fct: attrs.scope, marker } };
     const onClick = (e: Dome.Event): void => { update(location); e.emit(); };
-    menu.push({ label: reads, onClick: () => onClick(studiaReadsEvent) });
-    menu.push({ label: writes, onClick: () => onClick(studiaWritesEvent) });
+    const suffix = `of…`;
+    const createMenuItem = (label: string, evt: Dome.Event): void => {
+      menu.push({ label: label + suffix, onClick: () => onClick(evt) });
+    };
+    createMenuItem(reads, studiaReadsEvent);
+    createMenuItem(writes, studiaWritesEvent);
   }
 }
 
