@@ -27,7 +27,8 @@ import * as Dome from 'dome';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-
+import * as Locations from 'frama-c/kernel/Locations';
+import * as Ast from 'frama-c/kernel/api/ast';
 import * as API from './api';
 
 import Cytoscape from 'cytoscape';
@@ -121,7 +122,6 @@ class Dive {
   _layout = '';
   layoutOptions: Cytoscape.LayoutOptions | undefined;
   currentSelection: string | null = null;
-  onSelect: ((_: States.Location[]) => void) | null = null;
   selectedLocation: (States.Location | undefined) = undefined;
 
   constructor(cy: Cytoscape.Core | null = null) {
@@ -517,9 +517,17 @@ class Dive {
     this.updateNodeSelection(node);
     await this.explore(node);
 
-    const writes = node.data()?.writes;
-    if (writes && writes.length)
-      this.onSelect?.(writes);
+    const label = node.data()?.label as (string | undefined);
+    const writes = node.data()?.writes as States.Location[];
+    if (label && writes) {
+      const markers: Ast.marker[] = [];
+      writes.forEach(({ marker: m }) => { if (m) markers.push(m); });
+      Locations.setNextSelection({
+        label: `Writes to ${label}`,
+        title: 'Selected writes from Dive current selection',
+        markers
+      });
+    }
 
     /* Cytoscape automatically selects the node clicked, and unselects all other
        nodes and edges. As we want some incoming edges to remain selected, we
@@ -578,47 +586,47 @@ type GraphViewRef = {
 
 const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
   (props: GraphViewProps, ref) => {
-  const { lock, layout, selectionMode } = props;
+    const { lock, layout, selectionMode } = props;
 
-  const [dive, setDive] = useState(() => new Dive());
-  const selection = States.useCurrentLocation();
-  const graph = States.useSyncArrayData(API.graph);
+    const [dive, setDive] = useState(() => new Dive());
+    const selection = States.useCurrentLocation();
+    const graph = States.useSyncArrayData(API.graph);
 
-  function setCy(cy: Cytoscape.Core): void {
-    if (cy !== dive.cy)
-      setDive(new Dive(cy));
-  }
+    function setCy(cy: Cytoscape.Core): void {
+      if (cy !== dive.cy)
+        setDive(new Dive(cy));
+    }
 
-  useImperativeHandle(ref, () => ({ clear: () => dive.clear() }));
+    useImperativeHandle(ref, () => ({ clear: () => dive.clear() }));
 
-  useEffect(() => {
-    setDive(new Dive(dive.cy)); // On hot reload, setup a new instance
-  }, [Dive]); // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect(() => {
+      setDive(new Dive(dive.cy)); // On hot reload, setup a new instance
+    }, [Dive]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    dive.layout = layout;
-  }, [dive, layout]);
+    useEffect(() => {
+      dive.layout = layout;
+    }, [dive, layout]);
 
-  useEffect(() => {
-    dive.updateGraph(graph);
-  }, [dive, graph]);
+    useEffect(() => {
+      dive.updateGraph(graph);
+    }, [dive, graph]);
 
-  // Follow mode
-  useEffect(() => {
-    dive.mode = selectionMode === 'follow' ? 'explore' : 'overview';
-  }, [dive, selectionMode]);
+    // Follow mode
+    useEffect(() => {
+      dive.mode = selectionMode === 'follow' ? 'explore' : 'overview';
+    }, [dive, selectionMode]);
 
-  useEffect(() => {
     // Updates the graph according to the selected marker.
-    dive.selectLocation(selection, !lock);
-  }, [dive, lock, selection]);
+    useEffect(() => {
+      dive.selectLocation(selection, !lock);
+    }, [dive, lock, selection]);
 
-  return (
-    <CytoscapeComponent
-      stylesheet={style}
-      cy={setCy}
-      style={{ width: '100%', height: '100%' }}
-    />);
+    return (
+      <CytoscapeComponent
+        stylesheet={style}
+        cy={setCy}
+        style={{ width: '100%', height: '100%' }}
+      />);
 });
 
 GraphView.displayName = "GraphView";

@@ -67,19 +67,35 @@ export function setIndex(index: number): void {
   setSelection({ ...s, index });
 }
 
+function sameMarkers(xs: Ast.marker[], ys: Ast.marker[]): boolean
+{
+  if (xs.length !== ys.length) return false;
+  for (let k = 0; k < xs.length; k++)
+    if (xs[k] !== ys[k]) return false;
+  return true;
+}
+
+function sameSelection(u: MultiSelection, v: MultiSelection): boolean
+{
+  if (u.label !== v.label) return false;
+  if (u.title !== v.title) return false;
+  return sameMarkers(u.markers, v.markers);
+}
+
 /**
    Update the list of markers and select its first element,
    or cycle to the next element wrt current selection.
  */
-export function setNextSelection(locs: Ast.marker[]): void {
+export function setNextSelection(s: MultiSelection): void
+{
   const selection = MultiSelection.getValue();
-  const { markers, index } = selection;
-  if (markers === locs) {
+  if (s.index === undefined && sameSelection(selection, s)) {
+    const { index, markers } = selection;
     const target = index === undefined ? 0 : index+1;
-    const select = target < locs.length ? target : 0;
+    const select = target < markers.length ? target : 0;
     setSelection({ ...selection, index: select });
   } else {
-    setSelection({ ...selection, markers: locs, index: 0 });
+    setSelection(s);
   }
 }
 
