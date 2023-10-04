@@ -63,14 +63,14 @@ type t_terminates = identified_predicate option
 *)
 type 'a gen = (kernel_function -> spec -> 'a)
 
-(** Short name for clarity, status emitted for properties. *)
+(** Alias for brevity, status emitted for properties. *)
 type status = Property_status.emitted_status
 
 (** [register ?gen_exits ?gen_requires ?status_allocates ... name] registers a
     new mode called [name] which can then be used for specification generation
     (see {!Kernel.GeneratedSpecMode} and {!Kernel.GeneratedSpecCustom}). All
     parameters except [name] are optional, meaning default action (mode
-    Frama-C) will be performed if left unspecified (triggers a warning).
+    Frama_C) will be performed if left unspecified (triggers a warning).
 *)
 val register :
   ?gen_exits:t_exits gen -> ?status_exits:status ->
@@ -80,10 +80,12 @@ val register :
   ?status_terminates:status ->
   string -> unit
 
-(** [populate_funspec ~do_body kf clauses] generates missing specifications for
-    [kf] according to selected [clauses].
+(** [populate_funspec ~loc ~do_body kf clauses] generates missing specifications
+    for [kf] according to selected [clauses].
+    [loc] is set to [Kernel_function.get_location kf] by default, and is used
+    to specify warnings locations.
     By default [do_body] is false, meaning only specification of prototypes will
     be generated.
 *)
-val populate_funspec :
-  ?do_body:bool -> kernel_function -> clause list -> unit
+val populate_funspec : ?loc:Cil_types.location -> ?do_body:bool ->
+  kernel_function -> clause list ->unit
