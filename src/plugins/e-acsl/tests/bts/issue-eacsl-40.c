@@ -8,12 +8,12 @@
    COMMENT: attributes are erased by Frama-C's kernel. The test below checks
    COMMENT: whether code produced by E-ACSL's instrumentation remains parsable
    COMMENT: by GCC.
-   COMMENT: The 'LIBS:' line below disables the filter set by E_ACSL_test.ml
-   LIBS:
-   LOG: @PTEST_NAME@.out.frama.c
-   OPT: @GLOBAL@ @EACSL@ -cpp-extra-args="-DNO_FCLOSE" -no-frama-c-stdlib -then-last -print -ocode @PTEST_NAME@.out.frama.c
- ENABLED_IF: %{bin-available:gcc}
-   EXECNOW: BIN @PTEST_NAME@.o gcc -Wno-attributes %{dep:@PTEST_NAME@.out.frama.c} -c -o @PTEST_NAME@.o >@DEV_NULL@ 2>@DEV_NULL@
+*/
+
+/* run.config_dev
+
+   MACRO: ROOT_EACSL_GCC_OPTS_EXT -c
+
 */
 
 #include <stdio.h>
