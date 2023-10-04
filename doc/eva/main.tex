@@ -3976,6 +3976,7 @@ most cases, and a greater value is rarely needed.
 
 
 \subsection{Value partitioning}
+\label{value-partitioning}
 
 \subsubsection{Principle}
 
@@ -4166,6 +4167,44 @@ a significant factor. Most of the time, this option has little impact in the
 analysis, both in terms of precision and performance. However, when dealing
 with large arrays and matrices, it is worth considering its usage.
 
+
+\subsection{Subdividing the evaluation of non-linear expressions}
+\label{subdividing-evaluation}
+
+Option \verb|-eva-subdivide-non-linear| improves the analysis precision on
+non-linear expressions, such as \lstinline|x * x|,
+or on any expression with multiple occurrences of the same lvalue.
+
+The interval semantics is inherently imprecise on non-linear expressions.
+When $x \in [-10..10]$, the interval semantics computes $x*x \in [-100..100]$.
+Subdivisions can mitigate this imprecision by splitting the evaluation of
+\lstinline|x*x| according to the possible values of \lstinline|x|,
+and then joining the results.
+When \verb|-eva-subdivide-non-linear| is enabled, \Eva{} evaluates the
+expression \lstinline|x*x| separately for $x \in [-10..0]$ and $x \in [0..10]$,
+and computes the precise interval $x*x \in [0..100]$ for both cases.
+On this example, splitting the values of x further would not improve the result.
+
+The argument of \verb|-eva-subdivide-non-linear| is the maximal number of
+subdivisions that can be performed for each non-linear expression.
+This limit is not always reached, as heuristics may detect when more
+subdivisions cannot lead to a better result.
+This option slightly slows down the analysis, as more computations are performed;
+in practice, the limit can usually be set up to several hundreds even on
+large programs.
+
+The option is global, and subdivisions are applied to any non-linear expression
+of integer or floating-point type.
+Subdivisions can also be controlled locally by writing annotations
+in the analyzed code:
+a \lstinline|//@  subdivide N;| annotation instructs \Eva{}
+to apply up to $N$ subdivisions when evaluating the following statement,
+regardless of option \verb|-eva-subdivide-non-linear|.
+
+Finally, \Eva is also able to subdivide the evaluation of an expression
+according to the values of an arbitrary number of lvalues;
+thus, this subdivision mechanism can also improve the precision on expressions
+that are non-linear on several lvalues, such as \lstinline|x*x - 2*x*y + y*y|.
 
 \section{Analysis domains}
 \label{sec:eva}
@@ -5390,6 +5429,90 @@ implementation and the specification, using option
 not set, even user-written specifications are skipped (for functions
 of the standard library).
 
+\section{Directives guiding the analysis}
+
+The precision of the \Eva{} analysis can often be locally improved on some code
+patterns by writing directives as special ACSL annotations in the analyzed code.
+These directives allow the user to fine-tune the behavior of the analysis by
+locally enabling some features that would be too costly to apply on the whole
+program.
+This section lists such directives supported by \Eva{}, with a short description
+of their behavior and a reference to the relevant section of this manual that
+explains in more details their effect on the analysis.
+
+Each of these directives also has an alternative syntax where the keyword is
+prefixed by \texttt{\textbackslash eva::}. Thus, one can write
+\texttt{//@ \textbackslash eva::split x; //@ loop \textbackslash eva::unroll 100;}
+instead of \texttt{//@ split x; //@ loop unroll 100;}.
+This syntax makes explicit that the directive is specific to the \Eva{} plug-in,
+and avoids parsing failure if \Eva{} is not loaded (for instance when using
+the \verb|-no-autoload-plugins| parameter).
+
+\subsection{Directives guiding trace partitioning}
+
+\begin{center}
+  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}>{\raggedright}m{6cm}>{\raggedright}m{8cm}c}
+    Syntax & Description & Ref
+  \tabularnewline
+  \midrule
+  \midrule
+    \texttt{//@ loop unroll <N>;}
+  & Loop unrolling: analyze separately each of the \texttt{<N>} first
+    iterations of the given loop.
+  & \ref{loop-unroll}
+  \tabularnewline
+  \midrule
+    \texttt{//@ split <e>;}~\\
+    \texttt{//@ dynamic\_split <e>;}
+  & Case-based reasoning: separate the analysis for each possible value of expression \texttt{<e>}.
+  & \multirow{2}{*}{\ref{value-partitioning}}
+  \tabularnewline
+  \cmidrule{1-2} \cmidrule{2-2}
+    \texttt{//@ merge <e>;}
+  & Cancel previous splits on expression \texttt{<e>}.
+  & \tabularnewline
+  \midrule
+    \texttt{//@ slevel <N>;}
+  & Locally set the value of \texttt{-eva-slevel} to \texttt{<N>}.
+  & \multirow{4}{*}{\ref{slevel}}
+  \tabularnewline
+  \cmidrule{1-2} \cmidrule{2-2}
+    \texttt{//@ slevel full;}
+  & Locally remove the limit of \texttt{-eva-slevel}.
+  & \tabularnewline
+  \cmidrule{1-2} \cmidrule{2-2}
+    \texttt{//@ slevel default;}
+  & Reset \texttt{-eva-slevel} to its default value.
+  & \tabularnewline
+  \cmidrule{1-2} \cmidrule{2-2}
+    \texttt{//@ slevel merge;}
+  & Merge all states kept separate by \texttt{-eva-slevel}.
+  & \tabularnewline
+  \bottomrule
+  \end{tabular*}
+  \par
+\end{center}
+
+\subsection{Other directives improving precision}
+
+\begin{center}
+  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}>{\raggedright}p{6cm}>{\raggedright}p{8cm}c}
+  Syntax & Description & Ref\tabularnewline
+  \midrule
+  \midrule
+  \texttt{//@ widen\_hints <v>, <N>;} & Use constant \texttt{<N>} as a possible threshold for the widening
+  of variable \texttt{<v>}. & \ref{subsub:widen-hints}\tabularnewline
+  \midrule
+  \texttt{//@ subdivide <N>;} & Subdivide up to \texttt{<N>} times the evaluation of non-linear expressions
+  in the next statement. & \ref{subdividing-evaluation}\tabularnewline
+  \midrule
+  \texttt{//@ eva\_allocate <s>;} & Select a strategy to model dynamic allocation at the next statement. & \ref{malloc}\tabularnewline
+  \midrule
+  \texttt{//@ array\_partition <t>\dots ;} & Propose a segmentation to represent array \texttt{<t>} in the \texttt{multidim}
+  domain. & \ref{sec:multidim}\tabularnewline
+  \bottomrule
+  \end{tabular*}
+  \par\end{center}
 
 
 \chapter{Primitives}\label{primitives}
