@@ -28,7 +28,7 @@
    - {!Dynamic}: API for plug-ins linked dynamically
    - {!Log}: message outputs and printers
    - {!Plugin}: general services for plug-ins
-   - {!Project} and associated files: {!Kind}, {!Datatype} and {!State_builder}.
+   - {!Project} and associated files: {!Datatype} and {!State_builder}.
 
    Other main kernel modules:
    - {!Ast}: the cil AST

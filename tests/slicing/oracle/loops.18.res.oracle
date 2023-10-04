@@ -12,7 +12,8 @@
 [eva:alarm] loops.i:82: Warning: signed overflow. assert c + 10 ≤ 2147483647;
 [eva:alarm] loops.i:88: Warning: assertion got status unknown.
 [kernel:annot:missing-spec] loops.i:89: Warning: 
-  Neither code nor specification for function stop, generating default assigns from the prototype
+  Neither code nor specification for function stop,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function stop <- stop_f2.
   Called from loops.i:89.
 [eva] using specification for function stop

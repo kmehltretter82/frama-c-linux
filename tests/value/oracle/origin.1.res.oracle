@@ -53,7 +53,8 @@
    .t[1] ∈ {0}
   S_gpp[0..1] ∈ [--..--]
 [kernel:annot:missing-spec] origin.i:124: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- origin.
   Called from origin.i:124.
 [eva] using specification for function f

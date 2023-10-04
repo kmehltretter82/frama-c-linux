@@ -945,7 +945,7 @@ let type_cond needs_pebble metaenv env tr cond =
       let b =
         Option.map
           (fun b ->
-             let bhvs = Annotations.behaviors ~populate:false kf in
+             let bhvs = Annotations.behaviors kf in
              try List.find (fun x -> x.b_name = b) bhvs
              with Not_found ->
                Aorai_option.abort "Function %a has no behavior named %s"

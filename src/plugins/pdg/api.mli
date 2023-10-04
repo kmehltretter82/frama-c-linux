@@ -62,7 +62,7 @@ val from_same_fun : t -> t -> bool
 
 (**************************************************************************)
 
-(** {Finding PDG nodes} *)
+(** {3 Finding PDG nodes} *)
 
 val find_decl_var_node : t -> Cil_types.varinfo -> PdgTypes.Node.t
 (** Get the node corresponding the declaration of a local variable or a

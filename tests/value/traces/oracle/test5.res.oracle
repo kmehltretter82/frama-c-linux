@@ -8,7 +8,8 @@
 [eva:initial-state] Values of globals at initialization
   
 [kernel:annot:missing-spec] test5.i:21: Warning: 
-  Neither code nor specification for function my_switch, generating default assigns from the prototype
+  Neither code nor specification for function my_switch,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function my_switch <- main.
   Called from test5.i:21.
 [eva] using specification for function my_switch

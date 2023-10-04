@@ -5328,7 +5328,6 @@ and doExp local_env
     match e.enode, unrollType t with
     | (Lval(lv) | CastE(_, {enode = Lval lv})), TArray(tbase, _, a) ->
       mkStartOfAndMark loc lv, TPtr(tbase, a)
-    | Lval(Mem _, _), TFun _ -> e, t (* Do not turn pointer function types *)
     | (Lval(lv) | CastE(_, {enode = Lval lv})), TFun _  ->
       mkAddrOfAndMark loc lv, TPtr(t, [])
     | _, (TArray _ | TFun _) ->
@@ -6016,7 +6015,9 @@ and doExp local_env
             if asconst = CConst then
               Kernel.warning ~current:true "ASSIGN in constant";
             let se0 = unspecified_chunk empty in
-            let (r1,se1, e1', lvt) = doExp local_env CNoConst e (AExp None) in
+            let (r1,se1, e1', lvt) =
+              doExp local_env CNoConst e AExpLeaveArrayFun
+            in
             let lv =
               match e1'.enode with
               | Lval x when Cil.is_modifiable_lval x -> x

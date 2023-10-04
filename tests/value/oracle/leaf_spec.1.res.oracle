@@ -5,7 +5,8 @@
 [eva:initial-state] Values of globals at initialization
   
 [kernel:annot:missing-spec] leaf_spec.i:27: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- main1.
   Called from leaf_spec.i:27.
 [eva] using specification for function f

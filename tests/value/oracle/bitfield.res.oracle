@@ -100,7 +100,8 @@
 [eva] computing for function imprecise_bts_1671 <- main.
   Called from bitfield.i:165.
 [kernel:annot:missing-spec] bitfield.i:70: Warning: 
-  Neither code nor specification for function leaf, generating default assigns from the prototype
+  Neither code nor specification for function leaf,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function leaf <- imprecise_bts_1671 <- main.
   Called from bitfield.i:70.
 [eva] using specification for function leaf

@@ -40,7 +40,8 @@
 [eva] Recording results for f
 [eva] Done for function f
 [kernel:annot:missing-spec] cond.i:34: Warning: 
-  Neither code nor specification for function unknf, generating default assigns from the prototype
+  Neither code nor specification for function unknf,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function unknf <- main.
   Called from cond.i:34.
 [eva] using specification for function unknf

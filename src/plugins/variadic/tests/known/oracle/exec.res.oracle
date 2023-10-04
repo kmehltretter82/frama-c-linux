@@ -23,7 +23,8 @@
 [eva] using specification for function execv
 [eva] using specification for function execvp
 [kernel:annot:missing-spec] exec.c:15: Warning: 
-  Neither code nor specification for function execlp_fallback_1, generating default assigns from the prototype
+  Neither code nor specification for function execlp_fallback_1,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function execlp_fallback_1
 [eva:invalid-assigns] exec.c:15: 
   Completely invalid destination for assigns clause *(param1 + (0 ..)).

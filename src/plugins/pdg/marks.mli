@@ -31,7 +31,7 @@ open PdgMarks
     So this function takes one call to [f] and translate input keys into nodes.
 
     The function ([m2m]) is called for each element to translate.
-    See {!m2m} for more information about how to use it. *)
+    See {!PdgMarks.m2m} for more information about how to use it. *)
 val in_marks_to_caller :
   PdgTypes.Pdg.t ->
   Cil_types.stmt ->

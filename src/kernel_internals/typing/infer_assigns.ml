@@ -24,11 +24,7 @@ open Cil
 open Cil_types
 open Logic_const
 
-let emitter =
-  Emitter.create "Inferred annotations"
-    [Emitter.Funspec; Emitter.Property_status] ~correctness:[] ~tuning:[]
-
-let assigns_from_prototype kf =
+let from_prototype kf =
   let vi = Kernel_function.get_vi kf in
   let formals =
     try
@@ -157,128 +153,6 @@ let assigns_from_prototype kf =
     let loc = vi.vdecl in
     let result = Logic_const.(new_identified_term (tresult ~loc rtyp)) in
     (result, From (inputs vi.vghost)):: arguments
-
-let is_frama_c_builtin name =
-  Ast_info.is_frama_c_builtin name
-
-(* Put an 'Unknown' status on all 'assigns' and 'from' clauses that we
-   generate. *)
-let emit_unknown_status_on_assigns kf bhv assigns =
-  let emit ip =
-    Property_status.emit emitter ~hyps:[] ip Property_status.Dont_know
-  in
-  let pptopt =
-    Property.ip_of_assigns
-      kf Kglobal (Property.Id_contract (Datatype.String.Set.empty,bhv)) assigns
-  in
-  Option.iter emit pptopt;
-  match assigns with
-  | WritesAny -> ()
-  | Writes froms ->
-    let emit from =
-      let pptopt =
-        Property.ip_of_from
-          kf Kglobal
-          (Property.Id_contract (Datatype.String.Set.empty,bhv)) from
-      in
-      Option.iter emit pptopt
-    in
-    List.iter emit froms
-
-module Is_populated =
-  State_builder.Hashtbl
-    (Kernel_function.Hashtbl)
-    (Datatype.Unit)
-    (struct
-      let size = 17
-      let dependencies = [ Annotations.funspec_state ]
-      let name = "Infer_annotations.Is_populated"
-    end)
-
-let () = Ast.add_linked_state Is_populated.self
-
-let populate_funspec_aux kf spec =
-  let name = Kernel_function.get_name kf in
-  match spec.spec_behavior with
-  | [] ->
-    (* case 1: there is no initial specification -> use generated_behavior *)
-    if not (is_frama_c_builtin name) then begin
-      Kernel.warning ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
-        "Neither code nor specification for function %a, \
-         generating default assigns from the prototype"
-        Kernel_function.pretty kf;
-    end;
-    let assigns = Writes (assigns_from_prototype kf) in
-    let bhv = Cil.mk_behavior ~assigns () in
-    Annotations.add_behaviors emitter kf [ bhv ];
-    emit_unknown_status_on_assigns kf bhv assigns
-
-  | _ :: _ ->
-    (* case 2: there is a specification, so look at assigns clause *)
-    let bhv = match Cil.find_default_behavior spec with
-      | None -> Cil.mk_behavior ()
-      | Some bhv -> bhv
-    in
-    if bhv.b_assigns = WritesAny then
-      (* case 2.2 : some assigns have to be generated *)
-      (* step 2.1: looks at unguarded behaviors and then at complete
-         behaviors *)
-      let warn_if_not_builtin explicit_name name orig_name =
-        if not (is_frama_c_builtin name) then
-          Kernel.warning ~once:true ~current:true
-            ~wkey:Kernel.wkey_missing_spec
-            "Neither code nor %s assigns clause for function %a, \
-             generating default assigns from the %s"
-            explicit_name Kernel_function.pretty kf orig_name
-      in
-      let assigns = Ast_info.merge_assigns_from_spec ~warn:false spec in
-      let assigns =
-        if assigns <> WritesAny then begin
-          (* case 2.2.1. A correct assigns clause has been found *)
-          warn_if_not_builtin "explicit" name "specification";
-          assigns
-        end else begin
-          (* case 2.2.1. No correct assigns clause can be found *)
-          let assigns =
-            try (* Takes the union the assigns clauses, even if it
-                   is not advertised as complete behaviors.
-                   Not more arbitrary than using prototype to infer
-                   assigns.*)
-              List.fold_left
-                (fun acc bhv ->
-                   if Cil.is_default_behavior bhv then acc
-                   else match acc, bhv.b_assigns with
-                     | _, WritesAny -> raise Not_found
-                     | WritesAny, a -> a
-                     | Writes l1, Writes l2 -> Writes (l1 @ l2))
-                WritesAny
-                spec.spec_behavior
-            with Not_found ->
-              WritesAny
-          in
-          if assigns <> WritesAny then begin
-            warn_if_not_builtin "implicit" name "specification" ;
-            assigns
-          end else begin (* The union gave WritesAny, so use the prototype *)
-            warn_if_not_builtin "implicit" name "prototype";
-            Writes (assigns_from_prototype kf);
-          end
-        end
-      in
-      Annotations.add_assigns
-        ~keep_empty:false emitter kf ~behavior:bhv.b_name assigns;
-      emit_unknown_status_on_assigns kf bhv assigns
-
-let populate_funspec kf spec =
-  if Is_populated.mem kf then
-    false (* No need to add the spec again *)
-  else (
-    populate_funspec_aux kf spec;
-    Is_populated.add kf ();
-    true
-  )
-
-let () = Annotations.populate_spec_ref := populate_funspec
 
 (*
 Local Variables:

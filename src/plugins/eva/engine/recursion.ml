@@ -44,15 +44,10 @@ let mark_unknown_requires kinstr kf funspec =
   in
   List.iter emit_behavior funspec.spec_behavior
 
-let need_assigns funspec =
-  match Cil.find_default_behavior funspec with
-  | None -> true
-  | Some bhv -> bhv.b_assigns = WritesAny
-
-let get_spec kinstr kf =
-  let funspec = Annotations.funspec ~populate:false kf in
+let check_spec kinstr kf =
+  let funspec = Annotations.funspec kf in
   if List.for_all (fun b -> b.b_assigns = WritesAny) funspec.spec_behavior
-  then begin
+  then
     Self.error ~current:true
       "@[Recursive call to %a@ without assigns clause.@ \
        Generating probably incomplete assigns to interpret the call.@ \
@@ -64,43 +59,27 @@ let get_spec kinstr kf =
       Kernel_function.pretty kf
       Parameters.RecursiveUnroll.name
       Kernel_function.pretty kf
-      Eva_utils.pp_callstack;
-    Cil.CurrentLoc.set (Kernel_function.get_location kf);
-    ignore (!Annotations.populate_spec_ref kf funspec);
-    Annotations.funspec kf
-  end
+      Eva_utils.pp_callstack
   else
     let depth = Parameters.RecursiveUnroll.get () in
-    let () =
-      Self.warning ~once:true ~current:true
-        "@[Using specification of function %a@ for recursive calls%s.@ \
-         Analysis of function %a@ is thus incomplete@ and its soundness@ \
-         relies on the written specification.@]"
-        Kernel_function.pretty kf
-        (if depth > 0 then Format.asprintf " of depth %i" depth else "")
-        Kernel_function.pretty kf
-    in
-    let funspec =
-      if need_assigns funspec
-      then
-        begin
-          ignore (!Annotations.populate_spec_ref kf funspec);
-          Annotations.funspec ~populate:false kf
-        end
-      else funspec
-    in
-    mark_unknown_requires kinstr kf funspec;
-    funspec
+    Self.warning ~once:true ~current:true
+      "@[Using specification of function %a@ for recursive calls%s.@ \
+       Analysis of function %a@ is thus incomplete@ and its soundness@ \
+       relies on the written specification.@]"
+      Kernel_function.pretty kf
+      (if depth > 0 then Format.asprintf " of depth %i" depth else "")
+      Kernel_function.pretty kf;
+    mark_unknown_requires kinstr kf funspec
 
 (* Find a spec for a function [kf] that begins a recursive call. If [kf]
    has no existing specification, generate (an incorrect) one, and warn
    loudly. *)
 let _spec_for_recursive_call kf =
-  let initial_spec = Annotations.funspec ~populate:false kf in
+  let initial_spec = Annotations.funspec kf in
   match Cil.find_default_behavior initial_spec with
   | Some bhv when bhv.b_assigns <> WritesAny -> initial_spec
   | _ ->
-    let assigns = Infer_annotations.assigns_from_prototype kf in
+    let assigns = Infer_assigns.from_prototype kf in
     let bhv = Cil.mk_behavior ~assigns:(Writes assigns) () in
     let spec = { (Cil.empty_funspec ()) with spec_behavior = [bhv] } in
     Self.error ~once:true

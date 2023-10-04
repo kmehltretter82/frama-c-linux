@@ -8,7 +8,8 @@
 [eva] computing for function g <- main.
   Called from fct_ptr.i:15.
 [kernel:annot:missing-spec] fct_ptr.i:8: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- g <- main.
   Called from fct_ptr.i:8.
 [eva] using specification for function f

@@ -41,7 +41,8 @@
 [eva] computing for function string_reads <- main.
   Called from strings.i:142.
 [kernel:annot:missing-spec] strings.i:39: Warning: 
-  Neither code nor specification for function u, generating default assigns from the prototype
+  Neither code nor specification for function u,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function u <- string_reads <- main.
   Called from strings.i:39.
 [eva] using specification for function u

@@ -12,8 +12,6 @@
   Generating probably incomplete assigns to interpret the call. Try to increase
   the -eva-unroll-recursive-calls parameter or write a correct specification
   for function sum_nospec.
-[kernel:annot:missing-spec] recursion.c:423: Warning: 
-  Neither code nor specification for function sum_nospec, generating default assigns from the prototype
 [eva] using specification for function sum_nospec
 [eva] recursion.c:442: Frama_C_show_each_unreachable: [-2147483648..2147483647]
 [eva] ====== VALUES COMPUTED ======

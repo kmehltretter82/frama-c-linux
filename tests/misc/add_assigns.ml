@@ -22,6 +22,7 @@ let main () =
     let bhv = Cil.mk_behavior ~assigns () in
     Annotations.add_behaviors emitter kf [bhv];
     let bhv =
+      Populate_spec.populate_funspec kf [`Assigns];
       List.find
         (fun b -> b.b_name = Cil.default_behavior_name)
         (Annotations.behaviors kf)

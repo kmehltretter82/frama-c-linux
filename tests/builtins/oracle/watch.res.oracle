@@ -12,7 +12,8 @@
 [eva:watchpoint] watch.c:13: (void *)(& c) [--..--]
 [eva:watchpoint] watch.c:14: (void *)(& c) [--..--]
 [kernel:annot:missing-spec] watch.c:16: Warning: 
-  Neither code nor specification for function u, generating default assigns from the prototype
+  Neither code nor specification for function u,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function u <- main.
   Called from watch.c:16.
 [eva] using specification for function u

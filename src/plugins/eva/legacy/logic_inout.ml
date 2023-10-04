@@ -46,6 +46,7 @@ let compute_term_deps stmt t =
 let () = Logic_deps.compute_term_deps := compute_term_deps
 
 let valid_behaviors kf state =
+  Populate_spec.populate_funspec kf [`Assigns];
   let funspec = Annotations.funspec kf in
   let eval_predicate pred =
     match Eval_terms.(eval_predicate (env_pre_f ~pre:state ()) pred) with

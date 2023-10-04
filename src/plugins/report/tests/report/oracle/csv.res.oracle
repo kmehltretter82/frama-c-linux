@@ -11,7 +11,8 @@
 [eva] computing for function main2 <- main.
   Called from csv.c:55.
 [kernel:annot:missing-spec] csv.c:21: Warning: 
-  Neither code nor implicit assigns clause for function f, generating default assigns from the prototype
+  Neither code nor explicit assigns for function f,
+   generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f <- main2 <- main.
   Called from csv.c:21.
 [eva] using specification for function f

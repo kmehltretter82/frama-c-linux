@@ -36,7 +36,7 @@ let clone_function_definition old_kf =
   let visitor = new Visitor.frama_c_refresh (Project.current()) in
   let old_fundec = Kernel_function.get_definition old_kf in
   let old_loc = Kernel_function.get_location old_kf in
-  let old_funspec = Annotations.funspec ~populate:false old_kf in
+  let old_funspec = Annotations.funspec old_kf in
   visitor#set_current_kf old_kf;
   visitor#set_current_func old_fundec;
   let new_fundec = Visitor.visitFramacFunction visitor old_fundec in

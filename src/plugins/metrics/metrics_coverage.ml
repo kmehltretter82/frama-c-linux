@@ -35,7 +35,7 @@ class coverageAuxVisitor ~libc = object(self)
     if Metrics_base.consider_function ~libc vi then begin
       (* Visit the spec. There might be references to function pointers in
          the assigns *)
-      let spec = Annotations.funspec ~populate:false kf in
+      let spec = Annotations.funspec kf in
       ignore (Visitor.visitFramacFunspec self spec);
     end;
     (try

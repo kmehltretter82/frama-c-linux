@@ -341,6 +341,7 @@ struct
       in
 
       let cfg_contract env =
+        Populate_spec.populate_funspec kf [`Assigns];
         spec env (Annotations.funspec kf)
       in
 
@@ -764,6 +765,7 @@ struct
      * close_out cout; *)
     let binder = M.configure_ia autom in
     let bind = binder.bind in
+    Populate_spec.populate_funspec kf [`Assigns];
     let spec = Annotations.funspec kf in
     (* start and end nodes of pre(resp. post)-conditions. *)
     let pres = { pre = Cfg.node (); post = Cfg.node () } in

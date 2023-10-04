@@ -6,7 +6,8 @@
   a ∈ {0}
   b ∈ {0}
 [kernel:annot:missing-spec] input.i:7: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- main.
   Called from input.i:7.
 [eva] using specification for function f

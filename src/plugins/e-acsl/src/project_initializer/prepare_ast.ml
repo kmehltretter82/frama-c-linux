@@ -621,7 +621,7 @@ let must_duplicate kf vi =
     not (Functions.instrument kf)
     ||
     (* or: *)
-    ( let spec = Annotations.funspec ~populate:false kf in
+    ( let spec = Annotations.funspec kf in
       (* it has a function contract *)
       not (Cil.is_empty_funspec spec)
       && (* there are some annotations that might be treated *)
@@ -663,7 +663,7 @@ let prepare_global (globals, new_defs) = function
       let new_def, new_decl =
         dup_global
           loc
-          (Annotations.funspec ~populate:false kf)
+          (Annotations.funspec kf)
           (Lazy.force sound_verdict_vi)
           kf
           vi

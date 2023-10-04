@@ -464,9 +464,10 @@ and inject_in_stmt env kf stmt =
   let env = Translate_ats.for_stmt env kf stmt in
   (* translate the precondition of the function *)
   let env =
-    if translate_pre_funspec then
+    if translate_pre_funspec then begin
       let funspec = Annotations.funspec kf in
       Translate_annots.pre_funspec kf env funspec
+    end
     else
       env
   in

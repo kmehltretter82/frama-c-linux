@@ -20,7 +20,8 @@
 [eva] Recording results for f
 [eva] Done for function f
 [kernel:annot:missing-spec] precond2.c:24: Warning: 
-  Neither code nor implicit assigns clause for function g, generating default assigns from the prototype
+  Neither code nor explicit assigns for function g,
+   generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function g <- main.
   Called from precond2.c:24.
 [eva] using specification for function g
@@ -60,7 +61,7 @@
             by Call Preconditions.
 [    -    ] Assigns nothing
             assigns \nothing;
-            tried with Inferred annotations.
+            tried with Populated status.
 [    -    ] Default behavior
             default behavior
             tried with Frama-C kernel.

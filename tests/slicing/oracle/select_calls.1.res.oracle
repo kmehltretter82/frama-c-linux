@@ -7,7 +7,8 @@
   c ∈ [--..--]
   d ∈ [--..--]
 [kernel:annot:missing-spec] select_calls.i:42: Warning: 
-  Neither code nor specification for function nothing, generating default assigns from the prototype
+  Neither code nor specification for function nothing,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function nothing <- g.
   Called from select_calls.i:42.
 [eva] using specification for function nothing

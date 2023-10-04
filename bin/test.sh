@@ -71,6 +71,7 @@ function Usage
     echo "  -r|--clean          clean (remove all) test results (includes -p)"
     echo "  -p|--ptests         prepare (all) dune files"
     echo "  -w|--wp-cache       prepare (pull) WP-cache"
+    echo "  -f|--force          force re-run tests"
     echo "  -l|--logs           print output of tests (single file, no diff)"
     echo "  -u|--update         run tests and update oracles (and WP-cache)"
     echo "  -k|--commit         commit new test oracles"
@@ -157,6 +158,9 @@ do
             ;;
         "-w"|"--wp-cache")
             PULLCACHE=yes
+            ;;
+        "-f"|"--force")
+            DUNE_OPT+="--force "
             ;;
         "-u"|"--update")
             DUNE_OPT+="--auto-promote "

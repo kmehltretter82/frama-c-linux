@@ -42,14 +42,15 @@
 (****************************************************************************)
 
 (** Code to compute the control-flow graph of a function or file.
-    This will fill in the [preds] and [succs] fields of {!Cil.stmt}
+    This will fill in the [preds] and [succs] fields of {!Cil_types.stmt}
 
     This is nearly always automatically done by the kernel. You only need
     those functions if you build {!Cil_types.fundec} yourself. *)
 
 open Cil_types
 
-(** Compute the CFG for an entire file, by calling cfgFun on each function. *)
+(** Compute the CFG for an entire file,
+    by calling {!cfgFun} on each function. *)
 val computeFileCFG: file -> unit
 
 (** clear the sid (except when clear_id is explicitly set to false),

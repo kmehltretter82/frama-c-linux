@@ -74,7 +74,7 @@ check-hello-v5:check-hello-clean
 	diff checks/hello/v5.oracle checks/hello/v5.res
 
 check-hello-v6: check-hello-clean
-	(cd tutorial/hello/v6-* && $(duneb) @install && $(duneb) @ptests 2>&1 || true) > checks/hello/v6.res
+	(cd tutorial/hello/v6-* && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests 2>&1 || true) > checks/hello/v6.res
 	diff checks/hello/v6.oracle checks/hello/v6.res
 
 check-hello-v7: check-hello-clean
@@ -93,17 +93,17 @@ check-examples-clean:
 	rm -rf examples/*/_build
 
 check-examples-acsl_extension_foo: check-examples-clean
-	cd examples/acsl_extension_foo && $(duneb) @install && $(duneb) @ptests
+	cd examples/acsl_extension_foo && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests
 
 check-examples-acsl_extension_ext_types: check-examples-clean
-	cd examples/acsl_extension_ext_types && $(duneb) @install && $(duneb) @ptests
+	cd examples/acsl_extension_ext_types && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests
 
 check-examples-callstack: check-examples-clean
 	# no test oracles; just check that the code compiles
 	cd examples/callstack && $(duneb) @install
 
 check-examples-syntactic_check: check-examples-clean
-	cd examples/syntactic_check && $(duneb) @install && $(duneb) @ptests 2>&1
+	cd examples/syntactic_check && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests 2>&1
 
 
 check-all: developer.pdf
@@ -125,22 +125,22 @@ check-viewcfg-clean:
 	rm -rf tutorial/viewcfg/v*/_build
 
 check-viewcfg-v1:
-	cd tutorial/viewcfg/v1-* && $(duneb) @install && $(duneb) @ptests
+	cd tutorial/viewcfg/v1-* && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests
 
 check-viewcfg-v2:
 	cd tutorial/viewcfg/v2-* && $(duneb) @install
 
 check-viewcfg-v3:
-	cd tutorial/viewcfg/v2-* && $(duneb) @install && $(duneb) @ptests
+	cd tutorial/viewcfg/v3-* && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests
 
 check-viewcfg-v4:
-	cd tutorial/viewcfg/v2-* && $(duneb) @install
+	cd tutorial/viewcfg/v4-* && $(duneb) @install
 
 check-viewcfg-v5:
-	cd tutorial/viewcfg/v2-* && $(duneb) @install
+	cd tutorial/viewcfg/v5-* && $(duneb) @install
 
 check-viewcfg-v6:
-	cd tutorial/viewcfg/v2-* && $(duneb) @install
+	cd tutorial/viewcfg/v6-* && $(duneb) @install
 
 hello.tar.gz: FILES=$(shell cd tutorial/hello/v7-doc && git ls-files)
 

@@ -214,7 +214,7 @@ module type Weak_hashtbl = sig
   include S
   (** Hashtbl are a standard computation.
       BUT it is INCORRECT to use projectified hashtables if keys have a
-      custom [rehash] function (see {!Project.DATATYPE_OUTPUT.rehash}) *)
+      custom [rehash] function (see {!Datatype.Make_input.rehash}) *)
 
   type data
   (** @since Boron-20100401 *)
@@ -321,7 +321,7 @@ module Hashconsing_tbl: Hashconsing_tbl
 (** {3 Hashtables}
 
     IMPORTANT: that is INCORRECT to use projectified hashtables if keys have a
-    custom [rehash] function (see {!Project.DATATYPE_OUTPUT.rehash}) *)
+    custom [rehash] function (see {!Datatype.Make_input.rehash}) *)
 (* ************************************************************************* *)
 
 (** Events emitted when an [Hashtbl] state changes. *)
@@ -338,7 +338,7 @@ module type Hashtbl = sig
   include S
   (** Hashtbl are a standard computation.
       BUT that is INCORRECT to use projectified hashtables if keys have a
-      custom [rehash] function (see {!Project.DATATYPE_OUTPUT.rehash}) *)
+      custom [rehash] function (see {!Datatype.Make_input.rehash}) *)
 
   type key
   type data

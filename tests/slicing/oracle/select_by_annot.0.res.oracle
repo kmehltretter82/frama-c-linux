@@ -19,7 +19,8 @@
 [eva] Recording results for modifS
 [eva] Done for function modifS
 [kernel:annot:missing-spec] select_by_annot.i:140: Warning: 
-  Neither code nor specification for function new_int, generating default assigns from the prototype
+  Neither code nor specification for function new_int,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function new_int <- main.
   Called from select_by_annot.i:140.
 [eva] using specification for function new_int

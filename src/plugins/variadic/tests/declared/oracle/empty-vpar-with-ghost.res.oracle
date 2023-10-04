@@ -3,7 +3,8 @@
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
 [kernel:annot:missing-spec] empty-vpar-with-ghost.i:8: Warning: 
-  Neither code nor implicit assigns clause for function f, generating default assigns from the prototype
+  Neither code nor explicit assigns for function f,
+   generating default clauses. See -generated-spec-* options for more info
 [eva] using specification for function f
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

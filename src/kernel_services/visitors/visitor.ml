@@ -185,7 +185,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
         (* Ensures that we have a table associated to new_kf in Annotations. *)
         add_queue
           (fun () ->
-             ignore (Annotations.behaviors ~populate:false new_kf));
+             ignore (Annotations.behaviors new_kf));
         let module Fold =
         struct
           type 'a t =
@@ -331,7 +331,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
       in
       let register_annots b' f =
         add_queue
-          (fun () -> ignore (Annotations.behaviors ~populate:false new_kf));
+          (fun () -> ignore (Annotations.behaviors new_kf));
         remove_and_add
           (fun b -> b.b_requires)
           Annotations.remove_requires
@@ -430,7 +430,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
         in
         Queue.add
           (fun () ->
-             ignore (Annotations.funspec ~populate:false new_kf))
+             ignore (Annotations.funspec new_kf))
           self#get_filling_actions ;
         let new_terminates =
           Option.map
@@ -501,8 +501,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
       in
       let register_new_components new_spec =
         let add_spec_components () =
-          let populate = false in
-          let new_behaviors = Annotations.behaviors ~populate new_kf in
+          let new_behaviors = Annotations.behaviors new_kf in
           List.iter
             (fun b ->
                if
@@ -514,20 +513,20 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
                    Emitter.end_user new_kf [b]
                end)
             new_spec.spec_behavior;
-          let new_complete = Annotations.complete ~populate new_kf in
+          let new_complete = Annotations.complete new_kf in
           List.iter
             (fun c ->
                if not (List.memq c new_complete) then begin
                  Annotations.add_complete Emitter.end_user new_kf c
                end)
             new_spec.spec_complete_behaviors;
-          let new_disjoint = Annotations.disjoint ~populate new_kf in
+          let new_disjoint = Annotations.disjoint new_kf in
           List.iter
             (fun d ->
                if not (List.memq d new_disjoint) then
                  Annotations.add_disjoint Emitter.end_user new_kf d)
             new_spec.spec_disjoint_behaviors;
-          let new_terminates = Annotations.terminates ~populate new_kf in
+          let new_terminates = Annotations.terminates new_kf in
           (match new_terminates, new_spec.spec_terminates with
            | None, None -> ()
            | Some _, None -> ()
@@ -542,7 +541,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
                Kernel_function.pretty new_kf
                Printer.pp_identified_predicate p1
                Printer.pp_identified_predicate p2);
-          let new_decreases = Annotations.decreases ~populate new_kf in
+          let new_decreases = Annotations.decreases new_kf in
           (match new_decreases, new_spec.spec_variant with
            | None, None -> ()
            | Some _, None -> ()
@@ -673,7 +672,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
       let get_spec () = match g with
         | GFun _ | GFunDecl _ when Ast.is_def_or_last_decl g ->
           let spec =
-            Annotations.funspec ~populate:false (Option.get self#current_kf)
+            Annotations.funspec (Option.get self#current_kf)
           in
           Some (Cil.visitCilFunspec self#plain_copy_visitor spec)
         | _ -> None
@@ -706,7 +705,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
                         (Kernel_function.get_vi new_kf)
                     then begin
                       let dft =
-                        Annotations.funspec ~populate:false new_kf
+                        Annotations.funspec new_kf
                       in
                       let dft =
                         { dft with spec_behavior = dft.spec_behavior }
@@ -714,8 +713,6 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
                       let spec = Option.value ~default:dft spec in
                       Globals.Functions.register new_kf;
                       Globals.Functions.replace_by_declaration spec v l;
-                      (* Format.printf "registered spec:@\n%a@." Printer.pp_funspec
-                         (Annotations.funspec ~populate:false new_kf) *)
                     end else begin
                       Globals.Functions.replace_by_declaration
                         (Cil.empty_funspec()) v l
@@ -767,7 +764,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
                      Globals.Functions.register new_kf;
                      let spec =
                        Option.value
-                         ~default:(Annotations.funspec ~populate:false new_kf)
+                         ~default:(Annotations.funspec new_kf)
                          spec
                      in
                      Globals.Functions.replace_by_definition spec f l

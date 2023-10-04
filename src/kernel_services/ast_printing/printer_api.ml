@@ -214,7 +214,7 @@ class type extensible_printer_type = object
   (** Print a statement kind. The code to be printed is given in the
       {!Cil_types.stmtkind} argument.  The initial {!Cil_types.stmt} argument
       records the statement which follows the one being printed;
-      {!defaultCilPrinterClass} uses this information to prettify statement
+      {!Printer.extensible_printer} uses this information to prettify statement
       printing in certain special cases. The boolean flag indicated whether
       the statement has labels (which have already been printed) *)
 

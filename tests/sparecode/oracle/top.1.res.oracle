@@ -17,7 +17,8 @@
 [eva] computing for function not_used_in_main_top <- main_call_top.
   Called from top.i:27.
 [kernel:annot:missing-spec] top.i:10: Warning: 
-  Neither code nor specification for function print, generating default assigns from the prototype
+  Neither code nor specification for function print,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function print <- not_used_in_main_top <- main_call_top.
   Called from top.i:10.
 [eva] using specification for function print

@@ -8,7 +8,8 @@
   S_ch1[0..1] ∈ [--..--]
   S_ch2[0..1] ∈ [--..--]
 [kernel:annot:missing-spec] bug0223.i:33: Warning: 
-  Neither code nor specification for function F, generating default assigns from the prototype
+  Neither code nor specification for function F,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function F <- main.
   Called from bug0223.i:33.
 [eva] using specification for function F
@@ -19,7 +20,8 @@
 [eva] computing for function h2 <- main.
   Called from bug0223.i:35.
 [kernel:annot:missing-spec] bug0223.i:16: Warning: 
-  Neither code nor specification for function my_strcnmp, generating default assigns from the prototype
+  Neither code nor specification for function my_strcnmp,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function my_strcnmp <- h2 <- main.
   Called from bug0223.i:16.
 [eva] using specification for function my_strcnmp

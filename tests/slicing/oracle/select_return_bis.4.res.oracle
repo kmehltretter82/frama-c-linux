@@ -12,7 +12,8 @@
 [eva] computing for function k <- g.
   Called from select_return_bis.i:35.
 [kernel:annot:missing-spec] select_return_bis.i:28: Warning: 
-  Neither code nor specification for function get, generating default assigns from the prototype
+  Neither code nor specification for function get,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function get <- k <- g.
   Called from select_return_bis.i:28.
 [eva] using specification for function get
@@ -20,7 +21,8 @@
 [eva] computing for function k_bis <- k <- g.
   Called from select_return_bis.i:30.
 [kernel:annot:missing-spec] select_return_bis.i:24: Warning: 
-  Neither code nor specification for function send_bis, generating default assigns from the prototype
+  Neither code nor specification for function send_bis,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function send_bis <- k_bis <- k <- g.
   Called from select_return_bis.i:24.
 [eva] using specification for function send_bis
@@ -62,7 +64,8 @@
 [eva] Recording results for k
 [eva] Done for function k
 [kernel:annot:missing-spec] select_return_bis.i:44: Warning: 
-  Neither code nor specification for function send, generating default assigns from the prototype
+  Neither code nor specification for function send,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function send <- f <- g.
   Called from select_return_bis.i:44.
 [eva] using specification for function send

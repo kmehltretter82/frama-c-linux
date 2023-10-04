@@ -6,7 +6,8 @@
   Sa ∈ {0}
   Sb ∈ {0}
 [kernel:annot:missing-spec] semaphore.i:31: Warning: 
-  Neither code nor specification for function V, generating default assigns from the prototype
+  Neither code nor specification for function V,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function V <- g.
   Called from semaphore.i:31.
 [eva] using specification for function V
@@ -23,7 +24,8 @@
 [eva] Done for function V
 [eva] semaphore.i:28: starting to merge loop iterations
 [kernel:annot:missing-spec] semaphore.i:34: Warning: 
-  Neither code nor specification for function P, generating default assigns from the prototype
+  Neither code nor specification for function P,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function P <- g.
   Called from semaphore.i:34.
 [eva] using specification for function P

@@ -7,7 +7,8 @@
   y ∈ {0}
   z ∈ {0}
 [kernel:annot:missing-spec] variadic.i:12: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- main.
   Called from variadic.i:12.
 [eva] using specification for function f

@@ -3,7 +3,8 @@
 [eva:initial-state] Values of globals at initialization
   auto_states[0..3] ∈ {0}
 [kernel:annot:missing-spec] default_assigns_bts0966.i:34: Warning: 
-  Neither code nor implicit assigns clause for function copy, generating default assigns from the specification
+  Neither code nor explicit assigns for function copy,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [eva] using specification for function copy
 [eva] default_assigns_bts0966.i:20: Warning: 
   no \from part for clause 'assigns auto_states[Init], auto_states[Copy];'
@@ -35,7 +36,7 @@ enum states {
 };
 int auto_states[4];
 /*@ ensures \true;
-    assigns auto_states[Init], auto_states[Copy];
+    assigns auto_states[Copy], auto_states[Init];
     
     behavior from_init:
       assumes auto_states[Init] ≡ 1;
