@@ -35,6 +35,7 @@ import React, { ReactNode } from 'react';
 import { forEach, debounce, throttle } from 'lodash';
 import isEqual from 'react-fast-compare';
 import * as Dome from 'dome';
+import { classes } from 'dome/misc/utils';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import { DraggableCore } from 'react-draggable';
@@ -166,6 +167,10 @@ export interface ColumnProps<Row, Cell> {
 export interface TableProps<Key, Row> {
   /** Data proxy. */
   model: Model<Key, Row>;
+  /** Display the component (default) or not. */
+  display?: boolean;
+  /** Make the component visible (default) or not. */
+  visible?: boolean;
   /** Sorting Proxy. */
   sorting?: Sorting;
   /** Rendering by Fields. */
@@ -1151,9 +1156,14 @@ export function Table<Key, Row>(props: TableProps<Key, Row>): JSX.Element {
     return state.unwind;
   });
   Settings.useGlobalSettingsEvent(state.importSettings);
-  const columns = props.children ?? [];
+  const { display=true, visible=true, children: columns=[] } = props;
+  const classNames = classes(
+    'dome-xTable',
+    !display && 'dome-erased',
+    !visible && 'dome-hidden',
+  );
   return (
-    <div className="dome-xTable">
+    <div className={classNames}>
       <React.Fragment key="columns">
         {spawnIndex(state, [], columns)}
       </React.Fragment>

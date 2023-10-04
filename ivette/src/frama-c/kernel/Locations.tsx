@@ -29,8 +29,8 @@ import { GlobalState, useGlobalState } from 'dome/data/states';
 import * as States from 'frama-c/states';
 
 import { CompactModel } from 'dome/table/arrays';
-import { Table, Column } from 'dome/table/views';
-import { Label } from 'dome/controls/labels';
+import { Table, Column, Renderer } from 'dome/table/views';
+import { Label, Cell } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
 import { TitleBar } from 'ivette';
@@ -124,6 +124,9 @@ class Model extends CompactModel<Ast.marker, Data> {
 
 const getIndex = (d : Data): number => d.index + 1;
 
+const renderCell: Renderer<string> =
+  (text: string): JSX.Element => (<Cell title={text}>{text}</Cell>);
+
 export default function LocationsTable(): JSX.Element {
 
   // Hooks
@@ -138,7 +141,7 @@ export default function LocationsTable(): JSX.Element {
   }, [model, markers]);
   const selected = index !== undefined ? markers[index] : undefined;
   const size = markers.length;
-
+  const display = size > 0 ? label : `${label} (empty)`;
   const kindex = index === undefined ? (-1) : index;
   const indexLabel = index === undefined ? '…' : index+1;
   const positionLabel = `${indexLabel} / ${size}`;
@@ -148,7 +151,7 @@ export default function LocationsTable(): JSX.Element {
     if (!attr) return '';
     const decl = getDecl(attr.scope);
     if (!decl) return '';
-    return `${decl.label} ${attr.descr}`;
+    return `${decl.name}: ${attr.descr}`;
   }, [getDecl, getAttr]);
 
   // Component
@@ -180,9 +183,10 @@ export default function LocationsTable(): JSX.Element {
           onClick={clearSelection}
         />
       </TitleBar>
-      <Label label={label} title={title} style={{ textAlign: 'center' }} />
+      <Label label={display} title={title} style={{ textAlign: 'center' }} />
       <Table<Ast.marker, Data>
         model={model}
+        display={size >0}
         selection={selected}
         onSelection={(_marker, _data, index) => gotoIndex(index)}
       >
@@ -192,7 +196,7 @@ export default function LocationsTable(): JSX.Element {
         />
         <Column
           id='marker' label='Location' fill
-          getter={getLocation}
+          getter={getLocation} render={renderCell}
         />
       </Table>
     </>
