@@ -27,12 +27,11 @@ let status_allocates = Property_status.Dont_know
 let status_terminates = Property_status.Dont_know
 
 let run () =
-  let open Populate_spec in
-  let get_spec kf =
-    populate_funspec ~do_body:true kf
+  let generate_spec kf =
+    Populate_spec.populate_funspec ~do_body:true kf
       [`Exits; `Assigns; `Requires; `Allocates; `Terminates]
   in
-  Globals.Functions.iter get_spec
+  Globals.Functions.iter generate_spec
 
 let populate () =
   Format.printf "Registering an empty spec generation mode@.";
