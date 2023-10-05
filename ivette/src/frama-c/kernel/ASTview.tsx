@@ -320,14 +320,39 @@ function createMultipleDecorator(): Editor.Extension {
 // -----------------------------------------------------------------------------
 
 // This field contains the dead code information as inferred by Eva.
-const emptyDeadCode = { unreachable: [], nonTerminating: [] };
+const emptyDeadCode = { reached: [], unreachable: [], nonTerminating: [] };
 const Dead = Editor.createField<Eva.deadCode>(emptyDeadCode);
+
+// Comparison function on ranges
+function compareRange(x: Range, y: Range): number {
+  return (x.from !== y.from) ? (x.from - y.from) : (y.to - x.to);
+}
+
+// The unreachable statements given by the server may contain reachable
+// statements. This function is used to filter those reached statements.
+function filterReached(unreachables: Range[], reachables: Range[]): Range[] {
+  /* Sort [reachables] to always find the first largest reachable statement
+     within an unreachable one (if any). */
+  reachables.sort(compareRange);
+  function keepTrulyUnreached(unreached: Range): Range[] {
+    const reached = reachables.find((r) => Editor.startInto(r, unreached));
+    if (reached === undefined) return [unreached];
+    const firstUnreached = { from: unreached.from, to: reached.from - 1 };
+    const next = { from: reached.to + 1, to: unreached.to };
+    const result = (reached.to < unreached.to) ? keepTrulyUnreached(next) : [];
+    if (unreached.from < reached.from) result.unshift(firstUnreached);
+    return result;
+  }
+  return unreachables.map(keepTrulyUnreached).flat();
+}
 
 const UnreachableRanges = createUnreachableRanges();
 function createUnreachableRanges(): Editor.Aspect<Editor.Range[]> {
   const deps = { dead: Dead, ranges: Ranges };
   return Editor.createAspect(deps, ({ dead, ranges }) => {
-    return mapFilter(dead.unreachable, m => ranges.get(m)).flat();
+    const unreachable = mapFilter(dead.unreachable, m => ranges.get(m)).flat();
+    const reached = mapFilter(dead.reached, m => ranges.get(m)).flat();
+    return filterReached(unreachable, reached);
   });
 }
 
@@ -627,8 +652,7 @@ function useFctText(fct: Fct): text {
 
 // Server request handler returning the given function's dead code information.
 function useFctDead(fct: Fct): Eva.deadCode {
-  const empty = { unreachable: [], nonTerminating: [] };
-  return States.useRequest(Eva.getDeadCode, fct) ?? empty;
+  return States.useRequest(Eva.getDeadCode, fct) ?? emptyDeadCode;
 }
 
 // Server request handler returning the given function's callers.
