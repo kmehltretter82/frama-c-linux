@@ -293,7 +293,7 @@ val get_called : exp -> t option
 
 (** Hashtable indexed by kernel functions and dealing with project.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-module Make_Table(Data: Datatype.S)(Info: State_builder.Info_with_size):
+module Make_Table(Data: Datatype.S)(_: State_builder.Info_with_size):
   State_builder.Hashtbl with type key = t and type data = Data.t
 
 (** Set of kernel functions. *)

@@ -135,7 +135,7 @@ module type ForwardsTransfer = sig
 
 end
 
-module Forwards(T : ForwardsTransfer) : sig
+module Forwards(_ : ForwardsTransfer) : sig
   val compute: Cil_types.stmt list -> unit
   (** Fill in the T.stmtStartData, given a number of initial statements to
       start from. All of the initial statements must have some entry in
@@ -210,7 +210,7 @@ module type BackwardsTransfer = sig
 
 end
 
-module Backwards(T : BackwardsTransfer) : sig
+module Backwards(_ : BackwardsTransfer) : sig
   val compute: Cil_types.stmt list -> unit
   (** Fill in the T.stmtStartData, given a number of initial statements to start
       from (the sinks for the backwards data flow). All of the statements (not

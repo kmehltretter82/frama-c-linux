@@ -219,7 +219,7 @@ sig
 end
 
 module Make
-    (C :
+    (_ :
      sig
        val is_loop: unit -> bool
        (** whether the annotation we want to type is contained in a loop.

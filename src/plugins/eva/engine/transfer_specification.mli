@@ -26,8 +26,8 @@ open Eval
 module Make
     (Abstract: Abstractions.S)
     (States: Powerset.S with type state = Abstract.Dom.t)
-    (Logic : Transfer_logic.S with type state = Abstract.Dom.t
-                               and type states = States.t)
+    (_ : Transfer_logic.S with type state = Abstract.Dom.t
+                           and type states = States.t)
   : sig
 
     val treat_statement_assigns: assigns -> Abstract.Dom.t -> Abstract.Dom.t

@@ -532,7 +532,7 @@ module type S = sig
   (** Signature for extending an existing pretty-printer. OCaml forbids
       inheriting from a class received as argument, so we use a functor
       instead. *)
-  module type PrinterExtension = functor (X: PrinterClass) -> PrinterClass
+  module type PrinterExtension = functor (_: PrinterClass) -> PrinterClass
 
   val update_printer: (module PrinterExtension) -> unit
   (** Register a pretty-printer extension. The pretty-printer passed as

@@ -118,7 +118,7 @@ module type Collapse = sig val collapse : bool end
 
 (** If [C.collapse] then [L1.bottom,_] = [_,L2.bottom] = [bottom] *)
 (* Untested *)
-module Make_Lattice_Product (L1:AI_Lattice_with_cardinal_one) (L2:AI_Lattice_with_cardinal_one) (C:Collapse):
+module Make_Lattice_Product (L1:AI_Lattice_with_cardinal_one) (L2:AI_Lattice_with_cardinal_one) (_:Collapse):
   Lattice_Product with type t1 = L1.t and type t2 = L2.t
 
 (** Uncollapsed product. Literally the set of (e1, e2) ordered pairs

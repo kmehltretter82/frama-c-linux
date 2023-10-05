@@ -81,15 +81,15 @@ module type S = sig
 
 end
 
-(** [Register(Datatype)(State)(Info)] registers a new state.
+(** [Register(Datatype)(Local_state)(Info)] registers a new state.
     [Datatype] represents the datatype of a state, [Local_state]
     explains how to deal with the client-side state and [Info] are additional
     required information.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Register
     (Datatype: Datatype.S)
-    (Local_state: State.Local with type t = Datatype.t)
-    (Info: sig include Info val unique_name: string end)
+    (_: State.Local with type t = Datatype.t)
+    (_: sig include Info val unique_name: string end)
   : S with module Datatype = Datatype
 
 (* ************************************************************************* *)
@@ -127,7 +127,7 @@ end
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 module Ref
     (Data:Datatype.S)
-    (Info:sig
+    (_:sig
        include Info
        val default: unit -> Data.t
      end)
@@ -156,7 +156,7 @@ module type Option_ref = sig
 end
 
 (** Build a reference on an option. *)
-module Option_ref(Data:Datatype.S)(Info: Info) :
+module Option_ref(Data:Datatype.S)(_: Info) :
   Option_ref with type data = Data.t
 
 (** Output signature of [ListRef].
@@ -173,34 +173,34 @@ end
 
 (** Build a reference on a list.
     @since Boron-20100401 *)
-module List_ref(Data:Datatype.S)(Info: Info) :
+module List_ref(Data:Datatype.S)(_: Info) :
   List_ref with type data = Data.t list and type data_in_list = Data.t
 
 (** Build a reference on an integer.
     @since Carbon-20101201 *)
-module Int_ref(Info:sig include Info val default: unit -> int end) :
+module Int_ref(_:sig include Info val default: unit -> int end) :
   Ref with type data = int
 
 (** Build a reference on an integer, initialized with [0].
     @since Carbon-20101201 *)
-module Zero_ref(Info:Info) : Ref with type data = int
+module Zero_ref(_:Info) : Ref with type data = int
 
 (** Build a reference on a boolean.
     @since Oxygen-20120901 *)
-module Bool_ref(Info:sig include Info val default: unit -> bool end) :
+module Bool_ref(_:sig include Info val default: unit -> bool end) :
   Ref with type data = bool
 
 (** Build a reference on a boolean, initialized with [false].
     @since Carbon-20101201 *)
-module False_ref(Info:Info): Ref with type data = bool
+module False_ref(_:Info): Ref with type data = bool
 
 (** Build a reference on a boolean, initialized with [true].
     @since Carbon-20101201 *)
-module True_ref(Info:Info): Ref with type data = bool
+module True_ref(_:Info): Ref with type data = bool
 
 (** Build a reference on a float.
     @since Oxygen-20120901 *)
-module Float_ref(Info:sig include Info val default: unit -> float end) :
+module Float_ref(_:sig include Info val default: unit -> float end) :
   Ref with type data = float
 
 (* ************************************************************************* *)
@@ -269,13 +269,13 @@ end
     [W].
     @since Boron-20100401 *)
 module Weak_hashtbl
-    (W: Weak.S)(Data: Datatype.S with type t = W.data)(Info: Info_with_size) :
+    (W: Weak.S)(_: Datatype.S with type t = W.data)(_: Info_with_size) :
   Weak_hashtbl with type data = W.data
 
 (** Build a weak hashtbl over a datatype [Data] by using [Weak.Make] provided
     by the OCaml standard library. Note that the table is not saved on disk.
     @since Boron-20100401 *)
-module Caml_weak_hashtbl(Data: Datatype.S)(Info: Info_with_size) :
+module Caml_weak_hashtbl(Data: Datatype.S)(_: Info_with_size) :
   Weak_hashtbl with type data = Data.t
 
 (** Signature for the creation of projectified hashconsing tables..
@@ -296,7 +296,7 @@ module type Hashconsing_tbl =
        (** Pre-existing values stored in the built table and shared by all
            existing projects. *)
      end) ->
-  functor (Info: Info_with_size) ->
+  functor (_: Info_with_size) ->
     Weak_hashtbl with type data = Data.t
 
 (** Weak hashtbl dedicated to hashconsing.
@@ -398,11 +398,11 @@ end
 module Hashtbl
     (H: Datatype.Hashtbl)
     (Data: Datatype.S)
-    (Info: Info_with_size) :
+    (_: Info_with_size) :
   Hashtbl with type key = H.key and type data = Data.t
                                 and module Datatype = H.Make(Data)
 
-module Int_hashtbl(Data: Datatype.S)(Info:Info_with_size):
+module Int_hashtbl(Data: Datatype.S)(_:Info_with_size):
   Hashtbl with type key = int and type data = Data.t
 
 (* ************************************************************************* *)
@@ -423,7 +423,7 @@ module type Set_ref = sig
   val iter: (elt -> unit) -> unit
 end
 
-module Set_ref(S: Datatype.Set)(Info: Info)
+module Set_ref(S: Datatype.Set)(_: Info)
   : Set_ref with type elt = S.elt and type data = S.t
 
 (* ************************************************************************* *)
@@ -440,7 +440,7 @@ module type Queue = sig
   val length: unit -> int
 end
 
-module Queue(Data: Datatype.S)(Info: Info) : Queue with type elt = Data.t
+module Queue(Data: Datatype.S)(_: Info) : Queue with type elt = Data.t
 
 (* ************************************************************************* *)
 (** {3 Array} *)
@@ -459,7 +459,7 @@ module type Array = sig
   val fold_right:  (elt -> 'a -> 'a) -> 'a -> 'a
 end
 
-module Array(Data: Datatype.S)(Info: sig include Info val default: Data.t end) :
+module Array(Data: Datatype.S)(_: sig include Info val default: Data.t end) :
   Array with type elt = Data.t
 
 
@@ -515,12 +515,12 @@ end
 (** Creates a counter that is shared among all projects, but which is
     marshalling-compliant.
     @since Carbon-20101201 *)
-module SharedCounter(Info : sig val name : string end) : Counter
+module SharedCounter(_ : sig val name : string end) : Counter
 
 (** Creates a projectified counter. That starts at 0
 
     @since Nitrogen-20111001 *)
-module Counter(Info : sig val name : string end) : Counter
+module Counter(_ : sig val name : string end) : Counter
 
 
 (* ****************************************************************************)
@@ -549,7 +549,7 @@ end
 (** Hashconsed version of an arbitrary datatype *)
 module Hashcons
     (Data: Datatype.S)
-    (Info: sig
+    (_: sig
        include Info
        val initial_values: Data.t list
        (** List of values created at compile-time, that must be shared between

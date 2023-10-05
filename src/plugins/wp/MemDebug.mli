@@ -35,4 +35,4 @@ val pp_rloc : 'a Pretty_utils.formatter -> Format.formatter ->
 val pp_sloc : 'a Pretty_utils.formatter -> Format.formatter ->
   'a Sigs.sloc -> unit
 
-module Make(M : Sigs.Model) : Sigs.Model
+module Make(_ : Sigs.Model) : Sigs.Model

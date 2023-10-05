@@ -368,11 +368,11 @@ sig
 end
 
 (** Builds an indexer that {i does not} depend on current project. *)
-module Static(M : Map)(I : Info) :
+module Static(M : Map)(_ : Info) :
   Index with type t = M.key and type tag := int
 
 (** Builds a {i projectified} index. *)
-module Index(M : Map)(I : Info) :
+module Index(M : Map)(_ : Info) :
   Index with type t = M.key and type tag := int
 
 (** Datatype already identified by unique integers. *)
@@ -383,7 +383,7 @@ sig
 end
 
 (** Builds a {i projectified} index on types with {i unique} identifiers. *)
-module Identified(A : IdentifiedType)(I : Info) :
+module Identified(A : IdentifiedType)(_ : Info) :
   Index with type t = A.t and type tag := int
 
 (** Datatype already identified by unique integers. *)
@@ -394,7 +394,7 @@ sig
 end
 
 (** Builds a {i projectified} index on types with {i unique} identifiers. *)
-module Tagged(A : TaggedType)(I : Info) :
+module Tagged(A : TaggedType)(_ : Info) :
   Index with type t = A.t and type tag := string
 
 (* -------------------------------------------------------------------------- *)

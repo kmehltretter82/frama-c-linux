@@ -22,7 +22,7 @@
 
 open Cil_types
 
-module Make (Kf : sig val kf: kernel_function end) : sig
+module Make (_ : sig val kf: kernel_function end) : sig
   val widening_delay : int
   val widening_period : int
   val slevel : stmt -> int

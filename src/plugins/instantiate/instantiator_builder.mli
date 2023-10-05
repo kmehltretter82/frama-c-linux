@@ -137,4 +137,4 @@ end
     cache and function definition generation, as well as specification
     registration. This should only be used by [Transform].
 *)
-module Make_instantiator (G: Generator_sig) : Instantiator
+module Make_instantiator (_: Generator_sig) : Instantiator

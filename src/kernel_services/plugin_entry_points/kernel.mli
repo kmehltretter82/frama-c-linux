@@ -228,7 +228,7 @@ module type Input_with_arg = sig
   val module_name: string
 end
 
-module Kernel_function_set(X:Input_with_arg): Parameter_sig.Kernel_function_set
+module Kernel_function_set(_:Input_with_arg): Parameter_sig.Kernel_function_set
 
 (* ************************************************************************* *)
 (** {2 Option groups} *)

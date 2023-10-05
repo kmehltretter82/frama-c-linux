@@ -49,7 +49,7 @@ sig
   val map : (submemory -> submemory) -> t -> t
 end
 
-module Make (Config : Config) (M : ProtoMemory) :
+module Make (_ : Config) (M : ProtoMemory) :
   Structure with type submemory = M.t
 
 module type Disjunction =

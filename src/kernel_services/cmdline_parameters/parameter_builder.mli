@@ -27,7 +27,7 @@
 (* ************************************************************************* *)
 
 module Make
-    (P: sig
+    (_: sig
        val shortname: string
        val parameters: (string, Typed_parameter.t list) Hashtbl.t
        module L: sig

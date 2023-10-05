@@ -40,7 +40,6 @@ type env_t = {
   config: string
 ; dir: string
 ; dune_alias: string
-; absolute_tests_dir: string
 ; absolute_cwd: string
 }
 
@@ -610,7 +609,6 @@ type execnow =
   { ex_cmd: string;      (** command to launch *)
     ex_log: string list; (** log files *)
     ex_bin: string list; (** bin files *)
-    ex_dir: SubDir.t;    (** directory of test suite *)
     ex_timeout: string;
     ex_deps: deps;
     ex_exit_code: string option
@@ -631,7 +629,6 @@ type cmd = {
 
 type config =
   {
-    dc_subdir: SubDir.t ;
     dc_test_regexp: string; (** regexp of test files. *)
     dc_execnow    : execnow list; (** command to be launched before
                                        the toplevel(s)
@@ -727,9 +724,8 @@ end = struct
         timeout=""
       } ]
 
-  let default_config dir =
-    { dc_subdir = dir;
-      dc_test_regexp = test_file_regexp;
+  let default_config () =
+    { dc_test_regexp = test_file_regexp;
       dc_macros = Macros.default_macros ();
       dc_execnow = [];
       dc_libs = None;
@@ -749,7 +745,7 @@ end = struct
       dc_timeout = "";
     }
 
-  let scan_execnow ~file ~once dir ex_exit_code ex_timeout ex_deps (s:string) =
+  let scan_execnow ~file ~once ex_exit_code ex_timeout ex_deps (s:string) =
     if once=false then
       Format.eprintf "%s: using EXEC directive (DEPRECATED): %s@."
         file s;
@@ -781,7 +777,6 @@ end = struct
         { ex_cmd = s;
           ex_log = [];
           ex_bin = [];
-          ex_dir = dir;
           ex_deps;
           ex_timeout;
           ex_exit_code;
@@ -831,11 +826,11 @@ end = struct
       enabled_if = select ~prev:deps.enabled_if ~config:config.dc_enabled_if
     }
 
-  let config_exec ~once ~drop:_ ~file ~dir s current =
+  let config_exec ~once ~drop:_ ~file s current =
     let s = Macros.expand ~file current.dc_macros s in
     { current with
       dc_execnow =
-        scan_execnow ~file ~once dir
+        scan_execnow ~file ~once
           current.dc_exit_code current.dc_timeout (deps_of_config current)
           s :: current.dc_execnow
     }
@@ -917,14 +912,12 @@ end = struct
     end
 
   type parsing_env = {
-    current_default_toplevel: string;
     current_default_log: string list;
     current_default_bin: string list;
     current_default_cmds: cmd list;
   }
 
   let default_parsing_env = ref {
-      current_default_toplevel = "" ;
       current_default_log = [] ;
       current_default_bin = [] ;
       current_default_cmds = []
@@ -932,7 +925,6 @@ end = struct
 
   let set_default_parsing_env config =
     default_parsing_env := {
-      current_default_toplevel = config.dc_default_toplevel;
       current_default_log = config.dc_default_log;
       current_default_bin = config.dc_default_bin;
       current_default_cmds = List.rev config.dc_commands;
@@ -1024,8 +1016,12 @@ end = struct
       (fun ~drop:_ ~file:_ ~dir:_ _ current ->
          { current with dc_dont_run = true });
 
-      "EXECNOW", config_exec ~once:true;
-      "EXEC", config_exec ~once:false;
+      "EXECNOW",
+      (fun ~drop ~file ~dir:_ s acc ->
+         config_exec ~once:true ~file ~drop s acc);
+      "EXEC",
+      (fun ~drop ~file ~dir:_ s acc ->
+         config_exec ~once:false ~file ~drop s acc);
 
       "MACRO", config_macro;
       "LIBS", config_libs;
@@ -1093,7 +1089,7 @@ end = struct
 
   (* test for a possible toplevel configuration. *)
   let current_config ~env dir =
-    let default_config = default_config dir in
+    let default_config = default_config () in
     let general_config_file = SubDir.make_file dir (config_name ~env filename) in
     if Sys.file_exists general_config_file
     then begin
@@ -1941,13 +1937,6 @@ let test_pattern config =
   let regexp = Str.regexp config.dc_test_regexp in
   fun file -> Str.string_match regexp file 0
 
-(* if we have some references to directories in the default config, they
-   need to be adapted to the actual test directory. *)
-let update_dir_ref dir config =
-  let update_execnow e = { e with ex_dir = dir } in
-  let dc_execnow = List.map update_execnow config.dc_execnow in
-  { config with dc_execnow }
-
 let build_modules fmt modules =
   (* Prints rules dedicated to the build of the MODULEs *)
   let n = ref 0 in
@@ -2111,10 +2100,6 @@ let () =
   let absolute_cwd = Unix.getcwd () in
   List.iter (fun dir ->
       Format.printf "Test directory: %s@." dir;
-      let absolute_tests_dir = Filename.dirname
-          (if Filename.is_relative dir
-           then Filename.concat absolute_cwd dir else dir)
-      in
       let suites = Ptests_config.parse ~dir in
       if !verbosity >= 1 then Format.printf "%% Nb config= %d@." (StringMap.cardinal suites);
       let nb = !nb_dune_files in
@@ -2128,10 +2113,9 @@ let () =
           | _ ->
             if !verbosity >= 1 then Format.printf "%% - %s_SUITES -> nb suites= %d@."
                 (match config_mode with "" -> default_config | s -> s) (StringMap.cardinal suites);
-            let env = { config = config_mode ; dir ; dune_alias = "" ; absolute_tests_dir ; absolute_cwd} in
+            let env = { config = config_mode ; dir ; dune_alias = "" ; absolute_cwd} in
             let directory = SubDir.create ~with_subdir:false ~env dir in
             let config = Test_config.current_config ~env directory in
-            let config = update_dir_ref directory config in
             process ~env config suites) suites ;
       let nbi = !nb_ignores in
       if !verbosity >= 1 then Format.printf "%% Nb dune files= %d@." (!nb_dune_files-nb);

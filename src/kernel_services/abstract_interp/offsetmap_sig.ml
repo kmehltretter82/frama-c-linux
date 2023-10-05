@@ -160,7 +160,7 @@ module type S = sig
 
   (** {2 Narrowing} *)
 
-  module Make_Narrow (X: sig
+  module Make_Narrow (_: sig
       include Lattice_type.With_Top with type t := v
       include Lattice_type.With_Narrow with type t := v
     end) : sig
