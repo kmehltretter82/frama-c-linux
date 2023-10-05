@@ -85,13 +85,13 @@ SCRIPT_LIBS=""
 ###############
 
 DuneProject () {
-    echo "(lang dune 3.0)"
+    echo "(lang dune 3.3)"
     echo "(generate_opam_files true)"
     echo "(name ${PACKAGE})"
     echo "(maintainers \"anonymous\")"
     echo "(package (name ${PACKAGE})"
     echo "  (depends"
-    echo "    (\"frama-c\" (>= 26.0))"
+    echo "    (\"frama-c\" (>= 27.0))"
     echo "  )"
     echo " (tags (\"Frama-C scripts\"))"
     echo ")"
