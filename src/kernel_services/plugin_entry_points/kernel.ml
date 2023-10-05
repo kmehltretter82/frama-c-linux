@@ -1843,30 +1843,6 @@ module TypeCheck =
 [@@@warning "-60"]
 (* Warning: these options are parsed and used directly from Cmdline *)
 
-let () = Parameter_customize.set_negative_option_name ""
-let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.is_invisible ()
-module NoType =
-  Bool
-    (struct
-      let module_name = "NoType"
-      let default = not Cmdline.use_type
-      let option_name = "-no-type"
-      let help = ""
-    end)
-
-let () = Parameter_customize.set_negative_option_name ""
-let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.is_invisible ()
-module NoObj =
-  Bool
-    (struct
-      let module_name = "NoObj"
-      let default = not Cmdline.use_obj
-      let option_name = "-no-obj"
-      let help = ""
-    end)
-
 let () = Parameter_customize.set_group project
 let () = Parameter_customize.set_negative_option_name ""
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early

@@ -91,7 +91,7 @@ let t_queue = t_poly Unmarshal.t_queue
 let of_type ty = pack (Type.structural_descr ty)
 let of_structural ty d =
   let ty_d = Type.structural_descr ty in
-  if not (Type.may_use_obj ()) || Structural_descr.are_consistent ty_d d
+  if Structural_descr.are_consistent ty_d d
   then pack d
   else invalid_arg "Descr.of_structural: inconsistent descriptor"
 

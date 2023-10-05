@@ -153,21 +153,14 @@ let dynamic_values = Tbl.create 97
 let comments_fordoc = Hashtbl.create 97
 
 let register ?(comment="") ~plugin name ty f =
-  if Cmdline.use_type then begin
-    Klog.debug ~level:5 "registering dynamic function %s" name;
-    let key = plugin ^ "." ^ name in
-    Tbl.add dynamic_values key ty f;
-    if comment <> "" then Hashtbl.add comments_fordoc key comment ;
-    f
-  end else
-    f
+  Klog.debug ~level:5 "registering dynamic function %s" name;
+  let key = plugin ^ "." ^ name in
+  Tbl.add dynamic_values key ty f;
+  if comment <> "" then Hashtbl.add comments_fordoc key comment ;
+  f
 
 let get ~plugin name ty =
-  if Cmdline.use_type then
-    Tbl.find dynamic_values (plugin ^ "." ^ name) ty
-  else
-    failwith
-      (Printf.sprintf "cannot access value %s in the 'no obj' mode" name)
+  Tbl.find dynamic_values (plugin ^ "." ^ name) ty
 
 let iter f = Tbl.iter f dynamic_values
 let iter_comment f = Hashtbl.iter f comments_fordoc

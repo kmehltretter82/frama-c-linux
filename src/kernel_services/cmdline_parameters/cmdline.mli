@@ -360,12 +360,6 @@ val kernel_debug_atleast_ref: (int -> bool) ref
 val kernel_verbose_atleast_ref: (int -> bool) ref
 (** @since Boron-20100401 *)
 
-val use_obj: bool
-(** @since Beryllium-20090601-beta1 *)
-
-val use_type: bool
-(** @since Beryllium-20090601-beta1 *)
-
 val quiet: bool
 (** Must not be used for something else that initializing values
     @since Beryllium-20090601-beta1 *)

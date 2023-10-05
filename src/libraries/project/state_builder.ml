@@ -248,7 +248,6 @@ struct
     unmarshal := fun x -> go_out (Obj.obj x)
 
   let serialize p =
-    assert Cmdline.use_obj;
     commit p;
     let v = find p in
     let obj =
@@ -264,7 +263,6 @@ struct
       on_disk_digest = Type.digest Datatype.ty }
 
   let unserialize p new_s =
-    assert Cmdline.use_obj;
     if Type.digest Datatype.ty = new_s.State.on_disk_digest then begin
       let s, computed =
         if !must_save && new_s.State.on_disk_saved then begin

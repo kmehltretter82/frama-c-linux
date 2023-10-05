@@ -380,13 +380,6 @@ end
 (** {2 Internal API} *)
 (* ****************************************************************************)
 
-val no_obj: unit -> unit
-(** Deactivate all the black magic.
-    Roughly, in this mode, nothing is done by this module. *)
-
-val may_use_obj: unit -> bool
-(** Internal use only. Please, do not use it yourself. *)
-
 val add_abstract_types: (string -> string -> unit) ref
 
 (*
