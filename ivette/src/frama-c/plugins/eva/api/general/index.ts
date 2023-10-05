@@ -248,6 +248,8 @@ export const functionsDataDefault: functionsData =
 
 /** Unreachable and non terminating statements. */
 export interface deadCode {
+  /** List of statements reached by the analysis. */
+  reached: marker[];
   /** List of unreachable statements. */
   unreachable: marker[];
   /** List of reachable but non terminating statements. */
@@ -257,6 +259,7 @@ export interface deadCode {
 /** Decoder for `deadCode` */
 export const jDeadCode: Json.Decoder<deadCode> =
   Json.jObject({
+    reached: Json.jArray(jMarker),
     unreachable: Json.jArray(jMarker),
     nonTerminating: Json.jArray(jMarker),
   });
@@ -264,14 +267,15 @@ export const jDeadCode: Json.Decoder<deadCode> =
 /** Natural order for `deadCode` */
 export const byDeadCode: Compare.Order<deadCode> =
   Compare.byFields
-    <{ unreachable: marker[], nonTerminating: marker[] }>({
+    <{ reached: marker[], unreachable: marker[], nonTerminating: marker[] }>({
+    reached: Compare.array(byMarker),
     unreachable: Compare.array(byMarker),
     nonTerminating: Compare.array(byMarker),
   });
 
 /** Default value for `deadCode` */
 export const deadCodeDefault: deadCode =
-  { unreachable: [], nonTerminating: [] };
+  { reached: [], unreachable: [], nonTerminating: [] };
 
 const getDeadCode_internal: Server.GetRequest<fct,deadCode> = {
   kind: Server.RqKind.GET,
