@@ -380,7 +380,7 @@ val is_subcategory : string list -> string list -> bool
     They should apply {!Plugin.Register} instead.
     @since Beryllium-20090601-beta1 *)
 module Register
-    (P : sig
+    (_ : sig
        val channel : string
        val label : string
        val verbose_atleast : int -> bool

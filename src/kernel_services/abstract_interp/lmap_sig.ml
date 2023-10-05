@@ -73,7 +73,7 @@ module type S = sig
   val join : t -> t -> t
   val is_included : t -> t -> bool
 
-  module Make_Narrow(X: sig
+  module Make_Narrow(_: sig
       include Lattice_type.With_Top with type t := v
       include Lattice_type.With_Narrow with type t := v
       val bottom_is_strict: bool

@@ -493,9 +493,9 @@ let do_list_scheduled_result () =
 type script = {
   mutable proverscript : bool ;
   mutable strategies : bool ;
-  mutable scratch : bool ;
-  mutable update : bool ;
-  mutable stdout : bool ;
+  scratch : bool ;
+  update : bool ;
+  stdout : bool ;
   mutable depth : int ;
   mutable width : int ;
   mutable backtrack : int ;

@@ -47,7 +47,7 @@ val get_reset_selection: ?is_set:bool -> unit -> State_selection.t
 (* ************************************************************************* *)
 
 module Make
-    (P: sig val shortname: string end)
+    (_: sig val shortname: string end)
     (X:sig
        include Datatype.S
        val default: unit -> t

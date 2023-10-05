@@ -1,3 +1,4 @@
+(lang dune 3.3)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                        ;;
 ;;  This file is part of Frama-C.                                         ;;
@@ -20,18 +21,4 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(rule
- (alias frama-c-configure)
- (deps (universe))
- (action (progn
-          (echo "Qed:" %{lib-available:qed} "\n")
-          (echo "  - Zarith:" %{lib-available:zarith} "\n"))))
-
-(library
-  (name qed)
-  (optional)
-  (public_name qed)
-  (flags (-open Frama_c_kernel :standard -w -9))
-  (libraries frama-c.kernel zarith)
-  (instrumentation (backend landmarks))
-  (instrumentation (backend bisect_ppx)))
+(name qed)

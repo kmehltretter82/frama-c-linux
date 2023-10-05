@@ -59,7 +59,6 @@ module C_preprocessor = struct (* This could be put in Dune? *)
   type t =
     { preprocessor: string
     ; pp_opt: string option
-    ; is_gnu: bool
     }
 
   let stdout_contains out str =
@@ -97,24 +96,9 @@ module C_preprocessor = struct (* This could be put in Dune? *)
       Temp.create ~dir ~suffix:".c" (fun name -> write_file name code) in
     C.Process.run configurator ~dir preprocessor (options @ [ file ])
 
-  let is_gnu configurator preprocessor =
-    let code = {|#ifdef _FC_UNDEFINED_SYMBOL
-#error This should not remain after preprocessing
-#endif
-int kept_after_preprocessing = 42;
-|}
-    in
-    (* GNU preprocessors are always compatible with '-E'.
-       For 'cpp', the '-E' flag is unnecessary, but still works. *)
-    let result = call configurator preprocessor ["-E"] code in
-    result.exit_code = 0 &&
-    stdout_contains result.stdout "kept_after_preprocessing" &&
-    not (stdout_contains result.stdout "should not remain")
-
   let get configurator =
     let preprocessor, pp_opt = find_preprocessor configurator in
-    let is_gnu = is_gnu configurator preprocessor in
-    { preprocessor ; pp_opt; is_gnu }
+    { preprocessor ; pp_opt }
 
   let preprocess configurator t options code =
     call configurator t.preprocessor (Option.to_list t.pp_opt @ options) code

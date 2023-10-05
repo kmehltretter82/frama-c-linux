@@ -3,8 +3,8 @@
    STDOPT: +"-generated-spec-mode acsl"
    STDOPT: +"-generated-spec-mode safe"
    STDOPT: +"-generated-spec-mode frama-c"
-   STDOPT: +"-generated-spec-custom exits:acsl,assigns:frama-c,requires:safe,allocates:safe,terminates:acsl"
-
+   STDOPT: +"-generated-spec-mode skip"
+   STDOPT: +"-generated-spec-custom exits:skip,assigns:frama-c,requires:safe,allocates:safe,terminates:acsl"
    EXIT: 1
    STDOPT: +"-generated-spec-custom wrong_clause:safe"
    STDOPT: +"-generated-spec-custom wrong_clause:"

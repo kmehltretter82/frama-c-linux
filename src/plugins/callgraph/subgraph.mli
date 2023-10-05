@@ -28,8 +28,8 @@ module Make
        val create: ?size:int -> unit -> t
        val add_edge_e: t -> E.t -> unit
      end)
-    (D: Datatype.S with type t = G.t(* Graph datatype *))
-    (Info: sig
+    (_: Datatype.S with type t = G.t(* Graph datatype *))
+    (_: sig
        (** additional information *)
        val self: State.t
        val name: string

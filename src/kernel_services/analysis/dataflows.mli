@@ -118,7 +118,7 @@ module type BACKWARD_MONOTONE_PARAMETER = sig
   val init: (stmt * t) list
 end
 
-module Simple_backward(Fenv:FUNCTION_ENV)(P:BACKWARD_MONOTONE_PARAMETER) : sig
+module Simple_backward(_:FUNCTION_ENV)(P:BACKWARD_MONOTONE_PARAMETER) : sig
 
   (** {3 Retrieving the state before and after a statement.} *)
 
@@ -177,7 +177,7 @@ module type FORWARD_MONOTONE_PARAMETER = sig
 end
 
 
-module Simple_forward(Fenv:FUNCTION_ENV)(P:FORWARD_MONOTONE_PARAMETER) : sig
+module Simple_forward(_:FUNCTION_ENV)(P:FORWARD_MONOTONE_PARAMETER) : sig
 
   (** {3 Retrieve the state before and after a statement.} *)
 

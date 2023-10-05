@@ -1019,20 +1019,30 @@ let () =
 (* --- Build a marker from an ACSL term                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let build_marker ~stmt ~term =
-  let env =
-    let open Logic_typing in
-    Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
-  in
-  try
-    let kf = Kernel_function.find_englobing_kf stmt in
-    let term = Logic_parse_string.term ~env kf term in
-    let exp = Logic_to_c.term_to_exp term in
-    Some (Printer_tag.PExp (Some kf, Kstmt stmt, exp))
-  with Not_found
-     | Logic_parse_string.Error _
-     | Logic_parse_string.Unbound _
-     | Logic_to_c.No_conversion -> None (* TODO: return an error message. *)
+let environment () =
+  let open Logic_typing in
+  Lenv.empty () |> append_pre_label |> append_init_label |> append_here_label
+
+let parse_expr env kf stmt term =
+  let term = Logic_parse_string.term ~env kf term in
+  let exp = Logic_to_c.term_to_exp term in
+  Printer_tag.PExp (Some kf, Kstmt stmt, exp)
+
+let parse_lval env kf stmt term =
+  let term = Logic_parse_string.term_lval ~env kf term in
+  let lval = Logic_to_c.term_lval_to_lval term in
+  Printer_tag.PLval (Some kf, Kstmt stmt, lval)
+
+let build_marker parse marker term =
+  match Printer_tag.ki_of_localizable marker with
+  | Kglobal -> Data.failure "No statement at selection point"
+  | Kstmt stmt ->
+    let module C = Logic_to_c in
+    let module Parser = Logic_parse_string in
+    let kf () = Kernel_function.find_englobing_kf stmt in
+    try parse (environment ()) (kf ()) stmt term
+    with Not_found | Parser.(Error _ | Unbound _) | C.No_conversion ->
+      Data.failure "Invalid term"
 
 let () =
   let module Md = Markdown in
@@ -1046,13 +1056,20 @@ let () =
   Request.register_sig ~package s
     ~kind:`GET ~name:"parseExpr"
     ~descr:(Md.plain "Parse a C expression and returns the associated marker")
-    begin fun rq () ->
-      match Printer_tag.ki_of_localizable @@ get_marker rq with
-      | Kglobal -> Data.failure "No statement at selection point"
-      | Kstmt stmt ->
-        match build_marker ~stmt ~term:(get_term rq) with
-        | None -> Data.failure "Invalid expression"
-        | Some tag -> tag
-    end
+    (fun rq () -> build_marker parse_expr (get_marker rq) (get_term rq))
+
+let () =
+  let module Md = Markdown in
+  let s = Request.signature ~output:(module Marker) () in
+  let get_marker = Request.param s ~name:"stmt"
+      ~descr:(Md.plain "Marker position from where to localize the term")
+      (module Marker) in
+  let get_term = Request.param s ~name:"term"
+      ~descr:(Md.plain "ACSL term to parse")
+      (module Data.Jstring) in
+  Request.register_sig ~package s
+    ~kind:`GET ~name:"parseLval"
+    ~descr:(Md.plain "Parse a C lvalue and returns the associated marker")
+    (fun rq () -> build_marker parse_lval (get_marker rq) (get_term rq))
 
 (* -------------------------------------------------------------------------- *)

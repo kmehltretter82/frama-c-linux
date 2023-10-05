@@ -127,7 +127,7 @@ module Make_table
        val get: t -> emitter
      end)
     (D: Datatype.S)
-    (Info: sig include State_builder.Info_with_size val kinds: kind list end) :
+    (_: sig include State_builder.Info_with_size val kinds: kind list end) :
 sig
   type internal_tbl = D.t E.Hashtbl.t
   val self: State.t

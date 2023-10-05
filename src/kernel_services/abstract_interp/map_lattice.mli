@@ -172,8 +172,8 @@ module Make_Map_Lattice
         keys, indicating whether a key represents a summary of possibly multiple
         keys; a binding to such a key has never a cardinality of one. *)
     module With_Cardinality
-        (K: sig val is_summary: Key.t -> bool end)
-        (Value :
+        (_: sig val is_summary: Key.t -> bool end)
+        (_:
            Lattice_type.Full_AI_Lattice_with_cardinality with type t := Value.t)
       : Map_Lattice_with_cardinality with type t := t
                                       and type key := key
@@ -198,9 +198,9 @@ module Make_MapSet_Lattice
                             and type v := Value.t
 
     module With_Cardinality
-        (KVMap : Map_Lattice_with_cardinality with type t := KVMap.t
-                                               and type key := Key.t
-                                               and type v := Value.t)
+        (_ : Map_Lattice_with_cardinality with type t := KVMap.t
+                                           and type key := Key.t
+                                           and type v := Value.t)
       : MapSet_Lattice_with_cardinality with type t := t
                                          and type key := Key.t
                                          and type v := Value.t

@@ -105,9 +105,25 @@ module type S = sig
   val pretty_debug: t Pretty_utils.formatter
 end
 
+module type Initial_values = sig
+  type elt
+  val v : elt list list
+  (** List of the sets that must be shared between all instances of Frama-C
+      (the sets being described by the list of their elements).
+      Must include all sets that are exported at Caml link-time when the
+      functor is applied. This usually includes at least the empty set, hence
+      [v] nearly always contains [[]]. *)
+end
+
+module type Datatype_deps = sig
+  val l : State.t list
+  (** Dependencies of the hash-consing table. The table will be cleared
+      whenever one of those dependencies is cleared. *)
+end
+
 module Make(X: Hptmap.Id_Datatype)
-    (Initial_Values : sig val v : X.t list list end)
-    (Datatype_deps: sig val l : State.t list end) :
+    (_ : Initial_values with type elt := X.t)
+    (_ : Datatype_deps) :
 sig
   include S with type elt = X.t
              and type 'a map = 'a Hptmap.Shape(X).map

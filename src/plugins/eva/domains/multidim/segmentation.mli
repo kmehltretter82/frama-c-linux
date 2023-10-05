@@ -66,5 +66,5 @@ sig
   val add_segmentation_bounds : oracle:oracle -> bound list -> t -> t
 end
 
-module Make (Config : Config) (M : ProtoMemory) :
+module Make (_ : Config) (M : ProtoMemory) :
   Segmentation with type submemory = M.t

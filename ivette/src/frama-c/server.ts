@@ -837,7 +837,7 @@ client.onRejected((id: string) => {
 client.onError((id: string, msg: string) => {
   const p = pending.get(id);
   if (p) {
-    p.reject(`{error (${msg})`);
+    p.reject(`error (${msg})`);
     _resolved(id);
   }
 });

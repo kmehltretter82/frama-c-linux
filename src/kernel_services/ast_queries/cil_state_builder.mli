@@ -23,30 +23,30 @@
 (** Functors for building computations which use kernel datatypes.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
-module Stmt_set_ref(Info: State_builder.Info) :
+module Stmt_set_ref(_: State_builder.Info) :
   State_builder.Set_ref with type elt = Cil_types.stmt
 
-module Kinstr_hashtbl(Data:Datatype.S)(Info: State_builder.Info_with_size) :
+module Kinstr_hashtbl(Data:Datatype.S)(_: State_builder.Info_with_size) :
   State_builder.Hashtbl with type key = Cil_types.kinstr and type data = Data.t
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-module Stmt_hashtbl(Data:Datatype.S)(Info: State_builder.Info_with_size) :
+module Stmt_hashtbl(Data:Datatype.S)(_: State_builder.Info_with_size) :
   State_builder.Hashtbl with type key = Cil_types.stmt and type data = Data.t
 
-module Varinfo_hashtbl(Data:Datatype.S)(Info: State_builder.Info_with_size) :
+module Varinfo_hashtbl(Data:Datatype.S)(_: State_builder.Info_with_size) :
   State_builder.Hashtbl with type key = Cil_types.varinfo
                          and type data = Data.t
 
-module Exp_hashtbl(Data:Datatype.S)(Info: State_builder.Info_with_size) :
+module Exp_hashtbl(Data:Datatype.S)(_: State_builder.Info_with_size) :
   State_builder.Hashtbl with type key = Cil_types.exp
                          and type data = Data.t
 
-module Lval_hashtbl(Data:Datatype.S)(Info: State_builder.Info_with_size) :
+module Lval_hashtbl(Data:Datatype.S)(_: State_builder.Info_with_size) :
   State_builder.Hashtbl with type key = Cil_types.lval
                          and type data = Data.t
 
 module Kernel_function_hashtbl
-    (Data:Datatype.S)(Info: State_builder.Info_with_size):
+    (Data:Datatype.S)(_: State_builder.Info_with_size):
   State_builder.Hashtbl with type key = Cil_types.kernel_function
                          and type data = Data.t
 

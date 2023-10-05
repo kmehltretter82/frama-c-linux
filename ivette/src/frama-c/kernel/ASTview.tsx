@@ -26,17 +26,16 @@ import Lodash from 'lodash';
 import * as Dome from 'dome';
 import * as Editor from 'dome/text/editor';
 import * as Utils from 'dome/data/arrays';
-import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Settings from 'dome/data/settings';
 import { IconButton } from 'dome/controls/buttons';
 import { Filler, Inset } from 'dome/frame/toolbars';
+import * as Studia from 'frama-c/plugins/studia/studia';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { text } from 'frama-c/kernel/api/data';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Properties from 'frama-c/kernel/api/properties';
 import * as Locations from './Locations';
-import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
 
 import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
@@ -468,37 +467,6 @@ function createPropertiesGutter(): Editor.Extension {
 
 
 // -----------------------------------------------------------------------------
-//  Studia access
-// -----------------------------------------------------------------------------
-
-type access = 'Reads' | 'Writes';
-
-interface StudiaProps {
-  marker: string,
-  descr: string,
-  kind: access,
-}
-
-async function invokeStudia(props: StudiaProps): Promise<void> {
-  const { marker, descr, kind } = props;
-  const request = kind === 'Reads' ? getReadsLval : getWritesLval;
-  const data = await Server.send(request, marker);
-  const markers = data.direct.map(([_, marker]) => marker);
-  let label;
-  if (markers.length > 0)
-    label = `${kind} to ${descr}`;
-  else
-    label = `No ${kind.toLowerCase()} of ${descr}`;
-  const acc = (kind === 'Reads') ? 'accessing' : 'modifying';
-  const title = `Statements ${acc} ${descr}.`;
-  Locations.setSelection({ label, title, markers });
-}
-
-// -----------------------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------------------
 //  Context menu
 // -----------------------------------------------------------------------------
 
@@ -529,7 +497,7 @@ function createContextMenuHandler(): Editor.Extension {
       const node = coveringNode(tree, position);
       if (!node || !node.marker) return;
       const items: Dome.PopupMenuItem[] = [];
-      const { kind, labelKind, name, definition, descr } =
+      const { marker, kind, labelKind, name, definition, descr } =
         getData(node.marker) ?? Ast.markerAttributesDataDefault;
       if (kind === 'DFUN') {
         const groupedCallers = Lodash.groupBy(callers, ({ fct }) => fct);
@@ -557,21 +525,14 @@ function createContextMenuHandler(): Editor.Extension {
           items.push({ label, onClick });
         });
       }
-      const enabled = (kind==='LVAR' || kind==='LVAL');
-      const onClick = (kind: access): void => {
-        if (node.marker)
-          invokeStudia({ marker: node.marker, descr, kind });
-      };
-      const reads = 'Studia: select reads';
-      const writes = 'Studia: select writes';
-      items.push({ label: reads, enabled, onClick: () => onClick('Reads') });
-      items.push({ label: writes, enabled, onClick: () => onClick('Writes') });
-      const copy = (): void => {
-        const text = view.state.sliceDoc(node.from, node.to);
-        if (text !== '') navigator.clipboard.writeText(text);
-      };
-      items.push({ label: 'Copy to clipboard', onClick: copy });
-      if (items.length > 0) Dome.popupMenu(items);
+      Studia.buildMenu(items, marker, kind, descr);
+      items.push({
+        label: 'Copy to clipboard',
+        onClick: () => {
+          const text = view.state.sliceDoc(node.from, node.to);
+          if (text !== '') navigator.clipboard.writeText(text);
+      } });
+      Dome.popupMenu(items);
       return;
     }
   });

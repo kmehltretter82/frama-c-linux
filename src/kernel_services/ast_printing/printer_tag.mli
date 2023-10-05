@@ -144,6 +144,6 @@ sig
     (Format.formatter -> 'a -> unit)
 end
 
-module Make(T : Tag) : S_pp
+module Make(_ : Tag) : S_pp
 
 (* -------------------------------------------------------------------------- *)

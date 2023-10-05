@@ -54,7 +54,7 @@ end
 
 module Make(E : Elt)
     (S : Set with type elt = E.t)
-    (M : Map with type key = E.t) :
+    (_ : Map with type key = E.t) :
 sig
   type t
   type elt = E.t

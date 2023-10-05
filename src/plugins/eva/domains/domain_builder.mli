@@ -102,6 +102,6 @@ module Complete_Simple_Cvalue
 module Restrict
     (Value: Abstract_value.S)
     (Domain: Abstract.Domain.Internal with type value = Value.t)
-    (Scope: sig val functions: Domain_mode.function_mode list end)
+    (_: sig val functions: Domain_mode.function_mode list end)
   : Abstract.Domain.Internal with type value = Value.t
                               and type location = Domain.location
