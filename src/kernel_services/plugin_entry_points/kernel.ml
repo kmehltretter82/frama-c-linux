@@ -1486,8 +1486,11 @@ module GeneratedSpecCustom =
       let arg_name = "c1:m1,c2:m2,..."
       let default = Datatype.String.Map.empty
       let help =
-        "Fine-tune missing specification generation by manually choosing \
-         modes for each clause. See user manual for more information."
+        "Fine-tune missing specification generation by manually selecting \
+         modes for each clause. Can be one of: frama-c, acsl, safe, skip or \
+         the name of a custom registered mode. Do not use skip mode for \
+         assigns unless you know what you are doing! See user manual for more \
+         information."
     end)
 
 let normalization_parameters () =
