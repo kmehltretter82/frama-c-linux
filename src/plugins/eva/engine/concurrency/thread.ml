@@ -77,7 +77,7 @@ let create name =
   th
 
 let find id =
-  ThreadsById.find_opt id
+  if Int.equal id main.id then Some main else ThreadsById.find_opt id
 
 
 (* --- Current Thread --- *)
@@ -273,11 +273,12 @@ let reset_state () =
   last_thread_id := 1;
   ThreadsById.clear ();
   State.clear ();
-  ThreadsById.add main.id main;
-  State.add main (Properties.main_properties ());
   set_current main
 
-let get_properties = State.find
+let get_properties thread =
+  if is_main thread
+  then Properties.main_properties ()
+  else State.find thread
 
 let entry_point th =
   (get_properties th).entry_point
