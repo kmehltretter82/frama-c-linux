@@ -12,11 +12,10 @@ let gen_allocates _ _ = FreeAllocAny
 let status_allocates = Property_status.Dont_know
 
 let run () =
-  let open Populate_spec in
-  let get_spec kf =
-    populate_funspec kf [`Exits; `Assigns; `Requires; `Allocates]
+  let generate_spec kf =
+    Populate_spec.populate_funspec kf [`Exits; `Assigns; `Requires; `Allocates]
   in
-  Globals.Functions.iter get_spec
+  Globals.Functions.iter generate_spec
 
 let populate () =
   Format.printf "Registering an mode that does nothing@.";
