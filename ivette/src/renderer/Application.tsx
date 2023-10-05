@@ -36,6 +36,7 @@ import * as Controller from './Controller';
 import * as Extensions from './Extensions';
 import * as Laboratory from './Laboratory';
 import * as IvettePrefs from 'ivette/prefs';
+import * as Studia from 'frama-c/plugins/studia/studia';
 import './loader';
 import './sandbox';
 
@@ -48,6 +49,8 @@ export default function Application(): JSX.Element {
     Dome.useFlipSettings('frama-c.sidebar.unfold', true);
   const [viewbar, flipViewbar] =
     Dome.useFlipSettings('frama-c.viewbar.unfold', true);
+
+  Studia.useStudiaMode();
 
   return (
     <Vfill>
