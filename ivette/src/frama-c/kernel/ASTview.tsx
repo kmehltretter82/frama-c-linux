@@ -326,7 +326,7 @@ const emptyDeadCode = { reached: [], unreachable: [], nonTerminating: [] };
 const Dead = Editor.createField<Eva.deadCode>(emptyDeadCode);
 
 // Comparison function on ranges
-export function compareRange(x: Range, y: Range): number {
+function compareRange(x: Range, y: Range): number {
   return (x.from !== y.from) ? (x.from - y.from) : (y.to - x.to);
 }
 
@@ -351,10 +351,9 @@ function filterReached(unreachables: Range[], reachables: Range[]): Range[] {
 const UnreachableRanges = createUnreachableRanges();
 function createUnreachableRanges(): Editor.Aspect<Editor.Range[]> {
   const deps = { dead: Dead, ranges: Ranges };
-  return Editor.createAspect(deps, ({ dead, ranges: rs }) => {
-    const get = (ms: Ast.marker[]): Range[][] => mapFilter(ms, m => rs.get(m));
-    const unreachable = get(dead.unreachable).flat();
-    const reached = get(dead.reached).flat();
+  return Editor.createAspect(deps, ({ dead, ranges }) => {
+    const unreachable = mapFilter(dead.unreachable, m => ranges.get(m)).flat();
+    const reached = mapFilter(dead.reached, m => ranges.get(m)).flat();
     return filterReached(unreachable, reached);
   });
 }
