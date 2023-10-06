@@ -3,9 +3,9 @@ compiling Frama-C+dev.
 
 - OCaml 4.13.1
 - alt-ergo-free.2.2.0 (for wp, optional)
-- dune.3.5.0
-- dune-configurator.3.5.0
-- dune-site.3.5.0
+- dune.3.7.1
+- dune-configurator.3.7.1
+- dune-site.3.7.1
 - lablgtk3.3.1.3
 - lablgtk3-sourceview3.3.1.3
 - menhir.20211128
