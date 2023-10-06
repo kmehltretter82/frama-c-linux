@@ -32,6 +32,6 @@
   (optional)
   (public_name qed)
   (flags (:standard -w -9))
-  (libraries zarith)
+  (libraries str zarith)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx)))
