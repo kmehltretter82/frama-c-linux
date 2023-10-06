@@ -53,7 +53,6 @@ val get: plugin:string -> string -> 'a Type.t -> 'a
     @raise Unbound_value if the name is not registered
     @raise Incompatible_type if the name is not registered
     with a compatible type
-    @raise Failure _ in the -no-obj mode
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
 
 val iter: (string -> 'a Type.t -> 'a -> unit) -> unit
