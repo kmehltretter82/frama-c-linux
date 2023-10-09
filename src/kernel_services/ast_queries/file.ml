@@ -505,7 +505,7 @@ let silence_cpp_machdep_warnings cmdl =
 let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
   | NeedCPP (f, cmdl, extra_for_this_file, is_gnu_like) ->
-    if not (Sys.file_exists (f :> string)) then
+    if not (Filepath.exists f) then
       Kernel.abort "source file %a does not exist"
         Filepath.Normalized.pretty f;
     let debug = Kernel.is_debug_key_enabled Kernel.dkey_parser in
@@ -602,7 +602,7 @@ let abort_with_detailed_pp_message f cpp_command =
 
 let parse_cabs cpp_command = function
   | NoCPP f ->
-    if not (Sys.file_exists (f:>string)) then
+    if not (Filepath.exists f) then
       Kernel.abort "preprocessed file %a does not exist"
         Filepath.Normalized.pretty f;
     Kernel.feedback "Parsing %a (no preprocessing)"
@@ -651,7 +651,7 @@ let parse_cabs cpp_command = function
     safe_remove_file ppf;
     (cil,(f,defs))
   | External (f,suf) ->
-    if not (Sys.file_exists (f:>string)) then
+    if not (Filepath.exists f) then
       Kernel.abort "file %a does not exist."
         Filepath.Normalized.pretty f;
     Kernel.feedback "Parsing %a (external front-end)"

@@ -562,7 +562,7 @@ let mk_remarks is_draft =
     Parse_remarks.get_remarks (Mdr_params.Remarks.get ())
   else if is_draft then begin
     let f = Mdr_params.Output.get() in
-    if Sys.file_exists (f:>string) then begin
+    if Filepath.exists f then begin
       Mdr_params.feedback
         "Re-using pre-existing remarks in draft file %a"
         Filepath.Normalized.pretty f;

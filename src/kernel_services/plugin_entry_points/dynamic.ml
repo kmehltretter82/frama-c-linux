@@ -99,7 +99,7 @@ let is_package =
 
 let is_file base ext =
   let file = base ^ ext in
-  if Sys.file_exists file then Some file else None
+  if (Filepath.exists (Filepath.Normalized.of_string file)) then Some file else None
 
 let is_object base =
   if Dynlink.is_native then is_file base ".cmxs" else

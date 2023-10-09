@@ -362,7 +362,7 @@ struct
               List.fold_left
                 (fun dummy d ->
                    let name = Datatype.Filepath.concat d s in
-                   if Sys.file_exists (name :> string)
+                   if FramacFilepath.exists name
                    then raise (Found name)
                    else dummy)
                 None
@@ -424,7 +424,7 @@ struct
       let filepath = Datatype.Filepath.concat base_dir s_basename in
       match mode with
       | `Must_exist ->
-        if Sys.file_exists (filepath :> string)
+        if FramacFilepath.exists filepath
         then filepath
         else L.abort "there is no file %s in %s directories" (filepath :> string) O.option_name
       | `Normalize_only ->
