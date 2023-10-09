@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-!  Kernel    [2023-10-09] Remove options -no-type and -no-obj and related
+              functions.
 o!  Kernel    [2023-10-03] New mechanism for generating default specifications
 -   Kernel    [2023-10-03] New options -generated-spec-mode and
               -generated-spec-custom for configuring how default specifications
