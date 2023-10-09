@@ -55,6 +55,7 @@ let
 
     # Release
     api-doc = oself.callPackage ./api-doc.nix {};
+    api-json-doc = oself.callPackage ./api-json-doc.nix {};
     manuals = oself.callPackage ./manuals.nix {};
     src-distrib-tests = oself.callPackage ./src-distrib-tests.nix {
       frama-c-release = oself.frama-c.override {
