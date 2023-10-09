@@ -1717,6 +1717,7 @@ module Filepath = struct
   let concat ?existence t s = Filepath.Normalized.concat ?existence t s
   let pp_abs = Filepath.Normalized.pp_abs
 end
+let filepath = Filepath.ty
 
 (* ****************************************************************************)
 (** {3 Triple} *)
