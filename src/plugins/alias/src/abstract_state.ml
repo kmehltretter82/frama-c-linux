@@ -284,10 +284,15 @@ module Dot = Graph.Graphviz.Dot (struct
     let default_edge_attributes _ = []
     let get_subgraph _ = None
     let vertex_attributes _ = [`Shape `Box]
+
     let vertex_name (v:V.t) =
       let lset = !find_vertex_name_ref v in
       let fmt = Format.str_formatter in
-      Format.fprintf fmt "\"%a\"" LSet.pretty lset;
+      if LSet.is_empty lset
+      then
+        Format.fprintf fmt "\"empty_%d\"" v
+      else
+        Format.fprintf fmt "\"%a\"" LSet.pretty lset;
       Format.flush_str_formatter ()
     let default_vertex_attributes _ = []
     let graph_attributes _ = []
