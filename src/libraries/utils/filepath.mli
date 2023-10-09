@@ -216,6 +216,41 @@ val pp_pos : Format.formatter -> position -> unit
 *)
 val pwd : unit -> string
 
+(** Equivalent to [Sys.file_exists].
+    @since Frama-C+dev
+*)
+val exists: Normalized.t -> bool
+
+(** Equivalent to [Sys.is_directory].
+    @since Frama-C+dev
+*)
+val is_dir: Normalized.t -> bool
+
+(** Equivalent to [Sys.readdir].
+    @since Frama-C+dev
+*)
+val readdir: Normalized.t -> string array
+
+(** Equivalent to [Sys.remove].
+    @since Frama-C+dev
+*)
+val remove: Normalized.t -> unit
+
+(** Equivalent to [Sys.rename].
+    @since Frama-C+dev
+*)
+val rename: Normalized.t -> Normalized.t -> unit
+
+(** Equivalent to [Filename.basename].
+    @since Frama-C+dev
+*)
+val basename: Normalized.t -> string
+
+(** Equivalent to [Filename.dirname].
+    @since Frama-C+dev
+*)
+val dirname: Normalized.t -> Normalized.t
+
 (*
   Local Variables:
   compile-command: "make -C ../../.."

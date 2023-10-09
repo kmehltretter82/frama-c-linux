@@ -337,6 +337,20 @@ type position =
 let pp_pos fmt pos =
   Format.fprintf fmt "%a:%d" Normalized.pretty pos.pos_path pos.pos_lnum
 
+let exists (s : Normalized.t) = Sys.file_exists (s :> string)
+
+let is_dir (s : Normalized.t) = Sys.is_directory (s :> string)
+
+let readdir (s : Normalized.t) = Sys.readdir (s :> string)
+
+let remove (s : Normalized.t) = Sys.remove (s :> string)
+
+let rename s t = Sys.rename s t
+
+let basename p = Filename.basename p
+
+let dirname p = Filename.dirname p
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."
