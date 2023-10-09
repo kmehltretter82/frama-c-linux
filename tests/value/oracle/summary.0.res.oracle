@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   undet ∈ [--..--]
   volatile_d ∈ [--..--]
-[kernel:annot:missing-spec] summary.i:19: Warning: 
+[kernel:annot:missing-spec] summary.i:10: Warning: 
   Neither code nor specification for function minimalist,
    generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function minimalist

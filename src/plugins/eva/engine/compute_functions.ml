@@ -82,8 +82,6 @@ let generate_specs () =
       Self.warning "Generating potentially incorrect assigns \
                     for function '%a' for which option %s is set"
         Kernel_function.pretty kf Parameters.UsePrototype.option_name;
-      (* The function populate_funspec may emit a warning. Position a loc. *)
-      Cil.CurrentLoc.set (Kernel_function.get_location kf);
       Populate_spec.populate_funspec ~do_body:true kf [`Assigns];
     end
   in

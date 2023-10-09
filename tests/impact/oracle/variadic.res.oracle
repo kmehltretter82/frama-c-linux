@@ -6,7 +6,7 @@
 [eva:initial-state] Values of globals at initialization
   y ∈ {0}
   z ∈ {0}
-[kernel:annot:missing-spec] variadic.i:12: Warning: 
+[kernel:annot:missing-spec] variadic.i:6: Warning: 
   Neither code nor specification for function f,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- main.

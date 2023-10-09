@@ -11,7 +11,7 @@
   Z ∈ [--..--]
 [eva] loops.i:68: assertion got status valid.
 [eva] loops.i:66: starting to merge loop iterations
-[kernel:annot:missing-spec] loops.i:70: Warning: 
+[kernel:annot:missing-spec] loops.i:61: Warning: 
   Neither code nor specification for function stop,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function stop <- stop_f1.

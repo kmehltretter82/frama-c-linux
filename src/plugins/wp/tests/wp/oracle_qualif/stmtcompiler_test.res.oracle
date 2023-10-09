@@ -3,7 +3,7 @@
 [kernel:CERT:MSC:37] stmtcompiler_test.i:136: Warning: 
   Body of function if_assert falls-through. Adding a return statement
 [wp] Running WP plugin...
-[kernel:annot:missing-spec] stmtcompiler_test.i:167: Warning: 
+[kernel:annot:missing-spec] stmtcompiler_test.i:104: Warning: 
   Neither code nor explicit assigns for function behavior1,
    generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards

@@ -88,7 +88,7 @@
   ==END OF DUMP==
 [eva:alarm] initialized_copy.i:151: Warning: 
   accessing uninitialized left-value. assert \initialized(&a_8);
-[kernel:annot:missing-spec] initialized_copy.i:151: Warning: 
+[kernel:annot:missing-spec] initialized_copy.i:22: Warning: 
   Neither code nor specification for function g,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function g <- main.

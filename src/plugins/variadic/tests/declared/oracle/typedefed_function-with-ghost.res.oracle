@@ -3,7 +3,7 @@
 [variadic] typedefed_function-with-ghost.i:5: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
-[kernel:annot:missing-spec] typedefed_function-with-ghost.i:5: Warning: 
+[kernel:annot:missing-spec] typedefed_function-with-ghost.i:2: Warning: 
   Neither code nor specification for function f,
    generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function f

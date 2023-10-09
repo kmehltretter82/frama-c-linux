@@ -19,7 +19,7 @@
   assertion 'Eva,mem_access' got final status invalid.
 [eva] invalid_lval_arg.i:19: 
   assertion 'Eva,mem_access' got final status invalid.
-[kernel:annot:missing-spec] invalid_lval_arg.i:15: Warning: 
+[kernel:annot:missing-spec] invalid_lval_arg.i:1: Warning: 
   Neither code nor specification for function f,
    generating default assigns. See -generated-spec-* options for more info
 [eva] ====== VALUES COMPUTED ======

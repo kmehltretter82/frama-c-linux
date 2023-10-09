@@ -244,7 +244,7 @@
   G19 ∈ {0}
 [eva] computing for function F4 <- main.
   Called from s.i:260.
-[kernel:annot:missing-spec] s.i:230: Warning: 
+[kernel:annot:missing-spec] s.i:9: Warning: 
   Neither code nor specification for function F1,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function F1 <- F4 <- main.
@@ -253,7 +253,7 @@
 [eva] Done for function F1
 [eva:alarm] s.i:231: Warning: accessing out of bounds index. assert 0 ≤ V4;
 [eva:alarm] s.i:231: Warning: accessing out of bounds index. assert V4 < 64;
-[kernel:annot:missing-spec] s.i:233: Warning: 
+[kernel:annot:missing-spec] s.i:10: Warning: 
   Neither code nor specification for function F2,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function F2 <- F4 <- main.
@@ -267,7 +267,7 @@
 [eva] Done for function F2
 [eva:alarm] s.i:242: Warning: accessing out of bounds index. assert 0 ≤ V6;
 [eva:alarm] s.i:242: Warning: accessing out of bounds index. assert V6 < 64;
-[kernel:annot:missing-spec] s.i:244: Warning: 
+[kernel:annot:missing-spec] s.i:12: Warning: 
   Neither code nor specification for function F3,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function F3 <- F4 <- main.

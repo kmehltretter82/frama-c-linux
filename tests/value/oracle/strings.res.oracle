@@ -40,7 +40,7 @@
   Z ∈ {0}
 [eva] computing for function string_reads <- main.
   Called from strings.i:142.
-[kernel:annot:missing-spec] strings.i:39: Warning: 
+[kernel:annot:missing-spec] strings.i:15: Warning: 
   Neither code nor specification for function u,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function u <- string_reads <- main.

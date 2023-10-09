@@ -3,10 +3,10 @@
 --------------------------------------------------------------------------------
 --- No status to report
 --------------------------------------------------------------------------------
-[kernel:annot:missing-spec] hyp.i:25: Warning: 
+[kernel:annot:missing-spec] hyp.i:7: Warning: 
   Neither code nor specification for function f,
    generating default assigns. See -generated-spec-* options for more info
-[kernel:annot:missing-spec] hyp.i:25: Warning: 
+[kernel:annot:missing-spec] hyp.i:8: Warning: 
   Neither code nor specification for function f2,
    generating default assigns. See -generated-spec-* options for more info
 [kernel] NEVER_TRIED + NEVER_TRIED
