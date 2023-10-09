@@ -3172,7 +3172,7 @@ over which the analyses are performed. Customization of the front-end of
 \item\textbf{Parsing:} this stage takes care of converting an individual source
 file into a parsed AST (a.k.a Cabs, which differs from the type-checked AST on
 which most analyses operate). By default, source files are treated as C files,
-possibly needing a pre-processing phase. It is possible to tell Frama-C to use
+possibly needing a preprocessing phase. It is possible to tell Frama-C to use
 another parser for files ending with a given suffix by registering this
 parser with the \texttt{File.new\_file\_type}\scodeidxdef{File}{new\_file\_type}
 function. Suffixes \texttt{.h}, \texttt{.i}, \texttt{.c} and \texttt{.ci}
@@ -3286,7 +3286,7 @@ We present below a thorough description of each field.
   Note that some compiler extensions, such as attributes, are always enabled.
 \item[\texttt{cpp\_arch\_flags}]: list of arguments used by the compiler to
   select the corresponding architecture, e.g. \verb+["-m32"]+ for a 32-bit
-  machdep. Older versions (up to 26.x - Iron) of \framac did pass these flags to the pre-processor,
+  machdep. Older versions (up to 26.x - Iron) of \framac did pass these flags to the preprocessor,
   in order for it to define a set of built-in macros related to said architecture.
   Current versions do not use this field, and rely on \texttt{\texttt{custom\_defs}}
   containing the appropriate definitions.

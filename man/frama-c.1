@@ -50,10 +50,10 @@ It features the same options as the command-line version.
 It also features the same options as the command-line version.
 .PP
 By default, Frama-C recognizes \f[I].c\f[R] files as C files needing
-pre-processing and \f[I].i\f[R] files as C files having been already
-pre-processed.
+preprocessing and \f[I].i\f[R] files as C files having been already
+preprocessed.
 Some plugins may extend the list of recognized files.
-Pre-processing can be customized through the \f[B]-cpp-command\f[R] and
+Preprocessing can be customized through the \f[B]-cpp-command\f[R] and
 \f[B]-cpp-extra-args\f[R] options.
 .SH OPTIONS
 .SS Syntax
@@ -129,7 +129,7 @@ Defaults to yes.
 [-no]-annot
 reads ACSL annotations.
 This is the default.
-Annotations are pre-processed by default.
+Annotations are preprocessed by default.
 Use -no-pp-annot if you don\[cq]t want to expand macros in annotations.
 .TP
 [-no]-ast-diff
@@ -188,7 +188,7 @@ code are still fatal, though).
 instead.
 .TP
 -cpp-command \f[I]cmd\f[R]
-uses \f[I]cmd\f[R] as the command to pre-process C files.
+uses \f[I]cmd\f[R] as the command to preprocess C files.
 Defaults to the \f[B]CPP\f[R] environment variable or to
 .RS
 .PP
@@ -208,13 +208,13 @@ Note that this option is often better replaced by
 \f[B]-cpp-extra-args\f[R].
 .TP
 -cpp-extra-args \f[I]args\f[R]
-gives additional arguments to the pre-processor.
-Pre-processing annotations is done in two separate pre-processing
+gives additional arguments to the preprocessor.
+Preprocessing annotations is done in two separate preprocessing
 stages.
 The first one is a normal pass on the C code which retains macro
 definitions.
 These are then used in the second pass during which annotations are
-pre-processed.
+preprocessed.
 \f[I]args\f[R] are used only for the first pass, so that arguments that
 should not be used twice (such as additional include directives or macro
 definitions) must thus go there instead of \f[B]-cpp-command\f[R].
@@ -406,10 +406,10 @@ When this option is on, a message is printed each time this occurs.
 Defaults to no.
 .TP
 [-no]-pp-annot
-pre-processes annotations.
+preprocesses annotations.
 This is currently only possible when using gcc (or GNU cpp)
-pre-processor.
-The default is to pre-process annotations when the default pre-processor
+preprocessor.
+The default is to preprocess annotations when the default preprocessor
 is identified as GNU or GNU-like.
 See also \f[B]-cpp-frama-c-compliant\f[R].
 .TP

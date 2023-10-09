@@ -1012,8 +1012,8 @@ module PreprocessAnnot =
     let module_name = "PreprocessAnnot"
     let option_name = "-pp-annot"
     let help =
-      "pre-process annotations (if they are read). Set by default if \
-       the pre-processor is GNU-like (see option -cpp-frama-c-compliant)"
+      "preprocess annotations (if they are read). Set by default if \
+       the preprocessor is GNU-like (see option -cpp-frama-c-compliant)"
   end)
 
 let () = Parameter_customize.set_group parsing
@@ -1068,9 +1068,9 @@ module CppGnuLike =
       let module_name = "CppGnuLike"
       let option_name = "-cpp-frama-c-compliant"
       let help =
-        "indicates that a custom pre-processor (see option -cpp-command) \
+        "indicates that a custom preprocessor (see option -cpp-command) \
          accepts the same set of options as GNU cpp. Set it to false if you \
-         have pre-processing issues with a custom pre-processor."
+         have preprocessing issues with a custom preprocessor."
     end)
 
 let () = Parameter_customize.set_group parsing
