@@ -480,9 +480,9 @@ let adjust_pwd fp cpp_command =
     let dir =
       match Json_compilation_database.get_dir fp with
       | None -> cwd
-      | Some d -> (d:>string)
+      | Some d -> d
     in
-    if cwd <> dir then Some dir, "cd " ^ dir ^ " && " ^ cpp_command
+    if cwd <> dir then Some dir, "cd " ^ (dir :> string) ^ " && " ^ cpp_command
     else None, cpp_command
   else None, cpp_command
 
@@ -567,7 +567,7 @@ let build_cpp_cmd = function
     in
     let workdir, cpp_command_with_chdir = adjust_pwd f cpp_command in
     if workdir <> None then
-      Parse_env.set_workdir ppf (Option.get workdir);
+      Parse_env.set_workdir ppf ((Option.get workdir) :> string);
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
@@ -595,10 +595,10 @@ let abort_with_detailed_pp_message f cpp_command =
     else ""
   in
   Kernel.abort
-    "failed to run: %s\n(PWD: %s)@\n\
+    "failed to run: %s\n(PWD: %a)@\n\
      %sSee chapter \"Preparing the Sources\" in the Frama-C user manual \
      for more details."
-    cpp_command (Filepath.pwd ()) possible_cause
+    cpp_command Filepath.Normalized.pretty (Filepath.pwd ()) possible_cause
 
 let parse_cabs cpp_command = function
   | NoCPP f ->

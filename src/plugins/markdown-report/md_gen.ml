@@ -618,7 +618,7 @@ let gen_report ~draft:is_draft () =
       Mdr_params.Output.option_name
   else
     try
-      Command.print_file (file:>string)
+      Command.print_file file
         (fun fmt ->
            Markdown.pp_pandoc fmt doc;
            Format.pp_print_newline fmt ()) ;

@@ -82,7 +82,7 @@ struct
         Format.fprintf fmt "_%s" s) ;
     Format.fprintf fmt ".%s" ext ;
     Format.pp_print_flush fmt ();
-    Buffer.contents buffer
+    Filepath.Normalized.of_string (Buffer.contents buffer)
 
   let file_logout ~pid ~model ~prover =
     let id = WpPropId.get_propid pid in

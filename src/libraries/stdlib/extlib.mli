@@ -292,8 +292,9 @@ val temp_file_cleanup_at_exit: ?debug:bool -> string -> string -> string
     @raise Temp_file_error if the temp file cannot be created.
 *)
 
-val temp_dir_cleanup_at_exit: ?debug:bool -> string -> string
-(** @raise Temp_file_error if the temp dir cannot be created. *)
+val temp_dir_cleanup_at_exit: ?debug:bool -> string -> Filepath.Normalized.t
+(** @raise Temp_file_error if the temp dir cannot be created.
+    @since Frama-C+dev modify return type *)
 
 val safe_remove: string -> unit
 (** Tries to delete a file and never fails. *)

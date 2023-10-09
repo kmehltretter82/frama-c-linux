@@ -316,7 +316,7 @@ let temp_dir_cleanup_at_exit ?(debug=false) base =
           else
             safe_remove_dir dir
         end ;
-      dir
+      Filepath.Normalized.of_string dir
     with Unix.Unix_error(err,_,_) ->
       if limit < 0 then
         raise (Temp_file_error (Unix.error_message err))

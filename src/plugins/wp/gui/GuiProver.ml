@@ -74,8 +74,8 @@ class prover ~(console:Wtext.text) ~prover =
       begin
         let fout = Wpo.get_file_logout wpo prover in
         let ferr = Wpo.get_file_logerr wpo prover in
-        let lout = Sys.file_exists fout in
-        let lerr = Sys.file_exists ferr in
+        let lout = Filepath.exists fout in
+        let lerr = Filepath.exists ferr in
         if lout || lerr then console#hrule ;
         console#scroll () ;
         console#printf "[%a] %a@." VCS.pp_prover prover VCS.pp_result res ;

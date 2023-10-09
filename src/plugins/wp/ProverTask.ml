@@ -114,7 +114,7 @@ let dump_buffer buffer = function
     if n > 0 then
       Command.write_file log (fun out -> Buffer.output_buffer out buffer)
     else if Wp_parameters.has_out () then
-      Extlib.safe_remove log
+      Extlib.safe_remove (log :> string)
 
 let echo_buffer buffer =
   let n = Buffer.length buffer in
@@ -133,7 +133,7 @@ let location file line = {
 }
 
 let pp_file ~message ~file =
-  if Sys.file_exists file then
+  if Filepath.exists file then
     Log.print_on_output
       begin fun fmt ->
         let bar = String.make 60 '-' in

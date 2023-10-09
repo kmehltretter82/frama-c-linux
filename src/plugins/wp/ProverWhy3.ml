@@ -793,26 +793,29 @@ class visitor (ctx:context) c =
     method on_library thy =
       let copy_file source =
         if not (Datatype.Filepath.equal
-                  (Datatype.Filepath.of_string (Filename.dirname source))
+                  (Filepath.dirname source)
                   (Wp_parameters.Share.get_dir "."))
         then
           let tgtdir = WpContext.directory () in
-          let why3src = Filename.basename source in
-          let target = Printf.sprintf "%s/%s" (tgtdir :> string) why3src in
+          let why3src = Filepath.basename source in
+          let target = Filepath.Normalized.concat tgtdir (why3src :> string) in
           Command.copy source target
       in
       let iter_file opt =
         match Str.split_delim regexp_col opt with
         | [file] ->
+          let path = Filepath.Normalized.of_string file in
           let filenoext = filenoext file in
-          copy_file file;
+          copy_file path;
           self#add_import_file [filenoext]
             (String.capitalize_ascii filenoext);
         | [file;lib] ->
-          copy_file file;
+          let path = Filepath.Normalized.of_string file in
+          copy_file path;
           self#add_import_file [filenoext file] lib;
         | [file;lib;name] ->
-          copy_file file;
+          let path = Filepath.Normalized.of_string file in
+          copy_file path;
           self#add_import_file_as [filenoext file] lib name;
         | _ -> why3_failure
                  "[driver] incorrect why3.file %S for library '%s'"
@@ -1226,7 +1229,7 @@ let call_prover_task ~timeout ~steps ~config prover call =
 (* --- Batch Prover                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let digest_task wpo drv ?script prover task =
+let digest_task wpo drv ?(script : Filepath.Normalized.t option) prover task =
   let file = Wpo.DISK.file_goal
       ~pid:wpo.Wpo.po_pid
       ~model:wpo.Wpo.po_model
@@ -1241,14 +1244,14 @@ let digest_task wpo drv ?script prover task =
                let hash = Digest.file fscript |> Digest.to_hex in
                Format.fprintf fmt "(* WP Script %s *)@\n" hash ;
                open_in fscript
-            ) script in
+            ) (script :> string option) in
         let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
         Option.iter close_in old ;
       end ;
-    Digest.file file |> Digest.to_hex
+    Digest.file (file :> string) |> Digest.to_hex
   end
 
-let run_batch pconf driver ~config ?script ~timeout ~steplimit ~memlimit
+let run_batch pconf driver ~config ?(script : Filepath.Normalized.t option) ~timeout ~steplimit ~memlimit
     prover task =
   let steps = match steplimit with Some 0 -> None | _ -> steplimit in
   let limit =
@@ -1273,7 +1276,7 @@ let run_batch pconf driver ~config ?script ~timeout ~steplimit ~memlimit
   let command = Why3.Whyconf.get_complete_command pconf ~with_steps in
   Wp_parameters.debug ~dkey "Prover command %S" command ;
   let inplace = if script <> None then Some true else None in
-  let call = Why3.Driver.prove_task_prepared ?old:script ?inplace
+  let call = Why3.Driver.prove_task_prepared ?old:(script :> string option) ?inplace
       ~command ~limit ~config driver task in
   call_prover_task ~config ~timeout ~steps prover call
 
@@ -1293,33 +1296,35 @@ let editor_command pconf =
 
 let scriptfile ~force ~ext wpo =
   let dir = Wp_parameters.get_session_dir ~force "interactive" in
-  Format.sprintf "%s/%s%s" (dir :> string) wpo.Wpo.po_sid ext
+  let filenoext = Filepath.Normalized.concat dir wpo.Wpo.po_sid in
+  Filepath.Normalized.concat filenoext ext
 
 let updatescript ~script driver task =
-  let backup = script ^ ".bak" in
-  Sys.rename script backup ;
-  let old = open_in backup in
+  let backup = Filepath.Normalized.concat script ".bak" in
+  Filepath.rename script backup ;
+  let old = open_in (backup :> string) in
   Command.pp_to_file script
     (fun fmt ->
        ignore @@ Why3.Driver.print_task_prepared ~old driver fmt task
     );
   close_in old ;
-  let d_old = Digest.file backup in
-  let d_new = Digest.file script in
-  if String.equal d_new d_old then Extlib.safe_remove backup
+  let d_old = Digest.file (backup :> string) in
+  let d_new = Digest.file (script :> string) in
+  if String.equal d_new d_old then Extlib.safe_remove (backup :> string)
 
 let editor ~script ~merge ~config pconf driver task =
   Task.sync editor_mutex
     begin fun () ->
-      Wp_parameters.feedback ~ontty:`Transient "Editing %S..." script ;
+      Wp_parameters.feedback ~ontty:`Transient "Editing %a..."
+        Filepath.Normalized.pretty script ;
       if merge then updatescript ~script driver task ;
       let command = editor_command pconf in
       Wp_parameters.debug ~dkey "Editor command %S" command ;
       call_prover_task ~config ~timeout:None ~steps:None pconf.prover @@
-      Why3.Call_provers.call_editor ~command ~config script
+      Why3.Call_provers.call_editor ~command ~config (script :> string)
     end
 
-let compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task =
+let compile ~(script : Filepath.Normalized.t) ~timeout ~memlimit ~config wpo pconf driver prover task =
   let digest = digest_task wpo driver ~script in
   let runner = run_batch ~config pconf driver ~script ~memlimit in
   Cache.get_result ~digest ~runner ~timeout ~steplimit:None prover task
@@ -1328,7 +1333,7 @@ let prepare ~mode wpo driver task =
   let ext = Filename.extension (Why3.Driver.file_of_task driver "S" "T" task) in
   let force = mode <> VCS.Batch in
   let script = scriptfile ~force wpo ~ext in
-  if Sys.file_exists script then Some (script, true) else
+  if Filepath.exists script then Some (script, true) else
   if force then
     begin
       Command.pp_to_file script
@@ -1354,7 +1359,7 @@ let interactive ~mode wpo pconf ~config driver prover task =
   | Some (script, merge) ->
     Wp_parameters.debug ~dkey "%s %a script %S@."
       (if merge then "Found" else "New")
-      Why3.Whyconf.print_prover prover script ;
+      Why3.Whyconf.print_prover prover (script :> string) ;
     match mode with
     | VCS.Batch ->
       compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task

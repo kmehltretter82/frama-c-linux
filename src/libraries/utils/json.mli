@@ -79,7 +79,7 @@ val load_channel : ?file:string -> in_channel -> t
 val load_string : string -> t
 (** Parses the Json in the string. *)
 
-val load_file : string -> t
+val load_file : Filepath.Normalized.t -> t
 (** May also raise system exception. *)
 
 (** {2 Printers} *)
@@ -90,7 +90,7 @@ val save_string : ?pretty:bool -> t -> string
 val save_buffer : ?pretty:bool -> Buffer.t -> t -> unit
 val save_channel : ?pretty:bool -> out_channel -> t -> unit
 val save_formatter : ?pretty:bool -> Format.formatter -> t -> unit
-val save_file : ?pretty:bool -> string -> t -> unit
+val save_file : ?pretty:bool -> Filepath.Normalized.t -> t -> unit
 
 (** {2 Accessors} *)
 

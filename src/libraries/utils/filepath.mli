@@ -221,8 +221,9 @@ val pp_pos : Format.formatter -> position -> unit
     symbolic links in directory names.
 
     @since 25.0-Manganese
+    @before Frama-C+dev return type was string instead of Normalized.t.
 *)
-val pwd : unit -> string
+val pwd : unit -> Normalized.t
 
 (** Equivalent to [Sys.file_exists].
     @since Frama-C+dev
