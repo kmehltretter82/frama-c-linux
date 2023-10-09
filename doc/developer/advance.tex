@@ -3822,8 +3822,8 @@ Populate_spec.populate_funspec ~do_body:true kf [`Exits; `Assigns]
 
 This code will generate specifications in the default behavior for the function
 \verb+kf+ using the selected mode (see the user manual~\cite{userman} for more
-details about mode selection). The parameter \verb+do_body+ (\verb+false+
-by default) is used to chose if we want to generate specification only on
+details about mode selection). The parameter \verb+do_body+ (\verb+false+ by
+default) is used to chose if we want to generate specification only on
 prototypes or also for functions with a body. We also give a list of clauses for
 which we want to generate some specifications. Here we only want to generate
 \verb+`Assigns+ and \verb+`Exits+ clauses, but \verb+`Requires+,
@@ -3837,9 +3837,36 @@ the selected mode) or by combining existing clauses from other behaviors.
 
 \subsection{Custom mode registration}
 
-If none of the available modes behave as needed, it is also possible to create
-a customized mode. For this, we need to define generation functions for each
-clause:
+If none of the available modes (described in the user manual~\cite{userman})
+behave as needed, it is also possible to create a customized mode. Let's say we
+want a mode to match these tables:
+\begin{table}[h]
+  \centering
+  \begin{minipage}{.5\linewidth}
+    \begin{tabular}{@{}l|ll@{}}
+      ~ & \multicolumn{1}{c}{Proto} & \multicolumn{1}{c}{Body}  \\ \midrule
+      \texttt{exits}        & \verb+\false+  & \verb+\false+ \\
+      \texttt{assigns}      & Auto\footnote{Automatically generated using the function parameters.} & \verb+\everything+ \\
+      \texttt{allocates}    & \multicolumn{1}{c}{-----} & \multicolumn{1}{c}{-----} \\
+      \texttt{terminates}   & \multicolumn{1}{c}{-----} & \multicolumn{1}{c}{-----} \\
+      \texttt{requires}     & \multicolumn{1}{c}{-----} & \multicolumn{1}{c}{-----} \\
+    \end{tabular}
+  \end{minipage}
+  \begin{minipage}{.4\linewidth}
+      \begin{tabular}{@{}l|l@{}}
+        \footnotetext{} %Align correctly with the other table
+        ~ & \multicolumn{1}{c}{Status} \\ \midrule
+        \texttt{exits}      & Dont\_know \\
+        \texttt{assigns}    & True \\
+        \texttt{allocates}  & \multicolumn{1}{c}{-----} \\
+        \texttt{terminates} & \multicolumn{1}{c}{-----} \\
+        \texttt{requires}   & \multicolumn{1}{c}{-----} \\
+    \end{tabular}
+  \end{minipage}
+\end{table}
+
+
+For this, we need to define generation functions ans status for each clause:
 
 \begin{ocamlcode}
 (* Generate exits \false clauses. *)
