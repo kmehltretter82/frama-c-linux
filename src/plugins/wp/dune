@@ -56,7 +56,6 @@
   (section (site (frama-c share)))
   (files
     (share/Makefile.resources as wp/Makefile.resources)
-    (share/install.ml as wp/install.ml)
     (share/why3/frama_c_wp/vlist.mlw as wp/why3/frama_c_wp/vlist.mlw)
     (share/why3/frama_c_wp/cbits.mlw as wp/why3/frama_c_wp/cbits.mlw)
     (share/why3/frama_c_wp/cint.mlw as wp/why3/frama_c_wp/cint.mlw)
