@@ -3809,28 +3809,31 @@ directly stored in the AST. These modules and functions are the following.
 
 \subsection{Specification generation}
 
-When the default behavior is missing in a function contract but needed by either
-\framac or a plug-in, it can call \verb+Populate_spec.populate_funspec+%
+Sometimes, \framac and plug-ins need and use \acsl specifications to improve
+their performances and/or results. Thus, \framac's API offers a way to generate
+default specification if it is missing (the whole default behavior is missing or
+only some specific clauses). For this purpose, we can call
+\verb+Populate_spec.populate_funspec+%
 \scodeidxdef{Populate\_spec}{populate\_funspec} as follows:
 
 \begin{ocamlcode}
 Populate_spec.populate_funspec ~do_body:true kf [`Exits; `Assigns]
 \end{ocamlcode}
 
-This code will generate specifications for the function \verb+kf+ using the
-selected mode (see the user manual~\cite{userman} for more details on how a mode
-is selected). The parameter \verb+do_body+ (\verb+false+ by default) is used to
-chose if we want to generate specification only on prototypes or also for
-functions with a body. We also give a list of clauses for which we want to
-generate some specifications. Here we only want to generate \verb+`Assigns+ and
-\verb+`Exits+ clauses, but \verb+`Requires+, \verb+`Allocates+ and
-\verb+`Terminates+ are also available. This function can take an optionnal
-argument \verb+loc:Cil_types.location+ which is a location used when emitting
-missing specification warnings. By default this location is set to the location
-of \verb+kf+.
+This code will generate specifications in the default behavior for the function
+\verb+kf+ using the selected mode (see the user manual~\cite{userman} for more
+details about mode selection). The parameter \verb+do_body+ (\verb+false+
+by default) is used to chose if we want to generate specification only on
+prototypes or also for functions with a body. We also give a list of clauses for
+which we want to generate some specifications. Here we only want to generate
+\verb+`Assigns+ and \verb+`Exits+ clauses, but \verb+`Requires+,
+\verb+`Allocates+ and \verb+`Terminates+ are also available. This function can
+take an optionnal argument \verb+loc:Cil_types.location+ which is a location
+used when emitting missing specification warnings. By default this location is
+set to the location of \verb+kf+.
 
-The generated specifications either come form nothing (generated using the
-selected mode) or by combining existing clauses from other behaviors.
+The generated specifications are either generated from nothing (using
+the selected mode) or by combining existing clauses from other behaviors.
 
 \subsection{Custom mode registration}
 
