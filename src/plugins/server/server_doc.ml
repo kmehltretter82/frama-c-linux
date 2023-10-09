@@ -45,7 +45,7 @@ type page = {
   title : string ;
   order : int ;
   descr : Markdown.elements ;
-  readme: string option ;
+  readme: Filepath.Normalized.t option ;
   mutable sections : section list ;
 }
 
@@ -99,7 +99,7 @@ let publish ~page ?name ?(index=[]) ~title
   page.sections <- section :: page.sections ; href
 
 let protocol ~title ~readme:filename =
-  let readme = Printf.sprintf "src/plugins/server/doc/%s"  filename in
+  let readme = Filepath.Normalized.concats Fc_config.datadir ["server"; "doc"; filename] in
   ignore (page `Protocol ~title ~readme ~filename ())
 
 let () = protocol ~title:"Architecture" ~readme:"server.md"
@@ -344,12 +344,12 @@ let dump ~root ?(meta=true) () =
          let intro = match page.readme with
            | None -> Markdown.section ~title page.descr
            | Some file ->
-             if Sys.file_exists file
-             then Markdown.rawfile file @ page.descr
+             if Filepath.exists file
+             then Markdown.rawfile (file :> string) @ page.descr
              else (
-               Senv.warning "Can not find %S file" file ;
-               Markdown.section ~title page.descr
-             )
+               Senv.warning "Can not find %a file"
+                 Filepath.Normalized.pretty file ;
+               Markdown.section ~title page.descr)
          in
          let body = Markdown.subsections page.descr (build [] page.sections) in
          pp_one_page ~root ~page:path ~title (intro @ body) ;
@@ -380,7 +380,7 @@ let () =
     fun () ->
       if not (Senv.Doc.is_empty ()) then
         let root = Senv.Doc.get () in
-        if Sys.is_directory (root:>string) then
+        if Filepath.is_dir root then
           begin
             Senv.feedback "[doc] Root: '%a'" Filepath.Normalized.pretty root ;
             Package.iter package ;
