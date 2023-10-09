@@ -256,7 +256,7 @@ external address_of_value: 'a -> int = "address_of_value" [@@noalloc]
 (** {2 System commands} *)
 (* ************************************************************************* *)
 
-val mkdir : ?parents:bool -> string -> Unix.file_perm -> unit
+val mkdir : ?parents:bool -> Filepath.Normalized.t -> Unix.file_perm -> bool
 (** [mkdir ?parents name perm] creates directory [name] with permission
     [perm]. If [parents] is true, recursively create parent directories
     if needed. [parents] defaults to false.
@@ -264,8 +264,13 @@ val mkdir : ?parents:bool -> string -> Unix.file_perm -> unit
     and then fail to create the children, e.g. if [perm] does not allow
     user execution of the created directory. This will leave the filesystem
     in a modified state before raising an exception.
+    Returns [true] if the directory was created, [false] otherwise.
     @raise Unix.Unix_error if cannot create [name] or its parents.
-    @since 19.0-Potassium  *)
+    @since 19.0-Potassium
+    @since Frama-C+dev added check for existence of path (error if exists
+    but not a directory, otherwise do nothing if directory already exists).
+    Changed type of [name] argument and return type.
+*)
 
 val safe_at_exit : (unit -> unit) -> unit
 (** Register function to call with [Stdlib.at_exit], but only
