@@ -159,25 +159,27 @@ let encapsulate_local_vars f =
     in
     let retvar =
       match ret.skind with
-      | Return(None, _) -> []
-      | Return(Some {enode = Lval (Var v,NoOffset)}, _) -> [v]
+      | Return(None, _) -> None
+      | Return(Some {enode = Lval (Var v,NoOffset)}, _) -> Some v
       | Return _ ->
         Kernel.fatal "Return node in unexpected format after oneret call"
       | _ ->
         Kernel.fatal "find_return did not return Return node"
     in
-    let ret_block_locals =
-      List.filter
-        (fun v ->
-           not (List.exists
-                  (fun v' -> Cil_datatype.Varinfo.equal v v') retvar))
-        ret_block.blocals
+    let filter_retvar_vi blocals =
+      Option.fold retvar
+        ~none:blocals
+        ~some:(fun retvar_vi ->
+            List.filter
+              (fun vi -> not (Cil_datatype.Varinfo.equal retvar_vi vi))
+              blocals)
     in
     ret_block.bstmts <- ret_block_body;
-    ret_block.blocals <- ret_block_locals;
+    ret_block.blocals <- filter_retvar_vi ret_block.blocals;
+    f.sbody.blocals <- filter_retvar_vi f.sbody.blocals;
     let s1 = Cil.mkStmt (Block f.sbody) in
     let b = Cil.mkBlock [ s1; ret] in
-    b.blocals <- retvar;
+    b.blocals <- Option.to_list retvar;
     f.sbody <- b
   end
 
