@@ -278,6 +278,9 @@ module Normalized = struct
 
   let of_string ?existence ?base_name s = normalize ?existence ?base_name s
   let concat ?existence t s = normalize ?existence (t ^ "/" ^ s)
+  let concats ?existence t sl =
+    let s' = List.fold_left (fun acc s -> acc ^ "/" ^ s) "" sl in
+    normalize ?existence (t ^ s')
   let to_pretty_string s = pretty s
   let to_string_list l = l
   let equal : t -> t -> bool = (=)

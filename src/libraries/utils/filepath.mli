@@ -82,6 +82,14 @@ module Normalized: sig
   *)
   val concat: ?existence:existence -> t -> string -> t
 
+  (**
+     [concats ~existence dir paths] concatenates a list of paths, as per
+     the [concat] function.
+
+     @since Frama-C+dev
+  *)
+  val concats: ?existence:existence -> t -> string list -> t
+
   (** [to_pretty_string p] returns [p] prettified,
       that is, a relative path-like string.
       Note that this prettified string may contain symbolic dirs and is thus
