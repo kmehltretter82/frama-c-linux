@@ -188,7 +188,12 @@ let add_symbolic_dir_list name =
 let reset_symbolic_dirs () = Hashtbl.clear symbolic_dirs
 
 let all_symbolic_dirs () =
-  List.sort Extlib.compare_basic @@
+  let compare (s1, s1') (s2, s2') =
+    let c = String.compare s1 s2 in
+    if c <> 0 then c
+    else String.compare s1' s2'
+  in
+  List.sort compare @@
   Hashtbl.fold (fun dir name acc -> (name, dir) :: acc) symbolic_dirs []
 
 let rec add_uri_path buffer path =
@@ -282,7 +287,10 @@ module Normalized = struct
     let s1 = pretty s1 in
     let s2 = pretty s2 in
     if case_sensitive then String.compare s1 s2
-    else Extlib.compare_ignore_case s1 s2
+    else
+      String.compare
+        (String.lowercase_ascii s1)
+        (String.lowercase_ascii s2)
 
   let empty = normalize ""
   let unknown = empty
