@@ -156,19 +156,6 @@ Analyses usually take place on the normalized version of the source code.
 The normalized version may be printed by using
 the option \optionuse{-}{print} (see Section~\ref{sec:io}).
 
-Normalization gives a program which is semantically equivalent to the
-original one, except for one point. Namely, when the specification of
-a function \texttt{f} that is only declared and has no ACSL
-\texttt{assigns} clause is required by some analysis, \FramaC
-generates an \texttt{assigns} clause based on the prototype of
-\texttt{f} (the form of this clause is left unspecified). Indeed, as
-mentioned in the ACSL manual~\cite{acsl}, assuming that \texttt{f} can
-write to any location in the memory would amount to stop any
-semantical analysis at the first call to \texttt{f}, since nothing
-would be known on the memory state afterwards. \emph{The user is
-  invited to check that the generated clause makes sense}, and to
-provide an explicit \texttt{assigns} clause if this is not the case.
-
 The following options allow to customize the normalization process.
 \begin{description}
 \item \optiondef{-}{aggressive-merging} forces some function
@@ -331,6 +318,101 @@ To ignore this disabling \pragmadef{UNROLL} pragma and force unrolling, the opti
 Passing a negative argument to \texttt{-ulevel} will disable unrolling, even
 in case of \texttt{UNROLL} pragma.
 \end{description}
+
+\section{Normalizing Contacts}\label{sec:normalize-contracts}
+
+Normalization gives a program which is semantically equivalent to the original
+one, but there is an exception for function contracts. By default, function
+contracts are left as is, but \FramaC and plug-ins can require the presence of
+some specification to improve their performances. When they do, then can ask
+\FramaC's kernel to generate specifications.
+
+For example, let's say we have a function \texttt{f} that is only declared and
+has no \acsl \texttt{assigns} clause, but these \texttt{assigns} are required by
+\Eva. \Eva will then ask the kernel to generate \texttt{assigns} before resuming
+the analysis. Indeed, as mentioned in the \acsl manual~\cite{acsl}, assuming
+that \texttt{f} can write to any location in the memory would amount to stop any
+semantical analysis at the first call to \texttt{f}, since nothing would be
+known on the memory state afterwards.
+
+The generation is done according to a \emph{mode} which can be selected via an
+option. A plug-in developer has also the possibility to create its own mode
+using \FramaC's API. The Plug-in Development Guide~\cite{plugin-dev-guide}
+describes all steps required to create and use a custom mode. All available
+modes are detailed in the following table:
+\begin{table}[h]
+  \begin{minipage}{\linewidth}
+    \begin{tabular}{@{}l|ll|ll|ll@{}}
+      \multicolumn{1}{c|}{ \multirow{2}{*}{Mode}}
+      & \multicolumn{2}{c|}{\texttt{ACSL}}
+      & \multicolumn{2}{c|}{\texttt{Frama\_C}}
+      & \multicolumn{2}{c}{\texttt{Safe}} \\
+
+      & \multicolumn{1}{c}{Proto}  & \multicolumn{1}{c|}{Body}
+      &  \multicolumn{1}{c}{Proto} & \multicolumn{1}{c|}{Body}
+      &  \multicolumn{1}{c}{Proto} & \multicolumn{1}{c}{Body} \\ \midrule
+
+      \texttt{exits}        & \multicolumn{1}{c}{-----}     & \multicolumn{1}{c|}{-----}
+                            & \verb+\false+                 & \verb+\false+
+                            & \multicolumn{1}{c}{-----}     & \verb+\false+ \\
+      \texttt{assigns}      & \verb+\everything+            & \verb+\everything+
+                            & Auto\footnote{Automatically generated using the function parameters.} & Auto
+                            & \verb+\everything+            & \verb+\nothing+ \\
+      \texttt{allocates}    & \verb+\nothing+               & \verb+\nothing+
+                            & \texttt{ACSL}\footnote{Refer to \texttt{ACSL} mode to see what is generated.} & \texttt{ACSL}
+                            & \verb+\everything+            & \verb+\nothing+ \\
+      \texttt{terminates}   & \verb+\true+                  & \verb+\true+
+                            & \texttt{ACSL}                 & \texttt{ACSL}
+                            & \verb+\false+                 & \verb+\true+ \\
+      \texttt{requires}     & \multicolumn{1}{c}{-----}     & \multicolumn{1}{c|}{-----}
+                            & \texttt{ACSL}                 & \texttt{ACSL}
+                            & \verb+\false+                 & \multicolumn{1}{c}{-----} \\
+    \end{tabular}
+  \end{minipage}
+\end{table}
+
+By default, \FramaC selects the mode \texttt{Frama\_C} and the following options
+allow selecting mode(s) for the specification generation.
+
+\begin{description}
+\item \texttt{\optiondef{-}{generated-spec-mode <mode>}} selects which
+\texttt{mode} will be used to generate missing specifications. \texttt{mode} can
+be either ``frama-c'', ``acsl'', ``safe'' or any custom mode registered inside
+a plug-in.
+
+\item \texttt{\optiondef{-}{generated-spec-custom
+<clause\_1:mode\_1,clause\_2:mode\_2,...>}} has a similar behavior than
+\optionuse{-}generated-spec-mode, except that it allows the user to choose a
+\texttt{mode} individually for each clause. It also allows the user to ignore
+\FramaC and/or plug-ins needs by skipping the generation for a clause, with the
+mode ``skip''. This mode is not available with \optionuse{-}generated-spec-mode
+and will be replaced by \texttt{Frama\_C}. For example:
+\begin{frama-c-commands}
+  \$ frama-c -generated-spec-custom requires:safe
+\end{frama-c-commands}
+Here every clause will be generated using the default mode \texttt{Frama\_C}
+except for \texttt{requires} which will be generated using the mode
+\texttt{Safe}.
+\end{description}
+
+Additionally, a status will be emitted for each generated clause according to
+the following table:
+
+\begin{table}[h]
+  \centering
+  \begin{tabular}{@{}l|l|l|l@{}}
+      \multicolumn{1}{c|}{Mode} &
+      \multicolumn{1}{c|}{\texttt{ACSL}} &
+      \multicolumn{1}{c|}{\texttt{Frama\_C}} &
+      \multicolumn{1}{c}{\texttt{Safe}} \\ \midrule
+
+      \texttt{exits}      & Dont\_know                 & Dont\_know & Dont\_know \\
+      \texttt{assigns}    & \multicolumn{1}{c|}{-----} & Dont\_know & Dont\_know \\
+      \texttt{allocates}  & True                       & Dont\_know & Dont\_know \\
+      \texttt{terminates} & True                       & Dont\_know & Dont\_know \\
+      \texttt{requires}   & \multicolumn{1}{c|}{-----} & \multicolumn{1}{c|}{-----} & \multicolumn{1}{c}{-----} \\
+  \end{tabular}
+\end{table}
 
 \section{Incremental parsing} (experimental)\label{sec:incremental-parsing}
 
