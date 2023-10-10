@@ -443,14 +443,14 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Styling ToolBar Action Field                                       --- */
+/* --- Styling ToolBar Search Field                                       --- */
 /* -------------------------------------------------------------------------- */
 
-.dome-xToolBar-actionComponent {
+.dome-xToolBar-searchComponent {
   overflow: visible;
 }
 
-.dome-xToolBar-actionField {
+.dome-xToolBar-searchField {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -464,23 +464,23 @@
   z-Index: +1;
 }
 
-.dome-xToolBar-actionField:focus-within {
+.dome-xToolBar-searchField:focus-within {
   width: 228px !important;
   box-shadow: 0 0 2px var(--border-discrete);
 }
 
-.dome-xToolBar-actionField div.dome-xToolBar-modeSelection {
+.dome-xToolBar-searchField div.dome-xToolBar-modeSelection {
   position: relative;
   padding: 3px 8px 0px 8px;
   cursor: pointer;
 }
 
-.dome-xToolBar-actionField SVG.dome-xToolBar-modeIcon {
+.dome-xToolBar-searchField SVG.dome-xToolBar-modeIcon {
   position: relative;
 }
 
 /* Style the search box inside the navigation bar */
-.dome-xToolBar-actionField input[type=search] {
+.dome-xToolBar-searchField input[type=search] {
   border: none;
   border-top-right-radius: 12px;
   border-bottom-right-radius: 12px;
@@ -492,7 +492,7 @@
   color: var(--text);
 }
 
-.dome-xToolBar-actionComponent div.dome-xToolBar-suggestions {
+.dome-xToolBar-searchComponent div.dome-xToolBar-suggestions {
   position: absolute;
   overflow-x: hidden;
   overflow-y: auto;
@@ -503,11 +503,11 @@
   border-radius: 12px;
 }
 
-.dome-xToolBar-actionComponent:focus-within div.dome-xToolBar-suggestions {
+.dome-xToolBar-searchComponent:focus-within div.dome-xToolBar-suggestions {
   width: 230px;
 }
 
-.dome-xToolBar-searchitem {
+.dome-xToolBar-searchItem {
   display: block ;
   width: 100% ;
   margin-left: 0px ;
@@ -516,11 +516,11 @@
   padding-right: 2px ;
 }
 
-.dome-xToolBar-searchitem:hover, .dome-xToolBar-searchindex {
+.dome-xToolBar-searchItem:hover, .dome-xToolBar-searchIndex {
   background: var(--selected-element) !important;
 }
 
-.dome-xToolBar-searchitem:nth-child(even) {
+.dome-xToolBar-searchItem:nth-child(even) {
   background: var(--background-alterning-even);
 }
 

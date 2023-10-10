@@ -30,7 +30,7 @@
  */
 
 import React from 'react';
-import { Event, find, usePromise } from 'dome';
+import * as Dome from 'dome';
 import { SVG } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';
@@ -305,7 +305,7 @@ export function Select(props: SelectionProps<string>): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
-// --- ModalActionField necessary types
+// --- ModalSearchField necessary types
 // --------------------------------------------------------------------------
 
 /** Description of a hint used to populate the suggestions. */
@@ -326,82 +326,26 @@ export function byHint(a: Hint, b: Hint): number {
 /** Type alias for functions that build hints list from a pattern. */
 export type HintsEvaluator = (pattern: string) => Promise<Hint[]>;
 
-/** Description of an action mode. */
-export interface ActionMode {
-  /** Mode tooltip title. */
-  title?: string;
-  /** Mode tooltip label. */
-  label: string;
-  /** Mode placeholder text. */
-  placeholder?: string;
-  /** Icon displayed when the mode is selected. */
-  icon: string;
-  /** CSS class for the mode section. */
-  className: string;
-  /** Hints provider. */
-  hints: HintsEvaluator;
-  /** Hint selection callback. Defaults to evaluate the <value> field. */
-  onHint?: (hint: Hint) => void;
-  /** Action to perform when Enter is hit. Useful for modes without hints. */
-  onEnter?: (pattern: string) => void;
-  /** Event that triggers a focus request. */
-  event?: Event<void>;
-}
-
 // --------------------------------------------------------------------------
-// --- ModalActionField default mode: Search
-// --------------------------------------------------------------------------
-
-const searchEvaluators = new Map<string, HintsEvaluator>();
-
-// Updates to the new evaluator if the id is already registered
-export function registerSearchHints(
-  id: string,
-  search: HintsEvaluator
-): void {
-  searchEvaluators.set(id, search);
-}
-
-export function unregisterSearchHints(id: string): void {
-  searchEvaluators.delete(id);
-}
-
-async function searchHints(pattern: string): Promise<Hint[]> {
-  if (pattern === '') return [];
-  const promises = Array.from(searchEvaluators).map(([_id, E]) => E(pattern));
-  const hints = await Promise.all(promises);
-  return hints.flat().sort(byHint);
-}
-
-const searchMode: ActionMode = {
-  label: "Search",
-  title: 'Search through the global definitions',
-  placeholder: "Search…",
-  icon: "SEARCH",
-  className: 'dome-xToolBar-searchMode',
-  hints: searchHints,
-  event: find,
-};
-
-// --------------------------------------------------------------------------
-// --- ModalActionField mode button component
+// --- ModalSearchField mode button component
 // --------------------------------------------------------------------------
 
 interface ModeButtonComponentProps {
-  current: ActionMode;
-  onClick: () => void;
+  icon: string;
+  className?: string;
+  onClick?: () => void;
 }
 
 function ModeButton(props: ModeButtonComponentProps): JSX.Element {
-  const { current, onClick } = props;
+  const { className, icon, onClick } = props;
   return (
     <div
-      className={classes("dome-xToolBar-modeSelection", current.className)}
+      className={classes("dome-xToolBar-modeSelection", className)}
       onClick={onClick}
     >
       <SVG
         className="dome-xToolBar-modeIcon"
-        id={current.icon}
+        id={icon}
         offset={-1}
       />
     </div>
@@ -409,7 +353,7 @@ function ModeButton(props: ModeButtonComponentProps): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
-// --- ModalActionField suggestions component
+// --- ModalSearchField suggestions component
 // --------------------------------------------------------------------------
 
 interface SuggestionsProps {
@@ -428,8 +372,8 @@ function Suggestions(props: SuggestionsProps): JSX.Element {
   // Computing the relevant suggestions. */
   const suggestions = hints.map((h, k) => {
     const selected = k === index || hints.length === 1;
-    const classSelected = selected && 'dome-xToolBar-searchindex';
-    const className = classes('dome-xToolBar-searchitem', classSelected);
+    const classSelected = selected && 'dome-xToolBar-searchIndex';
+    const className = classes('dome-xToolBar-searchItem', classSelected);
     return (
       <Label
         ref={selected ? scrollToRef : undefined}
@@ -457,10 +401,10 @@ function Suggestions(props: SuggestionsProps): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
-// --- ModalActionField input field component
+// --- ModalSearchField input field component
 // --------------------------------------------------------------------------
 
-interface ActionInputProps {
+interface SearchInputProps {
   title?: string;
   placeholder?: string;
   hints: Hint[];
@@ -473,7 +417,7 @@ interface ActionInputProps {
   inputRef: React.MutableRefObject<HTMLInputElement | null>;
 }
 
-function ActionInput(props: ActionInputProps): JSX.Element {
+function SearchInput(props: SearchInputProps): JSX.Element {
   const { title, placeholder, hints, onHint, onEnter } = props;
   const { index, setIndex, pattern, setPattern, inputRef } = props;
 
@@ -531,38 +475,160 @@ function ActionInput(props: ActionInputProps): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
-// --- ModalActionField component
+// --- SearchField
 // --------------------------------------------------------------------------
 
-export const RegisterMode: Event<ActionMode> =
-  new Event('dome.actionmode.register');
+const onHintDefault = (h: Hint): void => h.value();
 
-export const UnregisterMode: Event<ActionMode> =
-  new Event('dome.actionmode.unregister');
+export interface SearchFieldProps {
+  /** Mode tooltip title. */
+  title?: string;
+  /** Mode tooltip label. */
+  label: string;
+  /** Mode placeholder text. */
+  placeholder?: string;
+  /** Search Icon. */
+  icon: string;
+  /** Search Icon class. */
+  className: string;
+  /** Hints provider. */
+  hints: HintsEvaluator;
+  /** Hint selection callback. Defaults to evaluate the <value> field. */
+  onHint?: (hint: Hint) => void;
+  /** Search to perform when Enter is hit. Useful for modes without hints. */
+  onEnter?: (pattern: string) => void;
+  /** Signal to trigger a focus request from the search field. */
+  focus?: Dome.Event<void>;
+  /** Click on the Search Icon. */
+  onSearch?: () => void;
+  /** Focus gained by the Search Field. */
+  onFocus?: () => void;
+  /** Focus lost by the Search Field. */
+  onBlur?: () => void;
+}
 
-export function ModalActionField(): JSX.Element {
-
-  // Internal state of the component along with useful functions acting on it.
+export function SearchField(props: SearchFieldProps): JSX.Element {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const [index, setIndex] = React.useState(-1);
   const [pattern, setPattern] = React.useState('');
-  const [current, onModeChange] = React.useState<ActionMode>(searchMode);
+  const focusInput = React.useCallback(() => inputRef.current?.focus(), []);
+  Dome.useEvent(props.focus, focusInput);
+
+  // Compute the hints for the current mode.
+  const { hints, onHint = onHintDefault, onEnter } = props;
+  const hintsPromise = React.useMemo(() => hints(pattern), [pattern, hints]);
+  const { result = [] } = Dome.usePromise(hintsPromise);
+
+  // Build the component.
+  return (
+    <div className="dome-xToolBar-searchComponent"
+         onBlur={props.onBlur}
+         onFocus={props.onFocus}>
+      <div className="dome-xToolBar-searchField">
+        <ModeButton
+          icon={props.icon}
+          className={props.className}
+          onClick={props.onSearch} />
+        <SearchInput
+          title={props.title}
+          placeholder={props.placeholder}
+          hints={result}
+          onHint={onHint}
+          onEnter={onEnter}
+          index={index}
+          setIndex={setIndex}
+          pattern={pattern}
+          setPattern={setPattern}
+          inputRef={inputRef}
+        />
+      </div>
+      <Suggestions hints={result} onHint={onHint} index={index} />
+    </div>
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- ModalSearchField component
+// --------------------------------------------------------------------------
+
+const searchEvaluators = new Map<string, HintsEvaluator>();
+
+// Updates to the new evaluator if the id is already registered
+export function registerSearchHints(
+  id: string,
+  search: HintsEvaluator
+): void {
+  searchEvaluators.set(id, search);
+}
+
+export function unregisterSearchHints(id: string): void {
+  searchEvaluators.delete(id);
+}
+
+async function searchHints(pattern: string): Promise<Hint[]> {
+  if (pattern === '') return [];
+  const promises = Array.from(searchEvaluators).map(([_id, E]) => E(pattern));
+  const hints = await Promise.all(promises);
+  return hints.flat().sort(byHint);
+}
+
+const searchMode: SearchMode = {
+  label: "Search",
+  title: 'Search through the global definitions',
+  placeholder: "Search…",
+  icon: "SEARCH",
+  className: 'dome-xToolBar-searchMode',
+  hints: searchHints,
+};
+
+export const RegisterMode: Dome.Event<SearchMode> =
+  new Dome.Event('dome.actionmode.register');
+
+export const UnregisterMode: Dome.Event<SearchMode> =
+  new Dome.Event('dome.actionmode.unregister');
+
+export interface SearchMode {
+  /** Mode tooltip title. */
+  title?: string;
+  /** Mode tooltip label. */
+  label: string;
+  /** Mode placeholder text. */
+  placeholder?: string;
+  /** Search Icon. */
+  icon: string;
+  /** Search Icon class. */
+  className: string;
+  /** Hints provider. */
+  hints: HintsEvaluator;
+  /** Hint selection callback. Defaults to evaluate the <value> field. */
+  onHint?: (hint: Hint) => void;
+  /** Search to perform when Enter is hit. Useful for modes without hints. */
+  onEnter?: (pattern: string) => void;
+  /** Signal to trigger a focus request from the search field. */
+  focus?: Dome.Event<void>;
+}
+
+export function ModalActionField(): JSX.Element {
+    const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const [index, setIndex] = React.useState(-1);
+  const [pattern, setPattern] = React.useState('');
+  const [current, onModeChange] = React.useState<SearchMode>(searchMode);
   const focus = (): void => inputRef.current?.focus();
-  const changeMode = (m: ActionMode) =>
+  const changeMode = (m: SearchMode) =>
     (): void => { onModeChange(m); focus(); };
   const toDefault = (): void => onModeChange(searchMode);
-  const reset = (m: ActionMode): void => { if (current === m) toDefault(); };
+  const reset = (m: SearchMode): void => { if (current === m) toDefault(); };
 
   // Set of all modes currently active. We populate it by reacting to
   // RegisterMode and UnregisterMode events. We also activate the mode event if
   // available. Everything is cleaned when the component is unmounted.
-  const [allModes] = React.useState<Set<ActionMode>>(new Set());
+  const [allModes] = React.useState<Set<SearchMode>>(new Set());
   React.useEffect(() => {
-    const on = (m: ActionMode): void => m.event?.on(changeMode(m));
-    const register = (m: ActionMode): void => { allModes.add(m); on(m); };
-    const off = (m: ActionMode): void => m.event?.off(changeMode(m));
+    const on = (m: SearchMode): void => m.focus?.on(changeMode(m));
+    const register = (m: SearchMode): void => { allModes.add(m); on(m); };
+    const off = (m: SearchMode): void => m.focus?.off(changeMode(m));
     const remove =
-      (m: ActionMode): void => { allModes.delete(m); off(m); reset(m); };
+      (m: SearchMode): void => { allModes.delete(m); off(m); reset(m); };
     RegisterMode.on(register); UnregisterMode.on(remove);
     return () => { RegisterMode.off(register); UnregisterMode.off(remove); };
   });
@@ -573,12 +639,12 @@ export function ModalActionField(): JSX.Element {
   // Compute the hints for the current mode.
   const { hints, onHint = (h) => h.value(), onEnter } = current;
   const hintsPromise = React.useMemo(() => hints(pattern), [pattern, hints]);
-  const { result = [] } = usePromise(hintsPromise);
+  const { result = [] } = Dome.usePromise(hintsPromise);
 
-  // Auxiliary function that build a Hint from an ActionMode.
-  const modeToHint = (mode: ActionMode): Hint => {
+  // Auxiliary function that build a Hint from an SearchMode.
+  const modeToHint = (mode: SearchMode): Hint => {
     const { label, title = '', icon } = mode;
-    const id = 'ActionMode-' + title + '-' + icon;
+    const id = 'SearchMode-' + title + '-' + icon;
     const value = (): void => { onModeChange(mode); };
     return { id, icon, label, title, value, rank: -1000 };
   };
@@ -586,7 +652,7 @@ export function ModalActionField(): JSX.Element {
   // Hints provider for the mode of all modes.
   const modesHints = React.useCallback((input: string) => {
     const p = input.toLowerCase();
-    const fit = (m: ActionMode): boolean => m.label.toLowerCase().includes(p);
+    const fit = (m: SearchMode): boolean => m.label.toLowerCase().includes(p);
     return Promise.resolve(Array.from(allModes).filter(fit).map(modeToHint));
   }, [allModes]);
 
@@ -620,10 +686,13 @@ export function ModalActionField(): JSX.Element {
   const handleModeClick = changeMode(modesMode);
   const onBlur = (): void => reset(modesMode);
   return (
-    <div className="dome-xToolBar-actionComponent" onBlur={onBlur}>
-      <div className="dome-xToolBar-actionField">
-        <ModeButton current={current} onClick={handleModeClick} />
-        <ActionInput
+    <div className="dome-xToolBar-searchComponent" onBlur={onBlur}>
+      <div className="dome-xToolBar-searchField">
+        <ModeButton
+          icon={current.icon}
+          className={current.className}
+          onClick={handleModeClick} />
+        <SearchInput
           title={title}
           placeholder={placeholder}
           hints={result}
