@@ -141,7 +141,7 @@ let encapsulate_local_vars f =
       (fun v -> Cil.hasAttribute Cabs2cil.frama_c_destructor v.vattr)
       f.sbody.blocals
   then begin
-    let module M = struct exception Found of (block * stmt) end in
+    let exception Found of (block * stmt) in
     let vis = object
       val sb = Stack.create ()
       inherit Cil.nopCilVisitor
@@ -151,16 +151,16 @@ let encapsulate_local_vars f =
 
       method! vstmt s =
         match s.skind with
-        | Return _ -> raise (M.Found (Stack.top sb,s));
+        | Return _ -> raise (Found (Stack.top sb,s));
         | _ -> DoChildren
     end
     in
     let ret_block, ret =
       try
         ignore (visitCilBlock vis f.sbody);
-        Kernel.fatal "no return statement found inside %a"
+        Kernel.fatal "No return statement found inside %a"
           Cil_printer.pp_varinfo f.svar
-      with M.Found res -> res
+      with Found res -> res
     in
     let ret_block_body =
       List.filter
