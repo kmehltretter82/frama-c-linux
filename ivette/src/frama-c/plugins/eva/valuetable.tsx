@@ -36,13 +36,9 @@ import { GlobalState, useGlobalState } from 'dome/data/states';
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Inset } from 'dome/frame/toolbars';
-import * as Toolbars from 'dome/frame/toolbars';
 import { Cell, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Filler, Hpack, Hfill, Vpack, Vfill } from 'dome/layout/boxes';
-import { ipcRenderer } from 'electron';
-
-
 
 /* -------------------------------------------------------------------------- */
 /* --- Miscellaneous definitions                                          --- */
@@ -920,55 +916,54 @@ class FunctionsManager {
 /* --- Evaluation Mode Handling                                           --- */
 /* -------------------------------------------------------------------------- */
 
-export const evaluateEvent = new Dome.Event('dome.evaluate');
-ipcRenderer.on('dome.ipc.evaluate', () => evaluateEvent.emit());
-
 interface EvaluationModeProps {
   computationState : Eva.computationStateType | undefined;
   current: Location | undefined;
   setLocPin: (loc: Location, pin: boolean) => void;
 }
 
+const evalShortcut = System.platform === 'macos' ? 'Cmd+E' : 'Ctrl+E';
+const evalMode : Ivette.ModeProps = {
+  id: 'frama-c.eva.evalMode',
+  label: 'Evaluation',
+  title: `Evaluate an ACSL expression (shortcut: ${evalShortcut})`,
+  icon: 'TERMINAL',
+  className: 'eva-evaluation-mode',
+  enabled: false,
+};
+
 Dome.addMenuItem({
   menu: 'Edit',
-  id: 'EvaluateMenu',
-  type: 'normal',
+  id: evalMode.id,
   label: 'Evaluate',
   key: 'Cmd+E',
-  onClick: () => evaluateEvent.emit(),
+  enabled: false,
+  onClick: () => Ivette.focusMode(evalMode.id),
 });
 
 function useEvaluationMode(props: EvaluationModeProps): void {
   const { computationState, current, setLocPin } = props;
-  const handleError = (): void => { return; };
-  const addProbe = (marker: Ast.marker | undefined): void => {
-    if (current && marker) setLocPin({ ...current, marker }, true);
-  };
+  const enabled = computationState === 'computed' && current !== undefined;
   React.useEffect(() => {
-    if (computationState !== 'computed') return () => { return; };
-    const shortcut = System.platform === 'macos' ? 'Cmd+E' : 'Ctrl+E';
-    const onEnter = (pattern: string): void => {
-      if (current) {
-        const data = { stmt: current.marker, term: pattern };
+    if (enabled) {
+      const { fct, marker } = current;
+      const onEnter = (pattern: string): void => {
+        const data = { stmt: marker, term: pattern };
+        const handleError = (): void => { return; };
+        const addProbe = (target: Ast.marker | undefined): void => {
+          if (target) setLocPin({ fct, marker: target }, true);
+        };
         Server.send(Ast.parseExpr, data).then(addProbe).catch(handleError);
-      }
-    };
-    const evalMode = {
-      label: 'Evaluation',
-      title: `Evaluate an ACSL expression (shortcut: ${shortcut})`,
-      icon: 'TERMINAL',
-      className: 'eva-evaluation-mode',
-      hints: () => { return Promise.resolve([]); },
-      onEnter,
-      event: evaluateEvent,
-    };
-    Toolbars.RegisterMode.emit(evalMode);
-    return () => Toolbars.UnregisterMode.emit(evalMode);
-  });
-  React.useEffect(() => {
-    Dome.setMenuItem({ id: 'EvaluateMenu', enabled: current !== undefined });
-    return () => Dome.setMenuItem({ id: 'EvaluateMenu', enabled: false });
-  });
+      };
+      Ivette.updateMode({ id: evalMode.id, enabled: true, onEnter });
+    } else {
+      Ivette.updateMode({ id: evalMode.id, enabled: false });
+    }
+  }, [enabled, current, setLocPin]);
+  React.useEffect(
+    () => Dome.setMenuItem({ id: evalMode.id, enabled })
+    , [enabled]
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -984,6 +979,12 @@ export const CallstackState = new GlobalState<callstack>('Summary');
 const FunctionsManagerState = new GlobalState(new FunctionsManager());
 const FocusState = new GlobalState<Probe | undefined>(undefined);
 
+/* Helper for defined locations */
+const currentLoc = (
+  marker: Ast.marker | undefined,
+  fct: string | undefined
+): Location | undefined => ((marker && fct) ? { marker, fct } : undefined);
+
 /* Component */
 function EvaTable(): JSX.Element {
 
@@ -994,10 +995,7 @@ function EvaTable(): JSX.Element {
   const { marker, scope } = States.useCurrentLocation();
   const { kind, name } = States.useDeclaration(scope);
   const fct = kind === 'FUNCTION' ? name : undefined;
-  const current: Location | undefined = React.useMemo(
-    (): Location | undefined =>
-      ((marker && fct) ? { marker, fct } : undefined)
-    , [marker, fct]);
+  const current = React.useMemo(() => currentLoc(marker, fct), [marker, fct]);
   const [ cs, setCS ] = useGlobalState(CallstackState);
   const [ fcts ] = useGlobalState(FunctionsManagerState);
   const [ focus, setFocus ] = useGlobalState(FocusState);

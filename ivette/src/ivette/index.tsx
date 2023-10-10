@@ -36,6 +36,7 @@ import { DefineElement } from 'dome/layout/dispatch';
 import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
 import * as Lab from 'ivette@lab';
 import * as Ext from 'ivette@ext';
+import * as Mode from 'ivette@mode';
 
 /* --------------------------------------------------------------------------*/
 /* --- Items                                                              ---*/
@@ -197,6 +198,51 @@ export function registerToolbar(tools: ToolProps): void {
 
 export function registerStatusbar(status: ToolProps): void {
   Ext.STATUSBAR.register(status);
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Search Modes                                                       ---*/
+/* --------------------------------------------------------------------------*/
+
+export interface Hint {
+  id: string | number;
+  name?: string; // searched string
+  icon?: string; // displayed icon
+  label?: string; // displayed hint
+  title?: string; // tooltip for hint
+  rank?: number; // hint sorting
+  onClick?: () => void; // click on hint
+}
+
+export interface ModeProps {
+  id: string; // Mode identifier
+  icon?: string; // Search Field's Icons
+  label?: string; // Search Field in mode menu
+  title?: string; // Search Field tooltip
+  placeholder?: string; // Empty Search Field
+  enabled?: boolean; // Search Field input
+  className?: string; // Search Field Icon's class
+  hints?: () => Hint[]; // Hint sub-menu
+  onHint?: (hint: Hint) => void; // Hint selection
+  onEnter?: (pattern: string) => void; // Enter key for search field
+}
+
+export function registerMode(m: ModeProps): void { Mode.registerMode(m); }
+export function updateMode(m: ModeProps): void { Mode.updateMode(m); }
+export function removeMode(id: string): void { Mode.removeMode(id); }
+export function focusMode(id: string): void { Mode.focusMode(id); }
+export function useMode(m: ModeProps): void {
+  React.useEffect(() => {
+    const id = m.id;
+    const m0 = Mode.findMode(id);
+    Mode.registerMode({ ...m0, ...m });
+    return () => {
+      if (m0 !== undefined)
+        Mode.registerMode(m0);
+      else
+        Mode.removeMode(id);
+    };
+  }, [m]);
 }
 
 /* --------------------------------------------------------------------------*/

@@ -141,40 +141,40 @@ export function init(): void {
     label: 'Set source files…',
     id: 'file_set',
     onClick: setFiles,
-    type: 'normal',
+    kind: 'normal',
   });
   Dome.addMenuItem({
     menu: 'File',
     label: 'Add source files…',
     id: 'file_add',
     onClick: addFiles,
-    type: 'normal',
+    kind: 'normal',
   });
   Dome.addMenuItem({
     menu: 'File',
     label: 'Reparse',
     id: 'file_reparse',
     onClick: reparseFiles,
-    type: 'normal',
+    kind: 'normal',
   });
   Dome.addMenuItem({
     menu: 'File',
     id: 'file_separator',
-    type: 'separator',
+    kind: 'separator',
   });
   Dome.addMenuItem({
     menu: 'File',
     label: 'Load session…',
     id: 'file_load',
     onClick: loadSession,
-    type: 'normal',
+    kind: 'normal',
   });
   Dome.addMenuItem({
     menu: 'File',
     label: 'Save session…',
     id: 'file_save',
     onClick: saveSession,
-    type: 'normal',
+    kind: 'normal',
   });
 }
 

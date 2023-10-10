@@ -447,6 +447,12 @@ export function useSyncArrayModel<K, A>(
   return st.model;
 }
 
+/** Get Synchronized Array as data array. */
+export function getSyncArrayData<K, A>(arr: Array<K, A>): A[]
+{
+  return getSyncArray(arr).getArray();
+}
+
 /** Use Synchronized Array as a data array. */
 export function useSyncArrayData<K, A>(arr: Array<K, A>): A[]
 {
@@ -464,6 +470,15 @@ export function useSyncArrayElt<K, A>(
     () => arrayGet(model, elt, stamp),
     [model, elt, stamp]
   );
+}
+
+/** Get Synchronized Array element. */
+export function getSyncArrayElt<K, A>(
+  arr: Array<K, A>,
+  elt: K | undefined,
+): A | undefined {
+  const model = getSyncArray(arr);
+  return arrayGet(model, elt, 0);
 }
 
 /** Use Synchronized Array as an element data getter. */
@@ -603,6 +618,11 @@ export function useHovered(): Marker {
   return h;
 }
 
+export function getSelected(): Marker {
+  const { curr: { marker } } = GlobalHistory.getValue();
+  return marker;
+}
+
 export function useSelected(): Marker {
   const [{ curr: { marker } }] = useGlobalState(GlobalHistory);
   return marker;
@@ -705,11 +725,23 @@ export function useDeclaration(decl: Ast.decl | undefined): declaration {
   return data ?? Ast.declAttributesDataDefault;
 }
 
+/** Access the marker attributes from AST. */
+export function getDeclaration(decl: Ast.decl | undefined): declaration {
+  const data = getSyncArrayElt(Ast.declAttributes, decl);
+  return data ?? Ast.declAttributesDataDefault;
+}
+
 // --------------------------------------------------------------------------
 // --- Markers
 // --------------------------------------------------------------------------
 
 export type attributes = Ast.markerAttributesData;
+
+/** Access the marker attributes from AST. */
+export function getMarker(marker: Ast.marker | undefined): attributes {
+  const data = getSyncArrayElt(Ast.markerAttributes, marker);
+  return data ?? Ast.markerAttributesDataDefault;
+}
 
 /** Access the marker attributes from AST. */
 export function useMarker(marker: Ast.marker | undefined): attributes {

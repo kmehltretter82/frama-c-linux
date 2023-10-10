@@ -31,8 +31,8 @@ import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item } from 'dome/frame/sidebars';
 import { Button } from 'dome/controls/buttons';
-import * as Toolbars from 'dome/frame/toolbars';
 
+import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Locations from 'frama-c/kernel/Locations';
@@ -43,20 +43,25 @@ import * as Eva from 'frama-c/plugins/eva/api/general';
 // --- Global Search Hints
 // --------------------------------------------------------------------------
 
-async function lookupGlobals(pattern: string): Promise<Toolbars.Hint[]> {
-  const lookup = pattern.toLowerCase();
+function globalHints(): Ivette.Hint[] {
   const globals = States.getSyncArray(Ast.declAttributes).getArray();
-  return globals.filter((g) => (
-    0 <= g.name.toLowerCase().indexOf(lookup)
-  )).map((g : Ast.declAttributesData) => ({
+  return globals.map((g : Ast.declAttributesData) => ({
     id: g.decl,
-    label: g.name,
-    title: g.label,
-    value: () => States.setCurrentScope(g.decl)
+    name: g.name,
+    label: g.label,
+    onClick: () => States.setCurrentScope(g.decl),
   }));
 }
 
-Toolbars.registerSearchHints('frama-c.globals', lookupGlobals);
+const globalSearchMode : Ivette.ModeProps = {
+  id: 'frama-c.kernel.globals',
+  label: 'Globals',
+  title: 'Lookup for Global Variables',
+  hints: globalHints,
+};
+
+Ivette.registerMode(globalSearchMode);
+Dome.find.on(() => Ivette.focusMode(globalSearchMode.id));
 
 // --------------------------------------------------------------------------
 // --- Function Item

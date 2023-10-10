@@ -20,24 +20,22 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import React from 'react';
 import * as Dome from 'dome';
+import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
-import * as Toolbars from 'dome/frame/toolbars';
 import * as Status from 'frama-c/kernel/Status';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Locations from 'frama-c/kernel/Locations';
 import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
-import { ipcRenderer } from 'electron';
 import './style.css';
 
-const studiaWritesEvent = new Dome.Event('dome.studia.writes');
-const studiaReadsEvent = new Dome.Event('dome.studia.reads');
-ipcRenderer.on('dome.ipc.studia.writes', () => studiaWritesEvent.emit());
-ipcRenderer.on('dome.ipc.studia.reads', () => studiaReadsEvent.emit());
-
 type access = 'Reads' | 'Writes';
+
+function handleError(err: string): void {
+  const msg = `Studia failure: ${err}.`;
+  Status.setMessage({ text: msg, kind: 'error' });
+}
 
 async function computeStudiaSelection(
   kind: access,
@@ -45,8 +43,8 @@ async function computeStudiaSelection(
   descr: string,
 ): Promise<void> {
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
-  const data = await Server.send(request, marker);
-  const markers = data.direct.map(([, m]) => m);
+  const data = await Server.send(request, marker).catch(handleError);
+  const markers = data?.direct.map(([, m]) => m) ?? [];
   const asLocs = markers.length > 0;
   const label = `${asLocs ? kind : `No ${kind.toLowerCase}`} of ${descr}`;
   const access = kind === 'Reads' ? 'accessing' : 'modifying';
@@ -83,45 +81,54 @@ export function buildMenu(
       onClick: () => computeStudiaSelection('Writes', marker, descr)
     });
   }
+  if (marker && kind === 'STMT') {
+    menu.push({
+      label: `Studia: select reads of …`,
+      onClick: () => Ivette.focusMode(studiaReadsMode.id)
+    });
+    menu.push({
+      label: `Studia: select writes of …`,
+      onClick: () => Ivette.focusMode(studiaWritesMode.id)
+    });
+  }
 }
 
-export function useStudiaMode(): void {
-  const stmt = States.useSelected();
-  async function onEnter(term: string, kind: access): Promise<void> {
-    try {
-      const marker = await Server.send(Ast.parseLval, { stmt, term });
-      computeStudiaSelection(kind, marker, term);
-    } catch(err) {
-      const msg = `Studia failure: ${err}.`;
-      Status.setMessage({ text: msg, kind: 'error' });
-    }
+const studiaReadsMode : Ivette.ModeProps = {
+  id: 'frama-c.plugins.studia.reads',
+  label: 'Studia: reads',
+  title: 'Select all statements reading the given lvalue',
+  placeholder: 'lvalue',
+  icon: 'EDIT',
+  className: 'studia-search-mode',
+  onEnter: (p: string) => onEnter('Reads', p)
+};
+
+const studiaWritesMode : Ivette.ModeProps = {
+  id: 'frama-c.plugins.studia.writes',
+  label: 'Studia: writes',
+  title: 'Select all statements writing the given lvalue',
+  placeholder: "lvalue",
+  icon: 'EDIT',
+  className: 'studia-search-mode',
+  onEnter: (p: string) => onEnter('Writes', p)
+};
+
+async function onEnter(akind: access, term: string): Promise<void> {
+  const stmt = States.getSelected();
+  const { kind: mkind } = States.getMarker(stmt);
+  if (mkind === 'STMT') {
+    const marker = await Server.send(Ast.parseLval, { stmt, term })
+      .catch(handleError);
+    if (marker) computeStudiaSelection(akind, marker, term);
   }
-  const shared = {
-    placeholder: "lvalue",
-    icon: 'EDIT',
-    className: 'studia-search-mode',
-    hints: () => { return Promise.resolve([]); },
-  };
-  const writesMode = {
-    ...shared,
-    label: 'Studia: select writes',
-    title: `Select all statements writing the given lvalue`,
-    onEnter: (pattern:string) => onEnter(pattern, "Writes"),
-    event: studiaWritesEvent,
-  };
-  const readsMode = {
-    ...shared,
-    label: 'Studia: select reads',
-    title: `Selects all statements reading the given lvalue`,
-    onEnter: (pattern:string) => onEnter(pattern, "Reads"),
-    event: studiaReadsEvent,
-  };
-  React.useEffect(() => {
-    Toolbars.RegisterMode.emit(writesMode);
-    Toolbars.RegisterMode.emit(readsMode);
-    return () => {
-      Toolbars.UnregisterMode.emit(writesMode);
-      Toolbars.UnregisterMode.emit(readsMode);
-    };
-  });
 }
+
+Ivette.registerMode(studiaReadsMode);
+Ivette.registerMode(studiaWritesMode);
+States.GlobalHistory.on((s: States.History) => {
+  const marker = s.curr.marker;
+  const { kind } = States.getMarker(marker);
+  const enabled = marker !== undefined && kind === 'STMT';
+  Ivette.updateMode({ id: studiaReadsMode.id, enabled });
+  Ivette.updateMode({ id: studiaWritesMode.id, enabled });
+});
