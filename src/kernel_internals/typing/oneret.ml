@@ -120,12 +120,22 @@ let collect_returns (ca : Cil_types.code_annotation) =
   | _ -> []
 
 let encapsulate_local_vars f =
-  (* we must ensure that our gotos to the end of the function do not
-     bypass declaration of objects with destructors, or there will be
-     issues when inserting the destructor calls. If needed, enclose
-     the main body (except return and the declaration of the retvar)
-     inside its own block.
-  *)
+  (* We must ensure that our gotos to the end of the function do not bypass
+     declarations of objects with destructors, or we may miss to insert the
+     corresponding destructor calls. Here is an example, with T a class:
+
+     extern void Ctor(T* x);
+
+     int f(void) {
+       goto L;
+       T __attribute__((__fc_destructor)) x;
+       Ctor(&x);
+       L: return 42;
+     }
+
+     Treating such a special case may be hard and not sufficient. Then, although
+     coarse, our general solution is to enclose the function body (except the
+     return statement and the declaration of the retvar) inside a block. *)
   if
     List.exists
       (fun v -> Cil.hasAttribute Cabs2cil.frama_c_destructor v.vattr)
