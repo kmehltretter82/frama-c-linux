@@ -170,10 +170,11 @@ let encapsulate_local_vars f =
     in
     ret_block.bstmts <- ret_block_bstmts;
     let s1 = Cil.mkStmt (Block f.sbody) in
-    let b = Cil.mkBlock [ s1; ret_stmt] in
+    let b = Cil.mkBlock [s1; ret_stmt] in
     (* As we filtered [ret_stmt] out its original block, we now need to move the
        declaration of the return variable into [b]. Before doing that, we must
-       remove such a declaration from its original block. *)
+       remove such a declaration from its original block, which lies somewhere
+       in the stack of blocks [stack_block]. *)
     let retvar =
       match ret_stmt.skind with
       | Return(None, _) -> None
@@ -183,35 +184,13 @@ let encapsulate_local_vars f =
       | _ ->
         Kernel.fatal "find_return did not return Return node"
     in
-    (* Retrieve the block declaring [retvar], if any. *)
-    let retvar_decl_block =
-      match retvar with
-      | None -> None
-      | Some retvar ->
-        let contains_retvar =
-          List.exists (Cil_datatype.Varinfo.equal retvar)
-        in
-        let rec find_decl_block stack =
-          let block = Stack.pop_opt stack in
-          match block with
-          | None ->
-            Kernel.fatal "No block found declaring return variable %a"
-              Cil_printer.pp_varinfo retvar
-          | Some block ->
-            if contains_retvar block.blocals
-            then Some block
-            else find_decl_block stack
-        in
-        find_decl_block stack_block
+    let filter_vi vi block =
+      block.blocals <-
+        List.filter (fun vi' -> not (Cil_datatype.Varinfo.equal vi vi'))
+          block.blocals
     in
-    (* Filter [retvar] out its original declaration block [retvar_decl_block],
-       if any, as we will add such declaration to the outermost block [b]. *)
-    Option.fold retvar_decl_block ~none:() ~some:(fun retvar_decl_block ->
-        let retvar = Option.get retvar in
-        retvar_decl_block.blocals <-
-          List.filter
-            (fun vi -> not (Cil_datatype.Varinfo.equal retvar vi))
-            retvar_decl_block.blocals);
+    let iter_block vi = Stack.iter (filter_vi vi) stack_block in
+    Option.iter iter_block retvar;
     (* We can now safely add [retvar] into [b]'s declarations, and use [b] as
        the new function's body block. *)
     b.blocals <- Option.to_list retvar;
