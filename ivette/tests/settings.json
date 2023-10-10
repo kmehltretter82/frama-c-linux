@@ -32,9 +32,6 @@
     },
     "storage": {
         "Controller.history": [
-            "--working /home/damien/git/frama-c\n--command /home/damien/git/frama-c/bin/frama-c\n--with-fixed-settings test-settings.json",
-            "--working /home/damien/git/frama-c\n--command /home/damien/git/frama-c/bin/frama-c",
-            "--working /home/damien/git/frama-c\n--command /home/damien/git/frama-c/bin/frama-c\n-server-debug 1"
         ]
     },
     "devtools": false
