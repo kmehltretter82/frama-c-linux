@@ -83,10 +83,12 @@ help::
 # --- Ivette Distribution
 # --------------------------------------------------------------------------
 
-.PHONY: dist appimage dist-dir
+.PHONY: dist appimage dist-dir dist-windows dist-macOS dist-linux
 
 dist: dist-dir dome-dist
-appimage: dist-dir dome-appimage
+dist-linux: dist-dir dome-appimage
+dist-windows: dist-dir dome-dist-win
+dist-macOS: dist-dir dome-dist-mac
 
 dist-dir:
 	@echo "Cleaning dist"
@@ -108,6 +110,8 @@ dome-app: pkg
 dome-dev: pkg
 dome-dist: pkg
 dome-appimage: pkg
+dome-dist-win: pkg
+dome-dist-mac: pkg
 
 pkg: $(LOADER) $(SANDBOX)
 
