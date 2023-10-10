@@ -21,16 +21,22 @@
 /* ************************************************************************ */
 
 import { test } from "@playwright/test";
-import * as e2eService from "./libs/e2eService";
+import * as e2eService from "../libs/e2eService";
 
-test("launch app", async () => {
+test("server connection with a C file to analyze", async () => {
   const launchAppResult = await e2eService.launchApp(
-    e2eService.argsDefaultLaunch,
+    e2eService.argsLaunchWithTestFile,
   );
   const electronApp = launchAppResult.app;
   const window = launchAppResult.page;
 
-  await window.screenshot({ path: "screenshots/e2e-app-launch.png" });
+  await window.waitForTimeout(1000);
+
+  await window.screenshot({ path: "screenshots/e2e-file-loaded-before.png" });
+
+  await e2eService.testFileIsLoaded(window);
+
+  await window.screenshot({ path: "screenshots/e2e-file-loaded-after.png" });
 
   // Exit app.
   await electronApp.close();
