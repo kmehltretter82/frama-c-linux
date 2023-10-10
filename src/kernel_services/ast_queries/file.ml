@@ -480,9 +480,9 @@ let adjust_pwd fp cpp_command =
     let dir =
       match Json_compilation_database.get_dir fp with
       | None -> cwd
-      | Some d -> (d:>string)
+      | Some d -> d
     in
-    if cwd <> dir then Some dir, "cd " ^ dir ^ " && " ^ cpp_command
+    if cwd <> dir then Some dir, "cd " ^ (dir :> string) ^ " && " ^ cpp_command
     else None, cpp_command
   else None, cpp_command
 
@@ -505,7 +505,7 @@ let silence_cpp_machdep_warnings cmdl =
 let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
   | NeedCPP (f, cmdl, extra_for_this_file, is_gnu_like) ->
-    if not (Sys.file_exists (f :> string)) then
+    if not (Filepath.exists f) then
       Kernel.abort "source file %a does not exist"
         Filepath.Normalized.pretty f;
     let debug = Kernel.is_debug_key_enabled Kernel.dkey_parser in
@@ -567,7 +567,7 @@ let build_cpp_cmd = function
     in
     let workdir, cpp_command_with_chdir = adjust_pwd f cpp_command in
     if workdir <> None then
-      Parse_env.set_workdir ppf (Option.get workdir);
+      Parse_env.set_workdir ppf ((Option.get workdir) :> string);
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
@@ -595,14 +595,14 @@ let abort_with_detailed_pp_message f cpp_command =
     else ""
   in
   Kernel.abort
-    "failed to run: %s\n(PWD: %s)@\n\
+    "failed to run: %s\n(PWD: %a)@\n\
      %sSee chapter \"Preparing the Sources\" in the Frama-C user manual \
      for more details."
-    cpp_command (Filepath.pwd ()) possible_cause
+    cpp_command Filepath.Normalized.pretty (Filepath.pwd ()) possible_cause
 
 let parse_cabs cpp_command = function
   | NoCPP f ->
-    if not (Sys.file_exists (f:>string)) then
+    if not (Filepath.exists f) then
       Kernel.abort "preprocessed file %a does not exist"
         Filepath.Normalized.pretty f;
     Kernel.feedback "Parsing %a (no preprocessing)"
@@ -651,7 +651,7 @@ let parse_cabs cpp_command = function
     safe_remove_file ppf;
     (cil,(f,defs))
   | External (f,suf) ->
-    if not (Sys.file_exists (f:>string)) then
+    if not (Filepath.exists f) then
       Kernel.abort "file %a does not exist."
         Filepath.Normalized.pretty f;
     Kernel.feedback "Parsing %a (external front-end)"

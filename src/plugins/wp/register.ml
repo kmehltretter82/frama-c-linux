@@ -294,7 +294,7 @@ let stats_to_json g (s : Stats.stats) : Json.t =
   let source = fst (Property.location target) in
   let script = match ProofSession.get g with
     | NoScript -> []
-    | Script file | Deprecated file -> [ "script", `String file ]
+    | Script file | Deprecated file -> [ "script", `String (file :> string) ]
   in
   let index =
     match g.po_idx with
@@ -333,7 +333,7 @@ let stats_to_json g (s : Stats.stats) : Json.t =
 
 let do_report_json () =
   let file = Wp_parameters.ReportJson.get () in
-  if file <> "" then
+  if not (Filepath.Normalized.is_empty file) then
     let json = List.rev @@
       GOALS.fold
         (fun g json ->
@@ -612,19 +612,16 @@ let compute_auto ~script =
     end
 
 type session_scripts = {
-  updated: (Wpo.t * string * Json.t) list;
-  incomplete: (Wpo.t * string * Json.t) list;
-  removed: (Wpo.t * string) list;
+  updated: (Wpo.t * Filepath.Normalized.t * Json.t) list;
+  incomplete: (Wpo.t * Filepath.Normalized.t * Json.t) list;
+  removed: (Wpo.t * Filepath.Normalized.t) list;
 }
 
 let do_collect_session goals =
   let updated = ref [] in
   let incomplete = ref [] in
   let removed = ref [] in
-  let file goal =
-    Format.asprintf "%a"
-      ProofSession.pp_file @@ ProofSession.filename ~force:false goal
-  in
+  let file goal = ProofSession.filename ~force:false goal in
   Bag.iter
     begin fun goal ->
       let results = Wpo.get_results goal in
@@ -686,7 +683,7 @@ let do_update_session script session =
 let do_show_session updated_session session =
   let show enabled kind dkey file =
     if enabled then
-      Wp_parameters.result ~dkey "[%s] %a" kind ProofSession.pp_file file
+      Wp_parameters.result ~dkey "[%s] %a" kind Filepath.Normalized.pretty file
   in
   (* Note: we display new (in)valid scripts only when updating *)
   List.iter

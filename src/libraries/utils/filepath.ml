@@ -188,7 +188,12 @@ let add_symbolic_dir_list name =
 let reset_symbolic_dirs () = Hashtbl.clear symbolic_dirs
 
 let all_symbolic_dirs () =
-  List.sort Extlib.compare_basic @@
+  let compare (s1, s1') (s2, s2') =
+    let c = String.compare s1 s2 in
+    if c <> 0 then c
+    else String.compare s1' s2'
+  in
+  List.sort compare @@
   Hashtbl.fold (fun dir name acc -> (name, dir) :: acc) symbolic_dirs []
 
 let rec add_uri_path buffer path =
@@ -273,6 +278,9 @@ module Normalized = struct
 
   let of_string ?existence ?base_name s = normalize ?existence ?base_name s
   let concat ?existence t s = normalize ?existence (t ^ "/" ^ s)
+  let concats ?existence t sl =
+    let s' = List.fold_left (fun acc s -> acc ^ "/" ^ s) "" sl in
+    normalize ?existence (t ^ s')
   let to_pretty_string s = pretty s
   let to_string_list l = l
   let equal : t -> t -> bool = (=)
@@ -282,7 +290,10 @@ module Normalized = struct
     let s1 = pretty s1 in
     let s2 = pretty s2 in
     if case_sensitive then String.compare s1 s2
-    else Extlib.compare_ignore_case s1 s2
+    else
+      String.compare
+        (String.lowercase_ascii s1)
+        (String.lowercase_ascii s2)
 
   let empty = normalize ""
   let unknown = empty
@@ -328,6 +339,20 @@ type position =
 
 let pp_pos fmt pos =
   Format.fprintf fmt "%a:%d" Normalized.pretty pos.pos_path pos.pos_lnum
+
+let exists (s : Normalized.t) = Sys.file_exists (s :> string)
+
+let is_dir (s : Normalized.t) = Sys.is_directory (s :> string)
+
+let readdir (s : Normalized.t) = Sys.readdir (s :> string)
+
+let remove (s : Normalized.t) = Sys.remove (s :> string)
+
+let rename s t = Sys.rename s t
+
+let basename p = Filename.basename p
+
+let dirname p = Filename.dirname p
 
 (*
 Local Variables:

@@ -236,7 +236,7 @@ type packageInfo = {
   p_package : string list ;
   p_title : string ;
   p_descr : Markdown.text ;
-  p_readme : string option ;
+  p_readme : Filepath.Normalized.t option ;
   p_content : declInfo list ;
 }
 
@@ -383,9 +383,9 @@ let resolve_readme ~plugin = function
     let file =
       match plugin with
       | Kernel ->
-        Printf.sprintf "src/plugins/server/doc/%s" readme
+        Filepath.Normalized.concats Fc_config.datadir ["server"; "doc"; readme]
       | Plugin name ->
-        Printf.sprintf "src/plugins/%s/doc/%s" name readme
+        Filepath.Normalized.concats Fc_config.datadir [name; "doc"; readme]
     in Some file
 
 (* -------------------------------------------------------------------------- *)

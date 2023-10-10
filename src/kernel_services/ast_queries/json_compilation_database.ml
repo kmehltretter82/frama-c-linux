@@ -297,18 +297,18 @@ let parse_compilation_entry jcdb_dir r =
   update_flags_verbosely path (dirpath, flags)
 
 let compute_flags_from_file () =
-  let database = (Kernel.JsonCompilationDatabase.get () :> string) in
+  let database = Kernel.JsonCompilationDatabase.get () in
   let jcdb_dir, jcdb_path =
-    if Sys.is_directory database then
-      database, Filename.concat database "compile_commands.json"
-    else Filename.dirname database, database
+    if Filepath.is_dir database then
+      database, Filepath.Normalized.concat database "compile_commands.json"
+    else Filepath.dirname database, database
   in
   Kernel.feedback ~dkey:Kernel.dkey_compilation_db
-    "using compilation database: %s" jcdb_path;
+    "using compilation database: %a" Datatype.Filepath.pretty jcdb_path;
   begin
     try
       let r_list =
-        Yojson.Basic.from_file jcdb_path |> Yojson.Basic.Util.to_list
+        Yojson.Basic.from_file (jcdb_path :> string) |> Yojson.Basic.Util.to_list
       in
       let is_build_database =
         try
@@ -318,13 +318,13 @@ let compute_flags_from_file () =
       let parse_entry =
         if is_build_database then parse_build_entry else parse_compilation_entry
       in
-      List.iter (parse_entry jcdb_dir) r_list;
+      List.iter (parse_entry (jcdb_dir :> string)) r_list;
     with
     | Sys_error msg
     | Yojson.Json_error msg
     | Yojson.Basic.Util.Type_error (msg, _) ->
-      Kernel.abort "could not parse compilation database: %s@ %s"
-        database msg
+      Kernel.abort "could not parse compilation database: %a@ %s"
+        Datatype.Filepath.pretty database msg
   end;
   Flags.mark_as_computed ()
 

@@ -153,10 +153,10 @@ let load_channel ?file inc =
   end ;
   load_lexbuf lexbuf
 
-let load_file file =
-  let inc = open_in file in
+let load_file (file : Filepath.Normalized.t) =
+  let inc = open_in (file :> string) in
   try
-    let content = load_channel ~file inc in
+    let content = load_channel ~file:(file :> string) inc in
     close_in inc ; content
   with e ->
     close_in inc ; raise e
@@ -230,8 +230,8 @@ let save_channel ?(pretty=true) out v =
 let save_formatter ?(pretty=true) fmt v =
   if pretty then pp fmt v else pp_dump fmt v
 
-let save_file ?(pretty=true) file v =
-  let out = open_out file in
+let save_file ?(pretty=true) (file : Filepath.Normalized.t) v =
+  let out = open_out (file :> string) in
   try
     save_channel ~pretty out v ;
     close_out out

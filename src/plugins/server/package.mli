@@ -100,7 +100,7 @@ type packageInfo = {
   p_package : string list ;
   p_title : string ;
   p_descr : Markdown.text ;
-  p_readme : string option ;
+  p_readme : Filepath.Normalized.t option ;
   p_content : declInfo list ;
 }
 

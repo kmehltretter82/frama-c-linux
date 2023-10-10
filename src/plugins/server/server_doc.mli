@@ -46,7 +46,7 @@ val chapter : page -> chapter
 val page : chapter ->
   title:string ->
   ?descr:elements ->
-  ?readme:string ->
+  ?readme:Filepath.Normalized.t ->
   filename:string ->
   unit ->page
 

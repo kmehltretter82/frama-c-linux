@@ -35,7 +35,7 @@ type index =
 
 module DISK :
 sig
-  val file_goal : pid:prop_id -> model:WpContext.model -> prover:prover -> string
+  val file_goal : pid:prop_id -> model:WpContext.model -> prover:prover -> Filepath.Normalized.t
 end
 
 module GOAL :
@@ -95,10 +95,10 @@ val get_label : t -> string
 val get_model : t -> WpContext.model
 val get_scope : t -> WpContext.scope
 val get_context : t -> WpContext.context
-val get_file_logout : t -> prover -> string
+val get_file_logout : t -> prover -> Filepath.Normalized.t
 (** only filename, might not exists *)
 
-val get_file_logerr : t -> prover -> string
+val get_file_logerr : t -> prover -> Filepath.Normalized.t
 (** only filename, might not exists *)
 
 val qed_time : t -> float

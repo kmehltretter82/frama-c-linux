@@ -82,6 +82,14 @@ module Normalized: sig
   *)
   val concat: ?existence:existence -> t -> string -> t
 
+  (**
+     [concats ~existence dir paths] concatenates a list of paths, as per
+     the [concat] function.
+
+     @since Frama-C+dev
+  *)
+  val concats: ?existence:existence -> t -> string list -> t
+
   (** [to_pretty_string p] returns [p] prettified,
       that is, a relative path-like string.
       Note that this prettified string may contain symbolic dirs and is thus
@@ -213,8 +221,44 @@ val pp_pos : Format.formatter -> position -> unit
     symbolic links in directory names.
 
     @since 25.0-Manganese
+    @before Frama-C+dev return type was string instead of Normalized.t.
 *)
-val pwd : unit -> string
+val pwd : unit -> Normalized.t
+
+(** Equivalent to [Sys.file_exists].
+    @since Frama-C+dev
+*)
+val exists: Normalized.t -> bool
+
+(** Equivalent to [Sys.is_directory].
+    @since Frama-C+dev
+*)
+val is_dir: Normalized.t -> bool
+
+(** Equivalent to [Sys.readdir].
+    @since Frama-C+dev
+*)
+val readdir: Normalized.t -> string array
+
+(** Equivalent to [Sys.remove].
+    @since Frama-C+dev
+*)
+val remove: Normalized.t -> unit
+
+(** Equivalent to [Sys.rename].
+    @since Frama-C+dev
+*)
+val rename: Normalized.t -> Normalized.t -> unit
+
+(** Equivalent to [Filename.basename].
+    @since Frama-C+dev
+*)
+val basename: Normalized.t -> string
+
+(** Equivalent to [Filename.dirname].
+    @since Frama-C+dev
+*)
+val dirname: Normalized.t -> Normalized.t
 
 (*
   Local Variables:
