@@ -27,7 +27,6 @@
 import React from 'react';
 import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
-import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as DATA from 'frama-c/kernel/api/data';
 import * as AST from 'frama-c/kernel/api/ast';
@@ -143,9 +142,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
   const foreign = !!scope && fct !== scope;
   const [unfold, setUnfold] = React.useState(true);
   const [expand, setExpand] = React.useState(false);
-  const req = React.useMemo(() =>
-    Server.send(AST.getInformation, marker), [marker]);
-  const { result: markerFields = [] } = Dome.usePromise(req);
+  const markerFields = States.useRequest(AST.getInformation, marker) ?? [];
   const isScrolled = marker === scrolled;
   const isHovered = marker === hovered;
   const isSelected = marker === selected;
@@ -153,7 +150,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
     isSelected && 'selected',
     isHovered && 'hovered',
   );
-  const { labelKind, titleKind, name, descr } = attrs;
+  const { labelKind, titleKind, descr } = attrs;
   const filtered = markerFields.filter((fd) => !excluded.includes(fd.id));
   const hasMore = filtered.length < markerFields.length;
   const displayed = expand ? markerFields : filtered;
@@ -208,7 +205,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
         <Code key="NAME" className="astinfo-markercode">
           <span className="astinfo-markerkind" title={titleKind}>
             {labelKind}
-          </span> {name}
+          </span> {descr}
         </Code>
         <Code key="SCOPE" className="" display={foreign}>
           [in: {scope}]
