@@ -120,18 +120,28 @@ let collect_returns (ca : Cil_types.code_annotation) =
   | _ -> []
 
 let encapsulate_local_vars f =
-  (* we must ensure that our gotos to the end of the function do not
-     bypass declaration of objects with destructors, or there will be
-     issues when inserting the destructor calls. If needed, enclose
-     the main body (except return and the declaration of the retvar)
-     inside its own block.
-  *)
+  (* We must ensure that our gotos to the end of the function do not bypass
+     declarations of objects with destructors, or we may miss to insert the
+     corresponding destructor calls. Here is an example, with T a class:
+
+     extern void Ctor(T* x);
+
+     int f(void) {
+       goto L;
+       T __attribute__((__fc_destructor)) x;
+       Ctor(&x);
+       L: return 42;
+     }
+
+     Treating such a special case may be hard and not sufficient. Then, although
+     coarse, our general solution is to enclose the function body (except the
+     return statement and the declaration of the retvar) inside a block. *)
   if
     List.exists
       (fun v -> Cil.hasAttribute Cabs2cil.frama_c_destructor v.vattr)
       f.sbody.blocals
   then begin
-    let module M = struct exception Found of (block * stmt) end in
+    let exception Found of (block Stack.t * stmt) in
     let vis = object
       val sb = Stack.create ()
       inherit Cil.nopCilVisitor
@@ -141,43 +151,49 @@ let encapsulate_local_vars f =
 
       method! vstmt s =
         match s.skind with
-        | Return _ -> raise (M.Found (Stack.top sb,s));
+        | Return _ -> raise (Found (sb, s));
         | _ -> DoChildren
     end
     in
-    let ret_block, ret =
+    let stack_block, ret_stmt =
       try
         ignore (visitCilBlock vis f.sbody);
-        Kernel.fatal "no return statement found inside %a"
+        Kernel.fatal "No return statement found inside %a"
           Cil_printer.pp_varinfo f.svar
-      with M.Found res -> res
+      with Found res -> res
     in
-    let ret_block_body =
+    let ret_block = Stack.top stack_block in
+    let ret_block_bstmts =
       List.filter
-        (fun s -> not (Cil_datatype.Stmt.equal ret s))
+        (fun s -> not (Cil_datatype.Stmt.equal ret_stmt s))
         ret_block.bstmts
     in
+    ret_block.bstmts <- ret_block_bstmts;
+    let s1 = Cil.mkStmt (Block f.sbody) in
+    let b = Cil.mkBlock [s1; ret_stmt] in
+    (* As we filtered [ret_stmt] out its original block, we now need to move the
+       declaration of the return variable into [b]. Before doing that, we must
+       remove such a declaration from its original block, which lies somewhere
+       in the stack of blocks [stack_block]. *)
     let retvar =
-      match ret.skind with
-      | Return(None, _) -> []
-      | Return(Some {enode = Lval (Var v,NoOffset)}, _) -> [v]
+      match ret_stmt.skind with
+      | Return(None, _) -> None
+      | Return(Some {enode = Lval (Var v,NoOffset)}, _) -> Some v
       | Return _ ->
         Kernel.fatal "Return node in unexpected format after oneret call"
       | _ ->
         Kernel.fatal "find_return did not return Return node"
     in
-    let ret_block_locals =
-      List.filter
-        (fun v ->
-           not (List.exists
-                  (fun v' -> Cil_datatype.Varinfo.equal v v') retvar))
-        ret_block.blocals
+    let filter_vi vi block =
+      block.blocals <-
+        List.filter (fun vi' -> not (Cil_datatype.Varinfo.equal vi vi'))
+          block.blocals
     in
-    ret_block.bstmts <- ret_block_body;
-    ret_block.blocals <- ret_block_locals;
-    let s1 = Cil.mkStmt (Block f.sbody) in
-    let b = Cil.mkBlock [ s1; ret] in
-    b.blocals <- retvar;
+    let iter_block vi = Stack.iter (filter_vi vi) stack_block in
+    Option.iter iter_block retvar;
+    (* We can now safely add [retvar] into [b]'s declarations, and use [b] as
+       the new function's body block. *)
+    b.blocals <- Option.to_list retvar;
     f.sbody <- b
   end
 
