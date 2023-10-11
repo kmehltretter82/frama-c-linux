@@ -288,21 +288,25 @@ struct
   let eq ?(oracle=no_oracle) b1 b2 =
     cmp ~oracle b1 b2 = Equal
 
+  let missing_bound kind b =
+    (* Do not warn when -eva-multidim-fast-imprecise is set, as it is expected
+       that bounds cannot be retrieved in this case. *)
+    if not (Parameters.MultidimFastImprecise.get ())
+    then
+      Self.warning ~current:true ~once:true
+        "Multidim domain: cannot retrieve %s for %a"
+        kind pretty b;
+    `Top
+
   let lower_integer ~oracle b =
     match Int_val.min_int (to_int_val ~oracle b) with
     | Some l -> `Value l
-    | None ->
-      Self.warning ~current:true "cannot retrieve a lower bound for %a"
-        pretty b;
-      `Top
+    | None -> missing_bound "a lower bound" b
 
   let upper_integer ~oracle b =
     match Int_val.max_int (to_int_val ~oracle b) with
     | Some u -> `Value u
-    | None ->
-      Self.warning ~current:true "cannot retrieve an upper bound for %a"
-        pretty b;
-      `Top
+    | None -> missing_bound "an upper bound" b
 
   let lower_bound ~oracle b1 b2 =
     if b1 == b2 || eq b1 b2 then `Value b1 else
@@ -870,8 +874,8 @@ struct
       | `Value m -> m
       | `Bottom -> assert false
       | `Top ->
-        Self.warning ~current:true
-          "failed to introduce %a inside the array segmentation"
+        Self.warning ~current:true ~once:true
+          "Multidim domain: failed to introduce %a inside the array segmentation"
           Bound.pretty b;
         m
     in

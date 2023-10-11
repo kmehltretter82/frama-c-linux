@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 module CamlString = String
-module FramacFilepath = Filepath
 
 let empty_string = ""
 
@@ -318,13 +317,13 @@ struct
         end)
 
     let mk_dir d =
-      let d' = FramacFilepath.Normalized.of_string d in
+      let d' = Fc_Filepath.Normalized.of_string d in
       try
-        Extlib.mkdir ~parents:true d 0o755;
-        L.warning "creating %s directory `%a'" O.option_name FramacFilepath.Normalized.pretty d';
+        if Extlib.mkdir ~parents:true d' 0o755 then
+          L.warning "created %s directory `%a'" O.option_name Fc_Filepath.Normalized.pretty d';
         d
       with Unix.Unix_error _ ->
-        L.abort "cannot create %s directory `%a'" O.option_name FramacFilepath.Normalized.pretty d'
+        L.abort "cannot create %s directory `%a'" O.option_name Fc_Filepath.Normalized.pretty d'
 
     let set filepath = Dir_name.set filepath
     let get () = Dir_name.get ()
@@ -362,7 +361,7 @@ struct
               List.fold_left
                 (fun dummy d ->
                    let name = Datatype.Filepath.concat d s in
-                   if Sys.file_exists (name :> string)
+                   if Fc_Filepath.exists name
                    then raise (Found name)
                    else dummy)
                 None
@@ -404,7 +403,7 @@ struct
           | `Create_path ->
             begin
               (try
-                 if not (Sys.is_directory (filepath :> string))
+                 if not (Fc_Filepath.is_dir filepath)
                  then
                    (* [filepath] already exists, and it is a file. *)
                    L.abort
@@ -424,7 +423,7 @@ struct
       let filepath = Datatype.Filepath.concat base_dir s_basename in
       match mode with
       | `Must_exist ->
-        if Sys.file_exists (filepath :> string)
+        if Fc_Filepath.exists filepath
         then filepath
         else L.abort "there is no file %s in %s directories" (filepath :> string) O.option_name
       | `Normalize_only ->

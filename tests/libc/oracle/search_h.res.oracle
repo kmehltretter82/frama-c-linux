@@ -35,7 +35,7 @@
 [eva] Done for function strcpy
 [eva:alarm] search_h.c:32: Warning: 
   out of bounds write. assert \valid(&elementptr->count);
-[kernel:annot:missing-spec] search_h.c:34: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/search.h:61: Warning: 
   Neither code nor specification for function tsearch,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function tsearch <- main.
@@ -55,7 +55,7 @@
 [eva] Done for function exit
 [eva:alarm] search_h.c:40: Warning: 
   out of bounds read. assert \valid_read((struct element **)node);
-[kernel:annot:missing-spec] search_h.c:46: Warning: 
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/search.h:64: Warning: 
   Neither code nor specification for function twalk,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function twalk <- main.

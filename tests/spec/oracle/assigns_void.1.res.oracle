@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[kernel:annot:missing-spec] assigns_void.c:11: Warning: 
+[kernel:annot:missing-spec] assigns_void.c:7: Warning: 
   Neither code nor specification for function f,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- g.

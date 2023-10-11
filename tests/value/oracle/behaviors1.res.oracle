@@ -337,7 +337,7 @@
 [eva] Done for function test_assigns2
 [eva] computing for function test_small1 <- main.
   Called from behaviors1.i:649.
-[kernel:annot:missing-spec] behaviors1.i:506: Warning: 
+[kernel:annot:missing-spec] behaviors1.i:502: Warning: 
   Neither code nor explicit assigns for function f3,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f3 <- test_small1 <- main.
@@ -352,7 +352,7 @@
 [eva] Done for function test_small1
 [eva] computing for function test_small2 <- main.
   Called from behaviors1.i:650.
-[kernel:annot:missing-spec] behaviors1.i:521: Warning: 
+[kernel:annot:missing-spec] behaviors1.i:517: Warning: 
   Neither code nor explicit assigns for function f4,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f4 <- test_small2 <- main.
@@ -371,7 +371,7 @@
 [eva] Done for function test_small2
 [eva] computing for function test_small3 <- main.
   Called from behaviors1.i:651.
-[kernel:annot:missing-spec] behaviors1.i:534: Warning: 
+[kernel:annot:missing-spec] behaviors1.i:531: Warning: 
   Neither code nor explicit assigns for function f5,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f5 <- test_small3 <- main.
@@ -382,7 +382,7 @@
 [eva] Done for function test_small3
 [eva] computing for function test_small4 <- main.
   Called from behaviors1.i:652.
-[kernel:annot:missing-spec] behaviors1.i:548: Warning: 
+[kernel:annot:missing-spec] behaviors1.i:545: Warning: 
   Neither code nor explicit assigns for function f6,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f6 <- test_small4 <- main.
@@ -393,7 +393,7 @@
 [eva] Done for function test_small4
 [eva] computing for function test_small5 <- main.
   Called from behaviors1.i:653.
-[kernel:annot:missing-spec] behaviors1.i:561: Warning: 
+[kernel:annot:missing-spec] behaviors1.i:558: Warning: 
   Neither code nor explicit assigns for function f7,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f7 <- test_small5 <- main.

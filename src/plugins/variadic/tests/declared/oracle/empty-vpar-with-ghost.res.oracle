@@ -2,7 +2,7 @@
 [variadic] empty-vpar-with-ghost.i:8: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
-[kernel:annot:missing-spec] empty-vpar-with-ghost.i:8: Warning: 
+[kernel:annot:missing-spec] empty-vpar-with-ghost.i:5: Warning: 
   Neither code nor explicit assigns for function f,
    generating default clauses. See -generated-spec-* options for more info
 [eva] using specification for function f

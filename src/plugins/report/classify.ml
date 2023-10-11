@@ -175,7 +175,7 @@ let configure file =
     let path = Datatype.Filepath.of_string file in
     R.feedback "Loading '%a'" Datatype.Filepath.pretty path;
     try
-      match Json.load_file file with
+      match Json.load_file path with
       | `List values -> List.iter add_rule values
       | _ -> failwith "Array expected"
     with
@@ -521,7 +521,7 @@ let report_dump fmt =
 
 let report_output file =
   R.feedback "Output %a@." Filepath.Normalized.pretty file;
-  Command.print_file (file:>string) report_dump
+  Command.print_file file report_dump
 
 let report_number name nb opt =
   if nb > 0 then R.feedback "%s%4d" name nb ;

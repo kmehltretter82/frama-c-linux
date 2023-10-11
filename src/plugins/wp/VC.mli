@@ -38,7 +38,6 @@ val get_description : t -> string
 val get_property : t -> Property.t
 val get_result : t -> prover -> result
 val get_results : t -> (prover * result) list
-
 val get_sequent : t -> Conditions.sequent
 val get_formula: t -> Lang.F.pred
 val is_trivial : t -> bool

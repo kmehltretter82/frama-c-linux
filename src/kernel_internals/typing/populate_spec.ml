@@ -815,7 +815,7 @@ let clauses_fmt =
    - if we used existing clauses.
    - the number of generated clause types.
 *)
-let do_warning kf funspec = function
+let do_warning kf ?(loc=Kernel_function.get_location kf) funspec = function
   | None -> ()
   | Some (combined, clauses) ->
     let n = List.length clauses in
@@ -839,12 +839,12 @@ let do_warning kf funspec = function
           clauses Kernel_function.pretty kf source
     in
     Kernel.warning
-      ~once:true ~current:true ~wkey:Kernel.wkey_missing_spec
+      ~once:true ~source:(fst loc) ~wkey:Kernel.wkey_missing_spec
       "%s. See -generated-spec-* options for more info" msg
 
 (* Perform generation of all clauses, add them to the original specification,
    and emit property status for each of them. *)
-let do_populate kf clauses =
+let do_populate ?loc kf clauses =
   let original_spec = Annotations.funspec kf in
   let config = activated_config kf clauses in
 
@@ -865,7 +865,7 @@ let do_populate kf clauses =
   let allocates, warn = apply warn Allocates.get_default config.c_allocates in
   let terminates, warn = apply warn Terminates.get_default config.c_terminates in
 
-  do_warning kf original_spec warn;
+  do_warning ?loc kf original_spec warn;
 
   let generated original = function
     | Kept -> original
@@ -939,12 +939,12 @@ let todo_clauses kf clauses =
      OR
      [do_body] is true
 *)
-let populate_funspec ?(do_body=false) kf clauses =
+let populate_funspec ?loc ?(do_body=false) kf clauses =
   let todo = todo_clauses kf clauses in
   if todo <> [] then
     let has_body = Kernel_function.has_definition kf in
     if not has_body || do_body then begin
-      do_populate kf todo;
+      do_populate ?loc kf todo;
       List.iter (fun c -> Is_populated.add (kf, c) ()) todo
     end
 

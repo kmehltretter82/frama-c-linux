@@ -29,7 +29,7 @@
   st_tab3_int_3.t[0] ∈ {30}
                .t[1] ∈ {31}
                .t[2] ∈ {32}
-[kernel:annot:missing-spec] leaf.i:48: Warning: 
+[kernel:annot:missing-spec] leaf.i:3: Warning: 
   Neither code nor specification for function f_int_int,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f_int_int <- main.
@@ -57,35 +57,35 @@
 [eva] leaf.i:57: Frama_C_show_each_F: {5}
 [eva] leaf.i:59: Frama_C_show_each_G: {{ &g }}
 [eva] leaf.i:60: Frama_C_show_each_F: {5}
-[kernel:annot:missing-spec] leaf.i:62: Warning: 
+[kernel:annot:missing-spec] leaf.i:14: Warning: 
   Neither code nor specification for function f_star_int_cint,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f_star_int_cint <- main.
   Called from leaf.i:62.
 [eva] using specification for function f_star_int_cint
 [eva] Done for function f_star_int_cint
-[kernel:annot:missing-spec] leaf.i:64: Warning: 
+[kernel:annot:missing-spec] leaf.i:17: Warning: 
   Neither code nor specification for function f_star_int_int,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f_star_int_int <- main.
   Called from leaf.i:64.
 [eva] using specification for function f_star_int_int
 [eva] Done for function f_star_int_int
-[kernel:annot:missing-spec] leaf.i:65: Warning: 
+[kernel:annot:missing-spec] leaf.i:19: Warning: 
   Neither code nor specification for function f_tab3_int_int,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f_tab3_int_int <- main.
   Called from leaf.i:65.
 [eva] using specification for function f_tab3_int_int
 [eva] Done for function f_tab3_int_int
-[kernel:annot:missing-spec] leaf.i:66: Warning: 
+[kernel:annot:missing-spec] leaf.i:18: Warning: 
   Neither code nor specification for function f_tab_int_int,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f_tab_int_int <- main.
   Called from leaf.i:66.
 [eva] using specification for function f_tab_int_int
 [eva] Done for function f_tab_int_int
-[kernel:annot:missing-spec] leaf.i:68: Warning: 
+[kernel:annot:missing-spec] leaf.i:38: Warning: 
   Neither code nor specification for function f_st_star_cint_st_star_cint,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f_st_star_cint_st_star_cint <- main.
@@ -95,7 +95,7 @@
 [eva:garbled-mix:write] leaf.i:68: 
   Assigning imprecise value to st_star_cint_1.
   The imprecision originates from Library function {leaf.i:68}
-[kernel:annot:missing-spec] leaf.i:69: Warning: 
+[kernel:annot:missing-spec] leaf.i:39: Warning: 
   Neither code nor specification for function f_st_star_int_st_star_int,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f_st_star_int_st_star_int <- main.
@@ -105,28 +105,28 @@
 [eva:garbled-mix:write] leaf.i:69: 
   Assigning imprecise value to st_star_int_1.
   The imprecision originates from Library function {leaf.i:69}
-[kernel:annot:missing-spec] leaf.i:70: Warning: 
+[kernel:annot:missing-spec] leaf.i:40: Warning: 
   Neither code nor specification for function f_st_tab3_int_st_tab3_int,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f_st_tab3_int_st_tab3_int <- main.
   Called from leaf.i:70.
 [eva] using specification for function f_st_tab3_int_st_tab3_int
 [eva] Done for function f_st_tab3_int_st_tab3_int
-[kernel:annot:missing-spec] leaf.i:72: Warning: 
+[kernel:annot:missing-spec] leaf.i:42: Warning: 
   Neither code nor specification for function f_star_st_star_cint_int,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f_star_st_star_cint_int <- main.
   Called from leaf.i:72.
 [eva] using specification for function f_star_st_star_cint_int
 [eva] Done for function f_star_st_star_cint_int
-[kernel:annot:missing-spec] leaf.i:73: Warning: 
+[kernel:annot:missing-spec] leaf.i:43: Warning: 
   Neither code nor specification for function f_star_st_star_int_int,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f_star_st_star_int_int <- main.
   Called from leaf.i:73.
 [eva] using specification for function f_star_st_star_int_int
 [eva] Done for function f_star_st_star_int_int
-[kernel:annot:missing-spec] leaf.i:74: Warning: 
+[kernel:annot:missing-spec] leaf.i:44: Warning: 
   Neither code nor specification for function f_star_st_tab3_int_int,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f_star_st_tab3_int_int <- main.

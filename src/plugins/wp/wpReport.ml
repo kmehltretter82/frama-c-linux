@@ -891,8 +891,9 @@ let export_json gstat ?jinput ~joutput () =
             Wp_parameters.feedback "Report out: '%s'" joutput ;
             jinput
         in
-        if Sys.file_exists jfile then
-          Json.load_file jfile
+        let jpath = Filepath.Normalized.of_string jfile in
+        if Filepath.exists jpath then
+          Json.load_file jpath
         else `Null
       with Json.Error(file,line,msg) ->
         let source = Log.source ~file ~line in
@@ -900,7 +901,7 @@ let export_json gstat ?jinput ~joutput () =
         `Null
     in
     rankify_fcstat gstat js ;
-    Json.save_file joutput (json_of_fcstat gstat) ;
+    Json.save_file (Filepath.Normalized.of_string joutput) (json_of_fcstat gstat) ;
   end
 
 

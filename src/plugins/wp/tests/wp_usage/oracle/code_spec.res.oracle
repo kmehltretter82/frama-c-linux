@@ -1,10 +1,10 @@
 # frama-c -wp [...]
 [kernel] Parsing code_spec.i (no preprocessing)
 [wp] Running WP plugin...
-[kernel:annot:missing-spec] code_spec.i:126: Warning: 
+[kernel:annot:missing-spec] code_spec.i:73: Warning: 
   Neither code nor explicit assigns for function by_addr_in_spec,
    generating default clauses. See -generated-spec-* options for more info
-[kernel:annot:missing-spec] code_spec.i:126: Warning: 
+[kernel:annot:missing-spec] code_spec.i:76: Warning: 
   Neither code nor explicit assigns for function by_array_in_spec,
    generating default clauses. See -generated-spec-* options for more info
 .................................................

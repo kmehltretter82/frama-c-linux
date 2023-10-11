@@ -8,7 +8,7 @@
   ptf ∈ {0}
 [eva] computing for function g <- h.
   Called from ptr_fct.i:23.
-[kernel:annot:missing-spec] ptr_fct.i:17: Warning: 
+[kernel:annot:missing-spec] ptr_fct.i:11: Warning: 
   Neither code nor specification for function f2,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f2 <- g <- h.

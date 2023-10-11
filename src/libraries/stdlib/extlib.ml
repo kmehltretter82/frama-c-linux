@@ -233,17 +233,27 @@ external address_of_value: 'a -> int = "address_of_value" [@@noalloc]
   hence interrupting the process, might not work: child processes still need to
   run some daemons, such as [flush_all] which is registered by default. *)
 
-let rec mkdir ?(parents=false) name perm =
-  try Unix.mkdir name perm
-  with
-  | Unix.Unix_error (Unix.ENOENT,_,_) when parents ->
-    let parent_name = Filename.dirname name in
-    if name <> parent_name then
-      begin
-        mkdir ~parents parent_name perm;
-        Unix.mkdir name perm
-      end
-  | e -> raise e
+let rec mkdir ?(parents=false) (name: Filepath.Normalized.t) perm =
+  if Filepath.exists name then
+    if not (Filepath.is_dir name) then
+      failwith (Format.asprintf "mkdir: %a exists but is not a directory"
+                  Filepath.Normalized.pretty name)
+    else false
+  else begin
+    begin
+      try Unix.mkdir (name:>string) perm
+      with
+      | Unix.Unix_error (Unix.ENOENT,_,_) when parents ->
+        let parent_name = Filepath.dirname name in
+        if name <> parent_name then
+          begin
+            ignore (mkdir ~parents parent_name perm);
+            Unix.mkdir (name:>string) perm
+          end
+      | e -> raise e
+    end;
+    true
+  end
 
 let pid = Unix.getpid ()
 let safe_at_exit f =
@@ -306,7 +316,7 @@ let temp_dir_cleanup_at_exit ?(debug=false) base =
           else
             safe_remove_dir dir
         end ;
-      dir
+      Filepath.Normalized.of_string dir
     with Unix.Unix_error(err,_,_) ->
       if limit < 0 then
         raise (Temp_file_error (Unix.error_message err))

@@ -1,6 +1,6 @@
 let run () =
   let open Populate_spec in
-  let get_spec kf =
+  let generate_spec kf =
     let funspec = Annotations.funspec kf in
     populate_funspec ~do_body:true kf [`Exits];
     (* Populates assigns using old deprecated API function. *)
@@ -13,7 +13,7 @@ let run () =
     populate_funspec ~do_body:true kf
       [`Exits; `Assigns; `Requires; `Allocates; `Terminates]
   in
-  Globals.Functions.iter get_spec
+  Globals.Functions.iter generate_spec
 [@@ warning "-3"]
 
 let () = Db.Main.extend run

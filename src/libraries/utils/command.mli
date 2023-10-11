@@ -26,14 +26,12 @@
 (** {2 File Utilities} *)
 (* ************************************************************************* *)
 
-val filename : string -> string -> string
-
-val pp_to_file : string -> (Format.formatter -> unit) -> unit
+val pp_to_file : Filepath.Normalized.t -> (Format.formatter -> unit) -> unit
 (** [pp_to_file file pp] runs [pp] on a formatter that writes into [file].
     The formatter is always properly flushed and closed on return.
     Exceptions in [pp] are re-raised after closing. *)
 
-val pp_from_file : Format.formatter -> string -> unit
+val pp_from_file : Format.formatter -> Filepath.Normalized.t -> unit
 (** [pp_from_file fmt file] dumps the content of [file] into the [fmt].
     Exceptions in [pp] are re-raised after closing. *)
 
@@ -44,19 +42,19 @@ val bincopy : bytes -> in_channel -> out_channel -> unit
     Recommended size is [2048].
 *)
 
-val copy : string -> string -> unit
+val copy : Filepath.Normalized.t -> Filepath.Normalized.t -> unit
 (** [copy source target] copies source file to target file using [bincopy]. *)
 
-val read_file : string -> (in_channel -> 'a) -> 'a
+val read_file : Filepath.Normalized.t -> (in_channel -> 'a) -> 'a
 (** Properly close the channel and re-raise exceptions *)
 
-val read_lines : string -> (string -> unit) -> unit
+val read_lines : Filepath.Normalized.t -> (string -> unit) -> unit
 (** Iter over all text lines in the file *)
 
-val write_file : string -> (out_channel -> 'a) -> 'a
+val write_file : Filepath.Normalized.t -> (out_channel -> 'a) -> 'a
 (** Properly close the channel and re-raise exceptions *)
 
-val print_file : string -> (Format.formatter -> 'a) -> 'a
+val print_file : Filepath.Normalized.t -> (Format.formatter -> 'a) -> 'a
 (** Properly flush and close the channel and re-raise exceptions *)
 
 (* ************************************************************************* *)

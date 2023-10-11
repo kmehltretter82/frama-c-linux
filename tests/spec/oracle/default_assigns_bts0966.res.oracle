@@ -2,7 +2,7 @@
 [eva] Analyzing a complete application starting at main
 [eva:initial-state] Values of globals at initialization
   auto_states[0..3] ∈ {0}
-[kernel:annot:missing-spec] default_assigns_bts0966.i:34: Warning: 
+[kernel:annot:missing-spec] default_assigns_bts0966.i:27: Warning: 
   Neither code nor explicit assigns for function copy,
    generating default clauses from the specification. See -generated-spec-* options for more info
 [eva] using specification for function copy

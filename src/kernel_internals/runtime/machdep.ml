@@ -345,7 +345,6 @@ let gen_all_defines fmt mach =
 let generate_machdep_header mach =
   let debug = Kernel.(is_debug_key_enabled dkey_pp) in
   let temp = Extlib.temp_dir_cleanup_at_exit ~debug "__fc_machdep" in
-  let temp = Filepath.Normalized.of_string temp in
   let file = Filepath.Normalized.concat temp "__fc_machdep.h" in
   let chan = open_out (file:>string) in
   let fmt = Format.formatter_of_out_channel chan in

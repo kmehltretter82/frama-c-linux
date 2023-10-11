@@ -128,7 +128,7 @@ module Cache: Parameter_sig.String
 module CacheEnv: Parameter_sig.Bool
 module CacheDir: Parameter_sig.String
 module CachePrint: Parameter_sig.Bool
-module Drivers: Parameter_sig.String_list
+module Drivers: Parameter_sig.Filepath_list
 module Timeout: Parameter_sig.Int
 module Memlimit: Parameter_sig.Int
 module FctTimeout:
@@ -156,7 +156,7 @@ module TruncPropIdFileName: Parameter_sig.Int
 module Print: Parameter_sig.Bool
 module Status: Parameter_sig.Bool
 module Report: Parameter_sig.String_list
-module ReportJson: Parameter_sig.String
+module ReportJson: Parameter_sig.Filepath
 module OldReportJson: Parameter_sig.String
 module ReportName: Parameter_sig.String
 module MemoryContext: Parameter_sig.Bool
@@ -176,12 +176,12 @@ val get_session : force:bool -> unit -> Datatype.Filepath.t
 val get_session_dir : force:bool -> string -> Datatype.Filepath.t
 val get_output : unit -> Datatype.Filepath.t
 val get_output_dir : string -> Datatype.Filepath.t
-val make_output_dir : string -> unit
+val make_output_dir : Datatype.Filepath.t -> unit
 
 (** {2 Debugging Categories} *)
 
 val has_print_generated: unit -> bool
-val print_generated: ?header:string -> string -> unit
+val print_generated: ?header:string -> Filepath.Normalized.t -> unit
 (** print the given file if the debugging category
     "print-generated" is set *)
 

@@ -860,10 +860,12 @@ let () = on_reset Tactics.clear
 
 let () = Parameter_customize.set_group wp_prover
 module Drivers =
-  String_list
+  Filepath_list
     (struct
       let option_name = "-wp-driver"
       let arg_name = "file,..."
+      let file_kind = "WP library"
+      let existence = Fc_Filepath.Must_exist
       let help = "Load drivers for linking to external libraries"
     end)
 
@@ -1108,10 +1110,11 @@ module Report =
 let () = Parameter_customize.set_group wp_po
 let () = Parameter_customize.do_not_save ()
 module ReportJson =
-  String(struct
+  Filepath(struct
     let option_name = "-wp-report-json"
     let arg_name ="file.json"
-    let default = ""
+    let file_kind = "JSON report"
+    let existence = Fc_Filepath.Indifferent
     let help = "Output proof results in JSON format."
   end)
 let () = on_reset ReportJson.clear
@@ -1163,10 +1166,11 @@ module CheckMemoryContext =
 
 let () = Parameter_customize.set_group wp_po
 module OutputDir =
-  String(struct
+  Filepath(struct
+    let existence = Fc_Filepath.Indifferent
     let option_name = "-wp-out"
     let arg_name = "dir"
-    let default = ""
+    let file_kind = "directory"
     let help = "Set working directory for generated files.\n\
                 Defaults to some temporary directory."
   end)
@@ -1177,29 +1181,21 @@ module OutputDir =
 
 let dkey = register_category "output"
 
-let has_out () = OutputDir.get() <> ""
+let has_out () = Fc_Filepath.Normalized.is_empty (OutputDir.get ())
 
 let make_output_dir dir =
-  if Sys.file_exists dir then
-    begin
-      if not (Sys.is_directory dir) then
-        abort "File '%s' is not a directory (WP aborted)" dir ;
-    end
-  else
-    begin
-      try
-        Extlib.mkdir ~parents:true dir 0o770 ;
-        debug ~dkey "Created output directory '%s'" dir
-      with Unix.Unix_error (err,_,_) ->
-        let msg = Unix.error_message err in
-        abort
-          "System Error (%s)@\nCan not create output directory '%s'"
-          msg dir
-    end
+  try
+    if Extlib.mkdir ~parents:true dir 0o770 then
+      debug ~dkey "Created output directory '%a'" Fc_Filepath.Normalized.pretty dir
+  with Unix.Unix_error (err,_,_) ->
+    let msg = Unix.error_message err in
+    abort
+      "System Error (%s)@\nCan not create output directory '%a'"
+      msg Fc_Filepath.Normalized.pretty dir
 
 (*[LC] Do not projectify this reference : it is common to all projects *)
-let unique_tmp = ref None
-let make_tmp_dir () =
+let unique_tmp : Fc_Filepath.Normalized.t option ref = ref None
+let make_tmp_dir () : Fc_Filepath.Normalized.t =
   match !unique_tmp with
   | None ->
     let tmp =
@@ -1208,7 +1204,7 @@ let make_tmp_dir () =
         abort "Cannot create temporary file: %s" s
     in
     unique_tmp := Some tmp ;
-    debug ~dkey "Created temporary directory '%s'" tmp ;
+    debug ~dkey "Created temporary directory '%a'" Fc_Filepath.Normalized.pretty tmp ;
     tmp
   | Some tmp -> tmp
 
@@ -1218,9 +1214,9 @@ let make_gui_dir () =
       try Sys.getenv "USERPROFILE" (*Win32*) with Not_found ->
       try Sys.getenv "HOME" (*Unix like*) with Not_found ->
         "." in
-    let dir = home ^ "/" ^ ".frama-c-wp" in
-    if Sys.file_exists dir && Sys.is_directory dir then
-      Extlib.safe_remove_dir dir;
+    let dir = Fc_Filepath.Normalized.of_string (home ^ "/" ^ ".frama-c-wp") in
+    if Fc_Filepath.exists dir && Fc_Filepath.is_dir dir then
+      Extlib.safe_remove_dir (dir:>string);
     make_output_dir dir ; dir
   with _ ->
     make_tmp_dir ()
@@ -1229,18 +1225,22 @@ let make_gui_dir () =
 let base_output = ref None
 let base_output () =
   match !base_output with
-  | None -> let output =
-              match OutputDir.get () with
-              | "" ->
-                if Fc_config.is_gui
-                then make_gui_dir ()
-                else make_tmp_dir ()
-              | dir ->
-                make_output_dir dir ; dir in
+  | None ->
+    let output =
+      let dir = OutputDir.get () in
+      if Fc_Filepath.Normalized.is_empty dir then
+        if Fc_config.is_gui
+        then make_gui_dir ()
+        else make_tmp_dir ()
+      else begin
+        make_output_dir dir ;
+        dir
+      end
+    in
     base_output := Some output;
-    Fc_Filepath.(add_symbolic_dir "WPOUT" (Normalized.of_string output)) ;
-    Datatype.Filepath.of_string output
-  | Some output -> Datatype.Filepath.of_string output
+    Fc_Filepath.(add_symbolic_dir "WPOUT" output) ;
+    output
+  | Some output -> output
 
 let get_output () =
   let base = base_output () in
@@ -1249,22 +1249,22 @@ let get_output () =
   if name = "default" then base
   else
     let dir = Datatype.Filepath.concat base name in
-    make_output_dir (dir :> string) ; dir
+    make_output_dir dir ; dir
 
 let get_output_dir d =
   let base = get_output () in
   let path = Datatype.Filepath.concat base d in
-  make_output_dir (path :> string) ; path
+  make_output_dir path ; path
 
 (* -------------------------------------------------------------------------- *)
 (* --- Session dir                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let default = Fc_Filepath.pwd () ^ "/.frama-c"
+let default = Fc_Filepath.(Normalized.concat (pwd ()) "/.frama-c")
 
 let has_session () =
   Session.is_set () ||
-  ( Sys.file_exists default && Sys.is_directory default )
+  ( Fc_Filepath.exists default && Fc_Filepath.is_dir default )
 
 let get_session ~force () =
   if force then
@@ -1278,7 +1278,7 @@ let get_session ~force () =
 let get_session_dir ~force d =
   let base = get_session ~force () in
   let path = Datatype.Filepath.concat base d in
-  if force then make_output_dir (path :> string) ; path
+  if force then make_output_dir path ; path
 
 (* -------------------------------------------------------------------------- *)
 (* --- Print Generated                                                    --- *)
@@ -1290,11 +1290,11 @@ let has_print_generated () = has_dkey cat_print_generated
 
 let print_generated ?header file =
   let header = match header with
-    | None -> Fc_Filepath.Normalized.to_pretty_string (Datatype.Filepath.of_string file)
+    | None -> Fc_Filepath.Normalized.to_pretty_string file
     | Some head -> head in
   debug ~dkey:cat_print_generated "%S@\n%t@." header
     begin fun fmt ->
-      if not (Sys.file_exists file) then
+      if not (Fc_Filepath.exists file) then
         Format.pp_print_string fmt "<missing file>"
       else
         Command.read_lines file (fun s ->

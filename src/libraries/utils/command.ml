@@ -27,10 +27,8 @@ let safe_close_in inc = try close_in inc with Sys_error _ -> ()
 (* --- File Utilities                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-let filename parent child = Filename.concat parent child
-
-let pp_to_file f pp =
-  let cout = open_out f in
+let pp_to_file (f: Filepath.Normalized.t) pp =
+  let cout = open_out (f :> string) in
   let fout = Format.formatter_of_out_channel cout in
   try
     pp fout ;
@@ -41,8 +39,8 @@ let pp_to_file f pp =
     safe_close_out cout ;
     raise err
 
-let pp_from_file fmt file =
-  let cin = open_in file in
+let pp_from_file fmt (file: Filepath.Normalized.t) =
+  let cin = open_in (file :> string) in
   try
     while true do
       Db.yield () ;
@@ -65,13 +63,13 @@ let rec bincopy buffer cin cout =
   else
     ( flush cout )
 
-let on_inc file job =
-  let inc = open_in file in
+let on_inc (file: Filepath.Normalized.t) job =
+  let inc = open_in (file :> string) in
   let finally () = safe_close_in inc in
   Fun.protect ~finally (fun () -> job inc)
 
-let on_out file job =
-  let out = open_out file in
+let on_out (file: Filepath.Normalized.t) job =
+  let out = open_out (file :> string) in
   let finally () = safe_close_out out in
   Fun.protect ~finally (fun () -> job out)
 
@@ -79,8 +77,8 @@ let copy src tgt =
   on_inc src
     (fun inc -> on_out tgt (fun out -> bincopy (Bytes.create 2048) inc out))
 
-let read_file file job =
-  let inc = open_in file in
+let read_file (file: Filepath.Normalized.t) job =
+  let inc = open_in (file :> string) in
   let finally () = safe_close_in inc in
   Fun.protect ~finally (fun () -> job inc)
 
@@ -94,8 +92,8 @@ let read_lines file job =
        with End_of_file -> ())
 
 let write_file file job =
-  assert (file <> "");
-  let out = open_out file in
+  assert (not (Filepath.Normalized.is_empty file));
+  let out = open_out (file :> string) in
   let finally () = flush out; safe_close_out out in
   Fun.protect ~finally (fun () -> job out)
 
@@ -227,8 +225,8 @@ let command_generic ~async ?stdout ?stderr cmd args =
       else
         begin
           let result = Result status in
-          flush stdout outf ;
-          flush stderr errf ;
+          flush stdout (Filepath.Normalized.of_string outf) ;
+          flush stderr (Filepath.Normalized.of_string errf) ;
           delete () ;
           deleted () ;
           killed () ;

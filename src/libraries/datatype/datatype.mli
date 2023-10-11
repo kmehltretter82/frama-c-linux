@@ -348,6 +348,7 @@ module Filepath: sig
   val pp_abs: Format.formatter -> t -> unit
   val dummy: t
 end
+val filepath: Filepath.t Type.t
 
 (* ****************************************************************************)
 (** {2 Generic functors for polymorphic types} *)

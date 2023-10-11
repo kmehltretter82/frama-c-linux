@@ -322,7 +322,8 @@ let cmdline () =
     begin
       try
         server := option ;
-        if Sys.file_exists addr then Unix.unlink addr ;
+        let addr_path = Filepath.Normalized.of_string addr in
+        if Filepath.exists addr_path then Unix.unlink addr ;
         let fd = Unix.socket PF_UNIX SOCK_STREAM 0 in
         Unix.bind fd (ADDR_UNIX addr) ;
         if Senv.debug_atleast 1 then

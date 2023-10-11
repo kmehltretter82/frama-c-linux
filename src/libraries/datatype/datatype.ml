@@ -129,7 +129,7 @@ end
 
 let check f fname tname fstr =
   assert
-    (if f == undefined && Type.may_use_obj () then begin
+    (if f == undefined then begin
         Format.printf "@[Preliminary datatype check failed.@\n\
                        Value `%s' of type %s is required for building %s.@]@."
           fname tname fstr;
@@ -187,14 +187,13 @@ struct
       else
       if rehash == identity then d
       else
-      if Type.may_use_obj () then begin
-        if Descr.is_unmarshable d then begin
-          check undefined "structural_descr" name "descriptor";
-          assert false
-        end;
-        Descr.transform d rehash
-      end else
-        Descr.unmarshable
+        begin
+          if Descr.is_unmarshable d then begin
+            check undefined "structural_descr" name "descriptor";
+            assert false
+          end;
+          Descr.transform d rehash
+        end
     in
     descr, Descr.pack descr
 
@@ -348,7 +347,7 @@ module Polymorphic2(P: Polymorphic2_input) = struct
     include Build
         (struct
           include T
-          let reprs = if Type.may_use_obj () then Type.reprs ty else []
+          let reprs = Type.reprs ty
           let build mk f1 f2 =
             if mk == undefined || f1 == undefined || f2 == undefined then
               undefined
@@ -462,7 +461,7 @@ struct
     include Build
         (struct
           include T
-          let reprs = if Type.may_use_obj () then Type.reprs ty else []
+          let reprs = Type.reprs ty
           let build mk f1 f2 f3 =
             if mk == undefined || f1 == undefined || f2 == undefined ||
                f3 == undefined
@@ -592,7 +591,7 @@ struct
     include Build
         (struct
           include T
-          let reprs = if Type.may_use_obj () then Type.reprs ty else []
+          let reprs = Type.reprs ty
           let build mk f1 f2 f3 f4 =
             if mk == undefined || f1 == undefined || f2 == undefined ||
                f3 == undefined || f4 == undefined
@@ -738,8 +737,7 @@ struct
     let copy = undefined
     let pretty = undefined
     let mem_project = never_any_project
-    let reprs =
-      if Type.may_use_obj () then Type.reprs ty else [ fun _ -> assert false ]
+    let reprs = Type.reprs ty
   end
   include T
   include Build(T)
@@ -848,7 +846,7 @@ module Polymorphic_gen(P: Polymorphic_input) = struct
               else fun p x -> P.mk_mem_project f p x
             in
             build mk X.mem_project
-          let reprs = if Type.may_use_obj () then Type.reprs ty else []
+          let reprs = Type.reprs ty
         end)
 
     let descr, packed_descr =
@@ -1719,6 +1717,7 @@ module Filepath = struct
   let concat ?existence t s = Filepath.Normalized.concat ?existence t s
   let pp_abs = Filepath.Normalized.pp_abs
 end
+let filepath = Filepath.ty
 
 (* ****************************************************************************)
 (** {3 Triple} *)

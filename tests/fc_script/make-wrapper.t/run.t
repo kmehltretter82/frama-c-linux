@@ -29,7 +29,7 @@ verbose output for Make.
             main
   [eva] using specification for function large_name_to_force_line_break_in_stack_msg
   [eva] using specification for function specified
-  [kernel:annot:missing-spec] make-wrapper.c:29: Warning: 
+  [kernel:annot:missing-spec] make-wrapper.c:14: Warning: 
     Neither code nor specification for function external,
      generating default assigns. See -generated-spec-* options for more info
   [kernel] User Error: warning annot:missing-spec treated as fatal error.

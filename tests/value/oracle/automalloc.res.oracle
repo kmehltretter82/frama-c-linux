@@ -4,14 +4,14 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[kernel:annot:missing-spec] automalloc.i:14: Warning: 
+[kernel:annot:missing-spec] automalloc.i:6: Warning: 
   Neither code nor specification for function malloc,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function malloc <- main.
   Called from automalloc.i:14.
 [eva] using specification for function malloc
 [eva] Done for function malloc
-[kernel:annot:missing-spec] automalloc.i:15: Warning: 
+[kernel:annot:missing-spec] automalloc.i:7: Warning: 
   Neither code nor specification for function realloc,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function realloc <- main.

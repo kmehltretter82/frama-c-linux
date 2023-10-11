@@ -31,10 +31,6 @@
    Sometimes the caml type system does not help you here.
    Introducing a bug here may introduce some "segmentation faults" in Frama-C *)
 
-let use_obj = ref true
-let no_obj () = use_obj := false
-let may_use_obj () = !use_obj
-
 (* ****************************************************************************)
 (* ****************************************************************************)
 (* ****************************************************************************)
@@ -94,12 +90,6 @@ module Tbl = Hashtbl.Make(struct type t = concrete_repr include Comparable end)
 let types : (string (* name *), Obj.t full_t) Hashtbl.t = Hashtbl.create 97
 let embedded_types: concrete_repr Tbl.t = Tbl.create 7
 
-let dummy =
-  { name = "";
-    digest = "";
-    structural_descr = Structural_descr.t_unknown;
-    pp_ml_name = fun _ _ -> assert false }
-
 (* ****************************************************************************)
 (** {2 Main functions} *)
 (* ****************************************************************************)
@@ -158,7 +148,7 @@ let register ?(closure=false) ~name ~ml_name structural_descr reprs =
         pp_ml_name = pp_ml_name }
     in
     let full_ty = { ty = ty; reprs = List.map Obj.repr reprs } in
-    if !use_obj then Hashtbl.add types name full_ty;
+    Hashtbl.add types name full_ty;
     ty
 
 let add_abstract_types = ref (fun _ _ -> ())
@@ -168,10 +158,9 @@ exception No_abstract_type of string
 module Abstract(T: sig val name: string end) = struct
   type t
   let ty =
-    if !use_obj then
-      try (Hashtbl.find types T.name).ty
-      with Not_found -> raise (No_abstract_type T.name)
-    else failwith "Cannot call `Type.Abstract' in `no obj' mode"
+    try (Hashtbl.find types T.name).ty
+    with Not_found -> raise (No_abstract_type T.name)
+
   let () =
     let p = match Str.split (Str.regexp_string ".") T.name with
       | [] ->
@@ -190,11 +179,8 @@ let ml_name ty = Format.asprintf "%t" (ty.pp_ml_name Basic)
 
 let unsafe_reprs ty = (Hashtbl.find types ty.name).reprs
 let reprs ty =
-  if !use_obj then
-    let l = try unsafe_reprs ty with Not_found -> assert false in
-    List.map Obj.obj l
-  else
-    []
+  let l = try unsafe_reprs ty with Not_found -> assert false in
+  List.map Obj.obj l
 
 let set_ml_name ty ml_name =
   let pp = mk_dyn_pp ty.name ml_name in
@@ -256,22 +242,19 @@ module Polymorphic(T: Polymorphic_input) = struct
       (from_ty.pp_ml_name Call)
 
   let instantiate (ty:'a t) =
-    if !use_obj then
-      try
-        Tbl.find ty, false
-      with Not_found ->
-        let repr =
-          register
-            ~name:(T.name ty)
-            ~ml_name:(Some (ml_name ty))
-            (T.structural_descr ty.structural_descr)
-            (List.fold_left
-               (fun acc ty -> T.reprs ty @ acc) [] (unsafe_reprs ty))
-        in
-        Tbl.add ty repr;
-        repr, true
-    else
-      dummy, false
+    try
+      Tbl.find ty, false
+    with Not_found ->
+      let repr =
+        register
+          ~name:(T.name ty)
+          ~ml_name:(Some (ml_name ty))
+          (T.structural_descr ty.structural_descr)
+          (List.fold_left
+             (fun acc ty -> T.reprs ty @ acc) [] (unsafe_reprs ty))
+      in
+      Tbl.add ty repr;
+      repr, true
 
   let is_instance_of = Tbl.mem_instance
 
@@ -323,35 +306,32 @@ module Polymorphic2(T: Polymorphic2_input) = struct
       (from_ty2.pp_ml_name Call)
 
   let instantiate a b =
-    if !use_obj then
-      let key = a, b in
-      try
-        Concrete_pair.find memo_tbl key, false
-      with Not_found ->
-        let reprs =
-          List.fold_left
-            (fun acc r1 ->
-               List.fold_left
-                 (fun acc r2 -> T.reprs r1 r2 @ acc)
-                 acc
-                 (unsafe_reprs b))
-            []
-            (unsafe_reprs a)
-        in
-        let ty =
-          register
-            ~name:(T.name a b)
-            ~ml_name:(Some (ml_name a b))
-            (T.structural_descr a.structural_descr b.structural_descr)
-            reprs
-        in
-        Concrete_pair.add memo_tbl key ty;
-        Tbl.add instances ty key;
-        Tbl.add embedded_types ty a;
-        Tbl.add embedded_types ty b;
-        ty, true
-    else
-      dummy, false
+    let key = a, b in
+    try
+      Concrete_pair.find memo_tbl key, false
+    with Not_found ->
+      let reprs =
+        List.fold_left
+          (fun acc r1 ->
+             List.fold_left
+               (fun acc r2 -> T.reprs r1 r2 @ acc)
+               acc
+               (unsafe_reprs b))
+          []
+          (unsafe_reprs a)
+      in
+      let ty =
+        register
+          ~name:(T.name a b)
+          ~ml_name:(Some (ml_name a b))
+          (T.structural_descr a.structural_descr b.structural_descr)
+          reprs
+      in
+      Concrete_pair.add memo_tbl key ty;
+      Tbl.add instances ty key;
+      Tbl.add embedded_types ty a;
+      Tbl.add embedded_types ty b;
+      ty, true
 
   let is_instance_of ty = Tbl.mem instances ty
 
@@ -404,16 +384,13 @@ module Function = struct
       assert false
 
   let get_optional_argument (type a) (type b) (ty:(a, b) poly t) =
-    if !use_obj then
-      try
-        match Tbl.find instances ty with
-        | _, None -> None
-        | _, Some o -> Some (Obj.obj o : unit -> 'b)
-      with Not_found ->
-        (* static typing ensures than [ty] has already been instantiated. *)
-        assert false
-    else
-      invalid_arg "cannot call `Type.get_optional_argument in the 'no obj' mode"
+    try
+      match Tbl.find instances ty with
+      | _, None -> None
+      | _, Some o -> Some (Obj.obj o : unit -> 'b)
+    with Not_found ->
+      (* static typing ensures than [ty] has already been instantiated. *)
+      assert false
 
   let name label ty1 ty2 =
     (match label with None -> "" | Some l -> "~" ^ l ^ ":")
@@ -426,35 +403,32 @@ module Function = struct
       (ty1.pp_ml_name Call) (ty2.pp_ml_name Call)
 
   let instantiate ?label (a:'a) (b:'b t): ('a, 'b) poly t * bool =
-    if !use_obj then
-      let l, o = match label with
-        | None -> None, None
-        | Some (l, None) -> Some l, None
-        | Some (l, Some o) -> Some l , Some (Obj.repr o)
+    let l, o = match label with
+      | None -> None, None
+      | Some (l, None) -> Some l, None
+      | Some (l, Some o) -> Some l , Some (Obj.repr o)
+    in
+    let key = { arg = a; ret = b; label = l } in
+    try
+      Memo.find memo_tbl key, false
+    with Not_found ->
+      let ty =
+        (* Do not inline [Types.repr b] in the closure below because
+           caml is not able to marshal the closure.
+           Sadly don't know exactly why. Seem to have some value tagged as
+           abstract in the closure environment. *)
+        register
+          ~closure:true
+          ~name:(name l a b)
+          ~ml_name:(Some (ml_name l a b))
+          Structural_descr.t_unknown
+          (List.map (fun r _ -> r) (unsafe_reprs b))
       in
-      let key = { arg = a; ret = b; label = l } in
-      try
-        Memo.find memo_tbl key, false
-      with Not_found ->
-        let ty =
-          (* Do not inline [Types.repr b] in the closure below because
-             caml is not able to marshal the closure.
-             Sadly don't know exactly why. Seem to have some value tagged as
-             abstract in the closure environment. *)
-          register
-            ~closure:true
-            ~name:(name l a b)
-            ~ml_name:(Some (ml_name l a b))
-            Structural_descr.t_unknown
-            (List.map (fun r _ -> r) (unsafe_reprs b))
-        in
-        Memo.add memo_tbl key ty;
-        Tbl.add instances ty (key, o);
-        Tbl.add embedded_types ty a;
-        Tbl.add embedded_types ty b;
-        ty, true
-    else
-      dummy, false
+      Memo.add memo_tbl key ty;
+      Tbl.add instances ty (key, o);
+      Tbl.add embedded_types ty a;
+      Tbl.add embedded_types ty b;
+      ty, true
 
 end
 
@@ -506,43 +480,40 @@ module Polymorphic3(T:Polymorphic3_input) = struct
       (from_ty3.pp_ml_name Call)
 
   let instantiate a b c =
-    if !use_obj then
-      let key = a, b, c in
-      try
-        Concrete_triple.find memo_tbl key, false
-      with Not_found ->
-        let reprs =
-          List.fold_left
-            (fun acc r1 ->
-               List.fold_left
-                 (fun acc r2 ->
-                    List.fold_left
-                      (fun acc r3 -> T.reprs r1 r2 r3 @ acc)
-                      acc
-                      (unsafe_reprs c))
-                 acc
-                 (unsafe_reprs b))
-            []
-            (unsafe_reprs a)
-        in
-        let ty =
-          register
-            ~name:(T.name a b c)
-            ~ml_name:(Some (ml_name a b c))
-            (T.structural_descr
-               a.structural_descr
-               b.structural_descr
-               c.structural_descr)
-            reprs
-        in
-        Concrete_triple.add memo_tbl key ty;
-        Tbl.add instances ty key;
-        Tbl.add embedded_types ty a;
-        Tbl.add embedded_types ty b;
-        Tbl.add embedded_types ty c;
-        ty, true
-    else
-      dummy, false
+    let key = a, b, c in
+    try
+      Concrete_triple.find memo_tbl key, false
+    with Not_found ->
+      let reprs =
+        List.fold_left
+          (fun acc r1 ->
+             List.fold_left
+               (fun acc r2 ->
+                  List.fold_left
+                    (fun acc r3 -> T.reprs r1 r2 r3 @ acc)
+                    acc
+                    (unsafe_reprs c))
+               acc
+               (unsafe_reprs b))
+          []
+          (unsafe_reprs a)
+      in
+      let ty =
+        register
+          ~name:(T.name a b c)
+          ~ml_name:(Some (ml_name a b c))
+          (T.structural_descr
+             a.structural_descr
+             b.structural_descr
+             c.structural_descr)
+          reprs
+      in
+      Concrete_triple.add memo_tbl key ty;
+      Tbl.add instances ty key;
+      Tbl.add embedded_types ty a;
+      Tbl.add embedded_types ty b;
+      Tbl.add embedded_types ty c;
+      ty, true
 
   let is_instance_of ty = Tbl.mem instances ty
 
@@ -608,49 +579,46 @@ module Polymorphic4(T:Polymorphic4_input) = struct
       (from_ty4.pp_ml_name Call)
 
   let instantiate a b c d =
-    if !use_obj then
-      let key = a, b, c, d in
-      try
-        Concrete_quadruple.find memo_tbl key, false
-      with Not_found ->
-        let reprs =
-          List.fold_left
-            (fun acc r1 ->
-               List.fold_left
-                 (fun acc r2 ->
-                    List.fold_left
-                      (fun acc r3 ->
-                         List.fold_left
-                           (fun acc r4 -> T.reprs r1 r2 r3 r4 @ acc)
-                           acc
-                           (unsafe_reprs d))
-                      acc
-                      (unsafe_reprs c))
-                 acc
-                 (unsafe_reprs b))
-            []
-            (unsafe_reprs a)
-        in
-        let ty =
-          register
-            ~name:(T.name a b c d)
-            ~ml_name:(Some (ml_name a b c d))
-            (T.structural_descr
-               a.structural_descr
-               b.structural_descr
-               c.structural_descr
-               d.structural_descr)
-            reprs
-        in
-        Concrete_quadruple.add memo_tbl key ty;
-        Tbl.add instances ty key;
-        Tbl.add embedded_types ty a;
-        Tbl.add embedded_types ty b;
-        Tbl.add embedded_types ty c;
-        Tbl.add embedded_types ty d;
-        ty, true
-    else
-      dummy, false
+    let key = a, b, c, d in
+    try
+      Concrete_quadruple.find memo_tbl key, false
+    with Not_found ->
+      let reprs =
+        List.fold_left
+          (fun acc r1 ->
+             List.fold_left
+               (fun acc r2 ->
+                  List.fold_left
+                    (fun acc r3 ->
+                       List.fold_left
+                         (fun acc r4 -> T.reprs r1 r2 r3 r4 @ acc)
+                         acc
+                         (unsafe_reprs d))
+                    acc
+                    (unsafe_reprs c))
+               acc
+               (unsafe_reprs b))
+          []
+          (unsafe_reprs a)
+      in
+      let ty =
+        register
+          ~name:(T.name a b c d)
+          ~ml_name:(Some (ml_name a b c d))
+          (T.structural_descr
+             a.structural_descr
+             b.structural_descr
+             c.structural_descr
+             d.structural_descr)
+          reprs
+      in
+      Concrete_quadruple.add memo_tbl key ty;
+      Tbl.add instances ty key;
+      Tbl.add embedded_types ty a;
+      Tbl.add embedded_types ty b;
+      Tbl.add embedded_types ty c;
+      Tbl.add embedded_types ty d;
+      ty, true
 
   let is_instance_of ty = Tbl.mem instances ty
 
@@ -689,23 +657,20 @@ end = struct
       type t = Obj.t
       let equal = (==)
       let hash x =
-        if !use_obj then
-          (* 0 is correct; trying to do a bit better... *)
-          let tag = Obj.tag x in
-          if tag = 0 then
-            0
-          else if tag = Obj.closure_tag then
-            (* Buggy code with OCaml 4.01, deactivated for now
-               (* assumes that the first word of a closure does not change in
-               any way (even by Gc.compact invocation). *)
-               Obj.magic (Obj.field x 0)*)
-            (* to be tested (suggested by Damien D.): add a 'xor 0' *)
-            (*         Obj.magic (Obj.field x 0)*)
-            0
-          else
-            Hashtbl.hash x
-        else
+        (* 0 is correct; trying to do a bit better... *)
+        let tag = Obj.tag x in
+        if tag = 0 then
           0
+        else if tag = Obj.closure_tag then
+          (* Buggy code with OCaml 4.01, deactivated for now
+             (* assumes that the first word of a closure does not change in
+             any way (even by Gc.compact invocation). *)
+             Obj.magic (Obj.field x 0)*)
+          (* to be tested (suggested by Damien D.): add a 'xor 0' *)
+          (*         Obj.magic (Obj.field x 0)*)
+          0
+        else
+          Hashtbl.hash x
     end)
 
   type 'a t = 'a O.t Tbl.t
@@ -713,24 +678,21 @@ end = struct
   let create () = Tbl.create 7
 
   let add tbl ty k v =
-    if !use_obj then
-      let tytbl =
-        try Tbl.find tbl ty
-        with Not_found ->
-          let tytbl = O.create 7 in
-          Tbl.add tbl ty tytbl;
-          tytbl
-      in
-      O.replace tytbl (Obj.repr k) v
+    let tytbl =
+      try Tbl.find tbl ty
+      with Not_found ->
+        let tytbl = O.create 7 in
+        Tbl.add tbl ty tytbl;
+        tytbl
+    in
+    O.replace tytbl (Obj.repr k) v
 
   let find tbl ty k =
-    if !use_obj then O.find (Tbl.find tbl ty) (Obj.repr k)
-    else invalid_arg "cannot call function 'find' in the 'no obj' mode"
+    O.find (Tbl.find tbl ty) (Obj.repr k)
 
   let mem tbl ty k =
     try
       let objs = Tbl.find tbl ty in
-      assert !use_obj;
       O.mem objs (Obj.repr k)
     with Not_found ->
       false
@@ -769,11 +731,9 @@ struct
   let create x = H.create x
 
   let add tbl s ty x =
-    if !use_obj then begin
-      let name = Key.to_string s in
-      if H.mem tbl s then raise (AlreadyExists name);
-      H.add tbl s { ty = ty; o = Obj.repr x }
-    end
+    let name = Key.to_string s in
+    if H.mem tbl s then raise (AlreadyExists name);
+    H.add tbl s { ty = ty; o = Obj.repr x }
 
   exception Unbound_value of string
   let type_error s ty_name ty_name' =
@@ -783,24 +743,19 @@ struct
             s ty_name' ty_name))
 
   let find tbl s ty =
-    if !use_obj then
-      let name = Key.to_string s in
-      let data =
-        try H.find tbl s with Not_found -> raise (Unbound_value name)
-      in
-      if ty.digest <> data.ty.digest then
-        type_error name ty.name data.ty.name;
-      Obj.obj data.o
-    else
-      invalid_arg "cannot call function 'find' in the 'no obj' mode"
+    let name = Key.to_string s in
+    let data =
+      try H.find tbl s with Not_found -> raise (Unbound_value name)
+    in
+    if ty.digest <> data.ty.digest then
+      type_error name ty.name data.ty.name;
+    Obj.obj data.o
 
   let iter f tbl =
-    if !use_obj then H.iter (fun k v -> f k v.ty (Obj.obj v.o)) tbl
-    else invalid_arg "cannot call function 'iter' in the 'no obj' mode"
+    H.iter (fun k v -> f k v.ty (Obj.obj v.o)) tbl
 
   let fold f tbl acc =
-    if !use_obj then H.fold (fun k v acc -> f k v.ty (Obj.obj v.o) acc) tbl acc
-    else invalid_arg "cannot call function 'fold' in the 'no obj' mode"
+    H.fold (fun k v acc -> f k v.ty (Obj.obj v.o) acc) tbl acc
 
 end
 

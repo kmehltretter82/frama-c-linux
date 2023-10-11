@@ -7,7 +7,7 @@
   ch2 ∈ {{ NULL ; &S_ch2[0] }}
   S_ch1[0..1] ∈ [--..--]
   S_ch2[0..1] ∈ [--..--]
-[kernel:annot:missing-spec] bug0223.i:33: Warning: 
+[kernel:annot:missing-spec] bug0223.i:9: Warning: 
   Neither code nor specification for function F,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function F <- main.
@@ -19,7 +19,7 @@
 [eva] Done for function F
 [eva] computing for function h2 <- main.
   Called from bug0223.i:35.
-[kernel:annot:missing-spec] bug0223.i:16: Warning: 
+[kernel:annot:missing-spec] bug0223.i:11: Warning: 
   Neither code nor specification for function my_strcnmp,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function my_strcnmp <- h2 <- main.

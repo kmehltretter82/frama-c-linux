@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   a ∈ {0}
   b ∈ {0}
-[kernel:annot:missing-spec] input.i:7: Warning: 
+[kernel:annot:missing-spec] input.i:1: Warning: 
   Neither code nor specification for function f,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- main.

@@ -7,7 +7,7 @@
 [rte:annot] annotating function chunk_typing
 [rte:annot] annotating function initialized_assigns
 [rte:annot] annotating function uninitialized_assigns
-[kernel:annot:missing-spec] opaque_struct.i:79: Warning: 
+[kernel:annot:missing-spec] opaque_struct.i:76: Warning: 
   Neither code nor specification for function use,
    generating default assigns. See -generated-spec-* options for more info
 [wp] 15 goals scheduled

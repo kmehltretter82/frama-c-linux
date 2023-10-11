@@ -33,6 +33,9 @@ COMMIT=
 TESTS=
 SAVE=
 COVER=
+HTML=
+XML=
+JSON=
 
 DUNE_ALIAS=
 DUNE_OPT=
@@ -78,7 +81,9 @@ function Usage
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
     echo "  -j|--jobs <jobs>    run no more than <jobs> commands simultaneously."
-    echo "  --coverage          compute test coverage"
+    echo "  --coverage          compute test coverage in html format"
+    echo "  --coverage-xml      compute test coverage in Cobertura XML format"
+    echo "  --coverage-json     compute test coverage in Coveralls JSON format"
     echo "  -h|--help           print this help"
     echo ""
     echo "VARIABLES"
@@ -197,7 +202,15 @@ do
             ;;
         "--coverage")
             COVER=yes
-            DUNE_OPT+="--workspace dev/dune-workspace.cover "
+            HTML=yes
+            ;;
+        "--coverage-xml")
+            COVER=yes
+            XML=yes
+            ;;
+        "--coverage-json")
+            COVER=yes
+            JSON=yes
             ;;
         "-n"|"--name")
             ALIAS_NAME=$2
@@ -287,6 +300,7 @@ function PrepareCoverage
     then
         Cmd rm -rf _coverage
         Cmd rm -rf _bisect
+        Cmd mkdir _coverage
         Cmd mkdir _bisect
     fi
 }
@@ -296,7 +310,18 @@ function GenerateCoverage
     if [ "$COVER" = "yes" ] ;
     then
         Head "Generating coverage in _coverage ..."
-        Cmd bisect-ppx-report html --coverage-path=_bisect
+        if [ "$HTML" = "yes" ] ;
+        then
+            Cmd bisect-ppx-report html --coverage-path=_bisect
+        fi
+        if [ "$XML" = "yes" ] ;
+        then
+            Cmd bisect-ppx-report cobertura --coverage-path=_bisect _coverage/coverage_report.xml
+        fi
+        if [ "$JSON" = "yes" ] ;
+        then
+            Cmd bisect-ppx-report coveralls --coverage-path=_bisect _coverage/coverage_report.json
+        fi
     fi
 }
 
@@ -325,7 +350,9 @@ function PrepareTests
 [ "$DUNE_LOG" = "" ] || rm -rf $DUNE_LOG
 function RunAlias
 {
-
+    if [ "$COVER" = "yes" ]; then
+        DUNE_OPT+="--workspace dev/dune-workspace.cover "
+    fi
     Head "Running tests..."
     if [ "$DUNE_LOG" = "" ]; then
         Run dune build $DUNE_OPT $@

@@ -10,14 +10,14 @@
   I ∈ [--..--]
 [eva] computing for function k <- g.
   Called from select_return.i:44.
-[kernel:annot:missing-spec] select_return.i:35: Warning: 
+[kernel:annot:missing-spec] select_return.i:28: Warning: 
   Neither code nor specification for function get,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function get <- k <- g.
   Called from select_return.i:35.
 [eva] using specification for function get
 [eva] Done for function get
-[kernel:annot:missing-spec] select_return.i:39: Warning: 
+[kernel:annot:missing-spec] select_return.i:32: Warning: 
   Neither code nor specification for function send_bis,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function send_bis <- k <- g.
@@ -58,7 +58,7 @@
 [eva] Done for function send_bis
 [eva] Recording results for k
 [eva] Done for function k
-[kernel:annot:missing-spec] select_return.i:53: Warning: 
+[kernel:annot:missing-spec] select_return.i:30: Warning: 
   Neither code nor specification for function send,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function send <- f <- g.
