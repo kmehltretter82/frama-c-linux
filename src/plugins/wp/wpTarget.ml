@@ -111,6 +111,8 @@ let check_properties behaviors props kf =
     with Annotations.No_funspec _ -> ()
   in
   let check_bhv kf kinstr bv =
+    if CfgInfos.is_entry_point kf then
+      check_bhv_requires kf kinstr bv ;
     check_bhv_assigns kf kinstr bv ;
     check_bhv_allocation kf kinstr bv ;
     check_bhv_ensures kf kinstr bv ;
