@@ -45,6 +45,7 @@ module TracesProject: Parameter_sig.Bool
 
 module MultidimSegmentLimit: Parameter_sig.Int
 module MultidimDisjunctiveInvariants: Parameter_sig.Bool
+module MultidimFastImprecise: Parameter_sig.Bool
 
 module AutomaticContextMaxDepth: Parameter_sig.Int
 module AutomaticContextMaxWidth: Parameter_sig.Int

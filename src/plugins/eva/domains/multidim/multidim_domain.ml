@@ -611,7 +611,8 @@ struct
     let narrow = join ~cache ~symmetric:false ~idempotent:true ~decide in
     fun (m1,t1) (m2,t2) -> `Value (narrow m1 m2, join_tracked t1 t2)
 
-  let join' ~oracle (m1,t1) (m2,t2) =
+  (* Precise join with oracle, but cannot be cached. *)
+  let precise_join ~oracle m1 m2 =
     let open BaseMap in
     let cache = Hptmap_sig.NoCache
     and decide _ x1 x2 =
@@ -619,8 +620,27 @@ struct
       and m2,r2 = Option.value ~default:V.top x2 in
       Memory.join ~oracle m1 m2, Referers.union r1 r2 (* TODO: Remove tops *)
     in
-    generic_join ~cache ~symmetric:false ~idempotent:true ~decide m1 m2,
-    join_tracked t1 t2
+    generic_join ~cache ~symmetric:false ~idempotent:true ~decide m1 m2
+
+  (* Optimized join without oracle. *)
+  let fast_join =
+    let open BaseMap in
+    let oracle _ _ = Int_val.top in
+    let cache = cache_name "fast_join"
+    and decide _ x1 x2 =
+      let m1, r1 = Option.value ~default:V.top x1
+      and m2, r2 = Option.value ~default:V.top x2 in
+      Memory.join ~oracle m1 m2, Referers.union r1 r2 (* TODO: Remove tops *)
+    in
+    generic_join ~cache ~symmetric:true ~idempotent:true ~decide
+
+  let join' ~oracle (m1, t1) (m2, t2) =
+    let m =
+      if Parameters.MultidimFastImprecise.get ()
+      then fast_join m1 m2
+      else precise_join ~oracle m1 m2
+    in
+    m, join_tracked t1 t2
 
   let join s1 s2 =
     let oracle = mk_bioracle s1 s2 in
@@ -890,21 +910,16 @@ struct
 
   let relate _kf _bases _state = Base.SetLattice.empty
 
-  let filter _kind bases (base_map,tracked : t) =
-    BaseMap.filter (fun elt -> Base.Hptset.mem elt bases) base_map,
+  let filter _kind bases (base_map, tracked : t) =
+    BaseMap.inter_with_shape bases base_map,
     Option.map (Tracking.inter bases) tracked
 
-  let reuse _kf bases =
-    let open BaseMap in
-    let cache = Hptmap_sig.NoCache in
-    let decide_both _key _v1 v2 = Some v2 in
-    let decide_left key v1 =
-      if Base.Hptset.mem key bases then None else Some v1
-    in
-    let reuse = merge ~cache ~symmetric:false ~idempotent:true
-        ~decide_both ~decide_left:(Traversing decide_left) ~decide_right:Neutral
-    in
-    fun ~current_input:(m1,t1)  ~previous_output:(m2,t2) ->
+  let reuse =
+    let cache = cache_name "reuse" in
+    let decide _key _v1 v2 = v2 in
+    let reuse = BaseMap.join ~cache ~symmetric:false ~idempotent:true ~decide in
+    fun _kf bases ~current_input:(m1,t1)  ~previous_output:(m2,t2) ->
+      let m1 = BaseMap.diff_with_shape bases m1 in
       reuse m1 m2, join_tracked t1 t2
 end
 
@@ -923,15 +938,22 @@ let multidim_hook (module Abstract: Abstractions.S) : (module Abstractions.S) =
 
       let join a b =
         let r = join (set key Domain.top a) (set key Domain.top b) in
-        let oracle state exp = (* TODO: cache results *)
-          let v, _alarms = Eval.evaluate state exp in
-          match v with
-          | `Bottom -> Cvalue.V.top
-          | `Value (_valuation,v) -> get_cval v
+        let oracle state =
+          let valuation_ref = ref Eval.Valuation.empty in
+          fun exp ->
+            let valuation = !valuation_ref in
+            let v, _alarms = Eval.evaluate ~valuation state exp in
+            match v with
+            | `Bottom -> Cvalue.V.top
+            | `Value (valuation, v) ->
+              valuation_ref := valuation;
+              get_cval v
         in
+        let left_oracle = oracle a
+        and right_oracle = oracle b in
         let oracle = function
-          | Abstract_memory.Left ->  convert_oracle (oracle a)
-          | Abstract_memory.Right -> convert_oracle (oracle b)
+          | Abstract_memory.Left ->  convert_oracle left_oracle
+          | Abstract_memory.Right -> convert_oracle right_oracle
         in
         let multidim = Domain.join' ~oracle (get_multidim a) (get_multidim b) in
         set key multidim r
