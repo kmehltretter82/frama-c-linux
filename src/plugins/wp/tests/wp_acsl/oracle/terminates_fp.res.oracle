@@ -1,26 +1,13 @@
 # frama-c -wp [...]
 [kernel] Parsing terminates_fp.i (no preprocessing)
-[kernel:annot:missing-spec] terminates_fp.i:78: Warning: 
-  Missing exits in specification of prototype gnt,
-   generating default specification, see -generated-spec-* options for more info
-[kernel:annot:missing-spec] terminates_fp.i:78: Warning: 
-  Missing exits in specification of prototype gt,
-   generating default specification, see -generated-spec-* options for more info
-[kernel:annot:missing-spec] terminates_fp.i:78: Warning: 
-  Missing terminates in specification of prototype gt,
-   generating default specification, see -generated-spec-* options for more info
-[kernel:annot:missing-spec] terminates_fp.i:78: Warning: 
-  Missing exits in specification of prototype hnt,
-   generating default specification, see -generated-spec-* options for more info
-[kernel:annot:missing-spec] terminates_fp.i:78: Warning: 
-  Missing exits in specification of prototype ht,
-   generating default specification, see -generated-spec-* options for more info
-[kernel:annot:missing-spec] terminates_fp.i:78: Warning: 
-  Missing terminates in specification of prototype ht,
-   generating default specification, see -generated-spec-* options for more info
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] terminates_fp.i:9: Warning: 
+  Neither code nor explicit terminates for function gt,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] terminates_fp.i:11: Warning: 
+  Neither code nor explicit terminates for function ht,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal warns_recursive_exits : Valid (Unreachable)
 [wp] terminates_fp.i:78: Warning: 
   In 'warns_recursive', no 'calls' specification for statement(s) on line(s): 
   line 79, 
@@ -51,18 +38,6 @@ Assume { (* Heap *) Type: region(G_gnt_32) <= 0. }
 Prove: false.
 
 ------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'no_t_spec' (1/2):
-Tags: Call gnt.
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'no_t_spec' (2/2):
-Tags: Call hnt.
-Prove: true.
-
-------------------------------------------------------------
 ------------------------------------------------------------
   Function no_t_spec_cond
 ------------------------------------------------------------
@@ -82,18 +57,6 @@ Call terminates at line 64
 Tags: Call hnt.
 Assume { (* Heap *) Type: region(G_hnt_37) <= 0. }
 Prove: false.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'no_t_spec_cond' (1/2):
-Tags: Call gt.
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'no_t_spec_cond' (2/2):
-Tags: Call hnt.
-Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -139,36 +102,23 @@ Assume { (* Heap *) Type: (region(G_hnt_37) <= 0) /\ (region(G_ht_27) <= 0).
 Prove: false.
 
 ------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'no_t_spec_cond_m' (1/4):
-Tags: Call gt.
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'no_t_spec_cond_m' (2/4):
-Tags: Call gt Call hnt.
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'no_t_spec_cond_m' (3/4):
-Tags: Call ht.
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'no_t_spec_cond_m' (4/4):
-Tags: Call ht Call hnt.
-Prove: true.
-
-------------------------------------------------------------
 ------------------------------------------------------------
   Function no_t_spec_in_bhv
 ------------------------------------------------------------
 
 Goal Call point gnt hnt in 'no_t_spec_in_bhv' at instruction (file terminates_fp.i, line 58):
-Prove: true.
+Let a = global(G_hnt_37).
+Let a_1 = global(G_gnt_32).
+Assume {
+  Type: is_sint32(x).
+  (* Heap *)
+  Type: region(f.base) <= 0.
+  (* Pre-condition for 'B1' *)
+  Have: ((x = 0) -> (a_1 = f)).
+  (* Pre-condition for 'B2' *)
+  Have: ((x != 0) -> (a = f)).
+}
+Prove: (a_1 = f) \/ (a = f).
 
 ------------------------------------------------------------
 
@@ -192,18 +142,6 @@ Call terminates at line 58
 Tags: Call gnt.
 Assume { (* Heap *) Type: region(G_gnt_32) <= 0. }
 Prove: false.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'no_t_spec_in_bhv' (1/2):
-Tags: Call gnt.
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'no_t_spec_in_bhv' (2/2):
-Tags: Call hnt.
-Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -235,24 +173,23 @@ Goal Termination-condition (generated) in 't_spec':
 Prove: true.
 
 ------------------------------------------------------------
-
-Goal Exit-condition (generated) in 't_spec' (1/2):
-Tags: Call gt.
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 't_spec' (2/2):
-Tags: Call ht.
-Prove: true.
-
-------------------------------------------------------------
 ------------------------------------------------------------
   Function t_spec_in_bhv
 ------------------------------------------------------------
 
 Goal Call point gt hnt in 't_spec_in_bhv' at instruction (file terminates_fp.i, line 38):
-Prove: true.
+Let a = global(G_gt_22).
+Let a_1 = global(G_hnt_37).
+Assume {
+  Type: is_sint32(x).
+  (* Heap *)
+  Type: region(f.base) <= 0.
+  (* Pre-condition for 'B1' *)
+  Have: ((x = 0) -> (a_1 = f)).
+  (* Pre-condition for 'B2' *)
+  Have: ((x != 0) -> (a = f)).
+}
+Prove: (a = f) \/ (a_1 = f).
 
 ------------------------------------------------------------
 
@@ -273,18 +210,6 @@ Prove: true.
 
 Goal Termination-condition (generated) in 't_spec_in_bhv' (2/2):
 Call terminates at line 38
-Tags: Call hnt.
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 't_spec_in_bhv' (1/2):
-Tags: Call gt.
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 't_spec_in_bhv' (2/2):
 Tags: Call hnt.
 Prove: true.
 

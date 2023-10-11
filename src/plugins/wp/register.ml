@@ -781,21 +781,10 @@ let dkey_logicusage = Wp_parameters.register_category "logicusage"
 let dkey_refusage = Wp_parameters.register_category "refusage"
 let dkey_wp_rte = Wp_parameters.register_category "wp-rte"
 
-let wkey_option_deprecated =
-  Wp_parameters.register_warn_category "deprecated"
-
 let cmdline_run () =
   begin
     if Wp_parameters.CachePrint.get () then
       Wp_parameters.feedback "Cache directory: %s" (Cache.get_dir ()) ;
-    if Wp_parameters.TerminatesDefinitions.get ()
-    || Wp_parameters.TerminatesExtDeclarations.get ()
-    || Wp_parameters.TerminatesStdlibDeclarations.get ()
-    then
-      Wp_parameters.warning ~wkey:wkey_option_deprecated
-        "Options -wp-declarations-terminate, -wp-definitions-terminate and \
-         -wp-frama-c-stdlib-terminate are deprecated. See -generated-spec-* \
-         options for more info." ;
     let fct = Wp_parameters.get_fct () in
     if fct <> Wp_parameters.Fct_none then
       begin
@@ -1013,7 +1002,7 @@ let tracelog () =
         (Format.pp_print_list ~pp_sep pp_category) active_keys)
   end
 
-let main = 
+let main =
   sequence [
     (fun () -> Wp_parameters.debug ~dkey:dkey_main "Start WP plugin...@.") ;
     do_prover_detect ;

@@ -1,10 +1,10 @@
 /* run.config
+   OPT: -generated-spec-custom terminates:skip,exits:skip
    OPT:
-   OPT: -wp-declarations-terminate -wp-definitions-terminate -wp-frama-c-stdlib-terminate
 */
 /* run.config_qualif
+   OPT: -generated-spec-custom terminates:skip,exits:skip
    OPT:
-   OPT: -wp-declarations-terminate -wp-definitions-terminate -wp-frama-c-stdlib-terminate
 */
 
 #include <stdlib.h>
@@ -29,14 +29,11 @@ void call_definition(void){
   definition();
 }
 
-//@ terminates \false ;
 void no_spec_generates_goal(void){
   for(;;);
 }
 
-/*@ terminates \true ;
-  @ exits \true ;
-*/
+//@ terminates \true ;
 void libc_call(void){
   (void) div(4,3);
   exit(0);

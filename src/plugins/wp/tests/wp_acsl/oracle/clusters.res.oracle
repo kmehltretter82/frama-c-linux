@@ -1,7 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing clusters.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal callee_no_r_exits : Valid (Unreachable)
 [wp] [CFG] Goal callee_no_r_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] clusters.i:16: Warning: 
@@ -19,11 +18,6 @@
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 'caller_no_cluster':
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'caller_no_cluster':
 Prove: true.
 
 ------------------------------------------------------------
@@ -54,22 +48,11 @@ Assume {
 Prove: false.
 
 ------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'fp':
-Tags: Call function.
-Prove: true.
-
-------------------------------------------------------------
 ------------------------------------------------------------
   Function function
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 'function':
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'function':
 Prove: true.
 
 ------------------------------------------------------------
@@ -104,21 +87,11 @@ Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
 Prove: false.
 
 ------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'mutual_1':
-Prove: true.
-
-------------------------------------------------------------
 ------------------------------------------------------------
   Function mutual_2
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 'mutual_2':
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'mutual_2':
 Prove: true.
 
 ------------------------------------------------------------
@@ -147,21 +120,11 @@ Call terminates (missing decreases) at line 71
 Prove: true.
 
 ------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'no_decr_ok_term':
-Prove: true.
-
-------------------------------------------------------------
 ------------------------------------------------------------
   Function simpl_r
 ------------------------------------------------------------
 
 Goal Termination-condition (generated) in 'simpl_r':
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'simpl_r':
 Prove: true.
 
 ------------------------------------------------------------
@@ -185,10 +148,5 @@ Goal Termination-condition (generated) in 'simpl_rf' (2/2):
 Call terminates (missing decreases) at line 16
 Assume { Type: is_uint32(n). (* Then *) Have: n != 0. }
 Prove: false.
-
-------------------------------------------------------------
-
-Goal Exit-condition (generated) in 'simpl_rf':
-Prove: true.
 
 ------------------------------------------------------------
