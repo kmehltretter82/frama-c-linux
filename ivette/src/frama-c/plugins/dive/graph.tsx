@@ -659,7 +659,7 @@ const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
     <CytoscapeComponent
       stylesheet={style}
       cy={setCy}
-      autoungrabify={grabbable}
+      autoungrabify={!grabbable}
       style={{ width: '100%', height: '100%' }}
     />);
 });
@@ -672,7 +672,7 @@ export default function GraphComponent(): JSX.Element {
   const [addSelection, flipAddSelection] =
     Dome.useFlipSettings('dive.addSelection', true);
   const [grabbable, flipGrabbable] =
-    Dome.useFlipSettings('dive.grabbable', false);
+    Dome.useFlipSettings('dive.grabbable', true);
   const [selectionMode, setSelectionMode] =
     Dome.useStringSettings('dive.selectionMode', 'follow');
   const [layout, setLayout] =
@@ -709,18 +709,18 @@ export default function GraphComponent(): JSX.Element {
         <IconButton
           icon="PIN"
           onClick={flipAddSelection}
-          kind={addSelection ? 'negative' : 'positive'}
+          kind={addSelection ? 'positive' : 'negative'}
           title={addSelection ?
-            'Update the graph with the selection' :
-            'Do not update the graph with the selection'}
+            'Do not add selected AST elements into the graph' :
+            'Add selected AST elements into the graph'}
         />
         <IconButton
           icon="LOCK"
           onClick={flipGrabbable}
-          kind={grabbable ? 'negative' : 'positive'}
+          kind={grabbable ? 'positive' : 'negative'}
           title={grabbable ?
-            'Allow nodes to be moved' :
-            'Disallow nodes to be moved'}
+            'Disallow nodes to be moved' :
+            'Allow nodes to be moved'}
         />
         <IconButton
           icon="SETTINGS"
