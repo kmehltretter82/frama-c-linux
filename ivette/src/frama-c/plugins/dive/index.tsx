@@ -22,31 +22,36 @@
 
 import React from 'react';
 import * as Ivette from 'ivette';
-import { GraphComponent } from './graph';
 
-// --------------------------------------------------------------------------
-// --- Export Component
-// --------------------------------------------------------------------------
+import GraphComponent from './graph';
+import TreeComponent from './tree';
 
 Ivette.registerComponent({
-  id: 'frama-c.plugins.dive',
-  label: 'Dive Dataflow',
-  group: 'frama-c.plugins',
-  rank: 2,
-  title:
-    'Data dependency graph according to an Eva analysis.\nNodes color ' +
-    'represents the precision of the values inferred by Eva.',
-  children: <GraphComponent />,
-});
+    id: 'frama-c.plugins.dive.graph',
+    label: 'Dive Dataflow Graph',
+    group: 'frama-c.plugins',
+    rank: 2,
+    title:
+      'Data dependency graph according to an Eva analysis.',
+    children: <GraphComponent />,
+  });
+
+Ivette.registerComponent({
+    id: 'frama-c.plugins.dive.tree',
+    label: 'Dive Dataflow Tree',
+    group: 'frama-c.plugins',
+    rank: 3,
+    title:
+        'Data dependency tree according to an Eva analysis.',
+    children: <TreeComponent />,
+  });
 
 Ivette.registerView({
-  id: 'dive',
-  label: 'Dive Dataflow',
-  rank: 5,
-  layout: [
-    ['frama-c.astview', 'frama-c.plugins.dive'],
-    ['frama-c.properties', 'frama-c.locations'],
-  ],
-});
-
-// --------------------------------------------------------------------------
+    id: 'dive',
+    label: 'Dive Dataflow',
+    rank: 5,
+    layout: [
+        ['frama-c.astview', 'frama-c.plugins.dive.graph'],
+        ['frama-c.properties', 'frama-c.locations'],
+    ],
+  });

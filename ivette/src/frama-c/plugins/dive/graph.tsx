@@ -48,8 +48,10 @@ import { Space } from 'dome/frame/toolbars';
 import '@fortawesome/fontawesome-free/js/all';
 
 import EvaReady from 'frama-c/plugins/eva/EvaReady';
+import Legend from './legend';
 import style from './style.json';
 import layouts from './layouts.json';
+import './dive.css';
 
 const Debug = new Dome.Debug('dive');
 
@@ -139,6 +141,7 @@ class Dive {
     // Add new listeners
     enableDoubleClickEvents(this.cy);
     this.cy.on('click', 'node', (event) => this.clickNode(event.target));
+    this.cy.on('click', 'edge', (event) => this.clickEdge(event.target));
     this.cy.on('double-click', '$node > node', // compound nodes
       (event) => this.doubleClickNode(event.target));
 
@@ -223,7 +226,15 @@ class Dive {
       return node;
     }
 
-    return this.cy.add({ data: { id, label: fileName }, classes: 'file' });
+    const nodeDefinition = {
+      data: { id, label: fileName },
+      classes: 'file',
+      pannable: true,
+    };
+    // cytoscape.add type declaration is missing the 'pannable' field
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return this.cy.add(nodeDefinition);
   }
 
   referenceCallstack(callstack: API.callstack): Cytoscape.NodeSingular | null {
@@ -240,9 +251,15 @@ class Dive {
     }
 
     const parentNode = this.referenceCallstack(callstack);
-    const parent = parentNode?.id();
-    const label = elt.fun;
-    return this.cy.add({ data: { id, label, parent }, classes: 'function' });
+    const nodeDefinition = {
+      data: { id, label: elt.fun, parent: parentNode?.id() },
+      classes: 'function',
+      pannable: true
+    };
+    // cytoscape.add type declaration is missing the 'pannable' field
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return this.cy.add(nodeDefinition);
   }
 
   createTips(node: Cytoscape.NodeSingular): Tippy.Instance[] {
@@ -514,16 +531,16 @@ class Dive {
   }
 
   async clickNode(node: Cytoscape.NodeSingular): Promise<void> {
+    // Node selection
     this.updateNodeSelection(node);
     await this.explore(node);
-
+    // Update locations
     const label = node.data()?.label as (string | undefined);
-    const writes = node.data()?.writes as States.Location[];
+    const writes = node.data()?.writes as Ast.location[];
     if (label && writes) {
-      const markers: Ast.marker[] = [];
-      writes.forEach(({ marker: m }) => { if (m) markers.push(m); });
+      const markers: Ast.marker[] = writes.map(({ marker }) => marker);
       Locations.setNextSelection({
-        label: `Writes to ${label}`,
+        label: `Dive: writes to ${label}`,
         title: 'Selected writes from Dive current selection',
         markers
       });
@@ -533,6 +550,23 @@ class Dive {
        nodes and edges. As we want some incoming edges to remain selected, we
        make the node unselectable, preventing cytoscape to select it. */
     node.unselectify();
+  }
+
+  async clickEdge(edge: Cytoscape.EdgeSingular): Promise<void> {
+    // Unselect everything
+    this.cy.$(':selected').forEach(unselect);
+    this.cy.$('.multiple-selection').removeClass('multiple-selection');
+    this.cy.$('.selection').removeClass('selection');
+    // Update locations
+    const origins = edge.data()?.origins as Ast.location[];
+    if (origins) {
+      const markers: Ast.marker[] = origins.map(({ marker }) => marker);
+      Locations.setNextSelection({
+        label: `Dive: origins`,
+        title: 'Origins of current edge in Dive graph',
+        markers
+      });
+    }
   }
 
   doubleClickNode(node: Cytoscape.NodeSingular): void {
@@ -575,7 +609,8 @@ class Dive {
 
 
 type GraphViewProps = {
-  lock: boolean;
+  addSelection: boolean;
+  grabbable: boolean;
   layout: string;
   selectionMode: string;
 }
@@ -586,7 +621,7 @@ type GraphViewRef = {
 
 const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
   (props: GraphViewProps, ref) => {
-    const { lock, layout, selectionMode } = props;
+  const { addSelection, grabbable, layout, selectionMode } = props;
 
     const [dive, setDive] = useState(() => new Dive());
     const selection = States.useCurrentLocation();
@@ -618,27 +653,33 @@ const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
 
     // Updates the graph according to the selected marker.
     useEffect(() => {
-      dive.selectLocation(selection, !lock);
-    }, [dive, lock, selection]);
+      dive.selectLocation(selection, addSelection);
+    }, [dive, addSelection, selection]);
 
-    return (
-      <CytoscapeComponent
-        stylesheet={style}
-        cy={setCy}
-        style={{ width: '100%', height: '100%' }}
-      />);
+  return (
+    <CytoscapeComponent
+      stylesheet={style}
+      cy={setCy}
+      autoungrabify={!grabbable}
+      style={{ width: '100%', height: '100%' }}
+    />);
 });
 
 GraphView.displayName = "GraphView";
 
-export function GraphComponent(): JSX.Element {
+
+export default function GraphComponent(): JSX.Element {
   const graph = useRef<GraphViewRef>();
-  const [lock, flipLock] =
-    Dome.useFlipSettings('dive.lock');
+  const [addSelection, flipAddSelection] =
+    Dome.useFlipSettings('dive.addSelection', true);
+  const [grabbable, flipGrabbable] =
+    Dome.useFlipSettings('dive.grabbable', true);
   const [selectionMode, setSelectionMode] =
     Dome.useStringSettings('dive.selectionMode', 'follow');
   const [layout, setLayout] =
     Dome.useStringSettings('dive.layout', 'dagre');
+  const [showLegend, flipShowLegend] =
+    Dome.useFlipSettings('dive.legend', true);
 
   // Selection mode
   const selectMode = (id?: string) => void (id && setSelectionMode(id));
@@ -667,12 +708,20 @@ export function GraphComponent(): JSX.Element {
     <>
       <Ivette.TitleBar>
         <IconButton
+          icon="PIN"
+          onClick={flipAddSelection}
+          kind={addSelection ? 'positive' : 'negative'}
+          title={addSelection ?
+            'Do not add selected AST elements into the graph' :
+            'Add selected AST elements into the graph'}
+        />
+        <IconButton
           icon="LOCK"
-          onClick={flipLock}
-          kind={lock ? 'negative' : 'positive'}
-          title={lock ?
-            'Unlock the graph: update the graph with the selection' :
-            'Lock the graph: do not update the graph with the selection'}
+          onClick={flipGrabbable}
+          kind={grabbable ? 'positive' : 'negative'}
+          title={grabbable ?
+            'Disallow nodes to be moved' :
+            'Allow nodes to be moved'}
         />
         <IconButton
           icon="SETTINGS"
@@ -686,6 +735,15 @@ export function GraphComponent(): JSX.Element {
         />
         <Space />
         <IconButton
+          icon="HELP"
+          onClick={flipShowLegend}
+          kind={showLegend ? 'positive' : 'default'}
+          title={showLegend ?
+            'Hide legend' :
+            'Show legend'}
+        />
+        <Space />
+        <IconButton
           icon="TRASH"
           onClick={() => graph.current?.clear()}
           title="Clear the graph"
@@ -693,10 +751,12 @@ export function GraphComponent(): JSX.Element {
       </Ivette.TitleBar>
       <EvaReady>
         <GraphView
-          lock={lock}
+          addSelection={addSelection}
+          grabbable={grabbable}
           layout={layout}
           selectionMode={selectionMode}
           ref={graph}/>
+        { showLegend ? <Legend /> : null }
       </EvaReady>
     </>
   );
