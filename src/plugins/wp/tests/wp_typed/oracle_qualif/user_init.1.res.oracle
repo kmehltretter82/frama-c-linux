@@ -19,20 +19,19 @@
 [wp] [Valid] typed_init_t2_v3_assigns_part1 (Qed)
 [wp] [Valid] typed_init_t2_v3_assigns_part2 (Tactic) (Alt-Ergo 2/2) (Cached)
 [wp] [Valid] typed_init_t2_bis_v2_loop_assigns_part1 (Qed)
-[wp] [Unsuccess] typed_init_t2_bis_v2_loop_assigns_part2 (Tactic) (Alt-Ergo) (Cached)
-[wp] [Valid] typed_init_t2_bis_v2_loop_assigns_part3 (Tactics 3) (Qed 34/34)
+[wp] [Valid] typed_init_t2_bis_v2_loop_assigns_part2 (Tactics 2) (Qed 12/13) (Alt-Ergo 1/13) (Cached)
+[wp] [Valid] typed_init_t2_bis_v2_loop_assigns_part3 (Tactics 2) (Qed 22/23) (Alt-Ergo 1/23) (Cached)
 [wp] [Valid] typed_init_t2_bis_v2_assigns_exit_part1 (Qed)
 [wp] [Valid] typed_init_t2_bis_v2_assigns_exit_part2 (Tactics 2) (Qed 12/13) (Alt-Ergo 1/13) (Cached)
 [wp] [Valid] typed_init_t2_bis_v2_assigns_exit_part3 (Qed)
 [wp] [Valid] typed_init_t2_bis_v2_assigns_normal_part1 (Qed)
 [wp] [Valid] typed_init_t2_bis_v2_assigns_normal_part2 (Tactics 2) (Qed 12/13) (Alt-Ergo 1/13) (Cached)
-[wp] Proved goals:   22 / 23
+[wp] Proved goals:   23 / 23
   Qed:            11
-  Script:         11 (Tactics 24) (Qed 174/186) (Alt-Ergo 10/186) (Cached)
-  Unsuccess:       1
+  Script:         12 (Tactics 24) (Qed 174/186) (Alt-Ergo 12/186) (Cached)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   init_t2_v2                3        -        8       100%
   init_t2_v3                4        -        7       100%
-  init_t2_bis_v2            4        -        8      87.5%
+  init_t2_bis_v2            4        -        8       100%
 ------------------------------------------------------------
