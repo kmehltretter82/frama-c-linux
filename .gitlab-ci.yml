@@ -233,7 +233,7 @@ ivette-tests:
     - make clean && make && make -C ivette dist
     - cd ivette
     - cp dist/renderer/* dist/main/
-    - xvfb-run --auto-servernum -e /dev/stdout -s "-screen 0 1920x1080x24 -ac -nolisten tcp -nolisten unix" yarn playwright test --headed
+    - xvfb-run --auto-servernum -e /dev/stdout -s "-screen 0 1920x1080x24 -ac -nolisten tcp -nolisten unix" dune exec -- yarn playwright test --headed
   artifacts:
     paths:
       - ivette/test-results

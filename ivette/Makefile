@@ -281,16 +281,16 @@ endif
 tests: dist
 	@cp dist/renderer/* dist/main/
 	@echo "[Ivette] running tests"
-	@yarn playwright test
+	@dune exec -- yarn playwright test
 
 tests-e2e: dist
 	@cp dist/renderer/* dist/main/
 	@echo "[Ivette] running tests (e2e)"
-	@yarn playwright test tests/e2e
+	@dune exec -- yarn playwright test tests/e2e
 
 tests-monkey: dist
 	@cp dist/renderer/* dist/main/
 	@echo "[Ivette] running tests (monkey)"
-	@yarn playwright test tests/monkey
+	@dune exec -- yarn playwright test tests/monkey
 
 # --------------------------------------------------------------------------
