@@ -426,8 +426,8 @@ function SearchInput(props: SearchInputProps): JSX.Element {
     index, setIndex, pattern, setPattern, inputRef
   } = props;
 
-    // Blur Event
-    const onBlur = (): void => { setPattern(''); setIndex(-1); };
+  // Blur Event
+  const onBlur = (): void => { setPattern(''); setIndex(-1); };
 
   // Key Up Events
   const onKeyUp = (evt: React.KeyboardEvent): void => {
