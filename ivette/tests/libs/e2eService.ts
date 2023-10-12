@@ -24,22 +24,26 @@ import { ElectronApplication, Page, expect } from "@playwright/test";
 import { _electron as electron } from "playwright-core";
 import * as locs from "./locatorsUtil";
 
-// Basic Electron launch of Ivette for Playwright e2e tests
+/**
+ * Basic Electron configuration for Playwright e2e tests of Ivette
+ */
 export const argsDefaultLaunch: string[] = [
   "./dist/main/main.js",
   "--no-sandbox",
 ];
 
-// Electron launch of Ivette for Playwright
-// e2e tests using Ivette's default settings
+/**
+ * Electron configuration for Playwright e2e tests of Ivette's default settings
+ */
 export const argsLaunchWithDefaultSettings: string[] = [
   "./dist/main/main.js",
   "--no-sandbox",
   "--init-settings",
 ];
 
-// Electron launch of Ivette for Playwright
-// e2e tests using an additional C file loaded
+/**
+ * Electron configuration for Playwright e2e tests of Ivette on a C file
+ */
 export const argsLaunchWithTestFile: string[] = [
   "./dist/main/main.js",
   "--no-sandbox",
@@ -47,6 +51,7 @@ export const argsLaunchWithTestFile: string[] = [
   "./tests/settings.json",
   "../tests/test/adpcm.c",
 ];
+
 /**
  * Basic Electron launch of Ivette for Playwright e2e tests
  */
@@ -61,7 +66,7 @@ export async function launchApp(
     args: params,
   });
 
-  // Get the first window that the app opens, wait if necessary.
+  // Get the first window that the app opens, wait if necessary
   const window = await electronApp.firstWindow();
 
   return {
@@ -71,7 +76,7 @@ export async function launchApp(
 }
 
 export async function testServerIsStarted(window: Page): Promise<void> {
-  // Click on the Console tab in the right menu.
+  // Click on the Console tab in the right menu
   await locs.getConsoleMenuItem(window).click();
 
   // Check the server status in the header's button bar
@@ -89,13 +94,13 @@ export async function testServerIsStarted(window: Page): Promise<void> {
 
 export async function testFileIsLoaded(window: Page): Promise<void> {
   await locs.getConsoleMenuItem(window).click();
-  // check if a message is present in the console view
-  // to confirm the file loaded
+  // Check if a message is present in the console view to confirm the file is
+  // loaded
   await expect(
     locs.getConsoleView(window).getByText("adpcm.c (with preprocessing)")
   ).toBeVisible();
 
-  // check if the main function is visible in the functions view
+  // Check if the main function is visible in the functions view
   await expect(
     locs.getFunctionsSideBar(window).getByText("main", { exact: true })
   ).toBeVisible();
