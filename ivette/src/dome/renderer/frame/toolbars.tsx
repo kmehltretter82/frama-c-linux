@@ -310,9 +310,9 @@ export function Select(props: SelectionProps<string>): JSX.Element {
 
 /** Description of a hint used to populate the suggestions. */
 export interface Hint {
-  id: string | number;
-  icon?: string;
+  id: string;
   label: string;
+  icon?: string;
   title?: string;
   rank?: number;
   onClick?: () => void;

@@ -205,7 +205,7 @@ export function registerStatusbar(status: ToolProps): void {
 /* --------------------------------------------------------------------------*/
 
 export interface Hint {
-  id: string | number;
+  id: string;
   name?: string; // searched string
   icon?: string; // displayed icon
   label?: string; // displayed hint

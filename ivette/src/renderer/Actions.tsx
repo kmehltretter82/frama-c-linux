@@ -34,7 +34,7 @@ import { GlobalState, useGlobalState } from 'dome/data/states';
 // --------------------------------------------------------------------------
 
 export interface Hint {
-  id: string | number;
+  id: string;
   name?: string;
   icon?: string;
   label?: string;
@@ -58,37 +58,40 @@ export interface ModeProps {
 
 const defaultMode : ModeProps = { id: '' };
 
-class ModeManager extends GlobalState<ModeProps[]> {
-  constructor() { super([]); }
+class ModeManager extends GlobalState<ModeProps> {
+  constructor() { super(defaultMode); }
   private registry: Map<string, ModeProps> = new Map();
-  private emit(): void {
-    this.setValue(Array.from(this.registry, ([_, v]) => v));
-  }
 
   find(id: string): ModeProps | undefined {
     return this.registry.get(id);
   }
 
-  register(m: ModeProps): void {
-    this.registry.set(m.id, m);
-    this.emit();
+  register(mode: ModeProps): void {
+    const id = mode.id;
+    this.registry.set(id, mode);
+    const id0 = this.getValue().id;
+    if (id0 === '' || id0 === id) this.setValue(mode);
   }
 
   update(m: ModeProps): void {
     const { id, ...data } = m;
-    const mprops = this.registry.get(id) ?? {};
-    this.registry.set(m.id, { ...mprops, ...data, id });
-    this.emit();
+    const curr = this.registry.get(id) ?? {};
+    const mode = { ...curr, ...data, id };
+    this.register(mode);
   }
 
   remove(id: string): void {
     this.registry.delete(id);
-    this.emit();
+    const id0 = this.getValue().id;
+    if (id0 === id) this.setValue(defaultMode);
+  }
+
+  selfhints(): Hint[] {
+    return Array.from(this.registry, ([_, mode]) => mode);
   }
 }
 
 const allModes = new ModeManager();
-const currentMode = new GlobalState<ModeProps>(defaultMode);
 const focus = new Dome.Event<void>('ivette.search.focus');
 
 // --------------------------------------------------------------------------
@@ -106,10 +109,22 @@ export function findMode(id: string): ModeProps | undefined {
 export function focusMode(id: string): void {
   const m = allModes.find(id);
   if (m !== undefined) {
-    currentMode.setValue(m);
+    allModes.setValue(m);
     focus.emit();
   }
 }
+
+// --------------------------------------------------------------------------
+// --- Search Mode Selector
+// --------------------------------------------------------------------------
+
+const searchMode : ModeProps = {
+  id: 'ivette.searchmode',
+  title: 'Search & Action Modes',
+  placeholder: 'mode',
+  hints: () => allModes.selfhints(),
+  onHint: (h: Hint) => focusMode(h.id),
+};
 
 // --------------------------------------------------------------------------
 // --- Search Action Component
@@ -133,23 +148,41 @@ function lookupHints(hs: Hint[], pattern: string): Toolbar.Hint[]
 }
 
 export function SearchAction(): JSX.Element {
-  const [mode] = useGlobalState(currentMode);
+  const [mode] = useGlobalState(allModes);
+  const currMode = mode.id;
+  const userMode = React.useRef('');
   const [pattern, onPattern] = React.useState('');
-  const { hints: getHints } = mode;
+  const disabled = mode.id === '';
+  const { hints: getHints, enabled=true } = mode;
   const hints = React.useMemo(() => {
     if (!getHints) return [];
     return lookupHints(getHints(), pattern);
   }, [getHints, pattern]);
+  React.useEffect(() => {
+    if (currMode && currMode !== searchMode.id)
+      userMode.current = currMode;
+  }, [currMode]);
+  const onSearch = React.useCallback(() => focusMode(searchMode.id), []);
+  const onBlur = React.useCallback(() => {
+    if (currMode === searchMode.id) {
+      const user = findMode(userMode.current) ?? defaultMode;
+      allModes.setValue(user);
+    }
+  }, [currMode]);
   return (
     <Toolbar.SearchField
       icon={mode.icon}
       title={mode.title}
+      className={mode.className}
       placeholder={mode.placeholder}
       hints={hints}
       onHint={mode.onHint}
       onEnter={mode.onEnter}
       onPattern={onPattern}
-      enabled={mode.id !== ''}
+      disabled={disabled}
+      enabled={enabled}
+      onSearch={onSearch}
+      onBlur={onBlur}
       focus={focus}
     />
   );
