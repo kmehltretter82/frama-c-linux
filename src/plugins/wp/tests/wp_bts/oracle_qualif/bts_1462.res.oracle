@@ -1,10 +1,10 @@
 # frama-c -wp [...]
 [kernel] Parsing bts_1462.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal local_exits : Valid (Unreachable)
+[wp] [Valid] Goal local_exits (Cfg) (Unreachable)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal wrong_exits : Valid (Unreachable)
-[wp] [CFG] Goal wrong_terminates : Valid (Trivial)
+[wp] [Valid] Goal wrong_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal wrong_terminates (Cfg) (Trivial)
 [wp] 16 goals scheduled
 [wp] [Valid] typed_wrong_assert_for_value (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_wrong_loop_invariant_A_KO_preserved (Alt-Ergo) (Cached)

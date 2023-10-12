@@ -2,8 +2,8 @@
 [kernel] Parsing bts779.i (no preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function f
-[wp] [CFG] Goal f_exits : Valid (Unreachable)
-[wp] [CFG] Goal f_terminates : Valid (Trivial)
+[wp] [Valid] Goal f_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f_terminates (Cfg) (Trivial)
 [wp] 2 goals scheduled
 [wp] [Valid] typed_f_assert (Qed)
 [wp] [Unsuccess] typed_f_assert_rte_mem_access (Alt-Ergo) (Cached)

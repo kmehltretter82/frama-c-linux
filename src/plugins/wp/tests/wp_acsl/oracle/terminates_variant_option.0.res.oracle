@@ -1,17 +1,17 @@
 # frama-c -wp [...]
 [kernel] Parsing terminates_variant_option.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal f1_exits : Valid (Unreachable)
-[wp] [CFG] Goal f1_terminates : Valid (Trivial)
+[wp] [Valid] Goal f1_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f1_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal fails_decreases_exits : Valid (Unreachable)
-[wp] [CFG] Goal fails_decreases_terminates : Valid (Trivial)
-[wp] [CFG] Goal fails_positive_exits : Valid (Unreachable)
-[wp] [CFG] Goal fails_positive_terminates : Valid (Trivial)
-[wp] [CFG] Goal trivial_variant_exits : Valid (Unreachable)
-[wp] [CFG] Goal trivial_variant_terminates : Valid (Trivial)
-[wp] [CFG] Goal trivial_variant_default_exits : Valid (Unreachable)
-[wp] [CFG] Goal trivial_variant_default_terminates : Valid (Trivial)
+[wp] [Valid] Goal fails_decreases_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal fails_decreases_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal fails_positive_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal fails_positive_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal trivial_variant_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal trivial_variant_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal trivial_variant_default_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal trivial_variant_default_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function f1
 ------------------------------------------------------------

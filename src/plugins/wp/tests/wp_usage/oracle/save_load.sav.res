@@ -1,7 +1,5 @@
 [kernel] Parsing save_load.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal f_exits : Valid (Unreachable)
-[wp] [CFG] Goal f_terminates : Valid (Trivial)
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function f

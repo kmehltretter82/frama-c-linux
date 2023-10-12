@@ -16,11 +16,11 @@
 [kernel:annot:missing-spec] unfold_assigns.i:108: Warning: 
   Neither code nor explicit exits and terminates for function f_assigns_range_with_array,
    generating default clauses. See -generated-spec-* options for more info
-[wp] [CFG] Goal ASSIGN_NO_UNFOLD_KO_exits : Valid (Unreachable)
-[wp] [CFG] Goal ASSIGN_NO_UNFOLD_KO_terminates : Valid (Trivial)
+[wp] [Valid] Goal ASSIGN_NO_UNFOLD_KO_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal ASSIGN_NO_UNFOLD_KO_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal ASSIGN_NO_UNFOLD_OK_exits : Valid (Unreachable)
-[wp] [CFG] Goal ASSIGN_NO_UNFOLD_OK_terminates : Valid (Trivial)
+[wp] [Valid] Goal ASSIGN_NO_UNFOLD_OK_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal ASSIGN_NO_UNFOLD_OK_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function ASSIGN_NO_UNFOLD_KO
 ------------------------------------------------------------

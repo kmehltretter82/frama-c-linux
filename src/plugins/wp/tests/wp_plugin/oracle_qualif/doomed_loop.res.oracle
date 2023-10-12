@@ -1,7 +1,7 @@
 # frama-c -wp [...]
 [kernel] Parsing doomed_loop.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal foo_exits : Valid (Unreachable)
+[wp] [Valid] Goal foo_exits (Cfg) (Unreachable)
 [wp] Warning: Missing RTE guards
 [wp] 9 goals scheduled
 [wp] [Failed] (Doomed) typed_foo_wp_smoke_dead_loop_s2 (Qed)

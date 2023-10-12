@@ -1,8 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing frama_c_exo1_solved.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal exo1_exits : Valid (Unreachable)
-[wp] [CFG] Goal exo1_terminates : Valid (Trivial)
+[wp] [Valid] Goal exo1_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal exo1_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 10 goals scheduled
 [wp] [Valid] typed_exo1_ensures (Alt-Ergo) (Cached)
@@ -26,7 +26,7 @@
 ------------------------------------------------------------
 [wp] Running WP plugin...
 [rte:annot] annotating function exo1
-[wp] [CFG] Goal exo1_terminates : Valid (Trivial)
+[wp] [Valid] Goal exo1_terminates (Cfg) (Trivial)
 [wp] 5 goals scheduled
 [wp] [Valid] typed_exo1_assert_rte_signed_overflow (Qed)
 [wp] [Valid] typed_exo1_assert_rte_mem_access (Alt-Ergo) (Cached)

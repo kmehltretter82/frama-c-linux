@@ -1,11 +1,11 @@
 # frama-c -wp [...]
 [kernel] Parsing issue-189-bis.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal memcpy_alias_vars_exits : Valid (Unreachable)
-[wp] [CFG] Goal memcpy_alias_vars_terminates : Valid (Trivial)
+[wp] [Valid] Goal memcpy_alias_vars_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal memcpy_alias_vars_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal memcpy_context_vars_exits : Valid (Unreachable)
-[wp] [CFG] Goal memcpy_context_vars_terminates : Valid (Trivial)
+[wp] [Valid] Goal memcpy_context_vars_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal memcpy_context_vars_terminates (Cfg) (Trivial)
 [wp] 34 goals scheduled
 [wp] [Valid] typed_memcpy_alias_vars_ensures_memcpy (Alt-Ergo) (Cached)
 [wp] [Valid] typed_memcpy_alias_vars_ensures_unmodified (Alt-Ergo) (Cached)

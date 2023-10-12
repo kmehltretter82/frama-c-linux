@@ -1,8 +1,8 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing frama_c_exo3_solved.old.v2.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal equal_elements_exits : Valid (Unreachable)
-[wp] [CFG] Goal equal_elements_terminates : Valid (Trivial)
+[wp] [Valid] Goal equal_elements_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal equal_elements_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 35 goals scheduled
 [wp] [Valid] typed_ref_equal_elements_ensures_v1_good (Alt-Ergo) (Cached)
@@ -60,7 +60,7 @@
   void equal_elements(int *a, int *v1, int *v2);
 [wp] Running WP plugin...
 [rte:annot] annotating function equal_elements
-[wp] [CFG] Goal equal_elements_terminates : Valid (Trivial)
+[wp] [Valid] Goal equal_elements_terminates (Cfg) (Trivial)
 [wp] 16 goals scheduled
 [wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access (Qed)
 [wp] [Valid] typed_ref_equal_elements_assert_rte_mem_access_2 (Qed)

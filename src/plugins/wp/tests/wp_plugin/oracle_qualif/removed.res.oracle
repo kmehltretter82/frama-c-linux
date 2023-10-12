@@ -8,8 +8,8 @@
 [eva:final-states] Values at end of function main:
   __retres ∈ [-2147483647..2147483647]
 [wp] Running WP plugin...
-[wp] [CFG] Goal main_exits : Valid (Unreachable)
-[wp] [CFG] Goal main_terminates : Valid (Trivial)
+[wp] [Valid] Goal main_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal main_terminates (Cfg) (Trivial)
 [wp] 1 goal scheduled
 [wp] [Unsuccess] typed_main_assert_Eva_signed_overflow (Alt-Ergo) (Cached)
 [wp] Proved goals:    2 / 3
@@ -21,7 +21,7 @@
   main                      -        -        1       0.0%
 ------------------------------------------------------------
 [wp] Running WP plugin...
-[wp] [CFG] Goal main_terminates_2 : Valid (Trivial)
+[wp] [Valid] Goal main_terminates_2 (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] Warning: No goal generated
 [wp] Proved goals:    1 / 1

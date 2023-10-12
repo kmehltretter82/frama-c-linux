@@ -1,13 +1,13 @@
 # frama-c -wp [...]
 [kernel] Parsing init_label.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal extra_exits : Valid (Unreachable)
-[wp] [CFG] Goal extra_terminates : Valid (Trivial)
+[wp] [Valid] Goal extra_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal extra_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal foreign_exits : Valid (Unreachable)
-[wp] [CFG] Goal foreign_terminates : Valid (Trivial)
-[wp] [CFG] Goal job_exits : Valid (Unreachable)
-[wp] [CFG] Goal job_terminates : Valid (Trivial)
+[wp] [Valid] Goal foreign_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal foreign_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal job_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal job_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function extra
 ------------------------------------------------------------

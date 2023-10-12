@@ -2,8 +2,8 @@
 [kernel] Parsing struct_fields.i (no preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function foo
-[wp] [CFG] Goal foo_exits : Valid (Unreachable)
-[wp] [CFG] Goal foo_terminates : Valid (Trivial)
+[wp] [Valid] Goal foo_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal foo_terminates (Cfg) (Trivial)
 [wp] 2 goals scheduled
 ---------------------------------------------
 --- Context 'typed_foo' Cluster 'Chunk' 

@@ -2,17 +2,17 @@
 [kernel] Parsing array_initialized.c (with preprocessing)
 [kernel] array_initialized.c:13: Warning: Too many initializers for array g
 [wp] Running WP plugin...
-[wp] [CFG] Goal main1_exits : Valid (Unreachable)
-[wp] [CFG] Goal main1_terminates : Valid (Trivial)
+[wp] [Valid] Goal main1_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal main1_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal main2_exits : Valid (Unreachable)
-[wp] [CFG] Goal main2_terminates : Valid (Trivial)
-[wp] [CFG] Goal main3_exits : Valid (Unreachable)
-[wp] [CFG] Goal main3_terminates : Valid (Trivial)
-[wp] [CFG] Goal main_pointer_exits : Valid (Unreachable)
-[wp] [CFG] Goal main_pointer_terminates : Valid (Trivial)
-[wp] [CFG] Goal simpl_exits : Valid (Unreachable)
-[wp] [CFG] Goal simpl_terminates : Valid (Trivial)
+[wp] [Valid] Goal main2_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal main2_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal main3_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal main3_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal main_pointer_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal main_pointer_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal simpl_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal simpl_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function main1
 ------------------------------------------------------------

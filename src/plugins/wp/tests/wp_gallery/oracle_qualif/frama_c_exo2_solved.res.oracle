@@ -1,8 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing frama_c_exo2_solved.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal max_subarray_exits : Valid (Unreachable)
-[wp] [CFG] Goal max_subarray_terminates : Valid (Trivial)
+[wp] [Valid] Goal max_subarray_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal max_subarray_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 22 goals scheduled
 [wp] [Valid] typed_max_subarray_ensures (Alt-Ergo) (Cached)
@@ -38,7 +38,7 @@
 ------------------------------------------------------------
 [wp] Running WP plugin...
 [rte:annot] annotating function max_subarray
-[wp] [CFG] Goal max_subarray_terminates : Valid (Trivial)
+[wp] [Valid] Goal max_subarray_terminates (Cfg) (Trivial)
 [wp] 1 goal scheduled
 [wp] [Valid] typed_max_subarray_assert_rte_mem_access (Alt-Ergo) (Cached)
 [wp] Proved goals:    2 / 2

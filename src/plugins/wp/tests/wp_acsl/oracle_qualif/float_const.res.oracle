@@ -4,11 +4,11 @@
   Floating-point constant 0.1f is not represented exactly. Will use 0x1.99999a0000000p-4.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [wp] Running WP plugin...
-[wp] [CFG] Goal double_convertible_exits : Valid (Unreachable)
-[wp] [CFG] Goal double_convertible_terminates : Valid (Trivial)
+[wp] [Valid] Goal double_convertible_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal double_convertible_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal float_convertible_exits : Valid (Unreachable)
-[wp] [CFG] Goal float_convertible_terminates : Valid (Trivial)
+[wp] [Valid] Goal float_convertible_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal float_convertible_terminates (Cfg) (Trivial)
 [wp] 8 goals scheduled
 [wp] [Valid] typed_float_convertible_check (Alt-Ergo) (Cached)
 [wp] [Valid] typed_float_convertible_check_2 (Alt-Ergo) (Cached)

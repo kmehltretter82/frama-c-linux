@@ -4,8 +4,8 @@
 [rte:annot] annotating function main
 [rte:annot] annotating function stringCompare
 [rte:annot] annotating function stringLength
-[wp] [CFG] Goal stringCompare_exits_never : Valid (Unreachable)
-[wp] [CFG] Goal stringLength_exits_never : Valid (Unreachable)
+[wp] [Valid] Goal stringCompare_exits_never (Cfg) (Unreachable)
+[wp] [Valid] Goal stringLength_exits_never (Cfg) (Unreachable)
 [wp] Goal typed_stringCompare_complete_SomeDifferent_allEqual : trivial
 [wp] Goal typed_stringCompare_disjoint_SomeDifferent_allEqual : trivial
 [wp] Goal typed_stringCompare_terminates : trivial

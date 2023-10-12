@@ -21,12 +21,12 @@
 [wp:rte] function job3: generate rte for unsigned overflow
 [wp:rte] function job3: generate rte for invalid bool value
 [rte:annot] annotating function job3
-[wp] [CFG] Goal job_exits : Valid (Unreachable)
-[wp] [CFG] Goal job_terminates : Valid (Trivial)
-[wp] [CFG] Goal job2_exits : Valid (Unreachable)
-[wp] [CFG] Goal job2_terminates : Valid (Trivial)
-[wp] [CFG] Goal job3_exits : Valid (Unreachable)
-[wp] [CFG] Goal job3_terminates : Valid (Trivial)
+[wp] [Valid] Goal job_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal job_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal job2_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal job2_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal job3_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal job3_terminates (Cfg) (Trivial)
 [wp] Goal typed_nat_job_ensures : not tried
 [wp] Goal typed_nat_job_assert_rte_mem_access : not tried
 [wp] Goal typed_nat_job_assert_rte_mem_access_2 : not tried

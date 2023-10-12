@@ -15,11 +15,11 @@
   'Rel' relation must be well-founded
 [wp:hypothesis] terminates_formulae.i:67: Warning: 
   'Rel' relation must be well-founded
-[wp] [CFG] Goal general_variant_exits : Valid (Unreachable)
-[wp] [CFG] Goal general_variant_terminates : Valid (Trivial)
-[wp] [CFG] Goal no_variant_exits : Valid (Unreachable)
-[wp] [CFG] Goal variant_exits : Valid (Unreachable)
-[wp] [CFG] Goal variant_terminates : Valid (Trivial)
+[wp] [Valid] Goal general_variant_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal general_variant_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal no_variant_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal variant_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal variant_terminates (Cfg) (Trivial)
 [wp] terminates_formulae.i:91: Warning: 
   Missing decreases clause on recursive function no_decreases, call must be unreachable
 [wp] 28 goals scheduled

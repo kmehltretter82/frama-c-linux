@@ -4,8 +4,8 @@
 [kernel] Parsing working_dir/swap2.h (with preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function swap
-[wp] [CFG] Goal swap_exits : Valid (Unreachable)
-[wp] [CFG] Goal swap_terminates : Valid (Trivial)
+[wp] [Valid] Goal swap_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal swap_terminates (Cfg) (Trivial)
 [wp] 8 goals scheduled
 [wp] [Valid] typed_swap_ensures_A (Alt-Ergo) (Cached)
 [wp] [Valid] typed_swap_ensures_B (Qed)

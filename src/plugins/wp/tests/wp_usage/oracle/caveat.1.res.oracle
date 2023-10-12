@@ -11,13 +11,13 @@ Function implicit: { a *r p q }
 Function explicit: { a *r p q }
 Function observer: { a *r p q }
 .................................................
-[wp] [CFG] Goal explicit_exits : Valid (Unreachable)
-[wp] [CFG] Goal explicit_terminates : Valid (Trivial)
+[wp] [Valid] Goal explicit_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal explicit_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal implicit_exits : Valid (Unreachable)
-[wp] [CFG] Goal implicit_terminates : Valid (Trivial)
-[wp] [CFG] Goal observer_exits : Valid (Unreachable)
-[wp] [CFG] Goal observer_terminates : Valid (Trivial)
+[wp] [Valid] Goal implicit_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal implicit_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal observer_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal observer_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function explicit
 ------------------------------------------------------------

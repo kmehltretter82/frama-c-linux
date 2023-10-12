@@ -1,13 +1,13 @@
 # frama-c -wp [...]
 [kernel] Parsing ex5.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal dummy_exits : Valid (Unreachable)
-[wp] [CFG] Goal dummy_terminates : Valid (Trivial)
+[wp] [Valid] Goal dummy_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal dummy_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal exists_exits : Valid (Unreachable)
-[wp] [CFG] Goal exists_terminates : Valid (Trivial)
-[wp] [CFG] Goal forall_exits : Valid (Unreachable)
-[wp] [CFG] Goal forall_terminates : Valid (Trivial)
+[wp] [Valid] Goal exists_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal exists_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal forall_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal forall_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function dummy
 ------------------------------------------------------------

@@ -4,8 +4,8 @@
 [kernel:annot:missing-spec] issue_751.i:28: Warning: 
   Neither code nor explicit exits and terminates for function checks,
    generating default clauses. See -generated-spec-* options for more info
-[wp] [CFG] Goal acquire_exits : Valid (Unreachable)
-[wp] [CFG] Goal acquire_terminates : Valid (Trivial)
+[wp] [Valid] Goal acquire_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal acquire_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 44 goals scheduled
 [wp] [Valid] typed_acquire_loop_invariant_RANGE_preserved (Qed)

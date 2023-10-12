@@ -1,6 +1,5 @@
 [kernel] Warning: ignoring source files specified on the command line while loading a global initial context.
 [wp] Running WP plugin...
-[wp] [CFG] Goal f_terminates_2 : Valid (Trivial)
 ------------------------------------------------------------
   Function f
 ------------------------------------------------------------

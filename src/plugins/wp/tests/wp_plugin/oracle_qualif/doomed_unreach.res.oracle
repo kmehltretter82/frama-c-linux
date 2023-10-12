@@ -4,8 +4,8 @@
 [wp] doomed_unreach.i:12: Warning: Failed smoke-test
 [wp] doomed_unreach.i:17: Warning: Failed smoke-test
 [wp] doomed_unreach.i:22: Warning: Failed smoke-test
-[wp] [CFG] Goal job_exits : Valid (Unreachable)
-[wp] [CFG] Goal job_terminates : Valid (Trivial)
+[wp] [Valid] Goal job_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal job_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
 [wp] [Passed] (Unsuccess) typed_job_wp_smoke_dead_code_s4 (Alt-Ergo) (Cached)

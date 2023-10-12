@@ -4,12 +4,12 @@
 [rte:annot] annotating function find
 [rte:annot] annotating function find_ptr
 [rte:annot] annotating function iter_ptr
-[wp] [CFG] Goal find_exits : Valid (Unreachable)
-[wp] [CFG] Goal find_terminates : Valid (Trivial)
-[wp] [CFG] Goal find_ptr_exits : Valid (Unreachable)
-[wp] [CFG] Goal find_ptr_terminates : Valid (Trivial)
-[wp] [CFG] Goal iter_ptr_exits : Valid (Unreachable)
-[wp] [CFG] Goal iter_ptr_terminates : Valid (Trivial)
+[wp] [Valid] Goal find_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal find_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal find_ptr_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal find_ptr_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal iter_ptr_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal iter_ptr_terminates (Cfg) (Trivial)
 [wp] Goal typed_find_complete_found_not_found : trivial
 [wp] Goal typed_find_disjoint_found_not_found : trivial
 [wp] Goal typed_find_ensures_Range : not tried

@@ -1,19 +1,19 @@
 # frama-c -wp [...]
 [kernel] Parsing wp_behav.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal assert_needed_exits : Valid (Unreachable)
-[wp] [CFG] Goal assert_needed_terminates : Valid (Trivial)
+[wp] [Valid] Goal assert_needed_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal assert_needed_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal bhv_exits : Valid (Unreachable)
-[wp] [CFG] Goal bhv_terminates : Valid (Trivial)
-[wp] [CFG] Goal bts0513_exits : Valid (Unreachable)
-[wp] [CFG] Goal bts0513_terminates : Valid (Trivial)
-[wp] [CFG] Goal f_exits : Valid (Unreachable)
-[wp] [CFG] Goal f_terminates : Valid (Trivial)
-[wp] [CFG] Goal min_exits : Valid (Unreachable)
-[wp] [CFG] Goal min_terminates : Valid (Trivial)
-[wp] [CFG] Goal razT_exits : Valid (Unreachable)
-[wp] [CFG] Goal razT_terminates : Valid (Trivial)
+[wp] [Valid] Goal bhv_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bhv_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal bts0513_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bts0513_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal f_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal min_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal min_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal razT_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal razT_terminates (Cfg) (Trivial)
 [wp] wp_behav.c:84: Warning: 
   Missing assigns clause (assigns 'everything' instead)
 ------------------------------------------------------------

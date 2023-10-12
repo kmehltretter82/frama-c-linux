@@ -1,8 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing issue-516.c (with preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal list_remove_exits : Valid (Unreachable)
-[wp] [CFG] Goal list_remove_terminates : Valid (Trivial)
+[wp] [Valid] Goal list_remove_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal list_remove_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] Warning: No definition for 'to_logic_list' interpreted as reads nothing
 ------------------------------------------------------------

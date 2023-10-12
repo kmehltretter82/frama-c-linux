@@ -2,8 +2,8 @@
 [kernel] Parsing euclid.c (with preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function euclid_gcd
-[wp] [CFG] Goal euclid_gcd_exits : Valid (Unreachable)
-[wp] [CFG] Goal euclid_gcd_terminates : Valid (Trivial)
+[wp] [Valid] Goal euclid_gcd_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal euclid_gcd_terminates (Cfg) (Trivial)
 [wp] 16 goals scheduled
 [wp] [Passed] (Unsuccess) typed_euclid_euclid_gcd_wp_smoke_default_requires (Alt-Ergo) (Cached)
 [wp] [Passed] (Unsuccess) typed_euclid_euclid_gcd_wp_smoke_dead_loop_s1 (Alt-Ergo) (Cached)

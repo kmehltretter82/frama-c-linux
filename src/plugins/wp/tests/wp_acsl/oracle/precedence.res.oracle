@@ -21,15 +21,15 @@
 [kernel:annot-error] precedence.i:176: Warning: 
   P is not a logic variable. Ignoring code annotation
 [wp] Running WP plugin...
-[wp] [CFG] Goal bitwise_exits : Valid (Unreachable)
-[wp] [CFG] Goal bitwise_terminates : Valid (Trivial)
+[wp] [Valid] Goal bitwise_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bitwise_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal comparison_exits : Valid (Unreachable)
-[wp] [CFG] Goal comparison_terminates : Valid (Trivial)
-[wp] [CFG] Goal predicate_exits : Valid (Unreachable)
-[wp] [CFG] Goal predicate_terminates : Valid (Trivial)
-[wp] [CFG] Goal predicate_bitwise_exits : Valid (Unreachable)
-[wp] [CFG] Goal predicate_bitwise_terminates : Valid (Trivial)
+[wp] [Valid] Goal comparison_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal comparison_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal predicate_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal predicate_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal predicate_bitwise_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal predicate_bitwise_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function bitwise
 ------------------------------------------------------------

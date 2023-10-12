@@ -3,10 +3,10 @@
 [wp] Running WP plugin...
 [rte:annot] annotating function foo_correct
 [rte:annot] annotating function foo_wrong
-[wp] [CFG] Goal foo_correct_exits : Valid (Unreachable)
-[wp] [CFG] Goal foo_correct_terminates : Valid (Trivial)
-[wp] [CFG] Goal foo_wrong_exits : Valid (Unreachable)
-[wp] [CFG] Goal foo_wrong_terminates : Valid (Trivial)
+[wp] [Valid] Goal foo_correct_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal foo_correct_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal foo_wrong_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal foo_wrong_terminates (Cfg) (Trivial)
 [wp] 10 goals scheduled
 [wp] [Valid] typed_foo_wrong_ensures (Qed)
 [wp] [Valid] typed_foo_wrong_assert_rte_mem_access (Qed)

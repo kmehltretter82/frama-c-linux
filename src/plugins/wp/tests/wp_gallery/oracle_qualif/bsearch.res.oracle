@@ -2,8 +2,8 @@
 [kernel] Parsing bsearch.c (with preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function binary_search
-[wp] [CFG] Goal binary_search_exits : Valid (Unreachable)
-[wp] [CFG] Goal binary_search_terminates : Valid (Trivial)
+[wp] [Valid] Goal binary_search_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal binary_search_terminates (Cfg) (Trivial)
 [wp] 28 goals scheduled
 [wp] [Passed] (Unsuccess) typed_binary_search_wp_smoke_default_requires (Alt-Ergo) (Cached)
 [wp] [Passed] (Unsuccess) typed_binary_search_wp_smoke_dead_loop_s3 (Alt-Ergo) (Cached)

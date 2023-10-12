@@ -1,8 +1,8 @@
 # frama-c -wp -wp-timeout 1 [...]
 [kernel] Parsing bts_2471.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal foo_exits : Valid (Unreachable)
-[wp] [CFG] Goal foo_terminates : Valid (Trivial)
+[wp] [Valid] Goal foo_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal foo_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled
 [wp] [Unsuccess] typed_foo_assert_ko (Alt-Ergo) (Cached)

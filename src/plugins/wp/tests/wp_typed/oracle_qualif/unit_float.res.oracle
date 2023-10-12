@@ -4,8 +4,8 @@
   Floating-point constant 0.2 is not represented exactly. Will use 0x1.999999999999ap-3.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [wp] Running WP plugin...
-[wp] [CFG] Goal main_exits : Valid (Unreachable)
-[wp] [CFG] Goal main_terminates : Valid (Trivial)
+[wp] [Valid] Goal main_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal main_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
 [wp] [Valid] typed_main_ensures_CST_F (Qed)

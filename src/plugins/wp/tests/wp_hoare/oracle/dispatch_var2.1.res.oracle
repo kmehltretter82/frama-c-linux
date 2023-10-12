@@ -2,12 +2,12 @@
 [kernel] Parsing dispatch_var2.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal incr_exits : Valid (Unreachable)
-[wp] [CFG] Goal incr_terminates : Valid (Trivial)
-[wp] [CFG] Goal load_exits : Valid (Unreachable)
-[wp] [CFG] Goal load_terminates : Valid (Trivial)
-[wp] [CFG] Goal reset_exits : Valid (Unreachable)
-[wp] [CFG] Goal reset_terminates : Valid (Trivial)
+[wp] [Valid] Goal incr_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal incr_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal load_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal load_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal reset_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal reset_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function call_global
 ------------------------------------------------------------

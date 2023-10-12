@@ -1,8 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing init_const_filter.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal default_init_exits : Valid (Unreachable)
-[wp] [CFG] Goal default_init_terminates : Valid (Trivial)
+[wp] [Valid] Goal default_init_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal default_init_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled
 [wp] [Valid] typed_default_init_check_X (Alt-Ergo) (Cached)

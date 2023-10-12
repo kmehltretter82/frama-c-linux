@@ -1,11 +1,11 @@
 # frama-c -wp [...]
 [kernel] Parsing arith.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal cast_sgn_usgn_exits : Valid (Unreachable)
-[wp] [CFG] Goal cast_sgn_usgn_terminates : Valid (Trivial)
+[wp] [Valid] Goal cast_sgn_usgn_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal cast_sgn_usgn_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal uchar_range_exits : Valid (Unreachable)
-[wp] [CFG] Goal uchar_range_terminates : Valid (Trivial)
+[wp] [Valid] Goal uchar_range_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal uchar_range_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Global
 ------------------------------------------------------------

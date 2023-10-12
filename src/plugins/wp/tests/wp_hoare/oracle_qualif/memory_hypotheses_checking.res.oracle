@@ -1,17 +1,17 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing memory_hypotheses_checking.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal add_return_ok_exits : Valid (Unreachable)
-[wp] [CFG] Goal add_return_ok_terminates : Valid (Trivial)
+[wp] [Valid] Goal add_return_ok_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal add_return_ok_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal assigns_ptr_exits : Valid (Unreachable)
-[wp] [CFG] Goal assigns_ptr_terminates : Valid (Trivial)
-[wp] [CFG] Goal bad_return_formal_exits : Valid (Unreachable)
-[wp] [CFG] Goal bad_return_formal_terminates : Valid (Trivial)
-[wp] [CFG] Goal gptr_sep_exits : Valid (Unreachable)
-[wp] [CFG] Goal gptr_sep_terminates : Valid (Trivial)
-[wp] [CFG] Goal sep_exits : Valid (Unreachable)
-[wp] [CFG] Goal sep_terminates : Valid (Trivial)
+[wp] [Valid] Goal assigns_ptr_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal assigns_ptr_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal bad_return_formal_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bad_return_formal_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal gptr_sep_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal gptr_sep_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal sep_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal sep_terminates (Cfg) (Trivial)
 [wp] 68 goals scheduled
 [wp] [Valid] typed_ref_sep_assigns (Qed)
 [wp] [Valid] typed_ref_call_sep_ok_terminates (Qed)

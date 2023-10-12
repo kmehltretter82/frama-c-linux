@@ -1,11 +1,11 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing logicref.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal fvrange_n_exits : Valid (Unreachable)
-[wp] [CFG] Goal fvrange_n_terminates : Valid (Trivial)
+[wp] [Valid] Goal fvrange_n_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal fvrange_n_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal gcd_exits : Valid (Unreachable)
-[wp] [CFG] Goal gcd_terminates : Valid (Trivial)
+[wp] [Valid] Goal gcd_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal gcd_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function fvrange_n
 ------------------------------------------------------------

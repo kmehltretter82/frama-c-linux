@@ -2,8 +2,8 @@
 [kernel] Parsing issue_pub_49.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal is_class_exits : Valid (Unreachable)
-[wp] [CFG] Goal is_class_terminates : Valid (Trivial)
+[wp] [Valid] Goal is_class_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal is_class_terminates (Cfg) (Trivial)
 [wp] 41 goals scheduled
 [wp] [Valid] typed_is_class_assigns_part1 (Qed)
 [wp] [Valid] typed_is_class_assigns_part2 (Qed)

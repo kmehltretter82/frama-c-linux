@@ -3,10 +3,10 @@
 [wp] Running WP plugin...
 [rte:annot] annotating function usable_axiom
 [rte:annot] annotating function usable_lemma
-[wp] [CFG] Goal usable_axiom_exits : Valid (Unreachable)
-[wp] [CFG] Goal usable_axiom_terminates : Valid (Trivial)
-[wp] [CFG] Goal usable_lemma_exits : Valid (Unreachable)
-[wp] [CFG] Goal usable_lemma_terminates : Valid (Trivial)
+[wp] [Valid] Goal usable_axiom_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal usable_axiom_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal usable_lemma_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal usable_lemma_terminates (Cfg) (Trivial)
 [wp] 3 goals scheduled
 ---------------------------------------------
 --- Context 'typed_usable_lemma' Cluster 'Chunk' 

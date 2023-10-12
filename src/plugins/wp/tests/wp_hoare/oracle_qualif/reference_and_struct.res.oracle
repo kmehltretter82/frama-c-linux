@@ -11,8 +11,8 @@
   Neither code nor explicit exits and terminates for function reset_5,
    generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal reset_exits : Valid (Unreachable)
-[wp] [CFG] Goal reset_terminates : Valid (Trivial)
+[wp] [Valid] Goal reset_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal reset_terminates (Cfg) (Trivial)
 [wp] 46 goals scheduled
 [wp] [Valid] typed_ref_reset_ensures (Qed)
 [wp] [Valid] typed_ref_reset_assigns (Qed)

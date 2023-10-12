@@ -344,7 +344,9 @@ let wp_trivially_terminates =
 
 let set_trivially_terminates p hyps =
   incr trivial_terminates ;
-  Wp_parameters.result "[CFG] Goal %a : Valid (Trivial)" WpPropId.pp_propid p ;
+  if Wp_parameters.has_dkey VCS.dkey_shell then
+    Wp_parameters.feedback "[Valid] Goal %a (Cfg) (Trivial)"
+      WpPropId.pp_propid p ;
   let pid = WpPropId.property_of_id p in
   let hyps = Property.Set.elements hyps in
   Property_status.emit wp_trivially_terminates ~hyps pid Property_status.True

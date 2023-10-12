@@ -3,8 +3,8 @@
 [kernel] Parsing working_dir/swap.c (with preprocessing)
 [kernel] Parsing working_dir/swap1.h (with preprocessing)
 [wp] Running WP plugin...
-[wp] [CFG] Goal swap_exits : Valid (Unreachable)
-[wp] [CFG] Goal swap_terminates : Valid (Trivial)
+[wp] [Valid] Goal swap_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal swap_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
 [wp] [Valid] typed_swap_ensures_A (Alt-Ergo) (Cached)

@@ -5,8 +5,8 @@
   Neither code nor explicit exits and terminates for function foo,
    generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
-[wp] [CFG] Goal f1_simpler_exits : Valid (Unreachable)
-[wp] [CFG] Goal f1_simpler_terminates : Valid (Trivial)
+[wp] [Valid] Goal f1_simpler_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f1_simpler_terminates (Cfg) (Trivial)
 [wp] 13 goals scheduled
 [wp] [Valid] typed_f1_terminates (Qed)
 [wp] [Unsuccess] typed_f1_ensures_BUG_LEGACY_WP (Alt-Ergo) (Cached)
