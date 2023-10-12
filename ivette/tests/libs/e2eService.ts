@@ -74,14 +74,9 @@ export async function testServerIsStarted(window: Page): Promise<void> {
   // Click on the Console tab in the right menu.
   await locs.getConsoleMenuItem(window).click();
 
-  window.waitForTimeout(5000);
-  window.screenshot({ path: `./screenshots/${Date.now()}-console.png` });
-
   // Check the server status in the header's button bar
   await expect(locs.getStartServerButton(window)).toBeDisabled();
   await expect(locs.getShutDownServerButton(window)).toBeEnabled();
-  // -> Will Fail if the server is started
-  // await expect(locs.getStartServerButton(window)).toBeEnabled();
 
   // Check the server status in the console view
   await expect(
