@@ -28,8 +28,6 @@ import * as locs from "./locatorsUtil";
 export const argsDefaultLaunch: string[] = [
   "./dist/main/main.js",
   "--no-sandbox",
-  "--command",
-  "../bin/frama-c",
 ];
 
 // Electron launch of Ivette for Playwright
@@ -38,8 +36,6 @@ export const argsLaunchWithDefaultSettings: string[] = [
   "./dist/main/main.js",
   "--no-sandbox",
   "--init-settings",
-  "--command",
-  "../bin/frama-c",
 ];
 
 // Electron launch of Ivette for Playwright
@@ -49,8 +45,6 @@ export const argsLaunchWithTestFile: string[] = [
   "--no-sandbox",
   "--with-fixed-settings",
   "./tests/settings.json",
-  "--command",
-  "../bin/frama-c",
   "../tests/test/adpcm.c",
 ];
 /**
