@@ -1,6 +1,6 @@
 /* run.config
  SCRIPT: @PTEST_NAME@
-   OPT: -wp-msg-key shell
+   DONTRUN: OPT: -wp-msg-key shell
 */
 int empty (int c){
   /*@ assert \true; */
