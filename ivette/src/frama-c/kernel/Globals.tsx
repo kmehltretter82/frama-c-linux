@@ -33,6 +33,7 @@ import { Section, Item } from 'dome/frame/sidebars';
 import { Button } from 'dome/controls/buttons';
 
 import * as Ivette from 'ivette';
+import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Locations from 'frama-c/kernel/Locations';
@@ -53,15 +54,26 @@ function globalHints(): Ivette.Hint[] {
   }));
 }
 
-const globalSearchMode : Ivette.ModeProps = {
+const globalMode : Ivette.ModeProps = {
   id: 'frama-c.kernel.globals',
   label: 'Globals',
-  title: 'Lookup for Global Variables',
+  title: 'Lookup for Global Declarations',
+  placeholder: 'declaration',
   hints: globalHints,
 };
 
-Ivette.registerMode(globalSearchMode);
-Dome.find.on(() => Ivette.focusMode(globalSearchMode.id));
+function resetMode(enabled: boolean): void {
+  Ivette.updateMode({ id: globalMode.id, enabled });
+  Ivette.selectMode(globalMode.id);
+}
+
+{
+  Ivette.registerMode(globalMode);
+  Dome.find.on(() => Ivette.focusMode(globalMode.id));
+  Server.onReady(() => resetMode(true));
+  Server.onShutdown(() => resetMode(false));
+  resetMode(false);
+}
 
 // --------------------------------------------------------------------------
 // --- Function Item

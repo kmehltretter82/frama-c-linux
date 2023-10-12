@@ -230,6 +230,7 @@ export interface ModeProps {
 export function registerMode(m: ModeProps): void { Mode.registerMode(m); }
 export function updateMode(m: ModeProps): void { Mode.updateMode(m); }
 export function removeMode(id: string): void { Mode.removeMode(id); }
+export function selectMode(id: string): void { Mode.selectMode(id); }
 export function focusMode(id: string): void { Mode.focusMode(id); }
 export function useMode(m: ModeProps): void {
   React.useEffect(() => {

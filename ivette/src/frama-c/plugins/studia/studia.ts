@@ -97,7 +97,7 @@ const studiaReadsMode : Ivette.ModeProps = {
   id: 'frama-c.plugins.studia.reads',
   label: 'Studia: reads',
   title: 'Select all statements reading the given lvalue',
-  placeholder: 'lvalue',
+  placeholder: 'lvalue (reads)',
   icon: 'EDIT',
   className: 'studia-search-mode',
   onEnter: (p: string) => onEnter('Reads', p)
@@ -107,7 +107,7 @@ const studiaWritesMode : Ivette.ModeProps = {
   id: 'frama-c.plugins.studia.writes',
   label: 'Studia: writes',
   title: 'Select all statements writing the given lvalue',
-  placeholder: "lvalue",
+  placeholder: "lvalue (writes)",
   icon: 'EDIT',
   className: 'studia-search-mode',
   onEnter: (p: string) => onEnter('Writes', p)

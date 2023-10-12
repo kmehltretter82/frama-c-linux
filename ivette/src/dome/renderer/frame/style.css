@@ -492,6 +492,13 @@
   color: var(--text);
 }
 
+.dome-xToolBar-searchField input[type=search]:disabled {
+  background: var(--background-profound);
+  color: var(--disabled-text);
+  opacity: 30%;
+}
+
+
 .dome-xToolBar-searchComponent div.dome-xToolBar-suggestions {
   position: absolute;
   overflow-x: hidden;
@@ -500,11 +507,11 @@
   z-index: +1;
   width: 0px;
   background: var(--background-alterning-odd);
-  border-radius: 12px;
 }
 
 .dome-xToolBar-searchComponent:focus-within div.dome-xToolBar-suggestions {
   width: 230px;
+  border: solid thin var(--border);
 }
 
 .dome-xToolBar-searchItem {
@@ -529,9 +536,9 @@
   fill: var(--text-discrete);
 }
 
-.dome-xToolBar-modeOfModes {
+.dome-xToolBar-disabledMode {
   background: var(--background-profound);
-  fill: var(--text-discrete);
+  fill: var(--disabled-text);
 }
 
 /* -------------------------------------------------------------------------- */

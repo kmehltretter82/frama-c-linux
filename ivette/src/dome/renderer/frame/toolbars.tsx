@@ -329,17 +329,19 @@ export function byHint(a: Hint, b: Hint): number {
 
 interface ModeButtonComponentProps {
   icon: string;
-  className?: string;
+  disabled: boolean;
+  className: string;
   onClick?: () => void;
 }
 
 function ModeButton(props: ModeButtonComponentProps): JSX.Element {
-  const { className, icon, onClick } = props;
+  const { icon, disabled, onClick } = props;
+  const className = classes(
+    'dome-xToolBar-modeSelection',
+    disabled ? 'dome-xToolBar-disabledMode' : props.className
+  );
   return (
-    <div
-      className={classes("dome-xToolBar-modeSelection", className)}
-      onClick={onClick}
-    >
+    <div className={className} onClick={onClick} >
       <SVG
         className="dome-xToolBar-modeIcon"
         id={icon}
@@ -354,9 +356,10 @@ function ModeButton(props: ModeButtonComponentProps): JSX.Element {
 // --------------------------------------------------------------------------
 
 interface SuggestionsProps {
-  hints?: Hint[];
-  onHint?: (hint: Hint) => void;
   index: number;
+  hints: Hint[];
+  onClose: () => void;
+  onHint?: (hint: Hint) => void;
 }
 
 function scrollToRef(r: null | HTMLLabelElement): void {
@@ -364,14 +367,13 @@ function scrollToRef(r: null | HTMLLabelElement): void {
 }
 
 function Suggestions(props: SuggestionsProps): JSX.Element {
-  const { hints=[], onHint, index } = props;
-
-  // Computing the relevant suggestions. */
+  const { hints, onHint, index, onClose } = props;
   const suggestions = hints.map((h, k) => {
     const selected = k === index || hints.length === 1;
     const classSelected = selected && 'dome-xToolBar-searchIndex';
     const className = classes('dome-xToolBar-searchItem', classSelected);
     const onClick = (): void => {
+      onClose();
       if (h.onClick) h.onClick();
       if (onHint) onHint(h);
     };
@@ -409,9 +411,10 @@ interface SearchInputProps {
   title?: string;
   placeholder?: string;
   disabled: boolean;
-  hints?: Hint[];
+  hints: Hint[];
   onHint?: (hint: Hint) => void;
   onEnter?: (pattern: string) => void;
+  onClose: () => void;
   index: number;
   setIndex: (n: number) => void;
   pattern: string;
@@ -421,28 +424,27 @@ interface SearchInputProps {
 
 function SearchInput(props: SearchInputProps): JSX.Element {
   const {
-    title, placeholder, disabled=false,
-    hints=[], onHint, onEnter,
+    title, placeholder, disabled,
+    hints=[], onHint, onEnter, onClose,
     index, setIndex, pattern, setPattern, inputRef
   } = props;
 
-  // Blur Event
-  const onBlur = (): void => { setPattern(''); setIndex(-1); };
-
   // Key Up Events
   const onKeyUp = (evt: React.KeyboardEvent): void => {
-    const blur = (): void => inputRef.current?.blur();
     switch (evt.key) {
       case 'Escape':
-        blur();
+        onClose();
         break;
       case 'Enter':
-        blur();
-        if (onHint) {
-          if (index >= 0 && index < hints.length) onHint(hints[index]);
-          else if (hints.length === 1) onHint(hints[0]);
+        onClose();
+        {
+          const hint : Hint | undefined =
+            hints[index] ??
+            (hints.length === 1 ? hints[0] : undefined);
+          if (hint && hint.onClick) hint.onClick();
+          if (hint && onHint) onHint(hint);
+          if (onEnter) onEnter(pattern);
         }
-        else if (onEnter) onEnter(pattern);
         break;
       case 'ArrowUp':
         if (index < 0) setIndex(hints.length - 1);
@@ -457,7 +459,12 @@ function SearchInput(props: SearchInputProps): JSX.Element {
 
   // Key Down Events. Disables the default behavior on ArrowUp and ArrowDown.
   const onKeyDown = (evt: React.KeyboardEvent): void => {
-    if (evt.key === 'ArrowUp' || evt.key === 'ArrowDown') evt.preventDefault();
+    switch (evt.key) {
+      case 'ArrowUp':
+      case 'ArrowDown':
+        evt.preventDefault();
+        break;
+    }
   };
 
   // // Input Events
@@ -477,7 +484,7 @@ function SearchInput(props: SearchInputProps): JSX.Element {
       onKeyUp={onKeyUp}
       onKeyDown={onKeyDown}
       onChange={onChange}
-      onBlur={onBlur}
+      onBlur={onClose}
     />
   );
 }
@@ -521,19 +528,32 @@ export function SearchField(props: SearchFieldProps): JSX.Element {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const [index, setIndex] = React.useState(-1);
   const [pattern, setPattern] = React.useState('');
-  const focusInput = React.useCallback(() => inputRef.current?.focus(), []);
   const { onPattern } = props;
+  const onFocus = React.useCallback(() => inputRef.current?.focus(), []);
+  const onClose = React.useCallback(() => {
+    inputRef.current?.blur();
+    setPattern('');
+    setIndex(-1);
+    if (onPattern) onPattern('');
+  }, [onPattern]);
   const onPatternChanged = React.useCallback((p: string) => {
     setPattern(p);
     if (onPattern) onPattern(p);
   }, [onPattern]);
-  Dome.useEvent(props.focus, focusInput);
+  Dome.useEvent(props.focus, onFocus);
 
   // Compute the hints for the current mode.
   const {
-    hints, onHint, onEnter, icon='SEARCH',
+    hints=[], onHint, onEnter,
+    icon='SEARCH',
+    className='dome-xToolBar-searchMode',
     enabled=true, disabled=false,
   } = props;
+
+  const disabledInput = disabled || !enabled;
+  React.useEffect(
+    () => { if (disabledInput) inputRef.current?.blur(); }
+    , [disabledInput]);
 
   // Build the component.
   return (
@@ -543,15 +563,17 @@ export function SearchField(props: SearchFieldProps): JSX.Element {
       <div className="dome-xToolBar-searchField">
         <ModeButton
           icon={icon}
-          className={props.className}
+          disabled={disabledInput}
+          className={className}
           onClick={props.onSearch} />
         <SearchInput
           title={props.title}
           placeholder={props.placeholder}
-          disabled={disabled || !enabled}
+          disabled={disabledInput}
           hints={hints}
           onHint={onHint}
           onEnter={onEnter}
+          onClose={onClose}
           index={index}
           setIndex={setIndex}
           pattern={pattern}
@@ -559,7 +581,11 @@ export function SearchField(props: SearchFieldProps): JSX.Element {
           inputRef={inputRef}
         />
       </div>
-      <Suggestions hints={hints} onHint={onHint} index={index} />
+      <Suggestions
+        index={index}
+        hints={hints}
+        onClose={onClose}
+        onHint={onHint} />
     </div>
   );
 }

@@ -106,6 +106,13 @@ export function findMode(id: string): ModeProps | undefined {
   return allModes.find(id);
 }
 
+export function selectMode(id: string): void {
+  const m = allModes.find(id);
+  if (m !== undefined) {
+    allModes.setValue(m);
+  }
+}
+
 export function focusMode(id: string): void {
   const m = allModes.find(id);
   if (m !== undefined) {
@@ -118,13 +125,16 @@ export function focusMode(id: string): void {
 // --- Search Mode Selector
 // --------------------------------------------------------------------------
 
-const searchMode : ModeProps = {
-  id: 'ivette.searchmode',
+const switchMode : ModeProps = {
+  id: 'ivette.switchmode',
+  icon: 'TRIANGLE.RIGHT',
   title: 'Search & Action Modes',
-  placeholder: 'mode',
+  placeholder: 'search mode',
   hints: () => allModes.selfhints(),
   onHint: (h: Hint) => focusMode(h.id),
 };
+
+allModes.register(switchMode);
 
 // --------------------------------------------------------------------------
 // --- Search Action Component
@@ -159,12 +169,15 @@ export function SearchAction(): JSX.Element {
     return lookupHints(getHints(), pattern);
   }, [getHints, pattern]);
   React.useEffect(() => {
-    if (currMode && currMode !== searchMode.id)
+    if (currMode && currMode !== switchMode.id)
       userMode.current = currMode;
   }, [currMode]);
-  const onSearch = React.useCallback(() => focusMode(searchMode.id), []);
+  const onSearch = React.useCallback(() => {
+    if (currMode !== switchMode.id)
+      focusMode(switchMode.id);
+  }, [currMode]);
   const onBlur = React.useCallback(() => {
-    if (currMode === searchMode.id) {
+    if (currMode === switchMode.id) {
       const user = findMode(userMode.current) ?? defaultMode;
       allModes.setValue(user);
     }
