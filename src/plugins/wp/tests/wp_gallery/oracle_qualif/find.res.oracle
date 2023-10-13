@@ -63,10 +63,10 @@
 ------------------------------------------------------------
 [wp] Running WP plugin...
 [rte:annot] annotating function find
-[wp] [Valid] Goal find_terminates (Cfg) (Trivial)
 [rte:annot] annotating function find_ptr
-[wp] [Valid] Goal find_ptr_terminates (Cfg) (Trivial)
 [rte:annot] annotating function iter_ptr
+[wp] [Valid] Goal find_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal find_ptr_terminates (Cfg) (Trivial)
 [wp] [Valid] Goal iter_ptr_terminates (Cfg) (Trivial)
 [wp] 3 goals scheduled
 [wp] [Valid] typed_find_assert_rte_mem_access (Alt-Ergo) (Cached)
