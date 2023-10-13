@@ -28,8 +28,10 @@ type deps = Function_Froms.Deps.deps = {
 }
 
 (* Pretty printing of detailed internal representation *)
-let pretty_debug fmt {data; indirect} =
-  match Zone.is_bottom indirect, Zone.is_bottom data with
+let pretty_precise fmt {data; indirect} =
+  let bottom_data = Zone.is_bottom data in
+  let bottom_indirect = Zone.is_bottom indirect in
+  match bottom_indirect, bottom_data with
   | true, true ->
     Format.fprintf fmt "\\nothing"
   | true, false ->
@@ -42,6 +44,8 @@ let pretty_debug fmt {data; indirect} =
     Format.fprintf fmt "indirect: %a; direct: %a"
       Zone.pretty indirect
       Zone.pretty data
+
+let pretty_debug = pretty_precise
 
 (* Conversion to zone, used by default pretty printing *)
 let to_zone d = Locations.Zone.join d.data d.indirect
