@@ -651,34 +651,22 @@ module Froms: sig
         [Unassigned <= MaybeAssignedFrom] and
         [AssignedFrom z <= MaybeAssignedFrom z]. *)
 
-    include Lmap_bitwise.With_default with type t = deps_or_unassigned
+    type t = deps_or_unassigned
 
-    val subst: (Deps.t -> Deps.t) -> t -> t
+    val top : t
+    val equal : t -> t -> bool
 
-    val extract_data: t -> Locations.Zone.t
-    val extract_indirect: t -> Locations.Zone.t
+    val subst : (Deps.t -> Deps.t) -> t -> t
 
-    val may_be_unassigned: t -> bool
-
-    val compose: t -> t -> t
-    (** [compose d1 d2] is the sequential composition of [d1] after [d2], ie.
-        the dependencies needed to execute [d1] after having executed [d2].
-        It is computed as [d1] if [d1 = AssignedFrom _] (as executing [d1]
-        completely overwrites what [d2] wrote), and as a partial join between
-        [d1] and [d2] in the other cases. *)
+    val may_be_unassigned : t -> bool
 
     val pretty_precise : Format.formatter -> t -> unit
 
     val to_zone: t -> Locations.Zone.t
-    val to_deps: t -> Deps.t
   end
 
   module Memory : sig
     include Lmap_bitwise.Location_map_bitwise with type v = DepsOrUnassigned.t
-
-    (** Prints the detail of address and data dependencies, as opposed to [pretty]
-        that prints the backwards-compatible union of them *)
-    val pretty_ind_data : Format.formatter -> t -> unit
 
     val find: t -> Locations.Zone.t -> Locations.Zone.t
     (** Imprecise version of find, in which data and indirect dependencies are
@@ -757,12 +745,6 @@ module Froms: sig
 
   (** Extract the left part of a from result, ie. the zones that are written *)
   val outputs: t -> Locations.Zone.t
-
-  (** Extract the right part of a from result, ie. the zones on which the
-      written zones depend. If [include_self] is true, and the from is
-      of the form [x FROM y (and SELF)], [x] is added to the result;
-      default value is [false]. *)
-  val inputs: ?include_self:bool -> t -> Locations.Zone.t
 
 end
 

@@ -132,18 +132,6 @@ module DepsOrUnassigned = struct
     | DepsBottom | Unassigned -> Zone.bottom
     | AssignedFrom fd | MaybeAssignedFrom fd -> Deps.to_zone fd
 
-  let to_deps = function
-    | DepsBottom | Unassigned -> Deps.bottom
-    | AssignedFrom fd | MaybeAssignedFrom fd -> fd
-
-  let extract_data = function
-    | DepsBottom | Unassigned -> Zone.bottom
-    | AssignedFrom fd | MaybeAssignedFrom fd -> fd.Deps.data
-
-  let extract_indirect = function
-    | DepsBottom | Unassigned -> Zone.bottom
-    | AssignedFrom fd | MaybeAssignedFrom fd -> fd.Deps.indirect
-
   let may_be_unassigned = function
     | DepsBottom | AssignedFrom _ -> false
     | Unassigned | MaybeAssignedFrom _ -> true
@@ -429,28 +417,6 @@ let outputs { deps_table = t } =
          | DepsBottom | Unassigned -> acc
          | AssignedFrom _ | MaybeAssignedFrom _ -> Locations.Zone.join z acc)
       m Locations.Zone.bottom
-
-let inputs ?(include_self=false) t =
-  let aux b offm acc =
-    Memory.LOffset.fold
-      (fun itvs deps acc ->
-         let z = DepsOrUnassigned.to_zone deps in
-         let self = DepsOrUnassigned.may_be_unassigned deps in
-         let acc = Zone.join z acc in
-         match include_self, self, b with
-         | true, true, Some b ->
-           Zone.join acc (Zone.inject b itvs)
-         | _ -> acc
-      )
-      offm
-      acc
-  in
-  let return = Deps.to_zone t.deps_return in
-  let aux_table b = aux (Some b) in
-  match t.deps_table with
-  | Memory.Top -> Zone.top
-  | Memory.Bottom -> Zone.bottom
-  | Memory.Map m -> Memory.fold_base aux_table m return
 
 
 let pretty fmt { deps_return = r ; deps_table = t } =
