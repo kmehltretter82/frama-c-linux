@@ -23,7 +23,7 @@
 [@@@ api_start]
 
 (** Memory dependencies of an expression. *)
-type t = Function_Froms.Deps.deps = {
+type t = {
   data: Locations.Zone.t;
   (** Memory zone directly required to evaluate the given expression. *)
   indirect: Locations.Zone.t;

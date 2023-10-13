@@ -66,7 +66,7 @@ val assigns_tlval_to_zones:
     and compare them with the given froms (computed by the from plugin).
     Emits warnings if needed, and sets statuses to the assigns clauses. *)
 val verify_assigns:
-  Cil_types.kernel_function -> pre:Cvalue.Model.t -> Function_Froms.froms -> unit
+  Cil_types.kernel_function -> pre:Cvalue.Model.t -> Froms.t -> unit
 
 
 (** [accept_base ~formals ~locals kf b] returns [true] if and only if [b] is:

@@ -22,7 +22,7 @@
 
 module Zone = Locations.Zone
 
-type deps = Function_Froms.Deps.deps = {
+type deps = {
   data: Zone.t;
   indirect: Zone.t;
 }

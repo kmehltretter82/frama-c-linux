@@ -579,9 +579,8 @@ let free ~exact bases state =
     Locals_scoping.make_escaping ~exact ~escaping ~on_escaping ~within state
   in
   let from_changed =
-    let open Function_Froms in
-    let m = Memory.(add_binding ~exact empty !changed Deps.bottom) in
-    { deps_table = m; deps_return = Deps.bottom }
+    let m = Froms.Memory.(add_binding ~exact empty !changed Deps.bottom) in
+    Froms.{ deps_table = m; deps_return = Deps.bottom }
   in
   state, (from_changed, if exact then !changed else Zone.bottom)
 

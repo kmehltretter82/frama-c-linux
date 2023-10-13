@@ -181,7 +181,7 @@ end
 module Deps: sig
 
   (** Memory dependencies of an expression. *)
-  type t = Function_Froms.Deps.deps = {
+  type t = {
     data: Locations.Zone.t;
     (** Memory zone directly required to evaluate the given expression. *)
     indirect: Locations.Zone.t;
@@ -634,6 +634,138 @@ module Eval: sig
                          callers, can be cached. *)
 end
 
+module Froms: sig
+
+  module DepsOrUnassigned : sig
+
+    type deps_or_unassigned =
+      | DepsBottom (** Bottom of the lattice, never bound inside a memory state
+                       at a valid location. (May appear for bases for which the
+                       validity does not start at 0, currently only NULL.) *)
+      | Unassigned (** Location has never been assigned *)
+      | AssignedFrom of Deps.t (** Location guaranteed to have been overwritten,
+                                   its contents depend on the [Deps.t] value *)
+      | MaybeAssignedFrom of Deps.t  (** Location may or may not have been
+                                         overwritten *)
+    (** The lattice is [DepsBottom <= Unassigned], [DepsBottom <= AssignedFrom z],
+        [Unassigned <= MaybeAssignedFrom] and
+        [AssignedFrom z <= MaybeAssignedFrom z]. *)
+
+    include Lmap_bitwise.With_default with type t = deps_or_unassigned
+
+    val subst: (Deps.t -> Deps.t) -> t -> t
+
+    val extract_data: t -> Locations.Zone.t
+    val extract_indirect: t -> Locations.Zone.t
+
+    val may_be_unassigned: t -> bool
+
+    val compose: t -> t -> t
+    (** [compose d1 d2] is the sequential composition of [d1] after [d2], ie.
+        the dependencies needed to execute [d1] after having executed [d2].
+        It is computed as [d1] if [d1 = AssignedFrom _] (as executing [d1]
+        completely overwrites what [d2] wrote), and as a partial join between
+        [d1] and [d2] in the other cases. *)
+
+    val pretty_precise : Format.formatter -> t -> unit
+
+    val to_zone: t -> Locations.Zone.t
+    val to_deps: t -> Deps.t
+  end
+
+  module Memory : sig
+    include Lmap_bitwise.Location_map_bitwise with type v = DepsOrUnassigned.t
+
+    (** Prints the detail of address and data dependencies, as opposed to [pretty]
+        that prints the backwards-compatible union of them *)
+    val pretty_ind_data : Format.formatter -> t -> unit
+
+    val find: t -> Locations.Zone.t -> Locations.Zone.t
+    (** Imprecise version of find, in which data and indirect dependencies are
+        not distinguished *)
+
+    val find_precise: t -> Locations.Zone.t -> Deps.t
+    (** Precise version of find *)
+
+    val add_binding: exact:bool -> t -> Locations.Zone.t -> Deps.t -> t
+    val add_binding_loc: exact:bool -> t -> Locations.location -> Deps.t -> t
+    val add_binding_precise_loc:
+      exact:bool -> Locations.access -> t ->
+      Precise_locs.precise_location -> Deps.t -> t
+    val bind_var: Cil_types.varinfo -> Deps.t -> t -> t
+    val unbind_var: Cil_types.varinfo -> t -> t
+
+    val map: (DepsOrUnassigned.t -> DepsOrUnassigned.t) -> t -> t
+
+    val compose: t -> t -> t
+    (** Sequential composition. See {!DepsOrUnassigned.compose}. *)
+
+    val substitute: t -> Deps.t -> Deps.t
+    (** [substitute m d] applies [m] to [d] so that any dependency in [d] is
+        expressed using the dependencies already present in [m]. For example,
+        [substitute 'x From y' 'x'] returns ['y']. *)
+
+
+    (** Dependencies for [\result]. *)
+
+    type return = Deps.t
+    (* Currently, this type is equal to [Deps.t]. However, some of the functions
+       below are more precise, and will be more useful when 'return' are
+       represented by a precise offsetmap. *)
+
+    (** Default value to use for storing the dependencies of [\result] *)
+    val default_return: return
+
+    (** Completely imprecise return *)
+    val top_return: return
+
+    (** Completely imprecise return of the given size *)
+    val top_return_size: Int_Base.t -> return
+
+    (** Add some dependencies to [\result], between bits [start] and
+        [start+size-1], to the [Deps.t] value; default value for [start] is 0.
+        If [m] is specified, the dependencies are added to it. Otherwise,
+        {!default_return} is used. *)
+    val add_to_return:
+      ?start:int -> size:Int_Base.t -> ?m:return -> Deps.t -> return
+
+    val collapse_return: return -> Deps.t
+  end
+
+
+
+  type t = {
+    deps_return : Memory.return
+  (** Dependencies for the returned value *);
+    deps_table : Memory.t
+  (** Dependencies on all the zones modified by the function *);
+  }
+
+  include Datatype.S with type t := t
+
+  val join: t -> t -> t
+
+  val top: t
+
+  (** Display dependencies of a function, using the function's type to improve
+      readability *)
+  val pretty_with_type: Cil_types.typ -> t Pretty_utils.formatter
+
+  (** Display dependencies of a function, using the function's type to improve
+      readability, separating direct and indirect dependencies *)
+  val pretty_with_type_indirect: Cil_types.typ -> t Pretty_utils.formatter
+
+  (** Extract the left part of a from result, ie. the zones that are written *)
+  val outputs: t -> Locations.Zone.t
+
+  (** Extract the right part of a from result, ie. the zones on which the
+      written zones depend. If [include_self] is true, and the from is
+      of the form [x FROM y (and SELF)], [x] is added to the result;
+      default value is [false]. *)
+  val inputs: ?include_self:bool -> t -> Locations.Zone.t
+
+end
+
 module Builtins: sig
 
   (** Eva analysis builtins for the cvalue domain, more efficient than their
@@ -658,7 +790,7 @@ module Builtins: sig
     c_clobbered: Base.SetLattice.t;
     (** An over-approximation of the bases in which addresses of local variables
         might have been written *)
-    c_from: (Function_Froms.froms * Locations.Zone.t) option;
+    c_from: (Froms.t * Locations.Zone.t) option;
     (** If not None, the froms of the function, and its sure outputs;
         i.e. the dependencies of the result and of each zone written to. *)
   }
@@ -709,7 +841,7 @@ module Cvalue_callbacks: sig
   (** If not None, the froms of the function, and its sure outputs;
       i.e. the dependencies of the result, and the dependencies
       of each zone written to. *)
-  type call_froms = (Function_Froms.froms * Locations.Zone.t) option
+  type call_froms = (Froms.t * Locations.Zone.t) option
 
   type analysis_kind =
     [ `Builtin (** A cvalue builtin is used to interpret the function. *)
@@ -804,7 +936,7 @@ module Logic_inout: sig
       and compare them with the given froms (computed by the from plugin).
       Emits warnings if needed, and sets statuses to the assigns clauses. *)
   val verify_assigns:
-    Cil_types.kernel_function -> pre:Cvalue.Model.t -> Function_Froms.froms -> unit
+    Cil_types.kernel_function -> pre:Cvalue.Model.t -> Froms.t -> unit
 
 
   (** [accept_base ~formals ~locals kf b] returns [true] if and only if [b] is:

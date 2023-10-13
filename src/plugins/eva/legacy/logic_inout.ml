@@ -150,11 +150,10 @@ let eval_assigns_from pre_state it =
 let check_from pre_state asgn assigns_zone from found_froms =
   let open Locations in
   let found_deps =
-    let open Function_Froms in
     if Logic_utils.is_result asgn.it_content then
-      found_froms.deps_return
+      found_froms.Froms.deps_return
     else
-      Memory.find_precise found_froms.deps_table assigns_zone
+      Froms.Memory.find_precise found_froms.deps_table assigns_zone
   in
   let (indirect_deps,direct_deps) =
     let filter x = List.mem "indirect" x.it_content.term_name in
@@ -214,7 +213,7 @@ let check_fct_assigns kf ab ~pre_state found_froms =
   let behaviors = Annotations.behaviors kf in
   (* Under-approximation of the union. *)
   let link zones = List.fold_left Zone.link Zone.bottom zones in
-  let outputs = Function_Froms.outputs found_froms in
+  let outputs = Froms.outputs found_froms in
   let check_for_behavior b =
     let activity = Active_behaviors.is_active ab b in
     match activity with

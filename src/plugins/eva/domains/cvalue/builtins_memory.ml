@@ -74,7 +74,7 @@ let frama_c_offset _state = function
 
 let () = register_builtin "Frama_C_offset" frama_c_offset
 
-exception Memcpy_result of (Cvalue.Model.t * Function_Froms.froms * Zone.t)
+exception Memcpy_result of (Cvalue.Model.t * Froms.t * Zone.t)
 
 exception Indeterminate of V_Or_Uninitialized.t
 
@@ -97,11 +97,10 @@ let memcpy_check_indeterminate_offsetmap offsm =
 (* Create a dependency [\from arg_n] where n is the nth argument of the
    currently called function. *)
 let deps_nth_arg n =
-  let open Function_Froms in
   let kf = Callstack.top_kf (Eva_utils.current_call_stack ()) in
   try
     let vi = List.nth (Kernel_function.get_formals kf) n in
-    Deps.add_data_dep Deps.bottom (Locations.zone_of_varinfo vi)
+    Deps.add_data Deps.bottom (Locations.zone_of_varinfo vi)
   with Failure _ -> Kernel.fatal "%d arguments expected" n
 
 
@@ -126,7 +125,7 @@ let frama_c_memcpy name state actuals =
     in
     let deps_return = deps_nth_arg 0 in
     let empty_cfrom =
-      Function_Froms.({ deps_table = Memory.empty; deps_return })
+      Froms.{ deps_table = Memory.empty; deps_return }
     in
     let precise_copy state =
       (* First step: copy the bytes we are sure to copy *)
@@ -155,15 +154,15 @@ let frama_c_memcpy name state actuals =
                imprecision of the value analysis here. *)
             let exact = Location_Bits.cardinal_zero_or_one dst_bits in
             let deps_table =
-              Function_Froms.Memory.add_binding ~exact
-                Function_Froms.Memory.empty zone_dst deps in
+              Froms.Memory.add_binding ~exact Froms.Memory.empty zone_dst deps
+            in
             let sure_zone = if exact then zone_dst else Zone.bottom in
             (deps_table, sure_zone)
           in
           new_state, deps_table, sure_zone
       end
       else (* Nothing certain can be copied *)
-        (state, Function_Froms.Memory.empty, Zone.bottom)
+        (state, Froms.Memory.empty, Zone.bottom)
     in
     let imprecise_copy new_state precise_deps_table sure_zone =
       (* Second step. Size is imprecise, we will now copy some bits
@@ -193,11 +192,10 @@ let frama_c_memcpy name state actuals =
         let zone_src = enumerate_valid_bits Locations.Read loc_src in
         let zone_dst = enumerate_valid_bits Locations.Write  loc_dst in
         let deps = Deps.data zone_src in
-        let open Function_Froms in
         let deps_table =
-          Memory.add_binding ~exact:false precise_deps_table zone_dst deps
+          Froms.Memory.add_binding ~exact:false precise_deps_table zone_dst deps
         in
-        { deps_table; deps_return }
+        Froms.{ deps_table; deps_return }
       in
       try
         (* We try to iter on all the slices inside the value of slice.
@@ -274,9 +272,10 @@ let frama_c_memcpy name state actuals =
         raise (Memcpy_result (state, empty_cfrom, Zone.bottom));
       let (precise_state,precise_deps_table,sure_zone) = precise_copy state in
       if Option.fold ~none:false ~some:(Int.equal min) max then
-        (let open Function_Froms in
-         let c_from = { deps_table = precise_deps_table; deps_return } in
-         raise (Memcpy_result (precise_state, c_from, sure_zone)));
+        begin
+          let c_from = Froms.{ deps_table = precise_deps_table; deps_return } in
+          raise (Memcpy_result (precise_state, c_from, sure_zone))
+        end;
       imprecise_copy precise_state precise_deps_table sure_zone
     with
     | Memcpy_result (new_state,c_from,sure_zone) ->
@@ -361,16 +360,16 @@ let frama_c_memset_imprecise state dst_lval dst v size =
     with Not_found -> (new_state,Zone.bottom) (* from find_lonely_key + explicit raise *)
   in
   let c_from =
-    let open Function_Froms in
     let value_dep = deps_nth_arg 1 in
+    let empty = Froms.Memory.empty in
     let deps_table =
-      Memory.add_binding ~exact:false Memory.empty over_zone value_dep
+      Froms.Memory.add_binding ~exact:false empty over_zone value_dep
     in
     let deps_table =
-      Memory.add_binding ~exact:true deps_table sure_zone value_dep
+      Froms.Memory.add_binding ~exact:true deps_table sure_zone value_dep
     in
     let deps_return = deps_nth_arg 0 in
-    { deps_table; deps_return }
+    Froms.{ deps_table; deps_return }
   in
   Builtins.Full
     { Builtins.c_values = [Some dst, new_state'];
@@ -573,15 +572,14 @@ let frama_c_memset_precise state dst_lval dst v (exp_size, size) =
     let dst_loc = Locations.loc_bytes_to_loc_bits dst in
     let (c_from,dst_zone) =
       let input = deps_nth_arg 1 in
-      let open Function_Froms in
       let size_bits = Integer.mul size (Bit_utils.sizeofchar ())in
       let dst_location = Locations.make_loc dst_loc (Int_Base.Value size_bits) in
       let dst_zone = Locations.(enumerate_valid_bits Write dst_location) in
       let deps_table =
-        Function_Froms.Memory.add_binding ~exact:true
-          Function_Froms.Memory.empty dst_zone input in
+        Froms.Memory.add_binding ~exact:true Froms.Memory.empty dst_zone input
+      in
       let deps_return = deps_nth_arg 0 in
-      let c_from = { deps_table; deps_return  } in
+      let c_from = Froms.{ deps_table; deps_return  } in
       c_from,dst_zone
     in
     let _ = c_from in

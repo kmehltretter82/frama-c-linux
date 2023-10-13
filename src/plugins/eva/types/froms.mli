@@ -22,34 +22,7 @@
 
 (** Datastructures and common operations for the results of the From plugin. *)
 
-module Deps : sig
-
-  type deps = {
-    data: Locations.Zone.t;
-    indirect: Locations.Zone.t;
-  }
-
-  val bottom: deps
-  val top: deps
-  val is_included: deps -> deps -> bool
-  val join: deps -> deps -> deps
-  val narrow: deps -> deps -> deps
-  val to_zone: deps -> Locations.Zone.t
-
-  val add_data_dep: deps -> Locations.Zone.t -> deps
-  val add_indirect_dep: deps -> Locations.Zone.t -> deps
-
-
-  val from_data_deps: Locations.Zone.t -> deps
-  val from_indirect_deps: Locations.Zone.t -> deps
-
-  val map: (Locations.Zone.t -> Locations.Zone.t) -> deps -> deps
-
-  include Datatype.S with type t = deps
-
-  val pretty_precise : Format.formatter -> t -> unit
-end
-
+[@@@ api_start]
 
 module DepsOrUnassigned : sig
 
@@ -85,7 +58,7 @@ module DepsOrUnassigned : sig
   val pretty_precise : Format.formatter -> t -> unit
 
   val to_zone: t -> Locations.Zone.t
-  val to_deps: t -> Deps.deps
+  val to_deps: t -> Deps.t
 end
 
 module Memory : sig
@@ -149,35 +122,37 @@ end
 
 
 
-type froms = {
+type t = {
   deps_return : Memory.return
 (** Dependencies for the returned value *);
   deps_table : Memory.t
 (** Dependencies on all the zones modified by the function *);
 }
 
-include Datatype.S with type t = froms
+include Datatype.S with type t := t
 
-val join: froms -> froms -> froms
+val join: t -> t -> t
 
-val top: froms
+val top: t
 
 (** Display dependencies of a function, using the function's type to improve
     readability *)
-val pretty_with_type: Cil_types.typ -> froms Pretty_utils.formatter
+val pretty_with_type: Cil_types.typ -> t Pretty_utils.formatter
 
 (** Display dependencies of a function, using the function's type to improve
     readability, separating direct and indirect dependencies *)
-val pretty_with_type_indirect: Cil_types.typ -> froms Pretty_utils.formatter
+val pretty_with_type_indirect: Cil_types.typ -> t Pretty_utils.formatter
 
 (** Extract the left part of a from result, ie. the zones that are written *)
-val outputs: froms -> Locations.Zone.t
+val outputs: t -> Locations.Zone.t
 
 (** Extract the right part of a from result, ie. the zones on which the
     written zones depend. If [include_self] is true, and the from is
     of the form [x FROM y (and SELF)], [x] is added to the result;
     default value is [false]. *)
-val inputs: ?include_self:bool -> froms -> Locations.Zone.t
+val inputs: ?include_self:bool -> t -> Locations.Zone.t
+
+[@@@ api_end]
 
 (*
 Local Variables:

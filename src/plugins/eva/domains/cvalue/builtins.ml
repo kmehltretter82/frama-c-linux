@@ -31,7 +31,7 @@ type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers
 type full_result = {
   c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
   c_clobbered: Base.SetLattice.t;
-  c_from: (Function_Froms.froms * Locations.Zone.t) option;
+  c_from: (Froms.t * Locations.Zone.t) option;
 }
 
 type call_result =

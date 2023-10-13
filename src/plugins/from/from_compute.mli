@@ -30,7 +30,7 @@ open Cil_types
 module type To_Use =
 sig
   (** How to find the Froms for a given call during the analysis. *)
-  val get_from_call : kernel_function -> stmt -> Function_Froms.t
+  val get_from_call : kernel_function -> stmt -> Eva.Froms.t
 
   (** The Eva request that can be used to evaluate expressions at a given
       statement through the Eva public API. *)
@@ -43,7 +43,7 @@ sig
 
   (** Clean the given from (that have been computed for the given function),
       optionally save them, and return the cleaned result. *)
-  val cleanup_and_save : kernel_function -> Function_Froms.t -> Function_Froms.t
+  val cleanup_and_save : kernel_function -> Eva.Froms.t -> Eva.Froms.t
 end
 
 (** Function that compute the Froms from a given prototype, called
@@ -52,14 +52,14 @@ val compute_using_prototype_for_state :
   Cvalue.Model.t ->
   Kernel_function.t ->
   assigns ->
-  Function_Froms.froms
+  Eva.Froms.t
 
 
 (** Functor computing the functional dependencies, according to the three
     modules above. *)
 module Make (_: To_Use) : sig
   (** Compute the dependencies of the given function, and return them *)
-  val compute_and_return : Kernel_function.t -> Function_Froms.t
+  val compute_and_return : Kernel_function.t -> Eva.Froms.t
 
   (** Compute the dependencies of the given function *)
   val compute : Kernel_function.t -> unit

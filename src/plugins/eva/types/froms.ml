@@ -22,107 +22,6 @@
 
 open Locations
 
-module Deps =
-struct
-
-  type deps = {
-    data: Zone.t;
-    indirect: Zone.t;
-  }
-
-  let to_zone {data; indirect} = Zone.join data indirect
-
-  module DatatypeFromDeps = Datatype.Make(struct
-      type t = deps
-
-      let name = "Function_Froms.Deps.from_deps"
-
-      let hash fd =
-        Zone.hash fd.data + 37 * Zone.hash fd.indirect
-
-      let compare fd1 fd2 =
-        let c = Zone.compare fd1.data fd2.data in
-        if c <> 0 then c
-        else Zone.compare fd1.indirect fd2.indirect
-
-      let equal = Datatype.from_compare
-
-      let pretty fmt d = Zone.pretty fmt (to_zone d)
-
-      let reprs =
-        List.map (fun z -> {data = z; indirect = z}) Zone.reprs
-
-      let structural_descr =
-        Structural_descr.t_record [| Zone.packed_descr; Zone.packed_descr; |]
-      let rehash = Datatype.identity
-
-      let mem_project = Datatype.never_any_project
-
-      let copy = Datatype.undefined
-    end)
-
-  include DatatypeFromDeps
-
-  let pretty_precise fmt {data; indirect} =
-    let bottom_data = Zone.is_bottom data in
-    let bottom_indirect = Zone.is_bottom indirect in
-    match bottom_indirect, bottom_data with
-    | true, true ->
-      Format.fprintf fmt "\\nothing"
-    | true, false ->
-      Format.fprintf fmt "direct: %a"
-        Zone.pretty data
-    | false, true ->
-      Format.fprintf fmt "indirect: %a"
-        Zone.pretty indirect
-    | false, false ->
-      Format.fprintf fmt "indirect: %a; direct: %a"
-        Zone.pretty indirect
-        Zone.pretty data
-
-  let from_data_deps z = { data = z; indirect = Zone.bottom }
-  let from_indirect_deps z = { data = Zone.bottom; indirect = z }
-
-  let bottom = {
-    data = Zone.bottom;
-    indirect = Zone.bottom;
-  }
-
-  let top = {
-    data = Zone.top;
-    indirect = Zone.top;
-  }
-
-  let is_included fd1 fd2 =
-    Zone.is_included fd1.data fd2.data &&
-    Zone.is_included fd1.indirect fd2.indirect
-
-  let join fd1 fd2 =
-    if fd1 == bottom then fd2
-    else if fd2 == bottom then fd1
-    else {
-      data = Zone.join fd1.data fd2.data;
-      indirect = Zone.join fd1.indirect fd2.indirect
-    }
-
-  let narrow fd1 fd2 = {
-    data = Zone.narrow fd1.data fd2.data;
-    indirect = Zone.narrow fd1.indirect fd2.indirect
-  }
-
-  let add_data_dep fd data =
-    { fd with data = Zone.join fd.data data }
-
-  let add_indirect_dep fd indirect =
-    { fd with indirect = Zone.join fd.indirect indirect }
-
-  let map f fd = {
-    data = f fd.data;
-    indirect = f fd.indirect;
-  }
-
-end
-
 module DepsOrUnassigned = struct
 
   type deps_or_unassigned =
@@ -310,7 +209,7 @@ module Memory = struct
   (** Once the base is known, we can obtain something of type [Deps.t] *)
   let convert_find_offsm base fp =
     let z = Zone.inject base fp.fo_itvs in
-    Deps.add_data_dep fp.fo_deps z
+    Deps.add_data fp.fo_deps z
 
   let empty_find_offsm = {
     fo_itvs = Int_Intervals.bottom;
@@ -354,7 +253,7 @@ module Memory = struct
     let conv = convert_find_offsm in
     (* We are querying a zone for which no dependency is stored. Hence, every
        base is implicitly bound to [Unassigned]. *)
-    let empty_map z = Deps.from_data_deps z in
+    let empty_map z = Deps.data z in
     let join = Deps.join in
     let empty = Deps.bottom in
     (* Partial application is important *)
@@ -418,7 +317,7 @@ module Memory = struct
      does the recursive descent. *)
   let substitute_data_deps =
     (* Nothing left to substitute, return z unchanged *)
-    let empty_right z = Deps.from_data_deps z in
+    let empty_right z = Deps.data z in
     (* Zone to substitute is empty *)
     let empty_left _ = Deps.bottom in
     (* [b] is in the zone and substituted. Rewrite appropriately *)
@@ -505,7 +404,7 @@ module Memory = struct
 
 end
 
-type froms =
+type t =
   { deps_return : Memory.return;
     deps_table : Memory.t }
 
@@ -600,31 +499,33 @@ let equal
     { deps_return = dr' ; deps_table = dt' } =
   Memory.equal dt dt'&& Deps.equal dr dr'
 
-include Datatype.Make
-    (struct
-      type t = froms
-      let reprs =
-        List.fold_left
-          (fun acc o ->
-             List.fold_left
-               (fun acc m -> { deps_return = o; deps_table = m } :: acc)
-               acc
-               Memory.reprs)
-          []
-          Deps.reprs
-      let structural_descr =
-        Structural_descr.t_record
-          [| Deps.packed_descr;
-             Memory.packed_descr |]
-      let name = "Function_Froms"
-      let hash = hash
-      let compare = Datatype.undefined
-      let equal = equal
-      let pretty = pretty
-      let rehash = Datatype.identity
-      let copy = Datatype.undefined
-      let mem_project = Datatype.never_any_project
-    end)
+include
+  (Datatype.Make
+     (struct
+       type nonrec t = t
+       let reprs =
+         List.fold_left
+           (fun acc o ->
+              List.fold_left
+                (fun acc m -> { deps_return = o; deps_table = m } :: acc)
+                acc
+                Memory.reprs)
+           []
+           Deps.reprs
+       let structural_descr =
+         Structural_descr.t_record
+           [| Deps.packed_descr;
+              Memory.packed_descr |]
+       let name = "Function_Froms"
+       let hash = hash
+       let compare = Datatype.undefined
+       let equal = equal
+       let pretty = pretty
+       let rehash = Datatype.identity
+       let copy = Datatype.undefined
+       let mem_project = Datatype.never_any_project
+     end)
+   : Datatype.S with type t := t)
 
 (*
 Local Variables:
