@@ -20,65 +20,58 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Locations
-
 module DepsOrUnassigned = struct
 
-  type deps_or_unassigned =
+  type t =
     | DepsBottom
     | Unassigned
     | AssignedFrom of Deps.t
     | MaybeAssignedFrom of Deps.t
 
-  module DatatypeDeps = Datatype.Make(struct
-      type t = deps_or_unassigned
+  module Datatype_Input = struct
+    include Datatype.Serializable_undefined
 
-      let name = "Function_Froms.Deps.deps"
+    type nonrec t = t
+    let name = "Eva.Froms.DepsOrUnassigned"
 
-      let pretty fmt = function
-        | DepsBottom -> Format.pp_print_string fmt "DEPS_BOTTOM"
-        | Unassigned -> Format.pp_print_string fmt "UNASSIGNED"
-        | AssignedFrom fd -> Deps.pretty_precise fmt fd
-        | MaybeAssignedFrom fd ->
-          (* '(or UNASSIGNED)' would be a better pretty-printer, we use
-             '(and SELF)' only for compatibility reasons *)
-          Format.fprintf fmt "%a (and SELF)" Deps.pretty_precise fd
+    let pretty fmt = function
+      | DepsBottom -> Format.pp_print_string fmt "DEPS_BOTTOM"
+      | Unassigned -> Format.pp_print_string fmt "UNASSIGNED"
+      | AssignedFrom fd -> Deps.pretty_precise fmt fd
+      | MaybeAssignedFrom fd ->
+        Format.fprintf fmt "%a (or UNASSIGNED)" Deps.pretty_precise fd
 
-      let hash = function
-        | DepsBottom -> 3
-        | Unassigned -> 17
-        | AssignedFrom fd -> 37 + 13 * Deps.hash fd
-        | MaybeAssignedFrom fd -> 57 + 123 * Deps.hash fd
+    let hash = function
+      | DepsBottom -> 3
+      | Unassigned -> 17
+      | AssignedFrom fd -> 37 + 13 * Deps.hash fd
+      | MaybeAssignedFrom fd -> 57 + 123 * Deps.hash fd
 
-      let compare d1 d2 = match d1, d2 with
-        | DepsBottom, DepsBottom
-        | Unassigned, Unassigned -> 0
-        | AssignedFrom fd1, AssignedFrom fd2
-        | MaybeAssignedFrom fd1, MaybeAssignedFrom fd2 ->
-          Deps.compare fd1 fd2
-        | DepsBottom, (Unassigned | AssignedFrom _ | MaybeAssignedFrom _)
-        | Unassigned, (AssignedFrom _ | MaybeAssignedFrom _)
-        | AssignedFrom _, MaybeAssignedFrom _ ->
-          -1
-        | (Unassigned | AssignedFrom _ | MaybeAssignedFrom _), DepsBottom
-        | (AssignedFrom _ | MaybeAssignedFrom _), Unassigned
-        | MaybeAssignedFrom _, AssignedFrom _ ->
-          1
+    let compare d1 d2 = match d1, d2 with
+      | DepsBottom, DepsBottom
+      | Unassigned, Unassigned -> 0
+      | AssignedFrom fd1, AssignedFrom fd2
+      | MaybeAssignedFrom fd1, MaybeAssignedFrom fd2 ->
+        Deps.compare fd1 fd2
+      | DepsBottom, (Unassigned | AssignedFrom _ | MaybeAssignedFrom _)
+      | Unassigned, (AssignedFrom _ | MaybeAssignedFrom _)
+      | AssignedFrom _, MaybeAssignedFrom _ ->
+        -1
+      | (Unassigned | AssignedFrom _ | MaybeAssignedFrom _), DepsBottom
+      | (AssignedFrom _ | MaybeAssignedFrom _), Unassigned
+      | MaybeAssignedFrom _, AssignedFrom _ ->
+        1
 
-      let equal = Datatype.from_compare
+    let equal = Datatype.from_compare
 
-      let reprs = Unassigned :: List.map (fun r -> AssignedFrom r) Deps.reprs
+    let reprs = Unassigned :: List.map (fun r -> AssignedFrom r) Deps.reprs
 
-      let structural_descr =
-        let d = Deps.packed_descr in
-        Structural_descr.t_sum [| [| d |]; [| d |] |]
-      let rehash = Datatype.identity
+    let structural_descr =
+      let d = Deps.packed_descr in
+      Structural_descr.t_sum [| [| d |]; [| d |] |]
+  end
 
-      let mem_project = Datatype.never_any_project
-
-      let copy = Datatype.undefined
-
-    end)
+  include (Datatype.Make (Datatype_Input) : Datatype.S with type t := t)
 
   let join d1 d2 = match d1, d2 with
     | DepsBottom, d | d, DepsBottom -> d
@@ -114,10 +107,8 @@ module DepsOrUnassigned = struct
   let top = MaybeAssignedFrom Deps.top
   let default = Unassigned
 
-  include DatatypeDeps
-
   let to_zone = function
-    | DepsBottom | Unassigned -> Zone.bottom
+    | DepsBottom | Unassigned -> Locations.Zone.bottom
     | AssignedFrom fd | MaybeAssignedFrom fd -> Deps.to_zone fd
 
   let may_be_unassigned = function
@@ -126,26 +117,39 @@ module DepsOrUnassigned = struct
 end
 
 module Memory = struct
-  (** A From table is internally represented as a Lmap of [DepsOrUnassigned].
-      However, the API mostly hides this fact, and exports access functions
-      that take or return [Deps.t] values. This way, the user needs not
-      understand the subtleties of DepsBottom/Unassigned/MaybeAssigned. *)
+  (* A From table is internally represented as a Lmap of [DepsOrUnassigned].
+     However, the API mostly hides this fact, and exports access functions
+     that take or return [Deps.t] values. This way, the user needs not
+     understand the subtleties of DepsBottom/Unassigned/MaybeAssigned. *)
 
   include Lmap_bitwise.Make_bitwise(DepsOrUnassigned)
 
-  (** This is the auxiliary datastructure used to write the function [find].
-      When we iterate over a offsetmap of value [DepsOrUnassigned], we obtain
-      two things: (1) some dependencies; (2) some intervals that may have not
-      been assigned, and that will appear as data dependencies (once we know
-      the base we are iterating on). *)
+  let add_binding_precise_loc ~exact access m loc v =
+    let aux_one_loc loc m =
+      let loc = Locations.valid_part access loc in
+      add_binding_loc ~exact m loc (DepsOrUnassigned.AssignedFrom v)
+    in
+    Precise_locs.fold aux_one_loc loc m
+
+  let add_binding ~exact m z v =
+    add_binding ~exact m z (DepsOrUnassigned.AssignedFrom v)
+
+  let add_binding_loc ~exact m loc v =
+    add_binding_loc ~exact m loc (DepsOrUnassigned.AssignedFrom v)
+
+  (* This is the auxiliary datastructure used to write the function [find].
+     When we iterate over a offsetmap of value [DepsOrUnassigned], we obtain
+     two things: (1) some dependencies; (2) some intervals that may have not
+     been assigned, and that will appear as data dependencies (once we know
+     the base we are iterating on). *)
   type find_offsm = {
     fo_itvs: Int_Intervals.t;
     fo_deps: Deps.t;
   }
 
-  (** Once the base is known, we can obtain something of type [Deps.t] *)
+  (* Once the base is known, we can obtain something of type [Deps.t] *)
   let convert_find_offsm base fp =
-    let z = Zone.inject base fp.fo_itvs in
+    let z = Locations.Zone.inject base fp.fo_itvs in
     Deps.add_data fp.fo_deps z
 
   let empty_find_offsm = {
@@ -161,10 +165,10 @@ module Memory = struct
       fo_deps = Deps.join fp1.fo_deps fp2.fo_deps;
     }
 
-  (** Auxiliary function that collects the dependencies on some intervals of
-      an offsetmap. *)
+  (* Auxiliary function that collects the dependencies on some intervals of
+     an offsetmap. *)
   let find_precise_offsetmap : Int_Intervals.t -> LOffset.t -> find_offsm =
-    let cache = Hptmap_sig.PersistentCache "Function_Froms.find_precise" in
+    let cache = Hptmap_sig.PersistentCache "Eva.Froms.Memory.find_precise" in
     let aux_find_offsm ib ie v =
       (* If the interval can be unassigned, we collect its bound. We also
          return the dependencies stored at this interval. *)
@@ -184,8 +188,8 @@ module Memory = struct
     LOffset.fold_join_itvs
       ~cache aux_find_offsm join_find_offsm empty_find_offsm
 
-  (** Collecting dependencies on a given zone. *)
-  let find_precise : t -> Zone.t -> Deps.t =
+  (* Collecting dependencies on a given zone. *)
+  let find_precise : t -> Locations.Zone.t -> Deps.t =
     let both = find_precise_offsetmap in
     let conv = convert_find_offsm in
     (* We are querying a zone for which no dependency is stored. Hence, every
@@ -205,21 +209,7 @@ module Memory = struct
     let fo = find_precise_offsetmap itv loffset in
     convert_find_offsm base fo
 
-  let find z m =
-    Deps.to_zone (find_precise z m)
-
-  let add_binding_precise_loc ~exact access m loc v =
-    let aux_one_loc loc m =
-      let loc = Locations.valid_part access loc in
-      add_binding_loc ~exact m loc (DepsOrUnassigned.AssignedFrom v)
-    in
-    Precise_locs.fold aux_one_loc loc m
-
-  let add_binding ~exact m z v =
-    add_binding ~exact m z (DepsOrUnassigned.AssignedFrom v)
-
-  let add_binding_loc ~exact m loc v =
-    add_binding_loc ~exact m loc (DepsOrUnassigned.AssignedFrom v)
+  let find z m = Deps.to_zone (find_precise z m)
 end
 
 type t =
@@ -239,7 +229,7 @@ let outputs { deps_table = t } =
   match t with
   | Memory.Top -> Locations.Zone.top
   | Memory.Bottom -> Locations.Zone.bottom
-  | Memory.Map(m) ->
+  | Memory.Map m ->
     Memory.fold
       (fun z v acc ->
          let open DepsOrUnassigned in
@@ -248,50 +238,27 @@ let outputs { deps_table = t } =
          | AssignedFrom _ | MaybeAssignedFrom _ -> Locations.Zone.join z acc)
       m Locations.Zone.bottom
 
+module Datatype_Input = struct
+  include Datatype.Serializable_undefined
+  type nonrec t = t
+  let name = "Eva.Froms"
 
-let pretty fmt { deps_return = r ; deps_table = t } =
-  Format.fprintf fmt "%a@\n\\result FROM @[%a@]@\n"
-    Memory.pretty t
-    Deps.pretty r
+  let reprs = [ top ]
+  let structural_descr =
+    Structural_descr.t_record [| Deps.packed_descr; Memory.packed_descr |]
 
-let hash { deps_return = dr ; deps_table = dt } =
-  Memory.hash dt + 197 * Deps.hash dr
+  let equal
+      { deps_return = dr ; deps_table = dt }
+      { deps_return = dr' ; deps_table = dt' } =
+    Memory.equal dt dt'&& Deps.equal dr dr'
 
-let equal
-    { deps_return = dr ; deps_table = dt }
-    { deps_return = dr' ; deps_table = dt' } =
-  Memory.equal dt dt'&& Deps.equal dr dr'
+  let hash { deps_return = dr ; deps_table = dt } =
+    Memory.hash dt + 197 * Deps.hash dr
 
-include
-  (Datatype.Make
-     (struct
-       type nonrec t = t
-       let reprs =
-         List.fold_left
-           (fun acc o ->
-              List.fold_left
-                (fun acc m -> { deps_return = o; deps_table = m } :: acc)
-                acc
-                Memory.reprs)
-           []
-           Deps.reprs
-       let structural_descr =
-         Structural_descr.t_record
-           [| Deps.packed_descr;
-              Memory.packed_descr |]
-       let name = "Function_Froms"
-       let hash = hash
-       let compare = Datatype.undefined
-       let equal = equal
-       let pretty = pretty
-       let rehash = Datatype.identity
-       let copy = Datatype.undefined
-       let mem_project = Datatype.never_any_project
-     end)
-   : Datatype.S with type t := t)
+  let pretty fmt { deps_return = r ; deps_table = t } =
+    Format.fprintf fmt "%a@\n\\result FROM @[%a@]@\n"
+      Memory.pretty t
+      Deps.pretty r
+end
 
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+include (Datatype.Make (Datatype_Input) : Datatype.S with type t := t)

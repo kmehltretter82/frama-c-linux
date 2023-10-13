@@ -26,7 +26,7 @@
 
 module DepsOrUnassigned : sig
 
-  type deps_or_unassigned =
+  type t =
     | DepsBottom (** Bottom of the lattice, never bound inside a memory state
                      at a valid location. (May appear for bases for which the
                      validity does not start at 0, currently only NULL.) *)
@@ -35,38 +35,35 @@ module DepsOrUnassigned : sig
                                  its contents depend on the [Deps.t] value *)
     | MaybeAssignedFrom of Deps.t  (** Location may or may not have been
                                        overwritten *)
+
   (** The lattice is [DepsBottom <= Unassigned], [DepsBottom <= AssignedFrom z],
       [Unassigned <= MaybeAssignedFrom] and
       [AssignedFrom z <= MaybeAssignedFrom z]. *)
 
-  type t = deps_or_unassigned
-
   val top : t
   val equal : t -> t -> bool
   val may_be_unassigned : t -> bool
-  val to_zone: t -> Locations.Zone.t
+  val to_zone : t -> Locations.Zone.t
 end
 
 module Memory : sig
   include Lmap_bitwise.Location_map_bitwise with type v = DepsOrUnassigned.t
 
-  val find: t -> Locations.Zone.t -> Locations.Zone.t
+  val find : t -> Locations.Zone.t -> Locations.Zone.t
   (** Imprecise version of find, in which data and indirect dependencies are
       not distinguished *)
 
-  val find_precise: t -> Locations.Zone.t -> Deps.t
+  val find_precise : t -> Locations.Zone.t -> Deps.t
   (** Precise version of find *)
 
   val find_precise_loffset : LOffset.t -> Base.t -> Int_Intervals.t -> Deps.t
 
-  val add_binding: exact:bool -> t -> Locations.Zone.t -> Deps.t -> t
-  val add_binding_loc: exact:bool -> t -> Locations.location -> Deps.t -> t
-  val add_binding_precise_loc:
+  val add_binding : exact:bool -> t -> Locations.Zone.t -> Deps.t -> t
+  val add_binding_loc : exact:bool -> t -> Locations.location -> Deps.t -> t
+  val add_binding_precise_loc :
     exact:bool -> Locations.access -> t ->
     Precise_locs.precise_location -> Deps.t -> t
 end
-
-
 
 type t = {
   deps_return : Deps.t
@@ -77,17 +74,10 @@ type t = {
 
 include Datatype.S with type t := t
 
-val join: t -> t -> t
-
-val top: t
-
-(** Extract the left part of a from result, ie. the zones that are written *)
-val outputs: t -> Locations.Zone.t
+val top : t
+val join : t -> t -> t
 
 [@@@ api_end]
 
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+(** Extract the left part of a from result, ie. the zones that are written *)
+val outputs : t -> Locations.Zone.t
