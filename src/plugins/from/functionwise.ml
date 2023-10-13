@@ -76,8 +76,7 @@ module To_Use = struct
         with Abstract_interp.Error_Top -> Zone.top
       in
       let map_zone = Eva.Deps.map zone_substitution in
-      let subst = Eva.Froms.DepsOrUnassigned.subst map_zone  in
-      { deps_table = Eva.Froms.Memory.map subst froms.deps_table;
+      { deps_table = From_memory.map map_zone froms.deps_table;
         deps_return = Eva.Deps.map zone_substitution froms.deps_return;
       }
 
@@ -110,7 +109,7 @@ let is_computed = Tbl.mem
 let get = To_Use.memo
 
 let pretty fmt v =
-  Eva.Froms.pretty_with_type (Kernel_function.get_type v) fmt (get v)
+  From_memory.pretty_with_type (Kernel_function.get_type v) fmt (get v)
 
 (*
 Local Variables:

@@ -53,7 +53,7 @@ let compute_using_prototype_for_state state kf assigns =
       From_parameters.warning "@[no assigns clauses@ for function %a.@]@ \
                                Results will be imprecise."
         Kernel_function.pretty kf;
-      Eva.Froms.Memory.(top_return, top)
+      From_memory.(top_return, top)
     | Writes assigns ->
       let (rt_typ,_,_,_) = splitFunctionTypeVI varinfo in
       let input_zone out ins =
@@ -106,7 +106,7 @@ let compute_using_prototype_for_state state kf assigns =
             (fun acc coff ->
                let (base,width) = bitsOffset rt_typ coff in
                let size = Int_Base.inject (Int.of_int width) in
-               Eva.Froms.Memory.add_to_return
+               From_memory.add_to_return
                  ~start:base ~size ~m:acc inputs_deps
             )
             acc coffs
@@ -115,7 +115,7 @@ let compute_using_prototype_for_state state kf assigns =
             "Unable to extract a proper offset. \
              Using FROM for the whole \\result";
           let size = Bit_utils.sizeof rt_typ in
-          Eva.Froms.Memory.add_to_return ~size ~m:acc inputs_deps
+          From_memory.add_to_return ~size ~m:acc inputs_deps
       in
       let return_assigns, other_assigns =
         List.fold_left
@@ -127,13 +127,13 @@ let compute_using_prototype_for_state state kf assigns =
       let return_assigns =
         match return_assigns with
         | [] when Cil.isVoidType rt_typ ->
-          Eva.Froms.Memory.default_return
+          From_memory.default_return
         | [] -> (* \from unspecified. *)
           let size = Bit_utils.sizeof rt_typ in
-          Eva.Froms.Memory.top_return_size size
+          From_memory.top_return_size size
         | _ ->
           List.fold_left treat_ret_assign
-            Eva.Froms.Memory.default_return return_assigns
+            From_memory.default_return return_assigns
       in
       return_assigns,
       List.fold_left
@@ -202,7 +202,7 @@ struct
     let aux_local acc vi =
       Cil.CurrentLoc.set vi.vdecl;
       (* Consider that local are initialized to a constant value *)
-      Eva.Froms.Memory.bind_var vi Eva.Deps.bottom acc
+      From_memory.bind_var vi Eva.Deps.bottom acc
     in
     let loc = Cil.CurrentLoc.get () in
 
@@ -212,7 +212,7 @@ struct
 
   let unbind_locals m b =
     let aux_local acc vi =
-      Eva.Froms.Memory.unbind_var vi acc
+      From_memory.unbind_var vi acc
     in
     List.fold_left aux_local m b.blocals
 
@@ -253,7 +253,7 @@ struct
     let callwise_states_with_formals = Stmt.Hashtbl.create 7
 
     let substitute call_site_froms extra_loc deps =
-      let subst_deps = Eva.Froms.Memory.substitute call_site_froms deps in
+      let subst_deps = From_memory.substitute call_site_froms deps in
       Eva.Deps.add_indirect subst_deps extra_loc
 
     let display_one_from fmt v =
@@ -358,7 +358,7 @@ struct
                 List.iter2
                   (fun vi from ->
                      state_with_formals :=
-                       Eva.Froms.Memory.bind_var
+                       From_memory.bind_var
                          vi from !state_with_formals;
                   ) formal_args args_froms;
               with Invalid_argument _ ->
@@ -379,10 +379,10 @@ struct
                but before the result assignment *)
             let deps_after_call =
               let before_call = state.deps_table in
-              let open Eva.Froms in
-              let subst d = DepsOrUnassigned.subst subst_before_call d in
-              let call_substituted = Memory.map subst froms_call_table in
-              Memory.compose call_substituted before_call
+              let call_substituted =
+                From_memory.map subst_before_call froms_call_table
+              in
+              From_memory.compose call_substituted before_call
             in
             let state = {state with deps_table = deps_after_call } in
             (* Treatement for the possible assignment
@@ -552,9 +552,9 @@ struct
          let zone = lval_to_zone_with_deps return v in
          let deps = Eva.Froms.Memory.find_precise state.deps_table zone in
          let size = Bit_utils.sizeof (Cil.typeOfLval v) in
-         Eva.Froms.Memory.add_to_return ~size deps
+         From_memory.add_to_return ~size deps
        | Return (None,_) ->
-         Eva.Froms.Memory.default_return
+         From_memory.default_return
        | _ -> assert false)
     in
     let accept = To_Use.keep_base kf in
@@ -613,14 +613,14 @@ struct
                 From_parameters.result
                   "Non-terminating function %a (no dependencies)"
                   Kernel_function.pretty kf;
-                Eva.Froms.{ deps_return = Eva.Froms.Memory.default_return;
+                Eva.Froms.{ deps_return = From_memory.default_return;
                             deps_table = Eva.Froms.Memory.bottom }
               end
           in
           last_from
 
         with Exit (* Recursive call *) ->
-          { deps_return = Eva.Froms.Memory.default_return;
+          { deps_return = From_memory.default_return;
             deps_table = Eva.Froms.Memory.empty }
 
   let compute_using_prototype kf =

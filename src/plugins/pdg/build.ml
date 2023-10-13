@@ -589,8 +589,7 @@ let finalize_pdg pdg from_opt =
            | Bottom -> assert false (* checked above *)
          in
          if not (Kernel_function.returns_void pdg.fct) then begin
-           let from0 = froms.Eva.Froms.deps_return in
-           let deps_ret = Eva.Froms.Memory.collapse_return from0 in
+           let deps_ret = froms.Eva.Froms.deps_return in
            let deps_ret = Eva.Deps.to_zone deps_ret in
            ignore
              (create_fun_output_node pdg (Some new_state) deps_ret)
@@ -686,10 +685,7 @@ let call_outputs  pdg state_before_call state_with_inputs stmt
     match lvaloption with
     | None -> state_with_outputs
     | Some lval ->
-      let r_dpds =
-        Eva.Froms.Memory.collapse_return froms_deps_return
-      in
-      let r_dpds = Eva.Deps.to_zone r_dpds in
+      let r_dpds = Eva.Deps.to_zone froms_deps_return in
       let (l_loc, exact, l_dpds, l_decl) = get_lval_infos lval stmt in
       process_call_return
         pdg

@@ -43,13 +43,7 @@ module DepsOrUnassigned : sig
 
   val top : t
   val equal : t -> t -> bool
-
-  val subst : (Deps.t -> Deps.t) -> t -> t
-
   val may_be_unassigned : t -> bool
-
-  val pretty_precise : Format.formatter -> t -> unit
-
   val to_zone: t -> Locations.Zone.t
 end
 
@@ -63,55 +57,19 @@ module Memory : sig
   val find_precise: t -> Locations.Zone.t -> Deps.t
   (** Precise version of find *)
 
+  val find_precise_loffset : LOffset.t -> Base.t -> Int_Intervals.t -> Deps.t
+
   val add_binding: exact:bool -> t -> Locations.Zone.t -> Deps.t -> t
   val add_binding_loc: exact:bool -> t -> Locations.location -> Deps.t -> t
   val add_binding_precise_loc:
     exact:bool -> Locations.access -> t ->
     Precise_locs.precise_location -> Deps.t -> t
-  val bind_var: Cil_types.varinfo -> Deps.t -> t -> t
-  val unbind_var: Cil_types.varinfo -> t -> t
-
-  val map: (DepsOrUnassigned.t -> DepsOrUnassigned.t) -> t -> t
-
-  val compose: t -> t -> t
-  (** Sequential composition. See {!DepsOrUnassigned.compose}. *)
-
-  val substitute: t -> Deps.t -> Deps.t
-  (** [substitute m d] applies [m] to [d] so that any dependency in [d] is
-      expressed using the dependencies already present in [m]. For example,
-      [substitute 'x From y' 'x'] returns ['y']. *)
-
-
-  (** Dependencies for [\result]. *)
-
-  type return = Deps.t
-  (* Currently, this type is equal to [Deps.t]. However, some of the functions
-     below are more precise, and will be more useful when 'return' are
-     represented by a precise offsetmap. *)
-
-  (** Default value to use for storing the dependencies of [\result] *)
-  val default_return: return
-
-  (** Completely imprecise return *)
-  val top_return: return
-
-  (** Completely imprecise return of the given size *)
-  val top_return_size: Int_Base.t -> return
-
-  (** Add some dependencies to [\result], between bits [start] and
-      [start+size-1], to the [Deps.t] value; default value for [start] is 0.
-      If [m] is specified, the dependencies are added to it. Otherwise,
-      {!default_return} is used. *)
-  val add_to_return:
-    ?start:int -> size:Int_Base.t -> ?m:return -> Deps.t -> return
-
-  val collapse_return: return -> Deps.t
 end
 
 
 
 type t = {
-  deps_return : Memory.return
+  deps_return : Deps.t
 (** Dependencies for the returned value *);
   deps_table : Memory.t
 (** Dependencies on all the zones modified by the function *);
@@ -122,14 +80,6 @@ include Datatype.S with type t := t
 val join: t -> t -> t
 
 val top: t
-
-(** Display dependencies of a function, using the function's type to improve
-    readability *)
-val pretty_with_type: Cil_types.typ -> t Pretty_utils.formatter
-
-(** Display dependencies of a function, using the function's type to improve
-    readability, separating direct and indirect dependencies *)
-val pretty_with_type_indirect: Cil_types.typ -> t Pretty_utils.formatter
 
 (** Extract the left part of a from result, ie. the zones that are written *)
 val outputs: t -> Locations.Zone.t

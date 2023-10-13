@@ -80,8 +80,7 @@ let process_call_res data stmt lvaloption froms =
     | None -> false, data
     | Some lval ->
       let ret_dpds = froms.Eva.Froms.deps_return in
-      let r_dpds = Eva.Froms.Memory.collapse_return ret_dpds in
-      let r_dpds = Eva.Deps.to_zone r_dpds in
+      let r_dpds = Eva.Deps.to_zone ret_dpds in
       let l_dpds, exact, l_zone =
         get_lval_zones ~for_writing:true  stmt lval in
       compute_new_data data l_zone l_dpds exact r_dpds
