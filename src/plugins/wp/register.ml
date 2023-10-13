@@ -816,7 +816,7 @@ let cmdline_run () =
             WpContext.on_context (model,WpContext.Global)
               LogicBuiltins.dump ();
           end ;
-        WpTarget.compute model ;
+        WpTarget.compute model ~fct ~bhv ~prop () ;
         wp_compute_memory_context model ;
         if Wp_parameters.CheckMemoryContext.get () then
           wp_insert_memory_context model ;

@@ -71,7 +71,7 @@ let with_callees kf =
 
 let with_callees = Callees.memo with_callees
 
-let add_with_callees ~populate_spec kf =
+let add_with_callees kf =
   let add kf =
     let insert_spec kf =
       let specs =
@@ -81,7 +81,7 @@ let add_with_callees ~populate_spec kf =
       in
       Populate_spec.populate_funspec ~do_body:true kf specs
     in
-    if populate_spec then insert_spec kf ;
+    insert_spec kf ;
     TargetKfs.add kf
   in
   Fct.iter add (with_callees kf)
@@ -155,29 +155,25 @@ let check_properties behaviors props kf =
 
 let add_with_behaviors behaviors props kf =
   if behaviors = [] && props = [] then
-    add_with_callees ~populate_spec:true kf
+    add_with_callees kf
   else begin
     try check_properties behaviors props kf
-    with Found -> add_with_callees ~populate_spec:true kf
+    with Found -> add_with_callees kf
   end
 
-let compute model =
-  let insert_rte kf =
-    if Wp_parameters.RTE.get () then
-      WpRTE.generate model kf
-  in
-  let behaviors = Wp_parameters.Behaviors.get() in
-  let props = Wp_parameters.Properties.get () in
-  let add_kf kf =
-    insert_rte kf ;
-    add_with_behaviors behaviors props kf
-  in
-  Wp_parameters.iter_kf add_kf
+let compute_kf model bhv prop kf =
+  let rtes = Wp_parameters.RTE.get () in
+  if rtes then WpRTE.generate model kf ;
+  add_with_behaviors bhv prop kf
 
-let compute model =
-  if not (TargetKfs.is_computed ()) then begin
-    compute model ;
-    TargetKfs.mark_as_computed ()
-  end
+let compute model
+  ?(fct=Wp_parameters.get_fct())
+  ?(bhv=Wp_parameters.Behaviors.get())
+  ?(prop=Wp_parameters.Properties.get ()) ()
+  =
+  Wp_parameters.iter_fct (compute_kf model bhv prop) fct
+
+let compute_kf model kf =
+  compute_kf model [] [] kf
 
 let iter = TargetKfs.iter

@@ -55,6 +55,16 @@ let get_kf_infos model kf ?bhv ?prop () =
   infos
 
 (* -------------------------------------------------------------------------- *)
+(* --- Target preparation                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let prepare_ip model ip =
+  Option.iter (WpTarget.compute_kf model) @@ Property.get_kf ip
+
+let prepare_main model ?fct ?bhv ?prop () =
+  WpTarget.compute model ?fct ?bhv ?prop ()
+
+(* -------------------------------------------------------------------------- *)
 (* --- Behavior Selection                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -265,6 +275,7 @@ struct
     end
 
   let compute_ip model ip =
+    prepare_ip model ip ;
     let pool = empty () in
     strategy_ip model pool ip ;
     compute model pool
@@ -275,6 +286,7 @@ struct
     Bag.empty
 
   let compute_main model ?fct ?bhv ?prop () =
+    prepare_main model ?fct ?bhv ?prop () ;
     let pool = empty () in
     strategy_main model pool ?fct ?bhv ?prop () ;
     compute model pool
@@ -334,11 +346,13 @@ let dumper setup driver =
     object
       method model = model
       method compute_ip ip =
+        prepare_ip model ip ;
         let pool = empty () in
         strategy_ip model pool ip ;
         dump pool ; Bag.empty
       method compute_call _ = Bag.empty
       method compute_main ?fct ?bhv ?prop () =
+        prepare_main model ?fct ?bhv ?prop () ;
         let pool = empty () in
         strategy_main model pool ?fct ?bhv ?prop () ;
         dump pool ; Bag.empty

@@ -37,32 +37,6 @@ let reload_callback = ref (fun () -> ())
 let on_reload f = reload_callback := f
 let reload () = !reload_callback ()
 
-module Wp_rte_generated =
-  Kernel_function.Make_Table
-    (Datatype.Unit)
-    (struct
-      let name = "GuiSource.Rte_generated"
-      let size = 8
-      let dependencies = [ Ast.self ]
-    end)
-
-let kf_of_selection = function
-  | S_none -> None
-  | S_fun kf -> Some kf
-  | S_prop ip -> Property.get_kf ip
-  | S_call s -> Some s.s_caller
-
-let wp_rte_generated s =
-  match kf_of_selection s with
-  | None -> false
-  | Some kf ->
-    if Wp_parameters.RTE.get () then
-      let mem = Wp_rte_generated.mem kf in
-      if not mem then
-        Wp_rte_generated.add kf () ;
-      not mem
-    else false
-
 let with_model action kf =
   let setup = Factory.parse (Wp_parameters.Model.get ()) in
   let driver = Driver.load_driver () in
@@ -117,10 +91,7 @@ let run_and_prove
         | S_prop ip -> spawn provers (VC.generate_ip ip)
         | S_call s -> spawn provers (VC.generate_call s.s_stmt)
       end ;
-      if wp_rte_generated selection then
-        main#redisplay ()
-      else
-        reload ()
+      main#redisplay ()
     with Stop -> ()
   end
 
