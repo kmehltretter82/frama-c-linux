@@ -28,11 +28,20 @@ module LSet = Cil_datatype.LvalStructEq.Set
 
 (** NB : do the analysis BEFORE using any of those functions *)
 
+(** [points_to_set_stmt kf s lv] returns the points-to set of lval [lv] before
+    [stmt] in function [kf]. *)
+val points_to_set_stmt : kernel_function -> stmt -> lval -> LSet.t
 
-(** points-to set of lval [lv] at the end of function [kf]. *)
+(** [points_to_set kf s lv] returns the points-to set of lval [lv] at the end
+    of function [kf]. *)
 val points_to_set_kf : kernel_function -> lval -> LSet.t
 
-(** aliases of lval [lv] at the end of function [kf]. *)
+(** [aliases_stmt kf s lv] return the alias set of lval [lv] before [stmt] in
+    function [kf]. *)
+val aliases_stmt : kernel_function -> stmt -> lval -> LSet.t
+
+(** [aliases_kf kf lv] return the alias set of lval [lv] at the end of function
+    [kf]. *)
 val aliases_kf : kernel_function -> lval -> LSet.t
 
 (** list of pairs [s, e] where [e] is the set of lval aliased to [v] after
