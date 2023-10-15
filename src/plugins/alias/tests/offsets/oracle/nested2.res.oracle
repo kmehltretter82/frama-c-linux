@@ -73,18 +73,19 @@
 [alias] May-aliases after instruction  z1->s[1] = (struct struct_1_t *)(& x2);  are
   <none>
 [alias] analysing instruction: z1->c = a;
-[alias] May-aliases after instruction  z1->c = a;  are  {z1->c, a}
+[alias] May-aliases after instruction  z1->c = a;  are  { z1->c; a }
 [alias] analysing instruction: t->t = (struct struct_2_t *)z1;
 [alias:unsafe-cast] nested2.c:45: Warning: 
   unsafe cast from st_2_t * to struct struct_2_t *
 [alias] May-aliases after instruction  t->t = (struct struct_2_t *)z1;  are
-  {t->t, z1}  {z1->c, a}
+  { t->t; z1 }  { z1->c; a }
 [alias] analysing instruction: t->d = a;
-[alias] May-aliases after instruction  t->d = a;  are  {t->t, z1}  {z1->c, t->d, a}
+[alias] May-aliases after instruction  t->d = a;  are
+  { t->t; z1 }  { z1->c; t->d; a }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
-  {t->t, z1}  {z1->c, t->d, a}
-[alias] May-aliases at the end of function main: {t->t, z1}  {z1->c, t->d, a}
+  { t->t; z1 }  { z1->c; t->d; a }
+[alias] May-aliases at the end of function main: { t->t; z1 }  { z1->c; t->d; a }
 [alias] analysing function: malloc
 [alias] May-aliases at the end of function malloc: ⊥
 [alias] analysing function: mblen

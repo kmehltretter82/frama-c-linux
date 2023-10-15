@@ -9,11 +9,13 @@
 [alias] analysing instruction: int *d = (int *)0;
 [alias] May-aliases after instruction  int *d = (int *)0;  are  <none>
 [alias] analysing instruction: *a = b;
-[alias] May-aliases after instruction  *a = b;  are  {*a, b}
+[alias] May-aliases after instruction  *a = b;  are  { *a; b }
 [alias] analysing instruction: *b = c;
-[alias] May-aliases after instruction  *b = c;  are  {*a, b}  {*(*a), *b, c}
+[alias] May-aliases after instruction  *b = c;  are  { *a; b }  { *(*a); *b; c }
 [alias] analysing instruction: d = *(*a);
-[alias] May-aliases after instruction  d = *(*a);  are  {*a, b}  {*(*a), *b, c, d}
+[alias] May-aliases after instruction  d = *(*a);  are
+  { *a; b }  { *(*a); *b; c; d }
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are  {*a, b}  {*(*a), *b, c, d}
-[alias] May-aliases at the end of function main: {*a, b}  {*(*a), *b, c, d}
+[alias] May-aliases after instruction  __retres = 0;  are
+  { *a; b }  { *(*a); *b; c; d }
+[alias] May-aliases at the end of function main: { *a; b }  { *(*a); *b; c; d }
