@@ -269,6 +269,16 @@ let pp_pattern = pp
 
 type sigma = Tactical.selection Vmap.t
 
+let pp_sigma fmt s =
+  begin
+    Format.fprintf fmt "@[<hv 0>[@[<hv 2>" ;
+    Vmap.iter
+      (fun x e ->
+         Format.fprintf fmt "@ @[<hov 2>%s -> %a@] ;" x Tactical.pp_selection e
+      ) s ;
+    Format.fprintf fmt "@]@ ]@]" ;
+  end
+
 type penv = {
   mutable sigma : sigma ;
   mutable marked : Lang.F.Tset.t ;
@@ -512,6 +522,7 @@ let pgoal ctxt sigma (seq : Conditions.sequent) =
 let empty = Vmap.empty
 
 let psequent ctxt sigma (seq : Conditions.sequent) =
+  Conditions.index seq ;
   match pgoal ctxt sigma seq with
   | Some _ as result -> result
   | None -> phyps ctxt sigma seq

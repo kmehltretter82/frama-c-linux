@@ -1734,10 +1734,15 @@ proof strategies:
   can be recovered easily.
 \end{itemize}
 
+To activate proof strategies and seach for new scripts for unproven goals, user
+shall activate the \verb+tip+ prover from the command line, with
+\verb+-wp-prover tip+, or use the interfactive \textsf{TIP} from the graphical
+user interface.
+
 Proof Strategies are defined thanks to dedicated ACSL extensions and controlled
 by specific command-line options. Note that those extensions are only available
-when command-line option \verb+-wp-strategy+ is specified.  The syntax of ACSL
-extensions for proof strategies is defined below:
+unless command-line option \verb+-wp-no-strategy-engine+ is specified.
+The syntax of ACSL extensions for proof strategies is defined below:
 
 \newcommand{\pdots}{\,,\,\ldots,\,}
 
