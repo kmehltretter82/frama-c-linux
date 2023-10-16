@@ -39,4 +39,3 @@ test("check server connection", async () => {
   // Exit app.
   await electronApp.close();
 });
-
