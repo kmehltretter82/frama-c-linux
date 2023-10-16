@@ -71,7 +71,7 @@ test("run gremlins.js", async () => {
       .unleash();
   });
 
-  // Could be usefull if you want to review the logs
+  // Could be useful if you want to review the logs
   // await window.pause()
 
   // Exit app.

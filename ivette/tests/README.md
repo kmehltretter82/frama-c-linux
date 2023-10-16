@@ -27,7 +27,7 @@ beforehand.
 Testing Ivette, in terms of both the e2e and monkey tests, amounts to the
 execution of the following commands from the Frama-C root directory:
 
-```
+```sh
 $ make                         // builds Frama-C, if not already
 $ cd ivette
 $ make tests                   // builds Ivette and execute all tests
@@ -35,13 +35,13 @@ $ make tests                   // builds Ivette and execute all tests
 
 To execute the e2e tests only, the last command to execute is the following:
 
-```
+```sh
 $ make tests-e2e
 ```
 
 To execute the monkey tests only, the last command to execute is the following:
 
-```
+```sh
 $ make tests-monkey
 ```
 
@@ -50,14 +50,14 @@ $ make tests-monkey
 Whenever the execution of the tests does not need (re-)building Ivette, one can
 directly do the following from the Ivette root directory:
 
-```
+```sh
 $ dune exec -- yarn playwright test
 ```
 
 This is also useful for executing just a (list of) test(s). In such a case, do
 the following from the Ivette root directory:
 
-```
+```sh
 $ dune exec -- yarn playwright test /path/to/test1 /path/to/test2
 ```
 
@@ -71,42 +71,83 @@ with a message on the console. This should be sufficient to debug the failure.
 However, `Playwright` also writes down a report of the failure that can be
 accessed as follows from the Ivette root directory:
 
-```
+```sh
 $ yarn playwright show-report
 ```
 
 The previous command should open a browser tab showing the last recorded report;
 if not, such a report should be available at `http://localhost:9323`.
 
-## Writing tests
+## Writing end-to-end tests
 
-Playwright uses its Locator system to select html elements. You can type your own,
-but Playwright can help with that aswell. Inside a test, add `await window.pause()`
-where required, then run said test. Doing so will open ivette, and,
-when the instruction is reached, an additional Playwright window. On the bottom
-of said window, there is a `Pick locator` button, which will provide the necessary
-locator for the selected element (works similarly to the inspect functionality
-of most browser developer tools).
-The `locatorsUti.ts` files comes with several default locators.
+End-to-end testing is meant for testing specific Ivette behaviors. This is done
+by using the `Playwright` library, which is based on [expect
+assertionts](https://playwright.dev/docs/test-assertions) on elements of a web
+page at a given moment, named
+[locators](https://playwright.dev/docs/api/class-locator).
 
-Once the element selected, multiple operations can be realized.
-Refer to the Playwright documentation for the complete list.
-Examples are provided in `e2eService.ts`.
+A test for Ivette looks like this:
 
-Complete tests scenarios are provided in `e2e.spec.ts`.
+```ts
+import { test } from "@playwright/test";
+import * as e2eService from "../libs/e2eService";
+
+test("<test description>", async () => {
+  const launchAppResult = await e2eService.launchApp(
+    <arguments>,
+  );
+
+  const electronApp = launchAppResult.app;
+  const window = launchAppResult.page;
+
+  // find/select HTML element via Playwright's
+  // [locators](https://playwright.dev/docs/locators].
+  const locator = await window.<locator>;
+
+  // perform a Playwright's [action](https://playwright.dev/docs/input)
+  // on the locator.
+  await locator.<action>;
+
+  // [test assertion](https://playwright.dev/docs/test-assertions) on a
+  // Playwright's value (e.g. locator) with respect to a Playwright's matcher.
+  await expect(<value>).<matcher>;
+
+  // exit app.
+  await electronApp.close();
+});
+```
+
+The Ivette testing framework abstracts the `Playwright`'s API by providing
+common utilities in the sub-directory `/tests/libs`. In particular,
+`/tests/libs/e2eService.ts` provides, and should be enriched with, common
+testing services for Ivette, while `/tests/libs/locatorsUtil.ts` provides, and
+should be enriched with, common locators for Ivette.
+
+Note that `/tests/libs/e2eService.ts` also provides with some examples of
+`<arguments>` to fed `e2eService.launchApp()` function with. In particular, use
+the `Dome`'s `--init-settings` option for launching Ivette with default
+settings, and the `--with-fixed-settings </path/to/json-file-with-settings>`
+option for launching Ivette with particular settings.
+
+`Playwright` also provides an interactive way for identifying new locators.
+Adding `await window.pause()` inside a test will open an additional `Playwright`
+window with a `Pick locator` button at the bottom, which provides the necessary
+locator any selected element (i.e., it works similarly to the inspect
+functionality of most browser developer tools).
+
+Complete test scenarios are provided in the sub-directory `/tests/e2e/`.
 
 ## Monkey Testing
 
-From `ivette` directory, launch monkey testing (gremlins.js) with
+Monkey testing is meant for testing the Ivette robustness by performing a stress
+testing of the UI. This is done by using the `gremlins.js` library.
 
-`yarn playwright test monkey-testing.spec.ts`;
+Please refer to the [library
+documentation](https://github.com/marmelab/gremlins.js) for more details, or
+look at the `/tests/monkey/monkey-testing.spec.ts` for an example.
 
-It is possible to seed a randomizer in order to obtain reproductible tests
-(see the randomizer value in `monkey-testing.spec.ts`).
-
-However for the test to be fully reproductible, Ivette also need to belaunch
-with its default configuration. An additional argument `--init-settings` has
-been added to Ivette for this purpose. User can provide a path to a settings
-file with argument `--with-fixed-settings`, which will be used to
-initialize Ivette's settings (the file is not modified when ivette exits).
-An example on how to do so is available in `e2eService.ts`.
+Note that, to obtain reproducible tests, one should seed a randomizer (see the
+`randomizer` value in `monkey-testing.spec.ts` for an example). For that, one
+should also launch Ivette with either default settings, by using the
+`--init-settings` option, or fixed settings, by using the `--with-fixed-settings
+</path/to/json-file-with-settings>` option.
