@@ -312,6 +312,8 @@ and autofork env ~depth fork =
 (* --- Proof Strategy Alternatives                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
+let dkey_strategy = Wp_parameters.register_category "strategy"
+
 type solver = ProofEngine.node -> bool Task.task
 
 let success = Task.return true
@@ -326,9 +328,17 @@ let rec sequence (f : 'a -> solver) = function
   | x::xs -> f x +>> sequence f xs
 
 let rec explore_strategy env process strategy : solver =
+  fun node ->
+  Wp_parameters.debug ~dkey:dkey_strategy "[%a] Strategy %s (enter)@."
+    ProofEngine.Node.pretty node (ProofStrategy.name strategy) ;
   sequence
     (explore_alternative env process strategy)
-    (ProofStrategy.alternatives strategy)
+    (ProofStrategy.alternatives strategy) node
+  >>= fun ok ->
+  Wp_parameters.debug ~dkey:dkey_strategy "[%a] Strategy %s: %s@."
+    ProofEngine.Node.pretty node (ProofStrategy.name strategy)
+    (if ok then "proved" else "failed");
+  Task.return ok
 
 and explore_alternative env process strategy alternative : solver =
   explore_provers env alternative +>>
@@ -350,9 +360,16 @@ and explore_prover env timeout prover node =
     Env.prove env wpo ~config prover
 
 and explore_tactic env process strategy alternative node =
+  Wp_parameters.debug ~dkey:dkey_strategy
+    "@[<hov 2>[%a] Trying@ %a@]"
+    ProofEngine.Node.pretty node
+    ProofStrategy.pp_alternative alternative ;
   match ProofStrategy.tactic env.tree node strategy alternative with
   | None -> failed
-  | Some nodes -> List.iter process nodes ; success
+  | Some nodes ->
+    Wp_parameters.debug "@[<hov 2>[%a] success (%d children)"
+      ProofEngine.Node.pretty node (List.length nodes) ;
+    List.iter process nodes ; success
 
 and explore_auto env process alternative node =
   match ProofStrategy.auto alternative with

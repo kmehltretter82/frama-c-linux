@@ -60,6 +60,9 @@ type lookup = {
 (** Matching result *)
 type sigma
 
+(** Sigma printer *)
+val pp_sigma : Format.formatter -> sigma -> unit
+
 (** Empty results *)
 val empty : sigma
 
