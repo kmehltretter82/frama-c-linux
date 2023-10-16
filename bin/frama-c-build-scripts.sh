@@ -85,7 +85,7 @@ SCRIPT_LIBS=""
 ###############
 
 DuneProject () {
-    echo "(lang dune 3.3)"
+    echo "(lang dune 3.7)"
     echo "(generate_opam_files true)"
     echo "(name ${PACKAGE})"
     echo "(maintainers \"anonymous\")"

@@ -119,7 +119,7 @@ run-test: [
 ]
 
 depends: [
-  "dune" { >= "3.3.0" | (>= "3.5.0" & os="macos") }
+  "dune" { >= "3.7.0" }
   "dune-configurator"
   "dune-site"
 
