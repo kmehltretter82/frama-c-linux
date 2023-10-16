@@ -236,7 +236,7 @@ ivette-tests:
     - xvfb-run --auto-servernum -e /dev/stdout -s "-screen 0 1920x1080x24 -ac -nolisten tcp -nolisten unix" dune exec -- yarn playwright test --headed
   artifacts:
     paths:
-      - ivette/test-results
+      - ivette/tests/test-results
       - ivette/screenshots
     when: always
     expire_in: 1 day

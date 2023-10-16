@@ -28,16 +28,21 @@ import { defineConfig, devices } from '@playwright/test';
  */
 // require('dotenv').config();
 
+const testDir = './tests';
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './tests',
-  /* Run tests in files in parallel (set to false to avoid concurrency issues with Electron) */
+  /* Directory to look for tests when executing 'yarn playwright test'. */
+  testDir: testDir,
+  /* Directory for test artifacts. */
+  outputDir: testDir.concat('/test-results'),
+  /* Run tests in files in parallel (set to false to avoid concurrency issues with Electron). */
   fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
+  /* Retry on CI only. */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
   workers: 1,
@@ -48,11 +53,11 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://127.0.0.1:3000',
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer. */
     trace: 'on-first-retry',
   },
 
-  /* Configure projects for major browsers */
+  /* Configure projects for major browsers. */
   projects: [
     {
       name: 'chromium',
@@ -80,7 +85,7 @@ export default defineConfig({
     // },
   ],
 
-  /* Run your local dev server before starting the tests */
+  /* Run your local dev server before starting the tests. */
   // webServer: {
   //   command: 'npm run start',
   //   url: 'http://127.0.0.1:3000',
