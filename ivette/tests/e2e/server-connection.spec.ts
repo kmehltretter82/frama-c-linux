@@ -29,12 +29,8 @@ test("check server connection", async () => {
   );
   const electronApp = launchAppResult.app;
   const window = launchAppResult.page;
-  await window.screenshot({ path: "screenshots/e2e-server-status-before.png" });
 
   await e2eService.testServerIsStarted(window);
-
-  // Capture a screenshot.
-  await window.screenshot({ path: "screenshots/e2e-server-status-after.png" });
 
   // Exit app.
   await electronApp.close();
