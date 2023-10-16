@@ -522,6 +522,7 @@ let pgoal ctxt sigma (seq : Conditions.sequent) =
 let empty = Vmap.empty
 
 let psequent ctxt sigma (seq : Conditions.sequent) =
+  Conditions.index seq ;
   match pgoal ctxt sigma seq with
   | Some _ as result -> result
   | None -> phyps ctxt sigma seq
