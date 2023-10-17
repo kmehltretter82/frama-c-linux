@@ -38,7 +38,7 @@ include ../MakeLaTeXModern
 
 BNF=ya_file.bnf basic_ya.bnf extended_ya.bnf ya_variables.bnf
 
-main.pdf: main.tex $(BNF:.bnf=.tex) macros.tex
+main.pdf: main.tex $(BNF:.bnf=.tex) macros.tex Schemas/example.pdf
 	$(MAKE) $(FRAMAC_MODERN)
 	touch main.aux #work around latexmk bug
 	latexmk -pdf main.tex
@@ -65,6 +65,9 @@ clean:
 		main???.png *.image.tex *.haux *.htoc *.html \
 		*.backup *.pdf *.backup example/frama_c_journal.ml \
                 $(ARCHIVENAME) $(ARCHIVENAME).tar.gz
+
+Schemas/example.pdf: SrcSchemas/example.dot
+	dot -Tpdf $< > $@
 
 .SUFFIXES: .tex .bnf .ml .cmo .mll
 
