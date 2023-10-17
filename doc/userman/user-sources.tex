@@ -335,12 +335,14 @@ that \texttt{f} can write to any location in the memory would amount to stop any
 semantical analysis at the first call to \texttt{f}, since nothing would be
 known on the memory state afterwards.
 
-The generation is done according to a \emph{mode} which can be selected via an
-option. A plug-in developer has also the possibility to create its own mode
-using \FramaC's API. The Plug-in Development Guide~\cite{plugin-dev-guide}
-describes all steps required to create and use a custom mode. All available
-modes are detailed in the following table:
-\begin{table}[h]
+The generation is done either by combining existing specifications or according
+to a \emph{mode} which can be selected via \FramaC's options. A plug-in
+developer has also the possibility to create its own mode using \FramaC's API.
+The Plug-in Development Guide~\cite{plugin-dev-guide} describes all steps
+required to create and use a custom mode. All available modes are detailed in
+table~\ref{table:populate-mode}.
+
+\begin{table}[t]
   \begin{minipage}{\linewidth}
     \begin{tabular}{@{}l|ll|ll|ll@{}}
       \multicolumn{1}{c|}{ \multirow{2}{*}{Mode}}
@@ -369,10 +371,12 @@ modes are detailed in the following table:
                             & \verb+\false+                 & \multicolumn{1}{c}{-----} \\
     \end{tabular}
   \end{minipage}
+  \caption{Specification generation's behaviors according to available modes}
+  \label{table:populate-mode}
 \end{table}
 
 By default, \FramaC selects the mode \texttt{Frama\_C} and the following options
-allow selecting mode(s) for the specification generation.
+allow selecting mode(s) for the specification generation:
 
 \begin{description}
 \item \texttt{\optiondef{-}{generated-spec-mode <mode>}} selects which
@@ -395,10 +399,28 @@ except for \texttt{requires} which will be generated using the mode
 \texttt{Safe}.
 \end{description}
 
-Additionally, a status will be emitted for each generated clause according to
-the following table:
+As mentionned, the generation can also be done by combining existing clauses
+from other behaviors following this algorithm:
+\begin{itemize}
+  \item[1.] If the function contract has some clauses \texttt{C} in unguarded
+  (without \texttt{assumes} clauses) behaviors, we combine them inside the
+  default behavior.
+  \item[2.] Else, if it has some clauses \texttt{C} in complete behaviors, we
+  combine them inside the default behavior.
+  \item[3.] Else, if it has some clauses \texttt{C} anywhere, we combine them inside
+  the default behavior.
+  \item[4.] Else we use the selected mode to generate these clauses (see mode's
+  table).
+\end{itemize}
 
-\begin{table}[h]
+{\em Note: There is an exception with the mode \texttt{ACSL} for which we never
+try to combine existing clauses from other behavior, and jump directly to the
+last point of our algorithm to use the selected mode.}\\
+
+Additionally, a status is emitted for each generated clause. A summary can
+be found in table~\ref{table:populate-status}.
+
+\begin{table}[t]
   \centering
   \begin{tabular}{@{}l|l|l|l@{}}
       \multicolumn{1}{c|}{Mode} &
@@ -412,6 +434,8 @@ the following table:
       \texttt{terminates} & True                       & Dont\_know & Dont\_know \\
       \texttt{requires}   & \multicolumn{1}{c|}{-----} & \multicolumn{1}{c|}{-----} & \multicolumn{1}{c}{-----} \\
   \end{tabular}
+  \caption{Status emitted during the specification generation according to the selected mode}
+  \label{table:populate-status}
 \end{table}
 
 \section{Incremental parsing} (experimental)\label{sec:incremental-parsing}
