@@ -869,19 +869,23 @@ let do_populate ?loc kf clauses =
 
   let generated original = function
     | Kept -> original
-    | Generated g -> g
+    | Generated clauses -> clauses
   in
 
   let bhv = Cil.mk_behavior () in
-  let bhv = { bhv with b_post_cond = generated bhv.b_post_cond exits } in
-  let bhv = { bhv with b_assigns = generated bhv.b_assigns assigns } in
-  let bhv = { bhv with b_requires = generated bhv.b_requires requires } in
-  let bhv = { bhv with b_allocation = generated bhv.b_allocation allocates } in
+  bhv.b_post_cond <- generated bhv.b_post_cond exits;
+  bhv.b_assigns <- generated bhv.b_assigns assigns;
+  bhv.b_requires <- generated bhv.b_requires requires;
+  bhv.b_allocation <- generated bhv.b_allocation allocates;
+
+  let is_empty_bhv =
+    exits = Kept && assigns = Kept && requires = Kept && allocates = Kept
+  in
 
   let spec = Cil.empty_funspec () in
-  let spec = { spec with spec_behavior = [ bhv ] } in
-  let spec =
-    { spec with spec_terminates = generated spec.spec_terminates terminates } in
+  spec.spec_behavior <- if is_empty_bhv then spec.spec_behavior else [ bhv ];
+  spec.spec_terminates <- generated spec.spec_terminates terminates;
+
   Annotations.add_spec emitter_populate kf spec;
   Exits.emit config.c_exits kf bhv exits;
   Assigns.emit config.c_assigns kf bhv assigns;
