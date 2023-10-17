@@ -20,10 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph
-
 open Cil_types
-
 open Cil_datatype
 
 open Simplified
@@ -32,41 +29,10 @@ module VSet = Datatype.Int.Set
 module VMap = Datatype.Int.Map
 
 module Lval = Simplified.Lval
+module LSet = Cil_datatype.LvalStructEq.Set
+module LMap = Cil_datatype.LvalStructEq.Map
 
-module LSet = struct
-  include Set.Make (Lval)
-
-  let pretty fmt s =
-    Format.fprintf fmt "{@[";
-    let is_first = ref true in
-    iter (fun e ->
-        if !is_first
-        then is_first := false
-        else Format.fprintf fmt ",@ ";
-        Format.fprintf fmt "%a" Lval.pretty e
-      )
-      s;
-    Format.fprintf fmt "@]}"
-end
-
-module LMap = struct
-  include Map.Make (Lval)
-
-  let pretty f fmt m =
-    let is_first = ref true in
-    Format.fprintf fmt "{@[<hov 2>";
-    iter (fun k v ->
-        if not !is_first
-        then Format.fprintf fmt ",@,"
-        else is_first := false;
-        Format.fprintf fmt " %a -> %a" Lval.pretty k f v
-      )
-      m;
-    Format.fprintf fmt " @]}"
-end
-
-module G = Persistent.Digraph.ConcreteBidirectional(Datatype.Int)
-
+module G = Graph.Persistent.Digraph.ConcreteBidirectional(Datatype.Int)
 module V = G.V
 
 (* like LMap, but organized with offset and specialized functions *)
@@ -326,7 +292,7 @@ let pretty ?(debug = false) fmt (x:t) =
 (** .dot printing functions*)
 let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
 
-module Dot = Graphviz.Dot (struct
+module Dot = Graph.Graphviz.Dot (struct
     include G
     let edge_attributes _ = []
     let default_edge_attributes _ = []

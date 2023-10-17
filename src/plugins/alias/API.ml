@@ -43,7 +43,7 @@ let lset
   | None -> LSet.empty
   | Some state -> get_set state
 
-let points_to_set kf s lv = lset (Abstract_state.points_to_set lv) kf s
+let points_to_set_stmt kf s lv = lset (Abstract_state.points_to_set lv) kf s
 
 let new_points_to_set_stmt kf s lv =
   let get_set state =
@@ -92,7 +92,7 @@ let fundec_stmts (kf : kernel_function) (lv : lval) =
 
 
 let fold_points_to_set f_fold acc kf s lv =
-  LSet.fold (fun e a -> f_fold a e) (points_to_set kf s lv) acc
+  LSet.fold (fun e a -> f_fold a e) (points_to_set_stmt kf s lv) acc
 
 let fold_aliases_stmt f_fold acc kf s lv =
   LSet.fold (fun e a -> f_fold a e) (aliases_stmt kf s lv) acc

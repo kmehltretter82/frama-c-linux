@@ -25,23 +25,10 @@
 open Cil_types
 
 (** Points-to graphs datastructure. *)
-module G: Graph.Sig.G
+module G: Graph.Sig.G with type V.t = int
 
-(** Set of [lval]s. Differs from Cil_datatype.Lval.Set in that is uses a
-    different comparison function ([Cil_datatype.LvalStructEq.compare]). *)
-module LSet : sig
-  include Set.S with type elt = lval
-
-  val pretty: Format.formatter -> t -> unit
-end
-
-(** map of [lval]s. Differs from Cil_datatype.Lval.Met in that is uses a
-    different comparison function ([Cil_datatype.LvalStructEq.compare]). *)
-module LMap : sig
-  include Map.S with type key = lval
-
-  val pretty: (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
-end
+module LSet = Cil_datatype.LvalStructEq.Set
+module LMap = Cil_datatype.LvalStructEq.Map
 
 (** external signature *)
 module type S =

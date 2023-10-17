@@ -64,12 +64,12 @@
 [alias:unsafe-cast] structure4.c:37: Warning: 
   unsafe cast from st_1_t * to struct struct_1_t *
 [alias] May-aliases after instruction  z->s = (struct struct_1_t *)y1;  are
-  {z->s, y1}
+  { z->s; y1 }
 [alias] analysing instruction: z->c = 6;
-[alias] May-aliases after instruction  z->c = 6;  are  {z->s, y1}
+[alias] May-aliases after instruction  z->c = 6;  are  { z->s; y1 }
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are  {z->s, y1}
-[alias] May-aliases at the end of function main: {z->s, y1}
+[alias] May-aliases after instruction  __retres = 0;  are  { z->s; y1 }
+[alias] May-aliases at the end of function main: { z->s; y1 }
 [alias] analysing function: malloc
 [alias] May-aliases at the end of function malloc: ⊥
 [alias] analysing function: mblen
