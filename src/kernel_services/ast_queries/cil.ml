@@ -5294,8 +5294,10 @@ let constFoldVisitor (machdep: bool) = new constFoldVisitorClass machdep
 
 let rec constFoldTermNodeAtTop = function
   | TSizeOf typ as t ->
-    (try integer_lconstant (bytesSizeOf typ)
-     with SizeOfError _ -> t)
+    begin
+      try integer_lconstant (bytesSizeOf typ)
+      with SizeOfError _ -> t
+    end
   | TSizeOfStr str -> integer_lconstant (String.length str + 1)
   | TAlignOf typ as t ->
     begin
@@ -5308,6 +5310,45 @@ let rec constFoldTermNodeAtTop = function
   | TSizeOfE _ | TAlignOfE _ ->
     assert false (* sizeof/alignof of logic types are rejected
                     by typing anyway. *)
+  | TUnOp (op, { term_node = t1 }) as t ->
+    begin
+      let constFoldTermUnOp int_unop =
+        match constFoldTermNodeAtTop t1 with
+        | TConst (Integer (i, _)) -> TConst (Integer (int_unop i, None))
+        | _ -> t
+      in
+      match op with
+      | Neg -> constFoldTermUnOp Integer.neg
+      | BNot -> constFoldTermUnOp Integer.lognot
+      | LNot -> constFoldTermUnOp
+                  (fun i -> if Integer.is_zero i
+                    then Integer.zero else Integer.one)
+    end
+  | TBinOp (op, {term_node = t1; term_type = typ1}, {term_node = t2}) as t ->
+    begin
+      let constFoldTermBinOp int_bop =
+        match constFoldTermNodeAtTop t1, constFoldTermNodeAtTop t2 with
+        | TConst (Integer (i1, _)), TConst (Integer (i2, _)) ->
+          TConst (Integer (int_bop i1 i2, None))
+        | _ -> t
+      in
+      match op with
+      | PlusA -> constFoldTermBinOp Integer.add
+      | MinusA -> constFoldTermBinOp Integer.sub
+      | Mult -> constFoldTermBinOp Integer.mul
+      | Shiftlt -> constFoldTermBinOp Integer.shift_left
+      | Shiftrt ->
+        let int_op =
+          match typ1 with
+          | Ctype ct when isUnsignedInteger ct -> Integer.shift_right_logical
+          | _ -> Integer.shift_right
+        in
+        constFoldTermBinOp int_op
+      | BAnd -> constFoldTermBinOp Integer.logand
+      | BXor -> constFoldTermBinOp Integer.logxor
+      | BOr -> constFoldTermBinOp Integer.logor
+      | _ -> t
+    end
   | t -> t
 
 let constFoldTerm machdep t =
