@@ -147,7 +147,7 @@
       with_nl, decode_utf8 @@ replace_backslash content
     with End_of_file ->
       Kernel.fatal
-        "too few annotations in result file while pre-processing annotations"
+        "too few annotations in result file while preprocessing annotations"
 
   let output_result outfile preprocessed content =
     let rec aux = function
@@ -173,7 +173,7 @@
         try Extlib.temp_file_cleanup_at_exit ~debug "ppannot" suffix
         with Extlib.Temp_file_error s ->
           Kernel.abort
-            "Could not open temporary file for logic pre-processing: %s" s
+            "Could not open temporary file for logic preprocessing: %s" s
       in
       let ppfile = open_out ppname in
       Buffer.output_buffer ppfile preprocess_buffer;

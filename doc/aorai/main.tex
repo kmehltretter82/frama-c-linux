@@ -5,6 +5,7 @@
 \usepackage{tikz}
 
 \usetikzlibrary{fit}
+\usetikzlibrary{arrows.meta}
 \usetikzlibrary{shapes.geometric}
 \usetikzlibrary{positioning}
 
@@ -194,8 +195,8 @@ write automata in \aorai are listed in the next chapter.
  The automaton of our running example is described by
  figure~\ref{BuchiExample}.
 
-  \begin{figure}[ht]
-    \centerline{\includegraphics[width=350pt]{Schemas/example}}
+  \begin{figure}[htb]
+    \centerline{\includegraphics[height=\textheight]{Schemas/example}}
     \caption{Automaton}
     \label{BuchiExample}
   \end{figure}
@@ -229,7 +230,7 @@ write automata in \aorai are listed in the next chapter.
 Finally, the C-code which will be checked is given in
 figure~\ref{example_c_file}.
 
-\begin{figure}[ht]
+\begin{figure}[htb]
 \lstinputlisting[style=c]{example/example.c}
 \caption{Example of C File}
 \label{example_c_file}
@@ -930,8 +931,53 @@ is correct with respect to an automaton, we need to verify two aspects:
 
 \end{itemize}
 
-\begin{figure}[ht]
-    \centerline{\includegraphics[width=250pt]{Schemas/synchro}}
+\begin{figure}[htb]
+\centering
+  \begin{tikzpicture}[
+    node distance=1cm and 1.5cm,
+    state/.style={circle,draw,minimum width=3em}
+    ]
+    \node[state] (t0) { $t_0$ };
+    \node[state] (t1) [right = of t0] { $t_1$ };
+    \node[state] (t2) [right = of t1] { $t_2$ };
+    \node[state] (tim1) [right = of t2] { $t_{i-1}$};
+    \node[state] (ti) [right = of tim1] { $t_i$};
+    \node[state] (tip1) [right = of ti] { $t_{i+1}$};
+    \node (tinf) [right = of tip1] {};
+
+    \node[state] (q0) [below = of t0] { $q_0$ };
+    \node[state] (q1) [right = of q0] { $q_1$ };
+    \node[state] (q2) [right = of q1] { $q_2$ };
+    \node[state] (qim1) [right = of q2] { $q_{i-1}$};
+    \node[state] (qi) [right = of qim1] { $q_i$};
+    \node[state] (qip1) [right = of qi] { $q_{i+1}$};
+    \node (qinf) [right = of qip1] {};
+
+    \draw[-Latex] (t0) -- (t1);
+    \draw[-Latex] (t1) -- (t2);
+    \draw[-Latex, dashed] (t2) -- (tim1);
+    \draw[-Latex] (tim1) -- (ti);
+    \draw[-Latex] (ti) -- (tip1);
+    \draw[-Latex,dashed] (tip1) -- (tinf);
+
+    \draw[-Latex] (q0) -- (q1) node[midway,below] {$P_0$};
+    \draw[-Latex] (q1) -- (q2) node[midway,below] {$P_1$};
+    \draw[-Latex, dashed] (q2) -- (qim1) node[midway,below] {$P_2$};
+    \draw[-Latex] (qim1) -- (qi) node[midway,below] {$P_{i-1}$};
+    \draw[-Latex] (qi) -- (qip1) node[midway,below] {$P_i$};
+    \draw[-Latex,dashed] (qip1) -- (qinf) node[midway,below] {$P_{i+1}$};
+
+    \coordinate [above left=5mm of ti] (tial);
+    \coordinate [above right=5mm of ti] (tiar);
+    \coordinate [above right=5mm of qip1] (qip1ar);
+    \coordinate [below right=5mm of qip1] (qip1br);
+    \coordinate (middle) at (tiar |- qip1ar);
+    \coordinate (qibl) at (tial |- qip1br);
+
+    \draw[red] (tial) -- (tiar) -- (middle) -- (qip1ar) -- (qip1br) -- (qibl) --cycle;
+
+
+  \end{tikzpicture}
     \caption{Synchronization of Paths from automata and from Program}
     \label{FigExplicationSynchro}
 \end{figure}
@@ -1084,7 +1130,7 @@ current active states, since it knows each previous active states.
     \node[yshift=-6em] (prop) at (c) {\it Property};
     \node[yshift=-3em] (ya) at (prop) {\it Ya automaton};
 
-    \node[draw,xshift=10ex,anchor=west,align=center,font=\bfseries] (fc) at (c.east) {Frama-C\\pre-processor};
+    \node[draw,xshift=10ex,anchor=west,align=center,font=\bfseries] (fc) at (c.east) {Frama-C\\preprocessor};
     \node[draw,xshift=10ex,anchor=west,align=center,font=\bfseries] (annot) at (fc.east) {Annotations\\calculus};
 
     \node[ellipse,draw,yshift=-6em,align=center] (buchi) at (annot) {Büchi\\automaton};

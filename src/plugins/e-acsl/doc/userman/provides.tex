@@ -50,7 +50,7 @@ to the \framac command line:
 [e-acsl] translation done in project "e-acsl".
 \end{shell}
 
-Even though \texttt{first.i} has already been pre-processed, \eacsl first asks
+Even though \texttt{first.i} has already been preprocessed, \eacsl first asks
 the \framac kernel to process and combine it against several header files
 provided by the \eacsl plug-in.  Further \eacsl translates the annotated code
 into a new \framac project named \texttt{e-acsl}\footnote{The notion of
@@ -233,7 +233,7 @@ respectively, for instance as follows:
 Runs of \framac and \gcc issued by \eacslgcc can further be customized by using
 additional flags.  \framac flags can be passed using the \shortopt{F} option,
 while \shortopt{e} and \shortopt{l} options allow for passing additional
-pre-processor and linker flags during \gcc invocations.  For example, command
+preprocessor and linker flags during \gcc invocations.  For example, command
 
 \begin{frama-c-commands}
 \$ e-acsl-gcc.sh -c -F"-unicode" -e"-I/bar -I/baz" foo.c
@@ -246,7 +246,7 @@ are output using the UTF-8 character set. Further, during the compilation of
 
 It is worth mentioning that \eacslgcc implements several convenience flags for
 setting some of the \framac options. For instance, \shortopt{E} can be used to
-pass additional arguments to the \framac pre-processor (see
+pass additional arguments to the \framac preprocessor (see
 Section~\ref{sec:eacsl-gcc:doc}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
