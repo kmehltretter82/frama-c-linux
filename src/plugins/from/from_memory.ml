@@ -89,7 +89,7 @@ let decide_compose m1 m2 =
   else LOffset.Recurse
 
 let compose_map =
-  let cache = Hptmap_sig.PersistentCache "Function_Froms.Memory.compose" in
+  let cache = Hptmap_sig.PersistentCache "From_memory.compose" in
   (* Partial application is important because of the cache. Idempotent,
      because [compose x x] is always equal to [x]. *)
   map2 ~cache ~symmetric:false ~idempotent:true ~empty_neutral:true
@@ -119,7 +119,7 @@ let substitute_data_deps =
   let both b itvs offsm = find_precise_loffset offsm b itvs in
   let join = Deps.join in
   let empty = Deps.bottom in
-  let cache = Hptmap_sig.PersistentCache "From_compute.subst_data" in
+  let cache = Hptmap_sig.PersistentCache "From_memory.substitute_data" in
   let f_map =
     Zone.fold2_join_heterogeneous
       ~cache ~empty_left ~empty_right ~both ~join ~empty
@@ -147,7 +147,7 @@ let substitute_indirect_deps =
   in
   let join = Zone.join in
   let empty = Zone.bottom in
-  let cache = Hptmap_sig.PersistentCache "From_compute.subst_indirect" in
+  let cache = Hptmap_sig.PersistentCache "From_memory.substitute_indirect" in
   let f_map =
     Zone.fold2_join_heterogeneous
       ~cache ~empty_left ~empty_right ~both ~join ~empty
