@@ -22,10 +22,9 @@ while external plug-ins must be installed separately.
 
 To install an external plug-in, \FramaC itself must be properly installed
 first. In particular, \texttt{frama-c \optionuse{-}{print-share-path}}
-must return the share directory of \FramaC (see Section~\ref{sec:var-share}),
+must return the share directory of \FramaC,
 while \texttt{frama-c \optionuse{-}{print-lib-path}}
-must return the directory where the \FramaC compiled library is installed (see
-Section~\ref{sec:var-lib}).
+must return the directory where the \FramaC compiled library is installed.
 
 The standard way for installing an external plug-in from source is to run the
 sequence of commands \texttt{make \&\& make install}. Please refer to each
@@ -57,10 +56,6 @@ In general, plug-ins must be compiled with the
 very same \caml compiler than \FramaC was, and against a consistent \FramaC
 installation. Loading will fail and a warning will be emitted at launch if this
 is not the case.
-
-These options require the \caml compiler that was
-used to compile \FramaC to be available and the \FramaC compiled library to be
-found (see Section~\ref{sec:var-lib}).
 \end{important}
 
 % Local Variables:
