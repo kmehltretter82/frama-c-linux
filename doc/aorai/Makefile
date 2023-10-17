@@ -67,6 +67,7 @@ clean:
                 $(ARCHIVENAME) $(ARCHIVENAME).tar.gz
 
 Schemas/example.pdf: SrcSchemas/example.dot
+	mkdir -p Schemas
 	dot -Tpdf $< > $@
 
 .SUFFIXES: .tex .bnf .ml .cmo .mll
