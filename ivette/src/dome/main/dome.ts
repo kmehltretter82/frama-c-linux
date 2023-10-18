@@ -155,6 +155,11 @@ const APP_DIR = app.getPath('userData');
 const PATH_WINDOW_SETTINGS = path.join(APP_DIR, 'WindowSettings.json');
 const PATH_GLOBAL_SETTINGS = path.join(APP_DIR, 'GlobalSettings.json');
 
+const CLI_OPTION_SETTINGS = {
+  name: "--settings",
+  defaultValue: "CLEAN",
+} as const;
+
 function saveGlobalSettings(): void {
   try {
     if (!fstat(APP_DIR)) fs.mkdirSync(APP_DIR);
@@ -216,7 +221,7 @@ function saveWindowConfig(handle: Handle): void {
     devtools: handle.devtools,
   };
 
-  if (process.argv.indexOf("--settings") === -1) {
+  if (process.argv.indexOf(CLI_OPTION_SETTINGS.name) === -1) {
     saveSettings(handle.config, configData);
   }
 }
@@ -406,10 +411,10 @@ function createBrowserWindow(
   };
 
   let configFile = PATH_WINDOW_SETTINGS;
-  if (argv && argv.indexOf('--settings') >= 0) {
-    const settingsIdx = argv.indexOf('--settings');
+  if (argv && argv.indexOf(CLI_OPTION_SETTINGS.name) >= 0) {
+    const settingsIdx = argv.indexOf(CLI_OPTION_SETTINGS.name);
     const settings = argv[settingsIdx + 1];
-    if (settings !== "CLEAN") {
+    if (settings !== CLI_OPTION_SETTINGS.defaultValue) {
       configFile = argv[settingsIdx + 1];
     }
     argv = argv.slice(0, settingsIdx).concat(argv.slice(settingsIdx + 2));
@@ -556,10 +561,10 @@ function createPrimaryWindow(): void {
   const cmd = stripElectronArgv({ wdir, argv: process.argv });
 
   // Reset Settings if the associated argument is provided
-  const settingsIdx = cmd.argv.indexOf("--settings");
+  const settingsIdx = cmd.argv.indexOf(CLI_OPTION_SETTINGS.name);
   if (settingsIdx >= 0) {
     const settings = cmd.argv[settingsIdx + 1];
-    if (settings === "CLEAN") {
+    if (settings === CLI_OPTION_SETTINGS.defaultValue) {
       restoreAllDefaultSettings();
     }
   }
