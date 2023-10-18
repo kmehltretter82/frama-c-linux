@@ -167,9 +167,9 @@ let compute_kf model bhv prop kf =
   add_with_behaviors bhv prop kf
 
 let compute model
-  ?(fct=Wp_parameters.get_fct())
-  ?(bhv=Wp_parameters.Behaviors.get())
-  ?(prop=Wp_parameters.Properties.get ()) ()
+    ?(fct=Wp_parameters.get_fct())
+    ?(bhv=Wp_parameters.Behaviors.get())
+    ?(prop=Wp_parameters.Properties.get ()) ()
   =
   Wp_parameters.iter_fct (compute_kf model bhv prop) fct
 
