@@ -38,7 +38,8 @@ export const argsDefaultLaunch: string[] = [
 export const argsLaunchWithDefaultSettings: string[] = [
   "./dist/main/main.js",
   "--no-sandbox",
-  "--init-settings",
+  "--settings",
+  "CLEAN"
 ];
 
 /**
@@ -47,7 +48,7 @@ export const argsLaunchWithDefaultSettings: string[] = [
 export const argsLaunchWithTestFile: string[] = [
   "./dist/main/main.js",
   "--no-sandbox",
-  "--with-fixed-settings",
+  "--settings",
   "./tests/settings.json",
   "../tests/test/adpcm.c",
 ];

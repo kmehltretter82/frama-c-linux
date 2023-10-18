@@ -216,7 +216,7 @@ function saveWindowConfig(handle: Handle): void {
     devtools: handle.devtools,
   };
 
-  if (!process.argv.includes("--with-fixed-settings")) {
+  if (process.argv.indexOf("--settings") === -1) {
     saveSettings(handle.config, configData);
   }
 }
@@ -406,13 +406,13 @@ function createBrowserWindow(
   };
 
   let configFile = PATH_WINDOW_SETTINGS;
-  if (argv && argv.includes('--with-fixed-settings')) {
-    configFile =
-      argv[argv.indexOf('--with-fixed-settings') + 1];
-    argv = argv.filter((p) => !!p &&
-      p !== "--with-fixed-settings" &&
-      p !== configFile
-    );
+  if (argv && argv.indexOf('--settings') >= 0) {
+    const settingsIdx = argv.indexOf('--settings');
+    const settings = argv[settingsIdx + 1];
+    if (settings !== "CLEAN") {
+      configFile = argv[settingsIdx + 1];
+    }
+    argv = argv.slice(0, settingsIdx).concat(argv.slice(settingsIdx + 2));
   } else if (isAppWindow) {
     configFile = lookupConfig(wdir);
   }
@@ -556,10 +556,12 @@ function createPrimaryWindow(): void {
   const cmd = stripElectronArgv({ wdir, argv: process.argv });
 
   // Reset Settings if the associated argument is provided
-  const initSettings = cmd.argv.includes("--init-settings");
-  if (initSettings) {
-    restoreAllDefaultSettings();
-    cmd.argv = cmd.argv.filter((p) => !!p && p !== "--init-settings");
+  const settingsIdx = cmd.argv.indexOf("--settings");
+  if (settingsIdx >= 0) {
+    const settings = cmd.argv[settingsIdx + 1];
+    if (settings === "CLEAN") {
+      restoreAllDefaultSettings();
+    }
   }
 
   // Initialize Theme

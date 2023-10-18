@@ -125,8 +125,8 @@ should be enriched with, common locators for Ivette.
 
 Note that `/tests/libs/e2eService.ts` also provides with some examples of
 `<arguments>` to fed `e2eService.launchApp()` function with. In particular, use
-the `Dome`'s `--init-settings` option for launching Ivette with default
-settings, and the `--with-fixed-settings </path/to/json-file-with-settings>`
+the `Dome`'s `--settings CLEAN` option for launching Ivette with default
+settings, and the `--settings </path/to/json-file-with-settings>`
 option for launching Ivette with particular settings.
 
 `Playwright` also provides an interactive way for identifying new locators.
@@ -149,5 +149,5 @@ look at the `/tests/monkey/monkey-testing.spec.ts` for an example.
 Note that, to obtain reproducible tests, one should seed a randomizer (see the
 `randomizer` value in `monkey-testing.spec.ts` for an example). For that, one
 should also launch Ivette with either default settings, by using the
-`--init-settings` option, or fixed settings, by using the `--with-fixed-settings
+`-settings CLEAN` option, or fixed settings, by using the `--settings
 </path/to/json-file-with-settings>` option.
