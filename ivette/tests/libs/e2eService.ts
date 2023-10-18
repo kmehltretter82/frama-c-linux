@@ -39,7 +39,7 @@ export const argsLaunchWithDefaultSettings: string[] = [
   "./dist/main/main.js",
   "--no-sandbox",
   "--settings",
-  "CLEAN"
+  "DEFAULT"
 ];
 
 /**

@@ -157,7 +157,7 @@ const PATH_GLOBAL_SETTINGS = path.join(APP_DIR, 'GlobalSettings.json');
 
 const CLI_OPTION_SETTINGS = {
   name: "--settings",
-  defaultValue: "CLEAN",
+  defaultValue: "DEFAULT",
 } as const;
 
 function saveGlobalSettings(): void {
