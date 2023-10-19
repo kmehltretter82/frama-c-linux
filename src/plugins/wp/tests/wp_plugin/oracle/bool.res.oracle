@@ -1,7 +1,15 @@
 # frama-c -wp [...]
 [kernel] Parsing bool.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal band_bool_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal band_bool_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal bor_bool_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bor_bool_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal bxor_bool_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bxor_bool_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal job_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal job_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function band_bool with behavior false
 ------------------------------------------------------------

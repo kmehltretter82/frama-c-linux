@@ -32,7 +32,26 @@
     by these options, they are not considered.
 *)
 
-val compute: WpContext.model -> unit
+val compute: WpContext.model ->
+  ?fct:Wp_parameters.functions ->
+  ?bhv:string list ->
+  ?prop:string list ->
+  unit ->
+  unit
+(** Compute the entire set, populating specification related to:
+    - exits
+    - terminates
+    - assigns (for functions without body)
+*)
+
+val compute_kf: WpContext.model -> Kernel_function.t -> unit
+(** Compute the target properties associated to the given kernel function. It
+    also populates exits, terminates and assigns for the function and its
+    callees, as well as RTE assertions if they are asked on command  line.
+
+    @since Frama-C+dev
+*)
+
 val iter: (Kernel_function.t -> unit) -> unit
 
 

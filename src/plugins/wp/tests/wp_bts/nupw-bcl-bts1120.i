@@ -16,7 +16,9 @@ int f(int x);
 //@ requires ExitF(max) ==> ExitP(max); assigns \nothing; exits ok:ExitP(max);
 void g (int max) {
   int tmp = f(max);
-  //@ loop assigns ok:tmp;
+  /*@ loop assigns ok:tmp;
+      loop variant max - tmp;
+  */
   while (tmp<=max) {
      tmp ++;
   }

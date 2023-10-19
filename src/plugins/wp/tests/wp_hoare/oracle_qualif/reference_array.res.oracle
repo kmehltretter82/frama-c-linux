@@ -1,55 +1,76 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing reference_array.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] reference_array.i:31: Warning: 
+  Neither code nor explicit exits and terminates for function add_5,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] reference_array.i:14: Warning: 
+  Neither code nor explicit exits and terminates for function reset_5,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] reference_array.i:24: Warning: 
+  Neither code nor explicit exits and terminates for function load_5,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
-[wp] 36 goals scheduled
+[wp] 48 goals scheduled
+[wp] [Valid] typed_ref_reset_1_5_terminates (Qed)
 [wp] [Valid] typed_ref_reset_1_5_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_reset_1_5_exits (Qed)
 [wp] [Valid] typed_ref_reset_1_5_assigns_exit (Qed)
 [wp] [Valid] typed_ref_reset_1_5_assigns_normal (Qed)
 [wp] [Valid] typed_ref_reset_1_5_call_reset_5_requires (Qed)
+[wp] [Valid] typed_ref_load_1_5_terminates (Qed)
 [wp] [Valid] typed_ref_load_1_5_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_load_1_5_exits (Qed)
 [wp] [Valid] typed_ref_load_1_5_assigns_exit (Qed)
 [wp] [Valid] typed_ref_load_1_5_assigns_normal (Qed)
 [wp] [Valid] typed_ref_load_1_5_call_load_5_requires (Qed)
+[wp] [Valid] typed_ref_add_1_5_terminates (Qed)
 [wp] [Valid] typed_ref_add_1_5_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_add_1_5_exits (Qed)
 [wp] [Valid] typed_ref_add_1_5_assigns_exit (Qed)
 [wp] [Valid] typed_ref_add_1_5_assigns_normal (Qed)
 [wp] [Valid] typed_ref_add_1_5_call_add_5_requires (Qed)
+[wp] [Valid] typed_ref_calls_on_array_dim_1_terminates (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_1_ensures_Pload (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_calls_on_array_dim_1_ensures_Preset (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_calls_on_array_dim_1_ensures_Padd (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_calls_on_array_dim_1_exits (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_1_assigns_exit (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_1_assigns_normal (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_1_call_load_5_requires (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_1_call_reset_5_requires (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_1_call_add_5_requires (Qed)
+[wp] [Valid] typed_ref_calls_on_array_dim_2_to_1_terminates (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_to_1_ensures_Pload (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_to_1_ensures_Preset (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_to_1_ensures_Padd (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_calls_on_array_dim_2_to_1_exits (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_to_1_assigns_exit (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_to_1_assigns_normal (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_to_1_call_load_5_requires (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_to_1_call_reset_5_requires (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_to_1_call_add_5_requires (Qed)
+[wp] [Valid] typed_ref_calls_on_array_dim_2_terminates (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_ensures_Pload (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_ensures_Preset (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_ensures_Padd (Alt-Ergo) (Cached)
+[wp] [Valid] typed_ref_calls_on_array_dim_2_exits (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_assigns_exit (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_assigns_normal (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_call_load_1_5_requires (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_call_reset_1_5_requires (Qed)
 [wp] [Valid] typed_ref_calls_on_array_dim_2_call_add_1_5_requires (Qed)
-[wp] Proved goals:   36 / 36
-  Qed:            24
+[wp] Proved goals:   48 / 48
+  Qed:            36
   Alt-Ergo:       12
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  reset_1_5                 3        1        4       100%
-  load_1_5                  3        1        4       100%
-  add_1_5                   3        1        4       100%
-  calls_on_array_dim_1      5        3        8       100%
-  calls_on_array_dim_2_to_1   5      3        8       100%
-  calls_on_array_dim_2      5        3        8       100%
+  reset_1_5                 5        1        6       100%
+  load_1_5                  5        1        6       100%
+  add_1_5                   5        1        6       100%
+  calls_on_array_dim_1      7        3       10       100%
+  calls_on_array_dim_2_to_1   7      3       10       100%
+  calls_on_array_dim_2      7        3       10       100%
 ------------------------------------------------------------
 [wp] reference_array.i:24: Warning: 
   Memory model hypotheses for function 'load_5':

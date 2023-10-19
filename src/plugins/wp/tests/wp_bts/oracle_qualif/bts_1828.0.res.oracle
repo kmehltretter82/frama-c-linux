@@ -1,7 +1,11 @@
 # frama-c -wp [...]
 [kernel] Parsing bts_1828.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal global_frame_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal global_frame_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal local_frame_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal local_frame_terminates (Cfg) (Trivial)
 [wp] 6 goals scheduled
 [wp] [Valid] typed_local_frame_assert_ok (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_global_frame_ensures_sep_iff_ref (Alt-Ergo) (Cached)
@@ -9,7 +13,9 @@
 [wp] [Valid] typed_global_frame_ensures_zero_always (Qed)
 [wp] [Valid] typed_global_frame_assert_ok (Qed)
 [wp] [Valid] typed_global_frame_assert_ok_2 (Qed)
-[wp] Proved goals:    4 / 6
+[wp] Proved goals:    8 / 10
+  Terminating:     2
+  Unreachable:     2
   Qed:             3
   Alt-Ergo:        1
   Unsuccess:       2

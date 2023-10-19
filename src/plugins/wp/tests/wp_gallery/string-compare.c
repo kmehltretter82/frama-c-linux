@@ -11,6 +11,7 @@
 #include <stdio.h>
 
 /*@ requires validStrings: valid_read_string(s1) && valid_read_string(s2);
+    terminates \false;
     assigns \nothing ;
     allocates \nothing ;
     frees \nothing ;
@@ -50,6 +51,7 @@ int stringCompare(const char* s1, const char* s2) {
 
 /*@ requires validString: valid_string(str);
     requires validLength: 0 <= strlen(str) < SIZE_MAX;
+    terminates \false;
     assigns \nothing ;
     exits never: \false ;
     ensures rightResult: \result == strlen(\old(str));
@@ -64,7 +66,8 @@ size_t stringLength(const char* str) {
   return --s - str;
 }
 
-/*@ assigns \nothing ;
+/*@ terminates \false ;
+    assigns \nothing ;
     exits never: \false ;
     ensures \result != 0 ;*/
 int main(void) {

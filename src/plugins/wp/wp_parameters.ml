@@ -516,29 +516,6 @@ module PrecondWeakening =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
-module TerminatesExtDeclarations =
-  False(struct
-    let option_name = "-wp-declarations-terminate"
-    let help = "Undefined external functions without terminates specification \
-                are considered to terminate when called."
-  end)
-
-let () = Parameter_customize.set_group wp_strategy
-module TerminatesDefinitions =
-  False(struct
-    let option_name = "-wp-definitions-terminate"
-    let help = "Defined functions without terminates specification are \
-                considered to terminate when called."
-  end)
-
-module TerminatesStdlibDeclarations =
-  False(struct
-    let option_name = "-wp-frama-c-stdlib-terminate"
-    let help = "Frama-C stdlib functions without terminates specification \
-                are considered to terminate when called."
-  end)
-
-let () = Parameter_customize.set_group wp_strategy
 module TerminatesVariantHyp =
   False(struct
     let option_name = "-wp-variant-with-terminates"

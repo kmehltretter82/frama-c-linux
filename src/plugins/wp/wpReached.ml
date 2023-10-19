@@ -424,8 +424,10 @@ let set_unreachable pid =
          unless we know exactly what is going on. *)
       | p ->
         incr unreachable_proved ;
-        Wp_parameters.result "[CFG] Goal %a : Valid (Unreachable)"
-          WpPropId.pp_propid pid ; [p]
+        if Wp_parameters.has_dkey VCS.dkey_shell then
+          Wp_parameters.feedback "[Valid] Goal %a (Cfg) (Unreachable)"
+            WpPropId.pp_propid pid ;
+        [p]
     in
     List.iter emit pids
 

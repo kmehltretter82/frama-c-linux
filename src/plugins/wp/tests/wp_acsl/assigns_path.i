@@ -16,6 +16,7 @@ void job( int n , int * b )
     loop invariant 0 <= i <= n ;
     loop invariant \forall integer k; 0 <= k < i ==> p.a[k] == b[k];
     loop assigns i, p.a[..];
+    loop variant n - i;
   */
   for (int i = 0; i < n; i++) p.a[i] = b[i];
 }

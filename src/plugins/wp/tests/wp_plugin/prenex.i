@@ -22,6 +22,7 @@ int diag(int *p,int n,int *q,int m)
       \forall integer j0; 0 <= j0 < m ==>
         p[i0] < q[j0];
     loop assigns i;
+    loop variant n - i;
   */
   for (int i = 0; i<n; i++)
     /*@
@@ -30,6 +31,7 @@ int diag(int *p,int n,int *q,int m)
         \forall integer j0; 0 <= j0 < j ==>
           p[i] < q[j0];
       loop assigns j;
+      loop variant m - j;
     */
     for (int j = 0; j<m; j++)
       if (p[i] >= q[j]) return 0;

@@ -2,8 +2,24 @@
 [kernel] Parsing chunk_printing.i (no preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function main
+[kernel:annot:missing-spec] chunk_printing.i:19: Warning: 
+  Neither code nor explicit exits and terminates for function get_int,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] chunk_printing.i:25: Warning: 
+  Neither code nor explicit exits and terminates for function get_uint,
+   generating default clauses. See -generated-spec-* options for more info
 ------------------------------------------------------------
   Function main
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assertion (file chunk_printing.i, line 32):

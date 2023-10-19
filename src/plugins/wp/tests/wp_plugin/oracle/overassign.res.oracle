@@ -1,9 +1,22 @@
 # frama-c -wp [...]
 [kernel] Parsing overassign.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] overassign.i:3: Warning: 
+  Neither code nor explicit exits and terminates for function g,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function f1_ok
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f1_ok':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f1_ok':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assigns (file overassign.i, line 13) in 'f1_ok':
@@ -21,6 +34,16 @@ Prove: true.
   Function f2_ok
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f2_ok':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f2_ok':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns (file overassign.i, line 16) in 'f2_ok':
 Call Effect at line 17
 Prove: true.
@@ -36,10 +59,19 @@ Prove: true.
   Function f3_ok
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f3_ok':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f3_ok':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'f3_ok':
 Call Effect at line 20
-Assume { (* Heap *) Type: (region(G_A_32) <= 0) /\ linked(Malloc_0). }
-Prove: invalid(Malloc_0, shift_sint32(global(G_A_32), 20), 10).
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -53,10 +85,19 @@ Prove: invalid(Malloc_0, shift_sint32(global(G_A_32), 20), 10).
   Function f4_ok
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f4_ok':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f4_ok':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'f4_ok':
 Call Effect at line 23
-Assume { (* Heap *) Type: (region(G_A_32) <= 0) /\ linked(Malloc_0). }
-Prove: invalid(Malloc_0, shift_sint32(global(G_A_32), -10), 10).
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -70,10 +111,19 @@ Prove: invalid(Malloc_0, shift_sint32(global(G_A_32), -10), 10).
   Function f5_ko
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f5_ko':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f5_ko':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'f5_ko':
 Call Effect at line 26
-Assume { (* Heap *) Type: (region(G_A_32) <= 0) /\ linked(Malloc_0). }
-Prove: invalid(Malloc_0, shift_sint32(global(G_A_32), 15), 10).
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -87,10 +137,19 @@ Prove: invalid(Malloc_0, shift_sint32(global(G_A_32), 15), 10).
   Function f6_ko
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f6_ko':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f6_ko':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'f6_ko':
 Call Effect at line 29
-Assume { (* Heap *) Type: (region(G_A_32) <= 0) /\ linked(Malloc_0). }
-Prove: invalid(Malloc_0, shift_sint32(global(G_A_32), -5), 10).
+Prove: true.
 
 ------------------------------------------------------------
 

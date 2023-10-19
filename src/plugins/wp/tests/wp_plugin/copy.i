@@ -10,6 +10,7 @@ void copy( int * a , int * b , int n )
   /*@ loop invariant Range: 0 <= i <= n ;
     @ loop invariant Copy:  \forall integer k ; 0 <= k < i ==> a[k] == b[k] ;
     @ loop assigns i , a[0..n-1] ;
+    @ loop variant n - i;
     @ */
   for (int i = 0 ; i < n ; i++) {
   L:

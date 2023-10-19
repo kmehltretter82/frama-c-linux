@@ -37,6 +37,7 @@ void job3(int *p)
   /*@
     loop invariant 0 <= i <= N;
     loop assigns i, p[0..N-1];
+    loop variant N - i;
    */
   for (int i = 0; i < N; i++)
     p[i] = 0;

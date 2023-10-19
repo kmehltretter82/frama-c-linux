@@ -2,6 +2,8 @@
 [kernel] Parsing binary-multiplication.c (with preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function BinaryMultiplication
+[wp] [Valid] Goal BinaryMultiplication_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal BinaryMultiplication_terminates (Cfg) (Trivial)
 [wp] Goal typed_lemma_ax1_ok : not tried
 [wp] Goal typed_lemma_ax2_lack : not tried
 [wp] Goal typed_lemma_ax3_lack : not tried

@@ -4,6 +4,7 @@
 
 // All contract shall be provable
 
+//@ terminates \false;
 void loop_switch(int *a,int c)
 {
   *a = 1;
@@ -33,6 +34,7 @@ void loop_switch(int *a,int c)
 
 int a;
 
+//@ terminates \false;
 void loop_continue(int x,int y)
 {
   int *p = &a;

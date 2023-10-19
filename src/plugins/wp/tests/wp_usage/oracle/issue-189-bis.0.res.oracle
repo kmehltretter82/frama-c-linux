@@ -1,7 +1,11 @@
 # frama-c -wp [...]
 [kernel] Parsing issue-189-bis.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal memcpy_alias_vars_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal memcpy_alias_vars_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal memcpy_context_vars_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal memcpy_context_vars_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function memcpy_alias_vars
 ------------------------------------------------------------
@@ -180,19 +184,19 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Loop assigns (file issue-189-bis.i, line 26) (2/4):
-Effect at line 32
+Effect at line 33
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Loop assigns (file issue-189-bis.i, line 26) (3/4):
-Effect at line 32
+Effect at line 33
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Loop assigns (file issue-189-bis.i, line 26) (4/4):
-Effect at line 32
+Effect at line 33
 Let a = global(P_dst_25).
 Let a_1 = Mptr_0[a].
 Let a_2 = shift_uint8(a_1, 0).
@@ -235,7 +239,17 @@ Prove: (a = v) \/ (a_5 = v) \/ included(v, 1, a_2, len_0).
 ------------------------------------------------------------
 
 Goal Assigns (file issue-189-bis.i, line 18) in 'memcpy_alias_vars':
-Effect at line 31
+Effect at line 32
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file issue-189-bis.i, line 32):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file issue-189-bis.i, line 32):
 Prove: true.
 
 ------------------------------------------------------------
@@ -312,7 +326,7 @@ Prove: a_2[a_5] = Mint_0[a_5].
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'ok,cpy' (file issue-189-bis.i, line 55):
+Goal Preservation of Invariant 'ok,cpy' (file issue-189-bis.i, line 56):
 Let a = Mptr_0[global(P_dst_48)].
 Let a_1 = shift_uint8(a, 0).
 Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, len_0).
@@ -349,22 +363,22 @@ Prove: a_5[shift_uint8(a_3, i)] = a_5[shift_uint8(a, i)].
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,cpy' (file issue-189-bis.i, line 55):
+Goal Establishment of Invariant 'ok,cpy' (file issue-189-bis.i, line 56):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'ok,dst' (file issue-189-bis.i, line 53):
+Goal Preservation of Invariant 'ok,dst' (file issue-189-bis.i, line 54):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,dst' (file issue-189-bis.i, line 53):
+Goal Establishment of Invariant 'ok,dst' (file issue-189-bis.i, line 54):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'ok,len' (file issue-189-bis.i, line 51):
+Goal Preservation of Invariant 'ok,len' (file issue-189-bis.i, line 52):
 Let a = Mptr_0[global(P_dst_48)].
 Let a_1 = shift_uint8(a, 0).
 Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, len_1).
@@ -396,40 +410,40 @@ Prove: len_0 <= (1 + len_1).
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,len' (file issue-189-bis.i, line 51):
+Goal Establishment of Invariant 'ok,len' (file issue-189-bis.i, line 52):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Preservation of Invariant 'ok,src' (file issue-189-bis.i, line 52):
+Goal Preservation of Invariant 'ok,src' (file issue-189-bis.i, line 53):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Establishment of Invariant 'ok,src' (file issue-189-bis.i, line 52):
+Goal Establishment of Invariant 'ok,src' (file issue-189-bis.i, line 53):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file issue-189-bis.i, line 54) (1/4):
+Goal Loop assigns (file issue-189-bis.i, line 55) (1/4):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file issue-189-bis.i, line 54) (2/4):
-Effect at line 60
+Goal Loop assigns (file issue-189-bis.i, line 55) (2/4):
+Effect at line 62
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file issue-189-bis.i, line 54) (3/4):
-Effect at line 60
+Goal Loop assigns (file issue-189-bis.i, line 55) (3/4):
+Effect at line 62
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Loop assigns (file issue-189-bis.i, line 54) (4/4):
-Effect at line 60
+Goal Loop assigns (file issue-189-bis.i, line 55) (4/4):
+Effect at line 62
 Let a = Mptr_0[global(P_dst_48)].
 Let a_1 = shift_uint8(a, 0).
 Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, len_0).
@@ -469,8 +483,18 @@ Prove: included(tmp_0, 1, a_1, len_0).
 
 ------------------------------------------------------------
 
-Goal Assigns (file issue-189-bis.i, line 44) in 'memcpy_context_vars':
-Effect at line 59
+Goal Assigns (file issue-189-bis.i, line 45) in 'memcpy_context_vars':
+Effect at line 61
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file issue-189-bis.i, line 61):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file issue-189-bis.i, line 61):
 Prove: true.
 
 ------------------------------------------------------------

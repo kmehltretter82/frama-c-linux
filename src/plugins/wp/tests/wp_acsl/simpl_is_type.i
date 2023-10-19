@@ -23,6 +23,7 @@ void f(int *t, int size){
     loop invariant \forall int x; 0 <= x < i ==> 0 < t[x];
     loop invariant \forall int x; i <= x < size ==> t[x] < 0;
     loop assigns t[0..size-1], i;
+    loop variant size - i;
     @*/
   for(int i=0; i<size; i++){
     t[i] = - t[i];
@@ -46,6 +47,7 @@ int g(int *t, int size, int x){
       \forall int j; 0 <= j < i ==>
          t[j] != x;
     loop assigns i;
+    loop variant size - i;
     @*/
   for(int i = 0; i < size; i++){
 

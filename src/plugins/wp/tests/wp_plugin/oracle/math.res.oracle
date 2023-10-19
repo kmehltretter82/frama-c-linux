@@ -1,7 +1,11 @@
 # frama-c -wp [...]
 [kernel] Parsing math.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal ko_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal ko_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal ok_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal ok_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Global
 ------------------------------------------------------------

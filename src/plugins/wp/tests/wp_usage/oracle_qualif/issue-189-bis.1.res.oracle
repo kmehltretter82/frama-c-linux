@@ -20,7 +20,7 @@
  Functions                 WP     Alt-Ergo  Total   Success
   memcpy_context_vars       7        3       10       100%
 ------------------------------------------------------------
-[wp] issue-189-bis.i:48: Warning: 
+[wp] issue-189-bis.i:49: Warning: 
   Memory model hypotheses for function 'memcpy_context_vars':
   /*@
      behavior wp_typed:

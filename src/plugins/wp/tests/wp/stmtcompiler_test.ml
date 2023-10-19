@@ -142,4 +142,11 @@ let run () =
     )
     ordered_kf
 
+(* Turn off populate spec for everything except assigns *)
+let turn_off_populate () =
+  Kernel.GeneratedSpecMode.set "skip";
+  Kernel.GeneratedSpecCustom.add ("assigns", Some "frama-c")
+
+let () = Cmdline.run_after_configuring_stage turn_off_populate
+
 let () =  Db.Main.extend run

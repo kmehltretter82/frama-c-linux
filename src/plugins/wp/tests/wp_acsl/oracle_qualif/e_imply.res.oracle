@@ -1,6 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing e_imply.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal f_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 42 goals scheduled
 [wp] [Valid] typed_f_ensures_p0 (Alt-Ergo) (Trivial)
@@ -45,7 +47,9 @@
 [wp] [Valid] typed_f_ensures_o9 (Alt-Ergo) (Trivial)
 [wp] [Valid] typed_f_ensures_f0 (Alt-Ergo) (Trivial)
 [wp] [Valid] typed_f_ensures_f1 (Alt-Ergo) (Trivial)
-[wp] Proved goals:   42 / 42
+[wp] Proved goals:   44 / 44
+  Terminating:     1
+  Unreachable:     1
   Qed:             8
   Alt-Ergo:       34
 ------------------------------------------------------------

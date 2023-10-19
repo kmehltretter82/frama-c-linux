@@ -2,11 +2,21 @@
 [kernel] Parsing initialized_shift_array.i (no preprocessing)
 [wp] Running WP plugin...
 [kernel:annot:missing-spec] initialized_shift_array.i:4: Warning: 
-  Neither code nor explicit assigns for function test,
+  Neither code nor explicit exits, assigns and terminates for function test,
    generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function fail_cell_after_end
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fail_cell_after_end':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fail_cell_after_end':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'fail_cell_after_end' at call 'test' (file initialized_shift_array.i, line 50)
@@ -18,6 +28,16 @@ Prove: false.
   Function fail_cell_before
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'fail_cell_before':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fail_cell_before':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'fail_cell_before' at call 'test' (file initialized_shift_array.i, line 34)
 :
 Prove: false.
@@ -25,6 +45,16 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function fail_partial_not_full
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fail_partial_not_full':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fail_partial_not_full':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'fail_partial_not_full' at call 'test' (file initialized_shift_array.i, line 55)
@@ -37,6 +67,16 @@ Prove: (([false..])[1 <- true][0 <- true][i]=true).
   Function fail_too_long
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'fail_too_long':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fail_too_long':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'fail_too_long' at call 'test' (file initialized_shift_array.i, line 38)
 :
 Prove: false.
@@ -44,6 +84,16 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function fail_too_long_from_1
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'fail_too_long_from_1':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fail_too_long_from_1':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'fail_too_long_from_1' at call 'test' (file initialized_shift_array.i, line 42)
@@ -55,6 +105,16 @@ Prove: false.
   Function fail_too_long_from_2
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'fail_too_long_from_2':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'fail_too_long_from_2':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'fail_too_long_from_2' at call 'test' (file initialized_shift_array.i, line 46)
 :
 Prove: false.
@@ -62,6 +122,16 @@ Prove: false.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function succ_from_1_from_1
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'succ_from_1_from_1':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'succ_from_1_from_1':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'succ_from_1_from_1' at call 'test' (file initialized_shift_array.i, line 23)
@@ -74,6 +144,16 @@ Prove: (([false..])[2 <- true][1 <- true][i]=true).
   Function succ_full_first_cell
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'succ_full_first_cell':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'succ_full_first_cell':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'succ_full_first_cell' at call 'test' (file initialized_shift_array.i, line 10)
 :
 Prove: true.
@@ -81,6 +161,16 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function succ_full_from_1
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'succ_full_from_1':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'succ_full_from_1':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'succ_full_from_1' at call 'test' (file initialized_shift_array.i, line 18)
@@ -101,6 +191,16 @@ Prove: (Init_buf_0[i]=true).
   Function succ_full_from_2
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'succ_full_from_2':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'succ_full_from_2':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'succ_full_from_2' at call 'test' (file initialized_shift_array.i, line 27)
 :
 Assume {
@@ -117,6 +217,16 @@ Prove: (Init_buf_0[2]=true).
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function succ_full_full
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'succ_full_full':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'succ_full_full':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Instance of 'Pre-condition (file initialized_shift_array.i, line 2) in 'test'' in 'succ_full_full' at call 'test' (file initialized_shift_array.i, line 14)
