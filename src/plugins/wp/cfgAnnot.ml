@@ -260,8 +260,19 @@ let assigns_upper_bound behaviors completes =
   | Writes _ as assigns -> assigns
   | WritesAny ->
     match unguarded_behavior_assigns behaviors with
-    | Writes _ as assigns -> assigns
-    | WritesAny -> complete_assigns behaviors completes
+    | Writes _ as assigns ->
+      Wp_parameters.warning ~once:true ~current:true
+        "No default assigns clause, using unguarded behavior assigns" ;
+      assigns
+    | WritesAny ->
+      match complete_assigns behaviors completes with
+      | Writes _ as assigns ->
+        Wp_parameters.warning ~once:true ~current:true
+          "No default assigns clause, using complete behaviors assigns" ;
+        assigns
+      | WritesAny ->
+        (* We don't warn here, WritesAny have special treatment in CfgCalculus*)
+        WritesAny
 
 (* -------------------------------------------------------------------------- *)
 (* --- Call Contracts                                                     --- *)

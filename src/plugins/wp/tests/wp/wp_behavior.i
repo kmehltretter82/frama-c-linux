@@ -74,7 +74,9 @@ void call(int cond, int* px, int *py, int * qx, int* qy) {
       ensures P ;
       assigns *px ;
 */
-void unguarded(int *px);
+void unguarded(int *px){
+
+}
 
 /*@ requires RQ ;
     assigns *py ;
