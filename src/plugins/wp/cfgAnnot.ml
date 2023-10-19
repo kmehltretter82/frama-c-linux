@@ -230,23 +230,38 @@ type contract = {
   contract_decreases : Cil_types.variant option ;
 }
 
-let assigns_upper_bound behaviors =
-  let collect_assigns (def, assigns) bhv =
-    (* Default behavior prevails *)
-    if Cil.is_default_behavior bhv then Some bhv.b_assigns, None
-    else if Option.is_some def then def, None
-    else begin
-      (* Note that here, def is None *)
-      match assigns, bhv.b_assigns with
-      | None, a -> None, Some a
-      | Some WritesAny, _ | Some _, WritesAny -> None, Some WritesAny
-      | Some (Writes a), Writes b -> None, Some (Writes (a @ b))
-    end
+let default_assigns behaviors =
+  try (List.find Cil.is_default_behavior behaviors).b_assigns
+  with Not_found -> WritesAny
+
+let unguarded_behavior_assigns behaviors =
+  let unguarded_assigns b = b.b_assumes = [] && b.b_assigns <> WritesAny in
+  try (List.find unguarded_assigns behaviors).b_assigns
+  with Not_found -> WritesAny
+
+let assigns_of_complete behaviors complete =
+  let in_complete b = List.exists (String.equal b.b_name) complete in
+  let behaviors = List.filter in_complete behaviors in
+  let concat a bhv = Logic_utils.concat_assigns a bhv.b_assigns in
+  List.fold_left concat (Writes []) behaviors
+
+let complete_assigns behaviors completes =
+  let exception Found of assigns in
+  let find_complete complete =
+    match assigns_of_complete behaviors complete with
+    | WritesAny -> ()
+    | assigns -> raise (Found assigns)
   in
-  match List.fold_left collect_assigns (None, None) behaviors with
-  | Some a, _ -> a (* default behavior first *)
-  | _, Some a -> a (* else combined behaviors *)
-  | _ -> WritesAny
+  try List.iter find_complete completes ; WritesAny
+  with Found assigns -> assigns
+
+let assigns_upper_bound behaviors completes =
+  match default_assigns behaviors with
+  | Writes _ as assigns -> assigns
+  | WritesAny ->
+    match unguarded_behavior_assigns behaviors with
+    | Writes _ as assigns -> assigns
+    | WritesAny -> complete_assigns behaviors completes
 
 (* -------------------------------------------------------------------------- *)
 (* --- Call Contracts                                                     --- *)
@@ -286,6 +301,7 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
         let wexit : WpPropId.pred_info list ref = ref [] in
         let add w f x = match f x with Some y -> w := y :: !w | None -> () in
         let behaviors = Annotations.behaviors kf in
+        let completes = Annotations.complete kf in
         setup_preconditions kf ;
         List.iter
           begin fun bhv ->
@@ -299,7 +315,7 @@ module CallContract = WpContext.StaticGenerator(Kernel_function)
             List.iter (add wpost @@ mk_post Normal) bhv.b_post_cond ;
             List.iter (add wexit @@ mk_post Exits) bhv.b_post_cond ;
           end behaviors ;
-        let assigns = match assigns_upper_bound behaviors with
+        let assigns = match assigns_upper_bound behaviors completes with
           | WritesAny -> WritesAny
           | Writes froms -> Writes (normalize_froms Normal froms)
         in
