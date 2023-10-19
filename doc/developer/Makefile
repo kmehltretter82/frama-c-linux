@@ -86,7 +86,7 @@ check-hello-v7: check-hello-clean
 # For check-examples, we perform no explicit oracle comparisons:
 # we simply build the code and run tests (which must always succeed).
 check-examples: check-examples-acsl_extension_foo check-examples-acsl_extension_ext_types \
-  check-examples-callstack check-examples-syntactic_check
+  check-examples-callstack check-examples-syntactic_check check-examples-populate_spec
 
 check-examples-clean:
 	$(ECHO) Cleaning example files...
@@ -105,6 +105,8 @@ check-examples-callstack: check-examples-clean
 check-examples-syntactic_check: check-examples-clean
 	cd examples/syntactic_check && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests 2>&1
 
+check-examples-populate_spec: check-examples-clean
+	cd examples/populate_spec && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests 2>&1
 
 check-all: developer.pdf
 	$(MAKE) -C ../.. check-devguide
