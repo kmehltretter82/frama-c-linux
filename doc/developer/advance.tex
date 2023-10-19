@@ -3920,13 +3920,12 @@ let create_mode () =
 \end{ocamlcode}
 
 This function registers a new mode \verb+mymode+ which can be selected using
-command line options \verb+-generated-spec-mode mymode+. All parameters are
-optional and, if a generation function is left unspecified, \verb+Frama_C+ mode
-(see the user manual~\cite{userman}) is used instead to generate the
-corresponding clauses (emits a warning). It is also possible to specify a
-property status\codeidx{Property\_status} to be emitted when a clause is
-generated (emits a warning if omitted). Requires are the only clause for which
-it is not possible to specify a status, because
+command line options \texttt{-generated-spec-mode mymode}. All parameters are
+optional and, if a generation function is left unspecified, \texttt{Frama\_C}
+mode is used instead to generate the corresponding clauses (emits a warning). It
+is also possible to specify a property status\codeidx{Property\_status} to be
+emitted when a clause is generated (emits a warning if omitted). Requires are
+the only clause for which it is not possible to specify a status, because
 \texttt{Populate\_spec}\codeidx{Populate\_spec} never tries to emit status of
 requires.
 
