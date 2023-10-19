@@ -319,17 +319,17 @@ Passing a negative argument to \texttt{-ulevel} will disable unrolling, even
 in case of \texttt{UNROLL} pragma.
 \end{description}
 
-\section{Normalizing Contacts}\label{sec:normalize-contracts}
+\section{Normalizing Contracts}\label{sec:normalize-contracts}
 
 Normalization gives a program which is semantically equivalent to the original
 one, but there is an exception for function contracts. By default, function
 contracts are left as is, but \FramaC and plug-ins can require the presence of
-some specification to improve their performances. When they do, then can ask
+some specification to improve their performances. When they do, they can ask
 \FramaC's kernel to generate specifications.
 
-For example, let's say we have a function \texttt{f} that is only declared and
+For example, let us say we have a function \texttt{f} that is only declared and
 has no \acsl \texttt{assigns} clause, but these \texttt{assigns} are required by
-\Eva. \Eva will then ask the kernel to generate \texttt{assigns} before resuming
+\Eva. \Eva asks the kernel to generate \texttt{assigns} before resuming
 the analysis. Indeed, as mentioned in the \acsl manual~\cite{acsl}, assuming
 that \texttt{f} can write to any location in the memory would amount to stop any
 semantical analysis at the first call to \texttt{f}, since nothing would be
@@ -337,7 +337,7 @@ known on the memory state afterwards.
 
 The generation is done either by combining existing specifications or according
 to a \emph{mode} which can be selected via \FramaC's options. A plug-in
-developer has also the possibility to create its own mode using \FramaC's API.
+developer has also the possibility to create their own mode using \FramaC's API.
 The Plug-in Development Guide~\cite{plugin-dev-guide} describes all steps
 required to create and use a custom mode. All available modes are detailed in
 table~\ref{table:populate-mode}.
@@ -380,34 +380,34 @@ allow selecting mode(s) for the specification generation:
 
 \begin{description}
 \item \texttt{\optiondef{-}{generated-spec-mode <mode>}} selects which
-\texttt{mode} will be used to generate missing specifications. \texttt{mode} can
-be either ``frama-c'', ``acsl'', ``safe'' or any custom mode registered inside
+\texttt{mode} is used to generate missing specifications. \texttt{mode} can
+be either ``frama-c'', ``acsl'', ``safe'' or any custom mode registered in
 a plug-in.
 
 \item \texttt{\optiondef{-}{generated-spec-custom
-<clause\_1:mode\_1,clause\_2:mode\_2,...>}} has a similar behavior than
-\optionuse{-}generated-spec-mode, except that it allows the user to choose a
-\texttt{mode} individually for each clause. It also allows the user to ignore
+<clause\_1:mode\_1,clause\_2:mode\_2,...>}} has a similar behavior as
+\optionuse{-}generated-spec-mode, except that it allows the user choosing a
+\texttt{mode} individually for each clause. It also allows the user ignoring
 \FramaC and/or plug-ins needs by skipping the generation for a clause, with the
 mode ``skip''. This mode is not available with \optionuse{-}generated-spec-mode
-and will be replaced by \texttt{Frama\_C}. For example:
+and is replaced by \texttt{Frama\_C}. For example:
 \begin{frama-c-commands}
   \$ frama-c -generated-spec-custom requires:safe
 \end{frama-c-commands}
-Here every clause will be generated using the default mode \texttt{Frama\_C}
-except for \texttt{requires} which will be generated using the mode
+Here every clause is generated using the default mode \texttt{Frama\_C}
+except for \texttt{requires} which is generated using the mode
 \texttt{Safe}.
 \end{description}
 
-As mentionned, the generation can also be done by combining existing clauses
+As mentioned, the generation can also be done by combining existing clauses
 from other behaviors following this algorithm:
 \begin{itemize}
   \item[1.] If the function contract has some clauses \texttt{C} in unguarded
-  (without \texttt{assumes} clauses) behaviors, we combine them inside the
-  default behavior.
+  (without \texttt{assumes} clauses) behaviors, we combine them in the default
+  behavior.
   \item[2.] Else, if it has some clauses \texttt{C} in complete behaviors, we
-  combine them inside the default behavior.
-  \item[3.] Else, if it has some clauses \texttt{C} anywhere, we combine them inside
+  combine them in the default behavior.
+  \item[3.] Else, if it has some clauses \texttt{C} anywhere, we combine them in
   the default behavior.
   \item[4.] Else we use the selected mode to generate these clauses (see mode's
   table).
@@ -415,7 +415,7 @@ from other behaviors following this algorithm:
 
 {\em Note: There is an exception with the mode \texttt{ACSL} for which we never
 try to combine existing clauses from other behavior, and jump directly to the
-last point of our algorithm to use the selected mode.}\\
+step of our algorithm to use the selected mode.}\\
 
 Additionally, a status is emitted for each generated clause. A summary can
 be found in table~\ref{table:populate-status}.

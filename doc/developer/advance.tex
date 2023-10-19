@@ -3820,15 +3820,15 @@ only some specific clauses). For this purpose, we can call
 Populate_spec.populate_funspec ~do_body:true kf [`Exits; `Assigns]
 \end{ocamlcode}
 
-This code will generate specifications in the default behavior for the function
+This code generates specifications in the default behavior for the function
 \verb+kf+ using the selected mode (see the user manual~\cite{userman} for more
-details about mode selection). The parameter \verb+do_body+ (\verb+false+ by
-default) is used to chose if we want to generate specification only on
-prototypes or also for functions with a body. We also give a list of clauses for
-which we want to generate some specifications. Here we only want to generate
+details about mode selection). The parameter \verb+do_body+ (which defaults to
+\verb+false+) is used to choose if we want to generate specification only on
+prototypes or also for functions with a body. We also give the list of clauses
+that we want to generate. Here we only want to generate
 \verb+`Assigns+ and \verb+`Exits+ clauses, but \verb+`Requires+,
 \verb+`Allocates+ and \verb+`Terminates+ are also available. This function can
-take an optionnal argument \verb+loc:Cil_types.location+ which is a location
+take an optional argument \verb+loc:Cil_types.location+ which is a location
 used when emitting missing specification warnings. By default this location is
 set to the location of \verb+kf+.
 
@@ -3839,7 +3839,7 @@ user manual~\cite{userman}).
 \subsection{Custom mode registration}
 
 If none of the available modes behave as needed, it is also possible to create a
-customized mode. Let's say we want a mode to match these tables:
+custom mode. Let us say we want a mode to match these tables:
 \begin{table}[h]
   \centering
   \begin{minipage}{.5\linewidth}
@@ -3922,12 +3922,12 @@ let create_mode () =
 This function registers a new mode \verb+mymode+ which can be selected using
 command line options \verb+-generated-spec-mode mymode+. All parameters are
 optional and, if a generation function is left unspecified, \verb+Frama_C+ mode
-(see the user manual~\cite{userman}) will be used instead to generate the
+(see the user manual~\cite{userman}) is used instead to generate the
 corresponding clauses (emits a warning). It is also possible to specify a
 property status\codeidx{Property\_status} to be emitted when a clause is
 generated (emits a warning if omitted). Requires are the only clause for which
 it is not possible to specify a status, because
-\texttt{Populate\_spec}\codeidx{Populate\_spec} will never try to emit status of
+\texttt{Populate\_spec}\codeidx{Populate\_spec} never tries to emit status of
 requires.
 
 Then we want the mode to be available, and for this we need to register it
