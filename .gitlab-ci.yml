@@ -670,3 +670,13 @@ publish-meta:
     - nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-branch.sh'
   <<: *when_publish
   interruptible: false
+
+publish-frama-c-api:
+  stage: publish
+  <<: *prepare_ssh_template
+  script:
+    - nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-api.sh'
+  only:
+    variables:
+      - $PUBLISH == "yes"
+  interruptible: false
