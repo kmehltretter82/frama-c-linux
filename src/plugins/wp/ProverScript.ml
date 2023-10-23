@@ -323,28 +323,36 @@ let unknown : solver = fun _ -> failed
 let (+>>) (a : solver) (b : solver) : solver =
   fun node -> a node >>= fun ok -> if ok then success else b node
 
+let progress a b =
+  let sa = ProofEngine.goal a |> Wpo.compute |> snd in
+  let sb = ProofEngine.goal b |> Wpo.compute |> snd in
+  not (Conditions.equal sa sb)
+
 let rec sequence (f : 'a -> solver) = function
   | [] -> unknown
   | x::xs -> f x +>> sequence f xs
+
+let pp_node fmt node =
+  Format.pp_print_string fmt (ProofEngine.goal node).Wpo.po_gid
 
 let rec explore_strategy env process strategy : solver =
   fun node ->
   if ProofEngine.depth node > env.Env.depth then
     begin
       Wp_parameters.debug ~dkey:dkey_strategy "[%a] Depth limit reached (%d)"
-        ProofEngine.Node.pretty node (ProofEngine.depth node) ;
+        pp_node node (ProofEngine.depth node) ;
       failed
     end
   else
     begin
-      Wp_parameters.debug ~dkey:dkey_strategy "[%a] Strategy %s (enter)@."
-        ProofEngine.Node.pretty node (ProofStrategy.name strategy) ;
+      Wp_parameters.debug ~dkey:dkey_strategy "[%a] Strategy %s: enter@."
+        pp_node node (ProofStrategy.name strategy) ;
       sequence
         (explore_alternative env process strategy)
         (ProofStrategy.alternatives strategy) node
       >>= fun ok ->
       Wp_parameters.debug ~dkey:dkey_strategy "[%a] Strategy %s: %s@."
-        ProofEngine.Node.pretty node (ProofStrategy.name strategy)
+        pp_node node (ProofStrategy.name strategy)
         (if ok then "proved" else "failed");
       Task.return ok
     end
@@ -371,14 +379,19 @@ and explore_prover env timeout prover node =
 and explore_tactic env process strategy alternative node =
   Wp_parameters.debug ~dkey:dkey_strategy
     "@[<hov 2>[%a] Trying@ %a@]"
-    ProofEngine.Node.pretty node
+    pp_node node
     ProofStrategy.pp_alternative alternative ;
   match ProofStrategy.tactic env.tree node strategy alternative with
   | None -> failed
+  | Some [node'] when not (progress node node') ->
+    Wp_parameters.debug ~dkey:dkey_strategy
+      "@[<hov 2>[%a] tactic has made no progress"
+      pp_node node ;
+    failed
   | Some nodes ->
     Wp_parameters.debug ~dkey:dkey_strategy
       "@[<hov 2>[%a] success (%d children) (at depth %d/%d)"
-      ProofEngine.Node.pretty node (List.length nodes)
+      pp_node node (List.length nodes)
       (ProofEngine.depth node) env.depth;
     List.iter process nodes ; success
 
