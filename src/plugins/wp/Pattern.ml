@@ -449,10 +449,11 @@ type lookup = {
   head: bool ;
   goal: bool ;
   hyps: bool ;
+  split: bool ;
   pattern: pattern ;
 }
 
-let pclause { head ; pattern } clause sigma prop =
+let pclause { head ; pattern ; split } clause sigma prop =
   let tprop = Lang.F.e_prop prop in
   let select t =
     if t == tprop then Tactical.Clause clause else Tactical.Inside(clause,t) in
@@ -462,7 +463,7 @@ let pclause { head ; pattern } clause sigma prop =
     then Some env.sigma else None
   in
   match Lang.F.repr tprop with
-  | And ts -> plist pcond ts
+  | And ts when split -> plist pcond ts
   | _ -> pcond tprop
 
 (* --- Step Ordering --- *)

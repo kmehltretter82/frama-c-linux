@@ -176,8 +176,9 @@ let parse_name ctxt ~kind ?check p =
     { loc ; value }
   | _ -> ctxt.error loc "%s name expected (%a)" kind debug p
 
-let parse_lookup penv ?(head=true) ?(goal=false) ?(hyps=false) p =
-  { goal ; hyps ; head ; pattern = Pattern.pa_pattern penv p }
+let parse_lookup penv
+    ?(head=true) ?(goal=false) ?(hyps=false) ?(split=false) p =
+  { goal ; hyps ; head ; split ; pattern = Pattern.pa_pattern penv p }
 
 let autoselect select lookup =
   match select , lookup with
@@ -208,7 +209,7 @@ let rec parse_tactic_params ctxt penv
       let lookup = List.rev_append qs lookup in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\when",[],qs) ->
-      let qs = List.map (parse_lookup ~hyps:true penv) qs in
+      let qs = List.map (parse_lookup ~hyps:true ~split:true penv) qs in
       let lookup = List.rev_append qs lookup in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\ingoal",[],qs) ->
@@ -216,7 +217,7 @@ let rec parse_tactic_params ctxt penv
       let lookup = List.rev_append qs lookup in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\incontext",[],qs) ->
-      let qs = List.map (parse_lookup ~head:false ~hyps:true penv) qs in
+      let qs = List.map (parse_lookup ~head:false ~hyps:true ~split:true penv) qs in
       let lookup = List.rev_append qs lookup in
       cc ~select ~lookup ~params ~children ~default ps
     | PLapp("\\pattern",[],qs) ->
