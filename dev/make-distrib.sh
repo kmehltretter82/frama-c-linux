@@ -33,10 +33,6 @@ if [ -z ${HDRCK+x} ]; then
   HDRCK="dune exec -- frama-c-hdrck"
 fi
 
-if [ -z ${VERSION+x} ]; then
-  VERSION=$(cat VERSION)
-fi
-
 if [ -z ${VERSION_CODENAME+x} ]; then
   VERSION_CODENAME=$(cat VERSION_CODENAME)
 fi
@@ -56,6 +52,8 @@ else
   TAR=tar
 fi
 
+
+VERSION=$(cat VERSION)
 VERSION_SAFE=${VERSION/~/-}
 
 FRAMAC="frama-c-$VERSION_SAFE-$VERSION_CODENAME"
@@ -81,14 +79,12 @@ do
             echo "  --open-source     Set open source header mode"
             echo "  --ci-link         Symlink to frama-c.tar.gz"
             echo "  --hdrck <cmd>     Check headers command"
-            echo "  --version <num>   Set local VERSION"
             echo "  --codename <name> Set local VERSION_CODENAME"
             echo ""
             echo "ENVIRONMENT VARIABLES"
             echo ""
             echo ""
             echo "  HDRCK=<cmd> (overriden set by --hdrck)"
-            echo "  VERSION=v<num> (overriden by --version)"
             echo "  VERSION_CODENAME=<name> (overriden by --codename)"
             echo "  OPEN_SOURCE=yes|no (overriden by --open-source and --close-source)"
             echo "  CI_LINK=yes|no (also set by --ci-link)"
@@ -98,10 +94,6 @@ do
         "--hdrck")
             shift
             HDRCK="$1"
-            ;;
-        "--version")
-            shift
-            VERSION=$1
             ;;
         "--codename")
             shift
