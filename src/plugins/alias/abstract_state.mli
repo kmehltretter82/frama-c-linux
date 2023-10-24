@@ -30,61 +30,54 @@ module G: Graph.Sig.G with type V.t = int
 module LSet = Cil_datatype.LvalStructEq.Set
 module LMap = Cil_datatype.LvalStructEq.Map
 
-(** external signature *)
-module type S =
-sig
+(** Type denothing an abstract state of the analysis. It is a graph containing
+    all aliases and points-to information. *)
+type t
 
-  (** Type denothing an abstract state of the analysis. It is a graph containing
-      all aliases and points-to information. *)
-  type t
+val vid : G.V.t -> int
 
-  (** access to the points-to graph *)
-  val get_graph: t -> G.t
+(** access to the points-to graph *)
+val get_graph: t -> G.t
 
-  (** set of lvals stored in a vertex *)
-  val get_lval_set : G.V.t -> t -> LSet.t
+(** set of lvals stored in a vertex *)
+val get_lval_set : G.V.t -> t -> LSet.t
 
-  (** pretty printer; debug=true prints the graph, debug = false only
-      prints aliased variables *)
-  val pretty : ?debug:bool -> Format.formatter -> t -> unit
+(** pretty printer; debug=true prints the graph, debug = false only
+    prints aliased variables *)
+val pretty : ?debug:bool -> Format.formatter -> t -> unit
 
-  (** dot printer; first argument is a file name *)
-  val print_dot : string -> t -> unit
+(** dot printer; first argument is a file name *)
+val print_dot : string -> t -> unit
 
-  (** finds the vertex corresponding to a lval.
-      @raise Not_found if such a vertex does not exist
-  *)
-  val find_vertex : lval -> t -> G.V.t
+(** finds the vertex corresponding to a lval.
+    @raise Not_found if such a vertex does not exist
+*)
+val find_vertex : lval -> t -> G.V.t
 
-  (** same as previous function, but return a set of lval. Cannot
-      raise an exception but may return an empty set if the lval is not
-      in the graph *)
-  val find_aliases : lval -> t -> LSet.t
+(** same as previous function, but return a set of lval. Cannot
+    raise an exception but may return an empty set if the lval is not
+    in the graph *)
+val find_aliases : lval -> t -> LSet.t
 
-  (** similar to the previous functions, but does not only give the
-      equivalence class of lv, but also all lv that are aliases in
-      other vertex of the graph *)
-  val find_all_aliases : lval -> t -> LSet.t
+(** similar to the previous functions, but does not only give the
+    equivalence class of lv, but also all lv that are aliases in
+    other vertex of the graph *)
+val find_all_aliases : lval -> t -> LSet.t
 
-  (** the set of all lvars to which the given variable may point. *)
-  val points_to_set : lval -> t -> LSet.t
+(** the set of all lvars to which the given variable may point. *)
+val points_to_set : lval -> t -> LSet.t
 
-  (** find_aliases, then recursively finds other sets of lvals. We
-      have the property (if lval [lv] is in abstract state [x]) :
-      List.hd (find_transitive_closure lv x) = (find_vertex lv x,
-      find_aliases lv x) *)
-  val find_transitive_closure : lval -> t -> (G.V.t * LSet.t) list
+(** find_aliases, then recursively finds other sets of lvals. We
+    have the property (if lval [lv] is in abstract state [x]) :
+    List.hd (find_transitive_closure lv x) = (find_vertex lv x,
+    find_aliases lv x) *)
+val find_transitive_closure : lval -> t -> (G.V.t * LSet.t) list
 
-  (** inclusion test; [is_included a1 a2] tests if, for any lvl
-      present in a1 (associated to a vertex v1), that it is also
-      present in a2 (associated to a vertex v2) and that
-      get_lval_set(succ(v1) is included in get_lval_set(succ(v2)) *)
-  val is_included : t -> t -> bool
-
-end
-
-
-include S
+(** inclusion test; [is_included a1 a2] tests if, for any lvl
+    present in a1 (associated to a vertex v1), that it is also
+    present in a2 (associated to a vertex v2) and that
+    get_lval_set(succ(v1) is included in get_lval_set(succ(v2)) *)
+val is_included : t -> t -> bool
 
 (** check all the invariants that must be true on an abstract value
       before and after each function call or transformation of the graph)  *)
@@ -98,13 +91,6 @@ val assignment : t -> lval -> exp -> t
 
 (** transfert function for malloc calls *)
 val assignment_x_allocate_y : t -> lval -> t
-
-
-(** inclusion test; [is_included a1 a2] tests if, for any lvl present
-    in a1 (associated to a vertex v1), that it is also present in a2
-    (associated to a vertex v2) and that set(succ(v1) is included in
-    set(succ(v2)) *)
-val is_included : t -> t -> bool
 
 (** union of two abstract values ; ensures that if 2 lval are
     aliased in one of the two input graph (or in a points-to
