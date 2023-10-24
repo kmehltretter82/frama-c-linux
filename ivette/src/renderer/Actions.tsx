@@ -117,7 +117,8 @@ export function focusMode(id: string): void {
   const m = allModes.find(id);
   if (m !== undefined) {
     allModes.setValue(m);
-    focus.emit();
+    const { enabled=true } = m;
+    if (enabled) focus.emit();
   }
 }
 
@@ -173,8 +174,7 @@ export function SearchAction(): JSX.Element {
       userMode.current = currMode;
   }, [currMode]);
   const onSearch = React.useCallback(() => {
-    if (currMode !== switchMode.id)
-      focusMode(switchMode.id);
+    focusMode(switchMode.id);
   }, [currMode]);
   const onBlur = React.useCallback(() => {
     if (currMode === switchMode.id) {
