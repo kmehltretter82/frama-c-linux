@@ -34,6 +34,8 @@ module LMap = Cil_datatype.LvalStructEq.Map
     all aliases and points-to information. *)
 type t
 
+val vid : G.V.t -> int
+
 (** access to the points-to graph *)
 val get_graph: t -> G.t
 

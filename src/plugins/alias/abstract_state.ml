@@ -35,6 +35,8 @@ module LMap = Cil_datatype.LvalStructEq.Map
 module G = Graph.Persistent.Digraph.ConcreteBidirectional(Datatype.Int)
 module V = G.V
 
+let vid (v : G.V.t) : int = v
+
 (* like LMap, but organized with offset and specialized functions *)
 module LLMap =
 struct

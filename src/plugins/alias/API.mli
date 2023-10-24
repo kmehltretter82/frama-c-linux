@@ -25,7 +25,9 @@
 open Cil_types
 
 module LSet = Cil_datatype.LvalStructEq.Set
-module G : Graph.Sig.G with type V.t = int
+module G : Graph.Sig.G
+
+val vid : G.V.t -> int
 
 (** NB : do the analysis BEFORE using any of those functions *)
 
