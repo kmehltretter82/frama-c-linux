@@ -4799,13 +4799,14 @@ and doType (ghost:bool) isFuncArg
                  Kernel.error ~once:true ~current:true
                    "Array length is negative."
                else
+                 (* Check if array size (nb elem * size elem) is smaller than
+                    max size. *)
                  try
-                   (* Check if array length is > SIZE_MAX / sizeof(bt) *)
                    let elem_size = Integer.of_int @@ bytesSizeOf bt in
                    let size_t = bitsSizeOfInt theMachine.kindOfSizeOf in
                    let size_max = Cil.max_unsigned_number size_t in
-                   let limit = Integer.c_div size_max elem_size in
-                   if Integer.gt i limit then
+                   let size = Integer.mul i elem_size in
+                   if Integer.gt size size_max then
                      Kernel.error ~once:true ~current:true
                        "Array length is too large.";
                  with
@@ -4813,8 +4814,6 @@ and doType (ghost:bool) isFuncArg
                    Kernel.abort ~current:true "%s" msg
                  | Invalid_argument msg ->
                    Kernel.fatal ~current:true "%s" msg
-                 | Division_by_zero ->
-                   Kernel.fatal ~current:true "Array element size cannot be zero"
              end
            | _  when not allowVarSizeArrays ->
              if isConstant cst then
