@@ -216,6 +216,7 @@ export interface Hint {
 
 export interface ModeProps {
   id: string; // Mode identifier
+  rank?: number; // Modes ordering
   icon?: string; // Search Field's Icons
   label?: string; // Search Field in mode menu
   title?: string; // Search Field tooltip

@@ -45,6 +45,7 @@ export interface Hint {
 
 export interface ModeProps {
   id: string;
+  rank?: number;
   icon?: string;
   label?: string;
   title?: string;
@@ -58,6 +59,17 @@ export interface ModeProps {
 
 const defaultMode : ModeProps = { id: '' };
 
+function byRank(a: ModeProps, b: ModeProps): number
+{
+  const ra = a.rank ?? 0;
+  const rb = b.rank ?? 0;
+  if (ra > rb) return -1;
+  if (ra < rb) return +1;
+  if (a.id < b.id) return -1;
+  if (a.id > b.id) return +1;
+  return 0;
+}
+
 class ModeManager extends GlobalState<ModeProps> {
   constructor() { super(defaultMode); }
   private registry: Map<string, ModeProps> = new Map();
@@ -67,8 +79,8 @@ class ModeManager extends GlobalState<ModeProps> {
   }
 
   register(mode: ModeProps): void {
-    const id = mode.id;
-    this.registry.set(id, mode);
+    const { id, icon='SEARCH', ...data } = mode;
+    this.registry.set(id, { id, icon, ...data });
     const id0 = this.getValue().id;
     if (id0 === '' || id0 === id) this.setValue(mode);
   }
@@ -87,7 +99,7 @@ class ModeManager extends GlobalState<ModeProps> {
   }
 
   selfhints(): Hint[] {
-    return Array.from(this.registry, ([_, mode]) => mode);
+    return Array.from(this.registry, ([_, mode]) => mode).sort(byRank);
   }
 }
 
@@ -175,7 +187,7 @@ export function SearchAction(): JSX.Element {
   }, [currMode]);
   const onSearch = React.useCallback(() => {
     focusMode(switchMode.id);
-  }, [currMode]);
+  }, []);
   const onBlur = React.useCallback(() => {
     if (currMode === switchMode.id) {
       const user = findMode(userMode.current) ?? defaultMode;

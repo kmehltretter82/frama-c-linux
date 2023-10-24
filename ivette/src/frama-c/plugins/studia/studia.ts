@@ -95,6 +95,7 @@ export function buildMenu(
 
 const studiaReadsMode : Ivette.ModeProps = {
   id: 'frama-c.plugins.studia.reads',
+  rank: -1,
   label: 'Studia: reads',
   title: 'Select all statements reading the given lvalue',
   placeholder: 'lvalue (reads)',
@@ -105,6 +106,7 @@ const studiaReadsMode : Ivette.ModeProps = {
 
 const studiaWritesMode : Ivette.ModeProps = {
   id: 'frama-c.plugins.studia.writes',
+  rank: -1,
   label: 'Studia: writes',
   title: 'Select all statements writing the given lvalue',
   placeholder: "lvalue (writes)",
@@ -127,8 +129,7 @@ Ivette.registerMode(studiaReadsMode);
 Ivette.registerMode(studiaWritesMode);
 States.GlobalHistory.on((s: States.History) => {
   const marker = s.curr.marker;
-  const { kind } = States.getMarker(marker);
-  const enabled = marker !== undefined && kind === 'STMT';
+  const enabled = marker !== undefined;
   Ivette.updateMode({ id: studiaReadsMode.id, enabled });
   Ivette.updateMode({ id: studiaWritesMode.id, enabled });
 });

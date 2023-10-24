@@ -941,6 +941,8 @@ Dome.addMenuItem({
   onClick: () => Ivette.focusMode(evalMode.id),
 });
 
+Ivette.registerMode(evalMode);
+
 function useEvaluationMode(props: EvaluationModeProps): void {
   const { computationState, current, setLocPin } = props;
   const enabled = computationState === 'computed' && current !== undefined;
