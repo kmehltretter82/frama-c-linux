@@ -36,14 +36,12 @@ module Effects = struct
   type record
   let record: record Record.signature = Record.signature ()
 
-  module Location = Data.Jpair (Kernel_ast.Function) (Kernel_ast.Marker)
-
   let direct = Record.field record ~name:"direct"
       ~descr:(Markdown.plain "List of statements with direct effect.")
-      (module Data.Jlist (Location))
+      (module Data.Jlist (Kernel_ast.Marker))
   let indirect = Record.field record ~name:"indirect"
       ~descr:(Markdown.plain "List of statements with indirect effect.")
-      (module Data.Jlist (Location))
+      (module Data.Jlist (Kernel_ast.Marker))
 
   let data = Record.publish record ~package ~name:"effects"
       ~descr:(Markdown.plain "Statements that read or write a location.")
@@ -53,13 +51,10 @@ module Effects = struct
   let jtype = R.jtype
 
   let to_json effects =
-    let output_stmt stmt =
-      let kf = Kernel_function.find_englobing_kf stmt in
-      kf, Printer_tag.PStmtStart (kf, stmt)
-    in
+    let markers = Printer_tag.localizable_of_stmt in
     R.default |>
-    R.set direct (List.map output_stmt effects.direct) |>
-    R.set indirect (List.map output_stmt effects.indirect) |>
+    R.set direct (List.map markers effects.direct) |>
+    R.set indirect (List.map markers effects.indirect) |>
     R.to_json
 end
 

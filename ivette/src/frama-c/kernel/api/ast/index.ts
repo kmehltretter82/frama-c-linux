@@ -88,18 +88,6 @@ export const bySource: Compare.Order<source> =
 export const sourceDefault: source =
   { dir: '', base: '', file: '', line: 0 };
 
-/** Function names */
-export type fct = Json.key<'#fct'>;
-
-/** Decoder for `fct` */
-export const jFct: Json.Decoder<fct> = Json.jKey<'#fct'>('#fct');
-
-/** Natural order for `fct` */
-export const byFct: Compare.Order<fct> = Compare.string;
-
-/** Default value for `fct` */
-export const fctDefault: fct = Json.jKey<'#fct'>('#fct')('');
-
 /** AST Declarations markers */
 export type decl = Json.key<'#decl'>;
 
@@ -123,25 +111,6 @@ export const byMarker: Compare.Order<marker> = Compare.string;
 
 /** Default value for `marker` */
 export const markerDefault: marker = Json.jKey<'#marker'>('#marker')('');
-
-/** Location: function and marker */
-export type location = { fct: fct, marker: marker };
-
-/** Decoder for `location` */
-export const jLocation: Json.Decoder<location> =
-  Json.jObject({ fct: jFct, marker: jMarker,});
-
-/** Natural order for `location` */
-export const byLocation: Compare.Order<location> =
-  Compare.byFields
-    <{ fct: fct, marker: marker }>({
-    fct: byFct,
-    marker: byMarker,
-  });
-
-/** Default value for `location` */
-export const locationDefault: location =
-  { fct: fctDefault, marker: markerDefault };
 
 /** Declaration kind */
 export type declKind =
@@ -411,35 +380,25 @@ export const markerAttributesDataDefault: markerAttributesData =
     definition: undefined, labelKind: '', titleKind: '', name: undefined,
     descr: '', sloc: undefined };
 
-const getMainFunction_internal: Server.GetRequest<null,fct | undefined> = {
+const getMainFunction_internal: Server.GetRequest<null,decl | undefined> = {
   kind: Server.RqKind.GET,
   name: 'kernel.ast.getMainFunction',
   input: Json.jNull,
-  output: Json.jOption(jFct),
+  output: Json.jOption(jDecl),
   signals: [],
 };
 /** Get the current 'main' function. */
-export const getMainFunction: Server.GetRequest<null,fct | undefined>= getMainFunction_internal;
+export const getMainFunction: Server.GetRequest<null,decl | undefined>= getMainFunction_internal;
 
-const getFunctions_internal: Server.GetRequest<null,fct[]> = {
+const getFunctions_internal: Server.GetRequest<null,decl[]> = {
   kind: Server.RqKind.GET,
   name: 'kernel.ast.getFunctions',
   input: Json.jNull,
-  output: Json.jArray(jFct),
+  output: Json.jArray(jDecl),
   signals: [],
 };
 /** Collect all functions in the AST */
-export const getFunctions: Server.GetRequest<null,fct[]>= getFunctions_internal;
-
-const printFunction_internal: Server.GetRequest<fct,text> = {
-  kind: Server.RqKind.GET,
-  name: 'kernel.ast.printFunction',
-  input: jFct,
-  output: jText,
-  signals: [ { name: 'kernel.ast.changed' } ],
-};
-/** Print the AST of a function */
-export const printFunction: Server.GetRequest<fct,text>= printFunction_internal;
+export const getFunctions: Server.GetRequest<null,decl[]>= getFunctions_internal;
 
 /** Data for array rows [`functions`](#functions)  */
 export interface functionsData {

@@ -173,8 +173,8 @@ let get_decl g = match g.Wpo.po_idx with
   | Function(kf,_) -> Some (Printer_tag.SFunction kf)
   | Axiomatic _ -> None (* TODO *)
 
-let get_kf g = match g.Wpo.po_idx with
-  | Function(kf,_) -> Some kf
+let get_fct g = match g.Wpo.po_idx with
+  | Function(kf,_) -> Some (Kernel_function.get_name kf)
   | Axiomatic _ -> None
 
 let get_bhv g = match g.Wpo.po_idx with
@@ -200,16 +200,16 @@ let () = S.column gmodel ~name:"scope"
     ~descr:(Md.plain "Associated declaration, if any")
     ~data:(module D.Joption(AST.Decl)) ~get:get_decl
 
-let () = S.column gmodel ~name:"fct"
-    ~descr:(Md.plain "Associated function, if any")
-    ~data:(module D.Joption(AST.Function)) ~get:get_kf
+let () = S.option gmodel ~name:"fct"
+    ~descr:(Md.plain "Associated function name, if any")
+    ~data:(module D.Jstring) ~get:get_fct
 
 let () = S.option gmodel ~name:"bhv"
-    ~descr:(Md.plain "Associated behavior, if any")
+    ~descr:(Md.plain "Associated behavior name, if any")
     ~data:(module D.Jstring) ~get:get_bhv
 
 let () = S.option gmodel ~name:"thy"
-    ~descr:(Md.plain "Associated axiomatic, if any")
+    ~descr:(Md.plain "Associated axiomatic name, if any")
     ~data:(module D.Jstring) ~get:get_thy
 
 let () = S.column gmodel ~name:"name"

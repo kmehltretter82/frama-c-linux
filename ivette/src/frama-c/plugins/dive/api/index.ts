@@ -38,17 +38,9 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byLocation } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jLocation } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { location } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { locationDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { marker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -346,7 +338,7 @@ export interface node {
   /** forward_explored */
   forward_explored: exploration;
   /** writes */
-  writes: location[];
+  writes: marker[];
   /** values */
   values?: string;
   /** range */
@@ -367,7 +359,7 @@ export const jNode: Json.Decoder<node> =
     is_root: Json.jBoolean,
     backward_explored: jExploration,
     forward_explored: jExploration,
-    writes: Json.jArray(jLocation),
+    writes: Json.jArray(jMarker),
     values: Json.jOption(Json.jString),
     range: jNodeRange,
     type: Json.jOption(Json.jString),
@@ -379,7 +371,7 @@ export const byNode: Compare.Order<node> =
   Compare.byFields
     <{ id: nodeId, label: string, nkind: nodeKind, locality: nodeLocality,
        is_root: boolean, backward_explored: exploration,
-       forward_explored: exploration, writes: location[], values?: string,
+       forward_explored: exploration, writes: marker[], values?: string,
        range: nodeRange, type?: string, taint?: taint }>({
     id: byNodeId,
     label: Compare.string,
@@ -388,7 +380,7 @@ export const byNode: Compare.Order<node> =
     is_root: Compare.boolean,
     backward_explored: byExploration,
     forward_explored: byExploration,
-    writes: Compare.array(byLocation),
+    writes: Compare.array(byMarker),
     values: Compare.defined(Compare.string),
     range: byNodeRange,
     type: Compare.defined(Compare.string),
@@ -414,7 +406,7 @@ export interface dependency {
   /** dkind */
   dkind: string;
   /** origins */
-  origins: location[];
+  origins: marker[];
 }
 
 /** Decoder for `dependency` */
@@ -424,19 +416,19 @@ export const jDependency: Json.Decoder<dependency> =
     src: jNodeId,
     dst: jNodeId,
     dkind: Json.jString,
-    origins: Json.jArray(jLocation),
+    origins: Json.jArray(jMarker),
   });
 
 /** Natural order for `dependency` */
 export const byDependency: Compare.Order<dependency> =
   Compare.byFields
-    <{ id: number, src: nodeId, dst: nodeId, dkind: string,
-       origins: location[] }>({
+    <{ id: number, src: nodeId, dst: nodeId, dkind: string, origins: marker[]
+       }>({
     id: Compare.number,
     src: byNodeId,
     dst: byNodeId,
     dkind: Compare.string,
-    origins: Compare.array(byLocation),
+    origins: Compare.array(byMarker),
   });
 
 /** Default value for `dependency` */

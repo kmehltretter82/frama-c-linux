@@ -79,14 +79,14 @@ function getWidth(node: any): string {
 // --- Graph
 // --------------------------------------------------------------------------
 
-function edgeId(source: AstAPI.fct, target: AstAPI.fct): string {
+function edgeId(source: AstAPI.decl, target: AstAPI.decl): string {
   return `${source}-${target}`;
 }
 
 function convertGraph(graph: CgAPI.graph): object[] {
   const elements = [];
   for (const v of graph.vertices) {
-    elements.push({ data: { ...v, id: v.kf } });
+    elements.push({ data: { ...v, id: v.decl } });
   }
   for (const e of graph.edges) {
     const id = edgeId(e.src, e.dst);
@@ -94,13 +94,6 @@ function convertGraph(graph: CgAPI.graph): object[] {
   }
   return elements;
 }
-
-type callstack = {
-  callee: AstAPI.fct,
-  caller?: AstAPI.fct,
-  stmt?: AstAPI.marker,
-  rank?: number
-}[]
 
 function selectFct(cy: Cy.Core, fct: string | undefined): void {
   const className = 'marker-selected';
@@ -110,10 +103,10 @@ function selectFct(cy: Cy.Core, fct: string | undefined): void {
   }
 }
 
-function selectCallstack(cy: Cy.Core, callstack: callstack | undefined): void {
+function selectCallstack(cy: Cy.Core, callstack: ValuesAPI.callsite[]): void {
   const className = 'callstack-selected';
   cy.$(`.${className}`).removeClass(className);
-  callstack?.forEach((call) => {
+  callstack.forEach((call) => {
     cy.$(`node[id='${call.callee}']`).addClass(className);
     if (call.caller) {
       const id = edgeId(call.caller, call.callee);
@@ -149,7 +142,7 @@ function Callgraph() : JSX.Element {
 
   // Callstack selection
   React.useEffect(() => {
-    cy && selectCallstack(cy, callstack);
+    cy && selectCallstack(cy, callstack ?? []);
   }, [cy, callstack]);
 
   // Click on graph

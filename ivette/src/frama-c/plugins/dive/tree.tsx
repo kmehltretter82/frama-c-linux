@@ -31,7 +31,7 @@ import * as States from 'frama-c/states';
 
 import EvaReady from 'frama-c/plugins/eva/EvaReady';
 import * as API from './api';
-import type { marker, location } from 'frama-c/kernel/api/ast';
+import type { marker } from 'frama-c/kernel/api/ast';
 import gearsIcon from '../eva/images/gears.svg';
 
 import './dive.css';
@@ -77,8 +77,10 @@ function Exploring(): JSX.Element {
   return <><img src={gearsIcon} className="exploration" />Exploring...</>;
 }
 
-function Marker(props: {location: location}): JSX.Element {
-  const { location: { marker } } = props;
+interface MarkerProps { marker: marker }
+
+function Marker(props: MarkerProps): JSX.Element {
+  const { marker } = props;
   const { descr } = States.useMarker(marker);
   const current = States.useSelected();
   const hovered = States.useHovered();
@@ -141,11 +143,11 @@ function TreeNode(props: WithItemChildren<TreeNodeProps>): JSX.Element {
     </div>;
 }
 
-function MarkerNode(props: WithItemChildren<{location: location}>):
+function MarkerNode(props: WithItemChildren<{marker: marker}>):
     JSX.Element {
   return <TreeNode
     unfolded={true}
-    label={<Marker location={props.location} />}
+    label={<Marker marker={props.marker} />}
     className="marker">
       {props.children}
   </TreeNode>;
@@ -164,15 +166,15 @@ function GraphNode(props: {nodeId: number, unfolded?: boolean}): JSX.Element {
 
     // Transform dependencies into a map 'statement' -> 'memory location read
     // at this statement'
-    const map = new Map<marker, [location, Set<API.nodeId>]>();
+    const map = new Map<marker, Set<API.nodeId>>();
     deps.forEach((d) => {
-      d.origins.forEach((loc) => {
-        let entry = map.get(loc.marker);
+      d.origins.forEach((marker) => {
+        let entry = map.get(marker);
         if (entry === undefined) {
-          entry = [loc, new Set()];
-          map.set(loc.marker, entry);
+          entry = new Set();
+          map.set(marker, entry);
         }
-        entry[1].add(d.src);
+        entry.add(d.src);
      });
     });
 
@@ -181,8 +183,8 @@ function GraphNode(props: {nodeId: number, unfolded?: boolean}): JSX.Element {
         onunfold={() => explore(node)}
         label={node.label}>
           {node.backward_explored ?
-            Array.from(map.entries()).map(([m, [loc, sources]]) =>
-              <MarkerNode location={loc} key={m}>
+            Array.from(map.entries()).map(([m, sources]) =>
+              <MarkerNode marker={m} key={m}>
                 {Array.from(sources.values()).map((src) =>
                   <GraphNode nodeId={src} key={src} />
                 ) }

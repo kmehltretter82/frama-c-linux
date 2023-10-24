@@ -536,9 +536,8 @@ class Dive {
     await this.explore(node);
     // Update locations
     const label = node.data()?.label as (string | undefined);
-    const writes = node.data()?.writes as Ast.location[];
-    if (label && writes) {
-      const markers: Ast.marker[] = writes.map(({ marker }) => marker);
+    const markers = node.data()?.writes as Ast.marker[];
+    if (label && markers) {
       Locations.setNextSelection({
         label: `Dive: writes to ${label}`,
         title: 'Selected writes from Dive current selection',
@@ -558,9 +557,8 @@ class Dive {
     this.cy.$('.multiple-selection').removeClass('multiple-selection');
     this.cy.$('.selection').removeClass('selection');
     // Update locations
-    const origins = edge.data()?.origins as Ast.location[];
-    if (origins) {
-      const markers: Ast.marker[] = origins.map(({ marker }) => marker);
+    const markers = edge.data()?.origins as Ast.marker[];
+    if (markers) {
       Locations.setNextSelection({
         label: `Dive: origins`,
         title: 'Origins of current edge in Dive graph',

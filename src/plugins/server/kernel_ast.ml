@@ -98,39 +98,6 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Functions                                                          --- *)
-(* -------------------------------------------------------------------------- *)
-
-let jFunction = Data.declare ~package ~name:"fct"
-    ~descr:(Md.plain "Function names")
-    (Pkg.Jkey "fct")
-
-module Function =
-struct
-  type t = kernel_function
-  let jtype = jFunction
-  let to_json kf =
-    `String (Kernel_function.get_name kf)
-  let of_json js =
-    let fn = Js.to_string js in
-    try Globals.Functions.find_by_name fn
-    with Not_found -> Data.failure "Undefined function '%s'" fn
-end
-
-module Fundec =
-struct
-  type t = fundec
-  let jtype = jFunction
-  let to_json fundec =
-    `String fundec.svar.vname
-  let of_json js =
-    let fn = Js.to_string js in
-    try Kernel_function.get_definition (Globals.Functions.find_by_name fn)
-    with Not_found | Kernel_function.No_Definition ->
-      Data.failure "Undefined function definition '%s'" fn
-end
-
-(* -------------------------------------------------------------------------- *)
 (* ---  Generic Markers                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -312,26 +279,6 @@ struct
   let of_json = function
     | `Null -> Kglobal
     | js -> Kstmt (Stmt.of_json js)
-end
-
-(* -------------------------------------------------------------------------- *)
-(* --- Record for (Kf * Marker)                                           --- *)
-(* -------------------------------------------------------------------------- *)
-
-module Location =
-struct
-  type t = Function.t * Marker.t
-  let jtype = Data.declare
-      ~package ~name:"location"
-      ~descr:(Md.plain "Location: function and marker")
-      (Jrecord ["fct", Function.jtype; "marker", Marker.jtype])
-  let to_json (kf, loc) = `Assoc [
-      "fct", Function.to_json kf ;
-      "marker", Marker.to_json loc ;
-    ]
-  let of_json js =
-    Json.field "fct" js |> Function.of_json,
-    Json.field "marker" js |> Marker.of_json
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -615,28 +562,22 @@ end
 let () = Request.register ~package
     ~kind:`GET ~name:"getMainFunction"
     ~descr:(Md.plain "Get the current 'main' function.")
-    ~input:(module Junit) ~output:(module Joption(Function))
+    ~input:(module Junit) ~output:(module Joption(Decl))
     begin fun () ->
-      try Some (fst (Globals.entry_point ()))
+      try Some (SFunction (fst @@ Globals.entry_point ()))
       with Globals.No_such_entry_point _ -> None
     end
 
 let () = Request.register ~package
     ~kind:`GET ~name:"getFunctions"
     ~descr:(Md.plain "Collect all functions in the AST")
-    ~input:(module Junit) ~output:(module Jlist(Function))
+    ~input:(module Junit) ~output:(module Jlist(Decl))
     begin fun () ->
       let pool = ref [] in
-      Globals.Functions.iter (fun kf -> pool := kf :: !pool) ;
+      Globals.Functions.iter
+        (fun kf -> pool := Printer_tag.SFunction kf :: !pool) ;
       List.rev !pool
     end
-
-let () = Request.register ~package
-    ~kind:`GET ~name:"printFunction"
-    ~descr:(Md.plain "Print the AST of a function")
-    ~signals:[ast_changed_signal]
-    ~input:(module Function) ~output:(module Jtext)
-    (fun kf -> print_global_ast @@ Kernel_function.get_global kf)
 
 module Functions =
 struct

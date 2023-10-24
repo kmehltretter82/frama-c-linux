@@ -432,6 +432,9 @@ let loc_of_localizable = function
 let localizable_of_kf kf =
   PVDecl(Some kf,Kglobal,Globals.Functions.get_vi kf)
 
+let localizable_of_stmt stmt =
+  PStmtStart (Kernel_function.find_englobing_kf stmt, stmt)
+
 let localizable_of_global g =
   match g with
   | GVarDecl(vi,_) | GVar(vi,_,_) when vi.vglob ->

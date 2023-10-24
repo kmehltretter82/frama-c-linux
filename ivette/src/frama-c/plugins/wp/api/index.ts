@@ -40,21 +40,13 @@ import * as State from 'frama-c/states';
 //@ts-ignore
 import { byDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { byFct } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { decl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { declDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fct } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { fctDefault } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { jDecl } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { jFct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -193,11 +185,11 @@ export interface goalsData {
   property: marker;
   /** Associated declaration, if any */
   scope?: decl;
-  /** Associated function, if any */
-  fct?: fct;
-  /** Associated behavior, if any */
+  /** Associated function name, if any */
+  fct?: string;
+  /** Associated behavior name, if any */
   bhv?: string;
-  /** Associated axiomatic, if any */
+  /** Associated axiomatic name, if any */
   thy?: string;
   /** Informal Property Name */
   name: string;
@@ -221,7 +213,7 @@ export const jGoalsData: Json.Decoder<goalsData> =
     wpo: jGoal,
     property: jMarker,
     scope: Json.jOption(jDecl),
-    fct: Json.jOption(jFct),
+    fct: Json.jOption(Json.jString),
     bhv: Json.jOption(Json.jString),
     thy: Json.jOption(Json.jString),
     name: Json.jString,
@@ -236,13 +228,13 @@ export const jGoalsData: Json.Decoder<goalsData> =
 /** Natural order for `goalsData` */
 export const byGoalsData: Compare.Order<goalsData> =
   Compare.byFields
-    <{ wpo: goal, property: marker, scope?: decl, fct?: fct, bhv?: string,
+    <{ wpo: goal, property: marker, scope?: decl, fct?: string, bhv?: string,
        thy?: string, name: string, smoke: boolean, passed: boolean,
        status: status, stats: stats, script?: string, saved: boolean }>({
     wpo: byGoal,
     property: byMarker,
     scope: Compare.defined(byDecl),
-    fct: Compare.defined(byFct),
+    fct: Compare.defined(Compare.string),
     bhv: Compare.defined(Compare.string),
     thy: Compare.defined(Compare.string),
     name: Compare.string,

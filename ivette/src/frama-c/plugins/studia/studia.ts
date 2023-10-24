@@ -44,7 +44,7 @@ async function computeStudiaSelection(
 ): Promise<void> {
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
   const data = await Server.send(request, marker).catch(handleError);
-  const markers = data?.direct.map(([, m]) => m) ?? [];
+  const markers = data?.direct ?? [];
   const asLocs = markers.length > 0;
   const label = `${asLocs ? kind : `No ${kind.toLowerCase}`} of ${descr}`;
   const access = kind === 'Reads' ? 'accessing' : 'modifying';

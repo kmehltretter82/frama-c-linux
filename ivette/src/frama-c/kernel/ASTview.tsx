@@ -500,7 +500,7 @@ const Callers = Editor.createField<Eva.CallSite[]>([]);
 
 // This field contains the function pointed to by the current hovered marker,
 // as inferred by Eva.
-const Callees = Editor.createField<Eva.Callee[]>([]);
+const Callees = Editor.createField<Ast.decl[]>([]);
 
 // This field contains information on markers.
 type GetMarkerData = (key: Ast.marker) => Ast.markerAttributesData | undefined;
@@ -525,15 +525,17 @@ function createContextMenuHandler(): Editor.Extension {
       const { marker, kind, labelKind, name, definition, descr } =
         getData(node.marker) ?? Ast.markerAttributesDataDefault;
       if (kind === 'DFUN') {
-        const groupedCallers = Lodash.groupBy(callers, ({ fct }) => fct);
+        const groupedCallers = Lodash.groupBy(callers, ({ call }) => call);
         Lodash.forEach(groupedCallers, (group) => {
           const n = group.length;
-          const { fct } : Eva.CallSite = group[0];
-          const call = `Go to caller ${fct}`;
-          const label = n > 1 ? `${call} (${n} call sites)` : call;
+          const { call } : Eva.CallSite = group[0];
+          const { name: fct } = States.getDeclaration(call);
+          const caller = `Go to caller ${fct}`;
+          const nsites = n > 1 ? ` (${n} call sites)` : '';
+          const label = caller + nsites;
           const markers = callers.map(({ stmt }) => stmt);
-          const index = callers.findIndex(({ fct: f }) => f === fct);
-          const title = `Call sites of function ${name}`;
+          const index = callers.findIndex(({ call: f }) => f === call);
+          const title = `Call sites of function ${fct}`;
           const onClick = (): void => Locations.setSelection({
             label, title, markers, index
           });
@@ -544,7 +546,8 @@ function createContextMenuHandler(): Editor.Extension {
         const onClick = (): void => States.setSelected(definition);
         items.push({ label, onClick });
       } else if (callees.length > 0) {
-        callees.forEach(({ fct, decl }) => {
+        callees.forEach((decl) => {
+          const { name: fct } = States.getDeclaration(decl);
           const onClick = (): void => States.setCurrentScope(decl);
           const label = `Go to definition of ${fct} (indirect)`;
           items.push({ label, onClick });
@@ -646,7 +649,7 @@ function useFctCallers(fct: Fct): Eva.CallSite[] {
 }
 
 // Server request handler returning the given function's callers.
-function useCallees(marker: Marker): Eva.Callee[] {
+function useCallees(marker: Marker): Ast.decl[] {
   return States.useRequest(Eva.getCallees, marker || undefined) ?? [];
 }
 

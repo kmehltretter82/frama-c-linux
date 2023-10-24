@@ -40,21 +40,13 @@ import * as State from 'frama-c/states';
 //@ts-ignore
 import { byDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { byFct } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { decl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { declDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fct } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { fctDefault } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { jDecl } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { jFct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -120,55 +112,44 @@ const computationState_internal: State.Value<computationStateType> = {
 /** The current computation state of the analysis. */
 export const computationState: State.Value<computationStateType> = computationState_internal;
 
-/** Callee, combining function and decl */
-export type Callee = { fct: fct, decl: decl };
-
-/** Decoder for `Callee` */
-export const jCallee: Json.Decoder<Callee> =
-  Json.jObject({ fct: jFct, decl: jDecl,});
-
-/** Natural order for `Callee` */
-export const byCallee: Compare.Order<Callee> =
-  Compare.byFields<{ fct: fct, decl: decl }>({ fct: byFct, decl: byDecl, });
-
-/** Default value for `Callee` */
-export const CalleeDefault: Callee = { fct: fctDefault, decl: declDefault };
-
-/** Call site, combining function and stmt */
-export type CallSite = { fct: fct, stmt: marker };
+/** Callee function and caller stmt */
+export type CallSite = { call: decl, stmt: marker };
 
 /** Decoder for `CallSite` */
 export const jCallSite: Json.Decoder<CallSite> =
-  Json.jObject({ fct: jFct, stmt: jMarker,});
+  Json.jObject({ call: jDecl, stmt: jMarker,});
 
 /** Natural order for `CallSite` */
 export const byCallSite: Compare.Order<CallSite> =
-  Compare.byFields<{ fct: fct, stmt: marker }>({ fct: byFct, stmt: byMarker,
+  Compare.byFields
+    <{ call: decl, stmt: marker }>({
+    call: byDecl,
+    stmt: byMarker,
   });
 
 /** Default value for `CallSite` */
 export const CallSiteDefault: CallSite =
-  { fct: fctDefault, stmt: markerDefault };
+  { call: declDefault, stmt: markerDefault };
 
-const getCallers_internal: Server.GetRequest<fct,CallSite[]> = {
+const getCallers_internal: Server.GetRequest<decl,CallSite[]> = {
   kind: Server.RqKind.GET,
   name: 'plugins.eva.general.getCallers',
-  input: jFct,
+  input: jDecl,
   output: Json.jArray(jCallSite),
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
-/** Get the list of call site of a function */
-export const getCallers: Server.GetRequest<fct,CallSite[]>= getCallers_internal;
+/** Get the list of call sites for a function */
+export const getCallers: Server.GetRequest<decl,CallSite[]>= getCallers_internal;
 
-const getCallees_internal: Server.GetRequest<marker,Callee[]> = {
+const getCallees_internal: Server.GetRequest<marker,decl[]> = {
   kind: Server.RqKind.GET,
   name: 'plugins.eva.general.getCallees',
   input: jMarker,
-  output: Json.jArray(jCallee),
+  output: Json.jArray(jDecl),
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Return the functions pointed to by a function pointer */
-export const getCallees: Server.GetRequest<marker,Callee[]>= getCallees_internal;
+export const getCallees: Server.GetRequest<marker,decl[]>= getCallees_internal;
 
 /** Data for array rows [`functions`](#functions)  */
 export interface functionsData {
@@ -277,15 +258,15 @@ export const byDeadCode: Compare.Order<deadCode> =
 export const deadCodeDefault: deadCode =
   { reached: [], unreachable: [], nonTerminating: [] };
 
-const getDeadCode_internal: Server.GetRequest<fct,deadCode> = {
+const getDeadCode_internal: Server.GetRequest<decl,deadCode> = {
   kind: Server.RqKind.GET,
   name: 'plugins.eva.general.getDeadCode',
-  input: jFct,
+  input: jDecl,
   output: jDeadCode,
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the lists of unreachable and of non terminating statements in a function */
-export const getDeadCode: Server.GetRequest<fct,deadCode>= getDeadCode_internal;
+export const getDeadCode: Server.GetRequest<decl,deadCode>= getDeadCode_internal;
 
 /** Taint status of logical properties */
 export enum taintStatus {
@@ -352,15 +333,15 @@ export const byLvalueTaints: Compare.Order<LvalueTaints> =
 export const LvalueTaintsDefault: LvalueTaints =
   { lval: markerDefault, taint: taintStatusDefault };
 
-const taintedLvalues_internal: Server.GetRequest<fct,LvalueTaints[]> = {
+const taintedLvalues_internal: Server.GetRequest<decl,LvalueTaints[]> = {
   kind: Server.RqKind.GET,
   name: 'plugins.eva.general.taintedLvalues',
-  input: jFct,
+  input: jDecl,
   output: Json.jArray(jLvalueTaints),
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the tainted lvalues of a given function */
-export const taintedLvalues: Server.GetRequest<fct,LvalueTaints[]>= taintedLvalues_internal;
+export const taintedLvalues: Server.GetRequest<decl,LvalueTaints[]>= taintedLvalues_internal;
 
 /** Data for array rows [`properties`](#properties)  */
 export interface propertiesData {
@@ -633,7 +614,7 @@ export const programStats: State.Value<programStatsType> = programStats_internal
 /** Data for array rows [`functionStats`](#functionstats)  */
 export interface functionStatsData {
   /** Entry identifier. */
-  key: fct;
+  key: decl;
   /** Function declaration tag */
   decl: decl;
   /** Coverage of the Eva analysis */
@@ -647,7 +628,7 @@ export interface functionStatsData {
 /** Decoder for `functionStatsData` */
 export const jFunctionStatsData: Json.Decoder<functionStatsData> =
   Json.jObject({
-    key: jFct,
+    key: jDecl,
     decl: jDecl,
     coverage: Json.jObject({ reachable: Json.jNumber, dead: Json.jNumber,}),
     alarmCount: Json.jArray(jAlarmEntry),
@@ -657,9 +638,9 @@ export const jFunctionStatsData: Json.Decoder<functionStatsData> =
 /** Natural order for `functionStatsData` */
 export const byFunctionStatsData: Compare.Order<functionStatsData> =
   Compare.byFields
-    <{ key: fct, decl: decl, coverage: { reachable: number, dead: number },
+    <{ key: decl, decl: decl, coverage: { reachable: number, dead: number },
        alarmCount: alarmEntry[], alarmStatuses: statusesEntry }>({
-    key: byFct,
+    key: byDecl,
     decl: byDecl,
     coverage: Compare.byFields
                 <{ reachable: number, dead: number }>({
@@ -687,7 +668,7 @@ export const reloadFunctionStats: Server.GetRequest<null,null>= reloadFunctionSt
 
 const fetchFunctionStats_internal: Server.GetRequest<
   number,
-  { reload: boolean, removed: fct[], updated: functionStatsData[],
+  { reload: boolean, removed: decl[], updated: functionStatsData[],
     pending: number }
   > = {
   kind: Server.RqKind.GET,
@@ -695,7 +676,7 @@ const fetchFunctionStats_internal: Server.GetRequest<
   input: Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
-            removed: Json.jArray(jFct),
+            removed: Json.jArray(jDecl),
             updated: Json.jArray(jFunctionStatsData),
             pending: Json.jNumber,
           }),
@@ -704,11 +685,11 @@ const fetchFunctionStats_internal: Server.GetRequest<
 /** Data fetcher for array [`functionStats`](#functionstats)  */
 export const fetchFunctionStats: Server.GetRequest<
   number,
-  { reload: boolean, removed: fct[], updated: functionStatsData[],
+  { reload: boolean, removed: decl[], updated: functionStatsData[],
     pending: number }
   >= fetchFunctionStats_internal;
 
-const functionStats_internal: State.Array<fct,functionStatsData> = {
+const functionStats_internal: State.Array<decl,functionStatsData> = {
   name: 'plugins.eva.general.functionStats',
   getkey: ((d:functionStatsData) => d.key),
   signal: signalFunctionStats,
@@ -717,11 +698,11 @@ const functionStats_internal: State.Array<fct,functionStatsData> = {
   order: byFunctionStatsData,
 };
 /** Statistics about the last Eva analysis for each function */
-export const functionStats: State.Array<fct,functionStatsData> = functionStats_internal;
+export const functionStats: State.Array<decl,functionStatsData> = functionStats_internal;
 
 /** Default value for `functionStatsData` */
 export const functionStatsDataDefault: functionStatsData =
-  { key: fctDefault, decl: declDefault, coverage: { reachable: 0, dead: 0 },
+  { key: declDefault, decl: declDefault, coverage: { reachable: 0, dead: 0 },
     alarmCount: [], alarmStatuses: statusesEntryDefault };
 
 const getStates_internal: Server.GetRequest<

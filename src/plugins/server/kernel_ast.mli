@@ -29,15 +29,6 @@ open Cil_types
 (** Represented by a Json record with file, dir, basename, line *)
 module Position : Data.S with type t = Filepath.position
 
-(** Json key representing a function name *)
-val jFunction : Package.jtype
-
-(** Represented by the function name as [jFunction]. *)
-module Function : Data.S with type t = kernel_function
-
-(** Represented by the function name as [jFunction]. *)
-module Fundec : Data.S with type t = fundec
-
 (* -------------------------------------------------------------------------- *)
 (** Ast Markers *)
 (* -------------------------------------------------------------------------- *)
@@ -76,9 +67,6 @@ module Stmt : Data.S with type t = stmt
 
 (** Optional markers interpreted as kinstr. *)
 module Kinstr : Data.S with type t = kinstr
-
-(** Represented as a Json record with function name and marker tag. *)
-module Location : Data.S with type t = Function.t * Marker.t
 
 (* -------------------------------------------------------------------------- *)
 (** Ast Printer *)

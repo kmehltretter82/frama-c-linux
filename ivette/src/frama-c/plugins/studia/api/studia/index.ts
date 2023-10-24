@@ -38,15 +38,7 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byFct } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { fct } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { fctDefault } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { jFct } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -57,24 +49,24 @@ import { markerDefault } from 'frama-c/kernel/api/ast';
 /** Statements that read or write a location. */
 export interface effects {
   /** List of statements with direct effect. */
-  direct: [ fct, marker ][];
+  direct: marker[];
   /** List of statements with indirect effect. */
-  indirect: [ fct, marker ][];
+  indirect: marker[];
 }
 
 /** Decoder for `effects` */
 export const jEffects: Json.Decoder<effects> =
   Json.jObject({
-    direct: Json.jArray(Json.jPair( jFct, jMarker,)),
-    indirect: Json.jArray(Json.jPair( jFct, jMarker,)),
+    direct: Json.jArray(jMarker),
+    indirect: Json.jArray(jMarker),
   });
 
 /** Natural order for `effects` */
 export const byEffects: Compare.Order<effects> =
   Compare.byFields
-    <{ direct: [ fct, marker ][], indirect: [ fct, marker ][] }>({
-    direct: Compare.array(Compare.pair(byFct,byMarker,)),
-    indirect: Compare.array(Compare.pair(byFct,byMarker,)),
+    <{ direct: marker[], indirect: marker[] }>({
+    direct: Compare.array(byMarker),
+    indirect: Compare.array(byMarker),
   });
 
 /** Default value for `effects` */
