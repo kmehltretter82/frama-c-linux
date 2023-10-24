@@ -8,6 +8,7 @@ void job(void)
   /*@
     loop invariant \forall integer j; 0 < j < 0 ==> \false ;
     loop assigns i ;
+    loop variant 10 - i;
   */
   while (i < 10) {
     K ++;

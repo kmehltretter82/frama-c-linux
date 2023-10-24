@@ -369,12 +369,12 @@ frama-c -eva main_1.c > log
 Frama-C has its own model of the target platform (the default target is
 a little-endian 64-bit platform). It also uses the host system's preprocessor.
 If you want to do the analysis for a different platform than the host platform,
-you need to provide Frama-C with a way to pre-process the files as they
+you need to provide Frama-C with a way to preprocess the files as they
 would be during an actual compilation.
 
 There are analyses where the influence of host platform parameters
 is not noticeable. The analysis we are embarking on is not one of them.
-If you pre-process the Skein source code with a 32-bit compiler and
+If you preprocess the Skein source code with a 32-bit compiler and
 then analyze it with Frama-C targeting its default 64-bit platform,
 the analysis will be meaningless and you won't be able to make sense of
 this tutorial.
@@ -2964,12 +2964,12 @@ $\dots$
 
 The analyzed files should be syntactically correct C. The files
 that do not use the {\tt .i} extension are automatically
-pre-processed. The preprocessing command used by default is
+preprocessed. The preprocessing command used by default is
 \lstinline|gcc -C -E -I.|, but another preprocessor may be employed.
 
 It is possible that files without a {\tt .c} extension
 fail to pass this stage. It is notably the case with \lstinline|gcc|,
-to which the option \lstinline|-x c| should be passed in order to pre-process
+to which the option \lstinline|-x c| should be passed in order to preprocess
 C files that do not have a \lstinline|.c| extension.
 \goodbreak
 

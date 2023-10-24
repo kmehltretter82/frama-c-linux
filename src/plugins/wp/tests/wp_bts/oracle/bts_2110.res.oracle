@@ -1,8 +1,12 @@
 # frama-c -wp [...]
 [kernel] Parsing bts_2110.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] bts_2110.i:22: Warning: 
+  Neither code nor explicit exits and terminates for function myRead,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
-[wp] 1 goal scheduled
+[wp] 3 goals scheduled
+[wp] [Generated] Goal typed_myMain_exits (Qed)
 ---------------------------------------------
 --- Context 'typed_myMain' Cluster 'S2_A' 
 ---------------------------------------------
@@ -108,4 +112,5 @@ end
        region (a.base) <= 0 ->
        is_sint32 i -> IsS2_A a3 -> is_sint32 x -> IsS2_A a4 -> EqS2_A a4 a3
   end
-[wp] 1 goal generated
+[wp] [Generated] Goal typed_myMain_terminates (Qed)
+[wp] 3 goals generated

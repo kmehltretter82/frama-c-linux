@@ -16,7 +16,7 @@
   axiom loop3: \forall integer n; R(n) ==> P(n+1);
   }*/
 
-
+//@ terminates \false;
 int foo(int x)
 {
   int n = 0;

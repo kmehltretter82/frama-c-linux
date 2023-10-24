@@ -223,7 +223,7 @@ type & size & representable interval \\
 
 \medskip
 Frama-C annotations added by plug-ins such as \rte{} may not contain macros
-since pre-processing is supposed to take place beforehand (user annotations at
+since preprocessing is supposed to take place beforehand (user annotations at
 the source level can be taken into account by using the \lstinline|-pp-annot|
 option).  As a consequence, annotations are displayed with big constants such as
 those appearing in this table.
@@ -875,7 +875,9 @@ Combined with the following Kernel options:
      Generate annotations when special floats are produced: infinite floats or
      NaN (by default), only on NaN or never.
 \item[{\tt -warn-invalid-pointer} (boolean, defaults to false)] \ \smallskip \\
-     Generate annotations for invalid pointer arithmetic
+     Generate annotations for invalid pointer
+     arithmetic\footnote{For the rationale about this default value, please refer to
+     the \framac{} user manual~\cite{userman}.}
 \end{description}
 
 Pretty-printing the output of \rte{} and relaunching the plug-in on the

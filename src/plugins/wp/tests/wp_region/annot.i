@@ -1,6 +1,6 @@
 /* run.config
    PLUGIN: wp
-   OPT: -region-annot -print
+   OPT: -region-annot -print -generated-spec-mode skip
    EXECNOW: BIN ocode_@PTEST_NAME@_1.i @frama-c@ %{dep:@PTEST_DIR@/@PTEST_NAME@.i}            -region-annot -print -ocode @PTEST_RESULT@/ocode_@PTEST_NAME@_1.i > @DEV_NULL@ 2> @DEV_NULL@
    EXECNOW: BIN ocode_@PTEST_NAME@_2.i @frama-c@ %{dep:@PTEST_RESULT@/ocode_@PTEST_NAME@_1.i} -region-annot -print -ocode @PTEST_RESULT@/ocode_@PTEST_NAME@_2.i > @DEV_NULL@ 2> @DEV_NULL@
    EXECNOW: LOG  diff_@PTEST_NAME@.txt diff %{dep:@PTEST_RESULT@/ocode_@PTEST_NAME@_1.i} %{dep:@PTEST_RESULT@/ocode_@PTEST_NAME@_2.i} &> @PTEST_RESULT@/diff_@PTEST_NAME@.txt

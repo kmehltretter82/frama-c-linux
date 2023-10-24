@@ -110,24 +110,21 @@ let selected_requires ~prop (b : Cil_types.funbehavior) =
   List.exists (selected_precond ~prop) b.b_requires
 
 let selected_call ~bhv ~prop kf =
-  Populate_spec.populate_funspec kf [`Assigns];
   bhv = [] && List.exists (selected_requires ~prop) (Annotations.behaviors kf)
 
 let selected_clause ~prop name getter kf =
   getter kf <> [] && selected_name ~prop name
 
 let selected_terminates ~prop kf =
-  Populate_spec.populate_funspec kf [`Assigns];
   match Annotations.terminates kf with
   | None ->
-    Wp_parameters.TerminatesDefinitions.get ()
+    false
   | Some ip ->
     let tk_name = "@terminates" in
     let tp_names = WpPropId.user_pred_names ip.Cil_types.ip_content in
     WpPropId.are_selected_names prop (tk_name :: tp_names)
 
 let selected_decreases ~prop kf =
-  Populate_spec.populate_funspec kf [`Assigns];
   match Annotations.decreases kf with
   | None -> false
   | Some (it, _) ->
@@ -136,7 +133,6 @@ let selected_decreases ~prop kf =
     WpPropId.are_selected_names prop (tk_name :: tp_names)
 
 let selected_disjoint_complete kf ~bhv ~prop =
-  Populate_spec.populate_funspec kf [`Assigns];
   selected_default ~bhv &&
   ( selected_clause ~prop "@complete_behaviors" Annotations.complete kf ||
     selected_clause ~prop "@disjoint_behaviors" Annotations.disjoint kf )
@@ -168,7 +164,6 @@ let collect_calls ~bhv ?(on_missing_calls=fun _ -> ()) kf stmt =
         let bhvs =
           if bhv = []
           then begin
-            Populate_spec.populate_funspec kf [`Assigns];
             List.map (fun b -> b.b_name) (Annotations.behaviors kf)
           end
           else bhv in
@@ -349,7 +344,9 @@ let wp_trivially_terminates =
 
 let set_trivially_terminates p hyps =
   incr trivial_terminates ;
-  Wp_parameters.result "[CFG] Goal %a : Valid (Trivial)" WpPropId.pp_propid p ;
+  if Wp_parameters.has_dkey VCS.dkey_shell then
+    Wp_parameters.feedback "[Valid] Goal %a (Cfg) (Trivial)"
+      WpPropId.pp_propid p ;
   let pid = WpPropId.property_of_id p in
   let hyps = Property.Set.elements hyps in
   Property_status.emit wp_trivially_terminates ~hyps pid Property_status.True
@@ -442,7 +439,6 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
     no_variant_loops = Sset.empty ;
     terminates_deps = Pset.empty ;
   } in
-  Populate_spec.populate_funspec kf [`Assigns];
   let behaviors = Annotations.behaviors kf in
   (* Inits *)
   if is_entry_point kf then

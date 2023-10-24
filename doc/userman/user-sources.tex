@@ -156,19 +156,6 @@ Analyses usually take place on the normalized version of the source code.
 The normalized version may be printed by using
 the option \optionuse{-}{print} (see Section~\ref{sec:io}).
 
-Normalization gives a program which is semantically equivalent to the
-original one, except for one point. Namely, when the specification of
-a function \texttt{f} that is only declared and has no ACSL
-\texttt{assigns} clause is required by some analysis, \FramaC
-generates an \texttt{assigns} clause based on the prototype of
-\texttt{f} (the form of this clause is left unspecified). Indeed, as
-mentioned in the ACSL manual~\cite{acsl}, assuming that \texttt{f} can
-write to any location in the memory would amount to stop any
-semantical analysis at the first call to \texttt{f}, since nothing
-would be known on the memory state afterwards. \emph{The user is
-  invited to check that the generated clause makes sense}, and to
-provide an explicit \texttt{assigns} clause if this is not the case.
-
 The following options allow to customize the normalization process.
 \begin{description}
 \item \optiondef{-}{aggressive-merging} forces some function
@@ -332,6 +319,130 @@ Passing a negative argument to \texttt{-ulevel} will disable unrolling, even
 in case of \texttt{UNROLL} pragma.
 \end{description}
 
+\section{Normalizing Contracts}\label{sec:normalize-contracts}
+
+Normalization gives a program which is semantically equivalent to the original
+one, but there is an exception for function contracts. By default, function
+contracts are left as is, but \FramaC and plug-ins can require the presence of
+some specification to improve their performances. When they do, they can ask
+\FramaC's kernel to generate specifications.
+
+For example, let us say we have a function \texttt{f} that is only declared and
+has no \acsl \texttt{assigns} clause, but these \texttt{assigns} are required by
+\Eva. \Eva asks the kernel to generate \texttt{assigns} before resuming
+the analysis. Indeed, as mentioned in the \acsl manual~\cite{acsl}, assuming
+that \texttt{f} can write to any location in the memory would amount to stop any
+semantical analysis at the first call to \texttt{f}, since nothing would be
+known on the memory state afterwards.
+
+The generation is done either by combining existing specifications or according
+to a \emph{mode} which can be selected via \FramaC's options. A plug-in
+developer has also the possibility to create their own mode using \FramaC's API.
+The Plug-in Development Guide~\cite{plugin-dev-guide} describes all steps
+required to create and use a custom mode. All available modes are detailed in
+table~\ref{table:populate-mode}. Additionally, a status is emitted for each
+generated clause. A summary can be found in table~\ref{table:populate-status}.
+
+\begin{table}[t]
+  \begin{minipage}{\linewidth}
+    \begin{tabular}{@{}l|ll|ll|ll@{}}
+      \multicolumn{1}{c|}{ \multirow{2}{*}{Mode}}
+      & \multicolumn{2}{c|}{\texttt{ACSL}}
+      & \multicolumn{2}{c|}{\texttt{Frama\_C}}
+      & \multicolumn{2}{c}{\texttt{Safe}} \\
+
+      & \multicolumn{1}{c}{Proto}  & \multicolumn{1}{c|}{Body}
+      &  \multicolumn{1}{c}{Proto} & \multicolumn{1}{c|}{Body}
+      &  \multicolumn{1}{c}{Proto} & \multicolumn{1}{c}{Body} \\ \midrule
+
+      \texttt{exits}        & \multicolumn{1}{c}{-----}     & \multicolumn{1}{c|}{-----}
+                            & \verb+\false+                 & \verb+\false+
+                            & \multicolumn{1}{c}{-----}     & \verb+\false+ \\
+      \texttt{assigns}      & \verb+\everything+            & \verb+\everything+
+                            & Auto\footnote{Automatically generated using the function parameters.} & Auto
+                            & \verb+\everything+            & \verb+\nothing+ \\
+      \texttt{allocates}    & \verb+\nothing+               & \verb+\nothing+
+                            & \texttt{ACSL}\footnote{Refer to \texttt{ACSL} mode to see what is generated.} & \texttt{ACSL}
+                            & \verb+\everything+            & \verb+\nothing+ \\
+      \texttt{terminates}   & \verb+\true+                  & \verb+\true+
+                            & \texttt{ACSL}                 & \texttt{ACSL}
+                            & \verb+\false+                 & \verb+\true+ \\
+      \texttt{requires}     & \multicolumn{1}{c}{-----}     & \multicolumn{1}{c|}{-----}
+                            & \texttt{ACSL}                 & \texttt{ACSL}
+                            & \verb+\false+                 & \multicolumn{1}{c}{-----} \\
+    \end{tabular}
+  \end{minipage}
+  \caption{Specification generation's behaviors according to available modes}
+  \label{table:populate-mode}
+\end{table}
+
+By default, \FramaC selects the mode \texttt{Frama\_C} and the following options
+allow selecting mode(s) for the specification generation:
+
+\begin{description}
+  \item \texttt{\optiondef{-}{generated-spec-mode <mode>}} selects which
+  \texttt{mode} is used to generate missing specifications. \texttt{mode} can be
+  either ``frama-c'', ``acsl'', ``safe'' or any custom mode registered in a
+  plug-in.
+
+  \item \texttt{\optiondef{-}{generated-spec-custom
+  <clause\_1:mode\_1,clause\_2:mode\_2,...>}} has a similar behavior as
+  \optionuse{-}{generated-spec-mode}, except that it allows the user choosing a
+  \texttt{mode} individually for each clause. It also allows the user ignoring
+  \FramaC and/or plug-ins needs by skipping the generation for a clause, with
+  the mode ``skip''. This mode is not available with
+  \optionuse{-}{generated-spec-mode} and trying to use it emits a warning and
+  replaces it by \texttt{Frama\_C}. For example:
+  \begin{frama-c-commands}
+    \$ frama-c -generated-spec-custom exits:skip,requires:safe
+  \end{frama-c-commands}
+  Here every clause is generated using the default mode \texttt{Frama\_C} except
+  for exits which are not generated and \texttt{requires} which are generated
+  using the mode \texttt{Safe}.
+\end{description}
+
+As mentioned, the generation can also be done by combining existing clauses
+from other behaviors following this algorithm:
+\begin{itemize}
+  \item[1.] If the function contract has some clauses \texttt{C} in unguarded
+  (without \texttt{assumes} clauses) behaviors, we combine them in the default
+  behavior.
+  \item[2.] Else, if it has some clauses \texttt{C} in complete behaviors, we
+  combine them in the default behavior.
+  \item[3.] Else, if it has some clauses \texttt{C} anywhere, we combine them in
+  the default behavior.
+  \item[4.] Else we use the selected mode to generate these clauses (see mode's
+  table).
+\end{itemize}
+
+{\em Note: There is an exception with the mode \texttt{ACSL} for which we never
+try to combine existing clauses from other behavior, and jump directly to the
+step of our algorithm to use the selected mode.}\\
+
+\begin{table}[t]
+  \centering
+  \begin{tabular}{@{}l|l|l|l@{}}
+      \multicolumn{1}{c|}{Mode} &
+      \multicolumn{1}{c|}{\texttt{ACSL}} &
+      \multicolumn{1}{c|}{\texttt{Frama\_C}} &
+      \multicolumn{1}{c}{\texttt{Safe}} \\ \midrule
+
+      \texttt{exits}      & Dont\_know                 & Dont\_know & Dont\_know \\
+      \texttt{assigns}    & \multicolumn{1}{c|}{-----} & Dont\_know & Dont\_know \\
+      \texttt{allocates}  & True                       & Dont\_know & Dont\_know \\
+      \texttt{terminates} & True                       & Dont\_know & Dont\_know \\
+      \texttt{requires}   & \multicolumn{1}{c|}{-----} & \multicolumn{1}{c|}{-----} & \multicolumn{1}{c}{-----} \\
+  \end{tabular}
+  \caption{Status emitted during the specification generation according to the selected mode}
+  \label{table:populate-status}
+\end{table}
+
+When a clause is generated for a function, \FramaC's kernel can emit a warning
+if this function is a prototype and if it is not part of \FramaC's builtins. The
+message emitted depends on the generated clauses, their origins (if we combined
+some clauses from existing ones, or generated them from nothing, or both) as
+well as if the function contract was empty before the generation or incomplete.
+
 \section{Incremental parsing} (experimental)\label{sec:incremental-parsing}
 
 Parsing large code bases takes a non-negligible amount of time.
@@ -451,7 +562,7 @@ By default, \FramaC's preprocessing will include the headers of its own standard
 library, instead of those installed in the user's machine. This avoids issues
 with non-portable, compiler-specific features.
 Option \optiondef{-}{frama-c-stdlib} (set by default)
-adds \texttt{-I\$FRAMAC\_SHARE/libc} to the preprocessor command, as well as
+adds \verb+-I$(frama-c-config -print-share-path)/libc+ to the preprocessor command, as well as
 GCC-specific option \texttt{-nostdinc}. If the latter is not recognized by
 your preprocessor,
 \optionuse{-}{no-cpp-frama-c-compliant} can be given to \FramaC

@@ -1,7 +1,17 @@
 # frama-c -wp [...]
 [kernel] Parsing initialized_memtyped.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal formal_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal formal_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal glob_arr_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal glob_arr_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal glob_var_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal glob_var_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal ptr_on_local_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal ptr_on_local_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_terminates (Cfg) (Trivial)
 [wp] 29 goals scheduled
 [wp] [Unsuccess] typed_test_check_unknown (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_test_check_unknown_2 (Alt-Ergo) (Cached)
@@ -32,7 +42,9 @@
 [wp] [Unsuccess] typed_glob_arr_ensures_unknown (Alt-Ergo) (Cached)
 [wp] [Valid] typed_formal_assert_provable (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ptr_on_local_assert_provable (Alt-Ergo) (Cached)
-[wp] Proved goals:   14 / 29
+[wp] Proved goals:   24 / 39
+  Terminating:     5
+  Unreachable:     5
   Qed:             6
   Alt-Ergo:        8
   Unsuccess:      15

@@ -1,9 +1,22 @@
 # frama-c -wp [...]
 [kernel] Parsing overarray.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] overarray.i:3: Warning: 
+  Neither code nor explicit exits and terminates for function g,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function f1_ok
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f1_ok':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f1_ok':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assigns (file overarray.i, line 12) in 'f1_ok':
@@ -19,6 +32,16 @@ Prove: true.
   Function f2_ok
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f2_ok':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f2_ok':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns (file overarray.i, line 15) in 'f2_ok':
 Prove: true.
 
@@ -30,6 +53,16 @@ Prove: true.
 ------------------------------------------------------------
 ------------------------------------------------------------
   Function f3_ok
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'f3_ok':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f3_ok':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'f3_ok':
@@ -45,6 +78,16 @@ Prove: true.
   Function f4_ok
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f4_ok':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f4_ok':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'f4_ok':
 Prove: true.
 
@@ -58,16 +101,19 @@ Prove: true.
   Function f5_ko
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f5_ko':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f5_ko':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'f5_ko':
 Call Effect at line 25
-Assume {
-  (* Heap *)
-  Type: IsArray_sint32(A).
-  (* Exit Effects *)
-  Have: forall i : Z. let x = 15 + i in (((-15) <= i) -> ((i <= 4) ->
-      (((i < 0) \/ (10 <= i)) -> (A_1[x] = A[x])))).
-}
-Prove: false.
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -87,16 +133,19 @@ Prove: false.
   Function f6_ko
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'f6_ko':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'f6_ko':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'f6_ko':
 Call Effect at line 28
-Assume {
-  (* Heap *)
-  Type: IsArray_sint32(A).
-  (* Exit Effects *)
-  Have: forall i : Z. let x = i - 5 in ((5 <= i) -> ((i <= 24) ->
-      (((i < 0) \/ (10 <= i)) -> (A_1[x] = A[x])))).
-}
-Prove: false.
+Prove: true.
 
 ------------------------------------------------------------
 

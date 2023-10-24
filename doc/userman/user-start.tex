@@ -35,9 +35,9 @@ file of the source distribution. The main components necessary for compiling
 and running \FramaC are described below.
 
 \begin{description}
-\item[A \C pre-processor]\index{C pre-processor} is required for \emph{using}
-  \FramaC on \C files. If you do not have any \C pre-processor,
-  you can only run \FramaC on already pre-processed \texttt{.i} files.
+\item[A \C preprocessor]\index{C preprocessor} is required for \emph{using}
+  \FramaC on \C files. If you do not have any \C preprocessor,
+  you can only run \FramaC on already preprocessed \texttt{.i} files.
 \item[A \C compiler]\index{C compiler} is required to compile the \FramaC
   kernel.
 \item[A \tool{Unix}-like compilation environment] with at least the tool
@@ -465,33 +465,6 @@ integer numbers:
 \section{Environment Variables}\label{sec:env-variables}
 
 Different environment variables may be set to customize \FramaC.
-
-\subsection{Variable \texttt{FRAMAC\_LIB}}\label{sec:var-lib}
-
-External plug-ins (see Section~\ref{sec:install-external}) or scripts (see
-Section~\ref{sec:use-plugins}) are compiled against the \FramaC compiled
-library. The \FramaC option \optiondef{-}{print-lib-path} prints the path to
-this library.
-It can be changed by setting the environment variable \textttdef{FRAMAC\_LIB}.
-
-\subsection{Variable \texttt{FRAMAC\_PLUGIN}}\label{sec:var-plugin}
-
-Dynamic plug-ins (see Section~\ref{sec:use-plugins}) are searched for in a default
-directory. The \FramaC option \optiondef{-}{print-plugin-path} prints the path
-to this directory. It can be changed by setting the environment variable
-\textttdef{FRAMAC\_PLUGIN}.
-
-\subsection{Variable \texttt{FRAMAC\_SHARE}}\label{sec:var-share}
-
-\FramaC looks for all its other data (installed manuals, configuration files,
-\C modelization libraries, \etc) in a single directory. The \FramaC option
-\optiondef{-}{print-share-path} prints this path.
-It can be changed by setting the environment variable \textttdef{FRAMAC\_SHARE}.
-
-A \FramaC plug-in may have its own share directory (default is \texttt{`frama-c
-  -print-share-path `/<plug-in shortname>}). If the plug-in is not installed in
-the standard way, you can set this share directory by using the option
-\texttt{-<plug-in shortname>-share}.
 
 \subsection{Variable \texttt{FRAMAC\_SESSION}}\label{sec:var-session}
 

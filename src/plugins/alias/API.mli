@@ -24,24 +24,24 @@
 
 open Cil_types
 
-(** Points-to graphs datastructure. *)
-module G: Graph.Sig.G
-
-(** Set of [lval]s. Differs from Cil_datatype.Lval.Set in that is uses a
-    different comparison function ([Cil_datatype.LvalStructEq.compare]). *)
-module LSet : sig
-  include Set.S with type elt = lval
-
-  val pretty: Format.formatter -> t -> unit
-end
+module LSet = Cil_datatype.LvalStructEq.Set
 
 (** NB : do the analysis BEFORE using any of those functions *)
 
+(** [points_to_set_stmt kf s lv] returns the points-to set of lval [lv] before
+    [stmt] in function [kf]. *)
+val points_to_set_stmt : kernel_function -> stmt -> lval -> LSet.t
 
-(** points-to set of lval [lv] at the end of function [kf]. *)
+(** [points_to_set kf s lv] returns the points-to set of lval [lv] at the end
+    of function [kf]. *)
 val points_to_set_kf : kernel_function -> lval -> LSet.t
 
-(** aliases of lval [lv] at the end of function [kf]. *)
+(** [aliases_stmt kf s lv] return the alias set of lval [lv] before [stmt] in
+    function [kf]. *)
+val aliases_stmt : kernel_function -> stmt -> lval -> LSet.t
+
+(** [aliases_kf kf lv] return the alias set of lval [lv] at the end of function
+    [kf]. *)
 val aliases_kf : kernel_function -> lval -> LSet.t
 
 (** list of pairs [s, e] where [e] is the set of lval aliased to [v] after
@@ -89,12 +89,12 @@ val are_aliased: kernel_function -> stmt -> lval -> lval -> bool
 (** [fold_vertex f acc kf s v] folds [f acc i lv] to all [lv] in [i], where [i] is
     the vertex that represents the equivalence class of [v] before statement [s] in function [kf]. *)
 val fold_vertex:
-  ('a -> G.V.t -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
+  ('a -> int -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
 
 (** [fold_vertex_closure f acc kf s v] is the transitive closure of function
     [fold_vertex]. *)
 val fold_vertex_closure:
-  ('a -> G.V.t -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
+  ('a -> int -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
 
 
 (** direct access to the abstract state. See Abstract_state.mli *)

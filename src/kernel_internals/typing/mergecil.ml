@@ -1549,7 +1549,7 @@ let matchModelField
 
 (* First pass might decide to ignore some globals that are not used in their
    own translation unit and have type incompatible with the one associated
-   to the symbol names in already pre-processed files. We store
+   to the symbol names in already preprocessed files. We store
    the corresponding varinfos here and ensure that we do not attempt to extract
    some information (notably function contract or function definition)
    from them in pass 2.

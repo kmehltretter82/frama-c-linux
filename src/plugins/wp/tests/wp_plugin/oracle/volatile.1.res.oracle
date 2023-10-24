@@ -1,7 +1,17 @@
 # frama-c -wp -wp-no-volatile [...]
 [kernel] Parsing volatile.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal default_init_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal default_init_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal job_assigns_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal job_assigns_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal job_read_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal job_read_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal job_struct_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal job_struct_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal job_struct_assigns_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal job_struct_assigns_terminates (Cfg) (Trivial)
 [wp] volatile.i:16: Warning: unsafe volatile access to (term) l-value
 [wp] volatile.i:15: Warning: unsafe write-access to volatile l-value
 [wp] volatile.i:22: Warning: unsafe volatile access to (term) l-value

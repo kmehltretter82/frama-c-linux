@@ -19,6 +19,51 @@ like \textsf{Coq}~\cite{Coq84} and more generally, any automated or interactive
 prover supported by \textsf{Why3}~\cite{Why3}.
 
 \clearpage
+\section{Supported annotations}
+
+The \textsf{WP} plug-in supports the following code annotations. We also
+indicate the number of verification conditions that are generated in the
+default configuration:
+\begin{itemize}
+  \item \lstinline{lemma}: 1 VC
+  \item \lstinline{axiom}: no VC (admitted with no proof)
+  \item \lstinline{ensures}: 1 VC
+  \item \lstinline{exits}: 1 VC
+  \item \lstinline{disjoint}: 1 VC
+  \item \lstinline{complete}: 1 VC
+  \item \lstinline{requires}: 1 VC for each call
+  \item \lstinline{terminates}: 1 VC for each call, 1 VC for each loop without "loop variant"
+  \item \lstinline{decreases}: 1 VC for each recursive call
+  \item \lstinline{assigns}: 1 VC for each assigned lvalue
+  \item \lstinline{admit}: no VC (admitted with no proof)
+  \item \lstinline{assert}/\lstinline{check}: 1 VC
+  \item \lstinline{loop invariant}: 2 VCs (established, preserved)
+  \item \lstinline{loop variant} (integer): 2 VCs (positive, decreasing)
+  \item \lstinline{loop variant} (general measure): 1 VC (the measure is \emph{assumed} to be well-founded)
+  \item \lstinline{loop assigns}: 1 VC for each assigned lvalue within the loop
+\end{itemize}
+The statement contracts are not supported. The number of generated verification
+conditions can vary depending on the selected options. See for example the
+options listed in~\ref{subsec:computation-strategy}.
+
+In addition, the \textsf{WP} plug-in asks the \textsf{Frama-C} kernel to generate
+automatically some annotations when they are missing:
+\begin{itemize}
+  \item \lstinline{terminates}
+  \item \lstinline{exits}
+  \item \lstinline{assigns}, for functions without body
+\end{itemize}
+In the default \textsf{Frama-C} configuration, \lstinline{terminates} is true,
+\lstinline{exits} is false. These proofs are generally easily discharged, reason
+why we enable them by default. The \lstinline{assigns} clauses for functions
+without body are inferred from the prototype, this is a best effort generation,
+and it triggers a warning since this is unsafe. One \textbf{shall} check the
+generated warnings. For more information about the specification generation,
+please refer to the options \lstinline{-generated-spec-*} of the kernel and to
+the \textsf{Frama-C} User Manual~\cite{userman}.
+
+
+\clearpage
 %-----------------------------------------------------------------------------
 \section{Graphical User Interface}
 \label{wp-gui}
@@ -1008,6 +1053,7 @@ The available \textsf{WP} command-line options related to model selection are:
 \end{description}
 
 \subsection{Computation Strategy}
+\label{subsec:computation-strategy}
 
 These options modify the way proof obligations are generated during
 weakest precondition calculus.
@@ -1050,15 +1096,6 @@ weakest precondition calculus.
   it is generally not necessary and it can generates a large number of
   verifications for structures with many (nested) fields. \texttt{-1} enables
   full unfolding.
-\item[\tt -wp-(no)-frama-c-stdlib-terminate] Frama-C stdlib functions without
-  \texttt{terminates} specification are considered to terminate when called
-  (default is: \texttt{no}).
-\item[\tt -wp-(no)-declarations-terminate] Undefined external functions without
-  \texttt{terminates} specification are considered to terminate when called
-  (default is: \texttt{no}).
-\item[\tt -wp-(no)-definitions-terminate] Defined functions without
-  \texttt{terminates} specification are considered to terminate when called
-  (default is: \texttt{no}).
 \item[\tt -wp-(no)-variant-with-terminates] prove \texttt{loop variant} under
   the termination hypothesis (thus, under a
   \texttt{terminates \textbackslash{}false}, any loop variant proof is trivial)
@@ -1165,14 +1202,8 @@ void caller(int i){
 }
 \end{lstlisting}
 
-When a called function does not have a terminates specification, WP assumes one
-as specified by the options:
-
-\begin{itemize}
-\item \verb+-wp-frama-c-stdlib-terminate+,
-\item \verb+-wp-declarations-terminate+,
-\item \verb+-wp-definitions-terminate+.
-\end{itemize}
+When a called function does not have a terminates specification, WP assumes that
+it does not terminate.
 
 \paragraph{(Mutually) recursive function.} When a function is involved in a
 recursive cluster (as defined in the ACSL manual) and shall terminate, WP checks that a
@@ -1734,10 +1765,15 @@ proof strategies:
   can be recovered easily.
 \end{itemize}
 
+To activate proof strategies and seach for new scripts for unproven goals, user
+shall activate the \verb+tip+ prover from the command line, with
+\verb+-wp-prover tip+, or use the interfactive \textsf{TIP} from the graphical
+user interface.
+
 Proof Strategies are defined thanks to dedicated ACSL extensions and controlled
 by specific command-line options. Note that those extensions are only available
-when command-line option \verb+-wp-strategy+ is specified.  The syntax of ACSL
-extensions for proof strategies is defined below:
+unless command-line option \verb+-wp-no-strategy-engine+ is specified.
+The syntax of ACSL extensions for proof strategies is defined below:
 
 \newcommand{\pdots}{\,,\,\ldots,\,}
 

@@ -39,7 +39,7 @@ type file =
       - cpp_opt_kind: whether the preprocessor supports GNU options
         such as -I/-D. *)
   | NoCPP of Filepath.Normalized.t
-  (** Already pre-processed file [.i] *)
+  (** Already preprocessed file [.i] *)
   | External of Filepath.Normalized.t * string
   (** file that can be translated into a Cil AST through an external
       function, together with the recognized suffix. *)

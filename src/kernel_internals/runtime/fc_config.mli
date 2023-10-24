@@ -94,7 +94,7 @@ val using_default_cpp: bool
 val preprocessor_is_gnu_like: bool
 (** whether the default preprocessor accepts the same options as gcc
     (i.e. is either gcc or clang), when this is the case, the default
-    command line for pre-processing contains more options.
+    command line for preprocessing contains more options.
     @since Sodium-20150201
 *)
 

@@ -45,4 +45,7 @@ val auto : alternative -> Strategy.heuristic option
 val fallback : alternative -> strategy option
 val tactic : tree -> node -> strategy -> alternative -> node list option
 
+val pp_strategy : Format.formatter -> strategy -> unit
+val pp_alternative : Format.formatter -> alternative -> unit
+
 (* -------------------------------------------------------------------------- *)

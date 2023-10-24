@@ -60,7 +60,8 @@ void induction(int n)
   /*@ 
     loop invariant 0 <= i <= n;
     loop invariant CALL == [| F , G |] *^ i;
-    loop assigns i,calls; 
+    loop assigns i,calls;
+    loop variant n - i;
    */
   for (int i = 0; i < n; i++)
     { f(); g(); }
@@ -80,7 +81,8 @@ void shifted(int n)
   /*@ 
     loop invariant 0 <= i <= n;
     loop invariant CALL == ([| F , G |] *^ i ^ [| F |]);
-    loop assigns i,calls; 
+    loop assigns i,calls;
+    loop variant n - i;
    */
   for (int i = 0; i < n; i++)
     { g(); f(); }

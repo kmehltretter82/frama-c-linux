@@ -776,9 +776,10 @@ let do_cache_cleanup () =
 (* ---  Command-line Entry Points                                       --- *)
 (* ------------------------------------------------------------------------ *)
 
+let dkey_builtins = Wp_parameters.register_category "builtins"
 let dkey_logicusage = Wp_parameters.register_category "logicusage"
 let dkey_refusage = Wp_parameters.register_category "refusage"
-let dkey_builtins = Wp_parameters.register_category "builtins"
+let dkey_wp_rte = Wp_parameters.register_category "wp-rte"
 
 let cmdline_run () =
   begin
@@ -792,8 +793,11 @@ let cmdline_run () =
         let model = generator#model in
         Ast.compute ();
         Dyncall.compute ();
-        if Wp_parameters.RTE.get () then
-          WpRTE.generate_all model ;
+        if Wp_parameters.has_dkey dkey_wp_rte then
+          begin
+            if Wp_parameters.RTE.get () then
+              WpRTE.generate_all model ;
+          end ;
         if Wp_parameters.has_dkey dkey_logicusage then
           begin
             LogicUsage.compute ();
@@ -812,7 +816,7 @@ let cmdline_run () =
             WpContext.on_context (model,WpContext.Global)
               LogicBuiltins.dump ();
           end ;
-        WpTarget.compute model ;
+        WpTarget.compute model ~fct ~bhv ~prop () ;
         wp_compute_memory_context model ;
         if Wp_parameters.CheckMemoryContext.get () then
           wp_insert_memory_context model ;
@@ -998,7 +1002,8 @@ let tracelog () =
         (Format.pp_print_list ~pp_sep pp_category) active_keys)
   end
 
-let main = sequence [
+let main =
+  sequence [
     (fun () -> Wp_parameters.debug ~dkey:dkey_main "Start WP plugin...@.") ;
     do_prover_detect ;
     do_search_tactics ;

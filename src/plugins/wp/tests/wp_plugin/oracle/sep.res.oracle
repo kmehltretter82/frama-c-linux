@@ -1,7 +1,25 @@
 # frama-c -wp -wp-model 'Typed (Caveat)' [...]
 [kernel] Parsing sep.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal escape_addrof_d_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal escape_addrof_d_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal f1_none_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f1_none_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal f2_p_a_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f2_p_a_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal f3_p_ab_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f3_p_ab_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal f4_pq_ab_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f4_pq_ab_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal f5_pq_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f5_pq_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal f6_Pa_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f6_Pa_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal f7_pq_ad_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f7_pq_ad_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal f8_pq_a_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f8_pq_a_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function f1_none
 ------------------------------------------------------------

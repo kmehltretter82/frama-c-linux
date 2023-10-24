@@ -20,6 +20,7 @@ void reset(struct S * p)
     loop invariant \forall integer k ; 0 <= k < i ==> p[k].f == 1 ;
     loop invariant \forall integer k ; 0 <= k < i ==> p[k].g == 2 ;
     loop assigns i, p[0..9] ;
+    loop variant 10 - i;
   */
   for (int i = 0 ; i < 10 ; i++) {
     p[i].f = 1 ;

@@ -30,6 +30,7 @@ void f(int *t , int a, int b)
   /*@ loop invariant Index: a<=i<=b+1 ;
     @ loop invariant Positive: \forall int k ; a<=k<i ==> t[k] > 0 ;
     @ loop assigns i,t[a..i-1] ;
+    @ loop variant b - i;
     @ */
   for(int i=a; i<=b; i++) t[i] = 1 ;
 

@@ -17,6 +17,7 @@
   }*/
 
 
+//@ terminates \false;
 int foo(int x)
 {
   int n = 0;

@@ -671,7 +671,6 @@ let cfun_spec env kf =
     method !vterm t = update_spec_env (vterm env t)
   end in
   AssignsCompleteness.compute kf ;
-  Populate_spec.populate_funspec kf [`Assigns];
   let spec = Annotations.funspec kf in
   ignore (Cil.visitCilFunspec (visitor:>Cil.cilVisitor) spec) ;
   (* Partitioning the accesses of the spec for formals vs globals *)

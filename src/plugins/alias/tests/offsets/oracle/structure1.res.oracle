@@ -13,7 +13,7 @@
 [alias] analysing instruction: p_x = (st_1_t *)p_y;
 [alias:unsafe-cast] structure1.c:28: Warning: 
   unsafe cast from st_2_t * to st_1_t *
-[alias] May-aliases after instruction  p_x = (st_1_t *)p_y;  are  {p_x, p_y}
+[alias] May-aliases after instruction  p_x = (st_1_t *)p_y;  are  { p_x; p_y }
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are  {p_x, p_y}
-[alias] May-aliases at the end of function main: {p_x, p_y}
+[alias] May-aliases after instruction  __retres = 0;  are  { p_x; p_y }
+[alias] May-aliases at the end of function main: { p_x; p_y }

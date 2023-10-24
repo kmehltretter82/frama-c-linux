@@ -2,13 +2,25 @@
 [kernel] Parsing issue_pub_49.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal is_class_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal is_class_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function caller1
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'caller1':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Post-condition 'postcs' in 'caller1':
 Assume { Type: is_sint32(codeCursor_1) /\ is_sint32(codeCursor_0). }
 Prove: codeCursor_0 = codeCursor_1.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'caller1':
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -55,9 +67,19 @@ Prove: true.
   Function caller2
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'caller2':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'postcs' in 'caller2':
 Assume { Type: is_sint32(codeCursor_1) /\ is_sint32(codeCursor_0). }
 Prove: codeCursor_0 = codeCursor_1.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'caller2':
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -104,9 +126,19 @@ Prove: true.
   Function caller3
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'caller3':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'postcs' in 'caller3':
 Assume { Type: is_sint32(codeCursor_1) /\ is_sint32(codeCursor_0). }
 Prove: codeCursor_0 = codeCursor_1.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'caller3':
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -147,9 +179,19 @@ Prove: true.
   Function caller4
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'caller4':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'postcs' in 'caller4':
 Assume { Type: is_sint32(codeCursor_1) /\ is_sint32(codeCursor_0). }
 Prove: codeCursor_0 = codeCursor_1.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'caller4':
+Prove: true.
 
 ------------------------------------------------------------
 

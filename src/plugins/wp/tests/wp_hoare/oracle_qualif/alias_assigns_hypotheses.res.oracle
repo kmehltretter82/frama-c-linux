@@ -1,7 +1,27 @@
 # frama-c -wp [...]
 [kernel] Parsing alias_assigns_hypotheses.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal comprehension_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal comprehension_alias_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal field_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal field_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal field_range_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal field_range_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal formal_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal formal_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal formal_alias_array_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal formal_alias_array_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal formal_no_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal formal_no_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal global_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal global_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal global_no_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal global_no_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal set_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal set_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal union_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal union_alias_terminates (Cfg) (Trivial)
 [wp] 30 goals scheduled
 [wp] [Valid] typed_global_alias_ensures (Qed)
 [wp] [Valid] typed_global_alias_ensures_2 (Qed)
@@ -33,7 +53,9 @@
 [wp] [Valid] typed_union_alias_ensures (Qed)
 [wp] [Valid] typed_union_alias_ensures_2 (Qed)
 [wp] [Valid] typed_union_alias_assigns (Qed)
-[wp] Proved goals:   30 / 30
+[wp] Proved goals:   50 / 50
+  Terminating:    10
+  Unreachable:    10
   Qed:            30
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success

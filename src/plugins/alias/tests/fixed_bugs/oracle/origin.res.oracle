@@ -8,7 +8,7 @@
 [alias:unsafe-cast] origin.c:8: Warning: unsafe cast from char to void (*)(void)
 [alias:unsafe-cast] origin.c:8: Warning: unsafe cast from int * to char *
 [alias] May-aliases after instruction  tmp = (void (*)(void))*((char *)(v.t));  are
-  {v.t, tmp}
+  { v.t; tmp }
 [alias] analysing instruction: int g = (int)tmp;
-[alias] May-aliases after instruction  int g = (int)tmp;  are  {v.t, tmp}
-[alias] May-aliases at the end of function f: {v.t, tmp}
+[alias] May-aliases after instruction  int g = (int)tmp;  are  { v.t; tmp }
+[alias] May-aliases at the end of function f: { v.t; tmp }
