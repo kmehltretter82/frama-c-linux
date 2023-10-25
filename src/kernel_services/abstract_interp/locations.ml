@@ -412,7 +412,7 @@ module Location_Bytes = struct
         Datatype.Integer.Set.add bound zero
       | Base.Empty | Base.Invalid -> zero
     in
-    int_thresholds, Fc_float.Widen_Hints.empty
+    int_thresholds, Datatype.Float.Set.empty
 
   let widen ?size ?hint =
     let widen_map =

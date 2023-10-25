@@ -30,12 +30,6 @@ type round = Up | Down | Near | Zero
     - the ACSL 'real' type.  *)
 type prec = Single | Double | Long_Double | Real
 
-
-module type Widen_Hints = sig
-  include module type of Cil_datatype.Logic_real.Set
-  val default_widen_hints: t
-end
-
 module type S = sig
   type t
 
@@ -86,14 +80,12 @@ module type S = sig
       behavior as [next_float]. *)
   val prev_float: prec -> t -> t
 
-  module Widen_Hints : Widen_Hints
-  type widen_hints = Widen_Hints.t
-
   (** [widen_up f] returns a value strictly larger than [f], such that
       successive applications of [widen_up] converge rapidly to infinity.
-      The first arguments give the set of steps that could be used. *)
-  val widen_up  : widen_hints -> prec -> t -> t
-  val widen_down: widen_hints -> prec -> t -> t
+      The first optional argument gives a set of relevant thresholds that
+      could be used. *)
+  val widen_up  : ?hint:Datatype.Float.Set.t -> prec -> t -> t
+  val widen_down: ?hint:Datatype.Float.Set.t -> prec -> t -> t
 
   (** Floating-point operations. *)
 

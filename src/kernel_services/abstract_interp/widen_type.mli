@@ -44,7 +44,7 @@ val num_hints:
 (** Define floating hints for one or all variables ([None]),
     for a certain stmt or for all statements ([None]).  *)
 val float_hints:
-  Cil_types.stmt option -> Base.t option -> Fc_float.Widen_Hints.t -> t
+  Cil_types.stmt option -> Base.t option -> Fval.widen_hint -> t
 
 (** Define a set of bases to widen in priority for a given statement. *)
 val var_hints : Cil_types.stmt -> Base.Set.t -> t

@@ -95,7 +95,7 @@ end
 
 include Type
 
-type widen_hint = Datatype.Integer.Set.t * Cil_datatype.Logic_real.Set.t
+type widen_hint = Datatype.Integer.Set.t * Datatype.Float.Set.t
 
 let hash = function
   | Bottom -> 311
@@ -314,10 +314,8 @@ let widen ?size ?hint t1 t2 =
         | Some 128 -> Float_sig.Long_Double
         | Some _ | None -> Float_sig.Single
       in
-      let hint =
-        Option.fold hint ~some:snd ~none:Cil_datatype.Logic_real.Set.empty
-      in
-      inject_float (Fval.widen hint prec f1 f2)
+      let hint = Option.map snd hint in
+      inject_float (Fval.widen ?hint prec f1 f2)
     | Int i2 ->
       let i1 = match t1 with
         | Bottom -> assert false
