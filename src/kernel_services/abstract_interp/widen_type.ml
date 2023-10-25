@@ -22,9 +22,11 @@
 
 open Cil_datatype
 
-module Num_hints_stmt = Stmt.Map.Make(Ival.Widen_Hints)
+module IntSet = Datatype.Integer.Set
+
+module Num_hints_stmt = Stmt.Map.Make(IntSet)
 module Float_hints_stmt = Stmt.Map.Make(Fc_float.Widen_Hints)
-module Num_hints_bases = Base.Map.Make(Ival.Widen_Hints)
+module Num_hints_bases = Base.Map.Make(IntSet)
 module Float_hints_bases = Base.Map.Make(Fc_float.Widen_Hints)
 module Num_hints_bases_stmt = Stmt.Map.Make(Num_hints_bases)
 module Float_hints_bases_stmt = Stmt.Map.Make(Float_hints_bases)
@@ -32,20 +34,20 @@ module Priority_bases_stmt = Stmt.Map.Make(Base.Set)
 
 type widen_hints = {
   priority_bases: Base.Set.t Stmt.Map.t;
-  default_hints: Ival.Widen_Hints.t;
+  default_hints: IntSet.t;
   default_float_hints: Fc_float.Widen_Hints.t;
-  default_hints_by_stmt: Ival.Widen_Hints.t Stmt.Map.t;
+  default_hints_by_stmt: IntSet.t Stmt.Map.t;
   default_float_hints_by_stmt: Fc_float.Widen_Hints.t Stmt.Map.t;
-  hints_by_addr: Ival.Widen_Hints.t Base.Map.t;
+  hints_by_addr: IntSet.t Base.Map.t;
   float_hints_by_addr: Fc_float.Widen_Hints.t Base.Map.t;
-  hints_by_addr_by_stmt: Ival.Widen_Hints.t Base.Map.t Stmt.Map.t;
+  hints_by_addr_by_stmt: IntSet.t Base.Map.t Stmt.Map.t;
   float_hints_by_addr_by_stmt: Fc_float.Widen_Hints.t Base.Map.t Stmt.Map.t;
 }
 
 (* an [empty] set of hints *)
 let empty = {
   priority_bases = Stmt.Map.empty;
-  default_hints = Ival.Widen_Hints.empty;
+  default_hints = IntSet.empty;
   default_float_hints = Fc_float.Widen_Hints.empty;
   default_hints_by_stmt = Stmt.Map.empty;
   default_float_hints_by_stmt = Stmt.Map.empty;
@@ -62,7 +64,7 @@ include Datatype.Make(struct
     let structural_descr =
       Structural_descr.t_tuple
         [| Priority_bases_stmt.packed_descr;
-           Ival.Widen_Hints.packed_descr;
+           IntSet.packed_descr;
            Fc_float.Widen_Hints.packed_descr;
            Num_hints_stmt.packed_descr;
            Float_hints_stmt.packed_descr;
@@ -83,7 +85,7 @@ include Datatype.Make(struct
              float_hints_by_addr_by_stmt = Stmt.Map.empty;
              hints_by_addr_by_stmt = Stmt.Map.empty
            })
-        Ival.Widen_Hints.reprs Fc_float.Widen_Hints.reprs
+        IntSet.reprs Fc_float.Widen_Hints.reprs
     let mem_project = Datatype.never_any_project
   end)
 
@@ -93,24 +95,24 @@ let join wh1 wh2 =
       Stmt.Map.union (map_union Base.Set.union)
         wh1.priority_bases wh2.priority_bases;
     default_hints =
-      Ival.Widen_Hints.union wh1.default_hints wh2.default_hints;
+      IntSet.union wh1.default_hints wh2.default_hints;
     default_float_hints =
       Fc_float.Widen_Hints.union wh1.default_float_hints wh2.default_float_hints;
     default_hints_by_stmt =
-      Stmt.Map.union (map_union Ival.Widen_Hints.union)
+      Stmt.Map.union (map_union IntSet.union)
         wh1.default_hints_by_stmt wh2.default_hints_by_stmt;
     default_float_hints_by_stmt =
       Stmt.Map.union (map_union Fc_float.Widen_Hints.union)
         wh1.default_float_hints_by_stmt wh2.default_float_hints_by_stmt;
     hints_by_addr =
-      Base.Map.union (map_union Ival.Widen_Hints.union)
+      Base.Map.union (map_union IntSet.union)
         wh1.hints_by_addr wh2.hints_by_addr;
     float_hints_by_addr =
       Base.Map.union (map_union Fc_float.Widen_Hints.union)
         wh1.float_hints_by_addr wh2.float_hints_by_addr;
     hints_by_addr_by_stmt =
       Stmt.Map.union
-        (map_union (Base.Map.union (map_union Ival.Widen_Hints.union)))
+        (map_union (Base.Map.union (map_union IntSet.union)))
         wh1.hints_by_addr_by_stmt wh2.hints_by_addr_by_stmt;
     float_hints_by_addr_by_stmt =
       Stmt.Map.union
@@ -144,31 +146,31 @@ let pretty fmt wh =
      hints_by_addr_by_stmt: %a@\n\
      float_hints_by_addr_by_stmt: %a@]"
     (pp_bindings pp_stmt Base.Set.pretty) (Stmt.Map.bindings wh.priority_bases)
-    Ival.Widen_Hints.pretty wh.default_hints
+    IntSet.pretty wh.default_hints
     Fc_float.Widen_Hints.pretty wh.default_float_hints
     (Pretty_utils.pp_list ~sep:",@ "
-       (Pretty_utils.pp_pair ~sep:" -> " pp_stmt Ival.Widen_Hints.pretty))
+       (Pretty_utils.pp_pair ~sep:" -> " pp_stmt IntSet.pretty))
     (Stmt.Map.bindings wh.default_hints_by_stmt)
     (Pretty_utils.pp_list ~sep:",@ "
        (Pretty_utils.pp_pair ~sep:" -> " pp_stmt Fc_float.Widen_Hints.pretty))
     (Stmt.Map.bindings wh.default_float_hints_by_stmt)
     (Pretty_utils.pp_list ~sep:",@ "
-       (Pretty_utils.pp_pair ~sep:" -> " Base.pretty Ival.Widen_Hints.pretty))
+       (Pretty_utils.pp_pair ~sep:" -> " Base.pretty IntSet.pretty))
     (Base.Map.bindings wh.hints_by_addr)
     (Pretty_utils.pp_list ~sep:",@ "
        (Pretty_utils.pp_pair ~sep:" -> " Base.pretty Fc_float.Widen_Hints.pretty))
     (Base.Map.bindings wh.float_hints_by_addr)
-    (pp_bindings pp_stmt (pp_base_map Ival.Widen_Hints.pretty))
+    (pp_bindings pp_stmt (pp_base_map IntSet.pretty))
     (Stmt.Map.bindings wh.hints_by_addr_by_stmt)
     (pp_bindings pp_stmt (pp_base_map Fc_float.Widen_Hints.pretty))
     (Stmt.Map.bindings wh.float_hints_by_addr_by_stmt)
 
 let hints_for_base default_hints hints_by_base b =
   let widen_hints_null =
-    try Ival.Widen_Hints.union (Base.Map.find b hints_by_base) default_hints
+    try IntSet.union (Base.Map.find b hints_by_base) default_hints
     with Not_found -> default_hints
   in
-  let widen_zero = Ival.Widen_Hints.singleton Integer.zero in
+  let widen_zero = IntSet.singleton Integer.zero in
   (function
     | Base.Null -> widen_hints_null
     | b ->
@@ -181,7 +183,7 @@ let hints_for_base default_hints hints_by_base b =
            anyway. This also works great for constant strings (this computes
            the offset of the null terminator). *)
         let bound = Integer.(pred (e_div (succ m) eight)) in
-        Ival.Widen_Hints.add bound widen_zero
+        IntSet.add bound widen_zero
       | Base.Empty | Base.Invalid -> widen_zero
   )
 
@@ -190,7 +192,7 @@ let hints_from_keys stmt h =
     try
       let at_stmt = Stmt.Map.find stmt h.hints_by_addr_by_stmt in
       Base.Map.union
-        (fun _b s1 s2 -> Some (Ival.Widen_Hints.union s1 s2))
+        (fun _b s1 s2 -> Some (IntSet.union s1 s2))
         at_stmt h.hints_by_addr
     with Not_found -> h.hints_by_addr
   in
@@ -209,7 +211,7 @@ let hints_from_keys stmt h =
   let int_default =
     try
       let at_stmt = Stmt.Map.find stmt h.default_hints_by_stmt in
-      Ival.Widen_Hints.union h.default_hints at_stmt
+      IntSet.union h.default_hints at_stmt
     with Not_found -> h.default_hints
   in
   let float_default =
@@ -256,7 +258,7 @@ let float_hints stmto baseo hints =
 
 (* default set of hints. Depends on the machdep *)
 let default () =
-  let int_default = Ival.Widen_Hints.of_list (List.map Integer.of_int [-1;0;1]) in
+  let int_default = IntSet.of_list (List.map Integer.of_int [-1;0;1]) in
   let float_default = Fc_float.Widen_Hints.default_widen_hints in
   join (num_hints None None int_default) (float_hints None None float_default)
 

@@ -23,6 +23,8 @@
 open Cil_types
 open Cil_datatype
 
+module IntSet = Datatype.Integer.Set
+
 let dkey = Widen_hints_ext.dkey
 
 (* Note concerning all visitors and hints related to statements:
@@ -106,13 +108,13 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
           | { term_node= TLval (TVar { lv_origin = Some vi}, _)} ->
             (Base.of_varinfo vi :: lv, lint, lfloat, lt)
           | { term_node= TConst (Integer(v,_))} ->
-            (lv, Ival.Widen_Hints.add v lint, lfloat, lt)
+            (lv, IntSet.add v lint, lfloat, lt)
           | _ ->
             match constFoldTermToLogicReal t.term_node with
             | Some f -> (lv, lint, Fc_float.Widen_Hints.add f lfloat, lt)
             | None -> (lv, lint, lfloat, t::lt)
         in
-        match List.fold_left f ([], Ival.Widen_Hints.empty, Fc_float.Widen_Hints.empty, []) l with
+        match List.fold_left f ([], IntSet.empty, Fc_float.Widen_Hints.empty, []) l with
         | (vars, int_thresholds, float_thresholds, []) ->
           (* the annotation is empty or contains only variables *)
           if vars = [] then begin
@@ -185,7 +187,7 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
         | None -> ()
         | Some i ->
           let base = Base.of_varinfo vi in
-          let threshold = Ival.Widen_Hints.singleton (Integer.pred i) in
+          let threshold = IntSet.singleton (Integer.pred i) in
           self#add_int_thresholds ~base threshold
       in
       List.iter process (find_candidates exp);
@@ -201,7 +203,7 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
       match e with
       | {enode=(CastE(_, { enode=Lval (Var varinfo, _)})
                | Lval (Var varinfo, _))} ->
-        let int_thresholds = Ival.Widen_Hints.singleton Integer.zero in
+        let int_thresholds = IntSet.singleton Integer.zero in
         let base = Base.of_varinfo varinfo in
         self#add_int_thresholds ~base int_thresholds;
         Cil.DoChildren
@@ -209,7 +211,7 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
     and comparison_visit add1 add2 e1 e2 =
       let add base set =
         let int_thresholds =
-          List.fold_right Ival.Widen_Hints.add set Ival.Widen_Hints.empty
+          List.fold_right IntSet.add set IntSet.empty
         in
         self#add_int_thresholds ~base int_thresholds
       in
@@ -248,7 +250,7 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
     let add_hint vidx size shift =
       let bound1 = Integer.sub size shift in
       let bound2 = Integer.(sub bound1 one) in
-      let int_thresholds = Ival.Widen_Hints.of_list [bound1; bound2] in
+      let int_thresholds = IntSet.of_list [bound1; bound2] in
       self#add_int_thresholds ~base:(Base.of_varinfo vidx) int_thresholds
     in
     (* Find inside [idx] a variable on which we will add hints. [shift] is an
@@ -348,7 +350,7 @@ let thresholds_of_threshold_terms hts =
             "widening hint mixing integers and floats: %a"
             Printer.pp_term ht;
         has_int := true;
-        Ival.Widen_Hints.add i int_acc, float_acc
+        IntSet.add i int_acc, float_acc
       | Real_th f ->
         if !has_int then
           Self.abort ~source:(fst ht.term_loc)
@@ -356,7 +358,7 @@ let thresholds_of_threshold_terms hts =
             Printer.pp_term ht;
         has_float := true;
         int_acc, Fc_float.Widen_Hints.add f float_acc
-    ) (Ival.Widen_Hints.empty, Fc_float.Widen_Hints.empty) hts
+    ) (IntSet.empty, Fc_float.Widen_Hints.empty) hts
 
 class hints_visitor init_widen_hints global = object(self)
   inherit Visitor.frama_c_inplace
@@ -380,10 +382,10 @@ class hints_visitor init_widen_hints global = object(self)
            (Pretty_utils.pp_opt ~none:(format_of_string "for all variables")
               Base.pretty) base
            (fun fmt ->
-              if Ival.Widen_Hints.is_empty int_thresholds then
+              if IntSet.is_empty int_thresholds then
                 Format.fprintf fmt "float:%a" Fc_float.Widen_Hints.pretty float_thresholds
               else
-                Ival.Widen_Hints.pretty fmt int_thresholds);
+                IntSet.pretty fmt int_thresholds);
          let new_int_hints =
            Widen_type.num_hints None (* see note above *) base int_thresholds
          in
@@ -444,7 +446,7 @@ type dynamic_hint = {
 (* dynamic, used to detect when a new base needs to be added to the global
    widening hints *);
   lv : exp * offset; (* static, parsed once from the AST *)
-  int_thresholds : Ival.Widen_Hints.t; (* static, computed only once *)
+  int_thresholds : IntSet.t; (* static, computed only once *)
   float_thresholds : Fc_float.Widen_Hints.t; (* static, computed only once *)
 }
 
@@ -458,7 +460,7 @@ module DynamicHintDatatype = Datatype.Make(struct
       Structural_descr.t_tuple
         [| Base.Hptset.packed_descr;
            ExpOffset.packed_descr;
-           Ival.Widen_Hints.packed_descr;
+           IntSet.packed_descr;
            Fc_float.Widen_Hints.packed_descr |]
     let reprs =
       Extlib.product
@@ -466,7 +468,7 @@ module DynamicHintDatatype = Datatype.Make(struct
                         lv = (Exp.dummy, NoOffset);
                         int_thresholds = wh;
                         float_thresholds = fh })
-        Ival.Widen_Hints.reprs
+        IntSet.reprs
         Fc_float.Widen_Hints.reprs
     let mem_project = Datatype.never_any_project
   end)
@@ -580,7 +582,7 @@ let dynamic_widen_hints_hook _callstack stmt states =
                     Self.debug ~source ~dkey
                       "adding new base due to dynamic widen hint: %a, %a%a"
                       Base.pretty base
-                      Ival.Widen_Hints.pretty dhint.int_thresholds
+                      IntSet.pretty dhint.int_thresholds
                       Fc_float.Widen_Hints.pretty dhint.float_thresholds;
                     let int_hint_for_base =
                       Widen_type.num_hints None (Some base) dhint.int_thresholds
