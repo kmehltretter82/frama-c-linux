@@ -733,9 +733,7 @@ val combineAttributes : combineWhat -> attribute list -> attributes -> attribute
 type combineFunction =
   {
     typ_combine : combineFunction ->
-      bool -> combineWhat -> typ -> typ -> typ;
-    (** [bool] is about strictness in return context.
-        See [StrictReturnTypes] in [combineTypeGen] *)
+      strictReturnTypes:bool -> combineWhat -> typ -> typ -> typ;
 
     enum_combine : combineFunction ->
       enuminfo -> enuminfo -> enuminfo;

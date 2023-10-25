@@ -1143,7 +1143,7 @@ let matchCompInfoGen (combineF : combineFunction)
                        should be the same.
                        We do not force this for now, but could do it. *)
                     let newtype =
-                      combineF.typ_combine combineF true
+                      combineF.typ_combine combineF ~strictReturnTypes:true
                         CombineOther oldf.ftype f.ftype in
                     (* Change the type in the representative *)
                     oldf.ftype <- newtype)
@@ -1212,7 +1212,7 @@ let matchTypeInfoGen (combineF : combineFunction)
     (* Check that they are the same *)
     Fidx.setTempFidx ~oldfidx:oldtnode.nfidx ~fidx:tnode.nfidx (fun () ->
         (try
-           ignore (combineF.typ_combine combineF true
+           ignore (combineF.typ_combine combineF ~strictReturnTypes:true
                      CombineOther oldti.ttype ti.ttype);
          with (Cannot_combine reason | Failure reason) ->
            let msg =
@@ -1235,7 +1235,7 @@ let matchTypeInfoGen (combineF : combineFunction)
 let conflict_detected = ref false
 
 let combines = {
-  typ_combine = (fun combF b what oldt t ->
+  typ_combine = (fun combF ~strictReturnTypes what oldt t ->
       let find_names_file = H.find fileNames in
       let oldfidx = Fidx.get_oldfidx () in
       let fidx = Fidx.get_fidx () in
@@ -1256,7 +1256,7 @@ let combines = {
           end
       in
       combineTypesGen ~emitwith
-        combF ~strictInteger:false ~strictReturnTypes:b
+        combF ~strictInteger:false ~strictReturnTypes
         what oldt t);
   enum_combine = (fun _ oldei ei ->
       matchEnumInfoGen oldei ei;
@@ -1278,7 +1278,8 @@ let matchCompInfo = setFidCall (matchCompInfoGen combines)
 
 let matchTypeInfo = setFidCall (matchTypeInfoGen combines)
 
-let combineTypes what = setFidCall (combines.typ_combine combines true what)
+let combineTypes what =
+  setFidCall (combines.typ_combine combines ~strictReturnTypes:true what)
 
 (* Match two compinfos and throw a Failure if they do not match *)
 
