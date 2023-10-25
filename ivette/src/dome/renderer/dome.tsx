@@ -765,6 +765,53 @@ export function useTimer(period: number, callback: () => void): void
   }, [period, callback]);
 }
 
+/** Protected callback against unmounted component.
+
+   The returned callback will not fired only when the component is mounted.
+
+   Unless constant, first create the callback with `React.useCallback()`, then
+   give it to `useActive()`.
+ */
+export function useActive<A>(
+  callback: (arg: A) => void,
+): (arg:A) => void
+{
+  const active = React.useRef(false);
+  React.useEffect(() => {
+    active.current = true;
+    return () => { active.current = false; };
+  }, []);
+  return React.useCallback((arg: A) => {
+    if (active.current) callback(arg);
+  }, [callback]);
+}
+
+/** Debounced callback (period in milliseconds).
+
+   The debounceded callback will not be fired when the component is unmounted.
+
+   Unless constant, first create the callback with `React.useCallback()`, then
+   give it to `useDebounced()`.
+ */
+export function useDebounced<A>(
+  period: number,
+  callback: (arg: A) => void
+): (arg:A) => void
+{
+  const active = React.useRef(false);
+  React.useEffect(() => {
+    active.current = true;
+    return () => { active.current = false; };
+  }, []);
+  return React.useMemo(() =>
+    _.debounce(
+      (arg: A) => {
+        if (active.current) callback(arg);
+      }, period
+    ), [callback, period]
+  );
+}
+
 // --------------------------------------------------------------------------
 // --- Sampling Hookds
 // --------------------------------------------------------------------------
