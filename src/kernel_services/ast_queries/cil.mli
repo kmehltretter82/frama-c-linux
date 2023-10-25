@@ -768,7 +768,7 @@ type combineFunction =
     @since 28.0-Nickel
 *)
 val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
-  ?strictInteger:bool -> ?strictReturnTypes:bool ->
+  ?strictInteger:bool -> strictReturnTypes:bool ->
   combineWhat -> typ -> typ -> typ
 
 (** Specialized verison of [combineTypesGen], we suppore here that

@@ -6074,7 +6074,7 @@ type combineFunction =
    because in some cases (e.g. string literals and char pointers) it is
    allowed to have differences, while in others we want to be more strict. *)
 let combineTypesGen ?emitwith (combF : combineFunction)
-    ?(strictInteger=true) ?(strictReturnTypes=false)
+    ?(strictInteger=true) ~strictReturnTypes
     (what : combineWhat) (oldt : typ) (t : typ) : typ =
   let warning = Kernel.warning ?emitwith in
   match oldt, t with
@@ -6289,8 +6289,8 @@ let default_combines = {
 }
 
 
-let combineTypes ?strictReturnTypes what (oldt: typ) (t: typ) : typ =
-  combineTypesGen default_combines ?strictReturnTypes what oldt t
+let combineTypes ?(strictReturnTypes=false) what (oldt: typ) (t: typ) : typ =
+  combineTypesGen default_combines ~strictReturnTypes what oldt t
 
 (***************** Compatibility ******)
 
