@@ -32,9 +32,13 @@ include Datatype.S_with_collections
 
 include Eva_lattice_type.Full_AI_Lattice_with_cardinality with type t := t
 
-type widen_hint = Integer.t * Datatype.Integer.Set.t
+(** Hints for the widening: set of relevant thresholds. *)
+type widen_hint = Datatype.Integer.Set.t
 
-val widen: widen_hint -> t -> t -> t
+(** [widen ~size ~hint t1 t2] is an over-approximation of [join t1 t2].
+    [size] is the size (in bits) of the widened value, [hint] is a set of
+    relevant thresholds for the widened interval bounds. *)
+val widen: ?size:Integer.t -> ?hint:widen_hint -> t -> t -> t
 
 (** Checks that the interval defined by [min, max, rem, modu] is well formed. *)
 val check:

@@ -26,15 +26,16 @@ open Lattice_type
 
 module type S = sig
 
-  type numerical_widen_hint
-  type size_widen_hint = Integer.t
-
   include Bounded_Join_Semi_Lattice
   include With_Cardinal_One with type t := t
 
-  type widen_hint = size_widen_hint * numerical_widen_hint
+  (** Hints for the widening. *)
+  type widen_hint
 
-  val widen : widen_hint -> t -> t -> t
+  (** [widen ~size ~hint v1 v2] is an over-approximation of [join v1 v2].
+      [size] is the size (in bits) of the widened value, and [hint] is some
+      hint for the widening. *)
+  val widen : ?size:Integer.t -> ?hint:widen_hint -> t -> t -> t
 
   val pretty_typ: Cil_types.typ option -> t Pretty_utils.formatter
 

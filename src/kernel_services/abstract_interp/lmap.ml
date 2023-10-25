@@ -49,7 +49,7 @@ module Make_LOffset
      end)
     (Offsetmap: Offsetmap_sig.S
      with type v = V.t
-      and type widen_hint = V.numerical_widen_hint)
+      and type widen_hint = V.widen_hint)
     (Default_offsetmap: Default_offsetmap with type v := V.t
                                            and type offsetmap := Offsetmap.t)
 =
@@ -58,7 +58,7 @@ struct
   type v = V.t
   type offsetmap = Offsetmap.t
 
-  type widen_hint_base = V.numerical_widen_hint
+  type widen_hint_base = V.widen_hint
 
   open Default_offsetmap
 
@@ -440,7 +440,7 @@ struct
         (Hptmap_sig.PersistentCache name) UniversalPredicate
         ~decide_fast ~decide_fst ~decide_snd ~decide_both
 
-    type widen_hint = Base.Set.t * (Base.t -> V.numerical_widen_hint)
+    type widen_hint = Base.Set.t * (Base.t -> V.widen_hint)
 
     (* Precondition : m1 <= m2 *)
     let widen (wh_key_set, wh_hints: widen_hint) m1 m2 =

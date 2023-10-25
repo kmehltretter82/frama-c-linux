@@ -395,18 +395,17 @@ module Location_Bytes = struct
         ~decide_both
         m1 m2
 
-  type size_widen_hint = Ival.size_widen_hint
-  type numerical_widen_hint = Base.t -> Ival.numerical_widen_hint
-  type widen_hint = size_widen_hint * numerical_widen_hint
+  type widen_hint = Base.t -> Ival.widen_hint
 
-  let widen (size, wh) =
+  let widen ?size ?hint =
     let widen_map =
-      let decide k v1 v2 =
+      let decide base v1 v2 =
         (* Do not perform size-based widening for pointers. This will only
            delay convergence, for no real benefit. The only interesting
            bound is the validity. *)
-        let size = if Base.equal k Base.null then size else Integer.zero in
-        Ival.widen (size, wh k) v1 v2
+        let size = if Base.equal base Base.null then size else None in
+        let hint = Option.map (fun f -> f base) hint in
+        Ival.widen ?size ?hint v1 v2
       in
       M.join
         ~cache:Hptmap_sig.NoCache (* No cache, because of wh *)

@@ -111,7 +111,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
   open Format
 
   type v = V.t
-  type widen_hint = V.numerical_widen_hint
+  type widen_hint = V.widen_hint
 
   let empty = Empty
   (** All high-level functions of this module must handle a size of 0, in which
@@ -1262,13 +1262,13 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
 
   end
 
-  let widen wh t1 t2 =
+  let widen hint t1 t2 =
     (* Due to the way f_aux_merge is designed, we can obtain intervals on which
        the two bindings do not verify [is_included v1 v2]. The widening
        operations require this, so we correct the arguments here. *)
     let widen size v1 v2 =
       let v2 = if not (V.is_included v1 v2) then V.join v1 v2 else v2 in
-      V.widen (size,wh) v1 v2
+      V.widen ~size ~hint v1 v2
     in
     let f_widen = f_aux_merge_join widen in
     let rec aux t1 t2 =
@@ -2188,10 +2188,8 @@ module FullyIsotropic = struct
   let shift_bits ~topify:_ ~offset:_ ~size:_ v = v
   let cardinal_zero_or_one _ = false
 
-  let widen _wh _ m = m
-  type numerical_widen_hint =  unit
-  type size_widen_hint = Integer.t
-  type widen_hint = size_widen_hint * numerical_widen_hint
+  type widen_hint = unit
+  let widen ?size:_ ?hint:_ _ m = m
 end
 
 
