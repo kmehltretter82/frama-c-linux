@@ -26,10 +26,68 @@ type kind =
   | K_Merge
   | K_Arith
 
-module LocationLattice = struct
-  include Abstract_interp.Make_Lattice_Base (Cil_datatype.Location)
+module Location = Cil_datatype.Location
 
-  let current_loc () = inject (Cil.CurrentLoc.get ())
+module LocationLattice = struct
+
+  type t = Top | Bottom | Value of Location.t
+
+  module Datatype_Input = struct
+    include Datatype.Serializable_undefined
+
+    type nonrec t = t
+    let name = "Origin.LocationLattice"
+    let reprs = [ Top ]
+    let structural_descr =
+      Structural_descr.t_sum [| [| Location.packed_descr |] |]
+
+    let compare l1 l2 =
+      match l1, l2 with
+      | Top, Top | Bottom, Bottom -> 0
+      | Value loc1, Value loc2 -> Location.compare loc1 loc2
+      | Top, _ -> 1
+      | _, Top -> -1
+      | Bottom, _ -> -1
+      | _, Bottom -> 1
+
+    let equal l1 l2 =
+      match l1, l2 with
+      | Top, Top | Bottom, Bottom -> true
+      | Value loc1, Value loc2 -> Location.equal loc1 loc2
+      | _ -> false
+
+    let hash = function
+      | Top -> 3
+      | Bottom -> 5
+      | Value loc -> Location.hash loc * 7
+
+    let pretty fmt = function
+      | Top -> Format.fprintf fmt "Top"
+      | Bottom ->  Format.fprintf fmt "Bottom"
+      | Value loc -> Format.fprintf fmt "{%a}" Location.pretty loc
+  end
+
+  include (Datatype.Make (Datatype_Input) : Datatype.S with type t := t)
+
+  let current_loc () = Value (Cil.CurrentLoc.get ())
+
+  let join l1 l2 =
+    if l1 == l2 then l1 else
+      match l1, l2 with
+      | Top, _ | _, Top -> Top
+      | Bottom , l | l, Bottom -> l
+      | Value loc1, Value loc2 ->
+        if Location.equal loc1 loc2 then l1 else Top
+
+  let narrow l1 l2 =
+    if l1 == l2 then l1 else
+      match l1, l2 with
+      | Bottom, _ | _, Bottom -> Bottom
+      | Top , l | l, Top -> l
+      | Value loc1, Value loc2 ->
+        if Location.equal loc1 loc2 then l1 else Bottom
+
+  let meet = narrow
 end
 
 type origin =
@@ -139,7 +197,7 @@ include Datatype.Make
       let mem_project = Datatype.never_any_project
     end)
 
-let bottom = Arith(LocationLattice.bottom)
+let bottom = Arith LocationLattice.Bottom
 
 let join o1 o2 =
   let result =
