@@ -88,7 +88,7 @@ else
   echo "$NEXT_CODENAME" >VERSION_CODENAME
 
   # Opam files
-  $SED -i "s/^version: .*/version: \"$NEXT_MAJOR.$NEXT_MINOR\"/g" opam
+  $SED -i "s/^version: .*/version: \"$NEXT\"/g" opam
   $SED -i "s/\(.*\)$CURRENT_MAJOR.$CURRENT_MINOR-$CURRENT_CODENAME\(.*\)/\1$NEXT_MAJOR.$NEXT_MINOR-$NEXT_CODENAME\2/g" opam
 
   $SED -i "s/^version: .*/version: \"$NEXT_MAJOR.$NEXT_MINOR\"/g" tools/lint/frama-c-lint.opam
@@ -113,7 +113,7 @@ else
   $SED -i "s/\($WP_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$WP_CL_MSG_NEXT/g" src/plugins/wp/Changelog
 
   # API doc
-  find src -name '*.ml*' -exec $SED -i -e "s/Frama-C+dev/${NEXT}-${NEXT_CODENAME}/gI" '{}' ';'
+  find src -name '*.ml*' -exec $SED -i -e "s/Frama-C+dev/${NEXT_MAJOR}.${NEXT_MINOR}-${NEXT_CODENAME}/gI" '{}' ';'
 
   # Manuals changes
   $SED -i "s/\(^\\\\section\*{Frama-C+dev}\)/%\1\n\n\\\\section\*{$NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)}/g" \
@@ -126,6 +126,10 @@ else
     src/plugins/e-acsl/doc/userman/changes.tex
 
   # Frama-C build script
-
   $SED -i "s/(\\\\\\\"frama-c\\\\\\\" (>= [1-9][0-9]\.[0-9]))/(\\\\\\\"frama-c\\\\\\\" (>= $NEXT_MAJOR.$NEXT_MINOR))/g" bin/frama-c-build-scripts.sh
+
+  # Reference configuration
+  $SED -i "s/Frama-C [1-9][0-9]\.[0-9]/Frama-C $NEXT_MAJOR.$NEXT_MINOR/gI" \
+    reference-configuration.md
+
 fi
