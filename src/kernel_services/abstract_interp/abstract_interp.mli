@@ -92,11 +92,6 @@ module Rel : sig
   val check: rem:t -> modu:Int.t -> bool
 end
 
-module Bool : sig
-  type t = Top | True | False | Bottom
-  include Full_AI_Lattice_with_cardinality with type t := t
-end
-
 module Make_Lattice_Set
     (V : Datatype.S)
     (Set: Lattice_type.Hptset with type elt = V.t)
