@@ -395,16 +395,35 @@ module Location_Bytes = struct
         ~decide_both
         m1 m2
 
-  type widen_hint = Base.t -> Ival.widen_hint
+  type widen_hint = Ival.widen_hint
+
+  (* Computes widening thresholds according to the validity of [base]. *)
+  let validity_widen_hints base =
+    let zero = Datatype.Integer.Set.singleton Integer.zero in
+    let int_thresholds =
+      match Base.validity base with
+      | Base.Known (_, m)
+      | Base.Unknown (_, _, m)
+      | Base.Variable { Base.max_alloc = m } ->
+        (* Try the frontier of the block: further accesses are invalid
+           anyway. This also works great for constant strings (this computes
+           the offset of the null terminator). *)
+        let bound = Integer.(pred (e_div (succ m) eight)) in
+        Datatype.Integer.Set.add bound zero
+      | Base.Empty | Base.Invalid -> zero
+    in
+    int_thresholds, Fc_float.Widen_Hints.empty
 
   let widen ?size ?hint =
     let widen_map =
       let decide base v1 v2 =
-        (* Do not perform size-based widening for pointers. This will only
-           delay convergence, for no real benefit. The only interesting
-           bound is the validity. *)
-        let size = if Base.equal base Base.null then size else None in
-        let hint = Option.map (fun f -> f base) hint in
+        let size, hint =
+          if Base.is_null base then size, hint else
+            (* Do not perform size-based widening for pointers. This will only
+               delay convergence, for no real benefit. The only interesting
+               bound is the validity. *)
+            None, Some (validity_widen_hints base)
+        in
         Ival.widen ?size ?hint v1 v2
       in
       M.join

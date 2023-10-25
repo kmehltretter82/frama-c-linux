@@ -51,7 +51,7 @@ module Location_Bytes : sig
       such as [join], [narrow], etc. *)
   include Lattice_type.AI_Lattice_with_cardinal_one with type t := t
 
-  type widen_hint = Base.t -> Ival.widen_hint
+  type widen_hint = Ival.widen_hint
 
   val widen : ?size:Integer.t -> ?hint:widen_hint -> t -> t -> t
 

@@ -165,28 +165,6 @@ let pretty fmt wh =
     (pp_bindings pp_stmt (pp_base_map Fc_float.Widen_Hints.pretty))
     (Stmt.Map.bindings wh.float_hints_by_addr_by_stmt)
 
-let hints_for_base default_hints hints_by_base b =
-  let widen_hints_null =
-    try IntSet.union (Base.Map.find b hints_by_base) default_hints
-    with Not_found -> default_hints
-  in
-  let widen_zero = IntSet.singleton Integer.zero in
-  (function
-    | Base.Null -> widen_hints_null
-    | b ->
-      let validity = Base.validity b in
-      match validity with
-      | Base.Known (_, m)
-      | Base.Unknown (_, _, m)
-      | Base.Variable { Base.max_alloc = m } ->
-        (* Try the frontier of the block: further accesses are invalid
-           anyway. This also works great for constant strings (this computes
-           the offset of the null terminator). *)
-        let bound = Integer.(pred (e_div (succ m) eight)) in
-        IntSet.add bound widen_zero
-      | Base.Empty | Base.Invalid -> widen_zero
-  )
-
 let hints_from_keys stmt h =
   let int_hints_by_base =
     try
@@ -220,13 +198,15 @@ let hints_from_keys stmt h =
       Fc_float.Widen_Hints.union h.default_float_hints at_stmt
     with Not_found -> h.default_float_hints
   in
+  let int_hints_for_base b =
+    try IntSet.union (Base.Map.find b int_hints_by_base) int_default
+    with Not_found -> int_default
+  in
   let float_hints_for_base b =
     try Fc_float.Widen_Hints.union (Base.Map.find b float_hints_by_base) float_default
     with Not_found -> float_default
   in
-  prio, (fun b b' ->
-      hints_for_base int_default int_hints_by_base b b',
-      float_hints_for_base b)
+  prio, (fun b -> int_hints_for_base b, float_hints_for_base b)
 
 let var_hints stmt prio_bases =
   let bases = Base.Set.filter (fun b -> not (Base.is_function b)) prio_bases in
