@@ -32,19 +32,18 @@ open Pdg_types
 (** {3 About options} *)
 
 (** associate a level to each function in order to control how it will be
- * specialized. This is only a hint used when the tool has to make a choice,
- * but it doesn't forbid to the user to do whatever he wants
- * (like building slices for a [DontSlice] function). *)
+    specialized. This is only a hint used when the tool has to make a choice,
+    but it doesn't forbid to the user to do whatever he wants
+    (like building slices for a [DontSlice] function). *)
 type level_option =
   | DontSlice (** don't build slice for the function :
                   ie. always call the source function. *)
   | DontSliceButComputeMarks
   (** don't slice the called functions,
-   *   but compute the marks for them *)
+      but compute the marks for them *)
   | MinNbSlice (** try to use existing slices, create at most one *)
-  | MaxNbSlice (** most precise slices
-                   (but merge slices with the same visibility,
-                    even if they don't have the same marks) *)
+  | MaxNbSlice (** most precise slices (but merge slices with the same
+                   visibility, even if they don't have the same marks) *)
 
 (** {3 About function slice} *)
 
@@ -62,7 +61,7 @@ val pdg_mark_packed_descr : Structural_descr.pack
 val compare_pdg_mark : pdg_mark -> pdg_mark -> int
 
 (** Type for all the informations related to any function,
- * even if we don't have its definition.  *)
+    even if we don't have its definition.  *)
 type fct_info = {
   fi_kf : Cil_types.kernel_function;
   fi_def : Cil_types.fundec option;
@@ -119,15 +118,15 @@ and project = {
 }
 
 (** Slicing criterion at the application level.
-      When applied, they are translated into [fct_criterion]
+    When applied, they are translated into [fct_criterion]
 *)
 and appli_criterion =
   | CaGlobalData of Locations.Zone.t
   (** select all that is necessary to compute the given location. *)
   | CaCall of fct_info
   (** select all that is necessary to call the given function.
-   * Its application generates requests to add persistent selection
-   * to all the function callers. *)
+      Its application generates requests to add persistent selection
+      to all the function callers. *)
   | CaOther
 
 (** Base criterion for the functions. These are the only one that can
@@ -139,7 +138,7 @@ and appli_criterion =
 and fct_base_criterion = pdg_mark PdgMarks.select
 
 (** Used to identify a location (zone) at a given program point.
-      * The boolean tell if the point is before (true) or after the statement *)
+    The boolean tell if the point is before (true) or after the statement *)
 and loc_point = Cil_types.stmt * Locations.Zone.t * bool
 
 (** [node_or_dpds] tells how we want to select nodes,
@@ -162,16 +161,16 @@ and fct_crit =
   (** call the [called_fct] for the given call [Cil_types.stmt] *)
   | CcMissingOutputs of Cil_types.stmt * (pdg_mark PdgMarks.select) * bool
   (** this call is affected to a function that doesn't compute enough
-   * outputs : we will have to choose between adding outputs to that slice,
-   * or call another one. The boolean tells if the modifications would
-   * change the visibility of some outputs. *)
+      outputs : we will have to choose between adding outputs to that slice,
+      or call another one. The boolean tells if the modifications would
+      change the visibility of some outputs. *)
   | CcMissingInputs of Cil_types.stmt * (pdg_mark PdgMarks.select) * bool
   (** the function calls a slice that has been modified :
-   * and doesn't compute not enough inputs.
-   * We will have to choose between adding marks to this function,
-   * and call another slice.
-   * The boolean tells if the modifications would
-   * change the visibility of some inputs. *)
+      and doesn't compute not enough inputs.
+      We will have to choose between adding marks to this function,
+      and call another slice.
+      The boolean tells if the modifications would
+      change the visibility of some inputs. *)
   | CcPropagate of (pdg_mark PdgMarks.select)
   (** simply propagate the given marks *)
   | CcExamineCalls of pdg_mark PdgMarks.info_called_outputs
@@ -180,11 +179,11 @@ and fct_crit =
 and fct_criterion =  {
   cf_fct : fct_id ;
   (** Identification of the {b RESULT} of this filter.
-   * When it a a slice, it might be an existing slice that will be modified,
-    * or a new one will be created during application.
-    * When it is the source function, it means what the criterion has to be
-    * applied on each existing slice, and stored into the initial marks of
-    * the function.
+      When it a a slice, it might be an existing slice that will be modified,
+      or a new one will be created during application.
+      When it is the source function, it means what the criterion has to be
+      applied on each existing slice, and stored into the initial marks of
+      the function.
   *)
   cf_info : fct_crit
 }

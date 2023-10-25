@@ -179,7 +179,7 @@ val visitFramacVarDecl: frama_c_visitor -> varinfo -> varinfo
 val visitFramacLogicVarDecl: frama_c_visitor -> logic_var -> logic_var
 
 (** Visit an initializer, pass also the global to which this belongs and the
- * offset. *)
+    offset. *)
 val visitFramacInit: frama_c_visitor -> varinfo -> offset -> init -> init
 
 (** Visit a list of attributes *)

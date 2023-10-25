@@ -146,16 +146,16 @@ val setReturnTypeVI: varinfo -> typ -> unit
 val setReturnType: fundec -> typ -> unit
 
 (** Set the types of arguments and results as given by the function type
- * passed as the second argument. Will not copy the names from the function
- * type to the formals *)
+    passed as the second argument. Will not copy the names from the function
+    type to the formals *)
 val setFunctionType: fundec -> typ -> unit
 
 (** Set the type of the function and make formal arguments for them *)
 val setFunctionTypeMakeFormals: fundec -> typ -> unit
 
 (** Update the smaxid after you have populated with locals and formals
- * (unless you constructed those using {!Cil.makeLocalVar} or
- * {!Cil.makeTempVar}. *)
+    (unless you constructed those using {!Cil.makeLocalVar} or
+    {!Cil.makeTempVar}. *)
 val setMaxId: fundec -> unit
 
 val selfFormalsDecl: State.t
@@ -209,12 +209,12 @@ val foldGlobals: file -> ('a -> global -> 'a) -> 'a -> 'a
 val mapGlobals: file -> (global -> global) -> unit
 
 (** Find a function or function prototype with the given name in the file.
-  * If it does not exist, create a prototype with the given type, and return
-  * the new varinfo.  This is useful when you need to call a libc function
-  * whose prototype may or may not already exist in the file.
-  *
-  * Because the new prototype is added to the start of the file, you shouldn't
-  * refer to any struct or union types in the function type.*)
+    If it does not exist, create a prototype with the given type, and return
+    the new varinfo.  This is useful when you need to call a libc function
+    whose prototype may or may not already exist in the file.
+
+    Because the new prototype is added to the start of the file, you shouldn't
+    refer to any struct or union types in the function type.*)
 val findOrCreateFunc: file -> string -> typ -> varinfo
 
 (** creates an expression with a fresh id *)
@@ -235,11 +235,11 @@ val is_case_label: label -> bool
 
 
 (** CIL keeps the types at the beginning of the file and the variables at the
- * end of the file. This function will take a global and add it to the
- * corresponding stack. Its operation is actually more complicated because if
- * the global declares a type that contains references to variables (e.g. in
- * sizeof in an array length) then it will also add declarations for the
- * variables to the types stack *)
+    end of the file. This function will take a global and add it to the
+    corresponding stack. Its operation is actually more complicated because if
+    the global declares a type that contains references to variables (e.g. in
+    sizeof in an array length) then it will also add declarations for the
+    variables to the types stack *)
 val pushGlobal: global -> types: global list ref
   -> variables: global list ref -> unit
 
@@ -257,15 +257,15 @@ val range_loc: location -> location -> location
 val makeZeroInit: loc:location -> typ -> init
 
 (** Fold over the list of initializers in a Compound (not also the nested
- * ones). [doinit] is called on every present initializer, even if it is of
- * compound type. The parameters of [doinit] are: the offset in the compound
- * (this is [Field(f,NoOffset)] or [Index(i,NoOffset)]), the initializer
- * value, expected type of the initializer value, accumulator. In the case of
- * arrays there might be missing zero-initializers at the end of the list.
- * These are scanned only if [implicit] is true. This is much like
- * [List.fold_left] except we also pass the type of the initializer.
+    ones). [doinit] is called on every present initializer, even if it is of
+    compound type. The parameters of [doinit] are: the offset in the compound
+    (this is [Field(f,NoOffset)] or [Index(i,NoOffset)]), the initializer
+    value, expected type of the initializer value, accumulator. In the case of
+    arrays there might be missing zero-initializers at the end of the list.
+    These are scanned only if [implicit] is true. This is much like
+    [List.fold_left] except we also pass the type of the initializer.
 
- * This is a good way to use it to scan even nested initializers :
+    This is a good way to use it to scan even nested initializers :
     {v
   let rec myInit (lv: lval) (i: init) (acc: 'a) : 'a =
     match i with
@@ -455,12 +455,12 @@ val has_flexible_array_member: typ -> bool
 *)
 
 (** Unroll a type until it exposes a non
- * [TNamed]. Will collect all attributes appearing in [TNamed]!!! *)
+    [TNamed]. Will collect all attributes appearing in [TNamed]!!! *)
 val unrollType: typ -> typ
 
 (** Unroll all the TNamed in a type (even under type constructors such as
- * [TPtr], [TFun] or [TArray]. Does not unroll the types of fields in [TComp]
- * types. Will collect all attributes *)
+    [TPtr], [TFun] or [TArray]. Does not unroll the types of fields in [TComp]
+    types. Will collect all attributes *)
 val unrollTypeDeep: typ -> typ
 
 (** Separate out the storage-modifier name attributes *)
@@ -643,14 +643,14 @@ val pp_incorrect_array_length:
   Format.formatter -> incorrect_array_length -> unit
 
 (** Raised when {!Cil.lenOfArray} fails either because the length is [None],
-  * because it is a non-constant expression, or because it overflows an int.
+    because it is a non-constant expression, or because it overflows an int.
 *)
 exception LenOfArray of incorrect_array_length
 
 
 (** Call to compute the array length as present in the array type, to an
-  * integer. Raises {!Cil.LenOfArray} if not able to compute the length, such
-  * as when there is no length or the length is not a constant. *)
+    integer. Raises {!Cil.LenOfArray} if not able to compute the length, such
+    as when there is no length or the length is not a constant. *)
 val lenOfArray: exp option -> int
 val lenOfArray64: exp option -> Integer.t
 
@@ -663,8 +663,8 @@ type existsAction =
     ExistsTrue                          (** We have found it *)
   | ExistsFalse                         (** Stop processing this branch *)
   | ExistsMaybe                         (** This node is not what we are
-                                         * looking for but maybe its
-                                         * successors are *)
+                                            looking for but maybe its
+                                            successors are *)
 
 (** Scans a type by applying the function on all elements.
     When the function returns ExistsTrue, the scan stops with
@@ -678,13 +678,13 @@ val existsType: (typ -> existsAction) -> typ -> bool
 
 
 (** Given a function type split it into return type,
- * arguments, is_vararg and attributes. An error is raised if the type is not
- * a function type *)
+    arguments, is_vararg and attributes. An error is raised if the type is not
+    a function type *)
 val splitFunctionType:
   typ -> typ * (string * typ * attributes) list option * bool * attributes
 
 (** Same as {!Cil.splitFunctionType} but takes a varinfo. Prints a nicer
- * error message if the varinfo is not for a function *)
+    error message if the varinfo is not for a function *)
 val splitFunctionTypeVI:
   varinfo ->
   typ * (string * typ * attributes) list option * bool * attributes
@@ -921,20 +921,20 @@ val isBitfield: lval -> bool
 val lastOffset: offset -> offset
 
 (** Add an offset at the end of an lvalue. Make sure the type of the lvalue
- * and the offset are compatible. *)
+    and the offset are compatible. *)
 val addOffsetLval: offset -> lval -> lval
 
 (** [addOffset o1 o2] adds [o1] to the end of [o2]. *)
 val addOffset:     offset -> offset -> offset
 
 (** Remove ONE offset from the end of an lvalue. Returns the lvalue with the
- * trimmed offset and the final offset. If the final offset is [NoOffset]
- * then the original [lval] did not have an offset. *)
+    trimmed offset and the final offset. If the final offset is [NoOffset]
+    then the original [lval] did not have an offset. *)
 val removeOffsetLval: lval -> lval * offset
 
 (** Remove ONE offset from the end of an offset sequence. Returns the
- * trimmed offset and the final offset. If the final offset is [NoOffset]
- * then the original [lval] did not have an offset. *)
+    trimmed offset and the final offset. If the final offset is [NoOffset]
+    then the original [lval] did not have an offset. *)
 val removeOffset:   offset -> offset * offset
 
 (** Compute the type of an lvalue *)
@@ -983,9 +983,9 @@ val mone: loc:Location.t -> exp
 val kinteger64: loc:location -> ?repr:string -> ?kind:ikind -> Integer.t -> exp
 
 (** Construct an integer of a given kind. Converts the integer to int64 and
-  * then uses kinteger64. This might truncate the value if you use a kind
-  * that cannot represent the given integer. This can only happen for one of
-  * the Char or Short kinds *)
+    then uses kinteger64. This might truncate the value if you use a kind
+    that cannot represent the given integer. This can only happen for one of
+    the Char or Short kinds *)
 val kinteger: loc:location -> ikind -> int -> exp
 
 (** Construct an integer of kind IInt. You can use this always since the
@@ -1317,10 +1317,6 @@ val mkStmtCfgBlock: stmt list -> stmt
 val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
   instr -> stmt
 
-(** Try to compress statements so as to get maximal basic blocks.
- * use this instead of List.@ because you get fewer basic blocks *)
-(*val compactStmts: stmt list -> stmt list*)
-
 (** Returns an empty statement (of kind [Instr]). See [mkStmt] for [ghost] and
     [valid_sid] arguments.
 *)
@@ -1471,7 +1467,7 @@ val addAttributes: attribute list -> attributes -> attributes
 val dropAttribute: string -> attributes -> attributes
 
 (** Remove all attributes with names appearing in the string list.
- *  Maintains the attributes in sorted order *)
+    Maintains the attributes in sorted order *)
 val dropAttributes: string list -> attributes -> attributes
 
 (** A block marked with this attribute is known to be a ghost else.
@@ -2086,8 +2082,8 @@ val doVisitList:
 (** {3 Visitor's entry points} *)
 
 (** Visit a file. This will re-cons all globals TWICE (so that it is
- * tail-recursive). Use {!Cil.visitCilFileSameGlobals} if your visitor will
- * not change the list of globals.
+    tail-recursive). Use {!Cil.visitCilFileSameGlobals} if your visitor will
+    not change the list of globals.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 val visitCilFileCopy: cilVisitor -> file -> file
 
@@ -2191,7 +2187,7 @@ val visitCilType: cilVisitor -> typ -> typ
 val visitCilVarDecl: cilVisitor -> varinfo -> varinfo
 
 (** Visit an initializer, pass also the global to which this belongs and the
- * offset. *)
+    offset. *)
 val visitCilInit: cilVisitor -> varinfo -> offset -> init -> init
 
 (** Visit a list of attributes *)
@@ -2285,8 +2281,8 @@ val constFoldVisitor: bool -> cilVisitor
 (* ************************************************************************* *)
 
 (** A reference to the current location. If you are careful to set this to
- * the current location then you can use some built-in logging functions that
- * will print the location. *)
+    the current location then you can use some built-in logging functions that
+    will print the location. *)
 module CurrentLoc: State_builder.Ref with type data = location
 
 (** Pretty-print [(Cil.CurrentLoc.get ())] *)
@@ -2346,17 +2342,17 @@ exception SizeOfError of string * typ
 val unsignedVersionOf : ikind -> ikind
 
 (** The signed integer kind for a given size (unsigned if second argument
- * is true). Raises Not_found if no such kind exists *)
+    is true). Raises Not_found if no such kind exists *)
 val intKindForSize : int -> bool -> ikind
 
 (** The float kind for a given size. Raises Not_found
- *  if no such kind exists *)
+    if no such kind exists *)
 val floatKindForSize : int-> fkind
 
 (** The size of a type, in bits. Trailing padding is added for structs and
- * arrays. Raises {!Cil.SizeOfError} when it cannot compute the size. This
- * function is architecture dependent, so you should only call this after you
- * call {!Cil.initCIL}. Remember that on GCC sizeof(void) is 1! *)
+    arrays. Raises {!Cil.SizeOfError} when it cannot compute the size. This
+    function is architecture dependent, so you should only call this after you
+    call {!Cil.initCIL}. Remember that on GCC sizeof(void) is 1! *)
 val bitsSizeOf: typ -> int
 
 (** The size of a type, in bytes. Raises {!Cil.SizeOfError} when it cannot
@@ -2392,8 +2388,8 @@ val intTypeIncluded: ikind -> ikind -> bool
 val frank: fkind -> int
 
 (** Represents an integer as for a given kind.
- * Returns a flag saying whether the value was changed
- * during truncation (because it was too large to fit in k). *)
+    Returns a flag saying whether the value was changed
+    during truncation (because it was too large to fit in k). *)
 val truncateInteger64: ikind -> Integer.t -> Integer.t * bool
 
 (** Returns the maximal value representable in a signed integer type of the
@@ -2430,14 +2426,14 @@ exception Not_representable
 val intKindForValue: Integer.t -> bool -> ikind
 
 (** The size of a type, in bytes. Returns a constant expression or a "sizeof"
- * expression if it cannot compute the size. This function is architecture
- * dependent, so you should only call this after you call {!Cil.initCIL}.  *)
+    expression if it cannot compute the size. This function is architecture
+    dependent, so you should only call this after you call {!Cil.initCIL}.  *)
 val sizeOf: loc:location -> typ -> exp
 
 (** The minimum alignment (in bytes) for a type. This function is
- * architecture dependent, so you should only call this after you call
- * {!Cil.initCIL}.
- * Raises {!SizeOfError} when it cannot compute the alignment. *)
+    architecture dependent, so you should only call this after you call
+    {!Cil.initCIL}.
+    @raise {!SizeOfError} when it cannot compute the alignment. *)
 val bytesAlignOf: typ -> int
 
 (** [intOfAttrparam a] tries to const-fold [a] into a numeric value.
@@ -2446,17 +2442,17 @@ val bytesAlignOf: typ -> int
 val intOfAttrparam: attrparam -> int option
 
 (** Give a type of a base and an offset, returns the number of bits from the
- * base address and the width (also expressed in bits) for the subobject
- * denoted by the offset. Raises {!Cil.SizeOfError} when it cannot compute
- * the size. This function is architecture dependent, so you should only call
- * this after you call {!Cil.initCIL}. *)
+    base address and the width (also expressed in bits) for the subobject
+    denoted by the offset. Raises {!Cil.SizeOfError} when it cannot compute
+    the size. This function is architecture dependent, so you should only call
+    this after you call {!Cil.initCIL}. *)
 val bitsOffset: typ -> offset -> int * int
 
 (** Give a field, returns the number of bits from the structure or union
- * containing the field and the width (also expressed in bits) for the subobject
- * denoted by the field. Raises {!Cil.SizeOfError} when it cannot compute
- * the size. This function is architecture dependent, so you should only call
- * this after you call {!Cil.initCIL}. *)
+    containing the field and the width (also expressed in bits) for the subobject
+    denoted by the field. Raises {!Cil.SizeOfError} when it cannot compute
+    the size. This function is architecture dependent, so you should only call
+    this after you call {!Cil.initCIL}. *)
 val fieldBitsOffset: fieldinfo -> int * int
 
 (** Like map but try not to make a copy of the list *)

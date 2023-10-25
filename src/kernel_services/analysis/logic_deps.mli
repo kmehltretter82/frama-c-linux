@@ -41,7 +41,7 @@ val mk_ctx_stmt_annot: kernel_function -> stmt -> ctx
 type t = {before:bool ; ki:stmt ; zone:Locations.Zone.t}
 type zone_info = (t list) option
 (** list of zones at some program points.
- *   None means that the computation has failed. *)
+    None means that the computation has failed. *)
 
 type decl = {var: Cil_datatype.Varinfo.Set.t ; (* related to vars of the annot *)
              lbl: Cil_datatype.Logic_label.Set.t} (* related to labels of the annot *)

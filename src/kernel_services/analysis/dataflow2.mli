@@ -29,7 +29,7 @@ type 't action =
     Default (** The default action *)
   | Done of 't (** Do not do the default action. Use this result *)
   | Post of ('t -> 't) (** The default action, followed by the given
-                        * transformer *)
+                           transformer *)
 
 type 't stmtaction =
     SDefault   (** The default action *)
