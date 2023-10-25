@@ -21,7 +21,7 @@ default:
 ### VARIABLES
 
 variables:
-  DEFAULT: "stable/nickel"
+  DEFAULT: "master"
   OCAML: "4.13"
   PUBLISH: "no"
   RELEASE: "no"
