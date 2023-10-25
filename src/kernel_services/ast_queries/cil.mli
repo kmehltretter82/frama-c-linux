@@ -589,7 +589,7 @@ val isLogicFunPtrType: logic_type -> bool
 
 (** Check if a type is a transparent union, and return the first field
 
-    @since Frama-C+dev *)
+    @since 28.0-Nickel *)
 val isTransparentUnion : typ -> fieldinfo option
 
 (** True if the argument is the type for reified C types. *)
@@ -614,22 +614,22 @@ val argsToPairOfLists:
 val isArrayType: typ -> bool
 
 (** True if the argument is an array type without size
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val isUnsizedArrayType: typ -> bool
 
 (** True if the argument is a sized array type
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val isSizedArrayType: typ -> bool
 
 (** True if the argument is a struct
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val isStructType: typ -> bool
 
 (** True if the argument is a union type
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val isUnionType: typ -> bool
 
@@ -695,7 +695,7 @@ exception Cannot_combine of string
 (** Used in {!combineTypes} and {!combineTypesGen} to indicate what we want to
     combine.
 
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 type combineWhat =
   | CombineFundef of bool
@@ -719,7 +719,7 @@ type combineWhat =
       (compatible, but with different qualifiers) declarations;
     - else, perform the union of old and new attributes.
 
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val combineAttributes : combineWhat -> attribute list -> attributes -> attributes
 
@@ -728,7 +728,7 @@ val combineAttributes : combineWhat -> attribute list -> attributes -> attribute
     {!combineTypesGen}.
     In pratice, the first argument of each field is a recursive definition.
 
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 type combineFunction =
   {
@@ -767,7 +767,7 @@ type combineFunction =
     @raise Cannot_combine with an explanation when the type cannot be
            combined.
 
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
   ?strictInteger:bool -> ?strictReturnTypes:bool ->
@@ -776,14 +776,14 @@ val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
 (** Specialized verison of [combineTypesGen], we suppore here that
     if two global symbols are equal, then they are the same object.
 
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val combineTypes : ?strictReturnTypes:bool -> combineWhat -> typ -> typ -> typ
 
 (** How type qualifiers must be checked when checking for types compatibility
     with {!areCompatibleTypes} and {!compatibleTypes}.
 
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 type qualifier_check_context =
   | Identical (** Identical qualifiers. *)
@@ -804,7 +804,7 @@ type qualifier_check_context =
     [context] indicates how check the compatibility of qualifiers.
     Other arguments are the same than [combineTypes].
 
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val areCompatibleTypes :
   ?strictReturnTypes:bool -> ?context:qualifier_check_context -> typ -> typ -> bool
@@ -814,7 +814,7 @@ val areCompatibleTypes :
 
     @raise Cannot_combine if [oldt] and [newt] are not compatible.
 
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val compatibleTypes :
   ?strictReturnTypes:bool -> ?context:qualifier_check_context -> typ -> typ -> typ
@@ -1000,19 +1000,19 @@ val isInteger: exp -> Integer.t option
     be considered as having a constant content. Defaults to
     [false].
 
-    @before Frama-C+dev [is_varinfo_cst] does not exist
+    @before 28.0-Nickel [is_varinfo_cst] does not exist
 *)
 val isConstant: ?is_varinfo_cst:(varinfo -> bool) -> exp -> bool
 
 (** True if the expression is a compile-time integer constant
 
-    @before Frama-C+dev [is_varinfo_cst] does not exist
+    @before 28.0-Nickel [is_varinfo_cst] does not exist
 *)
 val isIntegerConstant: ?is_varinfo_cst:(varinfo -> bool) -> exp -> bool
 
 (** True if the given offset contains only field names or constant indices.
 
-    @before Frama-C+dev [is_varinfo_cst] does not exist
+    @before 28.0-Nickel [is_varinfo_cst] does not exist
 *)
 val isConstantOffset: ?is_varinfo_cst:(varinfo -> bool) -> offset -> bool
 
@@ -1024,7 +1024,7 @@ val isZero: exp -> bool
     which are the two null pointer constants in the standard, or the cast of
     a null pointer (constant or not) into a pointer type.
 
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val is_nullptr: exp -> bool
 
@@ -1172,7 +1172,7 @@ val need_cast: ?force:bool -> typ -> typ -> bool
     This applies only to implicit casts. Casts already present
     in the source code are exempt from this hook.
 
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val typeForInsertedCast: (exp -> typ -> typ -> typ) ref
 
@@ -1193,7 +1193,7 @@ val typeForInsertedCast: (exp -> typ -> typ -> typ) ref
     - Cast, in both directions, between pointer to an object type and pointer
       to a function type.
 
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val checkCast:
   ?context:qualifier_check_context ->
@@ -1212,7 +1212,7 @@ val checkCast:
     unless [force] is [true] (default is [false]).
     Cast from [oldt] to [newt], returning the new type and the new expression.
 
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val mkCastTGen: ?check:bool -> ?context:qualifier_check_context ->
   ?fromsource:bool -> ?force:bool -> oldt:typ -> newt:typ -> exp -> typ * exp
@@ -1222,13 +1222,13 @@ val mkCastTGen: ?check:bool -> ?context:qualifier_check_context ->
     is [true] (default is [false]).
     Emit an error or warning if [check] is true and the cast is invalid.
     @before 23.0-Vanadium different order of arguments.
-    @before Frama-C+dev no [check] argument, it was always [false].
+    @before 28.0-Nickel no [check] argument, it was always [false].
 *)
 val mkCastT: ?check:bool -> ?force:bool -> oldt:typ -> newt:typ -> exp -> exp
 
 (** Like {!Cil.mkCastT}, but uses [typeOf] to get [oldt].
     @before 23.0-Vanadium different order of arguments.
-    @before Frama-C+dev no [check] argument, it was always [false].
+    @before 28.0-Nickel no [check] argument, it was always [false].
 *)
 val mkCast: ?check:bool -> ?force:bool -> newt:typ -> exp -> exp
 
@@ -1563,7 +1563,7 @@ val setTypeAttrs: typ -> attributes -> typ
 (** Add some attributes to a type.
     [combine] explains how to combine attributes. Default is [addAttributes].
 
-    @before Frama-C+dev [combine] does not exist *)
+    @before 28.0-Nickel [combine] does not exist *)
 val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->
   attribute list -> typ -> typ
 

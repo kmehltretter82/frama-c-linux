@@ -43,7 +43,7 @@ val terminates_deps : t -> Property.Set.t
 val is_entry_point : Kernel_function.t -> bool
 (** @return true iff the given argument should always be considered as the main
             entry point, in particular: lib-entry is inactive.
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 
 val is_recursive : Kernel_function.t -> bool

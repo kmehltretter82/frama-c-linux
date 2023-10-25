@@ -86,7 +86,7 @@ module Normalized: sig
      [concats ~existence dir paths] concatenates a list of paths, as per
      the [concat] function.
 
-     @since Frama-C+dev
+     @since 28.0-Nickel
   *)
   val concats: ?existence:existence -> t -> string list -> t
 
@@ -221,42 +221,42 @@ val pp_pos : Format.formatter -> position -> unit
     symbolic links in directory names.
 
     @since 25.0-Manganese
-    @before Frama-C+dev return type was string instead of Normalized.t.
+    @before 28.0-Nickel return type was string instead of Normalized.t.
 *)
 val pwd : unit -> Normalized.t
 
 (** Equivalent to [Sys.file_exists].
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val exists: Normalized.t -> bool
 
 (** Equivalent to [Sys.is_directory].
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val is_dir: Normalized.t -> bool
 
 (** Equivalent to [Sys.readdir].
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val readdir: Normalized.t -> string array
 
 (** Equivalent to [Sys.remove].
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val remove: Normalized.t -> unit
 
 (** Equivalent to [Sys.rename].
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val rename: Normalized.t -> Normalized.t -> unit
 
 (** Equivalent to [Filename.basename].
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val basename: Normalized.t -> string
 
 (** Equivalent to [Filename.dirname].
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 val dirname: Normalized.t -> Normalized.t
 

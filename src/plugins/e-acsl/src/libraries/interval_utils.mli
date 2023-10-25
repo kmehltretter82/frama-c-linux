@@ -64,7 +64,7 @@ val interv_of_logic_typ : logic_type -> ival
 
 exception Not_representable_ival
 (** raised by {!ikind_of_ival}.
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 
 val ikind_of_ival : Ival.t -> ikind
