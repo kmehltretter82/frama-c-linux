@@ -30,9 +30,11 @@ open Lattice_bounds
 
 include Datatype.S_with_collections
 
-include Eva_lattice_type.Full_AI_Lattice_with_cardinality
-  with type t := t
-   and type widen_hint = Integer.t * Datatype.Integer.Set.t
+include Eva_lattice_type.Full_AI_Lattice_with_cardinality with type t := t
+
+type widen_hint = Integer.t * Datatype.Integer.Set.t
+
+val widen: widen_hint -> t -> t -> t
 
 (** Checks that the interval defined by [min, max, rem, modu] is well formed. *)
 val check:

@@ -53,9 +53,11 @@ module Location_Bytes : sig
 
   (** Those locations have a lattice structure, including standard operations
       such as [join], [narrow], etc. *)
-  include Lattice_type.AI_Lattice_with_cardinal_one
-    with type t := t
-     and type widen_hint := widen_hint
+  include Lattice_type.AI_Lattice_with_cardinal_one with type t := t
+
+  type widen_hint := widen_hint
+
+  val widen : widen_hint -> t -> t -> t
 
   include Datatype.S_with_collections with type t := t
 
