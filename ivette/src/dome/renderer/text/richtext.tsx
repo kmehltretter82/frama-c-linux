@@ -39,13 +39,53 @@ export function byDepth(a : Range, b : Range): number
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Code Mirror Utils                                                  --- */
+/* -------------------------------------------------------------------------- */
+
+type View = CM.EditorView | null;
+
+class Field<A> {
+  readonly extension : CS.Extension;
+  readonly field : CS.StateField<A>;
+  private readonly annot : CS.AnnotationType<A>;
+
+  constructor(init: A) {
+    const annot = CS.Annotation.define<A>();
+    const field = CS.StateField.define<A>({
+      create: () => init,
+      update: (fd: A, tr: CS.Transaction) => tr.annotation(annot) ?? fd,
+    });
+    this.annot = annot;
+    this.field = field;
+    this.extension = [ field ];
+  }
+
+  get(view: View) : A | undefined {
+    return view?.state.field(this.field);
+  }
+
+  set(view: View, value?: A): void {
+    if (view && value !== undefined) {
+      view.dispatch({ annotations: this.annot.of(value) });
+    }
+  }
+
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Read Only                                                          --- */
+/* -------------------------------------------------------------------------- */
+
+const ReadOnly = new Field(false);
+
+/* -------------------------------------------------------------------------- */
 /* --- Editor View                                                        --- */
 /* -------------------------------------------------------------------------- */
 
 function createView(parent: Element): CM.EditorView {
   const extensions : CS.Extension[] = [
-    //CS.EditorState.readOnly.of(false),
-  ]
+    ReadOnly, CS.EditorState.readOnly.from(ReadOnly.field)
+  ];
   const state = CS.EditorState.create({ extensions });
   return new CM.EditorView({ state, parent });
 }
@@ -55,29 +95,33 @@ function createView(parent: Element): CM.EditorView {
 /* -------------------------------------------------------------------------- */
 
 export interface RichTextProps {
+  readOnly?: boolean;
   className?: string;
   style?: CSSProperties;
 }
 
 export function RichText(props: RichTextProps) : JSX.Element {
-  type View = CM.EditorView | null;
-  const parent = React.useRef(null);
-  const editor = React.useRef<View>(null);
+  const [view, setView] = React.useState<View>(null);
+
+  // ---- Updates
+  const { readOnly } = props;
+  React.useEffect(() => ReadOnly.set(view, readOnly), [view, readOnly]);
+
+  // ---- Mount & Unmount Editor
+  const [nodeRef, setRef] = React.useState<Element | null>(null);
   React.useEffect(() => {
-    const div = parent.current;
-    if (!div) return;
-    const view = createView(div);
-    editor.current = view;
-    return () => {
-      editor.current = null;
-      view.destroy();
-    };
-  }, []);
+    if (!nodeRef) return;
+    const view = createView(nodeRef);
+    setView(view);
+    return () => { setView(null); view.destroy(); };
+  }, [nodeRef]);
+
+  // ---- Editor DIV
   const className = classes(
     'cm-global-box',
     props.className
   );
-  return <div className={className} style={props.style} ref={parent} />;
+  return <div className={className} style={props.style} ref={setRef} />;
 }
 
 /* -------------------------------------------------------------------------- */

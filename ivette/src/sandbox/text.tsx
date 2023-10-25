@@ -26,6 +26,8 @@
 /* -------------------------------------------------------------------------- */
 
 import React from 'react';
+import { Hbox } from 'dome/layout/boxes';
+import { Checkbox } from 'dome/controls/buttons';
 import { RichText } from 'dome/text/richtext';
 import { registerSandbox } from 'ivette';
 
@@ -34,7 +36,15 @@ import { registerSandbox } from 'ivette';
 /* -------------------------------------------------------------------------- */
 
 function UseText(): JSX.Element {
-  return <RichText />;
+  const [readOnly, setReadOnly] = React.useState(false);
+  return (
+    <>
+      <Hbox>
+        <Checkbox label="Read Only" value={readOnly} onChange={setReadOnly} />
+      </Hbox>
+      <RichText readOnly={readOnly}/>
+    </>
+  );
 }
 
 /* -------------------------------------------------------------------------- */
