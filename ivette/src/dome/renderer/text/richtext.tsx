@@ -44,12 +44,17 @@ export function byDepth(a : Range, b : Range): number
 
 type View = CM.EditorView | null;
 
-class Field<A> {
-  readonly extension : CS.Extension;
+class Extension {
+  readonly extension : CS.Extension[] = [];
+  pack(ext : CS.Extension): void { this.extension.push(ext); }
+}
+
+class Field<A> extends Extension {
   readonly field : CS.StateField<A>;
   private readonly annot : CS.AnnotationType<A>;
 
   constructor(init: A) {
+    super();
     const annot = CS.Annotation.define<A>();
     const field = CS.StateField.define<A>({
       create: () => init,
@@ -57,17 +62,11 @@ class Field<A> {
     });
     this.annot = annot;
     this.field = field;
-    this.extension = [ field ];
+    this.pack(field);
   }
 
-  get(view: View) : A | undefined {
-    return view?.state.field(this.field);
-  }
-
-  set(view: View, value?: A): void {
-    if (view && value !== undefined) {
-      view.dispatch({ annotations: this.annot.of(value) });
-    }
+  dispatch(view: View, value: A): void {
+    view?.dispatch({ annotations: this.annot.of(value) });
   }
 
 }
@@ -78,13 +77,80 @@ class Field<A> {
 
 const ReadOnly = new Field(false);
 
+ReadOnly.pack(CS.EditorState.readOnly.from(ReadOnly.field));
+
+/* -------------------------------------------------------------------------- */
+/* --- Change Listener                                                    --- */
+/* -------------------------------------------------------------------------- */
+
+export type Callback = () => void;
+
+const OnChange = new Field<Callback|null>(null);
+
+OnChange.pack(
+  CM.EditorView.updateListener.computeN(
+    [OnChange.field],
+    (state) => {
+      const callback = state.field(OnChange.field);
+      if (callback !== null)
+        return [
+          (updates: CM.ViewUpdate) => {
+            if (!updates.changes.empty) callback();
+          }
+        ];
+      return [];
+    }
+));
+
+/* -------------------------------------------------------------------------- */
+/* --- Text Buffer                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+export class Text {
+  private view : View = null;
+
+  clear(): void {
+    const view = this.view;
+    if (view) {
+      const length = view.state.doc.length;
+      view.dispatch({ changes: { from: 0, to: length, insert: '' } });
+    }
+  }
+
+  toString(): string {
+    const view = this.view;
+    return view ? view.state.doc.toString() : '';
+  }
+
+  append(data: string): void {
+    const view = this.view;
+    if (view) {
+      const length = view.state.doc.length;
+      view?.dispatch({ changes: { from: length, insert: data } });
+    }
+  }
+
+  setContents(data: string): void {
+    const view = this.view;
+    if (view) {
+      const length = view.state.doc.length;
+      view?.dispatch({ changes: { from: 0, to: length, insert: data } });
+    }
+  }
+
+  /** @ignore */
+  connect(view: View): void { this.view = view; }
+
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Editor View                                                        --- */
 /* -------------------------------------------------------------------------- */
 
 function createView(parent: Element): CM.EditorView {
   const extensions : CS.Extension[] = [
-    ReadOnly, CS.EditorState.readOnly.from(ReadOnly.field)
+    ReadOnly,
+    OnChange,
   ];
   const state = CS.EditorState.create({ extensions });
   return new CM.EditorView({ state, parent });
@@ -95,7 +161,11 @@ function createView(parent: Element): CM.EditorView {
 /* -------------------------------------------------------------------------- */
 
 export interface RichTextProps {
+  text?: Text;
   readOnly?: boolean;
+  onChange?: Callback;
+  display?: boolean;
+  visible?: boolean;
   className?: string;
   style?: CSSProperties;
 }
@@ -103,9 +173,20 @@ export interface RichTextProps {
 export function RichText(props: RichTextProps) : JSX.Element {
   const [view, setView] = React.useState<View>(null);
 
-  // ---- Updates
-  const { readOnly } = props;
-  React.useEffect(() => ReadOnly.set(view, readOnly), [view, readOnly]);
+  // --- text
+  const { text } = props;
+  React.useEffect(() => {
+    if (text) {
+      text.connect(view);
+      if (view) return () => text.connect(null);
+    }
+    return undefined;
+  }, [text, view]);
+
+  // ---- readOnly, onChange
+  const { readOnly = false, onChange = null } = props;
+  React.useEffect(() => ReadOnly.dispatch(view, readOnly), [view, readOnly]);
+  React.useEffect(() => OnChange.dispatch(view, onChange), [view, onChange]);
 
   // ---- Mount & Unmount Editor
   const [nodeRef, setRef] = React.useState<Element | null>(null);
@@ -117,9 +198,12 @@ export function RichText(props: RichTextProps) : JSX.Element {
   }, [nodeRef]);
 
   // ---- Editor DIV
+  const { visible=true, display=true } = props;
   const className = classes(
     'cm-global-box',
-    props.className
+    !display && 'dome-erased',
+    !visible && 'dome-hidden',
+    props.className,
   );
   return <div className={className} style={props.style} ref={setRef} />;
 }
