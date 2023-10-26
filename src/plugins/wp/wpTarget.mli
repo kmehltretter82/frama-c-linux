@@ -49,7 +49,7 @@ val compute_kf: WpContext.model -> Kernel_function.t -> unit
     also populates exits, terminates and assigns for the function and its
     callees, as well as RTE assertions if they are asked on command  line.
 
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 
 val iter: (Kernel_function.t -> unit) -> unit

@@ -24,6 +24,10 @@
 Plugin WP <next-release>
 ###############################################################################
 
+###############################################################################
+Plugin WP 28.0 (Nickel)
+###############################################################################
+
 - WP          [2023-10-19] WP generates exits and terminates specification
                            on all functions, using the mechanism provided by
                            the Frama-C kernel
