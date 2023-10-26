@@ -154,8 +154,8 @@ module type S = sig
 
   include Lattice_type.Join_Semi_Lattice with type t := t
 
-  val widen : widen_hint -> t -> t -> t
-  (** [widen wh m1 m2] performs a widening step on [m2], assuming that
+  val widen : ?hint:widen_hint -> t -> t -> t
+  (** [widen m1 m2] performs a widening step on [m2], assuming that
       [m1] was the previous state. The relation [is_included m1 m2] must hold *)
 
   (** {2 Narrowing} *)

@@ -1262,13 +1262,13 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
 
   end
 
-  let widen hint t1 t2 =
+  let widen ?hint t1 t2 =
     (* Due to the way f_aux_merge is designed, we can obtain intervals on which
        the two bindings do not verify [is_included v1 v2]. The widening
        operations require this, so we correct the arguments here. *)
     let widen size v1 v2 =
       let v2 = if not (V.is_included v1 v2) then V.join v1 v2 else v2 in
-      V.widen ~size ~hint v1 v2
+      V.widen ~size ?hint v1 v2
     in
     let f_widen = f_aux_merge_join widen in
     let rec aux t1 t2 =

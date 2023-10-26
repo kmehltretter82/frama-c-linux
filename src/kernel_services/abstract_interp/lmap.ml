@@ -249,12 +249,14 @@ struct
     let join_widen op =
       let cache = match op with
         | `Join -> Hptmap_sig.PersistentCache "lmap.join"
-        | `Widen _ -> Hptmap_sig.NoCache
+        | `Widen None -> Hptmap_sig.PersistentCache "lmap.widen"
+        | `Widen Some _ -> Hptmap_sig.NoCache
       in
       let symmetric = match op with `Join -> true | `Widen _ -> false in
       let op = match op with
         | `Join -> fun _b o1 o2 -> Offsetmap.join o1 o2
-        | `Widen wh -> fun b o1 o2 -> Offsetmap.widen (wh b) o1 o2
+        | `Widen None -> fun _b o1 o2 -> Offsetmap.widen o1 o2
+        | `Widen (Some wh) -> fun b o1 o2 -> Offsetmap.widen ~hint:(wh b) o1 o2
       in
       let idempotent = true in
       let default = default_bound_offsetmap in
@@ -440,10 +442,10 @@ struct
         (Hptmap_sig.PersistentCache name) UniversalPredicate
         ~decide_fast ~decide_fst ~decide_snd ~decide_both
 
-    type widen_hint = Base.Set.t * (Base.t -> V.widen_hint)
+    type widen_hint = Base.t -> V.widen_hint
 
     (* Precondition : m1 <= m2 *)
-    let widen (wh_key_set, wh_hints: widen_hint) m1 m2 =
+    let widen ?(priority=Base.Set.empty) ?hint m1 m2 =
       let widened, something_done =
         Base.Set.fold
           (fun key (widened, something_done) ->
@@ -459,14 +461,15 @@ struct
                if unchanged
                then (widened, something_done)
                else
-                 let new_off = Offsetmap.widen (wh_hints key) offs1 offs2 in
+                 let hint = Option.map (fun f -> f key) hint in
+                 let new_off = Offsetmap.widen ?hint offs1 offs2 in
                  (add key new_off widened, true)
-          ) wh_key_set (m2, false)
+          ) priority (m2, false)
       in
       if something_done then
         widened
       else
-        let r = join_widen (`Widen wh_hints) m1 m2 in
+        let r = join_widen (`Widen hint) m1 m2 in
         (* If [r] is equal to [m2], the widening had no effect.
            If [m1] was not equal to [m2], either [m2] has reached some widening
            threshold (and the widening is postponed), or there is a convergence
@@ -758,13 +761,13 @@ struct
   type widen_hint = M.widen_hint
 
   (* Precondition : m1 <= m2 *)
-  let widen wh r1 r2 =
+  let widen ?priority ?hint r1 r2 =
     match r1,r2 with
     | Top, Top | _, Top -> Top
     | Bottom,Bottom -> Bottom
     | _, Bottom | Top, Map _-> assert false (* thanks to precondition *)
     | Bottom, m -> m
-    | Map m1,Map m2 -> Map (M.widen wh m1 m2)
+    | Map m1,Map m2 -> Map (M.widen ?priority ?hint m1 m2)
 
   let paste_offsetmap ~from ~dst_loc ~size ~exact m =
     match m with
