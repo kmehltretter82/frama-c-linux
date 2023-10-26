@@ -793,9 +793,9 @@ export function useActive<A>(
    Unless constant, first create the callback with `React.useCallback()`, then
    give it to `useDebounced()`.
  */
-export function useDebounced<A>(
+export function useDebounced<A=void>(
+  callback: (arg: A) => void,
   period: number,
-  callback: (arg: A) => void
 ): (arg:A) => void
 {
   const active = React.useRef(false);

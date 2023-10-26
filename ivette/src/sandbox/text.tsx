@@ -26,9 +26,11 @@
 /* -------------------------------------------------------------------------- */
 
 import React from 'react';
-import { Hbox } from 'dome/layout/boxes';
-import { Checkbox } from 'dome/controls/buttons';
-import { RichText } from 'dome/text/richtext';
+import * as Dome from 'dome';
+import { ToolBar, Filler } from 'dome/frame/toolbars';
+import { Code } from 'dome/controls/labels';
+import { Button } from 'dome/controls/buttons';
+import { TextView, TextProxy } from 'dome/text/richtext';
 import { registerSandbox } from 'ivette';
 
 /* -------------------------------------------------------------------------- */
@@ -37,12 +39,29 @@ import { registerSandbox } from 'ivette';
 
 function UseText(): JSX.Element {
   const [readOnly, setReadOnly] = React.useState(false);
+  const [prefix, setPrefix] = React.useState('');
+  const text = React.useMemo(() => new TextProxy(), []);
+  const onLockUnlock = React.useCallback(() => setReadOnly((v) => !v), []);
+  const updatePrefix = React.useCallback(
+    () => setPrefix(text.toString().substring(0, 20).trim()),
+    [text]
+  );
+  const push = React.useCallback(() => text.append(prefix), [text, prefix]);
+  const onChange = Dome.useDebounced(updatePrefix, 200);
   return (
     <>
-      <Hbox>
-        <Checkbox label="Read Only" value={readOnly} onChange={setReadOnly} />
-      </Hbox>
-      <RichText readOnly={readOnly}/>
+      <ToolBar>
+        <Button icon={readOnly ? 'LOCK' : 'EDIT'} onClick={onLockUnlock} />
+        <Filler />
+        <Code>{`"${prefix}"`}</Code>
+        <Button label="Push" enabled={prefix!==''} onClick={push} />
+        <Button label="Clear" kind='negative' onClick={text.clear}  />
+      </ToolBar>
+      <TextView
+        text={text}
+        readOnly={readOnly}
+        onChange={onChange}
+      />
     </>
   );
 }

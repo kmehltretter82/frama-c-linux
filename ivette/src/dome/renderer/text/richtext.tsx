@@ -106,11 +106,39 @@ OnChange.pack(
 /* --- Text Buffer                                                        --- */
 /* -------------------------------------------------------------------------- */
 
-export class Text {
-  private view : View = null;
+/**
+   Text contents of a RichText component.
+
+   This class can be used as a proxy to a the content of a {RichText}
+   component. Using the methods of the class, you can update or dump the
+   contents edited/viewed by the associated component.
+
+   At most one component shall be associated with a given Text buffer at the
+   same time.
+
+   All methods are bound to `this`.
+ */
+export class TextProxy {
+
+  // --- Private part
+
+  private proxy : View = null;
+
+  constructor() {
+    this.clear = this.clear.bind(this);
+    this.append = this.append.bind(this);
+    this.toString = this.toString.bind(this);
+    this.setContents = this.setContents.bind(this);
+    this.connect = this.connect.bind(this);
+  }
+
+  /** @ignore */
+  connect(view: View): void { this.proxy = view; }
+
+  // --- Public part
 
   clear(): void {
-    const view = this.view;
+    const view = this.proxy;
     if (view) {
       const length = view.state.doc.length;
       view.dispatch({ changes: { from: 0, to: length, insert: '' } });
@@ -118,12 +146,11 @@ export class Text {
   }
 
   toString(): string {
-    const view = this.view;
-    return view ? view.state.doc.toString() : '';
+    return this.proxy?.state.doc.toString() ?? '';
   }
 
   append(data: string): void {
-    const view = this.view;
+    const view = this.proxy;
     if (view) {
       const length = view.state.doc.length;
       view?.dispatch({ changes: { from: length, insert: data } });
@@ -131,15 +158,12 @@ export class Text {
   }
 
   setContents(data: string): void {
-    const view = this.view;
+    const view = this.proxy;
     if (view) {
       const length = view.state.doc.length;
-      view?.dispatch({ changes: { from: 0, to: length, insert: data } });
+      view.dispatch({ changes: { from: 0, to: length, insert: data } });
     }
   }
-
-  /** @ignore */
-  connect(view: View): void { this.view = view; }
 
 }
 
@@ -161,7 +185,7 @@ function createView(parent: Element): CM.EditorView {
 /* -------------------------------------------------------------------------- */
 
 export interface RichTextProps {
-  text?: Text;
+  text?: TextProxy;
   readOnly?: boolean;
   onChange?: Callback;
   display?: boolean;
@@ -170,7 +194,7 @@ export interface RichTextProps {
   style?: CSSProperties;
 }
 
-export function RichText(props: RichTextProps) : JSX.Element {
+export function TextView(props: RichTextProps) : JSX.Element {
   const [view, setView] = React.useState<View>(null);
 
   // --- text
