@@ -95,7 +95,7 @@ why3 config detect
 ### Reference configuration
 
 See file [reference-configuration.md](reference-configuration.md)
-for a set of packages that is known to work with Frama-C+dev.
+for a set of packages that is known to work with this version of Frama-C.
 
 ### Installing Custom Versions of Frama-C
 
@@ -182,8 +182,8 @@ opam depext --install -y frama-c
 
 #### Running the Frama-C GUI on WSL
 
-If you have WSL2: a known issue with Frama-C 24.0 (Chromium), lablgtk3 and
-Wayland require prefixing the command running the Frama-C GUI with
+If you have WSL2: a known issue with some versions of Frama-C, lablgtk3 and
+Wayland requires prefixing the command running the Frama-C GUI with
 `GDK_BACKEND=x11`, as in:
 
     GDK_BACKEND=x11 frama-c-gui <options>

@@ -24,7 +24,7 @@
     {!Kernel.GeneratedDefaultSpec}, {!Kernel.GeneratedSpecMode} and
     {!Kernel.GeneratedSpecCustom} can be used to choose precisely which clause
     to generate in which case.
-    @since Frama-C+dev
+    @since 28.0-Nickel
 *)
 
 open Cil_types

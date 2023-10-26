@@ -3,6 +3,13 @@
 
 That is the procedure for forking the release from \texttt{master}.
 
+\section{Creating the milestones}
+
+Create the milestone for the next releases on \textsf{Gitlab},
+in the Frama-C group. They will be used for development that will not
+be integrated into the upcoming release.
+\expertise{François, Julien}.
+
 \section{``Freezing'' master}
 
 When the ``freeze'' period arrives (usually a few weeks before the beta
@@ -48,14 +55,10 @@ and go through Merge-requests. Everything else should go in \texttt{master},
 which can then be reset to standard-level protection (Developers + Maintainers
 allowed to push/merge).
 
-\section{Creating the milestones}
-
-Create the milestone for the next release on \textsf{Gitlab},
-in the Frama-C group
-\expertise{François, Julien}.
-
-
 \section{GitLab issues}
+
+{\em This is currently done periodically in specific Frama-C meetings, so only
+  a final check is usually necessary.}~\\
 
 Check public issue tracker at \url{https://git.frama-c.com/pub/frama-c/issues/}.
 All issues should have been at least acknowledged: at least they should be
@@ -80,6 +83,7 @@ This will:
   \item update the \texttt{opam} files (Frama-C, lint, hdrck)
   \item update the API doc
   \item update the Frama-C build script
+  \item update the reference configuration
 \end{itemize}
 
 Merge the \texttt{stable} branch in the \texttt{master} branch.

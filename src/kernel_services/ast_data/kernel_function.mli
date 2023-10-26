@@ -185,7 +185,7 @@ val is_in_libc : t -> bool
 val is_not_called: t -> bool
 (** @return true if the given function is not called in the program.
     Warning, return false does not ensure that the function is called.
-    @since Frama-C+dev *)
+    @since 28.0-Nickel *)
 
 val is_entry_point: t -> bool
 (** @return true iff the given function is the main of the program (as stated by

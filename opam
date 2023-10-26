@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "frama-c"
 synopsis: "Platform dedicated to the analysis of source code written in C"
-version: "27.1+dev"
+version: "28.0~beta"
 description:"""
 Frama-C gathers several analysis techniques in a single collaborative
 framework, based on analyzers (called "plug-ins") that can build upon the
@@ -72,7 +72,7 @@ authors: [
 homepage: "https://frama-c.com/"
 license: "LGPL-2.1-only"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
-doc: "http://frama-c.com/download/user-manual-27.1-Cobalt.pdf"
+doc: "http://frama-c.com/download/user-manual-28.0-Nickel.pdf"
 bug-reports: "https://git.frama-c.com/pub/frama-c/issues"
 tags: [
   "deductive"
