@@ -4805,13 +4805,13 @@ and doType (ghost:bool) isFuncArg
                    let elem_size = Integer.of_int @@ bytesSizeOf bt in
                    let size_t = bitsSizeOfInt theMachine.kindOfSizeOf in
                    let size_max = Cil.max_unsigned_number size_t in
-                   let size = Integer.mul i elem_size in
-                   if Integer.gt size size_max then
+                   let array_size = Integer.mul i elem_size in
+                   if Integer.gt array_size size_max then
                      Kernel.error ~once:true ~current:true
                        "Array length is too large.";
                  with
                  | SizeOfError (msg,_) ->
-                   Kernel.abort ~current:true "%s" msg
+                   Kernel.error ~once:true ~current:true "%s" msg
                  | Invalid_argument msg ->
                    Kernel.fatal ~current:true "%s" msg
              end
