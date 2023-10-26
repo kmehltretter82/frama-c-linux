@@ -121,7 +121,7 @@ module type Ref = sig
   val add_hook_on_change: (data -> unit) -> unit
   (** Add an hook which is applied each time (just after) the value of the state
       changes inside the current project.
-      @since Frama-C+dev *)
+      @since 28.0-Nickel *)
 end
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
@@ -152,7 +152,7 @@ module type Option_ref = sig
   val add_hook_on_change: (data option -> unit) -> unit
   (** Add an hook which is applied each time (just after) the value of the state
       changes inside the current project.
-      @since Frama-C+dev *)
+      @since 28.0-Nickel *)
 end
 
 (** Build a reference on an option. *)
@@ -388,7 +388,7 @@ module type Hashtbl = sig
   val add_hook_on_change: ((key, data) hashtbl_event -> unit) -> unit
   (** Add an hook which is applied each time (just after) a (key,value) pair in
       the hashtable changes inside the current project.
-      @since Frama-C+dev *)
+      @since 28.0-Nickel *)
 end
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide

@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ###############################################################################
 
+###############################################################################
+Open Source Release 28.0 (Nickel)
+###############################################################################
+
 -!  Kernel    [2023-10-09] Remove options -no-type and -no-obj and related
               functions.
 o!  Kernel    [2023-10-03] New mechanism for generating default specifications

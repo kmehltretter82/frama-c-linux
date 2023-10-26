@@ -164,7 +164,7 @@ module ExpStructEqStrict: S_with_collections with type t = exp
    (instead of id).
    Different expressions with the same size within sizeof are equal.
 
-   @since Frama-C+dev
+   @since 28.0-Nickel
 *)
 module ExpStructEqSized: S_with_collections with type t = exp
 
@@ -173,7 +173,7 @@ module ExpStructEqSized: S_with_collections with type t = exp
    and with structural comparaison in case of sizeof (instead of id).
    Different expressions with the same size winthin sizeof are equal.
 
-   @since Frama-C+dev
+   @since 28.0-Nickel
 *)
 module ExpStructEqStrictSized: S_with_collections with type t = exp
 
