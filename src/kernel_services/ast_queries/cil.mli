@@ -772,12 +772,13 @@ val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
   strictInteger:bool -> strictReturnTypes:bool ->
   combineWhat -> typ -> typ -> typ
 
-(** Specialized verison of [combineTypesGen], we suppore here that
+(** Specialized verison of {!combineTypesGen], we suppose here that
     if two global symbols are equal, then they are the same object.
 
     @since 28.0-Nickel
 *)
-val combineTypes : ?strictReturnTypes:bool -> combineWhat -> typ -> typ -> typ
+val combineTypes : ?strictInteger:bool -> ?strictReturnTypes:bool ->
+  combineWhat -> typ -> typ -> typ
 
 (** How type qualifiers must be checked when checking for types compatibility
     with {!areCompatibleTypes} and {!compatibleTypes}.

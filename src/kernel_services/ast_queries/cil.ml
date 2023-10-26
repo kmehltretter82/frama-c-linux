@@ -6204,8 +6204,9 @@ let combineTypesGen ?emitwith (combF : combineFunction)
     (* If one does not have arguments, believe the one with the
      * arguments *)
     let newargs, olda' =
-      if oldargs = None then args, olda else
-      if args = None then oldargs, olda else
+      if oldargs = None then args, olda
+      else if args = None then oldargs, olda
+      else
         let (oldargslist, oldghostargslist) = argsToPairOfLists oldargs in
         let (argslist, ghostargslist) = argsToPairOfLists args in
         if List.length oldargslist <> List.length argslist then
@@ -6303,9 +6304,10 @@ let default_combines = {
 }
 
 
-let combineTypes ?(strictReturnTypes=false) what (oldt: typ) (t: typ) : typ =
+let combineTypes ?(strictInteger=true) ?(strictReturnTypes=false)
+    what (oldt: typ) (t: typ) : typ =
   combineTypesGen default_combines
-    ~strictInteger:true ~strictReturnTypes what oldt t
+    ~strictInteger ~strictReturnTypes what oldt t
 
 (***************** Compatibility ******)
 
