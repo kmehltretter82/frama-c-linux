@@ -39,10 +39,92 @@ export function byDepth(a : Range, b : Range): number
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Code Mirror Utils                                                  --- */
+/* --- Text Buffer                                                        --- */
 /* -------------------------------------------------------------------------- */
 
 type View = CM.EditorView | null;
+
+function appendContents(view: CM.EditorView, text: string): void {
+  const length = view.state.doc.length;
+  view.dispatch({ changes: { from: length, insert: text } });
+}
+
+function dispatchContents(view: CM.EditorView, text: string): void {
+  const length = view.state.doc.length;
+  view.dispatch({ changes: { from: 0, to: length, insert: text } });
+}
+
+/**
+   Text contents of a RichText component.
+
+   This class can be used as a proxy to a the content of a {RichText}
+   component. Using the methods of the class, you can update or dump the
+   contents edited/viewed by the associated component.
+
+   At most one component shall be associated with a given Text buffer at the
+   same time.
+
+   All methods are bound to `this`.
+ */
+export class TextProxy {
+
+  // --- Private part
+
+  private buffer = '';
+  private proxy : View = null;
+
+  constructor() {
+    this.clear = this.clear.bind(this);
+    this.append = this.append.bind(this);
+    this.toString = this.toString.bind(this);
+    this.setContents = this.setContents.bind(this);
+    this.connect = this.connect.bind(this);
+  }
+
+  /** @ignore */
+  connect(newView: View): void {
+    const oldView = this.proxy;
+    if (oldView) {
+      this.proxy = null;
+      this.buffer = oldView.state.doc.toString();
+    }
+    if (newView) {
+      dispatchContents(newView, this.buffer);
+      this.proxy = newView;
+      this.buffer = '';
+    }
+  }
+
+  // --- Public part
+
+  clear(): void {
+    const view = this.proxy;
+    if (view) dispatchContents(view, '');
+    else this.buffer = '';
+  }
+
+  toString(): string {
+    const view = this.proxy;
+    return view ? view.state.doc.toString() : this.buffer;
+  }
+
+  append(text: string): void {
+    const view = this.proxy;
+    if (view) appendContents(view, text);
+    else this.buffer += text;
+  }
+
+  setContents(text: string): void {
+    const view = this.proxy;
+    if (view) dispatchContents(view, text);
+    else this.buffer = text;
+  }
+
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Code Mirror Extensions                                             --- */
+/* -------------------------------------------------------------------------- */
 
 class Extension {
   readonly extension : CS.Extension[] = [];
@@ -101,71 +183,6 @@ OnChange.pack(
       return [];
     }
 ));
-
-/* -------------------------------------------------------------------------- */
-/* --- Text Buffer                                                        --- */
-/* -------------------------------------------------------------------------- */
-
-/**
-   Text contents of a RichText component.
-
-   This class can be used as a proxy to a the content of a {RichText}
-   component. Using the methods of the class, you can update or dump the
-   contents edited/viewed by the associated component.
-
-   At most one component shall be associated with a given Text buffer at the
-   same time.
-
-   All methods are bound to `this`.
- */
-export class TextProxy {
-
-  // --- Private part
-
-  private proxy : View = null;
-
-  constructor() {
-    this.clear = this.clear.bind(this);
-    this.append = this.append.bind(this);
-    this.toString = this.toString.bind(this);
-    this.setContents = this.setContents.bind(this);
-    this.connect = this.connect.bind(this);
-  }
-
-  /** @ignore */
-  connect(view: View): void { this.proxy = view; }
-
-  // --- Public part
-
-  clear(): void {
-    const view = this.proxy;
-    if (view) {
-      const length = view.state.doc.length;
-      view.dispatch({ changes: { from: 0, to: length, insert: '' } });
-    }
-  }
-
-  toString(): string {
-    return this.proxy?.state.doc.toString() ?? '';
-  }
-
-  append(data: string): void {
-    const view = this.proxy;
-    if (view) {
-      const length = view.state.doc.length;
-      view?.dispatch({ changes: { from: length, insert: data } });
-    }
-  }
-
-  setContents(data: string): void {
-    const view = this.proxy;
-    if (view) {
-      const length = view.state.doc.length;
-      view.dispatch({ changes: { from: 0, to: length, insert: data } });
-    }
-  }
-
-}
 
 /* -------------------------------------------------------------------------- */
 /* --- Editor View                                                        --- */
