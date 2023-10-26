@@ -52,7 +52,7 @@ CURRENT_MINOR=$(echo "$CURRENT" | $SED -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
 CURRENT_CODENAME=$(grep "$CURRENT_MAJOR " ./doc/release/periodic-elements.txt | cut -d " " -f2)
 
 if [[ $NEXT == "dev" ]]; then
-  echo "Set VERSION to $CURRENT+dev"
+  echo "Set VERSION to $CURRENT_MAJOR.$CURRENT_MINOR+dev"
   echo "Continue? [y/N] "
   read CHOICE
   case "${CHOICE}" in
@@ -60,10 +60,10 @@ if [[ $NEXT == "dev" ]]; then
   *) exit 1 ;;
   esac
 
-  echo "$CURRENT+dev" >VERSION
-  $SED -i "s/^version: .*/version: \"$CURRENT+dev\"/g" opam
-  $SED -i "s/^version: .*/version: \"$CURRENT+dev\"/g" tools/lint/frama-c-lint.opam
-  $SED -i "s/^version: .*/version: \"$CURRENT+dev\"/g" tools/hdrck/frama-c-hdrck.opam
+  echo "$CURRENT_MAJOR.$CURRENT_MINOR+dev" >VERSION
+  $SED -i "s/^version: .*/version: \"$CURRENT_MAJOR.$CURRENT_MINOR+dev\"/g" opam
+  $SED -i "s/^version: .*/version: \"$CURRENT_MAJOR.$CURRENT_MINOR+dev\"/g" tools/lint/frama-c-lint.opam
+  $SED -i "s/^version: .*/version: \"$CURRENT_MAJOR.$CURRENT_MINOR+dev\"/g" tools/hdrck/frama-c-hdrck.opam
 else
   NEXT_MAJOR=$(echo "$NEXT" | $SED -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
   NEXT_MINOR=$(echo "$NEXT" | $SED -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
