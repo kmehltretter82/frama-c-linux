@@ -309,15 +309,31 @@ lint:
 manuals:
   <<: *manuals_template
   except:
+    refs:
+      - schedules
     variables:
       - $RELEASE == "yes"
   when: manual
+
+manuals-changed:
+  <<: *manuals_template
+  only:
+    changes:
+      - doc/**/*
+
+manuals-nightly:
+  <<: *manuals_template
+  only:
+    - schedules
+  allow_failure: true
 
 manuals-for-release:
   <<: *manuals_template
   only:
     variables:
       - $RELEASE == "yes"
+
+# Release artifacts
 
 release-content:
   stage: distrib
