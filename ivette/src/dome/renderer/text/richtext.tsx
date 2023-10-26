@@ -24,6 +24,7 @@ import React, { CSSProperties } from 'react';
 import { classes } from 'dome/misc/utils';
 import * as CS from '@codemirror/state';
 import * as CM from '@codemirror/view';
+// import { diffLines } from 'diff';
 
 /* -------------------------------------------------------------------------- */
 /* --- Basic Definitions                                                  --- */
