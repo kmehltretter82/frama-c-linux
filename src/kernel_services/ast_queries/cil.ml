@@ -6055,7 +6055,8 @@ let combineAttributes what olda a =
 type combineFunction =
   {
     typ_combine : combineFunction ->
-      strictReturnTypes:bool -> combineWhat -> typ -> typ -> typ;
+      strictInteger:bool -> strictReturnTypes:bool ->
+      combineWhat -> typ -> typ -> typ;
 
     enum_combine : combineFunction ->
       enuminfo -> enuminfo -> enuminfo;
@@ -6074,7 +6075,7 @@ type combineFunction =
    because in some cases (e.g. string literals and char pointers) it is
    allowed to have differences, while in others we want to be more strict. *)
 let combineTypesGen ?emitwith (combF : combineFunction)
-    ?(strictInteger=true) ~strictReturnTypes
+    ~strictInteger ~strictReturnTypes
     (what : combineWhat) (oldt : typ) (t : typ) : typ =
   let warning = Kernel.warning ?emitwith in
   match oldt, t with
@@ -6154,8 +6155,10 @@ let combineTypesGen ?emitwith (combF : combineFunction)
           combineAttributes what olda a)
 
   | TArray (oldbt, oldsz, olda), TArray (bt, sz, a) ->
-    let newbt = combF.typ_combine combF ~strictReturnTypes CombineOther
-        oldbt bt in
+    let newbt =
+      combF.typ_combine combF
+        ~strictInteger ~strictReturnTypes CombineOther oldbt bt
+    in
     let newsz =
       match oldsz, sz with
       | None, Some _ -> sz
@@ -6185,12 +6188,17 @@ let combineTypesGen ?emitwith (combF : combineFunction)
     TArray (newbt, newsz, combineAttributes what olda a)
 
   | TPtr (oldbt, olda), TPtr (bt, a) ->
-    TPtr (combF.typ_combine combF ~strictReturnTypes CombineOther oldbt bt,
-          combineAttributes what olda a)
+    let newbt =
+      combF.typ_combine combF
+        ~strictInteger ~strictReturnTypes CombineOther oldbt bt
+    in
+    TPtr (newbt, combineAttributes what olda a)
 
   | TFun (oldrt, oldargs, oldva, olda), TFun (rt, args, va, a) ->
-    let newrt = combF.typ_combine combF ~strictReturnTypes
-        CombineFunret oldrt rt in
+    let newrt =
+      combF.typ_combine combF
+        ~strictInteger ~strictReturnTypes CombineFunret oldrt rt
+    in
     if oldva != va then
       raise (Cannot_combine "different vararg specifiers");
     (* If one does not have arguments, believe the one with the
@@ -6223,7 +6231,8 @@ let combineTypesGen ?emitwith (combF : combineFunction)
                      the function definition. *)
                   let n = if an <> "" then an else on in
                   let t =
-                    combF.typ_combine combF ~strictReturnTypes what ot at
+                    combF.typ_combine combF
+                      ~strictInteger ~strictReturnTypes what ot at
                   in
                   let a = addAttributes oa aa in
                   (n, t, a))
@@ -6251,11 +6260,17 @@ let combineTypesGen ?emitwith (combF : combineFunction)
             combineAttributes what olda a)
 
   | _, TNamed (t, a) ->
-    let res = combF.typ_combine combF ~strictReturnTypes what oldt t.ttype in
+    let res =
+      combF.typ_combine combF
+        ~strictInteger ~strictReturnTypes what oldt t.ttype
+    in
     typeAddAttributes ~combine:(combineAttributes what) a res
 
   | TNamed (oldt, olda), _ ->
-    let res = combF.typ_combine combF ~strictReturnTypes what oldt.ttype t in
+    let res =
+      combF.typ_combine combF
+        ~strictInteger ~strictReturnTypes what oldt.ttype t
+    in
     typeAddAttributes ~combine:(combineAttributes what) olda res
 
   | _ ->
@@ -6266,8 +6281,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
 
 
 let default_combines = {
-  typ_combine = (fun c ~strictReturnTypes ->
-      combineTypesGen c ~strictInteger:true ~strictReturnTypes);
+  typ_combine = (fun combF -> combineTypesGen combF);
   enum_combine = (fun _ _ ei -> ei);
   comp_combine = (fun _ oldci ci ->
       if oldci.cstruct <> ci.cstruct then
@@ -6282,7 +6296,7 @@ let default_combines = {
       if oldt.tname = t.tname then oldt
       else
         begin
-          ignore (c.typ_combine c ~strictReturnTypes:false
+          ignore (c.typ_combine c ~strictInteger:true ~strictReturnTypes:false
                     what oldt.ttype t.ttype);
           oldt
         end);
@@ -6290,7 +6304,8 @@ let default_combines = {
 
 
 let combineTypes ?(strictReturnTypes=false) what (oldt: typ) (t: typ) : typ =
-  combineTypesGen default_combines ~strictReturnTypes what oldt t
+  combineTypesGen default_combines
+    ~strictInteger:true ~strictReturnTypes what oldt t
 
 (***************** Compatibility ******)
 

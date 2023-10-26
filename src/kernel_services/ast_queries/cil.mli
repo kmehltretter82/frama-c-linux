@@ -733,7 +733,8 @@ val combineAttributes : combineWhat -> attribute list -> attributes -> attribute
 type combineFunction =
   {
     typ_combine : combineFunction ->
-      strictReturnTypes:bool -> combineWhat -> typ -> typ -> typ;
+      strictInteger:bool -> strictReturnTypes:bool ->
+      combineWhat -> typ -> typ -> typ;
 
     enum_combine : combineFunction ->
       enuminfo -> enuminfo -> enuminfo;
@@ -745,30 +746,30 @@ type combineFunction =
       typeinfo -> typeinfo -> typeinfo;
   }
 
-(** [combineTypesGen combF combW oldt newt]
-    Combine [oldt] and [newt] accordingly to [combF], [combW] indicates what we
-    are combinining.
+(** [combineTypesGen ~strictInteger ~strictReturnTypes combF combW oldt newt]
+      Combine [oldt] and [newt] accordingly to [combF], [combW] indicates what
+      we are combinining.
 
     Warning : this is not commutative. Indeed, excluding enum, struct/union and
     typedef which depend on [combF], the resulting type is as close as possible
     to [newt].
 
-    [strictInteger] is [true] (default) if two integers with same size and sign
-    but with different types cannot be combined. A warning is sent if it is
-    [false] and the compatibility is machine-dependent.
+    If [strictInteger] is [true], same size/sign integers with different types
+    will not be combined. Emits a warning if it is [false] and the compatibility
+    is machine-dependent.
 
-    [strictReturnTypes] is [false] (default) if a non-void type is compatible
-    with void in a return case.
+    If [strictReturnTypes] is [false], anything will be considered compatible
+    with void if [combW] is [CombineFunret] (i.e. comparing function return
+    types).
 
-    Notice that the [~emitwith] action is called iff a warning is logged.
+    [~emitwith] is used to emit warnings.
 
-    @raise Cannot_combine with an explanation when the type cannot be
-           combined.
+    @raise Cannot_combine with an explanation when the type cannot be combined.
 
     @since 28.0-Nickel
 *)
 val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
-  ?strictInteger:bool -> strictReturnTypes:bool ->
+  strictInteger:bool -> strictReturnTypes:bool ->
   combineWhat -> typ -> typ -> typ
 
 (** Specialized verison of [combineTypesGen], we suppore here that
