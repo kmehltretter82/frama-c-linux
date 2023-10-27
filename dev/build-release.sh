@@ -44,6 +44,8 @@
 ##########################################################################
 # Check binaries
 
+set -eu
+
 function echo_red {
   echo -e "\e[31m$1\e[0m"
 }
@@ -403,7 +405,7 @@ echo "Download directory built"
 mkdir -p $WEBSITE_INST_DIR
 
 INSTALL_WEBPAGE="$WEBSITE_INST_DIR/$LOWER_CODENAME.md"
-EXT="$FRAMAC_VERSION_CODENAME (released on $(date +%Y-%m-%d))"
+EXT="$CODENAME (released on $(date +%Y-%m-%d))"
 
 cat >$INSTALL_WEBPAGE <<EOL
 ---
