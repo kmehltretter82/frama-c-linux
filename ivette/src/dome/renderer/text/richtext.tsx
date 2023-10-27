@@ -364,7 +364,7 @@ function createView(parent: Element): CM.EditorView {
 /* --- Rich Text Component                                                --- */
 /* -------------------------------------------------------------------------- */
 
-export interface RichTextProps {
+export interface TextViewProps {
   text?: TextProxy;
   readOnly?: boolean;
   onChange?: Callback;
@@ -376,10 +376,10 @@ export interface RichTextProps {
   style?: CSSProperties;
 }
 
-export function TextView(props: RichTextProps) : JSX.Element {
+export function TextView(props: TextViewProps) : JSX.Element {
   const [view, setView] = React.useState<View>(null);
 
-  // --- text proxy
+  // --- Text Proxy
   const { text } = props;
   React.useEffect(() => {
     if (text) {
@@ -389,7 +389,7 @@ export function TextView(props: RichTextProps) : JSX.Element {
     return undefined;
   }, [text, view]);
 
-  // ---- readOnly, onChange, onSelection
+  // ---- Listeners readOnly, onChange, onSelection
   const {
     readOnly = false, onChange = null,
     onSelection: onSelect = null,
