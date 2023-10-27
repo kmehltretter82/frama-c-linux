@@ -30,7 +30,7 @@ import * as Dome from 'dome';
 import { ToolBar, Filler } from 'dome/frame/toolbars';
 import { Code } from 'dome/controls/labels';
 import { Button } from 'dome/controls/buttons';
-import { TextView, TextProxy, TextBuffer } from 'dome/text/richtext';
+import { TextView, TextProxy, TextBuffer, empty, } from 'dome/text/richtext';
 import { registerSandbox } from 'ivette';
 
 /* -------------------------------------------------------------------------- */
@@ -40,8 +40,9 @@ import { registerSandbox } from 'ivette';
 function UseText(): JSX.Element {
   const [prefix, setPrefix] = React.useState('');
   const [readOnly, flipReadOnly] = Dome.useFlipState(false);
-  const [useProxy, flipUseProxy] = Dome.useFlipState(true);
+  const [useProxy, flipUseProxy] = Dome.useFlipState(false);
   const [changes, setChanges] = React.useState(0);
+  const [s, onSelection] = React.useState(empty);
   const proxy = React.useMemo(() => new TextProxy(), []);
   const buffer = React.useMemo(() => new TextBuffer(), []);
   const text = useProxy ? proxy : buffer;
@@ -68,6 +69,8 @@ function UseText(): JSX.Element {
           title={useProxy ? 'Use TextProxy' : 'Use TextBuffer (persistent)'}
           onClick={flipUseProxy}
         />
+        <Code label={`Offset ${s.offset}-${s.offset + s.length}`} />
+        <Code label={`Line ${s.fromLine}-${s.toLine}`} />
         <Filler />
         <Code>{`"${prefix}" (${changes})`}</Code>
         <Button label="Push" onClick={push} />
@@ -77,6 +80,7 @@ function UseText(): JSX.Element {
         text={text}
         readOnly={readOnly}
         onChange={onChange}
+        onSelection={onSelection}
       />
     </>
   );

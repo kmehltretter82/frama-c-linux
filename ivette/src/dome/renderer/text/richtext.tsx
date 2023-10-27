@@ -34,6 +34,9 @@ export interface Range { offset: number; length: number }
 export interface Position { offset: number; line: number }
 export interface Selection extends Range { fromLine: number, toLine: number }
 
+export const empty : Range & Selection =
+  { offset: 0, length: 0, fromLine: 0, toLine: 0 };
+
 export function byDepth(a : Range, b : Range): number
 {
   return (a.length - b.length) || (b.offset - a.offset);
@@ -313,13 +316,45 @@ OnChange.pack(
 ));
 
 /* -------------------------------------------------------------------------- */
+/* --- Selection Change Listener                                          --- */
+/* -------------------------------------------------------------------------- */
+
+export type SelectionCallback = (S: Selection) => void;
+
+const OnSelect = new Field<SelectionCallback|null>(null);
+
+OnSelect.pack(
+  CM.EditorView.updateListener.computeN(
+    [OnSelect.field],
+    (state) => {
+      const callback = state.field(OnSelect.field);
+      if (callback !== null)
+        return [
+          (updates: CM.ViewUpdate) => {
+            const oldSel = updates.startState.selection.main;
+            const newSel = updates.state.selection.main;
+            const doc = updates.state.doc;
+            if (!newSel.eq(oldSel)) {
+              const { from: offset, to: endOffset } = newSel;
+              const fromLine = doc.lineAt(offset).number;
+              const toLine = doc.lineAt(endOffset).number;
+              callback({
+                offset, length: endOffset - offset,
+                fromLine, toLine,
+              });
+            }
+        }];
+      return [];
+    }
+));
+
+/* -------------------------------------------------------------------------- */
 /* --- Editor View                                                        --- */
 /* -------------------------------------------------------------------------- */
 
 function createView(parent: Element): CM.EditorView {
   const extensions : CS.Extension[] = [
-    ReadOnly,
-    OnChange,
+    ReadOnly, OnChange, OnSelect,
   ];
   const state = CS.EditorState.create({ extensions });
   return new CM.EditorView({ state, parent });
@@ -333,6 +368,8 @@ export interface RichTextProps {
   text?: TextProxy;
   readOnly?: boolean;
   onChange?: Callback;
+  selection?: Range;
+  onSelection?: SelectionCallback;
   display?: boolean;
   visible?: boolean;
   className?: string;
@@ -352,10 +389,24 @@ export function TextView(props: RichTextProps) : JSX.Element {
     return undefined;
   }, [text, view]);
 
-  // ---- readOnly, onChange
-  const { readOnly = false, onChange = null } = props;
+  // ---- readOnly, onChange, onSelection
+  const {
+    readOnly = false, onChange = null,
+    onSelection: onSelect = null,
+  } = props;
   React.useEffect(() => ReadOnly.dispatch(view, readOnly), [view, readOnly]);
   React.useEffect(() => OnChange.dispatch(view, onChange), [view, onChange]);
+  React.useEffect(() => OnSelect.dispatch(view, onSelect), [view, onSelect]);
+
+  // ---- Selection
+  const { selection } = props;
+  React.useEffect(() => {
+    if (selection) {
+      const anchor = selection.offset;
+      const head = anchor + selection.length;
+      view?.dispatch({ scrollIntoView: true, selection: { anchor, head } });
+    }
+  }, [view, selection]);
 
   // ---- Mount & Unmount Editor
   const [nodeRef, setRef] = React.useState<Element | null>(null);
