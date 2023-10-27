@@ -93,9 +93,12 @@ LOWER_CODENAME="$(echo "$CODENAME" | tr '[:upper:]' '[:lower:]')"
 VERSION_AND_CODENAME="${VERSION_SAFE}-${CODENAME}"
 
 if [ "$VERSION_MINOR" != 0 ]; then
+  # We compare new minor to previous minor
   PREVIOUS="$VERSION_MAJOR.$((VERSION_MINOR - 1))"
 else
-  PREVIOUS="$((VERSION_MAJOR - 1)).0"
+  # We compare new major to previous major, the exact previous version is not
+  # of interest for a new major version
+  PREVIOUS="$((VERSION_MAJOR - 1))"
 fi
 PREVIOUS_NAME=$(git show $PREVIOUS:VERSION_CODENAME)
 
