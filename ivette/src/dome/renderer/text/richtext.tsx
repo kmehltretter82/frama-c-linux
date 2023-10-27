@@ -24,7 +24,7 @@ import React, { CSSProperties } from 'react';
 import { classes } from 'dome/misc/utils';
 import * as CS from '@codemirror/state';
 import * as CM from '@codemirror/view';
-// import { diffLines } from 'diff';
+import { Change, diffLines } from 'diff';
 
 /* -------------------------------------------------------------------------- */
 /* --- Basic Definitions                                                  --- */
@@ -50,9 +50,48 @@ function appendContents(view: CM.EditorView, text: string): void {
   view.dispatch({ changes: { from: length, insert: text } });
 }
 
-function dispatchContents(view: CM.EditorView, text: string): void {
+function dispatchContents(view: CM.EditorView, text: string | CS.Text): void {
   const length = view.state.doc.length;
   view.dispatch({ changes: { from: 0, to: length, insert: text } });
+}
+
+class DiffBuffer {
+  private readonly changes : CS.ChangeSpec[] = [];
+  private offset = 0;
+  private added = '';
+  private removed = 0;
+
+  constructor() { this.add = this.add.bind(this); }
+
+  private commit(forward=0): void {
+    const { changes, offset, added, removed } = this;
+    if (added || removed) {
+      const nextOffset = offset + removed;
+      changes.push({ from: offset, to: nextOffset, insert: added });
+      this.offset = nextOffset + forward;
+      this.added = '';
+      this.removed = 0;
+    } else
+      if (forward) this.offset += forward;
+  }
+
+  add(c : Change): void {
+    if (c.added) this.added += c.value;
+    if (c.removed) this.removed += c.value.length;
+    if (!c.added && !c.removed) this.commit(c.value.length);
+  }
+
+  flush(): CS.ChangeSpec {
+    this.commit();
+    return this.changes;
+  }
+
+}
+
+function updateContents(view: CM.EditorView, newText: string): void {
+  const buffer = new DiffBuffer();
+  diffLines(view.state.doc.toString(), newText).forEach(buffer.add);
+  view.dispatch({ changes: buffer.flush() });
 }
 
 /* -------------------------------------------------------------------------- */
@@ -89,7 +128,7 @@ export class TextProxy {
 
   clear(): void {
     const view = this.proxy;
-    if (view) dispatchContents(view, '');
+    if (view) dispatchContents(view, CS.Text.empty);
   }
 
   toString(): string {
@@ -105,6 +144,12 @@ export class TextProxy {
   setContents(data: string): void {
     const view = this.proxy;
     if (view) dispatchContents(view, data);
+  }
+
+  /** Uses diff changes instead of replacing the entire view's contents. */
+  updateContents(data: string): void {
+    const view = this.proxy;
+    if (view) updateContents(view, data);
   }
 
 }
@@ -145,11 +190,12 @@ export class TextBuffer extends TextProxy {
       // invariant preserved
     }
     if (newView) {
-      dispatchContents(newView, this.toString());
+      const newData = this.contents ?? this.text;
       this.proxy = newView;
       this.text = CS.Text.empty;
       this.contents = undefined;
       // invariant established
+      dispatchContents(newView, newData);
     }
   }
 
@@ -157,7 +203,7 @@ export class TextBuffer extends TextProxy {
 
   clear(): void {
     const view = this.proxy;
-    if (view) dispatchContents(view, '');
+    if (view) dispatchContents(view, CS.Text.empty);
     else {
       this.text = CS.Text.empty;
       this.contents = undefined;
@@ -184,6 +230,17 @@ export class TextBuffer extends TextProxy {
   setContents(data: string): void {
     const view = this.proxy;
     if (view) dispatchContents(view, data);
+    else {
+      this.contents = data;
+      this.text = CS.Text.empty;
+      // invariant established
+    }
+  }
+
+  /** Uses diff changes instead of replacing the entire view's contents. */
+  updateContents(data: string): void {
+    const view = this.proxy;
+    if (view) updateContents(view, data);
     else {
       this.contents = data;
       this.text = CS.Text.empty;
