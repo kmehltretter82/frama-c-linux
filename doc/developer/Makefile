@@ -144,19 +144,21 @@ check-viewcfg-v5:
 check-viewcfg-v6:
 	cd tutorial/viewcfg/v6-* && $(duneb) @install
 
-hello.tar.gz: FILES=$(shell cd tutorial/hello/v7-doc && git ls-files)
-
+hello.tar: FILES= $(shell cd tutorial/hello/v7-doc && git ls-files)
 # - use 'git ls-files' to avoid including extraneous files in archive
 # - use several tar options to improve build reproducibility
-hello.tar.gz:
+hello.tar:
 	cd tutorial/hello && \
 	rm -rf hello && \
 	cp -r v7-doc hello && \
-	tar -cf - $(addprefix hello/,$(FILES)) \
+	tar -cf $@ $(addprefix hello/,$(FILES)) \
 	  --numeric-owner --owner=0 --group=0 --sort=name \
-	  --mtime="$$(date +"%F") Z" --mode='a+rw' | \
-	    gzip -9 -n > ../../hello.tar.gz && \
-	rm -rf hello
+	  --mtime="$$(date +"%F") Z" --mode='a+rw'
+
+hello.tar.gz: hello.tar
+	cd tutorial/hello && \
+	gzip -9 -n hello.tar > ../../hello.tar.gz && \
+	rm -rf hello hello.tar
 
 ###########
 

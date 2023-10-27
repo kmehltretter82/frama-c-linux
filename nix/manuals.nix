@@ -1,6 +1,7 @@
 { lib
 , stdenv
 , frama-c
+, git
 , headache
 , texlive
 } :
@@ -25,6 +26,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = frama-c.buildInputs ++ [
     frama-c
+    git
     headache
     texlive.combined.scheme-full
   ];
