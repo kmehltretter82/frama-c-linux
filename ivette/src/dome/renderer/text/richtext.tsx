@@ -262,16 +262,21 @@ class Extension {
   pack(ext : CS.Extension): void { this.extension.push(ext); }
 }
 
+interface Comparator<A> {
+  (a: A, b: A): boolean;
+}
+
 class Field<A> extends Extension {
   readonly field : CS.StateField<A>;
   private readonly annot : CS.AnnotationType<A>;
 
-  constructor(init: A) {
+  constructor(init: A, compare ?: Comparator<A>) {
     super();
     const annot = CS.Annotation.define<A>();
     const field = CS.StateField.define<A>({
       create: () => init,
       update: (fd: A, tr: CS.Transaction) => tr.annotation(annot) ?? fd,
+      compare,
     });
     this.annot = annot;
     this.field = field;
@@ -316,6 +321,19 @@ OnChange.pack(
 ));
 
 /* -------------------------------------------------------------------------- */
+/* --- Selection Builder                                                  --- */
+/* -------------------------------------------------------------------------- */
+
+type cmrange = { from: number, to: number };
+
+function selection(doc: CS.Text, range: cmrange) : Selection {
+  const { from: offset, to: endOffset } = range;
+  const fromLine = doc.lineAt(offset).number;
+  const toLine = doc.lineAt(endOffset).number;
+  return { offset, length: endOffset - offset, fromLine, toLine };
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Selection Change Listener                                          --- */
 /* -------------------------------------------------------------------------- */
 
@@ -334,17 +352,174 @@ OnSelect.pack(
             const oldSel = updates.startState.selection.main;
             const newSel = updates.state.selection.main;
             const doc = updates.state.doc;
-            if (!newSel.eq(oldSel)) {
-              const { from: offset, to: endOffset } = newSel;
-              const fromLine = doc.lineAt(offset).number;
-              const toLine = doc.lineAt(endOffset).number;
-              callback({
-                offset, length: endOffset - offset,
-                fromLine, toLine,
-              });
-            }
+            if (!newSel.eq(oldSel)) callback(selection(doc, newSel));
         }];
       return [];
+    }
+));
+
+/* -------------------------------------------------------------------------- */
+/* --- Decorations                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+export interface MarkDecoration extends Range {
+
+  /** The class of the decoration. */
+  className?: string;
+
+  /** The tooltip title of the decoration. */
+  title?: string;
+
+  /**
+     Whether the decoration shall extend to characters inserted
+     at start end end positions. Defaults to false.
+   */
+  inclusive?: boolean;
+}
+
+export interface LineDecoration {
+
+  /** The line number to be decorated. */
+  line: number;
+
+  /** The class of the decoration. */
+  className?: string;
+
+  /** The tooltip title of the decoration. */
+  title?: string;
+
+}
+
+export type Decoration = MarkDecoration | LineDecoration;
+export type Decorations = null | Decoration | readonly Decoration[];
+
+/* -------------------------------------------------------------------------- */
+/* --- Decoration Builder                                                 --- */
+/* -------------------------------------------------------------------------- */
+
+function isDecoration(d : Decorations) : d is Decoration
+{
+  return d !== null && !Array.isArray(d);
+}
+
+function isMarkDecoration(d : Decoration) : d is MarkDecoration
+{
+  // eslint-disable-next-line no-prototype-builtins
+  return d.hasOwnProperty("offset") && d.hasOwnProperty("length");
+}
+
+function isLineDecoration(d : Decoration) : d is LineDecoration
+{
+  // eslint-disable-next-line no-prototype-builtins
+  return d.hasOwnProperty("line");
+}
+
+/* TODO*/
+export class DecorationBuilder extends CS.RangeSetBuilder<CM.Decoration>
+{
+
+  private readonly doc : CS.Text;
+
+  constructor(doc: CS.Text) {
+    super();
+    this.doc = doc;
+    this.addSpec = this.addSpec.bind(this);
+  }
+
+  addSpec(spec : Decorations): void {
+    if (spec !== null) {
+      if (isDecoration(spec)) {
+        // ---- Mark Decoration
+        if (isMarkDecoration(spec)) {
+          const { offset, length, inclusive, className, title } = spec;
+          const attributes = title ? { title } : undefined;
+          const decoration = CM.Decoration.mark({
+            'class': className,
+            attributes,
+            inclusive,
+          });
+          this.add(offset, offset + length, decoration);
+        }
+        // ---- Line Decoration
+        if (isLineDecoration(spec)) {
+          const { line, className, title } = spec;
+          const offset = this.doc.line(line).from;
+          const attributes = title ? { title } : undefined;
+          const decoration = CM.Decoration.line({
+            'class': className,
+            attributes,
+          });
+          this.add(offset, offset, decoration);
+        }
+      } else spec.forEach(this.addSpec);
+    }
+  }
+
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Decorators                                                         --- */
+/* -------------------------------------------------------------------------- */
+
+export type Decorator = Decorations | ((viewport: Selection) => Decorations);
+
+function compareDecorators(a : Decorator[], b : Decorator[]): boolean
+{
+  if (a === b) return true;
+  const n = a.length;
+  if (n !== b.length) return false;
+  for (let k = 0; k < n; k++) if (a[k] !== b[k]) return false;
+  return true;
+}
+
+const Decorations = new Field<Decorator[]>([], compareDecorators);
+
+// --- Static Decorators
+
+function isStaticDecorator(d: Decorator): d is Decorations
+{
+  return typeof(d) !== 'function';
+}
+
+Decorations.pack(
+  CM.EditorView.decorations.compute(
+    [Decorations.field],
+    (state: CS.EditorState) => {
+      const decorators =
+        state.field(Decorations.field).filter(isStaticDecorator);
+      if (decorators.length === 0) return CS.RangeSet.empty;
+      const buffer = new DecorationBuilder(state.doc);
+      decorators.forEach(buffer.addSpec);
+      return buffer.finish();
+    }
+));
+
+// --- Dynamic Decorators
+
+type DynamicDecorator = ((viewport: Selection) => Decorations);
+
+function isDynamicDecorator(d: Decorator): d is DynamicDecorator
+{
+  return typeof(d) !== 'function';
+}
+
+Decorations.pack(
+  CM.EditorView.decorations.compute(
+    [Decorations.field],
+    (state: CS.EditorState) => {
+      const decorators =
+        state.field(Decorations.field).filter(isDynamicDecorator);
+      if (decorators.length === 0) return CS.RangeSet.empty;
+      return (view: CM.EditorView) => {
+        const doc = view.state.doc;
+        const viewports = view.visibleRanges;
+        const buffer = new DecorationBuilder(view.state.doc);
+        viewports.forEach((range) =>
+          decorators.forEach((fn: DynamicDecorator) =>
+            buffer.addSpec(fn(selection(doc, range)))
+        ));
+        return buffer.finish();
+      };
     }
 ));
 
@@ -354,7 +529,7 @@ OnSelect.pack(
 
 function createView(parent: Element): CM.EditorView {
   const extensions : CS.Extension[] = [
-    ReadOnly, OnChange, OnSelect,
+    ReadOnly, OnChange, OnSelect, Decorations,
   ];
   const state = CS.EditorState.create({ extensions });
   return new CM.EditorView({ state, parent });
@@ -370,6 +545,7 @@ export interface TextViewProps {
   onChange?: Callback;
   selection?: Range;
   onSelection?: SelectionCallback;
+  decorators?: Decorator[];
   display?: boolean;
   visible?: boolean;
   className?: string;
@@ -407,6 +583,13 @@ export function TextView(props: TextViewProps) : JSX.Element {
       view?.dispatch({ scrollIntoView: true, selection: { anchor, head } });
     }
   }, [view, selection]);
+
+  // ---- Decorations
+  const { decorators = [] } = props;
+  React.useEffect(
+    () => Decorations.dispatch(view, decorators),
+    [view, decorators],
+  );
 
   // ---- Mount & Unmount Editor
   const [nodeRef, setRef] = React.useState<Element | null>(null);
