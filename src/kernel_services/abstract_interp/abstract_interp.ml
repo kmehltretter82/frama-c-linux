@@ -74,7 +74,6 @@ module Make_Generic_Lattice_Set
 
   type t = Set of Set.t | Top
   type set = t
-  type widen_hint = Set.t
 
   let bottom = Set Set.empty
   let top = Top
@@ -98,8 +97,6 @@ module Make_Generic_Lattice_Set
       | Top, _ -> 1
       | _, Top -> -1
       | Set e1, Set e2 -> Set.compare e1 e2
-
-  let widen _wh _t1 t2 = t2
 
   (** This is exact *)
   let join e1 e2 =

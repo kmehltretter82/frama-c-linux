@@ -27,7 +27,7 @@
 module Make (V : Offsetmap_lattice_with_isotropy.S) :
   Offsetmap_sig.S
   with type v = V.t
-   and type widen_hint = V.numerical_widen_hint
+   and type widen_hint = V.widen_hint
 
 (**/**)
 (* Exported as Int_Intervals, do not use this module directly *)

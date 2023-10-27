@@ -330,30 +330,28 @@ let meet t1 t2 =
 
 let narrow = meet
 
-type size_widen_hint = Integer.t
-type generic_widen_hint = Datatype.Integer.Set.t
-type widen_hint = size_widen_hint * generic_widen_hint
+type widen_hint = Datatype.Integer.Set.t
 
-let widen (bitsize,wh) t1 t2 =
+let widen ?(size=Integer.zero) ?(hint = Datatype.Integer.Set.empty) t1 t2 =
   if equal t1 t2 then t2
   else
     (* Add possible interval limits deducted from the bitsize *)
-    let wh =
+    let thresholds =
       (* If bitsize > 128, the values do not correspond to a scalar type.
          This can (rarely) happen on structures or arrays that have been
          reinterpreted as one value by the offsetmaps. In this case, do not
          use limits, and do not create arbitrarily large integers. *)
-      if Integer.gt bitsize (Integer.of_int 128)
+      if Integer.gt size (Integer.of_int 128)
       then Datatype.Integer.Set.empty
-      else if Integer.is_zero bitsize
-      then wh
+      else if Integer.is_zero size
+      then hint
       else
         let limits =
-          [ Integer.neg (Integer.two_power (Integer.pred bitsize));
-            Integer.pred (Integer.two_power (Integer.pred bitsize));
-            Integer.pred (Integer.two_power bitsize); ]
+          Integer.[ neg (two_power (pred size));
+                    pred (two_power (pred size));
+                    pred (two_power size); ]
         in
-        Datatype.Integer.Set.(union wh (of_list limits))
+        Datatype.Integer.Set.(union hint (of_list limits))
     in
     let modu = Int.(pgcd (pgcd t1.modu t2.modu) (abs (sub t1.rem t2.rem))) in
     let rem = Int.e_rem t1.rem modu in
@@ -363,7 +361,7 @@ let widen (bitsize,wh) t1 t2 =
         | None -> None
         | Some min2 ->
           try
-            let v = Datatype.Integer.Set.nearest_elt_le min2 wh
+            let v = Datatype.Integer.Set.nearest_elt_le min2 thresholds
             in Some (Int.round_up_to_r ~r:rem ~modu ~min:v)
           with Not_found -> None
     in
@@ -373,7 +371,7 @@ let widen (bitsize,wh) t1 t2 =
         | None -> None
         | Some max2 ->
           try
-            let v = Datatype.Integer.Set.nearest_elt_ge max2 wh
+            let v = Datatype.Integer.Set.nearest_elt_ge max2 thresholds
             in Some (Int.round_down_to_r ~r:rem ~modu ~max:v)
           with Not_found -> None
     in

@@ -81,11 +81,14 @@ module type S = sig
     val narrow : t -> t -> t
   end
 
-  (** Bases that must be widening in priority, plus widening hints for each
-      base. *)
-  type widen_hint = Base.Set.t * (Base.t -> widen_hint_base)
+  (** Widening hint for each base. *)
+  type widen_hint = Base.t -> widen_hint_base
 
-  val widen : widen_hint-> t -> t -> t
+  (** [widen ~priority ~hint m1 m2] performs a widening on [m2], assuming that
+      [m1] was the previous state. The relation [is_included m1 m2] must hold.
+      [priority] is an optional set of bases that must be widened in priority.
+      [hint] defines optional hint for each base. *)
+  val widen : ?priority:Base.Set.t -> ?hint:widen_hint -> t -> t -> t
 
   (** [merge ~into t] adds all binding from [t] into [into].  *)
   val merge: into:t -> t -> t

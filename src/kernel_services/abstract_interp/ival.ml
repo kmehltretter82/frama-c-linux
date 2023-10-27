@@ -95,10 +95,7 @@ end
 
 include Type
 
-module Widen_Hints = Datatype.Integer.Set
-type size_widen_hint = Integer.t
-type numerical_widen_hint = Widen_Hints.t * Fc_float.Widen_Hints.t
-type widen_hint = size_widen_hint * numerical_widen_hint
+type widen_hint = Datatype.Integer.Set.t * Datatype.Float.Set.t
 
 let hash = function
   | Bottom -> 311
@@ -303,7 +300,7 @@ let has_smaller_max_bound t1 t2 =
     | Some _, None -> 1
     | Some m1, Some m2 -> Int.compare m2 m1
 
-let widen (bitsize,(wh,fh)) t1 t2 =
+let widen ?size ?hint t1 t2 =
   if equal t1 t2 || cardinal_zero_or_one t1 || is_bottom t1 then t2
   else
     match t2 with
@@ -311,22 +308,22 @@ let widen (bitsize,(wh,fh)) t1 t2 =
     | Float f2 ->
       let f1 = project_float t1 in
       let prec =
-        if Integer.equal bitsize (Integer.of_int 32)
-        then Float_sig.Single
-        else if Integer.equal bitsize (Integer.of_int 64)
-        then Float_sig.Double
-        else if Integer.equal bitsize (Integer.of_int 128)
-        then Float_sig.Long_Double
-        else Float_sig.Single
+        match Option.bind size Integer.to_int_opt with
+        | Some 32 -> Float_sig.Single
+        | Some 64 -> Float_sig.Double
+        | Some 128 -> Float_sig.Long_Double
+        | Some _ | None -> Float_sig.Single
       in
-      inject_float (Fval.widen fh prec f1 f2)
+      let hint = Option.map snd hint in
+      inject_float (Fval.widen ?hint prec f1 f2)
     | Int i2 ->
       let i1 = match t1 with
         | Bottom -> assert false
         | Int i1 -> i1
         | Float _ -> Int_val.top
       in
-      inject_int (Int_val.widen (bitsize,wh) i1 i2)
+      let hint = Option.map fst hint in
+      inject_int (Int_val.widen ?size ?hint i1 i2)
 
 let meet v1 v2 =
   if v1 == v2 then v1 else
