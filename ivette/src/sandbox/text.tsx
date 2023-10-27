@@ -30,7 +30,7 @@ import * as Dome from 'dome';
 import { ToolBar, Filler } from 'dome/frame/toolbars';
 import { Code } from 'dome/controls/labels';
 import { Button } from 'dome/controls/buttons';
-import { TextView, TextProxy } from 'dome/text/richtext';
+import { TextView, TextProxy, TextBuffer } from 'dome/text/richtext';
 import { registerSandbox } from 'ivette';
 
 /* -------------------------------------------------------------------------- */
@@ -38,23 +38,39 @@ import { registerSandbox } from 'ivette';
 /* -------------------------------------------------------------------------- */
 
 function UseText(): JSX.Element {
-  const [readOnly, setReadOnly] = React.useState(false);
   const [prefix, setPrefix] = React.useState('');
-  const text = React.useMemo(() => new TextProxy(), []);
-  const onLockUnlock = React.useCallback(() => setReadOnly((v) => !v), []);
+  const [readOnly, flipReadOnly] = Dome.useFlipState(false);
+  const [useProxy, flipUseProxy] = Dome.useFlipState(true);
+  const [changes, setChanges] = React.useState(0);
+  const proxy = React.useMemo(() => new TextProxy(), []);
+  const buffer = React.useMemo(() => new TextBuffer(), []);
+  const text = useProxy ? proxy : buffer;
   const updatePrefix = React.useCallback(
-    () => setPrefix(text.toString().substring(0, 20).trim()),
-    [text]
-  );
-  const push = React.useCallback(() => text.append(prefix), [text, prefix]);
+    () => {
+      setChanges((n) => 1+n);
+      setPrefix(text.toString().substring(0, 20).trim());
+    }, [text]);
+  const push = React.useCallback(() => {
+    const n = Math.random();
+    text.append(`ADDED${n}\n`);
+  }, [text]);
   const onChange = Dome.useDebounced(updatePrefix, 200);
   return (
     <>
       <ToolBar>
-        <Button icon={readOnly ? 'LOCK' : 'EDIT'} onClick={onLockUnlock} />
+        <Button
+          icon={readOnly ? 'LOCK' : 'EDIT'}
+          title={readOnly ? 'Read Only' : 'Editable'}
+          onClick={flipReadOnly}
+        />
+        <Button
+          icon={useProxy ? 'DISPLAY' : 'SAVE'}
+          title={useProxy ? 'Use TextProxy' : 'Use TextBuffer (persistent)'}
+          onClick={flipUseProxy}
+        />
         <Filler />
-        <Code>{`"${prefix}"`}</Code>
-        <Button label="Push" enabled={prefix!==''} onClick={push} />
+        <Code>{`"${prefix}" (${changes})`}</Code>
+        <Button label="Push" onClick={push} />
         <Button label="Clear" kind='negative' onClick={text.clear}  />
       </ToolBar>
       <TextView

@@ -39,11 +39,11 @@ export function byDepth(a : Range, b : Range): number
   return (a.length - b.length) || (b.offset - a.offset);
 }
 
-/* -------------------------------------------------------------------------- */
-/* --- Text Buffer                                                        --- */
-/* -------------------------------------------------------------------------- */
-
 type View = CM.EditorView | null;
+
+/* -------------------------------------------------------------------------- */
+/* --- Text View Updates                                                  --- */
+/* -------------------------------------------------------------------------- */
 
 function appendContents(view: CM.EditorView, text: string): void {
   const length = view.state.doc.length;
@@ -55,24 +55,24 @@ function dispatchContents(view: CM.EditorView, text: string): void {
   view.dispatch({ changes: { from: 0, to: length, insert: text } });
 }
 
-/**
-   Text contents of a RichText component.
+/* -------------------------------------------------------------------------- */
+/* --- Text Proxy                                                         --- */
+/* -------------------------------------------------------------------------- */
 
-   This class can be used as a proxy to a the content of a {RichText}
-   component. Using the methods of the class, you can update or dump the
-   contents edited/viewed by the associated component.
+/** Text proxy to a RichText component.
 
-   At most one component shall be associated with a given Text buffer at the
-   same time.
+   This class can be used as a proxy to the content of a {RichText} component,
+   provided such a component has been associated with the proxy.
 
-   All methods are bound to `this`.
- */
+   Methods of the class are no-ops when there is no associated view, and at most
+   one component shall be associated with a given Text buffer at the same time.
+
+   All methods are bound to `this`.  */
 export class TextProxy {
 
   // --- Private part
 
-  private buffer = '';
-  private proxy : View = null;
+  protected proxy : View = null;
 
   constructor() {
     this.clear = this.clear.bind(this);
@@ -83,16 +83,73 @@ export class TextProxy {
   }
 
   /** @ignore */
+  connect(newView: View): void { this.proxy = newView; }
+
+  // --- Public part
+
+  clear(): void {
+    const view = this.proxy;
+    if (view) dispatchContents(view, '');
+  }
+
+  toString(): string {
+    const view = this.proxy;
+    return view ? view.state.doc.toString() : '';
+  }
+
+  append(data: string): void {
+    const view = this.proxy;
+    if (view) appendContents(view, data);
+  }
+
+  setContents(data: string): void {
+    const view = this.proxy;
+    if (view) dispatchContents(view, data);
+  }
+
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Text Buffer                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+const NewLine = /(\r\n|\r|\n)/;
+function textOf(text: string): CS.Text {
+  return CS.Text.of(text.split(NewLine));
+}
+
+/** Text buffer extends a text proxy by making the contents persistent.
+
+   Contents is kept in sync with the associated view, and is still maintained or
+   updated when the view is unmounted.
+
+   All methods are bound to `this`. */
+export class TextBuffer extends TextProxy {
+
+  // --- Private part (we avoid unecessary conversions from/to text)
+  // --- Invariant: only one of proxy, text & contents holds data
+
+  private text = CS.Text.empty;
+  private contents : string | undefined = undefined;
+  private toText(): CS.Text {
+    const contents = this.contents;
+    return contents === undefined ? this.text : textOf(contents);
+  }
+
+  /** @ignore */
   connect(newView: View): void {
     const oldView = this.proxy;
     if (oldView) {
       this.proxy = null;
-      this.buffer = oldView.state.doc.toString();
+      this.text = oldView.state.doc;
+      // invariant preserved
     }
     if (newView) {
-      dispatchContents(newView, this.buffer);
+      dispatchContents(newView, this.toString());
       this.proxy = newView;
-      this.buffer = '';
+      this.text = CS.Text.empty;
+      this.contents = undefined;
+      // invariant established
     }
   }
 
@@ -101,24 +158,37 @@ export class TextProxy {
   clear(): void {
     const view = this.proxy;
     if (view) dispatchContents(view, '');
-    else this.buffer = '';
+    else {
+      this.text = CS.Text.empty;
+      this.contents = undefined;
+      // invariant established
+    }
   }
 
   toString(): string {
     const view = this.proxy;
-    return view ? view.state.doc.toString() : this.buffer;
+    if (view) return view.state.doc.toString();
+    return this.contents ?? this.text.toString();
   }
 
-  append(text: string): void {
+  append(data: string): void {
     const view = this.proxy;
-    if (view) appendContents(view, text);
-    else this.buffer += text;
+    if (view) { appendContents(view, data); }
+    else {
+      this.text = this.toText().append(textOf(data));
+      this.contents = undefined;
+      // invariant established
+    }
   }
 
-  setContents(text: string): void {
+  setContents(data: string): void {
     const view = this.proxy;
-    if (view) dispatchContents(view, text);
-    else this.buffer = text;
+    if (view) dispatchContents(view, data);
+    else {
+      this.contents = data;
+      this.text = CS.Text.empty;
+      // invariant established
+    }
   }
 
 }
@@ -215,7 +285,7 @@ export interface RichTextProps {
 export function TextView(props: RichTextProps) : JSX.Element {
   const [view, setView] = React.useState<View>(null);
 
-  // --- text
+  // --- text proxy
   const { text } = props;
   React.useEffect(() => {
     if (text) {

@@ -572,6 +572,25 @@ export function useForceUpdate(): () => void {
 }
 
 /**
+   Hook for a flipping boolean state.
+   The updating callback can be used either as a setter or as a flipper.
+ */
+export function useFlipState(
+  init: boolean
+): [boolean, (forced?: boolean) => void]
+{
+  const [value, setValue] = React.useState(init);
+  const flipValue = React.useCallback(
+    (forced?: boolean) => {
+      if (forced !== undefined)
+        setValue(forced);
+      else
+        setValue((v) => !v);
+    }, []);
+  return [value, flipValue];
+}
+
+/**
    Hook to re-render on Dome events (Custom React Hook).
    @param events - event names, defaults to a single `'dome.update'`.
 */
@@ -972,6 +991,7 @@ export function useBoolSettings(
 
 /**
    Bool window settings helper with a flip callback.
+   See also {useFlipState}.
  */
 export function useFlipSettings(
   key: string | undefined,
