@@ -25,7 +25,32 @@ variables:
   OCAML: "4.13"
   PUBLISH: "no"
   RELEASE: "no"
-  WEEKLY: "no"
+
+################################################################################
+### ONLY/EXCEPT TEMPLATES
+
+.build_template: &manual_when_not_special_pipeline
+  except:
+    refs:
+      - schedules
+    variables:
+      - $RELEASE == "yes"
+  when: manual
+
+.build_template: &when_release
+  only:
+    variables:
+      - $RELEASE == "yes"
+
+.build_template: &when_schedules
+  only:
+    refs:
+      - schedules
+
+.build_template: &when_publish
+  only:
+    variables:
+      - $PUBLISH == "yes"
 
 ################################################################################
 ### PREPARE
@@ -66,9 +91,7 @@ check-publish:
     [[ "$RELEASE" == "no" ]] &&
     [[ "$DEFAULT" == "$CI_COMMIT_BRANCH" ]] &&
     [[ "$DEFAULT" == "master" ]]
-  only:
-    variables:
-      - $PUBLISH == "yes"
+  <<: *when_publish
 
 check-release:
   stage: prepare
@@ -78,9 +101,7 @@ check-release:
     [[ "$DEFAULT" == "stable/$(cat VERSION_CODENAME | tr '[:upper:]' '[:lower:]')" ]] &&
     [[ "$(git describe --tag)" == "$(cat VERSION | sed 's/~/-/')" ]] &&
     [[ "$(cat VERSION)" == "$(cat opam | grep "^version" | sed 's/version: \"\(.*\)\"/\1/')" ]]
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
 
 # Observed: when several shell with same dependencies are started, deadlock may
 #           occur when building these dependencies. We build these dependencies
@@ -293,12 +314,14 @@ lint:
 
 # Manuals
 
-.build_template: &manuals_template
+.build_template: &manuals_build_template
   stage: distrib
   variables:
     OUT: "manuals"
   script:
     - ./nix/build-proxy.sh manuals
+
+.build_template: &manuals_artifacts_template
   artifacts:
     paths:
       - manuals/*.pdf
@@ -307,31 +330,22 @@ lint:
     expire_in: 7 days # Note: the LAST artifact of the ref is always kept
 
 manuals:
-  <<: *manuals_template
-  except:
-    refs:
-      - schedules
-    variables:
-      - $RELEASE == "yes"
-  when: manual
+  <<: *manuals_build_template
 
-manuals-changed:
-  <<: *manuals_template
-  only:
-    changes:
-      - doc/**/*
+manuals-artifacts:
+  <<: *manuals_build_template
+  <<: *manuals_artifacts_template
+  <<: *manual_when_not_special_pipeline
 
 manuals-nightly:
-  <<: *manuals_template
-  only:
-    - schedules
-  allow_failure: true
+  <<: *manuals_build_template
+  <<: *manuals_artifacts_template
+  <<: *when_publish
 
 manuals-for-release:
-  <<: *manuals_template
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *manuals_build_template
+  <<: *manuals_artifacts_template
+  <<: *when_release
 
 # Release artifacts
 
@@ -349,9 +363,7 @@ release-content:
       - wiki
       - opam-repository
       - release-data.json
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
 
 ################################################################################
 ### COMPATIBILITY
@@ -411,9 +423,7 @@ ocaml-versions-nightly:
   <<: *ocaml_versions_template
   <<: *ocaml_always_additional_versions_template
   # we still check them for the publisher pipeline job
-  only:
-    variables:
-      - $PUBLISH == "yes"
+  <<: *when_publish
 
 # Opam pin
 
@@ -431,24 +441,15 @@ ocaml-versions-nightly:
 
 opam-pin:
   <<: *opam_pin_template
-  except:
-    refs:
-      - schedules
-    variables:
-      - $RELEASE == "yes"
-  when: manual
+  <<: *manual_when_not_special_pipeline
 
 opam-pin-nightly:
   <<: *opam_pin_template
-  only:
-    refs:
-      - schedules
+  <<: *when_schedules
 
 opam-pin-release:
   <<: *opam_pin_template
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
 
 .build_template: &opam_pin_minimal_template
   stage: compatibility
@@ -481,19 +482,17 @@ opam-pin-release:
 
 opam-pin-minimal:
   <<: *opam_pin_minimal_template
-  except:
-    refs:
-      - schedules
-    variables:
-      - $WEEKLY == "yes"
-  when: manual
+  <<: *manual_when_not_special_pipeline
 
-opam-pin-minimal-weekly:
+opam-pin-minimal-nightly:
   <<: *opam_pin_minimal_template
+  <<: *when_schedules
   timeout: 2h
-  only:
-    variables:
-      - $WEEKLY == "yes"
+
+opam-pin-minimal-release:
+  <<: *opam_pin_minimal_template
+  <<: *when_release
+  timeout: 2h
 
 # Distrib
 
@@ -507,27 +506,19 @@ opam-pin-minimal-weekly:
 
 src-distrib-tests:
   <<: *src_distrib_tests_template
-  except:
-    refs:
-      - schedules
-    variables:
-      - $RELEASE == "yes"
+  <<: *manual_when_not_special_pipeline
 
 src-distrib-tests-scheduled:
   <<: *src_distrib_tests_template
+  <<: *when_schedules
   # The Opam target may affect this job
   timeout: 2h
-  only:
-    refs:
-      - schedules
 
 src-distrib-tests-release:
   <<: *src_distrib_tests_template
+  <<: *when_release
   # The Opam target may affect this job
   timeout: 2h
-  only:
-    variables:
-      - $RELEASE == "yes"
 
 ################################################################################
 ### RELEASE
@@ -545,9 +536,7 @@ release-branch:
     - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/$CI_COMMIT_BRANCH)
     - BRANCH="$CI_COMMIT_BRANCH" nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-branch.sh'
     # Note: BRANCH must be defined here, since we cannot *evaluate* a variable in 'variables'
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
   when: manual
   interruptible: false
 
@@ -559,9 +548,7 @@ release-create:
   needs:
     - release-branch
     - release-content
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
   when: manual
   interruptible: false
 
@@ -570,9 +557,7 @@ release-opam:
   <<: *prepare_ssh_template
   script:
     - nix-shell -p git git-lfs coreutils openssh --run './nix/frama-c-public/publish-opam.sh'
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
   interruptible: false
 
 release-website:
@@ -580,9 +565,7 @@ release-website:
   <<: *prepare_ssh_template
   script:
     - nix-shell -p git git-lfs coreutils openssh --run './nix/frama-c-public/publish-website.sh'
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
   interruptible: false
 
 release-wiki:
@@ -590,9 +573,7 @@ release-wiki:
   <<: *prepare_ssh_template
   script:
     - nix-shell -p git git-lfs coreutils openssh --run './nix/frama-c-public/publish-wiki.sh'
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
   interruptible: false
 
 ################################################################################
@@ -621,9 +602,7 @@ publish-frama-c:
   script:
     - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/master)
     -  nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-branch.sh'
-  only:
-    variables:
-      - $PUBLISH == "yes"
+  <<: *when_publish
   interruptible: false
 
 publish-fclang:
@@ -634,9 +613,7 @@ publish-fclang:
   <<: *prepare_ssh_template
   script:
     - nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-branch.sh'
-  only:
-    variables:
-      - $PUBLISH == "yes"
+  <<: *when_publish
   interruptible: false
 
 publish-meta:
@@ -647,7 +624,5 @@ publish-meta:
   <<: *prepare_ssh_template
   script:
     - nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-branch.sh'
-  only:
-    variables:
-      - $PUBLISH == "yes"
+  <<: *when_publish
   interruptible: false
