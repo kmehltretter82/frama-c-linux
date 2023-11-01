@@ -621,8 +621,7 @@ let assignment_x_allocate_y (a:t) (lv:lval) : t =
   match G.succ a.graph v1 with
   | [] ->
     let (v2,a) = create_cst_vertex a in
-    let new_a : t = set_type a v1 v2 in
-    let () = assert_invariants new_a in new_a
+    set_type a v1 v2
   | [_v2] -> a
   | _ -> Options.fatal "this should not hapen (invariant broken)"
 
