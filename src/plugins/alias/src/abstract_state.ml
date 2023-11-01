@@ -137,6 +137,11 @@ let find_aliases (lv:lval) (x:t) =
     find_lset v x
   with Not_found -> LSet.empty
 
+let add_lval_to_vertex lv v (x : t) =
+  let new_lmap = LLMap.add lv v x.lmap in
+  let new_vmap = VMap.update v (Option.map @@ LSet.add lv) x.vmap in
+  {x with lmap = new_lmap; vmap = new_vmap}
+
 let rec get_points_to (v:V.t) (x:t) : LSet.t =
   assert (G.mem_vertex x.graph v);
   let set_predecessors =
@@ -427,9 +432,7 @@ let rec create_vertex lv x =
               v2, {x with graph = new_graph }
             | [succ_v1] ->
               (* if there is a successor, update lmap and vmap to add blv to that successor's set *)
-              let new_lmap = LLMap.add lv succ_v1 x.lmap in
-              let new_vmap = VMap.add succ_v1 (LSet.add lv (VMap.find succ_v1 x.vmap)) x.vmap in
-              succ_v1, {x with lmap = new_lmap ; vmap = new_vmap }
+              succ_v1, add_lval_to_vertex lv succ_v1 x
             | _ -> Options.fatal " Invariant violated : more than 1 successor"
           end
       end
@@ -467,9 +470,7 @@ and find_or_create_lval_vertex (lv:lval) (x:t) : V.t * t =
       let () = assert (VSet.cardinal vset_res = 1) in
       let v_res = VSet.choose vset_res in
       (* vertex found, update the tables *)
-      let new_lmap = LLMap.add lv v_res x.lmap in
-      let new_vmap = VMap.add v_res (LSet.add lv (VMap.find v_res x.vmap)) x.vmap in
-      v_res, {x with lmap = new_lmap; vmap = new_vmap}
+      v_res, add_lval_to_vertex lv v_res x
 
 (* find the vertex of an lval *)
 and find_or_create_vertex (lv : LvalOrRef.t) (x:t) : V.t * t =
