@@ -2,20 +2,43 @@
 [alias] analysing function: choice
 [alias] analysing instruction: int c = 0;
 [alias] May-aliases after instruction  int c = 0;  are  <none>
+[alias] May-alias graph after instruction  int c = 0;  is    <empty>
 [alias] analysing instruction: __retres = x;
 [alias] May-aliases after instruction  __retres = x;  are  { x; __retres }
+[alias] May-alias graph after instruction  __retres = x;  is
+  0:{ x; __retres } → 1:{  }
 [alias] analysing instruction: __retres = y;
 [alias] May-aliases after instruction  __retres = y;  are  { y; __retres }
+[alias] May-alias graph after instruction  __retres = y;  is
+  4:{ y; __retres } → 5:{  }
 [alias] May-aliases at the end of function choice: { x; y; __retres }
+[alias] May-alias graph at the end of function choice:
+  0:{ x; y; __retres } → 1:{  }
+[alias] Summary of function choice:
+  formals: x  y    locals: c  __retres    returns: __retres
+  state: { x; y; __retres }
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
 [alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *a = (int *)0;  is    <empty>
 [alias] analysing instruction: int *b = (int *)0;
 [alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *b = (int *)0;  is    <empty>
 [alias] analysing instruction: int *c = (int *)0;
 [alias] May-aliases after instruction  int *c = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *c = (int *)0;  is    <empty>
 [alias] analysing instruction: c = choice(a,b);
 [alias] May-aliases after instruction  c = choice(a,b);  are  { a; b; c }
+[alias] May-alias graph after instruction  c = choice(a,b);  is
+  10:{ c } → 9:{  }   12:{ a } → 9:{  }   14:{ b } → 9:{  }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  { a; b; c }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  10:{ c } → 9:{  }   12:{ a } → 9:{  }   14:{ b } → 9:{  }
 [alias] May-aliases at the end of function main: { a; b; c }
+[alias] May-alias graph at the end of function main:
+  10:{ c } → 9:{  }   12:{ a } → 9:{  }   14:{ b } → 9:{  }
+[alias] Summary of function main:
+  formals:     locals: a  b  c  __retres    returns: __retres
+  state: { a; b; c }
+[alias] Analysis complete

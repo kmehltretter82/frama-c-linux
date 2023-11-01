@@ -1,2 +1,2 @@
 PLUGIN: alias
-OPT: -alias -alias-verbose 3
+OPT: -alias -alias-verbose 3 -alias-debug 3

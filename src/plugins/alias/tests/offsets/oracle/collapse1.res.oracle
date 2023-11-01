@@ -2,18 +2,32 @@
 [alias] analysing function: main
 [alias] analysing instruction: tab[0] = 0;
 [alias] May-aliases after instruction  tab[0] = 0;  are  <none>
+[alias] May-alias graph after instruction  tab[0] = 0;  is    <empty>
 [alias] analysing instruction: tab[1] = 1;
 [alias] May-aliases after instruction  tab[1] = 1;  are  <none>
+[alias] May-alias graph after instruction  tab[1] = 1;  is    <empty>
 [alias] analysing instruction: tab[2] = tab[1] + 1;
 [alias] May-aliases after instruction  tab[2] = tab[1] + 1;  are  <none>
+[alias] May-alias graph after instruction  tab[2] = tab[1] + 1;  is    <empty>
 [alias] analysing instruction: int x = 0;
 [alias] May-aliases after instruction  int x = 0;  are  <none>
+[alias] May-alias graph after instruction  int x = 0;  is    <empty>
 [alias] analysing instruction: int i = 0;
 [alias] May-aliases after instruction  int i = 0;  are  <none>
+[alias] May-alias graph after instruction  int i = 0;  is    <empty>
 [alias] analysing instruction: x = tab[i];
 [alias] May-aliases after instruction  x = tab[i];  are  <none>
+[alias] May-alias graph after instruction  x = tab[i];  is    <empty>
 [alias] analysing instruction: i ++;
 [alias] May-aliases after instruction  i ++;  are  <none>
+[alias] May-alias graph after instruction  i ++;  is    <empty>
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  <none>
+[alias] May-alias graph after instruction  __retres = 0;  is    <empty>
 [alias] May-aliases at the end of function main: <none>
+[alias] May-alias graph at the end of function main:
+  <empty>
+[alias] Summary of function main:
+  formals:     locals: tab  x  i  __retres    returns: __retres
+  state: <none>
+[alias] Analysis complete

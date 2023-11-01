@@ -2,12 +2,26 @@
 [alias] analysing function: main
 [alias] analysing instruction: mat[0][0] = 0;
 [alias] May-aliases after instruction  mat[0][0] = 0;  are  <none>
+[alias] May-alias graph after instruction  mat[0][0] = 0;  is    <empty>
 [alias] analysing instruction: mat[0][1] = 1;
 [alias] May-aliases after instruction  mat[0][1] = 1;  are  <none>
+[alias] May-alias graph after instruction  mat[0][1] = 1;  is    <empty>
 [alias] analysing instruction: *x = mat[1];
 [alias] May-aliases after instruction  *x = mat[1];  are  <none>
+[alias] May-alias graph after instruction  *x = mat[1];  is
+  0:{ x } → 1:{ *x }   1:{ *x } → 2:{ mat[0..] }
 [alias] analysing instruction: *y = *(*(x + 0));
 [alias] May-aliases after instruction  *y = *(*(x + 0));  are  <none>
+[alias] May-alias graph after instruction  *y = *(*(x + 0));  is
+  0:{ x } → 1:{ *x }   1:{ *x } → 2:{ mat[0..] }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  <none>
+[alias] May-alias graph after instruction  __retres = 0;  is
+  0:{ x } → 1:{ *x }   1:{ *x } → 2:{ mat[0..] }
 [alias] May-aliases at the end of function main: <none>
+[alias] May-alias graph at the end of function main:
+  0:{ x } → 1:{ *x }   1:{ *x } → 2:{ mat[0..] }
+[alias] Summary of function main:
+  formals:     locals: mat  x→{ *x }  y  __retres    returns: __retres
+  state: <none>
+[alias] Analysis complete

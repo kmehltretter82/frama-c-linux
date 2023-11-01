@@ -2,18 +2,38 @@
 [alias] analysing function: main
 [alias] analysing instruction: b = & c;
 [alias] May-aliases after instruction  b = & c;  are  { *b; c }
+[alias] May-alias graph after instruction  b = & c;  is
+  0:{ b } → 1:{ c }   1:{ c } → 3:{  }
 [alias] analysing instruction: c = & d;
 [alias] May-aliases after instruction  c = & d;  are  { *b; c }  { *(*b); *c; d }
+[alias] May-alias graph after instruction  c = & d;  is
+  0:{ b } → 1:{ c }   1:{ c } → 3:{ d }   3:{ d } → 6:{  }
 [alias] analysing instruction: d = & e;
 [alias] May-aliases after instruction  d = & e;  are  { *b; c }  { *(*b); *c; d }
+[alias] May-alias graph after instruction  d = & e;  is
+  0:{ b } → 1:{ c }   1:{ c } → 3:{ d }   3:{ d } → 6:{ e }
 [alias] analysing instruction: a = b;
 [alias] May-aliases after instruction  a = b;  are
   { *a; *b; c }  { *(*a); *(*b); *c; d }  { a; b }
+[alias] May-alias graph after instruction  a = b;  is
+  3:{ d } → 6:{ e }   10:{ a; b } → 11:{ c }   11:{ c } → 3:{ d }
 [alias] analysing instruction: a = & c;
 [alias] May-aliases after instruction  a = & c;  are
   { *a; *b; c }  { *(*a); *(*b); *c; d }  { a; b }
+[alias] May-alias graph after instruction  a = & c;  is
+  0:{ b } → 13:{ c }   3:{ d } → 6:{ e }   12:{ a } → 13:{ c }
+  13:{ c } → 3:{ d }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
   { *a; *b; c }  { *(*a); *(*b); *c; d }  { a; b }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  3:{ d } → 6:{ e }   10:{ a; b } → 11:{ c }   11:{ c } → 3:{ d }
 [alias] May-aliases at the end of function main:
   { *a; *b; c }  { *(*a); *(*b); *c; d }  { a; b }
+[alias] May-alias graph at the end of function main:
+  3:{ d } → 6:{ e }   10:{ a; b } → 11:{ c }   11:{ c } → 3:{ d }
+[alias] Summary of function main:
+  formals: 
+  locals: a→{ c }  b→{ c }  c→{ d }  d→{ e }  e  __retres
+  returns: __retres    state: { *a; *b; c }  { *(*a); *(*b); *c; d }  { a; b }
+[alias] Analysis complete

@@ -2,34 +2,68 @@
 [alias] analysing function: main
 [alias] analysing instruction: a = b;
 [alias] May-aliases after instruction  a = b;  are  { a; b }
+[alias] May-alias graph after instruction  a = b;  is    0:{ a; b } → 1:{  }
 [alias] analysing instruction: b = & i;
 [alias] May-aliases after instruction  b = & i;  are  { a; b }  { *a; *b; i }
+[alias] May-alias graph after instruction  b = & i;  is
+  0:{ a; b } → 1:{ i }   1:{ i } → 5:{  }
 [alias] analysing instruction: i = & x;
 [alias] May-aliases after instruction  i = & x;  are
   { a; b }  { *a; *b; i }  { *(*a); *(*b); *i; x }
+[alias] May-alias graph after instruction  i = & x;  is
+  0:{ a; b } → 1:{ i }   1:{ i } → 5:{ x }   5:{ x } → 8:{  }
 [alias] analysing instruction: x = & t;
 [alias] May-aliases after instruction  x = & t;  are
   { a; b }  { *a; *b; i }  { *(*a); *(*b); *i; x }
   { *(*(*a)); *(*(*b)); *(*i); *x; t }
+[alias] May-alias graph after instruction  x = & t;  is
+  0:{ a; b } → 1:{ i }   1:{ i } → 5:{ x }   5:{ x } → 8:{ t }
+  8:{ t } → 11:{  }
 [alias] analysing instruction: a = c;
 [alias] May-aliases after instruction  a = c;  are  { a; c }
+[alias] May-alias graph after instruction  a = c;  is    13:{ a; c } → 14:{  }
 [alias] analysing instruction: c = & j;
 [alias] May-aliases after instruction  c = & j;  are  { a; c }  { *a; *c; j }
+[alias] May-alias graph after instruction  c = & j;  is
+  13:{ a; c } → 14:{ j }   14:{ j } → 18:{  }
 [alias] analysing instruction: j = & y;
 [alias] May-aliases after instruction  j = & y;  are
   { a; c }  { *a; *c; j }  { *(*a); *(*c); *j; y }
+[alias] May-alias graph after instruction  j = & y;  is
+  13:{ a; c } → 14:{ j }   14:{ j } → 18:{ y }   18:{ y } → 21:{  }
 [alias] analysing instruction: y = & u;
 [alias] May-aliases after instruction  y = & u;  are
   { a; c }  { *a; *c; j }  { *(*a); *(*c); *j; y }
   { *(*(*a)); *(*(*c)); *(*j); *y; u }
+[alias] May-alias graph after instruction  y = & u;  is
+  13:{ a; c } → 14:{ j }   14:{ j } → 18:{ y }   18:{ y } → 21:{ u }
+  21:{ u } → 24:{  }
 [alias] analysing instruction: p = 0;
 [alias] May-aliases after instruction  p = 0;  are
   { a; b; c }  { *a; *b; *c; i; j }  { *(*a); *(*b); *(*c); *i; *j; x; y }
   { *(*(*a)); *(*(*b)); *(*(*c)); *(*i); *(*j); *x; *y; t; u }
+[alias] May-alias graph after instruction  p = 0;  is
+  0:{ a; b; c } → 1:{ i; j }   1:{ i; j } → 5:{ x; y }
+  5:{ x; y } → 8:{ t; u }   8:{ t; u } → 11:{  }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
   { a; b; c }  { *a; *b; *c; i; j }  { *(*a); *(*b); *(*c); *i; *j; x; y }
   { *(*(*a)); *(*(*b)); *(*(*c)); *(*i); *(*j); *x; *y; t; u }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  0:{ a; b; c } → 1:{ i; j }   1:{ i; j } → 5:{ x; y }
+  5:{ x; y } → 8:{ t; u }   8:{ t; u } → 11:{  }
 [alias] May-aliases at the end of function main:
   { a; b; c }  { *a; *b; *c; i; j }  { *(*a); *(*b); *(*c); *i; *j; x; y }
   { *(*(*a)); *(*(*b)); *(*(*c)); *(*i); *(*j); *x; *y; t; u }
+[alias] May-alias graph at the end of function main:
+  0:{ a; b; c } → 1:{ i; j }   1:{ i; j } → 5:{ x; y }
+  5:{ x; y } → 8:{ t; u }   8:{ t; u } → 11:{  }
+[alias] Summary of function main:
+  formals: 
+  locals: a→{ i; j }  b→{ i; j }  c→{ i; j }  i→{ x; y }  j→{ x; y }
+           x→{ t; u }  y→{ t; u }  t  u  p  __retres
+  returns: __retres
+  state: { a; b; c }  { *a; *b; *c; i; j }
+         { *(*a); *(*b); *(*c); *i; *j; x; y }
+         { *(*(*a)); *(*(*b)); *(*(*c)); *(*i); *(*j); *x; *y; t; u }
+[alias] Analysis complete
