@@ -905,7 +905,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
   let vertices_to_add_to_g, g =
     let g = ref g in
     let remove_if_leaf v _ =
-      if G.in_degree sum_state.graph v = 0
+      if G.in_degree !g v = 0
       then let () = g := G.remove_vertex !g v in None
       else Some LSet.empty
     in
