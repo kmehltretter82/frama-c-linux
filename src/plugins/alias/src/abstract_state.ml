@@ -205,16 +205,23 @@ let print_debug fmt (x:t) =
 
 let print_graph fmt (x:t) =
   let is_first = ref true in
+  let print_node v fmt lset = Format.fprintf fmt "%d:%a" v LSet.pretty lset in
   let print_edge v1 v2 =
     if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
-    let print_node v fmt lset = Format.fprintf fmt "%d:%a" v LSet.pretty lset in
     Format.fprintf fmt "@[%a@] → @[%a@]"
       (print_node v1) (VMap.find v1 x.vmap)
       (print_node v2) (VMap.find v2 x.vmap)
   in
-  if G.nb_edges x.graph = 0
+  let print_unconnected_vertex v =
+    if G.in_degree x.graph v = 0 && G.out_degree x.graph v = 0 then begin
+      if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
+      print_node v fmt (VMap.find v x.vmap)
+    end
+  in
+  if G.nb_vertex x.graph = 0
   then Format.fprintf fmt "<empty>"
-  else G.iter_edges print_edge x.graph
+  else (G.iter_edges print_edge x.graph;
+        G.iter_vertex print_unconnected_vertex x.graph)
 
 let print_aliases fmt (x:t) =
   let is_first = ref true in
