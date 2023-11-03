@@ -1,6 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing loop.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal init_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal init_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function init
@@ -87,7 +89,7 @@ Assume {
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
-  When: (a <= i_1) /\ (i_1 <= i).
+  When: (i_1 <= i) /\ (a <= i_1).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a_1, 1 + b - a).
   (* Pre-condition *)
@@ -119,13 +121,13 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Loop assigns 'qed_ok' (2/3):
-Effect at line 15
+Effect at line 17
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Loop assigns 'qed_ok' (3/3):
-Effect at line 16
+Effect at line 18
 Let a_1 = shift_sint32(t, a).
 Let x = -a.
 Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, i - a).
@@ -162,7 +164,7 @@ Prove: included(a_3, 1, a_1, 1 + i - a).
 ------------------------------------------------------------
 
 Goal Assigns 'qed_ok' in 'init':
-Effect at line 15
+Effect at line 17
 Let x = 1 + b.
 Let a_1 = shift_sint32(t, a).
 Let x_1 = -a.
@@ -180,5 +182,15 @@ Assume {
   Have: a <= x.
 }
 Prove: i <= x.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file loop.i, line 17):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file loop.i, line 17):
+Prove: true.
 
 ------------------------------------------------------------

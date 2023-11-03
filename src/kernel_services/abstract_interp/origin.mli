@@ -30,10 +30,7 @@
 
 
 (** Lattice of source locations. *)
-module LocationLattice : sig
-  include Lattice_type.Lattice_Base with type l = Cil_types.location
-  val current_loc : unit -> t
-end
+module LocationLattice : Datatype.S
 
 (** List of possible origins. Most of them also include the set of
     source locations where the operation took place. *)

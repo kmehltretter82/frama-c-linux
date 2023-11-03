@@ -14,6 +14,10 @@
             by Wp.typed.
 [  Valid  ] Post-condition 'B'
             by Wp.typed.
+[  Valid  ] Exit-condition (generated)
+            by Unreachable Annotations.
+[  Valid  ] Termination-condition (generated)
+            by Trivial Termination.
 [  Valid  ] Assigns (file working_dir/swap2.h, line 4)
             by Wp.typed.
 [  Valid  ] Assertion 'rte,mem_access' (file working_dir/swap.c, line 3)
@@ -30,6 +34,6 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-     8 Completely validated
-     8 Total
+    10 Completely validated
+    10 Total
 --------------------------------------------------------------------------------

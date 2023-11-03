@@ -2,13 +2,17 @@
 [kernel] Parsing doomed_localinit.i (no preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function access
+[wp] [Valid] Goal access_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal access_terminates (Cfg) (Trivial)
 [wp] 4 goals scheduled
 [wp] [Passed] (Unsuccess) typed_access_wp_smoke_dead_code_s3 (Alt-Ergo) (Cached)
 [wp] [Failed] (Doomed) typed_access_wp_smoke_dead_code_s5 (Qed)
 [wp] doomed_localinit.i:11: Warning: Failed smoke-test
 [wp] [Unsuccess] typed_access_assert_rte_mem_access (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_access_assert_rte_mem_access_2 (Alt-Ergo) (Cached)
-[wp] Proved goals:    1 / 4
+[wp] Proved goals:    3 / 6
+  Terminating:     1
+  Unreachable:     1
   Alt-Ergo:        1
   Failed:          1
   Unsuccess:       2

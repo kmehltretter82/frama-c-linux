@@ -1,9 +1,17 @@
 # frama-c -wp [...]
 [kernel] Parsing user_injector.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] user_injector.i:39: Warning: 
+  Neither code nor explicit exits and terminates for function service,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function job
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'job':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Post-condition 'SEQ' in 'job':
@@ -42,6 +50,11 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition 'E2' in 'job':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'job':
 Prove: true.
 
 ------------------------------------------------------------

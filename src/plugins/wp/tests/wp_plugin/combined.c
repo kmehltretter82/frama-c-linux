@@ -29,11 +29,13 @@ void job(int *t, int A) {
   /*@ loop invariant 0 <= i <= 50;
     @ loop invariant \forall integer k; 0 <= k < i ==> P(t[k]);
     @ loop assigns i,t[0..49];
+    @ loop variant 50 - i;
     @ */
   for(int i = 0; i < 50; i++) t[i] = f(i);
 
   /*@ loop invariant A <= j <= 100;
     @ loop assigns j,t[A..99];
+    @ loop variant 100 - j;
     @ */
   for(int j = A; j < 100; j++) t[j] = g(j);
 

@@ -47,15 +47,13 @@ module Location_Bytes : sig
     (** Garbled mix of the addresses in the set *)
     | Map of M.t (** Precise set of addresses+offsets *)
 
-  type size_widen_hint = Ival.size_widen_hint
-  type numerical_widen_hint = Base.t -> Ival.numerical_widen_hint
-  type widen_hint = size_widen_hint * numerical_widen_hint
-
   (** Those locations have a lattice structure, including standard operations
       such as [join], [narrow], etc. *)
-  include Lattice_type.AI_Lattice_with_cardinal_one
-    with type t := t
-     and type widen_hint := widen_hint
+  include Lattice_type.AI_Lattice_with_cardinal_one with type t := t
+
+  type widen_hint = Ival.widen_hint
+
+  val widen : ?size:Integer.t -> ?hint:widen_hint -> t -> t -> t
 
   include Datatype.S_with_collections with type t := t
 

@@ -1,7 +1,29 @@
 # frama-c -wp [...]
 [kernel] Parsing bitwise.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal band_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal band_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal band_bool_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal band_bool_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal bnot_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bnot_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal bor_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bor_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal bor_bool_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bor_bool_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal bxor_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bxor_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal bxor_bool_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bxor_bool_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal cast_uchar_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal cast_uchar_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal lemma_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal lemma_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal lshift_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal lshift_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal rshift_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal rshift_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function band
 ------------------------------------------------------------

@@ -37,8 +37,7 @@ let get_called_stmt stmt =
   | Instr (Call(_, fct, _, _)) ->
     begin match Kernel_function.get_called fct with
       | Some kf -> [kf]
-      | None -> Option.value ~default:[]
-                  (Option.map snd (Dyncall.get stmt))
+      | None -> Option.value ~default:[] @@ Option.map snd (Dyncall.get stmt)
     end
   | Instr (Local_init (_,ConsInit(vi,_,_),_)) -> [ Globals.Functions.get vi ]
   | _ -> []
@@ -73,7 +72,19 @@ let with_callees kf =
 let with_callees = Callees.memo with_callees
 
 let add_with_callees kf =
-  Fct.iter TargetKfs.add (with_callees kf)
+  let add kf =
+    let insert_spec kf =
+      let specs =
+        if Kernel_function.has_definition kf
+        then [ `Exits ; `Terminates ]
+        else [ `Exits ; `Terminates ; `Assigns ]
+      in
+      Populate_spec.populate_funspec ~do_body:true kf specs
+    in
+    insert_spec kf ;
+    TargetKfs.add kf
+  in
+  Fct.iter add (with_callees kf)
 
 exception Found
 
@@ -102,7 +113,6 @@ let check_properties behaviors props kf =
   in
   let check_complete_disjoint kf kinstr =
     try
-      Populate_spec.populate_funspec kf [`Assigns];
       let spec = Annotations.funspec kf in
       let comp = ip_complete_of_spec kf kinstr ~active:[] spec in
       let disj = ip_disjoint_of_spec kf kinstr ~active:[] spec in
@@ -111,6 +121,8 @@ let check_properties behaviors props kf =
     with Annotations.No_funspec _ -> ()
   in
   let check_bhv kf kinstr bv =
+    if CfgInfos.is_entry_point kf then
+      check_bhv_requires kf kinstr bv ;
     check_bhv_assigns kf kinstr bv ;
     check_bhv_allocation kf kinstr bv ;
     check_bhv_ensures kf kinstr bv ;
@@ -126,7 +138,6 @@ let check_properties behaviors props kf =
     in
     let check_call stmt =
       let check_callee kf =
-        Populate_spec.populate_funspec kf [`Assigns];
         let kf_behaviors = Annotations.behaviors kf in
         List.iter (check_bhv_requires kf Kglobal) kf_behaviors
       in
@@ -150,23 +161,19 @@ let add_with_behaviors behaviors props kf =
     with Found -> add_with_callees kf
   end
 
-let compute model =
-  let insert_rte kf =
-    if Wp_parameters.RTE.get () then
-      WpRTE.generate model kf
-  in
-  let behaviors = Wp_parameters.Behaviors.get() in
-  let props = Wp_parameters.Properties.get () in
-  let add_kf kf =
-    insert_rte kf ;
-    add_with_behaviors behaviors props kf
-  in
-  Wp_parameters.iter_kf add_kf
+let compute_kf model bhv prop kf =
+  let rtes = Wp_parameters.RTE.get () in
+  if rtes then WpRTE.generate model kf ;
+  add_with_behaviors bhv prop kf
 
-let compute model =
-  if not (TargetKfs.is_computed ()) then begin
-    compute model ;
-    TargetKfs.mark_as_computed ()
-  end
+let compute model
+    ?(fct=Wp_parameters.get_fct())
+    ?(bhv=Wp_parameters.Behaviors.get())
+    ?(prop=Wp_parameters.Properties.get ()) ()
+  =
+  Wp_parameters.iter_fct (compute_kf model bhv prop) fct
+
+let compute_kf model kf =
+  compute_kf model [] [] kf
 
 let iter = TargetKfs.iter

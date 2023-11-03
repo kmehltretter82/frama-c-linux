@@ -24,6 +24,17 @@
 Plugin WP <next-release>
 ###############################################################################
 
+###############################################################################
+Plugin WP 28.0 (Nickel)
+###############################################################################
+
+- WP          [2023-10-19] WP generates exits and terminates specification
+                           on all functions, using the mechanism provided by
+                           the Frama-C kernel
+- WP          [2023-10-19] Removed options -wp-frama-c-stdlib-terminate,
+                           -wp-declarations-terminate and
+                           -wp-definitions-terminate. Use -generated-spec-* to
+                           disable generation of terminates (or exits)
 - WP          [2023-09-21] Sequent simplification now applies to lemmas
 - Gui         [2023-09-14] Basic WP goals component for Ivette
 - WP          [2023-07-24] New option -wp-memlimit for provers

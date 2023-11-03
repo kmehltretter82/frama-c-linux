@@ -19,7 +19,8 @@ void function(void){
     @ check loop invariant Check_Q: Q(i);
     @ admit loop invariant Admit_R: R(i);
     @ loop invariant       Inv_S  : S(i);
-    @ loop assigns i ; */
+    @ loop assigns i ;
+    @ loop variant 10 - i; */
   while(i < 10) i++ ;
 
   //@ check W(i);

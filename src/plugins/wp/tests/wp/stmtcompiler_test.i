@@ -1,6 +1,6 @@
 /* run.config
  SCRIPT: @PTEST_NAME@
-   OPT: -wp-msg-key shell
+   DONTRUN: OPT: -wp-msg-key shell
 */
 int empty (int c){
   /*@ assert \true; */
@@ -87,7 +87,6 @@ int zloop(int x){
   if(foo==0){ /*@ assert bad: i == 1; @*/ 0; }
   return x;
 }
-
 
 /*@
   behavior zero:

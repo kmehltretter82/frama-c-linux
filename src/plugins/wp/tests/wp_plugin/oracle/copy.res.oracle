@@ -1,6 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing copy.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal copy_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal copy_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function copy
@@ -41,7 +43,7 @@ Assume {
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
   (* Goal *)
-  When: (0 <= i_1) /\ (i_1 <= i).
+  When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
   Have: separated(a_1, n, shift_sint32(b, 0), n).
   (* Invariant 'Range' *)
@@ -81,7 +83,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion 'A' (file copy.i, line 17):
+Goal Assertion 'A' (file copy.i, line 18):
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, n).
 Let a_3 = shift_sint32(a, i_1).
@@ -107,7 +109,7 @@ Prove: a_2[shift_sint32(a, i) <- a_2[shift_sint32(b, i)]][a_3] = a_2[a_3].
 
 ------------------------------------------------------------
 
-Goal Assertion 'B' (file copy.i, line 18):
+Goal Assertion 'B' (file copy.i, line 19):
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, n).
 Let a_3 = a_2[shift_sint32(a, i) <- a_2[shift_sint32(b, i)]].
@@ -143,13 +145,13 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Loop assigns (file copy.i, line 12) (2/3):
-Effect at line 14
+Effect at line 15
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Loop assigns (file copy.i, line 12) (3/3):
-Effect at line 16
+Effect at line 17
 Let a_1 = shift_sint32(a, 0).
 Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, n).
 Let x = i - 1.
@@ -187,7 +189,17 @@ Prove: included(a_3, 1, a_1, n).
 ------------------------------------------------------------
 
 Goal Assigns (file copy.i, line 6) in 'copy':
-Effect at line 14
+Effect at line 15
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file copy.i, line 15):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file copy.i, line 15):
 Prove: true.
 
 ------------------------------------------------------------

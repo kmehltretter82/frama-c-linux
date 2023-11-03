@@ -1,8 +1,8 @@
 /* run.config
-   OPT: -wp-definitions-terminate -wp-declarations-terminate
+   OPT: -generated-spec-custom exits:skip
 */
 /* run.config_qualif
-   OPT: -wp-definitions-terminate -wp-declarations-terminate
+   OPT: -generated-spec-custom exits:skip
 */
 
 ///// Simple recursion

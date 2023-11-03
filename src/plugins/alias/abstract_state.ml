@@ -35,6 +35,8 @@ module LMap = Cil_datatype.LvalStructEq.Map
 module G = Graph.Persistent.Digraph.ConcreteBidirectional(Datatype.Int)
 module V = G.V
 
+let vid (v : G.V.t) : int = v
+
 (* like LMap, but organized with offset and specialized functions *)
 module LLMap =
 struct
@@ -109,22 +111,6 @@ struct
       mo
       LMap.empty
 
-end
-
-module type S =
-sig
-  (* see abstract_state.mli for coments *)
-  type t
-  val get_graph: t -> G.t
-  val get_lval_set : G.V.t -> t -> LSet.t
-  val pretty : ?debug:bool -> Format.formatter -> t -> unit
-  val print_dot : string -> t -> unit
-  val find_vertex : lval -> t -> G.V.t
-  val find_aliases : lval -> t -> LSet.t
-  val find_all_aliases : lval -> t -> LSet.t
-  val points_to_set : lval -> t -> LSet.t
-  val find_transitive_closure : lval -> t -> (G.V.t * LSet.t) list
-  val is_included : t -> t -> bool
 end
 
 type t = {

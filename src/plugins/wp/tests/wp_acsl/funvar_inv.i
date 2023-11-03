@@ -26,7 +26,9 @@ int G [4];
 int * f (void)
 {
   int i =0; 
-  //@ loop assigns qed_ok: index:i ; 
+  /*@ loop assigns qed_ok: index:i ;
+    @ loop variant 4 - i;
+  */
   while (i < 4 && G[i] !=0) i++; 
   if (i>=4) return &(i) ; 
   else return &(G[i]); 
@@ -40,7 +42,9 @@ int * f (void)
 int * f2 (void)
 {
   int i =0; 
-  //@ loop assigns qed_ok: index:i ; 
+  /*@ loop assigns qed_ok: index:i ;
+    @ loop variant (G+4) - (G+i);
+  */
   while (((G+i) < (G+4)) && G[i] !=0) i++; 
   if (i>=4) return &(i) ; 
   else return &(G[i]); 
@@ -55,7 +59,9 @@ int * f2 (void)
 int * g (void)
 {
   int i =0; 
-  //@ loop assigns qed_ok: i ; 
+  /*@ loop assigns qed_ok: i ;
+    @ loop variant (&G+4) - (&G+i);
+  */
   while (((&G+i) < (&G+4)) && G[i] !=0) i++; 
   if (i>=4) return &(i) ; 
   else return &(G[i]); 

@@ -2,6 +2,8 @@
 [kernel] Parsing binary-multiplication-without-overflow.c (with preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function BinaryMultiplication
+[wp] [Valid] Goal BinaryMultiplication_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal BinaryMultiplication_terminates (Cfg) (Trivial)
 [wp] 16 goals scheduled
 [wp] [Valid] typed_lemma_half (Alt-Ergo) (Cached)
 [wp] [Valid] typed_lemma_size (Qed)
@@ -19,7 +21,9 @@
 [wp] [Valid] typed_BinaryMultiplication_loop_assigns (Qed)
 [wp] [Valid] typed_BinaryMultiplication_loop_variant_decrease (Alt-Ergo) (Cached)
 [wp] [Valid] typed_BinaryMultiplication_loop_variant_positive (Qed)
-[wp] Proved goals:   16 / 16
+[wp] Proved goals:   18 / 18
+  Terminating:     1
+  Unreachable:     1
   Qed:             5
   Alt-Ergo:       11
 ------------------------------------------------------------

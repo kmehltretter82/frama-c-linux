@@ -54,6 +54,7 @@ type lookup = {
   head: bool ;
   goal: bool ;
   hyps: bool ;
+  split: bool ;
   pattern: pattern ;
 }
 

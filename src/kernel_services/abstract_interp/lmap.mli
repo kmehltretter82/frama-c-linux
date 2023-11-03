@@ -72,12 +72,12 @@ module Make_LOffset
        include Lattice_type.With_Top_Opt with type t := t
      end)
     (Offsetmap: Offsetmap_sig.S with type v = V.t
-                                 and type widen_hint = V.numerical_widen_hint)
+                                 and type widen_hint = V.widen_hint)
     (_: Default_offsetmap with type v := V.t
                            and type offsetmap := Offsetmap.t):
   Lmap_sig.S
   with type v = V.t
-   and type widen_hint_base = V.numerical_widen_hint
+   and type widen_hint_base = V.widen_hint
    and type offsetmap = Offsetmap.t
 
 (*

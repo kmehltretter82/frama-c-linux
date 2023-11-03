@@ -2,10 +2,26 @@
 [kernel] Parsing gnu_zero_array.i (no preprocessing)
 [rte:annot] annotating function main
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] gnu_zero_array.i:9: Warning: 
+  Neither code nor explicit exits and terminates for function alloc,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] gnu_zero_array.i:14: Warning: 
   Cast with incompatible pointers types (source: sint8*) (target: S*)
 ------------------------------------------------------------
   Function main
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'main':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'main':
+gnu_zero_array.i:14: warning from Typed Model:
+ - Warning: Hide \result
+   Reason: Cast with incompatible pointers types (source: sint8*) (target: S*)
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Assertion 'rte,mem_access' (file gnu_zero_array.i, line 15):

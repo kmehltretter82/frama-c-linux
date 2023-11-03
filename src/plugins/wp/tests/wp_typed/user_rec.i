@@ -14,7 +14,8 @@ int F1(int n)
   /*@ 
     loop invariant 2 <= i <= (n+1) ;
     loop invariant p == fact(i-1) ;
-    loop assigns p,i; 
+    loop assigns p,i;
+    loop variant n - i;
   */
   while (i <= n) { p *= i ; i++; }
   return p;
@@ -28,6 +29,7 @@ int F2(int n)
     loop invariant RANGE: n<=1 ? i==2 : 2 <= i <= (n+1) ;
     loop invariant PART:  n<=1 ? p==1 : p == fact(i-1) ;
     loop assigns p,i;
+    loop variant n - i;
   */
   while (i <= n) { p *= i ; i++; }
   return p;
@@ -41,6 +43,7 @@ int F4(int n)
     loop invariant RANGE: \at(n,Pre) <= 1 ? n == \at(n,Pre) : 1 <= n <= \at(n,Pre) ;
     loop invariant NEVER: \at(n,Pre) <= 1 ? p == 1 : p == fact(\at(n,Pre)) / fact(n) ;
     loop assigns p,n ;
+    loop variant n;
   */
   while (n > 1) { 
     p *= n ; n--; 

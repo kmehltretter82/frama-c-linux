@@ -1,19 +1,31 @@
 # frama-c -wp -wp-timeout 1 [...]
 [kernel] Parsing wp_behav.c (with preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal assert_needed_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal assert_needed_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] wp_behav.c:82: Warning: 
+[wp] [Valid] Goal bhv_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bhv_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal bts0513_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bts0513_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal f_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal min_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal min_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal razT_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal razT_terminates (Cfg) (Trivial)
+[wp] wp_behav.c:84: Warning: 
   Missing assigns clause (assigns 'everything' instead)
-[wp] 19 goals scheduled
+[wp] 21 goals scheduled
 [wp] [Valid] typed_f_ensures_qed_ok (Qed)
 [wp] [Valid] typed_f_x1_ensures_qed_ok (Qed)
 [wp] [Valid] typed_f_assert_qed_ok (Qed)
 [wp] [Valid] typed_f_x2_ensures_qed_ok (Qed)
 [wp] [Valid] typed_f_assert_qed_ok_2 (Qed)
-[wp] [Valid] typed_min_complete_bx_by (Qed)
-[wp] [Valid] typed_min_disjoint_bx_by (Qed)
 [wp] [Valid] typed_min_bx_ensures_qed_ok (Qed)
 [wp] [Valid] typed_min_by_ensures_qed_ok (Qed)
+[wp] [Valid] typed_min_complete_bx_by (Qed)
+[wp] [Valid] typed_min_disjoint_bx_by (Qed)
 [wp] [Valid] typed_bhv_complete_neg_pos (Alt-Ergo) (Cached)
 [wp] [Valid] typed_bhv_pos_ensures_qed_ok (Qed)
 [wp] [Valid] typed_bhv_neg_ensures_qed_ok (Qed)
@@ -23,9 +35,13 @@
 [wp] [Unsuccess] typed_bts0513_ensures_ko2 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_razT_loop_invariant_qed_ok_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_razT_loop_invariant_qed_ok_established (Qed)
+[wp] [Valid] typed_razT_loop_variant_decrease (Qed)
+[wp] [Valid] typed_razT_loop_variant_positive (Qed)
 [wp] [Unsuccess] typed_razT_b1_ensures_e1 (Alt-Ergo) (Cached)
-[wp] Proved goals:   15 / 19
-  Qed:            13
+[wp] Proved goals:   29 / 33
+  Terminating:     6
+  Unreachable:     6
+  Qed:            15
   Alt-Ergo:        2
   Unsuccess:       4
 ------------------------------------------------------------
@@ -35,5 +51,5 @@
   bhv                       2        1        3       100%
   assert_needed             1        -        2      50.0%
   bts0513                   -        -        2       0.0%
-  razT                      1        1        3      66.7%
+  razT                      3        1        5      80.0%
 ------------------------------------------------------------

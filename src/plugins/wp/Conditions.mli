@@ -68,6 +68,7 @@ and sequence (** List of steps *)
 type sequent = sequence * F.pred
 
 val pretty : (Format.formatter -> sequent -> unit) ref
+val equal : sequent -> sequent -> bool
 
 (** Creates a single step *)
 val step :

@@ -40,6 +40,7 @@ and node =
   | Int of Integer.t
   | Bool of bool
   | String of string
+  | Not of ast
   | Assoc of assoc * ast list
   | Binop of ast * binop * ast
   | Call of string * ast list * bool (* trailing .. *)
@@ -48,7 +49,7 @@ and node =
   | Field of ast * string
   | Get of ast * ast
   | Set of ast * ast * ast
-and assoc = [ `Add | `Mul | `Concat | `Land | `Lor | `Lxor ]
+and assoc = [ `Add | `Mul | `Concat | `Band | `Bor | `Bxor | `And | `Or ]
 and binop = [ `Div | `Mod | `Repeat | `Eq | `Lt | `Le | `Ne | `Lsl | `Lsr ]
 
 let self p =
@@ -149,6 +150,9 @@ let rec parse ctxt p =
   | PLunop(Ubw_not,a) ->
     let a = parse ctxt a in
     { loc = a.loc ; value = Call("lf:lnot",[a],false) }
+  | PLnot a ->
+    let a = parse ctxt a in
+    { loc = a.loc ; value = Not a }
   | PLbinop(a,Bmul,b) ->
     let a = parse ctxt a in
     let b = parse ctxt b in
@@ -163,9 +167,9 @@ let rec parse ctxt p =
     let b = { loc = b.loc ; value = Times(Integer.minus_one,b) } in
     assoc `Add a b
   | PLbinop(a,Badd,b) -> assoc `Add (parse ctxt a) (parse ctxt b)
-  | PLbinop(a,Bbw_or,b) -> assoc `Lor (parse ctxt a) (parse ctxt b)
-  | PLbinop(a,Bbw_and,b) -> assoc `Land (parse ctxt a) (parse ctxt b)
-  | PLbinop(a,Bbw_xor,b) -> assoc `Lxor (parse ctxt a) (parse ctxt b)
+  | PLbinop(a,Bbw_or,b) -> assoc `Bor (parse ctxt a) (parse ctxt b)
+  | PLbinop(a,Bbw_and,b) -> assoc `Band (parse ctxt a) (parse ctxt b)
+  | PLbinop(a,Bbw_xor,b) -> assoc `Bxor (parse ctxt a) (parse ctxt b)
   | PLbinop(a,Bdiv,b) -> parse_binop ctxt ~loc `Div a b
   | PLbinop(a,Bmod,b) -> parse_binop ctxt ~loc `Mod a b
   | PLbinop(a,Blshift,b) -> parse_binop ctxt ~loc `Lsl a b
@@ -176,6 +180,8 @@ let rec parse ctxt p =
   | PLrel(a,Ge,b) -> parse_binop ctxt ~loc `Le b a
   | PLrel(a,Eq,b) -> parse_binop ctxt ~loc `Eq a b
   | PLrel(a,Neq,b) -> parse_binop ctxt ~loc `Ne a b
+  | PLand(a,b) -> assoc `And (parse ctxt a) (parse ctxt b)
+  | PLor(a,b) -> assoc `Or (parse ctxt a) (parse ctxt b)
   | PLempty -> { loc ; value = List [] }
   | PLlist ps -> { loc ; value = List (List.map (parse ctxt) ps) }
   | PLrepeat(p,n) -> parse_binop ctxt ~loc `Repeat p n
@@ -192,7 +198,7 @@ let rec parse ctxt p =
     ctxt.typing.error loc
       (if ctxt.value then "Invalid value" else "Invalid pattern")
 
-and parse_binop ctxt ~loc op a b =
+and parse_binop ctxt ~loc (op:binop) a b =
   { loc ; value = Binop(parse ctxt a,op,parse ctxt b) }
 
 let pa_pattern ctxt p = ctxt.value <- false ; parse ctxt p
@@ -211,20 +217,25 @@ let rec pp fmt (a : ast) =
   | Int n -> Integer.pretty fmt n
   | Bool b -> Format.pp_print_string fmt (if b then "\\true" else "\\false")
   | String s -> Format.fprintf fmt "%S" s
-  | Assoc(`Land,[]) -> Format.pp_print_string fmt "-1"
+  | Assoc(`Band,[]) -> Format.pp_print_string fmt "-1"
   | Assoc(`Mul,[]) -> Format.pp_print_string fmt "1"
-  | Assoc((`Add|`Lor|`Lxor),[]) -> Format.pp_print_string fmt "0"
+  | Assoc((`Add|`Bor|`Bxor),[]) -> Format.pp_print_string fmt "0"
+  | Assoc(`And,[]) -> Format.pp_print_string fmt "\\true"
+  | Assoc(`Or,[]) -> Format.pp_print_string fmt "\\false"
   | Assoc(`Concat,[]) -> Format.pp_print_string fmt "[| |]"
+  | Not a -> Format.fprintf fmt "!(%a)" pp a
   | Assoc(op,v::vs) ->
     let op = match op with
-      | `Add -> '+'
-      | `Mul -> '*'
-      | `Concat | `Lxor -> '^'
-      | `Land -> '&'
-      | `Lor -> '|'
+      | `Add -> "+"
+      | `Mul -> "*"
+      | `Concat | `Bxor -> "^"
+      | `Band -> "&"
+      | `Bor -> "|"
+      | `And -> "&&"
+      | `Or -> "||"
     in
     Format.fprintf fmt "@[<hov 2>(%a" pp v ;
-    List.iter (Format.fprintf fmt "@ %c %a" op pp) vs ;
+    List.iter (Format.fprintf fmt "@ %s %a" op pp) vs ;
     Format.fprintf fmt ")@]"
   | Binop(a,op,b) ->
     let op = match op with
@@ -313,13 +324,16 @@ let rec pmatch env (p : pattern) e =
     end
   | Bool true , True -> ()
   | Bool false , False -> ()
+  | Not p , Not e -> pmatch env p e
+  | Assoc(`Or,ps) , Or es -> pac env Lang.F.e_or [] ps es
+  | Assoc(`And,ps) , And es -> pac env Lang.F.e_and [] ps es
   | Assoc(`Add,ps) , Add es -> pac env Lang.F.e_sum [] ps es
   | Assoc(`Mul,ps) , Mul es -> pac env Lang.F.e_prod [] ps es
-  | Assoc(`Lor,ps) , Fun(lf,es) when lf == Cint.f_lor ->
+  | Assoc(`Bor,ps) , Fun(lf,es) when lf == Cint.f_lor ->
     pac env (Lang.F.e_fun lf) [] ps es
-  | Assoc(`Land,ps) , Fun(lf,es) when lf == Cint.f_land ->
+  | Assoc(`Band,ps) , Fun(lf,es) when lf == Cint.f_land ->
     pac env (Lang.F.e_fun lf) [] ps es
-  | Assoc(`Lxor,ps) , Fun(lf,es) when lf == Cint.f_lxor ->
+  | Assoc(`Bxor,ps) , Fun(lf,es) when lf == Cint.f_lxor ->
     pac env (Lang.F.e_fun lf) [] ps es
   | Binop(p,`Div,q) , Div(a,b) -> pbinop env p q a b
   | Binop(p,`Eq,q) , Div(a,b) -> pbinop env p q a b
@@ -449,10 +463,11 @@ type lookup = {
   head: bool ;
   goal: bool ;
   hyps: bool ;
+  split: bool ;
   pattern: pattern ;
 }
 
-let pclause { head ; pattern } clause sigma prop =
+let pclause { head ; pattern ; split } clause sigma prop =
   let tprop = Lang.F.e_prop prop in
   let select t =
     if t == tprop then Tactical.Clause clause else Tactical.Inside(clause,t) in
@@ -462,7 +477,7 @@ let pclause { head ; pattern } clause sigma prop =
     then Some env.sigma else None
   in
   match Lang.F.repr tprop with
-  | And ts -> plist pcond ts
+  | And ts when split -> plist pcond ts
   | _ -> pcond tprop
 
 (* --- Step Ordering --- *)
@@ -563,14 +578,17 @@ let rec select (env : sigma) (a : value) =
   | Range(a,b) -> Tactical.range a b
   | Int n -> Tactical.cint n
   | Bool b -> Tactical.compose (if b then "wp:true" else "wp:false") []
+  | Not a -> Tactical.compose "wp:not" [cc a]
   | Assoc(op,vs) ->
     let op = match op with
       | `Add -> "wp:add"
       | `Mul -> "wp:mul"
       | `Concat -> "wp:concat"
-      | `Lor -> "lf:lor"
-      | `Land -> "lf:land"
-      | `Lxor -> "lf:lxor"
+      | `And -> "wp:and"
+      | `Or -> "wp:or"
+      | `Bor -> "lf:lor"
+      | `Band -> "lf:land"
+      | `Bxor -> "lf:lxor"
     in Tactical.compose op (List.map (cc) vs)
   | Binop(a,op,b) ->
     let op = match op with
@@ -703,7 +721,10 @@ let rec typecheck env vt (a : ast) =
   | Int _ -> tc_merge ~loc vt vint
   | Bool _ -> tc_merge ~loc vt vbool
   | String _ -> tc_merge ~loc vt String
-  | Assoc((`Lor|`Land|`Lxor),vs) ->
+  | Not a -> typecheck env (tc_merge ~loc vbool vt) a
+  | Assoc((`And|`Or),vs) ->
+    List.fold_left (typecheck env) (tc_merge ~loc vbool vt) vs
+  | Assoc((`Bor|`Band|`Bxor),vs) ->
     List.fold_left (typecheck env) (tc_merge ~loc vint vt) vs
   | Assoc((`Add|`Mul),vs) ->
     List.fold_left (typecheck env) (tc_merge ~loc Numerical vt) vs

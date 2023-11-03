@@ -1,7 +1,17 @@
 # frama-c -wp [...]
 [kernel] Parsing initialized_memtyped.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal formal_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal formal_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal glob_arr_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal glob_arr_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal glob_var_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal glob_var_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal ptr_on_local_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal ptr_on_local_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function formal
 ------------------------------------------------------------

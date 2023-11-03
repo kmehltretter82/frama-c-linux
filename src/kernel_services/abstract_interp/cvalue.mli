@@ -46,13 +46,9 @@ module V : sig
        of all of them. Use some shortcuts *)
     with type M.t = Location_Bytes.M.t
      and type t = Location_Bytes.t
-     and type numerical_widen_hint = Location_Bytes.numerical_widen_hint
-     and type size_widen_hint = Location_Bytes.size_widen_hint
 
   include Offsetmap_lattice_with_isotropy.S
     with type t := t
-     and type numerical_widen_hint := numerical_widen_hint
-     and type size_widen_hint := size_widen_hint
      and type widen_hint := widen_hint
 
   val pretty_typ: Cil_types.typ option -> t Pretty_utils.formatter
@@ -174,9 +170,7 @@ module V_Or_Uninitialized : sig
 
   include Offsetmap_lattice_with_isotropy.S
     with type t := t
-     and  type size_widen_hint = Location_Bytes.size_widen_hint
-     and  type numerical_widen_hint = Location_Bytes.numerical_widen_hint
-     and  type widen_hint = Locations.Location_Bytes.widen_hint
+     and type widen_hint = Locations.Location_Bytes.widen_hint
   include Lattice_type.With_Under_Approximation with type t:= t
   include Lattice_type.With_Narrow with type t := t
   include Lattice_type.With_Top with type t := t
@@ -239,7 +233,7 @@ end
 module V_Offsetmap: sig
   include Offsetmap_sig.S
     with type v = V_Or_Uninitialized.t
-     and type widen_hint = V_Or_Uninitialized.numerical_widen_hint
+     and type widen_hint = V_Or_Uninitialized.widen_hint
 
   val narrow: t -> t -> t Lattice_bounds.or_bottom
   val narrow_reinterpret: t -> t -> t Lattice_bounds.or_bottom
@@ -259,7 +253,7 @@ module Model: sig
   include Lmap_sig.S
     with type v = V_Or_Uninitialized.t
      and type offsetmap = V_Offsetmap.t
-     and type widen_hint_base = V_Or_Uninitialized.numerical_widen_hint
+     and type widen_hint_base = V_Or_Uninitialized.widen_hint
 
   include Lattice_type.With_Narrow with type t := t
 

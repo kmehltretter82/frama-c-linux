@@ -23,7 +23,25 @@ Function call_two_ref: { r0 tmp tmp_0 __retres }
 Function g: { *pg tmp }
 Function array_in_struct_param: { sf }
 .................................................
+[kernel:annot:missing-spec] dispatch_var.i:12: Warning: 
+  Neither code nor explicit exits and terminates for function ref_ctr,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] dispatch_var.i:133: Warning: 
+  Neither code nor explicit exits and terminates for function ref_ctr_nr,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] dispatch_var.i:158: Warning: 
+  Neither code nor explicit exits and terminates for function ref_ctr_nstars,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] dispatch_var.i:83: Warning: 
+  Neither code nor explicit exits and terminates for function ref_valid,
+   generating default clauses. See -generated-spec-* options for more info
+[wp] [Valid] Goal array_in_struct_param_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal array_in_struct_param_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal no_ref_bd_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal no_ref_bd_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal ref_bd_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal ref_bd_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function array_in_struct_param
 ------------------------------------------------------------
@@ -41,7 +59,17 @@ Prove: true.
   Function call_no_ref_bd
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_no_ref_bd':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'Mem_n5_nr6' in 'call_no_ref_bd':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_no_ref_bd':
 Prove: true.
 
 ------------------------------------------------------------
@@ -95,7 +123,17 @@ Prove: true.
   Function call_ref_bd
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_ref_bd':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'Ref_r2' in 'call_ref_bd':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_ref_bd':
 Prove: true.
 
 ------------------------------------------------------------
@@ -119,7 +157,17 @@ Prove: true.
   Function call_ref_bd2
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_ref_bd2':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'Mem_n2' in 'call_ref_bd2':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_ref_bd2':
 Prove: true.
 
 ------------------------------------------------------------
@@ -167,7 +215,17 @@ Prove: true.
   Function call_ref_ctr
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_ref_ctr':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'Ref_r1' in 'call_ref_ctr':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_ref_ctr':
 Prove: true.
 
 ------------------------------------------------------------
@@ -191,7 +249,17 @@ Prove: true.
   Function call_ref_ctr2
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_ref_ctr2':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'Mem_n1' in 'call_ref_ctr2':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_ref_ctr2':
 Prove: true.
 
 ------------------------------------------------------------
@@ -239,12 +307,22 @@ Prove: true.
   Function call_ref_ctr_nr
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_ref_ctr_nr':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'R_R_R' in 'call_ref_ctr_nr':
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Post-condition 'R_R_R' in 'call_ref_ctr_nr':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_ref_ctr_nr':
 Prove: true.
 
 ------------------------------------------------------------
@@ -298,7 +376,17 @@ Prove: true.
   Function call_ref_ctr_nstars
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_ref_ctr_nstars':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file dispatch_var.i, line 162) in 'call_ref_ctr_nstars':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_ref_ctr_nstars':
 Prove: true.
 
 ------------------------------------------------------------
@@ -334,7 +422,17 @@ Prove: true.
   Function call_ref_valid
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_ref_valid':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'R7_N4' in 'call_ref_valid':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_ref_valid':
 Prove: true.
 
 ------------------------------------------------------------
@@ -400,7 +498,17 @@ Prove: true.
   Function call_two_ref
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_two_ref':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file dispatch_var.i, line 177) in 'call_two_ref':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_two_ref':
 Prove: true.
 
 ------------------------------------------------------------
@@ -442,7 +550,17 @@ Prove: true.
   Function g
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'g':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file dispatch_var.i, line 192) in 'g':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'g':
 Prove: true.
 
 ------------------------------------------------------------

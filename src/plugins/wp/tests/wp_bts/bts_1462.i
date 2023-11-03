@@ -10,6 +10,7 @@ void wrong(int c) {
     loop invariant B: \at(x==1,L) ==> i!=0 ==> x == 1;
     loop invariant C: \at(c==0,Pre) ==> i==0 ==> x == 0;
     loop assigns i,x,y;
+    loop variant 10 - i;
    */
   for (int i = 0; i<10; i++) {
     if (c == 0) { x = 0; }
@@ -19,7 +20,7 @@ void wrong(int c) {
   if (c==1) { /*@ assert consequence_of_false_invariant: y==0; */ }
 }
 
-
+//@ terminates \false;
 void local (void)
 {
   int y;

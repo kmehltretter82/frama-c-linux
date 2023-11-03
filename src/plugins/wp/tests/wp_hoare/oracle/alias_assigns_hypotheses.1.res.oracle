@@ -1,7 +1,27 @@
 # frama-c -wp [...]
 [kernel] Parsing alias_assigns_hypotheses.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal comprehension_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal comprehension_alias_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal field_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal field_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal field_range_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal field_range_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal formal_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal formal_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal formal_alias_array_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal formal_alias_array_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal formal_no_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal formal_no_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal global_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal global_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal global_no_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal global_no_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal set_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal set_alias_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal union_alias_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal union_alias_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function comprehension_alias
 ------------------------------------------------------------
@@ -200,6 +220,8 @@ struct X {
 int global[1];
 int *g_alias;
 /*@ requires \valid(g_alias);
+    terminates \true;
+    exits \false;
     ensures *g_alias ≡ 1;
     ensures \old(global[0]) ≡ global[0];
     assigns *g_alias;
@@ -214,6 +236,8 @@ void global_alias(void)
 }
 
 /*@ requires \valid(g_alias);
+    terminates \true;
+    exits \false;
     ensures *g_alias ≡ 1;
     assigns *g_alias;
     
@@ -227,6 +251,8 @@ void global_no_alias(void)
 }
 
 /*@ requires \valid(f_alias);
+    terminates \true;
+    exits \false;
     ensures *\old(f_alias) ≡ 1;
     ensures \old(global[0]) ≡ global[0];
     assigns *f_alias;
@@ -241,6 +267,8 @@ void formal_alias(int *f_alias)
 }
 
 /*@ requires \valid(f_alias);
+    terminates \true;
+    exits \false;
     ensures *\old(f_alias) ≡ 1;
     assigns *f_alias;
  */
@@ -251,6 +279,8 @@ void formal_no_alias(int *f_alias)
 }
 
 /*@ requires \valid(alias_array);
+    terminates \true;
+    exits \false;
     ensures (*\old(alias_array))[0] ≡ 1;
     ensures (*\old(alias_array))[1] ≡ 1;
     ensures \old(global[0]) ≡ global[0];
@@ -268,6 +298,8 @@ void formal_alias_array(int (*alias_array)[2])
 }
 
 /*@ requires \valid(x);
+    terminates \true;
+    exits \false;
     ensures \old(x)->x ≡ 1;
     ensures \old(global[0]) ≡ global[0];
     assigns x->x;
@@ -283,6 +315,8 @@ void field_alias(struct X *x)
 }
 
 /*@ requires \valid(x);
+    terminates \true;
+    exits \false;
     ensures \old(x)->x ≡ 1;
     ensures \old(global[0]) ≡ global[0];
     assigns (x + (0 .. 3))->x;
@@ -298,6 +332,8 @@ void field_range_alias(struct X *x)
 }
 
 /*@ requires \valid(g_alias);
+    terminates \true;
+    exits \false;
     ensures *g_alias ≡ 1;
     ensures \old(global[0]) ≡ global[0];
     assigns {*g_alias, *f_alias};
@@ -314,6 +350,8 @@ void set_alias(int *f_alias)
 }
 
 /*@ requires \valid(g_alias);
+    terminates \true;
+    exits \false;
     ensures *g_alias ≡ 1;
     ensures \old(global[0]) ≡ global[0];
     assigns {*alias | int *alias; alias ≡ \at(g_alias,Pre)};
@@ -332,6 +370,8 @@ void comprehension_alias(void)
 }
 
 /*@ requires \valid(g_alias);
+    terminates \true;
+    exits \false;
     ensures *g_alias ≡ 1;
     ensures \old(global[0]) ≡ global[0];
     assigns {*g_alias, *f_alias};

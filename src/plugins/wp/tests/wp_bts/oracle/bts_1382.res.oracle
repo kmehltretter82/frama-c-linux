@@ -1,25 +1,59 @@
 # frama-c -wp [...]
 [kernel] Parsing bts_1382.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] bts_1382.i:6: Warning: 
+  Neither code nor explicit exits and terminates for function copy,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] bts_1382.i:9: Warning: 
+  Neither code nor explicit exits and terminates for function f,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
-[wp] bts_1382.i:18: Warning: 
+[wp] bts_1382.i:20: Warning: 
   Cast with incompatible pointers types (source: sint32*) (target: sint8*)
-[wp] bts_1382.i:18: Warning: 
+[wp] bts_1382.i:20: Warning: 
   Cast with incompatible pointers types (source: sint32*) (target: sint8*)
-[wp] bts_1382.i:17: Warning: 
+[wp] bts_1382.i:19: Warning: 
   Cast with incompatible pointers types (source: sint32*) (target: uint8*)
 ------------------------------------------------------------
   Function loop
 ------------------------------------------------------------
 
-Goal Loop assigns (file bts_1382.i, line 15) (1/3):
-bts_1382.i:17: warning from Typed Model:
+Goal Termination-condition (generated) in 'loop':
+bts_1382.i:19: warning from Typed Model:
  - Warning: Hide sub-term definition
    Reason: Cast with incompatible pointers types (source: sint32*) (target: uint8*)
-bts_1382.i:18: warning from Typed Model:
+bts_1382.i:20: warning from Typed Model:
  - Warning: Hide sub-term definition
    Reason: Cast with incompatible pointers types (source: sint32*) (target: sint8*)
-bts_1382.i:18: warning from Typed Model:
+bts_1382.i:20: warning from Typed Model:
+ - Warning: Hide sub-term definition
+   Reason: Cast with incompatible pointers types (source: sint32*) (target: sint8*)
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'loop':
+bts_1382.i:19: warning from Typed Model:
+ - Warning: Hide sub-term definition
+   Reason: Cast with incompatible pointers types (source: sint32*) (target: uint8*)
+bts_1382.i:20: warning from Typed Model:
+ - Warning: Hide sub-term definition
+   Reason: Cast with incompatible pointers types (source: sint32*) (target: sint8*)
+bts_1382.i:20: warning from Typed Model:
+ - Warning: Hide sub-term definition
+   Reason: Cast with incompatible pointers types (source: sint32*) (target: sint8*)
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file bts_1382.i, line 15) (1/3):
+bts_1382.i:19: warning from Typed Model:
+ - Warning: Hide sub-term definition
+   Reason: Cast with incompatible pointers types (source: sint32*) (target: uint8*)
+bts_1382.i:20: warning from Typed Model:
+ - Warning: Hide sub-term definition
+   Reason: Cast with incompatible pointers types (source: sint32*) (target: sint8*)
+bts_1382.i:20: warning from Typed Model:
  - Warning: Hide sub-term definition
    Reason: Cast with incompatible pointers types (source: sint32*) (target: sint8*)
 Prove: true.
@@ -27,8 +61,8 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Loop assigns (file bts_1382.i, line 15) (2/3):
-Call Effect at line 17
-bts_1382.i:17: warning from Typed Model:
+Call Effect at line 19
+bts_1382.i:19: warning from Typed Model:
  - Warning: Hide sub-term definition
    Reason: Cast with incompatible pointers types (source: sint32*) (target: uint8*)
 Assume {
@@ -45,14 +79,14 @@ Prove: global(G_dest_45) = w.
 ------------------------------------------------------------
 
 Goal Loop assigns (file bts_1382.i, line 15) (3/3):
-Call Effect at line 18
-bts_1382.i:17: warning from Typed Model:
+Call Effect at line 20
+bts_1382.i:19: warning from Typed Model:
  - Warning: Hide sub-term definition
    Reason: Cast with incompatible pointers types (source: sint32*) (target: uint8*)
-bts_1382.i:18: warning from Typed Model:
+bts_1382.i:20: warning from Typed Model:
  - Warning: Hide sub-term definition
    Reason: Cast with incompatible pointers types (source: sint32*) (target: sint8*)
-bts_1382.i:18: warning from Typed Model:
+bts_1382.i:20: warning from Typed Model:
  - Warning: Hide sub-term definition
    Reason: Cast with incompatible pointers types (source: sint32*) (target: sint8*)
 Let a = shift_sint8(w, 0).
@@ -66,5 +100,33 @@ Assume {
   Have: i <= 99.
 }
 Prove: included(a, 4, global(G_dest_45), 1).
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file bts_1382.i, line 18):
+bts_1382.i:19: warning from Typed Model:
+ - Warning: Hide sub-term definition
+   Reason: Cast with incompatible pointers types (source: sint32*) (target: uint8*)
+bts_1382.i:20: warning from Typed Model:
+ - Warning: Hide sub-term definition
+   Reason: Cast with incompatible pointers types (source: sint32*) (target: sint8*)
+bts_1382.i:20: warning from Typed Model:
+ - Warning: Hide sub-term definition
+   Reason: Cast with incompatible pointers types (source: sint32*) (target: sint8*)
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file bts_1382.i, line 18):
+bts_1382.i:19: warning from Typed Model:
+ - Warning: Hide sub-term definition
+   Reason: Cast with incompatible pointers types (source: sint32*) (target: uint8*)
+bts_1382.i:20: warning from Typed Model:
+ - Warning: Hide sub-term definition
+   Reason: Cast with incompatible pointers types (source: sint32*) (target: sint8*)
+bts_1382.i:20: warning from Typed Model:
+ - Warning: Hide sub-term definition
+   Reason: Cast with incompatible pointers types (source: sint32*) (target: sint8*)
+Prove: true.
 
 ------------------------------------------------------------

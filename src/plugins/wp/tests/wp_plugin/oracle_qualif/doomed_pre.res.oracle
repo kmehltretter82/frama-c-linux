@@ -1,8 +1,24 @@
 # frama-c -wp [...]
 [kernel] Parsing doomed_pre.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal bhv_requires_assumes_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal bhv_requires_assumes_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] 13 goals scheduled
+[wp] [Valid] Goal only_assumes_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal only_assumes_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal reqs_1_2_assumes_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal reqs_1_2_assumes_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal reqs_2_2_assumes_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal reqs_2_2_assumes_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal reqs_assumes_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal reqs_assumes_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal reqs_combined_assumes_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal reqs_combined_assumes_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal reqs_massumes_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal reqs_massumes_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal requires_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal requires_terminates (Cfg) (Trivial)
+[wp] 14 goals scheduled
 [wp] [Failed] (Doomed) typed_requires_wp_smoke_default_requires (Qed)
 [wp] doomed_pre.i:10: Warning: Failed smoke-test
 [wp] [Passed] (Unsuccess) typed_reqs_assumes_wp_smoke_default_requires (Alt-Ergo) (Cached)
@@ -17,16 +33,20 @@
 [wp] [Passed] (Unsuccess) typed_reqs_combined_assumes_wp_smoke_default_requires (Alt-Ergo) (Cached)
 [wp] [Failed] (Doomed) typed_reqs_combined_assumes_wp_smoke_B_assumes (Qed)
 [wp] doomed_pre.i:37: Warning: Failed smoke-test
+[wp] [Failed] (Doomed) typed_only_assumes_wp_smoke_B_assumes (Qed)
+[wp] doomed_pre.i:42: Warning: Failed smoke-test
 [wp] [Failed] (Doomed) typed_bhv_requires_assumes_wp_smoke_B_requires (Qed)
 [wp] doomed_pre.i:48: Warning: Failed smoke-test
 [wp] [Passed] (Unsuccess) typed_reqs_massumes_wp_smoke_default_requires (Alt-Ergo) (Cached)
 [wp] [Failed] (Doomed) typed_reqs_massumes_wp_smoke_B1_assumes (Qed)
 [wp] doomed_pre.i:56: Warning: Failed smoke-test
 [wp] [Failed] (Doomed) typed_reqs_massumes_wp_smoke_B2_assumes (Qed)
-[wp] Proved goals:    5 / 13
+[wp] Proved goals:   21 / 30
+  Terminating:     8
+  Unreachable:     8
   Alt-Ergo:        5
-  Failed:          8
-  Smoke Tests:     5 / 13
+  Failed:          9
+  Smoke Tests:     5 / 14
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   requires                  -        -        1       0.0%
@@ -34,6 +54,7 @@
   reqs_2_2_assumes          -        1        2      50.0%
   reqs_1_2_assumes          -        1        2      50.0%
   reqs_combined_assumes     -        1        2      50.0%
+  only_assumes              -        -        1       0.0%
   bhv_requires_assumes      -        -        1       0.0%
   reqs_massumes             -        1        3      33.3%
 ------------------------------------------------------------
