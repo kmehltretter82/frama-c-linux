@@ -24,19 +24,23 @@
 /* --- Frama-C Registry                                                   ---*/
 /* --------------------------------------------------------------------------*/
 
-import React from 'react';
 import * as Ivette from 'ivette';
+import React from 'react';
 
-import History from 'frama-c/kernel/History';
-import Globals from 'frama-c/kernel/Globals';
-import Status from 'frama-c/kernel/Status';
-import ASTview from 'frama-c/kernel/ASTview';
 import ASTinfo from 'frama-c/kernel/ASTinfo';
-import SourceCode from 'frama-c/kernel/SourceCode';
-import PivotTable from 'frama-c/kernel/PivotTable';
+import ASTview from 'frama-c/kernel/ASTview';
+import Globals from 'frama-c/kernel/Globals';
+import History from 'frama-c/kernel/History';
 import Locations from 'frama-c/kernel/Locations';
-import Properties from 'frama-c/kernel/Properties';
 import Messages from 'frama-c/kernel/Messages';
+import PivotTable from 'frama-c/kernel/PivotTable';
+import Properties from 'frama-c/kernel/Properties';
+import SourceCode from 'frama-c/kernel/SourceCode';
+import Status from 'frama-c/kernel/Status';
+import * as db from '../sandbox/doublebar';
+import file from '../sandbox/icons/file.png';
+import folder from '../sandbox/icons/folder.png';
+import func from '../sandbox/icons/function.png';
 
 import 'frama-c/kernel/style.css';
 
@@ -52,7 +56,10 @@ Ivette.registerGroup({
   id: 'frama-c.kernel',
   label: 'Frama-C Kernel',
 }, () => {
-  Ivette.registerSidebar({ id: 'frama-c.globals', children: <Globals /> });
+  Ivette.registerDoublebar({
+    id: 'frama-c.doublebar',
+    children: <db.DoubleBar />
+  });
   Ivette.registerToolbar({ id: 'frama-c.history', children: <History /> });
   Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
   Ivette.registerComponent({
@@ -140,6 +147,23 @@ Ivette.registerView({
   layout: [
     ['frama-c.pivottable'],
   ],
+});
+
+
+Ivette.registerCategory({
+  title: "Functions",
+  iconPath: func,
+  subMenu: <Globals />
+});
+Ivette.registerCategory({
+  title: "File",
+  iconPath: file,
+  subMenu: db.secondaryMenu1
+});
+Ivette.registerCategory({
+  title: "Folder",
+  iconPath: folder,
+  subMenu: db.secondaryMenu2
 });
 
 /* --------------------------------------------------------------------------*/

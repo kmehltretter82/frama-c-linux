@@ -24,8 +24,8 @@
 /* --- Ivette Extensions                                                  ---*/
 /* --------------------------------------------------------------------------*/
 
-import React from 'react';
 import * as Dome from 'dome';
+import React from 'react';
 
 /* --------------------------------------------------------------------------*/
 /* --- Extension Elements                                                 ---*/
@@ -77,11 +77,11 @@ export function useRack(E: ElementRack): JSX.Element {
   return E.render();
 }
 
-export const SIDEBAR = new ElementRack();
+export const DOUBLEBAR = new ElementRack();
 export const TOOLBAR = new ElementRack();
 export const STATUSBAR = new ElementRack();
 
-export function Sidebar(): JSX.Element { return useRack(SIDEBAR); }
+export function Doublebar(): JSX.Element { return useRack(DOUBLEBAR); }
 export function Toolbar(): JSX.Element { return useRack(TOOLBAR); }
 export function Statusbar(): JSX.Element { return useRack(STATUSBAR); }
 

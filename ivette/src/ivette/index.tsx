@@ -29,13 +29,14 @@
    @module ivette
  */
 
-import React from 'react';
 import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
-import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
-import * as Lab from 'ivette@lab';
+import { GridHbox, GridItem, GridVbox } from 'dome/layout/grids';
 import * as Ext from 'ivette@ext';
+import * as Lab from 'ivette@lab';
+import React from 'react';
+import * as Doublebar from '../sandbox/doublebar';
 
 /* --------------------------------------------------------------------------*/
 /* --- Items                                                              ---*/
@@ -187,16 +188,30 @@ export interface ToolProps {
   children?: React.ReactNode;
 }
 
-export function registerSidebar(panel: ToolProps): void {
-  Ext.SIDEBAR.register(panel);
-}
-
 export function registerToolbar(tools: ToolProps): void {
   Ext.TOOLBAR.register(tools);
 }
 
 export function registerStatusbar(status: ToolProps): void {
   Ext.STATUSBAR.register(status);
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- DoubleBar                                                          ---*/
+/* --------------------------------------------------------------------------*/
+
+export interface DoubleBarCategoryProps {
+  title: string;
+  iconPath: string;
+  subMenu: React.ReactNode;
+}
+
+export function registerDoublebar(panel: ToolProps): void {
+  Ext.DOUBLEBAR.register(panel);
+}
+
+export function registerCategory(props: DoubleBarCategoryProps): void {
+  Doublebar.registerCategory(props);
 }
 
 /* --------------------------------------------------------------------------*/

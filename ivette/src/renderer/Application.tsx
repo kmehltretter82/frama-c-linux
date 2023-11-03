@@ -26,17 +26,17 @@
 
 // --- React & Dome
 
-import React from 'react';
 import * as Dome from 'dome';
+import * as Sidebar from 'dome/frame/sidebars';
+import * as Toolbar from 'dome/frame/toolbars';
 import { Vfill } from 'dome/layout/boxes';
 import { LSplit } from 'dome/layout/splitters';
-import * as Toolbar from 'dome/frame/toolbars';
-import * as Sidebar from 'dome/frame/sidebars';
+import * as Studia from 'frama-c/plugins/studia/studia';
+import * as IvettePrefs from 'ivette/prefs';
+import React from 'react';
 import * as Controller from './Controller';
 import * as Extensions from './Extensions';
 import * as Laboratory from './Laboratory';
-import * as IvettePrefs from 'ivette/prefs';
-import * as Studia from 'frama-c/plugins/studia/studia';
 import './loader';
 import './sandbox';
 
@@ -77,7 +77,7 @@ export default function Application(): JSX.Element {
       <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
         <Sidebar.SideBar>
           <div className="sidebar-ruler" />
-          <Extensions.Sidebar />
+          <Extensions.Doublebar />
         </Sidebar.SideBar>
         <Laboratory.LabView
           customize={viewbar}
