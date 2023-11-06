@@ -37,8 +37,8 @@ EACSL_DLMALLOC_FLAGS = \
   -DUSE_SPIN_LOCKS=1
 
 $(EACSL_DLMALLOC_LIB): $(EACSL_DLMALLOC_SRC)
-	@echo 'CC           $<'
-	@$(CC) $< -c -O2 -g3 -o$(EACSL_DLMALLOC_OBJ) $(EACSL_DLMALLOC_FLAGS)
+	@echo 'CC           $(EACSL_DLMALLOC_SRC)'
+	@$(CC) $(EACSL_DLMALLOC_SRC) -c -O2 -g3 -o$(EACSL_DLMALLOC_OBJ) $(EACSL_DLMALLOC_FLAGS)
 	@echo 'AR           $@'
 	@$(AR) crus $@ $(EACSL_DLMALLOC_OBJ)
 	@echo 'RANLIB       $@'
