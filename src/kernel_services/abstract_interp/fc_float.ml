@@ -107,80 +107,21 @@ let prev_float prec f =
 let le f1 f2 = compare f1 f2 <= 0
 
 
-(* --------------------------------------------------------------------------
-                                 Widen hints
-   -------------------------------------------------------------------------- *)
+module FloatSet = Datatype.Float.Set
 
-module Widen_Hints = struct
-
-  include Cil_datatype.Logic_real.Set
-
-  let pretty fmt s =
-    if not (is_empty s) then
-      Pretty_utils.pp_iter
-        ~pre:"@[<hov 1>{"
-        ~suf:"}@]"
-        ~sep:";@ "
-        iter
-        (fun fmt r -> Format.pp_print_string fmt r.Cil_types.r_literal) fmt s
-
-  let logic_real_of_float f =
-    { Cil_types.r_literal = Format.asprintf "%10.7g" f;
-      r_nearest = f;
-      r_lower = f;
-      r_upper = f; }
-
-  let of_float_list l =
-    match l with
-    | [] -> empty
-    | [e] -> singleton (logic_real_of_float e)
-    | e :: q ->
-      List.fold_left
-        (fun acc x -> add (logic_real_of_float x) acc)
-        (singleton (logic_real_of_float e)) q
-
-  let default_widen_hints =
-    let l = [0.0;1.0;10.0;1e10;Floating_point.max_single_precision_float;1e80] in
-    union (of_float_list l) (of_float_list (List.map (fun x -> -. x) l))
-
-  exception Found of float
-
-  let nearest_float_ge f s =
-    try
-      iter (fun e ->
-          if total_compare e.Cil_types.r_upper f >= 0
-          then raise (Found e.Cil_types.r_upper))
-        s;
-      raise Not_found
-    with Found r -> r
-
-  let nearest_float_le f s =
-    try
-      let els_desc = List.rev (elements s) in
-      List.iter (fun e ->
-          if total_compare e.Cil_types.r_lower f <= 0
-          then raise (Found e.Cil_types.r_lower))
-        els_desc;
-      raise Not_found
-    with Found r -> r
-
-end
-
-type widen_hints = Widen_Hints.t
-
-let widen_up wh prec f =
-  let r = try Widen_Hints.nearest_float_ge f wh
+let widen_up ?(hint = FloatSet.empty) prec f =
+  let r =
+    try FloatSet.find_first (fun e -> total_compare e f >= 0) hint
     with Not_found ->
-      if le f max_float then max_float
-      else infinity
+      if le f max_float then max_float else infinity
   in
   round_to_precision Up prec r
 
-let widen_down wh prec f =
-  let r = try Widen_Hints.nearest_float_le f wh
+let widen_down ?(hint = FloatSet.empty) prec f =
+  let r =
+    try FloatSet.find_last (fun e -> total_compare e f <= 0) hint
     with Not_found ->
-      if le (-. max_float) f then (-. max_float)
-      else neg_infinity
+      if le (-. max_float) f then (-. max_float) else neg_infinity
   in
   round_to_precision Down prec r
 

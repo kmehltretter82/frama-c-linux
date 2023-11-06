@@ -39,12 +39,12 @@ val pretty : Format.formatter -> t -> unit
 (** Define numeric hints for one or all variables ([None]),
     for a certain stmt or for all statements ([None]).  *)
 val num_hints:
-  Cil_types.stmt option -> Base.t option -> Ival.Widen_Hints.t -> t
+  Cil_types.stmt option -> Base.t option -> Int_val.widen_hint -> t
 
 (** Define floating hints for one or all variables ([None]),
     for a certain stmt or for all statements ([None]).  *)
 val float_hints:
-  Cil_types.stmt option -> Base.t option -> Fc_float.Widen_Hints.t -> t
+  Cil_types.stmt option -> Base.t option -> Fval.widen_hint -> t
 
 (** Define a set of bases to widen in priority for a given statement. *)
 val var_hints : Cil_types.stmt -> Base.Set.t -> t
@@ -53,7 +53,7 @@ val var_hints : Cil_types.stmt -> Base.Set.t -> t
     {!Cvalue.Model.widen}. *)
 val hints_from_keys :
   Cil_types.stmt -> t ->
-  Base.Set.t * (Base.t -> Locations.Location_Bytes.numerical_widen_hint)
+  Base.Set.t * (Base.t -> Locations.Location_Bytes.widen_hint)
 
 (*
 Local Variables:

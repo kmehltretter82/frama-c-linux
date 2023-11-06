@@ -316,12 +316,14 @@ module Make (F: Float_sig.S) = struct
     | (FRange.NaN, FRange.Itv (b1, e1, _)) -> FRange.inject ~nan:true b1 e1
     | FRange.NaN, FRange.NaN -> FRange.nan
 
-  let widen wh prec f1 f2 =
+  type widen_hint = Datatype.Float.Set.t
+
+  let widen ?hint prec f1 f2 =
     assert (is_included f1 f2);
     match f1, f2 with
     | FRange.Itv (b1, e1, _), FRange.Itv (b2, e2, nan) ->
-      let b = if Cmp.equal b2 b1 then b2 else F.widen_down wh prec b2 in
-      let e = if Cmp.equal e2 e1 then e2 else F.widen_up wh prec e2 in
+      let b = if Cmp.equal b2 b1 then b2 else F.widen_down ?hint prec b2 in
+      let e = if Cmp.equal e2 e1 then e2 else F.widen_up ?hint prec e2 in
       (* widen_up and down produce double only if the input is a double *)
       FRange.inject ~nan b e
     | FRange.NaN, f2 -> f2

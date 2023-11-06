@@ -39,14 +39,16 @@ type t
       and exact operations.
 *)
 
-module Widen_Hints = Datatype.Integer.Set
-type size_widen_hint = Integer.t
-type numerical_widen_hint = Widen_Hints.t * Fc_float.Widen_Hints.t
-
 include Datatype.S_with_collections with type t := t
-include Lattice_type.Full_AI_Lattice_with_cardinality
-  with type t := t
-   and type widen_hint = size_widen_hint * numerical_widen_hint
+include Lattice_type.Full_AI_Lattice_with_cardinality with type t := t
+
+(** Widening hints: set of relevant integer and floating-point thresholds. *)
+type widen_hint = Datatype.Integer.Set.t * Datatype.Float.Set.t
+
+(** [widen ~size ~hint t1 t2] is an over-approximation of [join t1 t2].
+    [size] is the size (in bits) of the widened value, and [hint] is a set of
+    relevant thresholds. *)
+val widen : ?size:Integer.t -> ?hint:widen_hint -> t -> t -> t
 
 val is_bottom : t -> bool
 

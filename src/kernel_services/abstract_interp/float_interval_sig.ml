@@ -31,11 +31,11 @@ module type S = sig
   (** Type of the interval bounds. *)
   type float
 
-  (** Type of the widen hints. *)
-  type widen_hints
-
   (** Type of intervals. *)
   type t
+
+  (** Hints for the widening: set of relevant thresholds. *)
+  type widen_hint = Datatype.Float.Set.t
 
   val packed_descr : Structural_descr.pack
 
@@ -74,7 +74,7 @@ module type S = sig
 
   val is_included: t -> t -> bool
   val join: t -> t -> t
-  val widen: widen_hints -> prec -> t -> t -> t
+  val widen: ?hint:widen_hint -> prec -> t -> t -> t
   val narrow: t -> t -> t or_bottom
 
   val contains_a_zero: t -> bool

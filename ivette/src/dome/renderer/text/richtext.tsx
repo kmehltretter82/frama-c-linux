@@ -462,8 +462,9 @@ export class DecorationBuilder extends CS.RangeSetBuilder<CM.Decoration>
 /* -------------------------------------------------------------------------- */
 
 export type Decorator = Decorations | ((viewport: Selection) => Decorations);
+export type Decorators = readonly Decorator[];
 
-function compareDecorators(a : Decorator[], b : Decorator[]): boolean
+function compareDecorators(a : Decorators, b : Decorators): boolean
 {
   if (a === b) return true;
   const n = a.length;
@@ -472,7 +473,7 @@ function compareDecorators(a : Decorator[], b : Decorator[]): boolean
   return true;
 }
 
-const Decorations = new Field<Decorator[]>([], compareDecorators);
+const Decorators = new Field<Decorators>([], compareDecorators);
 
 // --- Static Decorators
 
@@ -481,12 +482,12 @@ function isStaticDecorator(d: Decorator): d is Decorations
   return typeof(d) !== 'function';
 }
 
-Decorations.pack(
+Decorators.pack(
   CM.EditorView.decorations.compute(
-    [Decorations.field],
+    [Decorators.field],
     (state: CS.EditorState) => {
       const decorators =
-        state.field(Decorations.field).filter(isStaticDecorator);
+        state.field(Decorators.field).filter(isStaticDecorator);
       if (decorators.length === 0) return CS.RangeSet.empty;
       const buffer = new DecorationBuilder(state.doc);
       decorators.forEach(buffer.addSpec);
@@ -503,12 +504,12 @@ function isDynamicDecorator(d: Decorator): d is DynamicDecorator
   return typeof(d) !== 'function';
 }
 
-Decorations.pack(
+Decorators.pack(
   CM.EditorView.decorations.compute(
-    [Decorations.field],
+    [Decorators.field],
     (state: CS.EditorState) => {
       const decorators =
-        state.field(Decorations.field).filter(isDynamicDecorator);
+        state.field(Decorators.field).filter(isDynamicDecorator);
       if (decorators.length === 0) return CS.RangeSet.empty;
       return (view: CM.EditorView) => {
         const doc = view.state.doc;
@@ -529,7 +530,7 @@ Decorations.pack(
 
 function createView(parent: Element): CM.EditorView {
   const extensions : CS.Extension[] = [
-    ReadOnly, OnChange, OnSelect, Decorations,
+    ReadOnly, OnChange, OnSelect, Decorators,
   ];
   const state = CS.EditorState.create({ extensions });
   return new CM.EditorView({ state, parent });
@@ -545,7 +546,7 @@ export interface TextViewProps {
   onChange?: Callback;
   selection?: Range;
   onSelection?: SelectionCallback;
-  decorators?: Decorator[];
+  decorators?: Decorators;
   display?: boolean;
   visible?: boolean;
   className?: string;
@@ -565,14 +566,16 @@ export function TextView(props: TextViewProps) : JSX.Element {
     return undefined;
   }, [text, view]);
 
-  // ---- Listeners readOnly, onChange, onSelection
+  // ---- Listeners readOnly, onChange, onSelection, Decorations
   const {
     readOnly = false, onChange = null,
     onSelection: onSelect = null,
+    decorators: decors = [],
   } = props;
   React.useEffect(() => ReadOnly.dispatch(view, readOnly), [view, readOnly]);
   React.useEffect(() => OnChange.dispatch(view, onChange), [view, onChange]);
   React.useEffect(() => OnSelect.dispatch(view, onSelect), [view, onSelect]);
+  React.useEffect(() => Decorators.dispatch(view, decors), [view, decors]);
 
   // ---- Selection
   const { selection } = props;
@@ -583,13 +586,6 @@ export function TextView(props: TextViewProps) : JSX.Element {
       view?.dispatch({ scrollIntoView: true, selection: { anchor, head } });
     }
   }, [view, selection]);
-
-  // ---- Decorations
-  const { decorators = [] } = props;
-  React.useEffect(
-    () => Decorations.dispatch(view, decorators),
-    [view, decorators],
-  );
 
   // ---- Mount & Unmount Editor
   const [nodeRef, setRef] = React.useState<Element | null>(null);

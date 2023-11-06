@@ -52,8 +52,7 @@ module K2V = struct
     let cache = Hptmap_sig.NoCache in
     let symmetric = false in
     let idempotent = true in
-    let wh = Integer.zero, (fun _b -> Ival.Widen_Hints.empty, Fc_float.Widen_Hints.empty) in
-    let decide _ v1 v2 = Some (V.widen wh v1 v2) in
+    let decide _ v1 v2 = Some (V.widen v1 v2) in
     M.inter ~cache ~symmetric ~idempotent ~decide
 
   let _narrow =

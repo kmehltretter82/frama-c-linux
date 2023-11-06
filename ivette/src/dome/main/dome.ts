@@ -37,22 +37,22 @@
    @module dome(main)
 */
 
-import _ from 'lodash';
-import fs from 'fs';
-import path from 'path';
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/devtools';
+import SYS, * as System from 'dome/system';
 import {
-  app,
-  ipcMain,
   BrowserWindow,
   BrowserWindowConstructorOptions,
   IpcMainEvent,
-  shell,
-  dialog,
-  nativeTheme,
   Rectangle,
+  app,
+  dialog,
+  ipcMain,
+  nativeTheme,
+  shell,
 } from 'electron';
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/devtools';
-import SYS, * as System from 'dome/system';
+import fs from 'fs';
+import _ from 'lodash';
+import path from 'path';
 
 // --------------------------------------------------------------------------
 // --- Main Window Web Navigation
@@ -155,6 +155,11 @@ const APP_DIR = app.getPath('userData');
 const PATH_WINDOW_SETTINGS = path.join(APP_DIR, 'WindowSettings.json');
 const PATH_GLOBAL_SETTINGS = path.join(APP_DIR, 'GlobalSettings.json');
 
+const CLI_OPTION_SETTINGS = {
+  name: "--settings",
+  defaultValue: "DEFAULT",
+} as const;
+
 function saveGlobalSettings(): void {
   try {
     if (!fstat(APP_DIR)) fs.mkdirSync(APP_DIR);
@@ -215,7 +220,10 @@ function saveWindowConfig(handle: Handle): void {
     storage: handle.storage,
     devtools: handle.devtools,
   };
-  saveSettings(handle.config, configData);
+
+  if (process.argv.indexOf(CLI_OPTION_SETTINGS.name) === -1) {
+    saveSettings(handle.config, configData);
+  }
 }
 
 function windowSyncSettings(event: IpcMainEvent): void {
@@ -402,7 +410,20 @@ function createBrowserWindow(
     ...config,
   };
 
-  const configFile = isAppWindow ? lookupConfig(wdir) : PATH_WINDOW_SETTINGS;
+  let configFile = PATH_WINDOW_SETTINGS;
+  if (argv && argv.indexOf(CLI_OPTION_SETTINGS.name) >= 0) {
+    const settingsIdx = argv.indexOf(CLI_OPTION_SETTINGS.name);
+    const settings = argv[settingsIdx + 1];
+    if (settings !== CLI_OPTION_SETTINGS.defaultValue) {
+      configFile = argv[settingsIdx + 1];
+    }
+    argv = argv.slice(0, settingsIdx).concat(argv.slice(settingsIdx + 2));
+  } else if (isAppWindow) {
+    configFile = lookupConfig(wdir);
+  }
+
+  console.log('[Dome] Loading config file', configFile);
+
   const configData = loadSettings(configFile);
 
   const frame = jFrame(configData.frame);
@@ -539,6 +560,15 @@ function createPrimaryWindow(): void {
   const wdir = cwd === '/' ? app.getPath('home') : cwd;
   const cmd = stripElectronArgv({ wdir, argv: process.argv });
 
+  // Reset Settings if the associated argument is provided
+  const settingsIdx = cmd.argv.indexOf(CLI_OPTION_SETTINGS.name);
+  if (settingsIdx >= 0) {
+    const settings = cmd.argv[settingsIdx + 1];
+    if (settings === CLI_OPTION_SETTINGS.defaultValue) {
+      restoreAllDefaultSettings();
+    }
+  }
+
   // Initialize Theme
   const globals = obtainGlobalSettings();
   applyThemeSettings(globals);
@@ -627,6 +657,23 @@ function restoreDefaultSettings(): void {
   });
 
   broadcast('dome.ipc.settings.defaults');
+}
+
+/**
+ * Resets the Global setting file and delete the Window setting file
+ * (which will be recreated in a default state when needed)
+ */
+function restoreAllDefaultSettings(): void {
+  GlobalSettings = {};
+  nativeTheme.themeSource = 'system';
+  saveGlobalSettings();
+  try {
+    if (fs.existsSync(PATH_WINDOW_SETTINGS)) {
+      fs.rmSync(PATH_WINDOW_SETTINGS);
+    }
+  } catch (error) {
+    console.warn(error);
+  }
 }
 
 ipcMain.on('dome.menu.settings', showSettingsWindow);

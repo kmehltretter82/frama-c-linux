@@ -33,10 +33,6 @@ if [ -z ${HDRCK+x} ]; then
   HDRCK="dune exec -- frama-c-hdrck"
 fi
 
-if [ -z ${VERSION+x} ]; then
-  VERSION=$(cat VERSION)
-fi
-
 if [ -z ${VERSION_CODENAME+x} ]; then
   VERSION_CODENAME=$(cat VERSION_CODENAME)
 fi
@@ -56,10 +52,69 @@ else
   TAR=tar
 fi
 
+
+VERSION=$(cat VERSION)
 VERSION_SAFE=${VERSION/~/-}
 
 FRAMAC="frama-c-$VERSION_SAFE-$VERSION_CODENAME"
 FRAMAC_TAR="$FRAMAC.tar"
+
+################################################################################
+# Command Line
+
+while [ "$1" != "" ]
+do
+    case "$1" in
+        "-h"|"-help"|"--help")
+            echo "Make Frama-C Source Distribution"
+            echo ""
+            echo "USAGE"
+            echo ""
+            echo "  ./dev/make-distrib.sh [OPTIONS]"
+            echo ""
+            echo "OPTIONS"
+            echo ""
+            echo "  --help            Print this help message"
+            echo "  --close-source    Set close source header mode (default)"
+            echo "  --open-source     Set open source header mode"
+            echo "  --ci-link         Symlink to frama-c.tar.gz"
+            echo "  --hdrck <cmd>     Check headers command"
+            echo "  --codename <name> Set local VERSION_CODENAME"
+            echo ""
+            echo "ENVIRONMENT VARIABLES"
+            echo ""
+            echo ""
+            echo "  HDRCK=<cmd> (overriden set by --hdrck)"
+            echo "  VERSION_CODENAME=<name> (overriden by --codename)"
+            echo "  OPEN_SOURCE=yes|no (overriden by --open-source and --close-source)"
+            echo "  CI_LINK=yes|no (also set by --ci-link)"
+            echo ""
+            exit 0
+            ;;
+        "--hdrck")
+            shift
+            HDRCK="$1"
+            ;;
+        "--codename")
+            shift
+            VERSION_CODENAME=$1
+            ;;
+        "--open-source")
+            OPEN_SOURCE=yes
+            ;;
+        "--close-source")
+            OPEN_SOURCE=no
+            ;;
+        "--ci-link")
+            CI_LINK=yes
+            ;;
+        *)
+            echo "Don't known what to do with option '$1'"
+            exit 1
+            ;;
+    esac
+    shift
+done
 
 ################################################################################
 # Check Opam file
@@ -82,12 +137,25 @@ if [ "" != "$IGNORED_FILES" ]; then
 fi
 
 ################################################################################
-# Prepare archive
-
-git archive HEAD -o $FRAMAC_TAR --prefix "$FRAMAC/"
+# External Plugins
 
 PLUGINS=$(find src/plugins -mindepth 1 -maxdepth 1 -type d)
 EXTERNAL_PLUGINS=$(find src/plugins -type d -name ".git" | sed "s/\/.git//")
+
+################################################################################
+# Summary
+
+echo "----------------------------------------------------------------"
+echo "Make Distribution"
+echo "Version: $VERSION ($VERSION_CODENAME)"
+echo "Plugins: $EXTERNAL_PLUGINS"
+if [ "$OPEN_SOURCE" == "yes" ]
+then
+    echo "Headers: OPEN SOURCE"
+else
+    echo "Headers: CLOSE SOURCE"
+fi
+echo "----------------------------------------------------------------"
 
 ################################################################################
 # Warn if there are uncommitted changes (will not be taken into account)
@@ -96,25 +164,41 @@ GIT_STATUS="$(git status --porcelain -- $(sed 's/^./:!&/' <<< $EXTERNAL_PLUGINS)
 if [ "" != "$GIT_STATUS" ]; then
   echo "WARNING: uncommitted changes will be IGNORED when making archive:"
   echo "$GIT_STATUS" | sed 's/^/  /'
+  echo "----------------------------------------------------------------"
 fi
+
+################################################################################
+# Prepare Archive
+
+git archive HEAD -o $FRAMAC_TAR --prefix "$FRAMAC/"
 
 ################################################################################
 # Add external plugin to archive
 
-if [ "" != "$EXTERNAL_PLUGINS" ]; then
+if [ "" != "$EXTERNAL_PLUGINS" ]
+then
   echo "Including external plugins:"
-  echo "$EXTERNAL_PLUGINS" | sed 's/^/  /'
 fi
 
-for plugin in $EXTERNAL_PLUGINS ; do
-  PLUGIN_TAR="$(basename $plugin).tar"
-  git -C $plugin archive HEAD -o $PLUGIN_TAR --prefix "$FRAMAC/$plugin/"
-  $TAR --concatenate --file=$FRAMAC_TAR "$plugin/$PLUGIN_TAR"
-  rm -rf "$plugin/$PLUGIN_TAR"
+for plugin in $EXTERNAL_PLUGINS
+do
+    echo "  $plugin"
+    PLUGIN_TAR="$(basename $plugin).tar"
+    git -C $plugin archive HEAD -o $PLUGIN_TAR --prefix "$FRAMAC/$plugin/"
+    $TAR --concatenate --file=$FRAMAC_TAR "$plugin/$PLUGIN_TAR"
+    rm -rf "$plugin/$PLUGIN_TAR"
 done
+
+if [ "" != "$EXTERNAL_PLUGINS" ]
+then
+  echo "----------------------------------------------------------------"
+fi
+
 
 ################################################################################
 # Prepare header spec
+
+echo "Preparing headers..."
 
 HEADER_SPEC="header-spec.txt"
 
@@ -179,6 +263,8 @@ done
 ################################################################################
 # Headers
 
+echo "Make headers..."
+
 TMP_DIR=$(mktemp -d)
 $TAR xf $FRAMAC_TAR -C $TMP_DIR
 
@@ -201,6 +287,8 @@ fi
 ################################################################################
 # Finalize archive
 
+echo "Finalizing archive..."
+
 echo $VERSION_SAFE > $TMP_DIR/$FRAMAC/VERSION
 echo $VERSION_CODENAME > $TMP_DIR/$FRAMAC/VERSION_CODENAME
 
@@ -220,3 +308,6 @@ fi
 rm -rf $HEADER_SPEC
 rm -rf $FRAMAC_TAR
 rm -rf $TMP_DIR
+
+echo "Generated: $FRAMAC_TAR"
+echo "----------------------------------------------------------------"

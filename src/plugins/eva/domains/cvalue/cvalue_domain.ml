@@ -62,8 +62,8 @@ module State = struct
   let join (a, clob) (b, _) = Cvalue.Model.join a b, clob
 
   let widen kf stmt (a, clob) (b, _) =
-    let hint = Widen.getWidenHints kf stmt in
-    Cvalue.Model.widen hint a b, clob
+    let priority, hint = Widen.getWidenHints kf stmt in
+    Cvalue.Model.widen ~priority ~hint a b, clob
 
   let narrow (a, clob) (b, _) =
     let s = Cvalue.Model.narrow a b in
