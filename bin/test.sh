@@ -312,7 +312,7 @@ function GenerateCoverage
         Head "Generating coverage in _coverage ..."
         if [ "$HTML" = "yes" ] ;
         then
-            Cmd bisect-ppx-report html --coverage-path=_bisect
+            Cmd bisect-ppx-report html --coverage-path=_bisect --tree
         fi
         if [ "$XML" = "yes" ] ;
         then
