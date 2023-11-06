@@ -38,6 +38,7 @@ import Properties from 'frama-c/kernel/Properties';
 import SourceCode from 'frama-c/kernel/SourceCode';
 import Status from 'frama-c/kernel/Status';
 import * as db from '../sandbox/doublebar';
+import comp from '../sandbox/icons/component.png';
 import file from '../sandbox/icons/file.png';
 import folder from '../sandbox/icons/folder.png';
 import func from '../sandbox/icons/function.png';
@@ -45,6 +46,8 @@ import func from '../sandbox/icons/function.png';
 import 'frama-c/kernel/style.css';
 
 import * as Menu from 'frama-c/menu';
+
+import * as Laboratory from '../renderer/Laboratory';
 
 Menu.init();
 
@@ -149,6 +152,9 @@ Ivette.registerView({
   ],
 });
 
+/* --------------------------------------------------------------------------*/
+/* --- Frama-C Categories                                                 ---*/
+/* --------------------------------------------------------------------------*/
 
 Ivette.registerCategory({
   title: "Functions",
@@ -164,6 +170,14 @@ Ivette.registerCategory({
   title: "Folder",
   iconPath: folder,
   subMenu: db.secondaryMenu2
+});
+Ivette.registerCategory({
+  title: "Functions",
+  iconPath: comp,
+  subMenu: <Laboratory.LabView
+    customize={true}
+    settings="frama-c.labview"
+/>
 });
 
 /* --------------------------------------------------------------------------*/
