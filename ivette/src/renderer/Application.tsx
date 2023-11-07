@@ -77,7 +77,7 @@ export default function Application(): JSX.Element {
       <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
         <Sidebar.SideBar>
           <div className="sidebar-ruler" />
-          <Extensions.Doublebar />
+          <Extensions.Sidebar />
         </Sidebar.SideBar>
         <Laboratory.LabView
           customize={viewbar}

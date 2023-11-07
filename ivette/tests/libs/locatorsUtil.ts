@@ -77,5 +77,5 @@ export function getDoubleBarPrimary(window: Page): Locator {
  * Locator to access the secondary section (submenu) of the double bar
  */
 export function getDoubleBarSecondary(window: Page): Locator {
-  return window.locator('.dome-xDoubleBar-secondary');
+  return window.locator('dome-xSideBar-double-secondary');
 }

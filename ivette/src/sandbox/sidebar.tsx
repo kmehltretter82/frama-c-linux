@@ -24,7 +24,7 @@
 import React, { useState } from 'react';
 import { classes } from 'dome/misc/utils';
 import { Item, Section } from "dome/frame/sidebars";
-import { DoubleBarCategoryProps, registerSandbox } from 'ivette';
+import { SideBarCategoryProps, registerSandbox } from 'ivette';
 import './style.css';
 
 /* -------------------------------------------------------------------------- */
@@ -114,28 +114,29 @@ export const secondaryMenu2 = (
   </>
 );
 
-const categories: DoubleBarCategoryProps[] = [];
+const categories: SideBarCategoryProps[] = [];
 
-export function registerCategory(item: DoubleBarCategoryProps): void {
+export function registerCategory(item: SideBarCategoryProps): void {
   categories.push(item);
 }
 
-export function DoubleBar(): JSX.Element {
+export function SideBar(): JSX.Element {
   const classNameGlobal = classes(
-    'dome-xDoubleBar',
+    'dome-xSideBar-double',
   );
 
   const classNamePrime = classes(
-    'dome-xDoubleBar-primary',
+    'dome-xSideBar-double-primary',
     'dome-color-frame',
   );
 
   const classNamePrimeIcon = classes(
-    'dome-xDoubleBar-primary-icon'
+    'dome-xSideBar-double-primary-icon'
   );
 
   const classNameSecondary = classes(
-    'dome-xDoubleBar-secondary',
+    'dome-xSideBar-double-secondary',
+    'dome-xSideBar',
     'dome-color-frame',
   );
 
@@ -179,9 +180,9 @@ export function DoubleBar(): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 registerSandbox({
-  id: 'sandbox.doublebar',
-  label: 'Double Bar',
-  children: <DoubleBar />,
+  id: 'sandbox.sidebar',
+  label: 'Sidebar',
+  children: <SideBar />,
 });
 
 /* -------------------------------------------------------------------------- */

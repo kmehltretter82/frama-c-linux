@@ -77,11 +77,11 @@ export function useRack(E: ElementRack): JSX.Element {
   return E.render();
 }
 
-export const DOUBLEBAR = new ElementRack();
+export const SIDEBAR = new ElementRack();
 export const TOOLBAR = new ElementRack();
 export const STATUSBAR = new ElementRack();
 
-export function Doublebar(): JSX.Element { return useRack(DOUBLEBAR); }
+export function Sidebar(): JSX.Element { return useRack(SIDEBAR); }
 export function Toolbar(): JSX.Element { return useRack(TOOLBAR); }
 export function Statusbar(): JSX.Element { return useRack(STATUSBAR); }
 

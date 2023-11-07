@@ -37,7 +37,7 @@ import PivotTable from 'frama-c/kernel/PivotTable';
 import Locations from 'frama-c/kernel/Locations';
 import Properties from 'frama-c/kernel/Properties';
 import Messages from 'frama-c/kernel/Messages';
-import * as db from '../sandbox/doublebar';
+import * as SideBar from '../sandbox/sidebar';
 
 import compIco from '../sandbox/icons/component.png';
 import fileIco from '../sandbox/icons/file.png';
@@ -60,9 +60,9 @@ Ivette.registerGroup({
   id: 'frama-c.kernel',
   label: 'Frama-C Kernel',
 }, () => {
-  Ivette.registerDoublebar({
-    id: 'frama-c.doublebar',
-    children: <db.DoubleBar />
+  Ivette.registerSidebar({
+    id: 'frama-c.sidebar',
+    children: <SideBar.SideBar />
   });
   Ivette.registerToolbar({ id: 'frama-c.history', children: <History /> });
   Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
@@ -165,12 +165,12 @@ Ivette.registerCategory({
 Ivette.registerCategory({
   title: "File",
   iconPath: fileIco,
-  subMenu: db.secondaryMenu1
+  subMenu: SideBar.secondaryMenu1
 });
 Ivette.registerCategory({
   title: "Folder",
   iconPath: folderIco,
-  subMenu: db.secondaryMenu2
+  subMenu: SideBar.secondaryMenu2
 });
 Ivette.registerCategory({
   title: "Functions",

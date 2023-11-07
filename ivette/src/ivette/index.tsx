@@ -36,7 +36,7 @@ import { DefineElement } from 'dome/layout/dispatch';
 import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
 import * as Lab from 'ivette@lab';
 import * as Ext from 'ivette@ext';
-import * as Doublebar from '../sandbox/doublebar';
+import * as Doublebar from '../sandbox/sidebar';
 
 /* --------------------------------------------------------------------------*/
 /* --- Items                                                              ---*/
@@ -197,20 +197,20 @@ export function registerStatusbar(status: ToolProps): void {
 }
 
 /* --------------------------------------------------------------------------*/
-/* --- DoubleBar                                                          ---*/
+/* --- Sidebar                                                         ---*/
 /* --------------------------------------------------------------------------*/
 
-export interface DoubleBarCategoryProps {
+export interface SideBarCategoryProps {
   title: string;
   iconPath: string;
   subMenu: React.ReactNode;
 }
 
-export function registerDoublebar(panel: ToolProps): void {
-  Ext.DOUBLEBAR.register(panel);
+export function registerSidebar(panel: ToolProps): void {
+  Ext.SIDEBAR.register(panel);
 }
 
-export function registerCategory(props: DoubleBarCategoryProps): void {
+export function registerCategory(props: SideBarCategoryProps): void {
   Doublebar.registerCategory(props);
 }
 
