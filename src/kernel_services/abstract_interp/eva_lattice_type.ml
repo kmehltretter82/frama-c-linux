@@ -32,7 +32,6 @@ module type With_Top = Lattice_type.With_Top
 module type With_Intersects = Lattice_type.With_Intersects
 module type With_Enumeration = Lattice_type.With_Enumeration
 module type With_Cardinal_One = Lattice_type.With_Cardinal_One
-module type With_Widening = Lattice_type.With_Widening
 
 module type With_Narrow = sig
   type t
@@ -69,7 +68,6 @@ end
 module type AI_Lattice_with_cardinal_one = sig
   include Join_Semi_Lattice
   include With_Top with type t:= t
-  include With_Widening with type t:= t
   include With_Cardinal_One with type t := t
   include With_Narrow with type t := t
   include With_Under_Approximation with type t := t

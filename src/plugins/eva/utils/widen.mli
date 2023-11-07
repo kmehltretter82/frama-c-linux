@@ -27,7 +27,7 @@ open Cil_types
 (** [getWidenHints kf s] retrieves the set of widening hints related to
     function [kf] and statement [s]. *)
 val getWidenHints: kernel_function -> stmt ->
-  Base.Set.t * (Base.t -> Locations.Location_Bytes.numerical_widen_hint)
+  Base.Set.t * (Base.t -> Locations.Location_Bytes.widen_hint)
 
 (** Parses all widening hints defined via the widen_hint syntax extension.
     The result is memoized for subsequent calls. *)

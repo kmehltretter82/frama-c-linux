@@ -482,7 +482,7 @@ sig
       exist another builtin, it is replaced with the new one. Use with care.
 
       @before 22.0-Titanium the optional [force] parameter does not exist
-      @before Frama-C+dev one-dimensional access only
+      @before 28.0-Nickel one-dimensional access only
   *)
 
   val set_builtin_field :
@@ -493,7 +493,7 @@ sig
         The [force] parameters defaults to [false], when it is [true], if there
         exist another builtin, it is replaced with the new one. Use with care.
 
-        @since Frama-C+dev
+        @since 28.0-Nickel
   *)
 
   val set_builtin_eq :

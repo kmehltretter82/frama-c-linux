@@ -30,10 +30,7 @@ let small_cardinal_Int () = Int.of_int (small_cardinal ())
 let emitter = Lattice_messages.register "Int_val"
 let log_imprecision s = Lattice_messages.emit_imprecision emitter s
 
-module Widen_Hints = Datatype.Integer.Set
-type size_widen_hint = Integer.t
-type generic_widen_hint = Widen_Hints.t
-type widen_hint = size_widen_hint * generic_widen_hint
+type widen_hint = Datatype.Integer.Set.t
 
 (* --------------------------------- Datatype ------------------------------- *)
 
@@ -383,14 +380,14 @@ let meet v1 v2 =
 
 let narrow = meet (* meet is exact *)
 
-let widen widen_hints t1 t2 =
+let widen ?size ?hint t1 t2 =
   if equal t1 t2 || cardinal_zero_or_one t1 then t2
   else
     match t2 with
     | Itv _ | Set _ ->
       let i1 = make_itv t1
       and i2 = make_itv t2 in
-      inject_itv (Int_interval.widen widen_hints i1 i2)
+      inject_itv (Int_interval.widen ?size ?hint i1 i2)
 
 let intersects v1 v2 =
   match v1, v2 with

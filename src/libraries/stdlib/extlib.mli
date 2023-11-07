@@ -200,7 +200,7 @@ val string_prefix: ?strict:bool -> string -> string -> bool
     (that is, [s] must moreover be strictly longer than [p]). [strict]
     is false by default.
     @since Boron-20100401
-    @deprecated Frama-C+dev use 'String.starts_with' instead
+    @deprecated 28.0-Nickel use 'String.starts_with' instead
 *)
 
 val string_del_prefix: ?strict:bool -> string -> string -> string option
@@ -214,7 +214,7 @@ val string_suffix: ?strict:bool -> string -> string -> bool
     string [s]. [strict], which defaults to [false], indicates whether [s]
     should be strictly longer than [p].
     @since Aluminium-20160501
-    @deprecated Frama-C+dev use 'String.ends_with' instead
+    @deprecated 28.0-Nickel use 'String.ends_with' instead
 *)
 
 val string_del_suffix: ?strict:bool -> string -> string -> string option
@@ -267,7 +267,7 @@ val mkdir : ?parents:bool -> Filepath.Normalized.t -> Unix.file_perm -> bool
     Returns [true] if the directory was created, [false] otherwise.
     @raise Unix.Unix_error if cannot create [name] or its parents.
     @since 19.0-Potassium
-    @since Frama-C+dev added check for existence of path (error if exists
+    @since 28.0-Nickel added check for existence of path (error if exists
     but not a directory, otherwise do nothing if directory already exists).
     Changed type of [name] argument and return type.
 *)
@@ -294,7 +294,7 @@ val temp_file_cleanup_at_exit: ?debug:bool -> string -> string -> string
 
 val temp_dir_cleanup_at_exit: ?debug:bool -> string -> Filepath.Normalized.t
 (** @raise Temp_file_error if the temp dir cannot be created.
-    @since Frama-C+dev modify return type *)
+    @since 28.0-Nickel modify return type *)
 
 val safe_remove: string -> unit
 (** Tries to delete a file and never fails. *)

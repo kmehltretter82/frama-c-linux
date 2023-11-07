@@ -25,6 +25,10 @@
 Plugin E-ACSL <next-release>
 ###############################################################################
 
+###############################################################################
+Plugin E-ACSL 28.0 (Nickel)
+###############################################################################
+
 - E-ACSL        [2023-09-05] Generate more efficient code for arithmetic
 	        calculations. This is achieved by appraising more precisely the
 	        possible values an arithmetic variable can take. This allows in many

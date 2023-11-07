@@ -32,9 +32,8 @@ $(MAIN).pdf: $(DEPS_MODERN) $(FRAMAC_MODERN)
 .PHONY: clean
 clean:
 	rm -rf *~ *.aux *.log *.nav *.out *.snm *.toc *.lof *.pp *.bnf \
-		*.haux  *.hbbl *.htoc \
-                *.cb *.cm? *.bbl *.blg *.idx *.ind *.ilg \
-		transf trans.ml pp.ml pp
+		*.haux  *.hbbl *.htoc *.cb *.cm? *.bbl *.blg *.idx *.ind *.ilg \
+		transf trans.ml pp.ml pp eacslversion.tex
 
 super-clean: clean
 	rm -f $(MAIN).pdf

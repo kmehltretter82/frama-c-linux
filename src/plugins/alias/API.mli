@@ -25,6 +25,9 @@
 open Cil_types
 
 module LSet = Cil_datatype.LvalStructEq.Set
+module G : Graph.Sig.G
+
+val vid : G.V.t -> int
 
 (** NB : do the analysis BEFORE using any of those functions *)
 
@@ -89,17 +92,64 @@ val are_aliased: kernel_function -> stmt -> lval -> lval -> bool
 (** [fold_vertex f acc kf s v] folds [f acc i lv] to all [lv] in [i], where [i] is
     the vertex that represents the equivalence class of [v] before statement [s] in function [kf]. *)
 val fold_vertex:
-  ('a -> int -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
+  ('a -> G.V.t -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
 
 (** [fold_vertex_closure f acc kf s v] is the transitive closure of function
     [fold_vertex]. *)
 val fold_vertex_closure:
-  ('a -> int -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
+  ('a -> G.V.t -> lval -> 'a) -> 'a  -> kernel_function -> stmt -> lval  -> 'a
 
 
 (** direct access to the abstract state. See Abstract_state.mli *)
 
-module Abstract_state : Abstract_state.S
+module Abstract_state : sig
+  (** Type denothing an abstract state of the analysis. It is a graph containing
+      all aliases and points-to information. *)
+  type t
+
+  (** access to the points-to graph *)
+  val get_graph: t -> G.t
+
+  (** set of lvals stored in a vertex *)
+  val get_lval_set : G.V.t -> t -> LSet.t
+
+  (** pretty printer; debug=true prints the graph, debug = false only
+      prints aliased variables *)
+  val pretty : ?debug:bool -> Format.formatter -> t -> unit
+
+  (** dot printer; first argument is a file name *)
+  val print_dot : string -> t -> unit
+
+  (** finds the vertex corresponding to a lval.
+      @raise Not_found if such a vertex does not exist
+  *)
+  val find_vertex : lval -> t -> G.V.t
+
+  (** same as previous function, but return a set of lval. Cannot
+      raise an exception but may return an empty set if the lval is not
+      in the graph *)
+  val find_aliases : lval -> t -> LSet.t
+
+  (** similar to the previous functions, but does not only give the
+      equivalence class of lv, but also all lv that are aliases in
+      other vertex of the graph *)
+  val find_all_aliases : lval -> t -> LSet.t
+
+  (** the set of all lvars to which the given variable may point. *)
+  val points_to_set : lval -> t -> LSet.t
+
+  (** find_aliases, then recursively finds other sets of lvals. We
+      have the property (if lval [lv] is in abstract state [x]) :
+      List.hd (find_transitive_closure lv x) = (find_vertex lv x,
+      find_aliases lv x) *)
+  val find_transitive_closure : lval -> t -> (G.V.t * LSet.t) list
+
+  (** inclusion test; [is_included a1 a2] tests if, for any lvl
+      present in a1 (associated to a vertex v1), that it is also
+      present in a2 (associated to a vertex v2) and that
+      get_lval_set(succ(v1) is included in get_lval_set(succ(v2)) *)
+  val is_included : t -> t -> bool
+end
 
 (** [get_state_before_stmt f s] gets the abstract state computed after
     statement [s] in function [f]. Returns [None] if

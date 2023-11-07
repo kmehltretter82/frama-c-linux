@@ -272,9 +272,9 @@ struct
   let narrow = fun m1 _m2 -> m1
   let join = Memory.join
   let smash ~oracle = Memory.join ~oracle:(fun _ -> oracle)
-  let widen h =
+  let widen hint =
     Memory.widen
-      (fun ~size v1 v2 -> Value_or_Uninitialized.widen (size,h) v1 v2)
+      (fun ~size v1 v2 -> Value_or_Uninitialized.widen ~size ~hint v1 v2)
   let incr_bound = Memory.incr_bound
 
   let get ~oracle m loc =

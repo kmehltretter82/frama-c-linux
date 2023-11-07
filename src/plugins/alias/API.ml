@@ -25,6 +25,8 @@ open Cil_types
 (** Points-to graphs datastructure. *)
 module G = Abstract_state.G
 
+let vid = Abstract_state.vid
+
 module LSet = Abstract_state.LSet
 
 module Abstract_state = Abstract_state

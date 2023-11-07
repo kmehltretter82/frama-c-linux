@@ -84,8 +84,8 @@ module Memory = struct
   let name = "bitwise"
 
   let widen kf stmt s1 s2 =
-    let wh = Widen.getWidenHints kf stmt in
-    widen wh s1 s2
+    let priority, hint = Widen.getWidenHints kf stmt in
+    widen ~priority ~hint s1 s2
 
   let narrow x _y = `Value x
 end

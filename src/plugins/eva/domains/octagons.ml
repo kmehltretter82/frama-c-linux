@@ -211,12 +211,7 @@ module Arith = struct
     let r = narrow x y in
     if is_bottom r then `Bottom else `Value r
 
-  let widen =
-    let hints = Integer.zero,
-                (Ival.Widen_Hints.empty,
-                 Fc_float.Widen_Hints.default_widen_hints)
-    in
-    Ival.widen hints
+  let widen = Ival.widen
 
   (* TODO: do not use Ival.top on floating-point value? *)
   let project_float ival =
