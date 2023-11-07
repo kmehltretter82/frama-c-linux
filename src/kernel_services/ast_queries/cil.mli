@@ -772,7 +772,7 @@ val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
   strictInteger:bool -> strictReturnTypes:bool ->
   combineWhat -> typ -> typ -> typ
 
-(** Specialized verison of {!combineTypesGen], we suppose here that
+(** Specialized version of {!combineTypesGen], we suppose here that
     if two global symbols are equal, then they are the same object.
 
     @since 28.0-Nickel
