@@ -29,8 +29,16 @@ import React from 'react';
 import * as Dome from 'dome';
 import { ToolBar, Filler } from 'dome/frame/toolbars';
 import { Code } from 'dome/controls/labels';
-import { Button } from 'dome/controls/buttons';
-import { TextView, TextProxy, TextBuffer, empty, } from 'dome/text/richtext';
+import { Button, IconButton } from 'dome/controls/buttons';
+import {
+  TextView,
+  TextProxy,
+  TextBuffer,
+  empty,
+  Selection,
+  Decoration,
+  Decorator,
+} from 'dome/text/richtext';
 import { registerSandbox } from 'ivette';
 
 /* -------------------------------------------------------------------------- */
@@ -41,6 +49,7 @@ function UseText(): JSX.Element {
   const [prefix, setPrefix] = React.useState('');
   const [readOnly, flipReadOnly] = Dome.useFlipState(false);
   const [useProxy, flipUseProxy] = Dome.useFlipState(false);
+  const [dynamic, flipDynamic] = Dome.useFlipState(false);
   const [changes, setChanges] = React.useState(0);
   const [s, onSelection] = React.useState(empty);
   const proxy = React.useMemo(() => new TextProxy(), []);
@@ -56,6 +65,42 @@ function UseText(): JSX.Element {
     text.append(`ADDED${n}\n`);
   }, [text]);
   const onChange = Dome.useDebounced(updatePrefix, 200);
+
+  const [decorations, setDecorations] = React.useState<Decoration[]>([]);
+
+  const decorator = React.useMemo<Decorator>(() => {
+    if (!dynamic) return decorations;
+    return (_: Selection): Decoration[] => {
+      return decorations;
+    };
+  }, [ dynamic, decorations ]);
+
+  const clearDecorations = React.useCallback(() => setDecorations([]), []);
+
+  const addDecoration = React.useCallback(() => {
+    setDecorations([...decorations, {
+      offset: s.offset,
+      length: s.length,
+      className: 'decoration',
+      title: 'Decorated'
+    }]);
+  }, [decorations, s]);
+
+  const addLineDecoration = React.useCallback(() => {
+    setDecorations([...decorations, {
+      line: s.fromLine,
+      className: 'line-decoration',
+      title: 'Line Decorated'
+    }]);
+  }, [decorations, s]);
+
+  const addGutterDecoration = React.useCallback(() => {
+    setDecorations([...decorations, {
+      line: s.fromLine,
+      gutter: '*',
+    }]);
+  }, [decorations, s]);
+
   return (
     <>
       <ToolBar>
@@ -69,8 +114,39 @@ function UseText(): JSX.Element {
           title={useProxy ? 'Use TextProxy' : 'Use TextBuffer (persistent)'}
           onClick={flipUseProxy}
         />
+        <Button
+          icon={dynamic ? 'RELOAD' : 'PIN'}
+          title={dynamic ? 'Dynamic Decorations' : 'Static Decorations'}
+          onClick={flipDynamic}
+        />
         <Code label={`Offset ${s.offset}-${s.offset + s.length}`} />
         <Code label={`Line ${s.fromLine}-${s.toLine}`} />
+        <Code
+          display={decorations.length > 0}
+          label={`${decorations.length} Decorations`} />
+        <IconButton
+          display={s.length === 0}
+          icon="CIRC.INFO"
+          title="Add Gutter Decoration"
+          onClick={addGutterDecoration}
+        />
+        <IconButton
+          display={s.length === 0}
+          icon="CIRC.CHECK"
+          title="Add Line Decoration"
+          onClick={addLineDecoration}
+        />
+        <IconButton
+          display={s.length > 0}
+          icon="CIRC.PLUS"
+          title="Add Decoration"
+          onClick={addDecoration}
+        />
+        <IconButton
+          display={decorations.length > 0}
+          icon="CIRC.CLOSE"
+          title="Clear Decorations"
+          onClick={clearDecorations} />
         <Filler />
         <Code>{`"${prefix}" (${changes})`}</Code>
         <Button label="Push" onClick={push} />
@@ -81,6 +157,7 @@ function UseText(): JSX.Element {
         readOnly={readOnly}
         onChange={onChange}
         onSelection={onSelection}
+        decorators={[decorator]}
       />
     </>
   );

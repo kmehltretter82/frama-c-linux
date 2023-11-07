@@ -30,8 +30,9 @@ import { Change, diffLines } from 'diff';
 /* --- Basic Definitions                                                  --- */
 /* -------------------------------------------------------------------------- */
 
-export interface Range { offset: number; length: number }
-export interface Position { offset: number; line: number }
+export interface Offset { offset: number; }
+export interface Range extends Offset { length: number }
+export interface Position extends Offset { line: number }
 export interface Selection extends Range { fromLine: number, toLine: number }
 
 export const empty : Range & Selection =
@@ -40,6 +41,11 @@ export const empty : Range & Selection =
 export function byDepth(a : Range, b : Range): number
 {
   return (a.length - b.length) || (b.offset - a.offset);
+}
+
+export function byOffset(a : Offset, b : Offset): number
+{
+  return (a.offset - b.offset);
 }
 
 type View = CM.EditorView | null;
@@ -390,7 +396,14 @@ export interface LineDecoration {
 
 }
 
-export type Decoration = MarkDecoration | LineDecoration;
+export interface GutterDecoration extends LineDecoration {
+
+  /** The gutter text mark (shall be few chatracters long). */
+  gutter: string;
+
+}
+
+export type Decoration = MarkDecoration | LineDecoration | GutterDecoration;
 export type Decorations = null | Decoration | readonly Decoration[];
 
 /* -------------------------------------------------------------------------- */
@@ -411,47 +424,145 @@ function isMarkDecoration(d : Decoration) : d is MarkDecoration
 function isLineDecoration(d : Decoration) : d is LineDecoration
 {
   // eslint-disable-next-line no-prototype-builtins
-  return d.hasOwnProperty("line");
+  return d.hasOwnProperty("line") && !d.hasOwnProperty("gutter");
 }
 
-/* TODO*/
-export class DecorationBuilder extends CS.RangeSetBuilder<CM.Decoration>
+function isGutterDecoration(d : Decoration) : d is GutterDecoration
 {
+  // eslint-disable-next-line no-prototype-builtins
+  return d.hasOwnProperty("line") && d.hasOwnProperty("gutter");
+}
 
-  private readonly doc : CS.Text;
+/* -------------------------------------------------------------------------- */
+/* --- Generic Builder                                                    --- */
+/* -------------------------------------------------------------------------- */
+
+interface RangeValue<A> extends Range  { value: A }
+
+class Builder<A extends CS.RangeValue> {
+
+  private buffer : RangeValue<A>[] = [];
+  protected readonly doc : CS.Text;
 
   constructor(doc: CS.Text) {
-    super();
     this.doc = doc;
     this.addSpec = this.addSpec.bind(this);
   }
 
+  addRange(offset: number, length: number, value: A): void {
+    if (offset < 0) return;
+    if (offset + length > this.doc.length) return;
+    this.buffer.push({ offset, length, value });
+  }
+
   addSpec(spec : Decorations): void {
     if (spec !== null) {
-      if (isDecoration(spec)) {
-        // ---- Mark Decoration
-        if (isMarkDecoration(spec)) {
-          const { offset, length, inclusive, className, title } = spec;
-          const attributes = title ? { title } : undefined;
-          const decoration = CM.Decoration.mark({
-            'class': className,
-            attributes,
-            inclusive,
-          });
-          this.add(offset, offset + length, decoration);
-        }
-        // ---- Line Decoration
-        if (isLineDecoration(spec)) {
-          const { line, className, title } = spec;
-          const offset = this.doc.line(line).from;
-          const attributes = title ? { title } : undefined;
-          const decoration = CM.Decoration.line({
-            'class': className,
-            attributes,
-          });
-          this.add(offset, offset, decoration);
-        }
-      } else spec.forEach(this.addSpec);
+      if (isDecoration(spec))
+        this.addDecoration(spec);
+      else
+        spec.forEach(this.addSpec);
+    }
+  }
+
+  finish(): CS.RangeSet<A> {
+    const { buffer } = this;
+    if (buffer.length === 0) return CS.RangeSet.empty;
+    const builder = new CS.RangeSetBuilder<A>();
+    buffer.sort(byOffset).forEach((r) =>
+      builder.add(r.offset, r.offset+r.length, r.value)
+    );
+    return builder.finish();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  protected addDecoration(_: Decoration): void {}
+
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Decoration Builder                                                 --- */
+/* -------------------------------------------------------------------------- */
+
+class DecorationBuilder extends Builder<CM.Decoration>
+{
+
+  addDecoration(spec: Decoration): void {
+    // ---- Mark Decoration
+    if (isMarkDecoration(spec)) {
+      const { offset, length, inclusive, className, title } = spec;
+      const attributes = title ? { title } : undefined;
+      const decoration = CM.Decoration.mark({
+        'class': className,
+        attributes,
+        inclusive,
+      });
+      this.addRange(offset, length, decoration);
+    }
+    // ---- Line Decoration
+    if (isLineDecoration(spec)) {
+      const { line, className, title } = spec;
+      if (line < 1) return;
+      if (line > this.doc.lines) return;
+      const offset = this.doc.line(line).from;
+      const attributes = title ? { title } : undefined;
+      const decoration = CM.Decoration.line({
+        'class': className,
+        attributes,
+      });
+      this.addRange(offset, 0, decoration);
+    }
+  }
+
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Gutter Builder                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+class GutterMark extends CM.GutterMarker {
+  private spec: GutterDecoration;
+  constructor(spec: GutterDecoration) {
+    super();
+    this.spec = spec;
+  }
+
+  toDOM(): Node {
+    const {  gutter, className, title } = this.spec;
+    const textNode = document.createElement(gutter);
+    if (!className && !title) return textNode;
+    const span = document.createElement("span");
+    span.appendChild(textNode);
+    if (className) span.className = className;
+    if (title) span.title = title;
+    return span;
+  }
+}
+
+const GutterMarks : Map<string, GutterMark> = new Map();
+
+function gutterMark(spec: GutterDecoration) : CM.GutterMarker {
+  const { gutter, className='', title='' } = spec;
+  const key = `G${gutter}@C${className}@T${title}`;
+  let marker = GutterMarks.get(key);
+  if (!marker) {
+    marker = new GutterMark(spec);
+    GutterMarks.set(key, marker);
+  }
+  return marker;
+}
+
+class GutterBuilder extends Builder<CM.GutterMarker>
+{
+
+  addDecoration(spec : Decoration): void {
+    // ---- Gutter Decoration
+    if (isGutterDecoration(spec)) {
+      const { line } = spec;
+      if (line < 1) return;
+      if (line > this.doc.lines) return;
+      const offset = this.doc.line(line).from;
+      const decoration = gutterMark(spec);
+      this.addRange(offset, 0, decoration);
     }
   }
 
@@ -501,7 +612,7 @@ type DynamicDecorator = ((viewport: Selection) => Decorations);
 
 function isDynamicDecorator(d: Decorator): d is DynamicDecorator
 {
-  return typeof(d) !== 'function';
+  return typeof(d) === 'function';
 }
 
 Decorators.pack(
@@ -513,9 +624,8 @@ Decorators.pack(
       if (decorators.length === 0) return CS.RangeSet.empty;
       return (view: CM.EditorView) => {
         const doc = view.state.doc;
-        const viewports = view.visibleRanges;
-        const buffer = new DecorationBuilder(view.state.doc);
-        viewports.forEach((range) =>
+        const buffer = new DecorationBuilder(doc);
+        view.visibleRanges.forEach((range) =>
           decorators.forEach((fn: DynamicDecorator) =>
             buffer.addSpec(fn(selection(doc, range)))
         ));
@@ -524,13 +634,35 @@ Decorators.pack(
     }
 ));
 
+// --- Gutter Decorators
+
+const Gutters = CM.gutter({
+
+  markers(view : CM.EditorView): CS.RangeSet<CM.GutterMarker> {
+    const decorators = view.state.field(Decorators.field);
+    if (decorators.length === 0) return CS.RangeSet.empty;
+    const doc = view.state.doc;
+    const buffer = new GutterBuilder(doc);
+    decorators.forEach((spec: Decorator) => {
+      if (isStaticDecorator(spec))
+        buffer.addSpec(spec);
+      else
+        view.visibleRanges.forEach((range) =>
+          buffer.addSpec(spec(selection(doc, range)))
+        );
+    });
+    return buffer.finish();
+  }
+
+});
+
 /* -------------------------------------------------------------------------- */
 /* --- Editor View                                                        --- */
 /* -------------------------------------------------------------------------- */
 
 function createView(parent: Element): CM.EditorView {
   const extensions : CS.Extension[] = [
-    ReadOnly, OnChange, OnSelect, Decorators,
+    ReadOnly, OnChange, OnSelect, Decorators, Gutters
   ];
   const state = CS.EditorState.create({ extensions });
   return new CM.EditorView({ state, parent });
