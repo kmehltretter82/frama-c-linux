@@ -36,6 +36,8 @@ EACSL_DLMALLOC_FLAGS = \
   -DUSE_LOCKS=1 \
   -DUSE_SPIN_LOCKS=1
 
+# Caution: don't use $< here if you want to stay compatible with BSD make
+# (See https://stackoverflow.com/questions/12904011/bmake-proper-use-of-automatic-variables)
 $(EACSL_DLMALLOC_LIB): $(EACSL_DLMALLOC_SRC)
 	@echo 'CC           $(EACSL_DLMALLOC_SRC)'
 	@$(CC) $(EACSL_DLMALLOC_SRC) -c -O2 -g3 -o$(EACSL_DLMALLOC_OBJ) $(EACSL_DLMALLOC_FLAGS)
