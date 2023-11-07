@@ -72,19 +72,19 @@ else
 fi
 
 if [[ "$TAG" == "$VERSION_SAFE" ]] ; then
-  echo_green "Git tag and version are coherent"
+  echo_green "Git tag and version are consistent"
 else
-  exit_red   "GIT TAG $TAG IS NOT COHERENT WITH (SAFE) VERSION $VERSION_SAFE"
+  exit_red   "GIT TAG $TAG IS NOT CONSISTENT WITH (SAFE) VERSION $VERSION_SAFE"
 fi
 
 if [[ "$VERSION" == "$VERSION_OPAM" ]] ; then
-  echo_green "Opam version and version are coherent"
+  echo_green "Opam version and version are consistent"
 else
-  exit_red   "VERSION $VERSION AND OPAM VERSION $VERSION_OPAM ARE NOT COHERENT"
+  exit_red   "VERSION $VERSION AND OPAM VERSION $VERSION_OPAM ARE NOT CONSISTENT"
 fi
 
 if [[ "$MAN_VERSION_OPAM" == "$VERSION_SAFE-$CODENAME" ]] ; then
-  echo_green "Opam manual version and version are coherent"
+  echo_green "Opam manual version and version are consistent"
 else
-  exit_red   "OPAM MANUAL VERSION $MAN_VERSION_OPAM AND VERSION $VERSION_SAFE-$CODENAME ARE NOT COHERENT"
+  exit_red   "OPAM MANUAL VERSION $MAN_VERSION_OPAM AND VERSION $VERSION_SAFE-$CODENAME ARE NOT CONSISTENT"
 fi
