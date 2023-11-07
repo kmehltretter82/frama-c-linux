@@ -723,12 +723,14 @@ type combineWhat =
 *)
 val combineAttributes : combineWhat -> attribute list -> attributes -> attributes
 
-(** [combineFunction] contains information on how enum, struct/union and
-    typedef are to be handled when combining with {!combineTypes} and
-    {!combineTypesGen}.
-    In pratice, the first argument of each field is a recursive definition.
+(** [combineFunction] contains information on how enum, struct/union and typedef
+      are to be handled when combining with {!combineTypes} and
+      {!combineTypesGen}. In pratice, the first argument of each field is a
+      recursive definition.
 
     @since 28.0-Nickel
+    @before Frama-C+dev [strictReturnTypes] was not named and [strictInteger]
+    not present in {!typ_combine}.
 *)
 type combineFunction =
   {
@@ -767,15 +769,19 @@ type combineFunction =
     @raise Cannot_combine with an explanation when the type cannot be combined.
 
     @since 28.0-Nickel
+    @before Frama-C+dev [strictInteger (true)] and [strictReturnTypes (false)]
+            were optional
 *)
 val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
   strictInteger:bool -> strictReturnTypes:bool ->
   combineWhat -> typ -> typ -> typ
 
-(** Specialized version of {!combineTypesGen], we suppose here that
-    if two global symbols are equal, then they are the same object.
+(** Specialized version of {!combineTypesGen], we suppose here that if two
+      global symbols are equal, then they are the same object.
 
     @since 28.0-Nickel
+    @before Frama-C+dev [strictInteger (true)] was not present and left with its
+    default value in combineTypesGen.
 *)
 val combineTypes : ?strictInteger:bool -> ?strictReturnTypes:bool ->
   combineWhat -> typ -> typ -> typ
