@@ -25,6 +25,7 @@ import React, { useState } from 'react';
 import { classes } from 'dome/misc/utils';
 import { Item, Section } from "dome/frame/sidebars";
 import { DoubleBarCategoryProps, registerSandbox } from 'ivette';
+import './style.css';
 
 /* -------------------------------------------------------------------------- */
 /* --- Mocking                                                            --- */

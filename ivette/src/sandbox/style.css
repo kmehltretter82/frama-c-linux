@@ -1,0 +1,41 @@
+
+/* -------------------------------------------------------------------------- */
+/* --- DoubleBar                                                          --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xDoubleBar {
+    height: 100%;
+    display: flex;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.dome-xDoubleBar-primary {
+    min-width: 35px;
+    max-width: fit-content;
+    resize: horizontal;
+    overflow: auto
+}
+
+.dome-xDoubleBar-secondary {
+    min-width: 0px;
+    max-width: fit-content;
+    resize: horizontal;
+    overflow: auto
+}
+
+.dome-xDoubleBar-primary-icon {
+    margin: 5px;
+    width: 25px;
+    height: 25px;
+}
+
+.dome-xDoubleBar-primary.dome-color-frame
+{
+    background: var(--background-intense) ;
+}
+
+.dome-xDoubleBar-secondary.dome-color-frame
+{
+    background: var(--background-profound) ;
+}
