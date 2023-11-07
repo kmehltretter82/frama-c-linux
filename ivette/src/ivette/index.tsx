@@ -29,13 +29,13 @@
    @module ivette
  */
 
+import React from 'react';
 import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
-import { GridHbox, GridItem, GridVbox } from 'dome/layout/grids';
-import * as Ext from 'ivette@ext';
+import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
 import * as Lab from 'ivette@lab';
-import React from 'react';
+import * as Ext from 'ivette@ext';
 import * as Doublebar from '../sandbox/doublebar';
 
 /* --------------------------------------------------------------------------*/

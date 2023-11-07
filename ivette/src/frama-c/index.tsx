@@ -24,24 +24,25 @@
 /* --- Frama-C Registry                                                   ---*/
 /* --------------------------------------------------------------------------*/
 
-import * as Ivette from 'ivette';
 import React from 'react';
+import * as Ivette from 'ivette';
 
+import History from 'frama-c/kernel/History';
+import Globals from 'frama-c/kernel/Globals';
+import Status from 'frama-c/kernel/Status';
 import ASTinfo from 'frama-c/kernel/ASTinfo';
 import ASTview from 'frama-c/kernel/ASTview';
-import Globals from 'frama-c/kernel/Globals';
-import History from 'frama-c/kernel/History';
-import Locations from 'frama-c/kernel/Locations';
-import Messages from 'frama-c/kernel/Messages';
-import PivotTable from 'frama-c/kernel/PivotTable';
-import Properties from 'frama-c/kernel/Properties';
 import SourceCode from 'frama-c/kernel/SourceCode';
-import Status from 'frama-c/kernel/Status';
+import PivotTable from 'frama-c/kernel/PivotTable';
+import Locations from 'frama-c/kernel/Locations';
+import Properties from 'frama-c/kernel/Properties';
+import Messages from 'frama-c/kernel/Messages';
 import * as db from '../sandbox/doublebar';
-import comp from '../sandbox/icons/component.png';
-import file from '../sandbox/icons/file.png';
-import folder from '../sandbox/icons/folder.png';
-import func from '../sandbox/icons/function.png';
+
+import compIco from '../sandbox/icons/component.png';
+import fileIco from '../sandbox/icons/file.png';
+import folderIco from '../sandbox/icons/folder.png';
+import funcIco from '../sandbox/icons/function.png';
 
 import 'frama-c/kernel/style.css';
 
@@ -158,22 +159,22 @@ Ivette.registerView({
 
 Ivette.registerCategory({
   title: "Functions",
-  iconPath: func,
+  iconPath: funcIco,
   subMenu: <Globals />
 });
 Ivette.registerCategory({
   title: "File",
-  iconPath: file,
+  iconPath: fileIco,
   subMenu: db.secondaryMenu1
 });
 Ivette.registerCategory({
   title: "Folder",
-  iconPath: folder,
+  iconPath: folderIco,
   subMenu: db.secondaryMenu2
 });
 Ivette.registerCategory({
   title: "Functions",
-  iconPath: comp,
+  iconPath: compIco,
   subMenu: <Laboratory.LabView
     customize={true}
     settings="frama-c.labview"

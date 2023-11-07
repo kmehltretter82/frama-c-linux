@@ -24,8 +24,8 @@
 /* --- Ivette Extensions                                                  ---*/
 /* --------------------------------------------------------------------------*/
 
-import * as Dome from 'dome';
 import React from 'react';
+import * as Dome from 'dome';
 
 /* --------------------------------------------------------------------------*/
 /* --- Extension Elements                                                 ---*/

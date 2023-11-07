@@ -21,10 +21,10 @@
 /* ************************************************************************ */
 
 
-import { Item, Section } from "dome/frame/sidebars";
-import { classes } from 'dome/misc/utils';
-import { DoubleBarCategoryProps, registerSandbox } from 'ivette';
 import React, { useState } from 'react';
+import { classes } from 'dome/misc/utils';
+import { Item, Section } from "dome/frame/sidebars";
+import { DoubleBarCategoryProps, registerSandbox } from 'ivette';
 
 /* -------------------------------------------------------------------------- */
 /* --- Mocking                                                            --- */
