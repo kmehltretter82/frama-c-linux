@@ -723,19 +723,20 @@ type combineWhat =
 *)
 val combineAttributes : combineWhat -> attribute list -> attributes -> attributes
 
-(** [combineFunction] contains information on how enum, struct/union and
-    typedef are to be handled when combining with {!combineTypes} and
-    {!combineTypesGen}.
-    In pratice, the first argument of each field is a recursive definition.
+(** [combineFunction] contains information on how enum, struct/union and typedef
+    are to be handled when combining with {!combineTypes} and
+    {!combineTypesGen}. In pratice, the first argument of each field is a
+    recursive definition.
 
     @since 28.0-Nickel
+    @before Frama-C+dev [strictReturnTypes] was not named and [strictInteger]
+    not present in {!typ_combine}.
 *)
 type combineFunction =
   {
     typ_combine : combineFunction ->
-      bool -> combineWhat -> typ -> typ -> typ;
-    (** [bool] is about strictness in return context.
-        See [StrictReturnTypes] in [combineTypeGen] *)
+      strictInteger:bool -> strictReturnTypes:bool ->
+      combineWhat -> typ -> typ -> typ;
 
     enum_combine : combineFunction ->
       enuminfo -> enuminfo -> enuminfo;
@@ -747,38 +748,43 @@ type combineFunction =
       typeinfo -> typeinfo -> typeinfo;
   }
 
-(** [combineTypesGen combF combW oldt newt]
-    Combine [oldt] and [newt] accordingly to [combF], [combW] indicates what we
-    are combinining.
+(** [combineTypesGen ~strictInteger ~strictReturnTypes combF combW oldt newt]
+    Combine [oldt] and [newt] accordingly to [combF], [combW] indicates what
+    we are combinining.
 
     Warning : this is not commutative. Indeed, excluding enum, struct/union and
     typedef which depend on [combF], the resulting type is as close as possible
     to [newt].
 
-    [strictInteger] is [true] (default) if two integers with same size and sign
-    but with different types cannot be combined. A warning is sent if it is
-    [false] and the compatibility is machine-dependent.
+    If [strictInteger] is [true], same size/sign integers with different types
+    will not be combined. Emits a warning if it is [false] and the compatibility
+    is machine-dependent.
 
-    [strictReturnTypes] is [false] (default) if a non-void type is compatible
-    with void in a return case.
+    If [strictReturnTypes] is [false], anything will be considered compatible
+    with void if [combW] is [CombineFunret] (i.e. comparing function return
+    types).
 
-    Notice that the [~emitwith] action is called iff a warning is logged.
+    [~emitwith] is used to emit warnings.
 
-    @raise Cannot_combine with an explanation when the type cannot be
-           combined.
+    @raise Cannot_combine with an explanation when the type cannot be combined.
 
     @since 28.0-Nickel
+    @before Frama-C+dev [strictInteger (true)] and [strictReturnTypes (false)]
+            were optional
 *)
 val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
-  ?strictInteger:bool -> ?strictReturnTypes:bool ->
+  strictInteger:bool -> strictReturnTypes:bool ->
   combineWhat -> typ -> typ -> typ
 
-(** Specialized verison of [combineTypesGen], we suppore here that
-    if two global symbols are equal, then they are the same object.
+(** Specialized version of {!combineTypesGen], we suppose here that if two
+    global symbols are equal, then they are the same object.
 
     @since 28.0-Nickel
+    @before Frama-C+dev [strictInteger (true)] was not present and left with its
+    default value in combineTypesGen.
 *)
-val combineTypes : ?strictReturnTypes:bool -> combineWhat -> typ -> typ -> typ
+val combineTypes : ?strictInteger:bool -> ?strictReturnTypes:bool ->
+  combineWhat -> typ -> typ -> typ
 
 (** How type qualifiers must be checked when checking for types compatibility
     with {!areCompatibleTypes} and {!compatibleTypes}.
