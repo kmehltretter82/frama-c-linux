@@ -109,14 +109,22 @@ let setCurrentWorkingDirectory s =
   let current = Option.get !current in
   current.current_working_directory <- Some s
 
+(* preprocessors tend to use '<xxx>' filenames in line directives to
+   denote special locations, e.g. builtin or command-line-defined macros.
+   Worse, this can get localized. We are thus a bit liberal in what we
+   consider special filenames.
+*)
+let is_special_file n =
+  let len = String.length n in
+  (* not sure an empty string can realistically happen here,
+     but it can't hurt to check. *)
+  len = 0 || n.[0] = '<' && n.[len-1] = '>'
+
 let setCurrentFile n =
   let current = Option.get !current in
   let base_name = current.current_working_directory in
   let norm = Filepath.normalize ?base_name n in
-  if n <> "<built-in>"
-  && n <> "<command-line>" (* GCC syntax *)
-  && n <> "<command line>" (* Clang syntax *)
-  && not (Sys.file_exists norm)
+  if not (is_special_file n) && not (Sys.file_exists norm)
   then
     Kernel.warning ~wkey:Kernel.wkey_line_directive ~once:true
       "ignoring non-existing file '%s', referenced in a line directive" norm
