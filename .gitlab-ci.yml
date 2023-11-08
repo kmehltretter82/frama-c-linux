@@ -468,7 +468,7 @@ ocaml-versions-nightly:
     - opam pin . -n
     - opam depext frama-c --with-test
     - opam install --jobs 2 frama-c --with-test --with-doc
-    - frama-c -version
+    - frama-c --plugins
   tags:
     - docker
 
@@ -509,6 +509,7 @@ opam-pin-release:
     - export OPAMEXTERNALSOLVER="builtin-0install"
     - opam update --depexts
     - opam reinstall --jobs 2 frama-c
+    - frama-c --plugins
   timeout: 2h
   tags:
     - docker
