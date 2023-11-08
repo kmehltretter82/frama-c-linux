@@ -125,10 +125,6 @@ let () = Db.Main.extend main
 
    A dependency between two nodes can have any combination of these kinds.
 
-   You can find more documentation, particularly on how this graph is built,
-   in this {{:../../pdg/index.html}report} (in French).
-
-
    {2 Dynamic dependencies}
 
    After having built the PDG for a function, there is a way of adding dynamically
@@ -170,10 +166,6 @@ let () = Db.Main.extend main
    So a solid blue edge with a circle arrow represent a data+control dependency for
    instance, while a dotted black edge with a triangle arrow represent a address
    dependency.
-
-   You are invited to look at
-   {{:../../../tests/pdg/doc.g.svg}a simple example}
-   to see the different kinds of dependencies.
 *)
 
 

@@ -126,16 +126,10 @@ module PostdominatorsTypes: sig
   end
 end
 
-(** Syntactic postdominators plugin.
-    @see <../postdominators/index.html> internal documentation. *)
 module Postdominators: PostdominatorsTypes.Sig
 
-(** Postdominators using value analysis results.
-    @see <../postdominators/index.html> internal documentation. *)
 module PostdominatorsValue: PostdominatorsTypes.Sig
 
-(** Security analysis.
-    @see <../security/index.html> internal documentation. *)
 module Security : sig
 
   val run_whole_analysis: (unit -> unit) ref

@@ -65,8 +65,7 @@ let () = Db.Main.extend main
 (* {2 Overview}
 
    To have more details about what we are trying to do,
-   you may have a look to the
-   {{:../../slicing/index.html}specification} report (in French).
+   you may have a look to the specification report (in French).
 
    The internal types module ({!module:SlicingTypes.Internals})
    can give a pretty good idea of the kind of objects that we deal with in this

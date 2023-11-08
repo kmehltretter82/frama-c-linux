@@ -27,8 +27,7 @@
  *
  * Most high level function, named [apply_xxx],
  * like [apply_change_call], [apply_missing_outputs], ...,
- * correspond the actions defined in the
- * {{:../../slicing/index.html}specification report}.
+ * correspond the actions defined in the specification report}.
  *
  * Many functions are modifying the marks of a slice,
  * so they can return a list of actions to be applied in order to deal with

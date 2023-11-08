@@ -20,12 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* $Id: Users.mli,v 1.5 2008-04-01 09:25:22 uid568 Exp $ *)
 open Cil_types
 (** Users analysis. *)
 
-(** Functions used by another function.
-    @see <../users/index.html> internal documentation. *)
 module Users_register : sig
   val get: (kernel_function -> Kernel_function.Hptset.t)
 end
