@@ -22,7 +22,7 @@ stdenv.mkDerivation rec {
     dune build -j1 --error-reporting=twice @doc-json
     cp -r _build/default/_doc/_html frama-c-api-json
     echo ".dummy" > excluded
-    tar czf frama-c-api-json.tar.gz -X excluded frama-c-api-json
+    tar czf frama-c-api-json.tar.gz -X excluded --owner=0 --group=0 --numeric-owner --sort=name --mtime="$(date --iso-8601 --date "today 00:00:00") 00:00Z" frama-c-api-json
   '';
 
   installPhase = ''
