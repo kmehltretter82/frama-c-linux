@@ -200,10 +200,9 @@ export function registerStatusbar(status: ToolProps): void {
 /* --- Sidebar                                                         ---*/
 /* --------------------------------------------------------------------------*/
 
-export interface SideBarCategoryProps {
-  title: string;
-  iconPath: string;
-  subMenu: React.ReactNode;
+export interface SideBarCategoryProps extends ContentProps{
+  label: string;
+  iconPath?: string;
 }
 
 export function registerSidebar(panel: ToolProps): void {

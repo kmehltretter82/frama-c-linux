@@ -39,7 +39,6 @@ import Properties from 'frama-c/kernel/Properties';
 import Messages from 'frama-c/kernel/Messages';
 import * as SideBar from '../sandbox/sidebar';
 
-import compIco from '../sandbox/icons/component.png';
 import fileIco from '../sandbox/icons/file.png';
 import folderIco from '../sandbox/icons/folder.png';
 import funcIco from '../sandbox/icons/function.png';
@@ -47,8 +46,6 @@ import funcIco from '../sandbox/icons/function.png';
 import 'frama-c/kernel/style.css';
 
 import * as Menu from 'frama-c/menu';
-
-import * as Laboratory from '../renderer/Laboratory';
 
 Menu.init();
 
@@ -158,27 +155,32 @@ Ivette.registerView({
 /* --------------------------------------------------------------------------*/
 
 Ivette.registerCategory({
-  title: "Functions",
+  id: "functions",
+  label: "Functions",
   iconPath: funcIco,
-  subMenu: <Globals />
+  children: <Globals />
 });
 Ivette.registerCategory({
-  title: "File",
+  id: "file",
+  label: "File",
   iconPath: fileIco,
-  subMenu: SideBar.secondaryMenu1
+  children: SideBar.secondaryMenu1
 });
 Ivette.registerCategory({
-  title: "Folder",
+  id: "folder",
+  label: "Folder",
   iconPath: folderIco,
-  subMenu: SideBar.secondaryMenu2
+  children: SideBar.secondaryMenu2
 });
 Ivette.registerCategory({
-  title: "Functions",
-  iconPath: compIco,
-  subMenu: <Laboratory.LabView
-    customize={true}
-    settings="frama-c.labview"
-/>
+  id: "lorem",
+  label: "lorem",
+  children: SideBar.secondaryMenu1
+});
+Ivette.registerCategory({
+  id: "ipsum",
+  label: "ipsum",
+  children: SideBar.secondaryMenu2
 });
 
 /* --------------------------------------------------------------------------*/

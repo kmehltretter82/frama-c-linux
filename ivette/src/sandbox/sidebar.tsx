@@ -24,6 +24,7 @@
 import React, { useState } from 'react';
 import { classes } from 'dome/misc/utils';
 import { Item, Section } from "dome/frame/sidebars";
+import { Catch } from 'dome/errors';
 import { SideBarCategoryProps, registerSandbox } from 'ivette';
 import './style.css';
 
@@ -134,6 +135,10 @@ export function SideBar(): JSX.Element {
     'dome-xSideBar-double-primary-icon'
   );
 
+  const classNamePrimeLabel = classes(
+    'dome-xSideBar-double-primary-label'
+  );
+
   const classNameSecondary = classes(
     'dome-xSideBar-double-secondary',
     'dome-xSideBar',
@@ -143,24 +148,34 @@ export function SideBar(): JSX.Element {
   const [selectedCategory, setSelectedCategory] = useState(0);
 
   return (
+    <Catch label={"dome-xSideBar-double-catch"}>
     <div className={classNameGlobal}>
       <div className={classNamePrime}>
         <>
           {categories.map((item, key) => (
             <div key={key}>
-              <img
-              className={classNamePrimeIcon}
-              src={item.iconPath}
-              alt={item.title}
-              title={item.title}
-              onClick={
-                () => {
-                  selectedCategory !== key ?
-                  setSelectedCategory(key) :
-                  setSelectedCategory(-1);
+              {item.iconPath ?
+                <img
+                className={classNamePrimeIcon}
+                id={item.id}
+                src={item.iconPath}
+                alt={item.label}
+                title={item.label}
+                onClick={
+                  () => setSelectedCategory(key)
                 }
+                />
+                :
+                <label
+                className={classNamePrimeLabel}
+                id={item.id}
+                onClick={
+                  () => setSelectedCategory(key)
+                }
+                >
+                  {item.label.slice(0, 4).toLocaleUpperCase()}
+                </label>
               }
-              />
               <br/>
             </div>
           ))}
@@ -168,9 +183,10 @@ export function SideBar(): JSX.Element {
       </div>
       <div className={classNameSecondary}>
         {selectedCategory !== -1 &&
-        categories[selectedCategory].subMenu}
+        categories[selectedCategory].children}
       </div>
     </div>
+    </Catch>
   );
 }
 
