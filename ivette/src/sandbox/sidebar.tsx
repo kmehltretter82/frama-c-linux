@@ -191,7 +191,7 @@ export function SideBar(): JSX.Element {
         </>
       </div>
       <div className={classNameSecondary +
-      (categories[selectedCategory].display === true ? 'dome-erased' : '')}>
+      (categories[selectedCategory].display === false ? 'dome-erased' : '')}>
         {categories[selectedCategory].children}
       </div>
     </div>
