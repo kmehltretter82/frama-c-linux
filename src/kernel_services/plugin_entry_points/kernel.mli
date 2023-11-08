@@ -216,6 +216,9 @@ val wkey_file_not_found: warn_category
 val wkey_c11: warn_category
 (** Warnings related to usage of C11-specific constructions. *)
 
+val wkey_line_directive: warn_category
+(** Warnings related to unknown line directives. *)
+
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)
 (** Kernel_function-related options cannot be registered in this module:

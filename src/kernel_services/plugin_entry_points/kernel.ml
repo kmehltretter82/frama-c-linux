@@ -220,6 +220,8 @@ let () = set_warn_status wkey_file_not_found Log.Wfeedback
 let wkey_c11 = register_warn_category "c11"
 let () = set_warn_status wkey_c11 Log.Winactive
 
+let wkey_line_directive = register_warn_category "pp:line-directive"
+
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
 (* ************************************************************************* *)
