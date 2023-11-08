@@ -46,6 +46,7 @@ import { registerSandbox } from 'ivette';
 function UseText(): JSX.Element {
   const [prefix, setPrefix] = React.useState('');
   const [useLines, flipUseLines] = Dome.useFlipState(true);
+  const [useCurrent, flipUseCurrent] = Dome.useFlipState(true);
   const [readOnly, flipReadOnly] = Dome.useFlipState(false);
   const [useProxy, flipUseProxy] = Dome.useFlipState(false);
   const [changed, setChanged] = React.useState(false);
@@ -119,6 +120,12 @@ function UseText(): JSX.Element {
           onClick={flipUseLines}
         />
         <Button
+          icon="TERMINAL"
+          selected={useCurrent}
+          title={'Show Current Line'}
+          onClick={flipUseCurrent}
+        />
+        <Button
           icon={readOnly ? 'LOCK' : 'EDIT'}
           title={readOnly ? 'Read Only' : 'Editable'}
           onClick={flipReadOnly}
@@ -170,6 +177,8 @@ function UseText(): JSX.Element {
         onChange={onChange}
         onSelection={onSelection}
         decorations={decorations}
+        lineNumbers={useLines}
+        showCurrentLine={useCurrent}
       />
     </>
   );

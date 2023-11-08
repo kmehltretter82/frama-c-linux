@@ -290,6 +290,26 @@ class Field<A> extends Extension {
 
 }
 
+class Option extends Extension {
+
+  private readonly spec: CS.Extension;
+  private readonly comp = new CS.Compartment();
+
+  constructor(extension: CS.Extension, active=true) {
+    super();
+    this.spec = extension;
+    this.pack(this.comp.of(active ? extension : []));
+  }
+
+  dispatch(view: View, active?: boolean): void {
+    if (view !== null && active !== undefined) {
+      const effects = this.comp.reconfigure(active ? this.spec : []);
+      view.dispatch({ effects });
+    }
+  }
+
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Read Only                                                          --- */
 /* -------------------------------------------------------------------------- */
@@ -454,7 +474,6 @@ class GutterMark extends CM.GutterMarker {
 }
 
 const GutterMarks : Map<string, GutterMark> = new Map();
-const GutterInit : GutterDecoration = { line: 0, gutter: '?' };
 
 function gutterMark(spec: GutterDecoration) : CM.GutterMarker {
   const { gutter, className='', title='' } = spec;
@@ -473,11 +492,15 @@ function gutterMark(spec: GutterDecoration) : CM.GutterMarker {
 
 interface RangeValue<A> extends Range { value: A }
 
+function byRange<A>(a: RangeValue<A>, b: RangeValue<A>): number {
+  return (a.offset - b.offset) || (a.length - b.length);
+}
+
 function toRangeSet<A extends CS.RangeValue>(
   ranges: RangeValue<A>[]
 ): CS.RangeSet<A> {
   const buffer = new CS.RangeSetBuilder<A>();
-  ranges.sort(byOffset).forEach((r) =>
+  ranges.sort(byRange).forEach((r) =>
     buffer.add(r.offset, r.offset + r.length, r.value)
   );
   return buffer.finish();
@@ -609,11 +632,23 @@ function dispatchDecorations(view: View, spec: Decorations): void {
 const Decorations: CS.Extension = [
   DecoratorState,
   CM.EditorView.decorations.from(DecoratorState, ({ ranges }) => ranges),
-  CM.gutter({
-    initialSpacer: () => new GutterMark(GutterInit),
-    markers: (view) => view.state.field(DecoratorState).gutters,
-  }),
+  CM.gutter({ markers: (view) => view.state.field(DecoratorState).gutters, }),
 ];
+
+/* -------------------------------------------------------------------------- */
+/* --- Line Numbers                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+const LineNumbers = new Option(CM.lineNumbers());
+
+/* -------------------------------------------------------------------------- */
+/* --- Active Line                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+const ActiveLine = new Option([
+  CM.highlightActiveLine(),
+  CM.highlightActiveLineGutter(),
+]);
 
 /* -------------------------------------------------------------------------- */
 /* --- Editor View                                                        --- */
@@ -621,10 +656,12 @@ const Decorations: CS.Extension = [
 
 function createView(parent: Element): CM.EditorView {
   const extensions : CS.Extension[] = [
-    CM.lineNumbers(),
-    CM.highlightActiveLine(),
-    CM.highlightActiveLineGutter(),
-    ReadOnly, OnChange, OnSelect, Decorations,
+    LineNumbers,
+    ActiveLine,
+    ReadOnly,
+    OnChange,
+    OnSelect,
+    Decorations,
   ];
   const state = CS.EditorState.create({ extensions });
   return new CM.EditorView({ state, parent });
@@ -641,6 +678,8 @@ export interface TextViewProps {
   selection?: Range;
   onSelection?: SelectionCallback;
   decorations?: Decorations;
+  lineNumbers?: boolean;
+  showCurrentLine?: boolean;
   display?: boolean;
   visible?: boolean;
   className?: string;
@@ -660,15 +699,21 @@ export function TextView(props: TextViewProps) : JSX.Element {
     return undefined;
   }, [text, view]);
 
-  // ---- Listeners readOnly, onChange, onSelection, Decorations
+  // ---- readOnly, onChange, onSelection, lineNumbers
   const {
     readOnly = false, onChange = null,
     onSelection: onSelect = null,
-    decorations: decors = null,
+    lineNumbers: lines,
+    showCurrentLine: active,
   } = props;
   React.useEffect(() => ReadOnly.dispatch(view, readOnly), [view, readOnly]);
   React.useEffect(() => OnChange.dispatch(view, onChange), [view, onChange]);
   React.useEffect(() => OnSelect.dispatch(view, onSelect), [view, onSelect]);
+  React.useEffect(() => LineNumbers.dispatch(view, lines), [view, lines]);
+  React.useEffect(() => ActiveLine.dispatch(view, active), [view, active]);
+
+  // ---- Decorations
+  const { decorations: decors = null } = props;
   React.useEffect(() => dispatchDecorations(view, decors), [view, decors]);
 
   // ---- Selection

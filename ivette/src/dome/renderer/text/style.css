@@ -124,7 +124,6 @@
 
 .cm-editor .cm-gutters {
   border-right: 0px;
-  /*min-width: 2.15em;*/
   background: var(--background-report);
 }
 
