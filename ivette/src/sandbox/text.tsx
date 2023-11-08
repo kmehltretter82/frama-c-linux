@@ -34,7 +34,7 @@ import {
   TextView,
   TextProxy,
   TextBuffer,
-  empty,
+  emptySelection,
   Decoration,
 } from 'dome/text/richtext';
 import { registerSandbox } from 'ivette';
@@ -45,15 +45,18 @@ import { registerSandbox } from 'ivette';
 
 function UseText(): JSX.Element {
   const [prefix, setPrefix] = React.useState('');
+  const [useLines, flipUseLines] = Dome.useFlipState(true);
   const [readOnly, flipReadOnly] = Dome.useFlipState(false);
   const [useProxy, flipUseProxy] = Dome.useFlipState(false);
+  const [changed, setChanged] = React.useState(false);
   const [changes, setChanges] = React.useState(0);
-  const [s, onSelection] = React.useState(empty);
+  const [s, onSelection] = React.useState(emptySelection);
   const proxy = React.useMemo(() => new TextProxy(), []);
   const buffer = React.useMemo(() => new TextBuffer(), []);
   const text = useProxy ? proxy : buffer;
   const updatePrefix = React.useCallback(
     () => {
+      setChanged(true);
       setChanges((n) => 1+n);
       setPrefix(text.toString().substring(0, 20).trim());
     }, [text]);
@@ -63,9 +66,21 @@ function UseText(): JSX.Element {
   }, [text]);
   const onChange = Dome.useDebounced(updatePrefix, 200);
   const [decorations, setDecorations] = React.useState<Decoration[]>([]);
-  const clearDecorations = React.useCallback(() => setDecorations([]), []);
+  const inconsistent = decorations.length > 0 && changed;
+
+  const clearDecorations = React.useCallback(() => {
+    setChanged(false);
+    setDecorations([]);
+  }, []);
+
+  const clearText = React.useCallback(() => {
+    setChanged(false);
+    setDecorations([]);
+    text.clear();
+  }, [text]);
 
   const addDecoration = React.useCallback(() => {
+    setChanged(false);
     setDecorations([...decorations, {
       offset: s.offset,
       length: s.length,
@@ -75,6 +90,7 @@ function UseText(): JSX.Element {
   }, [decorations, s]);
 
   const addLineDecoration = React.useCallback(() => {
+    setChanged(false);
     setDecorations([...decorations, {
       line: s.fromLine,
       className: 'line-decoration',
@@ -83,15 +99,25 @@ function UseText(): JSX.Element {
   }, [decorations, s]);
 
   const addGutterDecoration = React.useCallback(() => {
+    setChanged(false);
     setDecorations([...decorations, {
       line: s.fromLine,
       gutter: '*',
     }]);
   }, [decorations, s]);
 
+  const isLine = s.fromLine === s.toLine;
+  const isRange = s.length > 0;
+
   return (
     <>
       <ToolBar>
+        <Button
+          icon="ITEMS.LIST"
+          selected={useLines}
+          title={'Line Numbers'}
+          onClick={flipUseLines}
+        />
         <Button
           icon={readOnly ? 'LOCK' : 'EDIT'}
           title={readOnly ? 'Read Only' : 'Editable'}
@@ -104,34 +130,39 @@ function UseText(): JSX.Element {
         />
         <Code label={`Offset ${s.offset}-${s.offset + s.length}`} />
         <Code label={`Line ${s.fromLine}-${s.toLine}`} />
-        <Code label={`Decorations ${decorations.length}`} />
+        <Code
+          icon={inconsistent ? 'WARNING' : undefined}
+          title={inconsistent ? 'Iconsistent (modified text)' : undefined}
+          label={`Decorations ${decorations.length}`}
+        />
         <IconButton
-          display={s.length === 0}
+          display={isLine}
           icon="CIRC.INFO"
           title="Add Gutter Decoration"
           onClick={addGutterDecoration}
         />
         <IconButton
-          display={s.length === 0}
+          display={isLine}
           icon="CIRC.CHECK"
           title="Add Line Decoration"
           onClick={addLineDecoration}
         />
         <IconButton
-          display={s.length > 0}
+          display={isRange}
           icon="CIRC.PLUS"
           title="Add Decoration"
           onClick={addDecoration}
         />
         <IconButton
           display={decorations.length > 0}
+          kind={inconsistent ? 'negative' : 'default'}
           icon="CIRC.CLOSE"
           title="Clear Decorations"
           onClick={clearDecorations} />
         <Filler />
         <Code>{`"${prefix}" (${changes})`}</Code>
         <Button label="Push" onClick={push} />
-        <Button label="Clear" kind='negative' onClick={text.clear}  />
+        <Button label="Clear" kind='negative' onClick={clearText}  />
       </ToolBar>
       <TextView
         text={text}

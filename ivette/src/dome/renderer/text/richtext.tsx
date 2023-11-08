@@ -35,8 +35,8 @@ export interface Range extends Offset { length: number }
 export interface Position extends Offset { line: number }
 export interface Selection extends Range { fromLine: number, toLine: number }
 
-export const empty : Range & Selection =
-  { offset: 0, length: 0, fromLine: 0, toLine: 0 };
+export const emptySelection : Range & Selection =
+  { offset: 0, length: 0, fromLine: 1, toLine: 1 };
 
 export function byDepth(a : Range, b : Range): number
 {
@@ -434,6 +434,7 @@ function isGutterDecoration(d : Decoration) : d is GutterDecoration
 
 class GutterMark extends CM.GutterMarker {
   private spec: GutterDecoration;
+
   constructor(spec: GutterDecoration) {
     super();
     this.spec = spec;
@@ -441,14 +442,15 @@ class GutterMark extends CM.GutterMarker {
 
   toDOM(): Node {
     const {  gutter, className, title } = this.spec;
-    const textNode = document.createElement(gutter);
+    const textNode = document.createTextNode(gutter);
     if (!className && !title) return textNode;
-    const span = document.createElement("span");
+    const span = document.createElement("div");
     span.appendChild(textNode);
     if (className) span.className = className;
     if (title) span.title = title;
     return span;
   }
+
 }
 
 const GutterMarks : Map<string, GutterMark> = new Map();
@@ -608,10 +610,8 @@ const Decorations: CS.Extension = [
   DecoratorState,
   CM.EditorView.decorations.from(DecoratorState, ({ ranges }) => ranges),
   CM.gutter({
-    initialSpacer: () => gutterMark(GutterInit),
+    initialSpacer: () => new GutterMark(GutterInit),
     markers: (view) => view.state.field(DecoratorState).gutters,
-    lineMarkerChange: (update) =>
-      update.transactions.some((tr) => !tr.annotation(DecoratorSpec))
   }),
 ];
 
@@ -621,7 +621,10 @@ const Decorations: CS.Extension = [
 
 function createView(parent: Element): CM.EditorView {
   const extensions : CS.Extension[] = [
-    ReadOnly, OnChange, OnSelect, Decorations
+    CM.lineNumbers(),
+    CM.highlightActiveLine(),
+    CM.highlightActiveLineGutter(),
+    ReadOnly, OnChange, OnSelect, Decorations,
   ];
   const state = CS.EditorState.create({ extensions });
   return new CM.EditorView({ state, parent });
