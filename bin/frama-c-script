@@ -98,7 +98,7 @@ usage() {
    echo "      Accepts Frama-C options (e.g. -cpp-extra-args for parsing)."
    echo ""
    echo "  - make-machdep [--compiler=<cc>] [--cpp-arch-flags=<flags>]"
-   echo "      Creates a new machdep definitions for a specific target."
+   echo "      Creates a new machdep definition for a specific target."
    echo "      Use $0 make-machdep --help for more information"
    echo ""
    echo "  - make-wrapper target arg..."
