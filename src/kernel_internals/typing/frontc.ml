@@ -57,7 +57,7 @@ let parse_to_cabs (path : Datatype.Filepath.t) =
        by the preprocessor will be invalid. *)
     let pwd =
       match Parse_env.get_workdir path with
-      | None -> Filepath.pwd ()
+      | None -> (Filepath.pwd () :> string)
       | Some workdir -> workdir
     in
     Errorloc.setCurrentWorkingDirectory pwd;
