@@ -97,6 +97,10 @@ usage() {
    echo "      definitions, with source location and number of statements."
    echo "      Accepts Frama-C options (e.g. -cpp-extra-args for parsing)."
    echo ""
+   echo "  - make-machdep [--compiler=<cc>] [--cpp-arch-flags=<flags>]"
+   echo "      Creates a new machdep definitions for a specific target."
+   echo "      Use $0 make-machdep --help for more information"
+   echo ""
    echo "  - make-wrapper target arg..."
    echo "      Runs 'make target arg...', parsing the output to suggest"
    echo "      useful commands in case of failure."
@@ -109,7 +113,7 @@ usage() {
    echo "  - summary [options]"
    echo "      Monitors and summarizes multiple analyses dispatched by a Makefile"
    echo "      in the current PWD."
-   echo "      Use $0 summary --help for more informations."
+   echo "      Use $0 summary --help for more information."
    exit "$1"
 }
 
