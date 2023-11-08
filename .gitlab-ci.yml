@@ -23,6 +23,7 @@ default:
 variables:
   DEFAULT: "master"
   OCAML: "4.13"
+  NODE: "16"
   PUBLISH: "no"
   RELEASE: "no"
 
@@ -232,25 +233,23 @@ wp-tests:
 
 ivette-tests:
   stage: tests
-  allow_failure: true
   image: "ocaml/opam:ubuntu-lts-ocaml-$OCAML"
   before_script:
     - sudo apt update
-    - sudo apt install -y xvfb curl bubblewrap unzip libnss3 libasound2
+    - sudo apt install -y xvfb curl unzip libnss3 libasound2
     - sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
     - export NVM_DIR="$HOME/.nvm"
     - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
     - '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
-    - nvm install 16
-    - nvm use node 16
+    - nvm install $NODE
+    - nvm use node $NODE
     - corepack enable
   script:
-    - opam switch create 4.13.1
-    - eval $(opam env)
     - opam pin . -n
-    - opam depext frama-c --with-test
-    - opam install --deps-only .
-    - make clean && make && make -C ivette dist
+    - opam depext frama-c
+    - opam install --jobs 2 --deps-only .
+    - dune build -j2 @install
+    - make -C ivette dist
     - cd ivette
     - cp dist/renderer/* dist/main/
     - xvfb-run --auto-servernum -e /dev/stdout -s "-screen 0 1920x1080x24 -ac -nolisten tcp -nolisten unix" dune exec -- yarn playwright test --headed
@@ -260,6 +259,7 @@ ivette-tests:
       - ivette/screenshots
     when: always
     expire_in: 1 day
+  allow_failure: true
   tags:
     - docker
 
