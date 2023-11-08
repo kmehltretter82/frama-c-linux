@@ -32,6 +32,10 @@ import './style.css';
 /* --- Mocking                                                            --- */
 /* -------------------------------------------------------------------------- */
 
+interface Category extends SideBarCategoryProps{
+  display: boolean;
+}
+
 const itemsSection1 = (
   <div>
     <Item
@@ -115,10 +119,10 @@ export const secondaryMenu2 = (
   </>
 );
 
-const categories: SideBarCategoryProps[] = [];
+const categories: Category[] = [];
 
 export function registerCategory(item: SideBarCategoryProps): void {
-  categories.push(item);
+  categories.push({ ...item, display: false });
 }
 
 export function SideBar(): JSX.Element {
@@ -147,6 +151,11 @@ export function SideBar(): JSX.Element {
 
   const [selectedCategory, setSelectedCategory] = useState(0);
 
+  function updateSelected(key: number): void {
+    setSelectedCategory(key);
+    categories[key].display = true;
+  }
+
   return (
     <Catch label={"dome-xSideBar-double-catch"}>
     <div className={classNameGlobal}>
@@ -162,7 +171,7 @@ export function SideBar(): JSX.Element {
                 alt={item.label}
                 title={item.label}
                 onClick={
-                  () => setSelectedCategory(key)
+                  () => updateSelected(key)
                 }
                 />
                 :
@@ -170,7 +179,7 @@ export function SideBar(): JSX.Element {
                 className={classNamePrimeLabel}
                 id={item.id}
                 onClick={
-                  () => setSelectedCategory(key)
+                  () => updateSelected(key)
                 }
                 >
                   {item.label.slice(0, 4).toLocaleUpperCase()}
@@ -181,9 +190,9 @@ export function SideBar(): JSX.Element {
           ))}
         </>
       </div>
-      <div className={classNameSecondary}>
-        {selectedCategory !== -1 &&
-        categories[selectedCategory].children}
+      <div className={classNameSecondary +
+      (categories[selectedCategory].display === true ? 'dome-erased' : '')}>
+        {categories[selectedCategory].children}
       </div>
     </div>
     </Catch>
