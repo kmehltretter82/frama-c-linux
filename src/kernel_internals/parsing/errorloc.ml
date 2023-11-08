@@ -125,10 +125,11 @@ let setCurrentFile n =
   let base_name = current.current_working_directory in
   let norm = Filepath.normalize ?base_name n in
   if not (is_special_file n) && not (Sys.file_exists norm)
-  then
+  then begin
+    currentLine := None;
     Kernel.warning ~wkey:Kernel.wkey_line_directive ~once:true
       "ignoring non-existing file '%s', referenced in a line directive" norm
-  else begin
+  end else begin
     let pos = current.lexbuf.Lexing.lex_curr_p in
     current.lexbuf.Lexing.lex_curr_p <- {
       pos with Lexing.pos_fname = norm;
