@@ -35,9 +35,7 @@ import {
   TextProxy,
   TextBuffer,
   empty,
-  Selection,
   Decoration,
-  Decorator,
 } from 'dome/text/richtext';
 import { registerSandbox } from 'ivette';
 
@@ -49,7 +47,6 @@ function UseText(): JSX.Element {
   const [prefix, setPrefix] = React.useState('');
   const [readOnly, flipReadOnly] = Dome.useFlipState(false);
   const [useProxy, flipUseProxy] = Dome.useFlipState(false);
-  const [dynamic, flipDynamic] = Dome.useFlipState(false);
   const [changes, setChanges] = React.useState(0);
   const [s, onSelection] = React.useState(empty);
   const proxy = React.useMemo(() => new TextProxy(), []);
@@ -65,16 +62,7 @@ function UseText(): JSX.Element {
     text.append(`ADDED${n}\n`);
   }, [text]);
   const onChange = Dome.useDebounced(updatePrefix, 200);
-
   const [decorations, setDecorations] = React.useState<Decoration[]>([]);
-
-  const decorator = React.useMemo<Decorator>(() => {
-    if (!dynamic) return decorations;
-    return (_: Selection): Decoration[] => {
-      return decorations;
-    };
-  }, [ dynamic, decorations ]);
-
   const clearDecorations = React.useCallback(() => setDecorations([]), []);
 
   const addDecoration = React.useCallback(() => {
@@ -114,16 +102,9 @@ function UseText(): JSX.Element {
           title={useProxy ? 'Use TextProxy' : 'Use TextBuffer (persistent)'}
           onClick={flipUseProxy}
         />
-        <Button
-          icon={dynamic ? 'RELOAD' : 'PIN'}
-          title={dynamic ? 'Dynamic Decorations' : 'Static Decorations'}
-          onClick={flipDynamic}
-        />
         <Code label={`Offset ${s.offset}-${s.offset + s.length}`} />
         <Code label={`Line ${s.fromLine}-${s.toLine}`} />
-        <Code
-          display={decorations.length > 0}
-          label={`${decorations.length} Decorations`} />
+        <Code label={`Decorations ${decorations.length}`} />
         <IconButton
           display={s.length === 0}
           icon="CIRC.INFO"
@@ -157,7 +138,7 @@ function UseText(): JSX.Element {
         readOnly={readOnly}
         onChange={onChange}
         onSelection={onSelection}
-        decorators={[decorator]}
+        decorations={decorations}
       />
     </>
   );

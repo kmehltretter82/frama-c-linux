@@ -268,21 +268,16 @@ class Extension {
   pack(ext : CS.Extension): void { this.extension.push(ext); }
 }
 
-interface Comparator<A> {
-  (a: A, b: A): boolean;
-}
-
 class Field<A> extends Extension {
   readonly field : CS.StateField<A>;
   private readonly annot : CS.AnnotationType<A>;
 
-  constructor(init: A, compare ?: Comparator<A>) {
+  constructor(init: A) {
     super();
     const annot = CS.Annotation.define<A>();
     const field = CS.StateField.define<A>({
       create: () => init,
       update: (fd: A, tr: CS.Transaction) => tr.annotation(annot) ?? fd,
-      compare,
     });
     this.annot = annot;
     this.field = field;
@@ -434,88 +429,6 @@ function isGutterDecoration(d : Decoration) : d is GutterDecoration
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Generic Builder                                                    --- */
-/* -------------------------------------------------------------------------- */
-
-interface RangeValue<A> extends Range  { value: A }
-
-class Builder<A extends CS.RangeValue> {
-
-  private buffer : RangeValue<A>[] = [];
-  protected readonly doc : CS.Text;
-
-  constructor(doc: CS.Text) {
-    this.doc = doc;
-    this.addSpec = this.addSpec.bind(this);
-  }
-
-  addRange(offset: number, length: number, value: A): void {
-    if (offset < 0) return;
-    if (offset + length > this.doc.length) return;
-    this.buffer.push({ offset, length, value });
-  }
-
-  addSpec(spec : Decorations): void {
-    if (spec !== null) {
-      if (isDecoration(spec))
-        this.addDecoration(spec);
-      else
-        spec.forEach(this.addSpec);
-    }
-  }
-
-  finish(): CS.RangeSet<A> {
-    const { buffer } = this;
-    if (buffer.length === 0) return CS.RangeSet.empty;
-    const builder = new CS.RangeSetBuilder<A>();
-    buffer.sort(byOffset).forEach((r) =>
-      builder.add(r.offset, r.offset+r.length, r.value)
-    );
-    return builder.finish();
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  protected addDecoration(_: Decoration): void {}
-
-}
-
-/* -------------------------------------------------------------------------- */
-/* --- Decoration Builder                                                 --- */
-/* -------------------------------------------------------------------------- */
-
-class DecorationBuilder extends Builder<CM.Decoration>
-{
-
-  addDecoration(spec: Decoration): void {
-    // ---- Mark Decoration
-    if (isMarkDecoration(spec)) {
-      const { offset, length, inclusive, className, title } = spec;
-      const attributes = title ? { title } : undefined;
-      const decoration = CM.Decoration.mark({
-        'class': className,
-        attributes,
-        inclusive,
-      });
-      this.addRange(offset, length, decoration);
-    }
-    // ---- Line Decoration
-    if (isLineDecoration(spec)) {
-      const { line, className, title } = spec;
-      if (line < 1) return;
-      if (line > this.doc.lines) return;
-      const offset = this.doc.line(line).from;
-      const attributes = title ? { title } : undefined;
-      const decoration = CM.Decoration.line({
-        'class': className,
-        attributes,
-      });
-      this.addRange(offset, 0, decoration);
-    }
-  }
-
-}
-
-/* -------------------------------------------------------------------------- */
 /* --- Gutter Builder                                                     --- */
 /* -------------------------------------------------------------------------- */
 
@@ -539,6 +452,7 @@ class GutterMark extends CM.GutterMarker {
 }
 
 const GutterMarks : Map<string, GutterMark> = new Map();
+const GutterInit : GutterDecoration = { line: 0, gutter: '?' };
 
 function gutterMark(spec: GutterDecoration) : CM.GutterMarker {
   const { gutter, className='', title='' } = spec;
@@ -551,110 +465,155 @@ function gutterMark(spec: GutterDecoration) : CM.GutterMarker {
   return marker;
 }
 
-class GutterBuilder extends Builder<CM.GutterMarker>
-{
+/* -------------------------------------------------------------------------- */
+/* --- Decorations Builder                                                --- */
+/* -------------------------------------------------------------------------- */
 
-  addDecoration(spec : Decoration): void {
-    // ---- Gutter Decoration
-    if (isGutterDecoration(spec)) {
-      const { line } = spec;
-      if (line < 1) return;
-      if (line > this.doc.lines) return;
-      const offset = this.doc.line(line).from;
-      const decoration = gutterMark(spec);
-      this.addRange(offset, 0, decoration);
+interface RangeValue<A> extends Range { value: A }
+
+function toRangeSet<A extends CS.RangeValue>(
+  ranges: RangeValue<A>[]
+): CS.RangeSet<A> {
+  const buffer = new CS.RangeSetBuilder<A>();
+  ranges.sort(byOffset).forEach((r) =>
+    buffer.add(r.offset, r.offset + r.length, r.value)
+  );
+  return buffer.finish();
+}
+
+class DecorationsBuilder {
+
+  private ranges : RangeValue<CM.Decoration>[] = [];
+  private gutters : RangeValue<CM.GutterMarker>[] = [];
+  protected readonly doc : CS.Text;
+
+  constructor(doc: CS.Text) {
+    this.doc = doc;
+    this.addSpec = this.addSpec.bind(this);
+  }
+
+  addMark(spec: MarkDecoration): void {
+    const { offset, length, inclusive, className, title } = spec;
+    if (offset < 0) return;
+    if (offset + length > this.doc.length) return;
+    const attributes = title ? { title } : undefined;
+    const value = CM.Decoration.mark({
+      'class': className,
+      attributes,
+      inclusive,
+    });
+    this.ranges.push({ offset, length, value });
+  }
+
+  addLine(spec: LineDecoration): void {
+    const { line, className, title } = spec;
+    if (line < 1) return;
+    if (line > this.doc.lines) return;
+    const offset = this.doc.line(line).from;
+    const attributes = title ? { title } : undefined;
+    const value = CM.Decoration.line({
+      'class': className,
+      attributes,
+    });
+    this.ranges.push({ offset, length: 0, value });
+  }
+
+  addGutter(spec: GutterDecoration): void {
+    const { line } = spec;
+    if (line < 1) return;
+    if (line > this.doc.lines) return;
+    const offset = this.doc.line(line).from;
+    const value = gutterMark(spec);
+    this.gutters.push({ offset, length: 0, value });
+  }
+
+  addSpec(spec : Decorations): void {
+    if (spec !== null) {
+      if (isDecoration(spec)) {
+        if (isMarkDecoration(spec)) this.addMark(spec);
+        if (isLineDecoration(spec)) this.addLine(spec);
+        if (isGutterDecoration(spec)) this.addGutter(spec);
+      } else spec.forEach(this.addSpec);
     }
+  }
+
+  getRanges(): CS.RangeSet<CM.Decoration> {
+    return toRangeSet(this.ranges);
+  }
+
+  getGutters(): CS.RangeSet<CM.GutterMarker> {
+    return toRangeSet(this.gutters);
   }
 
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Decorators                                                         --- */
+/* --- Decorations                                                        --- */
 /* -------------------------------------------------------------------------- */
 
-export type Decorator = Decorations | ((viewport: Selection) => Decorations);
-export type Decorators = readonly Decorator[];
+interface Decorator {
+  spec : Decorations;
+  ranges : CM.DecorationSet;
+  gutters : CS.RangeSet<CM.GutterMarker>;
+}
 
-function compareDecorators(a : Decorators, b : Decorators): boolean
+function compareDecorations(a : Decorations, b : Decorations): boolean
 {
   if (a === b) return true;
+  if (!Array.isArray(a)) return false;
+  if (!Array.isArray(b)) return false;
   const n = a.length;
   if (n !== b.length) return false;
   for (let k = 0; k < n; k++) if (a[k] !== b[k]) return false;
   return true;
 }
 
-const Decorators = new Field<Decorators>([], compareDecorators);
+const DecoratorSpec = CS.Annotation.define<Decorations>();
 
-// --- Static Decorators
+const DecoratorState = CS.StateField.define<Decorator>({
 
-function isStaticDecorator(d: Decorator): d is Decorations
-{
-  return typeof(d) !== 'function';
-}
+  create: () => ({
+    spec: null,
+    ranges: CS.RangeSet.empty,
+    gutters: CS.RangeSet.empty,
+  }),
 
-Decorators.pack(
-  CM.EditorView.decorations.compute(
-    [Decorators.field],
-    (state: CS.EditorState) => {
-      const decorators =
-        state.field(Decorators.field).filter(isStaticDecorator);
-      if (decorators.length === 0) return CS.RangeSet.empty;
-      const buffer = new DecorationBuilder(state.doc);
-      decorators.forEach(buffer.addSpec);
-      return buffer.finish();
-    }
-));
-
-// --- Dynamic Decorators
-
-type DynamicDecorator = ((viewport: Selection) => Decorations);
-
-function isDynamicDecorator(d: Decorator): d is DynamicDecorator
-{
-  return typeof(d) === 'function';
-}
-
-Decorators.pack(
-  CM.EditorView.decorations.compute(
-    [Decorators.field],
-    (state: CS.EditorState) => {
-      const decorators =
-        state.field(Decorators.field).filter(isDynamicDecorator);
-      if (decorators.length === 0) return CS.RangeSet.empty;
-      return (view: CM.EditorView) => {
-        const doc = view.state.doc;
-        const buffer = new DecorationBuilder(doc);
-        view.visibleRanges.forEach((range) =>
-          decorators.forEach((fn: DynamicDecorator) =>
-            buffer.addSpec(fn(selection(doc, range)))
-        ));
-        return buffer.finish();
+  update(value: Decorator, tr: CS.Transaction) {
+    const newSpec : Decorations = tr.annotation(DecoratorSpec) ?? null;
+    if (newSpec !== null && !compareDecorations(newSpec, value.spec)) {
+      const builder = new DecorationsBuilder(tr.newDoc);
+      builder.addSpec(newSpec);
+      return {
+        spec: newSpec,
+        ranges: builder.getRanges(),
+        gutters: builder.getGutters(),
       };
     }
-));
-
-// --- Gutter Decorators
-
-const Gutters = CM.gutter({
-
-  markers(view : CM.EditorView): CS.RangeSet<CM.GutterMarker> {
-    const decorators = view.state.field(Decorators.field);
-    if (decorators.length === 0) return CS.RangeSet.empty;
-    const doc = view.state.doc;
-    const buffer = new GutterBuilder(doc);
-    decorators.forEach((spec: Decorator) => {
-      if (isStaticDecorator(spec))
-        buffer.addSpec(spec);
-      else
-        view.visibleRanges.forEach((range) =>
-          buffer.addSpec(spec(selection(doc, range)))
-        );
-    });
-    return buffer.finish();
-  }
+    if (tr.docChanged)
+      return {
+        spec: value.spec,
+        ranges: value.ranges.map(tr.changes),
+        gutters: value.gutters.map(tr.changes),
+      };
+    return value;
+  },
 
 });
+
+function dispatchDecorations(view: View, spec: Decorations): void {
+  view?.dispatch({ annotations: DecoratorSpec.of(spec) });
+}
+
+const Decorations: CS.Extension = [
+  DecoratorState,
+  CM.EditorView.decorations.from(DecoratorState, ({ ranges }) => ranges),
+  CM.gutter({
+    initialSpacer: () => gutterMark(GutterInit),
+    markers: (view) => view.state.field(DecoratorState).gutters,
+    lineMarkerChange: (update) =>
+      update.transactions.some((tr) => !tr.annotation(DecoratorSpec))
+  }),
+];
 
 /* -------------------------------------------------------------------------- */
 /* --- Editor View                                                        --- */
@@ -662,7 +621,7 @@ const Gutters = CM.gutter({
 
 function createView(parent: Element): CM.EditorView {
   const extensions : CS.Extension[] = [
-    ReadOnly, OnChange, OnSelect, Decorators, Gutters
+    ReadOnly, OnChange, OnSelect, Decorations
   ];
   const state = CS.EditorState.create({ extensions });
   return new CM.EditorView({ state, parent });
@@ -678,7 +637,7 @@ export interface TextViewProps {
   onChange?: Callback;
   selection?: Range;
   onSelection?: SelectionCallback;
-  decorators?: Decorators;
+  decorations?: Decorations;
   display?: boolean;
   visible?: boolean;
   className?: string;
@@ -702,12 +661,12 @@ export function TextView(props: TextViewProps) : JSX.Element {
   const {
     readOnly = false, onChange = null,
     onSelection: onSelect = null,
-    decorators: decors = [],
+    decorations: decors = null,
   } = props;
   React.useEffect(() => ReadOnly.dispatch(view, readOnly), [view, readOnly]);
   React.useEffect(() => OnChange.dispatch(view, onChange), [view, onChange]);
   React.useEffect(() => OnSelect.dispatch(view, onSelect), [view, onSelect]);
-  React.useEffect(() => Decorators.dispatch(view, decors), [view, decors]);
+  React.useEffect(() => dispatchDecorations(view, decors), [view, decors]);
 
   // ---- Selection
   const { selection } = props;
