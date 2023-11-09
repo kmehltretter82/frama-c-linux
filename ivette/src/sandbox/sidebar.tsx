@@ -26,6 +26,7 @@ import { classes } from 'dome/misc/utils';
 import { Item, Section } from "dome/frame/sidebars";
 import { Catch } from 'dome/errors';
 import { SideBarCategoryProps, registerSandbox } from 'ivette';
+import * as sb from '../../src/dome/renderer/frame/sidebars';
 import './style.css';
 
 /* -------------------------------------------------------------------------- */
@@ -145,7 +146,6 @@ export function SideBar(): JSX.Element {
 
   const classNameSecondary = classes(
     'dome-xSideBar-double-secondary',
-    'dome-xSideBar',
     'dome-color-frame',
   );
 
@@ -190,10 +190,10 @@ export function SideBar(): JSX.Element {
           ))}
         </>
       </div>
-      <div className={classNameSecondary +
+      <sb.SideBar className={classNameSecondary +
       (categories[selectedCategory].display === false ? 'dome-erased' : '')}>
         {categories[selectedCategory].children}
-      </div>
+      </sb.SideBar>
     </div>
     </Catch>
   );
