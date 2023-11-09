@@ -21,10 +21,18 @@
     height: 25px;
 }
 
+.dome-xSideBar-double-primary-icon:hover {
+    background-color: var(--background-profound-hover);
+}
+
 .dome-xSideBar-double-primary-label {
     display: inline-block;
     margin-top: 5px;
     font-weight: bold;
+}
+
+.dome-xSideBar-double-primary-label:hover {
+    background-color: var(--background-profound-hover);
 }
 
 .dome-xSideBar-double-primary.dome-color-frame
