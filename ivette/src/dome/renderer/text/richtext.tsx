@@ -20,6 +20,7 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+import _ from 'lodash';
 import React, { CSSProperties } from 'react';
 import { classes } from 'dome/misc/utils';
 import * as CS from '@codemirror/state';
@@ -35,7 +36,8 @@ export interface Range extends Offset { length: number }
 export interface Position extends Offset { line: number }
 export interface Selection extends Range { fromLine: number, toLine: number }
 
-export const emptySelection : Range & Selection =
+export const emptyPosition : Position = { offset: 0, line: 1 };
+export const emptySelection : Selection =
   { offset: 0, length: 0, fromLine: 1, toLine: 1 };
 
 export function byDepth(a : Range, b : Range): number
@@ -434,6 +436,42 @@ Viewport.pack(
 ));
 
 /* -------------------------------------------------------------------------- */
+/* --- Hovering Listener                                                  --- */
+/* -------------------------------------------------------------------------- */
+
+export type HoverCallback = (pos: Position | null) => void;
+
+const OnHover = new Field<HoverCallback|null>(null);
+
+function getPosition(evt: MouseEvent, view: CM.EditorView): Position | null
+{
+  const { x, y } = evt;
+  const offset = view.posAtCoords({ x, y }, false);
+  const line = view.state.doc.lineAt(offset);
+  const p = view.coordsAtPos(line.from);
+  const q = view.coordsAtPos(line.to);
+  if (p !== null && q !== null) {
+    const left = Math.trunc(p.left);
+    const right = Math.trunc(q.right + 0.5);
+    const top = Math.trunc(p.top);
+    const bottom = Math.trunc(q.bottom + 0.5);
+    const ok = left <= x && x <= right && top <= y && y <= bottom;
+    if (ok) return { offset, line: line.number };
+  }
+  return null;
+}
+
+OnHover.pack(
+  CM.EditorView.domEventHandlers({
+    mousemove: _.debounce(
+      (evt: MouseEvent, view: CM.EditorView) => {
+        const fn = view.state.field(OnHover.field);
+        if (fn !== null) fn(getPosition(evt, view));
+        return false;
+    }, 10)
+}));
+
+/* -------------------------------------------------------------------------- */
 /* --- Decorations                                                        --- */
 /* -------------------------------------------------------------------------- */
 
@@ -503,7 +541,44 @@ function isGutterDecoration(d : Decoration) : d is GutterDecoration
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Gutter Builder                                                     --- */
+/* --- Decorations Cache                                                  --- */
+/* -------------------------------------------------------------------------- */
+
+const DecorationCache : Map<string, CM.Decoration> = new Map();
+
+function markDecoration(spec: MarkDecoration): CM.Decoration {
+  const { className='', title='', inclusive=false } = spec;
+  const key = `M${className}@T${title}@I{inclusive}`;
+  let mark = DecorationCache.get(key);
+  if (!mark) {
+    const attributes = title ? { title } : undefined;
+    mark = CM.Decoration.mark({
+      'class': className,
+      attributes,
+      inclusive
+    });
+    DecorationCache.set(key, mark);
+  }
+  return mark;
+}
+
+function lineDecoration(spec: LineDecoration): CM.Decoration {
+  const { className='', title='' } = spec;
+  const key = `L${className}@T${title}`;
+  let line = DecorationCache.get(key);
+  if (!line) {
+    const attributes = title ? { title } : undefined;
+    line = CM.Decoration.line({
+      'class': className,
+      attributes,
+    });
+    DecorationCache.set(key, line);
+  }
+  return line;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Gutter Cache                                                       --- */
 /* -------------------------------------------------------------------------- */
 
 class GutterMark extends CM.GutterMarker {
@@ -527,15 +602,15 @@ class GutterMark extends CM.GutterMarker {
 
 }
 
-const GutterMarks : Map<string, GutterMark> = new Map();
+const GutterCache : Map<string, GutterMark> = new Map();
 
 function gutterMark(spec: GutterDecoration) : CM.GutterMarker {
   const { gutter, className='', title='' } = spec;
   const key = `G${gutter}@C${className}@T${title}`;
-  let marker = GutterMarks.get(key);
+  let marker = GutterCache.get(key);
   if (!marker) {
     marker = new GutterMark(spec);
-    GutterMarks.set(key, marker);
+    GutterCache.set(key, marker);
   }
   return marker;
 }
@@ -544,26 +619,10 @@ function gutterMark(spec: GutterDecoration) : CM.GutterMarker {
 /* --- Decorations Builder                                                --- */
 /* -------------------------------------------------------------------------- */
 
-interface RangeValue<A> extends Range { value: A }
-
-function byRange<A>(a: RangeValue<A>, b: RangeValue<A>): number {
-  return (a.offset - b.offset) || (a.length - b.length);
-}
-
-function toRangeSet<A extends CS.RangeValue>(
-  ranges: RangeValue<A>[]
-): CS.RangeSet<A> {
-  const buffer = new CS.RangeSetBuilder<A>();
-  ranges.sort(byRange).forEach((r) =>
-    buffer.add(r.offset, r.offset + r.length, r.value)
-  );
-  return buffer.finish();
-}
-
 class DecorationsBuilder {
 
-  private ranges : RangeValue<CM.Decoration>[] = [];
-  private gutters : RangeValue<CM.GutterMarker>[] = [];
+  private ranges : CS.Range<CM.Decoration>[] = [];
+  private gutters : CS.Range<CM.GutterMarker>[] = [];
   protected readonly doc : CS.Text;
 
   constructor(doc: CS.Text) {
@@ -572,29 +631,19 @@ class DecorationsBuilder {
   }
 
   addMark(spec: MarkDecoration): void {
-    const { offset, length, inclusive, className, title } = spec;
+    const { offset, length } = spec;
     if (offset < 0) return;
-    if (offset + length > this.doc.length) return;
-    const attributes = title ? { title } : undefined;
-    const value = CM.Decoration.mark({
-      'class': className,
-      attributes,
-      inclusive,
-    });
-    this.ranges.push({ offset, length, value });
+    const endOffset = offset + length;
+    if (endOffset > this.doc.length) return;
+    this.ranges.push(markDecoration(spec).range(offset, endOffset));
   }
 
   addLine(spec: LineDecoration): void {
-    const { line, className, title } = spec;
+    const { line } = spec;
     if (line < 1) return;
     if (line > this.doc.lines) return;
     const offset = this.doc.line(line).from;
-    const attributes = title ? { title } : undefined;
-    const value = CM.Decoration.line({
-      'class': className,
-      attributes,
-    });
-    this.ranges.push({ offset, length: 0, value });
+    this.ranges.push(lineDecoration(spec).range(offset));
   }
 
   addGutter(spec: GutterDecoration): void {
@@ -602,8 +651,7 @@ class DecorationsBuilder {
     if (line < 1) return;
     if (line > this.doc.lines) return;
     const offset = this.doc.line(line).from;
-    const value = gutterMark(spec);
-    this.gutters.push({ offset, length: 0, value });
+    this.gutters.push(gutterMark(spec).range(offset));
   }
 
   addSpec(spec : Decorations): void {
@@ -617,11 +665,11 @@ class DecorationsBuilder {
   }
 
   getRanges(): CS.RangeSet<CM.Decoration> {
-    return toRangeSet(this.ranges);
+    return CS.RangeSet.of(this.ranges, true);
   }
 
   getGutters(): CS.RangeSet<CM.GutterMarker> {
-    return toRangeSet(this.gutters);
+    return CS.RangeSet.of(this.gutters, true);
   }
 
 }
@@ -715,6 +763,7 @@ function createView(parent: Element): CM.EditorView {
     ReadOnly,
     OnChange,
     OnSelect,
+    OnHover,
     Viewport,
     Decorations,
   ];
@@ -733,6 +782,7 @@ export interface TextViewProps {
   selection?: Range;
   onViewport?: SelectionCallback;
   onSelection?: SelectionCallback;
+  onHover?: HoverCallback;
   decorations?: Decorations;
   lineNumbers?: boolean;
   showCurrentLine?: boolean;
@@ -755,21 +805,23 @@ export function TextView(props: TextViewProps) : JSX.Element {
     return undefined;
   }, [text, view]);
 
-  // ---- readOnly, onChange, onSelection, lineNumbers
+  // ---- Fields Props
   const {
-    readOnly = false,
+    onHover = null,
     onChange = null,
+    readOnly = false,
     onViewport: onReview = null,
     onSelection: onSelect = null,
     lineNumbers: lines,
     showCurrentLine: active,
   } = props;
+  React.useEffect(() => OnHover.dispatch(view, onHover), [view, onHover]);
   React.useEffect(() => ReadOnly.dispatch(view, readOnly), [view, readOnly]);
   React.useEffect(() => OnChange.dispatch(view, onChange), [view, onChange]);
   React.useEffect(() => OnSelect.dispatch(view, onSelect), [view, onSelect]);
   React.useEffect(() => Viewport.dispatch(view, onReview), [view, onReview]);
-  React.useEffect(() => LineNumbers.dispatch(view, lines), [view, lines]);
   React.useEffect(() => ActiveLine.dispatch(view, active), [view, active]);
+  React.useEffect(() => LineNumbers.dispatch(view, lines), [view, lines]);
 
   // ---- Decorations
   const { decorations: decors = null } = props;

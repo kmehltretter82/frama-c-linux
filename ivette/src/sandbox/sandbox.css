@@ -15,3 +15,7 @@
 .cm-global-box .line-decoration {
     background: lightgreen;
 }
+
+.cm-global-box .hover {
+    background: yellow;
+}

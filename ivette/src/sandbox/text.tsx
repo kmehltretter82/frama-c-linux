@@ -34,6 +34,7 @@ import {
   TextView,
   TextProxy,
   TextBuffer,
+  Position,
   emptySelection,
   Decoration,
 } from 'dome/text/richtext';
@@ -54,6 +55,7 @@ function UseText(): JSX.Element {
   const [lines, setLines] = React.useState(1);
   const [s, onSelection] = React.useState(emptySelection);
   const [v, onViewport] = React.useState(emptySelection);
+  const [h, onHover] = React.useState<Position | null>(null);
   const proxy = React.useMemo(() => new TextProxy(), []);
   const buffer = React.useMemo(() => new TextBuffer(), []);
   const text = useProxy ? proxy : buffer;
@@ -113,6 +115,10 @@ function UseText(): JSX.Element {
 
   const isLine = s.fromLine === s.toLine && s.toLine <= lines;
   const isRange = s.length > 0 && s.offset + s.length <= length;
+  const allDecorations = React.useMemo(() => {
+    if (h===null) return decorations;
+    return [...decorations, { line: h.line, className: 'hover' }];
+  }, [decorations, h]);
 
   return (
     <>
@@ -177,8 +183,9 @@ function UseText(): JSX.Element {
         readOnly={readOnly}
         onChange={onChange}
         onSelection={onSelection}
+        onHover={onHover}
         onViewport={onViewport}
-        decorations={decorations}
+        decorations={allDecorations}
         lineNumbers={useLines}
         showCurrentLine={useCurrent}
       />
@@ -186,6 +193,7 @@ function UseText(): JSX.Element {
         <Code label={`Offset ${s.offset}-${s.offset + s.length} / ${length}`} />
         <Code label={`Line ${s.fromLine}-${s.toLine} / ${lines}`} />
         <Code label={`View ${v.fromLine}-${v.toLine}`} />
+        <Code label={`Hover ${h ? h.offset : '-'}:${h ? h.line : '-'}`} />
         <Filler />
         <Code>{`Changes: ${changes}`}</Code>
       </ToolBar>
