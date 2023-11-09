@@ -39,8 +39,6 @@ import Properties from 'frama-c/kernel/Properties';
 import Messages from 'frama-c/kernel/Messages';
 import * as SideBar from '../sandbox/sidebar';
 
-import fileIco from '../sandbox/icons/file.png';
-import folderIco from '../sandbox/icons/folder.png';
 import funcIco from '../sandbox/icons/function.png';
 
 import 'frama-c/kernel/style.css';
@@ -160,27 +158,6 @@ Ivette.registerCategory({
   iconPath: funcIco,
   children: <Globals />
 });
-Ivette.registerCategory({
-  id: "file",
-  label: "File",
-  iconPath: fileIco,
-  children: SideBar.secondaryMenu1
-});
-Ivette.registerCategory({
-  id: "folder",
-  label: "Folder",
-  iconPath: folderIco,
-  children: SideBar.secondaryMenu2
-});
-Ivette.registerCategory({
-  id: "lorem",
-  label: "lorem",
-  children: SideBar.secondaryMenu1
-});
-Ivette.registerCategory({
-  id: "ipsum",
-  label: "ipsum",
-  children: SideBar.secondaryMenu2
-});
+
 
 /* --------------------------------------------------------------------------*/
