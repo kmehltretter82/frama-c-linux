@@ -25,8 +25,15 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import { SIDEBAR } from 'ivette';
+import * as Dome from 'dome';
+import { SideBar } from 'dome/frame/sidebars';
+import { Catch } from 'dome/errors';
+import { SidebarProps, SIDEBAR } from 'ivette';
 import * as Ext from './Extensions';
+
+// TODO: remove sandbox/style.css
+// TODO: add classes in `./style.css` under name .sidebar-xxx if necessary
+// TODO: incorporate previous dev in comments below into draft (Cf. TODO)
 
 /*
    export function SideBar(): JSX.Element {
@@ -103,13 +110,67 @@ import * as Ext from './Extensions';
    }
  */
 
+/* -------------------------------------------------------------------------- */
+/* --- SideBar Selector                                                   --- */
+/* -------------------------------------------------------------------------- */
+
+interface SelectorProps extends SidebarProps {
+  selected: string;
+  setSelected: (item: string) => void;
+}
+
+function Selector(props: SelectorProps): JSX.Element {
+  const { id, selected, setSelected, label, title } = props;
+  // TODO: redesign this by incorporating some stuff from previous dev
+  return (
+    <li title={title} onClick={() => setSelected(id)}>
+      {selected === id ? '(*)' : '(-)'} {label}
+    </li>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- User Sidebar Wrapper                                               --- */
+/* -------------------------------------------------------------------------- */
+
+interface WrapperProps extends SidebarProps {
+  selected: string;
+}
+
+function Wrapper(props: WrapperProps): JSX.Element {
+  const className = props.selected === props.id ? '' : 'dome-erased';
+  return (
+    <SideBar className={className}>
+      <Catch label={props.id}>
+        {props.children}
+      </Catch>
+    </SideBar>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- SideBar Main Component                                             --- */
+/* -------------------------------------------------------------------------- */
+
 export function Panel(): JSX.Element {
+  const [selected, setSelected] =
+    Dome.useStringSettings('ivette.sidebar.selected');
   const sidebars = Ext.useElements(SIDEBAR);
   const items = sidebars.map((sb) => (
-    <ul key={sb.id}>
-      {sb.label}
-    </ul>
+    <Selector
+      key={sb.id}
+      selected={selected}
+      setSelected={setSelected}
+      {...sb} />
   ));
+  const wrappers = sidebars.map((sb) => (
+    <Wrapper
+      key={sb.id}
+      selected={selected}
+      {...sb}
+    />
+  ));
+  // TODO: redesign this by incorporating some stuff drom previous dev
   return (
     <div>
       <div className='sidebar-ruler' />
@@ -117,6 +178,7 @@ export function Panel(): JSX.Element {
       <ul>
         {items}
       </ul>
+      {wrappers}
     </div>
   );
 }
