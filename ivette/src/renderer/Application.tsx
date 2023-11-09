@@ -31,10 +31,11 @@ import * as Dome from 'dome';
 import { Vfill } from 'dome/layout/boxes';
 import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
-import * as Sidebar from 'dome/frame/sidebars';
+import * as Sidebar from './Sidebar';
 import * as Controller from './Controller';
-import * as Extensions from './Extensions';
 import * as Laboratory from './Laboratory';
+import * as Ext from './Extensions';
+import { TOOLBAR, STATUSBAR } from 'ivette';
 import * as IvettePrefs from 'ivette/prefs';
 import * as Studia from 'frama-c/plugins/studia/studia';
 import './loader';
@@ -51,6 +52,8 @@ export default function Application(): JSX.Element {
     Dome.useFlipSettings('frama-c.viewbar.unfold', true);
 
   Studia.useStudiaMode();
+  const tools = Ext.useChildren(TOOLBAR);
+  const status = Ext.useChildren(STATUSBAR);
 
   return (
     <Vfill>
@@ -62,7 +65,7 @@ export default function Application(): JSX.Element {
           onClick={flipSidebar}
         />
         <Controller.Control />
-        <Extensions.Toolbar />
+        <>{tools}</>
         <Toolbar.Filler />
         <IvettePrefs.ThemeSwitchTool />
         <IvettePrefs.FontTools />
@@ -75,10 +78,7 @@ export default function Application(): JSX.Element {
         />
       </Toolbar.ToolBar>
       <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
-        <Sidebar.SideBar>
-          <div className="sidebar-ruler" />
-          <Extensions.Sidebar />
-        </Sidebar.SideBar>
+        <Sidebar.Panel />
         <Laboratory.LabView
           customize={viewbar}
           settings="frama-c.labview"
@@ -86,7 +86,7 @@ export default function Application(): JSX.Element {
       </LSplit>
       <Toolbar.ToolBar>
         <Controller.Status />
-        <Extensions.Statusbar />
+        <>{status}</>
         <Toolbar.Filler />
         <Controller.Stats />
       </Toolbar.ToolBar>

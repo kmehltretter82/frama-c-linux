@@ -21,193 +21,52 @@
 /* ************************************************************************ */
 
 
-import React, { useState } from 'react';
-import { classes } from 'dome/misc/utils';
+import React from 'react';
 import { Item, Section } from "dome/frame/sidebars";
-import { Catch } from 'dome/errors';
-import { SideBarCategoryProps, registerSandbox } from 'ivette';
-import * as sb from '../../src/dome/renderer/frame/sidebars';
-import './style.css';
+import * as Ivette from 'ivette';
 
 /* -------------------------------------------------------------------------- */
 /* --- Mocking                                                            --- */
 /* -------------------------------------------------------------------------- */
 
-interface Category extends SideBarCategoryProps{
-  display: boolean;
-}
+Ivette.registerSidebar({
+  id: 'sandbox.sidebar.a',
+  label: 'SandA',
+  children:
+    <>
+      <Section label='Section A.1'>
+        <Item label='Item A.1.1' />
+        <Item label='Item A.1.2' />
+        <Item label='Item A.1.3' />
+        <Item label='Item A.1.4' />
+      </Section>
+      <Section label='Section A.2'>
+        <Item label='Item A.2.1' />
+        <Item label='Item A.2.2' />
+        <Item label='Item A.2.3' />
+        <Item label='Item A.2.4' />
+      </Section>
+    </>
+});
 
-const itemsSection1 = (
-  <div>
-    <Item
-      className="class1.1"
-      label="item 1.1-l"
-      title="item 1.1-t"
-      selected={false}
-    />
-    <Item
-      className="class1.2"
-      label="item 1.2-l"
-      title="item 1.2-t"
-      selected={false}
-    />
-    <Item
-      className="class1.3"
-      label="item 1.3-l"
-      title="item 1.3-t"
-      selected={false}
-    />
-  </div>
-);
-
-const itemsSection2 = (
-  <div>
-    <Item
-      className="class2.1"
-      label="item 2.1-l"
-      title="item 2.1-t"
-      selected={false}
-    />
-    <Item
-      className="class2.2"
-      label="item 2.2-l"
-      title="item 2.2-t"
-      selected={false}
-    />
-    <Item
-      className="class2.3"
-      label="item 2.3-l"
-      title="item 2.3-t"
-      selected={false}
-      />
-  </div>
-);
-
-export const secondaryMenu1 = (
-  <>
-    <Section
-      label="label section1"
-      title="title section1"
-      defaultUnfold
-      settings="frama-c.sidebar.updated"
-      className='globals-function-section'
-    >
-      {itemsSection1}
-    </Section>
-    <Section
-      label="label section2"
-      title="title section2"
-      defaultUnfold={false}
-      settings="frama-c.sidebar.updated2"
-      className='globals-function-section'
-    >
-    {itemsSection2}
-  </Section>
-</>
-);
-
-export const secondaryMenu2 = (
-  <>
-    <Section
-      label="label section1"
-      title="title section1"
-      defaultUnfold={false}
-      settings="frama-c.sidebar.updated2"
-      className='globals-function-section'
-    >
-      {itemsSection2}
-    </Section>
-  </>
-);
-
-const categories: Category[] = [];
-
-export function registerCategory(item: SideBarCategoryProps): void {
-  categories.push({ ...item, display: false });
-}
-
-export function SideBar(): JSX.Element {
-  const classNameGlobal = classes(
-    'dome-xSideBar-double',
-  );
-
-  const classNamePrime = classes(
-    'dome-xSideBar-double-primary',
-    'dome-color-frame',
-  );
-
-  const classNamePrimeIcon = classes(
-    'dome-xSideBar-double-primary-icon'
-  );
-
-  const classNamePrimeLabel = classes(
-    'dome-xSideBar-double-primary-label'
-  );
-
-  const classNameSecondary = classes(
-    'dome-xSideBar-double-secondary',
-    'dome-color-frame',
-  );
-
-  const [selectedCategory, setSelectedCategory] = useState(0);
-
-  function updateSelected(key: number): void {
-    setSelectedCategory(key);
-    categories[key].display = true;
-  }
-
-  return (
-    <Catch label={"dome-xSideBar-double-catch"}>
-    <div className={classNameGlobal}>
-      <div className={classNamePrime}>
-        <>
-          {categories.map((item, key) => (
-            <div key={key}>
-              {item.iconPath ?
-                <img
-                className={classNamePrimeIcon}
-                id={item.id}
-                src={item.iconPath}
-                alt={item.label}
-                title={item.label}
-                onClick={
-                  () => updateSelected(key)
-                }
-                />
-                :
-                <label
-                className={classNamePrimeLabel}
-                id={item.id}
-                onClick={
-                  () => updateSelected(key)
-                }
-                >
-                  {item.label.slice(0, 4).toLocaleUpperCase()}
-                </label>
-              }
-              <br/>
-            </div>
-          ))}
-        </>
-      </div>
-      <sb.SideBar className={classNameSecondary +
-      (categories[selectedCategory].display === false ? 'dome-erased' : '')}>
-        {categories[selectedCategory].children}
-      </sb.SideBar>
-    </div>
-    </Catch>
-  );
-}
-
-
-/* -------------------------------------------------------------------------- */
-/* --- Sandbox                                                            --- */
-/* -------------------------------------------------------------------------- */
-
-registerSandbox({
-  id: 'sandbox.sidebar',
-  label: 'Sidebar',
-  children: <SideBar />,
+Ivette.registerSidebar({
+  id: 'sandbox.sidebar.b',
+  label: 'SandB',
+  children:
+    <>
+      <Section label='Section B.1'>
+        <Item label='Item B.1.1' />
+        <Item label='Item B.1.2' />
+        <Item label='Item B.1.3' />
+        <Item label='Item B.1.4' />
+      </Section>
+      <Section label='Section B.2'>
+        <Item label='Item B.2.1' />
+        <Item label='Item B.2.2' />
+        <Item label='Item B.2.3' />
+        <Item label='Item B.2.4' />
+      </Section>
+    </>
 });
 
 /* -------------------------------------------------------------------------- */

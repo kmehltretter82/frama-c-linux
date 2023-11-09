@@ -20,9 +20,9 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* --------------------------------------------------------------------------*/
-/* --- Frama-C Registry                                                   ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Frama-C Registry                                                   --- */
+/* -------------------------------------------------------------------------- */
 
 import React from 'react';
 import * as Ivette from 'ivette';
@@ -37,9 +37,6 @@ import PivotTable from 'frama-c/kernel/PivotTable';
 import Locations from 'frama-c/kernel/Locations';
 import Properties from 'frama-c/kernel/Properties';
 import Messages from 'frama-c/kernel/Messages';
-import * as SideBar from '../sandbox/sidebar';
-
-import funcIco from '../sandbox/icons/function.png';
 
 import 'frama-c/kernel/style.css';
 
@@ -47,20 +44,27 @@ import * as Menu from 'frama-c/menu';
 
 Menu.init();
 
-/* --------------------------------------------------------------------------*/
-/* --- Frama-C Kernel Groups                                              ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Frama-C Tools                                                      --- */
+/* -------------------------------------------------------------------------- */
+
+Ivette.registerSidebar({
+  id: 'frama-c.globals',
+  label: 'AST',
+  children: <Globals />
+});
+
+Ivette.registerToolbar({ id: 'frama-c.history', children: <History /> });
+Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
+
+/* -------------------------------------------------------------------------- */
+/* --- Frama-C Kernel Groups                                              --- */
+/* -------------------------------------------------------------------------- */
 
 Ivette.registerGroup({
   id: 'frama-c.kernel',
   label: 'Frama-C Kernel',
 }, () => {
-  Ivette.registerSidebar({
-    id: 'frama-c.sidebar',
-    children: <SideBar.SideBar />
-  });
-  Ivette.registerToolbar({ id: 'frama-c.history', children: <History /> });
-  Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
   Ivette.registerComponent({
     id: 'frama-c.astinfo',
     label: 'Inspector',
@@ -105,18 +109,18 @@ Ivette.registerGroup({
   });
 });
 
-/* --------------------------------------------------------------------------*/
-/* --- Frama-C Plug-ins Group                                             ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Frama-C Plug-ins Group                                             --- */
+/* -------------------------------------------------------------------------- */
 
 Ivette.registerGroup({
   id: 'frama-c.plugins',
   label: 'Frama-C Plug-ins',
 });
 
-/* --------------------------------------------------------------------------*/
-/* --- Frama-C Views                                                      ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Frama-C Views                                                      --- */
+/* -------------------------------------------------------------------------- */
 
 Ivette.registerView({
   id: 'source',
@@ -148,16 +152,4 @@ Ivette.registerView({
   ],
 });
 
-/* --------------------------------------------------------------------------*/
-/* --- Frama-C Categories                                                 ---*/
-/* --------------------------------------------------------------------------*/
-
-Ivette.registerCategory({
-  id: "functions",
-  label: "Functions",
-  iconPath: funcIco,
-  children: <Globals />
-});
-
-
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
