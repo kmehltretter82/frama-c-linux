@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Database in which static plugins are registered.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (**
    Modules providing general services:
@@ -68,12 +68,12 @@ val register_guarded_compute:
 
 (** Frama-C main interface.
     @since Lithium-20081201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Main: sig
 
   val extend : (unit -> unit) -> unit
   (** Register a function to be called by the Frama-C main entry point.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   val play: (unit -> unit) ref
   (** Run all the Frama-C analyses. This function should be called only by
@@ -126,16 +126,10 @@ module PostdominatorsTypes: sig
   end
 end
 
-(** Syntactic postdominators plugin.
-    @see <../postdominators/index.html> internal documentation. *)
 module Postdominators: PostdominatorsTypes.Sig
 
-(** Postdominators using value analysis results.
-    @see <../postdominators/index.html> internal documentation. *)
 module PostdominatorsValue: PostdominatorsTypes.Sig
 
-(** Security analysis.
-    @see <../security/index.html> internal documentation. *)
 module Security : sig
 
   val run_whole_analysis: (unit -> unit) ref
@@ -240,7 +234,7 @@ module Derefs : INOUT with type t = Locations.Zone.t
 
 (** This function should be called from time to time by all analysers taking
     time. In GUI mode, this will make the interface reactive.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @deprecated 21.0-Scandium *)
 val progress: (unit -> unit) ref
 [@@ deprecated "Use Db.yield instead."]

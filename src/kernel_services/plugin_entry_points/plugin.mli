@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Plugin registration and general services.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 (** Special signature for Kernel services, whose messages are handled in
@@ -76,7 +76,7 @@ end
 
 (** Provided plug-general services for plug-ins.
     @since Beryllium-20090601-beta1
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module type S = sig
   include Log.Messages
   include S_no_log
@@ -107,7 +107,7 @@ val register_kernel: unit -> unit
 
 (** Functors for registering a new plug-in. It provides access to several
     services.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Register
     (_: sig
        val name: string

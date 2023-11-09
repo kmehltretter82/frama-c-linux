@@ -42,7 +42,7 @@
 (****************************************************************************)
 
 (** The Abstract Syntax of CIL.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (**************************** WARNING ***************************************)
 (* Remember to reflect any change here into the visitor and pretty-printer  *)
@@ -68,7 +68,7 @@
     {!Cil.dummyFile} when you need a {!Cil_types.file} as a placeholder. For
     each global item CIL stores the source location where it appears (using the
     type {!Cil_types.location})
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 type file = {
   mutable fileName: Filepath.Normalized.t;   (** The complete file name *)
 
@@ -91,7 +91,7 @@ type file = {
 (** The main type for representing global declarations and definitions. A list
     of these form a CIL file. The order of globals in the file is generally
     important.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and global =
   | GType of typeinfo * location
   (** A typedef. All uses of type names (through the [TNamed] constructor)
@@ -143,7 +143,7 @@ and global =
 
   | GFun of fundec * location
   (** A function definition.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | GAsm of string * location
   (** Global asm statement. These ones can contain only a template *)
@@ -340,7 +340,7 @@ and attrparam =
     make one and use {!Cil_const.copyCompInfo} to copy one (this ensures that
     a new key is
     assigned and that the fields have the right pointers to parents.).
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 and compinfo = {
   mutable cstruct: bool;
@@ -388,7 +388,7 @@ and compinfo = {
     with the type of the field). *)
 
 (** Information about a struct/union field.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and fieldinfo = {
   mutable fcomp: compinfo;
   (** The host structure that contains this field. There can be only one
@@ -448,7 +448,7 @@ and fieldinfo = {
     enumeration. Make sure you have a [GEnumTag] for each of these. *)
 
 (** Information about an enumeration.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and enuminfo = {
   eorig_name: string; (** original name as found in C file. *)
 
@@ -477,7 +477,7 @@ and enumitem = {
 }
 
 (** Information about a defined type.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and typeinfo = {
   torig_name: string; (** original name as found in C file. *)
 
@@ -522,7 +522,7 @@ and typeinfo = {
     formals. *)
 
 (** Information about a variable.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and varinfo = {
   mutable vname: string;
   (** The name of the variable. Cannot be empty. It is primarily your
@@ -685,7 +685,7 @@ and exp_node =
   | BinOp      of binop * exp * exp * typ
   (** Binary operation. Includes the type of the result. The arithmetic
       conversions are made explicit for the arguments.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | CastE      of typ * exp
   (** Use {!Cil.mkCast} to make casts.  *)
@@ -757,9 +757,9 @@ and binop =
   | MinusPP  (** pointer - pointer *)
   | Mult     (** * *)
   | Div      (** /
-                 @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+                 @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | Mod      (** %
-                 @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+                 @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | Shiftlt  (** shift left *)
   | Shiftrt  (** shift right *)
 
@@ -847,7 +847,7 @@ and lhost =
     certain kinds of lvalues and its effect is that it advances the starting
     address of the lvalue and changes the denoted type, essentially focussing
     to some smaller lvalue that is contained in the original one.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and offset =
   | NoOffset
   (** No offset. Can be applied to any lvalue and does not change either the
@@ -935,7 +935,7 @@ and local_init =
     {!Cil.makeFormalVar} and {!Cil.setFormals}.  *)
 
 (** Function definitions.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and fundec = {
   mutable svar:     varinfo;
   (** Holds the name and type as a variable, so we can refer to it easily
@@ -1023,7 +1023,7 @@ and block = {
     to do it. *)
 
 (** Statements.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and stmt = {
   mutable labels: label list;
   (** Whether the statement starts with some labels, case statements or
@@ -1069,11 +1069,11 @@ and stmtkind =
   | Instr  of instr
   (** An instruction that does not contain control flow. Control implicitly
       falls through.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | Return of exp option * location
   (** The return statement. This is a leaf in the CFG.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | Goto of stmt ref * location
   (** A goto statement. Appears from actual goto's in the code or from goto's
@@ -1081,21 +1081,21 @@ and stmtkind =
       statement that is the target of the Goto. This means that you have to
       update the reference whenever you replace the target statement. The
       target statement MUST have at least a label.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | Break of location
   (** A break to the end of the nearest enclosing Loop or Switch.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | Continue of location
   (** A continue to the start of the nearest enclosing [Loop].
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | If of exp * block * block * location
   (** A conditional. Two successors, the "then" and the "else" branches (in
       this order).
       Both branches fall-through to the successor of the If statement.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | Switch of exp * block * (stmt list) * location
   (** A switch statement. [exp] is the index of the switch. [block] is
@@ -1105,7 +1105,7 @@ and stmtkind =
       cannot appear more than once in the list, and statements in
       [stmt list] can have several labels corresponding to several
       cases.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | Loop of
       code_annotation list * block * location * (stmt option) * (stmt option)
@@ -1114,12 +1114,12 @@ and stmtkind =
       first stmt option will point to the stmt containing the continue label
       for this loop and the second will point to the stmt containing the break
       label for this loop.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | Block of block
   (** Just a block of statements. Use it as a way to keep some block attributes
       local.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | UnspecifiedSequence of (stmt * lval list
                             * lval list * lval list * stmt ref list) list
@@ -1149,7 +1149,7 @@ and stmtkind =
 
       In case you do not care about this feature just handle it
       like a block (see {!Cil.block_from_unspecified_sequence}).
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | Throw of (exp * typ) option * location
   (** Throws an exception, C++ style.
@@ -1166,7 +1166,7 @@ and stmtkind =
   (** On MSVC we support structured exception handling. This is what you might
       expect. Control can get into the finally block either from the end of the
       body block, or if an exception is thrown.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | TryExcept of block * (instr list * exp) * block * location
   (** On MSVC we support structured exception handling. The try/except
@@ -1184,7 +1184,7 @@ and stmtkind =
       After that, depending on the value of the expression the control
       goes to the handler, propagates the exception, or retries the
       exception. The location corresponds to the try keyword.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (** Kind of exceptions that are caught by a given clause. *)
 and catch_binder =
@@ -1431,7 +1431,7 @@ and term_offset =
   (** index. Note that a range is denoted by [TIndex(Trange(i1,i2),ofs)] *)
 
 (** description of a logic function or predicate.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and logic_info = {
 (*
   mutable l_name : string; (** name of the function. *)
@@ -1465,7 +1465,7 @@ and logic_body =
   (** inductive definition *)
 
 (** Description of a logic type.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and logic_type_info = {
   mutable lt_name: string;
   lt_params : string list; (** type parameters*)
@@ -1491,7 +1491,7 @@ and logic_var_kind =
   | LVLocal (** local \let *)
 
 (** description of a logic variable
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and logic_var = {
   mutable lv_name : string; (** name of the variable. *)
   mutable lv_id : int; (** unique identifier *)
@@ -1506,7 +1506,7 @@ and logic_var = {
 }
 
 (** Description of a constructor of a logic sum-type.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and logic_ctor_info =
   { mutable ctor_name: string; (** name of the constructor. *)
     ctor_type: logic_type_info; (** type to which the constructor belongs. *)
@@ -1528,7 +1528,10 @@ and relation =
   | Rle
   | Rge
   | Req
-  | Rneq (** Different @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  | Rneq
+  (** Different
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
+  *)
 
 
 (** predicates *)
@@ -1658,7 +1661,7 @@ and spec = {
     different levels (e.g. [global] and [behavior]), as this would make the
     grammar ambiguous.
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and acsl_extension = {
   ext_id : int;
   ext_name : string;
@@ -1667,7 +1670,7 @@ and acsl_extension = {
   ext_kind : acsl_extension_kind
 }
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and acsl_extension_kind =
   | Ext_id of int (** id used internally by the extension itself. *)
   | Ext_terms of term list
@@ -1676,7 +1679,7 @@ and acsl_extension_kind =
   | Ext_annot of string * acsl_extension list
 
 (** Where are we expected to find corresponding extension keyword.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @since 18.0-Argon
 *)
 and ext_category =
@@ -1684,7 +1687,7 @@ and ext_category =
   | Ext_global
   | Ext_code_annot of ext_code_annot_context
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 and ext_code_annot_context =
   | Ext_here (** at current program point. *)
   | Ext_next_stmt (** covers next statement. *)
@@ -1694,7 +1697,7 @@ and ext_code_annot_context =
 (** Behavior of a function or statement. This type shares the name of its
     constructors with {!Logic_ptree.behavior}.
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 and behavior = {
   mutable b_name : string; (** name of the behavior. *)
@@ -1771,7 +1774,7 @@ and code_annotation_node =
       Boolean flag is true for loop extensions and false for code extensions
       @since Silicon-20161101
 
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
   *)
 
 (** function contract. *)
@@ -1811,7 +1814,7 @@ and global_annotation =
       argument of type t *)
   | Dextended of acsl_extension * attributes * location
   (** Extended global clause.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
   *)
 
 type kinstr =
@@ -1863,7 +1866,7 @@ type syntactic_scope =
   *)
 
 (** Definition of a machine model (architecture + compiler).
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 type mach = {
   sizeof_short: int;      (* Size of "short" *)
   sizeof_int: int;        (* Size of "int" *)

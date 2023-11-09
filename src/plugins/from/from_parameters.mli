@@ -26,7 +26,7 @@ include Plugin.S
 module ForceDeps: Parameter_sig.With_output
 
 (** Option -calldeps.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module ForceCallDeps: Parameter_sig.With_output
 
 (** Option -show-indirect-deps *)

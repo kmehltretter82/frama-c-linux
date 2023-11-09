@@ -25,8 +25,7 @@ open Cil_datatype
 
 (** Scope analysis. *)
 
-(** Interface for the Scope plugin.
-    @see <index.html> internal documentation. *)
+(** Interface for the Scope plugin. *)
 module Defs : sig
   val get_defs :
     Kernel_function.t -> stmt -> lval ->

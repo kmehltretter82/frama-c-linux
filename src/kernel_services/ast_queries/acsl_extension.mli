@@ -95,7 +95,7 @@ type extension_printer =
       | _ -> typing_context.error loc "expecting a predicate after keyword FOO"
     let () = Acsl_extension.register_behavior "FOO" foo_typer false
     ]
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_behavior:
   string -> ?preprocessor:extension_preprocessor -> extension_typer ->
@@ -105,7 +105,7 @@ val register_behavior:
 
 (** Registers extension for global annotation. See [register_behavior].
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_global:
   string -> ?preprocessor:extension_preprocessor -> extension_typer ->
@@ -115,7 +115,7 @@ val register_global:
 
 (** Registers extension for global block annotation. See [register_behavior].
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_global_block:
   string -> ?preprocessor:extension_preprocessor_block -> extension_typer_block ->
@@ -126,7 +126,7 @@ val register_global_block:
 (** Registers extension for code annotation to be evaluated at _current_
     program point. See [register_behavior].
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_code_annot:
   string -> ?preprocessor:extension_preprocessor -> extension_typer ->
@@ -137,7 +137,7 @@ val register_code_annot:
 (** Registers extension for code annotation to be evaluated for the _next_
     statement. See [register_behavior].
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_code_annot_next_stmt:
   string -> ?preprocessor:extension_preprocessor -> extension_typer ->
@@ -147,7 +147,7 @@ val register_code_annot_next_stmt:
 
 (** Registers extension for loop annotation. See [register_behavior].
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_code_annot_next_loop:
   string -> ?preprocessor:extension_preprocessor -> extension_typer ->
@@ -158,7 +158,7 @@ val register_code_annot_next_loop:
 (** Registers extension both for code and loop annotations.
     See [register_behavior].
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 val register_code_annot_next_both:
   string -> ?preprocessor:extension_preprocessor -> extension_typer ->

@@ -25,7 +25,7 @@
 open Cil_types
 
 (** Smart constructors for the logic.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (** {1 Identification Numbers} *)
 
@@ -261,7 +261,7 @@ let addTermOffsetLval toadd (b, off) : term_lval =
 (** {2 Terms} *)
 (* empty line for ocamldoc *)
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 let term ?(loc=Cil_datatype.Location.unknown) term typ =
   { term_node = term;
     term_type = typ;
@@ -406,7 +406,7 @@ let piff ?(loc=Cil_datatype.Location.unknown) (p2,p3) =
   | _, Ptrue -> p2
   | _,_ -> unamed ~loc (Piff (p2,p3))
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 let prel ?(loc=Cil_datatype.Location.unknown) (a,b,c) =
   unamed ~loc (Prel(a,b,c))
 

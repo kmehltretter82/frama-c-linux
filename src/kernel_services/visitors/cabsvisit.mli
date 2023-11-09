@@ -55,14 +55,13 @@ type nameKind =
 
 
 (* All visit methods are called in preorder! (but you can use
- * ChangeDoChildrenPost to change the order) *)
+   ChangeDoChildrenPost to change the order) *)
 class type cabsVisitor = object
   method vexpr: Cabs.expression -> Cabs.expression visitAction   (* expressions *)
   method vinitexpr: Cabs.init_expression -> Cabs.init_expression visitAction
   method vstmt: Cabs.statement -> Cabs.statement list visitAction
   method vblock: Cabs.block -> Cabs.block visitAction
-  method vvar: string -> string                  (* use of a variable
-                                                        * names *)
+  method vvar: string -> string                  (* use of a variable names *)
   method vdef: Cabs.definition -> Cabs.definition list visitAction
   method vtypespec: Cabs.typeSpecifier -> Cabs.typeSpecifier visitAction
   method vdecltype: Cabs.decl_type -> Cabs.decl_type visitAction
@@ -86,8 +85,8 @@ val visitCabsTypeSpecifier: cabsVisitor ->
 val visitCabsSpecifier: cabsVisitor -> Cabs.specifier -> Cabs.specifier
 
 (** Visits a decl_type. The bool argument is saying whether we are in a
-  * function definition and thus the scope in a PROTO should extend until the
-  * end of the function *)
+    function definition and thus the scope in a PROTO should extend until the
+    end of the function *)
 val visitCabsDeclType: cabsVisitor -> bool -> Cabs.decl_type -> Cabs.decl_type
 val visitCabsDefinition: cabsVisitor -> Cabs.definition -> Cabs.definition list
 val visitCabsBlock: cabsVisitor -> Cabs.block -> Cabs.block

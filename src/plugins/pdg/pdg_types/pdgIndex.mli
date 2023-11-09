@@ -21,31 +21,31 @@
 (**************************************************************************)
 
 (** This module can be useful to store some information about different
- * elements of a function.
- *
- * {!module:PdgIndex.Signature} is used to store information
- * about function inputs/outputs either for the function itself or for its
- * calls. {!module:PdgIndex.Key} provides keys to identify the different
- * elements we want to speak about. {!module:PdgIndex.FctIndex} is the main
- * object that manages the stored information.
- *
- * This module is used for instance to store the relation between a function
- * elements and the nodes of its PDG, but it can also be used to store many
- * other things.*)
+    elements of a function.
+
+    {!module:PdgIndex.Signature} is used to store information
+    about function inputs/outputs either for the function itself or for its
+    calls. {!module:PdgIndex.Key} provides keys to identify the different
+    elements we want to speak about. {!module:PdgIndex.FctIndex} is the main
+    object that manages the stored information.
+
+    This module is used for instance to store the relation between a function
+    elements and the nodes of its PDG, but it can also be used to store many
+    other things.*)
 
 (** try to add in information while there is already something stored.
- * Should have used replace function *)
+    Should have used replace function *)
 exception AddError
 
 (** Some functions do not apply to call statements because the stored
- * information has a different type. *)
+    information has a different type. *)
 exception CallStatement
 
 (** When we compare two things with different locations (no order) *)
 exception Not_equal
 
 (** What we call a [Signature] a mapping between keys that represent either a
- * function input or output, and some information.
+    function input or output, and some information.
 *)
 module Signature : sig
 
@@ -147,8 +147,8 @@ end
 
 
 (** Mapping between the function elements we are interested in and some
-  * information. Used for instance to associate the nodes with the statements,
-  * or the marks in a slice.
+    information. Used for instance to associate the nodes with the statements,
+    or the marks in a slice.
 *)
 module FctIndex : sig
 

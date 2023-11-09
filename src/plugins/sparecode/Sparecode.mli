@@ -21,8 +21,7 @@
 (**************************************************************************)
 
 (** Sparecode analysis. *)
-(** Interface for the unused code detection.
-    @see <../sparecode/index.html> internal documentation. *)
+(** Interface for the unused code detection. *)
 
 module Register: sig
   val get: select_annot:bool -> select_slice_pragma:bool -> Project.t
@@ -37,6 +36,6 @@ module Register: sig
       (the current one if no project given).
       The source project is not modified.
       The result is in the returned new project.
-    * *)
+  *)
 
 end

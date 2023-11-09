@@ -23,7 +23,7 @@
 (**************************************************************************)
 
 (** Smart constructors for logic annotations.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 open Cil_types
 open Cil_datatype
@@ -65,7 +65,7 @@ val toplevel_predicate: ?kind:predicate_kind -> predicate -> toplevel_predicate
 val new_predicate: ?kind:predicate_kind -> predicate -> identified_predicate
 
 (** creates a new acsl_extension with a fresh id.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @since Chlorine-20180501
 *)
 val new_acsl_extension:
@@ -162,7 +162,7 @@ val pif:
 val piff: ?loc:location -> predicate * predicate -> predicate
 
 (** Binary relation.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 val prel: ?loc:location -> relation * term * term -> predicate
 
 (** \forall *)

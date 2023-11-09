@@ -24,9 +24,9 @@ open Cil_types
 open LogicUsage
 
 (** Beside the property identification, it can be found in different contexts
- * depending on which part of the computation is involved.
- * For instance, properties on loops are split in 2 parts : establishment and
- * preservation.
+    depending on which part of the computation is involved.
+    For instance, properties on loops are split in 2 parts : establishment and
+    preservation.
 *)
 
 (** Property.t information and kind of PO (establishment, preservation, etc) *)

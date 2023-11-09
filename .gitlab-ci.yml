@@ -288,7 +288,7 @@ external-plugins:
 
 # API documentation
 
-api-doc: # Note: the Nix store avoids rebuilding
+api-doc:
   stage: distrib
   variables:
     OUT: "api"
@@ -298,6 +298,17 @@ api-doc: # Note: the Nix store avoids rebuilding
     paths:
       - api/frama-c-api.tar.gz
       - api/frama-c-server-api.tar.gz
+    expire_in: 7 days
+
+api-json-doc:
+  stage: distrib
+  variables:
+    OUT: "api"
+  script:
+    - ./nix/build-proxy.sh api-json-doc
+  artifacts:
+    paths:
+      - api/frama-c-api-json.tar.gz
     expire_in: 7 days
 
 # Build distribution tarball
@@ -655,4 +666,14 @@ publish-meta:
   script:
     - nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-branch.sh'
   <<: *when_publish
+  interruptible: false
+
+publish-frama-c-api:
+  stage: publish
+  <<: *prepare_ssh_template
+  script:
+    - nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-api.sh'
+  only:
+    variables:
+      - $PUBLISH == "yes"
   interruptible: false

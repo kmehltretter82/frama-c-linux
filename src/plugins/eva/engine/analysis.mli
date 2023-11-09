@@ -82,11 +82,11 @@ val compute : unit -> unit
 (** Computes the Eva analysis, if not already computed, using the entry point
     of the current project. You may set it with {!Globals.set_entry_point}.
     @raise Globals.No_such_entry_point if the entry point is incorrect
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val is_computed : unit -> bool
 (** Return [true] iff the Eva analysis has been done.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 val self : State.t
