@@ -44,28 +44,32 @@ import { registerSandbox } from 'ivette';
 /* -------------------------------------------------------------------------- */
 
 function UseText(): JSX.Element {
-  const [prefix, setPrefix] = React.useState('');
   const [useLines, flipUseLines] = Dome.useFlipState(true);
   const [useCurrent, flipUseCurrent] = Dome.useFlipState(true);
   const [readOnly, flipReadOnly] = Dome.useFlipState(false);
   const [useProxy, flipUseProxy] = Dome.useFlipState(false);
   const [changed, setChanged] = React.useState(false);
   const [changes, setChanges] = React.useState(0);
+  const [length, setLength] = React.useState(0);
+  const [lines, setLines] = React.useState(1);
   const [s, onSelection] = React.useState(emptySelection);
+  const [v, onViewport] = React.useState(emptySelection);
   const proxy = React.useMemo(() => new TextProxy(), []);
   const buffer = React.useMemo(() => new TextBuffer(), []);
   const text = useProxy ? proxy : buffer;
-  const updatePrefix = React.useCallback(
+  const updateProxy = React.useCallback(
     () => {
+      const { length, toLine } = text.range();
       setChanged(true);
       setChanges((n) => 1+n);
-      setPrefix(text.toString().substring(0, 20).trim());
+      setLength(length);
+      setLines(toLine);
     }, [text]);
   const push = React.useCallback(() => {
     const n = Math.random();
     text.append(`ADDED${n}\n`);
   }, [text]);
-  const onChange = Dome.useDebounced(updatePrefix, 200);
+  const onChange = Dome.useDebounced(updateProxy, 200);
   const [decorations, setDecorations] = React.useState<Decoration[]>([]);
   const inconsistent = decorations.length > 0 && changed;
 
@@ -107,8 +111,8 @@ function UseText(): JSX.Element {
     }]);
   }, [decorations, s]);
 
-  const isLine = s.fromLine === s.toLine;
-  const isRange = s.length > 0;
+  const isLine = s.fromLine === s.toLine && s.toLine <= lines;
+  const isRange = s.length > 0 && s.offset + s.length <= length;
 
   return (
     <>
@@ -135,39 +139,36 @@ function UseText(): JSX.Element {
           title={useProxy ? 'Use TextProxy' : 'Use TextBuffer (persistent)'}
           onClick={flipUseProxy}
         />
-        <Code label={`Offset ${s.offset}-${s.offset + s.length}`} />
-        <Code label={`Line ${s.fromLine}-${s.toLine}`} />
+        <Filler/>
         <Code
           icon={inconsistent ? 'WARNING' : undefined}
           title={inconsistent ? 'Iconsistent (modified text)' : undefined}
-          label={`Decorations ${decorations.length}`}
+          label={`Decorations: ${decorations.length}`}
         />
         <IconButton
-          display={isLine}
+          enabled={isLine}
           icon="CIRC.INFO"
           title="Add Gutter Decoration"
           onClick={addGutterDecoration}
         />
         <IconButton
-          display={isLine}
+          enabled={isLine}
           icon="CIRC.CHECK"
           title="Add Line Decoration"
           onClick={addLineDecoration}
         />
         <IconButton
-          display={isRange}
+          enabled={isRange}
           icon="CIRC.PLUS"
           title="Add Decoration"
           onClick={addDecoration}
         />
         <IconButton
-          display={decorations.length > 0}
+          enabled={decorations.length > 0}
           kind={inconsistent ? 'negative' : 'default'}
           icon="CIRC.CLOSE"
           title="Clear Decorations"
           onClick={clearDecorations} />
-        <Filler />
-        <Code>{`"${prefix}" (${changes})`}</Code>
         <Button label="Push" onClick={push} />
         <Button label="Clear" kind='negative' onClick={clearText}  />
       </ToolBar>
@@ -176,10 +177,18 @@ function UseText(): JSX.Element {
         readOnly={readOnly}
         onChange={onChange}
         onSelection={onSelection}
+        onViewport={onViewport}
         decorations={decorations}
         lineNumbers={useLines}
         showCurrentLine={useCurrent}
       />
+      <ToolBar>
+        <Code label={`Offset ${s.offset}-${s.offset + s.length} / ${length}`} />
+        <Code label={`Line ${s.fromLine}-${s.toLine} / ${lines}`} />
+        <Code label={`View ${v.fromLine}-${v.toLine}`} />
+        <Filler />
+        <Code>{`Changes: ${changes}`}</Code>
+      </ToolBar>
     </>
   );
 }

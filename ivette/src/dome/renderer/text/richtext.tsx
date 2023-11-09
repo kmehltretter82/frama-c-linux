@@ -115,6 +115,11 @@ function updateContents(view: CM.EditorView, newText: string): void {
    Methods of the class are no-ops when there is no associated view, and at most
    one component shall be associated with a given Text buffer at the same time.
 
+   <b>Warning:</n> do not access proxy's methods during React component
+   rendering since they would not be synchronized with further changes from
+   document or editor view. Rather, those methods shall be invoked from
+   React and event callbacks.
+
    All methods are bound to `this`.  */
 export class TextProxy {
 
@@ -123,6 +128,7 @@ export class TextProxy {
   protected proxy : View = null;
 
   constructor() {
+    this.range = this.range.bind(this);
     this.clear = this.clear.bind(this);
     this.append = this.append.bind(this);
     this.toString = this.toString.bind(this);
@@ -135,21 +141,33 @@ export class TextProxy {
 
   // --- Public part
 
+  /** Full document range. Remark: empty documents still have 1 (empty) line. */
+  range(): Selection {
+    const view = this.proxy;
+    if (view === null) return emptySelection;
+    const doc = view.state.doc;
+    return { offset: 0, length: doc.length, fromLine: 1, toLine: doc.lines };
+  }
+
+  /** Remove all text from document. */
   clear(): void {
     const view = this.proxy;
     if (view) dispatchContents(view, CS.Text.empty);
   }
 
+  /** Full document contents. */
   toString(): string {
     const view = this.proxy;
     return view ? view.state.doc.toString() : '';
   }
 
+  /** Appends to end of document. */
   append(data: string): void {
     const view = this.proxy;
     if (view) appendContents(view, data);
   }
 
+  /** Appends to end of document. */
   setContents(data: string): void {
     const view = this.proxy;
     if (view) dispatchContents(view, data);
@@ -181,13 +199,19 @@ function textOf(text: string): CS.Text {
 export class TextBuffer extends TextProxy {
 
   // --- Private part (we avoid unecessary conversions from/to text)
-  // --- Invariant: only one of proxy, text & contents holds data
+  // --- Invariant: only one of proxy, text or contents holds data
 
   private text = CS.Text.empty;
   private contents : string | undefined = undefined;
   private toText(): CS.Text {
+    // --- requires this.proxy is null
     const contents = this.contents;
-    return contents === undefined ? this.text : textOf(contents);
+    if (contents===undefined) return this.text;
+    const text = textOf(contents);
+    this.text = text;
+    this.contents = undefined;
+    // --- invariant established
+    return text;
   }
 
   /** @ignore */
@@ -209,6 +233,12 @@ export class TextBuffer extends TextProxy {
   }
 
   // --- Public part
+
+  range(): Selection {
+    if (this.proxy) return super.range();
+    const doc = this.toText();
+    return { offset: 0, length: doc.length, fromLine: 1, toLine: doc.lines };
+  }
 
   clear(): void {
     const view = this.proxy;
@@ -374,6 +404,30 @@ OnSelect.pack(
             const newSel = updates.state.selection.main;
             const doc = updates.state.doc;
             if (!newSel.eq(oldSel)) callback(selection(doc, newSel));
+        }];
+      return [];
+    }
+));
+
+/* -------------------------------------------------------------------------- */
+/* --- Viewport Change Listener                                           --- */
+/* -------------------------------------------------------------------------- */
+
+const Viewport = new Field<SelectionCallback|null>(null);
+
+Viewport.pack(
+  CM.EditorView.updateListener.computeN(
+    [Viewport.field],
+    (state) => {
+      const callback = state.field(Viewport.field);
+      if (callback !== null)
+        return [
+          (updates: CM.ViewUpdate) => {
+            if (updates.viewportChanged) {
+              const sel = updates.view.viewport;
+              const doc = updates.state.doc;
+              callback(selection(doc, sel));
+            }
         }];
       return [];
     }
@@ -661,6 +715,7 @@ function createView(parent: Element): CM.EditorView {
     ReadOnly,
     OnChange,
     OnSelect,
+    Viewport,
     Decorations,
   ];
   const state = CS.EditorState.create({ extensions });
@@ -676,6 +731,7 @@ export interface TextViewProps {
   readOnly?: boolean;
   onChange?: Callback;
   selection?: Range;
+  onViewport?: SelectionCallback;
   onSelection?: SelectionCallback;
   decorations?: Decorations;
   lineNumbers?: boolean;
@@ -701,7 +757,9 @@ export function TextView(props: TextViewProps) : JSX.Element {
 
   // ---- readOnly, onChange, onSelection, lineNumbers
   const {
-    readOnly = false, onChange = null,
+    readOnly = false,
+    onChange = null,
+    onViewport: onReview = null,
     onSelection: onSelect = null,
     lineNumbers: lines,
     showCurrentLine: active,
@@ -709,6 +767,7 @@ export function TextView(props: TextViewProps) : JSX.Element {
   React.useEffect(() => ReadOnly.dispatch(view, readOnly), [view, readOnly]);
   React.useEffect(() => OnChange.dispatch(view, onChange), [view, onChange]);
   React.useEffect(() => OnSelect.dispatch(view, onSelect), [view, onSelect]);
+  React.useEffect(() => Viewport.dispatch(view, onReview), [view, onReview]);
   React.useEffect(() => LineNumbers.dispatch(view, lines), [view, lines]);
   React.useEffect(() => ActiveLine.dispatch(view, active), [view, active]);
 
