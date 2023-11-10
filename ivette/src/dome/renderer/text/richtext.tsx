@@ -37,8 +37,9 @@ export interface Position extends Offset { line: number }
 export interface Selection extends Range { fromLine: number, toLine: number }
 
 export const emptyPosition : Position = { offset: 0, line: 1 };
+export const emptyRange : Range = { offset: 0, length: 0 };
 export const emptySelection : Selection =
-  { offset: 0, length: 0, fromLine: 1, toLine: 1 };
+  { ...emptyRange, fromLine: 1, toLine: 1 };
 
 export function byDepth(a : Range, b : Range): number
 {
@@ -64,6 +65,17 @@ function appendContents(view: CM.EditorView, text: string): void {
 function dispatchContents(view: CM.EditorView, text: string | CS.Text): void {
   const length = view.state.doc.length;
   view.dispatch({ changes: { from: 0, to: length, insert: text } });
+}
+
+function dispatchReplace(view: CM.EditorView, rg: Range, text: string): void {
+  const { offset: from, length } = rg;
+  view.dispatch({ changes: { from, to: from + length, insert: text } });
+}
+
+function dispatchScroll(view: CM.EditorView, rg: Range): void {
+  const anchor = rg.offset;
+  const head = anchor + rg.length;
+  view.dispatch({ scrollIntoView: true, selection: { anchor, head } });
 }
 
 class DiffBuffer {
@@ -127,6 +139,7 @@ export class TextProxy {
 
   // --- Private part
 
+  protected scrolled : Range | null = null;
   protected proxy : View = null;
 
   constructor() {
@@ -139,16 +152,43 @@ export class TextProxy {
   }
 
   /** @ignore */
-  connect(newView: View): void { this.proxy = newView; }
+  connect(newView: View): void {
+    this.proxy = newView;
+    const range = this.scrolled;
+    if (range) {
+      if (newView) dispatchScroll(newView, range);
+      this.scrolled = null;
+    }
+  }
+
+  /** @ignore */
+  protected toText(): CS.Text | null {
+    const view = this.proxy;
+    return view ? view.state.doc : null;
+  }
 
   // --- Public part
 
   /** Full document range. Remark: empty documents still have 1 (empty) line. */
   range(): Selection {
-    const view = this.proxy;
-    if (view === null) return emptySelection;
-    const doc = view.state.doc;
+    const doc = this.toText();
+    if (doc === null) return emptySelection;
     return { offset: 0, length: doc.length, fromLine: 1, toLine: doc.lines };
+  }
+
+  /** Returns 1 also when disconnected. */
+  lineAt(offset: number): number {
+    const doc = this.toText();
+    if (!doc) return -1;
+    return doc.lineAt(offset).number;
+  }
+
+  /** Returns empty range when disconnected. */
+  lineRange(line: number): Range {
+    const doc = this.toText();
+    if (!doc) return emptyRange;
+    const { from: offset, to: endOffset } = doc.line(line);
+    return { offset, length: endOffset - offset };
   }
 
   /** Remove all text from document. */
@@ -158,15 +198,23 @@ export class TextProxy {
   }
 
   /** Full document contents. */
-  toString(): string {
-    const view = this.proxy;
-    return view ? view.state.doc.toString() : '';
+  toString(slice ?: Range): string {
+    const doc = this.toText();
+    if (!doc) return '';
+    if (slice) {
+      const { offset, length } = slice;
+      return doc.sliceString(offset, offset + length);
+    } else
+      return doc.toString();
   }
 
   /** Appends to end of document. */
-  append(data: string): void {
-    const view = this.proxy;
-    if (view) appendContents(view, data);
+  append(...values: unknown[]): void {
+    if (values.length > 0) {
+      const data = values.join(' ');
+      const view = this.proxy;
+      if (view) appendContents(view, data);
+    }
   }
 
   /** Appends to end of document. */
@@ -175,10 +223,22 @@ export class TextProxy {
     if (view) dispatchContents(view, data);
   }
 
+  replaceContents(range: Range, data = ''): void {
+    const view = this.proxy;
+    if (view) dispatchReplace(view, range, data);
+  }
+
   /** Uses diff changes instead of replacing the entire view's contents. */
   updateContents(data: string): void {
     const view = this.proxy;
     if (view) updateContents(view, data);
+  }
+
+  /** Makes the editor scroll to the given range, when connected. */
+  scrollTo(range: Range): void {
+    const view = this.proxy;
+    if (view) dispatchScroll(view, range);
+    else this.scrolled = range;
   }
 
 }
@@ -205,16 +265,6 @@ export class TextBuffer extends TextProxy {
 
   private text = CS.Text.empty;
   private contents : string | undefined = undefined;
-  private toText(): CS.Text {
-    // --- requires this.proxy is null
-    const contents = this.contents;
-    if (contents===undefined) return this.text;
-    const text = textOf(contents);
-    this.text = text;
-    this.contents = undefined;
-    // --- invariant established
-    return text;
-  }
 
   /** @ignore */
   connect(newView: View): void {
@@ -223,6 +273,8 @@ export class TextBuffer extends TextProxy {
       this.proxy = null;
       this.text = oldView.state.doc;
       // invariant preserved
+      const { from: offset, to: endOffset } = oldView.state.selection.main;
+      this.scrolled = { offset, length: endOffset - offset };
     }
     if (newView) {
       const newData = this.contents ?? this.text;
@@ -231,16 +283,31 @@ export class TextBuffer extends TextProxy {
       this.contents = undefined;
       // invariant established
       dispatchContents(newView, newData);
+      const range = this.scrolled;
+      if (range) {
+        dispatchScroll(newView, range);
+        this.scrolled = null;
+      }
     }
   }
 
-  // --- Public part
-
-  range(): Selection {
-    if (this.proxy) return super.range();
-    const doc = this.toText();
-    return { offset: 0, length: doc.length, fromLine: 1, toLine: doc.lines };
+  /** @ignore */
+  protected toText(): CS.Text {
+    // Data is in Proxy
+    const view = this.proxy;
+    if (view) return view.state.doc;
+    // Data is in Text
+    const contents = this.contents;
+    if (contents===undefined) return this.text;
+    // Data is in Contents
+    const text = textOf(contents);
+    this.text = text;
+    this.contents = undefined;
+    // --- invariant established
+    return text;
   }
+
+  // --- Specific parts
 
   clear(): void {
     const view = this.proxy;
@@ -252,10 +319,14 @@ export class TextBuffer extends TextProxy {
     }
   }
 
-  toString(): string {
-    const view = this.proxy;
-    if (view) return view.state.doc.toString();
-    return this.contents ?? this.text.toString();
+  toString(slice?: Range): string {
+    const contents = this.contents;
+    if (contents !== undefined) {
+      if (slice) {
+        const { offset, length } = slice;
+        return contents.substring(offset, offset + length);
+      } else return contents;
+    } else return super.toString(slice);
   }
 
   append(...values: unknown[]): void {
@@ -281,7 +352,17 @@ export class TextBuffer extends TextProxy {
     }
   }
 
-  /** Uses diff changes instead of replacing the entire view's contents. */
+  replaceContents(range: Range, data = ''): void {
+    const view = this.proxy;
+    if (view) dispatchReplace(view, range, data);
+    else {
+      const doc = this.toText();
+      const { offset, length } = range;
+      this.text = doc.replace(offset, offset+length, textOf(data));
+      // invariant preserved
+    }
+  }
+
   updateContents(data: string): void {
     const view = this.proxy;
     if (view) updateContents(view, data);
@@ -890,11 +971,7 @@ export function TextView(props: TextViewProps) : JSX.Element {
   // ---- Selection
   const { selection } = props;
   React.useEffect(() => {
-    if (selection) {
-      const anchor = selection.offset;
-      const head = anchor + selection.length;
-      view?.dispatch({ scrollIntoView: true, selection: { anchor, head } });
-    }
+    if (selection && view) dispatchScroll(view, selection);
   }, [view, selection]);
 
   // ---- Mount & Unmount Editor
