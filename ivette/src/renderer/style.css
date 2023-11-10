@@ -16,7 +16,6 @@
 
 .sidebar-selector {
     min-width: 35px;
-    max-width: fit-content;
 }
 
 .sidebar-selector-icon {
@@ -39,6 +38,10 @@
 
 .sidebar-selector:hover {
     background-color: var(--background-profound-hover);
+}
+
+.sidebar-selector-selected {
+    background-color: var(--background-profound);
 }
 
 .component-info {

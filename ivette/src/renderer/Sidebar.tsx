@@ -42,49 +42,37 @@ interface SelectorProps extends SidebarProps {
 }
 
 function Selector(props: SelectorProps): JSX.Element {
-  const { id, iconPath, setSelected, label, title } = props;
-
-  const classNameSelector = classes(
+  const { id, iconPath, selected, setSelected, label, title } = props;
+  const className = classes(
     'sidebar-selector',
     'dome-color-frame',
-    );
-
-    const classNameSelectorIcon = classes(
-    'sidebar-selector-icon'
-    );
-
-    const classNameSelectorLabel = classes(
-    'sidebar-selector-label'
-    );
+    selected === id ? 'sidebar-selector-selected' : ''
+  );
 
   return (
-    <>
-      <div className={classNameSelector}>
-        {iconPath ?
-          <img
-          className={classNameSelectorIcon}
-          id={id}
-          src={iconPath}
-          alt={label}
-          title={title}
-          onClick={
-            () => setSelected(id)
-          }
-          />
-          :
-          <label
-          className={classNameSelectorLabel}
-          id={id}
-          onClick={
-            () => setSelected(id)
-          }
-          >
-            {label.slice(0, 4).toLocaleUpperCase()}
-          </label>
+    <div className={className}>
+      {iconPath ?
+        <img
+        className="sidebar-selector-icon"
+        src={iconPath}
+        alt={label}
+        title={title}
+        onClick={
+          () => setSelected(id)
         }
-        <br/>
-      </div>
-    </>
+        />
+        :
+        <label
+        className="sidebar-selector-label"
+        onClick={
+          () => setSelected(id)
+        }
+        >
+          {label.slice(0, 4).toLocaleUpperCase()}
+        </label>
+      }
+      <br/>
+    </div>
   );
 }
 
@@ -113,13 +101,6 @@ function Wrapper(props: WrapperProps): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 export function Panel(): JSX.Element {
-  const classNameRuler = classes(
-    'sidebar-ruler',
-    );
-  const classNameItems = classes(
-    'sidebar-items',
-    'dome-color-frame',
-    );
   const [selected, setSelected] =
     Dome.useStringSettings('ivette.sidebar.selected');
   const sidebars = Ext.useElements(SIDEBAR);
@@ -139,10 +120,10 @@ export function Panel(): JSX.Element {
   ));
 
   return (
-    <div className={classNameRuler}>
-      <ul className={classNameItems}>
+    <div className="sidebar-ruler">
+      <div className="sidebar-items dome-color-frame">
         {items}
-      </ul>
+      </div>
       {wrappers}
     </div>
   );
