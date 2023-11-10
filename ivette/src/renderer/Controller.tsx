@@ -228,27 +228,26 @@ const RenderConsole = (): JSX.Element => {
   const scratch = React.useRef([] as string[]);
   const [cursor, setCursor] = React.useState(-1);
   const [isEmpty, setEmpty] = React.useState(true);
-  const [noTrash, _setNoTrash] = React.useState(true);
+  const [noTrash, setNoTrash] = React.useState(true);
   const [history, setHistory] = useHistory();
+  const [maxLines] = Settings.useGlobalSettings(Preferences.ConsoleScrollback);
+  const headCmd = history[0];
 
-  /*
-  React.useEffect(() => {
-    const callback = (): void => {
+  const onChanged = React.useCallback(() => {
+    if (cursor < 0) {
+      const { length, toLine: lines } = Server.buffer.range();
+      if (lines > maxLines) {
+        const cut = Server.buffer.lineRange(lines - maxLines + 1);
+        Server.buffer.replaceContents({ offset: 0, length: cut.offset });
+        Server.buffer.scrollTo({ offset: length - cut.offset, length: 0 });
+      } else
+        Server.buffer.scrollTo({ offset: length, length: 0 });
+    } else {
       const cmd = editor.toString().trim();
       setEmpty(cmd === '');
-      setNoTrash(noTrash && cmd === history[0]);
-    };
-    editor.on('change', callback);
-    return () => { editor.off('change', callback); };
-  });
-  */
-
-  const [_maxLines] = Settings.useGlobalSettings(Preferences.ConsoleScrollback);
-  /*
-  React.useEffect(() => {
-    Server.buffer.setMaxlines(maxLines);
-  });
-  */
+      setNoTrash((noTrash) => noTrash && cmd === headCmd);
+    }
+  }, [cursor, maxLines, headCmd]);
 
   const doReload = (): void => {
     const cfg = Server.getConfig();
@@ -369,6 +368,7 @@ const RenderConsole = (): JSX.Element => {
       <TextView
         text={edited ? editor : Server.buffer}
         readOnly={!edited}
+        onChange={onChanged}
       />
     </>
   );
