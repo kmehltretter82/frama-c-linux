@@ -24,6 +24,8 @@
 import React from 'react';
 import { Item, Section } from "dome/frame/sidebars";
 import * as Ivette from 'ivette';
+import file from './icons/file.png';
+import folder from './icons/folder.png';
 
 /* -------------------------------------------------------------------------- */
 /* --- Mocking                                                            --- */
@@ -31,7 +33,8 @@ import * as Ivette from 'ivette';
 
 Ivette.registerSidebar({
   id: 'sandbox.sidebar.a',
-  label: 'SandA',
+  label: 'SanA',
+  iconPath: folder,
   children:
     <>
       <Section label='Section A.1'>
@@ -51,7 +54,7 @@ Ivette.registerSidebar({
 
 Ivette.registerSidebar({
   id: 'sandbox.sidebar.b',
-  label: 'SandB',
+  label: 'SanB',
   children:
     <>
       <Section label='Section B.1'>
@@ -65,6 +68,47 @@ Ivette.registerSidebar({
         <Item label='Item B.2.2' />
         <Item label='Item B.2.3' />
         <Item label='Item B.2.4' />
+      </Section>
+    </>
+});
+
+Ivette.registerSidebar({
+  id: 'sandbox.sidebar.c',
+  label: 'SanC',
+  children:
+    <>
+      <Section label='Section C.1'>
+        <Item label='Item C.1.1' />
+        <Item label='Item C.1.2' />
+        <Item label='Item C.1.3' />
+        <Item label='Item C.1.4' />
+      </Section>
+      <Section label='Section C.2'>
+        <Item label='Item C.2.1' />
+        <Item label='Item C.2.2' />
+        <Item label='Item C.2.3' />
+        <Item label='Item C.2.4' />
+      </Section>
+    </>
+});
+
+Ivette.registerSidebar({
+  id: 'sandbox.sidebar.d',
+  label: 'SanD',
+  iconPath: file,
+  children:
+    <>
+      <Section label='Section D.1'>
+        <Item label='Item D.1.1' />
+        <Item label='Item D.1.2' />
+        <Item label='Item D.1.3' />
+        <Item label='Item D.1.4' />
+      </Section>
+      <Section label='Section D.2'>
+        <Item label='Item D.2.1' />
+        <Item label='Item D.2.2' />
+        <Item label='Item D.2.3' />
+        <Item label='Item D.2.4' />
       </Section>
     </>
 });

@@ -28,87 +28,9 @@ import React from 'react';
 import * as Dome from 'dome';
 import { SideBar } from 'dome/frame/sidebars';
 import { Catch } from 'dome/errors';
+import { classes } from 'dome/misc/utils';
 import { SidebarProps, SIDEBAR } from 'ivette';
 import * as Ext from './Extensions';
-
-// TODO: remove sandbox/style.css
-// TODO: add classes in `./style.css` under name .sidebar-xxx if necessary
-// TODO: incorporate previous dev in comments below into draft (Cf. TODO)
-
-/*
-   export function SideBar(): JSX.Element {
-   const classNameGlobal = classes(
-   'dome-xSideBar-double',
-   );
-
-   const classNamePrime = classes(
-   'dome-xSideBar-double-primary',
-   'dome-color-frame',
-   );
-
-   const classNamePrimeIcon = classes(
-   'dome-xSideBar-double-primary-icon'
-   );
-
-   const classNamePrimeLabel = classes(
-   'dome-xSideBar-double-primary-label'
-   );
-
-   const classNameSecondary = classes(
-   'dome-xSideBar-double-secondary',
-   'dome-color-frame',
-   );
-
-   const [selectedCategory, setSelectedCategory] = useState(0);
-
-   function updateSelected(key: number): void {
-   setSelectedCategory(key);
-   categories[key].display = true;
-   }
-
-   return (
-   <Catch label={"dome-xSideBar-double-catch"}>
-   <div className={classNameGlobal}>
-   <div className={classNamePrime}>
-   <>
-   {categories.map((item, key) => (
-   <div key={key}>
-   {item.iconPath ?
-   <img
-   className={classNamePrimeIcon}
-   id={item.id}
-   src={item.iconPath}
-   alt={item.label}
-   title={item.label}
-   onClick={
-   () => updateSelected(key)
-   }
-   />
-   :
-   <label
-   className={classNamePrimeLabel}
-   id={item.id}
-   onClick={
-   () => updateSelected(key)
-   }
-   >
-   {item.label.slice(0, 4).toLocaleUpperCase()}
-   </label>
-   }
-   <br/>
-   </div>
-   ))}
-   </>
-   </div>
-   <sb.SideBar className={classNameSecondary +
-   (categories[selectedCategory].display === false ? 'dome-erased' : '')}>
-   {categories[selectedCategory].children}
-   </sb.SideBar>
-   </div>
-   </Catch>
-   );
-   }
- */
 
 /* -------------------------------------------------------------------------- */
 /* --- SideBar Selector                                                   --- */
@@ -120,12 +42,49 @@ interface SelectorProps extends SidebarProps {
 }
 
 function Selector(props: SelectorProps): JSX.Element {
-  const { id, selected, setSelected, label, title } = props;
-  // TODO: redesign this by incorporating some stuff from previous dev
+  const { id, iconPath, setSelected, label, title } = props;
+
+  const classNameSelector = classes(
+    'sidebar-selector',
+    'dome-color-frame',
+    );
+
+    const classNameSelectorIcon = classes(
+    'sidebar-selector-icon'
+    );
+
+    const classNameSelectorLabel = classes(
+    'sidebar-selector-label'
+    );
+
   return (
-    <li title={title} onClick={() => setSelected(id)}>
-      {selected === id ? '(*)' : '(-)'} {label}
-    </li>
+    <>
+      <div className={classNameSelector}>
+        {iconPath ?
+          <img
+          className={classNameSelectorIcon}
+          id={id}
+          src={iconPath}
+          alt={label}
+          title={title}
+          onClick={
+            () => setSelected(id)
+          }
+          />
+          :
+          <label
+          className={classNameSelectorLabel}
+          id={id}
+          onClick={
+            () => setSelected(id)
+          }
+          >
+            {label.slice(0, 4).toLocaleUpperCase()}
+          </label>
+        }
+        <br/>
+      </div>
+    </>
   );
 }
 
@@ -139,6 +98,7 @@ interface WrapperProps extends SidebarProps {
 
 function Wrapper(props: WrapperProps): JSX.Element {
   const className = props.selected === props.id ? '' : 'dome-erased';
+
   return (
     <SideBar className={className}>
       <Catch label={props.id}>
@@ -153,6 +113,13 @@ function Wrapper(props: WrapperProps): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 export function Panel(): JSX.Element {
+  const classNameRuler = classes(
+    'sidebar-ruler',
+    );
+  const classNameItems = classes(
+    'sidebar-items',
+    'dome-color-frame',
+    );
   const [selected, setSelected] =
     Dome.useStringSettings('ivette.sidebar.selected');
   const sidebars = Ext.useElements(SIDEBAR);
@@ -170,12 +137,10 @@ export function Panel(): JSX.Element {
       {...sb}
     />
   ));
-  // TODO: redesign this by incorporating some stuff drom previous dev
+
   return (
-    <div>
-      <div className='sidebar-ruler' />
-      Side Bar Selector
-      <ul>
+    <div className={classNameRuler}>
+      <ul className={classNameItems}>
         {items}
       </ul>
       {wrappers}
