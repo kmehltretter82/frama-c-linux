@@ -439,9 +439,7 @@ Viewport.pack(
 /* --- Hovering Listener                                                  --- */
 /* -------------------------------------------------------------------------- */
 
-export type HoverCallback = (pos: Position | null) => void;
-
-const OnHover = new Field<HoverCallback|null>(null);
+export type MouseCallback = (pos: Position | null, evt: MouseEvent) => void;
 
 function getPosition(evt: MouseEvent, view: CM.EditorView): Position | null
 {
@@ -461,15 +459,42 @@ function getPosition(evt: MouseEvent, view: CM.EditorView): Position | null
   return null;
 }
 
-OnHover.pack(
+class MouseCallbackField extends Field<MouseCallback|null> {
+  constructor() {
+    super(null);
+    this.callback = this.callback.bind(this);
+  }
+
+  callback(evt: MouseEvent, view: CM.EditorView): boolean {
+    const fn = view.state.field(this.field);
+    if (fn) {
+      const pos = getPosition(evt, view);
+      if (fn) fn(pos, evt);
+    }
+    return false;
+  }
+}
+
+const OnClick = new MouseCallbackField();
+const OnPopup = new MouseCallbackField();
+const OnHover = new MouseCallbackField();
+const OnDouble = new MouseCallbackField();
+
+const MouseEvents : CS.Extension = [
+  OnClick,
+  OnHover,
+  OnPopup,
+  OnDouble,
   CM.EditorView.domEventHandlers({
-    mousemove: _.debounce(
-      (evt: MouseEvent, view: CM.EditorView) => {
-        const fn = view.state.field(OnHover.field);
-        if (fn !== null) fn(getPosition(evt, view));
-        return false;
-    }, 10)
-}));
+    click: (evt: MouseEvent, view: CM.EditorView) => {
+      OnClick.callback(evt, view);
+      if (evt.detail > 1) OnDouble.callback(evt, view);
+      return false;
+    },
+    contextmenu: OnPopup.callback,
+    mousemove: _.debounce(OnHover.callback, 10),
+  }),
+];
 
 /* -------------------------------------------------------------------------- */
 /* --- Decorations                                                        --- */
@@ -763,8 +788,8 @@ function createView(parent: Element): CM.EditorView {
     ReadOnly,
     OnChange,
     OnSelect,
-    OnHover,
     Viewport,
+    MouseEvents,
     Decorations,
   ];
   const state = CS.EditorState.create({ extensions });
@@ -782,7 +807,10 @@ export interface TextViewProps {
   selection?: Range;
   onViewport?: SelectionCallback;
   onSelection?: SelectionCallback;
-  onHover?: HoverCallback;
+  onClick?: MouseCallback;
+  onPopup?: MouseCallback;
+  onHover?: MouseCallback;
+  onDoubleClick?: MouseCallback;
   decorations?: Decorations;
   lineNumbers?: boolean;
   showCurrentLine?: boolean;
@@ -807,19 +835,25 @@ export function TextView(props: TextViewProps) : JSX.Element {
 
   // ---- Fields Props
   const {
+    onClick = null,
+    onPopup = null,
     onHover = null,
     onChange = null,
     readOnly = false,
     onViewport: onReview = null,
     onSelection: onSelect = null,
+    onDoubleClick: onDouble = null,
     lineNumbers: lines,
     showCurrentLine: active,
   } = props;
+  React.useEffect(() => OnClick.dispatch(view, onClick), [view, onClick]);
+  React.useEffect(() => OnPopup.dispatch(view, onPopup), [view, onPopup]);
   React.useEffect(() => OnHover.dispatch(view, onHover), [view, onHover]);
-  React.useEffect(() => ReadOnly.dispatch(view, readOnly), [view, readOnly]);
+  React.useEffect(() => OnDouble.dispatch(view, onDouble), [view, onDouble]);
   React.useEffect(() => OnChange.dispatch(view, onChange), [view, onChange]);
   React.useEffect(() => OnSelect.dispatch(view, onSelect), [view, onSelect]);
   React.useEffect(() => Viewport.dispatch(view, onReview), [view, onReview]);
+  React.useEffect(() => ReadOnly.dispatch(view, readOnly), [view, readOnly]);
   React.useEffect(() => ActiveLine.dispatch(view, active), [view, active]);
   React.useEffect(() => LineNumbers.dispatch(view, lines), [view, lines]);
 

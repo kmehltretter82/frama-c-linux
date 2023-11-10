@@ -56,6 +56,7 @@ function UseText(): JSX.Element {
   const [s, onSelection] = React.useState(emptySelection);
   const [v, onViewport] = React.useState(emptySelection);
   const [h, onHover] = React.useState<Position | null>(null);
+  const [evt, setEvent] = React.useState('');
   const proxy = React.useMemo(() => new TextProxy(), []);
   const buffer = React.useMemo(() => new TextBuffer(), []);
   const text = useProxy ? proxy : buffer;
@@ -119,6 +120,32 @@ function UseText(): JSX.Element {
     if (h===null) return decorations;
     return [...decorations, { line: h.line, className: 'hover' }];
   }, [decorations, h]);
+
+  const clearEvent = React.useCallback(() => setEvent(''), []);
+  const triggerCancelEvent = Dome.useDebounced(clearEvent, 1000);
+
+  const onClick = React.useCallback(
+    (pos: Position | null, evt: MouseEvent) => {
+      const name =
+        evt.altKey ? 'Alt-Click' :
+        evt.ctrlKey ? 'Ctrl-Click' :
+        evt.metaKey ? 'Meta-Click' :
+        'Click';
+      setEvent(`${name} ${pos ? pos.offset : 'null'}`);
+      triggerCancelEvent();
+    }, [triggerCancelEvent]);
+
+  const onPopup = React.useCallback(
+    (pos: Position | null) => {
+      setEvent(`Popup ${pos ? pos.offset : 'null'}`);
+      triggerCancelEvent();
+    }, [triggerCancelEvent]);
+
+  const onDoubleClick = React.useCallback(
+    (pos: Position | null) => {
+      setEvent(`Double-Click ${pos ? pos.offset : 'null'}`);
+      triggerCancelEvent();
+    }, [triggerCancelEvent]);
 
   return (
     <>
@@ -184,17 +211,23 @@ function UseText(): JSX.Element {
         onChange={onChange}
         onSelection={onSelection}
         onHover={onHover}
+        onClick={onClick}
+        onPopup={onPopup}
+        onDoubleClick={onDoubleClick}
         onViewport={onViewport}
         decorations={allDecorations}
         lineNumbers={useLines}
         showCurrentLine={useCurrent}
       />
       <ToolBar>
-        <Code label={`Offset ${s.offset}-${s.offset + s.length} / ${length}`} />
-        <Code label={`Line ${s.fromLine}-${s.toLine} / ${lines}`} />
+        <Code label={`Length ${length}`} />
+        <Code label={`Lines ${lines}`} />
+        <Code label={`Offset ${s.offset}-${s.offset + s.length}`} />
+        <Code label={`Line ${s.fromLine}-${s.toLine}`} />
         <Code label={`View ${v.fromLine}-${v.toLine}`} />
         <Code label={`Hover ${h ? h.offset : '-'}:${h ? h.line : '-'}`} />
         <Filler />
+        <Code>{evt}</Code>
         <Code>{`Changes: ${changes}`}</Code>
       </ToolBar>
     </>
