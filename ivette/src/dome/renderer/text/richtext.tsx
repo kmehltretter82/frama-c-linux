@@ -258,13 +258,16 @@ export class TextBuffer extends TextProxy {
     return this.contents ?? this.text.toString();
   }
 
-  append(data: string): void {
-    const view = this.proxy;
-    if (view) { appendContents(view, data); }
-    else {
-      this.text = this.toText().append(textOf(data));
-      this.contents = undefined;
-      // invariant established
+  append(...values: unknown[]): void {
+    if (values.length > 0) {
+      const data = values.join(' ');
+      const view = this.proxy;
+      if (view) { appendContents(view, data); }
+      else {
+        this.text = this.toText().append(textOf(data));
+        this.contents = undefined;
+        // invariant established
+      }
     }
   }
 
