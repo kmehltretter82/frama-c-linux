@@ -479,12 +479,26 @@ const OnClick = new MouseCallbackField();
 const OnPopup = new MouseCallbackField();
 const OnHover = new MouseCallbackField();
 const OnDouble = new MouseCallbackField();
+const OnGutter = new MouseCallbackField();
+
+const gutterEventHandlers = {
+  click: (view: CM.EditorView, block: CM.BlockInfo, evt: Event) => {
+    const fn = view.state.field(OnGutter.field);
+    if (fn) {
+      const offset = block.from;
+      const line = view.state.doc.lineAt(offset).number;
+      fn({ offset, line }, evt as MouseEvent);
+    }
+    return false;
+  }
+};
 
 const MouseEvents : CS.Extension = [
   OnClick,
   OnHover,
   OnPopup,
   OnDouble,
+  OnGutter,
   CM.EditorView.domEventHandlers({
     click: (evt: MouseEvent, view: CM.EditorView) => {
       OnClick.callback(evt, view);
@@ -618,7 +632,7 @@ class GutterMark extends CM.GutterMarker {
     const {  gutter, className, title } = this.spec;
     const textNode = document.createTextNode(gutter);
     if (!className && !title) return textNode;
-    const span = document.createElement("div");
+    const span = document.createElement("span");
     span.appendChild(textNode);
     if (className) span.className = className;
     if (title) span.title = title;
@@ -759,14 +773,20 @@ function dispatchDecorations(view: View, spec: Decorations): void {
 const Decorations: CS.Extension = [
   DecoratorState,
   CM.EditorView.decorations.from(DecoratorState, ({ ranges }) => ranges),
-  CM.gutter({ markers: (view) => view.state.field(DecoratorState).gutters, }),
+  OnGutter,
+  CM.gutter({
+    markers: (view) => view.state.field(DecoratorState).gutters,
+    domEventHandlers: gutterEventHandlers,
+  }),
 ];
 
 /* -------------------------------------------------------------------------- */
 /* --- Line Numbers                                                       --- */
 /* -------------------------------------------------------------------------- */
 
-const LineNumbers = new Option(CM.lineNumbers());
+const LineNumbers = new Option(
+  CM.lineNumbers({ domEventHandlers: gutterEventHandlers })
+);
 
 /* -------------------------------------------------------------------------- */
 /* --- Active Line                                                        --- */
@@ -810,6 +830,7 @@ export interface TextViewProps {
   onClick?: MouseCallback;
   onPopup?: MouseCallback;
   onHover?: MouseCallback;
+  onGutter?: MouseCallback;
   onDoubleClick?: MouseCallback;
   decorations?: Decorations;
   lineNumbers?: boolean;
@@ -838,6 +859,7 @@ export function TextView(props: TextViewProps) : JSX.Element {
     onClick = null,
     onPopup = null,
     onHover = null,
+    onGutter = null,
     onChange = null,
     readOnly = false,
     onViewport: onReview = null,
@@ -850,6 +872,7 @@ export function TextView(props: TextViewProps) : JSX.Element {
   React.useEffect(() => OnPopup.dispatch(view, onPopup), [view, onPopup]);
   React.useEffect(() => OnHover.dispatch(view, onHover), [view, onHover]);
   React.useEffect(() => OnDouble.dispatch(view, onDouble), [view, onDouble]);
+  React.useEffect(() => OnGutter.dispatch(view, onGutter), [view, onGutter]);
   React.useEffect(() => OnChange.dispatch(view, onChange), [view, onChange]);
   React.useEffect(() => OnSelect.dispatch(view, onSelect), [view, onSelect]);
   React.useEffect(() => Viewport.dispatch(view, onReview), [view, onReview]);

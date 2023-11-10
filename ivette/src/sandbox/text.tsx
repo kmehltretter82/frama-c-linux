@@ -102,7 +102,7 @@ function UseText(): JSX.Element {
     setDecorations([...decorations, {
       line: s.fromLine,
       className: 'line-decoration',
-      title: 'Line Decorated'
+      title: 'Line Decorated',
     }]);
   }, [decorations, s]);
 
@@ -111,6 +111,7 @@ function UseText(): JSX.Element {
     setDecorations([...decorations, {
       line: s.fromLine,
       gutter: '*',
+      title: 'Gutter Mark',
     }]);
   }, [decorations, s]);
 
@@ -122,7 +123,7 @@ function UseText(): JSX.Element {
   }, [decorations, h]);
 
   const clearEvent = React.useCallback(() => setEvent(''), []);
-  const triggerCancelEvent = Dome.useDebounced(clearEvent, 1000);
+  const triggerCancelEvent = Dome.useDebounced(clearEvent, 1200);
 
   const onClick = React.useCallback(
     (pos: Position | null, evt: MouseEvent) => {
@@ -144,6 +145,12 @@ function UseText(): JSX.Element {
   const onDoubleClick = React.useCallback(
     (pos: Position | null) => {
       setEvent(`Double-Click ${pos ? pos.offset : 'null'}`);
+      triggerCancelEvent();
+    }, [triggerCancelEvent]);
+
+  const onGutter = React.useCallback(
+    (pos: Position | null) => {
+      setEvent(`Gutter-Click L${pos ? pos.line : 'null'}`);
       triggerCancelEvent();
     }, [triggerCancelEvent]);
 
@@ -213,6 +220,7 @@ function UseText(): JSX.Element {
         onHover={onHover}
         onClick={onClick}
         onPopup={onPopup}
+        onGutter={onGutter}
         onDoubleClick={onDoubleClick}
         onViewport={onViewport}
         decorations={allDecorations}
