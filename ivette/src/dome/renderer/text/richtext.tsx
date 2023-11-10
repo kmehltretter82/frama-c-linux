@@ -330,13 +330,13 @@ class Option extends Extension {
   private readonly spec: CS.Extension;
   private readonly comp = new CS.Compartment();
 
-  constructor(extension: CS.Extension, active=true) {
+  constructor(extension: CS.Extension) {
     super();
     this.spec = extension;
-    this.pack(this.comp.of(active ? extension : []));
+    this.pack(this.comp.of([]));
   }
 
-  dispatch(view: View, active?: boolean): void {
+  dispatch(view: View, active: boolean): void {
     if (view !== null && active !== undefined) {
       const effects = this.comp.reconfigure(active ? this.spec : []);
       view.dispatch({ effects });
@@ -868,8 +868,8 @@ export function TextView(props: TextViewProps) : JSX.Element {
     onViewport: onReview = null,
     onSelection: onSelect = null,
     onDoubleClick: onDouble = null,
-    lineNumbers: lines,
-    showCurrentLine: active,
+    lineNumbers: lines = false,
+    showCurrentLine: active = false,
   } = props;
   React.useEffect(() => OnClick.dispatch(view, onClick), [view, onClick]);
   React.useEffect(() => OnPopup.dispatch(view, onPopup), [view, onPopup]);
