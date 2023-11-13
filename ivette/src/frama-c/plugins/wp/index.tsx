@@ -71,8 +71,7 @@ function WPGoals(): JSX.Element {
 }
 
 Ivette.registerComponent({
-  id: 'frama-c.plugins.wp.goals',
-  group: 'frama-c.plugins',
+  id: 'fc.wp.goals',
   rank: 10,
   label: 'WP Goals',
   title: 'WP Generated Verification Conditions',
@@ -101,7 +100,7 @@ function ServerActivity(): JSX.Element {
 }
 
 Ivette.registerStatusbar({
-  id: 'frama-c.plugins.wp.server',
+  id: 'fc.wp.server',
   children: <ServerActivity />,
 });
 
@@ -110,13 +109,14 @@ Ivette.registerStatusbar({
 /* -------------------------------------------------------------------------- */
 
 Ivette.registerView({
-  id: 'frama-c.plugins.wp.main',
+  id: 'fc.wp.main',
   rank: 5,
   label: 'WP View',
-  layout: [
-    ['frama-c.astview', 'frama-c.astinfo'],
-    'frama-c.plugins.wp.goals',
-  ],
+  layout: {
+    'A': 'fc.kernel.astview',
+    'B': 'fc.kernel.astinfo',
+    'CD': 'fc.wp.goals',
+  }
 });
 
 // --------------------------------------------------------------------------

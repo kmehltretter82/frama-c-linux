@@ -33,7 +33,6 @@ import React from 'react';
 import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
-import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
 import * as Lab from 'ivette@lab';
 import * as Ext from 'ivette@ext';
 
@@ -61,56 +60,54 @@ export interface ContentProps extends ItemProps {
 /* --- Groups                                                             --- */
 /* -------------------------------------------------------------------------- */
 
-let GROUP: string | undefined;
+/** @ignore */
+export const GROUP = new Ext.ElementRack<ItemProps>();
 
-/**
-   Defines a group of components.
-   To arrach components to the group, use their `group` property.
-   Empty groups are not displayed.
+/** Defines a group of components.
 
-   If provided, the group is used by default for all components registered
-   during the continuation.
+   The group with identifier `G` contains
+   implicitely all components identified by pattern `G.*`. For instance,
+   component `fc.kernel.ast` belongs to group `kernel`.
+
+   Group `fc.kernel` is dedicated to components of the Kernel.
+   Group `fc.<plugin>` is dedicated to components of plugin `<plugin>`.
+   Groups `ivette` and `sandbox` are reserved for Ivette usage.
+
  */
-export function registerGroup(group: ItemProps, job?: () => void): void {
-  Lab.addLibraryItem('groups', group);
-  if (job) {
-    const STACK = GROUP;
-    try {
-      GROUP = group.id;
-      job();
-    } finally {
-      GROUP = STACK;
-    }
-  }
+export function registerGroup(group: ItemProps): void {
+  GROUP.register(group);
 }
 
 /* -------------------------------------------------------------------------- */
 /* --- View Layout                                                        --- */
 /* -------------------------------------------------------------------------- */
 
-/**
-   Alternating V-split and H-split layouts.
- */
-export type Layout = string | Layout[];
+/** Component identifier. */
+export type compId = string;
 
-function makeLayout(ly: Layout, hsplit = false): JSX.Element | null {
-  if (typeof (ly) === 'string') return <GridItem id={ly} />;
-  if (!ly) return null;
-  if (hsplit) {
-    return (
-      <GridHbox>
-        {React.Children.toArray(ly.map((l) => makeLayout(l, false)))}
-      </GridHbox>
-    );
-  }
-  return (
-    <GridVbox>
-      {React.Children.toArray(ly.map((l) => makeLayout(l, true)))}
-    </GridVbox>
-  );
+/** Four elements layout */
+export type Layout4 = { A: compId, B: compId, C: compId, D: compId };
 
-}
+/** Three elements layout: one component spreads over two quarters. */
+export type Layout3 =
+  | { AB: compId, C: compId, D: compId }
+  | { AC: compId, B: compId, D: compId }
+  | { A: compId, B: compId, CD: compId }
+  | { A: compId, BD: compId, C: compId }
 
+/** Two elements layout: each component spreads over two quarters. */
+export type Layout2 =
+  | { AB: compId, CD: compId }
+  | { AC: compId, BD: compId }
+
+/** One elements layout: a single component spreads over all quarters. */
+export type Layout1 =
+  | { ABCD: compId }
+
+/** A layout displays one to four components. */
+export type Layout = Layout1 | Layout2 | Layout3 | Layout4;
+
+/** A view dispatches elements over a predefined layout. */
 export interface ViewLayoutProps extends ItemProps {
   /** Use this view by default. */
   defaultView?: boolean;
@@ -118,31 +115,42 @@ export interface ViewLayoutProps extends ItemProps {
   layout: Layout;
 }
 
+/** @ignore */
+export const VIEW = new Ext.ElementRack<ViewLayoutProps>();
+
 /** Register a new View. */
 export function registerView(view: ViewLayoutProps): void {
-  const { layout, ...viewprops } = view;
-  Lab.addLibraryItem('views', {
-    ...viewprops,
-    children: makeLayout(layout),
-  });
+  VIEW.register(view);
 }
 
 /* -------------------------------------------------------------------------- */
 /* --- Components                                                         --- */
 /* -------------------------------------------------------------------------- */
 
+export type LayoutPosition =
+  | 'A' | 'B' | 'C' | 'D'
+  | 'AB' | 'AC' | 'BD' | 'CD'
+  | 'ABCD';
+
 export interface ComponentProps extends ContentProps {
-  /** Group attachment. */
-  group?: string;
+  /** Defaults to 'D' */
+  preferredPosition?: LayoutPosition;
 }
+
+/** @ignore */
+export const COMPONENT = new Ext.ElementRack<ComponentProps>();
 
 /**
    Register the given Ivette Component.
    Components are sorted by rank and identifier among each group.
  */
 export function registerComponent(props: ComponentProps): void {
-  Lab.addLibraryItem('components', { group: GROUP, ...props });
+  COMPONENT.register(props);
 }
+
+/* -------------------------------------------------------------------------- */
+/* --- Component TitleBar                                                 --- */
+/* -------------------------------------------------------------------------- */
 
 export interface TitleBarProps {
   /** Displayed icon. */
@@ -162,6 +170,7 @@ export interface TitleBarProps {
  */
 export function TitleBar(props: TitleBarProps): JSX.Element | null {
   const { icon, label, title, children } = props;
+  // TODO: this shall be adapted later on...
   const context = Lab.useTitleContext();
   if (!context.id) return null;
   return (
@@ -228,15 +237,20 @@ if (DEVEL) {
   });
   registerView({
     id: 'sandbox',
-    rank: -2,
     label: 'Sandbox',
     title: 'Sandbox Playground (only in DEVEL mode)',
-    layout: [],
+    layout: { ABCD: 'sandbox.qsplitter' },
   });
 }
 
 export function registerSandbox(props: ComponentProps): void {
-  if (DEVEL) registerComponent({ ...props, group: 'sandbox' });
+  if (DEVEL) {
+    if (!props.id.startsWith('sandbox.')) {
+      // eslint-disable-next-line no-console
+      console.error('SANDBOX wrong identifier', props.id);
+    }
+    registerComponent(props);
+  }
 }
 
 /* -------------------------------------------------------------------------- */

@@ -373,8 +373,7 @@ const RenderConsole = (): JSX.Element => {
 };
 
 Ivette.registerComponent({
-  id: 'frama-c.console',
-  group: 'frama-c.kernel',
+  id: 'ivette.console',
   label: 'Console',
   title: 'Frama-C Server Output & Command Line',
   rank: -1,
@@ -382,10 +381,10 @@ Ivette.registerComponent({
 });
 
 Ivette.registerView({
-  id: 'console',
+  id: 'ivette.console',
   rank: -1,
   label: 'Console',
-  layout: 'frama-c.console',
+  layout: { ABCD: 'ivette.console' },
 });
 
 // --------------------------------------------------------------------------

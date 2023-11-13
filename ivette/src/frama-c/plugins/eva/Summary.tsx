@@ -232,8 +232,7 @@ function EvaSummaryComponent(): JSX.Element {
 }
 
 Ivette.registerComponent({
-  id: 'frama-c.plugins.eva_summary',
-  group: 'frama-c.plugins',
+  id: 'fc.eva.summary',
   rank: 10,
   label: 'Eva Summary',
   title: 'Summary of the Eva analysis',

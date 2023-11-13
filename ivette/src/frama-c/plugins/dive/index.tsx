@@ -26,32 +26,35 @@ import * as Ivette from 'ivette';
 import GraphComponent from './graph';
 import TreeComponent from './tree';
 
-Ivette.registerComponent({
-    id: 'frama-c.plugins.dive.graph',
-    label: 'Dive Dataflow Graph',
-    group: 'frama-c.plugins',
-    rank: 2,
-    title:
-      'Data dependency graph according to an Eva analysis.',
-    children: <GraphComponent />,
-  });
+Ivette.registerGroup({
+  id: 'fc.dive',
+  label: 'Dive Plugin',
+});
 
 Ivette.registerComponent({
-    id: 'frama-c.plugins.dive.tree',
-    label: 'Dive Dataflow Tree',
-    group: 'frama-c.plugins',
-    rank: 3,
-    title:
-        'Data dependency tree according to an Eva analysis.',
-    children: <TreeComponent />,
-  });
+  id: 'fc.dive.graph',
+  label: 'Dive Dataflow Graph',
+  rank: 2,
+  title: 'Data dependency graph according to an Eva analysis.',
+  children: <GraphComponent />,
+});
+
+Ivette.registerComponent({
+  id: 'fc.dive.tree',
+  label: 'Dive Dataflow Tree',
+  rank: 3,
+  title: 'Data dependency tree according to an Eva analysis.',
+  children: <TreeComponent />,
+});
 
 Ivette.registerView({
-    id: 'dive',
-    label: 'Dive Dataflow',
-    rank: 5,
-    layout: [
-        ['frama-c.astview', 'frama-c.plugins.dive.graph'],
-        ['frama-c.properties', 'frama-c.locations'],
-    ],
-  });
+  id: 'fc.dive.dataflow',
+  label: 'Dive Dataflow',
+  rank: 5,
+  layout: {
+    'A': 'fc.kernel.astview',
+    'B': 'fc.dive.graph',
+    'C': 'fc.kernel.properties',
+    'D': 'frama-c.kernel.locations',
+  }
+});
