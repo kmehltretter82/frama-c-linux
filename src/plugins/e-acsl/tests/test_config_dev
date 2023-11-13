@@ -10,6 +10,9 @@ MACRO: ROOT_EACSL_GCC_FC_EXTRA -verbose 0
 COMMENT: Currently compilation assumes an x86_64 architecture
 ENABLED_IF: (= %{architecture} amd64)
 
+COMMENT: e-acsl-gcc.sh is not currently compatible with macos' getopt
+ENABLED_IF: (<> %{system} macosx)
+
 PLUGIN: e-acsl eva,scope,variadic rtegen
 
 COMMENT: The dependency to the plugin share directory has not to be explicited
