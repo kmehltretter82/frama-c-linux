@@ -15,7 +15,8 @@
 }
 
 .sidebar-selector {
-    min-width: 35px;
+    min-width: 35px;    
+    text-align: center;
 }
 
 .sidebar-selector-icon {
