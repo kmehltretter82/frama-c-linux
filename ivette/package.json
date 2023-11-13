@@ -84,7 +84,6 @@
     "diff": "^5.1.0",
     "gremlins.js": "^2.2.0",
     "immutable": "",
-    "jsdiff": "^1.1.1",
     "lodash": "^4.17.21",
     "react": "^16",
     "react-cytoscapejs": "",
