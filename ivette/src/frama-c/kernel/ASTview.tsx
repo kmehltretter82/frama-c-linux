@@ -718,7 +718,7 @@ export default function ASTview(): JSX.Element {
 
   // EVA Callbacks
   const { kind, name } = States.useDeclaration(scope);
-  const fct = kind==='FUNCTION' ? name : undefined;
+  const fct = kind === 'FUNCTION' ? name : undefined;
   const dead = useFctDead(fct);
   React.useEffect(() => Dead.set(view, dead), [view, dead]);
   const callers = useFctCallers(fct);
