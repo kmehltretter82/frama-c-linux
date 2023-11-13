@@ -33,6 +33,7 @@ import * as Toolbars from 'dome/frame/toolbars';
 import { IconButton } from 'dome/controls/buttons';
 import { LED, LEDstatus } from 'dome/controls/displays';
 import { Label, Code } from 'dome/controls/labels';
+import * as Text from 'dome/text/richtext';
 import { TextBuffer, TextView } from 'dome/text/richtext';
 import { resolve } from 'dome/system';
 
@@ -229,25 +230,41 @@ const RenderConsole = (): JSX.Element => {
   const [cursor, setCursor] = React.useState(-1);
   const [isEmpty, setEmpty] = React.useState(true);
   const [noTrash, setNoTrash] = React.useState(true);
+  const [scrolling, setScrolling] = React.useState(true);
   const [history, setHistory] = useHistory();
   const [maxLines] = Settings.useGlobalSettings(Preferences.ConsoleScrollback);
+  const edited = 0 <= cursor;
   const headCmd = history[0];
 
+  const onVisible = React.useCallback((s: Text.Selection) => {
+    if (!edited) {
+      const { offset, length } = Server.buffer.range();
+      const endOfBuffer = offset + length;
+      const endOfViewport = s.offset + s.length;
+      setScrolling(endOfViewport >= endOfBuffer);
+    }
+  }, [edited, setScrolling]);
+
+  const flipScrolling = React.useCallback(() => setScrolling((s) => !s), []);
+
   const onChanged = React.useCallback(() => {
-    if (cursor < 0) {
+    if (edited) {
+      const cmd = editor.toString().trim();
+      setEmpty(cmd === '');
+      setNoTrash((noTrash) => noTrash && cmd === headCmd);
+    } else {
       const { length, toLine: lines } = Server.buffer.range();
       if (lines > maxLines) {
         const cut = Server.buffer.lineRange(lines - maxLines + 1);
         Server.buffer.replaceContents({ offset: 0, length: cut.offset });
-        Server.buffer.scrollTo({ offset: length - cut.offset, length: 0 });
-      } else
-        Server.buffer.scrollTo({ offset: length, length: 0 });
-    } else {
-      const cmd = editor.toString().trim();
-      setEmpty(cmd === '');
-      setNoTrash((noTrash) => noTrash && cmd === headCmd);
+        if (scrolling)
+          Server.buffer.scrollTo({ offset: length - cut.offset, length: 0 });
+      } else {
+        if (scrolling)
+          Server.buffer.scrollTo({ offset: length, length: 0 });
+      }
     }
-  }, [cursor, maxLines, headCmd]);
+  }, [scrolling, edited, maxLines, headCmd]);
 
   const doReload = (): void => {
     const cfg = Server.getConfig();
@@ -261,11 +278,12 @@ const RenderConsole = (): JSX.Element => {
   };
 
   const doSwitch = (): void => {
-    if (cursor < 0) doReload();
-    else {
+    if (edited) {
       editor.clear();
       scratch.current = [];
       setCursor(-1);
+    } else {
+      doReload();
     }
   };
 
@@ -275,6 +293,7 @@ const RenderConsole = (): JSX.Element => {
     setHistory(hst);
     setCursor(-1);
     editor.clear();
+    setScrolling(true);
     Server.setConfig(cfg);
     Server.restart();
   };
@@ -310,7 +329,6 @@ const RenderConsole = (): JSX.Element => {
 
   const doPrev = doMove(cursor + 1);
   const doNext = doMove(cursor - 1);
-  const edited = 0 <= cursor;
   const n = history.length;
 
   return (
@@ -364,11 +382,21 @@ const RenderConsole = (): JSX.Element => {
           onClick={doSwitch}
           title="Toggle command line editing"
         />
+        <IconButton
+          icon="MEDIA.NEXT"
+          disabled={edited}
+          selected={scrolling}
+          onClick={flipScrolling}
+          title="Auto scrolling"
+        />
       </Ivette.TitleBar>
       <TextView
         text={edited ? editor : Server.buffer}
         readOnly={!edited}
         onChange={onChanged}
+        onViewport={onVisible}
+        onSelection={onVisible}
+        showCurrentLine={!scrolling}
       />
     </>
   );
