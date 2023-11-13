@@ -22,6 +22,7 @@
 
 
 import React from 'react';
+import { DEVEL } from 'dome';
 import { Item, Section } from "dome/frame/sidebars";
 import * as Ivette from 'ivette';
 import file from './icons/file.png';
@@ -31,11 +32,14 @@ import folder from './icons/folder.png';
 /* --- Mocking                                                            --- */
 /* -------------------------------------------------------------------------- */
 
-Ivette.registerSidebar({
-  id: 'sandbox.sidebar.a',
-  label: 'SanA',
-  iconPath: folder,
-  children:
+if (DEVEL) {
+
+  Ivette.registerSidebar({
+    id: 'sandbox.sidebar.a',
+    label: 'SanA',
+    title: 'Sandbox Title A',
+    iconPath: folder,
+    children:
     <>
       <Section label='Section A.1'>
         <Item label='Item A.1.1' />
@@ -50,12 +54,13 @@ Ivette.registerSidebar({
         <Item label='Item A.2.4' />
       </Section>
     </>
-});
+  });
 
-Ivette.registerSidebar({
-  id: 'sandbox.sidebar.b',
-  label: 'SanB',
-  children:
+  Ivette.registerSidebar({
+    id: 'sandbox.sidebar.b',
+    label: 'SanB',
+    title: 'Sandbox Title B',
+    children:
     <>
       <Section label='Section B.1'>
         <Item label='Item B.1.1' />
@@ -70,12 +75,13 @@ Ivette.registerSidebar({
         <Item label='Item B.2.4' />
       </Section>
     </>
-});
+  });
 
-Ivette.registerSidebar({
-  id: 'sandbox.sidebar.c',
-  label: 'SanC',
-  children:
+  Ivette.registerSidebar({
+    id: 'sandbox.sidebar.c',
+    label: 'SanC',
+    title: 'Sandbox Title C',
+    children:
     <>
       <Section label='Section C.1'>
         <Item label='Item C.1.1' />
@@ -90,13 +96,14 @@ Ivette.registerSidebar({
         <Item label='Item C.2.4' />
       </Section>
     </>
-});
+  });
 
-Ivette.registerSidebar({
-  id: 'sandbox.sidebar.d',
-  label: 'SanD',
-  iconPath: file,
-  children:
+  Ivette.registerSidebar({
+    id: 'sandbox.sidebar.d',
+    label: 'SanD',
+    iconPath: file,
+    title: 'Sandbox Title D',
+    children:
     <>
       <Section label='Section D.1'>
         <Item label='Item D.1.1' />
@@ -111,6 +118,7 @@ Ivette.registerSidebar({
         <Item label='Item D.2.4' />
       </Section>
     </>
-});
+  });
 
+}
 /* -------------------------------------------------------------------------- */
