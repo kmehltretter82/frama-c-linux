@@ -210,7 +210,6 @@
 .cm-number { color: var(--codemirror-number); }
 .cm-keyword { color: var(--codemirror-keyword); }
 
-.cm-activeLine
-.cm-active-line { background-color: var(--background); }
+.cm-line.cm-activeLine, .cm-active-line { background-color: var(--background); }
 
 /* -------------------------------------------------------------------------- */
