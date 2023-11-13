@@ -448,7 +448,6 @@ export const Status = (): JSX.Element => {
     <>
       <LED status={led} blink={blink} />
       <Code icon={icon} label={running} title={title} />
-      <Toolbars.Separator />
     </>
   );
 };

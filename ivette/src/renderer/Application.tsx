@@ -67,6 +67,8 @@ export default function Application(): JSX.Element {
         <Controller.Control />
         <>{tools}</>
         <Toolbar.Filler />
+        <Toolbar.ViewTabs />
+        <Toolbar.Filler />
         <IvettePrefs.ThemeSwitchTool />
         <IvettePrefs.FontTools />
         <Toolbar.ModalActionField />
@@ -88,6 +90,7 @@ export default function Application(): JSX.Element {
         <Controller.Status />
         <>{status}</>
         <Toolbar.Filler />
+        <Toolbar.ComponentDD />
         <Controller.Stats />
       </Toolbar.ToolBar>
     </Vfill>
