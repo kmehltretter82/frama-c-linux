@@ -20,9 +20,9 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* --------------------------------------------------------------------------*/
-/* --- Lab View Component                                                 ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Lab View Component                                                 --- */
+/* -------------------------------------------------------------------------- */
 
 /**
    @packageDocumentation
@@ -37,9 +37,9 @@ import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
 import * as Lab from 'ivette@lab';
 import * as Ext from 'ivette@ext';
 
-/* --------------------------------------------------------------------------*/
-/* --- Items                                                              ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Items                                                              --- */
+/* -------------------------------------------------------------------------- */
 
 export interface ItemProps {
   /** Identifier. */
@@ -57,9 +57,9 @@ export interface ContentProps extends ItemProps {
   children?: React.ReactNode;
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Groups                                                             ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Groups                                                             --- */
+/* -------------------------------------------------------------------------- */
 
 let GROUP: string | undefined;
 
@@ -84,9 +84,9 @@ export function registerGroup(group: ItemProps, job?: () => void): void {
   }
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- View Layout                                                        ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- View Layout                                                        --- */
+/* -------------------------------------------------------------------------- */
 
 /**
    Alternating V-split and H-split layouts.
@@ -127,9 +127,9 @@ export function registerView(view: ViewLayoutProps): void {
   });
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Components                                                         ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Components                                                         --- */
+/* -------------------------------------------------------------------------- */
 
 export interface ComponentProps extends ContentProps {
   /** Group attachment. */
@@ -177,9 +177,9 @@ export function TitleBar(props: TitleBarProps): JSX.Element | null {
   );
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Sidebar Panels                                                     ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Sidebar Panels                                                     --- */
+/* -------------------------------------------------------------------------- */
 
 export interface ToolProps {
   id: string;
@@ -187,21 +187,38 @@ export interface ToolProps {
   children?: React.ReactNode;
 }
 
-export function registerSidebar(panel: ToolProps): void {
-  Ext.SIDEBAR.register(panel);
-}
+/** @ignore */
+export const TOOLBAR = new Ext.ElementRack<ToolProps>();
+
+/** @ignore */
+export const STATUSBAR = new Ext.ElementRack<ToolProps>();
 
 export function registerToolbar(tools: ToolProps): void {
-  Ext.TOOLBAR.register(tools);
+  TOOLBAR.register(tools);
 }
 
 export function registerStatusbar(status: ToolProps): void {
-  Ext.STATUSBAR.register(status);
+  STATUSBAR.register(status);
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Sandbox                                                            ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Sidebar                                                           ---  */
+/* -------------------------------------------------------------------------- */
+
+export interface SidebarProps extends ContentProps {
+  iconPath?: string;
+}
+
+/** @ignore */
+export const SIDEBAR = new Ext.ElementRack<SidebarProps>();
+
+export function registerSidebar(sidebar: SidebarProps): void {
+  SIDEBAR.register(sidebar);
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Sandbox                                                            --- */
+/* -------------------------------------------------------------------------- */
 
 if (DEVEL) {
   registerGroup({
@@ -222,4 +239,4 @@ export function registerSandbox(props: ComponentProps): void {
   if (DEVEL) registerComponent({ ...props, group: 'sandbox' });
 }
 
-// --------------------------------------------------------------------------
+/* -------------------------------------------------------------------------- */

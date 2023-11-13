@@ -20,62 +20,18 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import { Locator, Page } from "@playwright/test";
+import { test } from "@playwright/test";
+import * as e2eService from "../libs/e2eService";
 
-/**
- * Locator to select "Console" in the right menu
- */
-export function getConsoleMenuItem(window: Page): Locator {
-  return window
-    .getByText("ViewsConsoleSource Code")
-    .getByText("Console")
-    .first();
-}
+test("testing double bar - 'functions' category", async () => {
+  const launchAppResult = await e2eService.launchApp(
+    e2eService.argsLaunchWithTestFile,
+  );
+  const electronApp = launchAppResult.app;
+  const window = launchAppResult.page;
 
-/**
- * Locator to select the Start button in the top button bar
- */
-export function getStartServerButton(window: Page): Locator {
-  return window
-    .locator(".dome-xToolBar")
-    .getByRole("button", { name: "Start the server", exact: true });
-}
+  await e2eService.testFileIsLoadedInDoubleBar(window);
 
-/**
- * Locator to select the Shut Down button in the top button bar
- */
-export function getShutDownServerButton(window: Page): Locator {
-  return window.locator(".dome-xToolBar").getByTitle("Shut down the server");
-}
-
-/**
- * Locator to select the Console View
- */
-export function getConsoleView(window: Page): Locator {
-  return window.locator(".CodeMirror");
-}
-
-/**
- * Locator to select the Functions side bar when loading a file
- */
-export function getFunctionsSideBar(window: Page): Locator {
-  return window.locator(".dome-xSideBar").first();
-}
-
-export function getServerStatusLabel(window: Page): Locator {
-  return window.getByTitle("Server is running");
-}
-
-/**
- * Locator to access the primary section (categories) of the double bar
- */
-export function getDoubleBarPrimary(window: Page): Locator {
-  return window.locator('.dome-xDoubleBar-primary');
-}
-
-/**
- * Locator to access the secondary section (submenu) of the double bar
- */
-export function getDoubleBarSecondary(window: Page): Locator {
-  return window.locator('dome-xSideBar-double-secondary');
-}
+  // Exit app.
+  await electronApp.close();
+});

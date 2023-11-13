@@ -39,7 +39,7 @@ export interface ElementProps {
   children?: React.ReactNode;
 }
 
-function byPanel(p: ElementProps, q: ElementProps): number {
+function byRank(p: ElementProps, q: ElementProps): number {
   const rp = p.rank ?? 0;
   const rq = q.rank ?? 0;
   if (rp < rq) return -1;
@@ -51,38 +51,38 @@ function byPanel(p: ElementProps, q: ElementProps): number {
   return 0;
 }
 
-export class ElementRack {
+export class ElementRack<A extends ElementProps> {
 
   private rank = 1;
-  private readonly items = new Map<string, ElementProps>();
+  private readonly items = new Map<string, A>();
 
-  register(elt: ElementProps): void {
+  register(elt: A): void {
     if (elt.rank === undefined) elt.rank = this.rank;
     this.rank++;
     this.items.set(elt.id, elt);
     UPDATED.emit();
   }
 
-  render(): JSX.Element {
-    const panels: ElementProps[] = [];
-    this.items.forEach((p) => { if (p.children) { panels.push(p); } });
-    const contents = panels.sort(byPanel).map((p) => p.children);
-    return <>{React.Children.toArray(contents)}</>;
+  getElements(): A[] {
+    const buffer: A[] = [];
+    this.items.forEach((p) => { if (p.children) { buffer.push(p); } });
+    return buffer.sort(byRank);
   }
 
 }
 
-export function useRack(E: ElementRack): JSX.Element {
+export function useElements<A extends ElementProps>(
+  E: ElementRack<A>
+): A[] {
   Dome.useUpdate(UPDATED);
-  return E.render();
+  return E.getElements();
 }
 
-export const SIDEBAR = new ElementRack();
-export const TOOLBAR = new ElementRack();
-export const STATUSBAR = new ElementRack();
-
-export function Sidebar(): JSX.Element { return useRack(SIDEBAR); }
-export function Toolbar(): JSX.Element { return useRack(TOOLBAR); }
-export function Statusbar(): JSX.Element { return useRack(STATUSBAR); }
+export function useChildren<A extends ElementProps>(
+  E: ElementRack<A>
+): React.ReactNode {
+  const elements = useElements(E);
+  return React.Children.toArray(elements.map((e) => e.children));
+}
 
 /* --------------------------------------------------------------------------*/

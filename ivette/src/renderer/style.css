@@ -3,10 +3,46 @@
 /* -------------------------------------------------------------------------- */
 
 .sidebar-ruler {
-    display: block;
-    visibility: hidden;
-    width: 80px;
-    height: 0px;
+    display: flex;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.sidebar-items.dome-color-frame
+{
+    background: var(--background-intense) ;
+}
+
+.sidebar-selector {
+    min-width: 35px;    
+    text-align: center;
+}
+
+.sidebar-selector-icon {
+    margin-top: 5px;
+    margin-left: 25%;
+    margin-right: 25%;
+    width: 25px;
+    height: 25px;
+}
+
+.sidebar-selector-icon:hover {
+    background-color: var(--background-profound-hover);
+}
+
+.sidebar-selector-label {
+    display: inline-block;
+    margin: 5px;
+    font-weight: bold;
+}
+
+.sidebar-selector:hover {
+    background-color: var(--background-profound-hover);
+}
+
+.sidebar-selector-selected {
+    background-color: var(--background-profound);
 }
 
 .component-info {
