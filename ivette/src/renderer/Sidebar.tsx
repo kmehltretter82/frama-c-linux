@@ -46,32 +46,16 @@ function Selector(props: SelectorProps): JSX.Element {
   const className = classes(
     'sidebar-selector',
     'dome-color-frame',
-    selected === id ? 'sidebar-selector-selected' : ''
+    selected === id && 'sidebar-selector-selected',
   );
-
+  const onClick = React.useCallback(() => setSelected(id), [setSelected, id]);
+  const component =
+    iconPath
+    ? <img className="sidebar-selector-icon" src={iconPath} alt={label} />
+    : <label className="sidebar-selector-label">{label}</label>;
   return (
-    <div className={className}>
-      {iconPath ?
-        <img
-        className="sidebar-selector-icon"
-        src={iconPath}
-        alt={label}
-        title={title}
-        onClick={
-          () => setSelected(id)
-        }
-        />
-        :
-        <label
-        className="sidebar-selector-label"
-        onClick={
-          () => setSelected(id)
-        }
-        >
-          {label.slice(0, 4).toLocaleUpperCase()}
-        </label>
-      }
-      <br/>
+    <div className={className} title={title} onClick={onClick}>
+      {component}
     </div>
   );
 }
