@@ -50,6 +50,6 @@ DOME_APP_PACKAGES= \
 	react-virtualized \
 	react-draggable \
 	react-fast-compare \
-	codemirror
+	diff
 
 # --------------------------------------------------------------------------

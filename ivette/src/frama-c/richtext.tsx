@@ -31,45 +31,10 @@
 
 import React from 'react';
 import * as Dome from 'dome';
-import * as DomeBuffers from 'dome/text/buffers';
 import * as KernelData from 'frama-c/kernel/api/data';
 import { classes } from 'dome/misc/utils';
 
 const D = new Dome.Debug('Utils');
-
-// --------------------------------------------------------------------------
-// --- Print Utilities
-// --------------------------------------------------------------------------
-
-/**
- * Print text containing tags into buffer.
- * @param buffer Rich text buffer to print into.
- * @param text Actual text containing tags.
- * @param options Specify particular marker options.
- */
-export function printTextWithTags(
-  buffer: DomeBuffers.RichTextBuffer,
-  text: KernelData.text,
-  options?: DomeBuffers.MarkerProps,
-): void {
-  if (Array.isArray(text)) {
-    const tag = text[0];
-    const marker = typeof (tag) === 'string';
-    if (marker) {
-      buffer.openTextMarker({ id: tag, ...options ?? {} });
-    }
-    for (let k = marker ? 1 : 0; k < text.length; k++) {
-      printTextWithTags(buffer, text[k], options);
-    }
-    if (marker) {
-      buffer.closeTextMarker();
-    }
-  } else if (typeof text === 'string') {
-    buffer.append(text);
-  } else {
-    D.error('Unexpected text', text);
-  }
-}
 
 // --------------------------------------------------------------------------
 // --- Lightweight Text Renderer

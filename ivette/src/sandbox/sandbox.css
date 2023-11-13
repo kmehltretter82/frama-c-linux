@@ -6,3 +6,16 @@
     width: 100px;
     text-align: center;
 }
+
+.decoration {
+    color: red;
+    font-style: italic;
+}
+
+.cm-global-box .line-decoration {
+    background: lightgreen;
+}
+
+.cm-global-box .hover {
+    background: yellow;
+}
