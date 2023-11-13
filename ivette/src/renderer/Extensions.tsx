@@ -63,12 +63,25 @@ export class ElementRack<A extends ElementProps> {
     UPDATED.emit();
   }
 
+  getElement(id: string): A | undefined
+  {
+    return this.items.get(id);
+  }
+
   getElements(): A[] {
     const buffer: A[] = [];
     this.items.forEach((p) => { if (p.children) { buffer.push(p); } });
     return buffer.sort(byRank);
   }
 
+}
+
+export function useElement<A extends ElementProps>(
+  E: ElementRack<A>, id: string | undefined
+): A | undefined
+{
+  Dome.useUpdate(UPDATED);
+  return id ? E.getElement(id) : undefined;
 }
 
 export function useElements<A extends ElementProps>(
