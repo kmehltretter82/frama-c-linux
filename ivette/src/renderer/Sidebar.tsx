@@ -87,7 +87,17 @@ function Wrapper(props: WrapperProps): JSX.Element {
 export function Panel(): JSX.Element {
   const [selected, setSelected] =
     Dome.useStringSettings('ivette.sidebar.selected');
+
   const sidebars = Ext.useElements(SIDEBAR);
+
+  // Ensures there is one selected sidebar
+  React.useEffect(() => {
+    if (sidebars.every((sb) => sb.id !== selected)) {
+      const first = sidebars[0];
+      if (first) setSelected(first.id);
+    }
+  }, [sidebars, selected, setSelected]);
+
   const items = sidebars.map((sb) => (
     <Selector
       key={sb.id}
@@ -95,6 +105,7 @@ export function Panel(): JSX.Element {
       setSelected={setSelected}
       {...sb} />
   ));
+
   const wrappers = sidebars.map((sb) => (
     <Wrapper
       key={sb.id}
@@ -103,9 +114,15 @@ export function Panel(): JSX.Element {
     />
   ));
 
+  // Hide sidebar if only one of them
+  const selectorClasses = classes(
+    'sidebar-items dome-color-frame',
+    sidebars.length <= 1 && 'dome-erased'
+  );
+
   return (
     <div className="sidebar-ruler">
-      <div className="sidebar-items dome-color-frame">
+      <div className={selectorClasses}>
         {items}
       </div>
       {wrappers}
