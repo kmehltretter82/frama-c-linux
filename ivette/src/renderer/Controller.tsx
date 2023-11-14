@@ -33,8 +33,8 @@ import * as Toolbars from 'dome/frame/toolbars';
 import { IconButton } from 'dome/controls/buttons';
 import { LED, LEDstatus } from 'dome/controls/displays';
 import { Label, Code } from 'dome/controls/labels';
-import { RichTextBuffer } from 'dome/text/buffers';
-import { Text } from 'dome/text/editors';
+import * as Text from 'dome/text/richtext';
+import { TextBuffer, TextView } from 'dome/text/richtext';
 import { resolve } from 'dome/system';
 
 import * as Ivette from 'ivette';
@@ -223,56 +223,77 @@ export const Control = (): JSX.Element => {
 // --- Server Console
 // --------------------------------------------------------------------------
 
-const editor = new RichTextBuffer();
+const editor = new TextBuffer();
 
 const RenderConsole = (): JSX.Element => {
   const scratch = React.useRef([] as string[]);
   const [cursor, setCursor] = React.useState(-1);
   const [isEmpty, setEmpty] = React.useState(true);
   const [noTrash, setNoTrash] = React.useState(true);
+  const [scrolling, setScrolling] = React.useState(true);
   const [history, setHistory] = useHistory();
-
-  React.useEffect(() => {
-    const callback = (): void => {
-      const cmd = editor.getValue().trim();
-      setEmpty(cmd === '');
-      setNoTrash(noTrash && cmd === history[0]);
-    };
-    editor.on('change', callback);
-    return () => { editor.off('change', callback); };
-  });
-
   const [maxLines] = Settings.useGlobalSettings(Preferences.ConsoleScrollback);
-  React.useEffect(() => {
-    Server.buffer.setMaxlines(maxLines);
-  });
+  const edited = 0 <= cursor;
+  const headCmd = history[0];
+
+  const onVisible = React.useCallback((s: Text.Selection) => {
+    if (!edited) {
+      const { offset, length } = Server.buffer.range();
+      const endOfBuffer = offset + length;
+      const endOfViewport = s.offset + s.length;
+      setScrolling(endOfViewport >= endOfBuffer);
+    }
+  }, [edited, setScrolling]);
+
+  const flipScrolling = React.useCallback(() => setScrolling((s) => !s), []);
+
+  const onChanged = React.useCallback(() => {
+    if (edited) {
+      const cmd = editor.toString().trim();
+      setEmpty(cmd === '');
+      setNoTrash((noTrash) => noTrash && cmd === headCmd);
+    } else {
+      const { length, toLine: lines } = Server.buffer.range();
+      if (lines > maxLines) {
+        const cut = Server.buffer.lineRange(lines - maxLines + 1);
+        Server.buffer.replaceContents({ offset: 0, length: cut.offset });
+        if (scrolling)
+          Server.buffer.scrollTo({ offset: length - cut.offset, length: 0 });
+      } else {
+        if (scrolling)
+          Server.buffer.scrollTo({ offset: length, length: 0 });
+      }
+    }
+  }, [scrolling, edited, maxLines, headCmd]);
 
   const doReload = (): void => {
     const cfg = Server.getConfig();
     const hst = insertConfig(history, cfg);
     const cmd = hst[0];
     scratch.current = hst.slice();
-    editor.setValue(cmd);
+    editor.setContents(cmd);
     setEmpty(cmd === '');
     setHistory(hst);
     setCursor(0);
   };
 
   const doSwitch = (): void => {
-    if (cursor < 0) doReload();
-    else {
+    if (edited) {
       editor.clear();
       scratch.current = [];
       setCursor(-1);
+    } else {
+      doReload();
     }
   };
 
   const doExec = (): void => {
-    const cfg = buildServerCommand(editor.getValue());
+    const cfg = buildServerCommand(editor.toString());
     const hst = insertConfig(history, cfg);
     setHistory(hst);
     setCursor(-1);
     editor.clear();
+    setScrolling(true);
     Server.setConfig(cfg);
     Server.restart();
   };
@@ -280,11 +301,11 @@ const RenderConsole = (): JSX.Element => {
   const doMove = (target: number): (undefined | (() => void)) => {
     if (0 <= target && target < history.length && target !== cursor)
       return (): void => {
-        const cmd = editor.getValue();
+        const cmd = editor.toString();
         const pad = scratch.current;
         pad[cursor] = cmd;
         const cmd2 = pad[target];
-        editor.setValue(cmd2);
+        editor.setContents(cmd2);
         setEmpty(cmd2 === '');
         setCursor(target);
       };
@@ -301,14 +322,13 @@ const RenderConsole = (): JSX.Element => {
       pad.splice(cursor, 1);
       setHistory(hst);
       const next = cursor > 0 ? cursor - 1 : 0;
-      editor.setValue(pad[next]);
+      editor.setContents(pad[next]);
       setCursor(next);
     }
   };
 
   const doPrev = doMove(cursor + 1);
   const doNext = doMove(cursor - 1);
-  const edited = 0 <= cursor;
   const n = history.length;
 
   return (
@@ -362,11 +382,21 @@ const RenderConsole = (): JSX.Element => {
           onClick={doSwitch}
           title="Toggle command line editing"
         />
+        <IconButton
+          icon="MEDIA.NEXT"
+          disabled={edited}
+          selected={scrolling}
+          onClick={flipScrolling}
+          title="Auto scrolling"
+        />
       </Ivette.TitleBar>
-      <Text
-        buffer={edited ? editor : Server.buffer}
-        mode="text"
+      <TextView
+        text={edited ? editor : Server.buffer}
         readOnly={!edited}
+        onChange={onChanged}
+        onViewport={onVisible}
+        onSelection={onVisible}
+        showCurrentLine={!scrolling}
       />
     </>
   );

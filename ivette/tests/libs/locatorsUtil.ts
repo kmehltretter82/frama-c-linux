@@ -52,7 +52,7 @@ export function getShutDownServerButton(window: Page): Locator {
  * Locator to select the Console View
  */
 export function getConsoleView(window: Page): Locator {
-  return window.locator(".CodeMirror");
+  return window.locator(".cm-global-box");
 }
 
 /**

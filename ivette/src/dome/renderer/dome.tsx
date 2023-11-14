@@ -572,6 +572,25 @@ export function useForceUpdate(): () => void {
 }
 
 /**
+   Hook for a flipping boolean state.
+   The updating callback can be used either as a setter or as a flipper.
+ */
+export function useFlipState(
+  init: boolean
+): [boolean, (forced?: boolean) => void]
+{
+  const [value, setValue] = React.useState(init);
+  const flipValue = React.useCallback(
+    (forced?: boolean) => {
+      if (forced !== undefined)
+        setValue(forced);
+      else
+        setValue((v) => !v);
+    }, []);
+  return [value, flipValue];
+}
+
+/**
    Hook to re-render on Dome events (Custom React Hook).
    @param events - event names, defaults to a single `'dome.update'`.
 */
@@ -765,6 +784,53 @@ export function useTimer(period: number, callback: () => void): void
   }, [period, callback]);
 }
 
+/** Protected callback against unmounted component.
+
+   The returned callback will not fired only when the component is mounted.
+
+   Unless constant, first create the callback with `React.useCallback()`, then
+   give it to `useActive()`.
+ */
+export function useActive<A>(
+  callback: (arg: A) => void,
+): (arg:A) => void
+{
+  const active = React.useRef(false);
+  React.useEffect(() => {
+    active.current = true;
+    return () => { active.current = false; };
+  }, []);
+  return React.useCallback((arg: A) => {
+    if (active.current) callback(arg);
+  }, [callback]);
+}
+
+/** Debounced callback (period in milliseconds).
+
+   The debounceded callback will not be fired when the component is unmounted.
+
+   Unless constant, first create the callback with `React.useCallback()`, then
+   give it to `useDebounced()`.
+ */
+export function useDebounced<A=void>(
+  callback: (arg: A) => void,
+  period: number,
+): (arg:A) => void
+{
+  const active = React.useRef(false);
+  React.useEffect(() => {
+    active.current = true;
+    return () => { active.current = false; };
+  }, []);
+  return React.useMemo(() =>
+    _.debounce(
+      (arg: A) => {
+        if (active.current) callback(arg);
+      }, period
+    ), [callback, period]
+  );
+}
+
 // --------------------------------------------------------------------------
 // --- Sampling Hookds
 // --------------------------------------------------------------------------
@@ -925,6 +991,7 @@ export function useBoolSettings(
 
 /**
    Bool window settings helper with a flip callback.
+   See also {useFlipState}.
  */
 export function useFlipSettings(
   key: string | undefined,
