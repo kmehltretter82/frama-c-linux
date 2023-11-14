@@ -341,6 +341,12 @@ const renderFile: Renderer<Ast.source> =
     <Cell label={`${loc.base}:${loc.line}`} title={loc.file} />
   );
 
+const renderDecl: Renderer<Ast.decl> =
+  (decl: Ast.decl): JSX.Element => {
+    const { name, label } = States.getDeclaration(decl);
+    return <Cell label={name} title={label} />;
+  };
+
 const MessageColumns = (): JSX.Element => (
   <>
     <Column
@@ -373,9 +379,9 @@ const MessageColumns = (): JSX.Element => (
     />
     <Column
       id="decl"
-      label="Function"
+      label="Declaration"
       width={150}
-      render={renderCell}
+      render={renderDecl}
     />
     <Column
       id="dir"
@@ -387,7 +393,7 @@ const MessageColumns = (): JSX.Element => (
     />
     <Column
       id="file"
-      label="File"
+      label="Location"
       width={150}
       getter={(msg: Message) => msg?.source}
       render={renderFile}

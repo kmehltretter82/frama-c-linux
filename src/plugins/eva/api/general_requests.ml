@@ -743,10 +743,10 @@ let _functionStats =
   let open Summary in
   let model = States.model () in
 
-  States.column model ~name:"decl"
-    ~descr:(Markdown.plain "Function declaration tag")
-    ~data:(module Kernel_ast.Decl)
-    ~get:(fun (kf,_) -> Printer_tag.SFunction kf);
+  States.column model ~name:"fctName"
+    ~descr:(Markdown.plain "Function name")
+    ~data:(module Data.Jalpha)
+    ~get:(fun (kf,_) -> Kernel_function.get_name kf);
 
   States.column model ~name:"coverage"
     ~descr:(Markdown.plain "Coverage of the Eva analysis")

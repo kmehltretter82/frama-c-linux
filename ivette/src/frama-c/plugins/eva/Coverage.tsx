@@ -79,9 +79,7 @@ export function CoverageTable(): JSX.Element {
   const scope = States.useCurrentScope();
   const { kind, name } = States.useDeclaration(scope);
   const selection = kind==='FUNCTION' ? name : undefined;
-  const onSelection = ({ decl }: stats): void => {
-    States.setCurrentScope(decl);
-  };
+  const onSelection = (s: stats): void => States.setCurrentScope(s.key);
 
   return (
     <Table
@@ -97,7 +95,7 @@ export function CoverageTable(): JSX.Element {
         align="left"
         width={200}
         fill
-        getter={({ key }: stats) => key}
+        getter={(s: stats) => s.fctName}
       />
       <Column
         id="alarms"
@@ -105,9 +103,8 @@ export function CoverageTable(): JSX.Element {
         title="Number of alarms emitted by the Eva analysis"
         align="center"
         width={80}
-        getter={({ alarmStatuses }: stats) => (
-          alarmStatuses.invalid + alarmStatuses.unknown
-        )}
+        getter={(s: stats) =>
+          s.alarmStatuses.invalid + s.alarmStatuses.unknown}
       />
       <Column
         id="sureAlarms"
@@ -115,7 +112,7 @@ export function CoverageTable(): JSX.Element {
         title="Number of sure alarms emitted by the Eva analysis"
         align="center"
         width={80}
-        getter={({ alarmStatuses }: stats) => alarmStatuses.invalid}
+        getter={(s: stats) => s.alarmStatuses.invalid}
       />
       <Column
         id="deadStatements"
@@ -124,7 +121,7 @@ export function CoverageTable(): JSX.Element {
         align="center"
         visible={false}
         width={80}
-        getter={({ coverage }: stats) => coverage.dead}
+        getter={(s: stats) => s.coverage.dead}
       />
       <Column
         id="reachableStatements"
@@ -133,7 +130,7 @@ export function CoverageTable(): JSX.Element {
         align="center"
         visible={false}
         width={80}
-        getter={({ coverage }: stats) => coverage.reachable}
+        getter={(s: stats) => s.coverage.reachable}
       />
       <Column
         id="totalStatements"
@@ -142,7 +139,7 @@ export function CoverageTable(): JSX.Element {
         align="center"
         visible={false}
         width={80}
-        getter={({ coverage }: stats) => coverage.dead + coverage.reachable}
+        getter={ (s: stats) => s.coverage.dead + s.coverage.reachable}
       />
       <Column
         id="coverage"
@@ -150,7 +147,7 @@ export function CoverageTable(): JSX.Element {
         title="Coverage of the Eva analysis"
         align="center"
         width={80}
-        getter={({ coverage }: stats) => coverage}
+        getter={(s: stats) => s.coverage}
         render={(coverage) => <>{percent(coverage)}</>}
       />
       <Column
@@ -158,8 +155,8 @@ export function CoverageTable(): JSX.Element {
         label=""
         align="center"
         width={80}
-        getter={({ coverage }: stats) => coverage}
-        render={(coverage) => (<CoverageMeter coverage={coverage} />)}
+        getter={(s: stats) => s.coverage}
+        render={(coverage) => <CoverageMeter coverage={coverage} />}
       />
     </Table>
   );

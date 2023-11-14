@@ -615,8 +615,8 @@ export const programStats: State.Value<programStatsType> = programStats_internal
 export interface functionStatsData {
   /** Entry identifier. */
   key: decl;
-  /** Function declaration tag */
-  decl: decl;
+  /** Function name */
+  fctName: string;
   /** Coverage of the Eva analysis */
   coverage: { reachable: number, dead: number };
   /** Alarms raised by the Eva analysis by category */
@@ -629,7 +629,7 @@ export interface functionStatsData {
 export const jFunctionStatsData: Json.Decoder<functionStatsData> =
   Json.jObject({
     key: jDecl,
-    decl: jDecl,
+    fctName: Json.jString,
     coverage: Json.jObject({ reachable: Json.jNumber, dead: Json.jNumber,}),
     alarmCount: Json.jArray(jAlarmEntry),
     alarmStatuses: jStatusesEntry,
@@ -638,10 +638,11 @@ export const jFunctionStatsData: Json.Decoder<functionStatsData> =
 /** Natural order for `functionStatsData` */
 export const byFunctionStatsData: Compare.Order<functionStatsData> =
   Compare.byFields
-    <{ key: decl, decl: decl, coverage: { reachable: number, dead: number },
+    <{ key: decl, fctName: string,
+       coverage: { reachable: number, dead: number },
        alarmCount: alarmEntry[], alarmStatuses: statusesEntry }>({
     key: byDecl,
-    decl: byDecl,
+    fctName: Compare.alpha,
     coverage: Compare.byFields
                 <{ reachable: number, dead: number }>({
                 reachable: Compare.number,
@@ -702,7 +703,7 @@ export const functionStats: State.Array<decl,functionStatsData> = functionStats_
 
 /** Default value for `functionStatsData` */
 export const functionStatsDataDefault: functionStatsData =
-  { key: declDefault, decl: declDefault, coverage: { reachable: 0, dead: 0 },
+  { key: declDefault, fctName: '', coverage: { reachable: 0, dead: 0 },
     alarmCount: [], alarmStatuses: statusesEntryDefault };
 
 const getStates_internal: Server.GetRequest<
