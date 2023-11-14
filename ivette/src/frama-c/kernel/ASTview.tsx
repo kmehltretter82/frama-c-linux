@@ -40,14 +40,12 @@ import * as Locations from './Locations';
 import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
 
-
-
 // -----------------------------------------------------------------------------
 //  Utilitary types and functions
 // -----------------------------------------------------------------------------
 
 // An alias type for functions and locations.
-type Fct = string | undefined;
+type Decl = Ast.decl | undefined;
 type Marker = Ast.marker | undefined;
 
 // A range is just a pair of position in the code.
@@ -502,36 +500,31 @@ const Callers = Editor.createField<Eva.CallSite[]>([]);
 // as inferred by Eva.
 const Callees = Editor.createField<Ast.decl[]>([]);
 
-// This field contains information on markers.
-type GetMarkerData = (key: Ast.marker) => Ast.markerAttributesData | undefined;
-const GetMarkerData = Editor.createField<GetMarkerData>(() => undefined);
-
 const ContextMenuHandler = createContextMenuHandler();
 function createContextMenuHandler(): Editor.Extension {
   const deps = {
     tree: Tree,
     callers: Callers,
     callees: Callees,
-    getData: GetMarkerData,
   };
   return Editor.createEventHandler(deps, {
     contextmenu: (inputs, view, event) => {
-      const { tree, callers, callees, getData } = inputs;
+      const { tree, callers, callees } = inputs;
       const coords = { x: event.clientX, y: event.clientY };
       const position = view.posAtCoords(coords); if (!position) return;
       const node = coveringNode(tree, position);
       if (!node || !node.marker) return;
       const items: Dome.PopupMenuItem[] = [];
       const { marker, kind, labelKind, name, definition, descr } =
-        getData(node.marker) ?? Ast.markerAttributesDataDefault;
+        States.getMarker(node.marker);
       if (kind === 'DFUN') {
         const groupedCallers = Lodash.groupBy(callers, ({ call }) => call);
         Lodash.forEach(groupedCallers, (group) => {
           const n = group.length;
           const { call } : Eva.CallSite = group[0];
           const { name: fct } = States.getDeclaration(call);
-          const caller = `Go to caller ${fct}`;
-          const nsites = n > 1 ? ` (${n} call sites)` : '';
+          const caller = `Goto ${fct} caller`;
+          const nsites = n > 1 ? `s (${n} call sites)` : '';
           const label = caller + nsites;
           const markers = callers.map(({ stmt }) => stmt);
           const index = callers.findIndex(({ call: f }) => f === call);
@@ -542,14 +535,14 @@ function createContextMenuHandler(): Editor.Extension {
           items.push({ label, onClick });
         });
       } else if (definition) {
-        const label = `Go to ${labelKind} ${name}`;
+        const label = `Goto ${name} (${labelKind.toLowerCase()})`;
         const onClick = (): void => States.setSelected(definition);
         items.push({ label, onClick });
       } else if (callees.length > 0) {
         callees.forEach((decl) => {
           const { name: fct } = States.getDeclaration(decl);
           const onClick = (): void => States.setCurrentScope(decl);
-          const label = `Go to definition of ${fct} (indirect)`;
+          const label = `Goto ${fct} (indirect call)`;
           items.push({ label, onClick });
         });
       }
@@ -635,27 +628,39 @@ function createTaintTooltip(): Editor.Extension {
 
 // Server request handler returning the given function's text.
 function useAST(decl: Ast.decl | undefined): text {
-  return States.useRequest(Ast.printDeclaration, decl) ?? [];
-}
-
-// Server request handler returning the given function's dead code information.
-function useFctDead(fct: Fct): Eva.deadCode {
-  return States.useRequest(Eva.getDeadCode, fct) ?? emptyDeadCode;
+  return States.useRequest(
+    Ast.printDeclaration, decl || undefined,
+    { onError: [] }
+  ) ?? [];
 }
 
 // Server request handler returning the given function's callers.
-function useFctCallers(fct: Fct): Eva.CallSite[] {
-  return States.useRequest(Eva.getCallers, fct) ?? [];
+function useCallers(decl: Decl): Eva.CallSite[] {
+  return States.useRequest(
+    Eva.getCallers, decl || undefined,
+    { onError: [] }
+  ) ?? [];
 }
 
 // Server request handler returning the given function's callers.
 function useCallees(marker: Marker): Ast.decl[] {
-  return States.useRequest(Eva.getCallees, marker || undefined) ?? [];
+  return States.useRequest(
+    Eva.getCallees, marker || undefined,
+    { onError: [] }
+  ) ?? [];
 }
 
 // Server request handler returning the tainted lvalues.
-function useFctTaints(fct: Fct): Eva.LvalueTaints[] {
-  return States.useRequest(Eva.taintedLvalues, fct, { onError: [] }) ?? [];
+function useTaints(decl: Decl): Eva.LvalueTaints[] {
+  return States.useRequest(Eva.taintedLvalues, decl, { onError: [] }) ?? [];
+}
+
+// Server request handler returning the given function's dead code information.
+function useDead(decl: Decl): Eva.deadCode {
+  return States.useRequest(
+    Eva.getDeadCode, decl || undefined,
+    { onError: emptyDeadCode }
+  ) ?? emptyDeadCode;
 }
 
 // -----------------------------------------------------------------------------
@@ -708,24 +713,18 @@ export default function ASTview(): JSX.Element {
   const tags = States.useTags(Properties.propStatusTags);
   React.useEffect(() => Tags.set(view, tags), [view, tags]);
 
-  // Marker attributes
-  const getData = States.useSyncArrayGetter(Ast.markerAttributes);
-  React.useEffect(() => GetMarkerData.set(view, getData), [view, getData]);
-
   // Printed AST
   const text = useAST(scope);
   React.useEffect(() => Text.set(view, text), [view, text]);
 
   // EVA Callbacks
-  const { kind, name } = States.useDeclaration(scope);
-  const fct = kind === 'FUNCTION' ? name : undefined;
-  const dead = useFctDead(fct);
+  const dead = useDead(scope);
   React.useEffect(() => Dead.set(view, dead), [view, dead]);
-  const callers = useFctCallers(fct);
+  const callers = useCallers(scope);
   React.useEffect(() => Callers.set(view, callers), [view, callers]);
   const callees = useCallees(hovered);
   React.useEffect(() => Callees.set(view, callees), [view, callees]);
-  const taints = useFctTaints(fct);
+  const taints = useTaints(scope);
   React.useEffect(() => TaintedLvalues.set(view, taints), [view, taints]);
 
   return (

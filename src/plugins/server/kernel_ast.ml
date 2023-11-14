@@ -429,7 +429,7 @@ struct
         ])
   let to_json = function
     | PStmt _ | PStmtStart _ -> `String "STMT"
-    | PVDecl(None,Kglobal,vi) ->
+    | PVDecl(_,Kglobal,vi) ->
       `String (if Globals.Functions.mem vi then "DFUN" else "DVAR")
     | PVDecl _ -> `String "DVAR"
     | PTermLval(_,_,_,(TVar { lv_origin = Some vi },TNoOffset))
