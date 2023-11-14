@@ -515,24 +515,24 @@ function createContextMenuHandler(): Editor.Extension {
       const node = coveringNode(tree, position);
       if (!node || !node.marker) return;
       const items: Dome.PopupMenuItem[] = [];
-      const { marker, kind, labelKind, name, definition, descr } =
-        States.getMarker(node.marker);
+      const attributes = States.getMarker(node.marker);
+      const { kind, labelKind, name, definition } = attributes;
       if (kind === 'DFUN') {
         const groupedCallers = Lodash.groupBy(callers, ({ call }) => call);
         Lodash.forEach(groupedCallers, (group) => {
           const n = group.length;
           const { call } : Eva.CallSite = group[0];
           const { name: fct } = States.getDeclaration(call);
-          const caller = `Goto ${fct} caller`;
+          const caller = `caller ${fct}`;
           const nsites = n > 1 ? `s (${n} call sites)` : '';
-          const label = caller + nsites;
+          const label = `Goto ${caller}${nsites}`;
+          const descr = `Calls to ${name} from ${fct}`;
           const markers = callers.map(({ stmt }) => stmt);
           const index = callers.findIndex(({ call: f }) => f === call);
-          const title = `Call sites of function ${fct}`;
           const onClick = (): void => Locations.setSelection({
-            label, title, markers, index
+            label: descr, markers, index
           });
-          items.push({ label, onClick });
+          items.push({ label: `Goto ${label}`, onClick });
         });
       } else if (definition) {
         const label = `Goto ${name} (${labelKind.toLowerCase()})`;
@@ -546,7 +546,7 @@ function createContextMenuHandler(): Editor.Extension {
           items.push({ label, onClick });
         });
       }
-      Studia.buildMenu(items, marker, kind, descr);
+      Studia.buildMenu(items, attributes);
       items.push({
         label: 'Copy to clipboard',
         onClick: () => {

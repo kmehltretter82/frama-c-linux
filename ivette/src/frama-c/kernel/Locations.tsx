@@ -42,7 +42,7 @@ import * as Ast from 'frama-c/kernel/api/ast';
 
 export interface MultiSelection {
   label: string;
-  title: string;
+  title?: string;
   markers: Ast.marker[];
   index?: number;
 }
@@ -141,7 +141,6 @@ export default function LocationsTable(): JSX.Element {
   }, [model, markers]);
   const selected = index !== undefined ? markers[index] : undefined;
   const size = markers.length;
-  const display = size > 0 ? label : `${label} (empty)`;
   const kindex = index === undefined ? (-1) : index;
   const indexLabel = index === undefined ? '…' : index+1;
   const positionLabel = `${indexLabel} / ${size}`;
@@ -183,7 +182,7 @@ export default function LocationsTable(): JSX.Element {
           onClick={clearSelection}
         />
       </TitleBar>
-      <Label label={display} title={title} style={{ textAlign: 'center' }} />
+      <Label label={label} title={title} style={{ textAlign: 'center' }} />
       <Table<Ast.marker, Data>
         model={model}
         display={size >0}

@@ -53,43 +53,47 @@ async function computeStudiaSelection(
   Locations.setSelection({ label, title, markers, index: 0 });
 }
 
-const isLval = (kind: Ast.markerKind):boolean => {
-  switch(kind) {
-    case 'LVAL':
-    case 'LVAR':
-    case 'DVAR':
-      return true;
-    default:
-      return false;
-  }
-};
-
 /** Builds the Studia entries in the contextual menu about a given marker.  */
 export function buildMenu(
   menu: Dome.PopupMenuItem[],
-  marker: Ast.marker,
-  kind: Ast.markerKind,
-  descr: string
+  attr: Ast.markerAttributesData,
 ): void {
-  if (marker && isLval(kind)) {
-    menu.push({
-      label: `Studia: select reads of ${descr}`,
-      onClick: () => computeStudiaSelection('Reads', marker, descr)
-    });
-    menu.push({
-      label: `Studia: select writes of ${descr}`,
-      onClick: () => computeStudiaSelection('Writes', marker, descr)
-    });
-  }
-  if (marker && kind === 'STMT') {
-    menu.push({
-      label: `Studia: select reads of …`,
-      onClick: () => Ivette.focusMode(studiaReadsMode.id)
-    });
-    menu.push({
-      label: `Studia: select writes of …`,
-      onClick: () => Ivette.focusMode(studiaWritesMode.id)
-    });
+  const { marker, kind } = attr;
+  switch(kind) {
+    case 'LVAL':
+      menu.push({
+        label: 'Studia: select reads of l-value',
+        onClick: () => computeStudiaSelection('Reads', marker, attr.descr)
+      });
+      menu.push({
+        label: 'Studia: select writes of l-value',
+        onClick: () => computeStudiaSelection('Writes', marker, attr.descr)
+      });
+      return;
+    case 'DVAR':
+    case 'LVAR':
+      {
+        const name = attr.name || attr.descr;
+        menu.push({
+          label: `Studia: select reads of ${name}`,
+          onClick: () => computeStudiaSelection('Reads', marker, name)
+        });
+        menu.push({
+          label: `Studia: select writes of ${name}`,
+          onClick: () => computeStudiaSelection('Writes', marker, name)
+        });
+      }
+      return;
+    case 'STMT':
+      menu.push({
+        label: `Studia: select reads of …`,
+        onClick: () => Ivette.focusMode(studiaReadsMode.id)
+      });
+      menu.push({
+        label: `Studia: select writes of …`,
+        onClick: () => Ivette.focusMode(studiaWritesMode.id)
+      });
+      return;
   }
 }
 
