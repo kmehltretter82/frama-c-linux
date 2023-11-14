@@ -115,17 +115,30 @@ function gotoIndex(index: number): void {
 
 interface Data {
   index: number,
-  marker: Ast.marker,
+  attr: Ast.markerAttributesData,
+  decl: Ast.declAttributesData,
 }
 
 class Model extends CompactModel<Ast.marker, Data> {
-  constructor() { super(({ marker }) => marker); }
+  constructor() { super(({ attr }) => attr.marker); }
 }
 
-const getIndex = (d : Data): number => d.index + 1;
+const renderIndex: Renderer<number> =
+  (index) => <Cell label={`${index+1}`}/>;
 
-const renderCell: Renderer<string> =
-  (text: string): JSX.Element => (<Cell title={text}>{text}</Cell>);
+const renderSource: Renderer<Data> =
+  (d) => {
+    const sloc = d.attr.sloc;
+    const name = d.decl.name;
+    const decl = d.decl.label;
+    const label = sloc === undefined ? name : `${name}:${sloc.line}`;
+    const title = sloc === undefined ? decl :
+                  `${decl}, file ${sloc.base}, line ${sloc.line}`;
+    return <Cell title={title} label={label} />;
+  };
+
+const renderAttr: Renderer<Ast.markerAttributesData> =
+  (attr) => <Cell title={attr.descr}>{attr.descr}</Cell>;
 
 export default function LocationsTable(): JSX.Element {
 
@@ -136,22 +149,18 @@ export default function LocationsTable(): JSX.Element {
   const { label, title, markers, index } = useSelection();
   React.useEffect(() => {
     model.replaceAllDataWith(
-      markers.map((marker, index): Data => ({ index, marker }))
+      markers.map((marker, index): Data => {
+        const attr = getAttr(marker) ?? Ast.markerAttributesDataDefault;
+        const decl = getDecl(attr.scope) ?? Ast.declAttributesDataDefault;
+        return { index, attr, decl };
+      })
     );
-  }, [model, markers]);
+  }, [model, markers, getAttr, getDecl]);
   const selected = index !== undefined ? markers[index] : undefined;
   const size = markers.length;
   const kindex = index === undefined ? (-1) : index;
   const indexLabel = index === undefined ? '…' : index+1;
   const positionLabel = `${indexLabel} / ${size}`;
-
-  const getLocation = React.useCallback((d: Data): string => {
-    const attr = getAttr(d.marker);
-    if (!attr) return '';
-    const decl = getDecl(attr.scope);
-    if (!decl) return '';
-    return `${decl.name}: ${attr.descr}`;
-  }, [getDecl, getAttr]);
 
   // Component
   return (
@@ -182,21 +191,23 @@ export default function LocationsTable(): JSX.Element {
           onClick={clearSelection}
         />
       </TitleBar>
-      <Label label={label} title={title} style={{ textAlign: 'center' }} />
-      <Table<Ast.marker, Data>
+      <Label className='locations' label={label} title={title} />
+      <Table
         model={model}
         display={size >0}
         selection={selected}
-        onSelection={(_marker, _data, index) => gotoIndex(index)}
-      >
+        onSelection={(_row, _key, index) => gotoIndex(index)}
+        >
         <Column
           id='index' label='#' align='center' width={25}
-          getter={getIndex}
-        />
+          render={renderIndex} />
         <Column
-          id='marker' label='Location' fill
-          getter={getLocation} render={renderCell}
-        />
+          id='source' label='Source'
+          getter={(d: Data) => d}
+          render={renderSource} />
+        <Column
+          id='attr' label='Location' fill
+          render={renderAttr} />
       </Table>
     </>
   );
