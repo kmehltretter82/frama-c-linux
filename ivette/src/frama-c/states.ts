@@ -676,15 +676,21 @@ export function useCurrentLocation(): Location {
   return curr;
 }
 
-export function setCurrentLocation(l: Location, meta = false): void {
+export function setCurrentLocation(newLoc: Location, meta = false): void {
   const s = GlobalHistory.getValue();
-  const empty = isEmpty(l);
-  GlobalHistory.setValue({
-    curr: l,
-    next: empty ? s.next : [],
-    prev: pushLoc(s.curr, s.prev)
-  });
-  if (meta && !empty) MetaSelection.emit(l);
+  const { curr: oldLoc } = s;
+  const definedTarget = !isEmpty(newLoc);
+  const definedScope = oldLoc.scope !== undefined;
+  if (definedScope && oldLoc.scope === newLoc.scope) {
+    GlobalHistory.setValue({ ...s, curr: newLoc });
+  } else {
+    GlobalHistory.setValue({
+      curr: newLoc,
+      next: definedTarget ? [] : s.next,
+      prev: definedScope ? pushLoc(oldLoc, s.prev) : s.prev,
+    });
+  }
+  if (meta && !isEmpty(newLoc)) MetaSelection.emit(newLoc);
 }
 
 export function useHistory(): History {
