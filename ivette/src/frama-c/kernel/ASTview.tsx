@@ -525,24 +525,24 @@ function createContextMenuHandler(): Editor.Extension {
           const { name: fct } = States.getDeclaration(call);
           const caller = `caller ${fct}`;
           const nsites = n > 1 ? `s (${n} call sites)` : '';
-          const label = `Goto ${caller}${nsites}`;
+          const label = `Go to ${caller}${nsites}`;
           const descr = `Calls to ${name} from ${fct}`;
           const markers = callers.map(({ stmt }) => stmt);
           const index = callers.findIndex(({ call: f }) => f === call);
           const onClick = (): void => Locations.setSelection({
             label: descr, markers, index
           });
-          items.push({ label: `Goto ${label}`, onClick });
+          items.push({ label: `Go to ${label}`, onClick });
         });
       } else if (definition) {
-        const label = `Goto ${name} (${labelKind.toLowerCase()})`;
+        const label = `Go to ${name} (${labelKind.toLowerCase()})`;
         const onClick = (): void => States.setSelected(definition);
         items.push({ label, onClick });
       } else if (callees.length > 0) {
         callees.forEach((decl) => {
           const { name: fct } = States.getDeclaration(decl);
           const onClick = (): void => States.setCurrentScope(decl);
-          const label = `Goto ${fct} (indirect call)`;
+          const label = `Go to ${fct} (indirect call)`;
           items.push({ label, onClick });
         });
       }
