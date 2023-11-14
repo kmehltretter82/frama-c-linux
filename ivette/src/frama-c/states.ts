@@ -597,12 +597,17 @@ function syncCurrentSelection(): void {
   }
 }
 
-{
+async function selectMainFunction(): Promise<void> {
+  const decl = await Server.send(Ast.getMainFunction, null);
+  if (decl !== undefined) setCurrentScope(decl);
+}
 
+{
   Server.onReady(clearHistory);
   Server.onShutdown(clearHistory);
   onSyncArray(Ast.markerAttributes, syncCurrentSelection);
   onSyncArray(Ast.declAttributes, syncCurrentSelection);
+  Server.onReady(selectMainFunction);
 }
 
 // --------------------------------------------------------------------------
