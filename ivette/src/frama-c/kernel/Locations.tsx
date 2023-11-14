@@ -35,19 +35,23 @@ import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
 import { TitleBar } from 'ivette';
 import * as Ast from 'frama-c/kernel/api/ast';
+import * as Status from 'frama-c/kernel/Status';
 
 // --------------------------------------------------------------------------
 // --- Global Multi-Selection
 // --------------------------------------------------------------------------
 
 export interface MultiSelection {
+  plugin: string;
   label: string;
   title?: string;
   markers: Ast.marker[];
   index?: number;
 }
 
-const emptySelection = { label: '', title: '', markers: [], index: 0 };
+const emptySelection = {
+  plugin: '', label: '', title: '', markers: [], index: 0
+};
 const MultiSelection = new GlobalState<MultiSelection>(emptySelection);
 
 export function useSelection(): MultiSelection {
@@ -60,6 +64,14 @@ export function setSelection(s: MultiSelection): void
   MultiSelection.setValue(s);
   const marker = s.index !== undefined ? s.markers[s.index] : undefined;
   if (marker) States.setSelected(marker);
+  if (s.plugin && s.markers.length > 0) {
+    const text = `${s.plugin}: ${s.markers.length} locs`;
+    const title = `${s.label} (${s.markers.length} locations)`;
+    Status.setMessage({
+      text, title,
+      kind: 'success'
+    });
+  }
 }
 
 export function setIndex(index: number): void {

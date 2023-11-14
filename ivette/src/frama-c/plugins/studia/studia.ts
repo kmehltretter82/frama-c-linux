@@ -33,8 +33,8 @@ import './style.css';
 type access = 'Reads' | 'Writes';
 
 function handleError(err: string): void {
-  const msg = `Studia failure: ${err}.`;
-  Status.setMessage({ text: msg, kind: 'error' });
+  const text = `Studia failure: ${err}.`;
+  Status.setMessage({ text, kind: 'error' });
 }
 
 async function computeStudiaSelection(
@@ -50,7 +50,9 @@ async function computeStudiaSelection(
   const access = kind === 'Reads' ? 'accessing' : 'modifying';
   const tail = `the memory location pointed by ${descr}`;
   const title = asLocs ? `List of statements ${access} ${tail}.` : '';
-  Locations.setSelection({ label, title, markers, index: 0 });
+  Locations.setSelection({
+    plugin: 'Studia', label, title, markers, index: 0
+  });
 }
 
 /** Builds the Studia entries in the contextual menu about a given marker.  */

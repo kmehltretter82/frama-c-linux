@@ -530,7 +530,7 @@ function createContextMenuHandler(): Editor.Extension {
           const markers = callers.map(({ stmt }) => stmt);
           const index = callers.findIndex(({ call: f }) => f === call);
           const onClick = (): void => Locations.setSelection({
-            label: descr, markers, index
+            label: descr, markers, index, plugin: 'Callers',
           });
           items.push({ label: `Go to ${label}`, onClick });
         });

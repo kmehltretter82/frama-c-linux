@@ -539,6 +539,7 @@ class Dive {
     const markers = node.data()?.writes as Ast.marker[];
     if (label && markers) {
       Locations.setNextSelection({
+        plugin: 'Dive',
         label: `Dive: writes to ${label}`,
         title: 'Selected writes from Dive current selection',
         markers
@@ -560,6 +561,7 @@ class Dive {
     const markers = edge.data()?.origins as Ast.marker[];
     if (markers) {
       Locations.setNextSelection({
+        plugin: `Dive`,
         label: `Dive: origins`,
         title: 'Origins of current edge in Dive graph',
         markers
