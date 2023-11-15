@@ -140,7 +140,8 @@ function createSyncOnUserSelection(): Editor.Extension {
           // The forced reload should NOT be necessary but... It is...
           await Server.send(Ast.reloadMarkerAttributes, null);
           States.setSelected(marker);
-          const location = States.getCurrentLocation();
+          const scope = States.getMarker(marker)?.scope;
+          const location = { marker, scope };
           Locations.set(view, { cursor: location, current: location });
         }
       } catch {
