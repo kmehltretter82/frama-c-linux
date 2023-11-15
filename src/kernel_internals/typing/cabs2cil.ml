@@ -1939,17 +1939,20 @@ struct
     let block_chunk = c2stmt_effect ~ghost se in
     {empty with stmts = [ block_chunk ]; locals}
 
-  (* This function is used to hide a chunk se inside a block and only make
-     visible its result (expr e).
-     We first create a new tmp variable which will store e, we concat both
-     chunks, enclosed it inside a block, and return the resulting chunk and our
-     tmp variable as the new result.
+  (* This function is used to hide a chunk inside a block and only make
+     visible its result.
+     We first create a new tmp variable which stores se's result, we concat it
+     with se, enclose them inside a block, and return the resulting chunk and
+     our tmp variable as the new result.
 
-     se : struct X tmp; tmp = ...;
-     e : tmp.arr
-     becomes
-     se' : struct X tmp; tmp = ...; tmp_res = tmp.arr;
-     e' : tmp_res
+     Result for type t :
+     se' :
+       t tmp_0;
+       {
+        se;
+        tmp_0 = e;
+       }
+     e' : tmp_0
   *)
   let hide_chunk ~ghost ~loc read se e t =
     let descr =
@@ -1957,7 +1960,7 @@ struct
     in
     let tmp_res = newTempVar ~ghost loc descr true t in
     let tmp_res_lv = (Var tmp_res, NoOffset) in
-    let res_instr = Set(tmp_res_lv, e, loc) in
+    let res_instr = Set (tmp_res_lv, e, loc) in
     let res_stmt = Cil.mkStmtOneInstr ~ghost ~valid_sid res_instr in
     let res_chunk = i2c (res_stmt, [], [tmp_res_lv], read) in
     let se_res_chunk = se @@@ (res_chunk, ghost) in
@@ -7797,7 +7800,7 @@ and doCondition ~is_loop local_env asconst
     (sf: chunk) : chunk =
   let ghost = local_env.is_ghost in
   contains_temp_subarray := false;
-  if isEmpty st && isEmpty sf(*TODO: ignore attribute FRAMA_C_KEEP_BLOCK*) then
+  if isEmpty st && isEmpty sf (*TODO: ignore attribute FRAMA_C_KEEP_BLOCK*) then
     begin
       let (_, se, e, _) = doExp local_env CNoConst e ADrop in
       let se' =
@@ -7822,9 +7825,11 @@ and doCondition ~is_loop local_env asconst
     if !contains_temp_subarray then begin
       contains_temp_subarray := false;
       if is_loop then
-        (* enclose our problematic chunk and the break condition. *)
+        (* Enclose everything (problematic chunk and break loop condition). *)
         enclose_chunk ~ghost (compileCondExp ~ghost ce st sf)
       else
+        (* The condition chunk will be hided, and a tmp variable will be used
+           instead in the condition. *)
         compileCondExp ~hide:true ~ghost ce st sf
     end
     else compileCondExp ~ghost ce st sf
@@ -7837,22 +7842,9 @@ and doPureExp local_env (e : Cabs.expression) : exp =
       ~once:true ~current:true "%a has side-effects" Cprint.print_expression e;
   e'
 
-(* If we have a problem :
-    if e result is dropped, then just enclose the block :
-    p = get_x().arr;
-    //becomes
-    {
-      struct X tmp;
-      tmp = get_x();
-      p = tmp.arr
-    }
-    else hide the chunk by creating a new variable to
-    store its result, enclosing it inside a block, and use this tmp as a result.
-   else proceed as usual.
-*)
 and doFullExp local_env const e what =
   contains_temp_subarray := false;
-  let (r, se,e,t) = doExp local_env const e what in
+  let (r, se, e, t) = doExp local_env const e what in
   let ghost = local_env.is_ghost in
   let loc = e.eloc in
   let se', e' =
