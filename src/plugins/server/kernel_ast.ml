@@ -899,26 +899,28 @@ let () = Server_parameters.Debug.add_hook_on_update
 (* -------------------------------------------------------------------------- *)
 
 let get_marker_at ~file ~line ~col =
-  let pos_path = Filepath.Normalized.of_string file in
-  let pos =
-    Filepath.{ pos_path; pos_lnum = line; pos_cnum = col; pos_bol = 0; }
-  in
-  Printer_tag.loc_to_localizable ~precise_col:true pos
+  if file="" then None else
+    let pos_path = Filepath.Normalized.of_string file in
+    let pos =
+      Filepath.{ pos_path; pos_lnum = line; pos_cnum = col; pos_bol = 0; }
+    in
+    Printer_tag.loc_to_localizable ~precise_col:true pos
 
 let () =
   let descr =
     Md.plain
       "Returns the marker and function at a source file position, if any. \
-       Input: file path, line and column."
+       Input: file path, line and column. \
+       File can be empty, in case no marker is returned."
   in
   let signature = Request.signature
       ~output:(module Joption(Marker)) () in
   let get_file = Request.param signature
       ~name:"file" ~descr:(Md.plain "File path") (module Jstring) in
   let get_line = Request.param signature
-      ~name:"line" ~descr:(Md.plain "Line number") (module Jint) in
+      ~name:"line" ~descr:(Md.plain "Line (1-based)") (module Jint) in
   let get_col = Request.param signature
-      ~name:"column" ~descr:(Md.plain "Column number") (module Jint) in
+      ~name:"column" ~descr:(Md.plain "Column (0-based)") (module Jint) in
   Request.register_sig signature
     ~package ~descr ~kind:`GET ~name:"getMarkerAt"
     ~signals:[ast_changed_signal]

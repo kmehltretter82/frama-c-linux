@@ -375,6 +375,26 @@ function createSelectionField(): Field<EditorSelection> {
   return { ...field, set, extension: [field.extension, updater] };
 }
 
+export type RangeCallback = (offset: number, endOffset: number) => void;
+export const OnSelection = createOnSelectionField();
+function createOnSelectionField(): Field<RangeCallback|null> {
+  const field = createField<RangeCallback|null>(null);
+  const set: Set<RangeCallback|null> = (view, fn) => {
+    field.set(view, fn);
+  };
+  const updater = EditorView.updateListener.of((update) => {
+    if (update.selectionSet) {
+      const view = update.view;
+      const fn = field.get(view.state);
+      if (fn !== null) {
+        const { from: offset, to: endOffset } = view.state.selection.main;
+        fn(offset, endOffset);
+      }
+    }
+  });
+  return { ...field, set, extension: [field.extension, updater] };
+}
+
 export const Document = createDocumentField();
 function createDocumentField(): Field<Text> {
   const field = createField<Text>(Text.empty);

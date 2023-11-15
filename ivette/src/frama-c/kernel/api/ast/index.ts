@@ -558,7 +558,7 @@ const getMarkerAt_internal: Server.GetRequest<
   output: Json.jOption(jMarker),
   signals: [ { name: 'kernel.ast.changed' } ],
 };
-/** Returns the marker and function at a source file position, if any. Input: file path, line and column. */
+/** Returns the marker and function at a source file position, if any. Input: file path, line and column. File can be empty, in case no marker is returned. */
 export const getMarkerAt: Server.GetRequest<
   { file: string, line: number, column: number },
   marker |
