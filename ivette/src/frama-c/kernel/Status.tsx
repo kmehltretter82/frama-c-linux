@@ -47,7 +47,7 @@ const emptyMessage: MessageProps = { text: '', kind: 'none' };
 const GlobalMessage = new GlobalState(emptyMessage);
 
 const clearMessage = (): void => setMessage(emptyMessage);
-const triggerClearMessage = _.debounce(clearMessage, 3000);
+const triggerClearMessage = _.debounce(clearMessage, 15000);
 
 export function setMessage(message: MessageProps): void {
   GlobalMessage.setValue(message);
