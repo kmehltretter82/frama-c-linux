@@ -65,8 +65,10 @@ export function setSelection(s: MultiSelection): void
   const marker = s.index !== undefined ? s.markers[s.index] : undefined;
   if (marker) States.setSelected(marker);
   if (s.plugin && s.markers.length > 0) {
-    const text = `${s.plugin}: ${s.markers.length} locs`;
-    const title = `${s.label} (${s.markers.length} locations)`;
+    const text =
+      `${s.plugin}: ${s.markers.length} locations selected, \
+      listed in the 'Locations' panel`;
+    const title = `${s.label}: ${s.markers.length} locations selected`;
     Status.setMessage({
       text, title,
       kind: 'success'
@@ -138,15 +140,20 @@ class Model extends CompactModel<Ast.marker, Data> {
 const renderIndex: Renderer<number> =
   (index) => <Cell label={`${index+1}`}/>;
 
-const renderSource: Renderer<Data> =
+const renderDecl: Renderer<Data> =
+(d) => {
+  const name = d.decl.name;
+  const label = d.decl.label;
+  return <Cell label={name} title={label} />;
+};
+
+const renderLocation: Renderer<Data> =
   (d) => {
-    const sloc = d.attr.sloc;
-    const name = d.decl.name;
-    const decl = d.decl.label;
-    const label = sloc === undefined ? name : `${name}:${sloc.line}`;
-    const title = sloc === undefined ? decl :
-                  `${decl}, file ${sloc.base}, line ${sloc.line}`;
-    return <Cell title={title} label={label} />;
+    const loc = d.attr.sloc;
+    if (loc)
+      return <Cell label={`${loc.base}:${loc.line}`} title={loc.file} />;
+    else
+      return null;
   };
 
 const renderAttr: Renderer<Ast.markerAttributesData> =
@@ -209,16 +216,23 @@ export default function LocationsTable(): JSX.Element {
         display={size >0}
         selection={selected}
         onSelection={(_row, _key, index) => gotoIndex(index)}
+        settings="ivette.locations.table"
         >
         <Column
           id='index' label='#' align='center' width={25}
           render={renderIndex} />
         <Column
-          id='source' label='Source'
+          id='decl' label='Scope'
+          width={100}
           getter={(d: Data) => d}
-          render={renderSource} />
+          render={renderDecl} />
         <Column
-          id='attr' label='Location' fill
+          id='location' label='Location'
+          width={180}
+          getter={(d: Data) => d}
+          render={renderLocation} />
+        <Column
+          id='attr' label='Marker' fill
           render={renderAttr} />
       </Table>
     </>
