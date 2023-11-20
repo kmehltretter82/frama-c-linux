@@ -32,7 +32,7 @@ type declaration =
   | SGlobal of varinfo
   | SFunction of kernel_function
 
-(** Prints a concise label of the declaration *)
+(** Prints a concise label of the declaration. *)
 val pp_declaration : Format.formatter -> declaration -> unit
 
 module Declaration: Datatype.S_with_collections with type t = declaration
@@ -76,23 +76,23 @@ module Localizable: Datatype.S_with_collections with type t = localizable
 
 (** {2 Declaration of Localizable}
 
-    Localizable items are always printed under a certain global scole
+    Localizable items are always printed under a certain global scope
     identified by a declaration that can be retrieved from
     {!declaration_of_type}, {!declaration_of_global}, {!declaration_of_property}
     and {!declaration_of_localizable} functions below.
 
-    Moreoever, each declarated item can be identified in two different ways: a
+    Moreover, each declared item can be identified in two different ways: a
     declaration scope and its own localizable inside this scope. Functions
     {!localizable_of_kf}, {!localizable_of_global} and
     {!localizable_of_declaration} can be used to obtain the self-localization of
     declarations.
 
-    Differently, some localizable refer to some global declaration, eg.
+    Differently, some localizable refers to some global declaration, eg.
     a variable or a function inside an expression or the compound name
     of a type. In such a case, functions {!definition_of_type} and
-    {!definition_of_localizable} returns the localization of the referenced
+    {!definition_of_localizable} return the localization of the referenced
     declaration. It is returned as a localization to the associated declaration,
-    which scope can be obtained in turn with {!declaration_of_localizable}.
+    whose scope can be obtained in turn with {!declaration_of_localizable}.
 
 *)
 
