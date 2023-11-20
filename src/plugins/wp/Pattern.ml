@@ -336,6 +336,8 @@ let rec pmatch env (p : pattern) e =
     pac env (Lang.F.e_fun lf) [] ps es
   | Assoc(`Bxor,ps) , Fun(lf,es) when lf == Cint.f_lxor ->
     pac env (Lang.F.e_fun lf) [] ps es
+  | Assoc(`Concat,ts) , Fun(lf, es) when lf == Vlist.f_concat ->
+    pac env (Lang.F.e_fun lf) [] ts es
   | Binop(p,`Div,q) , Div(a,b) -> pbinop env p q a b
   | Binop(p,`Mod,q) , Mod(a,b) -> pbinop env p q a b
   | Binop(p,`Eq,q) , Eq(a,b) -> pbinop env p q a b
