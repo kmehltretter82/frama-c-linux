@@ -315,6 +315,8 @@ struct
 
   let model = States.model ()
 
+  (* We must iterate over all known declaration in the Ast, contrarily to
+     markers, for which we ony need attributes of already generated markers. *)
   let iter_declaration f =
     if Ast.is_computed () then
       let marked = Declaration.Hashtbl.create 0 in
