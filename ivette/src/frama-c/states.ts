@@ -91,7 +91,9 @@ export function useRequest<In, Out>(
         const r = await Server.send(rq, params);
         updateResponse(r);
       } catch (error) {
-        D.error(`Fail in useRequest '${rq.name}'. ${error}`);
+        if (options.onError !== undefined) {
+          D.error(`Fail in useRequest '${rq.name}'. ${error}`);
+        }
         updateResponse(options.onError);
       }
     } else {

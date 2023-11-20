@@ -120,7 +120,9 @@ function Callgraph() : JSX.Element {
   const graph = States.useSyncValue(CgAPI.callgraph);
   const [cy, setCy] = React.useState<Cy.Core>();
   const [cs] = useGlobalState(CallstackState);
-  const callstack = States.useRequest(ValuesAPI.getCallstackInfo, cs);
+  const callstack = States.useRequest(
+    ValuesAPI.getCallstackInfo, cs, { onError: [] }
+  );
   const scope = States.useCurrentScope();
   const layout = { name: 'cola', nodeSpacing: 32 };
   const computedStyle = getComputedStyle(document.documentElement);
