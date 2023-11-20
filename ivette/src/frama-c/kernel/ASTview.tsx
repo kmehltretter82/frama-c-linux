@@ -519,6 +519,8 @@ function createContextMenuHandler(): Editor.Extension {
       const { kind, labelKind, name, definition } = attributes;
       if (kind === 'DFUN') {
         const groupedCallers = Lodash.groupBy(callers, ({ call }) => call);
+        const markers = callers.map(({ stmt }) => stmt);
+        const descr = `Calls to ${name}`;
         Lodash.forEach(groupedCallers, (group) => {
           const n = group.length;
           const { call } : Eva.CallSite = group[0];
@@ -526,13 +528,11 @@ function createContextMenuHandler(): Editor.Extension {
           const caller = `caller ${fct}`;
           const nsites = n > 1 ? `s (${n} call sites)` : '';
           const label = `Go to ${caller}${nsites}`;
-          const descr = `Calls to ${name} from ${fct}`;
-          const markers = callers.map(({ stmt }) => stmt);
           const index = callers.findIndex(({ call: f }) => f === call);
           const onClick = (): void => Locations.setSelection({
             label: descr, markers, index, plugin: 'Callers',
           });
-          items.push({ label: `Go to ${label}`, onClick });
+          items.push({ label, onClick });
         });
       } else if (definition) {
         const label = `Go to ${name} (${labelKind.toLowerCase()})`;
