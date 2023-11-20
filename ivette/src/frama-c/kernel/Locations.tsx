@@ -36,6 +36,7 @@ import { Space } from 'dome/frame/toolbars';
 import { TitleBar } from 'ivette';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Status from 'frama-c/kernel/Status';
+import * as Server from 'frama-c/server';
 
 // --------------------------------------------------------------------------
 // --- Global Multi-Selection
@@ -75,6 +76,8 @@ export function setSelection(s: MultiSelection): void
     });
   }
 }
+
+Server.onShutdown(() => MultiSelection.setValue(emptySelection));
 
 export function setIndex(index: number): void {
   const s = MultiSelection.getValue();
