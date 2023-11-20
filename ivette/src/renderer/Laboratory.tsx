@@ -605,7 +605,7 @@ export interface LabViewProps {
 /**
    Reconfigurable Component Display.
  */
-export function LabView(props: LabViewProps): JSX.Element {
+export function LabView2(props: LabViewProps): JSX.Element {
   // Parameters
   const { settings, customize = false } = props;
   const settingSplit = settings && `${settings}.split`;

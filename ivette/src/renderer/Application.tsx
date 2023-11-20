@@ -33,7 +33,7 @@ import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Sidebar from './Sidebar';
 import * as Controller from './Controller';
-import * as Laboratory from './Laboratory';
+import * as Lab from './Lab';
 import * as Ext from './Extensions';
 import { TOOLBAR, STATUSBAR } from 'ivette';
 import * as IvettePrefs from 'ivette/prefs';
@@ -67,8 +67,6 @@ export default function Application(): JSX.Element {
         <Controller.Control />
         <>{tools}</>
         <Toolbar.Filler />
-        <Toolbar.ViewTabs />
-        <Toolbar.Filler />
         <IvettePrefs.ThemeSwitchTool />
         <IvettePrefs.FontTools />
         <Toolbar.ModalActionField />
@@ -81,16 +79,12 @@ export default function Application(): JSX.Element {
       </Toolbar.ToolBar>
       <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
         <Sidebar.Panel />
-        <Laboratory.LabView
-          customize={viewbar}
-          settings="frama-c.labview"
-        />
+        <Lab.LabView />
       </LSplit>
       <Toolbar.ToolBar>
         <Controller.Status />
         <>{status}</>
         <Toolbar.Filler />
-        <Toolbar.ComponentDD />
         <Controller.Stats />
       </Toolbar.ToolBar>
     </Vfill>
