@@ -34,6 +34,7 @@ import * as Toolbars from 'dome/frame/toolbars';
 import * as Ivette from 'ivette';
 import * as Preferences from 'ivette/prefs';
 
+import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Status from 'frama-c/kernel/Status';
 import * as Ast from 'frama-c/kernel/api/ast';
@@ -177,8 +178,12 @@ export default function SourceCode(): JSX.Element {
   const selectedMarker = States.useSelected();
   const { sloc, kind } = States.useMarker(selectedMarker);
   const [floc, setFloc] = React.useState<Ast.source | undefined>();
+  const server = Server.useStatus();
   const isTop = isToplevelDecl(kind);
-  React.useEffect(() => { if (sloc) setFloc(sloc); }, [sloc]);
+  React.useEffect(() => {
+    if (server !== 'ON') setFloc(undefined);
+    else if (sloc) setFloc(sloc);
+  }, [sloc, server]);
   const file = floc?.file;
   const filename = floc?.base;
   const selectedMarkerLine = floc?.line ?? 0;
