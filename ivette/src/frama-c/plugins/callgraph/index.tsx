@@ -95,11 +95,11 @@ function convertGraph(graph: CgAPI.graph): object[] {
   return elements;
 }
 
-function selectFct(cy: Cy.Core, fct: string | undefined): void {
+function selectNode(cy: Cy.Core, nodeId: States.Scope): void {
   const className = 'marker-selected';
   cy.$(`.${className}`).removeClass(className);
-  if (fct) {
-    cy.$(`node[id='${fct}']`).addClass(className);
+  if (nodeId) {
+    cy.$(`node[id='${nodeId}']`).addClass(className);
   }
 }
 
@@ -122,8 +122,6 @@ function Callgraph() : JSX.Element {
   const [cs] = useGlobalState(CallstackState);
   const callstack = States.useRequest(ValuesAPI.getCallstackInfo, cs);
   const scope = States.useCurrentScope();
-  const { kind, name } = States.useDeclaration(scope);
-  const fct = kind === 'FUNCTION' ? name : undefined;
   const layout = { name: 'cola', nodeSpacing: 32 };
   const computedStyle = getComputedStyle(document.documentElement);
   const styleVariables =
@@ -138,7 +136,7 @@ function Callgraph() : JSX.Element {
   ];
 
   // Marker selection
-  React.useEffect(() => { cy && selectFct(cy, fct); }, [cy, fct]);
+  React.useEffect(() => { cy && selectNode(cy, scope); }, [cy, scope]);
 
   // Callstack selection
   React.useEffect(() => {
@@ -150,8 +148,8 @@ function Callgraph() : JSX.Element {
     if (cy) {
       cy.off('click');
       cy.on('click', 'node', (event) => {
-        const { decl } = event.target.data;
-        States.setCurrentScope(decl);
+        const { id } = event.target.data();
+        States.setCurrentScope(id);
       });
     }
   }, [cy]);
