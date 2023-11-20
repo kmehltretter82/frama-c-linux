@@ -180,16 +180,6 @@ function Callgraph() : JSX.Element {
 // --- Ivette Component
 // --------------------------------------------------------------------------
 
-function CallgraphComponent(): JSX.Element {
-  // Component
-  return (
-    <>
-      <Callgraph />
-    </>
-  );
-}
-
-
 Ivette.registerComponent({
   id: 'frama-c.plugins.callgraph',
   label: 'Call Graph',
@@ -197,5 +187,5 @@ Ivette.registerComponent({
   rank: 3,
   title:
     'Display a graph showing calls between functions.',
-  children: <CallgraphComponent />,
+  children: <Callgraph />,
 });
