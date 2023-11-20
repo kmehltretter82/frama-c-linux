@@ -324,6 +324,7 @@ let rec pmatch env (p : pattern) e =
     end
   | Bool true , True -> ()
   | Bool false , False -> ()
+  | Int v1, Kint v2 when Z.equal v1 v2 -> ()
   | Not p , Not e -> pmatch env p e
   | Assoc(`Or,ps) , Or es -> pac env Lang.F.e_or [] ps es
   | Assoc(`And,ps) , And es -> pac env Lang.F.e_and [] ps es
@@ -336,10 +337,11 @@ let rec pmatch env (p : pattern) e =
   | Assoc(`Bxor,ps) , Fun(lf,es) when lf == Cint.f_lxor ->
     pac env (Lang.F.e_fun lf) [] ps es
   | Binop(p,`Div,q) , Div(a,b) -> pbinop env p q a b
-  | Binop(p,`Eq,q) , Div(a,b) -> pbinop env p q a b
-  | Binop(p,`Ne,q) , Div(a,b) -> pbinop env p q a b
-  | Binop(p,`Lt,q) , Div(a,b) -> pbinop env p q a b
-  | Binop(p,`Le,q) , Div(a,b) -> pbinop env p q a b
+  | Binop(p,`Mod,q) , Mod(a,b) -> pbinop env p q a b
+  | Binop(p,`Eq,q) , Eq(a,b) -> pbinop env p q a b
+  | Binop(p,`Ne,q) , Neq(a,b) -> pbinop env p q a b
+  | Binop(p,`Lt,q) , Lt(a,b) -> pbinop env p q a b
+  | Binop(p,`Le,q) , Leq(a,b) -> pbinop env p q a b
   | Binop(p,`Lsl,q) , Fun(lf,[a;b]) when lf == Cint.f_lsl -> pbinop env p q a b
   | Binop(p,`Lsr,q) , Fun(lf,[a;b]) when lf == Cint.f_lsr -> pbinop env p q a b
   | Times(b,p) , Times(a,e) ->
