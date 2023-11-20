@@ -1933,7 +1933,7 @@ struct
   let remove_effects c =
     { c with stmts = List.map remove_effects_stmt c.stmts }
 
-  (* Put chunk inside a block. Optionnaly take a list of varinfo to add to
+  (* Put chunk inside a block. Optionally take a list of varinfo to add to
      the newly created block. *)
   let enclose_chunk ~ghost ?(locals=[]) se =
     let block_chunk = c2stmt_effect ~ghost se in
@@ -7828,7 +7828,7 @@ and doCondition ~is_loop local_env asconst
         (* Enclose everything (problematic chunk and break loop condition). *)
         enclose_chunk ~ghost (compileCondExp ~ghost ce st sf)
       else
-        (* The condition chunk will be hided, and a tmp variable will be used
+        (* The condition chunk will be hidden, and a tmp variable will be used
            instead in the condition. *)
         compileCondExp ~hide:true ~ghost ce st sf
     end
