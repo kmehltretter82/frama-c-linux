@@ -207,7 +207,7 @@ module Localizable =
         | PGlobal g ->
           Hashtbl.hash( 7, Global.hash g )
         | PType t ->
-          Hashtbl.hash( 8, Typ.hash t )
+          Hashtbl.hash( 8, TypByName.hash t )
 
       let equal l1 l2 = match l1,l2 with
         | PStmt (_,ki1), PStmt (_,ki2) -> ki1.sid = ki2.sid
@@ -223,7 +223,7 @@ module Localizable =
         | PExp (_,_,e1), PExp(_,_,e2) -> Exp.equal e1 e2
         | PIP ip1, PIP ip2 -> Property.equal ip1 ip2
         | PGlobal g1, PGlobal g2 -> Global.equal g1 g2
-        | PType t1, PType t2 -> Typ.equal t1 t2
+        | PType t1, PType t2 -> TypByName.equal t1 t2
         | (PStmt _ | PStmtStart _ | PLval _ | PExp _ | PTermLval _ | PVDecl _
           | PIP _ | PGlobal _ | PType _), _
           ->  false
@@ -257,7 +257,7 @@ module Localizable =
         | PIP p1 , PIP p2 -> Property.compare p1 p2
         | PIP _ , _ -> (-1)
         | _ , PIP _ -> 1
-        | PType t1, PType t2 -> Typ.compare t1 t2
+        | PType t1, PType t2 -> TypByName.compare t1 t2
         | PType _, _ -> (-1)
         | _, PType _ -> 1
         | PGlobal g1 , PGlobal g2 -> Global.compare g1 g2
@@ -855,16 +855,11 @@ struct
         super#code_annotation fmt ca;
         current_ca <- None
 
-    method! global fmt g =
-      match g with
-      (* these globals are already covered by the underlying parser *)
-      | GVarDecl _ | GVar _ | GFunDecl _ | GFun _
-      | GCompTag _ | GCompTagDecl _
-      | GEnumTag _ | GEnumTagDecl _
-      | GType _ ->
-        super#global fmt g
-      | GAsm _ | GPragma _ | GText _ | GAnnot _ ->
-        Format.fprintf fmt "@{<%s>%a@}" (Info.tag (PGlobal g)) super#global g
+    method! typeref t pp fmt x =
+      Format.fprintf fmt "@{<%s>%a@}" (Info.tag (PType t)) pp x
+
+    method! typedef g pp fmt x =
+      Format.fprintf fmt "@{<%s>%a@}" (Info.tag (PGlobal g)) pp x
 
     method! extended fmt ext =
       let loc =
@@ -995,37 +990,6 @@ struct
       let f = Option.get self#current_kf in
       let tag = Info.tag (PStmtStart(f,s)) in
       Format.fprintf fmt "@{<%s>%a@}" tag (super#stmtkind sattr next) sk
-
-    method! ikind fmt c =
-      Format.fprintf fmt "@{<%s>%a@}"
-        (Info.tag (PType(TInt(c,[]))))
-        super#ikind c
-
-    method! fkind fmt c =
-      Format.fprintf fmt "@{<%s>%a@}"
-        (Info.tag (PType(TFloat(c,[]))))
-        super#fkind c
-
-    method! compname fmt comp =
-      try
-        Format.fprintf fmt "@{<%s>%a@}"
-          (Info.tag (PGlobal(Globals.Types.global Struct comp.cname)))
-          super#compname comp
-      with Not_found -> super#compname fmt comp
-
-    method! enuminfo fmt enum =
-      try
-        Format.fprintf fmt "@{<%s>%a@}"
-          (Info.tag (PGlobal(Globals.Types.global Enum enum.ename)))
-          super#enuminfo enum
-      with Not_found -> super#enuminfo fmt enum
-
-    method! typeinfo fmt tinfo =
-      try
-        Format.fprintf fmt "@{<%s>%a@}"
-          (Info.tag (PGlobal(Globals.Types.global Typedef tinfo.tname)))
-          super#typeinfo tinfo
-      with Not_found -> super#typeinfo fmt tinfo
 
     initializer force_brace <- true
 
