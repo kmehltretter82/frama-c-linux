@@ -32,7 +32,7 @@ OCaml package manager. If you have it, simply run:
 
     opam install frama-c
 
-or, for `opam` versions less than 2.1.0:
+or, for `opam` versions less than 2.1:
 
     opam install depext # handles external (non-OCaml) dependencies
     opam depext frama-c --install
@@ -70,11 +70,13 @@ Frama-C can be run from the command-line, or via its graphical interface.
 The recommended usage for simple files is one of the following lines:
 
     frama-c file.c -<plugin> [options]
-    frama-c-gui file.c
+    ivette file.c -<plugin> [options]
 
 Where `-<plugin>` is one of the several Frama-C plug-ins,
 e.g. `-eva`, or `-wp`, or `-metrics`, etc.
-Plug-ins can also be run directly from the GUI.
+Plug-ins can also be run directly from the graphical interface,
+`ivette`.
+A legacy version of the GUI (`frama-c-gui`) is also available.
 
 To list all plug-ins, run:
 
@@ -91,23 +93,23 @@ is available through
 
 #### Complex scenarios
 
-For more complex usage scenarios (lots of files and directories,
-with several preprocessing directives), we recommend splitting Frama-C's usage
-in two parts:
+For complex usage scenarios (several files and directories,
+preprocessing directives, etc), we recommend the following two-step approach:
 
 1. Parsing the input files and saving the result to a file;
 2. Loading the parsing results and then running the analyses or the GUI.
 
-Parsing typically involves giving extra arguments to the C preprocessor,
-so the `-cpp-extra-args` option is often useful, as in the example below:
+Parsing complex C applications usually involves C preprocessor options
+(e.g. GCC's `-D` and `-I`).
+In Frama-C, they are passed via option `-cpp-extra-args`, as in this example:
 
-    frama-c *.c *.h -cpp-extra-args="-D<define> -I<include>" -save parsed.sav
+    frama-c *.c -cpp-extra-args="-D<define> -I<include>" -save parsed.sav
 
-The results are then loaded into Frama-C for further analyses or for inspection
+The results can then be loaded into Frama-C for further analyses or for inspection
 via the GUI:
 
     frama-c -load parsed.sav -<plugin> [options]
-    frama-c-gui -load parsed.sav -<plugin> [options]
+    ivette -load parsed.sav -<plugin> [options]
 
 ## Further reference
 
