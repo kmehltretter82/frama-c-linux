@@ -1,10 +1,10 @@
 /* run.config*
+  ENABLED_IF: (<> %{system} freebsd)
   FILTER: sed -e '/f32__/ s/\([0-9][.][0-9]\{6\}\)[0-9]\{10\}/\1/g' -e '/d64__/ s/\([0-9][.][0-9]\{15\}\)[0-9]\{1\}/\1/g'
   COMMENT: 'sed' filter is a temporary workaround due to libc imprecisions
   STDOPT: +"-float-normal -eva -eva-no-memexec -eva-builtin sqrt:Frama_C_sqrt,exp:Frama_C_exp,log:Frama_C_log,log10:Frama_C_log10,cos:Frama_C_cos,sin:Frama_C_sin,atan2:Frama_C_atan2,pow:Frama_C_pow,fmod:Frama_C_fmod,sqrtf:Frama_C_sqrtf,expf:Frama_C_expf,logf:Frama_C_logf,log10f:Frama_C_log10f,powf:Frama_C_powf,floor:Frama_C_floor,ceil:Frama_C_ceil,trunc:Frama_C_trunc,round:Frama_C_round,floorf:Frama_C_floorf,ceilf:Frama_C_ceilf,truncf:Frama_C_truncf,roundf:Frama_C_roundf -then -print"
 */ 
 #include <math.h>
-
 static volatile int nondet;
 static volatile double any_double;
 static volatile float any_float;
