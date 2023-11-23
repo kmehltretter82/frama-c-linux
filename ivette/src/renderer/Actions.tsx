@@ -140,7 +140,7 @@ export function focusMode(id: string): void {
 
 const switchMode : ModeProps = {
   id: 'ivette.switchmode',
-  icon: 'TRIANGLE.RIGHT',
+  icon: 'TUNINGS',
   title: 'Search & Action Modes',
   placeholder: 'search mode',
   hints: () => allModes.selfhints(),
