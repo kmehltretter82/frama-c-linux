@@ -45,14 +45,20 @@ async function computeStudiaSelection(
   const request = kind === 'Reads' ? getReadsLval : getWritesLval;
   const data = await Server.send(request, marker).catch(handleError);
   const markers = data?.direct ?? [];
-  const asLocs = markers.length > 0;
-  const label = `${asLocs ? kind : `No ${kind.toLowerCase}`} of ${descr}`;
-  const access = kind === 'Reads' ? 'accessing' : 'modifying';
-  const tail = `the memory location pointed by ${descr}`;
-  const title = asLocs ? `List of statements ${access} ${tail}.` : '';
-  Locations.setSelection({
-    plugin: 'Studia', label, title, markers, index: 0
-  });
+  if (markers.length > 0) {
+    const label = `${kind} to ${descr}`;
+    const access = kind === 'Reads' ? 'accessing' : 'modifying';
+    const title =
+      `Statements ${access} the memory location pointed by ${descr}.`;
+    Locations.setSelection({
+      plugin: 'Studia', label, title, markers, index: 0
+    });
+  } else {
+    const label = `No ${kind.toLowerCase()} to ${descr}`;
+    Locations.setSelection({
+      plugin: 'Studia', label, markers: [], index: 0
+    });
+  }
 }
 
 /** Builds the Studia entries in the contextual menu about a given marker.  */
