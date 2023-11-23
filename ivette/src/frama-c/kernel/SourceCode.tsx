@@ -106,7 +106,7 @@ type SourceCursor = { file: string, line: number, column: number };
 type SourceCallback = ((pos: Position) => void) | null;
 
 const noCursor: SourceCursor = { file: '', line: 0, column: 0 };
-const OnSelection = Editor.OnSelection;
+const OnClick = Editor.createField<SourceCallback>(null);
 const OnControlClick = Editor.createField<SourceCallback>(null);
 const OnContextMenu = Editor.createField<SourceCallback>(null);
 
@@ -114,14 +114,16 @@ const OnContextMenu = Editor.createField<SourceCallback>(null);
 const EventHandlers = createEventHandlers();
 function createEventHandlers(): Editor.Extension {
   const deps = {
+    onClick: OnClick,
     onControlClick: OnControlClick,
     onContextMenu: OnContextMenu
   };
   return Editor.createEventHandler(deps, {
     // Control Click
-    mouseup: ({ onControlClick }, view, event) => {
+    mouseup: ({ onClick, onControlClick }, view, event) => {
+      const pos = getCursorPosition(view);
+      if (onClick !== null) onClick(pos);
       if (event.ctrlKey && onControlClick !== null) {
-        const pos = getCursorPosition(view);
         onControlClick(pos);
       }
     },
@@ -164,7 +166,7 @@ const extensions: Editor.Extension[] = [
   Editor.LineNumbers,
   Editor.LanguageHighlighter,
   Editor.HighlightActiveLine,
-  OnSelection,
+  OnClick,
   OnContextMenu,
   OnControlClick,
   EventHandlers,
@@ -205,17 +207,15 @@ export default function SourceCode(): JSX.Element {
       }]);
   }, [file, command, editFile] );
 
-  const onSelect = React.useCallback((offset, endOffset) => {
-    if (!view || !file || endOffset !== offset) return;
-    const theLine = view.state.doc.lineAt(offset);
-    const line = theLine.number;
-    const column = offset - theLine.from;
+  const onClick = React.useCallback((pos: Position) => {
+    if (!file) return;
+    const { line, column } = pos;
     setCursor({ file, line, column });
-  }, [view, file]);
+  }, [file]);
 
   React.useEffect(() => { if (!file) setCursor(noCursor); }, [file]);
   React.useEffect(() => Source.set(view, source), [view, source]);
-  React.useEffect(() => OnSelection.set(view, onSelect), [view, onSelect]);
+  React.useEffect(() => OnClick.set(view, onClick), [view, onClick]);
   React.useEffect(() => OnContextMenu.set(view, menuPopup), [view, menuPopup]);
   React.useEffect(() => OnControlClick.set(view, editFile), [view, editFile]);
 
