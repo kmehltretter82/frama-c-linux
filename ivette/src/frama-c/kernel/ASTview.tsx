@@ -30,7 +30,7 @@ import * as States from 'frama-c/states';
 import * as Settings from 'dome/data/settings';
 import { IconButton } from 'dome/controls/buttons';
 import { Filler, Inset } from 'dome/frame/toolbars';
-import * as Studia from 'frama-c/plugins/studia/studia';
+import * as Studia from 'frama-c/plugins/studia';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { text } from 'frama-c/kernel/api/data';
 import * as Eva from 'frama-c/plugins/eva/api/general';
