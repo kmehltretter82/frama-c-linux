@@ -121,6 +121,7 @@ export function LabView(): JSX.Element {
 
   return (
     <QSplit
+      className='labview-container'
       A={A} B={B} C={C} D={D} H={H} V={V}
       setPosition={setPosition}
     >
