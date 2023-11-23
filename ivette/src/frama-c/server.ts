@@ -194,6 +194,24 @@ export function onShutdown(callback: () => void): void {
 }
 
 // --------------------------------------------------------------------------
+// --- Status Hooks
+// --------------------------------------------------------------------------
+
+export function useReady(callback: () => void): void {
+  React.useEffect(() => {
+    READY.on(callback);
+    return () => READY.off(callback);
+  }, [callback]);
+}
+
+export function useShutdown(callback: () => void): void {
+  React.useEffect(() => {
+    SHUTDOWN.on(callback);
+    return () => SHUTDOWN.off(callback);
+  }, [callback]);
+}
+
+// --------------------------------------------------------------------------
 // --- Status Update
 // --------------------------------------------------------------------------
 

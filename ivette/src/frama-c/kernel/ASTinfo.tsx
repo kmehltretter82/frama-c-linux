@@ -27,6 +27,7 @@
 import React from 'react';
 import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
+import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as DATA from 'frama-c/kernel/api/data';
 import * as Ast from 'frama-c/kernel/api/ast';
@@ -277,7 +278,9 @@ export default function ASTinfo(): JSX.Element {
   Dome.useEvent(States.MetaSelection, (loc: States.Location) => {
     setMarkers(addMarker(markers, loc.marker));
   });
-  // Scrolling Hooks
+  const clearMarkers = React.useCallback(() => setMarkers([]),[]);
+  Server.useShutdown(clearMarkers);
+    // Scrolling Hooks
   const [inside, setInside] = React.useState(false);
   const scroll = React.useRef<HTMLDivElement>(null);
   const scrollDiv = scroll.current;
