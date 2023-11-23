@@ -69,9 +69,7 @@ export class ElementRack<A extends ElementProps> {
   }
 
   getElements(): A[] {
-    const buffer: A[] = [];
-    this.items.forEach((p) => { if (p.children) { buffer.push(p); } });
-    return buffer.sort(byRank);
+    return Array.from(this.items.values()).sort(byRank);
   }
 
 }

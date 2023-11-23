@@ -21,92 +21,47 @@
 /* ************************************************************************ */
 
 import React from "react";
-import * as Ivette from 'ivette';
-import * as Ctrl from "dome/controls/buttons";
-import * as Disp from "dome/controls/displays";
 import * as Sidebars from 'dome/frame/sidebars';
 import * as Box from "dome/layout/boxes";
 import * as Qsplit from "dome/layout/qsplit";
-import * as States from '../dome/renderer/data/states';
+import * as States from 'dome/data/states';
+import { Catch } from 'dome/errors';
+import * as Ivette from 'ivette';
 import * as Ext from './Extensions';
 
-const COMPONENT = Ivette.COMPONENT;
 const VIEW = Ivette.VIEW;
-
-/* -------------------------------------------------------------------------- */
-/* --- Mocking                                                            --- */
-/* -------------------------------------------------------------------------- */
-
-const mockCompoIdA = "fc.kernel.messages";
-const mockLayout: Ivette.Layout1 = { ABCD: mockCompoIdA };
-
-/* -------------------------------------------------------------------------- */
-/* --- Quarter                                                            --- */
-/* -------------------------------------------------------------------------- */
-
-function Quarter(props: {
-  value?: string;
-  possibleValues: string[];
-  setValue: (v: string | undefined) => void;
-}): JSX.Element {
-  const onChange = (s?: string): void => props.setValue(s ? s : undefined);
-  return (
-    <Ctrl.Select value={props.value ?? ""} onChange={onChange}>
-      <option value="">-</option>
-      {props.possibleValues.map((v, key) => {
-        return <option key={key} value={v}>{v}</option>;
-      })}
-    </Ctrl.Select>
-  );
-}
+const COMPONENT = Ivette.COMPONENT;
 
 /* -------------------------------------------------------------------------- */
 /* --- Pane                                                               --- */
 /* -------------------------------------------------------------------------- */
 
-function Pane(props: { id: string; background: string }): JSX.Element {
-  const { id, background } = props;
+interface PaneProps { id: string; }
 
-  // eslint-disable-next-line no-console
-  console.log("getElement of ", id, COMPONENT.getElement(id));
-
-  const css: React.CSSProperties = {
-    width: "100%",
-    height: "100%",
-    textAlign: "center",
-    background,
-  };
-
-  const children = COMPONENT.getElement(id)?.children;
-
+function Pane(props: PaneProps): JSX.Element {
+  const { id } = props;
+  const component = Ext.useElement(COMPONENT, id);
   return (
-  <Qsplit.QPane id={id}>
-    {children ?? <div style={css}>{id}</div>}
-  </Qsplit.QPane>
+    <Qsplit.QPane id={id}>
+      <Catch label={id}>
+        {component?.children ?? null}
+      </Catch>
+    </Qsplit.QPane>
   );
 }
-
-const round = (r: number): number => Math.round(r * 100) / 100;
 
 /* -------------------------------------------------------------------------- */
 /* --- LabView                                                            --- */
 /* -------------------------------------------------------------------------- */
 
-export function LabView(): JSX.Element {
-  const globalLayoutState = new States.GlobalState<Ivette.Layout>(mockLayout);
-  const layoutState = States.useGlobalState(globalLayoutState);
-  const [layout, setLayout] = layoutState;
+const defaultLayout = { ABCD: "" };
+const globalLayoutState = new States.GlobalState<Ivette.Layout>(defaultLayout);
 
-  Ivette.registerSidebar({
-    id: 'fc.ivette.views',
-    label: 'Views',
-    rank: 1,
-    children: <ViewBar setLayout={setLayout}/>
-  });
+export function LabView(): JSX.Element {
+  const [layout] = States.useGlobalState(globalLayoutState);
 
   const [H, setH] = React.useState(0.5);
   const [V, setV] = React.useState(0.5);
-
   const [A, setA] = React.useState<string | undefined>("A");
   const [B, setB] = React.useState<string | undefined>("B");
   const [C, setC] = React.useState<string | undefined>("C");
@@ -114,8 +69,6 @@ export function LabView(): JSX.Element {
 
   const applyDefaultLayout = React.useCallback(
     () => {
-      // set the component to display in each quarter based on the
-      // layout provided
       if("A" in layout) setA(layout.A);
       if("B" in layout) setB(layout.B);
       if("C" in layout) setC(layout.C);
@@ -142,20 +95,6 @@ export function LabView(): JSX.Element {
     },
     [setH, setV]
   );
-  const reset = (): void => {
-    setPosition(0.5, 0.5);
-    applyDefaultLayout();
-  };
-  const clear = (): void => {
-    setPosition(0.5, 0.5);
-    setA(undefined);
-    setB(undefined);
-    setC(undefined);
-    setD(undefined);
-  };
-
-  // Available components for the selected view
-  const viewComponents = Object.values(layout);
 
   // Load the layout components
   React.useEffect(() => {
@@ -164,25 +103,13 @@ export function LabView(): JSX.Element {
 
   return (
     <Box.Vfill>
-      <Box.Hfill>
-        <Ctrl.Button icon="RELOAD" label="Reset" onClick={reset} />
-        <Ctrl.Button icon="TRASH" label="Clear" onClick={clear} />
-        <Box.Space />
-        <Disp.LCD>
-          H={round(H)} V={round(V)}
-        </Disp.LCD>
-        <Box.Space />
-        <Quarter value={A} setValue={setA} possibleValues={viewComponents}/>
-        <Quarter value={B} setValue={setB} possibleValues={viewComponents} />
-        <Quarter value={C} setValue={setC} possibleValues={viewComponents} />
-        <Quarter value={D} setValue={setD} possibleValues={viewComponents} />
-      </Box.Hfill>
-      <Qsplit.QSplit A={A} B={B} C={C} D={D} H={H} V={V}
-      setPosition={setPosition}>
-        <Pane id={A ?? "A"} background="lightblue" />
-        <Pane id={B ?? "B"} background="lightgreen" />
-        <Pane id={C ?? "C"} background="#8282db" />
-        <Pane id={D ?? "D"} background="coral" />
+      <Qsplit.QSplit
+        A={A} B={B} C={C} D={D} H={H} V={V}
+        setPosition={setPosition}>
+        <Pane id={A ?? "A"} />
+        <Pane id={B ?? "B"} />
+        <Pane id={C ?? "C"} />
+        <Pane id={D ?? "D"} />
       </Qsplit.QSplit>
     </Box.Vfill>
   );
@@ -192,35 +119,30 @@ export function LabView(): JSX.Element {
 /* --- ViewBar                                                            --- */
 /* -------------------------------------------------------------------------- */
 
-export interface ViewBarProps {
-  setLayout(layout: Ivette.Layout): void;
-}
-
-export function ViewBar(props: ViewBarProps): JSX.Element {
-
-  const views= Ext.useElements(VIEW);
-
-  // eslint-disable-next-line no-console
-  console.log("Ext.useElements(VIEW): ", views);
-
-  const itemsView = views?.map((view, key) => (
-    <Sidebars.Item
-    key={key}
-    label="Item label"
-    title="Item title"
-    onSelection={() => props.setLayout(view.layout)}
-    >
-      <span>{view.label}</span>
-    </Sidebars.Item>
-  ));
-
+export function ViewBar(): JSX.Element {
+  const views = Ext.useElements(VIEW);
   return (
     <Sidebars.SideBar>
-      <Sidebars.Section label="Views">
-        <div>{ itemsView }</div>
+      <Sidebars.Section label="Views" defaultUnfold>
+        {views.map((view) =>
+          <Sidebars.Item
+            key={view.id}
+            label={view.label}
+            title={view.title}
+            onSelection={() => globalLayoutState.setValue(view.layout)}
+          />
+        )}
       </Sidebars.Section>
     </Sidebars.SideBar>
   );
 }
+
+Ivette.registerSidebar({
+  id: "ivette.views",
+  rank: 100,
+  label: "Views",
+  title: "View Selector",
+  children: <ViewBar />,
+});
 
 /* -------------------------------------------------------------------------- */
