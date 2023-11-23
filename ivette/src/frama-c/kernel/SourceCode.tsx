@@ -220,9 +220,9 @@ export default function SourceCode(): JSX.Element {
   React.useEffect(() => OnControlClick.set(view, editFile), [view, editFile]);
 
   React.useEffect(() => {
-    if (selectedMarkerLine > 0)
+    if (source.length > 0 && selectedMarkerLine > 0)
       Editor.selectLine(view, selectedMarkerLine, isTop, true);
-  }, [view, isTop, selectedMarkerLine]);
+  }, [view, source, isTop, selectedMarkerLine]);
 
   React.useEffect(() => {
     if (cursor.line === slocAtCursor?.line)
