@@ -33,7 +33,6 @@ import React from 'react';
 import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
-import * as Lab from 'ivette@lab';
 import * as Ext from 'ivette@ext';
 
 /* -------------------------------------------------------------------------- */
@@ -149,8 +148,18 @@ export function registerComponent(props: ComponentProps): void {
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Component TitleBar                                                 --- */
+/* --- TitleBar Component                                                 --- */
 /* -------------------------------------------------------------------------- */
+
+/** @ignore */
+export interface TitleContext {
+  id?: string;
+  label?: string;
+  title?: string;
+}
+
+/** @ignore */
+export const TitleContext = React.createContext<TitleContext>({});
 
 export interface TitleBarProps {
   /** Displayed icon. */
@@ -170,8 +179,7 @@ export interface TitleBarProps {
  */
 export function TitleBar(props: TitleBarProps): JSX.Element | null {
   const { icon, label, title, children } = props;
-  // TODO: this shall be adapted later on...
-  const context = Lab.useTitleContext();
+  const context = React.useContext(TitleContext);
   if (!context.id) return null;
   return (
     <DefineElement id={`labview.title.${context.id}`}>

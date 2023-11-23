@@ -33,13 +33,14 @@ import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Sidebar from './Sidebar';
 import * as Controller from './Controller';
-import * as Lab from './Lab';
+import * as Lab from './Laboratory';
 import * as Ext from './Extensions';
 import { TOOLBAR, STATUSBAR } from 'ivette';
 import * as IvettePrefs from 'ivette/prefs';
 import * as Studia from 'frama-c/plugins/studia/studia';
 import './loader';
 import './sandbox';
+import './style.css';
 
 // --------------------------------------------------------------------------
 // --- Main View
