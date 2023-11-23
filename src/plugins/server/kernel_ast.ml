@@ -469,8 +469,17 @@ struct
       | PVDecl _ -> assert false
       | PExp _ -> if short then "Expr" else "Expression"
       | PIP _ -> if short then "Prop" else "Property"
-      | PGlobal _ -> if short then "Decl" else "Declaration"
+      | PGlobal (GType _ | GCompTag _ | GEnumTag _ | GEnumTagDecl _)
       | PType _ -> "Type"
+      | PGlobal _ -> if short then "Decl" else "Declaration"
+
+  let descr_localizable fmt = function
+    | PGlobal (GType(ti,_)) -> Printer.pp_typ fmt (TNamed(ti,[]))
+    | PGlobal (GCompTag(ci,_) | GCompTagDecl(ci,_)) ->
+      Printer.pp_typ fmt (TComp(ci,[]))
+    | PGlobal (GEnumTag(ei,_) | GEnumTagDecl(ei,_)) ->
+      Printer.pp_typ fmt (TEnum(ei,[]))
+    | g -> pp_localizable fmt g
 
   let model = States.model ()
 
@@ -527,7 +536,7 @@ struct
       ~name:"descr"
       ~descr:(Md.plain "Marker description")
       ~data:(module Jstring)
-      ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pp_localizable tag)
+      ~get:(fun (tag, _) -> Rich_text.to_string descr_localizable tag)
       model
 
   let () =
