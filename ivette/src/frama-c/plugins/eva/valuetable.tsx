@@ -851,22 +851,17 @@ class FunctionsManager {
     if (infos) infos.startingCallstack = n;
   }
 
-  pin(loc: Ast.marker): void {
-    const { scope } = States.getMarker(loc);
-    if (scope !== undefined) this.getInfos(scope).pin(loc);
+  pin(scope: Ast.decl, loc: Ast.marker): void {
+    this.getInfos(scope).pin(loc);
   }
 
-  unpin(loc: Ast.marker): void {
-    const { scope } = States.getMarker(loc);
-    if (scope !== undefined) this.cache.get(scope)?.pinned.delete(loc);
+  unpin(scope: Ast.decl, loc: Ast.marker): void {
+    this.cache.get(scope)?.pinned.delete(loc);
   }
 
-  removeLocation(loc: Ast.marker): void {
-    const { scope } = States.getMarker(loc);
-    if (scope !== undefined) {
-      const infos = this.cache.get(scope);
-      if (infos !== undefined) infos.delete(loc);
-    }
+  removeLocation(scope: Ast.decl, loc: Ast.marker): void {
+    const infos = this.cache.get(scope);
+    if (infos !== undefined) infos.delete(loc);
   }
 
   delete(scope: Ast.decl): void {
@@ -903,7 +898,8 @@ class FunctionsManager {
 interface EvaluationModeProps {
   computationState : Eva.computationStateType | undefined;
   current: Ast.marker | undefined;
-  setLocPin: (loc: Ast.marker, pin: boolean) => void;
+  scope: Ast.decl | undefined;
+  setLocPin: (scope: Ast.decl, loc: Ast.marker, pin: boolean) => void;
 }
 
 const evalShortcut = System.platform === 'macos' ? 'Cmd+E' : 'Ctrl+E';
@@ -928,15 +924,17 @@ Dome.addMenuItem({
 Ivette.registerMode(evalMode);
 
 function useEvaluationMode(props: EvaluationModeProps): void {
-  const { computationState, current, setLocPin } = props;
-  const enabled = computationState === 'computed' && current !== undefined;
+  const { computationState, current, scope, setLocPin } = props;
+  const enabled =
+    computationState === 'computed'
+    && current !== undefined && scope !== undefined;
   React.useEffect(() => {
     if (enabled) {
       const onEnter = (pattern: string): void => {
         const data = { stmt: current, term: pattern };
         const handleError = (): void => { return; };
         const addProbe = (target: Ast.marker | undefined): void => {
-          if (target) setLocPin(target, true);
+          if (target) setLocPin(scope, target, true);
         };
         Server.send(Ast.parseExpr, data).then(addProbe).catch(handleError);
       };
@@ -944,7 +942,7 @@ function useEvaluationMode(props: EvaluationModeProps): void {
     } else {
       Ivette.updateMode({ id: evalMode.id, enabled: false });
     }
-  }, [enabled, current, setLocPin]);
+  }, [enabled, current, scope, setLocPin]);
   React.useEffect(
     () => Dome.setMenuItem({ id: evalMode.id, enabled })
     , [enabled]
@@ -1032,17 +1030,18 @@ function EvaTable(): JSX.Element {
   }, [ current, fcts, fct, scope, getProbe, setFocus, locEvt ]);
 
   /* Callback used to pin or unpin a location */
-  const setLocPin = React.useCallback((loc: Ast.marker, pin: boolean): void => {
-    if (pin) fcts.pin(loc);
-    else fcts.unpin(loc);
-    setTic(tac + 1);
-  }, [fcts, setTic, tac]);
+  const setLocPin = React.useCallback(
+    (scope: Ast.decl, loc: Ast.marker, pin: boolean): void => {
+      if (pin) fcts.pin(scope, loc);
+      else fcts.unpin(scope, loc);
+      setTic(tac + 1);
+    }, [fcts, setTic, tac]);
 
   /* On meta-selection, pin the selected location. */
   React.useEffect(() => {
     const pin = (loc: States.Location): void => {
-      const { marker } = loc;
-      if (marker && fct) setLocPin(marker, true);
+      const { scope, marker } = loc;
+      if (scope && marker && fct) setLocPin(scope, marker, true);
     };
     States.MetaSelection.on(pin);
     return () => States.MetaSelection.off(pin);
@@ -1050,7 +1049,9 @@ function EvaTable(): JSX.Element {
 
   /* Callback used to remove a probe */
   const remove = React.useCallback((probe: Probe): void => {
-    fcts.removeLocation(probe.marker);
+    if (probe.scope) {
+      fcts.removeLocation(probe.scope, probe.marker);
+    }
     if (probe.marker === focusedMarker) {
       setFocus(undefined);
       fcts.clean(undefined);
@@ -1089,11 +1090,11 @@ function EvaTable(): JSX.Element {
         markers: fct.markers(focusedMarker),
         scope,
         close,
-        pinProbe: setLocPin,
+        pinProbe: (loc: Ast.marker, pin) => { setLocPin(scope, loc, pin); },
         getProbe,
         selectProbe: setFocus,
         removeProbe: remove,
-        addLoc: (loc: Ast.marker) => { fcts.pin(loc); setTic(tac + 1); },
+        addLoc: (loc: Ast.marker) => { fcts.pin(scope, loc); setTic(tac + 1); },
         folded,
         setFolded,
         getCallsites,
@@ -1134,7 +1135,7 @@ function EvaTable(): JSX.Element {
 
   /* Handle Evaluation mode */
   const computationState = States.useSyncValue(Eva.computationState);
-  useEvaluationMode({ computationState, current, setLocPin });
+  useEvaluationMode({ computationState, current, scope, setLocPin });
 
   /* Builds the component */
   return (
