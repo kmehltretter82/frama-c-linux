@@ -72,38 +72,99 @@ function Pane(props: PaneProps): JSX.Element | null {
 /* --- LabView                                                            --- */
 /* -------------------------------------------------------------------------- */
 
+interface ComponentState {
+  state: "active" | "inactive";
+}
+
+interface LabViewState {
+  A: string | undefined;
+  B: string | undefined;
+  C: string | undefined;
+  D: string | undefined;
+  H: number;
+  V: number;
+  components: Map<string, ComponentState>;
+}
+
 const defaultLayout = { ABCD: "" };
+
+const defaultLabViewState: LabViewState = {
+  A: defaultLayout.ABCD,
+  B: defaultLayout.ABCD,
+  C: defaultLayout.ABCD,
+  D: defaultLayout.ABCD,
+  H: 0.5,
+  V: 0.5,
+  components: new Map<string, ComponentState>()
+};
+
 const globalLayoutState = new States.GlobalState<Ivette.Layout>(defaultLayout);
+const globalLabViewState = new States.GlobalState<LabViewState>(
+  defaultLabViewState
+);
 
 export function LabView(): JSX.Element {
+
   const [layout] = States.useGlobalState(globalLayoutState);
+  const [state, setState] = States.useGlobalState(globalLabViewState);
 
-  const [H, setH] = React.useState(0.5);
-  const [V, setV] = React.useState(0.5);
-  const [A, setA] = React.useState<string | undefined>("A");
-  const [B, setB] = React.useState<string | undefined>("B");
-  const [C, setC] = React.useState<string | undefined>("C");
-  const [D, setD] = React.useState<string | undefined>("D");
+  const setH = React.useCallback(
+    (newH: number) => {
+      setState({ ...state, H: newH });
+    }, [state, setState]
+  );
 
-  const applyDefaultLayout = React.useCallback(
-    () => {
-      if("A" in layout) setA(layout.A);
-      if("B" in layout) setB(layout.B);
-      if("C" in layout) setC(layout.C);
-      if("D" in layout) setD(layout.D);
+  const setV = React.useCallback(
+    (newV: number) => {
+      setState({ ...state, V: newV });
+    }, [state, setState]
+  );
 
-      if("AB" in layout) { setA(layout.AB); setB(layout.AB); }
-      if("AC" in layout) { setA(layout.AC); setC(layout.AC); }
-      if("BD" in layout) { setB(layout.BD); setD(layout.BD); }
-      if("CD" in layout) { setC(layout.CD); setD(layout.CD); }
+  const applyLayout = React.useCallback(
+    (newLayout: Ivette.Layout) => {
+      let A, B, C, D;
 
-      if("ABCD" in layout) {
-        setA(layout.ABCD);
-        setB(layout.ABCD);
-        setC(layout.ABCD);
-        setD(layout.ABCD);
+      if("A" in newLayout) A = newLayout.A;
+      if("B" in newLayout) B = newLayout.B;
+      if("C" in newLayout) C = newLayout.C;
+      if("D" in newLayout) D = newLayout.D;
+
+      if("AB" in newLayout) {
+        A = newLayout.AB;
+        B = newLayout.AB;
       }
-    }, [layout]
+      if("AC" in newLayout) {
+        A = newLayout.AC;
+        C = newLayout.AC;
+      }
+      if("BD" in newLayout) {
+        B = newLayout.BD;
+        D = newLayout.BD;
+      }
+      if("CD" in newLayout) {
+        C = newLayout.CD;
+        D = newLayout.CD;
+      }
+
+      if("ABCD" in newLayout) {
+        A = newLayout.ABCD;
+        B = newLayout.ABCD;
+        C = newLayout.ABCD;
+        D = newLayout.ABCD;
+      }
+
+      const components = state.components;
+      components.forEach((compState) => compState.state = "inactive");
+      Object.values(newLayout).forEach(compId => {
+        components.set(compId, { state: "active" });
+      });
+
+      setState({
+        ...state,
+        A: A, B: B, C: C, D: D,
+        components: components
+      });
+    }, [setState, state]
   );
 
   const setPosition = React.useCallback(
@@ -116,19 +177,19 @@ export function LabView(): JSX.Element {
 
   // Load the layout components
   React.useEffect(() => {
-    applyDefaultLayout();
-  }, [applyDefaultLayout]);
+    applyLayout(layout);
+  }, [applyLayout, layout]);
 
   return (
     <QSplit
       className='labview-container'
-      A={A} B={B} C={C} D={D} H={H} V={V}
+      A={state.A} B={state.B} C={state.C} D={state.D} H={state.H} V={state.V}
       setPosition={setPosition}
     >
-      <Pane id={A ?? "A"} />
-      <Pane id={B ?? "B"} />
-      <Pane id={C ?? "C"} />
-      <Pane id={D ?? "D"} />
+      <Pane id={state.A ?? "A"} />
+      <Pane id={state.B ?? "B"} />
+      <Pane id={state.C ?? "C"} />
+      <Pane id={state.D ?? "D"} />
     </QSplit>
   );
 }
