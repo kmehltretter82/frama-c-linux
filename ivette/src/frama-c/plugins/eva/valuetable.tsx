@@ -563,10 +563,10 @@ async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
 
 
 /* -------------------------------------------------------------------------- */
-/* --- Function Section Component                                         --- */
+/* --- Scope Section Component                                            --- */
 /* -------------------------------------------------------------------------- */
 
-interface FunctionProps {
+interface ScopeProps {
   scope: Ast.decl;
   markers: Map<Ast.marker, MarkerStatus>;
   close: () => void;
@@ -590,7 +590,7 @@ interface FunctionProps {
 
 const PageSize = 99;
 
-async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
+async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   const {
     scope, folded, isSelectedCallstack, locEvt,
     byCallstacks, getCallsites,
@@ -633,8 +633,8 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     const pinProbe = (pin: boolean): void => props.pinProbe(marker, pin);
     const selectProbe = (): void => props.selectProbe(probe);
     const removeProbe = (): void => props.removeProbe(probe);
-    const fcts = { selectProbe, pinProbe, removeProbe };
-    return ProbeHeader({ ...d, ...fcts, locEvt });
+    const scopes = { selectProbe, pinProbe, removeProbe };
+    return ProbeHeader({ ...d, ...scopes, locEvt });
   }));
 
   /* Computes the columns descriptions */
@@ -745,15 +745,15 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
 
 
 /* -------------------------------------------------------------------------- */
-/* --- Function Manager                                                   --- */
+/* --- Scope Manager                                                      --- */
 /* -------------------------------------------------------------------------- */
-/* --- The Function Manager is responsible of all the data related to     --- */
-/* --- programs functions.                                                --- */
+/* --- The Scope Manager is responsible of all the data related to        --- */
+/* --- programs scopes (mainly functions).                                --- */
 /* -------------------------------------------------------------------------- */
 
-/* Informations on one function */
-class FunctionInfos {
-  readonly scope: Ast.decl;                 // Function decl
+/* Informations on one scope */
+class ScopeInfos {
+  readonly scope: Ast.decl;                 // Scope decl
   readonly pinned = new Set<Ast.marker>();  // Pinned markers
   readonly tracked = new Set<Ast.marker>(); // Tracked markers
   startingCallstack = 1;                    // First displayed callstack
@@ -797,14 +797,14 @@ class FunctionInfos {
 
 }
 
-/* State keeping tracks of informations for every relevant functions */
-class FunctionsManager {
+/* State keeping tracks of informations for every relevant scopes */
+class ScopesManager {
 
-  private readonly cache = new Map<Ast.decl, FunctionInfos>();
+  private readonly cache = new Map<Ast.decl, ScopeInfos>();
   private byCallstacks = false;
 
   constructor() {
-    this.newFunction = this.newFunction.bind(this);
+    this.newScope = this.newScope.bind(this);
     this.getInfos = this.getInfos.bind(this);
     this.setByCallstacks = this.setByCallstacks.bind(this);
     this.setFolded = this.setFolded.bind(this);
@@ -815,16 +815,16 @@ class FunctionsManager {
     this.map = this.map.bind(this);
   }
 
-  newFunction(scope: Ast.decl): void {
+  newScope(scope: Ast.decl): void {
     if (!this.cache.has(scope))
-      this.cache.set(scope, new FunctionInfos(scope, this.byCallstacks));
+      this.cache.set(scope, new ScopeInfos(scope, this.byCallstacks));
   }
 
-  private getInfos(scope: Ast.decl): FunctionInfos {
+  private getInfos(scope: Ast.decl): ScopeInfos {
     const { cache } = this;
     let infos = cache.get(scope);
     if (infos !== undefined) return infos;
-    infos = new FunctionInfos(scope, this.byCallstacks);
+    infos = new ScopeInfos(scope, this.byCallstacks);
     this.cache.set(scope, infos);
     return infos;
   }
@@ -882,7 +882,7 @@ class FunctionsManager {
     });
   }
 
-  map<A>(fn: (infos: FunctionInfos) => A): A[] {
+  map<A>(fn: (infos: ScopeInfos) => A): A[] {
     const data: A[] = [];
     this.cache.forEach((e) => data.push(fn(e)));
     return data;
@@ -962,7 +962,7 @@ function useEvaluationMode(props: EvaluationModeProps): void {
 
 /* Table's state. It is global for when the user changes the view. */
 export const CallstackState = new GlobalState<callstack>('Summary');
-const FunctionsManagerState = new GlobalState(new FunctionsManager());
+const ScopesManagerState = new GlobalState(new ScopesManager());
 const FocusState = new GlobalState<Probe | undefined>(undefined);
 
 /* Component */
@@ -974,13 +974,13 @@ function EvaTable(): JSX.Element {
   /* Component state */
   const { marker, scope } = States.useCurrentLocation();
   const [ cs, setCS ] = useGlobalState(CallstackState);
-  const [ fcts ] = useGlobalState(FunctionsManagerState);
+  const [ fcts ] = useGlobalState(ScopesManagerState);
   const [ focus, setFocus ] = useGlobalState(FocusState);
 
   /* Used to force the component update. We cannot use the `forceUpdate` hook
    * proposed by Dome as we need to be able to add dependencies on a changing
    * value (here tac) explicitly. We need to force the update as modifications
-   * of the Function Manager internal data does NOT trigger the component
+   * of the Scope Manager internal data does NOT trigger the component
    * update. */
   const [ tac, setTic ] = React.useState(0);
 
@@ -993,7 +993,7 @@ function EvaTable(): JSX.Element {
   const getCallsites = useCallsitesCache();
   const getCallstacks = useCallstacksCache();
 
-  /* Updates the function manager when the showCallstacks state changes. */
+  /* Updates the scope manager when the showCallstacks state changes. */
   React.useEffect(() => {
     fcts.setGlobalByCallstacks(showCallstacks);
     setTic(tac => tac + 1);
@@ -1019,7 +1019,7 @@ function EvaTable(): JSX.Element {
     fcts.clean(scope);
     const doUpdate = (p: Probe): void => {
       if (!p.evaluable) { setFocus(undefined); return; }
-      if (scope && p.code) fcts.newFunction(scope);
+      if (scope && p.code) fcts.newScope(scope);
       setFocus(p);
       if (marker) locEvt.emit(marker);
     };
@@ -1062,7 +1062,7 @@ function EvaTable(): JSX.Element {
    * asynchronously, we have to use the `usePromise` hook, which forces us to
    * memoize the promises building. */
   const functionsPromise = React.useMemo(() => {
-    const elts : Promise<JSX.Element>[] = fcts.map((fct: FunctionInfos) => {
+    const elts : Promise<JSX.Element>[] = fcts.map((fct: ScopeInfos) => {
       const { byCallstacks, scope, folded } = fct;
       const isSelectedCallstack = (c: callstack): boolean => c === cs;
       const setFolded = (folded: boolean): void => {
@@ -1082,7 +1082,7 @@ function EvaTable(): JSX.Element {
         if (csFct === scope) setCS('Summary');
         setTic(tac + 1);
       };
-      return FunctionSection({
+      return ScopeSection({
         markers: fct.markers(focus),
         scope,
         close,
