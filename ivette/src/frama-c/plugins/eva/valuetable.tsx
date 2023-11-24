@@ -772,11 +772,6 @@ class FunctionInfos {
     this.tracked.delete(marker);
   }
 
-  track(marker: Ast.marker): void {
-    this.tracked.add(marker);
-    this.pinned.delete(marker);
-  }
-
   delete(marker: Ast.marker): void {
     this.pinned.delete(marker);
     this.tracked.delete(marker);
@@ -811,7 +806,6 @@ class FunctionsManager {
     this.setByCallstacks = this.setByCallstacks.bind(this);
     this.setFolded = this.setFolded.bind(this);
     this.pin = this.pin.bind(this);
-    this.track = this.track.bind(this);
     this.removeLocation = this.removeLocation.bind(this);
     this.delete = this.delete.bind(this);
     this.clear = this.clear.bind(this);
@@ -865,11 +859,6 @@ class FunctionsManager {
   unpin(loc: Ast.marker): void {
     const { scope } = States.getMarker(loc);
     if (scope !== undefined) this.cache.get(scope)?.pinned.delete(loc);
-  }
-
-  track(loc: Ast.marker): void {
-    const { scope } = States.getMarker(loc);
-    if (scope !== undefined) this.getInfos(scope).track(loc);
   }
 
   removeLocation(loc: Ast.marker): void {
