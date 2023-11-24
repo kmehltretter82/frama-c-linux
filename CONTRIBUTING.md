@@ -69,7 +69,7 @@ The detailed steps to submit a contribution to Frama-C are:
 7. Check for unexpected changes.
   Use the command `make check-lint`
   in your terminal from the Frama-C root directory to detect trailing spaces,
-  tabulations or incorrect indentation (ocp-indent = 1.8.2, camomile,
+  tabulations or incorrect indentation (ocp-indent = 1.8.1, camomile,
   clang-format and black (Python linter) are needed), and `make lint` to fix
   problems if any.
 
