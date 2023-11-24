@@ -168,7 +168,11 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
         States.setMarked(m, m !== marker);
         break;
       case 'DOUBLE':
-        States.setSelected(m);
+        {
+          const { scope, definition } = States.getMarker(m);
+          if (scope || definition)
+            States.setSelected(scope ? m : definition);
+        }
         break;
     }
   };
@@ -278,7 +282,7 @@ export default function ASTinfo(): JSX.Element {
   Dome.useEvent(States.MetaSelection, (loc: States.Location) => {
     setMarkers(addMarker(markers, loc.marker));
   });
-  const clearMarkers = React.useCallback(() => setMarkers([]),[]);
+  const clearMarkers = React.useCallback(() => setMarkers([]), []);
   Server.useShutdown(clearMarkers);
     // Scrolling Hooks
   const [inside, setInside] = React.useState(false);
