@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Provided services for kernel developers.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (* ************************************************************************* *)
 (** {2 Log Machinery} *)
@@ -216,6 +216,9 @@ val wkey_file_not_found: warn_category
 val wkey_c11: warn_category
 (** Warnings related to usage of C11-specific constructions. *)
 
+val wkey_line_directive: warn_category
+(** Warnings related to unknown line directives. *)
+
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)
 (** Kernel_function-related options cannot be registered in this module:
@@ -295,14 +298,14 @@ module Quiet: Parameter_sig.Bool
 module Permissive: Parameter_sig.Bool
 (** Behavior of option "-permissive" *)
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Unicode: sig
   include Parameter_sig.Bool
   val without_unicode: ('a -> 'b) -> 'a -> 'b
   (** Execute the given function as if the option [-unicode] was not set. *)
 end
 (** Behavior of option "-unicode".
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 module Time: Parameter_sig.String
 (** Behavior of option "-time" *)
@@ -338,7 +341,7 @@ module PrintReturn : Parameter_sig.Bool
     @since Sulfur-20171101 *)
 
 (** Behavior of option "-ocode".
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module CodeOutput : sig
   include Parameter_sig.Filepath
   val output: (Format.formatter -> unit) -> unit
@@ -600,7 +603,7 @@ module UnspecifiedAccess: Parameter_sig.Bool
 
 module SafeArrays: Parameter_sig.Bool
 (** Behavior of option "-safe-arrays".
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 module SignedOverflow: Parameter_sig.Bool
 (** Behavior of option "-warn-signed-overflow" *)

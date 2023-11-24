@@ -214,11 +214,16 @@ export function register(icon: CustomIcon): void {
   Icons[id] = jsicon;
 }
 
+export interface IconData extends CustomIcon {
+  section?: string;
+  title?: string;
+}
+
 /**
    Iterate over icons gallery.
    See [[register]] to add custom icons to the gallery.
  */
-export function forEach(fn: (ico: CustomIcon) => void): void {
+export function forEach(fn: (ico: IconData) => void): void {
   const ids = Object.keys(Icons);
   ids.forEach((id) => {
     const jsicon = Icons[id];

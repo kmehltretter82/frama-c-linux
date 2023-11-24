@@ -46,7 +46,7 @@
     CIL original API documentation is available as
     an html version at http://manju.cs.berkeley.edu/cil.
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 open Cil_types
 open Cil_datatype
@@ -146,16 +146,16 @@ val setReturnTypeVI: varinfo -> typ -> unit
 val setReturnType: fundec -> typ -> unit
 
 (** Set the types of arguments and results as given by the function type
- * passed as the second argument. Will not copy the names from the function
- * type to the formals *)
+    passed as the second argument. Will not copy the names from the function
+    type to the formals *)
 val setFunctionType: fundec -> typ -> unit
 
 (** Set the type of the function and make formal arguments for them *)
 val setFunctionTypeMakeFormals: fundec -> typ -> unit
 
 (** Update the smaxid after you have populated with locals and formals
- * (unless you constructed those using {!Cil.makeLocalVar} or
- * {!Cil.makeTempVar}. *)
+    (unless you constructed those using {!Cil.makeLocalVar} or
+    {!Cil.makeTempVar}. *)
 val setMaxId: fundec -> unit
 
 val selfFormalsDecl: State.t
@@ -209,12 +209,12 @@ val foldGlobals: file -> ('a -> global -> 'a) -> 'a -> 'a
 val mapGlobals: file -> (global -> global) -> unit
 
 (** Find a function or function prototype with the given name in the file.
-  * If it does not exist, create a prototype with the given type, and return
-  * the new varinfo.  This is useful when you need to call a libc function
-  * whose prototype may or may not already exist in the file.
-  *
-  * Because the new prototype is added to the start of the file, you shouldn't
-  * refer to any struct or union types in the function type.*)
+    If it does not exist, create a prototype with the given type, and return
+    the new varinfo.  This is useful when you need to call a libc function
+    whose prototype may or may not already exist in the file.
+
+    Because the new prototype is added to the start of the file, you shouldn't
+    refer to any struct or union types in the function type.*)
 val findOrCreateFunc: file -> string -> typ -> varinfo
 
 (** creates an expression with a fresh id *)
@@ -235,11 +235,11 @@ val is_case_label: label -> bool
 
 
 (** CIL keeps the types at the beginning of the file and the variables at the
- * end of the file. This function will take a global and add it to the
- * corresponding stack. Its operation is actually more complicated because if
- * the global declares a type that contains references to variables (e.g. in
- * sizeof in an array length) then it will also add declarations for the
- * variables to the types stack *)
+    end of the file. This function will take a global and add it to the
+    corresponding stack. Its operation is actually more complicated because if
+    the global declares a type that contains references to variables (e.g. in
+    sizeof in an array length) then it will also add declarations for the
+    variables to the types stack *)
 val pushGlobal: global -> types: global list ref
   -> variables: global list ref -> unit
 
@@ -257,15 +257,15 @@ val range_loc: location -> location -> location
 val makeZeroInit: loc:location -> typ -> init
 
 (** Fold over the list of initializers in a Compound (not also the nested
- * ones). [doinit] is called on every present initializer, even if it is of
- * compound type. The parameters of [doinit] are: the offset in the compound
- * (this is [Field(f,NoOffset)] or [Index(i,NoOffset)]), the initializer
- * value, expected type of the initializer value, accumulator. In the case of
- * arrays there might be missing zero-initializers at the end of the list.
- * These are scanned only if [implicit] is true. This is much like
- * [List.fold_left] except we also pass the type of the initializer.
+    ones). [doinit] is called on every present initializer, even if it is of
+    compound type. The parameters of [doinit] are: the offset in the compound
+    (this is [Field(f,NoOffset)] or [Index(i,NoOffset)]), the initializer
+    value, expected type of the initializer value, accumulator. In the case of
+    arrays there might be missing zero-initializers at the end of the list.
+    These are scanned only if [implicit] is true. This is much like
+    [List.fold_left] except we also pass the type of the initializer.
 
- * This is a good way to use it to scan even nested initializers :
+    This is a good way to use it to scan even nested initializers :
     {v
   let rec myInit (lv: lval) (i: init) (acc: 'a) : 'a =
     match i with
@@ -455,12 +455,12 @@ val has_flexible_array_member: typ -> bool
 *)
 
 (** Unroll a type until it exposes a non
- * [TNamed]. Will collect all attributes appearing in [TNamed]!!! *)
+    [TNamed]. Will collect all attributes appearing in [TNamed]!!! *)
 val unrollType: typ -> typ
 
 (** Unroll all the TNamed in a type (even under type constructors such as
- * [TPtr], [TFun] or [TArray]. Does not unroll the types of fields in [TComp]
- * types. Will collect all attributes *)
+    [TPtr], [TFun] or [TArray]. Does not unroll the types of fields in [TComp]
+    types. Will collect all attributes *)
 val unrollTypeDeep: typ -> typ
 
 (** Separate out the storage-modifier name attributes *)
@@ -643,14 +643,14 @@ val pp_incorrect_array_length:
   Format.formatter -> incorrect_array_length -> unit
 
 (** Raised when {!Cil.lenOfArray} fails either because the length is [None],
-  * because it is a non-constant expression, or because it overflows an int.
+    because it is a non-constant expression, or because it overflows an int.
 *)
 exception LenOfArray of incorrect_array_length
 
 
 (** Call to compute the array length as present in the array type, to an
-  * integer. Raises {!Cil.LenOfArray} if not able to compute the length, such
-  * as when there is no length or the length is not a constant. *)
+    integer. Raises {!Cil.LenOfArray} if not able to compute the length, such
+    as when there is no length or the length is not a constant. *)
 val lenOfArray: exp option -> int
 val lenOfArray64: exp option -> Integer.t
 
@@ -663,8 +663,8 @@ type existsAction =
     ExistsTrue                          (** We have found it *)
   | ExistsFalse                         (** Stop processing this branch *)
   | ExistsMaybe                         (** This node is not what we are
-                                         * looking for but maybe its
-                                         * successors are *)
+                                            looking for but maybe its
+                                            successors are *)
 
 (** Scans a type by applying the function on all elements.
     When the function returns ExistsTrue, the scan stops with
@@ -678,13 +678,13 @@ val existsType: (typ -> existsAction) -> typ -> bool
 
 
 (** Given a function type split it into return type,
- * arguments, is_vararg and attributes. An error is raised if the type is not
- * a function type *)
+    arguments, is_vararg and attributes. An error is raised if the type is not
+    a function type *)
 val splitFunctionType:
   typ -> typ * (string * typ * attributes) list option * bool * attributes
 
 (** Same as {!Cil.splitFunctionType} but takes a varinfo. Prints a nicer
- * error message if the varinfo is not for a function *)
+    error message if the varinfo is not for a function *)
 val splitFunctionTypeVI:
   varinfo ->
   typ * (string * typ * attributes) list option * bool * attributes
@@ -723,19 +723,20 @@ type combineWhat =
 *)
 val combineAttributes : combineWhat -> attribute list -> attributes -> attributes
 
-(** [combineFunction] contains information on how enum, struct/union and
-    typedef are to be handled when combining with {!combineTypes} and
-    {!combineTypesGen}.
-    In pratice, the first argument of each field is a recursive definition.
+(** [combineFunction] contains information on how enum, struct/union and typedef
+    are to be handled when combining with {!combineTypes} and
+    {!combineTypesGen}. In pratice, the first argument of each field is a
+    recursive definition.
 
     @since 28.0-Nickel
+    @before Frama-C+dev [strictReturnTypes] was not named and [strictInteger]
+    not present in {!typ_combine}.
 *)
 type combineFunction =
   {
     typ_combine : combineFunction ->
-      bool -> combineWhat -> typ -> typ -> typ;
-    (** [bool] is about strictness in return context.
-        See [StrictReturnTypes] in [combineTypeGen] *)
+      strictInteger:bool -> strictReturnTypes:bool ->
+      combineWhat -> typ -> typ -> typ;
 
     enum_combine : combineFunction ->
       enuminfo -> enuminfo -> enuminfo;
@@ -747,38 +748,43 @@ type combineFunction =
       typeinfo -> typeinfo -> typeinfo;
   }
 
-(** [combineTypesGen combF combW oldt newt]
-    Combine [oldt] and [newt] accordingly to [combF], [combW] indicates what we
-    are combinining.
+(** [combineTypesGen ~strictInteger ~strictReturnTypes combF combW oldt newt]
+    Combine [oldt] and [newt] accordingly to [combF], [combW] indicates what
+    we are combinining.
 
     Warning : this is not commutative. Indeed, excluding enum, struct/union and
     typedef which depend on [combF], the resulting type is as close as possible
     to [newt].
 
-    [strictInteger] is [true] (default) if two integers with same size and sign
-    but with different types cannot be combined. A warning is sent if it is
-    [false] and the compatibility is machine-dependent.
+    If [strictInteger] is [true], same size/sign integers with different types
+    will not be combined. Emits a warning if it is [false] and the compatibility
+    is machine-dependent.
 
-    [strictReturnTypes] is [false] (default) if a non-void type is compatible
-    with void in a return case.
+    If [strictReturnTypes] is [false], anything will be considered compatible
+    with void if [combW] is [CombineFunret] (i.e. comparing function return
+    types).
 
-    Notice that the [~emitwith] action is called iff a warning is logged.
+    [~emitwith] is used to emit warnings.
 
-    @raise Cannot_combine with an explanation when the type cannot be
-           combined.
+    @raise Cannot_combine with an explanation when the type cannot be combined.
 
     @since 28.0-Nickel
+    @before Frama-C+dev [strictInteger (true)] and [strictReturnTypes (false)]
+            were optional
 *)
 val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
-  ?strictInteger:bool -> ?strictReturnTypes:bool ->
+  strictInteger:bool -> strictReturnTypes:bool ->
   combineWhat -> typ -> typ -> typ
 
-(** Specialized verison of [combineTypesGen], we suppore here that
-    if two global symbols are equal, then they are the same object.
+(** Specialized version of {!combineTypesGen], we suppose here that if two
+    global symbols are equal, then they are the same object.
 
     @since 28.0-Nickel
+    @before Frama-C+dev [strictInteger (true)] was not present and left with its
+    default value in combineTypesGen.
 *)
-val combineTypes : ?strictReturnTypes:bool -> combineWhat -> typ -> typ -> typ
+val combineTypes : ?strictInteger:bool -> ?strictReturnTypes:bool ->
+  combineWhat -> typ -> typ -> typ
 
 (** How type qualifiers must be checked when checking for types compatibility
     with {!areCompatibleTypes} and {!compatibleTypes}.
@@ -915,20 +921,20 @@ val isBitfield: lval -> bool
 val lastOffset: offset -> offset
 
 (** Add an offset at the end of an lvalue. Make sure the type of the lvalue
- * and the offset are compatible. *)
+    and the offset are compatible. *)
 val addOffsetLval: offset -> lval -> lval
 
 (** [addOffset o1 o2] adds [o1] to the end of [o2]. *)
 val addOffset:     offset -> offset -> offset
 
 (** Remove ONE offset from the end of an lvalue. Returns the lvalue with the
- * trimmed offset and the final offset. If the final offset is [NoOffset]
- * then the original [lval] did not have an offset. *)
+    trimmed offset and the final offset. If the final offset is [NoOffset]
+    then the original [lval] did not have an offset. *)
 val removeOffsetLval: lval -> lval * offset
 
 (** Remove ONE offset from the end of an offset sequence. Returns the
- * trimmed offset and the final offset. If the final offset is [NoOffset]
- * then the original [lval] did not have an offset. *)
+    trimmed offset and the final offset. If the final offset is [NoOffset]
+    then the original [lval] did not have an offset. *)
 val removeOffset:   offset -> offset * offset
 
 (** Compute the type of an lvalue *)
@@ -977,9 +983,9 @@ val mone: loc:Location.t -> exp
 val kinteger64: loc:location -> ?repr:string -> ?kind:ikind -> Integer.t -> exp
 
 (** Construct an integer of a given kind. Converts the integer to int64 and
-  * then uses kinteger64. This might truncate the value if you use a kind
-  * that cannot represent the given integer. This can only happen for one of
-  * the Char or Short kinds *)
+    then uses kinteger64. This might truncate the value if you use a kind
+    that cannot represent the given integer. This can only happen for one of
+    the Char or Short kinds *)
 val kinteger: loc:location -> ikind -> int -> exp
 
 (** Construct an integer of kind IInt. You can use this always since the
@@ -1311,10 +1317,6 @@ val mkStmtCfgBlock: stmt list -> stmt
 val mkStmtOneInstr: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
   instr -> stmt
 
-(** Try to compress statements so as to get maximal basic blocks.
- * use this instead of List.@ because you get fewer basic blocks *)
-(*val compactStmts: stmt list -> stmt list*)
-
 (** Returns an empty statement (of kind [Instr]). See [mkStmt] for [ghost] and
     [valid_sid] arguments.
 *)
@@ -1325,7 +1327,7 @@ val mkEmptyStmt: ?ghost:bool -> ?valid_sid:bool -> ?sattr:attributes ->
 val dummyInstr: instr
 
 (** A statement consisting of just [dummyInstr].
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 val dummyStmt: stmt
 
 (** Create an instruction equivalent to a pure expression. The new instruction
@@ -1465,7 +1467,7 @@ val addAttributes: attribute list -> attributes -> attributes
 val dropAttribute: string -> attributes -> attributes
 
 (** Remove all attributes with names appearing in the string list.
- *  Maintains the attributes in sorted order *)
+    Maintains the attributes in sorted order *)
 val dropAttributes: string list -> attributes -> attributes
 
 (** A block marked with this attribute is known to be a ghost else.
@@ -1744,33 +1746,33 @@ val typeAddGhost : typ -> typ
 
 (** Different visiting actions. 'a will be instantiated with [exp], [instr],
     etc.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 type 'a visitAction =
   | SkipChildren (** Do not visit the children. Return the node as it is.
-                     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+                     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | DoChildren (** Continue with the children of this node. Rebuild the node on
                    return if any of the children changes (use == test).
-                   @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+                   @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | DoChildrenPost of ('a -> 'a)
   (** visit the children, and apply the given function to the result.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | JustCopy (** visit the children, but only to make the necessary copies
                  (only useful for copy visitor).
-                 @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+                 @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | JustCopyPost of ('a -> 'a)
   (** same as JustCopy + applies the given function to the result.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide*)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>*)
   | ChangeTo of 'a  (** Replace the expression with the given one.
-                        @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+                        @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | ChangeToPost of 'a * ('a -> 'a)
   (** applies the expression to the function and gives back the result.
       Useful to insert some actions in an inheritance chain.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | ChangeDoChildrenPost of 'a * ('a -> 'a)
   (** First consider that the entire exp is replaced by the first parameter. Then
       continue with the children. On return rebuild the node if any of the
       children has changed and then apply the function on the node.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val mk_behavior :
   ?name:string ->
@@ -1817,11 +1819,11 @@ val find_default_requires: behavior list -> identified_predicate list
     {!Visitor.generic_frama_c_visitor} instead of {!genericCilVisitor} or
     {!nopCilVisitor}
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 class type cilVisitor = object
   method behavior: Visitor_behavior.t
   (** the kind of behavior expected for the behavior.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method project: Project.t option
   (** Project the visitor operates on. Non-nil for copy visitor.
@@ -1832,7 +1834,7 @@ class type cilVisitor = object
 
   method vfile: file -> file visitAction
   (** visit a whole file.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vvdec: varinfo -> varinfo visitAction
   (** Invoked for each variable declaration. The children to be traversed
@@ -1842,20 +1844,20 @@ class type cilVisitor = object
       formals and locals of function definitions. This means that the list
       of formals of a function may be traversed multiple times if there exists
       both a declaration and a definition, or multiple declarations.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vvrbl: varinfo -> varinfo visitAction
   (** Invoked on each variable use. Here only the [SkipChildren] and
       [ChangeTo] actions make sense since there are no subtrees. Note that
       the type and attributes of the variable are not traversed for a
       variable use.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vexpr: exp -> exp visitAction
   (** Invoked on each expression occurrence. The subtrees are the
       subexpressions, the types (for a [Cast] or [SizeOf] expression) or the
       variable use.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vlval: lval -> lval visitAction
   (** Invoked on each lvalue occurrence *)
@@ -1864,7 +1866,7 @@ class type cilVisitor = object
   (** Invoked on each offset occurrence that is *not* as part of an
       initializer list specification, i.e. in an lval or recursively inside an
       offset.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vinitoffs: offset -> offset visitAction
   (** Invoked on each offset appearing in the list of a
@@ -1881,7 +1883,7 @@ class type cilVisitor = object
       [Goto] and [Case] statements that point to the original statement. If you
       use the [ChangeTo] action then you should take care of preserving that
       sharing yourself.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vblock: block -> block visitAction
   (** Block. *)
@@ -1891,7 +1893,7 @@ class type cilVisitor = object
 
   method vglob: global -> global list visitAction
   (** Global (vars, types, etc.)
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vinit: varinfo -> offset -> init -> init visitAction
   (** Initializers. Pass the global where this occurs, and the offset *)
@@ -1943,7 +1945,7 @@ class type cilVisitor = object
   (** [Kstmt stmt] when visiting statement stmt, [Kglobal] when called outside
       of a statement.
       @since Carbon-20101201
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method push_stmt : stmt -> unit
   method pop_stmt : stmt -> unit
@@ -1966,29 +1968,29 @@ class type cilVisitor = object
   method vterm_offset: term_offset -> term_offset visitAction
   method vlogic_label: logic_label -> logic_label visitAction
   method vlogic_info_decl: logic_info -> logic_info visitAction
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vlogic_info_use: logic_info -> logic_info visitAction
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vlogic_type_info_decl: logic_type_info -> logic_type_info visitAction
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vlogic_type_info_use: logic_type_info -> logic_type_info visitAction
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vlogic_type_def: logic_type_def -> logic_type_def visitAction
   method vlogic_ctor_info_decl: logic_ctor_info -> logic_ctor_info visitAction
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vlogic_ctor_info_use: logic_ctor_info -> logic_ctor_info visitAction
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vlogic_var_decl: logic_var -> logic_var visitAction
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vlogic_var_use: logic_var -> logic_var visitAction
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method vquantifiers: quantifiers -> quantifiers visitAction
 
@@ -2024,11 +2026,11 @@ class type cilVisitor = object
   method fill_global_tables: unit
   (** fill the global environment tables at the end of a full copy in a
       new project.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method get_filling_actions: (unit -> unit) Queue.t
   (** get the queue of actions to be performed at the end of a full copy.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 end
 
@@ -2080,21 +2082,21 @@ val doVisitList:
 (** {3 Visitor's entry points} *)
 
 (** Visit a file. This will re-cons all globals TWICE (so that it is
- * tail-recursive). Use {!Cil.visitCilFileSameGlobals} if your visitor will
- * not change the list of globals.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    tail-recursive). Use {!Cil.visitCilFileSameGlobals} if your visitor will
+    not change the list of globals.
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 val visitCilFileCopy: cilVisitor -> file -> file
 
 (** Same thing, but the result is ignored. The given visitor must thus be
     an inplace visitor. Nothing is done if the visitor is a copy visitor.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 val visitCilFile: cilVisitor -> file -> unit
 
 (** A visitor for the whole file that does not *physically* change the
     globals (but maybe changes things inside the globals through
     side-effects). Use this function instead of {!Cil.visitCilFile}
     whenever appropriate because it is more efficient for long files.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 val visitCilFileSameGlobals: cilVisitor -> file -> unit
 
 (** Same as {!Cil.visitCilFileSameGlobals}, but only visits function definitions
@@ -2185,7 +2187,7 @@ val visitCilType: cilVisitor -> typ -> typ
 val visitCilVarDecl: cilVisitor -> varinfo -> varinfo
 
 (** Visit an initializer, pass also the global to which this belongs and the
- * offset. *)
+    offset. *)
 val visitCilInit: cilVisitor -> varinfo -> offset -> init -> init
 
 (** Visit a list of attributes *)
@@ -2279,8 +2281,8 @@ val constFoldVisitor: bool -> cilVisitor
 (* ************************************************************************* *)
 
 (** A reference to the current location. If you are careful to set this to
- * the current location then you can use some built-in logging functions that
- * will print the location. *)
+    the current location then you can use some built-in logging functions that
+    will print the location. *)
 module CurrentLoc: State_builder.Ref with type data = location
 
 (** Pretty-print [(Cil.CurrentLoc.get ())] *)
@@ -2340,17 +2342,17 @@ exception SizeOfError of string * typ
 val unsignedVersionOf : ikind -> ikind
 
 (** The signed integer kind for a given size (unsigned if second argument
- * is true). Raises Not_found if no such kind exists *)
+    is true). Raises Not_found if no such kind exists *)
 val intKindForSize : int -> bool -> ikind
 
 (** The float kind for a given size. Raises Not_found
- *  if no such kind exists *)
+    if no such kind exists *)
 val floatKindForSize : int-> fkind
 
 (** The size of a type, in bits. Trailing padding is added for structs and
- * arrays. Raises {!Cil.SizeOfError} when it cannot compute the size. This
- * function is architecture dependent, so you should only call this after you
- * call {!Cil.initCIL}. Remember that on GCC sizeof(void) is 1! *)
+    arrays. Raises {!Cil.SizeOfError} when it cannot compute the size. This
+    function is architecture dependent, so you should only call this after you
+    call {!Cil.initCIL}. Remember that on GCC sizeof(void) is 1! *)
 val bitsSizeOf: typ -> int
 
 (** The size of a type, in bytes. Raises {!Cil.SizeOfError} when it cannot
@@ -2386,8 +2388,8 @@ val intTypeIncluded: ikind -> ikind -> bool
 val frank: fkind -> int
 
 (** Represents an integer as for a given kind.
- * Returns a flag saying whether the value was changed
- * during truncation (because it was too large to fit in k). *)
+    Returns a flag saying whether the value was changed
+    during truncation (because it was too large to fit in k). *)
 val truncateInteger64: ikind -> Integer.t -> Integer.t * bool
 
 (** Returns the maximal value representable in a signed integer type of the
@@ -2424,14 +2426,14 @@ exception Not_representable
 val intKindForValue: Integer.t -> bool -> ikind
 
 (** The size of a type, in bytes. Returns a constant expression or a "sizeof"
- * expression if it cannot compute the size. This function is architecture
- * dependent, so you should only call this after you call {!Cil.initCIL}.  *)
+    expression if it cannot compute the size. This function is architecture
+    dependent, so you should only call this after you call {!Cil.initCIL}.  *)
 val sizeOf: loc:location -> typ -> exp
 
 (** The minimum alignment (in bytes) for a type. This function is
- * architecture dependent, so you should only call this after you call
- * {!Cil.initCIL}.
- * Raises {!SizeOfError} when it cannot compute the alignment. *)
+    architecture dependent, so you should only call this after you call
+    {!Cil.initCIL}.
+    @raise {!SizeOfError} when it cannot compute the alignment. *)
 val bytesAlignOf: typ -> int
 
 (** [intOfAttrparam a] tries to const-fold [a] into a numeric value.
@@ -2440,17 +2442,17 @@ val bytesAlignOf: typ -> int
 val intOfAttrparam: attrparam -> int option
 
 (** Give a type of a base and an offset, returns the number of bits from the
- * base address and the width (also expressed in bits) for the subobject
- * denoted by the offset. Raises {!Cil.SizeOfError} when it cannot compute
- * the size. This function is architecture dependent, so you should only call
- * this after you call {!Cil.initCIL}. *)
+    base address and the width (also expressed in bits) for the subobject
+    denoted by the offset. Raises {!Cil.SizeOfError} when it cannot compute
+    the size. This function is architecture dependent, so you should only call
+    this after you call {!Cil.initCIL}. *)
 val bitsOffset: typ -> offset -> int * int
 
 (** Give a field, returns the number of bits from the structure or union
- * containing the field and the width (also expressed in bits) for the subobject
- * denoted by the field. Raises {!Cil.SizeOfError} when it cannot compute
- * the size. This function is architecture dependent, so you should only call
- * this after you call {!Cil.initCIL}. *)
+    containing the field and the width (also expressed in bits) for the subobject
+    denoted by the field. Raises {!Cil.SizeOfError} when it cannot compute
+    the size. This function is architecture dependent, so you should only call
+    this after you call {!Cil.initCIL}. *)
 val fieldBitsOffset: fieldinfo -> int * int
 
 (** Like map but try not to make a copy of the list *)
@@ -2525,7 +2527,7 @@ val cvar_to_term: loc:location -> varinfo -> term
 val make_temp_logic_var: logic_type -> logic_var
 
 (** The constant logic term zero.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 val lzero : ?loc:location -> unit -> term
 
 (** The constant logic term 1. *)

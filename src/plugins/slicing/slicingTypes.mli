@@ -29,19 +29,20 @@ exception CantRemoveCalledFf
 exception WrongSlicingLevel
 
 (** raised when someone tries to build more than one slice for the entry point.
- * *)
+*)
 exception OnlyOneEntryPointSlice
 
 (** raised when one tries to select something in a function where we are not
- * able to compute the Pdg. *)
+    able to compute the Pdg. *)
 exception NoPdg
 
-(** {2 Public types}
-  * These types are the only one that should be used by the API functions.
-  * Public type definitions should be hidden to the outside world,
-  * but it is not really possible to have abstract types since Slicing has to
-  * use Db.Slicing functions...  So, it is up to the user of this module to use
-  * only this public part.
+(** {2 Public types} *)
+
+(** These types are the only one that should be used by the API functions.
+    Public type definitions should be hidden to the outside world,
+    but it is not really possible to have abstract types since Slicing has to
+    use Db.Slicing functions...  So, it is up to the user of this module to use
+    only this public part.
 *)
 
 (** contains global things that has been computed so far
@@ -53,8 +54,8 @@ exception NoPdg
 type sl_project   = SlicingInternals.project
 
 (** Type of the selections
- * (we store the varinfo because we cannot use the kernel_function in this file)
- * *)
+    (we store the varinfo because we cannot use the kernel_function in this file)
+*)
 type sl_select = Cil_types.varinfo * SlicingInternals.fct_user_crit
 
 module Fct_user_crit : Datatype.S with type t = SlicingInternals.fct_user_crit

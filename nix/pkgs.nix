@@ -3,13 +3,11 @@ let
   ocamlOverlay = oself: osuper: {
     # External Packages
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
-    camlp5 = oself.callPackage ./camlp5.nix {};
     combinetura = oself.callPackage ./combinetura.nix {};
     headache = oself.callPackage ./headache.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
-    ocamlgraph = oself.callPackage ./ocamlgraph.nix {};
+    ocplib-simplex = oself.callPackage ./ocplib-simplex.nix {};
     why3 = oself.callPackage ./why3.nix {};
-    ppx_deriving_yaml = oself.callPackage ./ppx_deriving_yaml.nix {};
 
     # Helpers
     mk_tests = oself.callPackage ./mk_tests.nix {};
@@ -57,6 +55,7 @@ let
 
     # Release
     api-doc = oself.callPackage ./api-doc.nix {};
+    api-json-doc = oself.callPackage ./api-json-doc.nix {};
     manuals = oself.callPackage ./manuals.nix {};
     src-distrib-tests = oself.callPackage ./src-distrib-tests.nix {
       frama-c-release = oself.frama-c.override {

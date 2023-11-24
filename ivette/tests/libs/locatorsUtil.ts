@@ -52,7 +52,7 @@ export function getShutDownServerButton(window: Page): Locator {
  * Locator to select the Console View
  */
 export function getConsoleView(window: Page): Locator {
-  return window.locator(".CodeMirror");
+  return window.locator(".cm-global-box");
 }
 
 /**
@@ -64,4 +64,18 @@ export function getFunctionsSideBar(window: Page): Locator {
 
 export function getServerStatusLabel(window: Page): Locator {
   return window.getByTitle("Server is running");
+}
+
+/**
+ * Locator to access the primary section (categories) of the double bar
+ */
+export function getDoubleBarPrimary(window: Page): Locator {
+  return window.locator('.dome-xDoubleBar-primary');
+}
+
+/**
+ * Locator to access the secondary section (submenu) of the double bar
+ */
+export function getDoubleBarSecondary(window: Page): Locator {
+  return window.locator('dome-xSideBar-double-secondary');
 }

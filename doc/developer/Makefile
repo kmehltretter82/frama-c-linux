@@ -144,19 +144,27 @@ check-viewcfg-v5:
 check-viewcfg-v6:
 	cd tutorial/viewcfg/v6-* && $(duneb) @install
 
-hello.tar.gz: FILES=$(shell cd tutorial/hello/v7-doc && git ls-files)
-
+ifdef NIX_BUILD_TOP
+# - in Nix CI we expect the directory to be clean
+hello.tar: FILES= $(shell cd tutorial/hello/v7-doc && find *)
+else
 # - use 'git ls-files' to avoid including extraneous files in archive
+hello.tar: FILES= $(shell cd tutorial/hello/v7-doc && git ls-files)
+endif
 # - use several tar options to improve build reproducibility
-hello.tar.gz:
+hello.tar:
 	cd tutorial/hello && \
 	rm -rf hello && \
 	cp -r v7-doc hello && \
-	tar -cf - $(addprefix hello/,$(FILES)) \
+	tar -cf $@ $(addprefix hello/,$(FILES)) \
 	  --numeric-owner --owner=0 --group=0 --sort=name \
-	  --mtime="$$(date +"%F") Z" --mode='a+rw' | \
-	    gzip -9 -n > ../../hello.tar.gz && \
-	rm -rf hello
+	  --mtime="$$(date +"%F") Z" --mode='a+rw' && \
+	rm -rf hello && \
+	mv hello.tar ../../hello.tar
+
+hello.tar.gz: hello.tar
+	gzip -9 -ncf hello.tar > hello.tar.gz && \
+	rm -rf hello.tar
 
 ###########
 

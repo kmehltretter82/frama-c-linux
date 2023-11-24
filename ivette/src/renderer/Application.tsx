@@ -31,11 +31,12 @@ import * as Dome from 'dome';
 import { Vfill } from 'dome/layout/boxes';
 import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
-import * as Sidebar from 'dome/frame/sidebars';
+import * as Sidebar from './Sidebar';
 import * as Actions from './Actions';
 import * as Controller from './Controller';
-import * as Extensions from './Extensions';
 import * as Laboratory from './Laboratory';
+import * as Ext from './Extensions';
+import { TOOLBAR, STATUSBAR } from 'ivette';
 import * as IvettePrefs from 'ivette/prefs';
 import './loader';
 import './sandbox';
@@ -50,6 +51,9 @@ export default function Application(): JSX.Element {
   const [viewbar, flipViewbar] =
     Dome.useFlipSettings('frama-c.viewbar.unfold', true);
 
+  const ToolBar = Ext.useChildren(TOOLBAR);
+  const StatusBar = Ext.useChildren(STATUSBAR);
+
   return (
     <Vfill>
       <Toolbar.ToolBar>
@@ -60,7 +64,7 @@ export default function Application(): JSX.Element {
           onClick={flipSidebar}
         />
         <Controller.Control />
-        <Extensions.Toolbar />
+        <>{ToolBar}</>
         <Toolbar.Filler />
         <IvettePrefs.ThemeSwitchTool />
         <IvettePrefs.FontTools />
@@ -73,10 +77,7 @@ export default function Application(): JSX.Element {
         />
       </Toolbar.ToolBar>
       <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
-        <Sidebar.SideBar>
-          <div className="sidebar-ruler" />
-          <Extensions.Sidebar />
-        </Sidebar.SideBar>
+        <Sidebar.Panel />
         <Laboratory.LabView
           customize={viewbar}
           settings="frama-c.labview"
@@ -84,7 +85,7 @@ export default function Application(): JSX.Element {
       </LSplit>
       <Toolbar.ToolBar>
         <Controller.Status />
-        <Extensions.Statusbar />
+        <>{StatusBar}</>
         <Toolbar.Filler />
         <Controller.Stats />
       </Toolbar.ToolBar>

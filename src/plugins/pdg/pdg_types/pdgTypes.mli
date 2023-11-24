@@ -25,12 +25,13 @@
 *)
 
 (** [Dpd] stands for 'dependence'. This object is used as a label on the edges
- * of the PDG. There are three kinds of dependencies :
- * - control dependency,
- * - address dependency,
- * - data dependency.
- * An edge can carry one or several kinds.
- * A bottom edge means that there are no relation.
+    of the PDG. There are three kinds of dependencies :
+    - control dependency,
+    - address dependency,
+    - data dependency.
+
+    An edge can carry one or several kinds. A bottom edge means that there are
+    no relation.
 *)
 module Dpd :
 sig
@@ -146,7 +147,7 @@ module Pdg : sig
   val iter_direct_codpds : t -> (Node.t -> unit) -> Node.t -> unit
 
   (** a dependency to another node. The dependency can be restricted to a zone.
-   * (None means no restriction ie. total dependency) *)
+      (None means no restriction ie. total dependency) *)
   type dpd_info = (Node.t * Locations.Zone.t option)
 
   val get_all_direct_dpds : t -> Node.t -> dpd_info list

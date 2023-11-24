@@ -33,7 +33,7 @@ val get_selection: ?is_set:bool -> unit -> State_selection.t
     [is_set] is [true] by default (for backward compatibility): in such a
     case, for each option, the extra internal state indicating whether it is
     set also belongs to the selection.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val get_reset_selection: ?is_set:bool -> unit -> State_selection.t
 (** Selection of resettable parameters in case of copy with a visitor.

@@ -21,11 +21,11 @@
 (**************************************************************************)
 
 (** This module provides elements to mapped information (here called 'marks')
- * to PDG elements and propagate it along the dependencies.
- *
- * Some more functions are defined in the PDG plugin itself
- * (in [pdg/marks]):
- * the signatures of these public functions can be found in file [Pdg.mli] *)
+    to PDG elements and propagate it along the dependencies.
+
+    Some more functions are defined in the PDG plugin itself
+    (in [pdg/marks]):
+    the signatures of these public functions can be found in file [Pdg.mli] *)
 
 (** Signature of the module to use in order to instantiate the computation *)
 module type Mark = sig
@@ -34,9 +34,9 @@ module type Mark = sig
   type t
 
   (** type of the information mapped to the function calls.
-   * This can be [unit] if there is nothing to store for the calls.
-   * (see {!PdgIndex.FctIndex} for more information)
-   * *)
+      This can be [unit] if there is nothing to store for the calls.
+      (see {!PdgIndex.FctIndex} for more information)
+  *)
   type call_info
 
   (** used to test [combine] result (see below) *)
@@ -46,11 +46,11 @@ module type Mark = sig
   val merge : t -> t -> t
 
   (** [combine] is used during propagation. It should return
-   * [(new_mark, mark_to_prop) = combine old_mak new_mark]
-   * where [new_mark] is the mark to associate with the node,
-   * and [mark_to_prop] the mark to propagate to its dependencies.
-   * If [is_bottom mark_to_prop], the propagation is stopped.
-   * *)
+      [(new_mark, mark_to_prop) = combine old_mak new_mark]
+      where [new_mark] is the mark to associate with the node,
+      and [mark_to_prop] the mark to propagate to its dependencies.
+      If [is_bottom mark_to_prop], the propagation is stopped.
+  *)
   val combine : t -> t -> t * t
 
   val pretty : Format.formatter -> t -> unit
@@ -58,10 +58,10 @@ module type Mark = sig
 end
 
 (** When selecting or propagating marks in a function,
- * the marks are most of the time associated to pdg nodes,
- * but we also need to associate marks to input locations
- * in order to propage information to the callers about undefined data.
- * *)
+    the marks are most of the time associated to pdg nodes,
+    but we also need to associate marks to input locations
+    in order to propage information to the callers about undefined data.
+*)
 type select_elem = private
   | SelNode of PdgTypes.Node.t * Locations.Zone.t option
   | SelIn of Locations.Zone.t
@@ -146,20 +146,20 @@ module type Config = sig
   module M : Mark
 
   (** define how to translate an input mark of a function into a mark
-   * to propagate in the callers.
-   * The statement specify to which call we are about to propagate,
-   * and the pdg is the one of the caller in which the call is.
-   * If it returns [None], the propagation is stopped.
-   * A simple propagation can be done by returning [Some m].
-   * The [call] parameter can be [None] when the caller has a Top PDG.
-   * *)
+      to propagate in the callers.
+      The statement specify to which call we are about to propagate,
+      and the pdg is the one of the caller in which the call is.
+      If it returns [None], the propagation is stopped.
+      A simple propagation can be done by returning [Some m].
+      The [call] parameter can be [None] when the caller has a Top PDG.
+  *)
   val mark_to_prop_to_caller_input : M.t call_m2m
 
   (** define how to translate a mark of a call output into a mark
-   * to propagate in the called function.
-   * The statement specify from which call we are about to propagate,
-   * and the pdg is the one of the called function.
-   * *)
+      to propagate in the called function.
+      The statement specify from which call we are about to propagate,
+      and the pdg is the one of the called function.
+  *)
   val mark_to_prop_to_called_output : M.t call_m2m
 
 end

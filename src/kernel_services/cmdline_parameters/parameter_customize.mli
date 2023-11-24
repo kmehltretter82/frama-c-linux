@@ -26,7 +26,7 @@
     provided by the functor {!Plugin.Register} and generating a new
     parameter.
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val set_cmdline_stage: Cmdline.stage -> unit
 (** Set the stage where the option corresponding to the parameter is
@@ -54,7 +54,7 @@ val set_negative_option_name: string -> unit
     Assume that the given string is a valid option name or empty.
     If it is empty, no negative option is created.
     @since Beryllium-20090601-beta1
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val set_negative_option_help: string -> unit
 (** For boolean parameters, set the help message of the negative

@@ -653,8 +653,7 @@ struct
         d_cluster = cluster ;
         d_definition = Function(tau,is_recursive l,r) ;
       } in
-      Definitions.define_symbol ldef ;
-      type_for_signature l ldef s ; SIG s
+      Definitions.define_symbol ldef ; SIG s
 
   (* -------------------------------------------------------------------------- *)
   (* --- Compiling Logic Predicate with Definition                          --- *)

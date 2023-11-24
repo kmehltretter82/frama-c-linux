@@ -34,7 +34,6 @@ import * as Dome from 'dome';
 import * as Themes from 'dome/themes';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Settings from 'dome/data/settings';
-import 'codemirror/mode/clike/clike';
 
 /* -------------------------------------------------------------------------- */
 /* --- Theme Switcher Button                                              --- */

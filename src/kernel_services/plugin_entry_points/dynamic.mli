@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Value accesses through dynamic typing.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (* ************************************************************************* *)
 (** {2 Registration} *)
@@ -37,7 +37,7 @@ val register:
     cannot register a value with the same name twice.
     @before 26.0-Iron there was a labeled argument [journalized], that has
             been removed when Journalization has been removed.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (* ************************************************************************* *)
 (** {2 Access} *)
@@ -53,7 +53,7 @@ val get: plugin:string -> string -> 'a Type.t -> 'a
     @raise Unbound_value if the name is not registered
     @raise Incompatible_type if the name is not registered
     with a compatible type
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val iter: (string -> 'a Type.t -> 'a -> unit) -> unit
 val iter_comment : (string -> string -> unit) -> unit
@@ -65,7 +65,7 @@ val iter_comment : (string -> string -> unit) -> unit
 
 (** Module to use for accessing parameters of plug-ins.
     Assume that the plug-in is already loaded.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Parameter : sig
 
   (** Set of common operations on parameters. *)
@@ -93,7 +93,7 @@ module Parameter : sig
   (**/**)
 
   (** Boolean parameters.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module Bool: sig
     include Common with type t = bool
     val on: string -> unit -> unit

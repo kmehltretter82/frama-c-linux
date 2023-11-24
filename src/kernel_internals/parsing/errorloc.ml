@@ -52,6 +52,9 @@ type parseinfo = {
 
 let current = ref None
 
+(* Used to temporarily store current line before knowing the current file *)
+let currentLine = ref None
+
 let startParsing fname lexer =
   (* We only support one open file at a time *)
   match !current with
@@ -86,27 +89,54 @@ let finishParsing () =
 
 (* Call this function to announce a new line *)
 let newline () =
-  Lexing.new_line (Option.get !current).lexbuf
+  let current = Option.get !current in
+  if !currentLine <> None then begin
+    (* line directive without file name; update line number *)
+    let pos = current.lexbuf.Lexing.lex_curr_p in
+    current.lexbuf.Lexing.lex_curr_p <-
+      { pos with
+        Lexing.pos_lnum = Option.get !currentLine;
+        Lexing.pos_bol = pos.Lexing.pos_cnum;
+      };
+    currentLine := None
+  end;
+  Lexing.new_line current.lexbuf
 
 let setCurrentLine (i: int) =
-  let current = Option.get !current in
-  let pos = current.lexbuf.Lexing.lex_curr_p in
-  current.lexbuf.Lexing.lex_curr_p <-
-    { pos with
-      Lexing.pos_lnum = i;
-      Lexing.pos_bol = pos.Lexing.pos_cnum;
-    }
+  currentLine := Some i
 
 let setCurrentWorkingDirectory s =
   let current = Option.get !current in
   current.current_working_directory <- Some s
 
+(* preprocessors tend to use '<xxx>' filenames in line directives to
+   denote special locations, e.g. builtin or command-line-defined macros.
+   Worse, this can get localized. We are thus a bit liberal in what we
+   consider special filenames.
+*)
+let is_special_file n =
+  let len = String.length n in
+  (* not sure an empty string can realistically happen here,
+     but it can't hurt to check. *)
+  len = 0 || n.[0] = '<' && n.[len-1] = '>'
+
 let setCurrentFile n =
   let current = Option.get !current in
   let base_name = current.current_working_directory in
-  let n = Filepath.normalize ?base_name n in
-  let pos = current.lexbuf.Lexing.lex_curr_p in
-  current.lexbuf.Lexing.lex_curr_p <- { pos with Lexing.pos_fname = n }
+  let norm = Filepath.normalize ?base_name n in
+  if not (is_special_file n) && not (Sys.file_exists norm)
+  then begin
+    currentLine := None;
+    Kernel.warning ~wkey:Kernel.wkey_line_directive ~once:true
+      "ignoring non-existing file '%s', referenced in a line directive" norm
+  end else begin
+    let pos = current.lexbuf.Lexing.lex_curr_p in
+    current.lexbuf.Lexing.lex_curr_p <- {
+      pos with Lexing.pos_fname = norm;
+               Lexing.pos_lnum = (Option.get !currentLine);
+               Lexing.pos_bol = pos.Lexing.pos_cnum;
+    }
+  end
 
 (* Prints the [pos.pos_lnum]-th line from file [pos.pos_fname],
    plus up to [ctx] lines before and after [pos.pos_lnum] (if they exist),

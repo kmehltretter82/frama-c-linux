@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Implementation of data flow analyses over user-supplied domains.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 (** possible kinds of action for backward analysis *)
@@ -29,7 +29,7 @@ type 't action =
     Default (** The default action *)
   | Done of 't (** Do not do the default action. Use this result *)
   | Post of ('t -> 't) (** The default action, followed by the given
-                        * transformer *)
+                           transformer *)
 
 type 't stmtaction =
     SDefault   (** The default action *)

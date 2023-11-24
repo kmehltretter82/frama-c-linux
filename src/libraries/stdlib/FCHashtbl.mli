@@ -22,7 +22,7 @@
 
 (** Extension of OCaml's [Hashtbl] module.
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 (* No need to expand OCaml's [Hashtbl.S] here: we do not provide an alternative

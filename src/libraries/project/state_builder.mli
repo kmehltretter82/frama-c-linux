@@ -24,7 +24,7 @@
     Provide ways to implement signature [State_builder.S].
     Depending on the builder, also provide some additional useful
     information.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (* ************************************************************************* *)
 (* ************************************************************************* *)
@@ -85,7 +85,7 @@ end
     [Datatype] represents the datatype of a state, [Local_state]
     explains how to deal with the client-side state and [Info] are additional
     required information.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Register
     (Datatype: Datatype.S)
     (_: State.Local with type t = Datatype.t)
@@ -124,7 +124,7 @@ module type Ref = sig
       @since 28.0-Nickel *)
 end
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Ref
     (Data:Datatype.S)
     (_:sig
@@ -391,7 +391,7 @@ module type Hashtbl = sig
       @since 28.0-Nickel *)
 end
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     - [H] is the hashtable implementation
     - [Data] is the datatype for values stored in the table
 *)

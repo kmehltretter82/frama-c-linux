@@ -27,7 +27,7 @@
     possible to have many projects at the same time. For registering a new
     state in the Frama-C projects, apply the functor {!State_builder.Register}.
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (* ************************************************************************* *)
 (** {2 Types for project} *)
@@ -67,7 +67,7 @@ exception NoProject
 val current: unit -> t
 (** The current project.
     @raise NoProject if there is no project.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val is_current: t -> bool
 (** Check whether the given project is the current one or not. *)
@@ -116,7 +116,7 @@ val set_current: ?on:bool -> ?selection:State_selection.t -> t -> unit
 (** Set the current project with the given one.
     The flag [on] is not for casual users.
     @raise Invalid_argument if the given project does not exist anymore.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val register_after_set_current_hook: user_only:bool -> (t -> unit) -> unit
 (** [register_after_set_current_hook f] adds a hook on function
@@ -132,7 +132,7 @@ val on: ?selection:State_selection.t -> t -> ('a -> 'b) -> 'a -> 'b
 (** [on p f x] sets the current project to [p], computes [f x] then
     restores the current project. You should use this function if you use a
     project different of [current ()].
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val set_keep_current: bool -> unit
 (** [set_keep_current b] keeps the current project forever (even after the end
@@ -171,7 +171,7 @@ val clear: ?selection:State_selection.t -> ?project:t -> unit -> unit
 (** Clear the given project. Default project is [current ()]. All the
     internal states of the given project are now empty (wrt the action
     registered with {!register_todo_before_clear}).
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val register_todo_before_clear: (t -> unit) -> unit
 (** Register an action performed just before clearing a project.
@@ -200,12 +200,12 @@ val register_before_remove_hook: (t -> unit) -> unit
 (* ************************************************************************* *)
 
 exception IOError of string
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val save: ?selection:State_selection.t -> ?project:t -> Filepath.Normalized.t -> unit
 (** Save a given project in a file. Default project is [current ()].
     @raise IOError if the project cannot be saved.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val load: ?selection:State_selection.t -> ?name:string -> Filepath.Normalized.t -> t
 (** Load a file into a new project given by its name.
@@ -219,7 +219,7 @@ val load: ?selection:State_selection.t -> ?name:string -> Filepath.Normalized.t 
     }
     @raise IOError if the project cannot be loaded
     @return the new project containing the loaded data.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val save_all: ?selection:State_selection.t -> Filepath.Normalized.t -> unit
 (** Save all the projects in a file.

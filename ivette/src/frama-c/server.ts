@@ -36,7 +36,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as System from 'dome/system';
 import * as Json from 'dome/data/json';
-import { RichTextBuffer } from 'dome/text/buffers';
+import { TextBuffer } from 'dome/text/richtext';
 import { ChildProcess } from 'child_process';
 import { client } from './client_socket';
 // import { client } from './client_zmq';
@@ -136,7 +136,7 @@ let killingTimer: NodeJS.Timeout | undefined;
 // --------------------------------------------------------------------------
 
 /** The server console buffer. */
-export const buffer = new RichTextBuffer();
+export const buffer = new TextBuffer();
 
 // --------------------------------------------------------------------------
 // --- Server Status
@@ -249,7 +249,7 @@ export async function start(): Promise<void> {
       try {
         await _launch();
       } catch (error) {
-        buffer.log('[frama-c]', error);
+        buffer.append('[frama-c]', error, '\n');
         _exit(false);
       }
       return;
@@ -498,27 +498,21 @@ async function _launch(): Promise<void> {
     sockaddr && System.remove(sockaddr);
   });
   process = await System.spawn(command, params, options);
-  const logger = (text: string | string[]): void => {
-    buffer.append(text);
-    if (text.indexOf('\n') >= 0) {
-      buffer.scroll();
-    }
-  };
-  process?.stdout?.on('data', logger);
-  process?.stderr?.on('data', logger);
+  process?.stdout?.on('data', buffer.append);
+  process?.stderr?.on('data', buffer.append);
   process?.on('exit', (code: number | null, signal: string | null) => {
     if (signal !== null) {
-      buffer.log('[frama-c]', signal);
+      buffer.append('[frama-c]', signal, '\n');
       _exit(false);
       return;
     }
     if (code !== 0) {
-      buffer.log('[frama-c] exit', code);
+      buffer.append('[frama-c] exit', code, '\n');
       _exit(true);
       return;
     }
     if (Dome.DEVEL)
-      buffer.log('[frama-c] terminated.');
+      buffer.append('[frama-c] terminated.\n');
     _exit(false);
     return;
   });
