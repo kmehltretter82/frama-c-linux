@@ -4,7 +4,7 @@
     "style": {
       "shape": "round-rectangle",
       "background-color": "#666",
-      "label": "data(id)",
+      "label": "data(name)",
       "color": "white",
       "text-outline-width": 2,
       "text-outline-color": "#666",

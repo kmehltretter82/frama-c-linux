@@ -64,8 +64,9 @@ type program_stats =
     assertions_statuses: statuses;
     preconds_statuses: statuses; }
 
-module FunctionStats : sig
-  type key = Cil_types.fundec
+module FunctionStats :
+sig
+  type key = Kernel_function.t
   type data = fun_stats
 
   (** Get the current analysis statistics for a function *)

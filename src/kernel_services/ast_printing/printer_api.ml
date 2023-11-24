@@ -153,6 +153,14 @@ class type extensible_printer_type = object
   method offset: Format.formatter -> offset -> unit
   (** Invoked on each offset occurrence. The second argument is the base. *)
 
+  method typeref: 'a. typ ->
+    (Format.formatter -> 'a -> unit) ->
+    Format.formatter -> 'a -> unit
+
+  method typedef: 'a. global ->
+    (Format.formatter -> 'a -> unit) ->
+    Format.formatter -> 'a -> unit
+
   method global: Format.formatter -> global -> unit
   (** Global (vars, types, etc.). This can be slow. *)
 
@@ -166,8 +174,8 @@ class type extensible_printer_type = object
   method compkind: Format.formatter -> compinfo -> unit
   method compname: Format.formatter -> compinfo -> unit
   method compinfo: Format.formatter -> compinfo -> unit
-  method enuminfo: Format.formatter -> enuminfo -> unit
-  method typeinfo: Format.formatter -> typeinfo -> unit
+  method enumname: Format.formatter -> enuminfo -> unit
+  method typename: Format.formatter -> typeinfo -> unit
 
   method typ:
     ?fundecl:varinfo ->

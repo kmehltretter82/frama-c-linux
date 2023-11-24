@@ -38,13 +38,13 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byFct } from 'frama-c/kernel/api/ast';
+import { byDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fct } from 'frama-c/kernel/api/ast';
+import { decl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fctDefault } from 'frama-c/kernel/api/ast';
+import { declDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jFct } from 'frama-c/kernel/api/ast';
+import { jDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
@@ -55,30 +55,38 @@ import { tag } from 'frama-c/kernel/api/data';
 import { tagDefault } from 'frama-c/kernel/api/data';
 
 export interface vertex {
-  /** The function represented by the node */
-  kf: fct;
+  /** The function name of the node */
+  name: string;
+  /** The declaration tag of the function */
+  decl: decl;
   /** whether this node is the root of a service */
   is_root: boolean;
   /** the root of this node's service */
-  root: fct;
+  root: decl;
 }
 
 /** Decoder for `vertex` */
 export const jVertex: Json.Decoder<vertex> =
-  Json.jObject({ kf: jFct, is_root: Json.jBoolean, root: jFct,});
+  Json.jObject({
+    name: Json.jString,
+    decl: jDecl,
+    is_root: Json.jBoolean,
+    root: jDecl,
+  });
 
 /** Natural order for `vertex` */
 export const byVertex: Compare.Order<vertex> =
   Compare.byFields
-    <{ kf: fct, is_root: boolean, root: fct }>({
-    kf: byFct,
+    <{ name: string, decl: decl, is_root: boolean, root: decl }>({
+    name: Compare.string,
+    decl: byDecl,
     is_root: Compare.boolean,
-    root: byFct,
+    root: byDecl,
   });
 
 /** Default value for `vertex` */
 export const vertexDefault: vertex =
-  { kf: fctDefault, is_root: false, root: fctDefault };
+  { name: '', decl: declDefault, is_root: false, root: declDefault };
 
 /** Whether the call goes through services or not */
 export enum edgeKind {
@@ -101,8 +109,8 @@ export const edgeKindDefault: edgeKind = edgeKind.inter_services;
 
 const edgeKindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.callgraph.edgeKindTags',
-  input:  Json.jNull,
+  name: 'plugins.callgraph.edgeKindTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -111,29 +119,29 @@ export const edgeKindTags: Server.GetRequest<null,tag[]>= edgeKindTags_internal;
 
 export interface edge {
   /** src */
-  src: fct;
+  src: decl;
   /** dst */
-  dst: fct;
+  dst: decl;
   /** kind */
   kind: edgeKind;
 }
 
 /** Decoder for `edge` */
 export const jEdge: Json.Decoder<edge> =
-  Json.jObject({ src: jFct, dst: jFct, kind: jEdgeKind,});
+  Json.jObject({ src: jDecl, dst: jDecl, kind: jEdgeKind,});
 
 /** Natural order for `edge` */
 export const byEdge: Compare.Order<edge> =
   Compare.byFields
-    <{ src: fct, dst: fct, kind: edgeKind }>({
-    src: byFct,
-    dst: byFct,
+    <{ src: decl, dst: decl, kind: edgeKind }>({
+    src: byDecl,
+    dst: byDecl,
     kind: byEdgeKind,
   });
 
 /** Default value for `edge` */
 export const edgeDefault: edge =
-  { src: fctDefault, dst: fctDefault, kind: edgeKindDefault };
+  { src: declDefault, dst: declDefault, kind: edgeKindDefault };
 
 /** The callgraph of the current project */
 export interface graph {
@@ -165,8 +173,8 @@ export const signalCallgraph: Server.Signal = {
 
 const getCallgraph_internal: Server.GetRequest<null,graph | undefined> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.callgraph.getCallgraph',
-  input:  Json.jNull,
+  name: 'plugins.callgraph.getCallgraph',
+  input: Json.jNull,
   output: Json.jOption(jGraph),
   signals: [],
 };
@@ -188,8 +196,8 @@ export const signalIsComputed: Server.Signal = {
 
 const getIsComputed_internal: Server.GetRequest<null,boolean> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.callgraph.getIsComputed',
-  input:  Json.jNull,
+  name: 'plugins.callgraph.getIsComputed',
+  input: Json.jNull,
   output: Json.jBoolean,
   signals: [],
 };
@@ -206,8 +214,8 @@ export const isComputed: State.Value<boolean> = isComputed_internal;
 
 const compute_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.callgraph.compute',
-  input:  Json.jNull,
+  name: 'plugins.callgraph.compute',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };

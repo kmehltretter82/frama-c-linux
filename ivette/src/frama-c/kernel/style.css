@@ -78,7 +78,7 @@
     color: var(--info-text);
 }
 
-.globals-function-section {
+.globals-section {
   padding-right: 3px;
 }
 
@@ -200,6 +200,16 @@
     user-select: text;
     white-space: pre-line;
     background-color: var(--background-report);
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Locations                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+label.locations {
+    padding-top: 2px;
+    padding-bottom: 4px;
+    text-align: center;
 }
 
 /* -------------------------------------------------------------------------- */

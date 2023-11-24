@@ -59,8 +59,8 @@ export const signalPivotState: Server.Signal = {
 
 const getPivotState_internal: Server.GetRequest<null,tableStateType> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.pivot.general.getPivotState',
-  input:  Json.jNull,
+  name: 'plugins.pivot.general.getPivotState',
+  input: Json.jNull,
   output: jTableStateType,
   signals: [],
 };
@@ -77,8 +77,8 @@ export const pivotState: State.Value<tableStateType> = pivotState_internal;
 
 const compute_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.pivot.general.compute',
-  input:  Json.jNull,
+  name: 'plugins.pivot.general.compute',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };

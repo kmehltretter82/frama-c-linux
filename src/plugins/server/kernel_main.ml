@@ -152,18 +152,18 @@ let () = States.option model ~name:"source"
 let getMarker (evt, _id) =
   Option.bind evt.Log.evt_source Printer_tag.loc_to_localizable
 
-let getFunction t =
-  Option.bind (getMarker t) Printer_tag.kf_of_localizable
+let getDecl t =
+  Option.bind (getMarker t) Printer_tag.declaration_of_localizable
 
 let () = States.option model ~name:"marker"
     ~descr:(Md.plain "Marker at the message position (if any)")
     ~data:(module Kernel_ast.Marker)
     ~get:getMarker
 
-let () = States.option model ~name:"fct"
-    ~descr:(Md.plain "Function containing the message position (if any)")
-    ~data:(module Kernel_ast.Function)
-    ~get:getFunction
+let () = States.option model ~name:"decl"
+    ~descr:(Md.plain "Declaration containing the message position (if any)")
+    ~data:(module Kernel_ast.Decl)
+    ~get:getDecl
 
 let iter f = ignore (Messages.fold (fun i evt -> f (evt, i); succ i) 0)
 

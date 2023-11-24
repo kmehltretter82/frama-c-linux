@@ -375,6 +375,26 @@ function createSelectionField(): Field<EditorSelection> {
   return { ...field, set, extension: [field.extension, updater] };
 }
 
+export type RangeCallback = (offset: number, endOffset: number) => void;
+export const OnSelection = createOnSelectionField();
+function createOnSelectionField(): Field<RangeCallback|null> {
+  const field = createField<RangeCallback|null>(null);
+  const set: Set<RangeCallback|null> = (view, fn) => {
+    field.set(view, fn);
+  };
+  const updater = EditorView.updateListener.of((update) => {
+    if (update.selectionSet) {
+      const view = update.view;
+      const fn = field.get(view.state);
+      if (fn !== null) {
+        const { from: offset, to: endOffset } = view.state.selection.main;
+        fn(offset, endOffset);
+      }
+    }
+  });
+  return { ...field, set, extension: [field.extension, updater] };
+}
+
 export const Document = createDocumentField();
 function createDocumentField(): Field<Text> {
   const field = createField<Text>(Text.empty);
@@ -460,13 +480,18 @@ function isVisible(view: View, line: number): boolean {
 }
 
 // Move to the given line. The indexation starts at 1.
-export function selectLine(view: View, line: number, atTop: boolean): void {
+export function selectLine(
+  view: View,
+  line: number,
+  atTop: boolean,
+  focus = true,
+): void {
   if (!view || view.state.doc.lines < line) return;
   const doc = view.state.doc;
   const { from: here } = doc.lineAt(view.state.selection.main.from);
   const { from: goto } = doc.line(Math.max(line, 1));
+  if (focus) view.dispatch({ selection: { anchor: goto } });
   if (here === goto) return;
-  view.dispatch({ selection: { anchor: goto } });
   if (isVisible(view, line)) return;
   const verticalScroll = atTop ? 'start' : 'center';
   const effects = EditorView.scrollIntoView(goto, { y: verticalScroll });
@@ -494,7 +519,12 @@ export function Editor(extensions: Extension[]): Editor {
   React.useEffect(() => {
     if (!parent.current) return;
     const state = EditorState.create({ extensions });
-    editor.current = new EditorView({ state, parent: parent.current });
+    const eview = new EditorView({ state, parent: parent.current });
+    editor.current = eview;
+    return () => {
+      eview.destroy();
+      editor.current = null;
+    };
   }, [parent, extensions]);
   return { view: editor.current, Component };
 }

@@ -65,8 +65,8 @@ export const projectInfoDefault: projectInfo =
 
 const getList_internal: Server.GetRequest<null,projectInfo[]> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.project.getList',
-  input:  Json.jNull,
+  name: 'kernel.project.getList',
+  input: Json.jNull,
   output: Json.jArray(jProjectInfo),
   signals: [],
 };
@@ -75,8 +75,8 @@ export const getList: Server.GetRequest<null,projectInfo[]>= getList_internal;
 
 const create_internal: Server.SetRequest<string,projectInfo> = {
   kind: Server.RqKind.SET,
-  name:   'kernel.project.create',
-  input:  Json.jString,
+  name: 'kernel.project.create',
+  input: Json.jString,
   output: jProjectInfo,
   signals: [],
 };

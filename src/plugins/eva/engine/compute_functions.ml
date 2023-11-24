@@ -228,7 +228,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
      the body of the called function. *)
   let compute_using_body fundec ~save_results kinstr call state =
     let result = Computer.compute ~save_results call.kf kinstr state in
-    Summary.FunctionStats.recompute fundec;
+    Summary.FunctionStats.recompute @@ Globals.Functions.get fundec.svar ;
     result
 
   (* Interprets a [call] at callsite [kinstr] in the state [state] by using the

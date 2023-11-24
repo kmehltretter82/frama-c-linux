@@ -25,6 +25,7 @@ import { IconKind, Cell } from 'dome/controls/labels';
 import { Filter } from 'dome/table/models';
 import { Table, Column } from 'dome/table/views';
 import * as States from 'frama-c/states';
+import * as Ast from 'frama-c/kernel/api/ast';
 import * as WP from 'frama-c/plugins/wp/api';
 
 /* -------------------------------------------------------------------------- */
@@ -79,11 +80,11 @@ function renderStatus(s : Status): JSX.Element {
 
 function filterGoal(
   failed: boolean,
-  scope: string | undefined,
+  scope: Ast.decl | undefined,
 ): Filter<WP.goal, WP.goalsData> {
   return (goal: WP.goalsData): boolean => {
     if (failed && goal.passed) return false;
-    if (scope && scope && goal.fct !== scope) return false;
+    if (scope && goal.scope !== scope) return false;
     return true;
   };
 }
@@ -93,7 +94,7 @@ function filterGoal(
 /* -------------------------------------------------------------------------- */
 
 export interface GoalTableProps {
-  scope: string | undefined;
+  scope: Ast.decl | undefined;
   failed: boolean;
   onFilter: (goals: number, total: number) => void;
 }
@@ -101,16 +102,13 @@ export interface GoalTableProps {
 export function GoalTable(props: GoalTableProps): JSX.Element {
   const { scope, failed, onFilter } = props;
   const model = States.useSyncArrayModel(WP.goals);
-  const [_, updateAstSelection] = States.useSelection();
   const [wpoSelection, setWpoSelection] = React.useState(WP.goalDefault);
 
   const onWpoSelection = React.useCallback(
-    ({ wpo, property: marker, fct }: WP.goalsData) => {
-      const location = { fct, marker };
-      updateAstSelection({ location });
+    ({ wpo, property }: WP.goalsData) => {
+      States.setSelected(property);
       setWpoSelection(wpo);
-    }, [updateAstSelection],
-  );
+    }, []);
 
   React.useEffect(() => {
     if (failed || !!scope) {

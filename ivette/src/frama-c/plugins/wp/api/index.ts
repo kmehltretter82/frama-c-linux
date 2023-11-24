@@ -38,15 +38,15 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byFct } from 'frama-c/kernel/api/ast';
+import { byDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fct } from 'frama-c/kernel/api/ast';
+import { decl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fctDefault } from 'frama-c/kernel/api/ast';
+import { declDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jFct } from 'frama-c/kernel/api/ast';
+import { jDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -169,8 +169,8 @@ export const statsDefault: stats =
 
 const getAvailableProvers_internal: Server.GetRequest<null,prover[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.wp.getAvailableProvers',
-  input:  Json.jNull,
+  name: 'plugins.wp.getAvailableProvers',
+  input: Json.jNull,
   output: Json.jArray(jProver),
   signals: [],
 };
@@ -183,11 +183,13 @@ export interface goalsData {
   wpo: goal;
   /** Property Marker */
   property: marker;
-  /** Associated function, if any */
-  fct?: fct;
-  /** Associated behavior, if any */
+  /** Associated declaration, if any */
+  scope?: decl;
+  /** Associated function name, if any */
+  fct?: string;
+  /** Associated behavior name, if any */
   bhv?: string;
-  /** Associated axiomatic, if any */
+  /** Associated axiomatic name, if any */
   thy?: string;
   /** Informal Property Name */
   name: string;
@@ -210,7 +212,8 @@ export const jGoalsData: Json.Decoder<goalsData> =
   Json.jObject({
     wpo: jGoal,
     property: jMarker,
-    fct: Json.jOption(jFct),
+    scope: Json.jOption(jDecl),
+    fct: Json.jOption(Json.jString),
     bhv: Json.jOption(Json.jString),
     thy: Json.jOption(Json.jString),
     name: Json.jString,
@@ -225,12 +228,13 @@ export const jGoalsData: Json.Decoder<goalsData> =
 /** Natural order for `goalsData` */
 export const byGoalsData: Compare.Order<goalsData> =
   Compare.byFields
-    <{ wpo: goal, property: marker, fct?: fct, bhv?: string, thy?: string,
-       name: string, smoke: boolean, passed: boolean, status: status,
-       stats: stats, script?: string, saved: boolean }>({
+    <{ wpo: goal, property: marker, scope?: decl, fct?: string, bhv?: string,
+       thy?: string, name: string, smoke: boolean, passed: boolean,
+       status: status, stats: stats, script?: string, saved: boolean }>({
     wpo: byGoal,
     property: byMarker,
-    fct: Compare.defined(byFct),
+    scope: Compare.defined(byDecl),
+    fct: Compare.defined(Compare.string),
     bhv: Compare.defined(Compare.string),
     thy: Compare.defined(Compare.string),
     name: Compare.string,
@@ -249,8 +253,8 @@ export const signalGoals: Server.Signal = {
 
 const reloadGoals_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.wp.reloadGoals',
-  input:  Json.jNull,
+  name: 'plugins.wp.reloadGoals',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -262,8 +266,8 @@ const fetchGoals_internal: Server.GetRequest<
   { reload: boolean, removed: goal[], updated: goalsData[], pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.wp.fetchGoals',
-  input:  Json.jNumber,
+  name: 'plugins.wp.fetchGoals',
+  input: Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
             removed: Json.jArray(jGoal),
@@ -291,10 +295,10 @@ export const goals: State.Array<goal,goalsData> = goals_internal;
 
 /** Default value for `goalsData` */
 export const goalsDataDefault: goalsData =
-  { wpo: goalDefault, property: markerDefault, fct: undefined,
-    bhv: undefined, thy: undefined, name: '', smoke: false, passed: false,
-    status: statusDefault, stats: statsDefault, script: undefined,
-    saved: false };
+  { wpo: goalDefault, property: markerDefault, scope: undefined,
+    fct: undefined, bhv: undefined, thy: undefined, name: '', smoke: false,
+    passed: false, status: statusDefault, stats: statsDefault,
+    script: undefined, saved: false };
 
 /** Proof Server Activity */
 export const serverActivity: Server.Signal = {
@@ -306,8 +310,8 @@ const getScheduledTasks_internal: Server.GetRequest<
   { procs: number, active: number, done: number, todo: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.wp.getScheduledTasks',
-  input:  Json.jNull,
+  name: 'plugins.wp.getScheduledTasks',
+  input: Json.jNull,
   output: Json.jObject({
             procs: Json.jNumber,
             active: Json.jNumber,
@@ -324,8 +328,8 @@ export const getScheduledTasks: Server.GetRequest<
 
 const cancelProofTasks_internal: Server.SetRequest<null,null> = {
   kind: Server.RqKind.SET,
-  name:   'plugins.wp.cancelProofTasks',
-  input:  Json.jNull,
+  name: 'plugins.wp.cancelProofTasks',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };

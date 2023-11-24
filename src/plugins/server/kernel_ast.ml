@@ -37,10 +37,10 @@ let () = Request.register ~package
     ~descr:(Md.plain "Ensures that AST is computed")
     ~input:(module Junit) ~output:(module Junit) Ast.compute
 
-let changed_signal = Request.signal ~package ~name:"changed"
+let ast_changed_signal = Request.signal ~package ~name:"changed"
     ~descr:(Md.plain "Emitted when the AST has been changed")
 
-let ast_changed () = Request.emit changed_signal
+let ast_changed () = Request.emit ast_changed_signal
 
 let ast_update_hook f =
   begin
@@ -98,58 +98,46 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Functions                                                          --- *)
+(* ---  Generic Markers                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let jFunction = Data.declare ~package ~name:"fct"
-    ~descr:(Md.plain "Function names")
-    (Pkg.Jkey "fct")
-
-module Function =
-struct
-  type t = kernel_function
-  let jtype = jFunction
-  let to_json kf =
-    `String (Kernel_function.get_name kf)
-  let of_json js =
-    let fn = Js.to_string js in
-    try Globals.Functions.find_by_name fn
-    with Not_found -> Data.failure "Undefined function '%s'" fn
+module type TagInfo =
+sig
+  type t
+  val name : string
+  val descr : string
+  val create : t -> string
+  module H : Hashtbl.S with type key = t
 end
 
-module Fundec =
-struct
-  type t = fundec
-  let jtype = jFunction
-  let to_json fundec =
-    `String fundec.svar.vname
-  let of_json js =
-    let fn = Js.to_string js in
-    try Kernel_function.get_definition (Globals.Functions.find_by_name fn)
-    with Not_found | Kernel_function.No_Definition ->
-      Data.failure "Undefined function definition '%s'" fn
+module type Tag =
+sig
+  include Data.S
+  val index : t -> string
+  val find : string -> t
 end
 
-(* -------------------------------------------------------------------------- *)
-(* ---  Printers                                                          --- *)
-(* -------------------------------------------------------------------------- *)
-
-module Marker =
+module MakeTag(T : TagInfo) :
+sig
+  include Tag with type t = T.t
+  val iter : (t * string -> unit) -> unit
+  val hook : (t * string -> unit) -> unit
+end =
 struct
 
-  open Printer_tag
+  type t = T.t
 
   type index = {
-    tags : string Localizable.Hashtbl.t ;
-    locs : (string,localizable) Hashtbl.t ;
+    tags : string T.H.t ;
+    items : (string,T.t) Hashtbl.t ;
   }
-
-  let kid = ref 0
 
   let index () = {
-    tags = Localizable.Hashtbl.create 0 ;
-    locs = Hashtbl.create 0 ;
+    tags = T.H.create 0 ;
+    items = Hashtbl.create 0 ;
   }
+
+  let module_name = String.capitalize_ascii T.name
 
   module TYPE : Datatype.S with type t = index =
     Datatype.Make
@@ -157,60 +145,83 @@ struct
         type t = index
         include Datatype.Undefined
         let reprs = [index()]
-        let name = "Server.Jprinter.Index"
+        let name = Printf.sprintf "Server.Kernel_ast.%s.TYPE" module_name
         let mem_project = Datatype.never_any_project
       end)
 
   module STATE = State_builder.Ref(TYPE)
       (struct
-        let name = "Server.Jprinter.State"
+        let name = Printf.sprintf "Server.Kernel_ast.%s.STATE" module_name
         let dependencies = []
         let default = index
       end)
 
   let iter f =
-    Localizable.Hashtbl.iter (fun key str -> f (key, str)) (STATE.get ()).tags
-
-  let create_tag = function
-    | PStmt(_,s) -> Printf.sprintf "#s%d" s.sid
-    | PStmtStart(_,s) -> Printf.sprintf "#k%d" s.sid
-    | PVDecl(_,_,v) -> Printf.sprintf "#v%d" v.vid
-    | PLval _ -> Printf.sprintf "#l%d" (incr kid ; !kid)
-    | PExp(_,_,e) -> Printf.sprintf "#e%d" e.eid
-    | PTermLval _ -> Printf.sprintf "#t%d" (incr kid ; !kid)
-    | PGlobal _ -> Printf.sprintf "#g%d" (incr kid ; !kid)
-    | PIP _ -> Printf.sprintf "#p%d" (incr kid ; !kid)
-    | PType _ -> Printf.sprintf "#y%d" (incr kid ; !kid)
+    T.H.iter (fun key str -> f (key, str)) (STATE.get ()).tags
 
   let hooks = ref []
   let hook f = hooks := !hooks @ [f]
 
-  let tag loc =
-    let { tags ; locs } = STATE.get () in
-    try Localizable.Hashtbl.find tags loc
+  let index item =
+    let { tags ; items } = STATE.get () in
+    try T.H.find tags item
     with Not_found ->
-      let tag = create_tag loc in
-      Localizable.Hashtbl.add tags loc tag ;
-      Hashtbl.add locs tag loc ;
-      List.iter (fun fn -> fn (loc,tag)) !hooks ; tag
+      let tag = T.create item in
+      T.H.add tags item tag ;
+      Hashtbl.add items tag item ;
+      List.iter (fun fn -> fn (item,tag)) !hooks ; tag
 
-  let find tag = Hashtbl.find (STATE.get()).locs tag
+  let find tag = Hashtbl.find (STATE.get()).items tag
 
-  type t = localizable
+  let jtype = Data.declare ~package ~name:T.name
+      ~descr:(Md.plain T.descr)
+      (Pkg.Jkey T.name)
 
-  let jtype = Data.declare ~package ~name:"marker"
-      ~descr:(Md.plain "Localizable AST markers")
-      (Pkg.Jkey "marker")
-
-  let to_json loc = `String (tag loc)
+  let to_json item = `String (index item)
   let of_json js =
     try find (Js.to_string js)
     with Not_found ->
-      Data.failure "invalid marker (%a)" Json.pp_dump js
+      Data.failure "invalid %s (%a)" T.name Json.pp_dump js
 
 end
 
-module Printer = Printer_tag.Make(Marker)
+module Decl = MakeTag
+    (struct
+      open Printer_tag
+      type t = declaration
+      let name = "decl"
+      let descr = "AST Declarations markers"
+      module H = Declaration.Hashtbl
+      let kid = ref 0
+      let create = function
+        | SEnum _ -> Printf.sprintf "#E%d" (incr kid ; !kid)
+        | SComp _ -> Printf.sprintf "#C%d" (incr kid ; !kid)
+        | SType _ -> Printf.sprintf "#T%d" (incr kid ; !kid)
+        | SGlobal vi -> Printf.sprintf "#G%d" vi.vid
+        | SFunction kf -> Printf.sprintf "#F%d" @@ Kernel_function.get_id kf
+    end)
+
+module Marker = MakeTag
+    (struct
+      open Printer_tag
+      type t = localizable
+      let name = "marker"
+      let descr = "Localizable AST markers"
+      module H = Localizable.Hashtbl
+      let kid = ref 0
+      let create = function
+        | PStmt(_,s) -> Printf.sprintf "#s%d" s.sid
+        | PStmtStart(_,s) -> Printf.sprintf "#k%d" s.sid
+        | PVDecl(_,_,v) -> Printf.sprintf "#v%d" v.vid
+        | PLval _ -> Printf.sprintf "#l%d" (incr kid ; !kid)
+        | PExp(_,_,e) -> Printf.sprintf "#e%d" e.eid
+        | PTermLval _ -> Printf.sprintf "#t%d" (incr kid ; !kid)
+        | PGlobal _ -> Printf.sprintf "#g%d" (incr kid ; !kid)
+        | PIP _ -> Printf.sprintf "#p%d" (incr kid ; !kid)
+        | PType _ -> Printf.sprintf "#y%d" (incr kid ; !kid)
+    end)
+
+module PrinterTag = Printer_tag.Make(struct let tag = Marker.index end)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Ast Data                                                           --- *)
@@ -271,34 +282,174 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Record for (Kf * Marker)                                           --- *)
+(* --- Declaration Attributes                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Location =
+module DeclKind =
 struct
-  type t = Function.t * Marker.t
+  open Printer_tag
+  type t = declaration
   let jtype = Data.declare
-      ~package ~name:"location"
-      ~descr:(Md.plain "Location: function and marker")
-      (Jrecord ["fct", Function.jtype; "marker", Marker.jtype])
-  let to_json (kf, loc) = `Assoc [
-      "fct", Function.to_json kf ;
-      "marker", Marker.to_json loc ;
-    ]
-  let of_json js =
-    Json.field "fct" js |> Function.of_json,
-    Json.field "marker" js |> Marker.of_json
+      ~package ~name:"declKind"
+      ~descr:(Md.plain "Declaration kind")
+      (Junion [
+          Jkey "ENUM";
+          Jkey "UNION";
+          Jkey "STRUCT";
+          Jkey "TYPEDEF";
+          Jkey "GLOBAL";
+          Jkey "FUNCTION";
+        ])
+  let to_json = function
+    | SEnum _ -> `String "ENUM"
+    | SComp { cstruct = true } -> `String "STRUCT"
+    | SComp { cstruct = false } -> `String "UNION"
+    | SType _ -> `String "TYPEDEF"
+    | SGlobal _ -> `String "GLOBAL"
+    | SFunction _ -> `String "FUNCTION"
 end
+
+module DeclAttributes =
+struct
+  open Printer_tag
+
+  let model = States.model ()
+
+  (* We must iterate over all known declaration in the Ast, contrarily to
+     markers, for which we ony need attributes of already generated markers. *)
+  let iter_declaration f =
+    if Ast.is_computed () then
+      let marked = Declaration.Hashtbl.create 0 in
+      Cil.iterGlobals
+        (Ast.get())
+        (fun g ->
+           match declaration_of_global g with
+           | None -> ()
+           | Some d ->
+             if not @@ Declaration.Hashtbl.mem marked d then
+               begin
+                 Declaration.Hashtbl.add marked d () ;
+                 f (d,Decl.index d)
+               end)
+
+  let () =
+    States.column
+      ~name:"kind"
+      ~descr:(Md.plain "Declaration kind")
+      ~data:(module DeclKind)
+      ~get:fst
+      model
+
+  let () =
+    States.column
+      ~name:"self"
+      ~descr:(Md.plain "Declaration's marker")
+      ~data:(module Marker)
+      ~get:(fun (decl,_) -> localizable_of_declaration decl)
+      model
+
+  let () =
+    States.column
+      ~name:"name"
+      ~descr:(Md.plain "Declaration identifier")
+      ~data:(module Jstring)
+      ~get:(fun (decl,_) -> name_of_declaration decl)
+      model
+
+  let () =
+    States.column
+      ~name:"label"
+      ~descr:(Md.plain "Declaration label (uncapitalized kind & name)")
+      ~data:(module Jstring)
+      ~get:(fun (decl,_) -> Pretty_utils.to_string pp_declaration decl)
+      model
+
+  let () =
+    States.column
+      ~name:"source"
+      ~descr:(Md.plain "Source location")
+      ~data:(module Position)
+      ~get:(fun (decl,_) -> fst @@ loc_of_declaration decl)
+      model
+
+  let array = States.register_array
+      ~package
+      ~name:"declAttributes"
+      ~descr:(Md.plain "Declaration attributes")
+      ~key:snd
+      ~keyName:"decl"
+      ~keyType:Decl.jtype
+      ~iter:iter_declaration
+      ~add_reload_hook:ast_update_hook
+      model
+
+  let () = Decl.hook (States.update array)
+
+end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Decl Printer                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+let print_global_ast global =
+  let stacked_libc = Kernel.PrintLibc.get () in
+  try
+    if not stacked_libc then Kernel.PrintLibc.set true ;
+    let printer = PrinterTag.(with_unfold_precond (fun _ -> true) pp_global) in
+    let ast = Jbuffer.to_json printer global in
+    if not stacked_libc then Kernel.PrintLibc.set false ; ast
+  with err ->
+    if not stacked_libc then Kernel.PrintLibc.set false ; raise err
+
+let () = Request.register ~package
+    ~kind:`GET ~name:"printDeclaration"
+    ~descr:(Md.plain "Prints an AST Declaration")
+    ~signals:[ast_changed_signal]
+    ~input:(module Decl) ~output:(module Jtext)
+    (fun d -> print_global_ast @@ Printer_tag.definition_of_declaration d)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Marker Attributes                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Attributes =
+module MarkerKind =
+struct
+  open Printer_tag
+  type t = localizable
+  let jtype = Data.declare
+      ~package ~name:"markerKind"
+      ~descr:(Md.plain "Marker kind")
+      (Junion [
+          Jkey "STMT";
+          Jkey "LFUN"; Jkey "DFUN";
+          Jkey "LVAR"; Jkey "DVAR";
+          Jkey "LVAL"; Jkey "EXP";
+          Jkey "TERM";
+          Jkey "TYPE";
+          Jkey "PROPERTY";
+          Jkey "DECLARATION";
+        ])
+  let to_json = function
+    | PStmt _ | PStmtStart _ -> `String "STMT"
+    | PVDecl(_,Kglobal,vi) ->
+      `String (if Globals.Functions.mem vi then "DFUN" else "DVAR")
+    | PVDecl _ -> `String "DVAR"
+    | PTermLval(_,_,_,(TVar { lv_origin = Some vi },TNoOffset))
+    | PLval(_,_,(Var vi,NoOffset)) ->
+      `String (if Globals.Functions.mem vi then "LFUN" else "LVAR")
+    | PLval _ -> `String "LVAL"
+    | PExp _ -> `String "EXP"
+    | PTermLval _ -> `String "TERM"
+    | PType _ -> `String "TYPE"
+    | PIP _ -> `String "PROPERTY"
+    | PGlobal _ -> `String "DECLARATION"
+end
+
+module MarkerAttributes =
 struct
   open Printer_tag
 
-  let descr ~short m =
+  let label_kind ~short m =
     match varinfo_of_localizable m with
     | Some vi ->
       if Globals.Functions.mem vi then "Function" else
@@ -318,100 +469,75 @@ struct
       | PVDecl _ -> assert false
       | PExp _ -> if short then "Expr" else "Expression"
       | PIP _ -> if short then "Prop" else "Property"
-      | PGlobal _ -> if short then "Decl" else "Declaration"
+      | PGlobal (GType _ | GCompTag _ | GEnumTag _ | GEnumTagDecl _)
       | PType _ -> "Type"
+      | PGlobal _ -> if short then "Decl" else "Declaration"
 
-  let is_function tag =
-    match varinfo_of_localizable tag with
-    | Some vi -> Globals.Functions.mem vi
-    | None -> false
-
-  let is_function_pointer = function
-    | PLval (_, _, (Mem _, NoOffset as lval))
-      when Cil.(isFunctionType (typeOfLval lval)) -> true
-    | PLval (_, _, lval)
-      when Cil.(isFunPtrType (Cil.typeOfLval lval)) -> true
-    | _ -> false
-
-  let is_fundecl = function
-    | PVDecl(Some _,Kglobal,vi) -> vi.vglob && Globals.Functions.mem vi
-    | _ -> false
-
-  let scope tag =
-    Option.map Kernel_function.get_name @@ Printer_tag.kf_of_localizable tag
+  let descr_localizable fmt = function
+    | PGlobal (GType(ti,_)) ->
+      PrinterTag.pp_typ fmt (TNamed(ti,[]))
+    | PGlobal (GCompTag(ci,_) | GCompTagDecl(ci,_)) ->
+      PrinterTag.pp_typ fmt (TComp(ci,[]))
+    | PGlobal (GEnumTag(ei,_) | GEnumTagDecl(ei,_)) ->
+      PrinterTag.pp_typ fmt (TEnum(ei,[]))
+    | g -> pp_localizable fmt g
 
   let model = States.model ()
 
   let () =
     States.column
-      ~name:"labelKind"
-      ~descr:(Md.plain "Marker kind (short)")
-      ~data:(module Jalpha)
-      ~get:(fun (tag,_) -> descr ~short:true tag)
-      model
-
-  let () =
-    States.column
-      ~name:"titleKind"
-      ~descr:(Md.plain "Marker kind (long)")
-      ~data:(module Jalpha)
-      ~get:(fun (tag,_) -> descr ~short:false tag)
-      model
-
-  let () =
-    States.column
-      ~name:"name"
-      ~descr:(Md.plain "Marker short name  or identifier when relevant.")
-      ~data:(module Jalpha)
-      ~get:(fun (tag, _) -> Printer_tag.label tag)
-      model
-
-  let () =
-    States.column
-      ~name:"descr"
-      ~descr:(Md.plain "Marker declaration or description")
-      ~data:(module Jstring)
-      ~get:(fun (tag, _) -> Rich_text.to_string Printer_tag.pretty tag)
-      model
-
-  let () =
-    States.column
-      ~name:"isLval"
-      ~descr:(Md.plain "Whether it is an l-value")
-      ~data:(module Jbool)
-      ~get:(fun (tag, _) -> Lval.mem tag)
-      model
-
-  let () =
-    States.column
-      ~name:"isFunction"
-      ~descr:(Md.plain "Whether it is a function symbol")
-      ~data:(module Jbool)
-      ~get:(fun (tag, _) -> is_function tag)
-      model
-
-  let () =
-    States.column
-      ~name:"isFunctionPointer"
-      ~descr:(Md.plain "Whether it is a function pointer")
-      ~data:(module Jbool)
-      ~get:(fun (tag, _) -> is_function_pointer tag)
-      model
-
-  let () =
-    States.column
-      ~name:"isFunDecl"
-      ~descr:(Md.plain "Whether it is a function declaration")
-      ~data:(module Jbool)
-      ~get:(fun (tag, _) -> is_fundecl tag)
+      ~name:"kind"
+      ~descr:(Md.plain "Marker kind (key)")
+      ~data:(module MarkerKind) ~get:fst
       model
 
   let () =
     States.option
       ~name:"scope"
-      ~descr:(Md.plain "Function scope of the marker, if applicable")
+      ~descr:(Md.plain "Marker Scope (where it is printed in)")
+      ~data:(module Decl)
+      ~get:(fun (tag,_) -> declaration_of_localizable tag)
+      model
+
+  let () =
+    States.option
+      ~name:"definition"
+      ~descr:(Md.plain "Marker's Target Definition (when applicable)")
+      ~data:(module Marker)
+      ~get:(fun (tag,_) -> definition_of_localizable tag)
+      model
+
+  let () =
+    States.column
+      ~name:"labelKind"
+      ~descr:(Md.plain "Marker kind label")
+      ~data:(module Jalpha)
+      ~get:(fun (tag,_) -> label_kind ~short:true tag)
+      model
+
+  let () =
+    States.column
+      ~name:"titleKind"
+      ~descr:(Md.plain "Marker kind title")
+      ~data:(module Jalpha)
+      ~get:(fun (tag,_) -> label_kind ~short:false tag)
+      model
+
+
+  let () =
+    States.option
+      ~name:"name"
+      ~descr:(Md.plain "Marker identifier (when applicable)")
+      ~data:(module Jalpha)
+      ~get:(fun (tag, _) -> Printer_tag.name_of_localizable tag)
+      model
+
+  let () =
+    States.column
+      ~name:"descr"
+      ~descr:(Md.plain "Marker description")
       ~data:(module Jstring)
-      ~get:(fun (tag, _) -> scope tag)
+      ~get:(fun (tag, _) -> Rich_text.to_string descr_localizable tag)
       model
 
   let () =
@@ -448,37 +574,21 @@ end
 let () = Request.register ~package
     ~kind:`GET ~name:"getMainFunction"
     ~descr:(Md.plain "Get the current 'main' function.")
-    ~input:(module Junit) ~output:(module Joption(Function))
+    ~input:(module Junit) ~output:(module Joption(Decl))
     begin fun () ->
-      try Some (fst (Globals.entry_point ()))
+      try Some (SFunction (fst @@ Globals.entry_point ()))
       with Globals.No_such_entry_point _ -> None
     end
 
 let () = Request.register ~package
     ~kind:`GET ~name:"getFunctions"
     ~descr:(Md.plain "Collect all functions in the AST")
-    ~input:(module Junit) ~output:(module Jlist(Function))
+    ~input:(module Junit) ~output:(module Jlist(Decl))
     begin fun () ->
       let pool = ref [] in
-      Globals.Functions.iter (fun kf -> pool := kf :: !pool) ;
+      Globals.Functions.iter
+        (fun kf -> pool := Printer_tag.SFunction kf :: !pool) ;
       List.rev !pool
-    end
-
-let () = Request.register ~package
-    ~kind:`GET ~name:"printFunction"
-    ~descr:(Md.plain "Print the AST of a function")
-    ~signals:[changed_signal]
-    ~input:(module Function) ~output:(module Jtext)
-    begin fun kf ->
-      let libc = Kernel.PrintLibc.get () in
-      try
-        if not libc then Kernel.PrintLibc.set true ;
-        let global = Kernel_function.get_global kf in
-        let pp_glb = Printer.(with_unfold_precond (fun _ -> true) pp_global) in
-        let ast = Jbuffer.to_json pp_glb global in
-        if not libc then Kernel.PrintLibc.set false ; ast
-      with err ->
-        if not libc then Kernel.PrintLibc.set false ; raise err
     end
 
 module Functions =
@@ -487,11 +597,11 @@ struct
   let key kf = Printf.sprintf "kf#%d" (Kernel_function.get_id kf)
 
   let signature kf =
-    let global = Kernel_function.get_global kf in
+    let g = Kernel_function.get_global kf in
     let libc = Kernel.PrintLibc.get () in
     try
       if not libc then Kernel.PrintLibc.set true ;
-      let txt = Rich_text.to_string Printer_tag.pretty (PGlobal global) in
+      let txt = Rich_text.to_string Printer_tag.pp_localizable (PGlobal g) in
       if not libc then Kernel.PrintLibc.set false ;
       if Kernel_function.is_entry_point kf then (txt ^ " /* main */") else txt
     with err ->
@@ -513,6 +623,11 @@ struct
   let array : kernel_function States.array =
     begin
       let model = States.model () in
+      States.column model
+        ~name:"decl"
+        ~descr:(Md.plain "Declaration Tag")
+        ~data:(module Decl)
+        ~get:(fun kf -> Printer_tag.SFunction kf) ;
       States.column model
         ~name:"name"
         ~descr:(Md.plain "Name")
@@ -729,11 +844,16 @@ let () = Information.register
     ~title:"Type Definition"
     begin fun fmt loc ->
       match loc with
-      | PGlobal
-          (( GType _
-           | GCompTag _ | GCompTagDecl _
-           | GEnumTag _ | GEnumTagDecl _
-           ) as g) -> Printer.pp_global fmt g
+      | PType (TNamed _ as ty)
+      | PGlobal (GType({ ttype = ty },_)) ->
+        begin
+          let tdef = Cil.unrollType ty in
+          match Printer_tag.definition_of_type tdef with
+          | Some marker ->
+            let tag = Marker.index marker in
+            Format.fprintf fmt "@{<%s>%a@}" tag Printer.pp_typ tdef
+          | None -> PrinterTag.pp_typ fmt tdef
+        end
       | _ -> raise Not_found
     end
 
@@ -767,12 +887,24 @@ let () = Information.register
     end
 
 let () = Information.register
+    ~id:"kernel.ast.propertyStatus"
+    ~label:"Status"
+    ~title:"Property Consolidated Status"
+    begin fun fmt loc ->
+      match loc with
+      | PIP prop ->
+        Property_status.Feedback.pretty fmt @@
+        Property_status.Feedback.get prop
+      | _ -> raise Not_found
+    end
+
+let () = Information.register
     ~id:"kernel.ast.marker"
     ~label:"Marker"
     ~title:"Ivette marker (for debugging)"
     ~enable:(fun _ -> Server_parameters.debug_atleast 1)
     begin fun fmt loc ->
-      let tag = Marker.create_tag loc in
+      let tag = Marker.index loc in
       Format.fprintf fmt "%S" tag
     end
 
@@ -783,26 +915,34 @@ let () = Server_parameters.Debug.add_hook_on_update
 (* --- Marker at a position                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let get_kf_marker (file, line, col) =
-  let pos_path = Filepath.Normalized.of_string file in
-  let pos =
-    Filepath.{ pos_path; pos_lnum = line; pos_cnum = col; pos_bol = 0; }
-  in
-  let tag = Printer_tag.loc_to_localizable ~precise_col:true pos in
-  let kf = Option.bind tag Printer_tag.kf_of_localizable in
-  kf, tag
+let get_marker_at ~file ~line ~col =
+  if file="" then None else
+    let pos_path = Filepath.Normalized.of_string file in
+    let pos =
+      Filepath.{ pos_path; pos_lnum = line; pos_cnum = col; pos_bol = 0; }
+    in
+    Printer_tag.loc_to_localizable ~precise_col:true pos
 
 let () =
   let descr =
     Md.plain
       "Returns the marker and function at a source file position, if any. \
-       Input: file path, line and column."
+       Input: file path, line and column. \
+       File can be empty, in case no marker is returned."
   in
-  Request.register
+  let signature = Request.signature
+      ~output:(module Joption(Marker)) () in
+  let get_file = Request.param signature
+      ~name:"file" ~descr:(Md.plain "File path") (module Jstring) in
+  let get_line = Request.param signature
+      ~name:"line" ~descr:(Md.plain "Line (1-based)") (module Jint) in
+  let get_col = Request.param signature
+      ~name:"column" ~descr:(Md.plain "Column (0-based)") (module Jint) in
+  Request.register_sig signature
     ~package ~descr ~kind:`GET ~name:"getMarkerAt"
-    ~input:(module Jtriple (Jstring) (Jint) (Jint))
-    ~output:(module Jpair (Joption (Function)) (Joption (Marker)))
-    get_kf_marker
+    ~signals:[ast_changed_signal]
+    (fun rq () ->
+       get_marker_at ~file:(get_file rq) ~line:(get_line rq) ~col:(get_col rq))
 
 (* -------------------------------------------------------------------------- *)
 (* --- Files                                                              --- *)

@@ -31,7 +31,7 @@ import * as States from 'frama-c/states';
 
 import EvaReady from 'frama-c/plugins/eva/EvaReady';
 import * as API from './api';
-import type { marker, location } from 'frama-c/kernel/api/ast';
+import type { marker } from 'frama-c/kernel/api/ast';
 import gearsIcon from '../eva/images/gears.svg';
 
 import './dive.css';
@@ -77,27 +77,29 @@ function Exploring(): JSX.Element {
   return <><img src={gearsIcon} className="exploration" />Exploring...</>;
 }
 
-function Marker(props: {location: location}): JSX.Element {
-  const location = props.location;
-  const marker = location.marker;
+interface MarkerProps { marker: marker }
+
+function Marker(props: MarkerProps): JSX.Element {
+  const { marker } = props;
   const { descr } = States.useMarker(marker);
-  const [selection, updateSelection] = States.useSelection();
-  const [hovering, updateHovered] = States.useHovered();
+  const current = States.useSelected();
+  const hovered = States.useHovered();
   const classeName = classes(
     'marker',
-    selection.current?.marker === marker && 'selected',
-    hovering?.marker === marker && 'hovered'
+    current === marker && 'selected',
+    hovered === marker && 'hovered'
   );
-
-  return <span
-    className={classeName}
-    onClick={() => updateSelection({ location: location })}
-    onMouseEnter={() => updateHovered(location)}
-    onMouseLeave={() => updateHovered(undefined)}>
+  return (
+    <span
+      className={classeName}
+      onClick={() => States.setSelected(marker)}
+      onMouseEnter={() => States.setHovered(marker)}
+      onMouseLeave={() => States.setHovered(undefined)}
+    >
       {descr}
-  </span>;
+    </span>
+  );
 }
-
 
 type WithKey<P> = P & {key: string | number | null}
 
@@ -141,11 +143,11 @@ function TreeNode(props: WithItemChildren<TreeNodeProps>): JSX.Element {
     </div>;
 }
 
-function MarkerNode(props: WithItemChildren<{location: location}>):
+function MarkerNode(props: WithItemChildren<{marker: marker}>):
     JSX.Element {
   return <TreeNode
     unfolded={true}
-    label={<Marker location={props.location} />}
+    label={<Marker marker={props.marker} />}
     className="marker">
       {props.children}
   </TreeNode>;
@@ -164,15 +166,15 @@ function GraphNode(props: {nodeId: number, unfolded?: boolean}): JSX.Element {
 
     // Transform dependencies into a map 'statement' -> 'memory location read
     // at this statement'
-    const map = new Map<marker, [location, Set<API.nodeId>]>();
+    const map = new Map<marker, Set<API.nodeId>>();
     deps.forEach((d) => {
-      d.origins.forEach((loc) => {
-        let entry = map.get(loc.marker);
+      d.origins.forEach((marker) => {
+        let entry = map.get(marker);
         if (entry === undefined) {
-          entry = [loc, new Set()];
-          map.set(loc.marker, entry);
+          entry = new Set();
+          map.set(marker, entry);
         }
-        entry[1].add(d.src);
+        entry.add(d.src);
      });
     });
 
@@ -181,8 +183,8 @@ function GraphNode(props: {nodeId: number, unfolded?: boolean}): JSX.Element {
         onunfold={() => explore(node)}
         label={node.label}>
           {node.backward_explored ?
-            Array.from(map.entries()).map(([m, [loc, sources]]) =>
-              <MarkerNode location={loc} key={m}>
+            Array.from(map.entries()).map(([m, sources]) =>
+              <MarkerNode marker={m} key={m}>
                 {Array.from(sources.values()).map((src) =>
                   <GraphNode nodeId={src} key={src} />
                 ) }
@@ -198,17 +200,17 @@ function GraphNode(props: {nodeId: number, unfolded?: boolean}): JSX.Element {
 
 export default function TreeComponent(): JSX.Element {
   const [root, setRoot] = React.useState<number | null>(null);
-  const [selection] = States.useSelection();
+  const current = States.useCurrentLocation();
 
   useEffect(() => {
     const update = async (): Promise<void> => {
-      if (selection.current) {
-        const node =  await requestLocation(selection.current);
+      if (current.marker) {
+        const node =  await requestLocation(current);
         root === null && node !== null && node !== undefined && setRoot(node);
       }
     };
     update();
-  }, [selection, root]);
+  }, [current, root]);
 
   return <>
     <Ivette.TitleBar>
