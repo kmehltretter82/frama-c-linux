@@ -843,11 +843,9 @@ let () = Information.register
     ~title:"Type Definition"
     begin fun fmt loc ->
       match loc with
-      | PGlobal
-          (( GType _
-           | GCompTag _ | GCompTagDecl _
-           | GEnumTag _ | GEnumTagDecl _
-           ) as g) -> Printer.pp_global fmt g
+      | PType (TNamed _ as ty)
+      | PGlobal (GType({ ttype = ty },_)) ->
+        Printer.pp_typ fmt (Cil.unrollType ty)
       | _ -> raise Not_found
     end
 
