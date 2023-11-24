@@ -21,6 +21,7 @@
 /* ************************************************************************ */
 
 import React from "react";
+import { DEVEL } from 'dome';
 import * as States from 'dome/data/states';
 import * as Sidebars from 'dome/frame/sidebars';
 import { Label } from 'dome/controls/labels';
@@ -227,6 +228,111 @@ Ivette.registerSidebar({
   label: "Views",
   title: "View Selector",
   children: <ViewBar />,
+});
+
+/* -------------------------------------------------------------------------- */
+/* --- ComponentBar                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+export function ComponentBar(): JSX.Element {
+  const [selected, setSelected] = React.useState("");
+
+  const components = Ext.useElements(COMPONENT);
+  const kernelComps = components.filter((comp) =>
+    comp.id.startsWith("fc.kernel"));
+  const diveComps = components.filter((comp) =>
+    comp.id.startsWith("fc.dive"));
+  const evaComps = components.filter((comp) =>
+    comp.id.startsWith("fc.eva"));
+  const sbComps = components.filter((comp) =>
+    comp.id.startsWith("sandbox"));
+
+  const unclassifiedComps = components.filter(n =>
+    !kernelComps.includes(n)
+    && !diveComps.includes(n)
+    && !evaComps.includes(n)
+    && !sbComps.includes(n)
+  );
+
+  return (
+    <Sidebars.SideBar>
+      <Sidebars.Section label="Kernel" defaultUnfold>
+        {kernelComps.map((compo) =>
+          <Sidebars.Item
+            key={compo.id}
+            label={compo.label}
+            title={compo.title}
+            selected={selected === compo.id}
+            onSelection={() => {
+              setSelected(compo.id);
+            }}
+          />
+        )}
+      </Sidebars.Section>
+      <Sidebars.Section label="Dive">
+        {diveComps.map((compo) =>
+          <Sidebars.Item
+            key={compo.id}
+            label={compo.label}
+            title={compo.title}
+            selected={selected === compo.id}
+            onSelection={() => {
+              setSelected(compo.id);
+            }}
+          />
+        )}
+      </Sidebars.Section>
+      <Sidebars.Section label="Eva">
+        {evaComps.map((compo) =>
+          <Sidebars.Item
+            key={compo.id}
+            label={compo.label}
+            title={compo.title}
+            selected={selected === compo.id}
+            onSelection={() => {
+              setSelected(compo.id);
+            }}
+          />
+        )}
+      </Sidebars.Section>
+      { DEVEL &&
+        <Sidebars.Section label="Sandbox">
+          {sbComps.map((compo) =>
+            <Sidebars.Item
+              key={compo.id}
+              label={compo.label}
+              title={compo.title}
+              selected={selected === compo.id}
+              onSelection={() => {
+                setSelected(compo.id);
+              }}
+            />
+          )}
+        </Sidebars.Section>
+      }
+      <Sidebars.Section label="Unclassified">
+        {unclassifiedComps.map((compo) =>
+          <Sidebars.Item
+            key={compo.id}
+            label={compo.label}
+            title={compo.title}
+            selected={selected === compo.id}
+            onSelection={() => {
+              setSelected(compo.id);
+            }}
+          />
+        )}
+      </Sidebars.Section>
+    </Sidebars.SideBar>
+  );
+}
+
+Ivette.registerSidebar({
+  id: "ivette.components",
+  rank: 100,
+  label: "Comps",
+  title: "Components Selector",
+  children: <ComponentBar />,
 });
 
 /* -------------------------------------------------------------------------- */
