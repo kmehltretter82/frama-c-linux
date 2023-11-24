@@ -139,6 +139,7 @@ export function LabView(): JSX.Element {
 
 export function ViewBar(): JSX.Element {
   const views = Ext.useElements(VIEW);
+  const [selected, setSelected] = React.useState("");
   return (
     <Sidebars.SideBar>
       <Sidebars.Section label="Views" defaultUnfold>
@@ -147,7 +148,11 @@ export function ViewBar(): JSX.Element {
             key={view.id}
             label={view.label}
             title={view.title}
-            onSelection={() => globalLayoutState.setValue(view.layout)}
+            selected={selected === view.id}
+            onSelection={() => {
+              globalLayoutState.setValue(view.layout);
+              setSelected(view.id);
+            }}
           />
         )}
       </Sidebars.Section>
