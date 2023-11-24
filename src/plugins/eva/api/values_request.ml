@@ -605,9 +605,6 @@ let () =
   and set_code = Request.result_opt getProbeInfo
       ~name:"code" ~descr:(Md.plain "Probe source code")
       (module Jstring)
-  and set_scope = Request.result_opt getProbeInfo
-      ~name:"scope" ~descr:(Md.plain "Probe function")
-      (module Jdecl)
   and set_stmt = Request.result_opt getProbeInfo
       ~name:"stmt" ~descr:(Md.plain "Probe statement")
       (module Jstmt)
@@ -625,11 +622,8 @@ let () =
     set_code rq (Some (Pretty_utils.to_string pp p));
     begin
       match eval_point with
-      | Initial -> ()
-      | Pre kf ->
-        set_scope rq (Some (SFunction kf))
-      | Stmt(kf,stmt) ->
-        set_scope rq (Some (SFunction kf)) ; set_stmt rq (Some stmt)
+      | Initial | Pre _ -> ()
+      | Stmt (_kf, stmt) -> set_stmt rq (Some stmt)
     end ;
     let on_steps = function
       | `Here -> ()
