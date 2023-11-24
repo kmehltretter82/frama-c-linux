@@ -335,7 +335,11 @@ export class TextBuffer extends TextProxy {
       const view = this.proxy;
       if (view) { appendContents(view, data); }
       else {
-        this.text = this.toText().append(textOf(data));
+        const state = CS.EditorState.create({ doc: this.toText() });
+        const offset = state.doc.length;
+        const changes = { from: offset, insert: data };
+        const transaction = state.update({ changes });
+        this.text = transaction.state.doc;
         this.contents = undefined;
         // invariant established
       }
@@ -356,9 +360,12 @@ export class TextBuffer extends TextProxy {
     const view = this.proxy;
     if (view) dispatchReplace(view, range, data);
     else {
-      const doc = this.toText();
       const { offset, length } = range;
-      this.text = doc.replace(offset, offset+length, textOf(data));
+      const endOffset = offset + length;
+      const state = CS.EditorState.create({ doc: this.toText() });
+      const changes = { from: offset, to: endOffset, insert: data };
+      const transaction = state.update({ changes });
+      this.text = transaction.state.doc;
       // invariant preserved
     }
   }

@@ -1933,6 +1933,41 @@ struct
   let remove_effects c =
     { c with stmts = List.map remove_effects_stmt c.stmts }
 
+  (* Put chunk inside a block. Optionally take a list of varinfo to add to
+     the newly created block. *)
+  let enclose_chunk ~ghost ?(locals=[]) se =
+    let block_chunk = c2stmt_effect ~ghost se in
+    {empty with stmts = [ block_chunk ]; locals}
+
+  (* This function is used to hide a chunk inside a block and only make
+     visible its result.
+     We first create a new tmp variable which stores se's result, we concat it
+     with se, enclose them inside a block, and return the resulting chunk and
+     our tmp variable as the new result.
+
+     Result for type t :
+     se' :
+       t tmp_0;
+       {
+        se;
+        tmp_0 = e;
+       }
+     e' : tmp_0
+  *)
+  let hide_chunk ~ghost ~loc read se e t =
+    let descr =
+      Format.asprintf "%a" Cil_descriptive_printer.pp_exp e
+    in
+    let tmp_res = newTempVar ~ghost loc descr true t in
+    let tmp_res_lv = (Var tmp_res, NoOffset) in
+    let res_instr = Set (tmp_res_lv, e, loc) in
+    let res_stmt = Cil.mkStmtOneInstr ~ghost ~valid_sid res_instr in
+    let res_chunk = i2c (res_stmt, [], [tmp_res_lv], read) in
+    let se_res_chunk = se @@@ (res_chunk, ghost) in
+    let se' = enclose_chunk ~ghost ~locals:[tmp_res] se_res_chunk in
+    let e' = new_exp ~loc (Lval tmp_res_lv) in
+    se', e'
+
   (* the chunks below are used in statements translation. Hence,
      their order of evaluation is always specified, and we can forget their
      effects.
@@ -1971,7 +2006,7 @@ struct
       { empty with
         stmts = List.map (fun s -> (s,[],[],[],[])) b.bstmts;
         locals = b.blocals }
-    | _ ->i2c (s,[],[],[])
+    | _ -> i2c (s,[],[],[])
 
   (* We can duplicate a chunk if it has a few simple statements, and if
    * it does not have cases, locals or statics *)
@@ -3387,7 +3422,7 @@ let convBinOp (bop: Cabs.binary_operator) : binop =
 (**** PEEP-HOLE optimizations ***)
 
 (* Should we collapse [tmp = f(); lv = tmp;] where the result type of [f]
-   is [tf], and the [lv] has type [tlv *)
+   is [tf], and the [lv] has type [tlv] *)
 let allow_return_collapse ~tlv ~tf =
   Cil_datatype.Typ.equal tlv tf ||
   Kernel.DoCollapseCallCast.get () &&
@@ -4041,6 +4076,17 @@ let rec checkRestrictQualifierDeep t =
           List.iter (fun (_, t, _) -> checkRestrictQualifierDeep t) args
       end
     | _ -> ()
+
+(* Return true if the given expression is a call or a struct-returning call. *)
+let rec nested_call e =
+  match e.expr_node with
+  | CALL _ -> true
+  | MEMBEROF (e, _ ) -> nested_call e
+  | _ -> false
+
+(* Used to remember if we encountered a access to a field of type array from
+   a struct-returning call. *)
+let contains_temp_subarray = ref false
 
 let rec doSpecList ghost (suggestedAnonName: string)
     (* This string will be part of
@@ -5544,6 +5590,7 @@ and doExp local_env
         then r
         else lv':: r
       in
+      contains_temp_subarray := (Cil.isArrayType field_type && nested_call e);
       finishExp reads se (new_exp ~loc (Lval lv')) (dropQualifiers field_type)
 
     (* e->str = * (e + off(str)) *)
@@ -7658,7 +7705,7 @@ and doCondExp local_env asconst
   in
   result
 
-and compileCondExp ~ghost ce st sf =
+and compileCondExp ?(hide=false) ~ghost ce st sf =
   match ce with
   | CEAnd (ce1, ce2) ->
     let loc = CurrentLoc.get () in
@@ -7669,7 +7716,7 @@ and compileCondExp ~ghost ce st sf =
         let lab = newLabelName ghost "_LAND" in
         (false, gotoChunk ~ghost lab loc, consLabel ~ghost lab sf loc false)
     in
-    let st' = compileCondExp ~ghost ce2 st sf1 in
+    let st' = compileCondExp ~hide ~ghost ce2 st sf1 in
     if not duplicable && !doAlternateConditional then
       let st_fall_through = chunkFallsThrough st' in
       (* if st does not fall through, we do not need to add a goto
@@ -7686,11 +7733,11 @@ and compileCondExp ~ghost ce st sf =
         else skipChunk
       in
       let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
-      (compileCondExp ~ghost ce1 st' sf')
+      (compileCondExp ~hide ~ghost ce1 st' sf')
       @@@ gotostmt @@@ sf2 @@@ labstmt
     else
       let sf' = sf2 in
-      compileCondExp ~ghost ce1 st' sf'
+      compileCondExp ~hide ~ghost ce1 st' sf'
 
   | CEOr (ce1, ce2) ->
     let loc = CurrentLoc.get () in
@@ -7703,7 +7750,7 @@ and compileCondExp ~ghost ce st sf =
     in
     if not duplicable && !doAlternateConditional then
       let st' = duplicateChunk st1 in
-      let sf' = compileCondExp ~ghost ce2 st1 sf in
+      let sf' = compileCondExp ~hide ~ghost ce2 st1 sf in
       let sf_fall_through = chunkFallsThrough sf' in
       let lab = newLabelName ghost "_LOR" in
       let gotostmt =
@@ -7717,17 +7764,14 @@ and compileCondExp ~ghost ce st sf =
         else skipChunk
       in
       let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
-      (compileCondExp ~ghost ce1 st' sf')
+      (compileCondExp ~hide ~ghost ce1 st' sf')
       @@@ gotostmt @@@ st2 @@@ labstmt
     else
       let st' = st1 in
-      let sf' = compileCondExp ~ghost ce2 st2 sf in
-      (*Format.eprintf
-        "result:@\nchunk then:@\n  @[%a@]@\nchunk else:  @[%a@]@."
-        d_chunk st d_chunk sf;*)
-      compileCondExp ~ghost ce1 st' sf'
+      let sf' = compileCondExp ~hide ~ghost ce2 st2 sf in
+      compileCondExp ~hide ~ghost ce1 st' sf'
 
-  | CENot ce1 -> compileCondExp ~ghost ce1 sf st
+  | CENot ce1 -> compileCondExp ~hide ~ghost ce1 sf st
 
   | CEExp (se, e) -> begin
       match e.enode with
@@ -7739,33 +7783,56 @@ and compileCondExp ~ghost ce st sf =
         when (Integer.equal z Integer.zero) && canDrop st ->
         full_clean_up_chunk_locals st;
         se @@@ (sf, ghost)
-      | _ -> (empty @@@ (se, ghost)) @@@ (ifChunk ~ghost e e.eloc st sf, ghost)
+      | _ ->
+        let se', e' =
+          if hide then hide_chunk ~ghost ~loc:e.eloc [] se e (typeOf e)
+          else se, e
+        in
+        (empty @@@ (se', ghost)) @@@ (ifChunk ~ghost e' e'.eloc st sf, ghost)
     end
 
 
 (* A special case for conditionals *)
-and doCondition local_env asconst
+and doCondition ~is_loop local_env asconst
     (* If we are in constants, we do our best to eliminate the conditional *)
     (e: Cabs.expression)
     (st: chunk)
     (sf: chunk) : chunk =
-  if isEmpty st && isEmpty sf(*TODO: ignore attribute FRAMA_C_KEEP_BLOCK*) then
+  let ghost = local_env.is_ghost in
+  contains_temp_subarray := false;
+  if isEmpty st && isEmpty sf (*TODO: ignore attribute FRAMA_C_KEEP_BLOCK*) then
     begin
-      let (_, se,e,_) = doExp local_env CNoConst e ADrop in
-      if is_dangerous e then begin
-        let ghost = local_env.is_ghost in
-        se @@@ (keepPureExpr ~ghost e e.eloc, ghost)
-      end else begin
-        if (isEmpty se) then begin
-          let name = !currentFunctionFDEC.svar.vorig_name in
-          IgnorePureExpHook.apply (name, e)
-        end;
-        se
+      let (_, se, e, _) = doExp local_env CNoConst e ADrop in
+      let se' =
+        if is_dangerous e then begin
+          se @@@ (keepPureExpr ~ghost e e.eloc, ghost)
+        end else begin
+          if (isEmpty se) then begin
+            let name = !currentFunctionFDEC.svar.vorig_name in
+            IgnorePureExpHook.apply (name, e)
+          end;
+          se
+        end
+      in
+      if !contains_temp_subarray then begin
+        contains_temp_subarray := false;
+        enclose_chunk ~ghost se'
       end
-    end else begin
+      else se'
+    end
+  else begin
     let ce = doCondExp (no_paren_local_env local_env) asconst e in
-    let chunk = compileCondExp ~ghost:local_env.is_ghost ce st sf in
-    chunk
+    if !contains_temp_subarray then begin
+      contains_temp_subarray := false;
+      if is_loop then
+        (* Enclose everything (problematic chunk and break loop condition). *)
+        enclose_chunk ~ghost (compileCondExp ~ghost ce st sf)
+      else
+        (* The condition chunk will be hidden, and a tmp variable will be used
+           instead in the condition. *)
+        compileCondExp ~hide:true ~ghost ce st sf
+    end
+    else compileCondExp ~ghost ce st sf
   end
 
 and doPureExp local_env (e : Cabs.expression) : exp =
@@ -7776,10 +7843,21 @@ and doPureExp local_env (e : Cabs.expression) : exp =
   e'
 
 and doFullExp local_env const e what =
-  let (r, se,e,t) = doExp local_env const e what in
-  let se' = add_reads ~ghost:local_env.is_ghost e.eloc r se in
+  contains_temp_subarray := false;
+  let (r, se, e, t) = doExp local_env const e what in
+  let ghost = local_env.is_ghost in
+  let loc = e.eloc in
+  let se', e' =
+    if !contains_temp_subarray then begin
+      contains_temp_subarray := false;
+      if what = ADrop
+      then enclose_chunk ~ghost (add_reads ~ghost loc r se), e
+      else hide_chunk ~ghost ~loc r se e t
+    end
+    else add_reads ~ghost loc r se, e
+  in
   (* there is a sequence point after a full exp *)
-  empty @@@ (se', local_env.is_ghost),e,t
+  empty @@@ (se', ghost), e',t
 
 and doInitializer local_env (vi: varinfo) (inite: Cabs.init_expression)
   (* Return the accumulated chunk, the initializer and the new type (might be
@@ -8811,6 +8889,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     else begin
       (* TODO: if vi occurs in se4, this is not a real initialization. *)
       vi.vdefined <- true;
+      contains_temp_subarray := false;
       let se4, ie', et, r = doInitializer (ghost_local_env ghost) vi inite in
       let se4 = cleanup_autoreference vi se4 in
       (* Fix the length *)
@@ -8829,12 +8908,42 @@ and createLocal ghost ((_, sto, _, _) as specs)
                      a))
          | _, _ -> ());
       (* Now create assignments instead of the initialization *)
-      (se1 @@@ (se4, ghost))
-      @@@
-      (i2c
-         (Cil.mkStmtOneInstr
-            ~ghost ~valid_sid (Local_init(vi,AssignInit ie',loc)),
-          [], [(Var vi,NoOffset)], Cil_datatype.Lval.Set.elements r), ghost)
+      let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
+      let read = Cil_datatype.Lval.Set.elements r in
+      let normal_init_chunk () =
+        let normal_init = Local_init(vi, AssignInit ie', loc) in
+        let normal_stmt = Cil.mkStmtOneInstr ~ghost ~valid_sid normal_init in
+        i2c (normal_stmt, [ ], [ var vi ], read)
+      in
+      let se4', chunk_init =
+        if not !contains_temp_subarray then se4, normal_init_chunk ()
+        else begin
+          contains_temp_subarray := false;
+          match ie' with
+          (* If ie' is already a tmp variable, enclose the chunk and extract tmp
+             from inner locals to the new block locals.
+          *)
+          | SingleInit {enode=Lval(Var tmp, NoOffset)} when tmp.vtemp ->
+            let f v = not @@ Cil_datatype.Varinfo.equal v tmp in
+            let locals_no_tmp = List.filter f se4.locals in
+            let se4_without_tmp = {se4 with locals = locals_no_tmp} in
+            let enclosed = enclose_chunk ~ghost ~locals:[tmp] se4_without_tmp in
+            enclosed, normal_init_chunk ()
+          (* In other cases we hide the chunk and use the new tmp variable for
+             the initialization. *)
+          | SingleInit old_e ->
+            let hidden_chunk, new_e =
+              hide_chunk ~ghost ~loc read se4 old_e vi.vtype
+            in
+            let init_exp = SingleInit new_e in
+            let init_instr = Local_init(vi, AssignInit init_exp, loc) in
+            let init_stmt = Cil.mkStmtOneInstr ~ghost ~valid_sid init_instr in
+            let init_vi_chunk = i2c (init_stmt, [ ], [ var vi ], [ ]) in
+            hidden_chunk, init_vi_chunk
+          | _ -> assert false
+        end
+      in
+      (se1 @@@ se4') @@@ chunk_init
     end
 
 and doAliasFun ghost vtype (thisname:string) (othername:string)
@@ -9713,7 +9822,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     let st' = doStatement local_env st in
     let sf' = doStatement local_env sf in
     CurrentLoc.set (convLoc loc);
-    doCondition local_env CNoConst e st' sf'
+    doCondition ~is_loop:false local_env CNoConst e st' sf'
 
   | Cabs.WHILE(a,e,s,loc) ->
     startLoop true;
@@ -9729,7 +9838,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     exitLoop ();
     CurrentLoc.set loc';
     loopChunk ~ghost ~sattr:[Attr("while",[])] a
-      ((doCondition local_env CNoConst e skipChunk break_cond)
+      ((doCondition ~is_loop:true local_env CNoConst e skipChunk break_cond)
        @@@ (s', ghost))
 
   | Cabs.DOWHILE(a, e,s,loc) ->
@@ -9759,6 +9868,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       let s'' =
         consLabContinue ~ghost
           (doCondition
+             ~is_loop:true
              local_env
              CNoConst e skipChunk (breakChunk ~ghost loc'))
       in
@@ -9791,7 +9901,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
         | Cabs.NOTHING -> (* This means true *)
           c
         | _ ->
-          doCondition local_env CNoConst e2 skipChunk break_cond @@@ (c, ghost)
+          doCondition ~is_loop:true local_env CNoConst e2 skipChunk break_cond @@@ (c, ghost)
       in
       let res = se1 @@@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a c, ghost) in
       exitScope ();
