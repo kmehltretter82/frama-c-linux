@@ -221,7 +221,7 @@ module Marker = MakeTag
         | PType _ -> Printf.sprintf "#y%d" (incr kid ; !kid)
     end)
 
-module Printer = Printer_tag.Make(struct let tag = Marker.index end)
+module PrinterTag = Printer_tag.Make(struct let tag = Marker.index end)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Ast Data                                                           --- *)
@@ -395,7 +395,7 @@ let print_global_ast global =
   let stacked_libc = Kernel.PrintLibc.get () in
   try
     if not stacked_libc then Kernel.PrintLibc.set true ;
-    let printer = Printer.(with_unfold_precond (fun _ -> true) pp_global) in
+    let printer = PrinterTag.(with_unfold_precond (fun _ -> true) pp_global) in
     let ast = Jbuffer.to_json printer global in
     if not stacked_libc then Kernel.PrintLibc.set false ; ast
   with err ->
@@ -474,11 +474,12 @@ struct
       | PGlobal _ -> if short then "Decl" else "Declaration"
 
   let descr_localizable fmt = function
-    | PGlobal (GType(ti,_)) -> Printer.pp_typ fmt (TNamed(ti,[]))
+    | PGlobal (GType(ti,_)) ->
+      PrinterTag.pp_typ fmt (TNamed(ti,[]))
     | PGlobal (GCompTag(ci,_) | GCompTagDecl(ci,_)) ->
-      Printer.pp_typ fmt (TComp(ci,[]))
+      PrinterTag.pp_typ fmt (TComp(ci,[]))
     | PGlobal (GEnumTag(ei,_) | GEnumTagDecl(ei,_)) ->
-      Printer.pp_typ fmt (TEnum(ei,[]))
+      PrinterTag.pp_typ fmt (TEnum(ei,[]))
     | g -> pp_localizable fmt g
 
   let model = States.model ()
@@ -845,7 +846,14 @@ let () = Information.register
       match loc with
       | PType (TNamed _ as ty)
       | PGlobal (GType({ ttype = ty },_)) ->
-        Printer.pp_typ fmt (Cil.unrollType ty)
+        begin
+          let tdef = Cil.unrollType ty in
+          match Printer_tag.definition_of_type tdef with
+          | Some marker ->
+            let tag = Marker.index marker in
+            Format.fprintf fmt "@{<%s>%a@}" tag Printer.pp_typ tdef
+          | None -> PrinterTag.pp_typ fmt tdef
+        end
       | _ -> raise Not_found
     end
 

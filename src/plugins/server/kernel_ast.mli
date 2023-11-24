@@ -72,7 +72,7 @@ module Kinstr : Data.S with type t = kinstr
 (** Ast Printer *)
 (* -------------------------------------------------------------------------- *)
 
-module Printer : Printer_tag.S_pp
+module PrinterTag : Printer_tag.S_pp
 
 (* -------------------------------------------------------------------------- *)
 (** Ast Information *)

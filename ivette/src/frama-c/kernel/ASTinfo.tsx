@@ -168,11 +168,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
         States.setMarked(m, m !== marker);
         break;
       case 'DOUBLE':
-        {
-          const { scope, definition } = States.getMarker(m);
-          if (scope || definition)
-            States.setSelected(scope ? m : definition);
-        }
+        States.setSelected(m);
         break;
     }
   };
