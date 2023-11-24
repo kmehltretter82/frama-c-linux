@@ -524,7 +524,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
 /* -------------------------------------------------------------------------- */
 
 interface CallsiteCellProps {
-  callstack: callstack | 'Header';
+  callstack: callstack | 'None' | 'Header';
   index?: number;
   getCallsites: Request<callstack, Values.callsite[]>;
   selectedClass?: string;
@@ -540,20 +540,28 @@ function makeStackTitle(calls: Values.callsite[]): string {
 async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
   const { callstack, index, getCallsites, selectedClass = '' } = props;
   const baseClasses = classes('eva-table-callsite-box', selectedClass);
+  const cls = classes(baseClasses, 'eva-table-value-sticky');
   switch (callstack) {
     case 'Header': {
-      const cls = classes(baseClasses, 'eva-table-header-sticky');
+      const headerCls = classes(baseClasses, 'eva-table-header-sticky');
       const title = 'Callstack at which expressions are evaluated';
-      return <td className={cls} rowSpan={2} title={title}>{'#'}</td>;
+      return <td className={headerCls} rowSpan={2} title={title}>{'#'}</td>;
+    }
+    case 'None': {
+      const text = '-';
+      const title = 'Global evaluation';
+      return <td className={cls} title={title}>{text}</td>;
+    }
+    case 'Summary': {
+      const text = '∑';
+      const title = 'Summary: value consolidated accross all callstacks';
+      return <td className={cls} title={title}>{text}</td>;
     }
     default: {
-      const cls = classes(baseClasses, 'eva-table-value-sticky');
       const callsites = await getCallsites(callstack);
-      const isSummary = callstack === 'Summary';
-      const summary = 'Summary: value consolidated accross all callstacks';
-      const infos = isSummary ? summary : makeStackTitle(callsites);
-      const text = isSummary ? '∑' : (index ? index.toString() : '0');
-      return <td className={cls} title={infos}>{text}</td>;
+      const title = makeStackTitle(callsites);
+      const text = index ? index.toString() : '0';
+      return <td className={cls} title={title}>{text}</td>;
     }
   }
 }
@@ -611,9 +619,8 @@ async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   /* Computes the relevant callstacks */
   const markers = Array.from(props.markers.keys());
   const allCallstacks = await getCS(markers);
-  const summaryOnly = allCallstacks.length === 1;
-  const callstacks = byCallstacks || summaryOnly ? allCallstacks : [];
-  const nbCS = allCallstacks.length;
+  const onlyOneCallstack = allCallstacks.length === 1;
+  const callstacks = byCallstacks || onlyOneCallstack ? allCallstacks : [];
 
   /* Computes the relevant data for each marker */
   interface Data { probe: Probe; summary: Evaluation; status: MarkerStatus }
@@ -644,9 +651,10 @@ async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   const miscs = { addLoc, isSelectedCallstack };
   const builders = data.map((d: Data) => ProbeValues({ ...d, ...miscs }));
   const summary = await Promise.all(builders.map((b) => b('Summary')));
-  const summCall = await CallsiteCell({ callstack: 'Summary', getCallsites });
+  const summaryKind = allCallstacks.length === 0 ? 'None' : 'Summary';
+  const summCall = await CallsiteCell({ callstack: summaryKind, getCallsites });
   let summaryRow = <></>;
-  if (!summaryOnly) {
+  if (!onlyOneCallstack) {
     summaryRow =
       <tr key={'Summary'} onClick={onClick('Summary')}>
         {doCall ? summCall : undefined}
@@ -699,13 +707,13 @@ async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
         <Cell className="eva-fct-name">{name}</Cell>
         <Filler />
         <div className='eva-nb-callstacks'>
-          {`${nbCS} callstack${nbCS > 1 ? 's' : ''}`}
+          {`${allCallstacks.length} callstack${onlyOneCallstack ? '' : 's'}`}
         </div>
         <IconButton
           icon="ITEMS.LIST"
           className="eva-button"
           selected={byCallstacks}
-          disabled={summaryOnly}
+          enabled={allCallstacks.length > 1}
           title="Show values by callstack"
           onClick={() => setByCallstacks(!byCallstacks)}
         />
