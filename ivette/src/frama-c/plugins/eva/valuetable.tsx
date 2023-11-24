@@ -257,6 +257,7 @@ async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
   if (callsites.length <= 1) return <></>;
   const makeCallsite = ({ caller, stmt }: Values.callsite): JSX.Element => {
     if (!caller || !stmt) return <></>;
+    const { name } = States.getDeclaration(caller);
     const key = `${caller}@${stmt}`;
     const select = (meta: boolean): void => {
       States.setSelected(stmt, meta);
@@ -274,7 +275,7 @@ async function StackInfos(props: StackInfosProps): Promise<JSX.Element> {
         onClick={onClick}
         onDoubleClick={onDoubleClick}
       >
-        {caller}
+        {name}
         <Stmt stmt={stmt} marker={stmt} />
       </Cell>
     );
