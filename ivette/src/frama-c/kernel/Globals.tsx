@@ -77,6 +77,21 @@ function resetMode(enabled: boolean): void {
 }
 
 // --------------------------------------------------------------------------
+// --- Menu item
+// --------------------------------------------------------------------------
+
+type setting = [boolean, () => void]
+function menuItem(label: string, [b, flip]: setting, enabled?: boolean)
+  : Dome.PopupMenuItem {
+  return {
+    label: label,
+    enabled: enabled !== undefined ? enabled : true,
+    checked: b,
+    onClick: flip,
+  };
+}
+
+// --------------------------------------------------------------------------
 // --- Items
 // --------------------------------------------------------------------------
 
@@ -138,25 +153,20 @@ export function Functions(): JSX.Element {
   const eva = States.useSyncArrayProxy(Eva.functions);
   const getMarker = States.useSyncArrayGetter(Ast.markerAttributes);
   const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
-  const { useFlipSettings } = Dome;
-  const [stdlib, flipStdlib] =
-    useFlipSettings('ivette.functions.stdlib', false);
-  const [builtin, flipBuiltin] =
-    useFlipSettings('ivette.functions.builtin', false);
-  const [def, flipDef] =
-    useFlipSettings('ivette.functions.def', true);
-  const [undef, flipUndef] =
-    useFlipSettings('ivette.functions.undef', true);
-  const [intern, flipIntern] =
-    useFlipSettings('ivette.functions.intern', true);
-  const [extern, flipExtern] =
-    useFlipSettings('ivette.functions.extern', true);
-  const [evaAnalyzed, flipEvaAnalyzed] =
-    useFlipSettings('ivette.functions.eva-analyzed', true);
-  const [evaUnreached, flipEvaUnreached] =
-    useFlipSettings('ivette.functions.eva-unreached', true);
-  const [selected, flipSelected] =
-    useFlipSettings('ivette.functions.selected', false);
+
+  function useFlipSettings(label: string, b: boolean): setting {
+    return Dome.useFlipSettings('ivette.functions.' + label, b);
+  }
+  const stdlib = useFlipSettings('stdlib', false);
+  const builtin = useFlipSettings('builtin', false);
+  const def = useFlipSettings('def', true);
+  const undef = useFlipSettings('undef', true);
+  const intern = useFlipSettings('intern', true);
+  const extern = useFlipSettings('extern', true);
+  const evaAnalyzed = useFlipSettings('eva-analyzed', true);
+  const evaUnreached = useFlipSettings('eva-unreached', true);
+  const selected = useFlipSettings('selected', false);
+
   const { markers } = Locations.useSelection();
   const multipleSelection: States.Scope[] =
     React.useMemo(
@@ -175,74 +185,35 @@ export function Functions(): JSX.Element {
 
   function showFunction(fct: functionsData): boolean {
     const visible =
-      (stdlib || !fct.stdlib)
-      && (builtin || !fct.builtin)
-      && (def || !fct.defined)
-      && (undef || fct.defined)
-      && (intern || fct.extern)
-      && (extern || !fct.extern)
-      && (!multipleSelectionActive || !selected || isSelected(fct))
-      && (evaAnalyzed || !evaComputed ||
+      (stdlib[0] || !fct.stdlib)
+      && (builtin[0] || !fct.builtin)
+      && (def[0] || !fct.defined)
+      && (undef[0] || fct.defined)
+      && (intern[0] || fct.extern)
+      && (extern[0] || !fct.extern)
+      && (!multipleSelectionActive || !selected[0] || isSelected(fct))
+      && (evaAnalyzed[0] || !evaComputed ||
           !('eva_analyzed' in fct && fct.eva_analyzed === true))
-      && (evaUnreached || !evaComputed ||
+      && (evaUnreached[0] || !evaComputed ||
           ('eva_analyzed' in fct && fct.eva_analyzed === true));
     return !!visible;
   }
 
   async function onContextMenu(): Promise<void> {
     const items: Dome.PopupMenuItem[] = [
-      {
-        label: 'Show Frama-C builtins',
-        checked: builtin,
-        onClick: flipBuiltin,
-      },
-      {
-        label: 'Show stdlib functions',
-        checked: stdlib,
-        onClick: flipStdlib,
-      },
+      menuItem('Show Frama-C builtins', builtin),
+      menuItem('Show stdlib functions', stdlib),
       'separator',
-      {
-        label: 'Show defined functions',
-        checked: def,
-        onClick: flipDef,
-      },
-      {
-        label: 'Show undefined functions',
-        checked: undef,
-        onClick: flipUndef,
-      },
+      menuItem('Show defined functions', def),
+      menuItem('Show undefined functions', undef),
       'separator',
-      {
-        label: 'Show non-extern functions',
-        checked: intern,
-        onClick: flipIntern,
-      },
-      {
-        label: 'Show extern functions',
-        checked: extern,
-        onClick: flipExtern,
-      },
+      menuItem('Show non-extern functions', intern),
+      menuItem('Show extern functions', extern),
       'separator',
-      {
-        label: 'Show functions analyzed by Eva',
-        enabled: evaComputed,
-        checked: evaAnalyzed,
-        onClick: flipEvaAnalyzed,
-      },
-      {
-        label: 'Show functions unreached by Eva',
-        enabled: evaComputed,
-        checked: evaUnreached,
-        onClick: flipEvaUnreached,
-      },
+      menuItem('Show functions analyzed by Eva', evaAnalyzed, evaComputed),
+      menuItem('Show functions unreached by Eva', evaUnreached, evaComputed),
       'separator',
-      {
-        label: 'Selected only',
-        enabled: multipleSelectionActive,
-        checked: selected,
-        onClick: flipSelected,
-      },
+      menuItem('Selected only', selected, multipleSelectionActive),
     ];
     Dome.popupMenu(items);
   }
@@ -327,120 +298,57 @@ export function Globals(): JSX.Element {
   const variables = States.useSyncArrayData(Ast.globals);
 
   // Filter settings
-  const { useFlipSettings } = Dome;
-  const [stdlib, flipStdlib] =
-    useFlipSettings('ivette.globals.stdlib', false);
-  const [extern, flipExtern] =
-    useFlipSettings('ivette.globals.extern', true);
-  const [nonExtern, flipNonExtern] =
-    useFlipSettings('ivette.globals.non-extern', true);
-  const [isConst, flipIsConst] =
-    useFlipSettings('ivette.globals.const', true);
-  const [nonConst, flipNonConst] =
-    useFlipSettings('ivette.globals.non-const', true);
-  const [volatile, flipVolatile] =
-    useFlipSettings('ivette.globals.volatile', true);
-  const [nonVolatile, flipNonVolatile] =
-    useFlipSettings('ivette.globals.non-volatile', true);
-  const [ghost, flipGhost] =
-    useFlipSettings('ivette.globals.ghost', true);
-  const [nonGhost, flipNonGhost] =
-    useFlipSettings('ivette.globals.non-ghost', true);
-  const [init, flipInit] =
-    useFlipSettings('ivette.globals.init', true);
-  const [nonInit, flipNonInit] =
-    useFlipSettings('ivette.globals.non-init', true);
-  const [source, flipSource] =
-    useFlipSettings('ivette.globals.source', true);
-  const [nonSource, flipNonSource] =
-    useFlipSettings('ivette.globals.non-source', false);
+  function useFlipSettings(label: string, b: boolean): setting {
+    return Dome.useFlipSettings('ivette.globals.' + label, b);
+  }
+  const stdlib = useFlipSettings('stdlib', false);
+  const extern = useFlipSettings('extern', true);
+  const nonExtern = useFlipSettings('non-extern', true);
+  const isConst = useFlipSettings('const', true);
+  const nonConst = useFlipSettings('non-const', true);
+  const volatile = useFlipSettings('volatile', true);
+  const nonVolatile = useFlipSettings('non-volatile', true);
+  const ghost = useFlipSettings('ghost', true);
+  const nonGhost = useFlipSettings('non-ghost', true);
+  const init = useFlipSettings('init', true);
+  const nonInit = useFlipSettings('non-init', true);
+  const source = useFlipSettings('source', true);
+  const nonSource = useFlipSettings('non-source', false);
 
   function showVariable(vi: Ast.globalsData): boolean {
     const visible =
-      (stdlib || !vi.stdlib)
-      && (extern || !vi.extern) && (nonExtern || vi.extern)
-      && (isConst || !vi.const) && (nonConst || vi.const)
-      && (volatile || !vi.volatile) && (nonVolatile || vi.volatile)
-      && (ghost || !vi.ghost) && (nonGhost || vi.ghost)
-      && (init || !vi.init) && (nonInit || vi.init)
-      && (source || !vi.source) && (nonSource || vi.source);
+      (stdlib[0] || !vi.stdlib)
+      && (extern[0] || !vi.extern) && (nonExtern[0] || vi.extern)
+      && (isConst[0] || !vi.const) && (nonConst[0] || vi.const)
+      && (volatile[0] || !vi.volatile) && (nonVolatile[0] || vi.volatile)
+      && (ghost[0] || !vi.ghost) && (nonGhost[0] || vi.ghost)
+      && (init[0] || !vi.init) && (nonInit[0] || vi.init)
+      && (source[0] || !vi.source) && (nonSource[0] || vi.source);
     return !!visible;
   }
 
   // Context menu to change filter settings
   async function onContextMenu(): Promise<void> {
     const items: Dome.PopupMenuItem[] = [
-      {
-        label: 'Show stdlib variables',
-        checked: stdlib,
-        onClick: flipStdlib,
-      },
+      menuItem('Show stdlib variables', stdlib),
       'separator',
-      {
-        label: 'Show extern variables',
-        checked: extern,
-        onClick: flipExtern,
-      },
-      {
-        label: 'Show non-extern variables',
-        checked: nonExtern,
-        onClick: flipNonExtern,
-      },
+      menuItem('Show extern variables', extern),
+      menuItem('Show non-extern variables', nonExtern),
       'separator',
-      {
-        label: 'Show const variables',
-        checked: isConst,
-        onClick: flipIsConst,
-      },
-      {
-        label: 'Show non-const variables',
-        checked: nonConst,
-        onClick: flipNonConst,
-      },
+      menuItem('Show const variables', isConst),
+      menuItem('Show non-const variables', nonConst),
       'separator',
-      {
-        label: 'Show volatile variables',
-        checked: volatile,
-        onClick: flipVolatile,
-      },
-      {
-        label: 'Show non-volatile variables',
-        checked: nonVolatile,
-        onClick: flipNonVolatile,
-      },
+      menuItem('Show volatile variables', volatile),
+      menuItem('Show non-volatile variables', nonVolatile),
       'separator',
-      {
-        label: 'Show ghost variables',
-        checked: ghost,
-        onClick: flipGhost,
-      },
-      {
-        label: 'Show non-ghost variables',
-        checked: nonGhost,
-        onClick: flipNonGhost,
-      },
+      menuItem('Show ghost variables', ghost),
+      menuItem('Show non-ghost variables', nonGhost),
       'separator',
-      {
-        label: 'Show variables with explicit initializer',
-        checked: init,
-        onClick: flipInit,
-      },
-      {
-        label: 'Show variables without explicit initializer',
-        checked: nonInit,
-        onClick: flipNonInit,
-      },
+      menuItem('Show variables with explicit initializer', init),
+      menuItem('Show variables without explicit initializer', nonInit),
       'separator',
-      {
-        label: 'Show variables from the source code',
-        checked: source,
-        onClick: flipSource,
-      },
-      {
-        label: 'Show variables generated from analyses',
-        checked: nonSource,
-        onClick: flipNonSource,
-      },
+      menuItem('Show variables from the source code', source),
+      menuItem('Show variables generated from analyses', nonSource),
     ];
     Dome.popupMenu(items);
   }
