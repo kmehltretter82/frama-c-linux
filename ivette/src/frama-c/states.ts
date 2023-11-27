@@ -79,9 +79,11 @@ export function useRequest<In, Out>(
 ): Out | undefined {
   const initial = options.offline ?? undefined;
   const [response, setResponse] = React.useState<Out | undefined>(initial);
-  const updateResponse = (opt: Out | undefined | null): void => {
-    if (opt !== null) setResponse(opt);
-  };
+  const doUpdateResponse = React.useCallback(
+    (opt: Out | undefined | null): void => {
+      if (opt !== null) setResponse(opt);
+    }, []);
+  const updateResponse = Dome.useActive(doUpdateResponse);
 
   // Fetch Request
   async function trigger(): Promise<void> {
