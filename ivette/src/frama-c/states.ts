@@ -342,10 +342,12 @@ class SyncArray<K, A> {
       } while (this.signaled || pending > 0);
       /* eslint-enable no-await-in-loop */
     } catch (error) {
-      D.error(
-        `Fail to retrieve the value of syncArray '${this.handler.name}'.`,
-        error,
-      );
+      if (Server.isRunning()) {
+        D.error(
+          `Fail to retrieve the value of syncArray '${this.handler.name}'.`,
+          error,
+        );
+      }
     } finally {
       this.signaled = false;
       this.fetching = false;
