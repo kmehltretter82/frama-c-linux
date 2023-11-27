@@ -24,6 +24,19 @@
 
 open Cil_types
 
+(** The kind of AST declarations that can be printed. *)
+type declaration =
+  | SEnum of enuminfo
+  | SComp of compinfo
+  | SType of typeinfo
+  | SGlobal of varinfo
+  | SFunction of kernel_function
+
+(** Prints a concise label of the declaration. *)
+val pp_declaration : Format.formatter -> declaration -> unit
+
+module Declaration: Datatype.S_with_collections with type t = declaration
+
 (** The kind of object that can be selected in the source viewer. *)
 type localizable =
   | PStmt of (kernel_function * stmt)
@@ -47,22 +60,64 @@ type localizable =
   | PIP of Property.t
   | PType of typ
 
-(** Name (or category). *)
-val label: localizable -> string
+(** Prints the global declaration of the declaration. *)
+val pp_signature : Format.formatter -> declaration -> unit
 
-(** Name (or category). *)
-val glabel: global -> string
+(** Prints the global definition of the declaration. *)
+val pp_definition : Format.formatter -> declaration -> unit
 
-(** Description of a localizable. *)
-val pretty: Format.formatter -> localizable -> unit
+(** Prints the signature of the localizable. *)
+val pp_localizable: Format.formatter -> localizable -> unit
 
 (** Debugging. *)
 val pp_debug: Format.formatter -> localizable -> unit
 
 module Localizable: Datatype.S_with_collections with type t = localizable
 
-val localizable_of_global : global -> localizable
+(** {2 Declaration of Localizable}
+
+    Localizable items are always printed under a certain global scope
+    identified by a declaration that can be retrieved from
+    {!declaration_of_type}, {!declaration_of_global}, {!declaration_of_property}
+    and {!declaration_of_localizable} functions below.
+
+    Moreover, each declared item can be identified in two different ways: a
+    declaration scope and its own localizable inside this scope. Functions
+    {!localizable_of_kf}, {!localizable_of_global} and
+    {!localizable_of_declaration} can be used to obtain the self-localization of
+    declarations.
+
+    Differently, some localizable refers to some global declaration, eg.
+    a variable or a function inside an expression or the compound name
+    of a type. In such a case, functions {!definition_of_type} and
+    {!definition_of_localizable} return the localization of the referenced
+    declaration. It is returned as a localization to the associated declaration,
+    whose scope can be obtained in turn with {!declaration_of_localizable}.
+
+*)
+
+val declaration_of_type : typ -> declaration option
+val declaration_of_global : global -> declaration option
+val declaration_of_property : Property.t -> declaration option
+val declaration_of_localizable : localizable -> declaration option
+
+val definition_of_type : typ -> localizable option
+val definition_of_localizable : localizable -> localizable option
+
+val loc_of_declaration : declaration -> location
+
+val name_of_type : typ -> string option
+val name_of_global : global -> string option
+val name_of_declaration : declaration -> string
+val name_of_localizable : localizable -> string option
+
+val signature_of_declaration : declaration -> global
+val definition_of_declaration : declaration -> global
+
 val localizable_of_kf : kernel_function -> localizable
+val localizable_of_global : global -> localizable
+val localizable_of_stmt : stmt -> localizable
+val localizable_of_declaration : declaration -> localizable
 
 val kf_of_localizable : localizable -> kernel_function option
 val ki_of_localizable : localizable -> kinstr

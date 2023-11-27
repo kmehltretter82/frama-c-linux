@@ -55,34 +55,34 @@ let computation_signal =
     ~output:(module ComputationState)
     (module Self.ComputationState)
 
-(* ----- Callsites ---------------------------------------------------------- *)
+(* ----- Callers & Callees -------------------------------------------------- *)
 
 module CallSite =
 struct
   type t = kernel_function * stmt
   let jtype = Data.declare ~package ~name:"CallSite"
-      ~descr:(Markdown.plain "Call site, combining function and stmt")
+      ~descr:(Markdown.plain "Callee function and caller stmt")
       (Jrecord [
-          "kf", Kernel_ast.Function.jtype;
+          "call", Kernel_ast.Decl.jtype;
           "stmt", Kernel_ast.Stmt.jtype;
         ])
   let to_json (kf,stmt) = `Assoc [
-      "kf", Kernel_ast.Function.to_json kf;
+      "call", Kernel_ast.Decl.to_json (SFunction kf);
       "stmt", Kernel_ast.Stmt.to_json stmt;
     ]
-  let of_json js =
-    Json.field "fct" js |> Kernel_ast.Function.of_json,
-    Json.field "stmt" js |> Kernel_ast.Stmt.of_json
+  let of_json _ = failwith "CallSite"
 end
 
-let callers kf =
-  let list = Results.callsites kf in
-  List.concat (List.map (fun (kf, l) -> List.map (fun s -> kf, s) l) list)
+let callers = function
+  | Printer_tag.SFunction kf ->
+    let list = Results.callsites kf in
+    List.concat (List.map (fun (kf, l) -> List.map (fun s -> kf, s) l) list)
+  | _ -> []
 
 let () = Request.register ~package
     ~kind:`GET ~name:"getCallers"
-    ~descr:(Markdown.plain "Get the list of call site of a function")
-    ~input:(module Kernel_ast.Function) ~output:(module Data.Jlist (CallSite))
+    ~descr:(Markdown.plain "Get the list of call sites for a function")
+    ~input:(module Kernel_ast.Decl) ~output:(module Data.Jlist (CallSite))
     ~signals:[computation_signal]
     callers
 
@@ -93,9 +93,11 @@ let eval_callee stmt lval =
 let callees = function
   | Printer_tag.PLval (_kf, Kstmt stmt, (Mem _, NoOffset as lval))
     when Cil.(isFunctionType (typeOfLval lval)) ->
+    List.map (fun kf -> Printer_tag.SFunction kf) @@
     eval_callee stmt lval
   | Printer_tag.PLval (_kf, Kstmt stmt, lval)
     when Cil.(isFunPtrType (Cil.typeOfLval lval)) ->
+    List.map (fun kf -> Printer_tag.SFunction kf) @@
     eval_callee stmt (Mem (Eva_utils.lval_to_exp lval), NoOffset)
   | _ -> []
 
@@ -104,7 +106,7 @@ let () = Request.register ~package
     ~descr:(Markdown.plain
               "Return the functions pointed to by a function pointer")
     ~input:(module Kernel_ast.Marker)
-    ~output:(module Data.Jlist (Kernel_ast.Function))
+    ~output:(module Data.Jlist(Kernel_ast.Decl))
     ~signals:[computation_signal]
     callees
 
@@ -167,7 +169,7 @@ module DeadCode = struct
   type t = dead_code
   let jtype = R.jtype
 
-  let to_json (dead_code) =
+  let to_json dead_code =
     let make_stmt stmt = Printer_tag.PStmt (dead_code.kf, stmt) in
     let make_non_term stmt = Printer_tag.PStmtStart (dead_code.kf, stmt) in
     R.default |>
@@ -175,40 +177,47 @@ module DeadCode = struct
     R.set unreachable (List.map make_stmt dead_code.unreachable) |>
     R.set non_terminating (List.map make_non_term dead_code.non_terminating) |>
     R.to_json
+
+  let of_json _ = Data.failure "DeadCode.of_json not implemented"
 end
 
 let all_statements kf =
   try (Kernel_function.get_definition kf).sallstmts
   with Kernel_function.No_Definition -> []
 
-let dead_code kf =
-  let empty = { kf ; reached = [] ; unreachable = [] ; non_terminating = [] } in
-  if Analysis.is_computed () then
-    let body = all_statements kf in
-    match Analysis.status kf with
-    | Unreachable | SpecUsed | Builtin _ -> { empty with unreachable = body }
-    | Analyzed NoResults -> empty
-    | Analyzed (Partial | Complete) ->
-      let classify { kf ; reached ; unreachable ; non_terminating = nt } stmt =
-        let before = Results.(before stmt |> is_empty) in
-        let after = Results.(after stmt |> is_empty) in
-        let unreachable = if before then stmt :: unreachable else unreachable in
-        let reached = if not before then stmt :: reached else reached in
-        let non_terminating = if not before && after then stmt :: nt else nt in
-        { kf ; reached ; unreachable ; non_terminating }
-      in List.fold_left classify empty body
-  else empty
+let dead_code = function
+  | Printer_tag.SFunction kf ->
+    let empty = { kf; reached = []; unreachable = []; non_terminating = [] } in
+    let record =
+      if Analysis.is_computed () then
+        let body = all_statements kf in
+        match Analysis.status kf with
+        | Unreachable | SpecUsed | Builtin _ -> { empty with unreachable = body }
+        | Analyzed NoResults -> empty
+        | Analyzed (Partial | Complete) ->
+          let classify { kf ; reached ; unreachable ; non_terminating = nt } stmt =
+            let before = Results.(before stmt |> is_empty) in
+            let after = Results.(after stmt |> is_empty) in
+            let unreachable = if before then stmt :: unreachable else unreachable in
+            let reached = if not before then stmt :: reached else reached in
+            let non_terminating = if not before && after then stmt :: nt else nt in
+            { kf ; reached ; unreachable ; non_terminating }
+          in
+          List.fold_left classify empty body
+      else empty
+    in
+    Some record
+  | _ -> None
 
 let () = Request.register ~package
     ~kind:`GET ~name:"getDeadCode"
-    ~descr:(Markdown.plain "Get the lists of unreachable and of non terminating \
-                            statements in a function")
-    ~input:(module Kernel_ast.Function)
-    ~output:(module DeadCode)
+    ~descr:(Markdown.plain
+              "Get the lists of unreachable and of non terminating \
+               statements in a function")
+    ~input:(module Kernel_ast.Decl)
+    ~output:(module Data.Joption (DeadCode))
     ~signals:[computation_signal]
     dead_code
-
-
 
 (* ----- Register Eva values information ------------------------------------ *)
 
@@ -470,21 +479,23 @@ module LvalueTaints = struct
         | None -> Cil.DoChildren
   end
 
-  let get_tainted_lvals fundec =
-    let taints = Table.create 17 in
-    Visitor.visitFramacFunction (new tainted_lvalues taints) fundec |> ignore ;
-    let fn lval (ki, taint) acc = Status.create (ki, lval) (Ok taint) :: acc in
-    Table.fold fn taints [] |> List.rev
+  let get_tainted_lvals kf =
+    try
+      let fn = Kernel_function.get_definition kf in
+      let taints = Table.create 17 in
+      Visitor.visitFramacFunction (new tainted_lvalues taints) fn |> ignore ;
+      let fn lval (ki, taint) acc = Status.create (ki, lval) (Ok taint) :: acc in
+      Table.fold fn taints [] |> List.rev
+    with Kernel_function.No_Definition -> []
 
   let () = Request.register ~package ~kind:`GET ~name:"taintedLvalues"
       ~descr:(Markdown.plain "Get the tainted lvalues of a given function")
-      ~input:(module (Kernel_ast.Fundec))
+      ~input:(module (Kernel_ast.Decl))
       ~output:(module (Data.Jlist (Status)))
       ~signals:[computation_signal]
-      get_tainted_lvals
+      (function SFunction kf -> get_tainted_lvals kf | _ -> [])
+
 end
-
-
 
 (* ----- Red and tainted alarms --------------------------------------------- *)
 
@@ -544,7 +555,7 @@ module PropertiesData = struct
       ~package
       ~name:"properties"
       ~descr:(Markdown.plain "Status of Registered Properties")
-      ~key:(fun ip -> Kernel_ast.Marker.tag (PIP ip))
+      ~key:(fun ip -> Kernel_ast.Marker.index (PIP ip))
       ~keyType:Kernel_ast.Marker.jtype
       ~iter:Property_status.iter
       ~add_update_hook
@@ -732,9 +743,14 @@ let _computed_signal =
     ~add_hook:(Analysis.register_computation_hook ~on:Computed)
     ()
 
-let _array =
+let _functionStats =
   let open Summary in
   let model = States.model () in
+
+  States.column model ~name:"fctName"
+    ~descr:(Markdown.plain "Function name")
+    ~data:(module Data.Jalpha)
+    ~get:(fun (kf,_) -> Kernel_function.get_name kf);
 
   States.column model ~name:"coverage"
     ~descr:(Markdown.plain "Coverage of the Eva analysis")
@@ -756,10 +772,9 @@ let _array =
     ~name:"functionStats"
     ~descr:(Markdown.plain
               "Statistics about the last Eva analysis for each function")
-    ~key:(fun fundec -> fundec.svar.vname)
-    ~keyType:Kernel_ast.Fundec.jtype
-    model
-    (module FunctionStats)
+    ~key:(fun kf -> Kernel_ast.Decl.index (SFunction kf))
+    ~keyType:(Kernel_ast.Decl.jtype)
+    model (module FunctionStats)
 
 
 

@@ -37,8 +37,7 @@ COPYRIGHT=CEA LIST / LSL
 
 .PHONY: all app dev
 
-all: pkg check-lint app
-
+all: pkg lint app
 app: api dome-app
 dev: api dome-dev
 

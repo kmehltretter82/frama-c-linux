@@ -157,12 +157,11 @@ let get_status ip =
   in
   Property_status.fold_on_statuses aux_status ip None
 
-let compute_fun_stats fundec =
+let compute_fun_stats kf =
   let alarms = AlarmsStats.create 13
   and coverage = Coverage.make ()
   and statuses = Statuses.make ()
   in
-  let kf = Globals.Functions.get fundec.Cil_types.svar in
   let do_status alarm ip =
     match get_status ip with
     | None -> ()
@@ -184,11 +183,15 @@ let compute_fun_stats fundec =
     Coverage.incr coverage ~reachable;
     Annotations.iter_code_annot (do_annot stmt) stmt
   in
-  List.iter do_stmt fundec.Cil_types.sallstmts;
+  begin
+    try
+      let fundec = Kernel_function.get_definition kf in
+      List.iter do_stmt fundec.Cil_types.sallstmts;
+    with Kernel_function.No_Definition -> ()
+  end ;
   { fun_coverage = coverage;
     fun_alarm_count = AlarmsStats.to_list alarms;
     fun_alarm_statuses = statuses; }
-
 
 module FunctionStats_Type = Datatype.Make (struct
     include Datatype.Serializable_undefined
@@ -203,7 +206,7 @@ module FunctionStats_Type = Datatype.Make (struct
 
 module FunctionStats = struct
   include State_builder.Hashtbl
-      (Cil_datatype.Fundec.Hashtbl)
+      (Kernel_function.Hashtbl)
       (FunctionStats_Type)
       (struct
         let name = "Eva.Summary.FunctionStats"
@@ -281,8 +284,9 @@ let compute_stats () =
   and prog_alarms = AlarmsStats.create 131
   in
   let do_fun fundec =
+    let kf = Globals.Functions.get fundec.Cil_types.svar in
     let consider = consider_function fundec.Cil_types.svar in
-    match FunctionStats.get fundec with
+    match FunctionStats.get kf with
     | Some fun_stats ->
       AlarmsStats.add_list prog_alarms fun_stats.fun_alarm_count;
       if consider then

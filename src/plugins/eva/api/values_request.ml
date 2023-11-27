@@ -30,7 +30,7 @@ module CSet = Callstack.Set
 module CSmap = Callstack.Hashtbl
 
 module Md = Markdown
-module Jfct = Kernel_ast.Function
+module Jdecl = Kernel_ast.Decl
 module Jstmt = Kernel_ast.Stmt
 module Jmarker = Kernel_ast.Marker
 
@@ -226,12 +226,16 @@ module Jcalls : Request.Output with type t = Callstack.t = struct
 
   type t = Callstack.t
 
-  let jtype = Package.(Jarray (Jrecord [
-      "callee" , Jfct.jtype ;
-      "caller" , Joption Jfct.jtype ;
-      "stmt" , Joption Jstmt.jtype ;
-      "rank" , Joption Jnumber ;
-    ]))
+  let jcallsite = Server.Data.declare ~package
+      ~name:"callsite" ~descr:(Md.plain "Call site infos")
+      (Jrecord [
+          "callee" , Jdecl.jtype ;
+          "caller" , Joption Jdecl.jtype ;
+          "stmt" , Joption Jstmt.jtype ;
+          "rank" , Joption Jnumber ;
+        ])
+
+  let jtype = Package.(Jarray jcallsite)
 
   let jcallsite ~jcaller ~jcallee stmt =
     `Assoc [
@@ -243,15 +247,15 @@ module Jcalls : Request.Output with type t = Callstack.t = struct
 
   let to_json (cs : t) =
     let aux (acc, jcaller) (callee, stmt) =
-      let jcallee = Jfct.to_json callee in
+      let jcallee = Jdecl.to_json (SFunction callee) in
       jcallsite ~jcaller ~jcallee stmt :: acc, jcallee
     in
-    let entry_point = Jfct.to_json cs.entry_point in
-    let l, _last_callee = List.fold_left aux
+    let entry_point = Jdecl.to_json (SFunction cs.entry_point) in
+    let l, _last_callee =
+      List.fold_left aux
         ([`Assoc [ "callee", entry_point ]], entry_point)
         (List.rev cs.stack)
-    in
-    `List l
+    in `List l
 
 end
 
@@ -570,8 +574,8 @@ let () =
 let () =
   let getStmtInfo = Request.signature ~input:(module Jstmt) () in
   let set_fct = Request.result getStmtInfo ~name:"fct"
-      ~descr:(Md.plain "Englobing function")
-      (module Jfct)
+      ~descr:(Md.plain "Function name")
+      (module Jstring)
   and set_rank = Request.result getStmtInfo ~name:"rank"
       ~descr:(Md.plain "Global stmt order")
       (module Jint)
@@ -580,7 +584,7 @@ let () =
     ~kind:`GET ~name:"getStmtInfo"
     ~descr:(Md.plain "Stmt Information")
     begin fun rq s ->
-      set_fct rq (Kernel_function.find_englobing_kf s) ;
+      set_fct rq Kernel_function.(get_name @@ find_englobing_kf s) ;
       set_rank rq (Ranking.stmt s) ;
     end
 
@@ -616,7 +620,11 @@ let () =
     let reachable = is_reachable eval_point in
     set_evaluable rq (computed && reachable);
     set_code rq (Some (Pretty_utils.to_string pp p));
-    set_stmt rq (match eval_point with Stmt (_, s) -> Some s | _ -> None);
+    begin
+      match eval_point with
+      | Initial | Pre _ -> ()
+      | Stmt (_kf, stmt) -> set_stmt rq (Some stmt)
+    end ;
     let on_steps = function
       | `Here -> ()
       | `Then _ | `Else _ -> set_condition rq true

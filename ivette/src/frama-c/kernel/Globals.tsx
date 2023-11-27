@@ -31,10 +31,12 @@ import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item } from 'dome/frame/sidebars';
 import { Button } from 'dome/controls/buttons';
-import * as Toolbars from 'dome/frame/toolbars';
 
+import * as Ivette from 'ivette';
+import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-import * as Kernel from 'frama-c/kernel/api/ast';
+import * as Ast from 'frama-c/kernel/api/ast';
+import * as Locations from 'frama-c/kernel/Locations';
 import { computationState } from 'frama-c/plugins/eva/api/general';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 
@@ -42,24 +44,37 @@ import * as Eva from 'frama-c/plugins/eva/api/general';
 // --- Global Search Hints
 // --------------------------------------------------------------------------
 
-function makeFunctionHint(fct: functionsData): Toolbars.Hint {
-  return {
-    id: fct.key,
-    label: fct.name,
-    title: fct.signature,
-    value: () => States.setSelection({ fct: fct.name }),
-  };
+function globalHints(): Ivette.Hint[] {
+  const globals = States.getSyncArray(Ast.declAttributes).getArray();
+  return globals.map((g : Ast.declAttributesData) => ({
+    id: g.decl,
+    name: g.name,
+    label: g.label,
+    onClick: () => States.setCurrentScope(g.decl),
+  }));
 }
 
-async function lookupGlobals(pattern: string): Promise<Toolbars.Hint[]> {
-  const lookup = pattern.toLowerCase();
-  const fcts = States.getSyncArray(Kernel.functions).getArray();
-  return fcts.filter((fn) => (
-    0 <= fn.name.toLowerCase().indexOf(lookup)
-  )).map(makeFunctionHint);
+const globalMode : Ivette.ModeProps = {
+  id: 'frama-c.kernel.globals',
+  rank: 1,
+  label: 'Globals',
+  title: 'Lookup for Global Declarations',
+  placeholder: 'declaration',
+  hints: globalHints,
+};
+
+function resetMode(enabled: boolean): void {
+  Ivette.updateMode({ id: globalMode.id, enabled });
+  Ivette.selectMode(globalMode.id);
 }
 
-Toolbars.registerSearchHints('frama-c.globals', lookupGlobals);
+{
+  Ivette.registerMode(globalMode);
+  Dome.find.on(() => Ivette.focusMode(globalMode.id));
+  Server.onReady(() => resetMode(true));
+  Server.onShutdown(() => resetMode(false));
+  resetMode(false);
+}
 
 // --------------------------------------------------------------------------
 // --- Function Item
@@ -68,11 +83,10 @@ Toolbars.registerSearchHints('frama-c.globals', lookupGlobals);
 interface FctItemProps {
   fct: functionsData;
   current: string | undefined;
-  onSelection: (name: string) => void;
 }
 
 function FctItem(props: FctItemProps): JSX.Element {
-  const { name, signature, main, stdlib, builtin, defined } = props.fct;
+  const { name, signature, main, stdlib, builtin, defined, decl } = props.fct;
   const className = classes(
     main && 'globals-main',
     (stdlib || builtin) && 'globals-stdlib',
@@ -87,7 +101,7 @@ function FctItem(props: FctItemProps): JSX.Element {
       label={name}
       title={signature}
       selected={name === props.current}
-      onSelection={() => props.onSelection(name)}
+      onSelection={() => States.setCurrentScope(decl)}
     >
       {attributes && <span className="globals-attr">{attributes}</span>}
     </Item>
@@ -95,16 +109,16 @@ function FctItem(props: FctItemProps): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
-// --- Globals Section(s)
+// --- Functions Section
 // --------------------------------------------------------------------------
 
 type functionsData =
-  Kernel.functionsData | (Kernel.functionsData & Eva.functionsData);
+  Ast.functionsData | (Ast.functionsData & Eva.functionsData);
 
 type FctKey = Json.key<'#functions'>;
 
 function computeFcts(
-  ker: States.ArrayProxy<FctKey, Kernel.functionsData>,
+  ker: States.ArrayProxy<FctKey, Ast.functionsData>,
   eva: States.ArrayProxy<FctKey, Eva.functionsData>,
 ): functionsData[] {
   const arr: functionsData[] = [];
@@ -115,12 +129,14 @@ function computeFcts(
   return arr.sort((f, g) => alpha(f.name, g.name));
 }
 
-export default function Globals(): JSX.Element {
+export function Functions(): JSX.Element {
 
   // Hooks
-  const [selection, updateSelection] = States.useSelection();
-  const ker = States.useSyncArrayProxy(Kernel.functions);
+  const scope = States.useCurrentScope();
+  const { kind, name } = States.useDeclaration(scope);
+  const ker = States.useSyncArrayProxy(Ast.functions);
   const eva = States.useSyncArrayProxy(Eva.functions);
+  const getMarker = States.useSyncArrayGetter(Ast.markerAttributes);
   const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
   const { useFlipSettings } = Dome;
   const [stdlib, flipStdlib] =
@@ -139,20 +155,23 @@ export default function Globals(): JSX.Element {
     useFlipSettings('ivette.globals.eva-analyzed', true);
   const [evaUnreached, flipEvaUnreached] =
     useFlipSettings('ivette.globals.eva-unreached', true);
-    const [selected, flipSelected] =
-      useFlipSettings('ivette.globals.selected', false);
-  const multipleSelection = selection?.multiple;
-  const multipleSelectionActive = multipleSelection?.allSelections.length > 0;
+  const [selected, flipSelected] =
+    useFlipSettings('ivette.globals.selected', false);
+  const { markers } = Locations.useSelection();
+  const multipleSelection: States.Scope[] =
+    React.useMemo(
+      () => markers.map((m) => getMarker(m)?.scope)
+      , [ getMarker, markers ]);
+  const multipleSelectionActive = multipleSelection.length > 0;
   const evaComputed = States.useSyncValue(computationState) === 'computed';
 
-  function isSelected(fct: functionsData): boolean {
-    return multipleSelection?.allSelections.some(
-      (l) => fct.name === l?.fct,
-    );
-  }
-
   // Currently selected function.
-  const current: undefined | string = selection?.current?.fct;
+  const current = (scope && kind === 'FUNCTION') ? name : undefined;
+
+  function isSelected(fct: functionsData): boolean {
+    const idx = multipleSelection.findIndex((s) => s === fct.decl);
+    return 0 <= idx;
+  }
 
   function showFunction(fct: functionsData): boolean {
     const visible =
@@ -162,16 +181,12 @@ export default function Globals(): JSX.Element {
       && (undef || fct.defined)
       && (intern || fct.extern)
       && (extern || !fct.extern)
+      && (!multipleSelectionActive || !selected || isSelected(fct))
       && (evaAnalyzed || !evaComputed ||
-        !('eva_analyzed' in fct && fct.eva_analyzed === true))
+          !('eva_analyzed' in fct && fct.eva_analyzed === true))
       && (evaUnreached || !evaComputed ||
-        ('eva_analyzed' in fct && fct.eva_analyzed === true))
-      && (!selected || !multipleSelectionActive || isSelected(fct));
+          ('eva_analyzed' in fct && fct.eva_analyzed === true));
     return !!visible;
-  }
-
-  function onSelection(name: string): void {
-    updateSelection({ location: { fct: name } });
   }
 
   async function onContextMenu(): Promise<void> {
@@ -248,10 +263,9 @@ export default function Globals(): JSX.Element {
   const filteredFunctions =
     filtered.map((fct) => (
       <FctItem
-        key={fct.name}
+        key={fct.key}
         fct={fct}
         current={current}
-        onSelection={onSelection}
       />
     ));
 
@@ -275,15 +289,115 @@ export default function Globals(): JSX.Element {
       label="Functions"
       title={title}
       defaultUnfold
-      settings="frama-c.sidebar.globals"
+      settings="frama-c.sidebar.functions"
       rightButtonProps={filterButtonProps}
       summary={[nFilter]}
-      className='globals-function-section'
+      className='globals-section'
     >
       {nFilter > 0 ? filteredFunctions : nTotal > 0 ? allFiltered : noFunction}
     </Section>
   );
 
+}
+
+// --------------------------------------------------------------------------
+// --- Generic Declaration Section
+// --------------------------------------------------------------------------
+
+interface DeclarationsProps {
+  id: string;
+  label: string;
+  title: string;
+  filter: (props: Ast.declAttributesData) => boolean;
+  defaultUnfold?: boolean;
+}
+
+function makeItem(
+  scope: States.Scope,
+  attributes: Ast.declAttributesData
+): JSX.Element {
+  const { decl, name, label } = attributes;
+  return (
+    <Item
+      key={decl}
+      label={name}
+      title={label}
+      selected={decl === scope}
+      onSelection={() => States.setCurrentScope(decl)}
+    />
+  );
+}
+
+export function Declarations(props: DeclarationsProps): JSX.Element {
+  const { id, label, title, filter, defaultUnfold=false } = props;
+  const settings = React.useMemo(() => `frama-c.sidebar.${id}`, [id]);
+  const data = States.useSyncArrayData(Ast.declAttributes);
+  const scope = States.useCurrentScope();
+  const items = React.useMemo(
+    () =>
+      data
+        .filter(filter)
+        .map((d) => makeItem(scope, d))
+    , [scope, data, filter]
+  );
+  return (
+    <Section
+      label={label}
+      title={title}
+      defaultUnfold={defaultUnfold}
+      settings={settings}
+      summary={[items.length]}
+      className='globals-section'
+    >
+      {items}
+    </Section>
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Global Variables Section
+// --------------------------------------------------------------------------
+
+const filterGlobals = (d: Ast.declAttributesData): boolean => (
+  d.kind === 'GLOBAL'
+);
+
+export function Globals(): JSX.Element {
+  return (
+    <Declarations
+      id='globals'
+      label='Globals'
+      title='Global Variables'
+      filter={filterGlobals}
+    />
+  );
+}
+
+const filterTypes = (d: Ast.declAttributesData): boolean => {
+  switch(d.kind) {
+    case 'TYPE':
+    case 'ENUM':
+    case 'UNION':
+    case 'STRUCT':
+      return true;
+    default:
+      return false;
+  }
+};
+
+// --------------------------------------------------------------------------
+// --- Types Section
+// --------------------------------------------------------------------------
+
+export function Types(): JSX.Element {
+  return (
+    <Declarations
+      id='types'
+      label='Types'
+      title='Typedefs, Structs, Unions and Enums'
+      filter={filterTypes}
+    />
+  );
 }
 
 // --------------------------------------------------------------------------

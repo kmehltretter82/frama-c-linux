@@ -27,7 +27,8 @@ import * as Dome from 'dome';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-
+import * as Locations from 'frama-c/kernel/Locations';
+import * as Ast from 'frama-c/kernel/api/ast';
 import * as API from './api';
 
 import Cytoscape from 'cytoscape';
@@ -123,7 +124,6 @@ class Dive {
   _layout = '';
   layoutOptions: Cytoscape.LayoutOptions | undefined;
   currentSelection: string | null = null;
-  onSelect: ((_: States.Location[]) => void) | null = null;
   selectedLocation: (States.Location | undefined) = undefined;
 
   constructor(cy: Cytoscape.Core | null = null) {
@@ -531,12 +531,20 @@ class Dive {
   }
 
   async clickNode(node: Cytoscape.NodeSingular): Promise<void> {
+    // Node selection
     this.updateNodeSelection(node);
     await this.explore(node);
-
-    const writes = node.data()?.writes;
-    if (writes && writes.length)
-      this.onSelect?.(writes);
+    // Update locations
+    const label = node.data()?.label as (string | undefined);
+    const markers = node.data()?.writes as Ast.marker[];
+    if (label && markers) {
+      Locations.setNextSelection({
+        plugin: 'Dive',
+        label: `Dive: writes to ${label}`,
+        title: 'Selected writes from Dive current selection',
+        markers
+      });
+    }
 
     /* Cytoscape automatically selects the node clicked, and unselects all other
        nodes and edges. As we want some incoming edges to remain selected, we
@@ -549,11 +557,16 @@ class Dive {
     this.cy.$(':selected').forEach(unselect);
     this.cy.$('.multiple-selection').removeClass('multiple-selection');
     this.cy.$('.selection').removeClass('selection');
-
-    // Update Ivette selection
-    const origins = edge.data()?.origins;
-    if (origins && origins.length)
-      this.onSelect?.(origins);
+    // Update locations
+    const markers = edge.data()?.origins as Ast.marker[];
+    if (markers) {
+      Locations.setNextSelection({
+        plugin: `Dive`,
+        label: `Dive: origins`,
+        title: 'Origins of current edge in Dive graph',
+        markers
+      });
+    }
   }
 
   doubleClickNode(node: Cytoscape.NodeSingular): void {
@@ -610,50 +623,38 @@ const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
   (props: GraphViewProps, ref) => {
   const { addSelection, grabbable, layout, selectionMode } = props;
 
-  const [dive, setDive] = useState(() => new Dive());
-  const [selection, updateSelection] = States.useSelection();
-  const graph = States.useSyncArrayData(API.graph);
+    const [dive, setDive] = useState(() => new Dive());
+    const selection = States.useCurrentLocation();
+    const graph = States.useSyncArrayData(API.graph);
 
-  function setCy(cy: Cytoscape.Core): void {
-    if (cy !== dive.cy)
-      setDive(new Dive(cy));
-  }
+    function setCy(cy: Cytoscape.Core): void {
+      if (cy !== dive.cy)
+        setDive(new Dive(cy));
+    }
 
-  useImperativeHandle(ref, () => ({ clear: () => dive.clear() }));
+    useImperativeHandle(ref, () => ({ clear: () => dive.clear() }));
 
-  useEffect(() => {
-    setDive(new Dive(dive.cy)); // On hot reload, setup a new instance
-  }, [Dive]); // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect(() => {
+      setDive(new Dive(dive.cy)); // On hot reload, setup a new instance
+    }, [Dive]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    dive.layout = layout;
-  }, [dive, layout]);
+    useEffect(() => {
+      dive.layout = layout;
+    }, [dive, layout]);
 
-  useEffect(() => {
-    dive.updateGraph(graph);
-  }, [dive, graph]);
+    useEffect(() => {
+      dive.updateGraph(graph);
+    }, [dive, graph]);
 
-  // Follow mode
-  useEffect(() => {
-    dive.mode = selectionMode === 'follow' ? 'explore' : 'overview';
-  }, [dive, selectionMode]);
-
-  useEffect(() => {
-    /* When clicking on a node, select its writes locations as a multiple
-       selection. If these locations were already selected, select the next
-       location in the multiple selection. */
-    dive.onSelect = (locations) => {
-      if (_.isEqual(locations, selection?.multiple?.allSelections))
-        updateSelection('MULTIPLE_CYCLE');
-      else {
-        const name = "Dive graph";
-        updateSelection({ name, locations, index: 0 });
-      }
-    };
+    // Follow mode
+    useEffect(() => {
+      dive.mode = selectionMode === 'follow' ? 'explore' : 'overview';
+    }, [dive, selectionMode]);
 
     // Updates the graph according to the selected marker.
-    dive.selectLocation(selection?.current, addSelection);
-  }, [dive, addSelection, selection, updateSelection]);
+    useEffect(() => {
+      dive.selectLocation(selection, addSelection);
+    }, [dive, addSelection, selection]);
 
   return (
     <CytoscapeComponent
@@ -759,4 +760,7 @@ export default function GraphComponent(): JSX.Element {
       </EvaReady>
     </>
   );
+
 }
+
+// --------------------------------------------------------------------------

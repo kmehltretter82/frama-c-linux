@@ -414,7 +414,7 @@ export interface MenuItemProps {
   /** The menu item identifier. Shall be unique in the _entire_ menu bar. */
   id: string;
   /** Default is `'normal'`. */
-  type: MenuItemType;
+  kind?: MenuItemType;
   /** Item label. Only optional for separators. */
   label?: string;
   /** Item is visible or not (default is `true`). */
@@ -447,14 +447,14 @@ export interface MenuItemProps {
    main process.
  */
 export function addMenuItem(props: MenuItemProps): void {
-  if (!props.id && props.type !== 'separator') {
+  if (!props.id && props.kind !== 'separator') {
     // eslint-disable-next-line no-console
     console.error('[Dome] Missing menu-item identifier', props);
     return;
   }
-  const { onClick, ...options } = props;
+  const { onClick, kind='normal', ...others } = props;
   if (onClick) customItemCallbacks.set(props.id, onClick);
-  ipcRenderer.send('dome.ipc.menu.addmenuitem', options);
+  ipcRenderer.send('dome.ipc.menu.addmenuitem', { ...others, type: kind });
 }
 
 export interface MenuItemOptions {

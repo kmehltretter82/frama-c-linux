@@ -34,6 +34,7 @@ import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
 import * as Ext from 'ivette@ext';
+import * as Mode from 'ivette@mode';
 
 /* -------------------------------------------------------------------------- */
 /* --- Items                                                              --- */
@@ -195,8 +196,12 @@ export function TitleBar(props: TitleBarProps): JSX.Element | null {
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Sidebar Panels                                                     --- */
+/* --- Side Panels                                                        --- */
 /* -------------------------------------------------------------------------- */
+
+export interface SidebarProps extends ContentProps {
+  iconPath?: string;
+}
 
 export interface ToolProps {
   id: string;
@@ -205,10 +210,17 @@ export interface ToolProps {
 }
 
 /** @ignore */
+export const SIDEBAR = new Ext.ElementRack<SidebarProps>();
+
+/** @ignore */
 export const TOOLBAR = new Ext.ElementRack<ToolProps>();
 
 /** @ignore */
 export const STATUSBAR = new Ext.ElementRack<ToolProps>();
+
+export function registerSidebar(sidebar: SidebarProps): void {
+  SIDEBAR.register(sidebar);
+}
 
 export function registerToolbar(tools: ToolProps): void {
   TOOLBAR.register(tools);
@@ -218,24 +230,56 @@ export function registerStatusbar(status: ToolProps): void {
   STATUSBAR.register(status);
 }
 
-/* -------------------------------------------------------------------------- */
-/* --- Sidebar                                                           ---  */
-/* -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------*/
+/* --- Search Modes                                                       ---*/
+/* --------------------------------------------------------------------------*/
 
-export interface SidebarProps extends ContentProps {
-  iconPath?: string;
+export interface Hint {
+  id: string;
+  name?: string; // searched string
+  icon?: string; // displayed icon
+  label?: string; // displayed hint
+  title?: string; // tooltip for hint
+  rank?: number; // hint sorting
+  onClick?: () => void; // click on hint
 }
 
-/** @ignore */
-export const SIDEBAR = new Ext.ElementRack<SidebarProps>();
-
-export function registerSidebar(sidebar: SidebarProps): void {
-  SIDEBAR.register(sidebar);
+export interface ModeProps {
+  id: string; // Mode identifier
+  rank?: number; // Modes ordering
+  icon?: string; // Search Field's Icons
+  label?: string; // Search Field in mode menu
+  title?: string; // Search Field tooltip
+  placeholder?: string; // Empty Search Field
+  enabled?: boolean; // Search Field input
+  className?: string; // Search Field Icon's class
+  hints?: () => Hint[]; // Hint sub-menu
+  onHint?: (hint: Hint) => void; // Hint selection
+  onEnter?: (pattern: string) => void; // Enter key for search field
 }
 
-/* -------------------------------------------------------------------------- */
-/* --- Sandbox                                                            --- */
-/* -------------------------------------------------------------------------- */
+export function registerMode(m: ModeProps): void { Mode.registerMode(m); }
+export function updateMode(m: ModeProps): void { Mode.updateMode(m); }
+export function removeMode(id: string): void { Mode.removeMode(id); }
+export function selectMode(id: string): void { Mode.selectMode(id); }
+export function focusMode(id: string): void { Mode.focusMode(id); }
+export function useMode(m: ModeProps): void {
+  React.useEffect(() => {
+    const id = m.id;
+    const m0 = Mode.findMode(id);
+    Mode.registerMode({ ...m0, ...m });
+    return () => {
+      if (m0 !== undefined)
+        Mode.registerMode(m0);
+      else
+        Mode.removeMode(id);
+    };
+  }, [m]);
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Sandbox                                                            ---*/
+/* --------------------------------------------------------------------------*/
 
 if (DEVEL) {
   registerGroup({

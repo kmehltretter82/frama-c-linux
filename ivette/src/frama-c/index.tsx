@@ -28,7 +28,7 @@ import React from 'react';
 import * as Ivette from 'ivette';
 
 import History from 'frama-c/kernel/History';
-import Globals from 'frama-c/kernel/Globals';
+import { Functions, Globals, Types } from 'frama-c/kernel/Globals';
 import Status from 'frama-c/kernel/Status';
 import ASTview from 'frama-c/kernel/ASTview';
 import ASTinfo from 'frama-c/kernel/ASTinfo';
@@ -51,8 +51,11 @@ Menu.init();
 Ivette.registerSidebar({
   id: 'fc.kernel.globals',
   label: 'AST',
-  rank: -1,
-  children: <Globals />
+  children: <>
+    <Types />
+    <Globals />
+    <Functions />
+  </>
 });
 
 Ivette.registerToolbar({ id: 'ivette.history', children: <History /> });

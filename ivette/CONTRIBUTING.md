@@ -129,8 +129,6 @@ console.log('test');
 - [lines-between-class-members](https://eslint.org/docs/rules/lines-between-class-members).
   Forces empty lines between class members, except for single line declarations
   (e.g. properties).
-- [object-curly-newline](https://eslint.org/docs/rules/object-curly-newline).
-  Unify curly braces positions.
 - [no-constant-condition](https://eslint.org/docs/rules/no-constant-condition).
   Forbids constant conditions which are often used during the debug process but
   should not remain in release versions. While recommended in Eslint, this

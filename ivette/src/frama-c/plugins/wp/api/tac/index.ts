@@ -209,8 +209,8 @@ export const signalTactical: Server.Signal = {
 
 const reloadTactical_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.wp.tac.reloadTactical',
-  input:  Json.jNull,
+  name: 'plugins.wp.tac.reloadTactical',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -223,8 +223,8 @@ const fetchTactical_internal: Server.GetRequest<
     pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.wp.tac.fetchTactical',
-  input:  Json.jNumber,
+  name: 'plugins.wp.tac.fetchTactical',
+  input: Json.jNumber,
   output: Json.jObject({
             reload: Json.jBoolean,
             removed: Json.jArray(Json.jKey<'#tactic'>('#tactic')),
@@ -261,8 +261,8 @@ const configureTactics_internal: Server.ExecRequest<
   null
   > = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.wp.tac.configureTactics',
-  input:  Json.jObject({ node: Json.jIndex<'#node'>('#node'),}),
+  name: 'plugins.wp.tac.configureTactics',
+  input: Json.jObject({ node: Json.jIndex<'#node'>('#node'),}),
   output: Json.jNull,
   signals: [ { name: 'plugins.wp.tip.printStatus' } ],
 };
@@ -278,13 +278,13 @@ const setParameter_internal: Server.ExecRequest<
   null
   > = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.wp.tac.setParameter',
-  input:  Json.jObject({
-            node: Json.jIndex<'#node'>('#node'),
-            tactic: Json.jKey<'#tactic'>('#tactic'),
-            param: Json.jKey<'#param'>('#param'),
-            value: Json.jAny,
-          }),
+  name: 'plugins.wp.tac.setParameter',
+  input: Json.jObject({
+           node: Json.jIndex<'#node'>('#node'),
+           tactic: Json.jKey<'#tactic'>('#tactic'),
+           param: Json.jKey<'#param'>('#param'),
+           value: Json.jAny,
+         }),
   output: Json.jNull,
   signals: [],
 };
@@ -300,8 +300,8 @@ const applyTactic_internal: Server.ExecRequest<
   Json.index<'#node'>[]
   > = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.wp.tac.applyTactic',
-  input:  Json.jKey<'#tactic'>('#tactic'),
+  name: 'plugins.wp.tac.applyTactic',
+  input: Json.jKey<'#tactic'>('#tactic'),
   output: Json.jArray(Json.jIndex<'#node'>('#node')),
   signals: [],
 };

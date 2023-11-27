@@ -44,20 +44,19 @@ import { Section } from 'dome/frame/sidebars';
 import { RSplit } from 'dome/layout/splitters';
 
 import * as Ast from 'frama-c/kernel/api/ast';
-import * as Properties from 'frama-c/kernel/api/properties';
 import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as Properties from 'frama-c/kernel/api/properties';
 
 type PropKey = Json.key<'#marker'>;
-type Property =
-  Properties.statusData |
-  (Properties.statusData & Eva.propertiesData) ;
+type Property = Properties.statusData |
+                (Properties.statusData & Eva.propertiesData) ;
 
 // --------------------------------------------------------------------------
 // --- Filters
 // --------------------------------------------------------------------------
 
 const DEFAULTS: { [key: string]: boolean } = {
-  currentFunction: false,
+  'currentScope': false,
   'status.valid': true,
   'status.valid_hyp': true,
   'status.unknown': true,
@@ -339,7 +338,7 @@ const byTaint =
 
 const byProperty: Compare.ByFields<Property> = {
   status: byStatus,
-  fct: Compare.defined(Compare.alpha),
+  scope: Compare.defined(Compare.string),
   source: bySource,
   kind: Compare.structural,
   alarm: Compare.defined(Compare.alpha),
@@ -361,7 +360,7 @@ const byColumn: Arrays.ByColumns<Property> = {
 
 class PropertyModel extends Arrays.CompactModel<PropKey, Property> {
 
-  private filterFun?: string;
+  private filterScope: States.Scope;
 
   constructor() {
     super((p: Property) => p.key);
@@ -370,17 +369,16 @@ class PropertyModel extends Arrays.CompactModel<PropKey, Property> {
     this.setFilter(this.filterItem.bind(this));
   }
 
-  setFilterFunction(kf?: string): void {
-    this.filterFun = kf;
-    if (filter('currentFunction')) this.reload();
+  setFilterScope(scope: States.Scope): void {
+    this.filterScope = scope;
+    if (filter('currentScope')) this.reload();
   }
 
   filterItem(prop: Property): boolean {
-    const kf = prop.fct;
-    const cf = this.filterFun;
-    const filteringFun = cf && filter('currentFunction');
-    const filterFunction = filteringFun ? kf === cf : true;
-    return filterFunction && filterProperty(prop);
+    const current = this.filterScope;
+    const filtering = current && filter('currentScope');
+    const filterScope = filtering ? prop.scope === current : true;
+    return filterScope && filterProperty(prop);
   }
 
 }
@@ -470,7 +468,7 @@ function CheckField(props: CheckFieldProps): JSX.Element {
 function PropertyFilter(): JSX.Element {
   return (
     <Scroll>
-      <CheckField label="Current function" path="currentFunction" />
+      <CheckField label="Current scope" path="currentScope" />
       <FilterSection label="Status" prefix="status" unfold>
         <CheckField label="Valid" path="status.valid" />
         <CheckField label="Valid under hyp." path="status.valid_hyp" />
@@ -549,30 +547,30 @@ function PropertyFilter(): JSX.Element {
 // -------------------------------------------------------------------------
 
 function PropertyColumns(): JSX.Element {
+  const getDecl = States.useSyncArrayGetter(Ast.declAttributes);
   const statusDict = States.useTags(Properties.propStatusTags);
   const kindDict = States.useTags(Properties.propKindTags);
   const alarmDict = States.useTags(Properties.alarmsTags);
   const taintDict = States.useTags(Eva.taintStatusTags);
+
+  const getScope = React.useCallback(
+    ({ scope }) => getDecl(scope)?.name
+    , [getDecl] );
   const getStatus = React.useCallback(
-    ({ status: st }: Property) => (statusDict.get(st) ?? { name: st }),
-    [statusDict],
-  );
+    ({ status: st }: Property) => (statusDict.get(st) ?? { name: st })
+    , [statusDict] );
   const getKind = React.useCallback(
-    ({ kind: kd }: Property) => (kindDict.get(kd) ?? { name: kd }),
-    [kindDict],
-  );
+    ({ kind: kd }: Property) => (kindDict.get(kd) ?? { name: kd })
+    , [kindDict] );
   const getAlarm = React.useCallback(
     ({ alarm }: Property) => (
       alarm === undefined ? alarm : (alarmDict.get(alarm) ?? { name: alarm })
-    ),
-    [alarmDict],
-  );
+    ), [alarmDict]);
   const getTaint = React.useCallback(
     (p: Property) => (
       'taint' in p ? taintDict.get(p.taint) ?? { name: p.taint } : undefined
-    ),
-    [taintDict],
-  );
+    ), [taintDict]);
+
   return (
     <>
       <Column
@@ -590,7 +588,7 @@ function PropertyColumns(): JSX.Element {
         getter={(prop: Property) => prop?.source}
         render={renderFile}
       />
-      <ColumnCode id="fct" label="Function" width={120} />
+      <ColumnCode id="scope" label="Scope" getter={getScope} width={120} />
       <ColumnTag id="kind" label="Property kind" getter={getKind} width={120} />
       <ColumnTag id="alarm" label="Alarms" getter={getAlarm} width={160} />
       <Column
@@ -680,28 +678,22 @@ export default function RenderProperties(): JSX.Element {
     populateModel(model, props, evaps);
   }, [model, props, evaps]);
 
-  const [selection, updateSelection] = States.useSelection();
+  const { marker, scope } = States.useCurrentLocation();
 
   const [showFilter, flipFilter] =
     Dome.useFlipSettings('ivette.properties.showFilter', true);
 
   // Updating the filter
   Dome.useEvent(Reload, model.reload);
-  const selectedFunction = selection?.current?.fct;
   React.useEffect(() => {
-    model.setFilterFunction(selectedFunction);
-  }, [model, selectedFunction]);
+    model.setFilterScope(scope);
+  }, [model, scope]);
 
   // Callbacks
 
   const onPropertySelection = React.useCallback(
-    ({ key: marker, fct }: Property) => {
-      const location = { fct, marker };
-      updateSelection({ location });
-    }, [updateSelection],
+    (p: Property) => States.setSelected(p.key), []
   );
-
-  const propertySelection = selection?.current?.marker;
 
   return (
     <>
@@ -722,7 +714,7 @@ export default function RenderProperties(): JSX.Element {
         <Table<string, Property>
           model={model}
           sorting={model}
-          selection={propertySelection}
+          selection={marker}
           onSelection={onPropertySelection}
           settings="ivette.properties.table"
         >

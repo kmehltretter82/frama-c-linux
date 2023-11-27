@@ -286,9 +286,9 @@ let () = States.column model ~name:"status"
     ~data:(module PropStatus)
     ~get:(Property_status.Feedback.get)
 
-let () = States.column model ~name:"fct"
-    ~descr:(Md.plain "Function")
-    ~data:(module Joption(Function)) ~get:Property.get_kf
+let () = States.option model ~name:"scope"
+    ~descr:(Md.plain "Declaration Scope")
+    ~data:(module Decl) ~get:Printer_tag.declaration_of_property
 
 let () = States.column model ~name:"kinstr"
     ~descr:(Md.plain "Instruction")
@@ -343,7 +343,7 @@ let array =
     ~package
     ~name:"status"
     ~descr:(Md.plain "Status of Registered Properties")
-    ~key:(fun ip -> Kernel_ast.Marker.tag (PIP ip))
+    ~key:(fun ip -> Kernel_ast.Marker.index (PIP ip))
     ~keyType:Kernel_ast.Marker.jtype
     ~iter
     ~add_reload_hook

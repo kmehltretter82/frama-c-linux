@@ -36,9 +36,7 @@ const globalSelectedDomain = new GlobalState("");
 const globalFilter = new GlobalState(true);
 
 export function EvaStates(): JSX.Element {
-  const [selection] = States.useSelection();
-  const selectedLoc = selection?.current;
-  const marker = selectedLoc?.marker;
+  const marker = States.useSelected();
   const [domains, setDomains] = React.useState<string[]>([]);
   const [selected, setSelected] = useGlobalState(globalSelectedDomain);
   const [stateBefore, setStateBefore] = React.useState("");

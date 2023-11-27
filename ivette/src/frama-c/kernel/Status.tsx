@@ -24,6 +24,7 @@
 /* --- Frama-C Status Message                                             ---*/
 /* --------------------------------------------------------------------------*/
 
+import _ from 'lodash';
 import React from 'react';
 import { Code, IconKind } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
@@ -35,7 +36,7 @@ export type kind =
   'none' | 'info' | 'warning' | 'error' | 'success' | 'progress';
 
 export interface MessageProps {
-  kind: kind;
+  kind?: kind;
   text: string;
   title?: string;
 }
@@ -45,8 +46,12 @@ const emptyMessage: MessageProps = { text: '', kind: 'none' };
 
 const GlobalMessage = new GlobalState(emptyMessage);
 
+const clearMessage = (): void => setMessage(emptyMessage);
+const triggerClearMessage = _.debounce(clearMessage, 15000);
+
 export function setMessage(message: MessageProps): void {
   GlobalMessage.setValue(message);
+  triggerClearMessage();
 }
 
 const msgIcon: { [kind: string]: string } = {
@@ -65,15 +70,16 @@ const msgKind: { [kind: string]: IconKind } = {
 
 export default function Message(): JSX.Element {
   const [message] = useGlobalState(GlobalMessage);
-  const icon = msgIcon[message.kind];
-  const kind = msgKind[message.kind];
+  const { kind: mKind='none' } = message;
+  const icon = msgIcon[mKind];
+  const kind = msgKind[mKind];
   return (
     <Toolbars.Group display={message.kind !== 'none'} >
       <Code icon={icon} kind={kind}
             label={message.text} title={message.title} />
       <IconButton
         icon="CIRC.CLOSE"
-        onClick={() => setMessage(emptyMessage)}
+        onClick={clearMessage}
         visible={message !== emptyMessage}
         title="Hide current message"
       />

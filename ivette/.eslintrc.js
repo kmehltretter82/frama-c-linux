@@ -39,8 +39,6 @@ module.exports = {
     "lines-between-class-members": [
       "error", "always", { "exceptAfterSingleLine": true }
     ],
-    // Force curly brackets on newline if some item is
-    "object-curly-newline": ["error", { "multiline": true }],
     // Allow infinite loops but still disallow constant if-then-else
     "no-constant-condition": ["error", { "checkLoops": false }],
     // Prefer const including when destructuring when _all_ destructured values

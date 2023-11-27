@@ -77,16 +77,16 @@ endif
 # IVETTE
 ################################
 
-.PHONY: ivette ivette-dev
+.PHONY: ivette ivette-api ivette-dev
 
-ivette: all
+ivette: ivette-api
 	@$(MAKE) -C ivette
+
+ivette-dev: ivette-api
+	@$(MAKE) -C ivette dev
 
 ivette-api: all
 	@$(MAKE) -C ivette api
-
-ivette-dev: all
-	@$(MAKE) -C ivette dev
 
 ##############################################################################
 # HELP

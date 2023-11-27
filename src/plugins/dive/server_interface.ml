@@ -57,17 +57,15 @@ end
 (* --- Data types                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let stmt_to_location stmt =
-  let kf = Kernel_function.find_englobing_kf stmt in
-  (kf, Printer_tag.PStmtStart (kf, stmt))
-
 let origin_to_locations = function
   | Studia.Writes.Assign s
-  | CallDirect s -> [stmt_to_location s]
+  | CallDirect s -> [Printer_tag.localizable_of_stmt s]
   | CallIndirect _s -> []
   | GlobalInit (_vi, _init) -> []
   | FormalInit (_vi, callsites) ->
-    List.concat_map (fun (_,l) -> List.map stmt_to_location l) callsites
+    List.concat_map
+      (fun (_,l) -> List.map Printer_tag.localizable_of_stmt l)
+      callsites
 
 
 module Range : Data.S with type t = int option range =
@@ -287,7 +285,7 @@ struct
   let is_root = field "is_root" jbool
   let backward_explored = field "backward_explored" (module Computation)
   let forward_explored = field "forward_explored" (module Computation)
-  let writes = field "writes" (module Jlist (Kernel_ast.Location))
+  let writes = field "writes" (module Jlist (Kernel_ast.Marker))
   let values = field "values" (joption jstring)
   let range = field "range" (module NodeRange)
   let typ = option "type" jstring
@@ -328,7 +326,7 @@ struct
   let src = field "src" (module NodeId)
   let dst = field "dst" (module NodeId)
   let dkind = field "dkind" jstring
-  let origins = field "origins" (module Jlist (Kernel_ast.Location))
+  let origins = field "origins" (module Jlist (Kernel_ast.Marker))
 
   include (val publish "dependency" ~descr:"The dependency between two nodes")
 
