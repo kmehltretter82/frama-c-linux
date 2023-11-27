@@ -34,6 +34,69 @@ import * as Ext from './Extensions';
 
 const VIEW = Ivette.VIEW;
 const COMPONENT = Ivette.COMPONENT;
+const defaultLayout = { ABCD: "" };
+const defaultLabViewState: LabViewState = {
+  A: defaultLayout.ABCD,
+  B: defaultLayout.ABCD,
+  C: defaultLayout.ABCD,
+  D: defaultLayout.ABCD,
+  H: 0.5,
+  V: 0.5,
+  components: new Map<string, ComponentState>()
+};
+
+const globalLabViewState = new States.GlobalState<LabViewState>(
+  defaultLabViewState
+);
+
+function applyLayout(newLayout: Ivette.Layout):void {
+  let A, B, C, D;
+
+  if("A" in newLayout) A = newLayout.A;
+  if("B" in newLayout) B = newLayout.B;
+  if("C" in newLayout) C = newLayout.C;
+  if("D" in newLayout) D = newLayout.D;
+
+  if("AB" in newLayout) {
+    A = newLayout.AB;
+    B = newLayout.AB;
+  }
+  if("AC" in newLayout) {
+    A = newLayout.AC;
+    C = newLayout.AC;
+  }
+  if("BD" in newLayout) {
+    B = newLayout.BD;
+    D = newLayout.BD;
+  }
+  if("CD" in newLayout) {
+    C = newLayout.CD;
+    D = newLayout.CD;
+  }
+
+  if("ABCD" in newLayout) {
+    A = newLayout.ABCD;
+    B = newLayout.ABCD;
+    C = newLayout.ABCD;
+    D = newLayout.ABCD;
+  }
+
+  const state = globalLabViewState.getValue();
+
+  const components = state.components;
+  components.forEach((compState) => compState.state = "inactive");
+  Object.values(newLayout).forEach(compId => {
+    components.set(compId, { state: "active" });
+  });
+
+
+  globalLabViewState.setValue({
+    ...state,
+    A: A, B: B, C: C, D: D,
+    components: components
+  });
+}
+
 
 /* -------------------------------------------------------------------------- */
 /* --- Pane Component                                                     --- */
@@ -87,26 +150,9 @@ interface LabViewState {
   components: Map<string, ComponentState>;
 }
 
-const defaultLayout = { ABCD: "" };
-
-const defaultLabViewState: LabViewState = {
-  A: defaultLayout.ABCD,
-  B: defaultLayout.ABCD,
-  C: defaultLayout.ABCD,
-  D: defaultLayout.ABCD,
-  H: 0.5,
-  V: 0.5,
-  components: new Map<string, ComponentState>()
-};
-
-const globalLayoutState = new States.GlobalState<Ivette.Layout>(defaultLayout);
-const globalLabViewState = new States.GlobalState<LabViewState>(
-  defaultLabViewState
-);
 
 export function LabView(): JSX.Element {
 
-  const [layout] = States.useGlobalState(globalLayoutState);
   const [state, setState] = States.useGlobalState(globalLabViewState);
 
   const setH = React.useCallback(
@@ -121,53 +167,6 @@ export function LabView(): JSX.Element {
     }, [state, setState]
   );
 
-  const applyLayout = React.useCallback(
-    (newLayout: Ivette.Layout) => {
-      let A, B, C, D;
-
-      if("A" in newLayout) A = newLayout.A;
-      if("B" in newLayout) B = newLayout.B;
-      if("C" in newLayout) C = newLayout.C;
-      if("D" in newLayout) D = newLayout.D;
-
-      if("AB" in newLayout) {
-        A = newLayout.AB;
-        B = newLayout.AB;
-      }
-      if("AC" in newLayout) {
-        A = newLayout.AC;
-        C = newLayout.AC;
-      }
-      if("BD" in newLayout) {
-        B = newLayout.BD;
-        D = newLayout.BD;
-      }
-      if("CD" in newLayout) {
-        C = newLayout.CD;
-        D = newLayout.CD;
-      }
-
-      if("ABCD" in newLayout) {
-        A = newLayout.ABCD;
-        B = newLayout.ABCD;
-        C = newLayout.ABCD;
-        D = newLayout.ABCD;
-      }
-
-      const components = state.components;
-      components.forEach((compState) => compState.state = "inactive");
-      Object.values(newLayout).forEach(compId => {
-        components.set(compId, { state: "active" });
-      });
-
-      setState({
-        ...state,
-        A: A, B: B, C: C, D: D,
-        components: components
-      });
-    }, [setState, state]
-  );
-
   const setPosition = React.useCallback(
     (h, v) => {
       setH(h);
@@ -175,11 +174,6 @@ export function LabView(): JSX.Element {
     },
     [setH, setV]
   );
-
-  // Load the layout components
-  React.useEffect(() => {
-    applyLayout(layout);
-  }, [applyLayout, layout]);
 
   return (
     <QSplit
@@ -231,7 +225,7 @@ export function ViewBar(): JSX.Element {
             icon='DISPLAY'
             selected={selected === view.id}
             onSelection={() => {
-              globalLayoutState.setValue(view.layout);
+              applyLayout(view.layout);
               setSelected(view.id);
             }}
           />
