@@ -78,7 +78,7 @@ The detailed steps to submit a contribution to Frama-C are:
   needed), and `make headers` to fix them.
 
 8. Locally run the test framework of Frama-C by typing
-  `make tests`
+  `make default-tests`
   in your terminal (you should be in the Frama-C root directory).
 
 9. Locally add (if needed) and commit your contribution.
