@@ -52,9 +52,9 @@ Ivette.registerView({
   label: 'Dive Dataflow',
   rank: 5,
   layout: {
-    'A': 'fc.kernel.astview',
-    'B': 'fc.dive.graph',
-    'C': 'fc.kernel.properties',
-    'D': 'frama-c.kernel.locations',
+    A: 'fc.kernel.astview',
+    B: 'fc.dive.graph',
+    C: 'fc.kernel.properties',
+    D: 'frama-c.kernel.locations',
   }
 });
