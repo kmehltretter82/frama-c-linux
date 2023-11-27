@@ -107,14 +107,10 @@ function List(props: ListProps): JSX.Element {
   const Name = name.charAt(0).toUpperCase() + name.slice(1);
   const count = children.length;
 
-  async function contextMenu(): Promise<void> {
-    Dome.popupMenu(filteringMenuItems);
-  }
-
   const filterButtonProps = {
     icon: 'TUNINGS',
     title: `${Name}s filtering options (${count} / ${total})`,
-    onClick: contextMenu,
+    onClick: () => Dome.popupMenu(filteringMenuItems),
   };
 
   const noItems =

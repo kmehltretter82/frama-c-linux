@@ -79,9 +79,11 @@ export function useRequest<In, Out>(
 ): Out | undefined {
   const initial = options.offline ?? undefined;
   const [response, setResponse] = React.useState<Out | undefined>(initial);
-  const updateResponse = (opt: Out | undefined | null): void => {
-    if (opt !== null) setResponse(opt);
-  };
+  const doUpdateResponse = React.useCallback(
+    (opt: Out | undefined | null): void => {
+      if (opt !== null) setResponse(opt);
+    }, []);
+  const updateResponse = Dome.useActive(doUpdateResponse);
 
   // Fetch Request
   async function trigger(): Promise<void> {
@@ -342,10 +344,12 @@ class SyncArray<K, A> {
       } while (this.signaled || pending > 0);
       /* eslint-enable no-await-in-loop */
     } catch (error) {
-      D.error(
-        `Fail to retrieve the value of syncArray '${this.handler.name}'.`,
-        error,
-      );
+      if (Server.isRunning()) {
+        D.error(
+          `Fail to retrieve the value of syncArray '${this.handler.name}'.`,
+          error,
+        );
+      }
     } finally {
       this.signaled = false;
       this.fetching = false;
