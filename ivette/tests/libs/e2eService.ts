@@ -106,10 +106,3 @@ export async function testFileIsLoaded(window: Page): Promise<void> {
     locs.getFunctionsSideBar(window).getByText("main", { exact: true })
   ).toBeVisible();
 }
-
-export async function testFileIsLoadedInDoubleBar(window: Page): Promise<void> {
-  // Check if the main function is visible in the functions view
-  await expect(
-    locs.getDoubleBarSecondary(window).getByText("main", { exact: true })
-  ).toBeVisible();
-}
