@@ -92,7 +92,64 @@ function menuItem(label: string, [b, flip]: setting, enabled?: boolean)
 }
 
 // --------------------------------------------------------------------------
-// --- Items
+// --- Lists
+// --------------------------------------------------------------------------
+
+interface ListProps {
+  name: string;
+  total: number;
+  filteringMenuItems: Dome.PopupMenuItem[];
+  children: JSX.Element[];
+}
+
+function List(props: ListProps): JSX.Element {
+  const { name, total, filteringMenuItems, children } = props;
+  const Name = name.charAt(0).toUpperCase() + name.slice(1);
+  const count = children.length;
+
+  async function contextMenu(): Promise<void> {
+    Dome.popupMenu(filteringMenuItems);
+  }
+
+  const filterButtonProps = {
+    icon: 'TUNINGS',
+    title: `${Name}s filtering options (${count} / ${total})`,
+    onClick: contextMenu,
+  };
+
+  const noItems =
+    <div className='dome-xSideBarSection-content'>
+      <label className='globals-info'>
+        There is no {name} to display.
+      </label>
+    </div>;
+
+  const allFiltered =
+    <div className='dome-xSideBarSection-content'>
+      <label className='globals-info'>
+        All {name}s are filtered. Try adjusting {name} filters.
+      </label>
+      <Button {...filterButtonProps} label={`${Name}s filters`} />
+    </div>;
+
+  return (
+    <Section
+      label={`${Name}s`}
+      title={`${Name}s ${count} / ${total}`}
+      defaultUnfold
+      settings={`frama-c.sidebar.${name}s`}
+      rightButtonProps={filterButtonProps}
+      summary={[count]}
+      className='globals-section'
+    >
+      {count > 0 ? children : total > 0 ? allFiltered : noItems}
+    </Section>
+  );
+}
+
+
+// --------------------------------------------------------------------------
+// --- Function items
 // --------------------------------------------------------------------------
 
 interface FctItemProps {
@@ -199,80 +256,41 @@ export function Functions(): JSX.Element {
     return !!visible;
   }
 
-  async function onContextMenu(): Promise<void> {
-    const items: Dome.PopupMenuItem[] = [
-      menuItem('Show Frama-C builtins', builtin),
-      menuItem('Show stdlib functions', stdlib),
-      'separator',
-      menuItem('Show defined functions', def),
-      menuItem('Show undefined functions', undef),
-      'separator',
-      menuItem('Show non-extern functions', intern),
-      menuItem('Show extern functions', extern),
-      'separator',
-      menuItem('Show functions analyzed by Eva', evaAnalyzed, evaComputed),
-      menuItem('Show functions unreached by Eva', evaUnreached, evaComputed),
-      'separator',
-      menuItem('Selected only', selected, multipleSelectionActive),
-    ];
-    Dome.popupMenu(items);
-  }
+  const contextMenuItems: Dome.PopupMenuItem[] = [
+    menuItem('Show Frama-C builtins', builtin),
+    menuItem('Show stdlib functions', stdlib),
+    'separator',
+    menuItem('Show defined functions', def),
+    menuItem('Show undefined functions', undef),
+    'separator',
+    menuItem('Show non-extern functions', intern),
+    menuItem('Show extern functions', extern),
+    'separator',
+    menuItem('Show functions analyzed by Eva', evaAnalyzed, evaComputed),
+    menuItem('Show functions unreached by Eva', evaUnreached, evaComputed),
+    'separator',
+    menuItem('Selected only', selected, multipleSelectionActive),
+  ];
 
   // Filtered
-
-  const filtered = fcts.filter(showFunction);
-  const nTotal = fcts.length;
-  const nFilter = filtered.length;
-  const title = `Functions ${nFilter} / ${nTotal}`;
-
-  const filterButtonProps = {
-    icon: 'TUNINGS',
-    title: `Functions filtering options (${nFilter} / ${nTotal})`,
-    onClick: onContextMenu,
-  };
-
-  const filteredFunctions =
-    filtered.map((fct) => (
-      <FctItem
-        key={fct.key}
-        fct={fct}
-        current={current}
-      />
-    ));
-
-  const noFunction =
-    <div className='dome-xSideBarSection-content'>
-      <label className='globals-info'>
-        There is no function to display.
-      </label>
-    </div>;
-
-  const allFiltered =
-    <div className='dome-xSideBarSection-content'>
-      <label className='globals-info'>
-        All functions are filtered. Try adjusting function filters.
-      </label>
-      <Button {...filterButtonProps} label='Functions filters' />
-    </div>;
+  const items =
+    fcts
+      .filter(showFunction)
+      .map((fct) => <FctItem key={fct.key} fct={fct} current={current} />);
 
   return (
-    <Section
-      label="Functions"
-      title={title}
-      defaultUnfold
-      settings="frama-c.sidebar.functions"
-      rightButtonProps={filterButtonProps}
-      summary={[nFilter]}
-      className='globals-section'
+    <List
+      name="function"
+      total={fcts.length}
+      filteringMenuItems={contextMenuItems}
     >
-      {nFilter > 0 ? filteredFunctions : nTotal > 0 ? allFiltered : noFunction}
-    </Section>
+      {items}
+    </List>
   );
-
 }
 
 // --------------------------------------------------------------------------
-// --- Global Variables
+// --- Global variables section
 // --------------------------------------------------------------------------
 
 function makeVarItem(
@@ -328,30 +346,27 @@ export function Globals(): JSX.Element {
   }
 
   // Context menu to change filter settings
-  async function onContextMenu(): Promise<void> {
-    const items: Dome.PopupMenuItem[] = [
-      menuItem('Show stdlib variables', stdlib),
-      'separator',
-      menuItem('Show extern variables', extern),
-      menuItem('Show non-extern variables', nonExtern),
-      'separator',
-      menuItem('Show const variables', isConst),
-      menuItem('Show non-const variables', nonConst),
-      'separator',
-      menuItem('Show volatile variables', volatile),
-      menuItem('Show non-volatile variables', nonVolatile),
-      'separator',
-      menuItem('Show ghost variables', ghost),
-      menuItem('Show non-ghost variables', nonGhost),
-      'separator',
-      menuItem('Show variables with explicit initializer', init),
-      menuItem('Show variables without explicit initializer', nonInit),
-      'separator',
-      menuItem('Show variables from the source code', source),
-      menuItem('Show variables generated from analyses', nonSource),
-    ];
-    Dome.popupMenu(items);
-  }
+  const contextMenuItems: Dome.PopupMenuItem[] = [
+    menuItem('Show stdlib variables', stdlib),
+    'separator',
+    menuItem('Show extern variables', extern),
+    menuItem('Show non-extern variables', nonExtern),
+    'separator',
+    menuItem('Show const variables', isConst),
+    menuItem('Show non-const variables', nonConst),
+    'separator',
+    menuItem('Show volatile variables', volatile),
+    menuItem('Show non-volatile variables', nonVolatile),
+    'separator',
+    menuItem('Show ghost variables', ghost),
+    menuItem('Show non-ghost variables', nonGhost),
+    'separator',
+    menuItem('Show variables with explicit initializer', init),
+    menuItem('Show variables without explicit initializer', nonInit),
+    'separator',
+    menuItem('Show variables from the source code', source),
+    menuItem('Show variables generated from analyses', nonSource),
+  ];
 
   // Filtered
   const items =
@@ -359,43 +374,14 @@ export function Globals(): JSX.Element {
       .filter(showVariable)
       .map((v) => makeVarItem(scope, v));
 
-  const nTotal = variables.length;
-  const nFilter = items.length;
-  const title = `Variables ${nFilter} / ${nTotal}`;
-
-  const filterButtonProps = {
-    icon: 'TUNINGS',
-    title: `Variables filtering options (${nFilter} / ${nTotal})`,
-    onClick: onContextMenu,
-  };
-
-  const noVariable =
-    <div className='dome-xSideBarSection-content'>
-      <label className='globals-info'>
-        There is no variable to display.
-      </label>
-    </div>;
-
-  const allFiltered =
-    <div className='dome-xSideBarSection-content'>
-      <label className='globals-info'>
-        All variables are filtered. Try adjusting variable filters.
-      </label>
-      <Button {...filterButtonProps} label='Variables filters' />
-    </div>;
-
   return (
-    <Section
-      label="Variables"
-      title={title}
-      defaultUnfold
-      settings="frama-c.sidebar.variables"
-      rightButtonProps={filterButtonProps}
-      summary={[nFilter]}
-      className='globals-section'
+    <List
+      name="variable"
+      total={variables.length}
+      filteringMenuItems={contextMenuItems}
     >
-      {nFilter > 0 ? items : nTotal > 0 ? allFiltered : noVariable}
-    </Section>
+      {items}
+    </List>
   );
 }
 
