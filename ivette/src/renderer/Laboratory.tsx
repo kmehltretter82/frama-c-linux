@@ -243,6 +243,7 @@ export function ViewBar(): JSX.Element {
             key={compo.id}
             label={compo.label}
             title={compo.title}
+            icon='COMPONENT'
             selected={selected === compo.id}
             onSelection={() => {
               setSelected(compo.id);
@@ -256,6 +257,7 @@ export function ViewBar(): JSX.Element {
             key={compo.id}
             label={compo.label}
             title={compo.title}
+            icon='COMPONENT'
             selected={selected === compo.id}
             onSelection={() => {
               setSelected(compo.id);
@@ -269,6 +271,7 @@ export function ViewBar(): JSX.Element {
             key={compo.id}
             label={compo.label}
             title={compo.title}
+            icon='COMPONENT'
             selected={selected === compo.id}
             onSelection={() => {
               setSelected(compo.id);
@@ -283,6 +286,7 @@ export function ViewBar(): JSX.Element {
               key={compo.id}
               label={compo.label}
               title={compo.title}
+              icon='COMPONENT'
               selected={selected === compo.id}
               onSelection={() => {
                 setSelected(compo.id);
@@ -297,6 +301,7 @@ export function ViewBar(): JSX.Element {
             key={compo.id}
             label={compo.label}
             title={compo.title}
+            icon='COMPONENT'
             selected={selected === compo.id}
             onSelection={() => {
               setSelected(compo.id);
