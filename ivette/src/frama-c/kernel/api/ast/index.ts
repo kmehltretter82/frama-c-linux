@@ -513,6 +513,126 @@ export const functionsDataDefault: functionsData =
     stdlib: undefined, builtin: undefined, extern: undefined,
     sloc: sourceDefault };
 
+/** Data for array rows [`globals`](#globals)  */
+export interface globalsData {
+  /** Entry identifier. */
+  key: Json.key<'#globals'>;
+  /** Declaration Tag */
+  decl: decl;
+  /** Name */
+  name: string;
+  /** Type */
+  type: string;
+  /** Is the variable from the Frama-C stdlib? */
+  stdlib: boolean;
+  /** Is the variable extern? */
+  extern: boolean;
+  /** Is the variable const? */
+  const: boolean;
+  /** Is the variable volatile? */
+  volatile: boolean;
+  /** Is the variable ghost? */
+  ghost: boolean;
+  /** Is the variable explicitly initialized? */
+  init: boolean;
+  /** Is the variable in the source code? */
+  source: boolean;
+  /** Source location */
+  sloc: source;
+}
+
+/** Decoder for `globalsData` */
+export const jGlobalsData: Json.Decoder<globalsData> =
+  Json.jObject({
+    key: Json.jKey<'#globals'>('#globals'),
+    decl: jDecl,
+    name: Json.jString,
+    type: Json.jString,
+    stdlib: Json.jBoolean,
+    extern: Json.jBoolean,
+    const: Json.jBoolean,
+    volatile: Json.jBoolean,
+    ghost: Json.jBoolean,
+    init: Json.jBoolean,
+    source: Json.jBoolean,
+    sloc: jSource,
+  });
+
+/** Natural order for `globalsData` */
+export const byGlobalsData: Compare.Order<globalsData> =
+  Compare.byFields
+    <{ key: Json.key<'#globals'>, decl: decl, name: string, type: string,
+       stdlib: boolean, extern: boolean, const: boolean, volatile: boolean,
+       ghost: boolean, init: boolean, source: boolean, sloc: source }>({
+    key: Compare.string,
+    decl: byDecl,
+    name: Compare.alpha,
+    type: Compare.string,
+    stdlib: Compare.boolean,
+    extern: Compare.boolean,
+    const: Compare.boolean,
+    volatile: Compare.boolean,
+    ghost: Compare.boolean,
+    init: Compare.boolean,
+    source: Compare.boolean,
+    sloc: bySource,
+  });
+
+/** Signal for array [`globals`](#globals)  */
+export const signalGlobals: Server.Signal = {
+  name: 'kernel.ast.signalGlobals',
+};
+
+const reloadGlobals_internal: Server.GetRequest<null,null> = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.ast.reloadGlobals',
+  input: Json.jNull,
+  output: Json.jNull,
+  signals: [],
+};
+/** Force full reload for array [`globals`](#globals)  */
+export const reloadGlobals: Server.GetRequest<null,null>= reloadGlobals_internal;
+
+const fetchGlobals_internal: Server.GetRequest<
+  number,
+  { reload: boolean, removed: Json.key<'#globals'>[], updated: globalsData[],
+    pending: number }
+  > = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.ast.fetchGlobals',
+  input: Json.jNumber,
+  output: Json.jObject({
+            reload: Json.jBoolean,
+            removed: Json.jArray(Json.jKey<'#globals'>('#globals')),
+            updated: Json.jArray(jGlobalsData),
+            pending: Json.jNumber,
+          }),
+  signals: [],
+};
+/** Data fetcher for array [`globals`](#globals)  */
+export const fetchGlobals: Server.GetRequest<
+  number,
+  { reload: boolean, removed: Json.key<'#globals'>[], updated: globalsData[],
+    pending: number }
+  >= fetchGlobals_internal;
+
+const globals_internal: State.Array<Json.key<'#globals'>,globalsData> = {
+  name: 'kernel.ast.globals',
+  getkey: ((d:globalsData) => d.key),
+  signal: signalGlobals,
+  fetch: fetchGlobals,
+  reload: reloadGlobals,
+  order: byGlobalsData,
+};
+/** AST global variables */
+export const globals: State.Array<Json.key<'#globals'>,globalsData> = globals_internal;
+
+/** Default value for `globalsData` */
+export const globalsDataDefault: globalsData =
+  { key: Json.jKey<'#globals'>('#globals')(''), decl: declDefault, name: '',
+    type: '', stdlib: false, extern: false, const: false, volatile: false,
+    ghost: false, init: false, source: false, sloc: sourceDefault };
+
 /** Updated AST information */
 export const getInformationUpdate: Server.Signal = {
   name: 'kernel.ast.getInformationUpdate',

@@ -684,6 +684,79 @@ struct
 end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Global variables                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+module GlobalVars = struct
+
+  let key vi = Printf.sprintf "vi#%d" vi.vid
+
+  let _ : varinfo States.array =
+    let model = States.model () in
+    States.column model
+      ~name:"decl"
+      ~descr:(Md.plain "Declaration Tag")
+      ~data:(module Decl)
+      ~get:(fun vi -> Printer_tag.SGlobal vi);
+    States.column model
+      ~name:"name"
+      ~descr:(Md.plain "Name")
+      ~data:(module Data.Jalpha)
+      ~get:(fun vi -> vi.vname);
+    States.column model
+      ~name:"type"
+      ~descr:(Md.plain "Type")
+      ~data:(module Jstring)
+      ~get:(fun vi -> Rich_text.to_string Printer.pp_typ vi.vtype);
+    States.column model
+      ~name:"stdlib"
+      ~descr:(Md.plain "Is the variable from the Frama-C stdlib?")
+      ~data:(module Data.Jbool)
+      ~get:(fun vi -> Cil.is_in_libc vi.vattr);
+    States.column model
+      ~name:"extern"
+      ~descr:(Md.plain "Is the variable extern?")
+      ~data:(module Data.Jbool)
+      ~get:(fun vi -> vi.vstorage = Extern);
+    States.column model
+      ~name:"const"
+      ~descr:(Md.plain "Is the variable const?")
+      ~data:(module Data.Jbool)
+      ~get:(fun vi -> Cil.isGlobalInitConst vi);
+    States.column model
+      ~name:"volatile"
+      ~descr:(Md.plain "Is the variable volatile?")
+      ~data:(module Data.Jbool)
+      ~get:(fun vi -> Cil.isVolatileType vi.vtype);
+    States.column model
+      ~name:"ghost"
+      ~descr:(Md.plain "Is the variable ghost?")
+      ~data:(module Data.Jbool)
+      ~get:(fun vi -> Cil.isGhostType vi.vtype);
+    States.column model
+      ~name:"init"
+      ~descr:(Md.plain "Is the variable explicitly initialized?")
+      ~data:(module Data.Jbool)
+      ~get:(fun vi -> Option.is_some (Globals.Vars.find vi).init);
+    States.column model
+      ~name:"source"
+      ~descr:(Md.plain "Is the variable in the source code?")
+      ~data:(module Data.Jbool)
+      ~get:(fun vi -> vi.vsource);
+    States.column model
+      ~name:"sloc"
+      ~descr:(Md.plain "Source location")
+      ~data:(module Position)
+      ~get:(fun vi -> fst vi.vdecl);
+    States.register_array model
+      ~package ~key
+      ~name:"globals"
+      ~descr:(Md.plain "AST global variables")
+      ~iter:(fun f -> Globals.Vars.iter (fun vi _init -> f vi))
+      ~add_reload_hook:ast_update_hook
+end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Marker Information                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
