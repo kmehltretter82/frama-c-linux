@@ -42,14 +42,14 @@ const defaultLabViewState: LabViewState = {
   D: defaultLayout.ABCD,
   H: 0.5,
   V: 0.5,
-  components: new Map<string, ComponentState>()
+  components: new Set<string>(),
+  selectedView: "default"
 };
-
 const globalLabViewState = new States.GlobalState<LabViewState>(
   defaultLabViewState
 );
 
-function applyLayout(newLayout: Ivette.Layout):void {
+function applyLayout(viewId : string, newLayout: Ivette.Layout):void {
   let A, B, C, D;
 
   if("A" in newLayout) A = newLayout.A;
@@ -82,18 +82,16 @@ function applyLayout(newLayout: Ivette.Layout):void {
   }
 
   const state = globalLabViewState.getValue();
-
   const components = state.components;
-  components.forEach((compState) => compState.state = "inactive");
   Object.values(newLayout).forEach(compId => {
-    components.set(compId, { state: "active" });
+    components.add(compId);
   });
-
 
   globalLabViewState.setValue({
     ...state,
     A: A, B: B, C: C, D: D,
-    components: components
+    components: components,
+    selectedView: viewId
   });
 }
 
@@ -136,10 +134,6 @@ function Pane(props: PaneProps): JSX.Element | null {
 /* --- LabView                                                            --- */
 /* -------------------------------------------------------------------------- */
 
-interface ComponentState {
-  state: "active" | "inactive";
-}
-
 interface LabViewState {
   A: string | undefined;
   B: string | undefined;
@@ -147,9 +141,9 @@ interface LabViewState {
   D: string | undefined;
   H: number;
   V: number;
-  components: Map<string, ComponentState>;
+  components: Set<string>
+  selectedView: string;
 }
-
 
 export function LabView(): JSX.Element {
 
@@ -181,10 +175,9 @@ export function LabView(): JSX.Element {
       A={state.A} B={state.B} C={state.C} D={state.D} H={state.H} V={state.V}
       setPosition={setPosition}
     >
-      <Pane id={state.A ?? "A"} />
-      <Pane id={state.B ?? "B"} />
-      <Pane id={state.C ?? "C"} />
-      <Pane id={state.D ?? "D"} />
+      {[...state.components].map((comp, key) =>
+        <Pane key={key} id={comp} />
+      )}
     </QSplit>
   );
 }
@@ -223,9 +216,9 @@ export function ViewBar(): JSX.Element {
             label={view.label}
             title={view.title}
             icon='DISPLAY'
-            selected={selected === view.id}
+            selected={globalLabViewState.getValue().selectedView === view.id}
             onSelection={() => {
-              applyLayout(view.layout);
+              applyLayout(view.id, view.layout);
               setSelected(view.id);
             }}
           />
