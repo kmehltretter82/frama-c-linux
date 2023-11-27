@@ -202,40 +202,6 @@ export function LabView(): JSX.Element {
 export function ViewBar(): JSX.Element {
   const views = Ext.useElements(VIEW);
   const [selected, setSelected] = React.useState("");
-  return (
-    <Sidebars.SideBar>
-      <Sidebars.Section label="Views" defaultUnfold>
-        {views.map((view) =>
-          <Sidebars.Item
-            key={view.id}
-            label={view.label}
-            title={view.title}
-            selected={selected === view.id}
-            onSelection={() => {
-              globalLayoutState.setValue(view.layout);
-              setSelected(view.id);
-            }}
-          />
-        )}
-      </Sidebars.Section>
-    </Sidebars.SideBar>
-  );
-}
-
-Ivette.registerSidebar({
-  id: "ivette.views",
-  rank: 100,
-  label: "Views",
-  title: "View Selector",
-  children: <ViewBar />,
-});
-
-/* -------------------------------------------------------------------------- */
-/* --- ComponentBar                                                       --- */
-/* -------------------------------------------------------------------------- */
-
-export function ComponentBar(): JSX.Element {
-  const [selected, setSelected] = React.useState("");
 
   const components = Ext.useElements(COMPONENT);
   const kernelComps = components.filter((comp) =>
@@ -256,6 +222,21 @@ export function ComponentBar(): JSX.Element {
 
   return (
     <Sidebars.SideBar>
+      <Sidebars.Section label="Views" defaultUnfold>
+        {views.map((view) =>
+          <Sidebars.Item
+            key={view.id}
+            label={view.label}
+            title={view.title}
+            icon='DISPLAY'
+            selected={selected === view.id}
+            onSelection={() => {
+              globalLayoutState.setValue(view.layout);
+              setSelected(view.id);
+            }}
+          />
+        )}
+      </Sidebars.Section>
       <Sidebars.Section label="Kernel" defaultUnfold>
         {kernelComps.map((compo) =>
           <Sidebars.Item
@@ -310,7 +291,7 @@ export function ComponentBar(): JSX.Element {
           )}
         </Sidebars.Section>
       }
-      <Sidebars.Section label="Unclassified">
+      <Sidebars.Section label="Other Plugins">
         {unclassifiedComps.map((compo) =>
           <Sidebars.Item
             key={compo.id}
@@ -328,11 +309,11 @@ export function ComponentBar(): JSX.Element {
 }
 
 Ivette.registerSidebar({
-  id: "ivette.components",
+  id: "ivette.views",
   rank: 100,
-  label: "Comps",
-  title: "Components Selector",
-  children: <ComponentBar />,
+  label: "Views",
+  title: "View Selector",
+  children: <ViewBar />,
 });
 
 /* -------------------------------------------------------------------------- */
