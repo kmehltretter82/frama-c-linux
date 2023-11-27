@@ -77,7 +77,7 @@ function resetMode(enabled: boolean): void {
 }
 
 // --------------------------------------------------------------------------
-// --- Function Item
+// --- Items
 // --------------------------------------------------------------------------
 
 interface FctItemProps {
@@ -140,23 +140,23 @@ export function Functions(): JSX.Element {
   const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
   const { useFlipSettings } = Dome;
   const [stdlib, flipStdlib] =
-    useFlipSettings('ivette.globals.stdlib', false);
+    useFlipSettings('ivette.functions.stdlib', false);
   const [builtin, flipBuiltin] =
-    useFlipSettings('ivette.globals.builtin', false);
+    useFlipSettings('ivette.functions.builtin', false);
   const [def, flipDef] =
-    useFlipSettings('ivette.globals.def', true);
+    useFlipSettings('ivette.functions.def', true);
   const [undef, flipUndef] =
-    useFlipSettings('ivette.globals.undef', true);
+    useFlipSettings('ivette.functions.undef', true);
   const [intern, flipIntern] =
-    useFlipSettings('ivette.globals.intern', true);
+    useFlipSettings('ivette.functions.intern', true);
   const [extern, flipExtern] =
-    useFlipSettings('ivette.globals.extern', true);
+    useFlipSettings('ivette.functions.extern', true);
   const [evaAnalyzed, flipEvaAnalyzed] =
-    useFlipSettings('ivette.globals.eva-analyzed', true);
+    useFlipSettings('ivette.functions.eva-analyzed', true);
   const [evaUnreached, flipEvaUnreached] =
-    useFlipSettings('ivette.globals.eva-unreached', true);
+    useFlipSettings('ivette.functions.eva-unreached', true);
   const [selected, flipSelected] =
-    useFlipSettings('ivette.globals.selected', false);
+    useFlipSettings('ivette.functions.selected', false);
   const { markers } = Locations.useSelection();
   const multipleSelection: States.Scope[] =
     React.useMemo(
@@ -301,6 +301,198 @@ export function Functions(): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
+// --- Global Variables
+// --------------------------------------------------------------------------
+
+function makeVarItem(
+  scope: States.Scope,
+  props: Ast.globalsData,
+): JSX.Element {
+  const { name, type, decl } = props;
+  return (
+    <Item
+      key={decl}
+      label={name}
+      title={type}
+      selected={decl === scope}
+      onSelection={() => States.setCurrentScope(decl)}
+    />
+  );
+}
+
+export function Globals(): JSX.Element {
+
+  // Hooks
+  const scope = States.useCurrentScope();
+  const variables = States.useSyncArrayData(Ast.globals);
+
+  // Filter settings
+  const { useFlipSettings } = Dome;
+  const [stdlib, flipStdlib] =
+    useFlipSettings('ivette.globals.stdlib', false);
+  const [extern, flipExtern] =
+    useFlipSettings('ivette.globals.extern', true);
+  const [nonExtern, flipNonExtern] =
+    useFlipSettings('ivette.globals.non-extern', true);
+  const [isConst, flipIsConst] =
+    useFlipSettings('ivette.globals.const', true);
+  const [nonConst, flipNonConst] =
+    useFlipSettings('ivette.globals.non-const', true);
+  const [volatile, flipVolatile] =
+    useFlipSettings('ivette.globals.volatile', true);
+  const [nonVolatile, flipNonVolatile] =
+    useFlipSettings('ivette.globals.non-volatile', true);
+  const [ghost, flipGhost] =
+    useFlipSettings('ivette.globals.ghost', true);
+  const [nonGhost, flipNonGhost] =
+    useFlipSettings('ivette.globals.non-ghost', true);
+  const [init, flipInit] =
+    useFlipSettings('ivette.globals.init', true);
+  const [nonInit, flipNonInit] =
+    useFlipSettings('ivette.globals.non-init', true);
+  const [source, flipSource] =
+    useFlipSettings('ivette.globals.source', true);
+  const [nonSource, flipNonSource] =
+    useFlipSettings('ivette.globals.non-source', false);
+
+  function showVariable(vi: Ast.globalsData): boolean {
+    const visible =
+      (stdlib || !vi.stdlib)
+      && (extern || !vi.extern) && (nonExtern || vi.extern)
+      && (isConst || !vi.const) && (nonConst || vi.const)
+      && (volatile || !vi.volatile) && (nonVolatile || vi.volatile)
+      && (ghost || !vi.ghost) && (nonGhost || vi.ghost)
+      && (init || !vi.init) && (nonInit || vi.init)
+      && (source || !vi.source) && (nonSource || vi.source);
+    return !!visible;
+  }
+
+  // Context menu to change filter settings
+  async function onContextMenu(): Promise<void> {
+    const items: Dome.PopupMenuItem[] = [
+      {
+        label: 'Show stdlib variables',
+        checked: stdlib,
+        onClick: flipStdlib,
+      },
+      'separator',
+      {
+        label: 'Show extern variables',
+        checked: extern,
+        onClick: flipExtern,
+      },
+      {
+        label: 'Show non-extern variables',
+        checked: nonExtern,
+        onClick: flipNonExtern,
+      },
+      'separator',
+      {
+        label: 'Show const variables',
+        checked: isConst,
+        onClick: flipIsConst,
+      },
+      {
+        label: 'Show non-const variables',
+        checked: nonConst,
+        onClick: flipNonConst,
+      },
+      'separator',
+      {
+        label: 'Show volatile variables',
+        checked: volatile,
+        onClick: flipVolatile,
+      },
+      {
+        label: 'Show non-volatile variables',
+        checked: nonVolatile,
+        onClick: flipNonVolatile,
+      },
+      'separator',
+      {
+        label: 'Show ghost variables',
+        checked: ghost,
+        onClick: flipGhost,
+      },
+      {
+        label: 'Show non-ghost variables',
+        checked: nonGhost,
+        onClick: flipNonGhost,
+      },
+      'separator',
+      {
+        label: 'Show variables with explicit initializer',
+        checked: init,
+        onClick: flipInit,
+      },
+      {
+        label: 'Show variables without explicit initializer',
+        checked: nonInit,
+        onClick: flipNonInit,
+      },
+      'separator',
+      {
+        label: 'Show variables from the source code',
+        checked: source,
+        onClick: flipSource,
+      },
+      {
+        label: 'Show variables generated from analyses',
+        checked: nonSource,
+        onClick: flipNonSource,
+      },
+    ];
+    Dome.popupMenu(items);
+  }
+
+  // Filtered
+  const items =
+    variables
+      .filter(showVariable)
+      .map((v) => makeVarItem(scope, v));
+
+  const nTotal = variables.length;
+  const nFilter = items.length;
+  const title = `Variables ${nFilter} / ${nTotal}`;
+
+  const filterButtonProps = {
+    icon: 'TUNINGS',
+    title: `Variables filtering options (${nFilter} / ${nTotal})`,
+    onClick: onContextMenu,
+  };
+
+  const noVariable =
+    <div className='dome-xSideBarSection-content'>
+      <label className='globals-info'>
+        There is no variable to display.
+      </label>
+    </div>;
+
+  const allFiltered =
+    <div className='dome-xSideBarSection-content'>
+      <label className='globals-info'>
+        All variables are filtered. Try adjusting variable filters.
+      </label>
+      <Button {...filterButtonProps} label='Variables filters' />
+    </div>;
+
+  return (
+    <Section
+      label="Variables"
+      title={title}
+      defaultUnfold
+      settings="frama-c.sidebar.variables"
+      rightButtonProps={filterButtonProps}
+      summary={[nFilter]}
+      className='globals-section'
+    >
+      {nFilter > 0 ? items : nTotal > 0 ? allFiltered : noVariable}
+    </Section>
+  );
+}
+
+
+// --------------------------------------------------------------------------
 // --- Generic Declaration Section
 // --------------------------------------------------------------------------
 
@@ -355,23 +547,8 @@ export function Declarations(props: DeclarationsProps): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
-// --- Global Variables Section
+// --- Types Section
 // --------------------------------------------------------------------------
-
-const filterGlobals = (d: Ast.declAttributesData): boolean => (
-  d.kind === 'GLOBAL'
-);
-
-export function Globals(): JSX.Element {
-  return (
-    <Declarations
-      id='globals'
-      label='Globals'
-      title='Global Variables'
-      filter={filterGlobals}
-    />
-  );
-}
 
 const filterTypes = (d: Ast.declAttributesData): boolean => {
   switch(d.kind) {
@@ -384,10 +561,6 @@ const filterTypes = (d: Ast.declAttributesData): boolean => {
       return false;
   }
 };
-
-// --------------------------------------------------------------------------
-// --- Types Section
-// --------------------------------------------------------------------------
 
 export function Types(): JSX.Element {
   return (
