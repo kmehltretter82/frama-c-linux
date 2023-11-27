@@ -169,7 +169,7 @@ module DeadCode = struct
   type t = dead_code
   let jtype = R.jtype
 
-  let to_json (dead_code) =
+  let to_json dead_code =
     let make_stmt stmt = Printer_tag.PStmt (dead_code.kf, stmt) in
     let make_non_term stmt = Printer_tag.PStmtStart (dead_code.kf, stmt) in
     R.default |>
@@ -177,6 +177,8 @@ module DeadCode = struct
     R.set unreachable (List.map make_stmt dead_code.unreachable) |>
     R.set non_terminating (List.map make_non_term dead_code.non_terminating) |>
     R.to_json
+
+  let of_json _ = Data.failure "DeadCode.of_json not implemented"
 end
 
 let all_statements kf =
@@ -185,25 +187,27 @@ let all_statements kf =
 
 let dead_code = function
   | Printer_tag.SFunction kf ->
-    let empty = {
-      kf ; reached = [] ; unreachable = [] ; non_terminating = [] ;
-    } in
-    if Analysis.is_computed () then
-      let body = all_statements kf in
-      match Analysis.status kf with
-      | Unreachable | SpecUsed | Builtin _ -> { empty with unreachable = body }
-      | Analyzed NoResults -> empty
-      | Analyzed (Partial | Complete) ->
-        let classify { kf ; reached ; unreachable ; non_terminating = nt } stmt =
-          let before = Results.(before stmt |> is_empty) in
-          let after = Results.(after stmt |> is_empty) in
-          let unreachable = if before then stmt :: unreachable else unreachable in
-          let reached = if not before then stmt :: reached else reached in
-          let non_terminating = if not before && after then stmt :: nt else nt in
-          { kf ; reached ; unreachable ; non_terminating }
-        in List.fold_left classify empty body
-    else empty
-  | _ -> failwith "Not a function"
+    let empty = { kf; reached = []; unreachable = []; non_terminating = [] } in
+    let record =
+      if Analysis.is_computed () then
+        let body = all_statements kf in
+        match Analysis.status kf with
+        | Unreachable | SpecUsed | Builtin _ -> { empty with unreachable = body }
+        | Analyzed NoResults -> empty
+        | Analyzed (Partial | Complete) ->
+          let classify { kf ; reached ; unreachable ; non_terminating = nt } stmt =
+            let before = Results.(before stmt |> is_empty) in
+            let after = Results.(after stmt |> is_empty) in
+            let unreachable = if before then stmt :: unreachable else unreachable in
+            let reached = if not before then stmt :: reached else reached in
+            let non_terminating = if not before && after then stmt :: nt else nt in
+            { kf ; reached ; unreachable ; non_terminating }
+          in
+          List.fold_left classify empty body
+      else empty
+    in
+    Some record
+  | _ -> None
 
 let () = Request.register ~package
     ~kind:`GET ~name:"getDeadCode"
@@ -211,7 +215,7 @@ let () = Request.register ~package
               "Get the lists of unreachable and of non terminating \
                statements in a function")
     ~input:(module Kernel_ast.Decl)
-    ~output:(module DeadCode)
+    ~output:(module Data.Joption (DeadCode))
     ~signals:[computation_signal]
     dead_code
 

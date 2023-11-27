@@ -153,7 +153,7 @@ interface Evaluation {
  * callstack. This computation is asynchronous. */
 interface Probe {
   marker: Ast.marker;
-  scope?: Ast.decl;
+  scope: Ast.decl;
   stmt?: Ast.marker;
   code?: string;
   evaluable: boolean;
@@ -177,14 +177,17 @@ function useEvaluationCache(): Request<[ Ast.marker, callstack ], Evaluation> {
 }
 
 /* Builds a cached function that builds a Probe given a Location */
-function useProbeCache(): Request<Ast.marker, Probe> {
+function useProbeCache(): Request<[ Ast.decl, Ast.marker ], Probe> {
   const cache = useEvaluationCache();
-  const getData = React.useCallback(async (m: Ast.marker): Promise<Probe> => {
-    const infos = await Server.send(Values.getProbeInfo, m);
-    const evaluate: Request<callstack, Evaluation> = (c) => cache([ m, c ]);
-    return { marker: m, ...infos, evaluate };
-  }, [ cache ]);
-  return Dome.useCache(getData);
+  const getKey = React.useCallback(([scope, marker]): string => {
+    return `${scope}:${marker}`;
+  }, []);
+  const getData = React.useCallback(async ([scope, marker]): Promise<Probe> => {
+    const infos = await Server.send(Values.getProbeInfo, marker);
+    const evaluate: Request<callstack, Evaluation> = (c) => cache([marker, c]);
+    return { marker, scope, ...infos, evaluate };
+  }, [cache]);
+  return Dome.useCache(getData, getKey);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -396,7 +399,7 @@ interface ProbeDescrProps {
 
 function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   const { probe } = props;
-  const { name } = States.getDeclaration(probe.scope);
+  const { name, kind } = States.getDeclaration(probe.scope);
   const valuesClass = classes('eva-table-values', 'eva-table-values-center');
   const tableClass = classes('eva-table-descrs', 'eva-table-descr-sticky');
   const cls = classes(valuesClass, tableClass);
@@ -407,7 +410,7 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
   if (!probe.effects && !probe.condition) {
     if (probe.stmt)
       push('Values at the statement', '-');
-    else if (probe.scope)
+    else if (kind === 'FUNCTION')
       push('Values at the start of function ' + name, '-');
     else
       push('Values at the start of the analysis', '-');
@@ -521,7 +524,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
 /* -------------------------------------------------------------------------- */
 
 interface CallsiteCellProps {
-  callstack: callstack | 'Header';
+  callstack: callstack | 'None' | 'Header';
   index?: number;
   getCallsites: Request<callstack, Values.callsite[]>;
   selectedClass?: string;
@@ -537,20 +540,28 @@ function makeStackTitle(calls: Values.callsite[]): string {
 async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
   const { callstack, index, getCallsites, selectedClass = '' } = props;
   const baseClasses = classes('eva-table-callsite-box', selectedClass);
+  const cls = classes(baseClasses, 'eva-table-value-sticky');
   switch (callstack) {
     case 'Header': {
-      const cls = classes(baseClasses, 'eva-table-header-sticky');
+      const headerCls = classes(baseClasses, 'eva-table-header-sticky');
       const title = 'Callstack at which expressions are evaluated';
-      return <td className={cls} rowSpan={2} title={title}>{'#'}</td>;
+      return <td className={headerCls} rowSpan={2} title={title}>{'#'}</td>;
+    }
+    case 'None': {
+      const text = '-';
+      const title = 'Global evaluation';
+      return <td className={cls} title={title}>{text}</td>;
+    }
+    case 'Summary': {
+      const text = '∑';
+      const title = 'Summary: value consolidated accross all callstacks';
+      return <td className={cls} title={title}>{text}</td>;
     }
     default: {
-      const cls = classes(baseClasses, 'eva-table-value-sticky');
       const callsites = await getCallsites(callstack);
-      const isSummary = callstack === 'Summary';
-      const summary = 'Summary: value consolidated accross all callstacks';
-      const infos = isSummary ? summary : makeStackTitle(callsites);
-      const text = isSummary ? '∑' : (index ? index.toString() : '0');
-      return <td className={cls} title={infos}>{text}</td>;
+      const title = makeStackTitle(callsites);
+      const text = index ? index.toString() : '0';
+      return <td className={cls} title={title}>{text}</td>;
     }
   }
 }
@@ -560,14 +571,14 @@ async function CallsiteCell(props: CallsiteCellProps): Promise<JSX.Element> {
 
 
 /* -------------------------------------------------------------------------- */
-/* --- Function Section Component                                         --- */
+/* --- Scope Section Component                                            --- */
 /* -------------------------------------------------------------------------- */
 
-interface FunctionProps {
+interface ScopeProps {
   scope: Ast.decl;
   markers: Map<Ast.marker, MarkerStatus>;
   close: () => void;
-  getProbe: Request<Ast.marker, Probe>;
+  getProbe: Request<[Ast.decl, Ast.marker], Probe>;
   pinProbe: (marker: Ast.marker, pin: boolean) => void;
   selectProbe: (probe: Probe) => void;
   removeProbe: (probe: Probe) => void;
@@ -587,7 +598,7 @@ interface FunctionProps {
 
 const PageSize = 99;
 
-async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
+async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   const {
     scope, folded, isSelectedCallstack, locEvt,
     byCallstacks, getCallsites,
@@ -608,15 +619,14 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   /* Computes the relevant callstacks */
   const markers = Array.from(props.markers.keys());
   const allCallstacks = await getCS(markers);
-  const summaryOnly = allCallstacks.length === 1;
-  const callstacks = byCallstacks || summaryOnly ? allCallstacks : [];
-  const nbCS = allCallstacks.length;
+  const onlyOneCallstack = allCallstacks.length === 1;
+  const callstacks = byCallstacks || onlyOneCallstack ? allCallstacks : [];
 
   /* Computes the relevant data for each marker */
   interface Data { probe: Probe; summary: Evaluation; status: MarkerStatus }
   const entries = Array.from(props.markers.entries());
   const data = await Promise.all(entries.map(async ([ marker, status ]) => {
-    const probe = await props.getProbe(marker);
+    const probe = await props.getProbe([scope, marker]);
     const summary = await probe.evaluate('Summary');
     return { probe, summary, status };
   }));
@@ -630,8 +640,8 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
     const pinProbe = (pin: boolean): void => props.pinProbe(marker, pin);
     const selectProbe = (): void => props.selectProbe(probe);
     const removeProbe = (): void => props.removeProbe(probe);
-    const fcts = { selectProbe, pinProbe, removeProbe };
-    return ProbeHeader({ ...d, ...fcts, locEvt });
+    const scopes = { selectProbe, pinProbe, removeProbe };
+    return ProbeHeader({ ...d, ...scopes, locEvt });
   }));
 
   /* Computes the columns descriptions */
@@ -641,9 +651,10 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
   const miscs = { addLoc, isSelectedCallstack };
   const builders = data.map((d: Data) => ProbeValues({ ...d, ...miscs }));
   const summary = await Promise.all(builders.map((b) => b('Summary')));
-  const summCall = await CallsiteCell({ callstack: 'Summary', getCallsites });
+  const summaryKind = allCallstacks.length === 0 ? 'None' : 'Summary';
+  const summCall = await CallsiteCell({ callstack: summaryKind, getCallsites });
   let summaryRow = <></>;
-  if (!summaryOnly) {
+  if (!onlyOneCallstack) {
     summaryRow =
       <tr key={'Summary'} onClick={onClick('Summary')}>
         {doCall ? summCall : undefined}
@@ -696,13 +707,13 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
         <Cell className="eva-fct-name">{name}</Cell>
         <Filler />
         <div className='eva-nb-callstacks'>
-          {`${nbCS} callstack${nbCS > 1 ? 's' : ''}`}
+          {`${allCallstacks.length} callstack${onlyOneCallstack ? '' : 's'}`}
         </div>
         <IconButton
           icon="ITEMS.LIST"
           className="eva-button"
           selected={byCallstacks}
-          disabled={summaryOnly}
+          enabled={allCallstacks.length > 1}
           title="Show values by callstack"
           onClick={() => setByCallstacks(!byCallstacks)}
         />
@@ -742,15 +753,15 @@ async function FunctionSection(props: FunctionProps): Promise<JSX.Element> {
 
 
 /* -------------------------------------------------------------------------- */
-/* --- Function Manager                                                   --- */
+/* --- Scope Manager                                                      --- */
 /* -------------------------------------------------------------------------- */
-/* --- The Function Manager is responsible of all the data related to     --- */
-/* --- programs functions.                                                --- */
+/* --- The Scope Manager is responsible of all the data related to        --- */
+/* --- programs scopes (mainly functions).                                --- */
 /* -------------------------------------------------------------------------- */
 
-/* Informations on one function */
-class FunctionInfos {
-  readonly scope: Ast.decl;                 // Function decl
+/* Informations on one scope */
+class ScopeInfos {
+  readonly scope: Ast.decl;                 // Scope decl
   readonly pinned = new Set<Ast.marker>();  // Pinned markers
   readonly tracked = new Set<Ast.marker>(); // Tracked markers
   startingCallstack = 1;                    // First displayed callstack
@@ -782,11 +793,10 @@ class FunctionInfos {
     return this.pinned.size === 0 && this.tracked.size === 0;
   }
 
-  markers(focusedLoc?: Ast.marker): Map<Ast.marker, MarkerStatus> {
-    const { scope } = States.getMarker(focusedLoc);
-    const inScope = scope === this.scope;
+  markers(probe?: Probe): Map<Ast.marker, MarkerStatus> {
+    const inScope = probe?.scope === this.scope;
     const ms = new Map<Ast.marker, MarkerStatus>();
-    const p0 = focusedLoc;
+    const p0 = probe?.marker;
     this.pinned.forEach((p) => ms.set(p, [ 'Pinned', inScope && p0 === p ]));
     this.tracked.forEach((p) => ms.set(p, [ 'Tracked', inScope && p0 === p ]));
     if (inScope && p0 && !this.has(p0)) ms.set(p0, 'JustFocused');
@@ -795,14 +805,14 @@ class FunctionInfos {
 
 }
 
-/* State keeping tracks of informations for every relevant functions */
-class FunctionsManager {
+/* State keeping tracks of informations for every relevant scopes */
+class ScopesManager {
 
-  private readonly cache = new Map<Ast.decl, FunctionInfos>();
+  private readonly cache = new Map<Ast.decl, ScopeInfos>();
   private byCallstacks = false;
 
   constructor() {
-    this.newFunction = this.newFunction.bind(this);
+    this.newScope = this.newScope.bind(this);
     this.getInfos = this.getInfos.bind(this);
     this.setByCallstacks = this.setByCallstacks.bind(this);
     this.setFolded = this.setFolded.bind(this);
@@ -813,16 +823,16 @@ class FunctionsManager {
     this.map = this.map.bind(this);
   }
 
-  newFunction(scope: Ast.decl): void {
+  newScope(scope: Ast.decl): void {
     if (!this.cache.has(scope))
-      this.cache.set(scope, new FunctionInfos(scope, this.byCallstacks));
+      this.cache.set(scope, new ScopeInfos(scope, this.byCallstacks));
   }
 
-  private getInfos(scope: Ast.decl): FunctionInfos {
+  private getInfos(scope: Ast.decl): ScopeInfos {
     const { cache } = this;
     let infos = cache.get(scope);
     if (infos !== undefined) return infos;
-    infos = new FunctionInfos(scope, this.byCallstacks);
+    infos = new ScopeInfos(scope, this.byCallstacks);
     this.cache.set(scope, infos);
     return infos;
   }
@@ -880,7 +890,7 @@ class FunctionsManager {
     });
   }
 
-  map<A>(fn: (infos: FunctionInfos) => A): A[] {
+  map<A>(fn: (infos: ScopeInfos) => A): A[] {
     const data: A[] = [];
     this.cache.forEach((e) => data.push(fn(e)));
     return data;
@@ -898,7 +908,7 @@ class FunctionsManager {
 
 interface EvaluationModeProps {
   computationState : Eva.computationStateType | undefined;
-  current: Ast.marker | undefined;
+  marker: Ast.marker | undefined;
   scope: Ast.decl | undefined;
   setLocPin: (scope: Ast.decl, loc: Ast.marker, pin: boolean) => void;
 }
@@ -925,14 +935,14 @@ Dome.addMenuItem({
 Ivette.registerMode(evalMode);
 
 function useEvaluationMode(props: EvaluationModeProps): void {
-  const { computationState, current, scope, setLocPin } = props;
+  const { computationState, marker, scope, setLocPin } = props;
   const enabled =
     computationState === 'computed'
-    && current !== undefined && scope !== undefined;
+    && marker !== undefined && scope !== undefined;
   React.useEffect(() => {
     if (enabled) {
       const onEnter = (pattern: string): void => {
-        const data = { stmt: current, term: pattern };
+        const data = { stmt: marker, term: pattern };
         const handleError = (): void => { return; };
         const addProbe = (target: Ast.marker | undefined): void => {
           if (target) setLocPin(scope, target, true);
@@ -943,7 +953,7 @@ function useEvaluationMode(props: EvaluationModeProps): void {
     } else {
       Ivette.updateMode({ id: evalMode.id, enabled: false });
     }
-  }, [enabled, current, scope, setLocPin]);
+  }, [enabled, marker, scope, setLocPin]);
   React.useEffect(
     () => Dome.setMenuItem({ id: evalMode.id, enabled })
     , [enabled]
@@ -960,7 +970,7 @@ function useEvaluationMode(props: EvaluationModeProps): void {
 
 /* Table's state. It is global for when the user changes the view. */
 export const CallstackState = new GlobalState<callstack>('Summary');
-const FunctionsManagerState = new GlobalState(new FunctionsManager());
+const ScopesManagerState = new GlobalState(new ScopesManager());
 const FocusState = new GlobalState<Probe | undefined>(undefined);
 
 /* Component */
@@ -971,19 +981,14 @@ function EvaTable(): JSX.Element {
 
   /* Component state */
   const { marker, scope } = States.useCurrentLocation();
-  const { kind, name } = States.useDeclaration(scope);
-  const fct = kind === 'FUNCTION' ? name : undefined;
-  const current = kind === 'FUNCTION' ? marker : undefined;
   const [ cs, setCS ] = useGlobalState(CallstackState);
-  const [ fcts ] = useGlobalState(FunctionsManagerState);
+  const [ fcts ] = useGlobalState(ScopesManagerState);
   const [ focus, setFocus ] = useGlobalState(FocusState);
-  const focusedMarker = focus?.marker;
-  const focusedScope = focus?.scope;
 
   /* Used to force the component update. We cannot use the `forceUpdate` hook
    * proposed by Dome as we need to be able to add dependencies on a changing
    * value (here tac) explicitly. We need to force the update as modifications
-   * of the Function Manager internal data does NOT trigger the component
+   * of the Scope Manager internal data does NOT trigger the component
    * update. */
   const [ tac, setTic ] = React.useState(0);
 
@@ -996,7 +1001,7 @@ function EvaTable(): JSX.Element {
   const getCallsites = useCallsitesCache();
   const getCallstacks = useCallstacksCache();
 
-  /* Updates the function manager when the showCallstacks state changes. */
+  /* Updates the scope manager when the showCallstacks state changes. */
   React.useEffect(() => {
     fcts.setGlobalByCallstacks(showCallstacks);
     setTic(tac => tac + 1);
@@ -1012,9 +1017,9 @@ function EvaTable(): JSX.Element {
 
   /* Reset the selected callstack when the corresponding function is removed */
   React.useEffect(() => {
-    if (csFct && fcts.isEmpty(csFct) && focusedScope !== csFct)
+    if (csFct && fcts.isEmpty(csFct) && focus?.scope !== csFct)
       setCS('Summary');
-  }, [ csFct, setCS, fcts, focusedScope ] );
+  }, [ csFct, setCS, fcts, focus?.scope ] );
 
   /* Updated the focused Probe when the selection changes. Also emit on the
    * `locEvent` event. */
@@ -1022,13 +1027,13 @@ function EvaTable(): JSX.Element {
     fcts.clean(scope);
     const doUpdate = (p: Probe): void => {
       if (!p.evaluable) { setFocus(undefined); return; }
-      if (fct && scope && p.code) fcts.newFunction(scope);
+      if (scope && p.code) fcts.newScope(scope);
       setFocus(p);
-      if (current) locEvt.emit(current);
+      if (marker) locEvt.emit(marker);
     };
-    if (current) getProbe(current).then(doUpdate);
+    if (scope && marker) getProbe([scope, marker]).then(doUpdate);
     else setFocus(undefined);
-  }, [ current, fcts, fct, scope, getProbe, setFocus, locEvt ]);
+  }, [ marker, fcts, scope, getProbe, setFocus, locEvt ]);
 
   /* Callback used to pin or unpin a location */
   const setLocPin = React.useCallback(
@@ -1042,7 +1047,7 @@ function EvaTable(): JSX.Element {
   React.useEffect(() => {
     const pin = (loc: States.Location): void => {
       const { scope, marker } = loc;
-      if (scope && marker && fct) setLocPin(scope, marker, true);
+      if (scope && marker) setLocPin(scope, marker, true);
     };
     States.MetaSelection.on(pin);
     return () => States.MetaSelection.off(pin);
@@ -1050,24 +1055,22 @@ function EvaTable(): JSX.Element {
 
   /* Callback used to remove a probe */
   const remove = React.useCallback((probe: Probe): void => {
-    if (probe.scope) {
-      fcts.removeLocation(probe.scope, probe.marker);
-    }
-    if (probe.marker === focusedMarker) {
+    fcts.removeLocation(probe.scope, probe.marker);
+    if (probe.marker === focus?.marker) {
       setFocus(undefined);
       fcts.clean(undefined);
     }
     else {
-      fcts.clean(focusedScope);
+      fcts.clean(focus?.scope);
     }
     setTic(tac + 1);
-  }, [ fcts, focusedScope, focusedMarker, setFocus, tac ]);
+  }, [ fcts, focus, setFocus, tac ]);
 
   /* Builds the sections for each function. As the component is built
    * asynchronously, we have to use the `usePromise` hook, which forces us to
    * memoize the promises building. */
   const functionsPromise = React.useMemo(() => {
-    const elts : Promise<JSX.Element>[] = fcts.map((fct: FunctionInfos) => {
+    const elts : Promise<JSX.Element>[] = fcts.map((fct: ScopeInfos) => {
       const { byCallstacks, scope, folded } = fct;
       const isSelectedCallstack = (c: callstack): boolean => c === cs;
       const setFolded = (folded: boolean): void => {
@@ -1087,8 +1090,8 @@ function EvaTable(): JSX.Element {
         if (csFct === scope) setCS('Summary');
         setTic(tac + 1);
       };
-      return FunctionSection({
-        markers: fct.markers(focusedMarker),
+      return ScopeSection({
+        markers: fct.markers(focus),
         scope,
         close,
         pinProbe: (loc: Ast.marker, pin) => { setLocPin(scope, loc, pin); },
@@ -1111,7 +1114,7 @@ function EvaTable(): JSX.Element {
     });
     return Promise.all(elts);
   }, [
-    cs, setCS, fcts, focusedMarker, setFocus, tac,
+    cs, setCS, fcts, focus, setFocus, tac,
     getCallsites, setLocPin, csFct,
     getCallstacks, getProbe, remove, locEvt
   ]);
@@ -1136,7 +1139,7 @@ function EvaTable(): JSX.Element {
 
   /* Handle Evaluation mode */
   const computationState = States.useSyncValue(Eva.computationState);
-  useEvaluationMode({ computationState, current, scope, setLocPin });
+  useEvaluationMode({ computationState, marker, scope, setLocPin });
 
   /* Builds the component */
   return (

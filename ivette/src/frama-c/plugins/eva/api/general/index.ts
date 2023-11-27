@@ -258,15 +258,15 @@ export const byDeadCode: Compare.Order<deadCode> =
 export const deadCodeDefault: deadCode =
   { reached: [], unreachable: [], nonTerminating: [] };
 
-const getDeadCode_internal: Server.GetRequest<decl,deadCode> = {
+const getDeadCode_internal: Server.GetRequest<decl,deadCode | undefined> = {
   kind: Server.RqKind.GET,
   name: 'plugins.eva.general.getDeadCode',
   input: jDecl,
-  output: jDeadCode,
+  output: Json.jOption(jDeadCode),
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the lists of unreachable and of non terminating statements in a function */
-export const getDeadCode: Server.GetRequest<decl,deadCode>= getDeadCode_internal;
+export const getDeadCode: Server.GetRequest<decl,deadCode | undefined>= getDeadCode_internal;
 
 /** Taint status of logical properties */
 export enum taintStatus {
