@@ -195,6 +195,7 @@ export function ViewBar(): JSX.Element {
   const compsByGroup: Map<string, Ivette.ComponentProps[]> = new Map();
   const defaultGroupName = "ungrouped";
   const sandboxGroupName = "sandbox";
+  const sandboxGroupId = "sandbox";
 
   groups.forEach(group => {
     compsByGroup.set(group.id, []);
@@ -213,8 +214,8 @@ export function ViewBar(): JSX.Element {
     }
   });
 
-  const compsSandbox = compsByGroup.get(sandboxGroupName);
-  compsByGroup.delete(sandboxGroupName);
+  const compsSandbox = compsByGroup.get(sandboxGroupId);
+  compsByGroup.delete(sandboxGroupId);
 
   return (
     <Sidebars.SideBar>
@@ -260,7 +261,7 @@ export function ViewBar(): JSX.Element {
         })
       }
       { DEVEL &&
-        <Sidebars.Section label="sandbox">
+        <Sidebars.Section label={sandboxGroupName}>
           {compsSandbox && compsSandbox.map((compo) =>
             <Sidebars.Item
               key={compo.id}
