@@ -21,6 +21,7 @@
 /* ************************************************************************ */
 
 import React from 'react';
+import Path from 'path';
 
 import * as Dome from 'dome';
 import * as System from 'dome/system';
@@ -36,7 +37,6 @@ import * as Preferences from 'ivette/prefs';
 
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-import * as Status from 'frama-c/kernel/Status';
 import * as Ast from 'frama-c/kernel/api/ast';
 
 // -----------------------------------------------------------------------------
@@ -55,7 +55,7 @@ function getCursorPosition(view: Editor.View): Position {
 }
 
 // Function launching the external editor at the currently selected position.
-async function editSourceFile(
+async function openSourceFile(
   cmd: string,
   file: string,
   pos: Position
@@ -68,9 +68,16 @@ async function editSourceFile(
     .split(' ');
   const prog = args.shift(); if (!prog) return;
   System.spawn(prog, args).catch(() => {
-    const text = 'Editing Failed';
-    const title = `Command ${prog} ${args} failed.`;
-    Status.setMessage({ text, title, kind: 'error' });
+    const filename = Path.basename(file);
+    Dialogs.showMessageBox({
+      kind: 'error',
+      message: `File ${filename} could not be opened with ${prog}`,
+      details: (
+        `\nThe command "${prog} ${args}" failed.\n\n`
+        + 'This command can be changed in the preferences.'
+      ),
+      buttons: [{ label: "Ok" }],
+    });
   });
 }
 
@@ -194,18 +201,18 @@ export default function SourceCode(): JSX.Element {
   const markerAtCursor = States.useRequest(Ast.getMarkerAt, cursor);
   const { sloc: slocAtCursor } = States.useMarker(markerAtCursor);
 
-  const editFile = React.useCallback(() => {
-    if (file) editSourceFile(command, file, getCursorPosition(view));
+  const openFile = React.useCallback(() => {
+    if (file) openSourceFile(command, file, getCursorPosition(view));
   }, [ command, file, view ]
   );
 
   const menuPopup = React.useCallback(() => {
     if (file && command)
       Dome.popupMenu([{
-        label: 'Edit file in editor',
-        onClick: editFile,
+        label: 'Open file in external editor',
+        onClick: openFile,
       }]);
-  }, [file, command, editFile] );
+  }, [file, command, openFile] );
 
   const onClick = React.useCallback((pos: Position) => {
     if (!file) return;
@@ -217,7 +224,7 @@ export default function SourceCode(): JSX.Element {
   React.useEffect(() => Source.set(view, source), [view, source]);
   React.useEffect(() => OnClick.set(view, onClick), [view, onClick]);
   React.useEffect(() => OnContextMenu.set(view, menuPopup), [view, menuPopup]);
-  React.useEffect(() => OnControlClick.set(view, editFile), [view, editFile]);
+  React.useEffect(() => OnControlClick.set(view, openFile), [view, openFile]);
 
   React.useEffect(() => {
     if (source.length > 0 && selectedMarkerLine > 0)
@@ -235,7 +242,7 @@ export default function SourceCode(): JSX.Element {
         <Buttons.IconButton
           icon="DUPLICATE"
           visible={!file}
-          onClick={editFile}
+          onClick={openFile}
           title='externalEditorTitle'
         />
         <Labels.Code title={file}>{filename}</Labels.Code>
