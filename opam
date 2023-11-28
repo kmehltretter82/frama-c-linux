@@ -132,7 +132,7 @@ depends: [
   "ocamlgraph" { with-test & >= "2.1.0" }
   "odoc" { with-doc }
   "unionFind" { >= "20220107" }
-  "why3" { >= "1.6.0" }
+  "why3" { >= "1.6.0" & < "1.7.0" }
   "yaml" { >= "3.0.0" }
   "yojson" {>= "1.6.0" & (>= "2.0.1" | !with-test)}
   "zarith" { >= "1.5" }
@@ -143,10 +143,11 @@ depends: [
   "ppx_deriving_yaml" { >= "0.2.0" }
   "ppx_import"
 
-  # GTK3 for non-macos only
-  "lablgtk3" { >= "3.1.0" & os!="macos" }
-  "lablgtk3-sourceview3" { os!="macos" }
-  "conf-gtksourceview3" { os!="macos" }
+  # GTK3 disabled on macOS (segfaults), and made optional on Windows
+  # (due to complex situation with Cygwin + MinGW).
+  "lablgtk3" { >= "3.1.0" & os!="macos" & os-family!="windows" }
+  "lablgtk3-sourceview3" { os!="macos" & os-family!="windows" }
+  "conf-gtksourceview3" { os!="macos" & os-family!="windows" }
 ]
 
 # Note: do not put particular versions here, if some version is *incompatible*,
@@ -155,6 +156,9 @@ depopts: [
   "apron"
   "mlmpfr"
   "zmq"
+  "lablgtk3" { os-family="windows" }
+  "lablgtk3-sourceview3" { os-family="windows" }
+  "conf-gtksourceview3" { os-family="windows" }
 ]
 
 conflicts: [

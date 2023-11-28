@@ -222,7 +222,7 @@ let rec of_tau ~cnv (t:Lang.F.tau) =
   | Real -> Some Why3.Ty.ty_real
   | Array(k,v) ->
     let ts = get_ts ~cnv ~f:["map"] ~l:"Map" ~p:["map"] in
-    Some (Why3.Ty.ty_app ts [Why3.Opt.get (of_tau ~cnv k); Why3.Opt.get (of_tau ~cnv v)])
+    Some (Why3.Ty.ty_app ts [Option.get (of_tau ~cnv k); Option.get (of_tau ~cnv v)])
   | Data(adt,l) -> begin
       let s = name_of_adt adt in
       let find s =
@@ -231,7 +231,7 @@ let rec of_tau ~cnv (t:Lang.F.tau) =
           Why3.Theory.(ns_find_ts (get_namespace cnv.th) (cut_path s))
       in
       match find s with
-      | ts -> Some (Why3.Ty.ty_app ts (List.map (fun e -> Why3.Opt.get (of_tau ~cnv e)) l))
+      | ts -> Some (Why3.Ty.ty_app ts (List.map (fun e -> Option.get (of_tau ~cnv e)) l))
       | exception Not_found ->
         why3_failure "Can't find type '%s' in why3 namespace" s
     end
@@ -659,7 +659,7 @@ and successive_binders cnv q t =
   | Bind((Forall|Exists) as q',tau,t) when q' = q ->
     let x = Lang.F.fresh cnv.pool tau in
     let x' = Why3.Ident.id_fresh (Lang.F.Tau.basename tau) in
-    let x' = Why3.Term.create_vsymbol x' (Why3.Opt.get (of_tau ~cnv tau)) in
+    let x' = Why3.Term.create_vsymbol x' (Option.get (of_tau ~cnv tau)) in
     let cnv = {cnv with subst = Lang.F.Tmap.add (Lang.F.e_var x) (Why3.Term.t_var x') cnv.subst} in
     let t = Lang.F.QED.e_unbind x t in
     let why3_vars, t = successive_binders cnv q t in
@@ -769,7 +769,7 @@ class visitor (ctx:context) c =
       | [] -> why3_failure "[driver] empty import option"
       | l ->
         let file, thy = Why3.Lists.chop_last l in
-        self#add_import_use file thy (Why3.Opt.get_def thy was) ~import:true
+        self#add_import_use file thy (Option.value ~default:thy was) ~import:true
 
     method add_import_file file thy =
       self#add_import_use ~import:true file thy thy
@@ -852,7 +852,7 @@ class visitor (ctx:context) c =
         let map i _ = tvar i in
         let tv_args = List.mapi map lt.lt_params in
         let cnv = empty_cnv ctx in
-        let t = Why3.Opt.get (of_tau ~cnv t) in
+        let t = Option.get (of_tau ~cnv t) in
         let id = Why3.Ty.create_tysymbol id tv_args (Alias t) in
         let decl = Why3.Decl.create_ty_decl id in
         ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
@@ -870,7 +870,7 @@ class visitor (ctx:context) c =
         let cases = List.map (fun (c,targs) ->
             let name = match c with | Lang.CTOR c -> Lang.ctor_id c | _ -> assert false in
             let id = Why3.Ident.id_fresh name in
-            let targs = List.map (fun t -> Why3.Opt.get (of_tau ~cnv t)) targs in
+            let targs = List.map (fun t -> Option.get (of_tau ~cnv t)) targs in
             let ls = Why3.Term.create_fsymbol ~constr id targs return_ty in
             let proj = List.map (fun _ -> None) targs in
             (ls,proj)
@@ -890,7 +890,7 @@ class visitor (ctx:context) c =
         let fields,args = List.split @@ List.map (fun (f,ty) ->
             let name = Lang.name_of_field f in
             let id = Why3.Ident.id_fresh name in
-            let ty = Why3.Opt.get (of_tau ~cnv ty) in
+            let ty = Option.get (of_tau ~cnv ty) in
             let ls = Why3.Term.create_fsymbol ~proj:true id [return_ty] ty in
             Some ls,ty
           ) fields in
@@ -920,7 +920,7 @@ class visitor (ctx:context) c =
           let ty_ctr = of_tau ~cnv tau in
           let id = Why3.Ident.id_fresh (Lang.name_of_field f) in
           let ls = Why3.Term.create_lsymbol ~proj:true id [ty] ty_ctr in
-          (Some ls,Why3.Opt.get ty_ctr)
+          (Some ls,Option.get ty_ctr)
         in
         let fields = Option.map (List.map map) fts in
         let decl = match fields with
@@ -964,7 +964,7 @@ class visitor (ctx:context) c =
         match d.d_definition with
         | Logic t ->
           let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_name d.d_lfun)) in
-          let map e = Why3.Opt.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
+          let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
           let ty_args = List.map map d.d_params in
           let id = Why3.Term.create_lsymbol id ty_args (of_tau ~cnv t) in
           let decl = Why3.Decl.create_param_decl id in
@@ -974,7 +974,7 @@ class visitor (ctx:context) c =
             | Rec -> (* transform recursive function into an axioms *)
               let name = Qed.Export.link_name (lfun_name d.d_lfun) in
               let id = Why3.Ident.id_fresh name in
-              let map e = Why3.Opt.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
+              let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
               let ty_args = List.map map d.d_params in
               let result = of_tau ~cnv t in
               let id = Why3.Term.create_lsymbol id ty_args result in
@@ -997,7 +997,7 @@ class visitor (ctx:context) c =
               ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
             | Def ->
               let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_name d.d_lfun)) in
-              let map e = Why3.Opt.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
+              let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
               let ty_args = List.map map d.d_params in
               let result = of_tau ~cnv t in
               let id = Why3.Term.create_lsymbol id ty_args result in
@@ -1012,7 +1012,7 @@ class visitor (ctx:context) c =
             | Rec ->
               let name = Qed.Export.link_name (lfun_name d.d_lfun) in
               let id = Why3.Ident.id_fresh name in
-              let map e = Why3.Opt.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
+              let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
               let ty_args = List.map map d.d_params in
               let result = None in
               let id = Why3.Term.create_lsymbol id ty_args result in
@@ -1034,7 +1034,7 @@ class visitor (ctx:context) c =
               ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
             | Def ->
               let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_name d.d_lfun)) in
-              let map e = Why3.Opt.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
+              let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
               let ty_args = List.map map d.d_params in
               let id = Why3.Term.create_lsymbol id ty_args None in
               let cnv, vars = mk_binders cnv d.d_params in
@@ -1047,7 +1047,7 @@ class visitor (ctx:context) c =
           (* create predicate symbol *)
           let fname = Qed.Export.link_name (lfun_name d.d_lfun) in
           let id = Why3.Ident.id_fresh fname in
-          let map e = Why3.Opt.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
+          let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
           let ty_args = List.map map d.d_params in
           let fid = Why3.Term.create_lsymbol id ty_args None in
           let make_case (l:Definitions.dlemma) =
@@ -1207,8 +1207,8 @@ let ping_prover_call ~config p =
 let call_prover_task ~timeout ~steps ~config prover call =
   Wp_parameters.debug ~dkey "Why3 run prover %a with timeout %f, steps %d@."
     Why3.Whyconf.print_prover prover
-    (Why3.Opt.get_def (0.0) timeout)
-    (Why3.Opt.get_def 0 steps) ;
+    (Option.value ~default:(0.0) timeout)
+    (Option.value ~default:0 steps) ;
   let timeout = match timeout with None -> 0.0 | Some tlimit -> tlimit in
   let pcall = {
     call ; prover ;
@@ -1260,9 +1260,9 @@ let run_batch pconf driver ~config ?(script : Filepath.Normalized.t option) ~tim
     let config_time = Why3.Whyconf.timelimit config in
     let config_steps = Why3.Call_provers.empty_limit.limit_steps in
     Why3.Call_provers.{
-      limit_time = Why3.Opt.get_def config_time timeout;
-      limit_steps = Why3.Opt.get_def config_steps steps;
-      limit_mem = Why3.Opt.get_def config_mem memlimit;
+      limit_time = Option.value ~default:config_time timeout;
+      limit_steps = Option.value ~default:config_steps steps;
+      limit_mem = Option.value ~default:config_mem memlimit;
     } in
   let with_steps = match steps, pconf.Why3.Whyconf.command_steps with
     | None, _ -> false
