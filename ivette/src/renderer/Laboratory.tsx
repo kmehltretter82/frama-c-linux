@@ -34,6 +34,7 @@ import * as Ext from './Extensions';
 
 const VIEW = Ivette.VIEW;
 const COMPONENT = Ivette.COMPONENT;
+const GROUP = Ivette.GROUP;
 const defaultLayout = { ABCD: "" };
 const defaultLabViewState: LabViewState = {
   A: defaultLayout.ABCD,
@@ -187,25 +188,33 @@ export function LabView(): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 export function ViewBar(): JSX.Element {
-  const views = Ext.useElements(VIEW);
   const [selected, setSelected] = React.useState("");
-
+  const views = Ext.useElements(VIEW);
+  const groups = Ext.useElements(GROUP);
   const components = Ext.useElements(COMPONENT);
-  const kernelComps = components.filter((comp) =>
-    comp.id.startsWith("fc.kernel"));
-  const diveComps = components.filter((comp) =>
-    comp.id.startsWith("fc.dive"));
-  const evaComps = components.filter((comp) =>
-    comp.id.startsWith("fc.eva"));
-  const sbComps = components.filter((comp) =>
-    comp.id.startsWith("sandbox"));
+  const compsByGroup: Map<string, Ivette.ComponentProps[]> = new Map();
+  const defaultGroupName = "ungrouped";
+  const sandboxGroupName = "sandbox";
 
-  const unclassifiedComps = components.filter(n =>
-    !kernelComps.includes(n)
-    && !diveComps.includes(n)
-    && !evaComps.includes(n)
-    && !sbComps.includes(n)
-  );
+  groups.forEach(group => {
+    compsByGroup.set(group.id, []);
+    components.forEach(comp => {
+      comp.id.startsWith(group.id) && compsByGroup.get(group.id)?.push(comp);
+    });
+  });
+
+  compsByGroup.set(defaultGroupName, []);
+  let groupedComponents: Ivette.ComponentProps[] = [];
+  compsByGroup.forEach(val =>
+    groupedComponents = groupedComponents.concat(val));
+  components.forEach(comp => {
+    if(groupedComponents.indexOf(comp) === -1) {
+      compsByGroup.get(defaultGroupName)?.push(comp);
+    }
+  });
+
+  const compsSandbox = compsByGroup.get(sandboxGroupName);
+  compsByGroup.delete(sandboxGroupName);
 
   return (
     <Sidebars.SideBar>
@@ -224,51 +233,35 @@ export function ViewBar(): JSX.Element {
           />
         )}
       </Sidebars.Section>
-      <Sidebars.Section label="Kernel" defaultUnfold>
-        {kernelComps.map((compo) =>
-          <Sidebars.Item
-            key={compo.id}
-            label={compo.label}
-            title={compo.title}
-            icon='COMPONENT'
-            selected={selected === compo.id}
-            onSelection={() => {
-              setSelected(compo.id);
-            }}
-          />
-        )}
-      </Sidebars.Section>
-      <Sidebars.Section label="Dive">
-        {diveComps.map((compo) =>
-          <Sidebars.Item
-            key={compo.id}
-            label={compo.label}
-            title={compo.title}
-            icon='COMPONENT'
-            selected={selected === compo.id}
-            onSelection={() => {
-              setSelected(compo.id);
-            }}
-          />
-        )}
-      </Sidebars.Section>
-      <Sidebars.Section label="Eva">
-        {evaComps.map((compo) =>
-          <Sidebars.Item
-            key={compo.id}
-            label={compo.label}
-            title={compo.title}
-            icon='COMPONENT'
-            selected={selected === compo.id}
-            onSelection={() => {
-              setSelected(compo.id);
-            }}
-          />
-        )}
-      </Sidebars.Section>
+      {
+        Array.from(compsByGroup.keys()).map((group, key) => {
+          const items: JSX.Element[] = [];
+
+          compsByGroup.get(group)?.forEach(comp => {
+            items.push(
+              <Sidebars.Item
+                key={comp.id}
+                label={comp.label}
+                title={comp.title}
+                icon='COMPONENT'
+                selected={selected === comp.id}
+                onSelection={() => {
+                  setSelected(comp.id);
+                }}
+              />
+            );
+          });
+
+          return (
+            <Sidebars.Section key= {key} label={group}>
+              {items}
+            </Sidebars.Section>
+          );
+        })
+      }
       { DEVEL &&
-        <Sidebars.Section label="Sandbox">
-          {sbComps.map((compo) =>
+        <Sidebars.Section label="sandbox">
+          {compsSandbox && compsSandbox.map((compo) =>
             <Sidebars.Item
               key={compo.id}
               label={compo.label}
@@ -282,20 +275,6 @@ export function ViewBar(): JSX.Element {
           )}
         </Sidebars.Section>
       }
-      <Sidebars.Section label="Other Plugins">
-        {unclassifiedComps.map((compo) =>
-          <Sidebars.Item
-            key={compo.id}
-            label={compo.label}
-            title={compo.title}
-            icon='COMPONENT'
-            selected={selected === compo.id}
-            onSelection={() => {
-              setSelected(compo.id);
-            }}
-          />
-        )}
-      </Sidebars.Section>
     </Sidebars.SideBar>
   );
 }
