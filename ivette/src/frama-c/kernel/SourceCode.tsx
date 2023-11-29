@@ -232,7 +232,8 @@ export default function SourceCode(): JSX.Element {
   }, [view, source, isTop, selectedMarkerLine]);
 
   React.useEffect(() => {
-    if (cursor.line === slocAtCursor?.line)
+    if (cursor.file === slocAtCursor?.file
+      && cursor.line === slocAtCursor?.line)
       States.setSelected(markerAtCursor);
   }, [cursor, markerAtCursor, slocAtCursor]);
 
