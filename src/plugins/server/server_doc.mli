@@ -39,14 +39,15 @@ val chapter : page -> chapter
 (** Obtain the given page in the server documentation.
 
     The readme introductory section is
-    read from the share directory:
-    - [frama-c/share/<filename>] server and kernel pages,
-    - [frama-c/share/<plugin>/server/<filename>] for plugin's pages.
+    read from the source directory:
+    - [src/plugins/server/<filename>] server and kernel pages,
+    - [src/plugins/<plugin>/<filename>] for plugin's pages.
 *)
 val page : chapter ->
   title:string ->
   ?descr:elements ->
-  ?readme:Filepath.Normalized.t ->
+  ?plugin:Package.plugin ->
+  readme:string option ->
   filename:string ->
   unit ->page
 
