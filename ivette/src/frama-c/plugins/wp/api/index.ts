@@ -181,10 +181,12 @@ export const getAvailableProvers: Server.GetRequest<null,prover[]>= getAvailable
 export interface goalsData {
   /** Entry identifier. */
   wpo: goal;
-  /** Property Marker */
-  property: marker;
+  /** Associated Marker */
+  marker: marker;
   /** Associated declaration, if any */
   scope?: decl;
+  /** Property Marker */
+  property: marker;
   /** Associated function name, if any */
   fct?: string;
   /** Associated behavior name, if any */
@@ -211,8 +213,9 @@ export interface goalsData {
 export const jGoalsData: Json.Decoder<goalsData> =
   Json.jObject({
     wpo: jGoal,
-    property: jMarker,
+    marker: jMarker,
     scope: Json.jOption(jDecl),
+    property: jMarker,
     fct: Json.jOption(Json.jString),
     bhv: Json.jOption(Json.jString),
     thy: Json.jOption(Json.jString),
@@ -228,12 +231,14 @@ export const jGoalsData: Json.Decoder<goalsData> =
 /** Natural order for `goalsData` */
 export const byGoalsData: Compare.Order<goalsData> =
   Compare.byFields
-    <{ wpo: goal, property: marker, scope?: decl, fct?: string, bhv?: string,
-       thy?: string, name: string, smoke: boolean, passed: boolean,
-       status: status, stats: stats, script?: string, saved: boolean }>({
+    <{ wpo: goal, marker: marker, scope?: decl, property: marker,
+       fct?: string, bhv?: string, thy?: string, name: string,
+       smoke: boolean, passed: boolean, status: status, stats: stats,
+       script?: string, saved: boolean }>({
     wpo: byGoal,
-    property: byMarker,
+    marker: byMarker,
     scope: Compare.defined(byDecl),
+    property: byMarker,
     fct: Compare.defined(Compare.string),
     bhv: Compare.defined(Compare.string),
     thy: Compare.defined(Compare.string),
@@ -295,10 +300,10 @@ export const goals: State.Array<goal,goalsData> = goals_internal;
 
 /** Default value for `goalsData` */
 export const goalsDataDefault: goalsData =
-  { wpo: goalDefault, property: markerDefault, scope: undefined,
-    fct: undefined, bhv: undefined, thy: undefined, name: '', smoke: false,
-    passed: false, status: statusDefault, stats: statsDefault,
-    script: undefined, saved: false };
+  { wpo: goalDefault, marker: markerDefault, scope: undefined,
+    property: markerDefault, fct: undefined, bhv: undefined, thy: undefined,
+    name: '', smoke: false, passed: false, status: statusDefault,
+    stats: statsDefault, script: undefined, saved: false };
 
 /** Proof Server Activity */
 export const serverActivity: Server.Signal = {

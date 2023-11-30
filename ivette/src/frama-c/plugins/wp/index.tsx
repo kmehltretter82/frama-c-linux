@@ -41,9 +41,8 @@ import './style.css';
 /* -------------------------------------------------------------------------- */
 
 function WPGoals(): JSX.Element {
-  const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped',false);
-  const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed',true);
-  const [list, flipListView] = Dome.useFlipSettings('frama-c.wp.goals.list',true);
+  const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped');
+  const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed');
   const [current, setCurrent] = React.useState(WP.goalDefault);
   const scope = States.useCurrentScope();
   const [goals, setGoals] = React.useState(0);
@@ -64,14 +63,9 @@ function WPGoals(): JSX.Element {
                     enabled={hasGoals}
                     selected={failed}
                     onClick={flipFailed} />
-        <IconButton icon='ITEMS.LIST'
-                    title='Goals List / Current Goal Details'
-                    enabled={hasGoals}
-                    selected={list}
-                    onClick={flipListView} />
       </Ivette.TitleBar>
       <GoalTable
-        display={list}
+        display={true}
         scope={scope}
         failed={failed}
         current={current}

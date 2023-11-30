@@ -113,8 +113,8 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
   const goals = model.getRowCount();
   const total = model.getTotalRowCount();
   const onSelection = React.useCallback(
-    ({ wpo, property }: WP.goalsData) => {
-      States.setSelected(property);
+    ({ wpo, marker }: WP.goalsData) => {
+      States.setSelected(marker);
       setCurrent(wpo);
     }, [setCurrent]);
 
