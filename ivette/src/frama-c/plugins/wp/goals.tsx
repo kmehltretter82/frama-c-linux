@@ -33,7 +33,7 @@ import * as WP from 'frama-c/plugins/wp/api';
 /* -------------------------------------------------------------------------- */
 
 function getScope(g : WP.goalsData): string {
-  if (g.bhv && g.fct) return `${g.fct}@{g.bhv}}`;
+  if (g.bhv && g.fct) return `${g.fct} — {g.bhv}}`;
   if (g.fct) return g.fct;
   if (g.thy) return g.thy;
   return '';
@@ -94,11 +94,12 @@ function filterGoal(
 /* -------------------------------------------------------------------------- */
 
 export interface GoalTableProps {
+  display: boolean;
   scope: Ast.decl | undefined;
   failed: boolean;
-  display: boolean;
   current: WP.goal;
   setCurrent: (goal: WP.goal) => void;
+  setTIP: (goal: WP.goal) => void;
   setGoals: (goals: number) => void;
   setTotal: (total: number) => void;
 }
@@ -106,7 +107,7 @@ export interface GoalTableProps {
 export function GoalTable(props: GoalTableProps): JSX.Element {
   const {
     display, scope, failed,
-    current, setCurrent,
+    current, setCurrent, setTIP,
     setGoals, setTotal,
   } = props;
   const { model } = States.useSyncArrayProxy(WP.goals);
@@ -117,6 +118,11 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
       States.setSelected(marker);
       setCurrent(wpo);
     }, [setCurrent]);
+  const onDoubleClick = React.useCallback(
+    ({ wpo }: WP.goalsData) => {
+      setTIP(wpo);
+    }, [setTIP]
+  );
 
   React.useEffect(() => {
     if (failed || !!scope) {
@@ -136,6 +142,7 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
       settings='wp.goals'
       selection={current}
       onSelection={onSelection}
+      onDoubleClick={onDoubleClick}
     >
       <Column id='scope' label='Scope'
               width={150}
