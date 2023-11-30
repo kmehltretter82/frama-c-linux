@@ -285,7 +285,6 @@ function ViewBar(): JSX.Element {
 
 Ivette.registerSidebar({
   id: "ivette.views",
-  rank: 100,
   label: "Views",
   title: "View Selector",
   children: <ViewBar />,

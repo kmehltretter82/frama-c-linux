@@ -173,7 +173,6 @@ export default function CoverageComponent(): JSX.Element {
 
 Ivette.registerComponent({
   id: 'fc.eva.coverage',
-  rank: 10,
   label: 'Eva Coverage',
   title: 'Detailed coverage of the Eva analysis',
   children: <CoverageComponent />,

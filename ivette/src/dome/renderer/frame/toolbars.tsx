@@ -314,13 +314,7 @@ export interface Hint {
   label: string;
   icon?: string;
   title?: string;
-  rank?: number;
   onClick?: () => void;
-}
-
-/** Total order on hints. */
-export function byHint(a: Hint, b: Hint): number {
-  return (a.rank ?? 0) - (b.rank ?? 0);
 }
 
 // --------------------------------------------------------------------------

@@ -42,7 +42,6 @@ Ivette.registerGroup({
 
 Ivette.registerView({
   id: 'fc.eva.summary',
-  rank: 3,
   label: 'Eva Summary',
   layout: {
     'A': 'fc.eva.summary',
@@ -53,7 +52,6 @@ Ivette.registerView({
 
 Ivette.registerView({
   id: 'fc.eva.values',
-  rank: 4,
   label: 'Eva Values',
   layout: {
     'A': 'fc.kernel.astview',

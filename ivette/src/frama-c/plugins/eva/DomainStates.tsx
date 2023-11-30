@@ -119,7 +119,6 @@ function EvaStatesComponent(): JSX.Element {
 
 Ivette.registerComponent({
   id: 'fc.eva.states',
-  rank: 10,
   label: 'Eva States',
   title: 'States of the Eva analysis',
   children: <EvaStatesComponent />,

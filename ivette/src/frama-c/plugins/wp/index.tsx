@@ -71,7 +71,6 @@ function WPGoals(): JSX.Element {
 
 Ivette.registerComponent({
   id: 'fc.wp.goals',
-  rank: 10,
   label: 'WP Goals',
   title: 'WP Generated Verification Conditions',
   children: <WPGoals />,
@@ -109,7 +108,6 @@ Ivette.registerStatusbar({
 
 Ivette.registerView({
   id: 'fc.wp.main',
-  rank: 5,
   label: 'WP View',
   layout: {
     'A': 'fc.kernel.astview',

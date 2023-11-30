@@ -125,7 +125,6 @@ Ivette.registerComponent({
 
 Ivette.registerView({
   id: 'fc.kernel.source',
-  rank: 1,
   label: 'Source Code',
   defaultView: true,
   layout: {
@@ -137,7 +136,6 @@ Ivette.registerView({
 
 Ivette.registerView({
   id: 'fc.kernel.properties',
-  rank: 2,
   label: 'Properties',
   layout: {
     A: 'fc.kernel.astview',
@@ -148,7 +146,6 @@ Ivette.registerView({
 
 Ivette.registerView({
   id: 'fc.kernel.pivot-table',
-  rank: 6,
   label: 'Pivot Table',
   layout: { 'ABCD': 'fc.kernel.pivottable' },
 });

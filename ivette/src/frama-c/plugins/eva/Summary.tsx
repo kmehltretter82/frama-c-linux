@@ -233,7 +233,6 @@ function EvaSummaryComponent(): JSX.Element {
 
 Ivette.registerComponent({
   id: 'fc.eva.summary',
-  rank: 10,
   label: 'Eva Summary',
   title: 'Summary of the Eva analysis',
   children: <EvaSummaryComponent />,

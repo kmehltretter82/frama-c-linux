@@ -59,17 +59,6 @@ export interface ModeProps {
 
 const defaultMode : ModeProps = { id: '' };
 
-function byRank(a: ModeProps, b: ModeProps): number
-{
-  const ra = a.rank ?? 0;
-  const rb = b.rank ?? 0;
-  if (ra > rb) return -1;
-  if (ra < rb) return +1;
-  if (a.id < b.id) return -1;
-  if (a.id > b.id) return +1;
-  return 0;
-}
-
 class ModeManager extends GlobalState<ModeProps> {
   constructor() { super(defaultMode); }
   private registry: Map<string, ModeProps> = new Map();
@@ -99,7 +88,7 @@ class ModeManager extends GlobalState<ModeProps> {
   }
 
   selfhints(): Hint[] {
-    return Array.from(this.registry, ([_, mode]) => mode).sort(byRank);
+    return Array.from(this.registry.values());
   }
 }
 

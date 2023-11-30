@@ -1168,7 +1168,6 @@ function EvaTable(): JSX.Element {
 /* Registers the component in Ivette */
 Ivette.registerComponent({
   id: 'fc.eva.values',
-  rank: 1,
   label: 'Eva Values',
   title: 'Values inferred by the Eva analysis',
   children: <EvaTable />,

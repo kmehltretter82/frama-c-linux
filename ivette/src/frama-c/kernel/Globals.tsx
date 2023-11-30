@@ -56,7 +56,6 @@ function globalHints(): Ivette.Hint[] {
 
 const globalMode : Ivette.ModeProps = {
   id: 'frama-c.kernel.globals',
-  rank: 1,
   label: 'Globals',
   title: 'Lookup for Global Declarations',
   placeholder: 'declaration',

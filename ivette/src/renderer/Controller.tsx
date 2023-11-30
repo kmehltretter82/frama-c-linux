@@ -406,13 +406,11 @@ Ivette.registerComponent({
   id: 'ivette.console',
   label: 'Console',
   title: 'Frama-C Server Output & Command Line',
-  rank: -1,
   children: <RenderConsole />,
 });
 
 Ivette.registerView({
   id: 'ivette.console',
-  rank: -1,
   label: 'Console',
   layout: { ABCD: 'ivette.console' },
 });

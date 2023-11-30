@@ -183,7 +183,6 @@ function Callgraph() : JSX.Element {
 Ivette.registerComponent({
   id: 'fc.callgraph',
   label: 'Call Graph',
-  rank: 3,
   title:
     'Display a graph showing calls between functions.',
   children: <Callgraph />,
