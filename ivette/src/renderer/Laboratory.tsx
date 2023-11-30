@@ -187,35 +187,41 @@ export function LabView(): JSX.Element {
 /* --- ViewBar                                                            --- */
 /* -------------------------------------------------------------------------- */
 
-export function ViewBar(): JSX.Element {
+function ViewBar(): JSX.Element {
   const [selected, setSelected] = React.useState("");
   const views = Ext.useElements(VIEW);
   const groups = Ext.useElements(GROUP);
   const components = Ext.useElements(COMPONENT);
-  const compsByGroup: Map<string, Ivette.ComponentProps[]> = new Map();
-  const defaultGroupName = "ungrouped";
-  const sandboxGroupName = "sandbox";
+  const compsByGroup: Map<Ivette.ItemProps, Ivette.ComponentProps[]>
+  = new Map();
   const sandboxGroupId = "sandbox";
+  const sandboxGroup = groups.filter(group => group.id === sandboxGroupId)[0];
+  const defaultGroup = {
+    id: "default",
+    label: "Components"
+  };
 
   groups.forEach(group => {
-    compsByGroup.set(group.id, []);
+    compsByGroup.set(group, []);
     components.forEach(comp => {
-      comp.id.startsWith(group.id) && compsByGroup.get(group.id)?.push(comp);
+      comp.id.startsWith(group.id + ".") &&
+      compsByGroup.get(group)?.push(comp);
     });
   });
 
-  compsByGroup.set(defaultGroupName, []);
+  compsByGroup.set(defaultGroup, []);
   let groupedComponents: Ivette.ComponentProps[] = [];
   compsByGroup.forEach(val =>
     groupedComponents = groupedComponents.concat(val));
   components.forEach(comp => {
     if(groupedComponents.indexOf(comp) === -1) {
-      compsByGroup.get(defaultGroupName)?.push(comp);
+      compsByGroup.get(defaultGroup)?.push(comp);
     }
   });
 
-  const compsSandbox = compsByGroup.get(sandboxGroupId);
-  compsByGroup.delete(sandboxGroupId);
+  if (!DEVEL) {
+    compsByGroup.delete(sandboxGroup);
+  }
 
   return (
     <Sidebars.SideBar>
@@ -254,27 +260,11 @@ export function ViewBar(): JSX.Element {
           });
 
           return (
-            <Sidebars.Section key= {key} label={group}>
+            <Sidebars.Section key= {key} label={group.label}>
               {items}
             </Sidebars.Section>
           );
         })
-      }
-      { DEVEL &&
-        <Sidebars.Section label={sandboxGroupName}>
-          {compsSandbox && compsSandbox.map((compo) =>
-            <Sidebars.Item
-              key={compo.id}
-              label={compo.label}
-              title={compo.title}
-              icon='COMPONENT'
-              selected={selected === compo.id}
-              onSelection={() => {
-                setSelected(compo.id);
-              }}
-            />
-          )}
-        </Sidebars.Section>
       }
     </Sidebars.SideBar>
   );
