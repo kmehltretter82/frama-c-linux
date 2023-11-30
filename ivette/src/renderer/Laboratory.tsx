@@ -23,6 +23,7 @@
 import React from "react";
 import * as States from 'dome/data/states';
 import * as Sidebars from 'dome/frame/sidebars';
+import { Icon } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { Hbox, Hfill, Vfill } from 'dome/layout/boxes';
 import { QPane, QSplit } from 'dome/layout/qsplit';
@@ -288,6 +289,67 @@ Ivette.registerSidebar({
   label: "Views",
   title: "View Selector",
   children: <ViewBar />,
+});
+
+/* -------------------------------------------------------------------------- */
+/* --- PanelLayoutSelector                                                --- */
+/* -------------------------------------------------------------------------- */
+
+export function PanelLayoutSelector(): JSX.Element {
+  const QSPLIT = "QSPLIT";
+  const iconSize = 30;
+
+  return (
+    <div className="panelLayoutSelector">
+      <Label>Panel Layout Selector</Label>
+      <table>
+        <tbody>
+          <tr>
+          <th className="panelLayoutSelector-hover">
+              <Icon id={"QSPLIT.A"} size={iconSize} /></th>
+            <th className="panelLayoutSelector-hover">
+              <Icon id={"QSPLIT.AB"} size={iconSize} /></th>
+            <th className="panelLayoutSelector-hover">
+              <Icon id={"QSPLIT.B"} size={iconSize} /></th>
+          </tr>
+          <tr>
+            <th className="panelLayoutSelector-hover">
+              <Icon id={"QSPLIT.AC"} size={iconSize} /></th>
+            <th className="panelLayoutSelector-hover">
+              <Icon id={"QSPLIT.ABCD"} size={iconSize} /></th>
+            <th className="panelLayoutSelector-hover">
+              <Icon id={"QSPLIT.BD"} size={iconSize} /></th>
+          </tr>
+          <tr>
+            <th className="panelLayoutSelector-hover">
+              <Icon id={"QSPLIT.C"} size={iconSize} /></th>
+            <th className="panelLayoutSelector-hover">
+              <Icon id={"QSPLIT.CD"} size={iconSize} /></th>
+            <th className="panelLayoutSelector-hover">
+              <Icon id={"QSPLIT.D"} size={iconSize} /></th>
+          </tr>
+        </tbody>
+      </table>
+      <div>
+        <div className="panelLayoutSelector-spaced">
+          Dock Panel
+          <Icon id={QSPLIT + ".DOCK"} size={30}
+          className="panelLayoutSelector-hover" />
+        </div>
+        <div className="panelLayoutSelector-spaced">
+          Remove Panel
+          <Icon id="TRASH" size={30}
+          className="panelLayoutSelector-hover" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Ivette.registerSandbox({
+  id: 'sandbox.panelLayoutSelector',
+  label: 'Panel Layout Selector',
+  children: <PanelLayoutSelector />,
 });
 
 /* -------------------------------------------------------------------------- */
