@@ -41,32 +41,46 @@ import './style.css';
 /* -------------------------------------------------------------------------- */
 
 function WPGoals(): JSX.Element {
-  const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped');
-  const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed');
+  const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped',false);
+  const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed',true);
+  const [list, flipListView] = Dome.useFlipSettings('frama-c.wp.goals.list',true);
+  const [current, setCurrent] = React.useState(WP.goalDefault);
   const scope = States.useCurrentScope();
   const [goals, setGoals] = React.useState(0);
   const [total, setTotal] = React.useState(0);
-  const onFilter = React.useCallback((goals, total) => {
-    setGoals(goals);
-    setTotal(total);
-  }, [setGoals, setTotal]);
-  const current = scoped ? scope : undefined;
-    return (
-      <>
-        <Ivette.TitleBar>
-          <Label display={goals < total}>
-            {goals} / {total}
-          </Label>
-          <Inset />
-          <IconButton icon='COMPONENT' title='Current Scope Only'
-                      enabled={!!current}
-                      selected={scoped} onClick={flipScoped} />
-          <IconButton icon='CIRC.QUESTION' title='Unresolved Goals Only'
-                      selected={failed} onClick={flipFailed} />
-        </Ivette.TitleBar>
-        <GoalTable scope={scope} failed={failed} onFilter={onFilter} />
-      </>
-    );
+  const hasGoals = total > 0;
+  return (
+    <>
+      <Ivette.TitleBar>
+        <Label display={goals < total}>
+          {goals} / {total}
+        </Label>
+        <Inset />
+        <IconButton icon='CURSOR' title='Current Scope Only'
+                    enabled={hasGoals}
+                    selected={scoped}
+                    onClick={flipScoped} />
+        <IconButton icon='CIRC.QUESTION' title='Unresolved Goals Only'
+                    enabled={hasGoals}
+                    selected={failed}
+                    onClick={flipFailed} />
+        <IconButton icon='ITEMS.LIST'
+                    title='Goals List / Current Goal Details'
+                    enabled={hasGoals}
+                    selected={list}
+                    onClick={flipListView} />
+      </Ivette.TitleBar>
+      <GoalTable
+        display={list}
+        scope={scope}
+        failed={failed}
+        current={current}
+        setCurrent={setCurrent}
+        setGoals={setGoals}
+        setTotal={setTotal}
+      />
+    </>
+  );
 }
 
 Ivette.registerComponent({

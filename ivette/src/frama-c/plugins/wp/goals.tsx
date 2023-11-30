@@ -96,19 +96,27 @@ function filterGoal(
 export interface GoalTableProps {
   scope: Ast.decl | undefined;
   failed: boolean;
-  onFilter: (goals: number, total: number) => void;
+  display: boolean;
+  current: WP.goal;
+  setCurrent: (goal: WP.goal) => void;
+  setGoals: (goals: number) => void;
+  setTotal: (total: number) => void;
 }
 
 export function GoalTable(props: GoalTableProps): JSX.Element {
-  const { scope, failed, onFilter } = props;
-  const model = States.useSyncArrayModel(WP.goals);
-  const [wpoSelection, setWpoSelection] = React.useState(WP.goalDefault);
-
-  const onWpoSelection = React.useCallback(
+  const {
+    display, scope, failed,
+    current, setCurrent,
+    setGoals, setTotal,
+  } = props;
+  const { model } = States.useSyncArrayProxy(WP.goals);
+  const goals = model.getRowCount();
+  const total = model.getTotalRowCount();
+  const onSelection = React.useCallback(
     ({ wpo, property }: WP.goalsData) => {
       States.setSelected(property);
-      setWpoSelection(wpo);
-    }, []);
+      setCurrent(wpo);
+    }, [setCurrent]);
 
   React.useEffect(() => {
     if (failed || !!scope) {
@@ -116,17 +124,18 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
     } else {
       model.setFilter();
     }
-    const goals = model.getRowCount();
-    const total = model.getTotalRowCount();
-    onFilter(goals, total);
-  }, [model, scope, failed, onFilter]);
+  }, [model, scope, failed]);
+
+  React.useEffect(() => setGoals(goals), [goals, setGoals]);
+  React.useEffect(() => setTotal(total), [total, setTotal]);
 
   return (
     <Table
       model={model}
+      display={display}
       settings='wp.goals'
-      onSelection={onWpoSelection}
-      selection={wpoSelection}
+      selection={current}
+      onSelection={onSelection}
     >
       <Column id='scope' label='Scope'
               width={150}
