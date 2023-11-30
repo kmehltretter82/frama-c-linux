@@ -23,7 +23,7 @@
 /* --- Generated Frama-C Server API --- */
 
 /**
-   Callgraph
+   Callgraph Services
    @packageDocumentation
    @module frama-c/plugins/callgraph/api
 */
