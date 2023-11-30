@@ -45,6 +45,7 @@ function getScope(g : WP.goalsData): string {
 
 interface IconStatus {
   icon: string;
+  label: string;
   kind: IconKind;
   title: string;
 }
@@ -52,22 +53,24 @@ interface IconStatus {
 interface Status extends IconStatus { label: string }
 
 const noResult : IconStatus =
-  { icon: 'MINUS', kind: 'disabled', title: 'No Result' };
+  { icon: 'MINUS', label: 'No Result', kind: 'disabled', title: 'No Result' };
 
+/* eslint-disable max-len */
 const baseStatus : { [key:string]: IconStatus } = {
-  'VALID': { icon: 'CHECK', kind: 'positive', title: 'Valid Goal' },
-  'PASSED': { icon: 'CHECK', kind: 'positive', title: 'Passed Test' },
-  'DOOMED': { icon: 'CROSS', kind: 'negative', title: 'Doomed Test' },
-  'FAILED': { icon: 'WARNING', kind: 'negative', title: 'Prover Failure' },
-  'UNKNOWN': { icon: 'ATTENTION', kind: 'warning', title: 'Prover Stucked' },
-  'TIMEOUT': { icon: 'HELP', kind: 'warning', title: 'Prover Timeout' },
-  'STEPOUT': { icon: 'HELP', kind: 'warning', title: 'Prover Stepout' },
-  'COMPUTING': { icon: 'EXECUTE', kind: 'default', title: 'Computing…' },
+  'VALID': { icon: 'CHECK', label: 'Valid', kind: 'positive', title: 'Valid Goal' },
+  'PASSED': { icon: 'CHECK', label: 'Passed', kind: 'positive', title: 'Passed Test' },
+  'DOOMED': { icon: 'CROSS', label: 'Doomed', kind: 'negative', title: 'Doomed Test' },
+  'FAILED': { icon: 'WARNING', label: 'Failed', kind: 'negative', title: 'Prover Failure' },
+  'UNKNOWN': { icon: 'ATTENTION', label: 'Unknown', kind: 'warning', title: 'Prover Stucked' },
+  'TIMEOUT': { icon: 'HELP', label: 'Timeout', kind: 'warning', title: 'Prover Timeout' },
+  'STEPOUT': { icon: 'HELP', label: 'Stepout', kind: 'warning', title: 'Prover Stepout' },
+  'COMPUTING': { icon: 'EXECUTE', label: 'Running', kind: 'default', title: 'Prover is running' },
 };
+/* eslint-enable max-len */
 
-function getStatus(g : WP.goalsData): Status {
-  const base = baseStatus[g.status] ?? noResult;
-  return { ...base, label: g.stats.summary };
+export function getStatus(g : WP.goalsData): Status {
+  const { label, ...base } = baseStatus[g.status] ?? noResult;
+  return { ...base, label: label + g.stats.summary };
 }
 
 function renderStatus(s : Status): JSX.Element {

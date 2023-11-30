@@ -34,7 +34,7 @@ import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import { GoalTable } from './goals';
-import { TIP } from './tip';
+import { TIPView } from './tip';
 import * as WP from 'frama-c/plugins/wp/api';
 import './style.css';
 
@@ -45,15 +45,17 @@ import './style.css';
 function WPGoals(): JSX.Element {
   const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped');
   const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed');
-  const [tip, flipTip] = Dome.useFlipSettings('frama-c.wp.goals.tip', false);
+  const [displayTip, setTip] = React.useState(false);
   const [current, setCurrent] = React.useState(WP.goalDefault);
-  Server.useShutdown(() => setCurrent(WP.goalDefault));
+  Server.useShutdown(() => {
+    setTip(false);
+    setCurrent(WP.goalDefault);
+  });
   const scope = States.useCurrentScope();
   const [goals, setGoals] = React.useState(0);
   const [total, setTotal] = React.useState(0);
   const hasGoals = total > 0;
   const hasSelection = current !== WP.goalDefault;
-  const displayTip = tip && hasSelection;
   return (
     <>
       <Ivette.TitleBar>
@@ -76,7 +78,7 @@ function WPGoals(): JSX.Element {
           kind={displayTip ? 'warning' : 'positive'}
           title='Goal Resolution'
           enabled={hasSelection}
-          onClick={flipTip} />
+          onClick={() => setTip(!displayTip)} />
       </Ivette.TitleBar>
       <GoalTable
         display={!displayTip}
@@ -84,11 +86,11 @@ function WPGoals(): JSX.Element {
         failed={failed}
         current={current}
         setCurrent={setCurrent}
-        setTIP={flipTip}
+        setTIP={() => setTip(true)}
         setGoals={setGoals}
         setTotal={setTotal}
       />
-      <TIP
+      <TIPView
         display={displayTip}
         goal={current} />
     </>
