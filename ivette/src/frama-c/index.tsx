@@ -67,7 +67,7 @@ Ivette.registerStatusbar({ id: 'ivette.status', children: <Status /> });
 
 Ivette.registerGroup({
   id: 'fc.kernel',
-  label: 'Frama-C Kernel',
+  label: 'Frama-C',
 });
 
 Ivette.registerComponent({

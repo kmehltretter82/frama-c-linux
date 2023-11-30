@@ -282,16 +282,11 @@ export function useMode(m: ModeProps): void {
 /* --------------------------------------------------------------------------*/
 
 if (DEVEL) {
-  registerGroup({
-    id: 'sandbox',
-    label: 'Sandbox',
-    title: 'Ivette Sandbox Components (only in DEVEL mode)',
-  });
   registerView({
     id: 'sandbox',
     label: 'Sandbox',
     title: 'Sandbox Playground (only in DEVEL mode)',
-    layout: { ABCD: 'sandbox.qsplitter' },
+    layout: { ABCD: 'sandbox.qsplit' },
   });
 }
 

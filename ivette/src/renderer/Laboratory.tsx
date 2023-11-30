@@ -21,7 +21,6 @@
 /* ************************************************************************ */
 
 import React from "react";
-import { DEVEL } from 'dome';
 import * as States from 'dome/data/states';
 import * as Sidebars from 'dome/frame/sidebars';
 import { Label } from 'dome/controls/labels';
@@ -46,45 +45,47 @@ const defaultLabViewState: LabViewState = {
   components: new Set<string>(),
   selectedView: "default"
 };
+
 const globalLabViewState = new States.GlobalState<LabViewState>(
   defaultLabViewState
 );
 
-function applyLayout(viewId : string, newLayout: Ivette.Layout):void {
+function applyLayout(view : Ivette.ViewLayoutProps):void {
+  const { layout } = view;
   let A, B, C, D;
 
-  if("A" in newLayout) A = newLayout.A;
-  if("B" in newLayout) B = newLayout.B;
-  if("C" in newLayout) C = newLayout.C;
-  if("D" in newLayout) D = newLayout.D;
+  if("A" in layout) A = layout.A;
+  if("B" in layout) B = layout.B;
+  if("C" in layout) C = layout.C;
+  if("D" in layout) D = layout.D;
 
-  if("AB" in newLayout) {
-    A = newLayout.AB;
-    B = newLayout.AB;
+  if("AB" in layout) {
+    A = layout.AB;
+    B = layout.AB;
   }
-  if("AC" in newLayout) {
-    A = newLayout.AC;
-    C = newLayout.AC;
+  if("AC" in layout) {
+    A = layout.AC;
+    C = layout.AC;
   }
-  if("BD" in newLayout) {
-    B = newLayout.BD;
-    D = newLayout.BD;
+  if("BD" in layout) {
+    B = layout.BD;
+    D = layout.BD;
   }
-  if("CD" in newLayout) {
-    C = newLayout.CD;
-    D = newLayout.CD;
+  if("CD" in layout) {
+    C = layout.CD;
+    D = layout.CD;
   }
 
-  if("ABCD" in newLayout) {
-    A = newLayout.ABCD;
-    B = newLayout.ABCD;
-    C = newLayout.ABCD;
-    D = newLayout.ABCD;
+  if("ABCD" in layout) {
+    A = layout.ABCD;
+    B = layout.ABCD;
+    C = layout.ABCD;
+    D = layout.ABCD;
   }
 
   const state = globalLabViewState.getValue();
   const components = state.components;
-  Object.values(newLayout).forEach(compId => {
+  Object.values(layout).forEach(compId => {
     components.add(compId);
   });
 
@@ -92,7 +93,7 @@ function applyLayout(viewId : string, newLayout: Ivette.Layout):void {
     ...state,
     A: A, B: B, C: C, D: D,
     components: components,
-    selectedView: viewId
+    selectedView: view.id,
   });
 }
 
@@ -184,47 +185,13 @@ export function LabView(): JSX.Element {
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- ViewBar                                                            --- */
+/* --- View Sidebar Section                                               --- */
 /* -------------------------------------------------------------------------- */
 
-function ViewBar(): JSX.Element {
-  const [selected, setSelected] = React.useState("");
+function ViewSection(): JSX.Element {
   const views = Ext.useElements(VIEW);
-  const groups = Ext.useElements(GROUP);
-  const components = Ext.useElements(COMPONENT);
-  const compsByGroup: Map<Ivette.ItemProps, Ivette.ComponentProps[]>
-  = new Map();
-  const sandboxGroupId = "sandbox";
-  const sandboxGroup = groups.filter(group => group.id === sandboxGroupId)[0];
-  const defaultGroup = {
-    id: "default",
-    label: "Components"
-  };
-
-  groups.forEach(group => {
-    compsByGroup.set(group, []);
-    components.forEach(comp => {
-      comp.id.startsWith(group.id + ".") &&
-      compsByGroup.get(group)?.push(comp);
-    });
-  });
-
-  compsByGroup.set(defaultGroup, []);
-  let groupedComponents: Ivette.ComponentProps[] = [];
-  compsByGroup.forEach(val =>
-    groupedComponents = groupedComponents.concat(val));
-  components.forEach(comp => {
-    if(groupedComponents.indexOf(comp) === -1) {
-      compsByGroup.get(defaultGroup)?.push(comp);
-    }
-  });
-
-  if (!DEVEL) {
-    compsByGroup.delete(sandboxGroup);
-  }
-
-  return (
-    <Sidebars.SideBar>
+  const [{ selectedView }] = States.useGlobalState(globalLabViewState);
+    return (
       <Sidebars.Section label="Views" defaultUnfold>
         {views.map((view) =>
           <Sidebars.Item
@@ -232,40 +199,86 @@ function ViewBar(): JSX.Element {
             label={view.label}
             title={view.title}
             icon='DISPLAY'
-            selected={globalLabViewState.getValue().selectedView === view.id}
-            onSelection={() => {
-              applyLayout(view.id, view.layout);
-              setSelected(view.id);
-            }}
+            selected={selectedView === view.id}
+            onSelection={() => applyLayout(view)}
           />
         )}
       </Sidebars.Section>
-      {
-        Array.from(compsByGroup.keys()).map((group, key) => {
-          const items: JSX.Element[] = [];
+    );
+}
 
-          compsByGroup.get(group)?.forEach(comp => {
-            items.push(
-              <Sidebars.Item
-                key={comp.id}
-                label={comp.label}
-                title={comp.title}
-                icon='COMPONENT'
-                selected={selected === comp.id}
-                onSelection={() => {
-                  setSelected(comp.id);
-                }}
-              />
-            );
-          });
+/* -------------------------------------------------------------------------- */
+/* --- Component Sidebar Item                                             --- */
+/* -------------------------------------------------------------------------- */
 
-          return (
-            <Sidebars.Section key= {key} label={group.label}>
-              {items}
-            </Sidebars.Section>
-          );
-        })
-      }
+function ComponentItem(comp: Ivette.ItemProps): JSX.Element {
+  // TODO: onclick/rightclick...
+  return (
+    <Sidebars.Item
+      icon='COMPONENT'
+      label={comp.label}
+      title={comp.title} />
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Group Sidebar Section                                              --- */
+/* -------------------------------------------------------------------------- */
+
+interface ID { id: string }
+
+const inGroup = (group: ID) => (elt: ID) => elt.id.startsWith(group.id+'.');
+const groupOf = (elt: ID) => (group: ID) => elt.id.startsWith(group.id+'.');
+const inNoGroup = (groups: ID[]) => (elt: ID) => !groups.some(groupOf(elt));
+
+interface GroupSectionProps extends Ivette.ItemProps {
+  filter: (comp: ID) => boolean;
+}
+
+function GroupSection(props: GroupSectionProps): JSX.Element | null {
+  const { id, label, title, filter } = props;
+  const settings = 'ivette.sidebar.group.' + id;
+  const components = Ext.useElements(COMPONENT).filter(filter);
+  if (!components.length) return null;
+  return (
+    <Sidebars.Section settings={settings} label={label} title={title}>
+      {components.map((comp) => <ComponentItem key={comp.id} {...comp} />)}
+    </Sidebars.Section>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Views & Components Sidebar                                         --- */
+/* -------------------------------------------------------------------------- */
+
+const Components: Ivette.ItemProps = {
+  id: 'components',
+  label: 'Other Plugins',
+  title: 'Components from other Frama-C Plugins'
+};
+
+const Sandbox: Ivette.ItemProps = {
+  id: 'sandbox',
+  label: 'Sandbox',
+  title: 'Sandbox Components (dev mode only)'
+};
+
+function ViewBar(): JSX.Element {
+  const groups = Ext.useElements(GROUP);
+  const allGroups = groups.concat(Sandbox);
+  return (
+    <Sidebars.SideBar>
+      <ViewSection key='views'/>
+      {groups.map((group) =>
+        <GroupSection
+          key={group.id}
+          filter={inGroup(group)} {...group} />)}
+      <GroupSection
+        key='components'
+        filter={inNoGroup(allGroups)} {...Components} />
+      <GroupSection
+        key='sandbox'
+        filter={inGroup(Sandbox)} {...Sandbox} />
     </Sidebars.SideBar>
   );
 }
