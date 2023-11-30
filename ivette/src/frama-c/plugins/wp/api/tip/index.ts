@@ -78,7 +78,8 @@ export const proofStatus: Server.Signal = {
 const getNodeInfos_internal: Server.GetRequest<
   Json.index<'#node'>,
   { result: string, proved: boolean, pending: number, size: number,
-    stats: string }
+    stats: string, results: [ prover, result ][], tactic: string,
+    children: [ string, Json.index<'#node'> ][] }
   > = {
   kind: Server.RqKind.GET,
   name: 'plugins.wp.tip.getNodeInfos',
@@ -89,30 +90,6 @@ const getNodeInfos_internal: Server.GetRequest<
             pending: Json.jNumber,
             size: Json.jNumber,
             stats: Json.jString,
-          }),
-  signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
-};
-/** Proof node information */
-export const getNodeInfos: Server.GetRequest<
-  Json.index<'#node'>,
-  { result: string, proved: boolean, pending: number, size: number,
-    stats: string }
-  >= getNodeInfos_internal;
-
-const getProofState_internal: Server.GetRequest<
-  goal,
-  { current: Json.index<'#node'>, parents: Json.index<'#node'>[],
-    pending: number, index: number, results: [ prover, result ][],
-    tactic: string, children: [ string, Json.index<'#node'> ][] }
-  > = {
-  kind: Server.RqKind.GET,
-  name: 'plugins.wp.tip.getProofState',
-  input: jGoal,
-  output: Json.jObject({
-            current: Json.jIndex<'#node'>('#node'),
-            parents: Json.jArray(Json.jIndex<'#node'>('#node')),
-            pending: Json.jNumber,
-            index: Json.jNumber,
             results: Json.jArray(Json.jPair( jProver, jResult,)),
             tactic: Json.jString,
             children: Json.jArray(
@@ -123,12 +100,35 @@ const getProofState_internal: Server.GetRequest<
           }),
   signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
 };
+/** Proof node information */
+export const getNodeInfos: Server.GetRequest<
+  Json.index<'#node'>,
+  { result: string, proved: boolean, pending: number, size: number,
+    stats: string, results: [ prover, result ][], tactic: string,
+    children: [ string, Json.index<'#node'> ][] }
+  >= getNodeInfos_internal;
+
+const getProofState_internal: Server.GetRequest<
+  goal,
+  { current: Json.index<'#node'>, path: Json.index<'#node'>[], index: number,
+    pending: number }
+  > = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.tip.getProofState',
+  input: jGoal,
+  output: Json.jObject({
+            current: Json.jIndex<'#node'>('#node'),
+            path: Json.jArray(Json.jIndex<'#node'>('#node')),
+            index: Json.jNumber,
+            pending: Json.jNumber,
+          }),
+  signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
+};
 /** Current Proof Status of a Goal */
 export const getProofState: Server.GetRequest<
   goal,
-  { current: Json.index<'#node'>, parents: Json.index<'#node'>[],
-    pending: number, index: number, results: [ prover, result ][],
-    tactic: string, children: [ string, Json.index<'#node'> ][] }
+  { current: Json.index<'#node'>, path: Json.index<'#node'>[], index: number,
+    pending: number }
   >= getProofState_internal;
 
 const goForward_internal: Server.SetRequest<goal,null> = {

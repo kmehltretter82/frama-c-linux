@@ -45,27 +45,43 @@ let proofStatus = R.signal ~package ~name:"proofStatus"
 module Node = D.Index(Map.Make(ProofEngine.Node))(struct let name = "node" end)
 
 let () =
-  let snode = R.signature ~input:(module Node) () in
-  let set_title = R.result snode ~name:"result"
+  let inode = R.signature ~input:(module Node) () in
+  let set_title = R.result inode ~name:"result"
       ~descr:(Md.plain "Proof node title") (module D.Jstring) in
-  let set_proved = R.result snode ~name:"proved"
+  let set_proved = R.result inode ~name:"proved"
       ~descr:(Md.plain "Proof node complete") (module D.Jbool) in
-  let set_pending = R.result snode ~name:"pending"
+  let set_pending = R.result inode ~name:"pending"
       ~descr:(Md.plain "Pending children") (module D.Jint) in
-  let set_size = R.result snode ~name:"size"
+  let set_size = R.result inode ~name:"size"
       ~descr:(Md.plain "Proof size") (module D.Jint) in
-  let set_stats = R.result snode ~name:"stats"
+  let set_stats = R.result inode ~name:"stats"
       ~descr:(Md.plain "Node statistics") (module D.Jstring) in
+  let set_results = R.result inode ~name:"results"
+      ~descr:(Md.plain "Prover results for current node")
+      (module D.Jlist(D.Jpair(Prover)(Result))) in
+  let set_tactic = R.result inode ~name:"tactic"
+      ~descr:(Md.plain "Proof node tactic header (if any)")
+      (module D.Jstring) in
+  let set_children = R.result inode ~name:"children"
+      ~descr:(Md.plain "Proof node tactic children (id any)")
+      (module D.Jlist(D.Jpair(D.Jstring)(Node))) in
   R.register_sig ~package ~kind:`GET ~name:"getNodeInfos"
-    ~descr:(Md.plain "Proof node information") snode
+    ~descr:(Md.plain "Proof node information") inode
     ~signals:[proofStatus]
     begin fun rq node ->
       set_title rq (ProofEngine.title node) ;
       set_proved rq (ProofEngine.proved node) ;
       set_pending rq (ProofEngine.pending node) ;
       let s = ProofEngine.stats node in
+      let tactic =
+        match ProofEngine.tactical node with
+        | None -> ""
+        | Some { header } -> header in
       set_size rq (Stats.subgoals s) ;
       set_stats rq (Pretty_utils.to_string Stats.pretty s) ;
+      set_results rq (Wpo.get_results (ProofEngine.goal node)) ;
+      set_tactic rq tactic ;
+      set_children rq (ProofEngine.children node) ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -76,22 +92,13 @@ let () =
   let state = R.signature ~input:(module Goal) () in
   let set_current = R.result state ~name:"current"
       ~descr:(Md.plain "Current proof node") (module Node) in
-  let set_parents = R.result state ~name:"parents"
+  let set_path = R.result state ~name:"path"
       ~descr:(Md.plain "Proof node parents") (module D.Jlist(Node)) in
-  let set_pending = R.result state ~name:"pending"
-      ~descr:(Md.plain "Pending proof nodes") (module D.Jint) in
   let set_index = R.result state ~name:"index"
       ~descr:(Md.plain "Current node index among pending nodes (else -1)")
       (module D.Jint) in
-  let set_results = R.result state ~name:"results"
-      ~descr:(Md.plain "Prover results for current node")
-      (module D.Jlist(D.Jpair(Prover)(Result))) in
-  let set_tactic = R.result state ~name:"tactic"
-      ~descr:(Md.plain "Proof node tactic header (if any)")
-      (module D.Jstring) in
-  let set_children = R.result state ~name:"children"
-      ~descr:(Md.plain "Proof node tactic children (id any)")
-      (module D.Jlist(D.Jpair(D.Jstring)(Node))) in
+  let set_pending = R.result state ~name:"pending"
+      ~descr:(Md.plain "Pending proof nodes") (module D.Jint) in
   R.register_sig ~package
     ~kind:`GET ~name:"getProofState"
     ~descr:(Md.plain "Current Proof Status of a Goal") state
@@ -103,19 +110,13 @@ let () =
         | `Main -> ProofEngine.root tree,-1
         | `Internal node -> node,-1
         | `Leaf(idx,node) -> node,idx in
-      let rec parents node = match ProofEngine.parent node with
+      let rec path node = match ProofEngine.parent node with
         | None -> []
-        | Some p -> p::parents p in
-      let tactic = match ProofEngine.tactical current with
-        | None -> ""
-        | Some { header } -> header in
+        | Some p -> p::path p in
       set_current rq current ;
-      set_parents rq (parents current) ;
+      set_path rq (path current) ;
       set_index rq index ;
       set_pending rq (ProofEngine.pending current) ;
-      set_results rq (Wpo.get_results (ProofEngine.goal current)) ;
-      set_tactic rq tactic ;
-      set_children rq (ProofEngine.children current) ;
     end
 
 (* -------------------------------------------------------------------------- *)
