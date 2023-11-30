@@ -173,23 +173,34 @@ let match_call ~builder new_callee new_tparams args =
   Build.(List.iter pure (of_exp_list unused_args));
   Build.(translated_call (var new_callee) (of_exp_list new_args))
 
+
+let check_available_name env name =
+  not @@ Environment.mem_global env name
+  && not @@ Environment.mem_function env name
+
+let get_next_name env id name =
+  let rec aux id =
+    let next_name = name ^ (string_of_int id) in
+    if check_available_name env next_name then
+      next_name, id
+    else
+      aux (id + 1)
+  in
+  aux id
+
 (* ************************************************************************ *)
 (* Fallback calls                                                           *)
 (* ************************************************************************ *)
 
-let fallback_fun_call ~builder ~callee vf args =
+let fallback_fun_call ~builder ~callee env vf args =
   let module Build = (val builder : Builder.S) in
 
   (* Choose function name *)
   let name = callee.vname in
   let vorig_name = callee.vorig_name in
-  let count =
-    try Fallback_counts.find name
-    with Not_found -> 0
-  in
-  let count = count + 1 in
-  Fallback_counts.replace name count;
-  let new_name = name ^ "_fallback_" ^ (string_of_int count) in
+  let count = try Fallback_counts.find name + 1 with Not_found -> 1 in
+  let new_name, new_count = get_next_name env count (name ^ "_fallback_") in
+  Fallback_counts.replace name new_count;
 
   (* Start building the function *)
   let loc = vf.vf_decl.vdecl in
@@ -431,15 +442,15 @@ let valid_read_nstring typ =
 let format_length typ =
   find_predicate_by_width typ "format_length" "wformat_length"
 
-
 let build_specialized_fun ~builder env vf format_fun tvparams =
   let open Format_types in
   let module Build = (val builder : Builder.S) in
 
   (* Choose function name *)
   let name = vf.vf_decl.vorig_name in
-  vf.vf_specialization_count <- vf.vf_specialization_count + 1;
-  let new_name = name ^ "_va_" ^ (string_of_int vf.vf_specialization_count) in
+  let id = vf.vf_specialization_count + 1 in
+  let new_name, new_count = get_next_name env id (name ^ "_va_") in
+  vf.vf_specialization_count <- new_count;
 
   (* Start building the function *)
   let loc = vf.vf_decl.vdecl in
