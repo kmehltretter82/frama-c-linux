@@ -34,9 +34,6 @@ theory Qed
   function eqb (x y : 'a) : bool (*= if x = y then True else False*)
   axiom eqb : forall x:'a, y:'a. eqb x y = True <-> x = y
 
-  axiom eqb_false : forall x:'a, y:'a. eqb x y = False <-> x <> y
-  meta "remove_for_" axiom eqb_false
-
   function neqb (x y : 'a) : bool(* = if x <> y then True else False*)
   axiom neqb : forall x:'a, y:'a. neqb x y = True <-> x <> y
 
