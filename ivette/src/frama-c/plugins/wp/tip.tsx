@@ -22,7 +22,8 @@
 
 import React from 'react';
 import { Cell } from 'dome/controls/labels';
-import { Vfill, Hbox } from 'dome/layout/boxes';
+import { ToolBar } from 'dome/frame/toolbars';
+import { Vfill } from 'dome/layout/boxes';
 import { MarkDecoration, Decorations, TextView } from 'dome/text/richtext';
 import * as States from 'frama-c/states';
 import * as RichText from 'frama-c/richtext';
@@ -145,16 +146,16 @@ export function TIPView(props: TIPProps): JSX.Element {
   const { current, index, pending } = useProofState(goal);
   return (
     <Vfill display={display}>
-      <Hbox>
+      <ToolBar>
         <Cell
           icon='HOME'
           label={infos.wpo} title='Goal identifier' />
         <Cell
           icon='CODE'
-          display={0 <= index && index < pending}
-          label={`${index}/${pending}`} title='Pending proof nodes'/>
+          display={0 <= index && index < pending && 1 < pending}
+          label={`${index+1}/${pending}`} title='Pending proof nodes'/>
         <Cell {...getStatus(infos)}/>
-      </Hbox>
+      </ToolBar>
       <GoalView node={current} />
     </Vfill>
   );

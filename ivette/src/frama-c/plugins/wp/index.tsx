@@ -47,17 +47,19 @@ type Goal = WP.goal | undefined;
 function WPGoals(): JSX.Element {
   const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped');
   const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed');
-  const [displayTip, setTip] = React.useState(false);
+  const [tip, setTip] = React.useState(false);
   const [current, setCurrent] = React.useState<Goal>(undefined);
   Server.useShutdown(() => { setTip(false); setCurrent(undefined); });
   const scope = States.useCurrentScope();
   const [goals, setGoals] = React.useState(0);
   const [total, setTotal] = React.useState(0);
   const hasGoals = total > 0;
-  const hasSelection = current !== WP.goalDefault;
   return (
     <>
-      <Ivette.TitleBar>
+      <Ivette.TitleBar
+        label={tip ? 'WP — TIP' : 'WP — Goals'}
+        title={tip ? 'Interactive Proof Transformer' : 'Generated Goals'}
+      >
         <Label display={goals < total}>
           {goals} / {total}
         </Label>
@@ -73,14 +75,14 @@ function WPGoals(): JSX.Element {
           selected={failed}
           onClick={flipFailed} />
         <IconButton
-          icon={displayTip ? 'ITEMS.LIST' : 'MEDIA.PLAY'}
-          kind={displayTip ? 'warning' : 'positive'}
-          title='Goal Resolution'
-          enabled={hasSelection}
-          onClick={() => setTip(!displayTip)} />
+          icon={tip ? 'ITEMS.LIST' : 'MEDIA.PLAY'}
+          kind={tip ? 'warning' : 'positive'}
+          title={tip ? 'Back to Goals' : 'Interactive Proof Transformer'}
+          enabled={!!current}
+          onClick={() => setTip(!tip)} />
       </Ivette.TitleBar>
       <GoalTable
-        display={!displayTip}
+        display={!tip}
         scope={scope}
         failed={failed}
         current={current}
@@ -90,7 +92,7 @@ function WPGoals(): JSX.Element {
         setTotal={setTotal}
       />
       <TIPView
-        display={displayTip}
+        display={tip}
         goal={current} />
     </>
   );
