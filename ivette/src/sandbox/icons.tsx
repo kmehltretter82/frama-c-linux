@@ -45,12 +45,8 @@ function Gallery(): JSX.Element {
       icons = [];
       gallery.set(section, icons);
     }
-    icons.push(
-      <>
-        <Code icon={id} label={id} />
-        <Label>{title}</Label>
-      </>
-    );
+    icons.push(<Code key={'C'+id} icon={id} label={id} />);
+    icons.push(<Label key={'L'+id} label={title} />);
   });
   const sections : JSX.Element[] = [];
   gallery.forEach((icons, section) => {
