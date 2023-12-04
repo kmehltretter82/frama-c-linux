@@ -37,6 +37,14 @@ import * as Server from 'frama-c/server';
 //@ts-ignore
 import * as State from 'frama-c/states';
 
+//@ts-ignore
+import { byNode } from 'frama-c/plugins/wp/api/tip';
+//@ts-ignore
+import { jNode } from 'frama-c/plugins/wp/api/tip';
+//@ts-ignore
+import { node } from 'frama-c/plugins/wp/api/tip';
+//@ts-ignore
+import { nodeDefault } from 'frama-c/plugins/wp/api/tip';
 
 /** Parameter kind */
 export type kind =
@@ -256,31 +264,25 @@ export const tacticalDataDefault: tacticalData =
   { id: Json.jKey<'#tactic'>('#tactic')(''), label: '', title: '',
     error: undefined, status: statusDefault, params: [] };
 
-const configureTactics_internal: Server.ExecRequest<
-  { node: Json.index<'#node'> },
-  null
-  > = {
+const configureTactics_internal: Server.ExecRequest<{ node: node },null> = {
   kind: Server.RqKind.EXEC,
   name: 'plugins.wp.tac.configureTactics',
-  input: Json.jObject({ node: Json.jIndex<'#node'>('#node'),}),
+  input: Json.jObject({ node: jNode,}),
   output: Json.jNull,
   signals: [ { name: 'plugins.wp.tip.printStatus' } ],
 };
 /** Configure all tactics */
-export const configureTactics: Server.ExecRequest<
-  { node: Json.index<'#node'> },
-  null
-  >= configureTactics_internal;
+export const configureTactics: Server.ExecRequest<{ node: node },null>= configureTactics_internal;
 
 const setParameter_internal: Server.ExecRequest<
-  { node: Json.index<'#node'>, tactic: Json.key<'#tactic'>,
-    param: Json.key<'#param'>, value: Json.json },
+  { node: node, tactic: Json.key<'#tactic'>, param: Json.key<'#param'>,
+    value: Json.json },
   null
   > = {
   kind: Server.RqKind.EXEC,
   name: 'plugins.wp.tac.setParameter',
   input: Json.jObject({
-           node: Json.jIndex<'#node'>('#node'),
+           node: jNode,
            tactic: Json.jKey<'#tactic'>('#tactic'),
            param: Json.jKey<'#param'>('#param'),
            value: Json.jAny,
@@ -290,25 +292,19 @@ const setParameter_internal: Server.ExecRequest<
 };
 /** Configure tactical parameter */
 export const setParameter: Server.ExecRequest<
-  { node: Json.index<'#node'>, tactic: Json.key<'#tactic'>,
-    param: Json.key<'#param'>, value: Json.json },
+  { node: node, tactic: Json.key<'#tactic'>, param: Json.key<'#param'>,
+    value: Json.json },
   null
   >= setParameter_internal;
 
-const applyTactic_internal: Server.ExecRequest<
-  Json.key<'#tactic'>,
-  Json.index<'#node'>[]
-  > = {
+const applyTactic_internal: Server.ExecRequest<Json.key<'#tactic'>,node[]> = {
   kind: Server.RqKind.EXEC,
   name: 'plugins.wp.tac.applyTactic',
   input: Json.jKey<'#tactic'>('#tactic'),
-  output: Json.jArray(Json.jIndex<'#node'>('#node')),
+  output: Json.jArray(jNode),
   signals: [],
 };
 /** Applies the (configured) tactic */
-export const applyTactic: Server.ExecRequest<
-  Json.key<'#tactic'>,
-  Json.index<'#node'>[]
-  >= applyTactic_internal;
+export const applyTactic: Server.ExecRequest<Json.key<'#tactic'>,node[]>= applyTactic_internal;
 
 /* ------------------------------------- */

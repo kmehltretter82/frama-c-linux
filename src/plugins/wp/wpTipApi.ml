@@ -42,7 +42,12 @@ let package = P.package ~plugin:"wp" ~name:"tip"
 let proofStatus = R.signal ~package ~name:"proofStatus"
     ~descr:(Md.plain "Proof Status has changed")
 
-module Node = D.Index(Map.Make(ProofEngine.Node))(struct let name = "node" end)
+module Node =
+struct
+  include D.Index(Map.Make(ProofEngine.Node))(struct let name = "node" end)
+  let jtype =
+    D.declare ~package ~name:"node" ~descr:(Md.plain "Proof Node index") jtype
+end
 
 let () =
   let inode = R.signature ~input:(module Node) () in

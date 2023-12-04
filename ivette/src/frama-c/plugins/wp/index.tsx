@@ -42,15 +42,14 @@ import './style.css';
 /* --- Goal Component                                                     --- */
 /* -------------------------------------------------------------------------- */
 
+type Goal = WP.goal | undefined;
+
 function WPGoals(): JSX.Element {
   const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped');
   const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed');
   const [displayTip, setTip] = React.useState(false);
-  const [current, setCurrent] = React.useState(WP.goalDefault);
-  Server.useShutdown(() => {
-    setTip(false);
-    setCurrent(WP.goalDefault);
-  });
+  const [current, setCurrent] = React.useState<Goal>(undefined);
+  Server.useShutdown(() => { setTip(false); setCurrent(undefined); });
   const scope = States.useCurrentScope();
   const [goals, setGoals] = React.useState(0);
   const [total, setTotal] = React.useState(0);

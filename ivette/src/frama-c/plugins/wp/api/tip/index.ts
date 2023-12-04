@@ -75,15 +75,27 @@ export const proofStatus: Server.Signal = {
   name: 'plugins.wp.tip.proofStatus',
 };
 
+/** Proof Node index */
+export type node = Json.index<'#node'>;
+
+/** Decoder for `node` */
+export const jNode: Json.Decoder<node> = Json.jIndex<'#node'>('#node');
+
+/** Natural order for `node` */
+export const byNode: Compare.Order<node> = Compare.number;
+
+/** Default value for `node` */
+export const nodeDefault: node = Json.jIndex<'#node'>('#node')(-1);
+
 const getNodeInfos_internal: Server.GetRequest<
-  Json.index<'#node'>,
+  node,
   { result: string, proved: boolean, pending: number, size: number,
     stats: string, results: [ prover, result ][], tactic: string,
-    children: [ string, Json.index<'#node'> ][] }
+    children: [ string, node ][] }
   > = {
   kind: Server.RqKind.GET,
   name: 'plugins.wp.tip.getNodeInfos',
-  input: Json.jIndex<'#node'>('#node'),
+  input: jNode,
   output: Json.jObject({
             result: Json.jString,
             proved: Json.jBoolean,
@@ -92,33 +104,28 @@ const getNodeInfos_internal: Server.GetRequest<
             stats: Json.jString,
             results: Json.jArray(Json.jPair( jProver, jResult,)),
             tactic: Json.jString,
-            children: Json.jArray(
-                        Json.jPair(
-                          Json.jString,
-                          Json.jIndex<'#node'>('#node'),
-                        )),
+            children: Json.jArray(Json.jPair( Json.jString, jNode,)),
           }),
   signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
 };
 /** Proof node information */
 export const getNodeInfos: Server.GetRequest<
-  Json.index<'#node'>,
+  node,
   { result: string, proved: boolean, pending: number, size: number,
     stats: string, results: [ prover, result ][], tactic: string,
-    children: [ string, Json.index<'#node'> ][] }
+    children: [ string, node ][] }
   >= getNodeInfos_internal;
 
 const getProofState_internal: Server.GetRequest<
   goal,
-  { current: Json.index<'#node'>, path: Json.index<'#node'>[], index: number,
-    pending: number }
+  { current: node, path: node[], index: number, pending: number }
   > = {
   kind: Server.RqKind.GET,
   name: 'plugins.wp.tip.getProofState',
   input: jGoal,
   output: Json.jObject({
-            current: Json.jIndex<'#node'>('#node'),
-            path: Json.jArray(Json.jIndex<'#node'>('#node')),
+            current: jNode,
+            path: Json.jArray(jNode),
             index: Json.jNumber,
             pending: Json.jNumber,
           }),
@@ -127,8 +134,7 @@ const getProofState_internal: Server.GetRequest<
 /** Current Proof Status of a Goal */
 export const getProofState: Server.GetRequest<
   goal,
-  { current: Json.index<'#node'>, path: Json.index<'#node'>[], index: number,
-    pending: number }
+  { current: node, path: node[], index: number, pending: number }
   >= getProofState_internal;
 
 const goForward_internal: Server.SetRequest<goal,null> = {
@@ -161,25 +167,25 @@ const goToIndex_internal: Server.SetRequest<[ goal, number ],null> = {
 /** Go to k-th pending node of proof tree */
 export const goToIndex: Server.SetRequest<[ goal, number ],null>= goToIndex_internal;
 
-const goToNode_internal: Server.SetRequest<Json.index<'#node'>,null> = {
+const goToNode_internal: Server.SetRequest<node,null> = {
   kind: Server.RqKind.SET,
   name: 'plugins.wp.tip.goToNode',
-  input: Json.jIndex<'#node'>('#node'),
+  input: jNode,
   output: Json.jNull,
   signals: [],
 };
 /** Set current node of associated proof tree */
-export const goToNode: Server.SetRequest<Json.index<'#node'>,null>= goToNode_internal;
+export const goToNode: Server.SetRequest<node,null>= goToNode_internal;
 
-const removeNode_internal: Server.SetRequest<Json.index<'#node'>,null> = {
+const removeNode_internal: Server.SetRequest<node,null> = {
   kind: Server.RqKind.SET,
   name: 'plugins.wp.tip.removeNode',
-  input: Json.jIndex<'#node'>('#node'),
+  input: jNode,
   output: Json.jNull,
   signals: [],
 };
 /** Remove node from tree and go to parent */
-export const removeNode: Server.SetRequest<Json.index<'#node'>,null>= removeNode_internal;
+export const removeNode: Server.SetRequest<node,null>= removeNode_internal;
 
 /** Updated TIP printer */
 export const printStatus: Server.Signal = {
@@ -221,15 +227,14 @@ export const byRformat: Compare.Order<rformat> = Compare.structural;
 export const rformatDefault: rformat = "ratio";
 
 const printSequent_internal: Server.ExecRequest<
-  { node: Json.index<'#node'>, indent?: number, margin?: number,
-    iformat?: iformat, rformat?: rformat, autofocus?: boolean,
-    unmangled?: boolean },
+  { node: node, indent?: number, margin?: number, iformat?: iformat,
+    rformat?: rformat, autofocus?: boolean, unmangled?: boolean },
   text
   > = {
   kind: Server.RqKind.EXEC,
   name: 'plugins.wp.tip.printSequent',
   input: Json.jObject({
-           node: Json.jIndex<'#node'>('#node'),
+           node: jNode,
            indent: Json.jOption(Json.jNumber),
            margin: Json.jOption(Json.jNumber),
            iformat: Json.jOption(jIformat),
@@ -242,31 +247,30 @@ const printSequent_internal: Server.ExecRequest<
 };
 /** Pretty-print the associated node */
 export const printSequent: Server.ExecRequest<
-  { node: Json.index<'#node'>, indent?: number, margin?: number,
-    iformat?: iformat, rformat?: rformat, autofocus?: boolean,
-    unmangled?: boolean },
+  { node: node, indent?: number, margin?: number, iformat?: iformat,
+    rformat?: rformat, autofocus?: boolean, unmangled?: boolean },
   text
   >= printSequent_internal;
 
-const clearSelection_internal: Server.SetRequest<Json.index<'#node'>,null> = {
+const clearSelection_internal: Server.SetRequest<node,null> = {
   kind: Server.RqKind.SET,
   name: 'plugins.wp.tip.clearSelection',
-  input: Json.jIndex<'#node'>('#node'),
+  input: jNode,
   output: Json.jNull,
   signals: [],
 };
 /** Reset node selection */
-export const clearSelection: Server.SetRequest<Json.index<'#node'>,null>= clearSelection_internal;
+export const clearSelection: Server.SetRequest<node,null>= clearSelection_internal;
 
 const setSelection_internal: Server.SetRequest<
-  { node: Json.index<'#node'>, part?: Json.key<'#part'>,
-    term?: Json.key<'#term'>, extend?: boolean },
+  { node: node, part?: Json.key<'#part'>, term?: Json.key<'#term'>,
+    extend?: boolean },
   null
   > = {
   kind: Server.RqKind.SET,
   name: 'plugins.wp.tip.setSelection',
   input: Json.jObject({
-           node: Json.jIndex<'#node'>('#node'),
+           node: jNode,
            part: Json.jOption(Json.jKey<'#part'>('#part')),
            term: Json.jOption(Json.jKey<'#term'>('#term')),
            extend: Json.jOption(Json.jBoolean),
@@ -276,8 +280,8 @@ const setSelection_internal: Server.SetRequest<
 };
 /** Set node selection */
 export const setSelection: Server.SetRequest<
-  { node: Json.index<'#node'>, part?: Json.key<'#part'>,
-    term?: Json.key<'#term'>, extend?: boolean },
+  { node: node, part?: Json.key<'#part'>, term?: Json.key<'#term'>,
+    extend?: boolean },
   null
   >= setSelection_internal;
 

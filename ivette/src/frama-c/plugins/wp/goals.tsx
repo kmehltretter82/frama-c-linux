@@ -98,9 +98,9 @@ function filterGoal(
 
 export interface GoalTableProps {
   display: boolean;
-  scope: Ast.decl | undefined;
   failed: boolean;
-  current: WP.goal;
+  scope: Ast.decl | undefined;
+  current: WP.goal | undefined;
   setCurrent: (goal: WP.goal) => void;
   setTIP: (goal: WP.goal) => void;
   setGoals: (goals: number) => void;

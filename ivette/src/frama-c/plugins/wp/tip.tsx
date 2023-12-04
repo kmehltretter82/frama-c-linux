@@ -29,26 +29,56 @@ import * as TIP from 'frama-c/plugins/wp/api/tip';
 import { getStatus } from './goals';
 
 /* -------------------------------------------------------------------------- */
+/* --- Goal View                                                          --- */
+/* -------------------------------------------------------------------------- */
+
+type Node = TIP.node | undefined;
+
+const nodeToString = (node: Node): string =>
+  node === undefined ? '-' : `#${node}`;
+
+interface GoalViewProps {
+  node: Node;
+}
+
+function GoalView(props: GoalViewProps): JSX.Element {
+  return <Cell label={`Node ${nodeToString(props.node)}`}/>;
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- TIP View                                                           --- */
 /* -------------------------------------------------------------------------- */
 
-export interface TIPProps {
-  display: boolean;
-  goal: WP.goal;
+interface ProofState {
+  current: Node;
+  index: number;
+  pending: number;
+}
+
+function useProofState(target: WP.goal | undefined): ProofState {
+  const DefaultProofState: ProofState = {
+    current: undefined, index: 0, pending: 0
+  };
+  return States.useRequest(
+    TIP.getProofState,
+    target,
+    { onError: DefaultProofState }
+  ) ?? DefaultProofState;
 }
 
 function useTarget(target: WP.goal | undefined) : WP.goalsData {
-  const data = States.useSyncArrayElt( WP.goals, target );
-  return data ?? WP.goalsDataDefault;
+  return States.useSyncArrayElt( WP.goals, target ) ?? WP.goalsDataDefault;
+}
+
+export interface TIPProps {
+  display: boolean;
+  goal: WP.goal | undefined;
 }
 
 export function TIPView(props: TIPProps): JSX.Element {
   const { display, goal } = props;
-  const target = goal !== WP.goalDefault ? goal : undefined;
-  const infos: WP.goalsData = useTarget(goal);
-  const status = getStatus(infos);
-  const { index=0, pending=0 } =
-    States.useRequest( TIP.getProofState, target ) ?? {};
+  const infos = useTarget(goal);
+  const { current, index, pending } = useProofState(goal);
   return (
     <Vfill display={display}>
       <Hbox>
@@ -57,10 +87,11 @@ export function TIPView(props: TIPProps): JSX.Element {
           label={infos.wpo} title='Goal identifier' />
         <Cell
           icon='CODE'
-          display={pending > 0}
-          label={`${index+1}/${pending}`} title='Pending proof nodes'/>
-        <Cell {...status}/>
+          display={0 <= index && index < pending}
+          label={`${index}/${pending}`} title='Pending proof nodes'/>
+        <Cell {...getStatus(infos)}/>
       </Hbox>
+      <GoalView node={current} />
     </Vfill>
   );
 }
