@@ -66,7 +66,7 @@ export type TagIndex = Map<string, Tags>;
 /** Extract a Tag forest from a text. */
 export function textToTags(
   text: KernelData.text,
-  filter?: (tag: string, offset: number, endOffset: number) => boolean,
+  filter?: (tag: Tag) => boolean,
 ): {
     index: TagIndex,
     tags: Tags
@@ -75,19 +75,24 @@ export function textToTags(
     (buffer: Tag[], offset: number, text: KernelData.text): number => {
       if (text===null) return offset;
       if (typeof(text)==='string') return offset + text.length;
-      const t0 = text[0];
-      const tag = typeof(t0)==='string' ? t0 : '';
-      const children: Tag[] = [];
       let endOffset = offset;
-      for(let k=1; k<text.length; k++)
-        endOffset = walk(children, endOffset, text[k]);
-      if (!filter || filter(tag, offset, endOffset)) {
+      const t0 = text[0];
+      if (t0 && typeof(t0)==='string') {
+        const tag = typeof(t0)==='string' ? t0 : '';
+        const children: Tag[] = [];
+        for(let k=1; k<text.length; k++)
+          endOffset = walk(children, endOffset, text[k]);
         const tg = { tag, offset, endOffset, children };
-        const tgs = index.get(tag);
-        if (tgs===undefined) index.set(tag, [tg]); else tgs.push(tg);
-        buffer.push(tg);
+        if (!filter || filter(tg)) {
+          const tgs = index.get(tag);
+          if (tgs===undefined) index.set(tag, [tg]); else tgs.push(tg);
+          buffer.push(tg);
+        } else {
+          children.forEach(t => buffer.push(t));
+        }
       } else {
-        children.forEach(tg => buffer.push(tg));
+        for(let k=1; k<text.length; k++)
+          endOffset = walk(buffer, endOffset, text[k]);
       }
       return endOffset;
     };

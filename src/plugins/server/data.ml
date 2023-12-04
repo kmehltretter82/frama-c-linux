@@ -237,6 +237,7 @@ struct
 end
 
 let jpretty = Jbuffer.to_json
+let jtext s = `String s
 
 (* -------------------------------------------------------------------------- *)
 (* --- Functional API                                                     --- *)

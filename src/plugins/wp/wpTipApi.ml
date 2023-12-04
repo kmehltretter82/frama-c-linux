@@ -306,7 +306,7 @@ let rformat : Plang.rformat R.input =
 
 let () =
   let printSequent = R.signature ~output:(module D.Jtext) () in
-  let get_node = R.param printSequent ~name:"node"
+  let get_node = R.param_opt printSequent ~name:"node"
       ~descr:(Md.plain "Proof Node") (module Node) in
   let get_indent = R.param_opt printSequent ~name:"indent"
       ~descr:(Md.plain "Number of identation spaces") (module D.Jint) in
@@ -321,20 +321,22 @@ let () =
   let get_unmangled = R.param_opt printSequent ~name:"unmangled"
       ~descr:(Md.plain "Unmangled memory model") (module D.Jbool) in
   R.register_sig ~package
-    ~kind:`EXEC
+    ~kind:`GET
     ~name:"printSequent"
     ~descr:(Md.plain "Pretty-print the associated node")
     ~signals:[printStatus] printSequent
     begin fun rq () ->
-      let node = get_node rq in
-      let pp = lookup_printer node in
-      let indent = get_indent rq in
-      let margin = get_margin rq in
-      Option.iter pp#set_iformat (get_iformat rq) ;
-      Option.iter pp#set_rformat (get_rformat rq) ;
-      Option.iter pp#set_focus_mode (get_autofocus rq) ;
-      Option.iter pp#set_unmangled (get_unmangled rq) ;
-      D.jpretty ?indent ?margin pp#pp_goal (ProofEngine.goal node)
+      match get_node rq with
+      | None -> D.jtext ""
+      | Some node ->
+        let pp = lookup_printer node in
+        let indent = get_indent rq in
+        let margin = get_margin rq in
+        Option.iter pp#set_iformat (get_iformat rq) ;
+        Option.iter pp#set_rformat (get_rformat rq) ;
+        Option.iter pp#set_focus_mode (get_autofocus rq) ;
+        Option.iter pp#set_unmangled (get_unmangled rq) ;
+        D.jpretty ?indent ?margin pp#pp_goal (ProofEngine.goal node)
     end
 
 (* -------------------------------------------------------------------------- *)

@@ -226,15 +226,15 @@ export const byRformat: Compare.Order<rformat> = Compare.structural;
 /** Default value for `rformat` */
 export const rformatDefault: rformat = "ratio";
 
-const printSequent_internal: Server.ExecRequest<
-  { node: node, indent?: number, margin?: number, iformat?: iformat,
+const printSequent_internal: Server.GetRequest<
+  { node?: node, indent?: number, margin?: number, iformat?: iformat,
     rformat?: rformat, autofocus?: boolean, unmangled?: boolean },
   text
   > = {
-  kind: Server.RqKind.EXEC,
+  kind: Server.RqKind.GET,
   name: 'plugins.wp.tip.printSequent',
   input: Json.jObject({
-           node: jNode,
+           node: Json.jOption(jNode),
            indent: Json.jOption(Json.jNumber),
            margin: Json.jOption(Json.jNumber),
            iformat: Json.jOption(jIformat),
@@ -246,8 +246,8 @@ const printSequent_internal: Server.ExecRequest<
   signals: [ { name: 'plugins.wp.tip.printStatus' } ],
 };
 /** Pretty-print the associated node */
-export const printSequent: Server.ExecRequest<
-  { node: node, indent?: number, margin?: number, iformat?: iformat,
+export const printSequent: Server.GetRequest<
+  { node?: node, indent?: number, margin?: number, iformat?: iformat,
     rformat?: rformat, autofocus?: boolean, unmangled?: boolean },
   text
   >= printSequent_internal;

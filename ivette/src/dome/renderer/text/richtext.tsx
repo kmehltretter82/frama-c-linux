@@ -641,7 +641,7 @@ export interface GutterDecoration extends LineDecoration {
 }
 
 export type Decoration = MarkDecoration | LineDecoration | GutterDecoration;
-export type Decorations = null | Decoration | readonly Decoration[];
+export type Decorations = null | Decoration | readonly Decorations[];
 
 /* -------------------------------------------------------------------------- */
 /* --- Decoration Builder                                                 --- */
@@ -817,11 +817,13 @@ interface Decorator {
 function compareDecorations(a : Decorations, b : Decorations): boolean
 {
   if (a === b) return true;
-  if (!Array.isArray(a)) return false;
-  if (!Array.isArray(b)) return false;
+  if (!a || isDecoration(a)) return false;
+  if (!b || isDecoration(b)) return false;
   const n = a.length;
   if (n !== b.length) return false;
-  for (let k = 0; k < n; k++) if (a[k] !== b[k]) return false;
+  for (let k = 0; k < n; k++)
+    if (!compareDecorations(a[k], b[k]))
+      return false;
   return true;
 }
 
@@ -912,7 +914,7 @@ function createView(parent: Element): CM.EditorView {
 /* -------------------------------------------------------------------------- */
 
 export interface TextViewProps {
-  text?: TextProxy;
+  text?: TextProxy | string;
   readOnly?: boolean;
   onChange?: Callback;
   selection?: Range;
@@ -938,9 +940,12 @@ export function TextView(props: TextViewProps) : JSX.Element {
   // --- Text Proxy
   const { text } = props;
   React.useEffect(() => {
-    if (text) {
+    if (text instanceof TextProxy) {
       text.connect(view);
       if (view) return () => text.connect(null);
+    }
+    if (typeof(text)==='string' && view) {
+      dispatchContents(view, text);
     }
     return undefined;
   }, [text, view]);
