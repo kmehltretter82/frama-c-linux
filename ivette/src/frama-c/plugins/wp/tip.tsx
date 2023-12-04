@@ -21,8 +21,10 @@
 /* ************************************************************************ */
 
 import React from 'react';
+import * as Dome from 'dome';
+import type { json } from 'dome/data/json';
 import { Cell } from 'dome/controls/labels';
-import { ToolBar } from 'dome/frame/toolbars';
+import { ToolBar, Select, Filler } from 'dome/frame/toolbars';
 import { Vfill } from 'dome/layout/boxes';
 import { MarkDecoration, Decorations, TextView } from 'dome/text/richtext';
 import * as States from 'frama-c/states';
@@ -31,6 +33,75 @@ import type { text } from 'frama-c/kernel/api/data';
 import * as WP from 'frama-c/plugins/wp/api';
 import * as TIP from 'frama-c/plugins/wp/api/tip';
 import { getStatus } from './goals';
+
+/* -------------------------------------------------------------------------- */
+/* --- Sequent Printing Modes                                             --- */
+/* -------------------------------------------------------------------------- */
+
+type Focus = 'AUTOFOCUS' | 'FULLCONTEXT' | 'MEMORY' | 'RAW';
+
+interface Selector<A> {
+  value: A;
+  setValue: (value: A) => void;
+}
+
+function jFocus(js: json): Focus {
+  switch(js) {
+    case 'AUTOFOCUS':
+    case 'FULLCONTEXT':
+    case 'MEMORY':
+    case 'RAW':
+      return (js as Focus);
+    default:
+      return 'AUTOFOCUS';
+  }
+}
+
+function FocusSelector(props: Selector<Focus>): JSX.Element {
+  const { value, setValue } = props;
+  return (
+    <Select
+      value={value}
+      title='Autofocus Mode'
+      onChange={(v) => setValue(jFocus(v))}
+    >
+      <option value='AUTOFOCUS'>Auto Focus</option>
+      <option value='FULLCONTEXT'>Full Context</option>
+      <option value='MEMORY'>Memory Model</option>
+      <option value='RAW'>Raw Proof</option>
+    </Select>
+  );
+}
+
+function IFormatSelector(props: Selector<TIP.iformat>): JSX.Element {
+  const { value, setValue } = props;
+  return (
+    <Select
+      value={value}
+      title='Large Integers Format'
+      onChange={(v) => setValue(TIP.jIformat(v))}
+    >
+      <option value='dec'>Int</option>
+      <option value='hex'>Hex</option>
+      <option value='bin'>Bin</option>
+    </Select>
+  );
+}
+
+function RFormatSelector(props: Selector<TIP.rformat>): JSX.Element {
+  const { value, setValue } = props;
+  return (
+    <Select
+      value={value}
+      title='Floatting Point Constants Format'
+      onChange={(v) => setValue(TIP.jRformat(v))}
+    >
+      <option value='ratio'>Real</option>
+      <option value='float'>Float</option>
+      <option value='double'>Double</option>
+    </Select>
+  );
+}
 
 /* -------------------------------------------------------------------------- */
 /* --- Sequent Decorations                                                --- */
@@ -95,11 +166,22 @@ class Sequent {
 
 interface GoalViewProps {
   node: Node;
+  focus: Focus;
+  iformat: TIP.iformat;
+  rformat: TIP.rformat;
 }
 
 function GoalView(props: GoalViewProps): JSX.Element {
-  const { node } = props;
-  const jtext = States.useRequest(TIP.printSequent, { node }) ?? null;
+  const { node, focus, iformat, rformat } = props;
+  const autofocus = focus === 'AUTOFOCUS' || focus === 'MEMORY';
+  const unmangled = focus === 'MEMORY' || focus === 'RAW';
+  const jtext = States.useRequest(TIP.printSequent, {
+    node,
+    iformat,
+    rformat,
+    autofocus,
+    unmangled,
+  }) ?? null;
   const sequent = React.useMemo(() => new Sequent(jtext), [jtext]);
   return (
     <TextView
@@ -144,6 +226,15 @@ export function TIPView(props: TIPProps): JSX.Element {
   const { display, goal } = props;
   const infos = useTarget(goal);
   const { current, index, pending } = useProofState(goal);
+  const [ focus, setFocus ] = Dome.useWindowSettings<Focus>(
+    'wp.tip.focus', jFocus, 'AUTOFOCUS'
+  );
+  const [ iformat, setIformat ] = Dome.useWindowSettings<TIP.iformat>(
+    'wp.tip.iformat', TIP.jIformat, 'dec'
+  );
+  const [ rformat, setRformat ] = Dome.useWindowSettings<TIP.rformat>(
+    'wp.tip.rformat', TIP.jRformat, 'ratio'
+  );
   return (
     <Vfill display={display}>
       <ToolBar>
@@ -155,8 +246,17 @@ export function TIPView(props: TIPProps): JSX.Element {
           display={0 <= index && index < pending && 1 < pending}
           label={`${index+1}/${pending}`} title='Pending proof nodes'/>
         <Cell {...getStatus(infos)}/>
+        <Filler/>
+        <FocusSelector value={focus} setValue={setFocus}/>
+        <IFormatSelector value={iformat} setValue={setIformat}/>
+        <RFormatSelector value={rformat} setValue={setRformat}/>
       </ToolBar>
-      <GoalView node={current} />
+      <GoalView
+        node={current}
+        focus={focus}
+        iformat={iformat}
+        rformat={rformat}
+      />
     </Vfill>
   );
 }
