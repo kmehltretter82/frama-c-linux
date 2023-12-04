@@ -187,6 +187,30 @@ const removeNode_internal: Server.SetRequest<node,null> = {
 /** Remove node from tree and go to parent */
 export const removeNode: Server.SetRequest<node,null>= removeNode_internal;
 
+/** Proof part marker */
+export type part = Json.key<'#part'>;
+
+/** Decoder for `part` */
+export const jPart: Json.Decoder<part> = Json.jKey<'#part'>('#part');
+
+/** Natural order for `part` */
+export const byPart: Compare.Order<part> = Compare.string;
+
+/** Default value for `part` */
+export const partDefault: part = Json.jKey<'#part'>('#part')('');
+
+/** Term marker */
+export type term = Json.key<'#term'>;
+
+/** Decoder for `term` */
+export const jTerm: Json.Decoder<term> = Json.jKey<'#term'>('#term');
+
+/** Natural order for `term` */
+export const byTerm: Compare.Order<term> = Compare.string;
+
+/** Default value for `term` */
+export const termDefault: term = Json.jKey<'#term'>('#term')('');
+
 /** Updated TIP printer */
 export const printStatus: Server.Signal = {
   name: 'plugins.wp.tip.printStatus',
@@ -263,16 +287,15 @@ const clearSelection_internal: Server.SetRequest<node,null> = {
 export const clearSelection: Server.SetRequest<node,null>= clearSelection_internal;
 
 const setSelection_internal: Server.SetRequest<
-  { node: node, part?: Json.key<'#part'>, term?: Json.key<'#term'>,
-    extend?: boolean },
+  { node: node, part?: part, term?: term, extend?: boolean },
   null
   > = {
   kind: Server.RqKind.SET,
   name: 'plugins.wp.tip.setSelection',
   input: Json.jObject({
            node: jNode,
-           part: Json.jOption(Json.jKey<'#part'>('#part')),
-           term: Json.jOption(Json.jKey<'#term'>('#term')),
+           part: Json.jOption(jPart),
+           term: Json.jOption(jTerm),
            extend: Json.jOption(Json.jBoolean),
          }),
   output: Json.jNull,
@@ -280,8 +303,7 @@ const setSelection_internal: Server.SetRequest<
 };
 /** Set node selection */
 export const setSelection: Server.SetRequest<
-  { node: node, part?: Json.key<'#part'>, term?: Json.key<'#term'>,
-    extend?: boolean },
+  { node: node, part?: part, term?: term, extend?: boolean },
   null
   >= setSelection_internal;
 

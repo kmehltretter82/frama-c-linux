@@ -42,12 +42,13 @@ let package = P.package ~plugin:"wp" ~name:"tip"
 let proofStatus = R.signal ~package ~name:"proofStatus"
     ~descr:(Md.plain "Proof Status has changed")
 
-module Node =
-struct
-  include D.Index(Map.Make(ProofEngine.Node))(struct let name = "node" end)
-  let jtype =
-    D.declare ~package ~name:"node" ~descr:(Md.plain "Proof Node index") jtype
-end
+module Node = D.Index
+    (Map.Make(ProofEngine.Node))
+    (struct
+      let package = package
+      let name = "node"
+      let descr = Md.plain "Proof Node index"
+    end)
 
 let () =
   let inode = R.signature ~input:(module Node) () in
@@ -177,13 +178,6 @@ let () = R.register ~package ~kind:`SET ~name:"removeNode"
 (* --- Sequent Indexers                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Term = D.Tagged
-    (struct
-      type t = Lang.F.term
-      let id t = Printf.sprintf "#e%d" (Lang.F.QED.id t)
-    end)
-    (struct let name = "term" end)
-
 module Part = D.Tagged
     (struct
       type t = [ `Term | `Goal | `Step of int ]
@@ -192,12 +186,27 @@ module Part = D.Tagged
         | `Goal -> "#goal"
         | `Step k -> Printf.sprintf "#s%d" k
     end)
-    (struct let name = "part" end)
+    (struct
+      let package = package
+      let name = "part"
+      let descr = Md.plain "Proof part marker"
+    end)
+
+module Term = D.Tagged
+    (struct
+      type t = Lang.F.term
+      let id t = Printf.sprintf "#e%d" (Lang.F.QED.id t)
+    end)
+    (struct
+      let package = package
+      let name = "term"
+      let descr = Md.plain "Term marker"
+    end)
 
 let of_part = function
-  | Ptip.Term -> "#term"
-  | Ptip.Goal -> "#goal"
-  | Ptip.Step s -> Printf.sprintf "#s%d" s.id
+  | Ptip.Term -> `Term
+  | Ptip.Goal -> `Goal
+  | Ptip.Step s -> `Step s.id
 
 let to_part sequent = function
   | `Term -> Ptip.Term
@@ -223,21 +232,27 @@ class printer () : Ptip.pseq =
     end in
   let focus : Ptip.term_wrapper =
     object
-      method wrap pp fmt t = wrap "wp:focus" pp fmt t
+      method wrap pp fmt t = wrap "wp:focus" (terms#wrap pp) fmt t
     end in
   let target : Ptip.term_wrapper =
     object
-      method wrap pp fmt t = wrap "wp:target" pp fmt t
+      method wrap pp fmt t = wrap "wp:target" (terms#wrap pp) fmt t
     end in
   let parts : Ptip.part_marker =
     object
-      method wrap pp fmt p = wrap (of_part p) pp fmt p
+      method wrap pp fmt p = wrap (Part.get @@ of_part p) pp fmt p
       method mark : 'a. Ptip.part -> 'a Ptip.printer -> 'a Ptip.printer
-        = fun p pp fmt x -> wrap (of_part p) pp fmt x
+        = fun p pp fmt x -> wrap (Part.get @@ of_part p) pp fmt x
+    end in
+  let target_part : Ptip.part_marker =
+    object
+      method wrap pp fmt p = wrap "wp:target" (parts#wrap pp) fmt p
+      method mark : 'a. Ptip.part -> 'a Ptip.printer -> 'a Ptip.printer
+        = fun p pp fmt x -> wrap "wp:target" (parts#mark p pp) fmt x
     end in
   let autofocus = new Ptip.autofocus in
   let plang = new Ptip.plang ~terms ~focus ~target ~autofocus in
-  let pcond = new Ptip.pcond ~parts ~target:parts ~autofocus ~plang in
+  let pcond = new Ptip.pcond ~parts ~target:target_part ~autofocus ~plang in
   Ptip.pseq ~autofocus ~plang ~pcond
 
 (* -------------------------------------------------------------------------- *)

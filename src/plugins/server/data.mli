@@ -341,10 +341,12 @@ end
 *)
 (* -------------------------------------------------------------------------- *)
 
-(** Datatype information. *)
+(** Datatype registration information. *)
 module type Info =
 sig
+  val package: package
   val name: string
+  val descr: Markdown.text
 end
 
 (** Simplified [Map.S]. *)
