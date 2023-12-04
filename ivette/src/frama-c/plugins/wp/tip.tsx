@@ -22,16 +22,22 @@
 
 import React from 'react';
 import * as Dome from 'dome';
+
 import type { json } from 'dome/data/json';
 import { Cell } from 'dome/controls/labels';
 import { ToolBar, Select, Filler } from 'dome/frame/toolbars';
 import { Vfill } from 'dome/layout/boxes';
-import { MarkDecoration, Decorations, TextView } from 'dome/text/richtext';
+import {
+  MarkDecoration, Decorations,
+  Position, TextView
+} from 'dome/text/richtext';
+
 import * as States from 'frama-c/states';
 import * as RichText from 'frama-c/richtext';
 import type { text } from 'frama-c/kernel/api/data';
 import * as WP from 'frama-c/plugins/wp/api';
 import * as TIP from 'frama-c/plugins/wp/api/tip';
+
 import { getStatus } from './goals';
 
 /* -------------------------------------------------------------------------- */
@@ -108,9 +114,11 @@ function RFormatSelector(props: Selector<TIP.rformat>): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 type Node = TIP.node | undefined;
+type Location = { step?: RichText.Tag, term?: RichText.Tag };
 
 class Sequent {
   private readonly contents: string;
+  private readonly tags: RichText.Tags;
   private readonly style: MarkDecoration[];
 
   constructor(jtext: text) {
@@ -139,7 +147,7 @@ class Sequent {
           addStyle(t, 'cm-type');
           return false;
         case 'wp:focus':
-          addStyle(t, 'cm-hovered');
+          addStyle(t, 'cm-hovered-code');
           return false;
         case 'wp:target':
           addStyle(t, 'cm-selected-code');
@@ -147,7 +155,8 @@ class Sequent {
       }
       return t.tag.startsWith('#');
     };
-    RichText.textToTags(jtext, filter);
+    const { tags } = RichText.textToTags(jtext, filter);
+    this.tags = tags;
   }
 
   get text(): string {
@@ -156,6 +165,16 @@ class Sequent {
 
   get decorations(): Decorations {
     return this.style;
+  }
+
+  locate(position: number): Location {
+    const stepOnly = ({ tag }: RichText.Tag): boolean => {
+      return tag === '#goal' || tag.startsWith('#s');
+    };
+    const step = RichText.findTag(this.tags, position, stepOnly);
+    if (!step) return {};
+    const term = RichText.findTag(step.children, position);
+    return { step, term };
   }
 
 }
@@ -183,11 +202,26 @@ function GoalView(props: GoalViewProps): JSX.Element {
     unmangled,
   }) ?? null;
   const sequent = React.useMemo(() => new Sequent(jtext), [jtext]);
+  const [hover, setHover] = React.useState<Decorations>(null);
+  const onHover = React.useCallback((pos: Position | null) => {
+    if (pos) {
+      const { step, term } = sequent.locate(pos.offset);
+      const range = term ?? step;
+      if (range) {
+        const { offset, endOffset } = range;
+        const length = endOffset - offset;
+        setHover({ className: 'cm-hovered-code', offset, length });
+        return;
+      }
+    }
+    setHover(null);
+  }, [sequent]);
   return (
     <TextView
       readOnly
       text={sequent.text}
-      decorations={sequent.decorations}
+      decorations={[hover, sequent.decorations]}
+      onHover={onHover}
     />
   );
 }

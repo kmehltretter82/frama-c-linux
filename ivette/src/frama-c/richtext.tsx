@@ -125,7 +125,7 @@ export function findChildTag(tags: Tags, offset: number) : Tag | undefined
   for(;;) {
     const d = q-p;
     if (d <= 1) return undefined;
-    const r = p + d / 2;
+    const r = Math.floor(p + d / 2);
     const c = tags[r];
     if (offset < c.offset) { b = c; q = r; continue; }
     if (c.endOffset < offset) { a = c; p = r; continue; }
