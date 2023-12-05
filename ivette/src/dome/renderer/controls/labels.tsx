@@ -112,6 +112,7 @@ const DESCR = 'dome-xLabel dome-text-descr';
 const TDATA = 'dome-xLabel dome-text-data';
 const TCODE = 'dome-xLabel dome-text-code';
 const TCELL = 'dome-xLabel dome-text-cell';
+const TITEM = 'dome-xLabel dome-text-item';
 
 // --------------------------------------------------------------------------
 // --- Components
@@ -134,5 +135,8 @@ export const Code = React.forwardRef(makeLabel(TCODE));
 
 /** Selectable inlined source-code content with default cursor. */
 export const Cell = React.forwardRef(makeLabel(TCELL));
+
+/** Non-selectable inlined source-code content with default cursor. */
+export const Item = React.forwardRef(makeLabel(TITEM));
 
 // --------------------------------------------------------------------------

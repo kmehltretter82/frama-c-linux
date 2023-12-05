@@ -94,10 +94,11 @@ div.dome-dragged {
 }
 
 .dome-text-descr {
+    font-weight: lighter ;
     font-family: sans-serif ;
     font-size: smaller ;
     user-select: none ;
-    white-space: wrap ;
+    white-space: normal ;
     text-overflow: ellipsis ;
 }
 
@@ -121,6 +122,15 @@ div.dome-dragged {
 .dome-text-cell {
     cursor: default ;
     user-select: text ;
+    font-family: 'Andale mono', monospace ;
+    font-size: 9pt ;
+    white-space: nowrap ;
+    text-overflow: clip ;
+}
+
+.dome-text-item {
+    cursor: default ;
+    user-select: none ;
     font-family: 'Andale mono', monospace ;
     font-size: 9pt ;
     white-space: nowrap ;
