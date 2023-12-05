@@ -30,16 +30,18 @@ import { Hfill, Vfill } from 'dome/layout/boxes';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
 import * as TIP from 'frama-c/plugins/wp/api/tip';
+import type { tactic } from 'frama-c/plugins/wp/api/tac';
 
 import { getStatus } from './goals';
 import { GoalView } from './seq';
-import { Tactics } from './tac';
+import { Tactics, Configure } from './tac';
 
 /* -------------------------------------------------------------------------- */
 /* --- Sequent Printing Modes                                             --- */
 /* -------------------------------------------------------------------------- */
 
 type Focus = 'AUTOFOCUS' | 'FULLCONTEXT' | 'MEMORY' | 'RAW';
+type Tactic = tactic | undefined;
 
 interface Selector<A> {
   value: A;
@@ -138,6 +140,7 @@ export function TIPView(props: TIPProps): JSX.Element {
   const { display, goal } = props;
   const infos = useTarget(goal);
   const { current, index, pending } = useProofState(goal);
+  const [selected, setSelected] = React.useState<Tactic>();
   const [ focus, setFocus ] = Dome.useWindowSettings<Focus>(
     'wp.tip.focus', jFocus, 'AUTOFOCUS'
   );
@@ -174,8 +177,17 @@ export function TIPView(props: TIPProps): JSX.Element {
             iformat={iformat}
             rformat={rformat}
           />
+          <Configure
+            node={current}
+            selected={selected}
+            setSelected={setSelected}
+          />
         </Vfill>
-        <Tactics node={current} />
+        <Tactics
+          node={current}
+          selected={selected}
+          setSelected={setSelected}
+        />
       </Hfill>
     </Vfill>
   );

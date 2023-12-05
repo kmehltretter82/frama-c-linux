@@ -23,8 +23,8 @@
 import React from 'react';
 import { classes } from 'dome/misc/utils';
 import { IconButton } from 'dome/controls/buttons';
-import { Label } from 'dome/controls/labels';
-import { Vbox, Hbox } from 'dome/layout/boxes';
+import { Item, Descr, LabelProps } from 'dome/controls/labels';
+import { Vbox, Hbox, Filler } from 'dome/layout/boxes';
 import * as States from 'frama-c/states';
 import * as TIP from 'frama-c/plugins/wp/api/tip';
 import * as TAC from 'frama-c/plugins/wp/api/tac';
@@ -33,7 +33,7 @@ type Node = TIP.node | undefined;
 type Tactic = TAC.tactic | undefined;
 
 /* -------------------------------------------------------------------------- */
-/* --- Tactical View                                                      --- */
+/* --- Tactical Item                                                      --- */
 /* -------------------------------------------------------------------------- */
 
 interface TacticalProps extends TAC.tacticalData {
@@ -57,7 +57,7 @@ function Tactical(props: TacticalProps): JSX.Element | null {
       onClick={onSelect}
       onDoubleClick={onPlay}
     >
-      <Label className='wp-tactical-cell' {...props}/>
+      <Item className='wp-tactical-cell' {...props}/>
       <IconButton
         icon='MEDIA.PLAY'
         title='Apply Tactic'
@@ -74,14 +74,15 @@ function Tactical(props: TacticalProps): JSX.Element | null {
 
 export interface TacticsProps {
   node: Node;
+  selected: Tactic;
+  setSelected: (tac: Tactic) => void;
 }
 
 export function Tactics(props: TacticsProps): JSX.Element {
-  const { node } = props;
-  const [selected, setSelected] = React.useState<Tactic>();
+  const { node, selected, setSelected } = props;
   const tactics = States.useSyncArrayData(TAC.tactical);
   return (
-    <Vbox className='wp-tactical-view'>
+    <Vbox className='wp-tactical-view dome-color-frame'>
       {tactics.map(tac => (
         <Tactical
           key={tac.id}
@@ -91,6 +92,58 @@ export function Tactics(props: TacticsProps): JSX.Element {
           {...tac} />
       ))}
     </Vbox>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Tactical Configuration                                             --- */
+/* -------------------------------------------------------------------------- */
+
+const noTactic: TAC.tacticalData = {
+  ...TAC.tacticalDataDefault,
+  status: 'NotApplicable'
+};
+
+function useTactic(selected: Tactic): TAC.tacticalData {
+  const data = States.useSyncArrayElt(TAC.tactical, selected);
+  return data ?? noTactic;
+}
+
+function getStatusLabel(tactical: TAC.tacticalData): LabelProps {
+  const { status, error } = tactical;
+  if (error)
+    return { icon: 'WARNING', kind: 'warning', label: error };
+  if (status === 'NotConfigured')
+    return { icon: 'WARNING', kind: 'default', label: 'Missing fields' };
+  return { icon: 'CHECK', kind: 'positive', label: 'Configured' };
+}
+
+export function Configure(props: TacticsProps): JSX.Element {
+  const { selected, setSelected } = props;
+  const tactical = useTactic(selected);
+  const { status, label, title } = tactical;
+  const display = !!selected && status !== 'NotApplicable';
+  const descr = getStatusLabel(tactical);
+  const onClose = (): void => setSelected(undefined);
+  const onPlay = (): void => { return; };
+  return (
+    <Hbox display={display}>
+      <Item icon='TUNINGS'>Tactic: {label}</Item>
+      <Filler/>
+      <Descr icon='CIRC.INFO' label={title} />
+      <Descr {...descr} />
+      <IconButton
+        icon='MEDIA.PLAY'
+        kind='positive'
+        title='Apply Tactic'
+        enabled={status==='Applicable'}
+        onClick={onPlay} />
+      <IconButton
+        icon='CIRC.CLOSE'
+        onClick={onClose}
+        title='Close Tactic Configuration Panel'
+      />
+    </Hbox>
   );
 }
 
