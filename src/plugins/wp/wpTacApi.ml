@@ -466,16 +466,13 @@ let tactics =
 (* -------------------------------------------------------------------------- *)
 
 let () =
-  let configureTactics = R.signature ~output:(module D.Junit) () in
-  let get_node = R.param configureTactics ~name:"node"
-      ~descr:(Md.plain "Proof node target") (module WpTipApi.Node) in
-  R.register_sig ~package ~kind:`EXEC
+  R.register ~package
+    ~kind:`EXEC
     ~name:"configureTactics"
     ~descr:(Md.plain "Configure all tactics")
-    ~signals:[WpTipApi.printStatus]
-    configureTactics
-    begin fun rq () ->
-      let node = get_node rq in
+    ~input:(module WpTipApi.Node)
+    ~output:(module D.Junit)
+    begin fun node ->
       let selection = WpTipApi.selection node in
       iter (fun cfg -> cfg#configure node selection) ;
       S.reload tactics ;

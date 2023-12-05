@@ -264,15 +264,15 @@ export const tacticalDataDefault: tacticalData =
   { id: Json.jKey<'#tactic'>('#tactic')(''), label: '', title: '',
     error: undefined, status: statusDefault, params: [] };
 
-const configureTactics_internal: Server.ExecRequest<{ node: node },null> = {
+const configureTactics_internal: Server.ExecRequest<node,null> = {
   kind: Server.RqKind.EXEC,
   name: 'plugins.wp.tac.configureTactics',
-  input: Json.jObject({ node: jNode,}),
+  input: jNode,
   output: Json.jNull,
-  signals: [ { name: 'plugins.wp.tip.printStatus' } ],
+  signals: [],
 };
 /** Configure all tactics */
-export const configureTactics: Server.ExecRequest<{ node: node },null>= configureTactics_internal;
+export const configureTactics: Server.ExecRequest<node,null>= configureTactics_internal;
 
 const setParameter_internal: Server.ExecRequest<
   { node: node, tactic: Json.key<'#tactic'>, param: Json.key<'#param'>,
