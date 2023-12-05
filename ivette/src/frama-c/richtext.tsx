@@ -61,7 +61,12 @@ export type Tag = {
   endOffset: number,
   children: Tags
 };
+
 export type TagIndex = Map<string, Tags>;
+
+export function contains(a: Tag, b: Tag): boolean {
+  return a.offset <= b.offset && b.endOffset <= a.endOffset;
+}
 
 /** Extract a Tag forest from a text. */
 export function textToTags(

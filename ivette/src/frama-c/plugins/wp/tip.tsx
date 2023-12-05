@@ -23,7 +23,7 @@
 import React from 'react';
 import * as Dome from 'dome';
 
-import type { json } from 'dome/data/json';
+import { jOption, json } from 'dome/data/json';
 import { Cell } from 'dome/controls/labels';
 import { ToolBar, Select, Filler } from 'dome/frame/toolbars';
 import { Vfill } from 'dome/layout/boxes';
@@ -32,6 +32,7 @@ import {
   Position, TextView
 } from 'dome/text/richtext';
 
+import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as RichText from 'frama-c/richtext';
 import type { text } from 'frama-c/kernel/api/data';
@@ -114,12 +115,13 @@ function RFormatSelector(props: Selector<TIP.rformat>): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 type Node = TIP.node | undefined;
-type Location = { step?: RichText.Tag, term?: RichText.Tag };
+type Location = { part?: RichText.Tag, term?: RichText.Tag };
 
 class Sequent {
   private readonly contents: string;
   private readonly tags: RichText.Tags;
   private readonly style: MarkDecoration[];
+  private readonly index: RichText.TagIndex;
 
   constructor(jtext: text) {
     this.contents = RichText.textToString(jtext);
@@ -147,7 +149,7 @@ class Sequent {
           addStyle(t, 'cm-type');
           return false;
         case 'wp:focus':
-          addStyle(t, 'cm-hovered-code');
+          addStyle(t, 'cm-multiple-code');
           return false;
         case 'wp:target':
           addStyle(t, 'cm-selected-code');
@@ -155,8 +157,9 @@ class Sequent {
       }
       return t.tag.startsWith('#');
     };
-    const { tags } = RichText.textToTags(jtext, filter);
+    const { index, tags } = RichText.textToTags(jtext, filter);
     this.tags = tags;
+    this.index = index;
   }
 
   get text(): string {
@@ -167,14 +170,42 @@ class Sequent {
     return this.style;
   }
 
+  find(tg: string | undefined) : RichText.Tags {
+    return tg ? this.index.get(tg) ?? [] : [];
+  }
+
+  select(part?: TIP.part, term?: TIP.term): RichText.Tag | undefined {
+    const ptags = this.find(part);
+    if (!ptags) return;
+    const etags = this.find(term);
+    if (etags) {
+      const tg = etags.find(e => ptags.find(p => RichText.contains(p, e)));
+      if (tg) return tg;
+    }
+    return ptags[0];
+  }
+
   locate(position: number): Location {
-    const stepOnly = ({ tag }: RichText.Tag): boolean => {
+    const isPart = ({ tag }: RichText.Tag): boolean => {
       return tag === '#goal' || tag.startsWith('#s');
     };
-    const step = RichText.findTag(this.tags, position, stepOnly);
-    if (!step) return {};
-    const term = RichText.findTag(step.children, position);
-    return { step, term };
+    const part = RichText.findTag(this.tags, position, isPart);
+    if (!part) return {};
+    const term = RichText.findTag(part.children, position);
+    return { part, term };
+  }
+
+  hover(pos: Position | null): Decorations {
+    if (pos) {
+      const { part, term } = this.locate(pos.offset);
+      const range = term ?? part;
+      if (range) {
+        const { offset, endOffset } = range;
+        const length = endOffset - offset;
+        return { className: 'wp cm-hovered-code', offset, length };
+      }
+    }
+    return null;
   }
 
 }
@@ -195,33 +226,45 @@ function GoalView(props: GoalViewProps): JSX.Element {
   const autofocus = focus === 'AUTOFOCUS' || focus === 'MEMORY';
   const unmangled = focus === 'MEMORY' || focus === 'RAW';
   const jtext = States.useRequest(TIP.printSequent, {
-    node,
-    iformat,
-    rformat,
-    autofocus,
-    unmangled,
+    node, iformat, rformat, autofocus, unmangled,
   }) ?? null;
+  const { part, term } = States.useRequest(TIP.getSelection, node) ?? {};
   const sequent = React.useMemo(() => new Sequent(jtext), [jtext]);
+  const selection = React.useMemo(
+    () => {
+      const tag = sequent.select(part, term);
+      const selection = tag && { offset: tag.offset, length: 0 };
+      return selection;
+    },
+    [sequent, part, term]
+  );
   const [hover, setHover] = React.useState<Decorations>(null);
   const onHover = React.useCallback((pos: Position | null) => {
-    if (pos) {
-      const { step, term } = sequent.locate(pos.offset);
-      const range = term ?? step;
-      if (range) {
-        const { offset, endOffset } = range;
-        const length = endOffset - offset;
-        setHover({ className: 'cm-hovered-code', offset, length });
-        return;
+    setHover(sequent.hover(pos));
+  }, [sequent]);
+  const onClick = React.useCallback((pos: Position | null) => {
+    setHover(null);
+    if (node) {
+      if (pos) {
+        const loc = sequent.locate(pos.offset);
+        const part = jOption(TIP.jPart)(loc.part?.tag);
+        const term = jOption(TIP.jTerm)(loc.term?.tag);
+        if (part || term) {
+          Server.send(TIP.setSelection, { node, part, term });
+          return;
+        }
       }
     }
-    setHover(null);
-  }, [sequent]);
+    Server.send(TIP.clearSelection, node);
+  }, [sequent, node]);
   return (
     <TextView
       readOnly
       text={sequent.text}
+      selection={selection}
       decorations={[hover, sequent.decorations]}
       onHover={onHover}
+      onClick={onClick}
     />
   );
 }

@@ -307,4 +307,23 @@ export const setSelection: Server.SetRequest<
   null
   >= setSelection_internal;
 
+const getSelection_internal: Server.GetRequest<
+  node,
+  { part?: part, term?: term }
+  > = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.tip.getSelection',
+  input: jNode,
+  output: Json.jObject({
+            part: Json.jOption(jPart),
+            term: Json.jOption(jTerm),
+          }),
+  signals: [ { name: 'plugins.wp.tip.printStatus' } ],
+};
+/** Get current selection in proof node */
+export const getSelection: Server.GetRequest<
+  node,
+  { part?: part, term?: term }
+  >= getSelection_internal;
+
 /* ------------------------------------- */

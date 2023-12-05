@@ -367,7 +367,9 @@ let () =
     ~output:(module D.Junit)
     begin fun node ->
       let pp = lookup_printer node in
-      pp#reset ; R.emit printStatus
+      pp#reset ;
+      pp#selected ;
+      R.emit printStatus
     end
 
 let () =
@@ -395,6 +397,24 @@ let () =
       let part = to_part (fst pp#sequent) part in
       pp#restore ~focus:(if extend then `Extend else `Focus) (part,term) ;
       R.emit printStatus
+    end
+
+let () =
+  let getSelection = R.signature ~input:(module Node) () in
+  let set_part = R.result_opt getSelection ~name:"part"
+      ~descr:(Md.plain "Selected part") (module Part) in
+  let set_term = R.result_opt getSelection ~name:"term"
+      ~descr:(Md.plain "Selected term") (module Term) in
+  R.register_sig ~package
+    ~kind:`GET
+    ~name:"getSelection"
+    ~descr:(Md.plain "Get current selection in proof node")
+    ~signals:[printStatus]
+    getSelection
+    begin fun rq node ->
+      let (part,term) = (lookup_printer node)#target in
+      set_part rq (if part <> Term then Some (of_part part) else None);
+      set_term rq term;
     end
 
 (* -------------------------------------------------------------------------- *)
