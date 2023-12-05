@@ -15,3 +15,18 @@
 {
     background: var(--code-hover);
 }
+
+.wp-tactical-view {
+    padding: 2px 0px 2px 3px;
+    flex-wrap: wrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.wp-tactical-item {
+    margin: 2px;
+    width: 120px;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 6px;
+}

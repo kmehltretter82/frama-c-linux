@@ -26,13 +26,14 @@ import * as Dome from 'dome';
 import { json } from 'dome/data/json';
 import { Cell } from 'dome/controls/labels';
 import { ToolBar, Select, Filler } from 'dome/frame/toolbars';
-import { Vfill } from 'dome/layout/boxes';
+import { Hfill, Vfill } from 'dome/layout/boxes';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
 import * as TIP from 'frama-c/plugins/wp/api/tip';
 
 import { getStatus } from './goals';
 import { GoalView } from './seq';
+import { Tactics } from './tac';
 
 /* -------------------------------------------------------------------------- */
 /* --- Sequent Printing Modes                                             --- */
@@ -164,13 +165,18 @@ export function TIPView(props: TIPProps): JSX.Element {
         <IFormatSelector value={iformat} setValue={setIformat}/>
         <RFormatSelector value={rformat} setValue={setRformat}/>
       </ToolBar>
-      <GoalView
-        node={current}
-        autofocus={autofocus}
-        unmangled={unmangled}
-        iformat={iformat}
-        rformat={rformat}
-      />
+      <Hfill>
+        <Vfill>
+          <GoalView
+            node={current}
+            autofocus={autofocus}
+            unmangled={unmangled}
+            iformat={iformat}
+            rformat={rformat}
+          />
+        </Vfill>
+        <Tactics node={current} />
+      </Hfill>
     </Vfill>
   );
 }

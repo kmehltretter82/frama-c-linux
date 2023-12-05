@@ -194,6 +194,7 @@ export function GoalView(props: GoalViewProps): JSX.Element {
       }
     }
     Server.send(TIP.clearSelection, node);
+    Server.send(TAC.configureTactics, node);
   }, [sequent, node]);
   return (
     <TextView
