@@ -30,3 +30,15 @@
     border-width: 1px;
     border-radius: 6px;
 }
+
+.wp-tactical-item.selected {
+    background: var(--code-select);
+}
+
+.wp-tactical-item:hover {
+    background: var(--code-hover);
+}
+
+.wp-tactical-cell {
+    flex: 1 0 auto;
+}

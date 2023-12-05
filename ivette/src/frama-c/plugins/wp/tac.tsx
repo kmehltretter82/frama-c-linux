@@ -21,26 +21,49 @@
 /* ************************************************************************ */
 
 import React from 'react';
-import { Cell } from 'dome/controls/labels';
+import { classes } from 'dome/misc/utils';
+import { IconButton } from 'dome/controls/buttons';
+import { Label } from 'dome/controls/labels';
 import { Vbox, Hbox } from 'dome/layout/boxes';
 import * as States from 'frama-c/states';
 import * as TIP from 'frama-c/plugins/wp/api/tip';
 import * as TAC from 'frama-c/plugins/wp/api/tac';
 
 type Node = TIP.node | undefined;
+type Tactic = TAC.tactic | undefined;
 
 /* -------------------------------------------------------------------------- */
 /* --- Tactical View                                                      --- */
 /* -------------------------------------------------------------------------- */
 
-interface TacticalProps extends TAC.tacticalData { node: Node }
+interface TacticalProps extends TAC.tacticalData {
+  node: Node;
+  selected: Tactic;
+  setSelected: (tac: Tactic) => void;
+}
 
 function Tactical(props: TacticalProps): JSX.Element | null {
-  const { status } = props;
+  const { id, status, selected, setSelected } = props;
   if (status === 'NotApplicable') return null;
+  const onSelect = (): void => setSelected(id);
+  const onPlay = (): void => { return; };
+  const className = classes(
+    'dome-color-frame wp-tactical-item',
+    selected===id && 'selected',
+  );
   return (
-    <Hbox className='dome-color-frame wp-tactical-item'>
-      <Cell {...props}/>
+    <Hbox
+      className={className}
+      onClick={onSelect}
+      onDoubleClick={onPlay}
+    >
+      <Label className='wp-tactical-cell' {...props}/>
+      <IconButton
+        icon='MEDIA.PLAY'
+        title='Apply Tactic'
+        kind='positive'
+        enabled={status==='Applicable'}
+        onClick={onPlay} />
     </Hbox>
   );
 }
@@ -54,11 +77,18 @@ export interface TacticsProps {
 }
 
 export function Tactics(props: TacticsProps): JSX.Element {
+  const { node } = props;
+  const [selected, setSelected] = React.useState<Tactic>();
   const tactics = States.useSyncArrayData(TAC.tactical);
   return (
     <Vbox className='wp-tactical-view'>
       {tactics.map(tac => (
-        <Tactical key={tac.id} node={props.node} {...tac} />
+        <Tactical
+          key={tac.id}
+          node={node}
+          selected={selected}
+          setSelected={setSelected}
+          {...tac} />
       ))}
     </Vbox>
   );
