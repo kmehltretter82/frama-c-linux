@@ -28,8 +28,8 @@ import { Cell } from 'dome/controls/labels';
 import { ToolBar, Select, Filler } from 'dome/frame/toolbars';
 import { Vfill } from 'dome/layout/boxes';
 import {
-  MarkDecoration, Decorations,
-  Position, TextView
+  MarkDecoration, GutterDecoration, Decorations,
+  Position, Range, TextProxy, TextView,
 } from 'dome/text/richtext';
 
 import * as Server from 'frama-c/server';
@@ -116,6 +116,7 @@ function RFormatSelector(props: Selector<TIP.rformat>): JSX.Element {
 
 type Node = TIP.node | undefined;
 type Location = { part?: RichText.Tag, term?: RichText.Tag };
+type Target = { selection?: Range, gutters: GutterDecoration[] };
 
 class Sequent {
   private readonly contents: string;
@@ -185,6 +186,20 @@ class Sequent {
     return ptags[0];
   }
 
+  target(proxy: TextProxy, part?: TIP.part, term?: TIP.term): Target {
+    const tag = this.select(part, term);
+    const gutters: GutterDecoration[] = [];
+    if (tag) {
+      const selection: Range = { offset: tag.offset, length: 0 };
+      const lineFrom = proxy.lineAt(tag.offset+1);
+      const lineTo = proxy.lineAt(tag.endOffset);
+      for (let line = lineFrom; line <= lineTo; line++)
+        gutters.push({ className: 'wp-gutter-part', gutter: '|', line });
+      return { selection, gutters };
+    } else
+      return { selection: undefined, gutters };
+  }
+
   locate(position: number): Location {
     const isPart = ({ tag }: RichText.Tag): boolean => {
       return tag === '#goal' || tag.startsWith('#s');
@@ -227,16 +242,18 @@ function GoalView(props: GoalViewProps): JSX.Element {
   const unmangled = focus === 'MEMORY' || focus === 'RAW';
   const jtext = States.useRequest(TIP.printSequent, {
     node, iformat, rformat, autofocus, unmangled,
+  }, {
+    pending: null,
+    offline: undefined,
+    onError: '',
   }) ?? null;
   const { part, term } = States.useRequest(TIP.getSelection, node) ?? {};
+  const proxy = React.useMemo(() => new TextProxy(), []);
   const sequent = React.useMemo(() => new Sequent(jtext), [jtext]);
-  const selection = React.useMemo(
-    () => {
-      const tag = sequent.select(part, term);
-      const selection = tag && { offset: tag.offset, length: 0 };
-      return selection;
-    },
-    [sequent, part, term]
+  React.useEffect(() => proxy.updateContents(sequent.text), [proxy, sequent]);
+  const { selection, gutters } = React.useMemo(
+    () => sequent.target(proxy, part, term),
+    [sequent, proxy, part, term]
   );
   const [hover, setHover] = React.useState<Decorations>(null);
   const onHover = React.useCallback((pos: Position | null) => {
@@ -244,15 +261,13 @@ function GoalView(props: GoalViewProps): JSX.Element {
   }, [sequent]);
   const onClick = React.useCallback((pos: Position | null) => {
     setHover(null);
-    if (node) {
-      if (pos) {
-        const loc = sequent.locate(pos.offset);
-        const part = jOption(TIP.jPart)(loc.part?.tag);
-        const term = jOption(TIP.jTerm)(loc.term?.tag);
-        if (part || term) {
-          Server.send(TIP.setSelection, { node, part, term });
-          return;
-        }
+    if (node && pos) {
+      const loc = sequent.locate(pos.offset);
+      const part = jOption(TIP.jPart)(loc.part?.tag);
+      const term = jOption(TIP.jTerm)(loc.term?.tag);
+      if (part || term) {
+        Server.send(TIP.setSelection, { node, part, term });
+        return;
       }
     }
     Server.send(TIP.clearSelection, node);
@@ -260,9 +275,10 @@ function GoalView(props: GoalViewProps): JSX.Element {
   return (
     <TextView
       readOnly
-      text={sequent.text}
+      className='wp'
+      text={proxy}
       selection={selection}
-      decorations={[hover, sequent.decorations]}
+      decorations={[hover, sequent.decorations, gutters]}
       onHover={onHover}
       onClick={onClick}
     />
