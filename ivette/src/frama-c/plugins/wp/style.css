@@ -46,3 +46,7 @@
     margin-right: 0px;
     text-overflow: ellipsis;
 }
+
+.wp-config-tactic {
+    flex: 0.1 1 120px;
+}

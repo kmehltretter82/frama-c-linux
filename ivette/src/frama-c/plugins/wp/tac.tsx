@@ -20,36 +20,55 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import React from 'react';
+import React, { Fragment } from 'react';
 import { classes } from 'dome/misc/utils';
+import { Icon } from 'dome/controls/icons';
 import { IconButton } from 'dome/controls/buttons';
 import { Item, Descr, LabelProps } from 'dome/controls/labels';
 import { Vbox, Hbox, Filler } from 'dome/layout/boxes';
+import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
+import * as WP from 'frama-c/plugins/wp/api';
 import * as TIP from 'frama-c/plugins/wp/api/tip';
 import * as TAC from 'frama-c/plugins/wp/api/tac';
 
+type Goal = WP.goal | undefined;
 type Node = TIP.node | undefined;
 type Tactic = TAC.tactic | undefined;
+
+/* -------------------------------------------------------------------------- */
+/* --- Apply Tactics                                                      --- */
+/* -------------------------------------------------------------------------- */
+
+async function applyTactic(tactic: Tactic): Promise<void> {
+  if (tactic) {
+    Server.send(TAC.applyTactic, tactic);
+  }
+}
 
 /* -------------------------------------------------------------------------- */
 /* --- Tactical Item                                                      --- */
 /* -------------------------------------------------------------------------- */
 
-interface TacticItemProps extends TAC.tacticalData {
+interface TacticSelection {
+  goal: Goal;
   node: Node;
   selected: Tactic;
   setSelected: (tac: Tactic) => void;
 }
 
+interface TacticItemProps extends TAC.tacticalData, TacticSelection {}
+
 function TacticItem(props: TacticItemProps): JSX.Element | null {
-  const { id, status, selected, setSelected } = props;
+  const { id: tactic, status, selected, setSelected } = props;
   if (status === 'NotApplicable') return null;
-  const onSelect = (): void => setSelected(id);
-  const onPlay = (): void => { return; };
+  const ready = status === 'Applicable';
+  const isSelected = selected === tactic;
+  const onSelect = (): void => setSelected(tactic);
+  const onPlay = (): void => { if (ready) applyTactic(tactic); };
   const className = classes(
     'dome-color-frame wp-tactical-item',
-    selected===id && 'selected',
+    isSelected && 'selected',
   );
   return (
     <Hbox
@@ -63,7 +82,7 @@ function TacticItem(props: TacticItemProps): JSX.Element | null {
         icon='MEDIA.PLAY'
         title='Apply Tactic'
         kind='positive'
-        enabled={status==='Applicable'}
+        enabled={ready}
         onClick={onPlay} />
     </Hbox>
   );
@@ -73,28 +92,15 @@ function TacticItem(props: TacticItemProps): JSX.Element | null {
 /* --- All Tactics View                                                   --- */
 /* -------------------------------------------------------------------------- */
 
-export interface TacticsProps {
-  node: Node;
-  selected: Tactic;
-  setSelected: (tac: Tactic) => void;
-}
-
-export function Tactics(props: TacticsProps): JSX.Element {
-  const { node, selected, setSelected } = props;
+export function Tactics(props: TacticSelection): JSX.Element {
+  const { node } = props;
   const tactics = States.useSyncArrayData(TAC.tactical);
   States.useRequest(TAC.configureTactics, node);
-  return (
-    <Vbox className='wp-tactical-view dome-color-frame'>
-      {tactics.map(tac => (
-        <TacticItem
-          key={tac.id}
-          node={node}
-          selected={selected}
-          setSelected={setSelected}
-          {...tac} />
-      ))}
-    </Vbox>
-  );
+  const items =
+    node
+    ? tactics.map(tac => <TacticItem key={tac.id} {...props} {...tac} />)
+    : null;
+  return <Vbox className='wp-tactical-view dome-color-frame'>{items}</Vbox>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -102,19 +108,24 @@ export function Tactics(props: TacticsProps): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 interface ParameterProps extends TAC.parameter {
-  node: Node;
-  tactic: Tactic;
+  node: TIP.node;
+  tactic: TAC.tactic;
 }
 
 function CheckBox(props: ParameterProps): JSX.Element
 {
-  const { label, title, value } = props;
+  const { id: param, node, tactic, label, title, value } = props;
+  const active = value === true;
+  const onClick = (): void => {
+    Server.send(TAC.setParameter, { node, tactic, param, value: !active });
+  };
   return (
     <Item
-      icon={ value === true ? 'SWITCH.ON' : 'SWITCH.OFF' }
       label={label}
       title={title}
-    />
+      onClick={onClick} >
+      <Icon id={active ? 'SWITCH.ON' : 'SWITCH.OFF'} />
+    </Item>
   );
 }
 
@@ -151,22 +162,30 @@ function getStatusLabel(tactical: TAC.tacticalData): LabelProps {
   return { icon: 'CHECK', kind: 'positive', label: 'Configured' };
 }
 
-export function Configure(props: TacticsProps): JSX.Element {
-  const { node, selected, setSelected } = props;
-  const tactical = useTactic(selected);
+export function ConfigureTactic(props: TacticSelection): JSX.Element {
+  const { node, selected: tactic, setSelected } = props;
+  const tactical = useTactic(tactic);
   const { status, label, title, params } = tactical;
-  const display = !!selected && status !== 'NotApplicable';
+  const display = !!tactic && status !== 'NotApplicable';
   const descr = getStatusLabel(tactical);
   const onClose = (): void => setSelected(undefined);
   const onPlay = (): void => { return; };
-  const parameters = params.map((prm: TAC.parameter) => (
-    <Parameter key={prm.id} node={node} tactic={selected} {...prm}/>
-  ));
+  const parameters =
+    (node && tactic)
+    ? params.map((prm: TAC.parameter) =>
+      <Parameter key={prm.id} node={node} tactic={tactic} {...prm}/>
+    ) : null;
   return (
-    <Hbox display={display}>
-      <Item key='tactic' icon='TUNINGS'>Tactic: {label}</Item>
-      <>{parameters}</>
-      <Filler/>
+    <Hbox
+      className='dome-xToolBar dome-color-frame'
+      display={display}
+    >
+      <Item
+        key='tactic'
+        className='wp-config-tactic'
+        icon='TUNINGS' label={label} />
+      <Fragment key='params'>{parameters}</Fragment>
+      <Filler key='filler'/>
       <Descr key='info' icon='CIRC.INFO' label={title} />
       <Descr key='descr' {...descr} />
       <IconButton

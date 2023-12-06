@@ -34,7 +34,7 @@ import type { tactic } from 'frama-c/plugins/wp/api/tac';
 
 import { getStatus } from './goals';
 import { GoalView } from './seq';
-import { Tactics, Configure } from './tac';
+import { Tactics, ConfigureTactic } from './tac';
 
 /* -------------------------------------------------------------------------- */
 /* --- Sequent Printing Modes                                             --- */
@@ -127,10 +127,6 @@ function useProofState(target: WP.goal | undefined): ProofState {
   ) ?? DefaultProofState;
 }
 
-function useTarget(target: WP.goal | undefined) : WP.goalsData {
-  return States.useSyncArrayElt( WP.goals, target ) ?? WP.goalsDataDefault;
-}
-
 export interface TIPProps {
   display: boolean;
   goal: WP.goal | undefined;
@@ -138,7 +134,8 @@ export interface TIPProps {
 
 export function TIPView(props: TIPProps): JSX.Element {
   const { display, goal } = props;
-  const infos = useTarget(goal);
+  const infos =
+    States.useSyncArrayElt( WP.goals, goal ) ?? WP.goalsDataDefault;
   const { current, index, pending } = useProofState(goal);
   const [selected, setSelected] = React.useState<Tactic>();
   const [ focus, setFocus ] = Dome.useWindowSettings<Focus>(
@@ -179,12 +176,14 @@ export function TIPView(props: TIPProps): JSX.Element {
           />
         </Vfill>
         <Tactics
+          goal={goal}
           node={current}
           selected={selected}
           setSelected={setSelected}
         />
       </Hfill>
-      <Configure
+      <ConfigureTactic
+        goal={goal}
         node={current}
         selected={selected}
         setSelected={setSelected}
