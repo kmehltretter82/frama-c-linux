@@ -52,17 +52,18 @@ module INDEX = State_builder.Ref
       let default () = Hashtbl.create 0
     end)
 
+let indexGoal g =
+  let id = g.Wpo.po_gid in
+  let index = INDEX.get () in
+  if not (Hashtbl.mem index id) then Hashtbl.add index id g ; id
+
 module Goal : D.S with type t = Wpo.t =
 struct
   type t = Wpo.t
   let jtype = D.declare ~package ~name:"goal"
       ~descr:(Md.plain "Proof Obligations") (Jkey "wpo")
   let of_json js = Hashtbl.find (INDEX.get ()) (Json.string js)
-  let to_json g =
-    let id = g.Wpo.po_gid in
-    let index = INDEX.get () in
-    if not (Hashtbl.mem index id) then Hashtbl.add index id g ;
-    `String id
+  let to_json g = `String (indexGoal g)
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -123,13 +124,13 @@ struct
   let to_json { smoke ; verdict } =
     `String begin
       match verdict with
-      | VCS.Valid -> if smoke then "DOOMED" else "VALID"
-      | VCS.Unknown -> if smoke then "PASSED" else "UNKNOWN"
+      | Valid -> if smoke then "DOOMED" else "VALID"
+      | Unknown -> if smoke then "PASSED" else "UNKNOWN"
+      | Timeout -> if smoke then "PASSED" else "TIMEOUT"
+      | Stepout -> if smoke then "PASSED" else "STEPOUT"
       | Failed -> "FAILED"
       | NoResult -> "NORESULT"
       | Computing _ -> "COMPUTING"
-      | Timeout -> "TIMEOUT"
-      | Stepout -> "STEPOUT"
     end
 end
 
@@ -169,6 +170,18 @@ let () = R.register ~package ~kind:`GET ~name:"getAvailableProvers"
 
 let gmodel : Wpo.t S.model = S.model ()
 
+let get_property g = Printer_tag.PIP (WpPropId.property_of_id g.Wpo.po_pid)
+
+let get_marker g =
+  match g.Wpo.po_formula.source with
+  | Some(stmt,_) -> Printer_tag.localizable_of_stmt stmt
+  | None ->
+    let ip = WpPropId.property_of_id g.Wpo.po_pid in
+    match ip with
+    | IPOther { io_loc = OLStmt(_,stmt) } ->
+      Printer_tag.localizable_of_stmt stmt
+    | _ -> Printer_tag.PIP ip
+
 let get_decl g = match g.Wpo.po_idx with
   | Function(kf,_) -> Some (Printer_tag.SFunction kf)
   | Axiomatic _ -> None (* TODO *)
@@ -191,14 +204,17 @@ let get_status g =
     verdict = (ProofEngine.consolidated g).best ;
   }
 
-let () = S.column gmodel ~name:"property"
-    ~descr:(Md.plain "Property Marker")
-    ~data:(module AST.Marker)
-    ~get:(fun g -> Printer_tag.PIP (WpPropId.property_of_id g.Wpo.po_pid))
+let () = S.column gmodel ~name:"marker"
+    ~descr:(Md.plain "Associated Marker")
+    ~data:(module AST.Marker) ~get:get_marker
 
 let () = S.column gmodel ~name:"scope"
     ~descr:(Md.plain "Associated declaration, if any")
     ~data:(module D.Joption(AST.Decl)) ~get:get_decl
+
+let () = S.column gmodel ~name:"property"
+    ~descr:(Md.plain "Property Marker")
+    ~data:(module AST.Marker) ~get:get_property
 
 let () = S.option gmodel ~name:"fct"
     ~descr:(Md.plain "Associated function name, if any")
@@ -248,7 +264,7 @@ let () = S.column gmodel ~name:"saved"
 
 let _ = S.register_array ~package ~name:"goals"
     ~descr:(Md.plain "Generated Goals")
-    ~key:(fun g -> g.Wpo.po_gid)
+    ~key:indexGoal
     ~keyName:"wpo"
     ~keyType:Goal.jtype
     ~iter:Wpo.iter_on_goals

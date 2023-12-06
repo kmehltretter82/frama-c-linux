@@ -42,30 +42,52 @@ let package = P.package ~plugin:"wp" ~name:"tip"
 let proofStatus = R.signal ~package ~name:"proofStatus"
     ~descr:(Md.plain "Proof Status has changed")
 
-module Node = D.Index(Map.Make(ProofEngine.Node))(struct let name = "node" end)
+module Node = D.Index
+    (Map.Make(ProofEngine.Node))
+    (struct
+      let package = package
+      let name = "node"
+      let descr = Md.plain "Proof Node index"
+    end)
 
 let () =
-  let snode = R.signature ~input:(module Node) () in
-  let set_title = R.result snode ~name:"result"
+  let inode = R.signature ~input:(module Node) () in
+  let set_title = R.result inode ~name:"result"
       ~descr:(Md.plain "Proof node title") (module D.Jstring) in
-  let set_proved = R.result snode ~name:"proved"
+  let set_proved = R.result inode ~name:"proved"
       ~descr:(Md.plain "Proof node complete") (module D.Jbool) in
-  let set_pending = R.result snode ~name:"pending"
+  let set_pending = R.result inode ~name:"pending"
       ~descr:(Md.plain "Pending children") (module D.Jint) in
-  let set_size = R.result snode ~name:"size"
+  let set_size = R.result inode ~name:"size"
       ~descr:(Md.plain "Proof size") (module D.Jint) in
-  let set_stats = R.result snode ~name:"stats"
+  let set_stats = R.result inode ~name:"stats"
       ~descr:(Md.plain "Node statistics") (module D.Jstring) in
+  let set_results = R.result inode ~name:"results"
+      ~descr:(Md.plain "Prover results for current node")
+      (module D.Jlist(D.Jpair(Prover)(Result))) in
+  let set_tactic = R.result inode ~name:"tactic"
+      ~descr:(Md.plain "Proof node tactic header (if any)")
+      (module D.Jstring) in
+  let set_children = R.result inode ~name:"children"
+      ~descr:(Md.plain "Proof node tactic children (id any)")
+      (module D.Jlist(D.Jpair(D.Jstring)(Node))) in
   R.register_sig ~package ~kind:`GET ~name:"getNodeInfos"
-    ~descr:(Md.plain "Proof node information") snode
+    ~descr:(Md.plain "Proof node information") inode
     ~signals:[proofStatus]
     begin fun rq node ->
       set_title rq (ProofEngine.title node) ;
       set_proved rq (ProofEngine.proved node) ;
       set_pending rq (ProofEngine.pending node) ;
       let s = ProofEngine.stats node in
+      let tactic =
+        match ProofEngine.tactical node with
+        | None -> ""
+        | Some { header } -> header in
       set_size rq (Stats.subgoals s) ;
       set_stats rq (Pretty_utils.to_string Stats.pretty s) ;
+      set_results rq (Wpo.get_results (ProofEngine.goal node)) ;
+      set_tactic rq tactic ;
+      set_children rq (ProofEngine.children node) ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -76,22 +98,13 @@ let () =
   let state = R.signature ~input:(module Goal) () in
   let set_current = R.result state ~name:"current"
       ~descr:(Md.plain "Current proof node") (module Node) in
-  let set_parents = R.result state ~name:"parents"
+  let set_path = R.result state ~name:"path"
       ~descr:(Md.plain "Proof node parents") (module D.Jlist(Node)) in
-  let set_pending = R.result state ~name:"pending"
-      ~descr:(Md.plain "Pending proof nodes") (module D.Jint) in
   let set_index = R.result state ~name:"index"
       ~descr:(Md.plain "Current node index among pending nodes (else -1)")
       (module D.Jint) in
-  let set_results = R.result state ~name:"results"
-      ~descr:(Md.plain "Prover results for current node")
-      (module D.Jlist(D.Jpair(Prover)(Result))) in
-  let set_tactic = R.result state ~name:"tactic"
-      ~descr:(Md.plain "Proof node tactic header (if any)")
-      (module D.Jstring) in
-  let set_children = R.result state ~name:"children"
-      ~descr:(Md.plain "Proof node tactic children (id any)")
-      (module D.Jlist(D.Jpair(D.Jstring)(Node))) in
+  let set_pending = R.result state ~name:"pending"
+      ~descr:(Md.plain "Pending proof nodes") (module D.Jint) in
   R.register_sig ~package
     ~kind:`GET ~name:"getProofState"
     ~descr:(Md.plain "Current Proof Status of a Goal") state
@@ -103,19 +116,13 @@ let () =
         | `Main -> ProofEngine.root tree,-1
         | `Internal node -> node,-1
         | `Leaf(idx,node) -> node,idx in
-      let rec parents node = match ProofEngine.parent node with
+      let rec path node = match ProofEngine.parent node with
         | None -> []
-        | Some p -> p::parents p in
-      let tactic = match ProofEngine.tactical current with
-        | None -> ""
-        | Some { header } -> header in
+        | Some p -> p::path p in
       set_current rq current ;
-      set_parents rq (parents current) ;
+      set_path rq (path current) ;
       set_index rq index ;
       set_pending rq (ProofEngine.pending current) ;
-      set_results rq (Wpo.get_results (ProofEngine.goal current)) ;
-      set_tactic rq tactic ;
-      set_children rq (ProofEngine.children current) ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -171,13 +178,6 @@ let () = R.register ~package ~kind:`SET ~name:"removeNode"
 (* --- Sequent Indexers                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Term = D.Tagged
-    (struct
-      type t = Lang.F.term
-      let id t = Printf.sprintf "#e%d" (Lang.F.QED.id t)
-    end)
-    (struct let name = "term" end)
-
 module Part = D.Tagged
     (struct
       type t = [ `Term | `Goal | `Step of int ]
@@ -186,12 +186,27 @@ module Part = D.Tagged
         | `Goal -> "#goal"
         | `Step k -> Printf.sprintf "#s%d" k
     end)
-    (struct let name = "part" end)
+    (struct
+      let package = package
+      let name = "part"
+      let descr = Md.plain "Proof part marker"
+    end)
+
+module Term = D.Tagged
+    (struct
+      type t = Lang.F.term
+      let id t = Printf.sprintf "#e%d" (Lang.F.QED.id t)
+    end)
+    (struct
+      let package = package
+      let name = "term"
+      let descr = Md.plain "Term marker"
+    end)
 
 let of_part = function
-  | Ptip.Term -> "#term"
-  | Ptip.Goal -> "#goal"
-  | Ptip.Step s -> Printf.sprintf "#s%d" s.id
+  | Ptip.Term -> `Term
+  | Ptip.Goal -> `Goal
+  | Ptip.Step s -> `Step s.id
 
 let to_part sequent = function
   | `Term -> Ptip.Term
@@ -217,21 +232,27 @@ class printer () : Ptip.pseq =
     end in
   let focus : Ptip.term_wrapper =
     object
-      method wrap pp fmt t = wrap "wp:focus" pp fmt t
+      method wrap pp fmt t = wrap "wp:focus" (terms#wrap pp) fmt t
     end in
   let target : Ptip.term_wrapper =
     object
-      method wrap pp fmt t = wrap "wp:target" pp fmt t
+      method wrap pp fmt t = wrap "wp:target" (terms#wrap pp) fmt t
     end in
   let parts : Ptip.part_marker =
     object
-      method wrap pp fmt p = wrap (of_part p) pp fmt p
+      method wrap pp fmt p = wrap (Part.get @@ of_part p) pp fmt p
       method mark : 'a. Ptip.part -> 'a Ptip.printer -> 'a Ptip.printer
-        = fun p pp fmt x -> wrap (of_part p) pp fmt x
+        = fun p pp fmt x -> wrap (Part.get @@ of_part p) pp fmt x
+    end in
+  let target_part : Ptip.part_marker =
+    object
+      method wrap pp fmt p = wrap "wp:target" (parts#wrap pp) fmt p
+      method mark : 'a. Ptip.part -> 'a Ptip.printer -> 'a Ptip.printer
+        = fun p pp fmt x -> wrap "wp:target" (parts#mark p pp) fmt x
     end in
   let autofocus = new Ptip.autofocus in
   let plang = new Ptip.plang ~terms ~focus ~target ~autofocus in
-  let pcond = new Ptip.pcond ~parts ~target:parts ~autofocus ~plang in
+  let pcond = new Ptip.pcond ~parts ~target:target_part ~autofocus ~plang in
   Ptip.pseq ~autofocus ~plang ~pcond
 
 (* -------------------------------------------------------------------------- *)
@@ -300,7 +321,7 @@ let rformat : Plang.rformat R.input =
 
 let () =
   let printSequent = R.signature ~output:(module D.Jtext) () in
-  let get_node = R.param printSequent ~name:"node"
+  let get_node = R.param_opt printSequent ~name:"node"
       ~descr:(Md.plain "Proof Node") (module Node) in
   let get_indent = R.param_opt printSequent ~name:"indent"
       ~descr:(Md.plain "Number of identation spaces") (module D.Jint) in
@@ -315,20 +336,22 @@ let () =
   let get_unmangled = R.param_opt printSequent ~name:"unmangled"
       ~descr:(Md.plain "Unmangled memory model") (module D.Jbool) in
   R.register_sig ~package
-    ~kind:`EXEC
+    ~kind:`GET
     ~name:"printSequent"
     ~descr:(Md.plain "Pretty-print the associated node")
     ~signals:[printStatus] printSequent
     begin fun rq () ->
-      let node = get_node rq in
-      let pp = lookup_printer node in
-      let indent = get_indent rq in
-      let margin = get_margin rq in
-      Option.iter pp#set_iformat (get_iformat rq) ;
-      Option.iter pp#set_rformat (get_rformat rq) ;
-      Option.iter pp#set_focus_mode (get_autofocus rq) ;
-      Option.iter pp#set_unmangled (get_unmangled rq) ;
-      D.jpretty ?indent ?margin pp#pp_goal (ProofEngine.goal node)
+      match get_node rq with
+      | None -> D.jtext ""
+      | Some node ->
+        let pp = lookup_printer node in
+        let indent = get_indent rq in
+        let margin = get_margin rq in
+        Option.iter pp#set_iformat (get_iformat rq) ;
+        Option.iter pp#set_rformat (get_rformat rq) ;
+        Option.iter pp#set_focus_mode (get_autofocus rq) ;
+        Option.iter pp#set_unmangled (get_unmangled rq) ;
+        D.jpretty ?indent ?margin pp#pp_goal (ProofEngine.goal node)
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -344,7 +367,9 @@ let () =
     ~output:(module D.Junit)
     begin fun node ->
       let pp = lookup_printer node in
-      pp#reset ; R.emit printStatus
+      pp#reset ;
+      pp#selected ;
+      R.emit printStatus
     end
 
 let () =
@@ -372,6 +397,24 @@ let () =
       let part = to_part (fst pp#sequent) part in
       pp#restore ~focus:(if extend then `Extend else `Focus) (part,term) ;
       R.emit printStatus
+    end
+
+let () =
+  let getSelection = R.signature ~input:(module Node) () in
+  let set_part = R.result_opt getSelection ~name:"part"
+      ~descr:(Md.plain "Selected part") (module Part) in
+  let set_term = R.result_opt getSelection ~name:"term"
+      ~descr:(Md.plain "Selected term") (module Term) in
+  R.register_sig ~package
+    ~kind:`GET
+    ~name:"getSelection"
+    ~descr:(Md.plain "Get current selection in proof node")
+    ~signals:[printStatus]
+    getSelection
+    begin fun rq node ->
+      let (part,term) = (lookup_printer node)#target in
+      set_part rq (if part <> Term then Some (of_part part) else None);
+      set_term rq term;
     end
 
 (* -------------------------------------------------------------------------- *)

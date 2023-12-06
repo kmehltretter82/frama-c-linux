@@ -59,18 +59,19 @@ export const changed: Server.Signal = {
   name: 'plugins.eva.values.changed',
 };
 
-export type callstack = Json.index<'#eva-callstack-id'>;
+/** Callstack identifier */
+export type callstack = Json.index<'#callstack'>;
 
 /** Decoder for `callstack` */
 export const jCallstack: Json.Decoder<callstack> =
-  Json.jIndex<'#eva-callstack-id'>('#eva-callstack-id');
+  Json.jIndex<'#callstack'>('#callstack');
 
 /** Natural order for `callstack` */
 export const byCallstack: Compare.Order<callstack> = Compare.number;
 
 /** Default value for `callstack` */
 export const callstackDefault: callstack =
-  Json.jIndex<'#eva-callstack-id'>('#eva-callstack-id')(-1);
+  Json.jIndex<'#callstack'>('#callstack')(-1);
 
 /** Call site infos */
 export type callsite =

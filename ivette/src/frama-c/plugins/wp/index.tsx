@@ -31,8 +31,10 @@ import { IconButton } from 'dome/controls/buttons';
 import { LED, Meter } from 'dome/controls/displays';
 import { Group, Inset } from 'dome/frame/toolbars';
 import * as Ivette from 'ivette';
+import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import { GoalTable } from './goals';
+import { TIPView } from './tip';
 import * as WP from 'frama-c/plugins/wp/api';
 import './style.css';
 
@@ -40,33 +42,60 @@ import './style.css';
 /* --- Goal Component                                                     --- */
 /* -------------------------------------------------------------------------- */
 
+type Goal = WP.goal | undefined;
+
 function WPGoals(): JSX.Element {
   const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped');
   const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed');
+  const [tip, setTip] = React.useState(false);
+  const [current, setCurrent] = React.useState<Goal>(undefined);
+  Server.useShutdown(() => { setTip(false); setCurrent(undefined); });
   const scope = States.useCurrentScope();
   const [goals, setGoals] = React.useState(0);
   const [total, setTotal] = React.useState(0);
-  const onFilter = React.useCallback((goals, total) => {
-    setGoals(goals);
-    setTotal(total);
-  }, [setGoals, setTotal]);
-  const current = scoped ? scope : undefined;
-    return (
-      <>
-        <Ivette.TitleBar>
-          <Label display={goals < total}>
-            {goals} / {total}
-          </Label>
-          <Inset />
-          <IconButton icon='COMPONENT' title='Current Scope Only'
-                      enabled={!!current}
-                      selected={scoped} onClick={flipScoped} />
-          <IconButton icon='CIRC.QUESTION' title='Unresolved Goals Only'
-                      selected={failed} onClick={flipFailed} />
-        </Ivette.TitleBar>
-        <GoalTable scope={scope} failed={failed} onFilter={onFilter} />
-      </>
-    );
+  const hasGoals = total > 0;
+  return (
+    <>
+      <Ivette.TitleBar
+        label={tip ? 'WP — TIP' : 'WP — Goals'}
+        title={tip ? 'Interactive Proof Transformer' : 'Generated Goals'}
+      >
+        <Label display={goals < total}>
+          {goals} / {total}
+        </Label>
+        <Inset />
+        <IconButton
+          icon='CURSOR' title='Current Scope Only'
+          enabled={hasGoals}
+          selected={scoped}
+          onClick={flipScoped} />
+        <IconButton
+          icon='CIRC.QUESTION' title='Unresolved Goals Only'
+          enabled={hasGoals}
+          selected={failed}
+          onClick={flipFailed} />
+        <IconButton
+          icon={tip ? 'ITEMS.LIST' : 'MEDIA.PLAY'}
+          kind={tip ? 'warning' : 'positive'}
+          title={tip ? 'Back to Goals' : 'Interactive Proof Transformer'}
+          enabled={!!current}
+          onClick={() => setTip(!tip)} />
+      </Ivette.TitleBar>
+      <GoalTable
+        display={!tip}
+        scope={scope}
+        failed={failed}
+        current={current}
+        setCurrent={setCurrent}
+        setTIP={() => setTip(true)}
+        setGoals={setGoals}
+        setTotal={setTotal}
+      />
+      <TIPView
+        display={tip}
+        goal={current} />
+    </>
+  );
 }
 
 Ivette.registerComponent({

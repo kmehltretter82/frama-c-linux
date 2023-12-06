@@ -409,6 +409,7 @@ export function reloadArray<K, A>(arr: Array<K, A>): void {
 
 /** Access to Synchronized Array elements. */
 export interface ArrayProxy<K, A> {
+  model: CompactModel<K, A>;
   length: number;
   getData(elt: K | undefined): (A | undefined);
   forEach(fn: (row: A, elt: K) => void): void;
@@ -429,6 +430,7 @@ function arrayProxy<K, A>(
   _stamp: number,
 ): ArrayProxy<K, A> {
   return {
+    model,
     length: model.length(),
     getData: (elt) => elt ? model.getData(elt) : undefined,
     forEach: (fn) => model.forEach((r) => fn(r, model.getkey(r))),

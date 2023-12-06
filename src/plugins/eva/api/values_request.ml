@@ -212,15 +212,14 @@ end
 (* --- Domain Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jcallstack : S with type t = Callstack.t = struct
-  module I = Data.Index
-      (Callstack.Map)
-      (struct let name = "eva-callstack-id" end)
-  let jtype = Data.declare ~package ~name:"callstack" I.jtype
-  type t = I.t
-  let to_json = I.to_json
-  let of_json = I.of_json
-end
+module Jcallstack : S with type t = Callstack.t =
+  Data.Index
+    (Callstack.Map)
+    (struct
+      let package = package
+      let name = "callstack"
+      let descr = Md.plain "Callstack identifier"
+    end)
 
 module Jcalls : Request.Output with type t = Callstack.t = struct
 
