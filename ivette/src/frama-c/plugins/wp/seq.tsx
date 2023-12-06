@@ -115,10 +115,11 @@ class Sequent {
     const gutters: GutterDecoration[] = [];
     if (tag) {
       const selection: Range = { offset: tag.offset, length: 0 };
-      const lineFrom = proxy.lineAt(tag.offset+1);
-      const lineTo = proxy.lineAt(tag.endOffset);
-      for (let line = lineFrom; line <= lineTo; line++)
-        gutters.push({ className: 'wp-gutter-part', gutter: '|', line });
+      const lineP = proxy.lineAt(tag.offset+1);
+      const lineQ = proxy.lineAt(tag.endOffset);
+      if (0 <= lineP && 0 <= lineQ)
+        for (let line = lineP; line <= lineQ; line++)
+          gutters.push({ className: 'wp-gutter-part', gutter: '|', line });
       return { selection, gutters };
     } else
       return { selection: undefined, gutters };

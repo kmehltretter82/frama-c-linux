@@ -189,8 +189,11 @@ export class TextProxy {
 
   /** Returns 1 also when disconnected. */
   lineAt(offset: number): number {
+    if (offset < 0) return -1;
     const doc = this.toText();
     if (!doc) return -1;
+    const length = doc.length;
+    if (offset > length) return -1;
     return doc.lineAt(offset).number;
   }
 
