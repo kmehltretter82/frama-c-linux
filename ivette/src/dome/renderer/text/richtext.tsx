@@ -53,6 +53,12 @@ export function byOffset(a : Offset, b : Offset): number
 
 type View = CM.EditorView | null;
 
+const clipRange = (a: number, value: number, b: number): number => {
+  if (value < a) return a;
+  if (value > b) return b;
+  return value;
+};
+
 /* -------------------------------------------------------------------------- */
 /* --- Text View Updates                                                  --- */
 /* -------------------------------------------------------------------------- */
@@ -68,13 +74,17 @@ function dispatchContents(view: CM.EditorView, text: string | CS.Text): void {
 }
 
 function dispatchReplace(view: CM.EditorView, rg: Range, text: string): void {
-  const { offset: from, length } = rg;
-  view.dispatch({ changes: { from, to: from + length, insert: text } });
+  const docLength = view.state.doc.length;
+  const { offset, length } = rg;
+  const endOffset = offset + length;
+  if (0 <= offset && offset <= endOffset && endOffset <= docLength)
+    view.dispatch({ changes: { from: offset, to: endOffset, insert: text } });
 }
 
 function dispatchScroll(view: CM.EditorView, rg: Range): void {
-  const anchor = rg.offset;
-  const head = anchor + rg.length;
+  const length = view.state.doc.length;
+  const anchor = clipRange(0,rg.offset,length);
+  const head = clipRange(anchor,anchor + rg.length,length);
   view.dispatch({ scrollIntoView: true, selection: { anchor, head } });
 }
 
