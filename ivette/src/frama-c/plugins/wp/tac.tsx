@@ -154,12 +154,14 @@ function useTactic(selected: Tactic): TAC.tacticalData {
 }
 
 function getStatusLabel(tactical: TAC.tacticalData): LabelProps {
-  const { status, error } = tactical;
+  const { status, error, params } = tactical;
   if (error)
     return { icon: 'WARNING', kind: 'warning', label: error };
   if (status === 'NotConfigured')
     return { icon: 'WARNING', kind: 'default', label: 'Missing fields' };
-  return { icon: 'CHECK', kind: 'positive', label: 'Configured' };
+  if (params.length)
+    return { icon: 'CHECK', kind: 'positive', label: 'Configured' };
+  return { icon: 'CHECK', kind: 'positive', label: 'Ready' };
 }
 
 export function ConfigureTactic(props: TacticSelection): JSX.Element {
