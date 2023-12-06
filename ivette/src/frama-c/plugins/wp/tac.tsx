@@ -23,8 +23,8 @@
 import React, { Fragment } from 'react';
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
-import { IconButton } from 'dome/controls/buttons';
-import { Item, Descr, LabelProps } from 'dome/controls/labels';
+import { IconButton, Spinner } from 'dome/controls/buttons';
+import { Item, Descr } from 'dome/controls/labels';
 import { Vbox, Hbox, Filler } from 'dome/layout/boxes';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
@@ -112,7 +112,7 @@ interface ParameterProps extends TAC.parameter {
   tactic: TAC.tactic;
 }
 
-function CheckBox(props: ParameterProps): JSX.Element
+function CheckBoxParam(props: ParameterProps): JSX.Element
 {
   const { id: param, node, tactic, label, title, value } = props;
   const active = value === true;
@@ -129,11 +129,40 @@ function CheckBox(props: ParameterProps): JSX.Element
   );
 }
 
+function SpinnerParam(props: ParameterProps): JSX.Element
+{
+  const {
+    id: param, node, tactic, label, title,
+    vmin, vmax, vstep, value: jval
+  } = props;
+  const onChange = (value: number): void => {
+    Server.send(TAC.setParameter, { node, tactic, param, value });
+  };
+  const value = typeof(jval)==='number' ? jval : undefined;
+  return (
+    <Item label={label} title={title}>
+      <Spinner
+        className='wp-config-spinner'
+        value={value}
+        vmin={vmin}
+        vmax={vmax}
+        vstep={vstep}
+        onChange={onChange}
+      />
+    </Item>
+  );
+}
+
 function Parameter(props: ParameterProps): JSX.Element | null
 {
+  if (!props.enabled) return null;
   switch(props.kind) {
     case 'checkbox':
-      return <CheckBox {...props} />;
+      return <CheckBoxParam {...props} />;
+    case 'spinner':
+      return <SpinnerParam {...props} />;
+    case 'selector':
+      return <Item label="<selector>" title={props.label} />;
     default:
       return null;
   }
@@ -153,12 +182,18 @@ function useTactic(selected: Tactic): TAC.tacticalData {
   return data ?? noTactic;
 }
 
-function getStatusLabel(tactical: TAC.tacticalData): LabelProps {
+interface StatusLabel {
+  icon: string;
+  kind: 'warning' | 'positive' | 'default';
+  label: string;
+}
+
+function getStatusLabel(tactical: TAC.tacticalData): StatusLabel {
   const { status, error, params } = tactical;
   if (error)
     return { icon: 'WARNING', kind: 'warning', label: error };
   if (status === 'NotConfigured')
-    return { icon: 'WARNING', kind: 'default', label: 'Missing fields' };
+    return { icon: 'WARNING', kind: 'warning', label: 'Missing fields' };
   if (params.length)
     return { icon: 'CHECK', kind: 'positive', label: 'Configured' };
   return { icon: 'CHECK', kind: 'positive', label: 'Ready' };
@@ -182,14 +217,18 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
       className='dome-xToolBar dome-color-frame'
       display={display}
     >
-      <Item
-        key='tactic'
-        className='wp-config-tactic'
-        icon='TUNINGS' label={label} />
-      <Fragment key='params'>{parameters}</Fragment>
+      <Item key='tactic' icon='TUNINGS' label={label} />
+      <Descr
+        key='info'
+        icon='CIRC.INFO'
+        className='wp-config-info'
+        label={title} />
       <Filler key='filler'/>
-      <Descr key='info' icon='CIRC.INFO' label={title} />
-      <Descr key='descr' {...descr} />
+      <Descr
+        key='descr'
+        className='wp-config-info'
+        {...descr} />
+      <Fragment key='params'>{parameters}</Fragment>
       <IconButton
         key='play'
         icon='MEDIA.PLAY'
