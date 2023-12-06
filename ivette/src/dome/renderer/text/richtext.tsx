@@ -83,8 +83,8 @@ function dispatchReplace(view: CM.EditorView, rg: Range, text: string): void {
 
 function dispatchScroll(view: CM.EditorView, rg: Range): void {
   const length = view.state.doc.length;
-  const anchor = clipRange(0,rg.offset,length);
-  const head = clipRange(anchor,anchor + rg.length,length);
+  const anchor = clipRange(0, rg.offset, length);
+  const head = clipRange(anchor, anchor + rg.length, length);
   view.dispatch({ scrollIntoView: true, selection: { anchor, head } });
 }
 
