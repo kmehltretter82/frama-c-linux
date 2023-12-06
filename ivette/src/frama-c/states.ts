@@ -72,19 +72,18 @@ export interface UseRequestOptions<A> {
 
   Options can be used to tune more precisely the behavior of the hook.
  */
-export function useRequest<In, Out>(
-  rq: Server.GetRequest<In, Out>,
+export function useRequest<Kd extends Server.RqKind, In, Out>(
+  rq: Server.Request<Kd, In, Out>,
   params: In | undefined,
   options: UseRequestOptions<Out> = {},
 ): Out | undefined {
   const initial = options.offline ?? undefined;
   const [response, setResponse] = React.useState<Out | undefined>(initial);
-  const doUpdateResponse = React.useCallback(
+  const updateResponse = Dome.useProtected(
     (opt: Out | undefined | null): void => {
       if (opt !== null) setResponse(opt);
-    }, []);
-  const updateResponse = Dome.useActive(doUpdateResponse);
-
+    }
+  );
   // Fetch Request
   async function trigger(): Promise<void> {
     if (Server.isRunning() && params !== undefined) {
