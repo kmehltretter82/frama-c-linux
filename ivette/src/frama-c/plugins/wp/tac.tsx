@@ -96,6 +96,37 @@ export function Tactics(props: TacticsProps): JSX.Element {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Tactical Parameter                                                 --- */
+/* -------------------------------------------------------------------------- */
+
+interface ParameterProps extends TAC.parameter {
+  node: Node;
+  tactic: Tactic;
+}
+
+function CheckBox(props: ParameterProps): JSX.Element
+{
+  const { label, title, value } = props;
+  return (
+    <Item
+      icon={ value === true ? 'SWITCH.ON' : 'SWITCH.OFF' }
+      label={label}
+      title={title}
+    />
+  );
+}
+
+function Parameter(props: ParameterProps): JSX.Element | null
+{
+  switch(props.kind) {
+    case 'checkbox':
+      return <CheckBox {...props} />;
+    default:
+      return null;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Tactical Configuration                                             --- */
 /* -------------------------------------------------------------------------- */
 
@@ -119,30 +150,33 @@ function getStatusLabel(tactical: TAC.tacticalData): LabelProps {
 }
 
 export function Configure(props: TacticsProps): JSX.Element {
-  const { selected, setSelected } = props;
+  const { node, selected, setSelected } = props;
   const tactical = useTactic(selected);
-  const { status, label, title } = tactical;
+  const { status, label, title, params } = tactical;
   const display = !!selected && status !== 'NotApplicable';
   const descr = getStatusLabel(tactical);
   const onClose = (): void => setSelected(undefined);
   const onPlay = (): void => { return; };
+  const parameters = params.map((prm: TAC.parameter) => (
+    <Parameter key={prm.id} node={node} tactic={selected} {...prm}/>
+  ));
   return (
     <Hbox display={display}>
-      <Item icon='TUNINGS'>Tactic: {label}</Item>
+      <Item key='tactic' icon='TUNINGS'>Tactic: {label}</Item>
+      <>{parameters}</>
       <Filler/>
-      <Descr icon='CIRC.INFO' label={title} />
-      <Descr {...descr} />
-      <IconButton
-        icon='MEDIA.PLAY'
-        kind='positive'
-        title='Apply Tactic'
-        enabled={status==='Applicable'}
-        onClick={onPlay} />
-      <IconButton
-        icon='CIRC.CLOSE'
-        onClick={onClose}
-        title='Close Tactic Configuration Panel'
-      />
+      <Descr key='info' icon='CIRC.INFO' label={title} />
+      <Descr key='descr' {...descr} />
+      <IconButton key='play'
+                  icon='MEDIA.PLAY'
+                  kind='positive'
+                  title='Apply Tactic'
+                  enabled={status==='Applicable'}
+                  onClick={onPlay} />
+      <IconButton key='close'
+                  icon='CIRC.CLOSE'
+                  onClick={onClose}
+                  title='Close Tactic Configuration Panel' />
     </Hbox>
   );
 }
