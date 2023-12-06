@@ -36,13 +36,13 @@ type Tactic = TAC.tactic | undefined;
 /* --- Tactical Item                                                      --- */
 /* -------------------------------------------------------------------------- */
 
-interface TacticalProps extends TAC.tacticalData {
+interface TacticItemProps extends TAC.tacticalData {
   node: Node;
   selected: Tactic;
   setSelected: (tac: Tactic) => void;
 }
 
-function Tactical(props: TacticalProps): JSX.Element | null {
+function TacticItem(props: TacticItemProps): JSX.Element | null {
   const { id, status, selected, setSelected } = props;
   if (status === 'NotApplicable') return null;
   const onSelect = (): void => setSelected(id);
@@ -57,7 +57,8 @@ function Tactical(props: TacticalProps): JSX.Element | null {
       onClick={onSelect}
       onDoubleClick={onPlay}
     >
-      <Item className='wp-tactical-cell' {...props}/>
+      <Item
+        className='wp-tactical-cell' {...props}/>
       <IconButton
         icon='MEDIA.PLAY'
         title='Apply Tactic'
@@ -81,10 +82,11 @@ export interface TacticsProps {
 export function Tactics(props: TacticsProps): JSX.Element {
   const { node, selected, setSelected } = props;
   const tactics = States.useSyncArrayData(TAC.tactical);
+  States.useRequest(TAC.configureTactics, node);
   return (
     <Vbox className='wp-tactical-view dome-color-frame'>
       {tactics.map(tac => (
-        <Tactical
+        <TacticItem
           key={tac.id}
           node={node}
           selected={selected}
@@ -167,16 +169,18 @@ export function Configure(props: TacticsProps): JSX.Element {
       <Filler/>
       <Descr key='info' icon='CIRC.INFO' label={title} />
       <Descr key='descr' {...descr} />
-      <IconButton key='play'
-                  icon='MEDIA.PLAY'
-                  kind='positive'
-                  title='Apply Tactic'
-                  enabled={status==='Applicable'}
-                  onClick={onPlay} />
-      <IconButton key='close'
-                  icon='CIRC.CLOSE'
-                  onClick={onClose}
-                  title='Close Tactic Configuration Panel' />
+      <IconButton
+        key='play'
+        icon='MEDIA.PLAY'
+        kind='positive'
+        title='Apply Tactic'
+        enabled={status==='Applicable'}
+        onClick={onPlay} />
+      <IconButton
+        key='close'
+        icon='CIRC.CLOSE'
+        onClick={onClose}
+        title='Close Tactic Configuration Panel' />
     </Hbox>
   );
 }

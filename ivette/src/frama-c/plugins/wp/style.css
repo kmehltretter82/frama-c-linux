@@ -42,9 +42,7 @@
 }
 
 .wp-tactical-cell {
-    flex: 1 0 auto;
-}
-
-.wp-tactic-info {
-    color: var();
+    flex: 1 0 90px;
+    margin-right: 0px;
+    text-overflow: ellipsis;
 }

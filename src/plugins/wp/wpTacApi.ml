@@ -473,6 +473,7 @@ let () =
     ~descr:(Md.plain "Configure all tactics")
     ~input:(module WpTipApi.Node)
     ~output:(module D.Junit)
+    ~signals:[WpTipApi.printStatus]
     begin fun node ->
       let selection = WpTipApi.selection node in
       iter (fun cfg -> cfg#configure node selection) ;

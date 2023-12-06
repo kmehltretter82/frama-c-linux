@@ -177,11 +177,6 @@ export function TIPView(props: TIPProps): JSX.Element {
             iformat={iformat}
             rformat={rformat}
           />
-          <Configure
-            node={current}
-            selected={selected}
-            setSelected={setSelected}
-          />
         </Vfill>
         <Tactics
           node={current}
@@ -189,6 +184,11 @@ export function TIPView(props: TIPProps): JSX.Element {
           setSelected={setSelected}
         />
       </Hfill>
+      <Configure
+        node={current}
+        selected={selected}
+        setSelected={setSelected}
+      />
     </Vfill>
   );
 }

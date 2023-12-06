@@ -33,7 +33,6 @@ import * as States from 'frama-c/states';
 import * as RichText from 'frama-c/richtext';
 import type { text } from 'frama-c/kernel/api/data';
 import * as TIP from 'frama-c/plugins/wp/api/tip';
-import * as TAC from 'frama-c/plugins/wp/api/tac';
 
 /* -------------------------------------------------------------------------- */
 /* --- Sequent Decorations                                                --- */
@@ -189,12 +188,10 @@ export function GoalView(props: GoalViewProps): JSX.Element {
       const term = jOption(TIP.jTerm)(loc.term?.tag);
       if (part || term) {
         Server.send(TIP.setSelection, { node, part, term });
-        Server.send(TAC.configureTactics, node);
         return;
       }
     }
     Server.send(TIP.clearSelection, node);
-    Server.send(TAC.configureTactics, node);
   }, [sequent, node]);
   return (
     <TextView
