@@ -29,12 +29,12 @@
     position:relative ;
 }
 
-.dome-xIcon-default { fill: var(--var-info-text-discrete) ; }
+.dome-xIcon-default { fill: var(--text-discrete) ; }
 .dome-xIcon-disabled { fill: var(--background-intense) ; }
 .dome-xIcon-selected { fill: var(--activated-button-color) ; }
 .dome-xIcon-positive { fill: var(--positive-button-color) ; }
 .dome-xIcon-negative { fill: var(--negative-button-color) ; }
-.dome-xIcon-warning { fill: var(--warning-button-color) ; }
+.dome-xIcon-warning { fill: var(--warning-button-hover) ; }
 
 .dome-xBadge {
     flex: 0 0 auto ;
