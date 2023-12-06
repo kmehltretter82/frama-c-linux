@@ -523,6 +523,64 @@ export function Select(props: SelectProps): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
+// --- Spinner
+// --------------------------------------------------------------------------
+
+export interface SpinnerProps {
+  /** Field identifier (to make forms or labels) */
+  id?: string;
+  /** Button tooltip */
+  title?: string;
+  /** Button placeholder */
+  placeholder?: string;
+  /** Defaults to `true`. */
+  enabled?: boolean;
+  /** Defaults to `false`. */
+  disabled?: boolean;
+  /** Currently selected value. */
+  value?: number;
+  /** Minimum value. */
+  vmin?: number;
+  /** Maximum value. */
+  vmax?: number;
+  /** Increment and Decrement step. */
+  vstep?: number;
+  /** Callback to selected values. */
+  onChange?: (newValue: number) => void;
+  /** Default selected value. */
+  className?: string;
+  /** Additional style for the `< dov /> ` container of Raiods */
+  style?: React.CSSProperties;
+}
+
+export function Spinner(props: SpinnerProps): JSX.Element {
+  const { onChange } = props;
+  const className = classes( 'dome-xSpinner', props.className );
+  const disabled = onChange ? DISABLED(props) : true;
+  const callback = (evt: React.ChangeEvent<HTMLInputElement>): void => {
+    if (onChange) {
+      const newValue = Number.parseInt(evt.target.value);
+      if (!Number.isNaN(newValue)) onChange(newValue);
+    }
+  };
+  return (
+    <input
+      id={props.id}
+      type="number"
+      value={props.value}
+      min={props.vmin}
+      max={props.vmax}
+      step={props.vstep}
+      className={className}
+      style={props.style}
+      disabled={disabled}
+      placeholder={props.placeholder}
+      onChange={callback}
+    />
+  );
+}
+
+// --------------------------------------------------------------------------
 // --- Text Input
 // --------------------------------------------------------------------------
 

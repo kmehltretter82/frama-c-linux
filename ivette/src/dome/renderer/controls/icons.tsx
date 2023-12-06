@@ -97,7 +97,7 @@ export function SVG(props: SVGprops): null | JSX.Element {
 // --------------------------------------------------------------------------
 
 export type IconKind =
-  'disabled' | 'selected' | 'positive' | 'negative' | 'warning';
+  'disabled' | 'selected' | 'positive' | 'negative' | 'warning' | 'default';
 
 /** Icon Component Properties */
 export interface IconProps extends SVGprops {
@@ -131,7 +131,7 @@ export function Icon(props: IconProps): JSX.Element {
     'dome-xIcon',
     !visible && 'dome-control-hidden',
     !display && 'dome-control-erased',
-    kind && ('dome-xIcon-' + kind),
+    kind && kind!=='default' && ('dome-xIcon-' + kind),
     className
   );
   const divStyle = styles(fill && { fill }, style);
