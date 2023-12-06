@@ -19,13 +19,14 @@
 .wp-tactical-view {
     padding: 2px 0px 2px 3px;
     flex-wrap: wrap;
+    align-content: flex-start;
     overflow-x: auto;
-    overflow-y: hidden;
     border-width: 1px;
     border-left-style: solid;
 }
 
 .wp-tactical-item {
+    flex: 0 0 auto;
     margin: 2px;
     width: 120px;
     border-style: solid;
