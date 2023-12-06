@@ -2,11 +2,16 @@
 /* --- Main Frame                                                         --- */
 /* -------------------------------------------------------------------------- */
 
-.sidebar-ruler {
+.sidebar-view {
     display: flex;
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
+}
+
+.sidebar-ruller {
+    width: 120px;
+    height: 0px;
 }
 
 .sidebar-items.dome-color-frame
@@ -15,7 +20,7 @@
 }
 
 .sidebar-selector {
-    min-width: 35px;    
+    min-width: 35px;
     text-align: center;
 }
 

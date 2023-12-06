@@ -73,6 +73,7 @@ function Wrapper(props: WrapperProps): JSX.Element {
 
   return (
     <SideBar className={className}>
+      <div className="sidebar-ruller"/>
       <Catch label={props.id}>
         {props.children}
       </Catch>
@@ -121,7 +122,7 @@ export function Panel(): JSX.Element {
   );
 
   return (
-    <div className="sidebar-ruler">
+    <div className="sidebar-view">
       <div className={selectorClasses}>
         {items}
       </div>
