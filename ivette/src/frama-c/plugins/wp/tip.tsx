@@ -26,7 +26,7 @@ import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Cell, Item } from 'dome/controls/labels';
-import { ToolBar, Select, Filler } from 'dome/frame/toolbars';
+import { ToolBar, Select, Filler, Button } from 'dome/frame/toolbars';
 import { Hfill, Vfill, Overlay } from 'dome/layout/boxes';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
@@ -127,10 +127,11 @@ function useProofState(target: WP.goal | undefined): ProofState {
 export interface TIPProps {
   display: boolean;
   goal: WP.goal | undefined;
+  onClose: () => void;
 }
 
 export function TIPView(props: TIPProps): JSX.Element {
-  const { display, goal } = props;
+  const { display, goal, onClose } = props;
   const infos =
     States.useSyncArrayElt( WP.goals, goal ) ?? WP.goalsDataDefault;
   const { current, index, pending } = useProofState(goal);
@@ -155,6 +156,11 @@ export function TIPView(props: TIPProps): JSX.Element {
           label={`${index+1}/${pending}`} title='Pending proof nodes'/>
         <Cell {...getStatus(infos)}/>
         <Filler/>
+        <Button
+          kind='warning'
+          icon='TRIANGLE.UP'
+          title='Close proof transformer'
+          onClick={onClose} />
       </ToolBar>
       <Hfill>
         <Vfill className="dome-positionned">

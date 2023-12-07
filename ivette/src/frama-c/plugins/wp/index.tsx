@@ -75,10 +75,10 @@ function WPGoals(): JSX.Element {
           selected={failed}
           onClick={flipFailed} />
         <IconButton
-          icon={tip ? 'ITEMS.LIST' : 'MEDIA.PLAY'}
-          kind={tip ? 'warning' : 'positive'}
+          icon='MEDIA.PLAY'
           title={tip ? 'Back to Goals' : 'Interactive Proof Transformer'}
           enabled={!!current}
+          selected={tip}
           onClick={() => setTip(!tip)} />
       </Ivette.TitleBar>
       <GoalTable
@@ -93,7 +93,9 @@ function WPGoals(): JSX.Element {
       />
       <TIPView
         display={tip}
-        goal={current} />
+        goal={current}
+        onClose={() => setTip(false)}
+      />
     </>
   );
 }
