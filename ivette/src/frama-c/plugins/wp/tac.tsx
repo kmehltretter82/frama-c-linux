@@ -21,11 +21,10 @@
 /* ************************************************************************ */
 
 import React, { Fragment } from 'react';
-import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { IconButton, Spinner, Select } from 'dome/controls/buttons';
-import { Item, Descr } from 'dome/controls/labels';
+import { Label, Item, Descr } from 'dome/controls/labels';
 import { Vbox, Hbox, Filler } from 'dome/layout/boxes';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
@@ -78,7 +77,7 @@ function TacticItem(props: TacticItemProps): JSX.Element | null {
       onDoubleClick={onPlay}
     >
       <Item
-        className='wp-tactical-cell' {...props}/>
+        className="wp-tactical-cell" {...props}/>
       <IconButton
         icon='MEDIA.PLAY'
         title='Apply Tactic'
@@ -101,7 +100,7 @@ export function Tactics(props: TacticSelection): JSX.Element {
     node
     ? tactics.map(tac => <TacticItem key={tac.id} {...props} {...tac} />)
     : null;
-  return <Vbox className='wp-tactical-view dome-color-frame'>{items}</Vbox>;
+  return <Vbox className="wp-tactical-view dome-color-frame">{items}</Vbox>;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -121,12 +120,17 @@ function CheckBoxParam(props: ParameterProps): JSX.Element
     Server.send(TAC.setParameter, { node, tactic, param, value: !active });
   };
   return (
-    <Item
+    <Label
+      className="wp-config-checkbox"
       label={label}
       title={title}
       onClick={onClick} >
-      <Icon id={active ? 'SWITCH.ON' : 'SWITCH.OFF'} />
-    </Item>
+      <Icon
+        className="wp-config-switch"
+        size={14}
+        offset={-2}
+        id={active ? 'SWITCH.ON' : 'SWITCH.OFF'} />
+    </Label>
   );
 }
 
@@ -141,7 +145,7 @@ function SpinnerParam(props: ParameterProps): JSX.Element
   };
   const value = typeof(jval)==='number' ? jval : undefined;
   return (
-    <Item label={label} title={title}>
+    <Label label={label} title={title}>
       <Spinner
         className="wp-config-field wp-config-spinner"
         value={value}
@@ -150,7 +154,7 @@ function SpinnerParam(props: ParameterProps): JSX.Element
         vstep={vstep}
         onChange={onChange}
       />
-    </Item>
+    </Label>
   );
 }
 
@@ -168,15 +172,13 @@ function SelectorParam(props: ParameterProps): JSX.Element
     Server.send(TAC.setParameter, { node, tactic, param, value });
   };
   return (
-    <Catch>
-      <Item label={label} title={title}>
-        <Select
-          className="wp-config-field wp-config-select"
-          value={value}
-          onChange={onChange}
-        >{options}</Select>
-      </Item>
-    </Catch>
+    <Label label={label} title={title}>
+      <Select
+        className="wp-config-field wp-config-select"
+        value={value}
+        onChange={onChange}
+      >{options}</Select>
+    </Label>
   );
 }
 
@@ -241,19 +243,23 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
     ) : null;
   return (
     <Hbox
-      className='dome-xToolBar dome-color-frame wp-configure'
+      className="dome-xToolBar dome-color-frame wp-configure"
       display={display}
     >
-      <Item key='tactic' icon='TUNINGS' label={label} />
+      <Item
+        key='tactic'
+        icon='TUNINGS'
+        className="wp-config-tactic"
+        label={label} />
       <Descr
         key='info'
         icon='CIRC.INFO'
-        className='wp-config-info'
+        className="wp-config-info"
         label={title} />
       <Filler key='filler'/>
       <Descr
         key='descr'
-        className='wp-config-info'
+        className="wp-config-info"
         {...descr} />
       <Fragment key='params'>{parameters}</Fragment>
       <IconButton

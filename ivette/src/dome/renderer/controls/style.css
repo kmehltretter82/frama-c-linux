@@ -10,8 +10,7 @@
 }
 
 .dome-xLabel.dome-text-descr {
-    overflow: auto ;
-    white-space: wrap ;
+    white-space: normal ;
 }
 
 /* -------------------------------------------------------------------------- */

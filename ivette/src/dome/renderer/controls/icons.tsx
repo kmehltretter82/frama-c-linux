@@ -81,7 +81,6 @@ export function SVG(props: SVGprops): null | JSX.Element {
   return (
     <svg
       height={size}
-      width={size}
       style={{ bottom: offset }}
       viewBox={viewBox}
       className={className}
