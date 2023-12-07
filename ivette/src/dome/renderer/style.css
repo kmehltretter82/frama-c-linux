@@ -39,6 +39,10 @@ body {
     visibility: hidden !important;
 }
 
+.dome-positionned {
+    position: relative;
+}
+
 .dome-color-frame {
     fill:         var(--text-discrete) ;
     color:        var(--text-discrete) ;
