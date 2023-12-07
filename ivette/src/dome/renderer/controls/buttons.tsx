@@ -475,6 +475,8 @@ export interface SelectProps {
   disabled?: boolean;
   /** Currently selected value. */
   value?: string;
+  /** Keep focus when selected (default to false). */
+  focus?: boolean;
   /** Callback to selected values. */
   onChange?: (newValue?: string) => void;
   /** Default selected value. */
@@ -497,7 +499,7 @@ export interface SelectProps {
 
  */
 export function Select(props: SelectProps): JSX.Element {
-  const { onChange, placeholder } = props;
+  const { onChange, placeholder, focus=false } = props;
   const className = classes(
     'dome-xSelect dome-xBoxButton dome-xButton-default dome-xButton-label',
     props.className,
@@ -505,6 +507,8 @@ export function Select(props: SelectProps): JSX.Element {
   const disabled = onChange ? DISABLED(props) : true;
   const callback = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
     if (onChange) onChange(evt.target.value);
+    const target = evt.target;
+    if (!focus) setImmediate(() => target.blur());
   };
   return (
     <select

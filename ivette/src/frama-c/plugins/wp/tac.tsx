@@ -21,9 +21,10 @@
 /* ************************************************************************ */
 
 import React, { Fragment } from 'react';
+import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
-import { IconButton, Spinner } from 'dome/controls/buttons';
+import { IconButton, Spinner, Select } from 'dome/controls/buttons';
 import { Item, Descr } from 'dome/controls/labels';
 import { Vbox, Hbox, Filler } from 'dome/layout/boxes';
 import * as Server from 'frama-c/server';
@@ -142,7 +143,7 @@ function SpinnerParam(props: ParameterProps): JSX.Element
   return (
     <Item label={label} title={title}>
       <Spinner
-        className='wp-config-spinner'
+        className="wp-config-field wp-config-spinner"
         value={value}
         vmin={vmin}
         vmax={vmax}
@@ -150,6 +151,32 @@ function SpinnerParam(props: ParameterProps): JSX.Element
         onChange={onChange}
       />
     </Item>
+  );
+}
+
+function SelectorParam(props: ParameterProps): JSX.Element
+{
+  const {
+    id: param, node, tactic, label, title,
+    value: jval, vlist=[]
+  } = props;
+  const value = typeof(jval) === 'string' ? jval : undefined;
+  const options = vlist.map(({ id, label, title }) =>
+    <option key={id} value={id} title={title}>{label}</option>
+  );
+  const onChange = (value: string | undefined): void => {
+    Server.send(TAC.setParameter, { node, tactic, param, value });
+  };
+  return (
+    <Catch>
+      <Item label={label} title={title}>
+        <Select
+          className="wp-config-field wp-config-select"
+          value={value}
+          onChange={onChange}
+        >{options}</Select>
+      </Item>
+    </Catch>
   );
 }
 
@@ -162,7 +189,7 @@ function Parameter(props: ParameterProps): JSX.Element | null
     case 'spinner':
       return <SpinnerParam {...props} />;
     case 'selector':
-      return <Item label="<selector>" title={props.label} />;
+      return <SelectorParam {...props} />;
     default:
       return null;
   }
@@ -214,7 +241,7 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
     ) : null;
   return (
     <Hbox
-      className='dome-xToolBar dome-color-frame'
+      className='dome-xToolBar dome-color-frame wp-configure'
       display={display}
     >
       <Item key='tactic' icon='TUNINGS' label={label} />
