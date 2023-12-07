@@ -164,14 +164,14 @@ class split =
     inherit Tactical.make
         ~id:"Wp.split"
         ~title:"Split"
-        ~descr:"Decompose Logical Connectives and Conditionals"
+        ~descr:"Decompose logical connectives and conditionals."
         ~params:[]
 
     method select feedback (s : Tactical.selection) =
       let split_cmp at title x y =
         feedback#set_title title ;
         feedback#set_descr
-          "Decompose into three comparisons (lt, eq, gt)" ;
+          "Decompose into three comparisons (lt, eq, gt)." ;
         let cases = [
           "Lt",F.p_bool (e_lt x y);
           "Eq",F.p_bool (e_eq x y);
@@ -199,7 +199,7 @@ class split =
           | Neq(x,y) when not (is_prop x || is_prop y) -> split_neq at x y
           | _ when F.is_prop e ->
             feedback#set_title "Split (true,false)" ;
-            feedback#set_descr "Decompose between True and False values" ;
+            feedback#set_descr "Decompose between boolean values." ;
             let cases = ["True",F.p_bool e;"False",F.p_not (F.p_bool e)] in
             let at = Tactical.at s in
             Applicable (Tactical.insert ?at cases)
@@ -218,7 +218,7 @@ class split =
                     (* unbound condition: proceed by case *)
                     feedback#set_title "Split (exists if)" ;
                     feedback#set_descr
-                      "Split unbound Condition into Branches" ;
+                      "Split unbound condition into branches." ;
                     let p = F.e_imply [c] (bind Exists ~vars p) in
                     let q = F.e_imply [e_not c] (bind Exists ~vars q) in
                     Applicable (Tactical.split [
@@ -230,8 +230,8 @@ class split =
                   begin
                     feedback#set_title "Split (rewrite exists if)" ;
                     feedback#set_descr
-                      "Rewrite the Conditional in a Disjunction \
-                       and Distribute the Quantifier under" ;
+                      "Rewrite into a disjunction \
+                       and distribute the quantifier under." ;
                     let p = bind Exists ~vars (F.e_and [c;p]) in
                     let q = bind Exists ~vars (F.e_and [(e_not c); q]) in
                     let cases = [ "Split" , F.p_bool (F.e_or [p;q]) ] in
@@ -240,14 +240,14 @@ class split =
               | Or es ->
                 feedback#set_title "Split (exists or)" ;
                 feedback#set_descr
-                  "Distributes the Quantifier under the Disjunction" ;
+                  "Distributes the quantifier under the disjunction." ;
                 let p = F.e_or (List.map (bind Exists ~vars) es) in
                 let cases = [ "Split" , F.p_bool p ] in
                 Applicable (Tactical.split cases)
               | Imply (es, p) ->
                 feedback#set_title "Split (exists imply)" ;
                 feedback#set_descr
-                  "Distributes the Quantifier under the Imply" ;
+                  "Distributes the quantifier under the implication." ;
                 let p = F.e_imply (List.map (bind Forall ~vars) es)
                     (bind Exists ~vars p) in
                 let cases = [ "Split" , F.p_bool p ] in
@@ -258,7 +258,7 @@ class split =
                 else begin
                   feedback#set_title "Split (exists and)" ;
                   feedback#set_descr
-                    "Decompose the Quantifier into %d Blocks" nb_parts ;
+                    "Decompose the quantifier into %d parts." nb_parts ;
                   let bind es =
                     bind Exists ~vars (F.e_and (F.Tset.elements es)) in
                   let goal i n es =
@@ -271,26 +271,26 @@ class split =
             let n = List.length es in
             feedback#set_title "Split (and)" ;
             feedback#set_descr
-              "Decompose between the %d parts of the Conjunction" n ;
+              "Decompose between the %d parts of the conjunction." n ;
             let goal i n e = Printf.sprintf "Goal %d/%d" i n , F.p_bool e in
             Applicable (Tactical.split (Tactical.mapi goal es))
           | Eq(x,y) when (F.is_prop x) && (F.is_prop y) ->
             feedback#set_title "Split (iff)" ;
-            feedback#set_descr "Turn Equivalence into Implications" ;
+            feedback#set_descr "Turn equivalence into implications." ;
             let p = F.p_bool (F.e_imply [x] y) in
             let q = F.p_bool (F.e_imply [y] x) in
             let cases = [ "Necessity" , p ; "Sufficiency" , q ] in
             Applicable (Tactical.split cases)
           | Neq(x,y) when (F.is_prop x) && (F.is_prop y) ->
             feedback#set_title "Split (xor)" ;
-            feedback#set_descr "Turn Dis-Equivalence into Implications" ;
+            feedback#set_descr "Turn dis-equivalence into implications" ;
             let p = F.p_bool (F.e_imply [x] (e_not y)) in
             let q = F.p_bool (F.e_imply [y] (e_not x)) in
             let cases = [ "Necessity" , p ; "Sufficiency" , q ] in
             Applicable (Tactical.split cases)
           | If(c,p,q) -> (* Split + intro *)
             feedback#set_title "Split (if)" ;
-            feedback#set_descr "Decompose Conditional into Branches" ;
+            feedback#set_descr "Decompose conditional into branches." ;
             let p = F.p_bool (F.e_imply [c] p) in
             let q = F.p_bool (F.e_imply [e_not c] q) in
             let cases = [ "Then" , p ; "Else" , q ] in
@@ -304,13 +304,13 @@ class split =
           | State _ -> Not_applicable
           | Branch(p,_,_) ->
             feedback#set_title "Split (branch)" ;
-            feedback#set_descr "Decompose Conditional into Branches" ;
+            feedback#set_descr "Decompose conditional into branches." ;
             let cases = [ "Then" , p ; "Else" , p_not p ] in
             Applicable (Tactical.insert ~at:step.id cases)
           | Either seqs ->
             let n = List.length seqs in
             feedback#set_title "Split (switch)" ;
-            feedback#set_descr "Decompose each %d Cases" n ;
+            feedback#set_descr "Decompose each %d cases." n ;
             let either i n s = Printf.sprintf "Case %d/%d" i n , Either [s] in
             let cases = Tactical.mapi either seqs in
             Applicable (Tactical.replace ~at:step.id cases)
@@ -325,7 +325,7 @@ class split =
                     if F.Vars.is_empty (F.Vars.inter (F.vars c) vars) then
                       begin (* unbound condition: so, the If is considered as a disjunction *)
                         feedback#set_title "Split (forall if)" ;
-                        feedback#set_descr "Decompose unbound conditional into Branches" ;
+                        feedback#set_descr "Decompose unbound conditional into branches." ;
                         let p = F.p_bool (F.e_and [c; (bind Exists ~vars p)]) in
                         let q = F.p_bool (F.e_and [(e_not c); (bind Exists ~vars q)]) in
                         let cases = [ "Then" , When p ; "Else" , When q ] in
@@ -334,7 +334,7 @@ class split =
                     else
                       begin
                         feedback#set_title "Split (rewrite forall if)" ;
-                        feedback#set_descr "Rewrite the Conditional in a Conjunction and Distributes the Quantifier under the Conjunction" ;
+                        feedback#set_descr "Rewrite the conjunction and distribute the quantifier." ;
                         let p = bind Exists ~vars (F.e_imply [c] p) in
                         let q = bind Exists ~vars (F.e_imply [e_not c] q) in
                         let cases = [ "Split (rewrite exists if)" , When (F.p_bool (F.e_and [p;q])) ] in
@@ -342,7 +342,7 @@ class split =
                       end
                   | And es ->
                     feedback#set_title "Split (forall and)" ;
-                    feedback#set_descr "Distributes the Quantifier under the Conjunction" ;
+                    feedback#set_descr "Distributes the quantifier under the conjunction." ;
                     let p = F.p_bool (F.e_and (List.map (bind Forall ~vars) es)) in
                     let cases = [ "Split (distrib forall and)" , When p ] in
                     Applicable (Tactical.replace ~at:step.id cases)
@@ -351,7 +351,7 @@ class split =
                     if nb_parts=1 then Not_applicable
                     else begin
                       feedback#set_title "Split (forall or)" ;
-                      feedback#set_descr "Decompose the Quantifier between %d parts of the Disjunction" nb_parts ;
+                      feedback#set_descr "Decompose the quantifier between %d parts of the disjunction." nb_parts ;
                       let bind es = bind Forall ~vars (F.e_or (F.Tset.elements es)) in
                       let goal i n es = Printf.sprintf "Goal %d/%d" i n , When (F.p_bool (bind es)) in
                       let cases = Tactical.mapi goal parts in
@@ -362,13 +362,13 @@ class split =
               | Or xs ->
                 let n = List.length xs in
                 feedback#set_title "Split (or)" ;
-                feedback#set_descr "Distinguish the %d parts of the Disjunction" n ;
+                feedback#set_descr "Distinguish the %d parts of the disjunction." n ;
                 let hyp i n e = Printf.sprintf "Case %d/%d" i n , When (F.p_bool e) in
                 let cases = Tactical.mapi hyp xs in
                 Applicable (Tactical.replace ~at:step.id cases)
               | Eq(x,y) when (F.is_prop x)&&(F.is_prop y) ->
                 feedback#set_title "Split (iff)";
-                feedback#set_descr "Decompose Equivalence into both True/False" ;
+                feedback#set_descr "Decompose equivalence into booleans." ;
                 let p = F.p_bool x in
                 let q = F.p_bool y in
                 let cases = [
@@ -378,7 +378,7 @@ class split =
                 Applicable (Tactical.replace ~at:step.id cases)
               | Neq(x,y) when (F.is_prop x)&&(F.is_prop y) ->
                 feedback#set_title "Split (xor)";
-                feedback#set_descr "Decompose Dis-Equivalence into alternated True/False" ;
+                feedback#set_descr "Decompose Dis-equivalence into booleans." ;
                 let p = F.p_bool x in
                 let q = F.p_bool y in
                 let cases = [
@@ -396,7 +396,7 @@ class split =
                 split_leq (Some step.id) x y
               | If(c,p,q) ->
                 feedback#set_title "Split (if)" ;
-                feedback#set_descr "Split Conditional into Branches" ;
+                feedback#set_descr "Split conditional into branches." ;
                 let p = F.p_bool (F.e_and [c;p]) in
                 let q = F.p_bool (F.e_and [e_not c;q]) in
                 let cases = [ "Then" , When p ; "Else" , When q ] in
@@ -412,7 +412,7 @@ class split =
                   | _ -> assert false (* see above pattern matching *)
                 in
                 feedback#set_title "Split (conjunction)" ;
-                feedback#set_descr "Split conjunction into steps" ;
+                feedback#set_descr "Split conjunction into different steps." ;
                 let ps = List.map (fun p -> cond @@ p_bool p) ps in
                 Applicable (Tactical.replace_step ~at:step.id ps)
               | _ ->

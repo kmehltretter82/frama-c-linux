@@ -186,7 +186,7 @@ class congruence =
     inherit Tactical.make
         ~id:"Wp.congruence"
         ~title:"Congruence"
-        ~descr:"Euclidian Comparisons"
+        ~descr:"Resolve congruences with euclidian divisions."
         ~params:[]
 
     method select _feedback = function
@@ -211,7 +211,7 @@ class autodiv =
 
     method id = "wp:congruence"
     method title = "Auto Congruence"
-    method descr = "Resolve Divisions and Multiplications"
+    method descr = "Resolve divisions and multiplications."
     method search push (seq : Conditions.sequent) =
       try
         let p = snd seq in
