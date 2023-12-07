@@ -2,6 +2,10 @@
 /* --- WP Panel Styles                                                    --- */
 /* -------------------------------------------------------------------------- */
 
+/* -------------------------------------------------------------------------- */
+/* --- Sequent Editor                                                     --- */
+/* -------------------------------------------------------------------------- */
+
 .wp .cm-gutter {
     width: 3px;
 }
@@ -15,6 +19,62 @@
 {
     background: var(--code-hover);
 }
+
+.wp-printer
+{
+    position: absolute;
+    right: 18px;
+    top: 2px;
+    background: var(--background-report);
+}
+
+.wp-printer-field
+{
+    margin: 0px;
+    font-size: x-small;
+    fill: var(--text-discrete);
+    color: var(--text-discrete);
+    font-size: x-small;
+    border-radius: 6px;
+    background: var(--background-report);
+}
+
+.wp-printer-field.selected
+{
+    font-weight: bolder;
+    fill: var(--positive-button-color);
+    color: var(--positive-button-color);
+}
+
+.wp-printer-field:hover
+{
+    fill: var(--default-button-color);
+    color: var(--default-button-color);
+    background: var(--background-button-hover) !important;
+}
+
+.wp-printer-button
+{
+    width: 30px;
+    padding: 5px 4px 5px 4px;
+}
+
+.wp-printer-button dome-xIcon {
+    margin: 0px;
+    padding: 0px;
+}
+
+.wp-printer-select
+{
+    border: none;
+    box-shadow: none;
+    text-align: right;
+    padding: 0px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Tactics View                                                       --- */
+/* -------------------------------------------------------------------------- */
 
 .wp-tactical-view {
     padding: 2px 0px 2px 3px;
@@ -47,6 +107,10 @@
     margin-right: 0px;
     text-overflow: ellipsis;
 }
+
+/* -------------------------------------------------------------------------- */
+/* --- Tactic Configuration                                               --- */
+/* -------------------------------------------------------------------------- */
 
 .wp-configure {
     min-height: 32px;
@@ -100,3 +164,5 @@
     width: 60px;
     padding-right: 2px;
 }
+
+/* -------------------------------------------------------------------------- */

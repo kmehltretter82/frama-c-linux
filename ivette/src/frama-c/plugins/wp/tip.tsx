@@ -23,10 +23,11 @@
 import React from 'react';
 import * as Dome from 'dome';
 
-import { json } from 'dome/data/json';
-import { Cell } from 'dome/controls/labels';
+import { classes } from 'dome/misc/utils';
+import { Icon } from 'dome/controls/icons';
+import { Cell, Item } from 'dome/controls/labels';
 import { ToolBar, Select, Filler } from 'dome/frame/toolbars';
-import { Hfill, Vfill } from 'dome/layout/boxes';
+import { Hfill, Vfill, Overlay } from 'dome/layout/boxes';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
 import * as TIP from 'frama-c/plugins/wp/api/tip';
@@ -40,7 +41,6 @@ import { Tactics, ConfigureTactic } from './tac';
 /* --- Sequent Printing Modes                                             --- */
 /* -------------------------------------------------------------------------- */
 
-type Focus = 'AUTOFOCUS' | 'FULLCONTEXT' | 'MEMORY' | 'RAW';
 type Tactic = tactic | undefined;
 
 interface Selector<A> {
@@ -48,31 +48,26 @@ interface Selector<A> {
   setValue: (value: A) => void;
 }
 
-function jFocus(js: json): Focus {
-  switch(js) {
-    case 'AUTOFOCUS':
-    case 'FULLCONTEXT':
-    case 'MEMORY':
-    case 'RAW':
-      return (js as Focus);
-    default:
-      return 'AUTOFOCUS';
-  }
+interface BoolSelector extends Selector<boolean> {
+  label: string;
+  title: string;
 }
 
-function FocusSelector(props: Selector<Focus>): JSX.Element {
+function AFormatSelector(props: BoolSelector): JSX.Element {
   const { value, setValue } = props;
+  const className = classes(
+    'wp-printer-field wp-printer-button',
+    value && 'selected'
+  );
   return (
-    <Select
-      value={value}
-      title='Autofocus Mode'
-      onChange={(v) => setValue(jFocus(v))}
+    <Item
+      className={className}
+      label={props.label}
+      title={props.title}
+      onClick={() => setValue(!value)}
     >
-      <option value='AUTOFOCUS'>Auto Focus</option>
-      <option value='FULLCONTEXT'>Full Context</option>
-      <option value='MEMORY'>Memory Model</option>
-      <option value='RAW'>Raw Proof</option>
-    </Select>
+      <Icon id={value ? 'SWITCH.ON' : 'SWITCH.OFF'} />
+    </Item>
   );
 }
 
@@ -80,13 +75,14 @@ function IFormatSelector(props: Selector<TIP.iformat>): JSX.Element {
   const { value, setValue } = props;
   return (
     <Select
+      className="wp-printer-field wp-printer-select"
       value={value}
-      title='Large Integers Format'
+      title='Large integers format.'
       onChange={(v) => setValue(TIP.jIformat(v))}
     >
-      <option value='dec'>Int</option>
-      <option value='hex'>Hex</option>
-      <option value='bin'>Bin</option>
+      <option value='dec' title='Integer'>int</option>
+      <option value='hex' title='Hex.'>hex</option>
+      <option value='bin' title='Binary'>bin</option>
     </Select>
   );
 }
@@ -95,13 +91,14 @@ function RFormatSelector(props: Selector<TIP.rformat>): JSX.Element {
   const { value, setValue } = props;
   return (
     <Select
+      className="wp-printer-field wp-printer-select"
       value={value}
-      title='Floatting Point Constants Format'
+      title='Floatting point format.'
       onChange={(v) => setValue(TIP.jRformat(v))}
     >
-      <option value='ratio'>Real</option>
-      <option value='float'>Float</option>
-      <option value='double'>Double</option>
+      <option value='ratio' title='Rational fraction'>frac</option>
+      <option value='float' title='IEEE Float 32-bits'>f32</option>
+      <option value='double' title='IEEE Float 64-bits'>f64</option>
     </Select>
   );
 }
@@ -138,17 +135,14 @@ export function TIPView(props: TIPProps): JSX.Element {
     States.useSyncArrayElt( WP.goals, goal ) ?? WP.goalsDataDefault;
   const { current, index, pending } = useProofState(goal);
   const [selected, setSelected] = React.useState<Tactic>();
-  const [ focus, setFocus ] = Dome.useWindowSettings<Focus>(
-    'wp.tip.focus', jFocus, 'AUTOFOCUS'
-  );
+  const [ autofocus, setAF ] = Dome.useBoolSettings('wp.tip.autofocus', true);
+  const [ memory, setMEM ] = Dome.useBoolSettings('wp.tip.unmangled', true);
   const [ iformat, setIformat ] = Dome.useWindowSettings<TIP.iformat>(
     'wp.tip.iformat', TIP.jIformat, 'dec'
   );
   const [ rformat, setRformat ] = Dome.useWindowSettings<TIP.rformat>(
     'wp.tip.rformat', TIP.jRformat, 'ratio'
   );
-  const autofocus = focus === 'AUTOFOCUS' || focus === 'MEMORY';
-  const unmangled = focus === 'MEMORY' || focus === 'RAW';
   return (
     <Vfill display={display}>
       <ToolBar>
@@ -161,16 +155,23 @@ export function TIPView(props: TIPProps): JSX.Element {
           label={`${index+1}/${pending}`} title='Pending proof nodes'/>
         <Cell {...getStatus(infos)}/>
         <Filler/>
-        <FocusSelector value={focus} setValue={setFocus}/>
-        <IFormatSelector value={iformat} setValue={setIformat}/>
-        <RFormatSelector value={rformat} setValue={setRformat}/>
       </ToolBar>
       <Hfill>
-        <Vfill>
+        <Vfill className="dome-positionned">
+          <Overlay display className="wp-printer">
+            <AFormatSelector
+              value={autofocus} setValue={setAF}
+              label='AF' title='Autofocus mode.' />
+            <AFormatSelector
+              value={memory} setValue={setMEM}
+              label='MEM' title='Memory model internals.' />
+            <IFormatSelector value={iformat} setValue={setIformat}/>
+            <RFormatSelector value={rformat} setValue={setRformat}/>
+          </Overlay>
           <GoalView
             node={current}
             autofocus={autofocus}
-            unmangled={unmangled}
+            unmangled={!memory}
             iformat={iformat}
             rformat={rformat}
           />
