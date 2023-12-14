@@ -262,14 +262,16 @@ let () = S.column gmodel ~name:"saved"
     ~data:(module D.Jbool)
     ~get:(fun wpo -> ProofEngine.get wpo = `Saved)
 
-let _ = S.register_array ~package ~name:"goals"
+let filter hook fn = hook (fun g -> if not @@ Wpo.is_tactic g then fn g)
+
+let goals = S.register_array ~package ~name:"goals"
     ~descr:(Md.plain "Generated Goals")
     ~key:indexGoal
     ~keyName:"wpo"
     ~keyType:Goal.jtype
-    ~iter:Wpo.iter_on_goals
-    ~add_update_hook:Wpo.add_modified_hook
-    ~add_remove_hook:Wpo.add_removed_hook
+    ~iter:(filter Wpo.iter_on_goals)
+    ~add_update_hook:(filter Wpo.add_modified_hook)
+    ~add_remove_hook:(filter Wpo.add_removed_hook)
     ~add_reload_hook:Wpo.add_cleared_hook
     gmodel
 

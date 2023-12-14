@@ -26,6 +26,7 @@
 
 module Node : Server.Data.S with type t = ProofEngine.node
 
+val proofStatus : Server.Request.signal
 val printStatus : Server.Request.signal
 val selection : ProofEngine.node -> Tactical.selection
 

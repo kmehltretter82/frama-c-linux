@@ -295,9 +295,7 @@ let lookup_printer (node : ProofEngine.node) : printer =
     let pp = new printer () in
     Hashtbl.add registry wpo.po_gid pp ; pp
 
-let selection node =
-  let pp = lookup_printer node in
-  pp#selection
+let selection node = (lookup_printer node)#selection
 
 (* -------------------------------------------------------------------------- *)
 (* --- PrintSequent Request                                               --- *)

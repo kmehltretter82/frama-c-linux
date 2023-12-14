@@ -42,7 +42,9 @@ type Tactic = TAC.tactic | undefined;
 
 async function applyTactic(tactic: Tactic): Promise<void> {
   if (tactic) {
-    Server.send(TAC.applyTactic, tactic);
+    console.log('APPLY',tactic);
+    const children = await Server.send(TAC.applyTactic, tactic);
+    console.log('CHILDREN',children);
   }
 }
 
@@ -232,10 +234,11 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
   const { node, selected: tactic, setSelected } = props;
   const tactical = useTactic(tactic);
   const { status, label, title, params } = tactical;
+  const isReady = status==='Applicable';
   const display = !!tactic && status !== 'NotApplicable';
   const descr = getStatusLabel(tactical);
   const onClose = (): void => setSelected(undefined);
-  const onPlay = (): void => { return; };
+  const onPlay = (): void => { if (isReady) applyTactic(tactic); };
   const parameters =
     (node && tactic)
     ? params.map((prm: TAC.parameter) =>
@@ -267,7 +270,7 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
         icon='MEDIA.PLAY'
         kind='positive'
         title='Apply Tactic'
-        enabled={status==='Applicable'}
+        enabled={isReady}
         onClick={onPlay} />
       <IconButton
         key='close'
