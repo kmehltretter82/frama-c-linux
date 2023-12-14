@@ -77,9 +77,6 @@ type typeSpecifier = (* Merge all specifiers into one type *)
 and storage =
   | NO_STORAGE | AUTO | STATIC | EXTERN | REGISTER
 
-and funspec =
-  | INLINE | VIRTUAL | EXPLICIT
-
 and cvspec =
   | CV_CONST | CV_VOLATILE | CV_RESTRICT
   | CV_ATTRIBUTE_ANNOT of string | CV_GHOST
@@ -96,7 +93,6 @@ and spec_elem =
   | SpecStorage of storage
   | SpecInline
   | SpecType of typeSpecifier
-  | SpecPattern of string       (* specifier pattern variable *)
 
 (* decided to go ahead and replace 'spec_elem list' with specifier *)
 and specifier = spec_elem list
@@ -311,7 +307,6 @@ and cabsexp =
   | MEMBEROF of expression * string
   | MEMBEROFPTR of expression * string
   | GNU_BODY of block
-  | EXPR_PATTERN of string     (* pattern variable, and name *)
   | GENERIC of (expression * (((specifier * decl_type) option * expression) list))
 
 and constant =

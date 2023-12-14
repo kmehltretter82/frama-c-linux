@@ -168,7 +168,6 @@ class metricsCabsVisitor = object(self)
      | MEMBEROF _
      | MEMBEROFPTR _
      | GNU_BODY _
-     | EXPR_PATTERN _
      | GENERIC _ -> ());
     Cil.DoChildren
 

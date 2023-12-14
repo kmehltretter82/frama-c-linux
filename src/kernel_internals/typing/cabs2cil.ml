@@ -4137,8 +4137,6 @@ let rec doSpecList ghost (suggestedAnonName: string)
     | Cabs.SpecCV cv -> cvattrs := cv :: !cvattrs; acc
     | Cabs.SpecAttr a -> attrs := a :: !attrs; acc
     | Cabs.SpecType ts -> ts :: acc
-    | Cabs.SpecPattern _ ->
-      Kernel.fatal ~current:true "SpecPattern in cabs2cil input"
   in
   (* Now scan the list and collect the type specifiers. Preserve the order *)
   let tspecs = List.fold_right doSpecElem specs [] in
@@ -7305,10 +7303,6 @@ and doExp local_env
         finishExp [] (unspecified_chunk empty)
           (mkCast ~newt:voidPtrType (integer ~loc addrval)) voidPtrType
       end
-
-    | Cabs.EXPR_PATTERN _ ->
-      Kernel.fatal ~current:true "EXPR_PATTERN in cabs2cil input"
-
 
     | Cabs.GENERIC (ce, assocs) ->
       let (_, _, control_exp, control_t) = doExp local_env asconst ce AType in
