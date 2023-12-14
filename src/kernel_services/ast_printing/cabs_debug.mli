@@ -26,7 +26,6 @@ open Format
 
 val pp_cabsloc : formatter -> cabsloc -> unit
 val pp_storage : formatter -> storage -> unit
-val pp_fun_spec : formatter -> funspec -> unit
 val pp_cvspec : formatter -> cvspec -> unit
 val pp_const : formatter -> constant -> unit
 val pp_labels : formatter -> string list -> unit
