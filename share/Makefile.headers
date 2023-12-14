@@ -42,7 +42,7 @@ HEADER_DIRS?=headers $(wildcard src/plugins/*/headers)
 # Can be set to unset/yes/no/<relative sub-directory>
 # - unset: look at $(HEADER_DIRS)
 # - yes:   look at $(HEADER_DIRS)/open-source
-# - no:    look at $(HEADER_DIRS)/close-source
+# - no:    look at $(HEADER_DIRS)/closed-source
 # - <dir>: look at $(HEADER_DIRS)/<dir>
 HEADER_OPEN_SOURCE?=yes
 
@@ -113,7 +113,7 @@ ifeq ($(HEADER_OPEN_SOURCE),yes)
 HDRCK.OPTS+= $(addprefix -header-dirs=,$(addsuffix /open-source,$(HEADER_DIRS)))
 else
 ifeq ($(HEADER_OPEN_SOURCE),no)
-HDRCK.OPTS+= $(addprefix -header-dirs=,$(addsuffix /close-source,$(HEADER_DIRS)))
+HDRCK.OPTS+= $(addprefix -header-dirs=,$(addsuffix /closed-source,$(HEADER_DIRS)))
 else
 ifeq ($(HEADER_OPEN_SOURCE),)
 HDRCK.OPTS+= $(addprefix -header-dirs=,$(HEADER_DIRS))

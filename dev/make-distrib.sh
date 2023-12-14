@@ -75,7 +75,7 @@ do
             echo "OPTIONS"
             echo ""
             echo "  --help            Print this help message"
-            echo "  --close-source    Set close source header mode (default)"
+            echo "  --closed-source   Set closed source header mode (default)"
             echo "  --open-source     Set open source header mode"
             echo "  --ci-link         Symlink to frama-c.tar.gz"
             echo "  --hdrck <cmd>     Check headers command"
@@ -86,7 +86,7 @@ do
             echo ""
             echo "  HDRCK=<cmd> (overriden set by --hdrck)"
             echo "  VERSION_CODENAME=<name> (overriden by --codename)"
-            echo "  OPEN_SOURCE=yes|no (overriden by --open-source and --close-source)"
+            echo "  OPEN_SOURCE=yes|no (overriden by --open-source and --closed-source)"
             echo "  CI_LINK=yes|no (also set by --ci-link)"
             echo ""
             exit 0
@@ -102,7 +102,7 @@ do
         "--open-source")
             OPEN_SOURCE=yes
             ;;
-        "--close-source")
+        "--closed-source")
             OPEN_SOURCE=no
             ;;
         "--ci-link")
@@ -153,7 +153,7 @@ if [ "$OPEN_SOURCE" == "yes" ]
 then
     echo "Headers: OPEN SOURCE"
 else
-    echo "Headers: CLOSE SOURCE"
+    echo "Headers: CLOSED SOURCE"
 fi
 echo "----------------------------------------------------------------"
 
@@ -222,12 +222,12 @@ done
 CHECK_HEADER_OPT="-header-dirs headers/open-source"
 
 # For plugins, either they can be open-source and we assume they have OS headers
-# or they are close-source
+# or they are closed-source
 for plugin in $PLUGINS ; do
   if [ -d "$plugin/headers/open-source" ] ; then
     CHECK_HEADER_OPT="$CHECK_HEADER_OPT -header-dirs $plugin/headers/open-source"
-  elif [ -d "$plugin/headers/close-source" ] ; then
-    CHECK_HEADER_OPT="$CHECK_HEADER_OPT -header-dirs $plugin/headers/close-source"
+  elif [ -d "$plugin/headers/closed-source" ] ; then
+    CHECK_HEADER_OPT="$CHECK_HEADER_OPT -header-dirs $plugin/headers/closed-source"
   fi
 done
 
@@ -237,24 +237,24 @@ done
 if [[ "$OPEN_SOURCE" == "yes" ]]; then
   HEADER_KIND="open-source"
 else
-  HEADER_KIND="close-source"
+  HEADER_KIND="closed-source"
 fi
 
 MAKE_HEADER_OPT="-header-dirs headers/$HEADER_KIND"
 
 # Plugins can:
-# - have both open and close -> just use header kind
-# - have only close -> just use header kind, if it is open, build will fail
+# - have both open and closed -> just use header kind
+# - have only closed -> just use header kind, if it is open, build will fail
 # - have only open -> just use open
 for plugin in $PLUGINS ; do
   if [ -d "$plugin/headers" ] ; then
     if [ "$OPEN_SOURCE" == "yes" ] ; then
       MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/open-source"
     else
-      if [ ! -d "$plugin/headers/close-source" ] ; then
+      if [ ! -d "$plugin/headers/closed-source" ] ; then
         MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/open-source"
       else
-        MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/close-source"
+        MAKE_HEADER_OPT="$MAKE_HEADER_OPT -header-dirs $plugin/headers/closed-source"
       fi
     fi
   fi
@@ -279,7 +279,7 @@ $HDRCK -update $MAKE_HEADER_OPT -spec-format="3-fields-by-line" -C "$TMP_DIR/$FR
 if [ "$OPEN_SOURCE" == "yes" ] ; then
   OUT=$(grep -Iir "Contact CEA LIST for licensing." $TMP_DIR | grep -v "headers/" | grep -v "dev/make-distrib.sh")
   if [ "$?" == "0" ]; then
-    echo "Looks like there are some files containing undetected close source licences"
+    echo "Looks like there are some files containing undetected closed source licences"
     exit 1
   fi
 fi
