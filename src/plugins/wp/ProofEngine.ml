@@ -27,6 +27,7 @@
 type node = {
   tree : Wpo.t ; (* root, to check consistency *)
   goal : Wpo.t ; (* only GoalAnnot of a sequent *)
+  child : string option ; (* child name from parent node *)
   parent : node option ;
   mutable script : script ;
   mutable stats : Stats.stats ;
@@ -86,8 +87,8 @@ let get wpo =
   with Not_found ->
     if ProofSession.exists wpo then `Script else `None
 
-let iter_all f ns = List.iter (fun (_,n) -> f n) ns
-let map_all f ns = List.map (fun (k,n) -> k,f n) ns
+let iter_children f ns = List.iter (fun m -> f (snd m)) ns
+let map_children f ns = List.map (fun m -> fst m,f m) ns
 
 let pool tree =
   match tree.pool with
@@ -112,7 +113,7 @@ let rec reset_node n =
   match n.script with
   | Opened | Script _ -> ()
   | Tactic(_,children) ->
-    n.script <- Opened ; iter_all reset_node children
+    n.script <- Opened ; iter_children reset_node children
 
 let reset_root = function None -> () | Some n -> reset_node n
 
@@ -138,7 +139,7 @@ let set_saved t s = t.saved <- s
 let rec walk f node =
   if not (Wpo.is_valid node.goal) then
     match node.script with
-    | Tactic (_,children) -> iter_all (walk f) children
+    | Tactic (_,children) -> iter_children (walk f) children
     | Opened | Script _ -> f node
 
 let iteri f tree =
@@ -233,9 +234,15 @@ let children n =
   | Tactic(_,children) -> children
   | Opened | Script _ -> []
 
+let subgoals n = List.map snd @@ children n
+
 let rec path n = match n.parent with
   | None -> []
   | Some p -> p::path p
+
+let child_label n = n.child
+let tactic_label n =
+  match n.script with Tactic({ header }, _)  -> Some header | _ -> None
 
 (* -------------------------------------------------------------------------- *)
 (* --- State & Status                                                     --- *)
@@ -337,9 +344,10 @@ let mk_goal t ~title ~part ~axioms sequent =
       po_formula = mk_formula ~main:t.main.po_formula axioms sequent ;
     })
 
-let mk_tree_node ~tree ~anchor goal = {
+let mk_tree_node ~tree ~anchor (child,goal) = {
   tree = tree.main ; goal ;
   parent = Some anchor ;
+  child = Some child ;
   script = Opened ;
   stats = Stats.empty ;
   search_index = 0 ;
@@ -349,6 +357,7 @@ let mk_tree_node ~tree ~anchor goal = {
 
 let mk_root_node goal = {
   tree = goal ; goal ;
+  child = None ;
   parent = None ;
   script = Opened ;
   stats = Stats.empty ;
@@ -392,7 +401,7 @@ struct
         (fun (part,s) -> part , mk_goal tree ~title ~part ~axioms s) dseqs
     in { tree ; tactic ; anchor ; goals }
 
-  let iter f w = iter_all f w.goals
+  let iter f w = iter_children f w.goals
 
   let header frk = frk.tactic.ProofScript.header
 end
@@ -419,7 +428,7 @@ let commit fork =
   List.iter (fun (_,wp) -> ignore (Wpo.resolve wp)) fork.Fork.goals ;
   let tree = fork.Fork.tree in
   let anchor = fork.Fork.anchor in
-  let children = map_all (mk_tree_node ~tree ~anchor) fork.Fork.goals in
+  let children = map_children (mk_tree_node ~tree ~anchor) fork.Fork.goals in
   tree.saved <- false ;
   anchor.script <- Tactic( fork.Fork.tactic , children ) ;
   anchor , children

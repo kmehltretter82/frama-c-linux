@@ -86,6 +86,9 @@ val stats : node -> Stats.stats
 val depth : node -> int
 val path : node -> node list
 val parent : node -> node option
+val child_label : node -> string option
+val tactic_label : node -> string option
+val subgoals : node -> node list
 val children : node -> (string * node) list
 val tactical : node -> ProofScript.jtactic option
 val get_strategies : node -> int * Strategy.t array (* current index *)

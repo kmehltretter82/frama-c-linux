@@ -111,16 +111,16 @@ function RFormatSelector(props: Selector<TIP.rformat>): JSX.Element {
 interface NodeProps {
   node: TIP.node;
   current: TIP.node | undefined;
-  label?: string;
   parent?: boolean;
 }
 
 function Node(props: NodeProps): JSX.Element
 {
   const cellRef = React.useRef<HTMLLabelElement>(null);
-  const { node, label, parent } = props;
+  const { node, parent } = props;
   const current = node === props.current;
-  const { tactic, title, proved, pending=1, size=1 } =
+  const debug = `#${node}`;
+  const { title=debug, child=debug, tactic, proved, pending=1, size=1 } =
     States.useRequest(
       TIP.getNodeInfos,
       node,
@@ -137,12 +137,11 @@ function Node(props: NodeProps): JSX.Element
     !parent && !current && 'child',
   );
   const icon =
-    current ? 'TRIANGLE.RIGHT' :
-    parent ? 'ANGLE.DOWN' : 'ANGLE.RIGHT';
-  const kind =
-    current ? (proved ? 'positive' : 'negative') :
-    parent ? 'default' : (proved ? 'positive' : 'warning');
-  const nodeLabel = label ?? tactic ?? 'root';
+    current
+    ? (parent ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT')
+    : (parent ? 'ANGLE.DOWN' : 'ANGLE.RIGHT');
+  const kind = proved ? 'positive' : (parent ? 'default' : 'warning');
+  const nodeLabel = parent ? tactic : child;
   const proofState =
     proved ? 'proved' :
     pending < size ? `pending ${pending}/${size}` : 'unproved';
@@ -161,7 +160,7 @@ function Node(props: NodeProps): JSX.Element
 
 interface NavBarProps {
   above: TIP.node[];
-  below: [string, TIP.node][];
+  below: TIP.node[];
   current: TIP.node | undefined;
 }
 
@@ -170,8 +169,8 @@ function NavBar(props: NavBarProps): JSX.Element {
   const parents = props.above.map(n => (
     <Node key={n} node={n} parent current={current} />
   )).reverse();
-  const children = props.below.map(([l, n]) => (
-    <Node key={n} node={n} label={l} current={current} />
+  const children = props.below.map(n => (
+    <Node key={n} node={n} current={current} />
   ));
   return (
     <Vbox className="wp-navbar">
@@ -190,7 +189,7 @@ function NavBar(props: NavBarProps): JSX.Element {
 interface ProofState {
   current: TIP.node|undefined;
   above: TIP.node[];
-  below: [string, TIP.node][];
+  below: TIP.node[];
   index: number;
   pending: number;
 }
@@ -200,7 +199,7 @@ function useProofState(target: WP.goal | undefined): ProofState {
     current: undefined, index: 0, pending: 0, above: [], below: []
   };
   return States.useRequest(
-    TIP.getProofState,
+    TIP.getProofCursor,
     target,
     { pending: null, onError: DefaultProofState }
   ) ?? DefaultProofState;

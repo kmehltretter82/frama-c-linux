@@ -51,7 +51,6 @@ module Node = D.Index
     end)
 
 module Path = D.Jlist(Node)
-module Children = D.Jlist(D.Jpair(D.Jstring)(Node))
 
 let () =
   let inode = R.signature ~input:(module Node) () in
@@ -68,15 +67,18 @@ let () =
   let set_results = R.result inode ~name:"results"
       ~descr:(Md.plain "Prover results for current node")
       (module D.Jlist(D.Jpair(Prover)(Result))) in
-  let set_tactic = R.result inode ~name:"tactic"
+  let set_tactic = R.result_opt inode ~name:"tactic"
       ~descr:(Md.plain "Proof node tactic header (if any)")
+      (module D.Jstring) in
+  let set_child = R.result_opt inode ~name:"child"
+      ~descr:(Md.plain "Proof node child label (from parent, if any)")
       (module D.Jstring) in
   let set_path = R.result inode ~name:"path"
       ~descr:(Md.plain "Proof node path from goal")
       (module Path) in
   let set_children = R.result inode ~name:"children"
       ~descr:(Md.plain "Proof node tactic children (id any)")
-      (module Children) in
+      (module Path) in
   R.register_sig ~package ~kind:`GET ~name:"getNodeInfos"
     ~descr:(Md.plain "Proof node information") inode
     ~signals:[proofStatus]
@@ -85,20 +87,19 @@ let () =
       set_proved rq (ProofEngine.proved node) ;
       set_pending rq (ProofEngine.pending node) ;
       let s = ProofEngine.stats node in
-      let tactic =
-        match ProofEngine.tactical node with
-        | None -> ""
-        | Some { header } -> header in
+      let tactic = ProofEngine.tactic_label node in
+      let child = ProofEngine.child_label node in
       set_size rq (Stats.subgoals s) ;
       set_stats rq (Pretty_utils.to_string Stats.pretty s) ;
       set_results rq (Wpo.get_results (ProofEngine.goal node)) ;
       set_tactic rq tactic ;
+      set_child rq child ;
       set_path rq (ProofEngine.path node) ;
-      set_children rq (ProofEngine.children node) ;
+      set_children rq (ProofEngine.subgoals node) ;
     end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Proof Tree                                                         --- *)
+(* --- Proof Cursor                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
 let () =
@@ -115,9 +116,9 @@ let () =
       (module Path) in
   let set_below = R.result state ~name:"below"
       ~descr:(Md.plain "Below nodes (including current when pending)")
-      (module Children) in
+      (module Path) in
   R.register_sig ~package
-    ~kind:`GET ~name:"getProofState"
+    ~kind:`GET ~name:"getProofCursor"
     ~descr:(Md.plain "Current Proof Status of a Goal") state
     ~signals:[proofStatus]
     begin fun rq wpo ->
@@ -133,7 +134,7 @@ let () =
       set_current rq current ;
       set_index rq index ;
       let above = ProofEngine.path current in
-      let below = ProofEngine.children current in
+      let below = ProofEngine.subgoals current in
       if below = [] then
         match above with
         | [] ->
@@ -141,7 +142,7 @@ let () =
           set_below rq [] ;
         | p::_ ->
           set_above rq above ;
-          set_below rq (ProofEngine.children p) ;
+          set_below rq (ProofEngine.subgoals p) ;
       else
         begin
           set_above rq (current::above) ;
