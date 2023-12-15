@@ -579,7 +579,7 @@ class pseq
       pcond#pp_esequent env fmt s
 
     method pp_goal fmt w =
-      Format.fprintf fmt "@\n@{<wp:clause>Goal@} %a:@\n" Wpo.pp_title w ;
+      Format.fprintf fmt "@{<wp:clause>Goal@} %a:@\n" Wpo.pp_title w ;
       let _,sequent = Wpo.compute w in
       self#pp_sequent fmt sequent
 

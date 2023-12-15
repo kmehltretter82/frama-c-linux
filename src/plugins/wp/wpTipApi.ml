@@ -337,7 +337,7 @@ let () = Wpo.add_cleared_hook
        let registry = PRINTER.get () in
        Hashtbl.clear registry)
 
-let lookup_printer (node : ProofEngine.node) : printer =
+let lookup_main_printer (node : ProofEngine.node) : printer =
   let tree = ProofEngine.tree node in
   let wpo = ProofEngine.main tree in
   let registry = PRINTER.get () in
@@ -345,7 +345,7 @@ let lookup_printer (node : ProofEngine.node) : printer =
     let pp = new printer () in
     Hashtbl.add registry wpo.po_gid pp ; pp
 
-let selection node = (lookup_printer node)#selection
+let selection node = (lookup_main_printer node)#selection
 
 (* -------------------------------------------------------------------------- *)
 (* --- PrintSequent Request                                               --- *)
@@ -392,7 +392,7 @@ let () =
       match get_node rq with
       | None -> D.jtext ""
       | Some node ->
-        let pp = lookup_printer node in
+        let pp = lookup_main_printer node in
         let indent = get_indent rq in
         let margin = get_margin rq in
         Option.iter pp#set_iformat (get_iformat rq) ;
@@ -414,7 +414,7 @@ let () =
     ~input:(module Node)
     ~output:(module D.Junit)
     begin fun node ->
-      let pp = lookup_printer node in
+      let pp = lookup_main_printer node in
       pp#reset ;
       pp#selected ;
       R.emit printStatus
@@ -441,7 +441,7 @@ let () =
       let part = get_part rq in
       let term = get_term rq in
       let extend = get_extend rq in
-      let pp = lookup_printer node in
+      let pp = lookup_main_printer node in
       let part = to_part (fst pp#sequent) part in
       pp#restore ~focus:(if extend then `Extend else `Focus) (part,term) ;
       R.emit printStatus
@@ -460,7 +460,7 @@ let () =
     ~signals:[printStatus;proofStatus]
     getSelection
     begin fun rq node ->
-      let (part,term) = (lookup_printer node)#target in
+      let (part,term) = (lookup_main_printer node)#target in
       set_part rq (if part <> Term then Some (of_part part) else None);
       set_term rq term;
     end
