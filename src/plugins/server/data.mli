@@ -85,11 +85,14 @@ module Jalpha : S with type t = string
 (** Rich text encoding, see [Jbuffer]. *)
 module Jtext : S with type t = json
 
-module Jmarkdown : S with type t = Markdown.text
+(** Simple string a Jtext *)
+val jtext : string -> Jtext.t
 
 (** All-in-one formatter. Return the JSON encoding of formatted text. *)
 val jpretty : ?indent:int -> ?margin:int ->
   (Format.formatter -> 'a -> unit) -> 'a -> Jtext.t
+
+module Jmarkdown : S with type t = Markdown.text
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Constructors} *)
@@ -338,10 +341,12 @@ end
 *)
 (* -------------------------------------------------------------------------- *)
 
-(** Datatype information. *)
+(** Datatype registration information. *)
 module type Info =
 sig
+  val package: package
   val name: string
+  val descr: Markdown.text
 end
 
 (** Simplified [Map.S]. *)

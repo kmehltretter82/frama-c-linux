@@ -2,7 +2,7 @@ The following set of packages is known to be a working configuration for
 compiling Frama-C 28.0.
 
 - OCaml 4.13.1
-- alt-ergo-free.2.2.0 (for wp, optional)
+- alt-ergo.2.4.2 (for wp, optional)
 - dune.3.7.1
 - dune-configurator.3.7.1
 - dune-site.3.7.1

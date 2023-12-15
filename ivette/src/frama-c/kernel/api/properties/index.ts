@@ -140,6 +140,8 @@ export enum propKind {
   check_lemma = 'check_lemma',
   /** ACSL extension */
   extension = 'extension',
+  /** Generic Property */
+  generic = 'generic',
 }
 
 /** Decoder for `propKind` */

@@ -396,7 +396,7 @@ interface SectionProps {
   children: React.ReactNode;
 }
 
-async function onContextMenu(prefix:string): Promise<void> {
+function onContextMenu(prefix:string): void {
   const items: Dome.PopupMenuItem[] = [
     {
       label: 'Reset to default',

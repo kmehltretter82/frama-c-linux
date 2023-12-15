@@ -108,13 +108,13 @@ a list of _commands_:
 Similarly, a single output message consists of a list
 of _replies_, listed in table below:
 
-| Replies  | Parameters | Description |
-|:---------|:-----------|:------------|
+| Replies | Parameters | Description |
+|:--------|:-----------|:------------|
 | `DATA` | `id,data` | Response data from the identified request |
 | `ERROR` | `id,message` | Error message from the identified request |
-| `SIGNAL` | `id` | The identified signal has been emitted since last exchange |
-| `KILLED` | `id` | The identified request has been killed or interrupted |
-| `REJECTED` | `id` | The identified request was not registered on the Server |
+| `SIGNAL` | `id` | The signal has been emitted since last exchange |
+| `KILLED` | `id` | The request has been killed or interrupted |
+| `REJECTED` | `id` | The request was not registered on the Server |
 | `CMDLINEON` | - | The command line has started |
 | `CMDLINEOFF` | - | The command line is terminated |
 

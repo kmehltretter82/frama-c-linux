@@ -97,7 +97,7 @@ check-publish:
 check-release:
   stage: prepare
   script:
-    - ./check-release.sh
+    - ./nix/frama-c-public/check-release.sh
   <<: *when_release
 
 # Observed: when several shell with same dependencies are started, deadlock may

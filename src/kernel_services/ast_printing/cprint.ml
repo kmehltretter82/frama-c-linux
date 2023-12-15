@@ -166,7 +166,6 @@ let get_operator exp =
   | MEMBEROF (_, _) -> ("", 15)
   | MEMBEROFPTR (_, _) -> ("", 15)
   | GNU_BODY _ -> ("", 17)
-  | EXPR_PATTERN _ -> ("", 16)     (* sm: not sure about this *)
   | GENERIC _ -> ("", 16)
 
 (*
@@ -197,7 +196,6 @@ let rec print_specifiers fmt (specs: spec_elem list) =
     | SpecCV CV_GHOST -> fprintf fmt "\\ghost"
     | SpecAttr al -> print_attribute fmt al
     | SpecType bt -> print_type_spec fmt bt
-    | SpecPattern name -> fprintf fmt "@@specifier(%s)" name
   in
   Pretty_utils.pp_list ~sep:"@ " print_spec_elem fmt specs
 
@@ -413,7 +411,6 @@ and print_expression_level (lvl: int) fmt (exp : expression) =
       fprintf fmt "%a->%s"
         print_expression exp fld
     | GNU_BODY blk -> fprintf fmt "(@[%a@])" print_block blk
-    | EXPR_PATTERN (name) -> fprintf fmt "@@expr(%s)" name
     | COMMA l -> pp_list ~sep:",@ " print_expression fmt l
     | GENERIC (control_exp, typ_exps) ->
       fprintf fmt "_Generic(@[%a,@ %a@])" print_expression control_exp

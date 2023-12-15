@@ -237,6 +237,7 @@ struct
 end
 
 let jpretty = Jbuffer.to_json
+let jtext s = `String s
 
 (* -------------------------------------------------------------------------- *)
 (* --- Functional API                                                     --- *)
@@ -579,7 +580,9 @@ end
 
 module type Info =
 sig
+  val package: package
   val name: string
+  val descr: Markdown.text
 end
 
 (** Simplified [Map.S] *)
@@ -662,7 +665,8 @@ struct
   include
     (struct
       type t = M.key
-      let jtype = Jindex I.name
+      let jtype =
+        declare ~package:I.package ~name:I.name ~descr:I.descr (Jindex I.name)
       let of_json = INDEX.of_json index
       let to_json = INDEX.to_json index
     end)
@@ -697,7 +701,8 @@ struct
   include
     (struct
       type t = M.key
-      let jtype = Jindex I.name
+      let jtype =
+        declare ~package:I.package ~name:I.name ~descr:I.descr (Jindex I.name)
       let of_json js = INDEX.of_json (index()) js
       let to_json v = INDEX.to_json (index()) v
     end)
@@ -754,14 +759,13 @@ struct
   let get x =
     let tag = A.id x in
     let hash = lookup () in
-    if not (Hashtbl.mem hash tag) then
-      Hashtbl.add hash tag x ;
-    tag
+    if not (Hashtbl.mem hash tag) then Hashtbl.add hash tag x ; tag
 
   include
     (struct
       type t = A.t
-      let jtype = T.jtype I.name
+      let jtype =
+        declare ~package:I.package ~descr:I.descr ~name:I.name (T.jtype I.name)
       let to_json a = T.to_json (get a)
       let of_json js =
         let k = T.of_json js in
@@ -794,8 +798,8 @@ sig
 end
 
 module Tagged(A : TaggedType)(I : Info)
-  : Index with type t = A.t and type tag := string =
-  HASHED
+  : Index with type t = A.t and type tag := string
+  = HASHED
     (struct
       include Jstring
       type tag = string

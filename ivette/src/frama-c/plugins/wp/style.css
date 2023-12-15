@@ -1,0 +1,17 @@
+/* -------------------------------------------------------------------------- */
+/* --- WP Panel Styles                                                    --- */
+/* -------------------------------------------------------------------------- */
+
+.wp .cm-gutter {
+    width: 3px;
+}
+
+.wp-gutter-part {
+    background: red;
+}
+
+.wp.cm-hovered-code,
+.wp.cm-hovered-code > span
+{
+    background: var(--code-hover);
+}

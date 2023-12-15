@@ -33,7 +33,7 @@ import * as WP from 'frama-c/plugins/wp/api';
 /* -------------------------------------------------------------------------- */
 
 function getScope(g : WP.goalsData): string {
-  if (g.bhv && g.fct) return `${g.fct}@{g.bhv}}`;
+  if (g.bhv && g.fct) return `${g.fct} — {g.bhv}}`;
   if (g.fct) return g.fct;
   if (g.thy) return g.thy;
   return '';
@@ -45,6 +45,7 @@ function getScope(g : WP.goalsData): string {
 
 interface IconStatus {
   icon: string;
+  label: string;
   kind: IconKind;
   title: string;
 }
@@ -52,22 +53,24 @@ interface IconStatus {
 interface Status extends IconStatus { label: string }
 
 const noResult : IconStatus =
-  { icon: 'MINUS', kind: 'disabled', title: 'No Result' };
+  { icon: 'MINUS', label: 'No Result', kind: 'disabled', title: 'No Result' };
 
+/* eslint-disable max-len */
 const baseStatus : { [key:string]: IconStatus } = {
-  'VALID': { icon: 'CHECK', kind: 'positive', title: 'Valid Goal' },
-  'PASSED': { icon: 'CHECK', kind: 'positive', title: 'Passed Test' },
-  'DOOMED': { icon: 'CROSS', kind: 'negative', title: 'Doomed Test' },
-  'FAILED': { icon: 'WARNING', kind: 'negative', title: 'Prover Failure' },
-  'UNKNOWN': { icon: 'ATTENTION', kind: 'warning', title: 'Prover Stucked' },
-  'TIMEOUT': { icon: 'HELP', kind: 'warning', title: 'Prover Timeout' },
-  'STEPOUT': { icon: 'HELP', kind: 'warning', title: 'Prover Stepout' },
-  'COMPUTING': { icon: 'EXECUTE', kind: 'default', title: 'Computing…' },
+  'VALID': { icon: 'CHECK', label: 'Valid', kind: 'positive', title: 'Valid Goal' },
+  'PASSED': { icon: 'CHECK', label: 'Passed', kind: 'positive', title: 'Passed Test' },
+  'DOOMED': { icon: 'CROSS', label: 'Doomed', kind: 'negative', title: 'Doomed Test' },
+  'FAILED': { icon: 'WARNING', label: 'Failed', kind: 'negative', title: 'Prover Failure' },
+  'UNKNOWN': { icon: 'ATTENTION', label: 'Unknown', kind: 'warning', title: 'Prover Stucked' },
+  'TIMEOUT': { icon: 'HELP', label: 'Timeout', kind: 'warning', title: 'Prover Timeout' },
+  'STEPOUT': { icon: 'HELP', label: 'Stepout', kind: 'warning', title: 'Prover Stepout' },
+  'COMPUTING': { icon: 'EXECUTE', label: 'Running', kind: 'default', title: 'Prover is running' },
 };
+/* eslint-enable max-len */
 
-function getStatus(g : WP.goalsData): Status {
-  const base = baseStatus[g.status] ?? noResult;
-  return { ...base, label: g.stats.summary };
+export function getStatus(g : WP.goalsData): Status {
+  const { label, ...base } = baseStatus[g.status] ?? noResult;
+  return { ...base, label: label + g.stats.summary };
 }
 
 function renderStatus(s : Status): JSX.Element {
@@ -94,21 +97,35 @@ function filterGoal(
 /* -------------------------------------------------------------------------- */
 
 export interface GoalTableProps {
-  scope: Ast.decl | undefined;
+  display: boolean;
   failed: boolean;
-  onFilter: (goals: number, total: number) => void;
+  scope: Ast.decl | undefined;
+  current: WP.goal | undefined;
+  setCurrent: (goal: WP.goal) => void;
+  setTIP: (goal: WP.goal) => void;
+  setGoals: (goals: number) => void;
+  setTotal: (total: number) => void;
 }
 
 export function GoalTable(props: GoalTableProps): JSX.Element {
-  const { scope, failed, onFilter } = props;
-  const model = States.useSyncArrayModel(WP.goals);
-  const [wpoSelection, setWpoSelection] = React.useState(WP.goalDefault);
-
-  const onWpoSelection = React.useCallback(
-    ({ wpo, property }: WP.goalsData) => {
-      States.setSelected(property);
-      setWpoSelection(wpo);
-    }, []);
+  const {
+    display, scope, failed,
+    current, setCurrent, setTIP,
+    setGoals, setTotal,
+  } = props;
+  const { model } = States.useSyncArrayProxy(WP.goals);
+  const goals = model.getRowCount();
+  const total = model.getTotalRowCount();
+  const onSelection = React.useCallback(
+    ({ wpo, marker }: WP.goalsData) => {
+      States.setSelected(marker);
+      setCurrent(wpo);
+    }, [setCurrent]);
+  const onDoubleClick = React.useCallback(
+    ({ wpo }: WP.goalsData) => {
+      setTIP(wpo);
+    }, [setTIP]
+  );
 
   React.useEffect(() => {
     if (failed || !!scope) {
@@ -116,17 +133,19 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
     } else {
       model.setFilter();
     }
-    const goals = model.getRowCount();
-    const total = model.getTotalRowCount();
-    onFilter(goals, total);
-  }, [model, scope, failed, onFilter]);
+  }, [model, scope, failed]);
+
+  React.useEffect(() => setGoals(goals), [goals, setGoals]);
+  React.useEffect(() => setTotal(total), [total, setTotal]);
 
   return (
     <Table
       model={model}
+      display={display}
       settings='wp.goals'
-      onSelection={onWpoSelection}
-      selection={wpoSelection}
+      selection={current}
+      onSelection={onSelection}
+      onDoubleClick={onDoubleClick}
     >
       <Column id='scope' label='Scope'
               width={150}

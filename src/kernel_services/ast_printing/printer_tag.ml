@@ -127,11 +127,7 @@ let definition_of_declaration = function
   | SEnum ei -> GEnumTag(ei,Location.unknown)
   | SComp ci -> GCompTag(ci,Location.unknown)
   | SType ti -> GType(ti,Location.unknown)
-  | SGlobal vi ->
-    begin
-      try GVar(vi,Globals.Vars.find vi,vi.vdecl)
-      with Not_found -> GVarDecl(vi,vi.vdecl)
-    end
+  | SGlobal vi -> Ast.def_or_last_decl vi
   | SFunction kf -> Kernel_function.get_global kf
 
 let pp_signature fmt d = Printer.pp_global fmt @@ signature_of_declaration d
@@ -410,14 +406,11 @@ let loc_of_localizable = function
   | PLval (_,Kstmt st,_) | PExp(_,Kstmt st, _)
   | PTermLval(_,Kstmt st,_,_) ->
     Stmt.loc st
-  | PIP ip ->
-    (match Property.get_kinstr ip with
-     | Kglobal ->
-       (match Property.get_kf ip with
-          None -> Location.unknown
-        | Some kf -> Kernel_function.get_location kf)
-     | Kstmt st -> Stmt.loc st)
-  | PVDecl (_,_,vi) -> vi.vdecl
+  | PIP ip -> Property.location ip
+  | PVDecl (_,_,vi) ->
+    if vi.vglob
+    then Global.loc (Ast.def_or_last_decl vi)
+    else vi.vdecl
   | PGlobal g -> Global.loc g
   | (PLval _ | PTermLval _ | PExp _) as localize ->
     (match kf_of_localizable localize with

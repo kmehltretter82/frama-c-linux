@@ -229,6 +229,7 @@ export function Switch(props: SwitchProps): JSX.Element | null {
 // --------------------------------------------------------------------------
 
 export interface SelectionProps<A> {
+  title?: string;
   /** Enabled Group (default `true`). */
   enabled?: boolean;
   /** Disabled Group (default `false`). */
@@ -295,6 +296,7 @@ export function Select(props: SelectionProps<string>): JSX.Element {
   return (
     <select
       className="dome-xToolBar-control dome-color-frame"
+      title={props.title}
       value={props.value}
       disabled={disabled || !enabled}
       onChange={callback}
