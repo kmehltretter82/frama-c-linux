@@ -218,17 +218,24 @@ let tree_context t = Wpo.get_context t.main
 let node_context n = Wpo.get_context n.goal
 let parent n = n.parent
 let title n = n.goal.Wpo.po_name
+
 let tactical n =
   match n.script with
   | Tactic(tactic,_) -> Some tactic
   | Opened | Script _ -> None
+
 let get_strategies n = n.search_index , n.search_space
 let set_strategies n ?(index=0) hs =
   n.search_index <- index ; n.search_space <- hs
+
 let children n =
   match n.script with
   | Tactic(_,children) -> children
   | Opened | Script _ -> []
+
+let rec path n = match n.parent with
+  | None -> []
+  | Some p -> p::path p
 
 (* -------------------------------------------------------------------------- *)
 (* --- State & Status                                                     --- *)

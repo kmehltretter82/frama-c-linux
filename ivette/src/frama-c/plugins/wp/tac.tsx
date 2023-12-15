@@ -40,11 +40,9 @@ type Tactic = TAC.tactic | undefined;
 /* --- Apply Tactics                                                      --- */
 /* -------------------------------------------------------------------------- */
 
-async function applyTactic(tactic: Tactic): Promise<void> {
+function applyTactic(tactic: Tactic): void {
   if (tactic) {
-    console.log('APPLY',tactic);
-    const children = await Server.send(TAC.applyTactic, tactic);
-    console.log('CHILDREN',children);
+    Server.send(TAC.applyTactic, tactic);
   }
 }
 

@@ -89,21 +89,22 @@ export const nodeDefault: node = Json.jIndex<'#node'>('#node')(-1);
 
 const getNodeInfos_internal: Server.GetRequest<
   node,
-  { result: string, proved: boolean, pending: number, size: number,
+  { title: string, proved: boolean, pending: number, size: number,
     stats: string, results: [ prover, result ][], tactic: string,
-    children: [ string, node ][] }
+    path: node[], children: [ string, node ][] }
   > = {
   kind: Server.RqKind.GET,
   name: 'plugins.wp.tip.getNodeInfos',
   input: jNode,
   output: Json.jObject({
-            result: Json.jString,
+            title: Json.jString,
             proved: Json.jBoolean,
             pending: Json.jNumber,
             size: Json.jNumber,
             stats: Json.jString,
             results: Json.jArray(Json.jPair( jProver, jResult,)),
             tactic: Json.jString,
+            path: Json.jArray(jNode),
             children: Json.jArray(Json.jPair( Json.jString, jNode,)),
           }),
   signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
@@ -111,30 +112,33 @@ const getNodeInfos_internal: Server.GetRequest<
 /** Proof node information */
 export const getNodeInfos: Server.GetRequest<
   node,
-  { result: string, proved: boolean, pending: number, size: number,
+  { title: string, proved: boolean, pending: number, size: number,
     stats: string, results: [ prover, result ][], tactic: string,
-    children: [ string, node ][] }
+    path: node[], children: [ string, node ][] }
   >= getNodeInfos_internal;
 
 const getProofState_internal: Server.GetRequest<
   goal,
-  { current: node, path: node[], index: number, pending: number }
+  { index: number, pending: number, current: node, above: node[],
+    below: [ string, node ][] }
   > = {
   kind: Server.RqKind.GET,
   name: 'plugins.wp.tip.getProofState',
   input: jGoal,
   output: Json.jObject({
-            current: jNode,
-            path: Json.jArray(jNode),
             index: Json.jNumber,
             pending: Json.jNumber,
+            current: jNode,
+            above: Json.jArray(jNode),
+            below: Json.jArray(Json.jPair( Json.jString, jNode,)),
           }),
   signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
 };
 /** Current Proof Status of a Goal */
 export const getProofState: Server.GetRequest<
   goal,
-  { current: node, path: node[], index: number, pending: number }
+  { index: number, pending: number, current: node, above: node[],
+    below: [ string, node ][] }
   >= getProofState_internal;
 
 const goForward_internal: Server.SetRequest<goal,null> = {

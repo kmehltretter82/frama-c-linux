@@ -27,7 +27,8 @@ import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Cell, Item } from 'dome/controls/labels';
 import { ToolBar, Select, Filler, Button } from 'dome/frame/toolbars';
-import { Hfill, Vfill, Overlay } from 'dome/layout/boxes';
+import { Hfill, Vfill, Vbox, Overlay } from 'dome/layout/boxes';
+import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
 import * as TIP from 'frama-c/plugins/wp/api/tip';
@@ -104,23 +105,104 @@ function RFormatSelector(props: Selector<TIP.rformat>): JSX.Element {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Node Path                                                          --- */
+/* -------------------------------------------------------------------------- */
+
+interface NodeProps {
+  node: TIP.node;
+  current: TIP.node | undefined;
+  label?: string;
+  parent?: boolean;
+}
+
+function Node(props: NodeProps): JSX.Element
+{
+  const cellRef = React.useRef<HTMLLabelElement>(null);
+  const { node, label, parent } = props;
+  const current = node === props.current;
+  const { tactic, title, proved, pending=1, size=1 } =
+    States.useRequest(
+      TIP.getNodeInfos,
+      node,
+      { pending: null },
+    ) ?? {};
+  const elt = cellRef.current;
+  React.useEffect(() => {
+    if (current && elt) elt.scrollIntoView();
+  }, [elt, current]);
+  const className = classes(
+    'wp-navbar-node',
+    parent && 'parent',
+    current && 'current',
+    !parent && !current && 'child',
+  );
+  const icon =
+    current ? 'TRIANGLE.RIGHT' :
+    parent ? 'ANGLE.DOWN' : 'ANGLE.RIGHT';
+  const kind =
+    current ? (proved ? 'positive' : 'negative') :
+    parent ? 'default' : (proved ? 'positive' : 'warning');
+  const nodeLabel = label ?? tactic ?? 'root';
+  const proofState =
+    proved ? 'proved' :
+    pending < size ? `pending ${pending}/${size}` : 'unproved';
+  const fullTitle = `${title} (${proofState})`;
+  const onSelection = (): void => { Server.send(TIP.goToNode, node); };
+  return (
+    <Cell
+      ref={cellRef} className={className}
+      icon={icon} kind={kind}
+      label={nodeLabel}
+      title={fullTitle}
+      onClick={onSelection}
+    />
+  );
+}
+
+interface NavBarProps {
+  above: TIP.node[];
+  below: [string, TIP.node][];
+  current: TIP.node | undefined;
+}
+
+function NavBar(props: NavBarProps): JSX.Element {
+  const { current } = props;
+  const parents = props.above.map(n => (
+    <Node key={n} node={n} parent current={current} />
+  )).reverse();
+  const children = props.below.map(([l, n]) => (
+    <Node key={n} node={n} label={l} current={current} />
+  ));
+  return (
+    <Vbox className="wp-navbar">
+      <Vbox>
+        {parents}
+        {children}
+      </Vbox>
+    </Vbox>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- TIP View                                                           --- */
 /* -------------------------------------------------------------------------- */
 
 interface ProofState {
-  current: TIP.node | undefined;
+  current: TIP.node|undefined;
+  above: TIP.node[];
+  below: [string, TIP.node][];
   index: number;
   pending: number;
 }
 
 function useProofState(target: WP.goal | undefined): ProofState {
   const DefaultProofState: ProofState = {
-    current: undefined, index: 0, pending: 0
+    current: undefined, index: 0, pending: 0, above: [], below: []
   };
   return States.useRequest(
     TIP.getProofState,
     target,
-    { onError: DefaultProofState }
+    { pending: null, onError: DefaultProofState }
   ) ?? DefaultProofState;
 }
 
@@ -134,8 +216,8 @@ export function TIPView(props: TIPProps): JSX.Element {
   const { display, goal, onClose } = props;
   const infos =
     States.useSyncArrayElt( WP.goals, goal ) ?? WP.goalsDataDefault;
-  const { current, index, pending } = useProofState(goal);
-  const [selected, setSelected] = React.useState<Tactic>();
+  const { current, above, below, index, pending } = useProofState(goal);
+  const [ selected, setSelected ] = React.useState<Tactic>();
   const [ autofocus, setAF ] = Dome.useBoolSettings('wp.tip.autofocus', true);
   const [ memory, setMEM ] = Dome.useBoolSettings('wp.tip.unmangled', true);
   const [ iformat, setIformat ] = Dome.useWindowSettings<TIP.iformat>(
@@ -158,11 +240,16 @@ export function TIPView(props: TIPProps): JSX.Element {
         <Filler/>
         <Button
           kind='warning'
-          icon='TRIANGLE.UP'
+          icon='EJECT'
           title='Close proof transformer'
           onClick={onClose} />
       </ToolBar>
       <Hfill>
+        <NavBar
+          above={above}
+          below={below}
+          current={current}
+        />
         <Vfill className="dome-positionned">
           <Overlay display className="wp-printer">
             <AFormatSelector

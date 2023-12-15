@@ -408,6 +408,7 @@ class configurator (tactic : Tactical.tactical) =
         let children = snd @@ ProofEngine.commit fork in
         ProofEngine.validate tree ;
         S.update WpApi.goals @@ ProofEngine.main tree ;
+        ProofEngine.forward tree ;
         R.emit WpTipApi.proofStatus ;
         List.map snd children
       with exn ->

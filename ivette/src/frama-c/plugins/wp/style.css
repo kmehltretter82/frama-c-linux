@@ -73,6 +73,37 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Navigation Bar                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+.wp-navbar {
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: var(--background-sidebar);
+}
+
+.wp-navbar-node {
+    padding-right: 8px;
+}
+
+.wp-navbar-node.parent {
+}
+
+.wp-navbar-node.current {
+    font-weight: bold;
+    padding-left: 4px;
+    background-color: var(--code-select);
+}
+
+.wp-navbar-node:hover {
+    background-color: var(--code-hover);
+}
+
+.wp-navbar-node.child {
+    padding-left: 8px;
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Tactics View                                                       --- */
 /* -------------------------------------------------------------------------- */
 

@@ -50,9 +50,12 @@ module Node = D.Index
       let descr = Md.plain "Proof Node index"
     end)
 
+module Path = D.Jlist(Node)
+module Children = D.Jlist(D.Jpair(D.Jstring)(Node))
+
 let () =
   let inode = R.signature ~input:(module Node) () in
-  let set_title = R.result inode ~name:"result"
+  let set_title = R.result inode ~name:"title"
       ~descr:(Md.plain "Proof node title") (module D.Jstring) in
   let set_proved = R.result inode ~name:"proved"
       ~descr:(Md.plain "Proof node complete") (module D.Jbool) in
@@ -68,9 +71,12 @@ let () =
   let set_tactic = R.result inode ~name:"tactic"
       ~descr:(Md.plain "Proof node tactic header (if any)")
       (module D.Jstring) in
+  let set_path = R.result inode ~name:"path"
+      ~descr:(Md.plain "Proof node path from goal")
+      (module Path) in
   let set_children = R.result inode ~name:"children"
       ~descr:(Md.plain "Proof node tactic children (id any)")
-      (module D.Jlist(D.Jpair(D.Jstring)(Node))) in
+      (module Children) in
   R.register_sig ~package ~kind:`GET ~name:"getNodeInfos"
     ~descr:(Md.plain "Proof node information") inode
     ~signals:[proofStatus]
@@ -87,6 +93,7 @@ let () =
       set_stats rq (Pretty_utils.to_string Stats.pretty s) ;
       set_results rq (Wpo.get_results (ProofEngine.goal node)) ;
       set_tactic rq tactic ;
+      set_path rq (ProofEngine.path node) ;
       set_children rq (ProofEngine.children node) ;
     end
 
@@ -96,33 +103,50 @@ let () =
 
 let () =
   let state = R.signature ~input:(module Goal) () in
-  let set_current = R.result state ~name:"current"
-      ~descr:(Md.plain "Current proof node") (module Node) in
-  let set_path = R.result state ~name:"path"
-      ~descr:(Md.plain "Proof node parents") (module D.Jlist(Node)) in
   let set_index = R.result state ~name:"index"
       ~descr:(Md.plain "Current node index among pending nodes (else -1)")
       (module D.Jint) in
   let set_pending = R.result state ~name:"pending"
       ~descr:(Md.plain "Pending proof nodes") (module D.Jint) in
+  let set_current = R.result state ~name:"current"
+      ~descr:(Md.plain "Current proof node") (module Node) in
+  let set_above = R.result state ~name:"above"
+      ~descr:(Md.plain "Above nodes (up to current when internal)")
+      (module Path) in
+  let set_below = R.result state ~name:"below"
+      ~descr:(Md.plain "Below nodes (including current when pending)")
+      (module Children) in
   R.register_sig ~package
     ~kind:`GET ~name:"getProofState"
     ~descr:(Md.plain "Current Proof Status of a Goal") state
     ~signals:[proofStatus]
     begin fun rq wpo ->
-      let tree = ProofEngine.proof ~main:wpo in
-      let current,index =
+      let tree = ProofEngine.proof  ~main:wpo in
+      let root = ProofEngine.root tree in
+      set_pending rq (ProofEngine.pending root) ;
+      let current, index =
         match ProofEngine.current tree with
-        | `Main -> ProofEngine.root tree,-1
-        | `Internal node -> node,-1
-        | `Leaf(idx,node) -> node,idx in
-      let rec path node = match ProofEngine.parent node with
-        | None -> []
-        | Some p -> p::path p in
+        | `Main -> root, -1
+        | `Internal node -> node, -1
+        | `Leaf(idx,node) -> node, idx
+      in
       set_current rq current ;
-      set_path rq (path current) ;
       set_index rq index ;
-      set_pending rq (ProofEngine.pending current) ;
+      let above = ProofEngine.path current in
+      let below = ProofEngine.children current in
+      if below = [] then
+        match above with
+        | [] ->
+          set_above rq [] ;
+          set_below rq [] ;
+        | p::_ ->
+          set_above rq above ;
+          set_below rq (ProofEngine.children p) ;
+      else
+        begin
+          set_above rq (current::above) ;
+          set_below rq below ;
+        end
     end
 
 (* -------------------------------------------------------------------------- *)
