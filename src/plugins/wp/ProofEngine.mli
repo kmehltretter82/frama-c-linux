@@ -86,6 +86,7 @@ val stats : node -> Stats.stats
 val depth : node -> int
 val path : node -> node list
 val parent : node -> node option
+val tactic : node -> Tactical.t option
 val child_label : node -> string option
 val tactic_label : node -> string option
 val subgoals : node -> node list

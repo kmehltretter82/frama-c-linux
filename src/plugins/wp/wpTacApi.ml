@@ -30,22 +30,10 @@ module R = Server.Request
 module S = Server.States
 module Md = Markdown
 module AST = Server.Kernel_ast
+module Jtactic = WpTipApi.Tactic
 
 let package = P.package ~plugin:"wp" ~name:"tac"
     ~title:"WP Tactics" ()
-
-(* -------------------------------------------------------------------------- *)
-(* --- Tacticals                                                          --- *)
-(* -------------------------------------------------------------------------- *)
-
-module Jtactic : D.S with type t = Tactical.t =
-struct
-  type t = Tactical.t
-  let jtype = D.declare ~package ~name:"tactic"
-      ~descr:(Md.plain "Tactic identifier") @@ P.Jkey "tactic"
-  let to_json (t : Tactical.t) = `String t#id
-  let of_json (js : Json.t) = Tactical.lookup ~id:(js |> Json.string)
-end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tactical Kind                                                      --- *)

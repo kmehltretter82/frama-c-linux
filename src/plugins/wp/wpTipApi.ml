@@ -36,11 +36,18 @@ let package = P.package ~plugin:"wp" ~name:"tip"
     ~title:"WP Interactive Prover" ()
 
 (* -------------------------------------------------------------------------- *)
-(* --- Proof Node                                                         --- *)
+(* --- Signals                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 let proofStatus = R.signal ~package ~name:"proofStatus"
     ~descr:(Md.plain "Proof Status has changed")
+
+let printStatus = R.signal ~package ~name:"printStatus"
+    ~descr:(Md.plain "Updated TIP printer")
+
+(* -------------------------------------------------------------------------- *)
+(* --- Proof Node                                                         --- *)
+(* -------------------------------------------------------------------------- *)
 
 module Node = D.Index
     (Map.Make(ProofEngine.Node))
@@ -49,6 +56,15 @@ module Node = D.Index
       let name = "node"
       let descr = Md.plain "Proof Node index"
     end)
+
+module Tactic : D.S with type t = Tactical.t =
+struct
+  type t = Tactical.t
+  let jtype = D.declare ~package ~name:"tactic"
+      ~descr:(Md.plain "Tactic identifier") @@ P.Jkey "tactic"
+  let to_json (t : Tactical.t) = `String t#id
+  let of_json (js : Json.t) = Tactical.lookup ~id:(js |> Json.string)
+end
 
 module Path = D.Jlist(Node)
 
@@ -68,7 +84,10 @@ let () =
       ~descr:(Md.plain "Prover results for current node")
       (module D.Jlist(D.Jpair(Prover)(Result))) in
   let set_tactic = R.result_opt inode ~name:"tactic"
-      ~descr:(Md.plain "Proof node tactic header (if any)")
+      ~descr:(Md.plain "Applied tactic (if any)")
+      (module Tactic) in
+  let set_header = R.result_opt inode ~name:"header"
+      ~descr:(Md.plain "Proof node tactic label (if any)")
       (module D.Jstring) in
   let set_child = R.result_opt inode ~name:"child"
       ~descr:(Md.plain "Proof node child label (from parent, if any)")
@@ -87,12 +106,14 @@ let () =
       set_proved rq (ProofEngine.proved node) ;
       set_pending rq (ProofEngine.pending node) ;
       let s = ProofEngine.stats node in
-      let tactic = ProofEngine.tactic_label node in
+      let tactic = ProofEngine.tactic node in
+      let header = ProofEngine.tactic_label node in
       let child = ProofEngine.child_label node in
       set_size rq (Stats.subgoals s) ;
       set_stats rq (Pretty_utils.to_string Stats.pretty s) ;
       set_results rq (Wpo.get_results (ProofEngine.goal node)) ;
       set_tactic rq tactic ;
+      set_header rq header ;
       set_child rq child ;
       set_path rq (ProofEngine.path node) ;
       set_children rq (ProofEngine.subgoals node) ;
@@ -117,8 +138,11 @@ let () =
   let set_below = R.result state ~name:"below"
       ~descr:(Md.plain "Below nodes (including current when pending)")
       (module Path) in
+  let set_tactic = R.result_opt state ~name:"tactic"
+      ~descr:(Md.plain "Applied tactic (if any)")
+      (module Tactic) in
   R.register_sig ~package
-    ~kind:`GET ~name:"getProofCursor"
+    ~kind:`GET ~name:"getProofStatus"
     ~descr:(Md.plain "Current Proof Status of a Goal") state
     ~signals:[proofStatus]
     begin fun rq wpo ->
@@ -131,8 +155,9 @@ let () =
         | `Internal node -> node, -1
         | `Leaf(idx,node) -> node, idx
       in
-      set_current rq current ;
       set_index rq index ;
+      set_current rq current ;
+      set_tactic rq @@ ProofEngine.tactic current ;
       let above = ProofEngine.path current in
       let below = ProofEngine.subgoals current in
       if below = [] then
@@ -196,6 +221,9 @@ let () = R.register ~package ~kind:`SET ~name:"removeNode"
     begin fun node ->
       let tree = ProofEngine.tree node in
       ProofEngine.remove tree node ;
+      ProofEngine.goto tree (`Node node) ;
+      ProofEngine.validate tree ;
+      S.update WpApi.goals @@ ProofEngine.main tree ;
       R.emit proofStatus ;
     end
 
@@ -283,9 +311,6 @@ class printer () : Ptip.pseq =
 (* -------------------------------------------------------------------------- *)
 (* --- Printer Registry                                                   --- *)
 (* -------------------------------------------------------------------------- *)
-
-let printStatus = R.signal ~package ~name:"printStatus"
-    ~descr:(Md.plain "Updated TIP printer")
 
 module PRINTER = State_builder.Ref
     (Datatype.Make
@@ -432,7 +457,7 @@ let () =
     ~kind:`GET
     ~name:"getSelection"
     ~descr:(Md.plain "Get current selection in proof node")
-    ~signals:[printStatus]
+    ~signals:[printStatus;proofStatus]
     getSelection
     begin fun rq node ->
       let (part,term) = (lookup_printer node)#target in

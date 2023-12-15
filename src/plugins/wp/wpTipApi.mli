@@ -25,6 +25,7 @@
 (* -------------------------------------------------------------------------- *)
 
 module Node : Server.Data.S with type t = ProofEngine.node
+module Tactic : Server.Data.S with type t = Tactical.t
 
 val proofStatus : Server.Request.signal
 val printStatus : Server.Request.signal

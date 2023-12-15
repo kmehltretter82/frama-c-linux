@@ -32,7 +32,6 @@ import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
 import * as TIP from 'frama-c/plugins/wp/api/tip';
-import type { tactic } from 'frama-c/plugins/wp/api/tac';
 
 import { getStatus } from './goals';
 import { GoalView } from './seq';
@@ -42,7 +41,8 @@ import { Tactics, ConfigureTactic } from './tac';
 /* --- Sequent Printing Modes                                             --- */
 /* -------------------------------------------------------------------------- */
 
-type Tactic = tactic | undefined;
+type Node = TIP.node | undefined;
+type Tactic = TIP.tactic | undefined;
 
 interface Selector<A> {
   value: A;
@@ -110,7 +110,7 @@ function RFormatSelector(props: Selector<TIP.rformat>): JSX.Element {
 
 interface NodeProps {
   node: TIP.node;
-  current: TIP.node | undefined;
+  current: Node;
   parent?: boolean;
 }
 
@@ -120,12 +120,10 @@ function Node(props: NodeProps): JSX.Element
   const { node, parent } = props;
   const current = node === props.current;
   const debug = `#${node}`;
-  const { title=debug, child=debug, tactic, proved, pending=1, size=1 } =
-    States.useRequest(
-      TIP.getNodeInfos,
-      node,
-      { pending: null },
-    ) ?? {};
+  const {
+    title=debug, child=debug, header=debug,
+    proved=false, pending=0, size=0
+  } = States.useRequest( TIP.getNodeInfos, node, { pending: null } ) ?? {};
   const elt = cellRef.current;
   React.useEffect(() => {
     if (current && elt) elt.scrollIntoView();
@@ -141,7 +139,7 @@ function Node(props: NodeProps): JSX.Element
     ? (parent ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT')
     : (parent ? 'ANGLE.DOWN' : 'ANGLE.RIGHT');
   const kind = proved ? 'positive' : (parent ? 'default' : 'warning');
-  const nodeLabel = parent ? tactic : child;
+  const nodeLabel = parent ? header : child;
   const proofState =
     proved ? 'proved' :
     pending < size ? `pending ${pending}/${size}` : 'unproved';
@@ -161,7 +159,7 @@ function Node(props: NodeProps): JSX.Element
 interface NavBarProps {
   above: TIP.node[];
   below: TIP.node[];
-  current: TIP.node | undefined;
+  current: Node;
 }
 
 function NavBar(props: NavBarProps): JSX.Element {
@@ -186,25 +184,6 @@ function NavBar(props: NavBarProps): JSX.Element {
 /* --- TIP View                                                           --- */
 /* -------------------------------------------------------------------------- */
 
-interface ProofState {
-  current: TIP.node|undefined;
-  above: TIP.node[];
-  below: TIP.node[];
-  index: number;
-  pending: number;
-}
-
-function useProofState(target: WP.goal | undefined): ProofState {
-  const DefaultProofState: ProofState = {
-    current: undefined, index: 0, pending: 0, above: [], below: []
-  };
-  return States.useRequest(
-    TIP.getProofCursor,
-    target,
-    { pending: null, onError: DefaultProofState }
-  ) ?? DefaultProofState;
-}
-
 export interface TIPProps {
   display: boolean;
   goal: WP.goal | undefined;
@@ -215,7 +194,8 @@ export function TIPView(props: TIPProps): JSX.Element {
   const { display, goal, onClose } = props;
   const infos =
     States.useSyncArrayElt( WP.goals, goal ) ?? WP.goalsDataDefault;
-  const { current, above, below, index, pending } = useProofState(goal);
+  const { current, above=[], below=[], index=-1, pending=0, tactic } =
+    States.useRequest( TIP.getProofStatus, goal, { pending: null } ) ?? {};
   const [ selected, setSelected ] = React.useState<Tactic>();
   const [ autofocus, setAF ] = Dome.useBoolSettings('wp.tip.autofocus', true);
   const [ memory, setMEM ] = Dome.useBoolSettings('wp.tip.unmangled', true);
@@ -225,6 +205,8 @@ export function TIPView(props: TIPProps): JSX.Element {
   const [ rformat, setRformat ] = Dome.useWindowSettings<TIP.rformat>(
     'wp.tip.rformat', TIP.jRformat, 'ratio'
   );
+  const locked = tactic !== undefined;
+  const configured = locked ? tactic : selected;
   return (
     <Vfill display={display}>
       <ToolBar>
@@ -271,14 +253,16 @@ export function TIPView(props: TIPProps): JSX.Element {
         <Tactics
           goal={goal}
           node={current}
-          selected={selected}
+          locked={locked}
+          selected={configured}
           setSelected={setSelected}
         />
       </Hfill>
       <ConfigureTactic
         goal={goal}
         node={current}
-        selected={selected}
+        locked={locked}
+        selected={configured}
         setSelected={setSelected}
       />
     </Vfill>

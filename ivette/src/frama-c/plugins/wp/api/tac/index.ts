@@ -40,23 +40,19 @@ import * as State from 'frama-c/states';
 //@ts-ignore
 import { byNode } from 'frama-c/plugins/wp/api/tip';
 //@ts-ignore
+import { byTactic } from 'frama-c/plugins/wp/api/tip';
+//@ts-ignore
 import { jNode } from 'frama-c/plugins/wp/api/tip';
+//@ts-ignore
+import { jTactic } from 'frama-c/plugins/wp/api/tip';
 //@ts-ignore
 import { node } from 'frama-c/plugins/wp/api/tip';
 //@ts-ignore
 import { nodeDefault } from 'frama-c/plugins/wp/api/tip';
-
-/** Tactic identifier */
-export type tactic = Json.key<'#tactic'>;
-
-/** Decoder for `tactic` */
-export const jTactic: Json.Decoder<tactic> = Json.jKey<'#tactic'>('#tactic');
-
-/** Natural order for `tactic` */
-export const byTactic: Compare.Order<tactic> = Compare.string;
-
-/** Default value for `tactic` */
-export const tacticDefault: tactic = Json.jKey<'#tactic'>('#tactic')('');
+//@ts-ignore
+import { tactic } from 'frama-c/plugins/wp/api/tip';
+//@ts-ignore
+import { tacticDefault } from 'frama-c/plugins/wp/api/tip';
 
 /** Parameter kind */
 export type kind =

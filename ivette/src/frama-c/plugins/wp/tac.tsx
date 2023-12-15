@@ -34,7 +34,7 @@ import * as TAC from 'frama-c/plugins/wp/api/tac';
 
 type Goal = WP.goal | undefined;
 type Node = TIP.node | undefined;
-type Tactic = TAC.tactic | undefined;
+type Tactic = TIP.tactic | undefined;
 
 /* -------------------------------------------------------------------------- */
 /* --- Apply Tactics                                                      --- */
@@ -53,6 +53,7 @@ function applyTactic(tactic: Tactic): void {
 interface TacticSelection {
   goal: Goal;
   node: Node;
+  locked: boolean;
   selected: Tactic;
   setSelected: (tac: Tactic) => void;
 }
@@ -60,9 +61,9 @@ interface TacticSelection {
 interface TacticItemProps extends TAC.tacticalData, TacticSelection {}
 
 function TacticItem(props: TacticItemProps): JSX.Element | null {
-  const { id: tactic, status, selected, setSelected } = props;
+  const { id: tactic, status, locked, selected, setSelected } = props;
   if (status === 'NotApplicable') return null;
-  const ready = status === 'Applicable';
+  const ready = !locked && status === 'Applicable';
   const isSelected = selected === tactic;
   const onSelect = (): void => setSelected(tactic);
   const onPlay = (): void => { if (ready) applyTactic(tactic); };
@@ -79,7 +80,7 @@ function TacticItem(props: TacticItemProps): JSX.Element | null {
       <Item
         className="wp-tactical-cell" {...props}/>
       <IconButton
-        icon='MEDIA.PLAY'
+        icon={locked ? 'LOCK' : 'MEDIA.PLAY'}
         title='Apply Tactic'
         kind='positive'
         enabled={ready}
@@ -95,7 +96,6 @@ function TacticItem(props: TacticItemProps): JSX.Element | null {
 export function Tactics(props: TacticSelection): JSX.Element {
   const { node } = props;
   const tactics = States.useSyncArrayData(TAC.tactical);
-  States.useRequest(TAC.configureTactics, node);
   const items =
     node
     ? tactics.map(tac => <TacticItem key={tac.id} {...props} {...tac} />)
@@ -109,7 +109,7 @@ export function Tactics(props: TacticSelection): JSX.Element {
 
 interface ParameterProps extends TAC.parameter {
   node: TIP.node;
-  tactic: TAC.tactic;
+  tactic: TIP.tactic;
 }
 
 function CheckBoxParam(props: ParameterProps): JSX.Element
@@ -211,13 +211,19 @@ function useTactic(selected: Tactic): TAC.tacticalData {
   return data ?? noTactic;
 }
 
-interface StatusLabel {
+interface StatusDescr {
   icon: string;
   kind: 'warning' | 'positive' | 'default';
   label: string;
 }
 
-function getStatusLabel(tactical: TAC.tacticalData): StatusLabel {
+const Locked: StatusDescr = {
+  icon: 'CHECK',
+  kind: 'default',
+  label: 'Applied',
+};
+
+function getStatusDescription(tactical: TAC.tacticalData): StatusDescr {
   const { status, error, params } = tactical;
   if (error)
     return { icon: 'WARNING', kind: 'warning', label: error };
@@ -229,14 +235,16 @@ function getStatusLabel(tactical: TAC.tacticalData): StatusLabel {
 }
 
 export function ConfigureTactic(props: TacticSelection): JSX.Element {
-  const { node, selected: tactic, setSelected } = props;
+  const { node, locked, selected: tactic, setSelected } = props;
   const tactical = useTactic(tactic);
+  States.useRequest(TAC.configureTactics, node);
   const { status, label, title, params } = tactical;
-  const isReady = status==='Applicable';
-  const display = !!tactic && status !== 'NotApplicable';
-  const descr = getStatusLabel(tactical);
+  const isReady = !locked && status==='Applicable';
+  const display = !!tactic && (locked || status !== 'NotApplicable');
+  const descr = locked ? Locked : getStatusDescription(tactical);
   const onClose = (): void => setSelected(undefined);
   const onPlay = (): void => { if (isReady) applyTactic(tactic); };
+  const onCancel = (): void => { Server.send(TIP.removeNode, node); };
   const parameters =
     (node && tactic)
     ? params.map((prm: TAC.parameter) =>
@@ -265,7 +273,7 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
       <Fragment key='params'>{parameters}</Fragment>
       <IconButton
         key='play'
-        icon='MEDIA.PLAY'
+        icon={locked ? 'LOCK' : 'MEDIA.PLAY'}
         kind='positive'
         title='Apply Tactic'
         enabled={isReady}
@@ -273,8 +281,16 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
       <IconButton
         key='close'
         icon='CIRC.CLOSE'
-        onClick={onClose}
-        title='Close Tactic Configuration Panel' />
+        title='Close Tactic Configuration Panel'
+        display={!locked}
+        onClick={onClose} />
+      <IconButton
+        key='cancel'
+        icon='CIRC.CLOSE'
+        kind='negative'
+        display={locked}
+        title='Cancel Tactic and Remove Sub-Tree'
+        onClick={onCancel} />
     </Hbox>
   );
 }

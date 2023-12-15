@@ -75,6 +75,11 @@ export const proofStatus: Server.Signal = {
   name: 'plugins.wp.tip.proofStatus',
 };
 
+/** Updated TIP printer */
+export const printStatus: Server.Signal = {
+  name: 'plugins.wp.tip.printStatus',
+};
+
 /** Proof Node index */
 export type node = Json.index<'#node'>;
 
@@ -87,11 +92,23 @@ export const byNode: Compare.Order<node> = Compare.number;
 /** Default value for `node` */
 export const nodeDefault: node = Json.jIndex<'#node'>('#node')(-1);
 
+/** Tactic identifier */
+export type tactic = Json.key<'#tactic'>;
+
+/** Decoder for `tactic` */
+export const jTactic: Json.Decoder<tactic> = Json.jKey<'#tactic'>('#tactic');
+
+/** Natural order for `tactic` */
+export const byTactic: Compare.Order<tactic> = Compare.string;
+
+/** Default value for `tactic` */
+export const tacticDefault: tactic = Json.jKey<'#tactic'>('#tactic')('');
+
 const getNodeInfos_internal: Server.GetRequest<
   node,
   { title: string, proved: boolean, pending: number, size: number,
-    stats: string, results: [ prover, result ][], tactic?: string,
-    child?: string, path: node[], children: node[] }
+    stats: string, results: [ prover, result ][], tactic?: tactic,
+    header?: string, child?: string, path: node[], children: node[] }
   > = {
   kind: Server.RqKind.GET,
   name: 'plugins.wp.tip.getNodeInfos',
@@ -103,7 +120,8 @@ const getNodeInfos_internal: Server.GetRequest<
             size: Json.jNumber,
             stats: Json.jString,
             results: Json.jArray(Json.jPair( jProver, jResult,)),
-            tactic: Json.jOption(Json.jString),
+            tactic: Json.jOption(jTactic),
+            header: Json.jOption(Json.jString),
             child: Json.jOption(Json.jString),
             path: Json.jArray(jNode),
             children: Json.jArray(jNode),
@@ -114,17 +132,17 @@ const getNodeInfos_internal: Server.GetRequest<
 export const getNodeInfos: Server.GetRequest<
   node,
   { title: string, proved: boolean, pending: number, size: number,
-    stats: string, results: [ prover, result ][], tactic?: string,
-    child?: string, path: node[], children: node[] }
+    stats: string, results: [ prover, result ][], tactic?: tactic,
+    header?: string, child?: string, path: node[], children: node[] }
   >= getNodeInfos_internal;
 
-const getProofCursor_internal: Server.GetRequest<
+const getProofStatus_internal: Server.GetRequest<
   goal,
   { index: number, pending: number, current: node, above: node[],
-    below: node[] }
+    below: node[], tactic?: tactic }
   > = {
   kind: Server.RqKind.GET,
-  name: 'plugins.wp.tip.getProofCursor',
+  name: 'plugins.wp.tip.getProofStatus',
   input: jGoal,
   output: Json.jObject({
             index: Json.jNumber,
@@ -132,15 +150,16 @@ const getProofCursor_internal: Server.GetRequest<
             current: jNode,
             above: Json.jArray(jNode),
             below: Json.jArray(jNode),
+            tactic: Json.jOption(jTactic),
           }),
   signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
 };
 /** Current Proof Status of a Goal */
-export const getProofCursor: Server.GetRequest<
+export const getProofStatus: Server.GetRequest<
   goal,
   { index: number, pending: number, current: node, above: node[],
-    below: node[] }
-  >= getProofCursor_internal;
+    below: node[], tactic?: tactic }
+  >= getProofStatus_internal;
 
 const goForward_internal: Server.SetRequest<goal,null> = {
   kind: Server.RqKind.SET,
@@ -215,11 +234,6 @@ export const byTerm: Compare.Order<term> = Compare.string;
 
 /** Default value for `term` */
 export const termDefault: term = Json.jKey<'#term'>('#term')('');
-
-/** Updated TIP printer */
-export const printStatus: Server.Signal = {
-  name: 'plugins.wp.tip.printStatus',
-};
 
 /** Integer constants format */
 export type iformat = "dec" | "hex" | "bin";
@@ -323,7 +337,8 @@ const getSelection_internal: Server.GetRequest<
             part: Json.jOption(jPart),
             term: Json.jOption(jTerm),
           }),
-  signals: [ { name: 'plugins.wp.tip.printStatus' } ],
+  signals: [ { name: 'plugins.wp.tip.printStatus' },
+             { name: 'plugins.wp.tip.proofStatus' } ],
 };
 /** Get current selection in proof node */
 export const getSelection: Server.GetRequest<

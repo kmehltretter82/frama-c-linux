@@ -241,8 +241,15 @@ let rec path n = match n.parent with
   | Some p -> p::path p
 
 let child_label n = n.child
+
 let tactic_label n =
   match n.script with Tactic({ header }, _)  -> Some header | _ -> None
+
+let tactic n =
+  match n.script with
+  | Tactic({ tactic }, _)  ->
+    begin try Some (Tactical.lookup ~id:tactic) with Not_found -> None end
+  | _ -> None
 
 (* -------------------------------------------------------------------------- *)
 (* --- State & Status                                                     --- *)
