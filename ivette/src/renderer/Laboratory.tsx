@@ -29,6 +29,7 @@ import { Hbox, Hfill, Vfill } from 'dome/layout/boxes';
 import { QPane, QSplit } from 'dome/layout/qsplit';
 import { RenderElement } from 'dome/layout/dispatch';
 import { Catch } from 'dome/errors';
+import { classes } from 'dome/misc/utils';
 import * as Ivette from 'ivette';
 import * as Ext from './Extensions';
 
@@ -44,14 +45,81 @@ const defaultLabViewState: LabViewState = {
   H: 0.5,
   V: 0.5,
   components: new Set<string>(),
+  dockedComponents: [],
   selectedView: "default"
 };
-
 const globalLabViewState = new States.GlobalState<LabViewState>(
   defaultLabViewState
 );
+const defaultPanelLayoutSelectorState: PanelLayoutSelectorState ={
+  display: false,
+  compId: "",
+  compLabel: ""
+};
+const globalPanelLayoutSelectorState = new States
+.GlobalState<PanelLayoutSelectorState>(defaultPanelLayoutSelectorState);
 
-function applyLayout(view : Ivette.ViewLayoutProps):void {
+function assignValueToQuarterStr(quarter: string, value: string)
+: Ivette.Layout4 {
+  let A = "",
+      B = "",
+      C = "",
+      D = "";
+
+  if("A" === quarter) A = value;
+  if("B" === quarter) B = value;
+  if("C" === quarter) C = value;
+  if("D" === quarter) D = value;
+
+  if("AB" === quarter) {
+    A = value;
+    B = value;
+  }
+  if("AC" === quarter) {
+    A = value;
+    C = value;
+  }
+  if("BD" === quarter) {
+    B = value;
+    D = value;
+  }
+  if("CD" === quarter) {
+    C = value;
+    D = value;
+  }
+
+  if("ABCD" === quarter) {
+    A = value;
+    B = value;
+    C = value;
+    D = value;
+  }
+
+  return {
+    A: A,
+    B: B,
+    C: C,
+    D: D,
+  };
+}
+
+function assignCompToQuarter(quarter: string, compId: string): void {
+  const labViewState = globalLabViewState.getValue();
+  const layout = assignValueToQuarterStr(quarter, compId);
+  if (layout.A === "") layout.A = labViewState.A ?? "";
+  if (layout.B === "") layout.B = labViewState.B ?? "";
+  if (layout.C === "") layout.C = labViewState.C ?? "";
+  if (layout.D === "") layout.D = labViewState.D ?? "";
+
+  // TODO : replace with Tabs
+  applyLayout({
+    id: "custom",
+    label: "Custom Layout",
+    layout: layout
+   });
+}
+
+function applyLayout(view : Ivette.ViewLayoutProps): void {
   const { layout } = view;
   let A, B, C, D;
 
@@ -145,6 +213,7 @@ interface LabViewState {
   H: number;
   V: number;
   components: Set<string>
+  dockedComponents: Ivette.ComponentProps[]
   selectedView: string;
 }
 
@@ -213,12 +282,29 @@ function ViewSection(): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 function ComponentItem(comp: Ivette.ItemProps): JSX.Element {
-  // TODO: onclick/rightclick...
+  function onSelection(): void {
+    const compObject = COMPONENT.getElement(comp.id);
+    const preferredPosition = compObject?.preferredPosition ?? "D";
+    assignCompToQuarter(preferredPosition, comp.id);
+  }
+
+  function onContextMenu(): void {
+    const state = globalPanelLayoutSelectorState.getValue();
+    const display = !state.display ? true : state.compId !== comp.id;
+    globalPanelLayoutSelectorState.setValue({
+      display: display,
+      compId: display ? comp.id : "",
+      compLabel: display ? comp.label : ""
+    });
+  }
+
   return (
     <Sidebars.Item
       icon='COMPONENT'
       label={comp.label}
-      title={comp.title} />
+      title={comp.title}
+      onSelection={onSelection}
+      onContextMenu={onContextMenu} />
   );
 }
 
@@ -267,6 +353,9 @@ const Sandbox: Ivette.ItemProps = {
 function ViewBar(): JSX.Element {
   const groups = Ext.useElements(GROUP);
   const allGroups = groups.concat(Sandbox);
+
+
+
   return (
     <Sidebars.SideBar>
       <ViewSection key='views'/>
@@ -280,6 +369,7 @@ function ViewBar(): JSX.Element {
       <GroupSection
         key='sandbox'
         filter={inGroup(Sandbox)} {...Sandbox} />
+      <PanelLayoutSelector />
     </Sidebars.SideBar>
   );
 }
@@ -295,51 +385,97 @@ Ivette.registerSidebar({
 /* --- PanelLayoutSelector                                                --- */
 /* -------------------------------------------------------------------------- */
 
-export function PanelLayoutSelector(): JSX.Element {
-  const QSPLIT = "QSPLIT";
+interface PanelLayoutSelectorState {
+  display: boolean;
+  compId: string;
+  compLabel: string;
+}
+
+export function PanelLayoutSelector()
+: JSX.Element {
+  const [state, ] =
+  States.useGlobalState(globalPanelLayoutSelectorState);
+  const className = classes(
+    state.display ? '' : 'dome-erased',
+    "panelLayoutSelector"
+  );
   const iconSize = 30;
 
+  function onclick(quarter: string): void {
+    assignCompToQuarter(quarter, state.compId);
+  }
+
+  function dock(): void {
+    const component: Ivette.ComponentProps = {
+      id: state.compId,
+      label: state.compLabel
+    };
+    const labviewState = globalLabViewState.getValue();
+    labviewState.dockedComponents =
+    [...labviewState.dockedComponents, component];
+    globalLabViewState.setValue(labviewState);
+  }
+
+  function remove(): void {
+    const labviewState = globalLabViewState.getValue();
+    labviewState.dockedComponents =
+    labviewState.dockedComponents.filter((comp) => comp.id === state.compId);
+    globalLabViewState.setValue(labviewState);
+  }
+
   return (
-    <div className="panelLayoutSelector">
+    <div className={className}>
       <Label>Panel Layout Selector</Label>
+      <Label>{state.compId}</Label>
       <table>
         <tbody>
           <tr>
           <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.A"} size={iconSize} /></th>
+              <Icon id={"QSPLIT.A"} size={iconSize}
+              onClick={() => onclick("A")} /></th>
             <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.AB"} size={iconSize} /></th>
+              <Icon id={"QSPLIT.AB"} size={iconSize}
+              onClick={() => onclick("AB")} /></th>
             <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.B"} size={iconSize} /></th>
+              <Icon id={"QSPLIT.B"} size={iconSize}
+              onClick={() => onclick("B")} /></th>
           </tr>
           <tr>
             <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.AC"} size={iconSize} /></th>
+              <Icon id={"QSPLIT.AC"} size={iconSize}
+              onClick={() => onclick("AC")} /></th>
             <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.ABCD"} size={iconSize} /></th>
+              <Icon id={"QSPLIT.ABCD"} size={iconSize}
+              onClick={() => onclick("ABCD")} /></th>
             <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.BD"} size={iconSize} /></th>
+              <Icon id={"QSPLIT.BD"} size={iconSize}
+              onClick={() => onclick("BD")} /></th>
           </tr>
           <tr>
             <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.C"} size={iconSize} /></th>
+              <Icon id={"QSPLIT.C"} size={iconSize}
+              onClick={() => onclick("C")} /></th>
             <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.CD"} size={iconSize} /></th>
+              <Icon id={"QSPLIT.CD"} size={iconSize}
+              onClick={() => onclick("CD")} /></th>
             <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.D"} size={iconSize} /></th>
+              <Icon id={"QSPLIT.D"} size={iconSize}
+              onClick={() => onclick("D")} /></th>
           </tr>
         </tbody>
       </table>
       <div>
         <div className="panelLayoutSelector-spaced">
           Dock Panel
-          <Icon id={QSPLIT + ".DOCK"} size={30}
-          className="panelLayoutSelector-hover" />
+          <Icon id={"QSPLIT.DOCK"} size={iconSize}
+          className="panelLayoutSelector-hover"
+          onClick={dock} />
         </div>
         <div className="panelLayoutSelector-spaced">
           Remove Panel
-          <Icon id="TRASH" size={30}
-          className="panelLayoutSelector-hover" />
+          <Icon id="TRASH" size={iconSize}
+          className="panelLayoutSelector-hover"
+          onClick={remove} />
         </div>
       </div>
     </div>
@@ -351,5 +487,27 @@ Ivette.registerSandbox({
   label: 'Panel Layout Selector',
   children: <PanelLayoutSelector />,
 });
+
+
+// --------------------------------------------------------------------------
+// --- Docked Components
+// --------------------------------------------------------------------------
+
+export function Dock(): JSX.Element {
+  const [ state ] = React.useState(
+    globalLabViewState.getValue()
+  );
+
+  // TODO : left/right click
+
+  return (
+    <>
+    {
+    state.dockedComponents.map((comp) =>
+      <span key={comp.id}>{comp.label}</span>
+    )}
+    </>
+  );
+}
 
 /* -------------------------------------------------------------------------- */
