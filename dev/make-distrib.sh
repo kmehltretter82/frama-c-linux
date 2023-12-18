@@ -53,12 +53,6 @@ else
 fi
 
 
-VERSION=$(cat VERSION)
-VERSION_SAFE=${VERSION/~/-}
-
-FRAMAC="frama-c-$VERSION_SAFE-$VERSION_CODENAME"
-FRAMAC_TAR="$FRAMAC.tar"
-
 ################################################################################
 # Command Line
 
@@ -109,12 +103,21 @@ do
             CI_LINK=yes
             ;;
         *)
-            echo "Don't known what to do with option '$1'"
+            echo "Don't know what to do with option '$1'"
             exit 1
             ;;
     esac
     shift
 done
+
+################################################################################
+# Target Names
+
+VERSION=$(cat VERSION)
+VERSION_SAFE=${VERSION/~/-}
+
+FRAMAC="frama-c-$VERSION_SAFE-$VERSION_CODENAME"
+FRAMAC_TAR="$FRAMAC.tar"
 
 ################################################################################
 # Check Opam file
@@ -309,5 +312,5 @@ rm -rf $HEADER_SPEC
 rm -rf $FRAMAC_TAR
 rm -rf $TMP_DIR
 
-echo "Generated: $FRAMAC_TAR"
+echo "Generated: $FRAMAC_TAR.gz"
 echo "----------------------------------------------------------------"
