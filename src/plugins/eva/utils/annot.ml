@@ -158,3 +158,125 @@ let eval_value ~loc lv request =
   |> predicate ~loc
 
 (* -------------------------------------------------------------------------- *)
+(* --- Instructions                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Slv = Cil_datatype.LvalStructEq.Set
+
+class evaluator request =
+  object(self)
+    inherit Visitor.generic_frama_c_visitor (Visitor_behavior.inplace ())
+
+    val mutable locked = Slv.empty
+    val mutable domain : pred list = []
+
+    method add p = if p <> True then domain <- p::domain
+    method flush = List.rev domain
+
+    method !vlval lv =
+      if not @@ Slv.mem lv locked then
+        begin
+          locked <- Slv.add lv locked ;
+          self#add @@ value (Exp.of_lval lv) (Cil.typeOfLval lv) @@
+          Results.eval_lval lv request ;
+          Cil.DoChildren
+        end
+      else Cil.SkipChildren
+
+    method !vterm_lval lv =
+      try
+        let _ = self#vlval @@ Logic_to_c.term_lval_to_lval lv in
+        DoChildren
+      with Logic_to_c.No_conversion ->
+        DoChildren
+
+    method private visit_expr e =
+      ignore @@ Cil.visitCilExpr (self :> Cil.cilVisitor) e
+
+    method private visit_offset ofs =
+      ignore @@ Cil.visitCilOffset (self :> Cil.cilVisitor) ofs
+
+    method private visit_host = function
+      | Var _ -> ()
+      | Mem e -> self#visit_expr e
+
+    method private visit_lset lv =
+      begin
+        self#visit_host (fst lv) ;
+        self#visit_offset (snd lv) ;
+      end
+
+    method !vinst = function
+      | Set(lv,exp,_) ->
+        self#visit_lset lv ;
+        self#visit_expr exp ;
+        SkipChildren
+      | Call(lr,_,es,_) ->
+        Option.iter self#visit_lset lr ;
+        List.iter self#visit_expr es ;
+        SkipChildren
+      | Local_init _ | Asm _ | Skip _ | Code_annot _ ->
+        DoChildren
+
+    method !vstmt_aux stmt =
+      match stmt.skind with
+      (* Branching expressions *)
+      | If(e,_,_,_) | Switch(e,_,_,_) ->
+        self#visit_expr e ; SkipChildren
+      (* Instructions *)
+      | Instr _ | Return _ | Goto _ | Break _ | Continue _
+      | UnspecifiedSequence _ -> DoChildren
+      (* Blocks *)
+      | Loop _ | Block _ | Throw _ | TryCatch _ | TryFinally _ | TryExcept _
+        -> SkipChildren
+
+  end
+
+let eval_instr ?callstack stmt =
+  let request =
+    let r = Results.before stmt in
+    match callstack with
+    | None -> r
+    | Some c -> Results.in_callstack c r in
+  let engine = new evaluator request in
+  let _ = Cil.visitCilStmt (engine :> Cil.cilVisitor) stmt in
+  List.map (predicate ~loc:(Cil_datatype.Stmt.loc stmt)) engine#flush
+
+(* -------------------------------------------------------------------------- *)
+(* --- Annotation Generator                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+let generated = Emitter.create "Eva_domain"
+    [ Emitter.Code_annot ]
+    ~correctness:[]
+    ~tuning:[]
+
+class generator =
+  object(self)
+    inherit Visitor.generic_frama_c_visitor (Visitor_behavior.inplace ())
+
+    method! vlval _ = SkipChildren
+    method! vexpr _ = SkipChildren
+
+    method !vstmt_aux stmt =
+      match self#current_kf with
+      | None -> Cil.SkipChildren
+      | Some kf ->
+        List.iter
+          (Annotations.add_assert generated ~kf stmt)
+          (eval_instr stmt) ;
+        Annotations.iter_code_annot
+          (fun e ca ->
+             if Emitter.equal e generated then
+               List.iter
+                 (fun ip ->
+                    Property_status.emit Analysis.emitter ~hyps:[] ip True
+                 ) (Property.ip_of_code_annot kf stmt ca)
+          ) stmt ;
+        DoChildren
+
+  end
+
+let generator () = (new generator :> Cil.cilVisitor)
+
+(* -------------------------------------------------------------------------- *)
