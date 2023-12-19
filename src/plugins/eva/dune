@@ -122,5 +122,6 @@
   utils/results.mli parameters.mli
   utils/eva_annotations.mli eval.mli types/assigns.mli ast/eva_ast.mli
   domains/cvalue/builtins.mli utils/cvalue_callbacks.mli utils/eva_perf.mli
-  legacy/logic_inout.mli utils/eva_results.mli utils/unit_tests.mli)
+  legacy/logic_inout.mli utils/eva_results.mli utils/unit_tests.mli
+  utils/annot.mli)
  (action (run ./gen_api/gen_api.exe %{deps})))

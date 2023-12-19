@@ -960,3 +960,7 @@ module Unit_tests: sig
   (** Runs some programmatic tests on Eva. *)
   val run: unit -> unit
 end
+
+module Annot: sig
+
+end
