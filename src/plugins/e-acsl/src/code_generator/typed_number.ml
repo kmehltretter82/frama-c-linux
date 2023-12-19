@@ -57,7 +57,7 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
         Gmp.Z.create ~loc ?name t_opt env kf e
     | _, false ->
       if Gmp_types.Q.is_t ctx then
-        if Gmp_types.Q.is_t (Cil.typeOf e) then (* R --> R *)
+        if Gmp_types.Q.is_t ty then (* R --> R *)
           e, env
         else (* C integer or Z --> R *)
           Gmp.Q.create ~loc ?name t_opt env kf e
