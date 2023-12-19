@@ -208,8 +208,6 @@ class metricsCabsVisitor = object(self)
      | DEFINITION _
      | ASM _
      | SEQUENCE _
-     | TRY_EXCEPT _
-     | TRY_FINALLY _
      | TRY_CATCH _
      | CODE_ANNOT _
      | CODE_SPEC _ -> ());
@@ -388,12 +386,6 @@ module Halstead = struct
 
       | DEFINITION _ -> Cil.DoChildren;
       | ASM _ -> reserved "asm";
-      | TRY_EXCEPT _ ->
-        update_val_incr "except" operator_tbl.reserved_tbl;
-        reserved "try";
-      | TRY_FINALLY _ ->
-        update_val_incr "finally" operator_tbl.reserved_tbl;
-        reserved "try";
       | _ -> Cil.DoChildren;
 
     method! vtypespec tspec =

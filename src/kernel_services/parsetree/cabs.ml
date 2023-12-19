@@ -248,9 +248,6 @@ and raw_statement =
       front-ends.
   *)
 
-  | TRY_EXCEPT of block * expression * block * cabsloc (** MS SEH *)
-  | TRY_FINALLY of block * block * cabsloc (** MS SEH *)
-
   | CODE_ANNOT of (Logic_ptree.code_annot * cabsloc) (* annotations *)
   | CODE_SPEC of (Logic_ptree.spec * cabsloc) (* annotations *)
 

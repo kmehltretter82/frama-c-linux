@@ -72,8 +72,6 @@ open Escape
 
 let version = "Cprint 2.1e 9.1.99 Hugues Cassé"
 
-let msvcMode = ref false
-
 let printLn = ref true
 let printLnComment = ref false
 
@@ -496,10 +494,7 @@ and print_statement fmt stat =
     let print_asm_operand fmt (_identop,cnstr, e) =
       fprintf fmt "@[%s@ (@[%a@])@]" cnstr print_expression e
     in
-    if !msvcMode then begin
-      fprintf fmt "__asm@ {@[%a@]}"
-        (pp_list ~sep:"@\n" pp_print_string) tlist
-    end else begin
+    begin
       let print_details
           fmt { aoutputs = outs; ainputs = ins; aclobbers = clobs } =
         pp_list ~sep:",@ " print_asm_operand fmt outs;
@@ -525,12 +520,6 @@ and print_statement fmt stat =
     fprintf fmt "@[<v 2>@[try %a {@]@;%a@]@;}@;"
       print_statement s
       (Pretty_utils.pp_list ~sep:"@;" print_one_catch) l
-  | TRY_FINALLY (b, h, _) ->
-    fprintf fmt "__try@ @[%a@]@ __finally@ @[%a@]"
-      print_block b print_block h
-  | TRY_EXCEPT (b, e, h, _) ->
-    fprintf fmt "__try@ @[%a@]@ __except(@[%a@])@ @[%a@]"
-      print_block b print_expression e print_block h
   | CODE_ANNOT (a, _) ->
     fprintf fmt "/*@@@ @[%a@]@ */"
       Logic_print.print_code_annot a

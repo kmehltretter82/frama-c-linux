@@ -139,18 +139,6 @@ let init_lexicon _ =
       ("__inline__", fun loc -> INLINE loc);
       ("inline", fun loc -> INLINE loc);
       ("__inline", fun loc -> INLINE loc);
-      ("_inline",
-       fun loc ->
-         if !Cprint.msvcMode then
-           INLINE loc
-         else begin
-           Kernel.(
-             warning
-               ~wkey:wkey_conditional_feature
-               "_inline is a MSVC keyword, \
-                use a msvc-specific machdep to enable it");
-           IDENT ("_inline")
-         end);
       ("_Noreturn",
        fun loc ->
          Kernel.(warning ~wkey:wkey_c11 "_Noreturn is a C11 keyword");
@@ -195,9 +183,6 @@ let init_lexicon _ =
       ("__declspec", fun loc -> DECLSPEC loc);
       ("__forceinline", fun loc -> INLINE loc); (* !! we turn forceinline
                                                  * into inline *)
-      ("__try", fun loc -> TRY loc);
-      ("__except", fun loc -> EXCEPT loc);
-      ("__finally", fun loc -> FINALLY loc);
       (* weimer: some files produced by 'GCC -E' expect this type to be
        * defined *)
       ("__builtin_va_list",
@@ -342,10 +327,10 @@ let scan_escape (char: char) : int64 =
   | '\'' -> '\''
   | '"'-> '"'     (* '"' *)
   | '?' -> '?'
-  | '(' when not !Cprint.msvcMode -> '('
-  | '{' when not !Cprint.msvcMode -> '{'
-  | '[' when not !Cprint.msvcMode -> '['
-  | '%' when not !Cprint.msvcMode -> '%'
+  | '(' -> '('
+  | '{' -> '{'
+  | '[' -> '['
+  | '%' -> '%'
   | '\\' -> '\\'
   | other ->
     E.parse_error "Unrecognized escape sequence: \\%c" other
@@ -757,9 +742,7 @@ rule initial = parse
 |		','				{COMMA}
 |		'.'				{DOT}
 |		"sizeof"		{SIZEOF (currentLoc ())}
-|               "__asm"                 { if !Cprint.msvcMode then
-                                             MSASM (msasm lexbuf, currentLoc ())
-                                          else (ASM (currentLoc ())) }
+|               "__asm"                 {ASM (currentLoc ())}
 
 (* If we see __pragma we eat it and the matching parentheses as well *)
 |               "__pragma"              { let _ = matchingpars 0 lexbuf in
@@ -881,27 +864,6 @@ and chr =  parse
 |	escape		{lex_simple_escape chr lexbuf}
 |       eof             {parse_error lexbuf "unterminated char" }
 |	_		{lex_unescaped chr lexbuf}
-
-and msasm = parse
-    blank               { msasm lexbuf }
-|   '{'                 { msasminbrace lexbuf }
-|   _                   { let cur = Lexing.lexeme lexbuf in
-                          cur ^ (msasmnobrace lexbuf) }
-
-and msasminbrace = parse
-    '}'                 { "" }
-|   _                   { let cur = Lexing.lexeme lexbuf in
-                          cur ^ (msasminbrace lexbuf) }
-and msasmnobrace = parse
-   ['}' ';' '\n']       { lexbuf.Lexing.lex_curr_pos <-
-                               lexbuf.Lexing.lex_curr_pos - 1;
-                          "" }
-|  "__asm"              { lexbuf.Lexing.lex_curr_pos <-
-                               lexbuf.Lexing.lex_curr_pos - 5;
-                          "" }
-|  _                    { let cur = Lexing.lexeme lexbuf in
-
-                          cur ^ (msasmnobrace lexbuf) }
 
 and annot_first_token = parse
   | "ghost" ((blank| '\\'?'\n' | ghost_comments)* as comments) "else" {

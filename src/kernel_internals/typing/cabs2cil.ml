@@ -10160,42 +10160,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     s2c
       (mkStmt
          ~ghost ~valid_sid (TryCatch(c2block ~ghost chunk_try,catches,loc')))
-  | TRY_FINALLY (b, h, loc) ->
-    let loc' = convLoc loc in
-    CurrentLoc.set loc';
-    let b': chunk = doBodyScope local_env b in
-    let h': chunk = doBodyScope local_env h in
-    if b'.cases <> [] || h'.cases <> [] then
-      Kernel.error ~once:true ~current:true
-        "Try statements cannot contain switch cases";
-    s2c (mkStmt ~ghost ~valid_sid
-           (TryFinally (c2block ~ghost b', c2block ~ghost h', loc')))
-
-  | TRY_EXCEPT (b, e, h, loc) ->
-    let loc' = convLoc loc in
-    CurrentLoc.set loc';
-    let b': chunk = doBodyScope local_env b in
-    (* Now do e *)
-    let ((se: chunk), e', _) =
-      doFullExp local_env CNoConst e (AExp None) in
-    let h': chunk = doBodyScope local_env h in
-    if b'.cases <> [] || h'.cases <> [] || se.cases <> [] then
-      Kernel.error ~once:true ~current:true
-        "Try statements cannot contain switch cases";
-    (* Now take se and try to convert it to a list of instructions. This
-     * might not be always possible *)
-    let stmt_to_instrs s =
-      List.rev_map
-        (function (s,_,_,_,_) -> match s.skind with
-            | Instr s -> s
-            | _ ->
-              abort_context "Except expression contains unexpected statement")
-        s
-    in
-    let il' = stmt_to_instrs se.stmts in
-    s2c (mkStmt ~ghost ~valid_sid
-           (TryExcept
-              (c2block ~ghost b',(il', e'), c2block ~ghost h', loc')))
   | CODE_ANNOT (a, loc) ->
     let loc' = convLoc loc in
     begin
