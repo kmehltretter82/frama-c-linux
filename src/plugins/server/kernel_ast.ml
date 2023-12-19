@@ -965,7 +965,7 @@ let () = Information.register
     ~title:"Property Consolidated Status"
     begin fun fmt loc ->
       match loc with
-      | PIP prop ->
+      | PIP prop when Property.has_status prop ->
         Property_status.Feedback.pretty fmt @@
         Property_status.Feedback.get prop
       | _ -> raise Not_found

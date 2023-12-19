@@ -268,7 +268,13 @@ let () = States.column model ~name:"names"
 let () = States.column model ~name:"status"
     ~descr:(Md.plain "Status")
     ~data:(module PropStatus)
-    ~get:(Property_status.Feedback.get)
+    ~get:
+      begin fun ip ->
+        if Property.has_status ip
+        then Property_status.Feedback.get ip
+        else Property_status.Feedback.Never_tried
+      end
+
 
 let () = States.option model ~name:"scope"
     ~descr:(Md.plain "Declaration Scope")
