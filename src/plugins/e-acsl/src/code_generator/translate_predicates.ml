@@ -327,17 +327,7 @@ and to_exp ~adata ?inplace ?name kf ?rte env p =
            in
            let env = if rte then !translate_rte_exp_ref kf env e else env in
            let env = Assert.do_pending_register_data env in
-           Extlib.nest
-             adata
-             (Typed_number.add_cast
-                ~loc:p.pred_loc
-                ?name
-                env
-                kf
-                None
-                Analyses_types.C_number
-                None
-                e)
+           (e, adata), env
          )
        env)
 
