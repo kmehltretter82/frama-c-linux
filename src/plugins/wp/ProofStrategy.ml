@@ -469,6 +469,8 @@ let auto = function
 (* --- Strategy Tactical Step                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
+let dkey_tactical = Wp_parameters.register_category "tactical"
+
 let tactical a =
   match resolve_tactic a with None -> raise Not_found | Some t -> t
 
@@ -483,8 +485,14 @@ let rec bind sigma sequent = function
   | [] -> sigma
   | lookup::binders ->
     match Pattern.psequent lookup sigma sequent with
-    | None -> raise Not_found
-    | Some sigma -> bind sigma sequent binders
+    | None ->
+      Wp_parameters.debug ~dkey:dkey_tactical "[failed] %a@."
+        pp_lookup lookup ;
+      raise Not_found
+    | Some sigma ->
+      Wp_parameters.debug ~dkey:dkey_tactical "[found] %a@."
+        pp_lookup lookup ;
+      bind sigma sequent binders
 
 let select sigma ?goal = function
   | [] ->
