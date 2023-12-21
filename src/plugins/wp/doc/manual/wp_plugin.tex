@@ -1845,7 +1845,7 @@ Tactic parameters are specified using the following syntax:
     \quad$|$\quad\verb+\ingoal+(\textit{pattern},\ldots) \\
     \quad$|$\quad\verb+\incontext+(\textit{pattern},\ldots) \\
     \quad$|$\quad\verb+\pattern+(\textit{pattern},\ldots) \\
-    \quad$|$\quad\verb+\select+(\textit{pattern}) \\
+    \quad$|$\quad\verb+\select+(\textit{value}) \\
     \quad$|$\quad\verb+\param+(\textit{id},\textit{value}) \\
     \quad$|$\quad\verb+\child+(\textit{id},\textit{strategy}) \\
     \quad$|$\quad\verb+\children+(\textit{strategy}) \\
@@ -1906,12 +1906,14 @@ to build patterns expression and values.
 strategies are deactivated by default on smoking goals. Indeed, smoke tests are
 proof obligations that are expected to \emph{fail}. However, it might be
 interesting to try strategies on smoking proof goals in order to stress-test
-further your code. To activate strategies for smoke-tests, you shall add the \verb+'smoke'
+further your code. To activate strategies for smoke-tests, you shall add the \verb'smoke'
 name to the strategies to use:
 
-\begin{lstlistings}
+\begin{center}
+  \begin{tabular}{l}
     \verb+@proof+ \textit{strategy}\,: smoke,\textit{target}\pdots\textit{target}\,;
-\end{lstlistings}
+  \end{tabular}
+\end{center}
 
 \section{Structure of JSON Scripts}
 \label{wp-json-scripts}
