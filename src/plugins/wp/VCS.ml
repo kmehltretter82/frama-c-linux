@@ -113,6 +113,10 @@ let filename_for_prover = function
   | Qed -> "Qed"
   | Tactical -> "Tactical"
 
+let is_prover = function
+  | Qed | Why3 _ -> true
+  | Tactical -> false
+
 let is_auto = function
   | Qed -> true
   | Tactical -> false
@@ -131,10 +135,10 @@ let cmp_prover p q =
   match p,q with
   | Qed , Qed -> 0
   | Qed , _ -> (-1)
-  | _ , Qed -> 1
+  | _ , Qed -> (+1)
   | Tactical , Tactical -> 0
   | Tactical , _ -> (-1)
-  | _ , Tactical -> 1
+  | _ , Tactical -> (+1)
   | Why3 p , Why3 q -> Why3Provers.compare p q
 
 let pp_prover fmt p = Format.pp_print_string fmt (title_of_prover p)
