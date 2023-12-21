@@ -259,10 +259,10 @@ let configure r =
 
 let time_fits t =
   t = 0.0 ||
-  let timeout = Wp_parameters.Timeout.get () in
-  timeout = 0 ||
-  let margin = Wp_parameters.TimeMargin.get () in
-  t < float (timeout - margin)
+  let timeout = float @@ Wp_parameters.Timeout.get () in
+  timeout = 0.0 ||
+  let margin = float_of_string @@ Wp_parameters.TimeMargin.get () in
+  t +. margin <= timeout
 
 let step_fits n =
   n = 0 ||
