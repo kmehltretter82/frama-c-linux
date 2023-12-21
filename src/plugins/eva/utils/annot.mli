@@ -29,7 +29,8 @@ open Cil_types
 (* -------------------------------------------------------------------------- *)
 
 (** Generates a predicate characterizing the domain of the l-value. *)
-val eval_value : loc:location -> lval -> Results.request -> predicate
+val eval_value :
+  loc:location -> ?name:string list -> lval -> Results.request -> predicate
 
 (**
    Generates a collection of predicates for each l-value that is read by the
@@ -40,7 +41,8 @@ val eval_value : loc:location -> lval -> Results.request -> predicate
    left-hand-side are not visited, but their inner l-values are visited; any
    l-value from the right-hand-side of the instruction is also visited.
 *)
-val eval_instr : ?callstack:Callstack.t -> stmt -> predicate list
+val eval_instr :
+  ?callstack:Callstack.t -> ?name:string list -> stmt -> predicate list
 
 (** Emitter used for generating domain assertions. *)
 val generated : Emitter.t
@@ -52,7 +54,6 @@ val generated : Emitter.t
    {!Analysis.emitter}.
 *)
 val generator : unit -> Cil.cilVisitor
-
 
 [@@@ api_end]
 

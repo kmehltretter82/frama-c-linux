@@ -59,19 +59,20 @@ let rec has_profile (vs : logic_var list) (ts : term list) =
 let matches_params (ts : term list) (fn : logic_info) =
   fn.l_labels = [] && has_profile fn.l_profile ts
 
-let rec predicate ~loc (p : pred) : predicate =
-  match p with
-  | True -> Logic_const.ptrue
-  | False -> Logic_const.pfalse
-  | Pand(a,b) -> Logic_const.pand ~loc (predicate ~loc a, predicate ~loc b)
-  | Por(a,b) -> Logic_const.por ~loc (predicate ~loc a, predicate ~loc b)
-  | Eval e -> Exp.cil_pred ~loc e
-  | Pcall(f,es) ->
-    let ts = List.map (Exp.cil_term ~loc) es in
-    let ls = Logic_env.find_all_logic_functions f in
-    match List.find_opt (matches_params ts) ls with
-    | None -> raise (Invalid_argument ("Eva.Annot." ^ f))
-    | Some li -> Logic_const.papp ~loc (li,[],ts)
+let predicate ~loc ?(name=[]) (p : pred) : predicate =
+  let rec aux = function
+    | True -> Logic_const.ptrue
+    | False -> Logic_const.pfalse
+    | Pand(a,b) -> Logic_const.pand ~loc (aux a, aux b)
+    | Por(a,b) -> Logic_const.por ~loc (aux a, aux b)
+    | Eval e -> Exp.cil_pred ~loc e
+    | Pcall(f,es) ->
+      let ts = List.map (Exp.cil_term ~loc) es in
+      let ls = Logic_env.find_all_logic_functions f in
+      match List.find_opt (matches_params ts) ls with
+      | None -> raise (Invalid_argument ("Eva.Annot." ^ f))
+      | Some li -> Logic_const.papp ~loc (li,[],ts)
+  in { (aux p) with pred_name = name }
 
 let error (err : Results.error) : pred =
   match err with
@@ -152,10 +153,10 @@ let value (exp : Exp.exp) typ (value : value) : pred =
 (* --- Evalutation                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let eval_value ~loc lv request =
+let eval_value ~loc ?name lv request =
   Results.eval_lval lv request
   |> value (Exp.of_lval lv) (Cil.typeOfLval lv)
-  |> predicate ~loc
+  |> predicate ?name ~loc
 
 (* -------------------------------------------------------------------------- *)
 (* --- Instructions                                                       --- *)
@@ -232,7 +233,7 @@ class evaluator request =
 
   end
 
-let eval_instr ?callstack stmt =
+let eval_instr ?callstack ?name stmt =
   let request =
     let r = Results.before stmt in
     match callstack with
@@ -240,7 +241,7 @@ let eval_instr ?callstack stmt =
     | Some c -> Results.in_callstack c r in
   let engine = new evaluator request in
   let _ = Cil.visitCilStmt (engine :> Cil.cilVisitor) stmt in
-  List.map (predicate ~loc:(Cil_datatype.Stmt.loc stmt)) engine#flush
+  List.map (predicate ?name ~loc:(Cil_datatype.Stmt.loc stmt)) engine#flush
 
 (* -------------------------------------------------------------------------- *)
 (* --- Annotation Generator                                               --- *)
@@ -264,7 +265,7 @@ class generator =
       | Some kf ->
         List.iter
           (Annotations.add_assert generated ~kf stmt)
-          (eval_instr stmt) ;
+          (eval_instr ~name:["Eva"] stmt) ;
         Annotations.iter_code_annot
           (fun e ca ->
              if Emitter.equal e generated then
