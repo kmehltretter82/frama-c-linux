@@ -423,6 +423,7 @@ let default () =
   Wp_parameters.DefaultStrategies.get ()
 
 let hints ?node goal =
+  let smoke = Wpo.is_smoke_test goal in
   let pool = ref [] in
   let add s = if not @@ List.memq s !pool then pool := s :: !pool in
   let addname name = Option.iter add @@ Hashtbl.find_opt strategies name in
@@ -430,14 +431,20 @@ let hints ?node goal =
   let pid = goal.Wpo.po_pid in
   List.iter
     (fun (name,ps) ->
-       if WpPropId.select_by_name ps pid then addname name
+       if not smoke || List.mem "smoke" ps then
+         if WpPropId.select_by_name ps pid then addname name
     ) !revhints ;
-  List.iter add @@ List.rev @@ default () ;
+  if not smoke then
+    List.iter add @@ List.rev @@ default () ;
   List.rev !pool
 
 let has_hint goal =
+  let smoke = Wpo.is_smoke_test goal in
   let pid = goal.Wpo.po_pid in
-  List.exists (fun (_,ps) -> WpPropId.select_by_name ps pid) !revhints
+  List.exists (fun (_,ps) ->
+      (not smoke || List.mem "smoke" ps) &&
+      WpPropId.select_by_name ps pid
+    ) !revhints
 
 (* -------------------------------------------------------------------------- *)
 (* --- Strategy Forward Step                                              --- *)
