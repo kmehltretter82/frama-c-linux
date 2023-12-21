@@ -434,7 +434,6 @@ let do_report_scheduled (stats : stats) =
         let none = fun _fmt -> () in
         let add_line title count pp =
           lines := (title,count,pp) :: !lines in
-        let smoked = !smoked_failed + !smoked_passed in
         if terminating > 0 then add_line "Terminating" terminating none ;
         if unreachable > 0 then add_line "Unreachable" unreachable none ;
         let proofs = stats.proofs in
@@ -462,10 +461,11 @@ let do_report_scheduled (stats : stats) =
             if proofs.timeout > 0 then add_line "Timeout" proofs.timeout none ;
             if proofs.unknown > 0 then add_line "Unknown" proofs.unknown none ;
           end ;
-        if proofs.noresult > 0 then add_line "Missing" proofs.noresult none ;
+        let smoked = !smoked_failed + !smoked_passed in
         if smoked > 0 then
           add_line "Smoke Tests" !smoked_passed
             (fun fmt -> Format.fprintf fmt " / %d" smoked) ;
+        if proofs.noresult > 0 then add_line "Missing" proofs.noresult none ;
         let iter f = List.iter f (List.rev !lines) in
         let title (p,_,_) = p in
         let pp_title fmt p = Format.fprintf fmt "%s:" p in
