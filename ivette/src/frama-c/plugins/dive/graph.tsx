@@ -23,7 +23,7 @@
 import React, { useState, useEffect, useImperativeHandle, useRef } from 'react';
 import _ from 'lodash';
 import { renderToString } from 'react-dom/server';
-import * as Dome from 'dome';
+import * as Dome from 'dome/dome';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';

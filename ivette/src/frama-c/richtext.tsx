@@ -30,9 +30,9 @@
  */
 
 import React from 'react';
-import * as Dome from 'dome';
+import * as Dome from 'dome/dome';
 import * as KernelData from 'frama-c/kernel/api/data';
-import { classes } from 'dome/misc/utils';
+import { classes } from 'utils';
 
 const D = new Dome.Debug('Utils');
 

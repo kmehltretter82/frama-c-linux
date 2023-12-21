@@ -31,9 +31,9 @@
 */
 
 import React from 'react';
-import Emitter from 'events';
+const Emitter = require('events');
 import isEqual from 'react-fast-compare';
-import { Debug } from 'dome';
+import { Debug } from 'dome/dome';
 
 const D = new Debug('State');
 
@@ -95,7 +95,7 @@ const UPDATE = 'dome.states.update';
 export class GlobalState<A> {
 
   private value: A;
-  private emitter: Emitter;
+  private emitter: typeof Emitter;
 
   constructor(initValue: A) {
     this.value = initValue;

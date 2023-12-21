@@ -29,22 +29,19 @@ DOME_DEV_PACKAGES= \
 	@babel/preset-env \
 	@babel/preset-react \
 	@babel/plugin-proposal-object-rest-spread \
-	electron@^16 \
-	electron-builder \
-	electron-webpack \
+	electron@^25 \
+	electron-builder@^24 \
+	electron-vite@^1 \
 	electron-devtools-installer \
-	webpack@^4 \
 	babel-loader \
 	css-loader@^5 \
-	react-hot-loader@^4 \
-	@hot-loader/react-dom@^16 \
-	@types/react@^16 \
-	@types/react-dom@^16 \
-	@types/react-virtualized@^9.21.0
+	@types/react@^18 \
+	@types/react-dom@^18 \
+	@types/react-virtualized@^9.21.8
 
 DOME_APP_PACKAGES= \
-	react@^16 \
-	react-dom@^16 \
+	react@^18 \
+	react-dom@^18 \
 	source-map-support \
 	lodash \
 	react-virtualized \

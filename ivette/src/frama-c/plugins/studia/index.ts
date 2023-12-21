@@ -20,7 +20,7 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import * as Dome from 'dome';
+import * as Dome from '$dome';
 import * as Ivette from 'ivette';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';

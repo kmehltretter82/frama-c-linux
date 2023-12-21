@@ -25,7 +25,7 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import * as Dome from 'dome';
+import * as Dome from 'dome/dome';
 import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { LED, Meter } from 'dome/controls/displays';

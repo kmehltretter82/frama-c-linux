@@ -60,9 +60,9 @@
  */
 
 import React from 'react';
-import * as Dome from 'dome';
+import * as Dome from 'dome/dome';
 import { Title } from 'dome/controls/labels';
-import { classes, styles } from 'dome/misc/utils';
+import { classes, styles } from '../../misc/utils';
 import './style.css';
 
 // --------------------------------------------------------------------------

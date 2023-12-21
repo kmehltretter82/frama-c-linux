@@ -224,7 +224,7 @@ dome-dev: dome-pkg dome-templ
 	@echo 'WDIR=$$PWD' >> $(DOME_CLI)
 	@echo 'ARGV="$(DOME_ARGS) $(DOME_DEV) $$@"' >> $(DOME_CLI)
 	@echo "cd $(CURDIR)" >> $(DOME_CLI)
-	@echo 'exec $(DOME_MK_BIN)/electron-webpack dev $$WDIR $$ARGV' >> $(DOME_CLI)
+	@echo 'exec $(DOME_MK_BIN)/electron-vite dev $$WDIR $$ARGV' >> $(DOME_CLI)
 	@chmod 555 $(DOME_CLI)
 
 # --------------------------------------------------------------------------
@@ -235,13 +235,13 @@ dome-dev: dome-pkg dome-templ
 
 dome-app: dome-pkg dome-templ
 	@echo "[Dome] compiling application (production)"
-	DOME=$(DOME) DOME_ENV='app' yarn run electron-webpack app
+	DOME=$(DOME) DOME_ENV='app' yarn run build
 	@echo "[Dome] linking $(DOME_CLI)"
 	@mkdir -p $(DOME_MK_CLIDIR)
 	@rm -f $(DOME_CLI)
 	@echo "#!/bin/sh" >> $(DOME_CLI)
 	@echo "export DOME_LOCAL=true" >> $(DOME_CLI)
-	@echo 'exec $(DOME_MK_BIN)/electron $(CURDIR)/dist/main/main.js $(DOME_ARGS) "$$@"' >> $(DOME_CLI)
+	@echo 'exec $(DOME_MK_BIN)/electron $(CURDIR)/dist/main/index.js $(DOME_ARGS) "$$@"' >> $(DOME_CLI)
 	@chmod 555 $(DOME_CLI)
 
 # --------------------------------------------------------------------------

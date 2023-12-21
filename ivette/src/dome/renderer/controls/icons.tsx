@@ -36,7 +36,7 @@
 
 import _ from 'lodash';
 import React from 'react';
-import { classes, styles } from 'dome/misc/utils';
+import { classes, styles } from 'utils';
 import Gallery from './gallery.json';
 import './style.css';
 

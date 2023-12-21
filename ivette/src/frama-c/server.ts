@@ -31,13 +31,13 @@
 */
 
 import { debounce } from 'lodash';
-import Path from 'path';
+const Path = require('path');
 import React from 'react';
-import * as Dome from 'dome';
-import * as System from 'dome/system';
+import * as Dome from 'dome/dome';
+import * as System from 'system';
 import * as Json from 'dome/data/json';
 import { TextBuffer } from 'dome/text/richtext';
-import { ChildProcess } from 'child_process';
+const ChildProcess = require('child_process');
 import { client } from './client_socket';
 // import { client } from './client_zmq';
 
@@ -121,7 +121,7 @@ interface PendingRequest {
 const pending = new Map<string, PendingRequest>();
 
 /** Server process. */
-let process: ChildProcess | undefined;
+let process: typeof ChildProcess | undefined;
 
 /** Polling timeout when server is busy. */
 const pollingTimeout = 50;

@@ -25,10 +25,10 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import * as Dome from 'dome';
+import * as Dome from 'dome/dome';
 import { SideBar } from 'dome/frame/sidebars';
 import { Catch } from 'dome/errors';
-import { classes } from 'dome/misc/utils';
+import { classes } from '../dome/misc/utils';
 import { SidebarProps, SIDEBAR } from 'ivette';
 import * as Ext from './Extensions';
 

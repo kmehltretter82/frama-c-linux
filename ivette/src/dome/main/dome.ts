@@ -37,8 +37,9 @@
    @module dome(main)
 */
 
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/devtools';
-import SYS, * as System from 'dome/system';
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'devtools';
+import SYS, * as System from 'system';
+import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import {
   BrowserWindow,
   BrowserWindowConstructorOptions,
@@ -50,21 +51,20 @@ import {
   nativeTheme,
   shell,
 } from 'electron';
-import fs from 'fs';
+const fs = require('fs');
 import _ from 'lodash';
-import path from 'path';
+const path = require('path');
 
 // --------------------------------------------------------------------------
 // --- Main Window Web Navigation
 // --------------------------------------------------------------------------
 
-import { URL } from 'url';
 import * as Menubar from './menubar';
 
 // The __static path is provided by webpack at execution time, but the static
 // type system is not aware of that for now. This is a workaround to avoid
 // an error during compilation.
-declare const __static: string;
+// declare const __static: string;
 
 // --------------------------------------------------------------------------
 // --- System Helpers
@@ -341,11 +341,20 @@ ipcMain.on('dome.ipc.window.title', setTitle);
 ipcMain.on('dome.ipc.window.modified', setModified);
 
 function getURL(): string {
-  if (DEVEL)
-    return `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`;
-  if (LOCAL)
-    return `file://${path.join(__dirname, '../renderer/index.html')}`;
-  return `file://${__dirname}/index.html`;
+  if (DEVEL) {
+    // const url = `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`;
+    const url = `http://localhost:5173`;
+    console.log('[Dome] DEVEL - Loading URL', url);
+    return url;
+  }
+  if (LOCAL) {
+    const url = `file://${path.join(__dirname, '../main/index.html')}`;
+    console.log('[Dome] LOCAL - Loading URL', url);
+    return url;
+  }
+  const url = path.normalize(path.join(__dirname, "/../renderer/index.html"));
+  console.log('[Dome] PROD - Loading URL', url);
+  return url;
 }
 
 function navigateURL(sender: Electron.WebContents) {
@@ -399,15 +408,18 @@ function createBrowserWindow(
     : SYS.WINDOW_PREFERENCES_ARGV;
 
   const options: BrowserWindowConstructorOptions = {
+    width: 900,
+    height: 670,
     show: false,
     backgroundColor: '#f0f0f0',
-    icon: path.join(__static, 'icon.png'),
+    // icon: path.join(__static, 'icon.png'),
     webPreferences: {
-      nodeIntegration: true,
       contextIsolation: false,
-      additionalArguments: [browserArguments],
+      nodeIntegration: true,
+      nodeIntegrationInWorker: true,
+      webSecurity: false,
     },
-    ...config,
+    // ...config,
   };
 
   let configFile = PATH_WINDOW_SETTINGS;
@@ -467,14 +479,13 @@ function createBrowserWindow(
   if (DEVEL || LOCAL)
     process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
 
-  theWindow.loadURL(getURL());
-
   // Load Finished
-  theWindow.once('ready-to-show', () => {
+  theWindow.on('ready-to-show', () => {
+    console.log('[Dome] Window ready');
     if (DEVEL || LOCAL)
       process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'false';
     if (DEVEL && devtools) {
-      webContents.openDevTools();
+    webContents.openDevTools();
     }
     theWindow.show();
   });
@@ -489,11 +500,11 @@ function createBrowserWindow(
 
   // Application Startup
   webContents.on('did-finish-load', () => {
-    if (!handle.reloaded) {
-      handle.reloaded = true;
-    } else {
-      broadcast('dome.ipc.reload');
-    }
+  if (!handle.reloaded) {
+  handle.reloaded = true;
+  } else {
+  broadcast('dome.ipc.reload');
+  }
     webContents.send('dome.ipc.command', argv, wdir);
   });
 
@@ -522,6 +533,15 @@ function createBrowserWindow(
     }, 300);
     theWindow.on('resize', saveFrame);
     theWindow.on('moved', saveFrame);
+  }
+
+  if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
+    theWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
+  } else {
+    const url = `file://${path.join(__dirname, "../renderer/index.html")}`;
+    theWindow.loadURL(url).catch((err) => {
+      console.error(err);
+    });
   }
 
   return theWindow;
@@ -553,9 +573,9 @@ function createPrimaryWindow(): void {
 
   // React Developper Tools
   if (DEVEL)
-    installExtension(REACT_DEVELOPER_TOOLS, true).catch((err) => {
-      console.error('[Dome] Enable to install React dev-tools', err);
-    });
+  installExtension(REACT_DEVELOPER_TOOLS, true).catch((err) => {
+  console.error('[Dome] Enable to install React dev-tools', err);
+  });
   const cwd = process.cwd();
   const wdir = cwd === '/' ? app.getPath('home') : cwd;
   const cmd = stripElectronArgv({ wdir, argv: process.argv });
@@ -563,10 +583,10 @@ function createPrimaryWindow(): void {
   // Reset Settings if the associated argument is provided
   const settingsIdx = cmd.argv.indexOf(CLI_OPTION_SETTINGS.name);
   if (settingsIdx >= 0) {
-    const settings = cmd.argv[settingsIdx + 1];
-    if (settings === CLI_OPTION_SETTINGS.defaultValue) {
-      restoreAllDefaultSettings();
-    }
+  const settings = cmd.argv[settingsIdx + 1];
+  if (settings === CLI_OPTION_SETTINGS.defaultValue) {
+  restoreAllDefaultSettings();
+  }
   }
 
   // Initialize Theme
@@ -709,19 +729,23 @@ export function start(): void {
   app.commandLine.appendSwitch('lang', 'en');
 
   // Listen to application events
-  app.on('ready', createPrimaryWindow); // Wait for Electron init
-  app.on('activate', activateWindows); // Mac OSX response to dock
-  app.on('second-instance', createSecondaryWindow);
+  app.whenReady().then(() => {
+    createPrimaryWindow()
+
+    // Wait for Electron init
+    app.on('activate', activateWindows); // Mac OSX response to dock
+    app.on('second-instance', createSecondaryWindow);
+  });
 
   // Configuring macOS for exiting
   app.on('before-quit', () => {
-    isQuitting = true;
+  isQuitting = true;
   });
 
   // At-exit callbacks
   app.on('will-quit', () => {
-    saveGlobalSettings();
-    System.doExit();
+  saveGlobalSettings();
+  System.doExit();
   });
 
   // On macOS the menu bar stays active until the user explicitly quits.
@@ -729,7 +753,7 @@ export function start(): void {
   // Warning: when no event handler is registered, the app automatically
   // quit when all windows are closed.
   app.on('window-all-closed', () => {
-    if (isQuitting || System.platform !== 'macos') app.quit();
+    if (isQuitting || System.platform !== 'darwin') app.quit();
   });
 
 }

@@ -32,10 +32,10 @@
 // --------------------------------------------------------------------------
 
 import _ from 'lodash';
-import Emitter from 'events';
-import Exec from 'child_process';
-import fspath from 'path';
-import fs from 'fs';
+const Emitter = require('events');
+const Exec = require('child_process');
+const path = require('path');
+const fs = require('fs');
 
 // --------------------------------------------------------------------------
 // --- Logging
@@ -193,7 +193,7 @@ export function getArguments(): string[] { return COMMAND_ARGV; }
    @description
    Same as [Node `path.join`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_join_paths)
 */
-export const { join } = fspath;
+export const { join } = path;
 
 /**
    @summary Absolute (joined) file paths.
@@ -202,7 +202,7 @@ export const { join } = fspath;
    @description
    Same as [Node `path.resolve`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_resolve_paths)
 */
-export const { resolve } = fspath;
+export const { resolve } = path;
 
 /**
    @summary Dirname of path.
@@ -211,7 +211,7 @@ export const { resolve } = fspath;
    @description
    Same as [Node `path.dirname`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_dirname_path)
 */
-export const { dirname } = fspath;
+export const { dirname } = path;
 
 /**
    @summary Basename of path.
@@ -221,7 +221,7 @@ export const { dirname } = fspath;
    @description
    Same as [Node `path.basename`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_basename_path_ext)
 */
-export const { basename } = fspath;
+export const { basename } = path;
 
 /**
    @summary File extension of path.
@@ -230,7 +230,7 @@ export const { basename } = fspath;
    @description
    Same as [Node `path.extname`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_extname_path)
 */
-export const { extname } = fspath;
+export const { extname } = path;
 
 // --------------------------------------------------------------------------
 // --- File Stats
@@ -419,7 +419,7 @@ async function rmDirRec(path: string): Promise<void> {
     }
     if (stats.isDirectory()) {
       const rmDirSub = (name: string): void => {
-        rmDirRec(fspath.join(path, name));
+        rmDirRec(path.join(path, name));
       };
       const entries = await readDir(path);
       await Promise.all(entries.map(rmDirSub));

@@ -30,10 +30,10 @@
  */
 
 import React from 'react';
-import * as Dome from 'dome';
+import * as Dome from 'dome/dome';
 import { SVG } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
-import { classes } from 'dome/misc/utils';
+import { classes } from '../../misc/utils';
 import './style.css';
 
 // --------------------------------------------------------------------------

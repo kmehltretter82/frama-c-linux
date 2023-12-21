@@ -29,7 +29,7 @@
    @module dome/table/arrays
 */
 
-import { Debug } from 'dome';
+import { Debug } from 'dome/dome';
 import * as Compare from 'dome/data/compare';
 import type { ByFields, Order } from 'dome/data/compare';
 import {

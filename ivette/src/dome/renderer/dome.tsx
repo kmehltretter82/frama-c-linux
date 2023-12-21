@@ -44,11 +44,11 @@ import _ from 'lodash';
 import Emitter from 'events';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { AppContainer } from 'react-hot-loader';
-import { ipcRenderer } from 'electron';
-import SYS, * as System from 'dome/system';
+// import { ipcRenderer } from 'electron';
+import SYS, * as System from 'system';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
+import { ipcRenderer } from 'electron';
 import './dark.css';
 import './light.css';
 import './style.css';
@@ -122,11 +122,12 @@ export function getPID(): number { return System.getPID(); }
 // The __static path is provided by webpack at execution time, but the static
 // type system is not aware of that for now. This is a workaround to avoid
 // an error during compilation.
-declare const __static: string;
+// declare const __static: string;
 
 /** Path to application static resources. */
 export function getStatic(file?: string): string {
-  return file ? System.join(__static, file) : __static;
+  throw new Error('DIR - Not implemented');
+  // return file ? System.join(__static, file) : __static;
 }
 
 // --------------------------------------------------------------------------
@@ -235,8 +236,8 @@ export function onCommand(
 }
 
 ipcRenderer.on('dome.ipc.command', (_event, argv, wdir) => {
-  SYS.setCommandLine(argv, wdir);
-  System.emitter.emit('dome.command', argv, wdir);
+SYS.setCommandLine(argv, wdir);
+System.emitter.emit('dome.command', argv, wdir);
 });
 
 /** Window Settings event.
@@ -252,9 +253,9 @@ export const globalSettings = new Event(Settings.global);
 // --------------------------------------------------------------------------
 
 ipcRenderer.on('dome.ipc.closing', async (_event, wid: number) => {
-    await System.doExit();
-    ipcRenderer.send('dome.ipc.closing.done', wid);
-  });
+await System.doExit();
+ipcRenderer.send('dome.ipc.closing.done', wid);
+});
 
 /** Register a callback to be executed when the window is closing. */
 export function atExit(callback: () => (void | Promise<void>)): void {
@@ -272,9 +273,9 @@ export const focus = new Event<boolean>('dome.focus');
 export function isFocused(): boolean { return windowFocus; }
 
 ipcRenderer.on('dome.ipc.focus', (_sender, value) => {
-  windowFocus = value;
-  setContextAppNode();
-  focus.emit(value);
+windowFocus = value;
+setContextAppNode();
+focus.emit(value);
 });
 
 /** Return the current window focus. See [[isFocused]]. */
@@ -297,8 +298,8 @@ export function useWindowFocus(): boolean {
 export const navigate = new Event<string>('dome.href');
 
 ipcRenderer.on(
-  'dome.ipc.href',
-  (_sender, href) => navigate.emit(href),
+'dome.ipc.href',
+(_sender, href) => navigate.emit(href),
 );
 
 // --------------------------------------------------------------------------
@@ -337,7 +338,7 @@ function setContainer(
 ): void {
   Settings.synchronize();
   const appNode = setContextAppNode();
-  const contents = <AppContainer><Component /></AppContainer>;
+  const contents = <Component />;
   ReactDOM.render(contents, appNode);
 }
 
@@ -486,8 +487,8 @@ export function setMenuItem(options: MenuItemOptions): void {
 }
 
 ipcRenderer.on('dome.ipc.menu.clicked', (_sender, id: string) => {
-  const callback = customItemCallbacks.get(id);
-  if (callback) callback();
+const callback = customItemCallbacks.get(id);
+if (callback) callback();
 });
 
 // --------------------------------------------------------------------------
@@ -547,14 +548,14 @@ export function popupMenu(
     };
   });
   ipcRenderer.invoke('dome.popup', ipcItems).then((index: number) => {
-    const item = items[index];
-    if (item && item !== 'separator') {
-      const { id, label, onClick } = item;
-      if (onClick) onClick();
-      if (callback) callback(id || label);
-    } else {
-      if (callback) callback(undefined);
-    }
+  const item = items[index];
+  if (item && item !== 'separator') {
+  const { id, label, onClick } = item;
+  if (onClick) onClick();
+  if (callback) callback(id || label);
+  } else {
+  if (callback) callback(undefined);
+  }
   });
 }
 

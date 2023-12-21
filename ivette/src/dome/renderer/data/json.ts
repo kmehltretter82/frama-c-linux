@@ -32,7 +32,7 @@
    @module dome/data/json
 */
 
-import { Debug } from 'dome/system';
+import { Debug } from 'system';
 
 const D = new Debug('Dome.json');
 

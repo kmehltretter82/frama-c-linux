@@ -37,7 +37,7 @@ import { dispatchEvent, DnD, DragSource, DropTarget } from 'dome/olddnd' ;
 import { AutoSizer } from 'react-virtualized' ;
 import { DraggableCore } from 'react-draggable' ;
 
-import * as Dome from 'dome' ;
+import * as Dome from '$dome' ;
 
 import './style.css' ;
 
@@ -840,7 +840,7 @@ export const GridVbox = (props) => null ;
 // --- User Grid & Components Extraction
 // --------------------------------------------------------------------------
 
-import { register, classOf } from 'dome/misc/register' ;
+import { register, classOf } from '../../../dome/misc/register' ;
 
 register(GridBox,  'DOME_GRIDLAYOUT_BOX');
 register(GridHbox, 'DOME_GRIDLAYOUT_HBOX');

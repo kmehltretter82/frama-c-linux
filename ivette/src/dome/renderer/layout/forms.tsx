@@ -40,8 +40,8 @@
 
 import { debounce } from 'lodash';
 import React from 'react';
-import * as Dome from 'dome';
-import * as Utils from 'dome/misc/utils';
+import * as Dome from 'dome/dome';
+import * as Utils from 'utils';
 import { SVG } from 'dome/controls/icons';
 import { Checkbox, Radio, Select as SelectMenu } from 'dome/controls/buttons';
 

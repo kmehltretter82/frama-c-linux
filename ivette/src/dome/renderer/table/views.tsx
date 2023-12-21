@@ -34,8 +34,8 @@
 import React, { ReactNode } from 'react';
 import { forEach, debounce, throttle } from 'lodash';
 import isEqual from 'react-fast-compare';
-import * as Dome from 'dome';
-import { classes } from 'dome/misc/utils';
+import * as Dome from 'dome/dome';
+import { classes } from 'utils';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import { DraggableCore } from 'react-draggable';
