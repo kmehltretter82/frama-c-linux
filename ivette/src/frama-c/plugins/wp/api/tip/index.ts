@@ -201,15 +201,35 @@ const goToNode_internal: Server.SetRequest<node,null> = {
 /** Set current node of associated proof tree */
 export const goToNode: Server.SetRequest<node,null>= goToNode_internal;
 
-const removeNode_internal: Server.SetRequest<node,null> = {
+const clearNode_internal: Server.SetRequest<node,null> = {
   kind: Server.RqKind.SET,
-  name: 'plugins.wp.tip.removeNode',
+  name: 'plugins.wp.tip.clearNode',
   input: jNode,
   output: Json.jNull,
   signals: [],
 };
-/** Remove node from tree and go to parent */
-export const removeNode: Server.SetRequest<node,null>= removeNode_internal;
+/** Cancel all node results and sub-tree (if any) */
+export const clearNode: Server.SetRequest<node,null>= clearNode_internal;
+
+const clearParentTactic_internal: Server.SetRequest<node,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.clearParentTactic',
+  input: jNode,
+  output: Json.jNull,
+  signals: [],
+};
+/** Cancel parent node tactic */
+export const clearParentTactic: Server.SetRequest<node,null>= clearParentTactic_internal;
+
+const clearGoal_internal: Server.SetRequest<goal,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.clearGoal',
+  input: jGoal,
+  output: Json.jNull,
+  signals: [],
+};
+/** Remove the complete goal proof tree */
+export const clearGoal: Server.SetRequest<goal,null>= clearGoal_internal;
 
 /** Proof part marker */
 export type part = Json.key<'#part'>;

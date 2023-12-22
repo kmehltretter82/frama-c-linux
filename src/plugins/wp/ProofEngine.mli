@@ -41,8 +41,6 @@ end
 
 val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
 val proof : main:Wpo.t -> tree
-val reset : tree -> unit
-val clear : Wpo.t -> unit
 
 (** Re-compute stats & set status of the entire script *)
 val validate : tree -> unit
@@ -98,8 +96,13 @@ val get_hint : node -> string option
 val set_hint : node -> string -> unit
 
 val forward : tree -> unit
-val cancel : tree -> unit
-val remove : tree -> node -> unit
+val clear_goal : Wpo.t -> unit
+val clear_tree : tree -> unit
+val clear_node : tree -> node -> unit
+val clear_parent_tactic : tree -> node -> unit
+
+val cancel_parent_tactic : tree -> unit
+val cancel_current_node : tree -> unit
 
 type fork
 val anchor : tree -> ?node:node -> unit -> node

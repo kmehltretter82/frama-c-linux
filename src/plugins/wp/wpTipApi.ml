@@ -215,31 +215,34 @@ let () = R.register ~package ~kind:`SET ~name:"goToNode"
       R.emit proofStatus ;
     end
 
-let () = R.register ~package ~kind:`SET ~name:"removeNode"
-    ~descr:(Md.plain "Remove node results and tactic (if any)")
+let () = R.register ~package ~kind:`SET ~name:"clearNode"
+    ~descr:(Md.plain "Cancel all node results and sub-tree (if any)")
     ~input:(module Node) ~output:(module D.Junit)
     begin fun node ->
       let tree = ProofEngine.tree node in
-      ProofEngine.remove tree node ;
-      ProofEngine.goto tree (`Node node) ;
+      ProofEngine.clear_node tree node ;
       ProofEngine.validate tree ;
       S.update WpApi.goals @@ ProofEngine.main tree ;
       R.emit proofStatus ;
     end
 
-let () = R.register ~package ~kind:`SET ~name:"revertTactic"
-    ~descr:(Md.plain "Go back to parent node and revert tactic (if any)")
+let () = R.register ~package ~kind:`SET ~name:"clearParentTactic"
+    ~descr:(Md.plain "Cancel parent node tactic")
     ~input:(module Node) ~output:(module D.Junit)
     begin fun node ->
       let tree = ProofEngine.tree node in
-      begin
-        match ProofEngine.parent node with
-        | None ->
-          ProofEngine.clear @@ ProofEngine.main tree
-        | Some node ->
-          ProofEngine.remove tree node ;
-          ProofEngine.goto tree (`Node node) ;
-      end ;
+      ProofEngine.clear_parent_tactic tree node ;
+      ProofEngine.validate tree ;
+      S.update WpApi.goals @@ ProofEngine.main tree ;
+      R.emit proofStatus ;
+    end
+
+let () = R.register ~package ~kind:`SET ~name:"clearGoal"
+    ~descr:(Md.plain "Remove the complete goal proof tree")
+    ~input:(module Goal) ~output:(module D.Junit)
+    begin fun goal ->
+      let tree = ProofEngine.proof ~main:goal in
+      ProofEngine.clear_tree tree ;
       ProofEngine.validate tree ;
       S.update WpApi.goals @@ ProofEngine.main tree ;
       R.emit proofStatus ;

@@ -161,8 +161,8 @@ class pane (gprovers : GuiConfig.provers) =
         scripter#on_click self#goto ;
         scripter#on_backtrack self#backtrack ;
         gprovers#connect self#register_provers ;
-        delete#connect (fun () -> self#interrupt ProofEngine.reset) ;
-        cancel#connect (fun () -> self#interrupt ProofEngine.cancel) ;
+        delete#connect (fun () -> self#interrupt ProofEngine.cancel_current_node) ;
+        cancel#connect (fun () -> self#interrupt ProofEngine.cancel_parent_tactic) ;
         forward#connect (fun () -> self#forward) ;
         next#connect (fun () -> self#navigate succ) ;
         prev#connect (fun () -> self#navigate pred) ;
@@ -279,7 +279,7 @@ class pane (gprovers : GuiConfig.provers) =
     method private play_script =
       match state with
       | Proof p ->
-        ProofEngine.reset p ;
+        ProofEngine.clear_tree p ;
         ProverScript.spawn
           ~provers:self#provers
           ~result:

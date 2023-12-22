@@ -298,7 +298,7 @@ class behavior
 
     method private popup_delete_script () =
       match popup_target with
-      | Some(w,_) -> ProofEngine.clear w ; ProofSession.remove w
+      | Some(w,_) -> ProofEngine.clear_goal w ; ProofSession.remove w
       | None -> ()
 
     method private popup_run mode () =

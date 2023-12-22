@@ -244,7 +244,7 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
   const descr = locked ? Locked : getStatusDescription(tactical);
   const onClose = (): void => setSelected(undefined);
   const onPlay = (): void => { if (isReady) applyTactic(tactic); };
-  const onCancel = (): void => { Server.send(TIP.removeNode, node); };
+  const onCancel = (): void => { Server.send(TIP.clearNode, node); };
   const parameters =
     (node && tactic)
     ? params.map((prm: TAC.parameter) =>

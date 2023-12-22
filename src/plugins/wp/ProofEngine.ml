@@ -106,31 +106,54 @@ let proof ~main =
   assert (not (Wpo.is_tactic main)) ;
   PROOFS.get main
 
-let rec reset_node n =
-  Wpo.clear_results n.goal ;
-  if Wpo.is_tactic n.goal then Wpo.remove n.goal ;
+let saved t = t.saved
+let set_saved t s = t.saved <- s
+
+(* -------------------------------------------------------------------------- *)
+(* --- Removal                                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+let rec revert_tactic t n =
   n.strategy <- None ;
   match n.script with
   | Opened | Script _ -> ()
   | Tactic(_,children) ->
-    n.script <- Opened ; iter_children reset_node children
+    n.script <- Opened ; iter_children (remove_node t) children
 
-let reset_root = function None -> () | Some n -> reset_node n
+and remove_node t n =
+  if Wpo.is_tactic n.goal then
+    Wpo.remove n.goal
+  else
+    Wpo.clear_results n.goal ;
+  begin
+    match t.head with
+    | Some n0 when n0 == n -> t.head <- None
+    | _ -> ()
+  end ;
+  revert_tactic t n
 
-let reset t =
+let clear_node t n =
+  Wpo.clear_results n.goal ;
+  revert_tactic t n ;
+  if t.head = None then t.head <- Some n
+
+let clear_tree t =
   begin
     Wpo.clear_results t.main ;
-    reset_root t.root ;
+    Option.iter (remove_node t) t.root ;
     t.gid <- 0 ;
     t.head <- None ;
     t.root <- None ;
     t.saved <- false ;
   end
 
-let clear w = if PROOFS.mem w then reset (PROOFS.get w)
+let clear_parent_tactic t n =
+  match n.parent with
+  | None -> clear_tree t
+  | Some p as h -> t.head <- h ; revert_tactic t p
 
-let saved t = t.saved
-let set_saved t s = t.saved <- s
+let clear_goal w =
+  if PROOFS.mem w then clear_tree (PROOFS.get w)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Walking                                                            --- *)
@@ -317,18 +340,15 @@ let rec forward t =
         forward t ;
       end
 
-let remove t node =
-  begin
-    Wpo.clear_results node.goal ;
-    t.head <- node.parent ;
-    if t.head = None then t.root <- None ;
-    reset_node node ;
-  end
-
-let cancel t =
+let cancel_parent_tactic t =
   match t.head with
   | None -> ()
-  | Some node -> remove t node
+  | Some n -> clear_parent_tactic t n
+
+let cancel_current_node t =
+  match t.head with
+  | None -> ()
+  | Some node -> clear_node t node
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sub-Goal                                                           --- *)
