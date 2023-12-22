@@ -28,6 +28,7 @@ open Cil_types
 
 module Ltype = Cil_datatype.Logic_type_ByName
 module Exp = Cil_builder.Exp
+type visitor = Visitor.frama_c_visitor
 
 type pred =
   | True
@@ -166,7 +167,7 @@ module Slv = Cil_datatype.LvalStructEq.Set
 
 class evaluator request =
   object(self)
-    inherit Visitor.generic_frama_c_visitor (Visitor_behavior.inplace ())
+    inherit Visitor.frama_c_inplace
 
     val mutable locked = Slv.empty
     val mutable domain : pred list = []
@@ -240,7 +241,7 @@ let eval_instr ?callstack ?name stmt =
     | None -> r
     | Some c -> Results.in_callstack c r in
   let engine = new evaluator request in
-  let _ = Cil.visitCilStmt (engine :> Cil.cilVisitor) stmt in
+  let _ = Visitor.visitFramacStmt (engine :> visitor) stmt in
   List.map (predicate ?name ~loc:(Cil_datatype.Stmt.loc stmt)) engine#flush
 
 (* -------------------------------------------------------------------------- *)
@@ -254,7 +255,7 @@ let generated = Emitter.create "Eva_domain"
 
 class generator =
   object(self)
-    inherit Visitor.generic_frama_c_visitor (Visitor_behavior.inplace ())
+    inherit Visitor.frama_c_inplace
 
     method! vlval _ = SkipChildren
     method! vexpr _ = SkipChildren
@@ -278,6 +279,56 @@ class generator =
 
   end
 
-let generator () = (new generator :> Cil.cilVisitor)
+let generator () = (new generator :> visitor)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Annotation Removal                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+class cleaner =
+  object(self)
+    inherit Visitor.frama_c_inplace
+
+    method! vlval _ = SkipChildren
+    method! vexpr _ = SkipChildren
+
+    method !vstmt_aux stmt =
+      match self#current_kf with
+      | None -> Cil.SkipChildren
+      | Some kf ->
+        Annotations.iter_code_annot
+          (fun e ca ->
+             if Emitter.equal e generated then
+               Annotations.remove_code_annot e ~kf stmt ca
+          ) stmt ;
+        DoChildren
+
+  end
+
+let cleaner () = (new cleaner :> visitor)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Command Line Option                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+let main () =
+  if Analysis.is_computed () then
+    let ast = Ast.get () in
+    let cleaner = cleaner () in
+    Self.feedback ~ontty:`Transient "Cleaning annotations..." ;
+    Visitor.visitFramacFile cleaner ast ;
+    let generator = new generator in
+    Parameters.Annot.iter
+      begin fun kf ->
+        if Kernel_function.has_definition kf then
+          let fundec = Kernel_function.get_definition kf in
+          Self.feedback "Annotate %a" Kernel_function.pretty kf ;
+          ignore @@ Visitor.visitFramacFunction generator fundec
+        else
+          Self.warning "Can not annotate %a (no definition)"
+            Kernel_function.pretty kf ;
+      end
+
+let () = Boot.Main.extend main
 
 (* -------------------------------------------------------------------------- *)

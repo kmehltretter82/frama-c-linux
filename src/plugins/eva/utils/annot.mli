@@ -53,7 +53,13 @@ val generated : Emitter.t
    {!generated} emitter. They are all assigned a valid status by
    {!Analysis.emitter}.
 *)
-val generator : unit -> Cil.cilVisitor
+val generator : unit -> Visitor.frama_c_inplace
+
+(**
+   Creates a visitor that can be used to remove all generated annotations from
+   {!generated} emitter. This will also remove their associated status.
+*)
+val cleaner : unit -> Visitor.frama_c_inplace
 
 [@@@ api_end]
 

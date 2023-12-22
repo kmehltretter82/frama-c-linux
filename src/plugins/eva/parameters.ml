@@ -1277,6 +1277,21 @@ let () = MallocLevel.set_range ~min:0 ~max:max_int
 let () = add_precision_dep MallocLevel.parameter
 
 (* -------------------------------------------------------------------------- *)
+(* --- Annotations Generator options                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Annot =
+  Kernel_function_set
+    (struct
+      let option_name = "-eva-annot"
+      let arg_name = "f"
+      let help =
+        "Populate the specified functions with assertions \
+         representing the range of values computed by Eva \
+         on l-values read by the code, when available."
+    end)
+
+(* -------------------------------------------------------------------------- *)
 (* --- Deprecated options and aliases                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
