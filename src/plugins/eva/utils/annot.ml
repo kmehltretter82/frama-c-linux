@@ -85,7 +85,7 @@ let error (err : Results.error) : pred =
 (* -------------------------------------------------------------------------- *)
 
 let iequal (exp : Exp.exp) (k : Z.t) : pred =
-  Eval Exp.( exp <= of_integer k )
+  Eval Exp.( exp == of_integer k )
 
 let imin (exp : Exp.exp) (ival : Ival.t) : pred =
   match Ival.min_int ival with
@@ -97,10 +97,19 @@ let imax (exp : Exp.exp) (ival : Ival.t) : pred =
   | None -> True
   | Some k -> Eval Exp.( exp <= of_integer k )
 
+let irange = function
+  | [_] | [] -> false
+  | x::xs ->
+    let rec continuous x = function
+      | [] -> true
+      | y::ys -> Z.equal (Z.succ x) y && continuous y ys
+    in continuous x xs
+
 let ival (exp : Exp.exp) (ival : Ival.t) : pred =
   match Ival.project_small_set ival with
-  | Some vs -> List.fold_left (fun w v -> por w (iequal exp v)) False vs
-  | None -> pand (imin exp ival) (imax exp ival)
+  | Some vs when not @@ irange vs ->
+    List.fold_left (fun w v -> por w (iequal exp v)) False vs
+  | _ -> pand (imin exp ival) (imax exp ival)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Fvalues                                                            --- *)
@@ -266,7 +275,7 @@ class generator =
       | Some kf ->
         List.iter
           (Annotations.add_assert generated ~kf stmt)
-          (eval_instr ~name:["Eva"] stmt) ;
+          (eval_instr stmt) ;
         Annotations.iter_code_annot
           (fun e ca ->
              if Emitter.equal e generated then
