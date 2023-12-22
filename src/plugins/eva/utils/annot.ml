@@ -202,10 +202,10 @@ class evaluator request =
         DoChildren
 
     method private visit_expr e =
-      ignore @@ Cil.visitCilExpr (self :> Cil.cilVisitor) e
+      ignore @@ Visitor.visitFramacExpr (self :> visitor) e
 
     method private visit_offset ofs =
-      ignore @@ Cil.visitCilOffset (self :> Cil.cilVisitor) ofs
+      ignore @@ Visitor.visitFramacOffset (self :> visitor) ofs
 
     method private visit_host = function
       | Var _ -> ()
