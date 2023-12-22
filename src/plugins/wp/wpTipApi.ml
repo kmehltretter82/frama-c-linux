@@ -216,12 +216,30 @@ let () = R.register ~package ~kind:`SET ~name:"goToNode"
     end
 
 let () = R.register ~package ~kind:`SET ~name:"removeNode"
-    ~descr:(Md.plain "Remove node from tree and go to parent")
+    ~descr:(Md.plain "Remove node results and tactic (if any)")
     ~input:(module Node) ~output:(module D.Junit)
     begin fun node ->
       let tree = ProofEngine.tree node in
       ProofEngine.remove tree node ;
       ProofEngine.goto tree (`Node node) ;
+      ProofEngine.validate tree ;
+      S.update WpApi.goals @@ ProofEngine.main tree ;
+      R.emit proofStatus ;
+    end
+
+let () = R.register ~package ~kind:`SET ~name:"revertTactic"
+    ~descr:(Md.plain "Go back to parent node and revert tactic (if any)")
+    ~input:(module Node) ~output:(module D.Junit)
+    begin fun node ->
+      let tree = ProofEngine.tree node in
+      begin
+        match ProofEngine.parent node with
+        | None ->
+          ProofEngine.clear @@ ProofEngine.main tree
+        | Some node ->
+          ProofEngine.remove tree node ;
+          ProofEngine.goto tree (`Node node) ;
+      end ;
       ProofEngine.validate tree ;
       S.update WpApi.goals @@ ProofEngine.main tree ;
       R.emit proofStatus ;
