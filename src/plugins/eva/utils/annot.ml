@@ -331,12 +331,16 @@ let main () =
     Parameters.Annot.iter
       begin fun kf ->
         if Kernel_function.has_definition kf then
-          let fundec = Kernel_function.get_definition kf in
-          Self.feedback "Annotate %a" Kernel_function.pretty kf ;
-          ignore @@ Visitor.visitFramacFunction generator fundec
+          if Results.are_available kf then
+            let fundec = Kernel_function.get_definition kf in
+            Self.feedback "Annotate %a" Kernel_function.pretty kf ;
+            ignore @@ Visitor.visitFramacFunction generator fundec
+          else
+            Self.warning "Can not annotate %a (no available results)"
+              Kernel_function.pretty kf
         else
           Self.warning "Can not annotate %a (no definition)"
-            Kernel_function.pretty kf ;
+            Kernel_function.pretty kf
       end
 
 let () = Boot.Main.extend main
