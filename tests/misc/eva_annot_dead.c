@@ -9,8 +9,13 @@
 
 int main(int a) {
   int b = 0;
-  if (a < 0) { a = 1; b++; }
-  if (a < 0) { a = 2; b++; }
+  if (a) goto B;
+  if (0) {
+    b++;
+    b++;
+  B:
+    b += 42;
+  }
   return b;
 }
 

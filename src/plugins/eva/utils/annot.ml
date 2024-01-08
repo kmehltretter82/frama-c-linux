@@ -27,6 +27,7 @@ open Cil_types
 (* -------------------------------------------------------------------------- *)
 
 module Ltype = Cil_datatype.Logic_type_ByName
+module Stmts = Cil_datatype.Stmt.Set
 module Exp = Cil_builder.Exp
 type visitor = Visitor.frama_c_visitor
 
@@ -270,6 +271,7 @@ let generated = Emitter.create "Eva_domain"
 class generator =
   object(self)
     inherit Visitor.frama_c_inplace
+    val mutable dead = Stmts.empty (* annotated as dead *)
 
     method! vlval _ = SkipChildren
     method! vexpr _ = SkipChildren
@@ -278,18 +280,23 @@ class generator =
       match self#current_kf with
       | None -> Cil.SkipChildren
       | Some kf ->
-        List.iter
-          (Annotations.add_assert generated ~kf stmt)
-          (eval_instr stmt) ;
-        Annotations.iter_code_annot
-          (fun e ca ->
-             if Emitter.equal e generated then
-               List.iter
-                 (fun ip ->
-                    Property_status.emit Analysis.emitter ~hyps:[] ip True
-                 ) (Property.ip_of_code_annot kf stmt ca)
-          ) stmt ;
-        if is_dead stmt then SkipChildren else DoChildren
+        if not @@ List.for_all (fun s -> Stmts.mem s dead) stmt.preds then
+          begin
+            List.iter
+              (Annotations.add_assert generated ~kf stmt)
+              (eval_instr stmt) ;
+            Annotations.iter_code_annot
+              (fun e ca ->
+                 if Emitter.equal e generated then
+                   List.iter
+                     (fun ip ->
+                        Property_status.emit Analysis.emitter ~hyps:[] ip True
+                     ) (Property.ip_of_code_annot kf stmt ca)
+              ) stmt ;
+          end ;
+        if is_dead stmt
+        then ( dead <- Stmts.add stmt dead ; SkipChildren )
+        else DoChildren
 
   end
 
