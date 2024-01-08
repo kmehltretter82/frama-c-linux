@@ -97,17 +97,18 @@ let imax (exp : Exp.exp) (ival : Ival.t) : pred =
   | None -> True
   | Some k -> Eval Exp.( exp <= of_integer k )
 
-let irange = function
-  | [_] | [] -> false
+let sparse = function
+  | [] -> false
+  | [_] -> true
   | x::xs ->
     let rec continuous x = function
       | [] -> true
       | y::ys -> Z.equal (Z.succ x) y && continuous y ys
-    in continuous x xs
+    in not @@ continuous x xs
 
 let ival (exp : Exp.exp) (ival : Ival.t) : pred =
   match Ival.project_small_set ival with
-  | Some vs when not @@ irange vs ->
+  | Some vs when sparse vs ->
     List.fold_left (fun w v -> por w (iequal exp v)) False vs
   | _ -> pand (imin exp ival) (imax exp ival)
 
@@ -231,14 +232,14 @@ class evaluator request =
 
     method !vstmt_aux stmt =
       match stmt.skind with
-      (* Branching expressions *)
-      | If(e,_,_,_) | Switch(e,_,_,_) ->
-        self#visit_expr e ; SkipChildren
       (* Instructions *)
-      | Instr _ | Return _ | Goto _ | Break _ | Continue _
-      | UnspecifiedSequence _ -> DoChildren
-      (* Blocks *)
-      | Loop _ | Block _ | Throw _ | TryCatch _ | TryFinally _ | TryExcept _
+      | Instr _ | Return _ -> DoChildren
+      (* Branching expressions *)
+      | If(e,_,_,_) | Switch(e,_,_,_) -> self#visit_expr e ; SkipChildren
+      (* Blocks & Jumps *)
+      | Goto _ | Break _ | Continue _
+      | Loop _ | Block _ | UnspecifiedSequence _
+      | Throw _ | TryCatch _ | TryFinally _ | TryExcept _
         -> SkipChildren
 
   end
