@@ -6,6 +6,8 @@ open Sigs
 
 let mode = `Tree
 
+let bar = String.make 60 '-'
+
 let run () =
   let setup : Factory.setup = { mheap = Typed MemTyped.NoCast;
                                 mvar = Var;
@@ -53,11 +55,11 @@ let run () =
         po_gid = ""; po_sid = ""; po_name = "";
         po_idx = Function(kf, None); po_model = model;
         po_pid = prop_id;
-        po_formula = Wpo.GoalAnnot vc_annot;
+        po_formula = vc_annot;
       } in
     Format.printf "@[%a@]" Wpo.pp_goal po;
     spawn po;
-    Format.printf "%s@." Wpo.bar ;
+    Format.printf "%s@." bar ;
   in
 
   let goal_read acc g =
@@ -139,5 +141,12 @@ let run () =
         Lang.local (run_test_ia model) kf
     )
     ordered_kf
+
+(* Turn off populate spec for everything except assigns *)
+let turn_off_populate () =
+  Kernel.GeneratedSpecMode.set "skip";
+  Kernel.GeneratedSpecCustom.add ("assigns", Some "frama-c")
+
+let () = Cmdline.run_after_configuring_stage turn_off_populate
 
 let () =  Db.Main.extend run

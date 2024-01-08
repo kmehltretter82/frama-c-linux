@@ -21,7 +21,7 @@
   assert
   ptr ≡ (struct S *)((char *)U) ∨ \separated(ptr, (struct S *)((char *)U));
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] array_overlap.i:12: assertion 'Eva,overlap' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

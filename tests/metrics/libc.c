@@ -1,9 +1,10 @@
 /* run.config
  PLUGIN: @PTEST_PLUGIN@ inout
- EXECNOW: LOG @PTEST_NAME@_metrics.res LOG @PTEST_NAME@_metrics.err @frama-c@ @PTEST_FILE@ -metrics -metrics-libc -then -metrics-no-libc | %{dep:@PTEST_SUITE_DIR@/../libc/check_some_metrics.sh} "> 5" "> 100" "= 0" "> 10" "= 2"  "= 6" "= 0" "= 0" "= 0" "= 4" >@PTEST_NAME@_metrics.res 2>@PTEST_NAME@_metrics.err
    STDOPT: #"-metrics-eva-cover"
    LOG: libc.json
    STDOPT: #"-metrics-libc -metrics-output ./libc.json"
+ ENABLED_IF: %{read:../../../python-3.7-available}
+ EXECNOW: LOG @PTEST_NAME@_metrics.res LOG @PTEST_NAME@_metrics.err @frama-c@ @PTEST_FILE@ -metrics -metrics-libc -then -metrics-no-libc | %{dep:@PTEST_SUITE_DIR@/../libc/check_some_metrics.py} "> 5" "> 100" "== 0" "> 10" "== 2"  "== 6" "== 0" "== 0" "== 0" "== 4" >@PTEST_NAME@_metrics.res 2>@PTEST_NAME@_metrics.err
 */
 #include <ctype.h>
 #include <stdio.h> // defines external variables

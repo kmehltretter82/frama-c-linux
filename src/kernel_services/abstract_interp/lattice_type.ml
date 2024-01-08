@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Lattice signatures.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 module type Join_Semi_Lattice = sig
   include Datatype.S (** datatype of element of the lattice *)
@@ -120,16 +120,6 @@ module type With_Cardinal_One = sig
   val cardinal_zero_or_one: t -> bool
 end
 
-module type With_Widening = sig
-  type t
-
-  type widen_hint (** hints for the widening *)
-
-  val widen: widen_hint -> t -> t -> t
-  (** [widen h t1 t2] is an over-approximation of [join t1 t2].
-      Assumes [is_included t1 t2] *)
-end
-
 
 (** {2 Common signatures} *)
 
@@ -137,7 +127,6 @@ end
 module type AI_Lattice_with_cardinal_one = sig
   include Bounded_Join_Semi_Lattice
   include With_Top with type t:= t
-  include With_Widening with type t:= t
   include With_Cardinal_One with type t := t
   include With_Narrow with type t := t
   include With_Under_Approximation with type t := t
@@ -222,9 +211,7 @@ end
 module type Lattice_Set = sig
   module O: Hptset
   type t = private Set of O.t | Top
-  include AI_Lattice_with_cardinal_one
-    with type t := t
-     and type widen_hint = O.t
+  include AI_Lattice_with_cardinal_one with type t := t
   val inject_singleton: O.elt -> t
   val inject: O.t -> t
   val empty: t

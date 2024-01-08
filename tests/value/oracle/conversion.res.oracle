@@ -87,7 +87,7 @@
   l ∈ [5..15] or UNINITIALIZED
   ==END OF DUMP==
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x[bits 0 to 15] ∈ {1}
@@ -162,7 +162,7 @@
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:alarm] conversion.i:39: Warning: 
   non-finite float value. assert \is_finite(*((float *)(&x)));
-[eva] conversion.i:39: 
+[eva:garbled-mix:write] conversion.i:39: 
   Assigning imprecise value to f.
   The imprecision originates from Arithmetic {conversion.i:39}
 [eva] conversion.i:40: 
@@ -197,7 +197,7 @@
   l ∈ [5..15]
   ==END OF DUMP==
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x[bits 0 to 15] ∈ {1}

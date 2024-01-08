@@ -154,7 +154,7 @@ struct
                 let l_lemma = F.p_hyps conditions (p_equal value1 value2) in
                 Definitions.define_lemma {
                   l_kind = Admit ;
-                  l_name ; l_types = 0 ;
+                  l_name ;
                   l_triggers ;
                   l_forall = F.p_vars l_lemma ;
                   l_lemma = l_lemma ;
@@ -267,25 +267,28 @@ struct
           let domain = Info.footprint obj loc in
           let result = Info.t_comp c in
           let lfun =
-            Lang.generated_f ~result "Load%a_%s" pp_rid r (Info.comp_id c)
-          in
-          (* Since its a generated it is the unique name given *)
+            Lang.generated_f ~context:true ~result "Load%a_%s"
+              pp_rid r (Info.comp_id c) in
           let xms,chunks,sigma = signature domain in
+          let prms = x :: xms in
           let dfun =
             match c.cfields with
             | None -> Definitions.Logic result
             | Some fields ->
               let def = List.map
                   (fun f ->
-                     Cfield (f, Info.kind) ,
-                     Info.load sigma (object_of f.ftype) (M.field loc f)
+                     let fd = cfield ~kind:Info.kind f in
+                     let ft = object_of f.ftype in
+                     let fv = Info.load sigma ft (M.field loc f) in
+                     let pr = F.e_apply (F.e_lambda prms fv) in
+                     F.set_builtin_field lfun fd pr ;
+                     fd,fv
                   ) fields
-              in
-              Definitions.Function( result , Def , e_record def )
+              in Definitions.Function( result , Def , e_record def )
           in
           Definitions.define_symbol {
             d_lfun = lfun ; d_types = 0 ;
-            d_params = x :: xms ;
+            d_params = prms ;
             d_definition = dfun ;
             d_cluster = cluster () ;
           } ;
@@ -317,32 +320,43 @@ struct
           let domain = Info.footprint obj loc in
           let result = Matrix.cc_tau (Info.t_array a) ds in
           let lfun =
-            Lang.generated_f ~result "Array%a_%s%a"
+            Lang.generated_f ~result ~context:true "Array%a_%s%a"
               pp_rid r (Info.array_id a) Matrix.pp_suffix_id ds in
           let prefix = Lang.Fun.debug lfun in
           let name = prefix ^ "_access" in
-          let xmem,chunks,sigma = signature domain in
+          let xms,chunks,sigma = signature domain in
           let env = Matrix.cc_env ds in
-          let phi = e_fun lfun (v :: env.size_val @ List.map e_var xmem) in
+          let prms = x :: env.size_var @ xms in
+          let phi = e_fun lfun (v :: env.size_val @ List.map e_var xms) in
           let va = List.fold_left e_get phi env.index_val in
           let ofs = e_sum env.index_offset in
           let vm = Info.load sigma obj (M.shift loc obj ofs) in
           let lemma = p_hyps env.index_range (p_equal va vm) in
           let cluster = cluster () in
           Definitions.define_symbol {
-            d_lfun = lfun ; d_types = 0 ;
-            d_params = x :: env.size_var @ xmem ;
+            d_lfun = lfun ;
+            d_types = 0 ;
+            d_params = prms ;
             d_definition = Logic result ;
             d_cluster = cluster ;
           } ;
           Definitions.define_lemma {
             l_kind = Admit ;
-            l_name = name ; l_types = 0 ;
+            l_name = name ;
             l_forall = F.p_vars lemma ;
             l_triggers = [[Trigger.of_term va]] ;
             l_lemma = lemma ;
             l_cluster = cluster ;
           } ;
+          let pr = F.e_lambda (prms @ env.index_var) vm in
+          let nk = List.length env.index_var in
+          Lang.F.set_builtin_get lfun
+            (fun es ks ->
+               if List.length ks = nk then
+                 F.e_apply pr (es @ ks)
+               else
+                 raise Not_found
+            ) ;
           if env.length <> None then
             begin
               let ns = List.map F.e_var env.size_var in
@@ -461,7 +475,7 @@ struct
           let lemma = p_equiv is_init_p is_init_r in
           Definitions.define_lemma {
             l_kind = Admit ;
-            l_name = name ^ "_range" ; l_types = 0 ;
+            l_name = name ^ "_range" ;
             l_forall = params ;
             l_triggers = [] ;
             l_lemma = lemma ;
@@ -509,7 +523,7 @@ struct
             let lemma = p_equiv is_init_p is_init_r in
             Definitions.define_lemma {
               l_kind = Admit ;
-              l_name = name ^ "_range" ; l_types = 0 ;
+              l_name = name ^ "_range" ;
               l_forall = params ;
               l_triggers = [] ;
               l_lemma = lemma ;

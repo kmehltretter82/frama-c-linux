@@ -1,8 +1,8 @@
 # frama-c -wp [...]
 [kernel] Parsing string_c.c (with preprocessing)
 [wp] Running WP plugin...
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/string.c:348: Warning: 
-  Neither code nor specification for function Frama_C_malloc_fresh, generating default assigns from the prototype
+[wp] [Valid] Goal memcpy_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal memcpy_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 
 Goal Post-condition 'copied_contents' in 'memcpy':
@@ -207,6 +207,11 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'memmove':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition 'copied_contents' in 'memmove':
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(i_1) /\
@@ -283,6 +288,11 @@ Prove: L_memcmp(Mchar_0, Mchar_1, dest_0, src_0, n) = 0.
 ------------------------------------------------------------
 
 Goal Post-condition 'result_ptr' in 'memmove':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'memmove':
 Prove: true.
 
 ------------------------------------------------------------

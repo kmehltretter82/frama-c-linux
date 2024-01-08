@@ -63,14 +63,16 @@ let init_file_names () =
     let pre = Filename.remove_extension name in
     let pre = match opt_suf with None -> pre | Some s -> pre ^ s in
     let rec fn p s n =
-      if not (Sys.file_exists (p^(string_of_int n)^s)) then (p^(string_of_int n)^s)
+      let fp = Filepath.Normalized.of_string (p ^ (string_of_int n) ^ s) in
+      if not (Filepath.exists fp) then fp
       else fn p s (n+1)
     in
     let name =
-      if not (Sys.file_exists (pre^suf)) then pre^suf
+      let fp = Filepath.Normalized.of_string (pre^suf) in
+      if not (Filepath.exists fp) then fp
       else fn pre suf 0
     in
-    Filepath.Normalized.of_string name
+    name
   in
   if Aorai_option.Ya.is_empty () then
     Aorai_option.abort "empty Ya file name";

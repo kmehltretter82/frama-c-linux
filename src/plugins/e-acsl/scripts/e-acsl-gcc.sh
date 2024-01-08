@@ -548,7 +548,7 @@ do
       OPTION_LDFLAGS="$OPTION_LDFLAGS $1"
       shift;
     ;;
-    # Additional flags passed to the pre-processor (compile-time)
+    # Additional flags passed to the preprocessor (compile-time)
     --cpp-flags|-e)
       shift;
       OPTION_CPPFLAGS="$OPTION_CPPFLAGS $1"

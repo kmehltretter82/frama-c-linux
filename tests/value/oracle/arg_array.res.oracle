@@ -8,7 +8,7 @@
 [eva:alarm] arg_array.i:4: Warning: out of bounds write. assert \valid(ptr + 1);
 [eva:alarm] arg_array.i:5: Warning: out of bounds write. assert \valid(ptr + 2);
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   ptr ∈ {{ &S_T[0] }}

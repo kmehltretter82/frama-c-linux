@@ -8,22 +8,23 @@
   I ∈ {0}
 [eva:alarm] leaf2.i:6: Warning: 
   pointer downcast. assert (unsigned int)(&I) ≤ 2147483647;
-[kernel:annot:missing-spec] leaf2.i:6: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+[kernel:annot:missing-spec] leaf2.i:2: Warning: 
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- main.
   Called from leaf2.i:6.
 [eva] using specification for function f
 [eva] Done for function f
-[eva] leaf2.i:6: 
+[eva:garbled-mix:write] leaf2.i:6: 
   Assigning imprecise value to G.
   The imprecision originates from Library function {leaf2.i:6}
 [eva:alarm] leaf2.i:7: Warning: signed overflow. assert -2147483648 ≤ G + 1;
 [eva:alarm] leaf2.i:7: Warning: signed overflow. assert G + 1 ≤ 2147483647;
-[eva] leaf2.i:7: 
+[eva:garbled-mix:write] leaf2.i:7: 
   Assigning imprecise value to G.
   The imprecision originates from Library function {leaf2.i:6}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   G ∈ {{ garbled mix of &{I} (origin: Library function {leaf2.i:6}) }}

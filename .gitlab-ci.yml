@@ -22,10 +22,36 @@ default:
 
 variables:
   DEFAULT: "master"
-  OCAML: "4.11"
+  OCAML: "4.13"
+  NODE: "16"
   PUBLISH: "no"
   RELEASE: "no"
-  WEEKLY: "no"
+
+################################################################################
+### ONLY/EXCEPT TEMPLATES
+
+.build_template: &manual_when_not_special_pipeline
+  except:
+    refs:
+      - schedules
+    variables:
+      - $RELEASE == "yes"
+  when: manual
+
+.build_template: &when_release
+  only:
+    variables:
+      - $RELEASE == "yes"
+
+.build_template: &when_schedules
+  only:
+    refs:
+      - schedules
+
+.build_template: &when_publish
+  only:
+    variables:
+      - $PUBLISH == "yes"
 
 ################################################################################
 ### PREPARE
@@ -66,21 +92,13 @@ check-publish:
     [[ "$RELEASE" == "no" ]] &&
     [[ "$DEFAULT" == "$CI_COMMIT_BRANCH" ]] &&
     [[ "$DEFAULT" == "master" ]]
-  only:
-    variables:
-      - $PUBLISH == "yes"
+  <<: *when_publish
 
 check-release:
   stage: prepare
-  script: >
-    [[ "$PUBLISH" == "no" ]] &&
-    [[ "$DEFAULT" == "$CI_COMMIT_BRANCH" ]] &&
-    [[ "$DEFAULT" == "stable/$(cat VERSION_CODENAME | tr '[:upper:]' '[:lower:]')" ]] &&
-    [[ "$(git describe --tag)" == "$(cat VERSION | sed 's/~/-/')" ]] &&
-    [[ "$(cat VERSION)" == "$(cat opam | grep "^version" | sed 's/version: \"\(.*\)\"/\1/')" ]]
-  only:
-    variables:
-      - $RELEASE == "yes"
+  script:
+    - ./nix/frama-c-public/check-release.sh
+  <<: *when_release
 
 # Observed: when several shell with same dependencies are started, deadlock may
 #           occur when building these dependencies. We build these dependencies
@@ -129,36 +147,55 @@ ivette:
 ################################################################################
 ### TESTS
 
+.build_template: &coverage_artifacts
+  artifacts:
+    name: coverage-$CI_JOB_NAME
+    paths:
+      - _bisect/*.tar.xz
+    expire_in: 24h
+
+.build_template: &coverage
+  variables:
+    OUT: "_bisect"
+  <<: *coverage_artifacts
+
 check-ts-api:
   stage: tests
   script:
     - ./nix/build-proxy.sh ts-api
+  <<: *coverage
 
 e-acsl-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh e-acsl-tests
+  <<: *coverage
 
 e-acsl-dev-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh e-acsl-dev-tests
+  <<: *coverage
   allow_failure: true
 
 .build_template: &eva_template
   stage: tests
   script:
     - ./nix/build-proxy.sh eva-$CONFIG-tests
+  <<: *coverage_artifacts
+  # Do not add OUT here, the parallel rule in Eva domains overload variables
 
 eva-default-tests:
   variables:
     CONFIG: "default"
+    OUT:    "_bisect"
   <<: *eva_template
 
 .build_template: &eva_domains
   parallel:
     matrix:
-      - CONFIG: [
+      - OUT: "_bisect"
+        CONFIG: [
           "apron",
           "bitwise",
           "equality",
@@ -171,40 +208,56 @@ eva-default-tests:
 eva-domains:
   <<: *eva_template
   <<: *eva_domains
-  only:
-    variables:
-      - $CI_COMMIT_BRANCH =~ /.*[-_\/.][Ee]va[-_\/.].*/
-      - $CI_COMMIT_BRANCH =~ /^[Ee]va[-_\/.].*/
-      - $CI_COMMIT_BRANCH =~ /.*[-_\/.][Ee]va$/
-
-eva-domains-nightly:
-  <<: *eva_template
-  <<: *eva_domains
-  only:
-    refs:
-      - schedules
-
-eva-domains-release:
-  <<: *eva_template
-  <<: *eva_domains
-  only:
-    variables:
-      - $RELEASE == "yes"
 
 kernel-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh kernel-tests
+  <<: *coverage
 
 plugins-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh plugins-tests
+  <<: *coverage
 
 wp-tests:
   stage: tests
   script:
     - ./nix/build-proxy.sh wp-tests
+  <<: *coverage
+
+ivette-tests:
+  stage: tests
+  image: "ocaml/opam:ubuntu-lts-ocaml-$OCAML"
+  before_script:
+    - sudo apt update
+    - sudo apt install -y xvfb curl unzip libnss3 libasound2
+    - sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+    - export NVM_DIR="$HOME/.nvm"
+    - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
+    - '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+    - nvm install $NODE
+    - nvm use node $NODE
+    - corepack enable
+  script:
+    - opam pin . -n
+    - opam depext frama-c
+    - opam install --jobs 2 --deps-only .
+    - dune build -j2 @install
+    - make -C ivette dist
+    - cd ivette
+    - cp dist/renderer/* dist/main/
+    - xvfb-run --auto-servernum -e /dev/stdout -s "-screen 0 1920x1080x24 -ac -nolisten tcp -nolisten unix" dune exec -- yarn playwright test --headed
+  artifacts:
+    paths:
+      - ivette/tests/test-results
+      - ivette/screenshots
+    when: always
+    expire_in: 1 day
+  allow_failure: true
+  tags:
+    - docker
 
 external-plugins:
   stage: tests
@@ -218,7 +271,6 @@ external-plugins:
           "context-from-precondition",
           "frama-clang",
           "genassigns",
-          "linea-cabs",
           "meta",
           "minimal",
           "mthread",
@@ -232,7 +284,7 @@ external-plugins:
 
 # API documentation
 
-api-doc: # Note: the Nix store avoids rebuilding
+api-doc:
   stage: distrib
   variables:
     OUT: "api"
@@ -242,6 +294,17 @@ api-doc: # Note: the Nix store avoids rebuilding
     paths:
       - api/frama-c-api.tar.gz
       - api/frama-c-server-api.tar.gz
+    expire_in: 7 days
+
+api-json-doc:
+  stage: distrib
+  variables:
+    OUT: "api"
+  script:
+    - ./nix/build-proxy.sh api-json-doc
+  artifacts:
+    paths:
+      - api/frama-c-api-json.tar.gz
     expire_in: 7 days
 
 # Build distribution tarball
@@ -259,6 +322,22 @@ build-distrib-tarball:
       - ./*.tar.gz
     expire_in: 1 week
 
+# Coverage
+
+coverage:
+  stage: distrib
+  variables:
+    BISECT_DIR: "_bisect"
+  script:
+    - ./nix/shell-checkers.sh "./nix/coverage.sh"
+  coverage: '/Coverage: \d+\.\d+\%/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: report.xml
+    expire_in: 1 week
+
 # Check files header
 
 header-check:
@@ -271,16 +350,18 @@ header-check:
 lint:
   stage: distrib
   script:
-    - ./nix/shell-checkers.sh "make -f share/Makefile.linting check-lint"
+    - ./nix/shell-checkers.sh "make -f share/Makefile.linting check-lint LINTCK_EXTRA=-s"
 
 # Manuals
 
-.build_template: &manuals_template
+.build_template: &manuals_build_template
   stage: distrib
   variables:
     OUT: "manuals"
   script:
     - ./nix/build-proxy.sh manuals
+
+.build_template: &manuals_artifacts_template
   artifacts:
     paths:
       - manuals/*.pdf
@@ -289,17 +370,24 @@ lint:
     expire_in: 7 days # Note: the LAST artifact of the ref is always kept
 
 manuals:
-  <<: *manuals_template
-  except:
-    variables:
-      - $RELEASE == "yes"
-  when: manual
+  <<: *manuals_build_template
+
+manuals-artifacts:
+  <<: *manuals_build_template
+  <<: *manuals_artifacts_template
+  <<: *manual_when_not_special_pipeline
+
+manuals-nightly:
+  <<: *manuals_build_template
+  <<: *manuals_artifacts_template
+  <<: *when_publish
 
 manuals-for-release:
-  <<: *manuals_template
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *manuals_build_template
+  <<: *manuals_artifacts_template
+  <<: *when_release
+
+# Release artifacts
 
 release-content:
   stage: distrib
@@ -315,9 +403,7 @@ release-content:
       - wiki
       - opam-repository
       - release-data.json
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
 
 ################################################################################
 ### COMPATIBILITY
@@ -335,7 +421,7 @@ internal:
   except:
     - schedules
 
-internal_nightly:
+internal-nightly:
   <<: *internal_template
   # The Opam target may affect this job
   timeout: 2h
@@ -349,11 +435,12 @@ internal_nightly:
     matrix:
       - OCAML: ["4.14"]
 
-.build_template: &ocaml_manual_additional_versions_template
-  parallel:
-    matrix:
-      - OCAML: ["4.12", "4.13"]
-  when: manual
+# Uncomment this block when there are intermediate versions to check manully
+#.build_template: &ocaml_manual_additional_versions_template
+#  parallel:
+#    matrix:
+#      - OCAML: ["4.14"]
+#  when: manual
 
 .build_template: &ocaml_versions_template
   stage: compatibility
@@ -367,17 +454,16 @@ ocaml-versions:
   except:
     - schedules
 
-ocaml-versions-more:
-  <<: *ocaml_versions_template
-  <<: *ocaml_manual_additional_versions_template
+# Uncomment this section when there are additional versions of OCaml to test
+# ocaml-versions-more:
+#   <<: *ocaml_versions_template
+#   <<: *ocaml_manual_additional_versions_template
 
 ocaml-versions-nightly:
   <<: *ocaml_versions_template
   <<: *ocaml_always_additional_versions_template
   # we still check them for the publisher pipeline job
-  only:
-    variables:
-      - $PUBLISH == "yes"
+  <<: *when_publish
 
 # Opam pin
 
@@ -388,31 +474,22 @@ ocaml-versions-nightly:
     - sudo apt update
     - opam pin . -n
     - opam depext frama-c --with-test
-    - opam install --jobs 2 frama-c --with-test
-    - frama-c -version
+    - opam install --jobs 2 frama-c --with-test --with-doc
+    - frama-c --plugins
   tags:
     - docker
 
 opam-pin:
   <<: *opam_pin_template
-  except:
-    refs:
-      - schedules
-    variables:
-      - $RELEASE == "yes"
-  when: manual
+  <<: *manual_when_not_special_pipeline
 
 opam-pin-nightly:
   <<: *opam_pin_template
-  only:
-    refs:
-      - schedules
+  <<: *when_schedules
 
 opam-pin-release:
   <<: *opam_pin_template
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
 
 .build_template: &opam_pin_minimal_template
   stage: compatibility
@@ -439,25 +516,22 @@ opam-pin-release:
     - export OPAMEXTERNALSOLVER="builtin-0install"
     - opam update --depexts
     - opam reinstall --jobs 2 frama-c
+    - frama-c --plugins
   timeout: 2h
   tags:
     - docker
 
 opam-pin-minimal:
   <<: *opam_pin_minimal_template
-  except:
-    refs:
-      - schedules
-    variables:
-      - $WEEKLY == "yes"
-  when: manual
+  <<: *manual_when_not_special_pipeline
 
-opam-pin-minimal-weekly:
+opam-pin-minimal-nightly:
   <<: *opam_pin_minimal_template
-  timeout: 2h
-  only:
-    variables:
-      - $WEEKLY == "yes"
+  <<: *when_schedules
+
+opam-pin-minimal-release:
+  <<: *opam_pin_minimal_template
+  <<: *when_release
 
 # Distrib
 
@@ -468,30 +542,20 @@ opam-pin-minimal-weekly:
   script:
     - mkdir $DIR && tar -xzf frama-c.tar.gz --strip-components 1 -C ./extracted
     - ./nix/build-proxy.sh src-distrib-tests
+  # The Opam target may affect this job
+  timeout: 2h
 
 src-distrib-tests:
   <<: *src_distrib_tests_template
-  except:
-    refs:
-      - schedules
-    variables:
-      - $RELEASE == "yes"
+  <<: *manual_when_not_special_pipeline
 
 src-distrib-tests-scheduled:
   <<: *src_distrib_tests_template
-  # The Opam target may affect this job
-  timeout: 2h
-  only:
-    refs:
-      - schedules
+  <<: *when_schedules
 
 src-distrib-tests-release:
   <<: *src_distrib_tests_template
-  # The Opam target may affect this job
-  timeout: 2h
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
 
 ################################################################################
 ### RELEASE
@@ -509,9 +573,7 @@ release-branch:
     - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/$CI_COMMIT_BRANCH)
     - BRANCH="$CI_COMMIT_BRANCH" nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-branch.sh'
     # Note: BRANCH must be defined here, since we cannot *evaluate* a variable in 'variables'
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
   when: manual
   interruptible: false
 
@@ -523,9 +585,7 @@ release-create:
   needs:
     - release-branch
     - release-content
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
   when: manual
   interruptible: false
 
@@ -534,9 +594,7 @@ release-opam:
   <<: *prepare_ssh_template
   script:
     - nix-shell -p git git-lfs coreutils openssh --run './nix/frama-c-public/publish-opam.sh'
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
   interruptible: false
 
 release-website:
@@ -544,9 +602,7 @@ release-website:
   <<: *prepare_ssh_template
   script:
     - nix-shell -p git git-lfs coreutils openssh --run './nix/frama-c-public/publish-website.sh'
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
   interruptible: false
 
 release-wiki:
@@ -554,9 +610,7 @@ release-wiki:
   <<: *prepare_ssh_template
   script:
     - nix-shell -p git git-lfs coreutils openssh --run './nix/frama-c-public/publish-wiki.sh'
-  only:
-    variables:
-      - $RELEASE == "yes"
+  <<: *when_release
   interruptible: false
 
 ################################################################################
@@ -585,9 +639,7 @@ publish-frama-c:
   script:
     - (! git merge-base --is-ancestor a1e186c68a6418a53b3dc06237f49e8dcbf75f4a origin/master)
     -  nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-branch.sh'
-  only:
-    variables:
-      - $PUBLISH == "yes"
+  <<: *when_publish
   interruptible: false
 
 publish-fclang:
@@ -598,9 +650,7 @@ publish-fclang:
   <<: *prepare_ssh_template
   script:
     - nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-branch.sh'
-  only:
-    variables:
-      - $PUBLISH == "yes"
+  <<: *when_publish
   interruptible: false
 
 publish-meta:
@@ -611,6 +661,14 @@ publish-meta:
   <<: *prepare_ssh_template
   script:
     - nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-branch.sh'
+  <<: *when_publish
+  interruptible: false
+
+publish-frama-c-api:
+  stage: publish
+  <<: *prepare_ssh_template
+  script:
+    - nix-shell -p coreutils openssh --run './nix/frama-c-public/publish-api.sh'
   only:
     variables:
       - $PUBLISH == "yes"

@@ -1,143 +1,148 @@
 # frama-c -wp [...]
 [kernel] Parsing arith.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal cast_sgn_usgn_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal cast_sgn_usgn_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal uchar_range_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal uchar_range_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Global
 ------------------------------------------------------------
 
-Lemma ASSOC:
-Assume: 'L16' 'L15' 'L14' 'L30' 'L21' 'L20' 'L13' 'L12' 'L11' 'L10' 'L01'
-  'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: ((land y_0 z_0)=x_0) -> ((land t_0 y_0 z_0)=(land t_0 x_0))
+Goal Lemma 'ASSOC':
+Assume Lemmas: 'L16' 'L15' 'L14' 'L30' 'L21' 'L20' 'L13' 'L12' 'L11' 'L10'
+  'L01' 'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma L01:
-Assume: 'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: true
+Goal Lemma 'L01':
+Assume Lemmas: 'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma L10:
-Assume: 'L01' 'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: true
-
-------------------------------------------------------------
-
-Lemma L11:
-Assume: 'L10' 'L01' 'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2'
+Goal Lemma 'L10':
+Assume Lemmas: 'L01' 'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2'
   'ucL1'
-Prove: true
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma L12:
-Assume: 'L11' 'L10' 'L01' 'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3'
+Goal Lemma 'L11':
+Assume Lemmas: 'L10' 'L01' 'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3'
   'ucL2' 'ucL1'
-Prove: true
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma L13:
-Assume: 'L12' 'L11' 'L10' 'L01' 'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4'
+Goal Lemma 'L12':
+Assume Lemmas: 'L11' 'L10' 'L01' 'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4'
   'ucL3' 'ucL2' 'ucL1'
-Prove: true
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma L14:
-Assume: 'L30' 'L21' 'L20' 'L13' 'L12' 'L11' 'L10' 'L01' 'scN2' 'scN1' 'scL1'
-  'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: true
-
-------------------------------------------------------------
-
-Lemma L15:
-Assume: 'L14' 'L30' 'L21' 'L20' 'L13' 'L12' 'L11' 'L10' 'L01' 'scN2' 'scN1'
-  'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: true
-
-------------------------------------------------------------
-
-Lemma L16:
-Assume: 'L15' 'L14' 'L30' 'L21' 'L20' 'L13' 'L12' 'L11' 'L10' 'L01' 'scN2'
-  'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: true
-
-------------------------------------------------------------
-
-Lemma L20:
-Assume: 'L13' 'L12' 'L11' 'L10' 'L01' 'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1'
+Goal Lemma 'L13':
+Assume Lemmas: 'L12' 'L11' 'L10' 'L01' 'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1'
   'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: true
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma L21:
-Assume: 'L20' 'L13' 'L12' 'L11' 'L10' 'L01' 'scN2' 'scN1' 'scL1' 'ucN2'
+Goal Lemma 'L14':
+Assume Lemmas: 'L30' 'L21' 'L20' 'L13' 'L12' 'L11' 'L10' 'L01' 'scN2' 'scN1'
+  'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Lemma 'L15':
+Assume Lemmas: 'L14' 'L30' 'L21' 'L20' 'L13' 'L12' 'L11' 'L10' 'L01' 'scN2'
+  'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Lemma 'L16':
+Assume Lemmas: 'L15' 'L14' 'L30' 'L21' 'L20' 'L13' 'L12' 'L11' 'L10' 'L01'
+  'scN2' 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Lemma 'L20':
+Assume Lemmas: 'L13' 'L12' 'L11' 'L10' 'L01' 'scN2' 'scN1' 'scL1' 'ucN2'
   'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: true
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma L30:
-Assume: 'L21' 'L20' 'L13' 'L12' 'L11' 'L10' 'L01' 'scN2' 'scN1' 'scL1' 'ucN2'
-  'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: true
+Goal Lemma 'L21':
+Assume Lemmas: 'L20' 'L13' 'L12' 'L11' 'L10' 'L01' 'scN2' 'scN1' 'scL1'
+  'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma scL1:
-Assume: 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: true
+Goal Lemma 'L30':
+Assume Lemmas: 'L21' 'L20' 'L13' 'L12' 'L11' 'L10' 'L01' 'scN2' 'scN1' 'scL1'
+  'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma scN1:
-Assume: 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: true
+Goal Lemma 'scL1':
+Assume Lemmas: 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma scN2:
-Assume: 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: true
+Goal Lemma 'scN1':
+Assume Lemmas: 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma ucL1:
-Prove: true
+Goal Lemma 'scN2':
+Assume Lemmas: 'scN1' 'scL1' 'ucN2' 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma ucL2:
-Assume: 'ucL1'
-Prove: true
+Goal Lemma 'ucL1':
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma ucL3:
-Assume: 'ucL2' 'ucL1'
-Prove: true
+Goal Lemma 'ucL2':
+Assume Lemmas: 'ucL1'
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma ucL4:
-Assume: 'ucL3' 'ucL2' 'ucL1'
-Prove: true
+Goal Lemma 'ucL3':
+Assume Lemmas: 'ucL2' 'ucL1'
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma ucN1:
-Assume: 'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: true
+Goal Lemma 'ucL4':
+Assume Lemmas: 'ucL3' 'ucL2' 'ucL1'
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma ucN2:
-Assume: 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
-Prove: true
+Goal Lemma 'ucN1':
+Assume Lemmas: 'ucL4' 'ucL3' 'ucL2' 'ucL1'
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Lemma 'ucN2':
+Assume Lemmas: 'ucN1' 'ucL4' 'ucL3' 'ucL2' 'ucL1'
+Prove: true.
 
 ------------------------------------------------------------
 ------------------------------------------------------------

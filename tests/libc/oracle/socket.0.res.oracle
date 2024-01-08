@@ -196,7 +196,7 @@
 [eva] Recording results for test_server_echo
 [eva] Done for function test_server_echo
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function init_sockets:
   __fc_socket_counter ∈ [--..--]
@@ -257,10 +257,10 @@
   __fc_socket_counter ∈ [--..--]
   fd ∈ [-1..1023]
   addr ∈ [--..--] or UNINITIALIZED
-  addrlen ∈ {8}
-  client_fd ∈ [-1..1023]
+  addrlen ∈ {8} or UNINITIALIZED
+  client_fd ∈ [-1..1023] or UNINITIALIZED
   buf[0..63] ∈ [--..--] or UNINITIALIZED
-  r ∈ [-1..64]
+  r ∈ [-1..64] or UNINITIALIZED
   __retres ∈ {0; 1; 5; 20; 100; 200; 300; 400}
 [eva:final-states] Values at end of function main:
   __fc_fds[0..1023] ∈ [--..--]

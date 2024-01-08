@@ -16,7 +16,7 @@
 [eva] Done for function main_top
 [eva] top.i:33: Reusing old results for call to f
 [eva] Recording results for main_top_not_used
-[eva] done for function main_top_not_used
+[eva] Done for function main_top_not_used
 [pdg] computing for function main_top_not_used
 [from] Computing for function main_top
 [from] Computing for function f <-main_top
@@ -46,8 +46,9 @@
 [sparecode] look for annotations in function print
 [pdg] computing for function print
 [from] Computing for function print
-[kernel:annot:missing-spec] top.i:22: Warning: 
-  Neither code nor specification for function print, generating default assigns from the prototype
+[kernel:annot:missing-spec] top.i:7: Warning: 
+  Neither code nor specification for function print,
+   generating default assigns. See -generated-spec-* options for more info
 [from] Done for function print
 [pdg] done for function print
 [sparecode] finalize call input propagation

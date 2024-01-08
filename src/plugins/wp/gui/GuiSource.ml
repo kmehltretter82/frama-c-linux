@@ -169,9 +169,6 @@ let instructions path =
        | _ -> false)
     path
 
-let lemmas ls =
-  List.fold_left (fun s l -> DEPS.add (LogicUsage.ip_lemma l) s) DEPS.empty ls
-
 class highlighter (main:Design.main_window_extension_points) =
   object(self)
 
@@ -208,13 +205,9 @@ class highlighter (main:Design.main_window_extension_points) =
           | None -> Wutil.later main#rehighlight ;
           | Some { Wpo.po_pid = pid ; Wpo.po_formula = f } ->
             begin
-              match f with
-              | GoalLemma l ->
-                deps <- lemmas l.VC_Lemma.depends
-              | GoalAnnot a ->
-                source <- a.VC_Annot.source ;
-                path <- instructions a.VC_Annot.path ;
-                deps <- a.VC_Annot.deps ;
+              source <- f.VC_Annot.source ;
+              path <- instructions f.VC_Annot.path ;
+              deps <- f.VC_Annot.deps ;
             end ;
             if not (WpPropId.is_check pid || WpPropId.is_tactic pid)
             then

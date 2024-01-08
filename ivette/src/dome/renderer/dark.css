@@ -88,6 +88,8 @@
     --meter-subopti:  linear-gradient(to bottom, #770 0%, #cc0 20%, #770 100%);
     --meter-evenless: linear-gradient(to bottom, #710 0%, #c50 20%, #710 100%);
 
+    --studia-search-mode: #c2c71e;
+
     --eva-evaluation-mode: #714074;
     --eva-state-before: #082032;
     --eva-state-after: #321428;

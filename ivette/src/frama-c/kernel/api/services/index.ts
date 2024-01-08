@@ -38,17 +38,17 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byFct } from 'frama-c/kernel/api/ast';
+import { byDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { bySource } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fct } from 'frama-c/kernel/api/ast';
+import { decl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fctDefault } from 'frama-c/kernel/api/ast';
+import { declDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jFct } from 'frama-c/kernel/api/ast';
+import { jDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -72,28 +72,28 @@ import { tagDefault } from 'frama-c/kernel/api/data';
 
 const getConfig_internal: Server.GetRequest<
   null,
-  { pluginpath: string[], datadir: string[], version: string }
+  { version: string, datadir: string[], pluginpath: string[] }
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.services.getConfig',
-  input:  Json.jNull,
+  name: 'kernel.services.getConfig',
+  input: Json.jNull,
   output: Json.jObject({
-            pluginpath: Json.jArray(Json.jString),
-            datadir: Json.jArray(Json.jString),
             version: Json.jString,
+            datadir: Json.jArray(Json.jString),
+            pluginpath: Json.jArray(Json.jString),
           }),
   signals: [],
 };
 /** Frama-C Kernel configuration */
 export const getConfig: Server.GetRequest<
   null,
-  { pluginpath: string[], datadir: string[], version: string }
+  { version: string, datadir: string[], pluginpath: string[] }
   >= getConfig_internal;
 
 const load_internal: Server.SetRequest<string,string | undefined> = {
   kind: Server.RqKind.SET,
-  name:   'kernel.services.load',
-  input:  Json.jString,
+  name: 'kernel.services.load',
+  input: Json.jString,
   output: Json.jOption(Json.jString),
   signals: [],
 };
@@ -102,8 +102,8 @@ export const load: Server.SetRequest<string,string | undefined>= load_internal;
 
 const save_internal: Server.SetRequest<string,string | undefined> = {
   kind: Server.RqKind.SET,
-  name:   'kernel.services.save',
-  input:  Json.jString,
+  name: 'kernel.services.save',
+  input: Json.jString,
   output: Json.jOption(Json.jString),
   signals: [],
 };
@@ -137,8 +137,8 @@ export const logkindDefault: logkind = logkind.ERROR;
 
 const logkindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.services.logkindTags',
-  input:  Json.jNull,
+  name: 'kernel.services.logkindTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -161,8 +161,8 @@ export interface messageData {
   source?: source;
   /** Marker at the message position (if any) */
   marker?: marker;
-  /** Function containing the message position (if any) */
-  fct?: fct;
+  /** Declaration containing the message position (if any) */
+  decl?: decl;
 }
 
 /** Decoder for `messageData` */
@@ -175,7 +175,7 @@ export const jMessageData: Json.Decoder<messageData> =
     category: Json.jOption(Json.jString),
     source: Json.jOption(jSource),
     marker: Json.jOption(jMarker),
-    fct: Json.jOption(jFct),
+    decl: Json.jOption(jDecl),
   });
 
 /** Natural order for `messageData` */
@@ -183,7 +183,7 @@ export const byMessageData: Compare.Order<messageData> =
   Compare.byFields
     <{ key: Json.key<'#message'>, kind: logkind, plugin: string,
        message: string, category?: string, source?: source, marker?: marker,
-       fct?: fct }>({
+       decl?: decl }>({
     key: Compare.string,
     kind: byLogkind,
     plugin: Compare.alpha,
@@ -191,7 +191,7 @@ export const byMessageData: Compare.Order<messageData> =
     category: Compare.defined(Compare.string),
     source: Compare.defined(bySource),
     marker: Compare.defined(byMarker),
-    fct: Compare.defined(byFct),
+    decl: Compare.defined(byDecl),
   });
 
 /** Signal for array [`message`](#message)  */
@@ -201,8 +201,8 @@ export const signalMessage: Server.Signal = {
 
 const reloadMessage_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.services.reloadMessage',
-  input:  Json.jNull,
+  name: 'kernel.services.reloadMessage',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -211,25 +211,25 @@ export const reloadMessage: Server.GetRequest<null,null>= reloadMessage_internal
 
 const fetchMessage_internal: Server.GetRequest<
   number,
-  { pending: number, updated: messageData[], removed: Json.key<'#message'>[],
-    reload: boolean }
+  { reload: boolean, removed: Json.key<'#message'>[], updated: messageData[],
+    pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.services.fetchMessage',
-  input:  Json.jNumber,
+  name: 'kernel.services.fetchMessage',
+  input: Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jMessageData),
-            removed: Json.jArray(Json.jKey<'#message'>('#message')),
             reload: Json.jBoolean,
+            removed: Json.jArray(Json.jKey<'#message'>('#message')),
+            updated: Json.jArray(jMessageData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`message`](#message)  */
 export const fetchMessage: Server.GetRequest<
   number,
-  { pending: number, updated: messageData[], removed: Json.key<'#message'>[],
-    reload: boolean }
+  { reload: boolean, removed: Json.key<'#message'>[], updated: messageData[],
+    pending: number }
   >= fetchMessage_internal;
 
 const message_internal: State.Array<Json.key<'#message'>,messageData> = {
@@ -247,7 +247,7 @@ export const message: State.Array<Json.key<'#message'>,messageData> = message_in
 export const messageDataDefault: messageData =
   { key: Json.jKey<'#message'>('#message')(''), kind: logkindDefault,
     plugin: '', message: '', category: undefined, source: undefined,
-    marker: undefined, fct: undefined };
+    marker: undefined, decl: undefined };
 
 /** Message event record. */
 export interface log {
@@ -292,8 +292,8 @@ export const logDefault: log =
 
 const setLogs_internal: Server.SetRequest<boolean,null> = {
   kind: Server.RqKind.SET,
-  name:   'kernel.services.setLogs',
-  input:  Json.jBoolean,
+  name: 'kernel.services.setLogs',
+  input: Json.jBoolean,
   output: Json.jNull,
   signals: [],
 };
@@ -302,8 +302,8 @@ export const setLogs: Server.SetRequest<boolean,null>= setLogs_internal;
 
 const getLogs_internal: Server.GetRequest<null,log[]> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.services.getLogs',
-  input:  Json.jNull,
+  name: 'kernel.services.getLogs',
+  input: Json.jNull,
   output: Json.jArray(jLog),
   signals: [],
 };

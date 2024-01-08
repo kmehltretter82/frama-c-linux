@@ -34,22 +34,21 @@
 [variadic] fcntl.c:28: 
   Fallback translation of call fcntl to a call to the specialized version fcntl_fallback_2.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva] using specification for function __va_fcntl_void
 [eva] using specification for function __va_fcntl_int
 [eva] using specification for function __va_fcntl_flock
-[kernel:annot:missing-spec] fcntl.c:16: Warning: 
-  Neither code nor specification for function fcntl_fallback_1, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/fcntl.h:129: Warning: 
+  Neither code nor specification for function fcntl_fallback_1,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function fcntl_fallback_1
 [eva:alarm] fcntl.c:20: Warning: 
   function __va_fcntl_void: precondition 'cmd_has_void_arg' got status invalid.
 [eva:alarm] fcntl.c:24: Warning: 
   function __va_fcntl_flock: precondition 'cmd_as_flock_arg' got status invalid.
-[kernel:annot:missing-spec] fcntl.c:28: Warning: 
-  Neither code nor specification for function fcntl_fallback_2, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/fcntl.h:129: Warning: 
+  Neither code nor specification for function fcntl_fallback_2,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function fcntl_fallback_2
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   fl ∈ [--..--] or UNINITIALIZED

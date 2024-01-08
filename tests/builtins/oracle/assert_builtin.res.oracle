@@ -1,6 +1,7 @@
 [kernel] Parsing assert_builtin.i (no preprocessing)
-[kernel:annot:missing-spec] assert_builtin.i:5: Warning: 
-  Neither code nor specification for function Frama_C_assert, generating default assigns from the prototype
+[kernel:annot:missing-spec] assert_builtin.i:3: Warning: 
+  Neither code nor specification for function Frama_C_assert,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -9,7 +10,7 @@
 [eva] assert_builtin.i:6: Call to builtin Frama_C_assert
 [eva] assert_builtin.i:6: Warning: Frama_C_assert: unknown
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}

@@ -317,7 +317,7 @@ let builtin_states =
   [ Logic_builtin.self; Logic_type_builtin.self; Logic_ctor_builtin.self ]
 
 module Builtins= struct
-  include Hook.Make(struct end)
+  include Hook.Make()
   (* ensures we do not apply the hooks twice *)
   module Applied =
     State_builder.False_ref

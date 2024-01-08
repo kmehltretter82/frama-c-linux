@@ -27,8 +27,8 @@
 open Pdg_types
 
 (** [data_info] is composed of [(node,z_part) list, undef_loc)]
- *             and correspond to data dependencies nodes.
- *             Can be None if we don't know how to compute them.
+    and correspond to data dependencies nodes.
+    Can be None if we don't know how to compute them.
 *)
 type data_info =
   ((PdgTypes.Node.t * Locations.Zone.t option) list
@@ -38,7 +38,7 @@ type data_info =
 type ctrl_info = PdgTypes.Node.t list
 
 (** [decl_info] correspond to the declarations nodes of the variables needed to
- * parse the annotation *)
+    parse the annotation *)
 type decl_info =  PdgTypes.Node.t list
 
 (** @raise Not_found when the statement is unreachable. *)

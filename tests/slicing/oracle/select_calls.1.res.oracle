@@ -6,14 +6,15 @@
 [eva:initial-state] Values of globals at initialization
   c ∈ [--..--]
   d ∈ [--..--]
-[kernel:annot:missing-spec] select_calls.i:42: Warning: 
-  Neither code nor specification for function nothing, generating default assigns from the prototype
+[kernel:annot:missing-spec] select_calls.i:6: Warning: 
+  Neither code nor specification for function nothing,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function nothing <- g.
   Called from select_calls.i:42.
 [eva] using specification for function nothing
 [eva] Done for function nothing
 [eva] Recording results for g
-[eva] done for function g
+[eva] Done for function g
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function g

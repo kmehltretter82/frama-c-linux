@@ -343,7 +343,7 @@ module Shape(Key: Id_Datatype) = struct
     | Empty -> Seq.Nil
     | Leaf (key, data, _) -> Seq.Cons ((key, data), Seq.empty)
     | Branch (_, _, tree0, tree1, _) ->
-      Transitioning.Seq.append (to_seq tree0) (to_seq tree1) ()
+      Seq.append (to_seq tree0) (to_seq tree1) ()
 
   (* This reference will contain a list of functions that will clear
      all the transient caches used in this module *)
@@ -587,16 +587,34 @@ module Shape(Key: Id_Datatype) = struct
       ~decide_fast ~decide_fst:decide_one ~decide_snd:decide_one ~decide_both
 end
 
+
+module type Compositional_bool = sig
+  type key
+  type v
+
+  val e : bool
+  val f : key -> v -> bool
+  val compose : bool -> bool -> bool
+end
+
+module type Initial_values = sig
+  type key
+  type v
+  val v : (key*v) list list
+end
+
+module type Datatype_deps = sig
+  val l : State.t list
+end
+
 module Make
     (Key: Id_Datatype)
     (V : V)
-    (Compositional_bool : sig
-       val e: bool
-       val f : Key.t -> V.t -> bool
-       val compose : bool -> bool -> bool
-     end)
-    (Initial_Values: sig val v : (Key.t * V.t) list list end)
-    (Datatype_deps: sig val l : State.t list end)
+    (Compositional_bool : Compositional_bool with type key := Key.t
+                                              and type v := V.t)
+    (Initial_Values: Initial_values with type key := Key.t
+                                     and type v := V.t)
+    (Datatype_deps: Datatype_deps)
 =
 struct
 

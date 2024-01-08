@@ -206,6 +206,14 @@ module type Leaf = sig
   val key: t key
 end
 
+(** Eva abstractions are divided between values, locations and domains.
+    Locations and domains depend on values, and use this type to declare such
+    dependencies. In the standard case, a domain depends on a single value
+    module [V] and uses [Leaf (module V)] to declare this dependency. *)
+type 'v dependencies =
+  | Leaf: (module Leaf with type t = 'v) -> 'v dependencies
+  | Node: 'l dependencies * 'r dependencies -> ('l * 'r) dependencies
+
 
 (*
 Local Variables:

@@ -57,7 +57,7 @@
 [eva] Recording results for using_dynamic_global
 [eva] Done for function using_dynamic_global
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function using_dynamic_global:
   b ∈ [0..2147483647]

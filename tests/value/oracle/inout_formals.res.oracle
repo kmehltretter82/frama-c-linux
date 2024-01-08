@@ -8,7 +8,7 @@
 [eva:alarm] inout_formals.i:7: Warning: out of bounds write. assert \valid(i);
 [eva] inout_formals.i:8: Frama_C_show_each: {{ &S_i }}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [inout] InOut (internal) for function main:
   Operational inputs:
     x; y; i

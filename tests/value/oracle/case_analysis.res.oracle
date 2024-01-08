@@ -10,7 +10,7 @@
 [eva] case_analysis.i:14: assertion got status valid.
 [eva] case_analysis.i:17: assertion got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   sq ∈ [0..100]

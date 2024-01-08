@@ -153,6 +153,14 @@ class type extensible_printer_type = object
   method offset: Format.formatter -> offset -> unit
   (** Invoked on each offset occurrence. The second argument is the base. *)
 
+  method typeref: 'a. typ ->
+    (Format.formatter -> 'a -> unit) ->
+    Format.formatter -> 'a -> unit
+
+  method typedef: 'a. global ->
+    (Format.formatter -> 'a -> unit) ->
+    Format.formatter -> 'a -> unit
+
   method global: Format.formatter -> global -> unit
   (** Global (vars, types, etc.). This can be slow. *)
 
@@ -166,8 +174,8 @@ class type extensible_printer_type = object
   method compkind: Format.formatter -> compinfo -> unit
   method compname: Format.formatter -> compinfo -> unit
   method compinfo: Format.formatter -> compinfo -> unit
-  method enuminfo: Format.formatter -> enuminfo -> unit
-  method typeinfo: Format.formatter -> typeinfo -> unit
+  method enumname: Format.formatter -> enuminfo -> unit
+  method typename: Format.formatter -> typeinfo -> unit
 
   method typ:
     ?fundecl:varinfo ->
@@ -214,7 +222,7 @@ class type extensible_printer_type = object
   (** Print a statement kind. The code to be printed is given in the
       {!Cil_types.stmtkind} argument.  The initial {!Cil_types.stmt} argument
       records the statement which follows the one being printed;
-      {!defaultCilPrinterClass} uses this information to prettify statement
+      {!Printer.extensible_printer} uses this information to prettify statement
       printing in certain special cases. The boolean flag indicated whether
       the statement has labels (which have already been printed) *)
 
@@ -532,7 +540,7 @@ module type S = sig
   (** Signature for extending an existing pretty-printer. OCaml forbids
       inheriting from a class received as argument, so we use a functor
       instead. *)
-  module type PrinterExtension = functor (X: PrinterClass) -> PrinterClass
+  module type PrinterExtension = functor (_: PrinterClass) -> PrinterClass
 
   val update_printer: (module PrinterExtension) -> unit
   (** Register a pretty-printer extension. The pretty-printer passed as

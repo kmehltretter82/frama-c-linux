@@ -40,7 +40,7 @@
   signed overflow. assert w + 1 ≤ 2147483647;
 [eva] for_loops.c:17: Frama_C_show_each_F: [0..2147483647]
 [eva] Recording results for main_2
-[eva] done for function main_2
+[eva] Done for function main_2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main_2:
   Frama_C_entropy_source ∈ [--..--]

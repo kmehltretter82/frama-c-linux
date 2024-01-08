@@ -27,9 +27,9 @@ type clobbered_set = {
   mutable clob: Base.SetLattice.t
 }
 
-let structural_descr =
+let packed_descr =
   let open Structural_descr in
-  t_record [| Base.SetLattice.packed_descr |]
+  pack (t_record [| Base.SetLattice.packed_descr |])
 
 let bottom () = { clob = Base.SetLattice.bottom }
 let top () = { clob = Base.SetLattice.top }

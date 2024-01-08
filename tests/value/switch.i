@@ -51,5 +51,18 @@ int main (int c, int d, int e, int f, double d1, long l) {
     case 0x0FFFFFFF: result4 = 1; break;
     case 0xFFFFFFFF: result4 = 2; break;
     }
+
+  int x;
+  /* This switch skips the declaration of variable i, as code between the
+     switch and the first case is not executed. */
+  switch(d) {
+    int i = 5; // dead code
+    case 0:
+      i = 17;
+    default:
+      //@ check unknown: i == 17;
+      x = i+1; // Initialization alarm: i may be uninitialized.
+  }
+
   return 77;
 }

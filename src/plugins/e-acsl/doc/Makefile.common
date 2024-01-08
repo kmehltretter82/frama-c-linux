@@ -16,7 +16,8 @@ eacslversion.tex: Makefile $(VERSION_FILE) $(CODENAME_FILE)
 	rm -f $@
 	printf '\\newcommand{\\eacslpluginversion}{$(EACSL_VERSION)\\xspace}\n' > $@
 	printf '\\newcommand{\\eacslplugincodename}{$(EACSL_CODENAME)\\xspace}\n' >> $@
-	printf '\\fcversion{$(FC_VERSION)\\xspace}\n' >> $@
+	printf '\\newcommand{\\framacversion}{$(FC_VERSION)\\xspace}\n' >> $@
+	printf '\\fcversion{\\framacversion}\n' >> $@
 	chmod a-w $@
 
 %.1: %.mp

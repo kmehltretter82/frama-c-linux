@@ -64,7 +64,7 @@
 [eva:alarm] alias.i:108: Warning: signed overflow. assert c + 3 ≤ 2147483647;
 [eva:alarm] alias.i:108: Warning: signed overflow. assert c + 4 ≤ 2147483647;
 [eva] Recording results for main3
-[eva] done for function main3
+[eva] Done for function main3
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main3:
   p2[0] ∈ {0; 96; 97; 98}

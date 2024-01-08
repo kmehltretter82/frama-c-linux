@@ -30,6 +30,7 @@ type node = {
   parent : node option ;
   mutable script : script ;
   mutable stats : Stats.stats ;
+  mutable strategy : string option ; (* hint *)
   mutable search_index : int ;
   mutable search_space : Strategy.t array ; (* sorted by priority *)
 }
@@ -38,6 +39,15 @@ and script =
   | Opened
   | Script of ProofScript.jscript (* to replay *)
   | Tactic of ProofScript.jtactic * (string * node) list (* played *)
+
+module Node =
+struct
+  type t = node
+  let hash t = Wpo.S.hash t.goal
+  let equal a b = Wpo.S.equal a.goal b.goal
+  let compare a b = Wpo.S.compare a.goal b.goal
+  let pretty fmt a = Wpo.S.pretty fmt a.goal
+end
 
 type tree = {
   main : Wpo.t ; (* Main goal to be proved. *)
@@ -98,9 +108,11 @@ let proof ~main =
 let rec reset_node n =
   Wpo.clear_results n.goal ;
   if Wpo.is_tactic n.goal then Wpo.remove n.goal ;
+  n.strategy <- None ;
   match n.script with
   | Opened | Script _ -> ()
-  | Tactic(_,children) -> iter_all reset_node children
+  | Tactic(_,children) ->
+    n.script <- Opened ; iter_all reset_node children
 
 let reset_root = function None -> () | Some n -> reset_node n
 
@@ -114,7 +126,7 @@ let reset t =
     t.saved <- false ;
   end
 
-let remove w = if PROOFS.mem w then reset (PROOFS.get w)
+let clear w = if PROOFS.mem w then reset (PROOFS.get w)
 
 let saved t = t.saved
 let set_saved t s = t.saved <- s
@@ -136,6 +148,11 @@ let iteri f tree =
     let k = ref 0 in
     walk (fun node -> f !k node ; incr k) r
 
+let rec depth node =
+  match node.parent with
+  | None -> 1
+  | Some p -> succ @@ depth p
+
 (* -------------------------------------------------------------------------- *)
 (* --- Consolidating                                                      --- *)
 (* -------------------------------------------------------------------------- *)
@@ -146,16 +163,23 @@ let pending n =
   let k = ref 0 in
   walk (fun _ -> incr k) n ; !k
 
-let rec consolidate n =
+let is_prover_result (p,_) = p <> VCS.Tactical
+
+let prover_stats ~smoke goal =
+  Stats.results ~smoke @@
+  List.filter is_prover_result @@
+  Wpo.get_results goal
+
+let rec consolidate ~smoke n =
   let s =
     if Wpo.is_valid n.goal then
-      Stats.results ~smoke:false (Wpo.get_results n.goal)
+      prover_stats ~smoke n.goal
     else
       match n.script with
-      | Opened | Script _ -> Stats.empty
+      | Opened | Script _ -> prover_stats ~smoke n.goal
       | Tactic(_,children) ->
         let qed = Wpo.qed_time n.goal in
-        let results = List.map (fun (_,n) -> consolidate n) children in
+        let results = List.map (fun (_,n) -> consolidate ~smoke n) children in
         Stats.tactical ~qed results
   in n.stats <- s ; s
 
@@ -163,30 +187,32 @@ let validate tree =
   match tree.root with
   | None -> ()
   | Some root ->
-    if not (Wpo.is_valid tree.main) then
-      let stats = consolidate root in
+    let main = tree.main in
+    if not (Wpo.is_valid main) then
+      let stats = consolidate ~smoke:(Wpo.is_smoke_test main) root in
       Wpo.set_result tree.main Tactical (Stats.script stats)
 
 let consolidated wpo =
   let smoke = Wpo.is_smoke_test wpo in
-  let prs = Wpo.get_results wpo in
   try
-    if Wpo.is_smoke_test wpo || not (PROOFS.mem wpo) then raise Not_found ;
+    if smoke || not (PROOFS.mem wpo) then raise Not_found ;
     match PROOFS.get wpo with
     | { root = Some { stats ; script = Tactic _ } } -> stats
     | _ -> raise Not_found
-  with Not_found ->
-    Stats.results ~smoke prs
+  with Not_found -> prover_stats ~smoke wpo
 
 (* -------------------------------------------------------------------------- *)
 (* --- Accessors                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
 let main t = t.main
-let head t = match t.head with
+let head t = t.head
+let head_goal t = match t.head with
   | None -> t.main
   | Some n -> n.goal
+let tree n = proof ~main:n.tree
 let goal n = n.goal
+
 let stats n = n.stats
 let tree_context t = Wpo.get_context t.main
 let node_context n = Wpo.get_context n.goal
@@ -270,39 +296,25 @@ let rec forward t =
         forward t ;
       end
 
+let remove t node =
+  begin
+    Wpo.clear_results node.goal ;
+    t.head <- node.parent ;
+    if t.head = None then t.root <- None ;
+    reset_node node ;
+  end
+
 let cancel t =
   match t.head with
   | None -> ()
-  | Some node ->
-    begin
-      Wpo.clear_results node.goal ;
-      match node.script with
-      | Opened ->
-        t.head <- node.parent ;
-        if t.head = None then t.root <- None ;
-      | Tactic _ | Script _ ->
-        (*TODO: save the current script *)
-        node.script <- Opened ;
-    end
+  | Some node -> remove t node
 
 (* -------------------------------------------------------------------------- *)
 (* --- Sub-Goal                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let mk_annot axioms goal vc =
-  let open Wpo.VC_Annot in
-  match vc with
-  | Wpo.GoalAnnot annot -> { annot with goal ; axioms }
-  | Wpo.GoalLemma _ -> {
-      axioms ; goal ;
-      tags = [] ; warn = [] ;
-      deps = Property.Set.empty ;
-      path = Cil_datatype.Stmt.Set.empty ;
-      source = None ;
-    }
-
 let mk_formula ~main axioms sequent =
-  Wpo.(GoalAnnot (mk_annot axioms (GOAL.make sequent) main))
+  Wpo.VC_Annot.{ main with goal = Wpo.GOAL.make sequent ; axioms }
 
 let mk_goal t ~title ~part ~axioms sequent =
   let id = t.gid in t.gid <- succ id ;
@@ -325,6 +337,7 @@ let mk_tree_node ~tree ~anchor goal = {
   stats = Stats.empty ;
   search_index = 0 ;
   search_space = [| |] ;
+  strategy = None ;
 }
 
 let mk_root_node goal = {
@@ -332,6 +345,7 @@ let mk_root_node goal = {
   parent = None ;
   script = Opened ;
   stats = Stats.empty ;
+  strategy = None ;
   search_index = 0 ;
   search_space = [| |] ;
 }
@@ -343,6 +357,11 @@ let mk_root ~tree =
   tree.root <- root ;
   tree.head <- root ;
   node
+
+let root tree =
+  match tree.root with
+  | Some node -> node
+  | None -> mk_root ~tree
 
 (* -------------------------------------------------------------------------- *)
 (* --- Forking                                                            --- *)
@@ -436,5 +455,8 @@ let bound node =
   match node.script with
   | Tactic _ | Opened -> []
   | Script s -> s
+
+let get_hint node = node.strategy
+let set_hint node strategy = node.strategy <- Some strategy
 
 (* -------------------------------------------------------------------------- *)

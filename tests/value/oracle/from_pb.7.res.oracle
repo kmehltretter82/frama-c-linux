@@ -11,7 +11,7 @@
   d ∈ {0}
   T[0..9] ∈ {0}
 [eva] Recording results for main5bis
-[eva] done for function main5bis
+[eva] Done for function main5bis
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main5bis:
   T[0..9] ∈ {0}

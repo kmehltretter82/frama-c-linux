@@ -20,47 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Lang.F
-type env = Plang.Env.t
-type 'a printer = 'a Qed.Plib.printer
-
 (* -------------------------------------------------------------------------- *)
 (* --- Sequent Pretty-Printer                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-type target
-
 class focused : Wtext.text ->
   object
-    method reset : unit
-    method get_focus_mode : bool
-    method set_focus_mode : bool -> unit
-    method get_state_mode : bool
-    method set_state_mode : bool -> unit
-
-    method get_iformat : Plang.iformat
-    method set_iformat : Plang.iformat -> unit
-
-    method get_rformat : Plang.rformat
-    method set_rformat : Plang.rformat -> unit
-
-    method selected : unit
-    method unselect : target
-    method restore : target -> unit
-    method on_selection : (unit -> unit) -> unit
-
-    method sequent : Conditions.sequent
-    method selection : Tactical.selection
-    method set_target : Tactical.selection -> unit
-
+    inherit Ptip.pseq
     method popup : unit
     method on_popup : (Widget.popup -> unit) -> unit
-
-    method pp_term : term printer
-    method pp_pred : pred printer
-    method pp_selection : Tactical.selection printer
-    method pp_sequent : Conditions.sequent -> Format.formatter -> unit
-    method goal : Wpo.t -> Format.formatter -> unit
     method button : title:string -> callback:(unit -> unit) ->
       Format.formatter -> unit
   end

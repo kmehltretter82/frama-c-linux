@@ -108,7 +108,7 @@
 [from] cast_fun.i:142: Warning: 
   variadic call detected. Using only 0 argument(s).
 [from] Done for function main
-[eva] done for function main
+[eva] Done for function main
 [eva] cast_fun.i:80: assertion 'Eva,function_pointer' got final status invalid.
 [eva] cast_fun.i:85: assertion 'Eva,function_pointer' got final status invalid.
 [eva] cast_fun.i:95: assertion 'Eva,function_pointer' got final status invalid.

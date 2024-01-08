@@ -1,19 +1,16 @@
 The following set of packages is known to be a working configuration for
-compiling Frama-C+dev.
+compiling Frama-C 28.0.
 
 - OCaml 4.13.1
-- alt-ergo-free.2.2.0 (for wp, optional)
-- apron.v0.9.13 (for eva, optional)
-- dune.3.5.0
-- dune-configurator.3.5.0
-- dune-site.3.5.0
-- lablgtk3.3.1.2
-- lablgtk3-sourceview3.3.1.2
+- alt-ergo.2.4.2 (for wp, optional)
+- dune.3.7.1
+- dune-configurator.3.7.1
+- dune-site.3.7.1
+- lablgtk3.3.1.3
+- lablgtk3-sourceview3.3.1.3
 - menhir.20211128
-- mlmpfr.4.1.0+bugfix2 (for eva, optional)
-- ocamlfind.1.9.5
-- ocamlgraph.2.0.0
-- ocp-indent.1.8.1 (for linting, optional)
+- ocamlfind.1.9.6
+- ocamlgraph.2.1.0
 - ppx_deriving_yaml.0.2.1
 - ppx_deriving_yojson.3.7.0
 - ppx_import.1.10.0

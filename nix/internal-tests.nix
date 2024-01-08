@@ -15,6 +15,7 @@
 , apron
 , camlzip
 , camomile
+, clang
 , dune_3
 , dune-configurator
 , dune-site
@@ -47,6 +48,8 @@
 , perl
 , pkgs
 , python3
+, python3Packages
+, yq
 , swiProlog
 , time
 , wp-cache
@@ -74,6 +77,7 @@ stdenvNoCC.mkDerivation rec {
     alt-ergo
     camlzip
     camomile
+    clang
     dune_3
     dune-configurator
     dune-site
@@ -107,6 +111,8 @@ stdenvNoCC.mkDerivation rec {
     perl
     pkgs.getopt
     python3
+    python3Packages.pyaml
+    yq
     swiProlog
     time
   ];

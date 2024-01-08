@@ -39,10 +39,10 @@ let print_config () =
           (String.concat ":" (Filepath.Normalized.to_string_list Fc_config.libdirs))
           (fun fmt ->
              if Fc_config.preprocessor = "" then
-               Format.fprintf fmt "@\nWarning: no default pre-processor"
+               Format.fprintf fmt "@\nWarning: no default preprocessor"
              else if not Fc_config.preprocessor_keep_comments then
                Format.fprintf fmt
-                 "@\nWarning: default pre-processor is not able to keep comments \
+                 "@\nWarning: default preprocessor is not able to keep comments \
                   (hence ACSL annotations) in its output")
         ;
       );

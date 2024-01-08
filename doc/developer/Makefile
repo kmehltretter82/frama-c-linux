@@ -74,7 +74,7 @@ check-hello-v5:check-hello-clean
 	diff checks/hello/v5.oracle checks/hello/v5.res
 
 check-hello-v6: check-hello-clean
-	(cd tutorial/hello/v6-* && $(duneb) @install && $(duneb) @ptests 2>&1 || true) > checks/hello/v6.res
+	(cd tutorial/hello/v6-* && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests 2>&1 || true) > checks/hello/v6.res
 	diff checks/hello/v6.oracle checks/hello/v6.res
 
 check-hello-v7: check-hello-clean
@@ -86,25 +86,27 @@ check-hello-v7: check-hello-clean
 # For check-examples, we perform no explicit oracle comparisons:
 # we simply build the code and run tests (which must always succeed).
 check-examples: check-examples-acsl_extension_foo check-examples-acsl_extension_ext_types \
-  check-examples-callstack check-examples-syntactic_check
+  check-examples-callstack check-examples-syntactic_check check-examples-populate_spec
 
 check-examples-clean:
 	$(ECHO) Cleaning example files...
 	rm -rf examples/*/_build
 
 check-examples-acsl_extension_foo: check-examples-clean
-	cd examples/acsl_extension_foo && $(duneb) @install && $(duneb) @ptests
+	cd examples/acsl_extension_foo && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests
 
 check-examples-acsl_extension_ext_types: check-examples-clean
-	cd examples/acsl_extension_ext_types && $(duneb) @install && $(duneb) @ptests
+	cd examples/acsl_extension_ext_types && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests
 
 check-examples-callstack: check-examples-clean
 	# no test oracles; just check that the code compiles
 	cd examples/callstack && $(duneb) @install
 
 check-examples-syntactic_check: check-examples-clean
-	cd examples/syntactic_check && $(duneb) @install && $(duneb) @ptests 2>&1
+	cd examples/syntactic_check && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests 2>&1
 
+check-examples-populate_spec: check-examples-clean
+	cd examples/populate_spec && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests 2>&1
 
 check-all: developer.pdf
 	$(MAKE) -C ../.. check-devguide
@@ -125,36 +127,44 @@ check-viewcfg-clean:
 	rm -rf tutorial/viewcfg/v*/_build
 
 check-viewcfg-v1:
-	cd tutorial/viewcfg/v1-* && $(duneb) @install && $(duneb) @ptests
+	cd tutorial/viewcfg/v1-* && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests
 
 check-viewcfg-v2:
 	cd tutorial/viewcfg/v2-* && $(duneb) @install
 
 check-viewcfg-v3:
-	cd tutorial/viewcfg/v2-* && $(duneb) @install && $(duneb) @ptests
+	cd tutorial/viewcfg/v3-* && $(duneb) @install && frama-c-ptests >/dev/null && $(duneb) @ptests
 
 check-viewcfg-v4:
-	cd tutorial/viewcfg/v2-* && $(duneb) @install
+	cd tutorial/viewcfg/v4-* && $(duneb) @install
 
 check-viewcfg-v5:
-	cd tutorial/viewcfg/v2-* && $(duneb) @install
+	cd tutorial/viewcfg/v5-* && $(duneb) @install
 
 check-viewcfg-v6:
-	cd tutorial/viewcfg/v2-* && $(duneb) @install
+	cd tutorial/viewcfg/v6-* && $(duneb) @install
 
-hello.tar.gz: FILES=$(shell cd tutorial/hello/v7-doc && git ls-files)
-
+ifdef NIX_BUILD_TOP
+# - in Nix CI we expect the directory to be clean
+hello.tar: FILES= $(shell cd tutorial/hello/v7-doc && find *)
+else
 # - use 'git ls-files' to avoid including extraneous files in archive
+hello.tar: FILES= $(shell cd tutorial/hello/v7-doc && git ls-files)
+endif
 # - use several tar options to improve build reproducibility
-hello.tar.gz:
+hello.tar:
 	cd tutorial/hello && \
 	rm -rf hello && \
 	cp -r v7-doc hello && \
-	tar -cf - $(addprefix hello/,$(FILES)) \
+	tar -cf $@ $(addprefix hello/,$(FILES)) \
 	  --numeric-owner --owner=0 --group=0 --sort=name \
-	  --mtime="$$(date +"%F") Z" --mode='a+rw' | \
-	    gzip -9 -n > ../../hello.tar.gz && \
-	rm -rf hello
+	  --mtime="$$(date +"%F") Z" --mode='a+rw' && \
+	rm -rf hello && \
+	mv hello.tar ../../hello.tar
+
+hello.tar.gz: hello.tar
+	gzip -9 -ncf hello.tar > hello.tar.gz && \
+	rm -rf hello.tar
 
 ###########
 

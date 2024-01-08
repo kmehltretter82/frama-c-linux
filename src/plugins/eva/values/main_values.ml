@@ -25,8 +25,6 @@ open Cil_types
 module CVal = struct
   include Cvalue.V
 
-  let key = Structure.Key_Value.create_key "cvalue"
-
   let zero = Cvalue.V.singleton_zero
   let one = Cvalue.V.singleton_one
 
@@ -134,12 +132,15 @@ module CVal = struct
     with Abstract_interp.Error_Top -> `Top, true
 
   let replace_base substitution t = snd (Cvalue.V.replace_base substitution t)
+
+  let key = Structure.Key_Value.create_key "cvalue"
 end
 
-module Interval = struct
+let cval = Abstract_value.Leaf (module CVal)
 
+
+module Interval = struct
   include Datatype.Option (Ival)
-  let key = Structure.Key_Value.create_key "interval"
 
   let pretty_typ _ = pretty
 
@@ -192,7 +193,14 @@ module Interval = struct
     `Value (None, None)
   let backward_cast ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ =
     `Value None
+
+  let key = Structure.Key_Value.create_key "interval"
 end
+
+let ival = Abstract_value.Leaf (module Interval)
+
+module Sign = Sign_value
+let sign = Abstract_value.Leaf (module Sign)
 
 (*
 Local Variables:

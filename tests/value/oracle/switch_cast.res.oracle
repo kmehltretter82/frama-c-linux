@@ -10,7 +10,7 @@
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function g:
   x ∈ [0..15]

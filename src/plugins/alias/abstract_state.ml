@@ -20,10 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Graph
-
 open Cil_types
-
 open Cil_datatype
 
 open Simplified
@@ -32,42 +29,13 @@ module VSet = Datatype.Int.Set
 module VMap = Datatype.Int.Map
 
 module Lval = Simplified.Lval
+module LSet = Cil_datatype.LvalStructEq.Set
+module LMap = Cil_datatype.LvalStructEq.Map
 
-module LSet = struct
-  include Set.Make (Lval)
-
-  let pretty fmt s =
-    Format.fprintf fmt "{@[";
-    let is_first = ref true in
-    iter (fun e ->
-        if !is_first
-        then is_first := false
-        else Format.fprintf fmt ",@ ";
-        Format.fprintf fmt "%a" Lval.pretty e
-      )
-      s;
-    Format.fprintf fmt "@]}"
-end
-
-module LMap = struct
-  include Map.Make (Lval)
-
-  let pretty f fmt m =
-    let is_first = ref true in
-    Format.fprintf fmt "{@[<hov 2>";
-    iter (fun k v ->
-        if not !is_first
-        then Format.fprintf fmt ",@,"
-        else is_first := false;
-        Format.fprintf fmt " %a -> %a" Lval.pretty k f v
-      )
-      m;
-    Format.fprintf fmt " @]}"
-end
-
-module G = Persistent.Digraph.ConcreteBidirectional(Datatype.Int)
-
+module G = Graph.Persistent.Digraph.ConcreteBidirectional(Datatype.Int)
 module V = G.V
+
+let vid (v : G.V.t) : int = v
 
 (* like LMap, but organized with offset and specialized functions *)
 module LLMap =
@@ -143,22 +111,6 @@ struct
       mo
       LMap.empty
 
-end
-
-module type S =
-sig
-  (* see abstract_state.mli for coments *)
-  type t
-  val get_graph: t -> G.t
-  val get_lval_set : G.V.t -> t -> LSet.t
-  val pretty : ?debug:bool -> Format.formatter -> t -> unit
-  val print_dot : string -> t -> unit
-  val find_vertex : lval -> t -> G.V.t
-  val find_aliases : lval -> t -> LSet.t
-  val find_all_aliases : lval -> t -> LSet.t
-  val points_to_set : lval -> t -> LSet.t
-  val find_transitive_closure : lval -> t -> (G.V.t * LSet.t) list
-  val is_included : t -> t -> bool
 end
 
 type t = {
@@ -326,7 +278,7 @@ let pretty ?(debug = false) fmt (x:t) =
 (** .dot printing functions*)
 let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
 
-module Dot = Graphviz.Dot (struct
+module Dot = Graph.Graphviz.Dot (struct
     include G
     let edge_attributes _ = []
     let default_edge_attributes _ = []
@@ -452,12 +404,13 @@ let rec create_vertex lv x =
   begin
     match lv with
       (Mem e, NoOffset) ->
-      (* special case, when we also add another vertex and a points-to edge*)
+      (* special case, when we also add another vertex and a points-to edge *)
       begin
         (* first find the vertex corresponding to e *)
         match LvalOrRef.from_exp e with
         | None -> Options.fatal "unexpected result: Lval.from (%a) = None" Exp.pretty e
-        | Some (LvalOrRef.Ref _) -> Options.fatal "unexpected: *(&x)"
+        | Some (LvalOrRef.Ref lv1) ->
+          find_or_create_vertex (LvalOrRef.Lval lv1) x
         | Some (LvalOrRef.Lval lv1) ->
           (* find the vertex *)
           let v1, x = find_or_create_vertex (LvalOrRef.Lval lv1) x in

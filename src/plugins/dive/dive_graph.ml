@@ -177,7 +177,7 @@ let output_to_dot out_channel g =
   let build_label s = `HtmlLabel (Extlib.html_escape s) in
 
   let module FileTable = Datatype.String.Hashtbl in
-  let module CallstackTable = Value_types.Callstack.Hashtbl in
+  let module CallstackTable = Callstack.Hashtbl in
   let file_table = FileTable.create 13
   and callstack_table = CallstackTable.create 13 in
   let file_counter = ref 0 in

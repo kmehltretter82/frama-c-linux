@@ -36,16 +36,17 @@
   AA ∈ {0}
   AR ∈ {0}
   AS ∈ {0}
-  At[0] ∈ {{ (int)&AA }}
+  At[0] ∈ {{ (long)&AA }}
     [1] ∈ {0}
-  Ar[0] ∈ {{ (int)&AA }}
+  Ar[0] ∈ {{ (long)&AA }}
     [1] ∈ {0}
   Ap ∈ {{ &At[0] }}
   f_previous ∈ {{ &a }}
 [eva] computing for function f <- main.
   Called from from_call.i:81.
-[kernel:annot:missing-spec] from_call.i:20: Warning: 
-  Neither code nor specification for function h, generating default assigns from the prototype
+[kernel:annot:missing-spec] from_call.i:13: Warning: 
+  Neither code nor specification for function h,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function h <- f <- main.
   Called from from_call.i:20.
 [eva] using specification for function h
@@ -143,7 +144,7 @@
 [eva] using specification for function unavailable_f
 [eva] Done for function unavailable_f
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [from] Computing for function access_tab
 [from] Done for function access_tab
 [from] Computing for function dispatcher

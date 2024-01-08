@@ -24,7 +24,7 @@
     type. This API is quite low level. Prefer to use module {!Datatype} instead
     whenever possible.
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (* ****************************************************************************)
 (** {2 Type declaration} *)
@@ -34,7 +34,7 @@ type 'a t
 (** Type of type values. For each monomorphic type [ty], a value of type [ty
     t] dynamically represents the type [ty]. Such a value is called a type
     value and should be unique for each static monomorphic type.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 type 'a ty = 'a t
 
@@ -47,10 +47,10 @@ type 'a ty = 'a t
 type precedence =
   | Basic
   (** Normal precedence
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | Call
   (** Instantiation of polymorphic type
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | Tuple
   | List
   | NoPar
@@ -66,7 +66,7 @@ type precedence =
     let myself = Call in
     par p_caller myself fmt pp]
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 val par:
   precedence -> precedence -> Format.formatter -> (Format.formatter -> unit) ->
   unit
@@ -82,7 +82,7 @@ val par_ty_name: ('a t -> bool) -> 'a t -> string
 
 exception AlreadyExists of string
 (** May be raised by {!register}.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val register:
   ?closure:bool ->
@@ -107,14 +107,14 @@ exception No_abstract_type of string
 (** Apply this functor to access to the abstract type of the given name.
     @raise No_abstract_type if no such abstract type was registered.
     @since Nitrogen-20111001
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-module Abstract(T: sig val name: string end): sig
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+module Abstract(_: sig val name: string end): sig
   type t
   val ty: t ty
 end
 
 val name: 'a t -> string
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val structural_descr: 'a t -> Structural_descr.t
 val reprs: 'a t -> 'a list
@@ -379,13 +379,6 @@ end
 (* ****************************************************************************)
 (** {2 Internal API} *)
 (* ****************************************************************************)
-
-val no_obj: unit -> unit
-(** Deactivate all the black magic.
-    Roughly, in this mode, nothing is done by this module. *)
-
-val may_use_obj: unit -> bool
-(** Internal use only. Please, do not use it yourself. *)
 
 val add_abstract_types: (string -> string -> unit) ref
 

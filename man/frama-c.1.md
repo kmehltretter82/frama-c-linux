@@ -47,10 +47,10 @@ It features the same options as the command-line version.
 **ivette** is a new, Electron-based graphical user interface for **frama-c**.
 It also features the same options as the command-line version.
 
-By default, Frama-C recognizes *.c* files as C files needing pre-processing
-and *.i* files as C files having been already pre-processed.
+By default, Frama-C recognizes *.c* files as C files needing preprocessing
+and *.i* files as C files having been already preprocessed.
 Some plugins may extend the list of recognized files.
-Pre-processing can be customized through the **-cpp-command** and
+Preprocessing can be customized through the **-cpp-command** and
 **-cpp-extra-args** options.
 
 # OPTIONS
@@ -116,7 +116,7 @@ Otherwise, normalization uses labels and gotos. Bigger blocks and blocks
 with non-trivial control flow are never duplicated. Defaults to yes.
 
 [-no]-annot
-: reads ACSL annotations. This is the default. Annotations are pre-processed
+: reads ACSL annotations. This is the default. Annotations are preprocessed
 by default. Use -no-pp-annot if you don't want to expand macros in annotations.
 
 [-no]-ast-diff
@@ -164,7 +164,7 @@ type‐checking will continue (errors in C code are still fatal, though). \
 **Deprecated**: use **-kernel-warn-key annot-error** instead.
 
 -cpp-command *cmd*
-: uses *cmd* as the command to pre-process C files.
+: uses *cmd* as the command to preprocess C files.
 Defaults to the **CPP** environment variable or to
 
 > gcc -C -E -I.
@@ -178,11 +178,11 @@ position of *<source file>* and *<preprocessed file>* respectively.
 Note that this option is often better replaced by **-cpp-extra-args**.
 
 -cpp-extra-args *args*
-: gives additional arguments to the pre-processor.
-Pre-processing annotations is done in two separate pre-processing stages.
+: gives additional arguments to the preprocessor.
+Preprocessing annotations is done in two separate preprocessing stages.
 The first one is a normal pass on the C code which retains macro definitions.
 These are then used in the second pass during which annotations are
-pre-processed. *args* are used only for the first pass, so that arguments that
+preprocessed. *args* are used only for the first pass, so that arguments that
 should not be used twice (such as additional include directives or macro
 definitions) must thus go there instead of **-cpp-command**.
 
@@ -343,9 +343,9 @@ and a formal parameter). When this option is on, a message is printed each
 time this occurs. Defaults to no.
 
 [-no]-pp-annot
-: pre-processes annotations. This is currently only possible when using gcc
-(or GNU cpp) pre-processor. The default is to pre-process annotations when the
-default pre-processor is identified as GNU or GNU-like.
+: preprocesses annotations. This is currently only possible when using gcc
+(or GNU cpp) preprocessor. The default is to preprocess annotations when the
+default preprocessor is identified as GNU or GNU-like.
 See also **-cpp-frama-c-compliant**.
 
 [-no]-print

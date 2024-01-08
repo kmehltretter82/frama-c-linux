@@ -4,8 +4,6 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[kernel:annot:missing-spec] va_list.c:14: Warning: 
-  Neither code nor specification for function __builtin_next_arg, generating default assigns from the prototype
 [eva] computing for function __builtin_next_arg <- main.
   Called from va_list.c:14.
 [eva] using specification for function __builtin_next_arg
@@ -13,7 +11,7 @@
   functions returning variadic arguments must be stubbed
 [eva] Done for function __builtin_next_arg
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   vlParameters ∈ [--..--]

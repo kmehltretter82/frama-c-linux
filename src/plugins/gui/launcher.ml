@@ -22,7 +22,7 @@
 
 open Gtk_helper
 
-module Kernel_hook = Hook.Make(struct end)
+module Kernel_hook = Hook.Make()
 
 class type basic_main = object
   inherit host

@@ -71,14 +71,14 @@ val clearConfiguration: unit -> unit
 val setConfiguration: string -> configData -> unit
 
 (** Find a configuration elements, given a key. Raises Not_found if it cannot
-    * find it *)
+    find it *)
 val findConfiguration: string -> configData
 
 (** Like findConfiguration but extracts the integer *)
 val findConfigurationInt: string -> int
 
 (** Looks for an integer configuration element, and if it is found, it uses
- * the given function. Otherwise, does nothing *)
+    the given function. Otherwise, does nothing *)
 val useConfigurationInt: string -> (int -> unit) -> unit
 
 val findConfigurationFloat: string -> float

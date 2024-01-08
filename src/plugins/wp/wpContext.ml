@@ -490,10 +490,11 @@ module type Generator =
 sig
   type key
   type data
-  val get : key -> data
   val mem : key -> bool
-  val clear : unit -> unit
+  val get : key -> data
+  val set : key -> data -> unit
   val remove : key -> unit
+  val clear : unit -> unit
 end
 
 module StaticGenerator(K : Key)(D : Data with type key = K.t) =
@@ -508,6 +509,7 @@ struct
   type key = D.key
   type data = D.data
   let get = G.memoize D.compile
+  let set = G.update
   let mem = G.mem
   let clear = G.clear
   let remove = G.remove
@@ -525,6 +527,7 @@ struct
   type key = D.key
   type data = D.data
   let get = G.memoize D.compile
+  let set = G.update
   let mem = G.mem
   let clear = G.clear
   let remove = G.remove
@@ -542,6 +545,7 @@ struct
   type key = D.key
   type data = D.data
   let get = G.memoize (fun k -> D.compile k (G.id ~basename:(D.basename k) k))
+  let set = G.update
   let mem = G.mem
   let clear = G.clear
   let remove = G.remove
@@ -559,6 +563,7 @@ struct
   type key = D.key
   type data = D.data
   let get = G.memoize (fun k -> D.compile k (G.id ~basename:(D.basename k) k))
+  let set = G.update
   let mem = G.mem
   let clear = G.clear
   let remove = G.remove

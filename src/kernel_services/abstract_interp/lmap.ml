@@ -32,6 +32,16 @@ type 'a default_contents =
   | Constant of 'a
   | Other
 
+
+module type Default_offsetmap = sig
+  type v
+  type offsetmap
+
+  val name: string
+  val default_offsetmap : Base.t -> offsetmap Lattice_bounds.or_bottom
+  val default_contents: v default_contents
+end
+
 module Make_LOffset
     (V: sig
        include Offsetmap_lattice_with_isotropy.S
@@ -39,19 +49,16 @@ module Make_LOffset
      end)
     (Offsetmap: Offsetmap_sig.S
      with type v = V.t
-      and type widen_hint = V.numerical_widen_hint)
-    (Default_offsetmap: sig
-       val name: string
-       val default_offsetmap : Base.t -> Offsetmap.t or_bottom
-       val default_contents: V.t default_contents
-     end)
+      and type widen_hint = V.widen_hint)
+    (Default_offsetmap: Default_offsetmap with type v := V.t
+                                           and type offsetmap := Offsetmap.t)
 =
 struct
 
   type v = V.t
   type offsetmap = Offsetmap.t
 
-  type widen_hint_base = V.numerical_widen_hint
+  type widen_hint_base = V.widen_hint
 
   open Default_offsetmap
 
@@ -242,12 +249,14 @@ struct
     let join_widen op =
       let cache = match op with
         | `Join -> Hptmap_sig.PersistentCache "lmap.join"
-        | `Widen _ -> Hptmap_sig.NoCache
+        | `Widen None -> Hptmap_sig.PersistentCache "lmap.widen"
+        | `Widen Some _ -> Hptmap_sig.NoCache
       in
       let symmetric = match op with `Join -> true | `Widen _ -> false in
       let op = match op with
         | `Join -> fun _b o1 o2 -> Offsetmap.join o1 o2
-        | `Widen wh -> fun b o1 o2 -> Offsetmap.widen (wh b) o1 o2
+        | `Widen None -> fun _b o1 o2 -> Offsetmap.widen o1 o2
+        | `Widen (Some wh) -> fun b o1 o2 -> Offsetmap.widen ~hint:(wh b) o1 o2
       in
       let idempotent = true in
       let default = default_bound_offsetmap in
@@ -433,10 +442,10 @@ struct
         (Hptmap_sig.PersistentCache name) UniversalPredicate
         ~decide_fast ~decide_fst ~decide_snd ~decide_both
 
-    type widen_hint = Base.Set.t * (Base.t -> V.numerical_widen_hint)
+    type widen_hint = Base.t -> V.widen_hint
 
     (* Precondition : m1 <= m2 *)
-    let widen (wh_key_set, wh_hints: widen_hint) m1 m2 =
+    let widen ?(priority=Base.Set.empty) ?hint m1 m2 =
       let widened, something_done =
         Base.Set.fold
           (fun key (widened, something_done) ->
@@ -452,14 +461,40 @@ struct
                if unchanged
                then (widened, something_done)
                else
-                 let new_off = Offsetmap.widen (wh_hints key) offs1 offs2 in
+                 let hint = Option.map (fun f -> f key) hint in
+                 let new_off = Offsetmap.widen ?hint offs1 offs2 in
                  (add key new_off widened, true)
-          ) wh_key_set (m2, false)
+          ) priority (m2, false)
       in
       if something_done then
         widened
       else
-        join_widen (`Widen wh_hints) m1 m2
+        let r = join_widen (`Widen hint) m1 m2 in
+        (* If [r] is equal to [m2], the widening had no effect.
+           If [m1] was not equal to [m2], either [m2] has reached some widening
+           threshold (and the widening is postponed), or there is a convergence
+           issue, for instance if the size of an allocated base is increased at
+           each loop iteration. To avoid such issue, we widen the size of weak
+           bases whose offsetmaps have changed between [m1] and [m2]. *)
+        if equal r m2 && not (equal m1 m2) then begin
+          let update_weak_base_validity base o1 o2 =
+            if Base.is_weak base && not (Offsetmap.equal o1 o2) then
+              match Base.validity base with
+              | Base.Variable v when Int.lt v.max_alloc v.max_allocable ->
+                (* Increasing [max_alloc] is never unsound as any access beyond
+                   [min_alloc] will generate an alarm anyway. *)
+                Base.update_variable_validity v ~weak:true
+                  ~min_alloc:v.min_alloc ~max_alloc:v.max_allocable
+              | _ -> ()
+          in
+          fold2_join_heterogeneous
+            ~cache:Hptmap_sig.NoCache
+            ~join:(fun () () -> ()) ~empty:()
+            ~empty_left:(fun _ -> ()) ~empty_right:(fun _ -> ())
+            ~both:update_weak_base_validity
+            m1 m2
+        end;
+        r
 
     let paste_offsetmap ~from ~dst_loc ~size ~exact m =
       let loc_dst = make_loc dst_loc (Int_Base.inject size) in
@@ -726,13 +761,13 @@ struct
   type widen_hint = M.widen_hint
 
   (* Precondition : m1 <= m2 *)
-  let widen wh r1 r2 =
+  let widen ?priority ?hint r1 r2 =
     match r1,r2 with
     | Top, Top | _, Top -> Top
     | Bottom,Bottom -> Bottom
     | _, Bottom | Top, Map _-> assert false (* thanks to precondition *)
     | Bottom, m -> m
-    | Map m1,Map m2 -> Map (M.widen wh m1 m2)
+    | Map m1,Map m2 -> Map (M.widen ?priority ?hint m1 m2)
 
   let paste_offsetmap ~from ~dst_loc ~size ~exact m =
     match m with

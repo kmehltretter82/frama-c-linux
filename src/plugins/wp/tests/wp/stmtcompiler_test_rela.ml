@@ -63,7 +63,7 @@ let run () =
         po_idx = Function(kf, None);
         po_model = model;
         po_pid = WpPropId.mk_assert_id kf stmt annot;
-        po_formula = Wpo.GoalAnnot vc_annot;
+        po_formula = vc_annot;
       }
     in
     let inter_po = ref po in
@@ -77,7 +77,7 @@ let run () =
               po_idx = Function(kf, None);
               po_model = model;
               po_pid = h.po_pid;
-              po_formula = Wpo.GoalAnnot vc_annot;
+              po_formula = vc_annot;
             }
         | _ -> ()
       );

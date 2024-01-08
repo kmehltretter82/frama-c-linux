@@ -73,7 +73,7 @@
   pointer comparison.
   assert \pointer_comparable((void (*)())0, (void (*)())(&f + 3));
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   p ∈ {{ &T + [-8589934588..36],0%4 }}

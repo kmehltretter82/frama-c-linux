@@ -1,29 +1,17 @@
 # frama-c -wp [...]
 [kernel] Parsing terminates_fp.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] terminates_fp.i:42: Warning: 
-  Missing terminates clause for no_t_spec, populates 'terminates \true'
+[kernel:annot:missing-spec] terminates_fp.i:9: Warning: 
+  Neither code nor explicit terminates for function gt,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] terminates_fp.i:11: Warning: 
+  Neither code nor explicit terminates for function ht,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
-[wp] terminates_fp.i:62: Warning: 
-  Missing terminates clause for no_t_spec_cond, populates 'terminates \true'
-[wp] terminates_fp.i:70: Warning: 
-  Missing terminates clause for no_t_spec_cond_m, populates 'terminates \true'
-[wp] terminates_fp.i:56: Warning: 
-  Missing terminates clause for no_t_spec_in_bhv, populates 'terminates \true'
-[wp] terminates_fp.i:22: Warning: 
-  Missing terminates clause for t_spec, populates 'terminates \true'
-[wp] terminates_fp.i:36: Warning: 
-  Missing terminates clause for t_spec_in_bhv, populates 'terminates \true'
-[wp] terminates_fp.i:78: Warning: 
-  Missing terminates clause for warns_recursive, populates 'terminates \true'
 [wp] terminates_fp.i:78: Warning: 
   In 'warns_recursive', no 'calls' specification for statement(s) on line(s): 
   line 79, 
   Assuming that they can call 'warns_recursive'
-[wp] terminates_fp.i:9: Warning: 
-  Missing terminates clause for gt, populates 'terminates \true'
-[wp] terminates_fp.i:11: Warning: 
-  Missing terminates clause for ht, populates 'terminates \true'
 [wp] terminates_fp.i:79: Warning: Missing 'calls' for default behavior
 [wp] terminates_fp.i:79: Warning: 
   Unknown callee, considering non-terminating call

@@ -82,6 +82,14 @@ module Normalized: sig
   *)
   val concat: ?existence:existence -> t -> string -> t
 
+  (**
+     [concats ~existence dir paths] concatenates a list of paths, as per
+     the [concat] function.
+
+     @since 28.0-Nickel
+  *)
+  val concats: ?existence:existence -> t -> string list -> t
+
   (** [to_pretty_string p] returns [p] prettified,
       that is, a relative path-like string.
       Note that this prettified string may contain symbolic dirs and is thus
@@ -209,19 +217,48 @@ type position =
 val pp_pos : Format.formatter -> position -> unit
 
 (** Return the current working directory.
-    Currently uses the environment's PWD instead of Sys.getcwd () because OCaml
-    has no function in its stdlib to resolve symbolic links (e.g. realpath)
-    for a given path. 'getcwd' always resolves them, but if the user
-    supplies a path with symbolic links, this may cause issues.
-    Instead of forcing the user to always provide resolved paths, we
-    currently choose to never resolve them.
-    We only resort to getcwd() to avoid issues when PWD does not exist.
-    Note that this function does not validate that PWD has not been tampered
-    with.
+    Implicitly uses {!Unix.realpath} to normalize paths and avoid issues with
+    symbolic links in directory names.
 
     @since 25.0-Manganese
+    @before 28.0-Nickel return type was string instead of Normalized.t.
 *)
-val pwd : unit -> string
+val pwd : unit -> Normalized.t
+
+(** Equivalent to [Sys.file_exists].
+    @since 28.0-Nickel
+*)
+val exists: Normalized.t -> bool
+
+(** Equivalent to [Sys.is_directory].
+    @since 28.0-Nickel
+*)
+val is_dir: Normalized.t -> bool
+
+(** Equivalent to [Sys.readdir].
+    @since 28.0-Nickel
+*)
+val readdir: Normalized.t -> string array
+
+(** Equivalent to [Sys.remove].
+    @since 28.0-Nickel
+*)
+val remove: Normalized.t -> unit
+
+(** Equivalent to [Sys.rename].
+    @since 28.0-Nickel
+*)
+val rename: Normalized.t -> Normalized.t -> unit
+
+(** Equivalent to [Filename.basename].
+    @since 28.0-Nickel
+*)
+val basename: Normalized.t -> string
+
+(** Equivalent to [Filename.dirname].
+    @since 28.0-Nickel
+*)
+val dirname: Normalized.t -> Normalized.t
 
 (*
   Local Variables:

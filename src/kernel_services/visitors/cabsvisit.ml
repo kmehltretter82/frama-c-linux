@@ -155,7 +155,7 @@ and childrenTypeSpecifier vis ts =
 
 and childrenSpecElem (vis: cabsVisitor) (se: spec_elem) : spec_elem =
   match se with
-    SpecTypedef | SpecInline | SpecStorage _ | SpecPattern _ -> se
+    SpecTypedef | SpecInline | SpecStorage _ -> se
   | SpecCV _ -> se    (* cop out *)
   | SpecAttr a -> begin
       let al' = visitCabsAttribute vis a in
@@ -482,7 +482,6 @@ and childrenExpression vis e =
   | GNU_BODY b ->
     let b' = visitCabsBlock vis b in
     if b' != b then { e with expr_node = GNU_BODY b' } else e
-  | EXPR_PATTERN _ -> e
   | GENERIC (e, generic_assocs) ->
     let e' = ve e in
     let exps = List.map snd generic_assocs in

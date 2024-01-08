@@ -308,10 +308,17 @@ let datatype ~library name =
   let m = new_extern ~link:name ~library ~debug:name in
   Mtype m
 
+
+let field_observers = ref []
+let field_observe fd = List.iter (fun k -> k fd) !field_observers ; fd
+let on_field f = field_observers := f :: !field_observers
+
+let cfield ?(kind=KValue) fd = field_observe @@ Cfield(fd,kind)
+
 let record ~link ~library fts =
   let m = new_extern ~link ~library ~debug:link in
   let r = { fields = [] } in
-  let fs = List.map (fun (f,t) -> Mfield(m,r,f,t)) fts in
+  let fs = List.map (fun (f,t) -> field_observe @@ Mfield(m,r,f,t)) fts in
   r.fields <- fs ; Mrecord(m,r)
 
 let field t f =
@@ -399,10 +406,10 @@ type lfun =
   (** Registered in Definition.t, only  *)
   | CTOR of Cil_types.logic_ctor_info
   (** Not registered in Definition.t, directly converted/printed *)
-  | Model of model
+  | FUN of lsymbol
   (** Generated or External function *)
 
-and model = {
+and lsymbol = {
   m_category : lfun category ;
   m_params : sort list ;
   m_result : sort ;
@@ -415,13 +422,21 @@ and source =
   | Generated of WpContext.context option * string
   | Extern of Engine.link extern
 
+let lfun_observers = ref []
+let lfun_observe lf = List.iter (fun k -> k lf) !lfun_observers ; lf
+let on_lfun f = lfun_observers := f :: !lfun_observers
+
+let acsl lf = lfun_observe (ACSL lf)
+let ctor cf = lfun_observe (CTOR cf)
+let lsymbol m = lfun_observe (FUN m)
+
 let tau_of_lfun phi ts =
   match phi with
   | ACSL f -> tau_of_return f.l_type
   | CTOR c ->
     if c.ctor_type.lt_params = [] then Logic.Data(Atype c.ctor_type,[])
     else raise Not_found
-  | Model m -> match m.m_result with
+  | FUN m -> match m.m_result with
     | Sint -> Int
     | Sreal -> Real
     | Sbool -> Bool
@@ -429,7 +444,7 @@ let tau_of_lfun phi ts =
 
 let is_coloring_lfun = function
   | ACSL _ | CTOR _ -> false
-  | Model { m_coloring } -> m_coloring
+  | FUN { m_coloring } -> m_coloring
 
 type balance = Nary | Left | Right
 
@@ -478,7 +493,7 @@ let symbolf
          match result with Some t -> fun _ -> t | None -> not_found in
        let result =
          match result with Some t -> Kind.of_tau t | None -> sort in
-       Model {
+       lsymbol {
          m_category = category ;
          m_params = params ;
          m_result = result ;
@@ -506,7 +521,7 @@ let extern_p ~library ?bool ?prop ?link ?(params=[]) ?(coloring=false) () =
     | _ , _ , _ -> assert false
   in
   let debug = Export.debug link in
-  Model {
+  lsymbol {
     m_category = Logic.Function;
     m_params = params ;
     m_result = Logic.Sprop;
@@ -519,7 +534,7 @@ let extern_fp ~library ?(params=[]) ?link ?(coloring=false) phi =
   let link = match link with
     | None -> Engine.F_call phi
     | Some link -> Engine.F_call link in
-  Model {
+  lsymbol {
     m_category = Logic.Function ;
     m_params = params ;
     m_result = Logic.Sprop;
@@ -535,7 +550,7 @@ let generated_f ?context ?category ?params ?sort ?result ?coloring name =
   symbolf ?context ?category ?params ?sort ?result ?coloring name
 
 let generated_p ?context ?(coloring=false) name =
-  Model {
+  lsymbol {
     m_category = Logic.Function ;
     m_params = [] ;
     m_result = Logic.Sprop;
@@ -555,14 +570,14 @@ struct
   let debug = function
     | ACSL f -> logic_id f
     | CTOR c -> ctor_id c
-    | Model({m_source=Generated(_,n)}) -> n
-    | Model({m_source=Extern e})    -> e.ext_debug
+    | FUN({m_source=Generated(_,n)}) -> n
+    | FUN({m_source=Extern e})    -> e.ext_debug
 
   let hash = function
     | ACSL f -> Logic_info.hash f
     | CTOR c -> Logic_ctor_info.hash c
-    | Model({m_source=Generated(_,n)}) -> Datatype.String.hash n
-    | Model({m_source=Extern e})    -> e.ext_id
+    | FUN({m_source=Generated(_,n)}) -> Datatype.String.hash n
+    | FUN({m_source=Extern e})    -> e.ext_id
 
   let compare_context c1 c2 =
     match c1 , c2 with
@@ -584,9 +599,9 @@ struct
   let compare f g =
     if f==g then 0 else
       match f , g with
-      | Model {m_source=mf} , Model {m_source=mg} -> compare_source mf mg
-      | Model _ , _ -> (-1)
-      | _ , Model _ -> 1
+      | FUN {m_source=mf} , FUN {m_source=mg} -> compare_source mf mg
+      | FUN _ , _ -> (-1)
+      | _ , FUN _ -> 1
       | ACSL f , ACSL g -> Logic_info.compare f g
       | ACSL _ , _ -> (-1)
       | _ , ACSL _ -> 1
@@ -597,12 +612,12 @@ struct
   let pretty fmt f = Format.pp_print_string fmt (debug f)
 
   let category = function
-    | Model m -> m.m_category
+    | FUN m -> m.m_category
     | ACSL _ -> Logic.Function
     | CTOR _ -> Logic.Constructor
 
   let sort = function
-    | Model m -> m.m_result
+    | FUN m -> m.m_result
     | ACSL { l_type=None } -> Logic.Sprop
     | ACSL { l_type=Some t } -> sort_of_ltype t
     | CTOR _ -> Logic.Sdata
@@ -610,7 +625,7 @@ struct
   let parameters = ref (fun _ -> [])
 
   let params = function
-    | Model m -> m.m_params
+    | FUN m -> m.m_params
     | CTOR ct -> List.map sort_of_ltype ct.ctor_params
     | (ACSL _) as f -> !parameters f
 
@@ -639,15 +654,20 @@ class virtual idprinting =
     method link = function
       | ACSL f -> Engine.F_call (self#sanitize_fun (logic_id f))
       | CTOR c -> Engine.F_call (self#sanitize_fun (ctor_id c))
-      | Model({m_source=Generated(_,n)}) -> Engine.F_call (self#sanitize_fun n)
-      | Model({m_source=Extern e}) -> e.ext_link
+      | FUN({m_source=Generated(_,n)}) -> Engine.F_call (self#sanitize_fun n)
+      | FUN({m_source=Extern e}) -> e.ext_link
   end
 
 let name_of_lfun = function
   | ACSL f -> logic_id f
   | CTOR c -> ctor_id c
-  | Model({m_source=Generated(_,f)}) -> f
-  | Model({m_source=Extern e}) -> e.ext_debug
+  | FUN({m_source=Generated(_,f)}) -> f
+  | FUN({m_source=Extern e}) -> e.ext_debug
+
+let context_of_lfun = function
+  | ACSL _ | CTOR _
+  | FUN({m_source=Extern _}) -> None
+  | FUN({m_source=Generated(ctxt,_)}) -> ctxt
 
 let name_of_field = function
   | Mfield(_,_,f,_) -> f
@@ -718,7 +738,7 @@ struct
   let set_builtin_eq f = QZERO.set_builtin_eq f
   let set_builtin_leq f = QZERO.set_builtin_leq f
   let set_builtin_get f = QZERO.set_builtin_get f
-
+  let set_builtin_field f = QZERO.set_builtin_field f
 
   (* -------------------------------------------------------------------------- *)
   (* --- Term Extensions                                                    --- *)
@@ -888,7 +908,7 @@ open F
 module N = struct
 
   let ( + ) = e_add
-  let ( ~- ) x = e_sub e_zero x
+  let ( ~-: ) x = e_sub e_zero x
   let ( - ) = e_sub
   let ( * ) = e_mul
   let ( / ) = e_div
@@ -902,8 +922,8 @@ module N = struct
   let ( <> ) = p_neq
 
   let ( ==> ) = p_imply
-  let ( && ) = p_and
-  let ( || ) = p_or
+  let ( &&: ) = p_and
+  let ( ||: ) = p_or
   let not = p_not
 
   let ( $ ) = e_fun

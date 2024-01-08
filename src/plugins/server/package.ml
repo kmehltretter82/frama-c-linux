@@ -377,17 +377,6 @@ let register_ident id =
     Senv.fatal "Duplicate identifier '%a'" pp_ident id ;
   registry := IdSet.add id !registry
 
-let resolve_readme ~plugin = function
-  | None -> None
-  | Some readme ->
-    let file =
-      match plugin with
-      | Kernel ->
-        Printf.sprintf "src/plugins/server/doc/%s" readme
-      | Plugin name ->
-        Printf.sprintf "src/plugins/%s/doc/%s" name readme
-    in Some file
-
 (* -------------------------------------------------------------------------- *)
 (* --- Declarations                                                       --- *)
 (* -------------------------------------------------------------------------- *)
@@ -403,7 +392,7 @@ let package ?plugin ?name ~title ?(descr=[]) ?readme () =
     p_package = pkgname ;
     p_title = title ;
     p_descr = descr ;
-    p_readme = resolve_readme ~plugin readme ;
+    p_readme = readme ;
     p_content = [] ;
   } in
   let package = { pkgInfo ; revDecl=[] } in
@@ -447,8 +436,8 @@ let iter f =
 (* --- JSON To MarkDown                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let key kd = Md.plain (Printf.sprintf "`#%s`" kd)
-let index kd = Md.plain (Printf.sprintf "`#0%s`" kd)
+let key kd = Md.plain (Printf.sprintf "`$%s`" kd)
+let index kd = Md.plain (Printf.sprintf "`#%s`" kd)
 let litteral tag = Md.plain (Printf.sprintf "`\"%s\"`" tag)
 
 type pp = {

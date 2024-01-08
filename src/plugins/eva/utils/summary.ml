@@ -157,12 +157,11 @@ let get_status ip =
   in
   Property_status.fold_on_statuses aux_status ip None
 
-let compute_fun_stats fundec =
+let compute_fun_stats kf =
   let alarms = AlarmsStats.create 13
   and coverage = Coverage.make ()
   and statuses = Statuses.make ()
   in
-  let kf = Globals.Functions.get fundec.Cil_types.svar in
   let do_status alarm ip =
     match get_status ip with
     | None -> ()
@@ -180,15 +179,19 @@ let compute_fun_stats fundec =
       List.iter (do_status alarm) l
   in
   let do_stmt stmt =
-    let reachable = Db.Value.is_reachable_stmt stmt in
+    let reachable = Cvalue_results.is_reachable stmt in
     Coverage.incr coverage ~reachable;
     Annotations.iter_code_annot (do_annot stmt) stmt
   in
-  List.iter do_stmt fundec.Cil_types.sallstmts;
+  begin
+    try
+      let fundec = Kernel_function.get_definition kf in
+      List.iter do_stmt fundec.Cil_types.sallstmts;
+    with Kernel_function.No_Definition -> ()
+  end ;
   { fun_coverage = coverage;
     fun_alarm_count = AlarmsStats.to_list alarms;
     fun_alarm_statuses = statuses; }
-
 
 module FunctionStats_Type = Datatype.Make (struct
     include Datatype.Serializable_undefined
@@ -203,7 +206,7 @@ module FunctionStats_Type = Datatype.Make (struct
 
 module FunctionStats = struct
   include State_builder.Hashtbl
-      (Cil_datatype.Fundec.Hashtbl)
+      (Kernel_function.Hashtbl)
       (FunctionStats_Type)
       (struct
         let name = "Eva.Summary.FunctionStats"
@@ -211,19 +214,10 @@ module FunctionStats = struct
         let size = 17
       end)
 
-  module Hook = Hook.Build (struct
-      type t = Cil_types.fundec * fun_stats
-    end)
-
-  let compute kf =
-    let stats = compute_fun_stats kf in
-    Hook.apply (kf,stats);
-    stats
   let get kf =
     try Some (find kf)
     with Not_found -> None
-  let recompute kf = replace kf (compute kf)
-  let register_hook = Hook.extend
+  let recompute kf = replace kf (compute_fun_stats kf)
 end
 
 
@@ -265,7 +259,7 @@ let compute_statuses ()  =
   in
   let do_property ip =
     let incr stmt statuses =
-      if Db.Value.is_reachable_stmt stmt then
+      if Cvalue_results.is_reachable stmt then
         match get_status ip with
         | None -> ()
         | Some status -> Statuses.incr statuses status
@@ -290,8 +284,9 @@ let compute_stats () =
   and prog_alarms = AlarmsStats.create 131
   in
   let do_fun fundec =
+    let kf = Globals.Functions.get fundec.Cil_types.svar in
     let consider = consider_function fundec.Cil_types.svar in
-    match FunctionStats.get fundec with
+    match FunctionStats.get kf with
     | Some fun_stats ->
       AlarmsStats.add_list prog_alarms fun_stats.fun_alarm_count;
       if consider then

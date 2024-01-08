@@ -26,6 +26,8 @@
  (action
   (progn
    (echo "EVA:" %{lib-available:frama-c-eva.core} "\n")
+   (echo " - ppx_deriving.eq:" %{lib-available:ppx_deriving.eq} "\n")
+   (echo " - ppx_deriving.ord:" %{lib-available:ppx_deriving.ord} "\n")
    (echo "Numerors:" %{lib-available:frama-c-eva.numerors.core} "\n")
    (echo " - MLMPFR:" %{lib-available:mlmpfr} "\n")
    (echo "Apron domains:" %{lib-available:frama-c-eva.apron.core} "\n")
@@ -38,9 +40,11 @@
  (name eva)
  (optional)
  (public_name frama-c-eva.core)
- (flags -open Frama_c_kernel :standard -w -9 -alert -db_deprecated)
+ (flags -open Frama_c_kernel :standard -w -9)
  (libraries frama-c.kernel frama-c-server.core)
- (instrumentation (backend landmarks)))
+ (instrumentation (backend landmarks))
+ (instrumentation (backend bisect_ppx))
+ (preprocess (staged_pps ppx_deriving.eq ppx_deriving.ord)))
 
 (plugin
  (name eva)
@@ -56,7 +60,7 @@
   (name eva_gui)
   (optional)
   (public_name frama-c-eva.gui)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva__Private :standard -w -9 -alert -db_deprecated)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva__Private :standard -w -9)
   (libraries eva frama-c.kernel frama-c.gui)
   (instrumentation (backend landmarks))))
 
@@ -74,7 +78,8 @@
   (public_name frama-c-eva.numerors.core)
   (flags -open Frama_c_kernel -open Eva__Private :standard)
   (libraries frama-c.kernel frama-c-eva.core mlmpfr)
-  (instrumentation (backend landmarks))))
+  (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx))))
 
 (plugin
  (name eva.numerors)
@@ -92,7 +97,8 @@
   (libraries
    frama-c.kernel frama-c-eva.core
    apron.octMPQ apron.boxMPQ apron.polkaMPQ apron.apron)
-  (instrumentation (backend landmarks))))
+  (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx))))
 
 (plugin
   (name eva.apron)
@@ -105,7 +111,7 @@
  (mode (promote (only Eva.mli)))
  (deps
   gen-api.sh Eva.header
-  engine/analysis.mli utils/results.mli parameters.mli
+  engine/analysis.mli types/callstack.mli utils/results.mli parameters.mli
   utils/eva_annotations.mli eval.mli domains/cvalue/builtins.mli
   utils/cvalue_callbacks.mli legacy/logic_inout.mli utils/eva_results.mli
   utils/unit_tests.mli)

@@ -29,32 +29,26 @@ open Cil_types
 (** Represented by a Json record with file, dir, basename, line *)
 module Position : Data.S with type t = Filepath.position
 
-(** Json key representing a function name *)
-val jFunction : Package.jtype
-
-(** Represented by the function name as [jFunction]. *)
-module Function : Data.S with type t = kernel_function
-
-(** Represented by the function name as [jFunction]. *)
-module Fundec : Data.S with type t = fundec
-
 (* -------------------------------------------------------------------------- *)
 (** Ast Markers *)
 (* -------------------------------------------------------------------------- *)
 
-(** Exported as Json string with their unique tag. *)
-module Marker :
+module type Tag =
 sig
-  include Data.S with type t = Printer_tag.localizable
+  (** Exported as Json string with their unique tag. *)
+  include Data.S
 
-  val tag : t -> string
+  val index : t -> string
   (** Memoized unique identifier. *)
 
   val find : string -> t
-  (** Get back the localizable, if any.
-      @raises Not_found if marker is not defined yet *)
+  (** Get back the scope, if any.
+      @raises Not_found if the marker is not defined yet *)
 
 end
+
+module Decl : (Tag with type t = Printer_tag.declaration)
+module Marker : (Tag with type t = Printer_tag.localizable)
 
 (* -------------------------------------------------------------------------- *)
 (** Ast Markers of Specific Kinds *)
@@ -74,14 +68,11 @@ module Stmt : Data.S with type t = stmt
 (** Optional markers interpreted as kinstr. *)
 module Kinstr : Data.S with type t = kinstr
 
-(** Represented as a Json record with function name and marker tag. *)
-module Location : Data.S with type t = Function.t * Marker.t
-
 (* -------------------------------------------------------------------------- *)
 (** Ast Printer *)
 (* -------------------------------------------------------------------------- *)
 
-module Printer : Printer_tag.S_pp
+module PrinterTag : Printer_tag.S_pp
 
 (* -------------------------------------------------------------------------- *)
 (** Ast Information *)

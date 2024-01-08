@@ -164,7 +164,7 @@
   function fmemopen: precondition 'valid_mode' got status valid.
 [eva] Done for function fmemopen
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ [--..--]
@@ -172,14 +172,14 @@
   __fc_heap_status ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   f ∈ {{ NULL ; &__fc_fopen + [0..120],0%8 }}
-  r ∈ [--..--]
-  tmp_2 ∈ {{ NULL ; &__fc_fopen + [0..120],0%8 }}
-  told ∈ [-1..2147483647]
-  toldo ∈ [-1..2147483647]
-  redirected ∈ {{ NULL ; &__fc_fopen + [0..120],0%8 }}
+  r ∈ [--..--] or UNINITIALIZED
+  tmp_2 ∈ {{ NULL ; &__fc_fopen + [0..120],0%8 }} or UNINITIALIZED
+  told ∈ [-1..2147483647] or UNINITIALIZED
+  toldo ∈ [-1..2147483647] or UNINITIALIZED
+  redirected ∈ {{ NULL ; &__fc_fopen + [0..120],0%8 }} or UNINITIALIZED
   fgets_buf0[0] ∈ [--..--] or UNINITIALIZED
-  fgets_res ∈ {{ NULL ; &fgets_buf0[0] }}
+  fgets_res ∈ {{ NULL ; &fgets_buf0[0] }} or UNINITIALIZED
   pos ∈ [--..--] or UNINITIALIZED
-  res_fclose ∈ {-1; 0}
+  res_fclose ∈ {-1; 0} or UNINITIALIZED
   __retres ∈ {0; 1; 2; 3}
   S___fc_stdout[0..1] ∈ [--..--]

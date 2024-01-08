@@ -77,8 +77,6 @@
 [variadic:typing] printf_wrong_types.c:36: Warning: 
   Incorrect type for argument 2. The argument will be cast from RC (unsigned int) to int.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva] using specification for function printf_va_1
 [eva] using specification for function printf_va_2
 [eva] using specification for function printf_va_3
@@ -94,7 +92,6 @@
 [eva] using specification for function printf_va_13
 [eva:alarm] printf_wrong_types.c:30: Warning: 
   function printf_va_13: precondition valid_read_string(param0) got status invalid.
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION
@@ -351,12 +348,10 @@ int main(void)
 
 
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
-[kernel:annot:missing-spec] printf_wrong_types.c:18: Warning: 
-  Neither code nor specification for function printf, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:211: Warning: 
+  Neither code nor specification for function printf,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function printf
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {42}
@@ -489,8 +484,6 @@ int main(void)
 [variadic:typing] printf_wrong_types.c:36: Warning: 
   Incorrect type for argument 2. The argument will be cast from RC (unsigned int) to int.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva] using specification for function printf_va_1
 [eva] using specification for function printf_va_2
 [eva] using specification for function printf_va_3
@@ -506,7 +499,6 @@ int main(void)
 [eva] using specification for function printf_va_13
 [eva:alarm] printf_wrong_types.c:30: Warning: 
   function printf_va_13: precondition valid_read_string(param0) got status invalid.
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

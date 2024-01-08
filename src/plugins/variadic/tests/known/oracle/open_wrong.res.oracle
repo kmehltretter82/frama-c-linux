@@ -13,12 +13,10 @@
 [variadic] open_wrong.c:13: 
   Fallback translation of call open to a call to the specialized version open_fallback_1.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
-[kernel:annot:missing-spec] open_wrong.c:13: Warning: 
-  Neither code nor specification for function open_fallback_1, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/fcntl.h:136: Warning: 
+  Neither code nor specification for function open_fallback_1,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function open_fallback_1
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   file ∈ {{ "file" }}

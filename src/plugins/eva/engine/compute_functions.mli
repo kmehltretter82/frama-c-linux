@@ -23,9 +23,8 @@
 (** Value analysis of entire functions, using Eva engine. *)
 
 open Cil_types
-open Eval
 
-module Make (Abstract: Abstractions.Eva)
+module Make (Abstract: Abstractions.S_with_evaluation)
   : sig
 
     (** Compute a call to the main function. *)
@@ -33,6 +32,4 @@ module Make (Abstract: Abstractions.Eva)
 
     (** Compute a call to the main function from the given initial state. *)
     val compute_from_init_state: kernel_function -> Abstract.Dom.t -> unit
-
-    val initial_state: lib_entry:bool -> Abstract.Dom.t or_bottom
   end

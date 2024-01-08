@@ -5,8 +5,9 @@
 [eva:initial-state] Values of globals at initialization
   Sa ∈ {0}
   Sb ∈ {0}
-[kernel:annot:missing-spec] semaphore.i:31: Warning: 
-  Neither code nor specification for function V, generating default assigns from the prototype
+[kernel:annot:missing-spec] semaphore.i:6: Warning: 
+  Neither code nor specification for function V,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function V <- g.
   Called from semaphore.i:31.
 [eva] using specification for function V
@@ -22,8 +23,9 @@
   Called from semaphore.i:31.
 [eva] Done for function V
 [eva] semaphore.i:28: starting to merge loop iterations
-[kernel:annot:missing-spec] semaphore.i:34: Warning: 
-  Neither code nor specification for function P, generating default assigns from the prototype
+[kernel:annot:missing-spec] semaphore.i:6: Warning: 
+  Neither code nor specification for function P,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function P <- g.
   Called from semaphore.i:34.
 [eva] using specification for function P
@@ -57,7 +59,7 @@
 [eva] Recording results for f
 [eva] Done for function f
 [eva] Recording results for g
-[eva] done for function g
+[eva] Done for function g
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   c ∈ {12}

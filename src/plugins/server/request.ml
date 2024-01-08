@@ -103,14 +103,14 @@ let rq_input (type a) (input : a rq_input) : paramInfo =
   match input with
   | Pnone -> assert false
   | Pdata d -> let module D = (val d) in P_value D.jtype
-  | Pfields fds -> P_named fds
+  | Pfields fds -> P_named (List.rev fds)
 
 (* json output syntax *)
 let rq_output (type b) (output : b rq_output) : paramInfo =
   match output with
   | Rnone -> assert false
   | Rdata d -> let module D = (val d) in P_value D.jtype
-  | Rfields fds -> P_named fds
+  | Rfields fds -> P_named (List.rev fds)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Multi-Parameters Requests                                          --- *)
@@ -135,14 +135,17 @@ let check_required fmap fd =
 (* -------------------------------------------------------------------------- *)
 
 (* current input fields *)
-let fds_input s : fieldInfo list =
+let fds_input fd s =
   if s.defined then
     raise (Invalid_argument "Server.Request: already published");
   match s.input with
   | Pdata _ ->
     raise (Invalid_argument "Server.Request: request has not named input");
-  | Pnone -> []
-  | Pfields fds -> fds
+  | Pnone -> s.input <- Pfields [fd]
+  | Pfields fds ->
+    if List.exists (fun fd0 -> fd0.fd_name = fd.fd_name) fds then
+      raise (Invalid_argument "Server.Request: duplicate request input name");
+    s.input <- Pfields (fd::fds)
 
 let param (type a b) (s : (unit,b) signature) ~name ~descr
     ?default (input : a input) : a param =
@@ -153,7 +156,7 @@ let param (type a b) (s : (unit,b) signature) ~name ~descr
       fd_type = ftype ;
       fd_descr = descr ;
     } in
-  s.input <- Pfields (fd :: fds_input s) ;
+  fds_input fd s ;
   fun rq ->
     try D.of_json (Fmap.find name rq.param)
     with Not_found ->
@@ -169,7 +172,7 @@ let param_opt (type a b) (s : (unit,b) signature) ~name ~descr
       fd_type = Joption D.jtype ;
       fd_descr = descr ;
     } in
-  s.input <- Pfields (fd :: fds_input s) ;
+  fds_input fd s ;
   fun rq ->
     try Some(D.of_json (Fmap.find name rq.param))
     with Not_found -> None
@@ -179,14 +182,17 @@ let param_opt (type a b) (s : (unit,b) signature) ~name ~descr
 (* -------------------------------------------------------------------------- *)
 
 (* current output fields *)
-let fds_output s : fieldInfo list =
+let fds_output fd s =
   if s.defined then
     raise (Invalid_argument "Server.Request: already published");
   match s.output with
   | Rdata _ ->
     raise (Invalid_argument "Server.Request: request has not named input");
-  | Rnone -> []
-  | Rfields fds -> fds
+  | Rnone -> s.output <- Rfields [fd]
+  | Rfields fds ->
+    if List.exists (fun fd0 -> fd0.fd_name = fd.fd_name) fds then
+      raise (Invalid_argument "Server.Request: duplicate request input name");
+    s.output <- Rfields (fd::fds)
 
 let result (type a b) (s : (a,unit) signature) ~name ~descr
     ?default (output : b output) : b result =
@@ -196,7 +202,7 @@ let result (type a b) (s : (a,unit) signature) ~name ~descr
       fd_type = D.jtype ;
       fd_descr = descr ;
     } in
-  s.output <- Rfields (fd :: fds_output s) ;
+  fds_output fd s ;
   begin
     match default with
     | None -> s.required <- name :: s.required
@@ -212,7 +218,7 @@ let result_opt (type a b) (s : (a,unit) signature) ~name ~descr
       fd_type = Joption D.jtype ;
       fd_descr = descr ;
     } in
-  s.output <- Rfields (fd :: fds_output s) ;
+  fds_output fd s ;
   fun rq opt ->
     match opt with None -> () | Some v ->
       rq.result <- Fmap.add name (D.to_json v) rq.result

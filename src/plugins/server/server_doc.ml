@@ -45,7 +45,7 @@ type page = {
   title : string ;
   order : int ;
   descr : Markdown.elements ;
-  readme: string option ;
+  readme: Filepath.Normalized.t option ;
   mutable sections : section list ;
 }
 
@@ -68,13 +68,20 @@ let path_for chapter filename =
   | `Kernel -> ".." , Printf.sprintf "kernel/%s" filename
   | `Plugin name -> "../.." , Printf.sprintf "plugins/%s/%s" name filename
 
-let page chapter ~title ?(descr=[]) ?readme ~filename () =
+let path_for_readme ~plugin filename =
+  let dirname = match plugin with Kernel -> "server" | Plugin p -> p in
+  Filepath.Normalized.concats
+    (Filepath.Normalized.of_string ".")
+    ["src";"plugins";dirname;"doc";filename]
+
+let page chapter ~title ?(descr=[]) ?(plugin=Kernel) ~readme ~filename () =
   let rootdir , path = path_for chapter filename in
   try
     let other = Pages.find path !pages in
     Senv.failure "Duplicate page '%s' path@." path ; other
   with Not_found ->
     let order = incr order ; !order in
+    let readme = Option.map (path_for_readme ~plugin) readme in
     let page = {
       order ; rootdir ; path ;
       chapter ; title ; descr ; readme ;
@@ -99,8 +106,7 @@ let publish ~page ?name ?(index=[]) ~title
   page.sections <- section :: page.sections ; href
 
 let protocol ~title ~readme:filename =
-  let readme = Printf.sprintf "src/plugins/server/doc/%s"  filename in
-  ignore (page `Protocol ~title ~readme ~filename ())
+  ignore (page `Protocol ~title ~readme:(Some filename) ~filename ())
 
 let () = protocol ~title:"Architecture" ~readme:"server.md"
 
@@ -131,7 +137,8 @@ let page_of_package pkg =
     page chapter
       ~title:pkg.p_title
       ~descr:(Markdown.par pkg.p_descr)
-      ?readme:pkg.p_readme
+      ~plugin:pkg.p_plugin
+      ~readme:pkg.p_readme
       ~filename ()
 
 let kind_of_decl = function
@@ -322,8 +329,7 @@ let metadata page : json =
 
 let pp_one_page ~root ~page ~title body =
   let full_path = Filepath.Normalized.concat root page in
-  let dir = Filename.dirname (full_path:>string) in
-  if not (Sys.file_exists dir) then Extlib.mkdir ~parents:true dir 0o755;
+  ignore (Extlib.mkdir ~parents:true (Filepath.dirname full_path) 0o755);
   try
     let chan = open_out (full_path:>string) in
     let fmt = Format.formatter_of_out_channel chan in
@@ -345,12 +351,12 @@ let dump ~root ?(meta=true) () =
          let intro = match page.readme with
            | None -> Markdown.section ~title page.descr
            | Some file ->
-             if Sys.file_exists file
-             then Markdown.rawfile file @ page.descr
+             if Filepath.exists file
+             then Markdown.rawfile (file :> string) @ page.descr
              else (
-               Senv.warning "Can not find %S file" file ;
-               Markdown.section ~title page.descr
-             )
+               Senv.warning "Can not find %a file"
+                 Filepath.Normalized.pretty file ;
+               Markdown.section ~title page.descr)
          in
          let body = Markdown.subsections page.descr (build [] page.sections) in
          pp_one_page ~root ~page:path ~title (intro @ body) ;
@@ -381,7 +387,7 @@ let () =
     fun () ->
       if not (Senv.Doc.is_empty ()) then
         let root = Senv.Doc.get () in
-        if Sys.is_directory (root:>string) then
+        if Filepath.is_dir root then
           begin
             Senv.feedback "[doc] Root: '%a'" Filepath.Normalized.pretty root ;
             Package.iter package ;

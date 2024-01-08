@@ -134,7 +134,7 @@
   half_smallest_pos5 ∈ {0x1.0000000000000p-149}
 [eva] const.i:48: assertion got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   f_ ∈ {-0x0.0000000000000p0}

@@ -87,7 +87,7 @@
   signed overflow. assert x + tmp_9 ≤ 2147483647;
                    (tmp_9 from bts963b())
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function main

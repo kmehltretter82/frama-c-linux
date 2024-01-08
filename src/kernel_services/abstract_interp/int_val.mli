@@ -30,13 +30,15 @@ open Lattice_bounds
 
 include Datatype.S_with_collections
 
-module Widen_Hints = Datatype.Integer.Set
-type size_widen_hint = Integer.t
-type generic_widen_hint = Widen_Hints.t
+include Eva_lattice_type.Full_AI_Lattice_with_cardinality with type t := t
 
-include Eva_lattice_type.Full_AI_Lattice_with_cardinality
-  with type t := t
-   and type widen_hint = size_widen_hint * generic_widen_hint
+(** Hints for the widening: set of relevant thresholds. *)
+type widen_hint = Datatype.Integer.Set.t
+
+(** [widen ~size ~hint t1 t2] is an over-approximation of [join t1 t2].
+    [size] is the size (in bits) of the widened value, and [hint] is a set of
+    relevant thresholds. *)
+val widen: ?size:Integer.t -> ?hint:widen_hint -> t -> t -> t
 
 val zero: t
 val one: t
@@ -162,6 +164,16 @@ val bitwise_or: t -> t -> t
 val bitwise_xor: t -> t -> t
 val bitwise_signed_not: t -> t
 val bitwise_unsigned_not: size:int -> t -> t
+
+(** {2 Comparisons} *)
+
+(** [forward_comp op l r] returns the result of the comparison [l op r]. *)
+val forward_comp:
+  Abstract_interp.Comp.t -> t -> t -> Abstract_interp.Comp.result
+
+(** [backward_comp_left op l r] reduces [l] by assuming [l op r] holds. *)
+val backward_comp_left: Abstract_interp.Comp.t -> t -> t -> t or_bottom
+
 
 (** {2 Misc} *)
 

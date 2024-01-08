@@ -22,7 +22,7 @@
   function free: precondition 'freeable' got status valid.
 [eva:malloc] realloc_imprecise.c:16: weak free on bases: {__alloc_w_main}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]

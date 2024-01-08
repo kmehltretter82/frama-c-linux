@@ -1,7 +1,5 @@
 [kernel] Parsing recursion.c (with preprocessing)
 [eva] Analyzing a complete application starting at main_fail
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   p ∈ {0}
@@ -14,14 +12,11 @@
   Generating probably incomplete assigns to interpret the call. Try to increase
   the -eva-unroll-recursive-calls parameter or write a correct specification
   for function sum_nospec.
-[kernel:annot:missing-spec] recursion.c:423: Warning: 
-  Neither code nor specification for function sum_nospec, generating default assigns from the prototype
 [eva] using specification for function sum_nospec
 [eva] recursion.c:442: Frama_C_show_each_unreachable: [-2147483648..2147483647]
-[eva] done for function main_fail
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function sum_nospec:
-  res ∈ [--..--]
+  res ∈ [--..--] or UNINITIALIZED
   __retres ∈ [--..--]
 [eva:final-states] Values at end of function main_fail:
   Frama_C_entropy_source ∈ [--..--]

@@ -1,7 +1,5 @@
 [kernel] Parsing split-array.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   t1[0] ∈ {1}
     [1] ∈ {2}
@@ -20,7 +18,6 @@
        [2] ∈ {4}
 [eva:alarm] split-array.c:4: Warning: 
   function main: precondition got status unknown.
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   S ∈ {6; 9; 30}

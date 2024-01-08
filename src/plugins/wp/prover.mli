@@ -29,6 +29,7 @@ open VCS
 val simplify :
   ?start:(Wpo.t -> unit) ->
   ?result:(Wpo.t -> prover -> result -> unit) ->
+  ?commit:bool ->
   Wpo.t -> bool Task.task
 
 val prove : Wpo.t ->

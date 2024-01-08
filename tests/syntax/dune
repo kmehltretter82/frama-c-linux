@@ -1,0 +1,4 @@
+(cram
+  (applies_to cpp-command)
+  (enabled_if %{read:../../python-3.7-available})
+)

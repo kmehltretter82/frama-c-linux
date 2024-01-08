@@ -26,32 +26,27 @@ import Lodash from 'lodash';
 import * as Dome from 'dome';
 import * as Editor from 'dome/text/editor';
 import * as Utils from 'dome/data/arrays';
-import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
-import { key } from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import { IconButton } from 'dome/controls/buttons';
 import { Filler, Inset } from 'dome/frame/toolbars';
+import * as Studia from 'frama-c/plugins/studia';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { text } from 'frama-c/kernel/api/data';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Properties from 'frama-c/kernel/api/properties';
-import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
+import * as Locations from './Locations';
 
 import { TitleBar } from 'ivette';
 import * as Preferences from 'ivette/prefs';
-
-
 
 // -----------------------------------------------------------------------------
 //  Utilitary types and functions
 // -----------------------------------------------------------------------------
 
 // An alias type for functions and locations.
-type Fct = string | undefined;
+type Decl = Ast.decl | undefined;
 type Marker = Ast.marker | undefined;
-
-const noMarker = Ast.jMarker('');
 
 // A range is just a pair of position in the code.
 type Range = Editor.Range;
@@ -175,19 +170,11 @@ const Ranges = Editor.createAspect({ t: Tree }, ({ t }) => markersRanges(t));
 //  Selected marker representation
 // -----------------------------------------------------------------------------
 
-// This field contains the currently selected function.
-const Fct = Editor.createField<Fct>(undefined);
-
 // This field contains the currently selected marker.
 const Marker = Editor.createField<Marker>(undefined);
 
 // This field contains the current multiple selection.
 const Multiple = Editor.createField<Marker[]>([]);
-
-// The Ivette selection must be updated by CodeMirror plugins. This input
-// add the callback in the CodeMirror internal state.
-type UpdateSelection = (a: States.SelectionActions) => void;
-const UpdateSelection = Editor.createField<UpdateSelection>(() => { return; });
 
 // The marker field is considered as the ground truth on what is selected in the
 // CodeMirror document. To do so, we catch the mouseup event (so when the user
@@ -196,14 +183,12 @@ const UpdateSelection = Editor.createField<UpdateSelection>(() => { return; });
 // component's render and thus update everything else.
 const MarkerUpdater = createMarkerUpdater();
 function createMarkerUpdater(): Editor.Extension {
-  const deps = { fct: Fct, tree: Tree, update: UpdateSelection };
+  const deps = { tree: Tree };
   return Editor.createEventHandler(deps, {
-    mouseup: ({ fct, tree, update }, view, event) => {
+    mouseup: ({ tree }, view, event) => {
       const main = view.state.selection.main;
       const marker = coveringNode(tree, main.from)?.marker;
-      const location = { fct, marker };
-      update({ location });
-      if (event.altKey) States.MetaSelection.emit(location);
+      States.setMarked(marker, event.altKey);
     }
   });
 }
@@ -220,7 +205,7 @@ function createMarkerScroller(): Editor.Extension {
     if (markerRanges.length !== 1) return;
     const { from: anchor } = markerRanges[0];
     const line = view.state.doc.lineAt(anchor).number;
-    Editor.selectLine(view, line, false);
+    Editor.selectLine(view, line, false, false);
   });
 }
 
@@ -235,39 +220,32 @@ function createMarkerScroller(): Editor.Extension {
 // This field contains the currently hovered marker.
 const Hovered = Editor.createField<Marker>(undefined);
 
-// The Ivette hovered element must be updated by CodeMirror plugins. This
-// field add the callback in the CodeMirror internal state.
-type UpdateHovered = (h: States.Hovered) => void;
-const UpdateHovered = Editor.createField<UpdateHovered>(() => { return; });
-
 // The Hovered field is updated each time the mouse moves through the CodeMirror
 // document. The handlers updates the Ivette hovered information, which is then
 // reflected on the Hovered field by the Editor component itself.
 const HoveredUpdater = createHoveredUpdater();
 function createHoveredUpdater(): Editor.Extension {
-  const deps = { fct: Fct, tree: Tree, update: UpdateHovered };
+  const deps = { tree: Tree };
   return Editor.createEventHandler(deps, {
     mousemove: (inputs, view, event) => {
-      const { fct, tree, update: updateHovered } = inputs;
+      const { tree } = inputs;
       const coords = { x: event.clientX, y: event.clientY };
-      const reset = (): void => updateHovered(undefined);
       const pos = view.posAtCoords(coords);
-      if (!pos) { reset(); return; }
-      const hov = coveringNode(tree, pos);
-      if (!hov) { reset(); return; }
-      const from = view.coordsAtPos(hov.from);
-      if (!from) { reset(); return; }
-      const to = view.coordsAtPos(hov.to);
-      if (!to) { reset(); return; }
+      if (!pos) { States.setHovered(); return; }
+      const node = coveringNode(tree, pos);
+      if (!node) { States.setHovered(); return; }
+      const from = view.coordsAtPos(node.from);
+      if (!from) { States.setHovered(); return; }
+      const to = view.coordsAtPos(node.to);
+      if (!to) { States.setHovered(); return; }
       const left = Math.min(from.left, to.left);
       const right = Math.max(from.left, to.left);
       const top = Math.min(from.top, to.top);
       const bottom = Math.max(from.bottom, to.bottom);
       const horizontallyOk = left <= coords.x && coords.x <= right;
       const verticallyOk = top <= coords.y && coords.y <= bottom;
-      if (!horizontallyOk || !verticallyOk) { reset(); return; }
-      const marker = hov.marker;
-      updateHovered(marker ? { fct, marker } : undefined);
+      if (!horizontallyOk || !verticallyOk) { States.setHovered(); return; }
+      States.setHovered(node.marker);
     }
   });
 }
@@ -322,14 +300,39 @@ function createMultipleDecorator(): Editor.Extension {
 // -----------------------------------------------------------------------------
 
 // This field contains the dead code information as inferred by Eva.
-const emptyDeadCode = { unreachable: [], nonTerminating: [] };
+const emptyDeadCode = { reached: [], unreachable: [], nonTerminating: [] };
 const Dead = Editor.createField<Eva.deadCode>(emptyDeadCode);
+
+// Comparison function on ranges
+function compareRange(x: Range, y: Range): number {
+  return (x.from !== y.from) ? (x.from - y.from) : (y.to - x.to);
+}
+
+// The unreachable statements given by the server may contain reachable
+// statements. This function is used to filter those reached statements.
+function filterReached(unreachables: Range[], reachables: Range[]): Range[] {
+  /* Sort [reachables] to always find the first largest reachable statement
+     within an unreachable one (if any). */
+  reachables.sort(compareRange);
+  function keepTrulyUnreached(unreached: Range): Range[] {
+    const reached = reachables.find((r) => Editor.startInto(r, unreached));
+    if (reached === undefined) return [unreached];
+    const firstUnreached = { from: unreached.from, to: reached.from - 1 };
+    const next = { from: reached.to + 1, to: unreached.to };
+    const result = (reached.to < unreached.to) ? keepTrulyUnreached(next) : [];
+    if (unreached.from < reached.from) result.unshift(firstUnreached);
+    return result;
+  }
+  return unreachables.map(keepTrulyUnreached).flat();
+}
 
 const UnreachableRanges = createUnreachableRanges();
 function createUnreachableRanges(): Editor.Aspect<Editor.Range[]> {
   const deps = { dead: Dead, ranges: Ranges };
   return Editor.createAspect(deps, ({ dead, ranges }) => {
-    return mapFilter(dead.unreachable, m => ranges.get(m)).flat();
+    const unreachable = mapFilter(dead.unreachable, m => ranges.get(m)).flat();
+    const reached = mapFilter(dead.reached, m => ranges.get(m)).flat();
+    return filterReached(unreachable, reached);
   });
 }
 
@@ -487,46 +490,6 @@ function createPropertiesGutter(): Editor.Extension {
 
 
 // -----------------------------------------------------------------------------
-//  Studia access
-// -----------------------------------------------------------------------------
-
-type access = 'Reads' | 'Writes';
-
-interface StudiaProps {
-  marker: string,
-  attrs: Ast.markerAttributesData,
-  kind: access,
-}
-
-interface StudiaInfos {
-  name: string,
-  title: string,
-  locations: { fct: key<'#fct'>, marker: Ast.marker }[],
-  index: number,
-}
-
-async function studia(props: StudiaProps): Promise<StudiaInfos> {
-  const { marker, attrs, kind } = props;
-  const request = kind === 'Reads' ? getReadsLval : getWritesLval;
-  const data = await Server.send(request, marker);
-  const locations = data.direct.map(([f, m]) => ({ fct: f, marker: m }));
-  const lval = attrs.name;
-  if (locations.length > 0) {
-    const name = `${kind} of ${lval}`;
-    const acc = (kind === 'Reads') ? 'accessing' : 'modifying';
-    const title =
-      `List of statements ${acc} the memory location pointed by ${lval}.`;
-    return { name, title, locations, index: 0 };
-  }
-  const name = `No ${kind.toLowerCase()} of ${lval}`;
-  return { name, title: '', locations: [], index: 0 };
-}
-
-// -----------------------------------------------------------------------------
-
-
-
-// -----------------------------------------------------------------------------
 //  Context menu
 // -----------------------------------------------------------------------------
 
@@ -535,69 +498,62 @@ const Callers = Editor.createField<Eva.CallSite[]>([]);
 
 // This field contains the function pointed to by the current hovered marker,
 // as inferred by Eva.
-const Callees = Editor.createField<Fct[]>([]);
-
-// This field contains information on markers.
-type GetMarkerData = (key: Ast.marker) => Ast.markerAttributesData | undefined;
-const GetMarkerData = Editor.createField<GetMarkerData>(() => undefined);
+const Callees = Editor.createField<Ast.decl[]>([]);
 
 const ContextMenuHandler = createContextMenuHandler();
 function createContextMenuHandler(): Editor.Extension {
-  const data = { tree: Tree, callers: Callers, callees: Callees };
-  const deps = { ...data, update: UpdateSelection, getData: GetMarkerData };
+  const deps = {
+    tree: Tree,
+    callers: Callers,
+    callees: Callees,
+  };
   return Editor.createEventHandler(deps, {
     contextmenu: (inputs, view, event) => {
-      const { tree, callers, callees, update, getData } = inputs;
+      const { tree, callers, callees } = inputs;
       const coords = { x: event.clientX, y: event.clientY };
       const position = view.posAtCoords(coords); if (!position) return;
       const node = coveringNode(tree, position);
       if (!node || !node.marker) return;
       const items: Dome.PopupMenuItem[] = [];
-      const attrs = getData(node.marker);
-      if (attrs?.isFunDecl) {
-        const groupedCallers = Lodash.groupBy(callers, (cs) => cs.kf);
-        const locations =
-          callers.map(({ kf, stmt }) => ({ fct: kf, marker: stmt }));
-        Lodash.forEach(groupedCallers, (e) => {
-          const callerName = e[0].kf;
-          const callSites = e.length > 1 ? `(${e.length} call sites)` : '';
-          items.push({
-            label: `Go to caller ${callerName} ` + callSites,
-            onClick: () => update({
-              name: `Call sites of function ${attrs.name}`,
-              locations: locations,
-              index: locations.findIndex(l => l.fct === callerName)
-            })
+      const attributes = States.getMarker(node.marker);
+      const { kind, labelKind, name, definition } = attributes;
+      if (kind === 'DFUN') {
+        const groupedCallers = Lodash.groupBy(callers, ({ call }) => call);
+        const markers = callers.map(({ stmt }) => stmt);
+        const descr = `Calls to ${name}`;
+        Lodash.forEach(groupedCallers, (group) => {
+          const n = group.length;
+          const { call } : Eva.CallSite = group[0];
+          const { name: fct } = States.getDeclaration(call);
+          const caller = `caller ${fct}`;
+          const nsites = n > 1 ? `s (${n} call sites)` : '';
+          const label = `Go to ${caller}${nsites}`;
+          const index = callers.findIndex(({ call: f }) => f === call);
+          const onClick = (): void => Locations.setSelection({
+            label: descr, markers, index, plugin: 'Callers',
           });
+          items.push({ label, onClick });
         });
-      } else if (attrs?.isFunction) {
-        const location = { fct: attrs.name };
-        const onClick = (): void => update({ location });
-        const label = `Go to definition of ${attrs.name}`;
+      } else if (definition) {
+        const label = `Go to ${name} (${labelKind.toLowerCase()})`;
+        const onClick = (): void => States.setSelected(definition);
         items.push({ label, onClick });
-      }
-      else if (attrs?.isFunctionPointer) {
-        Lodash.forEach(callees, (fct) => {
-          const onClick = (): void => update({ location: { fct } });
-          const label = `Go to definition of ${fct} (indirect)`;
+      } else if (callees.length > 0) {
+        callees.forEach((decl) => {
+          const { name: fct } = States.getDeclaration(decl);
+          const onClick = (): void => States.setCurrentScope(decl);
+          const label = `Go to ${fct} (indirect call)`;
           items.push({ label, onClick });
         });
       }
-      const enabled = attrs?.isLval;
-      const onClick = (kind: access): void => {
-        if (attrs && node.marker)
-          studia({ marker: node.marker, attrs, kind }).then(update);
-      };
-      const reads = 'Studia: select reads';
-      const writes = 'Studia: select writes';
-      items.push({ label: reads, enabled, onClick: () => onClick('Reads') });
-      items.push({ label: writes, enabled, onClick: () => onClick('Writes') });
-      const copy = (): void => {
-        const text = view.state.sliceDoc(node.from, node.to);
-        if (text !== '') navigator.clipboard.writeText(text);
-      };
-      items.push({ label: 'Copy to clipboard', onClick: copy });
-      if (items.length > 0) Dome.popupMenu(items);
+      Studia.buildMenu(items, attributes);
+      items.push({
+        label: 'Copy to clipboard',
+        onClick: () => {
+          const text = view.state.sliceDoc(node.from, node.to);
+          if (text !== '') navigator.clipboard.writeText(text);
+      } });
+      Dome.popupMenu(items);
       return;
     }
   });
@@ -671,29 +627,40 @@ function createTaintTooltip(): Editor.Extension {
 // -----------------------------------------------------------------------------
 
 // Server request handler returning the given function's text.
-function useFctText(fct: Fct): text {
-  return States.useRequest(Ast.printFunction, fct) ?? null;
-}
-
-// Server request handler returning the given function's dead code information.
-function useFctDead(fct: Fct): Eva.deadCode {
-  const empty = { unreachable: [], nonTerminating: [] };
-  return States.useRequest(Eva.getDeadCode, fct) ?? empty;
+function useAST(decl: Ast.decl | undefined): text {
+  return States.useRequest(
+    Ast.printDeclaration, decl || undefined,
+    { onError: [] }
+  ) ?? [];
 }
 
 // Server request handler returning the given function's callers.
-function useFctCallers(fct: Fct): Eva.CallSite[] {
-  return States.useRequest(Eva.getCallers, fct) ?? [];
+function useCallers(decl: Decl): Eva.CallSite[] {
+  return States.useRequest(
+    Eva.getCallers, decl || undefined,
+    { onError: [] }
+  ) ?? [];
 }
 
 // Server request handler returning the given function's callers.
-function useCallees(marker: Marker): Fct[] {
-  return States.useRequest(Eva.getCallees, marker || undefined) ?? [];
+function useCallees(marker: Marker): Ast.decl[] {
+  return States.useRequest(
+    Eva.getCallees, marker || undefined,
+    { onError: [] }
+  ) ?? [];
 }
 
 // Server request handler returning the tainted lvalues.
-function useFctTaints(fct: Fct): Eva.LvalueTaints[] {
-  return States.useRequest(Eva.taintedLvalues, fct, { onError: [] }) ?? [];
+function useTaints(decl: Decl): Eva.LvalueTaints[] {
+  return States.useRequest(Eva.taintedLvalues, decl, { onError: [] }) ?? [];
+}
+
+// Server request handler returning the given function's dead code information.
+function useDead(decl: Decl): Eva.deadCode {
+  return States.useRequest(
+    Eva.getDeadCode, decl || undefined,
+    { onError: emptyDeadCode }
+  ) ?? emptyDeadCode;
 }
 
 // -----------------------------------------------------------------------------
@@ -728,48 +695,37 @@ export default function ASTview(): JSX.Element {
   const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
   const { view, Component } = Editor.Editor(extensions);
 
-  // Updating CodeMirror when the selection or its callback are changed.
-  const [selection, setSel] = States.useSelection();
-  React.useEffect(() => UpdateSelection.set(view, setSel), [view, setSel]);
-  const fct = selection?.current?.fct;
-  React.useEffect(() => Fct.set(view, fct), [view, fct]);
-  const marker = selection?.current?.marker;
+  // Current selection
+  const { scope, marker = Ast.markerDefault } = States.useCurrentLocation();
   React.useEffect(() => Marker.set(view, marker), [view, marker]);
-  const multiple = selection?.multiple.allSelections.map(l => l.marker);
-  React.useEffect(() => Multiple.set(view, multiple), [view, multiple]);
-
-  // Updating CodeMirror when the <updateHovered> callback is changed.
-  const [hov, setHov] = States.useHovered();
-  const hovered = hov?.marker ?? noMarker;
-  React.useEffect(() => UpdateHovered.set(view, setHov), [view, setHov]);
+  const hovered = States.useHovered() ?? Ast.markerDefault;
   React.useEffect(() => Hovered.set(view, hovered), [view, hovered]);
 
-  // Updating CodeMirror when the <properties> synchronized array is changed.
+  // Multiple selection
+  const { markers } = Locations.useSelection();
+  React.useEffect(() => Multiple.set(view, markers), [view, markers]);
+
+  // Property status
   const props = States.useSyncArrayData(Properties.status);
   React.useEffect(() => PropertiesStatuses.set(view, props), [view, props]);
 
-  // Updating CodeMirror when the <propStatusTags> map is changed.
+  // Property tags
   const tags = States.useTags(Properties.propStatusTags);
   React.useEffect(() => Tags.set(view, tags), [view, tags]);
 
-  // Updating CodeMirror when the <markersInfo> synchronized array is changed.
-  const getData = States.useSyncArrayGetter(Ast.markerAttributes);
-  React.useEffect(() => GetMarkerData.set(view, getData), [view, getData]);
-
-  // Retrieving data on currently selected function and updating CodeMirror when
-  // they have changed.
-  const text = useFctText(fct);
+  // Printed AST
+  const text = useAST(scope);
   React.useEffect(() => Text.set(view, text), [view, text]);
-  const dead = useFctDead(fct);
-  React.useEffect(() => Dead.set(view, dead), [view, dead]);
-  const callers = useFctCallers(fct);
-  React.useEffect(() => Callers.set(view, callers), [view, callers]);
-  const taints = useFctTaints(fct);
-  React.useEffect(() => TaintedLvalues.set(view, taints), [view, taints]);
 
-  // Retrieving data on currently hovered marker.
+  // EVA Callbacks
+  const dead = useDead(scope);
+  React.useEffect(() => Dead.set(view, dead), [view, dead]);
+  const callers = useCallers(scope);
+  React.useEffect(() => Callers.set(view, callers), [view, callers]);
   const callees = useCallees(hovered);
   React.useEffect(() => Callees.set(view, callees), [view, callees]);
+  const taints = useTaints(scope);
+  React.useEffect(() => TaintedLvalues.set(view, taints), [view, taints]);
 
   return (
     <>

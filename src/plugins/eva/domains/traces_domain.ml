@@ -1089,6 +1089,9 @@ module D = struct
   type location = Precise_locs.precise_location
   type origin
 
+  let value_dependencies = Main_values.cval
+  let location_dependencies = Main_locations.ploc
+
   include (Traces: sig
              include Datatype.S_with_collections with type t = state
              include Abstract_domain.Lattice with type state := state
@@ -1259,6 +1262,15 @@ module D = struct
         if Parameters.TracesProject.get ()
         then project_of_cfg return_exp state
 end
+
+let registered =
+  let name = "traces"
+  and descr =
+    "Builds an over-approximation of all the traces that lead to a statement."
+  in
+  Abstractions.Domain.register ~name ~descr ~priority:2 ~experimental:true
+    (module D)
+
 
 
 (*

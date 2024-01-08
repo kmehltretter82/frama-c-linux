@@ -184,18 +184,14 @@ let eval_assigns kf state assigns =
       over_outputs_if_termination = r.over_outputs_d;
     }
 
-let compute_using_prototype_state state kf =
+let compute_using_spec state kf =
   let behaviors = Eva.Logic_inout.valid_behaviors kf state in
   let assigns = Ast_info.merge_assigns behaviors in
   eval_assigns kf state assigns
 
-let compute_using_given_spec_state state funspec kf =
-  let assigns = Ast_info.merge_assigns funspec.spec_behavior in
-  eval_assigns kf state assigns
-
 let compute_using_prototype ?stmt kf =
   let state = Cumulative_analysis.specialize_state_on_call ?stmt kf in
-  compute_using_prototype_state state kf
+  compute_using_spec state kf
 
 (* Results of this module, consolidated by functions. Formals and locals
    are stored *)
@@ -207,13 +203,16 @@ module Internals =
       let size = 17
     end)
 
-module CallsiteHash = Value_types.Callsite.Hashtbl
+module Callsite =
+  Datatype.Pair_with_collections (Kernel_function) (Cil_datatype.Kinstr)
+    (struct let module_name = "From.Callsite" end)
+module CallsiteHash = Callsite.Hashtbl
 
 (* Results of an an entire call, represented by a pair (stmt, kernel_function).
 *)
 module CallwiseResults =
   State_builder.Hashtbl
-    (Value_types.Callsite.Hashtbl)
+    (Callsite.Hashtbl)
     (Inout_type)
     (struct
       let size = 17
@@ -561,48 +560,37 @@ module Callwise = struct
     Internals.replace kf (Inout_type.join v prev);
   ;;
 
-  let merge_local_table_in_global_ones =
-    CallsiteHash.iter merge_call_in_global_tables
-  ;;
-
 
   let call_inout_stack = ref []
 
-  let call_for_callwise_inout callstack _kf call_type state =
-    let (current_function, ki as call_site) = List.hd callstack in
-    let merge_inout inout =
-      Db.Operational_inputs.Record_Inout_Callbacks.apply (callstack, inout);
-      if ki = Kglobal
-      then merge_call_in_global_tables call_site inout
-      else
-        let _above_function, table =
-          try List.hd !call_inout_stack
-          with Failure _ -> assert false
-        in
-        merge_call_in_local_table call_site table inout
-    in
-    match call_type with
-    | `Builtin (Some (froms,sure_out)) ->
-      let in_, out_ = extract_inout_from_froms froms in
-      let inout = {
-        over_inputs_if_termination = in_;
-        over_inputs = in_;
-        over_logic_inputs = Zone.bottom;
-        over_outputs_if_termination = out_ ;
-        over_outputs = out_;
-        under_outputs_if_termination = sure_out;
-      } in
-      merge_inout inout
-    | `Def | `Memexec ->
+  let call_for_callwise_inout _callstack kf _state = function
+    | `Body ->
       let table_current_function = CallsiteHash.create 7 in
-      call_inout_stack :=
-        (current_function, table_current_function) :: !call_inout_stack
-    | `Spec spec ->
-      let inout =compute_using_given_spec_state state spec current_function in
-      merge_inout inout
-    | `Builtin None ->
-      let inout = compute_using_prototype_state state current_function in
-      merge_inout inout
+      call_inout_stack := (kf, table_current_function) :: !call_inout_stack
+    | `Reuse | `Spec | `Builtin -> ()
+
+  let pop_local_table kf =
+    match !call_inout_stack with
+    | (kf', table) :: tail ->
+      if not (Kernel_function.equal kf kf') then
+        Inout_parameters.fatal "callwise inout: %a != %a@."
+          Kernel_function.pretty kf Kernel_function.pretty kf';
+      CallsiteHash.iter merge_call_in_global_tables table;
+      call_inout_stack := tail;
+    | [] -> Inout_parameters.fatal "callwise: internal stack is empty"
+
+  let end_record callstack kf inout =
+    Db.Operational_inputs.Record_Inout_Callbacks.apply inout;
+    let callsite = Eva.Callstack.top_callsite callstack in
+    match callsite, !call_inout_stack with
+    | Kstmt _, (_caller, table) :: _ ->
+      merge_call_in_local_table (kf, callsite) table inout;
+    | Kglobal, [] ->  (* the entry point *)
+      merge_call_in_global_tables (kf, callsite) inout;
+      CallwiseResults.mark_as_computed ()
+    | _ ->
+      Inout_parameters.fatal
+        "callwise: internal stack is inconsistent with Eva callstack"
 
 
   module MemExec =
@@ -615,25 +603,6 @@ module Callwise = struct
         let name = "Operational_inputs.MemExec"
       end)
 
-
-  let end_record call_stack inout =
-    merge_local_table_in_global_ones (snd (List.hd !call_inout_stack));
-
-    let (current_function, _ as call_site) = List.hd call_stack in
-    (* pop + record in top of stack the inout of function that just finished*)
-    match !call_inout_stack with
-    | (current_function2, _) :: (((_caller, table) :: _) as tail) ->
-      if current_function2 != current_function then
-        Inout_parameters.fatal "callwise inout %a != %a@."
-          Kernel_function.pretty current_function (* g *)
-          Kernel_function.pretty current_function2 (* f *);
-      call_inout_stack := tail;
-      merge_call_in_local_table call_site table inout;
-
-    | _ ->  (* the entry point, probably *)
-      merge_call_in_global_tables call_site inout;
-      call_inout_stack := [];
-      CallwiseResults.mark_as_computed ()
 
   let compute_call_from_value_states kf call_stack states =
     let module Fenv = (val Dataflows.function_env kf: Dataflows.FUNCTION_ENV) in
@@ -673,9 +642,10 @@ module Callwise = struct
     in
     Computer.end_dataflow ()
 
-  let record_for_callwise_inout callstack kf value_res =
-    let inout = match value_res with
-      | Eva.Cvalue_callbacks.Store ({before_stmts}, memexec_counter) ->
+  let record_for_callwise_inout callstack kf pre_state value_res =
+    let inout =
+      match value_res with
+      | `Body (Eva.Cvalue_callbacks.{before_stmts}, memexec_counter) ->
         let inout =
           if Eva.Analysis.save_results kf
           then
@@ -684,12 +654,23 @@ module Callwise = struct
           else top
         in
         MemExec.replace memexec_counter inout;
+        pop_local_table kf;
         inout
-      | Reuse counter ->
-        MemExec.find counter
+      | `Reuse counter -> MemExec.find counter
+      | `Spec _states
+      | `Builtin (_states, None) -> compute_using_spec pre_state kf
+      | `Builtin (_states, Some (froms,sure_out)) ->
+        let in_, out_ = extract_inout_from_froms froms in
+        {
+          over_inputs_if_termination = in_;
+          over_inputs = in_;
+          over_logic_inputs = Zone.bottom;
+          over_outputs_if_termination = out_ ;
+          over_outputs = out_;
+          under_outputs_if_termination = sure_out;
+        }
     in
-    Db.Operational_inputs.Record_Inout_Callbacks.apply (callstack, inout);
-    end_record callstack inout
+    end_record callstack kf inout
 
 
   (* Register our callbacks inside the value analysis *)

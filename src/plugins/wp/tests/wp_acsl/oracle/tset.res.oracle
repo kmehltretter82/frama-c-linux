@@ -5,30 +5,28 @@
   Global
 ------------------------------------------------------------
 
-Lemma UNION_DESCR:
-Assume: 'UNION_RANGE' 'UNION_LIFT' 'UNION_EQ'
-Prove: true
+Goal Lemma 'UNION_DESCR':
+Assume Lemmas: 'UNION_RANGE' 'UNION_LIFT' 'UNION_EQ'
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma UNION_EQ:
-Prove: (((x_0=0) \/ (y_0=x_0)) /\ ((y_0=0) \/ (y_0=x_0)))=(y_0=x_0)
+Goal Lemma 'UNION_EQ':
+Prove: (((x = 0) \/ (y = x)) /\ ((y = 0) \/ (y = x))) <-> (y = x).
 
 ------------------------------------------------------------
 
-Lemma UNION_LIFT:
-Assume: 'UNION_EQ'
-Prove: true
+Goal Lemma 'UNION_LIFT':
+Assume Lemmas: 'UNION_EQ'
+Prove: true.
 
 ------------------------------------------------------------
 
-Lemma UNION_RANGE:
-Assume: 'UNION_LIFT' 'UNION_EQ'
-Prove: (0<=k_0) -> (k_0<=n_0)
-       -> (((k_0<n_0) -> (-1<=k_0)) /\ ((0<k_0) -> (k_0<=(1+n_0)))
-           /\ (forall i_0:int.
-               (0<=i_0) -> (i_0<=n_0)
-               -> ((i_0=k_0) \/ ((k_0<i_0) /\ (i_0<=n_0))
-                   \/ ((0<=i_0) /\ (i_0<k_0)))))
+Goal Lemma 'UNION_RANGE':
+Assume Lemmas: 'UNION_LIFT' 'UNION_EQ'
+Assume { Have: 0 <= k. Have: k <= n. }
+Prove: (((k < n) -> ((-1) <= k))) /\ (((0 < k) -> (k <= (1 + n)))) /\
+    (forall i : Z. ((0 <= i) -> ((i <= n) ->
+     ((i = k) \/ ((k < i) /\ (i <= n)) \/ ((0 <= i) /\ (i < k)))))).
 
 ------------------------------------------------------------

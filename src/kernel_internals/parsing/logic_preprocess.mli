@@ -22,15 +22,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** adds another pre-processing step in order to expand macros in
+(** adds another preprocessing step in order to expand macros in
     annotations.
 *)
 
 (** [file suffix cpp file] takes the file to preprocess,
-    and the pre-processing directive, and returns the name of the file
-    containing the completely pre-processed source. suffix will be appended
-    to the name of intermediate files generated for pre-processing annotations
-    (gcc pre-processing differs between .c and .cxx files)
+    and the preprocessing directive, and returns the name of the file
+    containing the completely preprocessed source. suffix will be appended
+    to the name of intermediate files generated for preprocessing annotations
+    (gcc preprocessing differs between .c and .cxx files)
 
     @raises Sys_error if the file cannot be opened.
 *)

@@ -19,7 +19,7 @@
 [eva] Recording results for crash
 [eva] Done for function crash
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] absolute_pointer.i:12: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

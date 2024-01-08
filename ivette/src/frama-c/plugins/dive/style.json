@@ -168,17 +168,15 @@
   {
     "selector": "node[nkind='composite']",
     "style": {
-      "ghost": "yes",
-      "ghost-offset-x": "6px",
-      "ghost-offset-y": "6px",
-      "ghost-opacity": "0.7"
+      "border-style": "double",
+      "border-width": "5px"
     }
   },
   {
     "selector": "node[taint='direct']",
     "style": {
       "underlay-color": "#882288",
-      "underlay-padding": "14px",
+      "underlay-padding": "12px",
       "underlay-opacity": 0.4
     }
   },
@@ -186,7 +184,7 @@
     "selector": "node[taint='indirect']",
     "style": {
       "underlay-color": "#73BBBB",
-      "underlay-padding": "14px",
+      "underlay-padding": "12px",
       "underlay-opacity": 0.8
     }
   },

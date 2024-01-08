@@ -6,7 +6,7 @@
 
 int ki[2], k ;
 int f (int vi, int i) {
-  static int si[2] = 0, so[2] = 0;
+  static int si[2] = {0}, so[2] = {0};
   int vo = so[i]/k + ki[i]*(vi - si[i]) ;
 
   so[i] = vo ;

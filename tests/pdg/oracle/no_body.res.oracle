@@ -4,8 +4,9 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
-[kernel:annot:missing-spec] no_body.c:24: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+[kernel:annot:missing-spec] no_body.c:13: Warning: 
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- main.
   Called from no_body.c:24.
 [eva] using specification for function f
@@ -30,7 +31,7 @@
 [eva] Recording results for loop
 [eva] Done for function loop
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [inout] InOut (internal) for function loop:
   Operational inputs:
     G; x

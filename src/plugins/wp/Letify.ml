@@ -68,10 +68,10 @@ struct
   let frank = function
     | ACSL _ -> 0
     | CTOR _ -> 3
-    | Model { m_category = Function } -> 0
-    | Model { m_category = Injection } -> 1
-    | Model { m_category = Operator _ } -> 2
-    | Model { m_category = Constructor } -> 3
+    | FUN { m_category = Function } -> 0
+    | FUN { m_category = Injection } -> 1
+    | FUN { m_category = Operator _ } -> 2
+    | FUN { m_category = Constructor } -> 3
 
   let reduce env a b =
     if F.is_subterm a b then add_sigma env b a else

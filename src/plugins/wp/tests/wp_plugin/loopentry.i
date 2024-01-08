@@ -7,7 +7,9 @@ void f(int n,int p)
   r = 0;
   /*@ 
     loop invariant \at(n,LoopEntry) == \at(n+p,Pre);
+    loop invariant 0 ≤ n ≤ \at(n + p,Pre);
     loop invariant n + r == \at(n,LoopEntry);
+    loop variant n;
   */
   while (n--) r++;
 }

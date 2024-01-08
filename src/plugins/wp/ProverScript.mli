@@ -24,6 +24,7 @@ open VCS
 
 (** - [valid]: Play provers with valid result (default: true)
     - [failed]: Play provers with invalid result (default: true)
+    - [scratch]: Discard existing script (default: false)
     - [provers]: Additional list of provers to {i try} when stuck
     - [depth]: Strategy search depth (default: 0)
     - [width]: Strategy search width (default: 0)
@@ -33,11 +34,13 @@ open VCS
 type 'a process =
   ?valid:bool ->
   ?failed:bool ->
+  ?scratch:bool ->
   ?provers:prover list ->
   ?depth:int ->
   ?width:int ->
   ?backtrack:int ->
   ?auto:Strategy.heuristic list ->
+  ?strategies:bool ->
   ?start:(Wpo.t -> unit) ->
   ?progress:(Wpo.t -> string -> unit) ->
   ?result:(Wpo.t -> prover -> result -> unit) ->
@@ -60,5 +63,14 @@ val search :
   ProofEngine.node ->
   unit
 
+val explore :
+  ?depth:int ->
+  ?strategy:ProofStrategy.strategy ->
+  ?progress:(Wpo.t -> string -> unit) ->
+  ?result:(Wpo.t -> prover -> result -> unit) ->
+  ?success:(Wpo.t -> prover option -> unit) ->
+  ProofEngine.tree ->
+  ProofEngine.node ->
+  unit
+
 val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
-val save : stdout:bool -> Wpo.t -> unit

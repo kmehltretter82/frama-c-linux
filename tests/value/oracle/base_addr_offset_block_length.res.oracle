@@ -23,7 +23,7 @@
 [eva] base_addr_offset_block_length.i:27: assertion got status valid.
 [eva] base_addr_offset_block_length.i:28: assertion got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   px ∈ {{ &x + {4} }}
@@ -42,7 +42,7 @@
 [eva] base_addr_offset_block_length.i:20: assertion got status valid.
 [eva] base_addr_offset_block_length.i:23: assertion got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   px ∈ {{ &x + {4} }}

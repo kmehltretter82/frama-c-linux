@@ -33,7 +33,7 @@
 [eva] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function g:
   NON TERMINATING FUNCTION
@@ -213,8 +213,9 @@
   Y ∈ {0}
 [eva] computing for function f_slice_1 <- main.
   Called from bts1194.c:32.
-[kernel:annot:missing-spec] bts1194.c:13: Warning: 
-  Neither code nor specification for function input, generating default assigns from the prototype
+[kernel:annot:missing-spec] bts1194.c:9: Warning: 
+  Neither code nor specification for function input,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function input <- f_slice_1 <- main.
   Called from bts1194.c:13.
 [eva] using specification for function input
@@ -223,7 +224,7 @@
 [eva] Recording results for f_slice_1
 [eva] Done for function f_slice_1
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [pdg] computing for function input
 [from] Computing for function input
 [from] Done for function input

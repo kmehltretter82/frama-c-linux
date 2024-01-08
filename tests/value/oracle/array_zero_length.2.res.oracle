@@ -14,5 +14,4 @@
         ^^^^^^^^^^^^^^^
   14    char U1[0] = {};
   15    char V1[][2] = {};
-[kernel] User Error: stopping on file "array_zero_length.i" that has errors.
 [kernel] Frama-C aborted: invalid user input.

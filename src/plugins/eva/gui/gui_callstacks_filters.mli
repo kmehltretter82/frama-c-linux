@@ -26,7 +26,7 @@
 type rcallstack
 
 val empty: rcallstack
-val from_callstack: Value_types.callstack -> rcallstack
+val from_callstack: Callstack.t -> rcallstack
 
 
 (** Filters on callstacks. [None] means that all callstacks are active *)

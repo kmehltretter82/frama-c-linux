@@ -1,4 +1,10 @@
-# Nix
+# Frama-C build derivation
+# Input variables:
+# - `cover` (defaults to `true`) that indicates whether Frama-C should be
+#   compiled with coverage instrumentation,
+# - `release_mode` (defaults to `false`) that indicates whether Frama-C should
+#   be compiled in release mode.
+
 { lib
 , stdenvNoCC # for E-ACSL
 , fetchurl
@@ -11,6 +17,7 @@
 , findlib
 # Frama-C build
 , apron
+, bisect_ppx
 , camlzip
 , camomile
 , dune_3
@@ -44,6 +51,8 @@
 , dos2unix
 , doxygen
 , python3
+, python3Packages
+, cover ? true
 , release_mode ? false
 }:
 
@@ -69,6 +78,7 @@ stdenvNoCC.mkDerivation rec {
 
   buildInputs = [
     apron
+    bisect_ppx
     camlzip
     camomile
     dune_3
@@ -117,11 +127,15 @@ stdenvNoCC.mkDerivation rec {
   enableParallelBuilding = false;
   dune_opt = if release_mode then "--release" else "" ;
 
-  buildPhase = ''
-    dune build -j2 --display short --error-reporting=twice $release_mode @install
-    make tools/ptests/ptests.exe
-    make tools/ptests/wtests.exe
-  '';
+  buildPhase = (if cover then ''
+      export DUNE_WORKSPACE="dev/dune-workspace.cover"
+    '' else "") +
+    ''
+      dune build -j2 --display short --error-reporting=twice $dune_opt @install
+
+      make tools/ptests/ptests.exe
+      make tools/ptests/wtests.exe
+    '';
 
   installFlags = [
     "PREFIX=$(out)"

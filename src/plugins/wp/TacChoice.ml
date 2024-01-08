@@ -54,13 +54,21 @@ class absurd =
     inherit Tactical.make
         ~id:"Wp.absurd"
         ~title:"Absurd"
-        ~descr:"Contradict an Hypothesis"
+        ~descr:"Contradict the Goal or an Hypothesis"
         ~params:[]
 
     method select _feedback (s : Tactical.selection) =
       match s with
-      | Empty | Compose _ | Inside _ | Clause(Goal _) | Multi _
+      | Empty | Compose _ | Inside _ | Multi _
         -> Not_applicable
+      | Clause(Goal _) ->
+        let absurd (seq,goal) =
+          let goal = F.p_not goal in
+          let step = Conditions.step ~descr:"Absurd" (When goal) in
+          let hyps = Conditions.list seq in
+          let hyps = Conditions.sequence (hyps @ [step]) in
+          [ "Absurd", (hyps , F.p_false) ]
+        in Applicable absurd
       | Clause(Step s) ->
         begin
           match s.condition with

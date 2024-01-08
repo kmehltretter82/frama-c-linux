@@ -1,7 +1,5 @@
 [kernel] Parsing recursion-simple.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
 [eva:recursion] recursion-simple.c:4: 
@@ -17,7 +15,6 @@
 [eva:alarm] recursion-simple.c:4: Warning: 
   signed overflow. assert i * tmp ≤ 2147483647;
                    (tmp from factorial(i - 1))
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function factorial:
   __retres ∈ [-2147483646..2147483646]

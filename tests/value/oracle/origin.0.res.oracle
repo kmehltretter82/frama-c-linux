@@ -60,7 +60,7 @@
   signed overflow. assert -2147483648 ≤ -((int)((int *)ta1));
 [eva:alarm] origin.i:14: Warning: 
   signed overflow. assert -((int)((int *)ta1)) ≤ 2147483647;
-[eva] origin.i:14: 
+[eva:garbled-mix:write] origin.i:14: 
   Assigning imprecise value to pa1.
   The imprecision originates from Arithmetic {origin.i:14}
 [eva:alarm] origin.i:15: Warning: out of bounds write. assert \valid(pa1);
@@ -74,10 +74,10 @@
   signed overflow. assert -2147483648 ≤ -((int)((int *)ta2));
 [eva:alarm] origin.i:19: Warning: 
   signed overflow. assert -((int)((int *)ta2)) ≤ 2147483647;
-[eva] origin.i:19: 
+[eva:garbled-mix:write] origin.i:19: 
   Assigning imprecise value to pa2.
   The imprecision originates from Arithmetic {origin.i:19}
-[eva] origin.i:20: 
+[eva:garbled-mix:write] origin.i:20: 
   Assigning imprecise value to qa2.
   The imprecision originates from Arithmetic {origin.i:19}
 [eva:alarm] origin.i:20: Warning: 
@@ -86,7 +86,7 @@
   signed overflow. assert -2147483648 ≤ -((int)((int *)tta2));
 [eva:alarm] origin.i:20: Warning: 
   signed overflow. assert -((int)((int *)tta2)) ≤ 2147483647;
-[eva] origin.i:20: 
+[eva:garbled-mix:write] origin.i:20: 
   Assigning imprecise value to qa2.
   The imprecision originates from Arithmetic {origin.i:20}
 [eva:alarm] origin.i:21: Warning: out of bounds write. assert \valid(qa2);
@@ -102,7 +102,7 @@
   signed overflow. assert -2147483648 ≤ -((int)((int *)ta3));
 [eva:alarm] origin.i:25: Warning: 
   signed overflow. assert -((int)((int *)ta3)) ≤ 2147483647;
-[eva] origin.i:25: 
+[eva:garbled-mix:write] origin.i:25: 
   Assigning imprecise value to pa3.
   The imprecision originates from Arithmetic {origin.i:25}
 [eva:alarm] origin.i:26: Warning: out of bounds write. assert \valid(pa3);
@@ -110,8 +110,9 @@
 [eva] Done for function origin_arithmetic_3
 [eva] computing for function origin_leaf_1 <- main.
   Called from origin.i:97.
-[kernel:annot:missing-spec] origin.i:38: Warning: 
-  Neither code nor specification for function g, generating default assigns from the prototype
+[kernel:annot:missing-spec] origin.i:30: Warning: 
+  Neither code nor specification for function g,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function g <- origin_leaf_1 <- main.
   Called from origin.i:38.
 [eva] using specification for function g
@@ -131,13 +132,13 @@
   Called from origin.i:100.
 [eva] using specification for function gp
 [eva] Done for function gp
-[eva] origin.i:100: 
+[eva:garbled-mix:write] origin.i:100: 
   Assigning imprecise value to pl.
   The imprecision originates from Library function {origin.i:100}
 [eva:alarm] origin.i:101: Warning: out of bounds read. assert \valid_read(pl);
 [eva] computing for function origin_misalign_1 <- main.
   Called from origin.i:102.
-[eva] origin.i:48: 
+[eva:garbled-mix:write] origin.i:48: 
   Assigning imprecise value to pm1.
   The imprecision originates from Misaligned {origin.i:48}
 [eva:alarm] origin.i:49: Warning: out of bounds write. assert \valid(pm1);
@@ -145,7 +146,7 @@
 [eva] Done for function origin_misalign_1
 [eva] computing for function origin_misalign_2 <- main.
   Called from origin.i:103.
-[eva] origin.i:54: 
+[eva:garbled-mix:write] origin.i:54: 
   Assigning imprecise value to qm2.
   The imprecision originates from Misaligned {origin.i:54}
 [eva] origin.i:55: 
@@ -182,7 +183,7 @@
   signed overflow. assert -2147483648 ≤ -((int)(&arg));
 [eva:alarm] origin.i:85: Warning: 
   signed overflow. assert -((int)(&arg)) ≤ 2147483647;
-[eva] origin.i:85: 
+[eva:garbled-mix:write] origin.i:85: 
   Assigning imprecise value to esc3.
   The imprecision originates from Arithmetic {origin.i:85}
 [eva:alarm] origin.i:87: Warning: 
@@ -200,7 +201,7 @@
 [eva:locals-escaping] origin.i:108: Warning: 
   locals {local1} escaping the scope of local_escape_1 through esc4
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] origin.i:75: assertion 'Eva,initialization' got final status invalid.
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======

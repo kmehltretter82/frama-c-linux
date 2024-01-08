@@ -3,8 +3,9 @@
 --------------------------------------------------------------------------------
 --- No status to report
 --------------------------------------------------------------------------------
-[kernel:annot:missing-spec] hyp.i:25: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+[kernel:annot:missing-spec] hyp.i:7: Warning: 
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [kernel] SETTING STATUS OF assert \false; TO unknown
 [report] Computing properties status...
 
@@ -13,7 +14,7 @@
 --------------------------------------------------------------------------------
 
 [    -    ] Assigns nothing
-            tried with Inferred annotations.
+            tried with Populated status.
 [    -    ] Default behavior
             tried with Frama-C kernel.
 
@@ -38,7 +39,7 @@
 --------------------------------------------------------------------------------
 
 [    -    ] Assigns nothing
-            tried with Inferred annotations.
+            tried with Populated status.
 [    -    ] Default behavior
             tried with Frama-C kernel.
 

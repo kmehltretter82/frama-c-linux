@@ -75,7 +75,7 @@
 [eva] pthread_h.c:39: function printf_va_6: precondition got status valid.
 [eva] Done for function printf_va_6
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function start_routine:
   retval ∈ {43}

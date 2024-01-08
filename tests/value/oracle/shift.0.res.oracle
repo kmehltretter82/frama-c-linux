@@ -41,7 +41,7 @@
   unsigned overflow. assert 0 ≤ (unsigned long)((char *)t) << 8;
 [eva:alarm] shift.i:52: Warning: 
   unsigned overflow. assert (unsigned long)((char *)t) << 8 ≤ 4294967295;
-[eva] shift.i:52: 
+[eva:garbled-mix:write] shift.i:52: 
   Assigning imprecise value to r.
   The imprecision originates from Arithmetic {shift.i:52}
 [eva:alarm] shift.i:53: Warning: 
@@ -58,13 +58,13 @@
 [eva:alarm] shift.i:53: Warning: 
   signed overflow.
   assert (long)r + (long)((long)((char *)t) << 8) ≤ 2147483647;
-[eva] shift.i:53: 
+[eva:garbled-mix:write] shift.i:53: 
   Assigning imprecise value to r.
   The imprecision originates from Arithmetic
 [eva:alarm] shift.i:58: Warning: 
   unsigned overflow. assert 2U << 31 ≤ 4294967295;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] shift.i:35: assertion 'Eva,shift' got final status invalid.
 [eva] shift.i:36: assertion 'Eva,shift' got final status invalid.
 [eva] shift.i:40: assertion 'Eva,shift' got final status invalid.

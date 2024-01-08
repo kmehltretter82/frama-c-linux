@@ -61,7 +61,7 @@
 [eva] Recording results for ThrottleCmd
 [eva] Done for function ThrottleCmd
 [eva] Recording results for CruiseControl
-[eva] done for function CruiseControl
+[eva] Done for function CruiseControl
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function CruiseSpeedMgt:
   __retres ∈ {1}

@@ -38,13 +38,8 @@ let kernel_dependencies =
     Alarms.self;
     Annotations.code_annot_state; ]
 
-let dependencies = Db.Value.self :: kernel_dependencies
-
-let proxy = State_builder.Proxy.(create "eva" Forward dependencies)
+let proxy = State_builder.Proxy.(create "eva" Forward kernel_dependencies)
 let state = State_builder.Proxy.get proxy
-
-let () = State_builder.Proxy.extend [state] Db.Value.proxy
-
 
 (* Current state of the analysis *)
 type computation_state = NotComputed | Computing | Computed | Aborted
@@ -69,29 +64,13 @@ struct
   end
 
   module Datatype' = Datatype.Make (Prototype)
-  module Hook = Hook.Build (Prototype)
   include (State_builder.Ref (Datatype') (Prototype))
-
-  let set s = set s; Hook.apply s
-  let () = add_hook_on_update (fun r -> Hook.apply !r)
 end
 
 let is_computed () =
   match ComputationState.get () with
   | Computed | Aborted -> true
   | NotComputed | Computing -> false
-
-let current_computation_state = ComputationState.get
-let set_computation_state = ComputationState.set
-
-(* Register a hook on current computation state *)
-let register_computation_hook ?on f =
-  let f' = match on with
-    | None -> f
-    | Some s -> fun s' -> if s = s' then f s
-  in
-  ComputationState.Hook.extend f'
-
 
 (* Debug categories. *)
 let dkey_initial_state = register_category "initial-state"
@@ -114,8 +93,14 @@ let () =
 (* Warning categories. *)
 let wkey_alarm = register_warn_category "alarm"
 let wkey_locals_escaping = register_warn_category "locals-escaping"
-let wkey_garbled_mix = register_warn_category "garbled-mix"
-let () = set_warn_status wkey_garbled_mix Log.Winactive
+let wkey_garbled_mix_read = register_warn_category "garbled-mix:read"
+let () = set_warn_status wkey_garbled_mix_read Log.Wfeedback
+let wkey_garbled_mix_write = register_warn_category "garbled-mix:write"
+let () = set_warn_status wkey_garbled_mix_write Log.Wfeedback
+let wkey_garbled_mix_assigns = register_warn_category "garbled-mix:assigns"
+let () = set_warn_status wkey_garbled_mix_assigns Log.Winactive
+let wkey_garbled_mix_summary = register_warn_category "garbled-mix:summary"
+let () = set_warn_status wkey_garbled_mix_summary Log.Winactive
 let wkey_builtins_missing_spec = register_warn_category "builtins:missing-spec"
 let wkey_builtins_override = register_warn_category "builtins:override"
 let wkey_libc_unsupported_spec = register_warn_category "libc:unsupported-spec"

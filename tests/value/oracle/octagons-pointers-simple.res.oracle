@@ -38,7 +38,7 @@
 [eva:loop-unroll:partial] octagons-pointers-simple.c:49: 
   loop not completely unrolled
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cmdRead:
   len ∈ {{ &buffer + [3..433] }}
@@ -46,10 +46,10 @@
   elt1 ∈ {{ &buffer + [6..436] }}
   elt2 ∈ {{ &buffer + [10..440] }}
   elt3 ∈ {{ &buffer + [12..442] }}
-  c ∈ [--..--]
-  e1 ∈ [--..--]
-  e2 ∈ [--..--]
-  e3 ∈ [--..--]
+  c ∈ [--..--] or UNINITIALIZED
+  e1 ∈ [--..--] or UNINITIALIZED
+  e2 ∈ [--..--] or UNINITIALIZED
+  e3 ∈ [--..--] or UNINITIALIZED
 [eva:final-states] Values at end of function init:
   buffer[0..435] ∈ [--..--]
   i ∈ {436}

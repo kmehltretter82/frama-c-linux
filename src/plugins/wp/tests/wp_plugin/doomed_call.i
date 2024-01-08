@@ -69,13 +69,16 @@ void f3_ko(void)
   E++;
 }
 
-/*@ ensures \false ; */
+/*@ ensures \false ;
+  @ exits \true ;
+*/
 void f3_ok(void)
 {
   call_exit_ok();
 }
 
-/*@ ensures E ; */
+/*@ ensures E ;
+  @ exits \true ;*/
 void f4_ok(void)
 {
   E=1;

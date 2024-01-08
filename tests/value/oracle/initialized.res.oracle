@@ -72,10 +72,10 @@
   signed overflow. assert -2147483648 ≤ (int)(&b4) + (int)(&b4);
 [eva:alarm] initialized.c:50: Warning: 
   signed overflow. assert (int)(&b4) + (int)(&b4) ≤ 2147483647;
-[eva] initialized.c:50: 
+[eva:garbled-mix:write] initialized.c:50: 
   Assigning imprecise value to t[6].
   The imprecision originates from Arithmetic {initialized.c:50}
-[eva] initialized.c:51: 
+[eva:garbled-mix:write] initialized.c:51: 
   Assigning imprecise value to t[7].
   The imprecision originates from Arithmetic {initialized.c:50}
 [eva] initialized.c:63: 
@@ -103,6 +103,7 @@
    {[12][bits 24 to 31]#; [13][bits 0 to 23]#} ∈
    {0x11111111; 0x22222222} or UNINITIALIZED
    [13][bits 24 to 31] ∈ {0} or UNINITIALIZED
+  p_0 ∈ UNINITIALIZED
   v1 ∈ {0}
   i6 ∈ [--..--]
   __retres ∈ UNINITIALIZED
@@ -232,7 +233,7 @@
 [eva] Recording results for reduce_by_negation
 [eva] Done for function reduce_by_negation
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] initialized.c:93: assertion 'Eva,initialization' got final status invalid.
 [eva] initialized.c:104: 
   assertion 'Eva,initialization' got final status invalid.

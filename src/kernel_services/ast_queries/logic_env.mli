@@ -169,7 +169,7 @@ val remove_logic_function: string -> unit
     Otherwise, does nothing if no logic info with the same profile as [li]
     is in the table.
 
-    See {!Logic_env.add_logic_info_gen} for more information about the
+    See {!Logic_env.add_logic_function_gen} for more information about the
     [is_same_profile] argument.
 
     @since Chlorine-20180501

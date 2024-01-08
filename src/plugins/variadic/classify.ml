@@ -113,7 +113,7 @@ let mk_format_fun vi f_kind f_buffer ~format_pos =
 let is_frama_c_builtin name =
   Ast_info.is_frama_c_builtin name ||
   Cil_builtins.Builtin_functions.mem name ||
-  Extlib.string_prefix "__FRAMAC_" name (* Mthread prefixes *)
+  String.starts_with ~prefix:"__FRAMAC_" name (* Mthread prefixes *)
 
 let va_builtins = [
   "__builtin_va_start";
@@ -162,7 +162,7 @@ let classify_std env vi = match vi.vname with
 
   (* stropts.h *)
   | "ioctl"   -> mk_overload env ["__va_ioctl_void" ; "__va_ioctl_int" ; "__va_ioctl_ptr"]
-  | n when Extlib.string_prefix "__sync_" n -> Misc
+  | n when String.starts_with ~prefix:"__sync_" n -> Misc
   | n when is_va_builtin n -> Misc
   | n when is_frama_c_builtin n -> Builtin
   (* Anything else *)

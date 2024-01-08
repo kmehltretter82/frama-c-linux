@@ -54,7 +54,6 @@ and dlemma = {
   l_name  : string ;
   l_cluster : cluster ;
   l_kind : predicate_kind ;
-  l_types : int ;
   l_forall : var list ;
   l_triggers : trigger list list (* OR of AND triggers *) ;
   l_lemma : pred ;
@@ -321,7 +320,7 @@ class virtual visitor main =
                 | Some (LTsum cs) ->
                   let cases = List.map
                       (fun c ->
-                         Lang.CTOR c ,
+                         Lang.ctor c ,
                          List.map self#vtau_of_ltype c.ctor_params
                       ) cs in
                   Qed.Engine.Tsum cases
@@ -340,7 +339,7 @@ class virtual visitor main =
                   (List.map
                      (fun f ->
                         let t = Lang.tau_of_ctype f.ftype in
-                        self#vtau t ; Cfield (f, KValue) , t
+                        self#vtau t ; cfield f , t
                      ))
                   r.cfields
               in self#on_comp r fts ;
@@ -358,7 +357,7 @@ class virtual visitor main =
                   (List.map
                      (fun f ->
                         let t = Lang.init_of_ctype f.ftype in
-                        self#vtau t ; Cfield (f, KInit) , t
+                        self#vtau t ; cfield ~kind:KInit f , t
                      ))
                   r.cfields
               in self#on_icomp r fts ;
@@ -462,8 +461,8 @@ class virtual visitor main =
         begin
           symbols <- DF.add f symbols ;
           match f with
-          | Model { m_source = Extern e  } -> self#vlibrary e.ext_library
-          | Model { m_source = Generated _ } | ACSL _ -> self#vlfun f
+          | FUN { m_source = Extern e  } -> self#vlibrary e.ext_library
+          | FUN { m_source = Generated _ } | ACSL _ -> self#vlfun f
           | CTOR c -> self#vadt (Lang.adt c.ctor_type)
         end
 

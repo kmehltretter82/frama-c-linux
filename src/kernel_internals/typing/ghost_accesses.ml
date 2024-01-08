@@ -130,7 +130,7 @@ class visitor = object(self)
          && not (Kernel_function.has_definition kf)
       then begin
         let spec =
-          try Annotations.funspec ~populate:false kf
+          try Annotations.funspec kf
           with _ -> empty_funspec ()
         in
         if is_empty_funspec spec then self#bad_ghost_function kf

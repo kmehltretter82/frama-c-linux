@@ -125,22 +125,15 @@ let insert base path_name =
       Array.set cache (hash land 255) (Some (path_name, path));
       path
 
-(* TODO: we currently use PWD instead of Sys.getcwd () because OCaml has
-   no function in its stdlib to resolve symbolic links (e.g. realpath)
-   for a given path. 'getcwd' always resolves them, but if the user
-   supplies a path with symbolic links, this may cause issues.
-   Instead of forcing the user to always provide resolved paths, we
-   currently choose to never resolve them.
-   Note that, in rare situations (e.g. some Docker images), PWD does not
-   exist in the environment, so in that case, we fallback to Sys.getcwd.
-
-   REMARK[LC]: when the Frama-C binary is directly invoked by Node without
-   going through a shell script wrapper like ./bin/frama-c, the environment
-   variable "PWD" is _no more_ synchronized with Sys.getcwd.
-   This problem has been solved in `Dome.spawn()` by forcing the `PWD`
-   environement variable accordingly.
+(* Note: the call to Unix.realpath prevents some issues with symbolic links
+   in directory names. If you have problems with this, please contact us.
+   For the same reason, Sys.getcwd should _not_ be called directly, but only
+   via this function, to avoid conflicting results in case the user forgot
+   to call Unix.realpath.
 *)
-let cwd = insert dummy (try Sys.getenv "PWD" with Not_found -> Sys.getcwd ())
+let pwd () = Unix.(realpath (getcwd ()))
+
+let cwd = insert dummy (pwd ())
 
 type existence =
   | Must_exist
@@ -195,7 +188,12 @@ let add_symbolic_dir_list name =
 let reset_symbolic_dirs () = Hashtbl.clear symbolic_dirs
 
 let all_symbolic_dirs () =
-  List.sort Extlib.compare_basic @@
+  let compare (s1, s1') (s2, s2') =
+    let c = String.compare s1 s2 in
+    if c <> 0 then c
+    else String.compare s1' s2'
+  in
+  List.sort compare @@
   Hashtbl.fold (fun dir name acc -> (name, dir) :: acc) symbolic_dirs []
 
 let rec add_uri_path buffer path =
@@ -226,7 +224,7 @@ let add_path path =
   | Some symb -> symb ^ Buffer.contents buf
 
 let rec skip_dot file_name =
-  if Extlib.string_prefix "./" file_name then
+  if String.starts_with ~prefix:"./" file_name then
     skip_dot (String.sub file_name 2 (String.length file_name - 2))
   else file_name
 
@@ -237,7 +235,8 @@ let pretty file_name =
     let path = insert cwd file_name in
     let file_name = path.path_name in
     let cwd_name = cwd.path_name in
-    if Extlib.string_prefix ~strict:true cwd_name file_name then
+    if String.starts_with ~prefix:cwd_name file_name && cwd_name <> file_name
+    then
       let n = 1 + String.length cwd_name in
       String.sub file_name n (String.length file_name - n)
     else
@@ -255,7 +254,7 @@ let relativize ?base_name file_name =
   in
   if base_name = file_name then "." else
     let base_name = base_name ^ Filename.dir_sep in
-    if Extlib.string_prefix base_name file_name then
+    if String.starts_with ~prefix:base_name file_name then
       let n = String.length base_name in
       let file_name = String.sub file_name n (String.length file_name - n) in
       if file_name = "" then "." else file_name
@@ -268,7 +267,7 @@ let is_relative ?base_name file_name =
     | Some b -> (insert cwd b).path_name
   in
   base_name = file_name
-  || Extlib.string_prefix (base_name ^ Filename.dir_sep) file_name
+  || String.starts_with ~prefix:(base_name ^ Filename.dir_sep) file_name
 
 (* -------------------------------------------------------------------------- *)
 (* --- Normalized Typed Module                                            --- *)
@@ -279,6 +278,9 @@ module Normalized = struct
 
   let of_string ?existence ?base_name s = normalize ?existence ?base_name s
   let concat ?existence t s = normalize ?existence (t ^ "/" ^ s)
+  let concats ?existence t sl =
+    let s' = List.fold_left (fun acc s -> acc ^ "/" ^ s) "" sl in
+    normalize ?existence (t ^ s')
   let to_pretty_string s = pretty s
   let to_string_list l = l
   let equal : t -> t -> bool = (=)
@@ -288,7 +290,10 @@ module Normalized = struct
     let s1 = pretty s1 in
     let s2 = pretty s2 in
     if case_sensitive then String.compare s1 s2
-    else Extlib.compare_ignore_case s1 s2
+    else
+      String.compare
+        (String.lowercase_ascii s1)
+        (String.lowercase_ascii s2)
 
   let empty = normalize ""
   let unknown = empty
@@ -335,7 +340,19 @@ type position =
 let pp_pos fmt pos =
   Format.fprintf fmt "%a:%d" Normalized.pretty pos.pos_path pos.pos_lnum
 
-let pwd () = try Unix.getenv "PWD" with Not_found -> Sys.getcwd ()
+let exists (s : Normalized.t) = Sys.file_exists (s :> string)
+
+let is_dir (s : Normalized.t) = Sys.is_directory (s :> string)
+
+let readdir (s : Normalized.t) = Sys.readdir (s :> string)
+
+let remove (s : Normalized.t) = Sys.remove (s :> string)
+
+let rename s t = Sys.rename s t
+
+let basename p = Filename.basename p
+
+let dirname p = Filename.dirname p
 
 (*
 Local Variables:

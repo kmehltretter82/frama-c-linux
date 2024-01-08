@@ -171,6 +171,9 @@ let wkey_inconsistent_specifier =
 let wkey_int_conversion =
   register_warn_category "typing:int-conversion"
 
+let wkey_merge_conversion =
+  register_warn_category "typing:merge-conversion"
+
 let wkey_cert_exp_46 = register_warn_category "CERT:EXP:46"
 
 let wkey_cert_msc_37 = register_warn_category "CERT:MSC:37"
@@ -216,6 +219,8 @@ let () = set_warn_status wkey_file_not_found Log.Wfeedback
 
 let wkey_c11 = register_warn_category "c11"
 let () = set_warn_status wkey_c11 Log.Winactive
+
+let wkey_line_directive = register_warn_category "pp:line-directive"
 
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
@@ -1009,8 +1014,8 @@ module PreprocessAnnot =
     let module_name = "PreprocessAnnot"
     let option_name = "-pp-annot"
     let help =
-      "pre-process annotations (if they are read). Set by default if \
-       the pre-processor is GNU-like (see option -cpp-frama-c-compliant)"
+      "preprocess annotations (if they are read). Set by default if \
+       the preprocessor is GNU-like (see option -cpp-frama-c-compliant)"
   end)
 
 let () = Parameter_customize.set_group parsing
@@ -1065,9 +1070,9 @@ module CppGnuLike =
       let module_name = "CppGnuLike"
       let option_name = "-cpp-frama-c-compliant"
       let help =
-        "indicates that a custom pre-processor (see option -cpp-command) \
+        "indicates that a custom preprocessor (see option -cpp-command) \
          accepts the same set of options as GNU cpp. Set it to false if you \
-         have pre-processing issues with a custom pre-processor."
+         have preprocessing issues with a custom preprocessor."
     end)
 
 let () = Parameter_customize.set_group parsing
@@ -1452,6 +1457,44 @@ module DoCollapseCallCast =
        and the lvalue it is assigned to."
   end)
 
+let () = Parameter_customize.set_group normalisation
+let () = Parameter_customize.do_not_reset_on_copy ()
+module GeneratedSpecMode =
+  String
+    (struct
+      let module_name = "GeneratedSpecMode"
+      let option_name = "-generated-spec-mode"
+      let default = "frama-c"
+      let arg_name = "mode"
+      let help =
+        "Select which mode will be used to generate missing specifications. \
+         Can be one of: frama-c, acsl, safe, or the name of a custom \
+         registered mode (defaults to frama-c). See user manual for more \
+         information."
+    end)
+
+let () = Parameter_customize.set_group normalisation
+let () = Parameter_customize.do_not_reset_on_copy ()
+module GeneratedSpecCustom =
+  P.String_map
+    (struct
+      include Datatype.String
+      type key = string
+      let of_string ~key:_ ~prev:_ s = s
+      let to_string ~key:_ s = s
+    end)
+    (struct
+      let option_name = "-generated-spec-custom"
+      let arg_name = "c1:m1,c2:m2,..."
+      let default = Datatype.String.Map.empty
+      let help =
+        "Fine-tune missing specification generation by manually selecting \
+         modes for each clause. Can be one of: frama-c, acsl, safe, skip or \
+         the name of a custom registered mode. Do not use skip mode for \
+         assigns unless you know what you are doing! See user manual for more \
+         information."
+    end)
+
 let normalization_parameters () =
   let norm = Cmdline.Group.name normalisation in
   let kernel = Plugin.get_from_name "" in
@@ -1801,30 +1844,6 @@ module TypeCheck =
 
 [@@@warning "-60"]
 (* Warning: these options are parsed and used directly from Cmdline *)
-
-let () = Parameter_customize.set_negative_option_name ""
-let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.is_invisible ()
-module NoType =
-  Bool
-    (struct
-      let module_name = "NoType"
-      let default = not Cmdline.use_type
-      let option_name = "-no-type"
-      let help = ""
-    end)
-
-let () = Parameter_customize.set_negative_option_name ""
-let () = Parameter_customize.set_cmdline_stage Cmdline.Early
-let () = Parameter_customize.is_invisible ()
-module NoObj =
-  Bool
-    (struct
-      let module_name = "NoObj"
-      let default = not Cmdline.use_obj
-      let option_name = "-no-obj"
-      let help = ""
-    end)
 
 let () = Parameter_customize.set_group project
 let () = Parameter_customize.set_negative_option_name ""

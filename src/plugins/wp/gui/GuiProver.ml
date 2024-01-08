@@ -74,8 +74,8 @@ class prover ~(console:Wtext.text) ~prover =
       begin
         let fout = Wpo.get_file_logout wpo prover in
         let ferr = Wpo.get_file_logerr wpo prover in
-        let lout = Sys.file_exists fout in
-        let lerr = Sys.file_exists ferr in
+        let lout = Filepath.exists fout in
+        let lerr = Filepath.exists ferr in
         if lout || lerr then console#hrule ;
         console#scroll () ;
         console#printf "[%a] %a@.%a" VCS.pp_prover prover
@@ -89,10 +89,12 @@ class prover ~(console:Wtext.text) ~prover =
     method private run wpo =
       begin
         let spinner = function None -> None | Some s -> Some s#get in
+        let m = Wp_parameters.Memlimit.get () in
         let config = {
           VCS.valid = false ;
           VCS.timeout = Option.map float @@ spinner timeout ;
           VCS.stepout = spinner stepout ;
+          VCS.memlimit = if m > 0 then Some m else None ;
         } in
         let result wpo _prv _res = self#update wpo in
         let task = Prover.prove ~config ~result wpo prover in
@@ -134,7 +136,7 @@ class prover ~(console:Wtext.text) ~prover =
           self#set_action ~tooltip:"Run Prover" ~icon:`MEDIA_PLAY ~callback () ;
           Pretty_utils.ksfprintf self#set_label "%a (%a)" VCS.pp_prover prover
             Rformat.pp_time res.VCS.prover_time ;
-        | VCS.Invalid | VCS.Unknown | VCS.Timeout | VCS.Stepout ->
+        | VCS.Unknown | VCS.Timeout | VCS.Stepout | VCS.Invalid ->
           let callback () = self#run wpo in
           self#set_status ko_status ;
           self#set_action ~tooltip:"Run Prover" ~icon:`MEDIA_PLAY ~callback () ;

@@ -21,11 +21,11 @@
    [0].b ∈ {2}
    [0].pp ∈ {0}
    [0].p ∈ {{ &x }}
-   [1].a ∈ {{ (int)&z1 }}
-   [1].b ∈ {{ (int)&z2 }}
+   [1].a ∈ {{ (long)&z1 }}
+   [1].b ∈ {{ (long)&z2 }}
    [1].pp ∈ {{ &z3 }}
    [1].p ∈ {{ &y }}
-   [2].a ∈ {{ (int)&z4 }}
+   [2].a ∈ {{ (long)&z4 }}
    [2].b ∈ {2}
    [2].pp ∈ {0}
    [2].p ∈ {{ &x }}
@@ -109,7 +109,7 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   outp ∈ {{ &x ; &y }}
@@ -260,11 +260,11 @@
    [0].b ∈ {2}
    [0].pp ∈ {0}
    [0].p ∈ {{ &x }}
-   [1].a ∈ {{ (int)&z1 }}
-   [1].b ∈ {{ (int)&z2 }}
+   [1].a ∈ {{ (long)&z1 }}
+   [1].b ∈ {{ (long)&z2 }}
    [1].pp ∈ {{ &z3 }}
    [1].p ∈ {{ &y }}
-   [2].a ∈ {{ (int)&z4 }}
+   [2].a ∈ {{ (long)&z4 }}
    [2].b ∈ {2}
    [2].pp ∈ {0}
    [2].p ∈ {{ &x }}
@@ -338,7 +338,7 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   outp ∈ {{ &x ; &y }}

@@ -78,7 +78,9 @@ int T[10];
  */
 void razT (int n) {
 
-  //@ loop invariant qed_ok: \forall int k; 0<= k < i ==> T[k] == 0;
+  /*@ loop invariant qed_ok: \forall int k; 0<= k < i ==> T[k] == 0;
+    @ loop variant n - i;
+    @*/
   for (int i = 0; i < n; i++)
     T[i] = 0;
 }

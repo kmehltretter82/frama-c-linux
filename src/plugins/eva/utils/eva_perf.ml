@@ -218,7 +218,8 @@ module Imperative_callstack_trie(M:sig type t val default:unit -> t end) = struc
           n
       in find_subtree subnode.subtree b (Some subnode)
 
-  let find_subtree t callstack = find_subtree t (List.rev callstack) None
+  let find_subtree t callstack =
+    find_subtree t (Callstack.to_call_list callstack) None
 
   let find t callstack = (find_subtree t callstack).self
 
@@ -285,25 +286,25 @@ let display fmt =
   end
 ;;
 
-let caller_callee_callinfo = function
-  | (callee_kf,_)::(caller_kf,_)::_ ->
-    (let caller_flat = Kernel_function.Hashtbl.find flat caller_kf in
-     try
+let caller_callee_callinfo callstack =
+  match Callstack.top_caller callstack with
+  | Some caller_kf ->
+    let callee_kf = Callstack.top_kf callstack in
+    let caller_flat = Kernel_function.Hashtbl.find flat caller_kf in
+    (try
        Kernel_function.Hashtbl.find caller_flat.called_functions callee_kf
      with Not_found ->
        let call_info = Call_info.create() in
        Kernel_function.Hashtbl.add caller_flat.called_functions callee_kf call_info;
        call_info)
-  | [_] -> Call_info.main
-  | [] -> assert false
+  | None -> Call_info.main
 ;;
 
 let start_doing_perf callstack =
   if Parameters.ValShowPerf.get()
   then begin
     let time = Sys.time() in
-    assert (callstack != []);
-    let kf = fst (List.hd callstack) in
+    let kf = Callstack.top_kf callstack in
     let flat_info =
       try Kernel_function.Hashtbl.find flat kf
       with Not_found ->
@@ -325,7 +326,7 @@ let stop_doing_perf callstack =
   if Parameters.ValShowPerf.get()
   then begin
     let time = Sys.time() in
-    let kf = fst (List.hd callstack) in
+    let kf = Callstack.top_kf callstack in
     let flat_info = Kernel_function.Hashtbl.find flat kf in
     Call_info.after_call flat_info.call_info time;
     let node = Perf_by_callstack.find perf callstack in
@@ -365,14 +366,13 @@ let stack_flamegraph = ref []
 
 (* pretty-prints the functions in a Value callstack, starting by main (i.e.
    in reverse order). *)
-let pretty_callstack oc l =
+let pretty_callstack oc callstack =
   let rec aux oc = function
     | [] -> () (* does not happen in theory *)
-    | [main, _] -> Printf.fprintf oc "%s" (Kernel_function.get_name main)
-    | (f, _) :: q ->
-      Printf.fprintf oc "%a;%s" aux q (Kernel_function.get_name f)
+    | [main] -> Printf.fprintf oc "%s" (Kernel_function.get_name main)
+    | kf :: q -> Printf.fprintf oc "%s;%a" (Kernel_function.get_name kf) aux q
   in
-  aux oc l
+  aux oc (Callstack.to_kf_list callstack)
 
 (* update the [self_total_time] information for the function being analyzed,
    assuming that the current time is [time] *)
@@ -385,9 +385,8 @@ let update_self_total_time time =
 
 (* called when a new function is being analyzed *)
 let start_doing_flamegraph callstack =
-  match callstack with
-  | [] -> assert false
-  | [_] ->
+  match callstack.Callstack.stack with
+  | [] ->
     (* Analysis of main *)
     if not (Parameters.ValPerfFlamegraphs.is_empty ()) then begin
       let file = Parameters.ValPerfFlamegraphs.get () in
@@ -401,7 +400,7 @@ let start_doing_flamegraph callstack =
           (Printexc.to_string e);
         oc_flamegraph := None (* to be on the safe side  *)
     end
-  | _ :: _ :: _ ->
+  | _ :: _ ->
     if !oc_flamegraph <> None then
       (* Flamegraphs are being computed. Update time spent in current function
          so far, then push a slot for the analysis of the new function *)

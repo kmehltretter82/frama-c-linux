@@ -48,7 +48,7 @@ val new_driver:
   id:string ->
   ?base:driver ->
   ?descr:string ->
-  ?includes:string list ->
+  ?includes:Filepath.Normalized.t list ->
   ?configure:(unit -> unit) -> unit ->
   driver
 (** Creates a configured driver from an existing one.
@@ -66,7 +66,7 @@ val descr : driver -> string
 val is_default : driver -> bool
 val compare : driver -> driver -> int
 
-val find_lib: string -> string
+val find_lib: Filepath.Normalized.t -> Filepath.Normalized.t
 (** find a file in the includes of the current drivers *)
 
 val dependencies : string -> string list

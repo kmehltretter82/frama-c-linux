@@ -1,8 +1,12 @@
 # frama-c -wp [...]
 [kernel] Parsing issue-189-bis.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal memcpy_alias_vars_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal memcpy_alias_vars_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] 30 goals scheduled
+[wp] [Valid] Goal memcpy_context_vars_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal memcpy_context_vars_terminates (Cfg) (Trivial)
+[wp] 34 goals scheduled
 [wp] [Valid] typed_memcpy_alias_vars_ensures_memcpy (Alt-Ergo) (Cached)
 [wp] [Valid] typed_memcpy_alias_vars_ensures_unmodified (Alt-Ergo) (Cached)
 [wp] [Valid] typed_memcpy_alias_vars_loop_invariant_cpy_preserved (Alt-Ergo) (Cached)
@@ -18,6 +22,8 @@
 [wp] [Valid] typed_memcpy_alias_vars_loop_assigns_part3 (Qed)
 [wp] [Valid] typed_memcpy_alias_vars_loop_assigns_part4 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_memcpy_alias_vars_assigns (Qed)
+[wp] [Valid] typed_memcpy_alias_vars_loop_variant_decrease (Qed)
+[wp] [Valid] typed_memcpy_alias_vars_loop_variant_positive (Qed)
 [wp] [Valid] typed_memcpy_context_vars_ensures_memcpy_ok (Alt-Ergo) (Cached)
 [wp] [Valid] typed_memcpy_context_vars_ensures_unmodified_ok (Alt-Ergo) (Cached)
 [wp] [Valid] typed_memcpy_context_vars_loop_invariant_ok_cpy_preserved (Alt-Ergo) (Cached)
@@ -33,11 +39,15 @@
 [wp] [Valid] typed_memcpy_context_vars_loop_assigns_part3 (Qed)
 [wp] [Valid] typed_memcpy_context_vars_loop_assigns_part4 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_memcpy_context_vars_assigns (Qed)
-[wp] Proved goals:   30 / 30
-  Qed:            20
+[wp] [Valid] typed_memcpy_context_vars_loop_variant_decrease (Qed)
+[wp] [Valid] typed_memcpy_context_vars_loop_variant_positive (Qed)
+[wp] Proved goals:   38 / 38
+  Terminating:     2
+  Unreachable:     2
+  Qed:            24
   Alt-Ergo:       10
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  memcpy_alias_vars        10        5       15       100%
-  memcpy_context_vars      10        5       15       100%
+  memcpy_alias_vars        12        5       17       100%
+  memcpy_context_vars      12        5       17       100%
 ------------------------------------------------------------

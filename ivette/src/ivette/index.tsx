@@ -20,9 +20,9 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* --------------------------------------------------------------------------*/
-/* --- Lab View Component                                                 ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Lab View Component                                                 --- */
+/* -------------------------------------------------------------------------- */
 
 /**
    @packageDocumentation
@@ -36,10 +36,11 @@ import { DefineElement } from 'dome/layout/dispatch';
 import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
 import * as Lab from 'ivette@lab';
 import * as Ext from 'ivette@ext';
+import * as Mode from 'ivette@mode';
 
-/* --------------------------------------------------------------------------*/
-/* --- Items                                                              ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Items                                                              --- */
+/* -------------------------------------------------------------------------- */
 
 export interface ItemProps {
   /** Identifier. */
@@ -57,9 +58,9 @@ export interface ContentProps extends ItemProps {
   children?: React.ReactNode;
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Groups                                                             ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Groups                                                             --- */
+/* -------------------------------------------------------------------------- */
 
 let GROUP: string | undefined;
 
@@ -84,9 +85,9 @@ export function registerGroup(group: ItemProps, job?: () => void): void {
   }
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- View Layout                                                        ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- View Layout                                                        --- */
+/* -------------------------------------------------------------------------- */
 
 /**
    Alternating V-split and H-split layouts.
@@ -127,9 +128,9 @@ export function registerView(view: ViewLayoutProps): void {
   });
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Components                                                         ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Components                                                         --- */
+/* -------------------------------------------------------------------------- */
 
 export interface ComponentProps extends ContentProps {
   /** Group attachment. */
@@ -177,9 +178,13 @@ export function TitleBar(props: TitleBarProps): JSX.Element | null {
   );
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Sidebar Panels                                                     ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Side Panels                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+export interface SidebarProps extends ContentProps {
+  iconPath?: string;
+}
 
 export interface ToolProps {
   id: string;
@@ -187,16 +192,72 @@ export interface ToolProps {
   children?: React.ReactNode;
 }
 
-export function registerSidebar(panel: ToolProps): void {
-  Ext.SIDEBAR.register(panel);
+/** @ignore */
+export const SIDEBAR = new Ext.ElementRack<SidebarProps>();
+
+/** @ignore */
+export const TOOLBAR = new Ext.ElementRack<ToolProps>();
+
+/** @ignore */
+export const STATUSBAR = new Ext.ElementRack<ToolProps>();
+
+export function registerSidebar(sidebar: SidebarProps): void {
+  SIDEBAR.register(sidebar);
 }
 
 export function registerToolbar(tools: ToolProps): void {
-  Ext.TOOLBAR.register(tools);
+  TOOLBAR.register(tools);
 }
 
 export function registerStatusbar(status: ToolProps): void {
-  Ext.STATUSBAR.register(status);
+  STATUSBAR.register(status);
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Search Modes                                                       ---*/
+/* --------------------------------------------------------------------------*/
+
+export interface Hint {
+  id: string;
+  name?: string; // searched string
+  icon?: string; // displayed icon
+  label?: string; // displayed hint
+  title?: string; // tooltip for hint
+  rank?: number; // hint sorting
+  onClick?: () => void; // click on hint
+}
+
+export interface ModeProps {
+  id: string; // Mode identifier
+  rank?: number; // Modes ordering
+  icon?: string; // Search Field's Icons
+  label?: string; // Search Field in mode menu
+  title?: string; // Search Field tooltip
+  placeholder?: string; // Empty Search Field
+  enabled?: boolean; // Search Field input
+  className?: string; // Search Field Icon's class
+  hints?: () => Hint[]; // Hint sub-menu
+  onHint?: (hint: Hint) => void; // Hint selection
+  onEnter?: (pattern: string) => void; // Enter key for search field
+}
+
+export function registerMode(m: ModeProps): void { Mode.registerMode(m); }
+export function updateMode(m: ModeProps): void { Mode.updateMode(m); }
+export function removeMode(id: string): void { Mode.removeMode(id); }
+export function selectMode(id: string): void { Mode.selectMode(id); }
+export function focusMode(id: string): void { Mode.focusMode(id); }
+export function useMode(m: ModeProps): void {
+  React.useEffect(() => {
+    const id = m.id;
+    const m0 = Mode.findMode(id);
+    Mode.registerMode({ ...m0, ...m });
+    return () => {
+      if (m0 !== undefined)
+        Mode.registerMode(m0);
+      else
+        Mode.removeMode(id);
+    };
+  }, [m]);
 }
 
 /* --------------------------------------------------------------------------*/
@@ -222,4 +283,4 @@ export function registerSandbox(props: ComponentProps): void {
   if (DEVEL) registerComponent({ ...props, group: 'sandbox' });
 }
 
-// --------------------------------------------------------------------------
+/* -------------------------------------------------------------------------- */

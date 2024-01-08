@@ -10,10 +10,10 @@
 [alias] May-aliases after instruction  float *d = (float *)0;  are  <none>
 [alias] analysing instruction: a = (int *)c;
 [alias:unsafe-cast] cast1.c:10: Warning: unsafe cast from float * to int *
-[alias] May-aliases after instruction  a = (int *)c;  are  {a, c}
+[alias] May-aliases after instruction  a = (int *)c;  are  { a; c }
 [alias] analysing instruction: d = (float *)b;
 [alias:unsafe-cast] cast1.c:11: Warning: unsafe cast from int * to float *
-[alias] May-aliases after instruction  d = (float *)b;  are  {a, c}  {b, d}
+[alias] May-aliases after instruction  d = (float *)b;  are  { a; c }  { b; d }
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are  {a, c}  {b, d}
-[alias] May-aliases at the end of function main: {a, c}  {b, d}
+[alias] May-aliases after instruction  __retres = 0;  are  { a; c }  { b; d }
+[alias] May-aliases at the end of function main: { a; c }  { b; d }

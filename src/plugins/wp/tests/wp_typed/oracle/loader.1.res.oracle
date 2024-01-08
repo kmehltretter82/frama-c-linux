@@ -1,0 +1,34 @@
+# frama-c -wp -wp-model 'Typed (Ref)' [...]
+[kernel] Parsing loader.i (no preprocessing)
+[kernel] loader.i:5: Warning: 
+  parsing obsolete ACSL construct 'logic declaration'. 'an axiomatic block' should be used instead.
+[wp] Running WP plugin...
+[wp] [Valid] Goal load_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal load_terminates (Cfg) (Trivial)
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Function load
+------------------------------------------------------------
+
+Goal Post-condition 'F' in 'load':
+Assume { Type: IsS1_S(load_0). }
+Prove: P_Obs(load_0.F1_S_f).
+
+------------------------------------------------------------
+
+Goal Post-condition 'G' in 'load':
+Assume { Type: IsS1_S(load_0) /\ is_sint32(k). }
+Prove: P_Obs((load_0.F1_S_g)[k]).
+
+------------------------------------------------------------
+
+Goal Post-condition 'H' in 'load':
+Assume { Type: IsS1_S(load_0) /\ is_sint32(i) /\ is_sint32(j). }
+Prove: P_Obs((load_0.F1_S_m)[i][j]).
+
+------------------------------------------------------------
+[wp] loader.i:18: Warning: 
+  Memory model hypotheses for function 'load':
+  /*@ behavior wp_typed_ref:
+        requires \valid(x); */
+  struct S load(struct S *x, int k, int i, int j);

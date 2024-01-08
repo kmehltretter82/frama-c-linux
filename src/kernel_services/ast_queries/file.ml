@@ -132,12 +132,12 @@ let from_filename ?cpp f =
     else if cpp <> "" then begin
       if not Fc_config.preprocessor_keep_comments then
         Kernel.warning ~once:true
-          "Default pre-processor does not keep comments. Any ACSL annotation \
-           on non-pre-processed file will be discarded.";
+          "Default preprocessor does not keep comments. Any ACSL annotations \
+           on non-preprocessed files will be discarded.";
       NeedCPP (f, cpp, extra_for_this_file, is_cpp_gnu_like ())
     end else
-      Kernel.abort "No working pre-processor found. You can only analyze \
-                    pre-processed .i files."
+      Kernel.abort "No working preprocessor found. You can only analyze \
+                    preprocessed .i files."
 
 (* ************************************************************************* *)
 (** {2 Internal states} *)
@@ -441,6 +441,10 @@ let safe_remove_file (f : Datatype.Filepath.t) =
   if not (Kernel.is_debug_key_enabled Kernel.dkey_parser) then
     Extlib.safe_remove (f :> string)
 
+let cpp_name cmd =
+  let cmd = List.hd (String.split_on_char ' ' cmd) in
+  Filename.basename cmd
+
 let replace_in_cpp_cmd cmdl supp_args in_file out_file =
   (* using Filename.quote for filenames which contain space or shell
      metacharacters *)
@@ -476,16 +480,32 @@ let adjust_pwd fp cpp_command =
     let dir =
       match Json_compilation_database.get_dir fp with
       | None -> cwd
-      | Some d -> (d:>string)
+      | Some d -> d
     in
-    if cwd <> dir then Some dir, "cd " ^ dir ^ " && " ^ cpp_command
+    if cwd <> dir then Some dir, "cd " ^ (dir :> string) ^ " && " ^ cpp_command
     else None, cpp_command
   else None, cpp_command
+
+(* Prevent gcc/clang from emitting warnings during preprocessing,
+   related to builtin macro definitions from machdeps.
+   Returns a (possibly empty) list of flags to be added to the command line. *)
+let silence_cpp_machdep_warnings cmdl =
+  let exe = cpp_name cmdl in
+  if exe = "clang" || exe = "gcc" then
+    (* NB: For gcc, only old versions (still found in Ubuntu 18.04,
+       supported until 2028, though) activate builtin-macro-redefined.
+       This is also the case for newer clangs, while older ones will
+       complain about the unknown warning (gcc does not seem to care,
+       so that it is safe to keep the unknown-warning-option in every
+       case). *)
+    ["-Wno-builtin-macro-redefined"; "-Wno-unknown-warning-option"]
+  else
+    []
 
 let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
   | NeedCPP (f, cmdl, extra_for_this_file, is_gnu_like) ->
-    if not (Sys.file_exists (f :> string)) then
+    if not (Filepath.exists f) then
       Kernel.abort "source file %a does not exist"
         Filepath.Normalized.pretty f;
     let debug = Kernel.is_debug_key_enabled Kernel.dkey_parser in
@@ -497,7 +517,7 @@ let build_cpp_cmd = function
         Kernel.warning
           ~once:true
           "your preprocessor is not known to handle option `%s'. \
-           If pre-processing fails because of it, please add \
+           If preprocessing fails because of it, please add \
            -no-cpp-frama-c-compliant option to Frama-C's command-line. \
            If you do not want to see this warning again, explicitly use \
            option -cpp-frama-c-compliant."
@@ -516,6 +536,7 @@ let build_cpp_cmd = function
       else []
     in
     let fc_define_args = ["__FRAMAC__"] in
+    let clang_no_warn = silence_cpp_machdep_warnings cmdl in
     let nostdinc_arg =
       if Kernel.FramaCStdLib.get() then add_if_gnu "-nostdinc"
       else []
@@ -537,7 +558,7 @@ let build_cpp_cmd = function
     in
     let supp_args =
       string_of_supp_args
-        (gnu_implicit_args @
+        (gnu_implicit_args @ clang_no_warn @
          extra_for_this_file @ (Kernel.CppExtraArgs.get ()))
         fc_include_args fc_define_args
     in
@@ -546,7 +567,7 @@ let build_cpp_cmd = function
     in
     let workdir, cpp_command_with_chdir = adjust_pwd f cpp_command in
     if workdir <> None then
-      Parse_env.set_workdir ppf (Option.get workdir);
+      Parse_env.set_workdir ppf ((Option.get workdir) :> string);
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
@@ -574,14 +595,14 @@ let abort_with_detailed_pp_message f cpp_command =
     else ""
   in
   Kernel.abort
-    "failed to run: %s\n(PWD: %s)@\n\
+    "failed to run: %s\n(PWD: %a)@\n\
      %sSee chapter \"Preparing the Sources\" in the Frama-C user manual \
      for more details."
-    cpp_command (Filepath.pwd ()) possible_cause
+    cpp_command Filepath.Normalized.pretty (Filepath.pwd ()) possible_cause
 
 let parse_cabs cpp_command = function
   | NoCPP f ->
-    if not (Sys.file_exists (f:>string)) then
+    if not (Filepath.exists f) then
       Kernel.abort "preprocessed file %a does not exist"
         Filepath.Normalized.pretty f;
     Kernel.feedback "Parsing %a (no preprocessing)"
@@ -608,6 +629,10 @@ let parse_cabs cpp_command = function
                   "trying to preprocess annotation with an unknown \
                    preprocessor."; true))
       then begin
+        let clang_no_warn = silence_cpp_machdep_warnings cmdl in
+        let cmdl =
+          List.fold_left (fun acc s -> acc ^ " " ^ s) cmdl clang_no_warn
+        in
         let ppf' =
           try Logic_preprocess.file ".c"
                 (replace_in_cpp_cmd cmdl "")
@@ -626,7 +651,7 @@ let parse_cabs cpp_command = function
     safe_remove_file ppf;
     (cil,(f,defs))
   | External (f,suf) ->
-    if not (Sys.file_exists (f:>string)) then
+    if not (Filepath.exists f) then
       Kernel.abort "file %a does not exist."
         Filepath.Normalized.pretty f;
     Kernel.feedback "Parsing %a (external front-end)"
@@ -639,25 +664,20 @@ let parse_cabs cpp_command = function
          Filepath.Normalized.pretty f)
 
 let to_cil_cabs cpp_cmds_and_args f =
-  try
-    let cpp_command = List.assoc f cpp_cmds_and_args in
-    let a,c = parse_cabs cpp_command f in
-    Kernel.debug ~dkey:Kernel.dkey_file_print_one "result of parsing %s:@\n%a"
-      (get_name f) Cil_printer.pp_file a;
-    if Errorloc.had_errors () then raise Exit;
-    a, c
-  with exn when Errorloc.had_errors () ->
-    if Kernel.Debug.get () >= 1 then raise exn
-    else
-      Kernel.abort "@[stopping on@ file %S@ that@ has@ errors.%t@]"
-        (get_name f)
-        (fun fmt ->
-           if Filename.check_suffix (get_name f :> string) ".c" &&
-              not (Kernel.is_debug_key_enabled Kernel.dkey_pp)
-           then
-             Format.fprintf fmt "@ Add@ '-kernel-msg-key pp'@ \
-                                 for preprocessing command.")
-
+  let cpp_command = List.assoc f cpp_cmds_and_args in
+  let a,c = parse_cabs cpp_command f in
+  Kernel.debug ~dkey:Kernel.dkey_file_print_one "result of parsing %s:@\n%a"
+    (get_name f) Cil_printer.pp_file a;
+  if Errorloc.had_errors () then
+    Kernel.abort "@[stopping on@ file %S@ that@ has@ errors.%t@]"
+      (get_name f)
+      (fun fmt ->
+         if Filename.check_suffix (get_name f :> string) ".c" &&
+            not (Kernel.is_debug_key_enabled Kernel.dkey_pp)
+         then
+           Format.fprintf fmt "@ Add@ '-kernel-msg-key pp'@ \
+                               for preprocessing command.");
+  a, c
 
 let () =
   let handle f =

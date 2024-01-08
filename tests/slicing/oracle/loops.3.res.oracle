@@ -14,7 +14,7 @@
 [eva:alarm] loops.i:52: Warning: signed overflow. assert x1 + 1 ≤ 2147483647;
 [eva:alarm] loops.i:54: Warning: signed overflow. assert x2 + 1 ≤ 2147483647;
 [eva] Recording results for f2
-[eva] done for function f2
+[eva] Done for function f2
 [from] Computing for function f2
 [from] Non-terminating function f2 (no dependencies)
 [from] Done for function f2

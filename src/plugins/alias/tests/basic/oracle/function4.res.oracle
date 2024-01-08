@@ -11,7 +11,7 @@
 [alias] analysing instruction: a = addr(& c);
 [alias] May-aliases after instruction  a = addr(& c);  are  <none>
 [alias] analysing instruction: b = & c;
-[alias] May-aliases after instruction  b = & c;  are  {a, b}
+[alias] May-aliases after instruction  b = & c;  are  { a; b }
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are  {a, b}
-[alias] May-aliases at the end of function main: {a, b}
+[alias] May-aliases after instruction  __retres = 0;  are  { a; b }
+[alias] May-aliases at the end of function main: { a; b }

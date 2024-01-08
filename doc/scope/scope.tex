@@ -31,8 +31,6 @@
 \usepackage{fancyhdr}
 %------------------------------------
 
-\toplinks{}{../index.html}{}
-
 %==============================================================================
 \begin{document}
 
@@ -64,23 +62,23 @@ ou
 On utilise souvent le terme de portée ({\it scope} en anglais)
 en parlant d'une variable pour désigner la zone du programme
 dans laquelle il est valide de l'utiliser.
-Nous parlerons ici de la {\bf portée d'une donnée} pour désigner 
+Nous parlerons ici de la {\bf portée d'une donnée} pour désigner
 de l'ensemble des points de programme pour lesquels la donnée n'est pas
 modifiée. Nous préciserons en \S\ref{data-scope} ce que cela veut dire.\\
 
-Puis, nous généraliserons en \S\ref{prop-scope} à la 
+Puis, nous généraliserons en \S\ref{prop-scope} à la
 {\bf portée d'une propriété}.
 
 \section{Portée d'une donnée}\label{data-scope}
 
 \subsection{Donnée vs. {\it lvalue}}
 
-Nous utilisons ici le terme de {\bf donnée} pour représenter une zone mémoire. 
+Nous utilisons ici le terme de {\bf donnée} pour représenter une zone mémoire.
 Une donnée est généralement désignée
 par une expression de la famille des {\it lvalues} qui caractérise
 les expressions qui apparaissent à gauche d'une affectation.
 Lorsqu'on parle de la donnée correspondant à une variable X,
-il n'y a pas d'ambiguïté, il s'agit précisement la zone mémoire allouée pour 
+il n'y a pas d'ambiguïté, il s'agit précisement la zone mémoire allouée pour
 ranger la valeur de X.
 En revanche, lorsque la donnée est désignée par {\tt T[i]},
 la traduction en terme de zone mémoire fait intervenir la valeur de i.
@@ -92,20 +90,20 @@ information sur i.
 
 \subsection{Discussion sur la portée}
 
-On souhaite déterminer l'ensemble $\sc(D@L)$ des points 
+On souhaite déterminer l'ensemble $\sc(D@L)$ des points
 pour lesquels la donnée D a la même valeur qu'au point L.
 Cette définition semble relativement claire au premier abord,
 mais nous allons voir qu'elle manque quelque peu de précision...\\
 
 Pour parler de la valeur d'une donnée en différents points,
 nous allons raisonner en terme de traces d'exécution.
-Si on cherche à déterminer $\sc(D@L)$, 
+Si on cherche à déterminer $\sc(D@L)$,
 il peut sembler naturel de ne s'intéresser qu'aux traces qui passent par L
 car que signifierait {\it avoir la même valeur qu'en L} pour les autres traces~?
 
 Mais qu'en est-il des points appartenant à $\sc$ ?
 
-Pour la séquence~: 
+Pour la séquence~:
 
 \centerline{\verb!L: if (c) L1:.. else L2:...!}
 
@@ -117,32 +115,32 @@ par L et P, D ait la même valeur.
 Mais avec cette définition, si on a :
 
 \begin{verbatim}
-L0 :... 
-if (c) { 
-  L1:.. 
-  } 
-else { 
-  L2a:... 
-  D=x; 
-  L2b:... 
-} 
+L0 :...
+if (c) {
+  L1:..
+  }
+else {
+  L2a:...
+  D=x;
+  L2b:...
+}
 L3:...
 \end{verbatim}
 
 on va avoir $L3 \in \sc(D@L1)$. Est-ce que c'est bien ce qu'on veut avoir ?
 Comme par ailleurs, on a évidemment $L0 \in \sc(D@L1)$, est-ce qu'on aura pas
 tendance à penser que D à la même valeur en L0 et en L3 ?
-Il faudra mettre en évidence le fait qu'on s'intéresse uniquement 
+Il faudra mettre en évidence le fait qu'on s'intéresse uniquement
 aux traces passant pas L1...\\
- 
-Au premier abord, on a l'intuition qu'une relation 
+
+Au premier abord, on a l'intuition qu'une relation
 {\it avoir la même valeur pour D} est une relation d'équivalence, mais ce n'est
 si simple étant donné qu'on
 ne considère pas les mêmes traces. Si c'était le cas, on se retrouverait
 rapidement à dire que D a la même valeur en L2a et L2b en propageant en
 arrière à partir de L3, et en avant à partir de L0 !!!
 
-Par ailleurs, qu'est-ce que ça veut dire pour les traces 
+Par ailleurs, qu'est-ce que ça veut dire pour les traces
 qui contiennent plusieurs fois L et/ou P ?
 
 Prenons quelques exemples :
@@ -163,14 +161,14 @@ Prenons quelques exemples :
 \end{itemize}
 
 Il semble alors judicieux de distinguer une sélection avant $\sca$
-et une sélection arrière $\scb$, pour pouvoir avoir $n1 \in \sca$ et $n2 \in \scb$.  
-La signification serait alors : 
-$P \in \sca$ ssi à chaque fois que l'on va de L à P, 
-D a la même valeur en ces deux points, 
-mais il faut se restreindre aux chemins qui ne font pas un tour de boucles... 
+et une sélection arrière $\scb$, pour pouvoir avoir $n1 \in \sca$ et $n2 \in \scb$.
+La signification serait alors :
+$P \in \sca$ ssi à chaque fois que l'on va de L à P,
+D a la même valeur en ces deux points,
+mais il faut se restreindre aux chemins qui ne font pas un tour de boucles...
 càd ceux qui ne repassent pas par L.
 
-Mais si on a : 
+Mais si on a :
 
 \centerline{\verb!P:... Lp:... L:... D=x; ... goto Lp;!}
 
@@ -189,7 +187,7 @@ Ou alors, on dit que c'est normal~?
 \subsection{Définitions}
 
 On définit finalement les ensembles en considérant les traces d'exécution
-qui traversent une fonction 
+qui traversent une fonction
 sans rentrer dans les appels de fonction (en cas d'appel récursif, on ne
 considère donc qu'une exécution de la fonction).
 On considère les exécutions de la fonction
@@ -200,11 +198,11 @@ comme si on en regardait la trace dans un débogueur.
 \begin{itemize}
   \item $P \in \sca(D@L)$ si et seulement pour toute exécution de la fonction
     qui passe par L, si on s'arrête en P,
-    D a toujours la même valeur 
+    D a toujours la même valeur
     que la {\bf dernière} fois que l'on est passé en L~;
   \item $P \in \scb(D@L)$ si et seulement si pour toute exécution
     de la fonction qui passe par L, si on s'arrête en P,
-    D a toujours la même valeur que 
+    D a toujours la même valeur que
     la {\bf prochaine} fois que l'on passe en L.
 \end{itemize}
 
@@ -212,7 +210,7 @@ comme si on en regardait la trace dans un débogueur.
 
 En pratique, les résultats sont présentés comme une liste d'instructions et non
 directement de points de programme. Il faut donc préciser
-qu'on choisit de considérer l'étiquette de départ L comme une instruction 
+qu'on choisit de considérer l'étiquette de départ L comme une instruction
 à part entière, et l'instruction $I_L$ comme étant l'instruction suivante~:
 donc en suivant la définition, si on place un point d'arrêt en $I_L$,
 D a toujours la même valeur que la dernière fois que l'on est passé en L,
@@ -258,13 +256,13 @@ Puis on lance le calcul en indiquant qu'il faut traiter l'instruction L.
 Pour chaque chaque instruction I à traiter, le calcul consiste à
 calculer la marque $m' = T(I, m_a(I))$ à propager à ses successeurs.
 Pour chaque successeur I' de I, on va ajoute la marque m'
-à un éventuel résultat précédent $m_a(I')$ 
+à un éventuel résultat précédent $m_a(I')$
 à l'aide de l'opération {\tt merge}
 ($m_a(I')=m'$ si on n'a encore rien calculé).
 Si $m_a(I')$ n'est pas modifiée par l'opération, on arrête de propager par ce
 chemin. Sinon, on met I' dans la liste des instructions à traiter.
 
-Quand le résultat est stabilisé (plus d'instructions à traiter), 
+Quand le résultat est stabilisé (plus d'instructions à traiter),
 on a donc~:
 $$
 m_a(I') = \bigcup_{I \in pred(I')} T(I, m_a(I))
@@ -293,7 +291,7 @@ Il s'agit encore de calculer une marque $m_b(P)$ pour chaque point P.
 
 Cela nécessite d'initialiser tous les points à {\tt NotSeen},
 sauf le point de départ L qui est initialisé à  {\tt Start}.
-Puis on lance le calcul en indiquant qu'il faut traiter 
+Puis on lance le calcul en indiquant qu'il faut traiter
 les prédécesseurs de L.
 
 Pour chaque chaque instruction I à traiter, le calcul consiste à
@@ -312,8 +310,8 @@ $$
 m_b(I) = T(I, \bigcup_{I' \in succ(I)} m_b(I'))
 $$
 On récupère la liste des instructions
-marquées {\tt SameVal}, 
-et on ajoute l'instruction L de départ marquée {\tt Start} 
+marquées {\tt SameVal},
+et on ajoute l'instruction L de départ marquée {\tt Start}
 si $T(L, \bigcup_{I \in succ(L)} m_b(I))$ vaut {\tt SameVal}.
 Cela nous donne $\scb(D,L)$.\\
 
@@ -330,7 +328,7 @@ soit il s'agit du point de départ L, soit I est aussi dans $\scb(D,L)$.
 
 Pour tout $P \in \sca(D@L)$, il existe nécessairement un chemin entre L et P,
 et tous les points du chemin sont aussi dans $ \sca(D@L)$.
-De même, pour tout $P \in \scb(D@L)$,  
+De même, pour tout $P \in \scb(D@L)$,
 il existe nécessairement un chemin entre P et L,
 
 Il n'y a pas forcement de relation de domination/postdomination entre P et L.\\
@@ -354,7 +352,7 @@ L3b:... \} L4:...!}
 \begin{itemize}
   \item si on a une propriété P portant sur x en L2 (disons $x>0$), on ne peut pas
     forcement la déplacer en L1 car elle peut très bien n'être vraie que dans le
-    cas où la condition c est vraie (par exemple, grâce à une précondition :  
+    cas où la condition c est vraie (par exemple, grâce à une précondition :
     $c \Rightarrow x>0$);
   \item par contre, si on a P en L1, elle est aussi vraie en L2, mais il n'y a pas équivalence, car il faut aussi qu'elle soit vraie en L3a.
   \item idem dans l'autre sens :
@@ -375,7 +373,7 @@ on va voir apparaître~:
 
 \begin{verbatim}
 /*@ assert \valid(p);
-      // synthesized 
+      // synthesized
  */
 x = *p;
 \end{verbatim}
@@ -403,17 +401,17 @@ c'est-à-dire sur le déplacement de propriétés à travers des instructions
 qui ne modifient pas les données utilisées.
 La comparaison des menaces sera donc uniquement syntaxique.\\
 
-Si une propriété P est vraie à un point de programme L1, 
+Si une propriété P est vraie à un point de programme L1,
 elle est aussi vraie pour les points L2 qui suivent L1 tels que~:
 \begin{itemize}
-  \item L2 est dominé par L1 
-(ie. si on passe en L2, on est forcement passé en L1) 
+  \item L2 est dominé par L1
+(ie. si on passe en L2, on est forcement passé en L1)
 \item et la propriété n'est pas modifiée entre L1 et L2.
 \end{itemize}
 Donc si on rencontre une menace identique à P en un point L2
 qui vérifie ces caractéristiques, elle peut être éliminée.\\
 
-Si une propriété est vraie à un point de programme L1, 
+Si une propriété est vraie à un point de programme L1,
 on pourrait aussi se dire qu'elle est
 vraie pour les points L0 qui précèdent L1 tels que~:
 \begin{itemize}
@@ -429,4 +427,3 @@ car à cause des problèmes de terminaison des instructions que l'on traverse,
 %------------------------------------------------------------------------------
 \end{document}
 %==============================================================================
- 

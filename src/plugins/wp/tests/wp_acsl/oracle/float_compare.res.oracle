@@ -1,51 +1,64 @@
 # frama-c -wp [...]
 [kernel] Parsing float_compare.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal cmp_dd_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal cmp_dd_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal cmp_fd_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal cmp_fd_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal cmp_ff_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal cmp_ff_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal cmp_fnan_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal cmp_fnan_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Global
 ------------------------------------------------------------
 
-Lemma finite_32_64:
-Assume: 'test_double_compare_greater' 'test_float_compare_greater'
+Goal Lemma 'finite_32_64':
+Assume Lemmas: 'test_double_compare_greater' 'test_float_compare_greater'
   'test_double_compare' 'test_float_compare'
-Prove: (is_finite_f32 x_0) -> (is_finite_f64 (to_f64 (of_f32 x_0)))
+Assume { Have: is_finite_f32(x). }
+Prove: is_finite_f64(to_f64(of_f32(x))).
 
 ------------------------------------------------------------
 
-Lemma finite_32_64_real:
-Assume: 'finite_32_64' 'test_double_compare_greater'
+Goal Lemma 'finite_32_64_real':
+Assume Lemmas: 'finite_32_64' 'test_double_compare_greater'
   'test_float_compare_greater' 'test_double_compare' 'test_float_compare'
-Prove: let r_0 = (of_f32 x_0) in
-       (is_finite_f32 x_0) -> ((of_f64 (to_f64 r_0))=r_0)
+Let r = of_f32(x). Assume { Have: is_finite_f32(x). }
+Prove: of_f64(to_f64(r)) = r.
 
 ------------------------------------------------------------
 
-Lemma test_double_compare:
-Assume: 'test_float_compare'
-Prove: (is_finite_f64 x_0) -> (is_finite_f64 y_0) -> (le_f64 x_0 y_0)
-       -> ((eq_f64 x_0 y_0) \/ (lt_f64 x_0 y_0))
+Goal Lemma 'test_double_compare':
+Assume Lemmas: 'test_float_compare'
+Assume { Have: is_finite_f64(x). Have: is_finite_f64(y). Have: le_f64(x, y).
+}
+Prove: eq_f64(x, y) \/ lt_f64(x, y).
 
 ------------------------------------------------------------
 
-Lemma test_double_compare_greater:
-Assume: 'test_float_compare_greater' 'test_double_compare'
+Goal Lemma 'test_double_compare_greater':
+Assume Lemmas: 'test_float_compare_greater' 'test_double_compare'
   'test_float_compare'
-Prove: (is_finite_f64 x_0) -> (is_finite_f64 y_0) -> (le_f64 y_0 x_0)
-       -> ((eq_f64 x_0 y_0) \/ (lt_f64 y_0 x_0))
+Assume { Have: is_finite_f64(x). Have: is_finite_f64(y). Have: le_f64(y, x).
+}
+Prove: eq_f64(x, y) \/ lt_f64(y, x).
 
 ------------------------------------------------------------
 
-Lemma test_float_compare:
-Prove: (is_finite_f32 x_0) -> (is_finite_f32 y_0) -> (le_f32 x_0 y_0)
-       -> ((eq_f32 x_0 y_0) \/ (lt_f32 x_0 y_0))
+Goal Lemma 'test_float_compare':
+Assume { Have: is_finite_f32(x). Have: is_finite_f32(y). Have: le_f32(x, y).
+}
+Prove: eq_f32(x, y) \/ lt_f32(x, y).
 
 ------------------------------------------------------------
 
-Lemma test_float_compare_greater:
-Assume: 'test_double_compare' 'test_float_compare'
-Prove: (is_finite_f32 x_0) -> (is_finite_f32 y_0) -> (le_f32 y_0 x_0)
-       -> ((eq_f32 x_0 y_0) \/ (lt_f32 y_0 x_0))
+Goal Lemma 'test_float_compare_greater':
+Assume Lemmas: 'test_double_compare' 'test_float_compare'
+Assume { Have: is_finite_f32(x). Have: is_finite_f32(y). Have: le_f32(y, x).
+}
+Prove: eq_f32(x, y) \/ lt_f32(y, x).
 
 ------------------------------------------------------------
 ------------------------------------------------------------

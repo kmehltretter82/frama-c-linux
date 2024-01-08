@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Command line parsing.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (* ************************************************************************** *)
 (** {2 Stage configurations}
@@ -33,39 +33,39 @@
 type stage =
   | Early       (** Initial stage for very specific almost hard-coded
                     options. Do not use it.
-                    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+                    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | Extending   (** Before loading plug-ins. Run only once.
-                    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+                    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | Extended    (** The stage where plug-ins are loaded.
                     It is also the first stage each time the Frama-C main
                     loop is run (e.g. after each "-then").
-                    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+                    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | Exiting     (** Run once when exiting Frama-C.
-                    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+                    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | Loading     (** After {!Extended}, the stage where a previous Frama-C
                     internal states is restored (e.g. the one specified by
                     -load or by running the journal).
-                    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+                    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   | Configuring (** The stage where all the parameters which were not already
                     set may be modified to take into account cmdline options.
                     Just after this stage, Frama-C will run the plug-in mains.
-                    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+                    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 (** The different stages, from the first to be executed to the last one.
     @since Beryllium-20090601-beta1 *)
 
 val run_after_early_stage: (unit -> unit) -> unit
 (** Register an action to be executed at the end of the early stage.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @since Beryllium-20090901 *)
 
 val run_during_extending_stage: (unit -> unit) -> unit
 (** Register an action to be executed during the extending stage.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @since Beryllium-20090901 *)
 
 val run_after_extended_stage: (unit -> unit) -> unit
 (** Register an action to be executed at the end of the extended stage.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @since Beryllium-20090901 *)
 
 type exit
@@ -73,21 +73,21 @@ type exit
 
 val nop : exit
 (** @since Beryllium-20090901
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 exception Exit
 (** @since Beryllium-20090901
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val run_after_exiting_stage: (unit -> exit) -> unit
 (** Register an action to be executed at the end of the exiting stage.
     The guarded action must finish by [exit n].
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @since Beryllium-20090601-beta1 *)
 
 val run_after_loading_stage: (unit -> unit) -> unit
 (** Register an action to be executed at the end of the loading stage.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @since Beryllium-20090601-beta1 *)
 
 val is_going_to_load: unit -> unit
@@ -95,17 +95,17 @@ val is_going_to_load: unit -> unit
     It is not necessary to call this function if the running action is set by
     an option put on the command line.
     @since Beryllium-20090601-beta1
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val run_after_configuring_stage: (unit -> unit) -> unit
 (** Register an action to be executed at the end of the configuring stage.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @since Beryllium-20090601-beta1 *)
 
 val run_after_setting_files: (string list -> unit) -> unit
 (** Register an action to be executed just after setting the files put on the
     command line. The argument of the function is the list of files.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @since Carbon-20101201 *)
 
 val at_normal_exit: (unit -> unit) -> unit
@@ -359,12 +359,6 @@ val kernel_debug_atleast_ref: (int -> bool) ref
 
 val kernel_verbose_atleast_ref: (int -> bool) ref
 (** @since Boron-20100401 *)
-
-val use_obj: bool
-(** @since Beryllium-20090601-beta1 *)
-
-val use_type: bool
-(** @since Beryllium-20090601-beta1 *)
 
 val quiet: bool
 (** Must not be used for something else that initializing values

@@ -14,10 +14,11 @@
   # cvalue:
   f1 ∈ {9.99994610111e-41}
   d0 ∈ {1e-40}
+  d1 ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   d1 ∈ {9.99994610111e-41}

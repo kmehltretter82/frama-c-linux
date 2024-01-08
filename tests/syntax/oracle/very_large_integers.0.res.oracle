@@ -3,6 +3,4 @@
   integer constant too large in expression 999999999999999999U + 9999999999999999999U
 [kernel] very_large_integers.c:36: User Error: 
   bitfield width is not a valid integer constant
-[kernel] User Error: stopping on file "very_large_integers.c" that has errors. Add
-  '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

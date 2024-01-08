@@ -17,8 +17,9 @@
   function f: precondition 'i' got status invalid.
 [eva] Recording results for f
 [eva] Done for function f
-[kernel:annot:missing-spec] precond2.c:24: Warning: 
-  Neither code nor implicit assigns clause for function g, generating default assigns from the prototype
+[kernel:annot:missing-spec] precond2.c:17: Warning: 
+  Neither code nor explicit assigns for function g,
+   generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function g <- main.
   Called from precond2.c:24.
 [eva] using specification for function g
@@ -29,7 +30,7 @@
 [eva] precond2.c:24: function g: precondition got status valid.
 [eva] Done for function g
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   x ∈ {1}
@@ -58,7 +59,7 @@
             by Call Preconditions.
 [    -    ] Assigns nothing
             assigns \nothing;
-            tried with Inferred annotations.
+            tried with Populated status.
 [    -    ] Default behavior
             default behavior
             tried with Frama-C kernel.

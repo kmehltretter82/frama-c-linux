@@ -26,10 +26,15 @@
 
 module Abstract_domain = Abstract_domain
 module Abstract_value = Abstract_value
+module Abstract_location = Abstract_location
+module Abstract = Abstract
 module Abstractions = Abstractions
 module Active_behaviors = Active_behaviors
 module Alarmset = Alarmset
 module Analysis = Analysis
+module Callstack = Callstack
+module Cvalue_domain = Cvalue_domain
+module Cvalue_results = Cvalue_results
 module Domain_builder = Domain_builder
 module Eva_dynamic = Eva_dynamic
 module Eva_results = Eva_results

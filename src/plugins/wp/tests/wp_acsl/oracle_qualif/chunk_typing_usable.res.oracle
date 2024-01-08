@@ -3,11 +3,17 @@
 [wp] Running WP plugin...
 [rte:annot] annotating function usable_axiom
 [rte:annot] annotating function usable_lemma
+[wp] [Valid] Goal usable_axiom_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal usable_axiom_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal usable_lemma_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal usable_lemma_terminates (Cfg) (Trivial)
 [wp] 3 goals scheduled
 [wp] [Unsuccess] typed_lemma_provable_lemma (Alt-Ergo) (Cached)
 [wp] [Valid] typed_usable_axiom_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] typed_usable_lemma_ensures (Alt-Ergo) (Cached)
-[wp] Proved goals:    2 / 3
+[wp] Proved goals:    6 / 7
+  Terminating:     2
+  Unreachable:     2
   Alt-Ergo:        2
   Unsuccess:       1
 ------------------------------------------------------------

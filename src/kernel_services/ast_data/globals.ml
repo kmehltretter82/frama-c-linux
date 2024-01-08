@@ -883,13 +883,6 @@ let set_entry_point name lib =
     Kernel.LibEntry.unsafe_set lib;
   end
 
-let is_entry_point ?when_lib_entry kf =
-  match when_lib_entry with
-  | Some value when Kernel.LibEntry.get () -> value
-  | _ ->
-    try Cil_datatype.Kf.equal kf @@ fst @@ entry_point ()
-    with No_such_entry_point _ -> false
-
 (* ************************************************************************* *)
 (** {2 Global Comments} *)
 (* ************************************************************************* *)

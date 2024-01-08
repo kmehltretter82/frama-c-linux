@@ -21,8 +21,8 @@
 (**************************************************************************)
 
 module Make
-    (Abstract : Abstractions.Eva)
-    (Kf : sig val kf: Cil_types.kernel_function end) :
+    (Abstract : Abstractions.S_with_evaluation)
+    (_ : sig val kf: Cil_types.kernel_function end) :
 sig
   (** The states being partitioned *)
   type state = Abstract.Dom.t

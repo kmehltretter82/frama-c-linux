@@ -84,8 +84,8 @@ module Memory = struct
   let name = "bitwise"
 
   let widen kf stmt s1 s2 =
-    let wh = Widen.getWidenHints kf stmt in
-    widen wh s1 s2
+    let priority, hint = Widen.getWidenHints kf stmt in
+    widen ~priority ~hint s1 s2
 
   let narrow x _y = `Value x
 end
@@ -100,6 +100,9 @@ module D : Abstract_domain.Leaf
   type state = Memory.t
   type location = Precise_locs.precise_location
   type origin
+
+  let value_dependencies = Abstract_value.Leaf (module Offsm_value.Offsm)
+  let location_dependencies = Main_locations.ploc
 
   include (Memory: sig
              include Datatype.S_with_collections with type t = state
@@ -224,3 +227,10 @@ module D : Abstract_domain.Leaf
     let loc = Precise_locs.imprecise_location location in
     kill loc state
 end
+
+let registered =
+  let name = "bitwise"
+  and descr =
+    "Infers bitwise information to interpret more precisely bitwise operators."
+  in
+  Abstractions.Domain.register ~name ~descr ~priority:3 (module D)

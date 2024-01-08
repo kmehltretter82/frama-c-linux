@@ -11,7 +11,7 @@
   d ∈ [--..--]
 [eva:alarm] sort4.i:20: Warning: assertion got status unknown.
 [eva] Recording results for sort4_1
-[eva] done for function sort4_1
+[eva] Done for function sort4_1
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function sort4_1:
   a ∈ [--..--]

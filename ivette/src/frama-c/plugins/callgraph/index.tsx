@@ -20,7 +20,7 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import _ from 'lodash';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
@@ -36,7 +36,7 @@ import 'cytoscape-panzoom/cytoscape.js-panzoom.css';
 import style from './graph-style.json';
 
 import { useGlobalState } from 'dome/data/states';
-import { useRequest, useSelection, useSyncValue } from 'frama-c/states';
+import * as States from 'frama-c/states';
 
 import gearsIcon from 'frama-c/plugins/eva/images/gears.svg';
 import { CallstackState } from 'frama-c/plugins/eva/valuetable';
@@ -79,14 +79,14 @@ function getWidth(node: any): string {
 // --- Graph
 // --------------------------------------------------------------------------
 
-function edgeId(source: AstAPI.fct, target: AstAPI.fct): string {
+function edgeId(source: AstAPI.decl, target: AstAPI.decl): string {
   return `${source}-${target}`;
 }
 
 function convertGraph(graph: CgAPI.graph): object[] {
   const elements = [];
   for (const v of graph.vertices) {
-    elements.push({ data: { ...v, id: v.kf } });
+    elements.push({ data: { ...v, id: v.decl } });
   }
   for (const e of graph.edges) {
     const id = edgeId(e.src, e.dst);
@@ -95,25 +95,18 @@ function convertGraph(graph: CgAPI.graph): object[] {
   return elements;
 }
 
-type callstack = {
-  callee: AstAPI.fct,
-  caller?: AstAPI.fct,
-  stmt?: AstAPI.marker,
-  rank?: number
-}[]
-
-function selectFct(cy: Cy.Core, fct: string | undefined): void {
+function selectNode(cy: Cy.Core, nodeId: States.Scope): void {
   const className = 'marker-selected';
   cy.$(`.${className}`).removeClass(className);
-  if (fct) {
-    cy.$(`node[id='${fct}']`).addClass(className);
+  if (nodeId) {
+    cy.$(`node[id='${nodeId}']`).addClass(className);
   }
 }
 
-function selectCallstack(cy: Cy.Core, callstack: callstack | undefined): void {
+function selectCallstack(cy: Cy.Core, callstack: ValuesAPI.callsite[]): void {
   const className = 'callstack-selected';
   cy.$(`.${className}`).removeClass(className);
-  callstack?.forEach((call) => {
+  callstack.forEach((call) => {
     cy.$(`node[id='${call.callee}']`).addClass(className);
     if (call.caller) {
       const id = edgeId(call.caller, call.callee);
@@ -123,13 +116,14 @@ function selectCallstack(cy: Cy.Core, callstack: callstack | undefined): void {
 }
 
 function Callgraph() : JSX.Element {
-  const isComputed = useSyncValue(CgAPI.isComputed);
-  const graph = useSyncValue(CgAPI.callgraph);
-  const [cy, setCy] = useState<Cy.Core>();
+  const isComputed = States.useSyncValue(CgAPI.isComputed);
+  const graph = States.useSyncValue(CgAPI.callgraph);
+  const [cy, setCy] = React.useState<Cy.Core>();
   const [cs] = useGlobalState(CallstackState);
-  const [selection, setSelection] = useSelection();
-  const callstack = useRequest(ValuesAPI.getCallstackInfo, cs);
-
+  const callstack = States.useRequest(
+    ValuesAPI.getCallstackInfo, cs, { onError: [] }
+  );
+  const scope = States.useCurrentScope();
   const layout = { name: 'cola', nodeSpacing: 32 };
   const computedStyle = getComputedStyle(document.documentElement);
   const styleVariables =
@@ -144,26 +138,23 @@ function Callgraph() : JSX.Element {
   ];
 
   // Marker selection
-  useEffect(() => {
-    cy && selectFct(cy, selection.current?.fct);
-  }, [cy, selection]);
+  React.useEffect(() => { cy && selectNode(cy, scope); }, [cy, scope]);
 
   // Callstack selection
-  useEffect(() => {
-    cy && selectCallstack(cy, callstack);
+  React.useEffect(() => {
+    cy && selectCallstack(cy, callstack ?? []);
   }, [cy, callstack]);
 
   // Click on graph
-  useEffect(() => {
+  React.useEffect(() => {
     if (cy) {
       cy.off('click');
       cy.on('click', 'node', (event) => {
-        const fct = event.target.id() as string;
-        setSelection({ location: { fct } });
+        const { id } = event.target.data();
+        States.setCurrentScope(id);
       });
     }
-  }, [cy, setSelection]);
-
+  }, [cy]);
 
   if (isComputed === false) {
     Server.send(CgAPI.compute, null);
@@ -189,16 +180,6 @@ function Callgraph() : JSX.Element {
 // --- Ivette Component
 // --------------------------------------------------------------------------
 
-function CallgraphComponent(): JSX.Element {
-  // Component
-  return (
-    <>
-      <Callgraph />
-    </>
-  );
-}
-
-
 Ivette.registerComponent({
   id: 'frama-c.plugins.callgraph',
   label: 'Call Graph',
@@ -206,5 +187,5 @@ Ivette.registerComponent({
   rank: 3,
   title:
     'Display a graph showing calls between functions.',
-  children: <CallgraphComponent />,
+  children: <Callgraph />,
 });

@@ -41,7 +41,7 @@ end
 type t = private
   { pid: int; mutable name: string; mutable unique_name: string }
 (** @since Carbon-20101201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 type project = t
 (** @since Carbon-20101201 *)
@@ -54,7 +54,7 @@ val dummy: t
 (** @since Carbon-20101201 *)
 
 (** @since Carbon-20101201 *)
-module Make_setter(X: sig val mem: string -> bool end) : sig
+module Make_setter(_: sig val mem: string -> bool end) : sig
 
   val make_unique_name: string -> string
   (** @return a fresh name from the given string according to [X.mem].

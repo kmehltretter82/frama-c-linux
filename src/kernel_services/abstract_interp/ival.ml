@@ -95,10 +95,7 @@ end
 
 include Type
 
-module Widen_Hints = Datatype.Integer.Set
-type size_widen_hint = Integer.t
-type numerical_widen_hint = Widen_Hints.t * Fc_float.Widen_Hints.t
-type widen_hint = size_widen_hint * numerical_widen_hint
+type widen_hint = Datatype.Integer.Set.t * Datatype.Float.Set.t
 
 let hash = function
   | Bottom -> 311
@@ -303,7 +300,7 @@ let has_smaller_max_bound t1 t2 =
     | Some _, None -> 1
     | Some m1, Some m2 -> Int.compare m2 m1
 
-let widen (bitsize,(wh,fh)) t1 t2 =
+let widen ?size ?hint t1 t2 =
   if equal t1 t2 || cardinal_zero_or_one t1 || is_bottom t1 then t2
   else
     match t2 with
@@ -311,22 +308,22 @@ let widen (bitsize,(wh,fh)) t1 t2 =
     | Float f2 ->
       let f1 = project_float t1 in
       let prec =
-        if Integer.equal bitsize (Integer.of_int 32)
-        then Float_sig.Single
-        else if Integer.equal bitsize (Integer.of_int 64)
-        then Float_sig.Double
-        else if Integer.equal bitsize (Integer.of_int 128)
-        then Float_sig.Long_Double
-        else Float_sig.Single
+        match Option.bind size Integer.to_int_opt with
+        | Some 32 -> Float_sig.Single
+        | Some 64 -> Float_sig.Double
+        | Some 128 -> Float_sig.Long_Double
+        | Some _ | None -> Float_sig.Single
       in
-      inject_float (Fval.widen fh prec f1 f2)
+      let hint = Option.map snd hint in
+      inject_float (Fval.widen ?hint prec f1 f2)
     | Int i2 ->
       let i1 = match t1 with
         | Bottom -> assert false
         | Int i1 -> i1
         | Float _ -> Int_val.top
       in
-      inject_int (Int_val.widen (bitsize,wh) i1 i2)
+      let hint = Option.map fst hint in
+      inject_int (Int_val.widen ?size ?hint i1 i2)
 
 let meet v1 v2 =
   if v1 == v2 then v1 else
@@ -664,22 +661,6 @@ let backward_mult_int_left ~right ~result =
                       (backward_mult_pos_left Int.one max result)
                       (backward_mult_neg_left min Int.one result)))
 
-
-let backward_le_int max v =
-  match v with
-  | Bottom -> bottom
-  | Float _ -> v
-  | Int _ -> narrow v (inject_int (Int_val.inject_range None max))
-
-let backward_ge_int min v =
-  match v with
-  | Bottom -> bottom
-  | Float _ -> v
-  | Int _ -> narrow v (inject_int (Int_val.inject_range min None))
-
-let backward_lt_int max v = backward_le_int (Option.map Int.pred max) v
-let backward_gt_int min v = backward_ge_int (Option.map Int.succ min) v
-
 let diff_if_one value rem =
   match value, rem with
   | Int i1, Int i2 -> inject_int_or_bottom (Int_val.diff_if_one i1 i2)
@@ -713,17 +694,10 @@ let fold_int_bounds f v acc =
       if equal v bottom then acc else f v acc
 
 
-let backward_comp_int_left op l r =
-  let open Comp in
-  try
-    match op with
-    | Le -> backward_le_int (max_int r) l
-    | Ge -> backward_ge_int (min_int r) l
-    | Lt -> backward_lt_int (max_int r) l
-    | Gt -> backward_gt_int (min_int r) l
-    | Eq -> narrow l r
-    | Ne -> diff_if_one l r
-  with Error_Bottom (* raised by max_int *) -> bottom
+let backward_comp_int_left op v1 v2 =
+  match v1, v2 with
+  | Int i1, Int i2 -> inject_int_or_bottom (Int_val.backward_comp_left op i1 i2)
+  | _, _ -> v1 (* No reduction *)
 
 let backward_comp_float_left_true op fkind f1 f2  =
   let f1 = project_float f1 in
@@ -770,42 +744,11 @@ let all_values ~size v =
     | Bottom | Float _ -> false
     | Int i -> Int_val.all_values ~size i
 
-let compare_min_max min max =
-  match min, max with
-  | None,_ -> -1
-  | _,None -> -1
-  | Some min, Some max -> Int.compare min max
-
-let compare_max_min max min =
-  match max, min with
-  | None,_ -> 1
-  | _,None -> 1
-  | Some max, Some min -> Int.compare max min
-
-let forward_le_int i1 i2 =
-  if compare_max_min (max_int i1) (min_int i2) <= 0 then Comp.True
-  else if compare_min_max (min_int i1) (max_int i2) > 0 then Comp.False
-  else Comp.Unknown
-
-let forward_lt_int i1 i2 =
-  if compare_max_min (max_int i1) (min_int i2) < 0 then Comp.True
-  else if compare_min_max (min_int i1) (max_int i2) >= 0 then Comp.False
-  else Comp.Unknown
-
-let forward_eq_int i1 i2 =
-  if cardinal_zero_or_one i1 && equal i1 i2 then Comp.True
-  else if intersects i2 i2 then Comp.Unknown
-  else Comp.False
-
-let forward_comp_int op i1 i2 =
-  let open Abstract_interp.Comp in
-  match op with
-  | Le -> forward_le_int i1 i2
-  | Ge -> forward_le_int i2 i1
-  | Lt -> forward_lt_int i1 i2
-  | Gt -> forward_lt_int i2 i1
-  | Eq -> forward_eq_int i1 i2
-  | Ne -> inv_truth (forward_eq_int i1 i2)
+let forward_comp_int op v1 v2 =
+  match v1, v2 with
+  | Bottom, _ | _, Bottom -> raise Error_Bottom
+  | Float _, _ | _, Float _ -> Unknown
+  | Int i1, Int i2 -> Int_val.forward_comp op i1 i2
 
 let rehash = function
   | Bottom -> bottom

@@ -1,6 +1,9 @@
 # frama-c -wp [...]
 [kernel] Parsing induction_typing.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] induction_typing.i:30: Warning: 
+  Neither code nor explicit exits and terminates for function f,
+   generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
 [wp] 2 goals scheduled
 [wp:script:allgoals] 
@@ -54,7 +57,6 @@
   Prove: false.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_function_loop_invariant_X_preserved (Tactic)
 [wp:script:allgoals] 
   typed_function_loop_invariant_X_preserved subgoal:
   
@@ -115,6 +117,7 @@
   Prove: ([ 1 ] *^ n) = a_1.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_function_loop_invariant_X_preserved (Tactic) (Qed)
 [wp] Proved goals:    1 / 2
   Qed:             1
   Unsuccess:       1

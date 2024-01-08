@@ -70,6 +70,14 @@ let () = Log.set_current_source (fun () -> fst (CurrentLoc.get ()))
 
 let pp_thisloc fmt = Location.pretty fmt (CurrentLoc.get ())
 
+let abort_context msg =
+  let pos = fst (CurrentLoc.get ()) in
+  let append fmt =
+    Format.pp_print_newline fmt ();
+    Errorloc.pp_context_from_file fmt pos
+  in
+  Kernel.abort ~current:true ~append msg
+
 let voidType = Cil_const.voidType
 let intType = TInt(IInt,[])
 let uintType = TInt(IUInt,[])
@@ -152,7 +160,8 @@ let copyMachine src dst =
 let theMachine = createMachine ()
 
 let msvcMode () = (theMachine.theMachine.compiler = "msvc")
-let gccMode () = (theMachine.theMachine.compiler = "gcc")
+let gccMode () = (theMachine.theMachine.compiler = "gcc"
+                  || theMachine.theMachine.compiler = "clang")
 
 let acceptEmptyCompinfo = ref false
 
@@ -400,7 +409,7 @@ let splitArrayAttributes =
   List.partition
     (fun a -> List.mem (attributeName a) qualifier_attributes)
 
-let rec typeAddAttributes a0 t =
+let rec typeAddAttributes ?(combine=addAttributes) a0 t =
   begin
     match a0 with
     | [] ->
@@ -408,7 +417,7 @@ let rec typeAddAttributes a0 t =
       t
     | _ ->
       (* anything else: add a0 to existing attributes *)
-      let add (a: attributes) = addAttributes a0 a in
+      let add (a: attributes) = combine a0 a in
       match t with
         TVoid a -> TVoid (add a)
       | TInt (ik, a) -> TInt (ik, add a)
@@ -527,10 +536,6 @@ let rec typeRemoveAttributesDeep (anl: string list) t =
       reshare a (fun a -> TNamed (tn, a))
     else
       typeAddAttributes (dropAttributes anl a) tn'
-
-(* JS: build an attribute annotation from [s]. *)
-let mkAttrAnnot s = "/*@ " ^ s ^ " */"
-
 
 let type_remove_qualifier_attributes =
   typeRemoveAttributes qualifier_attributes
@@ -830,6 +835,7 @@ let id = Fun.id
 let alphabetabeta _ x = x
 let alphabetafalse _ _ = false
 let alphatrue _ = true
+let alphafalse _ = false
 
 module Extensions = struct
   let initialized = ref false
@@ -3271,7 +3277,7 @@ let parseIntRes s = fst (parseIntAux s)
 let parseInt s =
   match parseIntRes s with
   | Ok i -> i
-  | Error msg -> Kernel.fatal ~current:true "%s" msg
+  | Error msg -> Kernel.abort ~current:true "%s" msg
 
 let parseIntLogic ~loc str =
   let i = parseInt str in
@@ -3590,6 +3596,7 @@ let rec isLogicRealType t =
     isLogicRealType (unroll_ltdef ty)
   | Lvar _ | Ltype _ | Larrow _ -> false
 
+(* ISO 6.2.5.18 *)
 let isArithmeticType t =
   match unrollTypeSkel t with
     (TInt _ | TEnum _ | TFloat _) -> true
@@ -3599,13 +3606,6 @@ let isLongDoubleType t =
   match unrollTypeSkel t with
   | TFloat(FLongDouble,_) -> true
   | _ -> false
-
-let isScalarType t=
-  match unrollTypeSkel t with
-  | TInt _ | TEnum _ | TFloat _ | TPtr _ -> true
-  | _ -> false
-
-let isArithmeticOrPointerType = isScalarType
 
 let rec isLogicArithmeticType t =
   match t with
@@ -3620,6 +3620,10 @@ let isFunctionType t =
   | TFun _ -> true
   | _ -> false
 
+(* ISO 6.2.5.1 *)
+let isObjectType t =
+  not (isFunctionType t)
+
 let isLogicFunctionType t = Logic_const.isLogicCType isFunctionType t
 
 let isFunPtrType t =
@@ -3633,6 +3637,28 @@ let isPointerType t =
   match unrollTypeSkel t with
   | TPtr _ -> true
   | _ -> false
+
+(* ISO 6.2.5.21 *)
+let isScalarType t = isArithmeticType t || isPointerType t
+
+let isArithmeticOrPointerType = isScalarType
+
+
+(********** TRANSPARENT UNION ******)
+(* Check if a type is a transparent union, and return the first field if it
+ * is *)
+let isTransparentUnion (t: typ) : fieldinfo option =
+  match unrollType t with
+  | TComp (comp, _) when not comp.cstruct ->
+    (* Turn transparent unions into the type of their first field *)
+    if typeHasAttribute "transparent_union" t then begin
+      match comp.cfields with
+      | Some [] | None ->
+        abort_context "Empty transparent union: %s" (compFullName comp)
+      | Some (f :: _) -> Some f
+    end else
+      None
+  | _ -> None
 
 let rec isTypeTagType t =
   match t with
@@ -3701,15 +3727,15 @@ let rec typeOf (e: exp) : typ =
   | Const(CEnum {eival=v}) -> typeOf v
 
   (* l-values used as r-values lose their qualifiers (C99 6.3.2.1:2) *)
-  | Lval(lv) -> type_remove_qualifier_attributes (typeOfLval lv)
+  | Lval lv -> type_remove_qualifier_attributes (typeOfLval lv)
 
   | SizeOf _ | SizeOfE _ | SizeOfStr _ -> theMachine.typeOfSizeOf
   | AlignOf _ | AlignOfE _ -> theMachine.typeOfSizeOf
   | UnOp (_, _, t) -> t
   | BinOp (_, _, _, t) -> t
   | CastE (t, _) -> t
-  | AddrOf (lv) -> TPtr(typeOfLval lv, [])
-  | StartOf (lv) ->
+  | AddrOf lv -> TPtr(typeOfLval lv, [])
+  | StartOf lv ->
     match unrollType (typeOfLval lv) with
     | TArray (t,_,attrs) -> TPtr(t, attrs)
     | _ ->  Kernel.fatal ~current:true "typeOf: StartOf on a non-array"
@@ -5786,6 +5812,14 @@ let isArrayType t = match unrollTypeSkel t with
   | TArray _ -> true
   | _ -> false
 
+let isUnsizedArrayType t = match unrollTypeSkel t with
+  | TArray (_, None, _) -> true
+  | _ -> false
+
+let isSizedArrayType t = match unrollTypeSkel t with
+  | TArray (_, Some _, _) -> true
+  | _ -> false
+
 let isAnyCharArrayType t = match unrollTypeSkel t with
   | TArray(tau,_,_) when isAnyCharType tau -> true
   | _ -> false
@@ -5794,40 +5828,67 @@ let isCharArrayType t = match unrollTypeSkel t with
   | TArray(tau,_,_) when isCharType tau -> true
   | _ -> false
 
-let isStructOrUnionType t = match unrollTypeSkel t with
-  | TComp _ -> true
+let isStructType t = match unrollTypeSkel t with
+  | TComp (comp, _) -> comp.cstruct
   | _ -> false
+
+let isUnionType t = match unrollTypeSkel t with
+  | TComp (comp, _) -> not comp.cstruct
+  | _ -> false
+
+let isStructOrUnionType t = isStructType t || isUnionType t
 
 let isVariadicListType t = match unrollTypeSkel t with
   | TBuiltin_va_list _ -> true
   | _ -> false
 
-let rec isConstantGen f e = match e.enode with
+let rec isConstantGen lit_only is_varinfo_cst f e = match e.enode with
   | Const c -> f c
-  | UnOp (_, e, _) -> isConstantGen f e
-  | BinOp (_, e1, e2, _) -> isConstantGen f e1 && isConstantGen f e2
-  | Lval (Var vi, NoOffset) ->
-    (vi.vglob && isArrayType vi.vtype || isFunctionType vi.vtype)
+  | UnOp (_, e, _) -> isConstantGen lit_only is_varinfo_cst f e
+  | BinOp (_, e1, e2, _) ->
+    isConstantGen lit_only is_varinfo_cst f e1 &&
+    isConstantGen lit_only is_varinfo_cst f e2
+  | Lval (Var vi, _) ->
+    is_varinfo_cst vi ||
+    (vi.vglob && isArrayType vi.vtype) ||
+    isFunctionType vi.vtype
   | Lval _ -> false
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> true
   (* see ISO 6.6.6 *)
   | CastE(t,{ enode = Const(CReal _)}) when isIntegralType t -> true
-  | CastE (_, e) -> isConstantGen f e
-  | AddrOf (Var vi, off) | StartOf (Var vi, off)
-    -> vi.vglob && isConstantOffsetGen f off
-  | AddrOf (Mem e, off) | StartOf(Mem e, off)
-    -> isConstantGen f e && isConstantOffsetGen f off
+  | CastE(t, e) ->
+    begin
+      match t, typeOf e with
+      | TInt (i, _), TPtr _ ->
+        (* gcc/clang/ccomp consider a non-truncated pointer to be a constant.
+           If it is truncated, we check whether we already know its value. *)
+        bytesSizeOfInt theMachine.upointKind <= bytesSizeOfInt i ||
+        isConstantGen true is_varinfo_cst f e
+      | _ -> isConstantGen lit_only is_varinfo_cst f e
+    end
+  | AddrOf (Var vi, off) | StartOf (Var vi, off) ->
+    not lit_only &&
+    vi.vglob &&
+    isConstantOffsetGen lit_only is_varinfo_cst f off
+  | AddrOf (Mem e, off) | StartOf(Mem e, off) ->
+    isConstantGen lit_only is_varinfo_cst f e &&
+    isConstantOffsetGen lit_only is_varinfo_cst f off
 
-and isConstantOffsetGen f = function
+and isConstantOffsetGen lit_only is_varinfo_cst f = function
     NoOffset -> true
-  | Field(_fi, off) -> isConstantOffsetGen f off
-  | Index(e, off) -> isConstantGen f e && isConstantOffsetGen f off
+  | Field(_fi, off) -> isConstantOffsetGen lit_only is_varinfo_cst f off
+  | Index(e, off) ->
+    isConstantGen lit_only is_varinfo_cst f e &&
+    isConstantOffsetGen lit_only is_varinfo_cst f off
 
-let isConstant e = isConstantGen alphatrue e
-let isConstantOffset o = isConstantOffsetGen alphatrue o
+let isConstant ?(is_varinfo_cst = alphafalse) e =
+  isConstantGen false is_varinfo_cst alphatrue e
+let isConstantOffset ?(is_varinfo_cst = alphafalse) o =
+  isConstantOffsetGen false is_varinfo_cst alphatrue o
 
-let isIntegerConstant e =
-  isConstantGen
+let isIntegerConstant ?(is_varinfo_cst = alphafalse) e =
+  isConstantGen false
+    is_varinfo_cst
     (function
       | CInt64 _ | CChr _ | CEnum _ -> true
       | CStr _ | CWStr _ | CReal _ -> false)
@@ -5838,44 +5899,685 @@ let getCompField cinfo fieldName =
     (fun fi -> fi.fname = fieldName)
     (Option.value ~default:[] cinfo.cfields)
 
-let mkCastT ?(force=false) ~(oldt: typ) ~(newt: typ) e =
-  let loc = e.eloc in
-  (* Issue #!1546
-     let force = force ||
-      (* see warning of need_cast function:
-         [false] as default value for that option is not safe... *)
-      (match e.enode with | Const(CEnum _) -> false | _ -> true)
-     in *)
-  if need_cast ~force oldt newt then begin
-    let mk_cast exp = (* to new type [newt] *)
-      new_exp ~loc (CastE(type_remove_qualifier_attributes newt,exp))
-    in
-    let normalized_type = type_remove_attributes_for_c_cast (unrollType newt) in
-    (* Watch out for constants and cast of cast to pointer *)
-    match normalized_type, e.enode with
-    (* In the case were we have a representation for the literal,
-       explicitly add the cast. *)
-    | TInt(newik, []), Const(CInt64(i, _, None)) ->
-      kinteger64 ~loc ~kind:newik i
-    | TPtr _, CastE (_, e') ->
-      (match unrollType (typeOf e'), e'.enode with
-       | (TPtr _ as typ''), _ ->
-         (* Old cast can be removed...*)
-         if need_cast ~force newt typ'' then mk_cast e'
-         else (* In fact, both casts can be removed. *) e'
-       | _, Const(CInt64 (i, _, _)) when Integer.is_zero i -> mk_cast e'
-       | _ -> mk_cast e)
-    | _ ->
-      (* Do not remove old casts because they are conversions !!! *)
-      mk_cast e
-  end else
-    e
+let sameSizeInt ?(machdep=false) (ik1 : ikind) (ik2 : ikind) =
+  if machdep then bytesSizeOfInt ik1 == bytesSizeOfInt ik2
+  else
+    match ik1, ik2 with
+    | (IChar | ISChar | IUChar), (IChar | ISChar | IUChar) -> true
+    | (IShort | IUShort), (IShort | IUShort) -> true
+    | (IInt | IUInt), (IInt | IUInt) -> true
+    | (ILong | IULong), (ILong | IULong) -> true
+    | (ILongLong | IULongLong), (ILongLong | IULongLong) -> true
+    | _ -> false
 
-let mkCast ?force ~(newt: typ) e =
-  mkCastT ?force ~oldt:(typeOf e) ~newt e
+
+let sameSign ?(machdep=false) (ik1 : ikind) (ik2 : ikind) =
+  if machdep then isSigned ik1 = isSigned ik2
+  else
+    match ik1, ik2 with
+    | IChar, (ISChar | IUChar)
+    | ISChar, (IChar | IUChar)
+    | IUChar, (IChar | ISChar) -> false
+    | _ -> isSigned ik1 = isSigned ik2
+
+let same_int64 ?(machdep=true) e1 e2 =
+  match constFoldToInt ~machdep e1, constFoldToInt ~machdep e2 with
+  | Some i, Some i' -> Integer.equal i i'
+  | _ -> false
+
+(* how type qualifiers must be checked *)
+type qualifier_check_context =
+  | Identical (* identical qualifiers. *)
+  | IdenticalToplevel (* ignore at toplevel, use Identical when going under a
+                         pointer. *)
+  | Covariant (* first type can have const-qualifications
+                 the second doesn't have. *)
+  | CovariantToplevel
+  (* accepts everything for current type, use Covariant when going under a
+     pointer. *)
+  | Contravariant (* second type can have const-qualifications
+                     the first doesn't have. *)
+  | ContravariantToplevel
+  (* accepts everything for current type, use Contravariant when going under
+     a pointer. *)
+
+let qualifier_context_fun_arg = function
+  | Identical | IdenticalToplevel -> IdenticalToplevel
+  | Covariant | CovariantToplevel -> ContravariantToplevel
+  | Contravariant | ContravariantToplevel -> CovariantToplevel
+
+let qualifier_context_fun_ret = function
+  | Identical | IdenticalToplevel -> IdenticalToplevel
+  | Covariant | CovariantToplevel -> CovariantToplevel
+  | Contravariant | ContravariantToplevel -> ContravariantToplevel
+
+let qualifier_context_ptr = function
+  | Identical | IdenticalToplevel -> Identical
+  | Covariant | CovariantToplevel -> Covariant
+  | Contravariant | ContravariantToplevel -> Contravariant
+
+let included_qualifiers ?(context=Identical) a1 a2 =
+  let a1 = filter_qualifier_attributes a1 in
+  let a2 = filter_qualifier_attributes a2 in
+  let a1 = dropAttribute "restrict" a1 in
+  let a2 = dropAttribute "restrict" a2 in
+  let a1_no_cv = dropAttributes ["const"; "volatile"] a1 in
+  let a2_no_cv = dropAttributes ["const"; "volatile"] a2 in
+  let is_equal = Cil_datatype.Attributes.equal a1 a2 in
+  if is_equal then true
+  else begin
+    match context with
+    | Identical -> false
+    | Covariant -> Cil_datatype.Attributes.equal a1_no_cv a2
+    | Contravariant -> Cil_datatype.Attributes.equal a1 a2_no_cv
+    | CovariantToplevel | ContravariantToplevel | IdenticalToplevel -> true
+  end
+
+(* precondition: t1 and t2 must be "compatible" as per combineTypes, i.e.
+   you must have called [combineTypes t1 t2] before calling this function. *)
+let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
+  match unrollType t1, unrollType t2 with
+  | TFun (tres1, Some args1, _, _), TFun (tres2, Some args2, _, _) ->
+    have_compatible_qualifiers_deep
+      ~context:(qualifier_context_fun_ret context) tres1 tres2 &&
+    let context = qualifier_context_fun_arg context in
+    List.for_all2 (fun (_, t1', a1) (_, t2', a2) ->
+        have_compatible_qualifiers_deep ~context t1' t2' &&
+        included_qualifiers ~context a1 a2)
+      args1 args2
+  | TPtr (t1', a1), TPtr (t2', a2)
+  | TArray (t1', _, a1), TArray (t2', _, a2) ->
+    (included_qualifiers ~context a1 a2) &&
+    let context = qualifier_context_ptr context in
+    have_compatible_qualifiers_deep ~context t1' t2'
+  | _, _ -> included_qualifiers ~context (typeAttrs t1) (typeAttrs t2)
+
+
+let rec is_nullptr e =
+  match e.enode with
+  | Const (CInt64 (i,_,_)) -> Integer.is_zero i
+  | CastE (t,e) when isPointerType t -> is_nullptr e
+  | _ -> false
+
+(* true if the expression is known to be a boolean result, i.e. 0 or 1. *)
+let rec is_boolean_result e =
+  (isBoolType (typeOf e)) ||
+  match e.enode with
+  | Const _ ->
+    (match isInteger e with
+     | Some i -> Integer.is_zero i || Integer.is_one i
+     | None -> false)
+  | CastE (_, e) -> is_boolean_result e
+  | BinOp ((Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr), _, _, _) -> true
+  | BinOp
+      ((PlusA | PlusPI | MinusA | MinusPI | MinusPP | Mult
+       | Div | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr), _, _, _) -> false
+  | UnOp (LNot, _, _) -> true
+  | UnOp ((Neg | BNot), _, _) -> false
+  | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
+  | AlignOfE _ | AddrOf _ | StartOf _ -> false
+
+
+(** A hook into the code that creates casts.  By default this
+    returns the new type.
+    Casts in the source code are exempt from this hook. *)
+let typeForInsertedCast:
+  (Cil_types.exp -> Cil_types.typ -> Cil_types.typ -> Cil_types.typ) ref =
+  ref (fun _ _ t -> t)
+
+
+exception Cannot_combine of string
+
+type combineWhat =
+    CombineFundef of bool
+  (* The new definition is for a function definition. The old
+   * is for a prototype. arg is [true] for an old-style declaration *)
+  | CombineFunarg of bool
+  (* Comparing a function argument type with an old prototype argument.
+     arg is [true] for an old-style declaration, which
+     triggers some ad hoc treatment in GCC mode. *)
+  | CombineFunret (* Comparing the return of a function with that from an old
+                   * prototype *)
+  | CombineOther
+
+(* [combineAttributes what olda a] combines the attributes in [olda] and [a]
+   according to [what]:
+   - if [what == CombineFunarg], then override old attributes;
+     this is used to ensure that attributes from formal argument types in a
+     function definition are not mixed with attributes from arguments in other
+     (compatible, but with different qualifiers) declarations;
+   - else, perform the union of old and new attributes. *)
+let combineAttributes what olda a =
+  match what with
+  | CombineFunarg _ -> a (* override old attributes with new ones *)
+  | _ -> addAttributes olda a (* union of attributes *)
+
+type combineFunction =
+  {
+    typ_combine : combineFunction ->
+      strictInteger:bool -> strictReturnTypes:bool ->
+      combineWhat -> typ -> typ -> typ;
+
+    enum_combine : combineFunction ->
+      enuminfo -> enuminfo -> enuminfo;
+
+    comp_combine : combineFunction ->
+      compinfo -> compinfo -> compinfo;
+
+    name_combine : combineFunction -> combineWhat ->
+      typeinfo -> typeinfo -> typeinfo;
+  }
+
+(* Combine the types. Raises the Cannot_combine exception with an error message.
+   [what] is used to recursively deal with function return types and function
+   arguments in special ways.
+   Note: we cannot force the qualifiers of oldt and t to be the same here,
+   because in some cases (e.g. string literals and char pointers) it is
+   allowed to have differences, while in others we want to be more strict. *)
+let combineTypesGen ?emitwith (combF : combineFunction)
+    ~strictInteger ~strictReturnTypes
+    (what : combineWhat) (oldt : typ) (t : typ) : typ =
+  let warning = Kernel.warning ?emitwith in
+  match oldt, t with
+  | TVoid olda, TVoid a -> TVoid (combineAttributes what olda a)
+
+  | _, TVoid _ when what = CombineFunret && not strictReturnTypes -> t
+
+  | TInt (oldik, olda), TInt (ik, a) ->
+    let result k oldk = if rank oldk<rank k then k else oldk in
+    let check_gcc_mode oldk k =
+      if gccMode () && oldk == IInt &&
+         bytesSizeOf t <= bytesSizeOfInt IInt &&
+         (what = CombineFunarg true || what = CombineFunret)
+      then k
+      else
+        let msg =
+          Format.asprintf
+            "different integer types:@ '%a' and '%a'"
+            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t in
+        raise (Cannot_combine msg)
+    in
+    let combineIK oldk k =
+      if oldk == k then oldk else
+      if not strictInteger
+      then
+        if sameSizeInt ~machdep:false oldk k && sameSign ~machdep:false oldk k
+        then
+          (* The types contain the same sort of values but are not equal.
+             For example on x86_16 machdep unsigned short and unsigned int. *)
+          result k oldk
+        else
+        if sameSizeInt ~machdep:true oldk k && sameSign ~machdep:true oldk k
+        then
+          begin
+            warning
+              ~wkey:Kernel.wkey_int_conversion
+              ~current:true
+              "Integer compatibily is machine-dependent : %a and %a\n"
+              Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t;
+            result k oldk
+          end
+        else
+          check_gcc_mode oldk k
+      else
+        check_gcc_mode oldk k
+    in
+    TInt (combineIK oldik ik, combineAttributes what olda a)
+
+  | TFloat (oldfk, olda), TFloat (fk, a) ->
+    let combineFK oldk k =
+      if oldk == k then oldk else
+      if gccMode () && oldk == FDouble && k == FFloat
+         && (what = CombineFunarg true || what = CombineFunret)
+      then k
+      else
+        raise (Cannot_combine "different floating point types")
+    in
+    TFloat (combineFK oldfk fk, combineAttributes what olda a)
+
+  | TEnum (oldei, olda), TEnum (ei, a) ->
+    (* Matching enumerations always succeeds. But sometimes it maps both
+     * enumerations to integers *)
+    TEnum (combF.enum_combine combF oldei ei,
+           combineAttributes what olda a)
+
+  (* Strange one. But seems to be handled by GCC *)
+  | TEnum (oldei, olda) , TInt(IInt, a) ->
+    TEnum(oldei, combineAttributes what olda a)
+
+  (* Strange one. But seems to be handled by GCC. Warning. Here we are
+   * leaking types from new to old  *)
+  | TInt(IInt, olda), TEnum (ei, a) ->
+    TEnum(ei, combineAttributes what olda a)
+
+  | TComp (oldci, olda) , TComp (ci, a) ->
+    TComp(combF.comp_combine combF oldci ci,
+          combineAttributes what olda a)
+
+  | TArray (oldbt, oldsz, olda), TArray (bt, sz, a) ->
+    let newbt =
+      combF.typ_combine combF
+        ~strictInteger ~strictReturnTypes CombineOther oldbt bt
+    in
+    let newsz =
+      match oldsz, sz with
+      | None, Some _ -> sz
+      | Some _, None -> oldsz
+      | None, None -> sz
+      | Some oldsz', Some sz' ->
+        (* They are not structurally equal. But perhaps they are equal if we
+           evaluate them. Check first machine independent comparison. *)
+        let checkEqualSize (machdep: bool) =
+          match constFoldToInt ~machdep oldsz', constFoldToInt ~machdep sz' with
+          | Some m, Some n -> m = n
+          | _ -> ExpStructEqSized.equal oldsz' sz'
+        in
+        if checkEqualSize false then
+          oldsz
+        else if checkEqualSize true then begin
+          warning
+            ~wkey:Kernel.wkey_int_conversion
+            ~current:true
+            "Array type comparison succeeds only based on machine-dependent \
+             constant evaluation: %a and %a\n"
+            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t;
+          oldsz
+        end else
+          raise (Cannot_combine "different array lengths")
+    in
+    TArray (newbt, newsz, combineAttributes what olda a)
+
+  | TPtr (oldbt, olda), TPtr (bt, a) ->
+    let newbt =
+      combF.typ_combine combF
+        ~strictInteger ~strictReturnTypes CombineOther oldbt bt
+    in
+    TPtr (newbt, combineAttributes what olda a)
+
+  | TFun (oldrt, oldargs, oldva, olda), TFun (rt, args, va, a) ->
+    let newrt =
+      combF.typ_combine combF
+        ~strictInteger ~strictReturnTypes CombineFunret oldrt rt
+    in
+    if oldva != va then
+      raise (Cannot_combine "different vararg specifiers");
+    (* If one does not have arguments, believe the one with the
+     * arguments *)
+    let newargs, olda' =
+      if oldargs = None then args, olda
+      else if args = None then oldargs, olda
+      else
+        let (oldargslist, oldghostargslist) = argsToPairOfLists oldargs in
+        let (argslist, ghostargslist) = argsToPairOfLists args in
+        if List.length oldargslist <> List.length argslist then
+          raise (Cannot_combine "different number of arguments")
+        else if List.length oldghostargslist <> List.length ghostargslist then
+          raise (Cannot_combine "different number of ghost arguments")
+        else
+          let oldargslist = oldargslist @ oldghostargslist in
+          let argslist = argslist @ ghostargslist in
+          (* Go over the arguments and update the old ones with the
+           * adjusted types *)
+          (* Format.printf "new type is %a@." Cil_datatype.Typ.pretty t; *)
+          let what =
+            match what with
+            | CombineFundef b -> CombineFunarg b
+            | _ -> CombineOther
+          in
+          Some
+            (List.map2
+               (fun (on, ot, oa) (an, at, aa) ->
+                  (* Update the names. Always prefer the new name. This is
+                     very important if the prototype uses different names than
+                     the function definition. *)
+                  let n = if an <> "" then an else on in
+                  let t =
+                    combF.typ_combine combF
+                      ~strictInteger ~strictReturnTypes what ot at
+                  in
+                  let a = addAttributes oa aa in
+                  (n, t, a))
+               oldargslist argslist),
+          olda
+    in
+    (* Drop missingproto as soon as one of the type is a properly declared one*)
+    let olda =
+      if not (hasAttribute "missingproto" a) then
+        dropAttribute "missingproto" olda'
+      else olda'
+    in
+    let a =
+      if not (hasAttribute "missingproto" olda') then
+        dropAttribute "missingproto" a
+      else a
+    in
+    TFun (newrt, newargs, oldva, combineAttributes what olda a)
+
+  | TBuiltin_va_list olda, TBuiltin_va_list a ->
+    TBuiltin_va_list (combineAttributes what olda a)
+
+  | TNamed (oldt, olda), TNamed (t, a) ->
+    TNamed (combF.name_combine combF what oldt t,
+            combineAttributes what olda a)
+
+  | _, TNamed (t, a) ->
+    let res =
+      combF.typ_combine combF
+        ~strictInteger ~strictReturnTypes what oldt t.ttype
+    in
+    typeAddAttributes ~combine:(combineAttributes what) a res
+
+  | TNamed (oldt, olda), _ ->
+    let res =
+      combF.typ_combine combF
+        ~strictInteger ~strictReturnTypes what oldt.ttype t
+    in
+    typeAddAttributes ~combine:(combineAttributes what) olda res
+
+  | _ ->
+    raise
+      (Cannot_combine
+         (Format.asprintf "different type constructors:@ %a and %a"
+            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t))
+
+
+let default_combines = {
+  typ_combine = (fun combF -> combineTypesGen combF);
+  enum_combine = (fun _ _ ei -> ei);
+  comp_combine = (fun _ oldci ci ->
+      if oldci.cstruct <> ci.cstruct then
+        raise (Cannot_combine "different struct/union types");
+      if oldci.cname = ci.cname then
+        oldci
+      else
+        raise (Cannot_combine
+                 (Format.sprintf "%ss with different tags"
+                    (if oldci.cstruct then "struct" else "union"))));
+  name_combine = (fun c what oldt t ->
+      if oldt.tname = t.tname then oldt
+      else
+        begin
+          ignore (c.typ_combine c ~strictInteger:true ~strictReturnTypes:false
+                    what oldt.ttype t.ttype);
+          oldt
+        end);
+}
+
+
+let combineTypes ?(strictInteger=true) ?(strictReturnTypes=false)
+    what (oldt: typ) (t: typ) : typ =
+  combineTypesGen default_combines
+    ~strictInteger ~strictReturnTypes what oldt t
+
+(***************** Compatibility ******)
+
+let compatibleTypes ?strictReturnTypes ?context t1 t2 =
+  let r = combineTypes ?strictReturnTypes CombineOther t1 t2 in
+  (* C99, 6.7.3 §9: "... to be compatible, both shall have the identically
+     qualified version of a compatible type;" *)
+  if not (have_compatible_qualifiers_deep ?context t1 t2) then
+    raise (Cannot_combine "different qualifiers");
+  (* Note: different non-qualifier attributes will be silently dropped. *)
+  r
+
+let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
+  try
+    ignore (compatibleTypes ?strictReturnTypes ?context t1 t2); true
+  with Cannot_combine _ -> false
+
+(******************** CASTING *****)
+
+let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
+  let rec default_rec oldt newt =
+    let dkey = Kernel.dkey_typing_cast in
+    let error s =
+      if fromsource
+      then abort_context s
+      else Kernel.fatal ~current:true s
+    in
+    match unrollType oldt, unrollType newt with
+    | TNamed _, _
+    | _, TNamed _ -> Kernel.fatal ~current:true "unrollType failed in checkCast"
+    | t, TInt (IBool, _) when isScalarType t -> ()
+    | TInt _, TInt _ -> ()
+    | TFloat _, TInt _ -> (* ISO 6.3.1.4.1 *) ()
+    | TInt _, TFloat _ -> (* ISO 6.3.1.4.2 *) ()
+    | TFloat _, TFloat _ -> (* ISO 6.3.1.5.1 *) ()
+
+    (* ISO 6.4.4.3 is only about enum constant but ccomp is more permissive. *)
+    | TEnum _, (TInt _ | TFloat _ | TPtr _ | TEnum _)
+    | TFloat _ , TEnum _ -> ()
+    | TPtr _, TEnum _ ->
+      Kernel.debug ~dkey ~current:true
+        "Casting a pointer into an enumeration type"
+    | TInt _, TEnum _ -> ()
+
+    | _, TVoid _ ->
+      (* ISO 6.3.2.2 *)
+      Kernel.debug ~level:3
+        "Casting a value into void: expr is evaluated for side effects"
+    | TPtr (t, _), TPtr (TVoid _, _) when isObjectType t ->
+      (* ISO 6.3.2.3.1 *) ()
+    | TPtr (TVoid _, _), TPtr (t, _) when isObjectType t ->
+      (* ISO 6.3.2.3.1 *) ()
+    | TInt _, TPtr _ -> (* ISO 6.3.2.3.5 *) ()
+    | TPtr _, TInt _ -> (* ISO 6.3.2.3.6 *)
+      if not fromsource && newt != theMachine.upointType
+      then
+        Kernel.warning
+          ~wkey:Kernel.wkey_int_conversion
+          ~current:true
+          "Conversion from a pointer to an integer without an explicit cast"
+    | TPtr (t1, _), TPtr (t2, _) when isObjectType t1 && isObjectType t2 ->
+      (* ISO 6.3.2.3.7 *) ()
+    | TPtr (t1, _), TPtr (t2, _) when isFunctionType t1 && isFunctionType t2 ->
+      (* ISO 6.3.2.3.8 *)
+      if not (areCompatibleTypes ?context oldt newt)
+      then
+        Kernel.warning
+          ~wkey:Kernel.wkey_incompatible_types_call
+          ~current:true
+          "implicit conversion between incompatible function types:@ \
+           %a@ and@ %a"
+          Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
+
+    (* accept converting a ptr to function to/from a ptr to void, even though
+       not really accepted by the standard.
+       Main compilers supports it. *)
+    | TPtr (TFun _, _), TPtr (TVoid _, _) -> ()
+    | TPtr (TVoid _, _), TPtr (TFun _, _) -> ()
+
+    | TFun _, TPtr (TFun _, _) -> (* ISO 6.3.2.1.4 *) ()
+
+    | TArray (t1, _, _), TPtr (t2, _) ->
+      (* ISO 6.3.2.1.3 *)
+      if not (areCompatibleTypes ?context t1 t2)
+      then
+        Kernel.warning
+          ~wkey:Kernel.wkey_incompatible_types_call
+          ~current:true
+          "conversion between incompatible from array type to pointer type:@ \
+           %a@ and@ %a"
+          Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
+
+    | TArray (t1, _, _), TArray (t2, _, _) ->
+      if not (areCompatibleTypes ?context t1 t2)
+      then
+        Kernel.warning
+          ~wkey:Kernel.wkey_incompatible_types_call
+          ~current:true
+          "conversion between incompatible array types :@ \
+           %a@ and@ %a"
+          Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
+
+    (* pointer to potential function type. Note that we do not
+       use unrollTypeDeep above in order to avoid needless divergence with
+       original type in the sources.
+    *)
+    | TPtr (TFun _, _), TPtr (TNamed (ti, nattr), pattr) ->
+      default_rec oldt (TPtr (typeAddAttributes nattr ti.ttype, pattr))
+    | TPtr (TNamed (ti, nattr), pattr), TPtr (TFun _, _) ->
+      default_rec (TPtr (typeAddAttributes nattr ti.ttype, pattr)) newt
+
+    | TFloat _, TPtr _
+    | TPtr _, TFloat _ ->
+      (* ISO 6.5.4.4 *)
+      error "illegal conversion between float and pointers"
+
+    (* No other conversion implying a pointer to function
+          and a pointer to object are supported. *)
+    | TPtr (t1, _), TPtr (t2, _) when isFunctionType t1 && isObjectType t2 ->
+      if not nullptr_cast then
+        Kernel.warning
+          ~wkey:Kernel.wkey_incompatible_pointer_types
+          ~current:true
+          "casting function to %a" Cil_datatype.Typ.pretty newt
+    | TPtr (t1, _), TPtr (t2, _) when isFunctionType t2 && isObjectType t1 ->
+      if not nullptr_cast then
+        Kernel.warning
+          ~wkey:Kernel.wkey_incompatible_pointer_types
+          ~current:true
+          "casting function from %a" Cil_datatype.Typ.pretty oldt
+
+    | _, TPtr (t1, _) when isFunctionType t1 ->
+      error "cannot cast %a to function type"
+        Cil_datatype.Typ.pretty oldt
+
+    | t1, t2 when isArithmeticType t1 && isArithmeticType t2 ->
+      (* ISO 6.5.16.1.1#1 *) ()
+
+
+    | TComp _, TComp _ when areCompatibleTypes oldt newt ->
+      (* ISO 6.5.16.1.1#2*) ()
+
+    (* If we try to pass a transparent union value to a function
+       expecting a transparent union argument, the argument type would
+       have been changed to the type of the first argument, and we'll
+       see a cast from a union to the type of the first argument. Turn
+       that into a field access *)
+    | TComp (_, _), _ ->
+      begin
+        match isTransparentUnion oldt with
+        | None ->
+          abort_context "cast from %a to %a"
+            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
+        | Some _ -> ()
+      end
+
+    | TBuiltin_va_list _, (TInt _ | TPtr _) -> ()
+
+    | (TInt _ | TPtr _), TBuiltin_va_list _ ->
+      Kernel.debug ~dkey ~current:true
+        "Casting %a to __builtin_va_list" Cil_datatype.Typ.pretty oldt
+
+    | _, t1 when fromsource && not (isScalarType t1) ->
+      (* ISO 6.5.4.2 *)
+      error "Cast over a non-scalar type %a"
+        Cil_datatype.Typ.pretty newt
+
+    | _ ->
+      error "cannot cast from %a to %a@\n"
+        Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
+  in default_rec
+
+let rec castReduce fromsource force =
+  let dkey = Kernel.dkey_typing_cast in
+  let rec rec_default oldt newt e =
+    let loc = e.eloc in
+    let normalized_newt = type_remove_attributes_for_c_cast (unrollType newt) in
+    let res e = new_exp ~loc (CastE (type_remove_qualifier_attributes newt, e)) in
+    match unrollType oldt, normalized_newt, e.enode with
+    (* In the case were we have a representation for the literal,
+         explicitly add the cast. *)
+    | _, TInt (newik, []), Const (CInt64 (i, _, None)) ->
+      (* ISO 6.3.1.3.2 *) kinteger64 ~loc ~kind:newik i
+
+    | _, TPtr _, CastE (_, e') ->
+      begin
+        match unrollType (typeOf e'), e'.enode with
+        | (TPtr _ as typ''), _ ->
+          (* Old cast can be removed...*)
+          if need_cast ~force newt typ'' then res e'
+          else (* In fact, both casts can be removed. *) e'
+        | _, Const (CInt64 (i, _, _)) when Integer.is_zero i -> res e'
+        | _ -> res e
+      end
+
+    | TInt (ik, _), TEnum (ei, _), Const (CEnum { eihost = ei'}) when
+        ei.ename = ei'.ename && not fromsource &&
+        bytesSizeOfInt ik = bytesSizeOfInt ei'.ekind -> e
+
+    | TFun _, TPtr (TFun _, _), Lval lv -> mkAddrOf ~loc lv
+
+    | t, TInt (IBool, _), _ when isScalarType t ->
+      if is_boolean_result e then begin
+        Kernel.debug ~dkey "Explicit cast to Boolean: %a" !pp_exp_ref e;
+        res e
+      end else begin
+        Kernel.debug ~dkey
+          "bool conversion by checking !=0: %a" !pp_exp_ref e;
+        let cmp = mkBinOp ~loc Ne e (integer ~loc 0) in
+        let oldt = typeOf cmp in
+        rec_default oldt newt cmp
+      end
+
+    | TComp _, _, _ ->
+      begin
+        match isTransparentUnion oldt with
+        | None ->
+          abort_context "cast from %a to %a"
+            Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
+        | Some fstfield ->
+          (* We do it now only if the expression is an lval *)
+          let e' =
+            match e.enode with
+            | Lval lv ->
+              new_exp ~loc:e.eloc
+                (Lval (addOffsetLval (Field (fstfield, NoOffset)) lv))
+            | _ ->
+              Kernel.fatal ~current:true
+                "castTo: transparent union expression is not an lval: %a\n"
+                Cil_datatype.Exp.pretty e
+
+          in
+          (* Continue casting *)
+          rec_default fstfield.ftype newt e'
+      end
+
+    | _ -> res e
+  in rec_default
+
+and mkCastTGen ?(check=true) ?context ?(fromsource=false) ?(force=false)
+    ~(oldt: typ) ~(newt: typ) e =
+  let dkey = Kernel.dkey_typing_cast in
+  if
+    (if fromsource
+     then not (need_cast ~force oldt newt)
+     else not (need_cast ~force:false oldt newt))
+  then
+    begin
+      Kernel.debug ~dkey "no cast to perform";
+      let returned_type =
+        match newt with
+        | TNamed _ -> newt
+        | _ -> oldt
+      in
+      (returned_type, e)
+    end
+  else
+    let newt = if fromsource then newt else !typeForInsertedCast e oldt newt in
+    let nullptr_cast = is_nullptr e in
+    if check then checkCast ?context ~nullptr_cast ~fromsource oldt newt;
+    (newt, castReduce fromsource force oldt newt e)
+
+and mkCastT ?(check=true) ?(force=false) ~(oldt: typ) ~(newt: typ) e =
+  snd (mkCastTGen ~check ~context:Identical ~force ~oldt ~newt e)
+
+and mkCast ?(check=true) ?force ~(newt: typ) e =
+  mkCastT ~check ?force ~oldt:(typeOf e) ~newt e
 
 (* TODO: unify this with doBinOp in Cabs2cil. *)
-let mkBinOp ~loc op e1 e2 =
+and mkBinOp ~loc op e1 e2 =
   let t1 = typeOf e1 in
   let t2 = typeOf e2 in
   let machdep = false in
@@ -5907,7 +6609,7 @@ let mkBinOp ~loc op e1 e2 =
   let compare_pointer op ?cast1 ?cast2 e1 e2 =
     let do_cast e = function
       | None -> e
-      | Some t' -> mkCastT ~force:false ~oldt:(typeOf e) ~newt:t' e
+      | Some t' -> mkCast ~force:false ~newt:t' e
     in
     let e1, e2 =
       if need_cast ~force:true (typeOf e1) (typeOf e2) then

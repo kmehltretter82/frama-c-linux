@@ -68,3 +68,20 @@ void main(int c, int* p, int *q) {
 void call(int cond, int* px, int *py, int * qx, int* qy) {
   behaviors (cond, px, py, qx, qy) ;
 }
+
+/*@ behavior unguarded:
+      requires R ;
+      ensures P ;
+      assigns *px ;
+*/
+void unguarded(int *px){
+
+}
+
+/*@ requires RQ ;
+    assigns *py ;
+    ensures Q ;
+*/
+void call_unguarded(int* px, int* py){
+  unguarded(px) ;
+}

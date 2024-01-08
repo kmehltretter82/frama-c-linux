@@ -37,6 +37,13 @@ module Concurrency: Parameter_sig.Bool
 module Functions: Parameter_sig.Kernel_function_set
 module Instrument: Parameter_sig.Kernel_function_set
 
+module Widening_arguments_base: Parameter_sig.Int
+module Widening_arguments: Parameter_sig.Map
+  with type key = string and type value = int
+module Widening_output_base: Parameter_sig.Int
+module Widening_output: Parameter_sig.Map
+  with type key = string and type value = int
+
 val parameter_states: State.t list
 val emitter: Emitter.t
 
@@ -51,6 +58,7 @@ module Dkey: sig
   val typing: category
   val labels: category
   val translation: category
+  val env: category
 end
 
 val setup: ?rtl:bool -> unit -> unit

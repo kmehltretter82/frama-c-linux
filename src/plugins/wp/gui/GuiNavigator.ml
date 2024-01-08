@@ -298,7 +298,7 @@ class behavior
 
     method private popup_delete_script () =
       match popup_target with
-      | Some(w,_) -> ProofEngine.remove w ; ProofSession.remove w
+      | Some(w,_) -> ProofEngine.clear w ; ProofSession.remove w
       | None -> ()
 
     method private popup_run mode () =
@@ -403,7 +403,7 @@ let model_varinfo :
   | PTermLval(Some kf, _, _, (TVar {lv_origin=Some x},TNoOffset))
     when button=1 && RefUsage.is_computed () ->
     begin
-      let init = Globals.is_entry_point ~when_lib_entry:false kf in
+      let init = CfgInfos.is_entry_point kf in
       let acc = RefUsage.get ~kf ~init x in
       let model = match acc with
         | RefUsage.NoAccess -> "any"

@@ -140,6 +140,11 @@ let cmp_prover p q =
 let pp_prover fmt p = Format.pp_print_string fmt (title_of_prover p)
 let pp_mode fmt m = Format.pp_print_string fmt (title_of_mode m)
 
+let provers () =
+  List.map (fun p -> Why3 p) @@
+  List.filter Why3Provers.is_mainstream @@
+  Why3Provers.provers ()
+
 module P = struct type t = prover let compare = cmp_prover end
 module Pset = Set.Make(P)
 module Pmap = Map.Make(P)
@@ -152,18 +157,22 @@ type config = {
   valid : bool ;
   timeout : float option ;
   stepout : int option ;
+  memlimit : int option ;
 }
 
 let current () =
   let t = Wp_parameters.Timeout.get () in
   let s = Wp_parameters.Steps.get () in
+  let m = Wp_parameters.Memlimit.get () in
   {
     valid = false ;
     timeout = if t > 0 then Some (float t) else None ;
     stepout = if s > 0 then Some s else None ;
+    memlimit = if m > 0 then Some m else None ;
   }
 
-let default = { valid = false ; timeout = None ; stepout = None }
+let default =
+  { valid = false ; timeout = None ; stepout = None ; memlimit = None }
 
 let get_timeout ?kf ~smoke = function
   | { timeout = None } ->
@@ -181,18 +190,22 @@ let get_stepout = function
   | { stepout = None } -> Wp_parameters.Steps.get ()
   | { stepout = Some t } -> t
 
+let get_memlimit = function
+  | { memlimit = None } -> Wp_parameters.Memlimit.get ()
+  | { memlimit = Some t } -> t
+
 (* -------------------------------------------------------------------------- *)
 (* --- Results                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 type verdict =
   | NoResult
-  | Invalid
   | Unknown
   | Timeout
   | Stepout
   | Computing of (unit -> unit) (* kill function *)
   | Valid
+  | Invalid (* model *)
   | Failed
 
 type model = Why3Provers.model Probe.Map.t
@@ -209,7 +222,7 @@ type result = {
 }
 
 let is_result = function
-  | Valid | Unknown | Invalid | Timeout | Stepout | Failed -> true
+  | Valid | Invalid | Unknown | Timeout | Stepout | Failed -> true
   | NoResult | Computing _ -> false
 
 let is_verdict r = is_result r.verdict
@@ -217,15 +230,10 @@ let is_valid = function { verdict = Valid } -> true | _ -> false
 let is_trivial r = is_valid r && r.prover_time = 0.0
 let is_not_valid r = is_verdict r && not (is_valid r)
 let is_computing = function { verdict=Computing _ } -> true | _ -> false
-
-let smoked = function
-  | (Failed | NoResult | Computing _) as r -> r
-  | Valid -> Invalid
-  | Invalid | Unknown | Timeout | Stepout -> Valid
-
-let verdict ~smoke r = if smoke then smoked r.verdict else r.verdict
-
-let is_proved ~smoke r = (verdict ~smoke r = Valid)
+let is_proved ~smoke = function
+  | NoResult | Computing _ | Failed -> false
+  | Valid -> not smoke
+  | Unknown | Timeout | Stepout | Invalid -> smoke
 
 let configure r =
   let valid = (r.verdict = Valid) in
@@ -243,10 +251,14 @@ let configure r =
       let margin = 1000 in
       Some(max stepout margin)
     else None in
+  let memlimit =
+    let m = Wp_parameters.Memlimit.get () in
+    if m > 0 then Some m else None in
   {
     valid ;
     timeout ;
     stepout ;
+    memlimit ;
   }
 
 let time_fits t =
@@ -279,7 +291,6 @@ let result ?(model=Probe.Map.empty) ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(
 
 let no_result = result NoResult
 let valid = result Valid
-let invalid = result Invalid
 let unknown = result Unknown
 let timeout t = result ~time:t Timeout
 let stepout n = result ~steps:n Stepout
@@ -320,8 +331,8 @@ let pp_perf_shell fmt r =
 
 let name_of_verdict = function
   | NoResult | Computing _ -> "none"
-  | Invalid -> "invalid"
   | Valid -> "valid"
+  | Invalid -> "invalid"
   | Failed -> "failed"
   | Unknown -> "unknown"
   | Stepout -> "stepout"
@@ -345,7 +356,7 @@ let pp_result fmt r =
 let is_qualified prover result =
   match prover with
   | Qed | Tactical -> true
-  | Why3 _ -> result.cached || result.prover_time < Rformat.epsilon
+  | Why3 _ -> result.cached || result.prover_time <= Rformat.epsilon
 
 let pp_cache_miss fmt st updating prover result =
   if not updating
@@ -381,12 +392,21 @@ let pp_model fmt model =
     ) model
 
 let vrank = function
-  | NoResult | Computing _ -> 0
-  | Failed -> 1
-  | Unknown -> 2
-  | Timeout | Stepout -> 3
-  | Valid -> 4
-  | Invalid -> 5
+  | Computing _ -> 0
+  | NoResult -> 1
+  | Failed -> 2
+  | Unknown -> 3
+  | Timeout -> 4
+  | Stepout -> 5
+  | Valid -> 6
+  | Invalid -> 7
+
+let conjunction a b =
+  match a,b with
+  | Valid,Valid -> Valid
+  | Valid, r -> r
+  | r , Valid -> r
+  | _ -> if vrank b > vrank a then b else a
 
 let msize m = Probe.Map.fold (fun _ _ n -> succ n) m 0
 
@@ -405,30 +425,5 @@ let compare p q =
           if t <> 0 then t else
             Stdlib.compare p.solver_time q.solver_time
 
-let combine v1 v2 =
-  match v1 , v2 with
-  | Valid , Valid -> Valid
-  | Failed , _ | _ , Failed -> Failed
-  | Invalid , _ | _ , Invalid -> Invalid
-  | Timeout , _ | _ , Timeout -> Timeout
-  | Stepout , _ | _ , Stepout -> Stepout
-  | _ -> Unknown
-
-let merge r1 r2 =
-  let err = if r1.prover_errmsg <> "" then r1 else r2 in
-  {
-    verdict = combine r1.verdict r2.verdict ;
-    cached = r1.cached && r2.cached ;
-    solver_time = max r1.solver_time r2.solver_time ;
-    prover_time = max r1.prover_time r2.prover_time ;
-    prover_steps = max r1.prover_steps r2.prover_steps ;
-    prover_errpos = err.prover_errpos ;
-    prover_errmsg = err.prover_errmsg ;
-    prover_model = Probe.Map.union (fun _ v _ -> Some v)
-        r1.prover_model r2.prover_model
-  }
-
-let leq r1 r2 = compare r1 r2 <= 0
-
-let choose r1 r2 = if leq r1 r2 then r1 else r2
-let best = List.fold_left choose no_result
+let bestp pr1 pr2 = if compare (snd pr1) (snd pr2) <= 0 then pr1 else pr2
+let best = List.fold_left bestp (Qed,no_result)

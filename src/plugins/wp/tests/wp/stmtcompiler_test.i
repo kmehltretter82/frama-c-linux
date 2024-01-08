@@ -1,6 +1,6 @@
 /* run.config
  SCRIPT: @PTEST_NAME@
-   OPT: -wp-msg-key shell
+   DONTRUN: OPT: -wp-msg-key shell
 */
 int empty (int c){
   /*@ assert \true; */
@@ -88,7 +88,6 @@ int zloop(int x){
   return x;
 }
 
-
 /*@
   behavior zero:
     assumes x == 0;
@@ -153,4 +152,23 @@ int compare(int a, int b, int c, int d) {
   else r = 1;
   /*@ assert (a < b) ==> r == 1; @*/
   return r;
+}
+
+/*@ exits \true ;
+    ensures \false ;
+    assigns \nothing ;
+*/
+void exit(int);
+
+/*@ ensures foo == 0 ;
+    exits   foo == 1 ;
+*/
+void exits_and_ensures(void){
+  if(foo){
+    foo = 0 ;
+    return ;
+  } else {
+    foo = 1 ;
+    exit(0) ;
+  }
 }

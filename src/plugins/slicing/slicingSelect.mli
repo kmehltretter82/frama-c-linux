@@ -87,7 +87,7 @@ val select_stmt_zone :
   SlicingTypes.sl_select
 
 (** this one is similar to [select_stmt_zone] with the return statement
- * when the function is defined, but it can also be used for undefined functions. *)
+    when the function is defined, but it can also be used for undefined functions. *)
 val select_in_out_zone :
   at_end:bool ->
   use_undef:bool ->
@@ -136,7 +136,7 @@ val select_label :
   SlicingTypes.sl_select
 
 (** marking a call node means that a [choose_call] will have to decide that to
- * call according to the slicing-level, but anyway, the call will be visible.
+    call according to the slicing-level, but anyway, the call will be visible.
 *)
 val select_minimal_call :
   Kernel_function.t ->
@@ -199,9 +199,9 @@ val add_crit_ff_change_call :
   Cil_types.stmt -> SlicingInternals.called_fct -> unit
 
 (** change the call to call the given slice.
- * This is a user request, so it might be the case that
- * the new function doesn't compute enough outputs :
- * in that case, add outputs first.
+    This is a user request, so it might be the case that
+    the new function doesn't compute enough outputs :
+    in that case, add outputs first.
 *)
 val call_ff_in_caller :
   caller:SlicingInternals.fct_slice ->
@@ -223,6 +223,6 @@ val add_ff_selection :
   SlicingTypes.sl_select -> unit
 
 (** add a persistent selection to the function.
- * This might change its slicing level in order to call slices later on. *)
+    This might change its slicing level in order to call slices later on. *)
 val add_fi_selection :
   SlicingTypes.sl_select -> unit

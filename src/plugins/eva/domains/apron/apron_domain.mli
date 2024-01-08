@@ -24,11 +24,11 @@
     the APRON library: http://apron.cri.ensmp.fr/library
     For now, this binding only processes scalar integer variables. *)
 
-val octagon: Abstractions.flag
-val box: Abstractions.flag
-val polka_loose: Abstractions.flag
-val polka_strict: Abstractions.flag
-val polka_equality: Abstractions.flag
+val octagon: Abstractions.Domain.registered
+val box: Abstractions.Domain.registered
+val polka_loose: Abstractions.Domain.registered
+val polka_strict: Abstractions.Domain.registered
+val polka_equality: Abstractions.Domain.registered
 
 (*
 Local Variables:

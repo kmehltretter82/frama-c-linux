@@ -3,12 +3,12 @@ let
   ocamlOverlay = oself: osuper: {
     # External Packages
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
-    camlp5 = oself.callPackage ./camlp5.nix {};
+    combinetura = oself.callPackage ./combinetura.nix {};
     headache = oself.callPackage ./headache.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
+    ocplib-simplex = oself.callPackage ./ocplib-simplex.nix {};
     why3 = oself.callPackage ./why3.nix {};
-    yaml = oself.callPackage ./yaml.nix {};
-    ppx_deriving_yaml = oself.callPackage ./ppx_deriving_yaml.nix {};
+
     # Helpers
     mk_tests = oself.callPackage ./mk_tests.nix {};
     mk_plugin = oself.callPackage ./mk_plugin.nix {};
@@ -23,12 +23,16 @@ let
 
     # Builds
     frama-c = oself.callPackage ./frama-c.nix {};
+    frama-c-no-cover = oself.callPackage ./frama-c.nix { cover = false ; };
     frama-c-hdrck = oself.callPackage ./frama-c-hdrck.nix {};
     frama-c-lint = oself.callPackage ./frama-c-lint.nix {};
-    lint = oself.callPackage ./lint.nix {};
 
     # Tests
-    default-config-tests = oself.callPackage ./default-config-tests.nix {};
+    default-config-tests = oself.callPackage ./default-config-tests.nix {
+      frama-c-nocover = oself.frama-c.override {
+        cover = false ;
+      } ;
+    };
     e-acsl-tests = oself.callPackage ./e-acsl-tests.nix { config = ""; };
     e-acsl-dev-tests = oself.callPackage ./e-acsl-tests.nix { config = "dev"; };
     eva-default-tests = oself.callPackage ./eva-tests.nix { config = ""; };
@@ -51,9 +55,13 @@ let
 
     # Release
     api-doc = oself.callPackage ./api-doc.nix {};
+    api-json-doc = oself.callPackage ./api-json-doc.nix {};
     manuals = oself.callPackage ./manuals.nix {};
     src-distrib-tests = oself.callPackage ./src-distrib-tests.nix {
-      frama-c-release = oself.frama-c.override { release_mode = true ; } ;
+      frama-c-release = oself.frama-c.override {
+        release_mode = true ;
+        cover = false ;
+      } ;
     };
   };
   overlay = self: super: {

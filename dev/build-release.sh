@@ -44,6 +44,8 @@
 ##########################################################################
 # Check binaries
 
+set -eu
+
 function echo_red {
   echo -e "\e[31m$1\e[0m"
 }
@@ -91,9 +93,12 @@ LOWER_CODENAME="$(echo "$CODENAME" | tr '[:upper:]' '[:lower:]')"
 VERSION_AND_CODENAME="${VERSION_SAFE}-${CODENAME}"
 
 if [ "$VERSION_MINOR" != 0 ]; then
+  # We compare new minor to previous minor
   PREVIOUS="$VERSION_MAJOR.$((VERSION_MINOR - 1))"
 else
-  PREVIOUS="$((VERSION_MAJOR - 1)).0"
+  # We compare new major to previous major, the exact previous version is not
+  # of interest for a new major version
+  PREVIOUS="$((VERSION_MAJOR - 1))"
 fi
 PREVIOUS_NAME=$(git show $PREVIOUS:VERSION_CODENAME)
 
@@ -274,7 +279,19 @@ OPAM_FC_DIR="$OPAM_DIR/packages/frama-c/frama-c.$VERSION"
 mkdir -p $OPAM_DIR
 mkdir -p $OPAM_FC_DIR
 
-cat opam | grep -v "^version\:" | grep -v "^name\:" > $OPAM_FC_DIR/opam
+OPAM_VERSION="opam-version: \"2.0\""
+if [ "$FINAL_RELEASE" = "yes" ]; then
+  OPAM_VERSION_FIX="$OPAM_VERSION"
+else
+  OPAM_VERSION_FIX="$OPAM_VERSION\navailable: opam-version >= \"2.1.0\"\nflags: avoid-version"
+fi
+
+cat opam \
+  | grep -v "^version\:" \
+  | grep -v "^name\:" \
+  | sed -e "s/$OPAM_VERSION/$OPAM_VERSION_FIX/" \
+  > $OPAM_FC_DIR/opam
+
 cat >>$OPAM_FC_DIR/opam << EOL
 
 url {
@@ -356,7 +373,7 @@ cat >$JSON_DATA <<EOL
     ]
   },
 EOL
-echo "  \"description\": \"# Main changes since $PREVIOUS $PREVIOUS_NAME\n$(jq <"$CHANGES" --raw-input 'sub("^#";"##")' | jq --slurp 'join("\n")' | sed 's/^.//;s/.$//')" >> $JSON_DATA
+echo "  \"description\": \"# Main changes since $PREVIOUS $PREVIOUS_NAME\n$(jq <"$CHANGES" --raw-input 'sub("^#";"##")' | jq --slurp 'join("\n")' | sed 's/^.//;s/.$//')\"" >> $JSON_DATA
 echo "}" >> $JSON_DATA
 
 echo "Release data file built"
@@ -391,7 +408,7 @@ echo "Download directory built"
 mkdir -p $WEBSITE_INST_DIR
 
 INSTALL_WEBPAGE="$WEBSITE_INST_DIR/$LOWER_CODENAME.md"
-EXT="$FRAMAC_VERSION_CODENAME (released on $(date +%Y-%m-%d))"
+EXT="$CODENAME (released on $(date +%Y-%m-%d))"
 
 cat >$INSTALL_WEBPAGE <<EOL
 ---

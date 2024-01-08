@@ -27,7 +27,7 @@
 [eva:alarm] value_rte.c:13: Warning: 
   assertion 'rte,index_bound' got status unknown.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] value_rte.c:13: assertion 'rte,index_bound' got final status valid.
 [eva] value_rte.c:15: assertion 'rte,signed_overflow' got final status valid.
 [eva] ====== VALUES COMPUTED ======

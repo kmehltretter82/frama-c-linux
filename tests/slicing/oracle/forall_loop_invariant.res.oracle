@@ -16,7 +16,7 @@
   loop invariant got status unknown.
 [eva:alarm] forall_loop_invariant.i:18: Warning: assertion got status unknown.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function main

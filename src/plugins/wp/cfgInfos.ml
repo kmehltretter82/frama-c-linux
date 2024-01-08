@@ -118,7 +118,7 @@ let selected_clause ~prop name getter kf =
 let selected_terminates ~prop kf =
   match Annotations.terminates kf with
   | None ->
-    Wp_parameters.TerminatesDefinitions.get ()
+    false
   | Some ip ->
     let tk_name = "@terminates" in
     let tp_names = WpPropId.user_pred_names ip.Cil_types.ip_content in
@@ -163,7 +163,9 @@ let collect_calls ~bhv ?(on_missing_calls=fun _ -> ()) kf stmt =
       | None ->
         let bhvs =
           if bhv = []
-          then List.map (fun b -> b.b_name) (Annotations.behaviors kf)
+          then begin
+            List.map (fun b -> b.b_name) (Annotations.behaviors kf)
+          end
           else bhv in
         let calls =
           List.fold_left
@@ -299,6 +301,9 @@ end
 let is_recursive = RecursiveClusters.is_recursive
 let in_cluster = RecursiveClusters.in_cluster
 
+let is_entry_point kf =
+  not @@ Kernel.LibEntry.get () && Kernel_function.is_entry_point kf
+
 (* -------------------------------------------------------------------------- *)
 (* --- No variant loops                                                   --- *)
 (* -------------------------------------------------------------------------- *)
@@ -339,7 +344,9 @@ let wp_trivially_terminates =
 
 let set_trivially_terminates p hyps =
   incr trivial_terminates ;
-  Wp_parameters.result "[CFG] Goal %a : Valid (Trivial)" WpPropId.pp_propid p ;
+  if Wp_parameters.has_dkey VCS.dkey_shell then
+    Wp_parameters.feedback "[Valid] Goal %a (Cfg) (Trivial)"
+      WpPropId.pp_propid p ;
   let pid = WpPropId.property_of_id p in
   let hyps = Property.Set.elements hyps in
   Property_status.emit wp_trivially_terminates ~hyps pid Property_status.True
@@ -434,7 +441,7 @@ let compile Key.{ kf ; smoking ; bhv ; prop } =
   } in
   let behaviors = Annotations.behaviors kf in
   (* Inits *)
-  if Globals.is_entry_point ~when_lib_entry:false kf then
+  if is_entry_point kf then
     infos.annots <- List.exists (selected_main_bhv ~bhv ~prop) behaviors ;
   (* Function Body *)
   Option.iter

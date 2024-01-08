@@ -351,7 +351,7 @@
 [eva] Recording results for test_is_finite
 [eva] Done for function test_is_finite
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function my_ratio_body:
   __retres ∈ {-0x1.bca1b00000000p-1}

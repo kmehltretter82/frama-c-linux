@@ -29,24 +29,26 @@ import * as Toolbar from 'dome/frame/toolbars';
 import * as States from 'frama-c/states';
 
 export default function History(): JSX.Element {
-  const [selection, updateSelection] = States.useSelection();
-
-  const doPrevSelect = () => void updateSelection('HISTORY_PREV');
-  const doNextSelect = () => void updateSelection('HISTORY_NEXT');
-
+  const history = States.useHistory();
+  const prev = history.prev[0]?.scope;
+  const next = history.next[0]?.scope;
+  const { label: prevLabel } = States.useDeclaration(prev);
+  const { label: nextLabel } = States.useDeclaration(next);
+  const prevTitle = prevLabel || 'Previous location';
+  const nextTitle = nextLabel || 'Next location';
   return (
     <Toolbar.ButtonGroup>
       <Toolbar.Button
         icon="ANGLE.LEFT"
-        onClick={doPrevSelect}
-        disabled={!selection || selection.history.prevSelections.length === 0}
-        title="Previous location"
+        onClick={States.gotoPrev}
+        enabled={history.prev.length > 0}
+        title={prevTitle}
       />
       <Toolbar.Button
         icon="ANGLE.RIGHT"
-        onClick={doNextSelect}
-        disabled={!selection || selection.history.nextSelections.length === 0}
-        title="Next location"
+        onClick={States.gotoNext}
+        enabled={history.next.length > 0}
+        title={nextTitle}
       />
     </Toolbar.ButtonGroup>
   );

@@ -216,7 +216,7 @@ end
 (* ************************************************************************** *)
 
 (** Signature for a boolean parameter.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module type Bool = sig
 
   include S with type t = bool
@@ -230,7 +230,7 @@ module type Bool = sig
 end
 
 (** Signature for an integer parameter.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module type Int = sig
 
   include S with type t = int
@@ -437,7 +437,7 @@ module type String_set =
 (** Set of defined kernel functions. If you want to also include pure
     prototype, use {!Parameter_customize.argument_may_be_fundecl}.
     @since Sodium-20150201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module type Kernel_function_set =
   Set with type elt = Cil_types.kernel_function
        and type t = Cil_datatype.Kf.Set.t
@@ -515,7 +515,7 @@ module type Filepath_map =
 
 (** Signatures containing the different functors which may be used to generate
     new command line options.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module type Builder = sig
 
   val no_element_of_string: string -> 'a
@@ -523,34 +523,34 @@ module type Builder = sig
       @since Sodium-20150201
   *)
 
-  module Bool(X:sig include Input val default: bool end): Bool
-  module Action(X: Input) : Bool
+  module Bool(_:sig include Input val default: bool end): Bool
+  module Action(_: Input) : Bool
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-  module False(X: Input) : Bool
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+  module False(_: Input) : Bool
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-  module True(X: Input) : Bool
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+  module True(_: Input) : Bool
 
   module WithOutput
-      (X: sig include Input val output_by_default: bool end):
+      (_: sig include Input val output_by_default: bool end):
     With_output
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-  module Int(X: sig include Input_with_arg val default: int end): Int
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+  module Int(_: sig include Input_with_arg val default: int end): Int
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-  module Zero(X: Input_with_arg): Int
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+  module Zero(_: Input_with_arg): Int
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-  module String(X: sig include Input_with_arg val default: string end): String
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+  module String(_: sig include Input_with_arg val default: string end): String
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-  module Empty_string(X: Input_with_arg): String
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+  module Empty_string(_: Input_with_arg): String
 
   module Fc_Filepath = Filepath
 
-  module Filepath(X: sig
+  module Filepath(_: sig
       include Input_with_arg
       val existence: Filepath.existence
       val file_kind: string
@@ -565,21 +565,21 @@ module type Builder = sig
          include String_datatype_with_collections
          val of_singleton_string: string -> Set.t
        end)
-      (X: sig include Input_collection val default: E.Set.t end):
+      (_: sig include Input_collection val default: E.Set.t end):
     Set with type elt = E.t and type t = E.Set.t
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-  module String_set(X: Input_with_arg): String_set
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+  module String_set(_: Input_with_arg): String_set
 
   module Filled_string_set
-      (X: sig
+      (_: sig
          include Input_with_arg
          val default: Datatype.String.Set.t
        end): String_set
 
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-  module Kernel_function_set(X: Input_with_arg): Kernel_function_set
-  module Fundec_set(X: Input_with_arg): Fundec_set
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+  module Kernel_function_set(_: Input_with_arg): Kernel_function_set
+  module Fundec_set(_: Input_with_arg): Fundec_set
 
   module Make_list
       (E:
@@ -587,13 +587,13 @@ module type Builder = sig
          include String_datatype
          val of_singleton_string: string -> t list
        end)
-      (X: sig include Input_collection val default: E.t list end):
+      (_: sig include Input_collection val default: E.t list end):
     List with type elt = E.t and type t = E.t list
 
-  module String_list(X: Input_with_arg): String_list
+  module String_list(_: Input_with_arg): String_list
 
   module Filepath_list
-      (X: sig
+      (_: sig
          include Input_with_arg
          val existence: Fc_Filepath.existence
          val file_kind: string
@@ -602,7 +602,7 @@ module type Builder = sig
 
   module Filepath_map
       (V: Value_datatype with type key = Fc_Filepath.Normalized.t)
-      (X: sig
+      (_: sig
          include Input_with_arg
          val default: V.t Datatype.Filepath.Map.t
          val existence: Fc_Filepath.existence
@@ -617,13 +617,13 @@ module type Builder = sig
   module Make_map
       (K: String_datatype_with_collections)
       (V: Value_datatype with type key = K.t)
-      (X: sig include Input_collection val default: V.t K.Map.t end):
+      (_: sig include Input_collection val default: V.t K.Map.t end):
     Map
     with type key = K.t and type value = V.t and type t = V.t K.Map.t
 
   module String_map
       (V: Value_datatype with type key = string)
-      (X: sig include Input_with_arg val default: V.t Datatype.String.Map.t end):
+      (_: sig include Input_with_arg val default: V.t Datatype.String.Map.t end):
     Map
     with type key = string
      and type value = V.t
@@ -634,7 +634,7 @@ module type Builder = sig
       pure prototypes. *)
   module Kernel_function_map
       (V: Value_datatype with type key = Cil_types.kernel_function)
-      (X: sig include Input_with_arg val default: V.t Cil_datatype.Kf.Map.t end):
+      (_: sig include Input_with_arg val default: V.t Cil_datatype.Kf.Map.t end):
     Map
     with type key = Cil_types.kernel_function
      and type value = V.t
@@ -644,13 +644,13 @@ module type Builder = sig
   module Make_multiple_map
       (K: String_datatype_with_collections)
       (V: Multiple_value_datatype with type key = K.t)
-      (X: sig include Input_collection val default: V.t list K.Map.t end):
+      (_: sig include Input_collection val default: V.t list K.Map.t end):
     Multiple_map
     with type key = K.t and type value = V.t and type t = V.t list K.Map.t
 
   module String_multiple_map
       (V: Multiple_value_datatype with type key = string)
-      (X: sig
+      (_: sig
          include Input_with_arg
          val default: V.t list Datatype.String.Map.t
        end):
@@ -664,7 +664,7 @@ module type Builder = sig
       pure prototypes. *)
   module Kernel_function_multiple_map
       (V: Multiple_value_datatype with type key = Cil_types.kernel_function)
-      (X: sig
+      (_: sig
          include Input_with_arg
          val default: V.t list Cil_datatype.Kf.Map.t
        end):

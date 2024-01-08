@@ -242,7 +242,7 @@
   Called from stdlib_c.c:57.
 [eva] Done for function free
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function posix_memalign:
   __fc_heap_status ∈ [--..--]
@@ -256,7 +256,7 @@
   resolved_name ∈
                {{ NULL ; &__malloc_main_l44[0] ; &__malloc_realpath_l224[0] ;
                   &__malloc_realpath_l224_0[0] }}
-  realpath_len ∈ [1..4096]
+  realpath_len ∈ [1..4096] or UNINITIALIZED
   __retres ∈
           {{ NULL ; &__malloc_main_l44[0] ; &__malloc_realpath_l224[0] ;
              &__malloc_realpath_l224_0[0] }}
@@ -285,8 +285,8 @@
   p_memal_res ∈ {0; 12}
   p_memal_res2 ∈ {0; 12}
   resolved_name ∈ {{ NULL ; &__malloc_main_l44[0] }}
-  realpath_res ∈ {{ NULL ; &__malloc_realpath_l224[0] }}
-  canon ∈ {{ NULL ; &__malloc_realpath_l224_0[0] }}
+  realpath_res ∈ {{ NULL ; &__malloc_realpath_l224[0] }} or UNINITIALIZED
+  canon ∈ {{ NULL ; &__malloc_realpath_l224_0[0] }} or UNINITIALIZED
   __retres ∈ {0; 1}
   __calloc_w_main_l33[0..1073741823] ∈ {0; 42}
   __malloc_main_l44[0..4095] ∈ [--..--] or UNINITIALIZED

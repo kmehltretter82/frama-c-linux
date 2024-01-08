@@ -368,7 +368,7 @@ let in_ghost_block ?(battrs=[]) l =
 %token<Cabs.cabsloc> IF TRY EXCEPT FINALLY
 %token ELSE
 
-%token<Cabs.cabsloc> ATTRIBUTE INLINE NORETURN STATIC_ASSERT ASM TYPEOF FUNCTION__ PRETTY_FUNCTION__
+%token<Cabs.cabsloc> NOP_ATTRIBUTE ATTRIBUTE INLINE NORETURN STATIC_ASSERT ASM TYPEOF FUNCTION__ PRETTY_FUNCTION__
 %token LABEL__
 %token<Cabs.cabsloc> BUILTIN_VA_ARG
 %token BLOCKATTRIBUTE
@@ -1587,6 +1587,7 @@ attributes_with_asm:
 attribute_nocv:
     ATTRIBUTE LPAREN paren_attr_list RPAREN
                                         { ("__attribute__", $3), $1 }
+|   NOP_ATTRIBUTE                       { ("__attribute__", []), $1 }
 |   DECLSPEC paren_attr_list_ne         { ("__declspec", $2), $1 }
 |   MSATTR                              { (fst $1, []), snd $1 }
                                         /* ISO 6.7.3 */
@@ -1608,8 +1609,7 @@ attribute:
 |   RESTRICT              { ("restrict",[]), $1 }
 |   VOLATILE              { ("volatile",[]), $1 }
 |   GHOST                 { ("ghost",[]), $1 }
-|   ATTRIBUTE_ANNOT       { let annot, loc = $1 in
-			    (Cil.mkAttrAnnot annot, []), loc }
+|   ATTRIBUTE_ANNOT       { let annot, loc = $1 in (mk_attr_annot annot), loc }
 ;
 
 /* (* sm: I need something that just includes __attribute__ and nothing more,

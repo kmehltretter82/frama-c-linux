@@ -49,7 +49,7 @@ val create:
     become valid or invalid, but a valid status cannot become invalid).
     The given name must be unique.
     @raise Invalid_argument if an emitter with the given name already exist
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val get_name: t -> string
 
@@ -127,7 +127,7 @@ module Make_table
        val get: t -> emitter
      end)
     (D: Datatype.S)
-    (Info: sig include State_builder.Info_with_size val kinds: kind list end) :
+    (_: sig include State_builder.Info_with_size val kinds: kind list end) :
 sig
   type internal_tbl = D.t E.Hashtbl.t
   val self: State.t

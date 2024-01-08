@@ -73,12 +73,13 @@ module RTL = struct
 
   let mk_api_name fname = api_prefix ^ fname
 
-  let mk_gen_name name = e_acsl_gen_prefix ^ name
+  let is_generated_name name = startswith e_acsl_gen_prefix name
+
+  let mk_gen_name name =
+    if is_generated_name name then name else e_acsl_gen_prefix ^ name
 
   let get_original_name kf =
     strip_prefix e_acsl_gen_prefix (Kernel_function.get_name kf)
-
-  let is_generated_name name = startswith e_acsl_gen_prefix name
 
   let is_generated_kf kf =
     is_generated_name (Kernel_function.get_name kf)

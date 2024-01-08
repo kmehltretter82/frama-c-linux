@@ -9,7 +9,7 @@
 [eva] loop_array.i:8: starting to merge loop iterations
 [eva] loop_array.i:12: starting to merge loop iterations
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   T[0..4] ∈ {0; 2}

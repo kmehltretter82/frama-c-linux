@@ -2,6 +2,8 @@
 [kernel] Parsing doomed_localinit.i (no preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function access
+[wp] [Valid] Goal access_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal access_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function access
 ------------------------------------------------------------

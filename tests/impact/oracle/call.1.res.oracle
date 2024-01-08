@@ -14,8 +14,9 @@
   Called from call.i:16.
 [eva] using specification for function p1
 [eva] Done for function p1
-[kernel:annot:missing-spec] call.i:16: Warning: 
-  Neither code nor specification for function p2, generating default assigns from the prototype
+[kernel:annot:missing-spec] call.i:12: Warning: 
+  Neither code nor specification for function p2,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function p2 <- test <- call_test <- main2.
   Called from call.i:16.
 [eva] using specification for function p2
@@ -25,7 +26,7 @@
 [eva] Recording results for call_test
 [eva] Done for function call_test
 [eva] Recording results for main2
-[eva] done for function main2
+[eva] Done for function main2
 [pdg] computing for function main2
 [from] Computing for function call_test
 [from] Computing for function test <-call_test

@@ -637,9 +637,6 @@ let rm_asserts () =
     CA_Map.iter aux to_be_removed
   end
 
-
-let () = Db.register Db.Value.rm_asserts rm_asserts [@alert "-db_deprecated"]
-
 let rm_asserts =
   Dynamic.register
     ~comment:"Remove redundant alarms. Used by the Eva plugin."

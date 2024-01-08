@@ -190,6 +190,7 @@ module ProofScript = ProofScript
 module ProverScript = ProverScript
 module ProverSearch = ProverSearch
 module ProofSession = ProofSession
+module ProofStrategy = ProofStrategy
 
 (** {2 Tactics} *)
 
@@ -217,6 +218,7 @@ module TacSequence = TacSequence
 module TacShift = TacShift
 module TacSplit = TacSplit
 module TacUnfold = TacUnfold
+module TacCompute = TacCompute
 
 (** {2 Error Management} *)
 
@@ -225,9 +227,10 @@ module Wp_error = Wp_error
 
 (** {2 Printers and Reporting} *)
 
+module Plang = Plang
 module Pcfg = Pcfg
 module Pcond = Pcond
-module Plang = Plang
+module Ptip = Ptip
 module Rformat = Rformat
 module Stats = Stats
 module WpReport = WpReport

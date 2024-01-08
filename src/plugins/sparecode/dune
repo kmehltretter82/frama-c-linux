@@ -41,6 +41,7 @@
   (flags :standard -open Frama_c_kernel)
   (libraries frama-c.kernel frama-c-users.core frama-c-eva.core frama-c-pdg.core frama-c-inout.core)
   (instrumentation (backend landmarks))
+  (instrumentation (backend bisect_ppx))
 )
 
 (plugin (optional) (name sparecode) (libraries frama-c-sparecode.core) (site (frama-c plugins)))

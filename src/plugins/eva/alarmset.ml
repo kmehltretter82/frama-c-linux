@@ -205,8 +205,6 @@ let for_all test ~default = function
                                  Alarms
      ------------------------------------------------------------------------ *)
 
-open CilE
-
 let emitter = Eva_utils.emitter
 
 (* Printer that shows additional information about temporaries *)
@@ -431,32 +429,6 @@ let emit kinstr = function
     Self.abort ~current:true ~once:true
       "All alarms may arise: \
        abstract state too imprecise to continue the analysis."
-
-let warn_alarm warn_mode = function
-  | Alarms.Uninitialized _
-  | Alarms.Dangling _
-    -> warn_mode.unspecified ()
-  | Alarms.Pointer_comparison _
-  | Alarms.Differing_blocks _
-    -> warn_mode.defined_logic ()
-  | Alarms.Division_by_zero _
-  | Alarms.Overflow _
-  | Alarms.Float_to_int _
-  | Alarms.Invalid_shift _
-  | Alarms.Memory_access _
-  | Alarms.Index_out_of_bound _
-  | Alarms.Invalid_pointer _
-  | Alarms.Is_nan_or_infinite _
-  | Alarms.Is_nan _
-  | Alarms.Not_separated _
-  | Alarms.Overlap _
-  | Alarms.Function_pointer _
-  | Alarms.Invalid_bool _
-    -> warn_mode.others ()
-
-let notify warn_mode alarms =
-  iter (fun alarm _status -> warn_alarm warn_mode alarm) alarms
-
 
 (*
 Local Variables:

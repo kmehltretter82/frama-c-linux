@@ -21,12 +21,12 @@
 (**************************************************************************)
 
 (** Memory locations.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 open Cil_types
 
 (** Association between bases and offsets in byte.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Location_Bytes : sig
   (* TODOBY: write an mli for MapLattice, and name the result. Use it there,
      and simplify *)
@@ -47,15 +47,13 @@ module Location_Bytes : sig
     (** Garbled mix of the addresses in the set *)
     | Map of M.t (** Precise set of addresses+offsets *)
 
-  type size_widen_hint = Ival.size_widen_hint
-  type numerical_widen_hint = Base.t -> Ival.numerical_widen_hint
-  type widen_hint = size_widen_hint * numerical_widen_hint
-
   (** Those locations have a lattice structure, including standard operations
       such as [join], [narrow], etc. *)
-  include Lattice_type.AI_Lattice_with_cardinal_one
-    with type t := t
-     and type widen_hint := widen_hint
+  include Lattice_type.AI_Lattice_with_cardinal_one with type t := t
+
+  type widen_hint = Ival.widen_hint
+
+  val widen : ?size:Integer.t -> ?hint:widen_hint -> t -> t -> t
 
   include Datatype.S_with_collections with type t := t
 
@@ -142,8 +140,8 @@ module Location_Bytes : sig
   (** [fold_enum f loc acc] enumerates the locations in [acc], and passes
       them to [f]. Make sure to call {!cardinal_less_than} before calling
       this function, as all possible combinations of bases/offsets are
-      presented to [f]. Raises {!Error_Top} if [loc] is [Top _] or if
-      one offset cannot be enumerated. *)
+      presented to [f]. Raises {!Abstract_interp.Error_Top} if [loc] is
+      [Top _] or if one offset cannot be enumerated. *)
 
   val to_seq_i : t -> (Base.t * Ival.t) Seq.t
   (** Builds a sequence of all bases (with their offsets) of the location.
@@ -235,12 +233,12 @@ module Location_Bytes : sig
 end
 
 (** Association between bases and offsets in bits.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Location_Bits : module type of Location_Bytes
 
 
 (** Association between bases and ranges of bits.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Zone : sig
 
   type map_t
@@ -327,13 +325,13 @@ end
 (** {2 Locations} *)
 
 (** A {!Location_Bits.t} and a size in bits.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 type location = private {
   loc : Location_Bits.t;
   size : Int_Base.t;
 }
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Location: Datatype.S with type t = location
 
 val loc_top : location
@@ -401,7 +399,7 @@ val enumerate_bits : location -> Zone.t
 val enumerate_bits_under : location -> Zone.t
 
 val enumerate_valid_bits : access -> location -> Zone.t
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val enumerate_valid_bits_under : access -> location -> Zone.t
 

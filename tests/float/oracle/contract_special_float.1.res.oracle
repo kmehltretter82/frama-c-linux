@@ -16,8 +16,9 @@
 [eva] Done for function fun
 [eva:alarm] contract_special_float.c:93: Warning: 
   NaN double value. assert ¬\is_NaN(v);
-[kernel:annot:missing-spec] contract_special_float.c:94: Warning: 
-  Neither code nor explicit assigns clause for function fun_no_default, generating default assigns from the specification
+[kernel:annot:missing-spec] contract_special_float.c:48: Warning: 
+  Neither code nor explicit assigns for function fun_no_default,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [eva] computing for function fun_no_default <- main.
   Called from contract_special_float.c:94.
 [eva] using specification for function fun_no_default
@@ -47,7 +48,7 @@
   function fun_no_complete: precondition 'not_nan' got status valid.
 [eva] Done for function fun_no_complete
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   a ∈ [-0. .. inf]

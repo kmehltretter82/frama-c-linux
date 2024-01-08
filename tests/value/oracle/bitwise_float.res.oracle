@@ -8,7 +8,7 @@
   function main: precondition got status unknown.
 [eva] bitwise_float.c:5: Frama_C_show_each_x: [1028443341..1084227584]
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x ∈ {0; 2}

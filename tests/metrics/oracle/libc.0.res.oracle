@@ -35,13 +35,10 @@
   Pointer dereferencing = 1
   Cyclomatic complexity = 6
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   fp ∈ {{ &g }}
 [eva] using specification for function isalpha
 [eva] using specification for function isblank
-[eva] done for function main
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   5 functions analyzed (out of 6): 83% coverage.

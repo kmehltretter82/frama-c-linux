@@ -8,7 +8,7 @@
 [eva] keep_annot.i:50: assertion got status valid.
 [eva:alarm] keep_annot.i:52: Warning: assertion got status unknown.
 [eva] Recording results for bts1110
-[eva] done for function bts1110
+[eva] Done for function bts1110
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function bts1110

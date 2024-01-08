@@ -111,7 +111,7 @@ struct
 
   let printer_ref = ref None
 
-  module type PrinterExtension = functor (X: PrinterClass) -> PrinterClass
+  module type PrinterExtension = functor (_: PrinterClass) -> PrinterClass
 
   let set_printer p =
     printer_class_ref := p;

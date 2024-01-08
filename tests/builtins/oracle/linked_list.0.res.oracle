@@ -2306,7 +2306,7 @@
   Called from linked_list.c:51.
 [eva] Done for function printf_va_1
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function malloc:
   malloc_next_free ∈ [-2147483648..2147483640],0%8

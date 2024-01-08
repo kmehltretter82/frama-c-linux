@@ -57,7 +57,7 @@ val compute_using_prototype_for_state :
 
 (** Functor computing the functional dependencies, according to the three
     modules above. *)
-module Make (To_Use: To_Use) : sig
+module Make (_: To_Use) : sig
   (** Compute the dependencies of the given function, and return them *)
   val compute_and_return : Kernel_function.t -> Function_Froms.t
 

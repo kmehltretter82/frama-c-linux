@@ -37,7 +37,7 @@ val stmt_can_reach_filtered : (stmt -> bool) -> stmt -> stmt -> bool
 
 val stmt_is_in_cycle : stmt -> bool
 (** [stmt_is_in_cycle s] is [true] iff [s] is reachable through a non trivial path
- * starting at [s]. *)
+    starting at [s]. *)
 
 val stmt_is_in_cycle_filtered : (stmt -> bool) -> stmt -> bool
 (** Just like [stmt_is_in_cycle] but uses a function to filter the nodes of

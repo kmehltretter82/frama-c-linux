@@ -17,7 +17,7 @@
 [eva] loop_simple.i:25: starting to merge loop iterations
 [eva] loop_simple.i:24: starting to merge loop iterations
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {2}

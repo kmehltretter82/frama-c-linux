@@ -45,6 +45,7 @@ module TracesProject: Parameter_sig.Bool
 
 module MultidimSegmentLimit: Parameter_sig.Int
 module MultidimDisjunctiveInvariants: Parameter_sig.Bool
+module MultidimFastImprecise: Parameter_sig.Bool
 
 module AutomaticContextMaxDepth: Parameter_sig.Int
 module AutomaticContextMaxWidth: Parameter_sig.Int
@@ -148,9 +149,16 @@ module Precision: Parameter_sig.Int
    -eva-precision. *)
 val configure_precision: unit -> unit
 
-
+(** List of parameters having an impact on the correctness of the analysis. *)
 val parameters_correctness: Typed_parameter.t list
+
+(** List of parameters having an impact only on the analysis precision. *)
 val parameters_tuning: Typed_parameter.t list
+
+(** This function should be called whenever the correctness of the analysis
+    is externally changed through the Eva API, to ensure that the property
+    statuses emitted by Eva are properly reset. *)
+val change_correctness: unit -> unit
 
 (** Registers available cvalue builtins for the -eva-builtin option. *)
 val register_builtin: string -> unit

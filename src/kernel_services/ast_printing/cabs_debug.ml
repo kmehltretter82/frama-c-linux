@@ -34,11 +34,6 @@ let pp_storage  fmt = function
   |     EXTERN -> fprintf fmt "EXTERN"
   |     REGISTER -> fprintf fmt "REGISTER"
 
-let pp_fun_spec  fmt = function
-  |     INLINE -> fprintf fmt "INLINE"
-  |     VIRTUAL -> fprintf fmt "VIRTUAL"
-  |     EXPLICIT -> fprintf fmt "EXPLICIT"
-
 let pp_cvspec  fmt = function
   |     CV_CONST -> fprintf fmt "CV_CONST"
   |     CV_VOLATILE -> fprintf fmt "CV_VOLATILE"
@@ -102,7 +97,6 @@ and pp_spec_elem  fmt = function
   |     SpecStorage storage -> fprintf fmt "SpecStorage %a" pp_storage storage
   |     SpecInline -> fprintf fmt "SpecInline"
   |     SpecType typeSpec -> fprintf fmt "SpecType %a" pp_typeSpecifier typeSpec
-  |     SpecPattern s -> fprintf fmt "SpecPattern %s" s
 
 and pp_spec fmt spec_elems =
   fprintf fmt "@[<hv 2>{" ;
@@ -362,7 +356,6 @@ and pp_exp_node fmt = function
   |   MEMBEROFPTR (exp, s) ->
     fprintf fmt "MEMBEROFPTR(%a,%s)" pp_exp exp s
   |   GNU_BODY bl -> fprintf fmt "GNU_BODY %a" pp_block bl
-  |   EXPR_PATTERN s -> fprintf fmt "EXPR_PATTERN %s" s
   |   GENERIC (exp, generic_assoc_list) ->
     fprintf fmt "GENERIC(%a,%a)"
       pp_exp exp

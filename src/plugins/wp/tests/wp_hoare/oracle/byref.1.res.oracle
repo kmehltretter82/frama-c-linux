@@ -1,6 +1,8 @@
 # frama-c -wp -wp-model 'Typed (Ref)' [...]
 [kernel] Parsing byref.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal f_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function f
@@ -19,7 +21,17 @@ Prove: true.
   Function formal
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'formal':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file byref.i, line 47) in 'formal':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'formal':
 Prove: true.
 
 ------------------------------------------------------------
@@ -33,7 +45,17 @@ Prove: true.
   Function global
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'global':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file byref.i, line 57) in 'global':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'global':
 Prove: true.
 
 ------------------------------------------------------------
@@ -47,7 +69,17 @@ Prove: true.
   Function local
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'local':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file byref.i, line 38) in 'local':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'local':
 Prove: true.
 
 ------------------------------------------------------------
@@ -61,7 +93,17 @@ Prove: true.
   Function pointer
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'pointer':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file byref.i, line 29) in 'pointer':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'pointer':
 Prove: true.
 
 ------------------------------------------------------------
@@ -75,7 +117,17 @@ Prove: true.
   Function wrong_without_ref
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'wrong_without_ref':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file byref.i, line 18) in 'wrong_without_ref':
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'wrong_without_ref':
 Prove: true.
 
 ------------------------------------------------------------

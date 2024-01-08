@@ -26,7 +26,7 @@ open Partition
 let stat_max_widenings = Statistics.register_statement_stat "max-widenings"
 
 module Make
-    (Abstract: Abstractions.Eva)
+    (Abstract: Abstractions.S_with_evaluation)
     (Kf : sig val kf: kernel_function end) =
 struct
   module Partition_parameters = Partitioning_parameters.Make (Kf)

@@ -30,7 +30,7 @@ import { classes } from 'dome/misc/utils';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as DATA from 'frama-c/kernel/api/data';
-import * as AST from 'frama-c/kernel/api/ast';
+import * as Ast from 'frama-c/kernel/api/ast';
 import { Text, Modifier } from 'frama-c/richtext';
 import { Icon } from 'dome/controls/icons';
 import { Code } from 'dome/controls/labels';
@@ -43,13 +43,13 @@ import { TitleBar } from 'ivette';
 // --------------------------------------------------------------------------
 
 function addMarker(
-  ms: AST.marker[],
-  m: AST.marker | undefined
-): AST.marker[] {
+  ms: Ast.marker[],
+  m: Ast.marker | undefined
+): Ast.marker[] {
   return m ? (ms.includes(m) ? ms : ms.concat(m)) : ms;
 }
 
-function toggleMarker(ms: AST.marker[], m: AST.marker): AST.marker[] {
+function toggleMarker(ms: Ast.marker[], m: Ast.marker): Ast.marker[] {
   return ms.includes(m) ? ms.filter((m0) => m0 !== m) : ms.concat(m);
 }
 
@@ -71,16 +71,16 @@ interface FieldInfo {
 
 interface FieldInfoProps {
   field: FieldInfo;
-  onSelected: (m: AST.marker, meta: Modifier) => void;
-  onHovered: (m: AST.marker | undefined) => void;
+  onSelected: (m: Ast.marker, meta: Modifier) => void;
+  onHovered: (m: Ast.marker | undefined) => void;
 }
 
 function FieldInfo(props: FieldInfoProps): JSX.Element {
   const onSelected = (m: string, meta: Modifier): void => {
-    props.onSelected(AST.jMarker(m), meta);
+    props.onSelected(Ast.jMarker(m), meta);
   };
   const onHovered = (m: string | undefined): void => {
-    props.onHovered(m ? AST.jMarker(m) : undefined);
+    props.onHovered(m ? Ast.jMarker(m) : undefined);
   };
   const { label, descr, title, text } = props.field;
   return (
@@ -124,28 +124,26 @@ function MarkButton(props: MarkButtonProps): JSX.Element {
 // --------------------------------------------------------------------------
 
 interface InfoSectionProps {
-  fct: string | undefined;
   scroll: React.RefObject<HTMLDivElement> | undefined;
-  marker: AST.marker;
-  scrolled: AST.marker | undefined;
-  selected: AST.marker | undefined;
-  hovered: AST.marker | undefined;
+  current: Ast.decl | undefined; // current selection
+  marker: Ast.marker; // of the info-section
+  scrolled: Ast.marker | undefined; // among info-sections
+  selected: Ast.marker | undefined; // in current selection
+  hovered: Ast.marker | undefined;  // in current selection
   marked: boolean;
   excluded: string[];
-  setPinned: (m: AST.marker) => void;
-  togglePinned: (m: AST.marker) => void;
+  setPinned: (m: Ast.marker) => void;
+  togglePinned: (m: Ast.marker) => void;
 }
 
 function MarkInfos(props: InfoSectionProps): JSX.Element {
-  const { marker, fct, scrolled, selected, hovered, excluded } = props;
-  const attrs = States.useMarker(marker);
-  const scope = attrs.scope ?? fct;
-  const foreign = !!scope && fct !== scope;
+  const { current, marker, scrolled, selected, hovered, excluded } = props;
+  const { labelKind, titleKind, scope, descr } = States.useMarker(marker);
+  const { label } = States.useDeclaration(scope);
+  const foreign = !!current && !!scope && current !== scope;
   const [unfold, setUnfold] = React.useState(true);
   const [expand, setExpand] = React.useState(false);
-  const req = React.useMemo(() =>
-    Server.send(AST.getInformation, marker), [marker]);
-  const { result: markerFields = [] } = Dome.usePromise(req);
+  const markerFields = States.useRequest(Ast.getInformation, marker) ?? [];
   const isScrolled = marker === scrolled;
   const isHovered = marker === hovered;
   const isSelected = marker === selected;
@@ -153,7 +151,6 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
     isSelected && 'selected',
     isHovered && 'hovered',
   );
-  const { labelKind, titleKind, name, descr } = attrs;
   const filtered = markerFields.filter((fd) => !excluded.includes(fd.id));
   const hasMore = filtered.length < markerFields.length;
   const displayed = expand ? markerFields : filtered;
@@ -161,34 +158,30 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
     evt.stopPropagation();
     setUnfold(!unfold);
   };
-  const onChildSelected = (m: AST.marker, meta: Modifier): void => {
+  const onChildSelected = (m: Ast.marker, modifier: Modifier): void => {
     props.setPinned(marker);
-    switch (meta) {
+    switch (modifier) {
       case 'NORMAL':
-        States.setSelection({ fct, marker: m });
+        States.setMarked(m);
         break;
       case 'META':
-        States.setSelection({ fct, marker: m }, m !== marker);
+        States.setMarked(m, m !== marker);
         break;
       case 'DOUBLE':
-        States.setSelection({ fct: scope, marker: m });
+        States.setSelected(m);
         break;
     }
   };
-  const onChildHovered = (m: AST.marker | undefined): void => {
-    if (m) {
-      States.setHovered({ fct, marker: m });
-    } else {
-      States.setHovered({ fct, marker });
-    }
+  const onChildHovered = (m: Ast.marker | undefined): void => {
+    States.setHovered(m || marker);
   };
   return (
     <div
       ref={isScrolled ? props.scroll : undefined}
       className={`astinfo-section ${highlight}`}
-      onMouseEnter={() => States.setHovered({ fct, marker })}
+      onMouseEnter={() => States.setHovered(marker)}
       onMouseLeave={() => States.setHovered(undefined)}
-      onClick={() => onChildSelected(marker, foreign ? 'DOUBLE' : 'NORMAL')}
+      onClick={() => onChildSelected(marker, 'NORMAL')}
       onDoubleClick={() => onChildSelected(marker, 'DOUBLE')}
     >
       <div
@@ -208,11 +201,9 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
         <Code key="NAME" className="astinfo-markercode">
           <span className="astinfo-markerkind" title={titleKind}>
             {labelKind}
-          </span> {name}
+          </span> {descr}
         </Code>
-        <Code key="SCOPE" className="" display={foreign}>
-          [in: {scope}]
-        </Code>
+        <Code key="SCOPE" className="" display={foreign}>[in {label}]</Code>
         <MarkButton
           key="MORE"
           icon="CIRC.PLUS"
@@ -278,16 +269,18 @@ const filterSettings = 'frama-c.sidebar.astinfo.filter';
 
 export default function ASTinfo(): JSX.Element {
   // Selection Hooks
-  const [markers, setMarkers] = React.useState<AST.marker[]>([]);
+  const [markers, setMarkers] = React.useState<Ast.marker[]>([]);
   const [setting, setSetting] = Dome.useStringSettings(filterSettings, '');
-  const [selection] = States.useSelection();
-  const [hovering] = States.useHovered();
-  const allFields = States.useRequest(AST.getInformation, null) ?? [];
+  const { scope: current, marker: selected } = States.useCurrentLocation();
+  const hovered = States.useHovered();
+  const allFields = States.useRequest(Ast.getInformation, null) ?? [];
   const excluded = React.useMemo(() => makeFilter(setting), [setting]);
   Dome.useEvent(States.MetaSelection, (loc: States.Location) => {
     setMarkers(addMarker(markers, loc.marker));
   });
-  // Scrolling Hooks
+  const clearMarkers = React.useCallback(() => setMarkers([]), []);
+  Server.useShutdown(clearMarkers);
+    // Scrolling Hooks
   const [inside, setInside] = React.useState(false);
   const scroll = React.useRef<HTMLDivElement>(null);
   const scrollDiv = scroll.current;
@@ -295,24 +288,21 @@ export default function ASTinfo(): JSX.Element {
     scrollDiv?.scrollIntoView({ block: 'nearest' });
   }, [scrollDiv]);
   // Derived
-  const fct = selection?.current?.fct;
-  const selected = selection?.current?.marker;
-  const hovered = hovering?.marker;
   const allMarkers = addMarker(addMarker(markers, selected), hovered);
   const scrolled = inside ? selected : (hovered || selected);
   // Callbacks
   const setExcluded = (fs: string[]): void =>
     setSetting(fs.join(':'));
-  const setPinned = (marker: AST.marker): void =>
+  const setPinned = (marker: Ast.marker): void =>
     setMarkers(addMarker(markers, marker));
-  const togglePinned = (marker: AST.marker): void =>
+  const togglePinned = (marker: Ast.marker): void =>
     setMarkers(toggleMarker(markers, marker));
   // Mark Rendering
-  const renderMark = (marker: AST.marker): JSX.Element | null => {
+  const renderMark = (marker: Ast.marker): JSX.Element | null => {
     return (
       <MarkInfos
         key={marker}
-        fct={fct}
+        current={current}
         scroll={scroll}
         marker={marker}
         scrolled={scrolled}

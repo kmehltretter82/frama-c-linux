@@ -4,14 +4,15 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
-[kernel:annot:missing-spec] infinite.i:9: Warning: 
-  Neither code nor specification for function pause, generating default assigns from the prototype
+[kernel:annot:missing-spec] infinite.i:1: Warning: 
+  Neither code nor specification for function pause,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function pause <- main.
   Called from infinite.i:9.
 [eva] using specification for function pause
 [eva] Done for function pause
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

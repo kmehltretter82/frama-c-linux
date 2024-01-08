@@ -25,7 +25,7 @@
     functions (like iterators over kernel functions). This kind of operations is
     stored in module {!Globals.Functions}.
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 open Cil_types
 
@@ -182,6 +182,11 @@ val is_in_libc : t -> bool
 (** @return true iff the given function attributes contain libc indicators.
     @since 24.0-Chromium *)
 
+val is_not_called: t -> bool
+(** @return true if the given function is not called in the program.
+    Warning, return false does not ensure that the function is called.
+    @since 28.0-Nickel *)
+
 val is_entry_point: t -> bool
 (** @return true iff the given function is the main of the program (as stated by
     option -main).
@@ -287,8 +292,8 @@ val get_called : exp -> t option
 (* ************************************************************************* *)
 
 (** Hashtable indexed by kernel functions and dealing with project.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
-module Make_Table(Data: Datatype.S)(Info: State_builder.Info_with_size):
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+module Make_Table(Data: Datatype.S)(_: State_builder.Info_with_size):
   State_builder.Hashtbl with type key = t and type data = Data.t
 
 (** Set of kernel functions. *)

@@ -49,12 +49,27 @@ export { RangeSet } from '@codemirror/state';
 
 
 // -----------------------------------------------------------------------------
+// Ranges definition and interface
+// -----------------------------------------------------------------------------
+
+// Type definition.
+export type Range = { from: number, to: number };
+
+// Checks if the start of the range x belongs in y.
+export function startInto(x: Range, y: Range): boolean {
+  return y.from <= x.from && x.from < y.to;
+}
+
+// -----------------------------------------------------------------------------
+
+
+
+// -----------------------------------------------------------------------------
 //  CodeMirror state's extensions types definitions
 // -----------------------------------------------------------------------------
 
 // Helper types definitions.
 export type View = EditorView | null;
-export type Range = { from: number, to: number };
 export type Set<A> = (view: View, value: A) => void;
 export type Get<A> = (state: EditorState | undefined) => A;
 export type IsUpdated = (update: ViewUpdate) => boolean;
@@ -360,6 +375,26 @@ function createSelectionField(): Field<EditorSelection> {
   return { ...field, set, extension: [field.extension, updater] };
 }
 
+export type RangeCallback = (offset: number, endOffset: number) => void;
+export const OnSelection = createOnSelectionField();
+function createOnSelectionField(): Field<RangeCallback|null> {
+  const field = createField<RangeCallback|null>(null);
+  const set: Set<RangeCallback|null> = (view, fn) => {
+    field.set(view, fn);
+  };
+  const updater = EditorView.updateListener.of((update) => {
+    if (update.selectionSet) {
+      const view = update.view;
+      const fn = field.get(view.state);
+      if (fn !== null) {
+        const { from: offset, to: endOffset } = view.state.selection.main;
+        fn(offset, endOffset);
+      }
+    }
+  });
+  return { ...field, set, extension: [field.extension, updater] };
+}
+
 export const Document = createDocumentField();
 function createDocumentField(): Field<Text> {
   const field = createField<Text>(Text.empty);
@@ -445,16 +480,19 @@ function isVisible(view: View, line: number): boolean {
 }
 
 // Move to the given line. The indexation starts at 1.
-export function selectLine(view: View, line: number, atTop: boolean): void {
+export function selectLine(
+  view: View,
+  line: number,
+  atTop: boolean,
+  focus = true,
+): void {
   if (!view || view.state.doc.lines < line) return;
   const doc = view.state.doc;
-  const { from: here } = doc.lineAt(view.state.selection.main.from);
-  const { from: goto } = doc.line(Math.max(line, 1));
-  if (here === goto) return;
-  view.dispatch({ selection: { anchor: goto } });
+  const { from: anchor } = doc.line(Math.max(line, 1));
+  if (focus) view.dispatch({ selection: { anchor } });
   if (isVisible(view, line)) return;
   const verticalScroll = atTop ? 'start' : 'center';
-  const effects = EditorView.scrollIntoView(goto, { y: verticalScroll });
+  const effects = EditorView.scrollIntoView(anchor, { y: verticalScroll });
   view.dispatch({ effects });
 }
 
@@ -479,7 +517,12 @@ export function Editor(extensions: Extension[]): Editor {
   React.useEffect(() => {
     if (!parent.current) return;
     const state = EditorState.create({ extensions });
-    editor.current = new EditorView({ state, parent: parent.current });
+    const eview = new EditorView({ state, parent: parent.current });
+    editor.current = eview;
+    return () => {
+      eview.destroy();
+      editor.current = null;
+    };
   }, [parent, extensions]);
   return { view: editor.current, Component };
 }

@@ -31,13 +31,13 @@ module type Results = sig
   val get_global_state: unit -> state or_top_bottom
   val get_stmt_state : after:bool -> stmt -> state or_top_bottom
   val get_stmt_state_by_callstack:
-    ?selection:callstack list ->
-    after:bool -> stmt -> state Value_types.Callstack.Hashtbl.t or_top_bottom
+    ?selection:Callstack.t list ->
+    after:bool -> stmt -> state Callstack.Hashtbl.t or_top_bottom
   val get_initial_state:
     kernel_function -> state or_top_bottom
   val get_initial_state_by_callstack:
-    ?selection:callstack list ->
-    kernel_function -> state Value_types.Callstack.Hashtbl.t or_top_bottom
+    ?selection:Callstack.t list ->
+    kernel_function -> state Callstack.Hashtbl.t or_top_bottom
 
   val eval_expr : state -> exp -> value evaluated
   val copy_lvalue: state -> lval -> value flagged_value evaluated
@@ -60,7 +60,7 @@ end
 
 
 module type S = sig
-  include Abstractions.Eva
+  include Abstractions.S_with_evaluation
   include Results with type state := Dom.state
                    and type value := Val.t
                    and type location := Loc.location
@@ -82,14 +82,11 @@ val compute : unit -> unit
 (** Computes the Eva analysis, if not already computed, using the entry point
     of the current project. You may set it with {!Globals.set_entry_point}.
     @raise Globals.No_such_entry_point if the entry point is incorrect
-    @raise Db.Value.Incorrect_number_of_arguments if some arguments are
-    specified for the entry point using {!Db.Value.fun_set_args}, and
-    an incorrect number of them is given.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val is_computed : unit -> bool
 (** Return [true] iff the Eva analysis has been done.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 val self : State.t
@@ -154,6 +151,3 @@ val use_spec_instead_of_definition: Cil_types.kernel_function -> bool
     to known whether results are available for a given function. *)
 val save_results: Cil_types.kernel_function -> bool
 [@@@ api_end]
-
-val cvalue_initial_state: unit -> Cvalue.Model.t
-(** Return the initial state of the cvalue domain only. *)

@@ -18,3 +18,7 @@ yarn-error.log
 /icon.icns
 
 # --------------------------------------------------------------------------
+/tests/test-results/
+/screenshots/*
+/playwright-report/
+/playwright/.cache/

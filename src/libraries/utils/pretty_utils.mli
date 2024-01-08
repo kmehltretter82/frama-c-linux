@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Pretty-printer utilities.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (* ********************************************************************** *)
 (** {2 null formatters} *)

@@ -29,7 +29,7 @@
 [eva:alarm] undef_behavior_bts1059.i:23: Warning: 
   undefined multiple accesses in expression. assert \separated(&a, &a);
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] undef_behavior_bts1059.i:15: 
   assertion 'Eva,separation' got final status invalid.
 [eva] undef_behavior_bts1059.i:23: 

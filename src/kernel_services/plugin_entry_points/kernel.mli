@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Provided services for kernel developers.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (* ************************************************************************* *)
 (** {2 Log Machinery} *)
@@ -168,6 +168,8 @@ val wkey_inconsistent_specifier: warn_category
 
 val wkey_int_conversion: warn_category
 
+val wkey_merge_conversion: warn_category
+
 val wkey_cert_exp_46: warn_category
 
 val wkey_cert_msc_37: warn_category
@@ -214,6 +216,9 @@ val wkey_file_not_found: warn_category
 val wkey_c11: warn_category
 (** Warnings related to usage of C11-specific constructions. *)
 
+val wkey_line_directive: warn_category
+(** Warnings related to unknown line directives. *)
+
 (* ************************************************************************* *)
 (** {2 Functors for late option registration}                                *)
 (** Kernel_function-related options cannot be registered in this module:
@@ -226,7 +231,7 @@ module type Input_with_arg = sig
   val module_name: string
 end
 
-module Kernel_function_set(X:Input_with_arg): Parameter_sig.Kernel_function_set
+module Kernel_function_set(_:Input_with_arg): Parameter_sig.Kernel_function_set
 
 (* ************************************************************************* *)
 (** {2 Option groups} *)
@@ -293,14 +298,14 @@ module Quiet: Parameter_sig.Bool
 module Permissive: Parameter_sig.Bool
 (** Behavior of option "-permissive" *)
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Unicode: sig
   include Parameter_sig.Bool
   val without_unicode: ('a -> 'b) -> 'a -> 'b
   (** Execute the given function as if the option [-unicode] was not set. *)
 end
 (** Behavior of option "-unicode".
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 module Time: Parameter_sig.String
 (** Behavior of option "-time" *)
@@ -336,7 +341,7 @@ module PrintReturn : Parameter_sig.Bool
     @since Sulfur-20171101 *)
 
 (** Behavior of option "-ocode".
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module CodeOutput : sig
   include Parameter_sig.Filepath
   val output: (Format.formatter -> unit) -> unit
@@ -554,6 +559,14 @@ module DoCollapseCallCast: Parameter_sig.Bool
     This is false by default.  Set to true to replicate the behavior
     of CIL 1.3.5 and earlier. *)
 
+module GeneratedSpecMode: Parameter_sig.String
+(** Behavior of option "-generated-spec-mode". *)
+
+module GeneratedSpecCustom: Parameter_sig.Map
+  with type key = string
+   and type value = string
+(** Behavior of option "-generated-spec-custom". *)
+
 (* ************************************************************************* *)
 (** {2 Analysis Behavior of options} *)
 (* ************************************************************************* *)
@@ -590,7 +603,7 @@ module UnspecifiedAccess: Parameter_sig.Bool
 
 module SafeArrays: Parameter_sig.Bool
 (** Behavior of option "-safe-arrays".
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 module SignedOverflow: Parameter_sig.Bool
 (** Behavior of option "-warn-signed-overflow" *)

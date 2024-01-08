@@ -26,10 +26,6 @@ open Eval
 let save_results f =
   Parameters.ResultsAll.get () && not (Parameters.NoResultsFunctions.mem f)
 
-let () =
-  Db.Value.no_results :=
-    (fun fd -> not (save_results fd) || not (Parameters.Domains.mem "cvalue"))
-
 (* Signal that some results are not stored. The gui or some API calls
    may fail ungracefully. *)
 let partial_results () =
@@ -49,12 +45,14 @@ module Callers = Kernel_function.Map.Make (StmtSet)
 module CallersTable = Kernel_function.Make_Table (Callers) (val info "Callers")
 
 let register_call kinstr kf =
-  match kinstr, Eva_utils.call_stack () with
+  let callstack = Eva_utils.current_call_stack () in
+  let kf', kinstr' = Callstack.top_call callstack in
+  assert (Kernel_function.equal kf kf');
+  assert (Cil_datatype.Kinstr.equal kinstr kinstr');
+  match kinstr, Callstack.top_caller callstack with
   | Kglobal, _ -> CallersTable.add kf Kernel_function.Map.empty
-  | Kstmt _, ([] | [_]) -> assert false
-  | Kstmt stmt, (kf', kinstr') :: (caller, _) :: _ ->
-    assert (Kernel_function.equal kf kf');
-    assert (Cil_datatype.Kinstr.equal kinstr kinstr');
+  | Kstmt _, None -> assert false
+  | Kstmt stmt, Some caller ->
     let callsite = StmtSet.singleton stmt in
     let change calls =
       let prev_stmts = Kernel_function.Map.find_opt caller calls in
@@ -91,7 +89,7 @@ let nb_callsites () =
 type analysis_target =
   [ `Builtin of string * Builtins.builtin * cacheable * funspec
   | `Spec of Cil_types.funspec
-  | `Def of Cil_types.fundec * bool ]
+  | `Body of Cil_types.fundec * bool ]
 
 type results = Complete | Partial | NoResults
 type analysis_status =
@@ -136,7 +134,7 @@ let register_status kf kind =
     match kind with
     | `Builtin (name, _, _, _) -> Builtin name
     | `Spec _ -> SpecUsed
-    | `Def (_, results) -> Analyzed (if results then Complete else NoResults)
+    | `Body (_, results) -> Analyzed (if results then Complete else NoResults)
   in
   let change prev_status = merge_status prev_status status in
   ignore (StatusTable.memo ~change (fun _ -> status) kf)
@@ -154,20 +152,29 @@ let use_spec_instead_of_definition ?(recursion_depth = -1) kf =
   not (Kernel_function.is_definition kf) ||
   Kernel_function.Set.mem kf (Parameters.UsePrototype.get ())
 
+(* Returns the function specification of [kf], with generated assigns clauses
+   if they are missing. *)
+let get_funspec kf =
+  Populate_spec.populate_funspec ~do_body:true kf [`Assigns];
+  Annotations.funspec kf
+
 let analysis_target ~recursion_depth callsite kf =
   match Builtins.find_builtin_override kf with
   | Some (name, builtin, cache, spec) ->
     `Builtin (name, builtin, cache, spec)
   | None ->
     if recursion_depth >= Parameters.RecursiveUnroll.get ()
-    then `Spec (Recursion.get_spec callsite kf)
+    then begin
+      Recursion.check_spec callsite kf;
+      `Spec (get_funspec kf)
+    end
     else
       match kf.fundec with
-      | Declaration (_,_,_,_) -> `Spec (Annotations.funspec kf)
+      | Declaration _ -> `Spec (get_funspec kf)
       | Definition (def, _) ->
         if Kernel_function.Set.mem kf (Parameters.UsePrototype.get ())
-        then `Spec (Annotations.funspec kf)
-        else `Def (def, save_results def)
+        then `Spec (get_funspec kf)
+        else `Body (def, save_results def)
 
 let define_analysis_target ?(recursion_depth = -1) callsite kf  =
   let kind = analysis_target callsite kf ~recursion_depth in

@@ -1,12 +1,10 @@
 [variadic] simple.i:1: Declaration of variadic function f.
 [variadic] simple.i:9: Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
-[kernel:annot:missing-spec] simple.i:9: Warning: 
-  Neither code nor implicit assigns clause for function f, generating default assigns from the prototype
+[kernel:annot:missing-spec] simple.i:6: Warning: 
+  Neither code nor explicit assigns for function f,
+   generating default clauses. See -generated-spec-* options for more info
 [eva] using specification for function f
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   

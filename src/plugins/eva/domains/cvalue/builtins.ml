@@ -118,6 +118,11 @@ let () =
 (* Returns the specification of a builtin, used to evaluate preconditions
    and to transfer the states of other domains. *)
 let find_builtin_specification kf =
+  (* Functions for which a builtin is used should have a specification, except
+     Frama_C_* builtins such as Frama_C_assert, for which we generate an empty
+     specification with assigns clauses. *)
+  if String.starts_with ~prefix:"Frama_C" (Kernel_function.get_name kf)
+  then Populate_spec.populate_funspec kf [`Assigns];
   let spec = Annotations.funspec kf in
   (* The specification can be empty if [kf] has a body but no specification,
      in which case [Annotations.funspec] does not generate a specification.
@@ -266,13 +271,15 @@ let apply_builtin (builtin:builtin) call ~pre ~post =
   let arguments = compute_arguments call.arguments call.rest in
   try
     let call_result = builtin pre arguments in
+    let states = process_result call post call_result in
     let froms =
       match call_result with
-      | Full result -> `Builtin result.c_from
-      | States _ | Result _ -> `Builtin None
+      | Full result -> result.c_from
+      | States _ | Result _ -> None
     in
-    Cvalue_callbacks.apply_call_hooks call.callstack call.kf froms pre;
-    process_result call post call_result
+    let result = `Builtin (List.map fst states, froms) in
+    Cvalue_callbacks.apply_call_results_hooks call.callstack call.kf pre result;
+    states
   with
   | Invalid_nb_of_args n ->
     Self.abort ~current:true

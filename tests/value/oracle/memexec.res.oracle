@@ -194,7 +194,7 @@
 [eva:locals-escaping] memexec.c:198: Warning: 
   locals {x} escaping the scope of f9 through p
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f11:
   x1 ∈ {1}

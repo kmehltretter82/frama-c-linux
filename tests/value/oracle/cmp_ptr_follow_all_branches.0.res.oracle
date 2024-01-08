@@ -19,7 +19,7 @@
   assert \pointer_comparable((void *)(q + (size_t)((int)(-5))), (void *)q);
 [eva] cmp_ptr_follow_all_branches.i:15: Frama_C_show_each_4:
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}

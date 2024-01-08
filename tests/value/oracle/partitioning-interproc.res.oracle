@@ -24,7 +24,7 @@
 [eva] Done for function conditional_assign
 [eva] tests/value/partitioning-interproc.c:31: Frama_C_show_each: {1}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function conditional_assign:
   Frama_C_entropy_source ∈ [--..--]

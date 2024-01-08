@@ -61,7 +61,7 @@ sig
   val join : t -> t -> t
 end
 
-module Make (Config : Config) (Value : Value) :
+module Make (_ : Config) (Value : Value) :
 sig
   type location = Abstract_offset.t
   type value = Value.t

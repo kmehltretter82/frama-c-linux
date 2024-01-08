@@ -58,7 +58,7 @@ struct
   let schar = Single, Ctype (TInt (ISChar, []))
   let uchar = Single, Ctype (TInt (IUChar, []))
   let int = Single, Ctype (TInt (IInt, []))
-  let unit = Single, Ctype (TInt (IUInt, []))
+  let uint = Single, Ctype (TInt (IUInt, []))
   let short = Single, Ctype (TInt (IShort, []))
   let ushort = Single, Ctype (TInt (IUShort, []))
   let long = Single, Ctype (TInt (ILong, []))
@@ -339,11 +339,30 @@ struct
 
   (* Constants *)
 
-  let of_constant c = `const (CilConstant c)
-  let of_integer i = `const (Integer i)
   let of_int i = `const (Int i)
+  let of_integer i = `const (Integer i)
+  let of_constant c = `const (CilConstant c)
+
   let zero = of_int 0
   let one = of_int 1
+
+  let mk_cint kind iv =
+    let iv, _ = Cil.truncateInteger64 kind iv in
+    Cil_types.CInt64(iv,kind,None)
+
+  let mk_cfloat kind fv =
+    let open Cil_types in
+    let fv =
+      match kind with
+      | FFloat -> Floating_point.round_to_single_precision_float fv
+      | FDouble | FLongDouble -> fv
+    in CReal(fv,kind,None)
+
+  let of_cint ?(kind=Cil_types.IInt) iv =
+    `const (CilConstant (mk_cint kind iv))
+
+  let of_cfloat ?(kind=Cil_types.FDouble) fv =
+    `const (CilConstant (mk_cfloat kind fv))
 
   (* Lvalues *)
 
@@ -478,11 +497,10 @@ struct
     with Not_found ->
       typing_error ("no field " ^ s ^ " in " ^ ci.Cil_types.cname)
 
-
   let rec build_constant = function
     | CilConstant const -> const
-    | Int i -> build_constant (Integer (Integer.of_int i))
-    | Integer i -> Cil_types.(CInt64 (i, IInt, None))
+    | Int i -> mk_cint IInt (Integer.of_int i)
+    | Integer i -> mk_cint IInt i
 
   and build_var ~scope = function
     | CilVar vi -> vi

@@ -244,16 +244,18 @@
   G19 ∈ {0}
 [eva] computing for function F4 <- main.
   Called from s.i:260.
-[kernel:annot:missing-spec] s.i:230: Warning: 
-  Neither code nor specification for function F1, generating default assigns from the prototype
+[kernel:annot:missing-spec] s.i:9: Warning: 
+  Neither code nor specification for function F1,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function F1 <- F4 <- main.
   Called from s.i:230.
 [eva] using specification for function F1
 [eva] Done for function F1
 [eva:alarm] s.i:231: Warning: accessing out of bounds index. assert 0 ≤ V4;
 [eva:alarm] s.i:231: Warning: accessing out of bounds index. assert V4 < 64;
-[kernel:annot:missing-spec] s.i:233: Warning: 
-  Neither code nor specification for function F2, generating default assigns from the prototype
+[kernel:annot:missing-spec] s.i:10: Warning: 
+  Neither code nor specification for function F2,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function F2 <- F4 <- main.
   Called from s.i:233.
 [eva] using specification for function F2
@@ -265,8 +267,9 @@
 [eva] Done for function F2
 [eva:alarm] s.i:242: Warning: accessing out of bounds index. assert 0 ≤ V6;
 [eva:alarm] s.i:242: Warning: accessing out of bounds index. assert V6 < 64;
-[kernel:annot:missing-spec] s.i:244: Warning: 
-  Neither code nor specification for function F3, generating default assigns from the prototype
+[kernel:annot:missing-spec] s.i:12: Warning: 
+  Neither code nor specification for function F3,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function F3 <- F4 <- main.
   Called from s.i:244.
 [eva] using specification for function F3
@@ -276,7 +279,7 @@
 [eva] Recording results for F4
 [eva] Done for function F4
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function F4:
   V1 ∈ {0}

@@ -42,6 +42,7 @@ else:
 if not arg.exists():
     sys.exit(f"error: file '{arg}' not found")
 
+
 # check if arg has a known extension
 def is_known_c_extension(ext):
     return ext in (".c", ".i", ".ci", ".h")
@@ -79,13 +80,17 @@ print("")
 
 files_defining_main = set()
 re_main = re.compile(r"(int|void)\s+main\s*\([^)]*\)\s*\{")
-for (fname, file_for_fcmake) in files:
-    assert os.path.exists(fname), "file does not exist: %s" % fname
-    with open(fname, "r") as content_file:
-        content = content_file.read()
-        res = re.search(re_main, content)
-        if res is not None:
-            files_defining_main.add(file_for_fcmake)
+for fname, file_for_fcmake in sorted(files):
+    try:
+        with open(fname, "r") as content_file:
+            content = content_file.read()
+            res = re.search(re_main, content)
+            if res is not None:
+                files_defining_main.add(file_for_fcmake)
+    except OSError:
+        print(
+            f"warning: could not read file '{fname}', mentioned in '{arg}'. Skipping check of 'main' function."
+        )
 
 if files_defining_main != []:
     print("")

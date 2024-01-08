@@ -35,7 +35,6 @@ let check_signals, signal_abort =
   (fun () -> signal_emitted := true)
 
 let dkey = Self.dkey_iterator
-let dkey_callbacks = Self.dkey_callbacks
 let stat_iterations = Statistics.register_statement_stat "iterations"
 
 let blocks_share_locals b1 b2 =
@@ -44,8 +43,35 @@ let blocks_share_locals b1 b2 =
   | v1 :: _, v2 :: _ -> v1.vid = v2.vid
   | _, _ -> false
 
+
+module Conditions_table =
+  Cil_state_builder.Stmt_hashtbl
+    (Datatype.Pair (Datatype.Bool) (Datatype.Bool))
+    (struct
+      let name = "Eva.Iterator.Conditions_table"
+      let size = 101
+      let dependencies = [ Self.state ]
+    end)
+
+let condition_truth_value s =
+  try Conditions_table.find s
+  with Not_found -> false, false
+
+let record_fireable edge =
+  match edge.edge_transition with
+  | Guard (_exp, kind, stmt) ->
+    let b_then, b_else = condition_truth_value stmt in
+    let new_status =
+      match kind with
+      | Then -> true, b_else
+      | Else -> b_then, true
+    in
+    Conditions_table.replace stmt new_status
+  | _ -> ()
+
+
 module Make_Dataflow
-    (Abstract : Abstractions.Eva)
+    (Abstract : Abstractions.S_with_evaluation)
     (States : Powerset.S with type state = Abstract.Dom.t)
     (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
     (Init: Initialization.S with type state := Abstract.Dom.t)
@@ -63,6 +89,7 @@ module Make_Dataflow
 = struct
 
   module Domain = Abstract.Dom
+  include Cvalue_domain.Getters (Domain)
 
   (* --- Analysis parameters --- *)
 
@@ -104,10 +131,6 @@ module Make_Dataflow
   type tank = Partitioning.tank
   type widening = Partitioning.widening
 
-  type edge_info = {
-    mutable fireable : bool (* Does any states survive the transition ? *)
-  }
-
 
   (* --- Interpreted automata --- *)
 
@@ -120,12 +143,6 @@ module Make_Dataflow
   (* --- Initial state --- *)
 
   let active_behaviors = Logic.create AnalysisParam.initial_state kf
-
-  (* Compute the locals that we must enter in scope when we start the analysis
-     of [block]. The other ones will be introduced on the fly, when we
-     encounter a [Local_init] instruction. *)
-  let block_toplevel_locals block =
-    List.filter (fun vi -> not vi.vdefined) block.blocals
 
   let initial_states =
     let state = AnalysisParam.initial_state
@@ -177,7 +194,7 @@ module Make_Dataflow
     VertexTable.create control_point_count
   let w_table : widening VertexTable.t =
     VertexTable.create 7
-  let e_table : (tank * edge_info) EdgeTable.t =
+  let e_table : tank EdgeTable.t =
     EdgeTable.create transition_count
 
   (* Default (Initial) stores on vertex and edges *)
@@ -185,18 +202,18 @@ module Make_Dataflow
     Partitioning.empty_store ~stmt:v.vertex_start_of
   let default_vertex_widening (v : vertex) () : widening =
     Partitioning.empty_widening ~stmt:v.vertex_start_of
-  let default_edge_tank () : tank * edge_info =
-    Partitioning.empty_tank (), { fireable = false }
+  let default_edge_tank () : tank =
+    Partitioning.empty_tank ()
 
   (* Get the stores associated to a control point or edge *)
   let get_vertex_store (v : vertex) : store =
     VertexTable.find_or_add v_table v ~default:(default_vertex_store v)
   let get_vertex_widening (v : vertex) : widening =
     VertexTable.find_or_add w_table v ~default:(default_vertex_widening v)
-  let get_edge_data (e : vertex edge) : tank * edge_info =
+  let get_edge_data (e : vertex edge) : tank =
     EdgeTable.find_or_add e_table e ~default:default_edge_tank
   let get_succ_tanks (v : vertex) : tank list =
-    List.map (fun (_,e,_) -> fst (get_edge_data e)) (G.succ_e graph v)
+    List.map (fun (_,e,_) -> get_edge_data e) (G.succ_e graph v)
 
   module StmtTable = struct
     include Cil_datatype.Stmt.Hashtbl
@@ -266,8 +283,15 @@ module Make_Dataflow
     : transfer_function =
     lift' (fun s -> Transfer.assign s (Kstmt stmt) dest exp)
 
+  (* All variables local to a block are introduced in domain states when
+     entering the block. Variables explicitly initialized at declaration time
+     (for which vi.vdefined is true) enter the scope too early, as they should
+     be introduced on the fly when encountering their [Local_init] instruction.
+     However, goto statements can skip their declaration/initialization, so it
+     is safer to always introduce all local variables (without initialize them)
+     when entering a block. *)
   let transfer_enter (block : block) : transfer_function =
-    let vars = block_toplevel_locals block in
+    let vars = block.blocals in
     if vars = [] then id else lift (Transfer.enter_scope kf vars)
 
   let transfer_leave (block : block) : transfer_function =
@@ -288,20 +312,12 @@ module Make_Dataflow
   let transfer_instr (stmt : stmt) (instr : instr) : transfer_function =
     match instr with
     | Local_init (vi, AssignInit exp, _loc) ->
-      let kind = Abstract_domain.Local kf in
       let transfer state =
-        let state = Domain.enter_scope kind [vi] state in
         Init.initialize_local_variable stmt vi exp state
       in
       lift' transfer
     | Local_init (vi, ConsInit (f, args, k), loc) ->
-      let kind = Abstract_domain.Local kf in
       let as_func dest callee args _loc (key, state) =
-        (* This variable enters the scope too early, as it should
-           be introduced after the call to [f] but before the assignment
-           to [v]. This is currently not possible, at least without
-           splitting Transfer.call in two. *)
-        let state = Domain.enter_scope kind [vi] state in
         transfer_call stmt dest callee args (key, state)
       in
       Cil.treat_constructor_as_func as_func vi f args k loc
@@ -429,7 +445,7 @@ module Make_Dataflow
 
   let process_edge (v1,e,v2 : G.edge) : flow =
     let {edge_transition=transition; edge_kinstr=kinstr} = e in
-    let tank,edge_info = get_edge_data e in
+    let tank = get_edge_data e in
     let flow = Partitioning.drain tank in
     Db.yield ();
     check_signals ();
@@ -438,10 +454,10 @@ module Make_Dataflow
     let flow = Partitioning.transfer (transfer_transition transition) flow in
     let flow = process_partitioning_transitions v1 v2 transition flow in
     if not (Partitioning.is_empty_flow flow) then
-      edge_info.fireable <- true;
+      record_fireable e;
     flow
 
-  let gather_cvalues states = match Domain.get_cvalue with
+  let gather_cvalues states = match get_cvalue with
     | Some get -> List.map get states
     | None -> []
 
@@ -449,7 +465,7 @@ module Make_Dataflow
     (* TODO: apply on all domains. *)
     let states = Partitioning.contents f in
     let cvalue_states = gather_cvalues states in
-    let callstack = Eva_utils.call_stack () in
+    let callstack = Eva_utils.current_call_stack () in
     Cvalue_callbacks.apply_statement_hooks callstack stmt cvalue_states
 
   let update_vertex ?(widening : bool = false) (v : vertex)
@@ -533,7 +549,7 @@ module Make_Dataflow
 
   let reset_component (vertex_list : vertex list) : unit =
     let reset_edge (_,e,_) =
-      let t,_ = get_edge_data e in
+      let t = get_edge_data e in
       Partitioning.reset_tank t
     in
     let reset_vertex v =
@@ -618,29 +634,6 @@ module Make_Dataflow
 
   (* --- Results conversion --- *)
 
-  let merge_conditions () =
-    let table = StmtTable.create 5 in
-    let fill (_,e,_) =
-      match e.edge_transition with
-      | Guard (_exp,kind,stmt) ->
-        let mask = match kind with
-          | Then -> Db.Value.mask_then
-          | Else -> Db.Value.mask_else
-        in
-        let edge_info = snd (get_edge_data e) in
-        let old_status =
-          try StmtTable.find table stmt
-          with Not_found -> 0
-        and status =
-          if edge_info.fireable then mask else 0
-        in
-        let new_status = old_status lor status in
-        StmtTable.replace table stmt new_status;
-      | _ -> ()
-    in
-    G.iter_edges_e fill graph;
-    Db.Value.merge_conditions table
-
   let is_instr s = match s.skind with Instr _ -> true | _ -> false
 
   let states_after_stmt states_before states_after =
@@ -681,7 +674,7 @@ module Make_Dataflow
         then VertexTable.memo merged_states v get_smashed_store
         else `Bottom
     and lift_to_cvalues table =
-      StmtTable.map (fun _ s -> Domain.get_cvalue_or_top s) (Lazy.force table)
+      StmtTable.map (fun _ s -> get_cvalue_or_top s) (Lazy.force table)
     in
     let merged_pre_states = lazy
       (StmtTable.map' (fun s (v,_) -> get_merged_states ~all:true s v) automaton.stmt_table)
@@ -692,59 +685,28 @@ module Make_Dataflow
     let merged_post_states = lazy
       (states_after_stmt merged_pre_states merged_post_states)
     in
-    let unmerged_pre_cvalues = lazy
-      (StmtTable.map (fun _stmt (v,_) ->
-           let store = get_vertex_store v in
-           let states = Partitioning.expanded store in
-           List.map (fun (_k,x) -> Domain.get_cvalue_or_top x) states)
-          automaton.stmt_table)
-    in
     let merged_pre_cvalues = lazy (lift_to_cvalues merged_pre_states)
     and merged_post_cvalues = lazy (lift_to_cvalues merged_post_states) in
-    let callstack = Eva_utils.call_stack () in
+    let callstack = Eva_utils.current_call_stack () in
     if save_results then begin
       let register_pre = Domain.Store.register_state_before_stmt callstack
       and register_post = Domain.Store.register_state_after_stmt callstack in
       StmtTable.iter register_pre (Lazy.force merged_pre_states);
       StmtTable.iter register_post (Lazy.force merged_post_states);
-      merge_conditions ();
-    end;
-    if not (Db.Value.Record_Value_Superposition_Callbacks.is_empty ())
-    then begin
-      if Parameters.ValShowProgress.get () then
-        Self.debug ~dkey:dkey_callbacks
-          "now calling Record_Value_Superposition callbacks";
-      Db.Value.Record_Value_Superposition_Callbacks.apply
-        (callstack, unmerged_pre_cvalues);
-    end;
-    if not (Db.Value.Record_Value_Callbacks.is_empty ())
-    then begin
-      if Parameters.ValShowProgress.get () then
-        Self.debug ~dkey:dkey_callbacks
-          "now calling Record_Value callbacks";
-      Db.Value.Record_Value_Callbacks.apply
-        (callstack, merged_pre_cvalues)
     end;
     let states =
       Cvalue_callbacks.{ before_stmts = merged_pre_cvalues;
                          after_stmts = merged_post_cvalues }
     in
-    let results = Cvalue_callbacks.Store (states, Mem_exec.new_counter ()) in
-    Cvalue_callbacks.apply_call_results_hooks callstack kf results;
-    if not (Db.Value.Record_Value_After_Callbacks.is_empty ())
-    then begin
-      if Parameters.ValShowProgress.get () then
-        Self.debug ~dkey:dkey_callbacks
-          "now calling Record_After_Value callbacks";
-      Db.Value.Record_Value_After_Callbacks.apply
-        (callstack, merged_post_cvalues);
-    end;
+    let cvalue_init = get_cvalue_or_top initial_state in
+    let results = `Body (states, Mem_exec.new_counter ()) in
+    Cvalue_callbacks.apply_call_results_hooks callstack kf cvalue_init results;
 
 end
 
 
 module Computer
-    (Abstract : Abstractions.Eva)
+    (Abstract : Abstractions.S_with_evaluation)
     (States : Powerset.S with type state = Abstract.Dom.t)
     (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
     (Init: Initialization.S with type state := Abstract.Dom.t)

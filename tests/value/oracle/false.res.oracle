@@ -4,8 +4,9 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[kernel:annot:missing-spec] false.i:18: Warning: 
-  Neither code nor implicit assigns clause for function f, generating default assigns from the prototype
+[kernel:annot:missing-spec] false.i:8: Warning: 
+  Neither code nor explicit assigns for function f,
+   generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f <- main.
   Called from false.i:18.
 [eva] using specification for function f
@@ -21,7 +22,7 @@
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function g:
   

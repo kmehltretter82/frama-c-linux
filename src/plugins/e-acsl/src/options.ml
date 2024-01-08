@@ -134,6 +134,73 @@ module Instrument =
                   Be aware that runtime verdicts may become partial."
     end)
 
+module Widening_arguments_base =
+  Int
+    (struct
+      let default = 1
+      let option_name = "-e-acsl-widening-arguments-base"
+      let arg_name = "n"
+      let help = "widening strategy for arguments of recursive functions."
+    end)
+let () = Widening_arguments_base.set_range ~min:0 ~max:2
+
+module Widening_arguments =
+  String_map
+    (struct
+      include Datatype.Int
+      type key = string
+
+      let to_string ~key:_ i =
+        match i with
+        | None -> None
+        | Some i -> Some (string_of_int i)
+
+      let of_string ~key:_ ~prev: _ s =
+        match s with
+        | None -> None
+        | Some s ->  Some (int_of_string s)
+    end)
+    (struct
+      let default = Datatype.String.Map.empty
+      let option_name = "-e-acsl-widening-arguments"
+      let arg_name = ""
+      let help = "widening strategy for arguments of functions on a case by case \
+                  basis."
+    end)
+
+module Widening_output_base =
+  Int
+    (struct
+      let default = 1
+      let option_name = "-e-acsl-widening-output-base"
+      let arg_name = "n"
+      let help = "wideining strategy for output of recursive functions."
+    end)
+let () = Widening_output_base.set_range ~min:0 ~max:2
+
+module Widening_output =
+  String_map
+    (struct
+      include Datatype.Int
+      type key = string
+
+      let to_string ~key:_ i =
+        match i with
+        | None -> None
+        | Some i -> Some (string_of_int i)
+
+      let of_string ~key:_ ~prev: _ s =
+        match s with
+        | None -> None
+        | Some s ->  Some (int_of_string s)
+    end)
+    (struct
+      let default = Datatype.String.Map.empty
+      let option_name = "-e-acsl-widening-output"
+      let arg_name = ""
+      let help = "widening strategy for output of recursive functions on a case
+      by case basis."
+    end)
 
 let () = Parameter_customize.set_group help
 module Version =
@@ -163,7 +230,11 @@ let parameter_states =
     Temporal_validity.self;
     Validate_format_strings.self;
     Functions.self;
-    Instrument.self ]
+    Instrument.self;
+    Widening_arguments_base.self;
+    Widening_arguments.self;
+    Widening_output.self;
+    Widening_output_base.self ]
 
 let emitter =
   Emitter.create
@@ -176,7 +247,11 @@ let emitter =
     ~tuning:[ Gmp_only.parameter;
               Valid.parameter;
               Replace_libc_functions.parameter;
-              Full_mtracking.parameter ]
+              Full_mtracking.parameter;
+              Widening_output_base.parameter;
+              Widening_arguments.parameter;
+              Widening_output_base.parameter;
+              Widening_output.parameter ]
 
 let must_visit () = Run.get ()
 
@@ -189,6 +264,7 @@ module Dkey = struct
   let typing = register_category "analysis:typing"
   let labels = register_category "analysis:labels"
   let translation = register_category "translation"
+  let env = register_category "translation:env"
 end
 
 let setup ?(rtl=false) () =

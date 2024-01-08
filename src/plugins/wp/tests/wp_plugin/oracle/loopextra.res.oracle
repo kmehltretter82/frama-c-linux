@@ -1,26 +1,98 @@
 # frama-c -wp [...]
 [kernel] Parsing loopextra.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal f_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal f_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] loopextra.i:6: Warning: 
-  Missing assigns clause (assigns 'everything' instead)
-[wp] loopextra.i:3: Warning: 
-  Missing assigns clause (assigns 'everything' instead)
 ------------------------------------------------------------
   Function f
 ------------------------------------------------------------
 
-Goal Assertion (file loopextra.i, line 4):
+Goal Preservation of Invariant (file loopextra.i, line 6):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file loopextra.i, line 7):
+Goal Establishment of Invariant (file loopextra.i, line 6):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assertion (file loopextra.i, line 8):
+Goal Assertion (file loopextra.i, line 11):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant (file loopextra.i, line 14):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file loopextra.i, line 14):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assertion (file loopextra.i, line 19):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assertion (file loopextra.i, line 20):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file loopextra.i, line 7) (1/4):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file loopextra.i, line 7) (2/4):
+Effect at line 18
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file loopextra.i, line 7) (3/4):
+Effect at line 18
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file loopextra.i, line 7) (4/4):
+Effect at line 18
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file loopextra.i, line 15) (1/2):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file loopextra.i, line 15) (2/2):
+Effect at line 18
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file loopextra.i, line 10):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file loopextra.i, line 10):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file loopextra.i, line 18):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file loopextra.i, line 18):
 Prove: true.
 
 ------------------------------------------------------------

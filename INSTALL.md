@@ -39,39 +39,52 @@ macOS has opam through Homebrew.
 
 Windows users can install opam via WSL (Windows Subsystem for Linux).
 
-If your system does not have an opam package >= 2, you can use the provided
+If your system does not have an opam package, you can use the provided
 opam binaries available at:
 
 http://opam.ocaml.org/doc/Install.html
 
-### Installing Frama-C from opam repository
+Note: the `opam` binary itself is very small, but the initialization of an
+*opam switch* usually takes time and disk space, since it downloads and builds
+an OCaml compiler. Please refer to the opam documentation for details.
 
-The Frama-C package in opam is called `frama-c`, which includes both the
-command-line `frama-c` executable and the graphical interface `frama-c-gui`.
+### Installing Frama-C (including dependencies) via opam
 
-`frama-c` has some non-OCaml dependencies, such as Gtk and GMP. On most
-systems, `opam`'s `depext` mechanism can take care of installing these
-external dependencies. As of version
-2.1.0, `depext` is [directly included](https://opam.ocaml.org/blog/opam-2-1-0/#Seamless-integration-of-System-dependencies-handling-a-k-a-quot-depexts-quot)
-in `opam`, so that the following command should install everything, at
-least if your OS is supported by `depext` (and you have administrative
-rights):
+The Frama-C package in opam is called `frama-c`. It includes:
+- the command-line `frama-c` executable;
+- the graphical interface, `frama-c-gui` (in supported systems);
+- `ivette`, Frama-C's new Electron-based GUI.
 
-    opam install frama-c
+Note: Ivette's dependencies are _not_ included in the opam package,
+but downloaded from `npm` when the user runs `ivette` for the first time.
 
-For older `opam` versions, you have to install it
-separately and call it explicitly with the following commands, before
-installing Frama-C as above. Again, installing the external dependencies
-requires administrative rights.
+`frama-c` has some non-OCaml dependencies, such as GMP. opam includes
+a mechanism (`depext`) to handle such dependencies. It may require
+administrative rights to install system packages (e.g. `libgmp`).
 
-    # install Frama-C's dependencies with pre-2.1.0 opam
-    opam install depext
-    opam depext frama-c
+If your `opam` version is >= 2.1, such dependencies are installed
+automatically when installing `frama-c` itself:
 
-If there are errors due to missing external dependencies, opam may emit a
+```shell
+# install Frama-C and dependencies with opam >= 2.1
+opam install frama-c
+```
+
+If your opam version is < 2.1, you need to install `depext` first, then
+use it to install Frama-C's dependencies:
+
+```shell
+# install Frama-C's dependencies with pre-2.1 opam
+opam install depext
+opam depext frama-c
+# then install Frama-C itself
+opam install frama-c
+```
+
+If there are errors due to missing external dependencies, opam usually emits a
 message indicating which packages to install. If this is not sufficient,
-there may be missing dependencies in opam's `depext` tool. In this case,
-you may [create a Gitlab issue](https://git.frama-c.com/pub/frama-c/issues/new)
+there may be missing dependencies in opam's packages for your system. In this
+case, you may [create a Gitlab issue](https://git.frama-c.com/pub/frama-c/issues/new)
 indicating your distribution and error message.
 
 ### Configuring provers for Frama-C/WP
@@ -95,25 +108,27 @@ why3 config detect
 ### Reference configuration
 
 See file [reference-configuration.md](reference-configuration.md)
-for a set of packages that is known to work with Frama-C+dev.
+for a set of packages that is known to work with this version of Frama-C.
 
 ### Installing Custom Versions of Frama-C
 
 If you have a **non-standard** version of Frama-C available
 (with proprietary extensions, custom plugins, etc.),
-you can use opam to install Frama-C's dependencies and compile your
+you can still use opam to install Frama-C's dependencies and compile your
 own sources directly:
 
-    # optional: remove the standard frama-c package if it was installed
-    opam remove --force frama-c
+```shell
+# optional: remove the standard frama-c package if it was installed
+opam remove --force frama-c
 
-    # install Frama-C's dependencies
-    opam install depext # only for opam < 2.1.0
-    opam depext frama-c # only for opam < 2.1.0
-    opam install --deps-only frama-c [--with-test]
+# install Frama-C's dependencies
+opam install depext # only for opam < 2.1.0
+opam depext frama-c # only for opam < 2.1.0
+opam install --deps-only frama-c [--with-test]
 
-    # install custom version of frama-c
-    opam pin add --kind=path frama-c <dir>
+# install custom version of frama-c
+opam pin add --kind=path frama-c <dir>
+```
 
 where `<dir>` is the root of your unpacked Frama-C archive.
 See `opam pin` for more details. The option `--with-test` is optional and
@@ -154,7 +169,7 @@ Notes:
 To install opam, some packages are required. The following commands can be
 run to update the system and install those packages:
 
-```
+```shell
 sudo apt update
 sudo apt upgrade
 sudo apt install make m4 gcc opam gnome-icon-theme
@@ -162,7 +177,7 @@ sudo apt install make m4 gcc opam gnome-icon-theme
 
 Then opam can be set up using these commands:
 
-```
+```shell
 opam init --disable-sandboxing --shell-setup
 eval $(opam env)
 opam install -y depext
@@ -175,18 +190,20 @@ mentioned in the [reference configuration](reference-configuration.md).
 Now, to install Frama-C, run the following commands, which will use `apt` to
 install the dependencies of the opam packages and then install them:
 
-```
+```shell
 opam depext --install -y lablgtk3 lablgtk3-sourceview3
 opam depext --install -y frama-c
 ```
 
 #### Running the Frama-C GUI on WSL
 
-If you have WSL2: a known issue with Frama-C 24.0 (Chromium), lablgtk3 and
-Wayland require prefixing the command running the Frama-C GUI with
+If you have WSL2: a known issue with some versions of Frama-C, lablgtk3 and
+Wayland requires prefixing the command running the Frama-C GUI with
 `GDK_BACKEND=x11`, as in:
 
-    GDK_BACKEND=x11 frama-c-gui <options>
+```shell
+GDK_BACKEND=x11 frama-c-gui <options>
+```
 
 If you have WSL 1: WSL 1 does not support graphical user interfaces directly.
 If you want to run Frama-C's GUI, you need to install an X server,
@@ -213,7 +230,7 @@ in your `~/.bashrc` file, so this is done automatically when starting WSL.
 
 The Xserver is ready. From WSL, run:
 
-```
+```shell
 export LIBGL_ALWAYS_INDIRECT=1
 export DISPLAY=:0
 frama-c-gui
@@ -221,7 +238,7 @@ frama-c-gui
 
 ##### WSL 2
 
-```
+```shell
 export LIBGL_ALWAYS_INDIRECT=1
 export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0
 frama-c-gui
@@ -319,9 +336,11 @@ Arch Linux: `pikaur -S frama-c`
 1. Install [opam](http://opam.ocaml.org/) and use it to get all of Frama-C's
    dependencies (including some external ones):
 
-        opam install depext # only for opam < 2.1.0
-        opam depext frama-c # only for opam < 2.1.0
-        opam install --deps-only frama-c
+   ```shell
+   opam install depext # only for opam < 2.1.0
+   opam depext frama-c # only for opam < 2.1.0
+   opam install --deps-only frama-c
+   ```
 
    If not using [opam](http://opam.ocaml.org/), you will need to install
    the Frama-C dependencies by yourself. The `opam` file in the Frama-C
@@ -332,15 +351,17 @@ Arch Linux: `pikaur -S frama-c`
 
 2. On Linux-like distributions:
 
-        make RELEASE=yes && make install
+   ```shell
+   make RELEASE=yes && make install
+   ```
 
-    See section *Installation* below for options.
+   See section *Installation* below for options.
 
 3. On Windows+Cygwin:
 
-        make RELEASE=yes && make install
-
-4. The binary `frama-c` (and `frama-c-gui` if you have lablgtk2) is now installed.
+   ```shell
+   make RELEASE=yes && make install
+   ```
 
 ### Full Compilation Guide
 
@@ -356,8 +377,8 @@ root source folder):
 
 1. `opam switch create frama-c ocaml-base-compiler.4.13.1`
    to create a compatible opam switch
-1. `opam pin . -n` to pin to the latest development version
-1. `opam install --deps-only .` will fetch and build all
+2. `opam pin . -n` to pin to the latest development version
+3. `opam install --deps-only .` will fetch and build all
    relevant dependencies
 
 #### Compilation
@@ -365,30 +386,25 @@ root source folder):
 There are basically two compilation modes: development and release.
 
 Typing `make` builds in development mode, this is a shortcut for:
-```
+```shell
 dune build @install
 ```
 
 Typing `make RELEASE=yes` builds in release mode, this is a shortcut for:
-```
+```shell
 dune build @install --release --promote-install-files=false
 ```
 
-For more precise build configuration, use directly the `dune` command.
+For more precise build configurations, use directly the `dune` command.
 
 #### Testing
 
 Basic tests can be executed using:
 
-```
+```shell
 make run-ptests
 make default-tests
 ```
-
-**Beware!** If the tests fail due to JSON output, it is likely because of the
-Yojson package version. Make sure that your `opam` dependencies have been
-installed with the option `--with-test`
-(see [Installing Custom Versions of Frama-C](#installing-custom-versions-of-frama-c)).
 
 #### Installation
 
@@ -396,11 +412,11 @@ Type `make install` (depending on the installation directory, this may require
 superuser privileges. The installation directory is chosen through the variable
 `PREFIX`). This is a shortcut for:
 
-```
+```shell
 dune install
 ```
 
-The Makefile (and dune) supports the `DESTDIR` variable, that can be used to
+Makefile (and dune) support the `DESTDIR` variable, which can be used to
 configure the location of the installation.
 
 #### API Documentation
@@ -409,13 +425,13 @@ For plugin developers, the API documentation of the Frama-C kernel and
 distributed plugins is available in the `_build/default/_doc/_html` directory
 after running:
 
-```
+```shell
 make doc
 ```
 
 or:
 
-```
+```shell
 dune build @doc
 ```
 
@@ -432,20 +448,24 @@ This step is optional.
 
 Download some test files:
 
-    export PREFIX_URL="https://git.frama-c.com/pub/frama-c/raw/master/tests/value"
-    wget -P test ${PREFIX_URL}/CruiseControl.c
-    wget -P test ${PREFIX_URL}/CruiseControl_const.c
-    wget -P test ${PREFIX_URL}/CruiseControl.h
-    wget -P test ${PREFIX_URL}/CruiseControl_extern.h
-    wget -P test ${PREFIX_URL}/scade_types.h
-    wget -P test ${PREFIX_URL}/config_types.h
-    wget -P test ${PREFIX_URL}/definitions.h
+```shell
+export PREFIX_URL="https://git.frama-c.com/pub/frama-c/raw/master/tests/value"
+wget -P test ${PREFIX_URL}/CruiseControl.c
+wget -P test ${PREFIX_URL}/CruiseControl_const.c
+wget -P test ${PREFIX_URL}/CruiseControl.h
+wget -P test ${PREFIX_URL}/CruiseControl_extern.h
+wget -P test ${PREFIX_URL}/scade_types.h
+wget -P test ${PREFIX_URL}/config_types.h
+wget -P test ${PREFIX_URL}/definitions.h
+```
 
 Then test your installation by running:
 
-    frama-c -eva test/CruiseControl*.c
-    # or (if frama-c-gui is available)
-    frama-c-gui -eva test/CruiseControl*.c
+```shell
+frama-c -eva test/CruiseControl*.c
+# or (if ivette is available)
+ivette -eva test/CruiseControl*.c
+```
 
 # Available resources
 
@@ -457,16 +477,14 @@ available:
 - `frama-c`
 - `frama-c-gui`       if available
 - `frama-c-config`    lightweight wrapper used to display configuration paths
-- `frama-c-hdrck`     header checking tool for Frama-C
 - `frama-c-ptests`    testing tool for Frama-c
 - `frama-c-wtests`    testing tool for Frama-c
-- `frama-c-script`    utilities related to analysis parametrization
+- `frama-c-script`    utilities related to e.g. analysis parametrization
+- `ivette`            new graphical interface
 
 ## Shared files: (in `/INSTALL_DIR/share/frama-c` and subdirectories)
 
-- some `.h` and `.c` files used as preludes by Frama-C
 - some `Makefiles` used to compile dynamic plugins
-- some `.rc` files used to configure Frama-C
 - some image files used by the Frama-C GUI
 - some files for Frama-C/plug-in development (autocomplete scripts,
   Emacs settings, scripts for running Eva, ...)
@@ -492,7 +510,9 @@ Plugins may be released independently of Frama-C.
 
 The standard way for installing them should be:
 
-    dune build @install && dune install
+```shell
+dune build @install && dune install
+```
 
 Plugins may have their own custom installation procedures.
 Consult their specific documentation for details.
@@ -506,13 +526,13 @@ plugin developers. These tools are:
 
 They can be installed either by pinning them via Opam:
 
-```
+```shell
 opam pin tools/lint
 opam pin tools/hdrck
 ```
 
 Or by compiling/installing Frama-C manually in developer mode:
-```
+```shell
 FRAMAC_DEVELOPER=yes make
 FRAMAC_DEVELOPER=yes make install
 

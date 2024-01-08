@@ -139,7 +139,9 @@ let generate_kf ~loc fname env ret_ty params_ty params_ival li =
              (* GMP's integer are arrays: consider them as pointers in function's
                 parameters *)
              Gmp_types.Z.t_as_ptr ()
+           | C_integer _ when Options.Gmp_only.get () -> Gmp_types.Z.t_as_ptr ()
            | C_integer ik -> TInt(ik, [])
+           | C_float _ when Options.Gmp_only.get () -> Gmp_types.Q.t_as_ptr ()
            | C_float ik -> TFloat(ik, [])
            (* for the time being, no reals but rationals instead *)
            | Rational -> Gmp_types.Q.t ()
@@ -473,7 +475,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
           in
           try
             List.fold_right2
-              (fun targ earg (params_ty, params_ival ,args, adata, env) ->
+              (fun targ earg (params_ty, params_ival, args, adata, env) ->
                  let logic_env = Env.Logic_env.get env in
                  let param_ty = Typing.get_number_ty ~logic_env targ in
                  let param_ival = Interval.get ~logic_env targ in
@@ -482,6 +484,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
                      let ty = Typing.typ_of_number_ty param_ty in
                      Typed_number.add_cast
                        ~loc
+                       ~name:(Varname.of_exp earg)
                        env
                        kf
                        (Some ty)
@@ -507,7 +510,6 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
           Varname.get ~scope:Global (Functions.RTL.mk_gen_name fname)
         in
         let profile = Profile.make li.l_profile params_ival in
-        let profile = Interval.get_widened_profile profile li in
         let vi, e, env =
           try
             function_to_exp ~loc ?tapp gen_fname env kf li params_ty profile args

@@ -49,7 +49,7 @@
 [eva] partitioning-annots.c:89: Frama_C_show_each_end: {1}, {0; 1; 2}, {1}
 [eva] partitioning-annots.c:89: Frama_C_show_each_end: {0}, {0; 1; 2}, {0}
 [eva] Recording results for test_split
-[eva] done for function test_split
+[eva] Done for function test_split
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test_split:
   Frama_C_entropy_source ∈ [--..--]

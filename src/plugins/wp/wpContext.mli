@@ -83,6 +83,7 @@ module MINDEX : Hashtbl.S with type key = model
 val is_defined : unit -> bool
 val on_context : context -> ('a -> 'b) -> 'a -> 'b
 val get_model : unit -> model
+val get_ident : unit -> string
 val get_scope : unit -> scope
 val get_context : unit -> context
 
@@ -112,7 +113,7 @@ sig
   val clear : unit -> unit
   val remove : key -> unit
   val define : key -> data -> unit
-  (** no redefinition ; circularity protected *)
+  (** no redefinition unless forced ; circularity protected *)
 
   val update : key -> data -> unit
   (** set current value, with no protection *)
@@ -163,10 +164,11 @@ module type Generator =
 sig
   type key
   type data
-  val get : key -> data
   val mem : key -> bool
-  val clear : unit -> unit
+  val get : key -> data
+  val set : key -> data -> unit
   val remove : key -> unit
+  val clear : unit -> unit
 end
 
 (** projectified, depend on the model, not serialized *)

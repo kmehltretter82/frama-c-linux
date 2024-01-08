@@ -26,7 +26,7 @@
 [eva:alarm] tab.c:12: Warning: accessing out of bounds index. assert 0 ≤ i;
 [eva:alarm] tab.c:12: Warning: accessing out of bounds index. assert i < 4;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t[0] ∈ {0; 1}

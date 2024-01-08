@@ -15,8 +15,9 @@
 [eva] using specification for function p3
 [eva] call.i:41: Warning: no \from part for clause 'assigns G;'
 [eva] Done for function p3
-[kernel:annot:missing-spec] call.i:45: Warning: 
-  Neither code nor specification for function p2, generating default assigns from the prototype
+[kernel:annot:missing-spec] call.i:12: Warning: 
+  Neither code nor specification for function p2,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function p2 <- test3 <- call_test3 <- main3.
   Called from call.i:45.
 [eva] using specification for function p2
@@ -26,7 +27,7 @@
 [eva] Recording results for call_test3
 [eva] Done for function call_test3
 [eva] Recording results for main3
-[eva] done for function main3
+[eva] Done for function main3
 [pdg] computing for function main3
 [from] Computing for function call_test3
 [from] Computing for function test3 <-call_test3

@@ -211,12 +211,7 @@ module Arith = struct
     let r = narrow x y in
     if is_bottom r then `Bottom else `Value r
 
-  let widen =
-    let hints = Integer.zero,
-                (Ival.Widen_Hints.empty,
-                 Fc_float.Widen_Hints.default_widen_hints)
-    in
-    Ival.widen hints
+  let widen = Ival.widen
 
   (* TODO: do not use Ival.top on floating-point value? *)
   let project_float ival =
@@ -1616,6 +1611,9 @@ module Domain = struct
   type location = Precise_locs.precise_location
   type origin
 
+  let value_dependencies = Main_values.cval
+  let location_dependencies = Main_locations.ploc
+
   let top_value = `Value (Cvalue.V.top, None), Alarmset.all
 
   (* Evaluator building. *)
@@ -1953,3 +1951,11 @@ module Domain = struct
 end
 
 include Domain
+
+let registered =
+  let name = "octagon"
+  and descr =
+    "Infers relations between scalar variables of the form b ≤ ±X ± Y ≤ e, \
+     where X, Y are program variables and b, e are constants."
+  in
+  Abstractions.Domain.register ~name ~descr ~priority:6 (module Domain)

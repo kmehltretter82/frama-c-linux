@@ -369,12 +369,12 @@ frama-c -eva main_1.c > log
 Frama-C has its own model of the target platform (the default target is
 a little-endian 64-bit platform). It also uses the host system's preprocessor.
 If you want to do the analysis for a different platform than the host platform,
-you need to provide Frama-C with a way to pre-process the files as they
+you need to provide Frama-C with a way to preprocess the files as they
 would be during an actual compilation.
 
 There are analyses where the influence of host platform parameters
 is not noticeable. The analysis we are embarking on is not one of them.
-If you pre-process the Skein source code with a 32-bit compiler and
+If you preprocess the Skein source code with a 32-bit compiler and
 then analyze it with Frama-C targeting its default 64-bit platform,
 the analysis will be meaningless and you won't be able to make sense of
 this tutorial.
@@ -752,7 +752,7 @@ but when it is almost done (after the analysis of function
 [eva] using specification for function printf_va_1
 [eva:alarm] main_1.c:17: Warning:
   accessing uninitialized left-value. assert \initialized(&hash[i]);
-[eva] done for function main
+[eva] Done for function main
 ...
 \end{logs}
 
@@ -2964,12 +2964,12 @@ $\dots$
 
 The analyzed files should be syntactically correct C. The files
 that do not use the {\tt .i} extension are automatically
-pre-processed. The preprocessing command used by default is
+preprocessed. The preprocessing command used by default is
 \lstinline|gcc -C -E -I.|, but another preprocessor may be employed.
 
 It is possible that files without a {\tt .c} extension
 fail to pass this stage. It is notably the case with \lstinline|gcc|,
-to which the option \lstinline|-x c| should be passed in order to pre-process
+to which the option \lstinline|-x c| should be passed in order to preprocess
 C files that do not have a \lstinline|.c| extension.
 \goodbreak
 
@@ -3091,7 +3091,7 @@ prototype of \lstinline|main| is:
 \cwithrange{1-1}{examples/parametrizing/simple-main.c}
 The types of arguments \lstinline|argc| and \lstinline|argv|
 translate into the following initial values:
-\logwithrange{10-16}{examples/parametrizing/simple-main.log}
+\logwithrange{8-14}{examples/parametrizing/simple-main.log}
 
 This is generally not what is wanted, but then again, embedded applications
 are generally not written against the POSIX interface. If the analyzed
@@ -3198,7 +3198,7 @@ also decided by the value of option \lstinline|-eva-context-width|.
 Example: with the default value \lstinline|2| for option
 \lstinline|-eva-context-width|, the declaration \lstinline|int *(t[5]);|
 causes the following array to be allocated:
-\logwithrange{10-15}{examples/parametrizing/context-width.log}
+\logwithrange{8-13}{examples/parametrizing/context-width.log}
 
 Note that for both arrays of pointers and pointers to pointers,
 using option \lstinline|-eva-context-width 1| corresponds to a very strong
@@ -3223,7 +3223,7 @@ two is plenty for most programs.
 For instance, here is part of the initial state displayed by \Eva{}
 in \lstinline|-lib-entry| mode if a global variable \lstinline|s|
 has the type \lstinline|struct S| defined above:
-\logwithrange{6-17}{examples/parametrizing/context-depth.1.log}
+\logwithrange{4-15}{examples/parametrizing/context-depth.1.log}
 
 In this case, if variable \lstinline|s| is the only one which
 is automatically allocated, it makes sense to set the option
@@ -3237,7 +3237,7 @@ Below are the initial contents for a variable \lstinline|s| of type \lstinline|s
 with options \lstinline|-eva-context-width 1|
 \lstinline|-eva-context-depth 1|:
 
-\logwithrange{6-16}{examples/parametrizing/context-depth.2.log}
+\logwithrange{4-14}{examples/parametrizing/context-depth.2.log}
 
 \subsubsection{The possibility of invalid pointers}
 
@@ -3271,7 +3271,7 @@ a variable \lstinline|s| of
 type \lstinline|struct S| receives  the following initial contents,
 modeling a chained list of length exactly 3:
 
-\logwithrange{6-11}{examples/parametrizing/context-depth.3.log}
+\logwithrange{4-9}{examples/parametrizing/context-depth.3.log}
 
 \subsection{State of the IEEE 754 environment}
 
@@ -3395,7 +3395,7 @@ alarm. This leads to an alarm on the following example:
 \Eva{} assumes that writing \lstinline|t[0][...]|, the programmer
 intended the memory access to be inside \lstinline|t[0]|. Consequently,
 it emits an alarm:
-\logwithrange{8-8}{examples/parametrizing/out-of-bound.log}
+\logwithrange{5-6}{examples/parametrizing/out-of-bound.log}
 The option \lstinline|-unsafe-arrays| tells \Eva{} to warn
 only if the address as computed using its modeling of pointer arithmetics
 is invalid. With the option, \Eva{} does not warn about line 4
@@ -3503,7 +3503,7 @@ in the general case and will instead rely on the \lstinline|mod3| specification,
 as it cannot reduce the new argument value of the recursive calls, as shown
 by the successive values printed by the \lstinline|Frama_C_show_each| directive:
 
-\logwithrange{12-19}{examples/parametrizing/recursion-imprecise.log}
+\logwithrange{10-17}{examples/parametrizing/recursion-imprecise.log}
 
 Finally, note that the unrolling of a very large number of recursive calls can
 considerably slow down the analysis.
@@ -3672,10 +3672,10 @@ the specified unrolling value is insufficient to unroll the loop entirely:
 
 \csource{examples/parametrizing/loop-unroll-insuf.c}
 
-\logwithrange{7-7}
+\logwithrange{5-5}
   {examples/parametrizing/loop-unroll-insuf.log}
 
-The message can be deactived via \lstinline|-eva-warn-key loop-unroll=inactive|.
+The message can be disabled via \lstinline|-eva-warn-key loop-unroll=inactive|.
 
 Note that using an unrolling parameter which is higher than the actual number
 of iterations of a loop doesn't generally have an effect on the analysis.
@@ -3711,7 +3711,7 @@ option \lstinline|-eva-slevel 55| in order to be completely unrolled:
 
 When the loops are sufficiently unrolled, the result obtained for the
 contents of array \lstinline|t| are the optimally precise:
-\logwithrange{14-14}{examples/parametrizing/slevel.1.log}
+\logwithrange{11-11}{examples/parametrizing/slevel.1.log}
 
 The number to pass the option \lstinline|-eva-slevel|  is of the magnitude of
 the number of values for \lstinline|i| (the 6 integers between 0 and 5)
@@ -3720,7 +3720,7 @@ integers comprised between 0 and 10). If a value much lower than
 this is passed, the result of the initialization of array \lstinline|t|
 will only be precise for the first cells. The option \lstinline|-eva-slevel 28|
 gives for instance the following result for array \lstinline|t|:
-\logwithrange{15-16}{examples/parametrizing/slevel.2.log}
+\logwithrange{12-13}{examples/parametrizing/slevel.2.log}
 
 In this result, the effects of the first iterations of the loops
 (for the whole of \lstinline|t[0]|, the whole of \lstinline|t[1]| and the first
@@ -3976,6 +3976,7 @@ most cases, and a greater value is rarely needed.
 
 
 \subsection{Value partitioning}
+\label{value-partitioning}
 
 \subsubsection{Principle}
 
@@ -3994,7 +3995,7 @@ evaluated by \Eva{} as a singleton in each case, which enables the use of a
 the function can be exactly computed as the set of three possible values instead
 of an imprecise interval.
 
-\logwithrange{25-26}{examples/parametrizing/split-array.log}
+\logwithrange{22-23}{examples/parametrizing/split-array.log}
 
 A \lstinline|split| annotation can be used on any expression that evaluates to a
 {\it small} number of integer values. In particular, the expression can be a C
@@ -4129,13 +4130,13 @@ Example:
 With the default limit of 8 elements for sets of integers, the
 analysis of the program shows a correct but approximated result:
 
-\logwithrange{23-23}{examples/parametrizing/ilevel.1.log}
+\logwithrange{20-20}{examples/parametrizing/ilevel.1.log}
 
 Studying the program, the user may decide to improve the precision of
 the result by adding \verb|-eva-ilevel 16| to the command line. The
 analysis result then becomes:
 
-\logwithrange{23-23}{examples/parametrizing/ilevel.2.log}
+\logwithrange{20-20}{examples/parametrizing/ilevel.2.log}
 
 \subsection{Maximum number of precise items in arrays}
 
@@ -4166,6 +4167,44 @@ a significant factor. Most of the time, this option has little impact in the
 analysis, both in terms of precision and performance. However, when dealing
 with large arrays and matrices, it is worth considering its usage.
 
+
+\subsection{Subdividing the evaluation of non-linear expressions}
+\label{subdividing-evaluation}
+
+Option \verb|-eva-subdivide-non-linear| improves the analysis precision on
+non-linear expressions, such as \lstinline|x * x|,
+or on any expression with multiple occurrences of the same lvalue.
+
+The interval semantics is inherently imprecise on non-linear expressions.
+When $x \in [-10..10]$, the interval semantics computes $x*x \in [-100..100]$.
+Subdivisions can mitigate this imprecision by splitting the evaluation of
+\lstinline|x*x| according to the possible values of \lstinline|x|,
+and then joining the results.
+When \verb|-eva-subdivide-non-linear| is enabled, \Eva{} evaluates the
+expression \lstinline|x*x| separately for $x \in [-10..0]$ and $x \in [0..10]$,
+and computes the precise interval $x*x \in [0..100]$ for both cases.
+On this example, splitting the values of x further would not improve the result.
+
+The argument of \verb|-eva-subdivide-non-linear| is the maximal number of
+subdivisions that can be performed for each non-linear expression.
+This limit is not always reached, as heuristics may detect when more
+subdivisions cannot lead to a better result.
+This option slightly slows down the analysis, as more computations are performed;
+in practice, the limit can usually be set up to several hundreds even on
+large programs.
+
+The option is global, and subdivisions are applied to any non-linear expression
+of integer or floating-point type.
+Subdivisions can also be controlled locally by writing annotations
+in the analyzed code:
+a \lstinline|//@  subdivide N;| annotation instructs \Eva{}
+to apply up to $N$ subdivisions when evaluating the following statement,
+regardless of option \verb|-eva-subdivide-non-linear|.
+
+Finally, \Eva is also able to subdivide the evaluation of an expression
+according to the values of an arbitrary number of lvalues;
+thus, this subdivision mechanism can also improve the precision on expressions
+that are non-linear on several lvalues, such as \lstinline|x*x - 2*x*y + y*y|.
 
 \section{Analysis domains}
 \label{sec:eva}
@@ -5390,6 +5429,90 @@ implementation and the specification, using option
 not set, even user-written specifications are skipped (for functions
 of the standard library).
 
+\section{Directives guiding the analysis}
+
+The precision of the \Eva{} analysis can often be locally improved on some code
+patterns by writing directives as special ACSL annotations in the analyzed code.
+These directives allow the user to fine-tune the behavior of the analysis by
+locally enabling some features that would be too costly to apply on the whole
+program.
+This section lists such directives supported by \Eva{}, with a short description
+of their behavior and a reference to the relevant section of this manual that
+explains in more details their effect on the analysis.
+
+% Each of these directives also has an alternative syntax where the keyword is
+% prefixed by \texttt{\textbackslash eva::}. Thus, one can write
+% \texttt{//@ \textbackslash eva::split x; //@ loop \textbackslash eva::unroll 100;}
+% instead of \texttt{//@ split x; //@ loop unroll 100;}.
+% This syntax makes explicit that the directive is specific to the \Eva{} plug-in,
+% and avoids parsing failure if \Eva{} is not loaded (for instance when using
+% the \verb|-no-autoload-plugins| parameter).
+
+\subsection{Directives guiding trace partitioning}
+
+\begin{center}
+  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}>{\raggedright}m{6cm}>{\raggedright}m{8cm}c}
+    Syntax & Description & Ref
+  \tabularnewline
+  \midrule
+  \midrule
+    \texttt{//@ loop unroll <N>;}
+  & Loop unrolling: analyze separately each of the \texttt{<N>} first
+    iterations of the given loop.
+  & \ref{loop-unroll}
+  \tabularnewline
+  \midrule
+    \texttt{//@ split <e>;}~\\
+    \texttt{//@ dynamic\_split <e>;}
+  & Case-based reasoning: separate the analysis for each possible value of expression \texttt{<e>}.
+  & \multirow{2}{*}{\ref{value-partitioning}}
+  \tabularnewline
+  \cmidrule{1-2} \cmidrule{2-2}
+    \texttt{//@ merge <e>;}
+  & Cancel previous splits on expression \texttt{<e>}.
+  & \tabularnewline
+  \midrule
+    \texttt{//@ slevel <N>;}
+  & Locally set the value of \texttt{-eva-slevel} to \texttt{<N>}.
+  & \multirow{4}{*}{\ref{slevel}}
+  \tabularnewline
+  \cmidrule{1-2} \cmidrule{2-2}
+    \texttt{//@ slevel full;}
+  & Locally remove the limit of \texttt{-eva-slevel}.
+  & \tabularnewline
+  \cmidrule{1-2} \cmidrule{2-2}
+    \texttt{//@ slevel default;}
+  & Reset \texttt{-eva-slevel} to its default value.
+  & \tabularnewline
+  \cmidrule{1-2} \cmidrule{2-2}
+    \texttt{//@ slevel merge;}
+  & Merge all states kept separate by \texttt{-eva-slevel}.
+  & \tabularnewline
+  \bottomrule
+  \end{tabular*}
+  \par
+\end{center}
+
+\subsection{Other directives improving precision}
+
+\begin{center}
+  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}>{\raggedright}p{6cm}>{\raggedright}p{8cm}c}
+  Syntax & Description & Ref\tabularnewline
+  \midrule
+  \midrule
+  \texttt{//@ widen\_hints <v>, <N>;} & Use constant \texttt{<N>} as a possible threshold for the widening
+  of variable \texttt{<v>}. & \ref{subsub:widen-hints}\tabularnewline
+  \midrule
+  \texttt{//@ subdivide <N>;} & Subdivide up to \texttt{<N>} times the evaluation of non-linear expressions
+  in the next statement. & \ref{subdividing-evaluation}\tabularnewline
+  \midrule
+  \texttt{//@ eva\_allocate <s>;} & Select a strategy to model dynamic allocation at the next statement. & \ref{malloc}\tabularnewline
+  \midrule
+  \texttt{//@ array\_partition <t>\dots ;} & Propose a segmentation to represent array \texttt{<t>} in the \texttt{multidim}
+  domain. & \ref{sec:multidim}\tabularnewline
+  \bottomrule
+  \end{tabular*}
+  \par\end{center}
 
 
 \chapter{Primitives}\label{primitives}

@@ -41,7 +41,7 @@ module type Function = sig
   val well_typed: typ option -> typ list -> bool
 end
 
-module Make (F: Function) : sig
+module Make (_: Function) : sig
   val generate_function_type : typ -> typ
   val generate_prototype : typ -> string * typ
   val well_typed_call : lval option -> varinfo -> exp list -> bool

@@ -923,42 +923,101 @@ let hash_const c =
 
 module type Make_cmp_input = sig
   include Datatype.Make_input
-  val compare: strict:bool -> t -> t -> int
+  val compare: structural:bool -> strict:bool -> t -> t -> int
 end
 
 module Make_compare_non_strict(M: Make_cmp_input) =
   Datatype.Make_with_collections(
   struct
     include M
-    let compare = M.compare ~strict:false
+    let compare = M.compare ~structural:false ~strict:false
   end)
 
 module Make_compare_strict(M: Make_cmp_input) =
   Datatype.Make_with_collections(
   struct
     include M
-    let compare = M.compare ~strict:true
+    let compare = M.compare ~structural:false ~strict:true
     let name = M.name ^ "Strict"
+  end)
+
+module Make_compare_strict_sized(M: Make_cmp_input) =
+  Datatype.Make_with_collections(
+  struct
+    include M
+    let compare = M.compare ~structural:true ~strict:true
+    let name = M.name ^ "StrictSized"
+  end)
+
+module Make_compare_non_strict_sized(M: Make_cmp_input) =
+  Datatype.Make_with_collections(
+  struct
+    include M
+    let compare = M.compare ~structural:true ~strict:false
+    let name = M.name ^ "Sized"
   end)
 
 module StructEq =
 struct
+
+  (* Return true if the types have the same size, machine-indepently *)
+  let rec compare_structural_typ_size (t1 : typ) (t2 : typ) : int =
+    match !punrollType t1, !punrollType t2 with
+    | TPtr (t1, _), TPtr (t2, _) when
+        (match t1, t2 with
+         | (TVoid _ | TInt ((IChar | ISChar | IUChar) , _)),
+           (TVoid _ | TInt ((IChar | ISChar | IUChar) , _)) -> true
+         | _ -> false) ->
+      (* Void and characters pointers have the same size.
+         ISO.6.2.5.28 *)
+      0
+    | TPtr (TComp (comp1, _), _), TPtr (TComp (comp2, _), _)
+      when comp1.cstruct = comp2.cstruct ->
+      (* Struct pointers have the same size.
+         Union pointers have the same size.
+         ISO.6.2.5.28 *)
+      0
+    | TPtr (t1, _), TPtr (t2, _) ->
+      (* Pointers aren't force to have the same size. Depends on the type.
+         ISO.6.2.5.28 *)
+      Typ.compare t1 t2
+    | TComp (c1, _), TComp (c2, _) ->
+      (* Struct/union's id are not necessarily unified.
+         We structurally compare them. *)
+      begin
+        match c1.cfields, c2.cfields with
+        | Some c1f, Some c2f when c1.cstruct == c2.cstruct ->
+          Extlib.list_compare
+            (fun f1 f2 -> compare_structural_typ_size f1.ftype f2.ftype)
+            c1f c2f
+        | _ -> Typ.compare t1 t2
+      end
+    | _ -> Typ.compare t1 t2
+
+
   (* If [strict] is true, the comparaison of integer and floating-point constants
      takes into account their textual representation (if any). Otherwise,
      constants with the same type and value are equal even if their textual
-     representations differ. *)
-  let rec compare_exp ~strict e1 e2 =
-    let compare_exp = compare_exp ~strict in
+     representations differ.
+     If [structural] is true, the comparaison of type into sizeof takes only
+     the size into account. Otherwise, we use the usual type comparison.
+  *)
+  let rec compare_exp ~structural ~strict e1 e2 =
+    let compare_exp = compare_exp ~structural ~strict in
+    let compare_lval = compare_lval ~structural ~strict in
     match e1.enode, e2.enode with
     | Const (CStr _), Const (CStr _)
     | Const (CWStr _), Const (CWStr _) -> compare e1.eid e2.eid
     | Const c1, Const c2 -> compare_constant ~strict c1 c2
     | Const _, _ -> 1
     | _, Const _ -> -1
-    | Lval lv1, Lval lv2 -> compare_lval ~strict lv1 lv2
+    | Lval lv1, Lval lv2 -> compare_lval lv1 lv2
     | Lval _, _ -> 1
     | _, Lval _ -> -1
-    | SizeOf t1, SizeOf t2 -> Typ.compare t1 t2
+    | SizeOf t1, SizeOf t2 ->
+      if structural
+      then compare_structural_typ_size t1 t2
+      else Typ.compare t1 t2
     | SizeOf _, _  -> 1
     | _, SizeOf _ -> -1
     | SizeOfE e1, SizeOfE e2 -> compare_exp e1 e2
@@ -997,35 +1056,35 @@ struct
       if res = 0 then compare_exp e1 e2 else res
     | CastE _, _ -> 1
     | _, CastE _ -> -1
-    | AddrOf lv1, AddrOf lv2 -> compare_lval ~strict lv1 lv2
+    | AddrOf lv1, AddrOf lv2 -> compare_lval lv1 lv2
     | AddrOf _, _ -> 1
     | _, AddrOf _ -> -1
-    | StartOf lv1, StartOf lv2 -> compare_lval ~strict lv1 lv2
+    | StartOf lv1, StartOf lv2 -> compare_lval lv1 lv2
 
-  and compare_lval ~strict (h1,o1) (h2,o2) =
-    let res = compare_lhost ~strict h1 h2 in
-    if res = 0 then compare_offset ~strict o1 o2 else res
+  and compare_lval ~structural ~strict (h1,o1) (h2,o2) =
+    let res = compare_lhost ~structural ~strict h1 h2 in
+    if res = 0 then compare_offset ~structural ~strict o1 o2 else res
 
-  and compare_lhost ~strict h1 h2 =
+  and compare_lhost ~structural ~strict h1 h2 =
     match h1, h2 with
     | Var v1, Var v2 -> Varinfo.compare v1 v2
     | Var _, Mem _ -> 1
-    | Mem e1, Mem e2 -> compare_exp ~strict e1 e2
+    | Mem e1, Mem e2 -> compare_exp ~structural ~strict e1 e2
     | Mem _, Var _ -> -1
 
-  and compare_offset ~strict o1 o2 =
+  and compare_offset ~structural ~strict o1 o2 =
     match o1, o2 with
     | NoOffset, NoOffset -> 0
     | NoOffset, _ -> 1
     | _, NoOffset -> -1
     | Field(f1,o1), Field(f2, o2) ->
       let res = Fieldinfo.compare f1 f2 in
-      if res = 0 then compare_offset ~strict o1 o2 else res
+      if res = 0 then compare_offset ~structural ~strict o1 o2 else res
     | Field _, _ -> 1
     | _, Field _ -> -1
     | Index(e1, o1), Index(e2, o2) ->
-      let res = compare_exp ~strict e1 e2 in
-      if res = 0 then compare_offset ~strict o1 o2 else res
+      let res = compare_exp ~structural ~strict e1 e2 in
+      if res = 0 then compare_offset ~structural ~strict o1 o2 else res
 
   let prime = 83047
   let rec hash_exp acc e =
@@ -1071,7 +1130,7 @@ struct
   type t = constant
   let name = "Constant"
   let reprs = [ CInt64(Integer.zero, IInt, Some "0") ]
-  let compare = compare_constant
+  let compare ~structural = (fun _ -> compare_constant) structural
   let hash = hash_const
   let equal = Datatype.from_compare
   let pretty fmt t = !pretty_ref fmt t
@@ -1101,6 +1160,11 @@ end
 module ExpStructEq = Make_compare_non_strict(ExpStructEq_input)
 let () = compare_exp_struct_eq := ExpStructEq.compare
 module ExpStructEqStrict = Make_compare_strict(ExpStructEq_input)
+module ExpStructEqSized =
+  Make_compare_non_strict_sized(ExpStructEq_input)
+module ExpStructEqStrictSized =
+  Make_compare_strict_sized(ExpStructEq_input)
+
 
 module Block = struct
   let pretty_ref = Extlib.mk_fun "Cil_datatype.Block.pretty_ref"

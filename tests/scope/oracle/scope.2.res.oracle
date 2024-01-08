@@ -14,7 +14,7 @@
 [eva:alarm] scope.c:76: Warning: signed overflow. assert b + 1 ≤ 2147483647;
 [eva:alarm] scope.c:77: Warning: signed overflow. assert i + 1 ≤ 2147483647;
 [eva] Recording results for loop
-[eva] done for function loop
+[eva] Done for function loop
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function loop:
   a ∈ [1..2147483647]

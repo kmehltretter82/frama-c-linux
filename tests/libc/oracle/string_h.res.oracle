@@ -356,7 +356,7 @@
 [eva] Done for function mempcpy
 [eva:alarm] string_h.c:161: Warning: assertion 'imprecise' got status unknown.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function crashes_gcc:
   NON TERMINATING FUNCTION

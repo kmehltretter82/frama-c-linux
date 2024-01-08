@@ -42,7 +42,7 @@
 [eva] Recording results for getopt
 [eva] Done for function getopt
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function getopt:
   Frama_C_entropy_source ∈ [--..--]

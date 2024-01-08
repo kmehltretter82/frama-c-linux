@@ -1,6 +1,5 @@
 let e = Emitter.create "foo" [ Emitter.Funspec ] ~correctness:[] ~tuning:[]
 let emitter = e
-let populate = false
 
 let run () =
   let () = Ast.compute () in
@@ -11,7 +10,7 @@ let run () =
     e main [ Logic_const.new_predicate Logic_const.ptrue];
   File.pretty_ast();
   Annotations.remove_behavior
-    e main (List.hd (Annotations.behaviors ~populate ~emitter main));
+    e main (List.hd (Annotations.behaviors ~emitter main));
   File.pretty_ast();
   Annotations.add_ensures e main [];
   File.pretty_ast();
@@ -30,7 +29,7 @@ let run () =
   Annotations.add_complete e main [behavior];
   Annotations.add_disjoint e main [behavior];
   Annotations.remove_behavior_components e main
-    (List.hd (Annotations.behaviors ~populate ~emitter main));
+    (List.hd (Annotations.behaviors ~emitter main));
   File.pretty_ast()
 
 let () = Db.Main.extend run

@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Implementation of data flow analyses over user-supplied domains.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 (** possible kinds of action for backward analysis *)
@@ -29,7 +29,7 @@ type 't action =
     Default (** The default action *)
   | Done of 't (** Do not do the default action. Use this result *)
   | Post of ('t -> 't) (** The default action, followed by the given
-                        * transformer *)
+                           transformer *)
 
 type 't stmtaction =
     SDefault   (** The default action *)
@@ -135,7 +135,7 @@ module type ForwardsTransfer = sig
 
 end
 
-module Forwards(T : ForwardsTransfer) : sig
+module Forwards(_ : ForwardsTransfer) : sig
   val compute: Cil_types.stmt list -> unit
   (** Fill in the T.stmtStartData, given a number of initial statements to
       start from. All of the initial statements must have some entry in
@@ -210,7 +210,7 @@ module type BackwardsTransfer = sig
 
 end
 
-module Backwards(T : BackwardsTransfer) : sig
+module Backwards(_ : BackwardsTransfer) : sig
   val compute: Cil_types.stmt list -> unit
   (** Fill in the T.stmtStartData, given a number of initial statements to start
       from (the sinks for the backwards data flow). All of the statements (not

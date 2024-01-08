@@ -61,7 +61,7 @@ type EmitterFilter = {
 };
 
 interface Filter {
-  currentFct: boolean;
+  currentDecl: boolean;
   search: Search;
   kind: KindFilter;
   emitter: EmitterFilter;
@@ -107,7 +107,7 @@ const emitterFilter = {
 };
 
 const defaultFilter: Filter = {
-  currentFct: false,
+  currentDecl: false,
   search: {},
   kind: kindFilter,
   emitter: emitterFilter,
@@ -175,25 +175,27 @@ function filterSearched(search: Search, msg: Message): boolean {
     searchCategory(search.category, msg.category));
 }
 
-function filterFunction(
+function filterDecl(
   filter: Filter,
-  kf: string | undefined,
+  decl: Ast.decl | undefined,
   msg: Message
 ): boolean {
-  if (filter.currentFct)
-    return (kf === msg.fct);
+  if (filter.currentDecl)
+    return (decl === msg.decl);
   return true;
 }
 
 function filterMessage(
   filter: Filter,
-  kf: string | undefined,
+  decl: Ast.decl | undefined,
   msg: Message
 ): boolean {
-  return (filterFunction(filter, kf, msg) &&
+  return (
+    filterDecl(filter, decl, msg) &&
     filterSearched(filter.search, msg) &&
     filterKind(filter.kind, msg) &&
-    filterEmitter(filter.emitter, msg));
+    filterEmitter(filter.emitter, msg)
+  );
 }
 
 // --------------------------------------------------------------------------
@@ -255,7 +257,7 @@ function MessageFilter(props: { filter: State<Filter> }): JSX.Element {
       <Forms.CheckboxField
         label="Current function"
         title="Only show messages emitted at the current function"
-        state={Forms.useProperty(state, 'currentFct')}
+        state={Forms.useProperty(state, 'currentDecl')}
       />
       <Section label="Search">
         <Forms.TextField
@@ -339,6 +341,12 @@ const renderFile: Renderer<Ast.source> =
     <Cell label={`${loc.base}:${loc.line}`} title={loc.file} />
   );
 
+const renderDecl: Renderer<Ast.decl> =
+  (decl: Ast.decl): JSX.Element => {
+    const { name, label } = States.getDeclaration(decl);
+    return <Cell label={name} title={label} />;
+  };
+
 const MessageColumns = (): JSX.Element => (
   <>
     <Column
@@ -370,10 +378,10 @@ const MessageColumns = (): JSX.Element => (
       render={renderMessage}
     />
     <Column
-      id="fct"
-      label="Function"
+      id="decl"
+      label="Declaration"
       width={150}
-      render={renderCell}
+      render={renderDecl}
     />
     <Column
       id="dir"
@@ -385,7 +393,7 @@ const MessageColumns = (): JSX.Element => (
     />
     <Column
       id="file"
-      label="File"
+      label="Location"
       width={150}
       getter={(msg: Message) => msg?.source}
       render={renderFile}
@@ -412,7 +420,7 @@ const byMessage: Compare.ByFields<Message> = {
   kind: Compare.structural,
   plugin: Compare.string,
   category: Compare.defined(Compare.string),
-  fct: Compare.defined(Compare.alpha),
+  decl: Compare.defined(Compare.alpha),
   source: Compare.defined(bySource),
 };
 
@@ -437,29 +445,27 @@ export default function RenderMessages(): JSX.Element {
 
   const filterState = useGlobalState(globalFilterState);
   const [filter] = filterState;
-  const [selection, updateSelection] = States.useSelection();
-  const selectedFct = selection?.current?.fct;
+  const selectedDecl = States.useCurrentScope();
   const [selectedMsg, selectMsg] = React.useState<Message|undefined>(undefined);
   const [text, setText] = React.useState('');
 
   React.useEffect(() => {
-    if (selectedFct !== selectedMsg?.fct)
+    if (selectedDecl !== selectedMsg?.decl)
       selectMsg(undefined);
-  }, [selectedFct, selectedMsg?.fct]);
+  }, [selectedDecl, selectedMsg?.decl]);
 
   React.useEffect(() => {
-    model.setFilter((msg: Message) => filterMessage(filter, selectedFct, msg));
-  }, [model, filter, selectedFct]);
+    model.setFilter((msg: Message) => filterMessage(filter, selectedDecl, msg));
+  }, [model, filter, selectedDecl]);
 
   const onMessageSelection = React.useCallback(
     (msg: Message) => {
       selectMsg(msg);
       setText(msg.message);
-      if (msg.fct && msg.marker) {
-        const location = { fct: msg.fct, marker: msg.marker };
-        updateSelection({ location });
+      if (msg.decl || msg.marker) {
+        States.setCurrentLocation({ scope: msg.decl, marker: msg.marker });
       }
-    }, [updateSelection],
+    }, []
   );
 
   const [showFilter, flipFilter] =

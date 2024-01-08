@@ -491,7 +491,7 @@
 [eva] Recording results for test_realloc_multiple_bases_loop
 [eva] Done for function test_realloc_multiple_bases_loop
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function fill:
   __realloc_test_exact_null_l27[0] ∈ {0}

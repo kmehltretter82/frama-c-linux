@@ -251,9 +251,9 @@ export const globalSettings = new Event(Settings.global);
 // --- Closing
 // --------------------------------------------------------------------------
 
-ipcRenderer.on('dome.ipc.closing', async () => {
+ipcRenderer.on('dome.ipc.closing', async (_event, wid: number) => {
     await System.doExit();
-    ipcRenderer.send('dome.ipc.closing.done');
+    ipcRenderer.send('dome.ipc.closing.done', wid);
   });
 
 /** Register a callback to be executed when the window is closing. */
@@ -414,7 +414,7 @@ export interface MenuItemProps {
   /** The menu item identifier. Shall be unique in the _entire_ menu bar. */
   id: string;
   /** Default is `'normal'`. */
-  type: MenuItemType;
+  kind?: MenuItemType;
   /** Item label. Only optional for separators. */
   label?: string;
   /** Item is visible or not (default is `true`). */
@@ -447,14 +447,14 @@ export interface MenuItemProps {
    main process.
  */
 export function addMenuItem(props: MenuItemProps): void {
-  if (!props.id && props.type !== 'separator') {
+  if (!props.id && props.kind !== 'separator') {
     // eslint-disable-next-line no-console
     console.error('[Dome] Missing menu-item identifier', props);
     return;
   }
-  const { onClick, ...options } = props;
+  const { onClick, kind='normal', ...others } = props;
   if (onClick) customItemCallbacks.set(props.id, onClick);
-  ipcRenderer.send('dome.ipc.menu.addmenuitem', options);
+  ipcRenderer.send('dome.ipc.menu.addmenuitem', { ...others, type: kind });
 }
 
 export interface MenuItemOptions {
@@ -569,6 +569,25 @@ export function popupMenu(
 export function useForceUpdate(): () => void {
   const [tac, onTic] = React.useState(false);
   return () => onTic(!tac);
+}
+
+/**
+   Hook for a flipping boolean state.
+   The updating callback can be used either as a setter or as a flipper.
+ */
+export function useFlipState(
+  init: boolean
+): [boolean, (forced?: boolean) => void]
+{
+  const [value, setValue] = React.useState(init);
+  const flipValue = React.useCallback(
+    (forced?: boolean) => {
+      if (forced !== undefined)
+        setValue(forced);
+      else
+        setValue((v) => !v);
+    }, []);
+  return [value, flipValue];
 }
 
 /**
@@ -748,13 +767,219 @@ export function useClock(period: number, initStart = false): Timer {
   return { running, time, periods, blink, start, stop, clear };
 }
 
+/**
+   Register a polling callback on the given period.
+   The polling is synchronized with all clocks and timers
+   using the same period.
+ */
+export function useTimer(period: number, callback: () => void): void
+{
+  React.useEffect(() => {
+    const event = INC_CLOCK(period);
+    System.emitter.on(event, callback);
+    return () => {
+      System.emitter.off(event, callback);
+      DEC_CLOCK(period);
+    };
+  }, [period, callback]);
+}
+
+/** Protected callback against unmounted component.
+
+   The returned callback will not fired only when the component is mounted.
+
+   Unless constant, first create the callback with `React.useCallback()`, then
+   give it to `useActive()`.
+ */
+export function useActive<A>(
+  callback: (arg: A) => void,
+): (arg:A) => void
+{
+  const active = React.useRef(false);
+  React.useEffect(() => {
+    active.current = true;
+    return () => { active.current = false; };
+  }, []);
+  return React.useCallback((arg: A) => {
+    if (active.current) callback(arg);
+  }, [callback]);
+}
+
+/** Debounced callback (period in milliseconds).
+
+   The debounceded callback will not be fired when the component is unmounted.
+
+   Unless constant, first create the callback with `React.useCallback()`, then
+   give it to `useDebounced()`.
+ */
+export function useDebounced<A=void>(
+  callback: (arg: A) => void,
+  period: number,
+): (arg:A) => void
+{
+  const active = React.useRef(false);
+  React.useEffect(() => {
+    active.current = true;
+    return () => { active.current = false; };
+  }, []);
+  return React.useMemo(() =>
+    _.debounce(
+      (arg: A) => {
+        if (active.current) callback(arg);
+      }, period
+    ), [callback, period]
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Sampling Hookds
+// --------------------------------------------------------------------------
+
+export type range = [number, number];
+const NORANGE: range = [0, 0];
+
+/**
+   Static sampler. Accumulates instant values and compute their mean,
+   min and max values.
+ */
+export class Sampler {
+  private samples: number[];
+  private range: [number, number] | undefined;
+  private total = 0;
+  private index = 0;
+  private values = 0;
+  private current = 0;
+
+  /** @param n - maximum number of sampled values */
+  constructor(n: number) {
+    this.samples = new Array(n).fill(0);
+  }
+
+  /** Resets the sampler. Forgets all previous measures. */
+  reset(): void
+  {
+    this.index = 0;
+    this.values = 0;
+    this.current = 0;
+    this.total = 0;
+    this.range = undefined;
+    this.samples.fill(0);
+  }
+
+  /** Set the current instant value. */
+  setValue(m: number): void { this.current = m; }
+
+  /** Add or remove the given amount to the current instant value. */
+  addValue(d: number): void { this.current += d; }
+
+  /**
+     Register the given instant value `v` to the sampler.
+     This is a shortcut to `setValue(v)` followed by `flush()`.
+   */
+  pushValue(v: number): void {
+    this.current = v;
+    this.flush();
+  }
+
+  /**
+     Register the current instant value to the sampler.
+     The current instant value is left unchanged.
+   */
+  flush(): void {
+    const v = this.current;
+    const n = this.values;
+    const size = this.samples.length;
+    const rg = this.range;
+    if (rg) {
+      const [a, b] = rg;
+      if (v < a || b < v) this.range = undefined;
+    }
+    if (n < size) {
+      this.samples[n] = v;
+      this.total += v;
+      this.values++;
+    } else {
+      const k = this.index;
+      if (k + 1 < size) {
+        const v0 = this.samples[k];
+        this.samples[k] = v;
+        this.total += v - v0;
+        this.index++;
+      } else {
+        this.samples[k] = v;
+        this.index = 0;
+        this.total = this.samples.reduce((s, x) => s + x, 0);
+      }
+    }
+  }
+
+  /**
+     Returns the sum of all sampled values.
+     In case the sampler is empty, returns `0`.
+   */
+  getTotal(): number { return this.total; }
+
+  /**
+     Returns the mean of sampled values.
+     In case the sampler is empty, returns `undefined`.
+   */
+  getMean(): number | undefined {
+    const n = this.values;
+    return n > 0 ? this.total / n : undefined;
+  }
+
+  /**
+     Returns the `[min,max]` range of sampled values.
+     In case the sampler is empty, returns `[0,0]`.
+   */
+  getRange(): range {
+    const rg = this.range;
+    if (rg !== undefined) return rg;
+    const n = this.values;
+    if (n <= 0) return NORANGE;
+    let a = +Infinity;
+    let b = -Infinity;
+    for (let k = 0; k < n; k++) {
+      const s = this.samples[k];
+      if (s < a) a = s;
+      if (s > b) b = s;
+    }
+    const newrg: range = [a, b];
+    this.range = newrg;
+    return newrg;
+  }
+
+}
+
+export interface Sample {
+  max: number;
+  min: number;
+  value: number | undefined;
+}
+
+/**
+   Hook to periodically listen on a global sampler.
+ */
+export function useSampler(S: Sampler, polling: number): Sample {
+  const [sample, setSample] = React.useState<Sample>(
+    { min: 0, value: undefined, max: 0 }
+  );
+  useTimer(polling, () => {
+    const m = S.getMean();
+    const [a, b] = S.getRange();
+    if (m !== sample.value || a !== sample.min || b !== sample.max)
+      setSample({ value: m, min: a, max: b });
+  });
+  return sample;
+}
+
 // --------------------------------------------------------------------------
 // --- Settings Hookds
 // --------------------------------------------------------------------------
 
 /**
    Bool window settings helper. Default is `false` unless specified.
-*/
+ */
 export function useBoolSettings(
   key: string | undefined,
   defaultValue = false,
@@ -766,6 +991,7 @@ export function useBoolSettings(
 
 /**
    Bool window settings helper with a flip callback.
+   See also {useFlipState}.
  */
 export function useFlipSettings(
   key: string | undefined,

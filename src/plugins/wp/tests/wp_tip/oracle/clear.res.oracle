@@ -1,7 +1,11 @@
 # frama-c -wp [...]
 [kernel] Parsing clear.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal clear_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal clear_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal clear_in_step_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal clear_in_step_terminates (Cfg) (Trivial)
 [wp] 2 goals scheduled
 [wp:script:allgoals] 
   Goal Post-condition (file clear.i, line 22) in 'clear':
@@ -105,7 +109,7 @@
   Prove: P_S(42).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_clear_in_step_check (Tactics 3)
+[wp] [Unsuccess] typed_clear_in_step_check (Tactics 3) (Qed)
 [wp:script:allgoals] 
   typed_clear_ensures subgoal:
   
@@ -143,6 +147,8 @@
   Prove: P_S(a + b).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_clear_ensures (Tactics 7)
-[wp] Proved goals:    0 / 2
+[wp] [Unsuccess] typed_clear_ensures (Tactics 7) (Qed)
+[wp] Proved goals:    4 / 6
+  Terminating:     2
+  Unreachable:     2
   Unsuccess:       2

@@ -11,8 +11,11 @@
   result2 ∈ {7}
   d2 ∈ {0}
 [eva] switch.i:29: Frama_C_show_each_F: {0}
+[eva:alarm] switch.i:63: Warning: check 'unknown' got status unknown.
+[eva:alarm] switch.i:64: Warning: 
+  accessing uninitialized left-value. assert \initialized(&i);
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   result1 ∈ {0; 1; 2; 4}
@@ -21,6 +24,7 @@
   result2 ∈ {0; 7}
   d2 ∈ [-0.0000000000000000 .. 1.9999999999999998*2^1023]
   f ∈ [--..--]
+  x ∈ {18} or UNINITIALIZED
   __retres ∈ {0; 2; 77}
 [from] Computing for function main
 [from] Done for function main
@@ -35,6 +39,6 @@
   \result FROM c
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    result1; result3; result4; result2; d2; f; __retres
+    result1; result3; result4; result2; d2; f; x; i; __retres
 [inout] Inputs for function main:
     \nothing

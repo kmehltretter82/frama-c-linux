@@ -63,13 +63,13 @@
   Called from termios.c:26.
 [eva] Done for function tcsetattr
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
   fd ∈ [-1..1023]
   tio ∈ [--..--] or UNINITIALIZED
   res ∈ {-1; 0}
-  sp1 ∈ [--..--]
-  sp2 ∈ [--..--]
+  sp1 ∈ [--..--] or UNINITIALIZED
+  sp2 ∈ [--..--] or UNINITIALIZED
   __retres ∈ {-1; 0; 1; 8}

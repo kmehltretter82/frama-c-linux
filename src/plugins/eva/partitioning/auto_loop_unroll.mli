@@ -22,7 +22,7 @@
 
 (** Heuristic for automatic loop unrolling. *)
 
-module Make (Abstract: Abstractions.Eva) : sig
+module Make (Abstract: Abstractions.S_with_evaluation) : sig
 
   val compute:
     max_unroll:int -> Abstract.Dom.t -> Cil_types.stmt -> int option

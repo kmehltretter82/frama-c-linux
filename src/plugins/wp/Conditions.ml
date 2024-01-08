@@ -322,6 +322,9 @@ type sequent = sequence * F.pred
 
 let pretty = ref (fun _fmt _seq -> ())
 
+let equal (a : sequent) (b : sequent) : bool =
+  F.eqp (snd a) (snd b) && equal_seq (fst a) (fst b)
+
 let is_true = function { seq_catg = TRUE | EMPTY } -> true | _ -> false
 let is_empty = function { seq_catg = EMPTY } -> true | _ -> false
 let is_false = function { seq_catg = FALSE } -> true | _ -> false

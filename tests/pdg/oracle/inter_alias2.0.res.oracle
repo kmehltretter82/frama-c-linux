@@ -27,7 +27,7 @@
 [eva:alarm] inter_alias2.c:26: Warning: 
   signed overflow. assert v1 + v2 ≤ 2147483647;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function incr_ptr:
   x1 ∈ [-2147483647..2147483647]

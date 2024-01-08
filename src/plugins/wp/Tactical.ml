@@ -24,12 +24,12 @@ open Conditions
 open Lang.F
 
 module Tmap = Map.Make(String)
-let composers = ref Tmap.empty
-let groups = ref []
 
 (* -------------------------------------------------------------------------- *)
 (* --- Composer Factory                                                   --- *)
 (* -------------------------------------------------------------------------- *)
+
+type computer = term list -> term
 
 class type composer =
   object
@@ -42,6 +42,10 @@ class type composer =
     method compute : term list -> term
   end
 
+let computers : computer Tmap.t ref = ref Tmap.empty
+let composers : composer Tmap.t ref = ref Tmap.empty
+let groups = ref []
+
 let rec insert_group cc = function
   | [] -> [cc#group , [cc]]
   | (( gid , ccs ) as group ):: others ->
@@ -50,12 +54,17 @@ let rec insert_group cc = function
     else
       group :: insert_group cc others
 
+let add_computer id cc =
+  if not (Tmap.mem id !computers) then
+    computers := Tmap.add id cc !computers
+
 let add_composer (c : #composer) =
   let id = c#id in
-  if Tmap.mem id !composers then
+  if Tmap.mem id !composers || Tmap.mem id !computers then
     Wp_parameters.error "Composer #%s already registered (skipped)" id
   else
     begin
+      computers := Tmap.add id (c#compute :> computer) !computers ;
       composers := Tmap.add id (c :> composer) !composers ;
       groups := insert_group (c :> composer) !groups ;
     end
@@ -96,6 +105,33 @@ let head = function
 
 let is_empty = function Empty -> true | _ -> false
 
+let eq_clause a b =
+  a == b ||
+  match a, b with
+  | Goal p, Goal q -> Lang.F.eqp p q
+  | Step u, Step v -> u == v
+  | Goal _, Step _ | Step _, Goal _ -> false
+
+let eq_compose a b =
+  a == b ||
+  match a,b with
+  | Cint n, Cint m -> Integer.equal n m
+  | Range(a,b) , Range(p,q) -> a = b && p = q
+  | Code(ta,_,_), Code(tb,_,_) -> Lang.F.equal ta tb
+  | (Cint _ | Range _ | Code _), (Cint _ | Range _ | Code _) -> false
+
+let rec equal a b =
+  a == b ||
+  match a,b with
+  | Empty,Empty -> true
+  | Clause ca, Clause cb -> eq_clause ca cb
+  | Inside(ca,ta), Inside(cb,tb) -> eq_clause ca cb && Lang.F.equal ta tb
+  | Compose ca, Compose cb -> eq_compose ca cb
+  | Multi sa , Multi sb -> Qed.Hcons.equal_list equal sa sb
+  | (Empty | Clause _ | Inside _ | Compose _ | Multi _) ,
+    (Empty | Clause _ | Inside _ | Compose _ | Multi _)
+    -> false
+
 let composed = function
   | Cint a -> e_zint a
   | Range(a,_) -> e_int a
@@ -116,7 +152,15 @@ let get_int = function
   | Compose(Cint a) -> get_int_z a
   | s ->
     match Lang.F.repr (selected s) with
-    | Qed.Logic.Kint z -> get_int_z z
+    | Kint z -> get_int_z z
+    | _ -> None
+
+let get_bool = function
+  | Empty -> None
+  | s ->
+    match Lang.F.repr (selected s) with
+    | True -> Some true
+    | False -> Some false
     | _ -> None
 
 let subclause clause p =
@@ -160,8 +204,8 @@ let cint a = Compose(Cint a)
 let range a b = Compose(Range(a,b))
 let compose id es =
   try
-    let cc = Tmap.find id !composers in
-    let e = cc#compute (List.map selected es) in
+    let cc = Tmap.find id !computers in
+    let e = cc (List.map selected es) in
     match Lang.F.repr e with
     | Qed.Logic.Kint n -> cint n
     | _ -> Compose(Code(e,id,es))
@@ -243,6 +287,7 @@ type 'a named = { title : string ; descr : string ; vid : string ; value : 'a }
 type 'a range = { vmin : 'a option ; vmax : 'a option ; vstep : 'a }
 type 'a field = 'a named (* value is the default *)
 type 'a browser = ('a named -> unit) -> selection -> unit
+type 'a finder = string -> 'a named
 
 let field ~id ~title ~descr ~default : 'a field =
   if id = "" then raise (Invalid_argument "Tactical.field") ;
@@ -278,7 +323,7 @@ type parameter =
   | Spinner  of int field * int range
   | Composer of selection field * (Lang.F.term -> bool)
   | Selector : 'a field * 'a named list * ('a -> 'a -> bool) -> parameter
-  | Search : 'a named option field * 'a browser * (string -> 'a) -> parameter
+  | Search : 'a named option field * 'a browser * 'a finder -> parameter
 
 let checkbox ~id ~title ~descr ?(default=false) () =
   let fd = field ~id ~title ~descr ~default in
@@ -316,6 +361,13 @@ let composer ~id ~title ~descr ?(default=Empty) ?(filter=accept) () =
 let search ~id ~title ~descr ~browse ~find () =
   let fd = field ~id ~title ~descr ~default:None in
   fd , Search(fd,browse,find)
+
+let pident = function
+  | Checkbox fd -> ident fd
+  | Spinner(fd,_) -> ident fd
+  | Composer(fd,_) -> ident fd
+  | Selector(fd,_,_) -> ident fd
+  | Search(fd,_,_) -> ident fd
 
 (* -------------------------------------------------------------------------- *)
 (* --- Feedback                                                           --- *)
@@ -390,8 +442,11 @@ let rewrite ?at patterns sequent =
          Conditions.subst
            (fun e -> if e == src then tgt else raise Not_found)
            sequent in
-       let step = Conditions.(step ~descr (When guard)) in
-       descr , Conditions.insert ?at step sequent
+       let sequent =
+         if Lang.F.eqp Lang.F.p_true guard then sequent else
+           let step = Conditions.(step ~descr (When guard)) in
+           Conditions.insert ?at step sequent
+       in descr , sequent
     ) patterns
 
 let condition name guard process seq =
@@ -448,12 +503,21 @@ let register t =
 let export t = register t ; (t :> t)
 let iter f = Tmap.iter (fun _id t -> f t) !tacticals
 let lookup ~id = Tmap.find id !tacticals
+let lookup_param tactic ~id =
+  List.find (fun p -> pident p = id) tactic#params
 
 (* -------------------------------------------------------------------------- *)
 (* --- Default Composers                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
 open Lang
+
+let () = add_computer "wp:true" (fun _ -> e_true)
+let () = add_computer "wp:false" (fun _ -> e_false)
+let () = add_computer "wp:list" Vlist.list
+let () = add_computer "wp:concat" Vlist.concat
+let () = add_computer "wp:repeat"
+    (function [a;n] -> Vlist.repeat a n | _ -> raise Not_found)
 
 let () =
   for i = 0 to 9 do
@@ -485,6 +549,24 @@ let () = add_composer
            with Not_found -> false)
         | _ -> false
       method compute = function [a;b] -> F.e_eq a b | _ -> F.e_true
+    end)
+
+let () = add_composer
+    (object
+      method id = "wp:neq"
+      method group = "logic"
+      method title = "A != B"
+      method descr = ""
+      method arity = 2
+      method filter = function
+        | [a;b] ->
+          (try
+             let ta = F.typeof a in
+             let tb = F.typeof b in
+             F.Tau.equal ta tb
+           with Not_found -> false)
+        | _ -> false
+      method compute = function [a;b] -> F.e_neq a b | _ -> F.e_false
     end)
 
 let () = add_composer

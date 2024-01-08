@@ -42,7 +42,7 @@ class overflow =
         let min, max = e_zint min, e_zint max in
 
         let lower = v < min and upper = max < v in
-        let in_range = not (lower || upper) in
+        let in_range = not (lower ||: upper) in
 
         let length = (max - min) + e_one in
         let overflow = min + ((v - min) mod length) in

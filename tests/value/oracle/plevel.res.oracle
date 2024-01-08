@@ -11,7 +11,7 @@
   more than 40(65) locations to update in array. Approximating.
 [eva] Recording results for main
 [kernel] plevel.i:21: more than 40(65) elements to enumerate. Approximating.
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t[0..0xFF] ∈ {0}

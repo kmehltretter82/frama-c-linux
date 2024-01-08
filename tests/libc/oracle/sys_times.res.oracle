@@ -11,7 +11,7 @@
   function times: precondition 'valid_buffer' got status valid.
 [eva] Done for function times
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t ∈ [--..--] or UNINITIALIZED

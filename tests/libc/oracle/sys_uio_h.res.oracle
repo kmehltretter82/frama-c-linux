@@ -87,7 +87,7 @@
 [eva:alarm] sys_uio_h.c:43: Warning: 
   signed overflow. assert w + r ≤ 2147483647;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_fds[0..1023] ∈ [--..--]
@@ -103,6 +103,6 @@
    [3].iov_base ∈ {{ (void *)&buf2 }}
    [3].iov_len ∈ {14}
   fd ∈ [-1..1023]
-  w ∈ [-1..2147483647]
-  r ∈ [-1..2147483647]
+  w ∈ [-1..2147483647] or UNINITIALIZED
+  r ∈ [-1..2147483647] or UNINITIALIZED
   __retres ∈ [-2..2147483647]

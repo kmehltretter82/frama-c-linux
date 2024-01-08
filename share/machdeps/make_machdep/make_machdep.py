@@ -49,8 +49,6 @@ from yaml.representer import Representer
 
 my_path = Path(sys.argv[0]).parent
 
-logging.basicConfig(format="%(levelname)s: %(message)s")
-
 parser = argparse.ArgumentParser(prog="make_machdep")
 parser.add_argument("-v", "--verbose", action="store_true")
 parser.add_argument("-o", type=argparse.FileType("w"), dest="dest_file")
@@ -59,6 +57,12 @@ parser.add_argument(
     "--compiler-version",
     default="--version",
     help="option to pass to the compiler to obtain its version; default is --version",
+)
+
+parser.add_argument(
+    "--machdep-schema",
+    default="machdep-schema.yaml",
+    help="location of the schema file describing a machdep; default is 'machdep-schema.yaml'",
 )
 
 parser.add_argument(
@@ -98,6 +102,11 @@ parser.add_argument(
 
 args, other_args = parser.parse_known_args()
 
+if args.verbose:
+    logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
+else:
+    logging.basicConfig(format="%(levelname)s: %(message)s")
+
 if not args.compiler_flags:
     args.compiler_flags = ["-c"]
 
@@ -106,8 +115,7 @@ if not args.cpp_arch_flags:
 
 
 def make_schema():
-    schema_filename = my_path.parent / "machdep-schema.yaml"
-    with open(schema_filename, "r") as schema:
+    with open(args.machdep_schema, "r") as schema:
         return yaml.safe_load(schema)
 
 
@@ -275,11 +283,9 @@ def find_value(name, typ, output):
             machdep[name] = value
         else:
             logging.warning(
-                f"cannot find value of field '{name}', using default value: '{default}'"
+                f"cannot find value of field '{name}', using default value: '{default}'\ncompiler output is:\n{output}"
             )
             machdep[name] = default
-            if args.verbose:
-                print(f"compiler output is:{output}")
     else:
         logging.warning(f"unexpected symbol '{name}', ignoring")
 
@@ -331,9 +337,9 @@ for f, typ in source_files:
         continue
     if typ == "macro":
         if proc.returncode != 0:
-            logging.warning(f"error in preprocessing value '{p}', some values won't be filled")
-            if args.verbose:
-                print(f"compiler output is:{proc.stderr.decode()}")
+            logging.warning(
+                f"error in preprocessing value '{p}', some values won't be filled\ncompiler output is:\n{proc.stderr.decode()}"
+            )
             name = p.stem
             if name in machdep:
                 machdep[name] = ""
@@ -343,9 +349,9 @@ for f, typ in source_files:
     if typ == "macrolist":
         name = p.stem
         if proc.returncode != 0:
-            logging.warning(f"error in preprocessing value '{p}', some value might not be filled")
-            if args.verbose:
-                print(f"compiler output is:{proc.stderr.decode()}")
+            logging.warning(
+                f"error in preprocessing value '{p}', some values might not be filled\ncompiler output is:{proc.stderr.decode()}"
+            )
             if name in machdep:
                 machdep[name] = {}
             continue
@@ -416,9 +422,7 @@ if proc.returncode == 0:
         lines += f"{line.strip()}\n"
     machdep["custom_defs"] = custom_defs(lines)
 else:
-    logging.warning("could not determine predefined macros")
-    if args.verbose:
-        print(f"compiler output is:{proc.stderr}")
+    logging.warning(f"could not determine predefined macros. compiler output is:\n{proc.stderr}")
 
 if args.from_file and args.in_place:
     machdep["machdep_name"] = Path(args.from_file).stem

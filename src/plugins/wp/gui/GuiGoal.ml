@@ -24,8 +24,8 @@ type state =
   | Empty
   | Proof of ProofEngine.tree
   | Forking of ProofEngine.tree * ProofEngine.fork * Task.pool
-  | Composer of ProofEngine.tree * GuiTactic.composer * GuiSequent.target
-  | Browser of ProofEngine.tree * GuiTactic.browser * GuiSequent.target
+  | Composer of ProofEngine.tree * GuiTactic.composer * Ptip.target
+  | Browser of ProofEngine.tree * GuiTactic.browser * Ptip.target
 
 let on_proof_context proof job data =
   let ctxt = ProofEngine.tree_context proof in
@@ -117,6 +117,7 @@ class pane (gprovers : GuiConfig.provers) =
   let autofocus = new autofocus in
   let iformat = new iformat in
   let rformat = new rformat in
+  let autosearch = new GuiTactic.autosearch () in
   let strategies = new GuiTactic.strategies () in
   object(self)
 
@@ -145,8 +146,10 @@ class pane (gprovers : GuiConfig.provers) =
             (Why3.Whyconf.Sprover.elements gprovers#get) in
         provers <- why3_provers ;
         List.iter (fun p -> palette#add_tool p#tool) provers ;
+        palette#add_tool autosearch#tool ;
         palette#add_tool strategies#tool ;
-        Strategy.iter strategies#register ;
+        Strategy.iter autosearch#register ;
+        ProofStrategy.iter strategies#register ;
         Tactical.iter
           (fun tac ->
              let gtac = new GuiTactic.tactic tac printer#pp_selection in
@@ -380,23 +383,29 @@ class pane (gprovers : GuiConfig.provers) =
     method private update_tactics = function
       | None ->
         printer#set_target Tactical.Empty ;
+        autosearch#connect None ;
         strategies#connect None ;
         List.iter (fun tactic -> tactic#clear) tactics
       | Some(tree,sequent,sel) ->
         on_proof_context tree
           begin fun () ->
-            strategies#connect (Some (self#strategies sequent)) ;
-            let select (tactic : GuiTactic.tactic) =
-              let process = self#apply in
-              let composer = self#compose in
-              let browser = self#browse in
-              tactic#select ~process ~composer ~browser ~tree sel
-            in
-            List.iter select tactics ;
-            let tgt =
-              if List.exists (fun tactics -> tactics#targeted) tactics
-              then sel else Tactical.Empty in
-            printer#set_target tgt
+            (* configure strategies *)
+            let node = ProofEngine.head tree in
+            let wpo = ProofEngine.head_goal tree in
+            let hints = ProofStrategy.hints ?node wpo in
+            autosearch#connect (Some (self#autosearch sequent));
+            strategies#connect ~hints (Some self#strategies);
+            (* configure tactics *)
+            List.iter (fun (tactic : GuiTactic.tactic) ->
+                let process = self#apply in
+                let composer = self#compose in
+                let browser = self#browse in
+                tactic#select ~process ~composer ~browser ~tree sel
+              ) tactics ;
+            (* target selection feedback *)
+            printer#set_target
+              (if List.exists (fun tactics -> tactics#targeted) tactics
+               then sel else Tactical.Empty)
           end ()
 
     method private update_scriptbar =
@@ -508,9 +517,8 @@ class pane (gprovers : GuiConfig.provers) =
         self#update_provers None ;
         self#update_tactics None ;
       | Proof proof ->
-        let wpo = ProofEngine.head proof in
         begin
-          self#update_provers (Some wpo) ;
+          self#update_provers (Some (ProofEngine.head_goal proof)) ;
           let sequent = printer#sequent in
           let select = printer#selection in
           self#update_tactics (Some(proof,sequent,select)) ;
@@ -553,7 +561,7 @@ class pane (gprovers : GuiConfig.provers) =
             text#hrule ;
             scripter#tree proof ;
             text#hrule ;
-            text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+            text#printf "%a@." printer#pp_goal (ProofEngine.head_goal proof) ;
             text#printf "@{<bf>Goal id:@}  %s@." main.po_gid ;
             text#printf "@{<bf>Short id:@} %s@." main.po_sid ;
             text#hrule ;
@@ -565,11 +573,11 @@ class pane (gprovers : GuiConfig.provers) =
             text#clear ;
             let quit () =
               state <- Proof proof ;
-              printer#restore tgt ;
+              printer#restore ~focus:`Select tgt ;
               self#update in
             text#printf "%t@." (composer#print cc ~quit) ;
             text#hrule ;
-            text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+            text#printf "%a@." printer#pp_goal (ProofEngine.head_goal proof) ;
           end ()
       | Browser(proof,cc,tgt) ->
         on_proof_context proof
@@ -577,11 +585,11 @@ class pane (gprovers : GuiConfig.provers) =
             text#clear ;
             let quit () =
               state <- Proof proof ;
-              printer#restore tgt ;
+              printer#restore ~focus:`Select tgt ;
               self#update in
             text#printf "%t@." (browser#print cc ~quit) ;
             text#hrule ;
-            text#printf "%t@." (printer#goal (ProofEngine.head proof)) ;
+            text#printf "%a@." printer#pp_goal (ProofEngine.head_goal proof) ;
           end ()
       | Forking _ -> ()
 
@@ -648,20 +656,19 @@ class pane (gprovers : GuiConfig.provers) =
       | Proof proof ->
         Wutil.later
           begin fun () ->
-            let title = tactic#title in
             try
-              let tactic = ProofScript.jtactic ~title tactic selection in
+              let tactic = ProofScript.jtactic tactic selection in
               let anchor = ProofEngine.anchor proof () in
               self#fork proof (ProofEngine.fork proof ~anchor tactic process)
             with Exit | Not_found | Invalid_argument _ ->
-              text#printf "Application of tactic '%s' failed." title
+              text#printf "Application of tactic '%s' failed." tactic#title
           end
 
     method private search proof = function
       | None -> text#printf "No tactic found.@\n"
       | Some fork -> self#fork proof fork
 
-    method private strategies sequent ~depth ~width auto =
+    method private autosearch sequent ~depth ~width auto =
       match state with
       | Empty | Forking _ | Composer _ | Browser _ -> ()
       | Proof proof ->
@@ -691,6 +698,30 @@ class pane (gprovers : GuiConfig.provers) =
                 let server = ProverTask.server () in
                 Task.launch server
               end
+          end
+
+    method private strategies ~depth strategy =
+      match state with
+      | Empty | Forking _ | Composer _ | Browser _ -> ()
+      | Proof proof ->
+        Wutil.later
+          begin fun () ->
+            ProverScript.explore
+              ~depth ?strategy
+              ~result:
+                (fun wpo prv res ->
+                   text#printf "[%a] %a : %a@."
+                     VCS.pp_prover prv
+                     Wpo.pp_title wpo
+                     VCS.pp_result res)
+              ~success:
+                (fun _ _ ->
+                   ProofEngine.forward proof ;
+                   self#update ;
+                   text#printf "Strategie(s) Explored." )
+              proof (ProofEngine.anchor proof ()) ;
+            let server = ProverTask.server () in
+            Task.launch server
           end
 
     method private backtrack node =

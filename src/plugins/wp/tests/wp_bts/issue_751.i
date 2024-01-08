@@ -6,6 +6,7 @@ void acquire(int R,int Nb,int * Data)
     /*@
       loop invariant RANGE: 0 <= j <= Nb ;
       loop assigns j, Data[0..7] ;
+      loop variant Nb - j;
     */
     while (j < Nb) {
       Data[j] = 0 ;

@@ -27,7 +27,6 @@ open Eval
 
 module type S = sig
   type state
-  val initial_state : lib_entry:bool -> state or_bottom
   val initial_state_with_formals :
     lib_entry:bool -> kernel_function -> state or_bottom
   val initialize_local_variable:
@@ -82,8 +81,8 @@ let counter = ref 0
 
 module Make
     (Domain: Abstract.Domain.External)
-    (Eva: Evaluation.S with type state = Domain.state
-                        and type loc = Domain.location)
+    (Eva: Evaluation_sig.S with type state = Domain.state
+                            and type loc = Domain.location)
     (Transfer: Transfer_stmt.S with type state = Domain.t)
 = struct
 
@@ -95,6 +94,7 @@ module Make
     fst (Eva.lvaluate ~for_writing:false Domain.top lval)
     >>> fun (_valuation, loc, _typ) -> loc
 
+  include Cvalue_domain.Getters (Domain)
 
   (* ------------------------- Apply initializer ---------------------------- *)
 
@@ -272,13 +272,16 @@ module Make
   (* Use the values supplied in [actuals] for the formals of [kf], and
      bind them in [state] *)
   let add_supplied_main_formals kf actuals state =
-    match Domain.get_cvalue with
-    | None -> Self.abort "Function Db.Value.fun_set_args cannot be \
+    match get_cvalue with
+    | None -> Self.abort "API function [set_main_args] cannot be \
                           used without the Cvalue domain"
     | Some get_cvalue ->
       let formals = Kernel_function.get_formals kf in
       if (List.length formals) <> List.length actuals then
-        raise Db.Value.Incorrect_number_of_arguments;
+        Self.abort
+          "Incorrect number of arguments for the main function %a \
+           provided via the API function [set_main_args]"
+          Kernel_function.pretty kf;
       let cvalue_state = get_cvalue state in
       let add_actual state actual formal =
         let actual = Eval_op.offsetmap_of_v ~typ:formal.vtype actual in
@@ -291,7 +294,7 @@ module Make
       set_domain (cvalue_state, Locals_scoping.bottom ()) state
 
   let add_main_formals kf state =
-    match Db.Value.fun_get_args () with
+    match Eva_results.get_main_args () with
     | None -> compute_main_formals kf state
     | Some actuals -> add_supplied_main_formals kf actuals state
 
@@ -308,14 +311,18 @@ module Make
   let initialize_global_variable ~lib_entry vi init state =
     Cil.CurrentLoc.set vi.vdecl;
     let state = Domain.enter_scope Abstract_domain.Global [vi] state in
-    if vi.vsource then
-      let initialize =
-        if lib_entry || (vi.vstorage = Extern)
-        then initialize_var_lib_entry
-        else initialize_var_not_lib_entry ~local:false
-      in
-      initialize Kglobal vi init.init state
-    else state
+    let state = if vi.vsource then
+        let initialize =
+          if lib_entry || (vi.vstorage = Extern)
+          then initialize_var_lib_entry
+          else initialize_var_not_lib_entry ~local:false
+        in
+        initialize Kglobal vi init.init state
+      else state
+    in
+    state
+
+
 
   (* Compute the initial state with all global variable initialized. *)
   let compute_global_state ~lib_entry () =
@@ -352,21 +359,15 @@ module Make
     InitialState.memo (compute_global_state ~lib_entry)
 
   (* The global cvalue state may be supplied by the user. *)
-  let supplied_state () =
-    let cvalue_state = Db.Value.globals_state () in
+  let supplied_state cvalue_state =
     if Cvalue.Model.is_reachable cvalue_state
     then
       let cvalue_state = cvalue_state, Locals_scoping.bottom () in
       `Value (Domain.set Cvalue_domain.State.key cvalue_state Domain.top)
     else `Bottom
 
-  let initial_state ~lib_entry =
-    if Db.Value.globals_use_supplied_state ()
-    then supplied_state ()
-    else global_state ~lib_entry
-
   let print_initial_cvalue_state state =
-    let cvalue_state = Domain.get_cvalue_or_bottom state in
+    let cvalue_state = get_cvalue_or_bottom state in
     (* Do not show variables from the frama-c libc specifications. *)
     let print_base base =
       try
@@ -386,17 +387,16 @@ module Make
 
   let initial_state_with_formals ~lib_entry kf =
     let init_state =
-      if Db.Value.globals_use_supplied_state ()
-      then begin
+      match Eva_results.get_initial_state () with
+      | Some state ->
         Self.feedback "Initial state supplied by user";
-        supplied_state ()
-      end
-      else begin
-        Self.feedback "Computing initial state";
+        supplied_state state
+      | None ->
+        let pp = Parameters.ValShowProgress.get () in
+        if pp then Self.feedback "Computing initial state";
         let state = global_state ~lib_entry in
-        Self.feedback "Initial state computed";
+        if pp then Self.feedback "Initial state computed";
         state
-      end
     in
     let b = Parameters.ResultsAll.get () in
     Domain.Store.register_global_state b init_state;

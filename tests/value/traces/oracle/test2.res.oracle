@@ -14,7 +14,7 @@
 [eva] Recording results for loop
 [eva] Done for function loop
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function loop:
   j ∈ {4; 5}
@@ -54,7 +54,7 @@ c -> 1
     35 -> finalize_call: loop -> 36
     36 -> Assign: tmp = \result<loop> -> 37
     37 -> LeaveScope: \result<loop> -> 38
-    38 -> EnterScope: \result<main> -> 78
+    38 -> EnterScope: \result<main> -> 79
     39 -> EnterScope: j -> 40
     40 -> Assign: j = tmp -> 41
     41 -> EnterScope: i -> 43
@@ -74,15 +74,15 @@ c -> 1
     56 -> LeaveScope: i -> 57
     57 -> EnterScope: \result<loop> -> 58
     58 -> Assign: \result<loop> = j -> 59
-    59 -> LeaveScope: j -> 74
-    74 -> finalize_call: loop -> 75
-    75 -> Assign: tmp = \result<loop> -> 76
-    76 -> LeaveScope: \result<loop> -> 77
-    77 -> EnterScope: \result<main> -> 80
-    78 -> Assign: \result<main> = tmp -> 79
-    79 -> join -> 82
-    80 -> Assign: \result<main> = tmp -> 81
-    81 -> join -> 82 ]} at 82
+    59 -> LeaveScope: j -> 75
+    75 -> finalize_call: loop -> 76
+    76 -> Assign: tmp = \result<loop> -> 77
+    77 -> LeaveScope: \result<loop> -> 78
+    78 -> EnterScope: \result<main> -> 81
+    79 -> Assign: \result<main> = tmp -> 80
+    80 -> join -> 83
+    81 -> Assign: \result<main> = tmp -> 82
+    82 -> join -> 83 ]} at 83
 [from] Computing for function loop
 [from] Done for function loop
 [from] Computing for function main
@@ -103,11 +103,8 @@ c -> 1
 [inout] Inputs for function main:
     \nothing
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __traces_domain_return ∈ {4; 5}

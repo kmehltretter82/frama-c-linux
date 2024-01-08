@@ -23,7 +23,7 @@
 (**************************************************************************)
 
 (** Utilities for ACSL constructs.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 open Cil_types
 
@@ -33,7 +33,7 @@ exception Not_well_formed of location * string
 
 (** basic utilities for logic terms and predicates. See also {! Logic_const}
     to build terms and predicates.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (** add a logic function in the environment.
     See {!Logic_env.add_logic_function_gen}*)
@@ -145,12 +145,6 @@ val numeric_coerce: logic_type -> term -> term
 
 (** {2 Predicates} *)
 
-(** \valid_index *)
-(* val mk_pvalid_index: ?loc:location -> term * term -> predicate *)
-
-(** \valid_range *)
-(* val mk_pvalid_range: ?loc:location -> term * term * term -> predicate *)
-
 val pointer_comparable:
   ?loc:location -> ?label:logic_label -> term -> term -> predicate
 (** \pointer_comparable. [label] defaults to {!Logic_const.here_label}
@@ -176,7 +170,7 @@ val expr_to_term : ?coerce:bool -> exp -> term
     [expr_to_predicate] instead.
 
     @before 21.0-Scandium was unsound in many cases.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 val expr_to_predicate: exp -> predicate
@@ -448,9 +442,9 @@ val use_predicate : predicate_kind -> bool
     It is true for `Assert` and `Check`, and false for `Admit`. *)
 val verify_predicate : predicate_kind -> bool
 
-(** Functions below allows to test a special kind of code_annotation.
-    Use them in conjunction with {!Annotations.get_filter} to retrieve
-    a particular kind of annotations associated to a statement. *)
+(** The functions below allow testing for specific kinds of [code_annotation].
+    Use them in conjunction with iterators in {!Annotations} to retrieve
+    a particular kind of annotation associated to a statement. *)
 
 val is_assert : code_annotation -> bool
 val is_check : code_annotation -> bool

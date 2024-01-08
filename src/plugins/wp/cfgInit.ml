@@ -50,7 +50,7 @@ struct
 
   (* WP of global initializations. *)
   let process_global_init wenv kf obj =
-    if Globals.is_entry_point ~when_lib_entry:false kf then
+    if CfgInfos.is_entry_point kf then
       begin
         let obj = W.label wenv None Clabels.init obj in
         compute_global_init wenv `All obj

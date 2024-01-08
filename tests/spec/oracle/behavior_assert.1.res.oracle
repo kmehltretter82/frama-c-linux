@@ -47,7 +47,7 @@
 [eva] Recording results for k
 [eva] Done for function k
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function abs:
   __retres ∈ [0..11]

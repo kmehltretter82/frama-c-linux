@@ -692,7 +692,7 @@
 [eva] allocated.c:127: Call to builtin __fc_vla_free
 [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127_8}
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] allocated.c:27: assertion 'Eva,mem_access' got final status invalid.
 [eva] allocated.c:28: assertion 'Eva,mem_access' got final status invalid.
 [eva] allocated.c:46: assertion 'Eva,dangling_pointer' got final status invalid.

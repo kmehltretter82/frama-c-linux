@@ -24,9 +24,10 @@ type tool_cmds =
   { kind: (string [@default "Misc"]) ;
     extensions: (string list [@default []]);
     name: string ;
-    available_cmd: (string [@default ""]) ; (* leaves it empty to set it as unavailable *)
-    check_cmd: (string [@default ""]) ; (* leaves it empty if there is no check command *)
-    update_cmd: (string [@default ""]) (* leaves it empty if there is no updating command *)
+    available_cmd: (string [@default ""]) ; (* leave it empty to set it as unavailable *)
+    check_cmd: (string [@default ""]) ; (* leave it empty if there is no check command *)
+    update_cmd: (string [@default ""]) ; (* leave it empty if there is no updating command *)
+    version_cmd: (string [@default ""]) (* leave it empty if there is no version check command *)
   }
 [@@deriving yojson]
 
@@ -40,7 +41,8 @@ let external_formatters = [
     name = "clang-format";
     available_cmd = "clang-format --version > /dev/null 2> /dev/null";
     check_cmd = "clang-format --dry-run -Werror" ;
-    update_cmd = "clang-format -i"
+    update_cmd = "clang-format -i" ;
+    version_cmd = ""
   }
   ;
   { kind = "Python";
@@ -48,7 +50,8 @@ let external_formatters = [
     name = "black";
     available_cmd = "black --version > /dev/null 2> /dev/null";
     check_cmd = "black --quiet --line-length 100 --check" ;
-    update_cmd = "black --quiet --line-length 100"
+    update_cmd = "black --quiet --line-length 100" ;
+    version_cmd  = "black --version | grep black | grep -E '23\\.[0-9]+\\.[0-9]+' > /dev/null 2> /dev/null"
   }
 ]
 
@@ -328,8 +331,12 @@ let check_ml_indent ~update file =
 (* C/H *)
 
 (* returns true if the string command is empty *)
-let cmd_result ~file cmd =
-  (cmd = "") || (0 = Sys.command (Format.sprintf "%s \"%s\"" cmd file))
+let cmd_result ?file cmd =
+  let command = match file with
+    | None -> cmd
+    | Some file -> Format.sprintf "%s \"%s\"" cmd file
+  in
+  (cmd = "") || (0 = Sys.command command)
 
 let is_formatter_available ~file indent_formatter =
   match indent_formatter.is_available with
@@ -338,14 +345,22 @@ let is_formatter_available ~file indent_formatter =
       (indent_formatter.tool_cmds.update_cmd <> "") ||
       (indent_formatter.tool_cmds.check_cmd <> "")
     in
-    let is_available = is_enabled && (cmd_result ~file indent_formatter.tool_cmds.available_cmd) in
+    let is_available =
+      is_enabled
+      && (cmd_result indent_formatter.tool_cmds.available_cmd)
+      && (cmd_result indent_formatter.tool_cmds.version_cmd)
+    in
     indent_formatter.is_available <- Some is_available;
     if not is_enabled then
       (* [check_cmd] and [update_cmd] fields are empty *)
-      warn "%s is disabled for checking/updating indentation of some %s files (i.e. %s)@."
+      warn
+        "%s is disabled for checking/updating indentation of \
+         some %s files (i.e. %s)@."
         indent_formatter.tool_cmds.name indent_formatter.tool_cmds.kind file
     else if not is_available then
-      warn "%s is unavailable for checking/updating indentation of some %s files (i.e. %s)@."
+      warn
+        "%s is unavailable (or with incompatible version) for checking/updating \
+         indentation of some %s files (i.e. %s)@."
         indent_formatter.tool_cmds.name indent_formatter.tool_cmds.kind file;
     is_available
   | Some is_available -> is_available

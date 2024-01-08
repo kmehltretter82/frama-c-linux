@@ -92,7 +92,7 @@ let memcpy_check_indeterminate_offsetmap offsm =
    currently called function. *)
 let deps_nth_arg n =
   let open Function_Froms in
-  let (kf,_) = List.hd (Eva_utils.call_stack()) in
+  let kf = Callstack.top_kf (Eva_utils.current_call_stack ()) in
   try
     let vi = List.nth (Kernel_function.get_formals kf) n in
     Deps.add_data_dep Deps.bottom (Locations.zone_of_varinfo vi)
@@ -216,7 +216,7 @@ let frama_c_memcpy state actuals =
                 Cvalue.Model.paste_offsetmap
                   ~from:offsetmap ~dst_loc:dst ~size:diff ~exact:false state
               in
-              if Db.Value.is_reachable new_state then
+              if Cvalue.Model.is_reachable new_state then
                 let diffi = Ival.inject_singleton diff in
                 let dst = Location_Bits.shift diffi dst in
                 let src = Location_Bits.shift diffi src in

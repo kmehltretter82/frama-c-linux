@@ -88,7 +88,7 @@ module Type_namespace: Datatype.S with type t = type_namespace
 
 (** Functions that can be called when type-checking an extension of ACSL.
 
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 type typing_context = {
   is_loop: unit -> bool;
@@ -219,7 +219,7 @@ sig
 end
 
 module Make
-    (C :
+    (_ :
      sig
        val is_loop: unit -> bool
        (** whether the annotation we want to type is contained in a loop.

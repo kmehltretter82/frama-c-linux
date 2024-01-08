@@ -52,8 +52,7 @@ module K2V = struct
     let cache = Hptmap_sig.NoCache in
     let symmetric = false in
     let idempotent = true in
-    let wh = Integer.zero, (fun _b -> Ival.Widen_Hints.empty, Fc_float.Widen_Hints.empty) in
-    let decide _ v1 v2 = Some (V.widen wh v1 v2) in
+    let decide _ v1 v2 = Some (V.widen v1 v2) in
     M.inter ~cache ~symmetric ~idempotent ~decide
 
   let _narrow =
@@ -464,6 +463,9 @@ module D : Abstract_domain.Leaf
   type location = Precise_locs.precise_location
   type origin
 
+  let value_dependencies = Main_values.cval
+  let location_dependencies = Main_locations.ploc
+
   include (Memory: sig
              include Datatype.S_with_collections with type t = state
              include Abstract_domain.Lattice with type state := state
@@ -637,3 +639,11 @@ module D : Abstract_domain.Leaf
     let loc = Precise_locs.imprecise_location location in
     Memory.kill loc state
 end
+
+let registered =
+  let name = "symbolic-locations"
+  and descr =
+    "Infers values of symbolic locations represented by imprecise lvalues, \
+     such as t[i] or *p when the possible values of [i] or [p] are imprecise."
+  in
+  Abstractions.Domain.register ~name ~descr ~priority:7 (module D)

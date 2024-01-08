@@ -20,28 +20,25 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
-module type Conversion = sig
-  type extended_value
-  type extended_location
-  type internal_value
-  type internal_location
-
-  val extend_val : internal_value -> extended_value
-  val restrict_val : extended_value -> internal_value
-
-  val extend_loc : internal_location -> extended_location
-  val restrict_loc : extended_location -> internal_location
+module type Input_Domain = sig
+  include Abstract_domain.S
+  val key: t Structure.Key_Domain.key
 end
 
+module type Conversion = sig
+  type extended
+  type internal
+  val extend: internal -> extended
+  val restrict: extended -> internal
+end
 
 module Make
-    (Domain: Abstract_domain.Leaf)
-    (Convert : Conversion with type internal_value := Domain.value
-                           and type internal_location := Domain.location)
+    (Domain: Input_Domain)
+    (Val: Conversion with type internal := Domain.value)
+    (Loc: Conversion with type internal := Domain.location)
   : Abstract.Domain.Internal with type state = Domain.state
-                              and type value = Convert.extended_value
-                              and type location = Convert.extended_location
+                              and type value = Val.extended
+                              and type location = Loc.extended
                               and type origin = Domain.origin
 
 

@@ -234,10 +234,10 @@
   signed overflow. assert -2147483648 ≤ (int)p + (int)q;
 [eva:alarm] gauges.c:188: Warning: 
   signed overflow. assert (int)p + (int)q ≤ 2147483647;
-[eva] gauges.c:188: 
+[eva:garbled-mix:write] gauges.c:188: 
   Assigning imprecise value to z.
   The imprecision originates from Arithmetic {gauges.c:188}
-[eva] gauges.c:189: 
+[eva:garbled-mix:write] gauges.c:189: 
   Assigning imprecise value to r.
   The imprecision originates from Arithmetic {gauges.c:188}
 [eva:alarm] gauges.c:190: Warning: out of bounds write. assert \valid(r);
@@ -713,7 +713,7 @@
 [eva] Recording results for main17
 [eva] Done for function main17
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main0:
   i ∈ {1; 162}

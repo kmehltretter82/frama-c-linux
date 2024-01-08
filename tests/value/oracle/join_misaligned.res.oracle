@@ -19,8 +19,8 @@
 [eva:alarm] join_misaligned.i:37: Warning: 
   pointer downcast. assert (unsigned int)(&u) ≤ 2147483647;
 [eva] Recording results for main
-[eva] done for function main
-[eva:garbled-mix] Warning: 
+[eva] Done for function main
+[eva:garbled-mix:summary] Warning: 
   Garbled mix generated during analysis:
   {{ garbled mix of &{t} (origin: Merge {join_misaligned.i:42}) }}
   {{ garbled mix of &{u} (origin: Merge {join_misaligned.i:42}) }}

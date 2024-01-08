@@ -31,7 +31,7 @@
 [eva] Recording results for memchr_bug
 [eva] Done for function memchr_bug
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function memchr_bug:
   NON TERMINATING FUNCTION

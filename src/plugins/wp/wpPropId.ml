@@ -746,7 +746,10 @@ let user_prop_pid pid =
   let p_prop = match pid.p_kind with
     | PKPre (_,_,p_prop) -> p_prop
     | _ -> property_of_id pid in
-  user_prop_names p_prop
+  let names = user_prop_names p_prop in
+  match Property.get_kf p_prop with
+  | None -> names
+  | Some kf -> Kernel_function.get_name kf :: names
 
 let select_default pid =
   let names = user_prop_pid pid in

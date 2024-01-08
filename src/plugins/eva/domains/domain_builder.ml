@@ -101,8 +101,8 @@ let simplify_call call =
     return = call.Eval.return; }
 
 module Make_Minimal
-    (Value: Abstract_value.S)
-    (Location: Abstract_location.S)
+    (Value: Abstract_value.Leaf)
+    (Location: Abstract_location.Leaf)
     (Domain: Simpler_domains.Minimal)
 = struct
 
@@ -114,6 +114,9 @@ module Make_Minimal
   type location = Location.location
   type state = Domain.t
   type origin
+
+  let value_dependencies = Abstract_value.Leaf (module Value)
+  let location_dependencies = Abstract_location.Leaf (module Location)
 
   let narrow x _y = `Value x
 
@@ -155,8 +158,8 @@ end
 
 
 module Complete_Minimal
-    (Value: Abstract_value.S)
-    (Location: Abstract_location.S)
+    (Value: Abstract_value.Leaf)
+    (Location: Abstract_location.Leaf)
     (Domain: Simpler_domains.Minimal)
 = struct
 
@@ -186,8 +189,8 @@ end
 
 
 module Complete_Minimal_with_datatype
-    (Value: Abstract_value.S)
-    (Location: Abstract_location.S)
+    (Value: Abstract_value.Leaf)
+    (Location: Abstract_location.Leaf)
     (Domain: Minimal_with_datatype)
 = struct
 
@@ -225,6 +228,9 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
     type location = Precise_locs.precise_location
     type state = Domain.t
     type origin
+
+    let value_dependencies = Abstract_value.Leaf (module Main_values.CVal)
+    let location_dependencies = Abstract_location.Leaf (module Main_locations.PLoc)
 
     let narrow x _y = `Value x
 
@@ -604,8 +610,8 @@ module Restrict
 
     let lift_register f state = f (get_state state)
 
-    let register_initial_state callstack =
-      lift_register (Domain.Store.register_initial_state callstack)
+    let register_initial_state callstack kf =
+      lift_register (Domain.Store.register_initial_state callstack kf)
     let register_state_before_stmt callstack stmt =
       lift_register (Domain.Store.register_state_before_stmt callstack stmt)
     let register_state_after_stmt callstack stmt =
@@ -622,7 +628,7 @@ module Restrict
       | `Top -> `Top
       | `Bottom -> `Bottom
       | `Value t ->
-        let module Hashtbl = Value_types.Callstack.Hashtbl in
+        let module Hashtbl = Callstack.Hashtbl in
         let table = Hashtbl.create (Hashtbl.length t) in
         Hashtbl.iter (fun key s -> Hashtbl.add table key (inject s)) t;
         `Value table

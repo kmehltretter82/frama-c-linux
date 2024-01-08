@@ -14,6 +14,7 @@
   nondet ∈ [--..--]
   p.x ∈ {2}
    .y ∈ {1; 2}
+  q ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] narrow_behaviors.i:56: 
@@ -21,6 +22,7 @@
   # cvalue:
   nondet ∈ {0}
   p{.x; .y} ∈ {1}
+  q ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] computing for function f2 <- main.
@@ -83,6 +85,7 @@
   # cvalue:
   nondet ∈ {0}
   r{.x; .y} ∈ {1}
+  s ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] narrow_behaviors.i:62: 
@@ -90,6 +93,7 @@
   # cvalue:
   nondet ∈ {1}
   r{.x; .y} ∈ {2}
+  s ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] computing for function f2 <- main.
@@ -120,7 +124,7 @@
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}

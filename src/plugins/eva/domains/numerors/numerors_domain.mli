@@ -24,3 +24,5 @@
     of floating-point computations.
     Nothing is exported: the domain is registered as an analysis abstraction
     in the Eva engine, enabled by the -eva-domains numerors option. *)
+
+val registered : Abstractions.Domain.registered

@@ -77,7 +77,7 @@ let () = add_special_builtin_family
     (fun s -> Datatype.String.Set.mem s !special_builtins_table)
 
 let () = List.iter add_special_builtin
-    [ "__builtin_stdarg_start"; "__builtin_va_arg";
+    [ "__builtin_stdarg_start"; "__builtin_va_arg"; "__builtin_va_end";
       "__builtin_va_start"; "__builtin_expect"; "__builtin_next_arg"; ]
 
 module Builtin_functions =

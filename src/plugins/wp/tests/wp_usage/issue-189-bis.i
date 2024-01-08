@@ -27,6 +27,7 @@ void memcpy_alias_vars (unsigned char *src, unsigned char *dst, int len) {
     @ loop invariant cpy: \let idx = \at( len, LoopEntry ) - len ;
     @                     \forall integer k; 0 <= k < idx
     @                     ==> \at( dst, LoopEntry )[k] == \at( src, LoopEntry )[k];
+    @ loop variant len;
     @*/
   while (len > 0) {
     *(dst++) = *(src++);
@@ -55,6 +56,7 @@ void memcpy_context_vars (unsigned char *src, unsigned char *dst, int len) {
     @ loop invariant ok: cpy: \let idx = \at( len, LoopEntry ) - len ;
     @                         \forall integer k; 0 <= k < idx
     @                         ==> \at( dst2, LoopEntry )[k] == \at( src2, LoopEntry )[k];
+    @ loop variant len;
     @*/
   while (len > 0) {
     *(dst2++) = *(src2++);

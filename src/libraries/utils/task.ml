@@ -427,6 +427,7 @@ let server ?(stages=1) ?(procs=4) () = {
   waiting = false ;
 }
 
+let get_procs s = s.procs
 let set_procs s p = s.procs <- p
 let on_server_activity s cb  = s.activity <- s.activity @ [cb]
 let on_server_wait s cb = s.wait <- s.wait @ [cb]
@@ -449,6 +450,8 @@ let spawn server ?pool ?(stage=0) thread =
 
 let scheduled s = s.scheduled
 let terminated s = s.terminated
+let remaining s = s.scheduled - s.terminated
+let running s = List.length s.running
 let waiting s =
   if s.waiting || s.running = [] then None else Some (List.length s.running)
 

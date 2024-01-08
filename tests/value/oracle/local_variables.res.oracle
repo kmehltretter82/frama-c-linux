@@ -13,8 +13,9 @@
   Called from local_variables.i:30.
 [eva] computing for function w <- u <- main.
   Called from local_variables.i:11.
-[kernel:annot:missing-spec] local_variables.i:24: Warning: 
-  Neither code nor specification for function unkn, generating default assigns from the prototype
+[kernel:annot:missing-spec] local_variables.i:4: Warning: 
+  Neither code nor specification for function unkn,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function unkn <- w <- u <- main.
   Called from local_variables.i:24.
 [eva] using specification for function unkn
@@ -43,7 +44,7 @@
 [eva:alarm] local_variables.i:47: Warning: 
   out of bounds read. assert \valid_read(p);
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function w:
   B ∈ {0}

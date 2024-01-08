@@ -9,8 +9,9 @@
   var2 IN {0}
 [eva] computing for function inputsOf_testcase_func <- main.
   Called from bts709.c:47.
-[kernel:annot:missing-spec] bts709.c:55: Warning: 
-  Neither code nor specification for function nondet_int, generating default assigns from the prototype
+[kernel:annot:missing-spec] bts709.c:54: Warning: 
+  Neither code nor specification for function nondet_int,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function nondet_int <- inputsOf_testcase_func <- main.
   Called from bts709.c:55.
 [eva] using specification for function nondet_int
@@ -36,7 +37,7 @@
 [eva] bts709.c:46: starting to merge loop iterations
 [eva] bts709.c:47: Reusing old results for call to inputsOf_testcase_func
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function func

@@ -33,7 +33,7 @@
   function sendmsg: precondition 'valid_msg_iov' got status invalid.
 [eva] Done for function sendmsg
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_sockfds[0..1023] ∈ [--..--]
@@ -61,5 +61,5 @@
      .msg_iovlen ∈ {5; 6}
      {.msg_control; .msg_controllen; .msg_flags} ∈ UNINITIALIZED
   sockfd ∈ [-1..1023]
-  r ∈ [-1..2147483647]
+  r ∈ [-1..2147483647] or UNINITIALIZED
   __retres ∈ {0; 1}

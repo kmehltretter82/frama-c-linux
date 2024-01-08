@@ -302,13 +302,15 @@ let r_havoc = function
    - m[k]     WHEN separated (p,a,k,1)
    - undef[k] WHEN NOT separated (p,a,k,1)
 *)
-let r_get_havoc = function
-  | [undef;m;p;a] ->
-    (fun _ k ->
-       match is_separated [p;a;k;e_one] with
-       | L.Yes -> F.e_get m k
-       | L.No  -> F.e_get undef k
-       | _ -> raise Not_found)
+let r_get_havoc es ks =
+  match es, ks with
+  | [undef;m;p;a],[k] ->
+    begin
+      match is_separated [p;a;k;e_one] with
+      | L.Yes -> F.e_get m k
+      | L.No  -> F.e_get undef k
+      | _ -> raise Not_found
+    end
   | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)

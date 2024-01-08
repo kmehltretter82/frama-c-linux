@@ -5,7 +5,7 @@
   Axiomatic 'LISTS'
 ------------------------------------------------------------
 
-Lemma A:
-Prove: (length L_EmptyB)=(length L_EmptyA)
+Goal Lemma 'A':
+Prove: length(L_EmptyB) = length(L_EmptyA).
 
 ------------------------------------------------------------

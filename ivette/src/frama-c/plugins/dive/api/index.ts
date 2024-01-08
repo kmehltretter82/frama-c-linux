@@ -38,17 +38,9 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byLocation } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jLocation } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { location } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { locationDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { marker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -217,8 +209,8 @@ export const nodeKindDefault: nodeKind = nodeKind.scalar;
 
 const nodeKindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.dive.nodeKindTags',
-  input:  Json.jNull,
+  name: 'plugins.dive.nodeKindTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -246,8 +238,8 @@ export const taintDefault: taint = taint.untainted;
 
 const taintTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.dive.taintTags',
-  input:  Json.jNull,
+  name: 'plugins.dive.taintTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -277,8 +269,8 @@ export const explorationDefault: exploration = exploration.yes;
 
 const explorationTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.dive.explorationTags',
-  input:  Json.jNull,
+  name: 'plugins.dive.explorationTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -309,8 +301,8 @@ export const nodeSpecialRangeDefault: nodeSpecialRange =
 
 const nodeSpecialRangeTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.dive.nodeSpecialRangeTags',
-  input:  Json.jNull,
+  name: 'plugins.dive.nodeSpecialRangeTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -346,7 +338,7 @@ export interface node {
   /** forward_explored */
   forward_explored: exploration;
   /** writes */
-  writes: location[];
+  writes: marker[];
   /** values */
   values?: string;
   /** range */
@@ -367,7 +359,7 @@ export const jNode: Json.Decoder<node> =
     is_root: Json.jBoolean,
     backward_explored: jExploration,
     forward_explored: jExploration,
-    writes: Json.jArray(jLocation),
+    writes: Json.jArray(jMarker),
     values: Json.jOption(Json.jString),
     range: jNodeRange,
     type: Json.jOption(Json.jString),
@@ -379,7 +371,7 @@ export const byNode: Compare.Order<node> =
   Compare.byFields
     <{ id: nodeId, label: string, nkind: nodeKind, locality: nodeLocality,
        is_root: boolean, backward_explored: exploration,
-       forward_explored: exploration, writes: location[], values?: string,
+       forward_explored: exploration, writes: marker[], values?: string,
        range: nodeRange, type?: string, taint?: taint }>({
     id: byNodeId,
     label: Compare.string,
@@ -388,7 +380,7 @@ export const byNode: Compare.Order<node> =
     is_root: Compare.boolean,
     backward_explored: byExploration,
     forward_explored: byExploration,
-    writes: Compare.array(byLocation),
+    writes: Compare.array(byMarker),
     values: Compare.defined(Compare.string),
     range: byNodeRange,
     type: Compare.defined(Compare.string),
@@ -414,7 +406,7 @@ export interface dependency {
   /** dkind */
   dkind: string;
   /** origins */
-  origins: location[];
+  origins: marker[];
 }
 
 /** Decoder for `dependency` */
@@ -424,19 +416,19 @@ export const jDependency: Json.Decoder<dependency> =
     src: jNodeId,
     dst: jNodeId,
     dkind: Json.jString,
-    origins: Json.jArray(jLocation),
+    origins: Json.jArray(jMarker),
   });
 
 /** Natural order for `dependency` */
 export const byDependency: Compare.Order<dependency> =
   Compare.byFields
-    <{ id: number, src: nodeId, dst: nodeId, dkind: string,
-       origins: location[] }>({
+    <{ id: number, src: nodeId, dst: nodeId, dkind: string, origins: marker[]
+       }>({
     id: Compare.number,
     src: byNodeId,
     dst: byNodeId,
     dkind: Compare.string,
-    origins: Compare.array(byLocation),
+    origins: Compare.array(byMarker),
   });
 
 /** Default value for `dependency` */
@@ -483,8 +475,8 @@ export const signalGraph: Server.Signal = {
 
 const reloadGraph_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'plugins.dive.reloadGraph',
-  input:  Json.jNull,
+  name: 'plugins.dive.reloadGraph',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -493,25 +485,25 @@ export const reloadGraph: Server.GetRequest<null,null>= reloadGraph_internal;
 
 const fetchGraph_internal: Server.GetRequest<
   number,
-  { pending: number, updated: graphData[], removed: Json.key<'#graph'>[],
-    reload: boolean }
+  { reload: boolean, removed: Json.key<'#graph'>[], updated: graphData[],
+    pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'plugins.dive.fetchGraph',
-  input:  Json.jNumber,
+  name: 'plugins.dive.fetchGraph',
+  input: Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jGraphData),
-            removed: Json.jArray(Json.jKey<'#graph'>('#graph')),
             reload: Json.jBoolean,
+            removed: Json.jArray(Json.jKey<'#graph'>('#graph')),
+            updated: Json.jArray(jGraphData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`graph`](#graph)  */
 export const fetchGraph: Server.GetRequest<
   number,
-  { pending: number, updated: graphData[], removed: Json.key<'#graph'>[],
-    reload: boolean }
+  { reload: boolean, removed: Json.key<'#graph'>[], updated: graphData[],
+    pending: number }
   >= fetchGraph_internal;
 
 const graph_internal: State.Array<Json.key<'#graph'>,graphData> = {
@@ -531,8 +523,8 @@ export const graphDataDefault: graphData =
 
 const window_internal: Server.SetRequest<explorationWindow,null> = {
   kind: Server.RqKind.SET,
-  name:   'plugins.dive.window',
-  input:  jExplorationWindow,
+  name: 'plugins.dive.window',
+  input: jExplorationWindow,
   output: Json.jNull,
   signals: [],
 };
@@ -541,8 +533,8 @@ export const window: Server.SetRequest<explorationWindow,null>= window_internal;
 
 const clear_internal: Server.ExecRequest<null,null> = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.dive.clear',
-  input:  Json.jNull,
+  name: 'plugins.dive.clear',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -551,8 +543,8 @@ export const clear: Server.ExecRequest<null,null>= clear_internal;
 
 const add_internal: Server.ExecRequest<marker,nodeId | undefined> = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.dive.add',
-  input:  jMarker,
+  name: 'plugins.dive.add',
+  input: jMarker,
   output: Json.jOption(jNodeId),
   signals: [],
 };
@@ -561,8 +553,8 @@ export const add: Server.ExecRequest<marker,nodeId | undefined>= add_internal;
 
 const explore_internal: Server.ExecRequest<nodeId,null> = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.dive.explore',
-  input:  jNodeId,
+  name: 'plugins.dive.explore',
+  input: jNodeId,
   output: Json.jNull,
   signals: [],
 };
@@ -571,8 +563,8 @@ export const explore: Server.ExecRequest<nodeId,null>= explore_internal;
 
 const show_internal: Server.ExecRequest<nodeId,null> = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.dive.show',
-  input:  jNodeId,
+  name: 'plugins.dive.show',
+  input: jNodeId,
   output: Json.jNull,
   signals: [],
 };
@@ -581,8 +573,8 @@ export const show: Server.ExecRequest<nodeId,null>= show_internal;
 
 const hide_internal: Server.ExecRequest<nodeId,null> = {
   kind: Server.RqKind.EXEC,
-  name:   'plugins.dive.hide',
-  input:  jNodeId,
+  name: 'plugins.dive.hide',
+  input: jNodeId,
   output: Json.jNull,
   signals: [],
 };

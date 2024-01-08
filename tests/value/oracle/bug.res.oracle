@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] Recording results for f
-[eva] done for function f
+[eva] Done for function f
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   

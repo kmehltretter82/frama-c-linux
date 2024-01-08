@@ -205,7 +205,7 @@
   function g: precondition got status unknown.
 [eva] Done for function g
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function ct:
   __retres ∈ {20}
@@ -778,7 +778,7 @@
   Called from precise_locations.i:49.
 [eva] Done for function g
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function ct:
   __retres ∈ {20}

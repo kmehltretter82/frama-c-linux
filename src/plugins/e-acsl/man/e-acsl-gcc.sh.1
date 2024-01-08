@@ -94,7 +94,7 @@ Unless specified, the executable is named as inidicated by the \fB--oexec\fP opt
 run input source files through \fBFrama-C\fP without \fBE-ACSL\fP instrumentations.
 .TP
 .B -E, --extra-cpp-args=\fI<FLAGS>
-pass additional arguments to the \fBFrama-C\fP pre-processor.
+pass additional arguments to the \fBFrama-C\fP preprocessor.
 .TP
 .B -L, --frama-c-stdlib
 use the \fBFrama-C\fP standard library instead of a system-wide one.
@@ -137,8 +137,8 @@ compiler.
 pass the specified flags to the linker.
 .TP
 .B -e, --cpp-flags=\fI<FLAGS>
-pass the specified flags to the pre-processor at compile-time.
-For instrumentation-time pre-processor flags see \fB--extra-cpp-args\fP option.
+pass the specified flags to the preprocessor at compile-time.
+For instrumentation-time preprocessor flags see \fB--extra-cpp-args\fP option.
 .TP
 .B -q, --quiet
 suppress any output except for errors and warnings.

@@ -28,11 +28,6 @@ open Lattice_bounds
 module type S = sig
   type state
 
-  (** Compute the initial state for an analysis. The initial state is generated
-      according to the options of Value governing the shape of this state.
-      All global variables are bound in the resulting abstract state. *)
-  val initial_state : lib_entry:bool -> state or_bottom
-
   (** Compute the initial state for an analysis (as in {!initial_state}),
       but also bind the formal parameters of the function given as argument. *)
   val initial_state_with_formals :
@@ -45,9 +40,9 @@ end
 
 module Make
     (Domain: Abstract.Domain.External)
-    (Eva: Evaluation.S with type state = Domain.state
-                        and type loc = Domain.location)
-    (Transfer: Transfer_stmt.S with type state = Domain.t)
+    (_: Evaluation_sig.S with type state = Domain.state
+                          and type loc = Domain.location)
+    (_: Transfer_stmt.S with type state = Domain.t)
   : S with type state := Domain.t
 
 

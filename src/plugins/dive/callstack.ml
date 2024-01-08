@@ -22,10 +22,11 @@
 
 open Cil_types
 
-include Value_types.Callstack
+module Callsite = Datatype.Pair (Kernel_function) (Cil_datatype.Kinstr)
+type call_site = Callsite.t
 
-type call_site = Value_types.call_site
-module Callsite = Value_types.Callsite
+include Datatype.With_collections (Datatype.List (Callsite))
+    (struct let module_name = "Dive.Callstack" end)
 
 let init kf = [(kf,Kglobal)]
 

@@ -77,7 +77,6 @@ module LIT = WpContext.Generator(STR)
           l_name = prefix ^ "_literal" ;
           l_cluster = cluster () ;
           l_kind = Admit ;
-          l_types = 0 ;
           l_forall = [] ;
           l_triggers = [] ;
           l_lemma = F.p_conj (List.rev !chars) ;

@@ -1,8 +1,59 @@
 # frama-c -wp [...]
 [kernel] Parsing split.i (no preprocessing)
 [wp] Running WP plugin...
+[kernel:annot:missing-spec] split.i:27: Warning: 
+  Neither code nor explicit exits and terminates for function gen_P,
+   generating default clauses. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] split.i:31: Warning: 
+  Neither code nor explicit exits and terminates for function gen_Q,
+   generating default clauses. See -generated-spec-* options for more info
+[wp] [Valid] Goal test_goal_and_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_goal_and_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[wp] 23 goals scheduled
+[wp] [Valid] Goal test_goal_eq_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_goal_eq_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_goal_ex_and_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_goal_ex_and_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_goal_ex_if_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_goal_ex_if_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_goal_ex_imply_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_goal_ex_imply_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_goal_ex_or_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_goal_ex_or_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_goal_if_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_goal_if_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_goal_neq_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_goal_neq_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_inside_leq_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_inside_leq_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_inside_lt_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_inside_lt_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_inside_neq_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_inside_neq_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_step_and_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_step_and_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_step_fa_and_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_step_fa_and_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_step_fa_if_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_step_fa_if_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_step_fa_or_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_step_fa_or_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_step_if_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_step_if_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_step_leq_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_step_leq_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_step_lt_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_step_lt_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_step_neq_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_step_neq_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_step_or_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_step_or_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_step_peq_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_step_peq_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal test_step_pneq_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal test_step_pneq_terminates (Cfg) (Trivial)
+[wp] 25 goals scheduled
+[wp] [Valid] typed_test_step_branch_terminates (Qed)
 [wp:script:allgoals] 
   Goal Post-condition (file split.i, line 37) in 'test_step_branch':
   Assume {
@@ -14,6 +65,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
+[wp] [Valid] typed_test_step_branch_exits (Qed)
 [wp:script:allgoals] 
   Goal Post-condition (file split.i, line 47) in 'test_step_or':
   Assume { (* Pre-condition *) Have: P_P \/ P_Q \/ P_R. }
@@ -201,7 +253,6 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_branch_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_step_branch_ensures subgoal:
   
@@ -216,6 +267,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_step_branch_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_or_ensures subgoal:
   
@@ -224,7 +276,6 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_or_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_step_or_ensures subgoal:
   
@@ -241,6 +292,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_step_or_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_and_ensures subgoal:
   
@@ -256,7 +308,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_and_ensures (Tactic)
+[wp] [Unsuccess] typed_test_step_and_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_peq_ensures subgoal:
   
@@ -265,7 +317,6 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_peq_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_step_peq_ensures subgoal:
   
@@ -274,6 +325,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_step_peq_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_pneq_ensures subgoal:
   
@@ -282,7 +334,6 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_pneq_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_step_pneq_ensures subgoal:
   
@@ -291,6 +342,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_step_pneq_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_neq_ensures subgoal:
   
@@ -299,7 +351,6 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_neq_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_step_neq_ensures subgoal:
   
@@ -316,6 +367,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_step_neq_ensures (Tactic) (Qed 1/3)
 [wp:script:allgoals] 
   typed_test_step_leq_ensures subgoal:
   
@@ -324,7 +376,6 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_leq_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_step_leq_ensures subgoal:
   
@@ -340,6 +391,7 @@
   Prover Qed returns Valid
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_step_leq_ensures (Tactic) (Qed 1/3)
 [wp:script:allgoals] 
   typed_test_step_lt_ensures subgoal:
   
@@ -354,7 +406,6 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_lt_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_step_lt_ensures subgoal:
   
@@ -370,6 +421,7 @@
   Prover Qed returns Valid
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_step_lt_ensures (Tactic) (Qed 1/3)
 [wp:script:allgoals] 
   typed_test_step_if_ensures subgoal:
   
@@ -379,7 +431,6 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_if_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_step_if_ensures subgoal:
   
@@ -392,6 +443,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_step_if_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_fa_if_ensures subgoal:
   
@@ -405,7 +457,6 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_fa_if_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_step_fa_if_ensures subgoal:
   
@@ -419,6 +470,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_step_fa_if_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_fa_or_ensures subgoal:
   
@@ -427,7 +479,6 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_fa_or_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_step_fa_or_ensures subgoal:
   
@@ -436,6 +487,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_step_fa_or_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_step_fa_and_ensures subgoal:
   
@@ -448,7 +500,7 @@
   Prove: P_S.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_step_fa_and_ensures (Tactic)
+[wp] [Unsuccess] typed_test_step_fa_and_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_inside_leq_ensures subgoal:
   
@@ -463,7 +515,6 @@
   Prove: P_Q.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_inside_leq_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_inside_leq_ensures subgoal:
   
@@ -480,6 +531,7 @@
   Prover Qed returns Valid
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_inside_leq_ensures (Tactic) (Qed 1/3)
 [wp:script:allgoals] 
   typed_test_inside_lt_ensures subgoal:
   
@@ -494,7 +546,6 @@
   Prove: P_Q.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_inside_lt_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_inside_lt_ensures subgoal:
   
@@ -511,6 +562,7 @@
   Prover Qed returns Valid
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_inside_lt_ensures (Tactic) (Qed 1/3)
 [wp:script:allgoals] 
   typed_test_inside_neq_ensures subgoal:
   
@@ -525,7 +577,6 @@
   Prove: P_Q.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_inside_neq_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_inside_neq_ensures subgoal:
   
@@ -548,6 +599,7 @@
   Prove: P_Q.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_inside_neq_ensures (Tactic) (Qed 1/3)
 [wp:script:allgoals] 
   typed_test_goal_and_ensures subgoal:
   
@@ -556,7 +608,6 @@
   Prove: P_P.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_and_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_goal_and_ensures subgoal:
   
@@ -573,6 +624,7 @@
   Prove: P_R.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_goal_and_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_eq_ensures subgoal:
   
@@ -581,7 +633,6 @@
   Prove: (L_LP=true).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_eq_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_goal_eq_ensures subgoal:
   
@@ -590,6 +641,7 @@
   Prove: (L_LQ=true).
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_goal_eq_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_neq_ensures subgoal:
   
@@ -598,7 +650,6 @@
   Prove: (L_LP=false).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_neq_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_goal_neq_ensures subgoal:
   
@@ -607,6 +658,7 @@
   Prove: (L_LQ=false).
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_goal_neq_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_if_ensures subgoal:
   
@@ -620,7 +672,6 @@
   Prove: P_P.
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_if_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_goal_if_ensures subgoal:
   
@@ -634,6 +685,7 @@
   Prove: P_Q.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_goal_if_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_ex_and_ensures subgoal:
   
@@ -642,7 +694,6 @@
   Prove: exists i : Z. P_Pi(i) /\ P_Qi(i).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_ex_and_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_goal_ex_and_ensures subgoal:
   
@@ -651,6 +702,7 @@
   Prove: P_P /\ P_Q.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_goal_ex_and_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_ex_or_ensures subgoal:
   
@@ -659,7 +711,7 @@
   Prove: P_P \/ P_Q \/ (exists i : Z. P_Pi(i)) \/ (exists i : Z. P_Qi(i)).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_ex_or_ensures (Tactic)
+[wp] [Unsuccess] typed_test_goal_ex_or_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_ex_if_ensures subgoal:
   
@@ -674,7 +726,6 @@
   Prove: exists i : Z. P_Pi(i) /\ P_Qi(i).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_ex_if_ensures (Tactic)
 [wp:script:allgoals] 
   typed_test_goal_ex_if_ensures subgoal:
   
@@ -689,6 +740,7 @@
   Prove: P_P /\ P_Q.
   
   ------------------------------------------------------------
+[wp] [Unsuccess] typed_test_goal_ex_if_ensures (Tactic) (Qed)
 [wp:script:allgoals] 
   typed_test_goal_ex_imply_ensures subgoal:
   
@@ -702,6 +754,9 @@
   Prove: exists i : Z. P_Qi(i).
   
   ------------------------------------------------------------
-[wp] [Unsuccess] typed_test_goal_ex_imply_ensures (Tactic)
-[wp] Proved goals:    0 / 23
+[wp] [Unsuccess] typed_test_goal_ex_imply_ensures (Tactic) (Qed)
+[wp] Proved goals:   46 / 69
+  Terminating:    22
+  Unreachable:    22
+  Qed:             2
   Unsuccess:      23

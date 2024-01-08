@@ -42,7 +42,7 @@
 [eva] partitioning-annots.c:158: assertion got status valid.
 [eva] partitioning-annots.c:161: Frama_C_show_each: {{ "Value 42 not found" }}
 [eva] Recording results for test_loop_split
-[eva] done for function test_loop_split
+[eva] Done for function test_loop_split
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test_loop_split:
   Frama_C_entropy_source ∈ [--..--]

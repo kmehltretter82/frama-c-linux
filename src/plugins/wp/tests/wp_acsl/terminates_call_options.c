@@ -1,10 +1,10 @@
 /* run.config
+   OPT: -generated-spec-custom terminates:skip,exits:skip
    OPT:
-   OPT: -wp-declarations-terminate -wp-definitions-terminate -wp-frama-c-stdlib-terminate
 */
 /* run.config_qualif
+   OPT: -generated-spec-custom terminates:skip,exits:skip
    OPT:
-   OPT: -wp-declarations-terminate -wp-definitions-terminate -wp-frama-c-stdlib-terminate
 */
 
 #include <stdlib.h>

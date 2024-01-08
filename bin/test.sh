@@ -24,16 +24,24 @@
 THIS_SCRIPT="$0"
 CONFIG="<all>"
 VERBOSE=
+CLEAN=
+PREPARE=
+PULLCACHE=
 UPDATE=
 LOGS=
+COMMIT=
 TESTS=
 SAVE=
+COVER=
+HTML=
+XML=
+JSON=
 
 DUNE_ALIAS=
 DUNE_OPT=
 DUNE_LOG=./.test-errors.log
 ALIAS_NAME=ptests
-CACHEDIR=$(pwd -P)/.wp-cache
+LOCAL_WP_CACHE=$(pwd -P)/.wp-cache
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
 TEST_DIRS="tests/* src/plugins/*/tests/* src/kernel_internals/parsing/tests"
@@ -55,7 +63,7 @@ function Usage
     echo "  <DIR>     all tests in <DIR>"
     echo "  <FILE>    single test file <FILE>"
     echo ""
-    echo "  -a|--all            run all tests"
+    echo "  -a|--all            run all tests (default behavior)"
     echo "  -d|--default        run tests from default config only"
     echo "  -c|--config <name>  run tests from specified config only"
     echo ""
@@ -66,24 +74,26 @@ function Usage
     echo "  -r|--clean          clean (remove all) test results (includes -p)"
     echo "  -p|--ptests         prepare (all) dune files"
     echo "  -w|--wp-cache       prepare (pull) WP-cache"
-    echo "  -u|--update         run tests and update (local) WP-cache"
+    echo "  -f|--force          force re-run tests"
     echo "  -l|--logs           print output of tests (single file, no diff)"
+    echo "  -u|--update         run tests and update oracles (and WP-cache)"
+    echo "  -k|--commit         commit new test oracles"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
+    echo "  -j|--jobs <jobs>    run no more than <jobs> commands simultaneously."
+    echo "  --coverage          compute test coverage in html format"
+    echo "  --coverage-xml      compute test coverage in Cobertura XML format"
+    echo "  --coverage-json     compute test coverage in Coveralls JSON format"
     echo "  -h|--help           print this help"
     echo ""
     echo "VARIABLES"
     echo ""
     echo "  FRAMAC_WP_CACHE"
-    echo "    Management mode of wp-cache ($FRAMAC_WP_CACHE)"
+    echo "    Management mode of wp-cache (default is offline or update when -u)"
     echo ""
     echo "  FRAMAC_WP_QUALIF"
     echo "  FRAMAC_WP_CACHEDIR"
-    echo "    Absolute path to wp-cache directory ($FRAMAC_WP_CACHEDIR)"
-    if [ ! -d $FRAMAC_WP_CACHEDIR ]; then
-        echo "    About to clone from $FRAMAC_WP_CACHE_GIT"
-    fi
-    echo "    Please, always push to master branch"
+    echo "    Absolute path to wp-cache directory (git clone locally by default)"
     echo ""
 }
 
@@ -134,22 +144,120 @@ function RequiredTools
 }
 
 # --------------------------------------------------------------------------
+# ---  Command Line Processing
+# --------------------------------------------------------------------------
+
+while [ "$1" != "" ]
+do
+    case "$1" in
+        "-h"|"-help"|"--help")
+            Usage
+            exit 0
+            ;;
+        "-r"|"--clean")
+            CLEAN=yes
+            PREPARE=yes
+            ;;
+        "-p"|"--ptests")
+            PREPARE=yes
+            ;;
+        "-w"|"--wp-cache")
+            PULLCACHE=yes
+            ;;
+        "-f"|"--force")
+            DUNE_OPT+="--force "
+            ;;
+        "-u"|"--update")
+            DUNE_OPT+="--auto-promote "
+            UPDATE=yes
+            ;;
+        "-v"|"--verbose")
+            DUNE_OPT+="--display=short "
+            VERBOSE=yes
+            ;;
+        "-j"|"--jobs")
+            if [[ $2 == "auto" ]] || ([[ $2 != \-* ]] && [[ $2 -ge 1 ]]); then
+                DUNE_OPT+="-j $2 "
+                shift
+            else
+                ErrorUsage \
+                    "wrong opt ('$2') for '-j|--jobs', value 'auto' or >= 1 expected"
+            fi
+            ;;
+        "-l"|"--logs")
+            LOGS=yes
+            ;;
+        "-k"|"--commit")
+            COMMIT=yes
+            ;;
+        "-s"|"--save" )
+            SAVE=yes
+            ;;
+        "-d"|"--default")
+            CONFIG="<default>"
+            ;;
+        "-c"|"--config")
+            CONFIG=$2
+            shift
+            ;;
+        "--coverage")
+            COVER=yes
+            HTML=yes
+            ;;
+        "--coverage-xml")
+            COVER=yes
+            XML=yes
+            ;;
+        "--coverage-json")
+            COVER=yes
+            JSON=yes
+            ;;
+        "-n"|"--name")
+            ALIAS_NAME=$2
+            shift
+            ;;
+        "-a"|"--all")
+            TESTS=""
+            for dir in $TEST_DIRS ; do
+                if [ -d "$dir" ]; then
+                    TESTS="$TESTS $dir"
+                fi
+            done
+            ;;
+       *)
+            TESTS+=" $1"
+            ;;
+    esac
+    shift
+done
+
+# --------------------------------------------------------------------------
 # ---  WP Cache Environment
 # --------------------------------------------------------------------------
 
 function SetEnv
 {
     if [ "$FRAMAC_WP_CACHE" = "" ]; then
-        export FRAMAC_WP_CACHE=offline
-        Echo "Set FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
+        if [ "$UPDATE" = "yes" ]; then
+            Head "FRAMAC_WP_CACHE=update"
+            export FRAMAC_WP_CACHE=update
+        else
+            export FRAMAC_WP_CACHE=offline
+        fi
+    else
+        if [ "$UPDATE" = "yes" ]; then
+            Head "FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE (overrides -u)"
+        else
+            Head "FRAMAC_WP_CACHE=$FRAMAC_WP_CACHE"
+        fi
     fi
 
     if [ "$FRAMAC_WP_QUALIF" != "" ]; then
         export FRAMAC_WP_CACHEDIR="$FRAMAC_WP_QUALIF"
-        Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
+        Echo "# FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
     elif [ "$FRAMAC_WP_CACHEDIR" = "" ]; then
-        export FRAMAC_WP_CACHEDIR="$CACHEDIR"
-        Echo "Set FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
+        export FRAMAC_WP_CACHEDIR="$LOCAL_WP_CACHE"
+        Echo "# FRAMAC_WP_CACHEDIR=$FRAMAC_WP_CACHEDIR"
     fi
 
     [ ! -f "$FRAMAC_WP_CACHEDIR" ] || [ -d "$FRAMAC_WP_CACHEDIR" ] \
@@ -159,7 +267,6 @@ function SetEnv
         /*);;
         *) Error "Requires an absolute path to $FRAMAC_WP_CACHEDIR";;
     esac
-
 }
 
 function CloneCache
@@ -173,10 +280,67 @@ function CloneCache
 
 function PullCache
 {
-    CloneCache
-    Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
-    RequiredTools git
-    Run git -C $FRAMAC_WP_CACHEDIR pull --rebase
+    if [ "$PULLCACHE" = "yes" ]
+    then
+        CloneCache
+        Head "Pull WP cache (to $FRAMAC_WP_CACHEDIR)..."
+        RequiredTools git
+        Run git -C $FRAMAC_WP_CACHEDIR pull --rebase
+    fi
+}
+
+# --------------------------------------------------------------------------
+# ---  Coverage
+# --------------------------------------------------------------------------
+
+function PrepareCoverage
+{
+    export BISECT_FILE="$(pwd -P)/_bisect/bisect-"
+    if [ "$COVER" = "yes" ] ;
+    then
+        Cmd rm -rf _coverage
+        Cmd rm -rf _bisect
+        Cmd mkdir _coverage
+        Cmd mkdir _bisect
+    fi
+}
+
+function GenerateCoverage
+{
+    if [ "$COVER" = "yes" ] ;
+    then
+        Head "Generating coverage in _coverage ..."
+        if [ "$HTML" = "yes" ] ;
+        then
+            Cmd bisect-ppx-report html --coverage-path=_bisect --tree
+        fi
+        if [ "$XML" = "yes" ] ;
+        then
+            Cmd bisect-ppx-report cobertura --coverage-path=_bisect _coverage/coverage_report.xml
+        fi
+        if [ "$JSON" = "yes" ] ;
+        then
+            Cmd bisect-ppx-report coveralls --coverage-path=_bisect _coverage/coverage_report.json
+        fi
+    fi
+}
+
+# --------------------------------------------------------------------------
+# ---  Test Suite Preparation
+# --------------------------------------------------------------------------
+
+function PrepareTests
+{
+    if [ "$CLEAN" = "yes" ]
+    then
+        Head "Cleaning all tests..."
+        Cmd make clean-tests
+    fi
+    if [ "$PREPARE" = "yes" ]
+    then
+        Head "Generating dune files..."
+        Cmd make run-ptests
+    fi
 }
 
 # --------------------------------------------------------------------------
@@ -186,7 +350,9 @@ function PullCache
 [ "$DUNE_LOG" = "" ] || rm -rf $DUNE_LOG
 function RunAlias
 {
-
+    if [ "$COVER" = "yes" ]; then
+        DUNE_OPT+="--workspace dev/dune-workspace.cover "
+    fi
     Head "Running tests..."
     if [ "$DUNE_LOG" = "" ]; then
         Run dune build $DUNE_OPT $@
@@ -249,6 +415,9 @@ function TestFile
     else
         ALIAS=$DIR/$RESULT/${FILE%.*}.diff
     fi
+    if [ "$COMMIT" = "yes" ]; then
+        COMMITS="${COMMITS} $DIR/$RESULT/${FILE%.*}"
+    fi
     Head "Register test on file $1 $CFG"
     DUNE_ALIAS="${DUNE_ALIAS} @$ALIAS"
 }
@@ -271,6 +440,27 @@ function Register
                 *) ErrorUsage "ERROR: don't known what to do with '$1'";;
             esac
         fi
+        shift
+    done
+}
+
+# --------------------------------------------------------------------------
+# ---  Tests Commits
+# --------------------------------------------------------------------------
+
+function Commits
+{
+    while [ "$1" != "" ]
+    do
+        cd _build/default
+        for log in $1*.res.log
+        do
+            echo "Commit $log"
+            dest="${log//result/oracle}"
+            dest="${dest//res.log/res.oracle}"
+            cp -f $log "../../$dest"
+        done
+        cd ../..
         shift
     done
 }
@@ -305,76 +495,25 @@ function Status
 
     #-- Check wp-cache status
     if [ "$UPDATE" = "yes" ]; then
-        Head "Check $FRAMAC_WP_CACHEDIR status"
+        Head "Update $FRAMAC_WP_CACHEDIR and check status"
         RequiredTools git
+        Run git -C $FRAMAC_WP_CACHEDIR add -A
         Run git -C $FRAMAC_WP_CACHEDIR status -s
     fi
 }
 
 # --------------------------------------------------------------------------
-# ---  Command Line Processing
+# ---  Main Program
 # --------------------------------------------------------------------------
 
 SetEnv
-while [ "$1" != "" ]
-do
-    case "$1" in
-        "-h"|"-help"|"--help")
-            Usage
-            exit 0
-            ;;
-        "-r"|"--clean")
-            Head "Cleaning all tests..."
-            Cmd make clean-tests
-            Head "Generating dune files..."
-            Cmd make run-ptests
-            ;;
-        "-p"|"--ptests")
-            Head "Generating dune files..."
-            Cmd make run-ptests
-            ;;
-        "-w"|"--wp-cache")
-            PullCache
-            ;;
-        "-u"|"--update")
-            FRAMAC_WP_CACHE=update
-            UPDATE=yes
-            ;;
-        "-v"|"--verbose")
-            DUNE_OPT+="--display=short"
-            VERBOSE=yes
-            ;;
-        "-l"|"--logs")
-            LOGS=yes
-            ;;
-        "-s"|"--save" )
-             SAVE=yes
-            ;;
-        "-d"|"--default")
-            CONFIG="<default>"
-            ;;
-        "-c"|"--config")
-            CONFIG=$2
-            shift
-            ;;
-        "-n"|"--name")
-            ALIAS_NAME=$2
-            shift
-            ;;
-        "-a"|"--all")
-            TESTS=""
-            for dir in $TEST_DIRS ; do
-                if [ -d "$dir" ]; then
-                    TESTS="$TESTS $dir"
-                fi
-            done
-            ;;
-       *)
-            TESTS+=" $1"
-            ;;
-    esac
-    shift
-done
+PullCache
+PrepareCoverage
+PrepareTests
 Register $TESTS
 RunAlias ${DUNE_ALIAS}
+Commits ${COMMITS}
 Status $DUNE_LOG
+GenerateCoverage
+
+# --------------------------------------------------------------------------

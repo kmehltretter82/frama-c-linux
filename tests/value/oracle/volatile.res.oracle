@@ -55,8 +55,9 @@
   signed overflow. assert x_0 + y_0 ≤ 2147483647;
 [eva] Recording results for fn1
 [eva] Done for function fn1
-[kernel:annot:missing-spec] volatile.c:40: Warning: 
-  Neither code nor specification for function fn2, generating default assigns from the prototype
+[kernel:annot:missing-spec] volatile.c:20: Warning: 
+  Neither code nor specification for function fn2,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function fn2 <- main1 <- main.
   Called from volatile.c:40.
 [eva] using specification for function fn2
@@ -351,7 +352,7 @@
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function fn1:
   __retres ∈ [--..--]

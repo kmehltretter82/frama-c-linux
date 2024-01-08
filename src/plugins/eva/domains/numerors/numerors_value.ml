@@ -29,7 +29,6 @@ module P = Precisions
 
 module Arith = Numerors_arithmetics
 
-
 (*-----------------------------------------------------------------------------
  *            Abstract value for numerical errors estimation
  *-----------------------------------------------------------------------------
@@ -116,7 +115,6 @@ end
 include Datatype.Make(T)
 let pretty_debug = pretty
 let pretty_typ _ = pretty
-let key = Structure.Key_Value.create_key "numerors_values"
 
 
 (*-----------------------------------------------------------------------------
@@ -395,3 +393,5 @@ let get_max_absolute_error = function
 let get_max_relative_error = function
   | Elt x -> Some (snd (I.get_bounds (I.abs (x.Arith.rel_err))))
   | _ -> None
+
+let key = Structure.Key_Value.create_key "numerors_values"

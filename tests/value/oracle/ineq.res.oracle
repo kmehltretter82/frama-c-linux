@@ -12,14 +12,15 @@
   l ∈ {1}
   m ∈ {-1}
   n ∈ {-1}
-[kernel:annot:missing-spec] ineq.c:6: Warning: 
-  Neither code nor specification for function any_int, generating default assigns from the prototype
+[kernel:annot:missing-spec] ineq.c:1: Warning: 
+  Neither code nor specification for function any_int,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function any_int <- main.
   Called from ineq.c:6.
 [eva] using specification for function any_int
 [eva] Done for function any_int
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   G[0] ∈ {0; 7}

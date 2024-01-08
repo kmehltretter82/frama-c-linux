@@ -1,13 +1,13 @@
 open Cil_types
 
 let warn_cast =
-  let typeForInsertedCast = !Cabs2cil.typeForInsertedCast in
+  let typeForInsertedCast = !Cil.typeForInsertedCast in
   fun e t1 t2 ->
     Kernel.feedback ~source:(fst e.eloc) "Inserted implicit cast from %a to %a"
       Printer.pp_typ t1 Printer.pp_typ t2;
     typeForInsertedCast e t1 t2
 
-let () = Cabs2cil.typeForInsertedCast := warn_cast
+let () = Cil.typeForInsertedCast := warn_cast
 
 let run () =
   let f = Ast.get () in

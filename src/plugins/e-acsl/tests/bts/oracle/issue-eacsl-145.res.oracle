@@ -3,8 +3,6 @@
 [kernel] Parsing FRAMAC_SHARE/e-acsl/e_acsl.h (with preprocessing)
 [e-acsl] translation done in project "e-acsl".
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G IN {0}
   __e_acsl_sound_verdict IN [--..--]
@@ -32,7 +30,6 @@
 [eva] using specification for function __e_acsl_assert_clean
 [eva] using specification for function __e_acsl_delete_block
 [eva] using specification for function __e_acsl_memory_clean
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------

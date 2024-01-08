@@ -63,21 +63,21 @@ and 'a extern = {
   ext_debug  : string; (** just for printing during debugging *)
 }
 and fields = { mutable fields : field list }
-and field =
+and field = private
   | Mfield of mdt * fields * string * tau
   | Cfield of fieldinfo * datakind
 and tau = (field,adt) Logic.datatype
 
 type t_builtin = E_mdt of mdt | E_poly of (tau list -> tau)
 
-type lfun =
+type lfun = private
   | ACSL of Cil_types.logic_info (** Registered in Definition.t,
                                      only  *)
   | CTOR of Cil_types.logic_ctor_info (** Not registered in Definition.t
                                           directly converted/printed *)
-  | Model of model (** *)
+  | FUN of lsymbol (** External or Generated logic symbol *)
 
-and model = {
+and lsymbol = {
   m_category : lfun category ;
   m_params : sort list ;
   m_result : sort ;
@@ -99,6 +99,7 @@ val record :
   link:string -> library:string -> (string * tau) list -> adt
 val comp : compinfo -> adt
 val comp_init : compinfo -> adt
+val cfield : ?kind:datakind -> fieldinfo -> field
 val field : adt -> string -> field
 val fields_of_adt : adt -> field list
 val fields_of_tau : tau -> field list
@@ -107,6 +108,12 @@ val atype : logic_type_info -> tau list -> tau
 val adt : logic_type_info -> adt (** Must not be a builtin *)
 
 type balance = Nary | Left | Right
+
+val on_lfun : (lfun -> unit) -> unit
+val on_field : (field -> unit) -> unit
+
+val acsl : logic_info -> lfun
+val ctor : logic_ctor_info -> lfun
 
 val extern_s :
   library:library ->
@@ -196,6 +203,8 @@ val parameters : (lfun -> sort list) -> unit
 
 val name_of_lfun : lfun -> string
 val name_of_field : field -> string
+val context_of_lfun : lfun -> WpContext.context option
+(** LFuns are unique by name and context *)
 
 val is_coloring_lfun : lfun -> bool
 
@@ -378,6 +387,9 @@ sig
 
   val p_call : lfun -> term list -> pred
 
+  val e_lambda : var list -> term -> term
+  val e_apply : term -> term list -> term
+
   val p_forall : var list -> pred -> pred
   val p_exists : var list -> pred -> pred
   val p_bind : binder -> var -> pred -> pred
@@ -544,7 +556,8 @@ sig
       smaller terms. *)
 
   val set_builtin : lfun -> (term list -> term) -> unit
-  val set_builtin_get : lfun -> (term list -> tau option -> term-> term) -> unit
+  val set_builtin_get : lfun -> (term list -> term list -> term) -> unit
+  val set_builtin_field : lfun -> field -> (term list -> term) -> unit
   val set_builtin_1 : lfun -> unop -> unit
   val set_builtin_2 : lfun -> binop -> unit
   val set_builtin_2' : lfun -> (term -> term -> tau option -> term) -> unit
@@ -566,8 +579,11 @@ module N: sig
   val ( - ): F.binop
   (** {! F.p_sub } *)
 
-  val ( ~- ): F.unop
-  (** [fun x -> p_sub 0 x] *)
+  val ( ~-: ): F.unop
+  (** [fun x -> p_sub 0 x]
+      Beware that the operator does not have the same precedence as [~-] in
+      standard OCaml.
+  *)
 
   val ( * ): F.binop
   (** {! F.p_mul} *)
@@ -601,11 +617,17 @@ module N: sig
   val ( ==> ): F.operator
   (** {! F.p_imply } *)
 
-  val ( && ): F.operator
-  (** {! F.p_and } *)
+  val ( &&: ): F.operator
+  (** {! F.p_and }
+      Beware that the operator does not have the same precedence as [&&]
+      in standard OCaml.
+  *)
 
-  val ( || ): F.operator
-  (** {! F.p_or } *)
+  val ( ||: ): F.operator
+  (** {! F.p_or }
+      Beware that the operator does not have the same precedence as [||]
+      in standard OCaml.
+  *)
 
   val not: F.pred -> F.pred
   (** {! F.p_not } *)

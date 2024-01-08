@@ -26,6 +26,7 @@
   Frama_C_entropy_source ∈ [--..--]
   p ∈ {{ &__malloc_main1_l12 }}
   pp ∈ {{ &__malloc_main1_l12 }}
+  q ∈ UNINITIALIZED
   v ∈ [--..--]
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
@@ -144,6 +145,7 @@
   r ∈ {{ &__malloc_main3_l35[0] }}
   p ∈ {{ &__malloc_main3_l32[0] ; &__malloc_main3_l35[0] }}
   x ∈ {0; 1}
+  s ∈ UNINITIALIZED
   v ∈ [--..--]
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
@@ -241,6 +243,8 @@
   sizeq ∈ [0..10]
   p ∈ {{ &__malloc_main4_l55[0] }}
   q ∈ {{ &__malloc_main4_l56[0] }}
+  rp ∈ UNINITIALIZED
+  rq ∈ UNINITIALIZED
   v ∈ [--..--]
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
@@ -356,6 +360,7 @@
   p ∈ {{ &__malloc_main5_l76 }}
   c ∈ {0; 1}
   q ∈ {{ NULL ; &__malloc_main5_l76 }}
+  r ∈ UNINITIALIZED
   v ∈ [--..--]
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
@@ -695,7 +700,7 @@
 [eva] Recording results for main11
 [eva] Done for function main11
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   __fc_heap_status ∈ [--..--]

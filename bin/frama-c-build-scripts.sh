@@ -28,7 +28,7 @@ CMD="init"
 THIS_SCRIPT="$0"
 Usage () {
     echo "Usage: $(basename ${THIS_SCRIPT}) [<command>] [options] <script-dir> [<modules>]"
-    echo "  Build a script library to be used by Frama-C kernel."
+    echo "  Builds a script library to be used by the Frama-C kernel."
     echo ""
     echo "Commands:"
     echo "- init: generates dune files (default command)"
@@ -37,16 +37,16 @@ Usage () {
     echo ""
     echo "Options:"
     echo "  -help: prints usage information"
-    echo "  -package-name <name>: set the <name> of the package of the libraries (defaults to \"${PACKAGE}\")."
+    echo "  -package-name <name>: sets the <name> of the package of the libraries (defaults to \"${PACKAGE}\")."
     echo "                        note: once the dune-project file has been created, don't set another name."
     echo ""
     echo "Arguments:"
-    echo "  <script-dir>: directory that contents the script files:"
+    echo "  <script-dir>: directory that contains the script files:"
     echo "                - the basename of this directory fixes the name of the script library: ${PACKAGE}.<basename>"
-    echo "                - a 'dune' file is created (if it does not exists before) into this directory"
-    echo "                - a 'dune-project' file is created (if it does not exists before) into the parent directory"
+    echo "                - a 'dune' file is created (if it does not exist) in this directory"
+    echo "                - a 'dune-project' file is created (if it does not exist) in the parent directory"
     echo "                - note: the parent directory is './' when the script directory is also './'"
-    echo "  <modules>: names of the OCaml modules that compose the script (default to all OCaml modules of the script directory)"
+    echo "  <modules>: names of the OCaml modules that compose the script (defaults to all OCaml modules of the script directory)"
 }
 
 Error () {
@@ -72,26 +72,26 @@ while [ "$1" != "" ]; do
     shift
 done
 
-[ "$PACKAGE" != "" ] || Error "Missing option value: no package name"
-[ "$1" != "" ] || Error "Missing argument: no script directory"
+[ "$PACKAGE" != "" ] || Error "missing option value: package name"
+[ "$1" != "" ] || Error "missing argument: script directory"
 
 SCRIPT_DIR="$1"
 shift
 SCRIPT_FILES="$@"
 SCRIPT_LIBS=""
 
-[ -d "${SCRIPT_DIR}" ] || Error "Missing script directory: ${SCRIPT_DIR})"
+[ -d "${SCRIPT_DIR}" ] || Error "Script directory does not exist: ${SCRIPT_DIR})"
 
 ###############
 
 DuneProject () {
-    echo "(lang dune 3.0)"
+    echo "(lang dune 3.7)"
     echo "(generate_opam_files true)"
     echo "(name ${PACKAGE})"
     echo "(maintainers \"anonymous\")"
     echo "(package (name ${PACKAGE})"
     echo "  (depends"
-    echo "    (\"frama-c\" (>= 26.0))"
+    echo "    (\"frama-c\" (>= 28.0))"
     echo "  )"
     echo " (tags (\"Frama-C scripts\"))"
     echo ")"
@@ -118,7 +118,7 @@ Dune () {
 
 GenerateFile () {
     if [ -e "$2" ]; then
-        echo "$1 file exists already: $2"
+        echo "$1 file already exists: $2"
     else
         echo "- Creating $1 file: $2"
         $1 | while read p; do
@@ -151,7 +151,7 @@ DuneBuild() {
     echo ""
     echo "- Compiling the script library \"${PACKAGE}.${SCRIPT_NAME}\" via \"dune build @install\" command..."
     dune build @install
-    [ "$?" = "0" ] || Error "the compilation fails!"
+    [ "$?" = "0" ] || Error "compilation failure"
 }
 
 DuneInstall() {
@@ -170,16 +170,16 @@ GenerateFile Dune "${DUNE_FILE}"
 
 if [ "$CMD" = "init" ]; then
     echo ""
-    echo "To compile the all scripts defined inside this 'dune project' \"${PACKAGE}\", runs the following command:"
+    echo "To compile all scripts defined inside this 'dune project' \"${PACKAGE}\", run:"
     EchoDuneCmd "dune build @install"
 else
     DuneBuild
 fi
 echo ""
-echo "So, the script libraries, are compiled and installed into the local '_build' directory."
-echo "That also create or update the 'opam' file \"${PACKAGE}.opam\" allowing a global installation of all script libraries."
+echo "Script libraries have been compiled and installed into the local '_build' directory."
+echo "An 'opam' file \"${PACKAGE}.opam\" has been created/updated, allowing a global installation of all script libraries."
 echo ""
-echo "To load this script library from Frama-C, runs the following command:"
+echo "To load this script library from Frama-C, run the following command:"
 EchoDuneCmd "dune exec -- frama-c -load-library ${PACKAGE}.${SCRIPT_NAME} ..."
 
 if [ "$CMD" = "install" ]; then
@@ -190,5 +190,5 @@ else
     EchoDuneCmd "dune install"
 fi
 echo ""
-echo "Then, this script library can directly be loaded by Frama-C from the following command:"
+echo "After installation, this script library can be directly loaded by Frama-C with:"
 echo "  > frama-c -load-library ${PACKAGE}.${SCRIPT_NAME} ..."

@@ -76,8 +76,9 @@
   S_1_0_S_q_ss[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
   S_0_1_S_q_ss[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
   S_1_1_S_q_ss[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
-[kernel:annot:missing-spec] library.i:30: Warning: 
-  Neither code nor specification for function f_int, generating default assigns from the prototype
+[kernel:annot:missing-spec] library.i:5: Warning: 
+  Neither code nor specification for function f_int,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f_int <- main.
   Called from library.i:30.
 [eva] using specification for function f_int
@@ -86,7 +87,7 @@
   Called from library.i:31.
 [eva] using specification for function f_star_int
 [eva] Done for function f_star_int
-[eva] library.i:31: 
+[eva:garbled-mix:write] library.i:31: 
   Assigning imprecise value to G1.
   The imprecision originates from Library function {library.i:31}
 [eva:alarm] library.i:32: Warning: out of bounds write. assert \valid(G1);
@@ -95,8 +96,9 @@
 [eva:alarm] library.i:33: Warning: 
   out of bounds read. assert \valid_read(*(*G));
 [eva:alarm] library.i:33: Warning: out of bounds write. assert \valid(*(*(*G)));
-[kernel:annot:missing-spec] library.i:37: Warning: 
-  Neither code nor specification for function gen, generating default assigns from the prototype
+[kernel:annot:missing-spec] library.i:18: Warning: 
+  Neither code nor specification for function gen,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function gen <- main.
   Called from library.i:37.
 [eva] using specification for function gen
@@ -111,7 +113,7 @@
   Called from library.i:41.
 [eva] using specification for function i
 [eva] Done for function i
-[eva] library.i:41: 
+[eva:garbled-mix:write] library.i:41: 
   Assigning imprecise value to pf.
   The imprecision originates from Library function {library.i:41}
 [eva:alarm] library.i:42: Warning: out of bounds read. assert \valid_read(pf);
@@ -127,12 +129,12 @@
   Called from library.i:45.
 [eva] using specification for function k
 [eva] Done for function k
-[eva] library.i:45: 
+[eva:garbled-mix:write] library.i:45: 
   Assigning imprecise value to pd.
   The imprecision originates from Library function {library.i:45}
 [eva:alarm] library.i:46: Warning: out of bounds write. assert \valid(pd);
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] library.i:38: assertion 'Eva,function_pointer' got final status invalid.
 [eva] library.i:39: assertion 'Eva,function_pointer' got final status invalid.
 [eva] library.i:40: assertion 'Eva,function_pointer' got final status invalid.
@@ -280,7 +282,7 @@
 [eva:alarm] library.i:81: Warning: 
   assertion 'Unknown_Invalid' got status invalid (stopping propagation).
 [eva] Recording results for main2
-[eva] done for function main2
+[eva] Done for function main2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main2:
   
@@ -571,7 +573,7 @@
   assertion 'Unknown_Invalid' got status unknown.
 [eva] library.i:82: Frama_C_show_each_reached_3:
 [eva] Recording results for main2
-[eva] done for function main2
+[eva] Done for function main2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main2:
   

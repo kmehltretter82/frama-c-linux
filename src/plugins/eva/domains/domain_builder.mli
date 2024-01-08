@@ -73,16 +73,16 @@ end
 module Complete (Domain: InputDomain) : LeafDomain with type t := Domain.t
 
 module Complete_Minimal
-    (Value: Abstract_value.S)
-    (Location: Abstract_location.S)
+    (Value: Abstract_value.Leaf)
+    (Location: Abstract_location.Leaf)
     (Domain: Simpler_domains.Minimal)
   : Abstract_domain.Leaf with type value = Value.t
                           and type location = Location.location
                           and type state = Domain.t
 
 module Complete_Minimal_with_datatype
-    (Value: Abstract_value.S)
-    (Location: Abstract_location.S)
+    (Value: Abstract_value.Leaf)
+    (Location: Abstract_location.Leaf)
     (Domain: Simpler_domains.Minimal_with_datatype)
   : Abstract_domain.Leaf with type value = Value.t
                           and type location = Location.location
@@ -102,6 +102,6 @@ module Complete_Simple_Cvalue
 module Restrict
     (Value: Abstract_value.S)
     (Domain: Abstract.Domain.Internal with type value = Value.t)
-    (Scope: sig val functions: Domain_mode.function_mode list end)
+    (_: sig val functions: Domain_mode.function_mode list end)
   : Abstract.Domain.Internal with type value = Value.t
                               and type location = Domain.location

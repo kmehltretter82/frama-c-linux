@@ -56,7 +56,7 @@ val get: unit -> Cil_types.file
     @raise Bad_Initialization if neither {!File.init_from_c_files}
     nor {!File.init_project_from_cil_file} nor {!File.init_from_cmdline} was
     called before.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val compute: unit -> unit
 (** Enforce the computation of the AST.
@@ -71,14 +71,14 @@ val mark_as_changed: unit -> unit
 (** call this function whenever you've made some changes in place
     inside the AST
     @since Oxygen-20120901
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 val mark_as_grown: unit -> unit
 (** call this function whenever you have added something to the AST,
     without modifying the existing nodes
     @since Oxygen-20120901
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 val add_monotonic_state: State.t -> unit
@@ -88,12 +88,12 @@ val add_monotonic_state: State.t -> unit
     not erase such states, while {!Ast.mark_as_changed} and clearing Ast.self
     itself will.
     @since Oxygen-20120901
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 
 val self: State.t
 (** The state kind associated to the cil AST.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val apply_after_computed: (Cil_types.file -> unit) -> unit
 (** Apply the given hook just after building the AST.

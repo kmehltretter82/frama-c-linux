@@ -30,6 +30,9 @@
   q ∈ {{ &__malloc_main1_l10[0] }}
   r ∈ {{ &__malloc_main1_l8[0] ; &__malloc_main1_l10[0] }}
   tmp_1 ∈ {{ &__malloc_main1_l8[0] ; &__malloc_main1_l10[0] }}
+  u ∈ UNINITIALIZED
+  t ∈ UNINITIALIZED
+  s ∈ UNINITIALIZED
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   __malloc_main1_l8[0] ∈ UNINITIALIZED
@@ -68,7 +71,7 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   __fc_heap_status ∈ [--..--]

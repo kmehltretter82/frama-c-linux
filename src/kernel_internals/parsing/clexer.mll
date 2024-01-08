@@ -161,6 +161,7 @@ let init_lexicon _ =
          STATIC_ASSERT loc);
       ("__attribute__", fun loc -> ATTRIBUTE loc);
       ("__attribute", fun loc -> ATTRIBUTE loc);
+      ("_Nullable", fun loc -> NOP_ATTRIBUTE loc);
       ("__blockattribute__", fun _ -> BLOCKATTRIBUTE);
       ("__blockattribute", fun _ -> BLOCKATTRIBUTE);
       ("__asm__", fun loc -> ASM loc);
@@ -236,15 +237,15 @@ let init_lexicon _ =
          prevents duplicate error messages due to parsing errors. *)
       ("_Alignas",
        fun loc ->
-         Kernel.fatal ~source:(fst loc)
+         Kernel.abort ~source:(fst loc)
            "_Alignas is currently unsupported by Frama-C.");
       ("_Alignof",
        fun loc ->
-         Kernel.fatal ~source:(fst loc)
+         Kernel.abort ~source:(fst loc)
            "_Alignof is currently unsupported by Frama-C.");
       ("_Complex",
        fun loc ->
-         Kernel.fatal ~source:(fst loc)
+         Kernel.abort ~source:(fst loc)
            "_Complex is currently unsupported by Frama-C.");
       ("_Generic",
        fun loc ->
@@ -252,7 +253,7 @@ let init_lexicon _ =
          GENERIC loc);
       ("_Imaginary",
        fun loc ->
-         Kernel.fatal ~source:(fst loc)
+         Kernel.abort ~source:(fst loc)
            "_Imaginary is currently unsupported by Frama-C.");
      ]
 

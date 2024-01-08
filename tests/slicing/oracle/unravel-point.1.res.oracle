@@ -36,8 +36,9 @@
   signed overflow. assert *y + *x ≤ 2147483647;
 [eva] computing for function send1 <- main.
   Called from unravel-point.i:75.
-[kernel:annot:missing-spec] unravel-point.i:36: Warning: 
-  Neither code nor specification for function printf, generating default assigns from the prototype
+[kernel:annot:missing-spec] unravel-point.i:26: Warning: 
+  Neither code nor specification for function printf,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function printf <- send1 <- main.
   Called from unravel-point.i:36.
 [eva] using specification for function printf
@@ -78,7 +79,7 @@
 [eva] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] done for function main
+[eva] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to printf at unravel-point.i:36 (by send1):
   \result FROM __x1; "%d\n"

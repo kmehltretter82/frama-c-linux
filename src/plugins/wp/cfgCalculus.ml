@@ -388,7 +388,6 @@ struct
             "Unknown callee, considering non-terminating call" ;
           Logic_const.pfalse, Mcfg.MissingTerminates
         | Some callee ->
-          (* TODO: remove generated case when kernel support is available *)
           let generated, callee_t =
             (CfgAnnot.get_call_contract callee s).contract_terminates
           in
@@ -469,7 +468,7 @@ struct
 
   let do_preconditions env ~formals (b : CfgAnnot.behavior) w =
     let kf = env.mode.kf in
-    let init = Globals.is_entry_point ~when_lib_entry:false kf in
+    let init = CfgInfos.is_entry_point kf in
     let side_behaviors =
       if init || WpLog.PrecondWeakening.get () then []
       else CfgAnnot.get_preconditions ~goal:false kf in

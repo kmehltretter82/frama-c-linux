@@ -27,7 +27,7 @@
        [1] ∈ {12}
   ==END OF DUMP==
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   t[0] ∈ UNINITIALIZED

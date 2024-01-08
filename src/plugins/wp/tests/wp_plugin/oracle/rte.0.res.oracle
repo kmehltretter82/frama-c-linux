@@ -14,7 +14,13 @@
 [wp:rte] function job3: generate rte for division by zero
 [wp:rte] function job3: generate rte for signed overflow
 [rte:annot] annotating function job3
+[wp] [Valid] Goal job_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal job_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal job2_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal job2_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal job3_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal job3_terminates (Cfg) (Trivial)
 [wp] Goal typed_job_ensures : not tried
 [wp] Goal typed_job_assert_rte_mem_access : not tried
 [wp] Goal typed_job_assert_rte_mem_access_2 : not tried
@@ -29,7 +35,9 @@
       
       }
  */
-/*@ ensures R(\result); */
+/*@ terminates \true;
+    exits \false;
+    ensures R(\result); */
 int job(int *p, int n)
 {
   int __retres;
@@ -43,7 +51,9 @@ int job(int *p, int n)
   return __retres;
 }
 
-/*@ ensures R(\result); */
+/*@ terminates \true;
+    exits \false;
+    ensures R(\result); */
 unsigned int job2(unsigned int a, unsigned int b)
 {
   unsigned int __retres;
@@ -52,7 +62,9 @@ unsigned int job2(unsigned int a, unsigned int b)
 }
 
 _Bool X;
-/*@ ensures R(\result); */
+/*@ terminates \true;
+    exits \false;
+    ensures R(\result); */
 int job3(void)
 {
   int __retres;

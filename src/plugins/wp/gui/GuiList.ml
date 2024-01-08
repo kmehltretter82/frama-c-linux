@@ -51,13 +51,13 @@ let render_prover_result p =
   let icn_cut     = icn_stock "gtk-cut" in
   let icn_running = icn_stock "gtk-execute" in
   let open VCS in
-  let icon_of_verdict = function
+  let icon_of_verdict ~smoke = function
     | NoResult -> icn_none
-    | Valid    -> icn_valid
-    | Invalid  -> icn_invalid
-    | Unknown  -> icn_unknown
+    | Valid    -> if smoke then icn_invalid else icn_valid
+    | Invalid  -> if smoke then icn_valid else icn_invalid
+    | Unknown  -> if smoke then icn_valid else icn_unknown
+    | Timeout | Stepout -> if smoke then icn_valid else icn_cut
     | Failed   -> icn_failed
-    | Timeout | Stepout -> icn_cut
     | Computing _ -> icn_running
   in fun w ->
     match Wpo.get_result w p , p with
@@ -71,8 +71,7 @@ let render_prover_result p =
         | `Saved -> icn_stock "gtk-file"
       end
     | result , _ ->
-      let smoke = Wpo.is_smoke_test w in
-      icon_of_verdict (VCS.verdict ~smoke result)
+      icon_of_verdict ~smoke:(Wpo.is_smoke_test w) result.verdict
 
 class pane (gprovers:GuiConfig.provers) =
   let model = new model in

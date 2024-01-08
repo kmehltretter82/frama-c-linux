@@ -41,6 +41,9 @@ type mode =
 module Pset : Set.S with type elt = prover
 module Pmap : Map.S with type key = prover
 
+(** Mainstream installed provers *)
+val provers : unit -> prover list
+
 val name_of_prover : prover -> string
 val title_of_prover : ?version:bool -> prover -> string
 val filename_for_prover : prover -> string
@@ -64,6 +67,7 @@ type config = {
   valid : bool ;
   timeout : float option ;
   stepout : int option ;
+  memlimit : int option ;
 }
 
 val current : unit -> config (** Current parameters *)
@@ -73,18 +77,22 @@ val default : config (** all None *)
 val get_timeout : ?kf:Kernel_function.t -> smoke:bool -> config -> float
 (** 0.0 means no-timeout *)
 
-val get_stepout : config -> int (** 0 means no-stepout *)
+val get_stepout : config -> int
+(** 0 means no-stepout *)
+
+val get_memlimit : config -> int
+(** 0 means no-memlimit *)
 
 (** {2 Results} *)
 
 type verdict =
   | NoResult
-  | Invalid
   | Unknown
   | Timeout
   | Stepout
   | Computing of (unit -> unit) (* kill function *)
   | Valid
+  | Invalid (* model *)
   | Failed
 
 type model = Why3Provers.model Probe.Map.t
@@ -102,7 +110,6 @@ type result = {
 
 val no_result : result
 val valid : result
-val invalid : result
 val unknown : result
 val stepout : int -> result
 val timeout : float -> result
@@ -121,10 +128,7 @@ val is_valid: result -> bool
 val is_trivial: result -> bool
 val is_not_valid: result -> bool
 val is_computing: result -> bool
-val is_proved: smoke:bool -> result -> bool
-
-val smoked : verdict -> verdict
-val verdict: smoke:bool -> result -> verdict
+val is_proved: smoke:bool -> verdict -> bool
 
 val configure : result -> config
 val autofit : result -> bool (** Result that fits the default configuration *)
@@ -136,12 +140,8 @@ val pp_model : Format.formatter -> model -> unit
 val pp_result_qualif : ?updating:bool -> prover -> result ->
   Format.formatter -> unit
 
-val compare : result -> result -> int (* best is minimal *)
-
-val combine : verdict -> verdict -> verdict
-val merge : result -> result -> result
-val leq : result -> result -> bool
-val choose : result -> result -> result
-val best : result list -> result
+val conjunction : verdict -> verdict -> verdict (* for tactic children *)
+val compare : result -> result -> int (* minimal is best *)
+val best : (prover * result) list -> prover * result
 
 val dkey_shell: Wp_parameters.category

@@ -26,7 +26,7 @@ module G = Services.G
 
 (* --- Package declaration --- *)
 
-let package = Package.package ~plugin:"callgraph" ~title:"Callgraph" ()
+let package = Package.package ~plugin:"callgraph" ~title:"Callgraph Services" ()
 
 
 (* --- Helper modules --- *)
@@ -60,11 +60,13 @@ module Vertex =
 struct
   include Record ()
 
-  let kf = field "kf" (module Kernel_ast.Function)
-      ~descr: "The function represented by the node"
+  let name = field "name" (module Data.Jstring)
+      ~descr: "The function name of the node"
+  let decl = field "decl" (module Kernel_ast.Decl)
+      ~descr: "The declaration tag of the function"
   let is_root = field "is_root" Data.jbool
       ~descr: "whether this node is the root of a service"
-  let root = field "root" (module Kernel_ast.Function)
+  let root = field "root" (module Kernel_ast.Decl)
       ~descr: "the root of this node's service"
 
   include (val publish "vertex")
@@ -72,9 +74,10 @@ struct
 
   let to_json (v : Cil_types.kernel_function Service_graph.vertex) =
     default |>
-    set kf v.node |>
+    set name (Kernel_function.get_name v.node) |>
+    set decl (Printer_tag.SFunction v.node) |>
+    set root (SFunction v.root.node) |>
     set is_root v.is_root |>
-    set root v.root.node |>
     to_json
 
   let of_json _js = Data.failure "Vertex.of_json not implemented"
@@ -101,8 +104,8 @@ module Edge =
 struct
   include Record ()
 
-  let src = field "src" (module Kernel_ast.Function)
-  let dst = field "dst" (module Kernel_ast.Function)
+  let src = field "src" (module Kernel_ast.Decl)
+  let dst = field "dst" (module Kernel_ast.Decl)
   let kind = field "kind" (module EdgeKind)
 
   include (val publish "edge")
@@ -110,8 +113,8 @@ struct
 
   let to_json (e : t) =
     default |>
-    set src (G.E.src e).node |>
-    set dst (G.E.dst e).node |>
+    set src (SFunction (G.E.src e).node) |>
+    set dst (SFunction (G.E.dst e).node) |>
     set kind (G.E.label e) |>
     to_json
 

@@ -66,15 +66,15 @@
   function close: precondition 'valid_fd' got status valid.
 [eva] Done for function close
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ [--..--]
   __fc_fds[0..1023] ∈ [--..--]
   out_fd ∈ [-1..1023] or UNINITIALIZED
   in_fd ∈ [-1..1023]
-  offset ∈ [--..--]
+  offset ∈ [--..--] or UNINITIALIZED
   r1 ∈ [-1..42] or UNINITIALIZED
   r3 ∈ [-1..42] or UNINITIALIZED
-  r ∈ {-1; 0}
+  r ∈ {-1; 0} or UNINITIALIZED
   __retres ∈ {0; 1}

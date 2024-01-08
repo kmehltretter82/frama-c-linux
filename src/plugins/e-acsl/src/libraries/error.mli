@@ -92,7 +92,7 @@ module type S = sig
 end
 
 (** Functor to build an [Error] module for a given [phase]. *)
-module Make(P: sig val phase:Options.category end): S
+module Make(_: sig val phase:Options.category end): S
 
 (** The [Error] module implements [Error.S] with no phase. *)
 include S

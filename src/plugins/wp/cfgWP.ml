@@ -486,6 +486,9 @@ struct
   let add_vc
       target ?(warn=Warning.Set.empty) ?(deps=Property.Set.empty) pred vcs =
     let xs , hs , goal = introduction pred in
+    if Gmap.mem target vcs then
+      Wp_parameters.failure
+        "Multiple goals for the same target (%a)" TARGET.pretty target ;
     let hyps = Conditions.intros hs Conditions.nil in
     let vc = { empty_vc with goal ; vars=xs ; hyps ; warn ; deps } in
     Gmap.add target (Splitter.singleton vc) vcs
@@ -1570,7 +1573,7 @@ struct
       po_gid = "" ;
       po_name = "" ;
       po_idx = index ;
-      po_formula = GoalAnnot vcq ;
+      po_formula = vcq ;
     }
 
   (* -------------------------------------------------------------------------- *)
@@ -1646,10 +1649,15 @@ struct
       let id = WpPropId.mk_lemma_id l in
       let def = L.lemma l in
       let model = WpContext.get_model () in
+      let sequent = Conditions.lemma def.l_lemma in
       let vca = {
-        Wpo.VC_Lemma.depends = l.lem_depends ;
-        Wpo.VC_Lemma.lemma = def ;
-        Wpo.VC_Lemma.sequent = None ;
+        Wpo.VC_Annot.axioms = Some (def.l_cluster, l.lem_depends) ;
+        goal = GOAL.make sequent ;
+        tags = [] ;
+        warn = [] ; (* TODO: complete *)
+        deps = Property.Set.empty ;
+        path = Stmt.Set.empty ;
+        source = None ;
       } in
       let index = match LogicUsage.section_of_lemma l.lem_name with
         | LogicUsage.Toplevel _ -> Wpo.Axiomatic None
@@ -1663,7 +1671,7 @@ struct
         Wpo.po_name = Printf.sprintf "Lemma '%s'" l.lem_name ;
         Wpo.po_idx = index ;
         Wpo.po_pid = id ;
-        Wpo.po_formula = Wpo.GoalLemma vca ;
+        Wpo.po_formula = vca ;
       } in
       Wpo.add wpo ; wpo
     end

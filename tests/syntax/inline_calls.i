@@ -95,7 +95,7 @@ void post_decl(void);
 extern int x;
 
 void pre_decl() {
-  extern int y = 23;
+  extern int y;
   x++; y++;
   post_decl();
 }

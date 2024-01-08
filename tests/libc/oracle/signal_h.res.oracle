@@ -152,7 +152,7 @@
 [eva] signal_h.c:60: assertion 'sigsuspend_errno_eintr' got status valid.
 [eva] signal_h.c:61: assertion 'sigsuspend_return' got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ [--..--]
@@ -289,7 +289,7 @@
   s ∈ [--..--]
   uninit ∈ UNINITIALIZED
   old ∈ [--..--] or UNINITIALIZED
-  kill_res ∈ {-1; 0}
+  kill_res ∈ {-1; 0} or UNINITIALIZED
   sa1 ∈
      {{ garbled mix of &{__fc_sigaction}
       (origin: Library function {signal_h.c:45}) }} or UNINITIALIZED

@@ -55,52 +55,53 @@ module Temp = struct (* Almost copied from configurator *)
     try_name 0
 end
 
-module C_compiler = struct (* This could be put in Dune? *)
+module C_preprocessor = struct (* This could be put in Dune? *)
   type t =
-    { compiler: string
-    ; is_gnu: bool
+    { preprocessor: string
+    ; pp_opt: string option
     }
 
-  let find_compiler configurator =
-    let cc_env = try Sys.getenv "CC" with Not_found -> "" in
-    if cc_env <> "" then cc_env
+  let stdout_contains out str =
+    let re = Str.regexp_string str in
+    try ignore (Str.search_forward re out 0); true
+    with Not_found -> false
+
+  let find_preprocessor configurator =
+    let cc_env = try Sys.getenv "CPP" with Not_found -> "" in
+    if cc_env <> "" then (cc_env, None) (* assume default CPP needs no args *)
     else
-      let finder compiler = C.which configurator compiler |> Option.is_some in
-      try List.find finder [ "gcc"; "cc"; "cl.exe" ]
-      with Not_found -> C.die "Could not find a C compiler"
+      let finder (command, _pp_opt) =
+        C.which configurator command |> Option.is_some
+      in
+      (* Note: We could add 'cl.exe' to the list, but since it requires
+         '/<opt>' and not '-<opt>' for its options, it will fail in every
+         check anyway. So the user may manually specify it if they want it,
+         but having it here brings no benefit.
+         Note: 'cpp' is NOT the POSIX way to call the preprocessor, and it
+         behaves VERY badly on macOS (as if using '-traditional', see
+         https://stackoverflow.com/questions/9508159).
+         Therefore, we try `gcc -E` and `cc -E`, but not 'cpp'.
+      *)
+      try List.find finder [("gcc", Some "-E"); ("cc", Some "-E")]
+      with Not_found -> C.die "Could not find a C preprocessor"
 
   let write_file name code =
     let out = open_out name in
     Printf.fprintf out "%s" code ;
     close_out out
 
-  let call configurator compiler options code =
+  let call configurator preprocessor options code =
     let dir = Temp.create_dir () in
     let file =
       Temp.create ~dir ~suffix:".c" (fun name -> write_file name code) in
-    C.Process.run configurator ~dir compiler (options @ [ file ])
-
-
-  let preprocess_flag = "-E"
-
-  let is_gnu configurator compiler =
-    let code = {|#ifndef __GNUC__
-      this is not a gnuc compiler
-#endif
-|}
-    in
-    (call configurator compiler ["-c"] code).exit_code = 0
+    C.Process.run configurator ~dir preprocessor (options @ [ file ])
 
   let get configurator =
-    let compiler = find_compiler configurator in
-    let is_gnu = is_gnu configurator compiler in
-    { compiler ; is_gnu }
+    let preprocessor, pp_opt = find_preprocessor configurator in
+    { preprocessor ; pp_opt }
 
-  let preprocess configurator t options =
-    call configurator t.compiler (preprocess_flag :: options)
-
-  let _compile configurator t options =
-    call configurator t.compiler ("-c" :: options)
+  let preprocess configurator t options code =
+    call configurator t.preprocessor (Option.to_list t.pp_opt @ options) code
 end
 
 (* Frama-C specific part *)
@@ -113,40 +114,39 @@ module Cpp = struct
 int main(){}
 |}
 
-    let check configurator compiler =
+    let check configurator preprocessor =
       let options = ["-dD" ; "-nostdinc"] in
-      (C_compiler.preprocess configurator compiler options code).exit_code = 0
+      (C_preprocessor.preprocess configurator preprocessor options code).exit_code = 0
   end
 
   module KeepComments = struct
     let code =
       {|/* Check whether comments are kept in output */|}
 
-    let check configurator compiler options =
-      let result = C_compiler.preprocess configurator compiler options code in
-      result.exit_code = 0 &&
-      let re = Str.regexp_string "kept" in
-      try ignore (Str.search_forward re result.stdout 0); true
-      with Not_found -> false
+    let keep_comments_option = "-C"
+
+    let check configurator preprocessor =
+      let result = C_preprocessor.preprocess configurator preprocessor [keep_comments_option] code in
+      result.exit_code = 0 && C_preprocessor.stdout_contains result.stdout "kept"
   end
 
   module Archs = struct
     let opt_m_code value =
       Format.asprintf {|/* Check if preprocessor supports option -m%s */|} value
 
-    let check configurator compiler arch =
+    let check configurator preprocessor arch =
       let code = opt_m_code arch in
       let options = [ Format.asprintf "-m%s" arch ] in
-      if (C_compiler.preprocess configurator compiler options code).exit_code = 0
+      if (C_preprocessor.preprocess configurator preprocessor options code).exit_code = 0
       then Some arch else None
 
-    let supported_archs configurator compiler archs =
-      let check = check configurator compiler in
+    let supported_archs configurator preprocessor archs =
+      let check = check configurator preprocessor in
       List.map (fun s -> "-m" ^ s) @@ List.filter_map check archs
   end
 
   type t =
-    { compiler : C_compiler.t
+    { preprocessor : C_preprocessor.t
     ; default_args : string list
     ; is_gnu_like : bool
     ; keep_comments : bool
@@ -154,13 +154,13 @@ int main(){}
     }
 
   let get configurator =
-    let compiler = C_compiler.get configurator in
-    let default_args = [ "-C" ; "-I." ] in
-    let is_gnu_like = GnuLike.check configurator compiler in
-    let keep_comments = KeepComments.check configurator compiler [ "-C" ] in
+    let preprocessor = C_preprocessor.get configurator in
+    let default_args = Option.to_list preprocessor.pp_opt @ [ "-C" ; "-I." ] in
+    let is_gnu_like = GnuLike.check configurator preprocessor in
+    let keep_comments = KeepComments.check configurator preprocessor in
     let supported_archs_opts =
-      Archs.supported_archs configurator compiler [ "16" ; "32" ; "64" ] in
-    { compiler; default_args; is_gnu_like; keep_comments; supported_archs_opts }
+      Archs.supported_archs configurator preprocessor [ "16" ; "32" ; "64" ] in
+    { preprocessor; default_args; is_gnu_like; keep_comments; supported_archs_opts }
 
   let pp_flags fmt =
     let pp_sep fmt () = Format.fprintf fmt " " in
@@ -168,8 +168,8 @@ int main(){}
 
   let pp_default_cpp fmt cpp =
     Format.fprintf fmt "%s %a"
-      cpp.compiler.compiler
-      pp_flags (C_compiler.preprocess_flag :: cpp.default_args)
+      cpp.preprocessor.preprocessor
+      pp_flags cpp.default_args
 
   let pp_archs fmt cpp =
     let pp_arch fmt arch = Format.fprintf fmt "\"%s\"" arch in

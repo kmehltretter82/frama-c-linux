@@ -11,13 +11,15 @@
   s1 ∈ {0}
   si[0..1] ∈ {0}
   so[0..1] ∈ {0}
-[kernel:annot:missing-spec] bts334.i:66: Warning: 
-  Neither code nor explicit assigns clause for function init, generating default assigns from the specification
+[kernel:annot:missing-spec] bts334.i:61: Warning: 
+  Neither code nor explicit assigns for function init,
+   generating default clauses from the specification. See -generated-spec-* options for more info
 [eva] computing for function init <- main_init.
   Called from bts334.i:66.
 [eva] using specification for function init
 [eva] bts334.i:61: Warning: 
   no 'assigns \result \from ...' clause specified for function init
+[kernel] bts334.i:66: Warning: keeping only assigns from behaviors: default
 [eva] Done for function init
 [eva:alarm] bts334.i:67: Warning: 
   accessing uninitialized left-value. assert \initialized(&is_ok);
@@ -102,7 +104,7 @@
 [eva] Recording results for main_init
 [from] Computing for function main_init
 [from] Done for function main_init
-[eva] done for function main_init
+[eva] Done for function main_init
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to f at bts334.i:38 (by loop_body):
   si[0] FROM vi; i

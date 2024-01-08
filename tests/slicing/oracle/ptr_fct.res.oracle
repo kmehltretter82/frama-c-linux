@@ -8,8 +8,9 @@
   ptf ∈ {0}
 [eva] computing for function g <- h.
   Called from ptr_fct.i:23.
-[kernel:annot:missing-spec] ptr_fct.i:17: Warning: 
-  Neither code nor specification for function f2, generating default assigns from the prototype
+[kernel:annot:missing-spec] ptr_fct.i:11: Warning: 
+  Neither code nor specification for function f2,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f2 <- g <- h.
   Called from ptr_fct.i:17.
 [eva] using specification for function f2
@@ -21,7 +22,7 @@
 [eva] Recording results for g
 [eva] Done for function g
 [eva] Recording results for h
-[eva] done for function h
+[eva] Done for function h
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function h

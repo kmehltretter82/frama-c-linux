@@ -56,8 +56,7 @@ module InOutCallback =
     end)
 
 let register_callback () =
-  Db.Operational_inputs.Record_Inout_Callbacks.extend_once
-    (fun (_stack, inout) -> InOutCallback.set inout)
+  Db.Operational_inputs.Record_Inout_Callbacks.extend_once InOutCallback.set
 
 let () = Cmdline.run_after_configuring_stage register_callback
 
@@ -114,12 +113,13 @@ let substitution_visitor table = object
     | Some vi -> Cil.ChangeTo vi
 end
 
-module Make (Abstract: Abstractions.Eva) = struct
+module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   module Value = Abstract.Val
   module Location = Abstract.Loc
   module Domain = Abstract.Dom
   module Eval = Abstract.Eval
+  include Cvalue_domain.Getters (Domain)
 
   type state = Domain.t
   type value = Value.t
@@ -312,7 +312,7 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* Returns the result of a call, and a boolean that indicates whether a
      builtin has been used to interpret the call. *)
   let process_call stmt call recursion valuation state =
-    Eva_utils.push_call_stack call.kf (Kstmt stmt);
+    Eva_utils.push_call_stack call.kf stmt;
     let cleanup () =
       Eva_utils.pop_call_stack ();
       (* Changed by compute_call_ref, called from process_call *)
@@ -324,7 +324,8 @@ module Make (Abstract: Abstractions.Eva) = struct
         (* Process the call according to the domain decision. *)
         match Domain.start_call stmt call recursion domain_valuation state with
         | `Value state ->
-          Domain.Store.register_initial_state (Eva_utils.call_stack ()) state;
+          let callstack = Eva_utils.current_call_stack () in
+          Domain.Store.register_initial_state callstack call.kf state;
           !compute_call_ref stmt call recursion state
         | `Bottom ->
           { states = []; cacheable = Cacheable; builtin=false }
@@ -533,7 +534,7 @@ module Make (Abstract: Abstractions.Eva) = struct
   (* Create an Eval.call *)
   let create_call stmt kf args =
     let return = Library_functions.get_retres_vi kf in
-    let callstack = (kf, Kstmt stmt) :: Eva_utils.call_stack () in
+    let callstack = Callstack.push kf stmt (Eva_utils.current_call_stack ()) in
     let arguments, rest =
       let formals = Kernel_function.get_formals kf in
       let rec format_arguments acc args formals = match args, formals with
@@ -633,7 +634,7 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* For non scalar expressions, prints the offsetmap of the cvalue domain. *)
   let show_offsm =
-    match Domain.get_cvalue, Location.get Main_locations.PLoc.key with
+    match get_cvalue, Location.get Main_locations.PLoc.key with
     | None, _ | _, None ->
       fun fmt _ _ _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
     | Some get_cvalue, Some get_ploc ->
@@ -727,12 +728,16 @@ module Make (Abstract: Abstractions.Eva) = struct
 
   (* Legacy callbacks for the cvalue domain, usually called by
      {Cvalue_transfer.start_call}. *)
-  let apply_cvalue_callback kf ki_call state =
-    let stack_with_call = (kf, ki_call) :: Eva_utils.call_stack () in
-    let cvalue_state = Domain.get_cvalue_or_top state in
-    Db.Value.Call_Value_Callbacks.apply (cvalue_state, stack_with_call);
-    let kind = `Builtin None in
-    Cvalue_callbacks.apply_call_hooks stack_with_call kf kind cvalue_state
+  let apply_cvalue_callback kf stmt state =
+    (* Generates assigns clauses for other plugins, as they may use
+       the directive specification. *)
+    Populate_spec.populate_funspec kf [`Assigns];
+    let call_stack = Eva_utils.current_call_stack () in
+    let stack_with_call = Callstack.push kf stmt call_stack in
+    let cvalue_state = get_cvalue_or_top state in
+    Cvalue_callbacks.apply_call_hooks stack_with_call kf cvalue_state `Builtin;
+    Cvalue_callbacks.apply_call_results_hooks stack_with_call kf cvalue_state
+      (`Builtin ([cvalue_state], None))
 
   (* --------------------- Process the call statement ---------------------- *)
 
@@ -751,7 +756,7 @@ module Make (Abstract: Abstractions.Eva) = struct
         (* The special Frama_C_ functions to print states are handled here. *)
         if apply_special_directives ~subdivnb kf args state
         then
-          let () = apply_cvalue_callback kf ki_call state in
+          let () = apply_cvalue_callback kf stmt state in
           [(Partition.Key.empty, state)]
         else
           (* Create the call. *)

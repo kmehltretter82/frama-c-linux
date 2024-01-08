@@ -25,20 +25,25 @@ open Cil_types
 (** Mark the analysis as aborted. It will be stopped at the next safe point *)
 val signal_abort: unit -> unit
 
+(** Provided [stmt] is an 'if' construct, [fst (condition_truth_value stmt)]
+    (resp. snd) is true if and only if the condition of the 'if' has been
+    evaluated to true (resp. false) at least once during the analysis. *)
+val condition_truth_value: stmt -> bool * bool
+
 module Computer
     (* Abstractions with the evaluator. *)
-    (Abstract: Abstractions.Eva)
+    (Abstract: Abstractions.S_with_evaluation)
     (* Set of states of abstract domain. *)
     (States : Powerset.S with type state = Abstract.Dom.t)
     (* Transfer functions for statement on the abstract domain. *)
-    (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t
-                                 and type value = Abstract.Val.t)
+    (_ : Transfer_stmt.S with type state = Abstract.Dom.t
+                          and type value = Abstract.Val.t)
     (* Initialization of local variables. *)
-    (Init: Initialization.S with type state := Abstract.Dom.t)
+    (_: Initialization.S with type state := Abstract.Dom.t)
     (* Transfer functions for the logic on the abstract domain. *)
-    (Logic : Transfer_logic.S with type state = Abstract.Dom.t
-                               and type states = States.t)
-    (Spec: sig
+    (_ : Transfer_logic.S with type state = Abstract.Dom.t
+                           and type states = States.t)
+    (_: sig
        val treat_statement_assigns: assigns -> Abstract.Dom.t -> Abstract.Dom.t
      end)
   : sig
@@ -49,7 +54,6 @@ module Computer
       (Partition.key * Abstract.Dom.t) list * Eval.cacheable
 
   end
-
 
 (*
 Local Variables:

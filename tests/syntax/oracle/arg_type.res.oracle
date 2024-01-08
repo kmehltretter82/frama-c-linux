@@ -2,6 +2,10 @@
 [kernel] arg_type.i:15: User Error: 
   Declaration of g does not match previous declaration from arg_type.i:13 (different integer types:
   'int' and 'short').
-[kernel] arg_type.i:15: User Error: Cannot resolve variable x
-[kernel] User Error: stopping on file "arg_type.i" that has errors.
+[kernel] arg_type.i:15: User Error: 
+  Cannot resolve variable x
+  13    int g(int);
+  14    
+  15    int g(short x) { return x; }
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 [kernel] Frama-C aborted: invalid user input.

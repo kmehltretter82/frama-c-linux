@@ -16,7 +16,7 @@
 [eva:alarm] call_simple.i:15: Warning: 
   signed overflow. assert ll + 1 ≤ 2147483647;
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   X ∈ {68}

@@ -58,7 +58,7 @@ type t = private
 
   | Structure of structure
   (** Provide a description of the representation of data.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | T_pack of single_pack (** Internal use only.
                               Do not use it outside the library *)
@@ -71,7 +71,7 @@ and structure = private
       of their declarations in that type).  Each element of this latter array
       is an array of [t] that describes (in order) the fields of the
       corresponding constructor.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   | Array of pack (** The data is an array of values of the same type, each
                       value being described by the pack. *)
@@ -82,7 +82,7 @@ and structure = private
 
 val pack: t -> pack
 (** Pack a structural descriptor in order to embed it inside another one.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val recursive_pack: recursive -> pack
 (** Pack a recursive descriptor.
@@ -145,7 +145,7 @@ val p_abstract: pack
 
 val p_unit : pack
 val p_int : pack
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val p_string : pack
 val p_float : pack

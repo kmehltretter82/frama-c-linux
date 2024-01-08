@@ -35,8 +35,9 @@
 [eva] Done for function strcpy
 [eva:alarm] search_h.c:32: Warning: 
   out of bounds write. assert \valid(&elementptr->count);
-[kernel:annot:missing-spec] search_h.c:34: Warning: 
-  Neither code nor specification for function tsearch, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/search.h:61: Warning: 
+  Neither code nor specification for function tsearch,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function tsearch <- main.
   Called from search_h.c:34.
 [eva] using specification for function tsearch
@@ -54,8 +55,9 @@
 [eva] Done for function exit
 [eva:alarm] search_h.c:40: Warning: 
   out of bounds read. assert \valid_read((struct element **)node);
-[kernel:annot:missing-spec] search_h.c:46: Warning: 
-  Neither code nor specification for function twalk, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/search.h:64: Warning: 
+  Neither code nor specification for function twalk,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function twalk <- main.
   Called from search_h.c:46.
 [eva] using specification for function twalk
@@ -63,7 +65,7 @@
   Completely invalid destination for assigns clause *action. Ignoring.
 [eva] Done for function twalk
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] search_h.c:40: assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

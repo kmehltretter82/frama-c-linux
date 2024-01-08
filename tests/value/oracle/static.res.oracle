@@ -21,7 +21,7 @@
 [eva] Done for function f
 [eva] static.i:20: Reusing old results for call to f
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   __retres ∈ {{ &f_x }}

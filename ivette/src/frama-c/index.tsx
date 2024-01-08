@@ -20,15 +20,15 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* --------------------------------------------------------------------------*/
-/* --- Frama-C Registry                                                   ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Frama-C Registry                                                   --- */
+/* -------------------------------------------------------------------------- */
 
 import React from 'react';
 import * as Ivette from 'ivette';
 
 import History from 'frama-c/kernel/History';
-import Globals from 'frama-c/kernel/Globals';
+import { Functions, Globals, Types } from 'frama-c/kernel/Globals';
 import Status from 'frama-c/kernel/Status';
 import ASTview from 'frama-c/kernel/ASTview';
 import ASTinfo from 'frama-c/kernel/ASTinfo';
@@ -44,17 +44,31 @@ import * as Menu from 'frama-c/menu';
 
 Menu.init();
 
-/* --------------------------------------------------------------------------*/
-/* --- Frama-C Kernel Groups                                              ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Frama-C Tools                                                      --- */
+/* -------------------------------------------------------------------------- */
+
+Ivette.registerSidebar({
+  id: 'frama-c.globals',
+  label: 'AST',
+  children: <>
+    <Types />
+    <Globals />
+    <Functions />
+  </>
+});
+
+Ivette.registerToolbar({ id: 'frama-c.history', children: <History /> });
+Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
+
+/* -------------------------------------------------------------------------- */
+/* --- Frama-C Kernel Groups                                              --- */
+/* -------------------------------------------------------------------------- */
 
 Ivette.registerGroup({
   id: 'frama-c.kernel',
   label: 'Frama-C Kernel',
 }, () => {
-  Ivette.registerSidebar({ id: 'frama-c.globals', children: <Globals /> });
-  Ivette.registerToolbar({ id: 'frama-c.history', children: <History /> });
-  Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
   Ivette.registerComponent({
     id: 'frama-c.astinfo',
     label: 'Inspector',
@@ -99,18 +113,18 @@ Ivette.registerGroup({
   });
 });
 
-/* --------------------------------------------------------------------------*/
-/* --- Frama-C Plug-ins Group                                             ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Frama-C Plug-ins Group                                             --- */
+/* -------------------------------------------------------------------------- */
 
 Ivette.registerGroup({
   id: 'frama-c.plugins',
   label: 'Frama-C Plug-ins',
 });
 
-/* --------------------------------------------------------------------------*/
-/* --- Frama-C Views                                                      ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Frama-C Views                                                      --- */
+/* -------------------------------------------------------------------------- */
 
 Ivette.registerView({
   id: 'source',
@@ -142,4 +156,4 @@ Ivette.registerView({
   ],
 });
 
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */

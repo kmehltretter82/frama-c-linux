@@ -54,9 +54,11 @@ val range : int -> int -> selection
 val compose : string -> selection list -> selection
 val multi : selection list -> selection
 val get_int : selection -> int option
+val get_bool : selection -> bool option
 val destruct : selection -> selection list
 
 val head : clause -> pred
+val equal : selection -> selection -> bool
 val is_empty : selection -> bool
 val selected : selection -> term
 val subclause : clause -> pred -> bool
@@ -88,17 +90,19 @@ end
 type 'a named = { title : string ; descr : string ; vid : string ; value : 'a }
 type 'a range = { vmin : 'a option ; vmax : 'a option ; vstep : 'a }
 type 'a browser = ('a named -> unit) -> selection -> unit
+type 'a finder = string -> 'a named
 
 type parameter =
   | Checkbox of bool field
   | Spinner  of int field * int range
   | Composer of selection field * (Lang.F.term -> bool)
   | Selector : 'a field * 'a named list * ('a -> 'a -> bool) -> parameter
-  | Search : 'a named option field * 'a browser * (string -> 'a) -> parameter
+  | Search : 'a named option field * 'a browser * 'a finder -> parameter
 
 val ident : 'a field -> string
 val default : 'a field -> 'a
 val signature : 'a field -> 'a named
+val pident : parameter -> string
 
 val checkbox :
   id:string -> title:string -> descr:string ->
@@ -134,7 +138,7 @@ val composer :
 val search :
   id:string -> title:string -> descr:string ->
   browse:('a browser) ->
-  find:(string -> 'a) ->
+  find:('a finder) ->
   unit -> 'a named option field * parameter
 (** Search field.
     - [browse s n] is the lookup function, used in the GUI only.
@@ -254,8 +258,11 @@ val register : #tactical -> unit
 val export : #tactical -> tactical
 (** Register and returns the tactical *)
 
-val lookup : id:string -> tactical
 val iter : (tactical -> unit) -> unit
+val lookup : id:string -> tactical
+val lookup_param : tactical -> id:string -> parameter
 
+type computer = term list -> term
+val add_computer : string -> computer -> unit
 val add_composer : #composer -> unit
 val iter_composer : (composer -> unit) -> unit

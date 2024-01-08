@@ -42,7 +42,7 @@
 [eva] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] done for function main
+[eva] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to init at loop2.i:24 (by main):
   u[0..9] FROM v (and SELF)
@@ -144,7 +144,7 @@
 [eva] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] done for function main
+[eva] Done for function main
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to init at loop2.i:24 (by main):
   u[0..9] FROM v

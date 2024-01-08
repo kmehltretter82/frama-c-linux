@@ -209,7 +209,7 @@
 [eva] wchar_c_h.c:76: Call to builtin free
 [eva] wchar_c_h.c:76: function free: precondition 'freeable' got status valid.
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function wcscpy:
   i ∈ {8}
@@ -307,12 +307,13 @@
   r ∈ [--..--] or UNINITIALIZED
   i ∈ [--..--]
   res ∈ {{ NULL ; &buf[0] ; L"Needle" + [0..--],0%4 }}
-  wc_0 ∈ {{ L"ABC" }}
-  p ∈ {{ L"ABC" + {4} }}
-  wcr ∈ {{ L"ABC" + {8} }}
-  wmr1 ∈ {0}
-  wmr2 ∈ {{ L"ABC" + {8} }}
-  dupbuf ∈ {{ NULL ; &__malloc_wcsdup_l99_0[0] }} or ESCAPINGADDR
+  wc_0 ∈ {{ L"ABC" }} or UNINITIALIZED
+  p ∈ {{ L"ABC" + {4} }} or UNINITIALIZED
+  wcr ∈ {{ L"ABC" + {8} }} or UNINITIALIZED
+  wmr1 ∈ {0} or UNINITIALIZED
+  wmr2 ∈ {{ L"ABC" + {8} }} or UNINITIALIZED
+  dupbuf ∈
+        {{ NULL ; &__malloc_wcsdup_l99_0[0] }} or UNINITIALIZED or ESCAPINGADDR
   __retres ∈ {0}
   __malloc_wcsdup_l99[0] ∈ {65}
                      [1] ∈ {66}

@@ -54,7 +54,7 @@
 [eva:alarm] array_zero_length.i:44: Warning: 
   out of bounds read. assert \valid_read(&W[3][1]);
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   T[0..1] ∈ [--..--] or UNINITIALIZED

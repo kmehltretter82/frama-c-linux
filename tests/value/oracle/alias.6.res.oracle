@@ -58,7 +58,7 @@
   char1 ∈ {0}
   ll1 ∈ {0}
 [eva] Recording results for main8
-[eva] done for function main8
+[eva] Done for function main8
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main8:
   A ∈ {3; 4}

@@ -586,7 +586,6 @@ class markReferencedVisitor = object (self)
 
   val dkey = Kernel.dkey_referenced
 
-  val inside_exp : exp Stack.t = Stack.create ()
   val inside_typ : typ Stack.t = Stack.create ()
 
   method private reference varinfo loc =
@@ -652,15 +651,11 @@ class markReferencedVisitor = object (self)
     | SizeOf t | AlignOf t | UnOp (_, _, t) | BinOp (_, _, _, t) ->
       Stack.push t inside_typ;
       DoChildrenPost (fun e -> ignore (Stack.pop inside_typ); e)
-    | _ ->
-      Stack.push e inside_exp;
-      DoChildrenPost (fun e -> ignore (Stack.pop inside_exp); e)
+    | _ -> DoChildren
 
   method! vvrbl v =
-    if not (Stack.is_empty inside_exp) then begin
-      Kernel.debug ~current:true ~dkey "referenced: var %s" v.vname;
-      v.vreferenced <- true;
-    end;
+    Kernel.debug ~current:true ~dkey "referenced: var %s" v.vname;
+    v.vreferenced <- true;
     SkipChildren
 
   method! vspec _ = Cil.SkipChildren

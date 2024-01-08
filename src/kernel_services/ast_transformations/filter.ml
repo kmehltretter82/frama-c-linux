@@ -712,7 +712,7 @@ end = struct
       Varinfo.Hashtbl.clear local_visible;
       Varinfo.Hashtbl.add spec_table f.svar
         (visitCilFunspec (self:>Cil.cilVisitor)
-           (Annotations.funspec ~populate:false (Option.get self#current_kf)));
+           (Annotations.funspec (Option.get self#current_kf)));
       SkipChildren
 
     method private visit_pred p =
@@ -852,7 +852,7 @@ end = struct
                self#get_filling_actions);
           let res =
             Cil.visitCilFunspec (self :> Cil.cilVisitor)
-              (Annotations.funspec ~populate:false kf)
+              (Annotations.funspec kf)
           in
           let action () =
             (* Replace the funspec copied by the default visitor, as

@@ -53,6 +53,7 @@ argument_list = r"\([^)]*\)"
 
 debug = os.getenv("DEBUG", False)
 
+
 # Precomputes the regex for 'fname'
 def prepare_re_specific_name(fname):
     re_fun = re.compile(
@@ -105,6 +106,7 @@ def compute_re_def_or_decl(funcname):
 
 # matches function calls
 re_funcall = re.compile("(" + c_identifier + ")" + whitespace + r"\(")
+
 
 # Computes the offset (in bytes) of each '\n' in the file,
 # returning them as a list
@@ -223,6 +225,7 @@ def find_definitions_and_declarations(
 # list of identifiers which are never function calls
 calls_blacklist = ["if", "while", "for", "return", "sizeof", "switch", "_Alignas"]
 
+
 # Returns a list of tuples (fname, line, offset) for each function call.
 #
 # Note: this may include the function prototype itself;
@@ -246,7 +249,7 @@ def find_calls(file_content, newlines):
 # [defs] must be sorted in ascending order.
 def find_caller(defs, call):
     (_called, line, offset) = call
-    for (fname, _is_def, start, end, brace_offset) in defs:
+    for fname, _is_def, start, end, brace_offset in defs:
         if start <= line <= end and offset > brace_offset:
             return fname
         elif start > line:

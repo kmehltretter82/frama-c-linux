@@ -80,7 +80,7 @@
 [eva] Recording results for h
 [eva] Done for function h
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] fptr.i:44: assertion 'Eva,function_pointer' got final status invalid.
 [eva] fptr.i:45: assertion 'Eva,function_pointer' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

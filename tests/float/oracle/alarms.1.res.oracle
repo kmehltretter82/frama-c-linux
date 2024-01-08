@@ -26,11 +26,17 @@
   ull ∈ {0}
   rand ∈ [--..--]
   l ∈ [--..--]
+  vf ∈ UNINITIALIZED
   tmp ∈ UNINITIALIZED
+  vd ∈ UNINITIALIZED
+  i ∈ UNINITIALIZED
+  j ∈ UNINITIALIZED
+  mvd ∈ UNINITIALIZED
   l ∈ [--..--]
   ==END OF DUMP==
-[kernel:annot:missing-spec] alarms.i:21: Warning: 
-  Neither code nor specification for function fd, generating default assigns from the prototype
+[kernel:annot:missing-spec] alarms.i:11: Warning: 
+  Neither code nor specification for function fd,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function fd <- main1 <- main.
   Called from alarms.i:21.
 [eva] using specification for function fd
@@ -89,7 +95,7 @@
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] alarms.i:39: assertion 'Eva,is_nan' got final status invalid.
 [eva] alarms.i:50: assertion 'Eva,is_nan' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

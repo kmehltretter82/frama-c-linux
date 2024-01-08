@@ -591,6 +591,9 @@ let is_return_stmt kf stmt =
   with No_Statement ->
     false
 
+let is_not_called kf =
+  (not (get_vi kf).vaddrof) && find_syntactic_callsites kf = []
+
 let is_entry_point kf =
   try equal kf (fst (Globals.entry_point ()))
   with Globals.No_such_entry_point _ -> false

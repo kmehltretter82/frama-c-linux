@@ -38,7 +38,6 @@ import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from './server';
-import * as Status from 'frama-c/kernel/Status';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
@@ -80,9 +79,11 @@ export function useRequest<In, Out>(
 ): Out | undefined {
   const initial = options.offline ?? undefined;
   const [response, setResponse] = React.useState<Out | undefined>(initial);
-  const updateResponse = (opt: Out | undefined | null): void => {
-    if (opt !== null) setResponse(opt);
-  };
+  const doUpdateResponse = React.useCallback(
+    (opt: Out | undefined | null): void => {
+      if (opt !== null) setResponse(opt);
+    }, []);
+  const updateResponse = Dome.useActive(doUpdateResponse);
 
   // Fetch Request
   async function trigger(): Promise<void> {
@@ -92,7 +93,9 @@ export function useRequest<In, Out>(
         const r = await Server.send(rq, params);
         updateResponse(r);
       } catch (error) {
-        D.error(`Fail in useRequest '${rq.name}'. ${error}`);
+        if (options.onError !== undefined) {
+          D.error(`Fail in useRequest '${rq.name}'. ${error}`);
+        }
         updateResponse(options.onError);
       }
     } else {
@@ -341,10 +344,12 @@ class SyncArray<K, A> {
       } while (this.signaled || pending > 0);
       /* eslint-enable no-await-in-loop */
     } catch (error) {
-      D.error(
-        `Fail to retrieve the value of syncArray '${this.handler.name}'.`,
-        error,
-      );
+      if (Server.isRunning()) {
+        D.error(
+          `Fail to retrieve the value of syncArray '${this.handler.name}'.`,
+          error,
+        );
+      }
     } finally {
       this.signaled = false;
       this.fetching = false;
@@ -404,6 +409,7 @@ export function reloadArray<K, A>(arr: Array<K, A>): void {
 
 /** Access to Synchronized Array elements. */
 export interface ArrayProxy<K, A> {
+  model: CompactModel<K, A>;
   length: number;
   getData(elt: K | undefined): (A | undefined);
   forEach(fn: (row: A, elt: K) => void): void;
@@ -424,6 +430,7 @@ function arrayProxy<K, A>(
   _stamp: number,
 ): ArrayProxy<K, A> {
   return {
+    model,
     length: model.length(),
     getData: (elt) => elt ? model.getData(elt) : undefined,
     forEach: (fn) => model.forEach((r) => fn(r, model.getkey(r))),
@@ -448,6 +455,12 @@ export function useSyncArrayModel<K, A>(
   return st.model;
 }
 
+/** Get Synchronized Array as data array. */
+export function getSyncArrayData<K, A>(arr: Array<K, A>): A[]
+{
+  return getSyncArray(arr).getArray();
+}
+
 /** Use Synchronized Array as a data array. */
 export function useSyncArrayData<K, A>(arr: Array<K, A>): A[]
 {
@@ -465,6 +478,15 @@ export function useSyncArrayElt<K, A>(
     () => arrayGet(model, elt, stamp),
     [model, elt, stamp]
   );
+}
+
+/** Get Synchronized Array element. */
+export function getSyncArrayElt<K, A>(
+  arr: Array<K, A>,
+  elt: K | undefined,
+): A | undefined {
+  const model = getSyncArray(arr);
+  return arrayGet(model, elt, 0);
 }
 
 /** Use Synchronized Array as an element data getter. */
@@ -516,306 +538,216 @@ export function onSyncArray<K, A>(
 }
 
 // --------------------------------------------------------------------------
-// --- Selection
+// --- Selection & History
 // --------------------------------------------------------------------------
 
-/** An AST location.
- *
- *  Properties [[function]] and [[marker]] are optional,
- *  but at least one of the two must be set.
- */
-export type Location = {
-  fct?: string;
+export type Scope = Ast.decl | undefined
+export type Marker = Ast.marker | undefined
+
+/**
+
+   The current scope and the currently selected marker can updated in different
+   ways. They are generally related to each other, however this is not always
+   the case. The three different way of updating the current location are:
+
+   - `setCurrentScope` changes the currently printed declaration and sets
+     the current marker to itself.
+
+   - `setMarked` only updates the currently selected marker, without changing
+     the current scope.
+
+   - `setSelected` updates the currently selected marker and change the current
+     scope accordingly, when available.
+
+*/
+export interface Location {
+  scope?: Ast.decl;
   marker?: Ast.marker;
-};
-
-export interface HistorySelection {
-  /** Previous locations with respect to the [[current]] one. */
-  prevSelections: Location[];
-  /** Next locations with respect to the [[current]] one. */
-  nextSelections: Location[];
 }
 
-/** Actions on history selections:
- * - `HISTORY_PREV` jumps to previous history location
- *   (first in [[prevSelections]]).
- * - `HISTORY_NEXT` jumps to next history location
- *   (first in [[nextSelections]]).
- */
-export type HistorySelectActions = 'HISTORY_PREV' | 'HISTORY_NEXT';
-
-/** A selection of multiple locations. */
-export interface MultipleSelection {
-  /** Name of the multiple selection.  */
-  name: string;
-  /** Explanatory description of the multiple selection.  */
-  title: string;
-  /** The index of the current selected location in [[allSelections]]. */
-  index: number;
-  /** All locations forming a multiple selection. */
-  allSelections: Location[];
+/** Global current selection & history. */
+export interface History {
+  curr: Location; // might be empty
+  prev: Location[]; // last first, no empty locs
+  next: Location[]; // next first, no empty locs
 }
 
-/** A select action on multiple locations. */
-export interface MultipleSelect {
-  readonly name: string;
-  readonly title: string;
-  readonly index: number;
-  readonly locations: Location[];
-}
+const emptyHistory: History = { curr: {}, prev: [], next: [] };
+const isEmpty = (l: Location): boolean => (!l.scope && !l.marker);
+const pushLoc = (l: Location, ls: Location[]): Location[] =>
+  (isEmpty(l) ? ls : [l, ...ls]);
 
-/** Select the [[index]]-nth location of the current multiple selection. */
-export interface NthSelect {
-  readonly index: number;
-}
-
-/** Actions on multiple selections:
- * - [[MultipleSelect]].
- * - [[NthSelect]].
- * - `MULTIPLE_PREV` jumps to previous location of the multiple selections.
- * - `MULTIPLE_NEXT` jumps to next location of the multiple selections.
- * - `MULTIPLE_CYCLE` cycles between the multiple selections.
- * - `MULTIPLE_CLEAR` clears the multiple selection.
- */
-export type MultipleSelectActions =
-  MultipleSelect | NthSelect
-  | 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CYCLE' | 'MULTIPLE_CLEAR';
-
-export interface Selection {
-  /** Current selection. May be one in [[history]] or [[multiple]]. */
-  current?: Location;
-  /** History of selections. */
-  history: HistorySelection;
-  /** Multiple selections at once. */
-  multiple: MultipleSelection;
-}
-
-/** A select action on a location. */
-export interface SingleSelect {
-  readonly location: Location;
-}
-
-/** Actions on selection:
- * - [[SingleSelect]].
- * - [[HistorySelectActions]].
- * - [[MultipleSelectActions]].
- */
-export type SelectionActions =
-  SingleSelect | HistorySelectActions | MultipleSelectActions;
-
-function isSingleSelect(a: SelectionActions): a is SingleSelect {
-  return (a as SingleSelect).location !== undefined;
-}
-
-function isMultipleSelect(a: SelectionActions): a is MultipleSelect {
-  return (
-    (a as MultipleSelect).locations !== undefined &&
-    (a as MultipleSelect).index !== undefined
-  );
-}
-
-function isNthSelect(a: SelectionActions): a is NthSelect {
-  return (a as NthSelect).index !== undefined;
-}
-
-/** Update selection to the given location. */
-function selectLocation(s: Selection, location: Location): Selection {
-  const [prevSelections, nextSelections] =
-    s.current && s.current.fct !== location.fct ?
-      [[s.current, ...s.history.prevSelections], []] :
-      [s.history.prevSelections, s.history.nextSelections];
-  return {
-    ...s,
-    current: location,
-    history: { prevSelections, nextSelections },
-  };
-}
-
-/** Compute the next selection picking from the current history, depending on
- *  action.
- */
-function fromHistory(s: Selection, action: HistorySelectActions): Selection {
-  switch (action) {
-    case 'HISTORY_PREV': {
-      const [pS, ...prevS] = s.history.prevSelections;
-      return {
-        ...s,
-        current: pS,
-        history: {
-          prevSelections: prevS,
-          nextSelections:
-            [(s.current as Location), ...s.history.nextSelections],
-        },
-      };
-    }
-    case 'HISTORY_NEXT': {
-      const [nS, ...nextS] = s.history.nextSelections;
-      return {
-        ...s,
-        current: nS,
-        history: {
-          prevSelections:
-            [(s.current as Location), ...s.history.prevSelections],
-          nextSelections: nextS,
-        },
-      };
-    }
-    default:
-      return s;
-  }
-}
-
-/** Compute the next selection picking from the current multiple, depending on
- *  action.
- */
-function fromMultipleSelections(
-  s: Selection,
-  a: 'MULTIPLE_PREV' | 'MULTIPLE_NEXT' | 'MULTIPLE_CYCLE' | 'MULTIPLE_CLEAR',
-): Selection {
-  switch (a) {
-    case 'MULTIPLE_PREV':
-    case 'MULTIPLE_NEXT':
-    case 'MULTIPLE_CYCLE': {
-      const idx =
-        a === 'MULTIPLE_PREV' ?
-          s.multiple.index - 1 :
-          s.multiple.index + 1;
-      const index =
-        a === 'MULTIPLE_CYCLE' && idx >= s.multiple.allSelections.length ?
-          0 :
-          idx;
-      if (0 <= index && index < s.multiple.allSelections.length) {
-        const multiple = { ...s.multiple, index };
-        return selectLocation(
-          { ...s, multiple },
-          s.multiple.allSelections[index],
-        );
-      }
-      return s;
-    }
-    case 'MULTIPLE_CLEAR':
-      return {
-        ...s,
-        multiple: {
-          name: '',
-          title: '',
-          index: 0,
-          allSelections: [],
-        },
-      };
-    default:
-      return s;
-  }
-}
-
-/** Compute the next selection based on the current one and the given action. */
-function reducer(s: Selection, action: SelectionActions): Selection {
-  if (isSingleSelect(action)) {
-    return selectLocation(s, action.location);
-  }
-  if (isMultipleSelect(action)) {
-    const index = action.index > 0 ? action.index : 0;
-    const selection =
-      action.locations.length === 0 ? s :
-        selectLocation(s, action.locations[index]);
-    return {
-      ...selection,
-      multiple: {
-        name: action.name,
-        title: action.title,
-        allSelections: action.locations,
-        index,
-      },
-    };
-  }
-  if (isNthSelect(action)) {
-    const { index } = action;
-    if (0 <= index && index < s.multiple.allSelections.length) {
-      const location = s?.multiple.allSelections[index];
-      const selection = selectLocation(s, location);
-      const multiple = { ...selection.multiple, index };
-      return { ...selection, multiple };
-    }
-    return s;
-  }
-  switch (action) {
-    case 'HISTORY_PREV':
-    case 'HISTORY_NEXT':
-      return fromHistory(s, action);
-    case 'MULTIPLE_PREV':
-    case 'MULTIPLE_NEXT':
-    case 'MULTIPLE_CYCLE':
-    case 'MULTIPLE_CLEAR':
-      return fromMultipleSelections(s, action);
-    default:
-      return s;
-  }
-}
-
-/** The initial selection is empty. */
-const emptySelection = {
-  current: undefined,
-  history: {
-    prevSelections: [],
-    nextSelections: [],
-  },
-  multiple: {
-    name: '',
-    title: '',
-    index: 0,
-    allSelections: [],
-  },
-};
-
-export type Hovered = Location | undefined;
 export const MetaSelection = new Dome.Event<Location>('frama-c-meta-selection');
-export const GlobalHovered = new GlobalState<Hovered>(undefined);
-export const GlobalSelection = new GlobalState<Selection>(emptySelection);
+export const GlobalHovered = new GlobalState<Marker>(undefined);
+export const GlobalHistory = new GlobalState<History>(emptyHistory);
 
-Server.onShutdown(() => GlobalSelection.setValue(emptySelection));
+// --------------------------------------------------------------------------
+// --- Global Update & Synchronisation
+// --------------------------------------------------------------------------
 
-export function setHovered(h: Hovered): void { GlobalHovered.setValue(h); }
-export function useHovered(): [Hovered, (h: Hovered) => void] {
-  return useGlobalState(GlobalHovered);
+// Sycnhronisation of current selection.
+// Low level access only
+function syncCurrentSelection(): void {
+  const s = GlobalHistory.getValue();
+  const { curr: { scope, marker } } = s;
+  if (scope === undefined && marker !== undefined) {
+    // Try to update decl.
+    const st = currentSyncArray(Ast.markerAttributes);
+    const { scope: decl } = st.model.getData(marker) ?? {};
+    if (decl) GlobalHistory.setValue({ ...s, curr: { scope, marker } });
+    return;
+  }
+  if (scope !== undefined && marker === undefined) {
+    // Try to update mark.
+    const st = currentSyncArray(Ast.declAttributes);
+    const { self: marker } = st.model.getData(scope) ?? {};
+    if (marker) GlobalHistory.setValue({ ...s, curr: { scope, marker } });
+  }
 }
 
-export function setSelection(location: Location, meta = false): void {
-  const s = GlobalSelection.getValue();
-  GlobalSelection.setValue(reducer(s, { location }));
-  if (meta) MetaSelection.emit(location);
+async function selectMainFunction(): Promise<void> {
+  const decl = await Server.send(Ast.getMainFunction, null);
+  if (decl !== undefined) setCurrentScope(decl);
 }
 
-/** Current selection. */
-export function useSelection(): [Selection, (a: SelectionActions) => void] {
-  const [current, setCurrent] = useGlobalState(GlobalSelection);
-  const callback = React.useCallback((action) => {
-    setCurrent(reducer(current, action));
-    if (isMultipleSelect(action)) {
-      const l = action.locations.length;
-      const markers =
-        (l > 1) ? `${l} markers selected, listed in the 'Locations' panel` :
-          (l === 1) ? `1 marker selected` : `no markers selected`;
-      const text = `${action.name}: ${markers}`;
-      Status.setMessage({ text, title: action.title, kind: 'success' });
-    }
-  }, [current, setCurrent]);
-  return [current, callback];
+{
+  Server.onReady(clearHistory);
+  Server.onShutdown(clearHistory);
+  onSyncArray(Ast.markerAttributes, syncCurrentSelection);
+  onSyncArray(Ast.declAttributes, syncCurrentSelection);
+  Server.onReady(selectMainFunction);
 }
 
-/** Resets the selected locations. */
-export async function resetSelection(): Promise<void> {
-  GlobalSelection.setValue(emptySelection);
-  if (Server.isRunning()) {
-    try {
-      const main = await Server.send(Ast.getMainFunction, {});
-      // If the selection has already been modified, do not change it.
-      if (main && GlobalSelection.getValue() === emptySelection) {
-        GlobalSelection.setValue({ ...emptySelection, current: { fct: main } });
-      }
-    } catch (err) {
-      if (err) D.warn('Request error', err);
+// --------------------------------------------------------------------------
+// --- Selection API
+// --------------------------------------------------------------------------
+
+export function setHovered(h: Marker = undefined): void {
+  GlobalHovered.setValue(h);
+}
+
+export function useHovered(): Marker {
+  const [h] = useGlobalState(GlobalHovered);
+  return h;
+}
+
+export function getSelected(): Marker {
+  const { curr: { marker } } = GlobalHistory.getValue();
+  return marker;
+}
+
+export function useSelected(): Marker {
+  const [{ curr: { marker } }] = useGlobalState(GlobalHistory);
+  return marker;
+}
+
+/** Does not modify current scope, only current marker. */
+export function setMarked(marker: Marker = undefined, meta = false): void {
+  const scope = GlobalHistory.getValue().curr.scope;
+  setCurrentLocation({ scope, marker }, meta);
+}
+
+/** Set selected marker and update scope accordingly. */
+export function setSelected(marker: Marker = undefined, meta = false): void {
+  if (marker === undefined) {
+    const { curr: { scope } } = GlobalHistory.getValue();
+    setCurrentLocation({ scope });
+  } else {
+    const st = currentSyncArray(Ast.markerAttributes);
+    const { scope } = st.model.getData(marker) ?? {};
+    if (scope)
+      setCurrentLocation({ scope, marker }, meta);
+    else {
+      const { curr: { scope } } = GlobalHistory.getValue();
+      setCurrentLocation({ scope, marker }, meta);
     }
   }
+}
+
+/** Set current scope and move current marker to its declaration. */
+export function setCurrentScope(scope: Scope): void {
+  if (scope === undefined) {
+    setCurrentLocation({});
+  } else {
+    const st = currentSyncArray(Ast.declAttributes);
+    const { self: marker } = st.model.getData(scope) ?? {};
+    setCurrentLocation({ scope, marker });
+  }
+}
+
+export function useCurrentScope(): Scope {
+  const [{ curr: { scope } }] = useGlobalState(GlobalHistory);
+  return scope;
+}
+
+export function getCurrentLocation(): Location {
+  return GlobalHistory.getValue().curr;
+}
+
+export function useCurrentLocation(): Location {
+  const [{ curr }] = useGlobalState(GlobalHistory);
+  return curr;
+}
+
+export function setCurrentLocation(newLoc: Location, meta = false): void {
+  const s = GlobalHistory.getValue();
+  const { curr: oldLoc } = s;
+  const definedTarget = !isEmpty(newLoc);
+  const definedScope = oldLoc.scope !== undefined;
+  if (definedScope && oldLoc.scope === newLoc.scope) {
+    GlobalHistory.setValue({ ...s, curr: newLoc });
+  } else {
+    GlobalHistory.setValue({
+      curr: newLoc,
+      next: definedTarget ? [] : s.next,
+      prev: definedScope ? pushLoc(oldLoc, s.prev) : s.prev,
+    });
+  }
+  if (meta && !isEmpty(newLoc)) MetaSelection.emit(newLoc);
+}
+
+export function useHistory(): History {
+  const [h] = useGlobalState(GlobalHistory);
+  return h;
+}
+
+export function gotoNext(): void {
+  const s = GlobalHistory.getValue();
+  if (s.next.length > 0) {
+    const [curr, ...next] = s.next;
+    GlobalHistory.setValue({ curr, next, prev: pushLoc(s.curr, s.prev) });
+  }
+}
+
+export function gotoPrev(): void {
+  const s = GlobalHistory.getValue();
+  if (s.prev.length > 0) {
+    const [curr, ...prev] = s.prev;
+    GlobalHistory.setValue({ curr, next: pushLoc(s.curr, s.next), prev });
+  }
+}
+
+export function clearHistory(): void {
+  GlobalHovered.setValue(undefined);
+  GlobalHistory.setValue(emptyHistory);
+}
+
+// --------------------------------------------------------------------------
+// --- Declarations
+// --------------------------------------------------------------------------
+
+export type declaration = Ast.declAttributesData;
+
+/** Access the marker attributes from AST. */
+export function useDeclaration(decl: Ast.decl | undefined): declaration {
+  const data = useSyncArrayElt(Ast.declAttributes, decl);
+  return data ?? Ast.declAttributesDataDefault;
+}
+
+/** Access the marker attributes from AST. */
+export function getDeclaration(decl: Ast.decl | undefined): declaration {
+  const data = getSyncArrayElt(Ast.declAttributes, decl);
+  return data ?? Ast.declAttributesDataDefault;
 }
 
 // --------------------------------------------------------------------------
@@ -825,18 +757,15 @@ export async function resetSelection(): Promise<void> {
 export type attributes = Ast.markerAttributesData;
 
 /** Access the marker attributes from AST. */
-export function useMarker(marker: Ast.marker | undefined): attributes {
-  const marks = useSyncArrayElt(Ast.markerAttributes, marker);
-  return marks ?? Ast.markerAttributesDataDefault;
+export function getMarker(marker: Ast.marker | undefined): attributes {
+  const data = getSyncArrayElt(Ast.markerAttributes, marker);
+  return data ?? Ast.markerAttributesDataDefault;
 }
 
-// --------------------------------------------------------------------------
-// --- General Synchro
-// --------------------------------------------------------------------------
-
-Server.onReady(() => {
-  if (GlobalSelection.getValue() === emptySelection)
-    resetSelection();
-});
+/** Access the marker attributes from AST. */
+export function useMarker(marker: Ast.marker | undefined): attributes {
+  const data = useSyncArrayElt(Ast.markerAttributes, marker);
+  return data ?? Ast.markerAttributesDataDefault;
+}
 
 // --------------------------------------------------------------------------

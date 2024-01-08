@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Datatypes of some useful CIL types.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (* This module should not be exported, but we need the alias and OCaml
    requires us to export it. *)
@@ -154,10 +154,28 @@ end
 module ExpStructEq: S_with_collections with type t = exp
 
 (**
-   structural equality, with strict constant comparison as in {!ConstantStrict}
+   Structural equality, with strict constant comparison as in {!ConstantStrict}
    @since 24.0-Chromium
 *)
 module ExpStructEqStrict: S_with_collections with type t = exp
+
+(**
+   Structural equality, with structural comparaison in case of sizeof
+   (instead of id).
+   Different expressions with the same size within sizeof are equal.
+
+   @since 28.0-Nickel
+*)
+module ExpStructEqSized: S_with_collections with type t = exp
+
+(**
+   Structural equality, with strict constant comparison as in {!ConstantStrict}
+   and with structural comparaison in case of sizeof (instead of id).
+   Different expressions with the same size winthin sizeof are equal.
+
+   @since 28.0-Nickel
+*)
+module ExpStructEqStrictSized: S_with_collections with type t = exp
 
 module Fieldinfo: S_with_collections_pretty with type t = fieldinfo
 
@@ -217,7 +235,7 @@ module OffsetStructEqStrict: S_with_collections with type t = offset
 
 module Stmt_Id:  Hptmap.Id_Datatype with type t = stmt
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Stmt: sig
   include S_with_collections_pretty with type t = stmt
   module Hptset: sig
@@ -259,7 +277,7 @@ module Typeinfo: S_with_collections with type t = typeinfo
 
 module Varinfo_Id: Hptmap.Id_Datatype with type t = varinfo
 
-(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+(** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Varinfo: sig
   include S_with_collections_pretty with type t = varinfo
   module Hptset: sig
@@ -297,7 +315,7 @@ module Funbehavior: S_with_pretty with type t = funbehavior
 module Funspec: S_with_pretty with type t = funspec
 
 (** @since Fluorine-20130401
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 module Fundec: S_with_collections_pretty with type t = fundec
 

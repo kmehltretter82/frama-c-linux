@@ -9,7 +9,7 @@
 [eva:alarm] same_sliced_name_bts1422.i:9: Warning: 
   signed overflow. assert x + 1 ≤ 2147483647;
 [eva] Recording results for foo
-[eva] done for function foo
+[eva] Done for function foo
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function foo

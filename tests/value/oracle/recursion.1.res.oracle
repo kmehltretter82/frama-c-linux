@@ -1,7 +1,5 @@
 [kernel] Parsing recursion.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
   p ∈ {0}
@@ -124,10 +122,9 @@
   Analysis of function decr is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function decr
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function alarm:
-  res ∈ [2..2147483647]
+  res ∈ [2..2147483647] or UNINITIALIZED
   __retres ∈ [1..2147483647]
 [eva:final-states] Values at end of function decr:
   
@@ -147,7 +144,7 @@
   x ∈ {0; 1}
   b ∈ {0; 1}
 [eva:final-states] Values at end of function factorial:
-  res ∈ {2; 6; 24; 120}
+  res ∈ {2; 6; 24; 120} or UNINITIALIZED
   __retres ∈ {1; 2; 6; 24; 120}
 [eva:final-states] Values at end of function factorial_ptr:
   y ∈ {91; 120}
@@ -179,7 +176,7 @@
 [eva:final-states] Values at end of function precond:
   y ∈ [-100..-6]
 [eva:final-states] Values at end of function sum:
-  res ∈ [3..91]
+  res ∈ [3..91] or UNINITIALIZED
   __retres ∈ [1..91]
 [eva:final-states] Values at end of function sum_and_fact:
   x ∈ {11; 36}

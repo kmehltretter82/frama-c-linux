@@ -6,6 +6,10 @@
                                                    (9223372036854775808) )
 [kernel] very_large_integers.c:119: User Error: 
   array length too large for Frama-C: 72057594037927936
-[kernel] User Error: stopping on file "very_large_integers.c" that has errors. Add
-  '-kernel-msg-key pp' for preprocessing command.
+  117   
+  118   #ifdef ARRAY_INIT3
+  119   int ai3[] = {0xdead, [72057594037927936] = 0xbeef};
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  120   #endif
+  121   #ifdef ARRAY_INIT4
 [kernel] Frama-C aborted: invalid user input.

@@ -89,8 +89,6 @@
 [variadic] printf.c:75: 
   Translating call to printf to a call to the specialized version printf_va_28.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva] using specification for function printf_va_1
 [eva] using specification for function printf_va_2
 [eva] using specification for function printf_va_3
@@ -117,15 +115,15 @@
 [eva] using specification for function printf_va_24
 [eva] using specification for function printf_va_25
 [eva] using specification for function printf_va_26
-[kernel:annot:missing-spec] printf.c:71: Warning: 
-  Neither code nor specification for function printf_fallback_1, generating default assigns from the prototype
+[kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdio.h:211: Warning: 
+  Neither code nor specification for function printf_fallback_1,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function printf_fallback_1
 [eva:invalid-assigns] printf.c:71: 
   Completely invalid destination for assigns clause *(param1 + (0 ..)).
   Ignoring.
 [eva] using specification for function printf_va_27
 [eva] using specification for function printf_va_28
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_initial_stdout.__fc_FILE_id ∈ {1}

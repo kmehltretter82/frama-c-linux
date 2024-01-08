@@ -37,11 +37,13 @@ module TSC = Self.Action
       let help = "Generate TypeScript API"
     end)
 
-module OUT = Self.String
+module OUT = Self.Filepath
     (struct
       let option_name = "-server-tsc-out"
       let arg_name = "path"
       let default = "src"
+      let file_kind = "output-dir"
+      let existence = Filepath.Indifferent
       let help = Printf.sprintf "Output directory (default is '%s')" default
     end)
 
@@ -356,8 +358,8 @@ let makeDeclaration fmt names d =
       "@[<hv 2>const %s_internal: Server.%sRequest<@,%a,@,%a@,>@] = {@\n"
       self.name prefix jtype input jtype output ;
     Format.fprintf fmt "  kind: Server.RqKind.%s,@\n" kind ;
-    Format.fprintf fmt "  name:   '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
-    Format.fprintf fmt "  input:  %a,@\n" makeParam input ;
+    Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
+    Format.fprintf fmt "  input: %a,@\n" makeParam input ;
     Format.fprintf fmt "  output: %a,@\n" makeParam output ;
     Format.fprintf fmt "  signals: %a,@\n"
       (Pretty_utils.pp_list
@@ -571,10 +573,9 @@ let generate () =
           let path = pkg_path ~plugin:pkg.p_plugin ~package:pkg.p_package in
           Self.feedback "Package %s" path ;
           let out = OUT.get () in
-          let file = Printf.sprintf "%s/%s/index.ts" out path in
-          let dir = Filename.dirname file in
-          if not (Sys.file_exists dir && Sys.is_directory dir) then
-            Extlib.mkdir ~parents:true dir 0o755 ;
+          let dir = Filepath.Normalized.concat out path in
+          let file = Filepath.Normalized.concat dir "index.ts" in
+          ignore (Extlib.mkdir ~parents:true dir 0o755) ;
           Command.print_file file (makePackage pkg path) ;
         end
     end

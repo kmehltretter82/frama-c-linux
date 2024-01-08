@@ -26,12 +26,11 @@ open Cil_types
 
 module Kmap = Kernel_function.Hashtbl
 module Smap = Cil_datatype.Stmt.Hashtbl
-module CS = Value_types.Callstack
-module CSet = CS.Set
-module CSmap = CS.Hashtbl
+module CSet = Callstack.Set
+module CSmap = Callstack.Hashtbl
 
 module Md = Markdown
-module Jfct = Kernel_ast.Function
+module Jdecl = Kernel_ast.Decl
 module Jstmt = Kernel_ast.Stmt
 module Jmarker = Kernel_ast.Marker
 
@@ -49,7 +48,6 @@ type evaluation_point = General_requests.evaluation_point =
 (* A term and the program point where it should be evaluated. *)
 type probe = term * evaluation_point
 
-type callstack = Value_types.callstack
 type truth = Abstract_interp.truth
 
 (* The result of an evaluation:
@@ -138,7 +136,7 @@ let probe marker =
 
 module type Ranking_sig = sig
   val stmt : stmt -> int
-  val sort : callstack list -> callstack list
+  val sort : Callstack.t list -> Callstack.t list
 end
 
 module Ranking : Ranking_sig = struct
@@ -198,18 +196,15 @@ module Ranking : Ranking_sig = struct
 
   let stmt = let rk = new ranker in rk#rank
 
-  let rec ranks (rks : int list) (cs : callstack) : int list =
-    match cs with
-    | [] -> rks
-    | (_,Kglobal)::wcs -> ranks rks wcs
-    | (_,Kstmt s)::wcs -> ranks (stmt s :: rks) wcs
+  let ranks (cs : Callstack.t) : int list =
+    List.map stmt (Callstack.to_stmt_list cs)
 
   let order : int list -> int list -> int = Stdlib.compare
 
-  let sort (wcs : callstack list) : callstack list =
+  let sort (wcs : Callstack.t list) : Callstack.t list =
     List.map fst @@
     List.sort (fun (_,rp) (_,rq) -> order rp rq) @@
-    List.map (fun cs -> cs , ranks [] cs) wcs
+    List.map (fun cs -> cs , ranks cs) wcs
 
 end
 
@@ -217,44 +212,49 @@ end
 (* --- Domain Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jcallstack : S with type t = callstack = struct
-  module I = Data.Index
-      (Value_types.Callstack.Map)
-      (struct let name = "eva-callstack-id" end)
-  let jtype = Data.declare ~package ~name:"callstack" I.jtype
-  type t = I.t
-  let to_json = I.to_json
-  let of_json = I.of_json
-end
+module Jcallstack : S with type t = Callstack.t =
+  Data.Index
+    (Callstack.Map)
+    (struct
+      let package = package
+      let name = "callstack"
+      let descr = Md.plain "Callstack identifier"
+    end)
 
-module Jcalls : Request.Output with type t = callstack = struct
+module Jcalls : Request.Output with type t = Callstack.t = struct
 
-  type t = callstack
+  type t = Callstack.t
 
-  let jtype = Package.(Jarray (Jrecord [
-      "callee" , Jfct.jtype ;
-      "caller" , Joption Jfct.jtype ;
-      "stmt" , Joption Jstmt.jtype ;
-      "rank" , Joption Jnumber ;
-    ]))
+  let jcallsite = Server.Data.declare ~package
+      ~name:"callsite" ~descr:(Md.plain "Call site infos")
+      (Jrecord [
+          "callee" , Jdecl.jtype ;
+          "caller" , Joption Jdecl.jtype ;
+          "stmt" , Joption Jstmt.jtype ;
+          "rank" , Joption Jnumber ;
+        ])
 
-  let rec jcallstack jcallee ki cs : json list =
-    match ki , cs with
-    | Kglobal , _ | _ , [] -> [ `Assoc [ "callee", jcallee ] ]
-    | Kstmt stmt , (called,ki) :: cs ->
-      let jcaller = Jfct.to_json called in
-      let callsite = `Assoc [
-          "callee", jcallee ;
-          "caller", jcaller ;
-          "stmt", Jstmt.to_json stmt ;
-          "rank", Jint.to_json (Ranking.stmt stmt) ;
-        ]
-      in
-      callsite :: jcallstack jcaller ki cs
+  let jtype = Package.(Jarray jcallsite)
 
-  let to_json = function
-    | [] -> `List []
-    | (callee,ki)::cs -> `List (jcallstack (Jfct.to_json callee) ki cs)
+  let jcallsite ~jcaller ~jcallee stmt =
+    `Assoc [
+      "callee", jcallee ;
+      "caller", jcaller ;
+      "stmt", Jstmt.to_json stmt ;
+      "rank", Jint.to_json (Ranking.stmt stmt) ;
+    ]
+
+  let to_json (cs : t) =
+    let aux (acc, jcaller) (callee, stmt) =
+      let jcallee = Jdecl.to_json (SFunction callee) in
+      jcallsite ~jcaller ~jcallee stmt :: acc, jcallee
+    in
+    let entry_point = Jdecl.to_json (SFunction cs.entry_point) in
+    let l, _last_callee =
+      List.fold_left aux
+        ([`Assoc [ "callee", entry_point ]], entry_point)
+        (List.rev cs.stack)
+    in `List l
 
 end
 
@@ -353,12 +353,14 @@ let filter_variables bases =
 (* -------------------------------------------------------------------------- *)
 
 module type EvaProxy = sig
-  val kf_callstacks : kernel_function -> callstack list
-  val stmt_callstacks : stmt -> callstack list
-  val evaluate : probe -> callstack option -> evaluations
+  val kf_callstacks : kernel_function -> Callstack.t list
+  val stmt_callstacks : stmt -> Callstack.t list
+  val evaluate : probe -> Callstack.t option -> evaluations
 end
 
 module Proxy(A : Analysis.S) : EvaProxy = struct
+
+  include Cvalue_domain.Getters (A.Dom)
 
   open Eval
   type dstate = A.Dom.state or_top_bottom
@@ -448,7 +450,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   (* --- Evaluates an expression or lvalue into an evaluation [result]. ----- *)
 
   let lval_to_offsetmap lval state =
-    let cvalue_state = A.Dom.get_cvalue_or_top state in
+    let cvalue_state = get_cvalue_or_top state in
     match lval with
     | Var vi, NoOffset ->
       let r = extract_single_var vi cvalue_state in
@@ -571,8 +573,8 @@ let () =
 let () =
   let getStmtInfo = Request.signature ~input:(module Jstmt) () in
   let set_fct = Request.result getStmtInfo ~name:"fct"
-      ~descr:(Md.plain "Englobing function")
-      (module Jfct)
+      ~descr:(Md.plain "Function name")
+      (module Jstring)
   and set_rank = Request.result getStmtInfo ~name:"rank"
       ~descr:(Md.plain "Global stmt order")
       (module Jint)
@@ -581,7 +583,7 @@ let () =
     ~kind:`GET ~name:"getStmtInfo"
     ~descr:(Md.plain "Stmt Information")
     begin fun rq s ->
-      set_fct rq (Kernel_function.find_englobing_kf s) ;
+      set_fct rq Kernel_function.(get_name @@ find_englobing_kf s) ;
       set_rank rq (Ranking.stmt s) ;
     end
 
@@ -617,7 +619,11 @@ let () =
     let reachable = is_reachable eval_point in
     set_evaluable rq (computed && reachable);
     set_code rq (Some (Pretty_utils.to_string pp p));
-    set_stmt rq (match eval_point with Stmt (_, s) -> Some s | _ -> None);
+    begin
+      match eval_point with
+      | Initial | Pre _ -> ()
+      | Stmt (_kf, stmt) -> set_stmt rq (Some stmt)
+    end ;
     let on_steps = function
       | `Here -> ()
       | `Then _ | `Else _ -> set_condition rq true

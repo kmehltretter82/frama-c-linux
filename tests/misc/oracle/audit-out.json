@@ -38,12 +38,14 @@
     "warning-categories": {
       "enabled": [
         "*", "alarm", "builtins", "builtins:missing-spec",
-        "builtins:override", "ensures-false", "experimental", "libc",
-        "libc:unsupported-spec", "locals-escaping", "loop-unroll", "malloc",
-        "malloc:imprecise", "signed-overflow", "taint", "unknown-size"
+        "builtins:override", "ensures-false", "experimental", "garbled-mix",
+        "libc", "libc:unsupported-spec", "locals-escaping", "loop-unroll",
+        "malloc", "malloc:imprecise", "signed-overflow", "taint",
+        "unknown-size"
       ],
       "disabled": [
-        "garbled-mix", "invalid-assigns", "loop-unroll:auto",
+        "garbled-mix:assigns", "garbled-mix:read", "garbled-mix:summary",
+        "garbled-mix:write", "invalid-assigns", "loop-unroll:auto",
         "loop-unroll:missing", "loop-unroll:missing:for",
         "loop-unroll:partial", "malloc:weak", "watchpoint"
       ]
@@ -59,12 +61,12 @@
         "ghost:bad-use", "inline", "linker",
         "linker:drop-conflicting-unused", "parser",
         "parser:conditional-feature", "parser:unnamed-typedef",
-        "parser:unsupported", "pp", "pp:compilation-db", "typing",
-        "typing:implicit-conv-void-ptr",
+        "parser:unsupported", "pp", "pp:compilation-db", "pp:line-directive",
+        "typing", "typing:implicit-conv-void-ptr",
         "typing:implicit-function-declaration",
         "typing:incompatible-pointer-types",
         "typing:incompatible-types-call", "typing:inconsistent-specifier",
-        "typing:int-conversion", "typing:no-proto"
+        "typing:int-conversion", "typing:merge-conversion", "typing:no-proto"
       ],
       "disabled": [
         "CERT:EXP:10", "acsl-float-compare", "c11", "file:not-found",

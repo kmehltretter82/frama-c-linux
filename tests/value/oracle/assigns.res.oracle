@@ -66,10 +66,10 @@
 [eva] Done for function h
 [eva] computing for function j <- main1 <- main.
   Called from assigns.i:54.
+[eva] using specification for function j
 [eva] assigns.i:32: 
   Cannot evaluate range bound foo(*p)
   (unsupported ACSL construct: logic function foo). Approximating
-[eva] using specification for function j
 [eva] Done for function j
 [eva] computing for function assigns_post <- main1 <- main.
   Called from assigns.i:56.
@@ -102,20 +102,23 @@
 [eva] using specification for function ff3
 [eva] assigns.i:68: Warning: no \from part for clause 'assigns y1, y3;'
 [eva] Done for function ff3
-[kernel:annot:missing-spec] assigns.i:79: Warning: 
-  Neither code nor specification for function ff4, generating default assigns from the prototype
+[kernel:annot:missing-spec] assigns.i:71: Warning: 
+  Neither code nor specification for function ff4,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function ff4 <- main2 <- main.
   Called from assigns.i:79.
 [eva] using specification for function ff4
 [eva] Done for function ff4
-[kernel:annot:missing-spec] assigns.i:80: Warning: 
-  Neither code nor specification for function ff5, generating default assigns from the prototype
+[kernel:annot:missing-spec] assigns.i:73: Warning: 
+  Neither code nor specification for function ff5,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function ff5 <- main2 <- main.
   Called from assigns.i:80.
 [eva] using specification for function ff5
 [eva] Done for function ff5
-[kernel:annot:missing-spec] assigns.i:82: Warning: 
-  Neither code nor specification for function ff2, generating default assigns from the prototype
+[kernel:annot:missing-spec] assigns.i:62: Warning: 
+  Neither code nor specification for function ff2,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function ff2 <- main2 <- main.
   Called from assigns.i:82.
 [eva] using specification for function ff2
@@ -130,8 +133,9 @@
   pointer comparison. assert \pointer_comparable((void *)p, (void *)(&x));
 [eva] Recording results for main2
 [eva] Done for function main2
-[kernel:annot:missing-spec] assigns.i:112: Warning: 
-  Neither code nor specification for function main3, generating default assigns from the prototype
+[kernel:annot:missing-spec] assigns.i:92: Warning: 
+  Neither code nor specification for function main3,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function main3 <- main.
   Called from assigns.i:112.
 [eva] using specification for function main3
@@ -140,11 +144,11 @@
   Called from assigns.i:113.
 [eva] computing for function f_main4_1 <- main4 <- main.
   Called from assigns.i:104.
-[kernel] assigns.i:104: 
-  more than 200(1000) elements to enumerate. Approximating.
 [eva] using specification for function f_main4_1
 [kernel] assigns.i:104: 
   more than 200(1000) locations to update in array. Approximating.
+[kernel] assigns.i:104: 
+  more than 200(1000) elements to enumerate. Approximating.
 [eva] Done for function f_main4_1
 [eva] computing for function f_main4_2 <- main4 <- main.
   Called from assigns.i:105.
@@ -155,7 +159,7 @@
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   T[0..99] ∈ [--..--]

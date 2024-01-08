@@ -52,16 +52,17 @@
    .t[0] ∈ {{ &y }}
    .t[1] ∈ {0}
   S_gpp[0..1] ∈ [--..--]
-[kernel:annot:missing-spec] origin.i:124: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+[kernel:annot:missing-spec] origin.i:7: Warning: 
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- origin.
   Called from origin.i:124.
 [eva] using specification for function f
 [eva] Done for function f
-[eva] origin.i:126: 
+[eva:garbled-mix:write] origin.i:126: 
   Assigning imprecise value to r.p.
   The imprecision originates from Misaligned {origin.i:126}
-[eva] origin.i:129: 
+[eva:garbled-mix:write] origin.i:129: 
   Assigning imprecise value to r.t[0].
   The imprecision originates from Merge {origin.i:129}
 [eva:alarm] origin.i:130: Warning: 
@@ -70,14 +71,14 @@
   signed overflow. assert -2147483648 ≤ -((int)(&x));
 [eva:alarm] origin.i:130: Warning: 
   signed overflow. assert -((int)(&x)) ≤ 2147483647;
-[eva] origin.i:130: 
+[eva:garbled-mix:write] origin.i:130: 
   Assigning imprecise value to r.t[1].
   The imprecision originates from Arithmetic {origin.i:130}
-[eva] origin.i:131: 
+[eva:garbled-mix:write] origin.i:131: 
   Assigning imprecise value to \result<origin>.
   The imprecision originates from Misaligned {origin.i:126}
 [eva] Recording results for origin
-[eva] done for function origin
+[eva] Done for function origin
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function origin:
   r.c ∈ [--..--]

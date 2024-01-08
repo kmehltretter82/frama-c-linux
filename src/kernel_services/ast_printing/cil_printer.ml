@@ -1717,6 +1717,15 @@ class cil_printer () = object (self)
            ~pre:"" ~sep:"@;" ~suf:"" print_one_catch) catch
 
   (*** GLOBALS ***)
+
+  method typeref :
+    'a. typ -> (formatter -> 'a -> unit) -> formatter -> 'a -> unit =
+    fun _t pp fmt x -> pp fmt x
+
+  method typedef :
+    'a. global -> (formatter -> 'a -> unit) -> formatter -> 'a -> unit =
+    fun _g pp fmt x -> pp fmt x
+
   method global fmt (g:global) =
     if print_global g then
       match g with
@@ -1745,9 +1754,10 @@ class cil_printer () = object (self)
 
       | GType (typ, l) ->
         self#line_directive ~forcefile:true fmt l;
+        let pp_typename fmt = self#typedef g self#varname fmt typ.tname in
         fprintf fmt "%a %a;@\n"
           self#pp_keyword "typedef"
-          (self#typ (Some (fun fmt -> self#varname fmt typ.tname))) typ.ttype
+          (self#typ (Some pp_typename)) typ.ttype
 
       | GEnumTag (enum, l) ->
         self#line_directive fmt l;
@@ -1757,7 +1767,7 @@ class cil_printer () = object (self)
             (TInt(enum.ekind,[]));
         fprintf fmt "%a@[ %a {@\n%a@]@\n}%a;@\n"
           self#pp_keyword "enum"
-          self#enuminfo enum
+          (self#typedef g self#enumname) enum
           (Pretty_utils.pp_list ~sep:",@\n"
              (fun fmt item ->
                 fprintf fmt "%a = %a"
@@ -1770,7 +1780,7 @@ class cil_printer () = object (self)
         self#line_directive fmt l;
         fprintf fmt "%a %a;@\n"
           self#pp_keyword "enum"
-          self#enuminfo enum
+          (self#typeref (TEnum(enum,[])) self#enumname) enum
 
       | GCompTag (comp, l) -> (* This is a definition of a tag *)
         let sto_mod, rest_attr = Cil.separateStorageModifiers comp.cattr in
@@ -1778,7 +1788,7 @@ class cil_printer () = object (self)
         fprintf fmt "@[<3>%a%a %a {@\n%a@]@\n}%a;@\n"
           self#compkind comp
           self#attributes sto_mod
-          self#compname comp
+          (self#typedef g self#compname) comp
           (Pretty_utils.pp_list ~sep:"@\n" self#fieldinfo)
           (Option.value ~default:[] comp.cfields)
           self#attributes rest_attr
@@ -1787,7 +1797,7 @@ class cil_printer () = object (self)
         self#line_directive fmt l;
         fprintf fmt "%a %a;@\n"
           self#compkind comp
-          self#compname comp
+          (self#typeref (TComp(comp,[])) self#compname) comp
 
       | GVar (vi, io, l) ->
         self#line_directive ~forcefile:true fmt l;
@@ -1845,7 +1855,7 @@ class cil_printer () = object (self)
         in
         self#line_directive fmt l;
         if suppress then fprintf fmt "/* ";
-        fprintf fmt "#pragma ";
+        pp_print_string fmt "#pragma ";
         begin
           match an, args with
           | _, [] ->
@@ -1959,18 +1969,17 @@ class cil_printer () = object (self)
   method compinfo fmt ci =
     fprintf fmt "%a %a" self#compkind ci self#compname ci
 
-  method enuminfo fmt enum =
+  method enumname fmt enum =
     self#varname fmt enum.ename
 
-  method typeinfo fmt tinfo =
+  method typename fmt tinfo =
     self#varname fmt tinfo.tname
 
   method typ ?fundecl nameOpt
       fmt (t:typ) =
     let pname fmt space = match nameOpt with
       | None -> ()
-      | Some d -> Format.fprintf fmt "%s%t" (if space then " " else "") d
-    in
+      | Some pp -> if space then pp_print_char fmt ' '; pp fmt in
     let printAttributes fmt (a: attributes) =
       match nameOpt with
       | None when not state.print_cil_input && not (Cil.msvcMode ()) -> ()
@@ -1984,22 +1993,24 @@ class cil_printer () = object (self)
     | TVoid a -> fprintf fmt "void%a%a" self#attributes a pname true
 
     | TInt (ikind,a) ->
-      fprintf fmt "%a%a%a" self#ikind ikind self#attributes a pname true
+      fprintf fmt "%a%a%a"
+        (self#typeref t self#ikind) ikind self#attributes a pname true
 
     | TFloat(fkind, a) ->
-      fprintf fmt "%a%a%a" self#fkind fkind self#attributes a pname true
+      fprintf fmt "%a%a%a"
+        (self#typeref t self#fkind) fkind self#attributes a pname true
 
     | TComp (comp, a) -> (* A reference to a struct *)
-      fprintf fmt
-        "%a%a%a"
-        self#compinfo comp
+      fprintf fmt "%a %a%a%a"
+        self#compkind comp
+        (self#typeref t self#compname) comp
         self#attributes a
         pname true
 
     | TEnum (enum, a) ->
       fprintf fmt "%a %a%a%a"
         self#pp_keyword "enum"
-        self#enuminfo enum
+        (self#typeref t self#enumname) enum
         self#attributes a
         pname true
 
@@ -2131,9 +2142,9 @@ class cil_printer () = object (self)
       in
       self#typ (Some pp_params) fmt restyp
 
-    | TNamed (t, a) ->
+    | TNamed (ti, a) ->
       fprintf fmt "%a%a%a"
-        self#typeinfo t
+        (self#typeref t self#typename) ti
         self#attributes a
         pname true
 
@@ -2237,7 +2248,13 @@ class cil_printer () = object (self)
               (Pretty_utils.pp_list ~sep:"," self#attrparam) args);
          true)
     | AttrAnnot s ->
-      fprintf fmt "%s" (Cil.mkAttrAnnot s); false
+      let block = false in
+      fprintf fmt "%t %s %t"
+        (fun fmt -> self#pp_open_annotation ~block fmt)
+        s
+        (fun fmt -> self#pp_close_annotation ~block fmt);
+
+      false
 
   method private attribute_prec (contextprec: int) fmt (a: attrparam) =
     let thisLevel = Precedence.getParenthLevelAttrParam a in

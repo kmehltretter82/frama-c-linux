@@ -27,8 +27,6 @@
 [variadic] printf_wrong_pointers.c:18: 
   Translating call to printf to a call to the specialized version printf_va_5.
 [eva] Analyzing a complete application starting at main
-[eva] Computing initial state
-[eva] Initial state computed
 [eva] using specification for function printf_va_1
 [eva:alarm] printf_wrong_pointers.c:14: Warning: 
   function printf_va_1: precondition \valid(param0) got status invalid.
@@ -40,7 +38,6 @@
 [eva] using specification for function printf_va_5
 [eva:alarm] printf_wrong_pointers.c:18: Warning: 
   function printf_va_5: precondition valid_read_wstring(param0) got status invalid.
-[eva] done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   ui ∈ {42}

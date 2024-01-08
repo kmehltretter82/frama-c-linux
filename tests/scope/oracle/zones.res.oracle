@@ -57,7 +57,7 @@
 [eva] Recording results for caller
 [eva] Done for function caller
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function array1:
   T[0] ∈ [--..--]

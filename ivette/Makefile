@@ -37,8 +37,7 @@ COPYRIGHT=CEA LIST / LSL
 
 .PHONY: all app dev
 
-all: pkg check-lint app
-
+all: pkg lint app
 app: api dome-app
 dev: api dome-dev
 
@@ -83,10 +82,12 @@ help::
 # --- Ivette Distribution
 # --------------------------------------------------------------------------
 
-.PHONY: dist appimage dist-dir
+.PHONY: dist appimage dist-dir dist-windows dist-macOS dist-linux
 
 dist: dist-dir dome-dist
-appimage: dist-dir dome-appimage
+dist-linux: dist-dir dome-appimage
+dist-windows: dist-dir dome-dist-win
+dist-macOS: dist-dir dome-dist-mac
 
 dist-dir:
 	@echo "Cleaning dist"
@@ -108,6 +109,8 @@ dome-app: pkg
 dome-dev: pkg
 dome-dist: pkg
 dome-appimage: pkg
+dome-dist-win: pkg
+dome-dist-mac: pkg
 
 pkg: $(LOADER) $(SANDBOX)
 
@@ -235,7 +238,7 @@ install:
 	@cp ivette-macos.sh dist/ivette.sh
 	@echo "exec open -na $(LIBDIR)/frama-c/Ivette.app --args\\" >> dist/ivette.sh
 	@echo "  --command $(BINDIR)/frama-c\\" >> dist/ivette.sh
-	@echo "  --working \$$PWD \$$*" >> dist/ivette.sh
+	@echo "  --working \$$PWD \"\$@\"" >> dist/ivette.sh
 	@mkdir -p $(BINDIR)
 	@install dist/ivette.sh $(BINDIR)/ivette
 	@rm -fr $(IVETTE_DIST)
@@ -270,5 +273,23 @@ uninstall:
 	@rm -fr $(LIBDIR)/frama-c/ivette
 
 endif
+
+# --------------------------------------------------------------------------
+# --- Ivette Tests
+# --------------------------------------------------------------------------
+tests: dist
+	@cp dist/renderer/* dist/main/
+	@echo "[Ivette] running tests"
+	@dune exec -- yarn playwright test
+
+tests-e2e: dist
+	@cp dist/renderer/* dist/main/
+	@echo "[Ivette] running tests (e2e)"
+	@dune exec -- yarn playwright test tests/e2e
+
+tests-monkey: dist
+	@cp dist/renderer/* dist/main/
+	@echo "[Ivette] running tests (monkey)"
+	@dune exec -- yarn playwright test tests/monkey
 
 # --------------------------------------------------------------------------

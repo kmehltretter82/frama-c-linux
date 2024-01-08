@@ -50,7 +50,7 @@
   Called from imprecise.c:145.
 [eva:alarm] imprecise.c:19: Warning: 
   pointer downcast. assert (unsigned int)(&k) ≤ 2147483647;
-[eva] imprecise.c:19: 
+[eva:garbled-mix:write] imprecise.c:19: 
   Assigning imprecise value to p.
   The imprecision originates from Arithmetic {imprecise.c:19}
 [eva:alarm] imprecise.c:20: Warning: out of bounds write. assert \valid(p);
@@ -120,7 +120,7 @@
   signed overflow. assert -2147483648 ≤ (int)*((char *)(&p)) + 0;
 [eva:alarm] imprecise.c:68: Warning: 
   signed overflow. assert (int)*((char *)(&p)) + 0 ≤ 2147483647;
-[eva] imprecise.c:68: 
+[eva:garbled-mix:write] imprecise.c:68: 
   Assigning imprecise value to c3.
   The imprecision originates from Misaligned {imprecise.c:68}
 [eva] Recording results for cast_address
@@ -129,8 +129,9 @@
 [eva] Done for function cast_address
 [eva] computing for function garbled_mix_null <- main.
   Called from imprecise.c:148.
-[kernel:annot:missing-spec] imprecise.c:75: Warning: 
-  Neither code nor specification for function gm_f1, generating default assigns from the prototype
+[kernel:annot:missing-spec] imprecise.c:72: Warning: 
+  Neither code nor specification for function gm_f1,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function gm_f1 <- garbled_mix_null <- main.
   Called from imprecise.c:75.
 [eva] using specification for function gm_f1
@@ -168,7 +169,8 @@
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(p_gm_null);
 [kernel:annot:missing-spec] imprecise.c:77: Warning: 
-  Neither code nor specification for function gm_f2, generating default assigns from the prototype
+  Neither code nor specification for function gm_f2,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function gm_f2 <- garbled_mix_null <- main.
   Called from imprecise.c:77.
 [eva] using specification for function gm_f2
@@ -263,7 +265,7 @@
 [eva] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cast_address:
   p ∈ {{ &x }}
@@ -806,7 +808,7 @@
 [eva] Recording results for main
 [from] Computing for function main
 [from] Done for function main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cast_address:
   p ∈ {{ &x }}

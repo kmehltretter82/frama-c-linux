@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** The extensible GUI.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 open Cil_types
 
@@ -82,7 +82,7 @@ class protected_menu_factory:
   Gtk_helper.host -> GMenu.menu -> [ GMenu.menu ] GMenu.factory
 
 (** This is the type of extension points for the GUI.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 class type main_window_extension_points = object
   inherit view_code
 
@@ -158,7 +158,7 @@ class type main_window_extension_points = object
       localizable.
       If the button 3 is released, the first argument is popped as a
       contextual menu.
-        @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+        @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   method register_source_highlighter :
     (reactive_buffer -> Pretty_source.localizable ->
@@ -243,7 +243,7 @@ class main_window : unit -> main_window_extension_points
 val register_extension : (main_window_extension_points -> unit) -> unit
 (** Register an extension to the main GUI. It will be invoked at
     initialization time.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val register_reset_extension : (main_window_extension_points -> unit) -> unit
 (** Register a function to be called whenever the main GUI reset method is

@@ -20,7 +20,7 @@
 [eva] Recording results for main2
 [from] Computing for function main2
 [from] Done for function main2
-[eva] done for function main2
+[eva] Done for function main2
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to f2 at bts336.i:35 (by main2):
   T[1] FROM i

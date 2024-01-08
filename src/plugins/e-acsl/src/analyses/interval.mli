@@ -47,6 +47,7 @@
     Note: this is a partial wrapper on top of [Ival.t], to which most
     functions are delegated. *)
 
+open Cil_types
 open Analyses_types
 open Analyses_datatype
 
@@ -55,37 +56,9 @@ open Analyses_datatype
 (* ************************************************************************** *)
 type t = ival
 
-val is_included: t -> t -> bool
-val join: t -> t -> t
-val meet: t -> t -> t
+val ty_of_interv: ?ctx:number_ty -> ?use_gmp_opt:bool -> t -> number_ty
 
-val widen: t -> t
-(** @return the smallest interval containing a disjoint union of intervals *)
-
-val is_singleton_int: t -> bool
-
-(** assume [Ival _] as argument *)
-val extract_ival: t -> Ival.t
-
-val ikind_of_ival: Ival.t -> Cil_types.ikind
-(** @return the smallest ikind that contains the given interval.
-    @raise Cil.Not_representable if the given interval does not fit into any C
-    integral type. *)
-
-val interv_of_typ: Cil_types.typ -> t
-(** @return the smallest interval which contains the given C type.
-    @raise Is_a_real if the given type is a float type.
-    @raise Not_a_number if the given type does not represent any number. *)
-
-val extended_interv_of_typ: Cil_types.typ -> t
-(** @return the interval [n..m+1] when interv_of_typ returns [n..m].
-    It is in particular useful for computing bounds of quantified variables.
-    @raise Is_a_real if the given type is a float type.
-    @raise Not_a_number if the given type does not represent any number. *)
-
-val plus_one : ival -> ival
-(** @return the result of adding one to an interval. This is because when we
-      have a condition [x<t], we need to generate [t+1] *)
+val is_included_in_typ: ival -> typ -> bool
 
 (* ************************************************************************** *)
 (** {3 Inference system} *)
@@ -93,38 +66,42 @@ val plus_one : ival -> ival
 (* The inference phase infers the smallest possible integer interval which the
    values of the term can fit in. *)
 
-val get_from_profile: profile:Profile.t -> Cil_types.term -> t
+val get_from_profile: profile:Profile.t -> term -> t
 (** @return the value computed by the interval inference phase
     @raise Is_a_real if the term is either a float or a real.
     @raise Not_a_number if the term does not represent any
     number.*)
 
-val get: logic_env:Logic_env.t -> Cil_types.term -> t
+val get: logic_env:Logic_env.t -> term -> t
 (** @return the value computed by the interval inference phase, same as
       [get_from_profile] but with a full-fledged logic environment instead of a
       function profile *)
+
+val joins_from_profile: profile:Profile.t -> term list -> t
+val joins: logic_env:Logic_env.t -> term list -> t
+val join_plus_one: profile:Profile.t -> term -> term -> t
+
+val get_ival: logic_env:Logic_env.t -> term -> Ival.t
 
 
 (*****************************************************************************)
 (** {2 Interval processing} *)
 (*****************************************************************************)
 
-val infer_program : Cil_types.file -> unit
+val infer_program : file -> unit
 (** compute and store the type of all the terms that will be translated
     in a program *)
 
 val preprocess_predicate :
-  logic_env:Logic_env.t -> Cil_types.predicate -> unit
+  logic_env:Logic_env.t -> predicate -> unit
 (** compute and store the type of all the terms in a code annotation *)
 
 val preprocess_code_annot :
-  logic_env:Logic_env.t -> Cil_types.code_annotation -> unit
+  logic_env:Logic_env.t -> code_annotation -> unit
 (** compute and store the type of all the terms in a code annotation *)
 
 val preprocess_term :
-  logic_env:Logic_env.t -> Cil_types.term -> unit
-
-val get_widened_profile : Profile.t -> Cil_types.logic_info -> Profile.t
+  logic_env:Logic_env.t -> term -> unit
 
 val clear : unit -> unit
 

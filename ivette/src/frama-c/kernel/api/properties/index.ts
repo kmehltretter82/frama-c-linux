@@ -38,17 +38,17 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 //@ts-ignore
-import { byFct } from 'frama-c/kernel/api/ast';
+import { byDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { bySource } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fct } from 'frama-c/kernel/api/ast';
+import { decl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { fctDefault } from 'frama-c/kernel/api/ast';
+import { declDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jFct } from 'frama-c/kernel/api/ast';
+import { jDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
@@ -140,6 +140,8 @@ export enum propKind {
   check_lemma = 'check_lemma',
   /** ACSL extension */
   extension = 'extension',
+  /** Generic Property */
+  generic = 'generic',
 }
 
 /** Decoder for `propKind` */
@@ -153,8 +155,8 @@ export const propKindDefault: propKind = propKind.behavior;
 
 const propKindTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.properties.propKindTags',
-  input:  Json.jNull,
+  name: 'kernel.properties.propKindTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -199,8 +201,8 @@ export const propStatusDefault: propStatus = propStatus.unknown;
 
 const propStatusTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.properties.propStatusTags',
-  input:  Json.jNull,
+  name: 'kernel.properties.propStatusTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -256,8 +258,8 @@ export const alarmsDefault: alarms = alarms.division_by_zero;
 
 const alarmsTags_internal: Server.GetRequest<null,tag[]> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.properties.alarmsTags',
-  input:  Json.jNull,
+  name: 'kernel.properties.alarmsTags',
+  input: Json.jNull,
   output: Json.jArray(jTag),
   signals: [],
 };
@@ -276,8 +278,8 @@ export interface statusData {
   names: string[];
   /** Status */
   status: propStatus;
-  /** Function */
-  fct?: fct;
+  /** Declaration Scope */
+  scope?: decl;
   /** Instruction */
   kinstr?: marker;
   /** Position */
@@ -298,7 +300,7 @@ export const jStatusData: Json.Decoder<statusData> =
     kind: jPropKind,
     names: Json.jArray(Json.jString),
     status: jPropStatus,
-    fct: Json.jOption(jFct),
+    scope: Json.jOption(jDecl),
     kinstr: Json.jOption(jMarker),
     source: jSource,
     alarm: Json.jOption(Json.jString),
@@ -310,14 +312,14 @@ export const jStatusData: Json.Decoder<statusData> =
 export const byStatusData: Compare.Order<statusData> =
   Compare.byFields
     <{ key: marker, descr: string, kind: propKind, names: string[],
-       status: propStatus, fct?: fct, kinstr?: marker, source: source,
+       status: propStatus, scope?: decl, kinstr?: marker, source: source,
        alarm?: string, alarm_descr?: string, predicate?: string }>({
     key: byMarker,
     descr: Compare.string,
     kind: byPropKind,
     names: Compare.array(Compare.string),
     status: byPropStatus,
-    fct: Compare.defined(byFct),
+    scope: Compare.defined(byDecl),
     kinstr: Compare.defined(byMarker),
     source: bySource,
     alarm: Compare.defined(Compare.string),
@@ -332,8 +334,8 @@ export const signalStatus: Server.Signal = {
 
 const reloadStatus_internal: Server.GetRequest<null,null> = {
   kind: Server.RqKind.GET,
-  name:   'kernel.properties.reloadStatus',
-  input:  Json.jNull,
+  name: 'kernel.properties.reloadStatus',
+  input: Json.jNull,
   output: Json.jNull,
   signals: [],
 };
@@ -342,25 +344,25 @@ export const reloadStatus: Server.GetRequest<null,null>= reloadStatus_internal;
 
 const fetchStatus_internal: Server.GetRequest<
   number,
-  { pending: number, updated: statusData[], removed: marker[],
-    reload: boolean }
+  { reload: boolean, removed: marker[], updated: statusData[],
+    pending: number }
   > = {
   kind: Server.RqKind.GET,
-  name:   'kernel.properties.fetchStatus',
-  input:  Json.jNumber,
+  name: 'kernel.properties.fetchStatus',
+  input: Json.jNumber,
   output: Json.jObject({
-            pending: Json.jNumber,
-            updated: Json.jArray(jStatusData),
-            removed: Json.jArray(jMarker),
             reload: Json.jBoolean,
+            removed: Json.jArray(jMarker),
+            updated: Json.jArray(jStatusData),
+            pending: Json.jNumber,
           }),
   signals: [],
 };
 /** Data fetcher for array [`status`](#status)  */
 export const fetchStatus: Server.GetRequest<
   number,
-  { pending: number, updated: statusData[], removed: marker[],
-    reload: boolean }
+  { reload: boolean, removed: marker[], updated: statusData[],
+    pending: number }
   >= fetchStatus_internal;
 
 const status_internal: State.Array<marker,statusData> = {
@@ -377,7 +379,7 @@ export const status: State.Array<marker,statusData> = status_internal;
 /** Default value for `statusData` */
 export const statusDataDefault: statusData =
   { key: markerDefault, descr: '', kind: propKindDefault, names: [],
-    status: propStatusDefault, fct: undefined, kinstr: undefined,
+    status: propStatusDefault, scope: undefined, kinstr: undefined,
     source: sourceDefault, alarm: undefined, alarm_descr: undefined,
     predicate: undefined };
 

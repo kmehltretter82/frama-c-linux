@@ -17,7 +17,7 @@
 [eva] Done for function Frama_C_interval
 [eva] absorb.c:22: starting to merge loop iterations
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]

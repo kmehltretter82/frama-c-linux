@@ -47,7 +47,7 @@ README header_spec=.ignore
 /examples/demo/TODO header_spec=.ignore
 /examples/ensuresec/push-alerts/.env-example header_spec=.ignore
 
-/headers/close-source/* header_spec=.ignore
+/headers/closed-source/* header_spec=.ignore
 /headers/open-source/* header_spec=.ignore
 
 /license/* header_spec=.ignore

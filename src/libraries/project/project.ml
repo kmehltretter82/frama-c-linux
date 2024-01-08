@@ -435,38 +435,35 @@ let clear_all () =
 
 exception IOError = Sys_error
 
-module Before_load = Hook.Make(struct end)
+module Before_load = Hook.Make()
 let register_before_load_hook = Before_load.extend
 
-module After_load = Hook.Make(struct end)
+module After_load = Hook.Make()
 let register_after_load_hook = After_load.extend
 
-module After_global_load = Hook.Make(struct end)
+module After_global_load = Hook.Make()
 let register_after_global_load_hook = After_global_load.extend
 
 let magic = 9 (* magic number *)
 
 let save_projects selection projects filename =
-  if Cmdline.use_obj then begin
-    let cout = open_out_bin (filename : Filepath.Normalized.t :> string) in
-    output_value cout Fc_config.version;
-    output_value cout magic;
-    output_value cout !Graph.Blocks.cpt_vertex;
-    let states : (t * (string * State.state_on_disk) list) list =
-      Q.fold
-        (fun acc p ->
-           (* project + serialized version of all its states *)
-           (p, States_operations.serialize ~selection p) :: acc)
-        []
-        projects
-    in
-    (* projects are stored on disk from the current one to the last project.
-       !last_created_by_copy_ref must be saved at the same time to share the
-       project on disk *)
-    output_value cout (List.rev states, !last_created_by_copy_ref);
-    close_out cout;
-  end else
-    abort "saving a file is not supported in the 'no obj' mode"
+  let cout = open_out_bin (filename : Filepath.Normalized.t :> string) in
+  output_value cout Fc_config.version;
+  output_value cout magic;
+  output_value cout !Graph.Blocks.cpt_vertex;
+  let states : (t * (string * State.state_on_disk) list) list =
+    Q.fold
+      (fun acc p ->
+         (* project + serialized version of all its states *)
+         (p, States_operations.serialize ~selection p) :: acc)
+      []
+      projects
+  in
+  (* projects are stored on disk from the current one to the last project.
+     !last_created_by_copy_ref must be saved at the same time to share the
+     project on disk *)
+  output_value cout (List.rev states, !last_created_by_copy_ref);
+  close_out cout
 
 let save ?(selection=State_selection.full) ?(project=current()) filename =
   guarded_feedback selection 2 "saving project %S into file %a"
@@ -593,65 +590,62 @@ module Descr = struct
 end
 
 let load_projects ~project_under_copy selection ?name filename =
-  if Cmdline.use_obj then begin
-    let cin = open_in_bin (filename : Filepath.Normalized.t :> string) in
-    let gen_read f cin =
-      try f cin with
-      | End_of_file ->
-        close_in cin;
-        abort "unexpected end of file while loading '%a'"
-          Filepath.Normalized.pretty filename
-      | Failure s -> close_in cin; raise (IOError s)
-    in
-    let read = gen_read input_value in
-    let check_magic cin to_string current =
-      let old = read cin in
-      if old <> current then begin
-        close_in cin;
-        let s =
-          Format.sprintf
-            "project saved with an incompatible version (old: %S,current: %S)"
-            (to_string old)
-            (to_string current)
-        in
-        raise (IOError s)
-      end
-    in
-    check_magic cin (fun x -> x) Fc_config.version;
-    check_magic cin (fun n -> "magic number " ^ string_of_int n) magic;
-    let ocamlgraph_counter = read cin in
-    let pre_existing_projects = Descr.init project_under_copy in
-    let loaded_states, last_created =
-      gen_read
-        (fun c -> Descr.input_val c (Descr.global_state name selection))
-        cin
-    in
-    close_in cin;
-    last_created_by_copy_ref := last_created;
-    Descr.finalize loaded_states selection;
-    Graph.Blocks.after_unserialization ocamlgraph_counter;
-    (* [set_current] done when unmarshalling and hooks may reorder
-       projects: rebuild it in the good order *)
-    let last = current () in
-    Q.clear projects;
-    let loaded_projects =
-      List.fold_right
-        (fun (p, _) acc -> Q.add p projects; p :: acc) loaded_states []
-    in
-    List.iter (fun p -> Q.add p projects) pre_existing_projects;
-    (* We have to restore all the local states if the last loaded project is
-       not the good current one. The trick is to call [set_current] on [current
-       ()], but we ensure that this operation **does** something (that is not
-       the case by default) by putting [last] as current project
-       temporarily. *)
-    let true_current = current () in
-    Q.add last projects;
-    force_set_current true selection true_current;
-    Q.remove last projects;
-    After_global_load.apply ();
-    loaded_projects
-  end else
-    abort "loading a file is not supported in the 'no obj' mode"
+  let cin = open_in_bin (filename : Filepath.Normalized.t :> string) in
+  let gen_read f cin =
+    try f cin with
+    | End_of_file ->
+      close_in cin;
+      abort "unexpected end of file while loading '%a'"
+        Filepath.Normalized.pretty filename
+    | Failure s -> close_in cin; raise (IOError s)
+  in
+  let read = gen_read input_value in
+  let check_magic cin to_string current =
+    let old = read cin in
+    if old <> current then begin
+      close_in cin;
+      let s =
+        Format.sprintf
+          "project saved with an incompatible version (old: %S,current: %S)"
+          (to_string old)
+          (to_string current)
+      in
+      raise (IOError s)
+    end
+  in
+  check_magic cin (fun x -> x) Fc_config.version;
+  check_magic cin (fun n -> "magic number " ^ string_of_int n) magic;
+  let ocamlgraph_counter = read cin in
+  let pre_existing_projects = Descr.init project_under_copy in
+  let loaded_states, last_created =
+    gen_read
+      (fun c -> Descr.input_val c (Descr.global_state name selection))
+      cin
+  in
+  close_in cin;
+  last_created_by_copy_ref := last_created;
+  Descr.finalize loaded_states selection;
+  Graph.Blocks.after_unserialization ocamlgraph_counter;
+  (* [set_current] done when unmarshalling and hooks may reorder
+     projects: rebuild it in the good order *)
+  let last = current () in
+  Q.clear projects;
+  let loaded_projects =
+    List.fold_right
+      (fun (p, _) acc -> Q.add p projects; p :: acc) loaded_states []
+  in
+  List.iter (fun p -> Q.add p projects) pre_existing_projects;
+  (* We have to restore all the local states if the last loaded project is
+     not the good current one. The trick is to call [set_current] on [current
+     ()], but we ensure that this operation **does** something (that is not
+     the case by default) by putting [last] as current project
+     temporarily. *)
+  let true_current = current () in
+  Q.add last projects;
+  force_set_current true selection true_current;
+  Q.remove last projects;
+  After_global_load.apply ();
+  loaded_projects
 
 let load_with_copy
     ?project_under_copy ?(selection=State_selection.full) ?name filename =
@@ -716,13 +710,11 @@ module Undo = struct
       clear_breakpoint ()
 
   let breakpoint () =
-    if Cmdline.use_obj then begin
-      clear_breakpoint ();
-      filename := Filepath.Normalized.of_string
-          (try Extlib.temp_file_cleanup_at_exit short_filename ".sav"
-           with Extlib.Temp_file_error s ->
-             abort "cannot create temporary file: %s" s);
-    end
+    clear_breakpoint ();
+    filename := Filepath.Normalized.of_string
+        (try Extlib.temp_file_cleanup_at_exit short_filename ".sav"
+         with Extlib.Temp_file_error s ->
+           abort "cannot create temporary file: %s" s)
 
 end
 

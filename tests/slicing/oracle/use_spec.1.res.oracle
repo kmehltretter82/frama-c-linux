@@ -24,7 +24,7 @@
 [eva:alarm] use_spec.i:41: Warning: 
   signed overflow. assert tmp + G2 ≤ 2147483647;
 [eva] Recording results for main2
-[eva] done for function main2
+[eva] Done for function main2
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function main2
@@ -62,7 +62,7 @@
 [eva:alarm] use_spec.i:41: Warning: 
   signed overflow. assert tmp + G2 ≤ 2147483647;
 [eva] Recording results for main2
-[eva] done for function main2
+[eva] Done for function main2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main2:
   G1 ∈ [--..--]

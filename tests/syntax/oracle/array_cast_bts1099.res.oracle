@@ -6,5 +6,4 @@
   12      t* p2 = (t) p;
         ^^^^^^^^^^^^^^^^
   13    }
-[kernel] User Error: stopping on file "array_cast_bts1099.i" that has errors.
 [kernel] Frama-C aborted: invalid user input.

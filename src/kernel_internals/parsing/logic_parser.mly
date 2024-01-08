@@ -1507,8 +1507,10 @@ code_annotation:
           raise
             (Not_well_formed
                (loc $loc($1),
-                 ext ^ " is not a loop annotation extension. It can't be used \
-                         as plain code annotation extension"))
+                Printf.sprintf
+                  "%s is a loop annotation extension. It can't be used as a \
+                   plain code annotation extension. Did you mean 'loop %s'?"
+                  ext ext))
         | _ -> raise Not_found
       end
     with Not_found ->

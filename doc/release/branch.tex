@@ -3,6 +3,13 @@
 
 That is the procedure for forking the release from \texttt{master}.
 
+\section{Creating the milestones}
+
+Create the milestone for the next releases on \textsf{Gitlab},
+in the Frama-C group. They will be used for development that will not
+be integrated into the upcoming release.
+\expertise{François, Julien}.
+
 \section{``Freezing'' master}
 
 When the ``freeze'' period arrives (usually a few weeks before the beta
@@ -48,14 +55,10 @@ and go through Merge-requests. Everything else should go in \texttt{master},
 which can then be reset to standard-level protection (Developers + Maintainers
 allowed to push/merge).
 
-\section{Creating the milestones}
-
-Create the milestone for the next release on \textsf{Gitlab},
-in the Frama-C group
-\expertise{François, Julien}.
-
-
 \section{GitLab issues}
+
+{\em This is currently done periodically in specific Frama-C meetings, so only
+  a final check is usually necessary.}~\\
 
 Check public issue tracker at \url{https://git.frama-c.com/pub/frama-c/issues/}.
 All issues should have been at least acknowledged: at least they should be
@@ -68,21 +71,34 @@ one.
 
 \section{Version}
 
-Execute the script:
+On the new \texttt{stable} branch, execute the script:
 \begin{verbatim}
 ./dev/set-version.sh NN.M # to be replaced with actual major/minor version
 \end{verbatim}
 This will:
 \begin{itemize}
   \item update the \texttt{Changelog}s
-  \item update the changes in the manuals (excluding ACSL and E-ACSL references)
+  \item update the changes in the manuals \textbf{(excluding ACSL and E-ACSL references)}
   \item update the \texttt{VERSION} and \texttt{VERSION\_CODENAME} files
-  \item update the \texttt{opam} file
+  \item update the \texttt{opam} files (Frama-C, lint, hdrck)
   \item update the API doc
+  \item update the Frama-C build script
+  \item update the reference configuration
 \end{itemize}
 
-Merge the branch in \texttt{master} and add a commit to \texttt{master} by
-adding \texttt{"+dev"} in the \texttt{VERSION} file.
+Merge the \texttt{stable} branch in the \texttt{master} branch.
+
+On the \texttt{master} branch, execute the script:
+\begin{verbatim}
+  ./dev/set-version.sh dev
+\end{verbatim}
+This will:
+\begin{itemize}
+  \item update the \texttt{VERSION} file
+  \item update the \texttt{opam} files (Frama-C, lint, hdrck)
+\end{itemize}
+
+Commit this change and push.
 
 \section{Copyright}
 
@@ -90,11 +106,11 @@ Check that the date in copyright headers is correct. If not then:
 \begin{itemize}
   \item update the dates in the license files in:
   \begin{itemize}
-    \item \texttt{headers/close-source/*}
+    \item \texttt{headers/closed-source/*}
     \item \texttt{headers/open-source/*}
-    \item \texttt{ivette/headers/close-source/*}
+    \item \texttt{ivette/headers/closed-source/*}
     \item \texttt{ivette/headers/open-source/*}
-    \item \texttt{src/plugins/e-acsl/headers/close-source/*}
+    \item \texttt{src/plugins/e-acsl/headers/closed-source/*}
     \item \texttt{src/plugins/e-acsl/headers/open-source/*}
   \end{itemize}
   \item update the headers with the following command:

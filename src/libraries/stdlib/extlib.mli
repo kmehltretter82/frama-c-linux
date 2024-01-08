@@ -194,11 +194,14 @@ val opt_map2: ('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c option
 (* ************************************************************************* *)
 
 val string_prefix: ?strict:bool -> string -> string -> bool
+[@@alert deprecated "Use String.starts_with instead"]
 (** [string_prefix ~strict p s] returns [true] if and only if [p] is a
     prefix of the string [s]. If [strict] is true, the prefix must be strict
     (that is, [s] must moreover be strictly longer than [p]). [strict]
     is false by default.
-    @since Boron-20100401 *)
+    @since Boron-20100401
+    @deprecated 28.0-Nickel use 'String.starts_with' instead
+*)
 
 val string_del_prefix: ?strict:bool -> string -> string -> string option
 (** [string_del_prefix ~strict p s] returns [None] if [p] is not a prefix of
@@ -206,10 +209,12 @@ val string_del_prefix: ?strict:bool -> string -> string -> string option
     @since Oxygen-20120901 *)
 
 val string_suffix: ?strict:bool -> string -> string -> bool
+[@@alert deprecated "Use String.ends_with instead"]
 (** [string_suffix ~strict suf s] returns [true] iff [suf] is a suffix of
     string [s]. [strict], which defaults to [false], indicates whether [s]
     should be strictly longer than [p].
     @since Aluminium-20160501
+    @deprecated 28.0-Nickel use 'String.ends_with' instead
 *)
 
 val string_del_suffix: ?strict:bool -> string -> string -> string option
@@ -251,7 +256,7 @@ external address_of_value: 'a -> int = "address_of_value" [@@noalloc]
 (** {2 System commands} *)
 (* ************************************************************************* *)
 
-val mkdir : ?parents:bool -> string -> Unix.file_perm -> unit
+val mkdir : ?parents:bool -> Filepath.Normalized.t -> Unix.file_perm -> bool
 (** [mkdir ?parents name perm] creates directory [name] with permission
     [perm]. If [parents] is true, recursively create parent directories
     if needed. [parents] defaults to false.
@@ -259,8 +264,13 @@ val mkdir : ?parents:bool -> string -> Unix.file_perm -> unit
     and then fail to create the children, e.g. if [perm] does not allow
     user execution of the created directory. This will leave the filesystem
     in a modified state before raising an exception.
+    Returns [true] if the directory was created, [false] otherwise.
     @raise Unix.Unix_error if cannot create [name] or its parents.
-    @since 19.0-Potassium  *)
+    @since 19.0-Potassium
+    @since 28.0-Nickel added check for existence of path (error if exists
+    but not a directory, otherwise do nothing if directory already exists).
+    Changed type of [name] argument and return type.
+*)
 
 val safe_at_exit : (unit -> unit) -> unit
 (** Register function to call with [Stdlib.at_exit], but only
@@ -282,8 +292,9 @@ val temp_file_cleanup_at_exit: ?debug:bool -> string -> string -> string
     @raise Temp_file_error if the temp file cannot be created.
 *)
 
-val temp_dir_cleanup_at_exit: ?debug:bool -> string -> string
-(** @raise Temp_file_error if the temp dir cannot be created. *)
+val temp_dir_cleanup_at_exit: ?debug:bool -> string -> Filepath.Normalized.t
+(** @raise Temp_file_error if the temp dir cannot be created.
+    @since 28.0-Nickel modify return type *)
 
 val safe_remove: string -> unit
 (** Tries to delete a file and never fails. *)

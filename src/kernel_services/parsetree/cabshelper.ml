@@ -266,6 +266,7 @@ let mk_asm_templates =
     else res in
   outer []
 
+let mk_attr_annot s = "~attrannot:" ^ s, []
 
 (*
 Local Variables:

@@ -1,16 +1,22 @@
 {
   "name": "ivette",
+  "productName": "Ivette",
   "version": "1.0.0",
   "main": "index.js",
   "repository": "git@git.frama-c.com:frama-c/Ivette.git",
   "author": "Loïc Correnson <loic.correnson@cea.fr>",
-  "license": "MIT",
+  "license": "LGPL-2.1",
   "description": "Frama-C GUI",
+  "homepage": "https://frama-c.com/html/ivette.html",
   "scripts": {
-    "lint": "eslint --ext .ts,.tsx --format=compact ./src",
+    "lint": "eslint --ext .ts,.tsx --format=compact ./src ./tests",
     "typecheck": "tsc --noEmit",
     "typecheck:watch": "yarn run typecheck -- --watch",
-    "build": "tsc"
+    "build": "tsc",
+    "dist:mac": "yarn run electron-builder --mac --dir -c.compression=store -c.mac.identity=null",
+    "dist:win": "yarn run electron-builder --win --dir -c.compression=store",
+    "dist:linux": "yarn run electron-builder --linux --dir -c.compression=store",
+    "dist:all": "yarn run electron-builder -wlm --dir -c.compression=store -c.mac.identity=null"
   },
   "devDependencies": {
     "@babel/cli": "",
@@ -22,6 +28,7 @@
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "",
     "@hot-loader/react-dom": "^16",
+    "@playwright/test": "^1.36.0",
     "@types/codemirror": "",
     "@types/cytoscape": "",
     "@types/estree": "^0.0.50",
@@ -33,9 +40,10 @@
     "@typescript-eslint/eslint-plugin": "",
     "@typescript-eslint/parser": "",
     "babel-loader": "^8.2.3",
+    "cross-dirname": "^0.1.0",
     "css-loader": "^5",
     "electron": "^16",
-    "electron-builder": "^22.14.13",
+    "electron-builder": "^24.6.3",
     "electron-devtools-installer": "^3.2.0",
     "electron-webpack": "^2.8.2",
     "eslint": "",
@@ -45,6 +53,7 @@
     "eslint-plugin-jsx-a11y": "",
     "eslint-plugin-react": "",
     "eslint-plugin-react-hooks": "",
+    "gremlins.js": "^2.2.0",
     "html-loader": "^1",
     "jsdoc": "",
     "react-hot-loader": "^4",
@@ -55,16 +64,15 @@
   },
   "dependencies": {
     "@babel/runtime": "",
+    "@codemirror/commands": "6.1.0",
+    "@codemirror/lang-cpp": "6.0.1",
+    "@codemirror/language": "6.2.1",
+    "@codemirror/search": "6.2.3",
+    "@codemirror/state": "6.1.1",
+    "@codemirror/view": "6.2.3",
     "@fortawesome/fontawesome-free": "",
     "@types/diff": "",
     "@types/react-window": "",
-    "codemirror": "^5.65.2",
-    "@codemirror/view": "6.2.3",
-    "@codemirror/state": "6.1.1",
-    "@codemirror/search": "6.2.3",
-    "@codemirror/language": "6.2.1",
-    "@codemirror/commands": "6.1.0",
-    "@codemirror/lang-cpp": "6.0.1",
     "cytoscape": "",
     "cytoscape-cola": "",
     "cytoscape-cose-bilkent": "",
@@ -73,18 +81,70 @@
     "cytoscape-klay": "",
     "cytoscape-panzoom": "",
     "cytoscape-popper": "",
-    "diff": "",
+    "diff": "^5.1.0",
+    "gremlins.js": "^2.2.0",
     "immutable": "",
     "lodash": "^4.17.21",
     "react": "^16",
     "react-cytoscapejs": "",
     "react-dom": "^16",
-    "react-draggable": "^4.4.4",
-    "react-fast-compare": "^3.2.0",
+    "react-draggable": "^4.4.6",
+    "react-fast-compare": "^3.2.2",
     "react-pivottable": "^0.11.0",
-    "react-virtualized": "^9.22.3",
+    "react-virtualized": "^9.22.5",
     "react-window": "",
     "source-map-support": "^0.5.21",
     "tippy.js": "6.3.7"
+  },
+  "build": {
+    "appId": "com.framac.ivette",
+    "compression": "store",
+    "copyright": "Copyright © 2007-2023 Frama-C. All Rights Reserved.",
+    "artifactName": "${productName}-${arch}-${version}.${ext}",
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ],
+      "icon": "static/icon256.png",
+      "legalTrademarks": "LGPL-2.1"
+    },
+    "linux": {
+      "executableName": "ivette",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "synopsis": "Frama-C GUI",
+      "category": "Profiling"
+    },
+    "mac": {
+      "icon": "static/icon512.png",
+      "identity": null,
+      "mergeASARs": true,
+      "target": [
+        {
+          "target": "default",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "type": "distribution",
+      "category": "public.app-category.developer-tools"
+    },
+    "dmg": {
+      "title": "Ivette ${version}"
+    }
   }
 }

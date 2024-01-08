@@ -94,11 +94,13 @@ let result ~status ~smoke (r:VCS.result) =
   match status with
   | `Passed when smoke -> VALID
   | _ ->
-    match VCS.verdict ~smoke r with
+    match r.VCS.verdict with
     | VCS.NoResult | VCS.Computing _ -> NORESULT
     | VCS.Failed -> INCONCLUSIVE
-    | VCS.Invalid | VCS.Unknown | VCS.Timeout | VCS.Stepout -> UNSUCCESS
-    | VCS.Valid -> VALID
+    | VCS.Unknown | VCS.Timeout | VCS.Stepout | VCS.Invalid ->
+      if smoke then VALID else UNSUCCESS
+    | VCS.Valid ->
+      if smoke then UNSUCCESS else VALID
 
 let best_result a b = match a,b with
   | NORESULT,c | c,NORESULT -> c
@@ -889,8 +891,9 @@ let export_json gstat ?jinput ~joutput () =
             Wp_parameters.feedback "Report out: '%s'" joutput ;
             jinput
         in
-        if Sys.file_exists jfile then
-          Json.load_file jfile
+        let jpath = Filepath.Normalized.of_string jfile in
+        if Filepath.exists jpath then
+          Json.load_file jpath
         else `Null
       with Json.Error(file,line,msg) ->
         let source = Log.source ~file ~line in
@@ -898,7 +901,7 @@ let export_json gstat ?jinput ~joutput () =
         `Null
     in
     rankify_fcstat gstat js ;
-    Json.save_file joutput (json_of_fcstat gstat) ;
+    Json.save_file (Filepath.Normalized.of_string joutput) (json_of_fcstat gstat) ;
   end
 
 

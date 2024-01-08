@@ -338,8 +338,5 @@ let backward_unop ~typ_arg:_ _op ~arg:_ ~res:_ = `Value None
 (* Not implemented precisely *)
 let backward_cast ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ = `Value None
 
-
-(** {2 Misc} *)
-
 (* Eva boilerplate, used to retrieve the domain. *)
 let key = Structure.Key_Value.create_key "sign_values"

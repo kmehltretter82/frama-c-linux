@@ -2,8 +2,19 @@
 [kernel] Parsing dispatch_var2.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] Warning: Missing RTE guards
+[wp] [Valid] Goal incr_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal incr_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal load_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal load_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal reset_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal reset_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function call_global
+------------------------------------------------------------
+
+Goal Termination-condition (generated) in 'call_global':
+Prove: true.
+
 ------------------------------------------------------------
 
 Goal Post-condition (file dispatch_var2.i, line 37) in 'call_global':
@@ -24,6 +35,11 @@ Assume {
   Have: tmp_0 = call_global_0.
 }
 Prove: call_global_0 = 0.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_global':
+Prove: true.
 
 ------------------------------------------------------------
 
@@ -72,6 +88,11 @@ Prove: true.
   Function call_local
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_local':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file dispatch_var2.i, line 56) in 'call_local':
 Assume {
   Type: is_sint32(call_local_0) /\ is_sint32(load_0) /\ is_sint32(tmp_0) /\
@@ -95,6 +116,11 @@ Prove: call_local_0 = 0.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'call_local':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'call_local' (1/2):
 Prove: true.
 
@@ -103,23 +129,15 @@ Prove: true.
 Goal Assigns nothing in 'call_local' (2/2):
 Call Effect at line 61
 Assume {
-  Type: is_sint32(status_0) /\ is_sint32(status_1) /\ is_sint32(z).
+  Type: is_sint32(z).
   Have: (ta_z_1=true) <-> (ta_z_0=true).
   (* Block In *)
   Have: (Init_z_0=false) /\ (ta_tmp_0=false) /\ (ta_z_1=false).
-  (* Merge *)
-  Either {
-    Case:
-      Have: (Init_z_0=true) <-> (Init_z_1=true).
-      (* Call 'reset' *)
-      Have: z = 0.
-      (* Call Effects *)
-      Have: ((Init_z_1=true) -> (Init_z_2=true)).
-    Case:
-      Have: (Init_z_0=true) <-> (Init_z_3=true).
-      (* Exit Effects *)
-      Have: ((Init_z_3=true) -> (Init_z_4=true)).
-  }
+  Have: (Init_z_0=true) <-> (Init_z_1=true).
+  (* Call 'reset' *)
+  Have: z = 0.
+  (* Call Effects *)
+  Have: ((Init_z_1=true) -> (Init_z_2=true)).
 }
 Prove: (ta_z_0=false).
 
@@ -199,6 +217,11 @@ Prove: (ta_z_0=true).
   Function call_param
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_param':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file dispatch_var2.i, line 47) in 'call_param':
 Assume {
   Type: is_sint32(call_param_0) /\ is_sint32(load_0) /\ is_sint32(tmp_0) /\
@@ -228,6 +251,11 @@ Prove: call_param_0 = 0.
 
 ------------------------------------------------------------
 
+Goal Exit-condition (generated) in 'call_param':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Assigns nothing in 'call_param' (1/2):
 Prove: true.
 
@@ -236,7 +264,7 @@ Prove: true.
 Goal Assigns nothing in 'call_param' (2/2):
 Call Effect at line 51
 Assume {
-  Type: is_sint32(status_0) /\ is_sint32(status_1) /\ is_sint32(y).
+  Type: is_sint32(y).
   Have: (ta_y_1=true) <-> (ta_y_0=true).
   (* Pre-condition *)
   Have: (ta_y_1=true).
@@ -246,11 +274,8 @@ Assume {
   Have: (ta_y_2=true) /\ (ta_y_1=false).
   (* Block In *)
   Have: (ta_tmp_0=false).
-  (* Merge *)
-  Either {
-    Case: (* Call 'reset' *) Have: (ta_y_2=true) /\ (y = 0).
-    Case: (* Exit 'reset' *) Have: (ta_y_2=true).
-  }
+  (* Call 'reset' *)
+  Have: (ta_y_2=true) /\ (y = 0).
 }
 Prove: (ta_y_0=false).
 
@@ -345,6 +370,11 @@ Prove: (ta_y_0=true).
   Function call_param_ref
 ------------------------------------------------------------
 
+Goal Termination-condition (generated) in 'call_param_ref':
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Post-condition (file dispatch_var2.i, line 68) in 'call_param_ref':
 Assume {
   Type: is_sint32(call_param_ref_0) /\ is_sint32(load_0) /\ is_sint32(q) /\
@@ -361,6 +391,11 @@ Assume {
   Have: tmp_0 = call_param_ref_0.
 }
 Prove: call_param_ref_0 = 0.
+
+------------------------------------------------------------
+
+Goal Exit-condition (generated) in 'call_param_ref':
+Prove: true.
 
 ------------------------------------------------------------
 

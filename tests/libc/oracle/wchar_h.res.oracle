@@ -193,20 +193,20 @@
   function wcscasecmp: precondition 'valid_wstring_ws2' got status valid.
 [eva] Done for function wcscasecmp
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   fd ∈ {{ NULL ; &__fc_fopen + [0..120],0%8 }}
   buf[0..28] ∈ [--..--] or UNINITIALIZED
      [29] ∈ UNINITIALIZED
-  res ∈ {{ NULL ; &buf[0] }}
+  res ∈ {{ NULL ; &buf[0] }} or UNINITIALIZED
   buf2[0] ∈ {97} or UNINITIALIZED
       [1] ∈ {98} or UNINITIALIZED
-  r ∈ {{ &wdst[0] }}
-  wsrc ∈ {{ L"wide thing" }}
+  r ∈ {{ &wdst[0] }} or UNINITIALIZED
+  wsrc ∈ {{ L"wide thing" }} or UNINITIALIZED
   wdst[0..9] ∈ [--..--] or UNINITIALIZED
-  wdst2[0..9] ∈ {65}
-       [10] ∈ {0}
-       [11..19] ∈ [--..--]
-  ir ∈ [--..--]
+  wdst2[0..9] ∈ {65} or UNINITIALIZED
+       [10] ∈ {0} or UNINITIALIZED
+       [11..19] ∈ [--..--] or UNINITIALIZED
+  ir ∈ [--..--] or UNINITIALIZED
   __retres ∈ {0; 1}

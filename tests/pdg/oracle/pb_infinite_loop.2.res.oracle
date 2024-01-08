@@ -4,14 +4,15 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
-[kernel:annot:missing-spec] pb_infinite_loop.c:48: Warning: 
-  Neither code nor specification for function exit, generating default assigns from the prototype
+[kernel:annot:missing-spec] pb_infinite_loop.c:43: Warning: 
+  Neither code nor specification for function exit,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function exit <- test_exit.
   Called from pb_infinite_loop.c:48.
 [eva] using specification for function exit
 [eva] Done for function exit
 [eva] Recording results for test_exit
-[eva] done for function test_exit
+[eva] Done for function test_exit
 [pdg] computing for function test_exit
 [from] Computing for function exit
 [from] Done for function exit

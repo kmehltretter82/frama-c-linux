@@ -71,8 +71,6 @@ module Kernel_log =
 let dkey = Kernel_log.register_category "cmdline"
 
 let quiet_ref = ref false
-let use_obj_ref = ref true
-let use_type_ref = ref true
 let deterministic = ref false
 let permissive = ref false
 
@@ -158,7 +156,7 @@ let protect = function
 (** {2 Exiting Frama-C} *)
 (* ************************************************************************* *)
 
-module NormalExit = Hook.Make(struct end)
+module NormalExit = Hook.Make()
 let at_normal_exit = NormalExit.extend
 let run_normal_exit_hook = NormalExit.apply
 
@@ -379,9 +377,7 @@ let non_initial_options_ref = ref []
 let () =
   let first_parsing_stage () =
     parse
-      [ "-no-obj", Unit (fun () -> use_obj_ref := false);
-        "-no-type", Unit (fun () -> use_type_ref := false);
-        "-quiet",
+      [ "-quiet",
         Unit (fun () ->
             quiet_ref := true;
             Verbose_level.set 0;
@@ -406,16 +402,7 @@ let () =
     ~at_normal_exit:(fun () -> ())
     ~on_error:run_error_exit_hook
 
-let () =
-  if not !use_obj_ref then use_type_ref := false;
-  if not !use_type_ref then begin
-    Type.no_obj ();
-  end
-
 let quiet = !quiet_ref
-
-let use_obj = !use_obj_ref
-let use_type = !use_type_ref
 let deterministic = !deterministic
 let permissive = !permissive
 
@@ -617,7 +604,7 @@ struct
   let nb_actions = ref 0
   let is_going_to_run () = incr nb_actions
 
-  module H = Hook.Make(struct end)
+  module H = Hook.Make()
 
   let () = H.extend Log.treat_deferred_error
 

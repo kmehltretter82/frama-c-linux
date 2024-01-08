@@ -30,7 +30,7 @@ type clobbered_set = {
   mutable clob: Base.SetLattice.t
 }
 
-val structural_descr: Structural_descr.t
+val packed_descr: Structural_descr.pack
 
 val bottom: unit -> clobbered_set
 val top: unit -> clobbered_set

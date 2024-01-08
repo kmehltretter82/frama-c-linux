@@ -355,6 +355,15 @@ module MultidimDisjunctiveInvariants = False
     end)
 let () = add_precision_dep MultidimDisjunctiveInvariants.parameter
 
+let () = Parameter_customize.set_group domains
+let () = Parameter_customize.is_invisible ()
+module MultidimFastImprecise = False
+    (struct
+      let option_name = "-eva-multidim-fast-imprecise"
+      let help = "Makes the multidim domain faster but less precise: \
+                  the domain can lose more information when joining states."
+    end)
+let () = add_precision_dep MultidimFastImprecise.parameter
 
 (* -------------------------------------------------------------------------- *)
 (* --- Performance options                                                --- *)
@@ -1131,23 +1140,20 @@ let () = StopAtNthAlarm.set_range ~min:0 ~max:max_int
 (* -------------------------------------------------------------------------- *)
 
 let () = Parameter_customize.is_invisible ()
-module InitialStateChanged =
+module CorrectnessChanged =
   Int (struct
     let option_name = "-eva-new-initial-state"
     let default = 0
     let arg_name = "n"
     let help = ""
   end)
-(* Changing the user-supplied initial state (or the arguments of main) through
-   the API of Db.Value does reset the state of Value, but *not* the property
-   statuses that Value has positioned. Currently, statuses can only depend
-   on a command-line parameter. We use the dummy one above to force a reset
-   when needed. *)
-let () =
-  add_correctness_dep InitialStateChanged.parameter;
-  Db.Value.initial_state_changed :=
-    (fun () -> InitialStateChanged.set (InitialStateChanged.get () + 1))
+let () = add_correctness_dep CorrectnessChanged.parameter
 
+(* Changing the user-supplied initial state (or the arguments of main) through
+   the API does reset the state of Eva, but *not* the property statuses set by
+   Eva. Currently, statuses can only depend on command-line parameters.
+   We use the dummy one above to force a reset when needed. *)
+let change_correctness = CorrectnessChanged.incr
 
 (* -------------------------------------------------------------------------- *)
 (* --- Eva options                                                        --- *)

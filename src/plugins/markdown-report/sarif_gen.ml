@@ -251,7 +251,7 @@ let gen_run remarks =
         (key, (dir :> string))
       ) (Filepath.all_symbolic_dirs ())
   in
-  let pwd = Filepath.pwd () in
+  let pwd = (Filepath.pwd () :> string) in
   let uriBases = ("PWD", pwd) :: symbolicDirs in
   let uriBasesJson =
     List.fold_left (fun acc (name, dir) ->
@@ -278,7 +278,7 @@ let generate () =
   if not (Mdr_params.Output.is_empty ()) then
     let file = Mdr_params.Output.get () in
     try
-      Command.write_file (file:>string)
+      Command.write_file file
         (fun out ->
            Yojson.Safe.pretty_to_channel ~std:true out json;
            output_char out '\n') ;

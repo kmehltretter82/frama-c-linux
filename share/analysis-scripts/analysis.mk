@@ -80,8 +80,8 @@ endif
 SED_UNBUFFERED:=sed$(shell sed --unbuffered //p /dev/null 2>/dev/null && echo " --unbuffered" || true)
 
 # If there is a GNU time in the PATH, which contains the desired options
-# (-f and -o), use them; otherwise, use any time (be it a shell builtin
-# or a command). 'env' allows bypassing shell builtins (if they exist),
+# (-f and -o), use them; otherwise, ignore it.
+# 'env' allows bypassing shell builtins (if they exist),
 # since they usually don't have the required options.
 ifeq (OK,$(shell env time -f 'test' -o '/dev/null' echo OK || echo KO))
 define time_with_output
@@ -89,7 +89,6 @@ define time_with_output
 endef
 else
 define time_with_output
-  time
 endef
 endif
 
@@ -122,7 +121,7 @@ EVAFLAGS   ?= \
   -eva-no-print -eva-no-show-progress -eva-msg-key=-initial-state \
   -eva-print-callstacks -eva-warn-key alarm=inactive \
   -no-deps-print -no-calldeps-print \
-  -eva-warn-key garbled-mix \
+  -eva-warn-key garbled-mix=active,garbled-mix:write=feedback \
   -calldeps -from-verbose 0 \
   $(if $(EVABUILTINS), -eva-builtin=$(call fc_list,$(EVABUILTINS)),) \
   $(if $(EVAUSESPECS), -eva-use-spec $(call fc_list,$(EVAUSESPECS)),)

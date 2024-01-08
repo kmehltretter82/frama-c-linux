@@ -164,14 +164,6 @@ let () =
 
 let populate_spec_ref = Extlib.mk_fun "Annotations.populate_spec"
 
-let populate_spec populate kf spec = match kf.fundec with
-  | Definition _ -> false
-  | Declaration _ ->
-    if populate then begin
-      !populate_spec_ref kf spec;
-    end else
-      false
-
 let merge_from from1 from2 =
   match from1, from2 with
   | FromAny, FromAny -> FromAny
@@ -446,7 +438,7 @@ let register_funspec ?emitter ?force kf =
   pre_register_funspec ?emitter ?force kf
 
 exception No_funspec of Emitter.t
-let generic_funspec merge get ?emitter ?(populate=true) kf =
+let generic_funspec merge get ?emitter kf =
   let merge tbl =
     (* Kernel.feedback "Getting spec of function %a" Kf.pretty kf; *)
     match emitter with
@@ -460,9 +452,7 @@ let generic_funspec merge get ?emitter ?(populate=true) kf =
              merge spec s) tbl;
         spec
       in
-      let spec = merged_spec () in
-      let do_it = populate_spec populate kf spec in
-      get (if do_it then merged_spec () else spec)
+      get (merged_spec ())
     | Some e ->
       try
         let s = Emitter.Usable_emitter.Hashtbl.find tbl (Emitter.get e) in
@@ -478,12 +468,12 @@ let generic_funspec merge get ?emitter ?(populate=true) kf =
     pre_register_funspec ~tbl kf;
     merge tbl
 
-let funspec ?emitter ?populate kf =
-  generic_funspec merge_funspec ?emitter ?populate (fun x -> x) kf
+let funspec ?emitter kf =
+  generic_funspec merge_funspec ?emitter (fun x -> x) kf
 
 let has_funspec kf =
   try
-    not (Cil.is_empty_funspec (funspec ~populate:false kf))
+    not (Cil.is_empty_funspec (funspec kf))
   with No_funspec _ -> false
 
 (* Do not share behaviors with outside world if there's a single emitter. *)
@@ -1114,7 +1104,7 @@ let get_spec_e e kf ?stmt ?(active=[]) () =
 
 let get_spec_all kf ?stmt ?(active=[]) () =
   match stmt with
-  | None -> funspec ~populate:false kf
+  | None -> funspec kf
   | Some stmt ->
     let filter = filter_stmt_spec active in
     let spec = Cil.empty_funspec () in
@@ -1401,7 +1391,7 @@ let add_ensures e kf ?stmt ?active ?behavior l =
 let get_full_spec kf ?stmt ?(behavior=[]) () =
   match stmt with
   | None ->
-    (try funspec ~populate:false kf with Not_found -> Cil.empty_funspec())
+    (try funspec kf with Not_found -> Cil.empty_funspec())
   | Some stmt ->
     let filter a =
       match a.annot_content with
@@ -1832,7 +1822,7 @@ let behavior_names_of_stmt_in_kf kf = match kf.fundec with
     []
 
 let spec_function_behaviors kf =
-  List.map (fun x -> x.b_name) (behaviors ~populate:false kf)
+  List.map (fun x -> x.b_name) (behaviors kf)
 
 let all_function_behaviors kf =
   behavior_names_of_stmt_in_kf kf @ spec_function_behaviors kf

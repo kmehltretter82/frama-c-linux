@@ -248,7 +248,6 @@ struct
     unmarshal := fun x -> go_out (Obj.obj x)
 
   let serialize p =
-    assert Cmdline.use_obj;
     commit p;
     let v = find p in
     let obj =
@@ -264,7 +263,6 @@ struct
       on_disk_digest = Type.digest Datatype.ty }
 
   let unserialize p new_s =
-    assert Cmdline.use_obj;
     if Type.digest Datatype.ty = new_s.State.on_disk_digest then begin
       let s, computed =
         if !must_save && new_s.State.on_disk_saved then begin
@@ -328,6 +326,7 @@ module type Ref = sig
   val set: data -> unit
   val get: unit -> data
   val clear: unit -> unit
+  val add_hook_on_change: (data -> unit) -> unit
 end
 
 module Ref
@@ -353,9 +352,11 @@ struct
       end)
       (struct include Info let unique_name = name end)
 
-  let set v = !state := v
+  module Change_hook = Hook.Build(Data)
+  let add_hook_on_change = Change_hook.extend
+  let set v = !state := v; Change_hook.apply v
   let get () = !(!state)
-  let clear () = !state := Info.default ()
+  let clear () = let v = Info.default () in set v
 
 end
 
@@ -365,6 +366,7 @@ module type Option_ref = sig
   val map: (data -> data) -> data option
   val may: (data -> unit) -> unit
   val get_option : unit -> data option
+  val add_hook_on_change: (data option -> unit) -> unit
 end
 
 module Option_ref(Data:Datatype.S)(Info: Info) = struct
@@ -375,6 +377,7 @@ module Option_ref(Data:Datatype.S)(Info: Info) = struct
   let state = ref (create ())
 
   module D = Datatype.Ref(Datatype.Option(Data))
+  module Change_hook = Hook.Build(Datatype.Option(Data))
 
   include Register
       (D)
@@ -389,10 +392,12 @@ module Option_ref(Data:Datatype.S)(Info: Info) = struct
       end)
       (struct include Info let unique_name = name end)
 
-  let set v = !state := Some v
+  let add_hook_on_change = Change_hook.extend
+  let change opt_v = !state := opt_v; Change_hook.apply opt_v
+  let set v = change (Some v)
   let get () = match !(!state) with None -> raise Not_found | Some v -> v
   let get_option () = !(!state)
-  let clear () = !state := None
+  let clear () = change None
 
   let memo ?change f =
     try
@@ -474,6 +479,11 @@ end
 (** {3 Hashtbl} *)
 (* ************************************************************************* *)
 
+type ('k,'v) hashtbl_event =
+  | Update of 'k * 'v
+  | Remove of 'k
+  | Clear
+
 module type Hashtbl = sig
   include S
   type key
@@ -495,6 +505,7 @@ module type Hashtbl = sig
   val mem: key -> bool
   val remove: key -> unit
   val to_seq: unit -> (key * data) Seq.t
+  val add_hook_on_change: ((key, data) hashtbl_event -> unit) -> unit
 end
 
 module Hashtbl
@@ -545,15 +556,19 @@ struct
       end)
       (struct include Info let unique_name = name end)
 
-  let clear () = H.clear !state
+
+  module Change_hook = Hook.Build(struct type t = (key, data) hashtbl_event end)
+  let add_hook_on_change = Change_hook.extend
+  let clear () = H.clear !state; Change_hook.apply (Clear)
   let length () = H.length !state
-  let replace key v = H.replace !state key v
-  let add key v = H.add !state key v
+  let replace key v =
+    H.replace !state key v; Change_hook.apply (Update (key, v))
+  let add key v = H.add !state key v; Change_hook.apply (Update (key, v))
   let find key = H.find !state key
   let find_opt key = H.find_opt !state key
   let find_all key = H.find_all !state key
   let mem key = H.mem !state key
-  let remove key = H.remove !state key
+  let remove key = H.remove !state key; Change_hook.apply (Remove (key))
   let iter f = H.iter f !state
   let iter_sorted ?cmp f = H.iter_sorted ?cmp f !state
   let fold f acc = H.fold f !state acc
@@ -784,7 +799,7 @@ module type Hashconsing_tbl =
        val hash_internal: t -> int
        val initial_values: t list
      end) ->
-  functor (Info: Info_with_size) ->
+  functor (_: Info_with_size) ->
     Weak_hashtbl with type data = Data.t
 
 module Hashconsing_tbl =

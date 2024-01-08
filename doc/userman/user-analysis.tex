@@ -170,6 +170,13 @@ regardless of the value of the option.)
     *(p-2) = 1;
   \end{ccode}
 
+  \begin{important}
+    Currently, the option is disabled by default. The rationale for this is the
+    fact that it creates a lot of redundancies with pointer access alarms and
+    that most of the time even when a pointer reaches such an invalid value, it
+    is never read again, or if it is, the memory access will trigger an alarm.
+  \end{important}
+
 \item \optiondef{-}{unspecified-access} may be used to check when the
   evaluation of an expression depends on the order in which its sub-expressions
   are evaluated. For instance, this occurs with the following piece of code.

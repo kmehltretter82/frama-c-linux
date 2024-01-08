@@ -20,8 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Runtime Error Annotation Generation plugin.
-    @see <./index.html> internal documentation. *)
+(** Runtime Error Annotation Generation plugin. *)
 
 (** Same result as having [-rte] on the command line*)
 val compute : unit -> unit

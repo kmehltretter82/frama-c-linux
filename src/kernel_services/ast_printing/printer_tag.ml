@@ -20,12 +20,78 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_types
+open Cil_datatype
+
+(* -------------------------------------------------------------------------- *)
+(* --- Scope API                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+type declaration =
+  | SEnum of enuminfo
+  | SComp of compinfo
+  | SType of typeinfo
+  | SGlobal of varinfo
+  | SFunction of kernel_function
+
+let pp_declaration fmt = function
+  | SEnum e -> Format.fprintf fmt "enum %s" e.ename
+  | SComp { cstruct = true ; cname } -> Format.fprintf fmt "struct %s" cname
+  | SComp { cstruct = false ; cname } -> Format.fprintf fmt "union %s" cname
+  | SType t -> Format.fprintf fmt "type %s" t.tname
+  | SGlobal v -> Format.fprintf fmt "global %s" v.vname
+  | SFunction kf ->
+    Format.fprintf fmt "function %s" @@ Kernel_function.get_name kf
+
+module Declaration =
+  Datatype.Make_with_collections
+    (struct
+      include Datatype.Undefined
+      type t = declaration
+
+      let name = "Printer_tag.Declaration"
+      let reprs = List.map (fun g -> SGlobal g) Varinfo.reprs
+      let mem_project = Datatype.never_any_project
+
+      let hash = function
+        | SEnum e -> Hashtbl.hash( 0, Enuminfo.hash e )
+        | SComp c -> Hashtbl.hash( 1, Compinfo.hash c )
+        | SType t -> Hashtbl.hash( 2, Typeinfo.hash t )
+        | SGlobal g -> Hashtbl.hash( 3, Varinfo.hash g )
+        | SFunction kf -> Hashtbl.hash( 4, Kernel_function.hash kf )
+
+      let equal a b =
+        match a,b with
+        | SEnum u, SEnum v -> Enuminfo.equal u v
+        | SComp u, SComp v -> Compinfo.equal u v
+        | SType u, SType v -> Typeinfo.equal u v
+        | SGlobal u, SGlobal v -> Varinfo.equal u v
+        | SFunction f, SFunction g -> Kernel_function.equal f g
+        | (SEnum _, _) | (SComp _, _) | (SType _, _) | (SGlobal _, _)
+        | (SFunction _, _) -> false
+
+      let compare a b =
+        match a,b with
+        | SEnum u, SEnum v -> Enuminfo.compare u v
+        | SEnum _, _ -> (-1)
+        | _, SEnum _ -> (+1)
+        | SComp u, SComp v -> Compinfo.compare u v
+        | SComp _, _ -> (-1)
+        | _, SComp _ -> (+1)
+        | SType u, SType v -> Typeinfo.compare u v
+        | SType _, _ -> (-1)
+        | _, SType _ -> (+1)
+        | SGlobal u, SGlobal v -> Varinfo.compare u v
+        | SGlobal _, _ -> (-1)
+        | _, SGlobal _ -> (+1)
+        | SFunction f, SFunction g -> Kernel_function.compare f g
+
+      let pretty = pp_declaration
+    end)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Localizable API                                                    --- *)
 (* -------------------------------------------------------------------------- *)
-
-open Cil_types
-open Cil_datatype
 
 type localizable =
   | PStmt of (kernel_function * stmt)
@@ -38,33 +104,7 @@ type localizable =
   | PIP of Property.t
   | PType of typ
 
-let glabel = function
-  | GType(tinfo,_) -> tinfo.tname
-  | GCompTag(comp, _) | GCompTagDecl(comp, _) ->
-    Printf.sprintf "%s %s"
-      (if comp.cstruct then "struct" else "union")
-      comp.cname
-  | GEnumTag(enum, _) | GEnumTagDecl(enum, _) ->
-    Printf.sprintf "enum %s" enum.ename
-  | GVarDecl(vi,_) | GVar(vi, _, _)
-  | GFun( { svar=vi }, _) | GFunDecl(_,vi,_) -> vi.vname
-  | GPragma((Attr(a,_) | AttrAnnot a),_) -> a
-  | GAnnot _ -> "(annotation)"
-  | GAsm _ -> "(assembly)"
-  | GText _ -> "(text)"
-
-let label = function
-  | PVDecl(_,_,vi) -> vi.vname
-  | PLval (_, _, (Var vi, NoOffset)) -> vi.vname
-  | PLval _ -> "(l-value)"
-  | PExp  _ -> "(expression)"
-  | PStmt _ | PStmtStart _ -> "(statement)"
-  | PTermLval _ -> "(term)"
-  | PGlobal g -> glabel g
-  | PIP _ -> "(property)"
-  | PType ty -> Pretty_utils.to_string Printer.pp_typ ty
-
-let decl_of = function
+let declaration = function
   | GCompTag(comp,loc) -> GCompTagDecl(comp,loc)
   | GEnumTag(enum,loc) -> GEnumTagDecl(enum,loc)
   | GFunDecl(_,vi,loc) | GVar(vi,_,loc) | GFun({ svar=vi },loc)
@@ -76,13 +116,30 @@ let decl_of = function
   | ( GType _ | GCompTagDecl _ | GEnumTagDecl _
     | GVarDecl _ | GText _ | GPragma _) as g -> g
 
-let pretty fmt = function
+let signature_of_declaration = function
+  | SEnum ei -> GEnumTagDecl(ei,Location.unknown)
+  | SComp ci -> GCompTagDecl(ci,Location.unknown)
+  | SType ti -> GType(ti,Location.unknown)
+  | SGlobal vi -> GVarDecl(vi,vi.vdecl)
+  | SFunction kf -> let vi = Kernel_function.get_vi kf in GVarDecl(vi,vi.vdecl)
+
+let definition_of_declaration = function
+  | SEnum ei -> GEnumTag(ei,Location.unknown)
+  | SComp ci -> GCompTag(ci,Location.unknown)
+  | SType ti -> GType(ti,Location.unknown)
+  | SGlobal vi -> Ast.def_or_last_decl vi
+  | SFunction kf -> Kernel_function.get_global kf
+
+let pp_signature fmt d = Printer.pp_global fmt @@ signature_of_declaration d
+let pp_definition fmt d = Printer.pp_global fmt @@ definition_of_declaration d
+
+let pp_localizable fmt = function
   | PVDecl (_, _, vi) -> Printer.pp_vdecl fmt vi
   | PLval (_, _, lval) -> Printer.pp_lval fmt lval
   | PExp  (_, _, expr) -> Printer.pp_exp fmt expr
   | PTermLval (_, _, _, lv) -> Printer.pp_term_lval fmt lv
-  | PIP prop -> Description.pp_property fmt prop
-  | PGlobal g -> Printer.pp_global fmt (decl_of g)
+  | PIP prop -> Description.pp_local fmt prop
+  | PGlobal g -> Printer.pp_global fmt (declaration g)
   | PStmt(_,stmt) | PStmtStart (_, stmt) ->
     Printer.(without_annot pp_stmt) fmt stmt
   | PType t -> Printer.pp_typ fmt t
@@ -146,7 +203,7 @@ module Localizable =
         | PGlobal g ->
           Hashtbl.hash( 7, Global.hash g )
         | PType t ->
-          Hashtbl.hash( 8, Typ.hash t )
+          Hashtbl.hash( 8, TypByName.hash t )
 
       let equal l1 l2 = match l1,l2 with
         | PStmt (_,ki1), PStmt (_,ki2) -> ki1.sid = ki2.sid
@@ -162,7 +219,7 @@ module Localizable =
         | PExp (_,_,e1), PExp(_,_,e2) -> Exp.equal e1 e2
         | PIP ip1, PIP ip2 -> Property.equal ip1 ip2
         | PGlobal g1, PGlobal g2 -> Global.equal g1 g2
-        | PType t1, PType t2 -> Typ.equal t1 t2
+        | PType t1, PType t2 -> TypByName.equal t1 t2
         | (PStmt _ | PStmtStart _ | PLval _ | PExp _ | PTermLval _ | PVDecl _
           | PIP _ | PGlobal _ | PType _), _
           ->  false
@@ -196,12 +253,12 @@ module Localizable =
         | PIP p1 , PIP p2 -> Property.compare p1 p2
         | PIP _ , _ -> (-1)
         | _ , PIP _ -> 1
-        | PType t1, PType t2 -> Typ.compare t1 t2
+        | PType t1, PType t2 -> TypByName.compare t1 t2
         | PType _, _ -> (-1)
         | _, PType _ -> 1
         | PGlobal g1 , PGlobal g2 -> Global.compare g1 g2
 
-      let pretty = pretty (* defined above *)
+      let pretty = pp_localizable
 
     end)
 
@@ -209,8 +266,105 @@ module Localizable =
 (* --- Utility Accessors                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-let kf_of_localizable loc =
-  match loc with
+let declaration_of_global = function
+  | GType(ti, _) -> Some (SType ti)
+  | GCompTag(ci, _) | GCompTagDecl (ci, _) -> Some (SComp ci)
+  | GEnumTag(ei, _) | GEnumTagDecl (ei, _) -> Some (SEnum ei)
+  | GVar(vi, _, _) | GVarDecl(vi, _) -> Some (SGlobal vi)
+  | GFun({svar = vi}, _) | GFunDecl(_,vi,_) ->
+    Some(SFunction (Globals.Functions.get vi))
+  | GAsm _ | GPragma _ | GText _ | GAnnot _ -> None
+
+let declaration_of_type = function
+  | TVoid _ | TInt _ | TFloat _ | TPtr _
+  | TArray _ | TFun _ | TBuiltin_va_list _ -> None
+  | TNamed(ti, _) -> Some (SType ti)
+  | TComp (ci, _) -> Some (SComp ci)
+  | TEnum (ei, _) -> Some (SEnum ei)
+
+let declaration_of_property ip =
+  match Property.get_kf ip with
+  | None -> None
+  | Some kf -> Some (SFunction kf)
+
+let declaration_of_localizable = function
+  | PStmt(kf,_) | PStmtStart(kf,_)
+  | PVDecl(Some kf,_,_)
+  | PTermLval(Some kf,_,_,_)
+  | PLval(Some kf,_,_)
+  | PExp(Some kf,_,_)
+    -> Some (SFunction kf)
+  | PVDecl(None,_,vi) ->
+    Some(
+      try SFunction(Globals.Functions.get vi)
+      with Not_found -> SGlobal vi
+    )
+  | PGlobal g -> declaration_of_global g
+  | PIP p -> declaration_of_property p
+  | PTermLval(None,_,_,_)
+  | PLval(None,_,_) | PExp(None,_,_)
+  | PType _ -> None
+
+let definition_of_type = function
+  | TVoid _ | TInt _ | TFloat _ | TPtr _
+  | TArray _ | TFun _ | TBuiltin_va_list _ -> None
+  | TNamed(ti, _) -> Some (PGlobal(GType(ti,Location.unknown)))
+  | TComp (ci, _) -> Some (PGlobal(GCompTag(ci,Location.unknown)))
+  | TEnum (ei, _) -> Some (PGlobal(GEnumTag(ei,Location.unknown)))
+
+let definition_of_localizable = function
+  | PLval(kf,ki,(Var vi,NoOffset))
+  | PTermLval(kf,ki,_,(TVar { lv_origin = Some vi },TNoOffset)) ->
+    if vi.vglob then
+      let kf = try Some(Globals.Functions.get vi) with Not_found -> None in
+      Some (PVDecl(kf,Kglobal,vi))
+    else
+      Some (PVDecl(kf,ki,vi))
+  | PType ty -> definition_of_type ty
+  | PStmt _ | PStmtStart _ | PVDecl _
+  | PExp _ | PLval _ | PTermLval _ | PGlobal _ | PIP _
+    -> None
+
+let name_of_declaration = function
+  | SEnum ei -> ei.ename
+  | SComp ci -> ci.cname
+  | SType ti -> ti.tname
+  | SGlobal vi -> vi.vname
+  | SFunction kf -> Kernel_function.get_name kf
+
+let name_of_type = function
+  | TVoid _ | TInt _ | TFloat _ | TPtr _
+  | TArray _ | TFun _ | TBuiltin_va_list _ -> None
+  | TNamed(ti, _) -> Some ti.tname
+  | TComp (ci, _) -> Some ci.cname
+  | TEnum (ei, _) -> Some ei.ename
+
+let name_of_global g =
+  Option.map name_of_declaration @@ declaration_of_global g
+
+let name_of_localizable = function
+  | PVDecl(_,_,vi)
+  | PLval(_,_,(Var vi,NoOffset))
+  | PTermLval(_,_,_,(TVar { lv_origin = Some vi },TNoOffset)) ->
+    Some vi.vname
+  | PGlobal g -> name_of_global g
+  | PType ty -> name_of_type ty
+  | PStmt _ | PStmtStart _
+  | PExp _ | PLval _ | PTermLval _ | PIP _
+    -> None
+
+let loc_of_type space name =
+  try Global.loc @@ Globals.Types.global space name
+  with Not_found -> Location.unknown
+
+let loc_of_declaration = function
+  | SEnum ei -> loc_of_type Enum ei.ename
+  | SComp ci -> loc_of_type (if ci.cstruct then Struct else Union) ci.cname
+  | SType ti -> loc_of_type Typedef ti.tname
+  | SGlobal vi -> vi.vdecl
+  | SFunction kf -> Kernel_function.get_location kf
+
+let kf_of_localizable = function
   | PLval (kf_opt, _, _)
   | PExp (kf_opt,_,_)
   | PTermLval(kf_opt, _,_,_)
@@ -222,7 +376,7 @@ let kf_of_localizable loc =
   | PGlobal _ -> None
   | PType _ -> None
 
-let ki_of_localizable loc = match loc with
+let ki_of_localizable = function
   | PLval (_, ki, _)
   | PExp (_, ki, _)
   | PTermLval(_, ki,_,_)
@@ -252,14 +406,11 @@ let loc_of_localizable = function
   | PLval (_,Kstmt st,_) | PExp(_,Kstmt st, _)
   | PTermLval(_,Kstmt st,_,_) ->
     Stmt.loc st
-  | PIP ip ->
-    (match Property.get_kinstr ip with
-     | Kglobal ->
-       (match Property.get_kf ip with
-          None -> Location.unknown
-        | Some kf -> Kernel_function.get_location kf)
-     | Kstmt st -> Stmt.loc st)
-  | PVDecl (_,_,vi) -> vi.vdecl
+  | PIP ip -> Property.location ip
+  | PVDecl (_,_,vi) ->
+    if vi.vglob
+    then Global.loc (Ast.def_or_last_decl vi)
+    else vi.vdecl
   | PGlobal g -> Global.loc g
   | (PLval _ | PTermLval _ | PExp _) as localize ->
     (match kf_of_localizable localize with
@@ -272,8 +423,10 @@ let loc_of_localizable = function
 (* -------------------------------------------------------------------------- *)
 
 let localizable_of_kf kf =
-  let vi = Globals.Functions.get_vi kf in
-  PVDecl(Some kf,Kglobal,vi)
+  PVDecl(Some kf,Kglobal,Globals.Functions.get_vi kf)
+
+let localizable_of_stmt stmt =
+  PStmtStart (Kernel_function.find_englobing_kf stmt, stmt)
 
 let localizable_of_global g =
   match g with
@@ -283,6 +436,13 @@ let localizable_of_global g =
     (try PVDecl(Some (Globals.Functions.get vi) , Kglobal, vi)
      with Not_found -> PGlobal g)
   | _ -> PGlobal g
+
+let localizable_of_declaration = function
+  | SFunction kf -> localizable_of_kf kf
+  | SGlobal vi -> PVDecl(None,Kglobal,vi)
+  | SComp ci -> PType(TComp(ci,[]))
+  | SEnum ei -> PType(TEnum(ei,[]))
+  | SType ti -> PType(TNamed(ti,[]))
 
 (* -------------------------------------------------------------------------- *)
 (* --- Find localizable at a Filepath.position                            --- *)
@@ -688,16 +848,11 @@ struct
         super#code_annotation fmt ca;
         current_ca <- None
 
-    method! global fmt g =
-      match g with
-      (* these globals are already covered by the underlying parser *)
-      | GVarDecl _ | GVar _ | GFunDecl _ | GFun _
-      | GCompTag _ | GCompTagDecl _
-      | GEnumTag _ | GEnumTagDecl _
-      | GType _ ->
-        super#global fmt g
-      | GAsm _ | GPragma _ | GText _ | GAnnot _ ->
-        Format.fprintf fmt "@{<%s>%a@}" (Info.tag (PGlobal g)) super#global g
+    method! typeref t pp fmt x =
+      Format.fprintf fmt "@{<%s>%a@}" (Info.tag (PType t)) pp x
+
+    method! typedef g pp fmt x =
+      Format.fprintf fmt "@{<%s>%a@}" (Info.tag (PGlobal g)) pp x
 
     method! extended fmt ext =
       let loc =
@@ -828,31 +983,6 @@ struct
       let f = Option.get self#current_kf in
       let tag = Info.tag (PStmtStart(f,s)) in
       Format.fprintf fmt "@{<%s>%a@}" tag (super#stmtkind sattr next) sk
-
-    method! ikind fmt c =
-      Format.fprintf fmt "@{<%s>%a@}"
-        (Info.tag (PType(TInt(c,[]))))
-        super#ikind c
-
-    method! fkind fmt c =
-      Format.fprintf fmt "@{<%s>%a@}"
-        (Info.tag (PType(TFloat(c,[]))))
-        super#fkind c
-
-    method! compname fmt comp =
-      Format.fprintf fmt "@{<%s>%a@}"
-        (Info.tag (PGlobal(Globals.Types.global Struct comp.cname)))
-        super#compname comp
-
-    method! enuminfo fmt enum =
-      Format.fprintf fmt "@{<%s>%a@}"
-        (Info.tag (PGlobal(Globals.Types.global Enum enum.ename)))
-        super#enuminfo enum
-
-    method! typeinfo fmt tinfo =
-      Format.fprintf fmt "@{<%s>%a@}"
-        (Info.tag (PGlobal(Globals.Types.global Typedef tinfo.tname)))
-        super#typeinfo tinfo
 
     initializer force_brace <- true
 

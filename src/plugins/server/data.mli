@@ -85,11 +85,14 @@ module Jalpha : S with type t = string
 (** Rich text encoding, see [Jbuffer]. *)
 module Jtext : S with type t = json
 
-module Jmarkdown : S with type t = Markdown.text
+(** Simple string a Jtext *)
+val jtext : string -> Jtext.t
 
 (** All-in-one formatter. Return the JSON encoding of formatted text. *)
 val jpretty : ?indent:int -> ?margin:int ->
   (Format.formatter -> 'a -> unit) -> 'a -> Jtext.t
+
+module Jmarkdown : S with type t = Markdown.text
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Constructors} *)
@@ -121,6 +124,9 @@ val jlist : 'a data -> 'a list data
 val jalist : 'a data -> 'a list data
 val jarray : 'a data -> 'a array data
 val joption : 'a data -> 'a option data
+
+val data_of_json : 'a data -> json -> 'a
+val data_to_json : 'a data -> 'a -> json
 
 (**
    Declare the derived names for the provided type.
@@ -330,14 +336,17 @@ end
     - [Index()] for projectified datatypes,
     - [Static()] for project independant datatypes,
     - [Identified()] for projectified values already identified by integers.
+    - [Tagged()] for projectified values already identified by strings.
 
 *)
 (* -------------------------------------------------------------------------- *)
 
-(** Datatype information. *)
+(** Datatype registration information. *)
 module type Info =
 sig
+  val package: package
   val name: string
+  val descr: Markdown.text
 end
 
 (** Simplified [Map.S]. *)
@@ -354,8 +363,9 @@ end
 module type Index =
 sig
   include S
-  val get : t -> int
-  val find : int -> t
+  type tag
+  val get : t -> tag
+  val find : tag -> t
   (** @raise Not_found if not registered. *)
 
   val clear : unit -> unit
@@ -363,10 +373,12 @@ sig
 end
 
 (** Builds an indexer that {i does not} depend on current project. *)
-module Static(M : Map)(I : Info) : Index with type t = M.key
+module Static(M : Map)(_ : Info) :
+  Index with type t = M.key and type tag := int
 
 (** Builds a {i projectified} index. *)
-module Index(M : Map)(I : Info) : Index with type t = M.key
+module Index(M : Map)(_ : Info) :
+  Index with type t = M.key and type tag := int
 
 (** Datatype already identified by unique integers. *)
 module type IdentifiedType =
@@ -376,7 +388,19 @@ sig
 end
 
 (** Builds a {i projectified} index on types with {i unique} identifiers. *)
-module Identified(A : IdentifiedType)(I : Info) : Index with type t = A.t
+module Identified(A : IdentifiedType)(_ : Info) :
+  Index with type t = A.t and type tag := int
+
+(** Datatype already identified by unique integers. *)
+module type TaggedType =
+sig
+  type t
+  val id : t -> string
+end
+
+(** Builds a {i projectified} index on types with {i unique} identifiers. *)
+module Tagged(A : TaggedType)(_ : Info) :
+  Index with type t = A.t and type tag := string
 
 (* -------------------------------------------------------------------------- *)
 (** {2 Error handling}

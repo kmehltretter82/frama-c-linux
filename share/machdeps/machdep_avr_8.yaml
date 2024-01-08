@@ -15,6 +15,7 @@ compiler: clang
 cpp_arch_flags:
 - -target
 - avr
+- -mmcu=atmega8
 custom_defs: |
     #undef AVR
     #define AVR 1
@@ -32,6 +33,8 @@ custom_defs: |
     #define __ATOMIC_SEQ_CST 5
     #undef __AVR
     #define __AVR 1
+    #undef __AVR_ATmega8__
+    #define __AVR_ATmega8__ 1
     #undef __AVR__
     #define __AVR__ 1
     #undef __BIGGEST_ALIGNMENT__
@@ -644,6 +647,8 @@ custom_defs: |
     #define __clang_version__ "15.0.7 "
     #undef __clang_wide_literal_encoding__
     #define __clang_wide_literal_encoding__ "UTF-16"
+    #undef __flash
+    #define __flash __attribute__((address_space(1)))
     #undef __llvm__
     #define __llvm__ 1
 eof: (-1)

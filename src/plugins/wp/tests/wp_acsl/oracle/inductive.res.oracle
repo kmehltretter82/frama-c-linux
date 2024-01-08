@@ -65,8 +65,8 @@ end
            node -> P_reachable malloc mptr root node
     
     goal wp_goal :
-      forall t:int -> int, t1:addr -> addr, t2:int -> int, t3:addr -> addr, a:
-       addr, a1:addr. P_reachable t2 t3 a a1 -> not P_reachable t t1 a a1
+      forall t:int -> int, t1:int -> int, t2:addr -> addr, t3:addr -> addr, a:
+       addr, a1:addr. P_reachable t1 t3 a a1 -> not P_reachable t t2 a a1
   end
 [wp:print-generated] 
   theory WP1
@@ -185,21 +185,22 @@ end
   Global
 ------------------------------------------------------------
 
-Lemma test_multilabel:
-Assume: 'test_one_label' 'test_no_label'
-Prove: (P_same_elements Mint_1 Mint_2 a_0 b_0 b1_0 e1_0)
-       -> (not (P_same_elements Mint_0 Mint_1 b_0 a_0 b2_0 e2_0))
+Goal Lemma 'test_multilabel':
+Assume Lemmas: 'test_one_label' 'test_no_label'
+Assume { Have: P_same_elements(Mint_1, Mint_2, a, b, b1_0, e1_0). }
+Prove: !P_same_elements(Mint_0, Mint_1, b, a, b2_0, e2_0).
 
 ------------------------------------------------------------
 
-Lemma test_no_label:
-Prove: (P_is_gcd a_0 b_0 d_0) -> (not (P_is_gcd b_0 d_0 a_0))
+Goal Lemma 'test_no_label':
+Assume { Have: P_is_gcd(a, b, d). }
+Prove: !P_is_gcd(b, d, a).
 
 ------------------------------------------------------------
 
-Lemma test_one_label:
-Assume: 'test_no_label'
-Prove: (P_reachable Malloc_1 Mptr_1 l1_0 l2_0)
-       -> (not (P_reachable Malloc_0 Mptr_0 l1_0 l2_0))
+Goal Lemma 'test_one_label':
+Assume Lemmas: 'test_no_label'
+Assume { Have: P_reachable(Malloc_1, Mptr_1, l1_0, l2_0). }
+Prove: !P_reachable(Malloc_0, Mptr_0, l1_0, l2_0).
 
 ------------------------------------------------------------

@@ -3,6 +3,10 @@
   no compatible types and no default type in _Generic selection:
   controlling expression: '"abc"' (type: char *);
   candidate types: char const *
-[kernel] User Error: stopping on file "generic.c" that has errors. Add '-kernel-msg-key pp'
-  for preprocessing command.
+  63    #endif
+  64    #ifdef INCOMPATIBLE_QUALIFIED_TYPE
+  65      int a = _Generic("abc", char const *: 0);
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  66    #endif
+  67      int ok1 = _Generic("abc", char*: 0);
 [kernel] Frama-C aborted: invalid user input.

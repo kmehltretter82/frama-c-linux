@@ -11,8 +11,9 @@
 [eva] Done for function bts806
 [eva] computing for function unspec <- main.
   Called from filter.i:43.
-[kernel:annot:missing-spec] filter.i:36: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+[kernel:annot:missing-spec] filter.i:6: Warning: 
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- unspec <- main.
   Called from filter.i:36.
 [eva] using specification for function f
@@ -23,7 +24,7 @@
   signed overflow. assert r + tmp_0 ≤ 2147483647;
                    (tmp_0 from unspec())
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [slicing] initializing slicing ...
 [slicing] interpreting slicing requests from the command line...
 [pdg] computing for function main

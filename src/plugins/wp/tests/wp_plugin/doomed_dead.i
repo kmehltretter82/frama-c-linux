@@ -28,7 +28,9 @@ void exit(void);
 */
 void call(void);
 
-//@ assigns \nothing ;
+/*@ assigns \nothing ;
+  @ exits x ;
+  @ */
 int f2_ok(int x)
 {
   int r ;
@@ -37,7 +39,9 @@ int f2_ok(int x)
   return r;
 }
 
-//@ assigns \nothing ;
+/*@ assigns \nothing ;
+  @ exits x ;
+  @ */
 int f2_ko(int x)
 {
   int r ;
@@ -53,7 +57,9 @@ int f3_ok(int x)
   return r;
 }
 
-//@ assigns \nothing ;
+/*@ assigns \nothing ;
+  @ exits x ;
+  @ */
 int f4_ok(int x)
 {
   int r ;

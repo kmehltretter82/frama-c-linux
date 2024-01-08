@@ -31,18 +31,9 @@ val is_computed: unit -> bool
 (** Computation state of the analysis. *)
 type computation_state = NotComputed | Computing | Computed | Aborted
 
-(** Get the current computation state of the analysis, updated by
+(** The current computation state of the analysis, updated by
     [force_compute] and states updates. *)
-val current_computation_state : unit -> computation_state
-
-(** Set the current computation state. *)
-val set_computation_state: computation_state -> unit
-
-(** Registers a hook that will be called each time the analysis starts or
-    finishes. If [on] is given, the hook will only be called when the
-    analysis switches to this specific state. *)
-val register_computation_hook: ?on:computation_state ->
-  (computation_state -> unit) -> unit
+module ComputationState : State_builder.Ref with type data = computation_state
 
 (** Debug categories responsible for printing initial and final states of Value.
     Enabled by default, but can be disabled via the command-line:
@@ -65,7 +56,10 @@ val dkey_recursion : category
 
 val wkey_alarm: warn_category
 val wkey_locals_escaping: warn_category
-val wkey_garbled_mix: warn_category
+val wkey_garbled_mix_read: warn_category
+val wkey_garbled_mix_write: warn_category
+val wkey_garbled_mix_assigns: warn_category
+val wkey_garbled_mix_summary: warn_category
 val wkey_builtins_missing_spec: warn_category
 val wkey_builtins_override: warn_category
 val wkey_libc_unsupported_spec : warn_category

@@ -69,14 +69,14 @@ let is_session_dir path =
 let get_usable_dir ?(make=false) () =
   let path = CACHEDIR.get () in
   let parents = is_session_dir path in
-  let path = (path :> string) in
-  if not (Sys.file_exists path) && make then
-    Extlib.mkdir ~parents path 0o755 ;
-  if not (Sys.is_directory path) then begin
+  if not (Filepath.exists path) && make then
+    ignore (Extlib.mkdir ~parents path 0o755);
+  if not (Filepath.is_dir path) then begin
     Wp_parameters.warning ~current:false ~once:true
-      "Cache path is not a directory" ;
+      "Cache path %a is not a directory"
+      Filepath.Normalized.pretty path;
     raise Not_found
-  end ;
+  end;
   path
 
 let has_dir () =
@@ -105,14 +105,6 @@ let parse_mode ~origin ~fallback = function
       "Unknown %s mode %S (use %s instead)" origin m fallback ;
     raise Not_found
 
-let mode_name = function
-  | NoCache -> "none"
-  | Update -> "update"
-  | Replay -> "replay"
-  | Rebuild -> "rebuild"
-  | Offline -> "offline"
-  | Cleanup -> "cleanup"
-
 module MODE = WpContext.StaticGenerator(Datatype.Unit)
     (struct
       type key = unit
@@ -134,7 +126,7 @@ module MODE = WpContext.StaticGenerator(Datatype.Unit)
     end)
 
 let get_mode = MODE.get
-let set_mode m = MODE.clear () ; Wp_parameters.Cache.set (mode_name m)
+let set_mode m = MODE.set () m
 
 let is_active = function
   | NoCache -> false
@@ -162,11 +154,10 @@ let steps_seized steps steplimit =
   | None | Some 0 -> false
   | Some limit -> limit <= steps
 
-let promote ~timeout ~steplimit (res : VCS.result) =
+let promote ?timeout ?steplimit (res : VCS.result) =
   match res.verdict with
-  | VCS.NoResult | VCS.Computing _ -> VCS.no_result
-  | VCS.Failed -> res
-  | VCS.Invalid | VCS.Valid | VCS.Unknown ->
+  | VCS.NoResult | VCS.Computing _ | VCS.Invalid | VCS.Failed -> VCS.no_result
+  | VCS.Valid | VCS.Unknown ->
     if not (steps_fits res.prover_steps steplimit) then
       { res with verdict = Stepout }
     else
@@ -182,19 +173,24 @@ let promote ~timeout ~steplimit (res : VCS.result) =
     else (* can be run a longer time or widely *)
       VCS.no_result
 
+let file_from_hash hash =
+  let dir = get_usable_dir ~make:true () in
+  let file = Printf.sprintf "%s/%s.json" (dir:>string) hash in
+  file
+
 let get_cache_result ~mode hash =
   match mode with
   | NoCache | Rebuild -> VCS.no_result
   | Update | Cleanup | Replay | Offline ->
     try
-      let dir = get_usable_dir ~make:true () in
       let hash = Lazy.force hash in
-      let file = Printf.sprintf "%s/%s.json" dir hash in
-      if not (Sys.file_exists file) then VCS.no_result
+      let file = file_from_hash hash in
+      let path = Filepath.Normalized.of_string file in
+      if not (Filepath.exists path) then VCS.no_result
       else
         try
           mark_cache ~mode hash ;
-          Json.load_file file |> ProofScript.result_of_json
+          Json.load_file path |> ProofScript.result_of_json
         with err ->
           Wp_parameters.warning ~current:false ~once:true
             "invalid cache entry (%s)" (Printexc.to_string err) ;
@@ -207,11 +203,11 @@ let set_cache_result ~mode hash prover result =
   | Rebuild | Update | Cleanup ->
     let hash = Lazy.force hash in
     try
-      let dir = get_usable_dir ~make:true () in
-      let file = Printf.sprintf "%s/%s.json" dir hash in
+      let file = file_from_hash hash in
+      let path = Filepath.Normalized.of_string file in
       mark_cache ~mode hash ;
       ProofScript.json_of_result (VCS.Why3 prover) result
-      |> Json.save_file file
+      |> Json.save_file path
     with err ->
       Wp_parameters.warning ~current:false ~once:true
         "can not update cache (%s)" (Printexc.to_string err)
@@ -219,8 +215,7 @@ let set_cache_result ~mode hash prover result =
 let clear_result ~digest prover goal =
   try
     let hash = digest prover goal in
-    let dir = get_usable_dir ~make:true () in
-    let file = Printf.sprintf "%s/%s.json" dir hash in
+    let file = file_from_hash hash in
     Extlib.safe_remove file
   with err ->
     Wp_parameters.warning ~current:false ~once:true
@@ -230,7 +225,7 @@ let cleanup_cache () =
   let mode = get_mode () in
   if mode = Cleanup && (!hits > 0 || !miss > 0) then
     try
-      let dir = get_usable_dir () in
+      let dir = (get_usable_dir ():>string) in
       if is_global_cache () then
         Wp_parameters.warning ~current:false ~once:true
           "Cleanup mode deactivated with global cache."
@@ -273,7 +268,7 @@ let get_result ~digest ~runner ~timeout ~steplimit prover goal =
     let hash = lazy (digest prover goal) in
     let result =
       get_cache_result ~mode hash
-      |> promote ~timeout ~steplimit |> VCS.cached in
+      |> promote ?timeout ?steplimit |> VCS.cached in
     if VCS.is_verdict result
     then
       begin

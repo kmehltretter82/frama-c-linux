@@ -43,8 +43,9 @@
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
   Called from output_leafs.i:47.
-[kernel:annot:missing-spec] output_leafs.i:40: Warning: 
-  Neither code nor specification for function f, generating default assigns from the prototype
+[kernel:annot:missing-spec] output_leafs.i:36: Warning: 
+  Neither code nor specification for function f,
+   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- main3 <- main.
   Called from output_leafs.i:40.
 [eva] using specification for function f
@@ -52,7 +53,7 @@
 [eva] Recording results for main3
 [eva] Done for function main3
 [eva] Recording results for main
-[eva] done for function main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function g1:
   b ∈ [--..--]

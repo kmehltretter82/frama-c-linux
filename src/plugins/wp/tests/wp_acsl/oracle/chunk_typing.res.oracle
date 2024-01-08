@@ -2,6 +2,8 @@
 [kernel] Parsing chunk_typing.i (no preprocessing)
 [wp] Running WP plugin...
 [rte:annot] annotating function function
+[wp] [Valid] Goal function_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal function_terminates (Cfg) (Trivial)
 ------------------------------------------------------------
   Function function
 ------------------------------------------------------------

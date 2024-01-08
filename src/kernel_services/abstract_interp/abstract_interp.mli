@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** Functors for generic lattices implementations.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> Plug-in Development Guide *)
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 exception Error_Top
 (** Raised by some functions when encountering a top value. *)
@@ -92,13 +92,6 @@ module Rel : sig
   val check: rem:t -> modu:Int.t -> bool
 end
 
-module Bool : sig
-  type t = Top | True | False | Bottom
-  include Full_AI_Lattice_with_cardinality with type t := t
-end
-
-module Make_Lattice_Base (V : Lattice_Value) : Lattice_Base with type l = V.t
-
 module Make_Lattice_Set
     (V : Datatype.S)
     (Set: Lattice_type.Hptset with type elt = V.t)
@@ -113,23 +106,6 @@ module Make_Hashconsed_Lattice_Set
     result. It is passed here to avoid having multiple modules calling
     [Hptset.Make] on the same argument (which is forbidden by the datatype
     library, and would cause hashconsing problems) *)
-
-module type Collapse = sig val collapse : bool end
-
-(** If [C.collapse] then [L1.bottom,_] = [_,L2.bottom] = [bottom] *)
-(* Untested *)
-module Make_Lattice_Product (L1:AI_Lattice_with_cardinal_one) (L2:AI_Lattice_with_cardinal_one) (C:Collapse):
-  Lattice_Product with type t1 = L1.t and type t2 = L2.t
-
-(** Uncollapsed product. Literally the set of (e1, e2) ordered pairs
-    equipped with the order (e1, e2) < (d1, d2) <==> e1 < d1 && e2 < d2. *)
-module Make_Lattice_UProduct (L1:AI_Lattice_with_cardinal_one) (L2:AI_Lattice_with_cardinal_one) :
-  Lattice_UProduct with type t1 = L1.t and type t2 = L2.t
-
-(* Untested *)
-module Make_Lattice_Sum (L1:AI_Lattice_with_cardinal_one) (L2:AI_Lattice_with_cardinal_one):
-  (Lattice_Sum with type t1 = L1.t and type t2 = L2.t)
-
 
 (*
 Local Variables:
