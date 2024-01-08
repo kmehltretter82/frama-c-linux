@@ -250,9 +250,13 @@ let eval_instr ?callstack ?name stmt =
     match callstack with
     | None -> r
     | Some c -> Results.in_callstack c r in
-  let engine = new evaluator request in
-  let _ = Visitor.visitFramacStmt (engine :> visitor) stmt in
-  List.map (predicate ?name ~loc:(Cil_datatype.Stmt.loc stmt)) engine#flush
+  List.map (predicate ?name ~loc:(Cil_datatype.Stmt.loc stmt)) @@
+  if Results.is_empty request then [False] else
+    let engine = new evaluator request in
+    let _ = Visitor.visitFramacStmt (engine :> visitor) stmt in
+    engine#flush
+
+let is_dead stmt = Results.is_empty @@ Results.before stmt
 
 (* -------------------------------------------------------------------------- *)
 (* --- Annotation Generator                                               --- *)
@@ -285,7 +289,7 @@ class generator =
                     Property_status.emit Analysis.emitter ~hyps:[] ip True
                  ) (Property.ip_of_code_annot kf stmt ca)
           ) stmt ;
-        DoChildren
+        if is_dead stmt then SkipChildren else DoChildren
 
   end
 
