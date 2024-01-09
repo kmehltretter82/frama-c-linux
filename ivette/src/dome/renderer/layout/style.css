@@ -20,9 +20,8 @@
 
 .dome-xBoxes-grid
 {
-    flex: 1 1 auto ;
-    overflow: auto ;
-    display: grid ;
+    flex: 1 1 auto;
+    overflow: auto;
     display: grid;
     grid-auto-rows: auto;
     grid-auto-flow: row;
