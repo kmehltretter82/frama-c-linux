@@ -1158,7 +1158,7 @@ module OutputDir =
 
 let dkey = register_category "output"
 
-let has_out () = Fc_Filepath.Normalized.is_empty (OutputDir.get ())
+let has_out () = not @@ Fc_Filepath.Normalized.is_empty (OutputDir.get ())
 
 let make_output_dir dir =
   try
