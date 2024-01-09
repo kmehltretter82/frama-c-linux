@@ -41,15 +41,9 @@ let meta_remove_ =
 
 
 let elim_abstract remove_pr d = match d.d_node with
-  | Dprop (Paxiom,pr,_) when Spr.mem pr remove_pr ->
-    (* Format.eprintf "Remove %a@." Pretty.print_pr pr; *)
-    []
-  | Dprop (Paxiom,_,_) ->
-    (* Format.eprintf "Not Remove %a@." Pretty.print_pr pr; *)
-    [d]
-  | _ ->
-    (* Format.eprintf "Not Seen %a@." Pretty.print_decl d; *)
-    [d]
+  | Dprop (Paxiom,pr,_) when Spr.mem pr remove_pr -> []
+  | Dprop (Paxiom,_,_) -> [d]
+  | _ -> [d]
 
 let remove_prop meta =
   Trans.on_tagged_pr meta

@@ -62,7 +62,7 @@ module Plist = Qed.Listmap.Make
 let pzero = {
   tmin = max_float ;
   tval = 0.0 ;
-  tmax = 0.0 ;
+  tmax = min_float ;
   tnbr = 0.0 ;
   time = 0.0 ;
   success = 0.0 ;
@@ -83,8 +83,11 @@ let padd a b =
 let pmerge = Plist.union (fun _ a b -> padd a b)
 
 let ptime t valid =
-  { tmin = t ; tval = t ; tmax = t ; time = t ; tnbr = 1.0 ;
-    success = if valid then 1.0 else 0.0 }
+  if t < Rformat.epsilon then
+    { pzero with tnbr = 1.0 ; success = if valid then 1.0 else 0.0 }
+  else
+    { tmin = t ; tval = t ; tmax = t ; time = t ; tnbr = 1.0 ;
+      success = if valid then 1.0 else 0.0 }
 
 let psolver r = ptime r.solver_time false
 let pqed r = if VCS.is_valid r then ptime r.solver_time true else pzero
@@ -175,7 +178,7 @@ let complete s = s.proved = subgoals s
 
 let pp_pstats fmt p =
   if p.tnbr > 0.0 &&
-     p.tmin > Rformat.epsilon &&
+     p.tmax > Rformat.epsilon &&
      not (Wp_parameters.has_dkey VCS.dkey_shell)
   then
     let mean = p.tval /. p.tnbr in

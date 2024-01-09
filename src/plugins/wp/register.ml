@@ -187,19 +187,14 @@ module GOALS = Wpo.S.Set
 let scheduled = ref 0
 let exercised = ref 0
 let session = ref GOALS.empty
-let prover_stats = ref Stats.empty
-let tactic_stats = ref Stats.empty
 let smoked_passed = ref 0
 let smoked_failed = ref 0
-let add_stats r s = r := Stats.add !r s
 
 let clear_scheduled () =
   begin
     scheduled := 0 ;
     exercised := 0 ;
     session := GOALS.empty ;
-    prover_stats := Stats.empty ;
-    tactic_stats := Stats.empty ;
     CfgInfos.trivial_terminates := 0 ;
     WpReached.unreachable_proved := 0 ;
     WpReached.unreachable_failed := 0 ;
@@ -347,6 +342,14 @@ let do_report_json () =
 (* --- Prover Results                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
+type stats = {
+  proofs: Stats.stats ;
+  tactic: Stats.stats ;
+  updated: (Wpo.t * Filepath.Normalized.t * Json.t) list;
+  incomplete: (Wpo.t * Filepath.Normalized.t * Json.t) list;
+  removed: (Wpo.t * Filepath.Normalized.t) list;
+}
+
 let do_wpo_result goal prover res =
   if VCS.is_verdict res && prover = VCS.Qed then
     do_progress goal "Qed"
@@ -388,16 +391,13 @@ let do_wpo_success ~shell ~cache goal success =
   else
     let gui = Frama_c_very_first.Gui_init.is_gui in
     let smoke = Wpo.is_smoke_test goal in
-    let pstats = Stats.results ~smoke @@ Wpo.get_results goal in
     let cstats = ProofEngine.consolidated goal in
     let success = Wpo.is_passed goal in
     begin
-      add_stats prover_stats pstats ;
       if smoke then
         (if Wpo.is_passed goal
          then incr smoked_passed
          else incr smoked_failed) ;
-      if cstats.tactics > 0 then add_stats tactic_stats cstats ;
       if gui || shell || not success then
         do_report_stats ~shell ~cache goal ~smoke cstats ;
       if smoke then
@@ -409,7 +409,7 @@ let do_wpo_success ~shell ~cache goal success =
         end ;
     end
 
-let do_report_scheduled () =
+let do_report_scheduled (stats : stats) =
   if Wp_parameters.Generate.get () then
     let plural = if !exercised > 1 then "s" else "" in
     Wp_parameters.result "%d goal%s generated" !exercised plural
@@ -421,7 +421,6 @@ let do_report_scheduled () =
       !CfgInfos.trivial_terminates in
     if total > 0 then
       begin
-        let proofs = !prover_stats in
         let unreachable = !WpReached.unreachable_proved in
         let terminating = !CfgInfos.trivial_terminates in
         let passed = GOALS.fold
@@ -437,6 +436,7 @@ let do_report_scheduled () =
           lines := (title,count,pp) :: !lines in
         if terminating > 0 then add_line "Terminating" terminating none ;
         if unreachable > 0 then add_line "Unreachable" unreachable none ;
+        let proofs = stats.proofs in
         List.iter
           (fun (p,s) ->
              let name = VCS.title_of_prover p in
@@ -444,7 +444,7 @@ let do_report_scheduled () =
              if success > 0 || (not shell && p = Qed) then
                add_line name success (fun fmt ->
                    if p = Tactical then
-                     Stats.pp_stats ~shell ~cache fmt !tactic_stats
+                     Stats.pp_stats ~shell ~cache fmt stats.tactic
                    else
                    if not shell then Stats.pp_pstats fmt s
                  )
@@ -479,9 +479,9 @@ let do_report_scheduled () =
           end ;
       end
 
-let do_list_scheduled_result () =
+let do_list_scheduled_result stats =
   begin
-    do_report_scheduled () ;
+    do_report_scheduled stats ;
     do_report_json () ;
     clear_scheduled () ;
   end
@@ -611,55 +611,58 @@ let compute_auto ~script =
       if script.auto <> [] then script.proverscript <- true ;
     end
 
-type session_scripts = {
-  updated: (Wpo.t * Filepath.Normalized.t * Json.t) list;
-  incomplete: (Wpo.t * Filepath.Normalized.t * Json.t) list;
-  removed: (Wpo.t * Filepath.Normalized.t) list;
-}
+type scripts =
+  | Useless
+  | Scripts of { complete : bool ; scripts : ProofScript.alternative list }
+
+let do_compute_scripts ~smoke goal results : scripts =
+  let autoproof (p,r) =
+    (p=VCS.Qed) || (VCS.is_auto p && VCS.is_valid r && VCS.autofit r) in
+  if List.exists autoproof results then Useless
+  else
+    let scripts = ProofEngine.script (ProofEngine.proof ~main:goal) in
+    if scripts = [] then Useless
+    else
+      let complete = function
+        | ProofScript.Prover(p,r) -> VCS.is_auto p && VCS.is_valid r
+        | ProofScript.Tactic(n,_,_) -> n=0
+        | ProofScript.Error _ -> false in
+      let winning = List.filter complete scripts in
+      if winning <> [] then Scripts { complete=true ; scripts = winning }
+      else if smoke then Useless else Scripts { complete=false ; scripts }
 
 let do_collect_session goals =
+  let removed = ref [] in
   let updated = ref [] in
   let incomplete = ref [] in
-  let removed = ref [] in
-  let file goal = ProofSession.filename ~force:false goal in
+  let proofs = ref Stats.empty in
+  let tactic = ref Stats.empty in
+  let add r s = r := Stats.add !r s in
   Bag.iter
     begin fun goal ->
+      let smoke = Wpo.is_smoke_test goal in
       let results = Wpo.get_results goal in
-      let autoproof (p,r) =
-        (p=VCS.Qed) || (VCS.is_auto p && VCS.is_valid r && VCS.autofit r) in
-      if List.exists autoproof results then
-        begin
-          if ProofSession.exists goal then
-            begin
-              let file = file goal in
-              removed := (goal, file) :: !removed
-            end
-        end
-      else
-        let scripts = ProofEngine.script (ProofEngine.proof ~main:goal) in
-        if scripts <> [] then
-          begin
-            let keep = function
-              | ProofScript.Prover(p,r) -> VCS.is_auto p && VCS.is_valid r
-              | ProofScript.Tactic(n,_,_) -> n=0
-              | ProofScript.Error _ -> false in
-            let winning = List.filter keep scripts in
-            let file = file goal in
-            if winning <> [] then
-              begin
-                let json = ProofScript.encode winning in
-                updated := (goal, file, json) :: !updated
-              end
-            else
-              begin
-                let json = ProofScript.encode scripts in
-                incomplete := (goal, file, json) :: !incomplete
-              end
-          end
+      let file = ProofSession.filename ~force:false goal in
+      match do_compute_scripts ~smoke goal results with
+      | Useless ->
+        let provers = List.filter (fun (p,_) -> VCS.is_prover p) results in
+        add proofs @@ Stats.results ~smoke provers ;
+        if ProofSession.exists goal then
+          removed := (goal, file) :: !removed
+      | Scripts { complete ; scripts } ->
+        add proofs @@ Stats.results ~smoke results ;
+        add tactic @@ ProofEngine.consolidated goal ;
+        let json = ProofScript.encode scripts in
+        let accu = if complete then updated else incomplete in
+        accu := (goal, file, json) :: !accu ;
     end goals ;
-  { updated = !updated ;
+  {
+    updated = !updated ;
     incomplete = !incomplete ;
-    removed = !removed ; }
+    removed = !removed ;
+    proofs = !proofs ;
+    tactic = !tactic ;
+  }
 
 let do_update_session script session =
   let stdout = script.stdout in
@@ -724,11 +727,6 @@ let do_show_session updated_session session =
       (if updated_session then "Updated session" else "Session can be updated")
       removed_s updated_s invalid_s
 
-let do_session ~script goals =
-  let session = do_collect_session goals in
-  do_update_session script session ;
-  do_show_session script.update session
-
 let do_wpo_display goal =
   let result = if Wpo.is_trivial goal then "trivial" else "not tried" in
   Wp_parameters.feedback "Goal %s : %s" (Wpo.get_gid goal) result
@@ -752,13 +750,14 @@ let do_wp_proofs ?provers ?tip (goals : Wpo.t Bag.t) =
     spawn_wp_proofs ~script goals ;
     if spawned then
       begin
-        do_list_scheduled_result () ;
-        do_session ~script goals ;
+        let stats = do_collect_session goals in
+        do_list_scheduled_result stats ;
+        do_update_session script stats ;
+        do_show_session script.update stats ;
       end
     else
     if not (Wp_parameters.Print.get () || Wp_parameters.Status.get ())
-    then
-      Bag.iter do_wpo_display goals
+    then Bag.iter do_wpo_display goals
   end
 
 (* registered at frama-c (normal) exit *)

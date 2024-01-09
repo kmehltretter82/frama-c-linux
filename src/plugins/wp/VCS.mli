@@ -117,6 +117,7 @@ val cached : result -> result (** only for true verdicts *)
 val result : ?cached:bool -> ?solver:float -> ?time:float -> ?steps:int -> verdict -> result
 
 val is_auto : prover -> bool
+val is_prover : prover -> bool
 val is_result : verdict -> bool
 val is_verdict : result -> bool
 val is_valid: result -> bool
