@@ -5201,7 +5201,6 @@ and makeCompType ghost (isstruct: bool)
 
   (* Do regular fields first. *)
   let to_field = function
-    | TYPE_ANNOT _ -> None
     | STATIC_ASSERT_FG (e, s, loc) ->
       let (_, _, cond_exp, _) = doExp empty_local_env CConst e ADrop in
       begin
