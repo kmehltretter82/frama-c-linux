@@ -76,7 +76,7 @@ function IFormatSelector(props: Selector<TIP.iformat>): JSX.Element {
   const { value, setValue } = props;
   return (
     <Select
-      className="wp-printer-field wp-printer-select"
+      className='wp-printer-field wp-printer-select'
       value={value}
       title='Large integers format.'
       onChange={(v) => setValue(TIP.jIformat(v))}
@@ -92,7 +92,7 @@ function RFormatSelector(props: Selector<TIP.rformat>): JSX.Element {
   const { value, setValue } = props;
   return (
     <Select
-      className="wp-printer-field wp-printer-select"
+      className='wp-printer-field wp-printer-select'
       value={value}
       title='Floatting point format.'
       onChange={(v) => setValue(TIP.jRformat(v))}
@@ -121,7 +121,7 @@ function Node(props: NodeProps): JSX.Element
   const current = node === props.current;
   const debug = `#${node}`;
   const {
-    title=debug, child=debug, header=debug,
+    title=debug, child='Script', header=debug,
     proved=false, pending=0, size=0
   } = States.useRequest( TIP.getNodeInfos, node, { pending: null } ) ?? {};
   const elt = cellRef.current;
@@ -139,7 +139,10 @@ function Node(props: NodeProps): JSX.Element
     ? (parent ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT')
     : (parent ? 'ANGLE.DOWN' : 'ANGLE.RIGHT');
   const kind = proved ? 'positive' : (parent ? 'default' : 'warning');
-  const nodeLabel = parent ? header : child;
+  const nodeName = parent ? `${child}: ${header}` : child;
+  const nodeRest = size <= 1 ? '?' : `${pending}/${size}`;
+  const nodeFull = size <= 1 ? nodeName : `${nodeName} (${size})`;
+  const nodeLabel = proved ? nodeFull : `${nodeName} (${nodeRest})`;
   const proofState =
     proved ? 'proved' :
     pending < size ? `pending ${pending}/${size}` : 'unproved';
@@ -171,7 +174,7 @@ function NavBar(props: NavBarProps): JSX.Element {
     <Node key={n} node={n} current={current} />
   ));
   return (
-    <Vbox className="wp-navbar">
+    <Vbox className='wp-navbar'>
       <Vbox>
         {parents}
         {children}
@@ -206,7 +209,7 @@ export function TIPView(props: TIPProps): JSX.Element {
     'wp.tip.rformat', TIP.jRformat, 'ratio'
   );
   const locked = tactic !== undefined;
-  const configured = locked ? tactic : selected;
+  const configured = tactic ?? selected;
   return (
     <Vfill display={display}>
       <ToolBar>
@@ -231,8 +234,13 @@ export function TIPView(props: TIPProps): JSX.Element {
           below={below}
           current={current}
         />
-        <Vfill className="dome-positionned">
-          <Overlay display className="wp-printer">
+        <Vfill className='dome-positionned'>
+          <Overlay display className='wp-printer'>
+            <Icon
+              id='LOCK'
+              title='Tactical Selection Locked'
+              className='wp-printer-locked'
+              display={locked} />
             <AFormatSelector
               value={autofocus} setValue={setAF}
               label='AF' title='Autofocus mode.' />
@@ -244,6 +252,7 @@ export function TIPView(props: TIPProps): JSX.Element {
           </Overlay>
           <GoalView
             node={current}
+            locked={locked}
             autofocus={autofocus}
             unmangled={!memory}
             iformat={iformat}

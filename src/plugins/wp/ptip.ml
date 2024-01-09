@@ -483,7 +483,7 @@ class pseq
 
     method selected =
       begin
-        self#set_target self#selection ;
+        self#highlight self#selection ;
         List.iter (fun f -> f ()) demon ;
       end
 
@@ -529,7 +529,22 @@ class pseq
         in if selected then self#selected
       end
 
-    method set_target tgt =
+    method set_selection sel =
+      let current = self#selection in
+      if not @@ Tactical.equal current sel then
+        let target =
+          match sel with
+          | Tactical.Empty | Tactical.Compose _ | Tactical.Multi _ ->
+            Term, None
+          | Tactical.Clause(Goal p) -> Goal, Some (F.e_prop p)
+          | Tactical.Clause(Step s as clause) ->
+            Step s, Some (F.e_prop @@ Tactical.head clause)
+          | Tactical.Inside(Goal _,t) -> Goal, Some t
+          | Tactical.Inside(Step s,t) -> Step s, Some t
+        in
+        self#restore ~focus:`Focus target
+
+    method highlight tgt =
       match tgt with
       | Tactical.Empty | Tactical.Compose _ | Tactical.Multi _ ->
         begin

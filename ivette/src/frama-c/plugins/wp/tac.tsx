@@ -109,15 +109,17 @@ export function Tactics(props: TacticSelection): JSX.Element {
 
 interface ParameterProps extends TAC.parameter {
   node: TIP.node;
+  locked: boolean;
   tactic: TIP.tactic;
 }
 
 function CheckBoxParam(props: ParameterProps): JSX.Element
 {
-  const { id: param, node, tactic, label, title, value } = props;
+  const { id: param, locked, node, tactic, label, title, value } = props;
   const active = value === true;
   const onClick = (): void => {
-    Server.send(TAC.setParameter, { node, tactic, param, value: !active });
+    if (!locked)
+      Server.send(TAC.setParameter, { node, tactic, param, value: !active });
   };
   return (
     <Label
@@ -129,6 +131,7 @@ function CheckBoxParam(props: ParameterProps): JSX.Element
         className="wp-config-switch"
         size={14}
         offset={-2}
+        kind={locked ? 'disabled' : 'default'}
         id={active ? 'SWITCH.ON' : 'SWITCH.OFF'} />
     </Label>
   );
@@ -137,11 +140,12 @@ function CheckBoxParam(props: ParameterProps): JSX.Element
 function SpinnerParam(props: ParameterProps): JSX.Element
 {
   const {
-    id: param, node, tactic, label, title,
+    id: param, locked, node, tactic, label, title,
     vmin, vmax, vstep, value: jval
   } = props;
   const onChange = (value: number): void => {
-    Server.send(TAC.setParameter, { node, tactic, param, value });
+    if (!locked)
+      Server.send(TAC.setParameter, { node, tactic, param, value });
   };
   const value = typeof(jval)==='number' ? jval : undefined;
   return (
@@ -152,6 +156,7 @@ function SpinnerParam(props: ParameterProps): JSX.Element
         vmin={vmin}
         vmax={vmax}
         vstep={vstep}
+        disabled={locked}
         onChange={onChange}
       />
     </Label>
@@ -161,7 +166,7 @@ function SpinnerParam(props: ParameterProps): JSX.Element
 function SelectorParam(props: ParameterProps): JSX.Element
 {
   const {
-    id: param, node, tactic, label, title,
+    id: param, locked, node, tactic, label, title,
     value: jval, vlist=[]
   } = props;
   const value = typeof(jval) === 'string' ? jval : undefined;
@@ -169,13 +174,15 @@ function SelectorParam(props: ParameterProps): JSX.Element
     <option key={id} value={id} title={title}>{label}</option>
   );
   const onChange = (value: string | undefined): void => {
-    Server.send(TAC.setParameter, { node, tactic, param, value });
+    if (!locked)
+      Server.send(TAC.setParameter, { node, tactic, param, value });
   };
   return (
     <Label label={label} title={title}>
       <Select
         className="wp-config-field wp-config-select"
         value={value}
+        disabled={locked}
         onChange={onChange}
       >{options}</Select>
     </Label>
@@ -241,14 +248,22 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
   const { status, label, title, params } = tactical;
   const isReady = !locked && status==='Applicable';
   const display = !!tactic && (locked || status !== 'NotApplicable');
-  const descr = locked ? Locked : getStatusDescription(tactical);
+  const statusDescr = locked ? Locked : getStatusDescription(tactical);
   const onClose = (): void => setSelected(undefined);
   const onPlay = (): void => { if (isReady) applyTactic(tactic); };
-  const onCancel = (): void => { Server.send(TIP.clearNode, node); };
+  const onClear = (): void => {
+    Server.send(TIP.clearNode, node);
+    setSelected(undefined);
+  };
   const parameters =
     (node && tactic)
     ? params.map((prm: TAC.parameter) =>
-      <Parameter key={prm.id} node={node} tactic={tactic} {...prm}/>
+      <Parameter
+        key={prm.id}
+        node={node}
+        tactic={tactic}
+        locked={locked}
+        {...prm}/>
     ) : null;
   return (
     <Hbox
@@ -258,6 +273,7 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
       <Item
         key='tactic'
         icon='TUNINGS'
+        title='Selected Tactic Configuration'
         className="wp-config-tactic"
         label={label} />
       <Descr
@@ -267,9 +283,10 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
         label={title} />
       <Filler key='filler'/>
       <Descr
-        key='descr'
+        key='status'
         className="wp-config-info"
-        {...descr} />
+        title='Tactic Status'
+        {...statusDescr} />
       <Fragment key='params'>{parameters}</Fragment>
       <IconButton
         key='play'
@@ -285,12 +302,12 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
         display={!locked}
         onClick={onClose} />
       <IconButton
-        key='cancel'
+        key='clear'
         icon='CIRC.CLOSE'
         kind='negative'
         display={locked}
         title='Cancel Tactic and Remove Sub-Tree'
-        onClick={onCancel} />
+        onClick={onClear} />
     </Hbox>
   );
 }

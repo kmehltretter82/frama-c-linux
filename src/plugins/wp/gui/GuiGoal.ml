@@ -382,7 +382,7 @@ class pane (gprovers : GuiConfig.provers) =
 
     method private update_tactics = function
       | None ->
-        printer#set_target Tactical.Empty ;
+        printer#highlight Tactical.Empty ;
         autosearch#connect None ;
         strategies#connect None ;
         List.iter (fun tactic -> tactic#clear) tactics
@@ -403,7 +403,7 @@ class pane (gprovers : GuiConfig.provers) =
                 tactic#select ~process ~composer ~browser ~tree sel
               ) tactics ;
             (* target selection feedback *)
-            printer#set_target
+            printer#highlight
               (if List.exists (fun tactics -> tactics#targeted) tactics
                then sel else Tactical.Empty)
           end ()

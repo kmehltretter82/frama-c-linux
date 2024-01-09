@@ -156,6 +156,7 @@ class Sequent {
 
 export interface GoalViewProps {
   node: Node;
+  locked: boolean;
   autofocus: boolean;
   unmangled: boolean;
   iformat: TIP.iformat;
@@ -163,7 +164,7 @@ export interface GoalViewProps {
 }
 
 export function GoalView(props: GoalViewProps): JSX.Element {
-  const { node } = props;
+  const { node, locked } = props;
   const jtext = States.useRequest(TIP.printSequent, props, {
     pending: null,
     offline: undefined,
@@ -191,7 +192,7 @@ export function GoalView(props: GoalViewProps): JSX.Element {
         Server.send(TIP.setSelection, { node, part, term });
         return;
       }
-    }
+    } // otherwize
     Server.send(TIP.clearSelection, node);
   }, [sequent, node]);
   return (
@@ -202,7 +203,7 @@ export function GoalView(props: GoalViewProps): JSX.Element {
       selection={selection}
       decorations={[hover, sequent.decorations, gutters]}
       onHover={onHover}
-      onClick={onClick}
+      onClick={locked ? undefined : onClick}
     />
   );
 }

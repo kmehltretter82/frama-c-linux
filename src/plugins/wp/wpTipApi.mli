@@ -30,5 +30,6 @@ module Tactic : Server.Data.S with type t = Tactical.t
 val proofStatus : Server.Request.signal
 val printStatus : Server.Request.signal
 val selection : ProofEngine.node -> Tactical.selection
+val setSelection : ProofEngine.node -> Tactical.selection -> unit
 
 (* -------------------------------------------------------------------------- *)

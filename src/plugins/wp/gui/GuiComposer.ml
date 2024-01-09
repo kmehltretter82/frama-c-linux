@@ -179,7 +179,7 @@ class composer (focused : GuiSequent.focused) =
 
     method print (cc : GuiTactic.composer) ~quit fmt =
       begin
-        focused#set_target Tactical.Empty ;
+        focused#highlight Tactical.Empty ;
         Format.fprintf fmt "@{<bf>Selection:@} @{<ul>%s@} %t%t@\n"
           cc#title
           (focused#button ~title:"Help" ~callback:self#openhelp)
@@ -266,7 +266,7 @@ class browser (focused : GuiSequent.focused) =
 
     method print ( cc : GuiTactic.browser ) ~quit fmt =
       begin
-        focused#set_target cc#target ;
+        focused#highlight cc#target ;
         let ptitle = if paging = 10 then "5/page" else "10/page" in
         let ctitle () = paging <- if paging = 10 then 5 else 10 ; update () in
         Format.fprintf fmt "@{<bf>Selection for %s:@} %t%t@\n@\n"

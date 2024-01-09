@@ -458,6 +458,17 @@ let tactics =
 (* --- Tactical Target Configuration                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
+let configure jtactic node =
+  let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
+  match ProofScript.configure jtactic sequent with
+  | None -> ()
+  | Some(tactical,selection) ->
+    begin
+      let console = (configurator tactical :> Tactical.feedback) in
+      console#set_title "%s" tactical#title ;
+      WpTipApi.setSelection node selection ;
+    end
+
 let () =
   R.register ~package
     ~kind:`EXEC
@@ -467,9 +478,15 @@ let () =
     ~output:(module D.Junit)
     ~signals:[WpTipApi.printStatus]
     begin fun node ->
-      let selection = WpTipApi.selection node in
-      iter (fun cfg -> cfg#configure node selection) ;
-      S.reload tactics ;
+      match ProofEngine.tactical node with
+      | None ->
+        let selection = WpTipApi.selection node in
+        iter (fun cfg -> cfg#configure node selection) ;
+        S.reload tactics ;
+      | Some jtactic ->
+        let ctxt = ProofEngine.node_context node in
+        WpContext.on_context ctxt (configure jtactic) node ;
+        S.reload tactics ;
     end
 
 (* -------------------------------------------------------------------------- *)
