@@ -414,7 +414,10 @@ class Field<A> extends Extension {
     const annot = CS.Annotation.define<A>();
     const field = CS.StateField.define<A>({
       create: () => init,
-      update: (fd: A, tr: CS.Transaction) => tr.annotation(annot) ?? fd,
+      update: (fd: A, tr: CS.Transaction): A => {
+        const newValue = tr.annotation(annot);
+        return newValue !== undefined ? newValue : fd;
+      }
     });
     this.annot = annot;
     this.field = field;
