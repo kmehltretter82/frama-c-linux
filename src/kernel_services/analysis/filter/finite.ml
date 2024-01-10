@@ -23,37 +23,21 @@
 open Nat.Types
 
 module Types = struct
-  type 'n formal = First : 'n succ formal | Next : 'n formal -> 'n succ formal
-  type 'n finite = { value : int ; formal : 'n formal }
+  type 'n finite = int
 end
 
 open Types
 
-let first = { value = 0 ; formal = First }
-let next { value ; formal } = { value = value + 1 ; formal = Next formal }
-let to_int { value ; _ } = value
-let ( == ) l r = l.value = r.value
+let first : type n. n succ finite = 0
+let next : type n. n finite -> n succ finite = fun n -> n + 1
+let weaken : type n. n finite -> n succ finite = fun n -> n
+let ( == ) : type n. n finite -> n finite -> bool = fun l r -> l = r
+let to_int : type n. n finite -> int = fun n -> n
 
-let rec of_int : type n. n succ nat -> int -> n succ finite = fun limit n ->
-  match limit with
-  | Succ Zero -> first
-  | Succ Succ _ when n <= 0 -> first
-  | Succ Succ limit -> next (of_int (Succ limit) (n - 1))
+let of_int : type n. n succ nat -> int -> n succ finite =
+  fun limit n -> min (max 0 n) (Nat.to_int limit)
 
-let rec of_nat : type n. n succ nat -> n succ finite = function
-  | Succ Zero -> first
-  | Succ (Succ n) -> next (of_nat (Succ n))
-
-(* We use Obj.magic here to avoid the O(n) long but trivial proof *)
-let weaken : type n. n finite -> n succ finite =
-  fun { value ; formal } -> { value ; formal = Obj.magic formal }
-
-(* Non tail-rec to perform the computation in the natural order *)
-let rec fold f n acc =
-  match n with
-  | { formal = First ; _ } as n -> f n acc
-  | { formal = Next formal ; value } as n ->
-    f n (fold f (weaken { value = value - 1 ; formal }) acc)
-
-let for_each (type n) acc (n : n nat) (f : n finite -> 'a -> 'a) =
-  match n with Zero -> acc | Succ _ as n -> fold f (of_nat n) acc
+let for_each (type n) acc (limit : n nat) (f : n finite -> 'a -> 'a) =
+  let acc = ref acc in
+  for i = 0 to Nat.to_int limit - 1 do acc := f i !acc done ;
+  !acc

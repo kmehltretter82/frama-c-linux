@@ -23,29 +23,25 @@
 module Types = struct
   type zero = |
   type 'n succ = |
-  type 'n nat = Zero : zero nat | Succ : 'n nat -> 'n succ nat
+  type 'n nat = int
   type positive_or_null = PositiveOrNull : 'n nat -> positive_or_null
   type strictly_positive = StrictlyPositive : 'n succ nat -> strictly_positive
 end
 
 open Types
 
-let zero = Zero
-let one  = Succ Zero
-let succ n = (Succ n)
-let prev (Succ n) = n
-
-let to_int n =
-  let rec aux : type n. int -> n nat -> int = fun acc ->
-    function Zero -> acc | Succ n -> aux (acc + 1) n
-  in aux 0 n
+let zero : zero nat = 0
+let one  : zero succ nat = 1
+let succ : type n. n nat -> n succ nat = fun n -> n + 1
+let prev : type n. n succ nat -> n nat = fun n -> n - 1
+let to_int : type n. n nat -> int = fun n -> n
 
 let of_int n =
-  let next (PositiveOrNull n) = PositiveOrNull (Succ n) in
+  let next (PositiveOrNull n) = PositiveOrNull (succ n) in
   let rec aux acc n = if n <= 0 then acc else aux (next acc) (n - 1) in
   aux (PositiveOrNull zero) n
 
 let of_strictly_positive_int n =
-  let next (StrictlyPositive n) = StrictlyPositive (Succ n) in
+  let next (StrictlyPositive n) = StrictlyPositive (succ n) in
   let rec aux acc n = if n <= 1 then acc else aux (next acc) (n - 1) in
   aux (StrictlyPositive one) n
