@@ -687,7 +687,7 @@ let convert cnv expected t =
   let t = rebuild cnv t in
   Format.eprintf ">>>> CONVERT-IN@." ;
   (* rewrite terms which normal form inside qed are different from the one of the provers *)
-  let r = Lang.For_export.in_state (of_term ~cnv expected) t in
+  let r = Lang.For_export.in_state (share cnv expected) t in
   Format.eprintf "<<<< CONVERT-ED@." ; r
 
 let mk_binders cnv l =
