@@ -1451,11 +1451,11 @@ struct
     let vcs =
       if probes then
         let xps =
-          List.map
+          List.rev_map
             (fun x ->
                let tau = Ctypes.object_of x.vtype in
-               x, C.cval @@ M.load sigma tau @@ M.cvar x) xs in
-        gmap
+               x, C.cval @@ M.load sigma tau @@ M.cvar x) xs
+        in gmap
           (List.fold_right
              (fun (x,v) vc -> probe ~loc:x.vdecl ~name:x.vname v vc) xps) vcs
       else vcs
