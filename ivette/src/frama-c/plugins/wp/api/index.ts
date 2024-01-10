@@ -177,6 +177,40 @@ const getAvailableProvers_internal: Server.GetRequest<null,prover[]> = {
 /** Returns the list of configured provers from why3 */
 export const getAvailableProvers: Server.GetRequest<null,prover[]>= getAvailableProvers_internal;
 
+/** Signal for state [`provers`](#provers)  */
+export const signalProvers: Server.Signal = {
+  name: 'plugins.wp.signalProvers',
+};
+
+const getProvers_internal: Server.GetRequest<null,prover[]> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.getProvers',
+  input: Json.jNull,
+  output: Json.jArray(jProver),
+  signals: [],
+};
+/** Getter for state [`provers`](#provers)  */
+export const getProvers: Server.GetRequest<null,prover[]>= getProvers_internal;
+
+const setProvers_internal: Server.SetRequest<prover[],null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.setProvers',
+  input: Json.jArray(jProver),
+  output: Json.jNull,
+  signals: [],
+};
+/** Setter for state [`provers`](#provers)  */
+export const setProvers: Server.SetRequest<prover[],null>= setProvers_internal;
+
+const provers_internal: State.State<prover[]> = {
+  name: 'plugins.wp.provers',
+  signal: signalProvers,
+  getter: getProvers,
+  setter: setProvers,
+};
+/** Selected Provers */
+export const provers: State.State<prover[]> = provers_internal;
+
 /** Data for array rows [`goals`](#goals)  */
 export interface goalsData {
   /** Entry identifier. */

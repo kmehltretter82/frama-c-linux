@@ -82,6 +82,8 @@ struct
     | None -> D.failure "Unknown prover name"
 end
 
+module Provers = D.Jlist(Prover)
+
 module Result =
 struct
   type t = VCS.result
@@ -158,11 +160,38 @@ end
 
 let () = R.register ~package ~kind:`GET ~name:"getAvailableProvers"
     ~descr:(Md.plain "Returns the list of configured provers from why3")
-    ~input:(module D.Junit) ~output:(module D.Jlist(Prover))
+    ~input:(module D.Junit) ~output:(module Provers)
     (fun () ->
        List.map (fun p -> VCS.Why3 p) @@
        List.filter Why3Provers.is_mainstream @@
        Why3Provers.provers ())
+
+let provers = ref None
+
+let getProvers () =
+  match !provers with
+  | Some prvs -> prvs
+  | None ->
+    let cmdline =
+      match Wp_parameters.Provers.get () with
+      | [] -> [ "alt-ergo" ]
+      | prvs -> prvs in
+    let parse s =
+      match VCS.parse_prover s with
+      | None -> None
+      | Some (Qed | Tactical) -> None
+      | Some prv as result -> if VCS.is_auto prv then result else None in
+    let selection = List.filter_map parse cmdline in
+    provers := Some selection ; selection
+
+let setProvers prv = provers := Some prv
+
+let _ =
+  S.register_state ~package ~name:"provers"
+    ~descr:(Md.plain "Selected Provers")
+    ~data:(module Provers)
+    ~get:getProvers
+    ~set:setProvers ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Goal Array                                                         --- *)

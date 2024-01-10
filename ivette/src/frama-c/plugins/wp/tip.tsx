@@ -35,6 +35,7 @@ import * as TIP from 'frama-c/plugins/wp/api/tip';
 
 import { getStatus } from './goals';
 import { GoalView } from './seq';
+import { ConfigureProvers } from './prv';
 import { Tactics, ConfigureTactic } from './tac';
 
 /* -------------------------------------------------------------------------- */
@@ -267,6 +268,9 @@ export function TIPView(props: TIPProps): JSX.Element {
           setSelected={setSelected}
         />
       </Hfill>
+      <ConfigureProvers
+        node={current}
+      />
       <ConfigureTactic
         goal={goal}
         node={current}
