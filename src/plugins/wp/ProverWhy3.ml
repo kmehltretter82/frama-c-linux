@@ -349,14 +349,16 @@ let rec of_trigger ~cnv t =
     end
 
 let rec of_term ~cnv expected t : Why3.Term.term =
-  Wp_parameters.debug ~dkey:dkey_api
-    "of_term %a %a@."
-    Lang.F.Tau.pretty expected Lang.F.pp_term t;
   let sort =
     try Lang.F.typeof t
     with Not_found ->
       why3_failure "@[<hov 2>Untyped term: %a@]" Lang.F.pp_term t
   in
+  Wp_parameters.debug ~dkey:dkey_api
+    "of_term %a:%a (expected %a)@."
+    Lang.F.pp_term t Lang.F.Tau.pretty sort Lang.F.Tau.pretty expected
+;
+
   let ($) f x = f x in
   let r =
     try coerce ~cnv sort expected $ Lang.F.Tmap.find t cnv.subst
@@ -647,9 +649,9 @@ and mk_lets cnv l =
         let x = Why3.Ident.id_fresh (Lang.F.basename e) in
         let x = Why3.Term.create_vsymbol x ty in
         (* Format.printf "lets %a = %a : %a@."
-         *   Why3.Pretty.print_vsty x
-         *   Why3.Pretty.print_term e'
-         *   Why3.Pretty.print_ty (Why3.Term.t_type e'); *)
+            Why3.Pretty.print_vsty x
+            Why3.Pretty.print_term e'
+            Why3.Pretty.print_ty (Why3.Term.t_type e'); *)
         let cnv = {cnv with subst = Lang.F.Tmap.add e (Why3.Term.t_var x) cnv.subst } in
         let lets = (x,e')::lets in
         cnv,lets
@@ -676,12 +678,15 @@ and int_or_real ~cnv ~fint ~lint ~pint ~freal ~lreal ~preal a b =
     t_app_fold ~f:freal ~l:lreal ~p:preal ~cnv Real [a; b]
   | _ -> assert false
 
+let rebuild cnv t =
+  let t, cache = Lang.For_export.rebuild ~cache:cnv.convert_for_export t in
+  cnv.convert_for_export <- cache;
+  t
+
 let convert cnv expected t =
   Format.eprintf ">>>> CONVERT-IN@." ;
   (* rewrite terms which normal form inside qed are different from the one of the provers *)
-  let t, cache = Lang.For_export.rebuild ~cache:cnv.convert_for_export t in
-  cnv.convert_for_export <- cache;
-  let r = Lang.For_export.in_state (share cnv expected) t in
+  let r = Lang.For_export.in_state (of_term ~cnv expected) t in
   Format.eprintf "<<<< CONVERT-ED@." ; r
 
 let mk_binders cnv l =
@@ -1085,7 +1090,7 @@ let add_model_trace (probes: Lang.F.term Probe.Map.t) cnv t =
         (Ident.id_fresh ~loc ~attrs p.name) [] ty
     in
     let fold (p:Probe.t) (term:Lang.F.term) task =
-      let term' = of_term' cnv term in
+      let term' = convert cnv (Lang.F.typeof term) term in
       let id = create_id p term'.t_ty in
       let task = Task.add_param_decl task id in
       let eq_id = Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "ce_eq") in
@@ -1098,7 +1103,7 @@ let add_model_trace (probes: Lang.F.term Probe.Map.t) cnv t =
 let convert_freevariables ~probes ~cnv t =
   let freevars = Probe.Map.fold
       (fun _ t vars -> Lang.F.Vars.union vars (Lang.F.vars t))
-      probes (Lang.F.varsp t) in
+      probes (Lang.F.vars t) in
   let cnv,lss =
     Lang.F.Vars.fold (fun (v:Lang.F.Var.t) (cnv,lss) ->
         let ty = of_tau ~cnv @@ Lang.F.tau_of_var v in
@@ -1126,9 +1131,11 @@ let prove_goal ~id ~title ~name ?axioms ?(probes=Probe.Map.empty) t =
   v#add_builtin_lib;
   v#vgoal axioms t;
   let cnv = empty_cnv ~polarity:`Positive ctx in
-  let cnv,lss = convert_freevariables ~probes ~cnv t in
+  let t = rebuild cnv (Lang.F.e_prop t) in
+  let probes = Probe.Map.map (rebuild cnv) probes in
+  let cnv,lss = Lang.For_export.in_state (convert_freevariables ~probes ~cnv) t in
   Format.eprintf ">>>>>>>> TASK-IN@." ;
-  let goal = convert cnv Prop (Lang.F.e_prop t) in
+  let goal = convert cnv Prop t in
   Format.eprintf ">>>>>>>> TASK-OUT@." ;
   let decl = Why3.Decl.create_prop_decl Pgoal goal_id goal in
   let th = Why3.Theory.close_theory ctx.th in
