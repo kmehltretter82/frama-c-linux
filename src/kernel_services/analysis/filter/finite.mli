@@ -22,11 +22,13 @@
 
 open Nat.Types
 
-module Types : sig
-  type 'n finite = First : 'n succ finite | Next : 'n finite -> 'n succ finite
-end
+module Types : sig type 'n finite end
 
 open Types
+
+val first : 'n succ finite
+val next : 'n finite -> 'n succ finite
+val ( == ) : 'n finite -> 'n finite -> bool
 
 val weaken : 'n finite -> 'n succ finite
 val of_int : 'n succ nat -> int -> 'n succ finite

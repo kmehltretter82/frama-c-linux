@@ -47,8 +47,9 @@ module Space (Field : Field.S) = struct
       Parray.pretty ~pp_sep Field.pretty fmt data
 
     let init size f =
-      let index n = Finite.of_int size n |> f in
-      let data = Parray.init (Nat.to_int size) index in
+      let data = Parray.init (Nat.to_int size) (fun _ -> Field.zero) in
+      let set i data = Parray.set data (Finite.to_int i) (f i) in
+      let data = Finite.for_each data size set in
       M { data ; rows = size ; cols = Nat.one }
 
     let size (type n) (M vector : n vector) : n nat = vector.rows
@@ -92,14 +93,15 @@ module Space (Field : Field.S) = struct
 
     let pretty (type n m) fmt (M m : (n, m) matrix) =
       Finite.for_each () m.rows @@ fun i () ->
-      (match i with First -> () | Next _ -> Format.fprintf fmt "@ ") ;
+      (if Finite.(i == first) then () else Format.fprintf fmt "@ ") ;
       Format.fprintf fmt "@[<h>%a@]" Vector.pretty (row i (M m))
 
     let init n m init =
       let rows = Nat.to_int n and cols = Nat.to_int m in
-      let row i = Finite.of_int n (i  /  cols) in
-      let col i = Finite.of_int m (i mod cols) in
-      let data = Parray.init (rows * cols) @@ fun i -> init (row i) (col i) in
+      let t = Parray.init (rows * cols) (fun _ -> Field.zero) in
+      let index i j = Finite.to_int i * cols + Finite.to_int j in
+      let set i j data = Parray.set data (index i j) (init i j) in
+      let data = Finite.(for_each t n @@ fun i t -> for_each t m (set i)) in
       M { data ; rows = n ; cols = m }
 
     let zero n m = init n m (fun _ _ -> Field.zero)

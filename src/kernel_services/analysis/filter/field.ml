@@ -23,11 +23,8 @@
 module type S = sig
 
   module Types : sig type scalar end
+  include Datatype.S_with_collections with type t = Types.scalar
   open Types
-
-  val compare : scalar -> scalar -> int
-  val equal : scalar -> scalar -> bool
-  val pretty : Format.formatter -> scalar -> unit
 
   val zero     : scalar
   val one      : scalar
