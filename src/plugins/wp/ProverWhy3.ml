@@ -684,6 +684,7 @@ let rebuild cnv t =
   t
 
 let convert cnv expected t =
+  let t = rebuild cnv t in
   Format.eprintf ">>>> CONVERT-IN@." ;
   (* rewrite terms which normal form inside qed are different from the one of the provers *)
   let r = Lang.For_export.in_state (of_term ~cnv expected) t in
@@ -1090,7 +1091,7 @@ let add_model_trace (probes: Lang.F.term Probe.Map.t) cnv t =
         (Ident.id_fresh ~loc ~attrs p.name) [] ty
     in
     let fold (p:Probe.t) (term:Lang.F.term) task =
-      let term' = convert cnv (Lang.F.typeof term) term in
+      let term' = share cnv (Lang.F.typeof term) term in
       let id = create_id p term'.t_ty in
       let task = Task.add_param_decl task id in
       let eq_id = Why3.Decl.create_prsymbol (Why3.Ident.id_fresh "ce_eq") in
@@ -1133,9 +1134,10 @@ let prove_goal ~id ~title ~name ?axioms ?(probes=Probe.Map.empty) t =
   let cnv = empty_cnv ~polarity:`Positive ctx in
   let t = rebuild cnv (Lang.F.e_prop t) in
   let probes = Probe.Map.map (rebuild cnv) probes in
-  let cnv,lss = Lang.For_export.in_state (convert_freevariables ~probes ~cnv) t in
+  Lang.For_export.in_state (fun () ->
+  let cnv,lss = convert_freevariables ~probes ~cnv t in
   Format.eprintf ">>>>>>>> TASK-IN@." ;
-  let goal = convert cnv Prop t in
+  let goal = share cnv Prop t in
   Format.eprintf ">>>>>>>> TASK-OUT@." ;
   let decl = Why3.Decl.create_prop_decl Pgoal goal_id goal in
   let th = Why3.Theory.close_theory ctx.th in
@@ -1149,7 +1151,7 @@ let prove_goal ~id ~title ~name ?axioms ?(probes=Probe.Map.empty) t =
   let t = Why3.Task.use_export t th in
   let t = List.fold_left Why3.Task.add_param_decl t lss in
   let t = add_model_trace probes cnv t in
-  Why3.Task.add_decl t decl
+  Why3.Task.add_decl t decl) ()
 
 let prove_prop ?probes ?axioms ~pid prop =
   let id = WpPropId.get_propid pid in
