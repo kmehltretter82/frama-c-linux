@@ -131,6 +131,10 @@ let is_auto = function
         not prover_config.interactive
       with Not_found -> true
 
+let has_counter_examples = function
+  | Qed | Tactical -> false
+  | Why3 p -> Why3Provers.has_counter_examples p
+
 let cmp_prover p q =
   match p,q with
   | Qed , Qed -> 0

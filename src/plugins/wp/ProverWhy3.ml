@@ -1425,16 +1425,9 @@ let editor ~script ~merge ~config pconf driver task =
       Why3.Call_provers.call_editor ~command ~config (script :> string)
     end
 
-let compile ~script ~timeout ~memlimit ~config ?(probes=Probe.Map.empty)
-    wpo pconf driver prover task =
-  let runner =
-    run_batch ~config pconf driver ~script
-      ~memlimit ~probes:Probe.Map.empty in
-  let runner =
-    if Probe.Map.is_empty probes then runner else
-      let digest = digest_task wpo driver ~script in
-      Cache.get_result ~digest ~runner
-  in runner ~timeout ~steplimit:None prover task
+let compile ~script ~timeout ~memlimit ~config pconf driver prover task =
+  run_batch ~config pconf driver ~script ~timeout ~memlimit ~steplimit:None
+    ~probes:Probe.Map.empty prover task
 
 let prepare ~mode wpo driver task =
   let ext = Filename.extension (Why3.Driver.file_of_task driver "S" "T" task) in
@@ -1451,7 +1444,7 @@ let prepare ~mode wpo driver task =
     end
   else None
 
-let interactive ~mode ~probes wpo pconf ~config driver prover task =
+let interactive ~mode ~config wpo pconf driver prover task =
   let time = Wp_parameters.InteractiveTimeout.get () in
   let mem = Wp_parameters.Memlimit.get () in
   let timeout = if time <= 0 then None else Some (float time) in
@@ -1469,32 +1462,41 @@ let interactive ~mode ~probes wpo pconf ~config driver prover task =
       Why3.Whyconf.print_prover prover (script :> string) ;
     match mode with
     | VCS.Batch ->
-      compile ~probes ~script ~timeout ~memlimit ~config
-        wpo pconf driver prover task
+      compile ~script ~timeout ~memlimit ~config pconf driver prover task
     | VCS.Update ->
       if merge then updatescript ~script driver task ;
-      compile ~probes ~script ~timeout ~memlimit ~config
-        wpo pconf driver prover task
+      compile ~script ~timeout ~memlimit ~config pconf driver prover task
     | VCS.Edit ->
       let open Task in
       editor ~script ~merge ~config pconf driver task >>= fun _ ->
-      compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task
+      compile ~script ~timeout ~memlimit ~config pconf driver prover task
     | VCS.Fix ->
       let open Task in
-      compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task
+      compile ~script ~timeout ~memlimit ~config pconf driver prover task
       >>= fun r ->
       if VCS.is_valid r then return r else
         editor ~script ~merge ~config pconf driver task >>= fun _ ->
-        compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task
+        compile ~script ~timeout ~memlimit ~config pconf driver prover task
     | VCS.FixUpdate ->
       let open Task in
       if merge then updatescript ~script driver task ;
-      compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task
+      compile ~script ~timeout ~memlimit ~config pconf driver prover task
       >>= fun r ->
       if VCS.is_valid r then return r else
         let merge = false in
         editor ~script ~merge ~config pconf driver task >>= fun _ ->
-        compile ~script ~timeout ~memlimit ~config wpo pconf driver prover task
+        compile ~script ~timeout ~memlimit ~config pconf driver prover task
+
+let automated ~config ~probes ~timeout ~steplimit ~memlimit
+    wpo pconf drv prover task =
+  if Probe.Map.is_empty probes then
+    Cache.get_result
+      ~digest:(digest_task wpo drv)
+      ~runner:(run_batch ~config ~probes ~memlimit pconf drv ?script:None)
+      ~timeout ~steplimit prover task
+  else
+    run_batch ~config ~probes ~memlimit ~timeout ~steplimit
+      pconf drv prover task
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prove WPO                                                          --- *)
@@ -1541,12 +1543,10 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ?memlimit
         Task.return VCS.valid
       else
       if pconf.interactive then
-        interactive ~mode wpo pconf ~config ~probes drv prover task
+        interactive ~mode ~config wpo pconf drv prover task
       else
-        Cache.get_result
-          ~digest:(digest_task wpo drv)
-          ~runner:(run_batch ~config ~probes ~memlimit pconf drv ?script:None)
-          ~timeout ~steplimit prover task
+        automated ~config ~probes ~timeout ~steplimit ~memlimit
+          wpo pconf drv prover task
   with exn ->
     if Wp_parameters.has_dkey dkey_api then
       Wp_parameters.fatal "[Why3 Error] %a@\n%s"

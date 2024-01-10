@@ -122,6 +122,7 @@ val result : ?model:model -> ?cached:bool ->
   ?solver:float -> ?time:float -> ?steps:int -> verdict -> result
 
 val is_auto : prover -> bool
+val has_counter_examples : prover -> bool
 val is_prover : prover -> bool
 val is_result : verdict -> bool
 val is_verdict : result -> bool
