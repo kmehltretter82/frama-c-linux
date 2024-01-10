@@ -747,6 +747,7 @@ let user_prop_pid pid =
     | PKPre (_,_,p_prop) -> p_prop
     | _ -> property_of_id pid in
   let names = user_prop_names p_prop in
+  let names = if is_smoke_test pid then "smoke" :: names else names in
   match Property.get_kf p_prop with
   | None -> names
   | Some kf -> Kernel_function.get_name kf :: names

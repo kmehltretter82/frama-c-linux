@@ -135,7 +135,7 @@ module FctTimeout:
 module SmokeTimeout: Parameter_sig.Int
 module InteractiveTimeout: Parameter_sig.Int
 module TimeExtra: Parameter_sig.Int
-module TimeMargin: Parameter_sig.Int
+module TimeMargin: Parameter_sig.String
 module Steps: Parameter_sig.Int
 module Procs: Parameter_sig.Int
 module ProofTrace: Parameter_sig.Bool

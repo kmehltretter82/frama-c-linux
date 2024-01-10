@@ -465,10 +465,7 @@ struct
     end
 
   let list w =
-    Pmap.fold
-      (fun p r w ->
-         if is_verdict r then (p,r)::w else w
-      ) w.dps []
+    List.filter (fun (_,r) -> VCS.is_verdict r) @@ Pmap.bindings w.dps
 
 end
 

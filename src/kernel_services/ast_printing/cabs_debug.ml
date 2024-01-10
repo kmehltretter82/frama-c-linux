@@ -124,7 +124,6 @@ and pp_name_group fmt (spec, names) =
     names;
   fprintf fmt "}@]"
 
-(* Warning : printing for TYPE_ANNOT is not complete *)
 and pp_field_group fmt = function
   | FIELD (spec, l) ->
     fprintf fmt "@[<hov 2>FIELD spec(%a), {" pp_spec spec;
@@ -133,7 +132,6 @@ and pp_field_group fmt = function
         match e_opt with Some exp -> fprintf fmt "@ %a" pp_exp exp | _ -> ())
       l;
     fprintf fmt "}@]"
-  | TYPE_ANNOT _ -> fprintf fmt "TYPE_ANNOT"
   | STATIC_ASSERT_FG (exp, s, loc) ->
     fprintf  fmt "@[<hov 2>STATIC_ASSERT_FG exp(%a, %s, loc(%a))@]" pp_exp exp s pp_cabsloc loc
 

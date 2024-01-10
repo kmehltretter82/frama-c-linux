@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 let dkey = Wp_parameters.register_category "prover"
+let dkey_pp_task = Wp_parameters.register_category "prover:pp_task"
 let dkey_api = Wp_parameters.register_category "why3_api"
 let dkey_model = Wp_parameters.register_category "why3_model"
 
@@ -1503,6 +1504,23 @@ let is_trivial (t : Why3.Task.task) =
   let goal = Why3.Task.task_goal_fmla t in
   Why3.Term.t_equal goal Why3.Term.t_true
 
+let print_debug_task wpo drv prover task =
+  let pp_task fmt task =
+    ignore @@ Why3.Driver.print_task_prepared drv fmt task in
+  if Wp_parameters.has_out () then
+    let out_dir =
+      Wp_parameters.get_output_dir (WpContext.MODEL.id wpo.Wpo.po_model) in
+    let prover = Why3Provers.title prover in
+    let goal = Wpo.get_gid wpo ^ "_" ^ prover in
+    let filename = Why3.Driver.file_of_task drv "" goal task in
+    let file = Datatype.Filepath.concat out_dir filename in
+    let out_channel = open_out (file :> string) in
+    let fmt = Format.formatter_of_out_channel out_channel in
+    Format.fprintf fmt "%a" pp_task task ;
+    close_out out_channel
+  else
+    Wp_parameters.feedback "%a" pp_task task
+
 let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ?memlimit
     ~prover wpo () =
   try
@@ -1517,6 +1535,8 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ?memlimit
     else
       let {config; _ } as conf = WpContext.on_context context get_why3_conf () in
       let drv , pconf , task = prover_task conf.env prover task in
+      if Wp_parameters.is_debug_key_enabled dkey_pp_task then
+        print_debug_task wpo drv prover task ;
       if is_trivial task then
         Task.return VCS.valid
       else
