@@ -635,8 +635,7 @@ and share cnv expected t =
   let t = List.fold_left (fun t (x,e') ->
       Why3.Term.t_let_close x e' t
     ) t lets
-  in
-  t
+  in t
 
 and mk_lets cnv l =
   List.fold_left (fun (cnv,lets) e ->
@@ -678,10 +677,12 @@ and int_or_real ~cnv ~fint ~lint ~pint ~freal ~lreal ~preal a b =
   | _ -> assert false
 
 let convert cnv expected t =
+  Format.eprintf ">>>> CONVERT-IN@." ;
   (* rewrite terms which normal form inside qed are different from the one of the provers *)
-  let t, convert_for_export = Lang.For_export.rebuild ~cache:cnv.convert_for_export t in
-  cnv.convert_for_export <- convert_for_export;
-  Lang.For_export.in_state (share cnv expected) t
+  let t, cache = Lang.For_export.rebuild ~cache:cnv.convert_for_export t in
+  cnv.convert_for_export <- cache;
+  let r = Lang.For_export.in_state (share cnv expected) t in
+  Format.eprintf "<<<< CONVERT-ED@." ; r
 
 let mk_binders cnv l =
   List.fold_left (fun (cnv,lets) v ->
@@ -1103,7 +1104,9 @@ let convert_freevariables ~probes ~cnv t =
         let ty = of_tau ~cnv @@ Lang.F.tau_of_var v in
         let x = Why3.Ident.id_fresh (Lang.F.Var.basename v) in
         let ls = Why3.Term.create_lsymbol x [] ty in
-        let cnv = {cnv with subst = Lang.F.Tmap.add (Lang.F.e_var v) (Why3.Term.t_app ls [] ty) cnv.subst } in
+        let ex = Lang.F.e_var v in
+        let tx = Why3.Term.t_app ls [] ty in
+        let cnv = { cnv with subst = Lang.F.Tmap.add ex tx cnv.subst } in
         (cnv,ls::lss)) freevars (cnv,[])
   in
   cnv,lss
@@ -1124,7 +1127,9 @@ let prove_goal ~id ~title ~name ?axioms ?(probes=Probe.Map.empty) t =
   v#vgoal axioms t;
   let cnv = empty_cnv ~polarity:`Positive ctx in
   let cnv,lss = convert_freevariables ~probes ~cnv t in
+  Format.eprintf ">>>>>>>> TASK-IN@." ;
   let goal = convert cnv Prop (Lang.F.e_prop t) in
+  Format.eprintf ">>>>>>>> TASK-OUT@." ;
   let decl = Why3.Decl.create_prop_decl Pgoal goal_id goal in
   let th = Why3.Theory.close_theory ctx.th in
   if Wp_parameters.has_print_generated () then begin
