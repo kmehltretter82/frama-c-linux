@@ -23,14 +23,22 @@
 open Nat.Types
 
 module Types : sig type 'n finite end
-
 open Types
 
 val first : 'n succ finite
 val next : 'n finite -> 'n succ finite
 val ( == ) : 'n finite -> 'n finite -> bool
 
-val weaken : 'n finite -> 'n succ finite
+(* The call [of_int limit n] returns a finite value representing the n-nd
+   element of a finite set of cardinal limit. If n is strictly negative then it
+   returns the first element. If n is greater or equal to the limit then it
+   returns the last element. This function complexity is O(1). *)
 val of_int : 'n succ nat -> int -> 'n succ finite
+
+(* The call [to_int n] returns an integer equal to n. This function complexity
+   is O(1). *)
 val to_int : 'n finite -> int
+
+(* The call [for_each acc limit f] folds over each finite elements of a set of
+   cardinal limit, computing f at each step. The function complexity is O(n). *)
 val for_each : 'a -> 'n nat -> ('n finite -> 'a -> 'a) -> 'a

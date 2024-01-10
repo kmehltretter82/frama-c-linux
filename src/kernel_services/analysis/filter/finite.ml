@@ -30,7 +30,6 @@ open Types
 
 let first : type n. n succ finite = 0
 let next : type n. n finite -> n succ finite = fun n -> n + 1
-let weaken : type n. n finite -> n succ finite = fun n -> n
 let ( == ) : type n. n finite -> n finite -> bool = fun l r -> l = r
 let to_int : type n. n finite -> int = fun n -> n
 

@@ -34,6 +34,15 @@ val zero : zero nat
 val one  : zero succ nat
 val succ : 'n nat -> 'n succ nat
 val prev : 'n succ nat -> 'n nat
+
+(* The call [to_int n] returns an integer equal to n. This function complexity
+   is O(1). *)
 val to_int : 'n nat -> int
+
+(* Returns a positive or null natural. If the given parameter is stricly
+   negative then 0 is returned. This function complexity is O(n). *)
 val of_int : int -> positive_or_null
+
+(* Returns a strictly positive natural. If the given parameter is less or equal
+   than zero, then 1 is returned. This function complexity is O(n). *)
 val of_strictly_positive_int : int -> strictly_positive
