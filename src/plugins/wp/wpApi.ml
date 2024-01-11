@@ -84,6 +84,69 @@ end
 
 module Provers = D.Jlist(Prover)
 
+let () = R.register ~package ~kind:`GET ~name:"getAvailableProvers"
+    ~descr:(Md.plain "Returns the list of configured provers from why3")
+    ~input:(module D.Junit) ~output:(module Provers)
+    (fun () ->
+       List.map (fun p -> VCS.Why3 p) @@
+       List.filter Why3Provers.is_mainstream @@
+       Why3Provers.provers ())
+
+let provers = ref None
+
+let getProvers () =
+  match !provers with
+  | Some prvs -> prvs
+  | None ->
+    let cmdline =
+      match Wp_parameters.Provers.get () with
+      | [] -> [ "alt-ergo" ]
+      | prvs -> prvs in
+    let parse s =
+      match VCS.parse_prover s with
+      | None -> None
+      | Some (Qed | Tactical) -> None
+      | Some prv as result -> if VCS.is_auto prv then result else None in
+    let selection = List.filter_map parse cmdline in
+    provers := Some selection ; selection
+
+let setProvers prv = provers := Some prv
+
+let _ =
+  S.register_state ~package ~name:"provers"
+    ~descr:(Md.plain "Selected Provers")
+    ~data:(module Provers)
+    ~get:getProvers
+    ~set:setProvers ()
+
+let get_name = function
+  | VCS.Qed -> "Qed"
+  | VCS.Tactical -> "Script"
+  | VCS.Why3 p -> Why3Provers.name p
+
+let get_version = function
+  | VCS.Qed | Tactical -> Fc_config.version_and_codename
+  | Why3 p -> Why3Provers.version p
+
+let () =
+  let getProverInfo = R.signature ~input:(module Prover) () in
+  let result ~name ~descr =
+    R.result getProverInfo ~name ~descr:(Md.plain descr) (module D.Jalpha) in
+  let set_name = result ~name:"name" ~descr:"Prover name" in
+  let set_version = result ~name:"version" ~descr:"Prover version" in
+  let set_ident = result ~name:"ident" ~descr:"Prover identifier" in
+  R.register_sig ~package ~kind:`GET getProverInfo
+    ~name:"getProverInfo" ~descr:(Md.plain "Prover Information")
+    begin fun rq prv ->
+      set_name rq (get_name prv) ;
+      set_version rq (get_version prv) ;
+      set_ident rq (VCS.name_of_prover prv) ;
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Results and Stats                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
 module Result =
 struct
   type t = VCS.result
@@ -157,41 +220,6 @@ struct
       "total", `Int (Stats.subgoals cs) ;
     ]
 end
-
-let () = R.register ~package ~kind:`GET ~name:"getAvailableProvers"
-    ~descr:(Md.plain "Returns the list of configured provers from why3")
-    ~input:(module D.Junit) ~output:(module Provers)
-    (fun () ->
-       List.map (fun p -> VCS.Why3 p) @@
-       List.filter Why3Provers.is_mainstream @@
-       Why3Provers.provers ())
-
-let provers = ref None
-
-let getProvers () =
-  match !provers with
-  | Some prvs -> prvs
-  | None ->
-    let cmdline =
-      match Wp_parameters.Provers.get () with
-      | [] -> [ "alt-ergo" ]
-      | prvs -> prvs in
-    let parse s =
-      match VCS.parse_prover s with
-      | None -> None
-      | Some (Qed | Tactical) -> None
-      | Some prv as result -> if VCS.is_auto prv then result else None in
-    let selection = List.filter_map parse cmdline in
-    provers := Some selection ; selection
-
-let setProvers prv = provers := Some prv
-
-let _ =
-  S.register_state ~package ~name:"provers"
-    ~descr:(Md.plain "Selected Provers")
-    ~data:(module Provers)
-    ~get:getProvers
-    ~set:setProvers ()
 
 (* -------------------------------------------------------------------------- *)
 (* --- Goal Array                                                         --- *)

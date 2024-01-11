@@ -32,7 +32,7 @@ let cfg = lazy
       Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
   end
 
-let version = Why3.Config.version
+let why3_version = Why3.Config.version
 let config () = Lazy.force cfg
 
 let set_procs = Why3.Controller_itp.set_session_max_tasks
@@ -102,6 +102,9 @@ let title ?(version=true) p =
   if version then Pretty_utils.to_string Why3.Whyconf.print_prover p
   else p.Why3.Whyconf.prover_name
 let compare = Why3.Whyconf.Prover.compare
+let name p = p.Why3.Whyconf.prover_name
+let version p = p.Why3.Whyconf.prover_version
+let altern p = p.Why3.Whyconf.prover_altern
 let is_mainstream p = p.Why3.Whyconf.prover_altern = ""
 
 let provers () =
