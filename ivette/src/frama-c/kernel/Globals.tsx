@@ -25,9 +25,9 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import * as Dome from 'dome/dome';
+import * as Dome from 'dome$';
 import * as Json from 'dome/data/json';
-import { classes } from 'utils';
+import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item } from 'dome/frame/sidebars';
 import { Button } from 'dome/controls/buttons';

@@ -25,8 +25,8 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import * as Dome from 'dome/dome';
-import { classes } from 'utils';
+import * as Dome from 'dome$';
+import { classes } from 'dome/misc/utils';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as DATA from 'frama-c/kernel/api/data';

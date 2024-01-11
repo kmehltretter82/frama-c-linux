@@ -22,7 +22,7 @@
 
 import React, { useEffect } from 'react';
 
-import { classes } from 'utils';
+import { classes } from 'dome/misc/utils';
 import { IconButton } from 'dome/controls/buttons';
 import * as Ivette from 'ivette';
 

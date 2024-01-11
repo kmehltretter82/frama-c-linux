@@ -23,8 +23,8 @@
 import React from 'react';
 import _ from 'lodash';
 import * as Ivette from 'ivette';
-import * as Dome from 'dome/dome';
-import * as System from 'system';
+import * as Dome from 'dome$';
+import * as System from 'dome/system';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
@@ -33,7 +33,7 @@ import * as Values from 'frama-c/plugins/eva/api/values';
 import EvaReady from './EvaReady';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 
-import { classes } from 'utils';
+import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Inset } from 'dome/frame/toolbars';
 import { Cell, Code } from 'dome/controls/labels';

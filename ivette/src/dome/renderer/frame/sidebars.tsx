@@ -33,7 +33,7 @@ import React from 'react';
 import { useFlipSettings } from 'dome/dome';
 import { Badge } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
-import { classes } from 'utils';
+import { classes } from 'dome/misc/utils';
 import { Hbox } from 'dome/layout/boxes';
 import { IconButton, IconButtonProps } from 'dome/controls/buttons';
 

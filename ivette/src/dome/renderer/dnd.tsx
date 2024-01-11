@@ -29,7 +29,7 @@
  */
 
 import React from 'react';
-import { classes, styles } from 'utils';
+import { classes, styles } from 'dome/misc/utils';
 import { swap } from 'dome/data/arrays';
 import {
   DraggableCore,

@@ -30,7 +30,7 @@
 */
 
 import React from 'react';
-import { classes } from 'utils';
+import { classes } from 'dome/misc/utils';
 import { Icon } from './icons';
 import './style.css';
 

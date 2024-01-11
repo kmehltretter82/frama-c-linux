@@ -34,7 +34,7 @@ import React from 'react';
 import { ipcRenderer } from 'electron';
 import { debounce } from 'lodash';
 import isEqual from 'react-fast-compare';
-import { emitter as SysEmitter } from 'system';
+import { emitter as SysEmitter } from 'dome/system';
 import * as JSON from './json';
 import type { State } from './states';
 

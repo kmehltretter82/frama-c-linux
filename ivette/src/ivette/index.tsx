@@ -30,7 +30,7 @@
  */
 
 import React from 'react';
-import { DEVEL } from '$dome';
+import { DEVEL } from 'dome$';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
 import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';

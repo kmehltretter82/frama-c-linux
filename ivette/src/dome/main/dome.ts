@@ -37,8 +37,8 @@
    @module dome(main)
 */
 
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'devtools';
-import SYS, * as System from 'system';
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/misc/devtools';
+import SYS, * as System from 'dome/system';
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import {
   BrowserWindow,
@@ -573,9 +573,9 @@ function createPrimaryWindow(): void {
 
   // React Developper Tools
   if (DEVEL)
-  installExtension(REACT_DEVELOPER_TOOLS, true).catch((err) => {
-  console.error('[Dome] Enable to install React dev-tools', err);
-  });
+    installExtension(REACT_DEVELOPER_TOOLS, true).catch((err) => {
+      console.error('[Dome] Enable to install React dev-tools', err);
+    });
   const cwd = process.cwd();
   const wdir = cwd === '/' ? app.getPath('home') : cwd;
   const cmd = stripElectronArgv({ wdir, argv: process.argv });

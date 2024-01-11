@@ -46,7 +46,7 @@
  */
 
 import React from 'react';
-import { classes } from 'utils';
+import { classes } from 'dome/misc/utils';
 import './style.css';
 
 export interface TextProps {

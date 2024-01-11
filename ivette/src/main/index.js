@@ -36,6 +36,6 @@
    before or after the call to `Dome.start()`.
 */
 
-import * as Dome from '$dome';
+import * as Dome from 'dome$';
 Dome.setName('Ivette');
 Dome.start();

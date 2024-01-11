@@ -45,7 +45,7 @@ import Emitter from 'events';
 import React from 'react';
 import ReactDOM from 'react-dom';
 // import { ipcRenderer } from 'electron';
-import SYS, * as System from 'system';
+import SYS, * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import { ipcRenderer } from 'electron';

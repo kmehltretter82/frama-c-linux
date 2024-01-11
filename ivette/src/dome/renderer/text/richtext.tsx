@@ -22,7 +22,7 @@
 
 import _ from 'lodash';
 import React, { CSSProperties } from 'react';
-import { classes } from 'utils';
+import { classes } from 'dome/misc/utils';
 import * as CS from '@codemirror/state';
 import * as CM from '@codemirror/view';
 import { Change, diffLines } from 'diff';

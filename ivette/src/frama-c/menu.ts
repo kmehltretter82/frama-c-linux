@@ -24,7 +24,7 @@
 /* --- Frama-C MENU                                                       ---*/
 /* --------------------------------------------------------------------------*/
 
-import * as Dome from '$dome';
+import * as Dome from 'dome$';
 import * as Dialogs from 'dome/dialogs';
 import * as Server from 'frama-c/server';
 import * as Services from 'frama-c/kernel/api/services';

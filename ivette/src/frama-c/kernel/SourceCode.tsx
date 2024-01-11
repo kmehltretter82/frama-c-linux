@@ -23,7 +23,7 @@
 import React from 'react';
 
 import * as Dome from 'dome/dome';
-import * as System from 'system';
+import * as System from 'dome/system';
 import * as Editor from 'dome/text/editor';
 import * as Labels from 'dome/controls/labels';
 import * as Settings from 'dome/data/settings';

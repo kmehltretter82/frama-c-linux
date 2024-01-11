@@ -31,7 +31,7 @@
 
 import React from 'react';
 import { Icon } from 'dome/controls/icons';
-import { classes } from 'utils';
+import { classes } from 'dome/misc/utils';
 
 import './style.css';
 

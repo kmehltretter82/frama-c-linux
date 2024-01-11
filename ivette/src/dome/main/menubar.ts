@@ -35,7 +35,7 @@ import {
   shell,
   KeyboardEvent,
 } from 'electron';
-import * as System from 'system';
+import * as System from 'dome/system';
 
 // --------------------------------------------------------------------------
 // --- Special Callbacks

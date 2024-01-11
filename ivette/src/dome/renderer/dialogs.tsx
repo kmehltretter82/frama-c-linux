@@ -28,7 +28,7 @@
 
 const filepath = require('path');
 import { ipcRenderer } from 'electron';
-import * as System from 'system';
+import * as System from 'dome/system';
 
 // --------------------------------------------------------------------------
 // --- Message Box
