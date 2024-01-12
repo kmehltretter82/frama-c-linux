@@ -55,6 +55,7 @@ val parse_prover : string -> prover option
 val pp_prover : Format.formatter -> prover -> unit
 val pp_mode : Format.formatter -> mode -> unit
 
+val eq_prover : prover -> prover -> bool
 val cmp_prover : prover -> prover -> int
 
 (* -------------------------------------------------------------------------- *)

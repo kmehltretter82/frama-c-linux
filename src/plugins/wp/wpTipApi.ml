@@ -519,13 +519,44 @@ let () =
         { cfg with timeout = Some (float timeout) } in
       List.iter
         (fun prv ->
-           let process () = Prover.prove ~config wpo prv in
+           let result =
+             if prv = VCS.Qed then None else
+               let roolback _ p r =
+                 if p = VCS.Qed && VCS.is_valid r then
+                   Wpo.set_result wpo prv VCS.no_result in
+               Some roolback in
+           let process () = Prover.prove ~config ?result wpo prv in
            let thread = Task.thread @@ Task.later process () in
            let status = VCS.computing (fun () -> Task.cancel thread) in
            Wpo.set_result wpo prv status ;
            let server = ProverTask.server () in
            Task.spawn server thread
         ) provers
+    end
+
+let () =
+  let killProvers = R.signature ~output:(module D.Junit) () in
+  let get_node = R.param killProvers (module Node)
+      ~name:"node" ~descr:(Md.plain "Proof node") in
+  let get_provers = R.param_opt killProvers (module WpApi.Provers)
+      ~name:"provers"
+      ~descr:(Md.plain "Prover selection (default: all running provers") in
+  R.register_sig killProvers ~package ~kind:`SET
+    ~name:"killProvers"
+    ~descr:(Md.plain "Interrupt running provers on proof node")
+    begin fun rq () ->
+      let node = get_node rq in
+      let wpo = ProofEngine.goal node in
+      let filter =
+        match get_provers rq with
+        | None | Some [] -> fun _ -> true
+        | Some prvs -> fun p -> List.exists (VCS.eq_prover p) prvs
+      in List.iter
+        (fun (prv,res) ->
+           match res.VCS.verdict with
+           | Computing kill when filter prv -> kill ()
+           | _ -> ()
+        ) @@ Wpo.get_results wpo
     end
 
 (* -------------------------------------------------------------------------- *)

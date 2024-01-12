@@ -131,6 +131,13 @@ let is_auto = function
         not prover_config.interactive
       with Not_found -> true
 
+let eq_prover p q =
+  match p,q with
+  | Qed,Qed -> true
+  | Tactical,Tactical -> true
+  | Why3 p, Why3 q -> Why3Provers.compare p q = 0
+  | (Why3 _ | Qed | Tactical) , _ -> false
+
 let cmp_prover p q =
   match p,q with
   | Qed , Qed -> 0

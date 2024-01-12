@@ -386,4 +386,23 @@ export const runProvers: Server.SetRequest<
   null
   >= runProvers_internal;
 
+const killProvers_internal: Server.SetRequest<
+  { node: node, provers?: prover[] },
+  null
+  > = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.killProvers',
+  input: Json.jObject({
+           node: jNode,
+           provers: Json.jOption(Json.jArray(jProver)),
+         }),
+  output: Json.jNull,
+  signals: [],
+};
+/** Interrupt running provers on proof node */
+export const killProvers: Server.SetRequest<
+  { node: node, provers?: prover[] },
+  null
+  >= killProvers_internal;
+
 /* ------------------------------------- */
