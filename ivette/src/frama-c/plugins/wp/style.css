@@ -117,11 +117,11 @@
 /* --- Tactics View                                                       --- */
 /* -------------------------------------------------------------------------- */
 
-.wp-tactical-view {
+.wp-sidebar-view {
     padding: 2px 0px 2px 3px;
     flex-wrap: wrap;
     align-content: flex-start;
-    overflow-x: auto;
+    overflow-y: auto;
     border-width: 1px;
     border-left-style: solid;
 }

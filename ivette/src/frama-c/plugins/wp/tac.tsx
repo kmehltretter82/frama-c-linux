@@ -37,6 +37,50 @@ type Node = TIP.node | undefined;
 type Tactic = TIP.tactic | undefined;
 
 /* -------------------------------------------------------------------------- */
+/* --- Prover Feedback                                                    --- */
+/* -------------------------------------------------------------------------- */
+
+interface ProverProps {
+  prover: WP.prover;
+  result: WP.result | undefined;
+}
+
+function Prover(props : ProverProps): JSX.Element
+{
+  const { prover } = props;
+  const { name, ident } = States.useRequest(WP.getProverInfo, prover) ?? {};
+  const className = classes(
+    'dome-color-frame wp-tactical-item',
+    //isSelected && 'selected',
+  );
+  return (
+    <Hbox className={className}>
+      <Item
+        className='wp-tactical-cell'
+        label={name}
+        title={ident}
+      />
+    </Hbox>
+  );
+}
+
+export interface ProverSelection {
+  node: Node;
+}
+
+export function Provers(props: ProverSelection): JSX.Element {
+  const { node } = props;
+  const { results=[] } = States.useRequest(TIP.getNodeInfos,node) ?? {};
+  const [ provers=[] ] = States.useSyncState(WP.provers)
+  const items = provers.map((prover) => {
+    const res = results.find(([p]) => p == prover);
+    const result = res ? res[1] : undefined;
+    return <Prover key={prover} prover={prover} result={result} />
+  });
+  return <>{node ? items : null}</>;
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Apply Tactics                                                      --- */
 /* -------------------------------------------------------------------------- */
 
@@ -50,7 +94,7 @@ function applyTactic(tactic: Tactic): void {
 /* --- Tactical Item                                                      --- */
 /* -------------------------------------------------------------------------- */
 
-interface TacticSelection {
+export interface TacticSelection {
   goal: Goal;
   node: Node;
   locked: boolean;
@@ -77,8 +121,7 @@ function TacticItem(props: TacticItemProps): JSX.Element | null {
       onClick={onSelect}
       onDoubleClick={onPlay}
     >
-      <Item
-        className="wp-tactical-cell" {...props}/>
+      <Item className="wp-tactical-cell" {...props}/>
       <IconButton
         icon={locked ? 'LOCK' : 'MEDIA.PLAY'}
         title='Apply Tactic'
@@ -100,7 +143,7 @@ export function Tactics(props: TacticSelection): JSX.Element {
     node
     ? tactics.map(tac => <TacticItem key={tac.id} {...props} {...tac} />)
     : null;
-  return <Vbox className="wp-tactical-view dome-color-frame">{items}</Vbox>;
+  return <>{items}</>;
 }
 
 /* -------------------------------------------------------------------------- */
