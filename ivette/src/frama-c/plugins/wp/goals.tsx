@@ -142,7 +142,7 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
   const renderEmpty = React.useCallback(() => {
     const kind = failed ? ' failed' : '';
     const loc = scoped ? ' in current scope' : '';
-    const icon = scoped ? 'CURSOR' : failed ? 'CIRC.INFO' : 'INFO' ;
+    const icon = scoped ? 'CURSOR' : failed ? 'CIRC.INFO' : 'INFO';
     return (
       <Descr
         className='wp-empty-goals'

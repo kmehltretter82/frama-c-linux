@@ -177,7 +177,7 @@ struct
   let to_json (r : VCS.result) = `Assoc [
       "descr", `String (Pretty_utils.to_string VCS.pp_result r) ;
       "cached", `Bool r.cached ;
-      "verdict", `String (VCS.name_of_verdict r.verdict) ;
+      "verdict", `String (VCS.name_of_verdict ~computing:true r.verdict) ;
       "solverTime", `Float r.solver_time ;
       "proverTime", `Float r.prover_time ;
       "proverSteps", `Int r.prover_steps ;

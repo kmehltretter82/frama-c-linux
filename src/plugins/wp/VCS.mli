@@ -130,7 +130,7 @@ val is_proved: smoke:bool -> verdict -> bool
 val configure : result -> config
 val autofit : result -> bool (** Result that fits the default configuration *)
 
-val name_of_verdict : verdict -> string
+val name_of_verdict : ?computing:bool -> verdict -> string
 
 val pp_result : Format.formatter -> result -> unit
 val pp_result_qualif : ?updating:bool -> prover -> result ->

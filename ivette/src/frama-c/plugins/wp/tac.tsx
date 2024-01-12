@@ -23,9 +23,10 @@
 import React, { Fragment } from 'react';
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
-import { IconButton, Spinner, Select } from 'dome/controls/buttons';
+import { IconButton, IconButtonKind } from 'dome/controls/buttons';
+import { Spinner, Select } from 'dome/controls/buttons';
 import { Label, Item, Descr } from 'dome/controls/labels';
-import { Vbox, Hbox, Filler } from 'dome/layout/boxes';
+import { Hbox, Filler } from 'dome/layout/boxes';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
@@ -34,31 +35,89 @@ import * as TAC from 'frama-c/plugins/wp/api/tac';
 
 type Goal = WP.goal | undefined;
 type Node = TIP.node | undefined;
+type Prover = WP.prover | undefined;
 type Tactic = TIP.tactic | undefined;
+
+/* -------------------------------------------------------------------------- */
+/* --- Use Actions                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+function runProver(node: Node, prover: Prover): void {
+  if (node && prover) {
+    // Server.send(TIP.runProvers,{ node, provers:[prover] });
+  }
+}
+
+function applyTactic(tactic: Tactic): void {
+  if (tactic) {
+    Server.send(TAC.applyTactic, tactic);
+  }
+}
 
 /* -------------------------------------------------------------------------- */
 /* --- Prover Feedback                                                    --- */
 /* -------------------------------------------------------------------------- */
 
-interface ProverProps {
-  prover: WP.prover;
-  result: WP.result | undefined;
+interface ProverActionProps {
+  icon: string;
+  kind: IconButtonKind;
+  computing?: boolean;
 }
 
-function Prover(props : ProverProps): JSX.Element
+function getProverActions(result : WP.result) : ProverActionProps {
+  switch(result.verdict) {
+    case '':
+    case 'none':
+      return { icon: 'CIRC.INFO', kind: 'default' };
+    case 'computing':
+      return { icon: 'EXECUTE', kind: 'default', computing: true };
+    case 'valid':
+      return { icon: 'CIRC.CHECK', kind: 'positive' };
+    case 'unknown':
+    case 'stepout':
+    case 'timeout':
+      return { icon: 'CIRC.QUESTION', kind: 'warning' };
+    case 'failed':
+    default:
+      return { icon: 'WARNING', kind: 'negative' };
+  }
+}
+
+interface ProverItemProps {
+  node: Node;
+  prover: WP.prover;
+  result: WP.result;
+  selected: Prover;
+  setSelected: (prv: Prover) => void;
+}
+
+function ProverItem(props : ProverItemProps): JSX.Element
 {
-  const { prover } = props;
-  const { name, ident } = States.useRequest(WP.getProverInfo, prover) ?? {};
+  const { node, prover, result, selected, setSelected } = props;
+  const { descr='No Result' } = result;
+  const { icon, kind, computing=false } = getProverActions(result);
+  const { name } = States.useRequest(WP.getProverInfo, prover) ?? {};
+  const isSelected = prover === selected;
   const className = classes(
     'dome-color-frame wp-tactical-item',
-    //isSelected && 'selected',
+    isSelected && 'selected',
   );
   return (
-    <Hbox className={className}>
+    <Hbox
+      className={className}
+      onClick={() => setSelected(prover)}
+    >
       <Item
+        icon={icon}
+        kind={kind}
         className='wp-tactical-cell'
         label={name}
-        title={ident}
+        title={descr}
+      />
+      <IconButton
+        icon={computing ? 'MEDIA.PAUSE' : 'MEDIA.PLAY' }
+        kind={kind}
+        onClick={() => runProver(node, prover)}
       />
     </Hbox>
   );
@@ -66,28 +125,28 @@ function Prover(props : ProverProps): JSX.Element
 
 export interface ProverSelection {
   node: Node;
+  selected: Prover;
+  setSelected: (prv: Prover) => void;
 }
 
 export function Provers(props: ProverSelection): JSX.Element {
-  const { node } = props;
-  const { results=[] } = States.useRequest(TIP.getNodeInfos,node) ?? {};
-  const [ provers=[] ] = States.useSyncState(WP.provers)
+  const { node, selected, setSelected } = props;
+  const { results=[] } = States.useRequest(TIP.getNodeInfos, node) ?? {};
+  const [ provers=[] ] = States.useSyncState(WP.provers);
   const items = provers.map((prover) => {
-    const res = results.find(([p]) => p == prover);
-    const result = res ? res[1] : undefined;
-    return <Prover key={prover} prover={prover} result={result} />
+    const res = results.find(([p]) => p === prover);
+    const result = res ? res[1] : WP.resultDefault;
+    return (
+      <ProverItem
+        key={prover}
+        node={node}
+        prover={prover}
+        result={result}
+        selected={selected}
+        setSelected={setSelected} />
+    );
   });
   return <>{node ? items : null}</>;
-}
-
-/* -------------------------------------------------------------------------- */
-/* --- Apply Tactics                                                      --- */
-/* -------------------------------------------------------------------------- */
-
-function applyTactic(tactic: Tactic): void {
-  if (tactic) {
-    Server.send(TAC.applyTactic, tactic);
-  }
 }
 
 /* -------------------------------------------------------------------------- */

@@ -334,8 +334,9 @@ let pp_perf_shell fmt r =
   if not (Wp_parameters.has_dkey dkey_shell) then
     pp_perf_forced fmt r
 
-let name_of_verdict = function
-  | NoResult | Computing _ -> "none"
+let name_of_verdict ?(computing=false) = function
+  | NoResult -> "none"
+  | Computing _ -> if computing then "computing" else "none"
   | Valid -> "valid"
   | Failed -> "failed"
   | Unknown -> "unknown"

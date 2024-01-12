@@ -42,6 +42,7 @@ import { Provers, Tactics, ConfigureTactic } from './tac';
 /* -------------------------------------------------------------------------- */
 
 type Node = TIP.node | undefined;
+type Prover = WP.prover | undefined;
 type Tactic = TIP.tactic | undefined;
 
 interface Selector<A> {
@@ -197,9 +198,11 @@ export function TIPView(props: TIPProps): JSX.Element {
   const { display, goal, onClose } = props;
   const infos =
     States.useSyncArrayElt( WP.goals, goal ) ?? WP.goalsDataDefault;
-  const { current, above=[], below=[], index=-1, pending=0, tactic } =
-    States.useRequest( TIP.getProofStatus, goal, { pending: null } ) ?? {};
-  const [ selected, setSelected ] = React.useState<Tactic>();
+  const {
+    current, above=[], below=[], index=-1, pending=0, tactic: nodeTactic
+  } = States.useRequest( TIP.getProofStatus, goal, { pending: null } ) ?? {};
+  const [ tactic, setTactic ] = React.useState<Tactic>();
+  const [ prover, setProver ] = React.useState<Prover>();
   const [ autofocus, setAF ] = Dome.useBoolSettings('wp.tip.autofocus', true);
   const [ memory, setMEM ] = Dome.useBoolSettings('wp.tip.unmangled', true);
   const [ iformat, setIformat ] = Dome.useWindowSettings<TIP.iformat>(
@@ -208,8 +211,16 @@ export function TIPView(props: TIPProps): JSX.Element {
   const [ rformat, setRformat ] = Dome.useWindowSettings<TIP.rformat>(
     'wp.tip.rformat', TIP.jRformat, 'ratio'
   );
-  const locked = tactic !== undefined;
-  const configured = tactic ?? selected;
+  const locked = nodeTactic !== undefined;
+  const configuredTactic = nodeTactic ?? tactic;
+  const onSelectedProver = React.useCallback((prv) => {
+    setTactic(undefined);
+    setProver(prv);
+  }, []);
+  const onSelectedTactic = React.useCallback((tac) => {
+    setTactic(tac);
+    setProver(undefined);
+  }, []);
   return (
     <Vfill display={display}>
       <ToolBar>
@@ -260,13 +271,17 @@ export function TIPView(props: TIPProps): JSX.Element {
           />
         </Vfill>
         <Vbox className='wp-sidebar-view dome-color-frame'>
-          <Provers node={current} />
+          <Provers
+            node={current}
+            selected={prover}
+            setSelected={onSelectedProver}
+          />
           <Tactics
             goal={goal}
             node={current}
             locked={locked}
-            selected={configured}
-            setSelected={setSelected}
+            selected={configuredTactic}
+            setSelected={onSelectedTactic}
           />
         </Vbox>
       </Hfill>
@@ -274,8 +289,8 @@ export function TIPView(props: TIPProps): JSX.Element {
         goal={goal}
         node={current}
         locked={locked}
-        selected={configured}
-        setSelected={setSelected}
+        selected={configuredTactic}
+        setSelected={onSelectedTactic}
       />
     </Vfill>
   );
