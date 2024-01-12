@@ -1335,25 +1335,33 @@ let call_prover_task ~timeout ~steps ~config ~probes prover call =
 (* --- Batch Prover                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
+let output_task wpo drv ?(script : Filepath.Normalized.t option) prover task =
+  let file = Wpo.DISK.file_goal
+      ~pid:wpo.Wpo.po_pid
+      ~model:wpo.Wpo.po_model
+      ~prover:(VCS.Why3 prover) in
+  Command.print_file file
+  begin fun fmt ->
+    Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
+      (Why3Provers.ident_why3 prover) ;
+    let old = Option.map
+        (fun fscript ->
+           let hash = Digest.file fscript |> Digest.to_hex in
+           Format.fprintf fmt "(* WP Script %s *)@\n" hash ;
+           open_in fscript
+        ) (script :> string option) in
+    let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
+    Option.iter close_in old ;
+  end
+
+
 let digest_task wpo drv ?(script : Filepath.Normalized.t option) prover task =
+  output_task wpo drv ?script prover task;
   let file = Wpo.DISK.file_goal
       ~pid:wpo.Wpo.po_pid
       ~model:wpo.Wpo.po_model
       ~prover:(VCS.Why3 prover) in
   begin
-    Command.print_file file
-      begin fun fmt ->
-        Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
-          (Why3Provers.ident_why3 prover) ;
-        let old = Option.map
-            (fun fscript ->
-               let hash = Digest.file fscript |> Digest.to_hex in
-               Format.fprintf fmt "(* WP Script %s *)@\n" hash ;
-               open_in fscript
-            ) (script :> string option) in
-        let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
-        Option.iter close_in old ;
-      end ;
     Digest.file (file :> string) |> Digest.to_hex
   end
 
@@ -1499,6 +1507,7 @@ let interactive ~mode ~config wpo pconf driver prover task =
 
 let automated ~config ~probes ~timeout ~steplimit ~memlimit
     wpo pconf drv prover task =
+  if Wp_parameters.has_out () then output_task wpo drv prover task;
   if Probe.Map.is_empty probes then
     Cache.get_result
       ~digest:(digest_task wpo drv)
