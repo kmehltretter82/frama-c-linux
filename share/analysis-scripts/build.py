@@ -74,6 +74,12 @@ parser.add_argument(
     help="name of the main function (default: main)",
 )
 parser.add_argument(
+    "--no-source-filter",
+    action="store_false",
+    dest="source_filter",
+    help="disable source filters (less precise, but speeds up large projects)",
+)
+parser.add_argument(
     "--sources",
     metavar="FILE",
     nargs="+",
@@ -93,6 +99,7 @@ force = args.force
 jbdb_path = args.jbdb
 machdep = args.machdep
 main = args.main
+do_filter_source = args.source_filter
 sources = args.sources
 targets = args.targets
 debug = args.debug
@@ -234,7 +241,7 @@ def copy_fc_stubs() -> Path:
 # [funcname] in [filename].
 # [has_args] is used to distinguish between main(void) and main(int, char**).
 def find_definitions(funcname: str, filename: str) -> list[tuple[str, bool]]:
-    file_content = source_filter.open_and_filter(filename, not under_test)
+    file_content = source_filter.open_and_filter(filename, not under_test and do_filter_source)
     file_lines = file_content.splitlines(keepends=True)
     newlines = function_finder.compute_newline_offsets(file_lines)
     defs = function_finder.find_definitions_and_declarations(
