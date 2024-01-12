@@ -25,7 +25,7 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import * as Dome from 'dome$';
+import * as Dome from 'dometsx';
 import { classes } from 'dome/misc/utils';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';

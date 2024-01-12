@@ -33,8 +33,8 @@
 import { debounce } from 'lodash';
 const Path = require('path');
 import React from 'react';
-import * as Dome from 'dome$';
-import * as System from 'dome/misc/utils';
+import * as Dome from 'dometsx';
+import * as System from 'dome/misc/system';
 import * as Json from 'dome/data/json';
 import { TextBuffer } from 'dome/text/richtext';
 const ChildProcess = require('child_process');

@@ -23,7 +23,7 @@
 import React from 'react';
 import _ from 'lodash';
 import * as Ivette from 'ivette';
-import * as Dome from 'dome$';
+import * as Dome from 'dometsx';
 import * as System from 'dome/system';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';

@@ -30,7 +30,7 @@
  */
 
 import React from 'react';
-import * as Dome from 'dome$';
+import * as Dome from 'dometsx';
 import { SVG } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';

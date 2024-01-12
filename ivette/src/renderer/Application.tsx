@@ -27,7 +27,7 @@
 // --- React & Dome
 
 import React from 'react';
-import * as Dome from 'dome$';
+import * as Dome from 'dometsx';
 import { Vfill } from 'dome/layout/boxes';
 import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';

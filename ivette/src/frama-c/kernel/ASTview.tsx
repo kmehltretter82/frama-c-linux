@@ -23,7 +23,7 @@
 import React from 'react';
 import Lodash from 'lodash';
 
-import * as Dome from 'dome$';
+import * as Dome from 'dometsx';
 import * as Editor from 'dome/text/editor';
 import * as Utils from 'dome/data/arrays';
 import * as States from 'frama-c/states';

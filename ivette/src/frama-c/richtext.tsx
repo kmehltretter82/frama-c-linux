@@ -30,7 +30,7 @@
  */
 
 import React from 'react';
-import * as Dome from 'dome$';
+import * as Dome from 'dometsx';
 import * as KernelData from 'frama-c/kernel/api/data';
 import { classes } from 'dome/misc/utils';
 
