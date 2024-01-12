@@ -1730,7 +1730,7 @@ let have s =
 let condition s = F.p_conj (hyps s)
 let close sequent =
   let s,goal = alter_closure sequent in
-  F.p_close (F.p_hyps (hyps s) goal)
+  (F.p_hyps (hyps s) goal)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Visitor                                                            --- *)
