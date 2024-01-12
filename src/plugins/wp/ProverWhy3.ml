@@ -1234,11 +1234,10 @@ let get_model probes (res:Why3.Call_provers.prover_result) =
   if Wp_parameters.has_dkey dkey_model && not @@ Probe.Map.is_empty probes then
     debug_model (res:Why3.Call_provers.prover_result);
   (* we take the second model because it should be the most precise?? *)
-  match res.pr_models with
-  | [] -> Probe.Map.empty
-  | _ ->
+  match Why3.Check_ce.select_model_last_non_empty res.pr_models with
+  | None -> Probe.Map.empty
+  | Some model ->
     let index = Hashtbl.create 0 in
-    let _,model = Extlib.last res.pr_models in
     let elements = Why3.Model_parser.get_model_elements model in
     List.iter
       (fun (e:Why3.Model_parser.model_element) ->
