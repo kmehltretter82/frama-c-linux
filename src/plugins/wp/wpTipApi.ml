@@ -24,7 +24,7 @@
 (* --- Server API for WP                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-open WpApi
+module W = WpApi
 module P = Server.Package
 module D = Server.Data
 module R = Server.Request
@@ -82,7 +82,7 @@ let () =
       ~descr:(Md.plain "Node statistics") (module D.Jstring) in
   let set_results = R.result inode ~name:"results"
       ~descr:(Md.plain "Prover results for current node")
-      (module D.Jlist(D.Jpair(Prover)(Result))) in
+      (module D.Jlist(D.Jpair(W.Prover)(W.Result))) in
   let set_tactic = R.result_opt inode ~name:"tactic"
       ~descr:(Md.plain "Applied tactic (if any)")
       (module Tactic) in
@@ -124,7 +124,7 @@ let () =
 (* -------------------------------------------------------------------------- *)
 
 let () =
-  let state = R.signature ~input:(module Goal) () in
+  let state = R.signature ~input:(module W.Goal) () in
   let set_index = R.result state ~name:"index"
       ~descr:(Md.plain "Current node index among pending nodes (else -1)")
       (module D.Jint) in
@@ -181,7 +181,7 @@ let () =
 
 let () = R.register ~package ~kind:`SET ~name:"goForward"
     ~descr:(Md.plain "Go to to first pending node, or root if none")
-    ~input:(module Goal) ~output:(module D.Junit)
+    ~input:(module W.Goal) ~output:(module D.Junit)
     begin fun goal ->
       let tree = ProofEngine.proof ~main:goal in
       ProofEngine.forward tree ;
@@ -190,7 +190,7 @@ let () = R.register ~package ~kind:`SET ~name:"goForward"
 
 let () = R.register ~package ~kind:`SET ~name:"goToRoot"
     ~descr:(Md.plain "Go to root of proof tree")
-    ~input:(module Goal) ~output:(module D.Junit)
+    ~input:(module W.Goal) ~output:(module D.Junit)
     begin fun goal ->
       let tree = ProofEngine.proof ~main:goal in
       ProofEngine.goto tree `Main ;
@@ -199,7 +199,7 @@ let () = R.register ~package ~kind:`SET ~name:"goToRoot"
 
 let () = R.register ~package ~kind:`SET ~name:"goToIndex"
     ~descr:(Md.plain "Go to k-th pending node of proof tree")
-    ~input:(module D.Jpair(Goal)(D.Jint)) ~output:(module D.Junit)
+    ~input:(module D.Jpair(W.Goal)(D.Jint)) ~output:(module D.Junit)
     begin fun (goal,index) ->
       let tree = ProofEngine.proof ~main:goal in
       ProofEngine.goto tree (`Leaf index) ;
@@ -239,7 +239,7 @@ let () = R.register ~package ~kind:`SET ~name:"clearParentTactic"
 
 let () = R.register ~package ~kind:`SET ~name:"clearGoal"
     ~descr:(Md.plain "Remove the complete goal proof tree")
-    ~input:(module Goal) ~output:(module D.Junit)
+    ~input:(module W.Goal) ~output:(module D.Junit)
     begin fun goal ->
       let tree = ProofEngine.proof ~main:goal in
       ProofEngine.clear_tree tree ;
@@ -484,6 +484,48 @@ let () =
       let (part,term) = (lookup node)#target in
       set_part rq (if part <> Term then Some (of_part part) else None);
       set_term rq term;
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Prover Scheduling                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  let runProvers = R.signature ~output:(module D.Junit) () in
+  let get_node = R.param runProvers (module Node)
+      ~name:"node" ~descr:(Md.plain "Proof node") in
+  let get_timeout = R.param_opt runProvers (module D.Jint)
+      ~name:"timeout"
+      ~descr:(Md.plain "Prover timeout (in seconds, default: current)") in
+  let get_provers = R.param_opt runProvers (module WpApi.Provers)
+      ~name:"provers"
+      ~descr:(Md.plain "Prover selection (default: current") in
+  R.register_sig runProvers ~package ~kind:`SET
+    ~name:"runProvers"
+    ~descr:(Md.plain "Schedule provers on proof node")
+    begin fun rq () ->
+      let node = get_node rq in
+      let wpo = ProofEngine.goal node in
+      let provers =
+        match get_provers rq with
+        | Some ps -> ps
+        | None -> WpApi.getProvers () in
+      let timeout =
+        match get_timeout rq with
+        | Some t -> t
+        | None -> Wp_parameters.Timeout.get () in
+      let config =
+        let cfg = VCS.current () in
+        { cfg with timeout = Some (float timeout) } in
+      List.iter
+        (fun prv ->
+           let process () = Prover.prove ~config wpo prv in
+           let thread = Task.thread @@ Task.later process () in
+           let status = VCS.computing (fun () -> Task.cancel thread) in
+           Wpo.set_result wpo prv status ;
+           let server = ProverTask.server () in
+           Task.spawn server thread
+        ) provers
     end
 
 (* -------------------------------------------------------------------------- *)

@@ -144,6 +144,19 @@ let () =
     end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Provers Timeout                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+let _ =
+  S.register_state ~package
+    ~name:"timeout"
+    ~descr:(Md.plain "Prover's Timeout")
+    ~data:(module D.Jint)
+    ~get:Wp_parameters.Timeout.get
+    ~set:Wp_parameters.Timeout.set
+    ~add_hook:Wp_parameters.Timeout.add_hook_on_update ()
+
+(* -------------------------------------------------------------------------- *)
 (* --- Results and Stats                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 

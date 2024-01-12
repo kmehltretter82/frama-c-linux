@@ -32,5 +32,7 @@ module Result : Server.Data.S with type t = VCS.result
 module Goal : Server.Data.S with type t = Wpo.t
 
 val goals : Wpo.t Server.States.array
+val getProvers : unit -> VCS.prover list
+val setProvers : VCS.prover list -> unit
 
 (* -------------------------------------------------------------------------- *)

@@ -142,6 +142,40 @@ export const getProverInfo: Server.GetRequest<
   { name: string, version: string, ident: string }
   >= getProverInfo_internal;
 
+/** Signal for state [`timeout`](#timeout)  */
+export const signalTimeout: Server.Signal = {
+  name: 'plugins.wp.signalTimeout',
+};
+
+const getTimeout_internal: Server.GetRequest<null,number> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.getTimeout',
+  input: Json.jNull,
+  output: Json.jNumber,
+  signals: [],
+};
+/** Getter for state [`timeout`](#timeout)  */
+export const getTimeout: Server.GetRequest<null,number>= getTimeout_internal;
+
+const setTimeout_internal: Server.SetRequest<number,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.setTimeout',
+  input: Json.jNumber,
+  output: Json.jNull,
+  signals: [],
+};
+/** Setter for state [`timeout`](#timeout)  */
+export const setTimeout: Server.SetRequest<number,null>= setTimeout_internal;
+
+const timeout_internal: State.State<number> = {
+  name: 'plugins.wp.timeout',
+  signal: signalTimeout,
+  getter: getTimeout,
+  setter: setTimeout,
+};
+/** Prover's Timeout */
+export const timeout: State.State<number> = timeout_internal;
+
 /** Prover Result */
 export type result =
   { descr: string, cached: boolean, verdict: string, solverTime: number,

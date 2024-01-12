@@ -366,4 +366,24 @@ export const getSelection: Server.GetRequest<
   { part?: part, term?: term }
   >= getSelection_internal;
 
+const runProvers_internal: Server.SetRequest<
+  { node: node, timeout?: number, provers?: prover[] },
+  null
+  > = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.runProvers',
+  input: Json.jObject({
+           node: jNode,
+           timeout: Json.jOption(Json.jNumber),
+           provers: Json.jOption(Json.jArray(jProver)),
+         }),
+  output: Json.jNull,
+  signals: [],
+};
+/** Schedule provers on proof node */
+export const runProvers: Server.SetRequest<
+  { node: node, timeout?: number, provers?: prover[] },
+  null
+  >= runProvers_internal;
+
 /* ------------------------------------- */
