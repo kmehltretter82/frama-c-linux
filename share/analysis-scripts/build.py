@@ -204,11 +204,17 @@ def make_target_name(target: Path) -> str:
 # sources are pretty-printed relatively to the .frama-c directory, where the
 # GNUmakefile will reside
 def rel_prefix(path: Path) -> str:
-    return str(path) if os.path.isabs(path) else os.path.relpath(path, start=dot_framac_dir)
+    # heuristics: try a relative path, but if too many ".."'s, then give up
+    # and use an absolute one.
+    relp = os.path.relpath(path, start=dot_framac_dir)
+    if relp.startswith(os.path.join("..", "..")):
+        return path
+    else:
+        return relp
 
 
 def pretty_sources(sources: list[Path]) -> list[str]:
-    return [f"  {rel_prefix(source)} \\" for source in sources]
+    return [f"  {rel_prefix(source)} \\" for source in sorted(sources)]
 
 
 def lines_of_file(path: Path) -> list[str]:
@@ -356,7 +362,7 @@ if unknown_sources:
 # signature, to patch fc_stubs.c.
 
 main_definitions: dict[Path, list[tuple[Path, str, bool]]] = {}
-for target, sources in sources_map.items():
+for target, sources in sorted(sources_map.items()):
     main_definitions[target] = []
     for source in sources:
         fundefs = find_definitions(main, source)
@@ -394,7 +400,7 @@ for defs in main_definitions.values():
 
 if any_has_arguments:
     fc_stubs = copy_fc_stubs()
-    for target in targets:
+    for target in sorted(targets):
         if any(d[2] for d in main_definitions[target]):
             logging.debug(
                 "target %s has main with args, adding fc_stubs.c to its sources",
@@ -423,13 +429,13 @@ if jbdb_path:
         [f"  -json-compilation-database {rel_prefix(jbdb_path)} \\"],
     )
 
-targets_eva = [f"  {make_target_name(target)}.eva \\" for target in targets]
+targets_eva = [f"  {make_target_name(target)}.eva \\" for target in sorted(targets)]
 replace_line(template, "^TARGETS = main.eva", "TARGETS = \\")
 insert_lines_after(template, r"^TARGETS = \\", targets_eva)
 
 delete_line(template, r"^main.parse: \\")
 delete_line(template, r"^  main.c \\")
-for target, sources in reversed(sources_map.items()):
+for target, sources in sorted(sources_map.items(), reverse=True):
     pp_target = make_target_name(target)
     new_lines = [f"{pp_target}.parse: \\"] + pretty_sources(sources) + [""]
     if any(d[2] for d in main_definitions[target]):
