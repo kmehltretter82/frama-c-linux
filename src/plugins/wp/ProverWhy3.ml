@@ -1341,18 +1341,18 @@ let output_task wpo drv ?(script : Filepath.Normalized.t option) prover task =
       ~model:wpo.Wpo.po_model
       ~prover:(VCS.Why3 prover) in
   Command.print_file file
-  begin fun fmt ->
-    Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
-      (Why3Provers.ident_why3 prover) ;
-    let old = Option.map
-        (fun fscript ->
-           let hash = Digest.file fscript |> Digest.to_hex in
-           Format.fprintf fmt "(* WP Script %s *)@\n" hash ;
-           open_in fscript
-        ) (script :> string option) in
-    let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
-    Option.iter close_in old ;
-  end
+    begin fun fmt ->
+      Format.fprintf fmt "(* WP Task for Prover %s *)@\n"
+        (Why3Provers.ident_why3 prover) ;
+      let old = Option.map
+          (fun fscript ->
+             let hash = Digest.file fscript |> Digest.to_hex in
+             Format.fprintf fmt "(* WP Script %s *)@\n" hash ;
+             open_in fscript
+          ) (script :> string option) in
+      let _ = Why3.Driver.print_task_prepared ?old drv fmt task in
+      Option.iter close_in old ;
+    end
 
 
 let digest_task wpo drv ?(script : Filepath.Normalized.t option) prover task =
