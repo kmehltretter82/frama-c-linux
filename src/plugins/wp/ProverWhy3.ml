@@ -357,7 +357,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
   Wp_parameters.debug ~dkey:dkey_api
     "of_term %a:%a (expected %a)@."
     Lang.F.pp_term t Lang.F.Tau.pretty sort Lang.F.Tau.pretty expected
-;
+  ;
 
   let ($) f x = f x in
   let r =
@@ -684,11 +684,7 @@ let rebuild cnv t =
   t
 
 let convert cnv expected t =
-  let t = rebuild cnv t in
-  Format.eprintf ">>>> CONVERT-IN@." ;
-  (* rewrite terms which normal form inside qed are different from the one of the provers *)
-  let r = Lang.For_export.in_state (share cnv expected) t in
-  Format.eprintf "<<<< CONVERT-ED@." ; r
+  Lang.For_export.in_state (share cnv expected) (rebuild cnv t)
 
 let mk_binders cnv l =
   List.fold_left (fun (cnv,lets) v ->
@@ -697,8 +693,9 @@ let mk_binders cnv l =
       | Some ty ->
         let x = Why3.Ident.id_fresh (Lang.F.Var.basename v) in
         let x = Why3.Term.create_vsymbol x ty in
-        let e = Lang.F.e_var v in
-        let cnv = {cnv with subst = Lang.F.Tmap.add e (Why3.Term.t_var x) cnv.subst } in
+        let ex = Lang.F.e_var v in
+        let tx = Why3.Term.t_var x in
+        let cnv = { cnv with subst = Lang.F.Tmap.add ex tx cnv.subst } in
         let lets = x::lets in
         cnv,lets
     ) (cnv,[]) (List.rev l)
@@ -1134,24 +1131,24 @@ let prove_goal ~id ~title ~name ?axioms ?(probes=Probe.Map.empty) t =
   let cnv = empty_cnv ~polarity:`Positive ctx in
   let t = rebuild cnv (Lang.F.e_prop t) in
   let probes = Probe.Map.map (rebuild cnv) probes in
-  Lang.For_export.in_state (fun () ->
-  let cnv,lss = convert_freevariables ~probes ~cnv t in
-  Format.eprintf ">>>>>>>> TASK-IN@." ;
-  let goal = share cnv Prop t in
-  Format.eprintf ">>>>>>>> TASK-OUT@." ;
-  let decl = Why3.Decl.create_prop_decl Pgoal goal_id goal in
-  let th = Why3.Theory.close_theory ctx.th in
-  if Wp_parameters.has_print_generated () then begin
-    let th_uc_tmp = Why3.Theory.add_decl ~warn:false ctx.th decl in
-    let th_tmp    = Why3.Theory.close_theory th_uc_tmp in
-    Wp_parameters.debug ~dkey:Wp_parameters.cat_print_generated "%a"
-      Why3.Pretty.print_theory th_tmp
-  end;
-  let t = None in
-  let t = Why3.Task.use_export t th in
-  let t = List.fold_left Why3.Task.add_param_decl t lss in
-  let t = add_model_trace probes cnv t in
-  Why3.Task.add_decl t decl) ()
+  Lang.For_export.in_state
+    begin fun () ->
+      let cnv,lss = convert_freevariables ~probes ~cnv t in
+      let goal = share cnv Prop t in
+      let decl = Why3.Decl.create_prop_decl Pgoal goal_id goal in
+      let th = Why3.Theory.close_theory ctx.th in
+      if Wp_parameters.has_print_generated () then begin
+        let th_uc_tmp = Why3.Theory.add_decl ~warn:false ctx.th decl in
+        let th_tmp    = Why3.Theory.close_theory th_uc_tmp in
+        Wp_parameters.debug ~dkey:Wp_parameters.cat_print_generated "%a"
+          Why3.Pretty.print_theory th_tmp
+      end;
+      let t = None in
+      let t = Why3.Task.use_export t th in
+      let t = List.fold_left Why3.Task.add_param_decl t lss in
+      let t = add_model_trace probes cnv t in
+      Why3.Task.add_decl t decl
+    end ()
 
 let prove_prop ?probes ?axioms ~pid prop =
   let id = WpPropId.get_propid pid in
