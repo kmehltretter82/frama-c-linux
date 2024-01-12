@@ -21,7 +21,7 @@
 /* ************************************************************************ */
 
 import React from 'react';
-import { IconKind, Cell } from 'dome/controls/labels';
+import { IconKind, Cell, Descr } from 'dome/controls/labels';
 import { Filter } from 'dome/table/models';
 import { Table, Column } from 'dome/table/views';
 import * as States from 'frama-c/states';
@@ -99,6 +99,7 @@ function filterGoal(
 export interface GoalTableProps {
   display: boolean;
   failed: boolean;
+  scoped: boolean;
   scope: Ast.decl | undefined;
   current: WP.goal | undefined;
   setCurrent: (goal: WP.goal) => void;
@@ -109,8 +110,8 @@ export interface GoalTableProps {
 
 export function GoalTable(props: GoalTableProps): JSX.Element {
   const {
-    display, scope, failed,
-    current, setCurrent, setTIP,
+    display, scoped, failed,
+    scope, current, setCurrent, setTIP,
     setGoals, setTotal,
   } = props;
   const { model } = States.useSyncArrayProxy(WP.goals);
@@ -138,6 +139,17 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
   React.useEffect(() => setGoals(goals), [goals, setGoals]);
   React.useEffect(() => setTotal(total), [total, setTotal]);
 
+  const renderEmpty = React.useCallback(() => {
+    const kind = failed ? ' failed' : '';
+    const loc = scoped ? ' in current scope' : '';
+    const icon = scoped ? 'CURSOR' : failed ? 'CIRC.INFO' : 'INFO' ;
+    return (
+      <Descr
+        className='wp-empty-goals'
+        icon={icon} label={`No${kind} goals${loc}`} />
+    );
+  }, [scoped, failed]);
+
   return (
     <Table
       model={model}
@@ -146,6 +158,7 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
       selection={current}
       onSelection={onSelection}
       onDoubleClick={onDoubleClick}
+      renderEmpty={renderEmpty}
     >
       <Column id='scope' label='Scope'
               width={150}

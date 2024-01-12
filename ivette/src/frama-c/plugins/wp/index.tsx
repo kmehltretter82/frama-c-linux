@@ -83,8 +83,9 @@ function WPGoals(): JSX.Element {
       </Ivette.TitleBar>
       <GoalTable
         display={!tip}
-        scope={scope}
         failed={failed}
+        scoped={scoped}
+        scope={scope}
         current={current}
         setCurrent={setCurrent}
         setTIP={() => setTip(true)}
