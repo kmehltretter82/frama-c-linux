@@ -20,7 +20,7 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import React from 'react';
+import React, { useState } from 'react';
 import Lodash from 'lodash';
 
 import * as Dome from 'dome';
@@ -690,6 +690,29 @@ const extensions: Editor.Extension[] = [
   Editor.LanguageHighlighter,
 ];
 
+interface buttonUnFoldProps {
+  view: Editor.View
+}
+
+function ButtonUnFold(props: buttonUnFoldProps): JSX.Element {
+  const [isFold, setIsFold] = useState(false);
+  const icon = 'CHEVRON.' + (isFold ? 'EXPAND' : 'CONTRACT');
+  const title = isFold ? 'Expand' : 'Collapse';
+  const buttonUnFoldClicked = (): void => {
+    isFold ? Editor.unfoldAll(props.view) : Editor.foldAll(props.view);
+    setIsFold(!isFold);
+  };
+
+  return (
+    <IconButton
+      icon={icon}
+      onClick= {buttonUnFoldClicked}
+      title={title + ' all multi-line ACSL properties'}
+      className="titlebar-thin-icon"
+    />
+  );
+}
+
 // The component in itself.
 export default function ASTview(): JSX.Element {
   const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
@@ -731,20 +754,7 @@ export default function ASTview(): JSX.Element {
     <>
       <TitleBar>
         <Filler />
-        <IconButton
-          icon='CHEVRON.CONTRACT'
-          visible={true}
-          onClick={() => Editor.foldAll(view)}
-          title='Collapse all multi-line ACSL properties'
-          className="titlebar-thin-icon"
-        />
-        <IconButton
-          icon='CHEVRON.EXPAND'
-          visible={true}
-          onClick={() => Editor.unfoldAll(view)}
-          title='Expand all multi-line ACSL properties'
-          className="titlebar-thin-icon"
-        />
+        <ButtonUnFold view={view} />
         <Inset />
       </TitleBar>
       <Component style={{ fontSize: `${fontSize}px` }} />
