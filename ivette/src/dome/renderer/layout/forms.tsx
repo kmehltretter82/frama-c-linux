@@ -520,8 +520,8 @@ export function Section(props: SectionProps): JSX.Element | null {
 
   return (
     <CONTEXT.Provider value={{ hidden, disabled }}>
-      <div className="dome-xForm-section">
-        <div className="dome-xForm-fold" onClick={flip}>
+      <div className="dome-xForm-section" onClick={flip}>
+        <div className="dome-xForm-fold">
           <SVG id={unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT'} size={11} />
         </div>
         <label className={cssTitle} title={title}>
