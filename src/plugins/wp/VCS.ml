@@ -113,6 +113,10 @@ let filename_for_prover = function
   | Qed -> "Qed"
   | Tactical -> "Tactical"
 
+let is_prover = function
+  | Qed | Why3 _ -> true
+  | Tactical -> false
+
 let is_auto = function
   | Qed -> true
   | Tactical -> false
@@ -131,11 +135,11 @@ let cmp_prover p q =
   match p,q with
   | Qed , Qed -> 0
   | Qed , _ -> (-1)
-  | _ , Qed -> 1
-  | Tactical , Tactical -> 0
-  | Tactical , _ -> (-1)
-  | _ , Tactical -> 1
+  | _ , Qed -> (+1)
   | Why3 p , Why3 q -> Why3Provers.compare p q
+  | Why3 _ , _ -> (-1)
+  | _ , Why3 _ -> (+1)
+  | Tactical , Tactical -> 0
 
 let pp_prover fmt p = Format.pp_print_string fmt (title_of_prover p)
 let pp_mode fmt m = Format.pp_print_string fmt (title_of_mode m)
@@ -259,10 +263,10 @@ let configure r =
 
 let time_fits t =
   t = 0.0 ||
-  let timeout = Wp_parameters.Timeout.get () in
-  timeout = 0 ||
-  let margin = Wp_parameters.TimeMargin.get () in
-  t < float (timeout - margin)
+  let timeout = float @@ Wp_parameters.Timeout.get () in
+  timeout = 0.0 ||
+  let margin = float_of_string @@ Wp_parameters.TimeMargin.get () in
+  t +. margin <= timeout
 
 let step_fits n =
   n = 0 ||

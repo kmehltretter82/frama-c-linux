@@ -179,10 +179,6 @@ stdenvNoCC.mkDerivation rec {
         export DUNE_DIR_LOCATIONS="''${DUNE_DIR_LOCATIONS-}''${DUNE_DIR_LOCATIONS:+:}frama-c:lib:''$1/lib/frama-c"
       fi
 
-      if test -d "''$1/share/frama-c/"; then
-        export FRAMAC_EXTRA_SHARE="''${FRAMAC_EXTRA_SHARE-}''${FRAMAC_EXTRA_SHARE:+:}''$1/share/frama-c"
-      fi
-
     }
 
     addEnvHooks "$targetOffset" addFramaCPath

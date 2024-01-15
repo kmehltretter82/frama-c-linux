@@ -246,7 +246,7 @@ README* header_spec=.ignore
 /doc/**/*.sh header_spec=.ignore
 
 /headers/open-source/* header_spec=.ignore
-/headers/close-source/* header_spec=.ignore
+/headers/closed-source/* header_spec=.ignore
 
 /licenses/* header_spec=.ignore
 

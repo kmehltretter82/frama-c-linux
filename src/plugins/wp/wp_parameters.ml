@@ -927,7 +927,7 @@ let () = Parameter_customize.set_group wp_prover
 module TimeExtra =
   Int(struct
     let option_name = "-wp-time-extra"
-    let default = 5
+    let default = 1
     let arg_name = "n"
     let help =
       Printf.sprintf
@@ -936,16 +936,16 @@ module TimeExtra =
 
 let () = Parameter_customize.set_group wp_prover
 module TimeMargin =
-  Int(struct
+  String(struct
     let option_name = "-wp-time-margin"
-    let default = 2
+    let default = "0.5"
     let arg_name = "n"
     let help =
       Printf.sprintf
         "Set margin-time (in seconds) for considering a proof automatic.\n\
          When using the 'tip' prover, scripts are created or cancelled\n\
          if the proof time is greater or lower than (timeout - margin).\n\
-         (default: %d)." default
+         (default: %s)." default
   end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -1158,7 +1158,7 @@ module OutputDir =
 
 let dkey = register_category "output"
 
-let has_out () = Fc_Filepath.Normalized.is_empty (OutputDir.get ())
+let has_out () = not @@ Fc_Filepath.Normalized.is_empty (OutputDir.get ())
 
 let make_output_dir dir =
   try

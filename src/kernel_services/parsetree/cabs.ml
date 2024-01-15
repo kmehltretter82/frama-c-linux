@@ -129,7 +129,6 @@ and name_group = specifier * name list
 (* The optional expression is the bitfield *)
 and field_group =
   | FIELD of specifier * (name * expression option) list
-  | TYPE_ANNOT of Logic_ptree.type_annot
   | STATIC_ASSERT_FG of expression * string * cabsloc
 
 (* like name_group, except the declared variables are allowed to have initializers *)
