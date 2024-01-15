@@ -294,6 +294,16 @@ function ComponentItem(comp: Ivette.ItemProps): JSX.Element {
   }
 
   function onContextMenu(e: React.MouseEvent): void {
+    const labViewState = globalLabViewState.getValue();
+
+    if(labViewState.components.has(comp.id)) {
+      globalPanelLayoutSelectorState.setValue(defaultPanelLayoutSelectorState);
+      return;
+    }
+    openPanelLayoutSelector(e);
+  }
+
+  function openPanelLayoutSelector(e: React.MouseEvent): void {
     const state = globalPanelLayoutSelectorState.getValue();
     const display = !state.display ? true : state.compId !== comp.id;
     globalPanelLayoutSelectorState.setValue({
