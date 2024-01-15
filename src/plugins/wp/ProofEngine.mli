@@ -43,10 +43,10 @@ val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
 val proof : main:Wpo.t -> tree
 
 (** Re-compute stats & set status of the entire script *)
-val validate : tree -> unit
+val validate : computing:bool -> tree -> unit
 
 (** Consolidate statistics wrt current script or prover results *)
-val consolidated : Wpo.t -> Stats.stats
+val consolidated : computing:bool -> Wpo.t -> Stats.stats
 
 (** Leaves are numbered from 0 to n-1 *)
 

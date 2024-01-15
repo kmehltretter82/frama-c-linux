@@ -45,6 +45,8 @@ let proofStatus = R.signal ~package ~name:"proofStatus"
 let printStatus = R.signal ~package ~name:"printStatus"
     ~descr:(Md.plain "Updated TIP printer")
 
+let () = Wpo.add_modified_hook (fun _ -> R.emit proofStatus)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Proof Node                                                         --- *)
 (* -------------------------------------------------------------------------- *)
@@ -98,25 +100,37 @@ let () =
   let set_children = R.result inode ~name:"children"
       ~descr:(Md.plain "Proof node tactic children (id any)")
       (module Path) in
-  R.register_sig ~package ~kind:`GET ~name:"getNodeInfos"
-    ~descr:(Md.plain "Proof node information") inode
+  R.register_sig inode ~package ~kind:`GET ~name:"getNodeInfos"
+    ~descr:(Md.plain "Proof node information")
     ~signals:[proofStatus]
     begin fun rq node ->
-      set_title rq (ProofEngine.title node) ;
-      set_proved rq (ProofEngine.proved node) ;
-      set_pending rq (ProofEngine.pending node) ;
+      set_title rq (ProofEngine.title node);
+      set_proved rq (ProofEngine.proved node);
+      set_pending rq (ProofEngine.pending node);
       let s = ProofEngine.stats node in
-      let tactic = ProofEngine.tactic node in
-      let header = ProofEngine.tactic_label node in
-      let child = ProofEngine.child_label node in
-      set_size rq (Stats.subgoals s) ;
-      set_stats rq (Pretty_utils.to_string Stats.pretty s) ;
-      set_results rq (Wpo.get_results (ProofEngine.goal node)) ;
-      set_tactic rq tactic ;
-      set_header rq header ;
-      set_child rq child ;
-      set_path rq (ProofEngine.path node) ;
-      set_children rq (ProofEngine.subgoals node) ;
+      set_size rq (Stats.subgoals @@ s);
+      set_stats rq (Pretty_utils.to_string Stats.pretty s);
+      set_results rq (Wpo.get_results ~computing:true (ProofEngine.goal node));
+      set_tactic rq (ProofEngine.tactic node);
+      set_header rq (ProofEngine.tactic_label node);
+      set_child rq (ProofEngine.child_label node);
+      set_path rq (ProofEngine.path node);
+      set_children rq (ProofEngine.subgoals node);
+    end
+
+let () =
+  let iresult = R.signature ~output:(module W.Result) () in
+  let get_node = R.param iresult ~name:"node"
+      ~descr:(Md.plain "Proof node") (module Node) in
+  let get_prover = R.param iresult ~name:"prover"
+      ~descr:(Md.plain "Prover") (module W.Prover) in
+  R.register_sig iresult ~package ~kind:`GET ~name:"getResult"
+    ~descr:(Md.plain "Result for specified node and prover")
+    ~signals:[proofStatus]
+    begin fun rq () ->
+      let node = get_node rq in
+      let prover = get_prover rq in
+      Wpo.get_result (ProofEngine.goal node) prover
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -221,7 +235,7 @@ let () = R.register ~package ~kind:`SET ~name:"clearNode"
     begin fun node ->
       let tree = ProofEngine.tree node in
       ProofEngine.clear_node tree node ;
-      ProofEngine.validate tree ;
+      ProofEngine.validate ~computing:true tree ;
       S.update WpApi.goals @@ ProofEngine.main tree ;
       R.emit proofStatus ;
     end
@@ -232,7 +246,7 @@ let () = R.register ~package ~kind:`SET ~name:"clearParentTactic"
     begin fun node ->
       let tree = ProofEngine.tree node in
       ProofEngine.clear_parent_tactic tree node ;
-      ProofEngine.validate tree ;
+      ProofEngine.validate ~computing:true tree ;
       S.update WpApi.goals @@ ProofEngine.main tree ;
       R.emit proofStatus ;
     end
@@ -243,7 +257,7 @@ let () = R.register ~package ~kind:`SET ~name:"clearGoal"
     begin fun goal ->
       let tree = ProofEngine.proof ~main:goal in
       ProofEngine.clear_tree tree ;
-      ProofEngine.validate tree ;
+      ProofEngine.validate ~computing:true tree ;
       S.update WpApi.goals @@ ProofEngine.main tree ;
       R.emit proofStatus ;
     end
@@ -490,22 +504,47 @@ let () =
 (* --- Prover Scheduling                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
+let runProvers ~config ~node ~provers =
+  let wpo = ProofEngine.goal node in
+  if not @@ Wpo.is_trivial wpo then
+    let tree = ProofEngine.tree node in
+    List.iter
+      (fun prv ->
+         let backup = Wpo.get_result wpo prv in
+         let result =
+           if prv = VCS.Qed then None else
+             let rollback _ p r =
+               if p = VCS.Qed && VCS.is_valid r then
+                 Wpo.set_result wpo prv VCS.no_result
+               else if not @@ VCS.is_verdict r then
+                 Wpo.set_result wpo prv backup
+             in Some rollback in
+         let progress _ _ = ProofEngine.validate ~computing:true tree in
+         let process () = Prover.prove ~config ~progress ?result wpo prv in
+         let thread = Task.thread @@ Task.later process () in
+         let status = VCS.computing (fun () -> Task.cancel thread) in
+         Wpo.set_result wpo prv status ;
+         let server = ProverTask.server () in
+         Task.spawn server thread ;
+         Task.launch server ;
+         ProofEngine.validate ~computing:true tree ;
+      ) provers
+
 let () =
-  let runProvers = R.signature ~output:(module D.Junit) () in
-  let get_node = R.param runProvers (module Node)
+  let iRunProvers = R.signature ~output:(module D.Junit) () in
+  let get_node = R.param iRunProvers (module Node)
       ~name:"node" ~descr:(Md.plain "Proof node") in
-  let get_timeout = R.param_opt runProvers (module D.Jint)
+  let get_timeout = R.param_opt iRunProvers (module D.Jint)
       ~name:"timeout"
       ~descr:(Md.plain "Prover timeout (in seconds, default: current)") in
-  let get_provers = R.param_opt runProvers (module WpApi.Provers)
+  let get_provers = R.param_opt iRunProvers (module WpApi.Provers)
       ~name:"provers"
       ~descr:(Md.plain "Prover selection (default: current") in
-  R.register_sig runProvers ~package ~kind:`SET
+  R.register_sig iRunProvers ~package ~kind:`SET
     ~name:"runProvers"
     ~descr:(Md.plain "Schedule provers on proof node")
     begin fun rq () ->
       let node = get_node rq in
-      let wpo = ProofEngine.goal node in
       let provers =
         match get_provers rq with
         | Some ps -> ps
@@ -517,21 +556,7 @@ let () =
       let config =
         let cfg = VCS.current () in
         { cfg with timeout = Some (float timeout) } in
-      List.iter
-        (fun prv ->
-           let result =
-             if prv = VCS.Qed then None else
-               let roolback _ p r =
-                 if p = VCS.Qed && VCS.is_valid r then
-                   Wpo.set_result wpo prv VCS.no_result in
-               Some roolback in
-           let process () = Prover.prove ~config ?result wpo prv in
-           let thread = Task.thread @@ Task.later process () in
-           let status = VCS.computing (fun () -> Task.cancel thread) in
-           Wpo.set_result wpo prv status ;
-           let server = ProverTask.server () in
-           Task.spawn server thread
-        ) provers
+      runProvers ~config ~node ~provers
     end
 
 let () =
@@ -551,12 +576,14 @@ let () =
         match get_provers rq with
         | None | Some [] -> fun _ -> true
         | Some prvs -> fun p -> List.exists (VCS.eq_prover p) prvs
-      in List.iter
+      in
+      List.iter
         (fun (prv,res) ->
            match res.VCS.verdict with
            | Computing kill when filter prv -> kill ()
            | _ -> ()
-        ) @@ Wpo.get_results wpo
+        ) @@ Wpo.get_results ~computing:true wpo ;
+      ProofEngine.validate ~computing:true (ProofEngine.tree node) ;
     end
 
 (* -------------------------------------------------------------------------- *)

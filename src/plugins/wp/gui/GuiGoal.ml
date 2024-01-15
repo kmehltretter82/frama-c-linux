@@ -613,7 +613,7 @@ class pane (gprovers : GuiConfig.provers) =
         if n = 0 then
           begin
             ignore (ProofEngine.commit fork) ;
-            ProofEngine.validate proof ;
+            ProofEngine.validate ~computing:true proof ;
             ProofEngine.forward proof ;
             state <- Proof proof ;
             printer#reset ;

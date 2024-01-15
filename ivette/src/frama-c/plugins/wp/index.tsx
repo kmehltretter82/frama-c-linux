@@ -121,11 +121,12 @@ function ServerActivity(): JSX.Element {
   const done = rq ? rq.done : 0;
   const todo = rq ? rq.todo : 0;
   const total = done + todo;
+  const title = `${todo} / ${total}`;
   return (
-    <Group display={total > 0}>
+    <Group display={total > 0} title={title}>
       <LED status={status} />
       <Label>WP</Label>
-      <Meter value={done} min={0} max={done + total} />
+      <Meter min={0} value={1+done} max={1 + done + total} />
       <Inset />
     </Group>
   );

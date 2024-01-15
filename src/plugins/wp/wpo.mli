@@ -149,8 +149,9 @@ val has_verdict : t -> prover -> bool
 (** Raw prover result (without any respect to smoke tests) *)
 val get_result : t -> prover -> result
 
-(** All raw prover results (without any respect to smoke tests) *)
-val get_results : t -> (prover * result) list
+(** Return prover results (without any respect to smoke tests).
+    Unless [~computing:true] only finalized verdicts are provided. *)
+val get_results : ?computing:bool -> t -> (prover * result) list
 
 (** Consolidated wrt to associated property and smoke test. *)
 val get_proof : t -> [`Passed|`Failed|`Unknown] * Property.t

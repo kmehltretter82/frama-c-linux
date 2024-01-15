@@ -136,6 +136,22 @@ export const getNodeInfos: Server.GetRequest<
     header?: string, child?: string, path: node[], children: node[] }
   >= getNodeInfos_internal;
 
+const getResult_internal: Server.GetRequest<
+  { node: node, prover: prover },
+  result
+  > = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.tip.getResult',
+  input: Json.jObject({ node: jNode, prover: jProver,}),
+  output: jResult,
+  signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
+};
+/** Result for specified node and prover */
+export const getResult: Server.GetRequest<
+  { node: node, prover: prover },
+  result
+  >= getResult_internal;
+
 const getProofStatus_internal: Server.GetRequest<
   goal,
   { index: number, pending: number, current: node, above: node[],

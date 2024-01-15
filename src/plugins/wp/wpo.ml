@@ -437,27 +437,33 @@ struct
     mutable dps : result Pmap.t ;
   }
 
-  let not_computing _ r =
-    match r.verdict with VCS.Computing _ -> false | _ -> true
-
   let create () = { dps = Pmap.empty }
 
   let get w p =
     Pmap.find p w.dps
 
-  let clear w = w.dps <- Pmap.empty
+  let clear w =
+    Pmap.iter (fun _ r ->
+        match r.verdict with
+        | VCS.Computing kill -> kill ()
+        | _ -> ()
+      ) w.dps ;
+    w.dps <- Pmap.empty
 
   let replace w p r =
     begin
       if p = Qed then
-        begin
-          w.dps <- Pmap.filter not_computing w.dps ;
-        end ;
+        (w.dps <- Pmap.filter (fun _ r -> VCS.is_verdict r) w.dps) ;
       w.dps <- Pmap.add p r w.dps
     end
 
-  let list w =
-    List.filter (fun (_,r) -> VCS.is_verdict r) @@ Pmap.bindings w.dps
+  let list ?(computing=false) w =
+    List.filter
+      (fun (_,r) ->
+         match r.verdict with
+         | Computing _ -> computing
+         | _ -> VCS.is_verdict r
+      ) @@ Pmap.bindings w.dps
 
 end
 
@@ -707,9 +713,9 @@ let get_result g p : VCS.result =
   try Results.get (WPOmap.find g system.results) p
   with Not_found -> VCS.no_result
 
-let get_results g =
+let get_results ?computing g =
   let system = SYSTEM.get () in
-  try Results.list (WPOmap.find g system.results)
+  try Results.list ?computing (WPOmap.find g system.results)
   with Not_found -> []
 
 let is_trivial g =

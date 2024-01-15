@@ -42,9 +42,10 @@ type Tactic = TIP.tactic | undefined;
 /* --- Use Actions                                                        --- */
 /* -------------------------------------------------------------------------- */
 
-function runProver(node: Node, prover: Prover): void {
+function playProver(computing: boolean, node: Node, prover: Prover): void {
   if (node && prover) {
-    // Server.send(TIP.runProvers,{ node, provers:[prover] });
+    const request = computing ? TIP.killProvers : TIP.runProvers;
+    Server.send(request, { node, provers: [prover] });
   }
 }
 
@@ -61,6 +62,7 @@ function applyTactic(tactic: Tactic): void {
 interface ProverActionProps {
   icon: string;
   kind: IconButtonKind;
+  play?: boolean;
   computing?: boolean;
 }
 
@@ -68,7 +70,7 @@ function getProverActions(result : WP.result) : ProverActionProps {
   switch(result.verdict) {
     case '':
     case 'none':
-      return { icon: 'CIRC.INFO', kind: 'default' };
+      return { icon: 'CIRC.INFO', kind: 'default', play: true };
     case 'computing':
       return { icon: 'EXECUTE', kind: 'default', computing: true };
     case 'valid':
@@ -95,7 +97,7 @@ function ProverItem(props : ProverItemProps): JSX.Element
 {
   const { node, prover, result, selected, setSelected } = props;
   const { descr='No Result' } = result;
-  const { icon, kind, computing=false } = getProverActions(result);
+  const { icon, kind, computing=false, play=false } = getProverActions(result);
   const { name } = States.useRequest(WP.getProverInfo, prover) ?? {};
   const isSelected = prover === selected;
   const className = classes(
@@ -116,8 +118,9 @@ function ProverItem(props : ProverItemProps): JSX.Element
       />
       <IconButton
         icon={computing ? 'MEDIA.PAUSE' : 'MEDIA.PLAY' }
-        kind={kind}
-        onClick={() => runProver(node, prover)}
+        kind={computing ? 'warning' : 'positive'}
+        enabled={play || computing}
+        onClick={() => playProver(computing, node, prover)}
       />
     </Hbox>
   );
@@ -304,6 +307,63 @@ function Parameter(props: ParameterProps): JSX.Element | null
     default:
       return null;
   }
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Prover Configuration                                               --- */
+/* -------------------------------------------------------------------------- */
+
+export function ConfigureProver(props: ProverSelection): JSX.Element {
+  const { node, selected: prover, setSelected } = props;
+  const { ident } = States.useRequest(WP.getProverInfo, prover) ?? {};
+  const result = States.useRequest(
+    TIP.getResult, { node, prover }
+  ) ?? WP.resultDefault;
+  const [timeout = 0, setTimeout] = States.useSyncState(WP.timeout);
+  const { icon, kind, computing=false, play=false } = getProverActions(result);
+  const display = !!prover;
+  const onClose = (): void => setSelected(undefined);
+  const onPlay = (): void => playProver(computing, node, prover);
+  const enabled = play || computing || result.proverTime < timeout;
+  return (
+    <Hbox
+      className="dome-xToolBar dome-color-frame wp-configure"
+      display={display}
+    >
+      <Item
+        key='prover'
+        icon='SETTINGS'
+        title='Selected Prover Configuration'
+        className="wp-config-tactic"
+        label={ident} />
+      <Descr
+        icon={icon}
+        kind={kind}
+        label={result.descr} />
+      <Filler />
+      <Label label='Timeout' title='Prover Timeout (shared by all provers)'>
+        <Spinner
+          className="wp-config-field wp-config-spinner"
+          value={timeout}
+          vmin={0}
+          vmax={3600}
+          vstep={1}
+          onChange={setTimeout}
+        />
+      </Label>
+      <IconButton
+        icon={computing ? 'MEDIA.PAUSE' : 'MEDIA.PLAY'}
+        kind={computing ? 'warning' : 'positive'}
+        enabled={enabled}
+        onClick={onPlay}
+      />
+      <IconButton
+        key='close'
+        icon='CIRC.CLOSE'
+        title='Close Prover Configuration Panel'
+        onClick={onClose} />
+    </Hbox>
+  );
 }
 
 /* -------------------------------------------------------------------------- */

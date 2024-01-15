@@ -141,7 +141,7 @@ struct
   let progress env msg = env.progress (ProofEngine.main env.tree) msg
 
   let validate env =
-    ProofEngine.validate env.tree ;
+    ProofEngine.validate ~computing:false env.tree ;
     if not env.signaled then
       let wpo = ProofEngine.main env.tree in
       let proved = Wpo.is_passed wpo in

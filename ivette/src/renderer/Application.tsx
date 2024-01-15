@@ -83,7 +83,7 @@ export default function Application(): JSX.Element {
           settings="frama-c.labview"
         />
       </LSplit>
-      <Toolbar.ToolBar>
+      <Toolbar.ToolBar className="statusbar">
         <Controller.Status />
         <>{StatusBar}</>
         <Toolbar.Filler />

@@ -271,7 +271,7 @@ let get_thy g = match g.Wpo.po_idx with
 let get_status g =
   STATUS.{
     smoke = Wpo.is_smoke_test g ;
-    verdict = (ProofEngine.consolidated g).best ;
+    verdict = (ProofEngine.consolidated ~computing:true g).best ;
   }
 
 let () = S.column gmodel ~name:"marker"
@@ -317,7 +317,7 @@ let () = S.column gmodel ~name:"status"
 
 let () = S.column gmodel ~name:"stats"
     ~descr:(Md.plain "Prover Stats Summary")
-    ~data:(module STATS) ~get:ProofEngine.consolidated
+    ~data:(module STATS) ~get:(ProofEngine.consolidated ~computing:true)
 
 let () = S.option gmodel ~name:"script"
     ~descr:(Md.plain "Script File")

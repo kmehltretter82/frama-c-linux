@@ -383,20 +383,23 @@ let pp_result_qualif ?(updating=true) prover result fmt =
 
 (* highest is best *)
 let vrank = function
-  | Computing _ -> 0
   | NoResult -> 1
   | Failed -> 2
   | Unknown -> 3
   | Timeout -> 4
   | Stepout -> 5
   | Valid -> 6
+  | Computing _ -> 7
 
 let conjunction a b =
-  match a,b with
-  | Valid,Valid -> Valid
-  | Valid, r -> r
-  | r , Valid -> r
-  | _ -> if vrank b > vrank a then b else a
+  if a == b then a else
+    match a,b with
+    | Computing p , Computing q -> Computing (fun () -> p () ; q ())
+    | Computing _ , _ -> a
+    | _ , Computing _ -> b
+    | Valid,Valid -> Valid
+    | Valid,r | r,Valid -> r
+    | _ -> if vrank b > vrank a then b else a
 
 let compare p q =
   let r = vrank q.verdict - vrank p.verdict in

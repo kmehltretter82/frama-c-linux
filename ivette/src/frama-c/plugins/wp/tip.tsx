@@ -35,7 +35,7 @@ import * as TIP from 'frama-c/plugins/wp/api/tip';
 
 import { getStatus } from './goals';
 import { GoalView } from './seq';
-import { Provers, Tactics, ConfigureTactic } from './tac';
+import { Provers, Tactics, ConfigureProver, ConfigureTactic } from './tac';
 
 /* -------------------------------------------------------------------------- */
 /* --- Sequent Printing Modes                                             --- */
@@ -285,6 +285,11 @@ export function TIPView(props: TIPProps): JSX.Element {
           />
         </Vbox>
       </Hfill>
+      <ConfigureProver
+        node={current}
+        selected={prover}
+        setSelected={onSelectedProver}
+      />
       <ConfigureTactic
         goal={goal}
         node={current}
