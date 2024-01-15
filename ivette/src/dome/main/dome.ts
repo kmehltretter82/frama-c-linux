@@ -39,7 +39,7 @@
 
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/misc/devtools';
 import SYS, * as System from 'dome/system';
-import { electronApp, optimizer, is } from "@electron-toolkit/utils";
+import { is } from "@electron-toolkit/utils";
 import {
   BrowserWindow,
   BrowserWindowConstructorOptions,

@@ -25,9 +25,9 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import * as Dome from 'dome/dome';
+import * as Dome from 'dome';
 import * as Toolbar from 'dome/frame/toolbars';
-import { GlobalState, useGlobalState } from 'dome/data/states';
+  import { GlobalState, useGlobalState } from 'dome/data/states';
 
 // --------------------------------------------------------------------------
 // --- Search Actions Registry

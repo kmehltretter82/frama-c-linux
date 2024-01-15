@@ -21,7 +21,7 @@
 /* ************************************************************************ */
 
 import * as React from 'react';
-import * as Dome from 'dome/dome';
+
 
 import { IconButton } from 'dome/controls/buttons';
 import { Label, Cell } from 'dome/controls/labels';

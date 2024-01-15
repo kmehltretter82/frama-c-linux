@@ -30,7 +30,7 @@
 */
 
 import React from 'react';
-import { useFlipSettings } from 'dome/dome';
+import { useFlipSettings } from 'dome';
 import { Badge } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { classes } from 'dome/misc/utils';

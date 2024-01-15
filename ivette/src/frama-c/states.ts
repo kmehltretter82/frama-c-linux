@@ -31,7 +31,7 @@
 */
 
 import React from 'react';
-import * as Dome from 'dome/dome';
+
 import { Order } from 'dome/data/compare';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 import { Client, useModel } from 'dome/table/models';

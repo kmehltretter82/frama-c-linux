@@ -26,7 +26,7 @@
 
 import _ from 'lodash';
 import React from 'react';
-import * as Dome from 'dome/dome';
+import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import { Catch } from 'dome/errors';

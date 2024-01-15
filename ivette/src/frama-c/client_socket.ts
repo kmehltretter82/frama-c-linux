@@ -21,7 +21,7 @@
 /* ************************************************************************ */
 
 const Net = require('net');
-import { Debug } from 'dome/dome';
+import { Debug } from 'dome';
 import { json } from 'dome/data/json';
 import { Client } from './client';
 

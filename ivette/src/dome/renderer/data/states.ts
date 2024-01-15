@@ -33,7 +33,7 @@
 import React from 'react';
 const Emitter = require('events');
 import isEqual from 'react-fast-compare';
-import { Debug } from 'dome/dome';
+import { Debug } from 'dome';
 
 const D = new Debug('State');
 

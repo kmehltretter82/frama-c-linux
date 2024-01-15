@@ -22,7 +22,7 @@
 
 import { defineConfig, externalizeDepsPlugin } from "electron-vite";
 import react from "@vitejs/plugin-react";
-import path from "path"
+import path from "path";
 
 const DOME = process.env.DOME || path.resolve("src", "dome");
 const ENV = process.env.DOME_ENV;
@@ -41,19 +41,12 @@ export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
     resolve: {
-      extensions: ['.ts', '.tsx', '.js', 'jsx', '.json'],
+      extensions: [".ts", ".tsx", ".js", "jsx", ".json"],
       alias: {
-        'frama-c/api': path.resolve(__dirname, 'src/frama-c/api/generated'),
-        'frama-c': path.resolve(__dirname, 'src/frama-c'),
-        'ivette@ext': path.resolve(__dirname, 'src/renderer/Extensions'),
-        'ivette@lab': path.resolve(__dirname, 'src/renderer/Laboratory'),
-        'ivette@mode': path.resolve(__dirname, 'src/renderer/Actions'),
-        'ivette': path.resolve(__dirname, 'src/ivette'),
-        'dome/misc': path.resolve(DOME, 'misc'),
-        'dome/system': path.resolve(DOME, 'misc', 'system.ts'),
-        'dome$': path.resolve(DOME, 'main', 'dome.ts'),
-        'dome': path.resolve(DOME, 'renderer'),
-        'dometsx': path.resolve(DOME, 'renderer', 'dome.tsx'),
+        "dome/misc": path.resolve(DOME, "misc"),
+        "dome/system": path.resolve(DOME, "misc", "system.ts"),
+        "dome$": path.resolve(DOME, "main", "dome.ts"),
+
       },
     },
   },
@@ -62,39 +55,28 @@ export default defineConfig({
   },
   renderer: {
     resolve: {
-      extensions: ['.ts', '.tsx', '.js', 'jsx', '.json'],
+      extensions: [".ts", ".tsx", ".js", "jsx", ".json"],
       alias: {
-        'frama-c/api': path.resolve(__dirname, 'src/frama-c/api/generated'),
-        'frama-c': path.resolve(__dirname, 'src/frama-c'),
-        'ivette@ext': path.resolve(__dirname, 'src/renderer/Extensions'),
-        'ivette@lab': path.resolve(__dirname, 'src/renderer/Laboratory'),
-        'ivette@mode': path.resolve(__dirname, 'src/renderer/Actions'),
-        'ivette': path.resolve(__dirname, 'src/ivette'),
-        'dome/misc': path.resolve(DOME, 'misc'),
-        'dome/system': path.resolve(DOME, 'misc', 'system.ts'),
-        'dome$': path.resolve(DOME, 'main', 'dome.ts'),
-        'dome': path.resolve(DOME, 'renderer'),
-        'dometsx': path.resolve(DOME, 'renderer', 'dome.tsx'),
-        // dome: path.resolve(DOME, 'renderer'),
-        // 'dome$': path.resolve(DOME, 'main/dome.ts'),
-        // 'frama-c': path.resolve('src/frama-c'),
-        // 'ivette@ext': path.resolve('src/renderer/Extensions'),
-        // 'ivette@lab': path.resolve('src/renderer/Laboratory'),
-        // 'ivette@mode': path.resolve('src/renderer/Actions'),
-        // ivette: path.resolve('src/ivette'),
-        // // "dome/misc": path.resolve(DOME, "misc"),
-        // // "@renderer": resolve("src/renderer"),
-        // 'ivette/prefs': path.resolve('src', 'ivette', 'prefs'),
-        // 'devtools': path.resolve(DOME, 'misc', 'devtools.js'),
-        // system: path.resolve(DOME, 'misc/system.ts'),
-        // utils: path.resolve(DOME, 'misc/utils'),
-        // 'dome/layout/boxes': path.resolve(DOME, 'renderer', 'layout', 'boxes'),
-        // 'dome/layout/splitters': path.resolve(
-        //   DOME,
-        //   'renderer',
-        //   'layout',
-        //   'splitters'
-        // ),
+        "frama-c/api": path.resolve(__dirname, "src", "frama-c", "api", "generated"),
+        "frama-c": path.resolve(__dirname, "src", "frama-c"),
+        "ivette@ext": path.resolve(__dirname, "src", "renderer", "Extensions"),
+        "ivette@lab": path.resolve(__dirname, "src", "renderer", "Laboratory"),
+        "ivette@mode": path.resolve(__dirname, "src", "renderer", "Actions"),
+        "ivette": path.resolve(__dirname, "src", "ivette"),
+        "dome/misc": path.resolve(DOME, "misc"),
+        "dome/system": path.resolve(DOME, "misc", "system.ts"),
+        "dome/layout": path.resolve(DOME, "renderer", "layout"),
+        "dome/frame": path.resolve(DOME, "renderer", "frame"),
+        "dome/errors": path.resolve(DOME, "renderer", "errors"),
+        "dome/data": path.resolve(DOME, "renderer", "data"),
+        "dome/text": path.resolve(DOME, "renderer", "text"),
+        "dome/controls": path.resolve(DOME, "renderer", "controls"),
+        "dome/dialogs": path.resolve(DOME, "renderer", "dialogs"),
+        "dome/olddnd": path.resolve(DOME, "renderer", "olddnd"),
+        "dome/dnd": path.resolve(DOME, "renderer", "dnd"),
+        "dome/themes": path.resolve(DOME, "renderer", "themes"),
+        "dome/table": path.resolve(DOME, "renderer", "table"),
+        "dome": path.resolve(DOME, "renderer", "dome.tsx"),
       },
     },
     plugins: [react()],

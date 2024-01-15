@@ -30,7 +30,7 @@
  */
 
 // import React from 'react';
-import * as Dome from 'dome/dome';
+
 import * as Settings from 'dome/data/settings';
 import { State } from 'dome/data/states';
 import { ipcRenderer } from 'electron';

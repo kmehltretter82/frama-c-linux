@@ -30,7 +30,7 @@
 */
 
 import React from 'react';
-import { Debug } from 'dome/dome';
+import { Debug } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { Button } from 'dome/controls/buttons';
 

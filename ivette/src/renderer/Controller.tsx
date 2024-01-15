@@ -25,7 +25,7 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import * as Dome from 'dome/dome';
+import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import * as Preferences from 'ivette/prefs';
@@ -35,7 +35,7 @@ import { LED, LEDstatus } from 'dome/controls/displays';
 import { Label, Code } from 'dome/controls/labels';
 import * as Text from 'dome/text/richtext';
 import { TextBuffer, TextView } from 'dome/text/richtext';
-import { resolve } from '../dome/misc/system';
+import { resolve } from 'dome/system';
 
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';

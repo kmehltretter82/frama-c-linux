@@ -40,7 +40,7 @@
  */
 
 import React from 'react';
-import { Event } from 'dome/dome';
+import { Event } from 'dome';
 
 // --------------------------------------------------------------------------
 // --- Global Dispatcher
