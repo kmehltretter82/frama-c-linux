@@ -54,7 +54,8 @@ const globalLabViewState = new States.GlobalState<LabViewState>(
 const defaultPanelLayoutSelectorState: PanelLayoutSelectorState ={
   display: false,
   compId: "",
-  compLabel: ""
+  compLabel: "",
+  y: 0
 };
 const globalPanelLayoutSelectorState = new States
 .GlobalState<PanelLayoutSelectorState>(defaultPanelLayoutSelectorState);
@@ -242,15 +243,18 @@ export function LabView(): JSX.Element {
   );
 
   return (
-    <QSplit
-      className='labview-container'
-      A={state.A} B={state.B} C={state.C} D={state.D} H={state.H} V={state.V}
-      setPosition={setPosition}
-    >
-      {[...state.components].map((comp, key) =>
-        <Pane key={key} id={comp} />
-      )}
-    </QSplit>
+    <>
+      <PanelLayoutSelector />
+      <QSplit
+        className='labview-container'
+        A={state.A} B={state.B} C={state.C} D={state.D} H={state.H} V={state.V}
+        setPosition={setPosition}
+      >
+        {[...state.components].map((comp, key) =>
+          <Pane key={key} id={comp} />
+        )}
+      </QSplit>
+    </>
   );
 }
 
@@ -288,23 +292,25 @@ function ComponentItem(comp: Ivette.ItemProps): JSX.Element {
     assignCompToQuarter(preferredPosition, comp.id);
   }
 
-  function onContextMenu(): void {
+  function onContextMenu(e: React.MouseEvent): void {
     const state = globalPanelLayoutSelectorState.getValue();
     const display = !state.display ? true : state.compId !== comp.id;
     globalPanelLayoutSelectorState.setValue({
       display: display,
       compId: display ? comp.id : "",
-      compLabel: display ? comp.label : ""
+      compLabel: display ? comp.label : "",
+      y: e.clientY
     });
   }
 
   return (
-    <Sidebars.Item
-      icon='COMPONENT'
-      label={comp.label}
-      title={comp.title}
-      onSelection={onSelection}
-      onContextMenu={onContextMenu} />
+    <div onContextMenu={e => onContextMenu(e)}>
+      <Sidebars.Item
+        icon='COMPONENT'
+        label={comp.label}
+        title={comp.title}
+        onSelection={onSelection} />
+    </div>
   );
 }
 
@@ -354,8 +360,6 @@ function ViewBar(): JSX.Element {
   const groups = Ext.useElements(GROUP);
   const allGroups = groups.concat(Sandbox);
 
-
-
   return (
     <Sidebars.SideBar>
       <ViewSection key='views'/>
@@ -369,7 +373,6 @@ function ViewBar(): JSX.Element {
       <GroupSection
         key='sandbox'
         filter={inGroup(Sandbox)} {...Sandbox} />
-      <PanelLayoutSelector />
     </Sidebars.SideBar>
   );
 }
@@ -389,6 +392,7 @@ interface PanelLayoutSelectorState {
   display: boolean;
   compId: string;
   compLabel: string;
+  y: number;
 }
 
 export function PanelLayoutSelector()
@@ -401,8 +405,29 @@ export function PanelLayoutSelector()
   );
   const iconSize = 30;
 
+  function computePanelY(): number {
+    const panelHeight = 350;
+    const maxHeight = window.innerHeight;
+    let y = 0;
+
+    y = state.y - panelHeight/2 > 0 ? state.y - panelHeight/2 : 0;
+    if (y > maxHeight - panelHeight) y = maxHeight - panelHeight;
+    return y;
+  }
+
+  const y = computePanelY();
+
   function onclick(quarter: string): void {
     assignCompToQuarter(quarter, state.compId);
+  }
+
+  function close(): void {
+    globalPanelLayoutSelectorState.setValue({
+      display: false,
+      compId: "",
+      compLabel: "",
+      y: 0
+    });
   }
 
   function dock(): void {
@@ -424,9 +449,8 @@ export function PanelLayoutSelector()
   }
 
   return (
-    <div className={className}>
-      <Label>Panel Layout Selector</Label>
-      <Label>{state.compId}</Label>
+    <div className={className} style={{ top: y }}>
+      <Label>{state.compLabel}</Label>
       <table>
         <tbody>
           <tr>
@@ -476,6 +500,12 @@ export function PanelLayoutSelector()
           <Icon id="TRASH" size={iconSize}
           className="panelLayoutSelector-hover"
           onClick={remove} />
+        </div>
+        <div className="panelLayoutSelector-spaced">
+          Close Window
+          <Icon id={"CROSS"} size={iconSize}
+          className="panelLayoutSelector-hover"
+          onClick={() => close()} />
         </div>
       </div>
     </div>
