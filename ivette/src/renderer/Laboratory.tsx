@@ -55,6 +55,7 @@ const defaultPanelLayoutSelectorState: PanelLayoutSelectorState ={
   display: false,
   compId: "",
   compLabel: "",
+  origin: "sidebar",
   y: 0
 };
 const globalPanelLayoutSelectorState = new States
@@ -299,6 +300,7 @@ function ComponentItem(comp: Ivette.ItemProps): JSX.Element {
       display: display,
       compId: display ? comp.id : "",
       compLabel: display ? comp.label : "",
+      origin: "sidebar",
       y: e.clientY
     });
   }
@@ -392,6 +394,7 @@ interface PanelLayoutSelectorState {
   display: boolean;
   compId: string;
   compLabel: string;
+  origin: "sidebar" | "titlebar" | "dockbar";
   y: number;
 }
 
@@ -426,6 +429,7 @@ export function PanelLayoutSelector()
       display: false,
       compId: "",
       compLabel: "",
+      origin: "sidebar",
       y: 0
     });
   }
@@ -495,12 +499,14 @@ export function PanelLayoutSelector()
           className="panelLayoutSelector-hover"
           onClick={dock} />
         </div>
-        <div className="panelLayoutSelector-spaced">
-          Remove Panel
-          <Icon id="TRASH" size={iconSize}
-          className="panelLayoutSelector-hover"
-          onClick={remove} />
-        </div>
+        { state.origin !== "sidebar" &&
+          <div className="panelLayoutSelector-spaced">
+            Remove Panel
+            <Icon id="TRASH" size={iconSize}
+            className="panelLayoutSelector-hover"
+            onClick={remove} />
+          </div>
+        }
         <div className="panelLayoutSelector-spaced">
           Close Window
           <Icon id={"CROSS"} size={iconSize}
