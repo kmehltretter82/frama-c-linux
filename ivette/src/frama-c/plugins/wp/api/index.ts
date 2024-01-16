@@ -78,16 +78,6 @@ export const byProver: Compare.Order<prover> = Compare.string;
 /** Default value for `prover` */
 export const proverDefault: prover = Json.jKey<'#prover'>('#prover')('');
 
-const getAvailableProvers_internal: Server.GetRequest<null,prover[]> = {
-  kind: Server.RqKind.GET,
-  name: 'plugins.wp.getAvailableProvers',
-  input: Json.jNull,
-  output: Json.jArray(jProver),
-  signals: [],
-};
-/** Returns the list of configured provers from why3 */
-export const getAvailableProvers: Server.GetRequest<null,prover[]>= getAvailableProvers_internal;
-
 /** Signal for state [`provers`](#provers)  */
 export const signalProvers: Server.Signal = {
   name: 'plugins.wp.signalProvers',
@@ -122,26 +112,6 @@ const provers_internal: State.State<prover[]> = {
 /** Selected Provers */
 export const provers: State.State<prover[]> = provers_internal;
 
-const getProverInfo_internal: Server.GetRequest<
-  prover,
-  { name: string, version: string, ident: string }
-  > = {
-  kind: Server.RqKind.GET,
-  name: 'plugins.wp.getProverInfo',
-  input: jProver,
-  output: Json.jObject({
-            name: Json.jString,
-            version: Json.jString,
-            ident: Json.jString,
-          }),
-  signals: [],
-};
-/** Prover Information */
-export const getProverInfo: Server.GetRequest<
-  prover,
-  { name: string, version: string, ident: string }
-  >= getProverInfo_internal;
-
 /** Signal for state [`timeout`](#timeout)  */
 export const signalTimeout: Server.Signal = {
   name: 'plugins.wp.signalTimeout',
@@ -175,6 +145,90 @@ const timeout_internal: State.State<number> = {
 };
 /** Prover's Timeout */
 export const timeout: State.State<number> = timeout_internal;
+
+/** Data for array rows [`ProverInfos`](#proverinfos)  */
+export interface ProverInfosData {
+  /** Entry identifier. */
+  prover: prover;
+  /** Prover Name */
+  name: string;
+  /** Prover Version */
+  version: string;
+  /** Prover Full Name (description) */
+  descr: string;
+}
+
+/** Decoder for `ProverInfosData` */
+export const jProverInfosData: Json.Decoder<ProverInfosData> =
+  Json.jObject({
+    prover: jProver,
+    name: Json.jString,
+    version: Json.jString,
+    descr: Json.jString,
+  });
+
+/** Natural order for `ProverInfosData` */
+export const byProverInfosData: Compare.Order<ProverInfosData> =
+  Compare.byFields
+    <{ prover: prover, name: string, version: string, descr: string }>({
+    prover: byProver,
+    name: Compare.alpha,
+    version: Compare.alpha,
+    descr: Compare.alpha,
+  });
+
+/** Signal for array [`ProverInfos`](#proverinfos)  */
+export const signalProverInfos: Server.Signal = {
+  name: 'plugins.wp.signalProverInfos',
+};
+
+const reloadProverInfos_internal: Server.GetRequest<null,null> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.reloadProverInfos',
+  input: Json.jNull,
+  output: Json.jNull,
+  signals: [],
+};
+/** Force full reload for array [`ProverInfos`](#proverinfos)  */
+export const reloadProverInfos: Server.GetRequest<null,null>= reloadProverInfos_internal;
+
+const fetchProverInfos_internal: Server.GetRequest<
+  number,
+  { reload: boolean, removed: prover[], updated: ProverInfosData[],
+    pending: number }
+  > = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.fetchProverInfos',
+  input: Json.jNumber,
+  output: Json.jObject({
+            reload: Json.jBoolean,
+            removed: Json.jArray(jProver),
+            updated: Json.jArray(jProverInfosData),
+            pending: Json.jNumber,
+          }),
+  signals: [],
+};
+/** Data fetcher for array [`ProverInfos`](#proverinfos)  */
+export const fetchProverInfos: Server.GetRequest<
+  number,
+  { reload: boolean, removed: prover[], updated: ProverInfosData[],
+    pending: number }
+  >= fetchProverInfos_internal;
+
+const ProverInfos_internal: State.Array<prover,ProverInfosData> = {
+  name: 'plugins.wp.ProverInfos',
+  getkey: ((d:ProverInfosData) => d.prover),
+  signal: signalProverInfos,
+  fetch: fetchProverInfos,
+  reload: reloadProverInfos,
+  order: byProverInfosData,
+};
+/** Available Provers */
+export const ProverInfos: State.Array<prover,ProverInfosData> = ProverInfos_internal;
+
+/** Default value for `ProverInfosData` */
+export const ProverInfosDataDefault: ProverInfosData =
+  { prover: proverDefault, name: '', version: '', descr: '' };
 
 /** Prover Result */
 export type result =

@@ -98,7 +98,7 @@ function ProverItem(props : ProverItemProps): JSX.Element
   const { node, prover, result, selected, setSelected } = props;
   const { descr='No Result' } = result;
   const { icon, kind, computing=false, play=false } = getProverActions(result);
-  const { name } = States.useRequest(WP.getProverInfo, prover) ?? {};
+  const { name } = States.useSyncArrayElt(WP.ProverInfos, prover) ?? {};
   const isSelected = prover === selected;
   const className = classes(
     'dome-color-frame wp-tactical-item',
@@ -315,7 +315,7 @@ function Parameter(props: ParameterProps): JSX.Element | null
 
 export function ConfigureProver(props: ProverSelection): JSX.Element {
   const { node, selected: prover, setSelected } = props;
-  const { ident } = States.useRequest(WP.getProverInfo, prover) ?? {};
+  const { descr } = States.useSyncArrayElt(WP.ProverInfos,prover) ?? {};
   const result = States.useRequest(
     TIP.getResult, { node, prover }
   ) ?? WP.resultDefault;
@@ -335,7 +335,7 @@ export function ConfigureProver(props: ProverSelection): JSX.Element {
         icon='SETTINGS'
         title='Selected Prover Configuration'
         className="wp-config-tactic"
-        label={ident} />
+        label={descr} />
       <Descr
         icon={icon}
         kind={kind}

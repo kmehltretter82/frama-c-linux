@@ -84,14 +84,6 @@ end
 
 module Provers = D.Jlist(Prover)
 
-let () = R.register ~package ~kind:`GET ~name:"getAvailableProvers"
-    ~descr:(Md.plain "Returns the list of configured provers from why3")
-    ~input:(module D.Junit) ~output:(module Provers)
-    (fun () ->
-       List.map (fun p -> VCS.Why3 p) @@
-       List.filter Why3Provers.is_mainstream @@
-       Why3Provers.provers ())
-
 let provers = ref None
 
 let getProvers () =
@@ -119,30 +111,6 @@ let _ =
     ~get:getProvers
     ~set:setProvers ()
 
-let get_name = function
-  | VCS.Qed -> "Qed"
-  | VCS.Tactical -> "Script"
-  | VCS.Why3 p -> Why3Provers.name p
-
-let get_version = function
-  | VCS.Qed | Tactical -> Fc_config.version_and_codename
-  | Why3 p -> Why3Provers.version p
-
-let () =
-  let getProverInfo = R.signature ~input:(module Prover) () in
-  let result ~name ~descr =
-    R.result getProverInfo ~name ~descr:(Md.plain descr) (module D.Jalpha) in
-  let set_name = result ~name:"name" ~descr:"Prover name" in
-  let set_version = result ~name:"version" ~descr:"Prover version" in
-  let set_ident = result ~name:"ident" ~descr:"Prover identifier" in
-  R.register_sig ~package ~kind:`GET getProverInfo
-    ~name:"getProverInfo" ~descr:(Md.plain "Prover Information")
-    begin fun rq prv ->
-      set_name rq (get_name prv) ;
-      set_version rq (get_version prv) ;
-      set_ident rq (VCS.name_of_prover prv) ;
-    end
-
 (* -------------------------------------------------------------------------- *)
 (* --- Provers Timeout                                                    --- *)
 (* -------------------------------------------------------------------------- *)
@@ -155,6 +123,39 @@ let _ =
     ~get:Wp_parameters.Timeout.get
     ~set:Wp_parameters.Timeout.set
     ~add_hook:Wp_parameters.Timeout.add_hook_on_update ()
+
+(* -------------------------------------------------------------------------- *)
+(* --- Available Provers                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let get_name = function
+  | VCS.Qed -> "Qed"
+  | VCS.Tactical -> "Script"
+  | VCS.Why3 p -> Why3Provers.name p
+
+let get_version = function
+  | VCS.Qed | Tactical -> Fc_config.version_and_codename
+  | Why3 p -> Why3Provers.version p
+
+let iter_provers fn =
+  List.iter
+    (fun p -> if Why3Provers.is_mainstream p then fn (VCS.Why3 p))
+  @@ Why3Provers.provers ()
+
+let _ : VCS.prover S.array =
+  let model = S.model () in
+  S.column ~name:"name" ~descr:(Md.plain "Prover Name")
+    ~data:(module D.Jalpha) ~get:get_name model ;
+  S.column ~name:"version" ~descr:(Md.plain "Prover Version")
+    ~data:(module D.Jalpha) ~get:get_version model ;
+  S.column ~name:"descr" ~descr:(Md.plain "Prover Full Name (description)")
+    ~data:(module D.Jalpha) ~get:(VCS.title_of_prover ~version:true) model ;
+  S.register_array ~package
+    ~name:"ProverInfos" ~descr:(Md.plain "Available Provers")
+    ~key:VCS.name_of_prover
+    ~keyName:"prover"
+    ~keyType:Prover.jtype
+    ~iter:iter_provers model
 
 (* -------------------------------------------------------------------------- *)
 (* --- Results and Stats                                                  --- *)

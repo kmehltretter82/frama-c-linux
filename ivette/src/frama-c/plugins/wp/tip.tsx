@@ -233,7 +233,7 @@ export function TIPView(props: TIPProps): JSX.Element {
   // --- Next
   const nextIndex =
     pending <= 0 ? undefined :
-    pending == 1 ? (index == 0 ? undefined : 0) :
+    pending === 1 ? (index === 0 ? undefined : 0) :
     (index + 1 < pending ? index + 1 : 0);
   const nextAble = goal !== undefined && nextIndex !== undefined;
   const nextTitle =
