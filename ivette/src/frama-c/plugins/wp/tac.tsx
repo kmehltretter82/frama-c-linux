@@ -51,7 +51,7 @@ function playProver(computing: boolean, node: Node, prover: Prover): void {
 
 function applyTactic(tactic: Tactic): void {
   if (tactic) {
-    Server.send(TAC.applyTactic, tactic);
+    Server.send(TAC.applyTacticAndProve, tactic);
   }
 }
 

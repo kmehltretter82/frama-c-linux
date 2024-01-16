@@ -99,6 +99,7 @@ val forward : tree -> unit
 val clear_goal : Wpo.t -> unit
 val clear_tree : tree -> unit
 val clear_node : tree -> node -> unit
+val clear_node_tactic : tree -> node -> unit
 val clear_parent_tactic : tree -> node -> unit
 
 val cancel_parent_tactic : tree -> unit

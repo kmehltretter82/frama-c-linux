@@ -536,4 +536,19 @@ let () = R.register
       children
     end
 
+let () = R.register
+    ~package ~kind:`EXEC
+    ~name:"applyTacticAndProve"
+    ~descr:(Md.plain "Applies tactic and run provers on children")
+    ~input:(module Jtactic)
+    ~output:(module D.Jlist(WpTipApi.Node))
+    begin fun tactic ->
+      let cfg = configurator tactic in
+      let children = cfg#apply in
+      S.update tactics cfg ;
+      List.iter WpTipApi.runProvers children ;
+      children
+    end
+
+
 (* -------------------------------------------------------------------------- *)

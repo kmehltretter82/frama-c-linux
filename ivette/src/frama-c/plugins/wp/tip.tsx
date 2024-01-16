@@ -221,6 +221,30 @@ export function TIPView(props: TIPProps): JSX.Element {
     setTactic(tac);
     setProver(undefined);
   }, []);
+
+  // --- Delete
+  const deleteAble = locked || above.length > 0;
+  const onDelete = (): void => {
+    const request = locked ? TIP.clearNodeTactic : TIP.clearParentTactic;
+    Server.send(request, current);
+  };
+  const deleteTitle = locked ? 'Cancel Node Tactic' : 'Cancel Last Tactic';
+
+  // --- Next
+  const nextIndex =
+    pending <= 0 ? undefined :
+    pending == 1 ? (index == 0 ? undefined : 0) :
+    (index + 1 < pending ? index + 1 : 0);
+  const nextAble = goal !== undefined && nextIndex !== undefined;
+  const nextTitle =
+    nextIndex !== undefined
+    ? `Goto Next Pending Goal (#${nextIndex+1} / ${pending})`
+    : `Goto Next Pending Goal (if any)`;
+  const onNext = (): void => {
+    Server.send(TIP.goToIndex, [goal, nextIndex]);
+  };
+
+  // --- Component
   return (
     <Vfill display={display}>
       <ToolBar>
@@ -234,10 +258,20 @@ export function TIPView(props: TIPProps): JSX.Element {
         <Cell {...getStatus(infos)}/>
         <Filler/>
         <Button
+          icon='MEDIA.PREV'
           kind='warning'
+          enabled={deleteAble}
+          title={deleteTitle}
+          onClick={onDelete} />
+        <Button
           icon='EJECT'
-          title='Close proof transformer'
+          title='Close Proof Transformer (back to goals)'
           onClick={onClose} />
+        <Button
+          icon='MEDIA.NEXT'
+          enabled={nextAble}
+          title={nextTitle}
+          onClick={onNext} />
       </ToolBar>
       <Hfill>
         <NavBar

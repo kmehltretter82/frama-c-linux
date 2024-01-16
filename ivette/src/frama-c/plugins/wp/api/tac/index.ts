@@ -313,4 +313,14 @@ const applyTactic_internal: Server.ExecRequest<tactic,node[]> = {
 /** Applies the (configured) tactic */
 export const applyTactic: Server.ExecRequest<tactic,node[]>= applyTactic_internal;
 
+const applyTacticAndProve_internal: Server.ExecRequest<tactic,node[]> = {
+  kind: Server.RqKind.EXEC,
+  name: 'plugins.wp.tac.applyTacticAndProve',
+  input: jTactic,
+  output: Json.jArray(jNode),
+  signals: [],
+};
+/** Applies tactic and run provers on children */
+export const applyTacticAndProve: Server.ExecRequest<tactic,node[]>= applyTacticAndProve_internal;
+
 /* ------------------------------------- */

@@ -227,6 +227,16 @@ const clearNode_internal: Server.SetRequest<node,null> = {
 /** Cancel all node results and sub-tree (if any) */
 export const clearNode: Server.SetRequest<node,null>= clearNode_internal;
 
+const clearNodeTactic_internal: Server.SetRequest<node,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.clearNodeTactic',
+  input: jNode,
+  output: Json.jNull,
+  signals: [],
+};
+/** Cancel node current tactic */
+export const clearNodeTactic: Server.SetRequest<node,null>= clearNodeTactic_internal;
+
 const clearParentTactic_internal: Server.SetRequest<node,null> = {
   kind: Server.RqKind.SET,
   name: 'plugins.wp.tip.clearParentTactic',

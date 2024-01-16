@@ -132,11 +132,6 @@ and remove_node t n =
   end ;
   revert_tactic t n
 
-let clear_node t n =
-  Wpo.clear_results n.goal ;
-  revert_tactic t n ;
-  if t.head = None then t.head <- Some n
-
 let clear_tree t =
   begin
     Wpo.clear_results t.main ;
@@ -147,10 +142,18 @@ let clear_tree t =
     t.saved <- false ;
   end
 
+let clear_node_tactic t n =
+  revert_tactic t n ;
+  if t.head = None then t.head <- Some n
+
 let clear_parent_tactic t n =
   match n.parent with
   | None -> clear_tree t
   | Some p as h -> t.head <- h ; revert_tactic t p
+
+let clear_node t n =
+  Wpo.clear_results n.goal ;
+  clear_node_tactic t n
 
 let clear_goal w =
   if PROOFS.mem w then clear_tree (PROOFS.get w)

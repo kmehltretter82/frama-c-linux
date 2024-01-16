@@ -240,6 +240,17 @@ let () = R.register ~package ~kind:`SET ~name:"clearNode"
       R.emit proofStatus ;
     end
 
+let () = R.register ~package ~kind:`SET ~name:"clearNodeTactic"
+    ~descr:(Md.plain "Cancel node current tactic")
+    ~input:(module Node) ~output:(module D.Junit)
+    begin fun node ->
+      let tree = ProofEngine.tree node in
+      ProofEngine.clear_node_tactic tree node ;
+      ProofEngine.validate ~computing:true tree ;
+      S.update WpApi.goals @@ ProofEngine.main tree ;
+      R.emit proofStatus ;
+    end
+
 let () = R.register ~package ~kind:`SET ~name:"clearParentTactic"
     ~descr:(Md.plain "Cancel parent node tactic")
     ~input:(module Node) ~output:(module D.Junit)
@@ -504,23 +515,30 @@ let () =
 (* --- Prover Scheduling                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-let runProvers ~config ~node ~provers =
+let runProvers ?timeout ?provers node =
   let wpo = ProofEngine.goal node in
+  let provers = match provers with
+    | Some ps -> ps
+    | None -> WpApi.getProvers () in
+  let timeout = match timeout with
+    | Some t -> t
+    | None -> Wp_parameters.Timeout.get () in
+  let config =
+    let cfg = VCS.current () in
+    { cfg with timeout = Some (float timeout) } in
   if not @@ Wpo.is_trivial wpo then
     let tree = ProofEngine.tree node in
     List.iter
       (fun prv ->
          let backup = Wpo.get_result wpo prv in
-         let result =
-           if prv = VCS.Qed then None else
-             let rollback _ p r =
-               if p = VCS.Qed && VCS.is_valid r then
-                 Wpo.set_result wpo prv VCS.no_result
-               else if not @@ VCS.is_verdict r then
-                 Wpo.set_result wpo prv backup
-             in Some rollback in
+         let result _ p r =
+           if p = VCS.Qed && VCS.is_valid r then
+             Wpo.set_result wpo prv VCS.no_result
+           else if not @@ VCS.is_verdict r then
+             Wpo.set_result wpo prv backup ;
+           ProofEngine.validate ~computing:false tree in
          let progress _ _ = ProofEngine.validate ~computing:true tree in
-         let process () = Prover.prove ~config ~progress ?result wpo prv in
+         let process () = Prover.prove ~config ~progress ~result wpo prv in
          let thread = Task.thread @@ Task.later process () in
          let status = VCS.computing (fun () -> Task.cancel thread) in
          Wpo.set_result wpo prv status ;
@@ -545,45 +563,41 @@ let () =
     ~descr:(Md.plain "Schedule provers on proof node")
     begin fun rq () ->
       let node = get_node rq in
-      let provers =
-        match get_provers rq with
-        | Some ps -> ps
-        | None -> WpApi.getProvers () in
-      let timeout =
-        match get_timeout rq with
-        | Some t -> t
-        | None -> Wp_parameters.Timeout.get () in
-      let config =
-        let cfg = VCS.current () in
-        { cfg with timeout = Some (float timeout) } in
-      runProvers ~config ~node ~provers
+      let provers = get_provers rq in
+      let timeout = get_timeout rq in
+      runProvers ?timeout ?provers node
     end
 
+let killProvers ?provers node =
+  let wpo = ProofEngine.goal node in
+  let filter =
+    match provers with
+    | None | Some [] -> fun _ -> true
+    | Some prvs -> fun p -> List.exists (VCS.eq_prover p) prvs in
+  begin
+    List.iter
+      (fun (prv,res) ->
+         match res.VCS.verdict with
+         | Computing kill when filter prv -> kill ()
+         | _ -> ()
+      ) @@ Wpo.get_results ~computing:true wpo ;
+    ProofEngine.validate ~computing:true (ProofEngine.tree node) ;
+  end
+
 let () =
-  let killProvers = R.signature ~output:(module D.Junit) () in
-  let get_node = R.param killProvers (module Node)
+  let iKillProvers = R.signature ~output:(module D.Junit) () in
+  let get_node = R.param iKillProvers (module Node)
       ~name:"node" ~descr:(Md.plain "Proof node") in
-  let get_provers = R.param_opt killProvers (module WpApi.Provers)
+  let get_provers = R.param_opt iKillProvers (module WpApi.Provers)
       ~name:"provers"
       ~descr:(Md.plain "Prover selection (default: all running provers") in
-  R.register_sig killProvers ~package ~kind:`SET
+  R.register_sig iKillProvers ~package ~kind:`SET
     ~name:"killProvers"
     ~descr:(Md.plain "Interrupt running provers on proof node")
     begin fun rq () ->
       let node = get_node rq in
-      let wpo = ProofEngine.goal node in
-      let filter =
-        match get_provers rq with
-        | None | Some [] -> fun _ -> true
-        | Some prvs -> fun p -> List.exists (VCS.eq_prover p) prvs
-      in
-      List.iter
-        (fun (prv,res) ->
-           match res.VCS.verdict with
-           | Computing kill when filter prv -> kill ()
-           | _ -> ()
-        ) @@ Wpo.get_results ~computing:true wpo ;
-      ProofEngine.validate ~computing:true (ProofEngine.tree node) ;
+      let provers = get_provers rq in
+      killProvers ?provers node
     end
 
 (* -------------------------------------------------------------------------- *)

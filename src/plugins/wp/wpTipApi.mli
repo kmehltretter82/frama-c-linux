@@ -32,4 +32,13 @@ val printStatus : Server.Request.signal
 val selection : ProofEngine.node -> Tactical.selection
 val setSelection : ProofEngine.node -> Tactical.selection -> unit
 
+val runProvers :
+  ?timeout:int ->
+  ?provers:VCS.prover list ->
+  ProofEngine.node -> unit
+
+val killProvers :
+  ?provers:VCS.prover list ->
+  ProofEngine.node -> unit
+
 (* -------------------------------------------------------------------------- *)
