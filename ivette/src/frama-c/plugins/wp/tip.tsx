@@ -185,6 +185,29 @@ function NavBar(props: NavBarProps): JSX.Element {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Available Provers                                                  --- */
+/* -------------------------------------------------------------------------- */
+
+interface ProverConfig {
+  available: WP.ProverInfosData[];
+  provers: WP.prover[];
+  setProvers: (prvs: WP.prover[]) => void;
+}
+
+export function popupProvers(config: ProverConfig) {
+  const { available, provers, setProvers } = config;
+  Dome.popupMenu(
+    available.map(({ prover: id, descr: label }) => {
+      const checked = provers.some(p => p === id);
+      const updated =
+        checked ? provers.filter(p => p !== id) : provers.concat(id);
+      const onClick = (): void => setProvers(updated);
+      return { id, label, checked, onClick };
+    })
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- TIP View                                                           --- */
 /* -------------------------------------------------------------------------- */
 
@@ -196,13 +219,20 @@ export interface TIPProps {
 
 export function TIPView(props: TIPProps): JSX.Element {
   const { display, goal, onClose } = props;
+  // --- current goal
   const infos =
     States.useSyncArrayElt( WP.goals, goal ) ?? WP.goalsDataDefault;
+  // --- proof status
   const {
     current, above=[], below=[], index=-1, pending=0, tactic: nodeTactic
   } = States.useRequest( TIP.getProofStatus, goal, { pending: null } ) ?? {};
+  // --- provers
+  const available = States.useSyncArrayData(WP.ProverInfos);
+  const [ provers=[], setProvers ] = States.useSyncState(WP.provers);
+  // --- sidebar state
   const [ tactic, setTactic ] = React.useState<Tactic>();
   const [ prover, setProver ] = React.useState<Prover>();
+  // --- printer settings
   const [ autofocus, setAF ] = Dome.useBoolSettings('wp.tip.autofocus', true);
   const [ memory, setMEM ] = Dome.useBoolSettings('wp.tip.unmangled', true);
   const [ iformat, setIformat ] = Dome.useWindowSettings<TIP.iformat>(
@@ -211,18 +241,24 @@ export function TIPView(props: TIPProps): JSX.Element {
   const [ rformat, setRformat ] = Dome.useWindowSettings<TIP.rformat>(
     'wp.tip.rformat', TIP.jRformat, 'ratio'
   );
+
+  // --- derived states
   const locked = nodeTactic !== undefined;
   const configuredTactic = nodeTactic ?? tactic;
+
+  // --- prover selection
   const onSelectedProver = React.useCallback((prv) => {
     setTactic(undefined);
     setProver(prv);
   }, []);
+
+  // --- tactic selection
   const onSelectedTactic = React.useCallback((tac) => {
     setTactic(tac);
     setProver(undefined);
   }, []);
 
-  // --- Delete
+  // --- Delete button
   const deleteAble = locked || above.length > 0;
   const onDelete = (): void => {
     const request = locked ? TIP.clearNodeTactic : TIP.clearParentTactic;
@@ -230,7 +266,7 @@ export function TIPView(props: TIPProps): JSX.Element {
   };
   const deleteTitle = locked ? 'Cancel Node Tactic' : 'Cancel Last Tactic';
 
-  // --- Next
+  // --- Next button
   const nextIndex =
     pending <= 0 ? undefined :
     pending === 1 ? (index === 0 ? undefined : 0) :
@@ -242,6 +278,11 @@ export function TIPView(props: TIPProps): JSX.Element {
     : `Goto Next Pending Goal (if any)`;
   const onNext = (): void => {
     Server.send(TIP.goToIndex, [goal, nextIndex]);
+  };
+
+  // --- Configure button
+  const onConfigure = (): void => {
+    popupProvers({ available, provers, setProvers });
   };
 
   // --- Component
@@ -272,6 +313,10 @@ export function TIPView(props: TIPProps): JSX.Element {
           enabled={nextAble}
           title={nextTitle}
           onClick={onNext} />
+        <Button
+          icon='SETTINGS'
+          title='Active Provers Selection'
+          onClick={onConfigure} />
       </ToolBar>
       <Hfill>
         <NavBar
