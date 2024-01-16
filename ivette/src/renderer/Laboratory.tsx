@@ -257,7 +257,8 @@ interface CustomViewsProps {
   settings: string,
   shape: Shape,
   setShape: (shape: Shape) => void,
-  views: React.PropsWithChildren<View>[]
+  views: React.PropsWithChildren<View>[],
+  toolbar?: boolean
 }
 
 type CustomShapes = { [id: string]: Shape };
@@ -467,11 +468,19 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
     if (theDefault) setTimeout(() => { SELECT(theDefault.id); });
   }
 
-  return (
-    <Section label="Views" defaultUnfold>
-      {_.sortBy(theViews, ['order', 'id']).map(makeViewItem)}
-    </Section>
-  );
+  if(!props.toolbar) {
+    return (
+      <Section label="Views" defaultUnfold>
+        {_.sortBy(theViews, ['order', 'id']).map(makeViewItem)}
+      </Section>
+    );
+  } else {
+    return (
+      <>
+        {_.sortBy(theViews, ['order', 'id']).map(makeViewItem)}
+      </>
+    );
+  }
 }
 
 // --------------------------------------------------------------------------
@@ -559,17 +568,13 @@ function ToolbarView(
   const settingViews = settings && `${settings}.views`;
 
   return (
-    <SideBar
-      className='viewsBar'
-    >
-      <div className="svg-container">
-        <Icon
-          id="DISPLAY"
-          className="dome-xIcon-views"
-          size={17}
-          offset={-2}
-        />
-      </div>
+    <Hbox className='views-list'>
+      <Icon
+        id="DISPLAY"
+        className="views-icon"
+        size={17}
+        offset={-4}
+      />
       <CustomViews
         key="views"
         settings={settingViews}
@@ -577,7 +582,7 @@ function ToolbarView(
         setShape={setShape}
         views={views}
       />
-    </SideBar>
+    </Hbox>
   );
 }
 
@@ -674,7 +679,7 @@ export function LabView(props: LabViewProps): JSX.Element {
   // Make view
   return (
     <Vfill>
-      <Toolbar.ToolBar className='toolbar-views'>
+      <Toolbar.ToolBar>
         <ToolbarView
           settings={settingPanel}
           shape={shape}

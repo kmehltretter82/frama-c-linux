@@ -102,50 +102,47 @@
     fill: var(--info-text);
 }
 
-.viewsBar {
+/* -------------------------------------------------------------------------- */
+/* --- Temporary styling selection view on toolbar                        --- */
+/* -------------------------------------------------------------------------- */
+.views-list,
+.views-list .dome-xSideBarSection {
+    width: 100%;
+}
+
+.views-list .dome-xSideBarSection-content {
+    width: 100%;
     display: flex;
-    max-width: 100%;
+    flex-wrap: wrap;
 }
 
-.viewsBar .svg-container {
-  display: grid;
-  place-items: center;
-  padding: 0 5px;
-}
-
-.toolbar-views .dome-xSideBarSection-content {
-    display: flex;
-}
-
-.toolbar-views .dome-xIcon.dome-xIcon-default,
-.toolbar-views .dome-xIcon.labview-icon {
+.views-list  .dome-xIcon.dome-xIcon-default,
+.views-list  .dome-xSideBarSection-title {
     display: none;
 }
 
-.toolbar-views .dome-xSideBarItem {
-    max-width: 120px;
+.views-list  .dome-xSideBarItem {
     border-radius: 2em 2em;
     border: solid 1px var(--splitter);
     margin: 2px 3px;
     padding: 2px 10px;
 }
 
-.toolbar-views .dome-xSideBarItem.dome-active {
+.views-list  .dome-xSideBarItem.dome-active {
     border: solid 2px;
 }
 
-.toolbar-views .dome-xLabel.dome-text-label {
+.views-list  .dome-xLabel.dome-text-label {
     margin: 0;
     padding: 0;
 }
 
-.toolbar-views .dome-xSideBarItem .dome-xLabel:hover,
-.toolbar-views .dome-xSideBarItem:hover {
+.views-list  .dome-xSideBarItem .dome-xLabel:hover,
+.views-list  .dome-xSideBarItem:hover {
     cursor: pointer;
 }
 
-.toolbar-views .dome-xSideBarSection-title.dome-xBoxes-hbox.dome-xBoxes-box {
-    display: none;
+.views-list  .dome-xIcon {
+    margin: auto 4px;
 }
-
 /* -------------------------------------------------------------------------- */
