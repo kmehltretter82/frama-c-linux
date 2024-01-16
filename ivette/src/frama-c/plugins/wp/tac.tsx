@@ -26,7 +26,8 @@ import { Icon } from 'dome/controls/icons';
 import { IconButton, IconButtonKind } from 'dome/controls/buttons';
 import { Spinner, Select } from 'dome/controls/buttons';
 import { Label, Item, Descr } from 'dome/controls/labels';
-import { Hbox, Filler } from 'dome/layout/boxes';
+import { Hbox, Vbox, Filler } from 'dome/layout/boxes';
+import * as Dnd from 'dome/dnd';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
@@ -134,22 +135,31 @@ export interface ProverSelection {
 
 export function Provers(props: ProverSelection): JSX.Element {
   const { node, selected, setSelected } = props;
-  const { results=[] } = States.useRequest(TIP.getNodeInfos, node) ?? {};
-  const [ provers=[] ] = States.useSyncState(WP.provers);
-  const items = provers.map((prover) => {
+  const { results=[] } =
+    States.useRequest(TIP.getNodeInfos, node, { pending: null }) ?? {};
+  const [ provers=[], setProvers ] = States.useSyncState(WP.provers);
+  const setItems = (items: string[]) => setProvers(items.map(WP.jProver));
+  const children = [...provers].sort().map((prover) => {
     const res = results.find(([p]) => p === prover);
     const result = res ? res[1] : WP.resultDefault;
     return (
-      <ProverItem
-        key={prover}
-        node={node}
-        prover={prover}
-        result={result}
-        selected={selected}
-        setSelected={setSelected} />
+      <Dnd.Item id={prover} key={prover}>
+        <ProverItem
+          node={node}
+          prover={prover}
+          result={result}
+          selected={selected}
+          setSelected={setSelected} />
+      </Dnd.Item>
     );
   });
-  return <>{node ? items : null}</>;
+  return (
+    <Vbox>
+      <Dnd.List items={provers} setItems={setItems}>
+        {node ? children : null}
+      </Dnd.List>
+    </Vbox>
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -317,7 +327,7 @@ export function ConfigureProver(props: ProverSelection): JSX.Element {
   const { node, selected: prover, setSelected } = props;
   const { descr } = States.useSyncArrayElt(WP.ProverInfos,prover) ?? {};
   const result = States.useRequest(
-    TIP.getResult, { node, prover }
+    TIP.getResult, { node, prover }, { pending: null }
   ) ?? WP.resultDefault;
   const [timeout = 0, setTimeout] = States.useSyncState(WP.timeout);
   const { icon, kind, computing=false, play=false } = getProverActions(result);

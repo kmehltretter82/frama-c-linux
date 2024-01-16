@@ -115,7 +115,7 @@ Ivette.registerComponent({
 /* -------------------------------------------------------------------------- */
 
 function ServerActivity(): JSX.Element {
-  const rq = States.useRequest(WP.getScheduledTasks, null);
+  const rq = States.useRequest(WP.getScheduledTasks, null, { pending: null });
   const active = rq ? rq.active > 0 : false;
   const status = active ? 'active' : 'inactive';
   const done = rq ? rq.done : 0;

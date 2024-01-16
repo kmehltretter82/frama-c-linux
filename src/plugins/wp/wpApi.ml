@@ -84,6 +84,7 @@ end
 
 module Provers = D.Jlist(Prover)
 
+let signal = ref None
 let provers = ref None
 
 let getProvers () =
@@ -102,14 +103,17 @@ let getProvers () =
     let selection = List.filter_map parse cmdline in
     provers := Some selection ; selection
 
-let setProvers prv = provers := Some prv
+let updProvers prv = provers := Some prv
+let setProvers prv = updProvers prv ; Option.iter (fun s -> R.emit s) !signal
 
-let _ =
-  S.register_state ~package ~name:"provers"
-    ~descr:(Md.plain "Selected Provers")
-    ~data:(module Provers)
-    ~get:getProvers
-    ~set:setProvers ()
+let () =
+  let s =
+    S.register_state ~package ~name:"provers"
+      ~descr:(Md.plain "Selected Provers")
+      ~data:(module Provers)
+      ~get:getProvers
+      ~set:updProvers ()
+  in signal := Some s
 
 (* -------------------------------------------------------------------------- *)
 (* --- Provers Timeout                                                    --- *)
