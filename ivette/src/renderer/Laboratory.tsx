@@ -257,8 +257,7 @@ interface CustomViewsProps {
   settings: string,
   shape: Shape,
   setShape: (shape: Shape) => void,
-  views: React.PropsWithChildren<View>[],
-  toolbar?: boolean
+  views: React.PropsWithChildren<View>[]
 }
 
 type CustomShapes = { [id: string]: Shape };
@@ -468,19 +467,11 @@ function CustomViews(props: CustomViewsProps): JSX.Element {
     if (theDefault) setTimeout(() => { SELECT(theDefault.id); });
   }
 
-  if(!props.toolbar) {
-    return (
-      <Section label="Views" defaultUnfold>
-        {_.sortBy(theViews, ['order', 'id']).map(makeViewItem)}
-      </Section>
-    );
-  } else {
-    return (
-      <>
-        {_.sortBy(theViews, ['order', 'id']).map(makeViewItem)}
-      </>
-    );
-  }
+  return (
+    <Section label="Views" defaultUnfold>
+      {_.sortBy(theViews, ['order', 'id']).map(makeViewItem)}
+    </Section>
+  );
 }
 
 // --------------------------------------------------------------------------
