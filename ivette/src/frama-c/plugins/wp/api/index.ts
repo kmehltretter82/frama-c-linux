@@ -112,6 +112,40 @@ const provers_internal: State.State<prover[]> = {
 /** Selected Provers */
 export const provers: State.State<prover[]> = provers_internal;
 
+/** Signal for state [`process`](#process)  */
+export const signalProcess: Server.Signal = {
+  name: 'plugins.wp.signalProcess',
+};
+
+const getProcess_internal: Server.GetRequest<null,number> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.getProcess',
+  input: Json.jNull,
+  output: Json.jNumber,
+  signals: [],
+};
+/** Getter for state [`process`](#process)  */
+export const getProcess: Server.GetRequest<null,number>= getProcess_internal;
+
+const setProcess_internal: Server.SetRequest<number,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.setProcess',
+  input: Json.jNumber,
+  output: Json.jNull,
+  signals: [],
+};
+/** Setter for state [`process`](#process)  */
+export const setProcess: Server.SetRequest<number,null>= setProcess_internal;
+
+const process_internal: State.State<number> = {
+  name: 'plugins.wp.process',
+  signal: signalProcess,
+  getter: getProcess,
+  setter: setProcess,
+};
+/** Server Processes */
+export const process: State.State<number> = process_internal;
+
 /** Signal for state [`timeout`](#timeout)  */
 export const signalTimeout: Server.Signal = {
   name: 'plugins.wp.signalTimeout',

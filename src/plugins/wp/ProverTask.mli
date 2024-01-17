@@ -86,6 +86,7 @@ class virtual command : string ->
 
   end
 
+(** If provided, the number of procs is forwarded to the Why3 and the server *)
 val server : ?procs:int -> unit -> Task.server
 
 val schedule : 'a Task.task -> unit

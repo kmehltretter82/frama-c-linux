@@ -153,7 +153,7 @@ function Node(props: NodeProps): JSX.Element
   const fullTitle = `${title} (${proofState})`;
   const onSelection = (): void => { Server.send(TIP.goToNode, node); };
   return (
-    <Cell
+    <Item
       ref={cellRef} className={className}
       icon={icon} kind={kind}
       label={nodeLabel}
@@ -249,17 +249,22 @@ export function TIPView(props: TIPProps): JSX.Element {
   const locked = nodeTactic !== undefined;
   const configuredTactic = nodeTactic ?? tactic;
 
-  // --- prover selection
+  // --- current prover
   const onSelectedProver = React.useCallback((prv) => {
     setTactic(undefined);
     setProver(prv);
   }, []);
 
-  // --- tactic selection
+  // --- current tactic
   const onSelectedTactic = React.useCallback((tac) => {
     setTactic(tac);
     setProver(undefined);
   }, []);
+
+  // --- prover selection
+  const onProverSelection = (): void => {
+    popupProvers({ available, provers, setProvers });
+  };
 
   // --- Delete button
   const deleteAble = locked || above.length > 0;
@@ -295,11 +300,6 @@ export function TIPView(props: TIPProps): JSX.Element {
     Server.send(TIP.goToIndex, [goal, prevIndex]);
   };
 
-  // --- Configure button
-  const onConfigure = (): void => {
-    popupProvers({ available, provers, setProvers });
-  };
-
   // --- Component
   return (
     <Vfill display={display}>
@@ -307,11 +307,11 @@ export function TIPView(props: TIPProps): JSX.Element {
         <Cell
           icon='HOME'
           label={infos.wpo} title='Goal identifier' />
-        <Cell
+        <Item
           icon='CODE'
           display={0 <= index && index < pending && 1 < pending}
           label={`${index+1}/${pending}`} title='Pending proof nodes'/>
-        <Cell {...getStatus(infos)}/>
+        <Item {...getStatus(infos)}/>
         <Filler/>
         <Button
           icon='MEDIA.PREV'
@@ -337,8 +337,8 @@ export function TIPView(props: TIPProps): JSX.Element {
         </ButtonGroup>
         <Button
           icon='SETTINGS'
-          title='Active Provers Selection'
-          onClick={onConfigure} />
+          title='Provers Configuration (Prover Selection on right-click)'
+          onClick={onProverSelection} />
       </ToolBar>
       <Hfill>
         <NavBar

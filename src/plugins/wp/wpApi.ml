@@ -116,6 +116,21 @@ let () =
   in signal := Some s
 
 (* -------------------------------------------------------------------------- *)
+(* --- Server Processes                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+let _ =
+  S.register_state ~package
+    ~name:"process"
+    ~descr:(Md.plain "Server Processes")
+    ~data:(module D.Jint)
+    ~get:Wp_parameters.Procs.get
+    ~set:(fun procs ->
+        Wp_parameters.Procs.set procs ;
+        ignore @@ ProverTask.server ~procs ())
+    ~add_hook:Wp_parameters.Procs.add_hook_on_update ()
+
+(* -------------------------------------------------------------------------- *)
 (* --- Provers Timeout                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 

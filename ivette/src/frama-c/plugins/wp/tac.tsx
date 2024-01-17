@@ -26,7 +26,8 @@ import { Icon } from 'dome/controls/icons';
 import { IconButton, IconButtonKind } from 'dome/controls/buttons';
 import { Spinner, Select } from 'dome/controls/buttons';
 import { Label, Item, Descr } from 'dome/controls/labels';
-import { Hbox, Vbox, Filler, Space } from 'dome/layout/boxes';
+import { Hbox, Vbox, Filler } from 'dome/layout/boxes';
+import { Separator } from 'dome/frame/toolbars';
 import * as Dnd from 'dome/dnd';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
@@ -376,7 +377,8 @@ export function ConfigureProver(props: ProverSelection): JSX.Element {
   const result = States.useRequest(
     TIP.getResult, { node, prover }, { pending: null }
   ) ?? WP.resultDefault;
-  const [timeout = 0, setTimeout] = States.useSyncState(WP.timeout);
+  const [process = 1, setProcess] = States.useSyncState(WP.process);
+  const [timeout = 1, setTimeout] = States.useSyncState(WP.timeout);
   const { icon, kind, clear=true, running=false, play=false, forward=0 } =
     getProverActions(result);
   const [fwdTime, setFwdTime] = React.useState(0);
@@ -410,29 +412,43 @@ export function ConfigureProver(props: ProverSelection): JSX.Element {
       className="dome-xToolBar dome-color-frame wp-configure"
       display={display}
     >
-      <Item
-        key='prover'
+      <Label
         icon='SETTINGS'
-        title='Selected Prover Configuration'
-        className="wp-config-tactic"
-        label={descr} />
-      <Descr
-        icon={icon}
-        kind={kind}
-        label={result.descr} />
-      <Filler />
-      <Label label='Timeout' title='Prover Timeout (shared by all provers)'>
+        label='Process' title='Server Processes (shared by all provers)'
+      >
         <Spinner
           className="wp-config-field wp-config-spinner"
+          onChange={setProcess}
+          value={process}
+          vmin={1}
+          vmax={36}
+          vstep={1}
+        />
+      </Label>
+      <Label
+        label='Timeout' title='Prover Timeout (shared by all provers)'
+      >
+        <Spinner
+          className="wp-config-field wp-config-spinner"
+          enabled={fwdTime===0}
+          onChange={setTimeout}
           value={fwdTime > 0 ? fwdTime : timeout}
           vmin={1}
           vmax={3600}
           vstep={1}
-          enabled={fwdTime===0}
-          onChange={setTimeout}
         />
       </Label>
-      <Space />
+      <Separator />
+      <Item
+        key='prover'
+        title='Selected Prover Configuration'
+        className="wp-config-tactic"
+        label={descr} />
+      <Item
+        icon={icon}
+        kind={kind}
+        label={result.descr} />
+      <Filler />
       <Hbox>
         <IconButton
           key='clear'
