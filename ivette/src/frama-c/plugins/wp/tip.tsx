@@ -315,7 +315,7 @@ export function TIPView(props: TIPProps): JSX.Element {
         <Filler/>
         <Button
           icon='MEDIA.PREV'
-          kind='warning'
+          kind='negative'
           enabled={deleteAble}
           title={deleteTitle}
           onClick={onDelete} />

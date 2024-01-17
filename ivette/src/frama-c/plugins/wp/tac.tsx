@@ -129,7 +129,7 @@ function ProverItem(props : ProverItemProps): JSX.Element
   const title =
     inactive ? undefined :
     running ? 'Interrupt Prover' : 'Run Prover';
-  const action = running ? TIP.runProvers : TIP.killProvers;
+  const action = running ? TIP.killProvers : TIP.runProvers;
   return (
     <Hbox
       className={className}
@@ -432,31 +432,33 @@ export function ConfigureProver(props: ProverSelection): JSX.Element {
           onChange={setTimeout}
         />
       </Label>
-      <IconButton
-        key='clear'
-        icon='MEDIA.PREV'
-        kind='negative'
-        enabled={clear}
-        title='Clear Prover Result'
-        onClick={onClear}
-      />
-      <IconButton
-        key='play'
-        icon={running ? 'MEDIA.PAUSE' : 'MEDIA.PLAY'}
-        kind={running ? 'warning' : 'positive'}
-        title={running ? 'Interrupt Prover' : 'Run Prover'}
-        enabled={enabled}
-        onClick={onPlay}
-      />
-      <IconButton
-        key='forward'
-        icon='MEDIA.NEXT'
-        kind='positive'
-        enabled={forward > 0}
-        title={forwardTitle}
-        onClick={onForward}
-      />
       <Space />
+      <Hbox>
+        <IconButton
+          key='clear'
+          icon='MEDIA.PREV'
+          kind='negative'
+          enabled={clear}
+          title='Clear Prover Result'
+          onClick={onClear}
+        />
+        <IconButton
+          key='play'
+          icon={running ? 'MEDIA.PAUSE' : 'MEDIA.PLAY'}
+          kind={running ? 'warning' : 'positive'}
+          title={running ? 'Interrupt Prover' : 'Run Prover'}
+          enabled={enabled}
+          onClick={onPlay}
+        />
+        <IconButton
+          key='forward'
+          icon='MEDIA.NEXT'
+          kind='positive'
+          enabled={forward > 0}
+          title={forwardTitle}
+          onClick={onForward}
+        />
+      </Hbox>
       <IconButton
         key='close'
         icon='CIRC.CLOSE'
@@ -556,20 +558,21 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
         kind='positive'
         title='Apply Tactic'
         enabled={isReady}
+        display={!locked}
         onClick={onPlay} />
       <IconButton
-        key='close'
-        icon='CIRC.CLOSE'
-        title='Close Tactic Configuration Panel'
-        display={!locked}
-        onClick={onClose} />
-      <IconButton
         key='clear'
-        icon='CIRC.CLOSE'
+        icon='MEDIA.PREV'
         kind='negative'
         display={locked}
         title='Cancel Tactic and Remove Sub-Tree'
         onClick={onClear} />
+      <IconButton
+        key='close'
+        icon='CIRC.CLOSE'
+        title='Close Tactic Configuration Panel'
+        disabled={locked}
+        onClick={onClose} />
     </Hbox>
   );
 }

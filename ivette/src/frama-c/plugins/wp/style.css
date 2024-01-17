@@ -165,6 +165,7 @@
 
 .wp-configure .dome-xIconButton {
     padding: 2px 5px 2px 5px;
+    width: 20px;
 }
 
 .wp-configure .dome-xIconButton.dome-control-enabled:hover {
@@ -204,11 +205,12 @@
 .wp-config-spinner {
     width: 60px;
     color: var(--text-discrete);
-    padding-right: 2px;
+    background: var(--background-interaction);
 }
 
 input.wp-config-spinner:disabled {
     color: var(--text-disabled);
+    background: var(--background-profound);
 }
 
 /* -------------------------------------------------------------------------- */
