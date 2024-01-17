@@ -100,15 +100,6 @@ module Make_Dataflow
 
   (* --- Plugin parameters --- *)
 
-  type descending_strategy = NoIteration | FullIteration | ExitIteration
-
-  let descending_iteration : descending_strategy =
-    match Parameters.DescendingIteration.get () with
-    | "no" -> NoIteration
-    | "exits" -> ExitIteration
-    | "full" -> FullIteration
-    | _ -> assert false
-
   let hierachical_convergence : bool =
     Parameters.HierarchicalConvergence.get ()
 
@@ -584,7 +575,7 @@ module Make_Dataflow
         incr iteration_count;
       done;
       (* Descending sequence *)
-      let l =  match descending_iteration with
+      let l =  match Parameters.DescendingIteration.get () with
         | NoIteration -> []
         | ExitIteration ->
           Self.debug ~dkey
