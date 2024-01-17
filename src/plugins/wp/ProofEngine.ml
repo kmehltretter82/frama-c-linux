@@ -504,6 +504,26 @@ let bound node =
   | Tactic _ | Opened -> []
   | Script s -> s
 
+let is_script_result ~margin (prv,res) =
+  VCS.is_extern prv && VCS.is_valid res &&
+  res.prover_time > margin
+
+let has_result tree =
+  let margin = float_of_string @@ Wp_parameters.TimeMargin.get () in
+  let results = Wpo.get_results tree.main in
+  List.exists (is_script_result ~margin) results
+
+let has_tactics tree =
+  match tree.root with
+  | None -> false
+  | Some node ->
+    match node.script with
+    | Opened -> false
+    | Tactic _ -> true
+    | Script s -> List.exists ProofScript.is_tactic s
+
+let has_script tree = has_tactics tree || has_result tree
+
 let get_hint node = node.strategy
 let set_hint node strategy = node.strategy <- Some strategy
 

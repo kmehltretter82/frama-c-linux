@@ -627,3 +627,86 @@ let () =
     end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Script Management                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  let script = R.signature ~input:(module WpApi.Goal) () in
+  let set_proof = R.result script (module D.Jbool)
+      ~name:"proof" ~descr:(Md.plain "Some Proof Tree can be Saved") in
+  let set_script = R.result_opt script (module D.Jstring)
+      ~name:"script" ~descr:(Md.plain "Script File (if any)") in
+  let set_saved = R.result script (module D.Jbool)
+      ~name:"saved" ~descr:(Md.plain "Current Proof Script has been Saved") in
+  R.register_sig script ~package ~kind:`GET
+    ~name:"getScriptStatus"
+    ~descr:(Md.plain "Script Status for a given Goal")
+    ~signals:[proofStatus]
+    begin fun rq goal ->
+      let tree = ProofEngine.proof ~main:goal in
+      set_saved rq (ProofEngine.saved tree) ;
+      set_proof rq (ProofEngine.has_script tree) ;
+      set_script rq
+        begin
+          match ProofSession.get goal with
+          | NoScript -> None | Script file | Deprecated file ->
+            Some (file :> string)
+        end ;
+    end
+
+let () =
+  R.register ~package ~kind:`SET
+    ~name:"saveScript" ~descr:(Md.plain "Save Script for the Goal")
+    ~input:(module WpApi.Goal)
+    ~output:(module D.Junit)
+    begin fun goal ->
+      let tree = ProofEngine.proof ~main:goal in
+      let json = ProofScript.encode (ProofEngine.script tree) in
+      ProofSession.save ~stdout:false goal json ;
+      ProofEngine.set_saved tree true ;
+      R.emit proofStatus
+    end
+
+let () =
+  R.register ~package ~kind:`SET
+    ~name:"runScript"
+    ~descr:(Md.plain "Replay Saved Script for the Goal (if any)")
+    ~input:(module WpApi.Goal)
+    ~output:(module D.Junit)
+    begin fun goal ->
+      let tree = ProofEngine.proof ~main:goal in
+      ProofEngine.clear_tree tree ;
+      R.emit printStatus ;
+      R.emit proofStatus ;
+      ProverScript.spawn
+        ~provers:(WpApi.getProvers())
+        ~success:
+          begin fun _ _ ->
+            ProofEngine.forward tree ;
+            R.emit printStatus ;
+            R.emit proofStatus ;
+          end
+        goal ;
+      let server = ProverTask.server () in
+      Task.launch server ;
+    end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Full Trash                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  R.register ~package ~kind:`SET
+    ~name:"clearProofScript"
+    ~descr:(Md.plain "Clear Proof and Remove any Saved Script for the Goal")
+    ~input:(module WpApi.Goal)
+    ~output:(module D.Junit)
+    begin fun goal ->
+      let tree = ProofEngine.proof ~main:goal in
+      ProofEngine.clear_tree tree ;
+      ProofSession.remove goal ;
+      R.emit printStatus ;
+      R.emit proofStatus ;
+    end
+
+(* -------------------------------------------------------------------------- *)

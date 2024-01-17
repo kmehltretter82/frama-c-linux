@@ -112,6 +112,7 @@ val iter : (Wpo.t -> unit) -> fork -> unit
 val commit : fork -> node * (string * node) list
 val pretty : Format.formatter -> fork -> unit
 
+val has_script : tree -> bool
 val script : tree -> ProofScript.jscript
 val bind : node -> ProofScript.jscript -> unit
 val bound : node -> ProofScript.jscript

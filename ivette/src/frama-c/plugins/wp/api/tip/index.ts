@@ -450,4 +450,54 @@ export const clearProvers: Server.SetRequest<
   null
   >= clearProvers_internal;
 
+const getScriptStatus_internal: Server.GetRequest<
+  goal,
+  { proof: boolean, script?: string, saved: boolean }
+  > = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.tip.getScriptStatus',
+  input: jGoal,
+  output: Json.jObject({
+            proof: Json.jBoolean,
+            script: Json.jOption(Json.jString),
+            saved: Json.jBoolean,
+          }),
+  signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
+};
+/** Script Status for a given Goal */
+export const getScriptStatus: Server.GetRequest<
+  goal,
+  { proof: boolean, script?: string, saved: boolean }
+  >= getScriptStatus_internal;
+
+const saveScript_internal: Server.SetRequest<goal,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.saveScript',
+  input: jGoal,
+  output: Json.jNull,
+  signals: [],
+};
+/** Save Script for the Goal */
+export const saveScript: Server.SetRequest<goal,null>= saveScript_internal;
+
+const runScript_internal: Server.SetRequest<goal,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.runScript',
+  input: jGoal,
+  output: Json.jNull,
+  signals: [],
+};
+/** Replay Saved Script for the Goal (if any) */
+export const runScript: Server.SetRequest<goal,null>= runScript_internal;
+
+const clearProofScript_internal: Server.SetRequest<goal,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.clearProofScript',
+  input: jGoal,
+  output: Json.jNull,
+  signals: [],
+};
+/** Clear Proof and Remove any Saved Script for the Goal */
+export const clearProofScript: Server.SetRequest<goal,null>= clearProofScript_internal;
+
 /* ------------------------------------- */

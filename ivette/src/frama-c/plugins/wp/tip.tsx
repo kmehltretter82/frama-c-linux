@@ -229,6 +229,9 @@ export function TIPView(props: TIPProps): JSX.Element {
   const {
     current, above=[], below=[], index=-1, pending=0, tactic: nodeTactic
   } = States.useRequest( TIP.getProofStatus, goal, { pending: null } ) ?? {};
+  // --- script status
+  const { saved=false, proof=false, script } =
+    States.useRequest( TIP.getScriptStatus, goal, { pending: null } ) ?? {};
   // --- provers
   const available = States.useSyncArrayData(WP.ProverInfos);
   const [ provers=[], setProvers ] = States.useSyncState(WP.provers);
@@ -244,6 +247,11 @@ export function TIPView(props: TIPProps): JSX.Element {
   const [ rformat, setRformat ] = Dome.useWindowSettings<TIP.rformat>(
     'wp.tip.rformat', TIP.jRformat, 'ratio'
   );
+
+  // --- Script buttons
+  const onSave = (): void => { Server.send(TIP.saveScript, goal); };
+  const onReload = (): void => { Server.send(TIP.runScript, goal); };
+  const onTrash = (): void => { Server.send(TIP.clearProofScript, goal); };
 
   // --- derived states
   const locked = nodeTactic !== undefined;
@@ -313,12 +321,35 @@ export function TIPView(props: TIPProps): JSX.Element {
           label={`${index+1}/${pending}`} title='Pending proof nodes'/>
         <Item {...getStatus(infos)}/>
         <Filler/>
-        <Button
-          icon='MEDIA.PREV'
-          kind='negative'
-          enabled={deleteAble}
-          title={deleteTitle}
-          onClick={onDelete} />
+        <ButtonGroup>
+          <Button
+            icon='RELOAD'
+            enabled={ script !== undefined && !saved }
+            title='Replay Proof Script from Disk'
+            onClick={onReload}
+          />
+          <Button
+            icon='SAVE'
+            enabled={ proof && !saved }
+            title='Save Proof Script on Disk'
+            onClick={onSave}
+          />
+        </ButtonGroup>
+        <ButtonGroup>
+          <Button
+            icon='MEDIA.PREV'
+            kind='negative'
+            enabled={deleteAble}
+            title={deleteTitle}
+            onClick={onDelete} />
+          <Button
+            icon='TRASH'
+            kind='negative'
+            enabled={ proof || script !== undefined }
+            title='Clear Proof and Remove Script (if any)'
+            onClick={onTrash}
+          />
+        </ButtonGroup>
         <ButtonGroup>
           <Button
             icon='ANGLE.LEFT'
