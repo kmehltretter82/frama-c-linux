@@ -1,6 +1,6 @@
 [kernel] Parsing array_cast_bts1099.i (no preprocessing)
 [kernel] array_cast_bts1099.i:12: User Error: 
-  Cast over a non-scalar type t
+  explicit cast: cast over a non-scalar type t
   10      int tab1[4];
   11      u* p = &tab1;
   12      t* p2 = (t) p;
