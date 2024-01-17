@@ -90,13 +90,14 @@ interface ProverItemProps {
   node: Node;
   prover: WP.prover;
   result: WP.result;
+  inactive?: boolean;
   selected: Prover;
   setSelected: (prv: Prover) => void;
 }
 
 function ProverItem(props : ProverItemProps): JSX.Element
 {
-  const { node, prover, result, selected, setSelected } = props;
+  const { node, prover, inactive=false, result, selected, setSelected } = props;
   const { descr='No Result' } = result;
   const { icon, kind, computing=false, play=false } = getProverActions(result);
   const { name } = States.useSyncArrayElt(WP.ProverInfos, prover) ?? {};
@@ -115,12 +116,12 @@ function ProverItem(props : ProverItemProps): JSX.Element
         kind={kind}
         className='wp-tactical-cell'
         label={name}
-        title={descr}
+        title={inactive ? `${descr} (Inactive)` : descr}
       />
       <IconButton
-        icon={computing ? 'MEDIA.PAUSE' : 'MEDIA.PLAY' }
+        icon={inactive ? 'LOCK' : computing ? 'MEDIA.PAUSE' : 'MEDIA.PLAY' }
         kind={computing ? 'warning' : 'positive'}
-        enabled={play || computing}
+        enabled={!inactive && (play || computing)}
         onClick={() => playProver(computing, node, prover)}
       />
     </Hbox>
@@ -153,12 +154,33 @@ export function Provers(props: ProverSelection): JSX.Element {
       </Dnd.Item>
     );
   });
+  const isInactive = (p: WP.prover): boolean => (
+    p != 'qed' && p != 'script' && !provers.some(q => p === q)
+  );
+  const inactive =
+    results
+      .filter(([p]) => isInactive(p))
+      .map(([p,r]) => {
+        return (
+          <ProverItem
+            key={p}
+            node={node}
+            prover={p}
+            result={r}
+            inactive
+            selected={selected}
+            setSelected={setSelected} />
+        );
+      });
   return (
-    <Vbox>
-      <Dnd.List items={provers} setItems={setItems}>
-        {node ? children : null}
-      </Dnd.List>
-    </Vbox>
+    <>
+      <Vbox>
+        <Dnd.List items={provers} setItems={setItems}>
+          {node ? children : null}
+        </Dnd.List>
+      </Vbox>
+      {inactive}
+    </>
   );
 }
 
