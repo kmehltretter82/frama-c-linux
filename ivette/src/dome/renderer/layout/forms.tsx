@@ -833,6 +833,12 @@ function TEXT_OF_NUMBER(n: number | undefined): string {
   return Number(n).toLocaleString('en');
 }
 
+function TEXT_OF_INPUT_NUMBER(n: number | undefined): string {
+  if (n === undefined) return '';
+  if (Number.isNaN(n)) throw new Error('Invalid number');
+  return Number(n).toString();
+}
+
 function NUMBER_OF_TEXT(s: string): number | undefined {
   if (s === '') return undefined;
   const n = Number.parseFloat(s.replace(/[ ,]/g, ''));
@@ -909,7 +915,7 @@ export function SpinnerField(props: SpinnerFieldProps): JSX.Element {
 
   }, [min, max, checker]);
   const checked = useChecker(props.state, fullChecker);
-  const filtered = useFilter(checked, TEXT_OF_NUMBER, NUMBER_OF_TEXT, '');
+  const filtered = useFilter(checked, TEXT_OF_INPUT_NUMBER, NUMBER_OF_TEXT, '');
   const [value, error, setState] = useLatency(filtered, latency);
   const onChange = useChangeEvent(setState);
   const UNITS = units && (
