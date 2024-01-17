@@ -238,12 +238,6 @@ and pp_raw_stmt fmt = function
   |     COMPGOTO (exp, loc) ->  fprintf fmt "@[<hov 2>COMPGOTO exp(%a, loc(%a))@]" pp_exp exp pp_cabsloc loc
   |     DEFINITION def -> fprintf fmt "@[<hov 2>DEFINITION %a@]" pp_def def
   |     ASM (_,_,_,_) -> fprintf fmt "ASM"
-  |     TRY_EXCEPT (bl1, exp, bl2, loc) ->
-    fprintf fmt "@[<hov 2>TRY_EXCEPT block(%a) exp(%a) block(%a) loc(%a)@]"
-      pp_block bl1 pp_exp exp pp_block bl2 pp_cabsloc loc
-  |     TRY_FINALLY (bl1, bl2, loc) ->
-    fprintf fmt "@[<hov 2>TRY_EXCEPT block(%a) block(%a) loc(%a)@]"
-      pp_block bl1 pp_block bl2 pp_cabsloc loc
   |     THROW(e,loc) ->
     fprintf fmt "@[<hov 2>THROW %a, loc(%a)@]"
       (Format.pp_print_option pp_exp) e pp_cabsloc loc

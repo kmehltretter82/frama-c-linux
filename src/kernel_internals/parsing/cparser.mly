@@ -365,7 +365,7 @@ let in_ghost_block ?(battrs=[]) l =
 %token<Cabs.cabsloc> BREAK CONTINUE GOTO RETURN
 %token<Cabs.cabsloc> SWITCH CASE DEFAULT
 %token<Cabs.cabsloc> WHILE DO FOR
-%token<Cabs.cabsloc> IF TRY EXCEPT FINALLY
+%token<Cabs.cabsloc> IF
 %token ELSE
 
 %token<Cabs.cabsloc> NOP_ATTRIBUTE ATTRIBUTE INLINE NORETURN STATIC_ASSERT ASM TYPEOF FUNCTION__ PRETTY_FUNCTION__
@@ -374,7 +374,7 @@ let in_ghost_block ?(battrs=[]) l =
 %token BLOCKATTRIBUTE
 %token<Cabs.cabsloc> BUILTIN_TYPES_COMPAT BUILTIN_OFFSETOF
 %token<Cabs.cabsloc> DECLSPEC
-%token<string * Cabs.cabsloc> MSASM MSATTR
+%token<string * Cabs.cabsloc> MSATTR
 %token<string * Cabs.cabsloc> PRAGMA_LINE
 %token<Cabs.cabsloc> PRAGMA
 %token PRAGMA_EOL
@@ -1022,24 +1022,6 @@ statement:
 |   ASM asmattr LPAREN asmtemplate asmoutputs RPAREN SEMICOLON {
       let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       no_ghost [ASM ($2, mk_asm_templates $4, $5, loc)]
-    }
-|   MSASM   { no_ghost [ASM ([], [fst $1], None, snd $1)]}
-|   TRY block EXCEPT paren_comma_expression block {
-      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
-      let b, _, _ = $2 in
-      let h, _, _ = $5 in
-      if not !Cprint.msvcMode then
-        Errorloc.parse_error "try/except in GCC code";
-      no_ghost
-        [TRY_EXCEPT (b, make_expr $loc($4) (COMMA $4), h, loc)]
-    }
-|   TRY block FINALLY block {
-      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
-      let b, _, _ = $2 in
-      let h, _, _ = $4 in
-      if not !Cprint.msvcMode then
-        Errorloc.parse_error "try/finally in GCC code";
-      no_ghost [TRY_FINALLY (b, h, loc)]
     }
 ;
 
