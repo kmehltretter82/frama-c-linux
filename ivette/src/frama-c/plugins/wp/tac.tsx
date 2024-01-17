@@ -26,7 +26,7 @@ import { Icon } from 'dome/controls/icons';
 import { IconButton, IconButtonKind } from 'dome/controls/buttons';
 import { Spinner, Select } from 'dome/controls/buttons';
 import { Label, Item, Descr } from 'dome/controls/labels';
-import { Hbox, Vbox, Filler } from 'dome/layout/boxes';
+import { Hbox, Vbox, Filler, Space } from 'dome/layout/boxes';
 import * as Dnd from 'dome/dnd';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
@@ -43,10 +43,20 @@ type Tactic = TIP.tactic | undefined;
 /* --- Use Actions                                                        --- */
 /* -------------------------------------------------------------------------- */
 
-function playProver(computing: boolean, node: Node, prover: Prover): void {
+type ProverRequest =
+  Server.SetRequest<{ node: TIP.node, provers?: WP.prover[] }, null>;
+
+function sendProver( rq: ProverRequest, node: Node, prover: Prover ): void
+{
   if (node && prover) {
-    const request = computing ? TIP.killProvers : TIP.runProvers;
-    Server.send(request, { node, provers: [prover] });
+    Server.send(rq, { node, provers: [prover] });
+  }
+}
+
+function sendProverTime( node: Node, prover: Prover, timeout: number): void
+{
+  if (node && prover && timeout > 0) {
+    Server.send(TIP.runProvers, { node, timeout, provers: [prover] });
   }
 }
 
@@ -64,22 +74,28 @@ interface ProverActionProps {
   icon: string;
   kind: IconButtonKind;
   play?: boolean;
-  computing?: boolean;
+  clear?: boolean;
+  forward?: number;
+  running?: boolean;
 }
 
 function getProverActions(result : WP.result) : ProverActionProps {
   switch(result.verdict) {
     case '':
     case 'none':
-      return { icon: 'CIRC.INFO', kind: 'default', play: true };
+      return { icon: 'CIRC.INFO', kind: 'default', play: true, clear: false };
     case 'computing':
-      return { icon: 'EXECUTE', kind: 'default', computing: true };
+      return { icon: 'EXECUTE', kind: 'default', running: true, clear: false };
     case 'valid':
       return { icon: 'CIRC.CHECK', kind: 'positive' };
     case 'unknown':
     case 'stepout':
+      return { icon: 'CIRC.CROSS', kind: 'warning' };
     case 'timeout':
-      return { icon: 'CIRC.QUESTION', kind: 'warning' };
+      {
+        const forward = result.proverTime * 2;
+        return { icon: 'CIRC.QUESTION', kind: 'warning', forward };
+      }
     case 'failed':
     default:
       return { icon: 'WARNING', kind: 'negative' };
@@ -98,31 +114,40 @@ interface ProverItemProps {
 function ProverItem(props : ProverItemProps): JSX.Element
 {
   const { node, prover, inactive=false, result, selected, setSelected } = props;
-  const { descr='No Result' } = result;
-  const { icon, kind, computing=false, play=false } = getProverActions(result);
   const { name } = States.useSyncArrayElt(WP.ProverInfos, prover) ?? {};
+  const { descr='No Result' } = result;
+  const { icon: status, kind, running=false, play=false } =
+    getProverActions(result);
   const isSelected = prover === selected;
   const className = classes(
     'dome-color-frame wp-tactical-item',
     isSelected && 'selected',
   );
+  const enabled = !inactive && (play || running);
+  const icon =
+    inactive ? 'LOCK' : running ? 'MEDIA.PAUSE' : 'MEDIA.PLAY';
+  const title =
+    inactive ? undefined :
+    running ? 'Interrupt Prover' : 'Run Prover';
+  const action = running ? TIP.runProvers : TIP.killProvers;
   return (
     <Hbox
       className={className}
       onClick={() => setSelected(prover)}
     >
       <Item
-        icon={icon}
+        icon={status}
         kind={kind}
         className='wp-tactical-cell'
         label={name}
         title={inactive ? `${descr} (Inactive)` : descr}
       />
       <IconButton
-        icon={inactive ? 'LOCK' : computing ? 'MEDIA.PAUSE' : 'MEDIA.PLAY' }
-        kind={computing ? 'warning' : 'positive'}
-        enabled={!inactive && (play || computing)}
-        onClick={() => playProver(computing, node, prover)}
+        icon={icon}
+        title={title}
+        kind={running ? 'warning' : 'positive'}
+        enabled={enabled}
+        onClick={() => sendProver(action, node, prover)}
       />
     </Hbox>
   );
@@ -139,7 +164,7 @@ export function Provers(props: ProverSelection): JSX.Element {
   const { results=[] } =
     States.useRequest(TIP.getNodeInfos, node, { pending: null }) ?? {};
   const [ provers=[], setProvers ] = States.useSyncState(WP.provers);
-  const setItems = (items: string[]) => setProvers(items.map(WP.jProver));
+  const setItems = (prvs: string[]): void => setProvers(prvs.map(WP.jProver));
   const children = [...provers].sort().map((prover) => {
     const res = results.find(([p]) => p === prover);
     const result = res ? res[1] : WP.resultDefault;
@@ -155,12 +180,12 @@ export function Provers(props: ProverSelection): JSX.Element {
     );
   });
   const isInactive = (p: WP.prover): boolean => (
-    p != 'qed' && p != 'script' && !provers.some(q => p === q)
+    p !== 'qed' && p !== 'script' && !provers.some(q => p === q)
   );
   const inactive =
     results
       .filter(([p]) => isInactive(p))
-      .map(([p,r]) => {
+      .map(([p, r]) => {
         return (
           <ProverItem
             key={p}
@@ -347,16 +372,39 @@ function Parameter(props: ParameterProps): JSX.Element | null
 
 export function ConfigureProver(props: ProverSelection): JSX.Element {
   const { node, selected: prover, setSelected } = props;
-  const { descr } = States.useSyncArrayElt(WP.ProverInfos,prover) ?? {};
+  const { descr } = States.useSyncArrayElt(WP.ProverInfos, prover) ?? {};
   const result = States.useRequest(
     TIP.getResult, { node, prover }, { pending: null }
   ) ?? WP.resultDefault;
   const [timeout = 0, setTimeout] = States.useSyncState(WP.timeout);
-  const { icon, kind, computing=false, play=false } = getProverActions(result);
+  const { icon, kind, clear=true, running=false, play=false, forward=0 } =
+    getProverActions(result);
+  const [fwdTime, setFwdTime] = React.useState(0);
+  const [fwdArmed, setFwdArmed] = React.useState(false);
   const display = !!prover;
+  const action = running ? TIP.killProvers : TIP.runProvers;
+  const onPlay = (): void => sendProver(action, node, prover);
+  const onClear = (): void => sendProver(TIP.clearProvers, node, prover);
   const onClose = (): void => setSelected(undefined);
-  const onPlay = (): void => playProver(computing, node, prover);
-  const enabled = play || computing || result.proverTime < timeout;
+  const timedOut = forward > 0 && result.proverTime < timeout;
+  const enabled = play || running || timedOut;
+  const forwardTitle =
+    forward > 0 ? `Run Prover with ${forward}s` : 'Run Prover with Extra Time';
+  const onForward = (): void => {
+    setFwdTime(forward);
+    sendProverTime(node, prover, forward);
+  };
+  React.useEffect(() => {
+    if (fwdTime > 0) {
+      if (fwdArmed && !running) {
+        setFwdArmed(false);
+        setFwdTime(0);
+      }
+      if (!fwdArmed && running) {
+        setFwdArmed(true);
+      }
+    }
+  }, [running, fwdTime, fwdArmed] );
   return (
     <Hbox
       className="dome-xToolBar dome-color-frame wp-configure"
@@ -376,19 +424,39 @@ export function ConfigureProver(props: ProverSelection): JSX.Element {
       <Label label='Timeout' title='Prover Timeout (shared by all provers)'>
         <Spinner
           className="wp-config-field wp-config-spinner"
-          value={timeout}
-          vmin={0}
+          value={fwdTime > 0 ? fwdTime : timeout}
+          vmin={1}
           vmax={3600}
           vstep={1}
+          enabled={fwdTime===0}
           onChange={setTimeout}
         />
       </Label>
       <IconButton
-        icon={computing ? 'MEDIA.PAUSE' : 'MEDIA.PLAY'}
-        kind={computing ? 'warning' : 'positive'}
+        key='clear'
+        icon='MEDIA.PREV'
+        kind='negative'
+        enabled={clear}
+        title='Clear Prover Result'
+        onClick={onClear}
+      />
+      <IconButton
+        key='play'
+        icon={running ? 'MEDIA.PAUSE' : 'MEDIA.PLAY'}
+        kind={running ? 'warning' : 'positive'}
+        title={running ? 'Interrupt Prover' : 'Run Prover'}
         enabled={enabled}
         onClick={onPlay}
       />
+      <IconButton
+        key='forward'
+        icon='MEDIA.NEXT'
+        kind='positive'
+        enabled={forward > 0}
+        title={forwardTitle}
+        onClick={onForward}
+      />
+      <Space />
       <IconButton
         key='close'
         icon='CIRC.CLOSE'

@@ -116,17 +116,20 @@ Ivette.registerComponent({
 
 function ServerActivity(): JSX.Element {
   const rq = States.useRequest(WP.getScheduledTasks, null, { pending: null });
-  const active = rq ? rq.active > 0 : false;
-  const status = active ? 'active' : 'inactive';
+  const procs = rq ? rq.procs : 0;
+  const active = rq ? rq.active : 0;
+  const status = active > 0 ? 'active' : 'inactive';
   const done = rq ? rq.done : 0;
   const todo = rq ? rq.todo : 0;
   const total = done + todo;
-  const title = `${todo} / ${total}`;
+  const progress = done + active;
+  const objective = done + todo + procs;
+  const title = `${done} / ${todo} (${active} running, ${procs} procs)`;
   return (
     <Group display={total > 0} title={title}>
       <LED status={status} />
       <Label>WP</Label>
-      <Meter min={0} value={1+done} max={1 + done + total} />
+      <Meter min={0} value={progress} max={objective} />
       <Inset />
     </Group>
   );

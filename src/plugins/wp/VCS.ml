@@ -117,19 +117,14 @@ let is_prover = function
   | Qed | Why3 _ -> true
   | Tactical -> false
 
+let is_extern = function
+  | Qed | Tactical -> false
+  | Why3 _ -> true
+
 let is_auto = function
   | Qed -> true
   | Tactical -> false
-  | Why3 p ->
-    match p.prover_name with
-    | "Alt-Ergo" | "CVC4" | "Z3" -> true
-    | "Coq" -> false
-    | _ ->
-      let config = Why3Provers.config () in
-      try
-        let prover_config = Why3.Whyconf.get_prover_config config p in
-        not prover_config.interactive
-      with Not_found -> true
+  | Why3 p -> Why3Provers.is_auto p
 
 let eq_prover p q =
   match p,q with

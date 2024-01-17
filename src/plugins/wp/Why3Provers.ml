@@ -106,6 +106,16 @@ let name p = p.Why3.Whyconf.prover_name
 let version p = p.Why3.Whyconf.prover_version
 let altern p = p.Why3.Whyconf.prover_altern
 let is_mainstream p = p.Why3.Whyconf.prover_altern = ""
+let is_auto (p : t) =
+  match p.prover_name with
+  | "Coq" | "Isabelle" -> false
+  | "Alt-Ergo" | "Z3" | "CVC4" | "CVC5" | "Colibri2" -> true
+  | _ ->
+    let config = config () in
+    try
+      let prover_config = Why3.Whyconf.get_prover_config config p in
+      not prover_config.interactive
+    with Not_found -> true
 
 let provers () =
   Why3.Whyconf.Mprover.keys (Why3.Whyconf.get_provers (config ()))

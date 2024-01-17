@@ -431,4 +431,23 @@ export const killProvers: Server.SetRequest<
   null
   >= killProvers_internal;
 
+const clearProvers_internal: Server.SetRequest<
+  { node: node, provers?: prover[] },
+  null
+  > = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.clearProvers',
+  input: Json.jObject({
+           node: jNode,
+           provers: Json.jOption(Json.jArray(jProver)),
+         }),
+  output: Json.jNull,
+  signals: [],
+};
+/** Remove prover results from proof node */
+export const clearProvers: Server.SetRequest<
+  { node: node, provers?: prover[] },
+  null
+  >= clearProvers_internal;
+
 /* ------------------------------------- */

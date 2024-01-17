@@ -143,7 +143,9 @@ let get_version = function
 
 let iter_provers fn =
   List.iter
-    (fun p -> if Why3Provers.is_mainstream p then fn (VCS.Why3 p))
+    (fun p ->
+       if Why3Provers.is_auto p && Why3Provers.is_mainstream p then
+         fn (VCS.Why3 p))
   @@ Why3Provers.provers ()
 
 let _ : VCS.prover S.array =

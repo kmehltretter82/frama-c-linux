@@ -26,7 +26,10 @@ import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Cell, Item } from 'dome/controls/labels';
-import { ToolBar, Select, Filler, Button } from 'dome/frame/toolbars';
+import {
+  ToolBar, Select, Filler,
+  Button, ButtonGroup
+} from 'dome/frame/toolbars';
 import { Hfill, Vfill, Vbox, Overlay } from 'dome/layout/boxes';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
@@ -194,7 +197,7 @@ interface ProverConfig {
   setProvers: (prvs: WP.prover[]) => void;
 }
 
-export function popupProvers(config: ProverConfig) {
+export function popupProvers(config: ProverConfig): void {
   const { available, provers, setProvers } = config;
   Dome.popupMenu(
     available.map(({ prover: id, descr: label }) => {
@@ -271,13 +274,25 @@ export function TIPView(props: TIPProps): JSX.Element {
     pending <= 0 ? undefined :
     pending === 1 ? (index === 0 ? undefined : 0) :
     (index + 1 < pending ? index + 1 : 0);
+  const prevIndex =
+    pending <= 0 ? undefined :
+    pending === 1 ? (index === 0 ? undefined : 0) :
+    (index < 1 ? pending - 1 : index - 1);
   const nextAble = goal !== undefined && nextIndex !== undefined;
+  const prevAble = goal !== undefined && prevIndex !== undefined;
   const nextTitle =
     nextIndex !== undefined
     ? `Goto Next Pending Goal (#${nextIndex+1} / ${pending})`
     : `Goto Next Pending Goal (if any)`;
+  const prevTitle =
+    prevIndex !== undefined
+    ? `Goto Previous Pending Goal (#${prevIndex+1} / ${pending})`
+    : `Goto Previous Pending Goal (if any)`;
   const onNext = (): void => {
     Server.send(TIP.goToIndex, [goal, nextIndex]);
+  };
+  const onPrev = (): void => {
+    Server.send(TIP.goToIndex, [goal, prevIndex]);
   };
 
   // --- Configure button
@@ -304,15 +319,22 @@ export function TIPView(props: TIPProps): JSX.Element {
           enabled={deleteAble}
           title={deleteTitle}
           onClick={onDelete} />
-        <Button
-          icon='EJECT'
-          title='Close Proof Transformer (back to goals)'
-          onClick={onClose} />
-        <Button
-          icon='MEDIA.NEXT'
-          enabled={nextAble}
-          title={nextTitle}
-          onClick={onNext} />
+        <ButtonGroup>
+          <Button
+            icon='ANGLE.LEFT'
+            enabled={prevAble}
+            title={prevTitle}
+            onClick={onPrev} />
+          <Button
+            icon='EJECT'
+            title='Close Proof Transformer (back to goals)'
+            onClick={onClose} />
+          <Button
+            icon='ANGLE.RIGHT'
+            enabled={nextAble}
+            title={nextTitle}
+            onClick={onNext} />
+        </ButtonGroup>
         <Button
           icon='SETTINGS'
           title='Active Provers Selection'

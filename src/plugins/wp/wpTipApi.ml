@@ -600,4 +600,30 @@ let () =
       killProvers ?provers node
     end
 
+let clearProvers ?provers node =
+  let wpo = ProofEngine.goal node in
+  let clear p = if VCS.is_extern p then Wpo.set_result wpo p VCS.no_result in
+  begin
+    match provers with
+    | None -> List.iter (fun (prv,_) -> clear prv) @@ Wpo.get_results wpo ;
+    | Some prvs -> List.iter clear prvs
+  end ;
+  ProofEngine.validate ~computing:true (ProofEngine.tree node)
+
+let () =
+  let iClearProvers = R.signature ~output:(module D.Junit) () in
+  let get_node = R.param iClearProvers (module Node)
+      ~name:"node" ~descr:(Md.plain "Proof node") in
+  let get_provers = R.param_opt iClearProvers (module WpApi.Provers)
+      ~name:"provers"
+      ~descr:(Md.plain "Prover selection (default: all results") in
+  R.register_sig iClearProvers ~package ~kind:`SET
+    ~name:"clearProvers"
+    ~descr:(Md.plain "Remove prover results from proof node")
+    begin fun rq () ->
+      let node = get_node rq in
+      let provers = get_provers rq in
+      clearProvers ?provers node
+    end
+
 (* -------------------------------------------------------------------------- *)

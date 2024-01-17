@@ -41,4 +41,8 @@ val killProvers :
   ?provers:VCS.prover list ->
   ProofEngine.node -> unit
 
+val clearProvers :
+  ?provers:VCS.prover list ->
+  ProofEngine.node -> unit
+
 (* -------------------------------------------------------------------------- *)
