@@ -26,11 +26,14 @@ import * as Dome from 'dome';
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { Cell, Item } from 'dome/controls/labels';
+import { IconButton } from 'dome/controls/buttons';
 import {
   ToolBar, Select, Filler,
   Button, ButtonGroup
 } from 'dome/frame/toolbars';
 import { Hfill, Vfill, Vbox, Overlay } from 'dome/layout/boxes';
+import { writeClipboardText } from 'dome/system';
+
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as WP from 'frama-c/plugins/wp/api';
@@ -235,7 +238,8 @@ export function TIPView(props: TIPProps): JSX.Element {
   // --- provers
   const available = States.useSyncArrayData(WP.ProverInfos);
   const [ provers=[], setProvers ] = States.useSyncState(WP.provers);
-  // --- sidebar state
+  // --- sidebar & toolbar states
+  const [ copied, setCopied ] = React.useState(false);
   const [ tactic, setTactic ] = React.useState<Tactic>();
   const [ prover, setProver ] = React.useState<Prover>();
   // --- printer settings
@@ -252,6 +256,13 @@ export function TIPView(props: TIPProps): JSX.Element {
   const onSave = (): void => { Server.send(TIP.saveScript, goal); };
   const onReload = (): void => { Server.send(TIP.runScript, goal); };
   const onTrash = (): void => { Server.send(TIP.clearProofScript, goal); };
+  const onCopied = Dome.useDebounced(() => setCopied(false), 1000);
+  const copyTitle = copied ? 'Copied' : `Script: ${script} (Click to copy)`;
+  const onCopy = (): void => {
+    if (script) writeClipboardText(script);
+    setCopied(true);
+    onCopied();
+  };
 
   // --- derived states
   const locked = nodeTactic !== undefined;
@@ -321,6 +332,11 @@ export function TIPView(props: TIPProps): JSX.Element {
           label={`${index+1}/${pending}`} title='Pending proof nodes'/>
         <Item {...getStatus(infos)}/>
         <Filler/>
+        <IconButton
+          icon={copied ? 'DUPLICATE' : 'FOLDER'}
+          visible={script !== undefined}
+          title={copyTitle}
+          onClick={onCopy} />
         <ButtonGroup>
           <Button
             icon='RELOAD'
