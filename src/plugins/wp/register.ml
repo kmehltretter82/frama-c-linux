@@ -389,7 +389,7 @@ let do_wpo_success ~shell ~cache goal success =
       Wp_parameters.feedback ~ontty:`Silent
         "[Generated] Goal %s (%a)" (Wpo.get_gid goal) VCS.pp_prover prover
   else
-    let gui = Frama_c_very_first.Gui_init.is_gui in
+    let gui = Wp_parameters.is_interactive () in
     let smoke = Wpo.is_smoke_test goal in
     let cstats = ProofEngine.consolidated ~computing:false goal in
     let success = Wpo.is_passed goal in
@@ -874,7 +874,7 @@ let () = Cmdline.run_after_setting_files
 let () = Cmdline.run_after_configuring_stage Why3Provers.configure
 
 let do_prover_detect () =
-  if not Fc_config.is_gui && Wp_parameters.Detect.get () then
+  if Wp_parameters.Detect.get () && not @@ Wp_parameters.is_interactive () then
     let provers = Why3Provers.provers () in
     if provers = [] then
       Wp_parameters.result "No Why3 provers detected."

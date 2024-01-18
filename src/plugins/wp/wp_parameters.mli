@@ -24,6 +24,7 @@ include Plugin.S
 
 val reset : unit -> unit
 val hypothesis : 'a Log.pretty_printer
+val is_interactive : unit -> bool
 
 (** {2 Function Selection} *)
 
