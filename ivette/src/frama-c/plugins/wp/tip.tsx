@@ -335,7 +335,7 @@ export function TIPView(props: TIPProps): JSX.Element {
         <Item {...getStatus(infos)}/>
         <Filler/>
         <IconButton
-          icon={copied ? 'DUPLICATE' : 'FOLDER'}
+          icon={copied ? 'DUPLICATE' : (saved ? 'FOLDER' : 'FOLDER.OPEN')}
           visible={script !== undefined}
           title={copyTitle}
           onClick={onCopy} />

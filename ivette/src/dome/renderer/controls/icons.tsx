@@ -122,15 +122,14 @@ export interface IconProps extends SVGprops {
  */
 export function Icon(props: IconProps): JSX.Element {
   const {
-    id, title, onClick, fill, kind,
+    id, title, onClick, fill, kind='default',
     size, className, offset, style,
     visible = true, display = true,
   } = props;
   const divClass = classes(
-    'dome-xIcon',
+    'dome-xIcon', `dome-xIcon-${kind}`,
     !visible && 'dome-control-hidden',
     !display && 'dome-control-erased',
-    kind && kind!=='default' && ('dome-xIcon-' + kind),
     className
   );
   const divStyle = styles(fill && { fill }, style);

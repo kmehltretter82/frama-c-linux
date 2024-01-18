@@ -21,12 +21,38 @@
 /* ************************************************************************ */
 
 import React from 'react';
+import { Icon } from 'dome/controls/icons';
 import { IconKind, Cell, Descr } from 'dome/controls/labels';
 import { Filter } from 'dome/table/models';
 import { Table, Column } from 'dome/table/views';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as WP from 'frama-c/plugins/wp/api';
+
+/* -------------------------------------------------------------------------- */
+/* --- Table Cells                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+interface IconProps {
+  icon?: string;
+  title?: string;
+}
+
+function renderIcon(s : IconProps): JSX.Element {
+  const { icon=' ', title } = s;
+  return <Icon id={icon} title={title} />;
+}
+
+interface CellProps {
+  icon: string;
+  label: string;
+  kind: IconKind;
+  title: string;
+}
+
+function renderCell(s : CellProps): JSX.Element {
+  return <Cell {...s} />;
+}
 
 /* -------------------------------------------------------------------------- */
 /* --- Scope Column                                                       --- */
@@ -40,23 +66,40 @@ function getScope(g : WP.goalsData): string {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Script Column                                                      --- */
+/* -------------------------------------------------------------------------- */
+
+/* eslint-disable max-len */
+const savedScript: IconProps = { icon: 'FOLDER', title: 'Saved Script' };
+const updatedScript: IconProps = { icon: 'FOLDER.OPEN', title: 'Updated Script' };
+const proofEdit: IconProps = { icon: 'CODE', title: 'Proof Under Construction' };
+const proofNone: IconProps = { title: 'No Proof Script' };
+/* eslint-enable max-len */
+
+export function getScript(g : WP.goalsData): IconProps {
+  const { script, saved, proof } = g;
+  return (
+    script ? (saved ? savedScript : updatedScript)
+    : (proof ? proofEdit : proofNone)
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Status Column                                                      --- */
 /* -------------------------------------------------------------------------- */
 
-interface IconStatus {
+const noResult : CellProps =
+  { icon: 'MINUS', label: 'No Result', kind: 'disabled', title: 'No Result' };
+
+interface BaseProps {
   icon: string;
   label: string;
   kind: IconKind;
   title: string;
 }
 
-interface Status extends IconStatus { label: string }
-
-const noResult : IconStatus =
-  { icon: 'MINUS', label: 'No Result', kind: 'disabled', title: 'No Result' };
-
 /* eslint-disable max-len */
-const baseStatus : { [key:string]: IconStatus } = {
+const baseStatus : { [key:string]: BaseProps } = {
   'VALID': { icon: 'CHECK', label: 'Valid', kind: 'positive', title: 'Valid Goal' },
   'PASSED': { icon: 'CHECK', label: 'Passed', kind: 'positive', title: 'Passed Test' },
   'DOOMED': { icon: 'CROSS', label: 'Doomed', kind: 'negative', title: 'Doomed Test' },
@@ -68,13 +111,9 @@ const baseStatus : { [key:string]: IconStatus } = {
 };
 /* eslint-enable max-len */
 
-export function getStatus(g : WP.goalsData): Status {
+export function getStatus(g : WP.goalsData): CellProps {
   const { label, ...base } = baseStatus[g.status] ?? noResult;
   return { ...base, label: label + g.stats.summary };
-}
-
-function renderStatus(s : Status): JSX.Element {
-  return <Cell {...s} />;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -165,9 +204,12 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
               getter={getScope} />
       <Column id='name' label='Property'
               width={150} />
+      <Column id='script' icon='FILE'
+              fixed width={30}
+              getter={getScript} render={renderIcon} />
       <Column id='status' label='Status'
               fill={true}
-              getter={getStatus} render={renderStatus} />
+              getter={getStatus} render={renderCell} />
     </Table>
   );
 }

@@ -379,6 +379,8 @@ export interface goalsData {
   status: status;
   /** Prover Stats Summary */
   stats: stats;
+  /** Proof Tree */
+  proof: boolean;
   /** Script File */
   script?: string;
   /** Saved Script */
@@ -400,6 +402,7 @@ export const jGoalsData: Json.Decoder<goalsData> =
     passed: Json.jBoolean,
     status: jStatus,
     stats: jStats,
+    proof: Json.jBoolean,
     script: Json.jOption(Json.jString),
     saved: Json.jBoolean,
   });
@@ -410,7 +413,7 @@ export const byGoalsData: Compare.Order<goalsData> =
     <{ wpo: goal, marker: marker, scope?: decl, property: marker,
        fct?: string, bhv?: string, thy?: string, name: string,
        smoke: boolean, passed: boolean, status: status, stats: stats,
-       script?: string, saved: boolean }>({
+       proof: boolean, script?: string, saved: boolean }>({
     wpo: byGoal,
     marker: byMarker,
     scope: Compare.defined(byDecl),
@@ -423,6 +426,7 @@ export const byGoalsData: Compare.Order<goalsData> =
     passed: Compare.boolean,
     status: byStatus,
     stats: byStats,
+    proof: Compare.boolean,
     script: Compare.defined(Compare.string),
     saved: Compare.boolean,
   });
@@ -479,7 +483,7 @@ export const goalsDataDefault: goalsData =
   { wpo: goalDefault, marker: markerDefault, scope: undefined,
     property: markerDefault, fct: undefined, bhv: undefined, thy: undefined,
     name: '', smoke: false, passed: false, status: statusDefault,
-    stats: statsDefault, script: undefined, saved: false };
+    stats: statsDefault, proof: false, script: undefined, saved: false };
 
 /** Proof Server Activity */
 export const serverActivity: Server.Signal = {
