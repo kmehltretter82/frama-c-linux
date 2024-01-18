@@ -559,7 +559,7 @@ function ToolbarView(
   const settingViews = settings && `${settings}.views`;
 
   return (
-    <Hbox className='views-list'>
+    <Toolbar.ToolBar className='views-list'>
       <Icon
         id="DISPLAY"
         className="views-icon"
@@ -573,7 +573,7 @@ function ToolbarView(
         setShape={setShape}
         views={views}
       />
-    </Hbox>
+    </Toolbar.ToolBar>
   );
 }
 
@@ -670,13 +670,11 @@ export function LabView(props: LabViewProps): JSX.Element {
   // Make view
   return (
     <Vfill>
-      <Toolbar.ToolBar>
-        <ToolbarView
-          settings={settingPanel}
-          shape={shape}
-          setShape={setShape}
-          />
-      </Toolbar.ToolBar>
+      <ToolbarView
+        settings={settingPanel}
+        shape={shape}
+        setShape={setShape}
+        />
       <RSplit margin={120} settings={settingSplit} unfold={customize}>
         <Grids.GridLayout
           dnd={dnd}

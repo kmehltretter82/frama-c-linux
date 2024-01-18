@@ -105,6 +105,11 @@
 /* -------------------------------------------------------------------------- */
 /* --- Temporary styling selection view on toolbar                        --- */
 /* -------------------------------------------------------------------------- */
+.views-list {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
 .views-list,
 .views-list .dome-xSideBarSection {
     width: 100%;
