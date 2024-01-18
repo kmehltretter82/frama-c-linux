@@ -130,7 +130,9 @@ function Node(props: NodeProps): JSX.Element
   const {
     title=debug, child='Script', header=debug,
     proved=false, pending=0, size=0
-  } = States.useRequest( TIP.getNodeInfos, node, { pending: null } ) ?? {};
+  } = States.useRequest(
+    TIP.getNodeInfos, node, { pending: null, onError: null }
+  ) ?? {};
   const elt = cellRef.current;
   React.useEffect(() => {
     if (current && elt) elt.scrollIntoView();

@@ -92,7 +92,7 @@ export function useRequest<Kd extends Server.RqKind, In, Out>(
         const r = await Server.send(rq, params);
         updateResponse(r);
       } catch (error) {
-        if (options.onError !== undefined) {
+        if (options.onError === undefined) {
           D.error(`Fail in useRequest '${rq.name}'. ${error}`);
         }
         updateResponse(options.onError);

@@ -162,8 +162,9 @@ export interface ProverSelection {
 
 export function Provers(props: ProverSelection): JSX.Element {
   const { node, selected, setSelected } = props;
-  const { results=[] } =
-    States.useRequest(TIP.getNodeInfos, node, { pending: null }) ?? {};
+  const { results=[] } = States.useRequest(
+    TIP.getNodeInfos, node, { pending: null, onError: null }
+  ) ?? {};
   const [ provers=[], setProvers ] = States.useSyncState(WP.provers);
   const setItems = (prvs: string[]): void => setProvers(prvs.map(WP.jProver));
   const children = [...provers].sort().map((prover) => {
@@ -230,7 +231,12 @@ function TacticItem(props: TacticItemProps): JSX.Element | null {
   const ready = !locked && status === 'Applicable';
   const isSelected = selected === tactic;
   const onSelect = (): void => setSelected(tactic);
-  const onPlay = (): void => { if (ready) applyTactic(tactic); };
+  const onPlay = (): void => {
+    if (ready) {
+      applyTactic(tactic);
+      setSelected(undefined);
+    }
+  };
   const className = classes(
     'dome-color-frame wp-tactical-item',
     isSelected && 'selected',
@@ -375,7 +381,7 @@ export function ConfigureProver(props: ProverSelection): JSX.Element {
   const { node, selected: prover, setSelected } = props;
   const { descr } = States.useSyncArrayElt(WP.ProverInfos, prover) ?? {};
   const result = States.useRequest(
-    TIP.getResult, { node, prover }, { pending: null }
+    TIP.getResult, { node, prover }, { pending: null, onError: null }
   ) ?? WP.resultDefault;
   const [process = 1, setProcess] = States.useSyncState(WP.process);
   const [timeout = 1, setTimeout] = States.useSyncState(WP.timeout);
@@ -524,7 +530,7 @@ function getStatusDescription(tactical: TAC.tacticalData): StatusDescr {
 export function ConfigureTactic(props: TacticSelection): JSX.Element {
   const { node, locked, selected: tactic, setSelected } = props;
   const tactical = useTactic(tactic);
-  States.useRequest(TAC.configureTactics, node);
+  States.useRequest(TAC.configureTactics, node, { onError: null });
   const { status, label, title, params } = tactical;
   const isReady = !locked && status==='Applicable';
   const display = !!tactic && (locked || status !== 'NotApplicable');

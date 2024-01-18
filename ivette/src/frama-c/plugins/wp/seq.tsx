@@ -170,7 +170,12 @@ export function GoalView(props: GoalViewProps): JSX.Element {
     offline: undefined,
     onError: '',
   }) ?? null;
-  const { part, term } = States.useRequest(TIP.getSelection, node) ?? {};
+  const { part, term } =
+    States.useRequest(TIP.getSelection, node, {
+      pending: null,
+      offline: {},
+      onError: {},
+    }) ?? {};
   const proxy = React.useMemo(() => new TextProxy(), []);
   const sequent = React.useMemo(() => new Sequent(jtext), [jtext]);
   React.useEffect(() => proxy.updateContents(sequent.text), [proxy, sequent]);
