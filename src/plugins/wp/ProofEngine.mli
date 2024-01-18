@@ -101,6 +101,8 @@ val clear_tree : tree -> unit
 val clear_node : tree -> node -> unit
 val clear_node_tactic : tree -> node -> unit
 val clear_parent_tactic : tree -> node -> unit
+val add_clear_hook : (unit -> unit) -> unit
+val add_remove_hook : (node -> unit) -> unit
 
 val cancel_parent_tactic : tree -> unit
 val cancel_current_node : tree -> unit

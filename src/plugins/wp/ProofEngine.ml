@@ -113,6 +113,12 @@ let set_saved t s = t.saved <- s
 (* --- Removal                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
+let clear_hooks = ref []
+let remove_hooks = ref []
+
+let add_clear_hook fn = clear_hooks := !clear_hooks @ [fn]
+let add_remove_hook fn = remove_hooks := !remove_hooks @ [fn]
+
 let rec revert_tactic t n =
   n.strategy <- None ;
   match n.script with
@@ -125,15 +131,13 @@ and remove_node t n =
     Wpo.remove n.goal
   else
     Wpo.clear_results n.goal ;
-  begin
-    match t.head with
-    | Some n0 when n0 == n -> t.head <- None
-    | _ -> ()
-  end ;
+  List.iter (fun f -> f n) !remove_hooks ;
+  Option.iter (fun n0 -> if n0 == n then t.head <- None) t.head ;
   revert_tactic t n
 
 let clear_tree t =
   begin
+    List.iter (fun f -> f ()) !clear_hooks ;
     Wpo.clear_results t.main ;
     Option.iter (remove_node t) t.root ;
     t.gid <- 0 ;

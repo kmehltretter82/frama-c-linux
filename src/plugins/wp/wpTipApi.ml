@@ -59,6 +59,12 @@ module Node = D.Index
       let descr = Md.plain "Proof Node index"
     end)
 
+let () = Server.Main.once
+    begin fun () ->
+      ProofEngine.add_clear_hook Node.clear ;
+      ProofEngine.add_remove_hook Node.remove ;
+    end
+
 module Tactic : D.S with type t = Tactical.t =
 struct
   type t = Tactical.t
