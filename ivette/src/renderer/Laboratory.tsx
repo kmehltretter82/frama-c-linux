@@ -108,23 +108,40 @@ function assignValueToQuarterStr(quarter: string, value: string)
   };
 }
 
-function assignCompToQuarter(quarter: string, compId: string): void {
+function getQuarterComponents(quarter: string): (string | undefined)[] {
+  const result = [];
+
   const labViewState = globalLabViewState.getValue();
-  const layout = assignValueToQuarterStr(quarter, compId);
-  if (layout.A === "") layout.A = labViewState.A ?? "";
-  if (layout.B === "") layout.B = labViewState.B ?? "";
-  if (layout.C === "") layout.C = labViewState.C ?? "";
-  if (layout.D === "") layout.D = labViewState.D ?? "";
+  if ("A" === quarter) result.push(labViewState.A);
+  if ("B" === quarter) result.push(labViewState.B);
+  if ("C" === quarter) result.push(labViewState.C);
+  if ("D" === quarter) result.push(labViewState.D);
 
-  // TODO : replace with Tabs
-  applyLayout({
-    id: "custom",
-    label: "Custom Layout",
-    layout: layout
-   });
+  if ("AB" === quarter) {
+    result.push(labViewState.A);
+    result.push(labViewState.B);
+  }
+  if ("AC" === quarter) {
+    result.push(labViewState.A);
+    result.push(labViewState.C);
+  }
+  if ("BD" === quarter) {
+    result.push(labViewState.B);
+    result.push(labViewState.D);
+  }
+  if ("CD" === quarter) {
+    result.push(labViewState.C);
+    result.push(labViewState.D);
+  }
 
-   const comp = COMPONENT.getElement(compId);
-   comp && deleteFromDockedComponents(comp);
+  if ("ABCD" === quarter) {
+    result.push(labViewState.A);
+    result.push(labViewState.B);
+    result.push(labViewState.C);
+    result.push(labViewState.D);
+  }
+
+  return result;
 }
 
 function openPanelLayoutSelector(comp: Ivette.ComponentProps,
@@ -199,10 +216,44 @@ function deleteFromLoadedComponents(compId: string): void {
   }, true);
 }
 
+function addCompFromQuarterToDock(quarter: string): void {
+  const replacedCompIds = getQuarterComponents(quarter);
+  replacedCompIds.forEach(compId => {
+    if(compId !== undefined) {
+      const replacedComp = COMPONENT.getElement(compId);
+      if(replacedComp !== undefined) {
+       addToDockedComponents(replacedComp);
+      }
+    }
+  });
+}
+
+function assignCompToQuarter(quarter: string, compId: string): void {
+  const labViewState = globalLabViewState.getValue();
+  addCompFromQuarterToDock(quarter);
+
+  const layout = assignValueToQuarterStr(quarter, compId);
+  if (layout.A === "") layout.A = labViewState.A ?? "";
+  if (layout.B === "") layout.B = labViewState.B ?? "";
+  if (layout.C === "") layout.C = labViewState.C ?? "";
+  if (layout.D === "") layout.D = labViewState.D ?? "";
+
+  // TODO : replace with Tabs
+  applyLayout({
+    id: "custom",
+    label: "Custom Layout",
+    layout: layout
+   });
+
+   const comp = COMPONENT.getElement(compId);
+   comp && deleteFromDockedComponents(comp);
+}
 
 function applyLayout(view : Ivette.ViewLayoutProps): void {
   const { layout } = view;
   let A, B, C, D;
+
+  addCompFromQuarterToDock("ABCD");
 
   if("A" in layout) A = layout.A;
   if("B" in layout) B = layout.B;
@@ -233,11 +284,15 @@ function applyLayout(view : Ivette.ViewLayoutProps): void {
     D = layout.ABCD;
   }
 
-  const state = globalLabViewState.getValue();
+  let state = globalLabViewState.getValue();
   const components = state.components;
   Object.values(layout).forEach(compId => {
     components.add(compId);
+    const component = COMPONENT.getElement(compId);
+    component && deleteFromDockedComponents(component);
   });
+
+  state = globalLabViewState.getValue();
 
   globalLabViewState.setValue({
     ...state,
