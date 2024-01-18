@@ -124,9 +124,12 @@ let rec revert_tactic t n =
   match n.script with
   | Opened | Script _ -> ()
   | Tactic(_,children) ->
-    n.script <- Opened ; iter_children (remove_node t) children
+    t.saved <- false ;
+    n.script <- Opened ;
+    iter_children (remove_node t) children
 
 and remove_node t n =
+  t.saved <- false ;
   if Wpo.is_tactic n.goal then
     Wpo.remove n.goal
   else
@@ -167,7 +170,7 @@ let clear_goal w =
 (* -------------------------------------------------------------------------- *)
 
 let rec walk f node =
-  if not (Wpo.is_valid node.goal) then
+  if not (Wpo.is_locally_valid node.goal) then
     match node.script with
     | Tactic (_,children) -> iter_children (walk f) children
     | Opened | Script _ -> f node
@@ -188,51 +191,58 @@ let rec depth node =
 (* --- Consolidating                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-let proved n = Wpo.is_valid n.goal
-
 let pending n =
   let k = ref 0 in
   walk (fun _ -> incr k) n ; !k
 
-let is_prover_result (p,_) = p <> VCS.Tactical
+let locally_proved n = Wpo.is_locally_valid n.goal
 
-let prover_stats ~computing ~smoke goal =
+let fully_proved n =
+  let exception HasPending in
+  try walk (fun _ -> raise HasPending) n ; true
+  with HasPending -> false
+
+let is_prover (p,_) = VCS.is_prover p
+
+let prover_stats ~smoke goal =
   Stats.results ~smoke @@
-  List.filter is_prover_result @@
-  Wpo.get_results ~computing goal
+  List.filter is_prover @@
+  Wpo.get_results goal
 
-let rec consolidate ~computing ~smoke n =
+let rec consolidate ~smoke n =
   let s =
-    if Wpo.is_valid n.goal then
-      prover_stats ~computing ~smoke n.goal
+    if Wpo.is_locally_valid n.goal then
+      prover_stats ~smoke n.goal
     else
       match n.script with
-      | Opened | Script _ -> prover_stats ~computing ~smoke n.goal
+      | Opened | Script _ -> prover_stats ~smoke n.goal
       | Tactic(_,children) ->
         let qed = Wpo.qed_time n.goal in
         let results =
-          List.map (fun (_,n) -> consolidate ~computing ~smoke n) children in
+          List.map (fun (_,n) -> consolidate ~smoke n) children in
         Stats.tactical ~qed results
   in n.stats <- s ; s
 
-let validate ~computing tree =
+let validate tree =
   match tree.root with
   | None -> ()
   | Some root ->
     let main = tree.main in
-    if not (Wpo.is_valid main) then
+    if Wpo.is_locally_valid main then
+      Wpo.set_result tree.main Tactical VCS.no_result
+    else
       let smoke = Wpo.is_smoke_test main in
-      let stats = consolidate ~computing ~smoke root in
+      let stats = consolidate ~smoke root in
       Wpo.set_result tree.main Tactical (Stats.script stats)
 
-let consolidated ~computing wpo =
+let consolidated wpo =
   let smoke = Wpo.is_smoke_test wpo in
   try
     if smoke || not (PROOFS.mem wpo) then raise Not_found ;
     match PROOFS.get wpo with
     | { root = Some { stats ; script = Tactic _ } } -> stats
     | _ -> raise Not_found
-  with Not_found -> prover_stats ~computing ~smoke wpo
+  with Not_found -> prover_stats ~smoke wpo
 
 (* -------------------------------------------------------------------------- *)
 (* --- Accessors                                                          --- *)
@@ -299,7 +309,7 @@ type status = [
 let status t : status =
   match t.root with
   | None ->
-    if Wpo.is_valid t.main
+    if Wpo.is_locally_valid t.main
     then if Wpo.is_smoke_test t.main then `Invalid else `Proved
     else if Wpo.is_smoke_test t.main then `Passed else `Unproved
   | Some root ->
@@ -308,6 +318,9 @@ let status t : status =
       if Wpo.is_smoke_test t.main then `Passed else `Unproved
     | Tactic _ ->
       let n = pending root in
+      if n = 0 then
+        if Wpo.is_smoke_test t.main then `Invalid else `Proved
+      else
       if Wpo.is_smoke_test t.main then `StillResist n else `Pending n
 
 (* -------------------------------------------------------------------------- *)
@@ -527,6 +540,9 @@ let has_tactics tree =
     | Script s -> List.exists ProofScript.is_tactic s
 
 let has_script tree = has_tactics tree || has_result tree
+let has_proof wpo =
+  try has_script @@ PROOFS.get wpo
+  with Not_found -> false
 
 let get_hint node = node.strategy
 let set_hint node strategy = node.strategy <- Some strategy

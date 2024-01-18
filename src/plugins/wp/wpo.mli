@@ -151,7 +151,7 @@ val get_result : t -> prover -> result
 
 (** Return prover results (without any respect to smoke tests).
     Unless [~computing:true] only finalized verdicts are provided. *)
-val get_results : ?computing:bool -> t -> (prover * result) list
+val get_results : t -> (prover * result) list
 
 (** Consolidated wrt to associated property and smoke test. *)
 val get_proof : t -> [`Passed|`Failed|`Unknown] * Property.t
@@ -162,8 +162,11 @@ val get_target : t -> Property.t
 val is_trivial : t -> bool
 (** Currently trivial sequent (no forced simplification) *)
 
-val is_valid : t -> bool
-(** Checks for some prover with valid verdict (no forced simplification) *)
+val is_fully_valid : t -> bool
+(** Checks for some prover or script with valid verdict (no forced qed) *)
+
+val is_locally_valid : t -> bool
+(** Checks for some prover (no tactic) with valid verdict (no forced qed) *)
 
 val all_not_valid : t -> bool
 (** Checks for all provers to give a non-valid, computed verdict *)

@@ -128,7 +128,7 @@ class behavior
         list#reload ;
         let to_prove g =
           not (Wpo.is_smoke_test g) &&
-          not (Wpo.is_valid g || Wpo.reduce g) in
+          not (Wpo.is_fully_valid g || Wpo.reduce g) in
         let has_proof g =
           match ProofEngine.get g with
           | `None -> false

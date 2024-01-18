@@ -121,6 +121,7 @@ val is_auto : prover -> bool
 val is_prover : prover -> bool
 val is_extern : prover -> bool
 val is_result : verdict -> bool
+val is_none : result -> bool
 val is_verdict : result -> bool
 val is_valid: result -> bool
 val is_trivial: result -> bool

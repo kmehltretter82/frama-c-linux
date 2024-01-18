@@ -76,7 +76,7 @@ let do_print_current fmt tree =
   | `Internal node | `Leaf(_,node) -> do_print_parents fmt node
 
 let do_print_goal_status fmt (g : Wpo.t) =
-  if not (Wpo.is_valid g || Wpo.is_smoke_test g) then
+  if not (Wpo.is_fully_valid g || Wpo.is_smoke_test g) then
     begin
       do_print_index fmt g.po_idx ;
       Wpo.pp_goal fmt g ;
@@ -332,7 +332,7 @@ let do_report_json () =
     let json = List.rev @@
       GOALS.fold
         (fun g json ->
-           let s = ProofEngine.consolidated ~computing:false g in
+           let s = ProofEngine.consolidated g in
            let js = stats_to_json g s in
            js :: json
         ) !session [] in
@@ -391,7 +391,7 @@ let do_wpo_success ~shell ~cache goal success =
   else
     let gui = Wp_parameters.is_interactive () in
     let smoke = Wpo.is_smoke_test goal in
-    let cstats = ProofEngine.consolidated ~computing:false goal in
+    let cstats = ProofEngine.consolidated goal in
     let success = Wpo.is_passed goal in
     begin
       if smoke then
@@ -651,7 +651,7 @@ let do_collect_session goals =
           removed := (goal, file) :: !removed
       | Scripts { complete ; scripts } ->
         add proofs @@ Stats.results ~smoke results ;
-        add tactic @@ ProofEngine.consolidated ~computing:false goal ;
+        add tactic @@ ProofEngine.consolidated goal ;
         let json = ProofScript.encode scripts in
         let accu = if complete then updated else incomplete in
         accu := (goal, file, json) :: !accu ;

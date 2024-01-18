@@ -457,13 +457,8 @@ struct
       w.dps <- Pmap.add p r w.dps
     end
 
-  let list ?(computing=false) w =
-    List.filter
-      (fun (_,r) ->
-         match r.verdict with
-         | Computing _ -> computing
-         | _ -> VCS.is_verdict r
-      ) @@ Pmap.bindings w.dps
+  let list w =
+    List.filter (fun (_,r) -> not @@ VCS.is_none r) @@ Pmap.bindings w.dps
 
 end
 
@@ -713,9 +708,9 @@ let get_result g p : VCS.result =
   try Results.get (WPOmap.find g system.results) p
   with Not_found -> VCS.no_result
 
-let get_results ?computing g =
+let get_results g =
   let system = SYSTEM.get () in
-  try Results.list ?computing (WPOmap.find g system.results)
+  try Results.list @@ WPOmap.find g system.results
   with Not_found -> []
 
 let is_trivial g =
@@ -744,23 +739,28 @@ let compute g =
   let seq = WpContext.on_context ctxt (GOAL.compute_descr ~pid) goal in
   if not qed then modified g ; seq
 
-let is_valid g =
-  is_trivial g || List.exists (fun (_,r) -> VCS.is_valid r) (get_results g)
+let is_fully_valid g =
+  is_trivial g ||
+  List.exists (fun (_,r) -> VCS.is_valid r) @@ get_results g
+
+let is_locally_valid g =
+  is_trivial g ||
+  List.exists (fun (p,r) -> VCS.is_prover p && VCS.is_valid r) @@ get_results g
 
 let all_not_valid g =
   not (is_trivial g) &&
-  List.for_all (fun (_,r) -> VCS.is_not_valid r) (get_results g)
+  List.for_all (fun (_,r) -> VCS.is_not_valid r) @@ get_results g
 
 let is_passed g =
   if is_smoke_test g then
     all_not_valid g
   else
-    is_valid g
+    is_fully_valid g
 
 let has_unknown g =
-  not (is_valid g) &&
+  not (is_fully_valid g) &&
   List.exists
-    (fun (_,r) -> VCS.is_verdict r && not (VCS.is_valid r))
+    (fun (p,r) -> VCS.is_prover p && VCS.is_verdict r && not (VCS.is_valid r))
     (get_results g)
 
 (* -------------------------------------------------------------------------- *)

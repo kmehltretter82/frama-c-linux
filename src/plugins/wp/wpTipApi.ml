@@ -111,12 +111,12 @@ let () =
     ~signals:[proofStatus]
     begin fun rq node ->
       set_title rq (ProofEngine.title node);
-      set_proved rq (ProofEngine.proved node);
+      set_proved rq (ProofEngine.fully_proved node);
       set_pending rq (ProofEngine.pending node);
       let s = ProofEngine.stats node in
       set_size rq (Stats.subgoals @@ s);
       set_stats rq (Pretty_utils.to_string Stats.pretty s);
-      set_results rq (Wpo.get_results ~computing:true (ProofEngine.goal node));
+      set_results rq (Wpo.get_results @@ ProofEngine.goal node);
       set_tactic rq (ProofEngine.tactic node);
       set_header rq (ProofEngine.tactic_label node);
       set_child rq (ProofEngine.child_label node);
@@ -205,7 +205,6 @@ let () = R.register ~package ~kind:`SET ~name:"goForward"
     begin fun goal ->
       let tree = ProofEngine.proof ~main:goal in
       ProofEngine.forward tree ;
-      R.emit proofStatus ;
     end
 
 let () = R.register ~package ~kind:`SET ~name:"goToRoot"
@@ -214,7 +213,6 @@ let () = R.register ~package ~kind:`SET ~name:"goToRoot"
     begin fun goal ->
       let tree = ProofEngine.proof ~main:goal in
       ProofEngine.goto tree `Main ;
-      R.emit proofStatus ;
     end
 
 let () = R.register ~package ~kind:`SET ~name:"goToIndex"
@@ -223,7 +221,6 @@ let () = R.register ~package ~kind:`SET ~name:"goToIndex"
     begin fun (goal,index) ->
       let tree = ProofEngine.proof ~main:goal in
       ProofEngine.goto tree (`Leaf index) ;
-      R.emit proofStatus ;
     end
 
 let () = R.register ~package ~kind:`SET ~name:"goToNode"
@@ -232,7 +229,6 @@ let () = R.register ~package ~kind:`SET ~name:"goToNode"
     begin fun node ->
       let tree = ProofEngine.tree node in
       ProofEngine.goto tree (`Node node) ;
-      R.emit proofStatus ;
     end
 
 let () = R.register ~package ~kind:`SET ~name:"clearNode"
@@ -241,9 +237,6 @@ let () = R.register ~package ~kind:`SET ~name:"clearNode"
     begin fun node ->
       let tree = ProofEngine.tree node in
       ProofEngine.clear_node tree node ;
-      ProofEngine.validate ~computing:true tree ;
-      S.update WpApi.goals @@ ProofEngine.main tree ;
-      R.emit proofStatus ;
     end
 
 let () = R.register ~package ~kind:`SET ~name:"clearNodeTactic"
@@ -252,9 +245,6 @@ let () = R.register ~package ~kind:`SET ~name:"clearNodeTactic"
     begin fun node ->
       let tree = ProofEngine.tree node in
       ProofEngine.clear_node_tactic tree node ;
-      ProofEngine.validate ~computing:true tree ;
-      S.update WpApi.goals @@ ProofEngine.main tree ;
-      R.emit proofStatus ;
     end
 
 let () = R.register ~package ~kind:`SET ~name:"clearParentTactic"
@@ -263,9 +253,6 @@ let () = R.register ~package ~kind:`SET ~name:"clearParentTactic"
     begin fun node ->
       let tree = ProofEngine.tree node in
       ProofEngine.clear_parent_tactic tree node ;
-      ProofEngine.validate ~computing:true tree ;
-      S.update WpApi.goals @@ ProofEngine.main tree ;
-      R.emit proofStatus ;
     end
 
 let () = R.register ~package ~kind:`SET ~name:"clearGoal"
@@ -274,9 +261,6 @@ let () = R.register ~package ~kind:`SET ~name:"clearGoal"
     begin fun goal ->
       let tree = ProofEngine.proof ~main:goal in
       ProofEngine.clear_tree tree ;
-      ProofEngine.validate ~computing:true tree ;
-      S.update WpApi.goals @@ ProofEngine.main tree ;
-      R.emit proofStatus ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -533,7 +517,6 @@ let runProvers ?timeout ?provers node =
     let cfg = VCS.current () in
     { cfg with timeout = Some (float timeout) } in
   if not @@ Wpo.is_trivial wpo then
-    let tree = ProofEngine.tree node in
     List.iter
       (fun prv ->
          let backup = Wpo.get_result wpo prv in
@@ -541,17 +524,14 @@ let runProvers ?timeout ?provers node =
            if p = VCS.Qed && VCS.is_valid r then
              Wpo.set_result wpo prv VCS.no_result
            else if not @@ VCS.is_verdict r then
-             Wpo.set_result wpo prv backup ;
-           ProofEngine.validate ~computing:false tree in
-         let progress _ _ = ProofEngine.validate ~computing:true tree in
-         let process () = Prover.prove ~config ~progress ~result wpo prv in
+             Wpo.set_result wpo prv backup in
+         let process () = Prover.prove ~config ~result wpo prv in
          let thread = Task.thread @@ Task.later process () in
          let status = VCS.computing (fun () -> Task.cancel thread) in
          Wpo.set_result wpo prv status ;
          let server = ProverTask.server () in
          Task.spawn server thread ;
          Task.launch server ;
-         ProofEngine.validate ~computing:true tree ;
       ) provers
 
 let () =
@@ -579,16 +559,14 @@ let killProvers ?provers node =
   let filter =
     match provers with
     | None | Some [] -> fun _ -> true
-    | Some prvs -> fun p -> List.exists (VCS.eq_prover p) prvs in
-  begin
-    List.iter
-      (fun (prv,res) ->
-         match res.VCS.verdict with
-         | Computing kill when filter prv -> kill ()
-         | _ -> ()
-      ) @@ Wpo.get_results ~computing:true wpo ;
-    ProofEngine.validate ~computing:true (ProofEngine.tree node) ;
-  end
+    | Some prvs -> fun p -> List.exists (VCS.eq_prover p) prvs
+  in
+  List.iter
+    (fun (prv,res) ->
+       match res.VCS.verdict with
+       | Computing kill when filter prv -> kill ()
+       | _ -> ()
+    ) @@ Wpo.get_results wpo
 
 let () =
   let iKillProvers = R.signature ~output:(module D.Junit) () in
@@ -613,8 +591,7 @@ let clearProvers ?provers node =
     match provers with
     | None -> List.iter (fun (prv,_) -> clear prv) @@ Wpo.get_results wpo ;
     | Some prvs -> List.iter clear prvs
-  end ;
-  ProofEngine.validate ~computing:true (ProofEngine.tree node)
+  end
 
 let () =
   let iClearProvers = R.signature ~output:(module D.Junit) () in
@@ -670,7 +647,6 @@ let () =
       let json = ProofScript.encode (ProofEngine.script tree) in
       ProofSession.save ~stdout:false goal json ;
       ProofEngine.set_saved tree true ;
-      R.emit proofStatus
     end
 
 let () =
@@ -682,16 +658,9 @@ let () =
     begin fun goal ->
       let tree = ProofEngine.proof ~main:goal in
       ProofEngine.clear_tree tree ;
-      R.emit printStatus ;
-      R.emit proofStatus ;
       ProverScript.spawn
         ~provers:(WpApi.getProvers())
-        ~success:
-          begin fun _ _ ->
-            ProofEngine.forward tree ;
-            R.emit printStatus ;
-            R.emit proofStatus ;
-          end
+        ~success:(fun _ _ -> ProofEngine.forward tree)
         goal ;
       let server = ProverTask.server () in
       Task.launch server ;
@@ -711,8 +680,6 @@ let () =
       let tree = ProofEngine.proof ~main:goal in
       ProofEngine.clear_tree tree ;
       ProofSession.remove goal ;
-      R.emit printStatus ;
-      R.emit proofStatus ;
     end
 
 (* -------------------------------------------------------------------------- *)

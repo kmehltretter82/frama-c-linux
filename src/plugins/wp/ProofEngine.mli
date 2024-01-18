@@ -43,10 +43,10 @@ val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
 val proof : main:Wpo.t -> tree
 
 (** Re-compute stats & set status of the entire script *)
-val validate : computing:bool -> tree -> unit
+val validate : tree -> unit
 
-(** Consolidate statistics wrt current script or prover results *)
-val consolidated : computing:bool -> Wpo.t -> Stats.stats
+(** Consolidate statistics from last validation *)
+val consolidated : Wpo.t -> Stats.stats
 
 (** Leaves are numbered from 0 to n-1 *)
 
@@ -78,7 +78,8 @@ val tree_context : tree -> WpContext.t
 val node_context : node -> WpContext.t
 
 val title : node -> string
-val proved : node -> bool
+val fully_proved : node -> bool
+val locally_proved : node -> bool
 val pending : node -> int
 val stats : node -> Stats.stats
 val depth : node -> int
@@ -114,6 +115,7 @@ val iter : (Wpo.t -> unit) -> fork -> unit
 val commit : fork -> node * (string * node) list
 val pretty : Format.formatter -> fork -> unit
 
+val has_proof : Wpo.t -> bool
 val has_script : tree -> bool
 val script : tree -> ProofScript.jscript
 val bind : node -> ProofScript.jscript -> unit

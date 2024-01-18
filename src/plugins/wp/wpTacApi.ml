@@ -394,10 +394,7 @@ class configurator (tactic : Tactical.tactical) =
         let jtactic = ProofScript.jtactic tactic target in
         let fork = ProofEngine.fork tree ~anchor:node jtactic process in
         let children = snd @@ ProofEngine.commit fork in
-        ProofEngine.validate ~computing:true tree ;
-        S.update WpApi.goals @@ ProofEngine.main tree ;
         ProofEngine.forward tree ;
-        R.emit WpTipApi.proofStatus ;
         List.map snd children
       with exn ->
         local <- None ;
