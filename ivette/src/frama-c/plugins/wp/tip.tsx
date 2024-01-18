@@ -359,7 +359,7 @@ export function TIPView(props: TIPProps): JSX.Element {
             title={deleteTitle}
             onClick={onDelete} />
           <Button
-            icon='TRASH'
+            icon='CROSS'
             kind='negative'
             enabled={ proof || script !== undefined }
             title='Clear Proof and Remove Script (if any)'
@@ -384,7 +384,7 @@ export function TIPView(props: TIPProps): JSX.Element {
         </ButtonGroup>
         <Button
           icon='SETTINGS'
-          title='Provers Configuration (Prover Selection on right-click)'
+          title='Active Provers Selection'
           onClick={onProverSelection} />
       </ToolBar>
       <Hfill>
