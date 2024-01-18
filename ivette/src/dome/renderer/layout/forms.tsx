@@ -322,7 +322,11 @@ export function useProperty<A, K extends keyof A>(
     const localError = { ...objError, [property]: propError };
     setState(newValue, isValidObject(localError) ? undefined : localError);
   }, [value, error, setState, property, checker]);
-  return [value[property], error, update];
+  return [
+    value[property],
+    isObjectError(error) ? error[property] : undefined,
+    update
+  ];
 }
 
 /**
