@@ -381,10 +381,19 @@ let in_range ~min:a ~max:b v = min (max a v) b
 
 let kill () = raise Killed
 
+let rooters = ref []
 let daemons = ref []
+let once callback = rooters := !rooters @ [ callback ]
 let on callback = daemons := !daemons @ [ callback ]
 let set_active activity =
-  List.iter (fun f -> try f activity with _ -> ()) !daemons
+  begin
+    if activity then
+      begin
+        List.iter (fun f -> try f () with _ -> ()) !rooters ;
+        rooters := [] ;
+      end ;
+    List.iter (fun f -> try f activity with _ -> ()) !daemons ;
+  end
 
 let create ~pretty ?(equal=(=)) ~fetch () =
   let polling = in_range ~min:1 ~max:200 (Senv.Polling.get ()) in

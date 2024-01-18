@@ -141,6 +141,12 @@ val on_signal : signal -> (bool -> unit) -> unit
     Callbacks shall {i never} raise any exception. *)
 val on : (bool -> unit) -> unit
 
+(** Register a callback to listen for server initialization. All callbacks are
+    executed once, in their order of registration, and before activity
+    callbacks.
+    Callbacks shall {i never} raise any exception. *)
+val once : (unit -> unit) -> unit
+
 (** Register an asynchronous task on the server.
     When the server is not working in background, this is
     equivalent to [Task.call] ; otherwize,
