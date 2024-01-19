@@ -27,7 +27,7 @@
  */
 
 const filepath = require('path');
-import { ipcRenderer } from 'electron';
+const { ipcRenderer } = require('electron/renderer')
 import * as System from 'dome/system';
 
 // --------------------------------------------------------------------------

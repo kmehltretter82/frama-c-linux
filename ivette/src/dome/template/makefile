@@ -81,7 +81,7 @@ dome-help:
 
 dome-clean:
 	@echo "[Dome] remove temporary files"
-	@rm -fr dist .dome-*.stamp
+	@rm -fr out dist .dome-*.stamp
 
 # --------------------------------------------------------------------------
 # ---  Development Packages Init & Installation
@@ -224,7 +224,7 @@ dome-dev: dome-pkg dome-templ
 	@echo 'WDIR=$$PWD' >> $(DOME_CLI)
 	@echo 'ARGV="$(DOME_ARGS) $(DOME_DEV) $$@"' >> $(DOME_CLI)
 	@echo "cd $(CURDIR)" >> $(DOME_CLI)
-	@echo 'exec $(DOME_MK_BIN)/electron-vite dev $$WDIR $$ARGV' >> $(DOME_CLI)
+	@echo 'exec $(DOME_MK_BIN)/electron-vite dev -- $$WDIR $$ARGV' >> $(DOME_CLI)
 	@chmod 555 $(DOME_CLI)
 
 # --------------------------------------------------------------------------
@@ -241,7 +241,7 @@ dome-app: dome-pkg dome-templ
 	@rm -f $(DOME_CLI)
 	@echo "#!/bin/sh" >> $(DOME_CLI)
 	@echo "export DOME_LOCAL=true" >> $(DOME_CLI)
-	@echo 'exec $(DOME_MK_BIN)/electron $(CURDIR)/dist/main/index.js $(DOME_ARGS) "$$@"' >> $(DOME_CLI)
+	@echo 'exec $(DOME_MK_BIN)/electron $(CURDIR)/out/main/index.js $(DOME_ARGS) "$$@"' >> $(DOME_CLI)
 	@chmod 555 $(DOME_CLI)
 
 # --------------------------------------------------------------------------

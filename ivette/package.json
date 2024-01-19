@@ -2,7 +2,7 @@
   "name": "ivette",
   "productName": "Ivette",
   "version": "1.0.0",
-  "main": "./dist/main/index.js",
+  "main": "./out/main/index.js",
   "repository": "git@git.frama-c.com:frama-c/Ivette.git",
   "author": "Loïc Correnson <loic.correnson@cea.fr>",
   "license": "LGPL-2.1",
@@ -16,9 +16,9 @@
     "dist:win": "yarn run electron-builder --win --dir -c.compression=store",
     "dist:linux": "yarn run electron-builder --linux --dir -c.compression=store",
     "dist:all": "yarn run electron-builder -wlm --dir -c.compression=store -c.mac.identity=null",
-    "start": "electron-vite --outDir dist preview",
+    "start": "electron-vite preview",
     "dev": "electron-vite dev",
-    "build": "electron-vite --outDir dist build",
+    "build": "electron-vite build",
     "postinstall": "electron-builder install-app-deps"
   },
   "devDependencies": {

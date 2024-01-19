@@ -46,6 +46,7 @@ import { RSplit } from 'dome/layout/splitters';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Properties from 'frama-c/kernel/api/properties';
+import * as Dome from 'dome';
 
 type PropKey = Json.key<'#marker'>;
 type Property = Properties.statusData |

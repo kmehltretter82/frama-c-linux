@@ -44,11 +44,10 @@ import _ from 'lodash';
 import Emitter from 'events';
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import { ipcRenderer } from 'electron';
 import SYS, * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
-import { ipcRenderer } from 'electron';
+const { ipcRenderer } = require('electron/renderer')
 import './dark.css';
 import './light.css';
 import './style.css';
@@ -126,8 +125,7 @@ export function getPID(): number { return System.getPID(); }
 
 /** Path to application static resources. */
 export function getStatic(file?: string): string {
-  throw new Error('DIR - Not implemented');
-  // return file ? System.join(__static, file) : __static;
+  return file ? System.join(__dirname, file) : __dirname;
 }
 
 // --------------------------------------------------------------------------
@@ -235,9 +233,9 @@ export function onCommand(
   System.emitter.on('dome.command', job);
 }
 
-ipcRenderer.on('dome.ipc.command', (_event, argv, wdir) => {
-SYS.setCommandLine(argv, wdir);
-System.emitter.emit('dome.command', argv, wdir);
+ipcRenderer.on("dome.ipc.command", (_event, argv, wdir) => {
+  SYS.setCommandLine(argv, wdir);
+  System.emitter.emit("dome.command", argv, wdir);
 });
 
 /** Window Settings event.

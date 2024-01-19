@@ -31,7 +31,7 @@
 */
 
 import React from 'react';
-import { ipcRenderer } from 'electron';
+const { ipcRenderer } = require('electron/renderer')
 import { debounce } from 'lodash';
 import isEqual from 'react-fast-compare';
 import { emitter as SysEmitter } from 'dome/system';

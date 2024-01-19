@@ -416,10 +416,9 @@ function createBrowserWindow(
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: true,
-      nodeIntegrationInWorker: true,
-      webSecurity: false,
+      sandbox: false,
     },
-    // ...config,
+    ...config,
   };
 
   let configFile = PATH_WINDOW_SETTINGS;
@@ -499,13 +498,13 @@ function createBrowserWindow(
   webContents.on('did-navigate-in-page', navigateURL(webContents));
 
   // Application Startup
-  webContents.on('did-finish-load', () => {
-  if (!handle.reloaded) {
-  handle.reloaded = true;
-  } else {
-  broadcast('dome.ipc.reload');
-  }
-    webContents.send('dome.ipc.command', argv, wdir);
+  webContents.on("did-finish-load", () => {
+    if (!handle.reloaded) {
+      handle.reloaded = true;
+    } else {
+      broadcast("dome.ipc.reload");
+    }
+    webContents.send("dome.ipc.command", argv, wdir);
   });
 
   // Emitted when the window want's to close.

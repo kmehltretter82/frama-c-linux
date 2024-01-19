@@ -36,7 +36,7 @@ import gearsIcon from '../eva/images/gears.svg';
 
 import './dive.css';
 
-const window = {
+const w = {
   perception: { backward: 3, forward: 0 },
   horizon: { backward: undefined, forward: undefined },
 };
@@ -44,7 +44,7 @@ const window = {
 async function exec<I, O>(rq: Server.ExecRequest<I, O>, i: I):
     Promise<O | undefined> {
   if (Server.isRunning()) {
-    await Server.send(API.window, window);
+    await Server.send(API.window, w);
     return await Server.send(rq, i);
   }
 

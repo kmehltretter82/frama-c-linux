@@ -31,7 +31,7 @@ import * as Services from 'frama-c/kernel/api/services';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Status from 'frama-c/kernel/Status';
 import * as States from 'frama-c/states';
-import { ipcRenderer } from 'electron';
+const { ipcRenderer } = require('electron/renderer')
 
 const cFilter = {
   name: 'C source files',

@@ -38,6 +38,7 @@ import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from './server';
+import * as Dome from 'dome';
 
 // --------------------------------------------------------------------------
 // --- Pretty Printing (Browser Console)
