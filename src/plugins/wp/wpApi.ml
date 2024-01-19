@@ -367,8 +367,8 @@ let goals = S.register_array ~package ~name:"goals"
     ~keyName:"wpo"
     ~keyType:Goal.jtype
     ~iter:(filter Wpo.iter_on_goals)
-    ~add_update_hook:(filter Wpo.add_modified_hook)
     ~add_remove_hook:(filter Wpo.add_removed_hook)
+    ~add_update_hook:(ProofEngine.add_goal_hook)
     ~add_reload_hook:Wpo.add_cleared_hook
     gmodel
 

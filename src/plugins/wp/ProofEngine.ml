@@ -30,7 +30,7 @@ type node = {
   child : string option ; (* child name from parent node *)
   parent : node option ;
   mutable script : script ;
-  mutable stats : Stats.stats ;
+  mutable stats : Stats.stats option ; (* memoized *)
   mutable strategy : string option ; (* hint *)
   mutable search_index : int ;
   mutable search_space : Strategy.t array ; (* sorted by priority *)
@@ -54,6 +54,7 @@ type tree = {
   main : Wpo.t ; (* Main goal to be proved. *)
   mutable pool : Lang.F.pool option ; (* Global pool variable *)
   mutable saved : bool ; (* Saved on Disk. *)
+  mutable dirty : bool ; (* Tactical result is outdated *)
   mutable gid : int ; (* WPO goal numbering *)
   mutable head : node option ; (* the current node *)
   mutable root : node option ; (* the root node *)
@@ -71,16 +72,65 @@ module PROOFS = WpContext.StaticGenerator(Wpo.S)
           pool = None ;
           head = None ;
           root = None ;
+          dirty = false ;
           saved = false ;
         }
     end)
 
-let () = Wpo.add_removed_hook PROOFS.remove
-let () = Wpo.add_cleared_hook PROOFS.clear
+module NODES = WpContext.Static
+    (struct
+      type key = Wpo.t
+      type data = node
+      let name = "Wp.ProofEngine.Nodes"
+      let compare = Wpo.S.compare
+      let pretty = Wpo.S.pretty
+    end)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Signaling                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let goal_hooks = ref []
+let clear_hooks = ref []
+let remove_hooks = ref []
+let update_hooks = ref []
+
+let add_goal_hook fn = goal_hooks := !goal_hooks @ [fn]
+let add_clear_hook fn = clear_hooks := !clear_hooks @ [fn]
+let add_remove_hook fn = remove_hooks := !remove_hooks @ [fn]
+let add_update_hook fn = update_hooks := !update_hooks @ [fn]
+
+let signal_goal g = List.iter (fun fn -> fn g) !goal_hooks
+let signal_node n = List.iter (fun fn -> fn n) !update_hooks
+
+let dirty_root g =
+  try
+    let tree = PROOFS.find g in
+    if not tree.dirty then
+      begin
+        tree.dirty <- true ;
+        signal_goal g ;
+      end
+  with Not_found -> ()
+
+let rec dirty_node n =
+  match n.stats with
+  | None -> ()
+  | Some _ ->
+    n.stats <- None ;
+    signal_node n ;
+    match n.parent with
+    | Some p -> dirty_node p
+    | None -> dirty_root n.tree
+
+let dirty_goal g =
+  match NODES.get g with
+  | Some n -> dirty_node n
+  | None -> dirty_root g
 
 let get wpo =
   try
-    let proof = PROOFS.get wpo in
+    let proof = PROOFS.find wpo in
     match proof.root with
     | None | Some { script = Opened | Script _ } -> raise Not_found
     | Some { script = Tactic _ } -> if proof.saved then `Saved else `Proof
@@ -99,25 +149,19 @@ let pool tree =
     tree.pool <- Some pool ; pool
 
 (* -------------------------------------------------------------------------- *)
-(* --- Constructors                                                       --- *)
+(* --- Proofs                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
 let proof ~main =
   assert (not (Wpo.is_tactic main)) ;
-  PROOFS.get main
+  PROOFS.find main
 
 let saved t = t.saved
-let set_saved t s = t.saved <- s
+let set_saved t s = t.saved <- s ; signal_goal t.main
 
 (* -------------------------------------------------------------------------- *)
 (* --- Removal                                                            --- *)
 (* -------------------------------------------------------------------------- *)
-
-let clear_hooks = ref []
-let remove_hooks = ref []
-
-let add_clear_hook fn = clear_hooks := !clear_hooks @ [fn]
-let add_remove_hook fn = remove_hooks := !remove_hooks @ [fn]
 
 let rec revert_tactic t n =
   n.strategy <- None ;
@@ -129,7 +173,7 @@ let rec revert_tactic t n =
     iter_children (remove_node t) children
 
 and remove_node t n =
-  t.saved <- false ;
+  NODES.remove n.goal ;
   if Wpo.is_tactic n.goal then
     Wpo.remove n.goal
   else
@@ -140,30 +184,55 @@ and remove_node t n =
 
 let clear_tree t =
   begin
-    List.iter (fun f -> f ()) !clear_hooks ;
-    Wpo.clear_results t.main ;
     Option.iter (remove_node t) t.root ;
     t.gid <- 0 ;
     t.head <- None ;
     t.root <- None ;
     t.saved <- false ;
+    List.iter (fun fn -> fn t.main) !clear_hooks ;
+    signal_goal t.main ;
   end
 
 let clear_node_tactic t n =
-  revert_tactic t n ;
+  revert_tactic t n ; dirty_node n ;
   if t.head = None then t.head <- Some n
 
 let clear_parent_tactic t n =
   match n.parent with
   | None -> clear_tree t
-  | Some p as h -> t.head <- h ; revert_tactic t p
+  | Some p as h -> revert_tactic t p ; dirty_node p ; t.head <- h
 
 let clear_node t n =
   Wpo.clear_results n.goal ;
   clear_node_tactic t n
 
 let clear_goal w =
-  if PROOFS.mem w then clear_tree (PROOFS.get w)
+  try clear_tree (PROOFS.find w)
+  with Not_found -> Wpo.clear_results w
+
+(* -------------------------------------------------------------------------- *)
+(* --- Removel From Wpo                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+let removed_from_wpo g =
+  if not @@ Wpo.is_tactic g then
+    begin
+      try
+        clear_tree (PROOFS.find g) ;
+        PROOFS.remove g ;
+      with Not_found ->
+        signal_goal g
+    end
+
+let cleared_from_wpo () =
+  begin
+    NODES.clear () ;
+    PROOFS.clear () ;
+  end
+
+let () = Wpo.add_removed_hook removed_from_wpo
+let () = Wpo.add_cleared_hook cleared_from_wpo
+let () = Wpo.add_modified_hook dirty_goal
 
 (* -------------------------------------------------------------------------- *)
 (* --- Walking                                                            --- *)
@@ -210,39 +279,51 @@ let prover_stats ~smoke goal =
   Wpo.get_results goal
 
 let rec consolidate ~smoke n =
-  let s =
-    if Wpo.is_locally_valid n.goal then
-      prover_stats ~smoke n.goal
-    else
-      match n.script with
-      | Opened | Script _ -> prover_stats ~smoke n.goal
-      | Tactic(_,children) ->
-        let qed = Wpo.qed_time n.goal in
-        let results =
-          List.map (fun (_,n) -> consolidate ~smoke n) children in
-        Stats.tactical ~qed results
-  in n.stats <- s ; s
+  match n.stats with
+  | Some s -> s
+  | None -> let s = compute ~smoke n in n.stats <- Some s ; s
+
+and compute ~smoke n =
+  if Wpo.is_locally_valid n.goal then
+    prover_stats ~smoke n.goal
+  else
+    match n.script with
+    | Opened | Script _ -> prover_stats ~smoke n.goal
+    | Tactic(_,children) ->
+      Stats.tactical ~qed:(Wpo.qed_time n.goal) @@
+      List.map (fun (_,n) -> consolidate ~smoke n) children
+
+let tactical tree =
+  match tree.root with
+  | None -> VCS.no_result
+  | Some root ->
+    let smoke = Wpo.is_smoke_test tree.main in
+    Stats.script @@ consolidate ~smoke root
 
 let validate tree =
-  match tree.root with
-  | None -> ()
-  | Some root ->
-    let main = tree.main in
-    if Wpo.is_locally_valid main then
-      Wpo.set_result tree.main Tactical VCS.no_result
-    else
-      let smoke = Wpo.is_smoke_test main in
-      let stats = consolidate ~smoke root in
-      Wpo.set_result tree.main Tactical (Stats.script stats)
+  let main = tree.main in
+  if tree.dirty then
+    let result =
+      if Wpo.is_locally_valid main then VCS.no_result else tactical tree
+    in Wpo.set_result main VCS.Tactical result ; tree.dirty <- false
 
 let consolidated wpo =
   let smoke = Wpo.is_smoke_test wpo in
   try
-    if smoke || not (PROOFS.mem wpo) then raise Not_found ;
-    match PROOFS.get wpo with
-    | { root = Some { stats ; script = Tactic _ } } -> stats
+    match (PROOFS.find wpo).root with
+    | Some node -> consolidate ~smoke node
     | _ -> raise Not_found
   with Not_found -> prover_stats ~smoke wpo
+
+let results wpo =
+  (try validate (PROOFS.find wpo) with Not_found -> ()) ;
+  Wpo.get_results wpo
+
+let stats node =
+  match node.stats with Some s -> s | None ->
+    let smoke = Wpo.is_smoke_test node.tree in
+    let s = compute ~smoke node in
+    node.stats <- Some s ; s
 
 (* -------------------------------------------------------------------------- *)
 (* --- Accessors                                                          --- *)
@@ -256,7 +337,6 @@ let head_goal t = match t.head with
 let tree n = proof ~main:n.tree
 let goal n = n.goal
 
-let stats n = n.stats
 let tree_context t = Wpo.get_context t.main
 let node_context n = Wpo.get_context n.goal
 let parent n = n.parent
@@ -269,7 +349,7 @@ let tactical n =
 
 let get_strategies n = n.search_index , n.search_space
 let set_strategies n ?(index=0) hs =
-  n.search_index <- index ; n.search_space <- hs
+  n.search_index <- index ; n.search_space <- hs ; signal_node n
 
 let children n =
   match n.script with
@@ -339,28 +419,28 @@ let current t : current =
 type position = [ `Main | `Node of node | `Leaf of int ]
 let goto t = function
   | `Main ->
-    t.head <- t.root
+    t.head <- t.root ; signal_goal t.main
   | `Node n ->
-    if n.tree == t.main then t.head <- Some n
+    if n.tree == t.main then t.head <- Some n ; signal_goal t.main
   | `Leaf k ->
     t.head <- t.root ;
-    iteri (fun i n -> if i = k then t.head <- Some n) t
+    iteri (fun i n -> if i = k then t.head <- Some n) t ;
+    signal_goal t.main
 
 let fetch t node =
   try
     t.head <- t.root ;
-    walk (fun n -> t.head <- Some n ; raise Exit) node ; false
+    walk (fun n -> t.head <- Some n ; raise Exit) node ;
+    false
   with Exit -> true
 
 let rec forward t =
   match t.head with
-  | None -> t.head <- t.root
+  | None -> t.head <- t.root ; signal_goal t.main
   | Some hd ->
-    if not (fetch t hd) then
-      begin
-        t.head <- hd.parent ;
-        forward t ;
-      end
+    if not (fetch t hd)
+    then ( t.head <- hd.parent ; forward t )
+    else signal_goal t.main
 
 let cancel_parent_tactic t =
   match t.head with
@@ -393,31 +473,19 @@ let mk_goal t ~title ~part ~axioms sequent =
       po_formula = mk_formula ~main:t.main.po_formula axioms sequent ;
     })
 
-let mk_tree_node ~tree ~anchor (child,goal) = {
-  tree = tree.main ; goal ;
-  parent = Some anchor ;
-  child = Some child ;
-  script = Opened ;
-  stats = Stats.empty ;
-  search_index = 0 ;
-  search_space = [| |] ;
-  strategy = None ;
-}
-
-let mk_root_node goal = {
-  tree = goal ; goal ;
-  child = None ;
-  parent = None ;
-  script = Opened ;
-  stats = Stats.empty ;
-  strategy = None ;
-  search_index = 0 ;
-  search_space = [| |] ;
-}
+let mk_node ~main ?parent ?child goal =
+  let node = {
+    tree=main ; parent ; child ; goal ;
+    script = Opened ;
+    stats = Some Stats.empty ;
+    search_index = 0 ;
+    search_space = [| |] ;
+    strategy = None ;
+  } in NODES.define goal node ; node
 
 let mk_root ~tree =
-  let goal = tree.main in
-  let node = mk_root_node goal in
+  let main = tree.main in
+  let node = mk_node ~main main in
   let root = Some node in
   tree.root <- root ;
   tree.head <- root ;
@@ -476,35 +544,37 @@ let anchor tree ?node () =
 let commit fork =
   List.iter (fun (_,wp) -> ignore (Wpo.resolve wp)) fork.Fork.goals ;
   let tree = fork.Fork.tree in
-  let anchor = fork.Fork.anchor in
-  let children = map_children (mk_tree_node ~tree ~anchor) fork.Fork.goals in
+  let parent = fork.Fork.anchor in
+  let subnode (child,goal) = mk_node ~main:tree.main ~parent ~child goal in
+  let children = map_children subnode fork.Fork.goals in
   tree.saved <- false ;
-  anchor.script <- Tactic( fork.Fork.tactic , children ) ;
-  anchor , children
+  parent.script <- Tactic( fork.Fork.tactic , children ) ;
+  dirty_node parent ;
+  parent , children
 
 (* -------------------------------------------------------------------------- *)
 (* --- Scripting                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let results wpo =
-  List.map (fun (p,r) -> ProofScript.a_prover p r) (Wpo.get_results wpo)
+let script_provers wpo =
+  List.map (fun (p,r) -> ProofScript.a_prover p r) @@
+  Wpo.get_prover_results wpo
 
 let rec script_node (node : node) =
-  let provers = results node.goal in
-  let scripts =
+  script_provers node.goal @
+  begin
     match node.script with
     | Script s -> List.filter ProofScript.is_tactic s
     | Tactic( tactic , children ) ->
       [ ProofScript.a_tactic tactic (List.map subscript_node children) ]
     | Opened -> []
-  in
-  provers @ scripts
+  end
 
 and subscript_node (key,node) = key , script_node node
 
 let script tree =
   match tree.root with
-  | None -> results tree.main
+  | None -> script_provers tree.main
   | Some node -> script_node node
 
 let bind node script =
@@ -514,7 +584,9 @@ let bind node script =
     ()
   | Opened | Script _ ->
     (*TODO: saveback the previous script *)
-    node.script <- Script script
+    node.script <- Script script ;
+    signal_node node ;
+    signal_goal node.tree
 
 let bound node =
   match node.script with
@@ -541,10 +613,10 @@ let has_tactics tree =
 
 let has_script tree = has_tactics tree || has_result tree
 let has_proof wpo =
-  try has_script @@ PROOFS.get wpo
+  try has_script @@ PROOFS.find wpo
   with Not_found -> false
 
 let get_hint node = node.strategy
-let set_hint node strategy = node.strategy <- Some strategy
+let set_hint node strategy = node.strategy <- Some strategy ; signal_node node
 
 (* -------------------------------------------------------------------------- *)

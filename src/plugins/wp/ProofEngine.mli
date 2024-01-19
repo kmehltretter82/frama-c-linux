@@ -42,11 +42,14 @@ end
 val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
 val proof : main:Wpo.t -> tree
 
-(** Re-compute stats & set status of the entire script *)
+(** Consolidate and update status of the entire script (memoized). *)
 val validate : tree -> unit
 
-(** Consolidate statistics from last validation *)
+(** Consolidate statistics (memoized). *)
 val consolidated : Wpo.t -> Stats.stats
+
+(** Consolidate results (memoized). *)
+val results : Wpo.t -> (VCS.prover * VCS.result) list
 
 (** Leaves are numbered from 0 to n-1 *)
 
@@ -102,8 +105,11 @@ val clear_tree : tree -> unit
 val clear_node : tree -> node -> unit
 val clear_node_tactic : tree -> node -> unit
 val clear_parent_tactic : tree -> node -> unit
-val add_clear_hook : (unit -> unit) -> unit
+
+val add_goal_hook : (Wpo.t -> unit) -> unit
+val add_clear_hook : (Wpo.t -> unit) -> unit
 val add_remove_hook : (node -> unit) -> unit
+val add_update_hook : (node -> unit) -> unit
 
 val cancel_parent_tactic : tree -> unit
 val cancel_current_node : tree -> unit

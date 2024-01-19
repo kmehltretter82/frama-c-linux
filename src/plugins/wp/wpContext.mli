@@ -108,8 +108,8 @@ sig
 
   val id : basename:string -> key -> string
   val mem : key -> bool
-  val find : key -> data
   val get : key -> data option
+  val find : key -> data
   val clear : unit -> unit
   val remove : key -> unit
   val define : key -> data -> unit
@@ -167,6 +167,7 @@ sig
   val mem : key -> bool
   val get : key -> data
   val set : key -> data -> unit
+  val find : key -> data
   val remove : key -> unit
   val clear : unit -> unit
 end

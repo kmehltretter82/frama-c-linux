@@ -713,6 +713,9 @@ let get_results g =
   try Results.list @@ WPOmap.find g system.results
   with Not_found -> []
 
+let get_prover_results g =
+  List.filter (fun (p,_) -> VCS.is_prover p) @@ get_results g
+
 let is_trivial g =
   VC_Annot.is_trivial g.po_formula
 

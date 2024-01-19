@@ -61,8 +61,9 @@ module Node = D.Index
 
 let () = Server.Main.once
     begin fun () ->
-      ProofEngine.add_clear_hook Node.clear ;
       ProofEngine.add_remove_hook Node.remove ;
+      ProofEngine.add_clear_hook (fun _ -> Node.clear ()) ;
+      ProofEngine.add_update_hook (fun _ -> R.emit proofStatus) ;
     end
 
 module Tactic : D.S with type t = Tactical.t =
