@@ -406,17 +406,19 @@ function createBrowserWindow(
   const browserArguments = isAppWindow
     ? SYS.WINDOW_APPLICATION_ARGV
     : SYS.WINDOW_PREFERENCES_ARGV;
+  console.log('[Dome] Browser Arguments', browserArguments);
 
   const options: BrowserWindowConstructorOptions = {
     width: 900,
     height: 670,
     show: false,
     backgroundColor: '#f0f0f0',
-    // icon: path.join(__static, 'icon.png'),
+    // icon: path.join(__dirname, 'icon.png'),
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: true,
       sandbox: false,
+      additionalArguments: [...browserArguments]
     },
     ...config,
   };

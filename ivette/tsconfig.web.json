@@ -1,12 +1,20 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
   "include": [
+    "src/renderer/*.ts",
+    "src/renderer/*.tsx",
+    "src/renderer/**/*.ts",
+    "src/renderer/**/*.tsx",
     "src/renderer/src/env.d.ts",
     "src/renderer/src/**/*",
     "src/renderer/src/**/*.tsx",
     "src/preload/*.d.ts",
     "src/dome/**/*.ts",
     "src/dome/**/*.tsx",
+    "src/frama-c/**/*.tsx",
+    "src/frama-c/**/*.ts",
+    "src/ivette/**/*.tsx",
+    "src/ivette/**/*.ts",
   ],
   "compilerOptions": {
     "composite": true,
