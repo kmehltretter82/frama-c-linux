@@ -691,15 +691,22 @@ const extensions: Editor.Extension[] = [
 ];
 
 interface buttonUnFoldProps {
-  view: Editor.View
+  view: Editor.View;
+  scope: Ast.decl | undefined;
 }
 
 function ButtonUnFold(props: buttonUnFoldProps): JSX.Element {
+  const { view, scope } = props;
   const [isFold, setIsFold] = useState(false);
+  const [prevScope, setPrevScope] = useState(scope);
+  if (scope !== prevScope) {
+    setPrevScope(scope);
+    setIsFold(false);
+  }
   const icon = 'CHEVRON.' + (isFold ? 'EXPAND' : 'CONTRACT');
   const title = isFold ? 'Expand' : 'Collapse';
   const buttonUnFoldClicked = (): void => {
-    isFold ? Editor.unfoldAll(props.view) : Editor.foldAll(props.view);
+    isFold ? Editor.unfoldAll(view) : Editor.foldAll(view);
     setIsFold(!isFold);
   };
 
@@ -754,7 +761,7 @@ export default function ASTview(): JSX.Element {
     <>
       <TitleBar>
         <Filler />
-        <ButtonUnFold view={view} />
+        <ButtonUnFold view={view} scope={scope} />
         <Inset />
       </TitleBar>
       <Component style={{ fontSize: `${fontSize}px` }} />
