@@ -158,6 +158,13 @@ function openPanelLayoutSelector(comp: Ivette.ComponentProps,
   });
 }
 
+function getFirstDockedComponent(): string {
+  const labviewState = globalLabViewState.getValue();
+  const [head] = labviewState.dockedComponents;
+  deleteFromDockedComponents(head);
+  return head ? head.id : "";
+}
+
 function addToDockedComponents(comp: Ivette.ComponentProps)
 : void {
   const labviewState = globalLabViewState.getValue();
@@ -228,8 +235,38 @@ function addCompFromQuarterToDock(quarter: string): void {
   });
 }
 
+function fixLShapedComponentInLayout(
+layout: { A: string, B: string, C: string, D: string }):
+{A: string, B: string, C: string, D: string} {
+  Object.values(layout).forEach(compId => {
+    let occurences = 0;
+    Object.values(layout).forEach(c => {
+      if (compId === c) occurences++;
+    });
+
+    if(occurences === 3) {
+      if (layout.D === compId ) layout.D = getFirstDockedComponent();
+      else if (layout.C === compId ) layout.C = getFirstDockedComponent();
+      else if (layout.B === compId ) layout.B = getFirstDockedComponent();
+      else if (layout.A === compId ) layout.A = getFirstDockedComponent();
+    }
+  });
+
+  return layout;
+}
+
+function removeCompFromCurrentLayout(compId: string): void {
+  const labViewState = globalLabViewState.getValue();
+  if (labViewState.A === compId) labViewState.A = "";
+  if (labViewState.B === compId) labViewState.B = "";
+  if (labViewState.C === compId) labViewState.C = "";
+  if (labViewState.D === compId) labViewState.D = "";
+  globalLabViewState.setValue(labViewState);
+}
+
 function assignCompToQuarter(quarter: string, compId: string): void {
   const labViewState = globalLabViewState.getValue();
+  removeCompFromCurrentLayout(compId);
   addCompFromQuarterToDock(quarter);
 
   const layout = assignValueToQuarterStr(quarter, compId);
@@ -251,7 +288,7 @@ function assignCompToQuarter(quarter: string, compId: string): void {
 
 function applyLayout(view : Ivette.ViewLayoutProps): void {
   const { layout } = view;
-  let A, B, C, D;
+  let A = "", B = "", C = "", D = "";
 
   addCompFromQuarterToDock("ABCD");
 
@@ -283,6 +320,7 @@ function applyLayout(view : Ivette.ViewLayoutProps): void {
     C = layout.ABCD;
     D = layout.ABCD;
   }
+  const finalLayout = fixLShapedComponentInLayout({ A, B, C, D });
 
   let state = globalLabViewState.getValue();
   const components = state.components;
@@ -296,7 +334,7 @@ function applyLayout(view : Ivette.ViewLayoutProps): void {
 
   globalLabViewState.setValue({
     ...state,
-    A: A, B: B, C: C, D: D,
+    A: finalLayout.A, B: finalLayout.B, C: finalLayout.C, D: finalLayout.D,
     components: components,
     selectedView: view.id,
   });
