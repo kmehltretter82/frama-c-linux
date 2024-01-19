@@ -39,6 +39,7 @@ import { IconButton, Field } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import { Icon } from 'dome/controls/icons';
 import { RenderElement } from 'dome/layout/dispatch';
+import * as Toolbar from 'dome/frame/toolbars';
 
 import './style.css';
 
@@ -543,6 +544,39 @@ interface CustomPanelProps {
   setDragging: (id?: string) => void;
 }
 
+interface ToolbarViewProps {
+  settings: string;
+  shape?: Shape;
+  setShape: (shape: Shape) => void;
+}
+
+function ToolbarView(
+  { settings, shape, setShape }: ToolbarViewProps,
+): JSX.Element {
+  Dome.useUpdate(UPDATE);
+  const { items } = LIBRARY;
+  const views = getItems(items, 'views') as View[];
+  const settingViews = settings && `${settings}.views`;
+
+  return (
+    <Toolbar.ToolBar className='views-list'>
+      <Icon
+        id="DISPLAY"
+        className="views-icon"
+        size={17}
+        offset={-4}
+      />
+      <CustomViews
+        key="views"
+        settings={settingViews}
+        shape={shape}
+        setShape={setShape}
+        views={views}
+      />
+    </Toolbar.ToolBar>
+  );
+}
+
 function CustomizePanel(
   { dnd, settings, shape, setShape, setDragging }: CustomPanelProps,
 ): JSX.Element {
@@ -635,24 +669,31 @@ export function LabView(props: LabViewProps): JSX.Element {
     dragging ? gridItems.find((elt) => elt.props.id === dragging) : undefined;
   // Make view
   return (
-    <RSplit margin={120} settings={settingSplit} unfold={customize}>
-      <Grids.GridLayout
-        dnd={dnd}
-        padding={2}
-        className="labview-container"
-        items={gridItems}
-        shape={shape}
-        onReshape={setShape}
-        holding={holding}
-      />
-      <CustomizePanel
-        dnd={dnd}
+    <Vfill>
+      <ToolbarView
         settings={settingPanel}
         shape={shape}
         setShape={setShape}
-        setDragging={setDragging}
-      />
-    </RSplit>
+        />
+      <RSplit margin={120} settings={settingSplit} unfold={customize}>
+        <Grids.GridLayout
+          dnd={dnd}
+          padding={2}
+          className="labview-container"
+          items={gridItems}
+          shape={shape}
+          onReshape={setShape}
+          holding={holding}
+          />
+        <CustomizePanel
+          dnd={dnd}
+          settings={settingPanel}
+          shape={shape}
+          setShape={setShape}
+          setDragging={setDragging}
+          />
+      </RSplit>
+    </Vfill>
   );
 }
 
