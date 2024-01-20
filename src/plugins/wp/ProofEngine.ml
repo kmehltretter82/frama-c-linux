@@ -72,7 +72,7 @@ module PROOFS = WpContext.StaticGenerator(Wpo.S)
           pool = None ;
           head = None ;
           root = None ;
-          dirty = false ;
+          dirty = true ;
           saved = false ;
         }
     end)
@@ -123,10 +123,13 @@ let rec dirty_node n =
     | Some p -> dirty_node p
     | None -> dirty_root n.tree
 
+let self_updating = ref false
+
 let dirty_goal g =
-  match NODES.get g with
-  | Some n -> dirty_node n
-  | None -> dirty_root g
+  if not !self_updating then
+    match NODES.get g with
+    | Some n -> dirty_node n
+    | None -> dirty_root g
 
 let get wpo =
   try
@@ -154,7 +157,7 @@ let pool tree =
 
 let proof ~main =
   assert (not (Wpo.is_tactic main)) ;
-  PROOFS.find main
+  PROOFS.get main
 
 let saved t = t.saved
 let set_saved t s = t.saved <- s ; signal_goal t.main
@@ -301,11 +304,18 @@ let tactical tree =
     Stats.script @@ consolidate ~smoke root
 
 let validate tree =
-  let main = tree.main in
   if tree.dirty then
     let result =
-      if Wpo.is_locally_valid main then VCS.no_result else tactical tree
-    in Wpo.set_result main VCS.Tactical result ; tree.dirty <- false
+      if Wpo.is_locally_valid tree.main then VCS.no_result else tactical tree
+    in
+    try
+      self_updating := true ;
+      Wpo.set_result tree.main VCS.Tactical result ;
+      tree.dirty <- false ;
+      self_updating := false ;
+    with exn ->
+      self_updating := false ;
+      raise exn
 
 let consolidated wpo =
   let smoke = Wpo.is_smoke_test wpo in
@@ -477,7 +487,7 @@ let mk_node ~main ?parent ?child goal =
   let node = {
     tree=main ; parent ; child ; goal ;
     script = Opened ;
-    stats = Some Stats.empty ;
+    stats = None ;
     search_index = 0 ;
     search_space = [| |] ;
     strategy = None ;
