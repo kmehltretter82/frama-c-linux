@@ -45,8 +45,6 @@ let proofStatus = R.signal ~package ~name:"proofStatus"
 let printStatus = R.signal ~package ~name:"printStatus"
     ~descr:(Md.plain "Updated TIP printer")
 
-let () = Wpo.add_modified_hook (fun _ -> R.emit proofStatus)
-
 (* -------------------------------------------------------------------------- *)
 (* --- Proof Node                                                         --- *)
 (* -------------------------------------------------------------------------- *)
@@ -63,7 +61,10 @@ let () = Server.Main.once
     begin fun () ->
       ProofEngine.add_remove_hook Node.remove ;
       ProofEngine.add_clear_hook (fun _ -> Node.clear ()) ;
-      ProofEngine.add_update_hook (fun _ -> R.emit proofStatus) ;
+      let signal _ = R.emit proofStatus in
+      ProofEngine.add_update_hook signal ;
+      ProofEngine.add_goal_hook signal ;
+      Wpo.add_modified_hook signal ;
     end
 
 module Tactic : D.S with type t = Tactical.t =

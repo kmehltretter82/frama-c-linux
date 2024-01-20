@@ -325,9 +325,10 @@ let consolidated wpo =
     | _ -> raise Not_found
   with Not_found -> prover_stats ~smoke wpo
 
-let results wpo =
-  (try validate (PROOFS.find wpo) with Not_found -> ()) ;
-  Wpo.get_results wpo
+let consolidate wpo =
+  try validate (PROOFS.find wpo) with Not_found -> ()
+
+let results wpo = consolidate wpo ; Wpo.get_results wpo
 
 let stats node =
   match node.stats with Some s -> s | None ->

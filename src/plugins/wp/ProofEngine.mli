@@ -45,10 +45,13 @@ val proof : main:Wpo.t -> tree
 (** Consolidate and update status of the entire script (memoized). *)
 val validate : tree -> unit
 
-(** Consolidate statistics (memoized). *)
+(** Consolidate proof tree (memoized). *)
+val consolidate : Wpo.t -> unit
+
+(** Consolidated statistics (memoized). *)
 val consolidated : Wpo.t -> Stats.stats
 
-(** Consolidate results (memoized). *)
+(** Consolidated results (memoized). *)
 val results : Wpo.t -> (VCS.prover * VCS.result) list
 
 (** Leaves are numbered from 0 to n-1 *)

@@ -360,16 +360,24 @@ let () = S.column gmodel ~name:"saved"
     ~get:(fun wpo -> ProofEngine.get wpo = `Saved)
 
 let filter hook fn = hook (fun g -> if not @@ Wpo.is_tactic g then fn g)
+let (++) h1 h2 fn = h1 fn ; h2 fn
 
-let goals = S.register_array ~package ~name:"goals"
+let goals =
+  let add_remove_hook =
+    filter Wpo.add_removed_hook in
+  let add_update_hook =
+    filter Wpo.add_modified_hook ++ ProofEngine.add_goal_hook in
+  let add_reload_hook = Wpo.add_cleared_hook in
+  S.register_array ~package ~name:"goals"
     ~descr:(Md.plain "Generated Goals")
     ~key:indexGoal
     ~keyName:"wpo"
     ~keyType:Goal.jtype
     ~iter:(filter Wpo.iter_on_goals)
-    ~add_remove_hook:(filter Wpo.add_removed_hook)
-    ~add_update_hook:(ProofEngine.add_goal_hook)
-    ~add_reload_hook:Wpo.add_cleared_hook
+    ~preload:ProofEngine.consolidate
+    ~add_remove_hook
+    ~add_update_hook
+    ~add_reload_hook
     gmodel
 
 (* -------------------------------------------------------------------------- *)
