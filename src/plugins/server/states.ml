@@ -192,6 +192,7 @@ type 'a array = {
   key : 'a -> string ;
   iter : ('a -> unit) -> unit ;
   getter : (string * ('a -> json option)) list ;
+  preload : ('a -> unit) option ;
   (* [LC+JS]
      The two following fields allow to keep an array in sync
      with the current project and still have a polymorphic data type. *)
@@ -267,13 +268,14 @@ type buffer = {
   mutable updated : json list ;
 }
 
-let add_entry buffer cols fkey key v =
+let add_entry array buffer key v =
+  Option.iter (fun f -> f v) array.preload ;
   let fjs = List.fold_left (fun fjs (fd,to_json) ->
       match to_json v with
       | Some js -> (fd , js) :: fjs
       | None | exception Not_found -> fjs
-    ) [] cols in
-  let row = (fkey, `String key) :: fjs in
+    ) [] array.getter in
+  let row = (array.fkey, `String key) :: fjs in
   buffer.updated <- `Assoc row :: buffer.updated ;
   buffer.capacity <- pred buffer.capacity
 
@@ -281,9 +283,9 @@ let remove_entry buffer key =
   buffer.removed <- key :: buffer.removed ;
   buffer.capacity <- pred buffer.capacity
 
-let update_entry buffer cols fkey key = function
+let update_entry array buffer key = function
   | Remove -> remove_entry buffer key
-  | Add v -> add_entry buffer cols fkey key v
+  | Add v -> add_entry array buffer key v
 
 let fetch array n =
   let m = content array in
@@ -303,7 +305,7 @@ let fetch array n =
           begin fun v ->
             let key = array.key v in
             if buffer.capacity > 0 then
-              add_entry buffer array.getter array.fkey key v
+              add_entry array buffer key v
             else
               ( m.updates <- Kmap.add key (Add v) m.updates ;
                 buffer.pending <- succ buffer.pending ) ;
@@ -313,7 +315,7 @@ let fetch array n =
       m.updates <- Kmap.filter
           begin fun key upd ->
             if buffer.capacity > 0 then
-              ( update_entry buffer array.getter array.fkey key upd ; false )
+              ( update_entry array buffer key upd ; false )
             else
               ( buffer.pending <- succ buffer.pending ; true )
           end m.updates ;
@@ -334,6 +336,7 @@ let register_array ~package ~name ~descr ~key
     ?(keyName="key")
     ?(keyType=Package.Jkey name)
     ~(iter : 'a callback)
+    ?(preload : ('a -> unit) option)
     ?(add_update_hook : 'a callback option)
     ?(add_remove_hook : 'a callback option)
     ?(add_reload_hook : unit callback option)
@@ -375,7 +378,7 @@ let register_array ~package ~name ~descr ~key
   let getter =
     List.map Package.(fun (fd,to_js) -> fd.fd_name , to_js) !model in
   let array = {
-    fkey = keyName ; key ; iter ; getter ; signal ;
+    fkey = keyName ; key ; iter ; preload ; getter ; signal ;
     current = None ; projects = Hashtbl.create 0
   } in
   let signature = Request.signature ~input:(module Jint) () in
