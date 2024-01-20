@@ -91,7 +91,7 @@ function getProverActions(result : WP.result) : ProverActionProps {
       return { icon: 'CIRC.CHECK', kind: 'positive' };
     case 'unknown':
     case 'stepout':
-      return { icon: 'CIRC.CROSS', kind: 'warning' };
+      return { icon: 'CIRC.CLOSE', kind: 'warning' };
     case 'timeout':
       {
         const forward = result.proverTime * 2;
