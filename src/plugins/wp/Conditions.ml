@@ -1031,6 +1031,15 @@ let lemma g =
   let cc g =
     let hs,p = forall_intro g in
     let hs = List.map (fun p -> step (Have p)) hs in
+    let hs =
+      if Wp_parameters.CounterExamples.get () then
+        let freevars = Vars.union (vars_list hs) (F.varsp p) in
+        List.fold_right
+          (fun x hs ->
+             let p = Probe.create ~name:(Var.basename x) () in
+             step (Probe(p,e_var x)) :: hs
+          ) (Vars.elements freevars) hs
+      else hs in
     sequence hs , p
   in Lang.local ~vars:(F.varsp g) cc g
 

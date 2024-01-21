@@ -26,12 +26,12 @@ type probe = {
   id : int;
   name : string ;
   stmt : stmt option ;
-  loc : location ;
+  loc : location option ;
 }
 
 let create =
   let id = ref (-1) in
-  fun ~loc ?stmt ~name () ->
+  fun ?loc ?stmt ~name () ->
     incr id; { id = !id ; loc ; stmt ; name }
 
 module S =
@@ -39,14 +39,13 @@ struct
   include Datatype.Undefined
   let name = "WP.Conditions.Probe.t"
   let reprs = [{
-      loc=List.hd Cil_datatype.Location.reprs;
-      stmt = None; name =""; id=1
+      loc = None; stmt = None; name = ""; id=1
     }]
   type t = probe
   let hash x = x.id
   let equal x y = Int.equal x.id y.id
   let compare x y = Int.compare x.id y.id
-  let pretty fmt p = Format.fprintf fmt "#%d(%s)" p.id p.name
+  let pretty fmt p = Format.fprintf fmt "%s#%d" p.name p.id
 end
 
 include Datatype.Make_with_collections(S)
