@@ -202,8 +202,8 @@ val pred_cond : condition -> pred
 val condition : sequence -> pred
 (** With free variables kept. *)
 
-val close : sequent -> pred
-(** With free variables {i quantified}. *)
+val property : sequent -> pred
+(** With free variables kept. *)
 
 val at_closure : (sequent -> sequent ) -> unit
 (** register a transformation applied just before close *)

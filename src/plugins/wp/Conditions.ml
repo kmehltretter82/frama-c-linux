@@ -1728,7 +1728,7 @@ let have s =
   | Branch _ | Either _ | State _ | Probe _ -> p_true
 
 let condition s = F.p_conj (hyps s)
-let close sequent =
+let property sequent =
   let s,goal = alter_closure sequent in
   (F.p_hyps (hyps s) goal)
 

@@ -48,7 +48,7 @@ sig
   val is_computed : t -> bool
   val make : Conditions.sequent -> t
   val compute : pid:WpPropId.prop_id -> t -> unit
-  val compute_proof : pid:WpPropId.prop_id -> t -> F.pred
+  val compute_proof : pid:WpPropId.prop_id -> ?opened:bool -> t -> F.pred
   val compute_descr : pid:WpPropId.prop_id -> t -> Conditions.sequent
   val compute_probes : pid:WpPropId.prop_id -> t -> F.term Probe.Map.t
   val get_descr : t -> Conditions.sequent

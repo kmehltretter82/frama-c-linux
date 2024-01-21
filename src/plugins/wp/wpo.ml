@@ -109,7 +109,8 @@ struct
     mutable time : float ;
     mutable simplified : bool ;
     mutable sequent : Conditions.sequent ;
-    mutable obligation : F.pred ;
+    mutable opened : F.pred ;
+    mutable closed : F.pred ;
     mutable probes : F.term Probe.Map.t ;
   }
 
@@ -119,7 +120,8 @@ struct
     time = 0.0 ;
     simplified = false ;
     sequent = empty , F.p_false ;
-    obligation = F.p_false ;
+    opened = F.p_false ;
+    closed = F.p_false ;
     probes = Probe.Map.empty ;
   }
 
@@ -127,7 +129,8 @@ struct
     time = 0.0 ;
     simplified = true ;
     sequent = empty , F.p_true ;
-    obligation = F.p_true ;
+    opened = F.p_true ;
+    closed = F.p_true ;
     probes = Probe.Map.empty ;
   }
 
@@ -135,7 +138,8 @@ struct
     time = 0.0 ;
     simplified = false ;
     sequent = sequent ;
-    obligation = F.p_false ;
+    opened = F.p_false ;
+    closed = F.p_false ;
     probes = Probe.Map.empty ;
   }
 
@@ -182,9 +186,12 @@ struct
         if Wp_parameters.Clean.get ()
         then apply "-wp-clean" Conditions.clean g ;
       end ;
-    if Conditions.is_trivial g.sequent then
-      g.sequent <- Conditions.trivial ;
-    g.obligation <- Conditions.close g.sequent
+    begin
+      if Conditions.is_trivial g.sequent then
+        g.sequent <- Conditions.trivial ;
+      g.opened <- Conditions.property g.sequent ;
+      g.closed <- F.p_close g.opened ;
+    end
 
   let safecompute ~pid g =
     begin
@@ -203,7 +210,8 @@ struct
       Lang.local ~vars:(Conditions.vars_seq g.sequent)
         (safecompute ~pid) g
 
-  let compute_proof ~pid g = compute ~pid g ; g.obligation
+  let compute_proof ~pid ?(opened=false) g =
+    compute ~pid g ; if opened then g.opened else g.closed
   let compute_probes ~pid g = compute ~pid g ; g.probes
   let compute_descr ~pid g = compute ~pid g ; g.sequent
   let get_descr g = g.sequent

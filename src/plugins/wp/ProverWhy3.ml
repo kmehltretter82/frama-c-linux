@@ -1156,16 +1156,15 @@ let prove_prop ?probes ?axioms ~pid prop =
   let name = "WP" in
   prove_goal ?axioms ?probes ~id ~title ~name prop
 
+let compute_probes ~ce ~pid goal =
+  if ce then Wpo.GOAL.compute_probes ~pid goal else Probe.Map.empty
+
 let task_of_wpo ~ce wpo =
   let v = wpo.Wpo.po_formula in
   let pid = wpo.Wpo.po_pid in
-  let axioms = v.Wpo.VC_Annot.axioms in
-  let prop = Wpo.GOAL.compute_proof ~pid v.Wpo.VC_Annot.goal in
-  let probes =
-    if ce then
-      Wpo.GOAL.compute_probes ~pid v.Wpo.VC_Annot.goal
-    else Probe.Map.empty in
-  prove_prop ~pid ?axioms ~probes prop, probes
+  let prop = Wpo.GOAL.compute_proof ~pid ~opened:ce v.goal in
+  let probes = compute_probes ~ce ~pid v.goal in
+  prove_prop ~pid ?axioms:v.axioms ~probes prop, probes
 
 (* -------------------------------------------------------------------------- *)
 (* --- Prover Task                                                        --- *)
