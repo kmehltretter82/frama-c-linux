@@ -356,10 +356,17 @@ let do_wpo_result goal prover res =
 
 let pp_hasmodel fmt goal =
   if Wp_parameters.CounterExamples.get () then
-    let rs = Wpo.get_results goal in
-    if List.exists
-        (fun (_,r) -> not @@ Probe.Map.is_empty r.VCS.prover_model) rs
-    then Format.fprintf fmt " (Model)"
+    let results = Wpo.get_results goal in
+    let model =
+      List.exists
+        (fun (_,r) -> not @@ Probe.Map.is_empty r.VCS.prover_model)
+        results in
+    if model then Format.fprintf fmt " (Model)" else
+      let ce_variant =
+        List.exists
+          (fun (p,_) -> VCS.has_counter_examples p)
+          results in
+      if ce_variant then Format.fprintf fmt " (No Model)"
 
 let do_report_stats ~shell ~cache ~smoke goal (stats : Stats.stats) =
   let status =

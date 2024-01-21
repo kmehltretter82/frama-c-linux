@@ -133,7 +133,7 @@ let is_auto = function
 
 let has_counter_examples = function
   | Qed | Tactical -> false
-  | Why3 p -> Why3Provers.has_counter_examples p
+  | Why3 p -> Why3Provers.with_counter_examples p <> None
 
 let cmp_prover p q =
   match p,q with
