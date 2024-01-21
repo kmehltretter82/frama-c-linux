@@ -241,9 +241,9 @@ class engine (lang : #Plang.engine) =
       | Branch(p,sa,sb) ->
         begin
           self#pp_intro ~clause:"If" ~dot:"" fmt p ;
-          if not (Conditions.is_true sa)
+          if not (Conditions.is_empty sa)
           then self#sequence ~clause:"Then" fmt sa ;
-          if not (Conditions.is_true sb)
+          if not (Conditions.is_empty sb)
           then self#sequence ~clause:"Else" fmt sb ;
         end
       | Either cases ->
@@ -272,8 +272,9 @@ class engine (lang : #Plang.engine) =
 
     method private sequence ~clause fmt seq =
       Format.pp_print_space fmt () ; self#pp_block ~clause fmt seq
+
     method pp_block ~clause fmt seq =
-      if Conditions.is_true seq then
+      if Conditions.is_empty seq then
         Format.fprintf fmt "%a {}" self#pp_clause clause
       else
         begin
@@ -292,7 +293,7 @@ class engine (lang : #Plang.engine) =
       Format.fprintf fmt "@[<hv 0>" ;
       List.iter (append (self#define env) fmt) (F.defs marks) ;
       lang#set_env env ;
-      if not (Conditions.is_true hs) then
+      if not (Conditions.is_empty hs) then
         begin
           self#pp_block ~clause:"Assume" fmt hs ;
           Format.pp_print_newline fmt () ;

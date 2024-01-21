@@ -36,7 +36,7 @@ let dkey_pruning = Wp_parameters.register_category "pruning"
 (* -------------------------------------------------------------------------- *)
 
 type category =
-  | EMPTY  (** Empty Sequence, equivalent to True, but with State. *)
+  | KEEP   (** Has probes, but equivalent to True *)
   | TRUE   (** Logically equivalent to True *)
   | FALSE  (** Logically equivalent to False *)
   | MAYBE  (** Any Hypothesis *)
@@ -45,13 +45,12 @@ let c_and c1 c2 =
   match c1 , c2 with
   | FALSE , _ | _ , FALSE -> FALSE
   | MAYBE , _ | _ , MAYBE -> MAYBE
-  | TRUE , _  | _ , TRUE -> TRUE
-  | EMPTY , EMPTY -> EMPTY
+  | TRUE , TRUE -> TRUE
+  | (KEEP | TRUE) , (KEEP | TRUE) -> KEEP
 
 let c_or c1 c2 =
   match c1 , c2 with
   | FALSE , FALSE -> FALSE
-  | EMPTY , EMPTY -> EMPTY
   | TRUE , TRUE -> TRUE
   | _ -> MAYBE
 
@@ -61,7 +60,7 @@ let rec cfold_and a f = function
 let rec cfold_or a f = function
   | [] -> a | e::es -> cfold_or (c_or a (f e)) f es
 
-let c_conj f es = cfold_and EMPTY f es
+let c_conj f es = cfold_and TRUE f es
 let c_disj f = function [] -> FALSE | e::es -> cfold_or (f e) f es
 
 (* -------------------------------------------------------------------------- *)
@@ -148,13 +147,14 @@ let core_list s = List.fold_left add_core_step Pset.empty s
 
 let catg_seq s = s.seq_catg
 let catg_cond = function
-  | State _ | Probe _ -> TRUE
+  | State _ -> TRUE
+  | Probe _ -> KEEP
   | Have p | Type p | When p | Core p | Init p ->
     begin
       match F.is_ptrue p with
       | No -> FALSE
       | Maybe -> MAYBE
-      | Yes -> EMPTY
+      | Yes -> TRUE
     end
   | Either cs -> c_disj catg_seq cs
   | Branch(_,a,b) -> c_or a.seq_catg b.seq_catg
@@ -325,8 +325,8 @@ let pretty = ref (fun _fmt _seq -> ())
 let equal (a : sequent) (b : sequent) : bool =
   F.eqp (snd a) (snd b) && equal_seq (fst a) (fst b)
 
-let is_true = function { seq_catg = TRUE | EMPTY } -> true | _ -> false
-let is_empty = function { seq_catg = EMPTY } -> true | _ -> false
+let is_true = function { seq_catg = TRUE | KEEP } -> true | _ -> false
+let is_empty = function { seq_catg = TRUE } -> true | _ -> false
 let is_false = function { seq_catg = FALSE } -> true | _ -> false
 
 let is_absurd_h h = match h.condition with
@@ -400,11 +400,11 @@ let update_cond ?descr ?(deps=[]) ?(warn=Warning.Set.empty) h c =
 type 'a disjunction = D_TRUE | D_FALSE | D_EITHER of 'a list
 
 let disjunction phi es =
-  let positives = ref false in (* TRUE or EMPTY items *)
+  let positives = ref false in (* TRUE or KEEP items *)
   let remains = List.filter
       (fun e ->
          match phi e with
-         | TRUE | EMPTY -> positives := true ; false
+         | TRUE | KEEP -> positives := true ; false
          | MAYBE -> true
          | FALSE -> false
       ) es in
@@ -553,7 +553,7 @@ let assume ?descr ?stmt ?deps ?warn ?(init=false) ?(domain=false) p hs =
   | Maybe ->
     begin
       match Bundle.category hs with
-      | MAYBE | TRUE | EMPTY ->
+      | MAYBE | TRUE | KEEP ->
         let p = exist_intro p in
         let cond =
           if init then Init p else if domain then Type p else Have p in
@@ -608,10 +608,10 @@ let merge cases = either ~descr:"Merge" cases
 (* -------------------------------------------------------------------------- *)
 
 let rec flat_catg = function
-  | [] -> EMPTY
+  | [] -> TRUE
   | s::cs ->
     match catg_step s with
-    | EMPTY -> flat_catg cs
+    | TRUE -> flat_catg cs
     | r -> r
 
 let flat_cons step tail =
@@ -621,13 +621,13 @@ let flat_cons step tail =
 
 let flat_concat head tail =
   match flat_catg head with
-  | EMPTY -> tail
+  | TRUE -> tail
   | FALSE -> head
-  | MAYBE|TRUE ->
+  | MAYBE|KEEP ->
     match flat_catg tail with
-    | EMPTY -> head
+    | TRUE -> head
     | FALSE -> tail
-    | MAYBE|TRUE -> head @ tail
+    | MAYBE|KEEP -> head @ tail
 
 let core_residual step core = {
   id = noid ;
@@ -643,7 +643,7 @@ let core_residual step core = {
 let core_branch step p a b =
   let condition =
     match a.seq_catg , b.seq_catg with
-    | (TRUE | EMPTY) , (TRUE|EMPTY) -> Have p_true
+    | (TRUE | KEEP) , (TRUE|KEEP) -> Have p_true
     | FALSE , FALSE -> Have p_false
     | _ -> Branch(p,a,b)
   in update_cond step condition
@@ -669,7 +669,7 @@ let rec flatten_sequence m = function
           let sa = a.seq_list in
           let sb = b.seq_list in
           match a.seq_catg , b.seq_catg with
-          | (TRUE|EMPTY) , (TRUE|EMPTY) ->
+          | (TRUE|KEEP) , (TRUE|KEEP) ->
             m := true ; flatten_sequence m seq
           | _ , FALSE ->
             m := true ;
@@ -993,7 +993,7 @@ let empty = {
   seq_size = 0 ;
   seq_vars = Vars.empty ;
   seq_core = Pset.empty ;
-  seq_catg = EMPTY ;
+  seq_catg = TRUE ;
   seq_list = [] ;
 }
 
@@ -1304,9 +1304,9 @@ and clean_steps u = function
     let c = clean_cond u s.condition in
     let seq = clean_steps u seq in
     match catg_cond c with
-    | EMPTY -> seq
+    | TRUE -> seq
     | FALSE -> [update_cond s c]
-    | TRUE | MAYBE -> update_cond s c :: seq
+    | KEEP | MAYBE -> update_cond s c :: seq
 
 let clean (s,p) =
   let u = Cleaning.create () in
