@@ -42,7 +42,9 @@ val provers_set : unit -> Why3.Whyconf.Sprover.t
 val is_available : t -> bool
 val is_mainstream : t -> bool
 val has_counter_examples : t -> bool
+val with_counter_examples : t -> t option
 val has_shortcut : t -> string -> bool
+
 
 type model = Why3.Model_parser.concrete_syntax_term
 val pp_model : model Pretty_utils.formatter

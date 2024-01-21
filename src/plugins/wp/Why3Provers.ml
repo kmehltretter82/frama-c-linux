@@ -122,6 +122,13 @@ let has_shortcut p s =
   | None -> false
   | Some p' -> Why3.Whyconf.Prover.equal p p'
 
+let with_counter_examples p =
+  if has_counter_examples p then Some p else
+    let name = p.prover_name in
+    List.find_opt
+      (fun (q : t) -> q.prover_name = name && has_counter_examples q)
+    @@ provers ()
+
 (* -------------------------------------------------------------------------- *)
 (* --- Models                                                             --- *)
 (* -------------------------------------------------------------------------- *)

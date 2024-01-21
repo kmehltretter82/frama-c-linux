@@ -1546,9 +1546,12 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ?memlimit
   try
     (* Always generate common task *)
     let context = Wpo.get_context wpo in
-    let ce =
-      Wp_parameters.CounterExamples.get () &&
-      Why3Provers.has_counter_examples prover in
+    let ce,prover =
+      if Wp_parameters.CounterExamples.get () then
+        match Why3Provers.with_counter_examples prover with
+        | None -> false,prover
+        | Some prover_ce -> true,prover_ce
+      else Why3Provers.has_counter_examples prover, prover in
     let task,probes = WpContext.on_context context (task_of_wpo ~ce) wpo in
     if Wp_parameters.Generate.get ()
     then Task.return VCS.no_result (* Only generate *)
