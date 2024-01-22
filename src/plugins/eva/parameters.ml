@@ -566,20 +566,27 @@ let () = add_correctness_dep InitializationPaddingGlobals.parameter
 
 (* --- Iteration strategy --- *)
 
+type descending_strategy = NoIteration | FullIteration | ExitIteration
+
 let () = Parameter_customize.set_group precision_tuning
 let () = Parameter_customize.is_invisible ()
 module DescendingIteration =
-  String
+  Enum
     (struct
-      let default = "no"
       let option_name = "-eva-descending-iteration"
       let arg_name = "no|exits|full"
       let help = "Experimental. After hitting a postfix point, try to improve \
                   the precision with either a <full> iteration or an iteration \
                   from loop head to exit paths (<exits>) or do not try anything \
                   (<no>). Default is <no>."
+      type t = descending_strategy
+      let default = NoIteration
+      let all_values = [NoIteration ; FullIteration ; ExitIteration]
+      let to_string = function
+        | NoIteration -> "no"
+        | FullIteration -> "full"
+        | ExitIteration -> "exits"
     end)
-let () = DescendingIteration.set_possible_values ["no" ; "exits" ; "full"]
 let () = add_precision_dep DescendingIteration.parameter
 
 let () = Parameter_customize.set_group precision_tuning
