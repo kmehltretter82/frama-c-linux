@@ -20,7 +20,7 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import React, { useState } from 'react';
+import React from 'react';
 import Lodash from 'lodash';
 
 import * as Dome from 'dome';
@@ -690,36 +690,6 @@ const extensions: Editor.Extension[] = [
   Editor.LanguageHighlighter,
 ];
 
-interface buttonUnFoldProps {
-  view: Editor.View;
-  scope: Ast.decl | undefined;
-}
-
-function ButtonUnFold(props: buttonUnFoldProps): JSX.Element {
-  const { view, scope } = props;
-  const [isFold, setIsFold] = useState(false);
-  const [prevScope, setPrevScope] = useState(scope);
-  if (scope !== prevScope) {
-    setPrevScope(scope);
-    setIsFold(false);
-  }
-  const icon = 'CHEVRON.' + (isFold ? 'EXPAND' : 'CONTRACT');
-  const title = isFold ? 'Expand' : 'Collapse';
-  const buttonUnFoldClicked = (): void => {
-    isFold ? Editor.unfoldAll(view) : Editor.foldAll(view);
-    setIsFold(!isFold);
-  };
-
-  return (
-    <IconButton
-      icon={icon}
-      onClick= {buttonUnFoldClicked}
-      title={title + ' all multi-line ACSL properties'}
-      className="titlebar-thin-icon"
-    />
-  );
-}
-
 // The component in itself.
 export default function ASTview(): JSX.Element {
   const [fontSize] = Settings.useGlobalSettings(Preferences.EditorFontSize);
@@ -730,6 +700,12 @@ export default function ASTview(): JSX.Element {
   React.useEffect(() => Marker.set(view, marker), [view, marker]);
   const hovered = States.useHovered() ?? Ast.markerDefault;
   React.useEffect(() => Hovered.set(view, hovered), [view, hovered]);
+
+  // State unFoldButton
+  const [isFoldText, setIsFoldText] = React.useState(false);
+  const icon = 'CHEVRON.' + (isFoldText ? 'EXPAND' : 'CONTRACT');
+  const title = isFoldText ? 'Expand' : 'Collapse';
+  const unFoldButtonClicked = (): void => { setIsFoldText(!isFoldText); };
 
   // Multiple selection
   const { markers } = Locations.useSelection();
@@ -746,6 +722,9 @@ export default function ASTview(): JSX.Element {
   // Printed AST
   const text = useAST(scope);
   React.useEffect(() => Text.set(view, text), [view, text]);
+  React.useEffect(() => {
+    isFoldText ? Editor.foldAll(view) : Editor.unfoldAll(view);
+  }, [view, isFoldText, text]);
 
   // EVA Callbacks
   const dead = useDead(scope);
@@ -761,7 +740,12 @@ export default function ASTview(): JSX.Element {
     <>
       <TitleBar>
         <Filler />
-        <ButtonUnFold view={view} scope={scope} />
+        <IconButton
+          icon={icon}
+          onClick= {unFoldButtonClicked}
+          title={title + ' all multi-line ACSL properties'}
+          className="titlebar-thin-icon"
+        />
         <Inset />
       </TitleBar>
       <Component style={{ fontSize: `${fontSize}px` }} />
