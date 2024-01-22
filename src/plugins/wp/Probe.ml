@@ -48,7 +48,7 @@ struct
   type t = probe
   let hash x = x.id
   let equal x y = Int.equal x.id y.id
-  let compare x y = Int.compare x.id y.id
+  let compare x y = Int.compare y.id x.id (* lastly created first (wp) *)
   let pretty fmt p =
     if Wp_parameters.debug_atleast 1 then
       Format.fprintf fmt "%s#%d" p.name p.id

@@ -303,13 +303,16 @@ struct
         path = path ;
       }
 
-  let probe ~loc ?descr ?stmt ~name term vc =
+  let probe_vc ~loc ?descr ?stmt ?warn ~name term vc =
     let vars = F.vars term in
     let hyps = Conditions.probe ~loc ?descr ?stmt ~name term vc.hyps in
+    let wrns = match warn with
+      | None -> vc.warn
+      | Some w -> Warning.Set.union w vc.warn in
     { hyps = hyps ;
       vars = vars ;
+      warn = wrns ;
       goal = vc.goal ;
-      warn = vc.warn ;
       deps = vc.deps ;
       path = vc.path }
 
@@ -531,6 +534,19 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let add_axiom _id _l = ()
+
+  let add_probe wenv ?stmt probe term wp = in_wenv wenv wp
+      (fun env wp ->
+         let outcome =
+           Warning.catch
+             ~severe:false ~effect:"Skip probe"
+             (L.term env) term in
+         match outcome with
+         | Warning.Failed _warn -> wp
+         | Warning.Result(warn,value) ->
+           let add_probe_vc =
+             probe_vc ~loc:term.term_loc ?stmt ~warn ~name:probe value in
+           { wp with vcs = gmap add_probe_vc wp.vcs })
 
   let add_hyp ?for_pid wenv (hpid,predicate) wp = in_wenv wenv wp
       (fun env wp ->
@@ -1443,23 +1459,11 @@ struct
   (* --- WP RULE : scope                                                    --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let wp_scope env wp ~descr ?(probes=false) scope xs =
+  let wp_scope env wp ~descr scope xs =
     let sigma = L.current env in
     let pre = M.alloc sigma xs in
     let hs = M.scope { pre ; post = sigma } scope xs in
     let vcs = gmap (assume_vc ~descr hs) wp.vcs in
-    let vcs =
-      if probes then
-        let xps =
-          List.rev_map
-            (fun x ->
-               let tau = Ctypes.object_of x.vtype in
-               x, C.cval @@ M.load sigma tau @@ M.cvar x) xs
-        in gmap
-          (List.fold_right
-             (fun (x,v) vc -> probe ~loc:x.vdecl ~name:x.vname v vc) xps) vcs
-      else vcs
-    in
     { wp with sigma = Some pre ; vcs = vcs }
 
   let scope wenv xs sc wp = in_wenv wenv wp
@@ -1470,8 +1474,7 @@ struct
           let vcs = gmap (assume_vc ~descr:"Heap" ~domain:true hs) wp.vcs in
           { wp with vcs }
         | Mcfg.SC_Frame_in ->
-          let probes = Wp_parameters.CounterExamples.get () in
-          wp_scope env wp ~probes ~descr:"Frame In" Enter xs
+          wp_scope env wp ~descr:"Frame In" Enter xs
         | Mcfg.SC_Frame_out ->
           wp_scope env wp ~descr:"Frame Out" Leave xs
         | Mcfg.SC_Block_in ->
