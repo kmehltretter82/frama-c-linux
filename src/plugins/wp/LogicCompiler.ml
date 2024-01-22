@@ -808,7 +808,7 @@ struct
 
   let define_lemma c l =
     if l.lem_labels <> [] && Wp_parameters.has_dkey dkey_lemma then
-      Wp_parameters.warning ~source:l.lem_position
+      Wp_parameters.warning ~source:(fst l.lem_loc)
         "Lemma '%s' has labels, consider using global invariant instead."
         l.lem_name ;
     let { tp_kind = kind ; tp_statement = p } = l.lem_predicate in

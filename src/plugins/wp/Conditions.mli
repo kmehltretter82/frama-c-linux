@@ -188,7 +188,7 @@ val introduction : sequent -> sequent option
 val introduction_eq : sequent -> sequent
 (** Same as [introduction] but returns the same sequent is None *)
 
-val lemma : pred -> sequent
+val lemma : loc:location -> pred -> sequent
 (** Performs existential, universal and hypotheses introductions *)
 
 val head : step -> pred

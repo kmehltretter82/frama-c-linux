@@ -1080,16 +1080,12 @@ let add_model_trace (probes: Lang.F.term Probe.Map.t) cnv t =
     let create_id (p:Probe.t) ty =
       let attr = Ident.create_model_trace_attr (string_of_int p.id) in
       let attrs = Ident.Sattr.singleton attr in
-      let loc =
-        Option.map
-          (function
-              ({Filepath.pos_path;pos_lnum=l1;pos_cnum=c1},
-               {Filepath.pos_lnum=l2;pos_cnum=c2}) ->
-              Why3.Loc.user_position
-                (Filepath.Normalized.to_pretty_string pos_path) l1 c1 l2 c2
-          ) p.loc in
-      Term.create_lsymbol
-        (Ident.id_fresh ?loc ~attrs p.name) [] ty
+      let loc = match p.loc with
+          ({Filepath.pos_path;pos_lnum=l1;pos_cnum=c1},
+           {Filepath.pos_lnum=l2;pos_cnum=c2}) ->
+          Why3.Loc.user_position
+            (Filepath.Normalized.to_pretty_string pos_path) l1 c1 l2 c2
+      in Term.create_lsymbol (Ident.id_fresh ~loc ~attrs p.name) [] ty
     in
     let fold (p:Probe.t) (term:Lang.F.term) task =
       let term' = share cnv (Lang.F.typeof term) term in

@@ -26,12 +26,12 @@ type probe = {
   id : int;
   name : string ;
   stmt : stmt option ;
-  loc : location option ;
+  loc : location ;
 }
 
 let create =
   let id = ref (-1) in
-  fun ?loc ?stmt ~name () ->
+  fun ~loc ?stmt ~name () ->
     incr id; { id = !id ; loc ; stmt ; name }
 
 module S =
@@ -39,7 +39,7 @@ struct
   include Datatype.Undefined
   let name = "WP.Conditions.Probe.t"
   let reprs = [{
-      loc = None; stmt = None; name = ""; id=1
+      loc = Cil_datatype.Location.unknown; stmt = None; name = ""; id=1
     }]
   type t = probe
   let hash x = x.id

@@ -26,10 +26,10 @@ type probe = private {
   id : int;
   name : string ;
   stmt : stmt option ;
-  loc : location option ;
+  loc : location ;
 }
 
-val create : ?loc:location -> ?stmt:stmt -> name:string -> unit -> probe
+val create : loc:location -> ?stmt:stmt -> name:string -> unit -> probe
 
 include Datatype.S_with_collections with type t = probe
 

@@ -1649,7 +1649,7 @@ struct
       let id = WpPropId.mk_lemma_id l in
       let def = L.lemma l in
       let model = WpContext.get_model () in
-      let sequent = Conditions.lemma def.l_lemma in
+      let sequent = Conditions.lemma ~loc:l.lem_loc def.l_lemma in
       let vca = {
         Wpo.VC_Annot.axioms = Some (def.l_cluster, l.lem_depends) ;
         goal = GOAL.make sequent ;
