@@ -165,6 +165,37 @@ function getFirstDockedComponent(): string {
   return head ? head.id : "";
 }
 
+function fillBlankQuarterInLayout(
+  layout: { A: string, B: string, C: string, D: string }):
+  {A: string, B: string, C: string, D: string} {
+  if(layout.A === "" && layout.B === "" && layout.C === "" && layout.D === "") {
+    const compId = getFirstDockedComponent();
+    layout.A = compId;
+    layout.B = compId;
+    layout.C = compId;
+    layout.D = compId;
+    return layout;
+  }
+
+  if(layout.A === "")  {
+    if(layout.B !== "") layout.A = layout.B;
+    else if(layout.C !== "") layout.A = layout.C;
+  }
+  if(layout.B === "") {
+    if(layout.A !== "") layout.B = layout.A;
+    else if(layout.D !== "") layout.B = layout.D;
+  }
+  if(layout.C === "") {
+    if(layout.A !== "") layout.C = layout.A;
+    else if(layout.D !== "") layout.C = layout.D;
+  }
+  if(layout.D === "")  {
+    if(layout.B !== "") layout.D = layout.B;
+    else if(layout.C !== "") layout.D = layout.C;
+  }
+  return fixLShapedComponentInLayout(layout);
+}
+
 function addToDockedComponents(comp: Ivette.ComponentProps)
 : void {
   const labviewState = globalLabViewState.getValue();
@@ -203,23 +234,37 @@ function deleteFromDockedComponents(comp: Ivette.ComponentProps): void {
   }, true);
 }
 
-function deleteFromLoadedComponents(compId: string): void {
+function deleteFromLoadedComponents(comp: Ivette.ComponentProps): void {
   const labviewState = globalLabViewState.getValue();
   const loadedComponents = labviewState.components;
+  const dockedComponents = labviewState.dockedComponents;
+  const A = labviewState.A ?? "";
+  const B = labviewState.B ?? "";
+  const C = labviewState.C ?? "";
+  const D = labviewState.D ?? "";
 
   let exists = false;
   const tmpArray = Array.from(loadedComponents);
   tmpArray.forEach(c => {
-    if (c === compId) {
+    if (c === comp.id) {
       exists = true;
       tmpArray.splice(tmpArray.indexOf(c), 1);
     }
   });
   if(!exists) return;
 
+  removeCompFromCurrentLayout(comp.id);
+  const layout = fillBlankQuarterInLayout({ A: A, B: B, C: C, D: D });
+  addToDockedComponents(comp);
+
   globalLabViewState.setValue({
     ...labviewState,
-    components: new Set(tmpArray)
+    A: layout.A,
+    B: layout.B,
+    C: layout.C,
+    D: layout.D,
+    components: new Set(tmpArray),
+    dockedComponents: dockedComponents
   }, true);
 }
 
@@ -245,10 +290,10 @@ layout: { A: string, B: string, C: string, D: string }):
     });
 
     if(occurences === 3) {
-      if (layout.D === compId ) layout.D = getFirstDockedComponent();
-      else if (layout.C === compId ) layout.C = getFirstDockedComponent();
-      else if (layout.B === compId ) layout.B = getFirstDockedComponent();
-      else if (layout.A === compId ) layout.A = getFirstDockedComponent();
+      if (layout.D === compId) layout.D = getFirstDockedComponent();
+      else if (layout.C === compId) layout.C = getFirstDockedComponent();
+      else if (layout.B === compId) layout.B = getFirstDockedComponent();
+      else if (layout.A === compId) layout.A = getFirstDockedComponent();
     }
   });
 
@@ -281,9 +326,6 @@ function assignCompToQuarter(quarter: string, compId: string): void {
     label: "Custom Layout",
     layout: layout
    });
-
-   const comp = COMPONENT.getElement(compId);
-   comp && deleteFromDockedComponents(comp);
 }
 
 function applyLayout(view : Ivette.ViewLayoutProps): void {
@@ -365,6 +407,11 @@ function Pane(props: PaneProps): JSX.Element | null {
                   title={title} />
               </RenderElement>
             </Catch>
+            <Icon id={"ITEMS.GRID"}
+              className="titlebar-thin-icon"
+              onClick={(e) =>
+                openPanelLayoutSelector(component, e, "titlebar")}
+            />
           </Hfill>
         </Hbox>
         <Ivette.TitleContext.Provider value={{ id, label, title }}>
@@ -623,7 +670,12 @@ export function PanelLayoutSelector()
   }
 
   function remove(): void {
-    deleteFromLoadedComponents(state.compId);
+    const component: Ivette.ComponentProps = {
+      id: state.compId,
+      label: state.compLabel
+    };
+    state.origin === "titlebar" && deleteFromLoadedComponents(component);
+    state.origin === "dockbar" && deleteFromDockedComponents(component);
     close();
   }
 
@@ -676,7 +728,7 @@ export function PanelLayoutSelector()
             onClick={dock} />
           </div>
         }
-        { state.origin === "titlebar" &&
+        { state.origin !== "sidebar" &&
           <div className="panelLayoutSelector-spaced">
             Remove Panel
             <Icon id="TRASH" size={iconSize}
