@@ -29,6 +29,7 @@ type probe = private {
   loc : location ;
 }
 
+val annotations : stmt -> (string * term) list
 val create : loc:location -> ?stmt:stmt -> name:string -> unit -> probe
 
 include Datatype.S_with_collections with type t = probe
