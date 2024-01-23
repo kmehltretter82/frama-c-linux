@@ -1508,10 +1508,12 @@ To enable counter examples generation by \textsf{WP} you shall use
 \verb+-wp-counter-examples+ option. Then, for each selected solver that has a
 counter-examples variant, this variant will be used instead and counter-examples
 will be asked to the solver in case of unknown result. Notice that you can also
-use counter-examples solvers \emph{without} asking for counter-examples, by
-using \verb+-wp-no-counter-examples+, which is the default. Notice that
-solvers variants with counter-examples support are generally a bit slower than
-their original version.
+use counter-examples solvers \emph{without} asking for counter-examples. For
+instance, with option \verb+-wp-prover cvc4-ce+, \textsf{WP} will use this
+version of the prover, even if counter examples is not active; the prover will
+not be asked to report models, unless counter examples \emph{is}
+activate. Notice that solvers variants with counter-examples support are
+generally a bit slower than their original version.
 
 A proof obligation for which a counter-example has been generated is reported by
 \textsf{WP} by the string \verb+"(Model)"+ after its proof status. For instance:
@@ -1571,8 +1573,9 @@ general syntax for the annotation is:
 \]
 
 Probes are normalized by \textsf{Qed} during simplification of proof obligations
-by \textsf{WP}. Their (simplified) term definitions are also reported when
-printing proof obligations. For instance:
+by \textsf{WP}. Their (simplified) term definitions are reported when printing
+proof obligations, and their model values are reported when printing proof
+results, when available. For instance:
 
 \begin{shell}
   # frama-c [...] -wp-status
