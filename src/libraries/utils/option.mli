@@ -20,6 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Adding let binding operators to the Option module. See
+   https://v2.ocaml.org/manual/bindingops.html for more information. *)
+
 include module type of Stdlib.Option
 
 val zip : 'a option -> 'b option -> ('a * 'b) option
