@@ -52,6 +52,6 @@ Ivette.registerView({
     A: 'fc.kernel.astview',
     B: 'fc.dive.graph',
     C: 'fc.kernel.properties',
-    D: 'frama-c.kernel.locations',
+    D: 'fc.kernel.locations',
   }
 });
