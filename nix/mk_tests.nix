@@ -26,6 +26,7 @@
 
 { lib
 , alt-ergo
+, cvc4
 , clang
 , frama-c
 , perl
@@ -60,7 +61,7 @@ stdenvNoCC.mkDerivation {
     yq
     which
   ] ++
-  (if has-wp-proofs then [ alt-ergo ] else []);
+  (if has-wp-proofs then [ alt-ergo cvc4 ] else []);
 
   postPatch = ''
     patchShebangs .
