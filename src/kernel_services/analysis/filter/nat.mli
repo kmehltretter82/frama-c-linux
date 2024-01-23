@@ -41,8 +41,8 @@ val to_int : 'n nat -> int
 
 (* Returns a positive or null natural. If the given parameter is stricly
    negative then 0 is returned. This function complexity is O(n). *)
-val of_int : int -> positive_or_null
+val of_int : int -> positive_or_null option
 
 (* Returns a strictly positive natural. If the given parameter is less or equal
    than zero, then 1 is returned. This function complexity is O(n). *)
-val of_strictly_positive_int : int -> strictly_positive
+val of_strictly_positive_int : int -> strictly_positive option

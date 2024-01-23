@@ -37,11 +37,7 @@ let prev : type n. n succ nat -> n nat = fun n -> n - 1
 let to_int : type n. n nat -> int = fun n -> n
 
 let of_int n =
-  let next (PositiveOrNull n) = PositiveOrNull (succ n) in
-  let rec aux acc n = if n <= 0 then acc else aux (next acc) (n - 1) in
-  aux (PositiveOrNull zero) n
+  if n < 0 then None else Some (PositiveOrNull n)
 
 let of_strictly_positive_int n =
-  let next (StrictlyPositive n) = StrictlyPositive (succ n) in
-  let rec aux acc n = if n <= 1 then acc else aux (next acc) (n - 1) in
-  aux (StrictlyPositive one) n
+  if n < 1 then None else Some (StrictlyPositive n)

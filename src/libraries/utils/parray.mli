@@ -20,6 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Persistent array, based on "A Persistent Union-Find Data Structure" by
+   Sylvain Conchon and Jean-Chistophe Filliâtre. For further details, see
+   https://www.lri.fr/~filliatr/ftp/publis/puf-wml07.pdf *)
+
 module Types : sig
   type 'a array
 end

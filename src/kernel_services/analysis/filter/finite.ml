@@ -33,8 +33,8 @@ let next : type n. n finite -> n succ finite = fun n -> n + 1
 let ( == ) : type n. n finite -> n finite -> bool = fun l r -> l = r
 let to_int : type n. n finite -> int = fun n -> n
 
-let of_int : type n. n succ nat -> int -> n succ finite =
-  fun limit n -> min (max 0 n) (Nat.to_int limit)
+let of_int : type n. n succ nat -> int -> n succ finite option =
+  fun limit n -> if 0 <= n && n < Nat.to_int limit then Some n else None
 
 let for_each (type n) acc (limit : n nat) (f : n finite -> 'a -> 'a) =
   let acc = ref acc in

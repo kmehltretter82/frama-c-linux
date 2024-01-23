@@ -28,15 +28,30 @@ module Make (Field : Field.S) : sig
   open Linear.Types
   open Field.Types
 
+  (* A value of type [(n, m) filter] describes a linear filter of order n (i.e
+     with n state variables) and with m inputs. *)
   module Types : sig type ('n, 'm) filter end
   open Types
 
   val create :
     ('n succ, 'n succ) matrix ->
     ('n succ, 'm succ) matrix ->
-    'm succ vector -> ('n, 'm) filter
+    'm succ vector -> ('n succ, 'm succ) filter
 
   val pretty : Format.formatter -> ('n, 'm) filter -> unit
-  val invariant : ('n, 'm) filter -> scalar
+
+  (* Invariant computation. The computation of [invariant filter max] relies on
+     the search of an exponent such as the norm of the state matrix is strictly
+     lower than one. This search depth is bounded by [max]. If no exponent is
+     found before this limit is reached, the function returns None. If an
+     exponent [e] is found, the invariant computation complexity is bounded by
+     O(e * (n^3 + n^2 * m)) with [n] the filter's order and [m] its number of
+     inputs. Only the invariant's upper bound [λ] is returned, the filter's
+     invariant is thus bounded by ±λ. The only thing that limit the optimality
+     of this bound is [max], the initial search depth. However, for most simple
+     filters, a depth of 200 will gives an exact upper bound up to at least ten
+     digits, which is more than enough. Moreover, for those simple filters, the
+     computation is immediate, even when using rational numbers. *)
+  val invariant : ('n, 'm) filter -> int -> scalar option
 
 end

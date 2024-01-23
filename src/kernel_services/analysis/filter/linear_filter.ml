@@ -28,46 +28,47 @@ module Make (Field : Field.S) = struct
 
   module Linear = Linear.Space (Field)
   open Linear.Types
+  open Field.Types
+  open Linear
 
 
-  (* Invariant search fuel parameters. TODO: let the user change those. *)
-  let fuel = 50
-  let coarse_refinement_fuel = 5
-  let fine_refinement_fuel = 50
-  let refinement_threshold = 200
 
-  (* Find a first exponant such as the spectral radius is lower than one. *)
-  let rec first_exponant m exp fuel =
-    if Field.(Linear.Matrix.norm m <= one) then (exp, m)
-    else if fuel < 0 then raise (Invalid_argument "Divergeant filter")
-    else first_exponant Linear.Matrix.(m * m) (exp * 2) (fuel - 1)
+  let rec first_steps max steps matrix exponent =
+    let steps = (matrix, exponent) :: steps in
+    if Field.(Matrix.norm matrix < one) then
+      if exponent * 2 > max then Some steps
+      else first_steps max steps Matrix.(matrix * matrix) (exponent * 2)
+    else if exponent <= max then
+      first_steps max steps Matrix.(matrix * matrix) (exponent * 2)
+    else None
 
-  (* Refine the exponant to improve the precision. *)
-  let rec refine base m exp coarse fine =
-    if coarse < 0 || fine < 0 || exp > refinement_threshold
-    then exp, m
-    else if (exp * 2) > refinement_threshold
-    then refine base Linear.Matrix.(base * m) (exp + 1) coarse (fine - 1)
-    else refine base Linear.Matrix.(m * m) (exp * 2) (coarse - 1) fine
+  let rec refine max = function
+    | [] -> None
+    | [ (matrix, exponent) ] -> Some (Matrix.norm matrix, exponent)
+    | (matrix, exponent) :: (matrix', exponent') :: previous ->
+      let exponent'' = exponent + exponent' in
+      if exponent'' > max
+      then refine max ((matrix, exponent) :: previous)
+      else refine max ((Matrix.(matrix * matrix'), exponent'') :: previous)
 
-  (* Looking for an exponant n such as norm(A^n) ≤ 1, which implies that the
-     spectral radius of A is lower than 1. The exponant is refined to improve the
-     invariant's precision. *)
-  let find_exponant base =
-    let exponant, matrix = first_exponant base 1 fuel in
-    let coarse = coarse_refinement_fuel and fine = fine_refinement_fuel in
-    let exponant, matrix = refine base matrix exponant coarse fine in
-    (Linear.Matrix.norm matrix, exponant)
+  let find_exponent max_acceptable_exponent base =
+    let open Option.Operators in
+    let* steps = first_steps max_acceptable_exponent [] base 1 in
+    refine max_acceptable_exponent steps
 
 
 
   module Types = struct
-    type ('n, 'm) filter = Filter : ('n succ, 'm succ) data -> ('n, 'm) filter
+
+    type ('n, 'm) filter =
+      | Filter : ('n succ, 'm succ) data -> ('n succ, 'm succ) filter
+
     and ('n, 'm) data =
       { state : ('n, 'n) matrix
       ; input : ('n, 'm) matrix
       ; measure : 'm vector
       }
+
   end
 
   open Types
@@ -76,24 +77,26 @@ module Make (Field : Field.S) = struct
 
   let create state input measure = Filter { state ; input ; measure }
 
-  let pretty fmt (Filter f) =
-    let open Linear in
+  type ('n, 'm) formatter = Format.formatter -> ('n, 'm) filter -> unit
+  let pretty : type n m. (n, m) formatter = fun fmt (Filter f) ->
     Format.fprintf fmt "Filter:@.@." ;
     Format.fprintf fmt "- State :@.@.  @[<v>%a@]@.@." Matrix.pretty f.state ;
     Format.fprintf fmt "- Input :@.@.  @[<v>%a@]@.@." Matrix.pretty f.input
 
-  let sum order f g stop =
-    let rec compute (acc, res) i =
-      if i > 0 then compute (f acc, Field.(res + g acc)) (i - 1) else res
-    in compute (Linear.Matrix.id order, Field.zero) (stop - 1)
+  let sum order p norm stop =
+    let ( + ) res acc = Field.(res + norm acc) in
+    let rec aux (m, r) i = if i >= 0 then aux (p m, r + m) (i - 1) else r in
+    aux (Matrix.id order, Field.zero) (stop - 1)
 
-  let invariant (Filter f) =
-    let order, _ = Linear.Matrix.dimensions f.input in
-    let spectral, exponant = find_exponant f.state in
-    let power p = Linear.Matrix.(f.state * p) in
-    let norm  p = Linear.Matrix.(p * f.input |> norm) in
+  type ('n, 'm) invariant = ('n, 'm) filter -> int -> scalar option
+  let invariant : type n m. (n, m) invariant = fun (Filter f) max ->
+    let open Option.Operators in
+    let order, _ = Matrix.dimensions f.input in
+    let+ spectral, exponant = find_exponent max f.state in
+    let power p = Matrix.(f.state * p) in
+    let norm  p = Matrix.(p * f.input |> norm) in
     let sum = sum order power norm exponant in
-    let bound = Field.(Linear.Vector.norm f.measure * sum / (one - spectral)) in
+    let bound = Field.(Vector.norm f.measure * sum / (one - spectral)) in
     let order = Field.of_int (Nat.to_int order) in
     Field.(bound / order)
 

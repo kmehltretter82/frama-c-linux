@@ -30,10 +30,9 @@ val next : 'n finite -> 'n succ finite
 val ( == ) : 'n finite -> 'n finite -> bool
 
 (* The call [of_int limit n] returns a finite value representing the n-nd
-   element of a finite set of cardinal limit. If n is strictly negative then it
-   returns the first element. If n is greater or equal to the limit then it
-   returns the last element. This function complexity is O(1). *)
-val of_int : 'n succ nat -> int -> 'n succ finite
+   element of a finite set of cardinal limit. If n is not in the bounds, none is
+   returned. This function complexity is O(1). *)
+val of_int : 'n succ nat -> int -> 'n succ finite option
 
 (* The call [to_int n] returns an integer equal to n. This function complexity
    is O(1). *)
