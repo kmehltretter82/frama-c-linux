@@ -1504,7 +1504,7 @@ generation can be identified by the \verb$"counterexamples"$ variant after their
 name. For example, in the prover selection example above, \verb+cvc4-ce+ and
 \verb+z3-ce+ are such provers.
 
-To activate counter examples generation by \textsf{WP} you shall use
+To enable counter examples generation by \textsf{WP} you shall use
 \verb+-wp-counter-examples+ option. Then, for each selected solver that has a
 counter-examples variant, this variant will be used instead and counter-examples
 will be asked to the solver in case of unknown result. Notice that you can also
@@ -1528,7 +1528,7 @@ A proof obligation for which a counter-example has been generated is reported by
   Unknown:         1
 \end{shell}
 
-Notice that cache usage is deactivated for provers asked to generate a
+Notice that cache usage is disabled for provers asked to generate a
 counter-example, since models are currently not stored in \textsf{WP}'s
 cache\footnote{This feature might be added in future versions of the plugin.}.
 
@@ -1540,7 +1540,7 @@ wrong, although they might not be \emph{sufficient} in practice.
 
 Generated models are reported by \textsf{WP} along with prover results when
 either \verb+-wp-print+ or \verb+-wp-status+ options are used. The interactive
-proof transformer (\textsf{TIP}) also display models in the graphical user
+proof transformer (\textsf{TIP}) also displays models in the graphical user
 interface, when available.
 
 Probes are generalization of variables. They are named expressions for which the
@@ -1618,7 +1618,7 @@ is activated. For instance, in the previous example:
 \noindent
 Summary of \textsf{WP} options related to probes and counter-examples generation:
 \begin{description}
-\item[\tt -wp-(no)-counter-examples] activates counter examples generation for
+\item[\tt -wp-(no)-counter-examples] enables counter examples generation for
   supporting provers. Also generate probes for formal parameters of functions
   and universal quantifiers of lemmas. Not set by default.
 \item[\tt -wp-print, -wp-status] pretty-prints the probes and the associated models,
