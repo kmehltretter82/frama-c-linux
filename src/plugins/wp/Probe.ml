@@ -64,7 +64,7 @@ include Datatype.Make_with_collections(S)
 
 let rec name_of_host = function
   | TVar { lv_name = x } -> x
-  | TResult _ -> "result"
+  | TResult _ -> "result" (* currently not used, but could be one day *)
   | TMem t -> name_of_term t
 
 and name_of_term (t : term) =
@@ -90,6 +90,7 @@ let annotations stmt =
 
 let parse_probe : Acsl_extension.extension_typer =
   fun context _loc terms ->
+  (* use default context of the code-annotation (like an assert clause) *)
   let parse_term = context.type_term context context.pre_state in
   Ext_terms (List.map parse_term terms)
 
