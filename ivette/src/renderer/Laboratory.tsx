@@ -161,7 +161,7 @@ function openPanelLayoutSelector(comp: Ivette.ComponentProps,
 function getFirstDockedComponent(): string {
   const labviewState = globalLabViewState.getValue();
   const [head] = labviewState.dockedComponents;
-  deleteFromDockedComponents(head);
+  head !== undefined && deleteFromDockedComponents(head);
   return head ? head.id : "";
 }
 
@@ -215,7 +215,9 @@ function addToDockedComponents(comp: Ivette.ComponentProps)
 }
 
 function deleteFromDockedComponents(comp: Ivette.ComponentProps): void {
-  const labviewState = globalLabViewState.getValue();
+  let labviewState = globalLabViewState.getValue();
+  labviewState.components.has(comp.id) && deleteFromLoadedComponents(comp);
+  labviewState = globalLabViewState.getValue();
   const dockedComponents = labviewState.dockedComponents;
 
   let exists = false;
@@ -235,13 +237,8 @@ function deleteFromDockedComponents(comp: Ivette.ComponentProps): void {
 }
 
 function deleteFromLoadedComponents(comp: Ivette.ComponentProps): void {
-  const labviewState = globalLabViewState.getValue();
+  let labviewState = globalLabViewState.getValue();
   const loadedComponents = labviewState.components;
-  const dockedComponents = labviewState.dockedComponents;
-  const A = labviewState.A ?? "";
-  const B = labviewState.B ?? "";
-  const C = labviewState.C ?? "";
-  const D = labviewState.D ?? "";
 
   let exists = false;
   const tmpArray = Array.from(loadedComponents);
@@ -254,8 +251,12 @@ function deleteFromLoadedComponents(comp: Ivette.ComponentProps): void {
   if(!exists) return;
 
   removeCompFromCurrentLayout(comp.id);
+  labviewState = globalLabViewState.getValue();
+  const A = labviewState.A ?? "";
+  const B = labviewState.B ?? "";
+  const C = labviewState.C ?? "";
+  const D = labviewState.D ?? "";
   const layout = fillBlankQuarterInLayout({ A: A, B: B, C: C, D: D });
-  addToDockedComponents(comp);
 
   globalLabViewState.setValue({
     ...labviewState,
@@ -264,7 +265,6 @@ function deleteFromLoadedComponents(comp: Ivette.ComponentProps): void {
     C: layout.C,
     D: layout.D,
     components: new Set(tmpArray),
-    dockedComponents: dockedComponents
   }, true);
 }
 
@@ -369,7 +369,9 @@ function applyLayout(view : Ivette.ViewLayoutProps): void {
   Object.values(layout).forEach(compId => {
     components.add(compId);
     const component = COMPONENT.getElement(compId);
-    component && deleteFromDockedComponents(component);
+    if(component && component !== undefined) {
+      deleteFromDockedComponents(component);
+    }
   });
 
   state = globalLabViewState.getValue();
@@ -515,7 +517,8 @@ function ComponentItem(comp: Ivette.ItemProps): JSX.Element {
   function onContextMenu(e: React.MouseEvent): void {
     const labViewState = globalLabViewState.getValue();
 
-    if(labViewState.components.has(comp.id)) {
+    if(labViewState.components.has(comp.id)
+    || labViewState.dockedComponents.has(comp)) {
       globalPanelLayoutSelectorState.setValue(defaultPanelLayoutSelectorState);
       return;
     }
