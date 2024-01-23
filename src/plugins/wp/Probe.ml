@@ -103,11 +103,4 @@ let register () =
 
 let () = Cmdline.run_after_configuring_stage register
 
-
-
-
-
-
-
-
 (* -------------------------------------------------------------------------- *)
