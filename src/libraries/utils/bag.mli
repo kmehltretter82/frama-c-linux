@@ -45,6 +45,10 @@ val fold_right : ('a -> 'b -> 'b) -> 'a t -> 'b -> 'b
 val find : ('a -> bool) -> 'a t -> 'a
 val find_opt : ('a -> bool) -> 'a t -> 'a option
 val find_map : ('a -> 'b option) -> 'a t -> 'b option
+(** [find_map f b]: finds the first element [x] of the bag such
+    that [f x] returns [Some y], and returns [Some y]. If no such
+    element exists, returns None.
+*)
 
 val exists : ('a -> bool) -> 'a t -> bool
 val for_all : ('a -> bool) -> 'a t -> bool
