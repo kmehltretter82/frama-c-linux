@@ -216,7 +216,6 @@ function addToDockedComponents(comp: Ivette.ComponentProps)
 
 function deleteFromDockedComponents(comp: Ivette.ComponentProps): void {
   let labviewState = globalLabViewState.getValue();
-  labviewState.components.has(comp.id) && deleteFromLoadedComponents(comp);
   labviewState = globalLabViewState.getValue();
   const dockedComponents = labviewState.dockedComponents;
 
