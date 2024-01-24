@@ -767,10 +767,9 @@ module Make
                subvalues that are all evaluated. Limits the number of splits to
                keep the number of evaluations linear on [nb]. *)
             let subdivnb =
+              let pow n e = Integer.power_int_positive_int n e |> Option.get in
               if nb > 3
-              then
-                let pow = Integer.power_int_positive_int in
-                (subdivnb * nb) / (Integer.to_int_exn (pow 2 (nb - 1)))
+              then (subdivnb * nb) / (Integer.to_int_exn (pow 2 (nb - 1)))
               else subdivnb
             in
             Self.result ~current:true ~once:true ~dkey
