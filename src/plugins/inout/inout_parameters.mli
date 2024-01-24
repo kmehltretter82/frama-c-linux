@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val name: string
+
 include Plugin.S
 
 module ForceAccessPath: Parameter_sig.Bool

@@ -20,10 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let name = "inout"
+
 include Plugin.Register
     (struct
-      let name = "inout"
-      let shortname = "inout"
+      let name = name
+      let shortname = name
       let help = "operational, imperative and all kinds of inputs/outputs"
     end)
 

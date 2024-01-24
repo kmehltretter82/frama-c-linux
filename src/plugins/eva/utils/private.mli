@@ -45,7 +45,6 @@ module Eval_op = Eval_op
 module Eval_terms = Eval_terms
 module Eval_typ = Eval_typ
 module Function_calls = Function_calls
-module Inout = Inout
 module Logic_inout = Logic_inout
 module Main_locations = Main_locations
 module Main_values = Main_values

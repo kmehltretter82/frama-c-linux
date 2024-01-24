@@ -46,8 +46,8 @@ let used_var = UsedVarState.memo
        Function_calls.partial_results () ||
        try
          let f = fst (Globals.entry_point ()) in
-         let inputs = Inout.Inputs.get_external f in
-         let outputs = Inout.Outputs.get_external f in
+         let inputs = Eva_dynamic.Inout.kf_inputs f in
+         let outputs = Eva_dynamic.Inout.kf_outputs f in
          let b = Base.of_varinfo var in
          Locations.Zone.mem_base b inputs || Locations.Zone.mem_base b outputs
        with e ->
@@ -227,10 +227,10 @@ let gui_compute_values (main_ui:main_ui) =
   then main_ui#launcher ()
 
 let cleaned_outputs kf s =
-  let outs = Inout.Outputs.kinstr (Kstmt s) in
+  let outs = Eva_dynamic.Inout.stmt_outputs s in
   let accept = Logic_inout.accept_base ~formals:true ~locals:true kf in
   let filter = Locations.Zone.filter_base accept in
-  Option.map filter outs
+  filter outs
 
 let pretty_stmt_info (main_ui:main_ui) kf stmt =
   (* Is it an accessible statement ? *)
@@ -248,11 +248,8 @@ let pretty_stmt_info (main_ui:main_ui) kf stmt =
     else
       (* Out for this statement *)
       let outs = cleaned_outputs kf stmt in
-      match outs with
-      | Some outs ->
-        main_ui#pretty_information
-          "Modifies @[<hov>%a@]@." Locations.Zone.pretty outs
-      | _ -> ()
+      main_ui#pretty_information
+        "Modifies @[<hov>%a@]@." Locations.Zone.pretty outs
   end
   else main_ui#pretty_information "This code is dead@."
 

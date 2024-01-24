@@ -179,8 +179,14 @@ let self = Externals.self
 let statement = Analysis.statement
 let expr = Analysis.expr
 
-let () =
-  Eva__Private.Inout.Inputs.ref_get_external := get_external
+(* Registers a function only used by the Eva GTK GUI via the dynamic API. *)
+let _kf_inputs =
+  Dynamic.register
+    ~comment:"Returns the memory zone read by a given function."
+    ~plugin:Inout_parameters.name
+    "kf_inputs"
+    Datatype.(func Kernel_function.ty Zone.ty)
+    get_internal
 
 (*
 Local Variables:

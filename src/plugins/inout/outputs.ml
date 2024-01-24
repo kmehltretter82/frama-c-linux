@@ -175,10 +175,24 @@ let self = Externals.self
 let compute kf = ignore (get_internal kf)
 let statement = Analysis.statement
 
-let () =
-  Eva__Private.Inout.Outputs.ref_statement := Analysis.statement ;
-  Eva__Private.Inout.Outputs.ref_get_external := get_external ;
-  Eva__Private.Inout.Outputs.ref_get_internal := get_internal
+(* Registers functions used by Eva via the dynamic API. *)
+
+let _kf_outputs =
+  Dynamic.register
+    ~comment:"Returns the memory zone modified by a given function."
+    ~plugin:Inout_parameters.name
+    "kf_outputs"
+    Datatype.(func Kernel_function.ty Zone.ty)
+    get_internal
+
+(* Only used by the Eva GTK GUI. *)
+let _stmt_outputs =
+  Dynamic.register
+    ~comment:"Returns the memory zone modified by a statement"
+    ~plugin:Inout_parameters.name
+    "stmt_outputs"
+    Datatype.(func Cil_datatype.Stmt.ty Zone.ty)
+    Analysis.statement
 
 (*
 Local Variables:

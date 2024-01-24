@@ -541,6 +541,8 @@ let extract_inout_from_froms froms =
 [@@@ warning "-60"]
 module Callwise = struct
 
+  module Record_Inout_Callbacks = Hook.Build (struct type t = Inout_type.t end)
+
   let merge_call_in_local_table call local_table v =
     let prev =
       try CallsiteHash.find local_table call
@@ -584,7 +586,7 @@ module Callwise = struct
     | [] -> Inout_parameters.fatal "callwise: internal stack is empty"
 
   let end_record callstack kf inout =
-    Eva__Private.Inout.Operational_inputs.Record_Inout_Callbacks.apply inout;
+    Record_Inout_Callbacks.apply inout;
     let callsite = Eva.Callstack.top_callsite callstack in
     match callsite, !call_inout_stack with
     | Kstmt _, (_caller, table) :: _ ->
@@ -682,6 +684,15 @@ module Callwise = struct
   let () =
     Eva.Cvalue_callbacks.register_call_results_hook record_for_callwise_inout;
     Eva.Cvalue_callbacks.register_call_hook call_for_callwise_inout
+
+  let _register_call_hook =
+    Dynamic.register
+      ~comment:"Registers a function to be applied on the inputs/outputs \
+                computed for each function call."
+      ~plugin:Inout_parameters.name
+      "register_call_hook"
+      Datatype.(func (func Inout_type.ty unit) unit)
+      Record_Inout_Callbacks.extend_once
 
 end
 
