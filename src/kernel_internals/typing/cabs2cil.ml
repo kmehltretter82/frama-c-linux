@@ -128,10 +128,11 @@ let typeForInsertedVar: (Cil_types.typ -> Cil_types.typ) ref = ref (fun t -> t)
 let cabs_exp loc node = { expr_loc = loc; expr_node = node }
 
 let abort_context msg =
-  let pos = fst (Cil.CurrentLoc.get ()) in
+  let (p1,p2) = Cil.CurrentLoc.get() in
   let append fmt =
     Format.pp_print_newline fmt ();
-    Errorloc.pp_context_from_file fmt pos
+    Errorloc.pp_context_from_file
+      ~start_line:p1.pos_lnum ~start_char:(p1.pos_cnum -p1.pos_bol) fmt p2
   in
   Kernel.abort ~current:true ~append msg
 
@@ -2942,7 +2943,10 @@ let rec setOneInit this o preinit =
     let idx, (* Index in the current comp *)
         restoff (* Rest offset *) =
       match o with
-      | Index({enode = Const(CInt64(i,_,_))}, off) -> to_integer i, off
+      | NoOffset -> assert false
+      | Index({enode = Const(CInt64(i,_,_));eloc}, off) ->
+        CurrentLoc.set eloc;
+        to_integer i, off
       | Field (f, off) ->
         (* Find the index of the field *)
         let rec loop (idx: int) = function
@@ -2958,7 +2962,9 @@ let rec setOneInit this o preinit =
           | _ :: restf -> loop (idx + 1) restf
         in
         loop 0 (Option.value ~default:[] f.fcomp.cfields), off
-      | _ -> abort_context "setOneInit: non-constant index"
+      | Index({ eloc },_) ->
+        CurrentLoc.set eloc;
+        abort_context "setOneInit: non-constant index"
     in
     let pMaxIdx, pArray =
       match this  with
@@ -8337,6 +8343,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
           end
 
         | Cabs.ATINDEX_INIT(idx, whatnext) -> begin
+            CurrentLoc.set idx.expr_loc;
             match unrollType so.soTyp with
             | TArray (bt, leno, _) ->
               let ilen = integerArrayLength leno in
