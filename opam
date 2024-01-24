@@ -128,7 +128,7 @@ depends: [
   "conf-time" { with-test }
   "menhir" { >= "20181006" & build }
   "ocaml" { >= "4.13.1" }
-  "ocamlgraph" { >= "1.8.8" }
+  "ocamlgraph" { >= "2.0.0" }
   "ocamlgraph" { with-test & >= "2.1.0" }
   "odoc" { with-doc }
   "unionFind" { >= "20220107" }
