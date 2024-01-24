@@ -7832,7 +7832,9 @@ and doPureExp local_env (e : Cabs.expression) : exp =
   let (_,se, e', _) = doExp local_env CConst e (AExp None) in
   if isNotEmpty se then
     Kernel.error
-      ~once:true ~current:true "%a has side-effects" Cprint.print_expression e;
+      ~once:true ~current:true
+      "%a has side-effects. Side-effects are not yet supported here."
+      Cprint.print_expression e;
   e'
 
 and doFullExp local_env const e what =
