@@ -6,7 +6,7 @@
   63    #endif
   64    #ifdef INCOMPATIBLE_QUALIFIED_TYPE
   65      int a = _Generic("abc", char const *: 0);
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   66    #endif
   67      int ok1 = _Generic("abc", char*: 0);
 [kernel] Frama-C aborted: invalid user input.

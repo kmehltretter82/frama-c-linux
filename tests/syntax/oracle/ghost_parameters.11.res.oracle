@@ -5,7 +5,7 @@
   193   #ifdef VOID_EMPTY_GHOST_PARAMETER_LIST
   194   
   195   void function_void(void) /*@ ghost () */ {
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                            ^
   196   
   197   }
 [kernel] Frama-C aborted: invalid user input.

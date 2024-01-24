@@ -9,7 +9,7 @@
   121   #ifdef ARRAY_INIT4
   122   // Previously caused Out of memory
   123   int ai4[] = {1, [7205759403792793] = 11};
-                        ^^^^^^^^^^^^^^^^^
+                         ^^^^^^^^^^^^^^^^
   124   #endif
   125
 [kernel] Frama-C aborted: invalid user input.

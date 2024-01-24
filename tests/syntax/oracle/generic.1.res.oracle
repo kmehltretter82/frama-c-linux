@@ -5,7 +5,7 @@
   34    int main() {
   35    #ifdef NONE
   36      int a = _Generic("abc");
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                 ^
   37    #endif
   38    #ifdef TOO_MANY_DEFAULTS
 [kernel] Frama-C aborted: invalid user input.

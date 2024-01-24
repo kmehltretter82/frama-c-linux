@@ -128,11 +128,10 @@ let typeForInsertedVar: (Cil_types.typ -> Cil_types.typ) ref = ref (fun t -> t)
 let cabs_exp loc node = { expr_loc = loc; expr_node = node }
 
 let abort_context msg =
-  let (p1,p2) = Cil.CurrentLoc.get() in
+  let start_pos,end_pos = Cil.CurrentLoc.get() in
   let append fmt =
     Format.pp_print_newline fmt ();
-    Errorloc.pp_context_from_file
-      ~start_line:p1.pos_lnum ~start_char:(p1.pos_cnum -p1.pos_bol) fmt p2
+    Errorloc.pp_context_from_file ~start_pos fmt end_pos
   in
   Kernel.abort ~current:true ~append msg
 

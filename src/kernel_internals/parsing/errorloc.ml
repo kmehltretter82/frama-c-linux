@@ -142,15 +142,19 @@ let setCurrentFile n =
    plus up to [ctx] lines before and after [pos.pos_lnum] (if they exist),
    similar to 'grep -C<ctx>'. The first line is numbered 1.
    Most exceptions are silently caught and printing is stopped if they occur. *)
-let pp_context_from_file ?(ctx=2) ?start_line ?(start_char=1) fmt pos =
+let pp_context_from_file ?(ctx=2) ?start_pos fmt pos =
   try
     let in_ch = open_in (pos.Filepath.pos_path :> string) in
     try
       begin
-        let first_error_line, last_error_line =
-          match start_line with
-          | None -> pos.Filepath.pos_lnum, pos.Filepath.pos_lnum
-          | Some l -> min l pos.Filepath.pos_lnum, max l pos.Filepath.pos_lnum
+        let open Filepath in
+        let first_error_line, start_char, last_error_line =
+          match start_pos with
+          | None -> pos.pos_lnum, 1, pos.pos_lnum
+          | Some s ->
+            min s.pos_lnum pos.pos_lnum,
+            (s.pos_cnum - s.pos_bol + 1),
+            max s.pos_lnum pos.pos_lnum
         in
         (* The difference between the first and last error lines can be very
            large; in this case, we print only the first and last [error_ctx]
@@ -292,11 +296,7 @@ let parse_error ?source msg =
               pp_location (start_pos, last_pos)
               pretty_token (Lexing.lexeme current.lexbuf);
             Format.fprintf fmt "%a@."
-              (pp_context_from_file
-                 ~start_line:start_pos.Filepath.pos_lnum
-                 ~ctx:2
-                 ~start_char:(start_pos.pos_cnum - start_pos.pos_bol + 1))
-              last_pos);
+              (pp_context_from_file ~start_pos ~ctx:2) last_pos);
       raise (Log.AbortError "kernel"))
     msg
 

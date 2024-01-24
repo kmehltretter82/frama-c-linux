@@ -5,7 +5,7 @@
   18    #ifdef IN_DECL
   19    
   20    int \ghost global ;
-        ^^^^^^^^^^^^^^^^^^^
+        ^^^^^^^^^^
   21    
   22    #endif
 [kernel] Frama-C aborted: invalid user input.

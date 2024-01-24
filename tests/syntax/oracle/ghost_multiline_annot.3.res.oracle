@@ -5,7 +5,7 @@
   55    int main()
   56    {
   57      assert (2 == 2); @/
-        ^^^^^^^^^^^^^^^^^^^^^
+                         ^^^
   58      return 0;
   59    }
 [kernel] Frama-C aborted: invalid user input.

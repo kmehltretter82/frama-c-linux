@@ -5,7 +5,7 @@
   60    #endif
   61    #ifdef FUNCTION_TYPE
   62      int a = _Generic(1, void(int): 1);
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                   ^^^
   63    #endif
   64    #ifdef INCOMPATIBLE_QUALIFIED_TYPE
 [kernel] Frama-C aborted: invalid user input.

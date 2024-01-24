@@ -5,6 +5,6 @@
   9     
   10    void main() {
   11      {_LOR:} // KO: labels can't be at the end of a block.
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                ^
   12    }
 [kernel] Frama-C aborted: invalid user input.

@@ -68,14 +68,15 @@ val finishParsing: unit -> unit (** Call this function to finish parsing and
 
 (** prints the line identified by the position, together with [ctx] lines
     of context before and after. [ctx] defaults to 2.
-    If [start_line] is specified, then all lines between [start_line] and
-    [pos.pos_lnum] are considered part of the error.
-    If [start_line] and [pos.pos_lnum] are identical (or [start_line] is None),
-    the portion of the line between [start_char] (defaults to 1) and
-    the character position indicated by [pos] is underlined with [^].
+    If [start_pos] is specified, then all positions between [start_pos] and
+    [pos] are considered part of the error. If this expands to multiple
+    lines, those lines will be separated from context by blank lines.
+    Otherwise, the portion of the line that is between the two positions
+    will be underlined with [^]
+    @before Frama-C+dev: [start_pos] was named [start_line] (and was an [int]).
 *)
 val pp_context_from_file:
-  ?ctx:int -> ?start_line:int -> ?start_char:int ->
+  ?ctx:int -> ?start_pos:Filepath.position ->
   Format.formatter -> Filepath.position -> unit
 
 (** prints a readable description of a location
