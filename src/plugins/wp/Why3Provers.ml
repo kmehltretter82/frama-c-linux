@@ -116,6 +116,9 @@ let is_auto (p : t) =
       let prover_config = Why3.Whyconf.get_prover_config config p in
       not prover_config.interactive
     with Not_found -> true
+let has_counter_examples p =
+  List.mem "counterexamples" @@
+  String.split_on_char '+' p.Why3.Whyconf.prover_altern
 
 let provers () =
   Why3.Whyconf.Mprover.keys (Why3.Whyconf.get_provers (config ()))
@@ -131,5 +134,19 @@ let has_shortcut p s =
           (Why3.Whyconf.get_prover_shortcuts (config ())) with
   | None -> false
   | Some p' -> Why3.Whyconf.Prover.equal p p'
+
+let with_counter_examples p =
+  if has_counter_examples p then Some p else
+    let name = p.prover_name in
+    List.find_opt
+      (fun (q : t) -> q.prover_name = name && has_counter_examples q)
+    @@ provers ()
+
+(* -------------------------------------------------------------------------- *)
+(* --- Models                                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+type model = Why3.Model_parser.concrete_syntax_term
+let pp_model = Why3.Model_parser.print_concrete_term
 
 (* -------------------------------------------------------------------------- *)

@@ -49,6 +49,7 @@ let s_kind s = match s.condition with
   | Type _ -> "type"
   | Init _ -> "init"
   | Branch _ -> "branch"
+  | Probe _ -> "probe"
   | Either _ -> "either"
   | State _ -> "state"
 
@@ -337,6 +338,7 @@ let json_of_verdict = function
   | VCS.Timeout -> `String "timeout"
   | VCS.Stepout -> `String "stepout"
   | VCS.Failed -> `String "failed"
+  | VCS.Invalid -> `String "invalid"
 
 let verdict_of_json = function
   | `String "valid" -> VCS.Valid
@@ -344,6 +346,7 @@ let verdict_of_json = function
   | `String "timeout" -> VCS.Timeout
   | `String "stepout" -> VCS.Stepout
   | `String "failed" -> VCS.Failed
+  | `String "invalid" -> VCS.Invalid
   | _ -> VCS.NoResult
 
 let json_of_result (p : VCS.prover) (r : VCS.result) =

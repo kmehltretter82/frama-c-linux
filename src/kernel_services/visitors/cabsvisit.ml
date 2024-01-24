@@ -383,16 +383,6 @@ and childrenStatement vis s =
     in
     if details' != details then
       {s with stmt_node = ASM (sl, b, details', l)} else s
-  | TRY_FINALLY (b1, b2, l) ->
-    let b1' = visitCabsBlock vis b1 in
-    let b2' = visitCabsBlock vis b2 in
-    if b1' != b1 || b2' != b2 then {s with stmt_node = TRY_FINALLY(b1', b2', l)} else s
-  | TRY_EXCEPT (b1, e, b2, l) ->
-    let b1' = visitCabsBlock vis b1 in
-    let e' = visitCabsExpression vis e in
-    let b2' = visitCabsBlock vis b2 in
-    if b1' != b1 || e' != e || b2' != b2 then
-      {s with stmt_node = TRY_EXCEPT(b1', e', b2', l)} else s
   | THROW (e,l) ->
     let e' = optMapNoCopy (visitCabsExpression vis) e in
     if e != e' then { s with stmt_node = THROW(e',l) } else s

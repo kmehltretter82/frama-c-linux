@@ -225,6 +225,7 @@ struct
     `String begin
       match verdict with
       | Valid -> if smoke then "DOOMED" else "VALID"
+      | Invalid -> if smoke then "PASSED" else "INVALID"
       | Unknown -> if smoke then "PASSED" else "UNKNOWN"
       | Timeout -> if smoke then "PASSED" else "TIMEOUT"
       | Stepout -> if smoke then "PASSED" else "STEPOUT"

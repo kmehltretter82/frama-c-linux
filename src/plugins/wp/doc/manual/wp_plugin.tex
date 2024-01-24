@@ -1227,7 +1227,7 @@ would never be provable.
 
 The \textsf{WP} plug-in can generate smoke-tests to detect such inconsistencies.
 Basically, it consists in checking if \verb+\false+ is provable under the requirements
-or assumptions of a behaviour, or under the invariants of a loop. Also, a simple reachability
+or assumptions of a behavior, or under the invariants of a loop. Also, a simple reachability
 analysis is performed to track dead-code statements and calls that neither terminates nor exits.
 
 This is best-effort verification : if at least one prover succeed in proving \verb+\false+,
@@ -1492,6 +1492,146 @@ obligations are:
 \item[\tt -wp-out <dir>] sets the user directory where proof
   obligations are saved. The directory is created if it does not exist
   yet. Its content is not cleaned up automatically.
+\end{description}
+
+\subsection{Probes and Counter Examples}
+
+\emph{Introduced since Frama-C 29.0 (Copper)}
+
+Depending on prover capabilities, \textsf{WP} can trigger counter example
+generation for non successful goals. Provers supporting counter example
+generation can be identified by the \verb$"counterexamples"$ variant after their
+name. For example, in the prover selection example above, \verb+cvc4-ce+ and
+\verb+z3-ce+ are such provers.
+
+To enable counter examples generation by \textsf{WP} you shall use
+\verb+-wp-counter-examples+ option. Then, for each selected solver that has a
+counter-examples variant, this variant will be used instead and counter-examples
+will be asked to the solver in case of unknown result. Notice that you can also
+use counter-examples solvers \emph{without} asking for counter-examples. For
+instance, with option \verb+-wp-prover cvc4-ce+, \textsf{WP} will use this
+version of the prover, even if counter examples is not active; the prover will
+not be asked to report models, unless counter examples \emph{is}
+activate. Notice that solvers variants with counter-examples support are
+generally a bit slower than their original version.
+
+A proof obligation for which a counter-example has been generated is reported by
+\textsf{WP} by the string \verb+"(Model)"+ after its proof status. For instance:
+
+\begin{shell}
+# ./bin/frama-c -wp ~/work/wrong.i -wp-prover cvc4 -wp-counter-examples
+[...]
+[wp] 6 goals scheduled
+[wp] [Unknown] typed_g_ensures (Qed 4ms) (CVC4) (No Cache) (Model)
+[wp] [Cache] not used
+[wp] Proved goals:    6 / 7
+  Unreachable:     1
+  Qed:             5 (0.72ms)
+  Unknown:         1
+\end{shell}
+
+Notice that cache usage is disabled for provers asked to generate a
+counter-example, since models are currently not stored in \textsf{WP}'s
+cache\footnote{This feature might be added in future versions of the plugin.}.
+
+A counter-example consists in a \emph{Model}, that is, a map from
+\emph{Variables} or \emph{Probes} (see below) to \emph{Values}, for which the
+proof obligation formula is expected to be \verb+False+. More precisely, the
+Model reports on \emph{necessary} conditions for the proof obligation to be
+wrong, although they might not be \emph{sufficient} in practice.
+
+Generated models are reported by \textsf{WP} along with prover results when
+either \verb+-wp-print+ or \verb+-wp-status+ options are used. The interactive
+proof transformer (\textsf{TIP}) also displays models in the graphical user
+interface, when available.
+
+Probes are generalization of variables. They are named expressions for which the
+prover is asked to output a value in the model. \textsf{WP} will automatically
+introduce probes for formal parameters of functions and universally quantified
+variables of lemmas. Developers can introduce their own probes by using the
+\verb+@probe+ annotation. For instance:
+
+\begin{lstlisting}[style=c]
+  int a[4][5];
+  /*@
+    ensures \false;
+    assigns \nothing;
+  */
+  int value(int i, int j) {
+    //@ probe Offset: &a[i][j] - &a[0][0];
+    return a[i][j];
+  }
+}
+\end{lstlisting}
+
+Probes \emph{must} be named \textsf{ACSL} terms.  As a short cut, for very
+simple probes such as variables, the name can be omitted. Several probes might
+have the same name, although it is not really convenient for debugging. The
+general syntax for the annotation is:
+\[
+\mathtt{probe} \; a_1: t_1, \ldots, a_n: t_n \;\mathtt{;}
+\]
+
+Probes are normalized by \textsf{Qed} during simplification of proof obligations
+by \textsf{WP}. Their (simplified) term definitions are reported when printing
+proof obligations, and their model values are reported when printing proof
+results, when available. For instance:
+
+\begin{shell}
+  # frama-c [...] -wp-status
+  [...]
+  Goal Post-condition (file /Users/correnson/work/matrix.i, line 3) in 'value':
+  Assume {
+    Type: is_sint32(i) /\ is_sint32(j).
+    Probe i = i.
+    Probe j = j.
+    Probe Offset = ((4 * j) + (20 * i)) / 4.
+  }
+  Prove: false.
+  Prover CVC4 1.8 returns Unknown (Model) (Qed:2ms)
+  Model i = 0
+  Model j = 0
+  Model Offset = 0
+  [...]
+\end{shell}
+
+User probes are always reported, even if \verb+-wp-counter-examples+ is not
+activated. This feature reveals to be extremely useful for debugging proofs in
+practice, even when counter examples is not available or not activated. It also
+helps in understanding \textsf{C}, \textsf{ACSL} and \textsf{WP} models and
+encoding.
+
+You may freely add as many probes as you want: probes do not modify the
+proof obligations submitted to the provers, unless \verb+-wp-counter-examples+
+is activated. For instance, in the previous example:
+
+\begin{shell}
+  # frama-c [...] -wp-status -wp-no-counter-examples
+  [...]
+  Goal Post-condition (file /Users/correnson/work/matrix.i, line 3) in 'value':
+  Assume {
+    Type: is_sint32(i) /\ is_sint32(j).
+    Probe Offset = ((4 * j) + (20 * i)) / 4.
+  }
+  Prove: false.
+  Prover CVC4 1.8 returns Unknown (Qed:2ms) (Cached)
+  [...]
+\end{shell}
+
+\noindent
+Summary of \textsf{WP} options related to probes and counter-examples generation:
+\begin{description}
+\item[\tt -wp-(no)-counter-examples] enables counter examples generation for
+  supporting provers. Also generate probes for formal parameters of functions
+  and universal quantifiers of lemmas. Not set by default.
+\item[\tt -wp-print, -wp-status] pretty-prints the probes and the associated models,
+  when available.
+\item[\tt -wp-solver xxx-ce] use the specified variant of prover, even
+  when counter-examples is not activated.
+\item[\tt -wp-(no)-probes] registers the \verb+@probe+ \textsf{ACSL}
+  extension in \textsf{Frama-C} kernel.
+  This option is set by default, but you may want to deactivate it to
+  avoid any clash with extensions from other plugins.
 \end{description}
 
 \subsection{Additional Proof Libraries}

@@ -41,9 +41,6 @@
 (*                          et Automatique).                                *)
 (****************************************************************************)
 
-(** Signals that we are in MS VC mode *)
-val setMSVCMode: unit -> unit
-
 (** add a syntactic transformation that will be applied to all freshly parsed
     C files.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)

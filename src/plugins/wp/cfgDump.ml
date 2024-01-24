@@ -89,6 +89,16 @@ let new_env ?lvars kf : t_env = ignore lvars ; kf
 
 let add_axiom _p _l = ()
 
+let add_probe _env ?stmt p t k =
+  ignore stmt ;
+  let u = node () in
+  if Wp_parameters.debug_atleast 1 then
+    Format.fprintf !out "  %a [ label=\"Probe %a\" ] ;@." pretty u Printer.pp_term t
+  else
+    Format.fprintf !out "  %a [ label=\"Probe %s\" ] ;@." pretty u p ;
+  Format.fprintf !out "  %a -> %a [ style=dotted ] ;@." pretty u pretty k ;
+  link u k ; u
+
 let add_hyp ?for_pid _env (pid,pred) k =
   ignore(for_pid);
   let u = node () in

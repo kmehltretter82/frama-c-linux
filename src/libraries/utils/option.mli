@@ -1,9 +1,9 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of WP plug-in of Frama-C.                           *)
+(*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
 (*  Copyright (C) 2007-2023                                               *)
-(*    CEA (Commissariat a l'energie atomique et aux energies              *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
@@ -20,37 +20,16 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val why3_version : string
-val config : unit -> Why3.Whyconf.config
-val configure : unit -> unit
-val set_procs : int -> unit
+(* Adding let binding operators to the Option module. See
+   https://v2.ocaml.org/manual/bindingops.html for more information. *)
 
-type t = Why3.Whyconf.prover
+include module type of Stdlib.Option
 
-val find_opt : string -> t option
+val zip : 'a option -> 'b option -> ('a * 'b) option
 
-type fallback = Exact of t | Fallback of t | NotFound
-val find_fallback : string -> fallback
-
-val ident_why3 : t -> string
-val ident_wp : t -> string
-val title : ?version:bool -> t -> string
-val name : t -> string
-val version : t -> string
-val altern : t -> string
-val compare : t -> t -> int
-
-val provers : unit -> t list
-val provers_set : unit -> Why3.Whyconf.Sprover.t
-val is_auto : t -> bool
-val is_available : t -> bool
-val is_mainstream : t -> bool
-val has_counter_examples : t -> bool
-val with_counter_examples : t -> t option
-val has_shortcut : t -> string -> bool
-
-
-type model = Why3.Model_parser.concrete_syntax_term
-val pp_model : model Pretty_utils.formatter
-
-(**************************************************************************)
+module Operators : sig
+  val ( let* ) : 'a option -> ('a -> 'b option) -> 'b option
+  val ( let+ ) : 'a option -> ('a -> 'b) -> 'b option
+  val ( and* ) : 'a option -> 'b option -> ('a * 'b) option
+  val ( and+ ) : 'a option -> 'b option -> ('a * 'b) option
+end

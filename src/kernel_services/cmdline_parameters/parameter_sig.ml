@@ -279,6 +279,21 @@ module type String = sig
   *)
 end
 
+(** Signature for a custom parameter. *)
+module type Custom = sig
+  include S
+
+  val set_possible_values: string list -> unit
+  (** Set what are the acceptable values for this parameter.
+      If the given list is empty, then all values are acceptable.
+      @since Frama-C+dev *)
+
+  val get_possible_values: unit -> string list
+  (** What are the acceptable values for this parameter.
+      If the returned list is empty, then all values are acceptable.
+      @since Frama-C+dev *)
+end
+
 (* ************************************************************************** *)
 (** {3 Custom signatures} *)
 (* ************************************************************************** *)
@@ -557,6 +572,28 @@ module type Builder = sig
       (** used in error message if the file does not exist where it should
           and vice-versa. *)
     end): Filepath
+
+  (** Allow using custom types as parameters.
+      @since Frama-c+dev *)
+  module Custom(X: sig
+      include Input_with_arg
+      include Datatype.S
+      val default: t
+      val of_string: string -> t option
+      val to_string: t -> string
+    end) : Custom with type t = X.t
+
+  (** A fixed set of possible values, represented by a type [t], intended to be
+      a variant with only a finite number of possible constructions.
+      Note that [t] must be comparable using [Stdlib.compare].
+      @since Frama-c+dev *)
+  module Enum(X : sig
+      include Input_with_arg
+      type t
+      val default: t
+      val all_values: t list
+      val to_string: t -> string
+    end) : S with type t = X.t
 
   exception Cannot_build of string
   module Make_set

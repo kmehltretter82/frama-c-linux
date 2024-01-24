@@ -55,6 +55,8 @@ let occurs_q p q = occurs_e (F.e_prop p) (F.e_prop q)
 let lookup_step env queue s =
   match s.condition with
   | State _ -> Empty
+  | Probe(_,t) ->
+    if t == env.target then Inside(Step s,env.target) else Empty
   | When p | Have p | Init p | Core p | Type p ->
     let p = Lang.F.e_prop p in
     if p == env.target then Clause(Step s) else

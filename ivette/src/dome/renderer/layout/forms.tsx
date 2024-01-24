@@ -322,7 +322,11 @@ export function useProperty<A, K extends keyof A>(
     const localError = { ...objError, [property]: propError };
     setState(newValue, isValidObject(localError) ? undefined : localError);
   }, [value, error, setState, property, checker]);
-  return [value[property], error, update];
+  return [
+    value[property],
+    isObjectError(error) ? error[property] : undefined,
+    update
+  ];
 }
 
 /**
@@ -520,8 +524,8 @@ export function Section(props: SectionProps): JSX.Element | null {
 
   return (
     <CONTEXT.Provider value={{ hidden, disabled }}>
-      <div className="dome-xForm-section">
-        <div className="dome-xForm-fold" onClick={flip}>
+      <div className="dome-xForm-section" onClick={flip}>
+        <div className="dome-xForm-fold">
           <SVG id={unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT'} size={11} />
         </div>
         <label className={cssTitle} title={title}>
@@ -833,6 +837,12 @@ function TEXT_OF_NUMBER(n: number | undefined): string {
   return Number(n).toLocaleString('en');
 }
 
+function TEXT_OF_INPUT_NUMBER(n: number | undefined): string {
+  if (n === undefined) return '';
+  if (Number.isNaN(n)) throw new Error('Invalid number');
+  return Number(n).toString();
+}
+
 function NUMBER_OF_TEXT(s: string): number | undefined {
   if (s === '') return undefined;
   const n = Number.parseFloat(s.replace(/[ ,]/g, ''));
@@ -909,7 +919,7 @@ export function SpinnerField(props: SpinnerFieldProps): JSX.Element {
 
   }, [min, max, checker]);
   const checked = useChecker(props.state, fullChecker);
-  const filtered = useFilter(checked, TEXT_OF_NUMBER, NUMBER_OF_TEXT, '');
+  const filtered = useFilter(checked, TEXT_OF_INPUT_NUMBER, NUMBER_OF_TEXT, '');
   const [value, error, setState] = useLatency(filtered, latency);
   const onChange = useChangeEvent(setState);
   const UNITS = units && (

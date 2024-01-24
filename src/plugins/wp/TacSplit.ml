@@ -301,7 +301,7 @@ class split =
       | Clause(Step step) ->
         begin
           match step.condition with
-          | State _ -> Not_applicable
+          | State _ | Probe _ -> Not_applicable
           | Branch(p,_,_) ->
             feedback#set_title "Split (branch)" ;
             feedback#set_descr "Decompose conditional into branches." ;

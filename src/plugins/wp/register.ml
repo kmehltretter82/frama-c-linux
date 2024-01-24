@@ -354,6 +354,20 @@ let do_wpo_result goal prover res =
   if VCS.is_verdict res && prover = VCS.Qed then
     do_progress goal "Qed"
 
+let pp_hasmodel fmt goal =
+  if Wp_parameters.CounterExamples.get () then
+    let results = Wpo.get_results goal in
+    let model =
+      List.exists
+        (fun (_,r) -> not @@ Probe.Map.is_empty r.VCS.prover_model)
+        results in
+    if model then Format.fprintf fmt " (Model)" else
+      let ce_variant =
+        List.exists
+          (fun (p,_) -> VCS.has_counter_examples p)
+          results in
+      if ce_variant then Format.fprintf fmt " (No Model)"
+
 let do_report_stats ~shell ~cache ~smoke goal (stats : Stats.stats) =
   let status =
     if smoke then
@@ -361,25 +375,27 @@ let do_report_stats ~shell ~cache ~smoke goal (stats : Stats.stats) =
       | Valid -> "[Failed] (Doomed)"
       | Failed ->  "[Failure] (Solver Error)"
       | NoResult | Computing _ -> "[NoResult] (Unknown)"
-      | (Unknown | Timeout | Stepout) when shell -> "[Passed] (Unsuccess)"
+      | (Unknown | Timeout | Stepout | Invalid)
+        when shell -> "[Passed] (Unsuccess)"
       | Unknown -> "[Passed] (Unknown)"
       | Timeout -> "[Passed] (Timeout)"
       | Stepout -> "[Passed] (Stepout)"
+      | Invalid -> "[Passed] (Invalid)"
     else
       match stats.best with
       | NoResult when shell -> "[NoResult]"
       | NoResult | Computing _ -> ""
       | Valid -> "[Valid]"
       | Failed ->  "[Failure]"
-      | (Unknown | Timeout | Stepout) when shell -> "[Unsuccess]"
+      | (Invalid | Unknown | Timeout | Stepout) when shell -> "[Unsuccess]"
       | Unknown -> "[Unknown]"
       | Timeout -> "[Timeout]"
       | Stepout -> "[Stepout]"
-  in
-  if status <> "" then
-    Wp_parameters.feedback "%s %s%a%a"
+      | Invalid -> "[Invalid]"
+  in if status <> "" then
+    Wp_parameters.feedback "%s %s%a%a%a"
       status (Wpo.get_gid goal) (Stats.pp_stats ~shell ~cache) stats
-      pp_warnings goal
+      pp_hasmodel goal pp_warnings goal
 
 let do_wpo_success ~shell ~cache goal success =
   if Wp_parameters.Generate.get () then

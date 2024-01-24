@@ -29,6 +29,7 @@ open Lang.F
 type usage
 
 val create : unit -> usage
+val as_term : usage -> term -> unit
 val as_atom : usage -> pred -> unit
 val as_type : usage -> pred -> unit
 val as_have : usage -> pred -> unit

@@ -62,7 +62,9 @@ module WarnSignedConvertedDowncast: Parameter_sig.Bool
 module WarnPointerSubstraction: Parameter_sig.Bool
 module WarnCopyIndeterminate: Parameter_sig.Kernel_function_set
 
-module DescendingIteration: Parameter_sig.String
+type descending_strategy = NoIteration | FullIteration | ExitIteration
+
+module DescendingIteration: Parameter_sig.S with type t = descending_strategy
 module HierarchicalConvergence: Parameter_sig.Bool
 module WideningDelay: Parameter_sig.Int
 module WideningPeriod: Parameter_sig.Int
