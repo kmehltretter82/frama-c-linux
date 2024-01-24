@@ -20,15 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Frama-C Entry Point (last linked module).
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-
-
-let () = Frama_c_kernel.Boot.boot ()
-(* Implicit exit 0 if we haven't exited yet *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+val boot : unit -> unit
+(** Start and define the Frama-C kernel main loop. Run by the last linked
+    module. *)
