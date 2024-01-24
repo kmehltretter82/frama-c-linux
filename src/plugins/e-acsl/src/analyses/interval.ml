@@ -392,10 +392,12 @@ let rec infer ~force ~logic_env t =
       let i2 = infer ~force ~logic_env t2 in
       Error.map2 (lift_arith_binop (ival_arith_binop op)) i1 i2
 
-    | TCastE (ty, t) ->
+    | TCast (false, Ctype ty, t) ->
       let src = infer ~force ~logic_env t in
       let dst = interv_of_typ ty in
       Error.map (fun src -> cast ~src ~dst) src
+    | TCast (true, _, t) -> get_res (infer ~force ~logic_env t)
+    | TCast (false, _,_) -> assert false
     | Tif (t1, t2, t3) ->
       ignore (infer ~force ~logic_env t1);
       let logic_env_tbranch, logic_env_fbranch =
@@ -440,7 +442,6 @@ let rec infer ~force ~logic_env t =
        | TPtr _ -> Lazy.force interv_of_unknown_block
        | _ -> assert false)
     | Tnull  -> singleton_of_int 0
-    | TLogic_coerce (_, t) -> get_res (infer ~force ~logic_env t)
     | Tapp (li,_,args) ->
       (match li.l_body with
        | LBpred _ | LBterm _ ->

@@ -270,9 +270,9 @@ and cc_term_value (map:map) (term:term) =
 
   | Tat(t,_) -> cc_term_value map t
 
-  | TCastE(ty,t) -> cast ty @@ cc_term_value map t
-  | TLogic_coerce (Ctype ty,t) -> cast ty @@ cc_term_value map t
-  | TLogic_coerce (_,t) -> cc_term_value map t
+  | TCast (_, Ctype ty,t) -> cast ty @@ cc_term_value map t
+  | TCast (true, _,t) -> cc_term_value map t
+  | TCast (false, _,_) -> assert false
 
   | TConst _
   | TSizeOf _ | TSizeOfE _ | TSizeOfStr _

@@ -1467,10 +1467,15 @@ and childrenTermNode vis tn =
     let t1' = vTerm t1 in
     let t2' = vTerm t2 in
     if t1' != t1 || t2' != t2 then TBinOp(op,t1',t2') else tn
-  | TCastE(ty,te) ->
+  | TCast(false, Ctype ty,te) ->
     let ty' = vTyp ty in
     let te' = vTerm te in
-    if ty' != ty || te' != te then TCastE(ty',te') else tn
+    if ty' != ty || te' != te then TCast(false, Ctype ty',te') else tn
+  | TCast (true, ty,t) ->
+    let ty' = visitCilLogicType vis ty in
+    let t' = visitCilTerm vis t in
+    if ty' != ty || t' != t then TCast (true, ty',t') else tn
+  | TCast(false,_,_) -> Kernel.fatal "TCast to ctype without Ctype"
   | TAddrOf tl ->
     let tl' = vTermLval tl in
     if tl' != tl then TAddrOf tl' else tn
@@ -1552,10 +1557,6 @@ and childrenTermNode vis tn =
     let def'= visitCilLogicInfo vis def in
     let body' = visitCilTerm vis body in
     if def != def' || body != body' then Tlet(def',body') else tn
-  | TLogic_coerce(ty,t) ->
-    let ty' = visitCilLogicType vis ty in
-    let t' = visitCilTerm vis t in
-    if ty' != ty || t' != t then TLogic_coerce(ty',t') else tn
 
 and visitCilLogicLabel vis l =
   doVisitCil vis
@@ -3186,14 +3187,14 @@ let isZero (e: exp) : bool =
 let rec isLogicZero t = match t.term_node with
   | TConst (Integer (n,_)) -> Integer.equal n Integer.zero
   | TConst (LChr c) -> Char.code c = 0
-  | TCastE(_, t) -> isLogicZero t
+  | TCast(false, _, t) -> isLogicZero t
   | _ -> false
 
 let isLogicNull t =
   isLogicZero t ||
   (let rec aux t = match t.term_node with
       | Tnull -> true
-      | TCastE(_, t) -> aux t
+      | TCast(false,_, t) -> aux t
       | _ -> false
    in aux t)
 
@@ -3461,7 +3462,7 @@ let rec stripCasts (e: exp) =
   match e.enode with CastE(_, e') -> stripCasts e' | _ -> e
 
 let rec stripTermCasts (t: term) =
-  match t.term_node with TCastE(_, t') -> stripTermCasts t' | _ -> t
+  match t.term_node with TCast(false,_, t') -> stripTermCasts t' | _ -> t
 
 (* Separate out the storage-modifier name attributes *)
 let separateStorageModifiers (al: attribute list) =
@@ -7356,7 +7357,7 @@ let rec free_vars_term bound_vars t = match t.term_node with
   | TSizeOfE t
   | TAlignOfE t
   | TUnOp (_,t)
-  | TCastE (_,t)
+  | TCast (_,_,t)
   | Tat (t,_)
   | Toffset (_,t)
   | Tbase_addr (_,t)
@@ -7429,7 +7430,6 @@ let rec free_vars_term bound_vars t = match t.term_node with
       free_vars_term (Logic_var.Set.add d.l_var_info bound_vars) b
     in
     Logic_var.Set.union fvd fvb
-  | TLogic_coerce(_,t) -> free_vars_term bound_vars t
 
 and free_vars_lval bv (h,o) =
   Logic_var.Set.union

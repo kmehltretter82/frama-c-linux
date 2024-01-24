@@ -473,8 +473,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         match t.term_node with
         | TConst _ -> "cst_"
         | TLval (TVar { lv_name }, _) -> lv_name ^ "_"
-        | TCastE (_, t) -> term_to_name t
-        | TLogic_coerce (_, t) -> term_to_name t
+        | TCast (_,_, t) -> term_to_name t
         | _ -> ""
       in
       let ctx = Typing.get_number_ty ~logic_env t in
@@ -724,7 +723,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       | C_float _ | Rational | Real | Nan ->
         assert false
     end
-  | TCastE(ty, t') ->
+  | TCast (false, Ctype ty, t') ->
     let e, adata, env = to_exp ~adata kf env t' in
     let e, env =
       Typed_number.add_cast
@@ -738,7 +737,8 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         e
     in
     e, adata, env, Analyses_types.C_number, ""
-  | TLogic_coerce (_, t) -> context_insensitive_term_to_exp ~adata kf env t
+  | TCast (true, _, t) -> context_insensitive_term_to_exp ~adata kf env t
+  | TCast (false, _,_) -> assert false
   | TAddrOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
     let e = Cil.mkAddrOf ~loc lv in

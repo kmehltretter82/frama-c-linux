@@ -660,7 +660,7 @@ and pp_term_node fmt = function
   | TUnOp(unop,term) -> Format.fprintf fmt "TUnOp(%a,%a)"  pp_unop unop  pp_term term
   | TBinOp(binop,term1,term2) ->
     Format.fprintf fmt "TBinOp(%a,%a,%a)"  pp_binop binop  pp_term term1  pp_term term2
-  | TCastE(typ,term) -> Format.fprintf fmt "TCastE(%a,%a)"  pp_typ typ  pp_term term
+  | TCast(logic,typ,term) -> Format.fprintf fmt "TCast(%a,%a,%a)" pp_bool logic pp_logic_type typ  pp_term term
   | TAddrOf(term_lval) -> Format.fprintf fmt "TAddrOf(%a)"  pp_term_lval  term_lval
   | TStartOf(term_lval) -> Format.fprintf fmt "TStartOf(%a)"  pp_term_lval term_lval
   | Tapp(logic_info,logic_label_list,term_list) ->
@@ -681,8 +681,6 @@ and pp_term_node fmt = function
   | Tblock_length(logic_label,term) ->
     Format.fprintf fmt "Tblock_length(%a,%a)"  pp_logic_label logic_label  pp_term term
   | Tnull -> Format.fprintf fmt "Tnull"
-  | TLogic_coerce(logic_type,term) ->
-    Format.fprintf fmt "TLogic_coerce(%a,%a)"  pp_logic_type logic_type  pp_term term
   | TUpdate(term1,term_offset,term2) ->
     Format.fprintf fmt "TUpdate(%a,%a,%a)"  pp_term term1  pp_term_offset term_offset  pp_term term2
   | Ttypeof(term) -> Format.fprintf fmt "Ttypeof(%a)"  pp_term term

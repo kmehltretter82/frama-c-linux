@@ -1362,7 +1362,13 @@ and term_node =
   | TAlignOfE of term (** alignment of the type of an expression. *)
   | TUnOp of unop * term (** unary operator. *)
   | TBinOp of binop * term * term (** binary operators. *)
-  | TCastE of typ * term (** cast to a C type. *)
+  | TCast of bool * logic_type * term
+  (** cast to a C type (if bool is false)
+      or an implicit conversion from C type to a logic type (if bool is true).
+      In the second case:
+      The logic type must not be a Ctype.
+      In particular, used to denote lifting to Linteger and Lreal.
+  *)
   | TAddrOf of term_lval (** address of a term. *)
   | TStartOf of term_lval (** beginning of an array. *)
 
@@ -1380,11 +1386,7 @@ and term_node =
   | Toffset of logic_label * term (** offset from the base address of a pointer. *)
   | Tblock_length of logic_label * term (** length of the block pointed to by the term. *)
   | Tnull (** the null pointer. *)
-  | TLogic_coerce of logic_type * term
-  (** implicit conversion from a C type to a logic type.
-      The logic type must not be a Ctype. In particular, used to denote
-      lifting to Linteger and Lreal.
-  *)
+
   | TUpdate of term * term_offset * term
   (** functional update of a field. *)
   | Ttypeof of term (** type tag for a term. *)

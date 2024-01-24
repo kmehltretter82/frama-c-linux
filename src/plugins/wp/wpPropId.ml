@@ -622,7 +622,7 @@ let rec term_hints hs t =
   match t.term_node with
   | TLval(lv,_) -> lval_hints hs lv
   | TAddrOf(lv,_) -> lval_hints hs lv
-  | TCastE(_,t) -> term_hints hs t
+  | TCast (false, Ctype _,t) -> term_hints hs t
   | TBinOp((PlusPI|MinusPI),a,_) -> term_hints hs a
   | Tlet(_,t) -> term_hints hs t
   | _ -> ()

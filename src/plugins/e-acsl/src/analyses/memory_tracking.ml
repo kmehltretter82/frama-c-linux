@@ -303,7 +303,7 @@ module rec Transfer
   and register_term kf varinfos term = match term.term_node with
     | TLval tlv | TAddrOf tlv | TStartOf tlv ->
       register_term_lval kf varinfos tlv
-    | TCastE(_, t) | Tat(t, _) ->
+    | TCast (_, _, t) | Tat(t, _) ->
       register_term kf varinfos t
     | Tlet(li, t) ->
       if may_alias li then Error.not_yet "let-binding on array or pointer"
@@ -339,7 +339,6 @@ module rec Transfer
     | Tbase_addr _ -> Error.not_yet "\\base_addr"
     | Toffset _ -> Error.not_yet "\\offset"
     | Tblock_length _ -> Error.not_yet "\\block_length"
-    | TLogic_coerce(_, t) -> register_term kf varinfos t
     | TUpdate _ -> Error.not_yet "functional update"
     | Ttypeof _ -> Error.not_yet "typeof"
     | Tempty_set -> Error.not_yet "empty set"
@@ -396,10 +395,10 @@ module rec Transfer
         (* no left-value inside inside: skip for efficiency *)
         Cil.SkipChildren
       | TUnOp _ | TBinOp _ | Ttypeof _ | TSizeOfE _
-      | TLval _ | TAlignOfE _ | TCastE _ | TAddrOf _
+      | TLval _ | TAlignOfE _ | TCast _ | TAddrOf _
       | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
       | TUpdate _ | Tunion _ | Tinter _
-      | Tcomprehension _ | Trange _ | TLogic_coerce _ ->
+      | Tcomprehension _ | Trange _  ->
         (* potential sub-term inside *)
         Cil.DoChildren
     method !vlogic_label _ = Cil.SkipChildren

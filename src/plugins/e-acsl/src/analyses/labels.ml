@@ -324,8 +324,8 @@ end = struct
       do_term ?error env t
     | TLval lv | TAddrOf lv | TStartOf lv ->
       do_term_lval ?error env lv
-    | TSizeOfE t | TAlignOfE t | TUnOp (_, t) | TCastE (_, t) | Tlambda (_, t)
-    | TLogic_coerce (_, t) ->
+    | TSizeOfE t | TAlignOfE t | TUnOp (_, t)
+    | TCast (_, _, t) | Tlambda (_, t) ->
       do_term ?error env t
     | TBinOp (_, t1, t2) ->
       let error = do_term ?error env t1 in
