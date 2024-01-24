@@ -40,6 +40,12 @@ let gen_define_macro fmt macro def =
   if def = "" then gen_undef fmt macro
   else gen_define_string fmt macro def
 
+let gen_define_custom_macros fmt key_values =
+  let rec iter = function
+    | (k,v)::kvs -> gen_define_macro fmt k v; iter kvs
+    | _ -> Format.fprintf fmt "@\n"
+  in iter key_values
+
 let gen_define_int fmt macro def = gen_define fmt macro Format.pp_print_int def
 
 let gen_byte_order fmt mach =
@@ -338,7 +344,7 @@ let gen_all_defines fmt mach =
   if mach.compiler = "gcc" then
     gen_include fmt "__fc_gcc_builtins.h";
 
-  Format.fprintf fmt "%s@\n" mach.custom_defs;
+  gen_define_custom_macros fmt mach.custom_defs;
 
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"
 

@@ -45,7 +45,6 @@ import subprocess
 import sys
 import logging
 import yaml
-from yaml.representer import Representer
 
 my_path = Path(sys.argv[0]).parent
 
@@ -159,7 +158,7 @@ def print_machdep(machdep):
         args.dest_file = open(args.from_file, "w")
     elif args.dest_file is None:
         args.dest_file = sys.stdout
-    yaml.dump(machdep, args.dest_file, indent=4, sort_keys=True)
+    yaml.dump(machdep, args.dest_file, indent=4, sort_keys=False)
 
 
 def default_value(typ):
@@ -377,50 +376,32 @@ machdep["compiler"] = args.compiler
 machdep["cpp_arch_flags"] = args.cpp_arch_flags
 machdep["version"] = version
 
-machdep["custom_defs"] = ""
+machdep["custom_defs"] = list()
 
 # Extract predefined macros; we're assuming a gcc-like compiler here.
 # Leave custom_defs empty if this fails.
-
-# in case we have all the predefined macros, custom_defs will be very long.
-# we thus want to output it as a literal block, not a simple string.
-# For that, use a custom object and tell PyYaml to output it in a particular way
-# Based on SO's answer:
-
-
-class custom_defs(str):
-    pass
-
-
-def change_style(style, representer):
-    def new_representer(dumper, data):
-        scalar = representer(dumper, data)
-        scalar.style = style
-        return scalar
-
-    return new_representer
-
-
-custom_defs_representer = change_style("|", Representer.represent_str)
-
-yaml.add_representer(custom_defs, custom_defs_representer)
 
 cmd = compilation_command + ["-dM", "-E", "-"]
 if args.verbose:
     print(f"[INFO] running command: {' '.join(cmd)}")
 proc = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, text=True)
 if proc.returncode == 0:
-    lines = ""
+    custom = dict()
     for line in proc.stdout.splitlines():
         # Preprocessor emits a warning if we're trying to #undef
         # standard macros. Leave them alone.
         if re.match(r"#define *__STDC", line):
             continue
-        macro = re.match(r"#define *(\w+)", line)
-        if macro:
-            lines += f"#undef {macro.group(1)}\n"
-        lines += f"{line.strip()}\n"
-    machdep["custom_defs"] = custom_defs(lines)
+        macro = re.match(r"# *define *(\w+) *(\w*)", line)
+        if not macro:
+            # This skips over ifndef/endif blocs for msvc, maybe this
+            # will be a problem later.
+            continue
+        macro_var = macro.group(1)
+        macro_val = macro.group(2)
+        # Python >= 3.7: dict is guaranteed to preserve insertion order
+        dict[macro_var] = macro_val
+    machdep["custom_defs"] = custom
 else:
     logging.warning(f"could not determine predefined macros. compiler output is:\n{proc.stderr}")
 

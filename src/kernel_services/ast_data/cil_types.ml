@@ -1950,7 +1950,7 @@ type mach = {
   nsig: string; (* expansion of non-standard NSIG macro, empty if undefined *)
   errno: (string * string) list; (* list of macros defining errors in errno.h*)
   machdep_name: string; (* name of the machdep *)
-  custom_defs: string; (* arbitrary text to be written in the header *)
+  custom_defs: (string * string) list; (* sequence of key/value for C macros *)
 }
 
 (*
