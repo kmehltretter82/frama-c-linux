@@ -45,26 +45,6 @@
      line)
 *)
 
-open Cil_types
-
-(* ************************************************************************* *)
-(** {2 Registering} *)
-(* ************************************************************************* *)
-
-val register: 'a ref -> 'a -> unit
-(** Plugins must register values with this function. *)
-
-val register_compute:
-  string ->
-  State.t list ->
-  (unit -> unit) ref -> (unit -> unit) -> State.t
-
-val register_guarded_compute:
-  (unit -> bool) ->
-  (unit -> unit) ref -> (unit -> unit) -> unit
-(** @before 26.0-Iron there was a string parameter (first position) that was
-            only used for Journalization, that has been removed. *)
-
 (** Frama-C main interface.
     @since Lithium-20081201
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)

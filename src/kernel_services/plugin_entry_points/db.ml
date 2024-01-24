@@ -20,20 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Extlib
-
-let register r f = r := f
-
-let register_compute name deps r f =
-  let name = "!Db." ^ name in
-  let compute, self = State_builder.apply_once name deps f in
-  r := compute;
-  self
-
-let register_guarded_compute is_computed r f =
-  let compute () = if not (is_computed ()) then f () in
-  r := compute
 
 module Main = struct
   include Hook.Make()
