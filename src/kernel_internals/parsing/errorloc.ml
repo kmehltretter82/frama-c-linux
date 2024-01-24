@@ -142,7 +142,7 @@ let setCurrentFile n =
    plus up to [ctx] lines before and after [pos.pos_lnum] (if they exist),
    similar to 'grep -C<ctx>'. The first line is numbered 1.
    Most exceptions are silently caught and printing is stopped if they occur. *)
-let pp_context_from_file ?(ctx=2) ?start_line fmt pos =
+let pp_context_from_file ?(ctx=2) ?start_line ?(start_char=1) fmt pos =
   try
     let in_ch = open_in (pos.Filepath.pos_path :> string) in
     try
@@ -161,7 +161,6 @@ let pp_context_from_file ?(ctx=2) ?start_line fmt pos =
         let error_height = last_error_line - first_error_line + 1 in
         let compress_error = error_height > 2 * error_ctx + 1 + 2 in
         let i = ref 1 in
-        let error_line_len = ref 0 in
         try
           (* advance to line *)
           while !i < first_to_print do
@@ -187,7 +186,6 @@ let pp_context_from_file ?(ctx=2) ?start_line fmt pos =
                     !i <= last_error_line - error_ctx then
               () (* ignore line *)
             else begin
-              error_line_len := String.length line;
               Format.fprintf fmt "%-6d%s\n" !i line;
             end;
             incr i
@@ -199,7 +197,8 @@ let pp_context_from_file ?(ctx=2) ?start_line fmt pos =
           else begin
             let cursor =
               String.make 6 ' ' ^
-              String.make !error_line_len '^'
+              String.make (start_char - 1) ' ' ^
+              String.make (pos.pos_cnum - pos.pos_bol - start_char + 1) '^'
             in
             Format.fprintf fmt "%s\n" cursor
           end;
@@ -293,7 +292,11 @@ let parse_error ?source msg =
               pp_location (start_pos, last_pos)
               pretty_token (Lexing.lexeme current.lexbuf);
             Format.fprintf fmt "%a@."
-              (pp_context_from_file ~start_line:start_pos.Filepath.pos_lnum ~ctx:2) last_pos);
+              (pp_context_from_file
+                 ~start_line:start_pos.Filepath.pos_lnum
+                 ~ctx:2
+                 ~start_char:(start_pos.pos_cnum - start_pos.pos_bol + 1))
+              last_pos);
       raise (Log.AbortError "kernel"))
     msg
 

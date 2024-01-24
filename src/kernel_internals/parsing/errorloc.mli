@@ -70,9 +70,13 @@ val finishParsing: unit -> unit (** Call this function to finish parsing and
     of context before and after. [ctx] defaults to 2.
     If [start_line] is specified, then all lines between [start_line] and
     [pos.pos_lnum] are considered part of the error.
+    If [start_line] and [pos.pos_lnum] are identical (or [start_line] is None),
+    the portion of the line between [start_char] (defaults to 1) and
+    the character position indicated by [pos] is underlined with [^].
 *)
 val pp_context_from_file:
-  ?ctx:int -> ?start_line:int -> Format.formatter -> Filepath.position -> unit
+  ?ctx:int -> ?start_line:int -> ?start_char:int ->
+  Format.formatter -> Filepath.position -> unit
 
 (** prints a readable description of a location
     @since 22.0-Titanium *)

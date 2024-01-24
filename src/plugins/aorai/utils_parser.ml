@@ -30,10 +30,11 @@ let current_loc lex = Cil_datatype.Position.of_lexing_pos (lexeme_start_p lex)
 let abort_current lex fmt =
   let source = current_loc lex in
   let start_line = source.Filepath.pos_lnum in
+  let start_char = source.pos_cnum - source.pos_bol in
   let fmt = "before or at token %s@\n%a@\n" ^^ fmt in
   Aorai_option.abort ~source fmt
     (Lexing.lexeme lex)
-    (Errorloc.pp_context_from_file ~start_line ~ctx:2) source
+    (Errorloc.pp_context_from_file ~start_line ~start_char ~ctx:2) source
 
 let unknown_token lex =
   abort_current lex
