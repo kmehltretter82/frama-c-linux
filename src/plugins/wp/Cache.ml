@@ -156,7 +156,7 @@ let steps_seized steps steplimit =
 
 let promote ?timeout ?steplimit (res : VCS.result) =
   match res.verdict with
-  | VCS.NoResult | VCS.Computing _ | VCS.Failed -> VCS.no_result
+  | VCS.NoResult | VCS.Computing _ | VCS.Invalid | VCS.Failed -> VCS.no_result
   | VCS.Valid | VCS.Unknown ->
     if not (steps_fits res.prover_steps steplimit) then
       { res with verdict = Stepout }

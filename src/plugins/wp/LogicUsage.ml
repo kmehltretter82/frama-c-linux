@@ -58,8 +58,8 @@ let trim name =
 (* -------------------------------------------------------------------------- *)
 
 type logic_lemma = {
+  lem_loc : location ;
   lem_name : string ;
-  lem_position : Filepath.position ;
   lem_types : string list ;
   lem_labels : logic_label list ;
   lem_predicate : toplevel_predicate ;
@@ -193,7 +193,7 @@ let pp_profile fmt l =
 let ip_lemma l =
   Property.ip_lemma {
     il_name = l.lem_name; il_labels = l.lem_labels;
-    il_args = l.lem_types; il_loc = (l.lem_position, l.lem_position);
+    il_args = l.lem_types; il_loc = l.lem_loc;
     il_attrs = l.lem_attrs;
     il_pred = l.lem_predicate;
   }
@@ -201,8 +201,8 @@ let ip_lemma l =
 let lemma_of_global ~context = function
   | Dlemma(name,labels,types,pred,attrs,loc) ->
     {
+      lem_loc = loc ;
       lem_name = name ;
-      lem_position = fst loc ;
       lem_types = types ;
       lem_labels = labels ;
       lem_predicate = pred ;

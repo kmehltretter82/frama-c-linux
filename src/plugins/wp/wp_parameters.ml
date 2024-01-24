@@ -1152,6 +1152,20 @@ module OutputDir =
                 Defaults to some temporary directory."
   end)
 
+module Probes =
+  True
+    (struct
+      let option_name = "-wp-probes"
+      let help = "Activate user-defines probes (@probe) (default: yes)"
+    end)
+
+module CounterExamples =
+  False
+    (struct
+      let option_name = "-wp-counter-examples"
+      let help = "Ask for counter examples when supported by provers"
+    end)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Output Dir                                                         --- *)
 (* -------------------------------------------------------------------------- *)

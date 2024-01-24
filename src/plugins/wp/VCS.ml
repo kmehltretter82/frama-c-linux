@@ -131,6 +131,10 @@ let is_auto = function
         not prover_config.interactive
       with Not_found -> true
 
+let has_counter_examples = function
+  | Qed | Tactical -> false
+  | Why3 p -> Why3Provers.with_counter_examples p <> None
+
 let cmp_prover p q =
   match p,q with
   | Qed , Qed -> 0
@@ -209,7 +213,10 @@ type verdict =
   | Stepout
   | Computing of (unit -> unit) (* kill function *)
   | Valid
+  | Invalid (* model *)
   | Failed
+
+type model = Why3Provers.model Probe.Map.t
 
 type result = {
   verdict : verdict ;
@@ -219,10 +226,11 @@ type result = {
   prover_steps : int ;
   prover_errpos : Lexing.position option ;
   prover_errmsg : string ;
+  prover_model : model ;
 }
 
 let is_result = function
-  | Valid | Unknown | Timeout | Stepout | Failed -> true
+  | Valid | Invalid | Unknown | Timeout | Stepout | Failed -> true
   | NoResult | Computing _ -> false
 
 let is_verdict r = is_result r.verdict
@@ -233,7 +241,7 @@ let is_computing = function { verdict=Computing _ } -> true | _ -> false
 let is_proved ~smoke = function
   | NoResult | Computing _ | Failed -> false
   | Valid -> not smoke
-  | Unknown | Timeout | Stepout -> smoke
+  | Unknown | Timeout | Stepout | Invalid -> smoke
 
 let configure r =
   let valid = (r.verdict = Valid) in
@@ -277,7 +285,7 @@ let autofit r =
   time_fits r.prover_time &&
   step_fits r.prover_steps
 
-let result ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(steps=0) verdict =
+let result ?(model=Probe.Map.empty) ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(steps=0) verdict =
   {
     verdict ;
     cached = cached ;
@@ -286,6 +294,7 @@ let result ?(cached=false) ?(solver=0.0) ?(time=0.0) ?(steps=0) verdict =
     prover_steps = steps ;
     prover_errpos = None ;
     prover_errmsg = "" ;
+    prover_model = model;
   }
 
 let no_result = result NoResult
@@ -302,6 +311,7 @@ let failed ?pos msg = {
   prover_steps = 0 ;
   prover_errpos = pos ;
   prover_errmsg = msg ;
+  prover_model = Probe.Map.empty ;
 }
 
 let cached r = if is_verdict r then { r with cached=true } else r
@@ -330,10 +340,15 @@ let pp_perf_shell fmt r =
 let name_of_verdict = function
   | NoResult | Computing _ -> "none"
   | Valid -> "valid"
+  | Invalid -> "invalid"
   | Failed -> "failed"
   | Unknown -> "unknown"
   | Stepout -> "stepout"
   | Timeout -> "timeout"
+
+let pp_hasmodel fmt (r : result) =
+  if not @@ Probe.Map.is_empty r.prover_model then
+    Format.fprintf fmt " (Model)"
 
 let pp_result fmt r =
   match r.verdict with
@@ -341,7 +356,8 @@ let pp_result fmt r =
   | Computing _ -> Format.pp_print_string fmt "Computing"
   | Failed -> Format.fprintf fmt "Failed@ %s" r.prover_errmsg
   | Valid -> Format.fprintf fmt "Valid%a" pp_perf_shell r
-  | Unknown -> Format.fprintf fmt "Unknown%a" pp_perf_shell r
+  | Invalid -> Format.fprintf fmt "Invalid%a" pp_hasmodel r
+  | Unknown -> Format.fprintf fmt "Unknown%a%a" pp_hasmodel r pp_perf_shell r
   | Stepout -> Format.fprintf fmt "Step limit%a" pp_perf_shell r
   | Timeout -> Format.fprintf fmt "Timeout%a" pp_perf_shell r
 
@@ -357,8 +373,10 @@ let pp_cache_miss fmt st updating prover result =
   then
     Format.fprintf fmt "%s%a (missing cache)" st pp_perf_forced result
   else
-    Format.pp_print_string fmt @@
-    if is_valid result then "Valid" else "Unsuccess"
+  if is_valid result then
+    Format.pp_print_string fmt "Valid"
+  else
+    Format.fprintf fmt "Unsuccess%a" pp_hasmodel result
 
 let pp_result_qualif ?(updating=true) prover result fmt =
   if Wp_parameters.has_dkey dkey_shell then
@@ -367,13 +385,20 @@ let pp_result_qualif ?(updating=true) prover result fmt =
     | Computing _ -> Format.pp_print_string fmt "Computing"
     | Failed -> Format.fprintf fmt "Failed@ %s" result.prover_errmsg
     | Valid -> pp_cache_miss fmt "Valid" updating prover result
+    | Invalid -> pp_cache_miss fmt "Invalid" updating prover result
     | Unknown -> pp_cache_miss fmt "Unsuccess" updating prover result
     | Timeout -> pp_cache_miss fmt "Timeout" updating prover result
     | Stepout -> pp_cache_miss fmt "Stepout" updating prover result
   else
     pp_result fmt result
 
-(* highest is best *)
+let pp_model fmt model =
+  Probe.Map.iter
+    (fun probe model ->
+       Format.fprintf fmt "@[<hov 2>Model %a = %a@]@\n"
+         Probe.pretty probe Why3Provers.pp_model model
+    ) model
+
 let vrank = function
   | Computing _ -> 0
   | NoResult -> 1
@@ -382,6 +407,7 @@ let vrank = function
   | Timeout -> 4
   | Stepout -> 5
   | Valid -> 6
+  | Invalid -> 7
 
 let conjunction a b =
   match a,b with
@@ -390,14 +416,22 @@ let conjunction a b =
   | r , Valid -> r
   | _ -> if vrank b > vrank a then b else a
 
+let msize m = Probe.Map.fold (fun _ _ n -> succ n) m 0
+
 let compare p q =
-  let r = vrank q.verdict - vrank p.verdict in
-  if r <> 0 then r else
-    let s = Stdlib.compare p.prover_steps q.prover_steps in
+  match is_valid p , is_valid q with
+  | true , false -> (-1)
+  | false , true -> (+1)
+  | _ ->
+    let s = msize q.prover_model - msize p.prover_model in
     if s <> 0 then s else
-      let t = Stdlib.compare p.prover_time q.prover_time in
-      if t <> 0 then t else
-        Stdlib.compare p.solver_time q.solver_time
+      let r = vrank q.verdict - vrank p.verdict in
+      if r <> 0 then r else
+        let s = Stdlib.compare p.prover_steps q.prover_steps in
+        if s <> 0 then s else
+          let t = Stdlib.compare p.prover_time q.prover_time in
+          if t <> 0 then t else
+            Stdlib.compare p.solver_time q.solver_time
 
 let bestp pr1 pr2 = if compare (snd pr1) (snd pr2) <= 0 then pr1 else pr2
 let best = List.fold_left bestp (Qed,no_result)

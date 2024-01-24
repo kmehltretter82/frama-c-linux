@@ -33,6 +33,7 @@ let filter_step n hs s =
   match s.Conditions.condition with
   | (Have _ | Type _ | Core _ | Init _ | When _)  ->
     Conditions.map_step (filter_pred n hs) s
+  | Probe _ -> s
   | (State _ | Branch _ | Either _) as c ->
     if F.Vars.mem n s.vars then
       (hs := Conditions.pred_cond c :: !hs ; Conditions.step (Have F.p_true))

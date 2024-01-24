@@ -20,33 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val version : string
-val config : unit -> Why3.Whyconf.config
-val configure : unit -> unit
-val set_procs : int -> unit
+open Cil_types
 
-type t = Why3.Whyconf.prover
+type probe = private {
+  id : int;
+  name : string ;
+  stmt : stmt option ;
+  loc : location ;
+}
 
-val find_opt : string -> t option
+val annotations : stmt -> (string * term) list
+val create : loc:location -> ?stmt:stmt -> name:string -> unit -> probe
 
-type fallback = Exact of t | Fallback of t | NotFound
-val find_fallback : string -> fallback
-
-val ident_why3 : t -> string
-val ident_wp : t -> string
-val title : ?version:bool -> t -> string
-val compare : t -> t -> int
-
-val provers : unit -> t list
-val provers_set : unit -> Why3.Whyconf.Sprover.t
-val is_available : t -> bool
-val is_mainstream : t -> bool
-val has_counter_examples : t -> bool
-val with_counter_examples : t -> t option
-val has_shortcut : t -> string -> bool
-
-
-type model = Why3.Model_parser.concrete_syntax_term
-val pp_model : model Pretty_utils.formatter
+include Datatype.S_with_collections with type t = probe
 
 (**************************************************************************)

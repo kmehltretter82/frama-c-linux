@@ -126,8 +126,7 @@ let bind ~side bindings property : Tactical.process =
   match side with
   | None ->
     instance_goal ~title:"Witness" bindings property
-  | Some s ->
-    let open Conditions in
+  | Some (s : Conditions.step) ->
     instance_have ?title:s.descr ~at:s.id bindings property
 
 let filter tau e =
