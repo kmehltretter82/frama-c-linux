@@ -38,4 +38,6 @@ val is_postdominator:
 
 val display: unit -> unit
 
-val self: State.t
+val print_dot : string -> kernel_function -> unit
+(** Print a representation of the postdominators in a dot file
+    whose name is [basename.function_name.dot]. *)

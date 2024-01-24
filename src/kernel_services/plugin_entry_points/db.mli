@@ -46,7 +46,6 @@
 *)
 
 open Cil_types
-open Cil_datatype
 
 (* ************************************************************************* *)
 (** {2 Registering} *)
@@ -95,38 +94,6 @@ module Toplevel: sig
       @since Beryllium-20090901 *)
 
 end
-
-(* ************************************************************************* *)
-(** {2 Plugins} *)
-(* ************************************************************************* *)
-
-(** Declarations common to the various postdominators-computing modules *)
-module PostdominatorsTypes: sig
-
-  exception Top
-  (** Used for postdominators-related functions, when the
-      postdominators of a statement cannot be computed. It means that
-      there is no path from this statement to the function return. *)
-
-  module type Sig = sig
-    val compute: (kernel_function -> unit) ref
-
-    val stmt_postdominators:
-      (kernel_function -> stmt -> Stmt.Hptset.t) ref
-    (** @raise Top (see above) *)
-
-    val is_postdominator:
-      (kernel_function -> opening:stmt -> closing:stmt -> bool) ref
-
-    val display: (unit -> unit) ref
-
-    val print_dot : (string -> kernel_function -> unit) ref
-    (** Print a representation of the postdominators in a dot file
-        whose name is [basename.function_name.dot]. *)
-  end
-end
-
-module Postdominators: PostdominatorsTypes.Sig
 
 (** {3 GUI} *)
 

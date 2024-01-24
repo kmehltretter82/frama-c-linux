@@ -20,22 +20,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+include Compute
 
-exception Top
-(** Used for postdominators-related functions, when the
-    postdominators of a statement cannot be computed. It means that
-    there is no path from this statement to the function return. *)
+let print_dot basename kf =
+  let filename = basename ^ "." ^ Kernel_function.get_name kf ^ ".dot" in
+  Print.build_dot filename kf;
+  Postdominators_parameters.result "dot file generated in %s" filename
 
-val compute: kernel_function -> unit
+let output () =
+  let dot_postdom = Postdominators_parameters.DotPostdomBasename.get () in
+  if dot_postdom <> "" then (
+    Ast.compute ();
+    Globals.Functions.iter (fun kf ->
+        if Kernel_function.is_definition kf then
+          print_dot dot_postdom kf)
+  )
 
-val stmt_postdominators:
-  kernel_function -> stmt -> Cil_datatype.Stmt.Hptset.t
-(** @raise Top (see above) *)
+let output, _ = State_builder.apply_once "Postdominators.Compute.output"
+    [Compute.self] output
 
-val is_postdominator:
-  kernel_function -> opening:stmt -> closing:stmt -> bool
-
-val display: unit -> unit
-
-val self: State.t
+let () = Db.Main.extend output

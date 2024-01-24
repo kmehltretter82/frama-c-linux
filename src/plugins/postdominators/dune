@@ -25,7 +25,6 @@
  (deps (universe))
  (action (progn
           (echo "Postdominators:" %{lib-available:frama-c-postdominators.core} "\n")
-          (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
   )
   )
 )
@@ -35,7 +34,7 @@
   (optional)
   (public_name frama-c-postdominators.core)
   (flags -open Frama_c_kernel :standard -w -9)
-  (libraries frama-c.kernel frama-c-eva.core)
+  (libraries frama-c.kernel)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))
 )

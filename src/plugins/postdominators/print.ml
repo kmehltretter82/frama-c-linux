@@ -88,14 +88,14 @@ let get_postdom kf graph s =
     | Some l -> l
   with Not_found ->
   try
-    let postdom = !Db.Postdominators.stmt_postdominators kf s in
+    let postdom = Compute.stmt_postdominators kf s in
     let postdom = Stmt.Hptset.remove s postdom in
     Postdominators_parameters.debug "postdom for %d:%a = %a\n"
       s.sid pretty_stmt s Stmt.Hptset.pretty postdom;
     Kinstr.Hashtbl.add graph (Kstmt s) (Some postdom); postdom
-  with Db.PostdominatorsTypes.Top ->
+  with Compute.Top ->
     Kinstr.Hashtbl.add graph (Kstmt s) None;
-    raise Db.PostdominatorsTypes.Top
+    raise Compute.Top
 
 (** [s_postdom] are [s] postdominators, including [s].
  * We don't have to represent the relation between s and s.
@@ -110,7 +110,7 @@ let reduce kf graph s =
         let p_postdom = get_postdom kf graph p in
         let s_postdom = Stmt.Hptset.diff s_postdom p_postdom
         in s_postdom
-      with Db.PostdominatorsTypes.Top -> assert false
+      with Compute.Top -> assert false
       (* p postdom s -> cannot be top *)
     else s_postdom (* p has already been removed from s_postdom *)
   in
@@ -120,7 +120,7 @@ let reduce kf graph s =
     Postdominators_parameters.debug "new postdom for %d:%a = %a\n"
       s.sid pretty_stmt s Stmt.Hptset.pretty postdom;
     Kinstr.Hashtbl.replace graph (Kstmt s) (Some postdom)
-  with Db.PostdominatorsTypes.Top ->
+  with Compute.Top ->
     ()
 
 let build_reduced_graph kf graph stmts =

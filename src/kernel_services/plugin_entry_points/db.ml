@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 open Extlib
 
 let register r f = r := f
@@ -45,35 +44,6 @@ module Toplevel = struct
 
   let run = ref (fun f -> f ())
 
-end
-
-(* ************************************************************************* *)
-(** {2 Others plugins} *)
-(* ************************************************************************* *)
-
-module PostdominatorsTypes = struct
-  exception Top
-
-  module type Sig = sig
-    val compute: (kernel_function -> unit) ref
-    val stmt_postdominators:
-      (kernel_function -> stmt -> Stmt.Hptset.t) ref
-    val is_postdominator:
-      (kernel_function -> opening:stmt -> closing:stmt -> bool) ref
-    val display: (unit -> unit) ref
-    val print_dot : (string -> kernel_function -> unit) ref
-  end
-end
-
-
-module Postdominators = struct
-  let compute = mk_fun "Postdominators.compute"
-  let is_postdominator
-    : (kernel_function -> opening:stmt -> closing:stmt -> bool) ref
-    = mk_fun "Postdominators.is_postdominator"
-  let stmt_postdominators = mk_fun "Postdominators.stmt_postdominators"
-  let display = mk_fun "Postdominators.display"
-  let print_dot = mk_fun "Postdominators.print_dot"
 end
 
 (* ************************************************************************* *)
