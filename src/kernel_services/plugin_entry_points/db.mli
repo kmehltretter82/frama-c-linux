@@ -128,8 +128,6 @@ end
 
 module Postdominators: PostdominatorsTypes.Sig
 
-module PostdominatorsValue: PostdominatorsTypes.Sig
-
 (** {3 GUI} *)
 
 (** Registered daemon on progress. *)

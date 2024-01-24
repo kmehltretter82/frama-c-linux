@@ -251,17 +251,6 @@ let output, _ = State_builder.apply_once "Postdominators.Compute.output"
 
 let () = Db.Main.extend output
 
-
-include
-  PostDomDb
-    (struct
-      let is_accessible = Eva.Results.is_reachable
-      let dependencies = [ Eva.Analysis.self ]
-      let name = "value"
-      let eval_cond stmt _e = Eva.Results.condition_truth_value stmt
-    end)
-    (Db.PostdominatorsValue)
-
 (*
 Local Variables:
 compile-command: "make -C ../../.."

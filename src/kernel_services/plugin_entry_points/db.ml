@@ -76,16 +76,6 @@ module Postdominators = struct
   let print_dot = mk_fun "Postdominators.print_dot"
 end
 
-module PostdominatorsValue = struct
-  let compute = mk_fun "PostdominatorsValue.compute"
-  let is_postdominator
-    : (kernel_function -> opening:stmt -> closing:stmt -> bool) ref
-    = mk_fun "PostdominatorsValue.is_postdominator"
-  let stmt_postdominators = mk_fun "PostdominatorsValue.stmt_postdominators"
-  let display = mk_fun "PostdominatorsValue.display"
-  let print_dot = mk_fun "PostdominatorsValue.print_dot"
-end
-
 (* ************************************************************************* *)
 (** {2 GUI} *)
 (* ************************************************************************* *)
