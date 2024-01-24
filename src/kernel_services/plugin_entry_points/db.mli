@@ -130,21 +130,6 @@ module Postdominators: PostdominatorsTypes.Sig
 
 module PostdominatorsValue: PostdominatorsTypes.Sig
 
-module Security : sig
-
-  val run_whole_analysis: (unit -> unit) ref
-  (** Run all the security analysis. *)
-
-  val run_ai_analysis: (unit -> unit) ref
-  (** Only run the analysis by abstract interpretation. *)
-
-  val run_slicing_analysis: (unit -> Project.t) ref
-  (** Only run the security slicing pre-analysis. *)
-
-  val self: State.t ref
-
-end
-
 (** {3 GUI} *)
 
 (** Registered daemon on progress. *)

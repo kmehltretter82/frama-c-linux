@@ -51,13 +51,6 @@ end
 (** {2 Others plugins} *)
 (* ************************************************************************* *)
 
-module Security = struct
-  let run_whole_analysis = mk_fun "Security.run_whole_analysis"
-  let run_ai_analysis = mk_fun "Security.run_ai_analysis"
-  let run_slicing_analysis = mk_fun "Security.run_slicing_analysis"
-  let self = ref State.dummy
-end
-
 module PostdominatorsTypes = struct
   exception Top
 
