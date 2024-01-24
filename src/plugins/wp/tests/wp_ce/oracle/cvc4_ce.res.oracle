@@ -16,7 +16,7 @@ Prove: IAbs.abs(x) = x.
   Function wrong
 ------------------------------------------------------------
 
-Goal Post-condition (file cvc4_ce.i, line 7) in 'wrong':
+Goal Post-condition (file cvc4_ce.i, line 11) in 'wrong':
 Assume { Type: is_sint32(wrong_0). }
 Prove: IAbs.abs(wrong_0) = wrong_0.
 

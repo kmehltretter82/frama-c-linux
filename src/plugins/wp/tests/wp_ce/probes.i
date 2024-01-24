@@ -1,6 +1,9 @@
 /* run.config_qualif
    DONTRUN:
- */
+*/
+/* run.config_ce
+   DONTRUN:
+*/
 
 // Matrix addessing
 
