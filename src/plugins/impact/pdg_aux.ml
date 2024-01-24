@@ -167,7 +167,7 @@ let find_call_input_nodes pdg_caller call_stmt ?(z=Locations.Zone.top) in_key =
 let all_call_input_nodes ~caller:pdg_caller ~callee:(kf_callee, pdg_callee) call_stmt =
   let real_inputs =
     let inout =
-      !Db.Operational_inputs.get_internal_precise ~stmt:call_stmt kf_callee
+      Inout.Operational_inputs.get_internal_precise ~stmt:call_stmt kf_callee
     in
     inout.Inout_type.over_inputs_if_termination
   in

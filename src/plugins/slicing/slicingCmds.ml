@@ -247,7 +247,7 @@ let select_func_calls_to set ~spare kf =
         SlicingMarks.mk_user_mark ~data:nspare ~addr:nspare ~ctrl:nspare
       in
       assert (Eva.Analysis.is_computed ());
-      let outputs = !Db.Outputs.get_external kf in
+      let outputs = Inout.Outputs.get_external kf in
       select_entry_point_and_some_inputs_outputs set ~mark kf
         ~return:true
         ~outputs
@@ -407,8 +407,8 @@ let select_lval_rw set mark ~rd ~wr ~eval kf ki_opt=
 
                    in
                    assert (Eva.Results.is_called kf) ; (* otherwise [!Db.Outputs.get_external kf] gives weird results *)
-                   select_inter_zone select_wr zone_wr_opt (!Db.Outputs.get_external kf) ;
-                   select_inter_zone select_rd zone_rd_opt (!Db.Inputs.get_external kf)
+                   select_inter_zone select_wr zone_wr_opt (Inout.Outputs.get_external kf) ;
+                   select_inter_zone select_rd zone_rd_opt (Inout.Inputs.get_external kf)
                  end
             ));
     !ac

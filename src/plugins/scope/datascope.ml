@@ -87,7 +87,7 @@ let get_writes stmt lval =
 let register_modified_zones lmap stmt =
   let register lmap zone = InitSid.add_zone lmap zone stmt in
   let aux_out out kf =
-    let inout= !Db.Operational_inputs.get_internal_precise ~stmt kf in
+    let inout= Inout.Operational_inputs.get_internal_precise ~stmt kf in
     Locations.Zone.join out inout.Inout_type.over_outputs
   in
   match stmt.skind with

@@ -411,7 +411,7 @@ module State = struct
           then Cvalue.Model.cardinal_estimate values
           else Cvalue.CardinalEstimate.one
         in
-        let outs = !Db.Outputs.get_internal kf in
+        let outs = Inout.Outputs.get_internal kf in
         let outs = Locations.Zone.filter_base filter_generated_and_locals outs in
         let header fmt =
           Format.fprintf fmt "Values at end of function %a:%t"

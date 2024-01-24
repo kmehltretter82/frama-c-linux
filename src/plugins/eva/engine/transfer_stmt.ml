@@ -56,7 +56,7 @@ module InOutCallback =
     end)
 
 let register_callback () =
-  Db.Operational_inputs.Record_Inout_Callbacks.extend_once InOutCallback.set
+  Inout.Operational_inputs.Record_Inout_Callbacks.extend_once InOutCallback.set
 
 let () = Cmdline.run_after_configuring_stage register_callback
 

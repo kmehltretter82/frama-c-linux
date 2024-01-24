@@ -20,11 +20,29 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val self: State.t
+module Outputs = struct
+  let ref_statement = ref (fun _ -> assert false)
+  let ref_get_external = ref (fun _ -> assert false)
+  let ref_get_internal = ref (fun _ -> assert false)
 
-val compute: Cil_types.kernel_function -> unit
-val get_external: Cil_types.kernel_function -> Locations.Zone.t
-val statement: Cil_types.stmt -> Locations.Zone.t
+  let kinstr = function
+    | Cil_types.Kstmt s -> Some (!ref_statement s)
+    | Kglobal -> None
 
-val pretty_external: Format.formatter -> Cil_types.kernel_function -> unit
-val pretty_internal: Format.formatter -> Cil_types.kernel_function -> unit
+  let get_external kf = !ref_get_external kf
+  let get_internal kf = !ref_get_internal kf
+end
+
+module Inputs = struct
+  let ref_get_external = ref (fun _ -> assert false)
+
+  let get_external kf = !ref_get_external kf
+end
+
+(** State_builder.of operational inputs
+    - over-approximation of zones whose input values are read by each function,
+      State_builder.of sure outputs
+    - under-approximation of zones written by each function. *)
+module Operational_inputs = struct
+  module Record_Inout_Callbacks = Hook.Build (struct type t = Inout_type.t end)
+end

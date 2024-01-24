@@ -20,11 +20,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val self: State.t
+module Outputs :
+sig
+  val ref_statement : (Cil_types.stmt -> Locations.Zone.t) ref
+  val ref_get_external : (Cil_types.kernel_function -> Locations.Zone.t) ref
+  val ref_get_internal : (Cil_types.kernel_function -> Locations.Zone.t) ref
 
-val compute: Cil_types.kernel_function -> unit
-val get_external: Cil_types.kernel_function -> Locations.Zone.t
-val statement: Cil_types.stmt -> Locations.Zone.t
+  val kinstr : Cil_types.kinstr -> Locations.Zone.t option
+  val get_external : Cil_types.kernel_function -> Locations.Zone.t
+  val get_internal : Cil_types.kernel_function -> Locations.Zone.t
+end
 
-val pretty_external: Format.formatter -> Cil_types.kernel_function -> unit
-val pretty_internal: Format.formatter -> Cil_types.kernel_function -> unit
+module Inputs :
+sig
+  val ref_get_external : (Cil_types.kernel_function -> Locations.Zone.t) ref
+  val get_external : Cil_types.kernel_function -> Locations.Zone.t
+end
+
+(** State_builder.of operational inputs.
+    That is:
+    - over-approximation of zones whose input values are read by each function,
+      State_builder.of sure outputs
+    - under-approximation of zones written by each function.
+      @see <../inout/Context.html> internal documentation. *)
+module Operational_inputs : sig
+  (**/**)
+  (* Internal use *)
+  module Record_Inout_Callbacks: Hook.Iter_hook with type param = Inout_type.t
+  (**/**)
+end

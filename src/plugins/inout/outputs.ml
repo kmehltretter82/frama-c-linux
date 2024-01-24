@@ -171,15 +171,14 @@ let pretty_external fmt kf =
   with Not_found ->
     ()
 
+let self = Externals.self
+let compute kf = ignore (get_internal kf)
+let statement = Analysis.statement
+
 let () =
-  Db.Outputs.self_internal := Analysis.Memo.self;
-  Db.Outputs.self_external := Externals.self;
-  Db.Outputs.get_internal := get_internal;
-  Db.Outputs.get_external := get_external;
-  Db.Outputs.compute := (fun kf -> ignore (get_internal kf));
-  Db.Outputs.display := pretty_internal;
-  Db.Outputs.display_external := pretty_external;
-  Db.Outputs.statement := Analysis.statement
+  Eva__Private.Inout.Outputs.ref_statement := Analysis.statement ;
+  Eva__Private.Inout.Outputs.ref_get_external := get_external ;
+  Eva__Private.Inout.Outputs.ref_get_internal := get_internal
 
 (*
 Local Variables:

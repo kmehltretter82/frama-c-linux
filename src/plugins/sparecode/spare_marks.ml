@@ -280,7 +280,7 @@ let select_entry_point proj _kf pdg =
   select_pdg_elements proj pdg to_select
 
 let select_all_outputs proj kf pdg =
-  let outputs = !Db.Outputs.get_external kf in
+  let outputs = Inout.Outputs.get_external kf in
   debug 1 "@[selecting output zones %a@]" Locations.Zone.pretty outputs;
   try
     let nodes, undef = Pdg.Api.find_location_nodes_at_end pdg outputs in
