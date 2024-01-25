@@ -199,10 +199,13 @@ let pp_context_from_file ?(ctx=2) ?start_pos fmt pos =
           if last_error_line <> first_error_line then
             Format.fprintf fmt "\n"
           else begin
+            let len = pos.pos_cnum - pos.pos_bol - start_char + 1 in
+            (* output at least one '^' *)
+            let len = if len = 0 then 1 else len in
             let cursor =
               String.make 6 ' ' ^
               String.make (start_char - 1) ' ' ^
-              String.make (pos.pos_cnum - pos.pos_bol - start_char + 1) '^'
+              String.make len '^'
             in
             Format.fprintf fmt "%s\n" cursor
           end;
