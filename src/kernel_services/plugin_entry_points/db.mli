@@ -45,27 +45,6 @@
      line)
 *)
 
-open Cil_types
-open Cil_datatype
-
-(* ************************************************************************* *)
-(** {2 Registering} *)
-(* ************************************************************************* *)
-
-val register: 'a ref -> 'a -> unit
-(** Plugins must register values with this function. *)
-
-val register_compute:
-  string ->
-  State.t list ->
-  (unit -> unit) ref -> (unit -> unit) -> State.t
-
-val register_guarded_compute:
-  (unit -> bool) ->
-  (unit -> unit) ref -> (unit -> unit) -> unit
-(** @before 26.0-Iron there was a string parameter (first position) that was
-            only used for Journalization, that has been removed. *)
-
 (** Frama-C main interface.
     @since Lithium-20081201
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
@@ -93,55 +72,6 @@ module Toplevel: sig
   (** Run a Frama-C toplevel playing the game given in argument (in
       particular, applying the argument runs the analyses).
       @since Beryllium-20090901 *)
-
-end
-
-(* ************************************************************************* *)
-(** {2 Plugins} *)
-(* ************************************************************************* *)
-
-(** Declarations common to the various postdominators-computing modules *)
-module PostdominatorsTypes: sig
-
-  exception Top
-  (** Used for postdominators-related functions, when the
-      postdominators of a statement cannot be computed. It means that
-      there is no path from this statement to the function return. *)
-
-  module type Sig = sig
-    val compute: (kernel_function -> unit) ref
-
-    val stmt_postdominators:
-      (kernel_function -> stmt -> Stmt.Hptset.t) ref
-    (** @raise Top (see above) *)
-
-    val is_postdominator:
-      (kernel_function -> opening:stmt -> closing:stmt -> bool) ref
-
-    val display: (unit -> unit) ref
-
-    val print_dot : (string -> kernel_function -> unit) ref
-    (** Print a representation of the postdominators in a dot file
-        whose name is [basename.function_name.dot]. *)
-  end
-end
-
-module Postdominators: PostdominatorsTypes.Sig
-
-module PostdominatorsValue: PostdominatorsTypes.Sig
-
-module Security : sig
-
-  val run_whole_analysis: (unit -> unit) ref
-  (** Run all the security analysis. *)
-
-  val run_ai_analysis: (unit -> unit) ref
-  (** Only run the analysis by abstract interpretation. *)
-
-  val run_slicing_analysis: (unit -> Project.t) ref
-  (** Only run the security slicing pre-analysis. *)
-
-  val self: State.t ref
 
 end
 

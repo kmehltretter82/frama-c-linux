@@ -20,21 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-open Cil_datatype
 open Extlib
-
-let register r f = r := f
-
-let register_compute name deps r f =
-  let name = "!Db." ^ name in
-  let compute, self = State_builder.apply_once name deps f in
-  r := compute;
-  self
-
-let register_guarded_compute is_computed r f =
-  let compute () = if not (is_computed ()) then f () in
-  r := compute
 
 module Main = struct
   include Hook.Make()
@@ -45,52 +31,6 @@ module Toplevel = struct
 
   let run = ref (fun f -> f ())
 
-end
-
-(* ************************************************************************* *)
-(** {2 Others plugins} *)
-(* ************************************************************************* *)
-
-module Security = struct
-  let run_whole_analysis = mk_fun "Security.run_whole_analysis"
-  let run_ai_analysis = mk_fun "Security.run_ai_analysis"
-  let run_slicing_analysis = mk_fun "Security.run_slicing_analysis"
-  let self = ref State.dummy
-end
-
-module PostdominatorsTypes = struct
-  exception Top
-
-  module type Sig = sig
-    val compute: (kernel_function -> unit) ref
-    val stmt_postdominators:
-      (kernel_function -> stmt -> Stmt.Hptset.t) ref
-    val is_postdominator:
-      (kernel_function -> opening:stmt -> closing:stmt -> bool) ref
-    val display: (unit -> unit) ref
-    val print_dot : (string -> kernel_function -> unit) ref
-  end
-end
-
-
-module Postdominators = struct
-  let compute = mk_fun "Postdominators.compute"
-  let is_postdominator
-    : (kernel_function -> opening:stmt -> closing:stmt -> bool) ref
-    = mk_fun "Postdominators.is_postdominator"
-  let stmt_postdominators = mk_fun "Postdominators.stmt_postdominators"
-  let display = mk_fun "Postdominators.display"
-  let print_dot = mk_fun "Postdominators.print_dot"
-end
-
-module PostdominatorsValue = struct
-  let compute = mk_fun "PostdominatorsValue.compute"
-  let is_postdominator
-    : (kernel_function -> opening:stmt -> closing:stmt -> bool) ref
-    = mk_fun "PostdominatorsValue.is_postdominator"
-  let stmt_postdominators = mk_fun "PostdominatorsValue.stmt_postdominators"
-  let display = mk_fun "PostdominatorsValue.display"
-  let print_dot = mk_fun "PostdominatorsValue.print_dot"
 end
 
 (* ************************************************************************* *)

@@ -172,7 +172,7 @@ module TransferTaint = struct
     let assume_stmts =
       Stmt.Set.filter
         (fun assume_stmt ->
-           not (!Db.Postdominators.is_postdominator kf
+           not (Postdominators.is_postdominator kf
                   ~opening:assume_stmt ~closing:stmt))
         state.assume_stmts
     in
