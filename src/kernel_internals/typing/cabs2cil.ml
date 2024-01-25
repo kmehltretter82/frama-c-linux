@@ -8397,6 +8397,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         in
         let doidxs = add_reads ~ghost idxs'.eloc rs doidxs in
         let doidxe = add_reads ~ghost idxe'.eloc re doidxe in
+        Cil.CurrentLoc.set (fst idxs'.eloc, snd idxe'.eloc);
         if isNotEmpty doidxs || isNotEmpty doidxe then
           abort_context "Range designators are not constants";
         let first, last =
