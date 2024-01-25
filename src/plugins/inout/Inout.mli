@@ -20,23 +20,37 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val name: string
+open Cil_types
 
-include Plugin.S
+(** Returns the memory zone needed to evaluate the given expression at the
+    given statement. *)
+val expr_inputs: stmt -> exp -> Locations.Zone.t
 
-module ForceAccessPath: Parameter_sig.Bool
-module ForceOut: Parameter_sig.Bool
-module ForceExternalOut: Parameter_sig.Bool
-module ForceInput: Parameter_sig.Bool
-module ForceInputWithFormals: Parameter_sig.Bool
-module ForceInout: Parameter_sig.Bool
-module ForceInoutExternalWithFormals: Parameter_sig.Bool
-module ForceDeref: Parameter_sig.Bool
+(** Returns the memory zone read by the given statement. *)
+val stmt_inputs: stmt -> Locations.Zone.t
 
-module Output: Parameter_sig.Bool
+(** Returns the memory zone modified by the given statement. *)
+val stmt_outputs: stmt -> Locations.Zone.t
 
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+(** Returns the memory zone read by the given function, including its
+    local and formal variables. *)
+val kf_inputs: kernel_function -> Locations.Zone.t
+
+(** Returns the memory zone read by the given function, without its
+    local and formal variables. *)
+val kf_external_inputs: kernel_function -> Locations.Zone.t
+
+(** Returns the memory zone modified by the given function, including its
+    local and formal variables. *)
+val kf_outputs: kernel_function -> Locations.Zone.t
+
+(** Returns the memory zone modified by the given function, without its
+    local and formal variables. *)
+val kf_external_outputs: kernel_function -> Locations.Zone.t
+
+(** Returns the inputs/outputs computed for the given function.
+    If [stmt] is specified and is a possible call to the given function,
+    returns the inputs/outputs for this call specifically. *)
+val get_precise_inout: ?stmt:stmt -> kernel_function -> Inout_type.t
+
+val self: State.t

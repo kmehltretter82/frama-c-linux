@@ -20,23 +20,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val name: string
+let expr_inputs = Inputs.expr
+let stmt_inputs = Inputs.statement
+let kf_inputs = Inputs.get_internal
+let kf_external_inputs = Inputs.get_external
 
-include Plugin.S
+let stmt_outputs = Outputs.statement
+let kf_outputs = Outputs.get_internal
+let kf_external_outputs = Outputs.get_external
 
-module ForceAccessPath: Parameter_sig.Bool
-module ForceOut: Parameter_sig.Bool
-module ForceExternalOut: Parameter_sig.Bool
-module ForceInput: Parameter_sig.Bool
-module ForceInputWithFormals: Parameter_sig.Bool
-module ForceInout: Parameter_sig.Bool
-module ForceInoutExternalWithFormals: Parameter_sig.Bool
-module ForceDeref: Parameter_sig.Bool
+let get_precise_inout = Operational_inputs.get_internal_precise
 
-module Output: Parameter_sig.Bool
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+let states = [ Inputs.self; Outputs.self ]
+let proxy = State_builder.Proxy.(create "inout" Both states)
+let self = State_builder.Proxy.get proxy

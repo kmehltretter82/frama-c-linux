@@ -43,7 +43,7 @@ let () =
     (fun () ->
        State_dependency_graph.add_codependencies
          ~onto:Result.self
-         [ Pdg.Api.self; !Db.Outputs.self_external ])
+         [ Pdg.Api.self; Inout.self ])
 
 module P = Sparecode_params
 

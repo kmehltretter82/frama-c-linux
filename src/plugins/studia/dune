@@ -26,6 +26,7 @@
  (action (progn
           (echo "Studia:" %{lib-available:frama-c-studia.core} "\n")
           (echo "  - Eva:" %{lib-available:frama-c-eva.core} "\n")
+          (echo "  - Inout:" %{lib-available:frama-c-inout.core} "\n")
   )
   )
 )
@@ -35,7 +36,7 @@
   (optional)
   (public_name frama-c-studia.core)
   (flags -open Frama_c_kernel :standard)
-  (libraries frama-c.kernel frama-c-eva.core)
+  (libraries frama-c.kernel frama-c-eva.core frama-c-inout.core)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))
 )
