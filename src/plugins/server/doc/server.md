@@ -38,7 +38,7 @@ asynchronous entry points, requests are classified into three kinds:
 - `EXEC` to starts a resource intensive analysis in Frama-C
 
 During an `EXEC` requests, the implementation of the all resource demanding
-computations shall repeatedly call the yielding routine `Db.yield()` of the
+computations shall repeatedly call the yielding routine `Async.yield()` of the
 Frama-C kernel to ensures a smooth asynchronous behavior of the Server. During a
 _yield_ call, the Server would be allowed to handle few `GET` pending requests,
 since they shall be fast without any modification. When the server is idled, any
@@ -75,8 +75,8 @@ Signals will be notified in addition to responses or logical requests
 or server polling.
 
 During the execution of the Frama-C command line, the server behaves just like
-during an `EXEC` request: only `GET` requests are processed at `Db.yield()` calls
-until the (normal) termination of the command line.
+during an `EXEC` request: only `GET` requests are processed at `Async.yield()`
+calls until the (normal) termination of the command line.
 
 ## Transport Messages
 
@@ -144,7 +144,7 @@ provide an implementation of the non-blocking `fetch` function and create a serv
 with `Server.create`. Then, you shall:
 
 - Schedule `Server.start myServer` during the main plug-in extension phase _via_
-  `Db.Main.extend`;
+  `Boot.Main.extend`;
 
 - Schedule `Server.run myServer` at normal command line termination phase _via_
   `Cmdline.at_normal_exit`;
