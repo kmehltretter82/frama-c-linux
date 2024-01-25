@@ -20,12 +20,17 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val self: State.t
+let expr_inputs = Inputs.expr
+let stmt_inputs = Inputs.statement
+let kf_inputs = Inputs.get_internal
+let kf_external_inputs = Inputs.get_external
 
-val compute: Cil_types.kernel_function -> unit
-val get_internal: Cil_types.kernel_function -> Locations.Zone.t
-val get_external: Cil_types.kernel_function -> Locations.Zone.t
-val statement: Cil_types.stmt -> Locations.Zone.t
+let stmt_outputs = Outputs.statement
+let kf_outputs = Outputs.get_internal
+let kf_external_outputs = Outputs.get_external
 
-val pretty_external: Format.formatter -> Cil_types.kernel_function -> unit
-val pretty_internal: Format.formatter -> Cil_types.kernel_function -> unit
+let get_precise_inout = Operational_inputs.get_internal_precise
+
+let states = [ Inputs.self; Outputs.self ]
+let proxy = State_builder.Proxy.(create "inout" Both states)
+let self = State_builder.Proxy.get proxy

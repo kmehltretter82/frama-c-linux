@@ -65,7 +65,7 @@ let compare w1 w2 =
 (** Does the functions called at [stmt] modify directly or indirectly [zlval] *)
 let effects_of_call stmt zlval effects  =
   let aux_kf (direct, indirect) kf =
-    let inout = Inout.Operational_inputs.get_internal_precise ~stmt kf in
+    let inout = Inout.get_precise_inout ~stmt kf in
     let out = inout.Inout_type.over_outputs in
     if Zone.intersects out zlval then
       if Eva.Analysis.use_spec_instead_of_definition kf then
@@ -89,7 +89,7 @@ class find_write_insts zlval = object (self)
       let aux_call lvopt _kf _args _loc =
         (* Direct effect through the writing of [lvopt], or indirect inside
            the call. *)
-        let z = Inout.Outputs.statement stmt in
+        let z = Inout.stmt_outputs stmt in
         if Zone.intersects z zlval then
           let direct = match lvopt with
             | None -> false
@@ -106,7 +106,7 @@ class find_write_insts zlval = object (self)
       match i with
       | Set _ | Local_init(_, AssignInit _, _) ->
         (* Effect only throuh the written l-value *)
-        let z = Inout.Outputs.statement stmt in
+        let z = Inout.stmt_outputs stmt in
         if Zone.intersects z zlval then begin
           res <- Assign stmt :: res
         end
@@ -123,7 +123,7 @@ end
 let inst_writes z =
   let vis = new find_write_insts z in
   let aux_kf_fundec kf =
-    let all_out = Inout.Operational_inputs.get_internal_precise kf in
+    let all_out = Inout.get_precise_inout kf in
     let zout = all_out.Inout_type.over_outputs in
     if Zone.intersects zout z then begin
       let fundec = Kernel_function.get_definition kf in

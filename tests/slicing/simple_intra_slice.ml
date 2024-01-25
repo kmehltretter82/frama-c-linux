@@ -47,7 +47,7 @@ let main _ =
   in
   let print_outputs fct_name =
     let fct = Globals.Functions.find_by_name fct_name in
-    let outs = Inout.Outputs.get_external fct in
+    let outs = Inout.kf_external_outputs fct in
     Format.printf "Sorties de la fonction %s = %a\n"
       fct_name Locations.Zone.pretty outs
   in

@@ -424,7 +424,7 @@ end = struct
       let add_mark =
         let kf = fi_to_call.SlicingInternals.fi_kf in
         let op_inputs =
-          Inout.Operational_inputs.get_internal_precise ~stmt:call kf in
+          Inout.get_precise_inout ~stmt:call kf in
         let z = op_inputs.Inout_type.over_inputs in
         match s with
         | PdgMarks.SelNode (_, None) -> true
@@ -1308,7 +1308,7 @@ let apply_change_call ff call f_to_call =
           try
             let kf = ff_to_call.SlicingInternals.ff_fct.SlicingInternals.fi_kf in
             let op_inputs =
-              Inout.Operational_inputs.get_internal_precise ~stmt:call kf in
+              Inout.get_precise_inout ~stmt:call kf in
             let z = op_inputs.Inout_type.over_inputs in
             (*Format.printf "##Call at %a,@ kf %a,@ @[Z %a@]@."
                Cil.d_loc (Cil_datatype.Stmt.loc call)

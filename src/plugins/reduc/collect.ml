@@ -122,7 +122,7 @@ class inout_vis
     with Kernel_function.No_Statement -> assert false
 
   method !vstmt stmt =
-    let out = Inout.Outputs.statement stmt in
+    let out = Inout.stmt_outputs stmt in
     let filter_out vi =
       let open Locations in
       let zone = enumerate_bits (loc_of_varinfo vi) in

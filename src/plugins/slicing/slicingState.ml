@@ -34,7 +34,7 @@ let () =
     (fun () ->
        State_dependency_graph.add_codependencies
          ~onto:self
-         [ Pdg.Api.self; Inout.Inputs.self ; Inout.Outputs.self ])
+         [ Pdg.Api.self; Inout.self ])
 
 let get () =
   try P.get ()

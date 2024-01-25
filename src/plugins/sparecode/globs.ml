@@ -160,7 +160,7 @@ let () =
     (fun () ->
        State_dependency_graph.add_codependencies
          ~onto:Result.self
-         [ Pdg.Api.self; Inout.Outputs.self ])
+         [ Pdg.Api.self; Inout.self ])
 
 let rm_unused_decl =
   Result.memo

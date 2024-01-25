@@ -37,11 +37,11 @@ class find_read zlval = object
 
   method! vstmt_aux stmt =
     let aux_call lvopt _kf args _loc =
-      let z = Inout.Inputs.statement stmt in
+      let z = Inout.stmt_inputs stmt in
       if Zone.intersects z zlval then begin
         (* Computes what is read to evaluate [args] and [lvopt] *)
         let deps =
-          List.map (Inout.Inputs.expr stmt) args
+          List.map (Inout.expr_inputs stmt) args
         in
         let deps = List.fold_left Zone.join Zone.bottom deps in
         let deps = match lvopt with
@@ -54,7 +54,7 @@ class find_read zlval = object
         (* now determine if the functions called at [stmt] read directly or
              indirectly [zlval] *)
         let aux_kf (direct, indirect) kf =
-          let inputs = Inout.Inputs.get_internal kf in
+          let inputs = Inout.kf_inputs kf in
           (* TODO: change to this once we can get "full" inputs through Inout.
              Currently, non operational inputs disappear, and this function
              is not suitable.
@@ -85,13 +85,13 @@ class find_read zlval = object
       Cil.treat_constructor_as_func aux_call v f args k l;
       Cil.SkipChildren
     | Instr _ ->
-      let z = Inout.Inputs.statement stmt in
+      let z = Inout.stmt_inputs stmt in
       if Zone.intersects z zlval then begin
         res <- Direct stmt :: res
       end;
       Cil.SkipChildren
     | If (e, _, _, _) | Switch (e, _, _, _) | Return (Some e, _) ->
-      let z = Inout.Inputs.expr stmt e in
+      let z = Inout.expr_inputs stmt e in
       if Zone.intersects z zlval then begin
         res <- Direct stmt :: res
       end;
@@ -104,7 +104,7 @@ end
 let compute z =
   let vis = new find_read z in
   let aux_kf_fundec kf =
-    let all_in = Inout.Inputs.get_internal kf in
+    let all_in = Inout.kf_inputs kf in
     if Zone.intersects all_in z then begin
       let fundec = Kernel_function.get_definition kf in
       ignore
