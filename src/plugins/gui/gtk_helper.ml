@@ -788,7 +788,7 @@ class error_manager ?reset (o_parent:GWindow.window_skel) : host =
       | Cmdline.Exit ->
         if cancelable then Project.Undo.clear_breakpoint ();
         None
-      | Sys.Break | Db.Cancel ->
+      | Sys.Break | Async.Cancel ->
         if cancelable then Project.Undo.restore ();
         self#error ?parent ~reset:true
           "Stopping current computation on user request.";

@@ -107,7 +107,7 @@ type 'a server = {
   fetch : unit -> 'a message option ; (* fetch some client message *)
   q_in : 'a pending Queue.t ; (* queue of pending `EXEC and `GET jobs *)
   q_out : 'a response Queue.t ; (* queue of pending responses *)
-  mutable daemon : Db.daemon option ; (* Db.yield daemon *)
+  mutable daemon : Async.daemon option ; (* Async.yield daemon *)
   mutable s_listen : Signals.t ; (* signals the client is listening to *)
   mutable s_emitted : Signals.t ; (* emitted signals enqueued *)
   mutable s_pending : Signals.t ; (* emitted signals not enqueued yet *)
@@ -184,7 +184,7 @@ let execute_process server ?yield proc =
   Senv.debug ~level:2 "%a" (pp_process server.pretty) proc ;
   let resp = match yield with
     | Some yield when proc.yield ->
-      Db.with_progress
+      Async.with_progress
         ~debounced:server.polling
         ?on_delayed:(delayed proc.request)
         yield run proc
@@ -231,7 +231,7 @@ let raise_if_killed = function
 let kill_running ?id s =
   match s.running with
   | Idle -> ()
-  | CmdLine -> if id = None then Db.cancel ()
+  | CmdLine -> if id = None then Async.cancel ()
   | ExecRequest p ->
     match id with
     | None -> p.killed <- true
@@ -362,7 +362,7 @@ let rec process server =
             execute_process server ~yield p
           | Command cmd ->
             server.running <- CmdLine ;
-            Db.with_progress
+            Async.with_progress
               ~debounced:server.polling
               ?on_delayed:(delayed "<async>")
               yield cmd ()
@@ -414,7 +414,7 @@ let schedule server job data =
       let st =
         try Task.Result (job data)
         with
-        | Db.Cancel -> Task.Canceled
+        | Async.Cancel -> Task.Canceled
         | exn -> Task.Failed exn
       in status := Task.Return st
   in
@@ -455,7 +455,7 @@ let start server =
       begin
         Senv.feedback "Server enabled." ;
         let daemon =
-          Db.on_progress
+          Async.on_progress
             ~debounced:server.polling
             ?on_delayed:(delayed "command line")
             (do_yield server)
@@ -480,7 +480,7 @@ let stop server =
         server.daemon <- None ;
         server.running <- Idle ;
         server.cmdline <- None ;
-        Db.off_progress daemon ;
+        Async.off_progress daemon ;
         set_active false ;
       end
   end
@@ -493,14 +493,14 @@ let foreground server =
     server.running <- Idle ;
     server.cmdline <- Some false ;
     emitter := do_signal server ;
-    Task.on_idle := Db.while_progress ~debounced:50 ;
+    Task.on_idle := Async.while_progress ~debounced:50 ;
     scheduler := Server server ;
     match server.daemon with
     | None -> ()
     | Some daemon ->
       begin
         server.daemon <- None ;
-        Db.off_progress daemon ;
+        Async.off_progress daemon ;
       end
   end
 
@@ -521,7 +521,7 @@ let run server =
       try
         while not server.shutdown do
           let activity = process server in
-          if not activity then Db.sleep server.polling
+          if not activity then Async.sleep server.polling
         done ;
       with Sys.Break -> () (* Ctr+C, just leave the loop normally *)
     end;

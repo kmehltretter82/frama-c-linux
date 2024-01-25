@@ -125,7 +125,7 @@ val command :
     When this function returns, the stdout and stderr of the child
     process will be filled into the arguments buffer.
     @raise Sys_error when a system error occurs
-    @raise Db.Cancel when the computation is interrupted or on timeout *)
+    @raise Async.Cancel when the computation is interrupted or on timeout *)
 
 (*
 Local Variables:

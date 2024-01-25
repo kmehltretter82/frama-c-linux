@@ -875,7 +875,7 @@ module Computer
   (** Compute the new state after 'instr' starting from state before 'state'.
   *)
   let doInstr stmt instr state =
-    Db.yield ();
+    Async.yield ();
     pdg_debug "doInstr sid:%d : %a" stmt.sid Printer.pp_instr instr;
     match instr with
     | _ when not (Eva.Results.is_reachable stmt) ->
@@ -884,12 +884,12 @@ module Computer
     | Local_init (v, AssignInit i, _) ->
       process_init current_pdg state stmt (Cil.var v) i
     | Local_init (v, ConsInit (f, args, kind), loc) ->
-      Db.yield ();
+      Async.yield ();
       Cil.treat_constructor_as_func
         (process_call current_pdg state stmt) v f args kind loc
     | Set (lv, exp, _) -> process_asgn current_pdg state stmt lv exp
     | Call (lvaloption,funcexp,argl,loc) ->
-      Db.yield ();
+      Async.yield ();
       process_call current_pdg state stmt lvaloption funcexp argl loc
     | Code_annot _
     | Skip _ -> process_skip current_pdg state stmt

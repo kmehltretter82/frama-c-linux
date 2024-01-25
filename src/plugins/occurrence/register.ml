@@ -132,7 +132,7 @@ class occurrence = object (self)
     DoChildren
 
   method! vstmt_aux s =
-    Db.yield ();
+    Async.yield ();
     super#vstmt_aux s
 
   initializer Eva.Analysis.compute ()
