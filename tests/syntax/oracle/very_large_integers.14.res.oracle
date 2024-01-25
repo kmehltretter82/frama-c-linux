@@ -1,7 +1,7 @@
 [kernel] Parsing very_large_integers.c (with preprocessing)
-[kernel] very_large_integers.c:84: Warning: 
+[kernel] very_large_integers.c:86: Warning: 
   ignoring invalid aligned attribute: __aligned__(9223372036854775808)
-[kernel] very_large_integers.c:84: Warning: 
+[kernel] very_large_integers.c:87: Warning: 
   ignoring invalid aligned attribute: __aligned__((9223372036854775808)+
                                                    (9223372036854775808) )
 [kernel] very_large_integers.c:107: User Error: Array length is too large.

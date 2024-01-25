@@ -631,6 +631,7 @@ let process_pragmas_pack_align_comp_attributes ci cattrs =
      the minimum of both is taken into account (note that, in GCC, if a field
      has 2 alignment directives, it is the maximum of those that is taken). *)
 let process_pragmas_pack_align_field_attributes fi fattrs cattr =
+  Cil.CurrentLoc.set fi.floc;
   match !current_packing_pragma, align_pragma_for_struct fi.forig_name with
   | None, None -> check_aligned fattrs
   | Some n, apragma ->
@@ -5096,6 +5097,7 @@ and makeCompType ghost (isstruct: bool)
         (((n,ndt,a,cloc) : Cabs.name), (widtho : Cabs.expression option))
       : fieldinfo list =
       let source = fst cloc in
+      Cil.CurrentLoc.set cloc;
       if sto <> NoStorage || inl then
         Kernel.error ~once:true ~source "Storage or inline not allowed for fields";
       let allowZeroSizeArrays = Cil.gccMode () || Cil.msvcMode () in
@@ -5212,7 +5214,8 @@ and makeCompType ghost (isstruct: bool)
             (* abort and not error, as this circularity could lead
                to infinite recursion... *)
             abort_context
-              "type %s %s is circular"
+              "field %s declaration contains a circular reference to type %s %s"
+              fname
               (if comp.cstruct then "struct" else "union")
               comp.cname;
           end else
