@@ -233,10 +233,6 @@ let sleep ms =
       in
       wait_and_trigger ()
 
-(* ---- Deprecated old API ---- *)
-
-let progress = ref (Kernel.deprecated "!Db.progress()" ~now:"Db.yield()" yield)
-
 (* ************************************************************************* *)
 
 (*

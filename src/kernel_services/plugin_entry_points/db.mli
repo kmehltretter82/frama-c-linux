@@ -147,13 +147,6 @@ end
 
 (** {3 GUI} *)
 
-(** This function should be called from time to time by all analysers taking
-    time. In GUI mode, this will make the interface reactive.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
-    @deprecated 21.0-Scandium *)
-val progress: (unit -> unit) ref
-[@@ deprecated "Use Db.yield instead."]
-
 (** Registered daemon on progress. *)
 type daemon
 

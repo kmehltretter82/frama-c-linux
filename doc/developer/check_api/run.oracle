@@ -258,7 +258,7 @@ Cil_types.logic_var//description of a logic variable/
 Cil_types.exp_node.BinOp/ of Cil_types.binop * Cil_types.exp * Cil_types.exp * Cil_types.typ/Binary operation. Includes the type of the result. The arithmetic  conversions are made explicit for the arguments./
 Log.log_channel/Log.channel -> ?kind:Log.kind -> 'a Log.pretty_printer/logging function to user-created channel./
 Cil_types.stmtkind.Loop/ of Cil_types.code_annotation list * Cil_types.block * Cil_types.location * Cil_types.stmt option * Cil_types.stmt option/A while(1) loop. The termination test is implemented in the body of a  loop using a Break statement. If Cfg.prepareCFG has been called, the  first stmt option will point to the stmt containing the continue label  for this loop and the second will point to the stmt containing the break  label for this loop./
-Db.progress/(unit -> unit) Stdlib.ref/This function should be called from time to time by all analysers taking time. In GUI mode, this will make the interface reactive./
+Db.yield/(unit -> unit) Stdlib.ref/This function should be called from time to time by all analysers taking time. In GUI mode, this will make the interface reactive./
 Kernel_function.get_definition/t -> Cil_types.fundec/Returns the list of static variables declared inside the function. raised exception: No_Definition./
 Datatype.char/char Type.t//
 Visitor_behavior.Get.stmt/Visitor_behavior.t -> Cil_types.stmt -> Cil_types.stmt/Fold operations on table of a given type of AST elements. Fold.ast_element vis f, folds f over each pair of ast_element registered in vis. The ast_element in the old AST is presented to f first (that is, f looks like: let f old_e new_e acc = .... For example for Cil_types.varinfo: Fold.varinfo vis (fun old_vi new_vi acc -> ... )./
