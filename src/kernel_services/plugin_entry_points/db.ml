@@ -20,17 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Extlib
-
 module Main = struct
   include Hook.Make()
-  let play = mk_fun "Main.play"
-end
-
-module Toplevel = struct
-
-  let run = ref (fun f -> f ())
-
 end
 
 (* ************************************************************************* *)

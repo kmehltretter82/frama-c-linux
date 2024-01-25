@@ -54,24 +54,10 @@ module Main: sig
   (** Register a function to be called by the Frama-C main entry point.
       @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  val play: (unit -> unit) ref
-  (** Run all the Frama-C analyses. This function should be called only by
-      toplevels.
-      @since Beryllium-20090901 *)
-
   (**/**)
   val apply: unit -> unit
   (** Not for casual user. *)
   (**/**)
-
-end
-
-module Toplevel: sig
-
-  val run: ((unit -> unit) -> unit) ref
-  (** Run a Frama-C toplevel playing the game given in argument (in
-      particular, applying the argument runs the analyses).
-      @since Beryllium-20090901 *)
 
 end
 

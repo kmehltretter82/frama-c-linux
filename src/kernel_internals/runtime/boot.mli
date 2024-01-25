@@ -20,6 +20,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val play_analysis : unit -> unit
+(** Run all the Frama-C analyses. This function should be called only by
+    toplevels.
+    @since Frama-C+dev
+*)
+
 val boot : unit -> unit
 (** Start and define the Frama-C kernel main loop. Run by the last linked
-    module. *)
+    module.
+*)
+
+val set_toplevel: ((unit -> unit) -> unit) -> unit
+(** Changes the toplevel function to run on boot
+    @since Frama-C+dev
+    @before
+*)

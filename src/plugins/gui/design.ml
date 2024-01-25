@@ -1937,7 +1937,7 @@ let toplevel play =
   ignore (Glib.Idle.add (fun () -> in_idle (); false));
   GMain.Main.main ()
 
-let () = Db.Toplevel.run := toplevel
+let () = Boot.set_toplevel toplevel
 
 (*
 Local Variables:

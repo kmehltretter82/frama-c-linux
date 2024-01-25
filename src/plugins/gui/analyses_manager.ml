@@ -43,7 +43,7 @@ let run title filter_name extension loader
        | `EXECUTE ->
          let run f =
            loader f;
-           !Db.Main.play ();
+           Boot.play_analysis ();
            host_window#reset ()
          in
          Option.iter run dialog#filename;
