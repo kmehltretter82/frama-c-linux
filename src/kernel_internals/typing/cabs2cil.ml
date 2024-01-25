@@ -3364,6 +3364,7 @@ let integerArrayLength (leno: exp option) : int =
     try lenOfArray leno
     with
     | LenOfArray cause ->
+      Cil.CurrentLoc.set len.eloc;
       abort_context
         "Array length %a is %a: no explicit initializer allowed."
         Cil_printer.pp_exp len Cil.pp_incorrect_array_length cause
