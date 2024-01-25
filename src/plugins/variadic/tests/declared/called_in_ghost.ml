@@ -37,4 +37,4 @@ class print =
 
 let run () = Visitor.visitFramacFileSameGlobals (new print) (Ast.get())
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

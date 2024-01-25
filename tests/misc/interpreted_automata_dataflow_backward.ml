@@ -70,4 +70,4 @@ let run () =
   Dataflow.Result.to_dot_file LivenessDomain.pretty results filepath
 
 let () =
-  Db.Main.extend run
+  Boot.Main.extend run

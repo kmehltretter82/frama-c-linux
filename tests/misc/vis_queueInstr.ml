@@ -4,5 +4,5 @@ class vis prj = object(this)
 end
 
 let () =
-  Db.Main.extend (fun () ->
+  Boot.Main.extend (fun () ->
       ignore (File.create_project_from_visitor "A" (new vis)))

@@ -88,7 +88,7 @@ let main () =
   if Project.get_name (Project.current()) <> "test" then
     ignore (generate_code "test")
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (*
 Local Variables:

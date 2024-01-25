@@ -59,4 +59,4 @@ let main () =
   set_status emitter1 Property_status.False_and_reachable;
   print_status ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

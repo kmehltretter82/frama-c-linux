@@ -98,7 +98,7 @@ let main () =
     File.pretty_ast ~prj:new_proj ()
   end
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (*
   Local Variables:

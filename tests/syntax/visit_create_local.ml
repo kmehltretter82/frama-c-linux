@@ -34,4 +34,4 @@ let main () =
     Project.on prj run ();
   end
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

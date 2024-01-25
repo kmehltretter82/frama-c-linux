@@ -13,4 +13,4 @@ let check = function
   | _ -> ()
 
 let () =
-  Db.Main.extend (fun () -> Annotations.iter_global (fun _ g -> check g))
+  Boot.Main.extend (fun () -> Annotations.iter_global (fun _ g -> check g))

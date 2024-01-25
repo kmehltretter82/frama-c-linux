@@ -110,7 +110,7 @@ let print_csv, _ =
 let main () =
   if not (Report_parameters.CSVFile.is_empty ()) then print_csv ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 
 (*

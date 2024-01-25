@@ -57,4 +57,4 @@ let update_func f =
 let run () =
   Globals.Functions.iter_on_fundecs update_func
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

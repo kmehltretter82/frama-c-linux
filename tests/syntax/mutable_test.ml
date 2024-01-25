@@ -15,4 +15,4 @@ let main () =
       (not (Cil.typeHasAttribute "const" (Cil.typeOffset x.vtype offset)))
   | _ -> assert false
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

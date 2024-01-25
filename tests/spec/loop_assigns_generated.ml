@@ -92,4 +92,4 @@ let main () =
        (Property.ip_of_code_annot_single kf s (List.hd lalloc)));
   File.pretty_ast ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

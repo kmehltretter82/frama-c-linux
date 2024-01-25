@@ -63,4 +63,4 @@ let main _ =
   tests ()
 ;;
 
-let _ = Db.Main.extend main
+let _ = Boot.Main.extend main

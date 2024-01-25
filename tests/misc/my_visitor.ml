@@ -81,7 +81,7 @@ let main () =
     print ()
   end
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (* This other main is a simple test for deep copy. *)
 
@@ -95,4 +95,4 @@ let main () =
     assert (Project.on p ~selection (fun () -> not (Kernel.LibEntry.get ())) ())
   end
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

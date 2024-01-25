@@ -13,4 +13,4 @@ let run () =
   Eva.Analysis.compute ();
   ()
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

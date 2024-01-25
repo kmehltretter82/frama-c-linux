@@ -38,4 +38,4 @@ let main () =
   end
 ;;
 
-Db.Main.extend main;;
+Boot.Main.extend main;;

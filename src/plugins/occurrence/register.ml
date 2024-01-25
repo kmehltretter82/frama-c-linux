@@ -249,7 +249,7 @@ let print_all = print_all
 (* ************************************************************************** *)
 
 let main _fmt = if Print.get () then print_all ()
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (*
 Local Variables:

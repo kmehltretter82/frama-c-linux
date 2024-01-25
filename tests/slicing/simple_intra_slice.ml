@@ -108,4 +108,4 @@ let main _ =
 
   Slicing.Api.Project.pretty Format.std_formatter
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

@@ -205,4 +205,4 @@ let main () =
   (***************************************************************************)
   test "INCONSISTENT + INCONSISTENT" (set inconsistent inconsistent)
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

@@ -336,6 +336,6 @@ let cmdline () =
           (Printexc.to_string exn)
     end
 
-let () = Db.Main.extend cmdline
+let () = Boot.Main.extend cmdline
 
 (* -------------------------------------------------------------------------- *)

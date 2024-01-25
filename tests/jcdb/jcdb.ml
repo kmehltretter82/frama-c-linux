@@ -10,4 +10,4 @@ let run () =
   let prj = Project.create_by_copy ~last:true "copy" in
   Project.on prj print_json ()
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

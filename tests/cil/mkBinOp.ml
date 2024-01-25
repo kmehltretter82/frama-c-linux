@@ -40,4 +40,4 @@ let main () =
   test cone ione;
   test ione cone
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

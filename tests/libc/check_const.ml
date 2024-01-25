@@ -68,4 +68,4 @@ let check () =
   in
   Globals.Functions.iter check_kf
 
-let () = Db.Main.extend check
+let () = Boot.Main.extend check

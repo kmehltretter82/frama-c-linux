@@ -49,4 +49,4 @@ let main () =
   print ()  ;
   print_status ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

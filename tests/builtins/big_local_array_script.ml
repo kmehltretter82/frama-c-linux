@@ -6,4 +6,4 @@ let foo () =
     File.init_from_c_files [File.from_filename f]
   end
 
-let () = Db.Main.extend foo
+let () = Boot.Main.extend foo

@@ -6,4 +6,4 @@ let run () =
         fname
     ) (Cabs2cil.func_locs ())
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

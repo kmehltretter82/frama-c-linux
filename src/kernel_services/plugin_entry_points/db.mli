@@ -45,20 +45,14 @@
      line)
 *)
 
-(** Frama-C main interface.
+(** DEPRECATED Frama-C main interface.
     @since Lithium-20081201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+    @deprecated Frama-C+dev Use module {!Boot.Main} *)
 module Main: sig
-
   val extend : (unit -> unit) -> unit
+  [@@ deprecated "Use module Boot.Main"]
   (** Register a function to be called by the Frama-C main entry point.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-
-  (**/**)
-  val apply: unit -> unit
-  (** Not for casual user. *)
-  (**/**)
-
+      @deprecated Frama-C+dev Use module {!Boot.Main} *)
 end
 
 (** {3 GUI} *)

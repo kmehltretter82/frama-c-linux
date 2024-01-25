@@ -46,4 +46,4 @@ let main () =
   print_models typ;
   Format.print_flush ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

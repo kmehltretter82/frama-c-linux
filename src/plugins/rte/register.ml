@@ -86,7 +86,7 @@ let main () =
       "annotations computed"
   end
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (*
   Local Variables:

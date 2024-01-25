@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Main = Hook.Make ()
+
 let toplevel = ref (fun f -> f ())
 let set_toplevel run = toplevel := run
 
@@ -33,7 +35,7 @@ let play_analysis () =
     end
   end;
   try
-    Db.Main.apply ();
+    Main.apply ();
     Log.treat_deferred_error ();
     (* Printing code, if required, have to be done at end. *)
     if Kernel.PrintCode.get () then File.pretty_ast ();

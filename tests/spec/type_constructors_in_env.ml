@@ -8,4 +8,4 @@ let run () =
    with Not_found -> Kernel.fatal "A should be in the environment");
   File.pretty_ast ()
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

@@ -17,4 +17,4 @@ let main () =
      failure "failure";*)
   ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

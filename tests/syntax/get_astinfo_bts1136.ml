@@ -36,4 +36,4 @@ let main () =
       Cil_datatype.Syntactic_scope.pretty kind
   in List.iter do_v vars; List.iter do_v vars'
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

@@ -20,6 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Frama-C main interface.
+    @since Lithium-20081201
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+module Main : sig
+  val extend : (unit -> unit) -> unit
+  (** Register a function to be called by the Frama-C main entry point.
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+end
+
 val play_analysis : unit -> unit
 (** Run all the Frama-C analyses. This function should be called only by
     toplevels.
