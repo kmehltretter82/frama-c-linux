@@ -33,8 +33,7 @@ module Tbl =
     (PdgTypes.Pdg)
     (struct
       let name = "Pdg.State"
-      let dependencies = [] (* postponed because !Db.From.self may
-                               not exist yet *)
+      let dependencies = [] (* postponed because From.self may not exist yet *)
       let size = 17
     end)
 

@@ -300,4 +300,4 @@ let run () =
     in
     print_json outfp funinfos_json
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

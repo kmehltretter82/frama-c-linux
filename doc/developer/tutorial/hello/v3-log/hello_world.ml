@@ -15,4 +15,4 @@ let run () =
   in
   Self.result "11 * 5 = %d" product
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

@@ -4,4 +4,4 @@ let run () =
   Visitor.visitFramacFileSameGlobals (new print_cfg fmt) (Ast.get ());
   close_out chan
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

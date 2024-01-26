@@ -21,4 +21,4 @@ let run () =
               function_name Property_status.pretty status)
          ip)
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

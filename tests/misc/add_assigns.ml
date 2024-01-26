@@ -33,4 +33,4 @@ let main () =
     Property_status.(emit emitter ~hyps:[] ip True)
   end
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

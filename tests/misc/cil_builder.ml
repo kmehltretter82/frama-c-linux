@@ -18,4 +18,4 @@ let run () =
 
 
 let () =
-  Db.Main.extend run
+  Boot.Main.extend run

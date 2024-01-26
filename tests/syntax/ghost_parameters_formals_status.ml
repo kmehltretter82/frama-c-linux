@@ -25,4 +25,4 @@ let run () =
   in
   Globals.Functions.iter print_info
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

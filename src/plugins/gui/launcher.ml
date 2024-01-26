@@ -35,7 +35,7 @@ let run (host:basic_main) dialog () =
             (fun () ->
                dialog#destroy ();
                Kernel_hook.apply ();
-               !Db.Main.play ()));
+               Boot.play_analysis ()));
   (* Even if the above operation failed, we try to reset the gui, as the
      plugins might have done something before crashing *)
   ignore (host#protect ~cancelable:false ~parent:(dialog :> GWindow.window_skel)

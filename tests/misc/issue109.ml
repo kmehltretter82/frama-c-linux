@@ -5,4 +5,4 @@ let main () =
   File.init_from_cmdline ();
   Eva.Analysis.compute ()
 
-let main = Db.Main.extend main
+let main = Boot.Main.extend main

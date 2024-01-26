@@ -20,37 +20,40 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let boot () =
-  let play_analysis () =
-    if Kernel.TypeCheck.get () then begin
-      if Kernel.Files.get () <> [] || Kernel.TypeCheck.is_set () then begin
-        Ast.compute ();
-        (* Printing files before anything else (in debug mode only) *)
-        if Kernel.debug_atleast 1 && Kernel.is_debug_key_enabled Kernel.dkey_ast
-        then File.pretty_ast ()
-      end
-    end;
-    try
-      Db.Main.apply ();
-      Log.treat_deferred_error ();
-      (* Printing code, if required, have to be done at end. *)
-      if Kernel.PrintCode.get () then File.pretty_ast ();
-      (* Easier to handle option -set-project-as-default at the last moment:
-         no need to worry about nested [Project.on] *)
-      Project.set_keep_current (Kernel.Set_project_as_default.get ());
-      (* unset Kernel.Set_project_as_default, but only if it set.
-         This avoids disturbing the "set by user" flag. *)
-      if Kernel.Set_project_as_default.get () then
-        Kernel.Set_project_as_default.off ()
-    with Globals.No_such_entry_point msg ->
-      Kernel.abort "%s" msg
-  in
-  let on_from_name name f =
-    try Project.on (Project.from_unique_name name) f ()
-    with Project.Unknown_project -> Kernel.abort "no project `%s'." name
-  in
-  Db.Main.play := play_analysis;
+module Main = Hook.Make ()
 
+let toplevel = ref (fun f -> f ())
+let set_toplevel run = toplevel := run
+
+let play_analysis () =
+  if Kernel.TypeCheck.get () then begin
+    if Kernel.Files.get () <> [] || Kernel.TypeCheck.is_set () then begin
+      Ast.compute ();
+      (* Printing files before anything else (in debug mode only) *)
+      if Kernel.debug_atleast 1 && Kernel.is_debug_key_enabled Kernel.dkey_ast
+      then File.pretty_ast ()
+    end
+  end;
+  try
+    Main.apply ();
+    Log.treat_deferred_error ();
+    (* Printing code, if required, have to be done at end. *)
+    if Kernel.PrintCode.get () then File.pretty_ast ();
+    (* Easier to handle option -set-project-as-default at the last moment:
+       no need to worry about nested [Project.on] *)
+    Project.set_keep_current (Kernel.Set_project_as_default.get ());
+    (* unset Kernel.Set_project_as_default, but only if it set.
+       This avoids disturbing the "set by user" flag. *)
+    if Kernel.Set_project_as_default.get () then
+      Kernel.Set_project_as_default.off ()
+  with Globals.No_such_entry_point msg ->
+    Kernel.abort "%s" msg
+
+let on_from_name name f =
+  try Project.on (Project.from_unique_name name) f ()
+  with Project.Unknown_project -> Kernel.abort "no project `%s'." name
+
+let boot () =
   (* Main: let's go! *)
   Sys.catch_break true;
   let f () =
@@ -58,7 +61,7 @@ let boot () =
     let on_from_name = { Cmdline.on_from_name } in
     Cmdline.parse_and_boot
       ~on_from_name
-      ~get_toplevel:(fun () -> !Db.Toplevel.run)
+      ~get_toplevel:(fun () -> !toplevel)
       ~play_analysis
   in
   Cmdline.catch_toplevel_run

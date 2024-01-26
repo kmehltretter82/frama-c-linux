@@ -13,7 +13,7 @@ let main () =
   let p = Project.load fp in
   Project.on p (fun () -> Eva.Analysis.compute (); ignore (sparecode ())) ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (* testing Project.create_by_copy *)
 let main2 () =
@@ -24,4 +24,4 @@ let main2 () =
   Format.printf "COPY AST@.";
   File.pretty_ast ~prj ()
 
-let () = Db.Main.extend main2
+let () = Boot.Main.extend main2

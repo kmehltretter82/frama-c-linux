@@ -23,14 +23,7 @@
 [@@@ api_start]
 
 (** Eva's result API is a new interface to access the results of an analysis,
-    once it is completed. It may slightly change in the future. It aims at
-    replacing most uses of [Db.Value], and has some advantages over Db's :
-
-    - evaluations uses every available domains and not only Cvalue;
-    - the caller may distinguish failure cases when a request is unsucessful;
-    - working with callstacks is easy;
-    - some common shortcuts are provided (e.g. for extracting ival directly);
-    - overall, individual functions are simpler.
+    once it is completed. It may slightly change in the future.
 
     The idea behind this API is that requests must be decomposed in several
     steps. For instance, to evaluate an expression :

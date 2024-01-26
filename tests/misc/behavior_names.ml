@@ -10,4 +10,4 @@ let run () =
     (Annotations.fresh_behavior_name kf "foo")
     (Annotations.fresh_behavior_name kf "bla")
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

@@ -49,7 +49,7 @@ let reparse (host_window: Design.main_window_extension_points) =
          Kernel.Files.set [];
          Kernel.Files.set files;
          Ast.compute ();
-         !Db.Main.play ();
+         Boot.play_analysis ();
          Source_manager.clear host_window#original_source_viewer)
   in
   begin match old_helt, succeeded with

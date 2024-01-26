@@ -24,7 +24,7 @@
 
 open Cil_types
 
-(** Class type for a Db-aware visitor.
+(** Class type for a database-aware visitor.
     This is done by defining auxiliary methods that can be
     redefined in inherited classes, while the corresponding ones from
     {!Cil.cilVisitor} {b must} retain their values as defined here. Otherwise,

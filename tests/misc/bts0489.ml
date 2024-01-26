@@ -17,4 +17,4 @@ let run () =
   let file = Ast.get () in
   Visitor.visitFramacFile (new visitor) file
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

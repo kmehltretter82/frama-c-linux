@@ -20,125 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Database in which static plugins are registered.
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-
-(**
-   Modules providing general services:
-   - {!Dynamic}: API for plug-ins linked dynamically
-   - {!Log}: message outputs and printers
-   - {!Plugin}: general services for plug-ins
-   - {!Project} and associated files: {!Datatype} and {!State_builder}.
-
-   Other main kernel modules:
-   - {!Ast}: the cil AST
-   - {!Ast_info}: syntactic value directly computed from the Cil Ast
-   - {!File}: Cil file initialization
-   - {!Globals}: global variables, functions and annotations
-   - {!Annotations}: annotations associated with a statement
-   - {!Property_status}: status of annotations
-   - {!Kernel_function}: C functions as seen by Frama-C
-   - {!Stmts_graph}: the statement graph
-   - {!Loop}: (natural) loops
-   - {!Visitor}: frama-c visitors
-   - {!Kernel}: general parameters of Frama-C (mostly set from the command
-     line)
-*)
-
-(** Frama-C main interface.
+(** DEPRECATED Frama-C main interface.
     @since Lithium-20081201
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+    @deprecated Frama-C+dev Use module {!Boot.Main} *)
 module Main: sig
-
   val extend : (unit -> unit) -> unit
+  [@@ deprecated "Use module Boot.Main"]
   (** Register a function to be called by the Frama-C main entry point.
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-
-  val play: (unit -> unit) ref
-  (** Run all the Frama-C analyses. This function should be called only by
-      toplevels.
-      @since Beryllium-20090901 *)
-
-  (**/**)
-  val apply: unit -> unit
-  (** Not for casual user. *)
-  (**/**)
-
+      @deprecated Frama-C+dev Use module {!Boot.Main} *)
 end
-
-module Toplevel: sig
-
-  val run: ((unit -> unit) -> unit) ref
-  (** Run a Frama-C toplevel playing the game given in argument (in
-      particular, applying the argument runs the analyses).
-      @since Beryllium-20090901 *)
-
-end
-
-(** {3 GUI} *)
-
-(** Registered daemon on progress. *)
-type daemon
-
-(**
-   [on_progress ?debounced ?on_delayed trigger] registers [trigger] as new
-   daemon to be executed on each {!yield}.
-   @param debounced the least amount of time between two successive calls to the
-   daemon, in milliseconds (default is 0ms).
-   @param on_delayed callback is invoked as soon as the time since the last
-   {!yield} is greater than [debounced] milliseconds (or 100ms at least).
-   @param on_finished callback is invoked when the callback is unregistered.
-*)
-val on_progress :
-  ?debounced:int -> ?on_delayed:(int -> unit) -> ?on_finished:(unit -> unit) ->
-  (unit -> unit) -> daemon
-
-(** Unregister the [daemon]. *)
-val off_progress : daemon -> unit
-
-(** [while_progress ?debounced ?on_delayed ?on_finished trigger] is similar to
-    [on_progress] but the daemon is automatically unregistered
-    as soon as [trigger] returns [false].
-    Same optional parameters than [on_progress].
-*)
-val while_progress :
-  ?debounced:int -> ?on_delayed:(int -> unit) -> ?on_finished:(unit -> unit) ->
-  (unit -> bool) -> unit
-
-(**
-   [with_progress ?debounced ?on_delayed trigger job data] executes the given
-   [job] on [data] while registering [trigger] as temporary (debounced) daemon.
-   The daemon is finally unregistered at the end of the computation.
-   Same optional parameters than [on_progress].
-*)
-val with_progress :
-  ?debounced:int -> ?on_delayed:(int -> unit) -> ?on_finished:(unit -> unit) ->
-  (unit -> unit) -> ('a -> 'b) -> 'a -> 'b
-
-(** Trigger all daemons immediately. *)
-val flush : unit -> unit
-
-(** Trigger all registered daemons (debounced).
-    This function should be called from time to time by all analysers taking
-    time. In GUI or Server mode, this will make the clients responsive. *)
-val yield : unit -> unit
-
-(** Interrupt the currently running job: the next call to {!yield}
-    will raise a [Cancel] exception. *)
-val cancel : unit -> unit
-
-(**
-   Pauses the currently running process for the specified time, in milliseconds.
-   Registered daemons, if any, will be regularly triggered during this waiting
-   time at a reasonable period with respect to their debouncing constraints.
-*)
-val sleep : int -> unit
-
-(** This exception may be raised by {!yield} to interrupt computations. *)
-exception Cancel
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

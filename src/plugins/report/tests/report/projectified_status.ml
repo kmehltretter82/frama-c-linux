@@ -55,4 +55,4 @@ let main () =
   set_status Property_status.Dont_know;
   print_status ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

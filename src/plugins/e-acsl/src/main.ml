@@ -162,7 +162,7 @@ let main () =
     ignore (generate_code (Options.Project_name.get ()));
   end
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (*
 Local Variables:

@@ -14,4 +14,4 @@ let main () =
   Cil.visitCilFile (new vis :> Cil.cilVisitor) (Ast.get ())
 
 let () =
-  Db.Main.extend main
+  Boot.Main.extend main

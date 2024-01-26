@@ -39,4 +39,4 @@ let main () =
   end in
   Visitor.visitFramacFileSameGlobals o (Ast.get ())
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

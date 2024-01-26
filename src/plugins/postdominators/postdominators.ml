@@ -39,4 +39,4 @@ let output () =
 let output, _ = State_builder.apply_once "Postdominators.Compute.output"
     [Compute.self] output
 
-let () = Db.Main.extend output
+let () = Boot.Main.extend output

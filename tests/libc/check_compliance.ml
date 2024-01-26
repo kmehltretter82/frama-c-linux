@@ -124,7 +124,7 @@ let check_ident c11 posix glibc nonstandard c11_headers id headers =
   end
 
 let () =
-  Db.Main.extend (fun () ->
+  Boot.Main.extend (fun () ->
       if not !run_once then begin
         run_once := true;
         let vis = new stdlib_visitor in

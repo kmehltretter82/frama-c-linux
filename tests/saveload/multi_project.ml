@@ -23,4 +23,4 @@ let main () =
   check "default" (<>);
   check "bar" (<>)
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

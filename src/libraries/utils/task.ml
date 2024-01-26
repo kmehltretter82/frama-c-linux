@@ -108,9 +108,9 @@ struct
 
   let rec wait = function
     | UNIT a -> a
-    | YIELD f -> Db.yield() ; wait (f Coin)
+    | YIELD f -> Async.yield() ; wait (f Coin)
     | WAIT(ms,f) ->
-      Db.yield() ; Unix.sleepf (float_of_int ms /. 1_000_000.); wait (f Coin)
+      Async.yield() ; Unix.sleepf (float_of_int ms /. 1_000_000.); wait (f Coin)
 
   let finished = function UNIT a -> Some a | YIELD _ | WAIT _ -> None
 
@@ -342,7 +342,7 @@ let share sh = todo
 let on_idle = ref
     (fun f -> try
         while f () do Unix.sleepf 0.05 (* wait for 50ms *) done
-      with Db.Cancel -> ())
+      with Async.Cancel -> ())
 
 (* -------------------------------------------------------------------------- *)
 (* --- Task thread                                                        --- *)
@@ -484,8 +484,8 @@ let server_progress server () =
         ) server.running ;
     Array.iter (schedule server) server.queue ;
     let () =
-      try Db.yield ()
-      with Db.Cancel -> cancel_all server
+      try Async.yield ()
+      with Async.Cancel -> cancel_all server
     in
     fire server.activity ;
     if server.running <> [] then

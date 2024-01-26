@@ -28,4 +28,4 @@ let run () =
   in
   Project.on prj check ()
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

@@ -339,7 +339,7 @@ class menu_manager ?packing (_:Gtk_helper.host) =
         else debug_item#misc#hide ()
       in
       reset ();
-      Db.Main.extend reset
+      Boot.Main.extend reset
 
   end
 

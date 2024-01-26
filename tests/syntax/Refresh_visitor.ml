@@ -76,4 +76,4 @@ let main () =
     ) ();
   File.pretty_ast ~prj:p ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

@@ -1164,7 +1164,7 @@ end
 let rec fixpoint limit solvers sigma s0 =
   if limit > 0 then compute limit solvers sigma s0 else s0
 and compute limit solvers sigma s0 =
-  Db.yield ();
+  Async.yield ();
   let s1 =
     if Wp_parameters.Ground.get () then ground s0
     else s0 in
@@ -1227,7 +1227,7 @@ let tc = ref 0
 let rec test_cases (s : hsp) = function
   | [] -> s
   | (p,_) :: tail ->
-    Db.yield () ;
+    Async.yield () ;
     match test_case p s , test_case (p_not p) s with
     | None , None -> incr tc ; [],F.p_true
     | Some w , None -> incr tc ; test_cases w tail

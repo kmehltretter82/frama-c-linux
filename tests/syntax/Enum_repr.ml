@@ -18,4 +18,4 @@ let run () =
     | _ -> ()
   in
   List.iter output f.globals
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

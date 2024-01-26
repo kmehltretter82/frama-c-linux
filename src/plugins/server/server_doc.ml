@@ -383,7 +383,7 @@ let dump ~root ?(meta=true) () =
   end
 
 let () =
-  Db.Main.extend begin
+  Boot.Main.extend begin
     fun () ->
       if not (Senv.Doc.is_empty ()) then
         let root = Senv.Doc.get () in

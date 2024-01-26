@@ -54,4 +54,4 @@ let main _ =
   pp_nodes "Test [all_related_nodes] y@11" nodes
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

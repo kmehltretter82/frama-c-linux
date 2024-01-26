@@ -26,4 +26,4 @@ let main () =
   (* no equality in Hashtbls. *)
   Test.Hashtbl.iter (fun _ _ -> assert false) (H.copy h)
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
