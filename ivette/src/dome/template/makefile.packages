@@ -44,7 +44,7 @@ DOME_APP_PACKAGES= \
 	react-dom@^18 \
 	source-map-support \
 	lodash \
-	react-virtualized \
+	react-virtualized@9.22.5 \
 	react-draggable \
 	react-fast-compare \
 	diff

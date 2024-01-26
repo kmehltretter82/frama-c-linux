@@ -114,6 +114,7 @@ dome-pkg: .dome-pkg.stamp
 	@echo "[Dome] building application dependencies"
 	@echo "[Dome] ----------------------------------------------------------------"
 	yarn install
+	cp ./src/dome/template/react-virtualized.hacked.onScroll.js ./node_modules/react-virtualized/dist/es/WindowScroller/utils/onScroll.js
 	yarn run electron-builder install-app-deps
 	@touch $@
 
