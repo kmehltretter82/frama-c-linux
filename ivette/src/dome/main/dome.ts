@@ -437,7 +437,6 @@ function createBrowserWindow(
   }
 
   console.log('[Dome] Loading config file', configFile);
-
   const configData = loadSettings(configFile);
 
   const frame = jFrame(configData.frame);
@@ -486,9 +485,7 @@ function createBrowserWindow(
     console.log('[Dome] Window ready');
     if (DEVEL || LOCAL)
       process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'false';
-    if (DEVEL && devtools) {
-    webContents.openDevTools();
-    }
+    if (DEVEL && devtools) webContents.openDevTools();
     theWindow.show();
   });
 
@@ -538,11 +535,13 @@ function createBrowserWindow(
   }
 
   if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
-    theWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
+    theWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]).catch((err) => {
+      console.error('LOAD URL (DEV)',err);
+    });
   } else {
     const url = `file://${path.join(__dirname, "../renderer/index.html")}`;
     theWindow.loadURL(url).catch((err) => {
-      console.error(err);
+      console.error('LOAD URL (APP)',err);
     });
   }
 
@@ -576,10 +575,10 @@ function createPrimaryWindow(): void {
   Menubar.install();
 
   // React Developper Tools
-  if (DEVEL)
-    installExtension(REACT_DEVELOPER_TOOLS, true).catch((err) => {
-      console.error('[Dome] Enable to install React dev-tools', err);
-    });
+  //if (DEVEL)
+  //  installExtension(REACT_DEVELOPER_TOOLS, true).catch((err: any) => {
+  //    console.error('[Dome] Enable to install React dev-tools', err);
+  //  });
   const cwd = process.cwd();
   const wdir = cwd === '/' ? app.getPath('home') : cwd;
   const cmd = stripElectronArgv({ wdir, argv: process.argv });
@@ -720,6 +719,14 @@ let isQuitting = false;
 
 /** Starts the main process. */
 export function start(): void {
+
+  // WORKS
+  app.on(
+    'certificate-error',
+    (event, _webContents, _url, _error, _certificate, callback) => {
+      event.preventDefault();
+      callback(true);
+    });
 
   // Workaround to recover the original commandline of a second instance
   // after chromium messes with the argument order.
