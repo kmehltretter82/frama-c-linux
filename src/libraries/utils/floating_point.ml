@@ -113,10 +113,6 @@ let num_dot_frac = Str.regexp (reg_numopt ^ reg_dot ^ reg_numopt)
 let num_dot_frac_exp = Str.regexp (reg_numopt ^ reg_dot ^ reg_numopt ^ reg_exp)
 let num_exp = Str.regexp (reg_num ^ reg_exp)
 
-let float_of_string_opt s =
-  try Some (float_of_string s)
-  with Failure _ -> None
-
 let sys_single_precision_of_string_opt s =
   try Some (sys_single_precision_of_string s)
   with Failure _ -> None
