@@ -309,18 +309,20 @@ if dyncallees:
     print(f"- note: calls to dynamic allocation functions: {', '.join(sorted(dyncallees))}")
 
 
-# unsupported C11-specific features
+# unsupported C11 or non-standard specific features
 
-c11_unsupported = [
-    "_Alignas",
-    "_Alignof",
-    "_Complex",
-    "_Imaginary",
-    "alignas",
-    "alignof",  # stdalign.h may use these symbols
+unsupported_keywords = [
+    ("_Alignas", "C11 construct"),
+    ("_Alignof", "C11 construct"),
+    ("_Complex", "C11 construct"),
+    ("_Imaginary", "C11 construct"),
+    ("alignas", "C11 construct"),
+    ("alignof", "C11 construct"),  # stdalign.h may use these symbols
+    ("__int128", "non-standard construct (GNU extension)"),
+    ("__uint128_t", "non-standard construct (GNU extension)"),
 ]
 
-for keyword in c11_unsupported:
+for keyword, message in unsupported_keywords:
     out = subprocess.Popen(
         ["grep", "-n", "\\b" + keyword + "\\b"] + files + ["/dev/null"],
         stdout=subprocess.PIPE,
@@ -331,7 +333,7 @@ for keyword in c11_unsupported:
         n = len(lines)
         print(
             f"- warning: found {n} line{'s' if n > 1 else ''} with occurrences of "
-            f"unsupported C11 construct '{keyword}'"
+            f"unsupported {message} '{keyword}'"
         )
 
 # assembly code
