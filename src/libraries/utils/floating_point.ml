@@ -20,7 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
+(* -------------------------------------------------------------------------- *)
+(* --- Rounding Modes                                                     --- *)
+(* -------------------------------------------------------------------------- *)
 
 type c_rounding_mode =
     FE_ToNearest | FE_Upward | FE_Downward | FE_TowardZero
@@ -30,9 +32,6 @@ let string_of_c_rounding_mode = function
   | FE_Upward -> "FE_UPWARD"
   | FE_Downward -> "FE_DOWNWARD"
   | FE_TowardZero -> "FE_TOWARDZERO"
-
-
-
 
 external set_round_downward: unit -> unit = "set_round_downward" [@@noalloc]
 external set_round_upward: unit -> unit = "set_round_upward" [@@noalloc]
@@ -45,10 +44,12 @@ external sys_single_precision_of_string: string -> float = "single_precision_of_
 (* TODO two functions above: declare "float",
    must have separate version for bytecode, see OCaml manual *)
 
+(* -------------------------------------------------------------------------- *)
+(* --- Constructors                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
 let max_single_precision_float = Int32.float_of_bits 0x7f7fffffl
 let most_negative_single_precision_float = -. max_single_precision_float
-
-
 
 type parsed_float = { f_nearest : float ; f_lower : float ; f_upper : float }
 
@@ -99,7 +100,9 @@ let make_float ~num ~den ~exp ~man_size ~min_exp ~max_exp =
     else inf ~man_size ~max_exp
   else zero
 
-
+(* -------------------------------------------------------------------------- *)
+(* --- Parser Engine                                                      --- *)
+(* -------------------------------------------------------------------------- *)
 
 let reg_exp = "[eE][+]?\\(-?[0-9]+\\)"
 let reg_dot = "[.]"
@@ -109,8 +112,6 @@ let reg_num = "\\([0-9]+\\)"
 let num_dot_frac = Str.regexp (reg_numopt ^ reg_dot ^ reg_numopt)
 let num_dot_frac_exp = Str.regexp (reg_numopt ^ reg_dot ^ reg_numopt ^ reg_exp)
 let num_exp = Str.regexp (reg_num ^ reg_exp)
-
-
 
 let float_of_string_opt s =
   try Some (float_of_string s)
@@ -122,8 +123,6 @@ let sys_single_precision_of_string_opt s =
 
 let is_hexadecimal s =
   String.length s >= 2 && s.[0] = '0' && (Char.uppercase_ascii s.[1] = 'X')
-
-
 
 exception Shortcut of parsed_float
 
@@ -178,7 +177,9 @@ let parse_positive_float ~man_size ~min_exp ~max_exp s =
   try parse_positive_float_with_shortcut ~man_size ~min_exp ~max_exp s
   with Shortcut r -> Some r
 
-
+(* -------------------------------------------------------------------------- *)
+(* --- Float & Double Parsers                                             --- *)
+(* -------------------------------------------------------------------------- *)
 
 let rec single_precision_of_string s =
   let open Option.Operators in
@@ -202,11 +203,13 @@ let rec double_precision_of_string s =
     { f_lower = f ; f_nearest = f ; f_upper = f }
   else parse_positive_float ~man_size:52 ~min_exp:(-1022) ~max_exp:1023 s
 
+(* -------------------------------------------------------------------------- *)
+(* --- Qualified C-float literals                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
 let parse_fkind string = function
   | Cil_types.FFloat -> single_precision_of_string string
   | Cil_types.(FDouble | FLongDouble) -> double_precision_of_string string
-
-
 
 let fkind_of_char = function
   | 'F' -> Cil_types.FFloat, true
@@ -224,8 +227,6 @@ let pretty_fkind fmt = function
   | Cil_types.FDouble -> Format.fprintf fmt "double precision"
   | Cil_types.FLongDouble -> Format.fprintf fmt "long double precision"
 
-
-
 let cannot_be_parsed string fkind =
   Kernel.abort ~current:true
     "The string %s cannot be parsed as a %a floating-point constant"
@@ -234,6 +235,10 @@ let cannot_be_parsed string fkind =
 let empty_string () =
   Kernel.abort ~current:true
     "Parsing an empty string as a floating-point constant."
+
+(* -------------------------------------------------------------------------- *)
+(* --- Full Parser                                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
 let parse string =
   let l = String.length string - 1 in
@@ -246,12 +251,14 @@ let parse string =
     | None -> cannot_be_parsed string fkind
   else empty_string ()
 
-
-
 let has_suffix fk lit =
   let ln = String.length lit in
   let suffix = suffix_of_fkind fk in
   ln > 0 && Char.uppercase_ascii lit.[ln - 1] = suffix
+
+(* -------------------------------------------------------------------------- *)
+(* --- Classification                                                     --- *)
+(* -------------------------------------------------------------------------- *)
 
 let is_not_finite f =
   match classify_float f with
@@ -260,6 +267,10 @@ let is_not_finite f =
 
 let is_not_integer s =
   String.(contains s '.' || contains s 'e' || contains s 'E')
+
+(* -------------------------------------------------------------------------- *)
+(* --- Pretty Printing                                                    --- *)
+(* -------------------------------------------------------------------------- *)
 
 let pretty_normal ~use_hex fmt f =
   let double_norm = Int64.shift_left 1L 52 in
@@ -309,7 +320,9 @@ let pretty fmt f =
     Format.fprintf fmt "%s%s" r dot
   else pretty_normal ~use_hex fmt f
 
-
+(* -------------------------------------------------------------------------- *)
+(* --- Conversions                                                        --- *)
+(* -------------------------------------------------------------------------- *)
 
 type sign = Neg | Pos
 
@@ -341,13 +354,14 @@ let bits_of_most_negative_float =
   let v = Int64.of_int32 0xFF7FFFFFl in
   Integer.of_int64 v
 
-
-
 external fround: float -> float = "c_round"
 external trunc: float -> float = "c_trunc"
 
-(** Single-precision (32-bit) functions. We round the result computed
-    as a double, since float32 functions are rarely precise. *)
+(* -------------------------------------------------------------------------- *)
+(* --- Single Precision Operations                                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+(* We round the result float64 operators since float32 ones are less precise. *)
 
 external expf: float -> float = "c_expf"
 external logf: float -> float = "c_logf"
@@ -362,9 +376,9 @@ external asinf: float -> float = "c_asinf"
 external atanf: float -> float = "c_atanf"
 external atan2f: float -> float -> float = "c_atan2f"
 
-
-
-(** C math-like functions *)
+(* -------------------------------------------------------------------------- *)
+(* --- C-Math like functions                                              --- *)
+(* -------------------------------------------------------------------------- *)
 
 let isnan f =
   match classify_float f with
@@ -416,6 +430,7 @@ let nextafter x y =
 let nextafterf x y =
   nextafter_aux ~is_f32:true incr_f32 decr_f32 x y
 
+(* -------------------------------------------------------------------------- *)
 
 (*
 Local Variables:
