@@ -28,6 +28,7 @@ const DOME = process.env.DOME || path.resolve("src", "dome");
 const ENV = process.env.DOME_ENV;
 
 // Do not use electron-devtools-installer in production mode
+
 function domeDevtools() {
   switch (ENV) {
     case "dev":
@@ -43,6 +44,7 @@ export default defineConfig({
     resolve: {
       extensions: [".ts", ".tsx", ".js", "jsx", ".json"],
       alias: {
+        "dome/misc/devtools": domeDevtools(),
         "dome/misc": path.resolve(DOME, "misc"),
         "dome/system": path.resolve(DOME, "misc", "system.ts"),
         "dome$": path.resolve(DOME, "main", "dome.ts"),
