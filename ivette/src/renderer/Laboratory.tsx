@@ -110,8 +110,8 @@ function assignValueToQuarterStr(quarter: string, value: string)
 
 function getQuarterComponents(quarter: string): (string | undefined)[] {
   const result = [];
-
   const labViewState = globalLabViewState.getValue();
+
   if ("A" === quarter) result.push(labViewState.A);
   if ("B" === quarter) result.push(labViewState.B);
   if ("C" === quarter) result.push(labViewState.C);
@@ -177,8 +177,7 @@ function addToDockedComponents(comp: Ivette.ComponentProps)
 }
 
 function deleteFromDockedComponents(comp: Ivette.ComponentProps): void {
-  let labviewState = globalLabViewState.getValue();
-  labviewState = globalLabViewState.getValue();
+  const labviewState = globalLabViewState.getValue();
   const dockedComponents = labviewState.dockedComponents;
 
   let exists = false;
@@ -198,7 +197,7 @@ function deleteFromDockedComponents(comp: Ivette.ComponentProps): void {
 }
 
 function deleteFromLoadedComponents(comp: Ivette.ComponentProps): void {
-  let labviewState = globalLabViewState.getValue();
+  const labviewState = globalLabViewState.getValue();
   const loadedComponents = labviewState.components;
 
   let exists = false;
@@ -211,21 +210,16 @@ function deleteFromLoadedComponents(comp: Ivette.ComponentProps): void {
   });
   if(!exists) return;
 
-  removeCompFromCurrentLayout(comp.id);
-  labviewState = globalLabViewState.getValue();
-  const A = labviewState.A ?? "";
-  const B = labviewState.B ?? "";
-  const C = labviewState.C ?? "";
-  const D = labviewState.D ?? "";
-
   globalLabViewState.setValue({
     ...labviewState,
-    A: A,
-    B: B,
-    C: C,
-    D: D,
     components: new Set(tmpArray),
   }, true);
+}
+
+function removeComponent(comp: Ivette.ComponentProps): void {
+  removeCompFromCurrentLayout(comp.id);
+  deleteFromDockedComponents(comp);
+  deleteFromLoadedComponents(comp);
 }
 
 function addCompFromQuarterToDock(quarter: string): void {
@@ -649,8 +643,7 @@ export function PanelLayoutSelector()
       id: state.compId,
       label: state.compLabel
     };
-    state.origin === "titlebar" && deleteFromLoadedComponents(component);
-    state.origin === "dockbar" && deleteFromDockedComponents(component);
+    removeComponent(component);
     close();
   }
 
