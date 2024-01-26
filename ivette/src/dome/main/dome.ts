@@ -51,9 +51,10 @@ import {
   nativeTheme,
   shell,
 } from 'electron';
-const fs = require('fs');
+import process from 'process';
+import fs from 'fs';
+import path from 'path';
 import _ from 'lodash';
-const path = require('path');
 
 // --------------------------------------------------------------------------
 // --- Main Window Web Navigation
@@ -559,13 +560,15 @@ ipcMain.on('dome.ipc.closing.done', (_event, wid:number) => {
 
 interface Cmd { wdir: string; argv: string[] }
 
+//[LC]: this is buggy, process.argv has no command line arguments
 function stripElectronArgv(cmd: Cmd): Cmd
 {
-  const wdir = DEVEL ? cmd.argv[3] : cmd.wdir;
-  const argv = cmd.argv
-      .slice(DEVEL ? 4 : (LOCAL ? 2 : 1))
-      .filter((p) => !!p && p !== "--no-sandbox");
-  return { wdir, argv };
+  console.log('STRIP COMMAND LINE',cmd);
+  //const wdir = DEVEL ? cmd.argv[3] : cmd.wdir;
+  //const argv = cmd.argv
+  //    .slice(DEVEL ? 4 : (LOCAL ? 2 : 1))
+  //    .filter((p) => !!p && p !== "--no-sandbox");
+  return { wdir:'.', argv:[] };
 }
 
 function createPrimaryWindow(): void {
@@ -584,10 +587,10 @@ function createPrimaryWindow(): void {
   // Reset Settings if the associated argument is provided
   const settingsIdx = cmd.argv.indexOf(CLI_OPTION_SETTINGS.name);
   if (settingsIdx >= 0) {
-  const settings = cmd.argv[settingsIdx + 1];
-  if (settings === CLI_OPTION_SETTINGS.defaultValue) {
-  restoreAllDefaultSettings();
-  }
+    const settings = cmd.argv[settingsIdx + 1];
+    if (settings === CLI_OPTION_SETTINGS.defaultValue) {
+      restoreAllDefaultSettings();
+    }
   }
 
   // Initialize Theme
