@@ -1,1 +1,1 @@
-react@^18 react-dom@^18 source-map-support lodash react-virtualized react-draggable react-fast-compare diff
+react@^18 react-dom@^18 source-map-support lodash react-virtualized@9.22.5 react-draggable react-fast-compare diff
