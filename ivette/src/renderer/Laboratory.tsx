@@ -34,7 +34,7 @@ import * as Ivette from 'ivette';
 import * as Ext from './Extensions';
 
 
-type PanelOrigin = "sidebar" | "titlebar" | "dockbar";
+type PanelOrigin = "sidebar" | "titlebar" | "dockbar" | "";
 const VIEW = Ivette.VIEW;
 const COMPONENT = Ivette.COMPONENT;
 const GROUP = Ivette.GROUP;
@@ -57,7 +57,7 @@ const defaultPanelLayoutSelectorState: PanelLayoutSelectorState ={
   display: false,
   compId: "",
   compLabel: "",
-  origin: "sidebar",
+  origin: "",
   x: 0,
   y: 0
 };
@@ -594,8 +594,16 @@ export function PanelLayoutSelector()
     "panelLayoutSelector"
   );
   const iconSize = 30;
+  const divRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    focusPanelLayoutSelector();
+  }, [state]);
 
   let x = 0, y = 0;
+
+  function focusPanelLayoutSelector(): void {
+    if(divRef.current) divRef.current.focus();
+  }
 
   function computePanelXY(): number {
     const panelWidth = 200;
@@ -614,14 +622,7 @@ export function PanelLayoutSelector()
   computePanelXY();
 
   function close(): void {
-    globalPanelLayoutSelectorState.setValue({
-      display: false,
-      compId: "",
-      compLabel: "",
-      origin: "sidebar",
-      x: 0,
-      y: 0
-    });
+    globalPanelLayoutSelectorState.setValue(defaultPanelLayoutSelectorState);
   }
 
   function onclick(quarter: string): void {
@@ -647,13 +648,18 @@ export function PanelLayoutSelector()
     close();
   }
 
+  function onEscapeKeyDown(e: React.KeyboardEvent<HTMLDivElement>): void {
+    if(e.key === "Escape") close();
+  }
+
   return (
-    <div className={className} style={{ left: x, top: y }}>
+    <div tabIndex={-1} className={className} style={{ left: x, top: y }}
+     ref={divRef} onKeyDown={e => onEscapeKeyDown(e)}>
       <Label>{state.compLabel}</Label>
       <table>
         <tbody>
           <tr>
-          <th className="panelLayoutSelector-hover">
+            <th className="panelLayoutSelector-hover">
               <Icon id={"QSPLIT.A"} size={iconSize}
               onClick={() => onclick("A")} /></th>
             <th className="panelLayoutSelector-hover">
@@ -704,12 +710,6 @@ export function PanelLayoutSelector()
             onClick={remove} />
           </div>
         }
-        <div className="panelLayoutSelector-spaced">
-          Close Window
-          <Icon id={"CROSS"} size={iconSize}
-          className="panelLayoutSelector-hover"
-          onClick={() => close()} />
-        </div>
       </div>
     </div>
   );
