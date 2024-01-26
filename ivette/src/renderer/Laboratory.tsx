@@ -330,17 +330,15 @@ function applyLayout(view : Ivette.ViewLayoutProps): void {
     D = layout.ABCD;
   }
 
-  let state = globalLabViewState.getValue();
+  const state = globalLabViewState.getValue();
   const components = state.components;
   Object.values(layout).forEach(compId => {
-    components.add(compId);
+    compId !== "" && components.add(compId);
     const component = COMPONENT.getElement(compId);
     if(component && component !== undefined) {
       deleteFromDockedComponents(component);
     }
   });
-
-  state = globalLabViewState.getValue();
 
   globalLabViewState.setValue({
     ...state,
@@ -474,6 +472,12 @@ function ViewSection(): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 function ComponentItem(comp: Ivette.ItemProps): JSX.Element {
+  const [ labViewState, ] = States.useGlobalState(globalLabViewState);
+  const [ panelLayoutSelectorState, ] =
+   States.useGlobalState(globalPanelLayoutSelectorState);
+  const selected = panelLayoutSelectorState.compId === comp.id;
+  const disabled = labViewState.components.has(comp.id);
+
   function onSelection(): void {
     const compObject = COMPONENT.getElement(comp.id);
     const preferredPosition = compObject?.preferredPosition ?? "D";
@@ -481,8 +485,6 @@ function ComponentItem(comp: Ivette.ItemProps): JSX.Element {
   }
 
   function onContextMenu(e: React.MouseEvent): void {
-    const labViewState = globalLabViewState.getValue();
-
     if(labViewState.components.has(comp.id)
     || labViewState.dockedComponents.has(comp)) {
       globalPanelLayoutSelectorState.setValue(defaultPanelLayoutSelectorState);
@@ -497,7 +499,9 @@ function ComponentItem(comp: Ivette.ItemProps): JSX.Element {
         icon='COMPONENT'
         label={comp.label}
         title={comp.title}
-        onSelection={onSelection} />
+        onSelection={onSelection}
+        selected={selected}
+        disabled={disabled} />
     </div>
   );
 }
@@ -607,7 +611,7 @@ export function PanelLayoutSelector()
 
   function computePanelXY(): number {
     const panelWidth = 200;
-    const panelHeight = 300;
+    const panelHeight = 250;
     const maxWidth = window.innerWidth;
     const maxHeight = window.innerHeight;
 
@@ -636,6 +640,7 @@ export function PanelLayoutSelector()
       label: state.compLabel
     };
     addToDockedComponents(component);
+    removeCompFromCurrentLayout(component.id);
     close();
   }
 
@@ -655,7 +660,6 @@ export function PanelLayoutSelector()
   return (
     <div tabIndex={-1} className={className} style={{ left: x, top: y }}
      ref={divRef} onKeyDown={e => onEscapeKeyDown(e)}>
-      <Label>{state.compLabel}</Label>
       <table>
         <tbody>
           <tr>
