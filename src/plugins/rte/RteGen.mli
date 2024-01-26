@@ -58,5 +58,4 @@ module Visit : sig
     code_annotation * bool
 end
 
-(** Replaces old Db API *)
 module Api : module type of Api

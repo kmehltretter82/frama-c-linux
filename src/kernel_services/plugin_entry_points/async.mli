@@ -20,17 +20,21 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Module dedicated to asynchronous actions.
+    @since Frama-C+dev
+    @before Frama-C+dev these features were in a module named Db
+*)
+
 (** Registered daemon on progress. *)
 type daemon
 
-(**
-   [on_progress ?debounced ?on_delayed trigger] registers [trigger] as new
-   daemon to be executed on each {!yield}.
-   @param debounced the least amount of time between two successive calls to the
-   daemon, in milliseconds (default is 0ms).
-   @param on_delayed callback is invoked as soon as the time since the last
-   {!yield} is greater than [debounced] milliseconds (or 100ms at least).
-   @param on_finished callback is invoked when the callback is unregistered.
+(** [on_progress ?debounced ?on_delayed trigger] registers [trigger] as new
+    daemon to be executed on each {!yield}.
+    @param debounced the least amount of time between two successive calls to
+    the daemon, in milliseconds (default is 0ms).
+    @param on_delayed callback is invoked as soon as the time since the last
+    {!yield} is greater than [debounced] milliseconds (or 100ms at least).
+    @param on_finished callback is invoked when the callback is unregistered.
 *)
 val on_progress :
   ?debounced:int -> ?on_delayed:(int -> unit) -> ?on_finished:(unit -> unit) ->
@@ -48,11 +52,10 @@ val while_progress :
   ?debounced:int -> ?on_delayed:(int -> unit) -> ?on_finished:(unit -> unit) ->
   (unit -> bool) -> unit
 
-(**
-   [with_progress ?debounced ?on_delayed trigger job data] executes the given
-   [job] on [data] while registering [trigger] as temporary (debounced) daemon.
-   The daemon is finally unregistered at the end of the computation.
-   Same optional parameters than [on_progress].
+(** [with_progress ?debounced ?on_delayed trigger job data] executes the given
+    [job] on [data] while registering [trigger] as temporary (debounced) daemon.
+    The daemon is finally unregistered at the end of the computation.
+    Same optional parameters than [on_progress].
 *)
 val with_progress :
   ?debounced:int -> ?on_delayed:(int -> unit) -> ?on_finished:(unit -> unit) ->
@@ -70,10 +73,9 @@ val yield : unit -> unit
     will raise a [Cancel] exception. *)
 val cancel : unit -> unit
 
-(**
-   Pauses the currently running process for the specified time, in milliseconds.
-   Registered daemons, if any, will be regularly triggered during this waiting
-   time at a reasonable period with respect to their debouncing constraints.
+(** Pauses the currently running process for the specified time, in milliseconds.
+    Registered daemons, if any, will be regularly triggered during this waiting
+    time at a reasonable period with respect to their debouncing constraints.
 *)
 val sleep : int -> unit
 

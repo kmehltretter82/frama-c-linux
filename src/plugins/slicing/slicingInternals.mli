@@ -21,9 +21,8 @@
 (**************************************************************************)
 
 (** {2 Internals types}
-    Internals type definitions should be hidden to the outside world,
-    but it is not really possible to have abstract types since Slicing has to
-    use Db.Slicing functions... *)
+    Internals type definitions should be hidden to the outside world.
+*)
 
 open Cil_datatype
 

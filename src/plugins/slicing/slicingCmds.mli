@@ -28,7 +28,7 @@ open Pdg_types
    is too vast and must be simplified. For example, functions should not
    receive variables as names (ie. strings) but directly as zones, possibly
    with a hint to the function that does to conversion. Also, most functions
-   are slightly modified in Register, then registered in Db. This module and
+   are slightly modified in Register. This module and
    Register should be fused. *)
 
 type set = SlicingTypes.Fct_user_crit.t Cil_datatype.Varinfo.Map.t

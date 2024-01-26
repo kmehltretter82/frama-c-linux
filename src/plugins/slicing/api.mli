@@ -50,7 +50,7 @@ module Project : sig
       @raise SlicingTypes.WrongSlicingLevel if [n] is not valid. *)
   val change_slicing_level : Cil_types.kernel_function -> int -> unit
 
-  (** Build a new [Db.Project.t] from all [Slice.t] of a project.
+  (** Build a new [Project.t] from all [Slice.t] of a project.
       Can optionally specify how to name the sliced functions
       by defining [f_slice_names].
       [f_slice_names kf src_visi num_slice] has to return the name
