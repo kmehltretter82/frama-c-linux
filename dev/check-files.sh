@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -29,7 +29,7 @@ DO_HDRCK="yes"
 REFERENCE=
 MODE="all"
 
-while [ "$1" != "" ]
+while [ $# -gt 0 ]
 do
     case "$1" in
         "-h"|"-help"|"--help")
@@ -37,7 +37,7 @@ do
             echo "OPTIONS"
             echo "  -h|-help|--help    print this message and exit"
             echo "  -f|--fix           fix files"
-            echo "  -c|--commit        check modified files to be commited only"
+            echo "  -c|--commit        check modified files to be committed only"
             echo "  -p|--push          check modified files to be pushed only"
             echo "  --no-headers       do not check headers"
             echo "  --no-lint          do not check lint"
@@ -48,7 +48,8 @@ do
             HDRCK=headers
             ;;
         "-p"|"--push")
-            REFERENCE="origin/$(git rev-parse --abbrev-ref HEAD)"
+            REMOTE=$(git config --default origin --get clone.defaultRemoteName)
+            REFERENCE="$REMOTE/$(git rev-parse --abbrev-ref HEAD)"
             MODE="push"
             ;;
         "-c"|"--commit")
@@ -70,53 +71,53 @@ done
 
 if [ "$MODE" = "all" ]; then
   if [ $DO_LINT = "yes" ] ; then
-    make $LINT || exit 1
+    make $LINT
   fi
   if [ $DO_HDRCK = "yes" ] ; then
     # Don't define HDRCK_EXTRA, that is required by external plugins
-    make $HDRCK || exit 1
+    make $HDRCK
   fi
 else
-  STAGED=$(git diff --diff-filter ACMR --name-only --cached $REFERENCE | sort)
-  UNSTAGED=$(git diff --diff-filter DMR --name-only | sort)
+  TMP_STAGED=$(mktemp)
+  TMP_UNSTAGED=$(mktemp)
+  TMP_INTER=$(mktemp)
+  TMP_INPUT=$(mktemp)
 
-  if [ "$STAGED" = "" ];
+  cleanup () {
+    rm -f "$TMP_STAGED" "$TMP_UNSTAGED" "$TMP_INPUT" "$TMP_INTER"
+  }
+  trap cleanup exit
+
+  git diff --diff-filter ACMR --name-only -z --cached $REFERENCE | sort -z > "$TMP_STAGED"
+  git diff --diff-filter DMR --name-only -z | sort -z > "$TMP_UNSTAGED"
+
+  if [ ! -s "$TMP_STAGED" ];
   then
     echo "No staged modification since last $MODE, nothing to do."
     exit 0
   fi
 
-  if [ "$UNSTAGED" != "" ];
+  if [ -s "$TMP_UNSTAGED" ];
   then
-    INTER=$(comm -12 <(ls $STAGED) <(ls $UNSTAGED))
-
-    if [ "$INTER" != "" ];
+    comm -12 --zero-terminated "$TMP_STAGED" "$TMP_UNSTAGED" > "$TMP_INTER"
+    if [ -s "$TMP_INTER" ];
     then
       echo "Cannot validate push."
       echo "The following staged files have been modified, renamed or deleted."
-      for file in $INTER ; do
-        echo "- $file"
-      done
+      while IFS= read -r -d $'\0' f; do
+        echo "- $f"
+      done < "$TMP_INTER"
       exit 1
     fi
   fi
 
-  STAGED=$(echo $STAGED | tr '\n' ' ')
-
-  TMP=$(mktemp)
-
-  cleanup () {
-    rm -f "$TMP"
-  }
-  trap cleanup exit
-
-  if [ $DO_LINT = "yes" ] ; then
-    git check-attr -za $STAGED > "$TMP"
-    make $LINT LINTCK_FILES_INPUT="$TMP" || exit 1
+  if [ $DO_LINT = "yes" -a -s "$TMP_STAGED" ] ; then
+    git check-attr -za --stdin < "$TMP_STAGED" > "$TMP_INPUT"
+    make $LINT LINTCK_FILES_INPUT="$TMP_INPUT"
   fi
-  if [ $DO_HDRCK = "yes" ] ; then
-    git check-attr -z header_spec $STAGED > "$TMP"
+  if [ $DO_HDRCK = "yes" -a -s "$TMP_STAGED" ] ; then
+    git check-attr -z header_spec --stdin < "$TMP_STAGED" > "$TMP_INPUT"
     # Don't define HDRCK_EXTRA, that is required by external plugins
-    make $HDRCK HDRCK_FILES_INPUT="$TMP" || exit 1
+    make $HDRCK HDRCK_FILES_INPUT="$TMP_INPUT"
   fi
 fi
