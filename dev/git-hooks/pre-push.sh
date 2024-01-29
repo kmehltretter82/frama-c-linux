@@ -38,12 +38,11 @@ do
     else
         if test "$remote_oid" = "$empty"
         then
-            # New branch, examine all commits
-            range="$local_oid"
-        else
-            # Update to existing branch, examine new commits
-            range="$remote_oid $local_oid"
+            # New branch, examine commits starting
+            # the forking point from master
+            remote_oid=$(git merge-base $local_ref master);
         fi
+        range="$remote_oid $local_oid";
         "$ROOT/dev/check-files.sh" -p "$range" || exit 1;
     fi;
 done
