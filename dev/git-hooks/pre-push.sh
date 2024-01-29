@@ -21,20 +21,31 @@
 #                                                                        #
 ##########################################################################
 
-# Example of installation of this pre-push hook (client side):
-# - (cd .git/hooks/ && ln -s ../../dev/git-hooks/pre-push.sh pre-push)
-# Note: if you decide to copy the file, the `SCRIPT_DIR` variable must be
-# fixed accordingly.
+ROOT=$(git rev-parse --show-toplevel)
 
 echo "Pre-push Hook..."
 
-STAGED=$(git diff --diff-filter ACMR --name-only --cached origin/$(git rev-parse --abbrev-ref HEAD) | sort)
+empty=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
 
-if [ "$STAGED" = "" ];
-then
-  echo "No diff since last push, nothing to do"
-  exit 0
-fi
+remote=$1
 
-SCRIPT_DIR=$(dirname -- "$( readlink -f -- "$0"; )")
-"$SCRIPT_DIR/../check-files.sh" -p || exit 1
+while read local_ref local_oid remote_ref remote_oid
+do
+    if test "$local_oid" = "$empty"
+    then
+        # Handle delete
+        :
+    else
+        if test "$remote_oid" = "$zero"
+        then
+            # New branch, examine all commits
+            range="$local_oid"
+        else
+            # Update to existing branch, examine new commits
+            range="$remote_oid $local_oid"
+        fi
+        "$ROOT/dev/check-files.sh" -p "$range" || exit 1;
+    fi;
+done
+
+exit 0

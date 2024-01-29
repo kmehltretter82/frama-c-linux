@@ -38,7 +38,7 @@ do
             echo "  -h|-help|--help    print this message and exit"
             echo "  -f|--fix           fix files"
             echo "  -c|--commit        check modified files to be committed only"
-            echo "  -p|--push          check modified files to be pushed only"
+            echo "  -p|--push range    check modified files to be pushed only"
             echo "  --no-headers       do not check headers"
             echo "  --no-lint          do not check lint"
             exit 0
@@ -48,11 +48,12 @@ do
             HDRCK=headers
             ;;
         "-p"|"--push")
-            REMOTE=$(git config --default origin --get clone.defaultRemoteName)
-            REFERENCE="$REMOTE/$(git rev-parse --abbrev-ref HEAD)"
+            shift
+            DIFF_ARG=$1
             MODE="push"
             ;;
         "-c"|"--commit")
+            DIFF_ARG=--cached
             MODE="commit"
             ;;
         "--no-headers")
@@ -87,9 +88,8 @@ else
     rm -f "$TMP_STAGED" "$TMP_UNSTAGED" "$TMP_INPUT" "$TMP_INTER"
   }
   trap cleanup exit
-
-  git diff --diff-filter ACMR --name-only -z --cached $REFERENCE | sort -z > "$TMP_STAGED"
-  git diff --diff-filter DMR --name-only -z | sort -z > "$TMP_UNSTAGED"
+  git diff --diff-filter ACMR --name-only $DIFF_ARG | sort > "$TMP_STAGED"
+  git diff --diff-filter DMR --name-only | sort > "$TMP_UNSTAGED"
 
   if [ ! -s "$TMP_STAGED" ];
   then
