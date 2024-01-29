@@ -233,9 +233,9 @@ export function onCommand(
   System.emitter.on('dome.command', job);
 }
 
-ipcRenderer.on("dome.ipc.command", (_event, argv, wdir) => {
+ipcRenderer.on('dome.ipc.command', (_event, argv, wdir) => {
   SYS.setCommandLine(argv, wdir);
-  System.emitter.emit("dome.command", argv, wdir);
+  System.emitter.emit('dome.command', argv, wdir);
 });
 
 /** Window Settings event.
@@ -251,8 +251,8 @@ export const globalSettings = new Event(Settings.global);
 // --------------------------------------------------------------------------
 
 ipcRenderer.on('dome.ipc.closing', async (_event, wid: number) => {
-await System.doExit();
-ipcRenderer.send('dome.ipc.closing.done', wid);
+  await System.doExit();
+  ipcRenderer.send('dome.ipc.closing.done', wid);
 });
 
 /** Register a callback to be executed when the window is closing. */
@@ -271,9 +271,9 @@ export const focus = new Event<boolean>('dome.focus');
 export function isFocused(): boolean { return windowFocus; }
 
 ipcRenderer.on('dome.ipc.focus', (_sender, value) => {
-windowFocus = value;
-setContextAppNode();
-focus.emit(value);
+  windowFocus = value;
+  setContextAppNode();
+  focus.emit(value);
 });
 
 /** Return the current window focus. See [[isFocused]]. */
@@ -295,10 +295,7 @@ export function useWindowFocus(): boolean {
  */
 export const navigate = new Event<string>('dome.href');
 
-ipcRenderer.on(
-'dome.ipc.href',
-(_sender, href) => navigate.emit(href),
-);
+ipcRenderer.on('dome.ipc.href', (_sender, href) => navigate.emit(href));
 
 // --------------------------------------------------------------------------
 // --- Window Management
@@ -485,8 +482,8 @@ export function setMenuItem(options: MenuItemOptions): void {
 }
 
 ipcRenderer.on('dome.ipc.menu.clicked', (_sender, id: string) => {
-const callback = customItemCallbacks.get(id);
-if (callback) callback();
+  const callback = customItemCallbacks.get(id);
+  if (callback) callback();
 });
 
 // --------------------------------------------------------------------------
@@ -532,7 +529,7 @@ export type PopupMenuItem = PopupMenuItemProps | 'separator';
 */
 export function popupMenu(
   items: PopupMenuItem[],
-  callback?: (item: string | undefined) => void,
+  callback?: (item: string | undefined) => void
 ): void {
   const ipcItems = items.map((item) => {
     if (!item) return undefined;
@@ -546,14 +543,14 @@ export function popupMenu(
     };
   });
   ipcRenderer.invoke('dome.popup', ipcItems).then((index: number) => {
-  const item = items[index];
-  if (item && item !== 'separator') {
-  const { id, label, onClick } = item;
-  if (onClick) onClick();
-  if (callback) callback(id || label);
-  } else {
-  if (callback) callback(undefined);
-  }
+    const item = items[index];
+    if (item && item !== 'separator') {
+      const { id, label, onClick } = item;
+      if (onClick) onClick();
+      if (callback) callback(id || label);
+    } else {
+      if (callback) callback(undefined);
+    }
   });
 }
 

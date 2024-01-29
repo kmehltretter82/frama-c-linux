@@ -51,7 +51,6 @@ import {
   nativeTheme,
   shell,
 } from 'electron';
-import process from 'process';
 import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
@@ -401,8 +400,7 @@ function createBrowserWindow(
   argv?: string[],
   wdir?: string,
 ): BrowserWindow {
-
-  const isAppWindow = (argv !== undefined && wdir !== undefined);
+  const isAppWindow = argv !== undefined && wdir !== undefined;
 
   const browserArguments = isAppWindow
     ? SYS.WINDOW_APPLICATION_ARGV
@@ -419,7 +417,7 @@ function createBrowserWindow(
       contextIsolation: false,
       nodeIntegration: true,
       sandbox: false,
-      additionalArguments: [...browserArguments]
+      additionalArguments: [...browserArguments],
     },
     ...config,
   };
@@ -477,8 +475,7 @@ function createBrowserWindow(
   });
 
   // Load the index.html of the app.
-  if (DEVEL || LOCAL)
-    process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
+  if (DEVEL || LOCAL) process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
 
   // Load Finished
   theWindow.on('ready-to-show', () => {
@@ -498,13 +495,13 @@ function createBrowserWindow(
   webContents.on('did-navigate-in-page', navigateURL(webContents));
 
   // Application Startup
-  webContents.on("did-finish-load", () => {
+  webContents.on('did-finish-load', () => {
     if (!handle.reloaded) {
       handle.reloaded = true;
     } else {
-      broadcast("dome.ipc.reload");
+      broadcast('dome.ipc.reload');
     }
-    webContents.send("dome.ipc.command", argv, wdir);
+    webContents.send('dome.ipc.command', argv, wdir);
   });
 
   // Emitted when the window want's to close.
@@ -534,14 +531,14 @@ function createBrowserWindow(
     theWindow.on('moved', saveFrame);
   }
 
-  if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
-    theWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]).catch((err) => {
-      console.error('LOAD URL (DEV)',err);
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    theWindow.loadURL(process.env['ELECTRON_RENDERER_URL']).catch((err) => {
+      console.error('LOAD URL (DEV)', err);
     });
   } else {
-    const url = `file://${path.join(__dirname, "../renderer/index.html")}`;
+    const url = `file://${path.join(__dirname, '../renderer/index.html')}`;
     theWindow.loadURL(url).catch((err) => {
-      console.error('LOAD URL (APP)',err);
+      console.error('LOAD URL (APP)', err);
     });
   }
 
@@ -560,14 +557,13 @@ ipcMain.on('dome.ipc.closing.done', (_event, wid:number) => {
 interface Cmd { wdir: string; argv: string[] }
 
 //[LC]: this is buggy, process.argv has no command line arguments
-function stripElectronArgv(cmd: Cmd): Cmd
-{
-  console.log('STRIP COMMAND LINE',cmd);
-  //const wdir = DEVEL ? cmd.argv[3] : cmd.wdir;
-  //const argv = cmd.argv
-  //    .slice(DEVEL ? 4 : (LOCAL ? 2 : 1))
-  //    .filter((p) => !!p && p !== "--no-sandbox");
-  return { wdir:'.', argv:[] };
+function stripElectronArgv(cmd: Cmd): Cmd {
+  console.log(cmd);
+  const wdir = DEVEL ? cmd.argv[2] : cmd.wdir;
+  const argv = cmd.argv
+    .slice(DEVEL ? 3 : LOCAL ? 2 : 1)
+    .filter((p) => !!p && p !== "--no-sandbox");
+  return { wdir, argv };
 }
 
 function createPrimaryWindow(): void {
@@ -719,19 +715,19 @@ let isQuitting = false;
 
 /** Starts the main process. */
 export function start(): void {
-
   // WORKS
   app.on(
     'certificate-error',
     (event, _webContents, _url, _error, _certificate, callback) => {
       event.preventDefault();
       callback(true);
-    });
+    }
+  );
 
   // Workaround to recover the original commandline of a second instance
   // after chromium messes with the argument order.
   // See https://github.com/electron/electron/issues/20322 for more details.
-  app.commandLine.appendSwitch("second-instance", JSON.stringify(process.argv));
+  app.commandLine.appendSwitch('second-instance', JSON.stringify(process.argv));
 
   // Ensures second instance triggers the main one
   if (!app.requestSingleInstanceLock()) app.quit();
@@ -741,7 +737,7 @@ export function start(): void {
 
   // Listen to application events
   app.whenReady().then(() => {
-    createPrimaryWindow()
+    createPrimaryWindow();
 
     // Wait for Electron init
     app.on('activate', activateWindows); // Mac OSX response to dock
@@ -750,13 +746,13 @@ export function start(): void {
 
   // Configuring macOS for exiting
   app.on('before-quit', () => {
-  isQuitting = true;
+    isQuitting = true;
   });
 
   // At-exit callbacks
   app.on('will-quit', () => {
-  saveGlobalSettings();
-  System.doExit();
+    saveGlobalSettings();
+    System.doExit();
   });
 
   // On macOS the menu bar stays active until the user explicitly quits.
@@ -766,7 +762,6 @@ export function start(): void {
   app.on('window-all-closed', () => {
     if (isQuitting || System.platform !== 'darwin') app.quit();
   });
-
 }
 
 // --------------------------------------------------------------------------

@@ -150,10 +150,6 @@ endif
 .PHONY: dome-templ dome-reboot
 
 DOME_MK_TEMPLATES= \
-	.babelrc \
-	webpack.main.js \
-	webpack.renderer.js \
-	electron-webpack.json \
 	src/main/index.js \
 	src/renderer/index.js
 
@@ -164,18 +160,6 @@ dome-reboot:
 	$(MAKE) dome-templ dome-pkg
 
 # Templated files
-
-.babelrc: $(DOME)/template/update.sh $(DOME)/template/babelrc.json
-	@$^ $@
-
-webpack.main.js: $(DOME)/template/update.sh $(DOME)/template/webpack.main.js
-	@$^ $@
-
-webpack.renderer.js: $(DOME)/template/update.sh $(DOME)/template/webpack.renderer.js
-	@$^ $@
-
-electron-webpack.json: $(DOME)/template/update.sh $(DOME)/template/electron-webpack.json
-	@$^ $@
 
 src/renderer/index.js: $(DOME)/template/update.sh $(DOME)/template/renderer.js
 	@$^ $@

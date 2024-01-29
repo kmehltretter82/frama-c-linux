@@ -106,7 +106,6 @@ class Library {
   }
 
   addItem(props: Item): void {
-    console.log('Adding item ', props.label, ' to library');
     if (!this.modified) {
       this.modified = true;
       setImmediate(() => this.commit());
