@@ -88,8 +88,8 @@ else
     rm -f "$TMP_STAGED" "$TMP_UNSTAGED" "$TMP_INPUT" "$TMP_INTER"
   }
   trap cleanup exit
-  git diff --diff-filter ACMR --name-only $DIFF_ARG | sort > "$TMP_STAGED"
-  git diff --diff-filter DMR --name-only | sort > "$TMP_UNSTAGED"
+  git diff -z --diff-filter ACMR --name-only $DIFF_ARG | sort -z > "$TMP_STAGED"
+  git diff -z --diff-filter DMR --name-only | sort -z > "$TMP_UNSTAGED"
 
   if [ ! -s "$TMP_STAGED" ];
   then
