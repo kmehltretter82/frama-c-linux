@@ -330,7 +330,7 @@ function applyLayout(view : Ivette.ViewLayoutProps): void {
     D = layout.ABCD;
   }
 
-  const state = globalLabViewState.getValue();
+  let state = globalLabViewState.getValue();
   const components = state.components;
   Object.values(layout).forEach(compId => {
     compId !== "" && components.add(compId);
@@ -339,6 +339,7 @@ function applyLayout(view : Ivette.ViewLayoutProps): void {
       deleteFromDockedComponents(component);
     }
   });
+  state = globalLabViewState.getValue();
 
   globalLabViewState.setValue({
     ...state,
