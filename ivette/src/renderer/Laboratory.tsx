@@ -609,7 +609,7 @@ export function PanelLayoutSelector()
     if(divRef.current) divRef.current.focus();
   }
 
-  function computePanelXY(): number {
+  function computePanelXY(): void {
     const panelWidth = 200;
     const panelHeight = 250;
     const maxWidth = window.innerWidth;
@@ -620,7 +620,6 @@ export function PanelLayoutSelector()
 
     y = state.y - panelHeight/2 > 0 ? state.y - panelHeight/2 : 0;
     if (y + panelHeight > maxHeight) y = maxHeight - panelHeight;
-    return y;
   }
 
   computePanelXY();
