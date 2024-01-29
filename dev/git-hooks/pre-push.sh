@@ -36,7 +36,7 @@ do
         # Handle delete
         :
     else
-        if test "$remote_oid" = "$zero"
+        if test "$remote_oid" = "$empty"
         then
             # New branch, examine all commits
             range="$local_oid"
