@@ -36,7 +36,7 @@
   signed overflow. assert *y + *x ≤ 2147483647;
 [eva] computing for function send1 <- main.
   Called from unravel-point.i:75.
-[kernel:annot:missing-spec] unravel-point.i:26: Warning: 
+[kernel:annot:missing-spec] unravel-point.i:36: Warning: 
   Neither code nor specification for function printf,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function printf <- send1 <- main.

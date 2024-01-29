@@ -16,14 +16,14 @@
   Called from noreturn.i:28.
 [eva] Recording results for warn_never_ends
 [eva] Done for function warn_never_ends
-[kernel:annot:missing-spec] noreturn.i:1: Warning: 
+[kernel:annot:missing-spec] noreturn.i:29: Warning: 
   Neither code nor specification for function stop,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function stop <- main.
   Called from noreturn.i:29.
 [eva] using specification for function stop
 [eva] Done for function stop
-[kernel:annot:missing-spec] noreturn.i:3: Warning: 
+[kernel:annot:missing-spec] noreturn.i:30: Warning: 
   Neither code nor specification for function haltme,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function haltme <- main.

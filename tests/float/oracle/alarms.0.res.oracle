@@ -37,7 +37,7 @@
   mvd ∈ UNINITIALIZED
   l ∈ [--..--]
   ==END OF DUMP==
-[kernel:annot:missing-spec] alarms.i:11: Warning: 
+[kernel:annot:missing-spec] alarms.i:21: Warning: 
   Neither code nor specification for function fd,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function fd <- main1 <- main.
