@@ -252,11 +252,15 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
      specification or body according to [target]. If [-eva-show-progress] is
      true, the callstack and additional information are printed. *)
   let compute_using_spec_or_body target kinstr call state =
-    if kinstr <> Kglobal && Parameters.ValShowProgress.get () then
-      Self.feedback
-        "@[computing for function %a.@\nCalled from %a.@]"
-        Callstack.pretty_short call.callstack
-        Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc kinstr);
+    begin
+      match kinstr with
+      | Kstmt stmt when Parameters.ValShowProgress.get () ->
+        Self.feedback
+          "@[computing for function %a.@\nCalled from %a.@]"
+          Callstack.pretty_short call.callstack
+          Cil_datatype.Location.pretty (Cil_datatype.Stmt.loc stmt)
+      | _ -> ()
+    end;
     let compute, kind =
       match target with
       | `Body (fundec, save_results) ->
