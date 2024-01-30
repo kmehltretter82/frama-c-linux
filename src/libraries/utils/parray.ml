@@ -20,13 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Types = struct
-  type 'a memory = 'a Array.t
-  type 'a array = 'a data ref
-  and 'a data = Memory of 'a memory | Diff of int * 'a * 'a array
-end
-
-open Types
+type 'a t = 'a data ref
+and 'a data = Memory of 'a array | Diff of int * 'a * 'a t
 
 let init n f = ref (Memory (Array.init n f))
 

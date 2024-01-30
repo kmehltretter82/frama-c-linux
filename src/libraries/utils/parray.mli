@@ -24,19 +24,15 @@
    Sylvain Conchon and Jean-Chistophe Filliâtre. For further details, see
    https://www.lri.fr/~filliatr/ftp/publis/puf-wml07.pdf *)
 
-module Types : sig
-  type 'a array
-end
+type 'a t
 
-open Types
-
-val init : int -> (int -> 'a) -> 'a array
-val get  : 'a array -> int -> 'a
-val set  : 'a array -> int -> 'a -> 'a array
-val fold : (int -> 'a -> 'b -> 'b) -> 'a array -> 'b -> 'b
-val map  : ('a -> 'a) -> 'a array -> 'a array
+val init : int -> (int -> 'a) -> 'a t
+val get  : 'a t -> int -> 'a
+val set  : 'a t -> int -> 'a -> 'a t
+val fold : (int -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
+val map  : ('a -> 'a) -> 'a t -> 'a t
 
 val pretty :
   ?pp_sep : (Format.formatter -> unit -> unit) ->
   (Format.formatter -> 'a -> unit) ->
-  Format.formatter -> 'a array -> unit
+  Format.formatter -> 'a t -> unit
