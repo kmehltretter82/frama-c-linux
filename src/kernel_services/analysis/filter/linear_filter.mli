@@ -25,18 +25,15 @@ open Nat.Types
 module Make (Field : Field.S) : sig
 
   module Linear : module type of Linear.Space (Field)
-  open Linear.Types
-  open Field.Types
 
   (* A value of type [(n, m) filter] describes a linear filter of order n (i.e
      with n state variables) and with m inputs. *)
-  module Types : sig type ('n, 'm) filter end
-  open Types
+  type ('n, 'm) filter
 
   val create :
-    ('n succ, 'n succ) matrix ->
-    ('n succ, 'm succ) matrix ->
-    'm succ vector -> ('n succ, 'm succ) filter
+    ('n succ, 'n succ) Linear.matrix ->
+    ('n succ, 'm succ) Linear.matrix ->
+    'm succ Linear.vector -> ('n succ, 'm succ) filter
 
   val pretty : Format.formatter -> ('n, 'm) filter -> unit
 
@@ -52,6 +49,6 @@ module Make (Field : Field.S) : sig
      filters, a depth of 200 will gives an exact upper bound up to at least ten
      digits, which is more than enough. Moreover, for those simple filters, the
      computation is immediate, even when using rational numbers. *)
-  val invariant : ('n, 'm) filter -> int -> scalar option
+  val invariant : ('n, 'm) filter -> int -> Field.scalar option
 
 end

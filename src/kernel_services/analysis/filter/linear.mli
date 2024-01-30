@@ -27,14 +27,9 @@ open Finite.Types
 
 module Space (Field : Field.S) : sig
 
-  open Field.Types
-
-  module Types : sig
-    type ('n, 'm) matrix
-    type 'n vector = ('n, zero succ) matrix
-  end
-
-  open Types
+  type scalar = Field.scalar
+  type ('n, 'm) matrix
+  type 'n vector = ('n, zero succ) matrix
 
   module Vector : sig
     val pretty : Format.formatter -> 'n vector -> unit

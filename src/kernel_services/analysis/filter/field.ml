@@ -22,9 +22,8 @@
 
 module type S = sig
 
-  module Types : sig type scalar end
-  include Datatype.S_with_collections with type t = Types.scalar
-  open Types
+  type scalar
+  include Datatype.S_with_collections with type t = scalar
 
   val zero     : scalar
   val one      : scalar

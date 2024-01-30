@@ -27,8 +27,6 @@ open Nat.Types
 module Make (Field : Field.S) = struct
 
   module Linear = Linear.Space (Field)
-  open Linear.Types
-  open Field.Types
   open Linear
 
 
@@ -58,20 +56,14 @@ module Make (Field : Field.S) = struct
 
 
 
-  module Types = struct
+  type ('n, 'm) filter =
+    | Filter : ('n succ, 'm succ) data -> ('n succ, 'm succ) filter
 
-    type ('n, 'm) filter =
-      | Filter : ('n succ, 'm succ) data -> ('n succ, 'm succ) filter
-
-    and ('n, 'm) data =
-      { state : ('n, 'n) matrix
-      ; input : ('n, 'm) matrix
-      ; measure : 'm vector
-      }
-
-  end
-
-  open Types
+  and ('n, 'm) data =
+    { state : ('n, 'n) matrix
+    ; input : ('n, 'm) matrix
+    ; measure : 'm vector
+    }
 
 
 
@@ -88,7 +80,7 @@ module Make (Field : Field.S) = struct
     let rec aux (m, r) i = if i >= 0 then aux (p m, r + m) (i - 1) else r in
     aux (Matrix.id order, Field.zero) (stop - 1)
 
-  type ('n, 'm) invariant = ('n, 'm) filter -> int -> scalar option
+  type ('n, 'm) invariant = ('n, 'm) filter -> int -> Field.scalar option
   let invariant : type n m. (n, m) invariant = fun (Filter f) max ->
     let open Option.Operators in
     let order, _ = Matrix.dimensions f.input in

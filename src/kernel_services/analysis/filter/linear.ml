@@ -27,15 +27,11 @@ open Finite.Types
 
 module Space (Field : Field.S) = struct
 
-  open Field.Types
+  type scalar = Field.scalar
 
-  module Types = struct
-    type ('n, 'm) m = { data : scalar Parray.t ; rows : 'n nat ; cols : 'm nat }
-    type ('n, 'm) matrix = M : ('n succ, 'm succ) m -> ('n succ, 'm succ) matrix
-    type 'n vector = ('n, zero succ) matrix
-  end
-
-  open Types
+  type ('n, 'm) m = { data : scalar Parray.t ; rows : 'n nat ; cols : 'm nat }
+  type ('n, 'm) matrix = M : ('n succ, 'm succ) m -> ('n succ, 'm succ) matrix
+  type 'n vector = ('n, zero succ) matrix
 
 
 
