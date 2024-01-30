@@ -38,8 +38,7 @@ module Space (Field : Field.S) = struct
   module Vector = struct
 
     let pretty (type n) fmt (M { data ; _ } : n vector) =
-      let pp_sep fmt () = Format.fprintf fmt "@ " in
-      Parray.pretty ~pp_sep Field.pretty fmt data
+      Parray.pretty ~sep:"@ " Field.pretty fmt data
 
     let init size f =
       let data = Parray.init (Nat.to_int size) (fun _ -> Field.zero) in

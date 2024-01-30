@@ -36,10 +36,10 @@ let rec reroot t =
     t' := Diff (i, v', t) ;
     mem
 
-let pretty ?(pp_sep = Format.pp_print_space) pp fmt t =
+let pretty ?(sep = format_of_string " ") pp fmt t =
   let mem = reroot t in
   for i = 0 to Array.length mem - 1 do
-    if i > 0 then pp_sep fmt () ;
+    if i > 0 then Format.fprintf fmt sep ;
     pp fmt mem.(i)
   done
 

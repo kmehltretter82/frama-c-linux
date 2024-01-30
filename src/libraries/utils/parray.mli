@@ -33,6 +33,6 @@ val fold : (int -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
 val map  : ('a -> 'a) -> 'a t -> 'a t
 
 val pretty :
-  ?pp_sep : (Format.formatter -> unit -> unit) ->
+  ?sep : Pretty_utils.sformat ->
   (Format.formatter -> 'a -> unit) ->
   Format.formatter -> 'a t -> unit
