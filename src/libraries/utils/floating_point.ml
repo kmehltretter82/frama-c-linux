@@ -143,10 +143,10 @@ let parse_positive_float_with_shortcut ~man_size ~min_exp ~max_exp s =
     let frac = Str.matched_group 2 s in
     let len_frac = String.length frac in
     let num = Integer.of_string (n ^ frac) in
-    let* den = Integer.power_int_positive_int 5 len_frac in
+    let* den = Integer.power_int_positive_int_opt 5 len_frac in
     if Integer.is_zero num then raise (Shortcut zero) ;
     let exp10 = match_exp 3 in
-    let+ pow5 = Integer.power_int_positive_int 5 (abs exp10) in
+    let+ pow5 = Integer.power_int_positive_int_opt 5 (abs exp10) in
     let num = if exp10 >= 0 then Integer.mul num pow5 else num in
     let den = if exp10 >= 0 then den else Integer.mul den pow5 in
     let exp = exp10 - len_frac in
@@ -156,14 +156,14 @@ let parse_positive_float_with_shortcut ~man_size ~min_exp ~max_exp s =
     let frac = Str.matched_group 2 s in
     let len_frac = String.length frac in
     let num = Integer.of_string (n ^ frac) in
-    let+ den = Integer.power_int_positive_int 5 len_frac in
+    let+ den = Integer.power_int_positive_int_opt 5 len_frac in
     return ~num ~den ~exp:(~- len_frac)
   else if Str.string_match num_exp s 0 then
     let n = Str.matched_group 1 s in
     let num = Integer.of_string n in
     if Integer.is_zero num then raise (Shortcut zero) ;
     let exp10 = match_exp 2 in
-    let+ pow5 = Integer.power_int_positive_int 5 (abs exp10) in
+    let+ pow5 = Integer.power_int_positive_int_opt 5 (abs exp10) in
     let num = if exp10 >= 0 then Integer.mul num pow5 else num in
     let den = if exp10 >= 0 then Integer.one else pow5 in
     return ~num ~den ~exp:exp10
