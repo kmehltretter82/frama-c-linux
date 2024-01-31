@@ -9,14 +9,14 @@ class add_skip = object(this)
     let open Cil_types in
     begin match s.skind with
       | If(_) ->
-        this#queueInstr([Skip(Cil.CurrentLoc.get())])
+        this#queueInstr([Skip(Cil_const.CurrentLoc.get())])
       | _ -> ()
     end ;
     Cil.DoChildren
 
   method! vinst _ =
     let open Cil_types in
-    this#queueInstr([Skip(Cil.CurrentLoc.get())]) ;
+    this#queueInstr([Skip(Cil_const.CurrentLoc.get())]) ;
     Cil.DoChildren
 end
 

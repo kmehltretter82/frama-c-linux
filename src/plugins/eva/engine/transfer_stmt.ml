@@ -311,7 +311,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let cleanup () =
       Eva_utils.pop_call_stack ();
       (* Changed by compute_call_ref, called from process_call *)
-      Cil.CurrentLoc.set (Cil_datatype.Stmt.loc stmt);
+      Cil_const.CurrentLoc.set (Cil_datatype.Stmt.loc stmt);
     in
     let process () =
       let domain_valuation = Eval.to_domain_valuation valuation in
@@ -686,7 +686,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let file = Format.sprintf "%s_%d" name n in
     let ch = open_out file in
     let fmt = Format.formatter_of_out_channel ch in
-    let l = fst (Cil.CurrentLoc.get ()) in
+    let l = fst (Cil_const.CurrentLoc.get ()) in
     Self.feedback ~current:true "Dumping state in file '%s'%t"
       file Eva_utils.pp_callstack;
     Format.fprintf fmt "DUMPING STATE at file %a line %d@."

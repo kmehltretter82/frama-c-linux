@@ -129,7 +129,7 @@ let compute kf =
   R.debug ~level:1 "computing for function %a" Kernel_function.pretty kf;
   let f = Kernel_function.get_definition kf in
   let do_stmt lmap s =
-    Cil.CurrentLoc.set (Cil_datatype.Stmt.loc s);
+    Cil_const.CurrentLoc.set (Cil_datatype.Stmt.loc s);
     if Eva.Results.is_reachable s
     then register_modified_zones lmap s
     else lmap

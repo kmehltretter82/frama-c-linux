@@ -234,7 +234,7 @@ let type_from_nb_elems tsize =
     if Int.equal Int.one nb
     then typ
     else
-      let loc = Cil.CurrentLoc.get () in
+      let loc = Cil_const.CurrentLoc.get () in
       let esize_arr = Cil.kinteger64 ~loc nb in (* [nb] fits in size_t *)
       TArray (typ, Some esize_arr, [])
 

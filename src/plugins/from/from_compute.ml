@@ -200,14 +200,14 @@ struct
       is redundant with the work done by Value -- hence the use of [\nothing].*)
   let bind_locals m b =
     let aux_local acc vi =
-      Cil.CurrentLoc.set vi.vdecl;
+      Cil_const.CurrentLoc.set vi.vdecl;
       (* Consider that local are initialized to a constant value *)
       From_memory.bind_var vi Eva.Deps.bottom acc
     in
-    let loc = Cil.CurrentLoc.get () in
+    let loc = Cil_const.CurrentLoc.get () in
 
     let r = List.fold_left aux_local m b.blocals in
-    Cil.CurrentLoc.set loc;
+    Cil_const.CurrentLoc.set loc;
     r
 
   let unbind_locals m b =
@@ -631,7 +631,7 @@ struct
     compute_using_prototype_for_state state kf assigns
 
   let compute_and_return kf =
-    let call_site_loc = CurrentLoc.get () in
+    let call_site_loc = Cil_const.CurrentLoc.get () in
     From_parameters.feedback
       "Computing for function %a%s"
       Kernel_function.pretty kf
@@ -651,7 +651,7 @@ struct
     From_parameters.feedback
       "Done for function %a" Kernel_function.pretty kf;
     Async.yield ();
-    CurrentLoc.set call_site_loc;
+    Cil_const.CurrentLoc.set call_site_loc;
     result
 
   let compute kf =

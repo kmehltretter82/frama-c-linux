@@ -243,7 +243,7 @@ let setup_assumes kf env contract =
           else
             let assumes = assumes_predicate env b.b_assumes in
             let loc = assumes.pred_loc in
-            Cil.CurrentLoc.set loc;
+            Cil_const.CurrentLoc.set loc;
             let idx = get_bhvr_idx contract b.b_name in
             Rtl_call.set_assumes ~loc env kf contract_e idx assumes
         with exn ->
@@ -321,7 +321,7 @@ let check_default_requires kf env contract =
              (Property.ip_of_requires kf kinstr b ip_requires) then
            let tp_requires = ip_requires.ip_content in
            let loc = tp_requires.tp_statement.pred_loc in
-           Cil.CurrentLoc.set loc;
+           Cil_const.CurrentLoc.set loc;
            Translate_predicates.do_it kf env tp_requires
          else
            env)
@@ -355,7 +355,7 @@ let check_other_requires kf env contract =
                | Assert | Check ->
                  let requires = tp_requires.tp_statement in
                  let loc = requires.pred_loc in
-                 Cil.CurrentLoc.set loc;
+                 Cil_const.CurrentLoc.set loc;
                  (* Prepend the name of the behavior *)
                  let requires =
                    { requires with pred_name = b.b_name :: requires.pred_name }
@@ -406,7 +406,7 @@ let check_other_requires kf env contract =
         (* Generate a predicate that will retrieve and test the
            already computed assumes value for the behavior *)
         let loc = assumes.pred_loc in
-        Cil.CurrentLoc.set loc;
+        Cil_const.CurrentLoc.set loc;
         let assumes_vi, assumes_e, env =
           get_or_create_assumes_var ~loc env
         in
@@ -439,7 +439,7 @@ type translate_ppt =
 let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf env contract clauses =
   let kinstr = Env.get_kinstr env in
   let loc = contract.location in
-  Cil.CurrentLoc.set loc;
+  Cil_const.CurrentLoc.set loc;
   let do_clause env bhvrs =
     let bhvrs_list = Datatype.String.Set.elements bhvrs in
     let active = [] in (* TODO: 'for' behaviors, e-acsl#109 *)
@@ -612,7 +612,7 @@ let check_complete_and_disjoint kf env contract =
     let env = check_bhvrs env Disjoint disjoints in
     env
   else begin
-    Cil.CurrentLoc.set contract.location;
+    Cil_const.CurrentLoc.set contract.location;
     Options.warning
       ~current:true
       "@[Some assumes clauses could not be translated.@ Ignoring complete and \
@@ -645,7 +645,7 @@ let check_post_conds kf env contract =
                (Property.ip_of_ensures kf kinstr b tp) then
              let tp_post_cond = ip_post_cond.ip_content in
              let loc = tp_post_cond.tp_statement.pred_loc in
-             Cil.CurrentLoc.set loc;
+             Cil_const.CurrentLoc.set loc;
              match termination with
              | Normal ->
                (* If translating the default behavior, directly translate the
@@ -674,7 +674,7 @@ let check_post_conds kf env contract =
                | Assert | Check -> begin
                    let post_cond = tp_post_cond.tp_statement in
                    let loc = post_cond.pred_loc in
-                   Cil.CurrentLoc.set loc;
+                   Cil_const.CurrentLoc.set loc;
                    match termination with
                    | Normal ->
                      (* Prepend the name of the behavior *)

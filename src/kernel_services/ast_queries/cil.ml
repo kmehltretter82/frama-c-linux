@@ -64,14 +64,12 @@ open Cil_types
    functions below. *)
 let check_invariants = false
 
-(* A reference to the current location *)
-module CurrentLoc = Cil_const.CurrentLoc
-let () = Log.set_current_source (fun () -> fst (CurrentLoc.get ()))
+let () = Log.set_current_source (fun () -> fst (Cil_const.CurrentLoc.get ()))
 
-let pp_thisloc fmt = Location.pretty fmt (CurrentLoc.get ())
+let pp_thisloc fmt = Location.pretty fmt (Cil_const.CurrentLoc.get ())
 
 let abort_context msg =
-  let loc = CurrentLoc.get () in
+  let loc = Cil_const.CurrentLoc.get () in
   let append fmt =
     Format.pp_print_newline fmt ();
     Errorloc.pp_context_from_file fmt loc
@@ -6842,7 +6840,7 @@ let foldLeftCompound
                 (* Some initializers are missing. Iterate over all the indexes in
                    the array, and use either the supplied initializer, or a generic
                    zero one.  *)
-                let loc = CurrentLoc.get () in
+                let loc = Cil_const.CurrentLoc.get () in
                 let zinit = makeZeroInit ~loc bt in
                 let acc = ref acc in
                 let initl = ref initl in
@@ -7044,7 +7042,7 @@ let uniqueVarNames (f: file) : unit =
              Hashtbl.add globalNames vi.vname vi.vid;
              (* And register it *)
              Alpha.registerAlphaName ~alphaTable:gAlphaTable
-               ~lookupname:vi.vname ~data:(CurrentLoc.get ())
+               ~lookupname:vi.vname ~data:(Cil_const.CurrentLoc.get ())
            end)
       | _ -> ());
 
@@ -7062,7 +7060,7 @@ let uniqueVarNames (f: file) : unit =
             let lookupname =
               if v.vorig_name = "" then v.vname else v.vorig_name
             in
-            let data = CurrentLoc.get () in
+            let data = Cil_const.CurrentLoc.get () in
             let newname, oldloc =
               Alpha.newAlphaName
                 ~alphaTable:gAlphaTable ~undolist:(Some undolist)

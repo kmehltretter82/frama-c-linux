@@ -2604,7 +2604,7 @@ struct
           (match lv.lv_type with
            | Ctype (TVoid _)->
              if ctxt.silent then raise Backtrack;
-             ctxt.error (CurrentLoc.get())
+             ctxt.error (Cil_const.CurrentLoc.get())
                "Variable %s is bound to a predicate, not a term" x
            | _ -> old_val lv)
         with Not_found ->

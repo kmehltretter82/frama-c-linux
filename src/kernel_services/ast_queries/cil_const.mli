@@ -46,7 +46,9 @@ open Cil_types
 
 val voidType: typ
 
-(** forward reference to current location (see {!Cil.CurrentLoc})*)
+(** A reference to the current location. If you are careful to set this to
+    the current location then you can use some built-in logging functions that
+    will print the location. *)
 module CurrentLoc: sig
   include State_builder.Ref with type data = location
   module Operators : sig

@@ -698,7 +698,7 @@ let add_gvar ?init vi =
   set_varinfo vi.vname vi
 
 let add_gvar_zeroinit vi =
-  add_gvar ~init:(Cil.makeZeroInit ~loc:(CurrentLoc.get()) vi.vtype) vi
+  add_gvar ~init:(Cil.makeZeroInit ~loc:(Cil_const.CurrentLoc.get()) vi.vtype) vi
 
 let mk_gvar ?init ~ty name =
   (* See if the variable is already declared *)
@@ -720,7 +720,7 @@ let mk_gvar_scalar ~init ?(ty = Cil.typeOf init) name =
   mk_gvar ~init:(SingleInit init) ~ty name
 
 let mk_integer value =
-  Cil.integer ~loc:(CurrentLoc.get()) value
+  Cil.integer ~loc:(Cil_const.CurrentLoc.get()) value
 
 (* Utilities for global enumerations *)
 let mk_global_c_enum_type_tagged name elements_l =

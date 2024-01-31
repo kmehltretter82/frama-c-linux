@@ -129,7 +129,7 @@ let cabs_exp loc node = { expr_loc = loc; expr_node = node }
 
 let abort_context ?loc msg =
   let loc = match loc with
-    | None -> Cil.CurrentLoc.get()
+    | None -> Cil_const.CurrentLoc.get()
     | Some loc -> loc
   in
   let append fmt =
@@ -969,7 +969,7 @@ let declared_in_current_scope ~ghost s =
 
 (* When you add to env, you also add it to the current scope *)
 let addLocalToEnv ghost name data =
-  let v = data, CurrentLoc.get() in
+  let v = data, Cil_const.CurrentLoc.get() in
   Datatype.String.Hashtbl.add ghost_env name v;
   if not ghost then Datatype.String.Hashtbl.add env name v;
   (* If we are in a scope, then it means we are not at top level. Add the
@@ -989,7 +989,7 @@ let addLocalToEnv ghost name data =
 
 let addGlobalToEnv ghost name data =
   let open Datatype.String.Hashtbl in
-  let v = data, CurrentLoc.get () in
+  let v = data, Cil_const.CurrentLoc.get () in
   add ghost_env name v;
   if not ghost then add env name v;
   add ghost_global_env name v;
@@ -1007,7 +1007,7 @@ let alphaTable : location Alpha.alphaTable = H.create 307
 
 let fresh_global lookupname =
   fst (Alpha.newAlphaName ~alphaTable ~undolist:None ~lookupname
-         ~data:(CurrentLoc.get ()))
+         ~data:(Cil_const.CurrentLoc.get ()))
 
 (* To keep different name scopes different, we add prefixes to names
  * specifying the kind of name: the kind can be one of "" for variables or
@@ -1064,7 +1064,7 @@ let newAlphaName
   let undolist =
     match undo_scope with None -> None | Some _ -> Some (ref [])
   in
-  let data = CurrentLoc.get () in
+  let data = Cil_const.CurrentLoc.get () in
   let newname, oldloc =
     Alpha.newAlphaName ~alphaTable ~undolist ~lookupname ~data
   in
@@ -1252,7 +1252,7 @@ let constFoldToInteger e =
 
 let get_temp_name ghost () =
   let undolist = ref [] in
-  let data = CurrentLoc.get() in
+  let data = Cil_const.CurrentLoc.get() in
   let name = if ghost then "g_tmp" else "tmp" in
   let name, _ =
     Alpha.newAlphaName ~alphaTable ~undolist:(Some undolist) ~lookupname:name ~data
@@ -1352,13 +1352,13 @@ let findCompType ghost kind name attr =
     if kind = "enum" then
       let enum, isnew = createEnumInfo name ~norig:name in
       if isnew then
-        cabsPushGlobal (GEnumTagDecl (enum, CurrentLoc.get ()));
+        cabsPushGlobal (GEnumTagDecl (enum, Cil_const.CurrentLoc.get ()));
       TEnum (enum, attr)
     else
       let iss = if kind = "struct" then true else false in
       let self, isnew = createCompInfo iss name ~norig:name in
       if isnew then
-        cabsPushGlobal (GCompTagDecl (self, CurrentLoc.get ()));
+        cabsPushGlobal (GCompTagDecl (self, Cil_const.CurrentLoc.get ()));
       TComp (self, attr)
   in
   try
@@ -2063,7 +2063,7 @@ struct
     (* Make the statement *)
     let loop =
       mkStmt ~ghost ~valid_sid ~sattr
-        (Loop (a,c2block ~ghost body, CurrentLoc.get (), None, None))
+        (Loop (a,c2block ~ghost body, Cil_const.CurrentLoc.get (), None, None))
     in
     { stmts = [ loop,[],[],[],[] ];
       cases = body.cases;
@@ -2441,7 +2441,7 @@ class gatherLabelsClass : Cabsvisit.cabsVisitor = object (self)
                lbl Cil_printer.pp_location oldloc
            | None ->
              (* Mark this label as defined *)
-             H.replace localLabels lbl (Some (CurrentLoc.get())))
+             H.replace localLabels lbl (Some (Cil_const.CurrentLoc.get())))
         with Not_found -> (* lbl is not a local label *)
           let newname, oldloc =
             newAlphaName s.stmt_ghost false "label" lbl
@@ -3027,7 +3027,7 @@ let rec collectInitializer
   (* parenttype is used to identify a tentative flexible array member
      initialization *)
   let dkey = Kernel.dkey_typing_init in
-  let loc = CurrentLoc.get() in
+  let loc = Cil_const.CurrentLoc.get() in
   if this = NoInitPre then begin
     Kernel.debug ~dkey "zero-initializing object of type %a"
       Cil_datatype.Typ.pretty thistype;
@@ -3275,7 +3275,7 @@ and normalSubobj (so: subobj) : unit =
       so.soTyp <- bt;
       so.soOff <-
         addOffset
-          (Index(integer ~loc:(CurrentLoc.get()) !current, NoOffset))
+          (Index(integer ~loc:(Cil_const.CurrentLoc.get()) !current, NoOffset))
           parOff
     end
 
@@ -3690,10 +3690,10 @@ let consLabContinue ~ghost (c: chunk) =
   | While lr :: _ ->
     begin
       assert (!doTransformWhile);
-      if !lr = "" then c else consLabel ~ghost !lr c (CurrentLoc.get ()) false
+      if !lr = "" then c else consLabel ~ghost !lr c (Cil_const.CurrentLoc.get ()) false
     end
   | NotWhile lr :: _ ->
-    if !lr = "" then c else consLabel ~ghost !lr c (CurrentLoc.get ()) false
+    if !lr = "" then c else consLabel ~ghost !lr c (Cil_const.CurrentLoc.get ()) false
 
 (* Was a continue instruction used inside the current loop *)
 let continueUsed () =
@@ -4401,7 +4401,7 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
       in
 
       (*TODO: find a better loc*)
-      let fields = loop (zero ~loc:(CurrentLoc.get())) eil in
+      let fields = loop (zero ~loc:(Cil_const.CurrentLoc.get())) eil in
       (* Now set the right set of items *)
       enum.eitems <- List.map (fun (_, x) -> x) fields;
       (* Pick the enum's kind - see discussion above *)
@@ -4431,7 +4431,7 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
       (* Record the enum name in the environment *)
       addLocalToEnv ghost (kindPlusName "enum" n') (EnvTyp res);
       (* And define the tag *)
-      cabsPushGlobal (GEnumTag (enum, CurrentLoc.get ()));
+      cabsPushGlobal (GEnumTag (enum, Cil_const.CurrentLoc.get ()));
       res
 
     | [Cabs.TtypeofE e] ->
@@ -5325,7 +5325,7 @@ and makeCompType loc ghost (isstruct: bool)
   comp.cattr <- process_pragmas_pack_align_comp_attributes loc comp a;
   let res = TComp (comp, []) in
   (* Create a typedef for this one *)
-  cabsPushGlobal (GCompTag (comp, CurrentLoc.get ()));
+  cabsPushGlobal (GCompTag (comp, Cil_const.CurrentLoc.get ()));
 
   (* There must be a self cell created for this already *)
   addLocalToEnv ghost (kindPlusName kind n) (EnvTyp res);
@@ -5466,7 +5466,7 @@ and doExp local_env
           ([], (* the reads are incorporated in the chunk. *)
            ((unspecified_chunk empty) @@@ (remove_reads lv se, ghost))
            +++
-           (mkStmtOneInstr ~ghost ~valid_sid (Set(lv, e'', CurrentLoc.get ())),
+           (mkStmtOneInstr ~ghost ~valid_sid (Set(lv, e'', Cil_const.CurrentLoc.get ())),
             writes,writes,
             List.filter (fun x -> not (LvalStructEq.equal x lv)) r @ reads),
            e'', t'')
@@ -6035,7 +6035,7 @@ and doExp local_env
               (se' +++
                (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
                   (Set(lv, snd (castTo tresult t result),
-                       CurrentLoc.get ())),[],[lv],r'))
+                       Cil_const.CurrentLoc.get ())),[],[lv],r'))
               e'
               t
           end
@@ -6076,7 +6076,7 @@ and doExp local_env
                 ([var tmp],
                  local_var_chunk se' tmp +++
                  (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
-                    (Set(var tmp, e', CurrentLoc.get ())),[],[],[]),
+                    (Set(var tmp, e', Cil_const.CurrentLoc.get ())),[],[],[]),
                  (* the tmp variable should not be investigated for
                     unspecified writes: it occurs at the right place in
                     the sequence.
@@ -6090,7 +6090,7 @@ and doExp local_env
                (mkStmtOneInstr ~ghost:local_env.is_ghost ~valid_sid
                   (Set(lv,
                        snd (castTo tresult (typeOfLval lv) opresult),
-                       CurrentLoc.get ())),
+                       Cil_const.CurrentLoc.get ())),
                 [],[lv], r'))
               result
               t
@@ -7754,7 +7754,7 @@ and doCondExp local_env asconst
 and compileCondExp ?(hide=false) ~ghost ce st sf =
   match ce with
   | CEAnd (ce1, ce2) ->
-    let loc = CurrentLoc.get () in
+    let loc = Cil_const.CurrentLoc.get () in
     let (duplicable, sf1, sf2) =
       (* If sf is small then will copy it *)
       try (true, sf, duplicateChunk sf)
@@ -7786,7 +7786,7 @@ and compileCondExp ?(hide=false) ~ghost ce st sf =
       compileCondExp ~hide ~ghost ce1 st' sf'
 
   | CEOr (ce1, ce2) ->
-    let loc = CurrentLoc.get () in
+    let loc = Cil_const.CurrentLoc.get () in
     let (duplicable, st1, st2) =
       (* If st is small then will copy it *)
       try (true, st, duplicateChunk st)
@@ -7806,7 +7806,7 @@ and compileCondExp ?(hide=false) ~ghost ce st sf =
       in
       let labstmt =
         if sf_fall_through then
-          consLabel ~ghost lab empty (CurrentLoc.get ()) false
+          consLabel ~ghost lab empty (Cil_const.CurrentLoc.get ()) false
         else skipChunk
       in
       let (@@@) s1 s2 = s1 @@@ (s2, ghost) in
@@ -8487,7 +8487,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
   (* Add the variable to the environment before doing the initializer
    * because it might refer to the variable itself *)
   if isFunctionType vi.vtype then begin
-    FuncLocs.add_loc ?spec:logic_spec (CurrentLoc.get ()) vi_loc n;
+    FuncLocs.add_loc ?spec:logic_spec (Cil_const.CurrentLoc.get ()) vi_loc n;
     if inite != Cabs.NO_INIT  then
       Kernel.error ~once:true ~current:true
         "Function declaration with initializer (%s)\n" vi.vname;
@@ -8584,8 +8584,8 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
           vi.vstorage <- NoStorage;     (* equivalent and canonical *)
 
         IH.remove mustTurnIntoDef vi.vid;
-        cabsPushGlobal (GVar(vi, {init = init}, CurrentLoc.get ()));
-        H.add alreadyDefined vi.vname (CurrentLoc.get ());
+        cabsPushGlobal (GVar(vi, {init = init}, Cil_const.CurrentLoc.get ()));
+        H.add alreadyDefined vi.vname (Cil_const.CurrentLoc.get ());
         vi
       end else begin
         if not (isFunctionType vi.vtype) &&
@@ -8624,7 +8624,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
             cabsPushGlobal (GFunDecl (spec, vi, loc));
           end
           else
-            cabsPushGlobal (GVarDecl (vi, CurrentLoc.get ()));
+            cabsPushGlobal (GVarDecl (vi, Cil_const.CurrentLoc.get ()));
           vi
         end else begin
           Kernel.debug ~dkey:Kernel.dkey_typing_global
@@ -8810,13 +8810,13 @@ and createLocal ghost ((_, sto, _, _) as specs)
            Push a prototype for the function, just in case. *)
         cabsPushGlobal
           (GFunDecl (empty_funspec (), !currentFunctionFDEC.svar,
-                     CurrentLoc.get ()));
+                     Cil_const.CurrentLoc.get ()));
         Cil.setFormalsDecl
           !currentFunctionFDEC.svar !currentFunctionFDEC.svar.vtype;
         Some ie'
       end
     in
-    cabsPushGlobal (GVar(vi, {init = init}, CurrentLoc.get ()));
+    cabsPushGlobal (GVar(vi, {init = init}, Cil_const.CurrentLoc.get ()));
     static_var_chunk empty vi
 
   (* Maybe we have an extern declaration. Make it a global *)
@@ -8881,7 +8881,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
              assert alloca_bounds: 0 < elt_size * array_size <= max_bounds
           *)
           (se0 +++ (
-              let castloc = CurrentLoc.get () in
+              let castloc = Cil_const.CurrentLoc.get () in
               let talloca_size =
                 let size = Logic_utils.expr_to_term ~coerce:true elt_size in
                 let tlen = Logic_utils.expr_to_term ~coerce:true len in
@@ -8913,7 +8913,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
         let setlen =  se0 +++
                       (mkStmtOneInstr ~ghost ~valid_sid
                          (Set(var savelen, mkCast ~newt:savelen.vtype len,
-                              CurrentLoc.get ())),
+                              Cil_const.CurrentLoc.get ())),
                        [],[],[])
         in
         (* Initialize the variable *)
@@ -8943,7 +8943,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
                     (vi,AssignInit
                        (SingleInit
                           (mkCast ~newt:vi.vtype (new_exp ~loc (Lval(var tmp))))),
-                     CurrentLoc.get ())),
+                     Cil_const.CurrentLoc.get ())),
                [],[var vi],[var tmp])
         end
       end else empty
@@ -9073,13 +9073,13 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
            if not (isFunctionType vtype) || local_env.is_ghost then begin
              Kernel.warning ~current:true
                "%a: CIL only supports attribute((alias)) for C functions."
-               Cil_printer.pp_location (CurrentLoc.get ());
+               Cil_printer.pp_location (Cil_const.CurrentLoc.get ());
              ignore (createGlobal l ghost logic_spec spec_res name)
            end else
              doAliasFun ghost vtype n othername (s, (n,ndt,a,l)) loc
          | _ ->
            Kernel.error ~once:true ~current:true
-             "Bad alias attribute at %a" Cil_printer.pp_location (CurrentLoc.get()));
+             "Bad alias attribute at %a" Cil_printer.pp_location (Cil_const.CurrentLoc.get()));
         acc
       end else
         acc @@@ (createLocal ghost spec_res name, ghost)
@@ -9131,7 +9131,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
         in
         Option.iter
           (fun a'' ->
-             cabsPushGlobal (GPragma (a'', CurrentLoc.get ())))
+             cabsPushGlobal (GPragma (a'', Cil_const.CurrentLoc.get ())))
           a'';
         empty
 
@@ -9272,7 +9272,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
             | [], _ -> []
 
             | fl, [] -> (* no more locs available *)
-              List.map (doFormal (CurrentLoc.get ())) fl
+              List.map (doFormal (Cil_const.CurrentLoc.get ())) fl
 
             | f::fl, (_,(_,_,_,l))::ll ->
               (* sfg: these lets seem to be necessary to
@@ -9462,7 +9462,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
                  (* A new shadow to be placed in the formals. Use
                   * makeTempVar to update smaxid and all others but
                     do not insert as a local variable of [f]. *)
-                 let loc = CurrentLoc.get () in
+                 let loc = Cil_const.CurrentLoc.get () in
                  let shadow =
                    makeTempVar
                      !currentFunctionFDEC ~insert:false
@@ -9570,11 +9570,12 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
                List.fold_left
                  (Fun.flip Logic_utils.add_attribute_glob_annot) tdecl attr
              in
-             cabsPushGlobal (GAnnot(tdecl,CurrentLoc.get ()))
+             cabsPushGlobal (GAnnot(tdecl,Cil_const.CurrentLoc.get ()))
            with LogicTypeError ((source,_),msg) ->
              Kernel.warning
                ~wkey:Kernel.wkey_annot_error ~source
-               "%s. Ignoring global annotation" msg)
+               "%s. Ignoring global annotation" msg
+        )
         decl;
     end;
     empty
@@ -9685,7 +9686,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
       (* Register the type. register it as local because we might be in a
        * local context  *)
       addLocalToEnv ghost (kindPlusName "type" n) (EnvTyp namedTyp);
-      cabsPushGlobal (GType (ti, CurrentLoc.get ()))
+      cabsPushGlobal (GType (ti, Cil_const.CurrentLoc.get ()))
     end
   in
   List.iter createTypedef nl
@@ -9720,12 +9721,12 @@ and doOnlyTypedef ghost (specs: Cabs.spec_elem list) : unit =
       ci.cattr <- cabsAddAttributes ci.cattr al;
       (* The GCompTag was already added *)
     end else (* Add a GCompTagDecl *)
-      cabsPushGlobal (GCompTagDecl(ci, CurrentLoc.get ()))
+      cabsPushGlobal (GCompTagDecl(ci, Cil_const.CurrentLoc.get ()))
   | TEnum(ei, al) ->
     if isadef then begin
       ei.eattr <- cabsAddAttributes ei.eattr al;
     end else
-      cabsPushGlobal (GEnumTagDecl(ei, CurrentLoc.get ()))
+      cabsPushGlobal (GEnumTagDecl(ei, Cil_const.CurrentLoc.get ()))
   | _ ->
     Kernel.warning ~current:true ~wkey:Kernel.wkey_unnamed_typedef
       "Ignoring unnamed typedef that does not introduce a struct or \

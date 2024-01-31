@@ -73,7 +73,7 @@ let relation_to_binop = function
 let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
   let loc = p.pred_loc in
   let logic_env = Env.Logic_env.get env in
-  Cil.CurrentLoc.set loc;
+  Cil_const.CurrentLoc.set loc;
   match p.pred_content with
   | Pfalse -> Cil.zero ~loc, adata, env
   | Ptrue -> Cil.one ~loc, adata, env

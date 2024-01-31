@@ -204,7 +204,7 @@ struct
 
   let rec wp (env:env) (a:vertex) : W.t_prop =
     match Vhash.find env.wp a with
-    | None -> raise (NonNaturalLoop (Cil.CurrentLoc.get()));
+    | None -> raise (NonNaturalLoop (Cil_const.CurrentLoc.get()));
     | Some pi -> pi
     | exception Not_found ->
       (* cut circularities *)
@@ -216,9 +216,9 @@ struct
 
   (* Compute a stmt node *)
   and stmt env a (s: stmt) : W.t_prop =
-    let kl = Cil.CurrentLoc.get () in
+    let kl = Cil_const.CurrentLoc.get () in
     try
-      Cil.CurrentLoc.set (Stmt.loc s) ;
+      Cil_const.CurrentLoc.set (Stmt.loc s) ;
       let smoking = is_default_bhv env.mode && env.dead s in
       let cas = CfgAnnot.get_code_assertions ~smoking env.mode.kf s in
       let opt_fold f = Option.fold ~none:Fun.id ~some:f in
@@ -235,9 +235,9 @@ struct
         List.fold_right (do_assert env) cas @@
         control env a s
       in
-      Cil.CurrentLoc.set kl ; pi
+      Cil_const.CurrentLoc.set kl ; pi
     with err ->
-      Cil.CurrentLoc.set kl ; raise err
+      Cil_const.CurrentLoc.set kl ; raise err
 
   (* Branching wrt control-flow *)
   and control env a s : W.t_prop =

@@ -1583,7 +1583,7 @@ let oneFilePass1 (f:file) : unit =
    * *)
   let matchVarinfo ~fromGFun (vi: varinfo) (loc, _ as l) =
     ignore (Alpha.registerAlphaName ~alphaTable:vtAlpha
-              ~lookupname:vi.vname ~data:(CurrentLoc.get ()));
+              ~lookupname:vi.vname ~data:(Cil_const.CurrentLoc.get ()));
     (* Make a node for it and put it in vEq *)
     let vinode =
       PlainMerging.mkSelfNode vEq vSyn !currentFidx vi.vname vi (Some l)
@@ -2194,10 +2194,11 @@ end
 let renameInlinesVisitor = new renameInlineVisitorClass
 
 let rec logic_annot_pass2 ~in_axiomatic g a =
+  let open Cil_const.CurrentLoc.Operators in
+  let* CurrentLocUpdated =  Cil_datatype.Global_annotation.loc a in
   match a with
-  | Dfun_or_pred (li,l) ->
+  | Dfun_or_pred (li, _) ->
     begin
-      CurrentLoc.set l;
       match LogicMerging.findReplacement true lfEq !currentFidx li with
       | None ->
         if not in_axiomatic then
@@ -2205,11 +2206,10 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
         Logic_utils.add_logic_function li;
       | Some _ -> ()
       (* FIXME: should we perform same actions
-         as the case Dlogic_reads above ? *)
+          as the case Dlogic_reads above ? *)
     end
-  | Dtype (t,l) ->
+  | Dtype (t, _) ->
     begin
-      CurrentLoc.set l;
       match PlainMerging.findReplacement true ltEq !currentFidx t.lt_name with
       | None ->
         if not in_axiomatic then
@@ -2226,9 +2226,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
         )
       | Some _ -> ()
     end
-  | Dinvariant (li,l) ->
+  | Dinvariant (li, _) ->
     begin
-      CurrentLoc.set l;
       match LogicMerging.findReplacement true lfEq !currentFidx li with
       | None ->
         if in_axiomatic then Kernel.abort ~current:true
@@ -2238,9 +2237,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
           (LogicMerging.find_eq_table lfEq (!currentFidx,li)).ndata
       | Some _ -> ()
     end
-  | Dtype_annot (n,l) ->
+  | Dtype_annot (n, _) ->
     begin
-      CurrentLoc.set l;
       match LogicMerging.findReplacement true lfEq !currentFidx n with
       | None ->
         let g = visitCilGlobal renameVisitor g in
@@ -2250,9 +2248,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
           (LogicMerging.find_eq_table lfEq (!currentFidx,n)).ndata
       | Some _ -> ()
     end
-  | Dmodel_annot (mf,l) ->
+  | Dmodel_annot (mf, l) ->
     begin
-      CurrentLoc.set l;
       match
         ModelMerging.findReplacement
           true mfEq !currentFidx (mf.mi_name,mf.mi_base_type)
@@ -2265,8 +2262,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
               mfEq (!currentFidx,(mf'.mi_name,mf'.mi_base_type))
           in
           (* Adds a new representative. Do not replace directly
-             my_node, as there might be some pointers to it from
-             other files.
+              my_node, as there might be some pointers to it from
+              other files.
           *)
           let my_node' = { my_node with ndata = mf' } in
           my_node.nrep <- my_node'; (* my_node' represents my_node *)
@@ -2285,16 +2282,15 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
              mfEq (!currentFidx,(mf'.mi_name,mf'.mi_base_type))).ndata;
       | Some _ -> ()
     end
-  | Dlemma (n,_,_,_,_,l) ->
+  | Dlemma (n, _, _, _, _, _) ->
     begin
-      CurrentLoc.set l;
       match PlainMerging.findReplacement true llEq !currentFidx n with
         None ->
         if not in_axiomatic then
           mergePushGlobals (visitCilGlobal renameVisitor g)
       | Some _ -> ()
     end
-  | Dvolatile(vi,rd,wr,attr,loc) ->
+  | Dvolatile(vi, rd, wr, attr, loc) ->
     let is_representative id =
       Option.is_none
         (VolatileMerging.findReplacement true lvEq !currentFidx id)
@@ -2307,7 +2303,6 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
         mergePushGlobals
           (visitCilGlobal renameVisitor (GAnnot (annot,loc)))
     in
-    CurrentLoc.set loc;
     (* check whether some volatile location clashes with a previous
        annotation. Warnings about that have been generated during pass 1
     *)
@@ -2345,9 +2340,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
       if Option.is_some rd then push_volatile only_reads rd None;
       if Option.is_some wr then push_volatile only_writes None wr
     end
-  | Daxiomatic(n,l,_,loc) ->
+  | Daxiomatic(n, l, _, _) ->
     begin
-      CurrentLoc.set loc;
       match PlainMerging.findReplacement true laEq !currentFidx n with
         None ->
         if in_axiomatic then Kernel.abort ~current:true
@@ -2356,9 +2350,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
         List.iter (logic_annot_pass2 ~in_axiomatic:true g) l
       | Some _ -> ()
     end
-  | Dextended(ext,_,loc) ->
-    (CurrentLoc.set loc;
-     match ExtMerging.findReplacement true extEq !currentFidx ext with
+  | Dextended(ext, _, _) ->
+    (match ExtMerging.findReplacement true extEq !currentFidx ext with
      | None -> mergePushGlobals (visitCilGlobal renameVisitor g);
      | Some _ -> ())
 
@@ -2564,6 +2557,7 @@ let oneFilePass2 (f: file) =
   let visited = ref Cil_datatype.Varinfo.Set.empty in
   let visit vi = visited := Cil_datatype.Varinfo.Set.add vi !visited in
   let processOneGlobal (g: global) : unit =
+    let open Cil_const.CurrentLoc.Operators in
     (* Process a varinfo. Reuse an old one, or rename it if necessary *)
     let processVarinfo (vi: varinfo) (vloc: location) : varinfo =
       if Cil_datatype.Varinfo.Set.mem vi !visited then vi
@@ -2572,7 +2566,7 @@ let oneFilePass2 (f: file) =
         if vi.vstorage = Static then begin
           let newName, _ =
             Alpha.newAlphaName ~alphaTable:vtAlpha ~undolist:None
-              ~lookupname:vi.vname ~data:(CurrentLoc.get ())
+              ~lookupname:vi.vname ~data:(Cil_const.CurrentLoc.get ())
           in
           let formals_decl =
             try Some (Cil.getFormalsDecl vi)
@@ -2926,7 +2920,7 @@ let oneFilePass2 (f: file) =
             in
             let newname, _ =
               Alpha.newAlphaName ~alphaTable:sAlpha ~undolist:None
-                ~lookupname:orig_name ~data:(CurrentLoc.get ())
+                ~lookupname:orig_name ~data:(Cil_const.CurrentLoc.get ())
             in
             ci.cname <- newname;
             ci.creferenced <- true;
@@ -2955,7 +2949,7 @@ let oneFilePass2 (f: file) =
             in
             let newname, _ =
               Alpha.newAlphaName ~alphaTable:eAlpha ~undolist:None
-                ~lookupname:orig_name ~data:(CurrentLoc.get ())
+                ~lookupname:orig_name ~data:(Cil_const.CurrentLoc.get ())
             in
             ei.ename <- newname;
             ei.ereferenced <- true;
@@ -3008,7 +3002,7 @@ let oneFilePass2 (f: file) =
             None -> (* We must rename it and keep it *)
             let newname, _ =
               Alpha.newAlphaName ~alphaTable:vtAlpha ~undolist:None
-                ~lookupname:ti.torig_name ~data:(CurrentLoc.get ())
+                ~lookupname:ti.torig_name ~data:(Cil_const.CurrentLoc.get ())
             in
             ti.tname <- newname;
             ti.treferenced <- true;

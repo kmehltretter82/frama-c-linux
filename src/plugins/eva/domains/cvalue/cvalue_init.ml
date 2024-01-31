@@ -111,7 +111,7 @@ let reject_empty_struct b offset typ =
 (** [initialize_var_using_type varinfo state] uses the type of [varinfo]
     to create an initial value in [state]. *)
 let initialize_var_using_type varinfo state =
-  Cil.CurrentLoc.set varinfo.vdecl;
+  Cil_const.CurrentLoc.set varinfo.vdecl;
   let rec add_offsetmap depth b name_desc name typ offset_orig typ_orig state =
     let typ = Cil.unrollType typ in
     let loc = lazy (loc_of_typoffset b typ_orig offset_orig) in

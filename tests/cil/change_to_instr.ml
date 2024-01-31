@@ -7,7 +7,7 @@ class add_skip = object(_)
 
   method! vinst i =
     let open Cil_types in
-    Cil.ChangeTo [ Skip(Cil.CurrentLoc.get()) ; i ]
+    Cil.ChangeTo [ Skip(Cil_const.CurrentLoc.get()) ; i ]
 end
 
 let run () =

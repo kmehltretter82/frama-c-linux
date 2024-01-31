@@ -92,7 +92,7 @@ let fresh_label =
   fun ?loc ?label_name () ->
     decr counter;
     let loc, orig = match loc with
-      | None -> CurrentLoc.get (), false
+      | None -> Cil_const.CurrentLoc.get (), false
       | Some loc -> loc, true
     and new_label_name =
       let prefix = match label_name with None -> "" | Some s -> s ^ "_"
