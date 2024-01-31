@@ -207,14 +207,18 @@ let init_lexicon () =
   (* We recognize __thread for GCC machdeps *)
   thread_keyword () ;
   filename_keyword () ;
-  (* The following C11 tokens are not yet supported, so we provide some
-     helpful error messages. Usage of 'fatal' instead of 'error' below
-     prevents duplicate error messages due to parsing errors. *)
+  (* The following C11/GNU extension tokens are not yet supported, so we
+   provide some helpful error messages. Usage of 'fatal' instead of 'error'
+   below prevents duplicate error messages due to parsing errors. *)
   unsupported "_Alignas" ;
   unsupported "_Alignof" ;
   unsupported "_Complex" ;
+  unsupported "_Decimal32" ;
+  unsupported "_Decimal64" ;
   warning_C11 "_Generic" (fun loc -> GENERIC loc) ;
-  unsupported "_Imaginary"
+  unsupported "_Imaginary" ;
+  unsupported "__int128" ;
+  unsupported "__uint128_t"
 
 
 
