@@ -2,7 +2,7 @@
 [variadic] simple-with-ghost.i:9: 
   Generic translation of call to variadic function.
 [eva] Analyzing a complete application starting at main
-[kernel:annot:missing-spec] simple-with-ghost.i:6: Warning: 
+[kernel:annot:missing-spec] simple-with-ghost.i:9: Warning: 
   Neither code nor explicit assigns for function f,
    generating default clauses. See -generated-spec-* options for more info
 [eva] using specification for function f

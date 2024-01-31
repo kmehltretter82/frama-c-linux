@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
-[kernel:annot:missing-spec] slice_no_body.i:9: Warning: 
+[kernel:annot:missing-spec] slice_no_body.i:21: Warning: 
   Neither code nor specification for function f,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- h.

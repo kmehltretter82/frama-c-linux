@@ -6,7 +6,7 @@
 [eva:initial-state] Values of globals at initialization
   c ∈ [--..--]
   d ∈ [--..--]
-[kernel:annot:missing-spec] select_calls.i:6: Warning: 
+[kernel:annot:missing-spec] select_calls.i:42: Warning: 
   Neither code nor specification for function nothing,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function nothing <- g.

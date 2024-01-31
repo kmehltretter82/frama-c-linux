@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
-[kernel:annot:missing-spec] n5.i:9: Warning: 
+[kernel:annot:missing-spec] n5.i:21: Warning: 
   Neither code nor explicit assigns for function may_not_terminate,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function may_not_terminate <- main.
@@ -13,7 +13,7 @@
 [eva] Done for function may_not_terminate
 [eva] computing for function f <- main.
   Called from n5.i:22.
-[kernel:annot:missing-spec] n5.i:5: Warning: 
+[kernel:annot:missing-spec] n5.i:12: Warning: 
   Neither code nor explicit assigns for function never_terminates,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function never_terminates <- f <- main.

@@ -213,7 +213,7 @@
   Y ∈ {0}
 [eva] computing for function f_slice_1 <- main.
   Called from bts1194.c:32.
-[kernel:annot:missing-spec] bts1194.c:9: Warning: 
+[kernel:annot:missing-spec] bts1194.c:13: Warning: 
   Neither code nor specification for function input,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function input <- f_slice_1 <- main.
