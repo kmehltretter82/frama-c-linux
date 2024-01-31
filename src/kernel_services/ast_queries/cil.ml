@@ -1423,10 +1423,9 @@ let copy_logic_label is_copy l =
   end else l
 
 let rec visitCilTerm vis t =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set t.term_loc;
-  let res = doVisitCil vis (fun x-> x) vis#vterm childrenTerm t in
-  CurrentLoc.set oldloc; res
+  let open Cil_const.CurrentLoc.Operators in
+  let* CurrentLocUpdated = t.term_loc in
+  doVisitCil vis (fun x-> x) vis#vterm childrenTerm t
 
 and childrenTerm vis t =
   let tn' = visitCilTermNode vis t.term_node in
@@ -2078,13 +2077,12 @@ and childrenModelInfo vis m =
   else begin m.mi_attr <- mi_attr; m end
 
 and visitCilModelInfo vis m =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set m.mi_decl;
+  let open Cil_const.CurrentLoc.Operators in
+  let* CurrentLocUpdated = m.mi_decl in
   let m' =
     doVisitCil
       vis (Visitor_behavior.Memo.model_info vis#behavior) vis#vmodel_info childrenModelInfo m
   in
-  CurrentLoc.set oldloc;
   if m' != m then begin
     (* reflect changes in the behavior tables for copy visitor. *)
     Visitor_behavior.Set.model_info vis#behavior m m';
@@ -2093,11 +2091,9 @@ and visitCilModelInfo vis m =
   m'
 
 and visitCilAnnotation vis a =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set (Global_annotation.loc a);
-  let res = doVisitCil vis id vis#vannotation childrenAnnotation a in
-  CurrentLoc.set oldloc;
-  res
+  let open Cil_const.CurrentLoc.Operators in
+  let* CurrentLocUpdated = Global_annotation.loc a in
+  doVisitCil vis id vis#vannotation childrenAnnotation a
 
 and childrenAnnotation vis a =
   match a with
@@ -2208,10 +2204,9 @@ and childrenCodeAnnot vis ca =
     else ca
 
 and visitCilExpr (vis: cilVisitor) (e: exp) : exp =
-  let oldLoc = CurrentLoc.get () in
-  CurrentLoc.set e.eloc;
-  let res = doVisitCil vis (Visitor_behavior.cexpr vis#behavior) vis#vexpr childrenExp e in
-  CurrentLoc.set oldLoc; res
+  let open Cil_const.CurrentLoc.Operators in
+  let* CurrentLocUpdated = e.eloc in
+  doVisitCil vis (Visitor_behavior.cexpr vis#behavior) vis#vexpr childrenExp e
 
 and childrenExp (vis: cilVisitor) (e: exp) : exp =
   let vExp e = visitCilExpr vis e in
@@ -2342,12 +2337,9 @@ and childrenLocal_init vi (vis: cilVisitor) li =
     if f' != f || args' != args then ConsInit(f',args',k) else li
 
 and visitCilInstr (vis: cilVisitor) (i: instr) : instr list =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set (Cil_datatype.Instr.loc i);
-  let res =
-    doVisitListCil vis id vis#vinst childrenInstr i in
-  CurrentLoc.set oldloc;
-  res
+  let open Cil_const.CurrentLoc.Operators in
+  let* CurrentLocUpdated = Cil_datatype.Instr.loc i in
+  doVisitListCil vis id vis#vinst childrenInstr i
 
 and childrenInstr (vis: cilVisitor) (i: instr) : instr =
   let fExp = visitCilExpr vis in
@@ -2410,31 +2402,26 @@ and childrenInstr (vis: cilVisitor) (i: instr) : instr =
 
 (* visit all nodes in a Cil statement tree in preorder *)
 and visitCilStmt (vis:cilVisitor) (s: stmt) : stmt =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set (Stmt.loc s) ;
+  let open Cil_const.CurrentLoc.Operators in
+  let* CurrentLocUpdated = Cil_datatype.Stmt.loc s in
   vis#push_stmt s; (*(vis#behavior.memo_stmt s);*)
   assertEmptyQueue vis;
   let toPrepend : instr list ref = ref [] in (* childrenStmt may add to this *)
   let res =
     doVisitCil vis
       (Visitor_behavior.Memo.stmt vis#behavior) vis#vstmt (childrenStmt toPrepend) s in
-  let ghost = res.ghost in
   (* Now see if we have saved some instructions *)
   toPrepend := !toPrepend @ vis#unqueueInstr ();
-  (match !toPrepend with
-     [] -> () (* Return the same statement *)
-   | _ ->
-     let b =
-       mkBlockNonScoping
-         ((List.map (fun i -> mkStmt ~ghost (Instr i)) !toPrepend)
-          @ [mkStmt ~ghost res.skind])
-     in
-     b.battrs <- addAttribute (Attr (vis_tmp_attr, [])) b.battrs;
-     (* Make our statement contain the instructions to prepend *)
-     res.skind <- Block b);
-  CurrentLoc.set oldloc;
-  vis#pop_stmt s;
-  res
+  match !toPrepend with
+    [] -> vis#pop_stmt s; res (* Return the same statement *)
+  | _ :: _ as instr_list ->
+    let make i = mkStmt ~ghost:res.ghost (Instr i) in
+    let last = mkStmt ~ghost:res.ghost res.skind in
+    let block = mkBlockNonScoping (List.map make instr_list @ [ last ]) in
+    block.battrs <- addAttribute (Attr (vis_tmp_attr, [])) block.battrs;
+    (* Make our statement contain the instructions to prepend *)
+    res.skind <- Block block;
+    vis#pop_stmt s; res
 
 and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
   let fExp e = (visitCilExpr vis e) in
@@ -2668,12 +2655,10 @@ and childrenType (vis : cilVisitor) (t : typ) : typ =
 (* for declarations, we visit the types inside; but for uses, *)
 (* we just visit the varinfo node *)
 and visitCilVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set v.vdecl;
-  let res =
-    doVisitCil vis (Visitor_behavior.Memo.varinfo vis#behavior)
-      vis#vvdec childrenVarDecl v
-  in CurrentLoc.set oldloc; res
+  let open Cil_const.CurrentLoc.Operators in
+  let* CurrentLocUpdated = v.vdecl in
+  doVisitCil vis (Visitor_behavior.Memo.varinfo vis#behavior)
+    vis#vvdec childrenVarDecl v
 
 and childrenVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
   (* in case of refresh visitor, the associated new logic var has a different
@@ -2876,12 +2861,9 @@ let visitCilEnumInfo vis e =
   doVisitCil vis (Visitor_behavior.Memo.enuminfo vis#behavior) vis#venuminfo childrenEnumInfo e
 
 let rec visitCilGlobal (vis: cilVisitor) (g: global) : global list =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set (Global.loc g) ;
-  let res =
-    doVisitListCil vis id vis#vglob childrenGlobal g in
-  CurrentLoc.set oldloc;
-  res
+  let open Cil_const.CurrentLoc.Operators in
+  let* CurrentLocUpdated = Global.loc g in
+  doVisitListCil vis id vis#vglob childrenGlobal g
 and childrenGlobal (vis: cilVisitor) (g: global) : global =
   match g with
   | GFun (f, l) ->
@@ -4982,8 +4964,9 @@ let compareConstant c1 c2 =
 
 (* Iterate over all globals, including the global initializer *)
 let iterGlobals (fl: file) (doone: global -> unit) : unit =
+  let open Cil_const.CurrentLoc.Operators in
   let doone' g =
-    CurrentLoc.set (Global.loc g);
+    let* CurrentLocUpdated = Global.loc g in
     doone g
   in
   List.iter doone' fl.globals;
@@ -4993,8 +4976,9 @@ let iterGlobals (fl: file) (doone: global -> unit) : unit =
 
 (* Fold over all globals, including the global initializer *)
 let foldGlobals (fl: file) (doone: 'a -> global -> 'a) (acc: 'a) : 'a =
+  let open Cil_const.CurrentLoc.Operators in
   let doone' acc g =
-    CurrentLoc.set (Global.loc g);
+    let* CurrentLocUpdated = Global.loc g in
     doone acc g
   in
   let acc' = List.fold_left doone' acc fl.globals in
@@ -7067,8 +7051,7 @@ let uniqueVarNames (f: file) : unit =
   (* Now we must scan the function bodies and rename the locals *)
   iterGlobals f
     (function
-        GFun(fdec, l) -> begin
-          CurrentLoc.set l;
+        GFun(fdec, _) -> begin
           (* Setup an undo list to be able to revert the changes to the
            * global alpha table *)
           let undolist = ref [] in

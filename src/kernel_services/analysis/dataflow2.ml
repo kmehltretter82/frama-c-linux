@@ -332,7 +332,8 @@ module Forwards(T : ForwardsTransfer) = struct
 
   (** Process a statement *)
   let processStmt worklist (s: stmt) : unit =
-    CurrentLoc.set (Cil_datatype.Stmt.loc s);
+    let open Cil_const.CurrentLoc.Operators in
+    let* CurrentLocUpdated = Cil_datatype.Stmt.loc s in
     if T.debug then
       Kernel.debug "FF(%s).stmt %d at %t@\n" T.name s.sid Cil.pp_thisloc;
 
@@ -356,10 +357,9 @@ module Forwards(T : ForwardsTransfer) = struct
           List.iter (fun s' -> reachedStatement worklist s s' state) s.succs
         in
 
-        CurrentLoc.set (Cil_datatype.Stmt.loc s);
         match s.skind with
         | Instr i ->
-          CurrentLoc.set (Cil_datatype.Instr.loc i);
+          let* CurrentLocUpdated = Cil_datatype.Instr.loc i in
           let after = T.doInstr s i curr in
           do_succs after
 
@@ -576,12 +576,13 @@ struct
   (** Process a statement and return true if the set of live return
    * addresses on its entry has changed. *)
   let processStmt (s: stmt) : bool =
+    let open Cil_const.CurrentLoc.Operators in
     if T.debug then
       (Kernel.debug "FF(%s).stmt %d\n" T.name s.sid);
 
 
     (* Find the state before the branch *)
-    CurrentLoc.set (Cil_datatype.Stmt.loc s);
+    let* CurrentLocUpdated = Cil_datatype.Stmt.loc s in
     let d: T.t =
       match T.doStmt s with
         Done d -> d
@@ -605,7 +606,7 @@ struct
             match s.skind with
             | Instr i ->
               begin
-                CurrentLoc.set (Cil_datatype.Instr.loc i);
+                let* CurrentLocUpdated = Cil_datatype.Instr.loc i in
                 let action = T.doInstr s i res in
                 match action with
                 | Done s' -> s'

@@ -241,6 +241,7 @@ module Functions = struct
          update_orig_name kf; kf)
 
   let update_kf kf fundec spec =
+    let open Cil_const.CurrentLoc.Operators in
     let oldloc = get_location kf in
     (match kf.fundec, fundec with
      (* we never update a definition with a declaration (see bug 1914).
@@ -251,8 +252,10 @@ module Functions = struct
      | _ -> kf.fundec <- fundec);
     (*    Kernel.feedback "UPDATE Spec of function %a (%a)"
           Cil_datatype.Kf.pretty kf Printer.pp_funspec spec;*)
-    (match fundec with
-     | Definition(_,loc) | Declaration(_,_,_,loc) -> CurrentLoc.set loc);
+    let loc =
+      match fundec with Definition (_,loc) | Declaration (_,_,_,loc) -> loc
+    in
+    let* CurrentLocUpdated = loc in
     Logic_utils.merge_funspec ~oldloc kf.spec spec
 
   let replace_by_declaration s v l=

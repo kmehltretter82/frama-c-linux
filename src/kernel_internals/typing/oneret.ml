@@ -198,6 +198,7 @@ let encapsulate_local_vars f =
   end
 
 let oneret ?(callback: callback option) (f: fundec) : unit =
+  let open Cil_const.CurrentLoc.Operators in
   let fname = f.svar.vname in
   (* Get the return type *)
   let retTyp =
@@ -341,7 +342,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
       List.rev (s::acc)
 
     | ({skind=Return (retval, loc)} as s) :: rests ->
-      Cil.CurrentLoc.set loc;
+      let* CurrentLocUpdated = loc in
     (*
       ignore (E.log "Fixing return(%a) at %a\n"
       insert

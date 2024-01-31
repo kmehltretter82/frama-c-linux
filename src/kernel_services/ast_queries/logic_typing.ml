@@ -4099,8 +4099,9 @@ struct
     | TDsyn typ -> LTsyn (plain_logic_type loc env typ)
 
   let rec annot in_axiomatic a =
+    let open Cil_const.CurrentLoc.Operators in
     let loc = a.decl_loc in
-    Cil.CurrentLoc.set loc;
+    let* CurrentLocUpdated = loc in
     match a.decl_node with
     | LDlogic_reads (f, labels, poly, t, p, l) ->
       let env,info = logic_decl loc f labels poly ~return_type:t p in

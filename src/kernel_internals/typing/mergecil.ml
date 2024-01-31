@@ -865,9 +865,11 @@ let rec global_annot_without_irrelevant_attributes ga =
     Dextended(ext, drop_attributes_for_merge attr, loc)
   | Dfun_or_pred _ | Dtype_annot _ | Dmodel_annot _ | Dinvariant _ -> ga
 
-let rec global_annot_pass1 g = match g with
+let rec global_annot_pass1 g =
+  let open Cil_const.CurrentLoc.Operators in
+  let* CurrentLocUpdated =  Cil_datatype.Global_annotation.loc g in
+  match g with
   | Dvolatile(hs,rvi,wvi,_,loc) ->
-    CurrentLoc.set loc;
     let process_term_kind (t,k as id) =
       let node =
         VolatileMerging.getNode
@@ -890,12 +892,10 @@ let rec global_annot_pass1 g = match g with
          if Option.is_some wvi then process_term_kind (x,W))
       hs
   | Daxiomatic(id,decls,_,l) ->
-    CurrentLoc.set l;
     ignore (PlainMerging.getNode laEq laSyn !currentFidx id (id,decls)
               (Some (l,!currentDeclIdx)));
     List.iter global_annot_pass1 decls
   | Dfun_or_pred (li,l) ->
-    CurrentLoc.set l;
     let mynode =
       LogicMerging.getNode
         lfEq lfSyn !currentFidx li li None
@@ -906,32 +906,26 @@ let rec global_annot_pass1 g = match g with
         (LogicMerging.getNode lfEq lfSyn !currentFidx li li
            (Some (l, !currentDeclIdx)))
   | Dtype_annot (pi,l) ->
-    CurrentLoc.set l;
     ignore (LogicMerging.getNode
               lfEq lfSyn !currentFidx pi pi
               (Some (l, !currentDeclIdx)))
   | Dmodel_annot (mfi,l) ->
-    CurrentLoc.set l;
     ignore (ModelMerging.getNode
               mfEq mfSyn !currentFidx (mfi.mi_name,mfi.mi_base_type) mfi
               (Some (l, !currentDeclIdx)))
   | Dinvariant (pi,l)  ->
-    CurrentLoc.set l;
     ignore (LogicMerging.getNode
               lfEq lfSyn !currentFidx pi pi
               (Some (l, !currentDeclIdx)))
   | Dtype (info,l) ->
-    CurrentLoc.set l;
     ignore (PlainMerging.getNode ltEq ltSyn !currentFidx info.lt_name info
               (Some (l, !currentDeclIdx)))
 
   | Dlemma (n,labs,typs,st,attr,l) ->
-    CurrentLoc.set l;
     ignore (PlainMerging.getNode
               llEq llSyn !currentFidx n (n,(labs,typs,st,attr,l))
               (Some (l, !currentDeclIdx)))
   | Dextended(ext,_,l) ->
-    CurrentLoc.set l;
     ignore
       (ExtMerging.getNode extEq extSyn !currentFidx
          ext ext (Some (l,!currentDeclIdx)))
@@ -1099,8 +1093,6 @@ let matchCompInfoGen (combineF : combineFunction)
            let old_len = List.length oldfields in
            let len = List.length fields in
            if old_len <> len then begin
-             let curLoc = CurrentLoc.get () in (* d_global blows this away.. *)
-             CurrentLoc.set curLoc;
              let aggregate_name = if cstruct then "struct" else "union" in
              let msg = Printf.sprintf
                  "different number of fields in %s %s and %s %s: %d != %d."
@@ -1576,6 +1568,7 @@ let remove_function_statics fdec =
       ) !theFile
 
 let oneFilePass1 (f:file) : unit =
+  let open Cil_const.CurrentLoc.Operators in
   H.add fileNames !currentFidx f.fileName;
   Kernel.feedback ~dkey:Kernel.dkey_linker
     "Pre-merging (%d) %a" !currentFidx Filepath.Normalized.pp_abs f.fileName ;
@@ -1715,86 +1708,85 @@ let oneFilePass1 (f:file) : unit =
       newrep.ndata.vattr <- addAttributes oldvi.vattr vi.vattr;
       newrep.ndata.vdecl <- newdecl
   in
-  List.iter
-    (function
-      | GVarDecl (vi, l) | GVar (vi, _, l) | GFunDecl (_, vi, l)->
-        CurrentLoc.set l;
-        incr currentDeclIdx;
-        if vi.vstorage <> Static then begin
-          matchVarinfo ~fromGFun:false vi (l, !currentDeclIdx);
-        end
+  let iter g =
+    let* CurrentLocUpdated = Cil_datatype.Global.loc g in
+    match g with
+    | GVarDecl (vi, l) | GVar (vi, _, l) | GFunDecl (_, vi, l)->
+      incr currentDeclIdx;
+      if vi.vstorage <> Static then begin
+        matchVarinfo ~fromGFun:false vi (l, !currentDeclIdx);
+      end
 
-      | GFun (fdec, l) ->
-        CurrentLoc.set l;
-        incr currentDeclIdx;
-        (* Save the names of the formal arguments *)
-        let _, args, _, _ = splitFunctionTypeVI fdec.svar in
-        H.add formalNames (!currentFidx, fdec.svar.vname)
-          (List.map (fun (n,_,_) -> n) (argsToList args));
-        (* Force inline functions to be static. *)
-        (* GN: This turns out to be wrong. inline functions are external,
-         * unless specified to be static. *)
-           (*
-             if fdec.svar.vinline && fdec.svar.vstorage = NoStorage then
-             fdec.svar.vstorage <- Static;
-           *)
-        if fdec.svar.vstorage <> Static then begin
-          matchVarinfo ~fromGFun:true fdec.svar (l, !currentDeclIdx)
-        end else begin
-          if fdec.svar.vinline && mergeInlines then
-            (* Just create the nodes for inline functions *)
-            ignore (PlainMerging.getNode iEq iSyn !currentFidx
-                      fdec.svar.vname fdec.svar (Some (l, !currentDeclIdx)))
-        end
-      (* Make nodes for the defined type and structure tags *)
-      | GType (t, l) ->
-        incr currentDeclIdx;
-        t.treferenced <- false;
-        if t.tname <> "" then (* The empty names are just for introducing
-                               * undefined comp tags *)
-          ignore (PlainMerging.getNode tEq tSyn !currentFidx t.tname t
-                    (Some (l, !currentDeclIdx)))
-        else begin (* Go inside and clean the referenced flag for the
-                    * declared tags *)
-          match t.ttype with
-            TComp (ci, _ ) ->
-            ci.creferenced <- false;
-            (* Create a node for it *)
-            ignore
-              (PlainMerging.getNode sEq sSyn !currentFidx ci.cname ci None)
-
-          | TEnum (ei, _) ->
-            ei.ereferenced <- false;
-            ignore
-              (EnumMerging.getNode eEq eSyn !currentFidx ei ei None)
-
-          | _ ->  (Kernel.fatal "Anonymous Gtype is not TComp")
-        end
-
-      | GCompTag (ci, l) ->
-        incr currentDeclIdx;
-        ci.creferenced <- false;
-        ignore (PlainMerging.getNode sEq sSyn !currentFidx ci.cname ci
+    | GFun (fdec, l) ->
+      incr currentDeclIdx;
+      (* Save the names of the formal arguments *)
+      let _, args, _, _ = splitFunctionTypeVI fdec.svar in
+      H.add formalNames (!currentFidx, fdec.svar.vname)
+        (List.map (fun (n,_,_) -> n) (argsToList args));
+      (* Force inline functions to be static. *)
+      (* GN: This turns out to be wrong. inline functions are external,
+        * unless specified to be static. *)
+          (*
+            if fdec.svar.vinline && fdec.svar.vstorage = NoStorage then
+            fdec.svar.vstorage <- Static;
+          *)
+      if fdec.svar.vstorage <> Static then begin
+        matchVarinfo ~fromGFun:true fdec.svar (l, !currentDeclIdx)
+      end else begin
+        if fdec.svar.vinline && mergeInlines then
+          (* Just create the nodes for inline functions *)
+          ignore (PlainMerging.getNode iEq iSyn !currentFidx
+                    fdec.svar.vname fdec.svar (Some (l, !currentDeclIdx)))
+      end
+    (* Make nodes for the defined type and structure tags *)
+    | GType (t, l) ->
+      incr currentDeclIdx;
+      t.treferenced <- false;
+      if t.tname <> "" then (* The empty names are just for introducing
+                             * undefined comp tags *)
+        ignore (PlainMerging.getNode tEq tSyn !currentFidx t.tname t
                   (Some (l, !currentDeclIdx)))
-      | GCompTagDecl (ci,_) -> ci.creferenced <- false
-      | GEnumTagDecl (ei,_) -> ei.ereferenced <- false
-      | GEnumTag (ei, l) ->
-        incr currentDeclIdx;
-        let orig_name =
-          if ei.eorig_name = "" then ei.ename else ei.eorig_name
-        in
-        ignore (Alpha.newAlphaName ~alphaTable:aeAlpha ~undolist:None
-                  ~lookupname:orig_name ~data:l);
-        ei.ereferenced <- false;
-        ignore
-          (EnumMerging.getNode eEq eSyn !currentFidx ei ei
-             (Some (l, !currentDeclIdx)))
-      | GAnnot (gannot,l) ->
-        CurrentLoc.set l;
-        incr currentDeclIdx;
-        global_annot_pass1 gannot
-      | GText _ | GPragma _ | GAsm _ -> ())
-    f.globals
+      else begin (* Go inside and clean the referenced flag for the
+                  * declared tags *)
+        match t.ttype with
+          TComp (ci, _ ) ->
+          ci.creferenced <- false;
+          (* Create a node for it *)
+          ignore
+            (PlainMerging.getNode sEq sSyn !currentFidx ci.cname ci None)
+
+        | TEnum (ei, _) ->
+          ei.ereferenced <- false;
+          ignore
+            (EnumMerging.getNode eEq eSyn !currentFidx ei ei None)
+
+        | _ ->  (Kernel.fatal "Anonymous Gtype is not TComp")
+      end
+
+    | GCompTag (ci, l) ->
+      incr currentDeclIdx;
+      ci.creferenced <- false;
+      ignore (PlainMerging.getNode sEq sSyn !currentFidx ci.cname ci
+                (Some (l, !currentDeclIdx)))
+    | GCompTagDecl (ci,_) -> ci.creferenced <- false
+    | GEnumTagDecl (ei,_) -> ei.ereferenced <- false
+    | GEnumTag (ei, l) ->
+      incr currentDeclIdx;
+      let orig_name =
+        if ei.eorig_name = "" then ei.ename else ei.eorig_name
+      in
+      ignore (Alpha.newAlphaName ~alphaTable:aeAlpha ~undolist:None
+                ~lookupname:orig_name ~data:l);
+      ei.ereferenced <- false;
+      ignore
+        (EnumMerging.getNode eEq eSyn !currentFidx ei ei
+           (Some (l, !currentDeclIdx)))
+    | GAnnot (gannot, _) ->
+      incr currentDeclIdx;
+      global_annot_pass1 gannot
+    | GText _ | GPragma _ | GAsm _ -> ()
+  in
+  List.iter iter f.globals
 
 let matchInlines (oldfidx: int) (oldi: varinfo)
     (fidx: int) (i: varinfo) =
@@ -2619,9 +2611,9 @@ let oneFilePass2 (f: file) =
         end
       end
     in
+    let* CurrentLocUpdated = Cil_datatype.Global.loc g in
     match g with
     | GVarDecl (vi, l) as g ->
-      CurrentLoc.set l;
       incr currentDeclIdx;
       let vi' = processVarinfo vi l in
       if vi == vi' && not (H.mem emittedVarDecls vi'.vname) then begin
@@ -2631,7 +2623,6 @@ let oneFilePass2 (f: file) =
       end
 
     | GFunDecl (spec,vi, l) as g ->
-      CurrentLoc.set l;
       incr currentDeclIdx;
       let vi' = processVarinfo vi l in
       let spec' = visitCilFunspec renameVisitor spec in
@@ -2653,7 +2644,6 @@ let oneFilePass2 (f: file) =
       end
 
     | GVar (vi, init, l) ->
-      CurrentLoc.set l;
       incr currentDeclIdx;
       if not (is_ignored_vi vi) then begin
         let vi' = processVarinfo vi l in
@@ -2693,7 +2683,6 @@ let oneFilePass2 (f: file) =
       end
 
     | GFun (fdec, l) as g ->
-      CurrentLoc.set l;
       incr currentDeclIdx;
       if not (is_ignored_vi fdec.svar) then begin
         (* We apply the renaming *)
@@ -2908,8 +2897,7 @@ let oneFilePass2 (f: file) =
         end
       end
 
-    | GCompTag (ci, l) as g -> begin
-        CurrentLoc.set l;
+    | GCompTag (ci, _) as g -> begin
         incr currentDeclIdx;
         if ci.creferenced then
           ()
@@ -2953,8 +2941,7 @@ let oneFilePass2 (f: file) =
             end
         end
       end
-    | GEnumTag (ei, l) as g -> begin
-        CurrentLoc.set l;
+    | GEnumTag (ei, _) as g -> begin
         incr currentDeclIdx;
         if ei.ereferenced then
           ()
@@ -2988,10 +2975,10 @@ let oneFilePass2 (f: file) =
             ()
         end
       end
-    | GCompTagDecl (ci, l) -> begin
-        CurrentLoc.set l; (* This is here just to introduce an undefined
-                           * structure. But maybe the structure was defined
-                           * already.  *)
+    | GCompTagDecl (ci, _) -> begin
+        (* This is here just to introduce an undefined
+         * structure. But maybe the structure was defined
+         * already.  *)
         (* Do not increment currentDeclIdx because it is not incremented in
          * pass 1*)
         if H.mem emittedCompDecls ci.cname then
@@ -3003,16 +2990,14 @@ let oneFilePass2 (f: file) =
         end
       end
 
-    | GEnumTagDecl (_ei, l) ->
-      CurrentLoc.set l;
+    | GEnumTagDecl (_ei, _) ->
       (* Do not increment currentDeclIdx because it is not incremented in
        * pass 1*)
       (* Keep it as a declaration *)
       mergePushGlobal g
 
 
-    | GType (ti, l) as g -> begin
-        CurrentLoc.set l;
+    | GType (ti, _) as g -> begin
         incr currentDeclIdx;
         if ti.treferenced then
           ()
@@ -3033,8 +3018,7 @@ let oneFilePass2 (f: file) =
             ()
         end
       end
-    | GAnnot (a, l) as g ->
-      CurrentLoc.set l;
+    | GAnnot (a, _) as g ->
       incr currentDeclIdx;
       global_annot_pass2 g a
     | g -> mergePushGlobals (visitCilGlobal renameVisitor g)
@@ -3103,6 +3087,7 @@ let merge_specs orig to_merge =
   List.iter merge_one_spec to_merge
 
 let global_merge_spec g =
+  let open Cil_const.CurrentLoc.Operators in
   Kernel.debug ~dkey:Kernel.dkey_linker
     "Merging global %a" Cil_printer.pp_global g;
   let rename v spec =
@@ -3111,8 +3096,9 @@ let global_merge_spec g =
       ignore (visitCilFunspec alpha spec)
     with Not_found -> ()
   in
+  let* CurrentLocUpdated = Cil_datatype.Global.loc g in
   match g with
-  | GFun(fdec,loc) ->
+  | GFun(fdec, _) ->
     Kernel.debug ~dkey:Kernel.dkey_linker
       "Merging global definition %a" Cil_printer.pp_global g;
     (match Cil_datatype.Varinfo.Hashtbl.find_opt spec_to_merge fdec.svar with
@@ -3130,11 +3116,10 @@ let global_merge_spec g =
          specs;
        Kernel.debug ~dkey:Kernel.dkey_linker
          "Merging with %a" Cil_printer.pp_funspec fdec.sspec ;
-       Cil.CurrentLoc.set loc;
        rename fdec.svar fdec.sspec;
        merge_specs fdec.sspec specs
     )
-  | GFunDecl(spec,v,loc) ->
+  | GFunDecl(spec, v, _) ->
     Kernel.debug ~dkey:Kernel.dkey_linker
       "Merging global declaration %a" Cil_printer.pp_global g;
     (match Cil_datatype.Varinfo.Hashtbl.find_opt spec_to_merge v with
@@ -3157,7 +3142,6 @@ let global_merge_spec g =
        List.iter (rename v) specs;
        Kernel.debug ~dkey:Kernel.dkey_linker
          "Renamed to %a" Cil_printer.pp_funspec spec;
-       Cil.CurrentLoc.set loc;
        merge_specs spec specs;
        Kernel.debug ~dkey:Kernel.dkey_linker
          "Merged into %a" Cil_printer.pp_funspec spec ;

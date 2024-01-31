@@ -359,8 +359,6 @@ module type JOIN_SEMILATTICE = sig
 
 end
 
-module CurrentLoc = Cil_const.CurrentLoc;;
-
 
 (****************************************************************)
 
@@ -488,8 +486,9 @@ struct
       W.insert ord) P.init;;
 
   let update_before (stmt, new_state) =
+    let open Cil_const.CurrentLoc.Operators in
     let ord = Fenv.to_ordered stmt in
-    CurrentLoc.set (Cil_datatype.Stmt.loc stmt);
+    let* CurrentLocUpdated = Cil_datatype.Stmt.loc stmt in
     let join =
       (* If we know that we already have to recompute before.(ord), we
          can omit the inclusion testing, and only perform the join. The
@@ -508,10 +507,11 @@ struct
   ;;
 
   let do_stmt ord =
+    let open Cil_const.CurrentLoc.Operators in
     let cur_state = P.get_before ord  in
     let stmt = Fenv.to_stmt ord in
     Kernel.debug ~dkey:Kernel.dkey_dataflow "forward: doing stmt %d" stmt.sid;
-    CurrentLoc.set (Cil_datatype.Stmt.loc stmt);
+    let* CurrentLocUpdated = Cil_datatype.Stmt.loc stmt in
     let l = P.transfer_stmt stmt cur_state in
     List.iter update_before l
   ;;

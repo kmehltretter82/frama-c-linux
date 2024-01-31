@@ -351,10 +351,11 @@ and print_generic_association fmt (type_exp : (specifier * decl_type) option * e
 and print_expression fmt (exp: expression) = print_expression_level 0 fmt exp
 
 and print_expression_level (lvl: int) fmt (exp : expression) =
+  let open Cil_const.CurrentLoc.Operators in
   let (txt, lvl') = get_operator exp in
   let print_expression fmt exp = print_expression_level lvl' fmt exp in
   let print_exp fmt e =
-    Cil_const.CurrentLoc.set e.expr_loc;
+    let* CurrentLocUpdated = e.expr_loc in
     match e.expr_node with
       NOTHING -> ()
     | PAREN exp -> print_expression fmt exp
@@ -424,12 +425,13 @@ and print_for_init fmt fc =
   | FC_DECL dec -> print_def fmt dec
 
 and print_statement fmt stat =
+  let open Cil_const.CurrentLoc.Operators in
   let loc = Cabshelper.get_statementloc stat in
-  Cil_const.CurrentLoc.set loc;
+  let* CurrentLocUpdated = loc in
   if Kernel.debug_atleast 2 then
     fprintf fmt "@\n/* %a */@\n" Cil_printer.pp_location loc;
   match stat.stmt_node with
-    NOP _ -> pp_print_string fmt ";"
+  | NOP _ -> pp_print_string fmt ";"
   | COMPUTATION (exp,_) -> fprintf fmt "%a;" print_expression exp
   | BLOCK (blk, _,_) -> print_block fmt blk
   | SEQUENCE (s1, s2,_) ->
@@ -580,7 +582,8 @@ and print_defs fmt defs =
     defs
 
 and print_def fmt def =
-  Cil_const.CurrentLoc.set (Cabshelper.get_definitionloc def);
+  let open Cil_const.CurrentLoc.Operators in
+  let* CurrentLocUpdated = Cabshelper.get_definitionloc def in
   match def with
     FUNDEF (spec, proto, body, loc, _) ->
     if !printCounters then begin

@@ -598,16 +598,9 @@ let inliner curr_label inline =
   }
 
 let inline_term ~inline ?(current = BuiltinLabel Here) term =
-  let current_loc = Cil_const.CurrentLoc.get () in
   try Some (Visitor.visitFramacTerm (inliner current inline) term)
-  with CannotInline ->
-    (* The visitor changes and resets the reference to the current location.
-       If an exception is raised during the visit, the current location must be
-       reset by the caller. *)
-    Cil_const.CurrentLoc.set current_loc;
-    None
+  with CannotInline -> None
 
 let inline_predicate ~inline ?(current = BuiltinLabel Here) pred =
-  let current_loc = Cil_const.CurrentLoc.get () in
   try Some (Visitor.visitFramacPredicate (inliner current inline) pred)
-  with CannotInline ->  Cil_const.CurrentLoc.set current_loc; None
+  with CannotInline -> None

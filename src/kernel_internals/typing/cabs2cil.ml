@@ -2429,7 +2429,8 @@ class gatherLabelsClass : Cabsvisit.cabsVisitor = object (self)
     ChangeDoChildrenPost (blk, fun _ -> (self#removeLocalLabels blk; blk))
 
   method! vstmt s =
-    CurrentLoc.set (get_statementloc s);
+    let open Cil_const.CurrentLoc.Operators in
+    let* CurrentLocUpdated = get_statementloc s in
     (match s.stmt_node with
      | LABEL (lbl,_,_) ->
        (try
@@ -5405,11 +5406,11 @@ and doExp local_env
     (e: Cabs.expression)
     (what: expAction)
   =
+  let open Cil_const.CurrentLoc.Operators in
   let ghost = local_env.is_ghost in
   let loc = e.expr_loc in
   (* will be reset at the end of the compilation of current expression. *)
-  let oldLoc = CurrentLoc.get() in
-  CurrentLoc.set loc;
+  let* CurrentLocUpdated = loc in
   let checkVoidLval e t =
     if (match e.enode with Lval _ -> true | _ -> false) && isVoidType t then
       abort_context "lvalue of type void: %a@\n" Cil_printer.pp_exp e
@@ -7446,7 +7447,6 @@ and doExp local_env
     Cprint.print_expression e;
     Format.eprintf "@.";
     Format.eprintf "Got: chunk:'%a'@." d_chunk b;*)
-  CurrentLoc.set oldLoc;
   result
 
 and normalize_unop unop action asconst local_env e what =
@@ -8458,6 +8458,7 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
  * varinfo *)
 and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * Cabs.attribute list))
     (((n,ndt,a,cloc), inite) : Cabs.init_name) : varinfo =
+  let open Cil_const.CurrentLoc.Operators in
   Kernel.debug ~dkey:Kernel.dkey_typing_global "createGlobal: %s" n;
   (* If the global is a Frama-C builtin, set the generated flag *)
   if is_stdlib_macro n && get_current_stdheader () = "" then begin
@@ -8599,24 +8600,28 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
           if isFunctionType vi.vtype then begin
             if not vi.vdefined then
               setFormalsDecl vi vi.vtype;
-            let spec =
+            let spec, loc =
               match logic_spec with
-              | None -> empty_funspec ()
+              | None -> empty_funspec (), Cil_const.CurrentLoc.get ()
               | Some (spec,loc) ->
                 begin
-                  CurrentLoc.set loc;
-                  try
-                    (* it can not have old behavior names, since this is the
-                       first time we see the declaration.
-                    *)
-                    Ltyping.funspec [] vi None vi.vtype spec
-                  with LogicTypeError ((source,_),msg) ->
-                    Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
-                      "%s. Ignoring specification of function %s" msg vi.vname;
-                    empty_funspec ()
+                  let* CurrentLocUpdated = loc in
+                  let loc = Cil_const.CurrentLoc.get () in
+                  let res =
+                    try
+                      (* it can not have old behavior names, since this is the
+                         first time we see the declaration.
+                      *)
+                      Ltyping.funspec [] vi None vi.vtype spec
+                    with LogicTypeError ((source,_),msg) ->
+                      Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
+                        "%s. Ignoring specification of function %s" msg vi.vname;
+                      empty_funspec ()
+                  in
+                  res, loc
                 end
             in
-            cabsPushGlobal (GFunDecl (spec, vi, CurrentLoc.get ()));
+            cabsPushGlobal (GFunDecl (spec, vi, loc));
           end
           else
             cabsPushGlobal (GVarDecl (vi, CurrentLoc.get ()));
@@ -8627,7 +8632,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
           (match logic_spec with
            | None -> ()
            | Some (spec,loc) ->
-             CurrentLoc.set loc;
+             let* CurrentLocUpdated = loc in
              let merge_spec = function
                | GFunDecl(old_spec, _, oldloc) ->
                  let behaviors =
@@ -9038,10 +9043,11 @@ and doAliasFun ghost vtype (thisname:string) (othername:string)
 
 
 (* Do one declaration *)
-and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
+and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
+  let open Cil_const.CurrentLoc.Operators in
+  let* CurrentLocUpdated = get_definitionloc def in
+  match def with
   | Cabs.DECDEF (logic_spec, (s, nl), loc) ->
-    let cloc = convLoc loc in
-    CurrentLoc.set cloc;
     (* Do the specifiers exactly once *)
     let sugg =
       match nl with
@@ -9101,18 +9107,16 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
             res
         end
     end
-  | Cabs.TYPEDEF (ng, loc) ->
-    CurrentLoc.set (convLoc loc); doTypedef local_env.is_ghost ng; empty
+  | Cabs.TYPEDEF (ng, _) ->
+    doTypedef local_env.is_ghost ng; empty
 
-  | Cabs.ONLYTYPEDEF (s, loc) ->
-    CurrentLoc.set (convLoc loc); doOnlyTypedef local_env.is_ghost s; empty
+  | Cabs.ONLYTYPEDEF (s, _) ->
+    doOnlyTypedef local_env.is_ghost s; empty
 
-  | Cabs.GLOBASM (s,loc) when isglobal ->
-    CurrentLoc.set (convLoc loc);
-    cabsPushGlobal (GAsm (s, CurrentLoc.get ())); empty
+  | Cabs.GLOBASM (s, _) when isglobal ->
+    cabsPushGlobal (GAsm (s, Cil_const.CurrentLoc.get ())); empty
 
-  | Cabs.PRAGMA (a, loc) when isglobal -> begin
-      CurrentLoc.set (convLoc loc);
+  | Cabs.PRAGMA (a, _) when isglobal -> begin
       match doAttr local_env.is_ghost ("dummy", [a]) with
       | [Attr("dummy", [a'])] ->
         let a'' =
@@ -9134,8 +9138,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
       | _ -> abort_context "Too many attributes in pragma"
     end
 
-  | Cabs.STATIC_ASSERT (e, s, loc) -> begin
-      CurrentLoc.set (convLoc loc);
+  | Cabs.STATIC_ASSERT (e, s, _) -> begin
       let (_, _, cond_exp, _) = doExp local_env CConst e ADrop in
       begin
         match Cil.constFoldToInt ~machdep:true cond_exp with
@@ -9162,7 +9165,6 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
       let endloc = loc2 in
       Kernel.debug ~dkey:Kernel.dkey_typing_global
         "Definition of %s at %a\n" n Cil_printer.pp_location idloc;
-      CurrentLoc.set idloc;
       FuncLocs.add_loc ?spec loc1 endloc n;
       IH.clear callTempVars;
 
@@ -9186,12 +9188,11 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
        * they need alpha-conv  *)
       enterScope ();  (* Start the scope *)
       ignore (Cabsvisit.visitCabsBlock (new gatherLabelsClass) body);
-      CurrentLoc.set idloc;
+
       IH.clear varSizeArrays;
 
       (* Enter all the function's labels into the alpha conversion table *)
       ignore (Cabsvisit.visitCabsBlock (new registerLabelsVisitor) body);
-      CurrentLoc.set idloc;
 
       (* Do not process transparent unions in function definitions.
        * We'll do it later *)
@@ -9347,10 +9348,26 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
       in
       let behaviors = find_existing_behaviors !currentFunctionFDEC.svar in
       (******* Now do the spec *******)
+      let merge_spec () =
+        (* Merge pre-existing spec if needed. *)
+        if has_decl then begin
+          let merge_spec = function
+            | GFunDecl(old_spec,_,oldloc) as g ->
+              if not (Cil.is_empty_funspec old_spec) then begin
+                rename_spec g;
+                Logic_utils.merge_funspec ~oldloc
+                  !currentFunctionFDEC.sspec old_spec;
+                Logic_utils.clear_funspec old_spec;
+              end;
+            | _ -> assert false
+          in
+          update_fundec_in_theFile !currentFunctionFDEC.svar merge_spec
+        end
+      in
       begin
         match spec with
         | Some (spec,loc) ->
-          CurrentLoc.set loc;
+          let* CurrentLocUpdated = loc in
           (try
              !currentFunctionFDEC.sspec <-
                Ltyping.funspec behaviors
@@ -9360,22 +9377,9 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
            with LogicTypeError ((source,_),msg) ->
              Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
                "%s. Ignoring logic specification of function %s"
-               msg !currentFunctionFDEC.svar.vname)
-        | None -> ()
-      end;
-      (* Merge pre-existing spec if needed. *)
-      if has_decl then begin
-        let merge_spec = function
-          | GFunDecl(old_spec,_,oldloc) as g ->
-            if not (Cil.is_empty_funspec old_spec) then begin
-              rename_spec g;
-              Logic_utils.merge_funspec ~oldloc
-                !currentFunctionFDEC.sspec old_spec;
-              Logic_utils.clear_funspec old_spec;
-            end
-          | _ -> assert false
-        in
-        update_fundec_in_theFile !currentFunctionFDEC.svar merge_spec
+               msg !currentFunctionFDEC.svar.vname);
+          merge_spec ()
+        | None -> merge_spec ()
       end;
       (********** Now do the BODY *************)
       let _ =
@@ -9537,8 +9541,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
       empty
     end (* FUNDEF *)
 
-  | LINKAGE (n, loc, dl) ->
-    CurrentLoc.set (convLoc loc);
+  | LINKAGE (n, _, dl) ->
     if n <> "C" then
       Kernel.warning ~current:true
         "Encountered linkage specification \"%s\"" n;
@@ -9559,7 +9562,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
       List.iter
         (fun decl  ->
            let loc = convLoc decl.Logic_ptree.decl_loc in
-           CurrentLoc.set loc;
+           let* CurrentLocUpdated = loc in
            try
              let tdecl = Ltyping.annot decl in
              let attr = fc_stdlib_attribute [] in
@@ -9832,6 +9835,7 @@ and doBodyScope local_env blk =
   enterScope (); let res = doBody local_env blk in exitScope (); res
 
 and doStatement local_env (s : Cabs.statement) : chunk =
+  let open Cil_const.CurrentLoc.Operators in
   let mk_loop_annot a loc =
     try
       List.map
@@ -9845,12 +9849,12 @@ and doStatement local_env (s : Cabs.statement) : chunk =
   in
   let ghost = s.stmt_ghost in
   let local_env = { local_env with is_ghost = ghost } in
+  let* CurrentLocUpdated = convLoc (get_statementloc s) in
   match s.stmt_node with
   | Cabs.NOP loc ->
     { empty
       with stmts = [mkEmptyStmt ~ghost ~valid_sid ~loc (), [],[],[],[]]}
   | Cabs.COMPUTATION (e, loc) ->
-    CurrentLoc.set (convLoc loc);
     let (lasts, data) = !gnu_body_result in
     if lasts == s then begin      (* This is the last in a GNU_BODY *)
       let (s', e', t') = doFullExp local_env CNoConst e (AExp None) in
@@ -9873,8 +9877,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
           s'
         end
 
-  | Cabs.BLOCK (b, loc,_) ->
-    CurrentLoc.set (convLoc loc);
+  | Cabs.BLOCK (b, _, _) ->
     let c = doBodyScope local_env b in
     let b = c2block ~ghost c in
     b.battrs <- addAttributes [Attr(frama_c_keep_block,[])] b.battrs;
@@ -9886,10 +9889,9 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     let c2 = doStatement local_env s2 in
     c1 @@@ (c2, ghost)
 
-  | Cabs.IF(e,st,sf,loc) ->
+  | Cabs.IF(e, st, sf, _) ->
     let st' = doStatement local_env st in
     let sf' = doStatement local_env sf in
-    CurrentLoc.set (convLoc loc);
     doCondition ~is_loop:false local_env CNoConst e st' sf'
 
   | Cabs.WHILE(a,e,s,loc) ->
@@ -9904,7 +9906,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     let loc' = convLoc loc in
     let break_cond = breakChunk ~ghost loc' in
     exitLoop ();
-    CurrentLoc.set loc';
     loopChunk ~ghost ~sattr:[Attr("while",[])] a
       ((doCondition ~is_loop:true local_env CNoConst e skipChunk break_cond)
        @@@ (s', ghost))
@@ -9914,7 +9915,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     let a = mk_loop_annot a loc in
     let s' = doStatement local_env s in
     let loc' = convLoc loc in
-    CurrentLoc.set loc';
     (* No 'break' instruction can exit the chunk *)
     let no_break chunk =
       List.for_all (fun (s, _, _, _, _) -> not (stmtCanBreak s)) chunk.stmts
@@ -9945,7 +9945,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
 
   | Cabs.FOR(a,fc1,e2,e3,s,loc) -> begin
       let loc' = convLoc loc in
-      CurrentLoc.set loc';
       enterScope (); (* Just in case we have a declaration *)
       ForLoopHook.apply (fc1,e2,e3,s);
       let (se1, _, _) , has_decl =
@@ -9959,7 +9958,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       let a = mk_loop_annot a loc in
       let s' = doStatement local_env s in
       (*Kernel.debug "Loop body : %a" d_chunk s';*)
-      CurrentLoc.set loc';
       let s'' = consLabContinue ~ghost se3 in
       let break_cond = breakChunk ~ghost loc' in
       exitLoop ();
@@ -9982,17 +9980,14 @@ and doStatement local_env (s : Cabs.statement) : chunk =
 
   | Cabs.BREAK loc ->
     let loc' = convLoc loc in
-    CurrentLoc.set loc';
     breakChunk ~ghost loc'
 
   | Cabs.CONTINUE loc ->
     let loc' = convLoc loc in
-    CurrentLoc.set loc';
     continueOrLabelChunk ~ghost loc'
 
   | Cabs.RETURN ({ expr_node = Cabs.NOTHING}, loc) ->
     let loc' = convLoc loc in
-    CurrentLoc.set loc';
     if not (isVoidType !currentReturnType) then
       Kernel.error ~current:true
         "Return statement without a value in function returning %a\n"
@@ -10001,7 +9996,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
 
   | Cabs.RETURN (e, loc) ->
     let loc' = convLoc loc in
-    CurrentLoc.set loc';
     (* Sometimes we return the result of a void function call *)
     if isVoidType !currentReturnType then begin
       Kernel.error ~current:true
@@ -10020,7 +10014,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
 
   | Cabs.SWITCH (e, s, loc) ->
     let loc' = convLoc loc in
-    CurrentLoc.set loc';
     let (se, e', et) = doFullExp local_env CNoConst e (AExp None) in
     if not (Cil.isIntegralType et) then
       Kernel.error ~once:true ~current:true "Switch on a non-integer expression.";
@@ -10033,7 +10026,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
 
   | Cabs.CASE (e, s, loc) ->
     let loc' = convLoc loc in
-    CurrentLoc.set loc';
     let (se, e', _) = doFullExp local_env CConst e (AExp None) in
     if isNotEmpty se || not (Cil.isIntegerConstant e') then
       Kernel.error ~once:true ~current:true
@@ -10049,7 +10041,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
 
   | Cabs.CASERANGE (el, eh, s, loc) ->
     let loc' = convLoc loc in
-    CurrentLoc.set loc;
     let (sel, el', _) = doFullExp local_env CNoConst el (AExp None) in
     let (seh, eh', _) = doFullExp local_env CNoConst eh (AExp None) in
     if isNotEmpty sel || isNotEmpty seh then
@@ -10073,11 +10064,9 @@ and doStatement local_env (s : Cabs.statement) : chunk =
 
   | Cabs.DEFAULT (s, loc) ->
     let loc' = convLoc loc in
-    CurrentLoc.set loc';
     defaultChunk ~ghost loc' (doStatement local_env s)
   | Cabs.LABEL (l, s, loc) ->
     let loc' = convLoc loc in
-    CurrentLoc.set loc';
     add_label_env l;
     C_logic_env.add_current_label l;
     (* Lookup the label because it might have been locally defined *)
@@ -10088,13 +10077,11 @@ and doStatement local_env (s : Cabs.statement) : chunk =
 
   | Cabs.GOTO (l, loc) ->
     let loc' = convLoc loc in
-    CurrentLoc.set loc';
     (* Maybe we need to rename this label *)
     gotoChunk ~ghost (lookupLabel ghost l) loc'
 
   | Cabs.COMPGOTO (e, loc) -> begin
       let loc' = convLoc loc in
-      CurrentLoc.set loc';
       (* Do the expression *)
       let se, e', _ =
         doFullExp local_env CNoConst e (AExp (Some voidPtrType))
@@ -10148,7 +10135,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     (* Make sure all the outs are variables *)
     let loc' = convLoc loc in
     let attr' = doAttributes local_env.is_ghost asmattr in
-    CurrentLoc.set loc';
     let stmts : chunk ref = ref empty in
     let ext_asm =
       match details with
@@ -10200,7 +10186,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
      ghost)
   | THROW (e,loc) ->
     let loc' = convLoc loc in
-    CurrentLoc.set loc';
     (match e with
      | None -> s2c (mkStmt ~ghost ~valid_sid (Throw (None,loc')))
      | Some e ->
@@ -10209,7 +10194,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
        (s2c (mkStmt ~ghost ~valid_sid (Throw (Some (e,t),loc'))),ghost))
   | TRY_CATCH(stry,l,loc) ->
     let loc' = convLoc loc in
-    CurrentLoc.set loc';
     let chunk_try = doStatement local_env stry in
     let type_one_catch (var,scatch) =
       enterScope();

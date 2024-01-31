@@ -43,14 +43,29 @@
 
 open Cil_types
 
-module CurrentLoc =
-  State_builder.Ref
-    (Cil_datatype.Location)
-    (struct
-      let dependencies = []
-      let name = "CurrentLoc"
-      let default () = Cil_datatype.Location.unknown
-    end)
+module CurrentLoc = struct
+  include
+    State_builder.Ref
+      (Cil_datatype.Location)
+      (struct
+        let dependencies = []
+        let name = "CurrentLoc"
+        let default () = Cil_datatype.Location.unknown
+      end)
+  module Operators = struct
+    type operation = CurrentLocUpdated
+
+    let from_option opt =
+      Option.value ~default:(get ()) opt
+
+    let ( let* ) loc f =
+      let oldLoc = get () in
+      let finally () = set oldLoc in
+      let work () = set loc; f CurrentLocUpdated in
+      Fun.protect ~finally work
+  end
+
+end
 
 let voidType = TVoid([])
 
