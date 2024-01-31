@@ -43,26 +43,25 @@ module Space (Field : Field.S) = struct
     let init size f =
       let data = Parray.init (Nat.to_int size) (fun _ -> Field.zero) in
       let set i data = Parray.set data (Finite.to_int i) (f i) in
-      let data = Finite.for_each data size set in
+      let data = Finite.for_each set size data in
       M { data ; rows = size ; cols = Nat.one }
 
     let size (type n) (M vector : n vector) : n nat = vector.rows
     let repeat n size = init size (fun _ -> n)
     let zero size = repeat Field.zero size
 
-    let set (type n) (i : n finite) n (M vec : n vector) : n vector =
-      M { vec with data = Parray.set vec.data (Finite.to_int i) n }
+    let get (type n) (i : n finite) (M vec : n vector) : scalar =
+      Parray.get vec.data (Finite.to_int i)
+
+    let set (type n) (i : n finite) scalar (M vec : n vector) : n vector =
+      M { vec with data = Parray.set vec.data (Finite.to_int i) scalar }
 
     let norm (type n) (M vector : n vector) =
       Parray.fold (fun _ a acc -> Field.(abs a + acc)) vector.data Field.zero
 
-    let ( * ) (type n) (M l : n vector) (M r : n vector) =
-      let inner = ref Field.zero in
-      let get i v = Parray.get v.data i in
-      for i = 0 to Nat.to_int l.rows - 1 do
-        inner := Field.(!inner + (get i l) * (get i r))
-      done ;
-      !inner
+    let ( * ) (type n) (l : n vector) (r : n vector) =
+      let inner i acc = Field.(acc + get i l * get i r) in
+      Finite.for_each inner (size l) Field.zero
 
   end
 
@@ -70,13 +69,15 @@ module Space (Field : Field.S) = struct
 
   module Matrix = struct
 
+    let index cols i j = i * Nat.to_int cols + j
+
     let get (type n m) (i : n finite) (j : m finite) (M m : (n, m) matrix) =
       let i = Finite.to_int i and j = Finite.to_int j in
-      Parray.get m.data (i * Nat.to_int m.cols + j)
+      Parray.get m.data (index m.cols i j)
 
     let set (type n m) i j num (M m : (n, m) matrix) : (n, m) matrix =
       let i = Finite.to_int i and j = Finite.to_int j in
-      let data = Parray.set m.data (i * Nat.to_int m.cols + j) num in
+      let data = Parray.set m.data (index m.cols i j) num in
       M { m with data }
 
     let row row (M m) = Vector.init m.cols @@ fun i -> get row i (M m)
@@ -86,20 +87,24 @@ module Space (Field : Field.S) = struct
       fun (M m) -> m.rows, m.cols
 
     let pretty (type n m) fmt (M m : (n, m) matrix) =
-      Finite.for_each () m.rows @@ fun i () ->
-      (if Finite.(i == first) then () else Format.fprintf fmt "@ ") ;
-      Format.fprintf fmt "@[<h>%a@]" Vector.pretty (row i (M m))
+      let open Format in
+      let not_first i = not Finite.(i == first) in
+      let newline fmt i = if not_first i then pp_print_newline fmt () in
+      let row fmt i = fprintf fmt "@[<h>%a@]" Vector.pretty (row i (M m)) in
+      let pp_line fmt i () = newline fmt i ; row fmt i in
+      let pp fmt () = Finite.for_each (pp_line fmt) m.rows () in
+      Format.fprintf fmt "@[<v>%a@]" pp ()
 
     let init n m init =
       let rows = Nat.to_int n and cols = Nat.to_int m in
       let t = Parray.init (rows * cols) (fun _ -> Field.zero) in
-      let index i j = Finite.to_int i * cols + Finite.to_int j in
+      let index i j = index m (Finite.to_int i) (Finite.to_int j) in
       let set i j data = Parray.set data (index i j) (init i j) in
-      let data = Finite.(for_each t n @@ fun i t -> for_each t m (set i)) in
+      let data = Finite.(for_each (fun i t -> for_each (set i) m t) n t) in
       M { data ; rows = n ; cols = m }
 
     let zero n m = init n m (fun _ _ -> Field.zero)
-    let id n = Finite.for_each (zero n n) n @@ fun i m -> set i i Field.one m
+    let id n = Finite.for_each (fun i m -> set i i Field.one m) n (zero n n)
 
     type ('n, 'm) add = ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
     let ( + ) : type n m. (n, m) add = fun (M l) (M r) ->
@@ -113,7 +118,7 @@ module Space (Field : Field.S) = struct
 
     let norm : type n m. (n, m) matrix -> scalar = fun (M m) ->
       let max i res = Field.max res (col i (M m) |> Vector.norm) in
-      Finite.for_each Field.zero m.cols max
+      Finite.for_each max m.cols Field.zero
 
   end
 

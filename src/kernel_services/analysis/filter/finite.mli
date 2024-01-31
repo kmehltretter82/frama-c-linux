@@ -40,4 +40,4 @@ val to_int : 'n finite -> int
 
 (* The call [for_each acc limit f] folds over each finite elements of a set of
    cardinal limit, computing f at each step. The function complexity is O(n). *)
-val for_each : 'a -> 'n nat -> ('n finite -> 'a -> 'a) -> 'a
+val for_each : ('n finite -> 'a -> 'a) -> 'n nat -> 'a -> 'a

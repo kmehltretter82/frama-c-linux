@@ -31,28 +31,25 @@ module Make (Field : Field.S) = struct
 
 
 
-  let rec first_steps max steps matrix exponent =
-    let steps = (matrix, exponent) :: steps in
-    if Field.(Matrix.norm matrix < one) then
-      if exponent * 2 > max then Some steps
-      else first_steps max steps Matrix.(matrix * matrix) (exponent * 2)
-    else if exponent <= max then
-      first_steps max steps Matrix.(matrix * matrix) (exponent * 2)
-    else None
+  let rec first_steps target steps matrix exponent =
+    let steps' = (matrix, exponent) :: steps in
+    if exponent * 2 > target
+    then if exponent <= target then steps' else steps
+    else first_steps target steps' Matrix.(matrix * matrix) (exponent * 2)
 
-  let rec refine max = function
+  let rec refine target = function
     | [] -> None
-    | [ (matrix, exponent) ] -> Some (Matrix.norm matrix, exponent)
+    | [ (matrix, _) ] ->
+      let norm = Matrix.norm matrix in
+      if Field.(norm < one) then Some norm else None
     | (matrix, exponent) :: (matrix', exponent') :: previous ->
       let exponent'' = exponent + exponent' in
-      if exponent'' > max
-      then refine max ((matrix, exponent) :: previous)
-      else refine max ((Matrix.(matrix * matrix'), exponent'') :: previous)
+      if exponent'' > target
+      then refine target ((matrix, exponent) :: previous)
+      else refine target ((Matrix.(matrix * matrix'), exponent'') :: previous)
 
-  let find_exponent max_acceptable_exponent base =
-    let open Option.Operators in
-    let* steps = first_steps max_acceptable_exponent [] base 1 in
-    refine max_acceptable_exponent steps
+  let find_spectral_radius target base =
+    first_steps target [] base 1 |> refine target
 
 
 
@@ -71,9 +68,11 @@ module Make (Field : Field.S) = struct
 
   type ('n, 'm) formatter = Format.formatter -> ('n, 'm) filter -> unit
   let pretty : type n m. (n, m) formatter = fun fmt (Filter f) ->
-    Format.fprintf fmt "Filter:@.@." ;
-    Format.fprintf fmt "- State :@.@.  @[<v>%a@]@.@." Matrix.pretty f.state ;
-    Format.fprintf fmt "- Input :@.@.  @[<v>%a@]@.@." Matrix.pretty f.input
+    Format.fprintf fmt "@[<v>" ;
+    Format.fprintf fmt "Filter:@ @ " ;
+    Format.fprintf fmt "- State :@ @   @[<v>%a@]@ @ " Matrix.pretty f.state ;
+    Format.fprintf fmt "- Input :@ @   @[<v>%a@]@ @ " Matrix.pretty f.input ;
+    Format.fprintf fmt "@]"
 
   let sum order p norm stop =
     let ( + ) res acc = Field.(res + norm acc) in
@@ -81,13 +80,13 @@ module Make (Field : Field.S) = struct
     aux (Matrix.id order, Field.zero) (stop - 1)
 
   type ('n, 'm) invariant = ('n, 'm) filter -> int -> Field.scalar option
-  let invariant : type n m. (n, m) invariant = fun (Filter f) max ->
+  let invariant : type n m. (n, m) invariant = fun (Filter f) exponent ->
     let open Option.Operators in
     let order, _ = Matrix.dimensions f.input in
-    let+ spectral, exponant = find_exponent max f.state in
+    let+ spectral = find_spectral_radius exponent f.state in
     let power p = Matrix.(f.state * p) in
     let norm  p = Matrix.(p * f.input |> norm) in
-    let sum = sum order power norm exponant in
+    let sum = sum order power norm exponent in
     let bound = Field.(Vector.norm f.measure * sum / (one - spectral)) in
     let order = Field.of_int (Nat.to_int order) in
     Field.(bound / order)

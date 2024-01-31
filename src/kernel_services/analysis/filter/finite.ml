@@ -36,7 +36,7 @@ let to_int : type n. n finite -> int = fun n -> n
 let of_int : type n. n succ nat -> int -> n succ finite option =
   fun limit n -> if 0 <= n && n < Nat.to_int limit then Some n else None
 
-let for_each (type n) acc (limit : n nat) (f : n finite -> 'a -> 'a) =
+let for_each (type n) (f : n finite -> 'a -> 'a) (limit : n nat) acc =
   let acc = ref acc in
   for i = 0 to Nat.to_int limit - 1 do acc := f i !acc done ;
   !acc
