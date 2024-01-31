@@ -91,9 +91,9 @@ let dbgToken (t: token) =
 *)
 let lexicon = H.create 211
 let init_lexicon _ =
-  H.clear lexicon;
-  Logic_env.reset_typenames ();
-  Logic_env.builtin_types_as_typenames ();
+  H.clear lexicon ;
+  Logic_env.reset_typenames () ;
+  Logic_env.builtin_types_as_typenames () ;
   List.iter
     (fun (key, builder) -> H.add lexicon key builder)
     [ ("auto", fun loc -> AUTO loc);
@@ -110,8 +110,8 @@ let init_lexicon _ =
       ("unsigned", fun loc -> UNSIGNED loc);
       ("volatile", fun loc -> VOLATILE loc);
       ("__volatile", fun loc -> VOLATILE loc);
-      (* WW: see /usr/include/sys/cdefs.h for why __signed and __volatile
-       * are accepted GCC-isms *)
+  (* WW: see /usr/include/sys/cdefs.h for why __signed and __volatile
+   * are accepted GCC-isms *)
       ("char", fun loc -> CHAR loc);
       ("_Bool", fun loc -> BOOL loc);
       ("int", fun loc -> INT loc);
@@ -134,7 +134,7 @@ let init_lexicon _ =
       ("for", fun loc -> FOR loc);
       ("if", fun loc -> dbgToken (IF loc));
       ("else", fun _ -> ELSE);
-      (*** Implementation specific keywords ***)
+  (*** Implementation specific keywords ***)
       ("__signed__", fun loc -> SIGNED loc);
       ("__inline__", fun loc -> INLINE loc);
       ("inline", fun loc -> INLINE loc);
@@ -166,11 +166,11 @@ let init_lexicon _ =
       ("__func__", fun loc -> FUNCTION__ loc); (* ISO 6.4.2.2 *)
       ("__PRETTY_FUNCTION__", fun loc -> PRETTY_FUNCTION__ loc);
       ("__label__", fun _ -> LABEL__);
-      (*** weimer: GCC arcana ***)
+  (*** weimer: GCC arcana ***)
       ("__restrict", fun loc -> RESTRICT loc);
       ("restrict", fun loc -> RESTRICT loc);
 (*      ("__extension__", EXTENSION); *)
-      (**** MS VC ***)
+  (**** MS VC ***)
       ("__int64", fun _ -> INT64 (currentLoc ()));
       ("__int32", fun loc -> INT loc);
       ("_cdecl",  fun _ -> MSATTR ("_cdecl", currentLoc ()));
@@ -194,7 +194,7 @@ let init_lexicon _ =
        fun loc ->
          Kernel.(warning ~wkey:wkey_c11 "_Thread_local is a C11 keyword");
          THREAD_LOCAL loc);
-      (* We recognize __thread for GCC machdeps *)
+  (* We recognize __thread for GCC machdeps *)
       ("__thread",
        fun loc ->
          if Cil.gccMode () then
@@ -217,9 +217,9 @@ let init_lexicon _ =
             Seq.fold_left (fun acc c -> convert_char c :: acc) [] seq
           in
           CST_STRING (List.rev l,loc)));
-      (* The following C11 tokens are not yet supported, so we provide some
-         helpful error messages. Usage of 'fatal' instead of 'error' below
-         prevents duplicate error messages due to parsing errors. *)
+  (* The following C11 tokens are not yet supported, so we provide some
+     helpful error messages. Usage of 'fatal' instead of 'error' below
+     prevents duplicate error messages due to parsing errors. *)
       ("_Alignas",
        fun loc ->
          Kernel.abort ~source:(fst loc)
@@ -261,7 +261,7 @@ let set_typedef () = typedef_decl := true
 
 let reset_typedef () = typedef_decl := false
 
-let push_context _ = context := []::!context
+let push_context _ = context := [] :: !context
 
 let pop_context _ =
   match !context with
@@ -280,11 +280,11 @@ let pop_context _ =
 let add_identifier name =
   match !context with
     [] -> Kernel.fatal "Empty context stack"
-  | con::sub ->
+  | con :: sub ->
       (context := (name::con)::sub;
        (*Format.eprintf "adding IDENT for %s@." name;*)
        H.add lexicon name (fun _ -> dbgToken (IDENT name));
-       Logic_env.hide_typename name
+    Logic_env.hide_typename name
       )
 
 
@@ -345,7 +345,7 @@ let scan_hex_escape str =
     let thisDigit = Cabshelper.valueOfDigit (String.get str i) in
     (* the_value := !the_value * 16 + thisDigit *)
     the_value := Int64.add (Int64.mul !the_value radix) thisDigit
-  done;
+  done ;
   !the_value
 
 let scan_oct_escape str =
@@ -356,7 +356,7 @@ let scan_oct_escape str =
     let thisDigit = Cabshelper.valueOfDigit (String.get str i) in
     (* the_value := !the_value * 8 + thisDigit *)
     the_value := Int64.add (Int64.mul !the_value radix) thisDigit
-  done;
+  done ;
   !the_value
 
 let lex_hex_escape remainder lexbuf =
@@ -384,8 +384,8 @@ let lex_comment remainder buffer lexbuf =
 
 let do_ghost_else_comments register comments =
   let ends_with_n =
-    let last = String.length comments in
-    (* note that comments contains at least a blank *)
+  let last = String.length comments in
+  (* note that comments contains at least a blank *)
     '\n' = String.get comments (last - 1)
   in
   let comments = String.split_on_char '\n' comments in
@@ -410,7 +410,7 @@ let do_ghost_else_comments register comments =
 let do_lex_comment ?(first_string="") remainder lexbuf =
   let buffer =
     if Kernel.PrintComments.get () then begin
-      let b = Buffer.create 80 in
+    let b = Buffer.create 80 in
       Buffer.add_string b first_string;
       Some b
     end else None
@@ -454,7 +454,7 @@ let annot_char = ref '@'
 let () =
   Kernel.ReadAnnot.add_set_hook
     (fun _ x ->
-      (* prevent the C lexer interpretation of comments *)
+(* prevent the C lexer interpretation of comments *)
       annot_char := if x then '@' else '\000')
 
 let annot_start_pos = ref Cabshelper.cabslu
@@ -465,28 +465,28 @@ let save_current_pos () =
 
 let annot_lex initial rule lexbuf =
   try
-    save_current_pos ();
-    Buffer.clear buf;
+  save_current_pos () ;
+  Buffer.clear buf ;
     rule lexbuf
   with Parsing.Parse_error ->
     let source = Cil_datatype.Position.of_lexing_pos (Lexing.lexeme_start_p lexbuf) in
-    Kernel.warning ~wkey:Kernel.wkey_annot_error ~source "skipping annotation";
+    Kernel.warning ~wkey:Kernel.wkey_annot_error ~source "skipping annotation" ;
     initial lexbuf
 
 let make_annot ~one_line default lexbuf s =
   let start = snd !annot_start_pos in
   match Logic_lexer.annot (start, s) with
   | Some (stop, token) ->
-    lexbuf.Lexing.lex_curr_p <- Cil_datatype.Position.to_lexing_pos stop;
-    if one_line then E.newline ();
+    lexbuf.Lexing.lex_curr_p <- Cil_datatype.Position.to_lexing_pos stop ;
+    if one_line then E.newline () ;
     (match token with
-     | Logic_ptree.Adecl d -> DECL d
-     | Logic_ptree.Aspec -> SPEC (start,s)
-     (* At this point, we only have identified a function spec. Complete
+    | Logic_ptree.Adecl d -> DECL d
+    | Logic_ptree.Aspec -> SPEC (start, s)
+    (* At this point, we only have identified a function spec. Complete
            parsing of the annotation will only occur in the cparser.mly rule.
      *)
-     | Logic_ptree.Acode_annot (loc,a) -> CODE_ANNOT (a, loc)
-     | Logic_ptree.Aloop_annot (loc,a) -> LOOP_ANNOT (a,loc)
+    | Logic_ptree.Acode_annot (loc,a) -> CODE_ANNOT (a, loc)
+    | Logic_ptree.Aloop_annot (loc,a) -> LOOP_ANNOT (a,loc)
      | Logic_ptree.Aattribute_annot (loc,a) -> ATTRIBUTE_ANNOT (a, loc))
   | None -> (* error occured and annotation is discarded. Find a normal token. *)
     default lexbuf
@@ -497,13 +497,13 @@ let parse_error lexbuf msg =
   E.parse_error ~source msg
 
 let () =
-  (* Initialize the pointer in Errormsg *)
-  Lexerhack.add_type := add_type;
-  Lexerhack.push_context := push_context;
-  Lexerhack.pop_context := pop_context;
-  Lexerhack.add_identifier := add_identifier;
-  Lexerhack.is_typedef := is_typedef;
-  Lexerhack.set_typedef := set_typedef;
+(* Initialize the pointer in Errormsg *)
+  Lexerhack.add_type := add_type ;
+  Lexerhack.push_context := push_context ;
+  Lexerhack.pop_context := pop_context ;
+  Lexerhack.add_identifier := add_identifier ;
+  Lexerhack.is_typedef := is_typedef ;
+  Lexerhack.set_typedef := set_typedef ;
   Lexerhack.reset_typedef := reset_typedef
 }
 
@@ -515,7 +515,7 @@ let letter = ['a'- 'z' 'A'-'Z']
 
 
 let usuffix = ['u' 'U']
-let lsuffix = "l"|"L"|"ll"|"LL"
+let lsuffix = "l" | "L" | "ll" | "LL"
 let intsuffix = lsuffix | usuffix | usuffix lsuffix | lsuffix usuffix
               | usuffix ? "i64"
 
@@ -531,16 +531,16 @@ let binarynum = binaryprefix binarydigit+ intsuffix?
 let exponent = ['e' 'E']['+' '-']? decdigit+
 let fraction  = '.' decdigit+
 let decfloat = (intnum? fraction)
-	      |(intnum exponent)
-	      |(intnum? fraction exponent)
-	      | (intnum '.')
-              | (intnum '.' exponent)
+  | (intnum exponent)
+  | (intnum? fraction exponent)
+  | (intnum '.')
+  | (intnum '.' exponent)
 
 
 let hexfraction = hexdigit* '.' hexdigit+ | hexdigit+ '.'
 let binexponent = ['p' 'P'] ['+' '-']? decdigit+
 let hexfloat = hexprefix hexfraction binexponent
-             | hexprefix hexdigit+   binexponent
+  | hexprefix hexdigit+   binexponent
 
 let floatsuffix = ['f' 'F' 'l' 'L']
 let floatnum = (decfloat | hexfloat) floatsuffix?
@@ -558,7 +558,7 @@ let no_parse_pragma =
              | "ident" | "section" | "option" | "asm" | "use_section" | "weak"
              | "redefine_extname"
              | "TCS_align"
-                 (* Embedded world *)
+(* Embedded world *)
              | "global_register" | "location"
 
 let ghost_comments = "//\n"
@@ -567,12 +567,12 @@ let ghost_comments = "//\n"
 rule initial = parse
 | "/*" ("" | "@{" | "@}" as suf) (* Skip special doxygen comments. Use of '@'
                                     instead of '!annot_char' is intentional *)
-      {
-        do_lex_comment ~first_string:suf comment lexbuf ;
-        initial lexbuf
-      }
+    {
+    do_lex_comment ~first_string:suf comment lexbuf ;
+    initial lexbuf
+    }
 
-| "/*" ([^ '*' '\n'] as c)
+  | "/*" ([^ '*' '\n'] as c)
     { if c = !annot_char then begin
         annot_lex initial annot_first_token lexbuf
       end else
@@ -594,7 +594,7 @@ rule initial = parse
       end
     }
 
-| "//" ([^ '\n'] as c)
+  | "//" ([^ '\n'] as c)
     { if c = !annot_char then begin
         annot_lex initial annot_one_line lexbuf
       end else
@@ -612,7 +612,7 @@ rule initial = parse
 	    end
 	end
     }
-| "\\ghost"
+  | "\\ghost"
     { if is_ghost_code () || is_oneline_ghost () then begin
         GHOST (currentLoc())
       end else begin
@@ -636,72 +636,72 @@ rule initial = parse
                                             initial lexbuf
                                           end }
 |               '\\' '\r' * '\n'        { E.newline ();
-                                          initial lexbuf
-                                        }
-|		'#'			{ hash lexbuf}
-|		"%:"			{ hash lexbuf}
-|               "_Pragma" 	        { PRAGMA (currentLoc ()) }
+    initial lexbuf
+    }
+  | '#'  { hash lexbuf }
+  | "%:" { hash lexbuf }
+  | "_Pragma" { PRAGMA (currentLoc ()) }
 |		'\''			{
-      let start = Lexing.lexeme_start_p lexbuf in
-      let content = chr lexbuf in
-      let last = Lexing.lexeme_end_p lexbuf in
-      CST_CHAR (content, Cil_datatype.Location.of_lexing_loc (start,last))
+    let start = Lexing.lexeme_start_p lexbuf in
+    let content = chr lexbuf in
+    let last = Lexing.lexeme_end_p lexbuf in
+    CST_CHAR (content, Cil_datatype.Location.of_lexing_loc (start,last))
     }
 |		"L'"			{
-      let start = Lexing.lexeme_start_p lexbuf in
-      let content = chr lexbuf in
-      let last = Lexing.lexeme_end_p lexbuf in
-      CST_WCHAR (content, Cil_datatype.Location.of_lexing_loc (start,last))
+    let start = Lexing.lexeme_start_p lexbuf in
+    let content = chr lexbuf in
+    let last = Lexing.lexeme_end_p lexbuf in
+    CST_WCHAR (content, Cil_datatype.Location.of_lexing_loc (start,last))
     }
 |		'"'			{
-      let start = Lexing.lexeme_start_p lexbuf in
-      let content = str lexbuf in
-      let last = Lexing.lexeme_end_p lexbuf in
-      CST_STRING (content, Cil_datatype.Location.of_lexing_loc (start,last))
+    let start = Lexing.lexeme_start_p lexbuf in
+    let content = str lexbuf in
+    let last = Lexing.lexeme_end_p lexbuf in
+    CST_STRING (content, Cil_datatype.Location.of_lexing_loc (start,last))
     }
 |		"L\""			{
-      let start = Lexing.lexeme_start_p lexbuf in
-      let content = str lexbuf in
-      let last = Lexing.lexeme_end_p lexbuf in
-      CST_WSTRING(content, Cil_datatype.Location.of_lexing_loc (start,last))
+    let start = Lexing.lexeme_start_p lexbuf in
+    let content = str lexbuf in
+    let last = Lexing.lexeme_end_p lexbuf in
+    CST_WSTRING(content, Cil_datatype.Location.of_lexing_loc (start,last))
     }
-|		floatnum		{CST_FLOAT (Lexing.lexeme lexbuf, currentLoc ())}
+  | floatnum  { CST_FLOAT (Lexing.lexeme lexbuf, currentLoc ()) }
 |		binarynum               { (* GCC Extension for binary numbers *)
                                           CST_INT (Lexing.lexeme lexbuf, currentLoc ())}
-|		hexnum			{CST_INT (Lexing.lexeme lexbuf, currentLoc ())}
-|		octnum			{CST_INT (Lexing.lexeme lexbuf, currentLoc ())}
-|		intnum			{CST_INT (Lexing.lexeme lexbuf, currentLoc ())}
-|		"!quit!"		{EOF}
-|		"..."			{ELLIPSIS}
-|		"+="			{PLUS_EQ}
-|		"-="			{MINUS_EQ}
-|		"*="			{STAR_EQ}
-|		"/="			{SLASH_EQ}
-|		"%="			{PERCENT_EQ}
-|		"|="			{PIPE_EQ}
-|		"&="			{AND_EQ}
-|		"^="			{CIRC_EQ}
-|		"<<="			{INF_INF_EQ}
-|		">>="			{SUP_SUP_EQ}
-|		"<<"			{INF_INF}
-|		">>"			{SUP_SUP}
-| 		"=="			{EQ_EQ}
-| 		"!="			{EXCLAM_EQ}
-|		"<="			{INF_EQ}
-|		">="			{SUP_EQ}
-|		"="			{EQ}
-|		"<"			{INF}
-|		">"			{SUP}
-|		"++"			{PLUS_PLUS (currentLoc ())}
-|		"--"			{MINUS_MINUS (currentLoc ())}
-|		"->"			{ARROW}
-|		'+'			{PLUS (currentLoc ())}
-|		'-'			{MINUS (currentLoc ())}
-|		'*'
+  | hexnum    { CST_INT (Lexing.lexeme lexbuf, currentLoc ()) }
+  | octnum    { CST_INT (Lexing.lexeme lexbuf, currentLoc ()) }
+  | intnum    { CST_INT (Lexing.lexeme lexbuf, currentLoc ()) }
+  | "!quit!"  { EOF }
+  | "..."     { ELLIPSIS }
+  | "+="      { PLUS_EQ }
+  | "-="      { MINUS_EQ }
+  | "*="      { STAR_EQ }
+  | "/="      { SLASH_EQ }
+  | "%="      { PERCENT_EQ }
+  | "|="      { PIPE_EQ }
+  | "&="      { AND_EQ }
+  | "^="      { CIRC_EQ }
+  | "<<="     { INF_INF_EQ }
+  | ">>="     { SUP_SUP_EQ }
+  | "<<"      { INF_INF }
+  | ">>"      { SUP_SUP }
+  | "=="      { EQ_EQ }
+  | "!="      { EXCLAM_EQ }
+  | "<="      { INF_EQ }
+  | ">="      { SUP_EQ }
+  | "="       { EQ }
+  | "<"       { INF }
+  | ">"       { SUP }
+  | "++"      { PLUS_PLUS (currentLoc ()) }
+  | "--"      { MINUS_MINUS (currentLoc ()) }
+  | "->"      { ARROW }
+  | '+'       { PLUS (currentLoc ()) }
+  | '-'       { MINUS (currentLoc ()) }
+  | '*'
                     { if is_ghost_code () then might_end_ghost lexbuf
                       else
                         STAR (currentLoc ())}
-| "/" ([^ '\n'] as c)
+  | "/" ([^ '\n'] as c)
    { if c = !annot_char then
        if is_ghost_code () || is_oneline_ghost () then begin
          enter_ghost_annot();
@@ -712,81 +712,81 @@ rule initial = parse
        lexbuf.Lexing.lex_curr_pos <- lexbuf.Lexing.lex_curr_pos - 1;
        SLASH
      end }
-|               '/'                     {SLASH}
-|		'%'			{PERCENT}
-|		'!'			{EXCLAM (currentLoc ())}
-|		"&&"			{AND_AND (currentLoc ())}
-|		"||"			{PIPE_PIPE}
-|		'&'			{AND (currentLoc ())}
-|		'|'			{PIPE}
-|		'^'			{CIRC}
-|		'?'			{QUEST}
-|		':'
+  | '/'   { SLASH }
+  | '%'   { PERCENT }
+  | '!'   { EXCLAM (currentLoc ()) }
+  | "&&"  { AND_AND (currentLoc ()) }
+  | "||"  { PIPE_PIPE }
+  | '&'   { AND (currentLoc ()) }
+  | '|'   { PIPE }
+  | '^'   { CIRC }
+  | '?'   { QUEST }
+  | ':'
   { if Cabshelper.is_attr_test () then begin
         Cabshelper.pop_attr_test (); COLON2
       end else COLON
-  }
+    }
 |		'~'		        {TILDE (currentLoc ())}
 
 |		'{'		       {dbgToken (LBRACE (currentLoc ()))}
 |		'}'		       {dbgToken (RBRACE (currentLoc ()))}
 |		"<%"		       {dbgToken (LBRACE (currentLoc ()))}
 |		"%>"		       {dbgToken (RBRACE (currentLoc ()))}
-|		'['				{LBRACKET}
-|		']'				{RBRACKET}
-|		"<:"				{LBRACKET}
-|		":>"				{RBRACKET}
+  | '['       { LBRACKET }
+  | ']'       { RBRACKET }
+  | "<:"      { LBRACKET }
+  | ":>"      { RBRACKET }
 |		'('		       {dbgToken (LPAREN (currentLoc ())) }
-|		')'				{RPAREN}
+  | ')'       { RPAREN }
 |		';'		       {dbgToken (SEMICOLON (currentLoc ())) }
-|		','				{COMMA}
-|		'.'				{DOT}
-|		"sizeof"		{SIZEOF (currentLoc ())}
-|               "__asm"                 {ASM (currentLoc ())}
+  | ','       { COMMA }
+  | '.'       { DOT }
+  | "sizeof"  { SIZEOF (currentLoc ()) }
+  | "__asm"   { ASM (currentLoc ()) }
 
 (* If we see __pragma we eat it and the matching parentheses as well *)
 |               "__pragma"              { let _ = matchingpars 0 lexbuf in
                                           initial lexbuf
                                         }
 
-(* __extension__ is a black. The parser runs into some conflicts if we let it
+  (* __extension__ is a black. The parser runs into some conflicts if we let it
  * pass *)
-|               "__extension__"         {initial lexbuf }
-|               ident                   {scan_ident (Lexing.lexeme lexbuf)}
-|               eof
+  | "__extension__" { initial lexbuf }
+  | ident { scan_ident (Lexing.lexeme lexbuf) }
+  | eof
   { if is_oneline_ghost() then begin
       exit_oneline_ghost (); RGHOST
     end
     else EOF
-  }
-|               _ as c
+    }
+  | _ as c
   { if is_ghost_code() && c = '@' then initial lexbuf
     else parse_error lexbuf "Invalid symbol"
-  }
+    }
 and might_end_ghost = parse
-  | '/' { exit_ghost_code(); RGHOST }
-  | "" { STAR (currentLoc()) }
+  | '/' { exit_ghost_code() ; RGHOST }
+  | ""  { STAR (currentLoc()) }
 
 and comment buffer = parse
-  |  "*/"       {  }
-  | eof         { parse_error lexbuf "Unterminated C comment" }
-  | _           { lex_comment comment buffer lexbuf }
+  | "*/" {  }
+  | eof  { parse_error lexbuf "Unterminated C comment" }
+  | _    { lex_comment comment buffer lexbuf }
 
 and onelinecomment buffer = parse
   | "*/"        { if is_ghost_code () then
-                      (* end of multiline comment *)
+    (* end of multiline comment *)
                       lexbuf.Lexing.lex_curr_pos <-
                           lexbuf.Lexing.lex_curr_pos - 2
                   else
                       lex_comment onelinecomment buffer lexbuf
-                }
-  | '\n'|eof    {  }
-  | _           { lex_comment onelinecomment buffer lexbuf }
+    }
+  | '\n' | eof {  }
+  | _          { lex_comment onelinecomment buffer lexbuf }
 
 and matchingpars parsopen = parse
   '\n'          { E.newline (); matchingpars parsopen lexbuf }
-| blank         { matchingpars parsopen lexbuf }
-| '('           { matchingpars (parsopen + 1) lexbuf }
+  | blank { matchingpars parsopen lexbuf }
+  | '('   { matchingpars (parsopen + 1) lexbuf }
 | ')'           { if parsopen > 1 then
                     matchingpars (parsopen - 1) lexbuf
                 }
@@ -794,15 +794,15 @@ and matchingpars parsopen = parse
                   matchingpars parsopen lexbuf }
 |  '"'		{ let _ = str lexbuf in
                   matchingpars parsopen lexbuf }
-| _             { matchingpars parsopen lexbuf }
+  | _     { matchingpars parsopen lexbuf }
 
 (* # <line number> <file name> ... *)
 and hash = parse
   '\n'		{ E.newline (); initial lexbuf}
-| blank		{ hash lexbuf}
+  | blank { hash lexbuf}
 | intnum	{ (* We are seeing a line number. This is the number for the
                    * next line *)
-                 let s = Lexing.lexeme lexbuf in
+    let s = Lexing.lexeme lexbuf in
                  let lineno = try
                    int_of_string s
                  with Failure _ ->
@@ -810,39 +810,39 @@ and hash = parse
                    Kernel.warning "Bad line number in preprocessed file: %s" s;
                    (-1)
                  in
-                 E.setCurrentLine (lineno - 1);
-                  (* A file name may follow *)
+    E.setCurrentLine (lineno - 1) ;
+    (* A file name may follow *)
 		  file lexbuf }
 | "line"        { hash lexbuf } (* MSVC line number info *)
                 (* For pragmas with irregular syntax, like #pragma warning,
                  * we parse them as a whole line. *)
-| "pragma" blank (no_parse_pragma as pragmaName)
+  | "pragma" blank (no_parse_pragma as pragmaName)
                 { let here = currentLoc () in
-                  PRAGMA_LINE (pragmaName ^ pragma lexbuf, here)
-                }
-| "pragma"      { pragmaLine := true; PRAGMA (currentLoc ()) }
-| _	        { endline lexbuf}
+    PRAGMA_LINE (pragmaName ^ pragma lexbuf, here)
+    }
+  | "pragma"  { pragmaLine := true ; PRAGMA (currentLoc ()) }
+  | _         { endline lexbuf }
 
-and file =  parse
+and file = parse
         '\n'		        {E.newline (); initial lexbuf}
-|	blank			{file lexbuf}
+  | blank { file lexbuf }
 (* The //-ending file directive is a GCC extension that provides the CWD of the
    preprocessor when the file was preprocessed. *)
 |       '"' ([^ '\012' '\t' '"']* as d) "//\"" {
-        E.setCurrentWorkingDirectory d;
+    E.setCurrentWorkingDirectory d ;
                                  endline lexbuf }
 |	'"' (([^ '\012' '\t' '"']|"\\\"")* as f) '"' {
-        let unescape = Str.regexp_string "\\\"" in
-        let f = Str.global_replace unescape "\"" f in
-                                 E.setCurrentFile f;
+    let unescape = Str.regexp_string "\\\"" in
+    let f = Str.global_replace unescape "\"" f in
+    E.setCurrentFile f ;
 				 endline lexbuf}
 
-|	_			{endline lexbuf}
+  | _ { endline lexbuf }
 
 and endline = parse
         '\n' 			{ E.newline (); initial lexbuf}
-|   eof                         { EOF }
-|	_			{ endline lexbuf}
+  | eof   { EOF }
+  | _     { endline lexbuf }
 
 and pragma = parse
    '\n'                 { E.newline (); "" }
@@ -851,45 +851,45 @@ and pragma = parse
 
 and str = parse
         '"'             {[]} (* no nul terminiation in CST_STRING '"' *)
-|	hex_escape	{lex_hex_escape str lexbuf}
-|	oct_escape	{lex_oct_escape str lexbuf}
-|	escape		{lex_simple_escape str lexbuf}
-|       eof             {parse_error lexbuf "unterminated string" }
-|	_		{lex_unescaped str lexbuf}
+  | hex_escape  { lex_hex_escape str lexbuf }
+  | oct_escape  { lex_oct_escape str lexbuf }
+  | escape      { lex_simple_escape str lexbuf }
+  | eof         { parse_error lexbuf "unterminated string" }
+  | _           { lex_unescaped str lexbuf }
 
 and chr =  parse
 	'\''	        {[]}
-|	hex_escape	{lex_hex_escape chr lexbuf}
-|	oct_escape	{lex_oct_escape chr lexbuf}
-|	escape		{lex_simple_escape chr lexbuf}
-|       eof             {parse_error lexbuf "unterminated char" }
-|	_		{lex_unescaped chr lexbuf}
+  | hex_escape  { lex_hex_escape chr lexbuf }
+  | oct_escape  { lex_oct_escape chr lexbuf }
+  | escape      { lex_simple_escape chr lexbuf }
+  | eof         { parse_error lexbuf "unterminated char" }
+  | _           { lex_unescaped chr lexbuf }
 
 and annot_first_token = parse
   | "ghost" ((blank| '\\'?'\n' | ghost_comments)* as comments) "else" {
-      if is_oneline_ghost () then parse_error lexbuf "nested ghost code";
-      Buffer.clear buf;
-      let loc = currentLoc () in
-      do_ghost_else_comments true comments ;
-      enter_ghost_code ();
-      LGHOST_ELSE (loc)
+    if is_oneline_ghost () then parse_error lexbuf "nested ghost code" ;
+    Buffer.clear buf ;
+    let loc = currentLoc () in
+    do_ghost_else_comments true comments ;
+    enter_ghost_code () ;
+    LGHOST_ELSE (loc)
     }
   | "ghost" {
-      if is_oneline_ghost () then parse_error lexbuf "nested ghost code";
-      Buffer.clear buf;
-      enter_ghost_code ();
-      LGHOST
+    if is_oneline_ghost () then parse_error lexbuf "nested ghost code" ;
+    Buffer.clear buf ;
+    enter_ghost_code () ;
+    LGHOST
     }
-  | ' '|'@'|'\t'|'\r' as c { Buffer.add_char buf c; annot_first_token lexbuf }
-  | '\n' { E.newline(); Buffer.add_char buf '\n'; annot_first_token lexbuf }
-  | "" { annot_token lexbuf }
+  | ' '|'@'|'\t'|'\r' as c { Buffer.add_char buf c ; annot_first_token lexbuf }
+  | '\n' { E.newline() ; Buffer.add_char buf '\n' ; annot_first_token lexbuf }
+  | ""   { annot_token lexbuf }
 and annot_token = parse
   | "*/" { if is_ghost_annot () then
              parse_error lexbuf "Ghost multi-line annotation not terminated";
-           let s = Buffer.contents buf in
+    let s = Buffer.contents buf in
            make_annot ~one_line:false initial lexbuf s }
   | eof  { parse_error lexbuf "Unterminated annotation" }
-  | '\n' {E.newline(); Buffer.add_char buf '\n'; annot_token lexbuf }
+  | '\n' { E.newline() ; Buffer.add_char buf '\n' ; annot_token lexbuf }
   | _ as c { if is_ghost_annot () && c = !annot_char then
                might_end_ghost_annot lexbuf
              else (Buffer.add_char buf c; annot_token lexbuf) }
@@ -900,20 +900,20 @@ and might_end_ghost_annot = parse
   | "" { Buffer.add_char buf !annot_char; annot_token lexbuf }
 and annot_one_line = parse
   | "ghost" ((blank|"\\\n")+ as comments) "else" {
-      do_ghost_else_comments false comments ;
-      if is_oneline_ghost () then parse_error lexbuf "nested ghost code";
+    do_ghost_else_comments false comments ;
+    if is_oneline_ghost () then parse_error lexbuf "nested ghost code" ;
       enter_oneline_ghost (); LGHOST_ELSE (currentLoc ())
-  }
+    }
   | "ghost" {
-      if is_oneline_ghost () then parse_error lexbuf "nested ghost code";
+    if is_oneline_ghost () then parse_error lexbuf "nested ghost code" ;
       enter_oneline_ghost (); LGHOST
     }
-  | ' '|'@'|'\t'|'\r' as c { Buffer.add_char buf c; annot_one_line lexbuf }
+  | ' '|'@'|'\t'|'\r' as c { Buffer.add_char buf c ; annot_one_line lexbuf }
   | "" { annot_one_line_logic lexbuf }
 and annot_one_line_logic = parse
-  | '\n' { make_annot ~one_line:true initial lexbuf (Buffer.contents buf) }
-  | eof { parse_error lexbuf "Invalid C file: should end with a newline" }
-  | _ as c { Buffer.add_char buf c; annot_one_line_logic lexbuf }
+  | '\n'    { make_annot ~one_line:true initial lexbuf (Buffer.contents buf) }
+  | eof     { parse_error lexbuf "Invalid C file: should end with a newline" }
+  | _ as c  { Buffer.add_char buf c ; annot_one_line_logic lexbuf }
 
 {
 
