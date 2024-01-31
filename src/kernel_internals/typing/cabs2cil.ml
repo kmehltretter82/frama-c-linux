@@ -9485,6 +9485,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       (* Now see whether we can fall through to the end of the function *)
       if blockFallsThrough !currentFunctionFDEC.sbody then begin
         let loc = endloc in
+        let* CurrentLocUpdated = endloc in
         let protect_return,retval =
           (* Guard the [return] instructions we add with an
              [\assert \false]*)
