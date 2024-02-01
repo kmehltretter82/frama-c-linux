@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -21,18 +21,8 @@
 #                                                                        #
 ##########################################################################
 
-WORKING_DIR="."
-while [ "$1" != "" ] ; do
-    case "$1" in
-        -check) shift;;
-        -C) shift; WORKING_DIR="$1";;
-        *) break;;
-    esac
-   shift
-done
-
 usage() {
-   echo "usage: $0 [-C working-dir] cmd [args]"
+   echo "usage: $0 cmd [args]"
    echo ""
    echo "  where cmd is:"
    echo ""
@@ -48,7 +38,7 @@ usage() {
    echo "      and non-POSIX external libraries."
    echo "      (run 'frama-c -machdep help' to get the list of machdeps)."
    echo ""
-   echo "  - creduce <args>"
+   echo "  - creduce [[file] args]"
    echo "      Use the external tool C-Reduce to minimize C files when"
    echo "      debugging crashes and fatal errors. Run without arguments for"
    echo "      more details."
@@ -101,7 +91,7 @@ usage() {
    echo "      Creates a new machdep definition for a specific target."
    echo "      Use $0 make-machdep --help for more information"
    echo ""
-   echo "  - make-wrapper target arg..."
+   echo "  - make-wrapper [target] [arg...]"
    echo "      Runs 'make target arg...', parsing the output to suggest"
    echo "      useful commands in case of failure."
    echo ""
@@ -122,13 +112,13 @@ if [ $# -lt 1 ]; then
 fi
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-cd "$WORKING_DIR"
 
 # All scripts called by frama-c-script may rely on FRAMAC_BIN pointing to the
 # directory containing frama-c, frama-c-config and frama-c-script.
 export FRAMAC_BIN="$DIR"
 FRAMAC_LIB=$("${DIR}/frama-c-config" -print-lib-path)
 FRAMAC_SHARE=$("${DIR}/frama-c-config" -print-share-path)
+ANALYSIS_SCRIPTS_DIR="${FRAMAC_LIB}/analysis-scripts"
 if [ -z ${FRAMAC_SESSION+x} ]; then
     FRAMAC_SESSION="./.frama-c";
 fi
@@ -139,7 +129,7 @@ command="$1"
 # ask if it should be overwritten
 check_path_exists() {
     if [ -e "$1" ]; then
-        read -p "warning: '$1' already exists. Overwrite? [y/N] " yn
+        read -r -p "warning: '$1' already exists. Overwrite? [y/N] " yn
         case $yn in
             [Yy]) ;;
             *)
@@ -184,10 +174,10 @@ flamegraph() {
         mkdir "$dir" || { echo "error: could not create '$dir'"; exit 1; }
     fi
     out_svg="$dir/flamegraph.svg"
-    "${FRAMAC_LIB}/analysis-scripts/flamegraph.pl" \
+    "$ANALYSIS_SCRIPTS_DIR/flamegraph.pl" \
         --title "Eva Flamegraph" --inverted --hash "$path" \
         --width 1400 --fontsize 11 > "$out_svg.tmp"
-    if [ ! $? -eq 0 ]; then
+    if [ ! $? ]; then
         echo "Error creating flamegraph, aborting."
         exit 1
     fi
@@ -226,22 +216,22 @@ case "$command" in
         ;;
     "build")
         shift;
-        ${FRAMAC_LIB}/analysis-scripts/build.py "$@";
+        "$ANALYSIS_SCRIPTS_DIR/build.py" "$@";
         ;;
     "list-files")
         shift;
-        "${FRAMAC_LIB}"/analysis-scripts/list_files.py "$@";
+        "$ANALYSIS_SCRIPTS_DIR/list_files.py" "$@";
         ;;
     "list-functions")
         shift;
         # to avoid a slow startup, we only load plugins which perform syntactic
         # transformations. This may trigger annotation errors due to missing
         # plugins, so we disable those
-        "${DIR}"/frama-c "$@" -no-autoload-plugins -load-module variadic,instantiate,frama-c.analysis-scripts -kernel-warn-key annot-error=inactive -kernel-verbose 0;
+        "${DIR}/frama-c" "$@" -no-autoload-plugins -load-module variadic,instantiate,frama-c.analysis-scripts -kernel-warn-key annot-error=inactive -kernel-verbose 0;
         ;;
     "find-fun")
         shift;
-        "${FRAMAC_LIB}"/analysis-scripts/find_fun.py "$@";
+        "$ANALYSIS_SCRIPTS_DIR/find_fun.py" "$@";
         ;;
     "flamegraph")
         shift;
@@ -249,7 +239,7 @@ case "$command" in
         ;;
     "summary")
         shift;
-        "${FRAMAC_LIB}"/analysis-scripts/summary.py "$@";
+        "$ANALYSIS_SCRIPTS_DIR/summary.py" "$@";
         ;;
     "configure")
         shift;
@@ -257,36 +247,36 @@ case "$command" in
         ;;
     "heuristic-print-callgraph")
         shift;
-        ${FRAMAC_LIB}/analysis-scripts/print_callgraph.py "$@";
+        "$ANALYSIS_SCRIPTS_DIR/print_callgraph.py" "$@";
         ;;
     "heuristic-detect-recursion")
         shift;
-        ${FRAMAC_LIB}/analysis-scripts/detect_recursion.py "$@";
+        "$ANALYSIS_SCRIPTS_DIR/detect_recursion.py" "$@";
         ;;
     "heuristic-list-functions")
         shift;
-        ${FRAMAC_LIB}/analysis-scripts/heuristic_list_functions.py "$@";
+        "$ANALYSIS_SCRIPTS_DIR/heuristic_list_functions.py" "$@";
         ;;
     "estimate-difficulty")
         shift;
-        ${FRAMAC_LIB}/analysis-scripts/estimate_difficulty.py "$@";
+        "$ANALYSIS_SCRIPTS_DIR/estimate_difficulty.py" "$@";
         ;;
     "make-wrapper")
         shift;
-        "${FRAMAC_LIB}"/analysis-scripts/make_wrapper.py "$0" "$@";
+        "$ANALYSIS_SCRIPTS_DIR/make_wrapper.py" "$0" "$@";
         ;;
     "normalize-jcdb")
         shift;
-        "${FRAMAC_LIB}"/analysis-scripts/normalize_jcdb.py "$@";
+        "$ANALYSIS_SCRIPTS_DIR/normalize_jcdb.py" "$@";
         ;;
     "creduce")
         shift;
-        ${FRAMAC_LIB}/analysis-scripts/creduce.sh "$@";
+        "$ANALYSIS_SCRIPTS_DIR/creduce.sh" "$@";
         ;;
     "make-machdep")
         shift;
-        ${FRAMAC_LIB}/make_machdep/make_machdep.py \
-          --machdep-schema ${FRAMAC_SHARE}/machdeps/machdep-schema.yaml "$@"
+        "${FRAMAC_LIB}/make_machdep/make_machdep.py" \
+          --machdep-schema "${FRAMAC_SHARE}/machdeps/machdep-schema.yaml" "$@"
         ;;
     *)
         echo "error: unrecognized command: $command";
