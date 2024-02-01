@@ -149,4 +149,22 @@
     padding: 5px;
 }
 
+.dock-component-selected {
+    background: var(--selected-element);
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Styling Tabs                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+.tabs-component {
+    font-size: smaller;
+    border: solid;
+    padding: 5px;
+}
+
+.tabs-component-selected {
+    background: var(--selected-element);
+}
+
 /* -------------------------------------------------------------------------- */

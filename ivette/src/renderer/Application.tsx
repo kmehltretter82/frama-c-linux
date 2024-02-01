@@ -67,6 +67,8 @@ export default function Application(): JSX.Element {
         <Controller.Control />
         <>{ToolBar}</>
         <Toolbar.Filler />
+        <Lab.Tabs />
+        <Toolbar.Filler />
         <IvettePrefs.ThemeSwitchTool />
         <IvettePrefs.FontTools />
         <Actions.SearchAction />
