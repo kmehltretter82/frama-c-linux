@@ -315,7 +315,7 @@ let add_new_block_in_stmt env kf stmt =
       let res = Smart_stmt.block new_stmt post_block in
       res, env
   in
-  Options.debug ~level:4
+  Options.debug ~dkey ~level:4
     "@[new stmt (from sid %d):@ %a@]" stmt.sid Printer.pp_stmt new_stmt;
   new_stmt, env
 
