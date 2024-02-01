@@ -38,7 +38,7 @@ module type S = sig
   val max : scalar -> scalar -> scalar
   val min : scalar -> scalar -> scalar
 
-  val ( == ) : scalar -> scalar -> bool
+  val ( =  ) : scalar -> scalar -> bool
   val ( <= ) : scalar -> scalar -> bool
   val ( <  ) : scalar -> scalar -> bool
   val ( >= ) : scalar -> scalar -> bool

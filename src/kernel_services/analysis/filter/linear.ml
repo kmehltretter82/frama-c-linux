@@ -87,7 +87,7 @@ module Space (Field : Field.S) = struct
       fun (M m) -> m.rows, m.cols
 
     let pretty (type n m) fmt (M m : (n, m) matrix) =
-      let cut i = if not Finite.(i == first) then Format.pp_print_cut fmt () in
+      let cut i = if not Finite.(i = first) then Format.pp_print_cut fmt () in
       let row i = Format.fprintf fmt "@[<h>%a@]" Vector.pretty (row i (M m)) in
       let pretty () = Finite.for_each (fun i () -> cut i ; row i) m.rows () in
       Format.pp_open_vbox fmt 0 ; pretty () ; Format.pp_close_box fmt ()

@@ -25,8 +25,8 @@ open Nat
 type 'n finite
 
 val first : 'n succ finite
-val next : 'n finite -> 'n succ finite
-val ( == ) : 'n finite -> 'n finite -> bool
+val next  : 'n finite -> 'n succ finite
+val ( = ) : 'n finite -> 'n finite -> bool
 
 (* The call [of_int limit n] returns a finite value representing the n-nd
    element of a finite set of cardinal limit. If n is not in the bounds, none is

@@ -42,7 +42,7 @@ module Rational = struct
     let ten = Z.of_int 10 in
     let sign = if Q.sign n >= 0 then "" else "-" in
     let num = Q.num n |> Z.abs and den = Q.den n |> Z.abs in
-    let finish n = Z.Compare.(n >= den || n == Z.zero) in
+    let finish n = Z.Compare.(n >= den || n = Z.zero) in
     let rec f e n = if finish n then (n, e) else f (e + 1) Z.(n * ten) in
     let num, exponent = f 0 num in
     let default fmt n = Format.fprintf fmt "%1.7f" (Q.to_float n) in
@@ -53,7 +53,7 @@ module Rational = struct
 
   include Q
   let infinity = Q.inf
-  let ( == ) = Q.equal
+  let ( = ) = Q.equal
 
 end
 
