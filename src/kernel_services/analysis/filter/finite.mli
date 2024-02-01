@@ -20,10 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Nat.Types
+open Nat
 
-module Types : sig type 'n finite end
-open Types
+type 'n finite
 
 val first : 'n succ finite
 val next : 'n finite -> 'n succ finite

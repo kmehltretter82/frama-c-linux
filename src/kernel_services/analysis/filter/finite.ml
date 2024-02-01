@@ -20,13 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Nat.Types
+open Nat
 
-module Types = struct
-  type 'n finite = int
-end
-
-open Types
+type 'n finite = int
 
 let first : type n. n succ finite = 0
 let next : type n. n finite -> n succ finite = fun n -> n + 1

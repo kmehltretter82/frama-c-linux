@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Nat.Types
-open Finite.Types
+open Nat
+open Finite
 
 
 

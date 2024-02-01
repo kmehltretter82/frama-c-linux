@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Nat.Types
-open Finite.Types
+open Nat
+open Finite
 
 
 
@@ -87,13 +87,10 @@ module Space (Field : Field.S) = struct
       fun (M m) -> m.rows, m.cols
 
     let pretty (type n m) fmt (M m : (n, m) matrix) =
-      let open Format in
-      let not_first i = not Finite.(i == first) in
-      let newline fmt i = if not_first i then pp_print_newline fmt () in
-      let row fmt i = fprintf fmt "@[<h>%a@]" Vector.pretty (row i (M m)) in
-      let pp_line fmt i () = newline fmt i ; row fmt i in
-      let pp fmt () = Finite.for_each (pp_line fmt) m.rows () in
-      Format.fprintf fmt "@[<v>%a@]" pp ()
+      let cut i = if not Finite.(i == first) then Format.pp_print_cut fmt () in
+      let row i = Format.fprintf fmt "@[<h>%a@]" Vector.pretty (row i (M m)) in
+      let pretty () = Finite.for_each (fun i () -> cut i ; row i) m.rows () in
+      Format.pp_open_vbox fmt 0 ; pretty () ; Format.pp_close_box fmt ()
 
     let init n m init =
       let rows = Nat.to_int n and cols = Nat.to_int m in

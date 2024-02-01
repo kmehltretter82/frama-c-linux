@@ -20,15 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Types : sig
-  type zero = |
-  type 'n succ = |
-  type 'n nat
-  type positive_or_null = PositiveOrNull : 'n nat -> positive_or_null
-  type strictly_positive = StrictlyPositive : 'n succ nat -> strictly_positive
-end
-
-open Types
+type zero = |
+type 'n succ = |
+type 'n nat
+type positive_or_null = PositiveOrNull : 'n nat -> positive_or_null
+type strictly_positive = StrictlyPositive : 'n succ nat -> strictly_positive
 
 val zero : zero nat
 val one  : zero succ nat
