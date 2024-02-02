@@ -24,14 +24,6 @@
 
 open Cil_types
 
-(** Type of a string that represents a number.
-    Used when a string is required to encode a constant number because it is not
-    representable in any C type  *)
-type strnum =
-  | Str_Z         (* integers *)
-  | Str_R         (* reals *)
-  | C_number      (* integers and floats included *)
-
 (** [add_cast ~loc ?name env kf ctx sty t_opt e] convert number expression [e]
     in a way that it is compatible with the given typing context [ctx].
     [sty] indicates if the expression is a string representing a number (integer
@@ -43,7 +35,7 @@ val add_cast:
   Env.t ->
   kernel_function ->
   typ option ->
-  strnum ->
+  Analyses_types.strnum ->
   term option ->
   exp ->
   exp * Env.t

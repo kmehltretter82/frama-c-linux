@@ -42,4 +42,4 @@ let main () =
   Annotations.add_ensures Emitter.end_user kf ~stmt:!s3 post_cond;
   Filecheck.check_ast "after merging code_annot and ensures"
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

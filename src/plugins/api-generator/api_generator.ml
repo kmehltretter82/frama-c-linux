@@ -581,6 +581,6 @@ let generate () =
     end
 
 let () =
-  Db.Main.extend generate
+  Boot.Main.extend generate
 
 (* -------------------------------------------------------------------------- *)

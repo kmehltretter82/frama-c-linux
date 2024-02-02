@@ -50,4 +50,4 @@ let main () =
   let prj = File.create_project_from_visitor "test" (fun prj -> new vis prj) in
   File.pretty_ast ~prj ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ {0}
-[kernel:annot:missing-spec] no_body.c:13: Warning: 
+[kernel:annot:missing-spec] no_body.c:24: Warning: 
   Neither code nor specification for function f,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- main.

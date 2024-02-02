@@ -11,4 +11,4 @@ let run () =
     (File.create_project_from_visitor
        "change_main" (fun prj -> new visitor prj))
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

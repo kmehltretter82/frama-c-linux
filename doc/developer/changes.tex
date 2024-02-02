@@ -5,7 +5,17 @@
 This chapter summarizes the major changes in this documentation between each
 \framac release, from newest to oldest.
 
-%\section*{Frama-C+dev}
+\section*{Frama-C+dev}
+\begin{itemize}
+\item There is no more \texttt{Db} module:
+  \begin{itemize}
+  \item Whole document: \texttt{Db.Main.extend} is now \texttt{Boot.Main.extend}
+  \item \textbf{Declaring dependencies}: removed section about \texttt{Db}
+  \item \textbf{Kernel-integrated Registration and Access}: removed section
+  \item \textbf{Registering a New State}: adapted example on postponed dependencies
+  \item \textbf{GUI Extension}: \texttt{Db.yield} is now \texttt{Async.yield}
+  \end{itemize}
+\end{itemize}
 
 \section*{27.0 (Cobalt)}
 \begin{itemize}

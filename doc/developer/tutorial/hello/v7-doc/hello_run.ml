@@ -13,4 +13,4 @@ let run () =
     Hello_print.output "Hello, world!"
 
 (** Definition of the entry point of the hello plug-in. *)
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

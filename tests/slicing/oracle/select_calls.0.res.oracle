@@ -6,7 +6,7 @@
 [eva:initial-state] Values of globals at initialization
   c ∈ [--..--]
   d ∈ [--..--]
-[kernel:annot:missing-spec] select_calls.i:8: Warning: 
+[kernel:annot:missing-spec] select_calls.i:22: Warning: 
   Neither code nor specification for function send,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function send <- f.
@@ -16,7 +16,7 @@
 [eva] computing for function send <- f.
   Called from select_calls.i:23.
 [eva] Done for function send
-[kernel:annot:missing-spec] select_calls.i:10: Warning: 
+[kernel:annot:missing-spec] select_calls.i:24: Warning: 
   Neither code nor specification for function crypt,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function crypt <- f.
@@ -29,7 +29,7 @@
 [eva] computing for function send <- f.
   Called from select_calls.i:28.
 [eva] Done for function send
-[kernel:annot:missing-spec] select_calls.i:12: Warning: 
+[kernel:annot:missing-spec] select_calls.i:30: Warning: 
   Neither code nor specification for function uncrypt,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function uncrypt <- f.

@@ -45,4 +45,4 @@ class visitor = object(_)
 end
 
 let () =
-  Db.Main.extend (fun () -> Visitor.visitFramacFileSameGlobals (new visitor) (Ast.get ()))
+  Boot.Main.extend (fun () -> Visitor.visitFramacFileSameGlobals (new visitor) (Ast.get ()))

@@ -1152,6 +1152,20 @@ module OutputDir =
                 Defaults to some temporary directory."
   end)
 
+module Probes =
+  True
+    (struct
+      let option_name = "-wp-probes"
+      let help = "Activate user-defines probes (@probe) (default: yes)"
+    end)
+
+module CounterExamples =
+  False
+    (struct
+      let option_name = "-wp-counter-examples"
+      let help = "Ask for counter examples when supported by provers"
+    end)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Output Dir                                                         --- *)
 (* -------------------------------------------------------------------------- *)
@@ -1286,7 +1300,7 @@ let print_generated ?header file =
 let protect e =
   if debug_atleast 1 then false else
     match e with
-    | Sys.Break | Db.Cancel | Log.AbortError _ | Log.AbortFatal _ -> false
+    | Sys.Break | Async.Cancel | Log.AbortError _ | Log.AbortFatal _ -> false
     | _ -> true
 
 (* -------------------------------------------------------------------------- *)

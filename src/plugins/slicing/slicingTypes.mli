@@ -39,10 +39,7 @@ exception NoPdg
 (** {2 Public types} *)
 
 (** These types are the only one that should be used by the API functions.
-    Public type definitions should be hidden to the outside world,
-    but it is not really possible to have abstract types since Slicing has to
-    use Db.Slicing functions...  So, it is up to the user of this module to use
-    only this public part.
+    Public type definitions should be hidden to the outside world.
 *)
 
 (** contains global things that has been computed so far

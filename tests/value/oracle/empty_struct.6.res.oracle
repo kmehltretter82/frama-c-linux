@@ -12,7 +12,7 @@
 [eva:garbled-mix:write] empty_struct.c:99: 
   Assigning imprecise value to r.
   The imprecision originates from Library function {empty_struct.c:99}
-[kernel:annot:missing-spec] empty_struct.c:96: Warning: 
+[kernel:annot:missing-spec] empty_struct.c:100: Warning: 
   Neither code nor specification for function g,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function g <- main4.

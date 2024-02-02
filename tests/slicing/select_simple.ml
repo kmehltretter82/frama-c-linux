@@ -21,4 +21,4 @@ let main _ =
   ignore (test_select_data "f8" "ps->c");
   ignore (test_select_data "f8" "*ps")
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

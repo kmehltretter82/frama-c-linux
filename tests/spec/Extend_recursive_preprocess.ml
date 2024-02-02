@@ -80,4 +80,4 @@ let run () =
   Filecheck.check_ast "Test";
   Project.set_current old
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

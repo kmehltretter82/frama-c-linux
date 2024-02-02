@@ -53,4 +53,4 @@ let main () =
   print () ;
   Globals.Functions.iter show_rte_of_kf
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

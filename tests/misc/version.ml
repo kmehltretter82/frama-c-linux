@@ -17,4 +17,4 @@ let run () =
     Kernel.abort
       "could not parse Fc_config.version"
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

@@ -16,4 +16,4 @@ let main () =
   Ast.compute () ;
   List.iter dump ["f";"g";"h";"k"]
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

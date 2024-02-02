@@ -27,7 +27,7 @@ let main () =
     end else
     if not (Cg.is_computed ()) then Cg.dump ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (*
 Local Variables:

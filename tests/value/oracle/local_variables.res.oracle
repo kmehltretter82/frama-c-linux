@@ -13,7 +13,7 @@
   Called from local_variables.i:30.
 [eva] computing for function w <- u <- main.
   Called from local_variables.i:11.
-[kernel:annot:missing-spec] local_variables.i:4: Warning: 
+[kernel:annot:missing-spec] local_variables.i:24: Warning: 
   Neither code nor specification for function unkn,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function unkn <- w <- u <- main.

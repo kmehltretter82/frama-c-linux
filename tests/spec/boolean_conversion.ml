@@ -19,4 +19,4 @@ let run () =
   Visitor.visitFramacFileSameGlobals vis (Ast.get());
   Filecheck.check_ast "Test"
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

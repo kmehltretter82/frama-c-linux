@@ -31,4 +31,4 @@ let main () =
       Mdr_params.Generate.option_name s
 
 let () =
-  Db.Main.extend main
+  Boot.Main.extend main

@@ -162,4 +162,4 @@ let run () =
     ordered_kf
 
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

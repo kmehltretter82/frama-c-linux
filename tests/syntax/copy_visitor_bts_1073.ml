@@ -30,4 +30,4 @@ let run () =
   in
   File.pretty_ast ~prj ()
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

@@ -28,4 +28,4 @@ let run () =
   Visitor.visitFramacFileSameGlobals vis (Ast.get())
 ;;
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

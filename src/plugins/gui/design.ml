@@ -1885,7 +1885,7 @@ let make_splash () =
 
 let toplevel play =
   Gtk_helper.Configuration.load ();
-  ignore (Db.on_progress Gtk_helper.refresh_gui) ;
+  ignore (Async.on_progress Gtk_helper.refresh_gui) ;
   let in_idle () =
     let tid, splash_out, splash_w, reparent_console, force_s=  make_splash () in
     let error_manager =
@@ -1937,7 +1937,7 @@ let toplevel play =
   ignore (Glib.Idle.add (fun () -> in_idle (); false));
   GMain.Main.main ()
 
-let () = Db.Toplevel.run := toplevel
+let () = Boot.set_toplevel toplevel
 
 (*
 Local Variables:

@@ -60,7 +60,7 @@ class printer (text : Wtext.text) =
                  text#printf "@{<bf>Prover@} %a: @{<green>%a@}.@\n"
                    VCS.pp_prover prv VCS.pp_result res
                else
-                 text#printf "@{<bf>Prover@} %a: @{<green>%a@}.@\n"
+                 text#printf "@{<bf>Prover@} %a: @{<orange>%a@}.@\n"
                    VCS.pp_prover prv VCS.pp_result res
         ) (Wpo.get_results wpo)
 

@@ -53,4 +53,4 @@ let main () =
   Kernel.feedback "After replacement:@\n%t"
     (fun fmt -> File.pretty_ast ~fmt ())
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

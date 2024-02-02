@@ -79,6 +79,8 @@ end
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*)
 
+exception Top
+
 module type MakePostDomArg = sig
   val is_accessible: stmt -> bool
   (* Evaluation of an expression which is supposed to be the condition of an
@@ -118,7 +120,7 @@ struct
     let combineSuccessors = DomSet.inter
 
     let doStmt stmt =
-      Db.yield ();
+      Async.yield ();
       Postdominators_parameters.debug ~level:2 "doStmt: %d" stmt.sid;
       match stmt.skind with
       | Return _ -> Dataflow2.Done (DomSet.Value (Stmt.Hptset.singleton stmt))
@@ -155,7 +157,7 @@ struct
   end
   module PostCompute = Dataflow2.Backwards(PostComputer)
 
-  let compute_postdom kf =
+  let compute kf =
     let return =
       try Kernel_function.find_return kf
       with Kernel_function.No_Statement ->
@@ -183,9 +185,9 @@ struct
   let get_stmt_postdominators f stmt =
     let do_it () = PostDom.find stmt in
     try do_it ()
-    with Not_found -> compute_postdom f; do_it ()
+    with Not_found -> compute f; do_it ()
 
-  (** @raise Db.PostdominatorsTypes.Top when the statement postdominators
+  (** @raise Top when the statement postdominators
    * have not been computed ie neither the return statement is reachable,
    * nor the statement is in a natural loop. *)
   let stmt_postdominators f stmt =
@@ -194,73 +196,30 @@ struct
       Postdominators_parameters.debug ~level:1 "Postdom for %d are %a"
         stmt.sid Stmt.Hptset.pretty s;
       s
-    | DomSet.Top -> raise Db.PostdominatorsTypes.Top
+    | DomSet.Top -> raise Top
 
   let is_postdominator f ~opening ~closing =
     let open_postdominators = get_stmt_postdominators f opening in
     DomSet.mem closing open_postdominators
 
-  let display_postdom () =
+  let display () =
     let disp_all fmt =
       PostDom.iter
         (fun k v -> Format.fprintf fmt "Stmt:%d -> @[%a@]\n"
             k.sid PostComputer.pretty v)
     in Postdominators_parameters.result "%t" disp_all
 
-  let print_dot_postdom basename kf =
-    let filename = basename ^ "." ^ Kernel_function.get_name kf ^ ".dot" in
-    Print.build_dot filename kf;
-    Postdominators_parameters.result "dot file generated in %s" filename
-
 end
 
-module PostDomDb(X: MakePostDomArg)(DbPostDom: Db.PostdominatorsTypes.Sig) =
-struct
-  include MakePostDom(X)
-
-  let () = DbPostDom.compute := compute_postdom
-  let () = DbPostDom.is_postdominator := is_postdominator
-  let () = DbPostDom.stmt_postdominators := stmt_postdominators
-  let () = DbPostDom.display := display_postdom
-  let () = DbPostDom.print_dot := print_dot_postdom
-
+module PostDomArg = struct
+  let is_accessible _ = true
+  let dependencies = []
+  let name = "basic"
+  let eval_cond _ _ = true, true
 end
 
-module PostDomBasic =
-  PostDomDb(
-  struct
-    let is_accessible _ = true
-    let dependencies = []
-    let name = "basic"
-    let eval_cond _ _ = true, true
-  end)
-    (Db.Postdominators)
-
-
-let output () =
-  let dot_postdom = Postdominators_parameters.DotPostdomBasename.get () in
-  if dot_postdom <> "" then (
-    Ast.compute ();
-    Globals.Functions.iter (fun kf ->
-        if Kernel_function.is_definition kf then
-          !Db.Postdominators.print_dot dot_postdom kf)
-  )
-
-let output, _ = State_builder.apply_once "Postdominators.Compute.output"
-    [PostDomBasic.PostDom.self] output
-
-let () = Db.Main.extend output
-
-
-include
-  PostDomDb
-    (struct
-      let is_accessible = Eva.Results.is_reachable
-      let dependencies = [ Eva.Analysis.self ]
-      let name = "value"
-      let eval_cond stmt _e = Eva.Results.condition_truth_value stmt
-    end)
-    (Db.PostdominatorsValue)
+include MakePostDom (PostDomArg)
+let self = PostDom.self
 
 (*
 Local Variables:

@@ -272,23 +272,29 @@ struct
     mutable target : domain ;
   }
 
+  let collect_term env t =
+    let dp = Value.domain env.usage t in
+    if not (Domain.separated dp env.target)
+    then env.target <- Domain.join dp env.target
+
+  let collect_probe env t =
+    let dp = Value.domain env.usage t in
+    env.target <- Domain.join dp env.target
+
   let rec collect_hyp env p =
     match F.p_expr p with
     | And ps | Or ps -> List.iter (collect_hyp env) ps
     | Imply(hs,p) ->
       List.iter (collect_hyp env) hs ;
       collect_hyp env p
-    | _ ->
-      let dp = Value.domain env.usage (F.e_prop p) in
-      if not (Domain.separated dp env.target)
-      then
-        ( env.target <- Domain.join dp env.target )
+    | _ -> collect_term env (F.e_prop p)
 
   let rec collect_seq env s = Conditions.iter (collect_step env) s
   and collect_step env s =
     let open Conditions in
     match s.condition with
     | Type _ | State _ -> ()
+    | Probe(_,t) -> collect_probe env t
     | Core p | Have p | When p | Init p -> collect_hyp env p
     | Either cs -> List.iter (collect_seq env) cs
     | Branch(p,a,b) ->

@@ -621,7 +621,7 @@ let compute_func_aux stack call_site kf init_state =
           let source =
             match call_site with
             | Kglobal -> None
-            | Kstmt _ -> Some (fst (Cil_datatype.Kinstr.loc call_site))
+            | Kstmt stmt -> Some (fst (Cil_datatype.Stmt.loc stmt))
           in
           Aorai_option.warning ?source
             "Call to %a does not follow automaton's specification. \

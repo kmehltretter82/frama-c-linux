@@ -24,7 +24,6 @@
   (name frama_c_boot)
   (public_name frama-c.boot)
   (modules boot)
-  (flags :standard -open Frama_c_kernel)
   (libraries frama_c_kernel)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))

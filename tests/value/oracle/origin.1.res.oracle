@@ -52,7 +52,7 @@
    .t[0] ∈ {{ &y }}
    .t[1] ∈ {0}
   S_gpp[0..1] ∈ [--..--]
-[kernel:annot:missing-spec] origin.i:7: Warning: 
+[kernel:annot:missing-spec] origin.i:124: Warning: 
   Neither code nor specification for function f,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- origin.

@@ -45,4 +45,4 @@ let collect_headers () =
     ) all_headers
 
 let () =
-  Db.Main.extend collect_headers
+  Boot.Main.extend collect_headers

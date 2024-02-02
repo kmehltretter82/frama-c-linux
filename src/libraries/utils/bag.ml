@@ -97,6 +97,37 @@ let rec iter f = function
   | List xs -> List.iter f xs
   | Concat(a,b) -> iter f a ; iter f b
 
+let find (type a) f xs =
+  let exception Found of a in
+  try
+    iter (fun x -> if f x then raise (Found x)) xs ;
+    raise Not_found
+  with Found x -> x
+
+let find_opt (type a) f xs =
+  let exception Found of a in
+  try
+    iter (fun x -> if f x then raise (Found x)) xs ;
+    None
+  with Found x -> Some x
+
+let find_map (type b) f xs =
+  let exception Found of b in
+  try
+    iter (fun x -> match f x with Some y -> raise (Found y) | None -> ()) xs ;
+    None
+  with Found x -> Some x
+
+let exists f xs =
+  let exception Found in
+  try iter (fun x -> if f x then raise Found) xs ; false
+  with Found -> true
+
+let for_all f xs =
+  let exception Found in
+  try iter (fun x -> if not @@ f x then raise Found) xs ; true
+  with Found -> false
+
 let rec fold_left f w = function
   | Empty -> w
   | Elt x -> f w x

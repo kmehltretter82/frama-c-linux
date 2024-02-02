@@ -7,4 +7,4 @@ let main _ =
   test_select_data "main" "x";
   test_select_data "main" "y";
   test_select_data "main" "z"
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

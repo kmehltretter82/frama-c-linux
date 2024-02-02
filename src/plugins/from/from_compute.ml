@@ -323,7 +323,7 @@ struct
                        ~exact access state.deps_table loc deps }
 
     let transfer_call stmt dest f args _loc state =
-      Db.yield ();
+      Async.yield ();
       let request = To_Use.stmt_request stmt in
       let called_vinfos = Eva.Results.(eval_callee f request |> default []) in
       let f_deps = Eva.Results.expr_deps f request in
@@ -424,7 +424,7 @@ struct
       result
 
     let transfer_instr stmt (i: instr) (state: t) =
-      Db.yield ();
+      Async.yield ();
       match i with
       | Set (lv, exp, _) ->
         let comp_vars = find stmt state.deps_table exp in
@@ -485,7 +485,7 @@ struct
       let map' =
         ZoneStmtMap.fold
           (fun k _v acc_map ->
-             if !Db.Postdominators.is_postdominator kf ~opening:k ~closing:s
+             if Postdominators.is_postdominator kf ~opening:k ~closing:s
              then ZoneStmtMap.remove k acc_map
              else acc_map
           ) map map
@@ -643,7 +643,7 @@ struct
             s := !s^" <-"^(Format.asprintf "%a" Kernel_function.pretty kf))
          call_stack;
        !s);
-    Db.yield ();
+    Async.yield ();
     let result =
       if Eva.Analysis.use_spec_instead_of_definition kf
       then compute_using_prototype kf
@@ -652,7 +652,7 @@ struct
     let result = To_Use.cleanup_and_save kf result in
     From_parameters.feedback
       "Done for function %a" Kernel_function.pretty kf;
-    Db.yield ();
+    Async.yield ();
     CurrentLoc.set call_site_loc;
     result
 

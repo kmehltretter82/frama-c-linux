@@ -54,6 +54,7 @@ let render_prover_result p =
   let icon_of_verdict ~smoke = function
     | NoResult -> icn_none
     | Valid    -> if smoke then icn_invalid else icn_valid
+    | Invalid  -> if smoke then icn_valid else icn_invalid
     | Unknown  -> if smoke then icn_valid else icn_unknown
     | Timeout | Stepout -> if smoke then icn_valid else icn_cut
     | Failed   -> icn_failed

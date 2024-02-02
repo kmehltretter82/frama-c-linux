@@ -47,7 +47,7 @@ type stats = {
   noresult : int ; (** number of no-result sub-goals *)
   failed : int ; (** number of failed sub-goals *)
   cached : int ; (** number of cached prover results *)
-  cachemiss : int ; (** number of non-cached prover results *)
+  cacheable : int ; (** number of prover results that can be cached *)
 }
 
 val pp_pstats : Format.formatter -> pstats -> unit

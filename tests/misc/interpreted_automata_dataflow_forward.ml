@@ -120,4 +120,4 @@ let run () =
       ConstantsDomain.pretty result
 
 let () =
-  Db.Main.extend run
+  Boot.Main.extend run

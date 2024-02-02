@@ -488,7 +488,7 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
                        env
                        kf
                        (Some ty)
-                       Typed_number.C_number
+                       Analyses_types.C_number
                        (Some targ)
                        earg
                    with Typing.Not_a_number ->

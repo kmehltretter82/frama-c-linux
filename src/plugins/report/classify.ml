@@ -574,7 +574,7 @@ let main () =
 let () =
   begin
     Cmdline.run_after_configuring_stage register ;
-    Db.Main.extend main ;
+    Boot.Main.extend main ;
   end
 
 (* -------------------------------------------------------------------------- *)

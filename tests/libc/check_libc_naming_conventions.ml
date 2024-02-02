@@ -46,7 +46,7 @@ let check_separated =
 let run_once = ref false
 
 let () =
-  Db.Main.extend (fun () ->
+  Boot.Main.extend (fun () ->
       if not !run_once then begin
         run_once := true;
         Globals.Functions.fold (fun kf () ->

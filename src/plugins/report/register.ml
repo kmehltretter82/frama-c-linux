@@ -47,7 +47,7 @@ let print, _ =
 let main () = if Report_parameters.Print.get () then print ()
 
 let () =
-  Db.Main.extend main;
+  Boot.Main.extend main;
 
 (*
 Local Variables:

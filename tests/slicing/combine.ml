@@ -66,4 +66,4 @@ let main _ =
   Format.printf "After Sparecode :@.";
   File.pretty_ast ~prj:proj4 ();;
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

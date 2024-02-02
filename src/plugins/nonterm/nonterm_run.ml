@@ -348,4 +348,4 @@ let main () =
   if Enabled.get () then run_once ()
 
 let () =
-  Db.Main.extend main
+  Boot.Main.extend main

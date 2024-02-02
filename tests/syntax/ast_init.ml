@@ -17,4 +17,4 @@ let run () =
   Ast.compute ();
   File.pretty_ast ()
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

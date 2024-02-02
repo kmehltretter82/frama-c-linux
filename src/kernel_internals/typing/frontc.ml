@@ -41,10 +41,6 @@
 (*                          et Automatique).                                *)
 (****************************************************************************)
 
-(* Signal that we are in MS VC mode *) (* BY: never called *)
-let setMSVCMode () =
-  Cprint.msvcMode := true
-
 let parse_to_cabs (path : Datatype.Filepath.t) =
   try
     Kernel.feedback ~level:2 "Parsing %a" Datatype.Filepath.pretty path;

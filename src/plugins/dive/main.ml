@@ -66,4 +66,4 @@ let main () =
   end
 
 let () =
-  Db.Main.extend main
+  Boot.Main.extend main

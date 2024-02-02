@@ -13,4 +13,4 @@ let run () =
     (if Kernel.Unicode.get () = Project.on proj Kernel.Unicode.get () then
        "" else "not ")
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

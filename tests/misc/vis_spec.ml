@@ -48,4 +48,4 @@ let startup () =
   Project.set_current prj;
 ;;
 
-let () = Db.Main.extend startup
+let () = Boot.Main.extend startup

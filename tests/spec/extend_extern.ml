@@ -33,4 +33,4 @@ let () = Kernel.TypeCheck.set false
 
 let () = Kernel.Debug.set 1
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

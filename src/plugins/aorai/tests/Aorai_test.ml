@@ -50,7 +50,6 @@ let is_suffix suf str =
 
 let extend () =
   let myrun =
-    let run = !Db.Toplevel.run in
     fun f ->
       let my_project = Project.create "Reparsing" in
       let wp_compute_kf kf =
@@ -71,7 +70,7 @@ let extend () =
         then
           wp_compute_kf kf
       in
-      run f;
+      f ();
       let tmpdir = Filename.get_temp_dir_name () in
       let tmpdir =
         match Filename.chop_suffix_opt ~suffix:"/" tmpdir with
@@ -133,6 +132,6 @@ let extend () =
       end;
       ok:=true (* no error, we can erase the file *)
   in
-  Db.Toplevel.run := myrun
+  Boot.set_toplevel myrun
 
 let () = extend ()
