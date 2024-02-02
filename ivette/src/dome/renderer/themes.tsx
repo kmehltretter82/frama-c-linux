@@ -34,7 +34,7 @@
 import * as Settings from 'dome/data/settings';
 import { State } from 'dome/data/states';
 import * as Dome from 'dome';
-const { ipcRenderer } = require('electron/renderer')
+const { ipcRenderer } = require('electron/renderer');
 /* -------------------------------------------------------------------------- */
 /* --- Global Settings                                                    --- */
 /* -------------------------------------------------------------------------- */

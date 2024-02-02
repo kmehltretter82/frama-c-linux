@@ -21,16 +21,15 @@
 /* ************************************************************************ */
 
 /**
-   @packageDocumentation
-   @module dome/system
+  @packageDocumentation
+  @module dome/system
 */
 
 /* eslint-disable max-len */
-
+/* eslint-disable @typescript-eslint/no-var-requires */
 // --------------------------------------------------------------------------
 // --- Evolved Spawn Process
 // --------------------------------------------------------------------------
-
 import _ from 'lodash';
 const Emitter = require('events');
 const Exec = require('child_process');

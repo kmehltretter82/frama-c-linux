@@ -25,11 +25,12 @@
 // --------------------------------------------------------------------------
 
 /**
-   Manage the current Frama-C server/client interface
-   @packageDocumentation
-   @module frama-c/server
+ Manage the current Frama-C server/client interface
+ @packageDocumentation
+ @module frama-c/server
 */
 
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { debounce } from 'lodash';
 const Path = require('path');
 import React from 'react';

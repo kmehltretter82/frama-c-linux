@@ -47,7 +47,7 @@ import ReactDOM from 'react-dom';
 import SYS, * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
-const { ipcRenderer } = require('electron/renderer')
+const { ipcRenderer } = require('electron/renderer');
 import './dark.css';
 import './light.css';
 import './style.css';

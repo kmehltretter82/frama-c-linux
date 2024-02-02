@@ -37,7 +37,7 @@
    @module dome(main)
 */
 
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/misc/devtools';
+import _installExtension, { _REACT_DEVELOPER_TOOLS } from 'dome/misc/devtools';
 import SYS, * as System from 'dome/system';
 import { is } from "@electron-toolkit/utils";
 import {
@@ -556,7 +556,7 @@ ipcMain.on('dome.ipc.closing.done', (_event, wid:number) => {
 
 interface Cmd { wdir: string; argv: string[] }
 
-//[LC]: this is buggy, process.argv has no command line arguments
+// [LC]: this is buggy, process.argv has no command line arguments
 function stripElectronArgv(cmd: Cmd): Cmd {
   console.log(cmd);
   const wdir = DEVEL ? cmd.argv[2] : cmd.wdir;
@@ -571,7 +571,7 @@ function createPrimaryWindow(): void {
   Menubar.install();
 
   // React Developper Tools
-  //if (DEVEL)
+  // if (DEVEL)
   //  installExtension(REACT_DEVELOPER_TOOLS, true).catch((err: any) => {
   //    console.error('[Dome] Enable to install React dev-tools', err);
   //  });
