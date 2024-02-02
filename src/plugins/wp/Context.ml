@@ -25,13 +25,9 @@
 (* -------------------------------------------------------------------------- *)
 
 let with_current_loc loc phi x =
-  let tmp = Cil_const.CurrentLoc.get () in
-  try
-    Cil_const.CurrentLoc.set loc ;
-    let y = phi x in
-    Cil_const.CurrentLoc.set tmp ; y
-  with error ->
-    Cil_const.CurrentLoc.set tmp ; raise error
+  let open Cil_const.CurrentLoc.Operators in
+  let<> CurrentLocUpdated = loc in
+  phi x
 
 (* -------------------------------------------------------------------------- *)
 (* --- Local Context                                                      --- *)
