@@ -635,7 +635,8 @@ let process_pragmas_pack_align_comp_attributes loc ci cattrs =
      the minimum of both is taken into account (note that, in GCC, if a field
      has 2 alignment directives, it is the maximum of those that is taken). *)
 let process_pragmas_pack_align_field_attributes fi fattrs cattr =
-  Cil.CurrentLoc.set fi.floc;
+  let open Cil_const.CurrentLoc.Operators in
+  let<> UpdatedCurrentLoc = fi.floc in
   match !current_packing_pragma, align_pragma_for_struct fi.forig_name with
   | None, None -> check_aligned fattrs
   | Some n, apragma ->
@@ -2430,7 +2431,7 @@ class gatherLabelsClass : Cabsvisit.cabsVisitor = object (self)
 
   method! vstmt s =
     let open Cil_const.CurrentLoc.Operators in
-    let* CurrentLocUpdated = get_statementloc s in
+    let<> CurrentLocUpdated = get_statementloc s in
     (match s.stmt_node with
      | LABEL (lbl,_,_) ->
        (try
@@ -2955,7 +2956,8 @@ let rec setOneInit this o preinit =
       match o with
       | NoOffset -> assert false
       | Index({enode = Const(CInt64(i,_,_));eloc}, off) ->
-        CurrentLoc.set eloc;
+        let open Cil_const.CurrentLoc.Operators in
+        let<> UpdatedCurrentLoc = eloc in
         to_integer i, off
       | Field (f, off) ->
         (* Find the index of the field *)
@@ -5410,7 +5412,7 @@ and doExp local_env
   let ghost = local_env.is_ghost in
   let loc = e.expr_loc in
   (* will be reset at the end of the compilation of current expression. *)
-  let* CurrentLocUpdated = loc in
+  let<> CurrentLocUpdated = loc in
   let checkVoidLval e t =
     if (match e.enode with Lval _ -> true | _ -> false) && isVoidType t then
       abort_context "lvalue of type void: %a@\n" Cil_printer.pp_exp e
@@ -8605,7 +8607,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
               | None -> empty_funspec (), Cil_const.CurrentLoc.get ()
               | Some (spec,loc) ->
                 begin
-                  let* CurrentLocUpdated = loc in
+                  let<> CurrentLocUpdated = loc in
                   let loc = Cil_const.CurrentLoc.get () in
                   let res =
                     try
@@ -8632,7 +8634,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
           (match logic_spec with
            | None -> ()
            | Some (spec,loc) ->
-             let* CurrentLocUpdated = loc in
+             let<> CurrentLocUpdated = loc in
              let merge_spec = function
                | GFunDecl(old_spec, _, oldloc) ->
                  let behaviors =
@@ -9045,7 +9047,7 @@ and doAliasFun ghost vtype (thisname:string) (othername:string)
 (* Do one declaration *)
 and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated = get_definitionloc def in
+  let<> CurrentLocUpdated = get_definitionloc def in
   match def with
   | Cabs.DECDEF (logic_spec, (s, nl), loc) ->
     (* Do the specifiers exactly once *)
@@ -9367,7 +9369,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       begin
         match spec with
         | Some (spec,loc) ->
-          let* CurrentLocUpdated = loc in
+          let<> CurrentLocUpdated = loc in
           (try
              !currentFunctionFDEC.sspec <-
                Ltyping.funspec behaviors
@@ -9485,7 +9487,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       (* Now see whether we can fall through to the end of the function *)
       if blockFallsThrough !currentFunctionFDEC.sbody then begin
         let loc = endloc in
-        let* CurrentLocUpdated = endloc in
+        let<> CurrentLocUpdated = endloc in
         let protect_return,retval =
           (* Guard the [return] instructions we add with an
              [\assert \false]*)
@@ -9563,7 +9565,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       List.iter
         (fun decl  ->
            let loc = convLoc decl.Logic_ptree.decl_loc in
-           let* CurrentLocUpdated = loc in
+           let<> CurrentLocUpdated = loc in
            try
              let tdecl = Ltyping.annot decl in
              let attr = fc_stdlib_attribute [] in
@@ -9851,7 +9853,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
   in
   let ghost = s.stmt_ghost in
   let local_env = { local_env with is_ghost = ghost } in
-  let* CurrentLocUpdated = convLoc (get_statementloc s) in
+  let<> CurrentLocUpdated = convLoc (get_statementloc s) in
   match s.stmt_node with
   | Cabs.NOP loc ->
     { empty

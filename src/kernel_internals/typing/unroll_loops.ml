@@ -386,7 +386,7 @@ let copy_block kf switch_label_action break_continue_must_change bl =
         ?(break_continue_must_change = break_continue_must_change) =
       copy_block ~switch_label_action ~break_continue_must_change
     in
-    let* CurrentLocUpdated = Cil_datatype.Stmt.loc_skind stkind in
+    let<> CurrentLocUpdated = Cil_datatype.Stmt.loc_skind stkind in
     match stkind with
     | (Instr _ | Return _ | Throw _) as keep ->
       keep,labelled_stmt_tbl,calls_tbl
@@ -624,7 +624,7 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
                    goes into the remaining loop. *)
           (* TODO: transforms loop annotations into statement contracts
              inside the unrolled parts. *)
-          let* CurrentLocUpdated = loc in
+          let<> CurrentLocUpdated = loc in
           let break_lbl_stmt =
             let break_label = fresh_label () in
             let break_lbl_stmt = mkEmptyStmt () in

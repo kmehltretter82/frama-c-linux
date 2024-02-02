@@ -434,7 +434,7 @@ end = struct
     method! vcode_annot v =
       let open Cil_const.CurrentLoc.Operators in
       let loc_opt = Cil_datatype.Code_annotation.loc v in
-      let* CurrentLocUpdated = from_option loc_opt in
+      let<> CurrentLocUpdated = from_option loc_opt in
       let stmt =
         Visitor_behavior.Get_orig.stmt
           self#behavior (Option.get self#current_stmt)

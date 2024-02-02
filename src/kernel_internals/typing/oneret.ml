@@ -342,7 +342,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
       List.rev (s::acc)
 
     | ({skind=Return (retval, loc)} as s) :: rests ->
-      let* CurrentLocUpdated = loc in
+      let<> CurrentLocUpdated = loc in
     (*
       ignore (E.log "Fixing return(%a) at %a\n"
       insert

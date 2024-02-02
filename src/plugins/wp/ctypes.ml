@@ -237,7 +237,7 @@ let char c = Integer.to_int64_exn (Cil.charConstToInt c)
 
 let constant e =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated = e.eloc in
+  let<> CurrentLocUpdated = e.eloc in
   match (Cil.constFold true e).enode with
   | Const(CInt64(k,_,_)) ->
     begin

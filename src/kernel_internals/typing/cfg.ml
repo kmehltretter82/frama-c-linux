@@ -440,7 +440,7 @@ let xform_switch_block ?(keepSwitch=false) b =
       [] -> []
     | s :: rest ->
       begin
-        let* CurrentLocUpdated = Stmt.loc s in
+        let<> CurrentLocUpdated = Stmt.loc s in
         if not keepSwitch then
           s.labels <- List.map (fun lab -> match lab with
                 Label _ -> lab

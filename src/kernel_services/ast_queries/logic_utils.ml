@@ -103,7 +103,7 @@ let plain_array_to_ptr ty =
       match lo with
       | None -> []
       | Some e ->
-        let* CurrentLocUpdated = e.eloc in
+        let<> CurrentLocUpdated = e.eloc in
         try
           let len = Cil.bitsSizeOf tarr in
           let len = try len / (Cil.bitsSizeOf ty)

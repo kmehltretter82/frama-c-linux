@@ -867,7 +867,7 @@ let rec global_annot_without_irrelevant_attributes ga =
 
 let rec global_annot_pass1 g =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated =  Cil_datatype.Global_annotation.loc g in
+  let<> CurrentLocUpdated =  Cil_datatype.Global_annotation.loc g in
   match g with
   | Dvolatile(hs,rvi,wvi,_,loc) ->
     let process_term_kind (t,k as id) =
@@ -1709,7 +1709,7 @@ let oneFilePass1 (f:file) : unit =
       newrep.ndata.vdecl <- newdecl
   in
   let iter g =
-    let* CurrentLocUpdated = Cil_datatype.Global.loc g in
+    let<> CurrentLocUpdated = Cil_datatype.Global.loc g in
     match g with
     | GVarDecl (vi, l) | GVar (vi, _, l) | GFunDecl (_, vi, l)->
       incr currentDeclIdx;
@@ -2195,7 +2195,7 @@ let renameInlinesVisitor = new renameInlineVisitorClass
 
 let rec logic_annot_pass2 ~in_axiomatic g a =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated =  Cil_datatype.Global_annotation.loc a in
+  let<> CurrentLocUpdated =  Cil_datatype.Global_annotation.loc a in
   match a with
   | Dfun_or_pred (li, _) ->
     begin
@@ -2605,7 +2605,7 @@ let oneFilePass2 (f: file) =
         end
       end
     in
-    let* CurrentLocUpdated = Cil_datatype.Global.loc g in
+    let<> CurrentLocUpdated = Cil_datatype.Global.loc g in
     match g with
     | GVarDecl (vi, l) as g ->
       incr currentDeclIdx;
@@ -3090,7 +3090,7 @@ let global_merge_spec g =
       ignore (visitCilFunspec alpha spec)
     with Not_found -> ()
   in
-  let* CurrentLocUpdated = Cil_datatype.Global.loc g in
+  let<> CurrentLocUpdated = Cil_datatype.Global.loc g in
   match g with
   | GFun(fdec, _) ->
     Kernel.debug ~dkey:Kernel.dkey_linker

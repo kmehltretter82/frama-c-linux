@@ -58,7 +58,7 @@ module CurrentLoc = struct
     let from_option opt =
       Option.value ~default:(get ()) opt
 
-    let ( let* ) loc f =
+    let ( let<> ) loc f =
       let oldLoc = get () in
       let finally () = set oldLoc in
       let work () = set loc; f CurrentLocUpdated in

@@ -4101,7 +4101,7 @@ struct
   let rec annot in_axiomatic a =
     let open Cil_const.CurrentLoc.Operators in
     let loc = a.decl_loc in
-    let* CurrentLocUpdated = loc in
+    let<> CurrentLocUpdated = loc in
     match a.decl_node with
     | LDlogic_reads (f, labels, poly, t, p, l) ->
       let env,info = logic_decl loc f labels poly ~return_type:t p in

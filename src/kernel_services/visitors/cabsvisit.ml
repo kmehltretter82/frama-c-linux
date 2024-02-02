@@ -84,13 +84,13 @@ class nopCabsVisitor : cabsVisitor = object
   method vinitexpr (_e:init_expression) = DoChildren
   method vstmt (s: statement) =
     let open Cil_const.CurrentLoc.Operators in
-    let* CurrentLocUpdated = get_statementloc s in
+    let<> CurrentLocUpdated = get_statementloc s in
     DoChildren
   method vblock (_b: block) = DoChildren
   method vvar (s: string) = s
   method vdef (d: definition) =
     let open Cil_const.CurrentLoc.Operators in
-    let* CurrentLocUpdated = get_definitionloc d in
+    let<> CurrentLocUpdated = get_definitionloc d in
     DoChildren
   method vtypespec (_ts: typeSpecifier) = DoChildren
   method vdecltype (_dt: decl_type) = DoChildren

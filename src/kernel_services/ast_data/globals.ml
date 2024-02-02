@@ -255,7 +255,7 @@ module Functions = struct
     let loc =
       match fundec with Definition (_,loc) | Declaration (_,_,_,loc) -> loc
     in
-    let* CurrentLocUpdated = loc in
+    let<> CurrentLocUpdated = loc in
     Logic_utils.merge_funspec ~oldloc kf.spec spec
 
   let replace_by_declaration s v l=

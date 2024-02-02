@@ -355,7 +355,7 @@ and print_expression_level (lvl: int) fmt (exp : expression) =
   let (txt, lvl') = get_operator exp in
   let print_expression fmt exp = print_expression_level lvl' fmt exp in
   let print_exp fmt e =
-    let* CurrentLocUpdated = e.expr_loc in
+    let<> CurrentLocUpdated = e.expr_loc in
     match e.expr_node with
       NOTHING -> ()
     | PAREN exp -> print_expression fmt exp
@@ -427,7 +427,7 @@ and print_for_init fmt fc =
 and print_statement fmt stat =
   let open Cil_const.CurrentLoc.Operators in
   let loc = Cabshelper.get_statementloc stat in
-  let* CurrentLocUpdated = loc in
+  let<> CurrentLocUpdated = loc in
   if Kernel.debug_atleast 2 then
     fprintf fmt "@\n/* %a */@\n" Cil_printer.pp_location loc;
   match stat.stmt_node with
@@ -583,7 +583,7 @@ and print_defs fmt defs =
 
 and print_def fmt def =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated = Cabshelper.get_definitionloc def in
+  let<> CurrentLocUpdated = Cabshelper.get_definitionloc def in
   match def with
     FUNDEF (spec, proto, body, loc, _) ->
     if !printCounters then begin

@@ -963,7 +963,7 @@ let filter_init_state restrict initial map acc =
 
 let backward_analysis_aux stack kf ret_state =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated = Kernel_function.get_location kf in
+  let<> CurrentLocUpdated = Kernel_function.get_location kf in
   if Data_for_aorai.isIgnoredFunction kf then
     Aorai_option.fatal
       "Call backward analysis on ignored function %a" Kernel_function.pretty kf

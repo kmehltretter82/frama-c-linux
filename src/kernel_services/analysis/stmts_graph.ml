@@ -268,7 +268,7 @@ let rec get_block_stmts blk =
 
 and get_stmt_stmts s =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated = Cil_datatype.Stmt.loc s in
+  let<> CurrentLocUpdated = Cil_datatype.Stmt.loc s in
   let compute_stmt_stmts s = match s.skind with
     | Instr _ | Return _ | Throw _ -> Stmt.Set.singleton s
     | Continue _ | Break _ | Goto _ -> Stmt.Set.singleton s

@@ -1422,7 +1422,7 @@ let copy_logic_label is_copy l =
 
 let rec visitCilTerm vis t =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated = t.term_loc in
+  let<> CurrentLocUpdated = t.term_loc in
   doVisitCil vis (fun x-> x) vis#vterm childrenTerm t
 
 and childrenTerm vis t =
@@ -2076,7 +2076,7 @@ and childrenModelInfo vis m =
 
 and visitCilModelInfo vis m =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated = m.mi_decl in
+  let<> CurrentLocUpdated = m.mi_decl in
   let m' =
     doVisitCil
       vis (Visitor_behavior.Memo.model_info vis#behavior) vis#vmodel_info childrenModelInfo m
@@ -2090,7 +2090,7 @@ and visitCilModelInfo vis m =
 
 and visitCilAnnotation vis a =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated = Global_annotation.loc a in
+  let<> CurrentLocUpdated = Global_annotation.loc a in
   doVisitCil vis id vis#vannotation childrenAnnotation a
 
 and childrenAnnotation vis a =
@@ -2203,7 +2203,7 @@ and childrenCodeAnnot vis ca =
 
 and visitCilExpr (vis: cilVisitor) (e: exp) : exp =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated = e.eloc in
+  let<> CurrentLocUpdated = e.eloc in
   doVisitCil vis (Visitor_behavior.cexpr vis#behavior) vis#vexpr childrenExp e
 
 and childrenExp (vis: cilVisitor) (e: exp) : exp =
@@ -2336,7 +2336,7 @@ and childrenLocal_init vi (vis: cilVisitor) li =
 
 and visitCilInstr (vis: cilVisitor) (i: instr) : instr list =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated = Cil_datatype.Instr.loc i in
+  let<> CurrentLocUpdated = Cil_datatype.Instr.loc i in
   doVisitListCil vis id vis#vinst childrenInstr i
 
 and childrenInstr (vis: cilVisitor) (i: instr) : instr =
@@ -2401,7 +2401,7 @@ and childrenInstr (vis: cilVisitor) (i: instr) : instr =
 (* visit all nodes in a Cil statement tree in preorder *)
 and visitCilStmt (vis:cilVisitor) (s: stmt) : stmt =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated = Cil_datatype.Stmt.loc s in
+  let<> CurrentLocUpdated = Cil_datatype.Stmt.loc s in
   vis#push_stmt s; (*(vis#behavior.memo_stmt s);*)
   assertEmptyQueue vis;
   let toPrepend : instr list ref = ref [] in (* childrenStmt may add to this *)
@@ -2654,7 +2654,7 @@ and childrenType (vis : cilVisitor) (t : typ) : typ =
 (* we just visit the varinfo node *)
 and visitCilVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated = v.vdecl in
+  let<> CurrentLocUpdated = v.vdecl in
   doVisitCil vis (Visitor_behavior.Memo.varinfo vis#behavior)
     vis#vvdec childrenVarDecl v
 
@@ -2860,7 +2860,7 @@ let visitCilEnumInfo vis e =
 
 let rec visitCilGlobal (vis: cilVisitor) (g: global) : global list =
   let open Cil_const.CurrentLoc.Operators in
-  let* CurrentLocUpdated = Global.loc g in
+  let<> CurrentLocUpdated = Global.loc g in
   doVisitListCil vis id vis#vglob childrenGlobal g
 and childrenGlobal (vis: cilVisitor) (g: global) : global =
   match g with
@@ -4964,7 +4964,7 @@ let compareConstant c1 c2 =
 let iterGlobals (fl: file) (doone: global -> unit) : unit =
   let open Cil_const.CurrentLoc.Operators in
   let doone' g =
-    let* CurrentLocUpdated = Global.loc g in
+    let<> CurrentLocUpdated = Global.loc g in
     doone g
   in
   List.iter doone' fl.globals;
@@ -4976,7 +4976,7 @@ let iterGlobals (fl: file) (doone: global -> unit) : unit =
 let foldGlobals (fl: file) (doone: 'a -> global -> 'a) (acc: 'a) : 'a =
   let open Cil_const.CurrentLoc.Operators in
   let doone' acc g =
-    let* CurrentLocUpdated = Global.loc g in
+    let<> CurrentLocUpdated = Global.loc g in
     doone acc g
   in
   let acc' = List.fold_left doone' acc fl.globals in

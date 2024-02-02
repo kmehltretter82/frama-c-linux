@@ -333,7 +333,7 @@ module Forwards(T : ForwardsTransfer) = struct
   (** Process a statement *)
   let processStmt worklist (s: stmt) : unit =
     let open Cil_const.CurrentLoc.Operators in
-    let* CurrentLocUpdated = Cil_datatype.Stmt.loc s in
+    let<> CurrentLocUpdated = Cil_datatype.Stmt.loc s in
     if T.debug then
       Kernel.debug "FF(%s).stmt %d at %t@\n" T.name s.sid Cil.pp_thisloc;
 
@@ -359,7 +359,7 @@ module Forwards(T : ForwardsTransfer) = struct
 
         match s.skind with
         | Instr i ->
-          let* CurrentLocUpdated = Cil_datatype.Instr.loc i in
+          let<> CurrentLocUpdated = Cil_datatype.Instr.loc i in
           let after = T.doInstr s i curr in
           do_succs after
 
@@ -582,7 +582,7 @@ struct
 
 
     (* Find the state before the branch *)
-    let* CurrentLocUpdated = Cil_datatype.Stmt.loc s in
+    let<> CurrentLocUpdated = Cil_datatype.Stmt.loc s in
     let d: T.t =
       match T.doStmt s with
         Done d -> d
@@ -606,7 +606,7 @@ struct
             match s.skind with
             | Instr i ->
               begin
-                let* CurrentLocUpdated = Cil_datatype.Instr.loc i in
+                let<> CurrentLocUpdated = Cil_datatype.Instr.loc i in
                 let action = T.doInstr s i res in
                 match action with
                 | Done s' -> s'
