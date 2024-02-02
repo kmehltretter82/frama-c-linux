@@ -77,12 +77,6 @@ module Make (Field : Field.S) = struct
 
 
 
-  let memoized_powers m =
-    let cache = Datatype.Int.Hashtbl.create 17 in
-    let find i = Datatype.Int.Hashtbl.find cache i in
-    let save i v = Datatype.Int.Hashtbl.add cache i v ; v in
-    fun i -> try find i with Not_found -> save i (Matrix.power m i)
-
   let check_convergence matrix =
     let norm = Matrix.norm matrix in
     if Field.(norm < one) then Some norm else None
@@ -90,18 +84,18 @@ module Make (Field : Field.S) = struct
   type ('n, 'm) compute = ('n, 'm) filter -> int -> 'n invariant option
   let invariant : type n m. (n, m) compute = fun (Filter f) e ->
     let open Option.Operators in
+    let state = Matrix.power f.state in
     let measure = Vector.norm f.measure in
-    let powers = memoized_powers f.state in
     let order, _ = Matrix.dimensions f.input in
     let base i = Vector.base i order |> Matrix.transpose in
     let* StrictlyPositive exponent = Nat.of_strictly_positive_int e in
-    let+ spectral = powers (Nat.to_int exponent) |> check_convergence in
+    let+ spectral = state (Nat.to_int exponent) |> check_convergence in
     (* Computation of the inputs contribution for the i-th state dimension *)
-    let input base e = Matrix.(base * powers e * f.input |> norm) in
+    let input base e = Matrix.(base * state e * f.input |> norm) in
     let add_input base e res = Field.(res + input base (Finite.to_int e)) in
     let input i = Finite.for_each (base i |> add_input) exponent Field.zero in
     (* Computation of the center contribution for the i-th state dimension *)
-    let center e = Matrix.(powers e * f.center) in
+    let center e = Matrix.(state e * f.center) in
     let add_center e res = Matrix.(res + center (Finite.to_int e)) in
     let center = Finite.for_each add_center exponent (Vector.zero order) in
     let center i = Matrix.(base i * center |> norm) in
@@ -112,12 +106,4 @@ module Make (Field : Field.S) = struct
     let upper i inv = set_upper i (bound Field.one i) inv in
     Finite.(invariant order |> for_each lower order |> for_each upper order)
 
-  (* - Powers : k * n^3
-     - Input i : n x n mul + n x m mul + norm
-        -> n^2 + nm + 1 because of projection
-     - Center i : n x n mul + k * n x n add + n x n mul + norm
-        -> n^2 + kn^2 + n^2 + 1 because of projection
-     - Dimension i : O(kn^2 + nm)
-     Total : O(kn^3 + mn^2)
-   *)
 end

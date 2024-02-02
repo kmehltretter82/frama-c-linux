@@ -52,7 +52,8 @@ module Space (Field : Field.S) : sig
     val dimensions : ('m, 'n) matrix -> 'm nat * 'n nat
     val ( + ) : ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
     val ( * ) : ('n, 'm) matrix -> ('m, 'p) matrix -> ('n, 'p) matrix
-    val power : ('n, 'n) matrix -> int -> ('n, 'n) matrix
+    (* Memoized, instantiate first on a matrix and then use it *)
+    val power : ('n, 'n) matrix -> (int -> ('n, 'n) matrix)
   end
 
 end

@@ -147,25 +147,19 @@ module Space (Field : Field.S) = struct
       let max i res = Field.max res (row i (M m) |> sum) in
       Finite.for_each max m.rows Field.zero
 
-    let rec fast_power target steps matrix exponent =
-      let steps' = (matrix, exponent) :: steps in
-      let exponent' = Stdlib.(exponent * 2) in
-      if exponent' > target then if exponent <= target then steps' else steps
-      else fast_power target steps' (matrix * matrix) exponent'
-
-    let rec refine target = function
-      | [] -> assert false
-      | [ (matrix, _) ] -> matrix
-      | (matrix, exponent) :: (matrix', exponent') :: previous ->
-        let exponent'' = Stdlib.(exponent + exponent') in
-        if exponent'' > target
-        then refine target ((matrix, exponent) :: previous)
-        else refine target (((matrix * matrix'), exponent'') :: previous)
-
-    let power (type n) (M matrix : (n, n) matrix) exponent : (n, n) matrix =
-      if exponent < 0 then raise (Invalid_argument "negative exponent")
-      else if Stdlib.(exponent = 0) then id matrix.rows
-      else fast_power exponent [] (M matrix) 1 |> refine exponent
+    let power (type n) (M m : (n, n) matrix) : int -> (n, n) matrix =
+      let n = dimensions (M m) |> fst in
+      let cache = Datatype.Int.Hashtbl.create 17 in
+      let find i = Datatype.Int.Hashtbl.find_opt cache i in
+      let save i v = Datatype.Int.Hashtbl.add cache i v ; v in
+      let rec pow e =
+        if e < 0 then raise (Invalid_argument "negative exponent") ;
+        match find e with
+        | Some r -> r
+        | None when Stdlib.(e = 0) -> id n
+        | None when Stdlib.(e = 1) -> M m
+        | None -> let h = pow (e / 2) in save e (pow (e mod 2) * h * h)
+      in pow
 
   end
 
