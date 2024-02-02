@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
-
 module Rational = struct
 
   type scalar = Q.t
@@ -80,6 +78,10 @@ let pretty_invariant order fmt = function
 
 
 
+(* Invariant computation for the filter:
+     X = 0.68 * X - 0.68 * Y + E1;
+     Y = 0.68 * X + 0.68 * Y + E2;
+   with E1 ∈ [-1 .. 1] and E2 ∈ [-1 .. 1]. *)
 module Circle = struct
 
   let order = Nat.(succ one)
@@ -106,6 +108,10 @@ end
 
 
 
+(* Invariant computation for the filter:
+     X = 1.5 * X - 0.7 * Y + E + 1;
+     Y = X + 1;
+   with E ∈ [-0.1 .. 0.1]. *)
 module Simple = struct
 
   let order = Nat.(succ one)

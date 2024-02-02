@@ -20,4 +20,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Tests the Linear_filter module: invariant computation of filters. *)
 val run : unit -> unit

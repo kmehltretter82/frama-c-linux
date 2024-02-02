@@ -26,17 +26,19 @@ open Finite
 (* A filter corresponds to the recursive equation
    X[k + 1] = AX[k] + Bε[k + 1] + C where :
    - n is the filter's order and m its number of inputs ;
-   - X[k]∈ ℝ^n is the filter's state at iteration [k] ;
-   - ε[k]∈ ℝ^m is the filters's inputs at iteration [k] ;
-   - A∈ ℝ^(n×n) is the filter's state matrix ;
-   - B∈ ℝ^(n×m) is the filter's input matrix ;
-   - C∈ ℝ^n is the filter's center.
+   - X[k] ∈ ℝ^n is the filter's state at iteration [k] ;
+   - ε[k] ∈ ℝ^m is the filters's inputs at iteration [k] ;
+   - A ∈ ℝ^(n×n) is the filter's state matrix ;
+   - B ∈ ℝ^(n×m) is the filter's input matrix ;
+   - C ∈ ℝ^n is the filter's center.
 
    The goal of this module is to compute filters invariants, i.e bounds for
    each of the filter's state dimensions when the iterations goes to infinity.
    To do so, it only suppose that, at each iteration, each input εi is bounded
    by [-λi .. λi]. Each input is thus supposed centered around zero but each
-   one can have different bounds. *)
+   one can have different bounds.
+
+   {!Linear_filter_test} is an example using this module. *)
 module Make (Field : Field.S) : sig
 
   module Linear : module type of Linear.Space (Field)
@@ -71,7 +73,7 @@ module Make (Field : Field.S) : sig
      lower than one. For the filter to converge, there must exist an α such as,
      for every β greater than α, ||A^β|| < 1 with A the filter's state matrix.
      As such, the search does not have to find α, but instead any exponent such
-     as the property is satisfies. As the computed invariant will be more
+     as the property is satisfied. As the computed invariant will be more
      precise with a larger exponent, the computation always uses [k], the
      largest authorized exponent, and thus only check that indeed ||A^k|| < 1.
      If the property is not verified, the function returns None as it cannot
