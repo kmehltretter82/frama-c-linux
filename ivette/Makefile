@@ -239,7 +239,7 @@ install:
 	@cp ivette-macos.sh dist/ivette.sh
 	@echo "exec open -na $(LIBDIR)/frama-c/Ivette.app --args\\" >> dist/ivette.sh
 	@echo "  --command $(BINDIR)/frama-c\\" >> dist/ivette.sh
-	@echo "  --working \$$PWD \"\$@\"" >> dist/ivette.sh
+	@echo "  --working \$$PWD \"\$$@\"" >> dist/ivette.sh
 	@mkdir -p $(BINDIR)
 	@install dist/ivette.sh $(BINDIR)/ivette
 	@rm -fr $(IVETTE_DIST)

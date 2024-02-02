@@ -1296,8 +1296,7 @@ let editor_command pconf =
 
 let scriptfile ~force ~ext wpo =
   let dir = Wp_parameters.get_session_dir ~force "interactive" in
-  let filenoext = Filepath.Normalized.concat dir wpo.Wpo.po_sid in
-  Filepath.Normalized.concat filenoext ext
+  Filepath.Normalized.concat dir (wpo.Wpo.po_sid ^ ext)
 
 let updatescript ~script driver task =
   let backup = Filepath.Normalized.concat script ".bak" in
