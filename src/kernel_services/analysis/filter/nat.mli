@@ -20,6 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Encoding of the Peano arithmetic in OCaml type system. A value of type
+   [n nat] contains [n] at the value and the type level, allowing to express
+   properties on objects sizes and accesses for example. It is used by the
+   module Linear to represent vectors and matrices dimensions. *)
 type zero = |
 type 'n succ = |
 type 'n nat

@@ -22,6 +22,11 @@
 
 open Nat
 
+
+
+(* The type [n finite] encodes all finite sets of cardinal [n]. It is used by
+   the module Linear to represent accesses to vectors and matrices coefficients,
+   statically ensuring that no out of bounds access can be performed. *)
 type 'n finite
 
 val first : 'n succ finite
