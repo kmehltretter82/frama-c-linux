@@ -57,23 +57,12 @@ module Make (Field : Field.S) = struct
 
   type 'n invariant = ('n, zero succ succ) matrix
 
-  let invariant rows =
-    Matrix.zero rows Nat.(zero |> succ |> succ)
-
-  let lower i invariant =
-    Matrix.get i Finite.first invariant
-
-  let upper i invariant =
-    Matrix.get i Finite.(next first) invariant
-
-  let bounds i invariant =
-    (lower i invariant, upper i invariant)
-
-  let set_lower i bound invariant =
-    Matrix.set i Finite.first bound invariant
-
-  let set_upper i bound invariant =
-    Matrix.set i Finite.(next first)  bound invariant
+  let invariant rows = Matrix.zero rows Nat.(zero |> succ |> succ)
+  let lower i inv = Matrix.get i Finite.first inv
+  let upper i inv = Matrix.get i Finite.(next first) inv
+  let bounds i inv = (lower i inv, upper i inv)
+  let set_lower i bound inv = Matrix.set i Finite.first bound inv
+  let set_upper i bound inv = Matrix.set i Finite.(next first) bound inv
 
 
 
