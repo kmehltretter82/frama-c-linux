@@ -98,7 +98,7 @@ module Circle = struct
   let center = Linear.Vector.zero order
 
   let compute () =
-    let filter = Filter.create state input center measure in
+    let filter = Filter.create ~state ~input ~center ~measure in
     let invariant = Filter.invariant filter max_exponent in
     Kernel.result "@[<v>Circle :@,%a@,@]" (pretty_invariant order) invariant
 
@@ -128,7 +128,7 @@ module Simple = struct
   let center = Linear.Vector.repeat Rational.one order
 
   let compute () =
-    let filter = Filter.create state input center measure in
+    let filter = Filter.create ~state ~input ~center ~measure in
     let invariant = Filter.invariant filter max_exponent in
     Kernel.result "@[<v>Simple :@,%a@,@]" (pretty_invariant order) invariant
 
