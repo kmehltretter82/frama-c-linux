@@ -21,6 +21,7 @@
 /* ************************************************************************ */
 
 import React from "react";
+import * as Dome from 'dome';
 import * as States from 'dome/data/states';
 import * as Sidebars from 'dome/frame/sidebars';
 import { Icon } from 'dome/controls/icons';
@@ -670,16 +671,12 @@ function PanelLayoutSelector()
     "panelLayoutSelector"
   );
   const iconSize = 30;
-  const divRef = React.useRef<HTMLDivElement>(null);
-  React.useEffect(() => {
-    focusPanelLayoutSelector();
-  }, [state]);
-
   let x = 0, y = 0;
+  computePanelXY();
 
-  function focusPanelLayoutSelector(): void {
-    if(divRef.current) divRef.current.focus();
-  }
+  Dome.escaped.on(() => {
+    close();
+  });
 
   function computePanelXY(): void {
     const panelWidth = 200;
@@ -693,8 +690,6 @@ function PanelLayoutSelector()
     y = state.y - panelHeight/2 > 0 ? state.y - panelHeight/2 : 0;
     if (y + panelHeight > maxHeight) y = maxHeight - panelHeight;
   }
-
-  computePanelXY();
 
   function close(): void {
     globalPanelLayoutSelectorState.setValue(defaultPanelLayoutSelectorState);
@@ -724,13 +719,8 @@ function PanelLayoutSelector()
     close();
   }
 
-  function onEscapeKeyDown(e: React.KeyboardEvent<HTMLDivElement>): void {
-    if(e.key === "Escape") close();
-  }
-
   return (
-    <div tabIndex={-1} className={className} style={{ left: x, top: y }}
-     ref={divRef} onKeyDown={e => onEscapeKeyDown(e)}>
+    <div className={className} style={{ left: x, top: y }}>
       <table>
         <tbody>
           <tr>

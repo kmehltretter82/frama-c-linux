@@ -227,6 +227,12 @@ ipcRenderer.on('dome.ipc.reload', () => reload.emit());
 export const find = new Event('dome.find');
 ipcRenderer.on('dome.ipc.find', () => find.emit());
 
+/**
+   Dome escape event. Triggered by pressing the Escape key
+ */
+export const escaped = new Event('dome.escaped');
+ipcRenderer.on('dome.escaped', () => escaped.emit());
+
 /** Command-line arguments event handler. */
 export function onCommand(
   job: (argv: string[], workingDir: string) => void,
