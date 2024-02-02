@@ -160,20 +160,6 @@ function getQuarterComponents(quarter: string): (string | undefined)[] {
   return result;
 }
 
-function openPanelLayoutSelector(comp: Ivette.ComponentProps,
-  e: React.MouseEvent, origin: PanelOrigin): void {
-  const state = globalPanelLayoutSelectorState.getValue();
-  const display = !state.display ? true : state.compId !== comp.id;
-  globalPanelLayoutSelectorState.setValue({
-    display: display,
-    compId: display ? comp.id : "",
-    compLabel: display ? comp.label : "",
-    origin: origin,
-    x: e.clientX,
-    y: e.clientY
-  });
-}
-
 function addToDockedComponents(comp: Ivette.ComponentProps)
 : void {
   const labviewState = globalLabViewState.getValue();
@@ -659,6 +645,20 @@ interface PanelLayoutSelectorState {
   origin: PanelOrigin;
   x: number,
   y: number;
+}
+
+function openPanelLayoutSelector(comp: Ivette.ComponentProps,
+  e: React.MouseEvent, origin: PanelOrigin): void {
+  const state = globalPanelLayoutSelectorState.getValue();
+  const display = !state.display ? true : state.compId !== comp.id;
+  globalPanelLayoutSelectorState.setValue({
+    display: display,
+    compId: display ? comp.id : "",
+    compLabel: display ? comp.label : "",
+    origin: origin,
+    x: e.clientX,
+    y: e.clientY
+  });
 }
 
 function PanelLayoutSelector()
