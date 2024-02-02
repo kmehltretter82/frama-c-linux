@@ -33,22 +33,26 @@ module Space (Field : Field.S) : sig
 
   module Vector : sig
     val pretty : Format.formatter -> 'n vector -> unit
-    val size : 'n vector -> 'n nat
-    val norm : 'n vector -> scalar
-    val zero : 'n succ nat -> 'n succ vector
+    val zero   : 'n succ nat -> 'n succ vector
+    val base   : 'n succ finite -> 'n succ nat -> 'n succ vector
     val repeat : scalar -> 'n succ nat -> 'n succ vector
-    val set : 'n finite -> scalar -> 'n vector -> 'n vector
+    val set    : 'n finite -> scalar -> 'n vector -> 'n vector
+    val size   : 'n vector -> 'n nat
+    val norm   : 'n vector -> scalar
   end
 
   module Matrix : sig
     val pretty : Format.formatter -> ('n, 'm) matrix -> unit
     val id : 'n succ nat -> ('n succ, 'n succ) matrix
     val zero : 'n succ nat -> 'm succ nat -> ('n succ, 'm succ) matrix
+    val get : 'n finite -> 'm finite -> ('n, 'm) matrix -> scalar
     val set : 'n finite -> 'm finite -> scalar -> ('n, 'm) matrix -> ('n, 'm) matrix
+    val norm : ('n, 'm) matrix -> scalar
+    val transpose : ('n, 'm) matrix -> ('m, 'n) matrix
     val dimensions : ('m, 'n) matrix -> 'm nat * 'n nat
     val ( + ) : ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
     val ( * ) : ('n, 'm) matrix -> ('m, 'p) matrix -> ('n, 'p) matrix
-    val norm : ('n, 'm) matrix -> scalar
+    val power : ('n, 'n) matrix -> int -> ('n, 'n) matrix
   end
 
 end

@@ -35,10 +35,29 @@ module Space (Field : Field.S) = struct
 
 
 
+  type 'n row = Format.formatter -> 'n finite -> unit
+  let pretty (type n m) (row : n row) fmt (M m : (n, m) matrix) =
+    let cut () = Format.pp_print_cut fmt () in
+    let first () = Format.fprintf fmt "@[<h>⌈%a⌉@]" row Finite.first in
+    let mid i = Format.fprintf fmt "@[<h>|%a|@]" row i in
+    let last () = Format.fprintf fmt "@[<h>⌋%a⌊@]" row Finite.(last m.rows) in
+    let row i () =
+      if Finite.(i = first) then first ()
+      else if Finite.(i = last m.rows) then (cut () ; last ())
+      else (cut () ; mid i)
+    in
+    Format.pp_open_vbox fmt 0 ;
+    Finite.for_each row m.rows () ;
+    Format.pp_close_box fmt ()
+
+
+
   module Vector = struct
 
-    let pretty (type n) fmt (M { data ; _ } : n vector) =
-      Parray.pretty ~sep:"@ " Field.pretty fmt data
+    let pretty_row (type n) fmt (M { data ; _ } : n vector) =
+      Format.pp_open_hbox fmt () ;
+      Parray.pretty ~sep:"@ " Field.pretty fmt data ;
+      Format.pp_close_box fmt ()
 
     let init size f =
       let data = Parray.init (Nat.to_int size) (fun _ -> Field.zero) in
@@ -53,15 +72,23 @@ module Space (Field : Field.S) = struct
     let get (type n) (i : n finite) (M vec : n vector) : scalar =
       Parray.get vec.data (Finite.to_int i)
 
+    let pretty (type n) fmt (vector : n vector) =
+      let get fmt (i : n finite) = Field.pretty fmt (get i vector) in
+      pretty get fmt vector
+
     let set (type n) (i : n finite) scalar (M vec : n vector) : n vector =
       M { vec with data = Parray.set vec.data (Finite.to_int i) scalar }
 
-    let norm (type n) (M vector : n vector) =
-      Parray.fold (fun _ a acc -> Field.(abs a + acc)) vector.data Field.zero
+    let norm (type n) (v : n vector) : scalar =
+      let max i r = Field.(max (abs (get i v)) r) in
+      Finite.for_each max (size v) Field.zero
 
     let ( * ) (type n) (l : n vector) (r : n vector) =
       let inner i acc = Field.(acc + get i l * get i r) in
       Finite.for_each inner (size l) Field.zero
+
+    let base (type n) (i : n succ finite) (dimension : n succ nat) =
+      zero dimension |> set i Field.one
 
   end
 
@@ -87,10 +114,8 @@ module Space (Field : Field.S) = struct
       fun (M m) -> m.rows, m.cols
 
     let pretty (type n m) fmt (M m : (n, m) matrix) =
-      let cut i = if not Finite.(i = first) then Format.pp_print_cut fmt () in
-      let row i = Format.fprintf fmt "@[<h>%a@]" Vector.pretty (row i (M m)) in
-      let pretty () = Finite.for_each (fun i () -> cut i ; row i) m.rows () in
-      Format.pp_open_vbox fmt 0 ; pretty () ; Format.pp_close_box fmt ()
+      let row fmt i = Vector.pretty_row fmt (row i (M m)) in
+      pretty row fmt (M m)
 
     let init n m init =
       let rows = Nat.to_int n and cols = Nat.to_int m in
@@ -103,6 +128,9 @@ module Space (Field : Field.S) = struct
     let zero n m = init n m (fun _ _ -> Field.zero)
     let id n = Finite.for_each (fun i m -> set i i Field.one m) n (zero n n)
 
+    let transpose : type n m. (n, m) matrix -> (m, n) matrix =
+      fun (M m) -> init m.cols m.rows (fun j i -> get i j (M m))
+
     type ('n, 'm) add = ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
     let ( + ) : type n m. (n, m) add = fun (M l) (M r) ->
       let ( + ) i j = Field.(get i j (M l) + get i j (M r)) in
@@ -114,8 +142,30 @@ module Space (Field : Field.S) = struct
       init l.rows r.cols ( * )
 
     let norm : type n m. (n, m) matrix -> scalar = fun (M m) ->
-      let max i res = Field.max res (col i (M m) |> Vector.norm) in
-      Finite.for_each max m.cols Field.zero
+      let add v j r = Field.(abs (Vector.get j v) + r) in
+      let sum v = Finite.for_each (add v) (Vector.size v) Field.zero in
+      let max i res = Field.max res (row i (M m) |> sum) in
+      Finite.for_each max m.rows Field.zero
+
+    let rec fast_power target steps matrix exponent =
+      let steps' = (matrix, exponent) :: steps in
+      let exponent' = Stdlib.(exponent * 2) in
+      if exponent' > target then if exponent <= target then steps' else steps
+      else fast_power target steps' (matrix * matrix) exponent'
+
+    let rec refine target = function
+      | [] -> assert false
+      | [ (matrix, _) ] -> matrix
+      | (matrix, exponent) :: (matrix', exponent') :: previous ->
+        let exponent'' = Stdlib.(exponent + exponent') in
+        if exponent'' > target
+        then refine target ((matrix, exponent) :: previous)
+        else refine target (((matrix * matrix'), exponent'') :: previous)
+
+    let power (type n) (M matrix : (n, n) matrix) exponent : (n, n) matrix =
+      if exponent < 0 then raise (Invalid_argument "negative exponent")
+      else if Stdlib.(exponent = 0) then id matrix.rows
+      else fast_power exponent [] (M matrix) 1 |> refine exponent
 
   end
 

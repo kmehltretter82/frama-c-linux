@@ -25,6 +25,7 @@ open Nat
 type 'n finite
 
 val first : 'n succ finite
+val last  : 'n succ nat -> 'n succ finite
 val next  : 'n finite -> 'n succ finite
 val ( = ) : 'n finite -> 'n finite -> bool
 

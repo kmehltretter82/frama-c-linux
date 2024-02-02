@@ -66,9 +66,17 @@ let max_exponent = 200
 let fin size n = Finite.of_int size n |> Option.get
 let set row col i j n = Linear.Matrix.set (fin row i) (fin col j) n
 
-let pretty_invariant fmt = function
+let pretty_bounds invariant fmt i =
+  let l, u = Filter.bounds i invariant in
+  Format.fprintf fmt "@[<h>[%a .. %a]@]" Rational.pretty l Rational.pretty u
+
+let pretty_invariant order fmt = function
   | None -> Format.fprintf fmt "%s" (Unicode.top_string ())
-  | Some invariant -> Format.fprintf fmt "%a" Rational.pretty invariant
+  | Some invariant ->
+    let pp f i = pretty_bounds invariant f i in
+    let pp f i = Format.fprintf f "@[<h>* %d : %a@]@," (Finite.to_int i) pp i in
+    let pretty fmt () = Finite.for_each (fun i () -> pp fmt i) order () in
+    Format.fprintf fmt "@[<v>%a@]" pretty ()
 
 
 
@@ -87,10 +95,12 @@ module Circle = struct
 
   let measure = Linear.Vector.repeat Rational.one order
 
+  let center = Linear.Vector.zero order
+
   let compute () =
-    let filter = Filter.create state input measure in
+    let filter = Filter.create state input center measure in
     let invariant = Filter.invariant filter max_exponent in
-    Kernel.result "Circle : %a@." pretty_invariant invariant
+    Kernel.result "@[<v>Circle :@,%a@,@]" (pretty_invariant order) invariant
 
 end
 
@@ -115,10 +125,12 @@ module Simple = struct
 
   let measure = Linear.Vector.repeat (Rational.of_float 0.1) delay
 
+  let center = Linear.Vector.repeat Rational.one order
+
   let compute () =
-    let filter = Filter.create state input measure in
+    let filter = Filter.create state input center measure in
     let invariant = Filter.invariant filter max_exponent in
-    Kernel.result "Simple : %a@." pretty_invariant invariant
+    Kernel.result "@[<v>Simple :@,%a@,@]" (pretty_invariant order) invariant
 
 end
 
