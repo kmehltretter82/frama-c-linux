@@ -197,7 +197,7 @@ export function GoalView(props: GoalViewProps): JSX.Element {
         Server.send(TIP.setSelection, { node, part, term });
         return;
       }
-    } // otherwize
+    } // otherwise
     Server.send(TIP.clearSelection, node);
   }, [sequent, node]);
   return (
