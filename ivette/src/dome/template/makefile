@@ -270,7 +270,7 @@ dome-dist-win: dome-app
 
 dome-dist-mac: dome-app
 	@echo "[Dome] packaging application (macOS exe)"
-	DOME=$(DOME) yarn run electron-builder --mac
+	DOME=$(DOME) yarn run electron-builder --mac -c.mac.identity=null
 	@echo "[Dome] application packaged in ./dist"
 
 # --------------------------------------------------------------------------

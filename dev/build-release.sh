@@ -95,12 +95,14 @@ VERSION_AND_CODENAME="${VERSION_SAFE}-${CODENAME}"
 if [ "$VERSION_MINOR" != 0 ]; then
   # We compare new minor to previous minor
   PREVIOUS="$VERSION_MAJOR.$((VERSION_MINOR - 1))"
+  PREVIOUS_TAG="$PREVIOUS"
 else
   # We compare new major to previous major, the exact previous version is not
   # of interest for a new major version
   PREVIOUS="$((VERSION_MAJOR - 1))"
+  PREVIOUS_TAG="$PREVIOUS.0"
 fi
-PREVIOUS_NAME=$(git show $PREVIOUS:VERSION_CODENAME)
+PREVIOUS_NAME=$(git show "$PREVIOUS_TAG":VERSION_CODENAME)
 
 if [ "$VERSION_MODIFIER" == "+dev" ]; then
   echo "Development version ($VERSION)"
