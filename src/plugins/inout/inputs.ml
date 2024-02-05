@@ -163,7 +163,7 @@ let get_with_formals kf =
     (Eva.Logic_inout.accept_base ~formals:true ~locals:false kf)
     (get_internal kf)
 
-let compute_external kf = ignore (get_external kf)
+let compute kf = ignore (get_external kf)
 
 let pretty_external fmt kf =
   Format.fprintf fmt "@[Inputs for function %a:@\n@[<hov 2>  %a@]@]@\n"
@@ -175,18 +175,18 @@ let pretty_with_formals fmt kf =
     Kernel_function.pretty kf
     Zone.pretty (get_with_formals kf)
 
-let () =
-  Db.Inputs.self_internal := Analysis.Memo.self;
-  Db.Inputs.self_external := Externals.self;
-  Db.Inputs.self_with_formals := Analysis.Memo.self;
-  Db.Inputs.get_internal := get_internal;
-  Db.Inputs.get_external := get_external;
-  Db.Inputs.get_with_formals := get_with_formals;
-  Db.Inputs.compute := compute_external;
-  Db.Inputs.display := pretty_external;
-  Db.Inputs.display_with_formals := pretty_with_formals;
-  Db.Inputs.statement := Analysis.statement;
-  Db.Inputs.expr := Analysis.expr
+let self = Externals.self
+let statement = Analysis.statement
+let expr = Analysis.expr
+
+(* Registers a function only used by the Eva GTK GUI via the dynamic API. *)
+let _kf_inputs =
+  Dynamic.register
+    ~comment:"Returns the memory zone read by a given function."
+    ~plugin:Inout_parameters.name
+    "kf_inputs"
+    Datatype.(func Kernel_function.ty Zone.ty)
+    get_internal
 
 (*
 Local Variables:

@@ -64,4 +64,4 @@ let main _ =
   let pp = find_ret "caller" in
   compute_and_print pp "Yf"
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

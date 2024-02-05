@@ -8,4 +8,4 @@ let run () =
          Printer.pp_location vi.vdecl
     )
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

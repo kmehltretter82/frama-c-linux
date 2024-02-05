@@ -44,4 +44,4 @@ let run () =
   let vis prj = new test prj in
   ignore (File.create_project_from_visitor "test" vis)
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

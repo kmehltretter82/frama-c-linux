@@ -12,7 +12,7 @@
   Called from call.i:16.
 [eva] using specification for function p1
 [eva] Done for function p1
-[kernel:annot:missing-spec] call.i:12: Warning: 
+[kernel:annot:missing-spec] call.i:16: Warning: 
   Neither code nor specification for function p2,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function p2 <- test <- main.

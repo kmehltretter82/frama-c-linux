@@ -40,4 +40,4 @@ let run () =
   Format.printf "Printing saved project:@.";
   File.pretty_ast ~prj ~fmt ()
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

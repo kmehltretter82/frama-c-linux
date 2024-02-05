@@ -60,7 +60,7 @@ let main () =
   end
 
 (** Register the function [main] as a main entry point. *)
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (* {2 Overview}
 

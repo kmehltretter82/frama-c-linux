@@ -11,4 +11,4 @@ let check_vi_exists vi _ =
 let run () =
   let _ = Ast.get () in Cil.iterFormalsDecl check_vi_exists
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

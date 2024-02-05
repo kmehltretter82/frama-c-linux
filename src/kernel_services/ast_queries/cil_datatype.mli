@@ -200,7 +200,6 @@ module Kinstr: sig
   val kinstr_of_opt_stmt: stmt option -> kinstr
   (** @since Nitrogen-20111001. *)
 
-  val loc: t -> location
 end
 
 module Label: S_with_collections_pretty with type t = label

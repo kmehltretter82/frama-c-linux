@@ -110,7 +110,7 @@ let print () =
 let print_once, _self_print =
   State_builder.apply_once "Users_register.print" [ Users.self ] print
 
-let () = Db.Main.extend print_once
+let () = Boot.Main.extend print_once
 
 (*
 Local Variables:

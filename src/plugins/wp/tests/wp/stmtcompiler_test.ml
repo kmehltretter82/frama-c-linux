@@ -149,4 +149,4 @@ let turn_off_populate () =
 
 let () = Cmdline.run_after_configuring_stage turn_off_populate
 
-let () =  Db.Main.extend run
+let () =  Boot.Main.extend run

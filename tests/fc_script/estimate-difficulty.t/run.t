@@ -9,3 +9,5 @@
   Estimating difficulty for 3 '#include <header>' directives...
   - WARNING: included header <complex.h> is explicitly unsupported by Frama-C
   Header-related warnings: 1
+  - warning: found 1 line with occurrences of unsupported C11 construct '_Complex'
+  - warning: found 1 line with occurrences of unsupported non-standard construct (GNU extension) '__int128'

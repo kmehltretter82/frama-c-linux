@@ -277,4 +277,4 @@ let main _ =
   test_forward_comp ();
 ;;
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

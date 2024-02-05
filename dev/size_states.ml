@@ -109,4 +109,4 @@ let all_sizes () =
   Kernel.result "## Sizes ##@.%a"
     (Pretty_utils.pp_list ~pre:"@[<v>" ~suf:"@]" ~sep:"@ " pp) res
 
-let () = Db.Main.extend all_sizes
+let () = Boot.Main.extend all_sizes

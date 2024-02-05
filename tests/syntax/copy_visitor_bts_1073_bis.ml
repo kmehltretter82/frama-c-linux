@@ -51,5 +51,5 @@ let main () =
       P.feedback "exported in new project : %s" new_proj_name
     end
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 (*============================================================================*)

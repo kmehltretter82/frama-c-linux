@@ -24,4 +24,4 @@ let run () =
   Visitor.visitFramacFileSameGlobals (new add_skip) (Ast.get())
 
 let () =
-  Db.Main.extend run
+  Boot.Main.extend run

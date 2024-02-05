@@ -43,7 +43,7 @@ let run title filter_name extension loader
        | `EXECUTE ->
          let run f =
            loader f;
-           !Db.Main.play ();
+           Boot.play_analysis ();
            host_window#reset ()
          in
          Option.iter run dialog#filename;
@@ -68,7 +68,7 @@ let insert (main_ui: Design.main_window_extension_points) =
           (Menu_manager.Unit_callback (fun () -> run_module main_ui));
         Menu_manager.toolbar ~sensitive:(fun () -> !stop_sensitive) ~icon:`STOP
           ~label:"Stop" ~tooltip:"Stop currently running analyses"
-          (Menu_manager.Unit_callback Db.cancel)
+          (Menu_manager.Unit_callback Async.cancel)
       ]
   in
   default_analyses_items.(0)#add_accelerator `CONTROL 'r';

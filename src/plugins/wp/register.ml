@@ -1031,6 +1031,6 @@ let main =
   ]
 
 let () = Cmdline.at_normal_exit do_cache_cleanup
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (* ------------------------------------------------------------------------ *)

@@ -6330,13 +6330,10 @@ let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
 (******************** CASTING *****)
 
 let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
+  let dkey = Kernel.dkey_typing_cast in
+  let origin = if fromsource then "explicit cast:" else " implicit cast:" in
+  let error msg = abort_context ("%s " ^^ msg) origin in
   let rec default_rec oldt newt =
-    let dkey = Kernel.dkey_typing_cast in
-    let error s =
-      if fromsource
-      then abort_context s
-      else Kernel.fatal ~current:true s
-    in
     match unrollType oldt, unrollType newt with
     | TNamed _, _
     | _, TNamed _ -> Kernel.fatal ~current:true "unrollType failed in checkCast"
@@ -6461,7 +6458,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
       begin
         match isTransparentUnion oldt with
         | None ->
-          abort_context "cast from %a to %a"
+          error "cast from %a to %a"
             Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
         | Some _ -> ()
       end
@@ -6474,8 +6471,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
 
     | _, t1 when fromsource && not (isScalarType t1) ->
       (* ISO 6.5.4.2 *)
-      error "Cast over a non-scalar type %a"
-        Cil_datatype.Typ.pretty newt
+      error "cast over a non-scalar type %a" Cil_datatype.Typ.pretty newt
 
     | _ ->
       error "cannot cast from %a to %a@\n"
@@ -6484,6 +6480,8 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
 
 let rec castReduce fromsource force =
   let dkey = Kernel.dkey_typing_cast in
+  let origin = if fromsource then "explicit cast:" else " implicit cast:" in
+  let error msg = abort_context ("%s " ^^ msg) origin in
   let rec rec_default oldt newt e =
     let loc = e.eloc in
     let normalized_newt = type_remove_attributes_for_c_cast (unrollType newt) in
@@ -6527,7 +6525,7 @@ let rec castReduce fromsource force =
       begin
         match isTransparentUnion oldt with
         | None ->
-          abort_context "cast from %a to %a"
+          error "cast from %a to %a"
             Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
         | Some fstfield ->
           (* We do it now only if the expression is an lval *)
@@ -6537,8 +6535,7 @@ let rec castReduce fromsource force =
               new_exp ~loc:e.eloc
                 (Lval (addOffsetLval (Field (fstfield, NoOffset)) lv))
             | _ ->
-              Kernel.fatal ~current:true
-                "castTo: transparent union expression is not an lval: %a\n"
+              error "transparent union expression is not an lval: %a\n"
                 Cil_datatype.Exp.pretty e
 
           in

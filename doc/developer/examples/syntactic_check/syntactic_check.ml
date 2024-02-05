@@ -64,4 +64,4 @@ let create_syntactic_check_project () =
   ignore
     (File.create_project_from_visitor "syntactic check" (new non_zero_divisor))
 
-let () = Db.Main.extend create_syntactic_check_project
+let () = Boot.Main.extend create_syntactic_check_project

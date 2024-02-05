@@ -7,4 +7,4 @@ let main () =
   in
   ignore (File.create_project_from_visitor "justcopy" o)
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

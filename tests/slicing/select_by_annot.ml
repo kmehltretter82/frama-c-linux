@@ -45,4 +45,4 @@ let main _ =
   Slicing.Api.Project.pretty Format.std_formatter;
   extract_and_print ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

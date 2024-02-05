@@ -10,4 +10,4 @@ let main _ =
     ();
   File.pretty_ast ~prj:new_proj ();;
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

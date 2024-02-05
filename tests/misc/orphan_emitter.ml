@@ -18,4 +18,4 @@ let main () =
   let stmt = Kernel_function.find_first_stmt kf in
   Annotations.add_assert emitter1 stmt Logic_const.ptrue
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

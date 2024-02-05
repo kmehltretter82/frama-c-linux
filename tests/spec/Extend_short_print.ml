@@ -11,4 +11,4 @@ let process_global _ = function
   | Dextended(e, _, _) -> Kernel.feedback "%a" Cil_printer.pp_short_extended e
   | _ -> ()
 
-let () = Db.Main.extend (fun () -> Annotations.iter_global process_global)
+let () = Boot.Main.extend (fun () -> Annotations.iter_global process_global)

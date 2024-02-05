@@ -70,4 +70,4 @@ let main _ =
   Slicing.Api.Request.apply_all_internal ();
   extract_and_print ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

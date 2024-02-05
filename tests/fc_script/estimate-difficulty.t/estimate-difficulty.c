@@ -21,3 +21,6 @@ int main() {
   ccosl(); // warning: neither code nor spec
   dprintf(); // no warning: neither code nor spec, but handled by Variadic
 }
+
+__int128 large_int;
+_Complex complex;

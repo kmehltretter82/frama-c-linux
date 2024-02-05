@@ -84,7 +84,7 @@ let main () =
     (compute_once ();
      Pdg_parameters.BuildAll.output output)
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (* {2 Overview}
 

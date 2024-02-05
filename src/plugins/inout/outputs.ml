@@ -171,15 +171,28 @@ let pretty_external fmt kf =
   with Not_found ->
     ()
 
-let () =
-  Db.Outputs.self_internal := Analysis.Memo.self;
-  Db.Outputs.self_external := Externals.self;
-  Db.Outputs.get_internal := get_internal;
-  Db.Outputs.get_external := get_external;
-  Db.Outputs.compute := (fun kf -> ignore (get_internal kf));
-  Db.Outputs.display := pretty_internal;
-  Db.Outputs.display_external := pretty_external;
-  Db.Outputs.statement := Analysis.statement
+let self = Externals.self
+let compute kf = ignore (get_internal kf)
+let statement = Analysis.statement
+
+(* Registers functions used by Eva via the dynamic API. *)
+
+let _kf_outputs =
+  Dynamic.register
+    ~comment:"Returns the memory zone modified by a given function."
+    ~plugin:Inout_parameters.name
+    "kf_outputs"
+    Datatype.(func Kernel_function.ty Zone.ty)
+    get_internal
+
+(* Only used by the Eva GTK GUI. *)
+let _stmt_outputs =
+  Dynamic.register
+    ~comment:"Returns the memory zone modified by a statement"
+    ~plugin:Inout_parameters.name
+    "stmt_outputs"
+    Datatype.(func Cil_datatype.Stmt.ty Zone.ty)
+    Analysis.statement
 
 (*
 Local Variables:

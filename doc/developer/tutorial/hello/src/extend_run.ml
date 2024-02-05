@@ -1,1 +1,1 @@
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

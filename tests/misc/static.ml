@@ -23,4 +23,4 @@ let run () =
     Kernel.fatal "mixing local variables from f and g";
   File.pretty_ast ()
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

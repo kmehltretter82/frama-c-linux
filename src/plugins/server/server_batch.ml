@@ -126,6 +126,6 @@ let execute () =
 (* --- Run the Server from the Command line                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let () = Db.Main.extend execute
+let () = Boot.Main.extend execute
 
 (* -------------------------------------------------------------------------- *)

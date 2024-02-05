@@ -19,4 +19,4 @@ class vis =
 
 let do_it () = Visitor.visitFramacFileSameGlobals (new vis) (Ast.get())
 
-let () = Db.Main.extend do_it
+let () = Boot.Main.extend do_it

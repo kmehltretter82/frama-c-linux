@@ -1300,7 +1300,7 @@ let print_generated ?header file =
 let protect e =
   if debug_atleast 1 then false else
     match e with
-    | Sys.Break | Db.Cancel | Log.AbortError _ | Log.AbortFatal _ -> false
+    | Sys.Break | Async.Cancel | Log.AbortError _ | Log.AbortFatal _ -> false
     | _ -> true
 
 (* -------------------------------------------------------------------------- *)

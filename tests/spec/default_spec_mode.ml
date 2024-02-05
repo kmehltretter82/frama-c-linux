@@ -16,4 +16,4 @@ let run () =
   Globals.Functions.iter generate_spec
 [@@ warning "-3"]
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

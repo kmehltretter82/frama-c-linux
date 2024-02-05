@@ -33,4 +33,4 @@ let transform () =
   Project.on prj Filecheck.check_ast "prj";
   File.pretty_ast ~prj ()
 
-let () = Db.Main.extend transform
+let () = Boot.Main.extend transform

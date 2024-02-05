@@ -17,7 +17,7 @@
 [eva] precond.c:32: function f: precondition 'i' got status valid.
 [eva] Recording results for f
 [eva] Done for function f
-[kernel:annot:missing-spec] precond.c:25: Warning: 
+[kernel:annot:missing-spec] precond.c:34: Warning: 
   Neither code nor explicit assigns for function g,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function g <- main.
@@ -27,7 +27,7 @@
 [eva] Done for function g
 [eva] computing for function aux <- main.
   Called from precond.c:36.
-[kernel:annot:missing-spec] precond.c:16: Warning: 
+[kernel:annot:missing-spec] precond.c:21: Warning: 
   Neither code nor explicit assigns for function f2,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f2 <- aux <- main.

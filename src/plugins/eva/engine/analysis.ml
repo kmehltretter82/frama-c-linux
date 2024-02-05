@@ -236,4 +236,4 @@ let main () =
   if Parameters.ForceValues.get () then compute ();
   if is_computed () then Red_statuses.report ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

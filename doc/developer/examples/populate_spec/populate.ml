@@ -72,4 +72,4 @@ let create_mode () =
    frama-c. *)
 let () = Cmdline.run_after_configuring_stage create_mode
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

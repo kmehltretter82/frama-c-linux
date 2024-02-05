@@ -107,4 +107,4 @@ let main _ =
   print_project ();;
 (*=========================================================================*)
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

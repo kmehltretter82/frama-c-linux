@@ -50,7 +50,7 @@ end
 let run_once = ref false
 
 let () =
-  Db.Main.extend (fun () ->
+  Boot.Main.extend (fun () ->
       if not !run_once then begin
         run_once := true;
         Visitor.visitFramacFile (new tags_visitor) (Ast.get ())

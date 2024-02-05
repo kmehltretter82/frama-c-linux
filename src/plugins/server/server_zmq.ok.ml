@@ -212,6 +212,6 @@ let cmdline () =
     if cmd <> "" then launch_client cmd ;
   end
 
-let () = Db.Main.extend cmdline
+let () = Boot.Main.extend cmdline
 
 (* -------------------------------------------------------------------------- *)

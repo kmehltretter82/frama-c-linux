@@ -54,4 +54,4 @@ let run () =
   File.pretty_ast ();
   Filecheck.check_ast "reordered"
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

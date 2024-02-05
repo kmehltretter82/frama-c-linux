@@ -136,4 +136,4 @@ let run () =
   Project.on prj Ast.compute ();
   File.pretty_ast ~prj ()
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

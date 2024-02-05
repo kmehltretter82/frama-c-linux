@@ -161,7 +161,7 @@ let main () =
     ignore (compute_pragmas ());
     Options.feedback "analysis done"
   end
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (*
 Local Variables:

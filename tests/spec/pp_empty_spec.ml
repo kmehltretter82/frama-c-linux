@@ -32,4 +32,4 @@ let run () =
     (List.hd (Annotations.behaviors ~emitter main));
   File.pretty_ast()
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

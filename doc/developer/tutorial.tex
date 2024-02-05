@@ -122,7 +122,7 @@ platform. This tutorial focuses on specific parts of this figure.
        {on chain,draw,fill=Orange,minimum height=\designheight,txt,
          minimum width=\kernelwidth}]
        {kernel}
-       \node (db-main) {Db.Main};
+       \node (db-main) {Boot.Main};
        \node (dynamic) {Dynamic};
        \node (plugin)  {Plugin};
        \node (type)    {Type};
@@ -148,7 +148,7 @@ platform. This tutorial focuses on specific parts of this figure.
 
  \end{tikzpicture}
 \end{center}
-\scodeidx{Db}{Main}\codeidx{Dynamic}\codeidx{Plugin}
+\scodeidx{Boot}{Main}\codeidx{Dynamic}\codeidx{Plugin}
 \codeidx{Project}\codeidx{Type}
 \codeidx{Design}
 \index{GUI}\index{Plug-in!GUI}
@@ -163,7 +163,7 @@ a function or a functor). For instance,
 the next section shows how to:
 \begin{itemize}
 \item extend the \framac entry point\index{Entry point} thanks to the function
-  \texttt{Db.Main.extend}\sscodeidx{Db}{Main}{extend} if you want to run
+  \texttt{Boot.Main.extend}\sscodeidx{Boot}{Main}{extend} if you want to run
   plug-in specific code whenever \framac is executed;
 \item use specific plug-in services provided by the module
   \texttt{Plugin}\codeidx{Plugin}, such as adding a new \framac option.
@@ -247,7 +247,7 @@ Let us add a simple file to our plug-in:
 
 \listingname{./hello\_world.ml}
 \ocamlinput{./tutorial/hello/v1-simple/hello_world.ml}
-\sscodeidx{Db}{Main}{extend}
+\sscodeidx{Boot}{Main}{extend}
 
 This file defines a simple function that writes a message to an output file,
 then registers the function \texttt{run} as an entry point. \framac will call
@@ -281,7 +281,7 @@ Registering a plug-in is achieved through the use of the
 
 \listingname{./hello\_world.ml}
 \ocamlinput{./tutorial/hello/v2-register/hello_world.ml}
-\sscodeidx{Db}{Main}{extend}
+\sscodeidx{Boot}{Main}{extend}
 \scodeidx{Plugin}{Register}
 
 The argument to the \texttt{Plugin.Register} functor is a module with three
@@ -318,7 +318,7 @@ general services instead\footnote{However, writing to a new file using standard
 
 \listingname{./hello\_world.ml}
 \ocamlinput{./tutorial/hello/v3-log/hello_world.ml}
-\sscodeidx{Db}{Main}{extend}
+\sscodeidx{Boot}{Main}{extend}
 \scodeidx{Plugin}{Register}
 
 Running this script yields the following output:
@@ -440,7 +440,7 @@ You can uninstall it by running \verb|dune uninstall|.
 Here is a slightly more complex example where the plug-in has been split into
 several files. Usually, plug-in registration through \texttt{Plugin.Register}
 should be done at the bottom of the module hierarchy, while registration of the
-\texttt{run} function through \texttt{Db.Main.extend} should be at the top.
+\texttt{run} function through \texttt{Boot.Main.extend} should be at the top.
 The three following files completely replace the \texttt{./hello\_world.ml}
 from the previous section. Modules are directly called by their name in the
 classical \ocaml way.
@@ -454,7 +454,7 @@ classical \ocaml way.
 
 \listingname{./hello\_run.ml}
 \ocamlinput{./tutorial/hello/v5-multiple/hello_run.ml}
-\sscodeidx{Db}{Main}{extend}
+\sscodeidx{Boot}{Main}{extend}
 
 The plug-in can be tested again by running:
 
@@ -656,7 +656,7 @@ Now, let's introduce an error. Assume the plug-in has been modified as follows:
 
 \listingname{./hello\_run.ml}
 \ocamlinput{./tutorial/hello/v6-test-with-bug/hello_run.ml}
-\sscodeidx{Db}{Main}{extend}
+\sscodeidx{Boot}{Main}{extend}
 
 We assume that ``\texttt{Hello, world!}'' has been unintentionally changed to
 ``\texttt{Hello world!}''.
@@ -750,7 +750,7 @@ Then, we add some documentation tags to our modules:
 
 \listingname{./hello\_run.ml}
 \ocamlinput{./tutorial/hello/v7-doc//hello_run.ml}
-\sscodeidx{Db}{Main}{extend}
+\sscodeidx{Boot}{Main}{extend}
 
 Running \verb|dune build @doc| will generate documentation files in
 \texttt{./\_build/default/\_doc/\_html}. Open \texttt{index.html} in your
@@ -1042,7 +1042,7 @@ Now our plug-in can call all functions and access all types declared in
 
 For historical reasons, several kernel-integrated plug-ins, such as
 \textsf{From}, \textsf{InOut} and \textsf{Slicing}, had their API exposed
-via the \texttt{Db} module of the \framac kernel. This has been deprecated
+via the \texttt{Boot} module of the \framac kernel. This has been deprecated
 for \textsf{Eva}, and newer plug-ins expose their public interface directly.
 
 In our example, we will use \textsf{Eva}'s new API to obtain reachability
@@ -1112,7 +1112,7 @@ We will create the following files:
   command-line options (\verb|Enabled| and \verb|OutputFile|);
 \item[visit.ml]: will contain the \verb|print_stmt| function and the visitor;
 \item[run.ml]: will contain the definition of function \verb|run| and the
-  call to \verb|Db.Main.extend|.
+  call to \verb|Boot.Main.extend|.
 \end{description}
 
 Note that a few changes are needed to the code: functions from other files

@@ -664,8 +664,13 @@ let find_alarm_in_emitters tbl alarm =
 (** Converts an alarm to a code annotation. Returns the code annotation,
     whether said code annotation is new, and the table in which the code annot
     is/should be inserted. *)
-let to_annot_aux kinstr ?(loc=Kinstr.loc kinstr) alarm =
+let to_annot_aux kinstr ?loc alarm =
   (*  Kernel.debug "registering alarm %a" D.pretty alarm;*)
+  let loc = match loc, kinstr with
+    | Some l, _ -> l
+    | None, Kstmt stmt -> Stmt.loc stmt
+    | None, Kglobal -> Location.unknown
+  in
   let add alarm =
     let pred = create_predicate ~loc alarm in
     let pred = Logic_const.toplevel_predicate pred in

@@ -30,4 +30,4 @@ let run () =
   Visitor.visitFramacFileSameGlobals (new check) (Ast.get());
   Kernel.result "Script done"
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

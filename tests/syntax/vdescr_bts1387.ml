@@ -12,4 +12,4 @@ class print_vdescr =
 
 let run () = Visitor.visitFramacFileSameGlobals (new print_vdescr) (Ast.get())
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

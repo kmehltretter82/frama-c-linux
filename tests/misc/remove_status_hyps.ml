@@ -58,4 +58,4 @@ let main () =
     report "removing P1" l'
   | _ -> assert false
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

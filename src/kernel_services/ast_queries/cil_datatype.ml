@@ -363,10 +363,6 @@ module Kinstr = struct
           | Kstmt s -> Stmt.pretty fmt s
       end)
 
-  let loc = function
-    | Kstmt st -> Stmt.loc st
-    | Kglobal -> assert false
-
   let kinstr_of_opt_stmt = function
     | None -> Kglobal
     | Some s -> Kstmt s

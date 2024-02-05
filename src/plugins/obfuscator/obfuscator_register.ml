@@ -71,7 +71,7 @@ let run () =
                            and by the discussion in Gitlab issue #491 *)
   end
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run
 
 (*
 Local Variables:

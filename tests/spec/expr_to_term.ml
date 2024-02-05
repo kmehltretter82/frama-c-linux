@@ -92,4 +92,4 @@ let compute () =
     treat_fct_pred i;
   end
 
-let () = Db.Main.extend compute
+let () = Boot.Main.extend compute

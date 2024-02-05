@@ -203,7 +203,7 @@ val two_power : t -> t
 val two_power_of_int : int -> t
 (** Computes [2^n] *)
 
-val power_int_positive_int: int -> int -> t
+val power_int_positive_int_opt : int -> int -> t option
 (** Exponentiation *)
 
 val extract_bits : start:t -> stop:t -> t -> t

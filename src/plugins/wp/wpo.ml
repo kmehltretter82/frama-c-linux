@@ -150,7 +150,7 @@ struct
 
   let apply option phi g =
     try
-      Db.yield () ;
+      Async.yield () ;
       Wp_parameters.debug ~dkey "Apply %s" option ;
       g.sequent <- phi g.sequent ;
     with exn when Wp_parameters.protect exn ->
