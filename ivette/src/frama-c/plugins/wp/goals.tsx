@@ -62,7 +62,7 @@ function getScope(g : WP.goalsData): string {
   if (g.bhv && g.fct) return `${g.fct} — {g.bhv}}`;
   if (g.fct) return g.fct;
   if (g.thy) return g.thy;
-  return '';
+  return 'Global';
 }
 
 /* -------------------------------------------------------------------------- */
@@ -168,12 +168,12 @@ export function GoalTable(props: GoalTableProps): JSX.Element {
   );
 
   React.useEffect(() => {
-    if (failed || !!scope) {
+    if (failed || scoped) {
       model.setFilter(filterGoal(failed, scope));
     } else {
       model.setFilter();
     }
-  }, [model, scope, failed]);
+  }, [model, failed, scoped, scope]);
 
   React.useEffect(() => setGoals(goals), [goals, setGoals]);
   React.useEffect(() => setTotal(total), [total, setTotal]);
