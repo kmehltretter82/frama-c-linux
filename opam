@@ -135,7 +135,7 @@ depends: [
   "why3" { >= "1.6.0" & ( < "1.7.0" | !with-test ) }
   "yaml" { >= "3.0.0" }
   "yojson" {>= "1.6.0" & (>= "2.0.1" | !with-test)}
-  "zarith" { >= "1.5" }
+  "zarith" { >= "1.9" }
 
   # PPXs
   "ppx_deriving"
