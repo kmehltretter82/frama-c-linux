@@ -73,7 +73,7 @@ function Wrapper(props: WrapperProps): JSX.Element {
 
   return (
     <SideBar className={className}>
-      <div className="sidebar-ruller"/>
+      <div className="sidebar-ruler"/>
       <Catch label={props.id}>
         {props.children}
       </Catch>
