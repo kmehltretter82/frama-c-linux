@@ -44,6 +44,7 @@ import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
 import { SVG } from 'dome/controls/icons';
 import { Checkbox, Radio, Select as SelectMenu } from 'dome/controls/buttons';
+import { Label } from 'dome/controls/labels';
 
 export type FieldError =
   | undefined | boolean | string
@@ -596,14 +597,13 @@ export function Field(props: GenericFieldProps): JSX.Element | null {
 
   return (
     <>
-      <label
+      <Label
         className={cssLabel}
         style={{ top: offset }}
         htmlFor={htmlFor}
         title={title}
-      >
-        {label}
-      </label>
+        label={label}
+      />
       <div className={cssField} title={title}>
         {children}
         {WARNING}

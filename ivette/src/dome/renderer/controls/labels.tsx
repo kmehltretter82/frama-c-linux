@@ -61,6 +61,8 @@ export interface LabelProps {
   display?: boolean;
   /** Additional content of the `<label/>` element. */
   children?: React.ReactNode;
+  /** Html tag `<input />` element. */
+  htmlFor?: string;
   /** Click event callback. */
   onClick?: (evt: React.MouseEvent) => void;
   /** Click event callback. */
@@ -93,6 +95,7 @@ const makeLabel = (className: string) =>
         onClick={props.onClick}
         onDoubleClick={props.onDoubleClick}
         onContextMenu={props.onContextMenu}
+        htmlFor={props.htmlFor}
       >
         {props.icon &&
          <Icon title={props.title} id={props.icon} className={iconClass} />}
