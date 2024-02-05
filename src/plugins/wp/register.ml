@@ -549,7 +549,7 @@ let spawn_wp_proofs ~script goals =
 
 let get_prover_names () =
   match Wp_parameters.Provers.get () with
-  | [] -> [ "alt-ergo" ] | pnames -> pnames
+  | [] -> [ "Alt-Ergo" ] | pnames -> pnames
 
 let compute_provers ~mode ~script =
   script.provers <- List.fold_right
