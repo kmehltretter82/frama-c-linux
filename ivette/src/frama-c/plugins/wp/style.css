@@ -53,8 +53,8 @@
 
 .wp-printer-field:hover
 {
-    fill: var(--default-button-color);
-    color: var(--default-button-color);
+    /* fill: var(--default-button-color); */
+    /* color: var(--default-button-color); */
     background: var(--background-button-hover) !important;
 }
 
