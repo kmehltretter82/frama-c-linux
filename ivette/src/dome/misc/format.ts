@@ -36,7 +36,7 @@
    For instance, returns `'250ms'` for an input time of `.25`.
  */
 export function duration(time : number) : string {
-  if (time < 1.0e-3) return `${Math.round(time * 1.0e6)}ns`;
+  if (time < 1.0e-3) return `${Math.round(time * 1.0e6)}µs`;
   if (time < 1.0) return `${Math.round(time * 1.0e3)}ms`;
   if (time < 60) return `${Math.round(time)}s`;
   if (time < 3600) return `${Math.round(time / 60)}m`;
