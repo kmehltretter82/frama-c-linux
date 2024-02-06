@@ -37,9 +37,8 @@
    @module dome(main)
 */
 
-import _installExtension, { _REACT_DEVELOPER_TOOLS } from 'dome/misc/devtools';
-import SYS, * as System from 'dome/system';
 import { is } from "@electron-toolkit/utils";
+import SYS, * as System from 'dome/system';
 import {
   BrowserWindow,
   BrowserWindowConstructorOptions,
@@ -51,9 +50,11 @@ import {
   nativeTheme,
   shell,
 } from 'electron';
+import installExtension from 'electron-devtools-installer';
+import { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import fs from 'fs';
-import path from 'path';
 import _ from 'lodash';
+import path from 'path';
 
 // --------------------------------------------------------------------------
 // --- Main Window Web Navigation
@@ -412,7 +413,7 @@ function createBrowserWindow(
     height: 670,
     show: false,
     backgroundColor: '#f0f0f0',
-    // icon: path.join(__dirname, 'icon.png'),
+    icon: path.join(__dirname, 'icon.png'),
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: true,
@@ -483,7 +484,7 @@ function createBrowserWindow(
     if (DEVEL || LOCAL)
       process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'false';
     if (DEVEL && devtools) webContents.openDevTools();
-    theWindow.show();
+          theWindow.show();
   });
 
   // Focus Management
@@ -558,7 +559,6 @@ interface Cmd { wdir: string; argv: string[] }
 
 // [LC]: this is buggy, process.argv has no command line arguments
 function stripElectronArgv(cmd: Cmd): Cmd {
-  console.log(cmd);
   const wdir = DEVEL ? cmd.argv[2] : cmd.wdir;
   const argv = cmd.argv
     .slice(DEVEL ? 3 : LOCAL ? 2 : 1)
@@ -737,6 +737,11 @@ export function start(): void {
 
   // Listen to application events
   app.whenReady().then(() => {
+    if (DEVEL) {
+      installExtension(REACT_DEVELOPER_TOOLS)
+        .then((name) => console.log(`Added Extension:  ${name}`))
+        .catch((err) => console.log('An error occurred: ', err));
+    }
     createPrimaryWindow();
 
     // Wait for Electron init

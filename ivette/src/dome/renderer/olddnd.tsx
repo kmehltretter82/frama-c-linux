@@ -19,7 +19,6 @@
 /*   for more details (enclosed in the file licenses/LGPLv2.1).             */
 /*                                                                          */
 /* ************************************************************************ */
-
 /**
    @packageDocumentation
    @module dome/olddnd
@@ -127,21 +126,16 @@ This event handler will receive the current D&D state in argument, with the cumu
 updates from all participants merged in.
 
 */
-
-import _ from 'lodash' ;
-import React from 'react' ;
+import _ from 'lodash';
+import React from 'react';
 import Draggable, { DraggableCore } from 'react-draggable';
-
-const HOLD_TIME = 100 ; /* time in ms */
-const HOLD_FIRE = 6 ;   /* number of HOLD_TIME before « hold » */
-const HOLD_MOVE = 3 ;   /* maximum moved pixels for « holding » */
-
+const HOLD_TIME = 100; /* time in ms */
+const HOLD_FIRE = 6; /* number of HOLD_TIME before « hold » */
+const HOLD_MOVE = 3; /* maximum moved pixels for « holding » */
 // --------------------------------------------------------------------------
 // --- Events Dispatcher
 // --------------------------------------------------------------------------
-
-const notify = ( cb, evt ) => cb && cb(evt);
-
+const notify = (cb, evt) => cb && cb(evt);
 /**
    @method
    @summary Dispatch a dragging event over listeners.
@@ -167,49 +161,48 @@ D&D features into your own component. Here is a typical pattern:
     );
 
  */
-export const dispatchEvent = ( dragging , handlers ) => {
-  if (!handlers) return;
-  const dragged = Object.assign( {} , dragging );
-  notify( handlers.onDnd , dragged );
-  switch( dragged.move ) {
-  case 'START':
-    notify( handlers.onStart, dragged );
-    return;
-  case 'STOP':
-    notify( handlers.onStop,  dragged );
-    return;
-  case 'ENTER':
-    notify( handlers.onEnter, dragged );
-    return;
-  case 'SWITCH':
-    notify( handlers.onLeave, dragged );
-    notify( handlers.onEnter, dragged );
-    return;
-  case 'LEAVE':
-    notify( handlers.onLeave, dragged );
-    return;
-  case 'DRAG':
-    notify( handlers.onDrag,  dragged );
-    return;
-  case 'MOVE':
-    notify( handlers.onMove,  dragged );
-    notify( handlers.onDrag,  dragged );
-    return;
-  case 'HOLD':
-    notify( handlers.onHold,  dragged );
-    return;
-  case 'DROP':
-    notify( handlers.onDrop,  dragged );
-    return;
-  default:
-    return;
-  }
+export const dispatchEvent = (dragging, handlers) => {
+    if (!handlers)
+        return;
+    const dragged = Object.assign({}, dragging);
+    notify(handlers.onDnd, dragged);
+    switch (dragged.move) {
+        case 'START':
+            notify(handlers.onStart, dragged);
+            return;
+        case 'STOP':
+            notify(handlers.onStop, dragged);
+            return;
+        case 'ENTER':
+            notify(handlers.onEnter, dragged);
+            return;
+        case 'SWITCH':
+            notify(handlers.onLeave, dragged);
+            notify(handlers.onEnter, dragged);
+            return;
+        case 'LEAVE':
+            notify(handlers.onLeave, dragged);
+            return;
+        case 'DRAG':
+            notify(handlers.onDrag, dragged);
+            return;
+        case 'MOVE':
+            notify(handlers.onMove, dragged);
+            notify(handlers.onDrag, dragged);
+            return;
+        case 'HOLD':
+            notify(handlers.onHold, dragged);
+            return;
+        case 'DROP':
+            notify(handlers.onDrop, dragged);
+            return;
+        default:
+            return;
+    }
 };
-
 // --------------------------------------------------------------------------
 // --- Dnd Controllers
 // --------------------------------------------------------------------------
-
 /**
    @class
    @summary D&D Controller.
@@ -244,290 +237,282 @@ export const dispatchEvent = ( dragging , handlers ) => {
    Outside of a D&D sequence, the `state` and `dragging` properties are undefined.
 
 */
-
 export class DnD {
-
-  constructor(handlers) {
-    this.kid = 0 ;
-    this.targets = {} ;
-    this.tickHold = this.tickHold.bind(this);
-    this.triggerUpdate = this.triggerUpdate.bind(this);
-    this.triggerDnd = this.triggerDnd.bind(this);
-    this.handlers = handlers || {} ;
-  }
-
-  /** @summary Update the D&D event handlers.
-      @param {object} [handlers] - D&D events callbacks
-      @description
-      Replace the event handlers by those specified in the `handlers` object.
-      Not mentionned callbacks are left unchanged.
-      If the `null` object is given, all current handlers are removed.
-  */
-  setHandlers( handlers ) {
-    this.handlers =
-      handlers === null ? {} : Object.assign( this.handlers, handlers );
-  }
-
-  //--- Registering
-
-  /** @summary Registers a target into the D&D controller.
-      @param {React.ref} ref - a referrence on the drop target DOM element
-      @param {function} callback - generic D&D events callback
-      @return {ident} the target identifier
-      @description
-      You normally don't call this method by yoursef, it is automatically
-      called when `<DropTarget/>` are mounted in the DOM.
-  */
-  register( ref, callback )
-  {
-    if (!ref) return undefined;
-    const id = 'DOME$' + (++this.kid) ;
-    this.targets[id] = { id, ref , callback } ;
-    return id;
-  }
-
-  //--- Updating
-
-  /** @summary Update the event handlers associated to a drop target.
-      @param {ident} id - the drop target identifier
-      @param {React.ref} ref - a referrence on the drop target DOM element
-      @param {function} callback - generic D&D events callback
-      @description
-      You normally don't call this method by yoursef, it is automatically
-      called when `<DropTarget/>` are updated. If the target data is falsy, the target identifier
-      is used instead.
-  */
-  update( id, ref, callback ) {
-    if (this.targets[id]) {
-      this.targets[id] = { id, ref, callback };
+    constructor(handlers) {
+        this.kid = 0;
+        this.targets = {};
+        this.tickHold = this.tickHold.bind(this);
+        this.triggerUpdate = this.triggerUpdate.bind(this);
+        this.triggerDnd = this.triggerDnd.bind(this);
+        this.handlers = handlers || {};
     }
-  }
 
-  //--- Un-Registering
-
-  /** @summary Un-register a target from the D&D controller.
-      @param {ident} id - the drop target identifier to remove
-      @description
-      You normally don't call this method by yoursef, it is automatically
-      called when `<DropTarget/>` are unmounted from the DOM.
-  */
-  remove( id ) {
-    delete this.targets[id] ;
-  }
-
-  //--- Generic Mouse Event
-
-  handleMouseEvent( evt, x, y ) {
-    const d = this.dragging ;
-    d.meta = evt.ctrKey || evt.altKey || evt.metaKey ;
-    d.deltaX = x - this.rootX ;
-    d.deltaY = y - this.rootY ;
-    d.position = {x,y} ;
-    const ex = d.clientX = evt.clientX ;
-    const ey = d.clientY = evt.clientY ;
-    d.targetClientRect = undefined ;
-    this.leaved = this.target ;
-    this.leavedHandler = this.targetHandler ;
-    this.target = undefined ;
-    this.targetHandler = undefined ;
-    const elts = document.elementsFromPoint(ex,ey);
-    elts.find((elt) => {
-      const target = _.find( this.targets, (tgt) => tgt.ref.current === elt );
-      if (target) {
-        const { id, callback } = target ;
-        this.target = id ;
-        this.targetHandler = target.callback ;
-        if (id === this.leaved) this.leavedHandler = undefined ;
-        d.targetClientRect = elt.getBoundingClientRect();
-        return true;
-      }
-      return false;
-    });
-  }
-
-  //--- Starting D&D sequence
-
-  /** @summary Initiates a new drag.
-      @param {Event} evt - the mouse event originating the drag
-      @param {number} x - initial horizontal coordinate
-      @param {number} y - initial vertical coordinate
-      @param {Element} node - the source DOM element
-      @param {function} callback - generic D&D events callback
-      @description
-You normally don't call this method by sourself, it is automatically
-called by `DragSource` objects.
-
-Initial `(x,y)` coordinates can be in any coordinate system, they
-are only used to compute relative offsets of further D&D events.
-They can be typically taken from React-Draggable events data.
-
-The generic callback shall handle two kind of events:
- - `callback()` when the global D&D state has been updated;
- - `callback(Dragging)` when some D&D event is triggered.
-
-Generally, you shall `forceUpdate()` your component in the first case,
-and `dispatchEvent()` the event to D&D listeners in the second case.
-
-  */
-  handleStart( evt, x, y, node, callback ) {
-    if (this.dragging) {
-      this.triggerDnd('STOP');
-      if (this.timer) clearInterval(this.timer);
+    /** @summary Update the D&D event handlers.
+        @param {object} [handlers] - D&D events callbacks
+        @description
+        Replace the event handlers by those specified in the `handlers` object.
+        Not mentionned callbacks are left unchanged.
+        If the `null` object is given, all current handlers are removed.
+    */
+    setHandlers(handlers) {
+        this.handlers =
+            handlers === null ? {} : Object.assign(this.handlers, handlers);
     }
-    this.state = {};
-    this.dragging = {
-      sourceClientRect: node.getBoundingClientRect()
-    };
-    this.sourceHandler = callback ;
-    this.targetHandler = undefined ;
-    this.leavedHandler = undefined ;
-    this.rootX = x;
-    this.rootY = y;
-    this.lastX = x;
-    this.lastY = y;
-    this.ticks = 0;
-    this.handleMouseEvent( evt, x, y );
-    this.triggerDnd( 'START' );
-    this.timer = setInterval( this.tickHold , HOLD_TIME );
-  }
 
-  //--- Dragging D&D sequence
-
-  /** @summary Dispatch a drag-event amoung registered drop targets.
-      @param {Event} evt - the dragging mouse event
-      @param {number} x - the horizontal coordinate
-      @param {number} y - the vertical coordinate
-      @description
-You normally don't call this method by sourself, it is automatically
-called by `DragSource` objects.
-
-The `(x,y)` coordinates shall be in the same coordinate system than
-when starting the D&D sequence. It is only used to compute relative
-the offsets of the associated D&D event.
-  */
-  handleDrag( evt, x, y ) {
-    let kind = 'DRAG' ;
-    let delta = Math.abs( x - this.lastX ) + Math.abs( y - this.lastY );
-    this.lastX = x ;
-    this.lastY = y ;
-    if (delta > HOLD_MOVE) {
-      this.ticks = 0 ;
-      const d = this.dragging ;
-      if (d.held) {
-        d.held = false ;
-        kind = 'MOVE' ;
-      }
+    // --- Registering
+    /** @summary Registers a target into the D&D controller.
+        @param {React.ref} ref - a referrence on the drop target DOM element
+        @param {function} callback - generic D&D events callback
+        @return {ident} the target identifier
+        @description
+        You normally don't call this method by yoursef, it is automatically
+        called when `<DropTarget/>` are mounted in the DOM.
+    */
+    register(ref, callback) {
+        if (!ref)
+            return undefined;
+        const id = 'DOME$' + (++this.kid);
+        this.targets[id] = { id, ref, callback };
+        return id;
     }
-    this.handleMouseEvent( evt, x, y );
-    const target = this.target ;
-    const leaved = this.leaved ;
-    if (target !== leaved) {
-      if (target && !leaved) kind = 'ENTER' ; else
-        if (!target && leaved) kind = 'LEAVE' ; else
-          if (target && leaved) kind = 'SWITCH' ;
+
+    // --- Updating
+    /** @summary Update the event handlers associated to a drop target.
+        @param {ident} id - the drop target identifier
+        @param {React.ref} ref - a referrence on the drop target DOM element
+        @param {function} callback - generic D&D events callback
+        @description
+        You normally don't call this method by yoursef, it is automatically
+        called when `<DropTarget/>` are updated. If the target data is falsy, the target identifier
+        is used instead.
+    */
+    update(id, ref, callback) {
+        if (this.targets[id]) {
+            this.targets[id] = { id, ref, callback };
+        }
     }
-    this.triggerDnd(kind);
-  }
 
-  //--- Stopping D&D sequence
-
-  /** @summary Dispatch a drop-event over registered drop targets.
-      @param {Event} evt - the dropping mouse event
-      @param {number} x - the horizontal coordinate
-      @param {number} y - the vertical coordinate
-      @description
-You normally don't call this method by sourself, it is automatically
-called by `DragSource` objects.
-
-The `(x,y)` coordinates shall be in the same coordinate system than
-when starting the D&D sequence. It is only used to compute relative
-the offsets of the associated D&D event.
-  */
-  handleStop( evt, x, y ) {
-    clearInterval( this.timer );
-    this.handleMouseEvent( evt, x, y );
-    this.triggerDnd(this.target ? 'DROP' : 'STOP');
-    this.dragging = undefined ;
-    this.state = undefined ;
-    this.timer = undefined;
-    this.ticks = undefined;
-    this.triggerUpdate();
-  }
-
-  //--- Hold Detection
-
-  tickHold() {
-    if (this.dragging && (this.ticks++) > HOLD_FIRE)
-    {
-      this.dragging.held = true ;
-      this.triggerDnd('HOLD');
-      this.ticks = 0 ;
+    // --- Un-Registering
+    /** @summary Un-register a target from the D&D controller.
+        @param {ident} id - the drop target identifier to remove
+        @description
+        You normally don't call this method by yoursef, it is automatically
+        called when `<DropTarget/>` are unmounted from the DOM.
+    */
+    remove(id) {
+        delete this.targets[id];
     }
-  }
 
-  //--- Update State
-
-  /**
-     @summary Update the controller state.
-     @parameter {object} update - the data to update the state with
-     @description
-     Update the state with the given updates, like React component states.
-     This will force the drag source target and drop target components to re-render.
-  */
-  setState(update) {
-    const state = this.state ;
-    if (state && update) {
-      this.state = Object.assign( state, update );
-      if (!this.dirty) {
-        this.dirty = true ;
-        setImmediate( this.triggerUpdate );
-      }
+    // --- Generic Mouse Event
+    handleMouseEvent(evt, x, y) {
+        const d = this.dragging;
+        d.meta = evt.ctrKey || evt.altKey || evt.metaKey;
+        d.deltaX = x - this.rootX;
+        d.deltaY = y - this.rootY;
+        d.position = { x, y };
+        const ex = d.clientX = evt.clientX;
+        const ey = d.clientY = evt.clientY;
+        d.targetClientRect = undefined;
+        this.leaved = this.target;
+        this.leavedHandler = this.targetHandler;
+        this.target = undefined;
+        this.targetHandler = undefined;
+        const elts = document.elementsFromPoint(ex, ey);
+        elts.find((elt) => {
+            const target = _.find(this.targets, (tgt) => tgt.ref.current === elt);
+            if (target) {
+                const { id, callback } = target;
+                this.target = id;
+                this.targetHandler = target.callback;
+                if (id === this.leaved)
+                    this.leavedHandler = undefined;
+                d.targetClientRect = elt.getBoundingClientRect();
+                return true;
+            }
+            return false;
+        });
     }
-  }
 
-  triggerUpdate() {
-    this.dirty = false ;
-    notify( this.leavedHandler ); // always different from target
-    notify( this.sourceHandler );
-    notify( this.targetHandler );
-    notify( this.handlers.onUpdate , this.state );
-  }
+    // --- Starting D&D sequence
+    /** @summary Initiates a new drag.
+        @param {Event} evt - the mouse event originating the drag
+        @param {number} x - initial horizontal coordinate
+        @param {number} y - initial vertical coordinate
+        @param {Element} node - the source DOM element
+        @param {function} callback - generic D&D events callback
+        @description
+  You normally don't call this method by sourself, it is automatically
+  called by `DragSource` objects.
 
-  //--- Trigger Dragging Events
+  Initial `(x,y)` coordinates can be in any coordinate system, they
+  are only used to compute relative offsets of further D&D events.
+  They can be typically taken from React-Draggable events data.
 
-  triggerDnd(move) {
-    const d = this.dragging ;
-    d.move = move ;
-    switch( move ) {
-    case 'ENTER':
-      notify( this.sourceHandler, d );
-      notify( this.targetHandler, d );
-      break;
-    case 'LEAVE':
-      notify( this.leavedHandler, d );
-      notify( this.sourceHandler, d );
-      break;
-    case 'SWITCH':
-      d.move = 'LEAVE'  ; notify( this.leavedHandler, d );
-      d.move = 'SWITCH' ; notify( this.sourceHandler, d );
-      d.move = 'ENTER'  ; notify( this.targetHandler, d );
-      d.move = 'SWITCH' ;
-      break;
-    default:
-      notify( this.leavedHandler, d ); // allways different from target
-      notify( this.sourceHandler, d );
-      notify( this.targetHandler, d );
-      break;
+  The generic callback shall handle two kind of events:
+   - `callback()` when the global D&D state has been updated;
+   - `callback(Dragging)` when some D&D event is triggered.
+
+  Generally, you shall `forceUpdate()` your component in the first case,
+  and `dispatchEvent()` the event to D&D listeners in the second case.
+
+    */
+    handleStart(evt, x, y, node, callback) {
+        if (this.dragging) {
+            this.triggerDnd('STOP');
+            if (this.timer)
+                clearInterval(this.timer);
+        }
+        this.state = {};
+        this.dragging = {
+            sourceClientRect: node.getBoundingClientRect()
+        };
+        this.sourceHandler = callback;
+        this.targetHandler = undefined;
+        this.leavedHandler = undefined;
+        this.rootX = x;
+        this.rootY = y;
+        this.lastX = x;
+        this.lastY = y;
+        this.ticks = 0;
+        this.handleMouseEvent(evt, x, y);
+        this.triggerDnd('START');
+        this.timer = setInterval(this.tickHold, HOLD_TIME);
     }
-    dispatchEvent( d, this.handlers );
-  }
 
+    // --- Dragging D&D sequence
+    /** @summary Dispatch a drag-event amoung registered drop targets.
+        @param {Event} evt - the dragging mouse event
+        @param {number} x - the horizontal coordinate
+        @param {number} y - the vertical coordinate
+        @description
+  You normally don't call this method by sourself, it is automatically
+  called by `DragSource` objects.
+
+  The `(x,y)` coordinates shall be in the same coordinate system than
+  when starting the D&D sequence. It is only used to compute relative
+  the offsets of the associated D&D event.
+    */
+    handleDrag(evt, x, y) {
+        let kind = 'DRAG';
+        const delta = Math.abs(x - this.lastX) + Math.abs(y - this.lastY);
+        this.lastX = x;
+        this.lastY = y;
+        if (delta > HOLD_MOVE) {
+            this.ticks = 0;
+            const d = this.dragging;
+            if (d.held) {
+                d.held = false;
+                kind = 'MOVE';
+            }
+        }
+        this.handleMouseEvent(evt, x, y);
+        const target = this.target;
+        const leaved = this.leaved;
+        if (target !== leaved) {
+            if (target && !leaved)
+                kind = 'ENTER';
+            else if (!target && leaved)
+                kind = 'LEAVE';
+            else if (target && leaved)
+                kind = 'SWITCH';
+        }
+        this.triggerDnd(kind);
+    }
+
+    // --- Stopping D&D sequence
+    /** @summary Dispatch a drop-event over registered drop targets.
+        @param {Event} evt - the dropping mouse event
+        @param {number} x - the horizontal coordinate
+        @param {number} y - the vertical coordinate
+        @description
+  You normally don't call this method by sourself, it is automatically
+  called by `DragSource` objects.
+
+  The `(x,y)` coordinates shall be in the same coordinate system than
+  when starting the D&D sequence. It is only used to compute relative
+  the offsets of the associated D&D event.
+    */
+    handleStop(evt, x, y) {
+        clearInterval(this.timer);
+        this.handleMouseEvent(evt, x, y);
+        this.triggerDnd(this.target ? 'DROP' : 'STOP');
+        this.dragging = undefined;
+        this.state = undefined;
+        this.timer = undefined;
+        this.ticks = undefined;
+        this.triggerUpdate();
+    }
+
+    // --- Hold Detection
+    tickHold() {
+        if (this.dragging && (this.ticks++) > HOLD_FIRE) {
+            this.dragging.held = true;
+            this.triggerDnd('HOLD');
+            this.ticks = 0;
+        }
+    }
+
+    // --- Update State
+    /**
+       @summary Update the controller state.
+       @parameter {object} update - the data to update the state with
+       @description
+       Update the state with the given updates, like React component states.
+       This will force the drag source target and drop target components to re-render.
+    */
+    setState(update) {
+        const state = this.state;
+        if (state && update) {
+            this.state = Object.assign(state, update);
+            if (!this.dirty) {
+                this.dirty = true;
+                setImmediate(this.triggerUpdate);
+            }
+        }
+    }
+
+    triggerUpdate() {
+        this.dirty = false;
+        notify(this.leavedHandler); // always different from target
+        notify(this.sourceHandler);
+        notify(this.targetHandler);
+        notify(this.handlers.onUpdate, this.state);
+    }
+
+    // --- Trigger Dragging Events
+    triggerDnd(move) {
+        const d = this.dragging;
+        d.move = move;
+        switch (move) {
+            case 'ENTER':
+                notify(this.sourceHandler, d);
+                notify(this.targetHandler, d);
+                break;
+            case 'LEAVE':
+                notify(this.leavedHandler, d);
+                notify(this.sourceHandler, d);
+                break;
+            case 'SWITCH':
+                d.move = 'LEAVE';
+                notify(this.leavedHandler, d);
+                d.move = 'SWITCH';
+                notify(this.sourceHandler, d);
+                d.move = 'ENTER';
+                notify(this.targetHandler, d);
+                d.move = 'SWITCH';
+                break;
+            default:
+                notify(this.leavedHandler, d); // allways different from target
+                notify(this.sourceHandler, d);
+                notify(this.targetHandler, d);
+                break;
+        }
+        dispatchEvent(d, this.handlers);
+    }
 }
-
 // --------------------------------------------------------------------------
 // --- Drag Overlay
 // --------------------------------------------------------------------------
-
 /**
    @summary Display a Drag Source with an Overlay.
    @property {Dragging} [dragging] - current dragging event
@@ -567,49 +552,36 @@ the offsets of the associated D&D event.
    Finally, you may supply a custom rendering function for rendering the drag
    source content, which is fed with the current dragging event.
  */
-
-export const Overlay = ({
-  dragging, className='', style, styleDragged, styleDragging,
-  offsetX=4, offsetY=4, insetX=0, insetY=0,
-  zIndex=1,
-  children,
-  ...divProps
-}) => {
-  let outerClass,outerStyle,innerStyle,innerClass ;
-  if (dragging) {
-    const { left, top, width, height } = dragging.sourceClientRect ;
-    const position = {
-      position: 'fixed',
-      left:   left + offsetX + dragging.deltaX,
-      top:    top  + offsetY + dragging.deltaY,
-      width, height, zIndex, margin: 0
-    };
-    const holder = {
-      width, height
-    };
-    outerClass = 'dome-dragged ' + className ;
-    innerClass = 'dome-dragging ' + className ;
-    outerStyle = Object.assign( {}, style, styleDragged, holder );
-    innerStyle = Object.assign( {}, style, styleDragging, position );
-  } else {
-    outerClass = className ;
-    outerStyle = style ;
-    innerClass = undefined ;
-    innerStyle = undefined ;
-  }
-  return (
-    <div className={outerClass} style={outerStyle} {...divProps}>
-      <div className={innerClass} style={innerStyle}>
-        {typeof(children)==='function' ? children(dragging) : children}
-      </div>
-    </div>
-  );
+export const Overlay = ({ dragging, className = '', style, styleDragged, styleDragging, offsetX = 4, offsetY = 4, insetX = 0, insetY = 0, zIndex = 1, children, ...divProps }) => {
+    let outerClass, outerStyle, innerStyle, innerClass;
+    if (dragging) {
+        const { left, top, width, height } = dragging.sourceClientRect;
+        const position = {
+            position: 'fixed',
+            left: left + offsetX + dragging.deltaX,
+            top: top + offsetY + dragging.deltaY,
+            width, height, zIndex, margin: 0
+        };
+        const holder = {
+            width, height
+        };
+        outerClass = 'dome-dragged ' + className;
+        innerClass = 'dome-dragging ' + className;
+        outerStyle = Object.assign({}, style, styleDragged, holder);
+        innerStyle = Object.assign({}, style, styleDragging, position);
+    }
+    else {
+        outerClass = className;
+        outerStyle = style;
+        innerClass = undefined;
+        innerStyle = undefined;
+    }
+    return (React.createElement("div", { className: outerClass, style: outerStyle, ...divProps },
+        React.createElement("div", { className: innerClass, style: innerStyle }, typeof (children) === 'function' ? children(dragging) : children)));
 };
-
 // --------------------------------------------------------------------------
 // --- Drag Sources
 // --------------------------------------------------------------------------
-
 /**
    @class
    @summary Drag Source Component.
@@ -660,115 +632,79 @@ See [react-draggable](https://github.com/mzabriskie/react-draggable)
 documentation for more details.
 
 */
-
-export class DragSource extends React.Component
-{
-  constructor(props)
-  {
-    super(props);
-    this.onStart = this.onStart.bind(this);
-    this.onDrag = this.onDrag.bind(this);
-    this.onStop = this.onStop.bind(this);
-    this.handleDnd = this.handleDnd.bind(this);
-    this.state = { };
-  }
-
-  componentDidMount() {
-    this.mounted = true;
-  }
-
-  componentWillUnmount() {
-    this.mounted = false;
-  }
-
-  onStart(evt,drag) {
-    const { dnd, disabled } = this.props;
-    if (dnd) dnd.handleStart(evt,drag.x,drag.y,drag.node,this.handleDnd);
-  }
-
-  onDrag(evt,drag) {
-    const { dnd, disabled } = this.props ;
-    if (dnd) dnd.handleDrag(evt,drag.x,drag.y);
-  }
-
-  onStop(evt,drag) {
-    const { dnd, disabled } = this.props ;
-    if (dnd) dnd.handleStop(evt,drag.x,drag.y);
-  }
-
-  handleDnd(dragging) {
-    if (!this.mounted) return;
-    if (!dragging)
-      this.forceUpdate();
-    else {
-      dispatchEvent( dragging, this.props );
-      switch(dragging.move) {
-      case 'STOP':
-      case 'DROP':
-        this.setState({dragging:undefined});
-        break;
-      default:
-        this.setState({dragging});
-        break;
-      }
+export class DragSource extends React.Component {
+    constructor(props) {
+        super(props);
+        this.onStart = this.onStart.bind(this);
+        this.onDrag = this.onDrag.bind(this);
+        this.onStop = this.onStop.bind(this);
+        this.handleDnd = this.handleDnd.bind(this);
+        this.state = {};
     }
-  }
 
-  render() {
-    const { dnd, disabled, className, style,
-            handle, draggable, overlay,
-            children } = this.props ;
-    if (overlay || typeof(children)==='function') {
-      const dragging = this.state.dragging ;
-      return (
-        <DraggableCore
-          handle={handle}
-          disabled={!dnd || disabled}
-          onStart={this.onStart}
-          onDrag={this.onDrag}
-          onStop={this.onStop}
-          {...draggable}
-          >
-          { overlay ?
-            (
-              <Overlay
-                dragging={dragging}
-                className={className} style={style}
-                {...overlay} >
-                {children}
-              </Overlay>
-            )
-            : children(dragging)
-          }
-        </DraggableCore>
-      );
-    } else {
-      const { className, style, position={x:0,y:0} } = this.props ;
-      return (
-        <Draggable
-          handle={handle}
-          disabled={!dnd || disabled}
-          position={position}
-          defaultClassName=''
-          defaultClassNameDragged=''
-          defaultClassNameDragging='dome-dragging'
-          onStart={this.onStart}
-          onDrag={this.onDrag}
-          onStop={this.onStop}
-          {...draggable}
-          >
-          <div className={className} style={style}>{children}</div>
-        </Draggable>
-      );
+    componentDidMount() {
+        this.mounted = true;
     }
-  }
 
+    componentWillUnmount() {
+        this.mounted = false;
+    }
+
+    onStart(evt, drag) {
+        const { dnd, disabled } = this.props;
+        if (dnd)
+            dnd.handleStart(evt, drag.x, drag.y, drag.node, this.handleDnd);
+    }
+
+    onDrag(evt, drag) {
+        const { dnd, disabled } = this.props;
+        if (dnd)
+            dnd.handleDrag(evt, drag.x, drag.y);
+    }
+
+    onStop(evt, drag) {
+        const { dnd, disabled } = this.props;
+        if (dnd)
+            dnd.handleStop(evt, drag.x, drag.y);
+    }
+
+    handleDnd(dragging) {
+        if (!this.mounted)
+            return;
+        if (!dragging)
+            this.forceUpdate();
+        else {
+            dispatchEvent(dragging, this.props);
+            switch (dragging.move) {
+                case 'STOP':
+                case 'DROP':
+                    this.setState({ dragging: undefined });
+                    break;
+                default:
+                    this.setState({ dragging });
+                    break;
+            }
+        }
+    }
+
+    render() {
+        const { dnd, disabled, className, style, handle, draggable, overlay, children } = this.props;
+        if (overlay || typeof (children) === 'function') {
+            const dragging = this.state.dragging;
+            return (React.createElement(DraggableCore, { handle: handle, disabled: !dnd || disabled, onStart: this.onStart, onDrag: this.onDrag, onStop: this.onStop, ...draggable }, overlay ?
+                (React.createElement(Overlay, { dragging: dragging, className: className, style: style, ...overlay }, children))
+                : children(dragging)));
+        }
+        else {
+            const { className, style, position = { x: 0, y: 0 } } = this.props;
+            return (React.createElement(Draggable, { handle: handle, disabled: !dnd || disabled, position: position, defaultClassName: '', defaultClassNameDragged: '', defaultClassNameDragging: 'dome-dragging', onStart: this.onStart, onDrag: this.onDrag, onStop: this.onStop, ...draggable },
+                React.createElement("div", { className: className, style: style }, children)));
+        }
+    }
 }
-
 // --------------------------------------------------------------------------
 // --- Drop Target
 // --------------------------------------------------------------------------
-
 /**
    @class
    @summary Drop Target Container.
@@ -802,70 +738,61 @@ to this drop target. See event callbacks documentation for more details on
 other specific event listeners.
 
 */
-export class DropTarget extends React.Component
-{
-
-  constructor(props) {
-    super(props);
-    this.targetRef = this.props.targetRef || React.createRef() ;
-    this.handleDnd = this.handleDnd.bind(this);
-    this.state = {};
-  }
-
-  componentDidMount() {
-    const { dnd } = this.props ;
-    this.id = dnd && dnd.register( this.targetRef, this.handleDnd );
-    this.mounted = true ;
-  }
-
-  componentDidUpdate() {
-    const { dnd } = this.props ;
-    dnd && dnd.update(this.id, this.targetRef, this.handleDnd );
-  }
-
-  componentWillUnmount() {
-    const { dnd } = this.props ;
-    dnd && dnd.remove( this.id );
-    this.mounted = false ;
-  }
-
-  handleDnd(dragging) {
-    if (!this.mounted) return;
-    if (!dragging)
-      this.forceUpdate();
-    else {
-      dispatchEvent( dragging, this.props );
-      switch(dragging.move) {
-      case 'STOP':
-      case 'DROP':
-      case 'LEAVE':
-        this.setState({dragging:undefined});
-        break;
-      default:
-        this.setState({dragging});
-        break;
-      }
+export class DropTarget extends React.Component {
+    constructor(props) {
+        super(props);
+        this.targetRef = this.props.targetRef || React.createRef();
+        this.handleDnd = this.handleDnd.bind(this);
+        this.state = {};
     }
-  }
 
-  render() {
-    const targetRef = this.targetRef ;
-    const { children } = this.props ;
-    const { dragging } = this.state ;
-    if (typeof(children)==='function')
-      return children(dragging);
-    else {
-      let { className='', style } = this.props ;
-      return (
-        <div ref={targetRef}
-             className={ dragging ? className + ' dome-dragging' : className }
-             style={style} >
-          {children}
-        </div>
-      );
+    componentDidMount() {
+        const { dnd } = this.props;
+        this.id = dnd && dnd.register(this.targetRef, this.handleDnd);
+        this.mounted = true;
     }
-  }
 
+    componentDidUpdate() {
+        const { dnd } = this.props;
+        dnd && dnd.update(this.id, this.targetRef, this.handleDnd);
+    }
+
+    componentWillUnmount() {
+        const { dnd } = this.props;
+        dnd && dnd.remove(this.id);
+        this.mounted = false;
+    }
+
+    handleDnd(dragging) {
+        if (!this.mounted)
+            return;
+        if (!dragging)
+            this.forceUpdate();
+        else {
+            dispatchEvent(dragging, this.props);
+            switch (dragging.move) {
+                case 'STOP':
+                case 'DROP':
+                case 'LEAVE':
+                    this.setState({ dragging: undefined });
+                    break;
+                default:
+                    this.setState({ dragging });
+                    break;
+            }
+        }
+    }
+
+    render() {
+        const targetRef = this.targetRef;
+        const { children } = this.props;
+        const { dragging } = this.state;
+        if (typeof (children) === 'function')
+            return children(dragging);
+        else {
+            const { className = '', style } = this.props;
+            return (React.createElement("div", { ref: targetRef, className: dragging ? className + ' dome-dragging' : className, style: style }, children));
+        }
+    }
 }
-
 // --------------------------------------------------------------------------

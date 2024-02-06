@@ -43,7 +43,6 @@
 import _ from 'lodash';
 import Emitter from 'events';
 import React from 'react';
-import ReactDOM from 'react-dom';
 import SYS, * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
@@ -52,6 +51,7 @@ import './dark.css';
 import './light.css';
 import './style.css';
 import { State } from './data/states';
+import { createRoot } from 'react-dom/client';
 
 // --------------------------------------------------------------------------
 // --- Context
@@ -332,9 +332,10 @@ function setContainer(
   Component: React.FunctionComponent | React.ComponentClass,
 ): void {
   Settings.synchronize();
-  const appNode = setContextAppNode();
+  const appNode = setContextAppNode()!;
   const contents = <Component />;
-  ReactDOM.render(contents, appNode);
+  const root = createRoot(appNode);
+  root.render(contents);
 }
 
 // --------------------------------------------------------------------------
