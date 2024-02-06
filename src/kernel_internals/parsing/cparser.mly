@@ -929,7 +929,7 @@ else_part:
     {
       let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       Kernel.warning ~wkey:Kernel.wkey_ghost_bad_use ~source:(fst loc)
-        "Invalid ghost else ignored@." ;
+        "Invalid ghost else ignored" ;
       in_block $5
     }
 
