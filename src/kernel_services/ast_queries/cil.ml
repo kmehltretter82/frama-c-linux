@@ -64,8 +64,6 @@ open Cil_types
    functions below. *)
 let check_invariants = false
 
-let () = Log.set_current_source (fun () -> fst (Current_loc.get ()))
-
 let pp_thisloc fmt = Location.pretty fmt (Current_loc.get ())
 
 let abort_context msg =

@@ -6,6 +6,8 @@ include State_builder.Ref
       let default () = Cil_datatype.Location.unknown
     end)
 
+let () = Log.set_current_source (fun () -> fst (get ()))
+
 let with_loc loc f x =
   let oldLoc = get () in
   let finally () = set oldLoc in
