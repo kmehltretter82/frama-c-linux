@@ -58,7 +58,7 @@ module Id = State_builder.Counter (struct let name = "Origin.Id" end)
 
 let current kind =
   let id = Id.next () in
-  let loc = Cil_const.CurrentLoc.get () in
+  let loc = Current_loc.get () in
   Origin { kind; loc; id; }
 
 let well = Well
@@ -153,7 +153,7 @@ let clear () = Id.reset (); History.clear ()
 
 let is_current = function
   | Unknown | Well -> false
-  | Origin { loc } -> Cil_datatype.Location.equal loc (Cil_const.CurrentLoc.get ())
+  | Origin { loc } -> Cil_datatype.Location.equal loc (Current_loc.get ())
 
 (* Returns true if the origin has never been registered and is related to the
    current location. *)

@@ -204,7 +204,7 @@ struct
 
   let rec wp (env:env) (a:vertex) : W.t_prop =
     match Vhash.find env.wp a with
-    | None -> raise (NonNaturalLoop (Cil_const.CurrentLoc.get()));
+    | None -> raise (NonNaturalLoop (Current_loc.get()));
     | Some pi -> pi
     | exception Not_found ->
       (* cut circularities *)
@@ -216,8 +216,8 @@ struct
 
   (* Compute a stmt node *)
   and stmt env a (s: stmt) : W.t_prop =
-    let open Cil_const.CurrentLoc.Operators in
-    let<> CurrentLocUpdated = Stmt.loc s in
+    let open Current_loc.Operators in
+    let<> UpdatedCurrentLoc = Stmt.loc s in
     let smoking = is_default_bhv env.mode && env.dead s in
     let cas = CfgAnnot.get_code_assertions ~smoking env.mode.kf s in
     let opt_fold f = Option.fold ~none:Fun.id ~some:f in

@@ -48,7 +48,7 @@ let pre_funspec kf env funspec =
     env
   in
   let loc = Kernel_function.get_location kf in
-  Cil_const.CurrentLoc.set loc;
+  Current_loc.set loc;
   let env = convert_unsupported_clauses env in
   let contract = Contract.create ~loc funspec in
   Env.with_params

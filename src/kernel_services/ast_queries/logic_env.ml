@@ -60,8 +60,6 @@ let preprocess_extension = Extensions.preprocess
 let preprocess_extension_block = Extensions.preprocess_block
 let extension_from = Extensions.extension_from
 
-module CurrentLoc = Cil_const.CurrentLoc
-
 let error (b,_e) fstring =
   Kernel.abort
     ~source:b
@@ -228,7 +226,7 @@ let add_logic_function_gen is_same_profile li =
   let name = li.l_var_info.lv_name in
   if is_builtin_logic_function name then
     error
-      (Cil_const.CurrentLoc.get())
+      (Current_loc.get())
       "logic function or predicate %s is built-in. You cannot redefine it"
       name;
   match Logic_info.find name with
@@ -237,7 +235,7 @@ let add_logic_function_gen is_same_profile li =
       (fun li' ->
          if is_same_profile li li' then
            error
-             (Cil_const.CurrentLoc.get ())
+             (Current_loc.get ())
              "already declared logic function or predicate %s \
               with same profile"
              name)
@@ -265,14 +263,14 @@ let find_logic_type = Logic_type_info.find
 let add_logic_type t infos =
   if is_logic_type t
   (* type variables hide type definitions on their scope *)
-  then error (Cil_const.CurrentLoc.get ()) "logic type %s already declared" t
+  then error (Current_loc.get ()) "logic type %s already declared" t
   else Logic_type_info.add t infos
 
 let is_logic_ctor = Logic_ctor_info.mem
 let find_logic_ctor = Logic_ctor_info.find
 let add_logic_ctor c infos =
   if is_logic_ctor c
-  then error (Cil_const.CurrentLoc.get ()) "logic constructor %s already declared" c
+  then error (Current_loc.get ()) "logic constructor %s already declared" c
   else Logic_ctor_info.add c infos
 let remove_logic_ctor = Logic_ctor_info.remove
 
@@ -308,7 +306,7 @@ let find_model_field s typ =
 let add_model_field m =
   try
     ignore (find_model_field m.mi_name m.mi_base_type);
-    error (Cil_const.CurrentLoc.get())
+    error (Current_loc.get())
       "Cannot add model field %s to type %a: it already exists."
       m.mi_name Cil_datatype.Typ.pretty m.mi_base_type
   with Not_found -> Model_info.add m.mi_name m
@@ -375,7 +373,7 @@ let add_builtin_logic_function_gen is_same_profile bl =
     List.iter
       (fun bl' ->
          if is_same_profile bl bl' then
-           error (Cil_const.CurrentLoc.get ())
+           error (Current_loc.get ())
              "already declared builtin logic function or predicate \
               %s with same profile"
              bl.bl_name)

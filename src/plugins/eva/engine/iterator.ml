@@ -441,7 +441,7 @@ module Make_Dataflow
     Async.yield ();
     check_signals ();
     current_ki := kinstr;
-    Cil_const.CurrentLoc.set e.edge_loc;
+    Current_loc.set e.edge_loc;
     let flow = Partitioning.transfer (transfer_transition transition) flow in
     let flow = process_partitioning_transitions v1 v2 transition flow in
     if not (Partitioning.is_empty_flow flow) then
@@ -466,7 +466,7 @@ module Make_Dataflow
         (* Set location *)
         current_ki := Kstmt stmt;
         let current_loc = Cil_datatype.Stmt.loc stmt in
-        Cil_const.CurrentLoc.set current_loc
+        Current_loc.set current_loc
       | None -> ()
     end;
     (* Get vertex store *)

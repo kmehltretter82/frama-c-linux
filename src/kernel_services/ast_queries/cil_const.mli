@@ -46,42 +46,6 @@ open Cil_types
 
 val voidType: typ
 
-(** A reference to the current location. If you are careful to set this to
-    the current location then you can use some built-in logging functions that
-    will print the location.
-*)
-module CurrentLoc: sig
-  include State_builder.Ref with type data = location
-  module Operators : sig
-
-    (** [CurrentLocUpdated] is a simple constructor which can be used as
-        documentation : [let<> CurrentLocUpdated = loc in ...] or replaced with
-        [_]
-    *)
-    type operation = CurrentLocUpdated
-
-    (** Utils function, [from_option opt] will return [l] if [opt] is [Some l]
-        and [CurrentLoc.get ()] if it is [None].
-        *)
-    val from_option : data option -> data
-
-    (**
-       [let<> _ = loc in ...] can be used to mimic the behavior obtained with
-       [
-         let oldloc = CurrentLoc.get () in
-         try
-           CurrentLoc.set loc;
-           let res = ... in
-           CurrentLoc.set oldloc;
-           res
-         with exn -> CurrentLoc.set oldloc; raise exn
-       ].
-       [let<>] syntax requires to open [CurrentLoc.Operators].
-    *)
-    val ( let<> ) : data -> (operation -> 'a) -> 'a
-  end
-end
-
 module Vid: sig val next: unit -> int end
 module Sid: sig val next: unit -> int end
 module Eid: sig val next: unit -> int end

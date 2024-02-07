@@ -486,9 +486,7 @@ struct
       W.insert ord) P.init;;
 
   let update_before (stmt, new_state) =
-    let open Cil_const.CurrentLoc.Operators in
     let ord = Fenv.to_ordered stmt in
-    let<> CurrentLocUpdated = Cil_datatype.Stmt.loc stmt in
     let join =
       (* If we know that we already have to recompute before.(ord), we
          can omit the inclusion testing, and only perform the join. The
@@ -503,15 +501,16 @@ struct
         if not is_included then W.insert ord;
         join
     in
-    P.set_before ord join
+    Current_loc.with_loc (Cil_datatype.Stmt.loc stmt)
+      (P.set_before ord) join
   ;;
 
   let do_stmt ord =
-    let open Cil_const.CurrentLoc.Operators in
+    let open Current_loc.Operators in
     let cur_state = P.get_before ord  in
     let stmt = Fenv.to_stmt ord in
     Kernel.debug ~dkey:Kernel.dkey_dataflow "forward: doing stmt %d" stmt.sid;
-    let<> CurrentLocUpdated = Cil_datatype.Stmt.loc stmt in
+    let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc stmt in
     let l = P.transfer_stmt stmt cur_state in
     List.iter update_before l
   ;;

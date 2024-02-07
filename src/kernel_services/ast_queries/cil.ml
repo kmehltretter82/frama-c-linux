@@ -64,12 +64,12 @@ open Cil_types
    functions below. *)
 let check_invariants = false
 
-let () = Log.set_current_source (fun () -> fst (Cil_const.CurrentLoc.get ()))
+let () = Log.set_current_source (fun () -> fst (Current_loc.get ()))
 
-let pp_thisloc fmt = Location.pretty fmt (Cil_const.CurrentLoc.get ())
+let pp_thisloc fmt = Location.pretty fmt (Current_loc.get ())
 
 let abort_context msg =
-  let loc = Cil_const.CurrentLoc.get () in
+  let loc = Current_loc.get () in
   let append fmt =
     Format.pp_print_newline fmt ();
     Errorloc.pp_context_from_file fmt loc
@@ -1421,9 +1421,8 @@ let copy_logic_label is_copy l =
   end else l
 
 let rec visitCilTerm vis t =
-  let open Cil_const.CurrentLoc.Operators in
-  let<> CurrentLocUpdated = t.term_loc in
-  doVisitCil vis (fun x-> x) vis#vterm childrenTerm t
+  Current_loc.with_loc t.term_loc
+    (doVisitCil vis (fun x-> x) vis#vterm childrenTerm) t
 
 and childrenTerm vis t =
   let tn' = visitCilTermNode vis t.term_node in
@@ -2075,8 +2074,8 @@ and childrenModelInfo vis m =
   else begin m.mi_attr <- mi_attr; m end
 
 and visitCilModelInfo vis m =
-  let open Cil_const.CurrentLoc.Operators in
-  let<> CurrentLocUpdated = m.mi_decl in
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = m.mi_decl in
   let m' =
     doVisitCil
       vis (Visitor_behavior.Memo.model_info vis#behavior) vis#vmodel_info childrenModelInfo m
@@ -2089,9 +2088,8 @@ and visitCilModelInfo vis m =
   m'
 
 and visitCilAnnotation vis a =
-  let open Cil_const.CurrentLoc.Operators in
-  let<> CurrentLocUpdated = Global_annotation.loc a in
-  doVisitCil vis id vis#vannotation childrenAnnotation a
+  Current_loc.with_loc (Global_annotation.loc a)
+    (doVisitCil vis id vis#vannotation childrenAnnotation) a
 
 and childrenAnnotation vis a =
   match a with
@@ -2202,9 +2200,9 @@ and childrenCodeAnnot vis ca =
     else ca
 
 and visitCilExpr (vis: cilVisitor) (e: exp) : exp =
-  let open Cil_const.CurrentLoc.Operators in
-  let<> CurrentLocUpdated = e.eloc in
-  doVisitCil vis (Visitor_behavior.cexpr vis#behavior) vis#vexpr childrenExp e
+  Current_loc.with_loc (e.eloc)
+    (doVisitCil vis (Visitor_behavior.cexpr vis#behavior) vis#vexpr childrenExp)
+    e
 
 and childrenExp (vis: cilVisitor) (e: exp) : exp =
   let vExp e = visitCilExpr vis e in
@@ -2335,9 +2333,8 @@ and childrenLocal_init vi (vis: cilVisitor) li =
     if f' != f || args' != args then ConsInit(f',args',k) else li
 
 and visitCilInstr (vis: cilVisitor) (i: instr) : instr list =
-  let open Cil_const.CurrentLoc.Operators in
-  let<> CurrentLocUpdated = Cil_datatype.Instr.loc i in
-  doVisitListCil vis id vis#vinst childrenInstr i
+  Current_loc.with_loc (Cil_datatype.Instr.loc i)
+    (doVisitListCil vis id vis#vinst childrenInstr) i
 
 and childrenInstr (vis: cilVisitor) (i: instr) : instr =
   let fExp = visitCilExpr vis in
@@ -2400,8 +2397,8 @@ and childrenInstr (vis: cilVisitor) (i: instr) : instr =
 
 (* visit all nodes in a Cil statement tree in preorder *)
 and visitCilStmt (vis:cilVisitor) (s: stmt) : stmt =
-  let open Cil_const.CurrentLoc.Operators in
-  let<> CurrentLocUpdated = Cil_datatype.Stmt.loc s in
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc s in
   vis#push_stmt s; (*(vis#behavior.memo_stmt s);*)
   assertEmptyQueue vis;
   let toPrepend : instr list ref = ref [] in (* childrenStmt may add to this *)
@@ -2653,10 +2650,9 @@ and childrenType (vis : cilVisitor) (t : typ) : typ =
 (* for declarations, we visit the types inside; but for uses, *)
 (* we just visit the varinfo node *)
 and visitCilVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
-  let open Cil_const.CurrentLoc.Operators in
-  let<> CurrentLocUpdated = v.vdecl in
-  doVisitCil vis (Visitor_behavior.Memo.varinfo vis#behavior)
-    vis#vvdec childrenVarDecl v
+  Current_loc.with_loc v.vdecl
+    (doVisitCil vis (Visitor_behavior.Memo.varinfo vis#behavior)
+       vis#vvdec childrenVarDecl) v
 
 and childrenVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
   (* in case of refresh visitor, the associated new logic var has a different
@@ -2859,9 +2855,8 @@ let visitCilEnumInfo vis e =
   doVisitCil vis (Visitor_behavior.Memo.enuminfo vis#behavior) vis#venuminfo childrenEnumInfo e
 
 let rec visitCilGlobal (vis: cilVisitor) (g: global) : global list =
-  let open Cil_const.CurrentLoc.Operators in
-  let<> CurrentLocUpdated = Global.loc g in
-  doVisitListCil vis id vis#vglob childrenGlobal g
+  Current_loc.with_loc (Global.loc g)
+    (doVisitListCil vis id vis#vglob childrenGlobal) g
 and childrenGlobal (vis: cilVisitor) (g: global) : global =
   match g with
   | GFun (f, l) ->
@@ -4962,10 +4957,8 @@ let compareConstant c1 c2 =
 
 (* Iterate over all globals, including the global initializer *)
 let iterGlobals (fl: file) (doone: global -> unit) : unit =
-  let open Cil_const.CurrentLoc.Operators in
   let doone' g =
-    let<> CurrentLocUpdated = Global.loc g in
-    doone g
+    Current_loc.with_loc (Global.loc g) doone g
   in
   List.iter doone' fl.globals;
   match fl.globinit with
@@ -4974,10 +4967,8 @@ let iterGlobals (fl: file) (doone: global -> unit) : unit =
 
 (* Fold over all globals, including the global initializer *)
 let foldGlobals (fl: file) (doone: 'a -> global -> 'a) (acc: 'a) : 'a =
-  let open Cil_const.CurrentLoc.Operators in
   let doone' acc g =
-    let<> CurrentLocUpdated = Global.loc g in
-    doone acc g
+    Current_loc.with_loc (Global.loc g) (doone acc) g
   in
   let acc' = List.fold_left doone' acc fl.globals in
   match fl.globinit with
@@ -6840,7 +6831,7 @@ let foldLeftCompound
                 (* Some initializers are missing. Iterate over all the indexes in
                    the array, and use either the supplied initializer, or a generic
                    zero one.  *)
-                let loc = Cil_const.CurrentLoc.get () in
+                let loc = Current_loc.get () in
                 let zinit = makeZeroInit ~loc bt in
                 let acc = ref acc in
                 let initl = ref initl in
@@ -7042,7 +7033,7 @@ let uniqueVarNames (f: file) : unit =
              Hashtbl.add globalNames vi.vname vi.vid;
              (* And register it *)
              Alpha.registerAlphaName ~alphaTable:gAlphaTable
-               ~lookupname:vi.vname ~data:(Cil_const.CurrentLoc.get ())
+               ~lookupname:vi.vname ~data:(Current_loc.get ())
            end)
       | _ -> ());
 
@@ -7060,7 +7051,7 @@ let uniqueVarNames (f: file) : unit =
             let lookupname =
               if v.vorig_name = "" then v.vname else v.vorig_name
             in
-            let data = Cil_const.CurrentLoc.get () in
+            let data = Current_loc.get () in
             let newname, oldloc =
               Alpha.newAlphaName
                 ~alphaTable:gAlphaTable ~undolist:(Some undolist)

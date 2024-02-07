@@ -20,10 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Current Loc *)
-
-val with_current_loc : Cil_types.location -> ('a -> 'b) -> 'a -> 'b
-
 (** Contextual Values *)
 
 type 'a value

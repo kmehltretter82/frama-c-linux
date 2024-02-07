@@ -267,8 +267,6 @@ let rec get_block_stmts blk =
   List.fold_left add Stmt.Set.empty blk.bstmts
 
 and get_stmt_stmts s =
-  let open Cil_const.CurrentLoc.Operators in
-  let<> CurrentLocUpdated = Cil_datatype.Stmt.loc s in
   let compute_stmt_stmts s = match s.skind with
     | Instr _ | Return _ | Throw _ -> Stmt.Set.singleton s
     | Continue _ | Break _ | Goto _ -> Stmt.Set.singleton s
@@ -288,7 +286,8 @@ and get_stmt_stmts s =
     | TryExcept (_, _, _, _) | TryFinally (_, _, _) ->
       Kernel.not_yet_implemented ~current:true "exception handling"
   in
-  StmtStmts.memo compute_stmt_stmts s
+  Current_loc.with_loc (Cil_datatype.Stmt.loc s)
+    (StmtStmts.memo compute_stmt_stmts) s
 
 (* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ *)
 

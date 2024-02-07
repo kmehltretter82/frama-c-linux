@@ -92,7 +92,7 @@ let fresh_label =
   fun ?loc ?label_name () ->
     decr counter;
     let loc, orig = match loc with
-      | None -> Cil_const.CurrentLoc.get (), false
+      | None -> Current_loc.get (), false
       | Some loc -> loc, true
     and new_label_name =
       let prefix = match label_name with None -> "" | Some s -> s ^ "_"
@@ -380,13 +380,13 @@ let copy_block kf switch_label_action break_continue_must_change bl =
   and copy_stmtkind
       switch_label_action break_continue_must_change
       labelled_stmt_tbl calls_tbl stkind =
-    let open Cil_const.CurrentLoc.Operators in
+    let open Current_loc.Operators in
     let copy_block
         ?(switch_label_action = switch_label_action)
         ?(break_continue_must_change = break_continue_must_change) =
       copy_block ~switch_label_action ~break_continue_must_change
     in
-    let<> CurrentLocUpdated = Cil_datatype.Stmt.loc_skind stkind in
+    let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc_skind stkind in
     match stkind with
     | (Instr _ | Return _ | Throw _) as keep ->
       keep,labelled_stmt_tbl,calls_tbl
@@ -569,7 +569,7 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
     ChangeDoChildrenPost (fundec, post_goto_updater)
 
   method! vstmt_aux s =
-    let open Cil_const.CurrentLoc.Operators in
+    let open Current_loc.Operators in
     match s.skind with
     | Goto _ ->
       gotos <- s::gotos; (* gotos that may need to be updated *)
@@ -624,7 +624,7 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
                    goes into the remaining loop. *)
           (* TODO: transforms loop annotations into statement contracts
              inside the unrolled parts. *)
-          let<> CurrentLocUpdated = loc in
+          let<> UpdatedCurrentLoc = loc in
           let break_lbl_stmt =
             let break_label = fresh_label () in
             let break_lbl_stmt = mkEmptyStmt () in

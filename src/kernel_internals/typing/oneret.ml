@@ -198,7 +198,7 @@ let encapsulate_local_vars f =
   end
 
 let oneret ?(callback: callback option) (f: fundec) : unit =
-  let open Cil_const.CurrentLoc.Operators in
+  let open Current_loc.Operators in
   let fname = f.svar.vname in
   (* Get the return type *)
   let retTyp =
@@ -342,7 +342,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
       List.rev (s::acc)
 
     | ({skind=Return (retval, loc)} as s) :: rests ->
-      let<> CurrentLocUpdated = loc in
+      let<> UpdatedCurrentLoc = loc in
     (*
       ignore (E.log "Fixing return(%a) at %a\n"
       insert
@@ -494,8 +494,8 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
     { b with bstmts = scanStmts [] mainbody 0 b.bstmts;}
 
   in
-  (*CEA since CurrentLoc isn't set
-    ignore (visitCilBlock dummyVisitor f.sbody) ; *)(* sets CurrentLoc *)
+  (*CEA since Current_loc isn't set
+    ignore (visitCilBlock dummyVisitor f.sbody) ; *)(* sets Current_loc *)
   (*CEA so, [scanBlock] will set [lastloc] when necessary
     lastloc := !currentLoc ;  *) (* last location in the function *)
   f.sbody <- scanBlock true f.sbody ;

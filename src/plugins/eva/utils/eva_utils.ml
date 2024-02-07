@@ -169,7 +169,7 @@ class postconditions_mention_result = object
 end
 let postconditions_mention_result spec =
   (* We save the current location because the visitor modifies it. *)
-  let loc = Cil_const.CurrentLoc.get () in
+  let loc = Current_loc.get () in
   let vis = new postconditions_mention_result in
   let aux_bhv bhv =
     let aux (_, post) = ignore (Visitor.visitFramacIdPredicate vis post) in
@@ -181,7 +181,7 @@ let postconditions_mention_result spec =
       false
     with Exit -> true
   in
-  Cil_const.CurrentLoc.set loc;
+  Current_loc.set loc;
   res
 
 let conv_comp op =

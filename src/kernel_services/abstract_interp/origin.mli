@@ -34,7 +34,7 @@ type kind =
   | Arith (* Arithmetic operation on addresses *)
 
 (** Creates an origin of the given kind, associated with the current source
-    location extracted from [Cil_const.CurrentLoc]. *)
+    location extracted from [Current_loc]. *)
 val current: kind -> t
 
 (** Origin for garbled mix created in the initial state of the analysis

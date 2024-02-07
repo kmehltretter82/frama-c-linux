@@ -866,8 +866,8 @@ let rec global_annot_without_irrelevant_attributes ga =
   | Dfun_or_pred _ | Dtype_annot _ | Dmodel_annot _ | Dinvariant _ -> ga
 
 let rec global_annot_pass1 g =
-  let open Cil_const.CurrentLoc.Operators in
-  let<> CurrentLocUpdated =  Cil_datatype.Global_annotation.loc g in
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = Cil_datatype.Global_annotation.loc g in
   match g with
   | Dvolatile(hs,rvi,wvi,_,loc) ->
     let process_term_kind (t,k as id) =
@@ -1568,7 +1568,7 @@ let remove_function_statics fdec =
       ) !theFile
 
 let oneFilePass1 (f:file) : unit =
-  let open Cil_const.CurrentLoc.Operators in
+  let open Current_loc.Operators in
   H.add fileNames !currentFidx f.fileName;
   Kernel.feedback ~dkey:Kernel.dkey_linker
     "Pre-merging (%d) %a" !currentFidx Filepath.Normalized.pp_abs f.fileName ;
@@ -1583,7 +1583,7 @@ let oneFilePass1 (f:file) : unit =
    * *)
   let matchVarinfo ~fromGFun (vi: varinfo) (loc, _ as l) =
     ignore (Alpha.registerAlphaName ~alphaTable:vtAlpha
-              ~lookupname:vi.vname ~data:(Cil_const.CurrentLoc.get ()));
+              ~lookupname:vi.vname ~data:(Current_loc.get ()));
     (* Make a node for it and put it in vEq *)
     let vinode =
       PlainMerging.mkSelfNode vEq vSyn !currentFidx vi.vname vi (Some l)
@@ -1709,7 +1709,7 @@ let oneFilePass1 (f:file) : unit =
       newrep.ndata.vdecl <- newdecl
   in
   let iter g =
-    let<> CurrentLocUpdated = Cil_datatype.Global.loc g in
+    let<> UpdatedCurrentLoc = Cil_datatype.Global.loc g in
     match g with
     | GVarDecl (vi, l) | GVar (vi, _, l) | GFunDecl (_, vi, l)->
       incr currentDeclIdx;
@@ -2194,8 +2194,8 @@ end
 let renameInlinesVisitor = new renameInlineVisitorClass
 
 let rec logic_annot_pass2 ~in_axiomatic g a =
-  let open Cil_const.CurrentLoc.Operators in
-  let<> CurrentLocUpdated =  Cil_datatype.Global_annotation.loc a in
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = Cil_datatype.Global_annotation.loc a in
   match a with
   | Dfun_or_pred (li, _) ->
     begin
@@ -2557,7 +2557,7 @@ let oneFilePass2 (f: file) =
   let visited = ref Cil_datatype.Varinfo.Set.empty in
   let visit vi = visited := Cil_datatype.Varinfo.Set.add vi !visited in
   let processOneGlobal (g: global) : unit =
-    let open Cil_const.CurrentLoc.Operators in
+    let open Current_loc.Operators in
     (* Process a varinfo. Reuse an old one, or rename it if necessary *)
     let processVarinfo (vi: varinfo) (vloc: location) : varinfo =
       if Cil_datatype.Varinfo.Set.mem vi !visited then vi
@@ -2566,7 +2566,7 @@ let oneFilePass2 (f: file) =
         if vi.vstorage = Static then begin
           let newName, _ =
             Alpha.newAlphaName ~alphaTable:vtAlpha ~undolist:None
-              ~lookupname:vi.vname ~data:(Cil_const.CurrentLoc.get ())
+              ~lookupname:vi.vname ~data:(Current_loc.get ())
           in
           let formals_decl =
             try Some (Cil.getFormalsDecl vi)
@@ -2605,7 +2605,7 @@ let oneFilePass2 (f: file) =
         end
       end
     in
-    let<> CurrentLocUpdated = Cil_datatype.Global.loc g in
+    let<> UpdatedCurrentLoc = Cil_datatype.Global.loc g in
     match g with
     | GVarDecl (vi, l) as g ->
       incr currentDeclIdx;
@@ -2920,7 +2920,7 @@ let oneFilePass2 (f: file) =
             in
             let newname, _ =
               Alpha.newAlphaName ~alphaTable:sAlpha ~undolist:None
-                ~lookupname:orig_name ~data:(Cil_const.CurrentLoc.get ())
+                ~lookupname:orig_name ~data:(Current_loc.get ())
             in
             ci.cname <- newname;
             ci.creferenced <- true;
@@ -2949,7 +2949,7 @@ let oneFilePass2 (f: file) =
             in
             let newname, _ =
               Alpha.newAlphaName ~alphaTable:eAlpha ~undolist:None
-                ~lookupname:orig_name ~data:(Cil_const.CurrentLoc.get ())
+                ~lookupname:orig_name ~data:(Current_loc.get ())
             in
             ei.ename <- newname;
             ei.ereferenced <- true;
@@ -3002,7 +3002,7 @@ let oneFilePass2 (f: file) =
             None -> (* We must rename it and keep it *)
             let newname, _ =
               Alpha.newAlphaName ~alphaTable:vtAlpha ~undolist:None
-                ~lookupname:ti.torig_name ~data:(Cil_const.CurrentLoc.get ())
+                ~lookupname:ti.torig_name ~data:(Current_loc.get ())
             in
             ti.tname <- newname;
             ti.treferenced <- true;
@@ -3081,7 +3081,7 @@ let merge_specs orig to_merge =
   List.iter merge_one_spec to_merge
 
 let global_merge_spec g =
-  let open Cil_const.CurrentLoc.Operators in
+  let open Current_loc.Operators in
   Kernel.debug ~dkey:Kernel.dkey_linker
     "Merging global %a" Cil_printer.pp_global g;
   let rename v spec =
@@ -3090,7 +3090,7 @@ let global_merge_spec g =
       ignore (visitCilFunspec alpha spec)
     with Not_found -> ()
   in
-  let<> CurrentLocUpdated = Cil_datatype.Global.loc g in
+  let<> UpdatedCurrentLoc = Cil_datatype.Global.loc g in
   match g with
   | GFun(fdec, _) ->
     Kernel.debug ~dkey:Kernel.dkey_linker

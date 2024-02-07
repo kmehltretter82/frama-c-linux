@@ -82,16 +82,10 @@ end
 class nopCabsVisitor : cabsVisitor = object
   method vexpr (_e:expression) = DoChildren
   method vinitexpr (_e:init_expression) = DoChildren
-  method vstmt (s: statement) =
-    let open Cil_const.CurrentLoc.Operators in
-    let<> CurrentLocUpdated = get_statementloc s in
-    DoChildren
+  method vstmt (_s: statement) = DoChildren
   method vblock (_b: block) = DoChildren
   method vvar (s: string) = s
-  method vdef (d: definition) =
-    let open Cil_const.CurrentLoc.Operators in
-    let<> CurrentLocUpdated = get_definitionloc d in
-    DoChildren
+  method vdef (_d: definition) = DoChildren
   method vtypespec (_ts: typeSpecifier) = DoChildren
   method vdecltype (_dt: decl_type) = DoChildren
   method vname _k (_s:specifier) (_n: name) = DoChildren
@@ -235,7 +229,8 @@ and childrenSingleName vis (k: nameKind) (sn: single_name) : single_name =
   if s' != s || n' != n then (s', n') else sn
 
 and visitCabsDefinition vis (d: definition) : definition list =
-  doVisitList vis vis#vdef childrenDefinition d
+  Current_loc.with_loc (get_definitionloc d)
+    (doVisitList vis vis#vdef childrenDefinition) d
 and childrenDefinition vis d =
   match d with
     FUNDEF (spec,sn, b, l, lend) ->
@@ -280,7 +275,8 @@ and childrenBlock vis (b: block) : block =
   else
     b
 and visitCabsStatement vis (s: statement) :  statement list =
-  doVisitList vis vis#vstmt childrenStatement s
+  Current_loc.with_loc (get_statementloc s)
+    (doVisitList vis vis#vstmt childrenStatement) s
 and childrenStatement vis s =
   let ve e = visitCabsExpression vis e in
   let vs l s = match visitCabsStatement vis s with

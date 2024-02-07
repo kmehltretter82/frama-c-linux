@@ -2280,7 +2280,7 @@ val constFoldVisitor: bool -> cilVisitor
 (** {2 Debugging support} *)
 (* ************************************************************************* *)
 
-(** Pretty-print [(Cil_const.CurrentLoc.get ())] *)
+(** Pretty-print [(Current_loc.get ())] *)
 val pp_thisloc: Format.formatter -> unit
 
 (** @return a dummy specification *)
