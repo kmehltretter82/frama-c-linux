@@ -211,7 +211,7 @@ export function useBuffer<A>(
       setBuffer(newValue);
       setBerror(newError);
       if (isReset && newValue !== value)
-        onChanged(newValue,newError,isReset);
+        onChanged(newValue, newError, isReset);
     }, [value, onChanged]);
 
   return {
@@ -359,6 +359,7 @@ export function useFilter<A, B>(
   const [localValue, setLocalValue] = React.useState(defaultValue);
   const [localError, setLocalError] = React.useState<FieldError>(undefined);
   const [dangling, setDangling] = React.useState(false);
+  const localReset = reset !== undefined ? input(reset) : undefined;
 
   const update = React.useCallback(
     (newValue: B, newError: FieldError, isReset: boolean) => {
@@ -378,17 +379,11 @@ export function useFilter<A, B>(
     }, [output, onChanged, setLocalValue, setLocalError],
   );
 
-  const ConvertedReset = ((val: A | undefined): B | undefined => {
-    if(typeof val === "undefined") return val;
-    try { return input(val); }
-    catch { return undefined; }
-  })(reset);
-
   if (dangling) {
     return {
       value: localValue,
       error: localError,
-      reset: ConvertedReset,
+      reset: localReset,
       onChanged: update
     };
   }
@@ -396,14 +391,14 @@ export function useFilter<A, B>(
     return {
       value: input(value),
       error,
-      reset: ConvertedReset,
+      reset: localReset,
       onChanged: update
     };
   } catch (err) {
     return {
       value: localValue,
       error: err ? `${err}` : 'Invalid input',
-      reset: ConvertedReset,
+      reset: localReset,
       onChanged: update
     };
   }
