@@ -118,7 +118,7 @@ function isValidArray(err: FieldError[]): boolean {
 /* --- Reset Hooks                                                        ---*/
 /* --------------------------------------------------------------------------*/
 
-export type ResetCallback = () => void ;
+export type ResetCallback = () => void;
 
 /**
    Controller for _buffered_ field states.
