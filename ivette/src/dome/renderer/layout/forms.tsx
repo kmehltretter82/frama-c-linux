@@ -331,6 +331,17 @@ export function useChecker<A>(
   return { value, error, reset, onChanged: update };
 }
 
+function convertReset<A, B>(
+  fn: (value: A) => B, value: A | undefined
+): B | undefined
+{
+  try {
+    return value ? fn(value) : undefined;
+  } catch(_err) {
+    return undefined;
+  }
+}
+
 /**
    Transform a state `A` into a state `B` through converting functions.
 
@@ -347,7 +358,6 @@ export function useChecker<A>(
    @param input - converting function from `A` to `B`
    @param output - converting function from `B` to `A`
  */
-
 export function useFilter<A, B>(
   state: FieldState<A>,
   input: (value: A) => B,
@@ -359,7 +369,7 @@ export function useFilter<A, B>(
   const [localValue, setLocalValue] = React.useState(defaultValue);
   const [localError, setLocalError] = React.useState<FieldError>(undefined);
   const [dangling, setDangling] = React.useState(false);
-  const localReset = reset !== undefined ? input(reset) : undefined;
+  const localReset = convertReset(input, reset);
 
   const update = React.useCallback(
     (newValue: B, newError: FieldError, isReset: boolean) => {
