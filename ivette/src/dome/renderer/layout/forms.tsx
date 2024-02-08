@@ -237,7 +237,7 @@ export function useState<A>(
     setError(localError);
     if (onChange) onChange(newValue, localError);
   }, [checker, setValue, setError, onChange]);
-  return { value: value, error: error, onChanged: onChanged };
+  return { value, error, onChanged };
 }
 
 /** Introduces a local state and propagates only non-errors. */
@@ -254,7 +254,12 @@ export function useValid<A>(
       if (!newError) setValue(newValue);
     }, [setValue],
   );
-  return { value: error ? local : value, error: error, onChanged: update };
+  return {
+    value: error ? local : value,
+    error,
+    reset: value,
+    onChanged: update
+  };
 }
 
 /** Provides a new state with a default value. */
@@ -262,12 +267,8 @@ export function useDefault<A>(
   state: FieldState<A | undefined>,
   defaultValue: A,
 ): FieldState<A> {
-  const { value, error, onChanged } = state;
-  return {
-    value: value ?? defaultValue,
-    error: error,
-    onChanged: onChanged
-  };
+  const { value, error, reset, onChanged } = state;
+  return { value: value ?? defaultValue, error, reset, onChanged };
 }
 
 /**
@@ -277,7 +278,7 @@ export function useDefault<A>(
 export function useDefined<A>(
   state: FieldState<A>,
 ): FieldState<A | undefined> {
-  const { value, error, onChanged } = state;
+  const { value, error, reset, onChanged } = state;
   const update = React.useCallback(
     (newValue: A | undefined, newError: FieldError) => {
       if (newValue !== undefined) {
@@ -285,7 +286,7 @@ export function useDefined<A>(
       }
     }, [onChanged],
   );
-  return { value: value, error: error, onChanged: update };
+  return { value, error, reset, onChanged: update };
 }
 
 /**
@@ -296,7 +297,7 @@ export function useRequired<A>(
   state: FieldState<A>,
   onError?: string,
 ): FieldState<A | undefined> {
-  const { value, error, onChanged } = state;
+  const { value, error, reset, onChanged } = state;
   const cache = React.useRef(value);
   const update = React.useCallback(
     (newValue: A | undefined, newError: FieldError) => {
@@ -307,7 +308,7 @@ export function useRequired<A>(
       }
     }, [cache, onError, onChanged],
   );
-  return { value: value, error: error, onChanged: update };
+  return { value, error, reset, onChanged: update };
 }
 
 /**
@@ -318,12 +319,12 @@ export function useChecker<A>(
   state: FieldState<A>,
   checker?: Checker<A>,
 ): FieldState<A> {
-  const { value, error, onChanged } = state;
+  const { value, error, reset, onChanged } = state;
   const update = React.useCallback((newValue: A, newError: FieldError) => {
     const localError = validate(newValue, checker) || newError;
     onChanged(newValue, localError);
   }, [checker, onChanged]);
-  return { value: value, error: error, onChanged: update };
+  return { value, error, reset, onChanged: update };
 }
 
 /**
@@ -350,7 +351,7 @@ export function useFilter<A, B>(
   defaultValue: B,
 ): FieldState<B> {
 
-  const { value, error, onChanged } = state;
+  const { value, error, reset, onChanged } = state;
   const [localValue, setLocalValue] = React.useState(defaultValue);
   const [localError, setLocalError] = React.useState<FieldError>(undefined);
   const [dangling, setDangling] = React.useState(false);
@@ -373,15 +374,32 @@ export function useFilter<A, B>(
     }, [output, onChanged, setLocalValue, setLocalError],
   );
 
+  const ConvertedReset = ((val: A | undefined): B | undefined => {
+    if(typeof val === "undefined") return val;
+    try { return input(val); }
+    catch { return undefined; }
+  })(reset);
+
   if (dangling) {
-    return { value: localValue, error: localError, onChanged: update };
+    return {
+      value: localValue,
+      error: localError,
+      reset: ConvertedReset,
+      onChanged: update
+    };
   }
   try {
-    return { value: input(value), error: error, onChanged: update };
+    return {
+      value: input(value),
+      error,
+      reset: ConvertedReset,
+      onChanged: update
+    };
   } catch (err) {
     return {
       value: localValue,
       error: err ? `${err}` : 'Invalid input',
+      reset: ConvertedReset,
       onChanged: update
     };
   }
@@ -397,7 +415,7 @@ export function useLatency<A>(
   state: FieldState<A>,
   latency?: number,
 ): FieldState<A> {
-  const { value, error, onChanged } = state;
+  const { value, error, reset, onChanged } = state;
   const period = latency ?? 0;
   const [localValue, setLocalValue] = React.useState(value);
   const [localError, setLocalError] = React.useState(error);
@@ -423,6 +441,7 @@ export function useLatency<A>(
   return {
     value: dangling ? localValue : value,
     error: dangling ? localError : error,
+    reset,
     onChanged: update,
   };
 }
@@ -435,7 +454,7 @@ export function useProperty<A, K extends keyof A>(
   property: K,
   checker?: Checker<A[K]>,
 ): FieldState<A[K]> {
-  const { value, error, onChanged } = state;
+  const { value, error, reset, onChanged } = state;
   const update = React.useCallback((newProp: A[K], newError: FieldError) => {
     const newValue = { ...value, [property]: newProp };
     const objError = isObjectError(error) ? error : {};
@@ -447,6 +466,7 @@ export function useProperty<A, K extends keyof A>(
   return {
     value: value[property],
     error: isObjectError(error) ? error[property] : undefined,
+    reset: reset && reset[property],
     onChanged: update
   };
 }
@@ -459,7 +479,7 @@ export function useIndex<A>(
   index: number,
   checker?: Checker<A>,
 ): FieldState<A> {
-  const { value, error, onChanged } = state;
+  const { value, error, reset, onChanged } = state;
   const update = React.useCallback((newValue: A, newError: FieldError) => {
     const newArray = value.slice();
     newArray[index] = newValue;
@@ -469,7 +489,12 @@ export function useIndex<A>(
     onChanged(newArray, isValidArray(localError) ? undefined : localError);
   }, [value, error, onChanged, index, checker]);
   const itemError = isArrayError(error) ? error[index] : undefined;
-  return { value: value[index], error: itemError, onChanged: update };
+  return {
+    value: value[index],
+    error: itemError,
+    reset: reset && reset[index],
+    onChanged: update
+  };
 }
 
 /* --------------------------------------------------------------------------*/
