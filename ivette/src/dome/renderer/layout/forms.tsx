@@ -39,6 +39,7 @@
  */
 
 import { debounce } from 'lodash';
+import Events from 'events';
 import React from 'react';
 import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
@@ -50,9 +51,7 @@ export type FieldError =
   | undefined | boolean | string
   | { [key: string]: FieldError } | FieldError[];
 export type Checker<A> = (value: A) => boolean | FieldError;
-export type Callback<A> = (
-  value: A, error: FieldError, reset?: boolean
-  ) => void;
+export type Callback<A> = (value: A, error: FieldError) => void;
 
 export interface FieldState<A> {
   value: A;
@@ -113,6 +112,111 @@ function isValidArray(err: FieldError[]): boolean {
     if (!isValid(err[k])) return false;
   }
   return true;
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Reset Hooks                                                        ---*/
+/* --------------------------------------------------------------------------*/
+
+export type ResetCallback = () => void ;
+
+/**
+   Controller for _buffered_ field states.
+ */
+export class BufferController {
+  private readonly evt = new Events();
+
+  /** Notify all reset listener events. */
+  reset(): void { this.evt.emit('reset'); }
+
+  /** Notify all commit listener events. */
+  commit(): void { this.evt.emit('commit'); }
+
+  /** There are active listeners for Reset event. */
+  hasReset(): boolean { return this.evt.listenerCount('reset') > 0; }
+
+  /** There are active listeners for Commit event. */
+  hasCommit(): boolean { return this.evt.listenerCount('commit') > 0; }
+
+  /** @internal */
+  onReset(fn: ResetCallback) { this.evt.addListener('reset', fn); }
+
+  /** @internal */
+  offReset(fn: ResetCallback) { this.evt.addListener('reset', fn); }
+
+  /** @internal */
+  onCommit(fn: ResetCallback) { this.evt.addListener('commit', fn); }
+
+  /** @internal */
+  offCommit(fn: ResetCallback) { this.evt.addListener('commit', fn); }
+
+}
+
+/**
+   Insert a temporary buffer to stack modifications. Values are imported from
+   the input state, and modifications are stacked into an internal buffer.
+
+   The buffered state will perform the following actions
+   upon remote control events:
+
+   - on Reset event, the buffered state is restored to the input value.
+
+   - on Commit event, the buffered state is sent to the input callback.
+
+   The returned field state reflects the internal buffer state. Its local
+   reset value is either the input reset value or the current input value.
+
+ */
+export function useBuffer<A>(
+  remote : BufferController,
+  state: FieldState<A>
+): FieldState<A>
+{
+  const { value, error, reset, onChanged } = state;
+  const [ modified, setModified ] = React.useState(false);
+  const [ buffer, setBuffer ] = React.useState<A>(value);
+  const [ berror, setBerror ] = React.useState<FieldError>(error);
+  const staged = modified && !berror;
+
+  // --- Reset
+  React.useEffect(() => {
+    if (modified) {
+      const doReset = () => {
+        setModified(false);
+        setBuffer(value);
+        setBerror(error);
+      };
+      remote.onReset(doReset);
+      return () => remote.offReset(doReset);
+    } else return;
+  }, [remote, modified, value, error]);
+
+  // --- Commit
+  React.useEffect(() => {
+    if (staged) {
+      const doCommit = () => {
+        setModified(false);
+        onChanged(buffer, undefined);
+      };
+      remote.onCommit(doCommit);
+      return () => remote.offCommit(doCommit);
+    } else return;
+  }, [remote, staged, buffer]);
+
+  // --- Callback
+  const onLocalChange = React.useCallback(
+    (newValue, newError) => {
+      setModified(true);
+      setBuffer(newValue);
+      setBerror(newError);
+    }, []);
+
+  return {
+    value: modified ? buffer : value,
+    error: modified ? berror : error,
+    reset: reset ?? (modified ? value : undefined),
+    onChanged: onLocalChange,
+  };
 }
 
 /* --------------------------------------------------------------------------*/
