@@ -51,7 +51,8 @@ export type FieldError =
   | undefined | boolean | string
   | { [key: string]: FieldError } | FieldError[];
 export type Checker<A> = (value: A) => boolean | FieldError;
-export type Callback<A> = (value: A, error: FieldError) => void;
+export type Callback<A> =
+  (value: A, error: FieldError, reset: boolean) => void;
 
 export interface FieldState<A> {
   value: A;
@@ -196,7 +197,7 @@ export function useBuffer<A>(
     if (staged) {
       const doCommit = (): void => {
         setModified(false);
-        onChanged(buffer, undefined);
+        onChanged(buffer, undefined, false);
       };
       remote.onCommit(doCommit);
       return () => remote.offCommit(doCommit);
@@ -205,11 +206,13 @@ export function useBuffer<A>(
 
   // --- Callback
   const onLocalChange = React.useCallback(
-    (newValue, newError) => {
-      setModified(true);
+    (newValue, newError, isReset) => {
+      setModified(!isReset);
       setBuffer(newValue);
       setBerror(newError);
-    }, []);
+      if (isReset && newValue !== value)
+        onChanged(newValue,newError,isReset);
+    }, [value, onChanged]);
 
   return {
     value: modified ? buffer : value,
@@ -235,7 +238,7 @@ export function useState<A>(
     const localError = validate(newValue, checker) || newError;
     setValue(newValue);
     setError(localError);
-    if (onChange) onChange(newValue, localError);
+    if (onChange) onChange(newValue, localError, false);
   }, [checker, setValue, setError, onChange]);
   return { value, error, onChanged };
 }
@@ -280,9 +283,9 @@ export function useDefined<A>(
 ): FieldState<A | undefined> {
   const { value, error, reset, onChanged } = state;
   const update = React.useCallback(
-    (newValue: A | undefined, newError: FieldError) => {
+    (newValue: A | undefined, newError: FieldError, doReset) => {
       if (newValue !== undefined) {
-        onChanged(newValue, newError);
+        onChanged(newValue, newError, doReset);
       }
     }, [onChanged],
   );
@@ -300,11 +303,11 @@ export function useRequired<A>(
   const { value, error, reset, onChanged } = state;
   const cache = React.useRef(value);
   const update = React.useCallback(
-    (newValue: A | undefined, newError: FieldError) => {
+    (newValue: A | undefined, newError: FieldError, isReset: boolean) => {
       if (newValue === undefined) {
-        onChanged(cache.current, onError || 'Required field');
+        onChanged(cache.current, onError || 'Required field', false);
       } else {
-        onChanged(newValue, newError);
+        onChanged(newValue, newError, !newError && isReset);
       }
     }, [cache, onError, onChanged],
   );
@@ -320,10 +323,11 @@ export function useChecker<A>(
   checker?: Checker<A>,
 ): FieldState<A> {
   const { value, error, reset, onChanged } = state;
-  const update = React.useCallback((newValue: A, newError: FieldError) => {
-    const localError = validate(newValue, checker) || newError;
-    onChanged(newValue, localError);
-  }, [checker, onChanged]);
+  const update = React.useCallback(
+    (newValue: A, newError: FieldError, isReset: boolean) => {
+      const localError = validate(newValue, checker) || newError;
+      onChanged(newValue, localError, !localError && isReset);
+    }, [checker, onChanged]);
   return { value, error, reset, onChanged: update };
 }
 
@@ -357,14 +361,14 @@ export function useFilter<A, B>(
   const [dangling, setDangling] = React.useState(false);
 
   const update = React.useCallback(
-    (newValue: B, newError: FieldError) => {
+    (newValue: B, newError: FieldError, isReset: boolean) => {
       try {
         const outValue = output(newValue);
         setLocalValue(newValue);
         setLocalError(newError);
         if (isValid(newError)) {
           setDangling(false);
-          onChanged(outValue, undefined);
+          onChanged(outValue, undefined, isReset);
         }
       } catch (err) {
         setLocalValue(newValue);
@@ -423,16 +427,16 @@ export function useLatency<A>(
   const update = React.useMemo(() => {
     if (period > 0) {
       const propagate = debounce(
-        (lateValue: A, lateError: FieldError) => {
-          onChanged(lateValue, lateError);
+        (lateValue: A, lateError: FieldError, isReset: boolean) => {
+          onChanged(lateValue, lateError, !lateError && isReset);
           setDangling(false);
         }, period,
       );
-      return (newValue: A, newError: FieldError) => {
+      return (newValue: A, newError: FieldError, isReset: boolean) => {
         setLocalValue(newValue);
         setLocalError(newError);
         setDangling(true);
-        propagate(newValue, newError);
+        propagate(newValue, newError, isReset);
       };
     }
     setDangling(false);
@@ -455,13 +459,15 @@ export function useProperty<A, K extends keyof A>(
   checker?: Checker<A[K]>,
 ): FieldState<A[K]> {
   const { value, error, reset, onChanged } = state;
-  const update = React.useCallback((newProp: A[K], newError: FieldError) => {
-    const newValue = { ...value, [property]: newProp };
-    const objError = isObjectError(error) ? error : {};
-    const propError = validate(newProp, checker) || newError;
-    const localError = { ...objError, [property]: propError };
-    onChanged(newValue, isValidObject(localError) ? undefined : localError);
-  }, [value, error, onChanged, property, checker, ]);
+  const update = React.useCallback(
+    (newProp: A[K], newError: FieldError, isReset: boolean) => {
+      const newValue = { ...value, [property]: newProp };
+      const objError = isObjectError(error) ? error : {};
+      const propError = validate(newProp, checker) || newError;
+      const localError = { ...objError, [property]: propError };
+      const finalError = isValidObject(localError) ? undefined : localError;
+      onChanged(newValue, finalError, !finalError && isReset);
+    }, [value, error, onChanged, property, checker, ]);
 
   return {
     value: value[property],
@@ -480,14 +486,16 @@ export function useIndex<A>(
   checker?: Checker<A>,
 ): FieldState<A> {
   const { value, error, reset, onChanged } = state;
-  const update = React.useCallback((newValue: A, newError: FieldError) => {
-    const newArray = value.slice();
-    newArray[index] = newValue;
-    const localError = isArrayError(error) ? error.slice() : [];
-    const valueError = validate(newValue, checker) || newError;
-    localError[index] = valueError;
-    onChanged(newArray, isValidArray(localError) ? undefined : localError);
-  }, [value, error, onChanged, index, checker]);
+  const update = React.useCallback(
+    (newValue: A, newError: FieldError, isReset: boolean) => {
+      const newArray = value.slice();
+      newArray[index] = newValue;
+      const localError = isArrayError(error) ? error.slice() : [];
+      const valueError = validate(newValue, checker) || newError;
+      localError[index] = valueError;
+      const finalError = isValidArray(localError) ? undefined : localError;
+      onChanged(newArray, finalError, !finalError && isReset);
+    }, [value, error, onChanged, index, checker]);
   const itemError = isArrayError(error) ? error[index] : undefined;
   return {
     value: value[index],
@@ -780,11 +788,14 @@ export interface FieldProps<A> extends FilterProps {
 type InputEvent = { target: { value: string } };
 type InputState = [string, FieldError, (evt: InputEvent) => void];
 
-function useChangeEvent(onChanged: Callback<string>)
-: ((evt: InputEvent) => void) {
+function useChangeEvent(
+  onChanged: Callback<string>
+): ((evt: InputEvent) => void)
+{
   return React.useCallback(
-    (evt: InputEvent) => { onChanged(evt.target.value, undefined); },
-    [onChanged],
+    (evt: InputEvent) => {
+      onChanged(evt.target.value, undefined, false);
+    }, [onChanged],
   );
 }
 
@@ -1138,10 +1149,11 @@ const HIDE_SLIDER = `${CSS_SLIDER} dome-xForm-slider-hide`;
    @category Number Fields
  */
 export function SliderField(props: SliderFieldProps): JSX.Element {
-  const { min, max, step = 1, latency = 600, onReset } = props;
+  const { min, max, step = 1, latency = 600 } = props;
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const css = Utils.classes('dome-xForm-slider-field', props.className);
+  const onReset = props.onReset ?? props.state.reset;
   const checked = useChecker(props.state, props.checker);
   const delayed = useLatency(checked, latency);
   const [label, setLabel] = React.useState<string | undefined>(undefined);
@@ -1153,7 +1165,7 @@ export function SliderField(props: SliderFieldProps): JSX.Element {
       return (evt: InputEvent) => {
         const v = Number.parseInt(evt.target.value, 10);
         if (!Number.isNaN(v)) {
-          onChanged(v, undefined);
+          onChanged(v, undefined, false);
           const vlabel = labeling && labeling(v);
           setLabel(vlabel);
           if (vlabel) fadeOut();
@@ -1165,7 +1177,7 @@ export function SliderField(props: SliderFieldProps): JSX.Element {
   );
   const onDoubleClick = React.useCallback(() => {
     if (onReset) {
-      onChanged(onReset, undefined);
+      onChanged(onReset, undefined, true);
       setLabel(undefined);
     }
   }, [onReset, onChanged, setLabel]);
@@ -1335,7 +1347,7 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element | null {
     disabled && 'dome-disabled',
   );
   const onChange = (): void => {
-    onChanged(!value, undefined);
+    onChanged(!value, undefined, false);
   };
   return (
     <Checkbox
@@ -1365,7 +1377,7 @@ export function RadioField<A>(props: RadioFieldProps<A>): JSX.Element | null {
   if (hidden) return null;
 
   const { value: selection, onChanged } = props.state;
-  const onSelection = (value: A): void => onChanged(value, undefined);
+  const onSelection = (value: A): void => onChanged(value, undefined, false);
   const { label, title, value } = props;
   const css = Utils.classes(
     'dome-xForm-field dome-text-label',
@@ -1404,8 +1416,8 @@ export function SelectField(props: SelectFieldProps): JSX.Element {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const { value, error, onChanged } = useChecker(props.state, props.checker);
-  const onChange =
-    (newValue: string | undefined): void => onChanged(newValue, undefined);
+  const onChange = (newValue: string | undefined): void =>
+    onChanged(newValue, undefined, false);
   const { children, placeholder } = props;
   return (
     <Field
