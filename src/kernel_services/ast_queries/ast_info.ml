@@ -364,6 +364,22 @@ module Function = struct
   let get_name f = (get_vi f).vname
   let get_id f = (get_vi f).vid
 
+  let get_statics fundec =
+    let statics = ref [] in
+    let local_statics_visitor =
+      object
+        inherit Cil.nopCilVisitor
+        method! vblock b =
+          statics := !statics @ b.bstatics;
+          Cil.DoChildren
+        method! vinst _ = Cil.SkipChildren
+        method! vvdec _ = Cil.SkipChildren
+        method! vexpr _ = Cil.SkipChildren
+      end
+    in
+    ignore (Cil.visitCilBlock local_statics_visitor fundec.sbody);
+    !statics
+
 end
 
 exception FoundBlock of block

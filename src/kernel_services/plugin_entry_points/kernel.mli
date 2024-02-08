@@ -158,6 +158,8 @@ val wkey_conditional_feature: warn_category
 
 val wkey_drop_unused: warn_category
 
+val wkey_linker_weak: warn_category
+
 val wkey_implicit_conv_void_ptr: warn_category
 
 val wkey_incompatible_types_call: warn_category

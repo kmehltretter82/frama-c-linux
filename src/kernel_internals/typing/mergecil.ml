@@ -1564,6 +1564,17 @@ let ignore_vi vi =
 
 let is_ignored_vi vi = Cil_datatype.Varinfo.Set.mem vi !ignored_vi
 
+let remove_function_statics fdec =
+  let statics =
+    Cil_datatype.Varinfo.Set.of_list (Ast_info.Function.get_statics fdec)
+  in
+  theFile :=
+    List.filter (fun g ->
+        match g with
+        | GVar (vi, _, _) -> not (Cil_datatype.Varinfo.Set.mem vi statics)
+        | _ -> true
+      ) !theFile
+
 let oneFilePass1 (f:file) : unit =
   H.add fileNames !currentFidx f.fileName;
   Kernel.feedback ~dkey:Kernel.dkey_linker
@@ -1577,7 +1588,7 @@ let oneFilePass1 (f:file) : unit =
   (* We scan each file and we look at all global varinfo. We see if globals
    * with the same name have been encountered before and we merge those types
    * *)
-  let matchVarinfo (vi: varinfo) (loc, _ as l) =
+  let matchVarinfo ~fromGFun (vi: varinfo) (loc, _ as l) =
     ignore (Alpha.registerAlphaName ~alphaTable:vtAlpha
               ~lookupname:vi.vname ~data:(CurrentLoc.get ()));
     (* Make a node for it and put it in vEq *)
@@ -1680,6 +1691,27 @@ let oneFilePass1 (f:file) : unit =
             Cil_printer.pp_location oldloc
       in
       newrep.ndata.vstorage <- newstorage;
+      (* Special handling for 'weak' attributes: since we cannot properly
+         handle the case where the first function definition is to be
+         overridden by the second one, we try to detect whether an old
+         definition had a 'weak' attribute and a later one didn't; in this case,
+         the only way to obtain the "correct" function is to tell the user to
+         invert the order of source files given in the command line.
+      *)
+      if fromGFun && hasAttribute "weak" oldvi.vattr &&
+         not (hasAttribute "weak" vi.vattr) then
+        begin
+          let open Filepath in
+          let oldpath = (fst oldvi.vdecl).pos_path in
+          let newpath = (fst vi.vdecl).pos_path in
+          Kernel.abort ~current:true
+            "weak definition at %a cannot be overridden with \
+             this non-weak definition. @ \
+             Please exchange command-line arguments to put '%a' \
+             before '%a'.@."
+            Printer.pp_location oldvi.vdecl
+            Normalized.pretty newpath Normalized.pretty oldpath
+        end;
       newrep.ndata.vattr <- addAttributes oldvi.vattr vi.vattr;
       newrep.ndata.vdecl <- newdecl
   in
@@ -1689,7 +1721,7 @@ let oneFilePass1 (f:file) : unit =
         CurrentLoc.set l;
         incr currentDeclIdx;
         if vi.vstorage <> Static then begin
-          matchVarinfo vi (l, !currentDeclIdx);
+          matchVarinfo ~fromGFun:false vi (l, !currentDeclIdx);
         end
 
       | GFun (fdec, l) ->
@@ -1707,7 +1739,7 @@ let oneFilePass1 (f:file) : unit =
              fdec.svar.vstorage <- Static;
            *)
         if fdec.svar.vstorage <> Static then begin
-          matchVarinfo fdec.svar (l, !currentDeclIdx)
+          matchVarinfo ~fromGFun:true fdec.svar (l, !currentDeclIdx)
         end else begin
           if fdec.svar.vinline && mergeInlines then
             (* Just create the nodes for inline functions *)
@@ -2828,6 +2860,7 @@ let oneFilePass2 (f: file) =
               (mergePushGlobal g');
               (H.add emittedFunDefn fdec'.svar.vname (fdec', l, curSum))
             | Some (_prevFun, prevLoc, prevSum) ->
+              (* previous was found *)
               (* restore old binding for vi, as we are about to drop
                  the new definition and its formals.
               *)
@@ -2836,7 +2869,18 @@ let oneFilePass2 (f: file) =
                  Some l from getFormalsDecl
                  in case of a defined function. *)
               Cil.setFormals fdec (Option.get defn_formals);
-              (* previous was found *)
+              (* Remove static variables (avoids dangling globals in the AST *)
+              remove_function_statics fdec';
+              if hasAttribute "weak" fdec'.svar.vattr then begin
+                Kernel.warning ~current:true ~wkey:Kernel.wkey_linker_weak
+                  "dropping weak def'n of func %s at %a in favor of \
+                   that at %a"
+                  fdec'.svar.vname
+                  Cil_printer.pp_location l Cil_printer.pp_location prevLoc;
+                (* We remove the 'weak' attribute, assuming the 'strong'
+                   version overrode it. *)
+                fdec'.svar.vattr <- dropAttribute "weak" fdec'.svar.vattr;
+              end else
               if (curSum = prevSum) then
                 Kernel.warning ~current:true
                   "dropping duplicate def'n of func %s at %a in favor of \
