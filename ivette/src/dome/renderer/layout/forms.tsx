@@ -139,16 +139,16 @@ export class BufferController {
   hasCommit(): boolean { return this.evt.listenerCount('commit') > 0; }
 
   /** @internal */
-  onReset(fn: ResetCallback) { this.evt.addListener('reset', fn); }
+  onReset(fn: ResetCallback): void { this.evt.addListener('reset', fn); }
 
   /** @internal */
-  offReset(fn: ResetCallback) { this.evt.addListener('reset', fn); }
+  offReset(fn: ResetCallback): void { this.evt.addListener('reset', fn); }
 
   /** @internal */
-  onCommit(fn: ResetCallback) { this.evt.addListener('commit', fn); }
+  onCommit(fn: ResetCallback): void { this.evt.addListener('commit', fn); }
 
   /** @internal */
-  offCommit(fn: ResetCallback) { this.evt.addListener('commit', fn); }
+  offCommit(fn: ResetCallback): void { this.evt.addListener('commit', fn); }
 
 }
 
@@ -181,7 +181,7 @@ export function useBuffer<A>(
   // --- Reset
   React.useEffect(() => {
     if (modified) {
-      const doReset = () => {
+      const doReset = (): void => {
         setModified(false);
         setBuffer(value);
         setBerror(error);
@@ -194,14 +194,14 @@ export function useBuffer<A>(
   // --- Commit
   React.useEffect(() => {
     if (staged) {
-      const doCommit = () => {
+      const doCommit = (): void => {
         setModified(false);
         onChanged(buffer, undefined);
       };
       remote.onCommit(doCommit);
       return () => remote.offCommit(doCommit);
     } else return;
-  }, [remote, staged, buffer]);
+  }, [remote, staged, buffer, onChanged]);
 
   // --- Callback
   const onLocalChange = React.useCallback(
