@@ -50,8 +50,16 @@ export type FieldError =
   | undefined | boolean | string
   | { [key: string]: FieldError } | FieldError[];
 export type Checker<A> = (value: A) => boolean | FieldError;
-export type Callback<A> = (value: A, error: FieldError) => void;
-export type FieldState<A> = [A, FieldError, Callback<A>];
+export type Callback<A> = (
+  value: A, error: FieldError, reset?: boolean
+  ) => void;
+
+export interface FieldState<A> {
+  value: A;
+  error?: FieldError;
+  reset?: A;
+  onChanged: Callback<A>;
+}
 
 /* --------------------------------------------------------------------------*/
 /* --- State Errors Utilities                                             ---*/
@@ -119,13 +127,13 @@ export function useState<A>(
 ): FieldState<A> {
   const [value, setValue] = React.useState<A>(defaultValue);
   const [error, setError] = React.useState<FieldError>(undefined);
-  const setState = React.useCallback((newValue: A, newError: FieldError) => {
+  const onChanged = React.useCallback((newValue: A, newError: FieldError) => {
     const localError = validate(newValue, checker) || newError;
     setValue(newValue);
     setError(localError);
     if (onChange) onChange(newValue, localError);
   }, [checker, setValue, setError, onChange]);
-  return [value, error, setState];
+  return { value: value, error: error, onChanged: onChanged };
 }
 
 /** Introduces a local state and propagates only non-errors. */
@@ -142,7 +150,7 @@ export function useValid<A>(
       if (!newError) setValue(newValue);
     }, [setValue],
   );
-  return [error ? local : value, error, update];
+  return { value: error ? local : value, error: error, onChanged: update };
 }
 
 /** Provides a new state with a default value. */
@@ -150,8 +158,12 @@ export function useDefault<A>(
   state: FieldState<A | undefined>,
   defaultValue: A,
 ): FieldState<A> {
-  const [value, error, setState] = state;
-  return [value ?? defaultValue, error, setState];
+  const { value, error, onChanged } = state;
+  return {
+    value: value ?? defaultValue,
+    error: error,
+    onChanged: onChanged
+  };
 }
 
 /**
@@ -161,15 +173,15 @@ export function useDefault<A>(
 export function useDefined<A>(
   state: FieldState<A>,
 ): FieldState<A | undefined> {
-  const [value, error, setState] = state;
+  const { value, error, onChanged } = state;
   const update = React.useCallback(
     (newValue: A | undefined, newError: FieldError) => {
       if (newValue !== undefined) {
-        setState(newValue, newError);
+        onChanged(newValue, newError);
       }
-    }, [setState],
+    }, [onChanged],
   );
-  return [value, error, update];
+  return { value: value, error: error, onChanged: update };
 }
 
 /**
@@ -180,18 +192,18 @@ export function useRequired<A>(
   state: FieldState<A>,
   onError?: string,
 ): FieldState<A | undefined> {
-  const [value, error, setState] = state;
+  const { value, error, onChanged } = state;
   const cache = React.useRef(value);
   const update = React.useCallback(
     (newValue: A | undefined, newError: FieldError) => {
       if (newValue === undefined) {
-        setState(cache.current, onError || 'Required field');
+        onChanged(cache.current, onError || 'Required field');
       } else {
-        setState(newValue, newError);
+        onChanged(newValue, newError);
       }
-    }, [cache, onError, setState],
+    }, [cache, onError, onChanged],
   );
-  return [value, error, update];
+  return { value: value, error: error, onChanged: update };
 }
 
 /**
@@ -202,12 +214,12 @@ export function useChecker<A>(
   state: FieldState<A>,
   checker?: Checker<A>,
 ): FieldState<A> {
-  const [value, error, setState] = state;
+  const { value, error, onChanged } = state;
   const update = React.useCallback((newValue: A, newError: FieldError) => {
     const localError = validate(newValue, checker) || newError;
-    setState(newValue, localError);
-  }, [checker, setState]);
-  return [value, error, update];
+    onChanged(newValue, localError);
+  }, [checker, onChanged]);
+  return { value: value, error: error, onChanged: update };
 }
 
 /**
@@ -234,7 +246,7 @@ export function useFilter<A, B>(
   defaultValue: B,
 ): FieldState<B> {
 
-  const [value, error, setState] = state;
+  const { value, error, onChanged } = state;
   const [localValue, setLocalValue] = React.useState(defaultValue);
   const [localError, setLocalError] = React.useState<FieldError>(undefined);
   const [dangling, setDangling] = React.useState(false);
@@ -247,23 +259,27 @@ export function useFilter<A, B>(
         setLocalError(newError);
         if (isValid(newError)) {
           setDangling(false);
-          setState(outValue, undefined);
+          onChanged(outValue, undefined);
         }
       } catch (err) {
         setLocalValue(newValue);
         setLocalError(newError || err ? `${err}` : 'Invalid value');
         setDangling(true);
       }
-    }, [output, setState, setLocalValue, setLocalError],
+    }, [output, onChanged, setLocalValue, setLocalError],
   );
 
   if (dangling) {
-    return [localValue, localError, update];
+    return { value: localValue, error: localError, onChanged: update };
   }
   try {
-    return [input(value), error, update];
+    return { value: input(value), error: error, onChanged: update };
   } catch (err) {
-    return [localValue, err ? `${err}` : 'Invalid input', update];
+    return {
+      value: localValue,
+      error: err ? `${err}` : 'Invalid input',
+      onChanged: update
+    };
   }
 
 }
@@ -277,7 +293,7 @@ export function useLatency<A>(
   state: FieldState<A>,
   latency?: number,
 ): FieldState<A> {
-  const [value, error, setState] = state;
+  const { value, error, onChanged } = state;
   const period = latency ?? 0;
   const [localValue, setLocalValue] = React.useState(value);
   const [localError, setLocalError] = React.useState(error);
@@ -286,7 +302,7 @@ export function useLatency<A>(
     if (period > 0) {
       const propagate = debounce(
         (lateValue: A, lateError: FieldError) => {
-          setState(lateValue, lateError);
+          onChanged(lateValue, lateError);
           setDangling(false);
         }, period,
       );
@@ -298,13 +314,13 @@ export function useLatency<A>(
       };
     }
     setDangling(false);
-    return setState;
-  }, [period, setDangling, setState, setLocalValue, setLocalError]);
-  return [
-    dangling ? localValue : value,
-    dangling ? localError : error,
-    update,
-  ];
+    return onChanged;
+  }, [period, setDangling, onChanged, setLocalValue, setLocalError]);
+  return {
+    value: dangling ? localValue : value,
+    error: dangling ? localError : error,
+    onChanged: update,
+  };
 }
 
 /**
@@ -315,19 +331,20 @@ export function useProperty<A, K extends keyof A>(
   property: K,
   checker?: Checker<A[K]>,
 ): FieldState<A[K]> {
-  const [value, error, setState] = state;
+  const { value, error, onChanged } = state;
   const update = React.useCallback((newProp: A[K], newError: FieldError) => {
     const newValue = { ...value, [property]: newProp };
     const objError = isObjectError(error) ? error : {};
     const propError = validate(newProp, checker) || newError;
     const localError = { ...objError, [property]: propError };
-    setState(newValue, isValidObject(localError) ? undefined : localError);
-  }, [value, error, setState, property, checker]);
-  return [
-    value[property],
-    isObjectError(error) ? error[property] : undefined,
-    update
-  ];
+    onChanged(newValue, isValidObject(localError) ? undefined : localError);
+  }, [value, error, onChanged, property, checker, ]);
+
+  return {
+    value: value[property],
+    error: isObjectError(error) ? error[property] : undefined,
+    onChanged: update
+  };
 }
 
 /**
@@ -338,17 +355,17 @@ export function useIndex<A>(
   index: number,
   checker?: Checker<A>,
 ): FieldState<A> {
-  const [array, error, setState] = state;
+  const { value, error, onChanged } = state;
   const update = React.useCallback((newValue: A, newError: FieldError) => {
-    const newArray = array.slice();
+    const newArray = value.slice();
     newArray[index] = newValue;
     const localError = isArrayError(error) ? error.slice() : [];
     const valueError = validate(newValue, checker) || newError;
     localError[index] = valueError;
-    setState(newArray, isValidArray(localError) ? undefined : localError);
-  }, [array, error, setState, index, checker]);
+    onChanged(newArray, isValidArray(localError) ? undefined : localError);
+  }, [value, error, onChanged, index, checker]);
   const itemError = isArrayError(error) ? error[index] : undefined;
-  return [array[index], itemError, update];
+  return { value: value[index], error: itemError, onChanged: update };
 }
 
 /* --------------------------------------------------------------------------*/
@@ -634,11 +651,11 @@ export interface FieldProps<A> extends FilterProps {
 type InputEvent = { target: { value: string } };
 type InputState = [string, FieldError, (evt: InputEvent) => void];
 
-function useChangeEvent(setState: Callback<string>)
-  : ((evt: InputEvent) => void) {
+function useChangeEvent(onChanged: Callback<string>)
+: ((evt: InputEvent) => void) {
   return React.useCallback(
-    (evt: InputEvent) => { setState(evt.target.value, undefined); },
-    [setState],
+    (evt: InputEvent) => { onChanged(evt.target.value, undefined); },
+    [onChanged],
   );
 }
 
@@ -660,8 +677,8 @@ function useTextInputField(
 ): InputState {
   const checked = useChecker(props.state, props.checker);
   const period = props.latency ?? defaultLatency;
-  const [value, error, setState] = useLatency(checked, period);
-  const onChange = useChangeEvent(setState);
+  const { value, error, onChanged } = useLatency(checked, period);
+  const onChange = useChangeEvent(onChanged);
   return [value || '', error, onChange];
 }
 
@@ -861,8 +878,8 @@ export function NumberField(props: NumberFieldProps): JSX.Element {
   const css = Utils.classes('dome-xForm-number-field', props.className);
   const checked = useChecker(props.state, props.checker);
   const filtered = useFilter(checked, TEXT_OF_NUMBER, NUMBER_OF_TEXT, '');
-  const [value, error, setState] = useLatency(filtered, latency);
-  const onChange = useChangeEvent(setState);
+  const { value, error, onChanged } = useLatency(filtered, latency);
+  const onChange = useChangeEvent(onChanged);
   const UNITS = units && (
     <label className="dome-text-label dome-xForm-units">{units}</label>
   );
@@ -920,8 +937,8 @@ export function SpinnerField(props: SpinnerFieldProps): JSX.Element {
   }, [min, max, checker]);
   const checked = useChecker(props.state, fullChecker);
   const filtered = useFilter(checked, TEXT_OF_INPUT_NUMBER, NUMBER_OF_TEXT, '');
-  const [value, error, setState] = useLatency(filtered, latency);
-  const onChange = useChangeEvent(setState);
+  const { value, error, onChanged } = useLatency(filtered, latency);
+  const onChange = useChangeEvent(onChanged);
   const UNITS = units && (
     <label className="dome-text-label dome-xForm-units">{units}</label>
   );
@@ -999,7 +1016,7 @@ export function SliderField(props: SliderFieldProps): JSX.Element {
   const checked = useChecker(props.state, props.checker);
   const delayed = useLatency(checked, latency);
   const [label, setLabel] = React.useState<string | undefined>(undefined);
-  const [value, error, setState] = delayed;
+  const { value, error, onChanged } = delayed;
   const labeling = FORMATING(props);
   const onChange = React.useMemo(
     () => {
@@ -1007,7 +1024,7 @@ export function SliderField(props: SliderFieldProps): JSX.Element {
       return (evt: InputEvent) => {
         const v = Number.parseInt(evt.target.value, 10);
         if (!Number.isNaN(v)) {
-          setState(v, undefined);
+          onChanged(v, undefined);
           const vlabel = labeling && labeling(v);
           setLabel(vlabel);
           if (vlabel) fadeOut();
@@ -1015,14 +1032,14 @@ export function SliderField(props: SliderFieldProps): JSX.Element {
           setLabel(undefined);
         }
       };
-    }, [labeling, latency, setState, setLabel],
+    }, [labeling, latency, onChanged, setLabel],
   );
   const onDoubleClick = React.useCallback(() => {
     if (onReset) {
-      setState(onReset, undefined);
+      onChanged(onReset, undefined);
       setLabel(undefined);
     }
-  }, [onReset, setState, setLabel]);
+  }, [onReset, onChanged, setLabel]);
   const VALUELABEL = labeling && (
     <label className={label ? SHOW_SLIDER : HIDE_SLIDER}>
       {label}
@@ -1182,13 +1199,15 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element | null {
 
   if (hidden) return null;
 
-  const [value, , setState] = props.state;
+  const { value, onChanged } = props.state;
   const { label, title, inverted } = props;
   const css = Utils.classes(
     'dome-xForm-field dome-text-label',
     disabled && 'dome-disabled',
   );
-  const onChange = (): void => setState(!value, undefined);
+  const onChange = (): void => {
+    onChanged(!value, undefined);
+  };
   return (
     <Checkbox
       className={css}
@@ -1216,8 +1235,8 @@ export function RadioField<A>(props: RadioFieldProps<A>): JSX.Element | null {
 
   if (hidden) return null;
 
-  const [selection, , setState] = props.state;
-  const onSelection = (value: A): void => setState(value, undefined);
+  const { value: selection, onChanged } = props.state;
+  const onSelection = (value: A): void => onChanged(value, undefined);
   const { label, title, value } = props;
   const css = Utils.classes(
     'dome-xForm-field dome-text-label',
@@ -1255,9 +1274,9 @@ export interface SelectFieldProps extends FieldProps<string | undefined> {
 export function SelectField(props: SelectFieldProps): JSX.Element {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
-  const [value, error, setState] = useChecker(props.state, props.checker);
+  const { value, error, onChanged } = useChecker(props.state, props.checker);
   const onChange =
-    (newValue: string | undefined): void => setState(newValue, undefined);
+    (newValue: string | undefined): void => onChanged(newValue, undefined);
   const { children, placeholder } = props;
   return (
     <Field
