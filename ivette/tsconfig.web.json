@@ -20,7 +20,13 @@
     "composite": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
+    "esModuleInterop": true,
     "paths": {
+      "dome": [ "src/dome/renderer/dome.tsx" ],
+      "dome/system": [ "src/dome/misc/system.js" ],
+      "dome/devtools": [ "src/dome/misc/devtools.js" ],
+      "dome/misc/*": [ "src/dome/misc/*"],
+      "dome/*": [ "src/dome/renderer/*" ],
       "@renderer/*": [
         "src/renderer/src/*"
       ]

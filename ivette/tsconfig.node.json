@@ -3,6 +3,14 @@
   "include": ["electron.vite.config.*", "src/main/*", "src/preload/*"],
   "compilerOptions": {
     "composite": true,
-    "types": ["electron-vite/node"]
+    "esModuleInterop": true,
+    "types": ["electron-vite/node"],
+    "paths": {
+      "dome": [ "./src/dome/renderer/dome.tsx" ],
+      "dome/system": [ "./src/dome/misc/system.js" ],
+      "dome/devtools": [ "./src/dome/misc/devtools.js" ],
+      "dome/misc/*": [ "./src/dome/misc/*"],
+      "dome/*": [ "./src/dome/renderer/*" ],
+    }
   }
 }

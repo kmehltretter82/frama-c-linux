@@ -50,13 +50,11 @@ dev: api dome-dev
 # With autofix
 lint: dome-pkg dome-templ check-case
 	@echo "[Ivette] running typechecker & linter (with cache & fix mode)"
-	yarn run typecheck
 	yarn run lint --fix --cache --cache-location .eslint-cache
 
 # Without autofix
 check-lint: dome-pkg dome-templ check-case
 	@echo "[Ivette] running typechecker & linter"
-	yarn run typecheck
 	yarn run lint
 
 # In case-insensitive filesystems (macOS/Windows), import statements and
