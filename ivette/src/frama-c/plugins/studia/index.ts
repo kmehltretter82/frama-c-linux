@@ -129,12 +129,9 @@ const studiaWritesMode : Ivette.ModeProps = {
 
 async function onEnter(akind: access, term: string): Promise<void> {
   const stmt = States.getSelected();
-  const { kind: mkind } = States.getMarker(stmt);
-  if (mkind === 'STMT') {
-    const marker = await Server.send(Ast.parseLval, { stmt, term })
-      .catch(handleError);
-    if (marker) computeStudiaSelection(akind, marker, term);
-  }
+  const marker = await Server.send(Ast.parseLval, { stmt, term })
+    .catch(handleError);
+  if (marker) computeStudiaSelection(akind, marker, term);
 }
 
 Ivette.registerMode(studiaReadsMode);
