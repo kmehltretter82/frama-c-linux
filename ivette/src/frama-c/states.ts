@@ -332,6 +332,7 @@ export function useServerField<A>(
   return {
     value: localValue ?? defaultValue,
     error: localError,
+    reset: value,
     onChanged: update
   };
 }
