@@ -1385,8 +1385,59 @@ location of an \texttt{AST} visitor.
 \begin{itemize}
 \item[] \lstinline{~source:$s$} use the source location $s$ (see \texttt{Log.mli})
 \item[] \lstinline{~current:true} use the current source location
-  managed by \texttt{Cil.CurrentLoc}.
+  managed by \texttt{Current\_loc} (see \texttt{Current\_loc.mli}).
 \end{itemize}
+
+\codeidxdef{Current\_loc}
+The current location is set manually, either by frama-c's kernel or by
+developpers in their plug-in. For instance \texttt{Cil} visitors update this
+location when visiting expressions, statements, globals, etc.
+
+\begin{example}
+  Different ways to set and use \texttt{Current\_loc}:
+  \scodeidx{Current\_loc}{let-bindings}
+  \scodeidx{Current\_loc}{with\_loc\_opt}
+  \scodeidx{Current\_loc}{with\_loc}
+  \sscodeidx{Boot}{Main}{extend}
+  \begin{ocamlcode}
+  (* [Current_loc.get()] returns the last location set in Current_loc *)
+  let print_current_loc () =
+    Format.printf "%a@." Cil_datatype.Location.pretty (Current_loc.get ())
+
+  (* [with_loc loc f x] set the current location to loc, executes [f x] and set
+     the location to its old value before returning the result of [f x]. Raised
+     exceptions inside [f] will be caught and re-raised after resetting the
+     location to its previous value. *)
+  let apply_stmt f stmt =
+    Current_loc.with_loc (Cil_datatype.Stmt.loc s) f Stmt
+
+  (* [with_loc_opt opt_loc f x] behaves like [with_loc] if [loc_opt] is
+     [Some loc], and does not update the current location if it is [None].*)
+  let apply_code_annot f ca =
+    Current_loc.with_loc_opt (Cil_datatype.Code_annotation.loc s) f stmt
+
+  (* Current_loc defines 2 let-binding operators which call [with_loc] and
+     [with_loc_opt]. Here is a function that set the current location to the
+     expr location, and reset it after the match. *)
+  let do_expr e =
+    let open Current_loc.Operators in
+    let$<>$ UpdatedCUrrentLoc = e.eloc in
+    match e.enode with
+    | ...
+
+  (* The same function after removing the let-binding syntax. Here [let$<>$] can
+     be replaced with [with_loc]. [UpdatedCUrrentLoc] is used as documentation
+     to know which operation is done by the operator, and to be sure we are
+     using the right one. It can be replaced by [_]. *)
+  let do_expr2 e =
+    let open Current_loc.Operators in
+    ( let$<>$ ) e.eloc (fun UpdatedCUrrentLoc ->
+      match e.enode with
+      | ...
+    ) UpdatedCUrrentLoc
+
+  \end{ocamlcode}
+  \end{example}
 
 \paragraph{Emission Options.} By default, a message is echoed to the
 user \emph{after} its construction, and it is sent to registered
