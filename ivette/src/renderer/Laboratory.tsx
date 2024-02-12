@@ -478,7 +478,22 @@ function ViewSection(): JSX.Element {
   const views = Ext.useElements(VIEW);
   const [{ selectedView }] = States.useGlobalState(globalLabViewState);
 
-  function onSelection(view: Ivette.ViewLayoutProps): void {
+  function createTabFromView(view: Ivette.ViewLayoutProps): void {
+    const layout = getQuarterCompsFromLayout(view.layout);
+    const tab: Tab = {
+      viewId: view.id,
+      viewLabel: view.label,
+      A: layout.A,
+      B: layout.B,
+      C: layout.C,
+      D: layout.D,
+      H: defaultLabViewState.H,
+      V: defaultLabViewState.V,
+    };
+    addTab(tab);
+  }
+
+  function applyView(view: Ivette.ViewLayoutProps): void {
     applyLayout(view);
     const labViewState = globalLabViewState.getValue();
     const tabsState = globalTabsState.getValue();
@@ -494,19 +509,23 @@ function ViewSection(): JSX.Element {
     };
   }
 
+  function onSelection(view: Ivette.ViewLayoutProps, e?:React.MouseEvent):
+  void {
+    e?.shiftKey ? createTabFromView(view) : applyView(view);
+  }
+
   function onContextMenu(view: Ivette.ViewLayoutProps): void {
-    const layout = getQuarterCompsFromLayout(view.layout);
-    const tab: Tab = {
-      viewId: view.id,
-      viewLabel: view.label,
-      A: layout.A,
-      B: layout.B,
-      C: layout.C,
-      D: layout.D,
-      H: defaultLabViewState.H,
-      V: defaultLabViewState.V,
-    };
-    addTab(tab);
+    const items: Dome.PopupMenuItem[] = [
+      {
+        label: 'Apply view to current Tab',
+        onClick: () => applyView(view),
+      },
+      {
+        label: 'Create new Tab from view',
+        onClick: () => createTabFromView(view),
+      }
+    ];
+    Dome.popupMenu(items);
   }
 
   return (
@@ -518,7 +537,7 @@ function ViewSection(): JSX.Element {
           title={view.title}
           icon='DISPLAY'
           selected={selectedView === view.id}
-          onSelection={() => onSelection(view)}
+          onSelection={(evt) => onSelection(view, evt)}
           onContextMenu={() => onContextMenu(view)}
         />
       )}

@@ -184,7 +184,7 @@ export interface ItemProps {
   /** Selection state. */
   selected?: boolean;
   /** Selection callback. */
-  onSelection?: () => void;
+  onSelection?: (e?: React.MouseEvent) => void;
   /** Right-click callback. */
   onContextMenu?: () => void;
   /** Additional class. */
@@ -203,7 +203,8 @@ export function Item(props: ItemProps): JSX.Element {
   const [clicked, setClicked] = React.useState(false);
   const onSelection = isDisabled ? undefined : props.onSelection;
   const onClick =
-    onSelection ? () => { setClicked(true); onSelection(); } : undefined;
+    onSelection ? (e: React.MouseEvent) => {
+       setClicked(true); onSelection(e); } : undefined;
   const onContextMenu = isDisabled ? undefined : props.onContextMenu;
   const className = classes(
     'dome-xSideBarItem',
