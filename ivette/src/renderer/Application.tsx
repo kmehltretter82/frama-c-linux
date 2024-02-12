@@ -87,9 +87,8 @@ export default function Application(): JSX.Element {
         <Controller.Status />
         <>{StatusBar}</>
         <Toolbar.Filler />
-        <Controller.Stats />
-        <Toolbar.Filler />
         <Lab.Dock />
+        <Controller.Stats />
       </Toolbar.ToolBar>
     </Vfill>
   );
