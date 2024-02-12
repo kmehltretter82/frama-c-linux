@@ -68,8 +68,8 @@ const globalPanelLayoutSelectorState = new States
 const defaultTabsState: TabState = {
   tabs: [
     {
-      viewLabel: "default",
-      viewId: "default tab",
+      viewId: "tab.default",
+      viewLabel: "Default Tab",
       A: defaultLayout.ABCD,
       B: defaultLayout.ABCD,
       C: defaultLayout.ABCD,
@@ -290,9 +290,10 @@ function assignCompToQuarter(quarter: string, compId: string): void {
   layout = adjustBlanksInLayout(
     { A: layout.A, B: layout.B, C: layout.C, D: layout.D });
 
+  const view = VIEW.getElement(labViewState.selectedView);
   applyLayout({
-    id: "custom",
-    label: "Custom Layout",
+    id: view?.id ?? "view.custom",
+    label: view?.label ?? "Custom Layout",
     layout: layout
    });
 }
@@ -851,8 +852,8 @@ export function Dock(): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 interface Tab {
-  viewLabel?: string,
-  viewId?: string,
+  viewLabel: string,
+  viewId: string,
   A: string;
   B: string;
   C: string;
@@ -885,8 +886,8 @@ export function Tabs(): JSX.Element {
     labViewState.selectedTabIndex = state.tabs.indexOf(tab);
     globalLabViewState.setValue({ ...labViewState });
     applyLayout({
-      id: tab.viewId ?? "custom",
-      label: tab.viewLabel ?? "Custom Layout",
+      id: tab.viewId,
+      label: tab.viewLabel,
       layout: { A: tab.A, B: tab.B, C: tab.C, D: tab.D }
     });
   }
@@ -909,7 +910,7 @@ export function Tabs(): JSX.Element {
           }
           key={state.tabs.indexOf(tab)}
           onClick={() => onClick(tab)} onContextMenu={() => onContextMenu(tab)}>
-            Tab {state.tabs.indexOf(tab)}
+            {tab.viewLabel}
           </div>
         )
       }
