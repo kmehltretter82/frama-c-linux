@@ -874,14 +874,19 @@ function addTab(tab: Tab): void {
 
 function removeTab(tab: Tab): void {
   const tabsState = globalTabsState.getValue();
+  const labViewState = globalLabViewState.getValue();
+  const activeTab = tabsState.tabs[labViewState.selectedTabIndex];
+
   tabsState.tabs.splice(tabsState.tabs.indexOf(tab), 1);
+  labViewState.selectedTabIndex = tabsState.tabs.indexOf(activeTab);
   globalTabsState.setValue({ ...tabsState }, true);
+  globalLabViewState.setValue({ ...labViewState });
 }
 
 export function Tabs(): JSX.Element {
   const [ state, ] = States.useGlobalState(globalTabsState);
 
-  function onClick(tab: Tab): void {
+  function switchTab(tab: Tab): void {
     const labViewState = globalLabViewState.getValue();
     labViewState.selectedTabIndex = state.tabs.indexOf(tab);
     globalLabViewState.setValue({ ...labViewState });
@@ -892,11 +897,46 @@ export function Tabs(): JSX.Element {
     });
   }
 
-  function onContextMenu(tab: Tab): void {
+  function closeTab(tab: Tab): void {
     if(globalLabViewState.getValue().selectedTabIndex !==
     state.tabs.indexOf(tab)) {
       removeTab(tab);
     }
+  }
+
+  function resetTab(tab: Tab): void {
+    const view = VIEW.getElement(tab.viewId);
+    view && applyLayout(view);
+  }
+
+  function duplicateTab(tab: Tab): void {
+    addTab({ ...tab });
+  }
+
+  function onClick(tab: Tab, e?:React.MouseEvent): void {
+    e?.shiftKey ? duplicateTab(tab) : switchTab(tab);
+  }
+
+  function onContextMenu(tab: Tab): void {
+    const items: Dome.PopupMenuItem[] = [
+      {
+        label: 'Switch active Tab',
+        onClick: () => switchTab(tab),
+      },
+      {
+        label: 'Reset Tab to default view',
+        onClick: () => resetTab(tab),
+      },
+      {
+        label: 'Duplicate Tab',
+        onClick: () => duplicateTab(tab),
+      },
+      {
+        label: 'Close Tab',
+        onClick: () => closeTab(tab),
+      }
+    ];
+    Dome.popupMenu(items);
   }
 
   return (
@@ -909,7 +949,8 @@ export function Tabs(): JSX.Element {
           "tabs-component tabs-component-selected" : "tabs-component"
           }
           key={state.tabs.indexOf(tab)}
-          onClick={() => onClick(tab)} onContextMenu={() => onContextMenu(tab)}>
+          onClick={(e) => onClick(tab, e)}
+          onContextMenu={() => onContextMenu(tab)}>
             {tab.viewLabel}
           </div>
         )
