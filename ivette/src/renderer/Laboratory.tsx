@@ -837,7 +837,7 @@ export function Dock(): JSX.Element {
           <Toolbar.Button key={comp.id}
           label={comp.label}
           onClick={() => onClick(comp)}
-          onContextMenu={(e) => onContextMenu(comp, e)}
+          onContextMenu={(_value, e) => onContextMenu(comp, e)}
           selected={panelLayoutSelectorState.compId === comp.id}
           />
         )
@@ -961,7 +961,7 @@ export function Tabs(): JSX.Element {
         state.tabs.map(tab =>
           <Toolbar.Button key={state.tabs.indexOf(tab)}
           label={tab.viewLabel}
-          onClick={(_a, e) => onClick(tab, e)}
+          onClick={(_value, e) => onClick(tab, e)}
           onContextMenu={() => onContextMenu(tab)}
           selected={globalLabViewState.getValue().selectedTabIndex ===
             state.tabs.indexOf(tab)}
