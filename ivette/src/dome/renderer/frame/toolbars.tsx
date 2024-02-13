@@ -160,7 +160,9 @@ export interface ButtonProps<A> {
   /** Currently selected value. */
   selection?: A;
   /** Selection callback. Receives the button's value. */
-  onClick?: (value: A | undefined) => void;
+  onClick?: (value: A | undefined, evt?:React.MouseEvent) => void;
+  /** ContextMenu callback. Receives a MouseEvent. */
+  onContextMenu?: (evt?:React.MouseEvent) => void;
   /** Button contents */
   children?: React.ReactNode;
 }
@@ -172,7 +174,7 @@ export function Button<A = undefined>(
   const { visible = true, hidden = false } = props;
   if (!visible || hidden) return null;
   const { enabled = true, disabled = false } = props;
-  const { selected, value, selection, onClick } = props;
+  const { selected, value, selection, onClick, onContextMenu } = props;
   const isSelected = selected !== undefined
     ? selected
     : (value !== undefined && value === selection);
@@ -181,7 +183,8 @@ export function Button<A = undefined>(
       type="button"
       disabled={disabled || !enabled}
       className={isSelected ? SELECT : (BUTTON + KIND(props.kind))}
-      onClick={onClick && (() => onClick(value))}
+      onClick={onClick && ((evt) => onClick(value, evt))}
+      onContextMenu={onContextMenu && ((evt) => onContextMenu(evt))}
       title={props.title}
     >
       {props.icon && <SVG id={props.icon} />}

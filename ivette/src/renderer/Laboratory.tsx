@@ -24,6 +24,7 @@ import React from "react";
 import * as Dome from 'dome';
 import * as States from 'dome/data/states';
 import * as Sidebars from 'dome/frame/sidebars';
+import * as Toolbar from 'dome/frame/toolbars';
 import { Icon } from 'dome/controls/icons';
 import { Label } from 'dome/controls/labels';
 import { Hbox, Hfill, Vfill } from 'dome/layout/boxes';
@@ -396,7 +397,7 @@ function Pane(props: PaneProps): JSX.Element | null {
             <Icon id={"ITEMS.GRID"}
               className="titlebar-thin-icon"
               onClick={(e) =>
-                openPanelLayoutSelector(component, e, "titlebar")}
+                openPanelLayoutSelector(component, "titlebar", e)}
             />
           </Hfill>
         </Hbox>
@@ -569,7 +570,7 @@ function ComponentItem(comp: Ivette.ItemProps): JSX.Element {
       globalPanelLayoutSelectorState.setValue(defaultPanelLayoutSelectorState);
       return;
     }
-    openPanelLayoutSelector(comp, e, "sidebar");
+    openPanelLayoutSelector(comp, "sidebar", e);
   }
 
   return (
@@ -669,7 +670,7 @@ interface PanelLayoutSelectorState {
 }
 
 function openPanelLayoutSelector(comp: Ivette.ComponentProps,
-  e: React.MouseEvent, origin: PanelOrigin): void {
+  origin: PanelOrigin, e?: React.MouseEvent): void {
   const state = globalPanelLayoutSelectorState.getValue();
   const display = !state.display ? true : state.compId !== comp.id;
   globalPanelLayoutSelectorState.setValue({
@@ -677,9 +678,13 @@ function openPanelLayoutSelector(comp: Ivette.ComponentProps,
     compId: display ? comp.id : "",
     compLabel: display ? comp.label : "",
     origin: origin,
-    x: e.clientX,
-    y: e.clientY
+    x: e?.clientX ?? 250,
+    y: e?.clientY ?? 250
   });
+}
+
+function closePanelLayoutSelector(): void {
+  globalPanelLayoutSelectorState.setValue(defaultPanelLayoutSelectorState);
 }
 
 function PanelLayoutSelector()
@@ -695,7 +700,7 @@ function PanelLayoutSelector()
   computePanelXY();
 
   Dome.escaped.on(() => {
-    close();
+    closePanelLayoutSelector();
   });
 
   function computePanelXY(): void {
@@ -711,13 +716,9 @@ function PanelLayoutSelector()
     if (y + panelHeight > maxHeight) y = maxHeight - panelHeight;
   }
 
-  function close(): void {
-    globalPanelLayoutSelectorState.setValue(defaultPanelLayoutSelectorState);
-  }
-
   function onclick(quarter: string): void {
     assignCompToQuarter(quarter, state.compId);
-    close();
+    closePanelLayoutSelector();
   }
 
   function dock(): void {
@@ -727,7 +728,7 @@ function PanelLayoutSelector()
     };
     addToDockedComponents(component);
     removeCompFromCurrentLayout(component.id);
-    close();
+    closePanelLayoutSelector();
   }
 
   function remove(): void {
@@ -736,7 +737,7 @@ function PanelLayoutSelector()
       label: state.compLabel
     };
     removeComponent(component);
-    close();
+    closePanelLayoutSelector();
   }
 
   return (
@@ -821,26 +822,24 @@ export function Dock(): JSX.Element {
     const compObject = COMPONENT.getElement(comp.id);
     const preferredPosition = compObject?.preferredPosition ?? "D";
     assignCompToQuarter(preferredPosition, comp.id);
+    closePanelLayoutSelector();
   }
 
-  function onContextMenu(comp: Ivette.ComponentProps, e: React.MouseEvent):
+  function onContextMenu(comp: Ivette.ComponentProps, e?: React.MouseEvent):
   void {
-    openPanelLayoutSelector(comp, e, "dockbar");
+    openPanelLayoutSelector(comp, "dockbar", e);
   }
 
   return (
     <>
       {
         [...state.dockedComponents].map((comp) =>
-          <div className={
-          panelLayoutSelectorState.compId === comp.id ?
-          "dock-component dock-component-selected" : "dock-component"
-          }
-          key={comp.id}
+          <Toolbar.Button key={comp.id}
+          label={comp.label}
           onClick={() => onClick(comp)}
-          onContextMenu={e => onContextMenu(comp, e)}>
-            {comp.label}
-          </div>
+          onContextMenu={(e) => onContextMenu(comp, e)}
+          selected={panelLayoutSelectorState.compId === comp.id}
+          />
         )
       }
     </>
@@ -884,7 +883,7 @@ function removeTab(tab: Tab): void {
 }
 
 export function Tabs(): JSX.Element {
-  const [ state, ] = States.useGlobalState(globalTabsState);
+  const [ state, setState ] = States.useGlobalState(globalTabsState);
 
   function switchTab(tab: Tab): void {
     const labViewState = globalLabViewState.getValue();
@@ -906,7 +905,21 @@ export function Tabs(): JSX.Element {
 
   function resetTab(tab: Tab): void {
     const view = VIEW.getElement(tab.viewId);
-    view && applyLayout(view);
+    if (!view) return;
+    const tabIndex = state.tabs.indexOf(tab);
+
+    if(tabIndex === globalLabViewState.getValue().selectedTabIndex) {
+      applyLayout(view);
+      return;
+    }
+    const layout = getQuarterCompsFromLayout(view.layout);
+    state.tabs[tabIndex].A = layout.A;
+    state.tabs[tabIndex].B = layout.B;
+    state.tabs[tabIndex].C = layout.C;
+    state.tabs[tabIndex].D = layout.D;
+    state.tabs[tabIndex].H = defaultLabViewState.H;
+    state.tabs[tabIndex].V = defaultLabViewState.V;
+    setState({ ...state });
   }
 
   function duplicateTab(tab: Tab): void {
@@ -918,10 +931,12 @@ export function Tabs(): JSX.Element {
   }
 
   function onContextMenu(tab: Tab): void {
+    const labViewState = globalLabViewState.getValue();
     const items: Dome.PopupMenuItem[] = [
       {
         label: 'Switch active Tab',
         onClick: () => switchTab(tab),
+        enabled: state.tabs.indexOf(tab) !== labViewState.selectedTabIndex
       },
       {
         label: 'Reset Tab to default view',
@@ -934,6 +949,7 @@ export function Tabs(): JSX.Element {
       {
         label: 'Close Tab',
         onClick: () => closeTab(tab),
+        enabled: state.tabs.indexOf(tab) !== labViewState.selectedTabIndex
       }
     ];
     Dome.popupMenu(items);
@@ -943,16 +959,13 @@ export function Tabs(): JSX.Element {
     <>
       {
         state.tabs.map(tab =>
-          <div className={
-          globalLabViewState.getValue().selectedTabIndex ===
-          state.tabs.indexOf(tab) ?
-          "tabs-component tabs-component-selected" : "tabs-component"
-          }
-          key={state.tabs.indexOf(tab)}
-          onClick={(e) => onClick(tab, e)}
-          onContextMenu={() => onContextMenu(tab)}>
-            {tab.viewLabel}
-          </div>
+          <Toolbar.Button key={state.tabs.indexOf(tab)}
+          label={tab.viewLabel}
+          onClick={(_a, e) => onClick(tab, e)}
+          onContextMenu={() => onContextMenu(tab)}
+          selected={globalLabViewState.getValue().selectedTabIndex ===
+            state.tabs.indexOf(tab)}
+          />
         )
       }
     </>
