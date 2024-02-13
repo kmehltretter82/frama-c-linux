@@ -28,7 +28,7 @@ let title_revert = "Revert (current: m & a -> a % m+1)"
 let v_revert,p_revert =
   Tactical.checkbox ~id:"Wp.modmask.revert"
     ~title:title_no_revert
-    ~descr:"Changes operands for modulo"
+    ~descr:"Changes operands for modulo."
     ~default:false ()
 
 class modmask =
@@ -36,7 +36,7 @@ class modmask =
     inherit Tactical.make
         ~id:"Wp.modmask"
         ~title:"Mod-Mask"
-        ~descr:"Converts modulo from/to bitmask"
+        ~descr:"Converts modulo from/to bitmask."
         ~params:[p_revert]
 
     method select feedback selection =

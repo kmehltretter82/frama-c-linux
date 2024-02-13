@@ -193,7 +193,7 @@ class printer (text : Wtext.text) =
       | `Internal here | `Leaf(_,here) ->
         begin
           let root,path = rootchain here [here] in
-          let qed = if Wpo.is_valid (ProofEngine.main tree) then "Qed" else "End"
+          let qed = if Wpo.is_fully_valid (ProofEngine.main tree) then "Qed" else "End"
           in text#printf "@[<hv 0>@{<bf>Proof@}:%a@\n@{<bf>%s@}.@]@."
             (self#proofstep ~prefix:"  " ~direct:"  " ~path ~here) root qed ;
         end

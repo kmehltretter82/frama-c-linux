@@ -173,8 +173,8 @@ sig
 
   val id : basename:string -> key -> string
   val mem : key -> bool
-  val find : key -> data
   val get : key -> data option
+  val find : key -> data
   val clear : unit -> unit
   val remove : key -> unit
   val define : key -> data -> unit
@@ -493,6 +493,7 @@ sig
   val mem : key -> bool
   val get : key -> data
   val set : key -> data -> unit
+  val find : key -> data
   val remove : key -> unit
   val clear : unit -> unit
 end
@@ -509,6 +510,7 @@ struct
   type key = D.key
   type data = D.data
   let get = G.memoize D.compile
+  let find = G.find
   let set = G.update
   let mem = G.mem
   let clear = G.clear
@@ -529,6 +531,7 @@ struct
   let get = G.memoize D.compile
   let set = G.update
   let mem = G.mem
+  let find = G.find
   let clear = G.clear
   let remove = G.remove
 end
@@ -547,6 +550,7 @@ struct
   let get = G.memoize (fun k -> D.compile k (G.id ~basename:(D.basename k) k))
   let set = G.update
   let mem = G.mem
+  let find = G.find
   let clear = G.clear
   let remove = G.remove
 end
@@ -565,6 +569,7 @@ struct
   let get = G.memoize (fun k -> D.compile k (G.id ~basename:(D.basename k) k))
   let set = G.update
   let mem = G.mem
+  let find = G.find
   let clear = G.clear
   let remove = G.remove
 end

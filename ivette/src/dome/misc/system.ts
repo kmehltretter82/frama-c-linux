@@ -36,6 +36,7 @@ import Emitter from 'events';
 import Exec from 'child_process';
 import fspath from 'path';
 import fs from 'fs';
+import { clipboard } from 'electron';
 
 // --------------------------------------------------------------------------
 // --- Logging
@@ -616,6 +617,26 @@ export function spawn(
 
     result(child);
   });
+}
+
+// --------------------------------------------------------------------------
+// --- ClipBoard
+// --------------------------------------------------------------------------
+
+/**
+   Get plain text from system clipboard.
+*/
+export function readClipboardText(): string
+{
+  return clipboard.readText();
+}
+
+/**
+   Copy plain text to system clipboard.
+*/
+export function writeClipboardText(text: string): void
+{
+  clipboard.writeText(text);
 }
 
 // --------------------------------------------------------------------------

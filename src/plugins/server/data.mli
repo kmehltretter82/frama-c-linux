@@ -357,6 +357,7 @@ sig
   val empty : 'a t
   val add : key -> 'a -> 'a t -> 'a t
   val find : key -> 'a t -> 'a
+  val remove : key -> 'a t -> 'a t
 end
 
 (** Datatype extended with access to value identifiers. *)
@@ -367,6 +368,9 @@ sig
   val get : t -> tag
   val find : tag -> t
   (** @raise Not_found if not registered. *)
+
+  val remove : t -> unit
+  (** Remove item from index tables. Use with extreme care. *)
 
   val clear : unit -> unit
   (** Clear index tables. Use with extreme care. *)

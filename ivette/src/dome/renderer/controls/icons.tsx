@@ -81,7 +81,6 @@ export function SVG(props: SVGprops): null | JSX.Element {
   return (
     <svg
       height={size}
-      width={size}
       style={{ bottom: offset }}
       viewBox={viewBox}
       className={className}
@@ -97,7 +96,7 @@ export function SVG(props: SVGprops): null | JSX.Element {
 // --------------------------------------------------------------------------
 
 export type IconKind =
-  'disabled' | 'selected' | 'positive' | 'negative' | 'warning';
+  'disabled' | 'selected' | 'positive' | 'negative' | 'warning' | 'default';
 
 /** Icon Component Properties */
 export interface IconProps extends SVGprops {
@@ -123,15 +122,14 @@ export interface IconProps extends SVGprops {
  */
 export function Icon(props: IconProps): JSX.Element {
   const {
-    id, title, onClick, fill, kind,
+    id, title, onClick, fill, kind='default',
     size, className, offset, style,
     visible = true, display = true,
   } = props;
   const divClass = classes(
-    'dome-xIcon',
+    'dome-xIcon', `dome-xIcon-${kind}`,
     !visible && 'dome-control-hidden',
     !display && 'dome-control-erased',
-    kind && ('dome-xIcon-' + kind),
     className
   );
   const divStyle = styles(fill && { fill }, style);

@@ -42,15 +42,15 @@ let enum ?at e a b sequent =
   Tactical.insert ?at cases sequent
 
 let vmin,pmin = Tactical.spinner ~id:"inf"
-    ~title:"Inf" ~descr:"Range Lower Bound (inclusive)" ()
+    ~title:"Inf" ~descr:"Range lower bound (inclusive)." ()
 let vmax,pmax = Tactical.spinner ~id:"sup"
-    ~title:"Sup" ~descr:"Range Upper Bound (inclusive)" ()
+    ~title:"Sup" ~descr:"Range upper bound (inclusive)." ()
 
 class range =
   object(self)
     inherit Tactical.make ~id:"Wp.range"
         ~title:"Range"
-        ~descr:"Enumerate a range of values for an integer term"
+        ~descr:"Enumerate a range of values for an integer term."
         ~params:[pmin;pmax]
 
     method select feedback (s : Tactical.selection) =
@@ -65,7 +65,7 @@ class range =
               Not_configured )
           else
             ( feedback#set_title "Range (%d-%d)" a b ;
-              feedback#set_descr "Enumerate (lower,%d-%d,upper)" a b ;
+              feedback#set_descr "Enumerate lower, range %d-%d and upper." a b ;
               Applicable(enum ?at e a b) )
         end
       else

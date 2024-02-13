@@ -57,18 +57,18 @@ let process (fd : Tactical.feedback) ?at e =
     let p = F.p_bool c in
     let q = F.p_not p in
     fd#set_title "Compute (split)" ;
-    fd#set_descr "Split on if-then-else condition" ;
+    fd#set_descr "Split on if-then-else condition." ;
     Applicable (Tactical.rewrite ?at ["If-Then",p,e,a;"If-Else",q,e,b])
   | Unfold(e,f,d) ->
     fd#set_title "Compute (def)" ;
-    fd#set_descr "Unfold definition of '%s'" (Lang.name_of_lfun f) ;
+    fd#set_descr "Unfold definition of '%s'." (Lang.name_of_lfun f) ;
     Applicable (Tactical.rewrite ?at ["Definition",F.p_true,e,d])
 
 class compute : Tactical.tactical =
   object
     inherit Tactical.make ~id:"Wp.compute"
         ~title:"Compute"
-        ~descr:"Unfold definitions and split on conditions"
+        ~descr:"Unfold definitions and split on conditions."
         ~params:[]
     method select feedback (s : Tactical.selection) =
       process feedback ?at:(Tactical.at s) (Tactical.selected s)

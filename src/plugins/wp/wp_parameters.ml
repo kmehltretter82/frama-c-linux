@@ -45,6 +45,10 @@ let on_reset f = resetdemon := f :: !resetdemon
 let reset () = List.iter (fun f -> f ()) !resetdemon
 let has_dkey (k:category) = is_debug_key_enabled k
 
+let server = ref false
+let () = Server.Main.once (fun () -> server := true)
+let is_interactive () = Fc_config.is_gui || !server
+
 (* ------------------------------------------------------------------------ *)
 (* ---  WP Generation                                                   --- *)
 (* ------------------------------------------------------------------------ *)
@@ -1220,17 +1224,13 @@ let base_output () =
     let output =
       let dir = OutputDir.get () in
       if Fc_Filepath.Normalized.is_empty dir then
-        if Fc_config.is_gui
+        if is_interactive ()
         then make_gui_dir ()
         else make_tmp_dir ()
-      else begin
-        make_output_dir dir ;
-        dir
-      end
-    in
+      else
+        ( make_output_dir dir ; dir ) in
     base_output := Some output;
-    Fc_Filepath.(add_symbolic_dir "WPOUT" output) ;
-    output
+    Fc_Filepath.add_symbolic_dir "WPOUT" output ; output
   | Some output -> output
 
 let get_output () =

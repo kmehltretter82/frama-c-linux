@@ -53,7 +53,7 @@ class shift =
     inherit Tactical.make
         ~id:"Wp.shift"
         ~title:"Logical Shift"
-        ~descr:"Transform Shifts into Div/Mult"
+        ~descr:"Transform logical shifts into divisions and multiplications."
         ~params:[]
 
     method select feedback selection =
@@ -104,7 +104,7 @@ class autoshift =
 
     method id = "wp:bitshift"
     method title = "Auto Bit-Shift"
-    method descr = "Apply Bit-Shift in Goal"
+    method descr = "Decompose logical shifts from current goal."
 
     method search push (seq : Conditions.sequent) =
       let goal = snd seq in

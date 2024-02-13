@@ -29,14 +29,14 @@ open Tactical
 let vanti,panti =
   Tactical.checkbox ~id:"anti"
     ~title:"Absurd"
-    ~descr:"Find Contradiction in Side Hypotheses"
+    ~descr:"Find contradiction in extra hypotheses."
     ~default:false ()
 
 class filter =
   object(self)
     inherit Tactical.make ~id:"Wp.filter"
         ~title:"Filter"
-        ~descr:"Dependent Erasure of Hypotheses"
+        ~descr:"Eliminates extra hypotheses."
         ~params:[panti]
 
     method select feedback _sel =

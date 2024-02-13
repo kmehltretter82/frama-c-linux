@@ -161,6 +161,8 @@ export interface ButtonProps<A> {
   selection?: A;
   /** Selection callback. Receives the button's value. */
   onClick?: (value: A | undefined) => void;
+  /** Right-Click callback. Receives the button's value. */
+  onContextMenu?: (value: A | undefined) => void;
   /** Button contents */
   children?: React.ReactNode;
 }
@@ -172,7 +174,7 @@ export function Button<A = undefined>(
   const { visible = true, hidden = false } = props;
   if (!visible || hidden) return null;
   const { enabled = true, disabled = false } = props;
-  const { selected, value, selection, onClick } = props;
+  const { selected, value, selection, onClick, onContextMenu } = props;
   const isSelected = selected !== undefined
     ? selected
     : (value !== undefined && value === selection);
@@ -182,6 +184,7 @@ export function Button<A = undefined>(
       disabled={disabled || !enabled}
       className={isSelected ? SELECT : (BUTTON + KIND(props.kind))}
       onClick={onClick && (() => onClick(value))}
+      onContextMenu={onContextMenu && (() => onContextMenu(value))}
       title={props.title}
     >
       {props.icon && <SVG id={props.icon} />}
@@ -280,6 +283,12 @@ export function ButtonGroup<A>(props: ButtonGroupProps<A>): JSX.Element {
 // --- ToolBar Menu
 // --------------------------------------------------------------------------
 
+export interface SelectProps extends SelectionProps<string>
+{
+  className?: string;
+  style?: React.CSSProperties;
+}
+
 /** Toolbar Selector Menu.
 
    Behaves likes a standard `<select>` element, except that callback directly
@@ -287,15 +296,20 @@ export function ButtonGroup<A>(props: ButtonGroupProps<A>): JSX.Element {
    The list of options shall be given with standard
    `<option value={...} label={...}>` elements.
  */
-export function Select(props: SelectionProps<string>): JSX.Element {
+export function Select(props: SelectProps): JSX.Element {
   const { enabled = true, disabled = false, onChange } = props;
   const callback =
     (evt: React.ChangeEvent<HTMLSelectElement>): void => {
       if (onChange) onChange(evt.target.value);
     };
+  const className = classes(
+    'dome-xToolBar-control dome-color-frame',
+    props.className
+  );
   return (
     <select
-      className="dome-xToolBar-control dome-color-frame"
+      className={className}
+      style={props.style}
       title={props.title}
       value={props.value}
       disabled={disabled || !enabled}

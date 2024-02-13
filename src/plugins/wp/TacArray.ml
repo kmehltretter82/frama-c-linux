@@ -42,7 +42,7 @@ class array =
   object
     inherit Tactical.make ~id:"Wp.array"
         ~title:"Array"
-        ~descr:"Decompose array access-update patterns"
+        ~descr:"Decompose access-update patterns"
         ~params:[]
 
     method select feedback (s : Tactical.selection) =

@@ -449,9 +449,9 @@ let apply env node jtactic subscripts =
   | Some fork ->
     let _,children = ProofEngine.commit fork in
     reconcile children subscripts ; (*TODO: saveback forgiven script ? *)
-    let ok = List.for_all
-        (fun (_,node) -> ProofEngine.proved node)
-        children in
+    let ok =
+      List.for_all
+        (fun (_,node) -> ProofEngine.locally_proved node) children in
     if ok then [] else children
 
 (* -------------------------------------------------------------------------- *)
@@ -524,7 +524,7 @@ let rec process env node =
   schedule
     begin fun () ->
       Wp_parameters.debug ~dkey:dkey_pp_allgoals "%a" (pp_subgoal env) node ;
-      if ProofEngine.proved node then
+      if ProofEngine.locally_proved node then
         begin
           env.pending <- pred env.pending ;
           Env.validate env ;

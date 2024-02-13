@@ -78,6 +78,192 @@ export const byProver: Compare.Order<prover> = Compare.string;
 /** Default value for `prover` */
 export const proverDefault: prover = Json.jKey<'#prover'>('#prover')('');
 
+/** Signal for state [`provers`](#provers)  */
+export const signalProvers: Server.Signal = {
+  name: 'plugins.wp.signalProvers',
+};
+
+const getProvers_internal: Server.GetRequest<null,prover[]> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.getProvers',
+  input: Json.jNull,
+  output: Json.jArray(jProver),
+  signals: [],
+};
+/** Getter for state [`provers`](#provers)  */
+export const getProvers: Server.GetRequest<null,prover[]>= getProvers_internal;
+
+const setProvers_internal: Server.SetRequest<prover[],null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.setProvers',
+  input: Json.jArray(jProver),
+  output: Json.jNull,
+  signals: [],
+};
+/** Setter for state [`provers`](#provers)  */
+export const setProvers: Server.SetRequest<prover[],null>= setProvers_internal;
+
+const provers_internal: State.State<prover[]> = {
+  name: 'plugins.wp.provers',
+  signal: signalProvers,
+  getter: getProvers,
+  setter: setProvers,
+};
+/** Selected Provers */
+export const provers: State.State<prover[]> = provers_internal;
+
+/** Signal for state [`process`](#process)  */
+export const signalProcess: Server.Signal = {
+  name: 'plugins.wp.signalProcess',
+};
+
+const getProcess_internal: Server.GetRequest<null,number> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.getProcess',
+  input: Json.jNull,
+  output: Json.jNumber,
+  signals: [],
+};
+/** Getter for state [`process`](#process)  */
+export const getProcess: Server.GetRequest<null,number>= getProcess_internal;
+
+const setProcess_internal: Server.SetRequest<number,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.setProcess',
+  input: Json.jNumber,
+  output: Json.jNull,
+  signals: [],
+};
+/** Setter for state [`process`](#process)  */
+export const setProcess: Server.SetRequest<number,null>= setProcess_internal;
+
+const process_internal: State.State<number> = {
+  name: 'plugins.wp.process',
+  signal: signalProcess,
+  getter: getProcess,
+  setter: setProcess,
+};
+/** Server Processes */
+export const process: State.State<number> = process_internal;
+
+/** Signal for state [`timeout`](#timeout)  */
+export const signalTimeout: Server.Signal = {
+  name: 'plugins.wp.signalTimeout',
+};
+
+const getTimeout_internal: Server.GetRequest<null,number> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.getTimeout',
+  input: Json.jNull,
+  output: Json.jNumber,
+  signals: [],
+};
+/** Getter for state [`timeout`](#timeout)  */
+export const getTimeout: Server.GetRequest<null,number>= getTimeout_internal;
+
+const setTimeout_internal: Server.SetRequest<number,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.setTimeout',
+  input: Json.jNumber,
+  output: Json.jNull,
+  signals: [],
+};
+/** Setter for state [`timeout`](#timeout)  */
+export const setTimeout: Server.SetRequest<number,null>= setTimeout_internal;
+
+const timeout_internal: State.State<number> = {
+  name: 'plugins.wp.timeout',
+  signal: signalTimeout,
+  getter: getTimeout,
+  setter: setTimeout,
+};
+/** Prover's Timeout */
+export const timeout: State.State<number> = timeout_internal;
+
+/** Data for array rows [`ProverInfos`](#proverinfos)  */
+export interface ProverInfosData {
+  /** Entry identifier. */
+  prover: prover;
+  /** Prover Name */
+  name: string;
+  /** Prover Version */
+  version: string;
+  /** Prover Full Name (description) */
+  descr: string;
+}
+
+/** Decoder for `ProverInfosData` */
+export const jProverInfosData: Json.Decoder<ProverInfosData> =
+  Json.jObject({
+    prover: jProver,
+    name: Json.jString,
+    version: Json.jString,
+    descr: Json.jString,
+  });
+
+/** Natural order for `ProverInfosData` */
+export const byProverInfosData: Compare.Order<ProverInfosData> =
+  Compare.byFields
+    <{ prover: prover, name: string, version: string, descr: string }>({
+    prover: byProver,
+    name: Compare.alpha,
+    version: Compare.alpha,
+    descr: Compare.alpha,
+  });
+
+/** Signal for array [`ProverInfos`](#proverinfos)  */
+export const signalProverInfos: Server.Signal = {
+  name: 'plugins.wp.signalProverInfos',
+};
+
+const reloadProverInfos_internal: Server.GetRequest<null,null> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.reloadProverInfos',
+  input: Json.jNull,
+  output: Json.jNull,
+  signals: [],
+};
+/** Force full reload for array [`ProverInfos`](#proverinfos)  */
+export const reloadProverInfos: Server.GetRequest<null,null>= reloadProverInfos_internal;
+
+const fetchProverInfos_internal: Server.GetRequest<
+  number,
+  { reload: boolean, removed: prover[], updated: ProverInfosData[],
+    pending: number }
+  > = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.fetchProverInfos',
+  input: Json.jNumber,
+  output: Json.jObject({
+            reload: Json.jBoolean,
+            removed: Json.jArray(jProver),
+            updated: Json.jArray(jProverInfosData),
+            pending: Json.jNumber,
+          }),
+  signals: [],
+};
+/** Data fetcher for array [`ProverInfos`](#proverinfos)  */
+export const fetchProverInfos: Server.GetRequest<
+  number,
+  { reload: boolean, removed: prover[], updated: ProverInfosData[],
+    pending: number }
+  >= fetchProverInfos_internal;
+
+const ProverInfos_internal: State.Array<prover,ProverInfosData> = {
+  name: 'plugins.wp.ProverInfos',
+  getkey: ((d:ProverInfosData) => d.prover),
+  signal: signalProverInfos,
+  fetch: fetchProverInfos,
+  reload: reloadProverInfos,
+  order: byProverInfosData,
+};
+/** Available Provers */
+export const ProverInfos: State.Array<prover,ProverInfosData> = ProverInfos_internal;
+
+/** Default value for `ProverInfosData` */
+export const ProverInfosDataDefault: ProverInfosData =
+  { prover: proverDefault, name: '', version: '', descr: '' };
+
 /** Prover Result */
 export type result =
   { descr: string, cached: boolean, verdict: string, solverTime: number,
@@ -167,16 +353,6 @@ export const byStats: Compare.Order<stats> =
 export const statsDefault: stats =
   { summary: '', tactics: 0, proved: 0, total: 0 };
 
-const getAvailableProvers_internal: Server.GetRequest<null,prover[]> = {
-  kind: Server.RqKind.GET,
-  name: 'plugins.wp.getAvailableProvers',
-  input: Json.jNull,
-  output: Json.jArray(jProver),
-  signals: [],
-};
-/** Returns the list of configured provers from why3 */
-export const getAvailableProvers: Server.GetRequest<null,prover[]>= getAvailableProvers_internal;
-
 /** Data for array rows [`goals`](#goals)  */
 export interface goalsData {
   /** Entry identifier. */
@@ -203,6 +379,8 @@ export interface goalsData {
   status: status;
   /** Prover Stats Summary */
   stats: stats;
+  /** Proof Tree */
+  proof: boolean;
   /** Script File */
   script?: string;
   /** Saved Script */
@@ -224,6 +402,7 @@ export const jGoalsData: Json.Decoder<goalsData> =
     passed: Json.jBoolean,
     status: jStatus,
     stats: jStats,
+    proof: Json.jBoolean,
     script: Json.jOption(Json.jString),
     saved: Json.jBoolean,
   });
@@ -234,7 +413,7 @@ export const byGoalsData: Compare.Order<goalsData> =
     <{ wpo: goal, marker: marker, scope?: decl, property: marker,
        fct?: string, bhv?: string, thy?: string, name: string,
        smoke: boolean, passed: boolean, status: status, stats: stats,
-       script?: string, saved: boolean }>({
+       proof: boolean, script?: string, saved: boolean }>({
     wpo: byGoal,
     marker: byMarker,
     scope: Compare.defined(byDecl),
@@ -247,6 +426,7 @@ export const byGoalsData: Compare.Order<goalsData> =
     passed: Compare.boolean,
     status: byStatus,
     stats: byStats,
+    proof: Compare.boolean,
     script: Compare.defined(Compare.string),
     saved: Compare.boolean,
   });
@@ -303,7 +483,7 @@ export const goalsDataDefault: goalsData =
   { wpo: goalDefault, marker: markerDefault, scope: undefined,
     property: markerDefault, fct: undefined, bhv: undefined, thy: undefined,
     name: '', smoke: false, passed: false, status: statusDefault,
-    stats: statsDefault, script: undefined, saved: false };
+    stats: statsDefault, proof: false, script: undefined, saved: false };
 
 /** Proof Server Activity */
 export const serverActivity: Server.Signal = {

@@ -36,9 +36,9 @@ let get_description = Wpo.get_label
 let get_property = Wpo.get_property
 let get_sequent w = snd (Wpo.compute w)
 let get_result = Wpo.get_result
-let get_results = Wpo.get_results
+let get_results = ProofEngine.results
 let is_trivial = Wpo.is_trivial
-let is_valid = Wpo.is_valid
+let is_valid = Wpo.is_fully_valid
 let is_passed = Wpo.is_passed
 let has_unknown = Wpo.has_unknown
 

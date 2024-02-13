@@ -29,7 +29,7 @@ open Tactical
 let str_case = "Case"
 let sub_cases phi = function
   | []   -> List.map (fun t -> phi str_case (F.p_bool t))
-  | [descr]     -> List.map (fun t -> phi descr (F.p_bool t))
+  | [descr] -> List.map (fun t -> phi descr (F.p_bool t))
   | infos -> List.map2 (fun info t -> phi info (F.p_bool t)) infos
 
 (* split into n sequents: [hyps] |- [subcases]_i *)
@@ -79,7 +79,7 @@ class normal_form =
   object
     inherit Tactical.make ~id:"Wp.normal_form"
         ~title:"Intuition"
-        ~descr:"Decompose with Conjunctive/Disjunctive Normal Form"
+        ~descr:"Decompose into conjunctive or disjunctive normal form."
         ~params:[]
 
     method select feedback (s : Tactical.selection) =

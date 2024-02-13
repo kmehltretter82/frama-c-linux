@@ -52,7 +52,7 @@ function Gallery(): JSX.Element {
   gallery.forEach((icons, section) => {
     sections.push(
       <Section key={section} defaultUnfold label={section}>
-        <Grid columns="auto auto">{icons}</Grid>
+        <Grid style={{ paddingLeft: 24 }} columns="auto auto">{icons}</Grid>
       </Section>
     );
   });

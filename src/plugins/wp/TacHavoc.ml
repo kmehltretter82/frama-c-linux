@@ -45,7 +45,7 @@ class havoc =
   object
     inherit Tactical.make ~id:"Wp.havoc"
         ~title:"Havoc"
-        ~descr:"Go Through Assigns"
+        ~descr:"Go through assigns."
         ~params:[]
 
     method select _feedback sel =
@@ -93,7 +93,7 @@ class separated =
   object
     inherit Tactical.make ~id:"Wp.separated"
         ~title:"Separated"
-        ~descr:"Expand Separation Cases"
+        ~descr:"Split over separated and overlapping cases."
         ~params:[]
 
     method select _feedback sel =
@@ -176,7 +176,7 @@ class validity =
 
     inherit Tactical.make ~id:"Wp.valid"
         ~title:"Validity Range"
-        ~descr:"Unfold validity and range definitions"
+        ~descr:"Unfold validity and range definitions."
         ~params:[]
 
     method select _feedback (s : Tactical.selection) =
