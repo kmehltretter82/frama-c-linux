@@ -320,7 +320,7 @@ export function useServerField<A>(
   const update = React.useCallback((newValue: A, newError: FieldError) => {
     setLocal(newValue);
     setError(newError);
-    if (!newError) {
+    if (!isValid(newError)) {
       setState(newValue);
     }
   }, [setState]);
