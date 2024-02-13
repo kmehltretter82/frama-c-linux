@@ -314,7 +314,8 @@ export function useServerField<A>(
   defaultValue: A,
 ): FieldState<A> {
   const [value, setState] = useSyncState(state);
-  const [local, setLocal] = React.useState(value);
+  const stateValue = value !== undefined ? value : defaultValue;
+  const [local, setLocal] = React.useState(stateValue);
   const [error, setError] = React.useState<FieldError>(undefined);
 
   const update = React.useCallback((newValue: A, newError: FieldError) => {
@@ -326,7 +327,7 @@ export function useServerField<A>(
   }, [setState]);
 
   return {
-    value: (isValid(error) ? value : local) || defaultValue,
+    value: isValid(error) ? stateValue : local,
     error,
     reset: value,
     onChanged: update
