@@ -36,8 +36,8 @@ import { Order } from 'dome/data/compare';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
+import { FieldState, FieldError, isValid } from 'dome/layout/forms';
 import * as Ast from 'frama-c/kernel/api/ast';
-import { FieldState, FieldError } from 'dome/layout/forms';
 import * as Server from './server';
 
 // --------------------------------------------------------------------------
@@ -314,24 +314,20 @@ export function useServerField<A>(
   defaultValue: A,
 ): FieldState<A> {
   const [value, setState] = useSyncState(state);
-  const [localValue, setLocalValue] = React.useState(value);
-  const [localError, setLocalError] = React.useState<FieldError>(undefined);
-
-  React.useEffect(() => {
-    !localError && setLocalValue(value);
-  }, [value, localError]);
+  const [local, setLocal] = React.useState(value);
+  const [error, setError] = React.useState<FieldError>(undefined);
 
   const update = React.useCallback((newValue: A, newError: FieldError) => {
-    setLocalValue(newValue);
-    setLocalError(newError);
+    setLocal(newValue);
+    setError(newError);
     if (!newError) {
       setState(newValue);
     }
   }, [setState]);
 
   return {
-    value: localValue ?? defaultValue,
-    error: localError,
+    value: (isValid(error) ? value : local) || defaultValue,
+    error,
     reset: value,
     onChanged: update
   };
