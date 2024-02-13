@@ -35,14 +35,14 @@ let sum n = match F.repr n with
 (* -------------------------------------------------------------------------- *)
 
 let vmode,pmode =
-  Tactical.selector ~id:"seq.side" ~title:"Mode" ~descr:"Unrolling mode"
+  Tactical.selector ~id:"seq.side" ~title:"Mode" ~descr:"Unrolling mode."
     ~options:[
       { vid = "left" ; title = "Unroll left" ;
-        descr = "Transform (A^n) into (A.A^n-1)" ; value = `Left } ;
+        descr = "Transform (A^n) into (A.A^n-1)." ; value = `Left } ;
       { vid = "right" ; title = "Unroll right" ;
-        descr = "Transform (A^n) into (A^n-1.A)" ; value = `Right } ;
+        descr = "Transform (A^n) into (A^n-1.A)." ; value = `Right } ;
       { vid = "sum" ; title = "Concat sum" ;
-        descr = "Transform A^(p+q) into (A^p.A^q)" ; value = `Sum }
+        descr = "Transform A^(p+q) into (A^p.A^q)." ; value = `Sum }
     ] ()
 
 class sequence =
@@ -50,7 +50,7 @@ class sequence =
     inherit Tactical.make
         ~id:"Wp.sequence"
         ~title:"Sequence"
-        ~descr:"Unroll repeat-sequence operator"
+        ~descr:"Unroll repeat-sequence operator."
         ~params:[pmode]
 
     method select feedback (s : Tactical.selection) =
@@ -67,7 +67,7 @@ class sequence =
               match sum n with
               | [ s ] ->
                 feedback#set_descr
-                  "Cannot unroll with selected option, '%a' is not a sum"
+                  "Cannot unroll: '%a' is not a sum."
                   F.pp_term s ;
                 Tactical.Not_configured
               | ns ->
@@ -76,7 +76,7 @@ class sequence =
                 let cat =
                   concat ~result (List.map (repeat ~result a) ns) in
                 feedback#set_descr
-                  "Unroll repeat-sequence: unroll sum" ;
+                  "Unroll repeat-sequence: unroll sum." ;
                 Tactical.Applicable (
                   Tactical.condition "Positive" pos @@
                   Tactical.rewrite ?at [ "Unroll" , pos , value , cat ])
@@ -87,7 +87,7 @@ class sequence =
             let p = F.e_add n F.e_minus_one in
             let unroll = concat ~result [a ; repeat ~result a p] in
             feedback#set_descr
-              "Unroll repeat-sequence: unroll first element" ;
+              "Unroll repeat-sequence: unroll first element." ;
             Tactical.Applicable(
               Tactical.rewrite ?at [
                 "Nil", negative n , value , concat ~result [] ;
@@ -99,7 +99,7 @@ class sequence =
             let p = F.e_add n F.e_minus_one in
             let unroll = concat ~result [repeat ~result a p ; a] in
             feedback#set_descr
-              "Unroll repeat-sequence: unroll last element" ;
+              "Unroll repeat-sequence: unroll last element." ;
             Tactical.Applicable(
               Tactical.rewrite ?at [
                 "Nil", negative n , value , concat ~result [] ;

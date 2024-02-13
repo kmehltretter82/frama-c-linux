@@ -128,7 +128,7 @@ class clear =
   object(_)
     inherit Tactical.make ~id:"Wp.clear"
         ~title:"Clear"
-        ~descr:"Remove Hypothesis"
+        ~descr:"Remove the selected hypothesis."
         ~params:[]
 
     method select _feedback sel =

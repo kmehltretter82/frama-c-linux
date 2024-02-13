@@ -161,6 +161,10 @@ val signal : 'a array -> Request.signal
     Columns added to the model after registration are {i not} taken into
     account.
 
+    The optional [~preload] function will be called just before
+    every column getters. Notice that column getters are called in
+    registration order.
+
     If provided, the [~add_xxx_hook] options are used to register hooks
     to notify the server of corresponding array updates.
     Each hook will be installed only once the client starts to listen for array
@@ -177,6 +181,7 @@ val register_array :
   ?keyName:string ->
   ?keyType:jtype ->
   iter:('a callback) ->
+  ?preload:('a -> unit) ->
   ?add_update_hook:('a callback) ->
   ?add_remove_hook:('a callback) ->
   ?add_reload_hook:(unit callback) ->

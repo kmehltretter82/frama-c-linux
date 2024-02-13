@@ -75,6 +75,11 @@ export const proofStatus: Server.Signal = {
   name: 'plugins.wp.tip.proofStatus',
 };
 
+/** Updated TIP printer */
+export const printStatus: Server.Signal = {
+  name: 'plugins.wp.tip.printStatus',
+};
+
 /** Proof Node index */
 export type node = Json.index<'#node'>;
 
@@ -87,55 +92,90 @@ export const byNode: Compare.Order<node> = Compare.number;
 /** Default value for `node` */
 export const nodeDefault: node = Json.jIndex<'#node'>('#node')(-1);
 
+/** Tactic identifier */
+export type tactic = Json.key<'#tactic'>;
+
+/** Decoder for `tactic` */
+export const jTactic: Json.Decoder<tactic> = Json.jKey<'#tactic'>('#tactic');
+
+/** Natural order for `tactic` */
+export const byTactic: Compare.Order<tactic> = Compare.string;
+
+/** Default value for `tactic` */
+export const tacticDefault: tactic = Json.jKey<'#tactic'>('#tactic')('');
+
 const getNodeInfos_internal: Server.GetRequest<
   node,
-  { result: string, proved: boolean, pending: number, size: number,
-    stats: string, results: [ prover, result ][], tactic: string,
-    children: [ string, node ][] }
+  { title: string, proved: boolean, pending: number, size: number,
+    stats: string, results: [ prover, result ][], tactic?: tactic,
+    header?: string, child?: string, path: node[], children: node[] }
   > = {
   kind: Server.RqKind.GET,
   name: 'plugins.wp.tip.getNodeInfos',
   input: jNode,
   output: Json.jObject({
-            result: Json.jString,
+            title: Json.jString,
             proved: Json.jBoolean,
             pending: Json.jNumber,
             size: Json.jNumber,
             stats: Json.jString,
             results: Json.jArray(Json.jPair( jProver, jResult,)),
-            tactic: Json.jString,
-            children: Json.jArray(Json.jPair( Json.jString, jNode,)),
+            tactic: Json.jOption(jTactic),
+            header: Json.jOption(Json.jString),
+            child: Json.jOption(Json.jString),
+            path: Json.jArray(jNode),
+            children: Json.jArray(jNode),
           }),
   signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
 };
 /** Proof node information */
 export const getNodeInfos: Server.GetRequest<
   node,
-  { result: string, proved: boolean, pending: number, size: number,
-    stats: string, results: [ prover, result ][], tactic: string,
-    children: [ string, node ][] }
+  { title: string, proved: boolean, pending: number, size: number,
+    stats: string, results: [ prover, result ][], tactic?: tactic,
+    header?: string, child?: string, path: node[], children: node[] }
   >= getNodeInfos_internal;
 
-const getProofState_internal: Server.GetRequest<
-  goal,
-  { current: node, path: node[], index: number, pending: number }
+const getResult_internal: Server.GetRequest<
+  { node: node, prover: prover },
+  result
   > = {
   kind: Server.RqKind.GET,
-  name: 'plugins.wp.tip.getProofState',
+  name: 'plugins.wp.tip.getResult',
+  input: Json.jObject({ node: jNode, prover: jProver,}),
+  output: jResult,
+  signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
+};
+/** Result for specified node and prover */
+export const getResult: Server.GetRequest<
+  { node: node, prover: prover },
+  result
+  >= getResult_internal;
+
+const getProofStatus_internal: Server.GetRequest<
+  goal,
+  { index: number, pending: number, current: node, above: node[],
+    below: node[], tactic?: tactic }
+  > = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.tip.getProofStatus',
   input: jGoal,
   output: Json.jObject({
-            current: jNode,
-            path: Json.jArray(jNode),
             index: Json.jNumber,
             pending: Json.jNumber,
+            current: jNode,
+            above: Json.jArray(jNode),
+            below: Json.jArray(jNode),
+            tactic: Json.jOption(jTactic),
           }),
   signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
 };
 /** Current Proof Status of a Goal */
-export const getProofState: Server.GetRequest<
+export const getProofStatus: Server.GetRequest<
   goal,
-  { current: node, path: node[], index: number, pending: number }
-  >= getProofState_internal;
+  { index: number, pending: number, current: node, above: node[],
+    below: node[], tactic?: tactic }
+  >= getProofStatus_internal;
 
 const goForward_internal: Server.SetRequest<goal,null> = {
   kind: Server.RqKind.SET,
@@ -177,15 +217,45 @@ const goToNode_internal: Server.SetRequest<node,null> = {
 /** Set current node of associated proof tree */
 export const goToNode: Server.SetRequest<node,null>= goToNode_internal;
 
-const removeNode_internal: Server.SetRequest<node,null> = {
+const clearNode_internal: Server.SetRequest<node,null> = {
   kind: Server.RqKind.SET,
-  name: 'plugins.wp.tip.removeNode',
+  name: 'plugins.wp.tip.clearNode',
   input: jNode,
   output: Json.jNull,
   signals: [],
 };
-/** Remove node from tree and go to parent */
-export const removeNode: Server.SetRequest<node,null>= removeNode_internal;
+/** Cancel all node results and sub-tree (if any) */
+export const clearNode: Server.SetRequest<node,null>= clearNode_internal;
+
+const clearNodeTactic_internal: Server.SetRequest<node,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.clearNodeTactic',
+  input: jNode,
+  output: Json.jNull,
+  signals: [],
+};
+/** Cancel node current tactic */
+export const clearNodeTactic: Server.SetRequest<node,null>= clearNodeTactic_internal;
+
+const clearParentTactic_internal: Server.SetRequest<node,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.clearParentTactic',
+  input: jNode,
+  output: Json.jNull,
+  signals: [],
+};
+/** Cancel parent node tactic */
+export const clearParentTactic: Server.SetRequest<node,null>= clearParentTactic_internal;
+
+const clearGoal_internal: Server.SetRequest<goal,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.clearGoal',
+  input: jGoal,
+  output: Json.jNull,
+  signals: [],
+};
+/** Remove the complete goal proof tree */
+export const clearGoal: Server.SetRequest<goal,null>= clearGoal_internal;
 
 /** Proof part marker */
 export type part = Json.key<'#part'>;
@@ -210,11 +280,6 @@ export const byTerm: Compare.Order<term> = Compare.string;
 
 /** Default value for `term` */
 export const termDefault: term = Json.jKey<'#term'>('#term')('');
-
-/** Updated TIP printer */
-export const printStatus: Server.Signal = {
-  name: 'plugins.wp.tip.printStatus',
-};
 
 /** Integer constants format */
 export type iformat = "dec" | "hex" | "bin";
@@ -318,12 +383,121 @@ const getSelection_internal: Server.GetRequest<
             part: Json.jOption(jPart),
             term: Json.jOption(jTerm),
           }),
-  signals: [ { name: 'plugins.wp.tip.printStatus' } ],
+  signals: [ { name: 'plugins.wp.tip.printStatus' },
+             { name: 'plugins.wp.tip.proofStatus' } ],
 };
 /** Get current selection in proof node */
 export const getSelection: Server.GetRequest<
   node,
   { part?: part, term?: term }
   >= getSelection_internal;
+
+const runProvers_internal: Server.SetRequest<
+  { node: node, timeout?: number, provers?: prover[] },
+  null
+  > = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.runProvers',
+  input: Json.jObject({
+           node: jNode,
+           timeout: Json.jOption(Json.jNumber),
+           provers: Json.jOption(Json.jArray(jProver)),
+         }),
+  output: Json.jNull,
+  signals: [],
+};
+/** Schedule provers on proof node */
+export const runProvers: Server.SetRequest<
+  { node: node, timeout?: number, provers?: prover[] },
+  null
+  >= runProvers_internal;
+
+const killProvers_internal: Server.SetRequest<
+  { node: node, provers?: prover[] },
+  null
+  > = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.killProvers',
+  input: Json.jObject({
+           node: jNode,
+           provers: Json.jOption(Json.jArray(jProver)),
+         }),
+  output: Json.jNull,
+  signals: [],
+};
+/** Interrupt running provers on proof node */
+export const killProvers: Server.SetRequest<
+  { node: node, provers?: prover[] },
+  null
+  >= killProvers_internal;
+
+const clearProvers_internal: Server.SetRequest<
+  { node: node, provers?: prover[] },
+  null
+  > = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.clearProvers',
+  input: Json.jObject({
+           node: jNode,
+           provers: Json.jOption(Json.jArray(jProver)),
+         }),
+  output: Json.jNull,
+  signals: [],
+};
+/** Remove prover results from proof node */
+export const clearProvers: Server.SetRequest<
+  { node: node, provers?: prover[] },
+  null
+  >= clearProvers_internal;
+
+const getScriptStatus_internal: Server.GetRequest<
+  goal,
+  { proof: boolean, script?: string, saved: boolean }
+  > = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.wp.tip.getScriptStatus',
+  input: jGoal,
+  output: Json.jObject({
+            proof: Json.jBoolean,
+            script: Json.jOption(Json.jString),
+            saved: Json.jBoolean,
+          }),
+  signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
+};
+/** Script Status for a given Goal */
+export const getScriptStatus: Server.GetRequest<
+  goal,
+  { proof: boolean, script?: string, saved: boolean }
+  >= getScriptStatus_internal;
+
+const saveScript_internal: Server.SetRequest<goal,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.saveScript',
+  input: jGoal,
+  output: Json.jNull,
+  signals: [],
+};
+/** Save Script for the Goal */
+export const saveScript: Server.SetRequest<goal,null>= saveScript_internal;
+
+const runScript_internal: Server.SetRequest<goal,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.runScript',
+  input: jGoal,
+  output: Json.jNull,
+  signals: [],
+};
+/** Replay Saved Script for the Goal (if any) */
+export const runScript: Server.SetRequest<goal,null>= runScript_internal;
+
+const clearProofScript_internal: Server.SetRequest<goal,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.wp.tip.clearProofScript',
+  input: jGoal,
+  output: Json.jNull,
+  signals: [],
+};
+/** Clear Proof and Remove any Saved Script for the Goal */
+export const clearProofScript: Server.SetRequest<goal,null>= clearProofScript_internal;
 
 /* ------------------------------------- */

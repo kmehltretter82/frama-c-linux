@@ -84,14 +84,14 @@ let process value n0 sequent =
 (* -------------------------------------------------------------------------- *)
 
 let vbase,pbase = Tactical.composer ~id:"base"
-    ~title:"Base" ~descr:"Value of base case" ()
+    ~title:"Base" ~descr:"Value of base case." ()
 
 class induction =
   object(self)
     inherit Tactical.make
         ~id:"Wp.induction"
         ~title:"Induction"
-        ~descr:"Proof by integer induction"
+        ~descr:"Proof by integer induction."
         ~params:[pbase]
 
     method private get_base () =

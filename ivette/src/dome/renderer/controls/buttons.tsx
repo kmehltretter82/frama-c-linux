@@ -475,6 +475,8 @@ export interface SelectProps {
   disabled?: boolean;
   /** Currently selected value. */
   value?: string;
+  /** Keep focus when selected (default to false). */
+  focus?: boolean;
   /** Callback to selected values. */
   onChange?: (newValue?: string) => void;
   /** Default selected value. */
@@ -497,7 +499,7 @@ export interface SelectProps {
 
  */
 export function Select(props: SelectProps): JSX.Element {
-  const { onChange, placeholder } = props;
+  const { onChange, placeholder, focus=false } = props;
   const className = classes(
     'dome-xSelect dome-xBoxButton dome-xButton-default dome-xButton-label',
     props.className,
@@ -505,6 +507,8 @@ export function Select(props: SelectProps): JSX.Element {
   const disabled = onChange ? DISABLED(props) : true;
   const callback = (evt: React.ChangeEvent<HTMLSelectElement>): void => {
     if (onChange) onChange(evt.target.value);
+    const target = evt.target;
+    if (!focus) setImmediate(() => target.blur());
   };
   return (
     <select
@@ -519,6 +523,64 @@ export function Select(props: SelectProps): JSX.Element {
       {placeholder && <option value="">— {placeholder} —</option>}
       {props.children}
     </select >
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Spinner
+// --------------------------------------------------------------------------
+
+export interface SpinnerProps {
+  /** Field identifier (to make forms or labels) */
+  id?: string;
+  /** Button tooltip */
+  title?: string;
+  /** Button placeholder */
+  placeholder?: string;
+  /** Defaults to `true`. */
+  enabled?: boolean;
+  /** Defaults to `false`. */
+  disabled?: boolean;
+  /** Currently selected value. */
+  value?: number;
+  /** Minimum value. */
+  vmin?: number;
+  /** Maximum value. */
+  vmax?: number;
+  /** Increment and Decrement step. */
+  vstep?: number;
+  /** Callback to selected values. */
+  onChange?: (newValue: number) => void;
+  /** Default selected value. */
+  className?: string;
+  /** Additional style for the `< dov /> ` container of Raiods */
+  style?: React.CSSProperties;
+}
+
+export function Spinner(props: SpinnerProps): JSX.Element {
+  const { onChange } = props;
+  const className = classes( 'dome-xSpinner', props.className );
+  const disabled = onChange ? DISABLED(props) : true;
+  const callback = (evt: React.ChangeEvent<HTMLInputElement>): void => {
+    if (onChange) {
+      const newValue = Number.parseInt(evt.target.value);
+      if (!Number.isNaN(newValue)) onChange(newValue);
+    }
+  };
+  return (
+    <input
+      id={props.id}
+      type="number"
+      value={props.value}
+      min={props.vmin}
+      max={props.vmax}
+      step={props.vstep}
+      className={className}
+      style={props.style}
+      disabled={disabled}
+      placeholder={props.placeholder}
+      onChange={callback}
+    />
   );
 }
 

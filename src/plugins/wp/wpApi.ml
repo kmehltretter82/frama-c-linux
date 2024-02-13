@@ -82,6 +82,106 @@ struct
     | None -> D.failure "Unknown prover name"
 end
 
+module Provers = D.Jlist(Prover)
+
+let signal = ref None
+let provers = ref None
+
+let getProvers () =
+  match !provers with
+  | Some prvs -> prvs
+  | None ->
+    let cmdline =
+      match Wp_parameters.Provers.get () with
+      | [] -> [ "alt-ergo" ]
+      | prvs -> prvs in
+    let parse s =
+      match VCS.parse_prover s with
+      | None -> None
+      | Some (Qed | Tactical) -> None
+      | Some prv as result -> if VCS.is_auto prv then result else None in
+    let selection = List.filter_map parse cmdline in
+    provers := Some selection ; selection
+
+let updProvers prv = provers := Some prv
+let setProvers prv = updProvers prv ; Option.iter (fun s -> R.emit s) !signal
+
+let () =
+  let s =
+    S.register_state ~package ~name:"provers"
+      ~descr:(Md.plain "Selected Provers")
+      ~data:(module Provers)
+      ~get:getProvers
+      ~set:updProvers ()
+  in signal := Some s
+
+(* -------------------------------------------------------------------------- *)
+(* --- Server Processes                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+let _ =
+  S.register_state ~package
+    ~name:"process"
+    ~descr:(Md.plain "Server Processes")
+    ~data:(module D.Jint)
+    ~get:Wp_parameters.Procs.get
+    ~set:(fun procs ->
+        Wp_parameters.Procs.set procs ;
+        ignore @@ ProverTask.server ~procs ())
+    ~add_hook:Wp_parameters.Procs.add_hook_on_update ()
+
+(* -------------------------------------------------------------------------- *)
+(* --- Provers Timeout                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+let _ =
+  S.register_state ~package
+    ~name:"timeout"
+    ~descr:(Md.plain "Prover's Timeout")
+    ~data:(module D.Jint)
+    ~get:Wp_parameters.Timeout.get
+    ~set:Wp_parameters.Timeout.set
+    ~add_hook:Wp_parameters.Timeout.add_hook_on_update ()
+
+(* -------------------------------------------------------------------------- *)
+(* --- Available Provers                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+let get_name = function
+  | VCS.Qed -> "Qed"
+  | VCS.Tactical -> "Script"
+  | VCS.Why3 p -> Why3Provers.name p
+
+let get_version = function
+  | VCS.Qed | Tactical -> Fc_config.version_and_codename
+  | Why3 p -> Why3Provers.version p
+
+let iter_provers fn =
+  List.iter
+    (fun p ->
+       if Why3Provers.is_auto p && Why3Provers.is_mainstream p then
+         fn (VCS.Why3 p))
+  @@ Why3Provers.provers ()
+
+let _ : VCS.prover S.array =
+  let model = S.model () in
+  S.column ~name:"name" ~descr:(Md.plain "Prover Name")
+    ~data:(module D.Jalpha) ~get:get_name model ;
+  S.column ~name:"version" ~descr:(Md.plain "Prover Version")
+    ~data:(module D.Jalpha) ~get:get_version model ;
+  S.column ~name:"descr" ~descr:(Md.plain "Prover Full Name (description)")
+    ~data:(module D.Jalpha) ~get:(VCS.title_of_prover ~version:true) model ;
+  S.register_array ~package
+    ~name:"ProverInfos" ~descr:(Md.plain "Available Provers")
+    ~key:VCS.name_of_prover
+    ~keyName:"prover"
+    ~keyType:Prover.jtype
+    ~iter:iter_provers model
+
+(* -------------------------------------------------------------------------- *)
+(* --- Results and Stats                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
 module Result =
 struct
   type t = VCS.result
@@ -99,7 +199,7 @@ struct
   let to_json (r : VCS.result) = `Assoc [
       "descr", `String (Pretty_utils.to_string VCS.pp_result r) ;
       "cached", `Bool r.cached ;
-      "verdict", `String (VCS.name_of_verdict r.verdict) ;
+      "verdict", `String (VCS.name_of_verdict ~computing:true r.verdict) ;
       "solverTime", `Float r.solver_time ;
       "proverTime", `Float r.prover_time ;
       "proverSteps", `Int r.prover_steps ;
@@ -156,14 +256,6 @@ struct
       "total", `Int (Stats.subgoals cs) ;
     ]
 end
-
-let () = R.register ~package ~kind:`GET ~name:"getAvailableProvers"
-    ~descr:(Md.plain "Returns the list of configured provers from why3")
-    ~input:(module D.Junit) ~output:(module D.Jlist(Prover))
-    (fun () ->
-       List.map (fun p -> VCS.Why3 p) @@
-       List.filter Why3Provers.is_mainstream @@
-       Why3Provers.provers ())
 
 (* -------------------------------------------------------------------------- *)
 (* --- Goal Array                                                         --- *)
@@ -250,6 +342,11 @@ let () = S.column gmodel ~name:"stats"
     ~descr:(Md.plain "Prover Stats Summary")
     ~data:(module STATS) ~get:ProofEngine.consolidated
 
+let () = S.column gmodel ~name:"proof"
+    ~descr:(Md.plain "Proof Tree")
+    ~data:(module D.Jbool)
+    ~get:ProofEngine.has_proof
+
 let () = S.option gmodel ~name:"script"
     ~descr:(Md.plain "Script File")
     ~data:(module D.Jstring)
@@ -263,15 +360,25 @@ let () = S.column gmodel ~name:"saved"
     ~data:(module D.Jbool)
     ~get:(fun wpo -> ProofEngine.get wpo = `Saved)
 
-let _ = S.register_array ~package ~name:"goals"
+let filter hook fn = hook (fun g -> if not @@ Wpo.is_tactic g then fn g)
+let (++) h1 h2 fn = h1 fn ; h2 fn
+
+let goals =
+  let add_remove_hook =
+    filter Wpo.add_removed_hook in
+  let add_update_hook =
+    filter Wpo.add_modified_hook ++ ProofEngine.add_goal_hook in
+  let add_reload_hook = Wpo.add_cleared_hook in
+  S.register_array ~package ~name:"goals"
     ~descr:(Md.plain "Generated Goals")
     ~key:indexGoal
     ~keyName:"wpo"
     ~keyType:Goal.jtype
-    ~iter:Wpo.iter_on_goals
-    ~add_update_hook:Wpo.add_modified_hook
-    ~add_remove_hook:Wpo.add_removed_hook
-    ~add_reload_hook:Wpo.add_cleared_hook
+    ~iter:(filter Wpo.iter_on_goals)
+    ~preload:ProofEngine.consolidate
+    ~add_remove_hook
+    ~add_update_hook
+    ~add_reload_hook
     gmodel
 
 (* -------------------------------------------------------------------------- *)

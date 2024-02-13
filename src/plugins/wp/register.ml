@@ -76,7 +76,7 @@ let do_print_current fmt tree =
   | `Internal node | `Leaf(_,node) -> do_print_parents fmt node
 
 let do_print_goal_status fmt (g : Wpo.t) =
-  if not (Wpo.is_valid g || Wpo.is_smoke_test g) then
+  if not (Wpo.is_fully_valid g || Wpo.is_smoke_test g) then
     begin
       do_print_index fmt g.po_idx ;
       Wpo.pp_goal fmt g ;
@@ -405,7 +405,7 @@ let do_wpo_success ~shell ~cache goal success =
       Wp_parameters.feedback ~ontty:`Silent
         "[Generated] Goal %s (%a)" (Wpo.get_gid goal) VCS.pp_prover prover
   else
-    let gui = Frama_c_very_first.Gui_init.is_gui in
+    let gui = Wp_parameters.is_interactive () in
     let smoke = Wpo.is_smoke_test goal in
     let cstats = ProofEngine.consolidated goal in
     let success = Wpo.is_passed goal in
@@ -565,7 +565,7 @@ let spawn_wp_proofs ~script goals =
 
 let get_prover_names () =
   match Wp_parameters.Provers.get () with
-  | [] -> [ "alt-ergo" ] | pnames -> pnames
+  | [] -> [ "Alt-Ergo" ] | pnames -> pnames
 
 let compute_provers ~mode ~script =
   script.provers <- List.fold_right
@@ -890,7 +890,7 @@ let () = Cmdline.run_after_setting_files
 let () = Cmdline.run_after_configuring_stage Why3Provers.configure
 
 let do_prover_detect () =
-  if not Fc_config.is_gui && Wp_parameters.Detect.get () then
+  if Wp_parameters.Detect.get () && not @@ Wp_parameters.is_interactive () then
     let provers = Why3Provers.provers () in
     if provers = [] then
       Wp_parameters.result "No Why3 provers detected."

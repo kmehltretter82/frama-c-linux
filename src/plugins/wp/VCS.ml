@@ -117,19 +117,21 @@ let is_prover = function
   | Qed | Why3 _ -> true
   | Tactical -> false
 
+let is_extern = function
+  | Qed | Tactical -> false
+  | Why3 _ -> true
+
 let is_auto = function
   | Qed -> true
   | Tactical -> false
-  | Why3 p ->
-    match p.prover_name with
-    | "Alt-Ergo" | "CVC4" | "Z3" -> true
-    | "Coq" -> false
-    | _ ->
-      let config = Why3Provers.config () in
-      try
-        let prover_config = Why3.Whyconf.get_prover_config config p in
-        not prover_config.interactive
-      with Not_found -> true
+  | Why3 p -> Why3Provers.is_auto p
+
+let eq_prover p q =
+  match p,q with
+  | Qed,Qed -> true
+  | Tactical,Tactical -> true
+  | Why3 p, Why3 q -> Why3Provers.compare p q = 0
+  | (Why3 _ | Qed | Tactical) , _ -> false
 
 let has_counter_examples = function
   | Qed | Tactical -> false
@@ -232,12 +234,12 @@ type result = {
 let is_result = function
   | Valid | Invalid | Unknown | Timeout | Stepout | Failed -> true
   | NoResult | Computing _ -> false
-
 let is_verdict r = is_result r.verdict
 let is_valid = function { verdict = Valid } -> true | _ -> false
 let is_trivial r = is_valid r && r.prover_time = 0.0
 let is_not_valid r = is_verdict r && not (is_valid r)
 let is_computing = function { verdict=Computing _ } -> true | _ -> false
+let is_none = function { verdict=NoResult } -> true | _ -> false
 let is_proved ~smoke = function
   | NoResult | Computing _ | Failed -> false
   | Valid -> not smoke
@@ -337,8 +339,9 @@ let pp_perf_shell fmt r =
   if not (Wp_parameters.has_dkey dkey_shell) then
     pp_perf_forced fmt r
 
-let name_of_verdict = function
-  | NoResult | Computing _ -> "none"
+let name_of_verdict ?(computing=false) = function
+  | NoResult -> "none"
+  | Computing _ -> if computing then "computing" else "none"
   | Valid -> "valid"
   | Invalid -> "invalid"
   | Failed -> "failed"
@@ -400,7 +403,6 @@ let pp_model fmt model =
     ) model
 
 let vrank = function
-  | Computing _ -> 0
   | NoResult -> 1
   | Failed -> 2
   | Unknown -> 3
@@ -408,13 +410,17 @@ let vrank = function
   | Stepout -> 5
   | Valid -> 6
   | Invalid -> 7
+  | Computing _ -> 8
 
 let conjunction a b =
-  match a,b with
-  | Valid,Valid -> Valid
-  | Valid, r -> r
-  | r , Valid -> r
-  | _ -> if vrank b > vrank a then b else a
+  if a == b then a else
+    match a,b with
+    | Computing p , Computing q -> Computing (fun () -> p () ; q ())
+    | Computing _ , _ -> a
+    | _ , Computing _ -> b
+    | Valid,Valid -> Valid
+    | Valid,r | r,Valid -> r
+    | _ -> if vrank b > vrank a then b else a
 
 let msize m = Probe.Map.fold (fun _ _ n -> succ n) m 0
 

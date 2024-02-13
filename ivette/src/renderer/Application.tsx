@@ -83,7 +83,7 @@ export default function Application(): JSX.Element {
         <Sidebar.Panel />
         <Lab.LabView />
       </LSplit>
-      <Toolbar.ToolBar>
+      <Toolbar.ToolBar className="statusbar">
         <Controller.Status />
         <>{StatusBar}</>
         <Toolbar.Filler />

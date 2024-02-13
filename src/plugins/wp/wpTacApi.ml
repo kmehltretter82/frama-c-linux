@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Server API for WP                                                  --- *)
+(* --- Server API for Tactics                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
 module P = Server.Package
@@ -30,21 +30,10 @@ module R = Server.Request
 module S = Server.States
 module Md = Markdown
 module AST = Server.Kernel_ast
+module Jtactic = WpTipApi.Tactic
 
 let package = P.package ~plugin:"wp" ~name:"tac"
     ~title:"WP Tactics" ()
-
-(* -------------------------------------------------------------------------- *)
-(* --- Tacticals                                                          --- *)
-(* -------------------------------------------------------------------------- *)
-
-module Jtactic : D.S with type t = Tactical.t =
-struct
-  type t = Tactical.t
-  let jtype = P.Jkey "tactic"
-  let to_json (t : Tactical.t) = `String t#id
-  let of_json (js : Json.t) = Tactical.lookup ~id:(js |> Json.string)
-end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tactical Kind                                                      --- *)
@@ -405,6 +394,7 @@ class configurator (tactic : Tactical.tactical) =
         let jtactic = ProofScript.jtactic tactic target in
         let fork = ProofEngine.fork tree ~anchor:node jtactic process in
         let children = snd @@ ProofEngine.commit fork in
+        ProofEngine.forward tree ;
         List.map snd children
       with exn ->
         local <- None ;
@@ -465,20 +455,35 @@ let tactics =
 (* --- Tactical Target Configuration                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
+let configure jtactic node =
+  let sequent = snd @@ Wpo.compute @@ ProofEngine.goal node in
+  match ProofScript.configure jtactic sequent with
+  | None -> ()
+  | Some(tactical,selection) ->
+    begin
+      let console = (configurator tactical :> Tactical.feedback) in
+      console#set_title "%s" tactical#title ;
+      WpTipApi.setSelection node selection ;
+    end
+
 let () =
-  let configureTactics = R.signature ~output:(module D.Junit) () in
-  let get_node = R.param configureTactics ~name:"node"
-      ~descr:(Md.plain "Proof node target") (module WpTipApi.Node) in
-  R.register_sig ~package ~kind:`EXEC
+  R.register ~package
+    ~kind:`EXEC
     ~name:"configureTactics"
     ~descr:(Md.plain "Configure all tactics")
+    ~input:(module WpTipApi.Node)
+    ~output:(module D.Junit)
     ~signals:[WpTipApi.printStatus]
-    configureTactics
-    begin fun rq () ->
-      let node = get_node rq in
-      let selection = WpTipApi.selection node in
-      iter (fun cfg -> cfg#configure node selection) ;
-      S.reload tactics ;
+    begin fun node ->
+      match ProofEngine.tactical node with
+      | None ->
+        let selection = WpTipApi.selection node in
+        iter (fun cfg -> cfg#configure node selection) ;
+        S.reload tactics ;
+      | Some jtactic ->
+        let ctxt = ProofEngine.node_context node in
+        WpContext.on_context ctxt (configure jtactic) node ;
+        S.reload tactics ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -527,5 +532,20 @@ let () = R.register
       S.update tactics cfg ;
       children
     end
+
+let () = R.register
+    ~package ~kind:`EXEC
+    ~name:"applyTacticAndProve"
+    ~descr:(Md.plain "Applies tactic and run provers on children")
+    ~input:(module Jtactic)
+    ~output:(module D.Jlist(WpTipApi.Node))
+    begin fun tactic ->
+      let cfg = configurator tactic in
+      let children = cfg#apply in
+      S.update tactics cfg ;
+      List.iter WpTipApi.runProvers children ;
+      children
+    end
+
 
 (* -------------------------------------------------------------------------- *)

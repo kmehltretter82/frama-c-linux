@@ -453,27 +453,28 @@ struct
     mutable dps : result Pmap.t ;
   }
 
-  let not_computing _ r =
-    match r.verdict with VCS.Computing _ -> false | _ -> true
-
   let create () = { dps = Pmap.empty }
 
   let get w p =
     Pmap.find p w.dps
 
-  let clear w = w.dps <- Pmap.empty
+  let clear w =
+    Pmap.iter (fun _ r ->
+        match r.verdict with
+        | VCS.Computing kill -> kill ()
+        | _ -> ()
+      ) w.dps ;
+    w.dps <- Pmap.empty
 
   let replace w p r =
     begin
       if p = Qed then
-        begin
-          w.dps <- Pmap.filter not_computing w.dps ;
-        end ;
+        (w.dps <- Pmap.filter (fun _ r -> VCS.is_verdict r) w.dps) ;
       w.dps <- Pmap.add p r w.dps
     end
 
   let list w =
-    List.filter (fun (_,r) -> VCS.is_verdict r) @@ Pmap.bindings w.dps
+    List.filter (fun (_,r) -> not @@ VCS.is_none r) @@ Pmap.bindings w.dps
 
 end
 
@@ -725,8 +726,11 @@ let get_result g p : VCS.result =
 
 let get_results g =
   let system = SYSTEM.get () in
-  try Results.list (WPOmap.find g system.results)
+  try Results.list @@ WPOmap.find g system.results
   with Not_found -> []
+
+let get_prover_results g =
+  List.filter (fun (p,_) -> VCS.is_prover p) @@ get_results g
 
 let is_trivial g =
   VC_Annot.is_trivial g.po_formula
@@ -754,23 +758,28 @@ let compute g =
   let seq = WpContext.on_context ctxt (GOAL.compute_descr ~pid) goal in
   if not qed then modified g ; seq
 
-let is_valid g =
-  is_trivial g || List.exists (fun (_,r) -> VCS.is_valid r) (get_results g)
+let is_fully_valid g =
+  is_trivial g ||
+  List.exists (fun (_,r) -> VCS.is_valid r) @@ get_results g
+
+let is_locally_valid g =
+  is_trivial g ||
+  List.exists (fun (p,r) -> VCS.is_prover p && VCS.is_valid r) @@ get_results g
 
 let all_not_valid g =
   not (is_trivial g) &&
-  List.for_all (fun (_,r) -> VCS.is_not_valid r) (get_results g)
+  List.for_all (fun (_,r) -> VCS.is_not_valid r) @@ get_results g
 
 let is_passed g =
   if is_smoke_test g then
     all_not_valid g
   else
-    is_valid g
+    is_fully_valid g
 
 let has_unknown g =
-  not (is_valid g) &&
+  not (is_fully_valid g) &&
   List.exists
-    (fun (_,r) -> VCS.is_verdict r && not (VCS.is_valid r))
+    (fun (p,r) -> VCS.is_prover p && VCS.is_verdict r && not (VCS.is_valid r))
     (get_results g)
 
 (* -------------------------------------------------------------------------- *)

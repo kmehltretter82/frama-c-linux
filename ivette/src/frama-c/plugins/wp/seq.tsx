@@ -115,10 +115,11 @@ class Sequent {
     const gutters: GutterDecoration[] = [];
     if (tag) {
       const selection: Range = { offset: tag.offset, length: 0 };
-      const lineFrom = proxy.lineAt(tag.offset+1);
-      const lineTo = proxy.lineAt(tag.endOffset);
-      for (let line = lineFrom; line <= lineTo; line++)
-        gutters.push({ className: 'wp-gutter-part', gutter: '|', line });
+      const lineP = proxy.lineAt(tag.offset+1);
+      const lineQ = proxy.lineAt(tag.endOffset);
+      if (0 <= lineP && 0 <= lineQ)
+        for (let line = lineP; line <= lineQ; line++)
+          gutters.push({ className: 'wp-gutter-part', gutter: '|', line });
       return { selection, gutters };
     } else
       return { selection: undefined, gutters };
@@ -155,6 +156,7 @@ class Sequent {
 
 export interface GoalViewProps {
   node: Node;
+  locked: boolean;
   autofocus: boolean;
   unmangled: boolean;
   iformat: TIP.iformat;
@@ -162,13 +164,18 @@ export interface GoalViewProps {
 }
 
 export function GoalView(props: GoalViewProps): JSX.Element {
-  const { node } = props;
+  const { node, locked } = props;
   const jtext = States.useRequest(TIP.printSequent, props, {
     pending: null,
     offline: undefined,
     onError: '',
   }) ?? null;
-  const { part, term } = States.useRequest(TIP.getSelection, node) ?? {};
+  const { part, term } =
+    States.useRequest(TIP.getSelection, node, {
+      pending: null,
+      offline: {},
+      onError: {},
+    }) ?? {};
   const proxy = React.useMemo(() => new TextProxy(), []);
   const sequent = React.useMemo(() => new Sequent(jtext), [jtext]);
   React.useEffect(() => proxy.updateContents(sequent.text), [proxy, sequent]);
@@ -190,7 +197,7 @@ export function GoalView(props: GoalViewProps): JSX.Element {
         Server.send(TIP.setSelection, { node, part, term });
         return;
       }
-    }
+    } // otherwise
     Server.send(TIP.clearSelection, node);
   }, [sequent, node]);
   return (
@@ -201,7 +208,7 @@ export function GoalView(props: GoalViewProps): JSX.Element {
       selection={selection}
       decorations={[hover, sequent.decorations, gutters]}
       onHover={onHover}
-      onClick={onClick}
+      onClick={locked ? undefined : onClick}
     />
   );
 }

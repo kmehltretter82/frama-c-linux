@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val version : string
+val why3_version : string
 val config : unit -> Why3.Whyconf.config
 val configure : unit -> unit
 val set_procs : int -> unit
@@ -35,10 +35,14 @@ val find_fallback : string -> fallback
 val ident_why3 : t -> string
 val ident_wp : t -> string
 val title : ?version:bool -> t -> string
+val name : t -> string
+val version : t -> string
+val altern : t -> string
 val compare : t -> t -> int
 
 val provers : unit -> t list
 val provers_set : unit -> Why3.Whyconf.Sprover.t
+val is_auto : t -> bool
 val is_available : t -> bool
 val is_mainstream : t -> bool
 val has_counter_examples : t -> bool

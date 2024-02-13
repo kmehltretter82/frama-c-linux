@@ -701,6 +701,12 @@ export default function ASTview(): JSX.Element {
   const hovered = States.useHovered() ?? Ast.markerDefault;
   React.useEffect(() => Hovered.set(view, hovered), [view, hovered]);
 
+  // State unFoldButton
+  const [isFoldText, setIsFoldText] = React.useState(false);
+  const icon = 'CHEVRON.' + (isFoldText ? 'EXPAND' : 'CONTRACT');
+  const title = isFoldText ? 'Expand' : 'Collapse';
+  const unFoldButtonClicked = (): void => { setIsFoldText(!isFoldText); };
+
   // Multiple selection
   const { markers } = Locations.useSelection();
   React.useEffect(() => Multiple.set(view, markers), [view, markers]);
@@ -716,6 +722,9 @@ export default function ASTview(): JSX.Element {
   // Printed AST
   const text = useAST(scope);
   React.useEffect(() => Text.set(view, text), [view, text]);
+  React.useEffect(() => {
+    isFoldText ? Editor.foldAll(view) : Editor.unfoldAll(view);
+  }, [view, isFoldText, text]);
 
   // EVA Callbacks
   const dead = useDead(scope);
@@ -732,17 +741,9 @@ export default function ASTview(): JSX.Element {
       <TitleBar>
         <Filler />
         <IconButton
-          icon='CHEVRON.CONTRACT'
-          visible={true}
-          onClick={() => Editor.foldAll(view)}
-          title='Collapse all multi-line ACSL properties'
-          className="titlebar-thin-icon"
-        />
-        <IconButton
-          icon='CHEVRON.EXPAND'
-          visible={true}
-          onClick={() => Editor.unfoldAll(view)}
-          title='Expand all multi-line ACSL properties'
+          icon={icon}
+          onClick= {unFoldButtonClicked}
+          title={title + ' all multi-line ACSL properties'}
           className="titlebar-thin-icon"
         />
         <Inset />

@@ -32,7 +32,7 @@ let fclause,pclause =
   Tactical.composer
     ~id:"clause"
     ~title:"Clause"
-    ~descr:"Clause to Cut with"
+    ~descr:"Clause to cut with."
     ~filter:F.is_prop
     ()
 
@@ -42,18 +42,22 @@ let fmode,pmode =
   Tactical.selector
     ~id:"case"
     ~title:"Mode"
-    ~descr:"Select How the Clause is Used"
+    ~descr:"Select how the clause is used."
     ~default:MODUS
     ~options:Tactical.[
-        { title="Case Analysis" ; descr="" ; vid="CASES" ; value=CASES } ;
-        { title="Modus Ponens" ; descr="" ; vid="MODUS" ; value=MODUS } ;
+        { title="Case Analysis" ;
+          descr="Consider P->Q and !P->Q." ;
+          vid="CASES" ; value=CASES } ;
+        { title="Modus Ponens" ;
+          descr="Consider P and P->Q." ;
+          vid="MODUS" ; value=MODUS } ;
       ] ()
 
 class cut =
   object(self)
     inherit Tactical.make ~id:"Wp.cut"
         ~title:"Cut"
-        ~descr:"Use Intermerdiate Hypothesis"
+        ~descr:"Use intermerdiate hypothesis."
         ~params:[pmode;pclause]
 
     method select feedback sel =
@@ -70,7 +74,7 @@ class cut =
       else
         match mode with
         | MODUS ->
-          feedback#set_descr "Prove then Insert the Clause" ;
+          feedback#set_descr "Prove then insert the clause." ;
           let clause = F.p_bool (Tactical.selected cut) in
           let step = Conditions.step ~descr:"Cut" (Have clause) in
           let at = Tactical.at sel in
@@ -81,7 +85,7 @@ class cut =
                 "Assume" , (fst assume,snd sequent) ]
             end
         | CASES ->
-          feedback#set_descr "Proof by Case in the Clause" ;
+          feedback#set_descr "Proof by case in the clause." ;
           let positive = F.p_bool (Tactical.selected cut) in
           let negative = F.p_not positive in
           Applicable

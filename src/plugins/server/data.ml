@@ -593,6 +593,7 @@ sig
   val empty : 'a t
   val add : key -> 'a -> 'a t -> 'a t
   val find : key -> 'a t -> 'a
+  val remove : key -> 'a t -> 'a t
 end
 
 module type Index =
@@ -601,6 +602,7 @@ sig
   type tag
   val get : t -> tag
   val find : tag -> t
+  val remove : t -> unit
   val clear : unit -> unit
 end
 
@@ -611,6 +613,7 @@ sig
   val clear : index -> unit
   val get : index -> M.key -> int
   val find : index -> int -> M.key
+  val remove : index -> M.key -> unit
   val to_json : index -> M.key -> json
   val of_json : index -> json -> M.key
 end =
@@ -643,6 +646,13 @@ struct
       m.index <- M.add a id m.index ;
       Hashtbl.add m.lookup id a ; id
 
+  let remove m a =
+    try
+      let id = M.find a m.index in
+      Hashtbl.remove m.lookup id ;
+      m.index <- M.remove a m.index ;
+    with Not_found -> ()
+
   let find m id = Hashtbl.find m.lookup id
 
   let to_json m a = `Int (get m a)
@@ -662,6 +672,7 @@ struct
   let clear () = INDEX.clear index
   let get = INDEX.get index
   let find = INDEX.find index
+  let remove = INDEX.remove index
   include
     (struct
       type t = M.key
@@ -694,6 +705,7 @@ struct
 
   let index () = STATE.get ()
   let clear () = INDEX.clear (index())
+  let remove a = INDEX.remove (index()) a
 
   let get a = INDEX.get (index()) a
   let find id = INDEX.find (index()) id
@@ -760,6 +772,11 @@ struct
     let tag = A.id x in
     let hash = lookup () in
     if not (Hashtbl.mem hash tag) then Hashtbl.add hash tag x ; tag
+
+  let remove x =
+    let tag = A.id x in
+    let hash = lookup () in
+    Hashtbl.remove hash tag
 
   include
     (struct

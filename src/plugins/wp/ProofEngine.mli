@@ -41,14 +41,18 @@ end
 
 val get : Wpo.t -> [ `Script | `Proof | `Saved | `None ]
 val proof : main:Wpo.t -> tree
-val reset : tree -> unit
-val clear : Wpo.t -> unit
 
-(** Re-compute stats & set status of the entire script *)
+(** Consolidate and update status of the entire script (memoized). *)
 val validate : tree -> unit
 
-(** Consolidate statistics wrt current script or prover results *)
+(** Consolidate proof tree (memoized). *)
+val consolidate : Wpo.t -> unit
+
+(** Consolidated statistics (memoized). *)
 val consolidated : Wpo.t -> Stats.stats
+
+(** Consolidated results (memoized). *)
+val results : Wpo.t -> (VCS.prover * VCS.result) list
 
 (** Leaves are numbered from 0 to n-1 *)
 
@@ -80,11 +84,17 @@ val tree_context : tree -> WpContext.t
 val node_context : node -> WpContext.t
 
 val title : node -> string
-val proved : node -> bool
+val fully_proved : node -> bool
+val locally_proved : node -> bool
 val pending : node -> int
 val stats : node -> Stats.stats
-val parent : node -> node option
 val depth : node -> int
+val path : node -> node list
+val parent : node -> node option
+val tactic : node -> Tactical.t option
+val child_label : node -> string option
+val tactic_label : node -> string option
+val subgoals : node -> node list
 val children : node -> (string * node) list
 val tactical : node -> ProofScript.jtactic option
 val get_strategies : node -> int * Strategy.t array (* current index *)
@@ -93,8 +103,19 @@ val get_hint : node -> string option
 val set_hint : node -> string -> unit
 
 val forward : tree -> unit
-val cancel : tree -> unit
-val remove : tree -> node -> unit
+val clear_goal : Wpo.t -> unit
+val clear_tree : tree -> unit
+val clear_node : tree -> node -> unit
+val clear_node_tactic : tree -> node -> unit
+val clear_parent_tactic : tree -> node -> unit
+
+val add_goal_hook : (Wpo.t -> unit) -> unit
+val add_clear_hook : (Wpo.t -> unit) -> unit
+val add_remove_hook : (node -> unit) -> unit
+val add_update_hook : (node -> unit) -> unit
+
+val cancel_parent_tactic : tree -> unit
+val cancel_current_node : tree -> unit
 
 type fork
 val anchor : tree -> ?node:node -> unit -> node
@@ -103,6 +124,8 @@ val iter : (Wpo.t -> unit) -> fork -> unit
 val commit : fork -> node * (string * node) list
 val pretty : Format.formatter -> fork -> unit
 
+val has_proof : Wpo.t -> bool
+val has_script : tree -> bool
 val script : tree -> ProofScript.jscript
 val bind : node -> ProofScript.jscript -> unit
 val bound : node -> ProofScript.jscript

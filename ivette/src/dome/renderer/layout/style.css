@@ -20,9 +20,8 @@
 
 .dome-xBoxes-grid
 {
-    flex: 1 1 auto ;
-    overflow: auto ;
-    display: grid ;
+    flex: 1 1 auto;
+    overflow: auto;
     display: grid;
     grid-auto-rows: auto;
     grid-auto-flow: row;
@@ -510,6 +509,20 @@
 .dome-disabled .dome-xForm-color-field
 {
     opacity: 0.2 ;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Overlay                                                            --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xOverlay-anchor {
+    display: inline-block;
+    width: 0px;
+    height: 0px;
+}
+
+.dome-xOverlay-contents {
+    z-index: 1;
 }
 
 /* -------------------------------------------------------------------------- */

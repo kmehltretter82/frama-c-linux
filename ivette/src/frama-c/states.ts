@@ -72,19 +72,18 @@ export interface UseRequestOptions<A> {
 
   Options can be used to tune more precisely the behavior of the hook.
  */
-export function useRequest<In, Out>(
-  rq: Server.GetRequest<In, Out>,
+export function useRequest<Kd extends Server.RqKind, In, Out>(
+  rq: Server.Request<Kd, In, Out>,
   params: In | undefined,
   options: UseRequestOptions<Out> = {},
 ): Out | undefined {
   const initial = options.offline ?? undefined;
   const [response, setResponse] = React.useState<Out | undefined>(initial);
-  const doUpdateResponse = React.useCallback(
+  const updateResponse = Dome.useProtected(
     (opt: Out | undefined | null): void => {
       if (opt !== null) setResponse(opt);
-    }, []);
-  const updateResponse = Dome.useActive(doUpdateResponse);
-
+    }
+  );
   // Fetch Request
   async function trigger(): Promise<void> {
     if (Server.isRunning() && params !== undefined) {
@@ -93,7 +92,7 @@ export function useRequest<In, Out>(
         const r = await Server.send(rq, params);
         updateResponse(r);
       } catch (error) {
-        if (options.onError !== undefined) {
+        if (options.onError === undefined) {
           D.error(`Fail in useRequest '${rq.name}'. ${error}`);
         }
         updateResponse(options.onError);
@@ -211,6 +210,7 @@ class SyncState<A> extends GlobalState<A | undefined> {
     super(undefined);
     this.handler = h;
     this.fetch = this.fetch.bind(this);
+    this.update = this.update.bind(this);
   }
 
   signal(): Server.Signal { return this.handler.signal; }
@@ -235,7 +235,24 @@ class SyncState<A> extends GlobalState<A | undefined> {
       }
     } catch (error) {
       D.error(
-        `Fail to update SyncState '${this.handler.name}'.`,
+        `Fail to fetch state '${this.handler.name}'.`,
+        `${error}`,
+      );
+      this.setValue(undefined);
+    }
+  }
+
+  async update(value: A): Promise<void> {
+    try {
+      if (Server.isRunning() && this.handler.setter) {
+        this.status = SyncStatus.Loading;
+        await Server.send(this.handler.setter, value);
+        this.status = SyncStatus.Loaded;
+        this.setValue(value);
+      }
+    } catch (error) {
+      D.error(
+        `Fail to update state '${this.handler.name}'.`,
         `${error}`,
       );
       this.setValue(undefined);
@@ -276,7 +293,8 @@ export function useSyncState<A>(
   const st = lookupSyncState(state);
   Server.useSignal(st.signal(), st.fetch);
   st.online();
-  return useGlobalState(st);
+  const [v] = useGlobalState(st);
+  return [v, st.update];
 }
 
 /** Synchronization with a (projectified) server value. */

@@ -30,10 +30,10 @@ module L = Qed.Logic
 (* -------------------------------------------------------------------------- *)
 
 let descr = function
-  | 1 -> "First Parameter"
-  | 2 -> "Second Parameter"
-  | 3 -> "Third Parameter"
-  | n -> Printf.sprintf "%d-th Parameter" n
+  | 1 -> "First parameter."
+  | 2 -> "Second parameter."
+  | 3 -> "Third parameter."
+  | n -> Printf.sprintf "%d-th parameter." n
 
 let mkparam k =
   Tactical.composer
@@ -142,7 +142,7 @@ class instance =
   object(self)
     inherit Tactical.make ~id:"Wp.instance"
         ~title:"Instance"
-        ~descr:"Instantiate properties"
+        ~descr:"Instantiate properties."
         ~params
 
     method private wrap env lemma fields =
@@ -177,10 +177,10 @@ class instance =
           match cardinal 1000 bindings with
           | Some n ->
             if n > 1 then
-              feedback#set_descr "Generates %d instances" n ;
+              feedback#set_descr "Generates %d instances." n ;
             Applicable (bind ~side bindings (F.p_bool phi))
           | None ->
-            feedback#set_error "More than 1,000 instances" ;
+            feedback#set_error "More than 1,000 instances." ;
             Not_configured
         else Not_configured
       else

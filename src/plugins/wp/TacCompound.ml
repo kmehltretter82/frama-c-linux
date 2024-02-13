@@ -155,7 +155,7 @@ let process_expand (feedback : Tactical.feedback) ?at e =
   let pool = feedback#pool in
   let eq,cmp = get_compound_equality e in
   feedback#set_title "Compound (%s)" (name eq) ;
-  feedback#set_descr "Expand %s %s" (kind cmp) (equality eq) ;
+  feedback#set_descr "Expand %s %s." (kind cmp) (equality eq) ;
   let e' = (if eq then conj else disj) (clause ~pool cmp) in
   let cases = [feedback#get_title,F.p_true,e,F.e_prop e'] in
   Tactical.rewrite ?at cases
@@ -167,14 +167,14 @@ let process_have (feedback : Tactical.feedback) s =
   if eq then
     begin
       feedback#set_title "Compound (eq)" ;
-      feedback#set_descr "Expand %s equality" (kind cmp) ;
+      feedback#set_descr "Expand %s equality." (kind cmp) ;
       let cases = ["Compound (eq)",When (conj (clause ~pool cmp))] in
       Tactical.replace ~at:s.id cases
     end
   else
     begin
       feedback#set_title "Compound (split)" ;
-      feedback#set_descr "Split %s dis-equality" (kind cmp) ;
+      feedback#set_descr "Split %s dis-equality." (kind cmp) ;
       let cases = List.map negative (clause ~pool cmp) in
       Tactical.replace ~at:s.id cases
     end
@@ -185,13 +185,13 @@ let process_goal (feedback : Tactical.feedback) p =
   if eq then
     begin
       feedback#set_title "Compound (split)" ;
-      feedback#set_descr "Split %s equality" (kind cmp) ;
+      feedback#set_descr "Split %s equality." (kind cmp) ;
       Tactical.split (clause ~pool cmp) ;
     end
   else
     begin
       feedback#set_title "Compound (neq)" ;
-      feedback#set_descr "Expand compound dis-equality" ;
+      feedback#set_descr "Expand compound dis-equality." ;
       let cases = ["Compound (neq)",disj (clause ~pool cmp)] in
       Tactical.split cases
     end
@@ -200,7 +200,7 @@ class compound =
   object
     inherit Tactical.make ~id:"Wp.compound"
         ~title:"Compound"
-        ~descr:"Decompose compound equalities"
+        ~descr:"Decompose compound equalities."
         ~params:[]
 
     method select feedback (s : Tactical.selection) =

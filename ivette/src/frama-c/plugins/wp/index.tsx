@@ -75,16 +75,17 @@ function WPGoals(): JSX.Element {
           selected={failed}
           onClick={flipFailed} />
         <IconButton
-          icon={tip ? 'ITEMS.LIST' : 'MEDIA.PLAY'}
-          kind={tip ? 'warning' : 'positive'}
+          icon='MEDIA.PLAY'
           title={tip ? 'Back to Goals' : 'Interactive Proof Transformer'}
           enabled={!!current}
+          selected={tip}
           onClick={() => setTip(!tip)} />
       </Ivette.TitleBar>
       <GoalTable
         display={!tip}
-        scope={scope}
         failed={failed}
+        scoped={scoped}
+        scope={scope}
         current={current}
         setCurrent={setCurrent}
         setTIP={() => setTip(true)}
@@ -93,7 +94,9 @@ function WPGoals(): JSX.Element {
       />
       <TIPView
         display={tip}
-        goal={current} />
+        goal={current}
+        onClose={() => setTip(false)}
+      />
     </>
   );
 }
@@ -110,17 +113,21 @@ Ivette.registerComponent({
 /* -------------------------------------------------------------------------- */
 
 function ServerActivity(): JSX.Element {
-  const rq = States.useRequest(WP.getScheduledTasks, null);
-  const active = rq ? rq.active > 0 : false;
-  const status = active ? 'active' : 'inactive';
+  const rq = States.useRequest(WP.getScheduledTasks, null, { pending: null });
+  const procs = rq ? rq.procs : 0;
+  const active = rq ? rq.active : 0;
+  const status = active > 0 ? 'active' : 'inactive';
   const done = rq ? rq.done : 0;
   const todo = rq ? rq.todo : 0;
   const total = done + todo;
+  const progress = done + active;
+  const objective = done + todo + procs;
+  const title = `${done} / ${todo} (${active} running, ${procs} procs)`;
   return (
-    <Group display={total > 0}>
+    <Group display={total > 0} title={title}>
       <LED status={status} />
       <Label>WP</Label>
-      <Meter value={done} min={0} max={done + total} />
+      <Meter min={0} value={progress} max={objective} />
       <Inset />
     </Group>
   );

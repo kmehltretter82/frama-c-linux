@@ -28,7 +28,7 @@ class overflow =
     inherit Tactical.make
         ~id:"Wp.overflow"
         ~title:"Overflow"
-        ~descr:"Split integer overflow into in and out of range"
+        ~descr:"Split integer overflow into in and out of range."
         ~params:[]
 
     method select _feedback selection =

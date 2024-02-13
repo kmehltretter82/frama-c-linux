@@ -39,18 +39,27 @@
  */
 
 import { debounce } from 'lodash';
+import Events from 'events';
 import React from 'react';
 import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
 import { SVG } from 'dome/controls/icons';
 import { Checkbox, Radio, Select as SelectMenu } from 'dome/controls/buttons';
+import { Label } from 'dome/controls/labels';
 
 export type FieldError =
   | undefined | boolean | string
   | { [key: string]: FieldError } | FieldError[];
 export type Checker<A> = (value: A) => boolean | FieldError;
-export type Callback<A> = (value: A, error: FieldError) => void;
-export type FieldState<A> = [A, FieldError, Callback<A>];
+export type Callback<A> =
+  (value: A, error: FieldError, reset: boolean) => void;
+
+export interface FieldState<A> {
+  value: A;
+  error?: FieldError;
+  reset?: A;
+  onChanged: Callback<A>;
+}
 
 /* --------------------------------------------------------------------------*/
 /* --- State Errors Utilities                                             ---*/
@@ -107,6 +116,113 @@ function isValidArray(err: FieldError[]): boolean {
 }
 
 /* --------------------------------------------------------------------------*/
+/* --- Reset Hooks                                                        ---*/
+/* --------------------------------------------------------------------------*/
+
+export type ResetCallback = () => void;
+
+/**
+   Controller for _buffered_ field states.
+ */
+export class BufferController {
+  private readonly evt = new Events();
+
+  /** Notify all reset listener events. */
+  reset(): void { this.evt.emit('reset'); }
+
+  /** Notify all commit listener events. */
+  commit(): void { this.evt.emit('commit'); }
+
+  /** There are active listeners for Reset event. */
+  hasReset(): boolean { return this.evt.listenerCount('reset') > 0; }
+
+  /** There are active listeners for Commit event. */
+  hasCommit(): boolean { return this.evt.listenerCount('commit') > 0; }
+
+  /** @internal */
+  onReset(fn: ResetCallback): void { this.evt.addListener('reset', fn); }
+
+  /** @internal */
+  offReset(fn: ResetCallback): void { this.evt.addListener('reset', fn); }
+
+  /** @internal */
+  onCommit(fn: ResetCallback): void { this.evt.addListener('commit', fn); }
+
+  /** @internal */
+  offCommit(fn: ResetCallback): void { this.evt.addListener('commit', fn); }
+
+}
+
+/**
+   Insert a temporary buffer to stack modifications. Values are imported from
+   the input state, and modifications are stacked into an internal buffer.
+
+   The buffered state will perform the following actions
+   upon remote control events:
+
+   - on Reset event, the buffered state is restored to the input value.
+
+   - on Commit event, the buffered state is sent to the input callback.
+
+   The returned field state reflects the internal buffer state. Its local
+   reset value is either the input reset value or the current input value.
+
+ */
+export function useBuffer<A>(
+  remote : BufferController,
+  state: FieldState<A>
+): FieldState<A>
+{
+  const { value, error, reset, onChanged } = state;
+  const [ modified, setModified ] = React.useState(false);
+  const [ buffer, setBuffer ] = React.useState<A>(value);
+  const [ berror, setBerror ] = React.useState<FieldError>(error);
+  const staged = modified && !berror;
+
+  // --- Reset
+  React.useEffect(() => {
+    if (modified) {
+      const doReset = (): void => {
+        setModified(false);
+        setBuffer(value);
+        setBerror(error);
+      };
+      remote.onReset(doReset);
+      return () => remote.offReset(doReset);
+    } else return;
+  }, [remote, modified, value, error]);
+
+  // --- Commit
+  React.useEffect(() => {
+    if (staged) {
+      const doCommit = (): void => {
+        setModified(false);
+        onChanged(buffer, undefined, false);
+      };
+      remote.onCommit(doCommit);
+      return () => remote.offCommit(doCommit);
+    } else return;
+  }, [remote, staged, buffer, onChanged]);
+
+  // --- Callback
+  const onLocalChange = React.useCallback(
+    (newValue, newError, isReset) => {
+      setModified(!isReset);
+      setBuffer(newValue);
+      setBerror(newError);
+      if (isReset && newValue !== value)
+        onChanged(newValue, newError, isReset);
+    }, [value, onChanged]);
+
+  return {
+    value: modified ? buffer : value,
+    error: modified ? berror : error,
+    reset: reset ?? (modified ? value : undefined),
+    onChanged: onLocalChange,
+  };
+}
+
+/* --------------------------------------------------------------------------*/
 /* --- State Hooks                                                        ---*/
 /* --------------------------------------------------------------------------*/
 
@@ -118,13 +234,13 @@ export function useState<A>(
 ): FieldState<A> {
   const [value, setValue] = React.useState<A>(defaultValue);
   const [error, setError] = React.useState<FieldError>(undefined);
-  const setState = React.useCallback((newValue: A, newError: FieldError) => {
+  const onChanged = React.useCallback((newValue: A, newError: FieldError) => {
     const localError = validate(newValue, checker) || newError;
     setValue(newValue);
     setError(localError);
-    if (onChange) onChange(newValue, localError);
+    if (onChange) onChange(newValue, localError, false);
   }, [checker, setValue, setError, onChange]);
-  return [value, error, setState];
+  return { value, error, onChanged };
 }
 
 /** Introduces a local state and propagates only non-errors. */
@@ -141,7 +257,12 @@ export function useValid<A>(
       if (!newError) setValue(newValue);
     }, [setValue],
   );
-  return [error ? local : value, error, update];
+  return {
+    value: error ? local : value,
+    error,
+    reset: value,
+    onChanged: update
+  };
 }
 
 /** Provides a new state with a default value. */
@@ -149,8 +270,8 @@ export function useDefault<A>(
   state: FieldState<A | undefined>,
   defaultValue: A,
 ): FieldState<A> {
-  const [value, error, setState] = state;
-  return [value ?? defaultValue, error, setState];
+  const { value, error, reset, onChanged } = state;
+  return { value: value ?? defaultValue, error, reset, onChanged };
 }
 
 /**
@@ -160,15 +281,15 @@ export function useDefault<A>(
 export function useDefined<A>(
   state: FieldState<A>,
 ): FieldState<A | undefined> {
-  const [value, error, setState] = state;
+  const { value, error, reset, onChanged } = state;
   const update = React.useCallback(
-    (newValue: A | undefined, newError: FieldError) => {
+    (newValue: A | undefined, newError: FieldError, doReset) => {
       if (newValue !== undefined) {
-        setState(newValue, newError);
+        onChanged(newValue, newError, doReset);
       }
-    }, [setState],
+    }, [onChanged],
   );
-  return [value, error, update];
+  return { value, error, reset, onChanged: update };
 }
 
 /**
@@ -179,18 +300,18 @@ export function useRequired<A>(
   state: FieldState<A>,
   onError?: string,
 ): FieldState<A | undefined> {
-  const [value, error, setState] = state;
+  const { value, error, reset, onChanged } = state;
   const cache = React.useRef(value);
   const update = React.useCallback(
-    (newValue: A | undefined, newError: FieldError) => {
+    (newValue: A | undefined, newError: FieldError, isReset: boolean) => {
       if (newValue === undefined) {
-        setState(cache.current, onError || 'Required field');
+        onChanged(cache.current, onError || 'Required field', false);
       } else {
-        setState(newValue, newError);
+        onChanged(newValue, newError, !newError && isReset);
       }
-    }, [cache, onError, setState],
+    }, [cache, onError, onChanged],
   );
-  return [value, error, update];
+  return { value, error, reset, onChanged: update };
 }
 
 /**
@@ -201,12 +322,24 @@ export function useChecker<A>(
   state: FieldState<A>,
   checker?: Checker<A>,
 ): FieldState<A> {
-  const [value, error, setState] = state;
-  const update = React.useCallback((newValue: A, newError: FieldError) => {
-    const localError = validate(newValue, checker) || newError;
-    setState(newValue, localError);
-  }, [checker, setState]);
-  return [value, error, update];
+  const { value, error, reset, onChanged } = state;
+  const update = React.useCallback(
+    (newValue: A, newError: FieldError, isReset: boolean) => {
+      const localError = validate(newValue, checker) || newError;
+      onChanged(newValue, localError, !localError && isReset);
+    }, [checker, onChanged]);
+  return { value, error, reset, onChanged: update };
+}
+
+function convertReset<A, B>(
+  fn: (value: A) => B, value: A | undefined
+): B | undefined
+{
+  try {
+    return value ? fn(value) : undefined;
+  } catch(_err) {
+    return undefined;
+  }
 }
 
 /**
@@ -225,7 +358,6 @@ export function useChecker<A>(
    @param input - converting function from `A` to `B`
    @param output - converting function from `B` to `A`
  */
-
 export function useFilter<A, B>(
   state: FieldState<A>,
   input: (value: A) => B,
@@ -233,36 +365,52 @@ export function useFilter<A, B>(
   defaultValue: B,
 ): FieldState<B> {
 
-  const [value, error, setState] = state;
+  const { value, error, reset, onChanged } = state;
   const [localValue, setLocalValue] = React.useState(defaultValue);
   const [localError, setLocalError] = React.useState<FieldError>(undefined);
   const [dangling, setDangling] = React.useState(false);
+  const localReset = convertReset(input, reset);
 
   const update = React.useCallback(
-    (newValue: B, newError: FieldError) => {
+    (newValue: B, newError: FieldError, isReset: boolean) => {
       try {
         const outValue = output(newValue);
         setLocalValue(newValue);
         setLocalError(newError);
         if (isValid(newError)) {
           setDangling(false);
-          setState(outValue, undefined);
+          onChanged(outValue, undefined, isReset);
         }
       } catch (err) {
         setLocalValue(newValue);
         setLocalError(newError || err ? `${err}` : 'Invalid value');
         setDangling(true);
       }
-    }, [output, setState, setLocalValue, setLocalError],
+    }, [output, onChanged, setLocalValue, setLocalError],
   );
 
   if (dangling) {
-    return [localValue, localError, update];
+    return {
+      value: localValue,
+      error: localError,
+      reset: localReset,
+      onChanged: update
+    };
   }
   try {
-    return [input(value), error, update];
+    return {
+      value: input(value),
+      error,
+      reset: localReset,
+      onChanged: update
+    };
   } catch (err) {
-    return [localValue, err ? `${err}` : 'Invalid input', update];
+    return {
+      value: localValue,
+      error: err ? `${err}` : 'Invalid input',
+      reset: localReset,
+      onChanged: update
+    };
   }
 
 }
@@ -276,7 +424,7 @@ export function useLatency<A>(
   state: FieldState<A>,
   latency?: number,
 ): FieldState<A> {
-  const [value, error, setState] = state;
+  const { value, error, reset, onChanged } = state;
   const period = latency ?? 0;
   const [localValue, setLocalValue] = React.useState(value);
   const [localError, setLocalError] = React.useState(error);
@@ -284,26 +432,27 @@ export function useLatency<A>(
   const update = React.useMemo(() => {
     if (period > 0) {
       const propagate = debounce(
-        (lateValue: A, lateError: FieldError) => {
-          setState(lateValue, lateError);
+        (lateValue: A, lateError: FieldError, isReset: boolean) => {
+          onChanged(lateValue, lateError, !lateError && isReset);
           setDangling(false);
         }, period,
       );
-      return (newValue: A, newError: FieldError) => {
+      return (newValue: A, newError: FieldError, isReset: boolean) => {
         setLocalValue(newValue);
         setLocalError(newError);
         setDangling(true);
-        propagate(newValue, newError);
+        propagate(newValue, newError, isReset);
       };
     }
     setDangling(false);
-    return setState;
-  }, [period, setDangling, setState, setLocalValue, setLocalError]);
-  return [
-    dangling ? localValue : value,
-    dangling ? localError : error,
-    update,
-  ];
+    return onChanged;
+  }, [period, setDangling, onChanged, setLocalValue, setLocalError]);
+  return {
+    value: dangling ? localValue : value,
+    error: dangling ? localError : error,
+    reset,
+    onChanged: update,
+  };
 }
 
 /**
@@ -314,19 +463,23 @@ export function useProperty<A, K extends keyof A>(
   property: K,
   checker?: Checker<A[K]>,
 ): FieldState<A[K]> {
-  const [value, error, setState] = state;
-  const update = React.useCallback((newProp: A[K], newError: FieldError) => {
-    const newValue = { ...value, [property]: newProp };
-    const objError = isObjectError(error) ? error : {};
-    const propError = validate(newProp, checker) || newError;
-    const localError = { ...objError, [property]: propError };
-    setState(newValue, isValidObject(localError) ? undefined : localError);
-  }, [value, error, setState, property, checker]);
-  return [
-    value[property],
-    isObjectError(error) ? error[property] : undefined,
-    update
-  ];
+  const { value, error, reset, onChanged } = state;
+  const update = React.useCallback(
+    (newProp: A[K], newError: FieldError, isReset: boolean) => {
+      const newValue = { ...value, [property]: newProp };
+      const objError = isObjectError(error) ? error : {};
+      const propError = validate(newProp, checker) || newError;
+      const localError = { ...objError, [property]: propError };
+      const finalError = isValidObject(localError) ? undefined : localError;
+      onChanged(newValue, finalError, !finalError && isReset);
+    }, [value, error, onChanged, property, checker, ]);
+
+  return {
+    value: value[property],
+    error: isObjectError(error) ? error[property] : undefined,
+    reset: reset && reset[property],
+    onChanged: update
+  };
 }
 
 /**
@@ -337,17 +490,24 @@ export function useIndex<A>(
   index: number,
   checker?: Checker<A>,
 ): FieldState<A> {
-  const [array, error, setState] = state;
-  const update = React.useCallback((newValue: A, newError: FieldError) => {
-    const newArray = array.slice();
-    newArray[index] = newValue;
-    const localError = isArrayError(error) ? error.slice() : [];
-    const valueError = validate(newValue, checker) || newError;
-    localError[index] = valueError;
-    setState(newArray, isValidArray(localError) ? undefined : localError);
-  }, [array, error, setState, index, checker]);
+  const { value, error, reset, onChanged } = state;
+  const update = React.useCallback(
+    (newValue: A, newError: FieldError, isReset: boolean) => {
+      const newArray = value.slice();
+      newArray[index] = newValue;
+      const localError = isArrayError(error) ? error.slice() : [];
+      const valueError = validate(newValue, checker) || newError;
+      localError[index] = valueError;
+      const finalError = isValidArray(localError) ? undefined : localError;
+      onChanged(newArray, finalError, !finalError && isReset);
+    }, [value, error, onChanged, index, checker]);
   const itemError = isArrayError(error) ? error[index] : undefined;
-  return [array[index], itemError, update];
+  return {
+    value: value[index],
+    error: itemError,
+    reset: reset && reset[index],
+    onChanged: update
+  };
 }
 
 /* --------------------------------------------------------------------------*/
@@ -596,14 +756,13 @@ export function Field(props: GenericFieldProps): JSX.Element | null {
 
   return (
     <>
-      <label
+      <Label
         className={cssLabel}
         style={{ top: offset }}
         htmlFor={htmlFor}
         title={title}
-      >
-        {label}
-      </label>
+        label={label}
+      />
       <div className={cssField} title={title}>
         {children}
         {WARNING}
@@ -634,11 +793,14 @@ export interface FieldProps<A> extends FilterProps {
 type InputEvent = { target: { value: string } };
 type InputState = [string, FieldError, (evt: InputEvent) => void];
 
-function useChangeEvent(setState: Callback<string>)
-  : ((evt: InputEvent) => void) {
+function useChangeEvent(
+  onChanged: Callback<string>
+): ((evt: InputEvent) => void)
+{
   return React.useCallback(
-    (evt: InputEvent) => { setState(evt.target.value, undefined); },
-    [setState],
+    (evt: InputEvent) => {
+      onChanged(evt.target.value, undefined, false);
+    }, [onChanged],
   );
 }
 
@@ -660,8 +822,8 @@ function useTextInputField(
 ): InputState {
   const checked = useChecker(props.state, props.checker);
   const period = props.latency ?? defaultLatency;
-  const [value, error, setState] = useLatency(checked, period);
-  const onChange = useChangeEvent(setState);
+  const { value, error, onChanged } = useLatency(checked, period);
+  const onChange = useChangeEvent(onChanged);
   return [value || '', error, onChange];
 }
 
@@ -861,8 +1023,8 @@ export function NumberField(props: NumberFieldProps): JSX.Element {
   const css = Utils.classes('dome-xForm-number-field', props.className);
   const checked = useChecker(props.state, props.checker);
   const filtered = useFilter(checked, TEXT_OF_NUMBER, NUMBER_OF_TEXT, '');
-  const [value, error, setState] = useLatency(filtered, latency);
-  const onChange = useChangeEvent(setState);
+  const { value, error, onChanged } = useLatency(filtered, latency);
+  const onChange = useChangeEvent(onChanged);
   const UNITS = units && (
     <label className="dome-text-label dome-xForm-units">{units}</label>
   );
@@ -920,8 +1082,8 @@ export function SpinnerField(props: SpinnerFieldProps): JSX.Element {
   }, [min, max, checker]);
   const checked = useChecker(props.state, fullChecker);
   const filtered = useFilter(checked, TEXT_OF_INPUT_NUMBER, NUMBER_OF_TEXT, '');
-  const [value, error, setState] = useLatency(filtered, latency);
-  const onChange = useChangeEvent(setState);
+  const { value, error, onChanged } = useLatency(filtered, latency);
+  const onChange = useChangeEvent(onChanged);
   const UNITS = units && (
     <label className="dome-text-label dome-xForm-units">{units}</label>
   );
@@ -992,14 +1154,15 @@ const HIDE_SLIDER = `${CSS_SLIDER} dome-xForm-slider-hide`;
    @category Number Fields
  */
 export function SliderField(props: SliderFieldProps): JSX.Element {
-  const { min, max, step = 1, latency = 600, onReset } = props;
+  const { min, max, step = 1, latency = 600 } = props;
   const { disabled } = useContext(props);
   const id = useHtmlFor();
   const css = Utils.classes('dome-xForm-slider-field', props.className);
+  const onReset = props.onReset ?? props.state.reset;
   const checked = useChecker(props.state, props.checker);
   const delayed = useLatency(checked, latency);
   const [label, setLabel] = React.useState<string | undefined>(undefined);
-  const [value, error, setState] = delayed;
+  const { value, error, onChanged } = delayed;
   const labeling = FORMATING(props);
   const onChange = React.useMemo(
     () => {
@@ -1007,7 +1170,7 @@ export function SliderField(props: SliderFieldProps): JSX.Element {
       return (evt: InputEvent) => {
         const v = Number.parseInt(evt.target.value, 10);
         if (!Number.isNaN(v)) {
-          setState(v, undefined);
+          onChanged(v, undefined, false);
           const vlabel = labeling && labeling(v);
           setLabel(vlabel);
           if (vlabel) fadeOut();
@@ -1015,14 +1178,14 @@ export function SliderField(props: SliderFieldProps): JSX.Element {
           setLabel(undefined);
         }
       };
-    }, [labeling, latency, setState, setLabel],
+    }, [labeling, latency, onChanged, setLabel],
   );
   const onDoubleClick = React.useCallback(() => {
     if (onReset) {
-      setState(onReset, undefined);
+      onChanged(onReset, undefined, true);
       setLabel(undefined);
     }
-  }, [onReset, setState, setLabel]);
+  }, [onReset, onChanged, setLabel]);
   const VALUELABEL = labeling && (
     <label className={label ? SHOW_SLIDER : HIDE_SLIDER}>
       {label}
@@ -1182,13 +1345,15 @@ export function CheckboxField(props: CheckboxFieldProps): JSX.Element | null {
 
   if (hidden) return null;
 
-  const [value, , setState] = props.state;
+  const { value, onChanged } = props.state;
   const { label, title, inverted } = props;
   const css = Utils.classes(
     'dome-xForm-field dome-text-label',
     disabled && 'dome-disabled',
   );
-  const onChange = (): void => setState(!value, undefined);
+  const onChange = (): void => {
+    onChanged(!value, undefined, false);
+  };
   return (
     <Checkbox
       className={css}
@@ -1216,8 +1381,8 @@ export function RadioField<A>(props: RadioFieldProps<A>): JSX.Element | null {
 
   if (hidden) return null;
 
-  const [selection, , setState] = props.state;
-  const onSelection = (value: A): void => setState(value, undefined);
+  const { value: selection, onChanged } = props.state;
+  const onSelection = (value: A): void => onChanged(value, undefined, false);
   const { label, title, value } = props;
   const css = Utils.classes(
     'dome-xForm-field dome-text-label',
@@ -1255,9 +1420,9 @@ export interface SelectFieldProps extends FieldProps<string | undefined> {
 export function SelectField(props: SelectFieldProps): JSX.Element {
   const { disabled } = useContext(props);
   const id = useHtmlFor();
-  const [value, error, setState] = useChecker(props.state, props.checker);
-  const onChange =
-    (newValue: string | undefined): void => setState(newValue, undefined);
+  const { value, error, onChanged } = useChecker(props.state, props.checker);
+  const onChange = (newValue: string | undefined): void =>
+    onChanged(newValue, undefined, false);
   const { children, placeholder } = props;
   return (
     <Field

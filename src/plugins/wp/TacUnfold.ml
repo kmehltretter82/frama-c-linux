@@ -171,7 +171,7 @@ class unfold =
   object
     inherit Tactical.make ~id:"Wp.unfold"
         ~title:"Definition"
-        ~descr:"Unfold predicate and logic function definition"
+        ~descr:"Unfold definitions of predicates and functions."
         ~params:[]
 
     method select _feedback (s : Tactical.selection) =

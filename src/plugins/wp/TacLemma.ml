@@ -86,7 +86,7 @@ type lemma = Definitions.dlemma Tactical.named
 let find thm = named (Definitions.find_name thm)
 
 let search,psearch =
-  Tactical.search ~id:"lemma" ~title:"Lemma" ~descr:"Lemma to Instantiate"
+  Tactical.search ~id:"lemma" ~title:"Lemma" ~descr:"Lemma to instantiate."
     ~browse ~find ()
 
 
@@ -99,7 +99,7 @@ class instance =
   object(self)
     inherit Tactical.make ~id:"Wp.lemma"
         ~title:"Lemma"
-        ~descr:"Search & Instantiate Lemma"
+        ~descr:"Search and instantiate lemmas."
         ~params:(psearch :: TacInstance.params)
 
     method private hide (feedback : Tactical.feedback) fields =
@@ -139,7 +139,7 @@ class instance =
             match TacInstance.cardinal 1000 bindings with
             | Some n ->
               if n > 1 then
-                feedback#set_descr "Generates %d instances" n ;
+                feedback#set_descr "Generates %d instances." n ;
               let at = Tactical.at selection in
               Applicable
                 (TacInstance.instance_have ~title ?at bindings lemma)

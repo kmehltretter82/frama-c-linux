@@ -790,51 +790,71 @@ export function useTimer(period: number, callback: () => void): void
   }, [period, callback]);
 }
 
-/** Protected callback against unmounted component.
+type Callback<A> = (arg: A) => void;
 
-   The returned callback will not fired only when the component is mounted.
-
-   Unless constant, first create the callback with `React.useCallback()`, then
-   give it to `useActive()`.
+/**
+   Protected callback against unmounted component.
+   The returned callback will be only fired when the component is mounted.
+   The provided callback need not be memoized.
  */
-export function useActive<A>(
-  callback: (arg: A) => void,
-): (arg:A) => void
+export function useProtected<A>(fn: Callback<A> | undefined): Callback<A>
 {
-  const active = React.useRef(false);
+  const cb = React.useRef<Callback<A>>();
   React.useEffect(() => {
-    active.current = true;
-    return () => { active.current = false; };
+    cb.current = fn;
+    return () => { cb.current = undefined; };
+  }, [fn]);
+  const trigger = React.useCallback((arg: A) => {
+    const fn = cb.current;
+    if (fn) fn(arg);
   }, []);
-  return React.useCallback((arg: A) => {
-    if (active.current) callback(arg);
-  }, [callback]);
+  return trigger;
 }
 
-/** Debounced callback (period in milliseconds).
-
-   The debounceded callback will not be fired when the component is unmounted.
-
-   Unless constant, first create the callback with `React.useCallback()`, then
-   give it to `useDebounced()`.
+/**
+   Debounced callback (waiting time in milliseconds).
+   The returned callback will be only fired when the component is mounted.
+   The provided callback need not be memoized.
  */
 export function useDebounced<A=void>(
-  callback: (arg: A) => void,
-  period: number,
-): (arg:A) => void
+  fn: Callback<A> | undefined,
+  delay: number
+): Callback<A>
 {
-  const active = React.useRef(false);
+  const cb = React.useRef<Callback<A>>();
   React.useEffect(() => {
-    active.current = true;
-    return () => { active.current = false; };
-  }, []);
-  return React.useMemo(() =>
-    _.debounce(
-      (arg: A) => {
-        if (active.current) callback(arg);
-      }, period
-    ), [callback, period]
-  );
+    cb.current = fn;
+    return () => { cb.current = undefined; };
+  }, [fn]);
+  const trigger = React.useMemo(
+    () => _.debounce((arg: A) => {
+      const fn = cb.current;
+      if (fn) fn(arg);
+    }, delay), [delay]);
+  return trigger;
+}
+
+/**
+   Throttled callback (waiting time in milliseconds).
+   The returned callback will be only fired when the component is mounted.
+   The provided callback need not be memoized.
+ */
+export function useThrottled<A=void>(
+  fn: Callback<A> | undefined,
+  period: number
+): Callback<A>
+{
+  const cb = React.useRef<Callback<A>>();
+  React.useEffect(() => {
+    cb.current = fn;
+    return () => { cb.current = undefined; };
+  }, [fn]);
+  const trigger = React.useMemo(
+    () => _.throttle((arg: A) => {
+      const fn = cb.current;
+      if (fn) fn(arg);
+    }, period), [period]);
+  return trigger;
 }
 
 // --------------------------------------------------------------------------
