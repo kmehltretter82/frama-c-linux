@@ -53,8 +53,8 @@ let current kind =
   Origin { kind; loc; id; }
 
 let well = Well
-let top = Unknown
-let is_top t = t = Unknown
+let unknown = Unknown
+let is_unknown t = t = Unknown
 
 module Prototype = struct
   include Datatype.Serializable_undefined
@@ -91,7 +91,7 @@ end
 include Datatype.Make (Prototype)
 
 let pretty_as_reason fmt org =
-  if not (is_top org)
+  if not (is_unknown org)
   then Format.fprintf fmt " because of %a" pretty org
 
 let join t1 t2 =

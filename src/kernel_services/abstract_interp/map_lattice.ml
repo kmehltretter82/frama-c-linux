@@ -286,7 +286,7 @@ module Make_MapSet_Lattice
 
   type t = Top of KSet.t * Origin.t | Map of KVMap.t
 
-  let top = Top (KSet.top, Origin.top)
+  let top = Top (KSet.top, Origin.unknown)
 
   let bottom = Map KVMap.empty
 

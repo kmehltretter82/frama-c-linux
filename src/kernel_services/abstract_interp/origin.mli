@@ -40,8 +40,8 @@ val current: kind -> t
 (** This is automatically extracted from [Cil.CurrentLoc] *)
 
 val well: t
-val top: t
-val is_top: t -> bool
+val unknown: t
+val is_unknown: t -> bool
 
 val pretty_as_reason: Format.formatter -> t -> unit
 (** Pretty-print [because of <origin>] if the origin is not {!Unknown}, or

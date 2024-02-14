@@ -240,7 +240,7 @@ module V = struct
 
   let pretty_typ typ fmt v =
     let pretty_org fmt org =
-      if not (Origin.is_top org) then
+      if not (Origin.is_unknown org) then
         Format.fprintf fmt "@ @[(origin: %a)@]" Origin.pretty org
     in
     match v with

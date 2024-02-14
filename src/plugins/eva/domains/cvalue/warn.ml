@@ -67,7 +67,7 @@ let warn_imprecise_lval_read lv loc contents =
         Printer.pp_lval lv
         (fun fmt ->
            match loc.loc with
-           | Location_Bits.Top (param,o) when Origin.equal o Origin.top  ->
+           | Location_Bits.Top (param,o) when Origin.is_unknown o  ->
              Format.fprintf fmt "@[The location %a.@]@ "
                pretty_param param
            | Location_Bits.Top (param,orig) ->
@@ -83,7 +83,7 @@ let warn_imprecise_lval_read lv loc contents =
         )
         (fun fmt ->
            match contents with
-           | Location_Bytes.Top (param,o) when Origin.equal o Origin.top ->
+           | Location_Bytes.Top (param,o) when Origin.is_unknown o ->
              Format.fprintf fmt "@[%a.@]"
                pretty_param_b param
            | Location_Bytes.Top (param,orig) ->
@@ -109,7 +109,7 @@ let warn_right_exp_imprecision lv loc_lv exp_val =
              (Locations.pretty_english ~prefix:false) loc_lv
          | (Var _, _) -> ())
       (fun fmt org ->
-         if not (Origin.is_top origin) then
+         if not (Origin.is_unknown origin) then
            Format.fprintf fmt
              "@ @[The imprecision@ originates@ from@ %a@]"
              Origin.pretty org)

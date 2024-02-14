@@ -2803,14 +2803,14 @@ module Make_bitwise(V: sig
         in
         `Value (Int_Intervals.fold aux_itv itvs m)
     with Error_Top ->
-      update_imprecise_everywhere ~validity Origin.top v m
+      update_imprecise_everywhere ~validity Origin.unknown v m
 
   let add_binding_ival ~validity ~exact offsets ~size v m =
     match size with
     | Int_Base.Value size ->
       update ~validity ~exact ~offsets ~size v m
     | Int_Base.Top ->
-      update_imprecise_everywhere ~validity Origin.top v m
+      update_imprecise_everywhere ~validity Origin.unknown v m
 
   let fold_itv ?direction ~entire f itv m acc =
     let f' itv (v, _, _) acc = f itv v acc in
