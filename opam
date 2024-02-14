@@ -119,7 +119,9 @@ run-test: [
 ]
 
 depends: [
-  "dune" { >= "3.7.0" }
+  "dune" { >= "3.7.0" 
+         & != "3.13.0" # performance problem
+         }
   "dune-configurator"
   "dune-site" { >= "3.7.0" }
 
