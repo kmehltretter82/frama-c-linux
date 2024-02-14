@@ -268,6 +268,36 @@ let get_kf = function
   | IPOther {io_loc} -> kf_of_loc_o io_loc
   | IPTypeInvariant _ | IPGlobalInvariant _ -> None
 
+let get_ir p =
+  let get_pp = function
+    | IPPredicate {ip_kind = PKRequires _ | PKAssumes _ | PKTerminates }
+    | IPAxiomatic _ | IPLemma _ | IPComplete _ | IPDisjoint _ | IPCodeAnnot _
+    | IPAllocation _ | IPDecrease _ | IPPropertyInstance _ | IPOther _
+    | IPTypeInvariant _ | IPGlobalInvariant _
+      -> Before
+    | IPPredicate _ | IPAssigns _ | IPFrom _ | IPExtended _ | IPBehavior _
+      -> After
+    | IPReachable ir -> ir.ir_program_point
+  in
+  let ir_kf = get_kf p in
+  let ir_kinstr = get_kinstr p in
+  let ir_program_point = get_pp p in
+  {ir_kf; ir_kinstr; ir_program_point}
+
+let get_prog_state p =
+  let ir = get_ir p in
+  match ir.ir_kf, ir.ir_kinstr with
+  | None, _ | _, Kstmt _ -> ir
+  | Some kf, Kglobal ->
+    try
+      let ir_kinstr =
+        if ir.ir_program_point = Before
+        then Kstmt (Kernel_function.find_first_stmt kf)
+        else Kstmt (Kernel_function.find_return kf)
+      in
+      {ir with ir_kinstr}
+    with Kernel_function.No_Statement -> ir
+
 let rec get_names = function
   | IPPredicate ip -> (Logic_const.pred_of_id_pred ip.ip_pred).pred_name
   | IPExtended { ie_ext = {ext_name = name} }
@@ -1271,23 +1301,9 @@ let ip_other io_name io_loc = IPOther {io_name; io_loc}
 let ip_reachable_stmt kf ki =
   IPReachable {ir_kf=Some kf; ir_kinstr=Kstmt ki; ir_program_point=Before}
 
-let ip_reachable_ppt p =
-  let ir_kf = get_kf p in
-  let ir_kinstr = get_kinstr p in
-  let ir_program_point = match p with
-    | IPPredicate {ip_kind=(PKRequires _ | PKAssumes _ | PKTerminates)}
-    | IPAxiomatic _ | IPLemma _ | IPComplete _
-    | IPDisjoint _ | IPCodeAnnot _ | IPAllocation _
-    | IPDecrease _ | IPPropertyInstance _ | IPOther _
-    | IPTypeInvariant _ | IPGlobalInvariant _
-      -> Before
-    | IPPredicate _ | IPAssigns _ | IPFrom _
-    | IPExtended _
-    | IPBehavior _
-      -> After
-    | IPReachable _ -> Kernel.fatal "IPReachable(IPReachable _) is not possible"
-  in
-  IPReachable {ir_kf; ir_kinstr; ir_program_point}
+let ip_reachable_ppt = function
+  | IPReachable _ -> Kernel.fatal "IPReachable(IPReachable _) is not possible"
+  | p -> IPReachable (get_ir p)
 
 let ip_of_ensures ip_kf ip_kinstr b (k,ip_pred) =
   IPPredicate {ip_kind=PKEnsures (b, k); ip_kf; ip_kinstr; ip_pred}

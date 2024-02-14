@@ -127,8 +127,9 @@ type identified_reachable = {
   ir_program_point : program_point
 }
 (** [None, Kglobal] --> global property
-    [None, Some ki] --> impossible
-    [Some kf, Kglobal] --> property of a function without code
+    [None, Kstmt stmt] --> impossible
+    [Some kf, Kglobal] -->
+      property of a function without code / Not directly attached to a statement
     [Some kf, Kstmt stmt] --> reachability of the given stmt (and the attached
     properties) *)
 
@@ -503,6 +504,19 @@ val has_status: identified_property -> bool
 
 val get_kinstr: identified_property -> kinstr
 val get_kf: identified_property -> kernel_function option
+
+val get_ir: identified_property -> identified_reachable
+(** For a given property, returns its corresponding [kernel_function], [kinstr]
+    and program point.
+    @since Frama-C+dev *)
+
+val get_prog_state: identified_property -> identified_reachable
+(** Uses [get_ir]. If [ir_kf] is [Some kf] and [ir_kinstr] is
+    [Kglobal], we try to attach a statement depending on [ir_program_point] :
+    the first statement of [kf] for [Before], the return statement of kf for
+    [After].
+    @since Frama-C+dev *)
+
 val get_behavior: identified_property -> funbehavior option
 val get_names: identified_property -> string list
 val get_for_behaviors: identified_property -> string list
