@@ -31,12 +31,6 @@ open Cvalue
 val warn_right_imprecision:
   lval -> Locations.location -> V_Offsetmap.t -> unit
 
-(** [offsetmap_of_lval state lval loc] extracts from state [state] the offsetmap
-    at location [loc], corresponding to the lvalue [lval]. Warns if this
-    offsetmap contains a garbled mix. *)
-val offsetmap_of_lval:
-  Model.t -> lval -> Precise_locs.precise_location -> V_Offsetmap.t
-
 (** Computes the offsetmap for an assignment:
     - in case of a copy, extracts the offsetmap from the state;
     - otherwise, translates the value assigned into an offsetmap. *)

@@ -33,66 +33,6 @@ let warn_locals_escape is_block fundec k locals =
     "locals %a escaping the scope of %t%a through %a"
     Base.Hptset.pretty locals pretty_block Printer.pp_varinfo sv pretty_base k
 
-let warn_imprecise_lval_read lv loc contents =
-  if Self.verbose_atleast 1 then
-    let pretty_gm fmt s =
-      let s = Base.SetLattice.(inject (O.remove Base.null s)) in
-      Base.SetLattice.pretty fmt s
-    in
-    let pretty_param fmt param =
-      match param with
-      | Base.SetLattice.Top -> Format.fprintf fmt "is imprecise"
-      | Base.SetLattice.Set s ->
-        Format.fprintf fmt "is a garbled mix of %a" pretty_gm s
-    in
-    let pretty_param_b fmt param =
-      match param with
-      | Base.SetLattice.Top ->
-        Format.fprintf fmt "The contents@ are imprecise"
-      | Base.SetLattice.Set s ->
-        Format.fprintf fmt "It contains@ a garbled@ mix@ of@ %a" pretty_gm s
-    in
-    let something_to_warn =
-      match loc.loc with
-      | Location_Bits.Top _ -> true
-      | Location_Bits.Map _ ->
-        match contents with
-        | Location_Bytes.Top _ -> true
-        | Location_Bytes.Map _ -> false
-    in
-    if something_to_warn
-    then
-      Self.warning ~wkey:Self.wkey_garbled_mix_read ~current:true ~once:true
-        "@[<v>@[Reading left-value %a.@]@ %t%t%t@]"
-        Printer.pp_lval lv
-        (fun fmt ->
-           match loc.loc with
-           | Location_Bits.Top (param,o) when Origin.is_unknown o  ->
-             Format.fprintf fmt "@[The location %a.@]@ "
-               pretty_param param
-           | Location_Bits.Top (param,orig) ->
-             Format.fprintf fmt "@[The location @[%a@]@ because of@ %a.@]@ "
-               pretty_param param
-               Origin.pretty orig
-           | Location_Bits.Map _ ->
-             match lv with
-             | Mem _, _ ->
-               Format.fprintf fmt "@[The location is @[%a@].@]@ "
-                 Location_Bits.pretty loc.loc
-             | Var _, _ -> ()
-        )
-        (fun fmt ->
-           match contents with
-           | Location_Bytes.Top (param,o) when Origin.is_unknown o ->
-             Format.fprintf fmt "@[%a.@]"
-               pretty_param_b param
-           | Location_Bytes.Top (param,orig) ->
-             Format.fprintf fmt "@[%a@ because of@ %a.@]"
-               pretty_param_b param
-               Origin.pretty orig
-           | Location_Bytes.Map _ -> ())
-        Eva_utils.pp_callstack
-
 (* Auxiliary function for [do_assign] below. When computing the
    result of [lv = exp], warn if the evaluation of [exp] results in
    an imprecision. [loc_lv] is the location pointed to by [lv].

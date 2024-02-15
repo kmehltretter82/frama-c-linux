@@ -93,8 +93,6 @@ let () =
 (* Warning categories. *)
 let wkey_alarm = register_warn_category "alarm"
 let wkey_locals_escaping = register_warn_category "locals-escaping"
-let wkey_garbled_mix_read = register_warn_category "garbled-mix:read"
-let () = set_warn_status wkey_garbled_mix_read Log.Wfeedback
 let wkey_garbled_mix_write = register_warn_category "garbled-mix:write"
 let () = set_warn_status wkey_garbled_mix_write Log.Wfeedback
 let wkey_garbled_mix_assigns = register_warn_category "garbled-mix:assigns"

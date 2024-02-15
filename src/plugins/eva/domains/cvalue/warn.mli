@@ -26,5 +26,4 @@ open Cil_types
 open Locations
 
 val warn_locals_escape: bool -> fundec -> Base.t -> Base.Hptset.t -> unit
-val warn_imprecise_lval_read: lval -> location -> Location_Bytes.t -> unit
 val warn_right_exp_imprecision: lval -> location -> Cvalue.V.t -> unit

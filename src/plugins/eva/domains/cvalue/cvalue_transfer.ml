@@ -115,9 +115,7 @@ exception Do_assign_imprecise_copy
 
 let copy_one_loc state left_lv right_lv =
   let left_lval, left_loc, left_typ = left_lv
-  and right_lval, right_loc, right_typ = right_lv in
-  (* Warn if right_loc is imprecise *)
-  Warn.warn_imprecise_lval_read right_lval right_loc Cvalue.V.bottom;
+  and _right_lval, right_loc, right_typ = right_lv in
   (* top size is tested before this function is called, in which case
      the imprecise copy mode is used. *)
   let size = Int_Base.project right_loc.Locations.size in
@@ -221,11 +219,11 @@ let finalize_call stmt call _recursion ~pre:_ ~post:state =
 let show_expr valuation state fmt expr =
   match expr.enode with
   | Lval lval | StartOf lval ->
-    let record = match valuation.Abstract_domain.find_loc lval with
-      | `Value record -> record
+    let loc = match valuation.Abstract_domain.find_loc lval with
+      | `Value record -> record.loc
       | `Top -> assert false
     in
-    let offsm = Cvalue_offsetmap.offsetmap_of_lval state lval record.loc in
+    let offsm = Bottom.non_bottom (Eval_op.offsetmap_of_loc loc state) in
     let typ = Cil.typeOfLval lval in
     Eval_op.pretty_offsetmap typ fmt offsm
   | _ -> Format.fprintf fmt "%s" (Unicode.top_string ())

@@ -39,18 +39,6 @@ let warn_right_imprecision lval loc offsetmap =
   | Some v -> Warn.warn_right_exp_imprecision lval loc v
   | None -> ()
 
-let warn_if_imprecise lval loc offsm =
-  match offsetmap_contains_imprecision offsm with
-  | Some v ->
-    let loc = Precise_locs.imprecise_location loc in
-    Warn.warn_imprecise_lval_read lval loc v
-  | None -> ()
-
-let offsetmap_of_lval state lval loc =
-  let offsm = Bottom.non_bottom (Eval_op.offsetmap_of_loc loc state) in
-  warn_if_imprecise lval loc offsm;
-  offsm
-
 let offsetmap_of_v ~typ v =
   let size = Integer.of_int (Cil.bitsSizeOf typ) in
   let v = Cvalue.V.anisotropic_cast ~size v in
@@ -58,5 +46,7 @@ let offsetmap_of_v ~typ v =
   Cvalue.V_Offsetmap.create ~size v ~size_v:size
 
 let offsetmap_of_assignment state expr = function
-  | Copy (lv, _value) -> offsetmap_of_lval state lv.lval lv.lloc
-  | Assign value -> offsetmap_of_v ~typ:(Cil.typeOf expr) value
+  | Copy (lv, _value) ->
+    Bottom.non_bottom (Eval_op.offsetmap_of_loc lv.lloc state)
+  | Assign value ->
+    offsetmap_of_v ~typ:(Cil.typeOf expr) value
