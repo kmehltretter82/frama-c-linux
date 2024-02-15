@@ -22,23 +22,6 @@
 
 open Eval
 
-exception Got_imprecise of Cvalue.V.t
-let offsetmap_contains_imprecision offs =
-  try
-    Cvalue.V_Offsetmap.iter_on_values
-      (fun v ->
-         match Cvalue.V_Or_Uninitialized.get_v v with
-         | Locations.Location_Bytes.Map _ -> ()
-         | Locations.Location_Bytes.Top _ as v -> raise (Got_imprecise v)
-      ) offs;
-    None
-  with Got_imprecise v -> Some v
-
-let warn_right_imprecision lval loc offsetmap =
-  match offsetmap_contains_imprecision offsetmap with
-  | Some v -> Warn.warn_right_exp_imprecision lval loc v
-  | None -> ()
-
 let offsetmap_of_v ~typ v =
   let size = Integer.of_int (Cil.bitsSizeOf typ) in
   let v = Cvalue.V.anisotropic_cast ~size v in

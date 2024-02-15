@@ -25,12 +25,6 @@
 open Cil_types
 open Cvalue
 
-(** [warn_right_imprecision lval loc offsm] is used for the assignment of the
-    lvalue [lval] pointing to the location [loc]; it warns if the offsetmap
-    [offsm] contains a garbled mix. *)
-val warn_right_imprecision:
-  lval -> Locations.location -> V_Offsetmap.t -> unit
-
 (** Computes the offsetmap for an assignment:
     - in case of a copy, extracts the offsetmap from the state;
     - otherwise, translates the value assigned into an offsetmap. *)
