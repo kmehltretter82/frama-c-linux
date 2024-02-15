@@ -42,8 +42,7 @@
 [eva:alarm] shift.i:52: Warning: 
   unsigned overflow. assert (unsigned long)((char *)t) << 8 ≤ 4294967295;
 [eva:garbled-mix:write] shift.i:52: 
-  Assigning imprecise value to r.
-  The imprecision originates from Arithmetic {shift.i:52}
+  Assigning imprecise value to r because of arithmetic operation on addresses.
 [eva:alarm] shift.i:53: Warning: 
   pointer downcast. assert (unsigned int)((char *)t) ≤ 2147483647;
 [eva:alarm] shift.i:53: Warning: 
@@ -58,9 +57,6 @@
 [eva:alarm] shift.i:53: Warning: 
   signed overflow.
   assert (long)r + (long)((long)((char *)t) << 8) ≤ 2147483647;
-[eva:garbled-mix:write] shift.i:53: 
-  Assigning imprecise value to r.
-  The imprecision originates from Arithmetic {shift.i:52}
 [eva:alarm] shift.i:58: Warning: 
   unsigned overflow. assert 2U << 31 ≤ 4294967295;
 [eva] Recording results for main

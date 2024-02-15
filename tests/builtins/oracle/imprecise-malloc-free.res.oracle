@@ -13,10 +13,13 @@
 [eva:alarm] imprecise-malloc-free.c:13: Warning: 
   signed overflow. assert i + (int)((int)(&size2) >> 1) ≤ 2147483647;
 [eva:garbled-mix:write] imprecise-malloc-free.c:13: 
-  Assigning imprecise value to size2.
-  The imprecision originates from Arithmetic {imprecise-malloc-free.c:13}
+  Assigning imprecise value to size2
+  because of arithmetic operation on addresses.
 [eva:alarm] imprecise-malloc-free.c:14: Warning: 
   pointer downcast. assert (unsigned int)(&i) ≤ 2147483647;
+[eva:garbled-mix:write] imprecise-malloc-free.c:14: 
+  Assigning imprecise value to size
+  because of arithmetic operation on addresses.
 [eva] imprecise-malloc-free.c:14: Call to builtin malloc
 [eva] imprecise-malloc-free.c:14: allocating variable __malloc_main_l14
 [eva] imprecise-malloc-free.c:15: Call to builtin malloc
@@ -44,12 +47,16 @@
   pointer downcast. assert (unsigned int)(r + 3) ≤ 2147483647;
 [eva:alarm] imprecise-malloc-free.c:25: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 2147483647;
+[eva:garbled-mix:write] imprecise-malloc-free.c:25: 
+  Assigning imprecise value to p because of arithmetic operation on addresses.
 [eva] imprecise-malloc-free.c:25: Call to builtin free
 [eva:alarm] imprecise-malloc-free.c:25: Warning: 
   function free: precondition 'freeable' got status unknown.
 [eva:malloc] imprecise-malloc-free.c:25: weak free on bases: {__malloc_main_l14}
 [eva:alarm] imprecise-malloc-free.c:26: Warning: 
   pointer downcast. assert (unsigned int)r ≤ 2147483647;
+[eva:garbled-mix:write] imprecise-malloc-free.c:26: 
+  Assigning imprecise value to p because of arithmetic operation on addresses.
 [eva] imprecise-malloc-free.c:26: Call to builtin free
 [eva:alarm] imprecise-malloc-free.c:26: Warning: 
   function free: precondition 'freeable' got status unknown.

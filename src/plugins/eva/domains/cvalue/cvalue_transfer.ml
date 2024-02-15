@@ -36,47 +36,31 @@ let unbottomize = function
 (*                        Garbled mix warnings                            *)
 (* ---------------------------------------------------------------------- *)
 
-(* When computing the result of [lv = exp], warn if the evaluation of [exp]
-   results in an imprecision. [loc_lv] is the location pointed to by [lv].
-   [exp_val] is the part of the evaluation of [exp] that is imprecise. *)
-let warn_right_exp_imprecision lv loc_lv exp_val =
-  match exp_val with
-  | Locations.Location_Bytes.Top (topparam, origin) ->
-    Origin.register_write topparam origin;
-    Self.warning ~wkey:Self.wkey_garbled_mix_write ~once:true ~current:true
-      "@[<v>@[Assigning imprecise value to %a%t.@]%a%t@]"
-      Printer.pp_lval lv
-      (fun fmt -> match lv with
-         | (Mem _, _) ->
-           Format.fprintf fmt "@ (pointing to %a)"
-             (Locations.pretty_english ~prefix:false) loc_lv
-         | (Var _, _) -> ())
-      (fun fmt org ->
-         if not (Origin.is_unknown origin) then
-           Format.fprintf fmt
-             "@ @[The imprecision@ originates@ from@ %a@]"
-             Origin.pretty org)
-      origin
-      Eva_utils.pp_callstack
-  | Locations.Location_Bytes.Map _ -> ()
+let warn_imprecise_value lval value =
+  match value with
+  | Locations.Location_Bytes.Top (bases, origin) ->
+    if Origin.register_write bases origin then
+      Self.warning ~wkey:Self.wkey_garbled_mix_write ~once:true ~current:true
+        "@[Assigning imprecise value to %a@ because of %s.@]%t"
+        Printer.pp_lval lval (Origin.descr origin)
+        Eva_utils.pp_callstack
+  | _ -> ()
 
-let offsetmap_contains_imprecision offs =
-  let exception Got_imprecise of Cvalue.V.t in
-  try
-    Cvalue.V_Offsetmap.iter_on_values
-      (fun v ->
-         match Cvalue.V_Or_Uninitialized.get_v v with
-         | Locations.Location_Bytes.Map _ -> ()
-         | Locations.Location_Bytes.Top _ as v -> raise (Got_imprecise v)
-      ) offs;
-    None
-  with Got_imprecise v -> Some v
+let warn_imprecise_location loc =
+  match loc.Locations.loc with
+  | Locations.Location_Bits.Top (Base.SetLattice.Top, orig) ->
+    Self.fatal ~current:true
+      "@[writing at a completely unknown address@ because of %s.@]@\nAborting."
+      (Origin.descr orig)
+  | _ -> ()
 
-let warn_right_imprecision lval loc offsetmap =
-  match offsetmap_contains_imprecision offsetmap with
-  | Some v -> warn_right_exp_imprecision lval loc v
-  | None -> ()
+let warn_imprecise_write lval loc value =
+  warn_imprecise_location loc;
+  warn_imprecise_value lval value
 
+let warn_imprecise_offsm_write lval offsm =
+  let warn v = warn_imprecise_value lval (Cvalue.V_Or_Uninitialized.get_v v) in
+  Cvalue.V_Offsetmap.iter_on_values warn offsm
 
 (* ---------------------------------------------------------------------- *)
 (*                               Assumptions                              *)
@@ -136,26 +120,15 @@ let update valuation t =
 let write_abstract_value state (lval, loc, typ) assigned_value =
   let {v; initialized; escaping} = assigned_value in
   let value = unbottomize v in
-  warn_right_exp_imprecision lval loc value;
   let value =
     if Cil.typeHasQualifier "volatile" typ
     then Cvalue_forward.make_volatile value
     else value
   in
-  match loc.Locations.loc with
-  | Locations.Location_Bits.Top (Base.SetLattice.Top, orig) ->
-    Self.result
-      "State before degeneration:@\n======%a@\n======="
-      Cvalue.Model.pretty state;
-    Self.fatal ~current:true
-      "writing at a completely unknown address@[%a@].@\nAborting."
-      Origin.pretty_as_reason orig
-  | _ ->
-    let exact = Locations.cardinal_zero_or_one loc in
-    let value =
-      Cvalue.V_Or_Uninitialized.make ~initialized ~escaping value in
-    (* let value = Cvalue.V_Or_Uninitialized.initialized value in *)
-    add_indeterminate_binding ~exact state loc value
+  warn_imprecise_write lval loc value;
+  let exact = Locations.cardinal_zero_or_one loc in
+  let value = Cvalue.V_Or_Uninitialized.make ~initialized ~escaping value in
+  Cvalue.Model.add_indeterminate_binding ~exact state loc value;
 
 exception Do_assign_imprecise_copy
 
@@ -183,7 +156,7 @@ let copy_one_loc state left_lv right_lv =
     in
     if not (Eval_typ.offsetmap_matches_type left_typ offsetmap) then
       raise Do_assign_imprecise_copy;
-    warn_right_imprecision left_lval left_loc offsetmap;
+    warn_imprecise_offsm_write left_lval offsetmap;
     `Value
       (paste_offsetmap ~exact:true
          ~from:offsetmap ~dst_loc:left_loc.Locations.loc ~size state)
@@ -243,6 +216,7 @@ let actualize_formals state arguments =
     let offsm =
       Cvalue_offsetmap.offsetmap_of_assignment state arg.concrete arg.avalue
     in
+    warn_imprecise_offsm_write (Cil.var arg.formal) offsm;
     Cvalue.Model.add_base (Base.of_varinfo arg.formal) offsm state
   in
   List.fold_left treat_one_formal state arguments

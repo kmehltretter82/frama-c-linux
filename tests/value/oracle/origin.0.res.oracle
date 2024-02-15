@@ -61,8 +61,8 @@
 [eva:alarm] origin.i:14: Warning: 
   signed overflow. assert -((int)((int *)ta1)) ≤ 2147483647;
 [eva:garbled-mix:write] origin.i:14: 
-  Assigning imprecise value to pa1.
-  The imprecision originates from Arithmetic {origin.i:14}
+  Assigning imprecise value to pa1
+  because of arithmetic operation on addresses.
 [eva:alarm] origin.i:15: Warning: out of bounds write. assert \valid(pa1);
 [eva] Recording results for origin_arithmetic_1
 [eva] Done for function origin_arithmetic_1
@@ -75,11 +75,8 @@
 [eva:alarm] origin.i:19: Warning: 
   signed overflow. assert -((int)((int *)ta2)) ≤ 2147483647;
 [eva:garbled-mix:write] origin.i:19: 
-  Assigning imprecise value to pa2.
-  The imprecision originates from Arithmetic {origin.i:19}
-[eva:garbled-mix:write] origin.i:20: 
-  Assigning imprecise value to qa2.
-  The imprecision originates from Arithmetic {origin.i:19}
+  Assigning imprecise value to pa2
+  because of arithmetic operation on addresses.
 [eva:alarm] origin.i:20: Warning: 
   pointer downcast. assert (unsigned int)((int *)tta2) ≤ 2147483647;
 [eva:alarm] origin.i:20: Warning: 
@@ -87,8 +84,8 @@
 [eva:alarm] origin.i:20: Warning: 
   signed overflow. assert -((int)((int *)tta2)) ≤ 2147483647;
 [eva:garbled-mix:write] origin.i:20: 
-  Assigning imprecise value to qa2.
-  The imprecision originates from Arithmetic {origin.i:20}
+  Assigning imprecise value to qa2
+  because of arithmetic operation on addresses.
 [eva:alarm] origin.i:21: Warning: out of bounds write. assert \valid(qa2);
 [eva:alarm] origin.i:21: Warning: 
   pointer downcast. assert (unsigned int)(&aa2) ≤ 2147483647;
@@ -103,8 +100,8 @@
 [eva:alarm] origin.i:25: Warning: 
   signed overflow. assert -((int)((int *)ta3)) ≤ 2147483647;
 [eva:garbled-mix:write] origin.i:25: 
-  Assigning imprecise value to pa3.
-  The imprecision originates from Arithmetic {origin.i:25}
+  Assigning imprecise value to pa3
+  because of arithmetic operation on addresses.
 [eva:alarm] origin.i:26: Warning: out of bounds write. assert \valid(pa3);
 [eva] Recording results for origin_arithmetic_3
 [eva] Done for function origin_arithmetic_3
@@ -132,23 +129,18 @@
   Called from origin.i:100.
 [eva] using specification for function gp
 [eva] Done for function gp
-[eva:garbled-mix:write] origin.i:100: 
-  Assigning imprecise value to pl.
-  The imprecision originates from Library function {origin.i:100}
 [eva:alarm] origin.i:101: Warning: out of bounds read. assert \valid_read(pl);
 [eva] computing for function origin_misalign_1 <- main.
   Called from origin.i:102.
 [eva:garbled-mix:write] origin.i:48: 
-  Assigning imprecise value to pm1.
-  The imprecision originates from Misaligned {origin.i:48}
+  Assigning imprecise value to pm1 because of misaligned read of addresses.
 [eva:alarm] origin.i:49: Warning: out of bounds write. assert \valid(pm1);
 [eva] Recording results for origin_misalign_1
 [eva] Done for function origin_misalign_1
 [eva] computing for function origin_misalign_2 <- main.
   Called from origin.i:103.
 [eva:garbled-mix:write] origin.i:54: 
-  Assigning imprecise value to qm2.
-  The imprecision originates from Misaligned {origin.i:54}
+  Assigning imprecise value to qm2 because of misaligned read of addresses.
 [eva] origin.i:55: 
   Frama_C_show_each:
   {{ garbled mix of &{a; b} (origin: Misaligned {origin.i:54}) }}
@@ -184,8 +176,8 @@
 [eva:alarm] origin.i:85: Warning: 
   signed overflow. assert -((int)(&arg)) ≤ 2147483647;
 [eva:garbled-mix:write] origin.i:85: 
-  Assigning imprecise value to esc3.
-  The imprecision originates from Arithmetic {origin.i:85}
+  Assigning imprecise value to esc3
+  because of arithmetic operation on addresses.
 [eva:alarm] origin.i:87: Warning: 
   pointer downcast. assert (unsigned int)(&local1) ≤ 2147483647;
 [eva:alarm] origin.i:88: Warning: 

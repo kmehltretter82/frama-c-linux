@@ -8,9 +8,6 @@
   Called from spawn_h.c:36.
 [eva] using specification for function getopt
 [eva] Done for function getopt
-[eva:garbled-mix:write] spawn_h.c:36: 
-  Assigning imprecise value to opt.
-  The imprecision originates from Library function {spawn_h.c:36}
 [kernel:annot:missing-spec] spawn_h.c:43: Warning: 
   Neither code nor specification for function posix_spawn_file_actions_init,
    generating default assigns. See -generated-spec-* options for more info
@@ -148,6 +145,8 @@
 [eva] Done for function exit
 [eva:alarm] spawn_h.c:82: Warning: 
   out of bounds read. assert \valid_read(argv + optind);
+[eva:garbled-mix:write] spawn_h.c:82: 
+  Assigning imprecise value to file because of misaligned read of addresses.
 [kernel:annot:missing-spec] spawn_h.c:82: Warning: 
   Neither code nor specification for function posix_spawnp,
    generating default assigns. See -generated-spec-* options for more info

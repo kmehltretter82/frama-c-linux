@@ -14,20 +14,7 @@
   pointer downcast. assert (unsigned int)(&d + 1) ≤ 2147483647;
 [eva:garbled-mix:write] label.i:18: 
   Assigning imprecise value to *((char *)(& p) + i)
-  (pointing to p with offsets {0}).
-  The imprecision originates from Misaligned {label.i:18}
-[eva:garbled-mix:write] label.i:18: 
-  Assigning imprecise value to *((char *)(& p) + i)
-  (pointing to p with offsets {0; 8}).
-  The imprecision originates from Misaligned {label.i:18}
-[eva:garbled-mix:write] label.i:18: 
-  Assigning imprecise value to *((char *)(& p) + i)
-  (pointing to p with offsets {0; 8; 16}).
-  The imprecision originates from Misaligned {label.i:18}
-[eva:garbled-mix:write] label.i:18: 
-  Assigning imprecise value to *((char *)(& p) + i)
-  (pointing to p with offsets {0; 8; 16; 24}).
-  The imprecision originates from Misaligned {label.i:18}
+  because of misaligned read of addresses.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

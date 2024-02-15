@@ -13,8 +13,7 @@
 [eva:alarm] degeneration2.i:14: Warning: 
   signed overflow. assert -((int)A) ≤ 2147483647;
 [eva:garbled-mix:write] degeneration2.i:14: 
-  Assigning imprecise value to A.
-  The imprecision originates from Arithmetic {degeneration2.i:14}
+  Assigning imprecise value to A because of arithmetic operation on addresses.
 [eva:alarm] degeneration2.i:17: Warning: 
   accessing uninitialized left-value. assert \initialized((int *)A);
 [eva:alarm] degeneration2.i:17: Warning: 

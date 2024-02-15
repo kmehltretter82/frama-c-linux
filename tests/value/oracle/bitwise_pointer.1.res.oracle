@@ -32,15 +32,13 @@
 [eva:alarm] bitwise_pointer.i:18: Warning: 
   pointer downcast. assert (unsigned int)(&t[7]) ≤ 2147483647;
 [eva:garbled-mix:write] bitwise_pointer.i:18: 
-  Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {bitwise_pointer.i:18}
+  Assigning imprecise value to p because of arithmetic operation on addresses.
 [eva:alarm] bitwise_pointer.i:19: Warning: 
   out of bounds write. assert \valid(p);
 [eva:alarm] bitwise_pointer.i:22: Warning: 
   pointer downcast. assert (unsigned int)(&t1[mask]) ≤ 2147483647;
 [eva:garbled-mix:write] bitwise_pointer.i:22: 
-  Assigning imprecise value to p1.
-  The imprecision originates from Arithmetic {bitwise_pointer.i:22}
+  Assigning imprecise value to p1 because of arithmetic operation on addresses.
 [eva:alarm] bitwise_pointer.i:23: Warning: 
   out of bounds write. assert \valid(p1);
 [eva] Recording results for main

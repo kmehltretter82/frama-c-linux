@@ -60,11 +60,9 @@
 [eva] using specification for function f
 [eva] Done for function f
 [eva:garbled-mix:write] origin.i:126: 
-  Assigning imprecise value to r.p.
-  The imprecision originates from Misaligned {origin.i:126}
+  Assigning imprecise value to r.p because of misaligned read of addresses.
 [eva:garbled-mix:write] origin.i:129: 
-  Assigning imprecise value to r.t[0].
-  The imprecision originates from Merge {origin.i:129}
+  Assigning imprecise value to r.t[0] because of imprecise merge of addresses.
 [eva:alarm] origin.i:130: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:alarm] origin.i:130: Warning: 
@@ -72,11 +70,8 @@
 [eva:alarm] origin.i:130: Warning: 
   signed overflow. assert -((int)(&x)) ≤ 2147483647;
 [eva:garbled-mix:write] origin.i:130: 
-  Assigning imprecise value to r.t[1].
-  The imprecision originates from Arithmetic {origin.i:130}
-[eva:garbled-mix:write] origin.i:131: 
-  Assigning imprecise value to \result<origin>.
-  The imprecision originates from Misaligned {origin.i:126}
+  Assigning imprecise value to r.t[1]
+  because of arithmetic operation on addresses.
 [eva] Recording results for origin
 [eva] Done for function origin
 [eva] ====== VALUES COMPUTED ======

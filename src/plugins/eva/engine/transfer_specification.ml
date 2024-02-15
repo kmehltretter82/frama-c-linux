@@ -314,12 +314,12 @@ module Make
         begin
           match cvalue with
           | Top (bases, origin) ->
-            Origin.register_write bases origin;
-            Self.warning ~current:true ~once:true
-              ~wkey:Self.wkey_garbled_mix_assigns
-              "The specification of function %a has generated a garbled mix \
-               for %a."
-              Kernel_function.pretty kf pp_assign_clause (Assign, assign)
+            if Origin.register_write bases origin then
+              Self.warning ~current:true ~once:true
+                ~wkey:Self.wkey_garbled_mix_assigns
+                "@[The specification of function %a@ has generated \
+                 a garbled mix of addresses@ for %a.@]"
+                Kernel_function.pretty kf pp_assign_clause (Assign, assign)
           | _ -> ()
         end
     in

@@ -40,9 +40,6 @@
   Called from leaf.i:50.
 [eva] using specification for function f_int_star_int
 [eva] Done for function f_int_star_int
-[eva:garbled-mix:write] leaf.i:50: 
-  Assigning imprecise value to p.
-  The imprecision originates from Library function {leaf.i:50}
 [eva] leaf.i:51: Frama_C_show_each_F: [-2147483648..2147483647]
 [eva:alarm] leaf.i:52: Warning: out of bounds write. assert \valid(p);
 [eva] leaf.i:53: Frama_C_show_each_F: {5}
@@ -50,9 +47,6 @@
   Called from leaf.i:55.
 [eva] using specification for function f_int_star_int_star_int
 [eva] Done for function f_int_star_int_star_int
-[eva:garbled-mix:write] leaf.i:55: 
-  Assigning imprecise value to pp.
-  The imprecision originates from Library function {leaf.i:55}
 [eva] leaf.i:56: Frama_C_show_each_G: {{ &g }}
 [eva] leaf.i:57: Frama_C_show_each_F: {5}
 [eva] leaf.i:59: Frama_C_show_each_G: {{ &g }}
@@ -92,9 +86,6 @@
   Called from leaf.i:68.
 [eva] using specification for function f_st_star_cint_st_star_cint
 [eva] Done for function f_st_star_cint_st_star_cint
-[eva:garbled-mix:write] leaf.i:68: 
-  Assigning imprecise value to st_star_cint_1.
-  The imprecision originates from Library function {leaf.i:68}
 [kernel:annot:missing-spec] leaf.i:69: Warning: 
   Neither code nor specification for function f_st_star_int_st_star_int,
    generating default assigns. See -generated-spec-* options for more info
@@ -102,9 +93,6 @@
   Called from leaf.i:69.
 [eva] using specification for function f_st_star_int_st_star_int
 [eva] Done for function f_st_star_int_st_star_int
-[eva:garbled-mix:write] leaf.i:69: 
-  Assigning imprecise value to st_star_int_1.
-  The imprecision originates from Library function {leaf.i:69}
 [kernel:annot:missing-spec] leaf.i:70: Warning: 
   Neither code nor specification for function f_st_tab3_int_st_tab3_int,
    generating default assigns. See -generated-spec-* options for more info

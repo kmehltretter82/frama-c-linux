@@ -146,9 +146,6 @@
   Called from reduce_by_valid.i:272.
 [eva] using specification for function garbled_mix
 [eva] Done for function garbled_mix
-[eva:garbled-mix:write] reduce_by_valid.i:272: 
-  Assigning imprecise value to p.
-  The imprecision originates from Library function {reduce_by_valid.i:272}
 [eva] reduce_by_valid.i:273: 
   Frama_C_show_each_gm:
   {{ garbled mix of &{x; a}
@@ -171,9 +168,6 @@
 [eva] computing for function garbled_mix <- main12 <- main.
   Called from reduce_by_valid.i:290.
 [eva] Done for function garbled_mix
-[eva:garbled-mix:write] reduce_by_valid.i:290: 
-  Assigning imprecise value to r.
-  The imprecision originates from Library function {reduce_by_valid.i:290}
 [eva:alarm] reduce_by_valid.i:291: Warning: assertion got status unknown.
 [eva] Recording results for main12
 [eva] Done for function main12

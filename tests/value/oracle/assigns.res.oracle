@@ -50,6 +50,9 @@
   signed overflow. assert -2147483648 ≤ 2 * (int)(&T);
 [eva:alarm] assigns.i:51: Warning: 
   signed overflow. assert 2 * (int)(&T) ≤ 2147483647;
+[eva:garbled-mix:write] assigns.i:51: 
+  Assigning imprecise value to len
+  because of arithmetic operation on addresses.
 [eva] computing for function g <- main1 <- main.
   Called from assigns.i:51.
 [eva] using specification for function g
@@ -60,6 +63,8 @@
   signed overflow. assert -2147483648 ≤ 2 * (int)(&t3);
 [eva:alarm] assigns.i:52: Warning: 
   signed overflow. assert 2 * (int)(&t3) ≤ 2147483647;
+[eva:garbled-mix:write] assigns.i:52: 
+  Assigning imprecise value to p because of arithmetic operation on addresses.
 [eva] computing for function h <- main1 <- main.
   Called from assigns.i:52.
 [eva] using specification for function h

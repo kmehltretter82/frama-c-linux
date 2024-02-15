@@ -22,8 +22,7 @@
 [eva:alarm] alloc.c:51: Warning: 
   signed overflow. assert -((int)q) ≤ 2147483647;
 [eva:garbled-mix:write] alloc.c:51: 
-  Assigning imprecise value to r.
-  The imprecision originates from Arithmetic {alloc.c:51}
+  Assigning imprecise value to r because of arithmetic operation on addresses.
 [eva:alarm] alloc.c:54: Warning: out of bounds write. assert \valid(r);
 [eva:alarm] alloc.c:54: Warning: 
   pointer downcast. assert (unsigned int)r ≤ 2147483647;

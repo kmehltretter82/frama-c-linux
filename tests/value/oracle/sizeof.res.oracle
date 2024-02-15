@@ -21,8 +21,7 @@
 [eva:alarm] sizeof.i:32: Warning: 
   pointer downcast. assert (unsigned int)(&s1) ≤ 2147483647;
 [eva:garbled-mix:write] sizeof.i:32: 
-  Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {sizeof.i:32}
+  Assigning imprecise value to p because of arithmetic operation on addresses.
 [eva:alarm] sizeof.i:33: Warning: 
   accessing out of bounds index.
   assert (unsigned int)(sizeof(int [10]) - (unsigned int)i) < 10;

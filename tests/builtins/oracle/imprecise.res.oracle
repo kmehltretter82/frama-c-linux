@@ -51,8 +51,7 @@
 [eva:alarm] imprecise.c:19: Warning: 
   pointer downcast. assert (unsigned int)(&k) ≤ 2147483647;
 [eva:garbled-mix:write] imprecise.c:19: 
-  Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {imprecise.c:19}
+  Assigning imprecise value to p because of arithmetic operation on addresses.
 [eva:alarm] imprecise.c:20: Warning: out of bounds write. assert \valid(p);
 [eva] imprecise.c:21: 
   Frama_C_dump_each:
@@ -121,8 +120,7 @@
 [eva:alarm] imprecise.c:68: Warning: 
   signed overflow. assert (int)*((char *)(&p)) + 0 ≤ 2147483647;
 [eva:garbled-mix:write] imprecise.c:68: 
-  Assigning imprecise value to c3.
-  The imprecision originates from Misaligned {imprecise.c:68}
+  Assigning imprecise value to c3 because of misaligned read of addresses.
 [eva] Recording results for cast_address
 [from] Computing for function cast_address
 [from] Done for function cast_address

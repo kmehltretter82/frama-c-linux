@@ -235,11 +235,7 @@
 [eva:alarm] gauges.c:188: Warning: 
   signed overflow. assert (int)p + (int)q ≤ 2147483647;
 [eva:garbled-mix:write] gauges.c:188: 
-  Assigning imprecise value to z.
-  The imprecision originates from Arithmetic {gauges.c:188}
-[eva:garbled-mix:write] gauges.c:189: 
-  Assigning imprecise value to r.
-  The imprecision originates from Arithmetic {gauges.c:188}
+  Assigning imprecise value to z because of arithmetic operation on addresses.
 [eva:alarm] gauges.c:190: Warning: out of bounds write. assert \valid(r);
 [eva:alarm] gauges.c:192: Warning: out of bounds write. assert \valid(p);
 [eva:alarm] gauges.c:193: Warning: out of bounds write. assert \valid(q);

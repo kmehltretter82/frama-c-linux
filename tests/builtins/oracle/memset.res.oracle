@@ -28,6 +28,8 @@
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva:alarm] memset.c:34: Warning: 
   pointer downcast. assert (unsigned int)((int *)t2) ≤ 2147483647;
+[eva:garbled-mix:write] memset.c:34: 
+  Assigning imprecise value to s because of arithmetic operation on addresses.
 [eva] memset.c:34: Call to builtin memset
 [eva:alarm] memset.c:34: Warning: 
   function memset: precondition 'valid_s' got status unknown.

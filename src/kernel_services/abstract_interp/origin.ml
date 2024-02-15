@@ -94,6 +94,16 @@ let pretty_as_reason fmt org =
   if not (is_unknown org)
   then Format.fprintf fmt " because of %a" pretty org
 
+let descr = function
+  | Unknown -> "unknown origin"
+  | Well -> "well in initial state"
+  | Origin { kind } ->
+    match kind with
+    | Misalign_read -> "misaligned read of addresses"
+    | Leaf -> "assigns clause on addresses"
+    | Merge -> "imprecise merge of addresses"
+    | Arith -> "arithmetic operation on addresses"
+
 let join t1 t2 =
   if t1 == t2 then t1 else
     match t1, t2 with
@@ -121,9 +131,10 @@ module History = State_builder.Hashtbl (Hashtbl) (History_Data) (History_Info)
 let clear () = Id.reset (); History.clear ()
 
 let register_write bases t =
-  if not (is_unknown t) then
+  if is_unknown t then false else
     let change (w, r, b) = w+1, r, Base.SetLattice.join b bases in
-    ignore (History.memo ~change (fun _ -> 1, 0, bases) t)
+    let count, _, _ = History.memo ~change (fun _ -> 1, 0, bases) t in
+    count < 2 && is_current t
 
 let register_read bases t =
   if not (is_unknown t || is_current t) then
@@ -144,15 +155,9 @@ let pretty_origin fmt origin =
   match origin with
   | Unknown -> Format.fprintf fmt "Unknown origin"
   | Well -> Format.fprintf fmt "Initial state"
-  | Origin { kind; loc; } ->
-    let kind =
-      match kind with
-      | Misalign_read -> "misaligned read of addresses"
-      | Leaf -> "interpretation of assigns clause"
-      | Merge -> "imprecise merge of addresses"
-      | Arith -> "arithmetic operation on addresses"
-    in
-    Format.fprintf fmt "%a: %s" Cil_datatype.Location.pretty loc kind
+  | Origin { loc } ->
+    Format.fprintf fmt "%a: %s"
+      Cil_datatype.Location.pretty loc (descr origin)
 
 let pretty_history fmt =
   let list = get_history () in

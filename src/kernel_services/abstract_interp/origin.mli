@@ -47,12 +47,17 @@ val pretty_as_reason: Format.formatter -> t -> unit
 (** Pretty-print [because of <origin>] if the origin is not {!Unknown}, or
     nothing otherwise *)
 
+val descr: t -> string
+
 val join: t -> t -> t
 val is_included: t -> t -> bool
 
 (** Records the write of an imprecise value of the given bases,
-    with the given origin. *)
-val register_write: Base.SetLattice.t -> t -> unit
+    with the given origin.
+    Returns [true] if the given origin has never been written before,
+    and if it is related to the current location — in which case a warning
+    should be emitted. *)
+val register_write: Base.SetLattice.t -> t -> bool
 
 (** Records the read of an imprecise value of the given bases,
     with the given origin. *)

@@ -640,6 +640,8 @@
 [eva] Done for function strchr_unbounded
 [eva] computing for function strchr_invalid <- main.
   Called from strchr.c:561.
+[eva:garbled-mix:write] strchr.c:536: 
+  Assigning imprecise value to s because of arithmetic operation on addresses.
 [eva] strchr.c:536: Call to builtin strchr
 [eva:alarm] strchr.c:536: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
@@ -659,8 +661,8 @@
 [eva:alarm] strchr.c:541: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:garbled-mix:write] strchr.c:541: 
-  Assigning imprecise value to garbled.
-  The imprecision originates from Arithmetic {strchr.c:541}
+  Assigning imprecise value to garbled
+  because of arithmetic operation on addresses.
 [eva:alarm] strchr.c:542: Warning: 
   pointer downcast. assert (unsigned int)garbled ≤ 2147483647;
 [eva] strchr.c:542: Call to builtin strchr

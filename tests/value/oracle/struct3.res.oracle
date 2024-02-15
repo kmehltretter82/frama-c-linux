@@ -24,8 +24,8 @@
 [eva:alarm] struct3.i:46: Warning: 
   pointer downcast. assert (unsigned int)(s2.c + (int)s2.c) ≤ 2147483647;
 [eva:garbled-mix:write] struct3.i:46: Warning: 
-  Assigning imprecise value to s2.a.
-  The imprecision originates from Arithmetic {struct3.i:46}
+  Assigning imprecise value to s2.a
+  because of arithmetic operation on addresses.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] struct3.i:42: assertion 'Eva,index_bound' got final status invalid.

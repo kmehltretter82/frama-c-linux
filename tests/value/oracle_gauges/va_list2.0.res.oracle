@@ -1,4 +1,4 @@
-48a49,60
+36a37,48
 > [eva] va_list2.c:16: 
 >   Frama_C_show_each_i:
 >   {{ garbled mix of &{S_0_S___va_params; S_1_S___va_params} (origin: Well) }}

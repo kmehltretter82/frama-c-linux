@@ -57,27 +57,23 @@
 [eva:alarm] addition.i:34: Warning: 
   signed overflow. assert &p2 - &p3 ≤ 2147483647;
 [eva:garbled-mix:write] addition.i:34: Warning: 
-  Assigning imprecise value to p1.
-  The imprecision originates from Arithmetic {addition.i:34}
+  Assigning imprecise value to p1 because of arithmetic operation on addresses.
 [eva:alarm] addition.i:36: Warning: 
   pointer downcast. assert (unsigned int)(&p1) ≤ 2147483647;
 [eva:garbled-mix:write] addition.i:36: Warning: 
-  Assigning imprecise value to p2.
-  The imprecision originates from Arithmetic {addition.i:36}
+  Assigning imprecise value to p2 because of arithmetic operation on addresses.
 [eva:alarm] addition.i:38: Warning: 
   pointer downcast. assert (unsigned int)(&p1) ≤ 127;
 [eva:alarm] addition.i:38: Warning: 
   pointer downcast. assert (unsigned int)(&t[(char)(&p1)]) ≤ 2147483647;
 [eva:garbled-mix:write] addition.i:38: Warning: 
-  Assigning imprecise value to p3.
-  The imprecision originates from Arithmetic {addition.i:38}
+  Assigning imprecise value to p3 because of arithmetic operation on addresses.
 [eva:alarm] addition.i:40: Warning: 
   pointer downcast. assert (unsigned int)(&p1) ≤ 127;
 [eva:alarm] addition.i:40: Warning: 
   pointer downcast. assert (unsigned int)(&tt[(char)(&p1)].a) ≤ 2147483647;
 [eva:garbled-mix:write] addition.i:40: Warning: 
-  Assigning imprecise value to p4.
-  The imprecision originates from Arithmetic {addition.i:40}
+  Assigning imprecise value to p4 because of arithmetic operation on addresses.
 [eva:alarm] addition.i:42: Warning: 
   pointer downcast. assert (unsigned int)(&p1) ≤ 127;
 [eva:alarm] addition.i:42: Warning: 
@@ -86,24 +82,21 @@
   pointer downcast.
   assert (unsigned int)(&ttt[(char)(&p1)][(char)(&p2)]) ≤ 2147483647;
 [eva:garbled-mix:write] addition.i:42: Warning: 
-  Assigning imprecise value to p5.
-  The imprecision originates from Arithmetic {addition.i:42}
+  Assigning imprecise value to p5 because of arithmetic operation on addresses.
 [eva:alarm] addition.i:44: Warning: 
   pointer downcast. assert (unsigned int)(&p1) ≤ 127;
 [eva:alarm] addition.i:44: Warning: 
   pointer downcast.
   assert (unsigned int)(&ttt[(char)(&p1)][u2]) ≤ 2147483647;
 [eva:garbled-mix:write] addition.i:44: Warning: 
-  Assigning imprecise value to p6.
-  The imprecision originates from Arithmetic {addition.i:44}
+  Assigning imprecise value to p6 because of arithmetic operation on addresses.
 [eva:alarm] addition.i:46: Warning: 
   pointer downcast. assert (unsigned int)(&p2) ≤ 127;
 [eva:alarm] addition.i:46: Warning: 
   pointer downcast.
   assert (unsigned int)(&ttt[u2][(char)(&p2)]) ≤ 2147483647;
 [eva:garbled-mix:write] addition.i:46: Warning: 
-  Assigning imprecise value to p7.
-  The imprecision originates from Arithmetic {addition.i:46}
+  Assigning imprecise value to p7 because of arithmetic operation on addresses.
 [eva:alarm] addition.i:48: Warning: 
   pointer comparison.
   assert \pointer_comparable((void *)(&p1 + 1), (void *)(&p2));
@@ -114,34 +107,31 @@
 [eva:alarm] addition.i:50: Warning: 
   signed overflow. assert (int)(&p1) / 2 ≤ 2147483647;
 [eva:garbled-mix:write] addition.i:50: Warning: 
-  Assigning imprecise value to p9.
-  The imprecision originates from Arithmetic {addition.i:50}
+  Assigning imprecise value to p9 because of arithmetic operation on addresses.
 [eva:alarm] addition.i:52: Warning: 
   pointer downcast. assert (unsigned int)(&p1) ≤ 2147483647;
 [eva:garbled-mix:write] addition.i:52: Warning: 
-  Assigning imprecise value to p10.
-  The imprecision originates from Arithmetic {addition.i:52}
+  Assigning imprecise value to p10
+  because of arithmetic operation on addresses.
 [eva:alarm] addition.i:56: Warning: 
   pointer downcast. assert (unsigned int)(&p1) ≤ 2147483647;
 [eva:alarm] addition.i:56: Warning: 
   pointer downcast. assert (unsigned int)(&p2) ≤ 2147483647;
 [eva:garbled-mix:write] addition.i:56: Warning: 
-  Assigning imprecise value to p12.
-  The imprecision originates from Arithmetic {addition.i:56}
+  Assigning imprecise value to p12
+  because of arithmetic operation on addresses.
 [eva:alarm] addition.i:59: Warning: 
   signed overflow. assert -2147483648 ≤ (int)*((char *)(&q1)) + 2;
 [eva:alarm] addition.i:59: Warning: 
   signed overflow. assert (int)*((char *)(&q1)) + 2 ≤ 2147483647;
 [eva:garbled-mix:write] addition.i:59: Warning: 
-  Assigning imprecise value to p13.
-  The imprecision originates from Misaligned {addition.i:59}
+  Assigning imprecise value to p13 because of misaligned read of addresses.
 [eva:alarm] addition.i:61: Warning: 
   signed overflow. assert -2147483648 ≤ (int)*((char *)(&q1)) + 2;
 [eva:alarm] addition.i:61: Warning: 
   signed overflow. assert (int)*((char *)(&q1)) + 2 ≤ 2147483647;
 [eva:garbled-mix:write] addition.i:61: Warning: 
-  Assigning imprecise value to p14.
-  The imprecision originates from Misaligned {addition.i:61}
+  Assigning imprecise value to p14 because of misaligned read of addresses.
 [eva:alarm] addition.i:66: Warning: 
   out of bounds read. assert \valid_read(*((int **)45));
 [eva] addition.i:87: Frama_C_show_each_1: [-10..15]

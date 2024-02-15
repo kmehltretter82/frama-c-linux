@@ -416,9 +416,6 @@
 [eva] computing for function abs <- int_abs <- main.
   Called from logic.c:411.
 [eva] Done for function abs
-[eva:garbled-mix:write] logic.c:411: 
-  Assigning imprecise value to x_0.
-  The imprecision originates from Library function {logic.c:411}
 [eva] logic.c:412: 
   Frama_C_show_each_gm:
   {{ garbled mix of &{x_0} (origin: Library function {logic.c:411}) }}

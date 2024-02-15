@@ -40,16 +40,10 @@
 [eva] computing for function gm <- main3 <- main.
   Called from backward_add_ptr.c:75.
 [eva:garbled-mix:write] backward_add_ptr.c:68: Warning: 
-  Assigning imprecise value to __retres.
-  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
-[eva:garbled-mix:write] backward_add_ptr.c:68: Warning: 
-  Assigning imprecise value to \result<gm>.
-  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
+  Assigning imprecise value to __retres
+  because of arithmetic operation on addresses.
 [eva] Recording results for gm
 [eva] Done for function gm
-[eva:garbled-mix:write] backward_add_ptr.c:75: Warning: 
-  Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:81: Warning: 
   out of bounds read. assert \valid_read(p + (uintptr_t)q);
 [eva] backward_add_ptr.c:82: 
@@ -62,18 +56,12 @@
   {{ NULL + {0; 1; 2; 3} ; &a + [-4294967295..3] }},
   {{ NULL + [0..4294967295] ; &b }}
 [eva] backward_add_ptr.c:91: Reusing old results for call to gm
-[eva:garbled-mix:write] backward_add_ptr.c:91: Warning: 
-  Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:96: Warning: 
   out of bounds read. assert \valid_read(p + (uintptr_t)q);
 [eva] computing for function gm <- main3 <- main.
   Called from backward_add_ptr.c:100.
 [eva] Recording results for gm
 [eva] Done for function gm
-[eva:garbled-mix:write] backward_add_ptr.c:100: Warning: 
-  Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:106: Warning: 
   out of bounds read. assert \valid_read(p + (uintptr_t)q);
 [eva] backward_add_ptr.c:107: 
@@ -82,9 +70,6 @@
   (origin: Arithmetic {backward_add_ptr.c:68}) }},
   {{ NULL + [0..4294967295] ; &b }}
 [eva] backward_add_ptr.c:110: Reusing old results for call to gm
-[eva:garbled-mix:write] backward_add_ptr.c:110: Warning: 
-  Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:115: Warning: 
   out of bounds read. assert \valid_read((char *)p + (uintptr_t)q);
 [eva] backward_add_ptr.c:116: Frama_C_show_each_GM_only_c: {0}, {{ &c }}
@@ -94,9 +79,6 @@
   Frama_C_show_each_GM_only_b:
   {{ &b + [-17179869180..0],0%4 }}, [0..4294967295]
 [eva] backward_add_ptr.c:125: Reusing old results for call to gm
-[eva:garbled-mix:write] backward_add_ptr.c:125: Warning: 
-  Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:130: Warning: 
   out of bounds read. assert \valid_read((char *)p + (uintptr_t)q);
 [eva:alarm] backward_add_ptr.c:136: Warning: 
@@ -114,19 +96,10 @@
   Called from backward_add_ptr.c:145.
 [eva] Recording results for gm
 [eva] Done for function gm
-[eva:garbled-mix:write] backward_add_ptr.c:145: Warning: 
-  Assigning imprecise value to tmp_0.
-  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
-[eva:garbled-mix:write] backward_add_ptr.c:145: Warning: 
-  Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva] computing for function gm <- main4 <- main.
   Called from backward_add_ptr.c:146.
 [eva] Recording results for gm
 [eva] Done for function gm
-[eva:garbled-mix:write] backward_add_ptr.c:146: Warning: 
-  Assigning imprecise value to q.
-  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:150: Warning: 
   out of bounds read. assert \valid_read(p + (uintptr_t)q);
 [eva] backward_add_ptr.c:151: 
@@ -143,16 +116,10 @@
   (origin: Arithmetic {backward_add_ptr.c:68}) }},
   [0..4294967295]
 [eva] backward_add_ptr.c:160: Reusing old results for call to gm
-[eva:garbled-mix:write] backward_add_ptr.c:160: Warning: 
-  Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva] computing for function gm <- main4 <- main.
   Called from backward_add_ptr.c:161.
 [eva] Recording results for gm
 [eva] Done for function gm
-[eva:garbled-mix:write] backward_add_ptr.c:161: Warning: 
-  Assigning imprecise value to q.
-  The imprecision originates from Arithmetic {backward_add_ptr.c:68}
 [eva:alarm] backward_add_ptr.c:165: Warning: 
   out of bounds read. assert \valid_read((char *)p + (uintptr_t)q);
 [eva] backward_add_ptr.c:166: 
