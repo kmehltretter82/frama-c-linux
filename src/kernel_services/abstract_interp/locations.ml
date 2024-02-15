@@ -190,53 +190,9 @@ module Location_Bytes = struct
       in
       M.fold aux_base m (Some Int.zero)
 
-  (* These two states contain the garbled mix that we track. The list preserves
-     the creation order (except it is reversed), while the set is used to test
-     inclusion efficiently so far. Only "original" garbled mix are tracked,
-     i.e. operations that _transform a garbled mix are not tracked. *)
-  module ListGarbledMix = State_builder.List_ref(MapSetLattice)
-      (struct
-        let name = "Locations.ListGarbledMix"
-        let dependencies = [M.self]
-      end)
-  module SetGarbledMix = State_builder.Set_ref(MapSetLattice.Set)
-      (struct
-        let name = "Locations.SetGarbledMix"
-        let dependencies = [M.self]
-      end)
+  let top_with_origin origin = Top (Base.SetLattice.top, origin)
 
-  let get_garbled_mix () = List.rev (ListGarbledMix.get ())
-  let clear_garbled_mix () =
-    ListGarbledMix.clear ();
-    SetGarbledMix.clear ();
-  ;;
-
-  (* We skip imprecise origins: origins that have no location information,
-     and leaf origins, because we may create tons of those, that get reduced
-     to precise values by the specifications of the function. *)
-  let is_gm_to_log = function
-    | Top (_, origin) -> Origin.is_precise origin
-    | Map _ -> false
-
-  let ref_track_garbled_mix = ref true
-  let do_track_garbled_mix b = ref_track_garbled_mix := b
-
-  (* track a garbled mix if needed, then return it (more convenient for the
-     caller). *)
-  let track_garbled_mix gm =
-    if !ref_track_garbled_mix && is_gm_to_log gm && not (SetGarbledMix.mem gm)
-    then begin
-      SetGarbledMix.set (MapSetLattice.Set.add gm (SetGarbledMix.get ()));
-      ListGarbledMix.set (gm :: ListGarbledMix.get ());
-    end;
-    gm
-
-  let top_with_origin origin =
-    track_garbled_mix (Top(Base.SetLattice.top, origin))
-
-  (* This internal function builds a garbled mix, but does *not* track its
-     creation. This is useful for functions that transform existing GMs. *)
-  let inject_top_origin_internal o b =
+  let inject_top_origin o b =
     if Base.Hptset.(equal b empty || equal b Base.null_set) then
       top_int
     else begin
@@ -246,15 +202,12 @@ module Location_Bytes = struct
         Top (Base.(SetLattice.inject (Hptset.add null b)), o)
     end
 
-  let inject_top_origin o b =
-    track_garbled_mix (inject_top_origin_internal o b)
-
   (** some functions can reduce a garbled mix, make sure to normalize
       the result when only NULL remains *)
   let normalize_top m =
     match m with
     | Top (Base.SetLattice.Top, _) | Map _ -> m
-    | Top (Base.SetLattice.Set s, o) -> inject_top_origin_internal o s
+    | Top (Base.SetLattice.Set s, o) -> inject_top_origin o s
 
   let narrow m1 m2 = normalize_top (narrow m1 m2)
   let meet m1 m2 = normalize_top (meet m1 m2)
@@ -269,8 +222,7 @@ module Location_Bytes = struct
       else
         match get_keys v with
         | Base.SetLattice.Top -> top_with_origin o
-        | Base.SetLattice.Set b ->
-          track_garbled_mix (inject_top_origin_internal o b)
+        | Base.SetLattice.Set b -> inject_top_origin o b
 
   let topify_with_origin_kind ok v =
     let o = Origin.current ok in
@@ -327,7 +279,7 @@ module Location_Bytes = struct
       if Base.Hptset.equal garble nonlocals then
         false, v
       else
-        true, inject_top_origin_internal orig nonlocals
+        true, inject_top_origin orig nonlocals
     | Map m ->
       let nonlocals = M.filter non_local m in
       if M.equal nonlocals m then
@@ -366,7 +318,7 @@ module Location_Bytes = struct
     match v with
     | Top (Base.SetLattice.Top, _) -> false, v
     | Top (Base.SetLattice.Set set, origin) ->
-      substitute Base.Hptset.replace (inject_top_origin_internal origin) set
+      substitute Base.Hptset.replace (inject_top_origin origin) set
     | Map map ->
       let decide _key  = Ival.join in
       substitute (M.replace_key ~decide) (fun m -> Map m) map

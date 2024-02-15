@@ -101,7 +101,6 @@ let pre_analysis () =
   (* We may be resuming Value from a previously crashed analysis. Clear
      degeneration states *)
   Eva_utils.DegenerationPoints.clear ();
-  Cvalue.V.clear_garbled_mix ();
   Origin.clear ();
   Eva_utils.clear_call_stack ()
 
@@ -115,7 +114,7 @@ let post_analysis () =
   (* Garbled mix must be dumped here -- at least before the call to
      mark_green_and_red -- because fresh ones are created when re-evaluating
      all the alarms, and we get an unpleasant "ghost effect". *)
-  Eva_utils.dump_garbled_mix ();
+  Self.warning ~wkey:Self.wkey_garbled_mix_summary "%t" Origin.pretty_history;
   (* Mark unreachable and RTE statuses. Only do this there, not when the
      analysis was aborted (hence, not in post_cleanup), because the
      propagation is incomplete. Also do not mark unreachable statutes if
@@ -304,13 +303,9 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       Self.feedback ~current:true "Call to builtin %s%s"
         name (if kf_name = name then "" else " for function " ^ kf_name);
     apply_call_hooks call state `Builtin;
-    (* Do not track garbled mixes created when interpreting the specification,
-       as the result of the cvalue builtin will overwrite them. *)
-    Locations.Location_Bytes.do_track_garbled_mix false;
     let states =
       Spec.compute_using_specification ~warn:false kinstr call spec state
     in
-    Locations.Location_Bytes.do_track_garbled_mix true;
     let final_state = join_states states in
     match final_state with
     | `Bottom ->

@@ -314,7 +314,6 @@ module Make
         begin
           match cvalue with
           | Top (bases, origin) ->
-            ignore (Locations.Location_Bytes.track_garbled_mix cvalue);
             Origin.register_write bases origin;
             Self.warning ~current:true ~once:true
               ~wkey:Self.wkey_garbled_mix_assigns
@@ -337,7 +336,6 @@ module Make
      and [status] the status of the behaviors. *)
   let compute_effects ~warn kf spec result behaviors status states =
     States.join states >>- fun pre_state ->
-    Locations.Location_Bytes.do_track_garbled_mix false;
     let behavior = List.hd behaviors in
     let retres_loc = Option.map Location.eval_varinfo result in
     let assigns = get_assigns_for_behavior spec behavior in
@@ -355,7 +353,6 @@ module Make
     (* Warn on garbled mixes created by specifications, except on builtins. *)
     if warn
     then check_post_assigns kf retres_loc spec behavior ~pre:pre_state states;
-    Locations.Location_Bytes.do_track_garbled_mix true;
     states
 
   (* Reduces the [states] by the assumes and requires clauses of the [behavior]

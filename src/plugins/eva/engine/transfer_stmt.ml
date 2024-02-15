@@ -189,13 +189,8 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   (* Assignment by copying the value of a right lvalue. *)
   let assign_by_copy ~subdivnb state valuation lval lloc ltyp =
-    (* This code about garbled mix is specific to the Cvalue domain.
-       Unfortunately, the current API for abstract_domain does not permit
-       distinguishing between an evaluation or a copy. *)
-    Locations.Location_Bytes.do_track_garbled_mix false;
-    let r = copy_lvalue_and_check ~valuation ~subdivnb state lval in
-    Locations.Location_Bytes.do_track_garbled_mix true;
-    r >>=: fun (valuation, value) ->
+    copy_lvalue_and_check ~valuation ~subdivnb state lval
+    >>=: fun (valuation, value) ->
     Copy ({lval; lloc; ltyp}, value), valuation
 
   (* For an initialization, use for_writing:false for the evaluation of

@@ -107,13 +107,6 @@ let is_current = function
   | Unknown | Well -> false
   | Origin { loc } -> Cil_datatype.Location.equal loc (Cil.CurrentLoc.get ())
 
-(* Well and Unknown origins have no location information.
-   Leaf origins are also imprecise, because we may create tons of those,
-   that get reduced to precise values by the specifications of the function. *)
-let is_precise = function
-  | Unknown | Well -> false
-  | Origin { kind } -> kind <> Leaf
-
 
 module History_Info = struct
   let name = "Origin.History"
