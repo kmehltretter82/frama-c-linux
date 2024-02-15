@@ -234,7 +234,7 @@ function bufferReducer<A>(
 
    - on Reset event, the buffered state is restored to the input value.
 
-   - on Commit event, 
+   - on Commit event,
      the buffered state is sent to the input callback or restored.
 
    The returned field state reflects the internal buffer state. Its local
