@@ -40,7 +40,7 @@
 
 import { debounce } from 'lodash';
 import Events from 'events';
-import React from 'react';
+import React, { useReducer } from 'react';
 import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
 import { SVG } from 'dome/controls/icons';
@@ -126,6 +126,7 @@ export type ResetCallback = () => void;
  */
 export class BufferController {
   private readonly evt = new Events();
+  private errors = 0;
 
   /** Notify all reset listener events. */
   reset(): void { this.evt.emit('reset'); }
@@ -139,18 +140,89 @@ export class BufferController {
   /** There are active listeners for Commit event. */
   hasCommit(): boolean { return this.evt.listenerCount('commit') > 0; }
 
+  /** Get the number of errors */
+  getErrors(): number { return  this.errors; }
+
   /** @internal */
   onReset(fn: ResetCallback): void { this.evt.addListener('reset', fn); }
 
   /** @internal */
-  offReset(fn: ResetCallback): void { this.evt.addListener('reset', fn); }
+  offReset(fn: ResetCallback): void { this.evt.removeListener('reset', fn); }
 
   /** @internal */
   onCommit(fn: ResetCallback): void { this.evt.addListener('commit', fn); }
 
   /** @internal */
-  offCommit(fn: ResetCallback): void { this.evt.addListener('commit', fn); }
+  offCommit(fn: ResetCallback): void { this.evt.removeListener('commit', fn); }
 
+  /** @internal */
+  addError(): void { this.errors++; }
+
+  /** @internal */
+  removeError(): void { this.errors--; }
+}
+
+interface BufferState<A> {
+  modified: boolean,
+  bvalue: A,
+  berror: FieldError
+}
+
+interface BufferActionDispatch<A> {
+  type: "reset" | "commit" | "change",
+  remote: BufferController,
+  reset?: A,
+  onChanged?: Callback<A>,
+  payload?: Partial<BufferState<A>>
+}
+
+type BufferReducer<A> = (
+  state: BufferState<A>,
+  action: BufferActionDispatch<A>
+) => BufferState<A>;
+
+/**
+ * Dispatch function for useBuffer hook.
+ */
+function bufferReducer<A>(
+  state: BufferState<A>, action: BufferActionDispatch<A>
+): BufferState<A> {
+  const { bvalue, berror } = state;
+  const { type, remote, reset, onChanged, payload } = action;
+
+  const getResetState = (): BufferState<A> => {
+    return reset ?
+      {  ...state, bvalue: reset, berror: undefined, modified: false } :
+      state;
+  };
+
+  switch(type) {
+    case "reset": {
+      !isValid(berror) && reset && remote.removeError();
+      return getResetState();
+    }
+    case "commit": {
+      if(isValid(berror)) {
+        onChanged && onChanged(bvalue, undefined, false);
+        return { ...state, modified: false };
+      } else {
+        reset && remote.removeError();
+        return getResetState();
+      }
+    }
+    case "change": {
+      const newError = payload && payload.berror;
+      if(!isValid(berror) && isValid(newError)) {
+        remote.removeError();
+      } else if(isValid(berror) && !isValid(newError)) {
+        remote.addError();
+      }
+      return { ...state, ...payload };
+    }
+    default: {
+      return state;
+    }
+  }
 }
 
 /**
@@ -162,7 +234,7 @@ export class BufferController {
 
    - on Reset event, the buffered state is restored to the input value.
 
-   - on Commit event, the buffered state is sent to the input callback.
+   - on Commit event, the buffered state is sent to the input callback or restored.
 
    The returned field state reflects the internal buffer state. Its local
    reset value is either the input reset value or the current input value.
@@ -170,52 +242,67 @@ export class BufferController {
  */
 export function useBuffer<A>(
   remote : BufferController,
-  state: FieldState<A>
+  state: FieldState<A>,
+  equal?: (a: A, b: A) => boolean
 ): FieldState<A>
 {
   const { value, error, reset, onChanged } = state;
-  const [ modified, setModified ] = React.useState(false);
-  const [ buffer, setBuffer ] = React.useState<A>(value);
-  const [ berror, setBerror ] = React.useState<FieldError>(error);
-  const staged = modified && !berror;
+  const [ buffer, dispatch ] = useReducer<BufferReducer<A>>(bufferReducer, {
+    modified: false,
+    bvalue: value,
+    berror: error,
+  });
+  const { modified, berror, bvalue } = buffer;
 
   // --- Reset
   React.useEffect(() => {
     if (modified) {
       const doReset = (): void => {
-        setModified(false);
-        setBuffer(value);
-        setBerror(error);
+        dispatch({
+          type: "reset",
+          remote: remote,
+          reset: reset ?? value
+        });
       };
       remote.onReset(doReset);
       return () => remote.offReset(doReset);
     } else return;
-  }, [remote, modified, value, error]);
+  }, [remote, modified, value, reset]);
 
   // --- Commit
   React.useEffect(() => {
-    if (staged) {
+    if(modified) {
       const doCommit = (): void => {
-        setModified(false);
-        onChanged(buffer, undefined, false);
+        dispatch({
+          type: "commit",
+          remote: remote,
+          reset: reset ?? value,
+          onChanged
+        });
       };
       remote.onCommit(doCommit);
       return () => remote.offCommit(doCommit);
     } else return;
-  }, [remote, staged, buffer, onChanged]);
+  }, [remote, modified, value, reset, bvalue, onChanged]);
 
   // --- Callback
   const onLocalChange = React.useCallback(
     (newValue, newError, isReset) => {
-      setModified(!isReset);
-      setBuffer(newValue);
-      setBerror(newError);
-      if (isReset && newValue !== value)
+      dispatch({
+        type: "change",
+        remote: remote,
+        payload: {
+          modified: !isReset,
+          bvalue: newValue,
+          berror: newError,
+        }
+      });
+      if (isReset && (equal ? equal(newValue, value) : (newValue !== value)))
         onChanged(newValue, newError, isReset);
-    }, [value, onChanged]);
+    }, [value, onChanged, equal, remote]);
 
   return {
-    value: modified ? buffer : value,
+    value: modified ? bvalue : value,
     error: modified ? berror : error,
     reset: reset ?? (modified ? value : undefined),
     onChanged: onLocalChange,

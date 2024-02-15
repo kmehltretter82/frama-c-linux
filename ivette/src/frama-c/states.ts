@@ -329,7 +329,7 @@ export function useServerField<A>(
   return {
     value: isValid(error) ? stateValue : local,
     error,
-    reset: value,
+    reset: isValid(error) ? undefined : stateValue,
     onChanged: update
   };
 }
