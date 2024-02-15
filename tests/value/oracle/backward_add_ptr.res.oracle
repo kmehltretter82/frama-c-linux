@@ -182,31 +182,9 @@
 [eva] Recording results for main
 [eva] Done for function main
 [eva:garbled-mix:summary] Warning: 
-  Garbled mix generated during analysis:
-  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:25}) }}
-  {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:25}) }}
-  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:32}) }}
-  {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:32}) }}
-  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:38}) }}
-  {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:38}) }}
-  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:54}) }}
-  {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:54}) }}
-  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:60}) }}
-  {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:60}) }}
-  {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:68}) }}
-  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:81}) }}
-  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:87}) }}
-  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:96}) }}
-  {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:68}) }}
-  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:106}) }}
-  {{ garbled mix of &{c} (origin: Arithmetic {backward_add_ptr.c:115}) }}
-  {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:115}) }}
-  {{ garbled mix of &{c} (origin: Arithmetic {backward_add_ptr.c:121}) }}
-  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:130}) }}
-  {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:136}) }}
-  {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:68}) }}
-  {{ garbled mix of &{c} (origin: Arithmetic {backward_add_ptr.c:68}) }}
-  {{ garbled mix of &{b; c} (origin: Arithmetic {backward_add_ptr.c:68}) }}
+  Origins of garbled mix generated during analysis:
+    backward_add_ptr.c:68: arithmetic operation on addresses
+      (read 81 times, propagated 20 times) garbled mix of &{a; b; a; b; c}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function gm:
   __retres ∈
