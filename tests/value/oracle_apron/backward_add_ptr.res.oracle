@@ -26,3 +26,7 @@
 >   Called from backward_add_ptr.c:160.
 > [eva] Recording results for gm
 > [eva] Done for function gm
+187c199
+<       (propagated 20 times, read 86 times) garbled mix of bases {a; b; a; b; c}
+---
+>       (propagated 28 times, read 90 times) garbled mix of bases {a; b; a; b; c}

@@ -23,43 +23,7 @@
 >   Called from backward_add_ptr.c:160.
 > [eva] Recording results for gm
 > [eva] Done for function gm
-189a199,200
->   {{ garbled mix of &{b} (origin: Arithmetic {backward_add_ptr.c:33}) }}
->   {{ garbled mix of &{a} (origin: Arithmetic {backward_add_ptr.c:33}) }}
-200a212
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:106}) }}
-202c214
-<   {{ garbled mix of &{c} (origin: Arithmetic {backward_add_ptr.c:115}) }}
+187c196
+<       (propagated 20 times, read 86 times) garbled mix of bases {a; b; a; b; c}
 ---
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:107}) }}
-203a216,218
->   {{ garbled mix of &{c} (origin: Arithmetic {backward_add_ptr.c:115}) }}
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:116}) }}
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:121}) }}
-204a220,221
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:122}) }}
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:130}) }}
-205a223
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:136}) }}
-206a225
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:137}) }}
-207a227
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:145}) }}
-208a229,232
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:150}) }}
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:151}) }}
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:156}) }}
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:157}) }}
-209a234,245
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:165}) }}
->   {{ garbled mix of &{b; c} (origin: Arithmetic {backward_add_ptr.c:165}) }}
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:166}) }}
->   {{ garbled mix of &{b; c} (origin: Arithmetic {backward_add_ptr.c:166}) }}
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:171}) }}
->   {{ garbled mix of &{b; c} (origin: Arithmetic {backward_add_ptr.c:171}) }}
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:172}) }}
->   {{ garbled mix of &{b; c} (origin: Arithmetic {backward_add_ptr.c:172}) }}
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:177}) }}
->   {{ garbled mix of &{b; c} (origin: Arithmetic {backward_add_ptr.c:177}) }}
->   {{ garbled mix of &{a; b} (origin: Arithmetic {backward_add_ptr.c:178}) }}
->   {{ garbled mix of &{b; c} (origin: Arithmetic {backward_add_ptr.c:178}) }}
+>       (propagated 26 times, read 94 times) garbled mix of bases {a; b; a; b; c}
