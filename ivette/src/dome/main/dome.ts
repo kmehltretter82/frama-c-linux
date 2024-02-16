@@ -554,9 +554,15 @@ interface Cmd { wdir: string; argv: string[] }
 
 // [LC]: this is buggy, process.argv has no command line arguments
 function stripElectronArgv(cmd: Cmd): Cmd {
-  const wdir = DEVEL ? cmd.argv[2] : cmd.wdir;
+  console.log("DEVEL", DEVEL);
+  console.log("Is Dev", is.dev);
+  console.log("LOCAL", LOCAL);
+  console.log("Vite Mode", import.meta.env.MODE);
+
+  const devel = import.meta.env.MODE === "development";
+  const wdir = devel ? cmd.argv[2] : cmd.wdir;
   const argv = cmd.argv
-  .slice(DEVEL ? 3 : 2)
+  .slice(devel ? 3 : 2)
   .filter((p) => !!p && p !== "--no-sandbox");
   return { wdir, argv };
 }
@@ -573,7 +579,9 @@ function createPrimaryWindow(): void {
   const cwd = process.cwd();
   const wdir = cwd === '/' ? app.getPath('home') : cwd;
   console.log("Process argv: ", process.argv);
+  console.log("Before", { wdir, argv: process.argv });
   const cmd = stripElectronArgv({ wdir, argv: process.argv });
+  console.log("After", cmd);
 
   // Reset Settings if the associated argument is provided
   const settingsIdx = cmd.argv.indexOf(CLI_OPTION_SETTINGS.name);
