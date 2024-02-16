@@ -184,19 +184,14 @@ function deleteFromDockedComponents(comp: Ivette.ComponentProps): void {
   const labviewState = globalLabViewState.getValue();
   const dockedComponents = labviewState.dockedComponents;
 
-  let exists = false;
-  const tmpArray = Array.from(dockedComponents);
-  tmpArray.forEach(c => {
-    if (c.id === comp.id) {
-      exists = true;
-      tmpArray.splice(tmpArray.indexOf(c), 1);
-    }
+  const updatedSet = new Set<Ivette.ComponentProps>();
+  dockedComponents.forEach(c => {
+    c.id !== comp.id && updatedSet.add(c);
   });
-  if(!exists) return;
 
   globalLabViewState.setValue({
     ...labviewState,
-    dockedComponents: new Set(tmpArray)
+    dockedComponents: updatedSet
   }, true);
 }
 
@@ -204,19 +199,14 @@ function deleteFromLoadedComponents(comp: Ivette.ComponentProps): void {
   const labviewState = globalLabViewState.getValue();
   const loadedComponents = labviewState.components;
 
-  let exists = false;
-  const tmpArray = Array.from(loadedComponents);
-  tmpArray.forEach(c => {
-    if (c === comp.id) {
-      exists = true;
-      tmpArray.splice(tmpArray.indexOf(c), 1);
-    }
+  const updatedSet = new Set<string>();
+  loadedComponents.forEach(c => {
+    c !== comp.id && updatedSet.add(c);
   });
-  if(!exists) return;
 
   globalLabViewState.setValue({
     ...labviewState,
-    components: new Set(tmpArray),
+    components: updatedSet,
   }, true);
 }
 
