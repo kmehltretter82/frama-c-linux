@@ -305,9 +305,15 @@
 [eva] computing for function f <- test_assigns <- main.
   Called from behaviors1.i:473.
 [eva] using specification for function f
+[eva:garbled-mix:assigns] behaviors1.i:473: 
+  The specification of function f has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] Done for function f
 [eva] computing for function f <- test_assigns <- main.
   Called from behaviors1.i:474.
+[eva:garbled-mix:assigns] behaviors1.i:474: 
+  The specification of function f has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] Done for function f
 [eva] computing for function f <- test_assigns <- main.
   Called from behaviors1.i:475.
@@ -440,6 +446,12 @@
 [eva] Done for function test_narrow
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    behaviors1.i:473: assigns clause on addresses
+      (read 1 times, propagated 3 times) garbled mix of &{a}
+    behaviors1.i:474: assigns clause on addresses
+      (read 1 times, propagated 3 times) garbled mix of &{b}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test_123_comp_2345_comp_disj:
   a ∈ [--..--]

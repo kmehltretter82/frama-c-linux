@@ -51,6 +51,10 @@
   assert (long)r + (long)((long)((char *)t) << 8) ≤ 2147483647;
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    shift.i:52: arithmetic operation on addresses
+      (read 1 times, propagated 2 times) garbled mix of &{t}
 [eva] shift.i:35: assertion 'Eva,shift' got final status invalid.
 [eva] shift.i:36: assertion 'Eva,shift' got final status invalid.
 [eva] shift.i:40: assertion 'Eva,shift' got final status invalid.

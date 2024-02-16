@@ -42,6 +42,10 @@
 [eva] Done for function main2
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    arith_pointer.c:54: arithmetic operation on addresses
+      (read 2 times, propagated 2 times) garbled mix of &{x}
 [eva] arith_pointer.c:30: 
   assertion 'Eva,differing_blocks' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
@@ -151,6 +155,16 @@
 [eva] Done for function main2
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    arith_pointer.c:54: arithmetic operation on addresses
+      (read 2 times, propagated 2 times) garbled mix of &{x}
+    arith_pointer.c:30: arithmetic operation on addresses
+      (read 1 times, propagated 1 times) garbled mix of &{x; y}
+    arith_pointer.c:49: arithmetic operation on addresses
+      (read 1 times, propagated 1 times) garbled mix of &{x; y}
+    arith_pointer.c:51: arithmetic operation on addresses
+      (read 1 times, propagated 1 times) garbled mix of &{x; y}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   t[0..1] ∈ {-3}

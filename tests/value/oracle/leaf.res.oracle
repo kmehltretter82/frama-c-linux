@@ -39,6 +39,9 @@
 [eva] computing for function f_int_star_int <- main.
   Called from leaf.i:50.
 [eva] using specification for function f_int_star_int
+[eva:garbled-mix:assigns] leaf.i:50: 
+  The specification of function f_int_star_int
+  has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function f_int_star_int
 [eva] leaf.i:51: Frama_C_show_each_F: [-2147483648..2147483647]
 [eva:alarm] leaf.i:52: Warning: out of bounds write. assert \valid(p);
@@ -46,6 +49,9 @@
 [eva] computing for function f_int_star_int_star_int <- main.
   Called from leaf.i:55.
 [eva] using specification for function f_int_star_int_star_int
+[eva:garbled-mix:assigns] leaf.i:55: 
+  The specification of function f_int_star_int_star_int
+  has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function f_int_star_int_star_int
 [eva] leaf.i:56: Frama_C_show_each_G: {{ &g }}
 [eva] leaf.i:57: Frama_C_show_each_F: {5}
@@ -85,6 +91,9 @@
 [eva] computing for function f_st_star_cint_st_star_cint <- main.
   Called from leaf.i:68.
 [eva] using specification for function f_st_star_cint_st_star_cint
+[eva:garbled-mix:assigns] leaf.i:68: 
+  The specification of function f_st_star_cint_st_star_cint
+  has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function f_st_star_cint_st_star_cint
 [kernel:annot:missing-spec] leaf.i:69: Warning: 
   Neither code nor specification for function f_st_star_int_st_star_int,
@@ -92,6 +101,9 @@
 [eva] computing for function f_st_star_int_st_star_int <- main.
   Called from leaf.i:69.
 [eva] using specification for function f_st_star_int_st_star_int
+[eva:garbled-mix:assigns] leaf.i:69: 
+  The specification of function f_st_star_int_st_star_int
+  has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function f_st_star_int_st_star_int
 [kernel:annot:missing-spec] leaf.i:70: Warning: 
   Neither code nor specification for function f_st_tab3_int_st_tab3_int,
@@ -106,6 +118,9 @@
 [eva] computing for function f_star_st_star_cint_int <- main.
   Called from leaf.i:72.
 [eva] using specification for function f_star_st_star_cint_int
+[eva:garbled-mix:assigns] leaf.i:72: 
+  The specification of function f_star_st_star_cint_int
+  has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function f_star_st_star_cint_int
 [kernel:annot:missing-spec] leaf.i:73: Warning: 
   Neither code nor specification for function f_star_st_star_int_int,
@@ -113,6 +128,9 @@
 [eva] computing for function f_star_st_star_int_int <- main.
   Called from leaf.i:73.
 [eva] using specification for function f_star_st_star_int_int
+[eva:garbled-mix:assigns] leaf.i:73: 
+  The specification of function f_star_st_star_int_int
+  has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function f_star_st_star_int_int
 [kernel:annot:missing-spec] leaf.i:74: Warning: 
   Neither code nor specification for function f_star_st_tab3_int_int,
@@ -123,6 +141,12 @@
 [eva] Done for function f_star_st_tab3_int_int
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    leaf.i:55: assigns clause on addresses (read 10 times, propagated 2 times)
+      garbled mix of &{pg}
+    leaf.i:50: assigns clause on addresses (read 4 times, propagated 2 times)
+      garbled mix of &{g}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   T[0] ∈ [--..--]

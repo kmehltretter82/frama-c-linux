@@ -298,6 +298,9 @@
 [eva] computing for function f18 <- main18 <- main.
   Called from assigns_from.i:215.
 [eva] using specification for function f18
+[eva:garbled-mix:assigns] assigns_from.i:215: 
+  The specification of function f18 has generated a garbled mix of addresses
+  for assigns clause *x.
 [eva] Done for function f18
 [eva] Recording results for main18
 [from] Computing for function main18

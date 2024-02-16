@@ -8,6 +8,9 @@
 [eva] computing for function f <- main4.
   Called from empty_struct.c:99.
 [eva] using specification for function f
+[eva:garbled-mix:assigns] empty_struct.c:99: 
+  The specification of function f has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] Done for function f
 [kernel:annot:missing-spec] empty_struct.c:100: Warning: 
   Neither code nor specification for function g,
@@ -18,6 +21,10 @@
 [eva] Done for function g
 [eva] Recording results for main4
 [eva] Done for function main4
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    empty_struct.c:99: assigns clause on addresses
+      (read 2 times, propagated 3 times) garbled mix of &{gs}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main4:
   r ∈

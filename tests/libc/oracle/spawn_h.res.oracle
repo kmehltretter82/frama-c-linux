@@ -7,6 +7,9 @@
 [eva] computing for function getopt <- main.
   Called from spawn_h.c:36.
 [eva] using specification for function getopt
+[eva:garbled-mix:assigns] spawn_h.c:36: 
+  The specification of function getopt has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] Done for function getopt
 [kernel:annot:missing-spec] spawn_h.c:43: Warning: 
   Neither code nor specification for function posix_spawn_file_actions_init,
@@ -249,6 +252,11 @@
 [eva] Done for function exit
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    spawn_h.c:36: assigns clause on addresses
+      (read 20 times, propagated 13 times)
+      garbled mix of &{S_argv; S_0_S_argv; S_1_S_argv}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   NON TERMINATING FUNCTION

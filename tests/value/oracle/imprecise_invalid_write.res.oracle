@@ -45,6 +45,12 @@
 [eva] Done for function main3
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    imprecise_invalid_write.i:9: arithmetic operation on addresses
+      (read 2 times, propagated 1 times) garbled mix of &{main1}
+    imprecise_invalid_write.i:16: arithmetic operation on addresses
+      (read 2 times, propagated 1 times) garbled mix of &{"abc"}
 [eva] imprecise_invalid_write.i:5: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] imprecise_invalid_write.i:10: 

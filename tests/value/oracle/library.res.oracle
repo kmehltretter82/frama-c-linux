@@ -86,6 +86,9 @@
 [eva] computing for function f_star_int <- main.
   Called from library.i:31.
 [eva] using specification for function f_star_int
+[eva:garbled-mix:assigns] library.i:31: 
+  The specification of function f_star_int
+  has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function f_star_int
 [eva:alarm] library.i:32: Warning: out of bounds write. assert \valid(G1);
 [eva:alarm] library.i:33: Warning: out of bounds read. assert \valid_read(G);
@@ -109,6 +112,9 @@
 [eva] computing for function i <- main.
   Called from library.i:41.
 [eva] using specification for function i
+[eva:garbled-mix:assigns] library.i:41: 
+  The specification of function i has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] Done for function i
 [eva:alarm] library.i:42: Warning: out of bounds read. assert \valid_read(pf);
 [eva:alarm] library.i:42: Warning: 
@@ -122,10 +128,21 @@
 [eva] computing for function k <- main.
   Called from library.i:45.
 [eva] using specification for function k
+[eva:garbled-mix:assigns] library.i:45: 
+  The specification of function k has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] Done for function k
 [eva:alarm] library.i:46: Warning: out of bounds write. assert \valid(pd);
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    library.i:31: assigns clause on addresses
+      (read 2 times, propagated 2 times) garbled mix of &{S_gpi}
+    library.i:41: assigns clause on addresses
+      (read 2 times, propagated 2 times) garbled mix of &{S_gpf}
+    library.i:45: assigns clause on addresses
+      (read 2 times, propagated 2 times) garbled mix of &{S_gpd}
 [eva] library.i:38: assertion 'Eva,function_pointer' got final status invalid.
 [eva] library.i:39: assertion 'Eva,function_pointer' got final status invalid.
 [eva] library.i:40: assertion 'Eva,function_pointer' got final status invalid.

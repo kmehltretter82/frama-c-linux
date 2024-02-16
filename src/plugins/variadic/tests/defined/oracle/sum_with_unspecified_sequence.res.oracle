@@ -23,6 +23,10 @@
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   signed overflow. assert ret + tmp ≤ 2147483647;
                    (tmp from vararg)
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    Initial state (read 12 times, propagated 6 times)
+      garbled mix of &{S_0_S___va_params; S_1_S___va_params}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function sum:
   ret ∈

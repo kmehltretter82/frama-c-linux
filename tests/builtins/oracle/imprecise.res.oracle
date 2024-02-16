@@ -264,6 +264,10 @@
 [from] Computing for function main
 [from] Done for function main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    imprecise.c:19: arithmetic operation on addresses
+      (read 3 times, propagated 1 times) garbled mix of &{j; k}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cast_address:
   p ∈ {{ &x }}
@@ -807,6 +811,10 @@
 [from] Computing for function main
 [from] Done for function main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    imprecise.c:19: arithmetic operation on addresses
+      (read 3 times, propagated 1 times) garbled mix of &{j; k}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cast_address:
   p ∈ {{ &x }}

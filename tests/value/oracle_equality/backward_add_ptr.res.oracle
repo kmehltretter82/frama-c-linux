@@ -24,6 +24,6 @@
 > [eva] Recording results for gm
 > [eva] Done for function gm
 154c163
-<       (propagated 20 times, read 86 times) garbled mix of bases {a; b; a; b; c}
+<       (read 81 times, propagated 20 times) garbled mix of &{a; b; a; b; c}
 ---
->       (propagated 26 times, read 94 times) garbled mix of bases {a; b; a; b; c}
+>       (read 86 times, propagated 26 times) garbled mix of &{a; b; a; b; c}

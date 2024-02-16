@@ -5,32 +5,32 @@
 <   signed overflow. assert (int)*((char *)(&q1)) + 2 ≤ 2147483647;
 < [eva:garbled-mix:write] addition.i:61: Warning: 
 <   Assigning imprecise value to p14 because of misaligned read of addresses.
-144,147c138,139
-<       (propagated 1 times, read 1 times) garbled mix of bases {p1}
-<     addition.i:61: misaligned read of addresses
-<       (propagated 1 times, read 1 times) garbled mix of bases {p1}
+141c135,139
 < [scope:rm_asserts] removing 9 assertion(s)
 ---
->       (propagated 2 times, read 2 times) garbled mix of bases {p1}
+> [eva:garbled-mix:summary] Warning: 
+>   Origins of garbled mix generated during analysis:
+>     addition.i:59: misaligned read of addresses
+>       (read 1 times, propagated 2 times) garbled mix of &{p1}
 > [scope:rm_asserts] removing 7 assertion(s)
-169c161
+163c161
 <   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:61}) }}
 ---
 >   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:59}) }}
-363,366d354
+357,360d354
 < [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert -2147483648 ≤ (int)*((char *)(&q1)) + 2;
 < [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert (int)*((char *)(&q1)) + 2 ≤ 2147483647;
-375,378c363,364
-<       (propagated 1 times, read 1 times) garbled mix of bases {p1}
-<     addition.i:61: misaligned read of addresses
-<       (propagated 1 times, read 1 times) garbled mix of bases {p1}
+366c360,364
 < [scope:rm_asserts] removing 9 assertion(s)
 ---
->       (propagated 2 times, read 2 times) garbled mix of bases {p1}
+> [eva:garbled-mix:summary] Warning: 
+>   Origins of garbled mix generated during analysis:
+>     addition.i:59: misaligned read of addresses
+>       (read 1 times, propagated 2 times) garbled mix of &{p1}
 > [scope:rm_asserts] removing 7 assertion(s)
-401c387
+389c387
 <   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:61}) }}
 ---
 >   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:59}) }}

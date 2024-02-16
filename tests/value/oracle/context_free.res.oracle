@@ -90,6 +90,10 @@
   pointer to function with incompatible type. assert \valid_function(g);
 [eva] Recording results for f
 [eva] Done for function f
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    Initial state (read 9 times, propagated 5 times)
+      garbled mix of &{WELL_uu; S_p_svoid; S_qvoid; S_0_S_vvv; S_vv}
 [eva] context_free.i:62: 
   assertion 'Eva,function_pointer' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

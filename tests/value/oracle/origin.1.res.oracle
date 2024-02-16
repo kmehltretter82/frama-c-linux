@@ -74,6 +74,10 @@
   because of arithmetic operation on addresses.
 [eva] Recording results for origin
 [eva] Done for function origin
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    origin.i:126: misaligned read of addresses
+      (read 1 times, propagated 2 times) garbled mix of &{x; y}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function origin:
   r.c ∈ [--..--]

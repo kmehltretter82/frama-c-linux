@@ -14,11 +14,18 @@
 [eva] computing for function f <- main.
   Called from leaf2.i:6.
 [eva] using specification for function f
+[eva:garbled-mix:assigns] leaf2.i:6: 
+  The specification of function f has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] Done for function f
 [eva:alarm] leaf2.i:7: Warning: signed overflow. assert -2147483648 ≤ G + 1;
 [eva:alarm] leaf2.i:7: Warning: signed overflow. assert G + 1 ≤ 2147483647;
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    leaf2.i:6: assigns clause on addresses (read 4 times, propagated 4 times)
+      garbled mix of &{I}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   G ∈ {{ garbled mix of &{I} (origin: Library function {leaf2.i:6}) }}

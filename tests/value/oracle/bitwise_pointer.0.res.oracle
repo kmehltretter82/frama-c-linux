@@ -43,6 +43,12 @@
   out of bounds write. assert \valid(p1);
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    bitwise_pointer.i:18: arithmetic operation on addresses
+      (read 2 times, propagated 1 times) garbled mix of &{t}
+    bitwise_pointer.i:22: arithmetic operation on addresses
+      (read 2 times, propagated 1 times) garbled mix of &{t1}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   t[0] ∈ {0; 5}

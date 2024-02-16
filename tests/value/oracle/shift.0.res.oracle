@@ -61,6 +61,10 @@
   unsigned overflow. assert 2U << 31 ≤ 4294967295;
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    shift.i:52: arithmetic operation on addresses
+      (read 1 times, propagated 2 times) garbled mix of &{t}
 [eva] shift.i:35: assertion 'Eva,shift' got final status invalid.
 [eva] shift.i:36: assertion 'Eva,shift' got final status invalid.
 [eva] shift.i:40: assertion 'Eva,shift' got final status invalid.

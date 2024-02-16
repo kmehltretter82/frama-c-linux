@@ -94,6 +94,12 @@
   pointer downcast. assert (unsigned int)(&vg) ≤ 2147483647;
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    period.c:51: arithmetic operation on addresses
+      (read 2 times, propagated 1 times) garbled mix of &{g}
+    period.c:53: arithmetic operation on addresses
+      (read 2 times, propagated 1 times) garbled mix of &{g}
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

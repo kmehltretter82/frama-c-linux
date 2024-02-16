@@ -128,6 +128,9 @@
 [eva] computing for function gp <- main.
   Called from origin.i:100.
 [eva] using specification for function gp
+[eva:garbled-mix:assigns] origin.i:100: 
+  The specification of function gp has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] Done for function gp
 [eva:alarm] origin.i:101: Warning: out of bounds read. assert \valid_read(pl);
 [eva] computing for function origin_misalign_1 <- main.
@@ -194,6 +197,20 @@
   locals {local1} escaping the scope of local_escape_1 through esc4
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    origin.i:19: arithmetic operation on addresses
+      (read 3 times, propagated 2 times) garbled mix of &{ta2; tta2}
+    origin.i:54: misaligned read of addresses
+      (read 3 times, propagated 1 times) garbled mix of &{a; b}
+    origin.i:14: arithmetic operation on addresses
+      (read 2 times, propagated 1 times) garbled mix of &{ta1}
+    origin.i:25: arithmetic operation on addresses
+      (read 2 times, propagated 1 times) garbled mix of &{ta3}
+    origin.i:100: assigns clause on addresses
+      (read 2 times, propagated 2 times) garbled mix of &{S_gpp}
+    origin.i:48: misaligned read of addresses
+      (read 2 times, propagated 1 times) garbled mix of &{a; b}
 [eva] origin.i:75: assertion 'Eva,initialization' got final status invalid.
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
