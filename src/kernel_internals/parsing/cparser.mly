@@ -929,7 +929,7 @@ else_part:
     {
       let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       Kernel.warning ~wkey:Kernel.wkey_ghost_bad_use ~source:(fst loc)
-        "Invalid ghost else ignored@." ;
+        "Invalid ghost else ignored" ;
       in_block $5
     }
 
@@ -1296,8 +1296,26 @@ enumerator:
       let loc = Cil_datatype.Location.of_lexing_loc $sloc in
       ($1, { expr_node = NOTHING; expr_loc = loc }, loc)
     }
+|   IDENT just_attributes {
+      let attrs = $2 in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+      Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_attributes
+        ~source:(fst loc)
+        "Discarding attributes in enumerator (unsupported feature): %a"
+        Cprint.print_attributes attrs;
+      ($1, { expr_node = NOTHING; expr_loc = loc }, loc)
+    }
 |   IDENT EQ expression		{
       ($1, $3, Cil_datatype.Location.of_lexing_loc $sloc)
+    }
+|   IDENT just_attributes EQ expression {
+      let attrs = $2 in
+      let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+      Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_attributes
+        ~source:(fst loc)
+        "Discarding attributes in enumerator (unsupported feature): %a"
+        Cprint.print_attributes attrs;
+      ($1, $4, loc)
     }
 ;
 

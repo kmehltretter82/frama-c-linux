@@ -205,6 +205,9 @@ val wkey_audit: warn_category
 val wkey_parser_unsupported: warn_category
 (** Warning related to unsupported parsing-related features. *)
 
+val wkey_parser_unsupported_attributes: warn_category
+(** Warning related to unsupported attributes during parsing. *)
+
 val wkey_asm: warn_category
 (** Warnings related to assembly code. *)
 
