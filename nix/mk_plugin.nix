@@ -106,9 +106,13 @@ stdenv.mkDerivation {
     ''
   else "") ;
 
+  # The export NIX_GCC_DONT_MANGLE_PREFIX_MAP is meant to disable the
+  # transformation of the path of Frama-C into uppercase when using the
+  # __FILE__ macro.
   checkPhase = ''
     runHook preCheck
     make run-ptests
+    export NIX_GCC_DONT_MANGLE_PREFIX_MAP=
     dune build -j1 --display short @tests/ptests
   '';
 
