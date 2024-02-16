@@ -20,33 +20,35 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** The datastructures of this module can be used to track the origin
-    of a major imprecision in the values of an abstract domain. *)
-
-(** This module is generic, although currently used only by the plugin Value.
-    Within Value, values that have an imprecision origin are "garbled mix",
-    ie. a numeric value that contains bits extracted from at least one
-    pointer, and that are not the result of a translation *)
+(** This module is used to track the origin of very imprecise values
+    (namely "garbled mix", created on imprecise or unsupported operations on
+    addresses) propagated by an Eva analysis. *)
 
 include Datatype.S
 
 type kind =
-  | Misalign_read
-  | Leaf
-  | Merge
-  | Arith
+  | Misalign_read (* Misaligned read of addresses *)
+  | Leaf  (* Interpretation of assigns clause *)
+  | Merge (* Imprecise merge of addresses *)
+  | Arith (* Arithmetic operation on addresses *)
 
+(** Creates an origin of the given kind, associated with the current source
+    location extracted from [Cil.CurrentLoc]. *)
 val current: kind -> t
-(** This is automatically extracted from [Cil.CurrentLoc] *)
 
+(** Origin for garbled mix created in the initial state of the analysis
+    (not associated to a source location). *)
 val well: t
+
+(** Unknown origin. *)
 val unknown: t
 val is_unknown: t -> bool
 
-val pretty_as_reason: Format.formatter -> t -> unit
 (** Pretty-print [because of <origin>] if the origin is not {!Unknown}, or
-    nothing otherwise *)
+    nothing otherwise. *)
+val pretty_as_reason: Format.formatter -> t -> unit
 
+(** Short description of an origin. *)
 val descr: t -> string
 
 val join: t -> t -> t
@@ -56,7 +58,7 @@ val is_included: t -> t -> bool
     with the given origin.
     Returns [true] if the given origin has never been written before,
     and if it is related to the current location — in which case a warning
-    should be emitted. *)
+    should probably be emitted. *)
 val register_write: Base.SetLattice.t -> t -> bool
 
 (** Records the read of an imprecise value of the given bases,

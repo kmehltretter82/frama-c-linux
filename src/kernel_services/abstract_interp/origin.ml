@@ -45,6 +45,8 @@ type tt =
   | Well
   | Unknown
 
+(* Unique id for each origin. Used to keep the oldest origin when a garbled
+   mix may have several origins. *)
 module Id = State_builder.Counter (struct let name = "Origin.Id" end)
 
 let current kind =
@@ -104,6 +106,8 @@ let descr = function
     | Merge -> "imprecise merge of addresses"
     | Arith -> "arithmetic operation on addresses"
 
+(* Keep the oldest known origin: it is probably the most relevant origin, as
+   subsequent ones may have been created because of the first. *)
 let join t1 t2 =
   if t1 == t2 then t1 else
     match t1, t2 with
@@ -113,10 +117,19 @@ let join t1 t2 =
 
 let is_included = equal
 
-let is_current = function
-  | Unknown | Well -> false
-  | Origin { loc } -> Cil_datatype.Location.equal loc (Cil.CurrentLoc.get ())
 
+(* For each garbled mix origin, keep track of:
+   - the number of writes (according to [register_write] below), i.e. the number
+     of times a garbled mix with this origin has been written in a state during
+     the analysis.
+   - the number of reads (according to [register_read] below), i.e. the number
+     of times a garbled mix with this origin is used by the analysis.
+     Only reads at a different location than that of the origin are counted:
+     if a garbled mix is only used where it has been created, it has no more
+     impact on the analysis precision than any other imprecise value.
+   - the set of bases related to garbled mix with this origin.
+
+   These info are printed at the end of an Eva analysis. *)
 
 module History_Info = struct
   let name = "Origin.History"
@@ -124,24 +137,33 @@ module History_Info = struct
   let size = 32
 end
 
+(* Number of writes, number of reads, related bases. *)
 module History_Data =
   Datatype.Triple (Datatype.Int) (Datatype.Int) (Base.SetLattice)
 module History = State_builder.Hashtbl (Hashtbl) (History_Data) (History_Info)
 
 let clear () = Id.reset (); History.clear ()
 
+let is_current = function
+  | Unknown | Well -> false
+  | Origin { loc } -> Cil_datatype.Location.equal loc (Cil.CurrentLoc.get ())
+
+(* Returns true if the origin has never been registered and is related to the
+   current location. *)
 let register_write bases t =
   if is_unknown t then false else
     let change (w, r, b) = w+1, r, Base.SetLattice.join b bases in
     let count, _, _ = History.memo ~change (fun _ -> 1, 0, bases) t in
     count < 2 && is_current t
 
+(* Registers a read only if the current location is not that of the origin. *)
 let register_read bases t =
   if not (is_unknown t || is_current t) then
     let change (w, r, b) = w, r+1, Base.SetLattice.join b bases in
     ignore (History.memo ~change (fun _ -> 0, 1, bases) t)
 
-
+(* Returns the list of recorded origins, sorted by number of reads.
+   Origins with no reads are filtered. *)
 let get_history () =
   let list = List.of_seq (History.to_seq ()) in
   let list = List.filter (fun (_origin, (_, r, _)) -> r > 0) list in
