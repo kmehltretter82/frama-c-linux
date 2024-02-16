@@ -160,9 +160,9 @@ export interface ButtonProps<A> {
   /** Currently selected value. */
   selection?: A;
   /** Selection callback. Receives the button's value. */
-  onClick?: (value: A | undefined, evt?:React.MouseEvent) => void;
+  onClick?: (value: A | undefined, evt:React.MouseEvent) => void;
   /** Right-Click callback. Receives the button's value. */
-  onContextMenu?: (value: A | undefined, evt?:React.MouseEvent) => void;
+  onContextMenu?: (value: A | undefined, evt:React.MouseEvent) => void;
   /** Button contents */
   children?: React.ReactNode;
 }

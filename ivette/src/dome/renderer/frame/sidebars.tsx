@@ -184,7 +184,7 @@ export interface ItemProps {
   /** Selection state. */
   selected?: boolean;
   /** Selection callback. */
-  onSelection?: (e?: React.MouseEvent) => void;
+  onSelection ?: (e: React.MouseEvent) => void
   /** Right-click callback. */
   onContextMenu?: () => void;
   /** Additional class. */
