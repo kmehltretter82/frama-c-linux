@@ -22,7 +22,7 @@
 
 import React from 'react';
 
-
+import * as Dome from 'dome';
 import * as System from 'dome/system';
 import * as Editor from 'dome/text/editor';
 import * as Labels from 'dome/controls/labels';
@@ -39,7 +39,6 @@ import * as States from 'frama-c/states';
 import * as Status from 'frama-c/kernel/Status';
 import * as Ast from 'frama-c/kernel/api/ast';
 
-import * as Dome from 'dome';
 
 // -----------------------------------------------------------------------------
 //  Utilitary types and functions

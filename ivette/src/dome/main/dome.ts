@@ -62,11 +62,6 @@ import path from 'path';
 
 import * as Menubar from './menubar';
 
-// The __static path is provided by webpack at execution time, but the static
-// type system is not aware of that for now. This is a workaround to avoid
-// an error during compilation.
-// declare const __static: string;
-
 // --------------------------------------------------------------------------
 // --- System Helpers
 // --------------------------------------------------------------------------
@@ -561,8 +556,8 @@ interface Cmd { wdir: string; argv: string[] }
 function stripElectronArgv(cmd: Cmd): Cmd {
   const wdir = DEVEL ? cmd.argv[2] : cmd.wdir;
   const argv = cmd.argv
-    .slice(DEVEL ? 3 : LOCAL ? 2 : 1)
-    .filter((p) => !!p && p !== "--no-sandbox");
+  .slice(DEVEL ? 3 : 2)
+  .filter((p) => !!p && p !== "--no-sandbox");
   return { wdir, argv };
 }
 
@@ -577,6 +572,7 @@ function createPrimaryWindow(): void {
   //  });
   const cwd = process.cwd();
   const wdir = cwd === '/' ? app.getPath('home') : cwd;
+  console.log("Process argv: ", process.argv);
   const cmd = stripElectronArgv({ wdir, argv: process.argv });
 
   // Reset Settings if the associated argument is provided
@@ -740,7 +736,7 @@ export function start(): void {
     if (DEVEL) {
       installExtension(REACT_DEVELOPER_TOOLS)
         .then((name) => console.log(`Added Extension:  ${name}`))
-        .catch((err) => console.log('An error occurred: ', err));
+        .catch((err) => console.log('Extension error: ', err));
     }
     createPrimaryWindow();
 
@@ -765,7 +761,7 @@ export function start(): void {
   // Warning: when no event handler is registered, the app automatically
   // quit when all windows are closed.
   app.on('window-all-closed', () => {
-    if (isQuitting || System.platform !== 'darwin') app.quit();
+    if (isQuitting || System.platform !== 'macos') app.quit();
   });
 }
 

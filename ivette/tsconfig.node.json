@@ -6,6 +6,13 @@
     "esModuleInterop": true,
     "types": ["electron-vite/node"],
     "paths": {
+      "ivette@ext": [ "./src/renderer/Extensions.tsx" ],
+      "ivette@lab": [ "./src/renderer/Laboratory.tsx" ],
+      "ivette@mode": [ "./src/renderer/Actions.tsx" ],
+      "ivette": [ "./src/ivette/index.tsx" ],
+      "ivette/*": [ "./src/ivette/*" ],
+      "frama-c/api/*": [ "./src/frama-c/api/generated/*" ],
+      "frama-c/*": [ "./src/frama-c/*" ],
       "dome": [ "./src/dome/renderer/dome.tsx" ],
       "dome/system": [ "./src/dome/misc/system.js" ],
       "dome/devtools": [ "./src/dome/misc/devtools.js" ],

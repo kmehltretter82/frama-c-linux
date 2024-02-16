@@ -24,11 +24,10 @@
 // --- Properties
 // --------------------------------------------------------------------------
 
-import _ from 'lodash';
 import React from 'react';
 
+import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
-import * as States from 'frama-c/states';
 import * as Compare from 'dome/data/compare';
 import * as Settings from 'dome/data/settings';
 import { Label, Code } from 'dome/controls/labels';
@@ -36,17 +35,20 @@ import { Icon } from 'dome/controls/icons';
 import { IconButton, Checkbox } from 'dome/controls/buttons';
 import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
-import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
-import { TitleBar } from 'ivette';
 import { Scroll } from 'dome/layout/boxes';
 import { Section } from 'dome/frame/sidebars';
-
+import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { RSplit } from 'dome/layout/splitters';
+
+import { TitleBar } from 'ivette';
+
 
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Properties from 'frama-c/kernel/api/properties';
-import * as Dome from 'dome';
+import * as States from 'frama-c/states';
+
+import _ from 'lodash';
 
 type PropKey = Json.key<'#marker'>;
 type Property = Properties.statusData |

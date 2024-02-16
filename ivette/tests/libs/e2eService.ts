@@ -28,7 +28,7 @@ import * as locs from "./locatorsUtil";
  * Basic Electron configuration for Playwright e2e tests of Ivette
  */
 export const argsDefaultLaunch: string[] = [
-  "./dist/main/main.js",
+  "./out/main/index.js",
   "--no-sandbox",
 ];
 
@@ -36,7 +36,7 @@ export const argsDefaultLaunch: string[] = [
  * Electron configuration for Playwright e2e tests of Ivette's default settings
  */
 export const argsLaunchWithDefaultSettings: string[] = [
-  "./dist/main/main.js",
+  "./out/main/index.js",
   "--no-sandbox",
   "--settings",
   "DEFAULT"
@@ -46,7 +46,7 @@ export const argsLaunchWithDefaultSettings: string[] = [
  * Electron configuration for Playwright e2e tests of Ivette on a C file
  */
 export const argsLaunchWithTestFile: string[] = [
-  "./dist/main/main.js",
+  "./out/main/index.js",
   "--no-sandbox",
   "--settings",
   "./tests/settings.json",

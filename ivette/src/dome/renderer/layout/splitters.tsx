@@ -299,7 +299,7 @@ function SplitterEngine(props: SplitterEngineProps): JSX.Element {
 }
 
 const SplitterLayout = (props: SplitterLayoutProps): JSX.Element => (
-<div className={CONTAINER + " damien"}>
+<div className={CONTAINER}>
     <AutoSizer>
       {(size: Size) => (
         <SplitterEngine size={size} {...props} />

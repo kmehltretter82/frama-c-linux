@@ -40,18 +40,18 @@
    @module dome
  */
 
-import _ from 'lodash';
-import Emitter from 'events';
-import React from 'react';
-import SYS, * as System from 'dome/system';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
-const { ipcRenderer } = require('electron/renderer');
+import SYS, * as System from 'dome/system';
+import Emitter from 'events';
+import _ from 'lodash';
+import React from 'react';
+import { createRoot } from 'react-dom/client';
 import './dark.css';
+import { State } from './data/states';
 import './light.css';
 import './style.css';
-import { State } from './data/states';
-import { createRoot } from 'react-dom/client';
+const { ipcRenderer } = require('electron/renderer');
 
 // --------------------------------------------------------------------------
 // --- Context
@@ -117,11 +117,6 @@ export function getWorkingDir(): string { return System.getWorkingDir(); }
 
 /** Current process ID.. */
 export function getPID(): number { return System.getPID(); }
-
-// The __static path is provided by webpack at execution time, but the static
-// type system is not aware of that for now. This is a workaround to avoid
-// an error during compilation.
-// declare const __static: string;
 
 /** Path to application static resources. */
 export function getStatic(file?: string): string {
