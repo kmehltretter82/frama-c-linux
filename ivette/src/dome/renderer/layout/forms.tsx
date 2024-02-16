@@ -40,7 +40,7 @@
 
 import { debounce } from 'lodash';
 import Events from 'events';
-import React, { useReducer } from 'react';
+import React from 'react';
 import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
 import { SVG } from 'dome/controls/icons';
@@ -162,69 +162,6 @@ export class BufferController {
   removeError(): void { this.errors--; }
 }
 
-interface BufferState<A> {
-  modified: boolean,
-  bvalue: A,
-  berror: FieldError
-}
-
-interface BufferActionDispatch<A> {
-  type: "reset" | "commit" | "change",
-  remote: BufferController,
-  reset?: A,
-  onChanged?: Callback<A>,
-  payload?: Partial<BufferState<A>>
-}
-
-type BufferReducer<A> = (
-  state: BufferState<A>,
-  action: BufferActionDispatch<A>
-) => BufferState<A>;
-
-/**
- * Dispatch function for useBuffer hook.
- */
-function bufferReducer<A>(
-  state: BufferState<A>, action: BufferActionDispatch<A>
-): BufferState<A> {
-  const { bvalue, berror } = state;
-  const { type, remote, reset, onChanged, payload } = action;
-
-  const getResetState = (): BufferState<A> => {
-    return reset ?
-      {  ...state, bvalue: reset, berror: undefined, modified: false } :
-      state;
-  };
-
-  switch(type) {
-    case "reset": {
-      !isValid(berror) && reset && remote.removeError();
-      return getResetState();
-    }
-    case "commit": {
-      if(isValid(berror)) {
-        onChanged && onChanged(bvalue, undefined, false);
-        return { ...state, modified: false };
-      } else {
-        reset && remote.removeError();
-        return getResetState();
-      }
-    }
-    case "change": {
-      const newError = payload && payload.berror;
-      if(!isValid(berror) && isValid(newError)) {
-        remote.removeError();
-      } else if(isValid(berror) && !isValid(newError)) {
-        remote.addError();
-      }
-      return { ...state, ...payload };
-    }
-    default: {
-      return state;
-    }
-  }
-}
-
 /**
    Insert a temporary buffer to stack modifications. Values are imported from
    the input state, and modifications are stacked into an internal buffer.
@@ -248,62 +185,60 @@ export function useBuffer<A>(
 ): FieldState<A>
 {
   const { value, error, reset, onChanged } = state;
-  const [ buffer, dispatch ] = useReducer<BufferReducer<A>>(bufferReducer, {
-    modified: false,
-    bvalue: value,
-    berror: error,
-  });
-  const { modified, berror, bvalue } = buffer;
+  const [ modified, setModified ] = React.useState(false);
+  const [ buffer, setBuffer ] = React.useState<A>(value);
+  const [ berror, setBerror ] = React.useState<FieldError>(error);
 
   // --- Reset
   React.useEffect(() => {
     if (modified) {
       const doReset = (): void => {
-        dispatch({
-          type: "reset",
-          remote: remote,
-          reset: reset ?? value
-        });
+        !isValid(berror) && remote.removeError();
+        setModified(false);
+        setBuffer(reset ?? value);
+        setBerror(undefined);
       };
       remote.onReset(doReset);
       return () => remote.offReset(doReset);
     } else return;
-  }, [remote, modified, value, reset]);
+  }, [remote, modified, value, berror, reset]);
 
   // --- Commit
   React.useEffect(() => {
     if(modified) {
       const doCommit = (): void => {
-        dispatch({
-          type: "commit",
-          remote: remote,
-          reset: reset ?? value,
-          onChanged
-        });
+        if(isValid(berror)) {
+          setModified(false);
+          onChanged(buffer, undefined, false);
+        } else {
+          remote.removeError();
+          setModified(false);
+          setBuffer(reset ?? value);
+          setBerror(undefined);
+        }
       };
       remote.onCommit(doCommit);
       return () => remote.offCommit(doCommit);
     } else return;
-  }, [remote, modified, value, reset, bvalue, onChanged]);
+  }, [remote, modified, value, berror, buffer, reset, onChanged]);
 
   // --- Callback
   const onLocalChange = React.useCallback(
     (newValue, newError, isReset) => {
-      dispatch({
-        type: "change",
-        remote: remote,
-        payload: {
-          modified: !isReset,
-          bvalue: newValue,
-          berror: newError,
-        }
-      });
-      if (isReset && (equal ? equal(newValue, value) : (newValue !== value)))
+      if(!isValid(berror) && isValid(newError)) {
+        remote.removeError();
+      } else if(isValid(berror) && !isValid(newError)) {
+        remote.addError();
+      }
+      setModified(!isReset);
+      setBuffer(newValue);
+      setBerror(newError);
+      if (isReset && (equal ? !equal(newValue, value) : (newValue !== value)))
         onChanged(newValue, newError, isReset);
-    }, [value, onChanged, equal, remote]);
+    }, [value, onChanged, equal, berror, remote]);
 
   return {
-    value: modified ? bvalue : value,
+    value: modified ? buffer : value,
     error: modified ? berror : error,
     reset: reset ?? (modified ? value : undefined),
     onChanged: onLocalChange,
