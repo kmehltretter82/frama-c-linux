@@ -199,6 +199,7 @@ function deleteFromLoadedComponents(comp: Ivette.ComponentProps): void {
   const labviewState = globalLabViewState.getValue();
   const loadedComponents = labviewState.components;
 
+  if(!loadedComponents.has(comp.id)) return;
   const updatedSet = new Set<string>();
   loadedComponents.forEach(c => {
     c !== comp.id && updatedSet.add(c);
