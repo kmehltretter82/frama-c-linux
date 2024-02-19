@@ -4802,7 +4802,18 @@ and doType (ghost:bool) isFuncArg
                  (* Check if array size (nb elem * size elem) is smaller than
                     max size. *)
                  try
-                   let elem_size = Integer.of_int @@ bytesSizeOf bt in
+                   let elem_size =
+                     if Cil.isCompleteType bt &&
+                        not (Cil.is_variably_modified_type bt)
+                     then
+                       Integer.of_int @@ bytesSizeOf bt
+                     else
+                       (* Incomplete types can't be array elements,
+                          and multi-dimensional VLAs are currently unsupported.
+                          In both cases an error has already been raised,
+                          we just check here that the size is not widely off.*)
+                       Integer.one
+                   in
                    let size_t = bitsSizeOfInt theMachine.kindOfSizeOf in
                    let size_max = Cil.max_unsigned_number size_t in
                    let array_size = Integer.mul i elem_size in
