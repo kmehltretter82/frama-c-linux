@@ -5848,10 +5848,12 @@ let rec isConstantGen lit_only is_varinfo_cst f e = match e.enode with
   | BinOp (_, e1, e2, _) ->
     isConstantGen lit_only is_varinfo_cst f e1 &&
     isConstantGen lit_only is_varinfo_cst f e2
-  | Lval (Var vi, _) ->
+  | Lval (Var vi, NoOffset) ->
     is_varinfo_cst vi ||
     (vi.vglob && isArrayType vi.vtype) ||
     isFunctionType vi.vtype
+  | Lval (Var vi, offset) ->
+    is_varinfo_cst vi && isConstantOffsetGen lit_only is_varinfo_cst f offset
   | Lval _ -> false
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> true
   (* see ISO 6.6.6 *)
