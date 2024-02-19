@@ -1,5 +1,4 @@
 /* run.config*
-   EXIT: 1
    STDOPT: #"-eva-msg-key initial-state"
 */
 
