@@ -4822,7 +4822,10 @@ and doType (ghost:bool) isFuncArg
                        "Array length is too large.";
                  with
                  | SizeOfError (msg,_) ->
-                   Kernel.error ~once:true ~current:true "%s" msg
+                   Kernel.error ~once:true ~current:true
+                     "Unable to compute the size of array element '%a': %s"
+                     Cil_printer.pp_typ bt
+                     msg
                  | Invalid_argument msg ->
                    Kernel.fatal ~current:true "%s" msg
              end
