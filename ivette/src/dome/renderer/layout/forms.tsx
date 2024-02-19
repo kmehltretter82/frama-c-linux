@@ -836,7 +836,7 @@ export function Section(props: SectionProps): JSX.Element | null {
 export type ActionsProps = IconProps
 
 /** @category Form Fields Actions*/
-export function reloadActions<A>(
+export function resetActions<A>(
   fieldState: FieldState<A>,
   equal?: (a: A, b: A) => boolean
 ): ActionsProps | null {
@@ -844,7 +844,7 @@ export function reloadActions<A>(
 
   if(reset === undefined) return null;
 
-  const reloadAction = {
+  const resetActions = {
     id: "RELOAD",
     title: "Reset",
     size: 12,
@@ -854,10 +854,10 @@ export function reloadActions<A>(
     }
   };
   if(equal ? equal(reset, value) : reset === value) {
-    reloadAction.title = "Field modified";
-    reloadAction.kind = "warning" as IconKind;
+    resetActions.title = "Field modified";
+    resetActions.kind = "warning" as IconKind;
   }
-  return reloadAction;
+  return resetActions;
 }
 
 /** @category Form Fields Actions*/
