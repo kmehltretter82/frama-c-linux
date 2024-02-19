@@ -22,7 +22,6 @@
 
 open Cil_types
 open Eval
-open Cvalue.Model
 
 type value = Main_values.CVal.t
 type origin = value
@@ -79,7 +78,7 @@ let reduce valuation lval value t =
     | `Value record ->
       let loc = Precise_locs.imprecise_location record.loc in
       if Locations.cardinal_zero_or_one loc
-      then reduce_indeterminate_binding t loc value
+      then Cvalue.Model.reduce_indeterminate_binding t loc value
       else t
     | `Top -> t (* Cannot reduce without the location of the lvalue. *)
 
@@ -142,7 +141,8 @@ let copy_one_loc state left_lv right_lv =
   (* top size is tested before this function is called, in which case
      the imprecise copy mode is used. *)
   let size = Int_Base.project right_loc.Locations.size in
-  let offsetmap = copy_offsetmap right_loc.Locations.loc size state in
+  let right_loc = right_loc.Locations.loc in
+  let offsetmap = Cvalue.Model.copy_offsetmap right_loc size state in
   let make_volatile =
     Cil.typeHasQualifier "volatile" left_typ ||
     Cil.typeHasQualifier "volatile" right_typ
@@ -162,7 +162,7 @@ let copy_one_loc state left_lv right_lv =
       raise Do_assign_imprecise_copy;
     warn_imprecise_offsm_write left_lval offsetmap;
     `Value
-      (paste_offsetmap ~exact:true
+      (Cvalue.Model.paste_offsetmap ~exact:true
          ~from:offsetmap ~dst_loc:left_loc.Locations.loc ~size state)
 
 let make_determinate value =
@@ -185,9 +185,9 @@ let copy_right_lval state left_lv right_lv copied_value =
           and right_lv = right_lv.lval, right_loc, right_lv.ltyp in
           match copy_one_loc state left_lv right_lv with
           | `Bottom -> acc
-          | `Value state -> join acc state
+          | `Value state -> Cvalue.Model.join acc state
         in
-        Precise_locs.fold process right_lv.lloc bottom
+        Precise_locs.fold process right_lv.lloc Cvalue.Model.bottom
       with
         Do_assign_imprecise_copy ->
         write_abstract_value state (lval, loc, typ) copied_value
@@ -204,10 +204,10 @@ let assign _stmt { lval; ltyp; lloc } _expr assigned valuation state =
   in
   let aux_loc loc acc_state =
     let s = assign_one_loc loc in
-    join acc_state s
+    Cvalue.Model.join acc_state s
   in
-  let state = Precise_locs.fold aux_loc lloc bottom in
-  if not (is_reachable state)
+  let state = Precise_locs.fold aux_loc lloc Cvalue.Model.bottom in
+  if not (Cvalue.Model.is_reachable state)
   then `Bottom
   else `Value state
 
