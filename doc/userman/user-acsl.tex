@@ -6,14 +6,15 @@
 When a plug-in registers an extension, it can be used in \acsl annotations
 with 2 different syntaxes. As an example, with an extension \lstinline|bar|
 registered by the plug-in \lstinline|foo|, we can use the short syntax
-\lstinline|bar _| and the complete syntax \lstinline|\foo::bar _|.
+\lstinline|bar _| or the complete syntax \lstinline|\foo::bar _|.
 
-The complete syntax is usefull to print better warning/error messages, and to
+The complete syntax is useful to print better warning/error messages, and to
 better understand which plug-in introduced the extension. Additionnaly, all
 extensions coming from an unloaded plug-in can be ignored this way. For
 example, if \Eva is not loaded, \lstinline|\eva::unroll _| annotations will be
-ignored with a warning, unlike \lstinline|unroll _| which by default will be
-treated as a user error. 
+ignored with a warning, whereas \lstinline|unroll _| cannot be identified as
+being supported by Eva, which means that it can only be treated as a user
+error. 
 
 \section{Handling indirect calls with \texttt{calls}}
 \label{acsl:calls}
