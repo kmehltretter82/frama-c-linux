@@ -318,7 +318,7 @@
     | IDENTIFIER s ->
       if Plugin.is_present plugin then
         Kernel.warning ~once:true ~wkey:Kernel.wkey_extension_unknown ~source
-          "Unregistered extension %s for plug-in %s" s plugin
+          "Unregistered extension '%s' for plug-in %s" s plugin
       else
         Kernel.warning ~once:true ~wkey:Kernel.wkey_plugin_not_loaded ~source
           "Ignored extensions for unloaded plug-in %s" plugin;
@@ -328,9 +328,13 @@
     | EXT_GLOBAL_BLOCK s
     | EXT_CONTRACT s ->
       let plugin_from = Logic_env.extension_from s in
+      if plugin_from = plugin && plugin = "kernel" then
+        Kernel.abort ~source
+          "Extension '%s' from frama-c's kernel should not be used with the syntax \
+          \\kernel::%s" s s;
       if plugin_from <> plugin then
         Kernel.abort ~source
-          "Extension %s is from %s and not %s" s plugin_from plugin;
+          "Extension '%s' is from %s and not %s" s plugin_from plugin;
       tok
     | _ ->
       Kernel.abort ~source

@@ -191,12 +191,17 @@ module Extensions = struct
   let print name printer fmt kind =
     let ext_common = find_common name in
     let plugin = ext_common.plugin in
+    let full_name =
+      if Datatype.String.equal plugin "kernel" then name
+      else
+        Format.sprintf "\\%s::%s" plugin name
+    in
     let pp = ext_common.printer printer in
     match kind with
     | Ext_annot (id,_) ->
-      Format.fprintf fmt "@[<v 2>@[\\%s::%s %s {@]@\n%a}@]" plugin name id pp kind
+      Format.fprintf fmt "@[<v 2>@[%s %s {@]@\n%a}@]" full_name id pp kind
     | _ ->
-      Format.fprintf fmt "@[<hov 2>\\%s::%s %a;@]" plugin name pp kind
+      Format.fprintf fmt "@[<hov 2>%s %a;@]" full_name pp kind
 
   let short_print name printer fmt kind =
     let pp = (find_common name).short_printer in

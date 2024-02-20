@@ -508,10 +508,10 @@ int main(int c)
   int __retres;
   /*@ ghost main_pre_func(c); */
   if (c) pf = & f; else pf = & g;
-  /*@ \kernel::calls f, g; */
+  /*@ calls f, g; */
   (*pf)();
   if (c) pf = & g; else pf = & f;
-  /*@ \kernel::calls f, g; */
+  /*@ calls f, g; */
   (*pf)();
   __retres = 0;
   /*@ ghost main_post_func(__retres); */
