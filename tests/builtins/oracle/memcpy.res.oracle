@@ -108,6 +108,9 @@
 [eva:alarm] memcpy.c:87: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
 [eva] memcpy.c:87: function memcpy: precondition 'separation' got status valid.
+[eva:garbled-mix:write] memcpy.c:87: 
+  Builtin memcpy: assigning imprecise value to v3
+  because of misaligned read of addresses.
 [eva:alarm] memcpy.c:89: Warning: 
   pointer downcast. assert (unsigned int)(&v4) ≤ 2147483647;
 [eva:garbled-mix:write] memcpy.c:89: 

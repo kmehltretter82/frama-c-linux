@@ -252,6 +252,8 @@ let process_result call state call_result =
     | Some value, Some vi_ret ->
       let b_ret = Base.of_varinfo vi_ret in
       let offsm = Eval_op.offsetmap_of_v ~typ:vi_ret.vtype value in
+      let prefix = "Builtin " ^ Kernel_function.get_name call.kf in
+      Cvalue_transfer.warn_imprecise_offsm_write ~prefix (Cil.var vi_ret) offsm;
       Cvalue.Model.add_base b_ret offsm state, clob
     | _, _ -> state, clob (* TODO: error? *)
   in

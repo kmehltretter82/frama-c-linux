@@ -30,6 +30,12 @@ let register_builtin name ?replace builtin =
 
 let dkey = Self.register_category "imprecision"
 
+let rec lval_of_address exp =
+  match exp.enode with
+  | AddrOf lval -> lval
+  | CastE (_typ, exp) -> lval_of_address exp
+  | _ -> Cil.mkMem ~addr:exp ~off:Cil_types.NoOffset
+
 let frama_C_is_base_aligned _state = function
   | [_, x; _, y] ->
     let result =
@@ -99,8 +105,10 @@ let deps_nth_arg n =
   with Failure _ -> Kernel.fatal "%d arguments expected" n
 
 
-let frama_c_memcpy state actuals =
-  let compute (_exp_dst,dst_bytes) (_exp_src,src_bytes) (_exp_size,size) =
+let frama_c_memcpy name state actuals =
+  let prefix = "Builtin " ^ name in
+  let compute (exp_dst,dst_bytes) (_exp_src,src_bytes) (_exp_size,size) =
+    let dst_lval = lval_of_address exp_dst in
     let plevel = Parameters.ArrayPrecisionLevel.get() in
     let size =
       try Cvalue.V.project_ival size
@@ -132,6 +140,7 @@ let frama_c_memcpy state actuals =
           memcpy_check_indeterminate_offsetmap offsetmap;
           (* Read succeeded. We write the result *)
           let loc_src = make_loc src (Int_Base.inject size_min) in
+          Cvalue_transfer.warn_imprecise_offsm_write ~prefix dst_lval offsetmap;
           let new_state =
             Cvalue.Model.paste_offsetmap
               ~from:offsetmap ~dst_loc:dst_bits ~size:size_min ~exact:true state
@@ -212,6 +221,7 @@ let frama_c_memcpy state actuals =
               raise (Memcpy_result (state,c_from,sure_zone))
             | `Value offsetmap ->
               memcpy_check_indeterminate_offsetmap offsetmap;
+              Cvalue_transfer.warn_imprecise_offsm_write ~prefix dst_lval offsetmap;
               let new_state =
                 Cvalue.Model.paste_offsetmap
                   ~from:offsetmap ~dst_loc:dst ~size:diff ~exact:false state
@@ -247,6 +257,8 @@ let frama_c_memcpy state actuals =
                    "@[In memcpy@ builtin:@ imprecise@ copy of@ indeterminate@ values@]%t"
                    Eva_utils.pp_callstack
         end;
+        let value = Cvalue.V_Or_Uninitialized.get_v v in
+        Cvalue_transfer.warn_imprecise_write ~prefix dst_lval loc_dst value;
         let updated_state =
           Cvalue.Model.add_indeterminate_binding
             ~exact:false new_state loc_dst v
@@ -287,11 +299,13 @@ let frama_c_memcpy state actuals =
   | [dst; src; size] -> compute dst src size
   | _ -> raise (Builtins.Invalid_nb_of_args 3)
 
-let () = register_builtin ~replace:"memcpy" "Frama_C_memcpy" frama_c_memcpy
-let () = register_builtin ~replace:"memmove" "Frama_C_memmove" frama_c_memcpy
+let () =
+  register_builtin ~replace:"memcpy" "Frama_C_memcpy" (frama_c_memcpy "memcpy");
+  register_builtin ~replace:"memmove" "Frama_C_memmove" (frama_c_memcpy "memmove")
 
 (*  Implementation of [memset] that accepts imprecise arguments. *)
-let frama_c_memset_imprecise state dst v size =
+let frama_c_memset_imprecise state dst_lval dst v size =
+  let prefix = "Builtin memset" in
   let size_char = Bit_utils.sizeofchar () in
   let size_min, size_max_bytes =
     try
@@ -317,6 +331,7 @@ let frama_c_memset_imprecise state dst v size =
       let loc = Location_Bytes.shift shift dst in
       let loc = loc_bytes_to_loc_bits loc in
       let loc = make_loc loc (Int_Base.inject size_char) in
+      Cvalue_transfer.warn_imprecise_write ~prefix dst_lval loc v;
       let state = Cvalue.Model.add_binding ~exact:false state loc v in
       (state,enumerate_valid_bits Locations.Write loc)
     else (state,Zone.bottom)
@@ -335,6 +350,7 @@ let frama_c_memset_imprecise state dst v size =
         let left' = Location_Bits.inject base (Ival.inject_singleton maxb) in
         let vuninit = V_Or_Uninitialized.initialized v in
         let from = V_Offsetmap.create ~size:sure vuninit ~size_v:size_char in
+        Cvalue_transfer.warn_imprecise_offsm_write ~prefix dst_lval from;
         let state =
           Cvalue.Model.paste_offsetmap
             ~from ~dst_loc:left' ~size:sure ~exact:true new_state
@@ -521,7 +537,7 @@ let memset_typ_offsm typ v =
 
 (*  Precise memset builtin, that requires its arguments to be sufficiently
     precise abstract values. *)
-let frama_c_memset_precise state dst v (exp_size, size) =
+let frama_c_memset_precise state dst_lval dst v (exp_size, size) =
   try
     let size_char = Bit_utils.sizeofchar () in
     (* We want an exact size, Otherwise, we can use the imprecise memset as a
@@ -571,6 +587,8 @@ let frama_c_memset_precise state dst v (exp_size, size) =
       c_from,dst_zone
     in
     let _ = c_from in
+    let prefix = "Builtin memset" in
+    Cvalue_transfer.warn_imprecise_offsm_write ~prefix dst_lval offsm;
     let state' =
       Cvalue.Model.paste_offsetmap
         ~from:offsm ~dst_loc ~size:size_bits ~exact:true state
@@ -590,8 +608,9 @@ let frama_c_memset_precise state dst v (exp_size, size) =
 
 let frama_c_memset state actuals =
   match actuals with
-  | [(_exp_dst, dst); (_, v); (exp_size, size)] ->
+  | [(exp_dst, dst); (_, v); (exp_size, size)] ->
     begin
+      let dst_lval = lval_of_address exp_dst in
       (* Remove read-only destinations *)
       let dst = V.filter_base (fun b -> not (Base.is_read_only b)) dst in
       (* Keep only the first byte of the value argument *)
@@ -601,13 +620,13 @@ let frama_c_memset state actuals =
           ~size:(Int.of_int (Cil.bitsSizeOfInt IInt))
           v
       in
-      try frama_c_memset_precise state dst v (exp_size, size)
+      try frama_c_memset_precise state dst_lval dst v (exp_size, size)
       with ImpreciseMemset reason ->
         Self.debug ~dkey ~current:true
           "Call to builtin precise_memset(%a) failed; %a%t"
           Eva_utils.pretty_actuals actuals pretty_imprecise_memset_reason reason
           Eva_utils.pp_callstack;
-        frama_c_memset_imprecise state dst v size
+        frama_c_memset_imprecise state dst_lval dst v size
     end
   | _ -> raise (Builtins.Invalid_nb_of_args 3)
 

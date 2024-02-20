@@ -36,30 +36,34 @@ let unbottomize = function
 (*                        Garbled mix warnings                            *)
 (* ---------------------------------------------------------------------- *)
 
-let warn_imprecise_value lval value =
+let warn_imprecise_value ?prefix lval value =
   match value with
   | Locations.Location_Bytes.Top (bases, origin) ->
     if Origin.register_write bases origin then
+      let prefix = Option.fold ~none:"A" ~some:(fun s -> s ^ ": a") prefix in
       Self.warning ~wkey:Self.wkey_garbled_mix_write ~once:true ~current:true
-        "@[Assigning imprecise value to %a@ because of %s.@]%t"
-        Printer.pp_lval lval (Origin.descr origin)
+        "@[%sssigning imprecise value to %a@ because of %s.@]%t"
+        prefix Printer.pp_lval lval (Origin.descr origin)
         Eva_utils.pp_callstack
   | _ -> ()
 
-let warn_imprecise_location loc =
+let warn_imprecise_location ?prefix loc =
   match loc.Locations.loc with
   | Locations.Location_Bits.Top (Base.SetLattice.Top, orig) ->
+    let prefix = Option.fold ~none:"" ~some:(fun s -> s ^ ": ") prefix in
     Self.fatal ~current:true
-      "@[writing at a completely unknown address@ because of %s.@]@\nAborting."
-      (Origin.descr orig)
+      "@[%swriting at a completely unknown address@ because of %s.@]@\nAborting."
+      prefix (Origin.descr orig)
   | _ -> ()
 
-let warn_imprecise_write lval loc value =
-  warn_imprecise_location loc;
-  warn_imprecise_value lval value
+let warn_imprecise_write ?prefix lval loc value =
+  warn_imprecise_location ?prefix loc;
+  warn_imprecise_value ?prefix lval value
 
-let warn_imprecise_offsm_write lval offsm =
-  let warn v = warn_imprecise_value lval (Cvalue.V_Or_Uninitialized.get_v v) in
+let warn_imprecise_offsm_write ?prefix lval offsm =
+  let warn value =
+    warn_imprecise_value ?prefix lval (Cvalue.V_Or_Uninitialized.get_v value)
+  in
   Cvalue.V_Offsetmap.iter_on_values warn offsm
 
 (* ---------------------------------------------------------------------- *)
@@ -224,17 +228,8 @@ let actualize_formals state arguments =
 let start_call _stmt call _recursion _valuation state =
   `Value (actualize_formals state call.arguments)
 
-let finalize_call stmt call _recursion ~pre:_ ~post:state =
-  (* Deallocate memory allocated via alloca().
-     To minimize computations, only do it for function definitions. *)
-  let state' =
-    if Kernel_function.is_definition call.kf then
-      let callstack = Eva_utils.current_call_stack () in
-      let callstack = Callstack.push call.kf stmt callstack in
-      Builtins_malloc.free_automatic_bases callstack state
-    else state
-  in
-  `Value state'
+let finalize_call _stmt _call _recursion ~pre:_ ~post:state =
+  `Value state
 
 let show_expr valuation state fmt expr =
   match expr.enode with
