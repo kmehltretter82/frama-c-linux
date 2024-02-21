@@ -799,7 +799,7 @@ export interface SectionProps extends FilterProps, Children {
 /** @category Form Fields */
 export function Section(props: SectionProps): JSX.Element | null {
   const { label, title, children, warning, error, ...filter } = props;
-  const { disabled, hidden } = useContext(filter);
+  const { disabled, hidden, mode } = useContext(filter);
   const [unfold, flip] = Dome.useFlipSettings(props.settings, props.unfold);
 
   if (hidden) return null;
@@ -812,7 +812,7 @@ export function Section(props: SectionProps): JSX.Element | null {
   );
 
   return (
-    <CONTEXT.Provider value={{ hidden, disabled }}>
+    <CONTEXT.Provider value={{ hidden, disabled, mode }}>
       <div className="dome-xForm-section" onClick={flip}>
         <div className="dome-xForm-fold">
           <SVG id={unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT'} size={11} />
