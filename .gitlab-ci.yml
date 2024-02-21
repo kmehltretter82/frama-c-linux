@@ -132,7 +132,7 @@ frama-c:
 
 ivette:
   stage: build
-  image: node:lts-alpine
+  image: node:lts-buster
   cache:
     paths:
       - ivette/node_modules/
