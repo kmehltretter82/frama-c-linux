@@ -52,7 +52,7 @@ theory Compound
   
   (* use map.Map *)
   
-  (* use frama_c_wp.memory.Memory *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
   function shiftfield_F2_A_dummy (p:addr) : addr = shift p 0
   
@@ -67,6 +67,8 @@ theory Compound
     forall mint:addr -> int, p:addr, q:addr, v:int
      [Load_S2_A p (set mint q v)].
      not q = p -> Load_S2_A p (set mint q v) = Load_S2_A p mint
+  
+  (* use frama_c_wp.memory.Memory *)
   
   axiom Q_Load_S2_A_eqmem_Mint0 :
     forall mint:addr -> int, mint1:addr -> int, n:int, p:addr, q:addr
@@ -97,7 +99,7 @@ end
     
     (* use map.Map *)
     
-    (* use frama_c_wp.memory.Memory *)
+    (* use frama_c_wp.memaddr.MemAddr *)
     
     (* use Compound *)
     

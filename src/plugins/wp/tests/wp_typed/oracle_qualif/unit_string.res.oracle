@@ -5,11 +5,314 @@
 [wp] [Valid] Goal f_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 6 goals scheduled
+---------------------------------------------
+--- Context 'typed_f' Cluster 'Compound' 
+---------------------------------------------
+theory Compound
+  (* use why3.BuiltIn.BuiltIn *)
+  
+  (* use bool.Bool *)
+  
+  (* use int.Int *)
+  
+  (* use int.ComputerDivision *)
+  
+  (* use real.RealInfix *)
+  
+  (* use frama_c_wp.qed.Qed *)
+  
+  (* use map.Map *)
+  
+  (* use frama_c_wp.memaddr.MemAddr *)
+  
+  function shift_sint8 (p:addr) (k:int) : addr = shift p k
+end
+---------------------------------------------
+--- Context 'typed_f' Cluster 'cstring' 
+---------------------------------------------
+theory Cstring
+  (* use why3.BuiltIn.BuiltIn *)
+  
+  (* use bool.Bool *)
+  
+  (* use int.Int *)
+  
+  (* use int.ComputerDivision *)
+  
+  (* use real.RealInfix *)
+  
+  (* use frama_c_wp.qed.Qed *)
+  
+  (* use map.Map *)
+  
+  constant Str_1 : int
+  
+  constant Lit_75AD : int -> int
+  
+  constant Str_2 : int
+  
+  constant Lit_6152 : int -> int
+  
+  constant Str_3 : int
+  
+  constant Str_4 : int
+  
+  constant Lit_7BA4 : int -> int
+  
+  axiom Q_Str_1_base : Str_1 < 0
+  
+  axiom Q_Lit_75AD_literal :
+    (((((get Lit_75AD 0 = 97 /\ get Lit_75AD 1 = 98) /\ get Lit_75AD 2 = 99) /\
+       get Lit_75AD 3 = 100) /\
+      get Lit_75AD 4 = 101) /\
+     get Lit_75AD 5 = 102) /\
+    get Lit_75AD 6 = 0
+  
+  (* use frama_c_wp.memaddr.MemAddr *)
+  
+  axiom Q_Str_1_region : region Str_1 = (- 30125)
+  
+  axiom Q_Str_1_linked : forall t:int -> int. linked t -> get t Str_1 = 7
+  
+  (* use frama_c_wp.memory.Memory *)
+  
+  (* use Compound *)
+  
+  axiom Q_Str_1_literal :
+    forall mchar:addr -> int, i:int.
+     sconst mchar ->
+     get mchar (shift_sint8 (global Str_1) i) = get Lit_75AD i
+  
+  axiom Q_Str_2_base : Str_2 < 0
+  
+  axiom Q_Lit_6152_literal :
+    ((get Lit_6152 0 = 100 /\ get Lit_6152 1 = 101) /\ get Lit_6152 2 = 102) /\
+    get Lit_6152 3 = 0
+  
+  axiom Q_Str_2_region : region Str_2 = (- 24914)
+  
+  axiom Q_Str_2_linked : forall t:int -> int. linked t -> get t Str_2 = 4
+  
+  axiom Q_Str_2_literal :
+    forall mchar:addr -> int, i:int.
+     sconst mchar ->
+     get mchar (shift_sint8 (global Str_2) i) = get Lit_6152 i
+  
+  axiom Q_Str_3_base : Str_3 < 0
+  
+  axiom Q_Str_3_region : region Str_3 = (- 24914)
+  
+  axiom Q_Str_3_linked : forall t:int -> int. linked t -> get t Str_3 = 4
+  
+  axiom Q_Str_3_literal :
+    forall mchar:addr -> int, i:int.
+     sconst mchar ->
+     get mchar (shift_sint8 (global Str_3) i) = get Lit_6152 i
+  
+  axiom Q_Str_4_base : Str_4 < 0
+  
+  axiom Q_Lit_7BA4_literal :
+    ((get Lit_7BA4 0 = 97 /\ get Lit_7BA4 1 = 98) /\ get Lit_7BA4 2 = 99) /\
+    get Lit_7BA4 3 = 0
+  
+  axiom Q_Str_4_region : region Str_4 = (- 31652)
+  
+  axiom Q_Str_4_linked : forall t:int -> int. linked t -> get t Str_4 = 4
+  
+  axiom Q_Str_4_literal :
+    forall mchar:addr -> int, i:int.
+     sconst mchar ->
+     get mchar (shift_sint8 (global Str_4) i) = get Lit_7BA4 i
+end
+[wp:print-generated] 
+  theory WP
+    (* use why3.BuiltIn.BuiltIn *)
+    
+    (* use bool.Bool *)
+    
+    (* use int.Int *)
+    
+    (* use int.ComputerDivision *)
+    
+    (* use real.RealInfix *)
+    
+    (* use frama_c_wp.qed.Qed *)
+    
+    (* use map.Map *)
+    
+    (* use Cstring *)
+    
+    goal wp_goal : not Str_4 = Str_3
+  end
 [wp] [Valid] typed_f_assert_AB (Alt-Ergo) (Cached)
+[wp:print-generated] 
+  theory WP1
+    (* use why3.BuiltIn.BuiltIn *)
+    
+    (* use bool.Bool *)
+    
+    (* use int.Int *)
+    
+    (* use int.ComputerDivision *)
+    
+    (* use real.RealInfix *)
+    
+    (* use frama_c_wp.qed.Qed *)
+    
+    (* use map.Map *)
+    
+    (* use Cstring *)
+    
+    goal wp_goal :
+      forall t:int -> int.
+       not Str_4 = Str_3 ->
+       linked t -> valid_rd t (shift_sint8 (global Str_3) 0) 3
+  end
 [wp] [Valid] typed_f_assert_B_valid (Alt-Ergo) (Cached)
+[wp:print-generated] 
+  theory WP2
+    (* use why3.BuiltIn.BuiltIn *)
+    
+    (* use bool.Bool *)
+    
+    (* use int.Int *)
+    
+    (* use int.ComputerDivision *)
+    
+    (* use real.RealInfix *)
+    
+    (* use frama_c_wp.qed.Qed *)
+    
+    (* use map.Map *)
+    
+    (* use frama_c_wp.memaddr.MemAddr *)
+    
+    (* use Cstring *)
+    
+    (* use frama_c_wp.cint.Cint *)
+    
+    goal wp_goal :
+      let a = global Str_3 in
+      let a1 = shift_sint8 a 3 in
+      forall t:int -> int, t1:addr -> int.
+       let a2 = a in
+       let a3 = a1 in
+       let x = get t1 a3 in
+       not Str_4 = Str_3 ->
+       linked t ->
+       sconst t1 ->
+       is_sint8 x ->
+       valid_rd t (shift_sint8 a2 0) 3 -> x = 0 /\ valid_rd t a3 1
+  end
 [wp] [Valid] typed_f_assert_B_end (Alt-Ergo) (Cached)
+[wp:print-generated] 
+  theory WP3
+    (* use why3.BuiltIn.BuiltIn *)
+    
+    (* use bool.Bool *)
+    
+    (* use int.Int *)
+    
+    (* use int.ComputerDivision *)
+    
+    (* use real.RealInfix *)
+    
+    (* use frama_c_wp.qed.Qed *)
+    
+    (* use map.Map *)
+    
+    (* use frama_c_wp.memaddr.MemAddr *)
+    
+    (* use Cstring *)
+    
+    goal wp_goal :
+      let a = global Str_3 in
+      let a1 = shift_sint8 a 3 in
+      forall t:int -> int, t1:addr -> int.
+       let a2 = a in
+       let a3 = a1 in
+       not Str_4 = Str_3 ->
+       get t1 a3 = 0 ->
+       linked t ->
+       sconst t1 ->
+       valid_rd t (shift_sint8 a2 0) 3 ->
+       valid_rd t a3 1 -> not valid_rd t (shift_sint8 a2 4) 1
+  end
 [wp] [Valid] typed_f_assert_B_out (Alt-Ergo) (Cached)
+[wp:print-generated] 
+  theory WP4
+    (* use why3.BuiltIn.BuiltIn *)
+    
+    (* use bool.Bool *)
+    
+    (* use int.Int *)
+    
+    (* use int.ComputerDivision *)
+    
+    (* use real.RealInfix *)
+    
+    (* use frama_c_wp.qed.Qed *)
+    
+    (* use map.Map *)
+    
+    (* use frama_c_wp.memaddr.MemAddr *)
+    
+    (* use Cstring *)
+    
+    goal wp_goal :
+      let a = global Str_3 in
+      let a1 = shift_sint8 a 3 in
+      forall t:int -> int, t1:addr -> int.
+       let a2 = a in
+       let a3 = a1 in
+       not Str_4 = Str_3 ->
+       get t1 a3 = 0 ->
+       linked t ->
+       sconst t1 ->
+       valid_rd t (shift_sint8 a2 0) 3 ->
+       valid_rd t a3 1 ->
+       not valid_rd t (shift_sint8 a2 4) 1 ->
+       not valid_rw t (shift_sint8 a2 1) 1
+  end
 [wp] [Valid] typed_f_assert_B_rw (Alt-Ergo) (Cached)
+[wp:print-generated] 
+  theory WP5
+    (* use why3.BuiltIn.BuiltIn *)
+    
+    (* use bool.Bool *)
+    
+    (* use int.Int *)
+    
+    (* use int.ComputerDivision *)
+    
+    (* use real.RealInfix *)
+    
+    (* use frama_c_wp.qed.Qed *)
+    
+    (* use map.Map *)
+    
+    (* use frama_c_wp.memaddr.MemAddr *)
+    
+    (* use Cstring *)
+    
+    goal wp_goal :
+      let a = global Str_3 in
+      let a1 = shift_sint8 a 3 in
+      forall t:int -> int, t1:addr -> int, i:int.
+       let a2 = a in
+       let a3 = a1 in
+       not Str_4 = Str_3 ->
+       get t1 a3 = 0 ->
+       0 <= i ->
+       i <= 2 ->
+       linked t ->
+       sconst t1 ->
+       valid_rd t (shift_sint8 a2 0) 3 ->
+       valid_rd t a3 1 ->
+       not valid_rd t (shift_sint8 a2 4) 1 ->
+       not valid_rw t (shift_sint8 a2 1) 1 ->
+       get t1 (shift_sint8 (global Str_1) (3 + i)) = get t1 (shift_sint8 a2 i)
+  end
 [wp] [Valid] typed_f_assert_VAL (Alt-Ergo) (Cached)
 [wp] Proved goals:    8 / 8
   Terminating:     1

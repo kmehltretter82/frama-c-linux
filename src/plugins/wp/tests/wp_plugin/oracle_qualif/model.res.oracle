@@ -25,7 +25,7 @@ theory Compound
   
   (* use map.Map *)
   
-  (* use frama_c_wp.memory.Memory *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
   function shift_sint32 (p:addr) (k:int) : addr = shift p k
 end
@@ -65,7 +65,7 @@ end
     
     (* use map.Map *)
     
-    (* use frama_c_wp.memory.Memory *)
+    (* use frama_c_wp.memaddr.MemAddr *)
     
     (* use frama_c_wp.cint.Cint *)
     
@@ -108,7 +108,7 @@ theory Compound1
   
   (* use map.Map1 *)
   
-  (* use frama_c_wp.memory.Memory1 *)
+  (* use frama_c_wp.memaddr.MemAddr1 *)
   
   function shift_sint321 (p:addr1) (k:int) : addr1 = shift1 p k
 end
@@ -148,7 +148,7 @@ end
     
     (* use map.Map1 *)
     
-    (* use frama_c_wp.memory.Memory1 *)
+    (* use frama_c_wp.memaddr.MemAddr1 *)
     
     (* use frama_c_wp.cint.Cint1 *)
     

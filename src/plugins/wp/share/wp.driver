@@ -86,7 +86,10 @@ why3.import := "vset.Vset";
 library vlist:
 why3.import := "frama_c_wp.vlist.Vlist";
 
-library memory:
+library memaddr:
+why3.import := "frama_c_wp.memaddr.MemAddr";
+
+library memory: memaddr
 why3.import := "frama_c_wp.memory.Memory";
 
 library sqrt: cmath
