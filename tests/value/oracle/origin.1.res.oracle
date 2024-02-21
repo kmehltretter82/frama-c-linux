@@ -83,7 +83,7 @@
   r.c ∈ [--..--]
    .[bits 8 to 15] ∈ UNINITIALIZED
    .i ∈ [--..--]
-   .p ∈ {{ garbled mix of &{x} (origin: Misaligned {origin.i:126}) }}
+   .p ∈ {{ garbled mix of &{x} (origin: Misaligned read {origin.i:126}) }}
    .t[0][bits 0 to 7] ∈
    {{ garbled mix of &{y} (origin: Merge {origin.i:129}) }}
    .t[0][bits 8 to 15]# ∈ {{ NULL ; (? *)&y }}%32, bits 24 to 31 

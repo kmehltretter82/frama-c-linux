@@ -1849,7 +1849,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
       let origin =
         match origin with
         | Some origin -> origin
-        | None -> Origin.(current Misalign_read)
+        | None -> Origin.(current Misalign_write)
       in
       let v = V.topify_with_origin origin v in
       (* TODO: check *)
@@ -1872,7 +1872,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
         let v =
           if Int.is_zero (period %~ size) then v
           else
-            let origin = Origin.(current Misalign_read) in
+            let origin = Origin.(current Misalign_write) in
             let v' = V.topify_with_origin origin v in
             if not (V.equal v v') then
               Lattice_messages.emit_approximation msg_emitter
@@ -2803,14 +2803,14 @@ module Make_bitwise(V: sig
         in
         `Value (Int_Intervals.fold aux_itv itvs m)
     with Error_Top ->
-      update_imprecise_everywhere ~validity Origin.unknown v m
+      update_imprecise_everywhere ~validity Origin.(current Misalign_write) v m
 
   let add_binding_ival ~validity ~exact offsets ~size v m =
     match size with
     | Int_Base.Value size ->
       update ~validity ~exact ~offsets ~size v m
     | Int_Base.Top ->
-      update_imprecise_everywhere ~validity Origin.unknown v m
+      update_imprecise_everywhere ~validity Origin.(current Misalign_write) v m
 
   let fold_itv ?direction ~entire f itv m acc =
     let f' itv (v, _, _) acc = f itv v acc in

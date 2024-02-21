@@ -273,7 +273,7 @@
   p ∈ {{ &x }}
   c1 ∈ {{ (char)&x }}
   c2# ∈ {{ (? *)&x }}%32, bits 0 to 7 
-  c3 ∈ {{ garbled mix of &{x} (origin: Misaligned {imprecise.c:68}) }}
+  c3 ∈ {{ garbled mix of &{x} (origin: Misaligned read {imprecise.c:68}) }}
 [eva:final-states] Values at end of function garbled_mix_null:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   p_gm_null ∈ [100..197]
@@ -317,11 +317,12 @@
   vy ∈ {1} or UNINITIALIZED
 [eva:final-states] Values at end of function write_garbled:
   NULL[rbits 800 to 1607] ∈
-      {{ garbled mix of &{j; k} (origin: Misaligned {imprecise.c:22}) }}
+      {{ garbled mix of &{j; k}
+       (origin: Misaligned write {imprecise.c:22}) }}
   i ∈ {1}
   j ∈ {{ NULL + [1..197] ; (int)&j ; &k + [0..16] }}
   k[0..4] ∈
-   {{ garbled mix of &{j; k} (origin: Misaligned {imprecise.c:22}) }}
+   {{ garbled mix of &{j; k} (origin: Misaligned write {imprecise.c:22}) }}
   p ∈ {{ NULL + [100..197] ; &j ; &k + [0..16] }}
 [eva:final-states] Values at end of function main:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
@@ -820,7 +821,7 @@
   p ∈ {{ &x }}
   c1 ∈ {{ (char)&x }}
   c2# ∈ {{ (? *)&x }}%32, bits 0 to 7 
-  c3 ∈ {{ garbled mix of &{x} (origin: Misaligned {imprecise.c:68}) }}
+  c3 ∈ {{ garbled mix of &{x} (origin: Misaligned read {imprecise.c:68}) }}
 [eva:final-states] Values at end of function garbled_mix_null:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   p_gm_null ∈ [100..197]
@@ -861,11 +862,12 @@
   vy ∈ {1} or UNINITIALIZED
 [eva:final-states] Values at end of function write_garbled:
   NULL[rbits 800 to 1607] ∈
-      {{ garbled mix of &{j; k} (origin: Misaligned {imprecise.c:22}) }}
+      {{ garbled mix of &{j; k}
+       (origin: Misaligned write {imprecise.c:22}) }}
   i ∈ {1}
   j ∈ {{ NULL + [1..197] ; (int)&j ; &k + [0..16] }}
   k[0..4] ∈
-   {{ garbled mix of &{j; k} (origin: Misaligned {imprecise.c:22}) }}
+   {{ garbled mix of &{j; k} (origin: Misaligned write {imprecise.c:22}) }}
   p ∈ {{ NULL + [100..197] ; &j ; &k + [0..16] }}
 [eva:final-states] Values at end of function main:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR

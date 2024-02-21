@@ -159,8 +159,10 @@
   p10 ∈ {{ garbled mix of &{p1} (origin: Arithmetic {addition.i:52}) }}
   p11 ∈ [-2147483648..0],0%4
   p12 ∈ {{ garbled mix of &{p1; p2} (origin: Arithmetic {addition.i:56}) }}
-  p13 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:59}) }}
-  p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:61}) }}
+  p13 ∈
+     {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:59}) }}
+  p14 ∈
+     {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:61}) }}
   p15 ∈ {-1}
   p16 ∈ {2949122}
   p17 ∈ {-2147483648; 0}
@@ -385,8 +387,10 @@
   p10 ∈ {{ garbled mix of &{p1} (origin: Arithmetic {addition.i:52}) }}
   p11 ∈ [-2147483648..0],0%4
   p12 ∈ {{ garbled mix of &{p1; p2} (origin: Arithmetic {addition.i:56}) }}
-  p13 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:59}) }}
-  p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:61}) }}
+  p13 ∈
+     {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:59}) }}
+  p14 ∈
+     {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:61}) }}
   p15 ∈ {-1}
   p16 ∈ {2; 2949122; 3014658}
   p17 ∈ {-2147483648; 0}

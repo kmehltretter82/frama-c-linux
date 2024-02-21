@@ -13,16 +13,16 @@
 >     addition.i:59: misaligned read of addresses
 >       (read 1 times, propagated 2 times) garbled mix of &{p1}
 > [scope:rm_asserts] removing 7 assertion(s)
-163c161
-<   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:61}) }}
+165c163
+<      {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:61}) }}
 ---
->   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:59}) }}
-357,360d354
+>      {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:59}) }}
+359,362d356
 < [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert -2147483648 ≤ (int)*((char *)(&q1)) + 2;
 < [eva:alarm] addition.i:61: Warning: 
 <   signed overflow. assert (int)*((char *)(&q1)) + 2 ≤ 2147483647;
-366c360,364
+368c362,366
 < [scope:rm_asserts] removing 9 assertion(s)
 ---
 > [eva:garbled-mix:summary] Warning: 
@@ -30,7 +30,7 @@
 >     addition.i:59: misaligned read of addresses
 >       (read 1 times, propagated 2 times) garbled mix of &{p1}
 > [scope:rm_asserts] removing 7 assertion(s)
-389c387
-<   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:61}) }}
+393c391
+<      {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:61}) }}
 ---
->   p14 ∈ {{ garbled mix of &{p1} (origin: Misaligned {addition.i:59}) }}
+>      {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:59}) }}

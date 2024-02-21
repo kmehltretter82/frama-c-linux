@@ -187,7 +187,7 @@ struct
           let offm' =
             match size with
             | Int_Base.Top ->
-              let orig = Origin.current Origin.Arith in
+              let orig = Origin.current Origin.Misalign_write in
               Offsetmap.update_imprecise_everywhere ~validity orig v offm
             | Int_Base.Value size ->
               assert (Int.ge size Int.zero);

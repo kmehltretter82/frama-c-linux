@@ -111,25 +111,25 @@
 [eva] Done for function leaf
 [eva] bitfield.i:71: 
   Frama_C_show_each:
-  {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 [eva] bitfield.i:73: 
   Frama_C_show_each:
-  .next ∈ {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  .next ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
   .bitf ∈ {0}
   .[bits 65 to 95] ∈
-  {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 [eva] bitfield.i:69: starting to merge loop iterations
 [eva] computing for function leaf <- imprecise_bts_1671 <- main.
   Called from bitfield.i:70.
 [eva] Done for function leaf
 [eva] bitfield.i:71: 
   Frama_C_show_each:
-  {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 [eva:alarm] bitfield.i:72: Warning: 
   out of bounds write. assert \valid(&c->bitf);
 [eva] bitfield.i:73: 
   Frama_C_show_each:
-  {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 [eva:alarm] bitfield.i:74: Warning: 
   out of bounds read. assert \valid_read(&c->next.next);
 [eva] computing for function leaf <- imprecise_bts_1671 <- main.
@@ -187,8 +187,8 @@
   G ∈ {1}
   H ∈ {0}
   b ∈ {0}
-  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned {bitfield.i:70}) }}
-  ee ∈ {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70}) }}
+  ee ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
   foo ∈ [--..--]
   y.v0_3 ∈ [--..--]
    .v4 ∈ {0}
@@ -229,8 +229,9 @@
   r ∈ {1}
 [eva:final-states] Values at end of function imprecise_bts_1671:
   b ∈ {0}
-  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned {bitfield.i:70}) }}
-  ee ∈ {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  c ∈
+   {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70}) }}
+  ee ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 [eva:final-states] Values at end of function logic:
   y.v0_3 ∈ [--..--]
    .v4 ∈ {0}
@@ -280,8 +281,9 @@
   G ∈ {1}
   H ∈ {0}
   b ∈ {0}
-  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned {bitfield.i:70}) }}
-  ee ∈ {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  c ∈
+   {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70}) }}
+  ee ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
   y.v0_3 ∈ [--..--]
    .v4 ∈ {0}
    .v5_31 ∈ [--..--]

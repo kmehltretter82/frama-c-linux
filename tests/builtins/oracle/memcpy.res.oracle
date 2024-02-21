@@ -576,7 +576,7 @@
   v2.x ∈ {5}
     .y ∈ {7}
     {.p; .padding[0..23]} ∈ {0}
-  v3 ∈ {{ garbled mix of &{v1} (origin: Misaligned {memcpy.c:87}) }}
+  v3 ∈ {{ garbled mix of &{v1} (origin: Misaligned read {memcpy.c:87}) }}
   v4.x ∈ [--..--]
     .y ∈ {{ (int)&t }}
     {.p; .padding[0..23]} ∈ [--..--]

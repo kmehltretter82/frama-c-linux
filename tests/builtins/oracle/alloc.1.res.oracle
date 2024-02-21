@@ -39,7 +39,7 @@
 [eva:final-states] Values at end of function main_abs:
   NULL[rbits 2048 to 4103] ∈
       {{ garbled mix of &{__malloc_main_abs_l50}
-       (origin: Misaligned {alloc.c:54}) }}
+       (origin: Misaligned write {alloc.c:54}) }}
   __fc_heap_status ∈ [--..--]
   q ∈ {{ &__malloc_main_abs_l50 }}
   r ∈ {{ NULL + [256..509] ; &__malloc_main_abs_l50 }}

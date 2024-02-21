@@ -146,7 +146,7 @@
   Assigning imprecise value to qm2 because of misaligned read of addresses.
 [eva] origin.i:55: 
   Frama_C_show_each:
-  {{ garbled mix of &{a; b} (origin: Misaligned {origin.i:54}) }}
+  {{ garbled mix of &{a; b} (origin: Misaligned read {origin.i:54}) }}
 [eva:alarm] origin.i:56: Warning: out of bounds write. assert \valid(qm2);
 [eva:alarm] origin.i:56: Warning: 
   pointer downcast. assert (unsigned int)(&a) ≤ 2147483647;
@@ -228,9 +228,9 @@
   pa2 ∈ {{ garbled mix of &{ta2} (origin: Arithmetic {origin.i:19}) }}
   qa2 ∈ {{ &ta2 + [0..36] ; &tta2 + [0..36] }}
   ta2[0..9] ∈
-     {{ garbled mix of &{aa2} (origin: Misaligned {origin.i:21}) }}
+     {{ garbled mix of &{aa2} (origin: Misaligned write {origin.i:21}) }}
   tta2[0..9] ∈
-      {{ garbled mix of &{aa2} (origin: Misaligned {origin.i:21}) }}
+      {{ garbled mix of &{aa2} (origin: Misaligned write {origin.i:21}) }}
 [eva:final-states] Values at end of function origin_arithmetic_3:
   pa3 ∈ {{ &ta3 + [0..36] }}
   ta3[0..9] ∈ [--..--]
@@ -269,10 +269,10 @@
    {{ garbled mix of &{b} (origin: Merge {origin.i:106}) }}
   ta1[0..9] ∈ {0}
   ta2[0..9] ∈
-     {{ garbled mix of &{aa2} (origin: Misaligned {origin.i:21}) }}
+     {{ garbled mix of &{aa2} (origin: Misaligned write {origin.i:21}) }}
   ta3[0..9] ∈ [--..--]
   tta2[0..9] ∈
-      {{ garbled mix of &{aa2} (origin: Misaligned {origin.i:21}) }}
+      {{ garbled mix of &{aa2} (origin: Misaligned write {origin.i:21}) }}
   l1 ∈ [--..--]
   l2 ∈ [--..--]
   l3 ∈ [--..--]

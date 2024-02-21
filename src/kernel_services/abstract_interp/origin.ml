@@ -22,18 +22,21 @@
 
 type kind =
   | Misalign_read
+  | Misalign_write
   | Leaf
   | Merge
   | Arith
 
 let kind_rank = function
   | Misalign_read -> 0
-  | Leaf -> 1
-  | Merge -> 2
-  | Arith -> 3
+  | Misalign_write -> 1
+  | Leaf -> 2
+  | Merge -> 3
+  | Arith -> 4
 
 let kind_label = function
-  | Misalign_read -> "Misaligned"
+  | Misalign_read -> "Misaligned read"
+  | Misalign_write -> "Misaligned write"
   | Leaf -> "Library function"
   | Merge -> "Merge"
   | Arith -> "Arithmetic"
@@ -102,6 +105,7 @@ let descr = function
   | Origin { kind } ->
     match kind with
     | Misalign_read -> "misaligned read of addresses"
+    | Misalign_write -> "misaligned write of addresses"
     | Leaf -> "assigns clause on addresses"
     | Merge -> "imprecise merge of addresses"
     | Arith -> "arithmetic operation on addresses"

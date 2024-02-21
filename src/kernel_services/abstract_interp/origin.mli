@@ -28,6 +28,7 @@ include Datatype.S
 
 type kind =
   | Misalign_read (* Misaligned read of addresses *)
+  | Misalign_write (* Misaligned write of addresses *)
   | Leaf  (* Interpretation of assigns clause *)
   | Merge (* Imprecise merge of addresses *)
   | Arith (* Arithmetic operation on addresses *)

@@ -113,7 +113,8 @@
   t3[0..9] ∈ {0}
     [10..99]# ∈ {0; 17} repeated %8 
   t4[0..99] ∈ {0}
-  t5[0..99] ∈ {{ garbled mix of &{t1} (origin: Misaligned {memset.c:41}) }}
+  t5[0..99] ∈
+    {{ garbled mix of &{t1} (origin: Misaligned read {memset.c:41}) }}
   t6[0..9] ∈ {0}
     [10..13]# ∈ {0; 34} repeated %8 
     [14..99] ∈ {0}
@@ -168,7 +169,8 @@
   t3[0..9] ∈ {0}
     [10..99]# ∈ {0; 17} repeated %8 
   t4[0..99] ∈ {0}
-  t5[0..99] ∈ {{ garbled mix of &{t1} (origin: Misaligned {memset.c:41}) }}
+  t5[0..99] ∈
+    {{ garbled mix of &{t1} (origin: Misaligned read {memset.c:41}) }}
   t6[0..9] ∈ {0}
     [10..13]# ∈ {0; 34} repeated %8 
     [14..99] ∈ {0}
