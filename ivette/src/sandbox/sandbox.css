@@ -19,3 +19,24 @@
 .cm-global-box .hover {
     background: yellow;
 }
+.sandbox-item-graph{
+    color: var(--text);
+    background-color:  var(--background-profound);
+
+}
+.sandbox-item-graph-hover-selected{
+    color: var(--background-button-hover);
+    background-color:  var(--background-disabled-hover);
+}
+.sandbox-item-graph-shadow{
+    background-color:  var(--background-profound-hover);
+}
+.sandbox-item-graph-shadow-hover-selected{
+    background-color:  var(--splitter);
+}
+.sandbox-item-graph-edge{
+    background-color: var(--text);
+}
+.sandbox-item-graph-edge-hover-selected{
+    background-color: var(--background-button-hover);
+}
