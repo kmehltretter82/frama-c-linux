@@ -132,7 +132,7 @@ frama-c:
 
 ivette:
   stage: build
-  image: node:lts-gallium
+  image: node:lts-buster
   cache:
     paths:
       - ivette/node_modules/
@@ -140,6 +140,7 @@ ivette:
     - node --version
     - npm --version
     - yarn --version
+    - make --version
     - make -C ivette check-lint dome-app
   tags:
     - docker
