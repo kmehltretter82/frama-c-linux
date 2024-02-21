@@ -564,7 +564,6 @@ export function spawn(
   options?: ProcessOptions,
 ): Promise<Exec.ChildProcess> {
   return new Promise((result, reject) => {
-
     const cwd = options ? options.cwd : undefined;
     const opt = options ? options.env : undefined;
     const env = // Forces 'PWD' env. variable for executing a non-shell process

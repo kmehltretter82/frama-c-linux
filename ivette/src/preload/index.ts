@@ -1,13 +1,5 @@
-import { contextBridge } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
-import fs from 'fs/promises';
-
-// Custom APIs for renderer
-const api = {
-  readDir: async (path: string) => {
-    return await fs.readdir(path);
-  },
-};
+import { contextBridge } from 'electron';
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
@@ -15,7 +7,6 @@ const api = {
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI);
-    contextBridge.exposeInMainWorld('api', api);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error(error);
@@ -23,6 +14,4 @@ if (process.contextIsolated) {
 } else {
   // @ts-expect-error (define in dts)
   window.electron = electronAPI;
-  // @ts-expect-error (define in dts)
-  window.api = api;
 }

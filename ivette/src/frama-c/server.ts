@@ -491,7 +491,7 @@ async function _launch(): Promise<void> {
     cwd: working,
     stdout: { path: logout, pipe: true },
     stderr: { path: logerr, pipe: true },
-    env,
+    env: { ...env, ... window.electron.process.env },
   };
   // Launch Process
   System.atExit(() => {
