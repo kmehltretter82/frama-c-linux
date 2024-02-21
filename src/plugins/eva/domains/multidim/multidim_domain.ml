@@ -665,6 +665,9 @@ struct
   include DomainLattice
   include Domain_builder.Complete (DomainLattice)
 
+  type context = unit
+  let context_dependencies = Abstract_context.Leaf (module Unit_context)
+
   (* Eva Queries *)
 
   (* Nothing interesting to be done on expressions *)

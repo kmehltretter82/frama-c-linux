@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Abstract_value.Leaf
+include Abstract_value.Leaf with type context = unit
 
 val pretty_debug : t Pretty_utils.formatter
 

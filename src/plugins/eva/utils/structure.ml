@@ -87,6 +87,7 @@ module Make () = struct
   let print fmt x = Format.pp_print_string fmt x.name
 end
 
+module Key_Context = Make ()
 module Key_Value = Make ()
 module Key_Location = Make ()
 module Key_Domain = Make ()

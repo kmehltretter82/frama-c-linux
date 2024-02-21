@@ -23,6 +23,7 @@
 module Queries = struct
 
   type state = Cvalue.Model.t
+  type context = unit
   type value = Main_values.CVal.t
   type location = Main_locations.PLoc.location
 

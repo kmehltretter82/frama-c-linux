@@ -56,7 +56,9 @@ module Domain : sig
     val location_dependencies: location Abstract_location.dependencies
     module Make (V : Abstract.Value.External) : sig
       include Abstract_domain.S
-        with type value = V.t and type location = location
+        with type value = V.t
+         and type context = V.context
+         and type location = location
       val key : state Abstract_domain.key
     end
   end

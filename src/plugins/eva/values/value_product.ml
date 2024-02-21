@@ -45,11 +45,14 @@ let narrow_truth_pair x y =
   narrow_any_truth combine x y
 
 module Make
-    (Left: Abstract_value.S)
-    (Right: Abstract_value.S)
+    (Context : Abstract_context.S)
+    (Left  : Abstract.Value.Internal with type context = Context.t)
+    (Right : Abstract.Value.Internal with type context = Context.t)
 = struct
 
   include Datatype.Pair (Left) (Right)
+  type context = Context.t
+  let structure = Abstract.Value.Node (Left.structure, Right.structure)
 
   let pretty_typ typ =
     Pretty_utils.pp_pair ~pre:"@[" ~sep:",@ " ~suf:"@]"

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2023                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,70 +20,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let log_key = Self.register_category "unit-domain"
+open Eval
 
-module Static = struct
-  module D = struct
-    include Datatype.Unit
-    type state = t
-    type context = unit
-
-    let name = "unit"
-    let log_category = log_key
-    let structure = Abstract.Domain.Unit
-
-    let top = ()
-    let is_included _ _ = true
-    let join _ _ = ()
-    let widen _ _ _ _ = ()
-    let narrow _ _ = `Value ()
-  end
-
-  include D
-  include Domain_builder.Complete
-      (struct
-        include D
-        let top = top
-        let join = join
-      end)
+module type S = sig
+  include Datatype.S
+  val top : t
+  val is_included : t -> t -> bool
+  val join : t -> t -> t
+  val narrow : t -> t -> t or_bottom
 end
 
-module Make
-    (Value: Abstract_value.S with type context = unit)
-    (Loc: Abstract_location.S)
-= struct
+type 'c key = 'c Structure.Key_Context.key
 
-  include Static
-  type value = Value.t
-  type location = Loc.location
-  type origin
-
-  let eval_top = `Value (Value.top, None), Alarmset.all
-  let extract_expr ~oracle:_ _ _ _ = eval_top
-  let extract_lval ~oracle:_ _ _ _ _ _ = eval_top
-
-  let update _ _ = `Value ()
-  let assign _ _ _ _ _ _ = `Value ()
-  let assume _ _ _ _ _ = `Value ()
-  let start_call _ _ _ _ _ = `Value ()
-  let finalize_call _ _ _ ~pre:_ ~post:_ = `Value ()
-  let show_expr _ _ _ _ = ()
-
-  let logic_assign _ _ _ = ()
-
-  let enter_scope _ _ _ = ()
-  let leave_scope _ _ _ = ()
-
-  let empty () = ()
-  let initialize_variable _ _ ~initialized:_ _ _ = ()
-  let initialize_variable_using_type _ _ _  = ()
-
-  let relate _ _ () = Base.SetLattice.empty
+module type Leaf = sig
+  include S
+  val key : t key
 end
 
+type 'c dependencies =
+  | Leaf : (module Leaf with type t = 'c) -> 'c dependencies
+  | Node : 'l dependencies * 'r dependencies -> ('l * 'r) dependencies
 
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)

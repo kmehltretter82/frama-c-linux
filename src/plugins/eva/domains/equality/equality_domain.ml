@@ -185,6 +185,7 @@ module Make
 
   let get_cvalue = Value.get Main_values.CVal.key
 
+  type context = Value.context
   type value = Value.t
   type location = Precise_locs.precise_location
   type origin

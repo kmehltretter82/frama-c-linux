@@ -36,6 +36,7 @@ end
 
 module Make
     (Domain: Input_Domain)
+    (Ctx: Conversion with type internal := Domain.context)
     (Val: Conversion with type internal := Domain.value)
     (Loc: Conversion with type internal := Domain.location)
 = struct
@@ -47,6 +48,7 @@ module Make
 
   let log_category = Domain.log_category
 
+  type context = Ctx.extended
   type value = Val.extended
   type location = Loc.extended
   type origin = Domain.origin

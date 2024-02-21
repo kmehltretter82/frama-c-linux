@@ -26,7 +26,7 @@ open Eval
 type 'value builtin = 'value list -> 'value or_bottom
 
 module type Value = sig
-  include Abstract_value.Leaf
+  include Abstract_value.Leaf with type context = unit
   val widen : t -> t -> t
   val track_variable: Cil_types.varinfo -> bool
   val pretty_debug: t Pretty_utils.formatter
@@ -193,7 +193,9 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
   type value = Value.t
   type location = Precise_locs.precise_location
   type origin
+  type context = unit
 
+  let context_dependencies = Abstract_context.Leaf (module Unit_context)
   let value_dependencies = Abstract_value.Leaf (module Value)
   let location_dependencies = Main_locations.ploc
 

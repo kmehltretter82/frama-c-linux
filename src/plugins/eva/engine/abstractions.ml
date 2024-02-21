@@ -22,6 +22,117 @@
 
 
 
+(* --- Contexts abstraction ------------------------------------------------- *)
+
+module Context = struct
+  type 'c structure = 'c Abstract.Context.structure
+  type 'c dependencies = 'c Abstract_context.dependencies
+  let dec_eq = Abstract.Context.eq_structure
+
+  type 'c context = (module Abstract_context.Leaf with type t = 'c)
+
+  (* When building the abstraction, we will need to compare the dependencies
+     structure with the structured values. *)
+  let rec outline : type v. v dependencies -> v structure = function
+    | Leaf context ->
+      let module C = (val context) in
+      Abstract.Context.Leaf (C.key, (module C))
+    | Node (l, r) -> Abstract.Context.(Node (outline l, outline r))
+
+  (* Folding over contexts dependencies *)
+  type 'a folder = { folder : 'c. 'c context -> 'a -> 'a }
+  let rec fold : type c. 'a folder -> c dependencies -> 'a -> 'a =
+    fun folder dependencies acc ->
+    match dependencies with
+    | Leaf leaf -> folder.folder leaf acc
+    | Node (l, r) -> fold folder l (fold folder r acc)
+
+  (* The context abstraction build consists of accumulating registered contexts
+     into a structured context and then adding the needed operators, thus making
+     it interactive. A [Unit] structured abstraction is used for the initial
+     state and is discarded as soon as a real context abstraction is added. *)
+  module type Structured = Abstract.Context.Internal
+  module type Interactive = Abstract.Context.External
+  type 'a or_unit = Unit | Context of 'a
+  type structured = (module Structured) or_unit
+  type interactive = (module Interactive) or_unit
+
+  let init = Unit
+
+  (* During the complete abstraction build, we need to verify that there is at
+     least one context in the computed abstraction.
+     TODO: better error handling. *)
+  let assert_not_unit = function
+    | Unit -> Self.fatal "The built context cannot be unit."
+    | Context interactive -> interactive
+
+  (* Making a structured context interactive simply consists of adding the
+     needed operations using the Structure.Open functor.*)
+  let make_interactive : structured -> interactive = function
+    | Unit -> Unit
+    | Context (module Structured) ->
+      Context (module struct
+        include Structured
+        include Structure.Open (Abstract.Context) (Structured)
+      end)
+
+  (* Adding a registered context into a structured one consists of deciding if
+     a product is needed (which comes down to checking if the registered
+     context key we want to add is not in the structure), computing it, and
+     updating the structure. *)
+  let add : type c. c context -> structured -> structured =
+    fun (module Ctx) structured ->
+    let leaf = Abstract.Context.Leaf (Ctx.key, (module Ctx)) in
+    match make_interactive structured with
+    | Unit ->
+      Context (module struct
+        include Ctx
+        let structure = leaf
+      end)
+    | Context (module Interactive) when not (Interactive.mem Ctx.key) ->
+      Context (module struct
+        include Context_product.Make (Interactive) (Ctx)
+        let structure = Abstract.Context.Node (Interactive.structure, leaf)
+      end)
+    | _ -> structured
+
+
+  (* When building the complete abstraction, we need to trick values and domains
+     into thinking that their context dependencies are there, even if the
+     structured context type is not the good one. This is done through a
+     lift that requires conversion operations to interact with the subpart
+     of the structured context that matters for the value or the domain.
+     This functor is responsible of building such conversion operations. *)
+  module type From = sig type context val structure : context structure end
+  module Converter (From : From) (To : Interactive) = struct
+    type extended = To.t
+    let structure = From.structure
+
+    let void_context () =
+      Self.fatal "Cannot register a context module from a Void structure."
+
+    let rec set : type v. v structure -> v -> extended -> extended = function
+      | Leaf (key, _) -> To.set key
+      | Node (s1, s2) -> fun (v1, v2) ext -> set s2 v2 ext |> set s1 v1
+      | Option (s, default) -> fun v -> set s (Option.value ~default v)
+      | Unit -> fun () value -> value
+      | Void -> void_context ()
+
+    let rec get : type v. v structure -> extended -> v = function
+      | Leaf (key, _) -> Option.get (To.get key)
+      | Node (s1, s2) -> fun v -> get s1 v, get s2 v
+      | Option (s, _) -> fun v -> Some (get s v)
+      | Unit -> fun _ -> ()
+      | Void -> void_context ()
+
+    let replace = set structure
+    let extend v = replace v To.top
+    let restrict = get structure
+  end
+end
+
+
+
 (* --- Values abstraction --------------------------------------------------- *)
 
 module Value = struct
@@ -48,55 +159,101 @@ module Value = struct
     | Leaf leaf -> folder.folder leaf acc
     | Node (l, r) -> fold folder l (fold folder r acc)
 
-  (* The value abstraction build consists of accumulating registered values
-     into a structured value and then adding the needed operators, thus making
-     it interactive. A [Unit] structured abstraction is used for the initial
-     state and is discarded as soon as a real value abstraction is added. *)
-  module type Structured = Abstract.Value.Internal
+  (* Folding over contexts dependencies of a value. *)
+  let rec fold_contexts : type c. 'a Context.folder -> c dependencies -> 'a -> 'a =
+    fun folder dependencies acc ->
+      match dependencies with
+      | Leaf (module R) -> Context.fold folder R.context acc
+      | Node (l, r) -> fold_contexts folder l (fold_contexts folder r acc)
+
+
+  (* As for the context abstraction, building the value abstraction consists
+     of structuring the needed registered values and then adding the needed
+     operators to make it interactive. However, a structured value is not
+     as simple as a structured context, as it needs to keep track of the
+     context abstraction it is based on. This context is supposed to be the
+     complete aggregation of all the contexts that are needed by the
+     requested domains. *)
+  module type Structured = sig
+    type context
+    module Context : Context.Interactive with type t = context
+    module Value : Abstract.Value.Internal with type context = context
+  end
+
+  (* We expose the type of the structured context we are based on to statically
+     ensure that we do not temper with it. As for the context abstractions, a
+     [Unit] structured abstraction is used for the initial state and is
+     discarded as soon as a value is added. *)
+  type ('u, 'v) or_unit = Unit of 'u | Value of 'v
+  type 'c context = (module Context.Interactive with type t = 'c)
+  type 'c structured_module = (module Structured with type context = 'c)
+  type 'c structured = ('c context, 'c structured_module) or_unit
+
   module type Interactive = Abstract.Value.External
-  type 'a or_unit = Unit | Value of 'a
-  type structured = (module Structured) or_unit
-  type interactive = (module Interactive) or_unit
+  type 'c interactive_module = (module Interactive with type context = 'c)
+  type 'c interactive = ('c context, 'c interactive_module) or_unit
 
-  (* Making a structured value interactive simply consists of adding the
-     needed operations using the Structure.Open functor.*)
-  let make_interactive : structured -> interactive = function
-    | Unit -> Unit
-    | Value (module Structured) ->
-      Value (module struct
-        include Structured
-        include Structure.Open (Abstract.Value) (Structured)
-      end)
 
-  (* Adding a registered value into a structured one consists of deciding if
-     a product is needed (which comes down to checking if the registered
-     value key we want to add is not in the structure), computing it, and
-     updating the structure. *)
-  let add : type v. v value -> structured -> structured =
-    fun (module Val) structured ->
-    let leaf = Abstract.Value.Leaf (Val.key, (module Val)) in
-    match make_interactive structured with
-    | Unit ->
-      Value (module struct
-        include Val
-        let structure = leaf
-      end)
-    | Value (module Interactive) when not (Interactive.mem Val.key) ->
-      Value (module struct
-        include Value_product.Make (Interactive) (Val)
-        let structure = Abstract.Value.Node (Interactive.structure, leaf)
-      end)
-    | _ -> structured
-
-  (* The minimal value abstraction to use. *)
-  let init : structured = Unit
+  (* Initial value builder *)
+  let init (context : 'c context) : 'c structured = Unit context
 
   (* During the complete abstraction build, we need to verify that there is at
      least one value in the computed abstraction.
      TODO: better error handling. *)
   let assert_not_unit = function
-    | Unit -> Self.fatal "The built value cannot be unit."
+    | Unit _ -> Self.fatal "The built value cannot be unit."
     | Value interactive -> interactive
+
+
+  (* Making a structured value interactive simply consists of adding the
+     needed operations using the Structure.Open functor. *)
+  let make_interactive : type c. c structured -> c interactive = function
+    | Unit context -> Unit context
+    | Value (module Structured) ->
+      Value (module struct
+        include Structured.Value
+        include Structure.Open (Abstract.Value) (Structured.Value)
+      end)
+
+  (* Retrieves the context contained in a structured value. *)
+  let get_context : type c. c structured -> c context = function
+    | Unit context -> context
+    | Value (module V) -> (module V.Context)
+
+
+  (* Adding a registered value into a structured one consists of deciding if
+     a product is needed (which comes down to checking if the registered
+     value key we want to add is not in the structure), computing it, and
+     updating the structure. *)
+  let add : type c v. v value -> c structured -> c structured =
+    fun (module Leaf) structured ->
+      let leaf_context_structure = Context.outline Leaf.context in
+      let module To = (val get_context structured) in
+      let lifted_leaf : (module Abstract.Value.Internal with type context = c) =
+        match Context.dec_eq leaf_context_structure To.structure with
+        | Some Eq ->
+          let leaf = Abstract.Value.Leaf (Leaf.key, (module Leaf)) in
+          (module struct include Leaf let structure = leaf end)
+        | None ->
+          let module From = struct
+            type context = Leaf.context
+            let structure = leaf_context_structure
+          end in
+          let module Converter = Context.Converter (From) (To) in
+          (module Value_lift.Make (Leaf) (Converter))
+      in
+      let combined : (module Abstract.Value.Internal with type context = c) =
+        match make_interactive structured with
+        | Unit _ -> lifted_leaf
+        | Value (module Val) when Val.mem Leaf.key -> (module Val)
+        | Value (module Val) ->
+          (module Value_product.Make (To) (val lifted_leaf) (Val))
+      in
+      Value (module struct
+        type context = c
+        module Context = To
+        module Value = (val combined)
+      end)
 
 
   (* When building the complete abstraction, we need to trick locations and
@@ -309,7 +466,9 @@ module Domain = struct
     val location_dependencies: location Abstract_location.dependencies
     module Make (V : Abstract.Value.External) : sig
       include Abstract_domain.S
-        with type value = V.t and type location = location
+        with type value = V.t
+         and type context = V.context
+         and type location = location
       val key : state Abstract_domain.key
     end
   end
@@ -366,36 +525,61 @@ module Domain = struct
     let make () = { name ; experimental ; priority ; abstraction = make () } in
     dynamic_domains := (name, make) :: !dynamic_domains
 
+
   (* Building the domain abstraction consists of structuring the requested
      registered domains. To do so, we need to keep track of the values and
      locations abstraction on which the structured domain will rely. Those
      abstractions are supposed to be the complete aggregations of all the
      values (resp locations) that are needed by the requested domains. *)
   module type Structured = sig
+    type context
     type value
     type location
-    module Value : Value.Interactive with type t = value
+    module Context : Context.Interactive
+      with type t = context
+    module Value : Value.Interactive
+      with type context = context
+       and type t = value
     module Location : Location.Interactive
-      with type value = value and type location = location
+      with type value = value
+       and type location = location
     module Domain : Abstract.Domain.Internal
-      with type value = value and type location = location
+      with type context = context
+       and type value = value
+       and type location = location
   end
 
-  (* As for the value and location abstractions, a [Unit] structured domain is
-     used for the initial state. *)
-  type ('v, 'l, 's) or_unit = Unit of 'v * 'l | State of 's
-  type 'v value = (module Value.Interactive with type t = 'v)
+  type 'c context =
+    (module Context.Interactive with type t = 'c)
+
+  type ('c, 'v) value =
+    (module Value.Interactive with type context = 'c and type t = 'v)
+
   type ('v, 'l) location =
     (module Location.Interactive with type value = 'v and type location = 'l)
-  type ('v, 'l) structured_module =
-    (module Structured with type value = 'v and type location = 'l)
-  type ('v, 'l) structured =
-    ('v value, ('v, 'l) location, ('v, 'l) structured_module) or_unit
 
-  (* Recovers the value and location abstractions of a structured domain. *)
-  let get : type v l. (v, l) structured -> v value * (v, l) location = function
-    | Unit (value, location) -> (value, location)
-    | State (module S) -> ((module S.Value), (module S.Location))
+  type ('c, 'v, 'l) state =
+    (module Structured
+      with type context = 'c
+       and type value = 'v
+       and type location = 'l)
+
+  type ('c, 'v, 'l, 's) or_unit = Unit of 'c * 'v * 'l | State of 's
+
+  type ('c, 'v, 'l) structured =
+    ('c context, ('c, 'v) value, ('v, 'l) location, ('c, 'v, 'l) state) or_unit
+
+  (* Internal type used for intermediate results of the add procedure. *)
+  type ('c, 'v, 'l) structured_domain =
+    (module Abstract.Domain.Internal
+      with type context = 'c
+       and type value = 'v
+       and type location = 'l)
+
+
+  type ('c, 'v, 'l) init =
+    'c context -> ('c, 'v) value -> ('v, 'l) location -> ('c, 'v, 'l) structured
+  let init : type c v l. (c, v, l) init = fun c v l -> Unit (c, v, l)
 
   (* During the complete abstraction build, we need to verify that there is at
      least one domain in the computed abstraction.
@@ -404,34 +588,57 @@ module Domain = struct
     | Unit _ -> Self.fatal "The built domain cannot be unit."
     | State structured -> structured
 
-
-  (* Internal type used for intermediate results of the add procedure. *)
-  type ('v, 'l) structured_domain =
-    (module Abstract.Domain.Internal with type value = 'v and type location = 'l)
-
-  (* Utility function used to create an identity converter. *)
   module type Typ = sig type t end
-  let conversion_id (type t) (module T: Typ with type t = t) =
+  type 't typ = (module Typ with type t = 't)
+
+  type ('internal, 'extended) conversion =
+    (module Domain_lift.Conversion
+      with type extended = 'extended
+       and type internal = 'internal)
+
+  let conversion_id (type t) (_ : t typ) : (t, t) conversion =
     (module struct
-      type extended = T.t
-      type internal = T.t
+      type extended = t
+      type internal = t
       let extend x = x
       let restrict x = x
-    end: Domain_lift.Conversion with type extended = t and type internal = t)
+    end)
+
+  let context : type c v l. (c, v, l) structured -> c context = function
+    | Unit (context, _, _) -> context
+    | State (module S) -> (module S.Context)
+
+  let value : type c v l. (c, v, l) structured -> (c, v) value = function
+    | Unit (_, value, _) -> value
+    | State (module S) -> (module S.Value)
+
+  let location : type c v l. (c, v, l) structured -> (v, l) location = function
+    | Unit (_, _, location) -> location
+    | State (module S) -> (module S.Location)
+
+  type 'a identity = 'a -> 'a
+  type ('c, 'v, 'l) name = string -> ('c, 'v, 'l) structured_domain identity
+  let register_name : type c v l. (c, v, l) name = fun name (module D) ->
+    let no_results = Parameters.NoResultsDomains.mem name in
+    let register = D.Store.register_global_state in
+    let f storage state = register (storage && no_results) state in
+    let module S = struct include D.Store let register_global_state = f end in
+    (module struct include D module Store = S end)
+
 
   (* Adding a registered domain into a structured one consists of performing a
      lifting of the registered one if needed before performing the product,
      configuring the name and restricting the domain depending of the mode. *)
-  type add_input = registered_with_mode
-  let add : type v l. add_input -> (v, l) structured -> (v, l) structured =
-    fun (registered, mode) structured ->
+  type input = registered_with_mode
+  type ('c, 'v, 'l) add = input -> ('c, 'v, 'l) structured identity
+  let add : type c v l. (c, v, l) add = fun (registered, mode) structured ->
     let wkey = Self.wkey_experimental in
     let { experimental = exp ; name } = registered in
     if exp then Self.warning ~wkey "The %s domain is experimental." name ;
-    let value, location = get structured in
-    let module Val = (val value) in
-    let module Loc = (val location) in
-    let lifted : (v, l) structured_domain =
+    let module Ctx = (val context structured) in
+    let module Val = (val value structured) in
+    let module Loc = (val location structured) in
+    let lifted : (c, v, l) structured_domain =
       match registered.abstraction with
       | Functor (module Functor) ->
         let locs = Location.outline Functor.location_dependencies in
@@ -439,65 +646,89 @@ module Domain = struct
         let module D = Functor.Make (Val) in
         begin match eq_loc with
           | Some Eq ->
-            (module struct
-              include D
-              let structure = Abstract.Domain.Leaf (D.key, (module D))
-            end)
+            let structure = Abstract.Domain.Leaf (D.key, (module D)) in
+            (module struct include D let structure = structure end)
           | None ->
+            let module Ctx = (val conversion_id (module Ctx)) in
             let module Val = (val conversion_id (module Val)) in
             let module From = struct include D let structure = locs end in
             let module Loc = Location.Converter (From) (Loc) in
-            (module Domain_lift.Make (D) (Val) (Loc))
+            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
         end
       | Domain (module D) ->
-        let loc_deps = Location.outline D.location_dependencies in
+        let ctx_deps = Context.outline D.context_dependencies in
         let val_deps = Value.outline D.value_dependencies in
-        let eq_loc = Location.dec_eq loc_deps Loc.structure in
+        let loc_deps = Location.outline D.location_dependencies in
+        let eq_ctx = Context.dec_eq ctx_deps Ctx.structure in
         let eq_val = Value.dec_eq val_deps Val.structure in
-        begin match eq_val, eq_loc with
-          | Some Eq, Some Eq ->
-            (module struct
-              include D
-              let structure = Abstract.Domain.Leaf (D.key, (module D))
-            end)
-          | Some Eq, None ->
+        let eq_loc = Location.dec_eq loc_deps Loc.structure in
+        begin match eq_ctx, eq_val, eq_loc with
+          | Some Eq, Some Eq, Some Eq ->
+            let structure = Abstract.Domain.Leaf (D.key, (module D)) in
+            (module struct include D let structure = structure end)
+          | Some Eq, Some Eq, None ->
+            let module Ctx = (val conversion_id (module Ctx)) in
             let module Val = (val conversion_id (module Val)) in
             let module From = struct include D let structure = loc_deps end in
             let module Loc = Location.Converter (From) (Loc) in
-            (module Domain_lift.Make (D) (Val) (Loc))
-          | None, Some Eq ->
+            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
+          | Some Eq, None, Some Eq ->
+            let module Ctx = (val conversion_id (module Ctx)) in
             let module From = struct include D let structure = val_deps end in
             let module Val = Value.Converter (From) (Val) in
             let module LocTyp = struct type t = Loc.location end in
             let module Loc = (val conversion_id (module LocTyp)) in
-            (module Domain_lift.Make (D) (Val) (Loc))
-          | _, _ ->
+            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
+          | Some Eq, None, None ->
+            let module Ctx = (val conversion_id (module Ctx)) in
             let module From = struct include D let structure = val_deps end in
             let module Val = Value.Converter (From) (Val) in
             let module From = struct include D let structure = loc_deps end in
             let module Loc = Location.Converter (From) (Loc) in
-            (module Domain_lift.Make (D) (Val) (Loc))
+            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
+          | None, Some Eq, Some Eq ->
+            let module From = struct include D let structure = ctx_deps end in
+            let module Ctx = Context.Converter (From) (Ctx) in
+            let module Val = (val conversion_id (module Val)) in
+            let module LocTyp = struct type t = Loc.location end in
+            let module Loc = (val conversion_id (module LocTyp)) in
+            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
+          | None, Some Eq, None ->
+            let module From = struct include D let structure = ctx_deps end in
+            let module Ctx = Context.Converter (From) (Ctx) in
+            let module Val = (val conversion_id (module Val)) in
+            let module From = struct include D let structure = loc_deps end in
+            let module Loc = Location.Converter (From) (Loc) in
+            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
+          | None, None, Some Eq ->
+            let module From = struct include D let structure = ctx_deps end in
+            let module Ctx = Context.Converter (From) (Ctx) in
+            let module From = struct include D let structure = val_deps end in
+            let module Val = Value.Converter (From) (Val) in
+            let module LocTyp = struct type t = Loc.location end in
+            let module Loc = (val conversion_id (module LocTyp)) in
+            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
+          | None, None, None ->
+            let module From = struct include D let structure = ctx_deps end in
+            let module Ctx = Context.Converter (From) (Ctx) in
+            let module From = struct include D let structure = val_deps end in
+            let module Val = Value.Converter (From) (Val) in
+            let module From = struct include D let structure = loc_deps end in
+            let module Loc = Location.Converter (From) (Loc) in
+            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
         end
     in
     (* Set the name of the domain. *)
-    let module Named = struct
-      include (val lifted)
-      module Store = struct
-        include Store
-        let register_global_state storage state =
-          let no_results = Parameters.NoResultsDomains.mem registered.name in
-          register_global_state (storage && not no_results) state
-      end
-    end in
+    let module Named = (val register_name registered.name lifted) in
     (* Restricts the domain according to [mode]. *)
-    let restricted : (v, l) structured_domain =
+    let restricted : (c, v, l) structured_domain =
       match mode with
       | None -> (module Named)
       | Some kf_modes ->
         let module Scope = struct let functions = kf_modes end in
         (module Domain_builder.Restrict (Val) (Named) (Scope))
     in
-    let combined : (v, l) structured_domain =
+    let combined : (c, v, l) structured_domain =
       match structured with
       | Unit _ -> restricted
       | State (module Structured) ->
@@ -505,52 +736,63 @@ module Domain = struct
            will be processed before the domains from [Acc.Dom] during the
            analysis. *)
         let module Dom = Structured.Domain in
-        (module Domain_product.Make (Val) (val restricted) (Dom))
+        (module Domain_product.Make (Ctx) (Val) (Loc) (val restricted) (Dom))
     in
     State (module struct
+      type context = c
       type value = v
       type location = l
+      module Context = Ctx
       module Value = Val
       module Location = Loc
       module Domain = (val combined)
     end)
 
 
-  (* Build a complete abstraction based on a list of registered domains and a
-     value initial configuration. *)
-  let build domains : (module Structured) =
-    let values =
-      let add_value = Value.{ folder = add } in
-      let add_values values (registered, _) =
-        match registered.abstraction with
-        | Domain (module Domain) ->
-          Value.fold add_value Domain.value_dependencies values |>
-          Location.fold_values add_value Domain.location_dependencies
-        | Functor (module F) ->
-          Location.fold_values add_value F.location_dependencies values
-      in
-      List.fold_left add_values Value.init domains |>
-      Value.make_interactive
-    in
-    let module V = (val Value.assert_not_unit values) in
-    let locations =
-      let init : V.t Location.structured = Location.init (module V) in
-      let add = Location.{ folder = add } in
-      let add_locations locs (registered, _) =
-        match registered.abstraction with
-        | Domain  (module D) -> Location.fold add D.location_dependencies locs
-        | Functor (module D) -> Location.fold add D.location_dependencies locs
-      in
-      List.fold_left add_locations init domains |>
-      Location.make_interactive
-    in
-    let module L = (val Location.assert_not_unit locations) in
-    let structured : (V.t, L.location) structured =
-      Unit ((module V), (module L))
-    in
-    let structured = List.fold_left (fun s d -> add d s) structured domains in
-    let module Structured : Structured = (val assert_not_unit structured) in
-    (module Structured)
+
+  let add_contexts contexts (registered, _mode) =
+    let add_context = Context.{ folder = add } in
+    match registered.abstraction with
+    | Domain (module Domain) ->
+      Context.fold add_context Domain.context_dependencies contexts |>
+      Value.fold_contexts add_context Domain.value_dependencies
+    | Functor (module F) -> contexts
+
+  let add_values values (registered, _) =
+    let add_value = Value.{ folder = add } in
+    match registered.abstraction with
+    | Domain (module Domain) ->
+      Value.fold add_value Domain.value_dependencies values |>
+      Location.fold_values add_value Domain.location_dependencies
+    | Functor (module F) ->
+      Location.fold_values add_value F.location_dependencies values
+
+  let add_locations locs (registered, _) =
+    let add = Location.{ folder = add } in
+    match registered.abstraction with
+    | Domain  (module D) -> Location.fold add D.location_dependencies locs
+    | Functor (module D) -> Location.fold add D.location_dependencies locs
+
+  let build domains =
+    (* Build the contexts *)
+    let interactive_ctx c = Context.(make_interactive c |> assert_not_unit) in
+    let contexts = List.fold_left add_contexts Context.init domains in
+    let module Contexts = (val interactive_ctx contexts) in
+    (* Build the values *)
+    let init_values = Value.init (module Contexts) in
+    let interactive_value v = Value.(make_interactive v |> assert_not_unit) in
+    let values = List.fold_left add_values init_values domains in
+    let module Values = (val interactive_value values) in
+    (* Build the locations *)
+    let init_locations = Location.init (module Values) in
+    let interactive_loc l = Location.(make_interactive l |> assert_not_unit) in
+    let locations = List.fold_left add_locations init_locations domains in
+    let module Locs = (val interactive_loc locations) in
+    (* Build the domains *)
+    let init_domain = init (module Contexts) (module Values) (module Locs) in
+    let structured = List.fold_left (fun s d -> add d s) init_domain domains in
+    let module Structured = (val assert_not_unit structured) in
+    (module Structured : Structured)
 end
 
 

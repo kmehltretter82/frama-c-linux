@@ -68,6 +68,9 @@ include Datatype.Make(struct
 let pretty_debug = pretty
 let pretty_typ _ = pretty
 
+type context = unit
+let context = Abstract_context.Leaf (module Unit_context)
+
 (* Inclusion: test inclusion of each field. *)
 let is_included v1 v2 =
   let bincl b1 b2 = (not b1) || b2 in

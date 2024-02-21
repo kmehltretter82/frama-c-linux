@@ -127,6 +127,9 @@ module type Queries = sig
   (** Domain state. *)
   type state
 
+  (** Context used for expressions evaluation. *)
+  type context
+
   (** Numerical values to which the expressions are evaluated. *)
   type value
 
@@ -216,6 +219,7 @@ type ('value, 'location, 'origin) valuation =
 (** Transfer function of the domain. *)
 module type Transfer = sig
   type state
+  type context
   type value
   type location
   type origin
@@ -396,6 +400,7 @@ module type S = sig
   (** Transfer functions from the result of evaluations.
       See {!Eval} for more details about valuation. *)
   include Transfer with type state := t
+                    and type context := context
                     and type value := value
                     and type location := location
                     and type origin := origin
@@ -510,6 +515,10 @@ module type Leaf = sig
   (** The key identifies the domain and the type [t] of its states.
       Automatically created by {!Domain_builder.Complete}. *)
   val key: t key
+
+  (** The abstract context used by the domain.
+      It carries the [context] type used by the domain. *)
+  val context_dependencies : context Abstract_context.dependencies
 
   (** The abstract value used by the domain.
       It carries the [value] type used by the domain.

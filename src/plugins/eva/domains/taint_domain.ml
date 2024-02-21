@@ -300,7 +300,9 @@ module Domain = struct
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
   type origin
+  type context = unit
 
+  let context_dependencies = Abstract_context.Leaf (module Unit_context)
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
 
@@ -314,7 +316,8 @@ module Domain = struct
   include QueriesTaint
 
   include (TransferTaint: Abstract_domain.Transfer
-           with type state := state
+           with type context := context
+            and type state := state
             and type value := value
             and type location := location
             and type origin := origin)

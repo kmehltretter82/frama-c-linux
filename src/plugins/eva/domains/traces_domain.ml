@@ -1088,7 +1088,9 @@ module D = struct
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
   type origin
+  type context = unit
 
+  let context_dependencies = Abstract_context.Leaf (module Unit_context)
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
 

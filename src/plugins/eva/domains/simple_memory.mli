@@ -30,7 +30,7 @@ type 'value builtin = 'value list -> 'value Eval.or_bottom
 
 (** Abstraction of the values variables are mapped to. *)
 module type Value = sig
-  include Abstract_value.Leaf
+  include Abstract_value.Leaf with type context = unit
 
   (** Widening operation to ensure convergence. *)
   val widen : t -> t -> t

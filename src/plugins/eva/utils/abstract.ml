@@ -20,6 +20,28 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Context = struct
+
+  type 'a context = (module Abstract_context.S with type t = 'a)
+  module C = struct type 'a t = 'a context end
+  include Structure.Shape (Structure.Key_Context) (C)
+
+  module type Internal = sig
+    include Abstract_context.S
+    val structure : t structure
+  end
+
+  module type External = sig
+    include Internal
+    include Structure.External
+      with type t := t
+       and type 'a key := 'a key
+       and type 'a data := 'a data
+  end
+
+end
+
+
 module Value = struct
 
   module V = struct

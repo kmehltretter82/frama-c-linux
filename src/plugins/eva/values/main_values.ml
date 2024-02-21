@@ -24,6 +24,8 @@ open Cil_types
 
 module CVal = struct
   include Cvalue.V
+  type context = unit
+  let context = Abstract_context.Leaf (module Unit_context)
 
   let zero = Cvalue.V.singleton_zero
   let one = Cvalue.V.singleton_one
@@ -141,6 +143,9 @@ let cval = Abstract_value.Leaf (module CVal)
 
 module Interval = struct
   include Datatype.Option (Ival)
+
+  type context = unit
+  let context = Abstract_context.Leaf (module Unit_context)
 
   let pretty_typ _ = pretty
 

@@ -100,7 +100,9 @@ module D : Abstract_domain.Leaf
   type state = Memory.t
   type location = Precise_locs.precise_location
   type origin
+  type context = unit
 
+  let context_dependencies = Abstract_context.Leaf (module Unit_context)
   let value_dependencies = Abstract_value.Leaf (module Offsm_value.Offsm)
   let location_dependencies = Main_locations.ploc
 

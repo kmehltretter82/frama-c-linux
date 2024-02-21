@@ -23,6 +23,7 @@
 open Cil_types
 open Eval
 
+type context = unit
 type value = Main_values.CVal.t
 type origin = value
 type location = Main_locations.PLoc.location

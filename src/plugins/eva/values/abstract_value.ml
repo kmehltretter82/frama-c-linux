@@ -46,9 +46,13 @@ type bound = Int of Integer.t | Float of float * fkind
 
 type pointer_comparison = Equality | Relation | Subtraction
 
+type 'a enriched_context = { from_domains : 'a ; stmt : stmt }
+
 (** Signature of abstract numerical values. *)
 module type S = sig
   include Datatype.S
+
+  type context
 
   val pretty_typ: typ option -> t Pretty_utils.formatter
   (** Pretty the abstract value assuming it has the type given as argument. *)
@@ -205,6 +209,9 @@ module type Leaf = sig
 
   (** The key identifies the module and the type [t] of abstract values. *)
   val key: t key
+
+  (** The abstract context on which this value depends. *)
+  val context : context Abstract_context.dependencies
 end
 
 (** Eva abstractions are divided between values, locations and domains.

@@ -372,6 +372,9 @@ module Datatype_Offsm_or_top = Datatype.Make_with_collections(struct
 module Offsm : Abstract_value.Leaf with type t = offsm_or_top = struct
   include Datatype_Offsm_or_top
 
+  type context = unit
+  let context = Abstract_context.Leaf (module Unit_context)
+
   let pretty_typ typ fmt = function
     | Top as o -> pretty fmt o
     | O o ->
