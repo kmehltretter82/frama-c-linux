@@ -3187,14 +3187,14 @@ let isZero (e: exp) : bool =
 let rec isLogicZero t = match t.term_node with
   | TConst (Integer (n,_)) -> Integer.equal n Integer.zero
   | TConst (LChr c) -> Char.code c = 0
-  | TCast(false, _, t) -> isLogicZero t
+  | TCast(_, _, t) -> isLogicZero t
   | _ -> false
 
 let isLogicNull t =
   isLogicZero t ||
   (let rec aux t = match t.term_node with
       | Tnull -> true
-      | TCast(false,_, t) -> aux t
+      | TCast(_,_, t) -> aux t
       | _ -> false
    in aux t)
 
@@ -3462,7 +3462,7 @@ let rec stripCasts (e: exp) =
   match e.enode with CastE(_, e') -> stripCasts e' | _ -> e
 
 let rec stripTermCasts (t: term) =
-  match t.term_node with TCast(false,_, t') -> stripTermCasts t' | _ -> t
+  match t.term_node with TCast(_,_, t') -> stripTermCasts t' | _ -> t
 
 (* Separate out the storage-modifier name attributes *)
 let separateStorageModifiers (al: attribute list) =

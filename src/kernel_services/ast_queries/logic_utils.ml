@@ -1747,6 +1747,8 @@ let rec compare_term t1 t2 =
     if res = 0 then compare_term t1 t2 else res
   | TCast (false,_,_), _ -> 1
   | _, TCast (false,_,_) -> -1
+  | TCast(true,_,_), _ -> 1
+  | _, TCast(true,_,_) -> -1
   | TAddrOf l1, TAddrOf l2 -> compare_tlval l1 l2
   | TAddrOf _, _ -> 1
   | _, TAddrOf _ -> -1
@@ -1835,8 +1837,6 @@ let rec compare_term t1 t2 =
   | Tlet(d1,b1), Tlet(d2,b2) ->
     let res = compare_logic_info d1 d2 in
     if res = 0 then compare_term b1 b2 else res
-  | Tlet _, _ -> 1
-  | _, Tlet _ -> -1
 
 and compare_logic_info l1 l2 =
   let res = compare_logic_signature l1 l2 in
