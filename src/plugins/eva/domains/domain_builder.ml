@@ -316,8 +316,11 @@ let unique_name =
     name ^ string_of_int !counter
 
 module Restrict
-    (Value: Abstract_value.S)
-    (Domain: Abstract.Domain.Internal with type value = Value.t)
+    (Context: Abstract_context.S)
+    (Value: Abstract_value.S with type context = Context.t)
+    (Domain: Abstract.Domain.Internal
+      with type context = Context.t
+       and type value = Value.t)
     (Scope: sig val functions: Domain_mode.function_mode list end)
 = struct
 

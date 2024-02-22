@@ -24,6 +24,9 @@
 
 module Domain : sig
 
+  module type Context = Abstract.Context.External
+  module type Value = Abstract.Value.External
+
   (** Witness of the registration of an abstract domain, it can be used to
       programmatically enable the domain. *)
   type registered
@@ -54,10 +57,10 @@ module Domain : sig
   module type Functor = sig
     type location
     val location_dependencies: location Abstract_location.dependencies
-    module Make (V : Abstract.Value.External) : sig
+    module Make (C : Context) (V : Value with type context = C.t) : sig
       include Abstract_domain.S
-        with type value = V.t
-         and type context = V.context
+        with type context = C.t
+         and type value = V.t
          and type location = location
       val key : state Abstract_domain.key
     end

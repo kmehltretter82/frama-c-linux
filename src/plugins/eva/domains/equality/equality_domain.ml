@@ -176,16 +176,17 @@ let project (t, _, _) = t
 
 (* ------------------------- Abstract Domain -------------------------------- *)
 
-module Make
-    (Value : Abstract.Value.External)
-= struct
+module type Context = Abstract.Context.External
+module type Value = Abstract.Value.External
+
+module Make (Ctx : Context) (Value : Value with type context = Ctx.t) = struct
 
   include Internal
   include Store
 
   let get_cvalue = Value.get Main_values.CVal.key
 
-  type context = Value.context
+  type context = Ctx.t
   type value = Value.t
   type location = Precise_locs.precise_location
   type origin
@@ -535,7 +536,7 @@ end
 module Functor = struct
   type location = Precise_locs.precise_location
   let location_dependencies = Main_locations.ploc
-  module Make (V : Abstract.Value.External) = Make (V)
+  module Make (C : Context) (V : Value with type context = C.t) = Make (C) (V)
 end
 
 let registered =

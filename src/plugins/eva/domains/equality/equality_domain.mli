@@ -35,10 +35,15 @@ type t
 val key: t Abstract_domain.key
 val project: t -> Equality.Set.t
 
-module Make (Value : Abstract.Value.External) : sig
-  include Abstract_domain.S with type value = Value.t
-                             and type location = Precise_locs.precise_location
-                             and type state = t
+module type Context = Abstract.Context.External
+module type Value = Abstract.Value.External
+
+module Make (Ctx : Context) (Value : Value with type context = Ctx.t) : sig
+  include Abstract_domain.S
+    with type context = Ctx.t
+     and type value = Value.t
+     and type location = Precise_locs.precise_location
+     and type state = t
 
   val pretty_debug : Format.formatter -> t -> unit
 end

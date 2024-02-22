@@ -57,7 +57,7 @@ module Context = struct
   type structured = (module Structured) or_unit
   type interactive = (module Interactive) or_unit
 
-  let init = Unit
+  let init : structured = Unit
 
   (* During the complete abstraction build, we need to verify that there is at
      least one context in the computed abstraction.
@@ -184,7 +184,7 @@ module Value = struct
      ensure that we do not temper with it. As for the context abstractions, a
      [Unit] structured abstraction is used for the initial state and is
      discarded as soon as a value is added. *)
-  type ('u, 'v) or_unit = Unit of 'u | Value of 'v
+  type ('c, 'v) or_unit = Unit of 'c | Value of 'v
   type 'c context = (module Context.Interactive with type t = 'c)
   type 'c structured_module = (module Structured with type context = 'c)
   type 'c structured = ('c context, 'c structured_module) or_unit
@@ -458,16 +458,18 @@ end
 
 module Domain = struct
   module type S = Abstract_domain.S
+  module type Context = Abstract.Context.External
+  module type Value = Abstract.Value.External
 
   (** Functor domain which can be built over any value abstractions, but with
       fixed locations dependencies. *)
   module type Functor = sig
     type location
     val location_dependencies: location Abstract_location.dependencies
-    module Make (V : Abstract.Value.External) : sig
+    module Make (C : Context) (V : Value with type context = C.t) : sig
       include Abstract_domain.S
-        with type value = V.t
-         and type context = V.context
+        with type context = C.t
+         and type value = V.t
          and type location = location
       val key : state Abstract_domain.key
     end
@@ -577,9 +579,7 @@ module Domain = struct
        and type location = 'l)
 
 
-  type ('c, 'v, 'l) init =
-    'c context -> ('c, 'v) value -> ('v, 'l) location -> ('c, 'v, 'l) structured
-  let init : type c v l. (c, v, l) init = fun c v l -> Unit (c, v, l)
+  let init c v l : ('c, 'v, 'l) structured = Unit (c, v, l)
 
   (* During the complete abstraction build, we need to verify that there is at
      least one domain in the computed abstraction.
@@ -619,9 +619,9 @@ module Domain = struct
   type 'a identity = 'a -> 'a
   type ('c, 'v, 'l) name = string -> ('c, 'v, 'l) structured_domain identity
   let register_name : type c v l. (c, v, l) name = fun name (module D) ->
-    let no_results = Parameters.NoResultsDomains.mem name in
     let register = D.Store.register_global_state in
-    let f storage state = register (storage && no_results) state in
+    let no_results () = Parameters.NoResultsDomains.mem name in
+    let f storage state = register (storage && no_results ()) state in
     let module S = struct include D.Store let register_global_state = f end in
     (module struct include D module Store = S end)
 
@@ -643,7 +643,7 @@ module Domain = struct
       | Functor (module Functor) ->
         let locs = Location.outline Functor.location_dependencies in
         let eq_loc = Location.dec_eq locs Loc.structure in
-        let module D = Functor.Make (Val) in
+        let module D = Functor.Make (Ctx) (Val) in
         begin match eq_loc with
           | Some Eq ->
             let structure = Abstract.Domain.Leaf (D.key, (module D)) in
@@ -726,7 +726,7 @@ module Domain = struct
       | None -> (module Named)
       | Some kf_modes ->
         let module Scope = struct let functions = kf_modes end in
-        (module Domain_builder.Restrict (Val) (Named) (Scope))
+        (module Domain_builder.Restrict (Ctx) (Val) (Named) (Scope))
     in
     let combined : (c, v, l) structured_domain =
       match structured with

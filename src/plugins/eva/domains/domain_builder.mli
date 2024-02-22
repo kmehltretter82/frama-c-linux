@@ -105,12 +105,13 @@ module Complete_Simple_Cvalue
    in the current function and in all functions called from it.
    See {!Domain_mode} for more details. *)
 module Restrict
-    (Value: Abstract_value.S)
+    (Context: Abstract_context.S)
+    (Value: Abstract_value.S with type context = Context.t)
     (Domain: Abstract.Domain.Internal
-      with type context = Value.context
+      with type context = Context.t
        and type value = Value.t)
     (_: sig val functions: Domain_mode.function_mode list end)
   : Abstract.Domain.Internal
-    with type context = Value.context
+    with type context = Context.t
      and type value = Value.t
      and type location = Domain.location
