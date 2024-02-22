@@ -365,6 +365,37 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Field  block                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xForm-field-block,
+.dome-xForm-field-block .dome-xForm-label-actions,
+.dome-xForm-field-block > .dome-xForm-field {
+    display:flex;
+    flex-wrap: wrap;
+}
+
+.dome-xForm-field-block .dome-xForm-label{
+    margin-right: 15px;
+}
+
+.dome-xForm-field-block .dome-xForm-field-actions {
+    margin: auto 0;
+}
+
+.dome-xForm-field-block,
+.dome-xForm-field-block > .dome-xForm-field {
+    max-width: 100%;
+    align-items: center;
+    margin: 2px 0;
+}
+
+.dome-xForm-field-block {
+    justify-content: space-between;
+    margin-top: 4px;
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Errors                                                             --- */
 /* -------------------------------------------------------------------------- */
 

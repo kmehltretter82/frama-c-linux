@@ -637,6 +637,7 @@ export function useIndex<A>(
 /* --- Form Filter Context                                                ---*/
 /* --------------------------------------------------------------------------*/
 
+type modeForm = "grid" | "block";
 export interface FilterProps {
   /** default is false. */
   hidden?: boolean;
@@ -653,7 +654,7 @@ export interface Children { children?: React.ReactNode }
 interface FormContext {
   disabled: boolean;
   hidden: boolean;
-  mode?: modeForm;
+  mode: modeForm;
 }
 
 const CONTEXT = React.createContext<FormContext | undefined>(undefined);
@@ -666,12 +667,14 @@ const DISABLED =
   ({ disabled = false, enabled = true }: FilterProps): boolean =>
     disabled || !enabled;
 
+const DEFAULT_MODE = "grid";
+
 function useContext(props?: FilterProps): FormContext {
   const Parent = React.useContext(CONTEXT);
   return {
     hidden: (props && HIDDEN(props)) || (Parent?.hidden ?? false),
     disabled: (props && DISABLED(props)) || (Parent?.disabled ?? false),
-    mode: Parent?.mode,
+    mode: Parent?.mode ?? DEFAULT_MODE,
   };
 }
 
@@ -693,8 +696,6 @@ export function FormFilter(props: FilterProps & Children): JSX.Element | null {
 /* --- Main Form Container                                                ---*/
 /* --------------------------------------------------------------------------*/
 
-type modeForm = "grid" | "block";
-
 /** @category Form Containers */
 export interface PageProps extends FilterProps, Children {
   /** Additional container class. */
@@ -710,9 +711,9 @@ export interface PageProps extends FilterProps, Children {
    @category Form Containers
  */
 export function Page(props: PageProps): JSX.Element | null {
-  const { className, style, children, mode, ...filter } = props;
+  const { className, style, children, mode = DEFAULT_MODE, ...filter } = props;
   const { hidden, disabled } = useContext(filter);
-  const css = Utils.classes(className ?? 'dome-xForm-grid');
+  const css = Utils.classes('dome-xForm-grid', className);
   if (hidden) return null;
   return (
     <div className={css} style={style}>
@@ -972,8 +973,11 @@ export function Field(props: GenericFieldProps): JSX.Element | null {
 
   switch(mode) {
     case "block": return (
-      <Hbox className={disabled ? 'dome-disabled' : ""}>
-        <div className='dome-field-label-actions'>
+      <Hbox className={Utils.classes(
+        "dome-xForm-field-block",
+        disabled ? 'dome-disabled' : ""
+      )}>
+        <div className='dome-xForm-label-actions'>
           {labelField}
           {actionsComponent}
         </div>
