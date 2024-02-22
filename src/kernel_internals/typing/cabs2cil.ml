@@ -4794,9 +4794,41 @@ and doType (ghost:bool) isFuncArg
           let cst = constFold true len' in
           (match cst.enode with
            | Const(CInt64(i, _, _)) ->
-             if Integer.lt i Integer.zero then
-               Kernel.error ~once:true ~current:true
-                 "Array length is negative."
+             begin
+               if Integer.lt i Integer.zero then
+                 Kernel.error ~once:true ~current:true
+                   "Array length is negative."
+               else
+                 (* Check if array size (nb elem * size elem) is smaller than
+                    max size. *)
+                 try
+                   let elem_size =
+                     if Cil.isCompleteType bt &&
+                        not (Cil.is_variably_modified_type bt)
+                     then
+                       Integer.of_int @@ bytesSizeOf bt
+                     else
+                       (* Incomplete types can't be array elements,
+                          and multi-dimensional VLAs are currently unsupported.
+                          In both cases an error has already been raised,
+                          we just check here that the size is not widely off.*)
+                       Integer.one
+                   in
+                   let size_t = bitsSizeOfInt theMachine.kindOfSizeOf in
+                   let size_max = Cil.max_unsigned_number size_t in
+                   let array_size = Integer.mul i elem_size in
+                   if Integer.gt array_size size_max then
+                     Kernel.error ~once:true ~current:true
+                       "Array length is too large.";
+                 with
+                 | SizeOfError (msg,_) ->
+                   Kernel.error ~once:true ~current:true
+                     "Unable to compute the size of array element '%a': %s"
+                     Cil_printer.pp_typ bt
+                     msg
+                 | Invalid_argument msg ->
+                   Kernel.fatal ~current:true "%s" msg
+             end
            | _  when not allowVarSizeArrays ->
              if isConstant cst then
                (* e.g., there may be a float constant involved.

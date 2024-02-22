@@ -2,7 +2,13 @@
 [kernel] empty_base.c:13: User Error: 
   empty structs only allowed for GCC/MSVC machdeps; see option -machdep or run 'frama-c -machdep help' for the list of available machdeps
 [kernel] empty_base.c:48: User Error: 
+  Unable to compute the size of array element 'struct empty': empty struct 'struct empty'
+[kernel] empty_base.c:48: User Error: 
   zero-length arrays only allowed for GCC/MSVC machdeps; see option -machdep or run 'frama-c -machdep help' for the list of available machdeps
+[kernel] empty_base.c:49: User Error: 
+  Unable to compute the size of array element 'struct empty': empty struct 'struct empty'
+[kernel] empty_base.c:50: User Error: 
+  Unable to compute the size of array element 'struct empty': empty struct 'struct empty'
 [kernel] empty_base.c:50: User Error: 
   empty initializers only allowed for GCC/MSVC machdeps; see option -machdep or run 'frama-c -machdep help' for the list of available machdeps
   48    struct empty empty_array_of_empty[0];

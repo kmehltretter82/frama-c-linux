@@ -4510,7 +4510,7 @@ and bytesSizeOf t = (bitsSizeOf t) lsr 3
 
 and sizeOf ~loc t =
   try
-    integer ~loc ((bitsSizeOf t) lsr 3)
+    integer ~loc (bytesSizeOf t)
   with SizeOfError _ -> new_exp ~loc (SizeOf(t))
 
 and fieldBitsOffset (f : fieldinfo) : int * int =
@@ -4611,14 +4611,13 @@ and constFold (machdep: bool) (e: exp) : exp =
   | Const(CChr c) -> new_exp ~loc (Const(charConstToIntConstant c))
   | Const(CEnum {eival = v}) -> constFold machdep v
   | Const (CReal _ | CWStr _ | CStr _ | CInt64 _) -> e (* a constant *)
-  | SizeOf t when machdep -> begin
-      try
-        let bs = bitsSizeOf t in
-        kinteger ~loc theMachine.kindOfSizeOf (bs / 8)
+  | SizeOf t when machdep ->
+    begin
+      try kinteger ~loc theMachine.kindOfSizeOf (bytesSizeOf t)
       with SizeOfError _ -> e
     end
-  | SizeOfE e when machdep -> constFold machdep
-                                (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
+  | SizeOfE e when machdep ->
+    constFold machdep (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
   | SizeOfStr s when machdep ->
     kinteger ~loc theMachine.kindOfSizeOf (1 + String.length s)
   | AlignOf t when machdep ->

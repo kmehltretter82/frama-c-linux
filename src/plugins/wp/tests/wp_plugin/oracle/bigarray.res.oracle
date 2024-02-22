@@ -1,6 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing bigarray.c (with preprocessing)
-[kernel] bigarray.c:30: Warning: 
+[kernel] bigarray.c:19: Warning: 
   Cannot represent length of array as an attribute
 [wp] Running WP plugin...
 [wp] [Valid] Goal f_exits (Cfg) (Unreachable)
@@ -10,23 +10,23 @@
   Function f
 ------------------------------------------------------------
 
-Goal Loop assigns (file bigarray.c, line 27):
+Goal Loop assigns (file bigarray.c, line 16):
 Prove: true.
 
 ------------------------------------------------------------
 
 Goal Assigns nothing in 'f':
-Effect at line 30
+Effect at line 19
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Decreasing of Loop variant at loop (file bigarray.c, line 30):
+Goal Decreasing of Loop variant at loop (file bigarray.c, line 19):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Positivity of Loop variant at loop (file bigarray.c, line 30):
+Goal Positivity of Loop variant at loop (file bigarray.c, line 19):
 Prove: true.
 
 ------------------------------------------------------------
