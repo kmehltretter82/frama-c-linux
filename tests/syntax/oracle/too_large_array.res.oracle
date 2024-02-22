@@ -1,4 +1,3 @@
-# frama-c -wp [...]
 [kernel] Parsing too_large_array.i (no preprocessing)
 [kernel] too_large_array.i:12: User Error: Array length is too large.
 [kernel] too_large_array.i:12: Warning: 

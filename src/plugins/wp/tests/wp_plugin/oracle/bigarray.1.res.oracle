@@ -1,8 +1,0 @@
-# frama-c -wp [...]
-[kernel] Parsing bigarray.c (with preprocessing)
-[kernel] bigarray.c:26: User Error: Array length is too large.
-[kernel] bigarray.c:30: Warning: 
-  Cannot represent length of array as an attribute
-[kernel] User Error: stopping on file "bigarray.c" that has errors. Add '-kernel-msg-key pp'
-  for preprocessing command.
-[kernel] Frama-C aborted: invalid user input.
