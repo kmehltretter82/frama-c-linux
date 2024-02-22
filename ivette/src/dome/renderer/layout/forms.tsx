@@ -973,12 +973,14 @@ export function Field(props: GenericFieldProps): JSX.Element | null {
   switch(mode) {
     case "block": return (
       <Hbox className={disabled ? 'dome-disabled' : ""}>
-        {labelField}
+        <div className='dome-field-label-actions'>
+          {labelField}
+          {actionsComponent}
+        </div>
         <div className={cssField} title={title}>
           {children}
           {WARNING}
         </div>
-        {actionsComponent}
       </Hbox>
     );
     case "grid":
