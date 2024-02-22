@@ -428,7 +428,7 @@ let rec type_term
          order to lower the number of explicit casts *)
       let rec cast_first t1 t2 = match t1.term_node with
         | TLval _ -> false
-        | TLogic_coerce(_, t) -> cast_first t t2
+        | TCast (true, _, t) -> cast_first t t2
         | _ -> true
       in
       let cast_first = cast_first t1 t2 in
@@ -457,7 +457,7 @@ let rec type_term
       ignore (type_term ~use_gmp_opt:true ~ctx:c_int ~profile t2);
       ty
 
-    | TCastE(_, t') ->
+    | TCast (false, Ctype _, t') ->
       (* compute the smallest interval from the whole term [t] *)
       let i = Interval.get_from_profile ~profile t in
       (* nothing more to do: [i] is already more precise than what we could
@@ -465,6 +465,14 @@ let rec type_term
       let ctx = ty_of_interv ?ctx i in
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t');
       ctx
+
+    | TCast (true, _, t') ->
+      let i = Interval.get_from_profile ~profile t in
+      ignore (type_term ~use_gmp_opt ~arith_operand ?ctx ~profile t');
+      ty_of_interv ~use_gmp_opt i
+    (* TODO (NB) : Maybe can be merged ? *)
+
+    | TCast (false, _,_) -> assert false
 
     | Tif (t1, t2, t3) ->
       let ctx1 =
@@ -478,11 +486,6 @@ let rec type_term
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t2);
       ignore (type_term ~use_gmp_opt:true ~ctx ~profile t3);
       ctx
-
-    | TLogic_coerce (_, t') ->
-      let i = Interval.get_from_profile ~profile t in
-      ignore (type_term ~use_gmp_opt ~arith_operand ?ctx ~profile t');
-      ty_of_interv ~use_gmp_opt i
 
     | Tat (t, _) ->
       (type_term ~use_gmp_opt ~arith_operand ?ctx ~profile t).ty
@@ -534,7 +537,7 @@ let rec type_term
                       the kernel introduces a coercion to integer, so we will
                       always see integer here.*)
                    begin match x.term_node with
-                     |TLogic_coerce _ -> None
+                     | TCast (true,_,_) -> None
                      |_ -> if Options.Gmp_only.get() then Some Gmpz else None
                    end
                  | Lreal -> Some Real
@@ -567,7 +570,7 @@ let rec type_term
                       the kernel introduces a coercion to integer, so we will
                       always see integer here.*)
                    begin match x.term_node with
-                     | TLogic_coerce _ -> None
+                     | TCast (true,_,_) -> None
                      |_ -> if Options.Gmp_only.get() then Some Gmpz else None
                    end
                  | Lreal -> Some Real

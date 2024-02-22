@@ -519,7 +519,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
               | _ -> Cil.voidPtrType
             in
             let zero = Cil.lzero () in
-            Logic_const.term (TCastE (typ, zero)) (Ctype typ)
+            Logic_const.term (TCast (false, Ctype typ, zero)) (Ctype typ)
           end
         | Some e -> Logic_utils.expr_to_term e
       in

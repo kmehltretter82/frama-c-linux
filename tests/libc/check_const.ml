@@ -48,7 +48,7 @@ let check_annot kf _ (a: identified_predicate) =
         end
       | TBinOp ((PlusPI | MinusPI),
                 ({term_node = TLval (TVar lvi, _)} |
-                 {term_node = TCastE (_, {term_node = TLval (TVar lvi, _)})}),
+                 {term_node = TCast (false,_, {term_node = TLval (TVar lvi, _)})}),
                 _)
       | TLval (TVar lvi, _) -> begin
           match lvi.lv_origin with

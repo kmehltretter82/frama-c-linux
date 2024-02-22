@@ -307,7 +307,7 @@ let constant_term loc i =
 let rec is_null_term t = match t.term_node with
   | TConst c when is_integral_logic_const c ->
     Integer.equal (value_of_integral_logic_const c) Integer.zero
-  | TCastE(_,t) -> is_null_term t
+  | TCast(false, _,t) -> is_null_term t
   | _ -> false
 
 (* ************************************************************************** *)

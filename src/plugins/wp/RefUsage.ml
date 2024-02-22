@@ -419,8 +419,9 @@ and term (env:ctx) (t:term) : model = match t.term_node with
   | TBinOp((PlusPI|MinusPI),a,b) -> shift (term env a) (vterm env b)
 
   (* Casts *)
-  | TCastE(ty_tgt,t) -> cast (cast_ltyp ty_tgt t.term_type) (term env t)
-  | TLogic_coerce (_lt,t) -> term env t
+  | TCast (false, Ctype ty_tgt,t) -> cast (cast_ltyp ty_tgt t.term_type) (term env t)
+  | TCast (true, _lt,t) -> term env t
+  | TCast (false, _, _) -> assert false
 
 
   (* Term L-Values *)

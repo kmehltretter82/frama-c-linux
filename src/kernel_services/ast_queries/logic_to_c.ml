@@ -115,7 +115,7 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
     (* TODO: Very likely to fail on large integer and incorrect on reals not
        representable as floats *)
     [new_exp ~loc (Const (Logic_utils.lconstant_to_constant constant))]
-  | TCastE (typ, lexp) ->
+  | TCast (false, Ctype typ, lexp) ->
     List.map
       (fun x -> new_exp ~loc (CastE (typ, x))) (loc_to_exp ?result lexp)
   | TAlignOf typ -> [new_exp ~loc (AlignOf typ)]
@@ -129,15 +129,15 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
   | Tinter _ | Tcomprehension _ -> error_lval()
   | Tat ({term_node = TAddrOf (TVar _, TNoOffset)} as taddroflval, _) ->
     loc_to_exp ?result taddroflval
-  | TLogic_coerce(Linteger, t) when Logic_typing.is_integral_type t.term_type ->
+  | TCast (true, Linteger, t) when Logic_typing.is_integral_type t.term_type ->
     loc_to_exp ?result t
-  | TLogic_coerce(Lreal, t) when Logic_typing.is_integral_type t.term_type ->
+  | TCast (true, Lreal, t) when Logic_typing.is_integral_type t.term_type ->
     List.map
       (fun x -> new_exp ~loc (CastE (logic_type_to_typ Lreal, x)))
       (loc_to_exp ?result t)
-  | TLogic_coerce(Lreal, t) when Logic_typing.is_arithmetic_type t.term_type ->
+  | TCast (true, Lreal, t) when Logic_typing.is_arithmetic_type t.term_type ->
     loc_to_exp ?result t
-  | TLogic_coerce (set, t)
+  | TCast (true, set, t)
     when
       Logic_const.is_set_type set &&
       Logic_utils.is_same_type
@@ -154,7 +154,7 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
   | Toffset _
   | Tblock_length _
   | TUpdate _ | Ttypeof _ | Ttype _
-  | TLogic_coerce _
+  | TCast _
     -> error_lval ()
 
 let rec loc_to_lval ?result t =
@@ -167,7 +167,7 @@ let rec loc_to_lval ?result t =
   (* coercions to arithmetic types cannot be lval. We only have to consider
      a coercion to set here.
   *)
-  | TLogic_coerce(set, t) when
+  | TCast (true, set, t) when
       Logic_typing.is_set_type set &&
       Logic_utils.is_same_type
         (Logic_typing.type_of_set_elem set) t.term_type ->
@@ -175,10 +175,10 @@ let rec loc_to_lval ?result t =
   | Tinter _ -> error_lval() (* TODO *)
   | Tcomprehension _ -> error_lval()
   | TSizeOfE _ | TAlignOfE _ | TUnOp _ | TBinOp _ | TSizeOfStr _
-  | TConst _ | TCastE _ | TAlignOf _ | TSizeOf _ | Tapp _ | Tif _
+  | TConst _ | TCast _ | TAlignOf _ | TSizeOf _ | Tapp _ | Tif _
   | Tat _ | Toffset _ | Tbase_addr _ | Tblock_length _ | Tnull | Trange _
   | TDataCons _ | TUpdate _ | Tlambda _
-  | Ttypeof _ | Ttype _ | Tlet _ | TLogic_coerce _ ->
+  | Ttypeof _ | Ttype _ | Tlet _ ->
     error_lval ()
 
 let loc_to_offset ?result loc =
@@ -198,11 +198,10 @@ let loc_to_offset ?result loc =
     | Tempty_set -> h,[]
     | Trange _ | TAddrOf _ | Tat _
     | TSizeOfE _ | TAlignOfE _ | TUnOp _ | TBinOp _ | TSizeOfStr _
-    | TConst _ | TCastE _ | TAlignOf _ | TSizeOf _ | Tapp _ | Tif _
+    | TConst _ | TCast _ | TAlignOf _ | TSizeOf _ | Tapp _ | Tif _
     | Toffset _ | Tbase_addr _ | Tblock_length _ | Tnull
     | TDataCons _ | TUpdate _ | Tlambda _
     | Ttypeof _ | Ttype _ | Tcomprehension _ | Tinter _ | Tlet _
-    | TLogic_coerce _
       -> error_lval ()
   in snd (aux None loc.term_node)
 

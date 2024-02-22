@@ -122,7 +122,7 @@ let rec addr_of_lval ?loc term =
   match term.term_node with
   | TLval lv ->
     Logic_utils.mk_logic_AddrOf ?loc lv typ
-  | TCastE (_, t) | TLogic_coerce (_, t) ->
+  | TCast (_,_, t) ->
     addr_of_lval ?loc t
   | Tif(c, t, e) ->
     let t = addr_of_lval ?loc t in
@@ -320,7 +320,7 @@ let assigned_via_pointers kf =
     match t.term_node with
     | TLval (TMem _, _) ->
       true
-    | TCastE (_, t) | TLogic_coerce (_, t)
+    | TCast (_,_, t)
     | Tcomprehension(t, _, _) | Tat (t, _) ->
       assigned_via_pointer t
     | Tunion l | Tinter l ->
