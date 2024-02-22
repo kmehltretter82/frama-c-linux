@@ -29,7 +29,7 @@ module PartitionsQQ : sig
     Lang.F.Vars.t * Lang.F.QED.term
 
   val get : vars:Lang.F.Vars.t -> Lang.F.term list ->
-    int * Lang.F.Tset.t list
+    int * Lang.F.term list list
 end
 = struct
   let dkey = Wp_parameters.register_category "tac_split_quantifiers" (* debugging key *)
@@ -147,7 +147,11 @@ end
     r
 
   let get ~vars es =
-    extract (partitions ~vars es)
+    let nbparts, parts = extract (partitions ~vars es) in
+    let sorted_ts e = List.sort Lang.F.compare @@ Lang.F.Tset.elements e in
+    let sort_es = List.sort (Extlib.list_compare Lang.F.compare) in
+    let parts = sort_es @@ List.map sorted_ts parts in
+    nbparts, parts
 end
 
 open Lang.F
@@ -260,7 +264,7 @@ class split =
                   feedback#set_descr
                     "Decompose the quantifier into %d parts." nb_parts ;
                   let bind es =
-                    bind Exists ~vars (F.e_and (F.Tset.elements es)) in
+                    bind Exists ~vars (F.e_and es) in
                   let goal i n es =
                     Printf.sprintf "Goal %d/%d" i n , F.p_bool (bind es) in
                   Applicable (Tactical.split (Tactical.mapi goal parts))
@@ -352,7 +356,7 @@ class split =
                     else begin
                       feedback#set_title "Split (forall or)" ;
                       feedback#set_descr "Decompose the quantifier between %d parts of the disjunction." nb_parts ;
-                      let bind es = bind Forall ~vars (F.e_or (F.Tset.elements es)) in
+                      let bind es = bind Forall ~vars (F.e_or es) in
                       let goal i n es = Printf.sprintf "Goal %d/%d" i n , When (F.p_bool (bind es)) in
                       let cases = Tactical.mapi goal parts in
                       Applicable (Tactical.replace ~at:step.id cases)

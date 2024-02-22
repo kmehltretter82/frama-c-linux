@@ -475,7 +475,7 @@
   typed_test_step_fa_or_ensures subgoal:
   
   Goal Wp.Tactical.typed_test_step_fa_or_ensures-0 (generated):
-  Assume { (* Goal 1/2 *) When: forall i : Z. P_Pi(i) \/ P_Qi(i). }
+  Assume { (* Goal 1/2 *) When: P_P \/ P_Q \/ P_R. }
   Prove: P_S.
   
   ------------------------------------------------------------
@@ -483,7 +483,7 @@
   typed_test_step_fa_or_ensures subgoal:
   
   Goal Wp.Tactical.typed_test_step_fa_or_ensures-1 (generated):
-  Assume { (* Goal 2/2 *) When: P_P \/ P_Q \/ P_R. }
+  Assume { (* Goal 2/2 *) When: forall i : Z. P_Pi(i) \/ P_Qi(i). }
   Prove: P_S.
   
   ------------------------------------------------------------
@@ -691,7 +691,7 @@
   
   Goal Wp.Tactical.typed_test_goal_ex_and_ensures-0 (generated):
   Assume { (* Pre-condition *) Have: P_S. }
-  Prove: exists i : Z. P_Pi(i) /\ P_Qi(i).
+  Prove: P_P /\ P_Q.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
@@ -699,7 +699,7 @@
   
   Goal Wp.Tactical.typed_test_goal_ex_and_ensures-1 (generated):
   Assume { (* Pre-condition *) Have: P_S. }
-  Prove: P_P /\ P_Q.
+  Prove: exists i : Z. P_Pi(i) /\ P_Qi(i).
   
   ------------------------------------------------------------
 [wp] [Unsuccess] typed_test_goal_ex_and_ensures (Tactic) (Qed)

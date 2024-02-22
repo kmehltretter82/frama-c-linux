@@ -29,6 +29,7 @@ sig
   type t
   val dummy : t
   val equal : t -> t -> bool
+  val compare : t -> t -> int
 end
 
 module Make(T : Type) =
@@ -79,7 +80,7 @@ struct
     if cmp <> 0 then cmp else
       let cmp = Stdlib.compare x.vrank y.vrank in
       if cmp <> 0 then cmp else
-        Stdlib.compare x.vid y.vid
+        T.compare x.vtau y.vtau
 
   (* POOL *)
 
