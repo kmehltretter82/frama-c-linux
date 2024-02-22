@@ -220,7 +220,7 @@
 [eva] memcpy.c:172: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:172: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:172: 
-  In memcpy builtin: precise copy of indeterminate values UNINITIALIZED
+  In memcpy builtin: precise copy of indeterminate values.
 [eva] memcpy.c:173: assertion got status valid.
 [eva] computing for function itv <- main_uninit <- main_all.
   Called from memcpy.c:174.
@@ -233,7 +233,7 @@
 [eva:imprecision] memcpy.c:174: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:174: 
-  In memcpy builtin: imprecise copy of indeterminate values
+  In memcpy builtin: imprecise copy of indeterminate values.
 [eva] memcpy.c:175: assertion got status valid.
 [eva] computing for function make_unknown <- main_uninit <- main_all.
   Called from memcpy.c:178.
@@ -255,7 +255,7 @@
 [eva:imprecision] memcpy.c:181: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:181: 
-  In memcpy builtin: imprecise copy of indeterminate values
+  In memcpy builtin: imprecise copy of indeterminate values.
 [eva:alarm] memcpy.c:182: Warning: 
   accessing uninitialized left-value. assert \initialized(&b[11]);
 [eva] computing for function make_unknown <- main_uninit <- main_all.
@@ -267,7 +267,7 @@
 [eva] memcpy.c:187: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:187: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:187: 
-  In memcpy builtin: precise copy of indeterminate values UNINITIALIZED
+  In memcpy builtin: precise copy of indeterminate values.
 [eva] memcpy.c:188: assertion got status valid.
 [eva] computing for function itv <- main_uninit <- main_all.
   Called from memcpy.c:190.
@@ -279,7 +279,7 @@
 [eva:imprecision] memcpy.c:190: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:190: 
-  In memcpy builtin: imprecise copy of indeterminate values
+  In memcpy builtin: imprecise copy of indeterminate values.
 [eva] memcpy.c:191: assertion got status valid.
 [eva:alarm] memcpy.c:192: Warning: 
   accessing uninitialized left-value. assert \initialized(&b[8]);
@@ -306,7 +306,7 @@
 [eva:imprecision] memcpy.c:200: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:200: 
-  In memcpy builtin: imprecise copy of indeterminate values
+  In memcpy builtin: imprecise copy of indeterminate values.
 [eva:alarm] memcpy.c:201: Warning: 
   accessing uninitialized left-value. assert \initialized(&b[11]);
 [eva] Recording results for main_uninit
