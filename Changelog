@@ -18,7 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
-o   Kernel    [2024-01-29] Db is now mostly empty, the only remaining value is
+o!  Kernel    [2024-02-22] Merged AST nodes TCastE and TLogic_coerce
+o!  Kernel    [2024-01-29] Db is now mostly empty, the only remaining value is
                            Db.Main.extend which is deprecated and replaced by
                            Boot.Main.extend. Features related to asynchronous
                            interactions are now handled in module Async
