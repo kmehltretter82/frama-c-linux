@@ -3,7 +3,7 @@ module Spec_memory
   use int.Int
   use map.Map
 
-  use frama_c_wp.memory.Memory
+  use frama_c_wp.memaddr.MemAddr
 
   type malloc = map int int
 
