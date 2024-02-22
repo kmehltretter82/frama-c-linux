@@ -620,8 +620,8 @@ module Domain = struct
   type ('c, 'v, 'l) name = string -> ('c, 'v, 'l) structured_domain identity
   let register_name : type c v l. (c, v, l) name = fun name (module D) ->
     let register = D.Store.register_global_state in
-    let no_results () = Parameters.NoResultsDomains.mem name in
-    let f storage state = register (storage && no_results ()) state in
+    let results () = not (Parameters.NoResultsDomains.mem name) in
+    let f storage state = register (storage && results ()) state in
     let module S = struct include D.Store let register_global_state = f end in
     (module struct include D module Store = S end)
 
