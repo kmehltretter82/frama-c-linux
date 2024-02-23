@@ -36,45 +36,6 @@ let rec lval_of_address exp =
   | CastE (_typ, exp) -> lval_of_address exp
   | _ -> Cil.mkMem ~addr:exp ~off:Cil_types.NoOffset
 
-let frama_C_is_base_aligned _state = function
-  | [_, x; _, y] ->
-    let result =
-      match Ival.project_small_set (Cvalue.V.project_ival y) with
-      | Some si ->
-        let aligned =
-          Location_Bytes.for_all
-            (fun b _o -> List.for_all (Base.is_aligned_by b) si)
-            x
-        in
-        if aligned then Cvalue.V.singleton_one else Cvalue.V.zero_or_one
-      | None
-      | exception Cvalue.V.Not_based_on_null -> Cvalue.V.zero_or_one
-    in
-    Builtins.Result [result]
-  | _ -> raise (Builtins.Invalid_nb_of_args 2)
-
-let () = register_builtin "Frama_C_is_base_aligned" frama_C_is_base_aligned
-
-
-let frama_c_offset _state = function
-  | [_, x] ->
-    let result =
-      try
-        let acc = Ival.bottom in
-        let offsets = Location_Bytes.fold_i (fun _b -> Ival.join) x acc in
-        Cvalue.V.inject_ival offsets
-      with Abstract_interp.Error_Top ->
-        Self.error ~current:true
-          "Builtin Frama_C_offset is applied to a value not \
-           guaranteed to be an address";
-        Cvalue.V.top_int
-    in
-    Builtins.Result [result]
-  | _ -> raise (Builtins.Invalid_nb_of_args 1)
-
-let () = register_builtin "Frama_C_offset" frama_c_offset
-
-
 let plevel = Parameters.ArrayPrecisionLevel.get
 
 (* Create a dependency [\from arg_n] where n is the nth argument of the
@@ -617,6 +578,48 @@ let frama_c_memset state actuals =
   | _ -> raise (Builtins.Invalid_nb_of_args 3)
 
 let () = register_builtin ~replace:"memset" "Frama_C_memset" frama_c_memset
+
+(* -------------------------------------------------------------------------- *)
+(*                  is_base_aligned, offset, split, ungarbled                 *)
+(* -------------------------------------------------------------------------- *)
+
+let frama_C_is_base_aligned _state = function
+  | [_, x; _, y] ->
+    let result =
+      match Ival.project_small_set (Cvalue.V.project_ival y) with
+      | Some si ->
+        let aligned =
+          Location_Bytes.for_all
+            (fun b _o -> List.for_all (Base.is_aligned_by b) si)
+            x
+        in
+        if aligned then Cvalue.V.singleton_one else Cvalue.V.zero_or_one
+      | None
+      | exception Cvalue.V.Not_based_on_null -> Cvalue.V.zero_or_one
+    in
+    Builtins.Result [result]
+  | _ -> raise (Builtins.Invalid_nb_of_args 2)
+
+let () = register_builtin "Frama_C_is_base_aligned" frama_C_is_base_aligned
+
+
+let frama_c_offset _state = function
+  | [_, x] ->
+    let result =
+      try
+        let acc = Ival.bottom in
+        let offsets = Location_Bytes.fold_i (fun _b -> Ival.join) x acc in
+        Cvalue.V.inject_ival offsets
+      with Abstract_interp.Error_Top ->
+        Self.error ~current:true
+          "Builtin Frama_C_offset is applied to a value not \
+           guaranteed to be an address";
+        Cvalue.V.top_int
+    in
+    Builtins.Result [result]
+  | _ -> raise (Builtins.Invalid_nb_of_args 1)
+
+let () = register_builtin "Frama_C_offset" frama_c_offset
 
 let frama_c_interval_split _state actuals =
   match actuals with
