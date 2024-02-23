@@ -47,11 +47,12 @@ let rec type_of_offset (basetyp : typ) : offset -> typ = function
     in
     type_of_offset (Cil.typeAddAttributes base_attrs fi.ftype) o
 
+let type_of_lhost : lhost -> typ = function
+  | Var vi -> vi.vtype
+  | Mem addr -> Cil.typeOf_pointed addr.typ
+
 let type_of_lval (host, offset : lval_node) : typ =
-  let basetyp = match host with
-    | Var vi -> vi.vtype
-    | Mem addr -> Cil.typeOf_pointed addr.typ
-  in
+  let basetyp = type_of_lhost host in
   type_of_offset basetyp offset
 
 let type_of_exp : exp_node -> typ = function
@@ -67,7 +68,3 @@ let type_of_exp : exp_node -> typ = function
     match Cil.unrollType (lv.typ) with
     | TArray (t,_,attrs) -> TPtr(t, attrs)
     | _ ->  assert false
-
-let type_of_lhost = function
-  | Var x -> x.vtype
-  | Mem e -> Cil.typeOf_pointed e.typ
