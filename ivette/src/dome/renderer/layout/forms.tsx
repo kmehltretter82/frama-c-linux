@@ -162,6 +162,13 @@ export class BufferController {
   removeError(): void { this.errors--; }
 }
 
+export type Equal<A> = (a:A, b:A) => boolean;
+
+function compare<A>(equal: Equal<A> | undefined, a: A, b: A): boolean
+{
+  return equal ? equal(a, b) : a === b;
+}
+
 /**
    Insert a temporary buffer to stack modifications. Values are imported from
    the input state, and modifications are stacked into an internal buffer.
@@ -181,7 +188,7 @@ export class BufferController {
 export function useBuffer<A>(
   remote : BufferController,
   state: FieldState<A>,
-  equal?: (a: A, b: A) => boolean
+  equal?: Equal<A>,
 ): FieldState<A>
 {
   const { value, error, reset, onChanged } = state;
@@ -189,53 +196,56 @@ export function useBuffer<A>(
   const [ buffer, setBuffer ] = React.useState<A>(value);
   const [ berror, setBerror ] = React.useState<FieldError>(error);
 
+  const valid = !isValid(berror);
+  const rollback = reset ?? value;
+
+  // --- Error Count
+  React.useEffect(() => {
+      if (valid) return;
+    remote.addError();
+    return () => remote.removeError();
+  }, [remote, valid]);
+
   // --- Reset
   React.useEffect(() => {
     if (modified) {
       const doReset = (): void => {
-        !isValid(berror) && remote.removeError();
         setModified(false);
-        setBuffer(reset ?? value);
+        setBuffer(rollback);
         setBerror(undefined);
       };
       remote.onReset(doReset);
       return () => remote.offReset(doReset);
     } else return;
-  }, [remote, modified, value, berror, reset]);
+  }, [remote, modified, rollback]);
 
   // --- Commit
   React.useEffect(() => {
     if(modified) {
       const doCommit = (): void => {
-        if(isValid(berror)) {
+        if (valid) {
           setModified(false);
           onChanged(buffer, undefined, false);
         } else {
-          remote.removeError();
           setModified(false);
-          setBuffer(reset ?? value);
+          setBuffer(rollback);
           setBerror(undefined);
         }
       };
       remote.onCommit(doCommit);
       return () => remote.offCommit(doCommit);
     } else return;
-  }, [remote, modified, value, berror, buffer, reset, onChanged]);
+  }, [remote, modified, valid, buffer, rollback, onChanged]);
 
   // --- Callback
   const onLocalChange = React.useCallback(
     (newValue, newError, isReset) => {
-      if(!isValid(berror) && isValid(newError)) {
-        remote.removeError();
-      } else if(isValid(berror) && !isValid(newError)) {
-        remote.addError();
-      }
       setModified(!isReset);
       setBuffer(newValue);
       setBerror(newError);
-      if (isReset && (equal ? !equal(newValue, value) : (newValue !== value)))
+      if (isReset && !compare(equal, newValue, value))
         onChanged(newValue, newError, isReset);
-    }, [value, onChanged, equal, berror, remote]);
+    }, [equal, value, onChanged]);
 
   return {
     value: modified ? buffer : value,

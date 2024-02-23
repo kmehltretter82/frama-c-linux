@@ -327,8 +327,8 @@ export function useServerField<A>(
   }, [setState]);
 
   return {
-    value: isValid(error) ? stateValue : local,
     error,
+    value: isValid(error) ? stateValue : local,
     reset: isValid(error) ? undefined : stateValue,
     onChanged: update
   };
