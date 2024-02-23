@@ -95,3 +95,11 @@ val deps_of_lval: (lval -> Precise_locs.precise_location) -> lval -> Deps.t
 
 val const_fold: exp -> exp
 val fold_to_integer: exp -> Integer.t option
+
+(** Offsets *)
+
+(** Returns the last offset in the chain. *)
+val last_offset: offset -> offset
+
+(** Is an lvalue a bitfield? *)
+val is_bitfield: lval -> bool

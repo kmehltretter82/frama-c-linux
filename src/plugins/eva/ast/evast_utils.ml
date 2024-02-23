@@ -394,3 +394,17 @@ and to_float e =
 
 let fold_to_integer e =
   to_integer (const_fold e)
+
+
+(* --- Offsets --- *)
+
+let rec last_offset offset : offset =
+  match offset with
+  | NoOffset | Field(_,NoOffset) | Index(_,NoOffset) -> offset
+  | Field(_,off) | Index(_,off) -> last_offset off
+
+let is_bitfield lval =
+  let (_, offset) = lval.node in
+  match last_offset offset with
+  | Field({fbitfield=Some _}, _) -> true
+  | _ -> false
