@@ -31,13 +31,13 @@ module Make
     (Value    : Abstract_value.S with type context = Context.t)
     (Location : Abstract_location.S with type value = Value.t)
     (Left  : Abstract.Domain.Internal
-      with type context = Context.t
-       and type value = Value.t
-       and type location = Location.location)
+     with type context = Context.t
+      and type value = Value.t
+      and type location = Location.location)
     (Right : Abstract.Domain.Internal
-      with type context = Context.t
-       and type value = Value.t
-       and type location = Location.location)
+     with type context = Context.t
+      and type value = Value.t
+      and type location = Location.location)
 = struct
 
   type context = Context.t

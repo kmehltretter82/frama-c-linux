@@ -149,14 +149,14 @@ module Make
   let right (value : t) : Right.t = snd value
 
   let backward_unop context ~typ_arg unop ~arg ~res =
-    let on_left  = Left.backward_unop  context ~typ_arg unop in 
-    let on_right = Right.backward_unop context ~typ_arg unop in 
+    let on_left  = Left.backward_unop  context ~typ_arg unop in
+    let on_right = Right.backward_unop context ~typ_arg unop in
     let* left  = on_left  ~arg:(left  arg) ~res:(left  res) in
     let+ right = on_right ~arg:(right arg) ~res:(right res) in
     reduce arg left right
 
   let backward_binop ctx ~input_type ~resulting_type binop ~left:l ~right:r ~result:res =
-    let on_left  = Left.backward_binop  ctx ~input_type ~resulting_type binop in 
+    let on_left  = Left.backward_binop  ctx ~input_type ~resulting_type binop in
     let on_right = Right.backward_binop ctx ~input_type ~resulting_type binop in
     let* l1, l2 = on_left  ~left:(left  l) ~right:(left  r) ~result:(left  res) in
     let+ r1, r2 = on_right ~left:(right l) ~right:(right r) ~result:(right res) in

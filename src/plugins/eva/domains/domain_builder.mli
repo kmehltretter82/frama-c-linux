@@ -114,8 +114,8 @@ module Restrict
     (Context: Abstract_context.S)
     (Value: Abstract_value.S with type context = Context.t)
     (Domain: Abstract.Domain.Internal
-      with type context = Context.t
-       and type value = Value.t)
+     with type context = Context.t
+      and type value = Value.t)
     (_: sig val functions: Domain_mode.function_mode list end)
   : Abstract.Domain.Internal
     with type context = Context.t

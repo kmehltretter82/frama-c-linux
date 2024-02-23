@@ -162,9 +162,9 @@ module Value = struct
   (* Folding over contexts dependencies of a value. *)
   let rec fold_contexts : type c. 'a Context.folder -> c dependencies -> 'a -> 'a =
     fun folder dependencies acc ->
-      match dependencies with
-      | Leaf (module R) -> Context.fold folder R.context acc
-      | Node (l, r) -> fold_contexts folder l (fold_contexts folder r acc)
+    match dependencies with
+    | Leaf (module R) -> Context.fold folder R.context acc
+    | Node (l, r) -> fold_contexts folder l (fold_contexts folder r acc)
 
 
   (* As for the context abstraction, building the value abstraction consists
@@ -227,33 +227,33 @@ module Value = struct
      updating the structure. *)
   let add : type c v. v value -> c structured -> c structured =
     fun (module Leaf) structured ->
-      let leaf_context_structure = Context.outline Leaf.context in
-      let module To = (val get_context structured) in
-      let lifted_leaf : (module Abstract.Value.Internal with type context = c) =
-        match Context.dec_eq leaf_context_structure To.structure with
-        | Some Eq ->
-          let leaf = Abstract.Value.Leaf (Leaf.key, (module Leaf)) in
-          (module struct include Leaf let structure = leaf end)
-        | None ->
-          let module From = struct
-            type context = Leaf.context
-            let structure = leaf_context_structure
-          end in
-          let module Converter = Context.Converter (From) (To) in
-          (module Value_lift.Make (Leaf) (Converter))
-      in
-      let combined : (module Abstract.Value.Internal with type context = c) =
-        match make_interactive structured with
-        | Unit _ -> lifted_leaf
-        | Value (module Val) when Val.mem Leaf.key -> (module Val)
-        | Value (module Val) ->
-          (module Value_product.Make (To) (val lifted_leaf) (Val))
-      in
-      Value (module struct
-        type context = c
-        module Context = To
-        module Value = (val combined)
-      end)
+    let leaf_context_structure = Context.outline Leaf.context in
+    let module To = (val get_context structured) in
+    let lifted_leaf : (module Abstract.Value.Internal with type context = c) =
+      match Context.dec_eq leaf_context_structure To.structure with
+      | Some Eq ->
+        let leaf = Abstract.Value.Leaf (Leaf.key, (module Leaf)) in
+        (module struct include Leaf let structure = leaf end)
+      | None ->
+        let module From = struct
+          type context = Leaf.context
+          let structure = leaf_context_structure
+        end in
+        let module Converter = Context.Converter (From) (To) in
+        (module Value_lift.Make (Leaf) (Converter))
+    in
+    let combined : (module Abstract.Value.Internal with type context = c) =
+      match make_interactive structured with
+      | Unit _ -> lifted_leaf
+      | Value (module Val) when Val.mem Leaf.key -> (module Val)
+      | Value (module Val) ->
+        (module Value_product.Make (To) (val lifted_leaf) (Val))
+    in
+    Value (module struct
+      type context = c
+      module Context = To
+      module Value = (val combined)
+    end)
 
 
   (* When building the complete abstraction, we need to trick locations and

@@ -1084,7 +1084,7 @@ module Make
   (* These two modules could be implemented as mutually recursive, to avoid
      the reference for the oracle given to the domains. *)
   module Forward_Evaluation = struct
-    type nonrec context = recursive_environment 
+    type nonrec context = recursive_environment
     let evaluate ~subdivided env valuation expr =
       let open Evaluated.Operators in
       cache := valuation;
