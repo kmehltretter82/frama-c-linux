@@ -44,3 +44,5 @@ val add: exp -> exp -> exp
 val var: Cil_types.varinfo -> lval
 val var_exp: Cil_types.varinfo -> exp
 val lval: lval -> exp
+
+val normalize_condition: exp -> bool -> exp

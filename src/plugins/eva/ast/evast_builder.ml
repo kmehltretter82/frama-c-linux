@@ -22,6 +22,23 @@
 
 open Evast
 
+(* --- Constructors --- *)
+
+let value_or f x = function
+  | Some v -> v
+  | None -> f x
+
+let mk ?(origin=Built) ?typ node =
+  let typ = typ |> value_or Evast_typing.type_of_exp node in
+  { node ; origin ; typ }
+
+let mk_lval ?(origin=Built) ?typ node =
+  let typ = typ |> value_or Evast_typing.type_of_lval node in
+  { node ; origin ; typ }
+
+
+(* --- Translation from Cil --- *)
+
 let translate_unop = function
   | Cil_types.Neg -> Neg
   | Cil_types.BNot -> BNot
@@ -78,8 +95,7 @@ let rec translate_exp e =
     | Cil_types.AddrOf lval -> AddrOf (translate_lval lval)
     | Cil_types.StartOf lval -> StartOf (translate_lval lval)
   in
-  let typ = Evast_typing.type_of_exp node in
-  { node ; origin = Exp e ; typ }
+  mk ~origin:(Exp e) node
 
 and translate_host = function
   | Cil_types.Var vi -> Var vi
@@ -94,15 +110,10 @@ and translate_offset = function
 
 and translate_lval (host, offset as lval) =
   let node = translate_host host, translate_offset offset in
-  let typ = Evast_typing.type_of_lval node in
-  { node ; origin = Lval lval ; typ }
+  mk_lval ~origin:(Lval lval) node
 
 
-let mk node =
-  { node ; origin = Built ; typ = Evast_typing.type_of_exp node }
-
-let mk_lval node =
-  { node ; origin = Built ; typ = Evast_typing.type_of_lval node }
+(* --- Smart constructors --- *)
 
 let integer ?kind i = (* TODO: mathematical unbounded integer *)
   let kind = match kind with
@@ -143,3 +154,48 @@ let var vi = mk_lval (Var vi, NoOffset)
 let var_exp vi = mk (Lval (var vi))
 
 let lval lv = { lv with node=Lval lv }
+
+
+(* --- Condition normalization --- *)
+
+let zero_typed (typ : Cil_types.typ) =
+  match typ with
+  | TFloat (fk, _) -> mk (Const (CReal (0., fk, None)))
+  | TEnum ({ekind = ik },_)
+  | TInt (ik, _) -> mk (Const (CInt64 (Integer.zero, ik, None)))
+  | TPtr _ ->
+    let ik = Cil.(theMachine.upointKind) in
+    let zero = mk (Const (CInt64 (Integer.zero, ik, None))) in
+    mk (CastE (Cil.type_remove_qualifier_attributes typ, zero))
+  | typ ->
+    Self.fatal ~current:true "non-scalar type %a" Printer.pp_typ typ
+
+(* duplicate of Evast_utils.invert_relation; needs to be removed *)
+let invert_relation : binop -> binop = function
+  | Gt -> Le
+  | Lt -> Ge
+  | Le -> Gt
+  | Ge -> Lt
+  | Eq -> Ne
+  | Ne -> Eq
+  | _ -> invalid_arg "invert_relation: must be given a comparison operator"
+
+(* Transform an expression supposed to be [positive] into an equivalent
+   one in which the root expression is a comparison operator. *)
+let rec normalize_condition exp positive =
+  match exp.node with
+  | UnOp (LNot, e, _) -> normalize_condition e (not positive)
+  | BinOp ((Le|Ne|Eq|Gt|Lt|Ge as binop), e1, e2, typ) ->
+    if positive
+    then exp
+    else mk (BinOp (invert_relation binop, e1, e2, typ))
+  | _ ->
+    let op = if positive then Ne else Eq in
+    let typ = Cil.unrollType exp.typ in
+    mk (BinOp (op, zero_typed typ, exp, Cil.intType))
+
+
+(* --- Hide mk optional paremeters --- *)
+
+let mk = mk ~origin:Built ?typ:None
+let mk_lval = mk_lval ~origin:Built ?typ:None
