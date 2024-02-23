@@ -6,7 +6,7 @@
   131   }
   132   
   133   void function(int a, int b) /*@ ghost(int c, int d) */ {
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+             ^^^^^^^^
   134   
   135   }
 [kernel] Frama-C aborted: invalid user input.

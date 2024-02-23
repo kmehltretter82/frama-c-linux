@@ -5,7 +5,7 @@
   47      } /*@ ghost
   48        //@ ensures \true ;
   49        else {
-        ^^^^^^^^^^
+             ^^^^
   50          y++ ;
   51        }
 [kernel] Frama-C aborted: invalid user input.
