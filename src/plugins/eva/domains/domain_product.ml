@@ -120,6 +120,12 @@ module Make
       (Left.reduce_further left expr value)
       (Right.reduce_further right expr value)
 
+  let return_context (left, right) =
+    let open Eval.Bottom.Operators in
+    let* left  = Left.return_context  left  in
+    let* right = Right.return_context right in
+    Context.narrow left right
+
   let lift_record side record =
     let origin = Option.map side record.origin in
     let reductness =

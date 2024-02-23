@@ -191,6 +191,9 @@ module type Queries = sig
       Defined by {!Domain_builder.Complete} with no reduction. *)
   val reduce_further : state -> exp -> value -> (exp * value) list
 
+  (** Returns the current context. *)
+  val return_context : state -> context or_bottom
+
 end
 
 (** Results of an evaluation: the results of all intermediate calculation (the

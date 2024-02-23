@@ -1119,14 +1119,13 @@ module D : Abstract_domain.Leaf
   type state = G.t
   type location = Precise_locs.precise_location
   type origin
-  type context = unit
 
-  let context_dependencies = Abstract_context.Leaf (module Unit_context)
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
 
   include G
   include Domain_builder.Complete (struct include G let top = empty end)
+  include Domain_builder.No_context
 
   let log_category = dkey
 

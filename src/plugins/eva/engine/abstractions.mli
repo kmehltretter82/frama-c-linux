@@ -119,12 +119,15 @@ module type Value_with_reduction = sig
   val reduce : t -> t
 end
 
-(** The three abstractions used in an Eva analysis. *)
+(** The four abstractions used in an Eva analysis. *)
 module type S = sig
-  module Val : Value_with_reduction
+  module Ctx : Abstract.Context.External
+  module Val : Value_with_reduction with type context = Ctx.t
   module Loc : Abstract.Location.External with type value = Val.t
   module Dom : Abstract.Domain.External
-    with type value = Val.t and type location = Loc.location
+    with type value = Val.t
+     and type location = Loc.location
+     and type context = Ctx.t
 end
 
 (* The three abstractions plus an evaluation engine for these abstractions. *)
@@ -132,6 +135,7 @@ module type S_with_evaluation = sig
   include S
   module Eval : Evaluation_sig.S
     with type state = Dom.t
+     and type context = Ctx.t
      and type value = Val.t
      and type loc = Loc.location
      and type origin = Dom.origin

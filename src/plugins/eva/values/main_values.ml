@@ -49,7 +49,7 @@ module CVal = struct
   let assume_pointer = Cvalue_forward.assume_pointer
   let assume_comparable = Cvalue_forward.assume_comparable
 
-  let constant exp = function
+  let constant _ exp = function
     | CInt64 (i,_k,_s) -> Cvalue.V.inject_int i
     | CChr c           -> Cvalue.V.inject_int (Cil.charConstToInt c)
     | CWStr _ | CStr _ -> Cvalue.V.inject (Base.of_string_exp exp) Ival.zero
@@ -57,12 +57,12 @@ module CVal = struct
       Cvalue_forward.eval_float_constant f fkind fstring
     | CEnum _ -> assert false
 
-  let forward_unop typ unop value =
+  let forward_unop _context typ unop value =
     let value = Cvalue_forward.forward_unop typ unop value in
     (* TODO: `Bottom must be in CValue and Cvalue_forward. *)
     if Cvalue.V.is_bottom value then `Bottom else `Value value
 
-  let forward_binop typ binop v1 v2 =
+  let forward_binop _context typ binop v1 v2 =
     let value =
       match typ with
       | TFloat (fkind, _) ->
@@ -74,13 +74,13 @@ module CVal = struct
     then `Bottom
     else `Value value
 
-  let rewrap_integer = Cvalue_forward.rewrap_integer
+  let rewrap_integer _ = Cvalue_forward.rewrap_integer
 
-  let forward_cast ~src_type ~dst_type v =
+  let forward_cast _context ~src_type ~dst_type v =
     let v = Cvalue_forward.forward_cast ~src_type ~dst_type v in
     if Cvalue.V.is_bottom v then `Bottom else `Value v
 
-  let backward_binop ~input_type ~resulting_type binop ~left ~right ~result =
+  let backward_binop _ ~input_type ~resulting_type binop ~left ~right ~result =
     let reduction =
       Cvalue_backward.backward_binop
         ~typ_res:resulting_type ~res_value:result ~typ_e1:input_type left binop right
@@ -92,7 +92,7 @@ module CVal = struct
       then `Bottom
       else `Value (Some v1, Some v2)
 
-  let backward_unop ~typ_arg op ~arg ~res =
+  let backward_unop _ ~typ_arg op ~arg ~res =
     let reduction = Cvalue_backward.backward_unop ~typ_arg op ~arg ~res in
     match reduction with
     | None -> `Value None
@@ -101,7 +101,7 @@ module CVal = struct
       then `Bottom
       else `Value r
 
-  let backward_cast ~src_typ ~dst_typ ~src_val ~dst_val =
+  let backward_cast _ ~src_typ ~dst_typ ~src_val ~dst_val =
     let reduction =
       Cvalue_backward.backward_cast ~src_typ ~dst_typ ~src_val ~dst_val
     in
@@ -177,15 +177,15 @@ module Interval = struct
   let assume_pointer v = `Unknown v
   let assume_comparable _ v1 v2 = `Unknown (v1, v2)
 
-  let constant _ _ = top
-  let forward_unop _ _ _ = `Value top
-  let forward_binop _ _ _ _ = `Value top
-  let forward_cast ~src_type:_ ~dst_type:_ _ = `Value top
+  let constant _ _ _ = top
+  let forward_unop _ _ _ _ = `Value top
+  let forward_binop _ _ _ _ _ = `Value top
+  let forward_cast _ ~src_type:_ ~dst_type:_ _ = `Value top
 
   let resolve_functions _ = `Top, true
   let replace_base _substitution t = t
 
-  let rewrap_integer range value =
+  let rewrap_integer _ range value =
     match value with
     | None -> value
     | Some value ->
@@ -193,10 +193,10 @@ module Interval = struct
       let signed = range.Eval_typ.i_signed in
       Some (Ival.cast_int_to_int ~signed ~size value)
 
-  let backward_unop ~typ_arg:_ _unop ~arg:_ ~res:_ = `Value None
-  let backward_binop ~input_type:_ ~resulting_type:_ _binop ~left:_ ~right:_ ~result:_ =
+  let backward_unop _ ~typ_arg:_ _unop ~arg:_ ~res:_ = `Value None
+  let backward_binop _ ~input_type:_ ~resulting_type:_ _binop ~left:_ ~right:_ ~result:_ =
     `Value (None, None)
-  let backward_cast ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ =
+  let backward_cast _ ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ =
     `Value None
 
   let key = Structure.Key_Value.create_key "interval"

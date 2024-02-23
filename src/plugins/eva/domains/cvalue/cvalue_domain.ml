@@ -29,11 +29,10 @@ module State = struct
   type state = Cvalue.Model.t * Locals_scoping.clobbered_set
   type value = Main_values.CVal.t
   type location = Main_locations.PLoc.location
-  type context = unit
 
-  let context_dependencies = Abstract_context.Leaf (module Unit_context)
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
+  include Domain_builder.No_context
 
   let log_category = Self.dkey_cvalue_domain
 

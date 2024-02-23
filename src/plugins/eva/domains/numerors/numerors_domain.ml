@@ -125,8 +125,8 @@ let reduce_cast (module Abstract: Abstractions.S) =
       | Some get_cvalue, true ->
         (* Otherwise, applies the [forward_cast] function, but updates the
            numerors component of the result. *)
-        fun ~src_type ~dst_type value ->
-          forward_cast ~src_type ~dst_type value >>-: fun result ->
+        fun context ~src_type ~dst_type value ->
+          forward_cast context ~src_type ~dst_type value >>-: fun result ->
           match src_type, dst_type with
           | Eval_typ.TSInt _, Eval_typ.TSFloat fkind ->
             begin
@@ -146,6 +146,7 @@ let reduce_cast (module Abstract: Abstractions.S) =
           | _, _ -> result
   end in
   (module struct
+    module Ctx = Abstract.Ctx
     module Val = Val
     module Loc = Abstract.Loc
     module Dom = Abstract.Dom

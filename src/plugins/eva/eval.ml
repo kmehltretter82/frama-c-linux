@@ -56,6 +56,15 @@ let (>>=.) (t, a) f = match t with
   | `Bottom  -> `Bottom, a
   | `Value t -> let t' = f t in t', a
 
+module Evaluated = struct
+  type 'a t = 'a evaluated
+  module Operators = struct
+    let ( let* ) evaluated f = evaluated >>= f
+    let ( let+ ) evaluated f = evaluated >>=: f
+    let ( let& ) evaluated f = evaluated >>=. f
+  end
+end
+
 (* Backward evaluation. *)
 type 'a reduced = [ `Bottom | `Unreduced | `Value of 'a ]
 

@@ -300,9 +300,7 @@ module Domain = struct
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
   type origin
-  type context = unit
 
-  let context_dependencies = Abstract_context.Leaf (module Unit_context)
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
 
@@ -312,6 +310,7 @@ module Domain = struct
            end)
 
   include Domain_builder.Complete (LatticeTaint)
+  include Domain_builder.No_context
 
   include QueriesTaint
 
@@ -588,6 +587,7 @@ let interpret_taint_logic
     end
     in
     (module struct
+      module Ctx = Abstract.Ctx
       module Val = Abstract.Val
       module Loc = Abstract.Loc
       module Dom = Dom

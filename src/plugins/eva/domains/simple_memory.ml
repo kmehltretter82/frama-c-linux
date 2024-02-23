@@ -188,14 +188,13 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
   include M
 
   include Domain_builder.Complete (M)
+  include Domain_builder.No_context
 
   type state = t
   type value = Value.t
   type location = Precise_locs.precise_location
   type origin
-  type context = unit
 
-  let context_dependencies = Abstract_context.Leaf (module Unit_context)
   let value_dependencies = Abstract_value.Leaf (module Value)
   let location_dependencies = Main_locations.ploc
 

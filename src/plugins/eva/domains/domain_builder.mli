@@ -69,6 +69,12 @@ module type LeafDomain = sig
   val key: t Abstract_domain.key
 end
 
+module No_context : sig
+  type context = unit
+  val context_dependencies : context Abstract_context.dependencies
+  val return_context : 'a -> context Eval.or_bottom
+end
+
 (** Automatically builds some functions of an abstract domain. *)
 module Complete (Domain: InputDomain) : LeafDomain with type t := Domain.t
 

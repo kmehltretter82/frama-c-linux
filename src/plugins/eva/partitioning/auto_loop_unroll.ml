@@ -349,19 +349,18 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   (* Adds or subtracts the integer value of [expr] to the current increment
      [acc.delta], according to [binop] which can be PlusA or MinusA.
      Raises NoIncrement if [expr] is not a constant integer expression. *)
-  let add_to_delta binop acc expr =
+  let add_to_delta context binop acc expr =
     let typ = Cil.typeOf expr in
     match Cil.constFoldToInt expr with
     | None -> raise NoIncrement
     | Some i ->
-      let add_to v =
-        v >>- fun v -> Val.forward_binop typ binop v (Val.inject_int typ i)
-      in
-      { value = add_to acc.value; delta = add_to acc.delta; }
+      let inject i = Val.inject_int typ i in
+      let add v = let* v in Val.forward_binop context typ binop v (inject i) in
+      { value = add acc.value; delta = add acc.delta; }
 
   (* Adds to [acc] the increment from the assignement of [lval] to the value
      of [expr]. Raises NoIncrement if this is not an increment of [lval]. *)
-  let rec delta_assign lval expr acc =
+  let rec delta_assign context lval expr acc =
     (* Is the expression [e] equal to the lvalue [lval] (modulo cast)? *)
     let rec is_lval e = match e.enode with
       | Lval lv -> Cil_datatype.LvalStructEq.equal lval lv
@@ -376,11 +375,12 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       match expr.enode with
       | BinOp ((PlusA | MinusA) as binop, e1, e2, _) ->
         if is_lval e1
-        then add_to_delta binop acc e2
+        then add_to_delta context binop acc e2
         else if is_lval e2 && binop = PlusA
-        then add_to_delta binop acc e1
+        then add_to_delta context binop acc e1
         else raise NoIncrement
-      | CastE (typ, e) when Cil.isIntegralType typ -> delta_assign lval e acc
+      | CastE (typ, e) when Cil.isIntegralType typ ->
+        delta_assign context lval e acc
       | _ -> raise NoIncrement
 
   (* Computes an over-approximation of the increment of [lval] in the [loop].
@@ -388,8 +388,8 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
      should be a direct access to a variable whose address is not taken,
      and which should not be global if the loop contains function calls.
      Returns None if no increment can be computed. *)
-  let compute_delta lval loop =
-    let transfer = transfer_assign lval NoIncrement (delta_assign lval) in
+  let compute_delta ctx lval loop =
+    let transfer = transfer_assign lval NoIncrement (delta_assign ctx lval) in
     let join t1 t2 =
       { value = Bottom.join Val.join t1.value t2.value;
         delta = Bottom.join Val.join t1.delta t2.delta; }
@@ -517,7 +517,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   (* Is the number of iterations of a loop bounded by [limit]?
      [state] is the loop entry state, and [loop_block] the block of the loop. *)
-  let is_bounded_loop kf stmt loop state limit =
+  let is_bounded_loop kf stmt loop context state limit =
     (* Computes the effect of the loop. Stops if it contains assembly code. *)
     compute_loop_effect loop >>: fun loop_effect ->
     (* Finds loop exit conditions. *)
@@ -540,9 +540,10 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       evaluate_lvalue state lval >>: fun v_init ->
       (* Computes an over-approximation [v_incr] of the value update of [lval]
          in one iteration of the loop. *)
-      compute_delta lval loop >>: fun v_incr ->
+      compute_delta context lval loop >>: fun v_incr ->
       let typ = Cil.typeOfLval lval in
-      let binop op v1 v2 = Bottom.non_bottom (Val.forward_binop typ op v1 v2) in
+      let forward_binop op v1 v2 = Val.forward_binop context typ op v1 v2 in
+      let binop op v1 v2 = Bottom.non_bottom (forward_binop op v1 v2) in
       (* Computes the possible values of [lval] after n loop iterations. *)
       let value =
         (* [delta] is the possible increments of [lval] in one iteration. *)
@@ -578,10 +579,12 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   (* Computes an automatic loop unrolling for statement [stmt] in state [state],
      with a maximum limit. Returns None for no automatic loop unrolling. *)
   let compute ~max_unroll state stmt =
+    let open Option.Operators in
+    let* from_domains = Dom.return_context state |> Bottom.to_option in
     try
       let kf = Kernel_function.find_englobing_kf stmt in
       let loop = Graph.find_loop kf stmt in
-      if is_bounded_loop kf stmt loop state max_unroll
+      if is_bounded_loop kf stmt loop { from_domains } state max_unroll
       then Some max_unroll
       else None
     with Not_found -> None

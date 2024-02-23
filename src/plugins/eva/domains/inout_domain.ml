@@ -206,13 +206,11 @@ end
 
 module Domain = struct
 
-  type context = unit
   type state = inout
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
   type origin
 
-  let context_dependencies = Abstract_context.Leaf (module Unit_context)
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
 
@@ -222,6 +220,7 @@ module Domain = struct
            end)
 
   include Domain_builder.Complete (LatticeInout)
+  include Domain_builder.No_context
 
   let log_category = Self.register_category "d-inout"
 

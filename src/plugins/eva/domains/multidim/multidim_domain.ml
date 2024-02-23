@@ -664,9 +664,7 @@ module Domain =
 struct
   include DomainLattice
   include Domain_builder.Complete (DomainLattice)
-
-  type context = unit
-  let context_dependencies = Abstract_context.Leaf (module Unit_context)
+  include Domain_builder.No_context
 
   (* Eva Queries *)
 
@@ -934,7 +932,7 @@ let multidim_hook (module Abstract: Abstractions.S) : (module Abstractions.S) =
   | _, None -> (module Abstract)
   | Some get_cval,  Some get_multidim ->
     let module Eval =
-      Evaluation.Make (Abstract.Val) (Abstract.Loc) (Abstract.Dom)
+      Evaluation.Make (Abstract.Ctx) (Abstract.Val) (Abstract.Loc) (Abstract.Dom)
     in
     let module Dom = struct
       include Abstract.Dom
@@ -963,6 +961,7 @@ let multidim_hook (module Abstract: Abstractions.S) : (module Abstractions.S) =
     end
     in
     (module struct
+      module Ctx = Abstract.Ctx
       module Val = Abstract.Val
       module Loc = Abstract.Loc
       module Dom = Dom

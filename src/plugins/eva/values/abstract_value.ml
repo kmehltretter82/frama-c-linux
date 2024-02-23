@@ -46,7 +46,7 @@ type bound = Int of Integer.t | Float of float * fkind
 
 type pointer_comparison = Equality | Relation | Subtraction
 
-type 'a enriched_context = { from_domains : 'a ; stmt : stmt }
+type 'a enriched = { from_domains : 'a }
 
 (** Signature of abstract numerical values. *)
 module type S = sig
@@ -124,25 +124,26 @@ module type S = sig
 
   (** Embeds C constants into value abstractions: returns an abstract value
       for the given constant. The constant cannot be an enumeration constant. *)
-  val constant : exp -> constant -> t
+  val constant : context enriched -> exp -> constant -> t
 
   (** [forward_unop typ unop v] evaluates the value [unop v], resulting from the
       application of the unary operator [unop] to the value [v].  [typ] is the
       type of [v]. *)
-  val forward_unop : typ -> unop -> t -> t or_bottom
+  val forward_unop : context enriched -> typ -> unop -> t -> t or_bottom
 
   (** [forward_binop typ binop v1 v2] evaluates the value [v1 binop v2],
       resulting from the application of the binary operator [binop] to the
       values [v1] and [v2]. [typ] is the type of [v1]. *)
-  val forward_binop : typ -> binop -> t -> t -> t or_bottom
+  val forward_binop : context enriched -> typ -> binop -> t -> t -> t or_bottom
 
   (** [rewrap_integer irange t] wraps around the abstract value [t] to fit the
       integer range [irange], assuming 2's complement. Also used on absolute
       addresses for pointer values, seen as unsigned integers. *)
-  val rewrap_integer: Eval_typ.integer_range -> t -> t
+  val rewrap_integer: context enriched -> Eval_typ.integer_range -> t -> t
 
   (** Abstract evaluation of casts operators from [src_type] to [dst_type]. *)
   val forward_cast :
+    context enriched ->
     src_type: Eval_typ.scalar_typ -> dst_type: Eval_typ.scalar_typ ->
     t -> t or_bottom
 
@@ -168,19 +169,23 @@ module type S = sig
   (** Backward evaluation of the binary operation [left binop right = result];
       tries to reduce the argument [left] and [right] according to [result].
       [input_type] is the type of [left], [resulting_type] the type of [result]. *)
-  val backward_binop : input_type:typ -> resulting_type:typ ->
-    binop -> left:t -> right:t -> result:t -> (t option * t option) or_bottom
+  val backward_binop :
+    context enriched -> input_type:typ -> resulting_type:typ ->
+    binop -> left:t -> right:t -> result:t ->
+    (t option * t option) or_bottom
 
   (** Backward evaluation of the unary operation [unop arg = res];
       tries to reduce the argument [arg] according to [res].
       [typ_arg] is the type of [arg]. *)
   val backward_unop :
-    typ_arg:typ -> unop -> arg:t -> res:t -> t option or_bottom
+    context enriched -> typ_arg:typ -> unop ->
+    arg:t -> res:t -> t option or_bottom
 
   (** Backward evaluation of the cast of the value [src_val] of type [src_typ]
       into the value [dst_val] of type [dst_typ]. Tries to reduce [scr_val]
       according to [dst_val]. *)
   val backward_cast:
+    context enriched ->
     src_typ: typ ->
     dst_typ: typ ->
     src_val: t ->

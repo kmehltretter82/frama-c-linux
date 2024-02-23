@@ -59,6 +59,15 @@ val (>>=.) : 'a evaluated -> ('a -> 'b or_bottom) -> 'b evaluated
 val (>>=:) : 'a evaluated -> ('a -> 'b) -> 'b evaluated
 
 
+module Evaluated : sig
+  type 'a t = 'a evaluated
+  module Operators : sig
+    val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
+    val ( let+ ) : 'a t -> ('a -> 'b) -> 'b t
+    val ( let& ) : 'a t -> ('a -> 'b or_bottom) -> 'b t
+  end
+end
+
 (** Most backward evaluation function returns `Bottom if the reduction leads to
     an invalid state, `Unreduced if no reduction can be performed, or the
     reduced value. *)

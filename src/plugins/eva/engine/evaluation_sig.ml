@@ -30,6 +30,9 @@ module type S = sig
   (** State of abstract domain. *)
   type state
 
+  (** Context *)
+  type context
+
   (** Numeric values to which the expressions are evaluated. *)
   type value
 

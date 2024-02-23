@@ -67,6 +67,14 @@ end
 
 
 
+module No_context = struct
+  type context = unit
+  let context_dependencies = Abstract_context.Leaf (module Unit_context)
+  let return_context _ = `Value ()
+end
+
+
+
 module Complete (Domain: InputDomain) = struct
 
   let backward_location _state _lval _typ loc value = `Value (loc, value)
@@ -127,6 +135,7 @@ module Make_Minimal
   type state = Domain.t
   type origin
 
+  let return_context _ = `Value Context.top
   let context_dependencies = Abstract_context.Leaf (module Context)
   let value_dependencies = Abstract_value.Leaf (module Value)
   let location_dependencies = Abstract_location.Leaf (module Location)
@@ -244,9 +253,9 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
     type location = Precise_locs.precise_location
     type state = Domain.t
     type origin
-    type context = unit
 
-    let context_dependencies = Abstract_context.Leaf (module Unit_context)
+    include No_context
+
     let value_dependencies = Abstract_value.Leaf (module Main_values.CVal)
     let location_dependencies = Abstract_location.Leaf (module Main_locations.PLoc)
 
@@ -373,6 +382,10 @@ module Restrict
   type value = Domain.value
   type location = Domain.location
   type origin = Domain.origin
+
+  let return_context = function
+    | None -> `Value Context.top
+    | Some (state, _mode) -> Domain.return_context state
 
   let get_state = function
     | None -> Domain.top

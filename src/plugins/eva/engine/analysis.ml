@@ -95,7 +95,7 @@ module Make (Abstract: Abstractions.S) = struct
 
   module Abstract = struct
     include Abstract
-    module Eval = Evaluation.Make (Val) (Loc) (Dom)
+    module Eval = Evaluation.Make (Ctx) (Val) (Loc) (Dom)
   end
 
   include Abstract
