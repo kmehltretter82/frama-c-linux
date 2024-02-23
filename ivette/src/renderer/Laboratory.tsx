@@ -33,13 +33,9 @@ import { RenderElement } from 'dome/layout/dispatch';
 import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
 import * as Ivette from 'ivette';
+import { Layout4, Layout, VIEW, COMPONENT, GROUP } from 'ivette';
 import * as Ext from './Extensions';
 
-
-type PanelOrigin = "sidebar" | "titlebar" | "dockbar" | "";
-const VIEW = Ivette.VIEW;
-const COMPONENT = Ivette.COMPONENT;
-const GROUP = Ivette.GROUP;
 const defaultLayout = { ABCD: "" };
 const defaultLabViewState: LabViewState = {
   A: defaultLayout.ABCD,
@@ -60,7 +56,8 @@ const defaultPanelLayoutSelectorState: PanelLayoutSelectorState ={
   display: false,
   compId: "",
   compLabel: "",
-  origin: "",
+  dock: false,
+  close: false,
   x: 0,
   y: 0
 };
@@ -82,8 +79,8 @@ const defaultTabsState: TabState = {
 };
 const globalTabsState = new States.GlobalState<TabState>(defaultTabsState);
 
-function assignValueToQuarterStr(quarter: string, value: string)
-: Ivette.Layout4 {
+function assignValueToQuarterStr(quarter: string, value: string): Layout4
+{
   let A = "",
       B = "",
       C = "",
@@ -290,44 +287,24 @@ function assignCompToQuarter(quarter: string, compId: string): void {
    });
 }
 
-function getQuarterCompsFromLayout(layout: Ivette.Layout):
-{A: string, B: string, C: string, D: string} {
-  let A = "", B = "", C = "", D = "";
-  if("A" in layout) A = layout.A;
-  if("B" in layout) B = layout.B;
-  if("C" in layout) C = layout.C;
-  if("D" in layout) D = layout.D;
-
-  if("AB" in layout) {
-    A = layout.AB;
-    B = layout.AB;
-  }
-  if("AC" in layout) {
-    A = layout.AC;
-    C = layout.AC;
-  }
-  if("BD" in layout) {
-    B = layout.BD;
-    D = layout.BD;
-  }
-  if("CD" in layout) {
-    C = layout.CD;
-    D = layout.CD;
-  }
-
-  if("ABCD" in layout) {
-    A = layout.ABCD;
-    B = layout.ABCD;
-    C = layout.ABCD;
-    D = layout.ABCD;
-  }
-  return { A: A, B: B, C: C, D: D };
+function getQuarters(layout: Layout): Layout4 {
+  type Unstructured = {
+    A ?: string, B ?: string, C ?: string, D ?: string,
+    AB ?: string, AC ?: string, BD ?: string, CD ?: string,
+    ABCD ?: string
+  };
+  const u : Unstructured = layout;
+  const A : string = u.A ?? u.AB ?? u.AC ?? u.ABCD ?? '';
+  const B : string = u.B ?? u.AB ?? u.BD ?? u.ABCD ?? '';
+  const C : string = u.C ?? u.AC ?? u.CD ?? u.ABCD ?? '';
+  const D : string = u.D ?? u.CD ?? u.BD ?? u.ABCD ?? '';
+  return { A, B, C, D };
 }
 
 function applyLayout(view : Ivette.ViewLayoutProps): void {
   const { layout } = view;
   const tabsState = globalTabsState.getValue();
-  const parsedLayout = getQuarterCompsFromLayout(layout);
+  const parsedLayout = getQuarters(layout);
   addCompFromQuarterToDock("ABCD");
 
   let state = globalLabViewState.getValue();
@@ -367,6 +344,8 @@ function applyLayout(view : Ivette.ViewLayoutProps): void {
 
 interface PaneProps { id: string; }
 
+const paneActions: Actions = { dock: true, close: true };
+
 function Pane(props: PaneProps): JSX.Element | null {
   const { id } = props;
   const component = Ext.useElement(COMPONENT, id);
@@ -388,7 +367,7 @@ function Pane(props: PaneProps): JSX.Element | null {
             <Icon id={"ITEMS.GRID"}
               className="titlebar-thin-icon"
               onClick={(e) =>
-                openPanelLayoutSelector(component, "titlebar", e)}
+                openPanelLayoutSelector(component, paneActions, e)}
             />
           </Hfill>
         </Hbox>
@@ -472,7 +451,7 @@ function ViewSection(): JSX.Element {
   const [{ selectedView }] = States.useGlobalState(globalLabViewState);
 
   function createTabFromView(view: Ivette.ViewLayoutProps): void {
-    const layout = getQuarterCompsFromLayout(view.layout);
+    const layout = getQuarters(view.layout);
     const tab: Tab = {
       viewId: view.id,
       viewLabel: view.label,
@@ -542,9 +521,11 @@ function ViewSection(): JSX.Element {
 /* --- Component Sidebar Item                                             --- */
 /* -------------------------------------------------------------------------- */
 
+const sidebarActions: Actions = { dock: true, close: false };
+
 function ComponentItem(comp: Ivette.ItemProps): JSX.Element {
-  const [ labViewState, ] = States.useGlobalState(globalLabViewState);
-  const [ panelLayoutSelectorState, ] =
+  const [ labViewState ] = States.useGlobalState(globalLabViewState);
+  const [ panelLayoutSelectorState ] =
    States.useGlobalState(globalPanelLayoutSelectorState);
   const selected = panelLayoutSelectorState.compId === comp.id;
   const disabled = labViewState.components.has(comp.id);
@@ -561,7 +542,7 @@ function ComponentItem(comp: Ivette.ItemProps): JSX.Element {
       globalPanelLayoutSelectorState.setValue(defaultPanelLayoutSelectorState);
       return;
     }
-    openPanelLayoutSelector(comp, "sidebar", e);
+    openPanelLayoutSelector(comp, sidebarActions, e);
   }
 
   return (
@@ -651,26 +632,33 @@ Ivette.registerSidebar({
 /* --- PanelLayoutSelector                                                --- */
 /* -------------------------------------------------------------------------- */
 
-interface PanelLayoutSelectorState {
+interface Actions {
+  dock: boolean;
+  close: boolean;
+}
+
+interface PanelLayoutSelectorState extends Actions {
   display: boolean;
   compId: string;
   compLabel: string;
-  origin: PanelOrigin;
   x: number,
   y: number;
 }
 
-function openPanelLayoutSelector(comp: Ivette.ComponentProps,
-  origin: PanelOrigin, e?: React.MouseEvent): void {
+function openPanelLayoutSelector(
+  comp: Ivette.ComponentProps,
+  actions: Actions,
+  evt: React.MouseEvent
+): void {
   const state = globalPanelLayoutSelectorState.getValue();
   const display = !state.display ? true : state.compId !== comp.id;
   globalPanelLayoutSelectorState.setValue({
+    ...actions,
     display: display,
     compId: display ? comp.id : "",
     compLabel: display ? comp.label : "",
-    origin: origin,
-    x: e?.clientX ?? 250,
-    y: e?.clientY ?? 250
+    x: evt.clientX,
+    y: evt.clientY,
   });
 }
 
@@ -771,17 +759,17 @@ function PanelLayoutSelector()
         </tbody>
       </table>
       <div>
-        { state.origin !== "dockbar" &&
+        { state.dock &&
           <div className="panelLayoutSelector-spaced">
-            Dock Panel
+            Dock Component
             <Icon id={"QSPLIT.DOCK"} size={iconSize}
             className="panelLayoutSelector-hover"
             onClick={dock} />
           </div>
         }
-        { state.origin !== "sidebar" &&
+        { state.close &&
           <div className="panelLayoutSelector-spaced">
-            Remove Panel
+            Remove Component
             <Icon id="TRASH" size={iconSize}
             className="panelLayoutSelector-hover"
             onClick={remove} />
@@ -803,6 +791,8 @@ Ivette.registerSandbox({
 // --- Docked Components
 // --------------------------------------------------------------------------
 
+const dockActions: Actions = { dock: false, close: true };
+
 export function Dock(): JSX.Element {
 
   const [ state, ] = States.useGlobalState(globalLabViewState);
@@ -816,9 +806,11 @@ export function Dock(): JSX.Element {
     closePanelLayoutSelector();
   }
 
-  function onContextMenu(comp: Ivette.ComponentProps, e?: React.MouseEvent):
-  void {
-    openPanelLayoutSelector(comp, "dockbar", e);
+  function onContextMenu(
+    comp: Ivette.ComponentProps,
+    evt: React.MouseEvent,
+  ): void {
+    openPanelLayoutSelector(comp, dockActions, evt);
   }
 
   return (
@@ -903,7 +895,7 @@ export function Tabs(): JSX.Element {
       applyLayout(view);
       return;
     }
-    const layout = getQuarterCompsFromLayout(view.layout);
+    const layout = getQuarters(view.layout);
     state.tabs[tabIndex].A = layout.A;
     state.tabs[tabIndex].B = layout.B;
     state.tabs[tabIndex].C = layout.C;
