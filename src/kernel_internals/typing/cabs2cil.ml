@@ -585,7 +585,8 @@ let check_aligned attrs =
    component [ci], and checks the alignment of aligned() attributes.
    This function is complemented by
    [process_pragmas_pack_align_field_attributes]. *)
-let process_pragmas_pack_align_comp_attributes ci cattrs =
+let process_pragmas_pack_align_comp_attributes loc ci cattrs =
+  let source = snd loc in
   match !current_packing_pragma, align_pragma_for_struct ci.corig_name with
   | None, None -> check_aligned cattrs
   | Some n, apragma ->
@@ -600,7 +601,7 @@ let process_pragmas_pack_align_comp_attributes ci cattrs =
            Drop existing "aligned" attributes, if there are invalid ones. *)
         if Cil.hasAttribute "packed" cattrs then (dropAttribute "aligned" cattrs)
         else begin
-          Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
+          Kernel.feedback ~source ~dkey:Kernel.dkey_typing_pragma
             "adding aligned(%a) attribute to comp '%s' due to packing pragma"
             Integer.pretty n ci.cname;
           addAttribute (Attr("aligned",[AInt n])) (dropAttribute "aligned" cattrs)
@@ -609,7 +610,7 @@ let process_pragmas_pack_align_comp_attributes ci cattrs =
         (* The largest aligned wins with GCC. Don't know
            with other compilers. *)
         let align = Integer.max n local in
-        Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
+        Kernel.feedback ~source ~dkey:Kernel.dkey_typing_pragma
           "setting aligned(%a) attribute to comp '%s' due to packing pragma"
           Integer.pretty align ci.cname;
         addAttribute (Attr("aligned",[AInt align]))
@@ -4100,7 +4101,7 @@ let rec nested_call e =
    a struct-returning call. *)
 let contains_temp_subarray = ref false
 
-let rec doSpecList ghost (suggestedAnonName: string)
+let rec doSpecList loc ghost (suggestedAnonName: string)
     (* This string will be part of
      * the names for anonymous
      * structures and enums  *)
@@ -4281,7 +4282,7 @@ let rec doSpecList ghost (suggestedAnonName: string)
         if n <> "" then n else anonStructName "struct" suggestedAnonName in
       (* Use the (non-cv, non-name) attributes in !attrs now *)
       let a = extraAttrs @ (getTypeAttrs ()) in
-      makeCompType ghost true n' ~norig:n nglist (doAttributes ghost a)
+      makeCompType loc ghost true n' ~norig:n nglist (doAttributes ghost a)
 
     | [Cabs.Tunion (n, None, _)] -> (* A reference to a union *)
       if n = "" then
@@ -4293,7 +4294,7 @@ let rec doSpecList ghost (suggestedAnonName: string)
         if n <> "" then n else anonStructName "union" suggestedAnonName in
       (* Use the attributes now *)
       let a = extraAttrs @ (getTypeAttrs ()) in
-      makeCompType ghost false n' ~norig:n nglist (doAttributes ghost a)
+      makeCompType loc ghost false n' ~norig:n nglist (doAttributes ghost a)
 
     | [Cabs.Tenum (n, None, _)] -> (* Just a reference to an enum *)
       if n = "" then
@@ -4452,7 +4453,7 @@ let rec doSpecList ghost (suggestedAnonName: string)
       t'
 
     | [Cabs.TtypeofT (specs, dt)] ->
-      doOnlyType ghost specs dt
+      doOnlyType loc ghost specs dt
 
     | l ->
       abort_context
@@ -4599,9 +4600,9 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
           ACons(n', ae')
         end
       | Cabs.EXPR_SIZEOF e -> ASizeOfE (ae e)
-      | Cabs.TYPE_SIZEOF (bt, dt) -> ASizeOf (doOnlyType ghost bt dt)
+      | Cabs.TYPE_SIZEOF (bt, dt) -> ASizeOf (doOnlyType loc ghost bt dt)
       | Cabs.EXPR_ALIGNOF e -> AAlignOfE (ae e)
-      | Cabs.TYPE_ALIGNOF (bt, dt) -> AAlignOf (doOnlyType ghost bt dt)
+      | Cabs.TYPE_ALIGNOF (bt, dt) -> AAlignOf (doOnlyType loc ghost bt dt)
       | Cabs.BINARY(Cabs.AND, aa1, aa2) ->
         ABinOp(LAnd, ae aa1, ae aa2)
       | Cabs.BINARY(Cabs.OR, aa1, aa2) ->
@@ -4901,7 +4902,7 @@ and doType (ghost:bool) isFuncArg
       (* Make the argument as for a formal *)
       let doOneArg argl_length is_ghost (s, (n, ndt, a, cloc)) : varinfo =
         let ghost = is_ghost || ghost in
-        let s' = doSpecList ghost n s in
+        let s' = doSpecList cloc ghost n s in
         let vi = makeVarInfoCabs ~ghost ~isformal:true ~isglobal:false
             (convLoc cloc) s' (n,ndt,a) in
         if isVoidType vi.vtype then begin
@@ -5059,8 +5060,8 @@ and isVariableSizedArray ghost (dt: Cabs.decl_type)
   | None -> None
   | Some (se, e) -> Some (dt', se, e)
 
-and doOnlyType ghost (specs: Cabs.spec_elem list) (dt: Cabs.decl_type) : typ =
-  let bt',sto,inl,attrs = doSpecList ghost "" specs in
+and doOnlyType loc ghost (specs: Cabs.spec_elem list) (dt: Cabs.decl_type) : typ =
+  let bt',sto,inl,attrs = doSpecList loc ghost "" specs in
   if sto <> NoStorage || inl then
     Kernel.error ~once:true ~current:true "Storage or inline specifier in type only";
   let tres, nattr =
@@ -5071,7 +5072,7 @@ and doOnlyType ghost (specs: Cabs.spec_elem list) (dt: Cabs.decl_type) : typ =
   tres
 
 
-and makeCompType ghost (isstruct: bool)
+and makeCompType loc ghost (isstruct: bool)
     (n: string)
     ~(norig: string)
     (nglist: Cabs.field_group list)
@@ -5091,11 +5092,11 @@ and makeCompType ghost (isstruct: bool)
   let addFieldGroup ~last:last_group (flds : fieldinfo list)
       ((s: Cabs.spec_elem list), (nl: (Cabs.name * Cabs.expression option) list)) =
     (* Do the specifiers exactly once *)
-    let sugg = match nl with
-      | [] -> ""
-      | ((n, _, _, _), _) :: _ -> n
+    let sugg,loc = match nl with
+      | [] -> "",CurrentLoc.get()
+      | ((n, _, _, loc), _) :: _ -> n,loc
     in
-    let bt, sto, inl, attrs = doSpecList ghost sugg s in
+    let bt, sto, inl, attrs = doSpecList loc ghost sugg s in
     (* Do the fields *)
     let addFieldInfo ~last:last_field (flds : fieldinfo list)
         (((n,ndt,a,cloc) : Cabs.name), (widtho : Cabs.expression option))
@@ -5316,7 +5317,7 @@ and makeCompType ghost (isstruct: bool)
 
   (*  ignore (E.log "makeComp: %s: %a\n" comp.cname d_attrlist a); *)
   let a = Cil.addAttributes comp.cattr a in
-  comp.cattr <- process_pragmas_pack_align_comp_attributes comp a;
+  comp.cattr <- process_pragmas_pack_align_comp_attributes loc comp a;
   let res = TComp (comp, []) in
   (* Create a typedef for this one *)
   cabsPushGlobal (GCompTag (comp, CurrentLoc.get ()));
@@ -5326,11 +5327,11 @@ and makeCompType ghost (isstruct: bool)
   (* Now create a typedef with just this type *)
   res
 
-and preprocessCast ghost (specs: Cabs.specifier)
+and preprocessCast loc ghost (specs: Cabs.specifier)
     (dt: Cabs.decl_type)
     (ie: Cabs.init_expression)
   : Cabs.specifier * Cabs.decl_type * Cabs.init_expression =
-  let typ = doOnlyType ghost specs dt in
+  let typ = doOnlyType loc ghost specs dt in
   (* If we are casting to a union type then we have to treat this as a
    * constructor expression. This is to handle the gcc extension that allows
    * cast from a type of a field to the type of the union  *)
@@ -5741,7 +5742,7 @@ and doExp local_env
       end
 
     | Cabs.TYPE_SIZEOF (bt, dt) ->
-      let typ = doOnlyType local_env.is_ghost bt dt in
+      let typ = doOnlyType loc local_env.is_ghost bt dt in
       fail_if_incompatible_sizeof ~ensure_complete:true "sizeof" typ;
       let res = new_exp ~loc (SizeOf typ) in
       finishExp [] (unspecified_chunk empty) res theMachine.typeOfSizeOf
@@ -5768,7 +5769,7 @@ and doExp local_env
       finishExp [] scope_chunk size theMachine.typeOfSizeOf
 
     | Cabs.TYPE_ALIGNOF (bt, dt) ->
-      let typ = doOnlyType local_env.is_ghost bt dt in
+      let typ = doOnlyType loc local_env.is_ghost bt dt in
       fail_if_incompatible_sizeof ~ensure_complete:true "alignof" typ;
       let res = new_exp ~loc (AlignOf typ) in
       finishExp [] (unspecified_chunk empty) res theMachine.typeOfSizeOf
@@ -5790,9 +5791,9 @@ and doExp local_env
         theMachine.typeOfSizeOf
 
     | Cabs.CAST ((specs, dt), ie) ->
-      let s', dt', ie' = preprocessCast local_env.is_ghost specs dt ie in
+      let s', dt', ie' = preprocessCast loc local_env.is_ghost specs dt ie in
       (* We know now that we can do s' and dt' many times *)
-      let typ = doOnlyType local_env.is_ghost s' dt' in
+      let typ = doOnlyType loc local_env.is_ghost s' dt' in
       let what' =
         match what with
         | AExp (Some _) -> AExp (Some typ)
@@ -5819,7 +5820,7 @@ and doExp local_env
              * variable  *)
             let newvar = "__constr_expr_" ^ string_of_int (!constrExprId) in
             incr constrExprId;
-            let spec_res = doSpecList local_env.is_ghost "" s' in
+            let spec_res = doSpecList loc local_env.is_ghost "" s' in
             let se1 =
               if !scopes == [] then begin
                 (* This is a global.  Mark the new vars as static *)
@@ -7357,6 +7358,7 @@ and doExp local_env
       | Ok control_t ->
         let has_default, assocs =
           List.fold_left (fun (has_default, acc) (type_name, expr) ->
+              let loc = expr.expr_loc in
               match type_name with
               | None -> (* default *)
                 if has_default then
@@ -7364,7 +7366,7 @@ and doExp local_env
                     "multiple default clauses in _Generic selection";
                 true, ((None, expr) :: acc)
               | Some (spec, dt) ->
-                let t = doOnlyType ghost spec dt in
+                let t = doOnlyType loc ghost spec dt in
                 if not (Cil.isCompleteType t) then
                   abort_context
                     "generic association with incomplete type '%a'"
@@ -7908,6 +7910,8 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
   *)
   : chunk * init * typ * Cil_datatype.Lval.Set.t =
 
+  CurrentLoc.set loc;
+
   let checkArrayInit ty init =
     if Cil.isArrayType ty then
       match init with
@@ -7973,8 +7977,9 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
   let initl1 =
     match initl with
     | (Cabs.NEXT_INIT,
-       Cabs.SINGLE_INIT ({ expr_node = Cabs.CAST ((s, dt), ie)} as e)) :: rest ->
-      let s', dt', ie' = preprocessCast ghost s dt ie in
+       Cabs.SINGLE_INIT
+         ({ expr_node = Cabs.CAST ((s, dt), ie); expr_loc} as e)) :: rest ->
+      let s', dt', ie' = preprocessCast expr_loc ghost s dt ie in
       (Cabs.NEXT_INIT,
        Cabs.SINGLE_INIT
          ({expr_node = Cabs.CAST ((s', dt'), ie'); expr_loc = e.expr_loc}))
@@ -7987,9 +7992,12 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
     match initl1 with
     | (what,
        Cabs.SINGLE_INIT
-         ({expr_node = Cabs.CAST ((specs, dt), Cabs.COMPOUND_INIT ci)})) :: rest ->
-      let s', dt', _ie' = preprocessCast ghost specs dt (Cabs.COMPOUND_INIT ci) in
-      let typ = doOnlyType ghost s' dt' in
+         ({expr_node = Cabs.CAST ((specs, dt), Cabs.COMPOUND_INIT ci);
+           expr_loc})) :: rest ->
+      let s', dt', _ie' =
+        preprocessCast expr_loc ghost specs dt (Cabs.COMPOUND_INIT ci)
+      in
+      let typ = doOnlyType expr_loc ghost s' dt' in
       if Typ.equal
           (Cil.typeDeepDropAllAttributes typ)
           (Cil.typeDeepDropAllAttributes so.soTyp)
@@ -9038,7 +9046,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
       | ((n, _, _, _), _) :: _ -> n
     in
     let ghost = local_env.is_ghost in
-    let spec_res = doSpecList ghost sugg s in
+    let spec_res = doSpecList cloc ghost sugg s in
     (* Do all the variables and concatenate the resulting statements *)
     let doOneDeclarator (acc: chunk) (name: init_name) =
       let (n,ndt,a,l),_ = name in
@@ -9185,7 +9193,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
        * We'll do it later *)
       transparentUnionArgs := [];
 
-      let bt,sto,inl,attrs = doSpecList local_env.is_ghost n specs in
+      let bt,sto,inl,attrs = doSpecList idloc local_env.is_ghost n specs in
       !currentFunctionFDEC.svar.vinline <- inl;
       let ftyp, funattr =
         doType local_env.is_ghost false
@@ -9575,7 +9583,9 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
       "block-level typedefs currently unsupported;@ \
        trying to convert it to a global-level typedef.@ \
        Note that this may lead to incoherent error messages.";
-  let bt, sto, inl, attrs = doSpecList ghost (suggestAnonName nl) specs in
+  let bt, sto, inl, attrs =
+    doSpecList (CurrentLoc.get()) ghost (suggestAnonName nl) specs
+  in
   if sto <> NoStorage || inl then
     Kernel.error ~once:true ~current:true
       "Storage or inline specifier not allowed in typedef";
@@ -9674,7 +9684,9 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
   List.iter createTypedef nl
 
 and doOnlyTypedef ghost (specs: Cabs.spec_elem list) : unit =
-  let bt, sto, inl, attrs = doSpecList ghost "" specs in
+  let bt, sto, inl, attrs =
+    doSpecList (CurrentLoc.get()) ghost "" specs
+  in
   if sto <> NoStorage || inl then
     Kernel.error ~once:true ~current:true
       "Storage or inline specifier not allowed in typedef";
@@ -10201,7 +10213,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
         match var with
         | None -> Catch_all
         | Some (t,(n,ndt,a,ldecl)) ->
-          let spec = doSpecList ghost n t in
+          let spec = doSpecList ldecl ghost n t in
           let vi =
             makeVarInfoCabs
               ~ghost ~isformal:false ~isglobal:false ldecl spec (n,ndt,a)
