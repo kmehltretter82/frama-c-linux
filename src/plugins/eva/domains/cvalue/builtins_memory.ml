@@ -253,79 +253,46 @@ let () =
 (*  Implementation of [memset] that accepts imprecise arguments. *)
 let frama_c_memset_imprecise state dst_lval dst v size =
   let prefix = "Builtin memset" in
-  let size_char = Bit_utils.sizeofchar () in
-  let size_min, size_max_bytes =
-    try
-      let size = Cvalue.V.project_ival size in
-      let min,max = Ival.min_and_max size in
-      let min = match min with
-        | None -> Int.zero
-        | Some m -> Int.mul size_char (Int.max m Int.zero)
-      and max = match max with
-        | None -> Bit_utils.max_bit_address ()
-        | Some m -> m
-      in min, max
-    with V.Not_based_on_null -> Int.zero, Bit_utils.max_bit_address ()
-  in
-  let left = loc_bytes_to_loc_bits dst in
+  let size_min, size_max = min_max_size size in
   (* Write [v] everywhere that might be written, ie between
      [dst] and [dst+size-1]. *)
-  let (new_state,over_zone) =
-    if Int.gt size_max_bytes Int.zero then
-      let shift =
-        Ival.inject_range (Some Int.zero) (Some (Int.pred size_max_bytes))
-      in
-      let loc = Location_Bytes.shift shift dst in
-      let loc = loc_bytes_to_loc_bits loc in
-      let loc = make_loc loc (Int_Base.inject size_char) in
+  let state, over_zone =
+    if Int.gt size_max Int.zero then
+      let loc = char_location dst size_max in
       Cvalue_transfer.warn_imprecise_write ~prefix dst_lval loc v;
       let state = Cvalue.Model.add_binding ~exact:false state loc v in
-      (state,enumerate_valid_bits Locations.Write loc)
-    else (state,Zone.bottom)
+      let written_zone = enumerate_valid_bits Locations.Write loc in
+      state, written_zone
+    else state, Zone.bottom
   in
   (* Write "sure" bytes in an exact way: they exist only if there is only
      one base, and within it, size_min+leftmost_loc > rightmost_loc *)
-  let (new_state',sure_zone) =
+  let state, sure_zone =
     try
-      let base, offset = Location_Bits.find_lonely_key left in
+      let base, offset = Location_Bits.find_lonely_key dst in
       let minb, maxb = match Ival.min_and_max offset with
         | Some minb, Some maxb -> minb, maxb
         | _ -> raise Not_found
       in
       let sure = Int.sub (Int.add minb size_min) maxb in
       if Int.gt sure Int.zero then
-        let left' = Location_Bits.inject base (Ival.inject_singleton maxb) in
+        let dst_loc = Location_Bits.inject base (Ival.inject_singleton maxb) in
         let vuninit = V_Or_Uninitialized.initialized v in
-        let from = V_Offsetmap.create ~size:sure vuninit ~size_v:size_char in
+        let size_v = Bit_utils.sizeofchar () in
+        let from = V_Offsetmap.create ~size:sure vuninit ~size_v in
         Cvalue_transfer.warn_imprecise_offsm_write ~prefix dst_lval from;
         let state =
           Cvalue.Model.paste_offsetmap
-            ~from ~dst_loc:left' ~size:sure ~exact:true new_state
+            ~from ~dst_loc ~size:sure ~exact:true state
         in
-        let sure_loc = make_loc left' (Int_Base.inject sure) in
+        let sure_loc = make_loc dst_loc (Int_Base.inject sure) in
         let sure_zone = enumerate_valid_bits Locations.Write sure_loc in
-        (state,sure_zone)
+        state, sure_zone
       else
-        (new_state,Zone.bottom)
-    with Not_found -> (new_state,Zone.bottom) (* from find_lonely_key + explicit raise *)
+        state, Zone.bottom
+    with Not_found -> state, Zone.bottom (* from find_lonely_key + explicit raise *)
   in
-  let c_assigns =
-    let value_dep = deps_nth_arg 1 in
-    let memory = Assigns.Memory.empty in
-    let memory =
-      Assigns.Memory.add_binding ~exact:false memory over_zone value_dep
-    in
-    let memory =
-      Assigns.Memory.add_binding ~exact:true memory sure_zone value_dep
-    in
-    let deps_return = deps_nth_arg 0 in
-    Assigns.{ memory; return = deps_return }
-  in
-  Builtins.Full
-    { Builtins.c_values = [Some dst, new_state'];
-      c_clobbered = Base.SetLattice.bottom;
-      c_assigns = Some (c_assigns,sure_zone); }
-(* let () = register_builtin "Frama_C_memset" frama_c_memset_imprecise *)
+  state, sure_zone, over_zone
 
 (* Type that describes why the 'precise memset' builtin may fail. *)
 type imprecise_memset_reason =
@@ -341,23 +308,15 @@ type imprecise_memset_reason =
 
 exception ImpreciseMemset of imprecise_memset_reason
 
-let pretty_imprecise_memset_reason fmt = function
-  | UnsupportedType ->
-    Format.pp_print_string fmt "destination has an unknown type"
-  | ImpreciseTypeSize ->
-    Format.pp_print_string fmt "destination has a type with unknown size"
-  | NoTypeForDest ->
-    Format.pp_print_string fmt "destination has an unknown form"
-  | NotSingletonLoc ->
-    Format.pp_print_string fmt "destination is not exact"
-  | SizeMismatch ->
-    Format.pp_print_string fmt "destination type and size differ"
-  | ImpreciseValue ->
-    Format.pp_print_string fmt "value to write is imprecise"
-  | ImpreciseSize ->
-    Format.pp_print_string fmt "size is imprecise"
-  | NegativeOrNullSize ->
-    Format.pp_print_string fmt "size is negative or null"
+let imprecision_descr = function
+  | UnsupportedType -> "destination has an unknown type"
+  | ImpreciseTypeSize -> "destination has a type with unknown size"
+  | NoTypeForDest -> "destination has an unknown form"
+  | NotSingletonLoc -> "destination is not exact"
+  | SizeMismatch -> "destination type and size differ"
+  | ImpreciseValue -> "value to write is imprecise"
+  | ImpreciseSize -> "size is imprecise"
+  | NegativeOrNullSize -> "size is negative or null"
 
 
 (*  [memset_typ_offsm typ i] returns an offsetmap of size [sizeof(typ)]
@@ -486,14 +445,11 @@ let memset_typ_offsm typ v =
     precise abstract values. *)
 let frama_c_memset_precise state dst_lval dst v (exp_size, size) =
   try
-    let size_char = Bit_utils.sizeofchar () in
     (* We want an exact size, Otherwise, we can use the imprecise memset as a
        fallback *)
-    let isize = V.project_ival size in
-    let size = Ival.project_int isize in
-    let size_bits = Integer.mul size_char size in
+    let size = Ival.project_int size in
     (* Extract the location, check that it is precise. *)
-    if Location_Bytes.(is_bottom dst || not (cardinal_zero_or_one dst)) then
+    if Location_Bits.(is_bottom dst || not (cardinal_zero_or_one dst)) then
       raise (ImpreciseMemset NotSingletonLoc);
     if not (Int.gt size Int.zero) then
       raise (ImpreciseMemset NegativeOrNullSize);
@@ -511,39 +467,22 @@ let frama_c_memset_precise state dst_lval dst v (exp_size, size) =
       | None ->
         (* No such luck. Use the base and the offset of [dst] to resynthesize
            a type *)
-        let base_dst, offset_dst = Location_Bytes.find_lonely_binding dst in
-        let offset_dst = Ival.project_int offset_dst in
-        let offset_dst_bits = Int.mul offset_dst size_char in
+        let base_dst, offset_dst = Location_Bits.find_lonely_binding dst in
+        let offset = Ival.project_int offset_dst in
         let vi_dst = Base.to_varinfo base_dst in
-        let mo = Bit_utils.MatchSize size_bits in
-        snd (Bit_utils.(find_offset vi_dst.vtype ~offset:offset_dst_bits mo))
+        let mo = Bit_utils.MatchSize size in
+        snd (Bit_utils.(find_offset vi_dst.vtype ~offset mo))
     in
     let offsm = memset_typ_offsm typ v in
-    let dst_loc = Locations.loc_bytes_to_loc_bits dst in
-    let (c_from,dst_zone) =
-      let input = deps_nth_arg 1 in
-      let size_bits = Integer.mul size (Bit_utils.sizeofchar ())in
-      let dst_location = Locations.make_loc dst_loc (Int_Base.Value size_bits) in
-      let dst_zone = Locations.(enumerate_valid_bits Write dst_location) in
-      let memory =
-        Assigns.Memory.add_binding ~exact:true
-          Assigns.Memory.empty dst_zone input
-      in
-      let return = deps_nth_arg 0 in
-      let c_from = Assigns.{ memory; return  } in
-      c_from,dst_zone
-    in
-    let _ = c_from in
     let prefix = "Builtin memset" in
     Cvalue_transfer.warn_imprecise_offsm_write ~prefix dst_lval offsm;
-    let state' =
+    let state =
       Cvalue.Model.paste_offsetmap
-        ~from:offsm ~dst_loc ~size:size_bits ~exact:true state
+        ~from:offsm ~dst_loc:dst ~size ~exact:true state
     in
-    Builtins.Full
-      { Builtins.c_values = [Some dst, state'];
-        c_clobbered = Base.SetLattice.bottom;
-        c_assigns = Some (c_from,dst_zone); }
+    let dst_location = Locations.make_loc dst (Int_Base.Value size) in
+    let dst_zone = Locations.(enumerate_valid_bits Write dst_location) in
+    state, dst_zone, dst_zone
   with
   | Bit_utils.NoMatchingOffset -> raise (ImpreciseMemset SizeMismatch)
   | Base.Not_a_C_variable -> raise (ImpreciseMemset NoTypeForDest)
@@ -555,11 +494,20 @@ let frama_c_memset_precise state dst_lval dst v (exp_size, size) =
 
 let frama_c_memset state actuals =
   match actuals with
-  | [(exp_dst, dst); (_, v); (exp_size, size)] ->
+  | [(dst_exp, dst_cvalue); (_, v); (exp_size, size_cvalue)] ->
     begin
-      let dst_lval = lval_of_address exp_dst in
+      let dst_lval = lval_of_address dst_exp in
+      let size =
+        try Cvalue.V.project_ival size_cvalue
+        with Cvalue.V.Not_based_on_null -> Ival.top (* TODO: use size_t *)
+      in
+      (* Convert locations and size into bits. *)
+      let size = Ival.scale (Bit_utils.sizeofchar ()) size in
+      let dst = Locations.loc_bytes_to_loc_bits dst_cvalue in
       (* Remove read-only destinations *)
-      let dst = V.filter_base (fun b -> not (Base.is_read_only b)) dst in
+      let dst =
+        Location_Bits.filter_base (fun b -> not (Base.is_read_only b)) dst
+      in
       (* Keep only the first byte of the value argument *)
       let _, v = Cvalue.V.extract_bits
           ~topify:Origin.Misalign_read
@@ -567,13 +515,31 @@ let frama_c_memset state actuals =
           ~size:(Int.of_int (Cil.bitsSizeOfInt IInt))
           v
       in
-      try frama_c_memset_precise state dst_lval dst v (exp_size, size)
-      with ImpreciseMemset reason ->
-        Self.debug ~dkey ~current:true
-          "Call to builtin precise_memset(%a) failed; %a%t"
-          Eva_utils.pretty_actuals actuals pretty_imprecise_memset_reason reason
-          Eva_utils.pp_callstack;
-        frama_c_memset_imprecise state dst_lval dst v size
+      let state, sure_output, over_output =
+        try frama_c_memset_precise state dst_lval dst v (exp_size, size)
+        with ImpreciseMemset reason ->
+          Self.debug ~dkey ~current:true
+            "Call to builtin precise_memset(%a) failed; %s%t"
+            Eva_utils.pretty_actuals actuals (imprecision_descr reason)
+            Eva_utils.pp_callstack;
+          frama_c_memset_imprecise state dst_lval dst v size
+      in
+      let assigns =
+        let value_dep = deps_nth_arg 1 in
+        let memory = Assigns.Memory.empty in
+        let memory =
+          Assigns.Memory.add_binding ~exact:false memory over_output value_dep
+        in
+        let memory =
+          Assigns.Memory.add_binding ~exact:true memory sure_output value_dep
+        in
+        let return = deps_nth_arg 0 in
+        Assigns.{ memory; return }
+      in
+      Builtins.Full
+        { Builtins.c_values = [ Some dst_cvalue, state ];
+          c_clobbered = Base.SetLattice.bottom;
+          c_assigns = Some (assigns, sure_output); }
     end
   | _ -> raise (Builtins.Invalid_nb_of_args 3)
 
