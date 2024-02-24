@@ -150,6 +150,8 @@ let binop op e1 e2 =
 
 let add = binop PlusA
 
+let addr lval = mk (AddrOf lval)
+
 let var vi = mk_lval (Var vi, NoOffset)
 let var_exp vi = mk (Lval (var vi))
 
