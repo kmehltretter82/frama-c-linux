@@ -186,7 +186,7 @@ export interface ItemProps {
   /** Selection callback. */
   onSelection ?: (e: React.MouseEvent) => void
   /** Right-click callback. */
-  onContextMenu?: () => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
   /** Additional class. */
   className?: string;
   /** Additional styles. */

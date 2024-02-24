@@ -26,353 +26,267 @@ import * as States from 'dome/data/states';
 import * as Sidebars from 'dome/frame/sidebars';
 import * as Toolbar from 'dome/frame/toolbars';
 import { Icon } from 'dome/controls/icons';
+import { Button, IconButton } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
-import { Hbox, Hfill, Vfill } from 'dome/layout/boxes';
+import { Hbox, Hfill, Vfill, Grid } from 'dome/layout/boxes';
 import { QPane, QSplit } from 'dome/layout/qsplit';
 import { RenderElement } from 'dome/layout/dispatch';
 import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
 import * as Ivette from 'ivette';
-import { Layout4, Layout, VIEW, COMPONENT, GROUP } from 'ivette';
+import { compId, LayoutPosition, VIEW, COMPONENT, GROUP } from 'ivette';
 import * as Ext from './Extensions';
 
-const defaultLayout = { ABCD: "" };
-const defaultLabViewState: LabViewState = {
-  A: defaultLayout.ABCD,
-  B: defaultLayout.ABCD,
-  C: defaultLayout.ABCD,
-  D: defaultLayout.ABCD,
-  H: 0.5,
-  V: 0.5,
-  components: new Set<string>(),
-  dockedComponents: new Set<Ivette.ComponentProps>(),
-  selectedView: "default",
-  selectedTabIndex: 0
-};
-const globalLabViewState = new States.GlobalState<LabViewState>(
-  defaultLabViewState
-);
-const defaultPanelLayoutSelectorState: PanelLayoutSelectorState ={
-  display: false,
-  compId: "",
-  compLabel: "",
+/* -------------------------------------------------------------------------- */
+/* --- LabView State                                                      --- */
+/* -------------------------------------------------------------------------- */
+
+type viewId = string;
+
+interface Scroll { H: number, V: number }
+interface Layout { A: compId, B: compId, C: compId, D: compId }
+
+interface TabViewState {
+  view: viewId,
+  custom: number,
+  scroll: Scroll,
+  layout: Layout,
+}
+
+interface LabViewState {
+  scroll: Scroll;
+  layout: Layout;
+  panels: Set<compId>;
+  docked: Map<compId, LayoutPosition>;
+  tabs: TabViewState[];
+  tabIndex: number;
+  sideView: viewId; // from Sidebar or TAB selection
+  sideComp: compId; // from Sidebar selection
+}
+
+const defaultScroll: Scroll = { H: 0.5, V: 0.5 };
+const defaultLayout: Layout = { A: '', B: '', C: '', D: '' };
+
+const LAB = new States.GlobalState<LabViewState>({
+  scroll: defaultScroll,
+  layout: defaultLayout,
+  panels: new Set(),
+  docked: new Map(),
+  tabs: [],
+  tabIndex: 0,
+  sideView: '',
+  sideComp: '',
+});
+
+/* -------------------------------------------------------------------------- */
+/* --- Layout Utilities                                                   --- */
+/* -------------------------------------------------------------------------- */
+
+function removeLayout(m: Layout, cid: compId): Layout
+{
+  const { A, B, C, D } = m;
+  return {
+    A: A !== cid ? A : '',
+    B: B !== cid ? B : '',
+    C: A !== cid ? C : '',
+    D: A !== cid ? D : '',
+  };
+}
+
+function addLayout(m: Layout, cid: compId, p: LayoutPosition): Layout
+{
+  m = removeLayout(m, cid);
+  switch(p) {
+    case 'A': return { ...m, A: cid };
+    case 'B': return { ...m, B: cid };
+    case 'C': return { ...m, C: cid };
+    case 'D': return { ...m, D: cid };
+    case 'AB': return { ...m, A: cid, B: cid };
+    case 'AC': return { ...m, A: cid, C: cid };
+    case 'BD': return { ...m, B: cid, D: cid };
+    case 'CD': return { ...m, C: cid, D: cid };
+    case 'ABCD': return { A: cid, B: cid, C: cid, D: cid };
+    default: return m;
+  }
+}
+
+function getPosition(m: Layout, cid: compId): LayoutPosition | undefined
+{
+  const { A, B, C, D } = m;
+  const a = A === cid;
+  const b = B === cid;
+  const c = C === cid;
+  const d = D === cid;
+  if (a && b && c && d) return 'ABCD';
+  if (a && b) return 'AB';
+  if (a && c) return 'AC';
+  if (b && d) return 'BD';
+  if (c && d) return 'CD';
+  if (a) return 'A';
+  if (b) return 'B';
+  if (c) return 'C';
+  if (d) return 'D';
+  return undefined;
+}
+
+{
+  getPosition(addLayout(defaultLayout, 'Console', 'A'), 'Console');
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- LabView Actions                                                    --- */
+/* -------------------------------------------------------------------------- */
+
+function setCurrentView(view: viewId = ''):void {
+  const state = LAB.getValue();
+  LAB.setValue({ ...state, sideView: view, sideComp: '' });
+}
+
+function setCurrentComp(comp: compId = ''):void {
+  const state = LAB.getValue();
+  LAB.setValue({ ...state, sideComp: comp, sideView: '' });
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Layout Menu State                                                  --- */
+/* -------------------------------------------------------------------------- */
+
+interface Actions {
+  dock: boolean;
+  close: boolean;
+}
+
+interface LayoutMenuState extends Actions {
+  comp: compId;
+  x: number;
+  y: number;
+}
+
+const closedMenu: LayoutMenuState = {
+  comp: '',
   dock: false,
   close: false,
   x: 0,
-  y: 0
+  y: 0,
 };
-const globalPanelLayoutSelectorState = new States
-.GlobalState<PanelLayoutSelectorState>(defaultPanelLayoutSelectorState);
-const defaultTabsState: TabState = {
-  tabs: [
-    {
-      viewId: "tab.default",
-      viewLabel: "Default Tab",
-      A: defaultLayout.ABCD,
-      B: defaultLayout.ABCD,
-      C: defaultLayout.ABCD,
-      D: defaultLayout.ABCD,
-      H: defaultLabViewState.H,
-      V: defaultLabViewState.V
-    }
-  ]
-};
-const globalTabsState = new States.GlobalState<TabState>(defaultTabsState);
 
-function assignValueToQuarterStr(quarter: string, value: string): Layout4
-{
-  let A = "",
-      B = "",
-      C = "",
-      D = "";
+const MENU = new States.GlobalState<LayoutMenuState>(closedMenu);
 
-  if("A" === quarter) A = value;
-  if("B" === quarter) B = value;
-  if("C" === quarter) C = value;
-  if("D" === quarter) D = value;
+function openLayoutMenu(
+  comp: compId,
+  actions: Actions,
+  evt: React.MouseEvent
+): void {
+  MENU.setValue({ ...actions, comp, x: evt.clientX, y: evt.clientY });
+}
 
-  if("AB" === quarter) {
-    A = value;
-    B = value;
-  }
-  if("AC" === quarter) {
-    A = value;
-    C = value;
-  }
-  if("BD" === quarter) {
-    B = value;
-    D = value;
-  }
-  if("CD" === quarter) {
-    C = value;
-    D = value;
-  }
+function closeMenu(): void {
+  MENU.setValue(closedMenu);
+}
 
-  if("ABCD" === quarter) {
-    A = value;
-    B = value;
-    C = value;
-    D = value;
-  }
+Dome.escaped.on(closeMenu);
 
-  return {
-    A: A,
-    B: B,
-    C: C,
-    D: D,
+/* -------------------------------------------------------------------------- */
+/* --- Layout Menu Component                                              --- */
+/* -------------------------------------------------------------------------- */
+
+interface QuarterProps {
+  comp: compId;
+  pos: LayoutPosition;
+}
+
+function Quarter(props: QuarterProps): JSX.Element {
+  const { pos } = props;
+  const icon = 'QSPLIT.' + pos;
+  const onClick = ():void => {
+    closeMenu();
+    // console.log('LAYOUT', comp, pos);
   };
+  return <IconButton icon={icon} onClick={onClick} />;
 }
 
-function getQuarterComponents(quarter: string): (string | undefined)[] {
-  const result = [];
-  const labViewState = globalLabViewState.getValue();
+function LayoutMenu(): JSX.Element {
+  const [menu] = States.useGlobalState(MENU);
+  const { comp, dock, close } = menu;
+  const display = comp !== '';
+  const className = classes(
+    'labview-layout-menu',
+    !display && 'dome-erased'
+  );
+  const panelWidth = 200;
+  const panelHeight = 250;
+  const maxWidth = window.innerWidth;
+  const maxHeight = window.innerHeight;
 
-  if ("A" === quarter) result.push(labViewState.A);
-  if ("B" === quarter) result.push(labViewState.B);
-  if ("C" === quarter) result.push(labViewState.C);
-  if ("D" === quarter) result.push(labViewState.D);
+  let x = menu.x + 50;
+  if (x + panelWidth > maxWidth) x = maxWidth - panelWidth;
 
-  if ("AB" === quarter) {
-    result.push(labViewState.A);
-    result.push(labViewState.B);
-  }
-  if ("AC" === quarter) {
-    result.push(labViewState.A);
-    result.push(labViewState.C);
-  }
-  if ("BD" === quarter) {
-    result.push(labViewState.B);
-    result.push(labViewState.D);
-  }
-  if ("CD" === quarter) {
-    result.push(labViewState.C);
-    result.push(labViewState.D);
-  }
+  let y = menu.y - panelHeight/2 > 0 ? menu.y - panelHeight/2 : 0;
+  if (y + panelHeight > maxHeight) y = maxHeight - panelHeight;
 
-  if ("ABCD" === quarter) {
-    result.push(labViewState.A);
-    result.push(labViewState.B);
-    result.push(labViewState.C);
-    result.push(labViewState.D);
-  }
+  const onDock = (): void => { /* console.log('DOCK', comp);*/ };
+  const onClose = (): void => { /* console.log('CLOSE', comp);*/ };
 
-  return result;
+  return (
+    <div className={className} style={{ left: x, top: y }}>
+      <Grid columns='30px 30px 30px'>
+        <Quarter comp={comp} pos='A'    />
+        <Quarter comp={comp} pos='AB'   />
+        <Quarter comp={comp} pos='B'    />
+        <Quarter comp={comp} pos='AC'   />
+        <Quarter comp={comp} pos='ABCD' />
+        <Quarter comp={comp} pos='BD'   />
+        <Quarter comp={comp} pos='C'    />
+        <Quarter comp={comp} pos='CD'   />
+        <Quarter comp={comp} pos='D'    />
+      </Grid>
+      <Button
+        display={dock} label='Dock' icon='QSPLIT.DOCK' onClick={onDock} />
+      <Button
+        display={close} label='Close' icon='TRASH' onClick={onClose} />
+    </div>
+  );
 }
-
-function addToDockedComponents(comp: Ivette.ComponentProps)
-: void {
-  const labviewState = globalLabViewState.getValue();
-
-  let exists = false;
-  [...labviewState.dockedComponents].forEach(c => {
-    if (c.id === comp.id) exists = true;
-  });
-  if(exists) return;
-
-  const dockedComponents = labviewState.dockedComponents;
-  dockedComponents.add(comp);
-  globalLabViewState.setValue({
-    ...labviewState,
-    dockedComponents: dockedComponents
-  }, true);
-}
-
-function deleteFromDockedComponents(comp: Ivette.ComponentProps): void {
-  const labviewState = globalLabViewState.getValue();
-  const dockedComponents = labviewState.dockedComponents;
-
-  const updatedSet = new Set<Ivette.ComponentProps>();
-  dockedComponents.forEach(c => {
-    c.id !== comp.id && updatedSet.add(c);
-  });
-
-  globalLabViewState.setValue({
-    ...labviewState,
-    dockedComponents: updatedSet
-  }, true);
-}
-
-function deleteFromLoadedComponents(comp: Ivette.ComponentProps): void {
-  const labviewState = globalLabViewState.getValue();
-  const loadedComponents = labviewState.components;
-
-  if(!loadedComponents.has(comp.id)) return;
-  const updatedSet = new Set<string>();
-  loadedComponents.forEach(c => {
-    c !== comp.id && updatedSet.add(c);
-  });
-
-  globalLabViewState.setValue({
-    ...labviewState,
-    components: updatedSet,
-  }, true);
-}
-
-function removeComponent(comp: Ivette.ComponentProps): void {
-  removeCompFromCurrentLayout(comp.id);
-  deleteFromDockedComponents(comp);
-  deleteFromLoadedComponents(comp);
-}
-
-function addCompFromQuarterToDock(quarter: string): void {
-  const replacedCompIds = getQuarterComponents(quarter);
-  replacedCompIds.forEach(compId => {
-    if(compId !== undefined) {
-      const replacedComp = COMPONENT.getElement(compId);
-      if(replacedComp !== undefined) {
-       addToDockedComponents(replacedComp);
-      }
-    }
-  });
-}
-
-function adjustBlanksInLayout(
-  layout: { A: string, B: string, C: string, D: string }):
-  {A: string, B: string, C: string, D: string} {
-  Object.values(layout).forEach(compId => {
-    let occurences = 0;
-    Object.values(layout).forEach(c => {
-      if (compId === c) occurences++;
-    });
-
-    if(occurences === 3) {
-      if (layout.D === compId && occurences > 1) {
-        layout.D = "";
-        occurences--;
-      }
-      if (layout.C === compId && occurences > 1) {
-        layout.C = "";
-        occurences--;
-      }
-      if (layout.B === compId && occurences > 1) {
-        layout.B = "";
-        occurences--;
-      }
-      if (layout.A === compId && occurences > 1) {
-        layout.C = "";
-        occurences--;
-      }
-    }
-  });
-  return layout;
-}
-
-function removeCompFromCurrentLayout(compId: string): void {
-  const labViewState = globalLabViewState.getValue();
-  if (labViewState.A === compId) labViewState.A = "";
-  if (labViewState.B === compId) labViewState.B = "";
-  if (labViewState.C === compId) labViewState.C = "";
-  if (labViewState.D === compId) labViewState.D = "";
-  globalLabViewState.setValue(labViewState);
-}
-
-function assignCompToQuarter(quarter: string, compId: string): void {
-  const labViewState = globalLabViewState.getValue();
-  removeCompFromCurrentLayout(compId);
-  addCompFromQuarterToDock(quarter);
-
-  let layout = assignValueToQuarterStr(quarter, compId);
-  if (layout.A === "") layout.A = labViewState.A ?? "";
-  if (layout.B === "") layout.B = labViewState.B ?? "";
-  if (layout.C === "") layout.C = labViewState.C ?? "";
-  if (layout.D === "") layout.D = labViewState.D ?? "";
-  layout = adjustBlanksInLayout(
-    { A: layout.A, B: layout.B, C: layout.C, D: layout.D });
-
-  const view = VIEW.getElement(labViewState.selectedView);
-  applyLayout({
-    id: view?.id ?? "view.custom",
-    label: view?.label ?? "Custom Layout",
-    layout: layout
-   });
-}
-
-function getQuarters(layout: Layout): Layout4 {
-  type Unstructured = {
-    A ?: string, B ?: string, C ?: string, D ?: string,
-    AB ?: string, AC ?: string, BD ?: string, CD ?: string,
-    ABCD ?: string
-  };
-  const u : Unstructured = layout;
-  const A : string = u.A ?? u.AB ?? u.AC ?? u.ABCD ?? '';
-  const B : string = u.B ?? u.AB ?? u.BD ?? u.ABCD ?? '';
-  const C : string = u.C ?? u.AC ?? u.CD ?? u.ABCD ?? '';
-  const D : string = u.D ?? u.CD ?? u.BD ?? u.ABCD ?? '';
-  return { A, B, C, D };
-}
-
-function applyLayout(view : Ivette.ViewLayoutProps): void {
-  const { layout } = view;
-  const tabsState = globalTabsState.getValue();
-  const parsedLayout = getQuarters(layout);
-  addCompFromQuarterToDock("ABCD");
-
-  let state = globalLabViewState.getValue();
-  const components = state.components;
-  Object.values(layout).forEach(compId => {
-    compId !== "" && components.add(compId);
-    const component = COMPONENT.getElement(compId);
-    if(component && component !== undefined) {
-      deleteFromDockedComponents(component);
-    }
-  });
-  state = globalLabViewState.getValue();
-
-  globalLabViewState.setValue({
-    ...state,
-    A: parsedLayout.A, B: parsedLayout.B, C: parsedLayout.C, D: parsedLayout.D,
-    H: tabsState.tabs[state.selectedTabIndex].H,
-    V: tabsState.tabs[state.selectedTabIndex].V,
-    components: components,
-    selectedView: view.id,
-  });
-
-  tabsState.tabs[state.selectedTabIndex] = {
-    viewId: view.id,
-    viewLabel: view.label,
-    A: parsedLayout.A, B: parsedLayout.B, C: parsedLayout.C, D: parsedLayout.D,
-    H: tabsState.tabs[state.selectedTabIndex].H,
-    V: tabsState.tabs[state.selectedTabIndex].V
-  };
-  globalTabsState.setValue({ ...tabsState }, true);
-}
-
 
 /* -------------------------------------------------------------------------- */
 /* --- Pane Component                                                     --- */
 /* -------------------------------------------------------------------------- */
 
-interface PaneProps { id: string; }
+interface PaneProps { comp: compId }
 
 const paneActions: Actions = { dock: true, close: true };
 
 function Pane(props: PaneProps): JSX.Element | null {
-  const { id } = props;
-  const component = Ext.useElement(COMPONENT, id);
+  const { comp } = props;
+  const component = Ext.useElement(COMPONENT, comp);
+  const onLayout = React.useCallback(
+    (evt) => openLayoutMenu(comp, paneActions, evt),
+    [comp]
+  );
   if (!component) return null;
   const { label, title, children } = component;
   return (
-    <QPane id={id}>
+    <QPane id={comp}>
       <Vfill className="labview-content">
         <Hbox className="labview-titlebar">
           <Hfill>
-            <Catch label={id}>
-              <RenderElement id={`labview.title.${id}`}>
+            <Icon
+              id={"ITEMS.GRID"}
+              className="titlebar-thin-icon"
+              onClick={onLayout}
+            />
+            <Catch label={comp}>
+              <RenderElement id={`labview.title.${comp}`}>
                 <Label
                   className="labview-handle"
                   label={label}
                   title={title} />
               </RenderElement>
             </Catch>
-            <Icon id={"ITEMS.GRID"}
-              className="titlebar-thin-icon"
-              onClick={(e) =>
-                openPanelLayoutSelector(component, paneActions, e)}
-            />
           </Hfill>
         </Hbox>
-        <Ivette.TitleContext.Provider value={{ id, label, title }}>
-          <Catch label={id}>{children}</Catch>
+        <Ivette.TitleContext.Provider value={{ id: comp, label, title }}>
+          <Catch label={comp}>{children}</Catch>
         </Ivette.TitleContext.Provider>
       </Vfill>
     </QPane>
@@ -383,61 +297,24 @@ function Pane(props: PaneProps): JSX.Element | null {
 /* --- LabView                                                            --- */
 /* -------------------------------------------------------------------------- */
 
-interface LabViewState {
-  A: string | undefined;
-  B: string | undefined;
-  C: string | undefined;
-  D: string | undefined;
-  H: number;
-  V: number;
-  components: Set<string>
-  dockedComponents: Set<Ivette.ComponentProps>
-  selectedView: string,
-  selectedTabIndex: number;
-}
-
 export function LabView(): JSX.Element {
 
-  const [state, setState] = States.useGlobalState(globalLabViewState);
-
-  const setH = React.useCallback(
-    (newH: number) => {
-      setState({ ...state, H: newH });
-      const tabsState = globalTabsState.getValue();
-      tabsState.tabs[state.selectedTabIndex].H = newH;
-      globalTabsState.setValue({ ...tabsState });
-    }, [state, setState]
-  );
-
-  const setV = React.useCallback(
-    (newV: number) => {
-      setState({ ...state, V: newV });
-      const tabsState = globalTabsState.getValue();
-      tabsState.tabs[state.selectedTabIndex].V = newV;
-      globalTabsState.setValue({ ...tabsState });
-    }, [state, setState]
-  );
-
+  const [state] = States.useGlobalState(LAB);
   const setPosition = React.useCallback(
-    (h, v) => {
-      setH(h);
-      setV(v);
-    },
-    [setH, setV]
+    (H, V) => LAB.setValue({ ...state, scroll: { H, V } }),
+    [state]
   );
-
+  const { A, B, C, D } = state.layout;
+  const panels : JSX.Element[] = [];
+  state.panels.forEach((id) => panels.push(<Pane key={id} comp={id}/>));
   return (
     <>
-      <PanelLayoutSelector />
+      <LayoutMenu />
       <QSplit
         className='labview-container'
-        A={state.A} B={state.B} C={state.C} D={state.D} H={state.H} V={state.V}
+        A={A} B={B} C={C} D={D}
         setPosition={setPosition}
-      >
-        {[...state.components].map((comp, key) =>
-          <Pane key={key} id={comp} />
-        )}
-      </QSplit>
+      >{panels}</QSplit>
     </>
   );
 }
@@ -446,73 +323,58 @@ export function LabView(): JSX.Element {
 /* --- View Sidebar Section                                               --- */
 /* -------------------------------------------------------------------------- */
 
-function ViewSection(): JSX.Element {
-  const views = Ext.useElements(VIEW);
-  const [{ selectedView }] = States.useGlobalState(globalLabViewState);
+interface ViewItemProps {
+  view: Ivette.ViewLayoutProps;
+  selected: boolean;
+}
 
-  function createTabFromView(view: Ivette.ViewLayoutProps): void {
-    const layout = getQuarters(view.layout);
-    const tab: Tab = {
-      viewId: view.id,
-      viewLabel: view.label,
-      A: layout.A,
-      B: layout.B,
-      C: layout.C,
-      D: layout.D,
-      H: defaultLabViewState.H,
-      V: defaultLabViewState.V,
-    };
-    addTab(tab);
-  }
+function ViewItem(props: ViewItemProps): JSX.Element {
+  const { view, selected } = props;
+  const { id, label, title } = view;
 
-  function applyView(view: Ivette.ViewLayoutProps): void {
-    applyLayout(view);
-    const labViewState = globalLabViewState.getValue();
-    const tabsState = globalTabsState.getValue();
-    globalLabViewState.setValue({
-      ...labViewState,
-      H: defaultLabViewState.H,
-      V: defaultLabViewState.V
-    });
-    tabsState.tabs[labViewState.selectedTabIndex] = {
-      ...tabsState.tabs[labViewState.selectedTabIndex],
-      H: defaultLabViewState.H,
-      V: defaultLabViewState.V
-    };
-  }
+  const onSelection = (_evt:React.MouseEvent): void => {
+    setCurrentView(id);
+    /* evt.shiftKey ? createTabFromView(view) : applyView(view);*/
+  };
 
-  function onSelection(view: Ivette.ViewLayoutProps, e?:React.MouseEvent):
-  void {
-    e?.shiftKey ? createTabFromView(view) : applyView(view);
-  }
-
-  function onContextMenu(view: Ivette.ViewLayoutProps): void {
-    const items: Dome.PopupMenuItem[] = [
-      {
-        label: 'Apply view to current Tab',
-        onClick: () => applyView(view),
-      },
-      {
-        label: 'Create new Tab from view',
-        onClick: () => createTabFromView(view),
-      }
-    ];
-    Dome.popupMenu(items);
-  }
+  const onContextMenu = (): void => {
+    setCurrentView(id);
+    Dome.popupMenu([
+      { label: 'Display View' },
+      { label: 'Duplicate View' },
+      { label: 'Restore Default' },
+    ]);
+  };
 
   return (
-    <Sidebars.Section label="Views" defaultUnfold>
-      {views.map((view) =>
-        <Sidebars.Item
-          key={view.id}
-          label={view.label}
-          title={view.title}
-          icon='DISPLAY'
-          selected={selectedView === view.id}
-          onSelection={(evt) => onSelection(view, evt)}
-          onContextMenu={() => onContextMenu(view)}
-        />
-      )}
+    <Sidebars.Item
+      key={id}
+      label={label}
+      title={title}
+      icon='DISPLAY'
+      selected={selected}
+      onSelection={onSelection}
+      onContextMenu={onContextMenu}
+    />
+  );
+}
+
+function ViewSection(): JSX.Element {
+  const views = Ext.useElements(VIEW);
+  const [{ sideView }] = States.useGlobalState(LAB);
+
+  const items = views.map((view) => {
+    const { id } = view;
+    return (
+      <ViewItem key={id} view={view} selected={id === sideView} />
+    );
+  });
+
+  return (
+    <Sidebars.Section
+      settings="ivette.sidebar.views" label="Views" defaultUnfold
+    >
+      {items}
     </Sidebars.Section>
   );
 }
@@ -521,40 +383,36 @@ function ViewSection(): JSX.Element {
 /* --- Component Sidebar Item                                             --- */
 /* -------------------------------------------------------------------------- */
 
-const sidebarActions: Actions = { dock: true, close: false };
+interface ComponentItemProps {
+  comp: Ivette.ComponentProps;
+  selected: boolean;
+  active: boolean;
+  docked: boolean;
+}
 
-function ComponentItem(comp: Ivette.ItemProps): JSX.Element {
-  const [ labViewState ] = States.useGlobalState(globalLabViewState);
-  const [ panelLayoutSelectorState ] =
-   States.useGlobalState(globalPanelLayoutSelectorState);
-  const selected = panelLayoutSelectorState.compId === comp.id;
-  const disabled = labViewState.components.has(comp.id);
+function ComponentItem(props: ComponentItemProps): JSX.Element {
+  const { comp, selected, active, docked } = props;
+  const { id, label, title } = comp;
 
-  function onSelection(): void {
-    const compObject = COMPONENT.getElement(comp.id);
-    const preferredPosition = compObject?.preferredPosition ?? "D";
-    assignCompToQuarter(preferredPosition, comp.id);
-  }
+  const onSelection = (): void => {
+    setCurrentComp(id);
+  };
 
-  function onContextMenu(e: React.MouseEvent): void {
-    if(labViewState.components.has(comp.id)
-    || labViewState.dockedComponents.has(comp)) {
-      globalPanelLayoutSelectorState.setValue(defaultPanelLayoutSelectorState);
-      return;
-    }
-    openPanelLayoutSelector(comp, sidebarActions, e);
-  }
+  const onContextMenu = (evt: React.MouseEvent): void => {
+    setCurrentComp(id);
+    openLayoutMenu(id, { dock: !docked, close: active }, evt);
+  };
 
   return (
-    <div onContextMenu={e => onContextMenu(e)}>
-      <Sidebars.Item
-        icon='COMPONENT'
-        label={comp.label}
-        title={comp.title}
-        onSelection={onSelection}
-        selected={selected}
-        disabled={disabled} />
-    </div>
+    <Sidebars.Item
+      icon='COMPONENT'
+      label={label}
+      title={title}
+      onSelection={onSelection}
+      onContextMenu={onContextMenu}
+      selected={selected}
+      disabled={active}
+    />
   );
 }
 
@@ -575,11 +433,23 @@ interface GroupSectionProps extends Ivette.ItemProps {
 function GroupSection(props: GroupSectionProps): JSX.Element | null {
   const { id, label, title, filter } = props;
   const settings = 'ivette.sidebar.group.' + id;
-  const components = Ext.useElements(COMPONENT).filter(filter);
-  if (!components.length) return null;
+  const components = Ext.useElements(COMPONENT).filter(filter) ?? [];
+  const [{ panels, docked, sideComp }] = States.useGlobalState(LAB);
+  const items = components.map((comp) => {
+    const { id } = comp;
+    return (
+      <ComponentItem
+        key={id}
+        comp={comp}
+        selected={id === sideComp}
+        active={panels.has(id)}
+        docked={docked.has(id)}
+      />
+    );
+  });
   return (
     <Sidebars.Section settings={settings} label={label} title={title}>
-      {components.map((comp) => <ComponentItem key={comp.id} {...comp} />)}
+      {items}
     </Sidebars.Section>
   );
 }
@@ -628,332 +498,85 @@ Ivette.registerSidebar({
   children: <ViewBar />,
 });
 
-/* -------------------------------------------------------------------------- */
-/* --- PanelLayoutSelector                                                --- */
-/* -------------------------------------------------------------------------- */
-
-interface Actions {
-  dock: boolean;
-  close: boolean;
-}
-
-interface PanelLayoutSelectorState extends Actions {
-  display: boolean;
-  compId: string;
-  compLabel: string;
-  x: number,
-  y: number;
-}
-
-function openPanelLayoutSelector(
-  comp: Ivette.ComponentProps,
-  actions: Actions,
-  evt: React.MouseEvent
-): void {
-  const state = globalPanelLayoutSelectorState.getValue();
-  const display = !state.display ? true : state.compId !== comp.id;
-  globalPanelLayoutSelectorState.setValue({
-    ...actions,
-    display: display,
-    compId: display ? comp.id : "",
-    compLabel: display ? comp.label : "",
-    x: evt.clientX,
-    y: evt.clientY,
-  });
-}
-
-function closePanelLayoutSelector(): void {
-  globalPanelLayoutSelectorState.setValue(defaultPanelLayoutSelectorState);
-}
-
-function PanelLayoutSelector()
-: JSX.Element {
-  const [state, ] =
-  States.useGlobalState(globalPanelLayoutSelectorState);
-  const className = classes(
-    state.display ? '' : 'dome-erased',
-    "panelLayoutSelector"
-  );
-  const iconSize = 30;
-  let x = 0, y = 0;
-  computePanelXY();
-
-  Dome.escaped.on(() => {
-    closePanelLayoutSelector();
-  });
-
-  function computePanelXY(): void {
-    const panelWidth = 200;
-    const panelHeight = 250;
-    const maxWidth = window.innerWidth;
-    const maxHeight = window.innerHeight;
-
-    x = state.x + 50;
-    if (x + panelWidth > maxWidth) x = maxWidth - panelWidth;
-
-    y = state.y - panelHeight/2 > 0 ? state.y - panelHeight/2 : 0;
-    if (y + panelHeight > maxHeight) y = maxHeight - panelHeight;
-  }
-
-  function onclick(quarter: string): void {
-    assignCompToQuarter(quarter, state.compId);
-    closePanelLayoutSelector();
-  }
-
-  function dock(): void {
-    const component: Ivette.ComponentProps = {
-      id: state.compId,
-      label: state.compLabel
-    };
-    addToDockedComponents(component);
-    removeCompFromCurrentLayout(component.id);
-    closePanelLayoutSelector();
-  }
-
-  function remove(): void {
-    const component: Ivette.ComponentProps = {
-      id: state.compId,
-      label: state.compLabel
-    };
-    removeComponent(component);
-    closePanelLayoutSelector();
-  }
-
-  return (
-    <div className={className} style={{ left: x, top: y }}>
-      <table>
-        <tbody>
-          <tr>
-            <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.A"} size={iconSize}
-              onClick={() => onclick("A")} /></th>
-            <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.AB"} size={iconSize}
-              onClick={() => onclick("AB")} /></th>
-            <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.B"} size={iconSize}
-              onClick={() => onclick("B")} /></th>
-          </tr>
-          <tr>
-            <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.AC"} size={iconSize}
-              onClick={() => onclick("AC")} /></th>
-            <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.ABCD"} size={iconSize}
-              onClick={() => onclick("ABCD")} /></th>
-            <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.BD"} size={iconSize}
-              onClick={() => onclick("BD")} /></th>
-          </tr>
-          <tr>
-            <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.C"} size={iconSize}
-              onClick={() => onclick("C")} /></th>
-            <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.CD"} size={iconSize}
-              onClick={() => onclick("CD")} /></th>
-            <th className="panelLayoutSelector-hover">
-              <Icon id={"QSPLIT.D"} size={iconSize}
-              onClick={() => onclick("D")} /></th>
-          </tr>
-        </tbody>
-      </table>
-      <div>
-        { state.dock &&
-          <div className="panelLayoutSelector-spaced">
-            Dock Component
-            <Icon id={"QSPLIT.DOCK"} size={iconSize}
-            className="panelLayoutSelector-hover"
-            onClick={dock} />
-          </div>
-        }
-        { state.close &&
-          <div className="panelLayoutSelector-spaced">
-            Remove Component
-            <Icon id="TRASH" size={iconSize}
-            className="panelLayoutSelector-hover"
-            onClick={remove} />
-          </div>
-        }
-      </div>
-    </div>
-  );
-}
-
-Ivette.registerSandbox({
-  id: 'sandbox.panelLayoutSelector',
-  label: 'Panel Layout Selector',
-  children: <PanelLayoutSelector />,
-});
-
-
 // --------------------------------------------------------------------------
 // --- Docked Components
 // --------------------------------------------------------------------------
 
 const dockActions: Actions = { dock: false, close: true };
 
-export function Dock(): JSX.Element {
+interface DockItemProps {
+  comp: compId;
+  pos: LayoutPosition;
+}
 
-  const [ state, ] = States.useGlobalState(globalLabViewState);
-  const [ panelLayoutSelectorState, ] =
-  States.useGlobalState(globalPanelLayoutSelectorState);
-
-  function onClick(comp: Ivette.ComponentProps): void {
-    const compObject = COMPONENT.getElement(comp.id);
-    const preferredPosition = compObject?.preferredPosition ?? "D";
-    assignCompToQuarter(preferredPosition, comp.id);
-    closePanelLayoutSelector();
-  }
-
-  function onContextMenu(
-    comp: Ivette.ComponentProps,
-    evt: React.MouseEvent,
-  ): void {
-    openPanelLayoutSelector(comp, dockActions, evt);
-  }
-
+function DockItem(props: DockItemProps): JSX.Element {
+  const { comp: id, pos } = props;
+  const comp = Ext.useElement(COMPONENT, id);
+  const label = comp?.label ?? id;
+  const icon = 'QSPLIT.' + pos;
+  const title = `Display ${label} (right-click for more actions)`;
+  const onClick = (): void => {
+    // console.log('LAYOUT', id, pos);
+  };
+  const onContextMenu = (_: void, evt: React.MouseEvent): void => {
+    openLayoutMenu(id, dockActions, evt);
+  };
   return (
-    <>
-      {
-        [...state.dockedComponents].map((comp) =>
-          <Toolbar.Button key={comp.id}
-          label={comp.label}
-          onClick={() => onClick(comp)}
-          onContextMenu={(_value, e) => onContextMenu(comp, e)}
-          selected={panelLayoutSelectorState.compId === comp.id}
-          />
-        )
-      }
-    </>
+    <Toolbar.Button
+      icon={icon}
+      label={label}
+      title={title}
+      onClick={onClick}
+      onContextMenu={onContextMenu}
+    />
   );
+}
+
+export function Dock(): JSX.Element {
+  const [{ docked }] = States.useGlobalState(LAB);
+  const items: JSX.Element[] = [];
+  docked.forEach((pos, comp) => {
+    items.push(<DockItem key={comp} comp={comp} pos={pos} />);
+  });
+  return <>{items}</>;
 }
 
 /* -------------------------------------------------------------------------- */
 /* --- Tabs                                                               --- */
 /* -------------------------------------------------------------------------- */
 
-interface Tab {
-  viewLabel: string,
-  viewId: string,
-  A: string;
-  B: string;
-  C: string;
-  D: string;
-  H: number;
-  V: number;
+interface TabViewProps {
+  tab: TabViewState;
+  index: number;
+  selected: number;
 }
 
-interface TabState {
-  tabs: Tab[];
-}
-
-function addTab(tab: Tab): void {
-  const tabsState = globalTabsState.getValue();
-  tabsState.tabs.push(tab);
-  globalTabsState.setValue({ ...tabsState }, true);
-}
-
-function removeTab(tab: Tab): void {
-  const tabsState = globalTabsState.getValue();
-  const labViewState = globalLabViewState.getValue();
-  const activeTab = tabsState.tabs[labViewState.selectedTabIndex];
-
-  tabsState.tabs.splice(tabsState.tabs.indexOf(tab), 1);
-  labViewState.selectedTabIndex = tabsState.tabs.indexOf(activeTab);
-  globalTabsState.setValue({ ...tabsState }, true);
-  globalLabViewState.setValue({ ...labViewState });
-}
-
-export function Tabs(): JSX.Element {
-  const [ state, setState ] = States.useGlobalState(globalTabsState);
-
-  function switchTab(tab: Tab): void {
-    const labViewState = globalLabViewState.getValue();
-    labViewState.selectedTabIndex = state.tabs.indexOf(tab);
-    globalLabViewState.setValue({ ...labViewState });
-    applyLayout({
-      id: tab.viewId,
-      label: tab.viewLabel,
-      layout: { A: tab.A, B: tab.B, C: tab.C, D: tab.D }
-    });
-  }
-
-  function closeTab(tab: Tab): void {
-    if(globalLabViewState.getValue().selectedTabIndex !==
-    state.tabs.indexOf(tab)) {
-      removeTab(tab);
-    }
-  }
-
-  function resetTab(tab: Tab): void {
-    const view = VIEW.getElement(tab.viewId);
-    if (!view) return;
-    const tabIndex = state.tabs.indexOf(tab);
-
-    if(tabIndex === globalLabViewState.getValue().selectedTabIndex) {
-      applyLayout(view);
-      return;
-    }
-    const layout = getQuarters(view.layout);
-    state.tabs[tabIndex].A = layout.A;
-    state.tabs[tabIndex].B = layout.B;
-    state.tabs[tabIndex].C = layout.C;
-    state.tabs[tabIndex].D = layout.D;
-    state.tabs[tabIndex].H = defaultLabViewState.H;
-    state.tabs[tabIndex].V = defaultLabViewState.V;
-    setState({ ...state });
-  }
-
-  function duplicateTab(tab: Tab): void {
-    addTab({ ...tab });
-  }
-
-  function onClick(tab: Tab, e?:React.MouseEvent): void {
-    e?.shiftKey ? duplicateTab(tab) : switchTab(tab);
-  }
-
-  function onContextMenu(tab: Tab): void {
-    const labViewState = globalLabViewState.getValue();
-    const items: Dome.PopupMenuItem[] = [
-      {
-        label: 'Switch active Tab',
-        onClick: () => switchTab(tab),
-        enabled: state.tabs.indexOf(tab) !== labViewState.selectedTabIndex
-      },
-      {
-        label: 'Reset Tab to default view',
-        onClick: () => resetTab(tab),
-      },
-      {
-        label: 'Duplicate Tab',
-        onClick: () => duplicateTab(tab),
-      },
-      {
-        label: 'Close Tab',
-        onClick: () => closeTab(tab),
-        enabled: state.tabs.indexOf(tab) !== labViewState.selectedTabIndex
-      }
-    ];
-    Dome.popupMenu(items);
-  }
-
+function TabView(props: TabViewProps): JSX.Element | null {
+  const { tab, index, selected } = props;
+  const { view: id, custom } = tab;
+  const view = Ext.useElement(VIEW, id);
+  const name = view?.label ?? id;
+  const label = custom > 0 ? `${name} — ${custom}` : name;
   return (
-    <>
-      {
-        state.tabs.map(tab =>
-          <Toolbar.Button key={state.tabs.indexOf(tab)}
-          label={tab.viewLabel}
-          onClick={(_value, e) => onClick(tab, e)}
-          onContextMenu={() => onContextMenu(tab)}
-          selected={globalLabViewState.getValue().selectedTabIndex ===
-            state.tabs.indexOf(tab)}
-          />
-        )
-      }
-    </>
+    <Toolbar.Button
+      icon='DISPLAY'
+      label={label}
+      value={index}
+      selection={selected}
+    />
   );
 }
 
+export function Tabs(): JSX.Element {
+  const [{ tabs, tabIndex }] = States.useGlobalState(LAB);
+  const items = tabs.map((tab, k) => (
+    <TabView
+      key={tab.view}
+      tab={tab}
+      index={k}
+      selected={tabIndex} />
+  ));
+  return <>{items}</>;
+}
 
 /* -------------------------------------------------------------------------- */
