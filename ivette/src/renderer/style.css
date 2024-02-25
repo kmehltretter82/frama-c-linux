@@ -62,13 +62,6 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Styling Lab                                                        --- */
-/* -------------------------------------------------------------------------- */
-.lab-views-section {
-    padding-right: 3px;
-  }
-
-/* -------------------------------------------------------------------------- */
 /* --- Styling LabViews                                                   --- */
 /* -------------------------------------------------------------------------- */
 
@@ -124,22 +117,48 @@
 /* -------------------------------------------------------------------------- */
 
 .labview-layout-menu {
-    border: solid;
-    border-color: var(--splitter);
-    background-color: var(--background-softer);
-    margin: 5px;
-    position: absolute;
+    position: relative;
+    background: var(--background-softer);
+    box-shadow: 0px 0px 0px 1px var(--background-intense);
+    border-radius: 8px;
+    margin: 2px;
+    padding: 2px;
+    position: fixed;
     z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
+.labview-layout-quarter {
+    justify-self: center;
+    border-radius: 4px;
+    padding: 2px 4px 2px 4px;
+}
+
 .labview-layout-action {
-    margin: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    border: none;
+    position: relative;
+    width: 70px;
+    padding: 2px 0px 2px 6px;
+    background: var(--background-softer);
+}
+
+
+.labview-layout-action:hover {
+    background: var(--background-profound-hover);
+    border-radius: 4px;
+}
+
+.labview-layout-action-icon {
+    position: absolute;
+    top: -3px;
+    right: 1px;
+    fill: var(--info-text);
+}
+
+.labview-layout-action:hover .labview-layout-action-icon {
+    fill: var(--text);
 }
 
 /* -------------------------------------------------------------------------- */

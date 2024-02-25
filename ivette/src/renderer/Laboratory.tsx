@@ -26,7 +26,7 @@ import * as States from 'dome/data/states';
 import * as Sidebars from 'dome/frame/sidebars';
 import * as Toolbar from 'dome/frame/toolbars';
 import { Icon } from 'dome/controls/icons';
-import { Button, IconButton } from 'dome/controls/buttons';
+import { IconButton } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import { Hbox, Hfill, Vfill, Grid } from 'dome/layout/boxes';
 import { QPane, QSplit } from 'dome/layout/qsplit';
@@ -202,34 +202,61 @@ function Quarter(props: QuarterProps): JSX.Element {
     closeMenu();
     // console.log('LAYOUT', comp, pos);
   };
-  return <IconButton icon={icon} onClick={onClick} />;
+  return (
+    <IconButton
+      className='labview-layout-quarter'
+      icon={icon}
+      onClick={onClick} />
+  );
 }
 
-function LayoutMenu(): JSX.Element {
+interface ActionProps {
+  icon: string;
+  label: string;
+  display: boolean;
+  onClick: () => void;
+}
+
+function Action(props: ActionProps): JSX.Element {
+  const { icon, label, display, onClick } = props;
+  return (
+    <Label
+      className='labview-layout-action'
+      display={display}
+      label={label}
+      onClick={onClick}
+    >
+      <Icon className='labview-layout-action-icon' id={icon}/>
+    </Label>
+  );
+}
+
+function LayoutMenu(): JSX.Element | null {
+  const href = React.useRef<HTMLDivElement|null>(null);
+  const divElt = href.current;
   const [menu] = States.useGlobalState(MENU);
   const { comp, dock, close } = menu;
   const display = comp !== '';
   const className = classes(
+    'dome-color-frame',
     'labview-layout-menu',
     !display && 'dome-erased'
   );
-  const panelWidth = 200;
-  const panelHeight = 250;
+
   const maxWidth = window.innerWidth;
   const maxHeight = window.innerHeight;
+  const panelWidth = divElt?.offsetWidth ?? 50;
+  const panelHeight = divElt?.offsetHeight ?? 80;
 
-  let x = menu.x + 50;
-  if (x + panelWidth > maxWidth) x = maxWidth - panelWidth;
-
-  let y = menu.y - panelHeight/2 > 0 ? menu.y - panelHeight/2 : 0;
-  if (y + panelHeight > maxHeight) y = maxHeight - panelHeight;
+  const left = Math.max(0, Math.min(menu.x, maxWidth - panelWidth));
+  const top = Math.max(0, Math.min(menu.y, maxHeight - panelHeight));
 
   const onDock = (): void => { /* console.log('DOCK', comp);*/ };
   const onClose = (): void => { /* console.log('CLOSE', comp);*/ };
 
   return (
-    <div className={className} style={{ left: x, top: y }}>
-      <Grid columns='30px 30px 30px'>
+    <div ref={href} className={className} style={{ left, top }}>
+      <Grid columns='24px 24px 24px'>
         <Quarter comp={comp} pos='A'    />
         <Quarter comp={comp} pos='AB'   />
         <Quarter comp={comp} pos='B'    />
@@ -240,10 +267,10 @@ function LayoutMenu(): JSX.Element {
         <Quarter comp={comp} pos='CD'   />
         <Quarter comp={comp} pos='D'    />
       </Grid>
-      <Button
-        display={dock} label='Dock' icon='QSPLIT.DOCK' onClick={onDock} />
-      <Button
-        display={close} label='Close' icon='TRASH' onClick={onClose} />
+      <Action display={dock}
+        label='Dock' icon='QSPLIT.DOCK' onClick={onDock} />
+      <Action display={close}
+        label='Close' icon='TRASH' onClick={onClose} />
     </div>
   );
 }
