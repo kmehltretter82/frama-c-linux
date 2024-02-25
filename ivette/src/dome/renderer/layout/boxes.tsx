@@ -92,7 +92,7 @@ const makeBox = (
   );
   const allStyles = styles(style, morestyle);
   return (
-    <div className={allClasses} style={allStyles} tabIndex={-1} {...others}>
+    <div className={allClasses} style={allStyles} {...others}>
       {children}
     </div>
   );

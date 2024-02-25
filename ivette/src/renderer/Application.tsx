@@ -56,7 +56,7 @@ export default function Application(): JSX.Element {
   const StatusBar = Ext.useChildren(STATUSBAR);
 
   return (
-    <Vfill onKeyDown={e => { e.key === "Escape" && Dome.escaped.emit(); }}>
+    <Vfill>
       <Toolbar.ToolBar>
         <Toolbar.Button
           icon="SIDEBAR"

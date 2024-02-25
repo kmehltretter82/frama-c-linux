@@ -184,8 +184,6 @@ function closeMenu(): void {
   MENU.setValue(closedMenu);
 }
 
-Dome.escaped.on(closeMenu);
-
 /* -------------------------------------------------------------------------- */
 /* --- Layout Menu Component                                              --- */
 /* -------------------------------------------------------------------------- */
@@ -232,11 +230,18 @@ function Action(props: ActionProps): JSX.Element {
 }
 
 function LayoutMenu(): JSX.Element | null {
-  const href = React.useRef<HTMLDivElement|null>(null);
+  const href = React.useRef<HTMLDivElement>(null);
   const divElt = href.current;
   const [menu] = States.useGlobalState(MENU);
   const { comp, dock, close } = menu;
   const display = comp !== '';
+
+  React.useEffect(() => {
+    if (display && divElt) {
+      divElt.focus({ preventScroll: true });
+    }
+  }, [display, divElt]);
+
   const className = classes(
     'dome-color-frame',
     'labview-layout-menu',
@@ -245,8 +250,8 @@ function LayoutMenu(): JSX.Element | null {
 
   const maxWidth = window.innerWidth;
   const maxHeight = window.innerHeight;
-  const panelWidth = divElt?.offsetWidth ?? 50;
-  const panelHeight = divElt?.offsetHeight ?? 80;
+  const panelWidth = divElt?.offsetWidth ?? 0;
+  const panelHeight = divElt?.offsetHeight ?? 0;
 
   const left = Math.max(0, Math.min(menu.x, maxWidth - panelWidth));
   const top = Math.max(0, Math.min(menu.y, maxHeight - panelHeight));
@@ -255,7 +260,14 @@ function LayoutMenu(): JSX.Element | null {
   const onClose = (): void => { /* console.log('CLOSE', comp);*/ };
 
   return (
-    <div ref={href} className={className} style={{ left, top }}>
+    <div
+      ref={href}
+      tabIndex={0}
+      className={className}
+      style={{ left, top }}
+      onBlur={closeMenu}
+      onKeyDown={closeMenu}
+    >
       <Grid columns='24px 24px 24px'>
         <Quarter comp={comp} pos='A'    />
         <Quarter comp={comp} pos='AB'   />
@@ -268,9 +280,9 @@ function LayoutMenu(): JSX.Element | null {
         <Quarter comp={comp} pos='D'    />
       </Grid>
       <Action display={dock}
-        label='Dock' icon='QSPLIT.DOCK' onClick={onDock} />
+              label='Dock' icon='QSPLIT.DOCK' onClick={onDock} />
       <Action display={close}
-        label='Close' icon='TRASH' onClick={onClose} />
+              label='Close' icon='TRASH' onClick={onClose} />
     </div>
   );
 }
