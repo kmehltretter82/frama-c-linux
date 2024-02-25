@@ -204,8 +204,15 @@ export function Item(props: ItemProps): JSX.Element {
   const onSelection = isDisabled ? undefined : props.onSelection;
   const onClick =
     onSelection ? (e: React.MouseEvent) => {
-       setClicked(true); onSelection(e); } : undefined;
+      setClicked(true);
+      onSelection(e);
+    } : undefined;
   const onContextMenu = isDisabled ? undefined : props.onContextMenu;
+  const onRightClick =
+    onContextMenu ? (e: React.MouseEvent) => {
+      setClicked(true);
+      onContextMenu(e);
+    } : undefined;
   const className = classes(
     'dome-xSideBarItem',
     selected ? 'dome-active' : 'dome-inactive',
@@ -217,7 +224,7 @@ export function Item(props: ItemProps): JSX.Element {
     if (!clicked && selected) {
       ref?.current?.scrollIntoView({
         behavior: 'auto',
-        block: 'center',
+        inline: 'nearest',
       });
     }
     if (!selected && clicked)
@@ -230,7 +237,7 @@ export function Item(props: ItemProps): JSX.Element {
       className={className}
       style={props.style}
       title={props.title}
-      onContextMenu={onContextMenu}
+      onContextMenu={onRightClick}
       onClick={onClick}
     >
       <Label icon={props.icon} label={props.label} />
