@@ -82,7 +82,7 @@ const LAB = new States.GlobalState<LabViewState>({
 /* --- Layout Utilities                                                   --- */
 /* -------------------------------------------------------------------------- */
 
-function removeLayout(m: Layout, cid: compId): Layout
+function removeComponent(m: Layout, cid: compId): Layout
 {
   const { A, B, C, D } = m;
   return {
@@ -93,9 +93,9 @@ function removeLayout(m: Layout, cid: compId): Layout
   };
 }
 
-function addLayout(m: Layout, cid: compId, p: LayoutPosition): Layout
+function addComponent(m: Layout, cid: compId, p: LayoutPosition): Layout
 {
-  m = removeLayout(m, cid);
+  m = removeComponent(m, cid);
   switch(p) {
     case 'A': return { ...m, A: cid };
     case 'B': return { ...m, B: cid };
@@ -108,6 +108,21 @@ function addLayout(m: Layout, cid: compId, p: LayoutPosition): Layout
     case 'ABCD': return { A: cid, B: cid, C: cid, D: cid };
     default: return m;
   }
+}
+
+function addLayout(m: Layout, view: Ivette.Layout): Layout
+{
+  type Unstructured = {
+    A ?: compId, B ?: compId, C ?: compId, D ?: compId,
+    AB ?: compId, AC ?: compId, BD ?: compId, CD ?: compId,
+    ABCD ?: compId
+  };
+  const u = view as Unstructured;
+  const A : compId = u.A ?? u.AB ?? u.AC ?? u.ABCD ?? m.A;
+  const B : compId = u.B ?? u.AB ?? u.BD ?? u.ABCD ?? m.B;
+  const C : compId = u.C ?? u.AC ?? u.CD ?? u.ABCD ?? m.C;
+  const D : compId = u.D ?? u.CD ?? u.BD ?? u.ABCD ?? m.D;
+  return { A, B, C, D };
 }
 
 function getPosition(m: Layout, cid: compId): LayoutPosition | undefined
@@ -130,7 +145,7 @@ function getPosition(m: Layout, cid: compId): LayoutPosition | undefined
 }
 
 {
-  getPosition(addLayout(defaultLayout, 'Console', 'A'), 'Console');
+  getPosition(addComponent(defaultLayout, 'Console', 'A'), 'Console');
 }
 
 /* -------------------------------------------------------------------------- */
@@ -145,6 +160,18 @@ function setCurrentView(view: viewId = ''):void {
 function setCurrentComp(comp: compId = ''):void {
   const state = LAB.getValue();
   LAB.setValue({ ...state, sideComp: comp, sideView: '' });
+}
+
+function applyView(view: Ivette.ViewLayoutProps): void {
+  const state = LAB.getValue();
+  const layout = addLayout(state.layout, view.layout);
+  const panels = state.panels;
+  // Side effect on state.panels, but it is OK
+  panels.add(layout.A);
+  panels.add(layout.B);
+  panels.add(layout.C);
+  panels.add(layout.D);
+  LAB.setValue({ ...state, panels, layout, sideView: view.id, sideComp: '' });
 }
 
 /* -------------------------------------------------------------------------- */
@@ -198,7 +225,6 @@ function Quarter(props: QuarterProps): JSX.Element {
   const icon = 'QSPLIT.' + pos;
   const onClick = ():void => {
     closeMenu();
-    // console.log('LAYOUT', comp, pos);
   };
   return (
     <IconButton
@@ -256,8 +282,8 @@ function LayoutMenu(): JSX.Element | null {
   const left = Math.max(0, Math.min(menu.x, maxWidth - panelWidth));
   const top = Math.max(0, Math.min(menu.y, maxHeight - panelHeight));
 
-  const onDock = (): void => { /* console.log('DOCK', comp);*/ };
-  const onClose = (): void => { /* console.log('CLOSE', comp);*/ };
+  const onDock = (): void => { closeMenu(); };
+  const onClose = (): void => { closeMenu(); };
 
   return (
     <div
@@ -307,13 +333,8 @@ function Pane(props: PaneProps): JSX.Element | null {
   return (
     <QPane id={comp}>
       <Vfill className="labview-content">
-        <Hbox className="labview-titlebar">
+        <Hbox className="labview-titlebar" onContextMenu={onLayout}>
           <Hfill>
-            <Icon
-              id={"ITEMS.GRID"}
-              className="titlebar-thin-icon"
-              onClick={onLayout}
-            />
             <Catch label={comp}>
               <RenderElement id={`labview.title.${comp}`}>
                 <Label
@@ -343,6 +364,7 @@ export function LabView(): JSX.Element {
     (H, V) => LAB.setValue({ ...state, scroll: { H, V } }),
     [state]
   );
+  const { H, V } = state.scroll;
   const { A, B, C, D } = state.layout;
   const panels : JSX.Element[] = [];
   state.panels.forEach((id) => panels.push(<Pane key={id} comp={id}/>));
@@ -351,7 +373,7 @@ export function LabView(): JSX.Element {
       <LayoutMenu />
       <QSplit
         className='labview-container'
-        A={A} B={B} C={C} D={D}
+        A={A} B={B} C={C} D={D} H={H} V={V}
         setPosition={setPosition}
       >{panels}</QSplit>
     </>
@@ -372,8 +394,7 @@ function ViewItem(props: ViewItemProps): JSX.Element {
   const { id, label, title } = view;
 
   const onSelection = (_evt:React.MouseEvent): void => {
-    setCurrentView(id);
-    /* evt.shiftKey ? createTabFromView(view) : applyView(view);*/
+    applyView(view);
   };
 
   const onContextMenu = (): void => {
@@ -450,7 +471,6 @@ function ComponentItem(props: ComponentItemProps): JSX.Element {
       onSelection={onSelection}
       onContextMenu={onContextMenu}
       selected={selected}
-      disabled={active}
     />
   );
 }
@@ -554,9 +574,6 @@ function DockItem(props: DockItemProps): JSX.Element {
   const label = comp?.label ?? id;
   const icon = 'QSPLIT.' + pos;
   const title = `Display ${label} (right-click for more actions)`;
-  const onClick = (): void => {
-    // console.log('LAYOUT', id, pos);
-  };
   const onContextMenu = (_: void, evt: React.MouseEvent): void => {
     openLayoutMenu(id, dockActions, evt);
   };
@@ -565,7 +582,6 @@ function DockItem(props: DockItemProps): JSX.Element {
       icon={icon}
       label={label}
       title={title}
-      onClick={onClick}
       onContextMenu={onContextMenu}
     />
   );

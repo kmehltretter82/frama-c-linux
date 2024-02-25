@@ -114,6 +114,8 @@ export interface IconProps extends SVGprops {
   kind?: IconKind;
   /** Click callback. */
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  /** Right-Click callback. */
+  onContextMenu?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 /**
@@ -122,9 +124,10 @@ export interface IconProps extends SVGprops {
  */
 export function Icon(props: IconProps): JSX.Element {
   const {
-    id, title, onClick, fill, kind='default',
+    id, title, fill, kind='default',
     size, className, offset, style,
     visible = true, display = true,
+    onClick, onContextMenu,
   } = props;
   const divClass = classes(
     'dome-xIcon', `dome-xIcon-${kind}`,
@@ -138,6 +141,7 @@ export function Icon(props: IconProps): JSX.Element {
       className={divClass}
       style={divStyle}
       onClick={onClick}
+      onContextMenu={onContextMenu}
     >
       <SVG id={id} size={size} title={title} offset={offset} />
     </div>
