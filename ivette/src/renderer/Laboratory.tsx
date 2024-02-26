@@ -82,31 +82,33 @@ const LAB = new States.GlobalState<LabViewState>({
 /* --- Layout Utilities                                                   --- */
 /* -------------------------------------------------------------------------- */
 
-function removeComponent(m: Layout, cid: compId): Layout
+function removeComponent(layout: Layout, compId: compId): Layout
 {
-  const { A, B, C, D } = m;
+  const { A, B, C, D } = layout;
   return {
-    A: A !== cid ? A : '',
-    B: B !== cid ? B : '',
-    C: A !== cid ? C : '',
-    D: A !== cid ? D : '',
+    A: A !== compId ? A : '',
+    B: B !== compId ? B : '',
+    C: A !== compId ? C : '',
+    D: A !== compId ? D : '',
   };
 }
 
-function addComponent(m: Layout, cid: compId, p: LayoutPosition): Layout
+function addComponent(
+  layout: Layout, compId: compId, p: LayoutPosition
+): Layout
 {
-  m = removeComponent(m, cid);
+  layout = removeComponent(layout, compId);
   switch(p) {
-    case 'A': return { ...m, A: cid };
-    case 'B': return { ...m, B: cid };
-    case 'C': return { ...m, C: cid };
-    case 'D': return { ...m, D: cid };
-    case 'AB': return { ...m, A: cid, B: cid };
-    case 'AC': return { ...m, A: cid, C: cid };
-    case 'BD': return { ...m, B: cid, D: cid };
-    case 'CD': return { ...m, C: cid, D: cid };
-    case 'ABCD': return { A: cid, B: cid, C: cid, D: cid };
-    default: return m;
+    case 'A': return { ...layout, A: compId };
+    case 'B': return { ...layout, B: compId };
+    case 'C': return { ...layout, C: compId };
+    case 'D': return { ...layout, D: compId };
+    case 'AB': return { ...layout, A: compId, B: compId };
+    case 'AC': return { ...layout, A: compId, C: compId };
+    case 'BD': return { ...layout, B: compId, D: compId };
+    case 'CD': return { ...layout, C: compId, D: compId };
+    case 'ABCD': return { A: compId, B: compId, C: compId, D: compId };
+    default: return layout;
   }
 }
 
@@ -140,13 +142,15 @@ function fillLayout(m: Layout): Layout
   };
 }
 
-function getPosition(m: Layout, cid: compId): LayoutPosition | undefined
+function getPosition(
+  layout: Layout, compId: compId
+): LayoutPosition | undefined
 {
-  const { A, B, C, D } = m;
-  const a = A === cid;
-  const b = B === cid;
-  const c = C === cid;
-  const d = D === cid;
+  const { A, B, C, D } = layout;
+  const a = A === compId;
+  const b = B === compId;
+  const c = C === compId;
+  const d = D === compId;
   if (a && b && c && d) return 'ABCD';
   if (a && b) return 'AB';
   if (a && c) return 'AC';
@@ -167,14 +171,14 @@ function getPosition(m: Layout, cid: compId): LayoutPosition | undefined
 /* --- LabView Actions                                                    --- */
 /* -------------------------------------------------------------------------- */
 
-function setCurrentView(view: viewId = ''):void {
+function setCurrentView(viewId: viewId = ''):void {
   const state = LAB.getValue();
-  LAB.setValue({ ...state, sideView: view, sideComp: '' });
+  LAB.setValue({ ...state, sideView: viewId, sideComp: '' });
 }
 
-function setCurrentComp(comp: compId = ''):void {
+function setCurrentComp(compId: compId = ''):void {
   const state = LAB.getValue();
-  LAB.setValue({ ...state, sideComp: comp, sideView: '' });
+  LAB.setValue({ ...state, sideComp: compId, sideView: '' });
 }
 
 function applyView(view: Ivette.ViewLayoutProps): void {
@@ -213,13 +217,13 @@ interface Actions {
 }
 
 interface LayoutMenuState extends Actions {
-  comp: compId;
+  compId: compId;
   x: number;
   y: number;
 }
 
 const closedMenu: LayoutMenuState = {
-  comp: '',
+  compId: '',
   dock: false,
   close: false,
   x: 0,
@@ -229,11 +233,11 @@ const closedMenu: LayoutMenuState = {
 const MENU = new States.GlobalState<LayoutMenuState>(closedMenu);
 
 function openLayoutMenu(
-  comp: compId,
+  compId: compId,
   actions: Actions,
   evt: React.MouseEvent
 ): void {
-  MENU.setValue({ ...actions, comp, x: evt.clientX, y: evt.clientY });
+  MENU.setValue({ ...actions, compId, x: evt.clientX, y: evt.clientY });
 }
 
 function closeMenu(): void {
@@ -245,7 +249,8 @@ function closeMenu(): void {
 /* -------------------------------------------------------------------------- */
 
 interface QuarterProps {
-  comp: compId;
+  compId: compId;
+  layout: Layout;
   pos: LayoutPosition;
 }
 
@@ -288,8 +293,10 @@ function LayoutMenu(): JSX.Element | null {
   const href = React.useRef<HTMLDivElement>(null);
   const divElt = href.current;
   const [menu] = States.useGlobalState(MENU);
-  const { comp, dock, close } = menu;
-  const display = comp !== '';
+  const [state] = States.useGlobalState(LAB);
+  const layout = fillLayout(state.layout);
+  const { compId, dock, close } = menu;
+  const display = compId !== '';
 
   React.useEffect(() => {
     if (display && divElt) {
@@ -324,15 +331,15 @@ function LayoutMenu(): JSX.Element | null {
       onKeyDown={closeMenu}
     >
       <Grid columns='24px 24px 24px'>
-        <Quarter comp={comp} pos='A'    />
-        <Quarter comp={comp} pos='AB'   />
-        <Quarter comp={comp} pos='B'    />
-        <Quarter comp={comp} pos='AC'   />
-        <Quarter comp={comp} pos='ABCD' />
-        <Quarter comp={comp} pos='BD'   />
-        <Quarter comp={comp} pos='C'    />
-        <Quarter comp={comp} pos='CD'   />
-        <Quarter comp={comp} pos='D'    />
+        <Quarter compId={compId} layout={layout} pos='A'    />
+        <Quarter compId={compId} layout={layout} pos='AB'   />
+        <Quarter compId={compId} layout={layout} pos='B'    />
+        <Quarter compId={compId} layout={layout} pos='AC'   />
+        <Quarter compId={compId} layout={layout} pos='ABCD' />
+        <Quarter compId={compId} layout={layout} pos='BD'   />
+        <Quarter compId={compId} layout={layout} pos='C'    />
+        <Quarter compId={compId} layout={layout} pos='CD'   />
+        <Quarter compId={compId} layout={layout} pos='D'    />
       </Grid>
       <Action display={dock}
               label='Dock' icon='QSPLIT.DOCK' onClick={onDock} />
@@ -346,26 +353,26 @@ function LayoutMenu(): JSX.Element | null {
 /* --- Pane Component                                                     --- */
 /* -------------------------------------------------------------------------- */
 
-interface PaneProps { comp: compId }
+interface PaneProps { compId: compId }
 
 const paneActions: Actions = { dock: true, close: true };
 
 function Pane(props: PaneProps): JSX.Element | null {
-  const { comp } = props;
-  const component = Ext.useElement(COMPONENT, comp);
+  const { compId } = props;
+  const component = Ext.useElement(COMPONENT, compId);
   const onLayout = React.useCallback(
-    (evt) => openLayoutMenu(comp, paneActions, evt),
-    [comp]
+    (evt) => openLayoutMenu(compId, paneActions, evt),
+    [compId]
   );
   if (!component) return null;
   const { label, title, children } = component;
   return (
-    <QPane id={comp}>
+    <QPane id={compId}>
       <Vfill className="labview-content">
         <Hbox className="labview-titlebar" onContextMenu={onLayout}>
           <Hfill>
-            <Catch label={comp}>
-              <RenderElement id={`labview.title.${comp}`}>
+            <Catch label={compId}>
+              <RenderElement id={`labview.title.${compId}`}>
                 <Label
                   className="labview-handle"
                   label={label}
@@ -374,8 +381,8 @@ function Pane(props: PaneProps): JSX.Element | null {
             </Catch>
           </Hfill>
         </Hbox>
-        <Ivette.TitleContext.Provider value={{ id: comp, label, title }}>
-          <Catch label={comp}>{children}</Catch>
+        <Ivette.TitleContext.Provider value={{ id: compId, label, title }}>
+          <Catch label={compId}>{children}</Catch>
         </Ivette.TitleContext.Provider>
       </Vfill>
     </QPane>
@@ -396,7 +403,7 @@ export function LabView(): JSX.Element {
   const { A, B, C, D } = fillLayout(state.layout);
   const { H, V } = state.scroll;
   const panels : JSX.Element[] = [];
-  state.panels.forEach((id) => panels.push(<Pane key={id} comp={id}/>));
+  state.panels.forEach((id) => panels.push(<Pane key={id} compId={id}/>));
   return (
     <>
       <LayoutMenu />
@@ -599,12 +606,12 @@ Ivette.registerSidebar({
 const dockActions: Actions = { dock: false, close: true };
 
 interface DockItemProps {
-  comp: compId;
+  compId: compId;
   pos: LayoutPosition;
 }
 
 function DockItem(props: DockItemProps): JSX.Element {
-  const { comp: id, pos } = props;
+  const { compId: id, pos } = props;
   const comp = Ext.useElement(COMPONENT, id);
   const label = comp?.label ?? id;
   const icon = 'QSPLIT.' + pos;
@@ -625,8 +632,8 @@ function DockItem(props: DockItemProps): JSX.Element {
 export function Dock(): JSX.Element {
   const [{ docked }] = States.useGlobalState(LAB);
   const items: JSX.Element[] = [];
-  docked.forEach((pos, comp) => {
-    items.push(<DockItem key={comp} comp={comp} pos={pos} />);
+  docked.forEach((pos, compId) => {
+    items.push(<DockItem key={compId} compId={compId} pos={pos} />);
   });
   return <>{items}</>;
 }
