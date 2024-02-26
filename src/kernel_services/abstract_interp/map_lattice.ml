@@ -392,8 +392,7 @@ module Make_MapSet_Lattice
 
   let is_included t1 t2 =
     match t1, t2 with
-    | Top (s1, o1), Top (s2, o2)   ->
-      KSet.is_included s1 s2 && Origin.is_included o1 o2
+    | Top (s1, _), Top (s2, _)   -> KSet.is_included s1 s2
     | Map _, Top (KSet.Top, _)   -> true
     | Map m, Top (KSet.Set s, _) -> KVMap.for_all (fun k _ -> KSet.O.mem k s) m
     | Top _, Map _               -> false

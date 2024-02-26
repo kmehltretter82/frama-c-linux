@@ -119,8 +119,6 @@ let join t1 t2 =
     | Well, _ | _, Well -> Well
     | Origin o1, Origin o2 -> if o1.id <= o2.id then t1 else t2
 
-let is_included = equal
-
 
 (* For each garbled mix origin, keep track of:
    - the number of writes (according to [register_write] below), i.e. the number

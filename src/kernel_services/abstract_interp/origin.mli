@@ -53,7 +53,6 @@ val pretty_as_reason: Format.formatter -> t -> unit
 val descr: t -> string
 
 val join: t -> t -> t
-val is_included: t -> t -> bool
 
 (** Records the write of an imprecise value of the given bases,
     with the given origin.
