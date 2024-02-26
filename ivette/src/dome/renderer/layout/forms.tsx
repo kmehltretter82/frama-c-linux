@@ -115,11 +115,11 @@ function isValidArray(err: FieldError[]): boolean {
   return true;
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Reset Hooks                                                        ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Buffer Controller                                                  --- */
+/* -------------------------------------------------------------------------- */
 
-export type ResetCallback = () => void;
+export type BufferCallback = () => void;
 
 /**
    Controller for _buffered_ field states.
@@ -144,25 +144,76 @@ export class BufferController {
   getErrors(): number { return this.errors; }
 
   /** @internal */
-  onReset(fn: ResetCallback): void { this.evt.addListener('reset', fn); }
+  onReset(fn: BufferCallback): void {
+    this.evt.addListener('reset', fn);
+    this.notify();
+  }
 
   /** @internal */
-  offReset(fn: ResetCallback): void { this.evt.removeListener('reset', fn); }
+  protected notify(): void { this.evt.emit('update'); }
 
   /** @internal */
-  onCommit(fn: ResetCallback): void { this.evt.addListener('commit', fn); }
+  onChange(fn: BufferCallback): void { this.evt.addListener('update', fn); }
 
   /** @internal */
-  offCommit(fn: ResetCallback): void { this.evt.removeListener('commit', fn); }
+  offChange(fn: BufferCallback): void { this.evt.removeListener('update', fn); }
 
   /** @internal */
-  addError(): void { this.errors++; }
+  offReset(fn: BufferCallback): void {
+    this.evt.removeListener('reset', fn);
+    this.notify();
+  }
 
   /** @internal */
-  removeError(): void { this.errors--; }
+  onCommit(fn: BufferCallback): void {
+    this.evt.addListener('commit', fn);
+    this.notify();
+  }
+
+  /** @internal */
+  offCommit(fn: BufferCallback): void {
+    this.evt.removeListener('commit', fn);
+    this.notify();
+  }
+
+  /** @internal */
+  addError(): void {
+    this.errors++;
+    this.notify();
+  }
+
+  /** @internal */
+  removeError(): void {
+    this.errors--;
+    this.notify();
+  }
 }
 
-export type Equal<A> = (a: A, b: A) => boolean;
+/**
+   Hook for using a Buffer Controller. Typical use cases:
+
+   - `const ctrl = useController()` to obtain a new, monitored controller;
+   - `useController(ctrl)` to monitor changes on existing controller `ctrl`.
+
+   You can also use a mix of the two usages, to monitor an optional controller
+   or a local one.
+ */
+export function useController(ctrl?: BufferController): BufferController {
+  const self = React.useMemo(() => new BufferController(), []);
+  const current = ctrl ?? self;
+  const update = Dome.useForceUpdate();
+  React.useEffect(() => {
+    current.onChange(update);
+    return () => current.offChange(update);
+  }, [current, update]);
+  return current;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Buffered State                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+export type Equal<A> = (a:A, b:A) => boolean;
 
 function compare<A>(equal: Equal<A> | undefined, a: A, b: A): boolean {
   return equal ? equal(a, b) : a === b;
