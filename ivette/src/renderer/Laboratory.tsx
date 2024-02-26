@@ -88,8 +88,8 @@ function removeComponent(layout: Layout, compId: compId): Layout
   return {
     A: A !== compId ? A : '',
     B: B !== compId ? B : '',
-    C: A !== compId ? C : '',
-    D: A !== compId ? D : '',
+    C: C !== compId ? C : '',
+    D: D !== compId ? D : '',
   };
 }
 
@@ -137,7 +137,7 @@ function fillLayout(m: Layout): Layout
   return {
     A: A || ( BD ? C : B ) || B || C || D,
     B: B || ( AC ? D : A ) || A || D || C,
-    C: C || ( BD ? D : A ) || D || A || B,
+    C: C || ( BD ? A : D ) || D || A || B,
     D: D || ( AB ? C : B ) || C || B || A,
   };
 }
@@ -163,10 +163,6 @@ function getPosition(
   return undefined;
 }
 
-{
-  getPosition(defaultLayout, 'Console');
-}
-
 /* -------------------------------------------------------------------------- */
 /* --- LabView Actions                                                    --- */
 /* -------------------------------------------------------------------------- */
@@ -185,12 +181,11 @@ function applyView(view: Ivette.ViewLayoutProps): void {
   const state = LAB.getValue();
   const layout = addLayout(state.layout, view.layout);
   const panels = state.panels;
-  // Side effect on state.panels, but it is OK
   panels.add(layout.A);
   panels.add(layout.B);
   panels.add(layout.C);
   panels.add(layout.D);
-  LAB.setValue({ ...state, panels, layout, sideView: view.id, sideComp: '' });
+  LAB.setValue({ ...state, layout, sideView: view.id, sideComp: '' });
 }
 
 function applyComponent(
@@ -201,10 +196,17 @@ function applyComponent(
   const { id, preferredPosition } = comp;
   const pos = at ?? preferredPosition ?? 'D';
   const layout = addComponent(state.layout, id, pos);
-  const panels = state.panels;
-  // Side effect on state.panels, but it is OK
-  panels.add(id);
-  LAB.setValue({ ...state, panels, layout, sideView: '', sideComp: id });
+  state.panels.add(id);
+  LAB.setValue({ ...state, layout, sideView: '', sideComp: id });
+}
+
+function closeComponent(compId: compId): void
+{
+  const state = LAB.getValue();
+  const layout = removeComponent(state.layout, compId);
+  state.panels.delete(compId);
+  state.docked.delete(compId);
+  LAB.setValue({ ...state, layout, sideView: '', sideComp: compId });
 }
 
 /* -------------------------------------------------------------------------- */
@@ -255,15 +257,19 @@ interface QuarterProps {
 }
 
 function Quarter(props: QuarterProps): JSX.Element {
-  const { pos } = props;
+  const { layout, compId, pos } = props;
   const icon = 'QSPLIT.' + pos;
   const onClick = ():void => {
     closeMenu();
+    const comp = COMPONENT.getElement(compId);
+    if (comp) applyComponent(comp, pos);
   };
+  const curp = getPosition(layout, compId);
   return (
     <IconButton
       className='labview-layout-quarter'
       icon={icon}
+      disabled={curp === pos}
       onClick={onClick} />
   );
 }
@@ -294,7 +300,7 @@ function LayoutMenu(): JSX.Element | null {
   const divElt = href.current;
   const [menu] = States.useGlobalState(MENU);
   const [state] = States.useGlobalState(LAB);
-  const layout = fillLayout(state.layout);
+  const layout = state.layout;
   const { compId, dock, close } = menu;
   const display = compId !== '';
 
@@ -318,8 +324,15 @@ function LayoutMenu(): JSX.Element | null {
   const left = Math.max(0, Math.min(menu.x, maxWidth - panelWidth));
   const top = Math.max(0, Math.min(menu.y, maxHeight - panelHeight));
 
-  const onDock = (): void => { closeMenu(); };
-  const onClose = (): void => { closeMenu(); };
+  const onDock = (): void => {
+    closeMenu();
+  };
+
+
+  const onClose = (): void => {
+    closeMenu();
+    closeComponent(compId);
+  };
 
   return (
     <div
@@ -481,14 +494,24 @@ function ViewSection(): JSX.Element {
 
 interface ComponentItemProps {
   comp: Ivette.ComponentProps;
+  position: LayoutPosition | undefined;
   selected: boolean;
   active: boolean;
   docked: boolean;
 }
 
 function ComponentItem(props: ComponentItemProps): JSX.Element {
-  const { comp, selected, active, docked } = props;
-  const { id, label, title } = comp;
+  const { comp, position, selected, active, docked } = props;
+  const { id, label, title = label } = comp;
+  const icon =
+    position ? 'QSPLIT.' + position :
+    docked ? 'QSPLIT.DOCK' :
+    active ? 'EXECUTE' : 'COMPONENT';
+
+  const status =
+    position ? 'Visible' :
+    docked ? 'Docked' :
+    active ? 'Running' : 'Closed';
 
   const onSelection = (): void => {
     setCurrentComp(id);
@@ -506,9 +529,9 @@ function ComponentItem(props: ComponentItemProps): JSX.Element {
 
   return (
     <Sidebars.Item
-      icon='COMPONENT'
+      icon={icon}
       label={label}
-      title={title}
+      title={`${title} (${status})`}
       onSelection={onSelection}
       onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}
@@ -535,13 +558,14 @@ function GroupSection(props: GroupSectionProps): JSX.Element | null {
   const { id, label, title, filter } = props;
   const settings = 'ivette.sidebar.group.' + id;
   const components = Ext.useElements(COMPONENT).filter(filter) ?? [];
-  const [{ panels, docked, sideComp }] = States.useGlobalState(LAB);
+  const [{ panels, docked, sideComp, layout }] = States.useGlobalState(LAB);
   const items = components.map((comp) => {
     const { id } = comp;
     return (
       <ComponentItem
         key={id}
         comp={comp}
+        position={getPosition(layout, id)}
         selected={id === sideComp}
         active={panels.has(id)}
         docked={docked.has(id)}
