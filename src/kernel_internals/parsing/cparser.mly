@@ -1086,7 +1086,7 @@ declaration:                                /* ISO 6.7.*/
         end;
         !Lexerhack.reset_typedef();
         doDeclaration (Some $1) ((snd $2)) (fst $2) [] }
-|   static_assert_declaration
+|   static_assert_declaration SEMICOLON
       { let (e, m, loc) = $1 in STATIC_ASSERT (e, m, loc) }
 ;
 
