@@ -260,10 +260,7 @@ const sameOf = (P: Pid, Q: Pid): Pid => {
 };
 
 const merge = (U: Sid, V: Sid): Sid => {
-  if (U === V) return U;
-  if (U === undefined) return V;
-  if (V === undefined) return U;
-  return null;
+  return U === V ? U : null;
 };
 
 const fullOf = (A: Pid, B: Pid, C: Pid, D: Pid): Pid => {
@@ -308,65 +305,65 @@ function QSplitEngine(props: QSplitEngineProps): JSX.Element {
   const CD = sameOf(C, D);
   const ABCD = fullOf(A, B, C, D);
   // ----------------------------------------
-  // [ A ]
+  // [ ABCD ]
   // ---------------------------------------
   if (ABCD) {
     DISPLAY(layout, ABCD, 0, width, 0, height);
   }
   // ----------------------------------------
-  // [ A - C ]
+  // [ AB -- CD ]
   // ---------------------------------------
   else if (AB && CD) {
     vsplit = VSPLIT(0, Y, width);
-    DISPLAY(layout, AB, 0, width, 0, Y);
     DISPLAY(layout, CD, 0, width, Y + 1, RY);
+    DISPLAY(layout, AB, 0, width, 0, Y);
   }
   // ----------------------------------------
-  // [ A | B ]
+  // [ AC | BD ]
   // ---------------------------------------
   else if (AC && BD) {
     hsplit = HSPLIT(X, 0, height);
-    DISPLAY(layout, AC, 0, X, 0, height);
     DISPLAY(layout, BD, X + 1, RX, 0, height);
+    DISPLAY(layout, AC, 0, X, 0, height);
   }
   // ----------------------------------------
-  // [ A – C|D ]
+  // [ AB -- C | D ]
   // ----------------------------------------
   else if (AB) {
     hsplit = HSPLIT(X, Y, RY);
     vsplit = VSPLIT(0, Y, width);
-    DISPLAY(layout, AB, 0, width, 0, Y);
-    DISPLAY(layout, C, 0, X, Y + 1, RY);
     DISPLAY(layout, D, X + 1, RX, Y + 1, RY);
+    DISPLAY(layout, C, 0, X, Y + 1, RY);
+    DISPLAY(layout, AB, 0, width, 0, Y);
   }
   // ----------------------------------------
-  // [ A | B-D ]
+  // [ AC | B -- D ]
   // ----------------------------------------
   else if (AC) {
     hsplit = HSPLIT(X, 0, height);
     vsplit = VSPLIT(X, Y, RY);
-    DISPLAY(layout, AC, 0, X, 0, height);
-    DISPLAY(layout, B, X + 1, RX, 0, Y);
     DISPLAY(layout, D, X + 1, RX, Y + 1, RY);
+    DISPLAY(layout, B, X + 1, RX, 0, Y);
+    DISPLAY(layout, AC, 0, X, 0, height);
   }
   // ----------------------------------------
-  // [ A-C | B ]
+  // [ A -- C | BD ]
   // ----------------------------------------
   else if (BD) {
     hsplit = HSPLIT(X, 0, height);
     vsplit = VSPLIT(0, Y, X);
+    DISPLAY(layout, C, 0, X, Y + 1, RY);
     DISPLAY(layout, A, 0, X, 0, Y);
     DISPLAY(layout, BD, X + 1, RX, 0, height);
-    DISPLAY(layout, C, 0, X, Y + 1, RY);
   }
   // ----------------------------------------
-  // [ A|B - C ]
+  // [ A | B -- CD ]
   // ----------------------------------------
   else if (CD) {
     hsplit = HSPLIT(X, 0, Y);
     vsplit = VSPLIT(0, Y, width);
-    DISPLAY(layout, A, 0, X, 0, Y);
     DISPLAY(layout, B, X + 1, RX, 0, Y);
+    DISPLAY(layout, A, 0, X, 0, Y);
     DISPLAY(layout, CD, 0, width, Y + 1, RY);
   }
   // ----------------------------------------
@@ -375,10 +372,10 @@ function QSplitEngine(props: QSplitEngineProps): JSX.Element {
   else {
     hsplit = HSPLIT(X, 0, height);
     vsplit = VSPLIT(0, Y, width);
-    DISPLAY(layout, A, 0, X, 0, Y);
-    DISPLAY(layout, B, X + 1, RX, 0, Y);
-    DISPLAY(layout, C, 0, X, Y + 1, RY);
     DISPLAY(layout, D, X + 1, RX, Y + 1, RY);
+    DISPLAY(layout, C, 0, X, Y + 1, RY);
+    DISPLAY(layout, B, X + 1, RX, 0, Y);
+    DISPLAY(layout, A, 0, X, 0, Y);
   }
   // ----------------------------------------
   if (hsplit !== NODISPLAY && vsplit !== NODISPLAY)

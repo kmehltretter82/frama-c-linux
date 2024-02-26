@@ -125,6 +125,21 @@ function addLayout(m: Layout, view: Ivette.Layout): Layout
   return { A, B, C, D };
 }
 
+function fillLayout(m: Layout): Layout
+{
+  const { A, B, C, D } = m;
+  if (A && B && C && D) return m;
+  const AB = A && A === B;
+  const AC = A && A === C;
+  const BD = B && B === D;
+  return {
+    A: A || ( BD ? C : B ) || B || C || D,
+    B: B || ( AC ? D : A ) || A || D || C,
+    C: C || ( BD ? D : A ) || D || A || B,
+    D: D || ( AB ? C : B ) || C || B || A,
+  };
+}
+
 function getPosition(m: Layout, cid: compId): LayoutPosition | undefined
 {
   const { A, B, C, D } = m;
@@ -364,8 +379,8 @@ export function LabView(): JSX.Element {
     (H, V) => LAB.setValue({ ...state, scroll: { H, V } }),
     [state]
   );
+  const { A, B, C, D } = fillLayout(state.layout);
   const { H, V } = state.scroll;
-  const { A, B, C, D } = state.layout;
   const panels : JSX.Element[] = [];
   state.panels.forEach((id) => panels.push(<Pane key={id} comp={id}/>));
   return (
