@@ -47,6 +47,15 @@ let deps_nth_arg n =
     Deps.add_data Deps.bottom (Locations.zone_of_varinfo vi)
   with Failure _ -> Kernel.fatal "%d arguments expected" n
 
+(* Preconditions of memcpy, memmove and memset ensures that pointer arguments
+   are valid. Reduce them accordingly. *)
+let reduce_to_valid_loc dst size access =
+  let min_size = Ival.min_int size in
+  let size = Option.fold ~none:Int_Base.zero ~some:Int_Base.inject min_size in
+  let dst_loc = Locations.make_loc dst size in
+  let valid_dst_loc = Locations.valid_part ~bitfield:false access dst_loc in
+  valid_dst_loc.Locations.loc
+
 (* -------------------------------------------------------------------------- *)
 (*                             Memcpy & Memmove                               *)
 (* -------------------------------------------------------------------------- *)
@@ -220,10 +229,9 @@ let frama_c_memcpy _name state actuals =
     let size = Ival.scale (Bit_utils.sizeofchar ()) size in
     let src = loc_bytes_to_loc_bits src_cvalue in
     let dst = loc_bytes_to_loc_bits dst_cvalue in
-    (* Remove read-only destinations. *)
-    let dst =
-      Location_Bits.filter_base (fun b -> not (Base.is_read_only b)) dst
-    in
+    (* Remove invalid locations. *)
+    let src = reduce_to_valid_loc src size Locations.Read in
+    let dst = reduce_to_valid_loc dst size Locations.Write in
     (* Do the copy. *)
     let state, memory, sure_output =
       compute_memcpy ~dst_lval ~dst ~src ~size state
@@ -505,9 +513,7 @@ let frama_c_memset state actuals =
       let size = Ival.scale (Bit_utils.sizeofchar ()) size in
       let dst = Locations.loc_bytes_to_loc_bits dst_cvalue in
       (* Remove read-only destinations *)
-      let dst =
-        Location_Bits.filter_base (fun b -> not (Base.is_read_only b)) dst
-      in
+      let dst = reduce_to_valid_loc dst size Locations.Write in
       (* Keep only the first byte of the value argument *)
       let _, v = Cvalue.V.extract_bits
           ~topify:Origin.Misalign_read

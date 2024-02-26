@@ -44,7 +44,7 @@ void test() {
   memset(p, 0x22, 16); // multiple dest
 
   p = vol ? (char*) 0 : t8;
-  memset(p, 0x22, 16); // one valid dest; TODO
+  memset(p, 0x22, 16); // one valid dest;
 
   p = t9+20;
   while (1) {
