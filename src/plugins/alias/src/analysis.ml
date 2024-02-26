@@ -209,9 +209,9 @@ let do_stmt (a: Abstract_state.t) (s:stmt) :  Abstract_state.t =
   | _ -> a
 
 let analyse_function (kf:kernel_function) =
-  Options.feedback ~level:2 "analysing function: %a" Kernel_function.pretty kf;
   if Kernel_function.has_definition kf then
     begin
+      Options.feedback ~level:2 "analysing function: %a" Kernel_function.pretty kf;
       let first_stmt =
         try Kernel_function.find_first_stmt kf
         with Kernel_function.No_Statement -> assert false
@@ -235,12 +235,14 @@ let analyse_function (kf:kernel_function) =
 let doFunction (kf:kernel_function) =
   let final_state = analyse_function kf in
   let level = if Kernel_function.is_main kf then 1 else 2 in
-  Options.feedback ~level "@[May-aliases at the end of function %a:@ @[%a@]"
-    Kernel_function.pretty kf
-    (pp_abstract_state_opt ~debug:false) final_state;
-  Options.debug ~level "May-alias graph at the end of function %a:@;<4>@[%a@]"
-    Kernel_function.pretty kf
-    (pp_abstract_state_opt ~debug:true) final_state;
+  final_state |> Option.iter (fun s ->
+      Options.feedback ~level "@[May-aliases at the end of function %a:@ @[%a@]"
+        Kernel_function.pretty kf
+        (Abstract_state.pretty ~debug:false) s;
+      Options.debug ~level "May-alias graph at the end of function %a:@;<4>@[%a@]"
+        Kernel_function.pretty kf
+        (Abstract_state.pretty ~debug:true)s;
+    );
   let result =
     match final_state with
     (* final state is None if kf has no definition *)
