@@ -185,6 +185,8 @@ export interface ItemProps {
   selected?: boolean;
   /** Selection callback. */
   onSelection ?: (e: React.MouseEvent) => void
+  /** Double-click callback. */
+  onDoubleClick ?: (e: React.MouseEvent) => void
   /** Right-click callback. */
   onContextMenu?: (e: React.MouseEvent) => void;
   /** Additional class. */
@@ -201,18 +203,28 @@ export function Item(props: ItemProps): JSX.Element {
   const isDisabled = disabled || !enabled;
   const ref = React.useRef<HTMLDivElement>(null);
   const [clicked, setClicked] = React.useState(false);
-  const onSelection = isDisabled ? undefined : props.onSelection;
+
+  const fnClick = isDisabled ? undefined : props.onSelection;
   const onClick =
-    onSelection ? (e: React.MouseEvent) => {
+    fnClick ? (e: React.MouseEvent) => {
       setClicked(true);
-      onSelection(e);
+      fnClick(e);
     } : undefined;
-  const onContextMenu = isDisabled ? undefined : props.onContextMenu;
-  const onRightClick =
-    onContextMenu ? (e: React.MouseEvent) => {
+
+  const fnDoubleClick = isDisabled ? undefined : props.onDoubleClick;
+  const onDoubleClick =
+    fnDoubleClick ? (e: React.MouseEvent) => {
       setClicked(true);
-      onContextMenu(e);
+      fnDoubleClick(e);
     } : undefined;
+
+  const fnContextMenu = isDisabled ? undefined : props.onContextMenu;
+  const onContextMenu =
+    fnContextMenu ? (e: React.MouseEvent) => {
+      setClicked(true);
+      fnContextMenu(e);
+    } : undefined;
+
   const className = classes(
     'dome-xSideBarItem',
     selected ? 'dome-active' : 'dome-inactive',
@@ -237,8 +249,9 @@ export function Item(props: ItemProps): JSX.Element {
       className={className}
       style={props.style}
       title={props.title}
-      onContextMenu={onRightClick}
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
+      onContextMenu={onContextMenu}
     >
       <Label icon={props.icon} label={props.label} />
       {props.children}

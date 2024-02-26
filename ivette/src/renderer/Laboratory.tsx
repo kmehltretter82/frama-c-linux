@@ -160,7 +160,7 @@ function getPosition(m: Layout, cid: compId): LayoutPosition | undefined
 }
 
 {
-  getPosition(addComponent(defaultLayout, 'Console', 'A'), 'Console');
+  getPosition(defaultLayout, 'Console');
 }
 
 /* -------------------------------------------------------------------------- */
@@ -187,6 +187,20 @@ function applyView(view: Ivette.ViewLayoutProps): void {
   panels.add(layout.C);
   panels.add(layout.D);
   LAB.setValue({ ...state, panels, layout, sideView: view.id, sideComp: '' });
+}
+
+function applyComponent(
+  comp: Ivette.ComponentProps,
+  at?: LayoutPosition
+): void {
+  const state = LAB.getValue();
+  const { id, preferredPosition } = comp;
+  const pos = at ?? preferredPosition ?? 'D';
+  const layout = addComponent(state.layout, id, pos);
+  const panels = state.panels;
+  // Side effect on state.panels, but it is OK
+  panels.add(id);
+  LAB.setValue({ ...state, panels, layout, sideView: '', sideComp: id });
 }
 
 /* -------------------------------------------------------------------------- */
@@ -473,6 +487,11 @@ function ComponentItem(props: ComponentItemProps): JSX.Element {
     setCurrentComp(id);
   };
 
+  const onDoubleClick = (): void => {
+    setCurrentComp(id);
+    applyComponent(comp);
+  };
+
   const onContextMenu = (evt: React.MouseEvent): void => {
     setCurrentComp(id);
     openLayoutMenu(id, { dock: !docked, close: active }, evt);
@@ -484,6 +503,7 @@ function ComponentItem(props: ComponentItemProps): JSX.Element {
       label={label}
       title={title}
       onSelection={onSelection}
+      onDoubleClick={onDoubleClick}
       onContextMenu={onContextMenu}
       selected={selected}
     />
