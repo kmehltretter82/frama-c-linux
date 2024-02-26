@@ -35,7 +35,7 @@ module LMap = Cil_datatype.LvalStructEq.Map
 module G = Graph.Persistent.Digraph.ConcreteBidirectional(Datatype.Int)
 module V = G.V
 
-let vid (v : G.V.t) : int = v
+let vid (v : V.t) : int = v
 
 (* like LMap, but organized with offset and specialized functions *)
 module LLMap =
@@ -323,7 +323,7 @@ let rec closure_find_lset (v:V.t) (x:t) : (V.t * LSet.t) list =
   | [v_next] -> (v, find_lset v x)::(closure_find_lset v_next x)
   | _ -> Options.fatal ("this shall not happen (invariant broken)")
 
-let find_transitive_closure  (lv:lval) (x:t) : (G.V.t * LSet.t) list =
+let find_transitive_closure  (lv:lval) (x:t) : (V.t * LSet.t) list =
   let lv = Lval.simplify lv in
   assert_invariants x;
   try closure_find_lset (LLMap.find lv x.lmap) x with Not_found -> []
