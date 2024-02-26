@@ -669,14 +669,6 @@ let union_find vmap intersections =
   sets_to_be_joined
 
 let union (a1:t) (a2:t) :t =
-  (* naive algorithm :
-     1 merge the graph and the vmap (by doing union of sets)
-     2 for any node present in both a1.graph and a2.graph, merge/join them
-     3 for any lval [lv] that are has an entry in both a1.lmap and a2.lmap, merge the two vertex a1.lmap[lv]
-       and a2.lmap[lv]
-
-     I am not confident about this function, there are too many potential bugs and inefficiencies
-  *)
   assert_invariants a1;
   assert_invariants a2;
 
