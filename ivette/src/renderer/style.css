@@ -162,4 +162,28 @@
     fill: var(--text);
 }
 
+.labview-docked {
+    font-size: smaller;
+    background: var(--background-softer);
+    padding: 2px 5px 2px 2px;
+    border-radius: 5px;
+}
+
+.labview-docked.disabled {
+    color: var(--disabled-text);
+}
+
+.labview-docked.disabled svg {
+    fill: var(--disabled-text);
+}
+
+.labview-docked:hover {
+    background: var(--background-profound-hover);
+}
+
+.labview-docked svg {
+    bottom: 0px !important;
+    height: 8px;
+}
+
 /* -------------------------------------------------------------------------- */

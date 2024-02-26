@@ -82,7 +82,7 @@ const LAB = new States.GlobalState<LabViewState>({
 /* --- Layout Utilities                                                   --- */
 /* -------------------------------------------------------------------------- */
 
-function removeComponent(layout: Layout, compId: compId): Layout
+function removeLayoutComponent(layout: Layout, compId: compId): Layout
 {
   const { A, B, C, D } = layout;
   return {
@@ -93,11 +93,11 @@ function removeComponent(layout: Layout, compId: compId): Layout
   };
 }
 
-function addComponent(
+function addLayoutComponent(
   layout: Layout, compId: compId, p: LayoutPosition
 ): Layout
 {
-  layout = removeComponent(layout, compId);
+  layout = removeLayoutComponent(layout, compId);
   switch(p) {
     case 'A': return { ...layout, A: compId };
     case 'B': return { ...layout, B: compId };
@@ -112,7 +112,7 @@ function addComponent(
   }
 }
 
-function addLayout(m: Layout, view: Ivette.Layout): Layout
+function addLayoutView(m: Layout, view: Ivette.Layout): Layout
 {
   type Unstructured = {
     A ?: compId, B ?: compId, C ?: compId, D ?: compId,
@@ -127,7 +127,7 @@ function addLayout(m: Layout, view: Ivette.Layout): Layout
   return { A, B, C, D };
 }
 
-function fillLayout(m: Layout): Layout
+function completeLayout(m: Layout): Layout
 {
   const { A, B, C, D } = m;
   if (A && B && C && D) return m;
@@ -142,7 +142,7 @@ function fillLayout(m: Layout): Layout
   };
 }
 
-function getPosition(
+function getLayoutPosition(
   layout: Layout, compId: compId
 ): LayoutPosition | undefined
 {
@@ -167,6 +167,19 @@ function getPosition(
 /* --- LabView Actions                                                    --- */
 /* -------------------------------------------------------------------------- */
 
+function copySet<A>(s: Set<A>): Set<A>
+{
+  const r = new Set<A>();
+  s.forEach((a) => r.add(a));
+  return r;
+}
+
+function copyMap<A, B>(m: Map<A, B>): Map<A, B> {
+  const u = new Map<A, B>();
+  m.forEach((v, k) => u.set(k, v));
+  return u;
+}
+
 function setCurrentView(viewId: viewId = ''):void {
   const state = LAB.getValue();
   LAB.setValue({ ...state, sideView: viewId, sideComp: '' });
@@ -179,13 +192,14 @@ function setCurrentComp(compId: compId = ''):void {
 
 function applyView(view: Ivette.ViewLayoutProps): void {
   const state = LAB.getValue();
-  const layout = addLayout(state.layout, view.layout);
-  const panels = state.panels;
-  panels.add(layout.A);
-  panels.add(layout.B);
-  panels.add(layout.C);
-  panels.add(layout.D);
-  LAB.setValue({ ...state, layout, sideView: view.id, sideComp: '' });
+  const layout = addLayoutView(state.layout, view.layout);
+  const panels =
+    copySet(state.panels)
+      .add(layout.A)
+      .add(layout.B)
+      .add(layout.C)
+      .add(layout.D);
+  LAB.setValue({ ...state, panels, layout, sideView: view.id, sideComp: '' });
 }
 
 function applyComponent(
@@ -195,18 +209,32 @@ function applyComponent(
   const state = LAB.getValue();
   const { id, preferredPosition } = comp;
   const pos = at ?? preferredPosition ?? 'D';
-  const layout = addComponent(state.layout, id, pos);
-  state.panels.add(id);
-  LAB.setValue({ ...state, layout, sideView: '', sideComp: id });
+  const layout = addLayoutComponent(state.layout, id, pos);
+  const panels = copySet(state.panels).add(id);
+  LAB.setValue({ ...state, panels, layout, sideView: '', sideComp: id });
+}
+
+function dockComponent(comp: Ivette.ComponentProps): void
+{
+  const { id, preferredPosition } = comp;
+  const state = LAB.getValue();
+  const pos = getLayoutPosition(state.layout, id) ?? preferredPosition ?? 'D';
+  const layout = removeLayoutComponent(state.layout, id);
+  const docked = copyMap(state.docked).set(id, pos);
+  LAB.setValue({ ...state, docked, layout, sideView: '', sideComp: id });
 }
 
 function closeComponent(compId: compId): void
 {
   const state = LAB.getValue();
-  const layout = removeComponent(state.layout, compId);
-  state.panels.delete(compId);
-  state.docked.delete(compId);
-  LAB.setValue({ ...state, layout, sideView: '', sideComp: compId });
+  const layout = removeLayoutComponent(state.layout, compId);
+  const panels = copySet(state.panels);
+  const docked = copyMap(state.docked);
+  panels.delete(compId);
+  docked.delete(compId);
+  LAB.setValue({
+    ...state, panels, docked, layout, sideView: '', sideComp: compId
+  });
 }
 
 /* -------------------------------------------------------------------------- */
@@ -264,7 +292,7 @@ function Quarter(props: QuarterProps): JSX.Element {
     const comp = COMPONENT.getElement(compId);
     if (comp) applyComponent(comp, pos);
   };
-  const curp = getPosition(layout, compId);
+  const curp = getLayoutPosition(layout, compId);
   return (
     <IconButton
       className='labview-layout-quarter'
@@ -300,6 +328,8 @@ function LayoutMenu(): JSX.Element | null {
   const divElt = href.current;
   const [menu] = States.useGlobalState(MENU);
   const [state] = States.useGlobalState(LAB);
+  const [panelWidth, setWidth] = React.useState(80);
+  const [panelHeight, setHeight] = React.useState(80);
   const layout = state.layout;
   const { compId, dock, close } = menu;
   const display = compId !== '';
@@ -310,6 +340,11 @@ function LayoutMenu(): JSX.Element | null {
     }
   }, [display, divElt]);
 
+  const width = Math.max(divElt?.offsetWidth ?? 0, panelWidth);
+  const height = Math.max(divElt?.offsetHeight ?? 0, panelHeight);
+  React.useEffect(() => setWidth(width), [width]);
+  React.useEffect(() => setHeight(height), [height]);
+
   const className = classes(
     'dome-color-frame',
     'labview-layout-menu',
@@ -318,16 +353,15 @@ function LayoutMenu(): JSX.Element | null {
 
   const maxWidth = window.innerWidth;
   const maxHeight = window.innerHeight;
-  const panelWidth = divElt?.offsetWidth ?? 0;
-  const panelHeight = divElt?.offsetHeight ?? 0;
 
-  const left = Math.max(0, Math.min(menu.x, maxWidth - panelWidth));
-  const top = Math.max(0, Math.min(menu.y, maxHeight - panelHeight));
+  const left = Math.max(0, Math.min(menu.x, maxWidth - width));
+  const top = Math.max(0, Math.min(menu.y, maxHeight - height));
 
   const onDock = (): void => {
     closeMenu();
+    const comp = COMPONENT.getElement(compId);
+    if (comp) dockComponent(comp);
   };
-
 
   const onClose = (): void => {
     closeMenu();
@@ -354,10 +388,10 @@ function LayoutMenu(): JSX.Element | null {
         <Quarter compId={compId} layout={layout} pos='CD'   />
         <Quarter compId={compId} layout={layout} pos='D'    />
       </Grid>
-      <Action display={dock}
-              label='Dock' icon='QSPLIT.DOCK' onClick={onDock} />
-      <Action display={close}
-              label='Close' icon='TRASH' onClick={onClose} />
+      <Action
+        display={dock} label='Dock' icon='QSPLIT.DOCK' onClick={onDock} />
+      <Action
+        display={close} label='Close' icon='TRASH' onClick={onClose} />
     </div>
   );
 }
@@ -413,7 +447,7 @@ export function LabView(): JSX.Element {
     (H, V) => LAB.setValue({ ...state, scroll: { H, V } }),
     [state]
   );
-  const { A, B, C, D } = fillLayout(state.layout);
+  const { A, B, C, D } = completeLayout(state.layout);
   const { H, V } = state.scroll;
   const panels : JSX.Element[] = [];
   state.panels.forEach((id) => panels.push(<Pane key={id} compId={id}/>));
@@ -565,7 +599,7 @@ function GroupSection(props: GroupSectionProps): JSX.Element | null {
       <ComponentItem
         key={id}
         comp={comp}
-        position={getPosition(layout, id)}
+        position={getLayoutPosition(layout, id)}
         selected={id === sideComp}
         active={panels.has(id)}
         docked={docked.has(id)}
@@ -627,37 +661,56 @@ Ivette.registerSidebar({
 // --- Docked Components
 // --------------------------------------------------------------------------
 
-const dockActions: Actions = { dock: false, close: true };
-
 interface DockItemProps {
   compId: compId;
-  pos: LayoutPosition;
+  enabled: boolean;
+  position: LayoutPosition;
 }
 
-function DockItem(props: DockItemProps): JSX.Element {
-  const { compId: id, pos } = props;
-  const comp = Ext.useElement(COMPONENT, id);
-  const label = comp?.label ?? id;
-  const icon = 'QSPLIT.' + pos;
+function DockItem(props: DockItemProps): JSX.Element | null {
+  const { compId, enabled, position } = props;
+  const comp = Ext.useElement(COMPONENT, compId);
+  if (comp === undefined) return null;
+  const label = comp.label ?? compId;
+  const icon = 'QSPLIT.' + position;
   const title = `Display ${label} (right-click for more actions)`;
-  const onContextMenu = (_: void, evt: React.MouseEvent): void => {
-    openLayoutMenu(id, dockActions, evt);
+
+  const className = classes(
+    'labview-docked', !enabled && 'disabled',
+  );
+
+  const onClick = (): void => {
+    if (enabled) applyComponent(comp, position);
   };
+
+  const onContextMenu = (evt: React.MouseEvent): void => {
+    openLayoutMenu(compId, { dock: !enabled, close: true }, evt);
+  };
+
   return (
-    <Toolbar.Button
+    <Label
+      className={className}
       icon={icon}
       label={label}
       title={title}
+      onClick={onClick}
       onContextMenu={onContextMenu}
     />
   );
 }
 
 export function Dock(): JSX.Element {
-  const [{ docked }] = States.useGlobalState(LAB);
+  const [{ docked, layout }] = States.useGlobalState(LAB);
   const items: JSX.Element[] = [];
   docked.forEach((pos, compId) => {
-    items.push(<DockItem key={compId} compId={compId} pos={pos} />);
+    const curr = getLayoutPosition(layout, compId);
+    items.push(
+      <DockItem
+        key={compId}
+        compId={compId}
+        enabled={curr === undefined}
+        position={curr ?? pos}
+      />);
   });
   return <>{items}</>;
 }
