@@ -250,38 +250,37 @@ let pp_location fmt (pos_start, pos_end) =
     Format.fprintf fmt "Location: between %a and %a"
       pp_pos pos_start pp_pos pos_end
 
-let parse_error ?source msg =
+let parse_error ?loc msg =
   let current = Option.get !current in
-  let last_pos =
-    match source with
-    | None ->
-      Cil_datatype.Position.of_lexing_pos current.lexbuf.Lexing.lex_curr_p
-    | Some s -> s
-  in
   (* there are cases when we are called before menhir has requested at
      least two tokens, ending up in an assertion failure. Unfortunately,
      ErrorReports API does not allow us to check whether the buffer is
      empty or not.
   *)
+  let all_pos = Stack.create() in
   let () =
-    try ignore (MenhirLib.ErrorReports.last current.menhir_pos) with _ -> ()
-  in
-  let start_pos =
+    (* this is absolutely not a hack and used MenhirLib exactly as intended. *)
     try
-      let pos,_ =
+      let pp loc = Stack.push loc all_pos; "" in
+      ignore (MenhirLib.ErrorReports.show pp current.menhir_pos)
+    with _ -> ()
+  in
+  let start_pos,last_pos =
+    match loc with
+    | Some (s,l) -> s, l
+    | None ->
+      if Stack.is_empty all_pos then
         Cil_datatype.Location.of_lexing_loc
-          (MenhirLib.ErrorReports.last current.menhir_pos)
-      in
-      if Cil_datatype.Position.compare pos last_pos <= 0 then pos
+          (current.lexbuf.Lexing.lex_start_p, current.lexbuf.Lexing.lex_curr_p)
       else
-        (* during interaction between C and ACSL parser, it might happen,
-           at least as long as we haven't completed the move to menhir for
-           ACSL, that the start_pos seen by menhir is after the current position
-           of the (shared) lexbuf. This would lead to confusing error messages,
-           so we drop the one from menhir.
-        *)
-        last_pos
-    with _ -> last_pos
+        let _,start_pos = Stack.pop all_pos in
+        let last_pos =
+          if Stack.is_empty all_pos then
+            current.lexbuf.Lexing.lex_start_p
+          else
+            fst (Stack.pop all_pos)
+        in
+        Cil_datatype.Location.of_lexing_loc (start_pos, last_pos)
   in
   let pretty_token fmt token =
     (* prints more detailed information around the erroneous token;

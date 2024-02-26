@@ -84,14 +84,12 @@ val pp_context_from_file:
 val pp_location: Format.formatter -> Cil_types.location -> unit
 
 (** Emits the corresponding error message with some location information.
-    If given, [source] will be treated as the last position of the offending
-    expression that led to the error. It defaults to the current position of
-    the lexbuf currently in use (i.e. {!startParsing} must have been called
-    before that, and no {!finishParsing} call must have been done in between).
-    The start position will be inferred from menhir's error reporting mecanisms.
+    If not given, [location] will be considered to be between the end of
+    the forelast token read by the parser and the start of the last token,
+    i.e. we assume the parser has read an unexpected token.
 *)
 val parse_error:
-  ?source:Filepath.position -> ('a, Format.formatter, unit, 'b) format4 -> 'a
+  ?loc:Cil_types.location -> ('a, Format.formatter, unit, 'b) format4 -> 'a
 
 val had_errors : unit -> bool
 (** Has an error been raised since the last call to {!clear_errors}? *)
