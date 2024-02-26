@@ -25,100 +25,85 @@ open Cil_datatype
 
 open Simplified
 
-module VSet = Datatype.Int.Set
-module VMap = Datatype.Int.Map
+module EdgeLabel = struct
+  type t =
+    | Pointer (* represents dereferentiation of pointers as well as arrays *)
+    | Field of fieldinfo
+  let compare l r = match l, r with
+    | Pointer, Pointer -> 0
+    | Pointer, Field _ -> -1
+    | Field lv, Field rv -> Fieldinfo.compare lv rv
+    | Field _, Pointer -> 1
+  let default = Pointer
+  let is_pointer = function Pointer -> true | _ -> false
+  let is_field = function Field _ -> true | _ -> false
+  let pretty fmt = function
+    | Pointer -> ()
+    | Field f -> Format.fprintf fmt "-%s" f.fname
+end
 
-module Lval = Simplified.Lval
-module LSet = Cil_datatype.LvalStructEq.Set
-module LMap = Cil_datatype.LvalStructEq.Map
+module G = struct
+  include Graph.Persistent.Digraph.ConcreteBidirectionalLabeled (Datatype.Int) (EdgeLabel)
 
-module G = Graph.Persistent.Digraph.ConcreteBidirectional(Datatype.Int)
+  let psucc g v =
+    let only_pointer_succ e =
+      if EdgeLabel.is_pointer (E.label e) then Some (E.dst e) else None
+    in
+    List.filter_map only_pointer_succ (succ_e g v)
+
+  let ppred g v =
+    let p e = match E.label e with Pointer -> Some (E.src e) | _ -> None in
+    List.filter_map p (pred_e g v)
+
+  let fsucc_opt g v f =
+    assert (List.for_all (fun e -> EdgeLabel.is_field @@ E.label e) @@ succ_e g v);
+    let is_field_f e = match E.label e with
+      | Field f' -> Fieldinfo.equal f f'
+      | _ -> false
+    in
+    let edges = succ_e g v in
+    assert (List.length (List.filter is_field_f edges) <= 1);
+    Option.map E.dst @@ List.find_opt is_field_f edges
+
+  let psucc_opt g v = match psucc g v with
+    | [] -> None
+    | [v] -> Some v
+    | _ -> Options.fatal "Invariant violated: more than one successor"
+end
+
 module V = G.V
+module E = struct
+  include G.E
+  include EdgeLabel
+  module Map = Stdlib.Map.Make (struct
+      type t = EdgeLabel.t
+      let compare = EdgeLabel.compare
+    end)
+end
 
-let vid (v : V.t) : int = v
+module VMap = Datatype.Int.Map
+module VSet = Datatype.Int.Set
+module LSet = Cil_datatype.LvalStructEq.Set
+module VarSet = Cil_datatype.Varinfo.Set
 
-(* like [LMap], but organized with offset and specialized functions *)
-module LLMap = struct
-  module OMap = Offset.Map
+module VarMap = struct
+  include Cil_datatype.Varinfo.Map
 
-  (* each t is a map (lhost,NoOffset) -> offset -> V.t *)
-  type t = (V.t OMap.t) LMap.t
-
-  let empty : t = LMap.empty
-
-  let mem (lv : lval) (m:t) =
-    let lv, off = Cil.removeOffsetLval lv in
-    try OMap.mem off @@ LMap.find lv m with Not_found -> false
-
-  let find (lv : lval) (m:t) : V.t =
-    let lv, off = Cil.removeOffsetLval lv in
-    OMap.find off (LMap.find lv m)
-
-  let add (lv : lval) (v:V.t) (m:t) :t  =
-    let lv, off = Cil.removeOffsetLval lv in
-    let mo = try LMap.find lv m with Not_found -> OMap.empty in
-    LMap.add lv (OMap.add off v mo) m
-
-  let iter f = LMap.iter @@ fun lv -> OMap.iter @@ fun o -> f @@ Cil.addOffsetLval o lv
-
-  let map f = LMap.map @@ OMap.map f
+  let intersect = merge @@ fun _ l r -> match l,r with
+    | Some l, Some r -> Some (l,r)
+    | _ -> None
 
   let pretty fmt =
     let is_first = ref true in
-    LMap.iter (fun lv ->
-        OMap.iter
-          (fun o v -> let lv =  Cil.addOffsetLval o lv in
-            if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
-            Format.fprintf fmt "@ @[%a:%d@]" Lval.pretty lv v))
-
-  (* left-biased *)
-  let union = LMap.union @@ fun _ l r -> Some (OMap.union (fun _ l _r -> Some l) l r)
-
-  let intersect =
-    let intersect_omap l r = match l, r with
-      | Some l, Some r -> Some (l,r)
-      | _ -> None
-    in
-    let intersect_lmap l r = match l, r with
-      | Some l, Some r ->
-        let omap = OMap.merge (fun _ -> intersect_omap) l r in
-        if OMap.is_empty omap then None else Some omap
-      | _ -> None
-    in
-    LMap.merge @@ fun _ -> intersect_lmap
-
-  let to_seq m =
-    LMap.fold
-      (fun lv omap -> OMap.fold (fun o v s -> Seq.cons (lv,o,v) s) omap)
-      m
-      Seq.empty
-
-  (* specialized functions *)
-  let rec is_sub_offset o1 o2 =
-    match (o1,o2) with
-    | NoOffset, _ -> true
-    | Index (e1,o1), Index (e2,o2) when Cil_datatype.ExpStructEq.equal e1 e2 ->
-      is_sub_offset o1 o2
-    | Field (f1,o1), Field (f2,o2) when Fieldinfo.equal f1 f2 ->
-      is_sub_offset o1 o2
-    | _ -> false
-
-  (* finds all the lval lv1 apearing in [m] such as there exists an offset o1 and lv1 + o1 = lv *)
-  let find_upper_offsets (lv : lval) (m:t) : V.t LMap.t =
-    let lv, off = Cil.removeOffsetLval lv in
-    let mo = try LMap.find lv m with Not_found -> OMap.empty in
-    let f_filter o _v = is_sub_offset o off in
-    let mo = OMap.filter f_filter mo in
-    OMap.fold (fun o -> let lv = Cil.addOffsetLval o lv in LMap.add lv) mo LMap.empty
-
+    iter (fun var v ->
+        if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
+        Format.fprintf fmt "@ @[%a:%d@]" Varinfo.pretty var v)
 end
 
 type t =
   {graph : G.t;
-   lmap : LLMap.t;
-   (* lmap(lv) is a table [offset->v] where the vertex v corresponding to lval
-      (lv+offset), in other words (lv+offset) is in label(v) *)
-   vmap : LSet.t VMap.t; (* reverse of lmap *)}
+   vmap : VarSet.t VMap.t; (* associate with each node a set of variables *)
+   varmap : V.t VarMap.t (* reverse of varmap *)}
 
 let node_counter = ref 0
 let fresh_node_id () =
@@ -127,112 +112,156 @@ let fresh_node_id () =
   id
 
 (* find functions *)
-let find_lset (v:V.t) (x:t) : LSet.t =
-  try VMap.find v x.vmap with Not_found -> LSet.empty
+let find_varset (v:V.t) (x:t) : VarSet.t =
+  try VMap.find v x.vmap with Not_found -> VarSet.empty
 
-let find_aliases (lv:lval) (x:t) =
-  let lv = Lval.simplify lv in
-  try let v = LLMap.find lv x.lmap in find_lset v x
-  with Not_found -> LSet.empty
-
-let add_lval_to_vertex lv v (x : t) =
-  let new_lmap = LLMap.add lv v x.lmap in
-  let new_vmap = VMap.update v (Option.map @@ LSet.add lv) x.vmap in
-  {x with lmap = new_lmap; vmap = new_vmap}
-
-let rec get_points_to (v:V.t) (x:t) : LSet.t =
-  assert (G.mem_vertex x.graph v);
-  let set_predecessors =
-    List.fold_left
-      (fun acc v -> LSet.union acc (get_points_to v x))
-      LSet.empty
-      (G.pred x.graph v)
+(* raises Not_found *)
+let rec find_lval_vertex ((lhost, offset) : lval) (x : t) : V.t =
+  let find_psucc v = match G.psucc_opt x.graph v with Some v -> v | _ -> raise Not_found in
+  let find_fsucc v fname = match G.fsucc_opt x.graph v fname with Some v -> v | _ -> raise Not_found in
+  let find_lhost = function
+    | Var var -> VarMap.find var x.varmap
+    | Mem e ->
+      match LvalOrRef.from_exp e with
+      | None -> Options.fatal "unexpected result: Lval.from (%a) = None" Exp.pretty e
+      | Some (LvalOrRef.Ref lv1) -> find_lval_vertex lv1 x
+      | Some (LvalOrRef.Lval lv1) ->
+        let v1 = find_lval_vertex lv1 x in
+        find_psucc v1
   in
-  LSet.union (find_lset v x) (LSet.map Lval.points_to set_predecessors)
-
-let aliases_of_vertex (v:V.t) (x:t) : LSet.t =
-  assert (G.mem_vertex x.graph v);
-  let list_pred = G.pred x.graph v in
-  List.fold_left
-    (fun acc v -> LSet.union acc (get_points_to v x))
-    LSet.empty
-    list_pred
-
-let succ_of_lval (lv:lval) (x:t) : int option =
-  let lv = Lval.simplify lv in
-  try begin
-    let v = LLMap.find lv x.lmap in
-    match G.succ x.graph v with
-    | [] -> None
-    | [succ_v] -> Some succ_v
-    | _ -> Options.fatal "invariant violated (more than 1 successor)"
-  end with Not_found -> None
-
-let find_all_aliases (lv:lval) (x:t) : LSet.t =
-  match succ_of_lval lv x with
-  | None -> LSet.empty
-  | Some succ_v -> aliases_of_vertex succ_v x
-
-let points_to_set (lv:lval) (x:t) : LSet.t =
-  match succ_of_lval lv x with
-  | None -> LSet.empty
-  | Some succ_v -> find_lset succ_v x
-
-let get_graph (x:t) = x.graph
-
-(* renamed for the interface *)
-let get_lval_set = find_lset
-
-
-(* printing functions *)
-
-let print_debug fmt (x:t) =
-  Format.fprintf fmt "@[<v>";
-  Format.fprintf fmt "@[Edges:";
-  G.iter_edges (fun v1 v2 -> Format.fprintf fmt "@;<3 2>@[%d → %d@]" v1 v2) x.graph;
-  Format.fprintf fmt "@]@;<6>";
-  Format.fprintf fmt "@[LMap:@;<3 2>";
-  LLMap.pretty fmt x.lmap;
-  Format.fprintf fmt "@]@;<6>";
-  Format.fprintf fmt "@[VMap:@;<2>";
-  VMap.iter (fun v ls -> Format.fprintf fmt "@;<2 2>@[%d:%a@]" v LSet.pretty ls) x.vmap;
-  Format.fprintf fmt "@]";
-  Format.fprintf fmt "@]"
-
-let print_graph fmt (x:t) =
-  let is_first = ref true in
-  let print_node v fmt lset = Format.fprintf fmt "%d:%a" v LSet.pretty lset in
-  let print_edge v1 v2 =
-    if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
-    Format.fprintf fmt "@[%a@] → @[%a@]"
-      (print_node v1) (VMap.find v1 x.vmap)
-      (print_node v2) (VMap.find v2 x.vmap)
+  let rec find_offset v = function
+    | NoOffset -> v
+    | Index (_, o) ->
+      let v' = find_psucc v in
+      find_offset v' o
+    | Field (f, o) ->
+      let v' = find_fsucc v f in
+      find_offset v' o
   in
-  let print_unconnected_vertex v =
-    if G.in_degree x.graph v = 0 && G.out_degree x.graph v = 0 then begin
+  let hv = find_lhost lhost in
+  find_offset hv offset
+
+
+module Readout = struct
+
+  let get_lval_set v x =
+    let mk_lval var = Var var, NoOffset in
+    LSet.of_seq @@ Seq.map mk_lval @@ VarSet.to_seq @@ find_varset v x
+
+  (* Reconstruct all lvals that are represented by the given node.
+     Nodes only carry varinfos. In order to obtain lvals we recursively walk
+     backwards in the graph inductively constructing lvals from scratch.
+     - The lvals of the current node are the stored varinfos themselves.
+     - After gathering the lvals for the predecessor, the lvals are
+       modified according to the edge type used:
+       * Pointer: add a star (x → *x)
+       * Field f: add an offset (x -> x.f) *)
+  let rec reconstruct_lvals (x : t) (v : V.t) : LSet.t =
+    assert (G.mem_vertex x.graph v);
+    let modified_predecessors = List.map
+        (fun e ->
+           let pred_lvals = reconstruct_lvals x (E.src e) in
+           let modify_lval lv = match E.label e with
+             | Field f -> let lhost, o = lv in lhost, Field (f, o)
+             | Pointer ->
+               let ty = Cil.typeOfLval lv in
+               if Cil.isArrayType ty then
+                 let lhost, o = lv in lhost, Index (Simplified.nul_exp, o)
+               else
+                 let () = if not @@ Cil.isPointerType ty then
+                     Options.debug "unexpected type: %a" Printer.pp_typ ty
+                 in
+                 Mem (Cil.dummy_exp @@ Lval lv), NoOffset
+           in
+           LSet.map modify_lval pred_lvals
+        )
+        (G.pred_e x.graph v)
+    in
+    let lvals_of_v = get_lval_set v x in
+    List.fold_left LSet.union lvals_of_v modified_predecessors
+
+  let lvals_pointing_to_vertex (v:V.t) (x:t) : LSet.t =
+    assert (G.mem_vertex x.graph v);
+    let list_pred = List.map (reconstruct_lvals x) @@ G.ppred x.graph v in
+    List.fold_left LSet.union LSet.empty list_pred
+
+  let find_aliases (lv:lval) (x:t) =
+    let lv = Lval.simplify lv in
+    try let v = find_lval_vertex lv x in get_lval_set v x
+    with Not_found -> LSet.empty
+
+  let find_all_aliases (lv:lval) (x:t) : LSet.t =
+    let v_opt = try Some (find_lval_vertex lv x) with Not_found -> None in
+    match Option.bind v_opt @@ G.psucc_opt x.graph with
+    | None -> LSet.empty
+    | Some succ -> lvals_pointing_to_vertex succ x
+
+  let points_to_set (lv:lval) (x:t) : LSet.t =
+    let succ = try G.psucc_opt x.graph @@ find_lval_vertex lv x with Not_found -> None in
+    match succ with
+    | None -> LSet.empty
+    | Some succ_v -> get_lval_set succ_v x
+
+end
+
+
+module Pretty = struct
+
+  let pp_debug fmt (x:t) =
+    Format.fprintf fmt "@[<v>";
+    Format.fprintf fmt "@[Edges:";
+    G.iter_edges_e
+      (fun e ->
+         Format.fprintf fmt "@;<3 2>@[%d@ @[%a→@]@ %d@]"
+           (E.src e) E.pretty (E.label e) (E.dst e))
+      x.graph;
+    Format.fprintf fmt "@]@;<6>";
+    Format.fprintf fmt "@[VarMap:@;<3 2>";
+    VarMap.pretty fmt x.varmap;
+    Format.fprintf fmt "@]@;<6>";
+    Format.fprintf fmt "@[VMap:@;<2>";
+    VMap.iter (fun v ls -> Format.fprintf fmt "@;<2 2>@[%d:%a@]" v VarSet.pretty ls) x.vmap;
+    Format.fprintf fmt "@]";
+    Format.fprintf fmt "@]"
+
+  let pp_graph fmt (x:t) =
+    let is_first = ref true in
+    let pp_node v fmt lset = Format.fprintf fmt "%d:%a" v VarSet.pretty lset in
+    let pp_edge e =
+      let v1 = E.src e and v2 = E.dst e in
       if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
-      print_node v fmt (VMap.find v x.vmap)
-    end
-  in
-  if G.nb_vertex x.graph = 0
-  then Format.fprintf fmt "<empty>"
-  else (G.iter_edges print_edge x.graph;
-        G.iter_vertex print_unconnected_vertex x.graph)
+      Format.fprintf fmt "@[%a@] %a→ @[%a@]"
+        (pp_node v1) (VMap.find v1 x.vmap)
+        E.pretty (E.label e)
+        (pp_node v2) (VMap.find v2 x.vmap)
+    in
+    let pp_unconnected_vertex v =
+      if G.in_degree x.graph v = 0 && G.out_degree x.graph v = 0 then begin
+        if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
+        pp_node v fmt (VMap.find v x.vmap)
+      end
+    in
+    if G.nb_vertex x.graph = 0
+    then Format.fprintf fmt "<empty>"
+    else (G.iter_edges_e pp_edge x.graph;
+          G.iter_vertex pp_unconnected_vertex x.graph)
 
-let print_aliases fmt (x:t) =
-  let is_first = ref true in
-  let print_alias_set _ set_lv =
-    if !is_first then is_first := false else Format.fprintf fmt "@;<2>";
-    LSet.pretty fmt set_lv
-  in
-  let alias_set_of_vertex i _ =
-    let aliases = aliases_of_vertex i x in
-    if LSet.cardinal aliases >= 2 then Some aliases else None
-  in
-  let alias_sets = VMap.filter_map alias_set_of_vertex x.vmap in
-  if VMap.is_empty alias_sets
-  then Format.fprintf fmt "<none>"
-  else VMap.iter print_alias_set alias_sets
+  let pp_aliases fmt (x:t) =
+    let is_first = ref true in
+    let pp_alias_set _ set_lv =
+      if !is_first then is_first := false else Format.fprintf fmt "@;<2>";
+      LSet.pretty fmt set_lv
+    in
+    let alias_set_of_vertex i _ =
+      let aliases = Readout.lvals_pointing_to_vertex i x in
+      if LSet.cardinal aliases >= 2 then Some aliases else None
+    in
+    let alias_sets = VMap.filter_map alias_set_of_vertex x.vmap in
+    if VMap.is_empty alias_sets
+    then Format.fprintf fmt "<none>"
+    else VMap.iter pp_alias_set alias_sets
+
+end
 
 (* invariants of type t must be true before and after each functon call *)
 let assert_invariants (x:t) : unit =
@@ -240,231 +269,146 @@ let assert_invariants (x:t) : unit =
      and are integer between 0 and node_counter, and have at most 1 successor *)
   assert (!node_counter >= 0);
   let assert_vertex (v:V.t) =
+    Options.debug ~level:11 "checking coherence of vertex %d" v;
     assert (v >= 0);
     assert (v < !node_counter);
     assert (VMap.mem v x.vmap);
-    assert (List.length (G.succ x.graph v) <= 1)
+    let succ_e = G.succ_e x.graph v in
+    let is_pointer_vertex =
+      List.exists (fun e -> E.is_pointer @@ E.label e) succ_e
+    and is_struct_vertex =
+      List.exists (fun e -> E.is_field @@ E.label e) succ_e
+    in
+    assert (not (is_pointer_vertex && is_struct_vertex));
+    assert (not is_pointer_vertex || List.length (G.succ x.graph v) <= 1);
   in
   G.iter_vertex assert_vertex x.graph;
   let assert_edge v1 v2 =
+    Options.debug ~level:11 "checking coherence of edge %d → %d" v1 v2;
     assert (v1 <> v2);
     assert (G.mem_vertex x.graph v1);
     assert (G.mem_vertex x.graph v2)
   in
   G.iter_edges assert_edge x.graph;
-  let assert_lmap (lv : lval) (v:V.t) =
+  let assert_varmap (var : varinfo) (v:V.t) =
     assert (G.mem_vertex x.graph v);
-    assert (LSet.mem lv (VMap.find v x.vmap))
+    assert (VarSet.mem var (VMap.find v x.vmap))
   in
-  LLMap.iter assert_lmap x.lmap;
-  let assert_vmap (v:V.t) (ls:LSet.t) =
+  VarMap.iter assert_varmap x.varmap;
+  let assert_vmap (v:V.t) (ls:VarSet.t) =
     assert (G.mem_vertex x.graph v);
     (* TODO: we removed the invariant because of OSCS*)
-    (* if not (LSet.is_empty ls)
+    (* if not (VarSet.is_empty ls)
      * then
      *   begin
-     *     let lv = LSet.choose ls in
+     *     let lv = VarSet.choose ls in
      *     let is_ptr_lv = Lval.is_pointer lv in
-     *     assert (LSet.for_all (fun x -> Lval.is_pointer x = is_ptr_lv) ls)
+     *     assert (VarSet.for_all (fun x -> Lval.is_pointer x = is_ptr_lv) ls)
      *   end; *)
-    assert (LSet.fold (fun lv acc -> acc && V.equal (LLMap.find lv x.lmap) v) ls true)
+    assert (VarSet.fold (fun lv acc -> acc && V.equal (VarMap.find lv x.varmap) v) ls true)
   in
   VMap.iter assert_vmap x.vmap
 
 (* Ensure that assert_invariants is not executed if the -noassert flag is supplied. *)
-let assert_invariants x = assert (assert_invariants x; true)
+let assert_invariants x =
+  try assert (assert_invariants x; true)
+  with Assert_failure _ as exn ->
+    let bt = Printexc.get_raw_backtrace () in
+    Options.debug "incoherent graph:@ @[%a@]" Pretty.pp_debug x;
+    Options.debug "incoherent graph:@ @[%a@]" Pretty.pp_graph x;
+    Printexc.raise_with_backtrace exn bt
 
 let asserting_invariants x = assert_invariants x; x
 
 let pretty ?(debug = false) fmt (x:t) =
-  if debug then
-    try assert_invariants x; print_graph fmt x
-    with Assert_failure _ -> print_debug fmt x
-  else print_aliases fmt x
-
-(* .dot printing functions*)
-let find_vertex_name_ref = Extlib.mk_fun "find_vertex_name"
-
-module Dot = Graph.Graphviz.Dot (struct
-    include G
-    let edge_attributes _ = []
-    let default_edge_attributes _ = []
-    let get_subgraph _ = None
-    let vertex_attributes v =
-      let lset = !find_vertex_name_ref v in
-      let label =
-        LSet.pretty Format.str_formatter lset;
-        Format.flush_str_formatter ()
-      in
-      [`Label label]
-
-    let vertex_name (v:V.t) = string_of_int v
-    let default_vertex_attributes _ = [`Shape `Box]
-    let graph_attributes _ = []
-  end)
-
-let print_dot filename (a:t) =
-  let file = open_out filename in
-  find_vertex_name_ref := (fun v -> find_lset v a);
-  Dot.output_graph file a.graph;
-  close_out file
-
-(* find functions, part 2 *)
-let rec closure_find_lset (v:V.t) (x:t) : (V.t * LSet.t) list =
-  match G.succ x.graph v with
-  | [] -> [v, find_lset v x]
-  | [v_next] -> (v, find_lset v x)::(closure_find_lset v_next x)
-  | _ -> Options.fatal ("this shall not happen (invariant broken)")
-
-let find_transitive_closure  (lv:lval) (x:t) : (V.t * LSet.t) list =
-  let lv = Lval.simplify lv in
   assert_invariants x;
-  try closure_find_lset (LLMap.find lv x.lmap) x with Not_found -> []
-(* TODO : what about offsets ? *)
+  if debug then Pretty.pp_graph fmt x
+  else Pretty.pp_aliases fmt x
 
 (* NOTE on "constant vertex": a constant vertex represents an unamed
    scalar value (type bottom in steensgaard's paper), or the address
-   of a variable. It means that in [vmap], its associated LSet is
+   of a variable. It means that in [vmap], its associated VarSet is
    empty.  By definition, constant vertex cannot be associated to a
-   lval in [lmap] *)
-let create_cst_vertex (x:t) : V.t * t =
+   lval in [varmap] *)
+let create_empty_vertex (x:t) : V.t * t =
   let new_v = fresh_node_id () in
   new_v, {graph = G.add_vertex x.graph new_v;
-          lmap = x.lmap;
-          vmap = VMap.add new_v LSet.empty x.vmap}
+          varmap = x.varmap;
+          vmap = VMap.add new_v VarSet.empty x.vmap}
 
-(* find all the aliases of lv1 in x, for create_vertex *)
-let find_all_aliases_of_offset (lv1 : lval) (x: t) : LSet.t =
-  let lvals_to_be_searched = decompose_lval lv1 in
-  (* for each lval, find the set of aliases *)
-  let f_map (lv,o) =
-    try VMap.find (LLMap.find lv x.lmap) x.vmap, o
-    with Not_found -> LSet.empty, o
+let create_var_vertex var x =
+  assert (not @@ VarMap.mem var x.varmap);
+  let v = fresh_node_id () in
+  let x = {graph = G.add_vertex x.graph v;
+           varmap = VarMap.add var v x.varmap;
+           vmap = VMap.add v (VarSet.singleton var) x.vmap} in
+  match var.vtype with
+  | TPtr _ ->
+    (* then add a another empty vertex *)
+    let v', x = create_empty_vertex x in
+    v, {x with graph = G.add_edge x.graph v v'}
+  | _ -> v, x
+
+let find_or_create_var_vertex (var : varinfo) (x : t) =
+  try VarMap.find var x.varmap, x
+  with Not_found -> create_var_vertex var x
+
+let rec find_or_create_lval_vertex ((lhost, offset) : lval) (x : t) : V.t * t =
+  let find_or_create_psucc v x =
+    match G.psucc_opt x.graph v with
+    | None ->
+      let v', x = create_empty_vertex x in
+      (* finally add a points-to edge between v and v' *)
+      let new_graph = G.add_edge x.graph v v' in
+      v', {x with graph = new_graph}
+    | Some v' -> v', x
   in
-  Options.debug ~level:9 "decompose_lval %a : [@[<hov 2>" Lval.pretty lv1;
-  List.iter (fun (x, o) -> Options.debug ~level:9 " (%a,%a) " Lval.pretty x Offset.pretty o) lvals_to_be_searched;
-  Options.debug ~level:9 "@]]";
-  let aliases = List.map f_map lvals_to_be_searched in
-  (*  for each lval of the Lset, add the offset and add it to the resulting set *)
-  let f_fold_left (acc : LSet.t) (ls,o) =
-    LSet.fold (fun lv -> LSet.add @@ Cil.addOffsetLval o lv) ls acc
+  let find_or_create_fsucc v x f =
+    match G.fsucc_opt x.graph v f with
+    | None ->
+      let v', x = create_empty_vertex x in
+      (* finally add a points-to edge between v and v' *)
+      let new_graph = G.add_edge_e x.graph @@ E.create v (Field f) v' in
+      v', {x with graph = new_graph}
+    | Some v' -> v', x
   in
-  List.fold_left f_fold_left (LSet.singleton lv1) aliases
-
-(* returns the new vertex and the new graph *)
-(* only for function find_or_create vertex *)
-let create_vertex_simple (lv:lval) (x:t) : V.t * t =
-  let new_v = fresh_node_id () in
-  let new_g = G.add_vertex x.graph new_v in
-  (* find all the alias of lv (because of offset) *)
-  let set_of_aliases : LSet.t = find_all_aliases_of_offset lv x in
-  (* add all these aliases *)
-  Options.debug ~level:9 "all_aliases of %a : %a " Lval.pretty lv LSet.pretty set_of_aliases;
-  let new_lmap =
-    LSet.fold
-      (fun lv acc -> assert (not (LLMap.mem lv x.lmap)); LLMap.add lv new_v acc)
-      set_of_aliases
-      x.lmap
-  in
-  let new_vmap = VMap.add new_v set_of_aliases x.vmap in
-
-  let new_x = {graph = new_g; lmap = new_lmap; vmap = new_vmap} in
-  assert_invariants new_x;
-  match lv with
-  | Var v, NoOffset ->
-    begin match v.vtype with
-      | TPtr _ ->
-        (* then add a constant vertex *)
-        let another_v, new_x = create_cst_vertex new_x in
-        let new_g = G.add_edge new_x.graph new_v another_v in
-        new_v, {new_x with graph = new_g}
-      | _ -> new_v, new_x
-    end
-  | _ -> new_v, new_x
-
-let diff_offset (lv1 : lval) (lv2 : lval) =
-  let rec f_diff_offset o1 o2 =
-    match o1, o2 with
-    | NoOffset, _ -> o2
-    | Field (_,o1), Field (_,o2) -> f_diff_offset o1 o2
-    | Index (_,o1), Index (_,o2) -> f_diff_offset o1 o2
-    | _ -> Options.fatal "%s: unexpected case" __LOC__
-  in
-  let _, o1 = Cil.removeOffsetLval lv1 in
-  let _, o2 = Cil.removeOffsetLval lv2 in
-  assert (LLMap.is_sub_offset o1 o2);
-  f_diff_offset o1 o2
-
-let rec create_vertex lv x =
-  Options.debug ~level:9 "creating a vertex for %a" Lval.pretty lv;
-  assert (not (LLMap.mem lv x.lmap));
-  match lv with
-  | (Mem e, NoOffset) -> (* special case when we also add another vertex and a points-to edge *)
-    begin (* first find the vertex corresponding to e *)
+  let find_or_create_lhost (x : t) = function
+    | Var var -> find_or_create_var_vertex var x
+    | Mem e ->
       match LvalOrRef.from_exp e with
       | None -> Options.fatal "unexpected result: Lval.from (%a) = None" Exp.pretty e
-      | Some (LvalOrRef.Ref lv1) ->
-        find_or_create_vertex (LvalOrRef.Lval lv1) x
+      | Some (LvalOrRef.Ref lv1) -> find_or_create_lval_vertex lv1 x
       | Some (LvalOrRef.Lval lv1) ->
-        (* find the vertex *)
-        let v1, x = find_or_create_vertex (LvalOrRef.Lval lv1) x in
-        (* then creates a vertex for bvl ONLY IF there is no successor *)
-        begin match G.succ x.graph v1 with
-          | [] ->
-            let v2, x = create_vertex_simple lv x in
-            (* finally add a points-to edge between v1 and v2 *)
-            let new_graph = G.add_edge x.graph v1 v2 in
-            v2, {x with graph = new_graph}
-          | [succ_v1] ->
-            (* if there is a successor, update lmap and vmap to add blv to that successor's set *)
-            succ_v1, add_lval_to_vertex lv succ_v1 x
-          | _ -> Options.fatal " Invariant violated : more than 1 successor"
-        end
-    end
-  | _ -> create_vertex_simple lv x
+        let v1, x = find_or_create_lval_vertex lv1 x in
+        find_or_create_psucc v1 x
+  in
+  let rec find_or_create_offset v x = function
+    | NoOffset -> v, x
+    | Index (_, o) ->
+      let v', x = find_or_create_psucc v x in
+      find_or_create_offset v' x o
+    | Field (f, o) ->
+      let v', x = find_or_create_fsucc v x f in
+      find_or_create_offset v' x o
+  in
+  let hv, x = find_or_create_lhost x lhost in
+  let v, x = find_or_create_offset hv x offset in
+  Options.debug ~level:7 "graph after find_or_create_lval_vertex @[%a@] (%d):@ %a"
+    Printer.pp_lval (lhost, offset) v Pretty.pp_graph x;
+  v, x
 
-and find_or_create_lval_vertex (lv:lval) (x:t) : V.t * t =
-  try LLMap.find lv x.lmap, x
-  with Not_found ->
-    (* try to find if an alias already exists in x *)
-    let map_predecessors : V.t LMap.t =
-      LLMap.find_upper_offsets lv x.lmap
-    in
-    (* for any predecessor, find all its aliases and then look for potential existing vertex *)
-    let f_fold_lmap lvx vx acc =
-      let set_aliases = VMap.find vx x.vmap in
-      Options.debug ~level:9 "looking for aliases of %a in set %a"
-        Lval.pretty lv LSet.pretty set_aliases;
-      if LSet.cardinal set_aliases <= 1 then acc else
-        let off = diff_offset lvx lv in
-        let f_fold_lset lvs acc =
-          try
-            let lvs = Cil.addOffsetLval off lvs in
-            VSet.add (LLMap.find lvs x.lmap) acc
-          with Not_found -> acc
-        in
-        LSet.fold f_fold_lset set_aliases acc
-    in
-    (* set of all existing aliases *)
-    let vset_res = LMap.fold f_fold_lmap map_predecessors VSet.empty in
-    Options.debug ~level:9 "found aliases of %a : %a" Lval.pretty lv VSet.pretty vset_res;
-    if VSet.is_empty vset_res
-    then create_vertex lv x
-    else
-      let () = assert (VSet.cardinal vset_res = 1) in
-      let v_res = VSet.choose vset_res in
-      (* vertex found, update the tables *)
-      v_res, add_lval_to_vertex lv v_res x
+and find_or_create_ref_vertex (lv : lval) (x:t) : V.t * t =
+  let v1, x = find_or_create_lval_vertex lv x in
+  let va, x = create_empty_vertex x in
+  let x = {x with graph = G.add_edge x.graph va v1} in
+  Options.debug ~level:7 "graph after find_or_create_ref_vertex @[%a@] (%d):@ %a"
+    LvalOrRef.pretty (LvalOrRef.Ref lv) va Pretty.pp_graph x;
+  va, x
 
-(* find the vertex of an lval *)
-and find_or_create_vertex (lv : LvalOrRef.t) (x:t) : V.t * t =
+and find_or_create_lval_or_ref_vertex (lv : LvalOrRef.t) (x:t) : V.t * t =
   match lv with
   | LvalOrRef.Lval lv -> find_or_create_lval_vertex lv x
-  | LvalOrRef.Ref lv ->
-    Options.debug ~level:9 "creating a vertex for %a" LvalOrRef.pretty (LvalOrRef.Ref lv);
-    let v1, x = find_or_create_lval_vertex lv x in
-    let va, x = create_cst_vertex x in
-    va, {x with graph = G.add_edge x.graph va v1}
+  | LvalOrRef.Ref lv -> find_or_create_ref_vertex lv x
 
 (* TODO is there a better way to do it ? *)
 let find_vertex lv x =
@@ -475,58 +419,69 @@ let find_vertex lv x =
   else raise Not_found
 
 (* merge of two vertices; the first vertex carries both sets, the second is
-   removed from the graph and from lmap and vmap *)
+   removed from the graph and from varmap and vmap *)
 let merge x v1 v2 =
   if V.equal v1 v2 || not (G.mem_vertex x.graph v1) || not (G.mem_vertex x.graph v2)
   then x
   else
-    (* update lmap : every lval in v2 must now be associated with v1 *)
-    let new_lmap = LSet.fold (fun lv2 -> LLMap.add lv2 v1) (find_lset v2 x) x.lmap in
+    (* update varmap : every lval in v2 must now be associated with v1 *)
+    let new_varmap = VarSet.fold (fun lv2 -> VarMap.add lv2 v1) (find_varset v2 x) x.varmap in
     let new_vmap =
-      let new_set = LSet.union (find_lset v1 x) (find_lset v2 x) in
+      let new_set = VarSet.union (find_varset v1 x) (find_varset v2 x) in
       VMap.add v1 new_set @@ VMap.remove v2 x.vmap
     in
     let new_graph = (* update the graph *)
-      let f_fold_succ v_succ (g:G.t) : G.t = G.add_edge g v1 v_succ
-      and f_fold_pred v_pred (g:G.t) : G.t = G.add_edge g v_pred v1
+      let f_fold_succ e (g:G.t) : G.t =
+        G.add_edge_e g @@ E.create v1 (E.label e) (E.dst e)
+      and f_fold_pred e (g:G.t) : G.t =
+        G.add_edge_e g @@ E.create (E.src e) (E.label e) v1
       in
       let g = x.graph in
       (* add all new edges *)
-      let g = G.fold_succ f_fold_succ g v2 g in
-      let g = G.fold_pred f_fold_pred g v2 g in
+      let g = G.fold_succ_e f_fold_succ g v2 g in
+      let g = G.fold_pred_e f_fold_pred g v2 g in
       G.remove_vertex g v2 (* remove v2 *)
     in
-    {graph = new_graph; lmap = new_lmap; vmap = new_vmap}
+    {graph = new_graph; varmap = new_varmap; vmap = new_vmap}
 
 (* functions join and unify-pointer of steensgaard's paper *)
+(* join_without_check may break the invariants *)
 let rec join_without_check (x:t) (v1:V.t) (v2:V.t) : t =
   if V.equal v1 v2 || not (G.mem_vertex x.graph v1 && G.mem_vertex x.graph v2)
   then x
   else
-    let pt1 = G.succ x.graph v1 in (* TODO ask frama-c type instead of looking in the graph *)
-    let pt2 = G.succ x.graph v2 in
+    let mk_edge_map succs =
+      let mk_succ e = E.label e, E.dst e in
+      E.Map.of_seq @@ Seq.map mk_succ @@ List.to_seq succs
+    in
+    let succs1 = mk_edge_map @@ G.succ_e x.graph v1 in
+    let succs2 = mk_edge_map @@ G.succ_e x.graph v2 in
+    let succ_pairs =
+      let mk_pair _ succ1 succ2 = match succ1, succ2 with
+        | Some s1, Some s2 -> Some (s1, s2)
+        | _ -> None
+      in
+      E.Map.merge mk_pair succs1 succs2
+    in
     let x = merge x v1 v2 in
     assert (not (G.mem_vertex x.graph v2));
-    match (pt1, pt2) with
-    | [], _ -> x
-    | _, [] -> x
-    | [succ_v1],[succ_v2] ->
-      assert (succ_v1 <> v2);
-      assert (succ_v2 <> v1);
-      join_without_check x succ_v1 succ_v2
-    | _, _ -> Options.fatal "invariant broken"
+    let merge_succs _ (succ1, succ2) x =
+      assert (succ1 <> v2);
+      assert (succ2 <> v1);
+      join_without_check x succ1 succ2
+    in
+    E.Map.fold merge_succs succ_pairs x
 
-(* since the recursive version of join, unify, unify2 and merge may break the invariants *)
 let join (x:t) (v1:V.t) (v2:V.t) : t =
-  Options.debug ~level:7 "graph before join(%d,%d):@;<2>@[%a@]" v1 v2 print_debug x;
+  Options.debug ~level:6 "graph before join(%d,%d):@;<2>@[%a@]" v1 v2 Pretty.pp_graph x;
   assert_invariants x;
   let res = join_without_check x v1 v2 in
-  Options.debug ~level:7 "graph after join(%d,%d):@;<2>@[%a@]" v1 v2 print_debug res;
+  Options.debug ~level:6 "graph after join(%d,%d):@;<2>@[%a@]" v1 v2 Pretty.pp_graph res;
   begin try assert_invariants res
     with Assert_failure _ ->
       Options.debug "join(%d,%d) failed" v1 v2;
-      Options.debug "graph before join(%d,%d):@;<2>@[%a@]" v1 v2 print_debug x;
-      Options.debug "graph after join(%d,%d):@;<2>@[ %a@]" v1 v2 print_debug res;
+      Options.debug "graph before join(%d,%d):@;<2>@[%a@]" v1 v2 Pretty.pp_debug x;
+      Options.debug "graph after join(%d,%d):@;<2>@[ %a@]" v1 v2 Pretty.pp_debug res;
       assert_invariants res
   end;
   res
@@ -534,100 +489,121 @@ let join (x:t) (v1:V.t) (v2:V.t) : t =
 let merge_set (x:t) (vs:VSet.t) : V.t * t =
   let v0 = VSet.choose vs in
   if VSet.cardinal vs < 2 then v0, x else begin
-    Options.debug ~level:7 "graph before merge_set %a:@;<2>@[%a@]" VSet.pretty vs print_debug x;
+    Options.debug ~level:6 "graph before merge_set %a:@;<2>@[%a@]"
+      VSet.pretty vs Pretty.pp_debug x;
     assert (G.mem_vertex x.graph v0);
     let result = VSet.fold (fun v acc -> merge acc v0 v) vs x in
-    Options.debug ~level:7 "graph after merge_set %a:@;<2>@[%a@]" VSet.pretty vs print_debug result;
+    Options.debug ~level:6 "graph after merge_set %a:@;<2>@[%a@]"
+      VSet.pretty vs Pretty.pp_debug result;
     v0, result
   end
 
+(* may operate on an unsound state, where nodes may have multiple successors
+   of the same edge type *)
 let rec join_succs (x:t) v =
   Options.debug ~level:8 "joining successors of %d" v;
   if not @@ G.mem_vertex x.graph v then x else
-    match G.succ x.graph v with
-    | [] | [_] -> x
-    | succs ->
-      let v0, x = merge_set x @@ VSet.of_list succs in
-      join_succs x v0
+    let edge_map =
+      List.fold_left (fun m e ->
+          let add_dst = function
+            | None -> Some (VSet.singleton @@ E.dst e)
+            | Some vs -> Some (VSet.add (E.dst e) vs)
+          in
+          E.Map.update (E.label e) add_dst m
+        )
+        E.Map.empty
+        (G.succ_e x.graph v)
+    in
+    let merge_vset _e vs x =
+      if VSet.cardinal vs < 2
+      then x
+      else let v0, x = merge_set x vs in join_succs x v0
+    in
+    E.Map.fold merge_vset edge_map x
 
 (* in Steensgard's paper, this is written settype(v1,ref(v2,bot)) *)
 let set_type (x:t) (v1:V.t) (v2:V.t) : t =
   assert_invariants x;
   (* if v1 points to another node, suppress current outgoing edge (and the node if it is a constant node) *)
   let g, new_vmap =
-    match G.succ x.graph v1 with
-      [] -> x.graph, x.vmap
-    | [v2] ->
+    match G.psucc_opt x.graph v1 with
+    | None -> x.graph, x.vmap
+    | Some v2 ->
       (* if v2 is a constant node supress it directly *)
-      if LSet.is_empty (VMap.find v2 x.vmap)
-      then (G.remove_vertex x.graph v2, VMap.remove v2 x.vmap)
-      else (G.remove_edge x.graph v1 v2, x.vmap)
-    | _ -> Options.fatal "too many outgoing edges in set_type"
+      if VarSet.is_empty (VMap.find v2 x.vmap)
+      then G.remove_vertex x.graph v2, VMap.remove v2 x.vmap
+      else G.remove_edge x.graph v1 v2, x.vmap
   in
   let new_g = G.add_edge g v1 v2 in
   asserting_invariants {x with graph = new_g; vmap = new_vmap}
 
 let assignment (a:t) (lv:lval) (e:exp) : t =
   assert_invariants a;
-  if not @@ Cil.isPointerType (Cil.typeOf e) then a else
-    let x = Lval.simplify lv in
-    match LvalOrRef.from_exp e with
-    | None -> a
-    | Some y ->
-      let (v1,a) = find_or_create_lval_vertex x a in
-      let (v2,a) = find_or_create_vertex y a in
-      if List.mem v2 (G.succ a.graph v1) || List.mem v1 (G.succ a.graph v2)
-      then
-        let () =
-          Options.warning ~source:(fst e.eloc)
-            "ignoring assignment of the form: %a = %a"
-            Printer.pp_lval lv Printer.pp_exp e;
-        in a
-      else asserting_invariants @@ join a v1 v2
+  match Cil.isPointerType (Cil.typeOf e), LvalOrRef.from_exp e with
+  | false, _ | _, None -> a
+  | true, Some y ->
+    let v1, a = find_or_create_lval_vertex (Lval.simplify lv) a in
+    let v2, a = find_or_create_lval_or_ref_vertex y a in
+    if List.mem v2 (G.psucc a.graph v1) || List.mem v1 (G.psucc a.graph v2)
+    then
+      let () =
+        Options.warning ~source:(fst e.eloc)
+          "ignoring assignment of the form: %a = %a"
+          Printer.pp_lval lv Printer.pp_exp e;
+      in a
+    else asserting_invariants @@ join a v1 v2
 
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (lv:lval) : t =
   assert_invariants a;
   let x = Lval.simplify lv in
-  let (v1,a) = find_or_create_lval_vertex x a in
-  match G.succ a.graph v1 with
-  | [] ->
-    let (v2,a) = create_cst_vertex a in
+  let v1, a = find_or_create_lval_vertex x a in
+  match G.psucc_opt a.graph v1 with
+  | None ->
+    let v2, a = create_empty_vertex a in
     set_type a v1 v2
-  | [_v2] -> a
-  | _ -> Options.fatal "this should not hapen (invariant broken)"
+  | Some _ -> a
 
 let is_included (a1:t) (a2:t) =
   (* tests if a1 is included in a2, at least as the nodes with lval *)
   assert_invariants a1;
   assert_invariants a2;
-  Options.debug ~level:8 "testing equal %a AND à.%a" (pretty ~debug:true) a1 (pretty ~debug:true) a2;
+  Options.debug ~level:8 "testing equal %a AND à.%a"
+    Pretty.pp_graph a1 (pretty ~debug:true) a2;
   let exception Not_included in
   try
-    let iter_lmap (lv : lval) (v1:V.t): unit =
-      let v2 : V.t = try LLMap.find lv a2.lmap with Not_found -> raise Not_included in
-      match G.succ a1.graph v1, G.succ a2.graph v2 with
-      | [], _ -> ()
-      | [_], [] -> raise Not_included
-      | [v1p], [v2p] ->
-        if LSet.subset (VMap.find v1p a1.vmap) (VMap.find v2p a2.vmap)
-        then ()
-        else raise Not_included
-      | _ -> Options.fatal "this should not hapen (invariant broken)"
+    let iter_varmap (var : varinfo) (v1 : V.t): unit =
+      let v2 : V.t = try VarMap.find var a2.varmap with Not_found -> raise Not_included in
+      (* TODO: render correct for structs *)
+      let succs1 =
+        E.Map.of_seq @@ Seq.map (fun e -> E.label e, E.dst e) @@ List.to_seq @@ G.succ_e a1.graph v1
+      and succs2 =
+        E.Map.of_seq @@ Seq.map (fun e -> E.label e, E.dst e) @@ List.to_seq @@ G.succ_e a2.graph v2
+      in
+      let check_succs _ succ1 succ2 = match succ1, succ2 with
+        | None, _ -> None
+        | Some _, None -> raise Not_included
+        | Some v1p, Some v2p ->
+          if VarSet.subset (VMap.find v1p a1.vmap) (VMap.find v2p a2.vmap)
+          then None
+          else raise Not_included
+      in
+      ignore @@ E.Map.merge check_succs succs1 succs2
     in
-    LLMap.iter iter_lmap a1.lmap; true
+    VarMap.iter iter_varmap a1.varmap; true
   with
     Not_included -> false
 
-let empty : t = {graph = G.empty; lmap = LLMap.empty; vmap = VMap.empty}
+let empty : t = {graph = G.empty; varmap = VarMap.empty; vmap = VMap.empty}
 
 let is_empty s = compare s empty = 0
 
 (* add an int to all vertex values *)
 let shift (a : t) : t =
   assert_invariants a;
-  if is_empty a then a else
-    let () = Options.debug ~level:8 "before shift: node_counter=%d@.%a" !node_counter print_debug a in
+  if is_empty a then a else begin
+    Options.debug ~level:8 "before shift: node_counter=%d@.%a"
+      !node_counter Pretty.pp_debug a;
     let max_idx = G.fold_vertex max a.graph 0 in
     let min_idx = G.fold_vertex min a.graph max_idx in
     let offset = !node_counter - min_idx in
@@ -635,15 +611,17 @@ let shift (a : t) : t =
     let shift_vmap shift_elem vmap =
       VMap.of_seq @@ Stdlib.Seq.map shift_elem @@ VMap.to_seq vmap
     in
-    let {graph; lmap; vmap} = a in
+    let {graph; varmap; vmap} = a in
     node_counter := max_idx + offset + 1;
     let result =
       {graph = G.map_vertex shift graph;
-       lmap = LLMap.map shift lmap;
-       vmap = shift_vmap (fun (key, l) -> (shift key, l)) vmap}
+       varmap = VarMap.map shift varmap;
+       vmap = shift_vmap (fun (key, l) -> shift key, l) vmap}
     in
-    let () = Options.debug ~level:8 "after shift: node_counter=%d@.%a" !node_counter print_debug result in
+    Options.debug ~level:8 "after shift: node_counter=%d@.%a"
+      !node_counter Pretty.pp_debug result;
     asserting_invariants result
+  end
 
 let union_find vmap intersections =
   let module Store : UnionFind.STORE = UnionFind.StoreMap.Make (VMap) in
@@ -672,10 +650,10 @@ let union (a1:t) (a2:t) :t =
   assert_invariants a1;
   assert_invariants a2;
 
-  Options.debug ~level:4 "Union: First graph:%a" print_graph a1;
-  Options.debug ~level:5 "Union: First graph:%a" print_debug a1;
-  Options.debug ~level:4 "Union: Second graph:%a" print_graph a2;
-  Options.debug ~level:5 "Union: Second graph:%a" print_debug a2;
+  Options.debug ~level:4 "Union: First graph:%a" Pretty.pp_graph a1;
+  Options.debug ~level:5 "Union: First graph:%a" Pretty.pp_debug a1;
+  Options.debug ~level:4 "Union: Second graph:%a" Pretty.pp_graph a2;
+  Options.debug ~level:5 "Union: Second graph:%a" Pretty.pp_debug a2;
   let new_graph =
     G.fold_vertex
       (fun v2 g -> G.add_vertex g v2)
@@ -683,25 +661,22 @@ let union (a1:t) (a2:t) :t =
       a1.graph
   in
   let new_graph =
-    G.fold_edges
-      (fun v2a v2b g -> G.add_edge g v2a v2b)
-      a2.graph
-      new_graph
+    G.fold_edges_e (fun e g -> G.add_edge_e g e) a2.graph new_graph
   in
   let new_vmap =
-    VMap.union (fun _ lset1 lset2 -> Option.some @@ LSet.union lset1 lset2)
+    VMap.union (fun _ lset1 lset2 -> Option.some @@ VarSet.union lset1 lset2)
       a2.vmap
       a1.vmap
   in
   let sets_to_be_joined =
-    let intersections = LLMap.to_seq @@ LLMap.intersect a1.lmap a2.lmap in
-    union_find new_vmap @@ Seq.map (fun (_,_,x) -> x) intersections
+    let intersections = VarMap.to_seq @@ VarMap.intersect a1.varmap a2.varmap in
+    union_find new_vmap @@ Seq.map snd intersections
   in
-  let new_lmap = LLMap.union a1.lmap a2.lmap in
+  let new_varmap = VarMap.union (fun _ l _r -> Some l) a1.varmap a2.varmap in
   Options.debug ~level:7 "Union: sets to be joined:@[";
   VMap.iter (fun _ set -> Options.debug ~level:7 "%a" VSet.pretty set) sets_to_be_joined;
   Options.debug ~level:7 "@]";
-  let new_a = {graph = new_graph; lmap = new_lmap; vmap = new_vmap} in
+  let new_a = {graph = new_graph; varmap = new_varmap; vmap = new_vmap} in
   let merged_nodes, new_a =
     VMap.fold
       (fun _ set (merged_nodes, x) -> let v0, x = merge_set x set in (v0 :: merged_nodes), x)
@@ -709,87 +684,90 @@ let union (a1:t) (a2:t) :t =
       ([], new_a)
   in
   let new_a = List.fold_left join_succs new_a merged_nodes in
-  Options.debug ~level:4 "Union: Result graph:%a" print_graph new_a;
-  Options.debug ~level:5 "Union: Result graph:%a" print_debug new_a;
+  Options.debug ~level:4 "Union: Result graph:%a" Pretty.pp_graph new_a;
+  Options.debug ~level:5 "Union: Result graph:%a" Pretty.pp_debug new_a;
   begin try assert_invariants new_a
     with Assert_failure _ ->
       Options.debug "union failed";
-      Options.debug "Union: First graph:%a" print_graph a1;
-      Options.debug "Union: First graph:%a" print_debug a1;
-      Options.debug "Union: Second graph:%a" print_graph a2;
-      Options.debug "Union: Second graph:%a" print_debug a2;
-      Options.debug "Union: Result graph:%a" print_graph new_a;
-      Options.debug "Union: Result graph:%a" print_debug new_a;
+      Options.debug "Union: First graph:%a" Pretty.pp_graph a1;
+      Options.debug "Union: First graph:%a" Pretty.pp_debug a1;
+      Options.debug "Union: Second graph:%a" Pretty.pp_graph a2;
+      Options.debug "Union: Second graph:%a" Pretty.pp_debug a2;
+      Options.debug "Union: Result graph:%a" Pretty.pp_graph new_a;
+      Options.debug "Union: Result graph:%a" Pretty.pp_debug new_a;
       assert_invariants new_a
   end;
   new_a
 
-(* a type for summaries of functions *)
-type summary = {state   : t option;
-                formals : lval list;
-                locals  : lval list;
-                return  : exp option}
 
-let make_summary (s : t) (kf : kernel_function) =
-  let exp_return : exp option =
-    if Kernel_function.has_definition kf then
-      let return_stmt = Kernel_function.find_return kf in
-      match return_stmt.skind with
-      | Return (e, _) -> e
-      | _ -> Options.fatal "this should not happen"
-    else None
-  in
-  let s =
-    match exp_return with
-    | None -> s
-    | Some e ->
-      begin match s, LvalOrRef.from_exp e with
-        | _, None -> s
-        | s, Some lv ->
-          let _, new_s = find_or_create_vertex lv s in
-          new_s
-      end
-  in
-  {state = Some s;
-   formals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_formals kf);
-   locals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_locals kf);
-   return = exp_return}
+module Summary = struct
+  (* a type for summaries of functions *)
+  type s = {state   : t option;
+            formals : lval list;
+            locals  : lval list;
+            return  : exp option}
 
-let pretty_summary ?(debug=false) fmt s =
-  let print_list_lval ~state fmt (l: lval list) =
-    let is_first = ref true in
-    let print_elem x =
-      if !is_first then is_first := false else Format.fprintf fmt "@  ";
-      Format.fprintf fmt "@[%a" Cil_datatype.Lval.pretty x;
-      let pointees = points_to_set x state in
-      if not @@ LSet.is_empty pointees then
-        Format.fprintf fmt "→%a" LSet.pretty pointees;
-      Format.fprintf fmt "@]";
+  let make (s : t) (kf : kernel_function) =
+    let exp_return : exp option =
+      if Kernel_function.has_definition kf then
+        let return_stmt = Kernel_function.find_return kf in
+        match return_stmt.skind with
+        | Return (e, _) -> e
+        | _ -> Options.fatal "this should not happen"
+      else None
     in
-    List.iter print_elem l
-  in
-  let print_option pp fmt x =
-    match x with
-    | Some x -> pp fmt x
-    | None -> Format.fprintf fmt "<none>"
-  in
-  match s.state with
-  | None -> if debug then Format.fprintf fmt "not found"
-  | Some s when is_empty s -> if debug then Format.fprintf fmt "empty"
-  | Some state ->
-    Format.fprintf fmt "@[formals: @[%a@]@;<4>locals: @[%a@]@;<4>returns: @[%a@]@;<4>state: @[%a@] "
-      (print_list_lval ~state) s.formals
-      (print_list_lval ~state) s.locals
-      (print_option Exp.pretty) s.return
-      (print_option @@ pretty ~debug) s.state
+    let s =
+      match exp_return with
+      | None -> s
+      | Some e ->
+        begin match s, LvalOrRef.from_exp e with
+          | _, None -> s
+          | s, Some lv ->
+            let _, new_s = find_or_create_lval_or_ref_vertex lv s in
+            new_s
+        end
+    in
+    {state = Some s;
+     formals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_formals kf);
+     locals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_locals kf);
+     return = exp_return}
+
+  let pretty ?(debug=false) fmt s =
+    let pp_list_lval ~state fmt (l: lval list) =
+      let is_first = ref true in
+      let pp_elem x =
+        if !is_first then is_first := false else Format.fprintf fmt "@  ";
+        Format.fprintf fmt "@[%a" Cil_datatype.Lval.pretty x;
+        let pointees = Readout.points_to_set x state in
+        if not @@ LSet.is_empty pointees then
+          Format.fprintf fmt "→%a" LSet.pretty pointees;
+        Format.fprintf fmt "@]";
+      in
+      List.iter pp_elem l
+    in
+    let pp_option pp fmt = function
+      | Some x -> pp fmt x
+      | None -> Format.fprintf fmt "<none>"
+    in
+    match s.state with
+    | None -> if debug then Format.fprintf fmt "not found"
+    | Some s when is_empty s -> if debug then Format.fprintf fmt "empty"
+    | Some state ->
+      Format.fprintf fmt "@[formals: @[%a@]@;<4>locals: @[%a@]@;<4>returns: @[%a@]@;<4>state: @[%a@] "
+        (pp_list_lval ~state) s.formals
+        (pp_list_lval ~state) s.locals
+        (pp_option Exp.pretty) s.return
+        (pp_option @@ pretty ~debug) s.state
+
+end
 
 (* the algorithm:
    - unify the two graphs dropping all the variables from the summary
    - pair arguments with formals assigning the formal's successor as the argument's successor
 *)
-let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
+let call (state : t) (res : lval option) (args : exp list) (summary : Summary.s) : t =
   assert_invariants state;
-  let formals = summary.formals in
+  let formals = summary.Summary.formals in
   assert (List.length args = List.length formals);
   let sum_state = shift @@ Option.get summary.state in
 
@@ -827,8 +805,8 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
     let state = ref state in
     let find_vertex (lv1, lv2) =
       try
-        let v2 = LLMap.find lv2 sum_state.lmap in
-        let v1, new_state = find_or_create_vertex lv1 !state in
+        let v2 = find_lval_vertex lv2 sum_state in
+        let v1, new_state = find_or_create_lval_or_ref_vertex lv1 !state in
         state := new_state;
         Some (v1, v2)
       with Not_found -> None
@@ -840,13 +818,14 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
      for every arg/formal vertex pair (v1,v2) and every edge v2→v create edge v1→v. *)
   let g =
     let transfer_succs (g : G.t) (v1,v2) =
-      let v2_succs = G.succ sum_state.graph v2 in
-      assert (List.length v2_succs < 2);
-      List.fold_left (fun g succ -> G.add_edge g v1 succ) g v2_succs
+      List.fold_left
+        (fun g e -> G.add_edge_e g @@ E.create v1 (E.label e) (E.dst e))
+        g
+        (G.succ_e sum_state.graph v2)
     in
     let g = state.graph in
     let g = G.fold_vertex (fun i g -> G.add_vertex g i) sum_state.graph g in
-    let g = G.fold_edges (fun i j g -> G.add_edge g i j) sum_state.graph g in
+    let g = G.fold_edges_e (fun e g -> G.add_edge_e g e) sum_state.graph g in
     List.fold_left transfer_succs g vertex_pairs
   in
 
@@ -856,7 +835,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
     let remove_if_leaf v _ =
       if G.in_degree !g v = 0
       then let () = g := G.remove_vertex !g v in None
-      else Some LSet.empty
+      else Some VarSet.empty
     in
     let remaining_vertices = VMap.filter_map remove_if_leaf sum_state.vmap in
     remaining_vertices, !g
@@ -864,7 +843,7 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
 
   let state = {
     graph = g;
-    lmap = state.lmap;
+    varmap = state.varmap;
     vmap =
       let left_bias _ l _ = Some l in
       VMap.union left_bias state.vmap vertices_to_add_to_g}
@@ -872,3 +851,61 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
 
   asserting_invariants
     (List.fold_left join_succs state @@ List.map fst vertex_pairs)
+
+module Dot = struct
+  let find_varset_ref = Extlib.mk_fun "find_varset"
+
+  include Graph.Graphviz.Dot (struct
+      include G
+      let edge_attributes _ = []
+      let default_edge_attributes _ = []
+      let get_subgraph _ = None
+      let vertex_attributes v =
+        let lset = !find_varset_ref v in
+        let label =
+          VarSet.pretty Format.str_formatter lset;
+          Format.flush_str_formatter ()
+        in
+        [`Label label]
+
+      let vertex_name (v:V.t) = string_of_int v
+      let default_vertex_attributes _ = [`Shape `Box]
+      let graph_attributes _ = []
+    end)
+end
+
+module API = struct
+  type summary = Summary.s
+
+  let pretty_summary = Summary.pretty
+
+  let make_summary = Summary.make
+
+  let vid (v : V.t) : int = v
+
+  let rec closure_find_lset (v:V.t) (x:t) : (V.t * LSet.t) list =
+    match G.psucc_opt x.graph v with
+    | None -> [v, Readout.get_lval_set v x]
+    | Some v_next -> (v, Readout.get_lval_set v x) :: closure_find_lset v_next x
+
+  let find_transitive_closure  (lv:lval) (x:t) : (V.t * LSet.t) list =
+    let lv = Lval.simplify lv in
+    assert_invariants x;
+    try closure_find_lset (find_lval_vertex lv x) x with Not_found -> []
+  (* TODO : what about offsets ? *)
+
+  let get_lval_set = Readout.get_lval_set
+  let find_aliases = Readout.find_aliases
+  let find_all_aliases = Readout.find_all_aliases
+  let points_to_set = Readout.points_to_set
+
+  let get_graph (x:t) = x.graph
+
+  let print_dot filename (a:t) =
+    let file = open_out filename in
+    Dot.find_varset_ref := (fun v -> find_varset v a);
+    Dot.output_graph file a.graph;
+    close_out file
+end
+
+include API

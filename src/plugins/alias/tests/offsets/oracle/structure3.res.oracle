@@ -20,14 +20,15 @@
 [alias:unsafe-cast] structure3.c:33: Warning: 
   unsafe cast from st_2_t * to struct struct_2_t *
 [alias] May-aliases after instruction
-  st_3_t z = {.t = (struct struct_2_t *)(& y1), .d = 5};  are  <none>
+  st_3_t z = {.t = (struct struct_2_t *)(& y1), .d = 5};  are
+  { (z.t)->s; y1.s }
 [alias] analysing instruction: z.t = (struct struct_2_t *)(& y2);
 [alias:unsafe-cast] structure3.c:35: Warning: 
   unsafe cast from st_2_t * to struct struct_2_t *
 [alias] May-aliases after instruction  z.t = (struct struct_2_t *)(& y2);  are
-  <none>
+  { (z.t)->s; y1.s; y2.s }
 [alias] analysing instruction: y1.c = z.d;
-[alias] May-aliases after instruction  y1.c = z.d;  are  <none>
+[alias] May-aliases after instruction  y1.c = z.d;  are  { (z.t)->s; y1.s; y2.s }
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are  <none>
-[alias] May-aliases at the end of function main: <none>
+[alias] May-aliases after instruction  __retres = 0;  are  { (z.t)->s; y1.s; y2.s }
+[alias] May-aliases at the end of function main: { (z.t)->s; y1.s; y2.s }

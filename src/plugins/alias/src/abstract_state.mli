@@ -28,7 +28,6 @@ open Cil_types
 module G: Graph.Sig.G with type V.t = int
 
 module LSet = Cil_datatype.LvalStructEq.Set
-module LMap = Cil_datatype.LvalStructEq.Map
 
 (** Type denothing an abstract state of the analysis. It is a graph containing
     all aliases and points-to information. *)

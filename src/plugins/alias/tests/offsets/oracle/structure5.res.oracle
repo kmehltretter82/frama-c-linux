@@ -30,12 +30,12 @@
 [alias:unsafe-cast] structure5.c:43: Warning: 
   unsafe cast from st_2_t * to struct struct_2_t *
 [alias] May-aliases after instruction  t->t = (struct struct_2_t *)z;  are
-  { z->s; y1 }  { t->t; z }  { z->c; a }
+  { (t->t)->s; z->s; y1 }  { t->t; z }  { (t->t)->c; z->c; a }
 [alias] analysing instruction: t->d = a;
 [alias] May-aliases after instruction  t->d = a;  are
-  { z->s; y1 }  { t->t; z }  { z->c; t->d; a }
+  { (t->t)->s; z->s; y1 }  { t->t; z }  { (t->t)->c; z->c; t->d; a }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
-  { z->s; y1 }  { t->t; z }  { z->c; t->d; a }
+  { (t->t)->s; z->s; y1 }  { t->t; z }  { (t->t)->c; z->c; t->d; a }
 [alias] May-aliases at the end of function main:
-  { z->s; y1 }  { t->t; z }  { z->c; t->d; a }
+  { (t->t)->s; z->s; y1 }  { t->t; z }  { (t->t)->c; z->c; t->d; a }

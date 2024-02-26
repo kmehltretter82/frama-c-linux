@@ -22,6 +22,9 @@
 
 open Cil_types
 
+
+val nul_exp : exp
+
 module LvalOrRef : sig
   type t = Lval of lval | Ref of lval
   val pretty : Format.formatter -> t -> unit
@@ -46,10 +49,6 @@ module Lval : sig
   val simplify : lval -> lval
 
   val pretty: Format.formatter -> t -> unit
-
-  (* (points_to x) = *x and (points_to &x) = x. Raise
-     Explicit_pointer_address when applied to BNone *)
-  val points_to : lval -> lval
 end
 
 val decompose_lval : lval -> (lval * offset) list

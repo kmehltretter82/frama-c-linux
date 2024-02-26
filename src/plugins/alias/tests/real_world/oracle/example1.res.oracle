@@ -9,23 +9,28 @@
   { x; tmp }
 [alias] analysing instruction: idata = tmp->t2[*(tmp->n2)];
 [alias] May-aliases after instruction  idata = tmp->t2[*(tmp->n2)];  are
-  { x; tmp }  { tmp->t2[0..]; idata }
+  { x; tmp }  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; idata }
 [alias] analysing instruction: odata = tmp->t1[*(tmp->n1)];
 [alias] May-aliases after instruction  odata = tmp->t1[*(tmp->n1)];  are
-  { x; tmp }  { tmp->t2[0..]; idata }  { tmp->t1[0..]; odata }
+  { x; tmp }  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; idata }
+  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; odata }
 [alias] analysing instruction: idx = 0;
 [alias] May-aliases after instruction  idx = 0;  are
-  { x; tmp }  { tmp->t2[0..]; idata }  { tmp->t1[0..]; odata }
+  { x; tmp }  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; idata }
+  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; odata }
 [alias] analysing instruction: tmp_1 = sin(*(idata + idx));
 [alias:undefined:fn] example1.c:45: Warning: function sin has no definition
 [alias] May-aliases after instruction  tmp_1 = sin(*(idata + idx));  are
-  { x; tmp }  { tmp->t2[0..]; idata }  { tmp->t1[0..]; odata }
+  { x; tmp }  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; idata }
+  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; odata }
 [alias] analysing instruction: *(odata + idx) = 0.5 * tmp_1;
 [alias] May-aliases after instruction  *(odata + idx) = 0.5 * tmp_1;  are
-  { x; tmp }  { tmp->t2[0..]; idata }  { tmp->t1[0..]; odata }
+  { x; tmp }  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; idata }
+  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; odata }
 [alias] analysing instruction: idx ++;
 [alias] May-aliases after instruction  idx ++;  are
-  { x; tmp }  { tmp->t2[0..]; idata }  { tmp->t1[0..]; odata }
+  { x; tmp }  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; idata }
+  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; odata }
 [alias] analysing instruction: swap(tmp->n1);
 [alias] analysing function: swap
 [alias] analysing instruction: *n = 0;
@@ -34,13 +39,16 @@
 [alias] May-aliases after instruction  (*n) ++;  are  <none>
 [alias] May-aliases at the end of function swap: <none>
 [alias] May-aliases after instruction  swap(tmp->n1);  are
-  { x; tmp }  { tmp->t2[0..]; idata }  { tmp->t1[0..]; odata }
+  { x; tmp }  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; idata }
+  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; odata }
 [alias] analysing instruction: idata = tmp->t2[*(tmp->n2)];
 [alias] May-aliases after instruction  idata = tmp->t2[*(tmp->n2)];  are
-  { x; tmp }  { tmp->t2[0..]; idata }  { tmp->t1[0..]; odata }
+  { x; tmp }  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; idata }
+  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; odata }
 [alias] analysing instruction: odata = tmp->t1[*(tmp->n1)];
 [alias] May-aliases after instruction  odata = tmp->t1[*(tmp->n1)];  are
-  { x; tmp }  { tmp->t2[0..]; idata }  { tmp->t1[0..]; odata }
+  { x; tmp }  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; idata }
+  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; odata }
 [alias:no-return] example1.c:29: Warning: 
   function f1 does not return; analysis may be unsound
 [alias] May-aliases at the end of function f1: <none>
@@ -54,30 +62,37 @@
   { x; tmp }
 [alias] analysing instruction: idata = tmp->t1[*(tmp->n1)];
 [alias] May-aliases after instruction  idata = tmp->t1[*(tmp->n1)];  are
-  { x; tmp }  { tmp->t1[0..]; idata }
+  { x; tmp }  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; idata }
 [alias] analysing instruction: odata = tmp->t2[*(tmp->n2)];
 [alias] May-aliases after instruction  odata = tmp->t2[*(tmp->n2)];  are
-  { x; tmp }  { tmp->t1[0..]; idata }  { tmp->t2[0..]; odata }
+  { x; tmp }  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; idata }
+  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; odata }
 [alias] analysing instruction: idx = 0;
 [alias] May-aliases after instruction  idx = 0;  are
-  { x; tmp }  { tmp->t1[0..]; idata }  { tmp->t2[0..]; odata }
+  { x; tmp }  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; idata }
+  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; odata }
 [alias] analysing instruction:
   *(odata + idx) = (double)3 * *(idata + idx) + (double)1;
 [alias] May-aliases after instruction
   *(odata + idx) = (double)3 * *(idata + idx) + (double)1;  are
-  { x; tmp }  { tmp->t1[0..]; idata }  { tmp->t2[0..]; odata }
+  { x; tmp }  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; idata }
+  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; odata }
 [alias] analysing instruction: idx ++;
 [alias] May-aliases after instruction  idx ++;  are
-  { x; tmp }  { tmp->t1[0..]; idata }  { tmp->t2[0..]; odata }
+  { x; tmp }  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; idata }
+  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; odata }
 [alias] analysing instruction: swap(tmp->n2);
 [alias] May-aliases after instruction  swap(tmp->n2);  are
-  { x; tmp }  { tmp->t1[0..]; idata }  { tmp->t2[0..]; odata }
+  { x; tmp }  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; idata }
+  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; odata }
 [alias] analysing instruction: idata = tmp->t1[*(tmp->n1)];
 [alias] May-aliases after instruction  idata = tmp->t1[*(tmp->n1)];  are
-  { x; tmp }  { tmp->t1[0..]; idata }  { tmp->t2[0..]; odata }
+  { x; tmp }  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; idata }
+  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; odata }
 [alias] analysing instruction: odata = tmp->t2[*(tmp->n2)];
 [alias] May-aliases after instruction  odata = tmp->t2[*(tmp->n2)];  are
-  { x; tmp }  { tmp->t1[0..]; idata }  { tmp->t2[0..]; odata }
+  { x; tmp }  { x->t1; tmp->t1 }  { (*x)[0..].t1; (*tmp)[0..].t1; idata }
+  { x->t2; tmp->t2 }  { (*x)[0..].t2; (*tmp)[0..].t2; odata }
 [alias:no-return] example1.c:53: Warning: 
   function f2 does not return; analysis may be unsound
 [alias] May-aliases at the end of function f2: <none>
@@ -100,16 +115,6 @@
   <none>
 [alias] analysing instruction: i ++;
 [alias] May-aliases after instruction  i ++;  are  <none>
-[alias] analysing instruction:
-  a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));
-[alias] May-aliases after instruction
-  a->t1[i] = (double *)malloc((unsigned long)10 * sizeof(double));  are  
-  <none>
-[alias] analysing instruction:
-  a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double));
-[alias] May-aliases after instruction
-  a->t2[i] = (double *)malloc((unsigned long)10 * sizeof(double));  are  
-  <none>
 [alias] analysing instruction: a->n1 = (int *)malloc(sizeof(int));
 [alias] May-aliases after instruction  a->n1 = (int *)malloc(sizeof(int));  are
   <none>
@@ -123,41 +128,26 @@
 [alias] analysing instruction: i = 0;
 [alias] May-aliases after instruction  i = 0;  are  <none>
 [alias] analysing instruction: b->t1[i] = a->t1[i];
-[alias] May-aliases after instruction  b->t1[i] = a->t1[i];  are
-  { a->t1[0..]; b->t1[0..] }
+[alias] May-aliases after instruction  b->t1[i] = a->t1[i];  are  { a->t1; b->t1 }
 [alias] analysing instruction: b->t2[i] = a->t2[i];
 [alias] May-aliases after instruction  b->t2[i] = a->t2[i];  are
-  { a->t1[0..]; b->t1[0..] }  { a->t2[0..]; b->t2[0..] }
+  { a->t1; b->t1 }  { a->t2; b->t2 }
 [alias] analysing instruction: i ++;
-[alias] May-aliases after instruction  i ++;  are
-  { a->t1[0..]; b->t1[0..] }  { a->t2[0..]; b->t2[0..] }
-[alias] analysing instruction: b->t1[i] = a->t1[i];
-[alias] May-aliases after instruction  b->t1[i] = a->t1[i];  are
-  { a->t1[0..]; b->t1[0..] }  { a->t2[0..]; b->t2[0..] }
-[alias] analysing instruction: b->t2[i] = a->t2[i];
-[alias] May-aliases after instruction  b->t2[i] = a->t2[i];  are
-  { a->t1[0..]; b->t1[0..] }  { a->t2[0..]; b->t2[0..] }
+[alias] May-aliases after instruction  i ++;  are  { a->t1; b->t1 }  { a->t2; b->t2 }
 [alias] analysing instruction: b->n1 = a->n1;
-[alias] May-aliases after instruction  b->n1 = a->n1;  are
-  { a->t1[0..]; b->t1[0..] }  { a->t2[0..]; b->t2[0..] }  { a->n1; b->n1 }
+[alias] May-aliases after instruction  b->n1 = a->n1;  are  { a->n1; b->n1 }
 [alias] analysing instruction: b->n2 = a->n2;
 [alias] May-aliases after instruction  b->n2 = a->n2;  are
-  { a->t1[0..]; b->t1[0..] }  { a->t2[0..]; b->t2[0..] }  { a->n1; b->n1 }
-  { a->n2; b->n2 }
+  { a->n1; b->n1 }  { a->n2; b->n2 }
 [alias] analysing instruction: f1(a);
 [alias] May-aliases after instruction  f1(a);  are
-  { a->t1[0..]; b->t1[0..] }  { a->t2[0..]; b->t2[0..] }  { a->n1; b->n1 }
-  { a->n2; b->n2 }
+  { a->n1; b->n1 }  { a->n2; b->n2 }
 [alias] analysing instruction: f2(b);
 [alias] May-aliases after instruction  f2(b);  are
-  { a->t1[0..]; b->t1[0..] }  { a->t2[0..]; b->t2[0..] }  { a->n1; b->n1 }
-  { a->n2; b->n2 }
+  { a->n1; b->n1 }  { a->n2; b->n2 }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
-  { a->t1[0..]; b->t1[0..] }  { a->t2[0..]; b->t2[0..] }  { a->n1; b->n1 }
-  { a->n2; b->n2 }
-[alias] May-aliases at the end of function main:
-  { a->t1[0..]; b->t1[0..] }  { a->t2[0..]; b->t2[0..] }  { a->n1; b->n1 }
-  { a->n2; b->n2 }
+  { a->n1; b->n1 }  { a->n2; b->n2 }
+[alias] May-aliases at the end of function main: { a->n1; b->n1 }  { a->n2; b->n2 }
 [alias] analysing function: swap
 [alias] May-aliases at the end of function swap: <none>

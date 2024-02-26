@@ -23,7 +23,7 @@
 open Cil_types
 open Cil_datatype
 
-let nul_exp= Cil.kinteger64 ~loc:Location.unknown ~repr:"0.." ~kind:IInt Integer.zero
+let nul_exp = Cil.kinteger64 ~loc:Location.unknown ~repr:"0.." ~kind:IInt Integer.zero
 let is_nul_exp = Cil_datatype.ExpStructEq.equal nul_exp
 
 module HL = Lval.Hashtbl
@@ -81,7 +81,8 @@ and simplify_exp e =
         check_cast_compatibility e typ;
         simplify_exp e
       | Lval lv -> {e with enode = Lval (simplify_lval lv)}
-      | AddrOf lv | StartOf lv -> {e with enode = AddrOf (simplify_lval lv)}
+      | StartOf lv -> {e with enode = Lval (simplify_lval lv)}
+      | AddrOf lv -> {e with enode = AddrOf (simplify_lval lv)}
       | BinOp(PlusPI, e1, _, _) | BinOp(MinusPI, e1, _, _) ->
         begin
           match (simplify_exp e1).enode with
@@ -91,6 +92,8 @@ and simplify_exp e =
       | _ -> e
     in
     HE.add cached_exp e res;
+    Options.debug ~level:9 "simplify_exp %a = %a"
+      Printer.pp_exp e Printer.pp_exp res;
     res
 
 module LvalOrRef = struct
@@ -134,8 +137,6 @@ module Lval = struct
     if Options.is_debug_key_enabled Options.DebugKeys.lvals
     then Cil_types_debug.pp_lval l
     else Printer.pp_lval l
-
-  let points_to lv = Mem (Cil.dummy_exp (Lval lv)), NoOffset
 end
 
 let decompose_lval lv1 : (lval * offset) list =
