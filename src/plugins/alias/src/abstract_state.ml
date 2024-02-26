@@ -274,6 +274,8 @@ let assert_invariants (x:t) : unit =
 (* Ensure that assert_invariants is not executed if the -noassert flag is supplied. *)
 let assert_invariants x = assert (assert_invariants x; true)
 
+let asserting_invariants x = assert_invariants x; x
+
 let pretty ?(debug = false) fmt (x:t) =
   if debug then
     try assert_invariants x; print_graph fmt x
@@ -563,8 +565,7 @@ let set_type (x:t) (v1:V.t) (v2:V.t) : t =
     | _ -> Options.fatal "too many outgoing edges in set_type"
   in
   let new_g = G.add_edge g v1 v2 in
-  let new_x = {x with graph = new_g; vmap = new_vmap} in
-  assert_invariants new_x; new_x
+  asserting_invariants {x with graph = new_g; vmap = new_vmap}
 
 let assignment (a:t) (lv:lval) (e:exp) : t =
   assert_invariants a;
@@ -582,10 +583,7 @@ let assignment (a:t) (lv:lval) (e:exp) : t =
             "ignoring assignment of the form: %a = %a"
             Printer.pp_lval lv Printer.pp_exp e;
         in a
-      else
-        let a = join a v1 v2 in
-        let () = assert_invariants a in
-        a
+      else asserting_invariants @@ join a v1 v2
 
 (* assignment x = allocate(y) *)
 let assignment_x_allocate_y (a:t) (lv:lval) : t =
@@ -645,8 +643,7 @@ let shift (a : t) : t =
        vmap = shift_vmap (fun (key, l) -> (shift key, l)) vmap}
     in
     let () = Options.debug ~level:8 "after shift: node_counter=%d@.%a" !node_counter print_debug result in
-    assert_invariants result;
-    result
+    asserting_invariants result
 
 let union_find vmap intersections =
   let module Store : UnionFind.STORE = UnionFind.StoreMap.Make (VMap) in
@@ -881,7 +878,5 @@ let call (state:t) (res:lval option) (args:exp list) (summary:summary) :t =
       VMap.union left_bias state.vmap vertices_to_add_to_g}
   in
 
-  let state = List.fold_left join_succs state (List.map fst vertex_pairs) in
-
-  assert_invariants state;
-  state
+  asserting_invariants
+    (List.fold_left join_succs state @@ List.map fst vertex_pairs)
