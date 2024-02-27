@@ -498,21 +498,24 @@ global:
 /* (* Old-style function prototype. This should be somewhere else, like in
     * "declaration". For now we keep it at global scope only because in local
     * scope it looks too much like a function call  *) */
-| IDENT LPAREN old_parameter_list_ne RPAREN old_pardef_list SEMICOLON
-    {
-      let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
-      (* Convert pardecl to new style *)
-      let pardecl, isva = doOldParDecl $3 $5 in
-      (* Make the function declarator *)
-      doDeclaration None loc []
-        [(($1, PROTO(JUSTBASE, pardecl,[],isva),
-           ["FC_OLDSTYLEPROTO",[]], loc), NO_INIT)]
-    }
-| IDENT LPAREN RPAREN SEMICOLON {
-  let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
-  doDeclaration None loc []
-    [(($1, PROTO(JUSTBASE,[],[],false),
-       ["FC_OLDSTYLEPROTO",[]], loc), NO_INIT)]
+| f=IDENT LPAREN prms=old_parameter_list_ne RPAREN
+     decls=old_pardef_list SEMICOLON
+     {
+       let dloc = Cil_datatype.Location.of_lexing_loc $loc in
+       let floc = Cil_datatype.Location.of_lexing_loc $loc(f) in
+       (* Convert pardecl to new style *)
+       let pardecl, isva = doOldParDecl prms decls in
+       (* Make the function declarator *)
+       doDeclaration None dloc []
+         [((f, PROTO(JUSTBASE, pardecl,[],isva),
+            ["FC_OLDSTYLEPROTO",[]], floc), NO_INIT)]
+     }
+| f=IDENT LPAREN RPAREN SEMICOLON {
+  let dloc = Cil_datatype.Location.of_lexing_loc $loc in
+  let floc = Cil_datatype.Location.of_lexing_loc $loc(f) in
+  doDeclaration None dloc []
+    [((f, PROTO(JUSTBASE,[],[],false),
+       ["FC_OLDSTYLEPROTO",[]], floc), NO_INIT)]
 }
 ;
 
@@ -1068,31 +1071,39 @@ ghost_parameter:
 ;
 
 declaration:                                /* ISO 6.7.*/
-    decl_spec_list init_declarator_list SEMICOLON
-      { doDeclaration None ((snd $1)) (fst $1) $2 }
-|   decl_spec_list SEMICOLON
-      { if !Lexerhack.is_typedef () then begin
-          let source =
-            Cil_datatype.Position.of_lexing_pos $startpos($1)
-          in
-          Kernel.warning ~source ~wkey:Kernel.wkey_unnamed_typedef
-            "typedef without a name"
+    specif=decl_spec_list decls=init_declarator_list SEMICOLON
+  {
+    let loc = Cil_datatype.Location.of_lexing_loc $loc in
+    doDeclaration None loc (fst specif) decls
+  }
+|   decls=decl_spec_list SEMICOLON
+      {
+        let loc = Cil_datatype.Location.of_lexing_loc $loc in
+        if !Lexerhack.is_typedef () then begin
+          let source = fst loc in
+          let wkey = Kernel.wkey_unnamed_typedef in
+          Kernel.warning ~source ~wkey "typedef without a name"
         end;
         !Lexerhack.reset_typedef();
-        doDeclaration None ((snd $1)) (fst $1) []
+        doDeclaration None loc (fst decls) []
       }
-|   SPEC decl_spec_list init_declarator_list SEMICOLON
-          { doDeclaration (Some $1) ((snd $2)) (fst $2) $3 }
-|   SPEC decl_spec_list SEMICOLON
-      { if !Lexerhack.is_typedef () then begin
+|   spec=SPEC specif=decl_spec_list decls=init_declarator_list SEMICOLON
+          {
+            let loc = Cil_datatype.Location.of_lexing_loc $loc in
+            doDeclaration (Some spec) loc (fst specif) decls
+          }
+|   spec=SPEC specif=decl_spec_list SEMICOLON
+      {
+        let loc = Cil_datatype.Location.of_lexing_loc $loc in
+        if !Lexerhack.is_typedef () then begin
           let source =
-            Cil_datatype.Position.of_lexing_pos $startpos($2)
+            Cil_datatype.Position.of_lexing_pos $startpos(specif)
           in
-          Kernel.warning ~source ~wkey:Kernel.wkey_unnamed_typedef
-            "typedef without a name"
+          let wkey = Kernel.wkey_unnamed_typedef in
+          Kernel.warning ~source ~wkey "typedef without a name"
         end;
         !Lexerhack.reset_typedef();
-        doDeclaration (Some $1) ((snd $2)) (fst $2) [] }
+        doDeclaration (Some spec) loc (fst specif) [] }
 |   static_assert_declaration SEMICOLON
       { let (e, m, loc) = $1 in STATIC_ASSERT (e, m, loc) }
 ;

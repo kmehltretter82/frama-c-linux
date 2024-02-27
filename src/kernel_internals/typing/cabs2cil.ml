@@ -7910,8 +7910,6 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
   *)
   : chunk * init * typ * Cil_datatype.Lval.Set.t =
 
-  CurrentLoc.set loc;
-
   let checkArrayInit ty init =
     if Cil.isArrayType ty then
       match init with
@@ -7971,6 +7969,7 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
    – the list of unused initializers if any (should be empty most of the time)
 *)
 and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
+  CurrentLoc.set loc;
   let source = fst loc in
   let ghost = local_env.is_ghost in
   let whoami fmt = Cil_printer.pp_lval fmt (Var so.host, so.soOff) in
@@ -9050,6 +9049,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
     (* Do all the variables and concatenate the resulting statements *)
     let doOneDeclarator (acc: chunk) (name: init_name) =
       let (n,ndt,a,l),_ = name in
+      CurrentLoc.set l;
       if isglobal then begin
         let bt,_,_,attrs = spec_res in
         let vtype, nattr =
@@ -9057,14 +9057,14 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
             (AttrName false) bt (Cabs.PARENTYPE(attrs, ndt, a)) in
         (match filterAttributes "alias" nattr with
          | [] -> (* ordinary prototype. *)
-           ignore (createGlobal cloc local_env.is_ghost logic_spec spec_res name)
+           ignore (createGlobal l local_env.is_ghost logic_spec spec_res name)
          (*  E.log "%s is not aliased\n" name *)
          | [Attr("alias", [AStr othername])] ->
            if not (isFunctionType vtype) || local_env.is_ghost then begin
              Kernel.warning ~current:true
                "%a: CIL only supports attribute((alias)) for C functions."
                Cil_printer.pp_location (CurrentLoc.get ());
-             ignore (createGlobal cloc ghost logic_spec spec_res name)
+             ignore (createGlobal l ghost logic_spec spec_res name)
            end else
              doAliasFun ghost vtype n othername (s, (n,ndt,a,l)) loc
          | _ ->
