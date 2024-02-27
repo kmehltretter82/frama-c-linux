@@ -169,6 +169,7 @@
 .labview-tab {
     fill: var(--info-text);
     color: var(--info-text);
+    font-size: smaller;
     background: var(--background);
     background-image: none;
     border-radius: 8px;

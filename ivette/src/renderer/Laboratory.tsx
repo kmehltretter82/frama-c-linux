@@ -82,6 +82,19 @@ const LAB = new States.GlobalState<LabViewState>({
 /* --- Layout Utilities                                                   --- */
 /* -------------------------------------------------------------------------- */
 
+function compareScroll(p: Scroll, q: Scroll): boolean {
+  return p.H === q.H && p.V === q.V;
+}
+
+function compareLayout(u: Layout, v: Layout): boolean {
+  return (
+    u.A === v.A &&
+    u.B === v.B &&
+    u.C === v.C &&
+    u.D === v.D
+  );
+}
+
 function removeLayoutComponent(layout: Layout, compId: compId): Layout
 {
   const { A, B, C, D } = layout;
@@ -546,32 +559,49 @@ export function LabView(): JSX.Element {
 
 interface ViewItemProps {
   view: Ivette.ViewLayoutProps;
+  favorite: boolean;
   selected: boolean;
+  displayed: boolean;
+  layout: Layout | undefined;
+  scroll: Scroll | undefined;
 }
 
 function ViewItem(props: ViewItemProps): JSX.Element {
-  const { view, selected } = props;
-  const { id, label, title } = view;
+  const { view, favorite, displayed, selected, scroll, layout } = props;
+  const { id, label: vname, title: vtitle } = view;
 
   const onSelection = (_evt:React.MouseEvent): void => {
     applyView(view);
   };
 
+  const icon = favorite ? 'FAVORITE' : 'DISPLAY';
+  const modified =
+    (scroll !== undefined && !compareScroll(scroll, defaultScroll)) ||
+    (layout !== undefined && !compareLayout(layout, makeViewLayout(view.layout)));
+
+  console.log('MODIFIED', id, displayed, scroll,
+              scroll !== undefined && compareScroll(scroll, defaultScroll));
+
+  const label = modified ? vname + '*' : vname;
+  const title = modified ? vtitle + ' (modified)' : vtitle;
+
+  const onDisplay = (): void => applyView(view);
+
   const onContextMenu = (): void => {
     setCurrentView(id);
     Dome.popupMenu([
-      { label: 'Display View' },
+      { label: 'Display View', enabled: !displayed, onClick: onDisplay },
       { label: 'Duplicate View' },
-      { label: 'Restore Default' },
+      { label: 'Restore Default', enabled: modified },
     ]);
   };
 
   return (
     <Sidebars.Item
       key={id}
+      icon={icon}
       label={label}
       title={title}
-      icon='DISPLAY'
       selected={selected}
       onSelection={onSelection}
       onContextMenu={onContextMenu}
@@ -581,12 +611,25 @@ function ViewItem(props: ViewItemProps): JSX.Element {
 
 function ViewSection(): JSX.Element {
   const views = Ext.useElements(VIEW);
-  const [{ sideView }] = States.useGlobalState(LAB);
+  const [state] = States.useGlobalState(LAB);
+  const { tabs, tabIndex } = state;
 
   const items = views.map((view) => {
     const { id } = view;
+    const index = findTab(state.tabs, id);
+    const favorite = 0 <= index && tabs[index].custom === 0;
+    const displayed = 0 <= index && index === tabIndex;
+    const layout = displayed ? state.layout : undefined;
+    const scroll = displayed ? state.scroll : undefined;
     return (
-      <ViewItem key={id} view={view} selected={id === sideView} />
+      <ViewItem
+        key={id}
+        view={view}
+        favorite={favorite}
+        layout={layout}
+        scroll={scroll}
+        displayed={displayed}
+        selected={id === state.sideView} />
     );
   });
 
@@ -800,20 +843,35 @@ interface TabViewProps {
   tab: TabViewState;
   index: number;
   selection: number;
+  layout: Layout;
+  scroll: Scroll;
 }
 
 function TabView(props: TabViewProps): JSX.Element | null {
   const { tab, index, selection } = props;
   const { view: id, custom } = tab;
   const view = Ext.useElement(VIEW, id);
-  if (custom < 0 && index !== selection) return null;
-  const name = view?.label ?? id;
-  const label = custom > 0 ? `${name} — ${custom}` : name;
+  if (!view) return null;
+  const selected = index === selection;
+  if (custom < 0 && !selected) return null;
+  const layout = selected ? props.layout : tab.layout;
+  const scroll = selected ? props.scroll : tab.scroll;
+  const modified =
+    !compareScroll(scroll, defaultScroll) ||
+    !compareLayout(layout, makeViewLayout(view.layout));
+  const vname = view.label;
+  const tname = custom > 0 ? `${vname} — ${custom}` : vname;
+  const label = modified ? `${tname}*` : tname;
+  const tdup = custom > 0 ? 'Custom ' : custom === 0 ? 'Favorite ' : '';
+  const tmod = modified ? ' (modified)': '';
+  const title = tdup + vname + tmod;
+  const icon = custom < 0 ? 'DISPLAY' : 'FAVORITE';
   return (
     <Toolbar.Button
       className='labview-tab'
-      icon='DISPLAY'
+      icon={icon}
       label={label}
+      title={title}
       value={index}
       selection={selection}
       onClick={applyTab}
@@ -822,13 +880,16 @@ function TabView(props: TabViewProps): JSX.Element | null {
 }
 
 export function Tabs(): JSX.Element {
-  const [{ tabs, tabIndex }] = States.useGlobalState(LAB);
+  const [{ tabs, tabIndex, layout, scroll }] = States.useGlobalState(LAB);
   const items = tabs.map((tab, k) => (
     <TabView
       key={tab.view}
       tab={tab}
       index={k}
-      selection={tabIndex} />
+      selection={tabIndex}
+      layout={layout}
+      scroll={scroll}
+    />
   ));
   return <>{items}</>;
 }
