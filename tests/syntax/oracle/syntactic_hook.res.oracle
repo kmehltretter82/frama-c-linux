@@ -43,5 +43,5 @@
   28    }
   29    
   30    int f(int); //error: conflicting decls
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            ^
 [kernel] Frama-C aborted: invalid user input.

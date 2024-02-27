@@ -5,6 +5,6 @@
   4     */
   5     
   6     //@ assert \result == 0;
-        ^^^^^^^^^^^^^^^^^^^^^^^^
+                                ^
   7     extern int p(void void);
 [kernel] Frama-C aborted: invalid user input.

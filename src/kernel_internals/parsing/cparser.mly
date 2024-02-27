@@ -1577,7 +1577,6 @@ cvspec:
     {
       let annot, loc = $1 in
       if String.compare annot "\\ghost" = 0 then begin
-        let loc = Cil_datatype.Location.of_lexing_loc $loc in
         Errorloc.parse_error ~loc "Use of \\ghost out of ghost code"
       end else
         SpecCV(CV_ATTRIBUTE_ANNOT annot), loc

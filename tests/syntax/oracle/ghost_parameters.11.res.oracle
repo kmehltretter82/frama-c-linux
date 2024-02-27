@@ -1,7 +1,7 @@
 [kernel] Parsing ghost_parameters.c (with preprocessing)
 [kernel] ghost_parameters.c:195: 
   syntax error:
-  Location: line 195, between columns 36 and 37, before or at token: )
+  Location: line 195, column 36, before or at token: )
   193   #ifdef VOID_EMPTY_GHOST_PARAMETER_LIST
   194   
   195   void function_void(void) /*@ ghost () */ {

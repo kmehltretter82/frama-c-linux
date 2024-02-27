@@ -1,7 +1,7 @@
 [kernel] Parsing wrong_label.i (no preprocessing)
 [kernel] wrong_label.i:11: 
   syntax error:
-  Location: line 11, between columns 8 and 9, before or at token: }
+  Location: line 11, column 8, before or at token: }
   9     
   10    void main() {
   11      {_LOR:} // KO: labels can't be at the end of a block.

@@ -52,6 +52,12 @@ module H = Hashtbl
 module E = Errorloc
 
 let currentLoc () = E.currentLoc ()
+let parse_error lexbuf msg =
+  let loc =
+    Cil_datatype.Location.of_lexing_loc
+      (lexbuf.Lexing.lex_start_p,lexbuf.Lexing.lex_curr_p)
+  in
+  E.parse_error ~loc msg
 
 (* Convert char into Int64 *)
 let int64_of_char c = Int64.of_int (Char.code c)
@@ -273,7 +279,7 @@ let finish () =
 
 
 (*** escape character management ***)
-let scan_escape = function
+let scan_escape lexbuf = function
   | 'n' -> int64_of_char '\n'
   | 'r' -> int64_of_char '\r'
   | 't' -> int64_of_char '\t'
@@ -290,7 +296,7 @@ let scan_escape = function
   | '[' -> int64_of_char '['
   | '%' -> int64_of_char '%'
   | '\\' -> int64_of_char '\\'
-  | other -> E.parse_error "Unrecognized escape sequence: \\%c" other
+  | other -> parse_error lexbuf "Unrecognized escape sequence: \\%c" other
 
 let scan_hex_escape str =
   let radix = Int64.of_int 16 in
@@ -324,7 +330,7 @@ let lex_oct_escape remainder lexbuf =
 
 let lex_simple_escape remainder lexbuf =
   let lexchar = Lexing.lexeme_char lexbuf 1 in
-  let prefix = scan_escape lexchar in
+  let prefix = scan_escape lexbuf lexchar in
   prefix :: remainder lexbuf
 
 let lex_unescaped remainder lexbuf =
@@ -414,11 +420,6 @@ let make_annot ~one_line default lexbuf s =
     | Logic_ptree.Acode_annot (loc,a) -> CODE_ANNOT (a, loc)
     | Logic_ptree.Aloop_annot (loc,a) -> LOOP_ANNOT (a,loc)
     | Logic_ptree.Aattribute_annot (loc,a) -> ATTRIBUTE_ANNOT (a, loc)
-
-let parse_error lexbuf msg =
-  let loc = lexbuf.Lexing.lex_curr_p in
-  let source = Cil_datatype.Position.of_lexing_pos loc in
-  E.parse_error ~source msg
 
 (* Initialize the pointer in Errormsg *)
 let () =
