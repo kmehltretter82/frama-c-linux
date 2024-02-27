@@ -2,7 +2,7 @@
 [kernel] ghost_parameters.c:173: User Error: 
   Declaration of function does not match previous declaration from ghost_parameters.c:169 (different number of arguments).
 [kernel] ghost_parameters.c:173: User Error: 
-  Inconsistent formals
+  Function function redeclared with incompatible formals (original declaration was at ghost_parameters.c:169)
   171   }
   172   
   173   void function(int a, int b) /*@ ghost(int c, int d) */ {

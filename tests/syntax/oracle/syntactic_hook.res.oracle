@@ -39,7 +39,7 @@
 [kernel] syntactic_hook.i:30: Warning: 
   [SH]: conflict with declaration of f at line 8: different number of arguments
 [kernel] syntactic_hook.i:30: User Error: 
-  Inconsistent formals
+  Function f redeclared with incompatible formals (original declaration was at syntactic_hook.i:8)
   28    }
   29    
   30    int f(int); //error: conflicting decls

@@ -2759,7 +2759,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
          prototypes. Logic specifications refer to the varinfo in this table. *)
       begin
         match vi.vtype with
-        | TFun (_,Some formals , _, _ ) ->
+        | TFun (_,Some formals , _, _) ->
           (try
              let old_formals_env = getFormalsDecl oldvi in
              List.iter2
@@ -2783,7 +2783,12 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                formals;
            with
            | Invalid_argument _ ->
-             abort_context "Inconsistent formals" ;
+             abort_context
+               "Function %a redeclared with incompatible formals \
+                (original declaration was at %a)"
+               Cil_datatype.Varinfo.pretty vi
+               Cil_datatype.Location.pretty oldloc
+             ;
            | Not_found ->
              Cil.setFormalsDecl oldvi vi.vtype)
         | _ -> ()
