@@ -162,6 +162,31 @@
     fill: var(--text);
 }
 
+/* -------------------------------------------------------------------------- */
+/* --- Dock & Tabs                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.labview-tab {
+    fill: var(--info-text);
+    color: var(--info-text);
+    background: var(--background);
+    background-image: none;
+    border-radius: 8px;
+}
+
+.labview-tab:hover {
+    fill: var(--text);
+    color: var(--text);
+}
+
+.labview-tab.dome-selected:hover {
+    background: var(--default-button-hover);
+}
+
+.labview-tab.dome-selected {
+    background: var(--background-softer);
+}
+
 .labview-docked {
     font-size: smaller;
     background: var(--background-softer);

@@ -163,6 +163,8 @@ export interface ButtonProps<A> {
   onClick?: (value: A | undefined, evt:React.MouseEvent) => void;
   /** Right-Click callback. Receives the button's value. */
   onContextMenu?: (value: A | undefined, evt:React.MouseEvent) => void;
+  /** Further Styling */
+  className?: string;
   /** Button contents */
   children?: React.ReactNode;
 }
@@ -176,13 +178,16 @@ export function Button<A = undefined>(
   const { enabled = true, disabled = false } = props;
   const { selected, value, selection, onClick, onContextMenu } = props;
   const isSelected = selected !== undefined
-    ? selected
-    : (value !== undefined && value === selection);
+    ? selected : (value !== undefined && value === selection);
+  const className = classes(
+    isSelected ? SELECT : (BUTTON + KIND(props.kind)),
+    props.className,
+  );
   return (
     <button
       type="button"
       disabled={disabled || !enabled}
-      className={isSelected ? SELECT : (BUTTON + KIND(props.kind))}
+      className={className}
       onClick={onClick && ((evt) => onClick(value, evt))}
       onContextMenu={onContextMenu && ((evt) => onContextMenu(value, evt))}
       title={props.title}

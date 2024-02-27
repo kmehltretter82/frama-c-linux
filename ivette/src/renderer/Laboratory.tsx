@@ -48,7 +48,7 @@ interface Layout { A: compId, B: compId, C: compId, D: compId }
 
 interface TabViewState {
   view: viewId,
-  custom: number,
+  custom: number, /* -1: transient, 0: favorite, n: custom */
   scroll: Scroll,
   layout: Layout,
 }
@@ -73,7 +73,7 @@ const LAB = new States.GlobalState<LabViewState>({
   panels: new Set(),
   docked: new Map(),
   tabs: [],
-  tabIndex: 0,
+  tabIndex: -1,
   sideView: '',
   sideComp: '',
 });
@@ -112,7 +112,7 @@ function addLayoutComponent(
   }
 }
 
-function addLayoutView(m: Layout, view: Ivette.Layout): Layout
+function makeViewLayout(view: Ivette.Layout): Layout
 {
   type Unstructured = {
     A ?: compId, B ?: compId, C ?: compId, D ?: compId,
@@ -120,10 +120,10 @@ function addLayoutView(m: Layout, view: Ivette.Layout): Layout
     ABCD ?: compId
   };
   const u = view as Unstructured;
-  const A : compId = u.A ?? u.AB ?? u.AC ?? u.ABCD ?? m.A;
-  const B : compId = u.B ?? u.AB ?? u.BD ?? u.ABCD ?? m.B;
-  const C : compId = u.C ?? u.AC ?? u.CD ?? u.ABCD ?? m.C;
-  const D : compId = u.D ?? u.CD ?? u.BD ?? u.ABCD ?? m.D;
+  const A : compId = u.A ?? u.AB ?? u.AC ?? u.ABCD ?? '';
+  const B : compId = u.B ?? u.AB ?? u.BD ?? u.ABCD ?? '';
+  const C : compId = u.C ?? u.AC ?? u.CD ?? u.ABCD ?? '';
+  const D : compId = u.D ?? u.CD ?? u.BD ?? u.ABCD ?? '';
   return { A, B, C, D };
 }
 
@@ -164,6 +164,49 @@ function getLayoutPosition(
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Tabs Utilities                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+function findTab(tabs: TabViewState[], viewId: viewId) : number
+{
+  return tabs.findIndex(({ view, custom }) => view === viewId && custom <= 0);
+}
+
+/*
+function duplicateTab(tabs: TabViewState[], viewId: viewId): number
+{
+  return 1 + tabs.reduce((n, { view, custom }) => (
+    view === viewId ? Math.max(n, custom) : n
+  ), 0);
+}
+*/
+
+function newTab(
+  tabs: TabViewState[],
+  view: Ivette.ViewLayoutProps,
+  custom: number,
+): TabViewState[]
+{
+  return tabs.concat({
+    view: view.id, custom,
+    scroll: defaultScroll,
+    layout: makeViewLayout(view.layout)
+  });
+}
+
+function saveTab(
+  newTabs: TabViewState[],
+  oldState: LabViewState,
+): void {
+  const oldIndex = oldState.tabIndex;
+  const toSave = newTabs[oldIndex];
+  if (toSave !== undefined) {
+    const { layout, scroll } = oldState;
+    newTabs[oldIndex] = { ...toSave, layout, scroll };
+  }
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- LabView Actions                                                    --- */
 /* -------------------------------------------------------------------------- */
 
@@ -190,16 +233,50 @@ function setCurrentComp(compId: compId = ''):void {
   LAB.setValue({ ...state, sideComp: compId, sideView: '' });
 }
 
+function applyTab(index = -1): void {
+  const state = LAB.getValue();
+  const old = state.tabIndex;
+  if (old === index) return;
+  const tab = state.tabs[index];
+  if (tab === undefined) return;
+  const { view, layout, scroll } = tab;
+  const tabs = [...state.tabs];
+  saveTab(tabs, state);
+  LAB.setValue({
+    ...state,
+    tabIndex: index,
+    tabs, layout, scroll,
+    sideView: view,
+    sideComp: '',
+  });
+}
+
 function applyView(view: Ivette.ViewLayoutProps): void {
   const state = LAB.getValue();
-  const layout = addLayoutView(state.layout, view.layout);
-  const panels =
-    copySet(state.panels)
-      .add(layout.A)
-      .add(layout.B)
-      .add(layout.C)
-      .add(layout.D);
-  LAB.setValue({ ...state, panels, layout, sideView: view.id, sideComp: '' });
+  const viewId = view.id;
+  const index = findTab(state.tabs, viewId);
+  if (0 <= index) {
+    applyTab(index);
+  } else {
+    const layout = makeViewLayout(view.layout);
+    const panels =
+      copySet(state.panels)
+        .add(layout.A)
+        .add(layout.B)
+        .add(layout.C)
+        .add(layout.D);
+    const tabs = newTab(state.tabs, view, -1);
+    const tabIndex = tabs.length - 1;
+    saveTab(tabs, state);
+    LAB.setValue({
+      panels, layout,
+      scroll: state.scroll,
+      docked: state.docked,
+      tabs, tabIndex,
+      sideView: view.id,
+      sideComp: '',
+    });
+  }
 }
 
 function applyComponent(
@@ -722,21 +799,24 @@ export function Dock(): JSX.Element {
 interface TabViewProps {
   tab: TabViewState;
   index: number;
-  selected: number;
+  selection: number;
 }
 
 function TabView(props: TabViewProps): JSX.Element | null {
-  const { tab, index, selected } = props;
+  const { tab, index, selection } = props;
   const { view: id, custom } = tab;
   const view = Ext.useElement(VIEW, id);
+  if (custom < 0 && index !== selection) return null;
   const name = view?.label ?? id;
   const label = custom > 0 ? `${name} — ${custom}` : name;
   return (
     <Toolbar.Button
+      className='labview-tab'
       icon='DISPLAY'
       label={label}
       value={index}
-      selection={selected}
+      selection={selection}
+      onClick={applyTab}
     />
   );
 }
@@ -748,7 +828,7 @@ export function Tabs(): JSX.Element {
       key={tab.view}
       tab={tab}
       index={k}
-      selected={tabIndex} />
+      selection={tabIndex} />
   ));
   return <>{items}</>;
 }
