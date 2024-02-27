@@ -140,15 +140,34 @@ let float ~kind f =
   in
   mk (Const (CReal(f,kind,None)))
 
+let cast typ exp =
+  if Cil.need_cast exp.typ typ
+  then mk (CastE (Cil.type_remove_qualifier_attributes typ, exp))
+  else exp
+
 let binop op e1 e2 =
   (* TODO: const folding *)
-  let t = Cil.arithmeticConversion e1.typ e2.typ in
   match op with
   | PlusA | MinusA | Mult | Div ->
+    let t = Cil.arithmeticConversion e1.typ e2.typ in
     mk (BinOp (op,e1,e2,t))
+
+  | Eq |Ne |Lt |Le |Ge |Gt ->
+    let t =
+      if Cil.isArithmeticType e1.typ && Cil.isArithmeticType e2.typ then
+        Cil.arithmeticConversion e1.typ e2.typ
+      else if Cil.isPointerType e1.typ && Cil.isPointerType e2.typ then
+        Cil.theMachine.upointType
+      else
+        invalid_arg "unsupported construction"
+    in
+    mk (BinOp (op, cast t e1, cast t e2, Cil.intType))
+
   | _ -> invalid_arg "unsupported construction"
 
 let add = binop PlusA
+let eq = binop Eq
+let ne = binop Ne
 
 let addr lval = mk (AddrOf lval)
 

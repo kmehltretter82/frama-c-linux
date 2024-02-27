@@ -38,8 +38,11 @@ val float: kind:Cil_types.fkind -> float -> exp
 val integer: ?kind:Cil_types.ikind -> Integer.t -> exp
 val bool: bool -> exp (* convert booleans to an expression 0 or 1 *)
 
-val binop: binop -> exp -> exp -> exp
+val cast: typ -> exp -> exp (* (typ)x *)
+val binop: binop -> exp -> exp -> exp (* x op y *)
 val add: exp -> exp -> exp (* x + y *)
+val eq: exp -> exp -> exp (* x == y *)
+val ne: exp -> exp -> exp (* x != y *)
 val addr: lval -> exp (* &x *)
 
 val var: Cil_types.varinfo -> lval
