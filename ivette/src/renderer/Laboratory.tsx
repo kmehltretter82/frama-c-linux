@@ -47,7 +47,7 @@ interface Scroll { H: number, V: number }
 interface Layout { A: compId, B: compId, C: compId, D: compId }
 
 interface TabViewState {
-  view: viewId,
+  viewId: viewId,
   custom: number, /* -1: transient, 0: favorite, n: custom */
   scroll: Scroll,
   layout: Layout,
@@ -182,7 +182,7 @@ function getLayoutPosition(
 
 function findTab(tabs: TabViewState[], viewId: viewId) : number
 {
-  return tabs.findIndex(({ view, custom }) => view === viewId && custom <= 0);
+  return tabs.findIndex(tab => tab.viewId === viewId && tab.custom <= 0);
 }
 
 /*
@@ -201,7 +201,7 @@ function newTab(
 ): TabViewState[]
 {
   return tabs.concat({
-    view: view.id, custom,
+    viewId: view.id, custom,
     scroll: defaultScroll,
     layout: makeViewLayout(view.layout)
   });
@@ -217,6 +217,16 @@ function saveTab(
     const { layout, scroll } = oldState;
     newTabs[oldIndex] = { ...toSave, layout, scroll };
   }
+}
+
+function addPanels(panels: Set<compId>, layout: Layout): Set<compId>
+{
+  const { A, B, C, D } = layout;
+  if ( panels.has(A) && panels.has(B) && panels.has(C) && panels.has(D) )
+    return panels;
+  else
+    return copySet(panels).add(A).add(B).add(C).add(D);
+
 }
 
 /* -------------------------------------------------------------------------- */
@@ -252,14 +262,18 @@ function applyTab(index = -1): void {
   if (old === index) return;
   const tab = state.tabs[index];
   if (tab === undefined) return;
-  const { view, layout, scroll } = tab;
+  const { viewId, layout, scroll } = tab;
   const tabs = [...state.tabs];
   saveTab(tabs, state);
+  const panels = addPanels(state.panels, layout);
   LAB.setValue({
     ...state,
+    panels,
+    layout,
+    scroll,
+    tabs,
     tabIndex: index,
-    tabs, layout, scroll,
-    sideView: view,
+    sideView: viewId,
     sideComp: '',
   });
 }
@@ -272,12 +286,7 @@ function applyView(view: Ivette.ViewLayoutProps): void {
     applyTab(index);
   } else {
     const layout = makeViewLayout(view.layout);
-    const panels =
-      copySet(state.panels)
-        .add(layout.A)
-        .add(layout.B)
-        .add(layout.C)
-        .add(layout.D);
+    const panels = addPanels(state.panels, layout);
     const tabs = newTab(state.tabs, view, -1);
     const tabIndex = tabs.length - 1;
     saveTab(tabs, state);
@@ -285,10 +294,26 @@ function applyView(view: Ivette.ViewLayoutProps): void {
       panels, layout,
       scroll: state.scroll,
       docked: state.docked,
-      tabs, tabIndex,
+      tabs,
+      tabIndex,
       sideView: view.id,
       sideComp: '',
     });
+  }
+}
+
+function applyFavorite(view: Ivette.ViewLayoutProps, favorite: boolean): void {
+  const state = LAB.getValue();
+  const index = findTab(state.tabs, view.id);
+  if (0 <= index) {
+    const tabs = [...state.tabs];
+    const tab = tabs[index];
+    const custom = favorite ? 0 : -1;
+    tabs[index] = { ...tab, custom };
+    LAB.setValue({ ...state, tabs, sideView: view.id, sideComp: '' });
+  } else if (favorite) {
+    const tabs = newTab(state.tabs, view, 0);
+    LAB.setValue({ ...state, tabs, sideView: view.id, sideComp: '' });
   }
 }
 
@@ -576,21 +601,22 @@ function ViewItem(props: ViewItemProps): JSX.Element {
 
   const icon = favorite ? 'FAVORITE' : 'DISPLAY';
   const modified =
-    (scroll !== undefined && !compareScroll(scroll, defaultScroll)) ||
-    (layout !== undefined && !compareLayout(layout, makeViewLayout(view.layout)));
-
-  console.log('MODIFIED', id, displayed, scroll,
-              scroll !== undefined && compareScroll(scroll, defaultScroll));
+    (scroll !== undefined &&
+     !compareScroll(scroll, defaultScroll)) ||
+    (layout !== undefined &&
+     !compareLayout(layout, makeViewLayout(view.layout)));
 
   const label = modified ? vname + '*' : vname;
-  const title = modified ? vtitle + ' (modified)' : vtitle;
-
-  const onDisplay = (): void => applyView(view);
+  const title = modified ? (vtitle ?? vname) + ' (modified)' : vtitle;
 
   const onContextMenu = (): void => {
     setCurrentView(id);
+    const onDisplay = (): void => applyView(view);
+    const onFavorite = (): void => applyFavorite(view, !favorite);
+    const favAction = !favorite ? 'Add to Favorite' : 'Remove from Favorite';
     Dome.popupMenu([
       { label: 'Display View', enabled: !displayed, onClick: onDisplay },
+      { label: favAction, onClick: onFavorite },
       { label: 'Duplicate View' },
       { label: 'Restore Default', enabled: modified },
     ]);
@@ -842,18 +868,17 @@ export function Dock(): JSX.Element {
 interface TabViewProps {
   tab: TabViewState;
   index: number;
-  selection: number;
+  tabIndex: number;
   layout: Layout;
   scroll: Scroll;
 }
 
 function TabView(props: TabViewProps): JSX.Element | null {
-  const { tab, index, selection } = props;
-  const { view: id, custom } = tab;
-  const view = Ext.useElement(VIEW, id);
-  if (!view) return null;
-  const selected = index === selection;
-  if (custom < 0 && !selected) return null;
+  const { tab, index, tabIndex } = props;
+  const { viewId, custom } = tab;
+  const view = Ext.useElement(VIEW, viewId);
+  if (!view || custom < 0) return null;
+  const selected = index === tabIndex;
   const layout = selected ? props.layout : tab.layout;
   const scroll = selected ? props.scroll : tab.scroll;
   const modified =
@@ -862,10 +887,10 @@ function TabView(props: TabViewProps): JSX.Element | null {
   const vname = view.label;
   const tname = custom > 0 ? `${vname} — ${custom}` : vname;
   const label = modified ? `${tname}*` : tname;
-  const tdup = custom > 0 ? 'Custom ' : custom === 0 ? 'Favorite ' : '';
+  const tdup = custom > 0 ? 'Custom ' : '';
   const tmod = modified ? ' (modified)': '';
   const title = tdup + vname + tmod;
-  const icon = custom < 0 ? 'DISPLAY' : 'FAVORITE';
+  const icon = selected ? 'FAVORITE' : 'STAR';
   return (
     <Toolbar.Button
       className='labview-tab'
@@ -873,22 +898,22 @@ function TabView(props: TabViewProps): JSX.Element | null {
       label={label}
       title={title}
       value={index}
-      selection={selection}
+      selection={tabIndex}
       onClick={applyTab}
     />
   );
 }
 
 export function Tabs(): JSX.Element {
-  const [{ tabs, tabIndex, layout, scroll }] = States.useGlobalState(LAB);
-  const items = tabs.map((tab, k) => (
+  const [state] = States.useGlobalState(LAB);
+  const items = state.tabs.map((tab, k) => (
     <TabView
-      key={tab.view}
+      key={tab.viewId}
       tab={tab}
       index={k}
-      selection={tabIndex}
-      layout={layout}
-      scroll={scroll}
+      tabIndex={state.tabIndex}
+      layout={state.layout}
+      scroll={state.scroll}
     />
   ));
   return <>{items}</>;
