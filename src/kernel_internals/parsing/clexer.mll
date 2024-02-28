@@ -52,11 +52,8 @@ module H = Hashtbl
 module E = Errorloc
 
 let currentLoc () = E.currentLoc ()
-let parse_error lexbuf msg =
-  let loc =
-    Cil_datatype.Location.of_lexing_loc
-      (lexbuf.Lexing.lex_start_p,lexbuf.Lexing.lex_curr_p)
-  in
+
+let parse_error ?(loc=currentLoc()) msg =
   E.parse_error ~loc msg
 
 (* Convert char into Int64 *)
@@ -73,9 +70,15 @@ let enter_ghost_code () = ghost_code := true
 let exit_ghost_code () = ghost_code := false
 
 let ghost_annot = ref false
+let ghost_annot_start = ref Cil_datatype.Location.unknown
 let is_ghost_annot () = !ghost_annot
-let enter_ghost_annot () = ghost_annot := true
-let exit_ghost_annot () = ghost_annot := false
+let get_ghost_annot_start () = !ghost_annot_start
+let enter_ghost_annot () =
+  ghost_annot := true;
+  ghost_annot_start:= currentLoc()
+let exit_ghost_annot () =
+  ghost_annot := false;
+  ghost_annot_start := Cil_datatype.Location.unknown
 
 let add_comment c = Cabshelper.Comments.add (currentLoc()) c
 
@@ -279,7 +282,7 @@ let finish () =
 
 
 (*** escape character management ***)
-let scan_escape lexbuf = function
+let scan_escape = function
   | 'n' -> int64_of_char '\n'
   | 'r' -> int64_of_char '\r'
   | 't' -> int64_of_char '\t'
@@ -296,7 +299,7 @@ let scan_escape lexbuf = function
   | '[' -> int64_of_char '['
   | '%' -> int64_of_char '%'
   | '\\' -> int64_of_char '\\'
-  | other -> parse_error lexbuf "Unrecognized escape sequence: \\%c" other
+  | other -> parse_error "Unrecognized escape sequence: \\%c" other
 
 let scan_hex_escape str =
   let radix = Int64.of_int 16 in
@@ -330,7 +333,7 @@ let lex_oct_escape remainder lexbuf =
 
 let lex_simple_escape remainder lexbuf =
   let lexchar = Lexing.lexeme_char lexbuf 1 in
-  let prefix = scan_escape lexbuf lexchar in
+  let prefix = scan_escape lexchar in
   prefix :: remainder lexbuf
 
 let lex_unescaped remainder lexbuf =
@@ -529,7 +532,7 @@ rule initial = parse
     {
     if is_ghost_code () || is_oneline_ghost ()
     then GHOST (currentLoc())
-    else parse_error lexbuf "Use of \\ghost out of ghost code"
+    else parse_error "Use of \\ghost out of ghost code"
     }
 
   | blank {initial lexbuf} | '\n'
@@ -629,7 +632,7 @@ rule initial = parse
     if c = !annot_char then
       if is_ghost_code () || is_oneline_ghost ()
       then (enter_ghost_annot () ; annot_lex initial annot_first_token lexbuf)
-      else parse_error lexbuf "This kind of annotation is valid only inside ghost code"
+      else parse_error "This kind of annotation is valid only inside ghost code"
     else (lexbuf.Lexing.lex_curr_pos <- lexbuf.Lexing.lex_curr_pos - 1 ; SLASH)
     }
 
@@ -686,7 +689,7 @@ rule initial = parse
   | _ as c
     {
     if is_ghost_code() && c = '@' then initial lexbuf
-    else parse_error lexbuf "Invalid symbol"
+    else parse_error "Invalid symbol"
     }
 
 
@@ -697,7 +700,7 @@ and might_end_ghost = parse
 
 and comment buffer = parse
   | "*/" {  }
-  | eof  { parse_error lexbuf "Unterminated C comment" }
+  | eof  { parse_error "Unterminated C comment" }
   | _    { lex_comment comment buffer lexbuf }
 
 
@@ -794,7 +797,7 @@ and str = parse
   | hex_escape  { lex_hex_escape str lexbuf }
   | oct_escape  { lex_oct_escape str lexbuf }
   | escape      { lex_simple_escape str lexbuf }
-  | eof         { parse_error lexbuf "unterminated string" }
+  | eof         { parse_error "unterminated string" }
   | _           { lex_unescaped str lexbuf }
 
 
@@ -803,14 +806,14 @@ and chr =  parse
   | hex_escape  { lex_hex_escape chr lexbuf }
   | oct_escape  { lex_oct_escape chr lexbuf }
   | escape      { lex_simple_escape chr lexbuf }
-  | eof         { parse_error lexbuf "unterminated char" }
+  | eof         { parse_error "unterminated char" }
   | _           { lex_unescaped chr lexbuf }
 
 
 and annot_first_token = parse
   | "ghost" ((blank| '\\'?'\n' | ghost_comments)* as comments) "else"
     {
-    if is_oneline_ghost () then parse_error lexbuf "nested ghost code" ;
+    if is_oneline_ghost () then parse_error "nested ghost code" ;
     Buffer.clear buf ;
     let loc = currentLoc () in
     do_ghost_else_comments true comments ;
@@ -820,7 +823,7 @@ and annot_first_token = parse
 
   | "ghost"
     {
-    if is_oneline_ghost () then parse_error lexbuf "nested ghost code" ;
+    if is_oneline_ghost () then parse_error "nested ghost code" ;
     Buffer.clear buf ;
     enter_ghost_code () ;
     LGHOST
@@ -835,12 +838,15 @@ and annot_token = parse
   | "*/"
     {
     if is_ghost_annot ()
-    then parse_error lexbuf "Ghost multi-line annotation not terminated" ;
+    then begin
+      let loc = (fst (get_ghost_annot_start()), snd (currentLoc())) in
+      parse_error ~loc "Ghost multi-line annotation not terminated"
+    end;
     let s = Buffer.contents buf in
     make_annot ~one_line:false initial lexbuf s
     }
 
-  | eof  { parse_error lexbuf "Unterminated annotation" }
+  | eof  { parse_error "Unterminated annotation" }
   | '\n' { E.newline() ; Buffer.add_char buf '\n' ; annot_token lexbuf }
   | _ as c
     {
@@ -861,14 +867,14 @@ and annot_one_line = parse
   | "ghost" ((blank|"\\\n")+ as comments) "else"
     {
     do_ghost_else_comments false comments ;
-    if is_oneline_ghost () then parse_error lexbuf "nested ghost code" ;
+    if is_oneline_ghost () then parse_error "nested ghost code" ;
     enter_oneline_ghost () ;
     LGHOST_ELSE (currentLoc ())
     }
 
   | "ghost"
     {
-    if is_oneline_ghost () then parse_error lexbuf "nested ghost code" ;
+    if is_oneline_ghost () then parse_error "nested ghost code" ;
     enter_oneline_ghost () ;
     LGHOST
     }
@@ -879,7 +885,7 @@ and annot_one_line = parse
 
 and annot_one_line_logic = parse
   | '\n'    { make_annot ~one_line:true initial lexbuf (Buffer.contents buf) }
-  | eof     { parse_error lexbuf "Invalid C file: should end with a newline" }
+  | eof     { parse_error "Invalid C file: should end with a newline" }
   | _ as c  { Buffer.add_char buf c ; annot_one_line_logic lexbuf }
 
 
