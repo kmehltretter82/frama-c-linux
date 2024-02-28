@@ -35,7 +35,7 @@ let abort_current lex fmt =
   let fmt = "before or at token %s@\n%a@\n" ^^ fmt in
   Aorai_option.abort fmt
     (Lexing.lexeme lex)
-    (Errorloc.pp_context_from_file ~start_pos ~ctx:2) end_pos
+    (Errorloc.pp_context_from_file ~ctx:2) (start_pos,end_pos)
 
 let unknown_token lex =
   abort_current lex

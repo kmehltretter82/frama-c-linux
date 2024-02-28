@@ -71,10 +71,10 @@ let () = Log.set_current_source (fun () -> fst (CurrentLoc.get ()))
 let pp_thisloc fmt = Location.pretty fmt (CurrentLoc.get ())
 
 let abort_context msg =
-  let (start_pos,pos) = CurrentLoc.get () in
+  let loc = CurrentLoc.get () in
   let append fmt =
     Format.pp_print_newline fmt ();
-    Errorloc.pp_context_from_file ~start_pos fmt pos
+    Errorloc.pp_context_from_file fmt loc
   in
   Kernel.abort ~current:true ~append msg
 

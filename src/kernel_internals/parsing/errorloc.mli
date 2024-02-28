@@ -66,18 +66,20 @@ val finishParsing: unit -> unit (** Call this function to finish parsing and
                                     close the input channel *)
 
 
-(** prints the line identified by the position, together with [ctx] lines
+(** prints the line(s) identified by the location, together with [ctx] lines
     of context before and after. [ctx] defaults to 2.
-    If [start_pos] is specified, then all positions between [start_pos] and
-    [pos] are considered part of the error. If this expands to multiple
-    lines, those lines will be separated from context by blank lines.
-    Otherwise, the portion of the line that is between the two positions
-    will be underlined with [^]
-    @before Frama-C+dev: [start_pos] was named [start_line] (and was an [int]).
+    If the location expands to multiple lines, those lines will be separated
+    from context by blank lines.
+    Otherwise, the portion of the line that is between the two positions of
+    the location will be underlined with [^]
+    NB: if the two positions in the location refer to different files, the
+    first position will not be considered.
+    @before Frama-C+dev: the function took as argument a single position and
+    and an optional [start_line] (as an [int]) to indicate a different starting
+    line.
 *)
 val pp_context_from_file:
-  ?ctx:int -> ?start_pos:Filepath.position ->
-  Format.formatter -> Filepath.position -> unit
+  ?ctx:int -> Format.formatter -> Cil_types.location -> unit
 
 (** prints a readable description of a location
     @since 22.0-Titanium *)

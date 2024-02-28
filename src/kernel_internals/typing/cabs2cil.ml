@@ -132,10 +132,9 @@ let abort_context ?loc msg =
     | None -> Cil.CurrentLoc.get()
     | Some loc -> loc
   in
-  let start_pos,end_pos = loc in
   let append fmt =
     Format.pp_print_newline fmt ();
-    Errorloc.pp_context_from_file ~start_pos fmt end_pos
+    Errorloc.pp_context_from_file fmt loc
   in
   Kernel.abort ~current:true ~append msg
 

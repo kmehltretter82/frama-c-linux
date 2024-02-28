@@ -138,23 +138,24 @@ let setCurrentFile n =
     }
   end
 
-(* Prints the [pos.pos_lnum]-th line from file [pos.pos_fname],
-   plus up to [ctx] lines before and after [pos.pos_lnum] (if they exist),
-   similar to 'grep -C<ctx>'. The first line is numbered 1.
+(* Prints the line(s) between start_pos and pos,
+   plus up to [ctx] lines before and after (if they exist),
+   similar to 'grep -C<ctx>'.
    Most exceptions are silently caught and printing is stopped if they occur. *)
-let pp_context_from_file ?(ctx=2) ?start_pos fmt pos =
+let pp_context_from_file ?(ctx=2) fmt (start_pos, pos) =
+  let open Filepath in
   try
-    let in_ch = open_in (pos.Filepath.pos_path :> string) in
+    let start_pos =
+      if Normalized.equal start_pos.pos_path pos.pos_path then start_pos
+      else pos
+    in
+    let in_ch = open_in (pos.pos_path :> string) in
     try
       begin
-        let open Filepath in
         let first_error_line, start_char, last_error_line =
-          match start_pos with
-          | None -> pos.pos_lnum, 1, pos.pos_lnum
-          | Some s ->
-            min s.pos_lnum pos.pos_lnum,
-            (s.pos_cnum - s.pos_bol + 1),
-            max s.pos_lnum pos.pos_lnum
+          min start_pos.pos_lnum pos.pos_lnum,
+          (start_pos.pos_cnum - start_pos.pos_bol + 1),
+          max start_pos.pos_lnum pos.pos_lnum
         in
         (* The difference between the first and last error lines can be very
            large; in this case, we print only the first and last [error_ctx]
@@ -265,9 +266,9 @@ let parse_error ?loc msg =
       ignore (MenhirLib.ErrorReports.show pp current.menhir_pos)
     with _ -> ()
   in
-  let start_pos,last_pos =
+  let loc =
     match loc with
-    | Some (s,l) -> s, l
+    | Some loc -> loc
     | None ->
       if Stack.is_empty all_pos then
         Cil_datatype.Location.of_lexing_loc
@@ -292,13 +293,13 @@ let parse_error ?loc msg =
       Format.fprintf fmt ", before or at token: %s" token
   in
   Pretty_utils.ksfprintf (fun str ->
-      Kernel.feedback ~source:start_pos "%s:@." str
+      Kernel.feedback ~source:(fst loc) "%s:@." str
         ~append:(fun fmt ->
             Format.fprintf fmt "%a%a\n"
-              pp_location (start_pos, last_pos)
+              pp_location loc
               pretty_token (Lexing.lexeme current.lexbuf);
             Format.fprintf fmt "%a@."
-              (pp_context_from_file ~start_pos ~ctx:2) last_pos);
+              (pp_context_from_file ~ctx:2) loc);
       raise (Log.AbortError "kernel"))
     msg
 
