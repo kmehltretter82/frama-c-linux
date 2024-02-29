@@ -141,10 +141,10 @@ let rec thost_to_host kf env th = match th with
     let e, _, env = to_exp ~adata:Assert.no_data kf env t in
     Mem e, env, ""
 
-and toffset_to_offset ?loc kf env = function
+and toffset_to_offset kf env = function
   | TNoOffset -> NoOffset, env
   | TField(f, offset) ->
-    let offset, env = toffset_to_offset ?loc kf env offset in
+    let offset, env = toffset_to_offset kf env offset in
     Field(f, offset), env
   | TIndex(t, offset) ->
     let e, _, env = to_exp ~adata:Assert.no_data kf env t in
