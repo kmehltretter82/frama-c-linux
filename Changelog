@@ -27,6 +27,13 @@ o!  Kernel    [2024-01-29] Db is now mostly empty, the only remaining value is
                            interactions are now handled in module Async
 
 ###############################################################################
+Open Source Release 28.1 (Nickel)
+###############################################################################
+
+-*  Kernel    [2024-01-18] Fix Cil.isConstant on lvalues with offset.
+-*  Ivette    [2024-01-11] Fix Ivette shell wrapper on macOS.
+
+###############################################################################
 Open Source Release 28.0 (Nickel)
 ###############################################################################
 
