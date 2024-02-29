@@ -2,20 +2,38 @@
 [alias] analysing function: main
 [alias] analysing instruction: int ***a = (int ***)0;
 [alias] May-aliases after instruction  int ***a = (int ***)0;  are  <none>
+[alias] May-alias graph after instruction  int ***a = (int ***)0;  is    <empty>
 [alias] analysing instruction: int **b = (int **)0;
 [alias] May-aliases after instruction  int **b = (int **)0;  are  <none>
+[alias] May-alias graph after instruction  int **b = (int **)0;  is    <empty>
 [alias] analysing instruction: int *c = (int *)0;
 [alias] May-aliases after instruction  int *c = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *c = (int *)0;  is    <empty>
 [alias] analysing instruction: int *d = (int *)0;
 [alias] May-aliases after instruction  int *d = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *d = (int *)0;  is    <empty>
 [alias] analysing instruction: *a = b;
 [alias] May-aliases after instruction  *a = b;  are  { *a; b }  { *(*a); *b }
+[alias] May-alias graph after instruction  *a = b;  is
+  0:{ a } → 1:{ b }   1:{ b } → 2:{  }   2:{  } → 3:{  }
 [alias] analysing instruction: *b = c;
 [alias] May-aliases after instruction  *b = c;  are  { *a; b }  { *(*a); *b; c }
+[alias] May-alias graph after instruction  *b = c;  is
+  0:{ a } → 1:{ b }   1:{ b } → 2:{ c }   2:{ c } → 3:{  }
 [alias] analysing instruction: d = *(*a);
 [alias] May-aliases after instruction  d = *(*a);  are
   { *a; b }  { *(*a); *b; c; d }
+[alias] May-alias graph after instruction  d = *(*a);  is
+  0:{ a } → 1:{ b }   1:{ b } → 9:{ c; d }   9:{ c; d } → 10:{  }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
   { *a; b }  { *(*a); *b; c; d }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  0:{ a } → 1:{ b }   1:{ b } → 9:{ c; d }   9:{ c; d } → 10:{  }
 [alias] May-aliases at the end of function main: { *a; b }  { *(*a); *b; c; d }
+[alias] May-alias graph at the end of function main:
+  0:{ a } → 1:{ b }   1:{ b } → 9:{ c; d }   9:{ c; d } → 10:{  }
+[alias] Summary of function main:
+  formals:     locals: a→{ b }  b→{ c; d }  c  d  __retres
+  returns: __retres    state: { *a; b }  { *(*a); *b; c; d }
+[alias] Analysis complete

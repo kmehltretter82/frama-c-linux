@@ -2,14 +2,29 @@
 [alias] analysing function: main
 [alias] analysing instruction: short tmp_0 = (short)0;
 [alias] May-aliases after instruction  short tmp_0 = (short)0;  are  <none>
+[alias] May-alias graph after instruction  short tmp_0 = (short)0;  is    <empty>
 [alias] analysing instruction: *(& prev[1] + 0) = tmp_0;
 [alias] May-aliases after instruction  *(& prev[1] + 0) = tmp_0;  are  <none>
+[alias] May-alias graph after instruction  *(& prev[1] + 0) = tmp_0;  is    <empty>
 [alias] analysing instruction: prev[0] = (short)0;
 [alias] May-aliases after instruction  prev[0] = (short)0;  are  <none>
+[alias] May-alias graph after instruction  prev[0] = (short)0;  is    <empty>
 [alias] analysing instruction: p = & prev[1] + (int)*p;
 [alias] May-aliases after instruction  p = & prev[1] + (int)*p;  are  { prev; p }
+[alias] May-alias graph after instruction  p = & prev[1] + (int)*p;  is
+  0:{ p } → 1:{  }   2:{ prev } → 1:{  }
 [alias] analysing instruction: p = & prev[*p];
 [alias] May-aliases after instruction  p = & prev[*p];  are  { prev; p }
+[alias] May-alias graph after instruction  p = & prev[*p];  is
+  5:{ p } → 6:{  }   7:{ prev } → 6:{  }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  { prev; p }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  0:{ p } → 1:{  }   2:{ prev } → 1:{  }
 [alias] May-aliases at the end of function main: { prev; p }
+[alias] May-alias graph at the end of function main:
+  0:{ p } → 1:{  }   2:{ prev } → 1:{  }
+[alias] Summary of function main:
+  formals:     locals: __retres  prev  p  tmp_0    returns: __retres
+  state: { prev; p }
+[alias] Analysis complete

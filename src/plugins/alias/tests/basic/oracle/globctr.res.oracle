@@ -2,18 +2,33 @@
 [alias] analysing function: f
 [alias] analysing instruction: int y = 0;
 [alias] May-aliases after instruction  int y = 0;  are  <none>
+[alias] May-alias graph after instruction  int y = 0;  is    <empty>
 [alias] analysing instruction: *x = y;
 [alias] May-aliases after instruction  *x = y;  are  <none>
+[alias] May-alias graph after instruction  *x = y;  is    <empty>
 [alias] May-aliases at the end of function f: <none>
+[alias] May-alias graph at the end of function f:
+  <empty>
+[alias] Summary of function f:
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
 [alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *a = (int *)0;  is    <empty>
 [alias] analysing instruction: int *b = (int *)0;
 [alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *b = (int *)0;  is    <empty>
 [alias] analysing instruction: f(a);
 [alias] May-aliases after instruction  f(a);  are  <none>
+[alias] May-alias graph after instruction  f(a);  is    <empty>
 [alias] analysing instruction: f(b);
 [alias] May-aliases after instruction  f(b);  are  <none>
+[alias] May-alias graph after instruction  f(b);  is    <empty>
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  <none>
+[alias] May-alias graph after instruction  __retres = 0;  is    <empty>
 [alias] May-aliases at the end of function main: <none>
+[alias] May-alias graph at the end of function main:
+  <empty>
+[alias] Summary of function main:
+  formals:     locals: a  b  __retres    returns: __retres    state: <none>
+[alias] Analysis complete
