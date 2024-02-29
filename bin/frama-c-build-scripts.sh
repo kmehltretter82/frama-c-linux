@@ -91,7 +91,7 @@ DuneProject () {
     echo "(maintainers \"anonymous\")"
     echo "(package (name ${PACKAGE})"
     echo "  (depends"
-    echo "    (\"frama-c\" (>= 28.0))"
+    echo "    (\"frama-c\" (>= 28.1))"
     echo "  )"
     echo " (tags (\"Frama-C scripts\"))"
     echo ")"

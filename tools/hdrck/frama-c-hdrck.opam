@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "frama-c-hdrck"
 synopsis: "Frama-C header check tool"
-version: "28.0"
+version: "28.1"
 description:"""
 Performs all checks related to file headers as required by the Frama-C
 continuous integration.

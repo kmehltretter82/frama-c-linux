@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "frama-c-lint"
 synopsis: "Frama-C lint tool"
-version: "28.0"
+version: "28.1"
 description:"""
 Performs all checks related to source code formatting as required by the Frama-C
 continuous integration. Namely: OCP-indent for ML files, clang-format for E-ACSL
