@@ -2,35 +2,18 @@
 [alias] analysing function: main
 [alias] analysing instruction: st_1_t x1 = {.a = 0, .b = 1};
 [alias] May-aliases after instruction  st_1_t x1 = {.a = 0, .b = 1};  are  <none>
-[alias] May-alias graph after instruction  st_1_t x1 = {.a = 0, .b = 1};  is
-  <empty>
 [alias] analysing instruction: st_1_t x2 = {.a = 1, .b = 2};
 [alias] May-aliases after instruction  st_1_t x2 = {.a = 1, .b = 2};  are  <none>
-[alias] May-alias graph after instruction  st_1_t x2 = {.a = 1, .b = 2};  is
-  <empty>
 [alias] analysing instruction: st_2_t y = {.s = (struct struct_1_t *)(& x1), .c = 4};
 [alias:unsafe-cast] structure2.c:21: Warning: 
   unsafe cast from st_1_t * to struct struct_1_t *
 [alias] May-aliases after instruction
   st_2_t y = {.s = (struct struct_1_t *)(& x1), .c = 4};  are  <none>
-[alias] May-alias graph after instruction
-  st_2_t y = {.s = (struct struct_1_t *)(& x1), .c = 4};  is
-  0:{ y.s } → 1:{ x1 }
 [alias] analysing instruction: y.s = (struct struct_1_t *)(& x2);
 [alias:unsafe-cast] structure2.c:23: Warning: 
   unsafe cast from st_1_t * to struct struct_1_t *
 [alias] May-aliases after instruction  y.s = (struct struct_1_t *)(& x2);  are
   <none>
-[alias] May-alias graph after instruction  y.s = (struct struct_1_t *)(& x2);  is
-  0:{ y.s } → 1:{ x1; x2 }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  <none>
-[alias] May-alias graph after instruction  __retres = 0;  is
-  0:{ y.s } → 1:{ x1; x2 }
 [alias] May-aliases at the end of function main: <none>
-[alias] May-alias graph at the end of function main:
-  0:{ y.s } → 1:{ x1; x2 }
-[alias] Summary of function main:
-  formals:     locals: x1  x2  y  __retres    returns: __retres
-  state: <none>
-[alias] Analysis complete

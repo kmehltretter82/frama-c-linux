@@ -4,11 +4,4 @@
 [alias:unsafe-cast] origin_simpl.c:9: Warning: unsafe cast from int to void *
 [alias:unsafe-cast] origin_simpl.c:9: Warning: unsafe cast from char * to int *
 [alias] May-aliases after instruction  tmp = (void *)*((int *)(t));  are  { t; tmp }
-[alias] May-alias graph after instruction  tmp = (void *)*((int *)(t));  is
-  0:{ t; tmp } → 1:{  }
 [alias] May-aliases at the end of function f: { t; tmp }
-[alias] May-alias graph at the end of function f:
-  0:{ t; tmp } → 1:{  }
-[alias] Summary of function f:
-  formals:     locals: tmp    returns: <none>    state: { t; tmp }
-[alias] Analysis complete

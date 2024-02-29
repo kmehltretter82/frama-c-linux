@@ -2,48 +2,23 @@
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
 [alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
-[alias] May-alias graph after instruction  int *a = (int *)0;  is    <empty>
 [alias] analysing instruction: int *b = (int *)0;
 [alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
-[alias] May-alias graph after instruction  int *b = (int *)0;  is    <empty>
 [alias] analysing instruction: a = my_malloc(2);
 [alias] analysing function: my_malloc
 [alias] analysing instruction: int *res = (int *)0;
 [alias] May-aliases after instruction  int *res = (int *)0;  are  <none>
-[alias] May-alias graph after instruction  int *res = (int *)0;  is    <empty>
 [alias] analysing instruction: res = (int *)malloc((size_t)size);
 [alias] May-aliases after instruction  res = (int *)malloc((size_t)size);  are
   <none>
-[alias] May-alias graph after instruction  res = (int *)malloc((size_t)size);  is
-  0:{ res } → 1:{  }
 [alias] May-aliases at the end of function my_malloc: <none>
-[alias] May-alias graph at the end of function my_malloc:
-  0:{ res } → 1:{  }
-[alias] Summary of function my_malloc:
-  formals: size    locals: res    returns: res    state: <none>
 [alias] May-aliases after instruction  a = my_malloc(2);  are  <none>
-[alias] May-alias graph after instruction  a = my_malloc(2);  is
-  4:{ a } → 3:{  }
 [alias] analysing instruction: b = my_malloc(3);
 [alias] May-aliases after instruction  b = my_malloc(3);  are  <none>
-[alias] May-alias graph after instruction  b = my_malloc(3);  is
-  4:{ a } → 3:{  }   8:{ b } → 7:{  }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  <none>
-[alias] May-alias graph after instruction  __retres = 0;  is
-  4:{ a } → 3:{  }   8:{ b } → 7:{  }
 [alias] May-aliases at the end of function main: <none>
-[alias] May-alias graph at the end of function main:
-  4:{ a } → 3:{  }   8:{ b } → 7:{  }
-[alias] Summary of function main:
-  formals:     locals: a  b  __retres    returns: __retres    state: <none>
 [alias] analysing function: my_malloc
 [alias] analysing instruction: int *res = (int *)0;
 [alias] May-aliases after instruction  int *res = (int *)0;  are  <none>
-[alias] May-alias graph after instruction  int *res = (int *)0;  is    <empty>
 [alias] May-aliases at the end of function my_malloc: <none>
-[alias] May-alias graph at the end of function my_malloc:
-  0:{ res } → 1:{  }
-[alias] Summary of function my_malloc:
-  formals: size    locals: res    returns: res    state: <none>
-[alias] Analysis complete

@@ -2,78 +2,39 @@
 [alias] analysing function: main
 [alias] analysing instruction: st_1_t x1 = {.a = 0, .b = 1};
 [alias] May-aliases after instruction  st_1_t x1 = {.a = 0, .b = 1};  are  <none>
-[alias] May-alias graph after instruction  st_1_t x1 = {.a = 0, .b = 1};  is
-  <empty>
 [alias] analysing instruction: st_1_t x2 = {.a = 2, .b = 3};
 [alias] May-aliases after instruction  st_1_t x2 = {.a = 2, .b = 3};  are  <none>
-[alias] May-alias graph after instruction  st_1_t x2 = {.a = 2, .b = 3};  is
-  <empty>
 [alias] analysing instruction: st_2_t *z1 = malloc(sizeof(st_2_t));
 [alias] May-aliases after instruction  st_2_t *z1 = malloc(sizeof(st_2_t));  are
   <none>
-[alias] May-alias graph after instruction  st_2_t *z1 = malloc(sizeof(st_2_t));
-  is    0:{ z1 } → 1:{  }
 [alias] analysing instruction: st_3_t *t = malloc(sizeof(st_3_t));
 [alias] May-aliases after instruction  st_3_t *t = malloc(sizeof(st_3_t));  are
   <none>
-[alias] May-alias graph after instruction  st_3_t *t = malloc(sizeof(st_3_t));  is
-  0:{ z1 } → 1:{  }   2:{ t } → 3:{  }
 [alias] analysing instruction: int *a = malloc(sizeof(int));
 [alias] May-aliases after instruction  int *a = malloc(sizeof(int));  are  <none>
-[alias] May-alias graph after instruction  int *a = malloc(sizeof(int));  is
-  0:{ z1 } → 1:{  }   2:{ t } → 3:{  }   4:{ a } → 5:{  }
 [alias] analysing instruction: *a = 0;
 [alias] May-aliases after instruction  *a = 0;  are  <none>
-[alias] May-alias graph after instruction  *a = 0;  is
-  0:{ z1 } → 1:{  }   2:{ t } → 3:{  }   4:{ a } → 5:{  }
 [alias] analysing instruction: z1->s[0] = (struct struct_1_t *)(& x1);
 [alias:unsafe-cast] nested2.c:42: Warning: 
   unsafe cast from st_1_t * to struct struct_1_t *
 [alias] May-aliases after instruction  z1->s[0] = (struct struct_1_t *)(& x1);  are
   <none>
-[alias] May-alias graph after instruction  z1->s[0] = (struct struct_1_t *)(& x1);
-  is
-  0:{ z1 } → 1:{  }   2:{ t } → 3:{  }   4:{ a } → 5:{  }
-  6:{ z1->s[0..] } → 7:{ x1 }
 [alias] analysing instruction: z1->s[1] = (struct struct_1_t *)(& x2);
 [alias:unsafe-cast] nested2.c:43: Warning: 
   unsafe cast from st_1_t * to struct struct_1_t *
 [alias] May-aliases after instruction  z1->s[1] = (struct struct_1_t *)(& x2);  are
   <none>
-[alias] May-alias graph after instruction  z1->s[1] = (struct struct_1_t *)(& x2);
-  is
-  0:{ z1 } → 1:{  }   2:{ t } → 3:{  }   4:{ a } → 5:{  }
-  6:{ z1->s[0..] } → 7:{ x1; x2 }
 [alias] analysing instruction: z1->c = a;
 [alias] May-aliases after instruction  z1->c = a;  are  { z1->c; a }
-[alias] May-alias graph after instruction  z1->c = a;  is
-  0:{ z1 } → 1:{  }   2:{ t } → 3:{  }
-  6:{ z1->s[0..] } → 7:{ x1; x2 }   11:{ z1->c; a } → 5:{  }
 [alias] analysing instruction: t->t = (struct struct_2_t *)z1;
 [alias:unsafe-cast] nested2.c:45: Warning: 
   unsafe cast from st_2_t * to struct struct_2_t *
 [alias] May-aliases after instruction  t->t = (struct struct_2_t *)z1;  are
   { t->t; z1 }  { z1->c; a }
-[alias] May-alias graph after instruction  t->t = (struct struct_2_t *)z1;  is
-  2:{ t } → 3:{  }   6:{ z1->s[0..] } → 7:{ x1; x2 }
-  11:{ z1->c; a } → 5:{  }   12:{ t->t; z1 } → 1:{  }
 [alias] analysing instruction: t->d = a;
 [alias] May-aliases after instruction  t->d = a;  are
   { t->t; z1 }  { z1->c; t->d; a }
-[alias] May-alias graph after instruction  t->d = a;  is
-  2:{ t } → 3:{  }   6:{ z1->s[0..] } → 7:{ x1; x2 }
-  12:{ t->t; z1 } → 1:{  }   13:{ z1->c; t->d; a } → 5:{  }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
   { t->t; z1 }  { z1->c; t->d; a }
-[alias] May-alias graph after instruction  __retres = 0;  is
-  2:{ t } → 3:{  }   6:{ z1->s[0..] } → 7:{ x1; x2 }
-  12:{ t->t; z1 } → 1:{  }   13:{ z1->c; t->d; a } → 5:{  }
 [alias] May-aliases at the end of function main: { t->t; z1 }  { z1->c; t->d; a }
-[alias] May-alias graph at the end of function main:
-  2:{ t } → 3:{  }   6:{ z1->s[0..] } → 7:{ x1; x2 }
-  12:{ t->t; z1 } → 1:{  }   13:{ z1->c; t->d; a } → 5:{  }
-[alias] Summary of function main:
-  formals:     locals: x1  x2  z1  t  a  __retres    returns: __retres
-  state: { t->t; z1 }  { z1->c; t->d; a }
-[alias] Analysis complete

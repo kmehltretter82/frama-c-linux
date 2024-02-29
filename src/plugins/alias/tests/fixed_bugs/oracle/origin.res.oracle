@@ -4,22 +4,11 @@
 [alias] analysing function: f
 [alias] analysing instruction: tmp = & f;
 [alias] May-aliases after instruction  tmp = & f;  are  <none>
-[alias] May-alias graph after instruction  tmp = & f;  is    0:{ tmp } → 1:{ f }
 [alias] analysing instruction: tmp = (void (*)(void))*((char *)(v.t));
 [alias:unsafe-cast] origin.c:8: Warning: unsafe cast from char to void (*)(void)
 [alias:unsafe-cast] origin.c:8: Warning: unsafe cast from int * to char *
 [alias] May-aliases after instruction  tmp = (void (*)(void))*((char *)(v.t));  are
   { v.t; tmp }
-[alias] May-alias graph after instruction  tmp = (void (*)(void))*((char *)(v.t));
-  is    0:{ v.t; tmp } → 1:{ f }
 [alias] analysing instruction: int g = (int)tmp;
 [alias] May-aliases after instruction  int g = (int)tmp;  are  { v.t; tmp }
-[alias] May-alias graph after instruction  int g = (int)tmp;  is
-  0:{ v.t; tmp } → 1:{ f }
 [alias] May-aliases at the end of function f: { v.t; tmp }
-[alias] May-alias graph at the end of function f:
-  0:{ v.t; tmp } → 1:{ f }
-[alias] Summary of function f:
-  formals:     locals: g  tmp→{ f }    returns: <none>
-  state: { v.t; tmp }
-[alias] Analysis complete

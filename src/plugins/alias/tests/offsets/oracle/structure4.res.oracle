@@ -2,45 +2,23 @@
 [alias] analysing function: main
 [alias] analysing instruction: st_1_t x1 = {.a = 0, .b = 1};
 [alias] May-aliases after instruction  st_1_t x1 = {.a = 0, .b = 1};  are  <none>
-[alias] May-alias graph after instruction  st_1_t x1 = {.a = 0, .b = 1};  is
-  <empty>
 [alias] analysing instruction: st_1_t x2 = {.a = 1, .b = 2};
 [alias] May-aliases after instruction  st_1_t x2 = {.a = 1, .b = 2};  are  <none>
-[alias] May-alias graph after instruction  st_1_t x2 = {.a = 1, .b = 2};  is
-  <empty>
 [alias] analysing instruction: st_1_t *y1 = malloc(sizeof(st_1_t));
 [alias] May-aliases after instruction  st_1_t *y1 = malloc(sizeof(st_1_t));  are
   <none>
-[alias] May-alias graph after instruction  st_1_t *y1 = malloc(sizeof(st_1_t));
-  is    0:{ y1 } → 1:{  }
 [alias] analysing instruction: st_2_t *z = malloc(sizeof(st_2_t));
 [alias] May-aliases after instruction  st_2_t *z = malloc(sizeof(st_2_t));  are
   <none>
-[alias] May-alias graph after instruction  st_2_t *z = malloc(sizeof(st_2_t));  is
-  0:{ y1 } → 1:{  }   2:{ z } → 3:{  }
 [alias] analysing instruction: y1 = & x1;
 [alias] May-aliases after instruction  y1 = & x1;  are  <none>
-[alias] May-alias graph after instruction  y1 = & x1;  is
-  0:{ y1 } → 1:{ x1 }   2:{ z } → 3:{  }
 [alias] analysing instruction: z->s = (struct struct_1_t *)y1;
 [alias:unsafe-cast] structure4.c:37: Warning: 
   unsafe cast from st_1_t * to struct struct_1_t *
 [alias] May-aliases after instruction  z->s = (struct struct_1_t *)y1;  are
   { z->s; y1 }
-[alias] May-alias graph after instruction  z->s = (struct struct_1_t *)y1;  is
-  2:{ z } → 3:{  }   6:{ z->s; y1 } → 1:{ x1 }
 [alias] analysing instruction: z->c = 6;
 [alias] May-aliases after instruction  z->c = 6;  are  { z->s; y1 }
-[alias] May-alias graph after instruction  z->c = 6;  is
-  2:{ z } → 3:{  }   6:{ z->s; y1 } → 1:{ x1 }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  { z->s; y1 }
-[alias] May-alias graph after instruction  __retres = 0;  is
-  2:{ z } → 3:{  }   6:{ z->s; y1 } → 1:{ x1 }
 [alias] May-aliases at the end of function main: { z->s; y1 }
-[alias] May-alias graph at the end of function main:
-  2:{ z } → 3:{  }   6:{ z->s; y1 } → 1:{ x1 }
-[alias] Summary of function main:
-  formals:     locals: x1  x2  y1→{ x1 }  z  __retres    returns: __retres
-  state: { z->s; y1 }
-[alias] Analysis complete

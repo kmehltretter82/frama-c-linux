@@ -4,15 +4,6 @@
 [alias:unsafe-cast] tkn-2.c:6: Warning: unsafe cast from int ** to int *
 [alias] tkn-2.c:6: Warning: ignoring assignment of the form: a = (int *)(& a)
 [alias] May-aliases after instruction  a = (int *)(& a);  are  <none>
-[alias] May-alias graph after instruction  a = (int *)(& a);  is
-  0:{ a } → 1:{  }   2:{  } → 0:{ a }
 [alias] analysing instruction: __retres = *a;
 [alias] May-aliases after instruction  __retres = *a;  are  <none>
-[alias] May-alias graph after instruction  __retres = *a;  is
-  0:{ a } → 1:{  }   2:{  } → 0:{ a }
 [alias] May-aliases at the end of function main: <none>
-[alias] May-alias graph at the end of function main:
-  0:{ a } → 1:{  }   2:{  } → 0:{ a }
-[alias] Summary of function main:
-  formals:     locals: a  __retres    returns: __retres    state: <none>
-[alias] Analysis complete
