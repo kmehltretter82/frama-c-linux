@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* ************************************************************************ */
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
@@ -20,11 +21,13 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import React from 'react';
+import React, { useState } from 'react';
 // import other libs
-import { ForceGraph2D } from 'react-force-graph';
-import './style.css';
+import { ForceGraph2D, ForceGraph3D } from 'react-force-graph';
+import './sandbox.css';
 import { registerSandbox } from 'ivette';
+import { Button, ToolBar } from 'dome/frame/toolbars';
+import { graph } from 'frama-c/plugins/dive/api';
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Specifications                                               --- */
@@ -36,28 +39,24 @@ export interface Attributes {
   className?: string;
 }
 
-export type Shape = "dot" | "box" | "circle";
-export type ArrowType = "--" | "->" | "<-" | "<->";
-export type Layout = "2D" | "3D";
+export type Shape = 'dot' | 'box' | 'circle';
+export type ArrowType = '--' | '->' | '<-' | '<->';
+export type Layout = '2D' | '3D';
 
-export interface Node extends Attributes {
-
+export interface Node<ID> extends Attributes {
   /** Node identifier (unique). */
-  id: string;
+  id: ID;
 
   /** defaults to `"dot"` */
   shape?: Shape;
-
 }
 
 export interface Edge extends Attributes {
-
   fromNode: string;
   toNode: string;
 
   /** defaults to `"->"` */
   arrowType?: ArrowType;
-
 }
 
 export type Callback = () => void;
@@ -66,22 +65,39 @@ export type SelectionCallback = (node: string, evt: React.MouseEvent) => void;
 /* -------------------------------------------------------------------------- */
 /* --- Graph Implementation                                               --- */
 /* -------------------------------------------------------------------------- */
+/*
+const fgRef = useRef<ForceGraph2D>();
 
-// TO BE COMPLETE
+const [zoom,setZoom] = useState();
+class GraphPropsForce implements GraphProps {
+  constructor( private Graph :typeof ){}
+  nodes: readonly Node[];
+  edges: readonly Edge[];
+  selected?: string | undefined;
+  reset?: boolean | undefined;
+  zoom?: number | undefined;
+  layout?: Layout | undefined;
+  onSelection?: Callback | undefined;
+  onReady?: Callback | undefined;
+  display?: boolean | undefined;
+  className?: string | undefined;
+  children?: React.ReactNode;
 
+}
+*/
 /* -------------------------------------------------------------------------- */
 /* --- Graph Component Properties                                         --- */
 /* -------------------------------------------------------------------------- */
 
-export interface GraphProps {
-  nodes: readonly Node[];
+export interface GraphProps<ID> {
+  nodes: readonly Node<ID>[];
   edges: readonly Edge[];
 
   /**
      Element to focus on.
      The graph is scrolled to make this node visible if necessary.
    */
-  selected?: string;
+  selected?: ID;
 
   /** Force recomputing layout. */
   reset?: boolean;
@@ -97,7 +113,7 @@ export interface GraphProps {
   layout?: Layout;
 
   /** Invoked when a node is selected. */
-  onSelection?: Callback;
+  onSelection?: SelectionCallback;
 
   /** Invoked after layout is computed (typically used after a reset). */
   onReady?: Callback;
@@ -116,21 +132,75 @@ export interface GraphProps {
 /* --- Graph Component                                                    --- */
 /* -------------------------------------------------------------------------- */
 
-export function Graph(_props: GraphProps): JSX.Element {
-  const graph = { nodes: _props.nodes,
-                  links: _props.edges
-                };
-  return <><ForceGraph2D
+export function Graph(props: GraphProps<string>): JSX.Element {
+  const graph = {
+    nodes: props.nodes.map((node) => {
+      return { id: Number(node.id) };
+    }),
+    links: props.edges.map((edge) => {
+      return { source: Number(edge.fromNode), target: Number(edge.toNode) };
+    }),
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [display, setDisplay] = React.useState<boolean>(props.display!);
+  const [layout, setLayout] = React.useState<Layout>(props.layout!);
+  return (
+    <div className={props.className}>
+      {props.children}
+      {display ? (
+        layout === '2D' ? (
+          <ForceGraph2D
             graphData={graph}
-  /></>;
+            // autoPauseRedraw performance optimization to automatically
+            // pause redrawing the 2D canvas at every frame whenever
+            // the simulation engine is halted
+            autoPauseRedraw={true}
+            // Sets the simulation alpha min parameter.
+            d3AlphaDecay={1}
+            d3VelocityDecay={1}
+            dagLevelDistance={50}
+          />
+        ) : (
+          <ForceGraph3D graphData={graph} />
+        )
+      ) : (
+        <></>
+      )}
+    </div>
+  );
 }
 
-const initGraph = { nodes: [{ id: '1', x: 20, y: 30 },
-  { id: '2', x: 20, y: 30 }], edges: [{ fromNode: '1', toNode: '2' },] };
+function genRandomTree(): GraphProps<string> {
+  return {
+    nodes: [{ id: '0' }, { id: '1' }],
+    edges: [{ fromNode: '0', toNode: '1' }],
+    selected: '0',
+    zoom: 1,
+    layout: '2D',
+    display: true,
+    className: 'sandbox-item-graph',
+    children: (
+      <ToolBar>
+        <Button
+          icon='DISPLAY'
+          title='Display'
+          onClick={() => {
+            setInitGraph({ ...initGraph, display: !initGraph.display });
+          }}
+        />
+      </ToolBar>
+    ),
+  };
+}
+
+const [initGraph, setInitGraph] = useState<GraphProps<string>>(
+  genRandomTree() as GraphProps<string>
+);
 
 registerSandbox({
-  id: 'sandbox.graph_old',
+  id: 'sandbox.graph',
   label: 'Graph Component',
-  children: <Graph {...initGraph}  />,
+  children: <Graph {...initGraph} />,
 });
 /* -------------------------------------------------------------------------- */
