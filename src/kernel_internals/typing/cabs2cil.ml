@@ -7066,6 +7066,7 @@ and doExp local_env
         (* Now we must find the type of both branches, in order to compute
          * the type of the result *)
         let r2, se2, e2'o (* is an option. None means use e1 *), t2 =
+          (* A GCC extension. [x ? : y;] is equivalent to [x ? x : y;] *)
           match e2.expr_node with
           | Cabs.NOTHING -> begin (* The same as the type of e1 *)
               match ce1 with
