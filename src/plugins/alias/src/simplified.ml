@@ -115,50 +115,8 @@ module LvalOrRef = struct
       Lval lv -> Some (Lval lv)
     | AddrOf lv -> Some (Ref lv)
     | _ -> None
-
-  let is_pointer x =
-    match x with
-    | Ref _ -> true
-    | Lval lv ->
-      let t = Cil.typeOfLval lv in
-      match Cil.unrollType t with
-        TPtr _ | TArray _ -> true
-      | _ -> false
 end
 
 module Lval = struct
-  type t = lval
-
-  let simplify x = simplify_lval x
-
-  let compare = Cil_datatype.LvalStructEq.compare
-
-  let pretty l =
-    if Options.is_debug_key_enabled Options.DebugKeys.lvals
-    then Cil_types_debug.pp_lval l
-    else Printer.pp_lval l
+  let simplify = simplify_lval
 end
-
-let decompose_lval lv1 : (lval * offset) list =
-  let rec list_of_offset (o: offset) : (offset*offset) list =
-    match o with
-      NoOffset -> [NoOffset,o]
-    | Index(e,ofs) ->
-      let li =
-        List.map
-          (fun (o1,o2) -> (Index(e,o1),o2))
-          (list_of_offset ofs)
-      in
-      (NoOffset,o)::li
-    | Field(f, ofs) ->
-      let li =
-        List.map
-          (fun (o1,o2) -> (Field(f,o1),o2))
-          (list_of_offset ofs)
-      in
-      (NoOffset,o)::li
-  in
-  let lv, off = Cil.removeOffsetLval lv1 in
-  List.map
-    (fun (o1,o2) -> Cil.addOffsetLval o1 lv, o2)
-    (list_of_offset off)
