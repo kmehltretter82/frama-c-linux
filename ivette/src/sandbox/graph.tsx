@@ -22,7 +22,9 @@
 
 import React from 'react';
 // import other libs
+import { ForceGraph2D } from 'react-force-graph';
 import './style.css';
+import { registerSandbox } from 'ivette';
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Specifications                                               --- */
@@ -115,7 +117,20 @@ export interface GraphProps {
 /* -------------------------------------------------------------------------- */
 
 export function Graph(_props: GraphProps): JSX.Element {
-  return <></>;
+  const graph = { nodes: _props.nodes,
+                  links: _props.edges
+                };
+  return <><ForceGraph2D
+            graphData={graph}
+  /></>;
 }
 
+const initGraph = { nodes: [{ id: '1', x: 20, y: 30 },
+  { id: '2', x: 20, y: 30 }], edges: [{ fromNode: '1', toNode: '2' },] };
+
+registerSandbox({
+  id: 'sandbox.graph_old',
+  label: 'Graph Component',
+  children: <Graph {...initGraph}  />,
+});
 /* -------------------------------------------------------------------------- */
