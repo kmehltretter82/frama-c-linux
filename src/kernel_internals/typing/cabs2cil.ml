@@ -2879,6 +2879,7 @@ let conditionalConversion (t2: typ) (t3: typ) : typ =
       arithmeticConversion t2 t3
     | TComp (comp2,_), TComp (comp3,_)
       when comp2.ckey = comp3.ckey -> t2
+    | TVoid _, TVoid _ -> t2
     | TPtr(_, _), TPtr(TVoid _, _) -> t2
     | TPtr(TVoid _, _), TPtr(_, _) -> t3
     | TPtr _, TPtr _ when Cil_datatype.Typ.equal t2 t3 -> t2
