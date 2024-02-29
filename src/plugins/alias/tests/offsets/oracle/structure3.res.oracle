@@ -8,41 +8,24 @@
 [alias] May-aliases after instruction  st_1_t x2 = {.a = 1, .b = 2};  are  <none>
 [alias] May-alias graph after instruction  st_1_t x2 = {.a = 1, .b = 2};  is
   <empty>
-[alias] analysing instruction:
-  st_2_t y1 = {.s = (struct struct_1_t *)(& x1), .c = 3};
-[alias:unsafe-cast] structure3.c:31: Warning: 
-  unsafe cast from st_1_t * to struct struct_1_t *
-[alias] May-aliases after instruction
-  st_2_t y1 = {.s = (struct struct_1_t *)(& x1), .c = 3};  are  <none>
-[alias] May-alias graph after instruction
-  st_2_t y1 = {.s = (struct struct_1_t *)(& x1), .c = 3};  is
+[alias] analysing instruction: st_2_t y1 = {.s = & x1, .c = 3};
+[alias] May-aliases after instruction  st_2_t y1 = {.s = & x1, .c = 3};  are  <none>
+[alias] May-alias graph after instruction  st_2_t y1 = {.s = & x1, .c = 3};  is
   0:{ y1 } -s→ 1:{  }   1:{  } → 2:{ x1 }
-[alias] analysing instruction:
-  st_2_t y2 = {.s = (struct struct_1_t *)(& x2), .c = 4};
-[alias:unsafe-cast] structure3.c:32: Warning: 
-  unsafe cast from st_1_t * to struct struct_1_t *
-[alias] May-aliases after instruction
-  st_2_t y2 = {.s = (struct struct_1_t *)(& x2), .c = 4};  are  <none>
-[alias] May-alias graph after instruction
-  st_2_t y2 = {.s = (struct struct_1_t *)(& x2), .c = 4};  is
+[alias] analysing instruction: st_2_t y2 = {.s = & x2, .c = 4};
+[alias] May-aliases after instruction  st_2_t y2 = {.s = & x2, .c = 4};  are  <none>
+[alias] May-alias graph after instruction  st_2_t y2 = {.s = & x2, .c = 4};  is
   0:{ y1 } -s→ 1:{  }   1:{  } → 2:{ x1 }   4:{ y2 } -s→ 5:{  }
   5:{  } → 6:{ x2 }
-[alias] analysing instruction: st_3_t z = {.t = (struct struct_2_t *)(& y1), .d = 5};
-[alias:unsafe-cast] structure3.c:33: Warning: 
-  unsafe cast from st_2_t * to struct struct_2_t *
-[alias] May-aliases after instruction
-  st_3_t z = {.t = (struct struct_2_t *)(& y1), .d = 5};  are
+[alias] analysing instruction: st_3_t z = {.t = & y1, .d = 5};
+[alias] May-aliases after instruction  st_3_t z = {.t = & y1, .d = 5};  are
   { (z.t)->s; y1.s }
-[alias] May-alias graph after instruction
-  st_3_t z = {.t = (struct struct_2_t *)(& y1), .d = 5};  is
+[alias] May-alias graph after instruction  st_3_t z = {.t = & y1, .d = 5};  is
   0:{ y1 } -s→ 1:{  }   1:{  } → 2:{ x1 }   4:{ y2 } -s→ 5:{  }
   5:{  } → 6:{ x2 }   8:{ z } -t→ 9:{  }   9:{  } → 0:{ y1 }
-[alias] analysing instruction: z.t = (struct struct_2_t *)(& y2);
-[alias:unsafe-cast] structure3.c:35: Warning: 
-  unsafe cast from st_2_t * to struct struct_2_t *
-[alias] May-aliases after instruction  z.t = (struct struct_2_t *)(& y2);  are
-  { (z.t)->s; y1.s; y2.s }
-[alias] May-alias graph after instruction  z.t = (struct struct_2_t *)(& y2);  is
+[alias] analysing instruction: z.t = & y2;
+[alias] May-aliases after instruction  z.t = & y2;  are  { (z.t)->s; y1.s; y2.s }
+[alias] May-alias graph after instruction  z.t = & y2;  is
   0:{ y1; y2 } -s→ 1:{  }   1:{  } → 2:{ x1; x2 }   8:{ z } -t→ 9:{  }
   9:{  } → 0:{ y1; y2 }
 [alias] analysing instruction: y1.c = z.d;
