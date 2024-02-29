@@ -9,9 +9,9 @@
 [alias] analysing instruction: y = & x;
 [alias] May-aliases after instruction  y = & x;  are  { *b; a; y }
 [alias] analysing instruction: c = & y;
-[alias] May-aliases after instruction  c = & y;  are  { *b; *c; a; y }  { b; c }
+[alias] May-aliases after instruction  c = & y;  are  { b; c }  { *b; *c; a; y }
 [alias] analysing instruction: *y = 4;
-[alias] May-aliases after instruction  *y = 4;  are  { *b; *c; a; y }  { b; c }
+[alias] May-aliases after instruction  *y = 4;  are  { b; c }  { *b; *c; a; y }
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are  { *b; *c; a; y }  { b; c }
-[alias] May-aliases at the end of function main: { *b; *c; a; y }  { b; c }
+[alias] May-aliases after instruction  __retres = 0;  are  { b; c }  { *b; *c; a; y }
+[alias] May-aliases at the end of function main: { b; c }  { *b; *c; a; y }

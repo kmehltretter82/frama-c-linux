@@ -4,10 +4,10 @@
 [alias] May-aliases after instruction  *y = t + (*y - *x);  are  { *y; t }
 [alias] analysing instruction: *z = t + (*z - *x);
 [alias] May-aliases after instruction  *z = t + (*z - *x);  are
-  { *y; *z; t }  { y; z }
+  { y; z }  { *y; *z; t }
 [alias] analysing instruction: *x = t;
-[alias] May-aliases after instruction  *x = t;  are  { *x; *y; *z; t }  { x; y; z }
-[alias] May-aliases at the end of function f: { *x; *y; *z; t }  { x; y; z }
+[alias] May-aliases after instruction  *x = t;  are  { x; y; z }  { *x; *y; *z; t }
+[alias] May-aliases at the end of function f: { x; y; z }  { *x; *y; *z; t }
 [alias] analysing function: g
 [alias] analysing instruction: f(a,a,a);
 [alias] May-aliases after instruction  f(a,a,a);  are  <none>

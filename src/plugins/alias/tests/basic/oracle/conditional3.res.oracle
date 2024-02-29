@@ -1,23 +1,29 @@
 [kernel] Parsing conditional3.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: a = b;
-[alias] May-aliases after instruction  a = b;  are  { a; b }
+[alias] May-aliases after instruction  a = b;  are
+  { a; b }  { *a; *b }  { *(*a); *(*b) }  { *(*(*a)); *(*(*b)) }
 [alias] analysing instruction: b = & i;
-[alias] May-aliases after instruction  b = & i;  are  { a; b }  { *a; *b; i }
+[alias] May-aliases after instruction  b = & i;  are
+  { a; b }  { *a; *b; i }  { *(*a); *(*b); *i }  { *(*(*a)); *(*(*b)); *(*i) }
 [alias] analysing instruction: i = & x;
 [alias] May-aliases after instruction  i = & x;  are
   { a; b }  { *a; *b; i }  { *(*a); *(*b); *i; x }
+  { *(*(*a)); *(*(*b)); *(*i); *x }
 [alias] analysing instruction: x = & t;
 [alias] May-aliases after instruction  x = & t;  are
   { a; b }  { *a; *b; i }  { *(*a); *(*b); *i; x }
   { *(*(*a)); *(*(*b)); *(*i); *x; t }
 [alias] analysing instruction: a = c;
-[alias] May-aliases after instruction  a = c;  are  { a; c }
+[alias] May-aliases after instruction  a = c;  are
+  { a; c }  { *a; *c }  { *(*a); *(*c) }  { *(*(*a)); *(*(*c)) }
 [alias] analysing instruction: c = & j;
-[alias] May-aliases after instruction  c = & j;  are  { a; c }  { *a; *c; j }
+[alias] May-aliases after instruction  c = & j;  are
+  { a; c }  { *a; *c; j }  { *(*a); *(*c); *j }  { *(*(*a)); *(*(*c)); *(*j) }
 [alias] analysing instruction: j = & y;
 [alias] May-aliases after instruction  j = & y;  are
   { a; c }  { *a; *c; j }  { *(*a); *(*c); *j; y }
+  { *(*(*a)); *(*(*c)); *(*j); *y }
 [alias] analysing instruction: y = & u;
 [alias] May-aliases after instruction  y = & u;  are
   { a; c }  { *a; *c; j }  { *(*a); *(*c); *j; y }

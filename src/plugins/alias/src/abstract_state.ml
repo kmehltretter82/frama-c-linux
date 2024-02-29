@@ -342,12 +342,15 @@ let create_var_vertex var x =
   let x = {graph = G.add_vertex x.graph v;
            varmap = VarMap.add var v x.varmap;
            vmap = VMap.add v (VarSet.singleton var) x.vmap} in
-  match var.vtype with
-  | TPtr _ ->
-    (* then add a another empty vertex *)
-    let v', x = create_empty_vertex x in
-    v, {x with graph = G.add_edge x.graph v v'}
-  | _ -> v, x
+  let rec create_typ_vertex s v ty = match ty with
+    | TArray (ty, _, _) | TPtr (ty, _) ->
+      (* create more vertices for each level of dereferentiation *)
+      let v', s = create_empty_vertex s in
+      let s = {s with graph = G.add_edge s.graph v v'} in
+      create_typ_vertex s v' ty
+    | _ -> s (* until the type becomes scalar *)
+  in
+  v, create_typ_vertex x v var.vtype
 
 let find_or_create_var_vertex (var : varinfo) (x : t) =
   try VarMap.find var x.varmap, x
