@@ -155,29 +155,35 @@ module Readout = struct
        modified according to the edge type used:
        * Pointer: add a star (x → *x)
        * Field f: add an offset (x -> x.f) *)
-  let rec reconstruct_lvals s v : LSet.t =
+  let reconstruct_lvals s v : LSet.t =
     assert (G.mem_vertex s.graph v);
-    let modified_predecessors = List.map
-        (fun e ->
-           let pred_lvals = reconstruct_lvals s (E.src e) in
-           let modify_lval lv = match E.label e with
-             | Field f -> let lhost, o = lv in lhost, Field (f, o)
-             | Pointer ->
-               let ty = Cil.typeOfLval lv in
-               if Cil.isArrayType ty then
-                 let lhost, o = lv in lhost, Index (Simplified.nul_exp, o)
-               else
-                 let () = if not @@ Cil.isPointerType ty then
-                     Options.debug "unexpected type: %a" Printer.pp_typ ty
-                 in
-                 Mem (Cil.dummy_exp @@ Lval lv), NoOffset
-           in
-           LSet.map modify_lval pred_lvals
-        )
-        (G.pred_e s.graph v)
+    (* cycles can occur with unsafe casts such as: x->f = (int* ) x; *)
+    let rec checking_for_cycles s visited v =
+      if VSet.mem v visited then LSet.empty else
+        let visited = VSet.add v visited in
+        let modified_predecessors = List.map
+            (fun e ->
+               let pred_lvals = checking_for_cycles s visited @@ E.src e in
+               let modify_lval lv = match E.label e with
+                 | Field f -> let lhost, o = lv in lhost, Field (f, o)
+                 | Pointer ->
+                   let ty = Cil.typeOfLval lv in
+                   if Cil.isArrayType ty then
+                     let lhost, o = lv in lhost, Index (Simplified.nul_exp, o)
+                   else
+                     let () = if not @@ Cil.isPointerType ty then
+                         Options.debug "unexpected type: %a" Printer.pp_typ ty
+                     in
+                     Mem (Cil.dummy_exp @@ Lval lv), NoOffset
+               in
+               LSet.map modify_lval pred_lvals
+            )
+            (G.pred_e s.graph v)
+        in
+        let lvals_of_v = get_lval_set v s in
+        List.fold_left LSet.union lvals_of_v modified_predecessors
     in
-    let lvals_of_v = get_lval_set v s in
-    List.fold_left LSet.union lvals_of_v modified_predecessors
+    checking_for_cycles s VSet.empty v
 
   let lvals_pointing_to_vertex v s : LSet.t =
     assert (G.mem_vertex s.graph v);
