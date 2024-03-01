@@ -8419,6 +8419,13 @@ extern int pipe(int pipefd[2]);
  */
 extern ssize_t read(int fd, void *buf, size_t count);
 
+/*@ requires valid_name: valid_read_string(name);
+    ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
+    assigns \result;
+    assigns \result \from (indirect: *(name + (0 .. strlen{Old}(name))));
+ */
+extern int rmdir(char const *name);
+
 /*@ ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
     assigns \result;
     assigns \result \from (indirect: gid);

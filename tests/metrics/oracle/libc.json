@@ -104,6 +104,7 @@
     { "remove": { "calls": 0, "address_taken": false } },
     { "rename": { "calls": 0, "address_taken": false } },
     { "rewind": { "calls": 0, "address_taken": false } },
+    { "rmdir": { "calls": 0, "address_taken": false } },
     { "setbuf": { "calls": 0, "address_taken": false } },
     { "setegid": { "calls": 0, "address_taken": false } },
     { "seteuid": { "calls": 0, "address_taken": false } },
