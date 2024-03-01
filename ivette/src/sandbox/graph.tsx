@@ -21,13 +21,13 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import React, { useState } from 'react';
+import React from 'react';
 // import other libs
-import { ForceGraph2D, ForceGraph3D } from 'react-force-graph';
+import ForceGraph2D from 'react-force-graph-2d';
+import ForceGraph3D from 'react-force-graph-3d';
 import './sandbox.css';
 import { registerSandbox } from 'ivette';
-import { Button, ToolBar } from 'dome/frame/toolbars';
-import { graph } from 'frama-c/plugins/dive/api';
+import { Button } from 'dome/frame/toolbars';
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Specifications                                               --- */
@@ -65,26 +65,7 @@ export type SelectionCallback = (node: string, evt: React.MouseEvent) => void;
 /* -------------------------------------------------------------------------- */
 /* --- Graph Implementation                                               --- */
 /* -------------------------------------------------------------------------- */
-/*
-const fgRef = useRef<ForceGraph2D>();
 
-const [zoom,setZoom] = useState();
-class GraphPropsForce implements GraphProps {
-  constructor( private Graph :typeof ){}
-  nodes: readonly Node[];
-  edges: readonly Edge[];
-  selected?: string | undefined;
-  reset?: boolean | undefined;
-  zoom?: number | undefined;
-  layout?: Layout | undefined;
-  onSelection?: Callback | undefined;
-  onReady?: Callback | undefined;
-  display?: boolean | undefined;
-  className?: string | undefined;
-  children?: React.ReactNode;
-
-}
-*/
 /* -------------------------------------------------------------------------- */
 /* --- Graph Component Properties                                         --- */
 /* -------------------------------------------------------------------------- */
@@ -142,14 +123,11 @@ export function Graph(props: GraphProps<string>): JSX.Element {
     }),
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [display, setDisplay] = React.useState<boolean>(props.display!);
-  const [layout, setLayout] = React.useState<Layout>(props.layout!);
   return (
     <div className={props.className}>
       {props.children}
-      {display ? (
-        layout === '2D' ? (
+      {props.display ? (
+        props.layout === '2D' ? (
           <ForceGraph2D
             graphData={graph}
             // autoPauseRedraw performance optimization to automatically
@@ -171,36 +149,58 @@ export function Graph(props: GraphProps<string>): JSX.Element {
   );
 }
 
-function genRandomTree(): GraphProps<string> {
-  return {
-    nodes: [{ id: '0' }, { id: '1' }],
-    edges: [{ fromNode: '0', toNode: '1' }],
-    selected: '0',
-    zoom: 1,
-    layout: '2D',
-    display: true,
-    className: 'sandbox-item-graph',
-    children: (
-      <ToolBar>
-        <Button
-          icon='DISPLAY'
-          title='Display'
-          onClick={() => {
-            setInitGraph({ ...initGraph, display: !initGraph.display });
-          }}
-        />
-      </ToolBar>
-    ),
-  };
+function GraphComponent(): JSX.Element {
+  const [initGraph, setInitGraph] = React.useState<GraphProps<string>>(
+    genRandomTree() as GraphProps<string>
+  );
+
+  function genRandomTree(): GraphProps<string> {
+    return {
+      nodes: [{ id: '0' }, { id: '1' }],
+      edges: [{ fromNode: '0', toNode: '1' }],
+      selected: '0',
+      zoom: 1,
+      layout: '2D',
+      display: true,
+      className: 'sandbox-item-graph',
+      children: (
+        <div className='buttons'>
+          <Button
+            icon='DISPLAY'
+            title='Display'
+            onClick={() => {
+              setInitGraph((prevGraph) => {
+                return { ...prevGraph, display: !prevGraph.display };
+              });
+            }}
+          />
+          <Button
+            title='Layout'
+            icon='COMPONENT'
+            onClick={() => {
+              setInitGraph((prevGraph) => {
+                return {
+                  ...prevGraph,
+                  layout: prevGraph.layout === '2D' ? '3D' : '2D',
+                };
+              });
+            }}
+          />
+        </div>
+      ),
+    };
+  }
+  return (
+    <>
+      <Graph {...initGraph} />
+    </>
+  );
 }
 
-const [initGraph, setInitGraph] = useState<GraphProps<string>>(
-  genRandomTree() as GraphProps<string>
-);
-
+// const initGraph = genRandomTree();
 registerSandbox({
   id: 'sandbox.graph',
   label: 'Graph Component',
-  children: <Graph {...initGraph} />,
+  children: <GraphComponent />,
 });
 /* -------------------------------------------------------------------------- */
