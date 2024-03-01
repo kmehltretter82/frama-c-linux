@@ -1,19 +1,39 @@
 [kernel] Parsing conditional2.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: b = & c;
-[alias] May-aliases after instruction  b = & c;  are  { *b; c }
+[alias] May-aliases after instruction  b = & c;  are  { *b; c }  { *(*b); *c }
+[alias] May-alias graph after instruction  b = & c;  is
+  0:{ b } → 1:{ c }   1:{ c } → 2:{  }   2:{  } → 3:{  }
 [alias] analysing instruction: c = & d;
 [alias] May-aliases after instruction  c = & d;  are  { *b; c }  { *(*b); *c; d }
+[alias] May-alias graph after instruction  c = & d;  is
+  0:{ b } → 1:{ c }   1:{ c } → 2:{ d }   2:{ d } → 3:{  }
 [alias] analysing instruction: d = & e;
 [alias] May-aliases after instruction  d = & e;  are  { *b; c }  { *(*b); *c; d }
+[alias] May-alias graph after instruction  d = & e;  is
+  0:{ b } → 1:{ c }   1:{ c } → 2:{ d }   2:{ d } → 3:{ e }
 [alias] analysing instruction: a = b;
 [alias] May-aliases after instruction  a = b;  are
-  { *a; *b; c }  { *(*a); *(*b); *c; d }  { a; b }
+  { a; b }  { *a; *b; c }  { *(*a); *(*b); *c; d }
+[alias] May-alias graph after instruction  a = b;  is
+  13:{ a; b } → 14:{ c }   14:{ c } → 15:{ d }   15:{ d } → 16:{ e }
 [alias] analysing instruction: a = & c;
 [alias] May-aliases after instruction  a = & c;  are
-  { *a; *b; c }  { *(*a); *(*b); *c; d }  { a; b }
+  { a; b }  { *a; *b; c }  { *(*a); *(*b); *c; d }
+[alias] May-alias graph after instruction  a = & c;  is
+  0:{ b } → 18:{ c }   17:{ a } → 18:{ c }   18:{ c } → 19:{ d }
+  19:{ d } → 20:{ e }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
-  { *a; *b; c }  { *(*a); *(*b); *c; d }  { a; b }
+  { a; b }  { *a; *b; c }  { *(*a); *(*b); *c; d }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  13:{ a; b } → 14:{ c }   14:{ c } → 15:{ d }   15:{ d } → 16:{ e }
 [alias] May-aliases at the end of function main:
-  { *a; *b; c }  { *(*a); *(*b); *c; d }  { a; b }
+  { a; b }  { *a; *b; c }  { *(*a); *(*b); *c; d }
+[alias] May-alias graph at the end of function main:
+  13:{ a; b } → 14:{ c }   14:{ c } → 15:{ d }   15:{ d } → 16:{ e }
+[alias] Summary of function main:
+  formals: 
+  locals: a→{ c }  b→{ c }  c→{ d }  d→{ e }  e  __retres
+  returns: __retres    state: { a; b }  { *a; *b; c }  { *(*a); *(*b); *c; d }
+[alias] Analysis complete

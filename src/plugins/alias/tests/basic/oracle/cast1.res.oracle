@@ -2,18 +2,33 @@
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
 [alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *a = (int *)0;  is    <empty>
 [alias] analysing instruction: int *b = (int *)0;
 [alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *b = (int *)0;  is    <empty>
 [alias] analysing instruction: float *c = (float *)0;
 [alias] May-aliases after instruction  float *c = (float *)0;  are  <none>
+[alias] May-alias graph after instruction  float *c = (float *)0;  is    <empty>
 [alias] analysing instruction: float *d = (float *)0;
 [alias] May-aliases after instruction  float *d = (float *)0;  are  <none>
+[alias] May-alias graph after instruction  float *d = (float *)0;  is    <empty>
 [alias] analysing instruction: a = (int *)c;
 [alias:unsafe-cast] cast1.c:10: Warning: unsafe cast from float * to int *
 [alias] May-aliases after instruction  a = (int *)c;  are  { a; c }
+[alias] May-alias graph after instruction  a = (int *)c;  is    0:{ a; c } → 1:{  }
 [alias] analysing instruction: d = (float *)b;
 [alias:unsafe-cast] cast1.c:11: Warning: unsafe cast from int * to float *
 [alias] May-aliases after instruction  d = (float *)b;  are  { a; c }  { b; d }
+[alias] May-alias graph after instruction  d = (float *)b;  is
+  0:{ a; c } → 1:{  }   4:{ b; d } → 5:{  }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  { a; c }  { b; d }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  0:{ a; c } → 1:{  }   4:{ b; d } → 5:{  }
 [alias] May-aliases at the end of function main: { a; c }  { b; d }
+[alias] May-alias graph at the end of function main:
+  0:{ a; c } → 1:{  }   4:{ b; d } → 5:{  }
+[alias] Summary of function main:
+  formals:     locals: a  b  c  d  __retres    returns: __retres
+  state: { a; c }  { b; d }
+[alias] Analysis complete

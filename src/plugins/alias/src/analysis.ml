@@ -90,10 +90,9 @@ let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp
   in
   match ef with
   | {enode=Lval (Var v, _);_}  when is_malloc v.vname ->
-    begin
-      (* special case for malloc *)
-      match (state,res) with
-        (None, _) -> None
+    (* special case for malloc *)
+    begin match (state, res) with
+      | (None, _) -> None
       | (Some a, None) -> (Options.warning "Memory allocation not stored (ignored)"; Some a)
       | (Some a, Some lv) ->
         try Some (Abstract_state.assignment_x_allocate_y a lv)
@@ -101,25 +100,19 @@ let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp
           warn_unsupported_explicit_pointer Printer.pp_stmt stmt loc;
           Some a
     end
-  | _ ->
-    begin
-      (* general case *)
-      let summary =
-        match Kernel_function.get_called ef with
-        | Some kf when Kernel_function.is_main kf -> None
-        | Some kf -> begin
-            try Function_table.find kf
-            with Not_found -> doFunction kf
-          end
-        | None ->
-          Options.warning ~wkey:Options.Warn.unsupported_function ~source:(fst loc)
-            "unsupported feature: call to function pointer: %a" Exp.pretty ef;
-          None
-      in
-      match (state, summary) with
-        (None, _) -> None
-      | (Some a, Some summary) ->
-        Some (Abstract_state.call a res args summary)
+  | _ -> (* general case *)
+    let summary =
+      match Kernel_function.get_called ef with
+      | Some kf when Kernel_function.is_main kf -> None
+      | Some kf -> (try Function_table.find kf with Not_found -> doFunction kf)
+      | None ->
+        Options.warning ~wkey:Options.Warn.unsupported_function ~source:(fst loc)
+          "unsupported feature: call to function pointer: %a" Exp.pretty ef;
+        None
+    in
+    begin match (state, summary) with
+      | (None, _) -> None
+      | (Some a, Some summary) -> Some (Abstract_state.call a res args summary)
       | (Some a, None) ->
         Options.warning ~wkey:Options.Warn.undefined_function ~once:true ~source:(fst loc)
           "function %a has no definition" Exp.pretty ef;
@@ -129,15 +122,14 @@ let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp
 let do_cons_init (s:stmt) (v:varinfo) f arg t loc state =
   Cil.treat_constructor_as_func (do_function_call s state) v f arg t loc
 
-let analyse_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
+let analyse_instr (s:stmt) (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   match i with
-    Set (lv,exp,_) -> Option.map (do_assignment lv exp) a
+  | Set (lv,exp,_) -> Option.map (do_assignment lv exp) a
   | Local_init (v,AssignInit i,_) -> do_init (Var v, NoOffset) i a
   | Local_init (v,ConsInit (f,arg,t),loc) -> do_cons_init s v f arg t loc a
   | Code_annot _ -> a
   | Skip _ -> a
-  | Call (res,ef,es,loc) -> (* !function_compute_ref ef *)
-    do_function_call s a res ef es loc
+  | Call (res,ef,es,loc) -> do_function_call s a res ef es loc
   | Asm (_,_,_,loc) ->
     Options.warning
       ~source:(fst loc) ~wkey:Options.Warn.unsupported_asm
@@ -149,7 +141,7 @@ let pp_abstract_state_opt ?(debug=false) fmt v =
   | None -> Format.fprintf fmt "⊥"
   | Some a -> Abstract_state.pretty ~debug fmt a
 
-let do_instr (s:stmt)  (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
+let do_instr (s:stmt) (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   Options.feedback ~level:3 "@[analysing instruction:@ %a@]" Printer.pp_stmt s;
   let result = analyse_instr s i a in
   Options.feedback ~level:3 "@[May-aliases after instruction@;<2>@[%a@]@;<2>are@;<2>@[%a@]@]"
@@ -171,7 +163,7 @@ module T = struct
 
   let pretty fmt a =
     match a with
-      None -> Format.fprintf fmt "<No abstract state>"
+    | None -> Format.fprintf fmt "<No abstract state>"
     | Some a -> Abstract_state.pretty fmt a
 
   let computeFirstPredecessor _ a = a
@@ -188,8 +180,7 @@ module T = struct
 
   let doInstr = do_instr
 
-  let doGuard _ _ a =
-    Dataflow.GUse a, Dataflow.GUse a
+  let doGuard _ _ a = Dataflow.GUse a, Dataflow.GUse a
 
   let doStmt _ _ = Dataflow.SDefault
 
@@ -200,51 +191,47 @@ module F = Dataflow.Forwards (T)
 
 let do_stmt (a: Abstract_state.t) (s:stmt) :  Abstract_state.t =
   match s.skind with
-    Instr i ->
-    begin
-      match do_instr s i (Some a) with
-        None -> Options.fatal "problem here"
+  | Instr i ->
+    begin match do_instr s i (Some a) with
+      | None -> Options.fatal "problem here"
       | Some a -> a
     end
   | _ -> a
 
 let analyse_function (kf:kernel_function) =
-  Options.feedback ~level:2 "analysing function: %a" Kernel_function.pretty kf;
-  if Kernel_function.has_definition kf then
-    begin
-      let first_stmt =
-        try Kernel_function.find_first_stmt kf
-        with Kernel_function.No_Statement -> assert false
-      in
-      T.StmtStartData.add first_stmt (Some Abstract_state.empty);
-      F.compute [first_stmt];
-      let return_stmt = Kernel_function.find_return kf in
-      try Stmt_table.find return_stmt
-      with Not_found ->
-        begin
-          let source, _ = Kernel_function.get_location kf in
-          Options.warning ~source ~wkey:Options.Warn.no_return_stmt
-            "function %a does not return; analysis may be unsound"
-            Kernel_function.pretty kf;
-          Some Abstract_state.empty
-        end
-    end
-  else
-    None
+  if not @@ Kernel_function.has_definition kf then None else begin
+    Options.feedback ~level:2 "analysing function: %a" Kernel_function.pretty kf;
+    let first_stmt =
+      try Kernel_function.find_first_stmt kf
+      with Kernel_function.No_Statement -> assert false
+    in
+    T.StmtStartData.add first_stmt (Some Abstract_state.empty);
+    F.compute [first_stmt];
+    let return_stmt = Kernel_function.find_return kf in
+    try Stmt_table.find return_stmt
+    with Not_found ->
+      let source, _ = Kernel_function.get_location kf in
+      Options.warning ~source ~wkey:Options.Warn.no_return_stmt
+        "function %a does not return; analysis may be unsound"
+        Kernel_function.pretty kf;
+      Some Abstract_state.empty
+  end
 
 let doFunction (kf:kernel_function) =
   let final_state = analyse_function kf in
   let level = if Kernel_function.is_main kf then 1 else 2 in
-  Options.feedback ~level "@[May-aliases at the end of function %a:@ @[%a@]"
-    Kernel_function.pretty kf
-    (pp_abstract_state_opt ~debug:false) final_state;
-  Options.debug ~level "May-alias graph at the end of function %a:@;<4>@[%a@]"
-    Kernel_function.pretty kf
-    (pp_abstract_state_opt ~debug:true) final_state;
+  final_state |> Option.iter (fun s ->
+      Options.feedback ~level "@[May-aliases at the end of function %a:@ @[%a@]"
+        Kernel_function.pretty kf
+        (Abstract_state.pretty ~debug:false) s;
+      Options.debug ~level "May-alias graph at the end of function %a:@;<4>@[%a@]"
+        Kernel_function.pretty kf
+        (Abstract_state.pretty ~debug:true)s;
+    );
   let result =
     match final_state with
     (* final state is None if kf has no definition *)
-      None -> None
+    | None -> None
     | Some fs ->
       let summary = Abstract_state.make_summary fs kf in
       Options.debug ~level:2 "Summary of function %a:@ @[%a@]"
@@ -264,17 +251,13 @@ let doFunction (kf:kernel_function) =
 let () = function_compute_ref := doFunction
 
 let make_summary (state:Abstract_state.t) (kf:kernel_function) =
-  try
-    begin
-      match Function_table.find kf with
-        Some s -> (state, s)
-      | None -> Options.fatal "not implemented"
-    end
-  with
-    Not_found ->
-    begin
-      match doFunction kf with
-        Some s -> (state, s)
+  try begin match Function_table.find kf with
+    | Some s -> (state, s)
+    | None -> Options.fatal "not implemented"
+  end
+  with Not_found ->
+    begin match doFunction kf with
+      | Some s -> (state, s)
       | None -> Options.fatal "not implemented"
     end
 
@@ -315,16 +298,10 @@ let clear () =
 
 let get_state_before_stmt _kf stmt =
   if is_computed ()
-  then
-    try Stmt_table.find stmt with
-      Not_found -> None
-  else
-    None
+  then try Stmt_table.find stmt with Not_found -> None
+  else None
 
 let get_summary kf =
   if is_computed ()
-  then
-    try Function_table.find kf with
-      Not_found -> None
-  else
-    None
+  then try Function_table.find kf with Not_found -> None
+  else None

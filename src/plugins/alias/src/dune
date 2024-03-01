@@ -30,6 +30,8 @@
   )
 )
 
+(env (release (flags -noassert)))
+
 ( library
   (name Alias)
   (public_name frama-c-alias.core)

@@ -23,7 +23,7 @@
 open Cil_types
 open Cil_datatype
 
-let nul_exp= Cil.kinteger64 ~loc:Location.unknown ~repr:"0.." ~kind:IInt Integer.zero
+let nul_exp = Cil.kinteger64 ~loc:Location.unknown ~repr:"0.." ~kind:IInt Integer.zero
 let is_nul_exp = Cil_datatype.ExpStructEq.equal nul_exp
 
 module HL = Lval.Hashtbl
@@ -81,7 +81,8 @@ and simplify_exp e =
         check_cast_compatibility e typ;
         simplify_exp e
       | Lval lv -> {e with enode = Lval (simplify_lval lv)}
-      | AddrOf lv | StartOf lv -> {e with enode = AddrOf (simplify_lval lv)}
+      | StartOf lv -> {e with enode = Lval (simplify_lval lv)}
+      | AddrOf lv -> {e with enode = AddrOf (simplify_lval lv)}
       | BinOp(PlusPI, e1, _, _) | BinOp(MinusPI, e1, _, _) ->
         begin
           match (simplify_exp e1).enode with
@@ -91,6 +92,8 @@ and simplify_exp e =
       | _ -> e
     in
     HE.add cached_exp e res;
+    Options.debug ~level:9 "simplify_exp %a = %a"
+      Printer.pp_exp e Printer.pp_exp res;
     res
 
 module LvalOrRef = struct
@@ -112,52 +115,8 @@ module LvalOrRef = struct
       Lval lv -> Some (Lval lv)
     | AddrOf lv -> Some (Ref lv)
     | _ -> None
-
-  let is_pointer x =
-    match x with
-    | Ref _ -> true
-    | Lval lv ->
-      let t = Cil.typeOfLval lv in
-      match Cil.unrollType t with
-        TPtr _ | TArray _ -> true
-      | _ -> false
 end
 
 module Lval = struct
-  type t = lval
-
-  let simplify x = simplify_lval x
-
-  let compare = Cil_datatype.LvalStructEq.compare
-
-  let pretty l =
-    if Options.is_debug_key_enabled Options.DebugKeys.lvals
-    then Cil_types_debug.pp_lval l
-    else Printer.pp_lval l
-
-  let points_to lv = Mem (Cil.dummy_exp (Lval lv)), NoOffset
+  let simplify = simplify_lval
 end
-
-let decompose_lval lv1 : (lval * offset) list =
-  let rec list_of_offset (o: offset) : (offset*offset) list =
-    match o with
-      NoOffset -> [NoOffset,o]
-    | Index(e,ofs) ->
-      let li =
-        List.map
-          (fun (o1,o2) -> (Index(e,o1),o2))
-          (list_of_offset ofs)
-      in
-      (NoOffset,o)::li
-    | Field(f, ofs) ->
-      let li =
-        List.map
-          (fun (o1,o2) -> (Field(f,o1),o2))
-          (list_of_offset ofs)
-      in
-      (NoOffset,o)::li
-  in
-  let lv, off = Cil.removeOffsetLval lv1 in
-  List.map
-    (fun (o1,o2) -> Cil.addOffsetLval o1 lv, o2)
-    (list_of_offset off)

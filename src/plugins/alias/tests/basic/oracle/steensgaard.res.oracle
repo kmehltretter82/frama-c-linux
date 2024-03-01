@@ -2,16 +2,40 @@
 [alias] analysing function: main
 [alias] analysing instruction: a = & x;
 [alias] May-aliases after instruction  a = & x;  are  <none>
+[alias] May-alias graph after instruction  a = & x;  is    0:{ a } → 1:{ x }
 [alias] analysing instruction: b = & y;
 [alias] May-aliases after instruction  b = & y;  are  { *b; y }
+[alias] May-alias graph after instruction  b = & y;  is
+  0:{ a } → 1:{ x }   4:{ b } → 5:{ y }   5:{ y } → 6:{  }
 [alias] analysing instruction: y = & z;
 [alias] May-aliases after instruction  y = & z;  are  { *b; y }
+[alias] May-alias graph after instruction  y = & z;  is
+  0:{ a } → 1:{ x }   4:{ b } → 5:{ y }   5:{ y } → 6:{ z }
 [alias] analysing instruction: y = & x;
 [alias] May-aliases after instruction  y = & x;  are  { *b; a; y }
+[alias] May-alias graph after instruction  y = & x;  is
+  0:{ a } → 6:{ x }   4:{ b } → 5:{ y }   5:{ y } → 6:{ x }
 [alias] analysing instruction: c = & y;
-[alias] May-aliases after instruction  c = & y;  are  { *b; *c; a; y }  { b; c }
+[alias] May-aliases after instruction  c = & y;  are  { b; c }  { *b; *c; a; y }
+[alias] May-alias graph after instruction  c = & y;  is
+  0:{ a } → 15:{ x; z }   4:{ b } → 14:{ y }   13:{ c } → 14:{ y }
+  14:{ y } → 15:{ x; z }
 [alias] analysing instruction: *y = 4;
-[alias] May-aliases after instruction  *y = 4;  are  { *b; *c; a; y }  { b; c }
+[alias] May-aliases after instruction  *y = 4;  are  { b; c }  { *b; *c; a; y }
+[alias] May-alias graph after instruction  *y = 4;  is
+  0:{ a } → 15:{ x; z }   4:{ b } → 14:{ y }   13:{ c } → 14:{ y }
+  14:{ y } → 15:{ x; z }
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are  { *b; *c; a; y }  { b; c }
-[alias] May-aliases at the end of function main: { *b; *c; a; y }  { b; c }
+[alias] May-aliases after instruction  __retres = 0;  are  { b; c }  { *b; *c; a; y }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  0:{ a } → 15:{ x; z }   4:{ b } → 14:{ y }   13:{ c } → 14:{ y }
+  14:{ y } → 15:{ x; z }
+[alias] May-aliases at the end of function main: { b; c }  { *b; *c; a; y }
+[alias] May-alias graph at the end of function main:
+  0:{ a } → 15:{ x; z }   4:{ b } → 14:{ y }   13:{ c } → 14:{ y }
+  14:{ y } → 15:{ x; z }
+[alias] Summary of function main:
+  formals: 
+  locals: a→{ x; z }  b→{ y }  c→{ y }  y→{ x; z }  x  z  p  __retres
+  returns: __retres    state: { b; c }  { *b; *c; a; y }
+[alias] Analysis complete
