@@ -1,7 +1,8 @@
 [kernel] Parsing tkn-2.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: a = (int *)(& a);
-[alias:unsafe-cast] tkn-2.c:6: Warning: unsafe cast from int ** to int *
+[alias:unsafe-cast] tkn-2.c:6: Warning: 
+  unsafe cast from int ** to int *; analysis may be unsound
 [alias] tkn-2.c:6: Warning: ignoring assignment of the form: a = (int *)(& a)
 [alias] May-aliases after instruction  a = (int *)(& a);  are  <none>
 [alias] May-alias graph after instruction  a = (int *)(& a);  is

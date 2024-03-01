@@ -22,7 +22,7 @@
   0:{ p_x } → 1:{ x }   4:{ p_y } → 5:{ y }
 [alias] analysing instruction: p_x = (st_1_t *)p_y;
 [alias:unsafe-cast] structure1.c:28: Warning: 
-  unsafe cast from st_2_t * to st_1_t *
+  unsafe cast from st_2_t * to st_1_t *; analysis may be unsound
 [alias] May-aliases after instruction  p_x = (st_1_t *)p_y;  are  { p_x; p_y }
 [alias] May-alias graph after instruction  p_x = (st_1_t *)p_y;  is
   0:{ p_x; p_y } → 1:{ x; y }

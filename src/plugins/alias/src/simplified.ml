@@ -46,7 +46,7 @@ let check_cast_compatibility e typ =
       ~once:true
       ~source:(fst @@ e.eloc)
       ~wkey:Options.Warn.unsafe_cast
-      "unsafe cast from %a to %a"
+      "unsafe cast from %a to %a; analysis may be unsound"
       Printer.pp_typ type_of_e Printer.pp_typ typ
 
 let rec simplify_offset o =
