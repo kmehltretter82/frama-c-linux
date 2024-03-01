@@ -23,8 +23,12 @@
 
 import React from 'react';
 // import other libs
-import ForceGraph2D from 'react-force-graph-2d';
-import ForceGraph3D from 'react-force-graph-3d';
+import ForceGraph2D, {
+  ForceGraphMethods as ForceGraphMethods2D,
+} from 'react-force-graph-2d';
+import ForceGraph3D, {
+  ForceGraphMethods as ForceGraphMethods3D,
+} from 'react-force-graph-3d';
 import './sandbox.css';
 import { registerSandbox } from 'ivette';
 import { Button } from 'dome/frame/toolbars';
@@ -65,6 +69,7 @@ export type SelectionCallback = (node: string, evt: React.MouseEvent) => void;
 /* -------------------------------------------------------------------------- */
 /* --- Graph Implementation                                               --- */
 /* -------------------------------------------------------------------------- */
+export type MapGraph = (nodes: Node<string>[], edges: Edge[]) => void;
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Component Properties                                         --- */
@@ -74,6 +79,8 @@ export interface GraphProps<ID> {
   nodes: readonly Node<ID>[];
   edges: readonly Edge[];
 
+  /** Converts nodes and edges for ForceGraph */
+  mapGraph?: MapGraph;
   /**
      Element to focus on.
      The graph is scrolled to make this node visible if necessary.
@@ -114,6 +121,9 @@ export interface GraphProps<ID> {
 /* -------------------------------------------------------------------------- */
 
 export function Graph(props: GraphProps<string>): JSX.Element {
+  const fgRef2D = React.useRef<ForceGraphMethods2D | undefined>(undefined);
+  const fgRef3D = React.useRef<ForceGraphMethods3D | undefined>(undefined);
+  // const graph = props.mapGraph( props.nodes, props.edges);
   const graph = {
     nodes: props.nodes.map((node) => {
       return { id: Number(node.id) };
@@ -122,6 +132,11 @@ export function Graph(props: GraphProps<string>): JSX.Element {
       return { source: Number(edge.fromNode), target: Number(edge.toNode) };
     }),
   };
+  // Zoom update on ForceGraph2D
+  React.useEffect(() => {
+    fgRef2D.current?.zoom(props.zoom || 0);
+    // fgRef3D.current?.cameraPosition();
+  }, [props.zoom]);
 
   return (
     <div className={props.className}>
@@ -129,6 +144,7 @@ export function Graph(props: GraphProps<string>): JSX.Element {
       {props.display ? (
         props.layout === '2D' ? (
           <ForceGraph2D
+            ref={fgRef2D}
             graphData={graph}
             // autoPauseRedraw performance optimization to automatically
             // pause redrawing the 2D canvas at every frame whenever
@@ -140,7 +156,7 @@ export function Graph(props: GraphProps<string>): JSX.Element {
             dagLevelDistance={50}
           />
         ) : (
-          <ForceGraph3D graphData={graph} />
+          <ForceGraph3D ref={fgRef3D} graphData={graph} />
         )
       ) : (
         <></>
@@ -151,41 +167,60 @@ export function Graph(props: GraphProps<string>): JSX.Element {
 
 function GraphComponent(): JSX.Element {
   const [initGraph, setInitGraph] = React.useState<GraphProps<string>>(
-    genRandomTree() as GraphProps<string>
+    setGraph() as GraphProps<string>
   );
 
-  function genRandomTree(): GraphProps<string> {
+  function setGraph(): GraphProps<string> {
+    // Display or hide the graph
+    const updateDisplay = (): void => {
+      setInitGraph((prevGraph) => {
+        return { ...prevGraph, display: !prevGraph.display };
+      });
+    };
+    // Transition from 2D to 3D or 3D to 2D
+    const updateLayout = (): void => {
+      setInitGraph((prevGraph) => {
+        return {
+          ...prevGraph,
+          layout: prevGraph.layout === '2D' ? '3D' : '2D',
+        };
+      });
+    };
+    // Zoom out
+    const updateZoomOut = (): void => {
+      setInitGraph((prevGraph) => {
+        return {
+          ...prevGraph,
+          zoom: prevGraph.zoom! - 1,
+        };
+      });
+    };
+    // Zoom In
+    const updateZoomIn = (): void => {
+      setInitGraph((prevGraph) => {
+        return {
+          ...prevGraph,
+          zoom: prevGraph.zoom! + 1,
+        };
+      });
+    };
     return {
-      nodes: [{ id: '0' }, { id: '1' }],
-      edges: [{ fromNode: '0', toNode: '1' }],
+      nodes: [{ id: '0' }, { id: '1' }, { id: '2' }],
+      edges: [
+        { fromNode: '0', toNode: '1' },
+        { fromNode: '1', toNode: '2' },
+      ],
       selected: '0',
       zoom: 1,
       layout: '2D',
       display: true,
       className: 'sandbox-item-graph',
       children: (
-        <div className='buttons'>
-          <Button
-            icon='DISPLAY'
-            title='Display'
-            onClick={() => {
-              setInitGraph((prevGraph) => {
-                return { ...prevGraph, display: !prevGraph.display };
-              });
-            }}
-          />
-          <Button
-            title='Layout'
-            icon='COMPONENT'
-            onClick={() => {
-              setInitGraph((prevGraph) => {
-                return {
-                  ...prevGraph,
-                  layout: prevGraph.layout === '2D' ? '3D' : '2D',
-                };
-              });
-            }}
-          />
+        <div className='toolbar'>
+          <Button icon='DISPLAY' title='Display' onClick={updateDisplay} />
+          <Button title='Layout' icon='COMPONENT' onClick={updateLayout} />
+          <Button icon='ZOOM.IN' title={'Zoom in'} onClick={updateZoomIn} />
+          <Button icon='ZOOM.OUT' title={'Zoom out'} onClick={updateZoomOut} />
         </div>
       ),
     };
@@ -197,7 +232,6 @@ function GraphComponent(): JSX.Element {
   );
 }
 
-// const initGraph = genRandomTree();
 registerSandbox({
   id: 'sandbox.graph',
   label: 'Graph Component',
