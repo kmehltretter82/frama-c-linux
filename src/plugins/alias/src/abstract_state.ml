@@ -173,6 +173,9 @@ module Readout = struct
                let modify_lval lv = match E.label e with
                  | Field f -> let lhost, o = lv in lhost, Field (f, o)
                  | Pointer ->
+                   (* TODO: This Cil.typeOfLval may crash with a fatal kernel
+                      error for certain reconstructed lvals involving a union
+                      type. See tests/known_bugs/union_readback.c *)
                    let ty = Cil.typeOfLval lv in
                    if Cil.isArrayType ty then
                      let lhost, o = lv in lhost, Index (Simplified.nul_exp, o)
