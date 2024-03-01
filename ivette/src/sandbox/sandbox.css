@@ -22,8 +22,14 @@
 .sandbox-item-graph{
     color: var(--text);
     background-color:  var(--background-profound);
-
+    
 }
+.sandbox-item-graph .buttons{
+    text-align: right;
+    
+    
+}
+
 .sandbox-item-graph-hover-selected{
     color: var(--background-button-hover);
     background-color:  var(--background-disabled-hover);
