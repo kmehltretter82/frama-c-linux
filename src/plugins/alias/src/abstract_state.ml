@@ -159,7 +159,13 @@ module Readout = struct
     assert (G.mem_vertex s.graph v);
     (* cycles can occur with unsafe casts such as: x->f = (int* ) x; *)
     let rec checking_for_cycles s visited v =
-      if VSet.mem v visited then LSet.empty else
+      if VSet.mem v visited then
+        let () =
+          Options.warning ~once:true ~wkey:Options.Warn.incoherent
+            "cycle during readout of vertex %d, \
+             (following unsafe cast?); analysis may be unsound" v
+        in LSet.empty
+      else
         let visited = VSet.add v visited in
         let modified_predecessors = List.map
             (fun e ->
@@ -290,7 +296,9 @@ let assert_invariants s : unit =
   G.iter_vertex assert_vertex s.graph;
   let assert_edge v1 v2 =
     Options.debug ~level:11 "checking coherence of edge %d → %d" v1 v2;
-    assert (v1 <> v2);
+    if v1 = v2 then
+      Options.warning ~once:true ~wkey:Options.Warn.incoherent
+        "loop on vertex %d (following unsafe cast?); analysis may be unsound" v1;
     assert (G.mem_vertex s.graph v1);
     assert (G.mem_vertex s.graph v2)
   in

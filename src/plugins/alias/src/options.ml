@@ -72,6 +72,7 @@ module Warn = struct
   let unsupported_asm = register_warn_category "unsupported:asm"
   let unsupported_function = register_warn_category "unsupported:fn"
   let unsafe_cast = register_warn_category "unsafe-cast"
+  let incoherent = register_warn_category "incoherent"
 end
 
 module DebugKeys = struct
