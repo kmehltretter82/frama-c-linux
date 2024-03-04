@@ -518,7 +518,7 @@ module Select (Eval: Eval) = struct
          | Mem _, NoOffset when Cil.isFunctionType ty -> begin
              (* Function pointers *)
              (* get the list of functions in the values *)
-             let e = Eva_utils.lval_to_exp lv in
+             let e = Evast_builder.(lval (translate_lval lv)) in
              let state =
                match ki with
                | Kglobal -> Eval.Analysis.get_global_state ()

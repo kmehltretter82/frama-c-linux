@@ -995,8 +995,8 @@ let forward_binop_by_type typ =
 
 let forward_binop typ v1 op v2 =
   match op with
-  | Eq | Ne | Le | Lt | Ge | Gt ->
-    let comp = Eva_utils.conv_comp op in
+  | Evast.Eq | Ne | Le | Lt | Ge | Gt ->
+    let comp = Evast_utils.conv_relation op in
     if Cil.isPointerType typ || Cvalue_forward.are_comparable comp v1 v2
     then forward_binop_by_type typ v1 op v2
     else Cvalue.V.zero_or_one
@@ -1097,6 +1097,7 @@ let rec eval_term ~alarm_mode env t =
       | BNot -> r.etype (* can only be used on an integer type *)
       | LNot -> Cil.intType
     in
+    let op = Evast_builder.translate_unop op in
     let v = Cvalue_forward.forward_unop r.etype op r.eover in
     let eover = v in
     { etype = typ';
@@ -1363,6 +1364,7 @@ and eval_binop ~alarm_mode env op t1 t2 =
     let te1 = Cil.unrollType r1.etype in
     check_logic_alarms ~alarm_mode te1 r1 op r2;
     let typ_res = infer_binop_res_type op te1 in
+    let op = Evast_builder.translate_binop op in
     let eover = forward_binop te1 r1.eover op r2.eover in
     let default _r1 _r2 = under_from_over eover in
     let add_untyped_op factor =

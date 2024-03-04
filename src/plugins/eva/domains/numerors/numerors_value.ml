@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
+open Evast
 open Numerors_utils
 
 module I = Numerors_interval

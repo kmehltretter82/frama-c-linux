@@ -184,12 +184,12 @@ module Set = struct
   let pick_representative set =
     let choose elt (current, height) =
       let elt = HCE.to_exp elt in
-      let h = Eva_utils.height_expr elt in
+      let h = Evast_utils.height_exp elt in
       if h < height then (elt, h) else (current, height)
     in
     let head = HCESet.choose set in
     let current = HCE.to_exp head in
-    let height = Eva_utils.height_expr current in
+    let height = Evast_utils.height_exp current in
     fst (HCESet.fold choose (HCESet.remove head set) (current, height))
 
   (* Binds the terms of the [equality] to [equality] in the [map].

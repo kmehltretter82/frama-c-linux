@@ -36,4 +36,4 @@ include Evaluation_sig.S with type state := state
                           and type origin := origin
 
 (** Evaluates the location of a lvalue in a given cvalue state. *)
-val lval_to_loc: state -> Cil_types.lval -> Locations.location
+val lval_to_loc: state -> Evast.lval -> Locations.location

@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
+open Evast
 open Locations
 
 let dkey = Self.register_category "d-symblocs"
@@ -115,9 +115,10 @@ end
    Otherwise, the value should be inferred by the cvalue domain, or can be
    precisely computed from values inferred by the cvalue domain. *)
 let interesting_exp get_locs get_val e =
-  let is_comp = function Eq | Ne | Le | Ge | Lt | Gt -> true | _ -> false in
+  let is_comp = function Eq | Ne | Le | Ge | Lt | Gt -> true | _ -> false
+  in
   let rec has_lvalue e =
-    match e.enode with
+    match e.node with
     | Lval _ ->
       not (Cvalue.V.cardinal_zero_or_one (get_val e))
     | CastE (_, e) | UnOp (_, e, _) ->
@@ -128,7 +129,7 @@ let interesting_exp get_locs get_val e =
     | StartOf _ | AddrOf _ ->
       false
   in
-  match e.enode with
+  match e.node with
   | Lval lv ->
     not (Precise_locs.cardinal_zero_or_one (get_locs lv))
   | BinOp (op, e1, e2,_) ->
@@ -138,24 +139,19 @@ let interesting_exp get_locs get_val e =
     false
 
 (* Locals and formals syntactically present in an expression or lvalue *)
-let rec vars_lv (h, o) = Base.Set.union (vars_host h) (vars_offset o)
-and vars_exp (e: exp) = match e.enode with
-  | Const _ | SizeOf _ | AlignOf _ | SizeOfStr _ ->
-    Base.Set.empty
-  | AddrOf lv | StartOf lv | Lval lv ->
-    vars_lv lv
-  | SizeOfE e | AlignOfE e | CastE (_,e) | UnOp (_,e,_) ->
-    vars_exp e
-  | BinOp (_,e1,e2,_) -> Base.Set.union (vars_exp e1) (vars_exp e2)
-and vars_host = function
-  | Var vi ->
-    (* Global variables never go out of scope, no need to track them *)
-    if vi.vglob then Base.Set.empty else Base.(Set.singleton (of_varinfo vi))
-  | Mem e -> vars_exp e
-and vars_offset = function
-  | NoOffset -> Base.Set.empty
-  | Field (_, o) -> vars_offset o
-  | Index (e, o) -> Base.Set.union (vars_exp e) (vars_offset o)
+let vars_to_bases vi_set =
+  vi_set
+  |> Cil_datatype.Varinfo.Set.to_seq
+  (* Global variables never go out of scope, no need to track them *)
+  |> Seq.filter (fun vi -> not vi.Cil_types.vglob)
+  |> Seq.map Base.of_varinfo
+  |> Base.Set.of_seq
+
+let vars_lv lv =
+  vars_to_bases (Evast_utils.vars_in_lval lv)
+
+let vars_exp (e: exp) =
+  vars_to_bases (Evast_utils.vars_in_exp e)
 
 (* Legacy names *)
 module B2K = K.BaseToHCESet
@@ -373,12 +369,12 @@ module Memory = struct
   (* Add the the mapping [lv --> v] to [state] when possible.
      [get_z] is a function that computes dependencies. *)
   let add_lv state get_z lv v  =
-    if Eval_typ.lval_contains_volatile lv then
+    if Evast_utils.lval_contains_volatile lv then
       state
     else
       let k = K.HCE.of_lval lv in
       let z_lv = Precise_locs.enumerate_valid_bits Locations.Read (get_z lv) in
-      let z_lv_indirect = Eva_utils.indirect_zone_of_lval get_z lv in
+      let z_lv_indirect = Evast_utils.indirect_zone_of_lval get_z lv in
       if Locations.Zone.intersects z_lv z_lv_indirect then
         (* The location of [lv] intersects with the zones needed to compute
            itself, the equality would not hold. *)
@@ -390,11 +386,11 @@ module Memory = struct
   (* Add the mapping [e --> v] to [state] when possible and useful.
      [get_z] is a function that computes dependencies. *)
   let add_exp state get_z e v =
-    if Eval_typ.expr_contains_volatile e then
+    if Evast_utils.exp_contains_volatile e then
       state
     else
       let k = K.HCE.of_exp e in
-      let z = Eva_utils.zone_of_expr get_z e in
+      let z = Evast_utils.zone_of_exp get_z e in
       add_key k v z state
 
   let find k state =
@@ -491,7 +487,7 @@ module D : Abstract_domain.Leaf
       | `Value loc -> loc.Eval.loc
     in
     if Precise_locs.(equal_loc loc_top r) then
-      Self.fatal "Unknown location for %a" Printer.pp_lval lv
+      Self.fatal "Unknown location for %a" Evast_printer.pp_lval lv
     else r
 
   let get_val valuation = fun lv ->

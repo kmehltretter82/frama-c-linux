@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
+open Evast
 
 type value = Main_values.CVal.t
 type origin = value
@@ -42,7 +42,7 @@ let warn_imprecise_value ?prefix lval value =
       let prefix = Option.fold ~none:"A" ~some:(fun s -> s ^ ": a") prefix in
       Self.warning ~wkey:Self.wkey_garbled_mix_write ~once:true ~current:true
         "@[%sssigning imprecise value to %a@ because of %s.@]%t"
-        prefix Printer.pp_lval lval (Origin.descr origin)
+        prefix Evast_printer.pp_lval lval (Origin.descr origin)
         Eva_utils.pp_callstack
   | _ -> ()
 
@@ -70,8 +70,7 @@ let warn_imprecise_offsm_write ?prefix lval offsm =
 (* ---------------------------------------------------------------------- *)
 
 let reduce valuation lval value t =
-  let typ = Cil.typeOfLval lval in
-  if Cil.typeHasQualifier "volatile" typ
+  if Cil.typeHasQualifier "volatile" lval.typ
   then t
   else
     match valuation.Abstract_domain.find_loc lval with
@@ -91,9 +90,9 @@ let is_smaller_value typ v1 v2 =
 (* Update the state according to a Valuation. *)
 let update valuation t =
   let process exp record t =
-    match exp.enode with
+    match exp.node with
     | Lval lv ->
-      if record.reductness = Reduced && Cil.isScalarType (Cil.typeOfLval lv)
+      if record.reductness = Reduced && Cil.isScalarType lv.typ
       then
         let {v; initialized; escaping} = record.value in
         let v = unbottomize v in
@@ -105,8 +104,7 @@ let update valuation t =
              abstract values to choose the best value to keep. *)
           match record.origin with
           | Some previous_v ->
-            let typ = Cil.typeOfLval lv in
-            if is_smaller_value typ v previous_v then v else previous_v
+            if is_smaller_value lv.typ v previous_v then v else previous_v
           | _ -> v
         in
         let value = Cvalue.V_Or_Uninitialized.make ~initialized ~escaping v in
@@ -220,7 +218,7 @@ let actualize_formals state arguments =
     let offsm =
       Cvalue_offsetmap.offsetmap_of_assignment state arg.concrete arg.avalue
     in
-    warn_imprecise_offsm_write (Cil.var arg.formal) offsm;
+    warn_imprecise_offsm_write (Evast_builder.var arg.formal) offsm;
     Cvalue.Model.add_base (Base.of_varinfo arg.formal) offsm state
   in
   List.fold_left treat_one_formal state arguments
@@ -232,15 +230,14 @@ let finalize_call _stmt _call _recursion ~pre:_ ~post:state =
   `Value state
 
 let show_expr valuation state fmt expr =
-  match expr.enode with
+  match expr.node with
   | Lval lval | StartOf lval ->
     let loc = match valuation.Abstract_domain.find_loc lval with
       | `Value record -> record.loc
       | `Top -> assert false
     in
     let offsm = Bottom.non_bottom (Eval_op.offsetmap_of_loc loc state) in
-    let typ = Cil.typeOfLval lval in
-    Eval_op.pretty_offsetmap typ fmt offsm
+    Eval_op.pretty_offsetmap lval.typ fmt offsm
   | _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
 
 

@@ -103,7 +103,7 @@ let inject_int _ i =
   else zero
 
 let constant _context _expr = function
-  | CInt64 (i, _, _) -> inject_int () i
+  | Evast.CInt64 (i, _, _) -> inject_int () i
   | _ -> top
 
 (* Extracting function pointers from an abstraction. Not implemented
@@ -149,7 +149,7 @@ let logical_not v = { pos = v.zero; neg = false; zero = v.pos || v.neg }
 
 let forward_unop _context typ op v =
   match op with
-  | Neg -> `Value (neg_unop v)
+  | Evast.Neg -> `Value (neg_unop v)
   | BNot -> `Value (bitwise_not typ v)
   | LNot -> `Value (logical_not v)
 
@@ -228,7 +228,7 @@ let logical_or v1 v2 =
 
 let forward_binop _context _typ op v1 v2 =
   match op with
-  | PlusA  -> `Value (plus v1 v2)
+  | Evast.PlusA  -> `Value (plus v1 v2)
   | MinusA -> `Value (plus v1 (neg_unop v2))
   | Mult   -> `Value (mul v1 v2)
   | Div    -> if equal zero v2 then `Bottom else `Value (div v1 v2)
@@ -317,8 +317,8 @@ let backward_comp_right op ~left ~right =
    for comparison operators. *)
 let backward_binop _ctx ~input_type:_ ~resulting_type:_ op ~left ~right ~result =
   match op with
-  | Ne | Eq | Le | Lt | Ge | Gt ->
-    let op = Eva_utils.conv_comp op in
+  | Evast.Ne | Eq | Le | Lt | Ge | Gt ->
+    let op = Evast_utils.conv_relation op in
     if equal zero result then
       (* The comparison is false, as it always evaluate to false. Reduce by the
          fact that the inverse comparison is true.  *)

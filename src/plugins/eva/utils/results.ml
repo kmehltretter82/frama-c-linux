@@ -286,31 +286,6 @@ struct
     | Bottom -> false
     | _ -> true
 
-  let equality_class exp req =
-    let open Equality in
-    match A.Dom.get Equality_domain.key with
-    | None ->
-      Result.error DisabledDomain
-    | Some extract ->
-      let hce = Hcexprs.HCE.of_exp exp in
-      let extract' state =
-        let equalities = Equality_domain.project (extract state) in
-        try NonTrivial (Set.find hce equalities)
-        with Not_found -> Trivial
-      and reduce e1 e2 =
-        match e1, e2 with
-        | Trivial, _ | _, Trivial -> Trivial
-        | NonTrivial e1, NonTrivial e2 -> Equality.inter e1 e2
-      in
-      let r = match Response.map_join extract' reduce (get req) with
-        | (`Top | `Bottom) as r -> r
-        | `Value Trivial -> `Top
-        | `Value (NonTrivial e) ->
-          let l = Equality.elements e in
-          `Value (List.map Hcexprs.HCE.to_exp l)
-      in
-      convert r
-
   let get_cvalue_model req =
     match A.Dom.get Cvalue_domain.State.key with
     | None ->
@@ -527,10 +502,6 @@ let by_callstack req =
 
 (* State requests *)
 
-let equality_class exp req =
-  let module E = Make () in
-  E.equality_class exp req
-
 let get_cvalue_model_result req =
   let module E = Make () in
   E.get_cvalue_model req
@@ -576,13 +547,17 @@ let build_eval_lval_and_exp () =
   let eval_exp exp req = build @@ M.eval_exp exp req in
   eval_lval, eval_exp
 
-let eval_lval lval req = Value ((fst @@ build_eval_lval_and_exp ()) lval req)
+let eval_lval lval req =
+  let lval = Evast_builder.translate_lval lval in
+  Value ((fst @@ build_eval_lval_and_exp ()) lval req)
 
 let eval_var vi req = eval_lval (Cil.var vi) req
 
-let eval_exp exp req = Value ((snd @@ build_eval_lval_and_exp ()) exp req)
+let eval_exp exp req =
+  let exp = Evast_builder.translate_exp exp in
+  Value ((snd @@ build_eval_lval_and_exp ()) exp req)
 
-let eval_address ?(for_writing=false) lval req =
+let eval_address' ?(for_writing=false) lval req =
   let module M = Make () in
   let v = M.eval_address ~for_writing lval req in
   Address
@@ -590,6 +565,10 @@ let eval_address ?(for_writing=false) lval req =
       include M
       let v = v
     end : Lvaluation)
+
+let eval_address ?(for_writing=false) lval req =
+  let lval = Evast_builder.translate_lval lval in
+  eval_address' ~for_writing lval req
 
 let eval_callee exp req =
   (* Check the validity of exp *)
@@ -599,6 +578,7 @@ let eval_callee exp req =
       invalid_arg "The callee must be an lvalue with no offset"
   end;
   let module M = Make () in
+  let exp = Evast_builder.translate_exp exp in
   M.eval_callee exp req
 
 let callee stmt =
@@ -722,20 +702,21 @@ let alarms : type a. a evaluation -> Alarms.t list =
 (* Dependencies *)
 
 let expr_deps expr request =
-  let lval_to_loc lv = eval_address lv request |> as_precise_loc in
-  Eva_utils.zone_of_expr lval_to_loc expr
+  let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
+  Evast_utils.zone_of_exp lval_to_loc (Evast_builder.translate_exp expr)
 
 let lval_deps lval request =
-  let lval_to_loc lv = eval_address lv request |> as_precise_loc in
-  Eva_utils.zone_of_expr lval_to_loc (Cil.dummy_exp (Lval lval))
+  let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
+  Evast_utils.zone_of_lval lval_to_loc (Evast_builder.translate_lval lval)
 
 let address_deps lval request =
-  let lval_to_loc lv = eval_address lv request |> as_precise_loc in
-  Eva_utils.indirect_zone_of_lval lval_to_loc lval
+  let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
+  Evast_utils.indirect_zone_of_lval lval_to_loc
+    (Evast_builder.translate_lval lval)
 
 let expr_dependencies expr request =
-  let lval_to_loc lv = eval_address lv request |> as_precise_loc in
-  Eva_utils.deps_of_expr lval_to_loc expr
+  let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
+  Evast_utils.deps_of_exp lval_to_loc (Evast_builder.translate_exp expr)
 
 (* Taint *)
 

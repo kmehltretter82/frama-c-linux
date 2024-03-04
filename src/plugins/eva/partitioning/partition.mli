@@ -143,7 +143,7 @@ type action =
       If the rationing has been created with [merge:true], all the states from
       each flow receive the same stamp, but states from different flows receive
       different stamps, until [limit] states have been tagged. *)
-  | Restrict of Cil_types.exp * Integer.t list
+  | Restrict of Evast.exp * Integer.t list
   (** [Restrict (exp, list)] restricts the rationing according to the evaluation
       of the expression [exp]:
       – for each integer [i] in [list], states in which [exp] evaluates exactly

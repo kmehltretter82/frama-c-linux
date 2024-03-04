@@ -24,14 +24,14 @@ open Lattice_bounds
 
 type t =
   | NoOffset of Cil_types.typ
-  | Index of Cil_types.exp option * Int_val.t * Cil_types.typ * t
+  | Index of Evast.exp option * Int_val.t * Cil_types.typ * t
   | Field of Cil_types.fieldinfo * t
 
 val pretty : Format.formatter -> t -> unit
 
 val of_var_address : Cil_types.varinfo -> t
-val of_cil_offset : (Cil_types.exp -> Int_val.t) ->
-  Cil_types.typ -> Cil_types.offset -> t or_top
+val of_evast_offset : (Evast.exp -> Int_val.t) ->
+  Cil_types.typ -> Evast.offset -> t or_top
 val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t or_top
 val of_term_offset : Cil_types.typ -> Cil_types.term_offset -> t or_top
 
@@ -40,4 +40,4 @@ val references : t -> Cil_datatype.Varinfo.Set.t (* variables referenced in the 
 
 val append : t -> t -> t (* Does not check that the appened offset fits *)
 val join : t -> t -> t or_top
-val add_index : (Cil_types.exp -> Int_val.t) -> t -> Cil_types.exp -> t or_top
+val add_index : (Evast.exp -> Int_val.t) -> t -> Evast.exp -> t or_top

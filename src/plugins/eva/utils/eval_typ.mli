@@ -54,7 +54,7 @@ val need_cast: typ -> typ -> bool
    ignore more or less safely the incompatibility in the types (which is however
    reported in the returned boolean). *)
 val compatible_functions:
-  typ -> ?args:exp list -> Kernel_function.t list ->
+  typ -> ?args:typ list -> Kernel_function.t list ->
   Kernel_function.t list * bool
 
 val expr_contains_volatile: exp -> bool

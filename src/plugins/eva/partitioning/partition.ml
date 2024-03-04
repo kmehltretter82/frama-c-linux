@@ -313,7 +313,7 @@ type action =
   | Incr_loop
   | Branch of branch * int
   | Ration of rationing
-  | Restrict of Cil_types.exp * Integer.t list
+  | Restrict of Evast.exp * Integer.t list
   | Split of split_term * split_kind * split_monitor
   | Merge of split_term
   | Update_dynamic_splits
@@ -370,47 +370,46 @@ struct
 
   exception Operation_failed
 
-  let fail ~exp message =
-    let source = fst exp.Cil_types.eloc in
+  let fail ~source message =
     let warn_and_raise message =
       Self.warning ~source ~once:true "%s" message;
       raise Operation_failed
     in
     Pretty_utils.ksfprintf warn_and_raise message
 
-  let evaluate_exp_to_ival state exp =
+  let evaluate_exp_to_ival ~source state exp =
     (* Evaluate the expression *)
     let valuation, value =
       match evaluate state exp with
       | `Value (valuation, value), alarms when Alarmset.is_empty alarms ->
         valuation, value
       | _ ->
-        fail ~exp "this partitioning parameter cannot be evaluated safely on \
-                   all states"
+        fail ~source "this partitioning parameter cannot be evaluated safely on \
+                      all states"
     in
     (* Get the cvalue *)
     let cvalue = match Abstract.Val.get Main_values.CVal.key with
       | Some get_cvalue -> get_cvalue value
-      | None -> fail ~exp "partitioning is disabled when the CValue domain is \
-                           not active"
+      | None -> fail ~source "partitioning is disabled when the CValue domain is \
+                              not active"
     in
     (* Extract the ival *)
     let ival =
       try
         Cvalue.V.project_ival cvalue
       with Cvalue.V.Not_based_on_null ->
-        fail ~exp "this partitioning parameter must evaluate to an integer"
+        fail ~source "this partitioning parameter must evaluate to an integer"
     in
     valuation, ival
 
   exception Split_limit of Integer.t option
 
-  let split_by_value ~monitor state exp =
+  let split_by_value ~monitor ~source state exp =
     let module SplitValues = Datatype.Integer.Set in
-    let valuation, ival = evaluate_exp_to_ival state exp in
+    let valuation, ival = evaluate_exp_to_ival ~source state exp in
     (* Build a state with the lvalue set to a singleton *)
     let build i acc =
-      let value = Abstract.Val.inject_int (Cil.typeOf exp) i in
+      let value = Abstract.Val.inject_int exp.typ i in
       let state =
         let* valuation = Abstract.Eval.assume ~valuation state exp value in
         (* Check the reduction *)
@@ -418,9 +417,9 @@ struct
       in
       match state with
       | `Value state ->
-        let _,new_ival = evaluate_exp_to_ival state exp in
+        let _,new_ival = evaluate_exp_to_ival ~source state exp in
         if not (Ival.is_singleton_int new_ival) then
-          fail ~exp "failing to learn perfectly from split" ;
+          fail ~source "failing to learn perfectly from split" ;
         monitor.split_values <-
           SplitValues.add i monitor.split_values;
         (i, state) :: acc
@@ -452,18 +451,18 @@ struct
         | None -> ()
         | Some c -> Format.fprintf fmt " (%a)" Integer.pretty c
       in
-      fail ~exp "split on more than %d values%t prevented ; try to improve \
-                 the analysis precision or look at the option -eva-split-limit \
-                 to increase this limit."
+      fail ~source "split on more than %d values%t prevented ; try to improve \
+                    the analysis precision or look at the option -eva-split-limit \
+                    to increase this limit."
         monitor.split_limit pp_count
 
-  let eval_exp_to_int state exp =
-    let _valuation, ival = evaluate_exp_to_ival state exp in
+  let eval_exp_to_int ~source state exp =
+    let _valuation, ival = evaluate_exp_to_ival ~source state exp in
     try Integer.to_int_exn (Ival.project_int ival)
     with
     | Ival.Not_Singleton_Int ->
-      fail ~exp "this partitioning parameter must evaluate to a singleton"
-    | Z.Overflow -> fail ~exp "this partitioning parameter overflows an integer"
+      fail ~source "this partitioning parameter must evaluate to a singleton"
+    | Z.Overflow -> fail ~source "this partitioning parameter overflows an integer"
 
   let split_by_predicate state predicate =
     let env =
@@ -494,7 +493,7 @@ struct
   let stamp_by_value = match Abstract.Val.get Main_values.CVal.key with
     | None -> fun _ _ _ -> None
     | Some get -> fun expr expected_values state ->
-      let typ = Cil.typeOf expr in
+      let typ = expr.Evast.typ in
       let make stamp i = stamp, i, Abstract.Val.inject_int typ i in
       let expected_values = List.mapi make expected_values in
       match fst (evaluate state expr) with
@@ -520,8 +519,12 @@ struct
       in
       let states =
         match term with
-        | Expression exp -> split_by_value ~monitor state exp
-        | Predicate pred -> split_by_predicate state pred
+        | Expression cil_exp ->
+          let exp = Evast_builder.translate_exp cil_exp
+          and source = fst cil_exp.eloc in
+          split_by_value ~monitor ~source state exp
+        | Predicate pred ->
+          split_by_predicate state pred
       in
       List.map update_key states
     with Operation_failed -> [(key,state)]
@@ -567,7 +570,10 @@ struct
 
         | Enter_loop limit_kind -> fun k x ->
           let limit = try match limit_kind with
-            | ExpLimit exp -> eval_exp_to_int x exp
+            | ExpLimit cil_exp ->
+              let exp = Evast_builder.translate_exp cil_exp
+              and source = fst cil_exp.eloc in
+              eval_exp_to_int ~source x exp
             | IntLimit i -> i
             | AutoUnroll (stmt, min_unroll, max_unroll) ->
               match AutoLoopUnroll.compute ~max_unroll x stmt with

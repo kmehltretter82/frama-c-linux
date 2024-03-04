@@ -450,9 +450,9 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
 
   (* --- Evaluates an expression or lvalue into an evaluation [result]. ----- *)
 
-  let lval_to_offsetmap lval state =
+  let lval_to_offsetmap (lval : Evast.lval) state =
     let cvalue_state = get_cvalue_or_top state in
-    match lval with
+    match lval.node with
     | Var vi, NoOffset ->
       let r = extract_single_var vi cvalue_state in
       `Value r, Alarmset.none
@@ -461,8 +461,8 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
       let precise_loc = get_precise_loc loc in
       find_offsetmap cvalue_state precise_loc
 
-  let eval_lval lval state =
-    match Cil.(unrollType (typeOfLval lval)) with
+  let eval_lval (lval : Evast.lval) state =
+    match Cil.(unrollType lval.typ) with
     | TInt _ | TEnum _ | TPtr _ | TFloat _ ->
       A.copy_lvalue state lval >>=: fun value -> Value value
     | _ ->
@@ -489,8 +489,9 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   let do_next eval state eval_point callstack =
     match next_steps eval_point with
     | `Condition (stmt, cond) ->
-      let then_state = (A.assume_cond stmt state cond true :> dstate) in
-      let else_state = (A.assume_cond stmt state cond false :> dstate) in
+      let cond' = Evast_builder.translate_exp cond in
+      let then_state = (A.assume_cond stmt state cond' true :> dstate) in
+      let else_state = (A.assume_cond stmt state cond' false :> dstate) in
       Cond (eval then_state, eval else_state)
     | `Effect stmt ->
       let after_state = get_stmt_state ~after:true stmt callstack in
@@ -516,9 +517,11 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   let evaluate (term, eval_point) callstack =
     match term with
     | Plval lval ->
-      eval_steps (Cil.typeOfLval lval) (eval_lval lval) eval_point callstack
+      let lval' = Evast_builder.translate_lval lval in
+      eval_steps lval'.typ (eval_lval lval') eval_point callstack
     | Pexpr expr ->
-      eval_steps (Cil.typeOf expr) (eval_expr expr) eval_point callstack
+      let expr' = Evast_builder.translate_exp expr in
+      eval_steps expr'.typ (eval_expr expr') eval_point callstack
     | Ppred pred ->
       eval_steps Cil.intType (eval_pred eval_point pred) eval_point callstack
 end

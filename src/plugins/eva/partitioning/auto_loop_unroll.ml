@@ -56,15 +56,13 @@
    normalization.
    Any other assignment of [v] cancels the heuristic. *)
 
-open Cil_types
-
 let is_true = function
   | `True | `TrueReduced _ -> true
   | _ -> false
 
 (* Module for auxiliary functions manipulating interpreted automata. *)
 module Graph = struct
-  open Interpreted_automata
+  open Eva_automata
 
   type loop =
     { graph: G.t;   (* The complete graph of the englobing function. *)
@@ -78,7 +76,7 @@ module Graph = struct
     let automaton = get_automaton kf in
     let graph = automaton.graph in
     let vertex, _ = Cil_datatype.Stmt.Hashtbl.find automaton.stmt_table stmt in
-    match get_wto_index kf vertex with
+    match vertex.vertex_wto_index with
     | [] -> raise Not_found
     | head :: _ ->
       (* Find in the wto the component whose head is [head]. *)
@@ -88,14 +86,12 @@ module Graph = struct
         | Wto.Component (h, l) :: tl ->
           if Vertex.equal h head then {graph; head; wto = l} else find (l @ tl)
       in
-      find (get_wto kf)
+      find automaton.wto
 
   (* Applies [f acc instr] to all instructions [instr] in the [loop]. *)
-  let fold_instr f loop acc =
+  let fold_transitions f loop acc =
     let transfer (_v1, edge, _v2) acc =
-      match edge.edge_transition with
-      | Instr (instr, _stmt) -> f acc instr
-      | _ -> acc
+      f acc edge.edge_transition
     in
     let compute_vertex = G.fold_pred_e transfer loop.graph in
     let wto = Wto.flatten loop.wto in
@@ -145,7 +141,7 @@ module Graph = struct
   (* A loop exit condition is an expression and a boolean expression whether the
      expression must be zero or not-zero to exit the loop. *)
   module Condition = struct
-    module Exp = Cil_datatype.ExpStructEq
+    module Exp = Evast_datatype.Exp
     module Info = struct let module_name = "Condition" end
     include Datatype.Pair_with_collections (Exp) (Datatype.Bool) (Info)
   end
@@ -175,17 +171,20 @@ let add_written_var vi effect =
   let written_vars = Cil_datatype.Varinfo.Set.add vi effect.written_vars in
   { effect with written_vars }
 
-let is_frama_c_builtin exp =
-  match exp.enode with
-  | Lval (Var vi, NoOffset) -> Ast_info.start_with_frama_c_builtin vi.vname
+let is_frama_c_builtin (exp : Evast.exp) =
+  match exp.node with
+  | Lval { node = Var vi, NoOffset } ->
+    Ast_info.start_with_frama_c_builtin vi.vname
   | _ -> false
 
-let compute_instr_effect effect = function
-  | Set ((Var varinfo, _), _, _) -> add_written_var varinfo effect
-  | Set ((Mem _, _), _, _) -> { effect with pointer_writes = true }
-  | Call (Some (Var varinfo, _), _, _, _) ->
+let compute_transition_effect effect = function
+  | Eva_automata.Assign ({node = (Var varinfo, _)}, _, _) ->
+    add_written_var varinfo effect
+  | Assign ({node = (Mem _, _)}, _, _) ->
+    { effect with pointer_writes = true }
+  | Call (Some {node = Var varinfo, _}, _, _, _) ->
     { (add_written_var varinfo effect) with call = true; }
-  | Call (Some (Mem _, _), _, _, _) ->
+  | Call (Some {node = Mem _, _}, _, _, _) ->
     { effect with pointer_writes = true; call = true; }
   | Call (None, exp, _, _) when not (is_frama_c_builtin exp) ->
     { effect with call = true }
@@ -202,7 +201,7 @@ let compute_loop_effect loop =
       call = false;
       assembly = false; }
   in
-  let effect = Graph.fold_instr compute_instr_effect loop acc in
+  let effect = Graph.fold_transitions compute_transition_effect loop acc in
   if effect.assembly then None else Some effect
 
 (* The status of a lvalue for the automatic loop unroll heuristic. *)
@@ -214,23 +213,23 @@ type var_status =
                  in the loop. *)
   | Unsuitable (* Cannot be used for the heuristic. *)
 
-let is_integer lval = Cil.isIntegralType (Cil.typeOfLval lval)
+let is_integer lval = Cil.isIntegralType lval.Evast.typ
 
 (* Computes the status of a lvalue for the heuristic, according to the
    loop effects. Uses [eval_ptr] to compute the bases pointed by pointer
    expressions. *)
-let classify eval_ptr loop_effect lval =
+let classify eval_ptr loop_effect (lval : Evast.lval) =
   let is_written varinfo =
     Cil_datatype.Varinfo.Set.mem varinfo loop_effect.written_vars
   in
-  let rec is_const_expr expr =
-    match expr.enode with
+  let rec is_const_expr (expr : Evast.exp) =
+    match expr.node with
     | Lval lval -> classify_lval lval = Constant
     | UnOp (_, e, _) | CastE (_, e) -> is_const_expr e
     | BinOp (_, e1, e2, _) -> is_const_expr e1 && is_const_expr e2
     | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _
     | AlignOf _ | AlignOfE _ | AddrOf _ | StartOf _ -> true
-  and classify_lval = function
+  and classify_lval lv = match lv.node with
     | Var varinfo, offset ->
       if (varinfo.vglob && loop_effect.call)
       || not (is_const_offset offset)
@@ -259,8 +258,8 @@ let classify eval_ptr loop_effect lval =
   classify_lval lval
 
 (* Returns the list of all lvalues appearing in an expression. *)
-let rec get_lvalues expr =
-  match expr.enode with
+let rec get_lvalues (expr : Evast.exp) =
+  match expr.node with
   | Lval lval -> [ lval ]
   | UnOp (_, e, _) | CastE (_, e) -> get_lvalues e
   | BinOp (_op, e1, e2, _typ) -> get_lvalues e1 @ get_lvalues e2
@@ -286,38 +285,35 @@ let find_lonely_candidate eval_ptr loop_effect expr =
    except on assignemnts of [lval]:
    - to the value of an expression [expr], it applies [f expr acc];
    - to a function call, or if [inner_loop] is true, it raises [exn]. *)
-let transfer_assign lval exn f ~inner_loop acc instr =
-  let is_lval = Cil_datatype.LvalStructEq.equal lval in
-  let transfer_instr ~inner_loop acc = function
-    | Set (lv, expr, _loc) when is_lval lv ->
-      if inner_loop then raise exn else f expr acc
-    | Local_init (vi, AssignInit (SingleInit expr), _loc)
-      when is_lval (Cil.var vi) && not inner_loop ->
-      f expr acc
-    | Local_init (vi, _, _) when is_lval (Cil.var vi) -> raise exn
-    | Call (Some lv, _, _, _) when is_lval lv -> raise exn
-    | _ -> acc
-  in
-  match instr with
-  | Interpreted_automata.Instr (instr, _stmt) ->
-    transfer_instr ~inner_loop acc instr
+let transfer_assign lval exn f ~inner_loop acc transition =
+  let is_lval = Evast_datatype.Lval.equal lval in
+  match transition with
+  | Eva_automata.Assign (lv, expr, _loc)
+    when is_lval lv ->
+    if inner_loop then raise exn else f expr acc
+  | Init (vi, SingleInit (expr, _loc), _loc')
+    when is_lval (Evast_builder.var vi) && not inner_loop ->
+    f expr acc
+  | Init (vi, _, _) when is_lval (Evast_builder.var vi) -> raise exn
+  | Call (Some lv, _, _, _) when is_lval lv ->
+    raise exn
   | _ -> acc
 
 (* If in the [loop], [lval] is always assigned to the value of another
    lvalue, returns this new lvalue. Otherwise, returns [lval]. *)
-let cross_equality loop lval =
+let cross_equality loop (lval : Evast.lval) =
   (* If no such single equality can be found, return [lval] unchanged. *)
   let exception No_equality in
-  let find_lval expr _x =
-    match expr.enode with
+  let find_lval (expr : Evast.exp) _x =
+    match expr.node with
     | Lval lval -> lval
     | _ -> raise No_equality
   in
-  let transfer ~inner_loop lval instr =
-    transfer_assign lval No_equality find_lval ~inner_loop lval instr
+  let transfer ~inner_loop lval transition =
+    transfer_assign lval No_equality find_lval ~inner_loop lval transition
   in
   let join lv1 lv2 =
-    if Cil_datatype.LvalStructEq.equal lv1 lv2 then lv1 else raise No_equality
+    if Evast_datatype.Lval.equal lv1 lv2 then lv1 else raise No_equality
   in
   match Graph.compute ~backward:true loop transfer join lval with
   | Some lval -> lval
@@ -349,9 +345,9 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   (* Adds or subtracts the integer value of [expr] to the current increment
      [acc.delta], according to [binop] which can be PlusA or MinusA.
      Raises NoIncrement if [expr] is not a constant integer expression. *)
-  let add_to_delta context binop acc expr =
-    let typ = Cil.typeOf expr in
-    match Cil.constFoldToInt expr with
+  let add_to_delta context binop acc (expr : Evast.exp) =
+    let typ = expr.typ in
+    match Evast_utils.fold_to_integer expr with
     | None -> raise NoIncrement
     | Some i ->
       let inject i = Val.inject_int typ i in
@@ -362,17 +358,17 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
      of [expr]. Raises NoIncrement if this is not an increment of [lval]. *)
   let rec delta_assign context lval expr acc =
     (* Is the expression [e] equal to the lvalue [lval] (modulo cast)? *)
-    let rec is_lval e = match e.enode with
-      | Lval lv -> Cil_datatype.LvalStructEq.equal lval lv
+    let rec is_lval (e : Evast.exp) = match e.node with
+      | Lval lv -> Evast_datatype.Lval.equal lval lv
       | CastE (typ, e) -> Cil.isIntegralType typ && is_lval e
       | _ -> false
     in
-    match Cil.constFoldToInt expr with
+    match Evast_utils.fold_to_integer expr with
     | Some i ->
-      let v = Val.inject_int (Cil.typeOf expr) i in
+      let v = Val.inject_int expr.typ i in
       { value = `Value v; delta = `Bottom; }
     | None ->
-      match expr.enode with
+      match expr.node with
       | BinOp ((PlusA | MinusA) as binop, e1, e2, _) ->
         if is_lval e1
         then add_to_delta context binop acc e2
@@ -450,12 +446,13 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
          [condition] is NOT positive; its complement is an under-approximation
          of the values for which [condition] is positive. *)
       let cvalue = get_cvalue value in
-      cvalue_complement (Cil.typeOf expr) cvalue >>= fun cvalue ->
+      cvalue_complement expr.typ cvalue >>= fun cvalue ->
       Some (Val.set Main_values.CVal.key cvalue Val.top)
 
   (* If [lval] is a varinfo out-of-scope at statement [stmt] of function [kf],
      introduces it to the [state]. *)
-  let enter_scope state kf stmt = function
+  let enter_scope state kf stmt (lval : Evast.lval) =
+    match lval.node with
     | Var vi, _ ->
       let state =
         if vi.vglob || vi.vformal || Kernel_function.var_is_in_scope stmt vi
@@ -475,7 +472,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     (* If [lval] is not in scope at [stmt], introduces it into [state] so that
        the [condition] can be properly evaluated in [state]. *)
     let state = enter_scope state kf stmt lval in
-    let expr = Cil.new_exp ~loc:condition.eloc (Lval lval) in
+    let expr = Evast_builder.lval lval in
     (* Evaluate the [condition] in the given [state]. *)
     fst (Eval.evaluate state condition) >> fun (valuation, _v) ->
     (* In the resulting valuation, replace the value of [expr] by [top_int]
@@ -541,7 +538,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       (* Computes an over-approximation [v_incr] of the value update of [lval]
          in one iteration of the loop. *)
       compute_delta context lval loop >>: fun v_incr ->
-      let typ = Cil.typeOfLval lval in
+      let typ = lval.typ in
       let forward_binop op v1 v2 = Val.forward_binop context typ op v1 v2 in
       let binop op v1 v2 = Bottom.non_bottom (forward_binop op v1 v2) in
       (* Computes the possible values of [lval] after n loop iterations. *)

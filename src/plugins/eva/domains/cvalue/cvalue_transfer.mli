@@ -36,13 +36,13 @@ include Abstract_domain.Transfer
     value [v] into location [loc] if one of them is overly imprecise. [lval] is
     the assigned lvalue, and [prefix] is an optional prefix to the warning. *)
 val warn_imprecise_write:
-  ?prefix:string -> Cil_types.lval -> Locations.location -> Cvalue.V.t -> unit
+  ?prefix:string -> Evast.lval -> Locations.location -> Cvalue.V.t -> unit
 
 (** [warn_imprecise_offsm_write lval offsm] emits a warning about the assignment
     of offsetmap [offsm] if it contains an overly imprecise value. [lval] is the
     assigned lvalue, and [prefix] is an optional prefix to the warning. *)
 val warn_imprecise_offsm_write:
-  ?prefix:string -> Cil_types.lval -> Cvalue.V_Offsetmap.t -> unit
+  ?prefix:string -> Evast.lval -> Cvalue.V_Offsetmap.t -> unit
 
 (*
 Local Variables:

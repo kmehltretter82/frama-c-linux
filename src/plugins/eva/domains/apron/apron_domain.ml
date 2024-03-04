@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
+open Evast
 open Apron
 
 let dkey = Self.register_category "d-apron"
@@ -35,21 +35,21 @@ let abort exclog =
     print_exc exclog.exn print_funid exclog.funid exclog.msg
 
 let is_relevant_varinfo varinfo =
-  not (Cil.typeHasQualifier "volatile" varinfo.vtype)
+  not (Cil.typeHasQualifier "volatile" varinfo.Cil_types.vtype)
   && (true || not varinfo.vglob)
 
-let is_relevant_lval = function
+let is_relevant_lval lval = match lval.node with
   | Var varinfo, NoOffset -> is_relevant_varinfo varinfo
   | _ -> false
 
-let rec contains_relevant_lval expr = match expr.enode with
+let rec contains_relevant_lval expr = match expr.node with
   | Lval lval -> is_relevant_lval lval
   | UnOp (_, e, _) | CastE (_, e) -> contains_relevant_lval e
   | BinOp (_, e1, e2, _) ->
     contains_relevant_lval e1 || contains_relevant_lval e2
   | _ -> false
 
-let is_relevant expr = match expr.enode with
+let is_relevant expr = match expr.node with
   | Lval _ -> true
   | UnOp (_, e, _) | CastE (_, e) -> contains_relevant_lval e
   | BinOp (_, e1, e2, _) ->
@@ -237,7 +237,7 @@ let translate_varinfo varinfo =
       var
     | _ -> raise (Out_of_Scope "translate_varinfo not integer")
 
-let translate_lval = function
+let translate_lval lval = match lval.node with
   | Var varinfo, NoOffset -> translate_varinfo varinfo
   | _ -> raise (Out_of_Scope "translate_lval not Var")
 
@@ -249,7 +249,7 @@ let translate_constant = function
   | _ -> raise (Out_of_Scope "translate_constant not integer")
 
 (* Translation of expressions from cil to apron. *)
-let rec translate_expr eval oracle expr = match expr.enode with
+let rec translate_expr eval oracle expr = match expr.node with
   | Const cst -> Texpr1.Cst (translate_constant cst)
   | Lval lval -> Texpr1.Var (translate_lval lval)
   | UnOp (Neg, e1, typ) ->
@@ -261,15 +261,15 @@ let rec translate_expr eval oracle expr = match expr.enode with
     let e1' = translate_expr_linearize eval oracle e1 in
     let e2' = translate_expr_linearize eval oracle e2 in
     let need_coercion = op = Mod || op = Div in
-    let e1' = if need_coercion then coerce eval (Cil.typeOf e1) e1' else e1' in
-    let e2' = if need_coercion then coerce eval (Cil.typeOf e2) e2' else e2' in
+    let e1' = if need_coercion then coerce eval e1.typ e1' else e1' in
+    let e2' = if need_coercion then coerce eval e2.typ e2' else e2' in
     let op' = translate_binop op in
     Texpr1.(Binop (op', e1', e2', translate_typ typ, round))
   | CastE (typ, e)->
     coerce ~cast:true eval typ (translate_expr_linearize eval oracle e)
   | AddrOf _ | StartOf _  -> raise (Out_of_Scope "translate_expr addr")
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _  | AlignOfE _ ->
-    match Cil.constFoldToInt expr with
+    match Evast_utils.fold_to_integer expr with
     | None -> raise (Out_of_Scope "translate_expr sizeof alignof")
     | Some i -> Texpr1.Cst (Coeff.s_of_int (Integer.to_int_exn i))
 (* Expressions that cannot be translated by [translate_expr] are replaced
@@ -281,17 +281,17 @@ and translate_expr_linearize eval oracle expr =
 
 (* Express a cil expression into an apron constraint. *)
 let rec constraint_expr eval oracle env expr positive =
-  match expr.enode with
+  match expr.node with
   | UnOp (LNot, e, _) -> constraint_expr eval oracle env e (not positive)
   | BinOp ((Le|Ne|Eq|Gt|Lt|Ge as binop), e1, e2, typ) ->
     let e1' = translate_expr_linearize eval oracle e1 in
     let e2' = translate_expr_linearize eval oracle e2 in
-    let e1'' = coerce eval (Cil.typeOf e1) e1' in
-    let e2'' = coerce eval (Cil.typeOf e2) e2' in
+    let e1'' = coerce eval e1.typ e1' in
+    let e2'' = coerce eval e2.typ e2' in
     let typ = translate_typ (Cil.unrollType typ) in
     let e = Texpr1.Binop (Texpr1.Sub, e1'', e2'', typ, round) in
     let expr = Texpr1.of_expr env e in
-    let binop = Eva_utils.conv_comp binop in
+    let binop = Evast_utils.conv_relation binop in
     let binop = if positive then binop else Abstract_interp.Comp.inv  binop in
     translate_relation expr typ binop
   | _ -> raise (Out_of_Scope "constraint_expr not handled")
@@ -450,7 +450,7 @@ module Make (Man : Input) = struct
 
   let _constraint_to_typ env state vars =
     let aux (var_apron, vi) =
-      match Eval_typ.classify_as_scalar vi.vtype with
+      match Eval_typ.classify_as_scalar vi.Cil_types.vtype with
       | Some (Eval_typ.TSInt range) ->
         let inf, sup, _size = bounds_of_typ range in
         let inf = Scalar.of_mpqf (Mpqf.of_mpz inf)
@@ -495,10 +495,10 @@ module Make (Man : Input) = struct
       | Z.Overflow | Failure _ -> top
 
   let extract_expr ~oracle:_ _context state expr =
-    compute state expr (Cil.typeOf expr)
+    compute state expr expr.typ
 
   let extract_lval ~oracle:_ _context state lval typ _loc =
-    let expr = Eva_utils.lval_to_exp lval in
+    let expr = Evast_builder.lval lval in
     compute state expr typ
 
   let maybe_bottom state =
@@ -559,7 +559,7 @@ module Make (Man : Input) = struct
      into Apron intervals. *)
   let make_oracle valuation =
     fun exp exn ->
-    if Cil.isIntegralType (Cil.typeOf exp) then
+    if Cil.isIntegralType exp.typ then
       match valuation.Abstract_domain.find exp with
       | `Value { value = { v = `Value itv } } ->
         let interval = ival_to_interval itv in
@@ -579,7 +579,7 @@ module Make (Man : Input) = struct
       then
         try
           let expr = translate_expr_linearize eval oracle exp in
-          let expr = coerce eval (Cil.typeOf exp) expr in
+          let expr = coerce eval exp.typ expr in
           (* When the value is top or bottom, no constraint is expressible. *)
           let cons = record.value.v >>- fun ival ->
             let interval = ival_to_interval ival in

@@ -121,5 +121,5 @@ sig
   (* Update the array segmentation at the given offset so the given bound
      expressions appear in the segmentation *)
   val segmentation_hint : oracle:oracle ->
-    t -> location -> Cil_types.exp list -> t
+    t -> location -> Evast.exp list -> t
 end

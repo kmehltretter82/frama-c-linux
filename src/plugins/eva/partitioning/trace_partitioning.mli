@@ -85,7 +85,7 @@ sig
   val enter_loop : flow -> Cil_types.stmt -> flow
   val leave_loop : flow -> Cil_types.stmt -> flow
   val next_loop_iteration : flow -> Cil_types.stmt -> flow
-  val split_return : flow -> Cil_types.exp option -> flow
+  val split_return : flow -> Evast.exp option -> flow
 
   (** After the analysis of a function call, recombines callee partitioning keys
       with the caller key. *)

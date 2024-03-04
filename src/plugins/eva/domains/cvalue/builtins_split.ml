@@ -74,7 +74,8 @@ let warning warn s =
    [max_card] elements. *)
 let split_v ~warn lv state max_card =
   if Cil.isArithmeticOrPointerType (Cil.typeOfLval lv) then
-    let loc = Cvalue_queries.lval_to_loc state lv in
+    let lv' = Evast_builder.translate_lval lv in
+    let loc = Cvalue_queries.lval_to_loc state lv' in
     if Locations.Location_Bits.cardinal_zero_or_one loc.Locations.loc then
       let v_indet = Cvalue.Model.find_indeterminate state loc in
       let v = Cvalue.V_Or_Uninitialized.get_v v_indet in

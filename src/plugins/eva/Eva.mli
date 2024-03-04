@@ -342,10 +342,6 @@ module Results: sig
 
   (** State requests *)
 
-  (** Returns the list of expressions which have been inferred to be equal to
-      the given expression by the Equality domain. *)
-  val equality_class : Cil_types.exp -> request -> Cil_types.exp list result
-
   (** Returns the Cvalue state. Error cases are converted into the bottom or top
       cvalue state accordingly. *)
   val get_cvalue_model : request -> Cvalue.Model.t

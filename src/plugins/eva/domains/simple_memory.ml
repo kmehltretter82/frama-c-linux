@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
 
 type 'value builtin = 'value list -> 'value or_bottom
@@ -230,7 +229,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
      location with the result of the evaluation of [exp]. Both the value and
      the location are found in the [valuation]. *)
   let assume_exp valuation expr record state =
-    match expr.enode with
+    match (expr : Evast.exp).node with
     | Lval lv -> begin
         match valuation.Abstract_domain.find_loc lv with
         | `Top -> state
@@ -309,7 +308,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
         bind_loc return_loc return.vtype (`Value result) post
 
   let show_expr valuation state fmt expr =
-    match expr.enode with
+    match (expr : Evast.exp).node with
     | Lval lval ->
       begin
         match valuation.Abstract_domain.find_loc lval with

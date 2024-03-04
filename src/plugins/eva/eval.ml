@@ -22,6 +22,9 @@
 
 open Cil_types
 
+type lval = Evast.lval
+type exp = Evast.exp
+
 (** *)
 
 (* -------------------------------------------------------------------------- *)
@@ -153,16 +156,16 @@ let compute_englobing_subexpr ~subexpr ~expr =
      [subexpr], apart [subexpr] itself, or [None] if [subexpr] does not appear
      in [expr]. *)
   let rec compute expr =
-    if Cil_datatype.ExpStructEq.equal expr subexpr
+    if Evast_datatype.Exp.equal expr subexpr
     then Some []
     else
-      let sublist = match expr.enode with
+      let sublist = match expr.node with
         | UnOp (_, e, _)
         | CastE (_, e) ->
           compute e
         | BinOp (_, e1, e2, _) ->
           merge (compute e1) (compute e2)
-        | Lval (host, offset) ->
+        | Lval {node = (host, offset)} ->
           merge (compute_host host) (compute_offset offset)
         | _ -> None
       in
@@ -179,9 +182,9 @@ let compute_englobing_subexpr ~subexpr ~expr =
   Option.value ~default:[] (compute expr)
 
 module Englobing =
-  Datatype.Pair_with_collections (Cil_datatype.ExpStructEq) (Cil_datatype.ExpStructEq)
+  Datatype.Pair_with_collections (Evast_datatype.Exp) (Evast_datatype.Exp)
     (struct  let module_name = "Subexpressions" end)
-module SubExprs = Datatype.List (Cil_datatype.Exp)
+module SubExprs = Datatype.List (Evast_datatype.Exp)
 
 module EnglobingSubexpr =
   State_builder.Hashtbl (Englobing.Hashtbl) (SubExprs)
@@ -201,7 +204,7 @@ module Clear_Valuation (Valuation : Valuation) = struct
     let englobing = compute_englobing_subexpr ~subexpr ~expr in
     let remove valuation expr =
       let valuation = Valuation.remove valuation expr in
-      match expr.enode with
+      match expr.node with
       | Lval lval -> Valuation.remove_loc valuation lval
       | _ -> valuation
     in

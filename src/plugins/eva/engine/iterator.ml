@@ -21,7 +21,8 @@
 (**************************************************************************)
 
 open Cil_types
-open Interpreted_automata
+open Evast
+open Eva_automata
 open Lattice_bounds
 open Bottom.Operators
 
@@ -125,7 +126,7 @@ module Make_Dataflow
 
   (* --- Interpreted automata --- *)
 
-  let automaton = get_automaton kf
+  let automaton = Eva_automata.get_automaton kf
   let graph = automaton.graph
   let control_point_count = G.nb_vertex graph
   let transition_count = G.nb_edges graph
@@ -165,7 +166,7 @@ module Make_Dataflow
   let current_ki = ref Kglobal
 
   module VertexTable = struct
-    include Interpreted_automata.Vertex.Hashtbl
+    include Eva_automata.Vertex.Hashtbl
     let find_or_add (t : 'a t) (key : key) ~(default : unit -> 'a) : 'a =
       try find t key
       with Not_found ->
@@ -173,7 +174,7 @@ module Make_Dataflow
   end
 
   module EdgeTable = struct
-    include Interpreted_automata.Edge.Hashtbl
+    include Eva_automata.Edge.Hashtbl
     let find_or_add (t : 'a t) (key : key) ~(default : unit -> 'a) : 'a =
       try find t key
       with Not_found ->
@@ -201,7 +202,7 @@ module Make_Dataflow
     VertexTable.find_or_add v_table v ~default:(default_vertex_store v)
   let get_vertex_widening (v : vertex) : widening =
     VertexTable.find_or_add w_table v ~default:(default_vertex_widening v)
-  let get_edge_data (e : vertex edge) : tank =
+  let get_edge_data (e : edge) : tank =
     EdgeTable.find_or_add e_table e ~default:default_edge_tank
   let get_succ_tanks (v : vertex) : tank list =
     List.map (fun (_,e,_) -> get_edge_data e) (G.succ_e graph v)
@@ -270,7 +271,7 @@ module Make_Dataflow
     let positive = (kind = Then) in
     lift' (fun s -> Transfer.assume s stmt exp positive)
 
-  let transfer_assign (stmt : stmt) (dest : Cil_types.lval) (exp : exp)
+  let transfer_assign (stmt : stmt) (dest : lval) (exp : exp)
     : transfer_function =
     lift' (fun s -> Transfer.assign s (Kstmt stmt) dest exp)
 
@@ -300,33 +301,11 @@ module Make_Dataflow
     (* Recombine callee partitioning keys with caller key *)
     Partitioning.call_return ~caller:key result
 
-  let transfer_instr (stmt : stmt) (instr : instr) : transfer_function =
-    match instr with
-    | Local_init (vi, AssignInit exp, _loc) ->
-      let transfer state =
-        Init.initialize_local_variable stmt vi exp state
-      in
-      lift' transfer
-    | Local_init (vi, ConsInit (f, args, k), loc) ->
-      let as_func dest callee args _loc (key, state) =
-        transfer_call stmt dest callee args (key, state)
-      in
-      Cil.treat_constructor_as_func as_func vi f args k loc
-    | Set (dest, exp, _loc) ->
-      transfer_assign stmt dest exp
-    | Call (dest, callee, args, _loc) ->
-      transfer_call stmt dest callee args
-    | Asm _ ->
-      transfer_asm stmt
-    | Skip _loc -> id
-    | Code_annot (_,_loc) -> id (* already done in process_statement
-                                   from the annotation table *)
-
   let transfer_return (stmt : stmt) (return_exp : exp option)
     : transfer_function =
     (* Deconstruct return statement *)
     let return_var = match return_exp with
-      | Some {enode = Lval (Var v, NoOffset)} -> Some v
+      | Some {node = Lval {node = Var v, NoOffset}} -> Some v
       | None -> None
       | _ -> assert false (* Cil invariant *)
     in
@@ -348,7 +327,7 @@ module Make_Dataflow
       | None -> fun state -> [state]
       | Some return_exp ->
         let vi_ret = Option.get (Library_functions.get_retres_vi kf) in
-        let return_lval = Var vi_ret, NoOffset in
+        let return_lval = Evast_builder.var vi_ret in
         let kstmt = Kstmt stmt in
         fun state ->
           let kind = Abstract_domain.Result kf in
@@ -358,18 +337,27 @@ module Make_Dataflow
     in
     sequence (lift'' check_postconditions) (lift'' assign_retval)
 
-  let transfer_transition (t : vertex transition) : transfer_function =
+  let transfer_transition (t : transition) : transfer_function =
     match t with
     | Skip ->                     id
     | Return (return_exp,stmt) -> transfer_return stmt return_exp
     | Guard (exp,kind,stmt) ->    transfer_assume stmt exp kind
-    | Instr (instr,stmt) ->       transfer_instr stmt instr
+    | Init (vi, exp, stmt) ->
+      let transfer state =
+        Init.initialize_local_variable stmt vi exp state
+      in
+      lift' transfer
+    | Assign (dest, exp, stmt) ->
+      transfer_assign stmt dest exp
+    | Call (dest, callee, args, stmt) ->
+      transfer_call stmt dest callee args
+    | Asm (_,_,_,stmt) ->
+      transfer_asm stmt
     | Enter (block) ->            transfer_enter block
     | Leave (block) when blocks_share_locals fundec.sbody block ->
       (* The variables from the toplevel block will be removed by the caller *)
       id
     | Leave (block) ->            transfer_leave block
-    | Prop _ -> id (* Annotations are interpreted in [transfer_statement]. *)
 
   let transfer_annotations (stmt : stmt) ~(record : bool)
     : state -> state list =
@@ -397,6 +385,12 @@ module Make_Dataflow
     (* Check unspecified sequences *)
     match stmt.skind with
     | UnspecifiedSequence seq when Kernel.UnspecifiedAccess.get () ->
+      let seq = List.map (fun (stmt, modified, writes, reads, refs) ->
+          stmt,
+          List.map Evast_builder.translate_lval modified,
+          List.map Evast_builder.translate_lval writes,
+          List.map Evast_builder.translate_lval reads,
+          refs) seq in
       let check s =
         Transfer.check_unspecified_sequence stmt s seq = `Value ()
       in
@@ -407,7 +401,7 @@ module Make_Dataflow
   (* --- Iteration strategy ---*)
 
   let process_partitioning_transitions (v1 : vertex) (v2 : vertex)
-      (transition : vertex transition) (flow : flow) : flow =
+      (transition : transition) (flow : flow) : flow =
     (* Split return *)
     let flow = match transition with
       | Return (return_exp, _) -> Partitioning.split_return flow return_exp
@@ -426,9 +420,9 @@ module Make_Dataflow
       Partitioning.transfer (lift (Domain.incr_loop_counter (the_stmt v))) f
     in
     let loops_left, loops_entered =
-      Interpreted_automata.get_wto_index_diff kf v1 v2
+      Eva_automata.wto_index_diff v1 v2
     and loop_incr =
-      Interpreted_automata.is_back_edge kf (v1,v2)
+      Eva_automata.is_back_edge (v1,v2)
     in
     let flow = List.fold_left leave_loop flow loops_left in
     let flow = List.fold_left enter_loop flow loops_entered in
@@ -509,7 +503,7 @@ module Make_Dataflow
     let sources = List.map process_source (G.pred_e graph v) in
     (* Add initial source *)
     let sources =
-      if not (Interpreted_automata.Vertex.equal v automaton.entry_point)
+      if not (Eva_automata.Vertex.equal v automaton.entry_point)
       then sources
       else get_initial_flow () :: sources
     in
@@ -611,10 +605,8 @@ module Make_Dataflow
   let compute () : (key * state) list =
     if interpreter_mode then
       simulate automaton.entry_point (get_initial_flow ())
-    else begin
-      let wto = Interpreted_automata.get_wto kf in
-      iterate_list wto
-    end;
+    else
+      iterate_list automaton.wto;
     if not !post_conditions then mark_postconds_as_true ();
     let final_store = get_vertex_store automaton.return_point in
     Partitioning.expanded final_store

@@ -20,15 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
 
 let dkey = Self.register_category "nonlin"
 
 (* ----------------- Occurrences of lvalues in expressions ------------------ *)
 
-module LvalMap = Cil_datatype.LvalStructEq.Map
-module LvalSet = Cil_datatype.LvalStructEq.Set
+module LvalMap = Evast_datatype.Lval.Map
+module LvalSet = Evast_datatype.Lval.Set
 
 (* An expression [e] is non-linear on [x] if [x] appears multiple times in [e].
    When evaluating such an expression, a disjunction over the possible values of
@@ -88,14 +87,14 @@ let union expr depth map1 map2 =
    If a lvalue is bound to itself, then it appears only once in [expr].
    Otherwise, we say that the expression is non linear on this lvalue. *)
 let gather_non_linear expr =
-  let rec compute depth expr =
-    match expr.enode with
-    | Lval (host, offset as lv) ->
+  let rec compute depth (expr : Evast.exp) =
+    match expr.node with
+    | Lval ({ node = host, offset } as lv) ->
       let d = succ depth in
       let map1 = compute_from_offset d expr offset in
       let map2 = compute_from_host d host in
       let map = union expr depth map1 map2 in
-      if LvalMap.is_empty map && Cil.isArithmeticType (Cil.typeOfLval lv)
+      if LvalMap.is_empty map && Cil.isArithmeticType lv.typ
       then LvalMap.singleton lv (expr, d, LvalSet.empty)
       else map
     | UnOp (_, e, _) | CastE (_, e) -> compute depth e
@@ -118,7 +117,7 @@ let gather_non_linear expr =
 
 (* Map from subexpressions to the list of their non-linear lvalues. *)
 module ExpMap = struct
-  include Cil_datatype.ExpStructEq.Map
+  include Evast_datatype.Exp.Map
   let add expr lv map =
     try
       let list = find expr map in
@@ -139,8 +138,8 @@ module DepthMap = struct
     add depth expmap map
 end
 
-let same lval expr = match expr.enode with
-  | Lval lv -> Cil_datatype.LvalStructEq.equal lv lval
+let same lval (expr : Evast.exp) = match expr.node with
+  | Lval lv -> Evast_datatype.Lval.equal lv lval
   | _ -> false
 
 (* Converts a map from lvalues to expressions and depth into an association
@@ -156,12 +155,12 @@ let reverse_map map =
   DepthMap.fold concat depthmap []
 
 
-module LvalList = Datatype.List (Cil_datatype.LvalStructEq)
-module NonLinear = Datatype.Pair (Cil_datatype.Exp) (LvalList)
+module LvalList = Datatype.List (Evast_datatype.Lval)
+module NonLinear = Datatype.Pair (Evast_datatype.Exp) (LvalList)
 module NonLinears = Datatype.List (NonLinear)
 
 module Non_linear_expressions =
-  State_builder.Hashtbl (Cil_datatype.ExpStructEq.Hashtbl) (NonLinears)
+  State_builder.Hashtbl (Evast_datatype.Exp.Hashtbl) (NonLinears)
     (struct
       let name = "Value.Subdivided_evaluation.Non_linear_expressions"
       let size = 16
@@ -180,8 +179,8 @@ let compute_non_linear expr =
     List.iter
       (fun (e, lval) ->
          Self.result ~current:true ~once:true ~dkey
-           "non-linear '%a', lv '%a'" Printer.pp_exp e
-           (Pretty_utils.pp_list ~sep:", " Printer.pp_lval) lval)
+           "non-linear '%a', lv '%a'" Evast_printer.pp_exp e
+           (Pretty_utils.pp_list ~sep:", " Evast_printer.pp_lval) lval)
       list;
     Non_linear_expressions.replace expr list;
     list
@@ -658,7 +657,7 @@ module Make
       Clear.clear_englobing_exprs valuation ~expr ~subexpr:lv_info.lv_expr
     in
     let cleared_valuation = Hypotheses.fold clear variables valuation in
-    let eq_equal_subexpr = Cil_datatype.ExpStructEq.equal expr subexpr in
+    let eq_equal_subexpr = Evast_datatype.Exp.equal expr subexpr in
     (* Computes a disjunct from subvalues for [lvals]. *)
     let compute subvalues =
       (* Updates [variables] with their new [subvalues]. *)
@@ -708,7 +707,7 @@ module Make
 
   (* Builds the information for an lvalue. *)
   let get_info environment valuation lval =
-    let lv_expr = Eva_utils.lval_to_exp lval in
+    let lv_expr = Evast_builder.lval lval in
     (* Reevaluates the lvalue in the initial state, as its value could have
        been reduced in the evaluation of the complete expression, and we cannot
        omit the alarms for the removed values. *)
@@ -773,7 +772,7 @@ module Make
             in
             Self.result ~current:true ~once:true ~dkey
               "subdividing on %a"
-              (Pretty_utils.pp_list ~sep:", " Printer.pp_lval) lvals;
+              (Pretty_utils.pp_list ~sep:", " Evast_printer.pp_lval) lvals;
             let subdivide =
               subdivide_lvals environment valuation subdivnb lvals_info
             in
@@ -849,10 +848,10 @@ module Make
   (* Find locations on which it is interesting to proceed by case disjunction
      to evaluate the expression: locations which are singletons (on which the
      cvalue domain can reduce) and has an enumerable value. *)
-  let rec get_influential_vars valuation exp acc =
-    match exp.enode with
-    | Lval (host, off as lval) ->
-      if Cil.typeHasQualifier "volatile" (Cil.typeOfLval lval) then `Value acc
+  let rec get_influential_vars valuation (exp : Evast.exp) acc =
+    match exp.node with
+    | Lval ({ node = host, off } as lval)  ->
+      if Cil.typeHasQualifier "volatile" lval.typ then `Value acc
       else
         Loc.to_value (find_loc valuation lval) >>- fun value ->
         if Cvalue.V.cardinal_zero_or_one (get_cval value)
@@ -876,11 +875,11 @@ module Make
     | CastE (_, exp) -> get_influential_vars valuation exp acc
     | _ -> `Value acc
 
-  and get_vars_host valuation host acc = match host with
+  and get_vars_host valuation (host : Evast.lhost) acc = match host with
     | Var _v -> `Value acc
     | Mem e -> get_influential_vars valuation e acc
 
-  and get_vars_offset valuation offset acc = match offset with
+  and get_vars_offset valuation (offset : Evast.offset) acc = match offset with
     | NoOffset         -> `Value acc
     | Field (_, off)   -> get_vars_offset valuation off acc
     | Index (ind, off) ->

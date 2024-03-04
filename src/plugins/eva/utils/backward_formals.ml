@@ -22,30 +22,24 @@
 
 open Cil_types
 
-exception Unsafe
 
-(* This visitor checks that an expression is guaranteed to evaluate in
+(* This function checks that an expression is guaranteed to evaluate in
    the same way before and after a call. We restrict ourselves to
    lvalues that are unreferenced locals or formals, because they cannot
    be changed by the callee. *)
-let safe_argument_visitor = object(self)
-  inherit Visitor.frama_c_inplace
-
-  method! vlval = function
+let safe_argument expr =
+  let exception Unsafe in
+  let f (lv : Evast.lval) =
+    match lv.node with
     | Var vi, NoOffset ->
       if vi.vaddrof || Cil.typeHasQualifier "volatile" vi.vtype || vi.vglob
-      then raise Unsafe;
-      Cil.DoChildren
+      then raise Unsafe
     | _, _ -> raise Unsafe
-
-  method inspect expr =
-    try
-      ignore (Visitor.visitFramacExpr (self:>Visitor.frama_c_inplace) expr);
-      true
-    with Unsafe -> false
-end
-
-let safe_argument = safe_argument_visitor#inspect
+  in
+  try
+    Evast_utils.iter_lvals f expr;
+    true
+  with Unsafe -> false
 
 
 let written_formals kf =

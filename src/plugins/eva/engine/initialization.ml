@@ -24,13 +24,14 @@
 
 open Cil_types
 open Eval
+open Evast
 
 module type S = sig
   type state
   val initial_state_with_formals :
     lib_entry:bool -> kernel_function -> state or_bottom
   val initialize_local_variable:
-    stmt -> varinfo -> Cil_types.init -> state -> state or_bottom
+    stmt -> varinfo -> init -> state -> state or_bottom
 end
 
 type padding_initialization = [
@@ -106,7 +107,7 @@ module Make
   (* Initializes an entire variable [vi], in particular padding bits,
      according to [local] and [lib_entry] mode. *)
   let initialize_var_padding ~local ~lib_entry vi state =
-    let lval = Cil.var vi in
+    let lval = Evast_builder.var vi in
     match padding_initialization ~local with
     | `Uninitialized -> state
     | `Initialized | `MaybeInitialized as i ->
@@ -127,37 +128,40 @@ module Make
 
   (* Applies a single Cil initializer, using the standard transfer function on
      assignments. Warns if the results is bottom. *)
-  let apply_cil_single_initializer kinstr state lval expr =
+  let apply_evast_single_initializer ~source kinstr state lval expr =
     match Transfer.assign state kinstr lval expr with
     | `Bottom ->
       if kinstr = Kglobal then
-        Self.warning ~once:true ~source:(fst expr.eloc)
-          "evaluation of initializer '%a' failed@." Printer.pp_exp expr;
+        Self.warning ~once:true ~source
+          "evaluation of initializer '%a' failed@." Evast_printer.pp_exp expr;
       raise Initialization_failed
     | `Value v -> v
 
   (* Applies an initializer. If [top_volatile] is true, sets volatile locations
      to top without applying the initializer. Otherwise, lets the standard
      transfer function on assignments handle volatile locations. *)
-  let rec apply_cil_initializer ~top_volatile kinstr lval init state =
-    if top_volatile && Cil.typeHasQualifier "volatile" (Cil.typeOfLval lval)
+  let rec apply_evast_initializer ~top_volatile kinstr lval init state =
+    if top_volatile && Cil.typeHasQualifier "volatile" lval.typ
     then initialize_top_volatile lval state
     else
       match init with
-      | SingleInit exp -> apply_cil_single_initializer kinstr state lval exp
-      | CompoundInit (typ, l) ->
-        let doinit off init _typ state =
-          let lval = Cil.addOffsetLval off lval in
-          apply_cil_initializer ~top_volatile kinstr lval init state
+      | SingleInit (exp, loc) ->
+        let source = fst loc in
+        apply_evast_single_initializer ~source kinstr state lval exp
+      | CompoundInit (_typ, l) ->
+        let doinit state (off, init) =
+          let lval = Evast_builder.add_offset lval off in
+          apply_evast_initializer ~top_volatile kinstr lval init state
         in
-        Cil.foldLeftCompound ~implicit:false ~doinit ~ct:typ ~initl:l ~acc:state
+        List.fold_left doinit state l
 
   (* Field by field initialization of a variable to zero, or top if volatile.
      Very inefficient. *)
   let initialize_var_zero_or_volatile kinstr vi state =
     let loc = Cil_datatype.Location.unknown in
-    let zero_init = Cil.makeZeroInit ~loc vi.vtype in
-    apply_cil_initializer ~top_volatile:true kinstr (Cil.var vi) zero_init state
+    let init = Evast_builder.translate_init (Cil.makeZeroInit ~loc vi.vtype) in
+    let lval = Evast_builder.var vi in
+    apply_evast_initializer ~top_volatile:true kinstr lval init state
 
   (* ----------------------- Non Lib-entry mode ----------------------------- *)
 
@@ -165,7 +169,7 @@ module Make
   let initialize_var_not_lib_entry kinstr ~local vi init state =
     ignore (warn_unknown_size vi);
     let typ = vi.vtype in
-    let lval = Cil.var vi in
+    let lval = Evast_builder.var vi in
     let volatile_everywhere = Cil.typeHasQualifier "volatile" typ in
     let state =
       if volatile_everywhere && padding_initialization ~local = `Initialized
@@ -187,7 +191,7 @@ module Make
     match init with
     | None -> state
     | Some init ->
-      apply_cil_initializer ~top_volatile:false kinstr lval init state
+      apply_evast_initializer ~top_volatile:false kinstr lval init state
 
 
   (* --------------------------- Lib-entry mode ----------------------------- *)
@@ -195,12 +199,16 @@ module Make
   (* Special application of an initializer: only non-volatile lval with
      attributes 'const' are initialized. *)
   let rec apply_cil_const_initializer kinstr state lval = function
-    | SingleInit exp ->
+    | Cil_types.SingleInit exp ->
       let typ_lval = Cil.typeOfLval lval in
       if Cil.typeHasQualifier "const" typ_lval &&
          not (Cil.typeHasQualifier "volatile" typ_lval)
          && not (Cil.is_mutable_or_initialized lval)
-      then apply_cil_single_initializer kinstr state lval exp
+      then
+        let lval = Evast_builder.translate_lval lval
+        and exp = Evast_builder.translate_exp exp
+        and source = fst exp.eloc in
+        apply_evast_single_initializer ~source kinstr state lval exp
       else state
     | CompoundInit (typ, l) ->
       if Cil.typeHasQualifier "volatile" typ || not (Cil.isConstType typ)
@@ -219,13 +227,14 @@ module Make
     if Cil.typeHasQualifier "const" vi.vtype && not (vi.vstorage = Extern)
        && not (Cil.typeHasAttributeMemoryBlock Cil.frama_c_mutable vi.vtype)
     then (* Fully const base. Ignore -lib-entry altogether. *)
+      let init = Option.map Evast_builder.translate_init init in
       initialize_var_not_lib_entry kinstr ~local:false vi init state
     else
       let unknown_size =  warn_unknown_size vi in
       let state =
         if unknown_size then
           (* the type is unknown, initialize everything to Top *)
-          let lval = Cil.var vi in
+          let lval = Evast_builder.var vi in
           let loc = lval_to_loc lval in
           let v = Abstract_domain.Top in
           Domain.initialize_variable lval loc ~initialized:true v state
@@ -320,8 +329,12 @@ module Make
     let state = if vi.vsource then
         let initialize =
           if lib_entry || (vi.vstorage = Extern)
-          then initialize_var_lib_entry
-          else initialize_var_not_lib_entry ~local:false
+          then
+            initialize_var_lib_entry
+          else
+            fun ki vi init state ->
+              let init = Option.map Evast_builder.translate_init init in
+              initialize_var_not_lib_entry ki ~local:false vi init state
         in
         initialize Kglobal vi init.init state
       else state

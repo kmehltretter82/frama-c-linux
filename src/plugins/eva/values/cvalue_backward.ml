@@ -260,7 +260,7 @@ let backward_lor ~v1 ~v2 ~res =
 let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
   let typ = Cil.unrollType typ_res in
   match binop, typ with
-  | PlusA, TInt _ ->  backward_add_int typ ~res_value ~v1 ~v2 true
+  | Evast.PlusA, TInt _ ->  backward_add_int typ ~res_value ~v1 ~v2 true
   | MinusA, TInt _ -> backward_add_int typ ~res_value ~v1 ~v2 false
 
   | PlusA, TFloat (fk, _) ->  backward_add_float (Fval.kind fk) ~res_value ~v1 ~v2 `Add
@@ -277,7 +277,7 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
 
   (* comparison operators *)
   | (Eq | Ne | Le | Lt | Ge | Gt), _ -> begin
-      let binop = Eva_utils.conv_comp binop in
+      let binop = Evast_utils.conv_relation binop in
       match V.is_included V.singleton_zero res_value,
             V.is_included V.singleton_one  res_value with
       | true, true  ->
@@ -339,7 +339,7 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
 
 let backward_unop ~typ_arg op ~arg:_ ~res =
   match op with
-  | LNot -> None (* handled by the generic mechanism *)
+  | Evast.LNot -> None (* handled by the generic mechanism *)
   | BNot -> None (* No real idea of what should be done *)
   | Neg ->
     try

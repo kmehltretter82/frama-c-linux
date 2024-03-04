@@ -1102,11 +1102,14 @@ module D = struct
   let log_category = Self.register_category "d-traces"
 
   let assign ki lv e _v _valuation state =
-    let trans = Assign (ki, lv.Eval.lval, lv.Eval.ltyp, e) in
+    let cil_lval = Evast_utils.to_cil_lval lv.Eval.lval in
+    let cil_exp = Evast_utils.to_cil_exp e in
+    let trans = Assign (ki, cil_lval, lv.Eval.ltyp, cil_exp) in
     `Value (Traces.add_trans state trans)
 
   let assume stmt e pos _valuation state =
-    let trans = Assume (stmt, e, pos) in
+    let cil_exp = Evast_utils.to_cil_exp e in
+    let trans = Assume (stmt, cil_exp, pos) in
     `Value (Traces.add_trans state trans)
 
   let start_call stmt call _recursion _valuation state =
@@ -1121,7 +1124,8 @@ module D = struct
           Traces.add_trans state
             (Assign (Kstmt stmt, Cil.var arg.Eval.formal,
                      arg.Eval.formal.Cil_types.vtype,
-                     arg.Eval.concrete))) state call.Eval.arguments in
+                     Evast_utils.to_cil_exp arg.Eval.concrete)))
+          state call.Eval.arguments in
       `Value state
     else
       (* enter the scope of the dumb result variable *)
@@ -1129,7 +1133,11 @@ module D = struct
       let state = match var with
         | Some var -> Traces.add_trans state (EnterScope (kf, [var]))
         | None -> state in
-      let exps = List.map (fun arg -> arg.Eval.concrete) call.Eval.arguments in
+      let exps =
+        List.map
+          (fun arg -> Evast_utils.to_cil_exp arg.Eval.concrete)
+          call.Eval.arguments
+      in
       let state = Traces.add_trans state
           (CallDeclared (call.Eval.kf, exps, Option.map Cil.var var))
       in `Value {state with call_declared_function = true}
@@ -1150,7 +1158,7 @@ module D = struct
 
   let empty () = Traces.empty
   let initialize_variable lv _ ~initialized:_ _ state =
-    Traces.add_trans state (Msg(Format.asprintf "initialize variable: %a" Printer.pp_lval lv ))
+    Traces.add_trans state (Msg(Format.asprintf "initialize variable: %a" Evast_printer.pp_lval lv ))
   let initialize_variable_using_type var_kind varinfo state =
     let kind_str =
       match var_kind with

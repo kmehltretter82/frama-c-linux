@@ -25,7 +25,7 @@ open Top.Operators
 
 type t =
   | NoOffset of Cil_types.typ
-  | Index of Cil_types.exp option * Int_val.t * Cil_types.typ * t
+  | Index of Evast.exp option * Int_val.t * Cil_types.typ * t
   | Field of Cil_types.fieldinfo * t
 
 let rec pretty fmt = function
@@ -37,7 +37,7 @@ let rec pretty fmt = function
       pretty s
   | Index (Some e, i, _t, s) ->
     Format.fprintf fmt "[%a∈%a]%a"
-      Cil_printer.pp_exp e
+      Evast_printer.pp_exp e
       Int_val.pretty i
       pretty s
 
@@ -59,14 +59,12 @@ let add_index oracle base exp =
       Field (fi, sub')
     | Index (e, i, t, (NoOffset _ as sub)) ->
       let idx' = Int_val.add i (oracle exp) in
-      let loc = Cil_datatype.Location.unknown in
       let e = match e with (* If i is singleton, we can use this as the index expression *)
         | None when Int_val.is_singleton i ->
-          let loc = Cil_datatype.Location.unknown in
-          Some (Cil.kinteger64 ~loc (Int_val.project_int i))
+          Some (Evast_builder.integer (Int_val.project_int i))
         | e -> e
       in
-      let e' = Option.map (Fun.flip (Cil.mkBinOp ~loc Cil_types.PlusA) exp) e in
+      let e' = Option.map (Fun.flip (Evast_builder.add) exp) e in
       (* TODO: is idx inside bounds ? *)
       `Value (Index (e', idx', t, sub))
     | Index (e, i, t, sub) ->
@@ -87,7 +85,7 @@ let rec join o1 o2 =
   | Index (e1, i1, t, sub1), Index (e2, i2, t', sub2)
     when Bit_utils.type_compatible t t' ->
     let e = match e1, e2 with
-      | Some e1, Some e2 when Cil_datatype.ExpStructEq.equal e1 e2 ->
+      | Some e1, Some e2 when Evast_datatype.Exp.equal e1 e2 ->
         Some e1 (* keep expression only when equivalent from both offsets *)
       | _ -> None
     in
@@ -118,20 +116,20 @@ let assert_valid_index idx size =
 let of_var_address vi =
   NoOffset vi.Cil_types.vtype
 
-let rec of_cil_offset oracle base_typ = function
-  | Cil_types.NoOffset -> `Value (NoOffset base_typ)
+let rec of_evast_offset (oracle : Evast.exp -> Int_val.t) base_typ = function
+  | Evast.NoOffset -> `Value (NoOffset base_typ)
   | Field (fi, sub) ->
     if Cil.typeHasQualifier "volatile" fi.ftype then
       `Top
     else
-      let+ sub' = of_cil_offset oracle fi.ftype sub in
+      let+ sub' = of_evast_offset oracle fi.ftype sub in
       Field (fi, sub')
   | Index (exp, sub) ->
     match Cil.unrollType base_typ with
     | TArray (elem_typ, array_size, _) ->
       let idx = oracle exp in
       let+ () = assert_valid_index idx array_size
-      and+ sub' = of_cil_offset oracle elem_typ sub in
+      and+ sub' = of_evast_offset oracle elem_typ sub in
       Index (Some exp, idx, elem_typ, sub')
     | _ -> assert false
 
@@ -248,7 +246,7 @@ let references =
     | NoOffset _ -> acc
     | Field (_, sub) | Index (None, _, _, sub) -> aux acc sub
     | Index (Some e, _, _, sub) ->
-      let r = Cil.extract_varinfos_from_exp e in
+      let r = Evast_utils.vars_in_exp e in
       let acc = Cil_datatype.Varinfo.Set.union r acc in
       aux acc sub
   in

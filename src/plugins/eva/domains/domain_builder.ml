@@ -165,7 +165,7 @@ module Make_Minimal
     Domain.initialize_variable lval ~initialized value state
 
   let initialize_variable_using_type _kind varinfo state =
-    let lval = Cil.var varinfo in
+    let lval = Evast_builder.var varinfo in
     Domain.initialize_variable lval ~initialized:true Abstract_domain.Top state
 
   let logic_assign _assigns _location _state = top
@@ -295,7 +295,7 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
       Domain.initialize_variable lval ~initialized value state
 
     let initialize_variable_using_type _kind varinfo state =
-      let lval = Cil.var varinfo in
+      let lval = Evast_builder.var varinfo in
       Domain.initialize_variable lval ~initialized:true Abstract_domain.Top state
 
     let logic_assign _assigns _location _state = top

@@ -34,13 +34,13 @@ val backward_binop:
   typ_res:typ ->
   res_value: V.t ->
   typ_e1:typ ->
-  V.t -> binop -> V.t -> (V.t * V.t) option
+  V.t -> Evast.binop -> V.t -> (V.t * V.t) option
 
 (** This function tries to reduce the argument value of an unary operation,
     given its result. [typ_arg] is the type of [arg]. *)
 val backward_unop:
   typ_arg:typ ->
-  unop ->
+  Evast.unop ->
   arg: V.t ->
   res: V.t ->
   V.t option

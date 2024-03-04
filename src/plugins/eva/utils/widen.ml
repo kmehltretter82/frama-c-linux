@@ -437,7 +437,7 @@ module Parsed_Dynamic_Hints =
     end)
 
 let dynamic_bases_of_lval states e offset =
-  let lv = (Mem e, offset) in
+  let lv = Evast_builder.mk_lval (Mem e, offset) in
   List.fold_left (fun acc' state ->
       let location = Cvalue_queries.lval_to_loc state lv in
       Locations.Location_Bits.fold_bases
@@ -510,6 +510,8 @@ let dynamic_widen_hints_hook _callstack stmt states =
         List.fold_right (fun dhint (_acc_modified, acc_hints as acc) ->
             let old_bases = dhint.bases in
             let exp, offset = dhint.lv in
+            let exp = Evast_builder.translate_exp exp
+            and offset = Evast_builder.translate_offset offset in
             let bases = dynamic_bases_of_lval states exp offset in
             let new_bases = Base.Hptset.diff bases old_bases in
             if Base.Hptset.is_empty new_bases then

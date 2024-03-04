@@ -201,12 +201,13 @@ module Make (X: Analysis.S) = struct
       GO_Bottom, true
 
   let lval_to_offsetmap state lv =
+    let lv = Evast_builder.translate_lval lv in
     let loc, alarms = X.eval_lval_to_loc state lv in
     let ok = Alarmset.is_empty alarms in
     let state = get_cvalue_or_top state in
     let aux loc (acc_res, acc_ok) =
       let res, ok =
-        match lv with (* catch simplest pattern *)
+        match lv.node with (* catch simplest pattern *)
         | Var vi, NoOffset -> extract_single_var state vi
         | _ -> reduce_loc_and_eval state loc
       in
@@ -248,6 +249,7 @@ module Make (X: Analysis.S) = struct
 
   let lval_zone_ev =
     let lv_to_zone state lv =
+      let lv = Evast_builder.translate_lval lv in
       let loc, _alarms = X.eval_lval_to_loc state lv in
       match loc with
       | `Bottom -> Locations.Zone.bottom, false, false
@@ -284,6 +286,7 @@ module Make (X: Analysis.S) = struct
 
   let exp_ev =
     let eval_exp_and_warn state e =
+      let e = Evast_builder.translate_exp e in
       let r = X.eval_expr state e in
       fst r, Alarmset.is_empty (snd r), false
     in
@@ -302,6 +305,7 @@ module Make (X: Analysis.S) = struct
 
   let lval_ev =
     let eval_and_warn state lval =
+      let lval = Evast_builder.translate_lval lval in
       let r = X.copy_lvalue state lval in
       let flagged_value = match fst r with
         | `Bottom -> Eval.Flagged_Value.bottom

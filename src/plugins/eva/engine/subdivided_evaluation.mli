@@ -24,7 +24,6 @@
     for expressions in which some l-values appear multiple times, proceed
     by disjunction on their abstract value, in order to gain precision. *)
 
-open Cil_types
 open Eval
 
 module type Forward_Evaluation = sig

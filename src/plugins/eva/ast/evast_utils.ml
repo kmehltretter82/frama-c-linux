@@ -187,7 +187,7 @@ let invert_relation : binop -> binop = function
   | Ge -> Lt
   | Eq -> Ne
   | Ne -> Eq
-  | _ -> assert false
+  | _ -> invalid_arg "invert_relation: must be given a comparison operator"
 
 let conv_relation : binop -> Abstract_interp.Comp.t =
   function

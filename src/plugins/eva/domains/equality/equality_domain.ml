@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
 
 type call_init_state =
@@ -201,7 +200,7 @@ struct
       Equality.Equality.fold
         (fun atom acc ->
            let e = HCE.to_exp atom in
-           if Cil_datatype.ExpStructEq.equal e expr
+           if Evast_datatype.Exp.equal e expr
            then acc else (e, value) :: acc)
         equality []
     | None -> []
@@ -241,7 +240,7 @@ struct
     | None -> `Value (Value.top, None), Alarmset.all
 
   let extract_expr ~oracle _context (equalities, _, _) expr =
-    let expr = Cil.constFold true expr in
+    let expr = Evast_utils.const_fold expr in
     let atom_e = HCE.of_exp expr in
     coop_eval oracle equalities atom_e
 
@@ -320,11 +319,11 @@ struct
     | E _ -> assert false
     | LV lv ->
       let zone =
-        match lv with
+        match lv.node with
         | Var vi, NoOffset -> Locations.zone_of_varinfo vi
         | _ ->
-          let expr = Cil.dummy_exp (Lval lv) in
-          Eva_utils.zone_of_expr (find_loc valuation) expr
+          let expr = Evast_builder.lval lv in
+          Evast_utils.zone_of_exp (find_loc valuation) expr
       in
       Deps.add lval zone deps
 
@@ -346,8 +345,8 @@ struct
     | `Top -> false (* should not happen *)
     | `Value { value = { v } } -> is_singleton v
 
-  let expr_is_cardinal_zero_or_one_loc valuation e =
-    match e.enode with
+  let expr_is_cardinal_zero_or_one_loc valuation (e : Evast.exp) =
+    match e.node with
     | Lval lv -> begin
         let loc = valuation.Abstract_domain.find_loc lv in
         match loc with
@@ -380,9 +379,9 @@ struct
        the reevaluation of [right_expr] would reduce it incorrectly, by
        removing indeterminate flags without emitting alarms. *)
   let assign_eq left_lval right_expr value valuation state =
-    if Eval_typ.lval_contains_volatile left_lval ||
-       Eval_typ.expr_contains_volatile right_expr ||
-       not (Cil.isArithmeticOrPointerType (Cil.typeOfLval left_lval)) ||
+    if Evast_utils.lval_contains_volatile left_lval ||
+       Evast_utils.exp_contains_volatile right_expr ||
+       not (Cil.isArithmeticOrPointerType left_lval.typ) ||
        indeterminate_copy value
     then state
     else
@@ -402,12 +401,12 @@ struct
     let left_loc = Precise_locs.imprecise_location left_value.lloc in
     let direct_left_zone = Locations.(enumerate_valid_bits Write left_loc) in
     let state = kill Hcexprs.Modified direct_left_zone state in
-    let right_expr = Cil.constFold true right_expr in
+    let right_expr = Evast_utils.const_fold right_expr in
     try
       let indirect_left_zone =
-        Eva_utils.indirect_zone_of_lval (find_loc valuation) left_value.lval
+        Evast_utils.indirect_zone_of_lval (find_loc valuation) left_value.lval
       and right_zone =
-        Eva_utils.zone_of_expr (find_loc valuation) right_expr
+        Evast_utils.zone_of_exp (find_loc valuation) right_expr
       in
       (* After an assignment lv = e, the equality [lv == eq] holds iff the value
          of [e] and the location of [lv] are not modified by the assignment,
@@ -432,7 +431,7 @@ struct
         state
       else
         try
-          let left_value = Var arg.formal, NoOffset in
+          let left_value = Evast_builder.var arg.formal in
           assign_eq left_value arg.concrete arg.avalue valuation state
         with Top_location -> state
     in
@@ -447,18 +446,18 @@ struct
      reasoning. This is the case for equalities between 0. and -0., and
      between non-comparable pointers, so we need to skip such equalities. *)
   let assume _stmt expr positive valuation (eqs, deps, modified_zone as state) =
-    match positive, expr.enode with
+    match positive, (expr : Evast.exp).node with
     | true,  BinOp (Eq, e1, e2, _)
     | false, BinOp (Ne, e1, e2, _) ->
       begin
         if not (is_safe_equality valuation e1 e2)
         then `Value state
         else
-          let e1 = Cil.constFold true e1
-          and e2 = Cil.constFold true e2 in
-          if Eval_typ.expr_contains_volatile e1
-          || Eval_typ.expr_contains_volatile e2
-          || not (Cil.isArithmeticOrPointerType (Cil.typeOf e1))
+          let e1 = Evast_utils.const_fold e1
+          and e2 = Evast_utils.const_fold e2 in
+          if Evast_utils.exp_contains_volatile e1
+          || Evast_utils.exp_contains_volatile e2
+          || not (Cil.isArithmeticOrPointerType e1.typ)
           || (expr_is_cardinal_zero_or_one_loc valuation e1 &&
               expr_cardinal_zero_or_one valuation e2)
           || (expr_is_cardinal_zero_or_one_loc valuation e2 &&

@@ -114,7 +114,7 @@ let refine_fun_ptr typ args =
   match Cil.unrollType typ, args with
   | TFun (_, Some _, _, _), _ | _, None -> typ
   | TFun (ret, None, var, attrs), Some l ->
-    let ltyps = List.map (fun arg -> "", Cil.typeOf arg, []) l in
+    let ltyps = List.map (fun arg -> "", arg, []) l in
     TFun (ret, Some ltyps, var, attrs)
   | _ -> assert false
 

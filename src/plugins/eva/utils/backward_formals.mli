@@ -30,7 +30,7 @@ val written_formals: Cil_types.kernel_function -> Cil_datatype.Varinfo.Set.t
     which may be internally overwritten by [kf] during its call. *)
 
 
-val safe_argument: Cil_types.exp -> bool
+val safe_argument: Evast.exp -> bool
 (** [safe_argument e] returns [true] if [e] (which is supposed to be
     an actual parameter) is guaranteed to evaluate in the same way before and
     after the call. *)
