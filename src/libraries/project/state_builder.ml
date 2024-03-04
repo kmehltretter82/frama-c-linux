@@ -814,6 +814,7 @@ module Hashconsing_tbl =
 module type Counter = sig
   val next : unit -> int
   val get: unit -> int
+  val reset: unit -> unit
   val self: State.t
 end
 
@@ -849,6 +850,7 @@ module SharedCounter(Info : sig val name : string end) = struct
 
   let next () = incr cpt ; !cpt
   let get () = !cpt
+  let reset () = cpt := 0
   let self = Cpt.self
 
 end
@@ -886,6 +888,7 @@ module Counter(Info : sig val name : string end) = struct
 
   let next () = incr !cpt ; !(!cpt)
   let get () = !(!cpt)
+  let reset () = !cpt := 0
   let self = Cpt.self
 
 end

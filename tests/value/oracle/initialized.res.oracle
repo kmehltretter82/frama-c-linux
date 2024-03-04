@@ -73,11 +73,8 @@
 [eva:alarm] initialized.c:50: Warning: 
   signed overflow. assert (int)(&b4) + (int)(&b4) ≤ 2147483647;
 [eva:garbled-mix:write] initialized.c:50: 
-  Assigning imprecise value to t[6].
-  The imprecision originates from Arithmetic {initialized.c:50}
-[eva:garbled-mix:write] initialized.c:51: 
-  Assigning imprecise value to t[7].
-  The imprecision originates from Arithmetic {initialized.c:50}
+  Assigning imprecise value to t[6]
+  because of arithmetic operation on addresses.
 [eva] initialized.c:63: 
   Frama_C_dump_each:
   # cvalue:
@@ -234,6 +231,10 @@
 [eva] Done for function reduce_by_negation
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    initialized.c:50: arithmetic operation on addresses
+      (read 1 times, propagated 2 times) garbled mix of &{b4}
 [eva] initialized.c:93: assertion 'Eva,initialization' got final status invalid.
 [eva] initialized.c:104: 
   assertion 'Eva,initialization' got final status invalid.

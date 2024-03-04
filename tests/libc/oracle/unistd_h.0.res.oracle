@@ -59,6 +59,9 @@
   function execv: precondition 'valid_string_path' got status valid.
 [eva] unistd_h.c:17: 
   function execv: precondition 'valid_string_argv0' got status valid.
+[eva:garbled-mix:assigns] unistd_h.c:17: 
+  The specification of function execv has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] Done for function execv
 [eva] computing for function execv <- main.
   Called from unistd_h.c:17.

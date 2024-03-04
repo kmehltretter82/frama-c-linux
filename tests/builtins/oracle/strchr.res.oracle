@@ -640,6 +640,8 @@
 [eva] Done for function strchr_unbounded
 [eva] computing for function strchr_invalid <- main.
   Called from strchr.c:561.
+[eva:garbled-mix:write] strchr.c:536: 
+  Assigning imprecise value to s because of arithmetic operation on addresses.
 [eva] strchr.c:536: Call to builtin strchr
 [eva:alarm] strchr.c:536: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
@@ -659,8 +661,8 @@
 [eva:alarm] strchr.c:541: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:garbled-mix:write] strchr.c:541: 
-  Assigning imprecise value to garbled.
-  The imprecision originates from Arithmetic {strchr.c:541}
+  Assigning imprecise value to garbled
+  because of arithmetic operation on addresses.
 [eva:alarm] strchr.c:542: Warning: 
   pointer downcast. assert (unsigned int)garbled ≤ 2147483647;
 [eva] strchr.c:542: Call to builtin strchr
@@ -670,6 +672,10 @@
 [eva] Done for function strchr_garbled_mix_in_char
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    strchr.c:541: arithmetic operation on addresses
+      (read 1 times, propagated 3 times) garbled mix of &{x}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function init_array_nondet:
   from ∈ {-1}

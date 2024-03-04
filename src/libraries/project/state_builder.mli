@@ -507,6 +507,10 @@ module type Counter = sig
   (** @return the current value of the counter, without incrementing it.
       @since Fluorine-20130401 *)
 
+  (** Resets the counter to 0.
+      @since Frama-C+dev *)
+  val reset: unit -> unit
+
   val self: State.t
   (** @since Oxygen-20120901 *)
 

@@ -48,6 +48,12 @@
 [eva] Done for function use_array
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    multidim-relations.c:18: imprecise merge of addresses
+      (read 7 times, propagated 0 times) garbled mix of &{g; h}
+    multidim-relations.c:19: imprecise merge of addresses
+      (read 4 times, propagated 0 times) garbled mix of &{g; h}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function init_array:
   t[0]{.kind; .[bits 8 to 31]#} ∈ {0; 1} repeated %8 

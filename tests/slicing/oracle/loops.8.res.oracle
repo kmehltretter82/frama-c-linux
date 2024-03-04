@@ -12,6 +12,9 @@
 [eva] computing for function may_write_Y_from_Z <- main.
   Called from loops.i:199.
 [eva] using specification for function may_write_Y_from_Z
+[eva:garbled-mix:assigns] loops.i:199: 
+  The specification of function may_write_Y_from_Z
+  has generated a garbled mix of addresses for assigns clause *p.
 [eva] Done for function may_write_Y_from_Z
 [eva] computing for function loop <- main.
   Called from loops.i:202.

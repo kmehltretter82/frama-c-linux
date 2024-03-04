@@ -1,5 +1,5 @@
-277a278,279
+274a275,276
 > [eva:nonlin] nonlin.c:113: non-linear 'f + f', lv 'f'
 > [eva:nonlin] nonlin.c:113: subdividing on f
-280d281
+277d278
 < [eva:nonlin] nonlin.c:113: subdividing on f

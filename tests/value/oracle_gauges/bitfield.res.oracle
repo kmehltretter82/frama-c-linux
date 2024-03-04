@@ -1,16 +1,20 @@
 137a138,152
 > [eva] bitfield.i:71: 
 >   Frama_C_show_each:
->   {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+>   {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 > [eva] bitfield.i:73: 
 >   Frama_C_show_each:
->   {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+>   {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 > [eva] computing for function leaf <- imprecise_bts_1671 <- main.
 >   Called from bitfield.i:70.
 > [eva] Done for function leaf
 > [eva] bitfield.i:71: 
 >   Frama_C_show_each:
->   {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+>   {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 > [eva] bitfield.i:73: 
 >   Frama_C_show_each:
->   {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+>   {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
+213c228
+<       (read 5 times, propagated 7 times) garbled mix of &{b; ee}
+---
+>       (read 9 times, propagated 11 times) garbled mix of &{b; ee}

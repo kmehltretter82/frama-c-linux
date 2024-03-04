@@ -28,6 +28,8 @@
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva:alarm] memset.c:34: Warning: 
   pointer downcast. assert (unsigned int)((int *)t2) ≤ 2147483647;
+[eva:garbled-mix:write] memset.c:34: 
+  Assigning imprecise value to s because of arithmetic operation on addresses.
 [eva] memset.c:34: Call to builtin memset
 [eva:alarm] memset.c:34: Warning: 
   function memset: precondition 'valid_s' got status unknown.
@@ -49,6 +51,9 @@
 [eva] memset.c:41: function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:41: 
   Call to builtin precise_memset(({{ (void *)&t5 }},{{ (int)&t1 }},{400})) failed; value to write is imprecise
+[eva:garbled-mix:write] memset.c:41: 
+  Builtin memset: assigning imprecise value to t5[0]
+  because of misaligned read of addresses.
 [eva] memset.c:44: Call to builtin memset
 [eva] memset.c:44: function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:44: 
@@ -108,7 +113,8 @@
   t3[0..9] ∈ {0}
     [10..99]# ∈ {0; 17} repeated %8 
   t4[0..99] ∈ {0}
-  t5[0..99] ∈ {{ garbled mix of &{t1} (origin: Misaligned {memset.c:41}) }}
+  t5[0..99] ∈
+    {{ garbled mix of &{t1} (origin: Misaligned read {memset.c:41}) }}
   t6[0..9] ∈ {0}
     [10..13]# ∈ {0; 34} repeated %8 
     [14..99] ∈ {0}
@@ -163,7 +169,8 @@
   t3[0..9] ∈ {0}
     [10..99]# ∈ {0; 17} repeated %8 
   t4[0..99] ∈ {0}
-  t5[0..99] ∈ {{ garbled mix of &{t1} (origin: Misaligned {memset.c:41}) }}
+  t5[0..99] ∈
+    {{ garbled mix of &{t1} (origin: Misaligned read {memset.c:41}) }}
   t6[0..9] ∈ {0}
     [10..13]# ∈ {0; 34} repeated %8 
     [14..99] ∈ {0}

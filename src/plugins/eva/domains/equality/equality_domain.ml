@@ -212,7 +212,7 @@ module Make
       fun v ->
         let c = get v in
         if Cvalue.V.is_imprecise c then
-          let c' = Cvalue.V.topify_with_origin Origin.top c in
+          let c' = Cvalue.V.topify_with_origin Origin.unknown c in
           Value.set Main_values.CVal.key c' v
         else v
 
