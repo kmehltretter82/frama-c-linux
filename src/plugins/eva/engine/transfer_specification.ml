@@ -306,13 +306,15 @@ module Make
     let env = make_env pre in
     let assigns = get_assigns_for_behavior spec behavior in
     let check_one_assign cvalue_state (assign, _) =
-      match evaluate_location env retres_loc Assign assign with
-      | None -> ()
-      | Some location ->
-        let loc = Precise_locs.imprecise_location (get_ploc location) in
-        let cvalue = Cvalue.Model.find cvalue_state loc in
-        begin
-          match cvalue with
+      let location = evaluate_location env retres_loc Assign assign in
+      let precise_loc = Option.map get_ploc location in
+      let loc = Option.map Precise_locs.imprecise_location precise_loc in
+      match loc with
+      | None | Some Locations.{ size = Top } -> ()
+      | Some Locations.{ loc; size = Value size } ->
+        let offsm = Cvalue.Model.copy_offsetmap loc size cvalue_state in
+        let warn v =
+          match Cvalue.V_Or_Uninitialized.get_v v with
           | Top (bases, origin) ->
             if Origin.register_write bases origin then
               Self.warning ~current:true ~once:true
@@ -321,7 +323,8 @@ module Make
                  a garbled mix of addresses@ for %a.@]"
                 Kernel_function.pretty kf pp_assign_clause (Assign, assign)
           | _ -> ()
-        end
+        in
+        Bottom.iter (Cvalue.V_Offsetmap.iter_on_values warn) offsm
     in
     let check_one_state state =
       let cvalue_state = get_cvalue_or_top state in

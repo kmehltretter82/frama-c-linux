@@ -7,9 +7,6 @@
 [eva] computing for function getpwuid <- main.
   Called from pwd_h.c:10.
 [eva] using specification for function getpwuid
-[eva:garbled-mix:assigns] pwd_h.c:10: 
-  The specification of function getpwuid
-  has generated a garbled mix of addresses for assigns clause __fc_pwd.
 [eva] Done for function getpwuid
 [eva:alarm] pwd_h.c:13: Warning: assertion got status unknown.
 [eva:alarm] pwd_h.c:14: Warning: assertion got status unknown.
@@ -19,9 +16,6 @@
   Called from pwd_h.c:18.
 [eva] using specification for function getpwnam
 [eva] pwd_h.c:18: function getpwnam: precondition 'valid_name' got status valid.
-[eva:garbled-mix:assigns] pwd_h.c:18: 
-  The specification of function getpwnam
-  has generated a garbled mix of addresses for assigns clause __fc_pwd.
 [eva] Done for function getpwnam
 [eva:alarm] pwd_h.c:21: Warning: assertion got status unknown.
 [eva:alarm] pwd_h.c:22: Warning: assertion got status unknown.
