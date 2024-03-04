@@ -33,7 +33,6 @@ import { v4 as uuidv4 } from 'uuid';
 import './sandbox.css';
 import { registerSandbox } from 'ivette';
 import { Button } from 'dome/frame/toolbars';
-import { nodeDefault } from 'frama-c/plugins/dive/api';
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Specifications                                               --- */
@@ -49,9 +48,9 @@ export type Shape = 'dot' | 'box' | 'circle';
 export type ArrowType = '--' | '->' | '<-' | '<->';
 export type Layout = '2D' | '3D';
 
-export interface Node<ID> extends Attributes {
+export interface Node extends Attributes {
   /** Node identifier (unique). */
-  id: ID;
+  id: string;
 
   /** defaults to `"dot"` */
   shape?: Shape;
@@ -71,23 +70,22 @@ export type SelectionCallback = (node: string, evt: React.MouseEvent) => void;
 /* -------------------------------------------------------------------------- */
 /* --- Graph Implementation                                               --- */
 /* -------------------------------------------------------------------------- */
-export type MapGraph = (nodes: Node<string>[], edges: Edge[]) => void;
+
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Component Properties                                         --- */
 /* -------------------------------------------------------------------------- */
 
-export interface GraphProps<ID> {
-  nodes: readonly Node<ID>[];
+export interface GraphProps {
+  nodes: readonly Node[];
   edges: readonly Edge[];
 
-  /** Converts nodes and edges for ForceGraph */
-  mapGraph?: MapGraph;
+
   /**
      Element to focus on.
      The graph is scrolled to make this node visible if necessary.
    */
-  selected?: ID;
+  selected?: string;
 
   /** Force recomputing layout. */
   reset?: boolean;
@@ -123,23 +121,37 @@ export interface GraphProps<ID> {
 /* -------------------------------------------------------------------------- */
 
 export function Graph(props: {
-  graph: GraphProps<string>;
-  setInitGraph: React.Dispatch<React.SetStateAction<GraphProps<string>>>;
+  graph: GraphProps;
+  setInitGraph: React.Dispatch<React.SetStateAction<GraphProps>>;
 }): JSX.Element {
   const fgRef2D = React.useRef<ForceGraphMethods2D | undefined>(undefined);
   const fgRef3D = React.useRef<ForceGraphMethods3D | undefined>(undefined);
   // const graph = props.mapGraph( props.nodes, props.edges);
-  const graph = {
+  const [graph2D, setGraph2D] = React.useState({
     nodes: props.graph.nodes.map((node) => {
       return { id: node.id, name: node.label };
     }),
     links: props.graph.edges.map((edge) => {
       return { source: edge.fromNode, target: edge.toNode };
     }),
-  };
+  });
 
-  // Zoom update on ForceGraph2D
   React.useEffect(() => {
+    setGraph2D((prevGraph) => {
+      return {
+        ...prevGraph,
+        nodes: props.graph.nodes.map((node) => {
+          return { id: node.id, name: node.label };
+        }),
+        links: props.graph.edges.map((edge) => {
+          return { source: edge.fromNode, target: edge.toNode };
+        }),
+      };
+    });
+  }, [props.graph.nodes, props.graph.edges]);
+
+  React.useEffect(() => {
+    // Zoom update on ForceGraph2D
     fgRef2D.current?.zoom(props.graph.zoom || 0);
     // fgRef3D.current?.cameraPosition();
   }, [props.graph.zoom]);
@@ -151,7 +163,7 @@ export function Graph(props: {
         props.graph.layout === '2D' ? (
           <ForceGraph2D
             ref={fgRef2D}
-            graphData={graph}
+            graphData={graph2D}
             // autoPauseRedraw performance optimization to automatically
             // pause redrawing the 2D canvas at every frame whenever
             // the simulation engine is halted
@@ -162,14 +174,33 @@ export function Graph(props: {
             dagLevelDistance={50}
             // Node selection
             onNodeClick={(node): void => {
-              props.setInitGraph({ ...props.graph, selected: String(node.id) });
+              // change the selected value of GraphProps
+              props.setInitGraph((prevGraph) => {
+                return { ...prevGraph, selected: String(node.id) };
+              });
+            }}
+            onNodeDragEnd={(): void => {
+              setGraph2D((prevGraph) => {
+                return { ...prevGraph };
+              });
+              // change the x value and y value of GraphProps
+              props.setInitGraph((prevGraph) => {
+                return { ...prevGraph };
+              });
             }}
             nodeLabel={'name'}
             // eslint-disable-next-line no-console
             // onRenderFramePost={() => console.log('end draw')}
           />
         ) : (
-          <ForceGraph3D ref={fgRef3D} graphData={graph} />
+          <ForceGraph3D
+            ref={fgRef3D}
+            graphData={graph2D}
+            // Sets the simulation alpha min parameter.
+            d3AlphaDecay={1}
+            d3VelocityDecay={1}
+            dagLevelDistance={50}
+          />
         )
       ) : (
         <></>
@@ -180,16 +211,12 @@ export function Graph(props: {
 
 export default function GraphComponent(): JSX.Element {
   const [initGraph, setInitGraph] =
-    React.useState<GraphProps<string>>(setGraph());
-  /*
-  React.useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log(initGraph.selected);
-  }, [initGraph.selected]);
-  */
+    React.useState<GraphProps>(setGraph());
+
+
 
   // Generation of unique identifier
-  function setGraph(N = 3): GraphProps<string> {
+  function setGraph(N = 3): GraphProps {
     function generateUUIDs(): string[] {
       const uuidArray: string[] = [];
 
@@ -201,6 +228,29 @@ export default function GraphComponent(): JSX.Element {
     }
     const uniqueIds = generateUUIDs();
 
+    // add Node GraphProps
+    const addNode = (): void => {
+      const uniqueId = uuidv4();
+      const newNode = { id: uniqueId, label: `Node: ${uniqueId}` };
+
+      setInitGraph((prevGraph) => {
+        const fromNodeId = prevGraph.nodes[prevGraph.nodes.length - 1].id;
+        const newEdge = { fromNode: fromNodeId, toNode: newNode.id };
+        return {
+          ...prevGraph,
+          nodes: [...prevGraph.nodes, newNode],
+          edges: [...prevGraph.edges, newEdge],
+        };
+      });
+    };
+    // Supp Node GraphProps
+    const deleteNode = (): void => {
+      setInitGraph((prevState) => ({
+        ...prevState,
+        nodes: prevState.nodes.slice(0, -1),
+        edges: prevState.edges.slice(0, -1),
+      }));
+    };
     // Display or hide the graph
     const updateDisplay = (): void => {
       setInitGraph((prevGraph) => {
@@ -234,6 +284,7 @@ export default function GraphComponent(): JSX.Element {
         };
       });
     };
+
     return {
       nodes: [
         { id: uniqueIds[0], label: `Node: ${uniqueIds[0]}` },
@@ -255,13 +306,16 @@ export default function GraphComponent(): JSX.Element {
           <Button title='Layout' icon='COMPONENT' onClick={updateLayout} />
           <Button icon='ZOOM.IN' title={'Zoom in'} onClick={updateZoomIn} />
           <Button icon='ZOOM.OUT' title={'Zoom out'} onClick={updateZoomOut} />
+          <Button icon='PLUS' title={'Add'} onClick={addNode} />
+          <Button icon='MINUS' title={'Delete'} onClick={deleteNode} />
         </div>
       ),
+      onSelection: (n, e) => {},
+      onReady: () => {},
     };
   }
   return (
     <>
-      {/* <Graph {...initGraph} /> */}
       <Graph graph={initGraph} setInitGraph={setInitGraph} />
     </>
   );
