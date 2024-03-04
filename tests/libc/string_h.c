@@ -134,6 +134,14 @@ void test_strlcpy() {
   }
 }
 
+void test_strrchr() {
+  const char *s1 = "not a palyndrome";
+  const char *p = strrchr(s1, 'o');
+  //@ check p == s1 + strlen(s1) - 2;
+  p = strrchr(s1, 'Z');
+  //@ check p == \null;
+}
+
 int main(int argc, char **argv)
 {
   test_strcmp();
@@ -149,6 +157,7 @@ int main(int argc, char **argv)
   //@ assert valid_read_string(strsig);
   test_strncpy();
   test_strlcpy();
+  test_strrchr();
   char *c = "haystack";
   char d = nondet ? 'y' : 'k';
   char *chr1 = strchr(c, d);

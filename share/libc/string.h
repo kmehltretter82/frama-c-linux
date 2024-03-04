@@ -195,7 +195,7 @@ extern char *strchr(const char *s, int c);
 extern char *strchrnul(const char *s, int c);
 
 /*@ requires valid_string_s: valid_read_string(s);
-  @ assigns \result \from s, s[0..],c;
+  @ assigns \result \from s, indirect:s[0 .. strlen(s)], indirect:c;
   @ behavior found:
   @   assumes char_found: strchr(s,c);
   @   ensures result_char: *\result == c;
@@ -207,6 +207,8 @@ extern char *strchrnul(const char *s, int c);
   @ behavior default:
   @   ensures result_null_or_same_base:
   @     \result == \null || \base_addr(\result) == \base_addr(s);
+  @   ensures result_null_or_points_to_same:
+  @     \result == \null || \subset(\result, s + (0 .. strlen(s)));
   @*/
 extern char *strrchr(const char *s, int c);
 
