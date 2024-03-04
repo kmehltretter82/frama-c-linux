@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "frama-c"
 synopsis: "Platform dedicated to the analysis of source code written in C"
-version: "28.0+dev"
+version: "28.1+dev"
 description:"""
 Frama-C gathers several analysis techniques in a single collaborative
 framework, based on analyzers (called "plug-ins") that can build upon the
@@ -72,7 +72,7 @@ authors: [
 homepage: "https://frama-c.com/"
 license: "LGPL-2.1-only"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
-doc: "http://frama-c.com/download/user-manual-28.0-Nickel.pdf"
+doc: "http://frama-c.com/download/user-manual-28.1-Nickel.pdf"
 bug-reports: "https://git.frama-c.com/pub/frama-c/issues"
 tags: [
   "deductive"
@@ -119,9 +119,13 @@ run-test: [
 ]
 
 depends: [
-  "dune" { >= "3.7.0" & < "3.13.0" }
+  "dune" { >= "3.7.0"
+         & != "3.13.0" # performance problem
+         }
   "dune-configurator"
-  "dune-site" { >= "3.7.0" & < "3.13.0" }
+  "dune-site" { >= "3.7.0"
+              & != "3.13.0" # performance problem
+              }
 
   ( "alt-ergo-free" | "alt-ergo" )
   "conf-graphviz" { post }
