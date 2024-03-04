@@ -31,6 +31,9 @@ val origin_lval : lval -> Cil_types.lval
 val origin_offset : offset -> Cil_types.offset
 val loc : exp -> Cil_types.location option
 
+val to_cil_exp : exp -> Cil_types.exp
+val to_cil_lval : lval -> Cil_types.lval
+
 (** Expressions/Lvalue heights *)
 
 (** Computes the height of an expression, that is the maximum number of nested

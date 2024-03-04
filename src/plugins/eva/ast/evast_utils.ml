@@ -25,11 +25,10 @@ open Evast
 
 (* --- Origins --- *)
 
-let origin_exp e =
-  match e.origin with
-  | Exp exp -> exp
-  | Lval lval -> Cil.new_exp ~loc:Cil_datatype.Location.unknown (Lval lval)
-  | Built | Term _ -> invalid_arg "origin is not an expression"
+let origin_exp exp =
+  match exp.origin with
+  | Exp e -> e
+  | _ -> invalid_arg "origin is not an expression"
 
 let [@tail_mod_cons] rec origin_offset = function
   | NoOffset -> Cil_types.NoOffset
@@ -48,6 +47,91 @@ let loc exp =
   match exp.origin with
   | Exp exp -> Some (exp.Cil_types.eloc)
   | Lval _ | Built | Term _ -> None
+
+
+(* --- Conversion to Cil --- *)
+
+let rec to_cil_exp exp =
+  match exp.origin with
+  | Exp e -> e
+  | _ -> build_cil_exp exp.node
+
+and build_cil_exp node =
+  let exp_node = match node with
+    | Const c -> Cil_types.Const (to_cil_const c)
+    | Lval lv -> Lval (to_cil_lval lv)
+    | SizeOf (t, _) -> SizeOf (t)
+    | SizeOfE (e, _) -> SizeOfE (to_cil_exp e)
+    | SizeOfStr (s, _) -> SizeOfStr (s)
+    | AlignOf (t, _) -> AlignOf (t)
+    | AlignOfE (e, _) -> AlignOfE (to_cil_exp e)
+    | UnOp (op, e, t) -> UnOp (to_cil_unop op, to_cil_exp e, t)
+    | BinOp (op, e1, e2, t) ->
+      BinOp (to_cil_binop op, to_cil_exp e1, to_cil_exp e2, t)
+    | CastE (t, e) -> CastE (t, to_cil_exp e)
+    | AddrOf (lv) -> AddrOf (to_cil_lval lv)
+    | StartOf (lv) -> StartOf (to_cil_lval lv)
+  in
+  Cil.new_exp ~loc:Cil_datatype.Location.unknown exp_node
+
+and to_cil_unop op =
+  match op with
+  | Neg -> Cil_types.Neg
+  | BNot -> BNot
+  | LNot -> LNot
+
+and to_cil_binop op =
+  match op with
+  | PlusA -> Cil_types.PlusA
+  | PlusPI -> PlusPI
+  | MinusA -> MinusA
+  | MinusPI -> MinusPI
+  | MinusPP -> MinusPP
+  | Mult -> Mult
+  | Div -> Div
+  | Mod -> Mod
+  | Shiftlt -> Shiftlt
+  | Shiftrt -> Shiftrt
+  | Lt -> Lt
+  | Gt -> Gt
+  | Le -> Le
+  | Ge -> Ge
+  | Eq -> Eq
+  | Ne -> Ne
+  | BAnd -> BAnd
+  | BXor -> BXor
+  | BOr -> BOr
+  | LAnd -> LAnd
+  | LOr -> LOr
+
+and to_cil_lval lval =
+  match lval.origin with
+  | Lval lv -> lv
+  | _ ->
+    let (lh, off) = lval.node in
+    to_cil_lh lh, to_cil_offset off
+
+and to_cil_lh lhost =
+  match lhost with
+  | Var vi -> Cil_types.Var (vi)
+  | Mem e -> Mem (to_cil_exp e)
+
+and to_cil_offset offset =
+  match offset with
+  | NoOffset -> Cil_types.NoOffset
+  | Field (fi, off) -> Field (fi, to_cil_offset off)
+  | Index (e, off) -> Index (to_cil_exp e, to_cil_offset off)
+
+and to_cil_const const =
+  match const with
+  | CInt64 (i, ik, s) -> Cil_types.CInt64 (i, ik, s)
+  | CString (_base) -> to_cil_fail ()
+  | CChr (c) -> CChr (c)
+  | CReal (f, fk, s) -> CReal (f, fk, s)
+  | CEnum (ei) -> CEnum (ei)
+
+and to_cil_fail () =
+  invalid_arg "this AST cannot be converted to cil"
 
 
 (* --- Heights --- *)
