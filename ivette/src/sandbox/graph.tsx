@@ -29,6 +29,7 @@ import ForceGraph2D, {
 import ForceGraph3D, {
   ForceGraphMethods as ForceGraphMethods3D,
 } from 'react-force-graph-3d';
+import { v4 as uuidv4 } from 'uuid';
 import './sandbox.css';
 import { registerSandbox } from 'ivette';
 import { Button } from 'dome/frame/toolbars';
@@ -126,12 +127,13 @@ export function Graph(props: GraphProps<string>): JSX.Element {
   // const graph = props.mapGraph( props.nodes, props.edges);
   const graph = {
     nodes: props.nodes.map((node) => {
-      return { id: Number(node.id) };
+      return { id: node.id, name: node.label };
     }),
     links: props.edges.map((edge) => {
-      return { source: Number(edge.fromNode), target: Number(edge.toNode) };
+      return { source: edge.fromNode, target: edge.toNode };
     }),
   };
+
   // Zoom update on ForceGraph2D
   React.useEffect(() => {
     fgRef2D.current?.zoom(props.zoom || 0);
@@ -154,6 +156,11 @@ export function Graph(props: GraphProps<string>): JSX.Element {
             d3AlphaDecay={1}
             d3VelocityDecay={1}
             dagLevelDistance={50}
+            // Node selection
+            // onNodeClick={(node) => node.id}
+            nodeLabel={'name'}
+            // eslint-disable-next-line no-console
+            // onRenderFramePost={() => console.log('end draw')}
           />
         ) : (
           <ForceGraph3D ref={fgRef3D} graphData={graph} />
@@ -165,12 +172,23 @@ export function Graph(props: GraphProps<string>): JSX.Element {
   );
 }
 
-function GraphComponent(): JSX.Element {
-  const [initGraph, setInitGraph] = React.useState<GraphProps<string>>(
-    setGraph() as GraphProps<string>
-  );
+export default function GraphComponent(): JSX.Element {
+  const [initGraph, setInitGraph] =
+    React.useState<GraphProps<string>>(setGraph());
 
-  function setGraph(): GraphProps<string> {
+  function setGraph(N = 3): GraphProps<string> {
+    // Generation of unique identifier
+    function generateUUIDs(): string[] {
+      const uuidArray: string[] = [];
+
+      for (let i = 0; i < N; i++) {
+        uuidArray.push(uuidv4());
+      }
+
+      return uuidArray;
+    }
+    const uniqueIds = generateUUIDs();
+
     // Display or hide the graph
     const updateDisplay = (): void => {
       setInitGraph((prevGraph) => {
@@ -197,21 +215,25 @@ function GraphComponent(): JSX.Element {
     };
     // Zoom In
     const updateZoomIn = (): void => {
-      setInitGraph((prevGraph) => {
+      setInitGraph((initGraph) => {
         return {
-          ...prevGraph,
-          zoom: prevGraph.zoom! + 1,
+          ...initGraph,
+          zoom: initGraph.zoom! + 1,
         };
       });
     };
     return {
-      nodes: [{ id: '0' }, { id: '1' }, { id: '2' }],
+      nodes: [
+        { id: uniqueIds[0], label: `Node: ${uniqueIds[0]}` },
+        { id: uniqueIds[1], label: `Node: ${uniqueIds[1]}` },
+        { id: uniqueIds[2], label: `Node: ${uniqueIds[2]}` },
+      ],
       edges: [
-        { fromNode: '0', toNode: '1' },
-        { fromNode: '1', toNode: '2' },
+        { fromNode: uniqueIds[0], toNode: uniqueIds[1] },
+        { fromNode: uniqueIds[1], toNode: uniqueIds[2] },
       ],
       selected: '0',
-      zoom: 1,
+      zoom: 2,
       layout: '2D',
       display: true,
       className: 'sandbox-item-graph',
