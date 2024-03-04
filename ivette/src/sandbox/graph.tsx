@@ -33,6 +33,7 @@ import { v4 as uuidv4 } from 'uuid';
 import './sandbox.css';
 import { registerSandbox } from 'ivette';
 import { Button } from 'dome/frame/toolbars';
+import { nodeDefault } from 'frama-c/plugins/dive/api';
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Specifications                                               --- */
@@ -121,30 +122,33 @@ export interface GraphProps<ID> {
 /* --- Graph Component                                                    --- */
 /* -------------------------------------------------------------------------- */
 
-export function Graph(props: GraphProps<string>): JSX.Element {
+export function Graph(props: {
+  graph: GraphProps<string>;
+  setInitGraph: React.Dispatch<React.SetStateAction<GraphProps<string>>>;
+}): JSX.Element {
   const fgRef2D = React.useRef<ForceGraphMethods2D | undefined>(undefined);
   const fgRef3D = React.useRef<ForceGraphMethods3D | undefined>(undefined);
   // const graph = props.mapGraph( props.nodes, props.edges);
   const graph = {
-    nodes: props.nodes.map((node) => {
+    nodes: props.graph.nodes.map((node) => {
       return { id: node.id, name: node.label };
     }),
-    links: props.edges.map((edge) => {
+    links: props.graph.edges.map((edge) => {
       return { source: edge.fromNode, target: edge.toNode };
     }),
   };
 
   // Zoom update on ForceGraph2D
   React.useEffect(() => {
-    fgRef2D.current?.zoom(props.zoom || 0);
+    fgRef2D.current?.zoom(props.graph.zoom || 0);
     // fgRef3D.current?.cameraPosition();
-  }, [props.zoom]);
+  }, [props.graph.zoom]);
 
   return (
-    <div className={props.className}>
-      {props.children}
-      {props.display ? (
-        props.layout === '2D' ? (
+    <div className={props.graph.className}>
+      {props.graph.children}
+      {props.graph.display ? (
+        props.graph.layout === '2D' ? (
           <ForceGraph2D
             ref={fgRef2D}
             graphData={graph}
@@ -157,7 +161,9 @@ export function Graph(props: GraphProps<string>): JSX.Element {
             d3VelocityDecay={1}
             dagLevelDistance={50}
             // Node selection
-            // onNodeClick={(node) => node.id}
+            onNodeClick={(node): void => {
+              props.setInitGraph({ ...props.graph, selected: String(node.id) });
+            }}
             nodeLabel={'name'}
             // eslint-disable-next-line no-console
             // onRenderFramePost={() => console.log('end draw')}
@@ -175,9 +181,15 @@ export function Graph(props: GraphProps<string>): JSX.Element {
 export default function GraphComponent(): JSX.Element {
   const [initGraph, setInitGraph] =
     React.useState<GraphProps<string>>(setGraph());
+  /*
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log(initGraph.selected);
+  }, [initGraph.selected]);
+  */
 
+  // Generation of unique identifier
   function setGraph(N = 3): GraphProps<string> {
-    // Generation of unique identifier
     function generateUUIDs(): string[] {
       const uuidArray: string[] = [];
 
@@ -249,7 +261,8 @@ export default function GraphComponent(): JSX.Element {
   }
   return (
     <>
-      <Graph {...initGraph} />
+      {/* <Graph {...initGraph} /> */}
+      <Graph graph={initGraph} setInitGraph={setInitGraph} />
     </>
   );
 }
