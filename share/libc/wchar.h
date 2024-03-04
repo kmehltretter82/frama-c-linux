@@ -267,6 +267,25 @@ extern wchar_t *fgetws(wchar_t * restrict ws, int n, FILE * restrict stream);
 */
 extern int wcscasecmp(const wchar_t *ws1, const wchar_t *ws2);
 
+/*@
+  requires valid_wstring: valid_read_wstring(ws);
+  allocates \result;
+  assigns \result \from indirect:ws[0..wcslen(ws)], indirect:__fc_heap_status;
+  behavior allocation:
+    assumes can_allocate: is_allocable(wcslen(ws));
+    assigns __fc_heap_status \from indirect:ws, __fc_heap_status;
+    assigns \result \from indirect:ws[0..wcslen(ws)], indirect:__fc_heap_status;
+    ensures allocation: \fresh(\result,wcslen(ws) * sizeof(wchar_t));
+    ensures result_valid_string_and_same_contents:
+      valid_wstring(\result) && wcscmp(\result,ws) == 0;
+  behavior no_allocation:
+    assumes cannot_allocate: !is_allocable(wcslen(ws));
+    assigns \result \from \nothing;
+    allocates \nothing;
+    ensures result_null: \result == \null;
+*/
+extern wchar_t *wcsdup(const wchar_t *ws);
+
 /* It is unclear whether these are more often in wchar.h or stdio.h */
 
 extern int fwprintf(FILE * stream, const wchar_t * format, ...);

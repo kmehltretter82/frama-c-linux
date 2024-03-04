@@ -90,6 +90,7 @@ let unsupported_specifications =
     "strerror", "string.c";
     "strndup", "string.c";
     "unsetenv", "stdlib.c";
+    "wcsdup", "wchar.c";
   ]
 
 let unsupported_specs_tbl =

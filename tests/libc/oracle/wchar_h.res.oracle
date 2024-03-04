@@ -192,6 +192,19 @@
 [eva] wchar_h.c:71: 
   function wcscasecmp: precondition 'valid_wstring_ws2' got status valid.
 [eva] Done for function wcscasecmp
+[eva] computing for function wcsdup <- main.
+  Called from wchar_h.c:73.
+[eva] using specification for function wcsdup
+[eva:libc:unsupported-spec] wchar_h.c:73: Warning: 
+  The specification of function 'wcsdup' is currently not supported by Eva.
+  Consider adding 'FRAMAC_SHARE/libc/wchar.c' to the analyzed source files.
+[eva] wchar_h.c:73: Warning: ignoring unsupported allocates clause
+[eva] wchar_h.c:73: 
+  function wcsdup: precondition 'valid_wstring' got status valid.
+[eva] Done for function wcsdup
+[eva] wchar_h.c:74: 
+  cannot evaluate ACSL term, unsupported ACSL construct: wide constant strings
+[eva:alarm] wchar_h.c:74: Warning: check got status unknown.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -209,4 +222,5 @@
        [10] ∈ {0} or UNINITIALIZED
        [11..19] ∈ [--..--] or UNINITIALIZED
   ir ∈ [--..--] or UNINITIALIZED
+  ws ∈ [--..--] or UNINITIALIZED
   __retres ∈ {0; 1}

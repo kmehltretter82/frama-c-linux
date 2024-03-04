@@ -69,5 +69,8 @@ int main() {
 
   int ir = wcscasecmp(L"\0", L"\0");
   ir = wcscasecmp(wsrc, L"\0");
+
+  wchar_t *ws = wcsdup(L"Wide thing"); // imprecise: allocates unsupported
+  //@ check wcslen(ws) == wcslen(L"Wide thing");
   return 0;
 }
