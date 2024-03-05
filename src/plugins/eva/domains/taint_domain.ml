@@ -315,8 +315,7 @@ module Domain = struct
   include QueriesTaint
 
   include (TransferTaint: Abstract_domain.Transfer
-           with type context := context
-            and type state := state
+           with type state := state
             and type value := value
             and type location := location
             and type origin := origin)

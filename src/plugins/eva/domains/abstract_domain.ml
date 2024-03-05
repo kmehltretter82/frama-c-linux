@@ -222,7 +222,6 @@ type ('value, 'location, 'origin) valuation =
 (** Transfer function of the domain. *)
 module type Transfer = sig
   type state
-  type context
   type value
   type location
   type origin
@@ -403,7 +402,6 @@ module type S = sig
   (** Transfer functions from the result of evaluations.
       See {!Eval} for more details about valuation. *)
   include Transfer with type state := t
-                    and type context := context
                     and type value := value
                     and type location := location
                     and type origin := origin
