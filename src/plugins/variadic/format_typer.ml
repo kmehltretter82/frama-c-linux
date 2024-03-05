@@ -65,7 +65,7 @@ let type_f_specifier ?find_typedef spec =
   | #float_specifier, Some `l -> Cil.doubleType
   | #float_specifier, Some `L -> Cil.longDoubleType
   | `c, None    -> Cil.intType
-  | `c, Some `l -> get_typedef ?find_typedef "wchar_t"
+  | `c, Some `l -> get_typedef ?find_typedef "wint_t"
   | `s, None    -> Cil.charPtrType
   | `s, Some `l -> ptr (get_typedef ?find_typedef "wchar_t")
   | `p, None    -> Cil.voidPtrType
