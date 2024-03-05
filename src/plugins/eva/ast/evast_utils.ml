@@ -51,10 +51,20 @@ let loc exp =
 
 (* --- Conversion to Cil --- *)
 
+module ConversionToCil =
+  State_builder.Hashtbl
+    (Evast_datatype.Exp.Hashtbl)
+    (Cil_datatype.Exp)
+    (struct
+      let name = "Value.Evast_utils.ConversionToCil"
+      let size = 16
+      let dependencies = [ Ast.self ]
+    end)
+
 let rec to_cil_exp exp =
   match exp.origin with
   | Exp e -> e
-  | _ -> build_cil_exp exp.node
+  | _ -> ConversionToCil.memo (fun e -> build_cil_exp e.node) exp
 
 and build_cil_exp node =
   let exp_node = match node with
