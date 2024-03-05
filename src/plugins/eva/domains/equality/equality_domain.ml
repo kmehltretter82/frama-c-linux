@@ -127,7 +127,7 @@ module Internal = struct
 
   let pretty fmt (eqs, _, _) = Equality.Set.pretty fmt eqs
 
-  let pretty_debug fmt (eqs, deps, modified) =
+  let _pretty_debug fmt (eqs, deps, modified) =
     Format.fprintf fmt
       "@[<v>@[<hov 2>Eqs: %a@]@.@[<hov 2>Deps: %a@]@.@[<hov 2>Changed: %a@]@]"
       Equality.Set.pretty eqs Deps.pretty deps
@@ -179,19 +179,20 @@ let project (t, _, _) = t
 module type Context = Abstract.Context.External
 module type Value = Abstract.Value.External
 
-module Make (Ctx : Context) (Value : Value with type context = Ctx.t) = struct
+module Make (Context : Context) (Value : Value with type context = Context.t) =
+struct
 
   include Internal
   include Store
 
   let get_cvalue = Value.get Main_values.CVal.key
 
-  type context = Ctx.t
+  type context = Context.t
   type value = Value.t
   type location = Precise_locs.precise_location
   type origin
 
-  let return_context _ = `Value Ctx.top
+  let return_context _ = `Value Context.top
 
   let reduce_further (equalities, _, _) expr value =
     let atom = HCE.of_exp expr in
