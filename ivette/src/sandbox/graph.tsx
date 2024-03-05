@@ -71,7 +71,6 @@ export type SelectionCallback = (node: string, evt: React.MouseEvent) => void;
 /* --- Graph Implementation                                               --- */
 /* -------------------------------------------------------------------------- */
 
-
 /* -------------------------------------------------------------------------- */
 /* --- Graph Component Properties                                         --- */
 /* -------------------------------------------------------------------------- */
@@ -79,7 +78,6 @@ export type SelectionCallback = (node: string, evt: React.MouseEvent) => void;
 export interface GraphProps {
   nodes: readonly Node[];
   edges: readonly Edge[];
-
 
   /**
      Element to focus on.
@@ -126,7 +124,6 @@ export function Graph(props: {
 }): JSX.Element {
   const fgRef2D = React.useRef<ForceGraphMethods2D | undefined>(undefined);
   const fgRef3D = React.useRef<ForceGraphMethods3D | undefined>(undefined);
-  // const graph = props.mapGraph( props.nodes, props.edges);
   const [graph2D, setGraph2D] = React.useState({
     nodes: props.graph.nodes.map((node) => {
       return { id: node.id, name: node.label };
@@ -136,17 +133,42 @@ export function Graph(props: {
     }),
   });
 
+  const graph2Dmemo = React.useMemo(() => {
+    return graph2D;
+  }, [graph2D]);
+
+  // Cancels the redraw when the canvas is moved
+  const fgRef2Dmemo = React.useMemo(() => {
+    return fgRef2D;
+  }, [fgRef2D]);
+
+  // add and remove node on ForceGraph2D
   React.useEffect(() => {
     setGraph2D((prevGraph) => {
-      return {
-        ...prevGraph,
-        nodes: props.graph.nodes.map((node) => {
-          return { id: node.id, name: node.label };
-        }),
-        links: props.graph.edges.map((edge) => {
-          return { source: edge.fromNode, target: edge.toNode };
-        }),
-      };
+      if (props.graph.nodes.length > prevGraph.nodes.length) {
+        const newNode = {
+          id: props.graph.nodes[props.graph.nodes.length - 1].id,
+          name: props.graph.nodes[props.graph.nodes.length - 1].label,
+        };
+        const fromNodeId = prevGraph.nodes[prevGraph.nodes.length - 1].id;
+        const newEdge = { source: fromNodeId, target: newNode.id };
+
+        return {
+          ...prevGraph,
+          nodes: [...prevGraph.nodes, newNode],
+          links: [...prevGraph.links, newEdge],
+        };
+      } else {
+        if (props.graph.nodes.length < prevGraph.nodes.length) {
+          return {
+            ...prevGraph,
+            nodes: prevGraph.nodes.slice(0, -1),
+            links: prevGraph.links.slice(0, -1),
+          };
+        } else {
+          return { nodes: prevGraph.nodes, links: prevGraph.links };
+        }
+      }
     });
   }, [props.graph.nodes, props.graph.edges]);
 
@@ -162,8 +184,8 @@ export function Graph(props: {
       {props.graph.display ? (
         props.graph.layout === '2D' ? (
           <ForceGraph2D
-            ref={fgRef2D}
-            graphData={graph2D}
+            ref={fgRef2Dmemo}
+            graphData={graph2Dmemo}
             // autoPauseRedraw performance optimization to automatically
             // pause redrawing the 2D canvas at every frame whenever
             // the simulation engine is halted
@@ -173,29 +195,43 @@ export function Graph(props: {
             d3VelocityDecay={1}
             dagLevelDistance={50}
             // Node selection
+
             onNodeClick={(node): void => {
               // change the selected value of GraphProps
               props.setInitGraph((prevGraph) => {
                 return { ...prevGraph, selected: String(node.id) };
               });
+              props.setInitGraph((prevGraph) => {
+                return {
+                  ...prevGraph,
+                  onSelection: (node, event) => {
+                    return { node, event };
+                  },
+                };
+              });
             }}
             onNodeDragEnd={(): void => {
+              // Change x and y value on node ForceGraph2D
               setGraph2D((prevGraph) => {
                 return { ...prevGraph };
               });
-              // change the x value and y value of GraphProps
+              // Change the x value and y value of GraphProps
               props.setInitGraph((prevGraph) => {
                 return { ...prevGraph };
               });
             }}
+
             nodeLabel={'name'}
-            // eslint-disable-next-line no-console
-            // onRenderFramePost={() => console.log('end draw')}
+            // minimum frame size to avoid overloading
+            cooldownTime={10}
+            onRenderFramePost={(): void => {
+              props.graph.onReady!();
+            }}
           />
         ) : (
           <ForceGraph3D
             ref={fgRef3D}
-            graphData={graph2D}
+            graphData={graph2Dmemo}
             // Sets the simulation alpha min parameter.
             d3AlphaDecay={1}
             d3VelocityDecay={1}
@@ -210,11 +246,10 @@ export function Graph(props: {
 }
 
 export default function GraphComponent(): JSX.Element {
-  const [initGraph, setInitGraph] =
-    React.useState<GraphProps>(setGraph());
-
-
-
+  const [initGraph, setInitGraph] = React.useState<GraphProps>(setGraph());
+  const initGraphMemo = React.useMemo(() => {
+    return initGraph;
+  }, [initGraph]);
   // Generation of unique identifier
   function setGraph(N = 3): GraphProps {
     function generateUUIDs(): string[] {
@@ -243,7 +278,7 @@ export default function GraphComponent(): JSX.Element {
         };
       });
     };
-    // Supp Node GraphProps
+    // Remove Node GraphProps
     const deleteNode = (): void => {
       setInitGraph((prevState) => ({
         ...prevState,
@@ -277,10 +312,10 @@ export default function GraphComponent(): JSX.Element {
     };
     // Zoom In
     const updateZoomIn = (): void => {
-      setInitGraph((initGraph) => {
+      setInitGraph((initGraphMemo) => {
         return {
-          ...initGraph,
-          zoom: initGraph.zoom! + 1,
+          ...initGraphMemo,
+          zoom: initGraphMemo.zoom! + 1,
         };
       });
     };
@@ -316,7 +351,7 @@ export default function GraphComponent(): JSX.Element {
   }
   return (
     <>
-      <Graph graph={initGraph} setInitGraph={setInitGraph} />
+      <Graph graph={initGraphMemo} setInitGraph={setInitGraph} />
     </>
   );
 }
