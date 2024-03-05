@@ -104,7 +104,7 @@ int __gen_e_acsl_f_sum(int x);
 */
 void __gen_e_acsl_over(__e_acsl_mpq_t *__retres_arg, double a, double b);
 
-/*@ logic integer signum(real x) = x > 0.? 1: (x < 0.? -1: 0);
+/*@ logic integer signum(real x) = x > 0. ? 1 : (x < 0. ? -1 : 0);
 
 */
 int __gen_e_acsl_signum_3(__e_acsl_mpq_t x);
@@ -582,7 +582,7 @@ int main(void)
   return __retres;
 }
 
-/*@ logic integer f4(integer x) = x == 0? 0: (f4(x - 1) < 1 << 99? 1: 2);
+/*@ logic integer f4(integer x) = x == 0 ? 0 : (f4(x - 1) < 1 << 99 ? 1 : 2);
 
 */
 void __gen_e_acsl_f4_2(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x);

@@ -140,7 +140,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "(\\let size = sizeof(char) * (((nmemb * size - 1) - 0) + 1);\n size <= 0? 0: size)\n<= 18446744073709551615";
+    __gen_e_acsl_assert_data_2.pred_txt = "(\\let size = sizeof(char) * (((nmemb * size - 1) - 0) + 1);\n size <= 0 ? 0 : size)\n<= 18446744073709551615";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_2.fct = "fread";
     __gen_e_acsl_assert_data_2.line = 395;
@@ -332,7 +332,7 @@ size_t __gen_e_acsl_fread(void * restrict ptr, size_t size, size_t nmemb,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2));
     __gen_e_acsl_assert_data_7.blocking = 1;
     __gen_e_acsl_assert_data_7.kind = "RTE";
-    __gen_e_acsl_assert_data_7.pred_txt = "(\\let size = sizeof(char) * (((\\result * \\old(size) - 1) - 0) + 1);\n size <= 0? 0: size)\n<= 18446744073709551615";
+    __gen_e_acsl_assert_data_7.pred_txt = "(\\let size = sizeof(char) * (((\\result * \\old(size) - 1) - 0) + 1);\n size <= 0 ? 0 : size)\n<= 18446744073709551615";
     __gen_e_acsl_assert_data_7.file = "FRAMAC_SHARE/libc/stdio.h";
     __gen_e_acsl_assert_data_7.fct = "fread";
     __gen_e_acsl_assert_data_7.line = 401;

@@ -14,7 +14,7 @@ predicate is_valid_int_range{L}(int *p, int n) =
 predicate S{L}(int *p) =
   \at(\let z = 0;
         *p ≡
-        (\let x = 0; ((\let y = z; x < y)? 1 + 2: (\let y = x; y)) + 2),
+        (\let x = 0; ((\let y = z; x < y) ? 1 + 2 : (\let y = x; y)) + 2),
       L);
  */
 /*@ axiomatic a {

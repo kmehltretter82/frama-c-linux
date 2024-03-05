@@ -390,11 +390,11 @@ int main(void)
     }
     e_acsl_end_loop4: ;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_5,
-                                 "\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= 6 ==> \\at((u > 0? n + k: u + v) > 0,K))",
+                                 "\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= 6 ==> \\at((u > 0 ? n + k : u + v) > 0,K))",
                                  0,__gen_e_acsl_exists_2);
     __gen_e_acsl_assert_data_5.blocking = 1;
     __gen_e_acsl_assert_data_5.kind = "Assertion";
-    __gen_e_acsl_assert_data_5.pred_txt = "\\let k = -7;\n\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= 6 ==> \\at((u > 0? n + k: u + v) > 0,K))";
+    __gen_e_acsl_assert_data_5.pred_txt = "\\let k = -7;\n\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= 6 ==> \\at((u > 0 ? n + k : u + v) > 0,K))";
     __gen_e_acsl_assert_data_5.file = "at_on-purely-logic-variables.c";
     __gen_e_acsl_assert_data_5.fct = "main";
     __gen_e_acsl_assert_data_5.line = 31;
@@ -405,7 +405,7 @@ int main(void)
   assert \let k = -7;
   \exists integer u;
     9 <= u < 21 &&
-    (\forall integer v; -5 < v <= 6 ==> \at((u > 0? n + k: u + v) > 0,K));
+    (\forall integer v; -5 < v <= 6 ==> \at((u > 0 ? n + k : u + v) > 0,K));
    */
   ;
   {
@@ -600,11 +600,11 @@ int main(void)
     }
     e_acsl_end_loop7: ;
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,
-                                 "\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= (u < 15? u + 6: 3) ==> \\at((n + u) + v,K) > 0)",
+                                 "\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v;\n     -5 < v <= (u < 15 ? u + 6 : 3) ==> \\at((n + u) + v,K) > 0)",
                                  0,__gen_e_acsl_exists_4);
     __gen_e_acsl_assert_data_11.blocking = 1;
     __gen_e_acsl_assert_data_11.kind = "Assertion";
-    __gen_e_acsl_assert_data_11.pred_txt = "\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v; -5 < v <= (u < 15? u + 6: 3) ==> \\at((n + u) + v,K) > 0)";
+    __gen_e_acsl_assert_data_11.pred_txt = "\\exists integer u;\n  9 <= u < 21 &&\n  (\\forall integer v;\n     -5 < v <= (u < 15 ? u + 6 : 3) ==> \\at((n + u) + v,K) > 0)";
     __gen_e_acsl_assert_data_11.file = "at_on-purely-logic-variables.c";
     __gen_e_acsl_assert_data_11.fct = "main";
     __gen_e_acsl_assert_data_11.line = 44;
@@ -616,7 +616,7 @@ int main(void)
   \exists integer u;
     9 <= u < 21 &&
     (\forall integer v;
-       -5 < v <= (u < 15? u + 6: 3) ==> \at((n + u) + v,K) > 0);
+       -5 < v <= (u < 15 ? u + 6 : 3) ==> \at((n + u) + v,K) > 0);
    */
   ;
   int t[5] = {9, 12, 12, 12, -4};

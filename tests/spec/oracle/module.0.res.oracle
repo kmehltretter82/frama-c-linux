@@ -8,7 +8,7 @@ module Foo {
   
   logic t op(t x, t y) ;
   
-  logic t opN(t x, ℤ n) = n ≥ 0? op(x, opN(x, n - 1)): e;
+  logic t opN(t x, ℤ n) = n ≥ 0 ? op(x, opN(x, n - 1)) : e;
   
   }
  */
@@ -21,7 +21,7 @@ module foo::bar {
   logic Foo::t inv(Foo::t x) ;
   
   logic Foo::t opN(Foo::t x, ℤ n) =
-    n ≥ 0? Foo::opN(x, n): opN(inv(x), -n);
+    n ≥ 0 ? Foo::opN(x, n) : opN(inv(x), -n);
   
   }
  */
@@ -34,7 +34,7 @@ module foo::jazz {
   logic Foo::t inv(Foo::t x) ;
   
   logic Foo::t opN(Foo::t x, ℤ n) =
-    n ≥ 0? opN(x, n): Foo::opN(inv(x), -n);
+    n ≥ 0 ? opN(x, n) : Foo::opN(inv(x), -n);
   
   }
  */

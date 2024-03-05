@@ -95,14 +95,15 @@ int main(void)
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"n",0,n);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
-    __gen_e_acsl_assert_data_2.pred_txt = "\\let m = n > 0? 4: 341;\n\\forall char u; 1 < u < m ==> u > 0";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\let m = n > 0 ? 4 : 341;\n\\forall char u; 1 < u < m ==> u > 0";
     __gen_e_acsl_assert_data_2.file = "issue69.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 10;
     __e_acsl_assert(__gen_e_acsl_forall_2,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
-  /*@ assert \let m = n > 0? 4: 341; \forall char u; 1 < u < m ==> u > 0; */
+  /*@ assert \let m = n > 0 ? 4 : 341; \forall char u; 1 < u < m ==> u > 0;
+   */
   ;
   __retres = 0;
   __e_acsl_memory_clean();
