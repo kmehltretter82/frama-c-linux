@@ -6205,9 +6205,9 @@ let combineTypesGen ?emitwith (combF : combineFunction)
       raise (Cannot_combine "different vararg specifiers");
     (* If one does not have arguments, believe the one with the
      * arguments *)
-    let newargs, olda' =
-      if oldargs = None then args, olda
-      else if args = None then oldargs, olda
+    let newargs =
+      if oldargs = None then args
+      else if args = None then oldargs
       else
         let (oldargslist, oldghostargslist) = argsToPairOfLists oldargs in
         let (argslist, ghostargslist) = argsToPairOfLists args in
@@ -6239,21 +6239,20 @@ let combineTypesGen ?emitwith (combF : combineFunction)
                   in
                   let a = addAttributes oa aa in
                   (n, t, a))
-               oldargslist argslist),
-          olda
+               oldargslist argslist)
     in
     (* Drop missingproto as soon as one of the type is a properly declared one*)
-    let olda =
+    let olda' =
       if not (hasAttribute "missingproto" a) then
-        dropAttribute "missingproto" olda'
-      else olda'
+        dropAttribute "missingproto" olda
+      else olda
     in
-    let a =
-      if not (hasAttribute "missingproto" olda') then
+    let a' =
+      if not (hasAttribute "missingproto" olda) then
         dropAttribute "missingproto" a
       else a
     in
-    TFun (newrt, newargs, oldva, combineAttributes what olda a)
+    TFun (newrt, newargs, oldva, combineAttributes what olda' a')
 
   | TBuiltin_va_list olda, TBuiltin_va_list a ->
     TBuiltin_va_list (combineAttributes what olda a)
