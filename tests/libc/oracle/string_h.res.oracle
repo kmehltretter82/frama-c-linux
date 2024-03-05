@@ -13,7 +13,7 @@
   function strcmp: precondition 'valid_string_s1' got status valid.
 [eva] string_h.c:5: 
   function strcmp: precondition 'valid_string_s2' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:156: 
+[eva] FRAMAC_SHARE/libc/string.h:174: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strcmp
 [eva:alarm] string_h.c:6: Warning: assertion got status unknown.
@@ -51,7 +51,7 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] string_h.c:24: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:245: 
+[eva] FRAMAC_SHARE/libc/string.h:263: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Done for function strstr
 [eva:alarm] string_h.c:25: Warning: assertion got status unknown.
@@ -342,7 +342,7 @@
 [eva] string_h.c:163: Call to builtin strchr
 [eva] string_h.c:163: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:181: 
+[eva] FRAMAC_SHARE/libc/string.h:199: 
   cannot evaluate ACSL term, unsupported logic var p
 [eva] computing for function strchrnul <- main.
   Called from string_h.c:164.
@@ -367,11 +367,42 @@
   function mempcpy: precondition 'valid_src' got status valid.
 [eva] string_h.c:169: 
   function mempcpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:114: 
+[eva] FRAMAC_SHARE/libc/string.h:132: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [kernel] string_h.c:169: Warning: using size of 'void'
 [eva] Done for function mempcpy
 [eva:alarm] string_h.c:170: Warning: assertion 'imprecise' got status unknown.
+[eva] string_h.c:172: Call to builtin strlen
+[eva] string_h.c:172: 
+  function strlen: precondition 'valid_string_s' got status valid.
+[eva] computing for function memrchr <- main.
+  Called from string_h.c:172.
+[eva] using specification for function memrchr
+[eva] string_h.c:172: function memrchr: precondition 'valid' got status valid.
+[eva] string_h.c:172: 
+  function memrchr: precondition 'initialization' got status valid.
+[eva] string_h.c:172: 
+  function memrchr: precondition 'danglingness' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:100: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function memchr
+[eva] FRAMAC_SHARE/libc/string.h:104: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function memchr
+[kernel] string_h.c:172: Warning: using size of 'void'
+[eva] Done for function memrchr
+[eva:alarm] string_h.c:173: Warning: check got status unknown.
+[eva] string_h.c:174: Call to builtin strlen
+[eva] string_h.c:174: 
+  function strlen: precondition 'valid_string_s' got status valid.
+[eva] computing for function memrchr <- main.
+  Called from string_h.c:174.
+[eva] string_h.c:174: function memrchr: precondition 'valid' got status valid.
+[eva] string_h.c:174: 
+  function memrchr: precondition 'initialization' got status valid.
+[eva] string_h.c:174: 
+  function memrchr: precondition 'danglingness' got status valid.
+[kernel] string_h.c:174: Warning: using size of 'void'
+[eva] Done for function memrchr
+[eva:alarm] string_h.c:175: Warning: check got status unknown.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -449,4 +480,5 @@
   pdest[0..8] ∈ [--..--] or UNINITIALIZED
        [9] ∈ UNINITIALIZED
   pend ∈ {{ &pdest[9] }}
+  rchr ∈ {{ NULL ; "haystack" + [--..--] }}
   __retres ∈ {0}

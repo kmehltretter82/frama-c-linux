@@ -88,6 +88,24 @@ extern int memcmp (const void *s1, const void *s2, size_t n);
 extern void *memchr(const void *s, int c, size_t n);
 
 // Non-POSIX; GNU extension
+// Note: these specifications are simplified w.r.t memchr's; in particular,
+// since we start searching from the end of the string, we assume the entire
+// string is valid, initialized, non-escaping, etc.
+/*@
+  requires valid: valid_read_or_empty(s, n);
+  requires initialization: \initialized(((unsigned char*)s)+(0 .. n - 1));
+  requires danglingness: non_escaping(s, n);
+  assigns \result \from s, indirect:c, indirect:((unsigned char*)s)[0..n-1];
+  behavior found:
+    assumes char_found: memchr((char*)s,c,n);
+    ensures result_same_base: \base_addr(\result) == \base_addr(s);
+    ensures result_points_to_same_base: \subset(\result, s+(0 .. n));
+  behavior not_found:
+    assumes char_not_found: !memchr((char*)s,c,n);
+    ensures result_null: \result == \null;
+  complete behaviors;
+  disjoint behaviors;
+*/
 extern void *memrchr(const void *s, int c, size_t n);
 
 // Copy memory

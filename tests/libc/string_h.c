@@ -168,5 +168,11 @@ int main(int argc, char **argv)
   char pdest[10];
   char *pend = mempcpy(pdest, "gnu-only function", 9);
   //@ assert imprecise: pend == pdest + 9 && *pend == '\0';
+
+  char *rchr = memrchr(c, 'a', strlen(c));
+  //@ check imprecise: rchr == c + strlen("haysta");
+  rchr = memrchr(c, 'n', strlen(c));
+  //@ check imprecise: rchr == \null;
+
   return 0;
 }
