@@ -443,6 +443,16 @@ let append_loop_labels env =
   Lenv.add_logic_label "LoopEntry" Logic_const.loop_entry_label
     (Lenv.add_logic_label "LoopCurrent" Logic_const.loop_current_label env)
 
+let builtin_label = function
+  | "Init" -> Some Init
+  | "Pre" -> Some Pre
+  | "Old" -> Some Old
+  | "Post" -> Some Post
+  | "Here" -> Some Here
+  | "LoopCurrent" -> Some LoopCurrent
+  | "LoopEntry" -> Some LoopEntry
+  | _ -> None
+
 let add_var var info env = Lenv.add_var var info env
 
 let add_result env typ =

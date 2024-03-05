@@ -674,6 +674,52 @@ let markReferenced ast =
  *
  **********************************************************************)
 
+(* Assumption: one can order logic labels according to their visibility.
+
+   The goal of this function is to minimize name clash when the program contains
+   C labels with a name that correspond to a builtin logic label. Parsing the
+   result should not lead to a program with a different semantics.
+   For example:                              [Here: Old: ;]
+   cannot be normalized into:                [Here: ;]
+   because it could change the semantics of: [//@ assert P{Old};]
+
+   The behavior is as follows:
+   - select a name without name clash if there is one,
+   - else, order preferencer by visibility: Post > Old > Loop* > Other
+
+   A difference in semantics can appear if:
+   - there are several builtin label names with different visibilities
+   - there is an assertion that uses one non-visible label from this list
+   - we select a visible label from the list
+
+   By selecting the less visible we guarantee that we do not change the
+   semantics: either the selected label was not visible, it is not more visible
+   now, or it was already visible and thus already masked during the typing
+   phase.
+*)
+
+let prefer ~new_label ~old_label =
+  old_label = "" ||
+  match Logic_typing.builtin_label old_label with
+  | None -> false (* the old label already has a good name *)
+  | Some l_over ->
+    match Logic_typing.builtin_label new_label with
+    | None -> true (* the old label is a builtin name, the new one is better *)
+    | Some l_label ->
+      (* Ok, from now, we only have choices that are not good :( let's try to
+         minimize name clashes ...
+      *)
+      match l_label, l_over with
+      (* only visible in function contracts *)
+      | Post, _ -> true | _, Post -> false
+      (* only visible in contracts *)
+      | Old, _ -> true  | _, Old -> false
+      (* only visible in annotations associated to a loop *)
+      | (LoopCurrent | LoopEntry), _ -> true
+      | _, (LoopCurrent | LoopEntry) -> false
+      (* ok, now we give up: anything else is visible in code annotations *)
+      | _ -> false
+
 (* We keep only one label, preferably one that was not introduced by CIL.
  * Scan a list of labels and return the data for the label that should be
  * kept, and the remaining filtered list of labels *)
@@ -689,12 +735,16 @@ let labelsToKeep is_removable ll =
             | true, ("", _) ->
               (* keep this one only if we have no label so far *)
               (ln, lab), false
-            | true, _ -> sofar, false
+            | true, _ ->
+              sofar, false
             | false, (_, lab') when is_removable lab' ->
               (* this is an original label; prefer it to temporary or
                * missing labels *)
               (ln, lab), false
-            | false, _ -> sofar, false
+            | false, (ln', _) when prefer ~new_label:ln ~old_label:ln' ->
+              (ln, lab), false
+            | false, _ ->
+              sofar, false
           end
       in
       let newlabel', rest' = loop newlabel rest in

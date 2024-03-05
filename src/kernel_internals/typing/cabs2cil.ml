@@ -2749,7 +2749,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
          prototypes. Logic specifications refer to the varinfo in this table. *)
       begin
         match vi.vtype with
-        | TFun (_, Some formals , _, _) ->
+        | TFun (_,Some formals , _, _ ) ->
           (try
              let old_formals_env = getFormalsDecl oldvi in
              List.iter2
@@ -2770,14 +2770,14 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                       old.vattr <- attr;
                     end;
                     match old.vlogic_var_assoc with
-                    | None -> ()
+                     | None -> ()
                     | Some old_lv -> old_lv.lv_name <- name
                   end)
                old_formals_env
                formals
            with Not_found -> Cil.setFormalsDecl oldvi vi.vtype)
         | _ -> ()
-      end;
+      end ;
       (* if [isadef] is true, [vi] is a definition.  *)
       if isadef then begin
         (* always favor the location of the definition.*)
@@ -8592,15 +8592,15 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
                   let<> UpdatedCurrentLoc = loc in
                   let loc = Current_loc.get () in
                   let res =
-                    try
-                      (* it can not have old behavior names, since this is the
-                         first time we see the declaration.
-                      *)
-                      Ltyping.funspec [] vi None vi.vtype spec
-                    with LogicTypeError ((source,_),msg) ->
-                      Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
-                        "%s. Ignoring specification of function %s" msg vi.vname;
-                      empty_funspec ()
+                  try
+                    (* it can not have old behavior names, since this is the
+                       first time we see the declaration.
+                    *)
+                    Ltyping.funspec [] vi None vi.vtype spec
+                  with LogicTypeError ((source,_),msg) ->
+                    Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
+                      "%s. Ignoring specification of function %s" msg vi.vname;
+                    empty_funspec ()
                   in
                   res, loc
                 end
@@ -10052,6 +10052,17 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     defaultChunk ~ghost loc' (doStatement local_env s)
   | Cabs.LABEL (l, s, loc) ->
     let loc' = convLoc loc in
+    Option.iter
+      begin fun label ->
+        let context = match label with
+          | Here | Pre | Init -> "annotations"
+          | LoopEntry | LoopCurrent -> "loop annotations"
+          | Old | Post -> "contracts"
+        in
+        Kernel.warning ~current:true
+          "%s is a builtin ACSL label, this C label is hidden in %s" l context
+      end
+      (Logic_typing.builtin_label l) ;
     add_label_env l;
     C_logic_env.add_current_label l;
     (* Lookup the label because it might have been locally defined *)

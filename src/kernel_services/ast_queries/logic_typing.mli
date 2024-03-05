@@ -280,6 +280,10 @@ val append_pre_label: Lenv.t -> Lenv.t
 *)
 val append_init_label: Lenv.t -> Lenv.t
 
+(** returns the builtin label corresponding to the given name if it exists
+    @since Frama-C+dev
+*)
+val builtin_label: string -> logic_builtin_label option
 
 (** adds a given variable in local environment. *)
 val add_var: string -> logic_var -> Lenv.t -> Lenv.t
