@@ -26,7 +26,7 @@ open Eval
 type 'value builtin = 'value list -> 'value or_bottom
 
 module type Value = sig
-  include Abstract_value.Leaf with type context = unit
+  include Abstract_value.Leaf
   val widen : t -> t -> t
   val track_variable: Cil_types.varinfo -> bool
   val pretty_debug: t Pretty_utils.formatter

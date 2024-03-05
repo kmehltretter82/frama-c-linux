@@ -49,7 +49,7 @@ module Static = struct
 end
 
 module Make
-    (Value: Abstract_value.S with type context = unit)
+    (Value: Abstract_value.S)
     (Loc: Abstract_location.S)
 = struct
 

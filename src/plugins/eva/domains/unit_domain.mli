@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 module Make
-    (Value: Abstract_value.S with type context = unit)
+    (Value: Abstract_value.S)
     (Loc: Abstract_location.S)
   : Abstract.Domain.Internal with type context = unit
                               and type state = unit
