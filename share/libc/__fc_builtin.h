@@ -24,6 +24,7 @@
 #define Frama_C_BUILTIN
 #include "features.h"
 __PUSH_FC_STDLIB
+#include "__fc_alloc_axiomatic.h"
 #include "__fc_define_size_t.h"
 
 __BEGIN_DECLS
@@ -192,6 +193,11 @@ __attribute__((FC_BUILTIN));
 /*@ assigns \result \from p; */
 extern size_t Frama_C_offset(const void *p) __attribute__((FC_BUILTIN));
 
+/*@
+  allocates \result;
+  assigns __fc_heap_status \from size, __fc_heap_status;
+  assigns \result \from indirect:size, indirect:__fc_heap_status;
+*/
 extern void *Frama_C_malloc_fresh(size_t size) __attribute__((FC_BUILTIN));
 
 //@ assigns \result \from i;

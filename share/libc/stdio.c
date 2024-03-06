@@ -44,6 +44,7 @@ FILE * __fc_stdin = &__fc_initial_stdin;
 // "rb+","r+b","wb+","w+b","ab+","a+b".
 /*@
   requires valid_mode: valid_read_string(mode);
+  assigns \result \from mode[0 .. strlen(mode)];
  */
 static bool is_valid_mode(char const *mode) {
   if (!(mode[0] != 'r' || mode[0] != 'w' || mode[0] != 'a')) return false;

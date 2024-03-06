@@ -130,6 +130,7 @@ unsigned long Frama_C_unsigned_long_interval(unsigned long min, unsigned long ma
   return r;
 }
 
+/*@ assigns \nothing; */
 extern void __builtin_abort(void) __attribute__((noreturn)); // GCC builtin
 
 void Frama_C_abort(void)

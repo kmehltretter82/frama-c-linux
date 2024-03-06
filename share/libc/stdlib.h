@@ -811,6 +811,10 @@ extern char *realpath(const char *restrict file_name,
 // This function may allocate memory for the result, which is not supported by
 // some plugins such as Eva. In such cases, it is preferable to use the stub
 // provided in stdlib.c.
+/*@
+  allocates \result;
+  assigns \result \from path[0 .. strlen(path)];
+ */
 extern char *canonicalize_file_name(const char *path);
 
 __END_DECLS
