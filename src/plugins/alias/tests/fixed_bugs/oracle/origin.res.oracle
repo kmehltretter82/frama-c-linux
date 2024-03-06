@@ -11,19 +11,19 @@
 [alias:unsafe-cast] origin.c:8: Warning: 
   unsafe cast from int * to char *; analysis may be unsound
 [alias] May-aliases after instruction  tmp = (void (*)(void))*((char *)(v.t));  are
-  { v[0..].t; tmp }
+  { v.t[0..]; tmp }
 [alias] May-alias graph after instruction  tmp = (void (*)(void))*((char *)(v.t));
   is    0:{ tmp } → 1:{ f }   4:{ v } -t→ 5:{  }   5:{  } → 0:{ tmp }
 [alias] analysing instruction: int g = (int)tmp;
 [alias:unsafe-cast] origin.c:8: Warning: 
   unsafe cast from void (*)(void) to int; analysis may be unsound
-[alias] May-aliases after instruction  int g = (int)tmp;  are  { v[0..].t; tmp }
+[alias] May-aliases after instruction  int g = (int)tmp;  are  { v.t[0..]; tmp }
 [alias] May-alias graph after instruction  int g = (int)tmp;  is
   0:{ tmp } → 1:{ f }   4:{ v } -t→ 5:{  }   5:{  } → 0:{ tmp }
-[alias] May-aliases at the end of function f: { v[0..].t; tmp }
+[alias] May-aliases at the end of function f: { v.t[0..]; tmp }
 [alias] May-alias graph at the end of function f:
   0:{ tmp } → 1:{ f }   4:{ v } -t→ 5:{  }   5:{  } → 0:{ tmp }
 [alias] Summary of function f:
   formals:     locals: g  tmp→{ f }    returns: <none>
-  state: { v[0..].t; tmp }
+  state: { v.t[0..]; tmp }
 [alias] Analysis complete

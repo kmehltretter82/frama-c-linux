@@ -171,14 +171,14 @@ module Readout = struct
             (fun e ->
                let pred_lvals = checking_for_cycles s visited @@ E.src e in
                let modify_lval lv = match E.label e with
-                 | Field f -> let lhost, o = lv in lhost, Field (f, o)
+                 | Field f -> Cil.addOffsetLval (Field (f, NoOffset)) lv
                  | Pointer ->
                    (* TODO: This Cil.typeOfLval may crash with a fatal kernel
                       error for certain reconstructed lvals involving a union
                       type. See tests/known_bugs/union_readback.c *)
                    let ty = Cil.typeOfLval lv in
                    if Cil.isArrayType ty then
-                     let lhost, o = lv in lhost, Index (Simplified.nul_exp, o)
+                     Cil.addOffsetLval (Index (Simplified.nul_exp, NoOffset)) lv
                    else
                      let () = if not @@ Cil.isPointerType ty then
                          Options.debug "unexpected type: %a" Printer.pp_typ ty
