@@ -24,12 +24,7 @@
 
 open Evast
 
-(** These functions are given here as a temporary stub and should not be used *)
-
-val origin_exp : exp -> Cil_types.exp
-val origin_lval : lval -> Cil_types.lval
-val origin_offset : offset -> Cil_types.offset
-val loc : exp -> Cil_types.location option
+(** Conversion to Cil *)
 
 val to_cil_exp : exp -> Cil_types.exp
 val to_cil_lval : lval -> Cil_types.lval
