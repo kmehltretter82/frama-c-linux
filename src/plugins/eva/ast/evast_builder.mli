@@ -27,7 +27,7 @@ val translate_lval: Cil_types.lval -> lval
 val translate_unop: Cil_types.unop -> unop
 val translate_binop: Cil_types.binop -> binop
 
-val mk: exp_node -> exp (* Does not assign origin. Should not be used. *)
+val mk_exp: exp_node -> exp (* Does not assign origin. Should not be used. *)
 val mk_lval: lval_node -> lval
 
 val zero: exp

@@ -286,9 +286,9 @@ let rec const_fold (exp: exp) : exp =
   | Const (CChr c) -> integer (Cil.charConstToInt c)
   | Const (CEnum {eival = v}) -> const_fold (translate_exp v)
   | Const (CReal _ | CString _ | CInt64 _) -> exp
-  | Lval lv -> mk (Lval (const_fold_lval lv))
-  | AddrOf lv -> mk (AddrOf (const_fold_lval lv))
-  | StartOf lv -> mk (StartOf (const_fold_lval lv))
+  | Lval lv -> mk_exp (Lval (const_fold_lval lv))
+  | AddrOf lv -> mk_exp (AddrOf (const_fold_lval lv))
+  | StartOf lv -> mk_exp (StartOf (const_fold_lval lv))
   | SizeOf (_, size_opt) | SizeOfE (_, size_opt) | SizeOfStr (_, size_opt)
   | AlignOf (_, size_opt) | AlignOfE (_, size_opt) ->
     begin match size_opt with
@@ -304,6 +304,7 @@ and const_fold_cast t e =
   let open Evast_builder in
   let e' = const_fold e in
   let t' = Cil.(type_remove_attributes_for_c_cast (unrollType t)) in
+  let default () = if e' == e then e else mk_exp (CastE (t, e')) in
   match e'.node, t' with
   (* integer -> integer *)
   | Const (CInt64 (i,_k,_)), (TInt (ik, a) | TEnum ({ekind = ik}, a))
@@ -316,9 +317,9 @@ and const_fold_cast t e =
         let i = Floating_point.truncate_to_integer f in
         if Cil.fitsInInt kind i
         then integer ~kind i
-        else mk (CastE (t, e'))
+        else default ()
       with Floating_point.Float_Non_representable_as_Int64 _ ->
-        mk (CastE (t, e'))
+        default ()
     end
   (* real -> float *)
   | Const (CReal (f,_,_)), TFloat (kind, a) when a = [] ->
@@ -327,13 +328,12 @@ and const_fold_cast t e =
   | Const (CInt64(i,_,_)), (TFloat (kind, a)) when a = [] ->
     let f = Integer.to_float i in
     float ~kind f
-  | _, _ ->
-    mk (CastE (t, e'))
+  | _, _ -> default ()
 
 and const_fold_unop op e t =
   let open Evast_builder in
   let e' = const_fold e in
-  let default () = if e' == e then e else mk (UnOp (op, e', t)) in
+  let default () = if e' == e then e else mk_exp (UnOp (op, e', t)) in
   match e'.node, Cil.unrollType t with
   (* Integer operations *)
   | Const (CInt64 (i,_ik,_repr)), (TInt (ik, _) | TEnum ({ekind=ik},_)) ->
@@ -350,7 +350,7 @@ and const_fold_unop op e t =
           | FFloat -> Floating_point.round_to_single_precision_float f
           | FDouble | FLongDouble -> f
         in
-        mk (Const (CReal(-.f,fk,None)))
+        mk_exp (Const (CReal(-.f,fk,None)))
       | _ -> default ()
     end
   (* No possible folding *)
@@ -361,7 +361,7 @@ and const_fold_binop op e1 e2 t =
   let open Evast_builder in
   let e1' = const_fold e1 in
   let e2' = const_fold e2 in
-  let default () = mk (BinOp (op, e1', e2', t)) in
+  let default () = mk_exp (BinOp (op, e1', e2', t)) in
   (* Can a shift operation be safely computed ? *)
   let shift_in_bounds i2 =
     try

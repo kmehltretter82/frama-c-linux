@@ -22,8 +22,6 @@
 
 open Evast
 
-type typ = Cil_types.typ
-
 let type_of_const : constant -> typ = function
   | CInt64 (_, ik, _) -> Cil_types.TInt (ik, [])
   | CChr _ -> Cil.intType
@@ -51,11 +49,11 @@ let type_of_lhost : lhost -> typ = function
   | Var vi -> vi.vtype
   | Mem addr -> Cil.typeOf_pointed addr.typ
 
-let type_of_lval (host, offset : lval_node) : typ =
+let type_of_lval_node (host, offset : lval_node) : typ =
   let basetyp = type_of_lhost host in
   type_of_offset basetyp offset
 
-let type_of_exp : exp_node -> typ = function
+let type_of_exp_node : exp_node -> typ = function
   | Const c -> type_of_const c
   | Lval lv -> Cil.type_remove_qualifier_attributes lv.typ
   | SizeOf _ | SizeOfE _ | SizeOfStr _ -> Cil.theMachine.typeOfSizeOf

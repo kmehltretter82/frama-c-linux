@@ -50,7 +50,7 @@ struct
 
   let rewrite_exp ~visitor exp =
     let replace_if condition node =
-      if condition then Evast_builder.mk node else exp
+      if condition then Evast_builder.mk_exp node else exp
     in
     match exp.node with
     | Lval lv ->

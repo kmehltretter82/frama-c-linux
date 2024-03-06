@@ -23,6 +23,8 @@
 open Evast
 
 module Typ = Cil_datatype.Typ
+module Varinfo = Cil_datatype.Varinfo
+
 
 (** Hashing functions  *)
 
@@ -30,7 +32,7 @@ let rec hash_lval lv =
   let (h,o) = lv.node in
   Hashtbl.hash (hash_lhost h, hash_offset o)
 and hash_lhost = function
-  | Var v -> Hashtbl.hash (1, Cil_datatype.Varinfo.hash v)
+  | Var v -> Hashtbl.hash (1, Varinfo.hash v)
   | Mem e -> Hashtbl.hash (2, hash_exp e)
 and hash_offset = function
   | NoOffset -> Hashtbl.hash (1, ())

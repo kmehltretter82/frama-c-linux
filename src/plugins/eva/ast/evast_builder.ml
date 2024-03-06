@@ -28,12 +28,12 @@ let value_or f x = function
   | Some v -> v
   | None -> f x
 
-let mk ?(origin=Built) ?typ node =
-  let typ = typ |> value_or Evast_typing.type_of_exp node in
+let mk_exp ?(origin=Built) ?typ node =
+  let typ = typ |> value_or Evast_typing.type_of_exp_node node in
   { node ; origin ; typ }
 
 let mk_lval ?(origin=Built) ?typ node =
-  let typ = typ |> value_or Evast_typing.type_of_lval node in
+  let typ = typ |> value_or Evast_typing.type_of_lval_node node in
   { node ; origin ; typ }
 
 
@@ -95,7 +95,7 @@ let rec translate_exp e =
     | Cil_types.AddrOf lval -> AddrOf (translate_lval lval)
     | Cil_types.StartOf lval -> StartOf (translate_lval lval)
   in
-  mk ~origin:(Exp e) node
+  mk_exp ~origin:(Exp e) node
 
 and translate_host = function
   | Cil_types.Var vi -> Var vi
@@ -123,7 +123,7 @@ let integer ?kind i = (* TODO: mathematical unbounded integer *)
       then Cil_types.IInt
       else Cil.intKindForValue i false
   in
-  mk (Const (CInt64 (i, kind, None)))
+  mk_exp (Const (CInt64 (i, kind, None)))
 
 let int ?kind i =
   integer ?kind (Integer.of_int i)
@@ -138,11 +138,11 @@ let float ~kind f =
     then Floating_point.round_to_single_precision_float f
     else f
   in
-  mk (Const (CReal(f,kind,None)))
+  mk_exp (Const (CReal(f,kind,None)))
 
 let cast typ exp =
   if Cil.need_cast exp.typ typ
-  then mk (CastE (Cil.type_remove_qualifier_attributes typ, exp))
+  then mk_exp (CastE (Cil.type_remove_qualifier_attributes typ, exp))
   else exp
 
 let binop op e1 e2 =
@@ -150,7 +150,7 @@ let binop op e1 e2 =
   match op with
   | PlusA | MinusA | Mult | Div ->
     let t = Cil.arithmeticConversion e1.typ e2.typ in
-    mk (BinOp (op,e1,e2,t))
+    mk_exp (BinOp (op,e1,e2,t))
 
   | Eq |Ne |Lt |Le |Ge |Gt ->
     let t =
@@ -161,7 +161,7 @@ let binop op e1 e2 =
       else
         invalid_arg "unsupported construction"
     in
-    mk (BinOp (op, cast t e1, cast t e2, Cil.intType))
+    mk_exp (BinOp (op, cast t e1, cast t e2, Cil.intType))
 
   | _ -> invalid_arg "unsupported construction"
 
@@ -169,10 +169,10 @@ let add = binop PlusA
 let eq = binop Eq
 let ne = binop Ne
 
-let addr lval = mk (AddrOf lval)
+let addr lval = mk_exp (AddrOf lval)
 
 let var vi = mk_lval (Var vi, NoOffset)
-let var_exp vi = mk (Lval (var vi))
+let var_exp vi = mk_exp (Lval (var vi))
 
 let lval lv = { lv with node=Lval lv }
 
@@ -181,13 +181,13 @@ let lval lv = { lv with node=Lval lv }
 
 let zero_typed (typ : Cil_types.typ) =
   match typ with
-  | TFloat (fk, _) -> mk (Const (CReal (0., fk, None)))
+  | TFloat (fk, _) -> mk_exp (Const (CReal (0., fk, None)))
   | TEnum ({ekind = ik },_)
-  | TInt (ik, _) -> mk (Const (CInt64 (Integer.zero, ik, None)))
+  | TInt (ik, _) -> mk_exp (Const (CInt64 (Integer.zero, ik, None)))
   | TPtr _ ->
     let ik = Cil.(theMachine.upointKind) in
-    let zero = mk (Const (CInt64 (Integer.zero, ik, None))) in
-    mk (CastE (Cil.type_remove_qualifier_attributes typ, zero))
+    let zero = mk_exp (Const (CInt64 (Integer.zero, ik, None))) in
+    mk_exp (CastE (Cil.type_remove_qualifier_attributes typ, zero))
   | typ ->
     Self.fatal ~current:true "non-scalar type %a" Printer.pp_typ typ
 
@@ -209,14 +209,14 @@ let rec normalize_condition exp positive =
   | BinOp ((Le|Ne|Eq|Gt|Lt|Ge as binop), e1, e2, typ) ->
     if positive
     then exp
-    else mk (BinOp (invert_relation binop, e1, e2, typ))
+    else mk_exp (BinOp (invert_relation binop, e1, e2, typ))
   | _ ->
     let op = if positive then Ne else Eq in
     let typ = Cil.unrollType exp.typ in
-    mk (BinOp (op, zero_typed typ, exp, Cil.intType))
+    mk_exp (BinOp (op, zero_typed typ, exp, Cil.intType))
 
 
 (* --- Hide mk optional paremeters --- *)
 
-let mk = mk ~origin:Built ?typ:None
+let mk_exp = mk_exp ~origin:Built ?typ:None
 let mk_lval = mk_lval ~origin:Built ?typ:None
