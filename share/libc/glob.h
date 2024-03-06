@@ -26,6 +26,7 @@
 __PUSH_FC_STDLIB
 
 #include "__fc_machdep.h"
+#include "__fc_string_axiomatic.h"
 
 #define	GLOB_ERR	(1 << 0)/* Return on read errors.  */
 #define	GLOB_MARK	(1 << 1)/* Append a slash to each name.  */
@@ -67,10 +68,17 @@ typedef struct __fc_glob_t {
 #endif
 } glob_t;
 
+/*@
+  assigns \result, *pglob \from indirect:pattern[0 .. strlen(pattern)],
+                                indirect:flags, indirect:errfunc;
+*/
 extern int glob(const char *pattern, int flags,
                 int (*errfunc) (const char *epath, int eerrno),
                 glob_t *pglob);
 
+/*@
+  assigns *pglob \from *pglob;
+ */
 extern void globfree(glob_t *pglob);
 
 __END_DECLS
