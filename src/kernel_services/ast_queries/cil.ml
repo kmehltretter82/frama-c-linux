@@ -401,6 +401,8 @@ let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
 
 let fc_internal_attributes = ["declspec"; "arraylen"; "fc_stdlib"]
 
+let cast_irrelevant_attributes = ["visibility"]
+
 let filter_qualifier_attributes al =
   List.filter
     (fun a -> List.mem (attributeName a) qualifier_attributes) al
@@ -5020,14 +5022,20 @@ let spare_attributes_for_c_cast =
   fc_internal_attributes @ qualifier_attributes
 
 let type_remove_attributes_for_c_cast t =
-  let t = typeRemoveAttributesDeep fc_internal_attributes t in
+  let attributes_to_remove =
+    fc_internal_attributes @ cast_irrelevant_attributes
+  in
+  let t = typeRemoveAttributesDeep attributes_to_remove t in
   typeRemoveAttributes spare_attributes_for_c_cast t
 
 let spare_attributes_for_logic_cast =
   spare_attributes_for_c_cast
 
 let type_remove_attributes_for_logic_type t =
-  let t = typeRemoveAttributesDeep fc_internal_attributes t in
+  let attributes_to_remove =
+    fc_internal_attributes @ cast_irrelevant_attributes
+  in
+  let t = typeRemoveAttributesDeep attributes_to_remove t in
   typeRemoveAttributes spare_attributes_for_logic_cast t
 
 let () = Cil_datatype.drop_non_logic_attributes :=
