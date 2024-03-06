@@ -400,7 +400,7 @@ if proc.returncode == 0:
         macro_var = macro.group(1)
         macro_val = macro.group(2)
         # Python >= 3.7: dict is guaranteed to preserve insertion order
-        dict[macro_var] = macro_val
+        custom[macro_var] = macro_val
     machdep["custom_defs"] = custom
 else:
     logging.warning(f"could not determine predefined macros. compiler output is:\n{proc.stderr}")
