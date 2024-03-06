@@ -731,13 +731,13 @@ let format_fun_call ~builder env format_fun vf args =
   let tvparams =
     try
       Format_typer.type_format ~find_typedef format
-    with Format_typer.Type_not_found type_name ->
+    with Format_typer.Type_not_found (type_name) ->
       Self.warning ~current:true
         "Unable to find type %s in the source code which should be used in \
          this call:@ no specification will be generated.@ \
          Note that due to cleanup, the type may have been defined in the \
-         original code but not used anywhere."
-        type_name;
+         original code but not used anywhere.@.\
+         Did you include <stdint.h> ?" type_name;
       raise (Translate_call_exn vf.vf_decl)
   in
 
