@@ -491,10 +491,11 @@ let start_with_frama_c_builtin n =
    is_domain_show_each_builtin n ||
    is_dump_file_builtin n)
 
+let () = Cil_builtins.add_special_builtin_family start_with_frama_c_builtin
+
 let is_frama_c_builtin v =
   Cil_builtins.has_fc_builtin_attr v || start_with_frama_c_builtin v.vname
 
-let () = Cil_builtins.add_special_builtin_family start_with_frama_c_builtin
 
 (*
 Local Variables:
