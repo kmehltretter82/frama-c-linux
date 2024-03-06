@@ -62,7 +62,7 @@ val is_builtin: varinfo -> bool
     @since Fluorine-20130401 *)
 
 val has_fc_builtin_attr: varinfo -> bool
-(** @return true if the given variable refers to a Frama-C builtin.
+(** @return true if the given variable has a FC_BUILTIN attribute
     @since Frama-C+dev *)
 
 val is_unused_builtin: varinfo -> bool
