@@ -428,6 +428,44 @@ internal-nightly:
   only:
     - schedules
 
+# Linux ARM & MacOS
+
+.build_template: &additional_arch_template
+  stage: compatibility
+  script:
+    - opam switch create --empty .
+    - eval $(opam env --switch=. --set-switch)
+    # Note: we use this to get an exact version corresponding to a minor version
+    - opam pin add ocaml $(grep $OCAML nix/ocaml-versions.txt) -n
+    - opam install . --deps-only --with-test -y
+    - dune build --display short --error-reporting=twice @install
+    - dune exec -- frama-c-ptests tests src/plugins/*/tests
+    - dune build --display short @ptests_config
+  timeout: 2h
+  tags:
+    - ${ARCH}
+
+additional_arch:
+  <<: *additional_arch_template
+  <<: *manual_when_not_special_pipeline
+  parallel:
+    matrix:
+      - ARCH: [linux-arm, macos-x86, macos-arm]
+
+additional_arch_nightly:
+  <<: *additional_arch_template
+  <<: *when_publish
+  parallel:
+    matrix:
+      - ARCH: [linux-arm, macos-x86, macos-arm]
+
+additional_arch_release:
+  <<: *additional_arch_template
+  <<: *when_release
+  parallel:
+    matrix:
+      - ARCH: [linux-arm, macos-x86, macos-arm]
+
 # OCaml versions
 
 .build_template: &ocaml_always_additional_versions_template
