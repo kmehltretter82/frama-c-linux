@@ -89,8 +89,12 @@ val deps_of_lval: (lval -> Precise_locs.precise_location) -> lval -> Deps.t
 (** Given a function computing the location of lvalues, computes the memory
     dependencies of an lvalue. *)
 
-(** Constant folding. *)
+(** Constant conversion and folding. *)
 
+val to_integer : exp -> Integer.t option
+val to_float : exp -> float option
+val is_zero : exp -> bool
+val is_zero_ptr : exp -> bool
 val const_fold: exp -> exp
 val fold_to_integer: exp -> Integer.t option
 

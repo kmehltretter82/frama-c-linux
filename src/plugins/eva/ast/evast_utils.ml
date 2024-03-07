@@ -35,6 +35,12 @@ module ConversionToCil =
       let dependencies = [ Ast.self ]
     end)
 
+let undefined_location =
+  let l = { Cil_datatype.Position.unknown with
+            Filepath.pos_path = Datatype.Filepath.of_string "__eva__" }
+  in
+  l, l
+
 let rec to_cil_exp exp =
   match exp.origin with
   | Exp e -> e
@@ -56,7 +62,7 @@ and build_cil_exp node =
     | AddrOf (lv) -> AddrOf (to_cil_lval lv)
     | StartOf (lv) -> StartOf (to_cil_lval lv)
   in
-  Cil.new_exp ~loc:Cil_datatype.Location.unknown exp_node
+  Cil.new_exp ~loc:undefined_location exp_node
 
 and to_cil_unop op =
   match op with
@@ -242,6 +248,7 @@ and zone_of_lhost find_loc = function
   | Var _ -> Locations.Zone.bottom
   | Mem e -> zone_of_exp find_loc e
 
+
 (* Computation of the inputs of an offset. *)
 and zone_of_offset find_loc = function
   | NoOffset -> Locations.Zone.bottom
@@ -249,6 +256,31 @@ and zone_of_offset find_loc = function
   | Index (e, o) ->
     Locations.Zone.join
       (zone_of_exp find_loc e) (zone_of_offset find_loc o)
+
+let rec to_integer e =
+  match e.node with
+  | Const (CInt64 (n,_,_)) -> Some n
+  | Const (CChr c) -> Some (Cil.charConstToInt c)
+  | Const (CEnum {eival = v}) -> Cil.isInteger v
+  | CastE (typ, e) when Cil.isPointerType typ ->
+    begin match to_integer e with
+      | Some i as r when Cil.fitsInInt Cil.theMachine.upointKind i -> r
+      | _ -> None
+    end
+  | _ -> None
+
+let to_float e =
+  match e.node with
+  | Const (CReal (f,_,_)) -> Some f
+  | _ -> None
+
+let is_zero exp =
+  match to_integer exp with
+  | None -> false
+  | Some i -> Integer.is_zero i
+
+let is_zero_ptr exp =
+  is_zero exp && Cil.isPointerType exp.typ
 
 
 (* Constant folding *)
@@ -443,25 +475,8 @@ and const_fold_offset = function
   | Field (fi, offset) -> Field (fi, const_fold_offset offset)
   | Index (exp, offset) -> Index (const_fold exp, const_fold_offset offset)
 
-and to_integer e =
-  match e.node with
-  | Const (CInt64 (n,_,_)) -> Some n
-  | Const (CChr c) -> Some (Cil.charConstToInt c)
-  | Const (CEnum {eival = v}) -> Cil.isInteger v
-  | CastE (typ, e) when Cil.isPointerType typ ->
-    begin match to_integer e with
-      | Some i as r when Cil.fitsInInt Cil.theMachine.upointKind i -> r
-      | _ -> None
-    end
-  | _ -> None
-
-and to_float e =
-  match e.node with
-  | Const (CReal (f,_,_)) -> Some f
-  | _ -> None
-
-let fold_to_integer e =
-  to_integer (const_fold e)
+let fold_to_integer exp =
+  to_integer (const_fold exp)
 
 
 (* --- Offsets --- *)
