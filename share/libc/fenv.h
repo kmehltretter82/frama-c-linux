@@ -73,35 +73,71 @@ typedef struct __fc_fenv_t
   }
 fenv_t;
 
-/** Determines which of a specified subset of the floating-point exception flags
- *  are currently set.
- *  \param excepts  Specifies the floating-point status flags to be queried.
- *  \return  The value of the bitwise OR of the floating-point exception macros
- *    corresponding to the currently set floating-point exceptions included in
- *    parameter excepts.
- */
-extern int fetestexcept( int excepts );
+// From POSIX 1-2017:
+// - "fexcept_t does not have to be an integer type."
+// - "... the user cannot inspect it."
+typedef unsigned int fexcept_t;
 
-/** Saves the current floating-point environment in the object pointed to by
- *  envp, clears the floating-point status flags, and then installs a non-stop
- *  (continue on floating-point exceptions) mode for all floating-point
- *  exceptions.
- *  \return Always returns zero.
- */
-extern int feholdexcept( fenv_t *envp );
+__FC_EXTERN volatile fenv_t __fc_fenv_state;
 
-/** Establishes the floating-point environment represented by the object pointed
- *  to by envp. The argument envp shall point to a valid floating-point
- *  environment object.
- *  In principle, this function has the potential to trigger pending previous
- *  exceptions: If envp contains a raised exception flag and at the same time
- *  unmasks that exception type, then this will cause an interrupt.
- */
-extern int fesetenv( const fenv_t *envp );
+/*@
+  assigns __fc_fenv_state \from indirect:excepts, __fc_fenv_state;
+  assigns \result \from indirect:__fc_fenv_state, indirect:excepts;
+*/
+extern int feclearexcept(int excepts);
 
-/** Clears the supported floating-point exceptions represented by argument. 
- */
-extern int feclearexcept( int excepts );
+/*@
+  assigns *envp \from __fc_fenv_state;
+  assigns \result \from indirect:__fc_fenv_state;
+*/
+extern int fegetenv(fenv_t *envp);
+
+/*@
+  assigns *flagp \from __fc_fenv_state, excepts;
+  assigns \result \from indirect:__fc_fenv_state, indirect:excepts;
+*/
+extern int fegetexceptflag(fexcept_t *flagp, int excepts);
+
+/*@ assigns \result \from __fc_fenv_state; */
+extern int fegetround(void);
+
+/*@
+  assigns *envp \from __fc_fenv_state;
+  assigns \result \from indirect:__fc_fenv_state;
+*/
+extern int feholdexcept(fenv_t *envp);
+
+/*@ assigns \result \from indirect:__fc_fenv_state, indirect:excepts; */
+extern int feraiseexcept(int excepts);
+
+/*@
+  assigns __fc_fenv_state \from *envp;
+  assigns \result \from indirect:__fc_fenv_state, indirect:*envp;
+*/
+extern int fesetenv(const fenv_t *envp);
+
+/*@
+  assigns __fc_fenv_state \from *flagp, excepts;
+  assigns \result \from indirect:__fc_fenv_state, indirect:*flagp,
+                        indirect:excepts;
+*/
+extern int fesetexceptflag(const fexcept_t *flagp, int excepts);
+
+/*@
+  assigns __fc_fenv_state \from indirect:__fc_fenv_state, indirect:round;
+  assigns \result \from indirect:__fc_fenv_state, indirect:round;
+*/
+extern int fesetround(int round);
+
+/*@ assigns \result \from indirect:excepts, __fc_fenv_state; */
+extern int fetestexcept(int excepts);
+
+/*@
+  assigns __fc_fenv_state \from __fc_fenv_state, *envp;
+  assigns \result \from indirect:__fc_fenv_state, indirect:*envp;
+*/
+extern int feupdateenv(const fenv_t *envp);
+
 
 __END_DECLS
 
