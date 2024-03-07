@@ -18,6 +18,7 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-*   Variadic [2024-03-07] Make sure that generated functions have fresh names
 o!   Kernel   [2024-03-07] More coherent naming of functions determining if a
                            symbol is a Frama-C built-in.
 -*   Kernel   [2024-03-04] Accept conditional expr whose 2d and 3d operands
