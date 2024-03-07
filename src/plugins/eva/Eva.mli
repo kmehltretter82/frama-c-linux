@@ -571,6 +571,7 @@ module Eva_annotations: sig
 
   type split_kind = Static | Dynamic
 
+  (** Splits can be performed according to a C expression or an ACSL predicate. *)
   type split_term =
     | Expression of Cil_types.exp
     | Predicate of Cil_types.predicate
