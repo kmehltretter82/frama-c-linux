@@ -200,7 +200,7 @@ let translate_variadics (file : file) =
             try
               f ~builder args
             with Standard.Translate_call_exn callee ->
-              Standard.fallback_fun_call ~callee ~builder vf args
+              Standard.fallback_fun_call ~callee ~builder env vf args
         in
         match vf.vf_class with
         | Overload o -> cover_failure (Standard.overloaded_call o vf)

@@ -34,3 +34,6 @@ val find_struct : t -> string ->  Cil_types.compinfo
 val find_union : t -> string ->  Cil_types.compinfo
 val find_enum : t -> string ->  Cil_types.enuminfo
 val find_type : t -> Logic_typing.type_namespace -> string -> Cil_types.typ
+
+val mem_global : t -> string -> bool
+val mem_function : t -> string -> bool

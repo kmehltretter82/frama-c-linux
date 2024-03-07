@@ -51,12 +51,12 @@ int printf_va_1(char const * restrict format);
       \from (indirect: __fc_stdout->__fc_FILE_id),
             __fc_stdout->__fc_FILE_data, (indirect: *(format + (0 ..)));
  */
-int printf_va_1(char const * restrict format);
+int printf_va_2(char const * restrict format);
 
 int main(void)
 {
   int __retres;
-  printf(""); /* printf_va_1 */
+  printf(""); /* printf_va_2 */
   __retres = 0;
   return __retres;
 }
