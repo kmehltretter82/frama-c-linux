@@ -26,6 +26,7 @@
 #include "string.h"
 __PUSH_FC_STDLIB
 
+/*@ assigns \nothing; */
 void __fc_atomic_init_marker(void *obj, unsigned long long value) {}
 
 void atomic_thread_fence(memory_order order) {}

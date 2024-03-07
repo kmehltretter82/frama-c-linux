@@ -581,7 +581,7 @@ extern int pclose(FILE *stream);
 // This file may be included by non-POSIX machdeps, which do not define
 // ssize_t, so we must check it
 #ifdef __FC_POSIX_VERSION
-// No specification given; include "stdio.c" to use Frama-C's implementation
+/*@ assigns (*lineptr)[0 .. *n-1], *n, *stream, \result \from *stream; */
 ssize_t getline(char **lineptr, size_t *n, FILE *stream);
 #endif
 

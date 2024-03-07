@@ -178,7 +178,12 @@ extern int getaddrinfo(
   struct addrinfo **restrict res);
 
 extern struct hostent *gethostbyaddr(const void *, socklen_t, int);
-extern struct hostent *gethostbyname(const char *);
+
+/*@
+  assigns \result, *\result \from name[0 .. strlen(name)];
+*/
+extern struct hostent *gethostbyname(const char *name);
+
 extern struct hostent *gethostent(void);
 extern int getnameinfo(const struct sockaddr *restrict, socklen_t,
  char *restrict, socklen_t, char *restrict,

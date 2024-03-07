@@ -80,6 +80,10 @@ char *__fc_env[ARG_MAX];
 #define __FC_INITENV_LEN 64
 static char __fc_env_strings[__FC_INITENV_LEN];
 
+/*@
+  assigns __fc_env_strings[0 .. __FC_INITENV_LEN-1], __fc_env[0 .. ARG_MAX - 1]
+    \from Frama_C_entropy_source;
+*/
 static void __fc_initenv() {
   static char init;
   if (!init) {
