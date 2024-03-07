@@ -100,40 +100,8 @@ val postconditions_mention_result: Cil_types.funspec -> bool
 val conv_comp: binop -> Abstract_interp.Comp.t
 val conv_relation: relation -> Abstract_interp.Comp.t
 
-val normalize_as_cond: exp -> bool -> exp
-(** [normalize_as_cond e positive] returns the expression corresponding to
-    [e != 0] when [positive] is true, and [e == 0] otherwise. The
-    resulting expression will always have a comparison operation at its
-    root. *)
-
-val is_value_zero: exp -> bool
-(** Return [true] iff the argument has been created by {!normalize_as_cond} *)
-
 val lval_to_exp: lval -> exp
 (** This function is memoized to avoid creating too many expressions *)
-
-
-(** Dependences of expressions and lvalues. *)
-
-val zone_of_expr:
-  (lval -> Precise_locs.precise_location) -> exp -> Locations.Zone.t
-(** Given a function computing the location of lvalues, computes the memory zone
-    on which the value of an expression depends. *)
-
-val indirect_zone_of_lval:
-  (lval -> Precise_locs.precise_location) -> lval -> Locations.Zone.t
-(** Given a function computing the location of lvalues, computes the memory zone
-    on which the offset and the pointer expression (if any) of an lvalue depend.
-*)
-
-val deps_of_expr:
-  (lval -> Precise_locs.precise_location) -> exp -> Deps.t
-(** Given a function computing the location of lvalues, computes the memory
-    dependencies of an expression. *)
-
-val deps_of_lval: (lval -> Precise_locs.precise_location) -> lval -> Deps.t
-(** Given a function computing the location of lvalues, computes the memory
-    dependencies of an lvalue. *)
 
 (** Computes the height of an expression, that is the maximum number of nested
     operations in this expression. *)

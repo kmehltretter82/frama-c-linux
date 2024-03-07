@@ -57,3 +57,7 @@ val var_exp: Cil_types.varinfo -> exp
 val lval: lval -> exp
 
 val normalize_condition: exp -> bool -> exp
+(** [normalize_condition e positive] returns the expression corresponding to
+    [e != 0] when [positive] is true, and [e == 0] otherwise. The
+    resulting expression will always have a comparison operation at its
+    root. *)
