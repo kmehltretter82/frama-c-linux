@@ -681,8 +681,6 @@ let cfun_spec env kf =
 
 let cfun kf =
   let env = mk_ctx () in
-  (* Skipping frama-c builtins?
-     if not (Cil_builtins.is_builtin (Kernel_function.get_vi kf)) then *)
   begin
     if Kernel_function.is_definition kf then cfun_code env kf ;
     cfun_spec env kf
@@ -915,7 +913,7 @@ let dump () =
       in Format.fprintf fmt "@[<hv 0>Init:@ %a@]@." E.pretty a_init ;
       KFmap.iter (fun kf m ->
           (* Do not dump results for frama-c builtins *)
-          if not (Cil_builtins.is_builtin (Kernel_function.get_vi kf)) then
+          if not (Cil_builtins.has_fc_builtin_attr (Kernel_function.get_vi kf)) then
             Format.fprintf fmt "@[<hv 0>Function %a:@ %a@]@."
               Kernel_function.pretty kf E.pretty m ;
         ) a_usage;

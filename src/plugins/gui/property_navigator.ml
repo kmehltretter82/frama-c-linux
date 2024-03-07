@@ -43,7 +43,7 @@ let all_properties () =
        match Property.get_kf ip with
        | None -> globals := Property.Set.add ip !globals
        | Some kf ->
-         if not (Ast_info.is_frama_c_builtin (Kernel_function.get_name kf))
+         if not (Ast_info.start_with_frama_c_builtin (Kernel_function.get_name kf))
          then try
              let fips = Kernel_function.Map.find kf !functions in
              fips := Property.Set.add ip !fips

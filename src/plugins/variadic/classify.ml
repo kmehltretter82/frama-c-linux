@@ -111,7 +111,7 @@ let mk_format_fun vi f_kind f_buffer ~format_pos =
 (* ************************************************************************ *)
 
 let is_frama_c_builtin name =
-  Ast_info.is_frama_c_builtin name ||
+  Ast_info.start_with_frama_c_builtin name ||
   Cil_builtins.Builtin_functions.mem name ||
   String.starts_with ~prefix:"__FRAMAC_" name (* Mthread prefixes *)
 

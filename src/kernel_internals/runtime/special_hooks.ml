@@ -277,7 +277,7 @@ let warn_if_another_compiler_builtin name =
    depends on Ast_info *)
 let on_call_to_undeclared_function vi =
   let name = vi.Cil_types.vname in
-  if not (Ast_info.is_frama_c_builtin name) then begin
+  if not (Ast_info.start_with_frama_c_builtin name) then begin
     if not (warn_if_another_compiler_builtin name) then
       Kernel.warning ~wkey:Kernel.wkey_implicit_function_declaration
         ~current:true ~once:true
