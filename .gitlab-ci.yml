@@ -445,21 +445,21 @@ internal-nightly:
   tags:
     - ${ARCH}
 
-additional_arch:
+additional-arch:
   <<: *additional_arch_template
   <<: *manual_when_not_special_pipeline
   parallel:
     matrix:
       - ARCH: [linux-arm, macos-x86, macos-arm]
 
-additional_arch_nightly:
+additional-arch-nightly:
   <<: *additional_arch_template
   <<: *when_publish
   parallel:
     matrix:
       - ARCH: [linux-arm, macos-x86, macos-arm]
 
-additional_arch_release:
+additional-arch-release:
   <<: *additional_arch_template
   <<: *when_release
   parallel:
