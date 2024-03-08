@@ -133,15 +133,6 @@ export function Graph(props: {
     }),
   });
 
-  const graph2Dmemo = React.useMemo(() => {
-    return graph2D;
-  }, [graph2D]);
-
-  // Cancels the redraw when the canvas is moved
-  const fgRef2Dmemo = React.useMemo(() => {
-    return fgRef2D;
-  }, [fgRef2D]);
-
   // add and remove node on ForceGraph2D
   React.useEffect(() => {
     setGraph2D((prevGraph) => {
@@ -184,8 +175,8 @@ export function Graph(props: {
       {props.graph.display ? (
         props.graph.layout === '2D' ? (
           <ForceGraph2D
-            ref={fgRef2Dmemo}
-            graphData={graph2Dmemo}
+            ref={fgRef2D}
+            graphData={graph2D}
             // autoPauseRedraw performance optimization to automatically
             // pause redrawing the 2D canvas at every frame whenever
             // the simulation engine is halted
@@ -215,10 +206,9 @@ export function Graph(props: {
                 return { ...prevGraph };
               });
             }}
-
             nodeLabel={'name'}
             // minimum frame size to avoid overloading
-            cooldownTime={10}
+            cooldownTime={1}
             onRenderFramePost={(): void => {
               if (props.graph.onReady) {
                 props.graph.onReady();
@@ -228,7 +218,7 @@ export function Graph(props: {
         ) : (
           <ForceGraph3D
             ref={fgRef3D}
-            graphData={graph2Dmemo}
+            graphData={graph2D}
             // Sets the simulation alpha min parameter.
             d3AlphaDecay={1}
             d3VelocityDecay={1}
