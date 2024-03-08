@@ -65,7 +65,7 @@ export interface Edge extends Attributes {
 }
 
 export type Callback = () => void;
-export type SelectionCallback = (node: string, evt: React.MouseEvent) => void;
+export type SelectionCallback = (node: string, evt: MouseEvent) => void;
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Implementation                                               --- */
@@ -196,18 +196,13 @@ export function Graph(props: {
             dagLevelDistance={50}
             // Node selection
 
-            onNodeClick={(node): void => {
+            onNodeClick={(node, event): void => {
               // change the selected value of GraphProps
+              if (props.graph.onSelection) {
+                props.graph.onSelection(String(node.id), event);
+              }
               props.setInitGraph((prevGraph) => {
                 return { ...prevGraph, selected: String(node.id) };
-              });
-              props.setInitGraph((prevGraph) => {
-                return {
-                  ...prevGraph,
-                  onSelection: (node, event) => {
-                    return { node, event };
-                  },
-                };
               });
             }}
             onNodeDragEnd={(): void => {
@@ -225,7 +220,9 @@ export function Graph(props: {
             // minimum frame size to avoid overloading
             cooldownTime={10}
             onRenderFramePost={(): void => {
-              props.graph.onReady!();
+              if (props.graph.onReady) {
+                props.graph.onReady();
+              }
             }}
           />
         ) : (
@@ -338,14 +335,14 @@ export default function GraphComponent(): JSX.Element {
       children: (
         <div className='toolbar'>
           <Button icon='DISPLAY' title='Display' onClick={updateDisplay} />
-          <Button title='Layout' icon='COMPONENT' onClick={updateLayout} />
+          <Button icon='COMPONENT' title='Layout' onClick={updateLayout} />
           <Button icon='ZOOM.IN' title={'Zoom in'} onClick={updateZoomIn} />
           <Button icon='ZOOM.OUT' title={'Zoom out'} onClick={updateZoomOut} />
           <Button icon='PLUS' title={'Add'} onClick={addNode} />
           <Button icon='MINUS' title={'Delete'} onClick={deleteNode} />
         </div>
       ),
-      onSelection: (n, e) => {},
+      onSelection: (_n, _e) => {},
       onReady: () => {},
     };
   }
