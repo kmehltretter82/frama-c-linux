@@ -22,7 +22,9 @@
 /* ************************************************************************ */
 
 import React from 'react';
-// import other libs
+import { Button } from 'dome/frame/toolbars';
+import { registerSandbox } from 'ivette';
+import './sandbox.css';
 import ForceGraph2D, {
   ForceGraphMethods as ForceGraphMethods2D,
 } from 'react-force-graph-2d';
@@ -30,9 +32,6 @@ import ForceGraph3D, {
   ForceGraphMethods as ForceGraphMethods3D,
 } from 'react-force-graph-3d';
 import { v4 as uuidv4 } from 'uuid';
-import './sandbox.css';
-import { registerSandbox } from 'ivette';
-import { Button } from 'dome/frame/toolbars';
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Specifications                                               --- */
@@ -181,8 +180,7 @@ export function Graph(props: {
             // pause redrawing the 2D canvas at every frame whenever
             // the simulation engine is halted
             autoPauseRedraw={true}
-            // Sets the simulation alpha min parameter.
-            d3AlphaDecay={1}
+            // Nodes velocity decay that simulates the medium resistance.
             d3VelocityDecay={1}
             dagLevelDistance={50}
             // Node selection
@@ -207,7 +205,8 @@ export function Graph(props: {
               });
             }}
             nodeLabel={'name'}
-            // minimum frame size to avoid overloading
+            // How long (ms) to render for before stopping
+            // and freezing the layout engine.
             cooldownTime={1}
             onRenderFramePost={(): void => {
               if (props.graph.onReady) {
@@ -219,8 +218,6 @@ export function Graph(props: {
           <ForceGraph3D
             ref={fgRef3D}
             graphData={graph2D}
-            // Sets the simulation alpha min parameter.
-            d3AlphaDecay={1}
             d3VelocityDecay={1}
             dagLevelDistance={50}
           />
@@ -254,7 +251,6 @@ export default function GraphComponent(): JSX.Element {
     const addNode = (): void => {
       const uniqueId = uuidv4();
       const newNode = { id: uniqueId, label: `Node: ${uniqueId}` };
-
       setInitGraph((prevGraph) => {
         const fromNodeId = prevGraph.nodes[prevGraph.nodes.length - 1].id;
         const newEdge = { fromNode: fromNodeId, toNode: newNode.id };
@@ -326,10 +322,10 @@ export default function GraphComponent(): JSX.Element {
         <div className='toolbar'>
           <Button icon='DISPLAY' title='Display' onClick={updateDisplay} />
           <Button icon='COMPONENT' title='Layout' onClick={updateLayout} />
-          <Button icon='ZOOM.IN' title={'Zoom in'} onClick={updateZoomIn} />
-          <Button icon='ZOOM.OUT' title={'Zoom out'} onClick={updateZoomOut} />
-          <Button icon='PLUS' title={'Add'} onClick={addNode} />
-          <Button icon='MINUS' title={'Delete'} onClick={deleteNode} />
+          <Button icon='ZOOM.IN' title='Zoom in' onClick={updateZoomIn} />
+          <Button icon='ZOOM.OUT' title='Zoom out' onClick={updateZoomOut} />
+          <Button icon='PLUS' title='Add' onClick={addNode} />
+          <Button icon='MINUS' title='Delete' onClick={deleteNode} />
         </div>
       ),
       onSelection: (_n, _e) => {},
