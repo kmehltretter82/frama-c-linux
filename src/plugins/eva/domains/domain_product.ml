@@ -103,15 +103,15 @@ module Make
       (Left.extract_expr ~oracle context left expr)
       (Right.extract_expr ~oracle context right expr)
 
-  let extract_lval ~oracle context (left, right) lval typ location =
+  let extract_lval ~oracle context (left, right) lval location =
     merge
-      (Left.extract_lval ~oracle context left lval typ location)
-      (Right.extract_lval ~oracle context right lval typ location)
+      (Left.extract_lval ~oracle context left lval location)
+      (Right.extract_lval ~oracle context right lval location)
 
-  let backward_location (left, right) lval typ loc value =
+  let backward_location (left, right) lval loc value =
     (* TODO: Loc.narrow *)
-    Left.backward_location left lval typ loc value >>- fun (loc, value1) ->
-    Right.backward_location right lval typ loc value >>- fun (loc, value2) ->
+    Left.backward_location left lval loc value >>- fun (loc, value1) ->
+    Right.backward_location right lval loc value >>- fun (loc, value2) ->
     Value.narrow value1 value2 >>-: fun value ->
     loc, value
 

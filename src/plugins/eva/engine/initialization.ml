@@ -93,7 +93,7 @@ module Make
      other globals. *)
   let lval_to_loc lval =
     fst (Eva.lvaluate ~for_writing:false Domain.top lval)
-    >>> fun (_valuation, loc, _typ) -> loc
+    >>> fun (_valuation, loc) -> loc
 
   include Cvalue_domain.Getters (Domain)
 

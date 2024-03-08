@@ -20,6 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Evast
 open Eval
 
 type function_calls =
@@ -991,7 +992,7 @@ module G = struct
     with Not_found -> raise Untranslatable
 
   let translate_exp state to_loc to_v e =
-    let ptr_size (e : Evast.exp) =
+    let ptr_size e =
       let typ_pointed = Cil.typeOf_pointed e.typ in
       try Integer.of_int (Cil.bytesSizeOf typ_pointed)
       with Cil.SizeOfError _ -> raise Untranslatable
@@ -999,7 +1000,7 @@ module G = struct
     (* This function translates the expression as a precise gauge. For any
        expression that cannot be handled, [Untranslatable] is raised. *)
     let rec aux_gauge e =
-      match (e : Evast.exp).node with
+      match e.node with
       | Const _ | SizeOf _ | SizeOfE _  | SizeOfStr _ | AlignOf _ | AlignOfE _
       | AddrOf _ | StartOf _ ->
         raise Untranslatable (* constant: using linearization directly *)
@@ -1096,7 +1097,7 @@ module G = struct
   let assign to_loc to_v lv e state =
     let loc = to_loc lv in
     try
-      let b = loc_to_base loc lv.Evast.typ in
+      let b = loc_to_base loc lv.typ in
       let g = translate_exp state to_loc to_v e in
       store_gauge b g state
     with Untranslatable ->
@@ -1154,7 +1155,7 @@ module D : Abstract_domain.Leaf
 
   let assume_exp valuation e r state =
     if r.reductness = Created || r.reductness = Reduced then
-      match (e : Evast.exp).node with
+      match e.node with
       | Lval lv -> begin
           match valuation.Abstract_domain.find_loc lv with
           | `Top -> `Value state
@@ -1257,10 +1258,10 @@ module D : Abstract_domain.Leaf
   let extract_expr ~oracle:_ _context _state _exp =
     `Value (Cvalue.V.top, None), Alarmset.all
 
-  let extract_lval ~oracle:_ _context state _lv typ loc =
+  let extract_lval ~oracle:_ _context state lv loc =
     let v =
       try
-        let b = loc_to_base (Precise_locs.imprecise_location loc) typ in
+        let b = loc_to_base (Precise_locs.imprecise_location loc) lv.typ in
         match extract_gauge state b with
         | Some g -> eval_gauge state g
         | None -> Cvalue.V.top

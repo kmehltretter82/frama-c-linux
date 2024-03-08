@@ -118,11 +118,11 @@ let update valuation t =
 (*                              Assignments                               *)
 (* ---------------------------------------------------------------------- *)
 
-let write_abstract_value state (lval, loc, typ) assigned_value =
+let write_abstract_value state (lval, loc) assigned_value =
   let {v; initialized; escaping} = assigned_value in
   let value = unbottomize v in
   let value =
-    if Cil.typeHasQualifier "volatile" typ
+    if Cil.typeHasQualifier "volatile" lval.typ
     then Cvalue_forward.make_volatile value
     else value
   in
@@ -134,16 +134,16 @@ let write_abstract_value state (lval, loc, typ) assigned_value =
 exception Do_assign_imprecise_copy
 
 let copy_one_loc state left_lv right_lv =
-  let left_lval, left_loc, left_typ = left_lv
-  and _right_lval, right_loc, right_typ = right_lv in
+  let left_lval, left_loc = left_lv
+  and right_lval, right_loc = right_lv in
   (* top size is tested before this function is called, in which case
      the imprecise copy mode is used. *)
   let size = Int_Base.project right_loc.Locations.size in
   let right_loc = right_loc.Locations.loc in
   let offsetmap = Cvalue.Model.copy_offsetmap right_loc size state in
   let make_volatile =
-    Cil.typeHasQualifier "volatile" left_typ ||
-    Cil.typeHasQualifier "volatile" right_typ
+    Cil.typeHasQualifier "volatile" left_lval.typ ||
+    Cil.typeHasQualifier "volatile" right_lval.typ
   in
   match offsetmap with
   | `Bottom -> `Bottom
@@ -156,7 +156,7 @@ let copy_one_loc state left_lv right_lv =
           (Cvalue.V_Or_Uninitialized.map Cvalue_forward.make_volatile) offsm
       else offsm
     in
-    if not (Eval_typ.offsetmap_matches_type left_typ offsetmap) then
+    if not (Eval_typ.offsetmap_matches_type left_lval.typ offsetmap) then
       raise Do_assign_imprecise_copy;
     warn_imprecise_offsm_write left_lval offsetmap;
     `Value
@@ -167,20 +167,20 @@ let make_determinate value =
   { v = `Value value; initialized = true; escaping = false }
 
 let copy_right_lval state left_lv right_lv copied_value =
-  let lval, loc, typ = left_lv in
+  let lval, loc = left_lv in
   (* Size mismatch between left and right size, or imprecise size.
      This cannot be done by copies, but require a conversion *)
   let right_size = Main_locations.PLoc.size right_lv.lloc
   and left_size = Main_locations.PLoc.size loc in
   if not (Int_Base.equal left_size right_size) || Int_Base.is_top right_size
   then
-    fun loc -> write_abstract_value state (lval, loc, typ) copied_value
+    fun loc -> write_abstract_value state (lval, loc) copied_value
   else
     fun loc ->
       try
         let process right_loc acc =
-          let left_lv = lval, loc, typ
-          and right_lv = right_lv.lval, right_loc, right_lv.ltyp in
+          let left_lv = lval, loc
+          and right_lv = right_lv.lval, right_loc in
           match copy_one_loc state left_lv right_lv with
           | `Bottom -> acc
           | `Value state -> Cvalue.Model.join acc state
@@ -188,17 +188,17 @@ let copy_right_lval state left_lv right_lv copied_value =
         Precise_locs.fold process right_lv.lloc Cvalue.Model.bottom
       with
         Do_assign_imprecise_copy ->
-        write_abstract_value state (lval, loc, typ) copied_value
+        write_abstract_value state (lval, loc) copied_value
 
-let assign _stmt { lval; ltyp; lloc } _expr assigned valuation state =
+let assign _stmt { lval; lloc } _expr assigned valuation state =
   let state = update valuation state in
   let assign_one_loc =
     match assigned with
     | Assign value ->
       let assigned_value = make_determinate value in
-      fun loc -> write_abstract_value state (lval, loc, ltyp) assigned_value
+      fun loc -> write_abstract_value state (lval, loc) assigned_value
     | Copy (right_lv, copied_value) ->
-      copy_right_lval state (lval, lloc, ltyp) right_lv copied_value
+      copy_right_lval state (lval, lloc) right_lv copied_value
   in
   let aux_loc loc acc_state =
     let s = assign_one_loc loc in

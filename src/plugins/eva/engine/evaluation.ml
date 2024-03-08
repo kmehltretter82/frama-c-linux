@@ -480,10 +480,10 @@ module Make
 
   (* Assumes that [res] is a valid result for the lvalue [lval] of type [typ].
      Removes NaN and infinite floats and trap representations of bool values. *)
-  let assume_valid_value context typ lval res =
+  let assume_valid_value context lval res =
     let open Evaluated.Operators in
     let* value, origin = res in
-    match typ with
+    match lval.typ with
     | TFloat (fkind, _) ->
       let expr = Evast_builder.lval lval in
       let+ new_value = remove_special_float expr fkind value in
@@ -885,7 +885,7 @@ module Make
     | Lval _lval -> assert false
 
     | AddrOf v | StartOf v ->
-      let* loc, _, _ = lval_to_loc env ~for_writing:false ~reduction:false v in
+      let* loc, _ = lval_to_loc env ~for_writing:false ~reduction:false v in
       let* value = Loc.to_value loc, Alarmset.none in
       let v = assume_pointer env.context expr value in
       compute_reduction v false
@@ -953,13 +953,13 @@ module Make
     let compute () =
       let res, alarms = reduced_lval_to_loc env ~for_writing ~reduction lval in
       let res =
-        let+ loc, typ_offs, red, volatile = res in
+        let+ loc, red, volatile = res in
         let fuel = env.remaining_fuel in
-        let record = { loc; typ = typ_offs; loc_alarms = alarms }
+        let record = { loc; loc_alarms = alarms }
         and report = { fuel = Finite fuel; reduction = red; volatile }
         and loc_report = { for_writing; with_reduction = reduction } in
         cache := Cache.add_loc' !cache lval (record, (report, loc_report));
-        (loc, typ_offs, volatile)
+        (loc, volatile)
       in
       res, alarms
     in
@@ -968,7 +968,7 @@ module Make
     match Cache.find_loc' !cache lval with
     | `Value (record, (report, loc_report)) ->
       if already_precise loc_report && not_enough_fuel report.fuel
-      then `Value (record.loc, record.typ, report.volatile), record.loc_alarms
+      then `Value (record.loc, report.volatile), record.loc_alarms
       else compute ()
     | `Top -> compute ()
 
@@ -977,7 +977,7 @@ module Make
   and reduced_lval_to_loc env ~for_writing ~reduction lval =
     let open Evaluated.Operators in
     let lval_to_loc = internal_lval_to_loc env ~for_writing ~reduction in
-    let* loc, typ, volatile = lval_to_loc lval in
+    let* loc, volatile = lval_to_loc lval in
     if reduction then
       let bitfield = Evast_utils.is_bitfield lval in
       let truth = Loc.assume_valid_location ~for_writing ~bitfield loc in
@@ -986,8 +986,8 @@ module Make
       let alarm () = Alarms.Memory_access (cil_lval, access) in
       let+ valid_loc = interpret_truth ~alarm loc truth in
       let reduction = if Loc.equal_loc valid_loc loc then Neither else Forward in
-      valid_loc, typ, reduction, volatile
-    else `Value (loc, typ, Neither, volatile), Alarmset.none
+      valid_loc, reduction, volatile
+    else `Value (loc, Neither, volatile), Alarmset.none
 
   (* Internal evaluation of a lvalue to an abstract location.
      Combination of the evaluation of the right part of an lval (an host) with
@@ -995,16 +995,17 @@ module Make
   and internal_lval_to_loc env ~for_writing ~reduction lval =
     let open Evaluated.Operators in
     let host, offset = lval.node in
-    let typ = Evast_typing.type_of_lhost host in
-    let evaluated = eval_offset env ~reduce_valid_index:reduction typ offset in
-    let* (offs, typ_offs, offset_volatile) = evaluated in
-    if for_writing && Eva_utils.is_const_write_invalid typ_offs then
+    let basetyp = Evast_typing.type_of_lhost host in
+    let reduce_valid_index = reduction in
+    let evaluated = eval_offset env ~reduce_valid_index basetyp offset in
+    let* (offs, offset_volatile) = evaluated in
+    if for_writing && Eva_utils.is_const_write_invalid lval.typ then
       let cil_lval = Evast_utils.to_cil_lval lval in
       let alarm = Alarms.(Memory_access (cil_lval, For_writing)) in
       `Bottom, Alarmset.singleton ~status:Alarmset.False alarm
     else
-      let+ loc, host_volatile = eval_host env typ_offs offs host in
-      loc, typ_offs, offset_volatile || host_volatile
+      let+ loc, host_volatile = eval_host env lval.typ offs host in
+      loc, offset_volatile || host_volatile
 
   (* Host evaluation. Also returns a boolean which is true if the host
      contains a volatile sub-expression. *)
@@ -1022,7 +1023,7 @@ module Make
   (* Offset evaluation. Also returns a boolean which is true if the offset
      contains a volatile sub-expression. *)
   and eval_offset env ~reduce_valid_index typ = function
-    | NoOffset -> return (Loc.no_offset, typ, false)
+    | NoOffset -> return (Loc.no_offset, false)
     | Index (index_expr, remaining) ->
       let open Evaluated.Operators in
       let typ_pointed, array_size =
@@ -1031,7 +1032,7 @@ module Make
         | t -> Self.fatal ~current:true "Got type '%a'" Printer.pp_typ t
       in
       let eval = eval_offset env ~reduce_valid_index typ_pointed remaining in
-      let* roffset, typ_offs, remaining_volatile = eval in
+      let* roffset, remaining_volatile = eval in
       let* index, volatile = root_forward_eval env index_expr in
       let valid_index =
         if not (Kernel.SafeArrays.get ()) || not reduce_valid_index
@@ -1050,16 +1051,16 @@ module Make
           with Cil.LenOfArray _ -> `Value index, Alarmset.none (* unknown array size *)
       in
       let+ index = valid_index in
-      Loc.forward_index typ_pointed index roffset, typ_offs,
+      Loc.forward_index typ_pointed index roffset,
       remaining_volatile || volatile
     | Field (fi, remaining) ->
       let open Evaluated.Operators in
       let attrs = Cil.filter_qualifier_attributes (Cil.typeAttrs typ) in
       let typ_fi = Cil.typeAddAttributes attrs fi.ftype in
       let evaluated = eval_offset env ~reduce_valid_index typ_fi remaining in
-      let+ r, typ_res, volatile = evaluated in
+      let+ r, volatile = evaluated in
       let off = Loc.forward_field typ fi r in
-      off, typ_res, volatile
+      off, volatile
 
   and eval_lval ?(indeterminate=false) env lval =
     let open Evaluated.Operators in
@@ -1067,23 +1068,22 @@ module Make
     let env = { env with root = false } in
     (* Computes the location of [lval]. *)
     let evaluated = lval_to_loc env ~for_writing:false ~reduction:true lval in
-    let* loc, typ_lv, volatile_expr = evaluated in
-    let typ_lv = Cil.unrollType typ_lv in
+    let* loc, volatile_expr = evaluated in
     (* the lvalue is volatile:
        - if it has qualifier volatile (lval_to_loc propagates qualifiers
          in the proper way through offsets)
        - if it contains a sub-expression which is volatile (volatile_expr)
     *)
-    let volatile = volatile_expr || Cil.typeHasQualifier "volatile" typ_lv in
+    let volatile = volatile_expr || Cil.typeHasQualifier "volatile" lval.typ in
     let cil_lval = Evast_utils.to_cil_lval lval in
     (* Find the value of the location, if not bottom. *)
-    let v, alarms = domain_query lval typ_lv loc in
+    let v, alarms = domain_query lval loc in
     let alarms = close_dereference_alarms cil_lval alarms in
     if indeterminate then
       let record, alarms = indeterminate_copy cil_lval v alarms in
       `Value (record, Neither, volatile), alarms
     else
-      let v, alarms = assume_valid_value env.context typ_lv lval (v, alarms) in
+      let v, alarms = assume_valid_value env.context lval (v, alarms) in
       let+ value, origin = v, alarms in
       let value = define_value value in
       let reductness, reduction =
@@ -1363,8 +1363,9 @@ module Make
     match find_loc_for_reduction lval with
     | None -> `Value None
     | Some (record, report) ->
-      let backward_location = Domain.backward_location state lval in
-      let* loc, new_value = backward_location record.typ record.loc value in
+      let* loc, new_value =
+        Domain.backward_location state lval record.loc value
+      in
       let+ value = Value.narrow new_value value in
       let b = not (Loc.equal_loc record.loc loc) in
       (* Avoids useless reductions and reductions of volatile expressions. *)
@@ -1392,7 +1393,7 @@ module Make
         let typ_lval = Cil.typeOf_pointed expr.typ in
         let* env = fast_eval_environment state in
         let eval = eval_offset env ~reduce_valid_index typ_lval offset in
-        let* loc_offset, _, _ = fst eval in
+        let* loc_offset, _ = fst eval in
         let* value = find_val expr in
         let pointer = Loc.backward_pointer value loc_offset location in
         let* pointer_value, loc_offset = pointer in
@@ -1409,7 +1410,7 @@ module Make
       let* v = find_val exp in
       let typ_pointed = Cil.typeOf_array_elem typ in
       let* env = fast_eval_environment state in
-      let* rem, _, _ =
+      let* rem, _ =
         eval_offset env ~reduce_valid_index:true typ_pointed remaining |> fst
       in
       let* v', rem' =
@@ -1472,7 +1473,7 @@ module Make
       let* () =
         if (fst report).reduction = Backward then
           let for_writing = false and reduction = true in
-          let+ loc, _, _, _ =
+          let+ loc, _, _ =
             reduced_lval_to_loc ~for_writing ~reduction env lval |> fst
           in
           (* TODO: Loc.narrow *)
@@ -1587,11 +1588,11 @@ module Make
     let* valuation = evaluate_offsets valuation ?subdivnb state offset in
     cache := valuation;
     let* env = root_environment ?subdivnb state, Alarmset.none in
-    let& _, typ, _ = lval_to_loc env ~for_writing ~reduction:true lval in
+    let& _ = lval_to_loc env ~for_writing ~reduction:true lval in
     let open Bottom.Operators in
     let+ () = backward_lval (backward_fuel ()) env.context state lval in
     match Cache.find_loc !cache lval with
-    | `Value record -> !cache, record.loc, typ
+    | `Value record -> !cache, record.loc
     | `Top -> assert false
 
   let reduce ?valuation:(valuation=Cache.empty) state expr positive =

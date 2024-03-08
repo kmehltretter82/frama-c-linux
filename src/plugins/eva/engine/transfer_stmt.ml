@@ -189,10 +189,10 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     Assign value, valuation
 
   (* Assignment by copying the value of a right lvalue. *)
-  let assign_by_copy ~subdivnb state valuation lval lloc ltyp =
+  let assign_by_copy ~subdivnb state valuation lval lloc =
     copy_lvalue_and_check ~valuation ~subdivnb state lval
     >>=: fun (valuation, value) ->
-    Copy ({lval; lloc; ltyp}, value), valuation
+    Copy ({lval; lloc}, value), valuation
 
   (* For an initialization, use for_writing:false for the evaluation of
      the left location, as the written variable could be const.  This is only
@@ -243,12 +243,12 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         "@[<v>@[all target addresses were invalid. This path is \
          assumed to be dead.@]%t@]" Eva_utils.pp_callstack;
       `Bottom
-    | `Value (valuation, lloc, ltyp) ->
+    | `Value (valuation, lloc) ->
       (* Tries to interpret the assignment as a copy for the returned value
          of a function call, on struct and union types, and when
          -eva-warn-copy-indeterminate is disabled. *)
       let lval_copy =
-        if is_ret || Cil.isStructOrUnionType ltyp || do_copy_at kinstr
+        if is_ret || Cil.isStructOrUnionType lval.typ || do_copy_at kinstr
         then find_lval expr
         else None
       in
@@ -261,18 +261,18 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
           (* In case of a copy, checks that the left and right locations are
              compatible and that they do not overlap. *)
           lvaluate_and_check ~for_writing ~subdivnb ~valuation state right_lval
-          >>= fun (valuation, rloc, rtyp) ->
-          check_overlap ltyp (lval, lloc) (right_lval, rloc)
+          >>= fun (valuation, rloc) ->
+          check_overlap lval.typ (lval, lloc) (right_lval, rloc)
           >>= fun (lloc, rloc) ->
           if are_compatible lloc rloc
-          then assign_by_copy ~subdivnb state valuation right_lval rloc rtyp
+          then assign_by_copy ~subdivnb state valuation right_lval rloc
           else assign_by_eval ~subdivnb state valuation expr
       in
       if is_ret then assert (Alarmset.is_empty alarms);
       Alarmset.emit kinstr alarms;
       let* assigned, valuation = eval in
       let domain_valuation = Eval.to_domain_valuation valuation in
-      let lvalue = { lval; ltyp; lloc } in
+      let lvalue = { lval; lloc } in
       Domain.assign kinstr lvalue expr assigned domain_valuation state
 
   let assign = assign_lv_or_ret ~is_ret:false
@@ -491,7 +491,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     match (expr : Evast.exp).node with
     | Lval lv ->
       lvaluate_and_check ~for_writing:false ~subdivnb ~valuation state lv
-      >>= fun (valuation, loc, typ) ->
+      >>= fun (valuation, loc) ->
       if Int_Base.is_top (Location.size loc)
       then
         Self.abort ~current:true
@@ -499,7 +499,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
           Evast_printer.pp_exp expr;
       if determinate && Cil.isArithmeticOrPointerType lv.typ
       then assign_by_eval ~subdivnb state valuation expr
-      else assign_by_copy ~subdivnb state valuation lv loc typ
+      else assign_by_copy ~subdivnb state valuation lv loc
     | _ -> assign_by_eval ~subdivnb state valuation expr
 
   (* Evaluates the list of the actual arguments of a call. Returns the list
@@ -542,7 +542,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       let flagged = { flagged with v } in
       let lloc = Location.replace_base substitution loc.lloc in
       let lval = Evast_visitor.Rewrite.visit_lval visitor loc.lval in
-      let loc = { loc with lval; lloc } in
+      let loc = { lval; lloc } in
       Copy (loc, flagged)
 
   let replace_recursive_call recursion call =
@@ -626,7 +626,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       fun fmt subdivnb lval state ->
         try
           let offsm =
-            let* (_, loc, _) =
+            let* (_, loc) =
               fst (Eval.lvaluate ~for_writing:false ~subdivnb state lval) in
             Eval_op.offsetmap_of_loc (get_ploc loc) (get_cvalue state)
           in
@@ -788,7 +788,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let eval_loc (acc, valuation) lval =
       match lvaluate ~valuation lval with
       | `Bottom -> acc, valuation
-      | `Value (valuation, loc, _) -> (lval, loc) :: acc, valuation
+      | `Value (valuation, loc) -> (lval, loc) :: acc, valuation
     in
     let eval_list valuation lvs =
       List.fold_left eval_loc ([], valuation) lvs

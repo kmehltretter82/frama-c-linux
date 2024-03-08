@@ -203,15 +203,15 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
   (* This function returns the information known about the location
      corresponding to [_lv], so that it may be used by the engine during
      evaluation. *)
-  let extract_lval ~oracle:_ _context state _lv typ loc =
-    let v = find loc typ state in
+  let extract_lval ~oracle:_ _context state lv loc =
+    let v = find loc lv.Evast.typ state in
     `Value (v, None), Alarmset.all
 
   let extract_expr ~oracle:_ _context _state _expr =
     `Value (Value.top, None), Alarmset.all
 
-  let backward_location state _lval typ loc _value =
-    let new_value = find loc typ state in
+  let backward_location state lval loc _value =
+    let new_value = find loc lval.Evast.typ state in
     `Value (loc, new_value)
 
   (* This function binds [loc] to [v], of type [typ], in [state].
@@ -233,9 +233,9 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
     | Lval lv -> begin
         match valuation.Abstract_domain.find_loc lv with
         | `Top -> state
-        | `Value {loc; typ} ->
+        | `Value {loc} ->
           if Precise_locs.cardinal_zero_or_one loc
-          then bind_loc loc typ record.value.v state
+          then bind_loc loc lv.typ record.value.v state
           else state
       end
     | _ -> state
@@ -254,7 +254,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
     (* Extract the abstract value *)
     let value = Eval.value_assigned value in
     (* Store the information [lv = e;] in the state *)
-    let state = bind_loc lv.lloc lv.ltyp value state in
+    let state = bind_loc lv.lloc lv.lval.typ value state in
     `Value state
 
   let update valuation state = `Value (assume_valuation valuation state)
@@ -313,7 +313,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
       begin
         match valuation.Abstract_domain.find_loc lval with
         | `Top -> ()
-        | `Value {loc; typ} -> Value.pretty fmt (find loc typ state)
+        | `Value {loc} -> Value.pretty fmt (find loc lval.typ state)
       end
     | _ -> ()
 

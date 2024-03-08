@@ -44,7 +44,7 @@ module type LeafDomain = sig
   val context_dependencies: context Abstract_context.dependencies
   val build_context: t -> context or_bottom
 
-  val backward_location: t -> lval -> typ -> 'loc -> 'v -> ('loc * 'v) or_bottom
+  val backward_location: t -> lval -> 'loc -> 'v -> ('loc * 'v) or_bottom
   val reduce_further: t -> exp -> 'v -> (exp * 'v) list
 
   val evaluate_predicate:

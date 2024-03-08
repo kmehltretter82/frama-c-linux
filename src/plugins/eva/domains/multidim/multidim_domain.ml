@@ -672,8 +672,8 @@ struct
   let extract_expr ~oracle:_ _context _state _expr =
     `Value (Value.top, None), Alarmset.all
 
-  let extract_lval ~oracle _context state lv typ _loc =
-    if Cil.isScalarType typ then
+  let extract_lval ~oracle _context state lv _loc =
+    if Cil.isScalarType lv.Evast.typ then
       let oracle = fun exp ->
         match oracle exp with
         | `Value v, alarms when Alarmset.is_empty alarms -> v (* only use values safely evaluated *)
@@ -752,8 +752,8 @@ struct
         | `Value src ->
           overwrite ~oracle state dst src
 
-  let assign _kinstr { lval=dst; ltyp } src assigned_value valuation state =
-    if Int_Base.is_zero (Bit_utils.sizeof ltyp)
+  let assign _kinstr { lval=dst } src assigned_value valuation state =
+    if Int_Base.is_zero (Bit_utils.sizeof dst.typ)
     then `Value state
     else
       let+ state = assume_valuation valuation state in

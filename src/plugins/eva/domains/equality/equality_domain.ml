@@ -244,7 +244,7 @@ struct
     let atom_e = HCE.of_exp expr in
     coop_eval oracle equalities atom_e
 
-  let extract_lval ~oracle _context (equalities, _, _) lval _typ _location =
+  let extract_lval ~oracle _context (equalities, _, _) lval _location =
     let atom_lv = HCE.of_lval lval in
     coop_eval oracle equalities atom_lv
 

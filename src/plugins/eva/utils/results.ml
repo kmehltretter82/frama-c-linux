@@ -212,7 +212,7 @@ struct
     type valuation = A.Eval.Valuation.t
     type exp = (valuation * A.Val.t) Eval.evaluated
     type lval = (valuation * A.Val.t Eval.flagged_value) Eval.evaluated
-    type loc = (valuation * A.Loc.location * Cil_types.typ) Eval.evaluated
+    type loc = (valuation * A.Loc.location) Eval.evaluated
   end
 
   type ('a,'c) evaluation =
@@ -398,7 +398,7 @@ struct
     | Address (r, access) ->
       let extract (x, _alarms) =
         let open Bottom.Operators in
-        let+ _valuation,loc,_typ = x in loc
+        let+ _valuation,loc = x in loc
       in
       Response.map extract r, access
 

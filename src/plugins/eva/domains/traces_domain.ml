@@ -1104,7 +1104,7 @@ module D = struct
   let assign ki lv e _v _valuation state =
     let cil_lval = Evast_utils.to_cil_lval lv.Eval.lval in
     let cil_exp = Evast_utils.to_cil_exp e in
-    let trans = Assign (ki, cil_lval, lv.Eval.ltyp, cil_exp) in
+    let trans = Assign (ki, cil_lval, lv.lval.typ, cil_exp) in
     `Value (Traces.add_trans state trans)
 
   let assume stmt e pos _valuation state =
@@ -1180,7 +1180,7 @@ module D = struct
   let top_query = `Value (Cvalue.V.top, None), Alarmset.all
 
   let extract_expr ~oracle:_ _context _state _expr = top_query
-  let extract_lval ~oracle:_ _context _state _lv _typ _locs = top_query
+  let extract_lval ~oracle:_ _context _state _lv _locs = top_query
 
   let enter_loop stmt state =
     let state = Traces.add_trans state (Msg "enter_loop") in

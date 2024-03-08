@@ -1654,7 +1654,7 @@ module Domain = struct
     then `Bottom, Alarmset.all
     else `Value (Cvalue.V.inject_ival ival, None), alarms
 
-  let extract_lval ~oracle:_ _context _t _lval _typ _loc = top_value
+  let extract_lval ~oracle:_ _context _t _lval _loc = top_value
 
   let reduce_further state expr value =
     match expr.node with
@@ -1801,7 +1801,7 @@ module Domain = struct
 
   let assign kinstr left_value expr assigned valuation state =
     if kinstr <> Cil_types.Kglobal
-    && Cil.isIntegralOrPointerType left_value.ltyp
+    && Cil.isIntegralOrPointerType left_value.lval.typ
     && not (Evast_utils.lval_contains_volatile left_value.lval)
     then assign_variable left_value.lval expr assigned valuation state
     else

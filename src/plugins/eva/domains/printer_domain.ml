@@ -56,7 +56,7 @@ module Simple : Simpler_domains.Simple_Cvalue = struct
   let extract_expr _state _exp =
     `Value (Cvalue.V.top)
 
-  let extract_lval _state _lval _typ _loc =
+  let extract_lval _state _lval _loc =
     `Value (Cvalue.V.top)
 
   (* --- Transfer functions --- *)

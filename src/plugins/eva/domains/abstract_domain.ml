@@ -174,22 +174,22 @@ module type Queries = sig
     state -> exp -> (value * origin option) evaluated
 
   (** Query function for lvalues:
-      [extract_lval ~oracle context t lval typ loc] returns the known value
-      stored at the location [loc] of the left value [lval] of type [typ].
+      [extract_lval ~oracle context t lval loc] returns the known value
+      stored at the location [loc] of the left value [lval].
       See above for more details on queries. *)
   val extract_lval :
     oracle:(exp -> value evaluated) -> evaluation_context ->
-    state -> lval -> typ -> location -> (value * origin option) evaluated
+    state -> lval -> location -> (value * origin option) evaluated
 
   (** [backward_location state lval typ loc v] reduces the location [loc] of the
-      lvalue [lval] of type [typ], so that only the locations that may have value
+      lvalue [lval], so that only the locations that may have value
       [v] are kept.
       The returned location must be included in [loc], but it is always sound
       to return [loc] itself.
       Also returns the value that may have the returned location, if not bottom.
       Defined by {!Domain_builder.Complete} with no reduction. *)
   val backward_location :
-    state -> lval -> typ -> location -> value -> (location * value) or_bottom
+    state -> lval -> location -> value -> (location * value) or_bottom
 
   (** Given a reduction [expr] = [value], provides more reductions that may
       be performed.

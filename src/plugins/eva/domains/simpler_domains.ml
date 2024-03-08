@@ -116,7 +116,7 @@ module type Simple_Cvalue = sig
   (** Query functions. *)
 
   val extract_expr: t -> exp -> cvalue or_bottom
-  val extract_lval: t -> lval -> typ -> precise_loc -> cvalue or_bottom
+  val extract_lval: t -> lval -> precise_loc -> cvalue or_bottom
 
   (** Transfer functions. *)
 

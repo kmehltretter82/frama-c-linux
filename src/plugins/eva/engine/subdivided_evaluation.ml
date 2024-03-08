@@ -393,7 +393,7 @@ module Make
     | `Value record -> record
     | `Top -> assert false
 
-  let find_loc valuation lval = match Valuation.find_loc valuation lval with
+  let _find_loc valuation lval = match Valuation.find_loc valuation lval with
     | `Value record -> record
     | `Top -> assert false
 
@@ -497,11 +497,9 @@ module Make
 
   (* Makes the split function for a list of lvalues. The split function depends
      on the size of each lvalue, computed from their type.  *)
-  let make_split valuation (lvals: 'l sub_lvals) : 'l split =
+  let make_split (lvals: 'l sub_lvals) : 'l split =
     let compute_size info =
-      (* The size is defined, as [lv] is a scalar *)
-      let record = find_loc valuation info.lval in
-      Int_Base.project (Eval_typ.sizeof_lval_typ record.typ)
+      Int_Base.project (Eval_typ.sizeof_lval_typ info.lval.typ)
     in
     let sizes = Hypotheses.map compute_size lvals in
     Hypotheses.split sizes
@@ -651,7 +649,7 @@ module Make
   let subdivide_lvals env valuation subdivnb ~expr ~subexpr lvals =
     let Hypotheses.L variables = Hypotheses.from_list lvals in
     (* Split function for the subvalues of [lvals]. *)
-    let split = make_split valuation variables in
+    let split = make_split variables in
     (* Clear the valuation to force the evaluation on top of [lvals]. *)
     let clear lv_info valuation =
       Clear.clear_englobing_exprs valuation ~expr ~subexpr:lv_info.lv_expr

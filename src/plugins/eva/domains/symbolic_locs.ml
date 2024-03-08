@@ -546,7 +546,7 @@ module D : Abstract_domain.Leaf
     `Value (Memory.kill loc state)
 
   let store_copy valuation lv loc state fv =
-    if Cil.isArithmeticOrPointerType lv.ltyp then
+    if Cil.isArithmeticOrPointerType lv.lval.typ then
       match fv.v, fv.initialized, fv.escaping with
       | `Value v, true, false -> store_value valuation lv.lval loc state v
       | _ -> store_indeterminate state loc
@@ -585,7 +585,7 @@ module D : Abstract_domain.Leaf
     | None -> top_query
     | Some v -> `Value (v, None), Alarmset.none
 
-  let extract_lval ~oracle:_ _context state lv _typ _locs =
+  let extract_lval ~oracle:_ _context state lv _locs =
     match Memory.find_lval lv state with
     | None -> top_query
     | Some v -> `Value (v, None), Alarmset.none

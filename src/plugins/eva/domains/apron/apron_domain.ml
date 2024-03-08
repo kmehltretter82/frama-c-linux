@@ -469,7 +469,7 @@ module Make (Man : Input) = struct
 
   let dummy_oracle _ exn = raise exn
 
-  let compute state expr typ =
+  let compute state expr =
     let top = `Value (None, None), Alarmset.all in
     if not (is_relevant expr)
     then top
@@ -477,6 +477,7 @@ module Make (Man : Input) = struct
       try
         let eval = make_eval state in
         let oracle = dummy_oracle in
+        let typ = expr.typ in
         let exp = coerce eval typ (translate_expr_linearize eval oracle expr) in
         let interval = eval exp in
         let interval = truncate_interval typ interval in
@@ -495,11 +496,11 @@ module Make (Man : Input) = struct
       | Z.Overflow | Failure _ -> top
 
   let extract_expr ~oracle:_ _context state expr =
-    compute state expr expr.typ
+    compute state expr
 
-  let extract_lval ~oracle:_ _context state lval typ _loc =
+  let extract_lval ~oracle:_ _context state lval _loc =
     let expr = Evast_builder.lval lval in
-    compute state expr typ
+    compute state expr
 
   let maybe_bottom state =
     if Abstract1.is_bottom man state
@@ -606,7 +607,7 @@ module Make (Man : Input) = struct
           let var = translate_lval lvalue.lval in
           let expr = expr in
           let exp = translate_expr_linearize eval oracle expr in
-          let exp = coerce eval lvalue.ltyp exp in
+          let exp = coerce eval lvalue.lval.typ exp in
           let exp = Texpr1.of_expr (Abstract1.env state) exp in
           (* TODO: currently, all variables are present in the environment
              at all times. Change to a dynamic environment, in which new
