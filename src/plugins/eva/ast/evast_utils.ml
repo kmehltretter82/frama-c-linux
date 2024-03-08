@@ -285,7 +285,7 @@ let is_zero_ptr exp =
 
 (* Constant folding *)
 
-(* This function is largely based on Cil.constFold. See there for details. *)
+(* These functions are largely based on Cil.constFold. See there for details. *)
 let rec const_fold (exp: exp) : exp =
   let open Evast_builder in
   match exp.node with
@@ -306,11 +306,11 @@ let rec const_fold (exp: exp) : exp =
   | UnOp (op, e, t) -> const_fold_unop op e t
   | BinOp (op, e1, e2, t) -> const_fold_binop op e1 e2 t
 
-and const_fold_cast t e =
+and const_fold_cast (t : typ) (e : exp) : exp  =
   let open Evast_builder in
   let e' = const_fold e in
   let t' = Cil.(type_remove_attributes_for_c_cast (unrollType t)) in
-  let default () = if e' == e then e else mk_exp (CastE (t, e')) in
+  let default () = mk_exp (CastE (t, e')) in
   match e'.node, t' with
   (* integer -> integer *)
   | Const (CInt64 (i,_k,_)), (TInt (ik, a) | TEnum ({ekind = ik}, a))
@@ -336,10 +336,10 @@ and const_fold_cast t e =
     float ~kind f
   | _, _ -> default ()
 
-and const_fold_unop op e t =
+and const_fold_unop (op : unop) (e : exp) (t : typ) : exp =
   let open Evast_builder in
   let e' = const_fold e in
-  let default () = if e' == e then e else mk_exp (UnOp (op, e', t)) in
+  let default () = mk_exp (UnOp (op, e', t)) in
   match e'.node, Cil.unrollType t with
   (* Integer operations *)
   | Const (CInt64 (i,_ik,_repr)), (TInt (ik, _) | TEnum ({ekind=ik},_)) ->
@@ -362,7 +362,7 @@ and const_fold_unop op e t =
   (* No possible folding *)
   | _ -> default ()
 
-and const_fold_binop op e1 e2 t =
+and const_fold_binop (op : binop) (e1 : exp) (e2 : exp) (t : typ) : exp =
   (* TODO: float comparisons *)
   let open Evast_builder in
   let e1' = const_fold e1 in
@@ -462,18 +462,18 @@ and const_fold_binop op e1 e2 t =
     end
   | _ -> default ()
 
-and const_fold_lval lval =
+and const_fold_lval (lval : lval) : lval =
   let lhost, offset = lval.node in
   Evast_builder.mk_lval (const_fold_lhost lhost, const_fold_offset offset)
 
-and const_fold_lhost = function
+and const_fold_lhost : lhost -> lhost = function
   | Mem e -> Mem (const_fold e)
   | Var _ as host -> host
 
-and const_fold_offset = function
+and const_fold_offset : offset -> offset = function
   | NoOffset -> NoOffset
-  | Field (fi, offset) -> Field (fi, const_fold_offset offset)
-  | Index (exp, offset) -> Index (const_fold exp, const_fold_offset offset)
+  | Field (fi, o) -> Field (fi, const_fold_offset o)
+  | Index (e, o) -> Index (const_fold e, const_fold_offset o)
 
 let fold_to_integer exp =
   to_integer (const_fold exp)
