@@ -45,6 +45,7 @@ val add: exp -> exp -> exp (* x + y *)
 val eq: exp -> exp -> exp (* x == y *)
 val ne: exp -> exp -> exp (* x != y *)
 
+val index: lval -> exp -> lval (* x[y] *)
 val addr: lval -> exp (* &x *)
 val mem: exp -> lval (* *x *)
 

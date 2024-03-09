@@ -169,8 +169,24 @@ let add = binop PlusA
 let eq = binop Eq
 let ne = binop Ne
 
-let addr lval = mk_exp (AddrOf lval)
-let mem exp = mk_lval (Mem exp, NoOffset)
+let rec concat_offset (o1: offset) (o2: offset) : offset =
+  match o1 with
+  | NoOffset -> o2
+  | Field (fid, o1') -> Field(fid, concat_offset o1' o2)
+  | Index (e, o1') -> Index(e, concat_offset o1' o2)
+
+let index (array : lval) (index : exp) =
+  let (base,offset) = array.node in
+  mk_lval (base, concat_offset offset (Index (index, NoOffset)))
+
+let addr (lval : lval) : exp =
+  mk_exp (AddrOf lval)
+
+let mem (exp : exp) : lval =
+  match exp.node with
+  | AddrOf lv -> lv
+  | StartOf lv -> index lv zero (* Must be an array *)
+  | _ -> mk_lval (Mem exp, NoOffset)
 
 let var vi = mk_lval (Var vi, NoOffset)
 let var_exp vi = mk_exp (Lval (var vi))
