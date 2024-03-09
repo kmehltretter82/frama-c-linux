@@ -24,6 +24,7 @@ open Evast
 
 val translate_exp: Cil_types.exp -> exp
 val translate_lval: Cil_types.lval -> lval
+val translate_offset: Cil_types.offset -> offset
 val translate_unop: Cil_types.unop -> unop
 val translate_binop: Cil_types.binop -> binop
 
@@ -43,7 +44,9 @@ val binop: binop -> exp -> exp -> exp (* x op y *)
 val add: exp -> exp -> exp (* x + y *)
 val eq: exp -> exp -> exp (* x == y *)
 val ne: exp -> exp -> exp (* x != y *)
+
 val addr: lval -> exp (* &x *)
+val mem: exp -> lval (* *x *)
 
 val var: Cil_types.varinfo -> lval
 val var_exp: Cil_types.varinfo -> exp

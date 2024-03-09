@@ -170,6 +170,7 @@ let eq = binop Eq
 let ne = binop Ne
 
 let addr lval = mk_exp (AddrOf lval)
+let mem exp = mk_lval (Mem exp, NoOffset)
 
 let var vi = mk_lval (Var vi, NoOffset)
 let var_exp vi = mk_exp (Lval (var vi))
