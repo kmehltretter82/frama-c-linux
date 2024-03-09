@@ -36,19 +36,20 @@
 [alias] May-alias graph after instruction  p = & alias_yz;  is
   8:{ p } → 9:{ alias_xy; alias_yz }
 [alias] analysing instruction: (*p)(a,b,c);
-[alias:unsupported:fn] pointer_call.c:15: Warning: 
-  unsupported feature: call to function pointer: *p
-[alias:undefined:fn] pointer_call.c:15: Warning: function *p has no definition
-[alias] May-aliases after instruction  (*p)(a,b,c);  are  <none>
+[alias] (*p)(a,b,c); is an indirect function call to one of { alias_xy; alias_yz }
+[alias] May-aliases after instruction  (*p)(a,b,c);  are  { a; b; c }
 [alias] May-alias graph after instruction  (*p)(a,b,c);  is
-  8:{ p } → 9:{ alias_xy; alias_yz }
+  8:{ p } → 9:{ alias_xy; alias_yz }   16:{ a } → 15:{  }
+  18:{ b } → 15:{  }   22:{ c } → 15:{  }
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are  <none>
+[alias] May-aliases after instruction  __retres = 0;  are  { a; b; c }
 [alias] May-alias graph after instruction  __retres = 0;  is
-  8:{ p } → 9:{ alias_xy; alias_yz }
-[alias] May-aliases at the end of function main: <none>
+  8:{ p } → 9:{ alias_xy; alias_yz }   16:{ a } → 15:{  }
+  18:{ b } → 15:{  }   22:{ c } → 15:{  }
+[alias] May-aliases at the end of function main: { a; b; c }
 [alias] May-alias graph at the end of function main:
-  8:{ p } → 9:{ alias_xy; alias_yz }
+  8:{ p } → 9:{ alias_xy; alias_yz }   16:{ a } → 15:{  }
+  18:{ b } → 15:{  }   22:{ c } → 15:{  }
 [alias] Summary of function main:
-  formals:     returns: __retres    state: <none>
+  formals:     returns: __retres    state: { a; b; c }
 [alias] Analysis complete

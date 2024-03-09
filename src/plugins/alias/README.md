@@ -43,7 +43,6 @@ Therefore the analysis is efficient, whereas the results are not very precise.
 - recursive functions
 - user-defined variadic functions
 - function declared and used without being defined (i.e., no function body)
-- function pointers
 - assembly code
 - instructions longjmp and setjmp
 - complex instruction goto that breaks the natural control-flow of the program
