@@ -1,0 +1,54 @@
+[kernel] Parsing pointer_call.c (with preprocessing)
+[alias] analysing function: alias_xy
+[alias] analysing instruction: x = y;
+[alias] May-aliases after instruction  x = y;  are  { x; y }
+[alias] May-alias graph after instruction  x = y;  is    0:{ x; y } → 1:{  }
+[alias] May-aliases at the end of function alias_xy: { x; y }
+[alias] May-alias graph at the end of function alias_xy:
+  0:{ x; y } → 1:{  }
+[alias] Summary of function alias_xy:
+  formals: x  y  z    returns: <none>    state: { x; y }
+[alias] analysing function: alias_yz
+[alias] analysing instruction: y = z;
+[alias] May-aliases after instruction  y = z;  are  { y; z }
+[alias] May-alias graph after instruction  y = z;  is    4:{ y; z } → 5:{  }
+[alias] May-aliases at the end of function alias_yz: { y; z }
+[alias] May-alias graph at the end of function alias_yz:
+  4:{ y; z } → 5:{  }
+[alias] Summary of function alias_yz:
+  formals: x  y  z    returns: <none>    state: { y; z }
+[alias] analysing function: main
+[alias] analysing instruction: int *a = (int *)0;
+[alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *a = (int *)0;  is    <empty>
+[alias] analysing instruction: int *b = (int *)0;
+[alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *b = (int *)0;  is    <empty>
+[alias] analysing instruction: int *c = (int *)0;
+[alias] May-aliases after instruction  int *c = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *c = (int *)0;  is    <empty>
+[alias] analysing instruction: p = & alias_xy;
+[alias] May-aliases after instruction  p = & alias_xy;  are  <none>
+[alias] May-alias graph after instruction  p = & alias_xy;  is
+  8:{ p } → 9:{ alias_xy }
+[alias] analysing instruction: p = & alias_yz;
+[alias] May-aliases after instruction  p = & alias_yz;  are  <none>
+[alias] May-alias graph after instruction  p = & alias_yz;  is
+  8:{ p } → 9:{ alias_xy; alias_yz }
+[alias] analysing instruction: (*p)(a,b,c);
+[alias:unsupported:fn] pointer_call.c:15: Warning: 
+  unsupported feature: call to function pointer: *p
+[alias:undefined:fn] pointer_call.c:15: Warning: function *p has no definition
+[alias] May-aliases after instruction  (*p)(a,b,c);  are  <none>
+[alias] May-alias graph after instruction  (*p)(a,b,c);  is
+  8:{ p } → 9:{ alias_xy; alias_yz }
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases after instruction  __retres = 0;  are  <none>
+[alias] May-alias graph after instruction  __retres = 0;  is
+  8:{ p } → 9:{ alias_xy; alias_yz }
+[alias] May-aliases at the end of function main: <none>
+[alias] May-alias graph at the end of function main:
+  8:{ p } → 9:{ alias_xy; alias_yz }
+[alias] Summary of function main:
+  formals:     returns: __retres    state: <none>
+[alias] Analysis complete
