@@ -27,6 +27,7 @@ val translate_lval: Cil_types.lval -> lval
 val translate_offset: Cil_types.offset -> offset
 val translate_unop: Cil_types.unop -> unop
 val translate_binop: Cil_types.binop -> binop
+val translate_init: Cil_types.init -> init
 
 val mk_exp: exp_node -> exp (* Does not assign origin. Should not be used. *)
 val mk_lval: lval_node -> lval
@@ -45,7 +46,9 @@ val add: exp -> exp -> exp (* x + y *)
 val eq: exp -> exp -> exp (* x == y *)
 val ne: exp -> exp -> exp (* x != y *)
 
+val add_offset: lval -> offset -> lval
 val index: lval -> exp -> lval (* x[y] *)
+val field: lval -> Cil_types.fieldinfo -> lval (* x.field *)
 val addr: lval -> exp (* &x *)
 val mem: exp -> lval (* *x *)
 

@@ -44,7 +44,7 @@ type transition =
   | Guard of exp * guard_kind * stmt
   | Assign of lval * exp * stmt
   | Call of lval option * exp * exp list * stmt
-  | Local_init of varinfo * local_init * stmt
+  | Init of varinfo * init * stmt
   | Asm of attributes * string list * extended_asm option * stmt
 
 type edge = private {

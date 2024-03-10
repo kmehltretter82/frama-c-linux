@@ -112,6 +112,14 @@ and translate_constant = function
   | Cil_types.CReal (float, fkind, str) -> CReal (float, fkind, str)
   | Cil_types.CEnum ei -> CEnum (ei, translate_exp ei.eival)
 
+let rec translate_init = function
+  | Cil_types.SingleInit e -> SingleInit (translate_exp e, e.eloc)
+  | Cil_types.CompoundInit (t, l) ->
+    let translate_field_init (o, i) =
+      translate_offset o, translate_init i
+    in
+    CompoundInit (t, List.map translate_field_init l)
+
 
 (* --- Smart constructors --- *)
 
@@ -169,15 +177,28 @@ let add = binop PlusA
 let eq = binop Eq
 let ne = binop Ne
 
-let rec concat_offset (o1: offset) (o2: offset) : offset =
+let rec concat_offset (o1 : offset) (o2 : offset) : offset =
   match o1 with
   | NoOffset -> o2
   | Field (fid, o1') -> Field(fid, concat_offset o1' o2)
   | Index (e, o1') -> Index(e, concat_offset o1' o2)
 
-let index (array : lval) (index : exp) =
-  let (base,offset) = array.node in
-  mk_lval (base, concat_offset offset (Index (index, NoOffset)))
+let add_offset (lval : lval) (offset : offset) : lval =
+  let (lval_host, lval_offset) = lval.node in
+  mk_lval (lval_host, concat_offset lval_offset offset)
+
+let index (base : lval) (index : exp) : lval =
+  assert(Cil.isArrayType base.typ);
+  add_offset base (Index (index, NoOffset))
+
+let field (base : lval) (field : Cil_types.fieldinfo) : lval =
+  let field_belongs_to_typ fi typ =
+    match typ with
+    | Cil_types.TComp (ci,_attr) -> ci == fi.Cil_types.fcomp
+    | _ -> false
+  in
+  assert(field_belongs_to_typ field base.typ);
+  add_offset base (Field (field, NoOffset))
 
 let addr (lval : lval) : exp =
   mk_exp (AddrOf lval)

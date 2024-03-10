@@ -41,7 +41,7 @@ type transition =
   | Guard of exp * guard_kind * stmt
   | Assign of lval * exp * stmt
   | Call of lval option * exp * exp list * stmt
-  | Local_init of varinfo * local_init * stmt
+  | Init of varinfo * init * stmt
   | Asm of attributes * string list * extended_asm option * stmt
 
 type edge = {
@@ -93,7 +93,7 @@ module Transition = Datatype.Make (struct
       | Guard (exp,Else,_) -> fprintf fmt "!(%a)" Evast_printer.pp_exp exp
       | Assign (_,_,stmt)
       | Call (_,_,_,stmt)
-      | Local_init (_,_,stmt)
+      | Init (_,_,stmt)
       | Asm (_,_,_,stmt) -> Printer.pp_stmt fmt stmt
       | Enter (b) -> fprintf fmt "Enter %a" print_var_list b.blocals
       | Leave (b)  -> fprintf fmt "Exit %a" print_var_list b.blocals
@@ -179,18 +179,26 @@ let build_wto graph entry_point =
 
 (* Automata translation *)
 
-let translate_instr stmt = function
+
+let translate_instr stmt instr =
+  let translate_call dest callee args _loc =
+    let dest' = Option.map Evast_builder.translate_lval dest in
+    let callee' = Evast_builder.translate_exp callee in
+    let args' = List.map Evast_builder.translate_exp args in
+    Call (dest', callee', args', stmt)
+  in
+  match instr with
   | Cil_types.Set (lval, exp, _loc) ->
     let lval' = Evast_builder.translate_lval lval in
     let exp' = Evast_builder.translate_exp exp in
     Assign (lval', exp', stmt)
-  | Call (lval_opt, exp, exp_list, _loc) ->
-    let lval_opt' = Option.map Evast_builder.translate_lval lval_opt in
-    let exp' = Evast_builder.translate_exp exp in
-    let exp_list' = List.map Evast_builder.translate_exp exp_list in
-    Call (lval_opt', exp', exp_list', stmt)
-  | Local_init (vi, local_init, _loc) ->
-    Local_init (vi, local_init, stmt)
+  | Call (dest, callee, args, loc) ->
+    translate_call dest callee args loc
+  | Local_init (dest, Cil_types.ConsInit (callee, args, k), loc) ->
+    Cil.treat_constructor_as_func translate_call dest callee args k loc
+  | Local_init (vi, Cil_types.AssignInit init, _loc) ->
+    let init' = Evast_builder.translate_init init in
+    Init (vi, init', stmt)
   | Asm (attributes, string_list, ext_asm_opt, _loc) ->
     Asm (attributes, string_list, ext_asm_opt, stmt)
   | Skip (_loc) | Code_annot (_, _loc) ->

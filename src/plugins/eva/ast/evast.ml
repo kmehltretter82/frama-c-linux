@@ -108,3 +108,7 @@ and binop =
   | BOr
   | LAnd
   | LOr
+
+type init =
+  | SingleInit of (exp * Cil_types.location)
+  | CompoundInit of typ * (offset * init) list
