@@ -61,10 +61,10 @@ and exp_node =
 (** Literal constants *)
 and constant =
   | CInt64 of Integer.t * ikind * string option
-  | CString of Base.t (* Base must be String *)
+  | CString of Base.t (* the base must be [Base.String _] *)
   | CChr of char
   | CReal of float * fkind * string option
-  | CEnum of Enumitem.t
+  | CEnum of Enumitem.t * exp (* the translated expression that this enumitem refers to *)
 
 and lval_node = lhost * offset
 

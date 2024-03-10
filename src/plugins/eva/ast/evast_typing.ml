@@ -29,7 +29,7 @@ let type_of_const : constant -> typ = function
   | CString (String (_, Base.CSWstring _)) -> TPtr (Cil.theMachine.wcharType, [])
   | CString (_) -> assert false (* it must be a String base*)
   | CReal (_, fk, _) -> TFloat (fk, [])
-  | CEnum {eival=e} -> Cil.typeOf e
+  | CEnum (_ei, e) -> e.typ
 
 let rec type_of_offset (basetyp : typ) : offset -> typ = function
   | NoOffset -> basetyp

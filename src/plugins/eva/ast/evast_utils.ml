@@ -118,7 +118,7 @@ and to_cil_const const =
   | CString (_base) -> to_cil_fail ()
   | CChr (c) -> CChr (c)
   | CReal (f, fk, s) -> CReal (f, fk, s)
-  | CEnum (ei) -> CEnum (ei)
+  | CEnum (ei, _) -> CEnum (ei)
 
 and to_cil_fail () =
   invalid_arg "this AST cannot be converted to cil"
@@ -261,7 +261,7 @@ let rec to_integer e =
   match e.node with
   | Const (CInt64 (n,_,_)) -> Some n
   | Const (CChr c) -> Some (Cil.charConstToInt c)
-  | Const (CEnum {eival = v}) -> Cil.isInteger v
+  | Const (CEnum ({eival = v}, _)) -> Cil.isInteger v
   | CastE (typ, e) when Cil.isPointerType typ ->
     begin match to_integer e with
       | Some i as r when Cil.fitsInInt Cil.theMachine.upointKind i -> r
@@ -290,7 +290,7 @@ let rec const_fold (exp: exp) : exp =
   let open Evast_builder in
   match exp.node with
   | Const (CChr c) -> integer (Cil.charConstToInt c)
-  | Const (CEnum {eival = v}) -> const_fold (translate_exp v)
+  | Const (CEnum(_ei, e)) -> const_fold e
   | Const (CReal _ | CString _ | CInt64 _) -> exp
   | Lval lv -> mk_exp (Lval (const_fold_lval lv))
   | AddrOf lv -> mk_exp (AddrOf (const_fold_lval lv))

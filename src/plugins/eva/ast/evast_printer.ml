@@ -152,5 +152,5 @@ and pp_constant fmt = function
     Format.fprintf fmt "%s" s
   | CReal (f, _, None) ->
     Floating_point.pretty fmt f
-  | CEnum { einame } ->
+  | CEnum ({ einame },_) ->
     Format.fprintf fmt "%s" einame

@@ -59,7 +59,7 @@ and hash_constant c =
   | CString _ | CChr _ -> Hashtbl.hash (1, c)
   | CReal (fn, fk, _) -> Hashtbl.hash (2, fn, fk)
   | CInt64 (n, k, _) -> Hashtbl.hash (3, n, k )
-  | CEnum ei -> Hashtbl.hash (4, ei)
+  | CEnum (ei, _) -> Hashtbl.hash (4, ei.einame)
 
 
 (* Tag utility *)

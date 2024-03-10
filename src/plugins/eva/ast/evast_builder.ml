@@ -67,13 +67,6 @@ let translate_binop = function
   | Cil_types.LAnd -> LAnd
   | Cil_types.LOr -> LOr
 
-let translate_constant = function
-  | Cil_types.CStr _ | Cil_types.CWStr _ -> assert false (* Handled at higher level by translate_expr *)
-  | Cil_types.CInt64 (cst, ikind, str) -> CInt64 (cst, ikind, str)
-  | Cil_types.CChr chr -> CChr chr
-  | Cil_types.CReal (float, fkind, str) -> CReal (float, fkind, str)
-  | Cil_types.CEnum enum -> CEnum enum
-
 
 let rec translate_exp e =
   let eval_size e = Cil.constFoldToInt e in
@@ -111,6 +104,13 @@ and translate_offset = function
 and translate_lval (host, offset as lval) =
   let node = translate_host host, translate_offset offset in
   mk_lval ~origin:(Lval lval) node
+
+and translate_constant = function
+  | Cil_types.CStr _ | Cil_types.CWStr _ -> assert false (* Handled at higher level by translate_expr *)
+  | Cil_types.CInt64 (cst, ikind, str) -> CInt64 (cst, ikind, str)
+  | Cil_types.CChr chr -> CChr chr
+  | Cil_types.CReal (float, fkind, str) -> CReal (float, fkind, str)
+  | Cil_types.CEnum ei -> CEnum (ei, translate_exp ei.eival)
 
 
 (* --- Smart constructors --- *)
