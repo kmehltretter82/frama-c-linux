@@ -308,7 +308,7 @@ function applyTab(index = -1): void {
   if (tab === undefined) return;
   const { viewId, stack, split } = tab;
   if (old === index) {
-    LAB.setValue({ ...state, sideView: viewId });
+    LAB.setValue({ ...state, sideView: viewId, sideComp: '' });
     return;
   }
   const tabs = [...state.tabs];
@@ -325,6 +325,42 @@ function applyTab(index = -1): void {
     sideView: viewId,
     sideComp: '',
   });
+}
+
+
+function closeTab(index: number): void {
+  const state = LAB.getValue();
+  const old = state.tabIndex;
+  const preTabs = state.tabs.slice(0,index);
+  const postTabs = state.tabs.slice(index+1);
+  const newTabs = [ ...preTabs, ...postTabs ];
+  const tabIndex = old > 0 ? old - 1 : 0;
+  const tab = newTabs[tabIndex];
+  if (tab === undefined) {
+    LAB.setValue({
+      ...state,
+      stack: [defaultLayout],
+      split: defaultSplit,
+      tabs: newTabs,
+      tabIndex: -1,
+      sideView: '',
+      sideComp: '',
+    });
+  } else {
+    const { viewId, stack, split } = tab;
+    const layout = stack[0];
+    const panels = addPanels(state.panels, layout);
+    LAB.setValue({
+      ...state,
+      panels,
+      stack,
+      split,
+      tabs: newTabs,
+      tabIndex,
+      sideView: viewId,
+      sideComp: '',
+    });
+  }
 }
 
 function applyView(view: Ivette.ViewLayoutProps): void {
@@ -954,6 +990,7 @@ function TabView(props: TabViewProps): JSX.Element | null {
     !compareSplit(split, defaultSplit) ||
     !compareLayout(layout, makeViewLayout(view.layout));
   const vname = view.label;
+  const favorite = custom === 0;
   const tname = custom > 0 ? `${vname} — ${custom}` : vname;
   const label = modified ? `${tname}*` : tname;
   const tdup = custom > 0 ? 'Custom ' : '';
@@ -963,6 +1000,20 @@ function TabView(props: TabViewProps): JSX.Element | null {
     (custom < 0) ? 'DISPLAY' :
     selected ? 'FAVORITE' :
     'STAR';
+  const onClose = (): void => closeTab(index);
+  const onContextMenu = (): void => {
+    const onDisplay = (): void => applyTab(index);
+    const onFavorite = (): void => applyFavorite(view, !favorite);
+    const onRestore = (): void => restoreDefault(view);
+    const favAction = !favorite ? 'Add to Favorite' : 'Remove from Favorite';
+    Dome.popupMenu([
+      { label: 'Display View', enabled: !selected, onClick: onDisplay },
+      { label: favAction, display: custom <= 0, onClick: onFavorite },
+      { label: 'Restore Default', enabled: modified, onClick: onRestore },
+      { label: 'Close Tab', display: custom < 0, onClick: onClose },
+    ]);
+  };
+
   return (
     <Toolbar.Button
       className='labview-tab'
@@ -972,7 +1023,14 @@ function TabView(props: TabViewProps): JSX.Element | null {
       value={index}
       selection={tabIndex}
       onClick={applyTab}
-    />
+      onContextMenu={onContextMenu}
+    >
+      <IconButton
+        display={custom < 0}
+        icon='CIRC.CLOSE'
+        onClick={onClose}
+      />
+    </Toolbar.Button>
   );
 }
 
