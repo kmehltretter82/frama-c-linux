@@ -93,11 +93,7 @@ module VarMap = struct
     | Some l, Some r -> Some (l,r)
     | _ -> None
 
-  let pretty fmt =
-    let is_first = ref true in
-    iter (fun var v ->
-        if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
-        Format.fprintf fmt "@ @[%a:%d@]" Varinfo.pretty var v)
+  let pretty = let module M = Make (Datatype.Int) in M.pretty
 end
 
 type state =
@@ -261,19 +257,12 @@ module Pretty = struct
           G.iter_vertex pp_unconnected_vertex s.graph)
 
   let pp_aliases fmt s =
-    let is_first = ref true in
-    let pp_alias_set _ set_lv =
-      if !is_first then is_first := false else Format.fprintf fmt "@;<2>";
-      LSet.pretty fmt set_lv
-    in
-    let alias_set_of_vertex i _ =
+    let alias_set_of_vertex (i, _) =
       let aliases = Readout.lvals_pointing_to_vertex i s in
       if LSet.cardinal aliases >= 2 then Some aliases else None
     in
-    let alias_sets = VMap.filter_map alias_set_of_vertex s.vmap in
-    if VMap.is_empty alias_sets
-    then Format.fprintf fmt "<none>"
-    else VMap.iter pp_alias_set alias_sets
+    let alias_sets = List.filter_map alias_set_of_vertex @@ VMap.bindings s.vmap in
+    Pretty_utils.pp_list ~empty:"<none>" ~sep:"@;<2>" LSet.pretty fmt alias_sets
 
 end
 
