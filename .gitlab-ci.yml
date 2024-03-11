@@ -433,6 +433,7 @@ internal-nightly:
 .build_template: &additional_arch_template
   stage: compatibility
   script:
+    - opam update
     - opam switch create --empty .
     - eval $(opam env --switch=. --set-switch)
     # Note: we use this to get an exact version corresponding to a minor version
