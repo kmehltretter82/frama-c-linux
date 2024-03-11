@@ -48,6 +48,7 @@ module Warn : sig
   val unsupported_asm : warn_category
   val unsupported_function : warn_category
   val unsafe_cast : warn_category
+  val incoherent : warn_category
 end
 
 module DebugKeys : sig

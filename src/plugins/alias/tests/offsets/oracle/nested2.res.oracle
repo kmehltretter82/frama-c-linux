@@ -28,7 +28,7 @@
   0:{ z1 } → 1:{  }   2:{ t } → 3:{  }   4:{ a } → 5:{  }
 [alias] analysing instruction: z1->s[0] = (struct struct_1_t *)(& x1);
 [alias:unsafe-cast] nested2.c:42: Warning: 
-  unsafe cast from st_1_t * to struct struct_1_t *
+  unsafe cast from st_1_t * to struct struct_1_t *; analysis may be unsound
 [alias] May-aliases after instruction  z1->s[0] = (struct struct_1_t *)(& x1);  are
   <none>
 [alias] May-alias graph after instruction  z1->s[0] = (struct struct_1_t *)(& x1);
@@ -37,7 +37,7 @@
   4:{ a } → 5:{  }   6:{  } → 7:{  }   7:{  } → 8:{ x1 }
 [alias] analysing instruction: z1->s[1] = (struct struct_1_t *)(& x2);
 [alias:unsafe-cast] nested2.c:43: Warning: 
-  unsafe cast from st_1_t * to struct struct_1_t *
+  unsafe cast from st_1_t * to struct struct_1_t *; analysis may be unsound
 [alias] May-aliases after instruction  z1->s[1] = (struct struct_1_t *)(& x2);  are
   <none>
 [alias] May-alias graph after instruction  z1->s[1] = (struct struct_1_t *)(& x2);
@@ -52,10 +52,10 @@
   12:{ a } → 5:{  }
 [alias] analysing instruction: t->t = (struct struct_2_t *)z1;
 [alias:unsafe-cast] nested2.c:45: Warning: 
-  unsafe cast from st_2_t * to struct struct_2_t *
+  unsafe cast from st_2_t * to struct struct_2_t *; analysis may be unsound
 [alias] May-aliases after instruction  t->t = (struct struct_2_t *)z1;  are
   { t->t; z1 }  { (t->t)->c; z1->c; a }  { (t->t)->s; z1->s }
-  { (*(t->t))[0..].s; (*z1)[0..].s }
+  { (t->t)->s[0..]; z1->s[0..] }
 [alias] May-alias graph after instruction  t->t = (struct struct_2_t *)z1;  is
   1:{  } -s→ 6:{  }   1:{  } -c→ 12:{ a }   2:{ t } → 3:{  }
   3:{  } -t→ 13:{ z1 }   6:{  } → 7:{  }   7:{  } → 8:{ x1; x2 }
@@ -63,7 +63,7 @@
 [alias] analysing instruction: t->d = a;
 [alias] May-aliases after instruction  t->d = a;  are
   { t->t; z1 }  { (t->t)->c; z1->c; t->d; a }  { (t->t)->s; z1->s }
-  { (*(t->t))[0..].s; (*z1)[0..].s }
+  { (t->t)->s[0..]; z1->s[0..] }
 [alias] May-alias graph after instruction  t->d = a;  is
   1:{  } -s→ 6:{  }   1:{  } -c→ 14:{ a }   2:{ t } → 3:{  }
   3:{  } -t→ 13:{ z1 }   3:{  } -d→ 14:{ a }   6:{  } → 7:{  }
@@ -71,14 +71,14 @@
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
   { t->t; z1 }  { (t->t)->c; z1->c; t->d; a }  { (t->t)->s; z1->s }
-  { (*(t->t))[0..].s; (*z1)[0..].s }
+  { (t->t)->s[0..]; z1->s[0..] }
 [alias] May-alias graph after instruction  __retres = 0;  is
   1:{  } -s→ 6:{  }   1:{  } -c→ 14:{ a }   2:{ t } → 3:{  }
   3:{  } -t→ 13:{ z1 }   3:{  } -d→ 14:{ a }   6:{  } → 7:{  }
   7:{  } → 8:{ x1; x2 }   13:{ z1 } → 1:{  }   14:{ a } → 5:{  }
 [alias] May-aliases at the end of function main:
   { t->t; z1 }  { (t->t)->c; z1->c; t->d; a }  { (t->t)->s; z1->s }
-  { (*(t->t))[0..].s; (*z1)[0..].s }
+  { (t->t)->s[0..]; z1->s[0..] }
 [alias] May-alias graph at the end of function main:
   1:{  } -s→ 6:{  }   1:{  } -c→ 14:{ a }   2:{ t } → 3:{  }
   3:{  } -t→ 13:{ z1 }   3:{  } -d→ 14:{ a }   6:{  } → 7:{  }
@@ -86,5 +86,5 @@
 [alias] Summary of function main:
   formals:     locals: x1  x2  z1  t  a  __retres    returns: __retres
   state: { t->t; z1 }  { (t->t)->c; z1->c; t->d; a }  { (t->t)->s; z1->s }
-         { (*(t->t))[0..].s; (*z1)[0..].s }
+         { (t->t)->s[0..]; z1->s[0..] }
 [alias] Analysis complete

@@ -93,11 +93,7 @@ module VarMap = struct
     | Some l, Some r -> Some (l,r)
     | _ -> None
 
-  let pretty fmt =
-    let is_first = ref true in
-    iter (fun var v ->
-        if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
-        Format.fprintf fmt "@ @[%a:%d@]" Varinfo.pretty var v)
+  let pretty = let module M = Make (Datatype.Int) in M.pretty
 end
 
 type state =
@@ -159,17 +155,26 @@ module Readout = struct
     assert (G.mem_vertex s.graph v);
     (* cycles can occur with unsafe casts such as: x->f = (int* ) x; *)
     let rec checking_for_cycles s visited v =
-      if VSet.mem v visited then LSet.empty else
+      if VSet.mem v visited then
+        let () =
+          Options.warning ~once:true ~wkey:Options.Warn.incoherent
+            "cycle during readout of vertex %d, \
+             (following unsafe cast?); analysis may be unsound" v
+        in LSet.empty
+      else
         let visited = VSet.add v visited in
         let modified_predecessors = List.map
             (fun e ->
                let pred_lvals = checking_for_cycles s visited @@ E.src e in
                let modify_lval lv = match E.label e with
-                 | Field f -> let lhost, o = lv in lhost, Field (f, o)
+                 | Field f -> Cil.addOffsetLval (Field (f, NoOffset)) lv
                  | Pointer ->
+                   (* TODO: This Cil.typeOfLval may crash with a fatal kernel
+                      error for certain reconstructed lvals involving a union
+                      type. See tests/known_bugs/union_readback.c *)
                    let ty = Cil.typeOfLval lv in
                    if Cil.isArrayType ty then
-                     let lhost, o = lv in lhost, Index (Simplified.nul_exp, o)
+                     Cil.addOffsetLval (Index (Simplified.nul_exp, NoOffset)) lv
                    else
                      let () = if not @@ Cil.isPointerType ty then
                          Options.debug "unexpected type: %a" Printer.pp_typ ty
@@ -252,19 +257,12 @@ module Pretty = struct
           G.iter_vertex pp_unconnected_vertex s.graph)
 
   let pp_aliases fmt s =
-    let is_first = ref true in
-    let pp_alias_set _ set_lv =
-      if !is_first then is_first := false else Format.fprintf fmt "@;<2>";
-      LSet.pretty fmt set_lv
-    in
-    let alias_set_of_vertex i _ =
+    let alias_set_of_vertex (i, _) =
       let aliases = Readout.lvals_pointing_to_vertex i s in
       if LSet.cardinal aliases >= 2 then Some aliases else None
     in
-    let alias_sets = VMap.filter_map alias_set_of_vertex s.vmap in
-    if VMap.is_empty alias_sets
-    then Format.fprintf fmt "<none>"
-    else VMap.iter pp_alias_set alias_sets
+    let alias_sets = List.filter_map alias_set_of_vertex @@ VMap.bindings s.vmap in
+    Pretty_utils.pp_list ~empty:"<none>" ~sep:"@;<2>" LSet.pretty fmt alias_sets
 
 end
 
@@ -290,7 +288,9 @@ let assert_invariants s : unit =
   G.iter_vertex assert_vertex s.graph;
   let assert_edge v1 v2 =
     Options.debug ~level:11 "checking coherence of edge %d → %d" v1 v2;
-    assert (v1 <> v2);
+    if v1 = v2 then
+      Options.warning ~once:true ~wkey:Options.Warn.incoherent
+        "loop on vertex %d (following unsafe cast?); analysis may be unsound" v1;
     assert (G.mem_vertex s.graph v1);
     assert (G.mem_vertex s.graph v2)
   in

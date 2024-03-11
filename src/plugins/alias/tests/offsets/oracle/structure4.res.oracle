@@ -24,7 +24,7 @@
   0:{ y1 } → 1:{ x1 }   2:{ z } → 3:{  }
 [alias] analysing instruction: z->s = (struct struct_1_t *)y1;
 [alias:unsafe-cast] structure4.c:37: Warning: 
-  unsafe cast from st_1_t * to struct struct_1_t *
+  unsafe cast from st_1_t * to struct struct_1_t *; analysis may be unsound
 [alias] May-aliases after instruction  z->s = (struct struct_1_t *)y1;  are
   { z->s; y1 }
 [alias] May-alias graph after instruction  z->s = (struct struct_1_t *)y1;  is

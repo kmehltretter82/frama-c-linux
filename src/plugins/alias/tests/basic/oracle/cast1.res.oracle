@@ -13,11 +13,13 @@
 [alias] May-aliases after instruction  float *d = (float *)0;  are  <none>
 [alias] May-alias graph after instruction  float *d = (float *)0;  is    <empty>
 [alias] analysing instruction: a = (int *)c;
-[alias:unsafe-cast] cast1.c:10: Warning: unsafe cast from float * to int *
+[alias:unsafe-cast] cast1.c:10: Warning: 
+  unsafe cast from float * to int *; analysis may be unsound
 [alias] May-aliases after instruction  a = (int *)c;  are  { a; c }
 [alias] May-alias graph after instruction  a = (int *)c;  is    0:{ a; c } → 1:{  }
 [alias] analysing instruction: d = (float *)b;
-[alias:unsafe-cast] cast1.c:11: Warning: unsafe cast from int * to float *
+[alias:unsafe-cast] cast1.c:11: Warning: 
+  unsafe cast from int * to float *; analysis may be unsound
 [alias] May-aliases after instruction  d = (float *)b;  are  { a; c }  { b; d }
 [alias] May-alias graph after instruction  d = (float *)b;  is
   0:{ a; c } → 1:{  }   4:{ b; d } → 5:{  }
