@@ -105,6 +105,7 @@ module Context = struct
      This functor is responsible of building such conversion operations. *)
   module type From = sig type context val structure : context structure end
   module Converter (From : From) (To : Interactive) = struct
+    type internal = From.context
     type extended = To.t
     let structure = From.structure
 
@@ -264,6 +265,7 @@ module Value = struct
      This functor is responsible of building such conversion operations. *)
   module type From = sig type value val structure : value structure end
   module Converter (From : From) (To : Interactive) = struct
+    type internal = From.value
     type extended = To.t
     let structure = From.structure
 
@@ -426,6 +428,7 @@ module Location = struct
      responsible of building such conversion operations. *)
   module type From = sig type location val structure : location structure end
   module Converter (From : From) (To : Interactive) = struct
+    type internal = From.location
     type extended = To.location
     let structure = From.structure
 
@@ -662,61 +665,34 @@ module Domain = struct
         let eq_ctx = Context.dec_eq ctx_deps Ctx.structure in
         let eq_val = Value.dec_eq val_deps Val.structure in
         let eq_loc = Location.dec_eq loc_deps Loc.structure in
-        begin match eq_ctx, eq_val, eq_loc with
-          | Some Eq, Some Eq, Some Eq ->
-            let structure = Abstract.Domain.Leaf (D.key, (module D)) in
-            (module struct include D let structure = structure end)
-          | Some Eq, Some Eq, None ->
-            let module Ctx = (val conversion_id (module Ctx)) in
-            let module Val = (val conversion_id (module Val)) in
-            let module From = struct include D let structure = loc_deps end in
-            let module Loc = Location.Converter (From) (Loc) in
-            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
-          | Some Eq, None, Some Eq ->
-            let module Ctx = (val conversion_id (module Ctx)) in
-            let module From = struct include D let structure = val_deps end in
-            let module Val = Value.Converter (From) (Val) in
-            let module LocTyp = struct type t = Loc.location end in
-            let module Loc = (val conversion_id (module LocTyp)) in
-            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
-          | Some Eq, None, None ->
-            let module Ctx = (val conversion_id (module Ctx)) in
-            let module From = struct include D let structure = val_deps end in
-            let module Val = Value.Converter (From) (Val) in
-            let module From = struct include D let structure = loc_deps end in
-            let module Loc = Location.Converter (From) (Loc) in
-            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
-          | None, Some Eq, Some Eq ->
-            let module From = struct include D let structure = ctx_deps end in
-            let module Ctx = Context.Converter (From) (Ctx) in
-            let module Val = (val conversion_id (module Val)) in
-            let module LocTyp = struct type t = Loc.location end in
-            let module Loc = (val conversion_id (module LocTyp)) in
-            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
-          | None, Some Eq, None ->
-            let module From = struct include D let structure = ctx_deps end in
-            let module Ctx = Context.Converter (From) (Ctx) in
-            let module Val = (val conversion_id (module Val)) in
-            let module From = struct include D let structure = loc_deps end in
-            let module Loc = Location.Converter (From) (Loc) in
-            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
-          | None, None, Some Eq ->
-            let module From = struct include D let structure = ctx_deps end in
-            let module Ctx = Context.Converter (From) (Ctx) in
-            let module From = struct include D let structure = val_deps end in
-            let module Val = Value.Converter (From) (Val) in
-            let module LocTyp = struct type t = Loc.location end in
-            let module Loc = (val conversion_id (module LocTyp)) in
-            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
-          | None, None, None ->
-            let module From = struct include D let structure = ctx_deps end in
-            let module Ctx = Context.Converter (From) (Ctx) in
-            let module From = struct include D let structure = val_deps end in
-            let module Val = Value.Converter (From) (Val) in
-            let module From = struct include D let structure = loc_deps end in
-            let module Loc = Location.Converter (From) (Loc) in
-            (module Domain_lift.Make (D) (Ctx) (Val) (Loc))
-        end
+        match eq_ctx, eq_val, eq_loc with
+        | Some Eq, Some Eq, Some Eq ->
+          let structure = Abstract.Domain.Leaf (D.key, (module D)) in
+          (module struct include D let structure = structure end)
+        | _ ->
+          let ctx_converter : (D.context, Ctx.t) conversion =
+            match eq_ctx with
+            | Some Eq -> conversion_id (module Ctx)
+            | None ->
+              let module From = struct include D let structure = ctx_deps end in
+              (module Context.Converter (From) (Ctx))
+          in
+          let val_converter : (D.value, Val.t) conversion =
+            match eq_val with
+            | Some Eq -> conversion_id (module Val)
+            | None ->
+              let module From = struct include D let structure = val_deps end in
+              (module Value.Converter (From) (Val))
+          in
+          let loc_converter : (D.location, Loc.location) conversion =
+            match eq_loc with
+            | Some Eq -> conversion_id (module (struct type t = Loc.location end))
+            | None ->
+              let module From = struct include D let structure = loc_deps end in
+              (module Location.Converter (From) (Loc))
+          in
+          (module Domain_lift.Make (D)
+               (val ctx_converter) (val val_converter) (val loc_converter))
     in
     (* Set the name of the domain. *)
     let module Named = (val register_name registered.name lifted) in
