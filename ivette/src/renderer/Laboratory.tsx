@@ -20,9 +20,11 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import React from "react";
+import React from 'react';
 import * as Dome from 'dome';
+import * as Json from 'dome/data/json';
 import * as States from 'dome/data/states';
+import * as Settings from 'dome/data/settings';
 import * as Sidebars from 'dome/frame/sidebars';
 import * as Toolbar from 'dome/frame/toolbars';
 import { Icon } from 'dome/controls/icons';
@@ -79,12 +81,93 @@ const LAB = new States.GlobalState<LabViewState>({
 });
 
 /* -------------------------------------------------------------------------- */
-/* --- Layout Utilities                                                   --- */
+/* --- Settings Management                                                --- */
 /* -------------------------------------------------------------------------- */
 
-function compareSplit(p: Split, q: Split): boolean {
-  return p.H === q.H && p.V === q.V;
+interface TabSettings {
+  view: viewId,
+  split: Split,
 }
+
+interface DockSettings {
+  comp: compId,
+  position: Ivette.LayoutPosition,
+}
+
+interface LabSettings {
+  tabIndex: number;
+  tabs: TabSettings[];
+  dock: DockSettings[];
+}
+
+const jSplit: Json.Decoder<Split> =
+  Json.jObject({
+    H: Json.jRange(0, 1, 0.5),
+    V: Json.jRange(0, 1, 0.5),
+  });
+
+const jPosition: Json.Decoder<Ivette.LayoutPosition> =
+  (js: Json.json) => {
+    switch(js) {
+      case 'A': case 'B': case 'C': case 'D':
+      case 'AB': case 'AC': case 'BD': case 'CD':
+      case 'ABCD':
+        return js;
+      default:
+        return 'D';
+    }
+  };
+
+const jTabSettings: Json.Decoder<TabSettings> =
+  Json.jObject({
+    view: Json.jString,
+    split: jSplit,
+  });
+
+const jDockSettings: Json.Decoder<DockSettings> =
+  Json.jObject({
+    comp: Json.jString,
+    position: jPosition,
+  });
+
+const jLabSettings: Json.Decoder<LabSettings> =
+  Json.jObject({
+    tabIndex: Json.jNumber,
+    tabs: Json.jCatch(Json.jArray(jTabSettings), []),
+    dock: Json.jCatch(Json.jArray(jDockSettings), []),
+  });
+
+const eLabSettings: Json.Encoder<LabSettings> =
+  (s: LabSettings): Json.json => ((s as object) as Json.json);
+
+function labSettings(state: LabViewState): LabSettings {
+  let tabIndex = 0;
+  const tabs: TabSettings[] = [];
+  state.tabs.forEach((tab, index) => {
+    if (tab.custom === 0) {
+      if (index === state.tabIndex)
+        tabIndex = tabs.length;
+      tabs.push({
+        view: tab.viewId,
+        split: tab.split,
+      });
+    }
+  });
+  const dock: DockSettings[] = [];
+  state.docked.forEach((position, compId) => dock.push({
+    comp: compId,
+    position,
+  }));
+  return { tabIndex, tabs, dock };
+}
+
+const defaultSettings: LabSettings = {
+  tabIndex: 0, tabs: [], dock: [],
+};
+
+/* -------------------------------------------------------------------------- */
+/* --- Layout Utilities                                                   --- */
+/* -------------------------------------------------------------------------- */
 
 function compareLayout(u: Layout, v: Layout): boolean {
   return (
@@ -175,29 +258,43 @@ function addLayoutComponent(
 ): Layout[]
 {
   stack = stack.map(removeLayout(compId)).filter(isDefined);
-  const layout = addLayout(stack[0], compId, at);
+  const top = stack[0] ?? defaultLayout;
+  const layout = addLayout(top, compId, at);
   return unstackLayout(layout, stack.slice(1));
 }
 
 function removeLayoutComponent(stack: Layout[], compId: compId): Layout[]
 {
   stack = stack.map(removeLayout(compId)).filter(isDefined);
-  return unstackLayout(stack[0], stack.slice(1));
+  const top = stack[0] ?? defaultLayout;
+  return unstackLayout(top, stack.slice(1));
 }
 
 function completeLayout(m: Layout): Layout
 {
-  const { A, B, C, D } = m;
+  let { A, B, C, D } = m;
   if (A && B && C && D) return m;
-  const AB = A && A === B;
-  const AC = A && A === C;
-  const BD = B && B === D;
-  return {
-    A: A || ( BD ? C : B ) || B || C || D,
-    B: B || ( AC ? D : A ) || A || D || C,
-    C: C || ( BD ? A : D ) || D || A || B,
-    D: D || ( AB ? C : B ) || C || B || A,
-  };
+  if (!A) {
+    const BD = B && B === D;
+    const CD = C && C === D;
+    A = BD ? C : CD ? B : (B || C || D);
+  }
+  if (!B) {
+    const AC = A && A === C;
+    const CD = C && C === D;
+    B = AC ? D : CD ? A : (A || D || C);
+  }
+  if (!C) {
+    const AB = A && A === B;
+    const BD = B && B === D;
+    C = AB ? D : BD ? A : (A || D || B);
+  }
+  if (!D) {
+    const AB = A && A === B;
+    const AC = A && A === C;
+    D = AB ? C : AC ? B : (B || C || A);
+  }
+  return { A, B, C, D };
 }
 
 function getLayoutPosition(
@@ -301,18 +398,20 @@ function setCurrentComp(compId: compId = ''):void {
   LAB.setValue({ ...state, sideComp: compId, sideView: '' });
 }
 
+function setCurrentNone(): void {
+  const state = LAB.getValue();
+  LAB.setValue({ ...state, sideComp: '', sideView: '' });
+}
+
 function applyTab(index = -1): void {
   const state = LAB.getValue();
   const old = state.tabIndex;
   const tab = state.tabs[index];
   if (tab === undefined) return;
-  const { viewId, stack, split } = tab;
-  if (old === index) {
-    LAB.setValue({ ...state, sideView: viewId, sideComp: '' });
-    return;
-  }
+  const { stack, split } = tab;
+  if (old === index) return;
   const tabs = [...state.tabs];
-  const layout = stack[0];
+  const layout = stack[0] ?? defaultLayout;
   saveTab(tabs, state);
   const panels = addPanels(state.panels, layout);
   LAB.setValue({
@@ -322,16 +421,13 @@ function applyTab(index = -1): void {
     split,
     tabs,
     tabIndex: index,
-    sideView: viewId,
-    sideComp: '',
   });
 }
-
 
 function closeTab(index: number): void {
   const state = LAB.getValue();
   const old = state.tabIndex;
-  const preTabs = state.tabs.slice(0,index);
+  const preTabs = state.tabs.slice(0, index);
   const postTabs = state.tabs.slice(index+1);
   const newTabs = [ ...preTabs, ...postTabs ];
   const tabIndex = old > 0 ? old - 1 : 0;
@@ -343,12 +439,10 @@ function closeTab(index: number): void {
       split: defaultSplit,
       tabs: newTabs,
       tabIndex: -1,
-      sideView: '',
-      sideComp: '',
     });
   } else {
-    const { viewId, stack, split } = tab;
-    const layout = stack[0];
+    const { stack, split } = tab;
+    const layout = stack[0] ?? defaultLayout;
     const panels = addPanels(state.panels, layout);
     LAB.setValue({
       ...state,
@@ -357,8 +451,6 @@ function closeTab(index: number): void {
       split,
       tabs: newTabs,
       tabIndex,
-      sideView: viewId,
-      sideComp: '',
     });
   }
 }
@@ -376,14 +468,13 @@ function applyView(view: Ivette.ViewLayoutProps): void {
     const tabIndex = tabs.length - 1;
     saveTab(tabs, state);
     LAB.setValue({
+      ...state,
       panels,
       split: defaultSplit,
       stack: [layout],
       docked: state.docked,
       tabs,
       tabIndex,
-      sideView: view.id,
-      sideComp: '',
     });
   }
 }
@@ -410,11 +501,13 @@ function applyFavorite(view: Ivette.ViewLayoutProps, favorite: boolean): void {
     const tabs = [...state.tabs];
     const tab = tabs[index];
     const custom = favorite ? 0 : -1;
-    tabs[index] = { ...tab, custom };
-    LAB.setValue({ ...state, tabs, sideView: view.id, sideComp: '' });
+    if (tab.custom !== custom) {
+      tabs[index] = { ...tab, custom };
+      LAB.setValue({ ...state, tabs });
+    }
   } else if (favorite) {
     const tabs = newTab(state.tabs, view, 0);
-    LAB.setValue({ ...state, tabs, sideView: view.id, sideComp: '' });
+    LAB.setValue({ ...state, tabs });
   }
 }
 
@@ -427,17 +520,22 @@ function applyComponent(
   const pos = at ?? preferredPosition ?? 'D';
   const stack = addLayoutComponent(state.stack, id, pos);
   const panels = copySet(state.panels).add(id);
-  LAB.setValue({ ...state, panels, stack, sideView: '', sideComp: id });
+  LAB.setValue({ ...state, panels, stack });
 }
 
-function dockComponent(comp: Ivette.ComponentProps): void
+function dockComponent(
+  comp: Ivette.ComponentProps,
+  at?: Ivette.LayoutPosition
+): void
 {
   const { id, preferredPosition } = comp;
   const state = LAB.getValue();
-  const pos = getLayoutPosition(state.stack[0], id) ?? preferredPosition ?? 'D';
+  const top = state.stack[0] ?? defaultLayout;
+  const pos =
+    at ?? getLayoutPosition(top, id) ?? preferredPosition ?? 'D';
   const stack = removeLayoutComponent(state.stack, id);
   const docked = copyMap(state.docked).set(id, pos);
-  LAB.setValue({ ...state, docked, stack, sideView: '', sideComp: id });
+  LAB.setValue({ ...state, docked, stack });
 }
 
 function closeComponent(compId: compId): void
@@ -448,10 +546,62 @@ function closeComponent(compId: compId): void
   const docked = copyMap(state.docked);
   panels.delete(compId);
   docked.delete(compId);
-  LAB.setValue({
-    ...state, panels, docked, stack, sideView: '', sideComp: compId
-  });
+  LAB.setValue({ ...state, panels, docked, stack });
 }
+
+/* -------------------------------------------------------------------------- */
+/* --- Settings Update                                                    --- */
+/* -------------------------------------------------------------------------- */
+
+let synchronize = true;
+
+LAB.on((state: LabViewState) => {
+  if (synchronize) {
+    try {
+      synchronize = false;
+      const data = labSettings(state);
+      Settings.setWindowSettings('ivette.laboratory', eLabSettings(data));
+    } finally {
+      synchronize = true;
+    }
+  }
+});
+
+Settings.onWindowSettings(() => {
+  if (synchronize) {
+    try {
+      synchronize = false;
+      const settings = Settings.getWindowSettings(
+        'ivette.laboratory', jLabSettings, defaultSettings
+      );
+      let gotoView: viewId | undefined = undefined;
+      settings.tabs.forEach((tab, index) => {
+        const view = VIEW.getElement(tab.view);
+        if (view !== undefined) {
+          applyFavorite(view, true);
+          if (index === settings.tabIndex) gotoView = tab.view;
+        }
+      });
+      settings.dock.forEach(dock => {
+        const comp = COMPONENT.getElement(dock.comp);
+        if (comp !== undefined)
+          dockComponent(comp, dock.position);
+      });
+      if (gotoView !== undefined) {
+        const state = LAB.getValue();
+        if (state.tabIndex < 0) {
+          const tabIndex = findTab(state.tabs, gotoView);
+          if (0 <= tabIndex) {
+            applyTab(tabIndex);
+            setCurrentNone();
+          }
+        }
+      }
+    } finally {
+      synchronize = true;
+    }
+  }
+});
 
 /* -------------------------------------------------------------------------- */
 /* --- Layout Menu State                                                  --- */
@@ -546,7 +696,7 @@ function LayoutMenu(): JSX.Element | null {
   const [state] = States.useGlobalState(LAB);
   const [panelWidth, setWidth] = React.useState(80);
   const [panelHeight, setHeight] = React.useState(80);
-  const layout = state.stack[0];
+  const layout = state.stack[0] ?? defaultLayout;
   const { compId, dock, close } = menu;
   const display = compId !== '';
 
@@ -657,13 +807,13 @@ function Pane(props: PaneProps): JSX.Element | null {
 /* -------------------------------------------------------------------------- */
 
 export function LabView(): JSX.Element {
-
   const [state] = States.useGlobalState(LAB);
   const setPosition = React.useCallback(
     (H, V) => LAB.setValue({ ...state, split: { H, V } }),
     [state]
   );
-  const { A, B, C, D } = completeLayout(state.stack[0]);
+  const layout = state.stack[0] ?? defaultLayout;
+  const { A, B, C, D } = completeLayout(layout);
   const { H, V } = state.split;
   const panels : JSX.Element[] = [];
   state.panels.forEach((id) => panels.push(<Pane key={id} compId={id}/>));
@@ -689,21 +839,19 @@ interface ViewItemProps {
   selected: boolean;
   displayed: boolean;
   layout: Layout | undefined;
-  split: Split | undefined;
 }
 
 function ViewItem(props: ViewItemProps): JSX.Element {
-  const { view, favorite, displayed, selected, split, layout } = props;
+  const { view, favorite, displayed, selected, layout } = props;
   const { id, label: vname, title: vtitle } = view;
 
   const onSelection = (_evt:React.MouseEvent): void => {
+    setCurrentView(id);
     applyView(view);
   };
 
   const icon = favorite ? 'FAVORITE' : 'DISPLAY';
   const modified =
-    (split !== undefined &&
-     !compareSplit(split, defaultSplit)) ||
     (layout !== undefined &&
      !compareLayout(layout, makeViewLayout(view.layout)));
 
@@ -750,14 +898,12 @@ function ViewSection(): JSX.Element {
     const displayed = 0 <= index && index === tabIndex;
     const tab = 0 <= index ? tabs[index] : undefined;
     const layout = displayed ? state.stack[0] : tab?.stack[0];
-    const split = displayed ? state.split : tab?.split;
     return (
       <ViewItem
         key={id}
         view={view}
         favorite={favorite}
         layout={layout}
-        split={split}
         displayed={displayed}
         selected={id === state.sideView} />
     );
@@ -792,6 +938,8 @@ function ComponentItem(props: ComponentItemProps): JSX.Element {
     docked ? 'QSPLIT.DOCK' :
     'COMPONENT';
 
+  const mlabel = !position && active ? label + '*' : label;
+
   const status =
     position ? 'Visible' :
     docked ? 'Docked' :
@@ -814,7 +962,7 @@ function ComponentItem(props: ComponentItemProps): JSX.Element {
   return (
     <Sidebars.Item
       icon={icon}
-      label={label}
+      label={mlabel}
       title={`${title} (${status})`}
       onSelection={onSelection}
       onDoubleClick={onDoubleClick}
@@ -843,7 +991,7 @@ function GroupSection(props: GroupSectionProps): JSX.Element | null {
   const settings = 'ivette.sidebar.group.' + id;
   const components = Ext.useElements(COMPONENT).filter(filter) ?? [];
   const [{ panels, docked, sideComp, stack }] = States.useGlobalState(LAB);
-  const layout = stack[0];
+  const layout = stack[0] ?? defaultLayout;
   const items = components.map((comp) => {
     const { id } = comp;
     return (
@@ -931,7 +1079,10 @@ function DockItem(props: DockItemProps): JSX.Element | null {
   );
 
   const onClick = (): void => {
-    if (enabled) applyComponent(comp, position);
+    if (enabled) {
+      applyComponent(comp, position);
+      setCurrentNone();
+    }
   };
 
   const onContextMenu = (evt: React.MouseEvent): void => {
@@ -954,7 +1105,8 @@ export function Dock(): JSX.Element {
   const [{ docked, stack }] = States.useGlobalState(LAB);
   const items: JSX.Element[] = [];
   docked.forEach((pos, compId) => {
-    const curr = getLayoutPosition(stack[0], compId);
+    const layout = stack[0] ?? defaultLayout;
+    const curr = getLayoutPosition(layout, compId);
     items.push(
       <DockItem
         key={compId}
@@ -975,7 +1127,6 @@ interface TabViewProps {
   index: number;
   tabIndex: number;
   layout: Layout;
-  split: Split;
 }
 
 function TabView(props: TabViewProps): JSX.Element | null {
@@ -984,11 +1135,9 @@ function TabView(props: TabViewProps): JSX.Element | null {
   const view = Ext.useElement(VIEW, viewId);
   if (!view /* || custom < 0*/) return null;
   const selected = index === tabIndex;
-  const layout = selected ? props.layout : tab.stack[0];
-  const split = selected ? props.split : tab.split;
-  const modified =
-    !compareSplit(split, defaultSplit) ||
-    !compareLayout(layout, makeViewLayout(view.layout));
+  const top = tab.stack[0] ?? defaultLayout;
+  const layout = selected ? props.layout : top;
+  const modified = !compareLayout(layout, makeViewLayout(view.layout));
   const vname = view.label;
   const favorite = custom === 0;
   const tname = custom > 0 ? `${vname} — ${custom}` : vname;
@@ -1000,6 +1149,8 @@ function TabView(props: TabViewProps): JSX.Element | null {
     (custom < 0) ? 'DISPLAY' :
     selected ? 'FAVORITE' :
     'STAR';
+
+  const onClick = (): void => { applyTab(index); setCurrentNone(); };
   const onClose = (): void => closeTab(index);
   const onContextMenu = (): void => {
     const onDisplay = (): void => applyTab(index);
@@ -1014,18 +1165,24 @@ function TabView(props: TabViewProps): JSX.Element | null {
     ]);
   };
 
+  const className = classes(
+    'labview-tab',
+    0 <= custom && 'persistent',
+  );
+
   return (
     <Toolbar.Button
-      className='labview-tab'
+      className={className}
       icon={icon}
       label={label}
       title={title}
       value={index}
       selection={tabIndex}
-      onClick={applyTab}
+      onClick={onClick}
       onContextMenu={onContextMenu}
     >
       <IconButton
+        className='labview-tab-closing'
         display={custom < 0}
         icon='CIRC.CLOSE'
         onClick={onClose}
@@ -1035,15 +1192,15 @@ function TabView(props: TabViewProps): JSX.Element | null {
 }
 
 export function Tabs(): JSX.Element {
-  const [state] = States.useGlobalState(LAB);
-  const items = state.tabs.map((tab, k) => (
+  const [{ tabIndex, stack, tabs }] = States.useGlobalState(LAB);
+  const layout = stack[0] ?? defaultLayout;
+  const items = tabs.map((tab, k) => (
     <TabView
       key={tab.viewId}
       tab={tab}
       index={k}
-      tabIndex={state.tabIndex}
-      layout={state.stack[0]}
-      split={state.split}
+      tabIndex={tabIndex}
+      layout={layout}
     />
   ));
   return <>{items}</>;
