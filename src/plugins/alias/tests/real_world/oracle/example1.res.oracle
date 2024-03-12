@@ -100,8 +100,7 @@
 [alias] May-alias graph at the end of function f1:
   <empty>
 [alias] Summary of function f1:
-  formals: x    locals: tmp  idata  odata  idx  tmp_1  __retres
-  returns: __retres    state: <none>
+  formals: x    returns: __retres    state: <none>
 [alias] analysing function: f2
 [alias] analysing instruction: ty *tmp = x;
 [alias] May-aliases after instruction  ty *tmp = x;  are  { x; tmp }
@@ -186,8 +185,7 @@
 [alias] May-alias graph at the end of function f2:
   <empty>
 [alias] Summary of function f2:
-  formals: x    locals: tmp  idx  idata  odata  __retres
-  returns: __retres    state: <none>
+  formals: x    returns: __retres    state: <none>
 [alias] analysing function: main
 [alias] analysing instruction: a = (ty *)malloc(sizeof(ty));
 [alias] May-aliases after instruction  a = (ty *)malloc(sizeof(ty));  are  <none>
@@ -317,8 +315,7 @@
   30:{ b } → 31:{  }   31:{  } -n1→ 50:{  }   31:{  } -n2→ 51:{  }
   50:{  } → 39:{  }   51:{  } → 41:{  }
 [alias] Summary of function main:
-  formals:     locals: a  b  i  __retres    returns: __retres
-  state: { a->n1; b->n1 }  { a->n2; b->n2 }
+  formals:     returns: __retres    state: { a->n1; b->n1 }  { a->n2; b->n2 }
 [alias] analysing function: swap
 [alias] May-aliases at the end of function swap: <none>
 [alias] May-alias graph at the end of function swap:

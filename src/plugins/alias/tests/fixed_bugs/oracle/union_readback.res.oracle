@@ -11,6 +11,5 @@
   0:{ flag } -r→ 1:{  }   1:{  } -v→ 2:{ o }   2:{ o } → 4:{  }
   4:{  } → 5:{  }
 [alias] Summary of function f:
-  formals: o    locals: flag    returns: <none>
-  state: { o; flag.r.v }  { *o; *(flag.r.v) }
+  formals: o    returns: <none>    state: { o; flag.r.v }  { *o; *(flag.r.v) }
 [alias] Analysis complete

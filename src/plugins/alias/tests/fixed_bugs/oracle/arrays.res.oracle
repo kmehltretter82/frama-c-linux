@@ -44,6 +44,6 @@
   10:{ z; q } → 11:{ t }   11:{ t } → 16:{ a; b; n }
   16:{ a; b; n } → 17:{  }
 [alias] Summary of function main:
-  formals:     locals: __retres    returns: __retres
+  formals:     returns: __retres
   state: { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
 [alias] Analysis complete

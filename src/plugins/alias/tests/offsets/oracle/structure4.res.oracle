@@ -41,6 +41,5 @@
 [alias] May-alias graph at the end of function main:
   2:{ z } → 3:{  }   3:{  } -s→ 6:{ y1 }   6:{ y1 } → 1:{ x1 }
 [alias] Summary of function main:
-  formals:     locals: x1  x2  y1→{ x1 }  z  __retres    returns: __retres
-  state: { z->s; y1 }
+  formals:     returns: __retres    state: { z->s; y1 }
 [alias] Analysis complete

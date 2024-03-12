@@ -18,8 +18,7 @@
 [alias] May-alias graph at the end of function f1:
   0:{ x; y; tmp } → 1:{  }
 [alias] Summary of function f1:
-  formals: x  y    locals: tmp  __retres    returns: __retres
-  state: { x; y; tmp }
+  formals: x  y    returns: __retres    state: { x; y; tmp }
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
 [alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
@@ -52,6 +51,5 @@
   16:{ a } → 9:{  }   18:{ b } → 9:{  }   28:{ c } → 21:{  }
   30:{ d } → 21:{  }
 [alias] Summary of function main:
-  formals:     locals: a  b  c  d  __retres    returns: __retres
-  state: { a; b }  { c; d }
+  formals:     returns: __retres    state: { a; b }  { c; d }
 [alias] Analysis complete

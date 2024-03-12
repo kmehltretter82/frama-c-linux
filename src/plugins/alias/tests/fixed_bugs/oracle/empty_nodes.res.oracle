@@ -19,7 +19,7 @@
   0:{ y } → 9:{ t }   5:{ z } → 9:{ t }   8:{ x } → 9:{ t }
   9:{ t } → 10:{  }
 [alias] Summary of function f:
-  formals: x→{ t }  y→{ t }  z→{ t }    locals: t    returns: <none>
+  formals: x→{ t }  y→{ t }  z→{ t }    returns: <none>
   state: { x; y; z }  { *x; *y; *z; t }
 [alias] analysing function: g
 [alias] analysing instruction: f(a,a,a);
@@ -30,5 +30,5 @@
 [alias] May-alias graph at the end of function g:
   20:{  } → 21:{  }   22:{ a } → 20:{  }
 [alias] Summary of function g:
-  formals: a    locals:     returns: <none>    state: <none>
+  formals: a    returns: <none>    state: <none>
 [alias] Analysis complete

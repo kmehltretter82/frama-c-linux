@@ -710,7 +710,6 @@ module Summary = struct
   (* a type for summaries of functions *)
   type t = {state   : state option;
             formals : lval list;
-            locals  : lval list;
             return  : exp option}
 
   let make s (kf : kernel_function) =
@@ -735,7 +734,6 @@ module Summary = struct
     in
     {state = Some s;
      formals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_formals kf);
-     locals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_locals kf);
      return = exp_return}
 
   let pretty ?(debug=false) fmt summary =
@@ -759,9 +757,8 @@ module Summary = struct
     | None -> if debug then Format.fprintf fmt "not found"
     | Some s when is_empty s -> if debug then Format.fprintf fmt "empty"
     | Some s ->
-      Format.fprintf fmt "@[formals: @[%a@]@;<4>locals: @[%a@]@;<4>returns: @[%a@]@;<4>state: @[%a@] "
+      Format.fprintf fmt "@[formals: @[%a@]@;<4>returns: @[%a@]@;<4>state: @[%a@] "
         (pp_list_lval s) summary.formals
-        (pp_list_lval s) summary.locals
         (pp_option Exp.pretty) summary.return
         (pp_option @@ pretty ~debug) summary.state
 

@@ -35,7 +35,5 @@
   0:{ a } → 15:{ x; z }   4:{ b } → 14:{ y }   13:{ c } → 14:{ y }
   14:{ y } → 15:{ x; z }
 [alias] Summary of function main:
-  formals: 
-  locals: a→{ x; z }  b→{ y }  c→{ y }  y→{ x; z }  x  z  p  __retres
-  returns: __retres    state: { b; c }  { *b; *c; a; y }
+  formals:     returns: __retres    state: { b; c }  { *b; *c; a; y }
 [alias] Analysis complete

@@ -25,6 +25,5 @@
 [alias] May-alias graph at the end of function main:
   0:{ p } → 1:{  }   2:{ prev } → 1:{  }
 [alias] Summary of function main:
-  formals:     locals: __retres  prev  p  tmp_0    returns: __retres
-  state: { prev; p }
+  formals:     returns: __retres    state: { prev; p }
 [alias] Analysis complete

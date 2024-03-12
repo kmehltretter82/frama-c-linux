@@ -13,5 +13,5 @@
 [alias] May-alias graph at the end of function f:
   0:{ tmp } → 1:{  }   2:{ t } → 0:{ tmp }
 [alias] Summary of function f:
-  formals:     locals: tmp    returns: <none>    state: { t[0..]; tmp }
+  formals:     returns: <none>    state: { t[0..]; tmp }
 [alias] Analysis complete
