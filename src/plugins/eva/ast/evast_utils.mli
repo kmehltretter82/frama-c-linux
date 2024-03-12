@@ -29,6 +29,13 @@ open Evast
 val to_cil_exp : exp -> Cil_types.exp
 val to_cil_lval : lval -> Cil_types.lval
 
+
+(** Queries *)
+
+val is_mutable : lval -> bool
+val is_initialized : lval -> bool
+
+
 (** Expressions/Lvalue heights *)
 
 (** Computes the height of an expression, that is the maximum number of nested

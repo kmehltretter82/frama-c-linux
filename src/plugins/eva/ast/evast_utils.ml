@@ -124,6 +124,42 @@ and to_cil_fail () =
   invalid_arg "this AST cannot be converted to cil"
 
 
+(* --- Queries --- *)
+
+let is_mutable (lval : lval) : bool =
+  let (lhost, offset) = lval.node in
+  let rec aux base_mutable typ off =
+    let base_mutable = base_mutable && not (Cil.isConstType typ) in
+    match Cil.unrollType typ, off with
+    | _, NoOffset -> base_mutable
+    | _, Field (fi, off) ->
+      let base_mutable = base_mutable || Cil.(hasAttribute frama_c_mutable fi.fattr) in
+      aux base_mutable fi.ftype off
+    | TArray(typ, _, _), Index(_, off) -> aux base_mutable typ off
+    | _typ, Index _ ->
+      invalid_arg "Index on a non-array type"
+  in
+  aux false (Evast_typing.type_of_lhost lhost) offset
+
+let rec is_initialized_exp (on_same_obj : bool) (exp : exp) =
+  match exp.node with
+  | Lval lv | AddrOf lv | StartOf lv ->
+    let (lh, _) = lv.node in
+    is_initialized_lhost on_same_obj lh
+  | BinOp ((PlusPI|MinusPI), e, _, _) | CastE (_, e) ->
+    is_initialized_exp on_same_obj e
+  | _ -> false
+
+and is_initialized_lhost (on_same_obj : bool) (lhost : lhost) =
+  match lhost with
+  | Var vi -> Cil.(hasAttribute frama_c_init_obj vi.vattr)
+  | Mem e -> on_same_obj && is_initialized_exp false e
+
+let is_initialized lval =
+  let (lhost, _) = lval.node in
+  is_initialized_lhost true lhost
+
+
 (* --- Heights --- *)
 
 let rec height_exp exp =
