@@ -30,6 +30,7 @@ __PUSH_FC_STDLIB
 #include "__fc_define_wchar_t.h"
 #include "__fc_alloc_axiomatic.h"
 #include "__fc_string_axiomatic.h"
+#include "errno.h"
 
 __BEGIN_DECLS
 
@@ -752,34 +753,57 @@ extern int mkstemps(char *templat, int suffixlen);
 // some plugins such as Eva. In such cases, it is preferable to use the stub
 // provided in stdlib.c.
 /*@
-  requires valid_file_name: valid_read_string(file_name);
+  requires valid_file_name_or_null:
+    file_name == \null || valid_read_string(file_name);
   requires resolved_name_null_or_allocated:
     resolved_name == \null || \valid(resolved_name+(0 .. PATH_MAX-1));
   assigns __fc_heap_status \from indirect:resolved_name, __fc_heap_status;
-  assigns \result, resolved_name[0 .. PATH_MAX-1] \from
+  assigns \result[0 .. PATH_MAX-1], resolved_name[0 .. PATH_MAX-1] \from
     indirect:__fc_heap_status, indirect:resolved_name, indirect:file_name[0..];
+  assigns __fc_errno \from
+    indirect:file_name, indirect:file_name[0..], indirect:resolved_name,
+    indirect:__fc_heap_status;
+  behavior null_file_name:
+    assumes null_file_name: file_name == \null;
+    assigns \result, __fc_errno \from indirect:file_name;
+    ensures null_result: \result == \null;
+    ensures errno_set: __fc_errno == EINVAL;
   behavior allocate_resolved_name:
+    assumes valid_file_name: valid_read_string(file_name);
     assumes resolved_name_null: resolved_name == \null;
     assumes can_allocate: is_allocable(PATH_MAX);
     assigns __fc_heap_status \from __fc_heap_status;
     assigns \result \from indirect:__fc_heap_status;
     ensures allocation: \fresh(\result,PATH_MAX);
   behavior not_enough_memory:
+    assumes valid_file_name: valid_read_string(file_name);
     assumes resolved_name_null: resolved_name == \null;
+    assumes cannot_allocate: !is_allocable(PATH_MAX);
     assigns \result \from \nothing;
     allocates \nothing;
     ensures null_result: \result == \null;
+    ensures errno_set: __fc_errno == ENOMEM;
   behavior resolved_name_buffer:
+    assumes valid_file_name: valid_read_string(file_name);
     assumes allocated_resolved_name_or_fail:
       \valid(resolved_name+(0 .. PATH_MAX-1));
-    assigns \result \from \nothing;
+    assigns \result \from resolved_name;
     assigns resolved_name[0 .. PATH_MAX-1] \from indirect:file_name[0..];
-    ensures valid_string_resolved_name: valid_string(resolved_name);
+    ensures valid_string_resolved_name: valid_string(resolved_name)
+                                        && strlen(resolved_name) < PATH_MAX;
     // missing: assigns \result,
     //                  resolved_name[0 .. PATH_MAX-1] \from 'filesystem';
     ensures resolved_result: \result == resolved_name;
     allocates \nothing;
- */
+  behavior filesystem_error:
+    assumes valid_file_name: valid_read_string(file_name);
+    assigns \result, __fc_errno
+      \from indirect:file_name[0..]; // missing: indirect:'filesystem';
+    ensures null_result: \result == \null;
+    ensures errno_set:
+      __fc_errno \in {EACCES, EIO, ELOOP, ENAMETOOLONG, ENOENT, ENOTDIR};
+    allocates \nothing;
+*/
 extern char *realpath(const char *restrict file_name,
                       char *restrict resolved_name);
 

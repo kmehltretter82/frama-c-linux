@@ -355,19 +355,19 @@
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function fgetc:
-  Frama_C_entropy_source ∈ [--..--]
   __fc_errno ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __retres ∈ [-1..255]
 [eva:final-states] Values at end of function fgets:
-  Frama_C_entropy_source ∈ [--..--]
   __fc_errno ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   i ∈ [0..9] or UNINITIALIZED
   buf[0..8] ∈ [--..--] or UNINITIALIZED
      [9] ∈ {0} or UNINITIALIZED
   __retres ∈ {{ NULL ; &buf[0] }}
 [eva:final-states] Values at end of function getchar:
-  Frama_C_entropy_source ∈ [--..--]
   __fc_errno ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
 [eva:final-states] Values at end of function is_valid_mode:
   __retres ∈ {1}
 [eva:final-states] Values at end of function asprintf:
@@ -381,14 +381,14 @@
                         [255] ∈ {0} or UNINITIALIZED
 [eva:final-states] Values at end of function fmemopen:
   __fc_heap_status ∈ [--..--]
-  Frama_C_entropy_source ∈ [--..--]
   __fc_errno ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   buf ∈ {{ NULL ; (void *)&__malloc_fmemopen_l224 }}
   __retres ∈ {{ NULL ; &__fc_fopen + [0..120],0%8 }}
 [eva:final-states] Values at end of function getline:
   __fc_heap_status ∈ [--..--]
-  Frama_C_entropy_source ∈ [--..--]
   __fc_errno ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   cur ∈ [0..2147483647] or UNINITIALIZED
   line ∈
       {{ NULL ; &__malloc_w_getline_l73[0] ; &__realloc_w_getline_l104[0] }}
@@ -399,8 +399,8 @@
                           [2147483646] ∈ {0} or UNINITIALIZED
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
-  Frama_C_entropy_source ∈ [--..--]
   __fc_errno ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __fc_fopen[0..15] ∈ [--..--]
   __fc_initial_stdout.__fc_FILE_id ∈ {1}
                      .__fc_FILE_data ∈ [--..--]

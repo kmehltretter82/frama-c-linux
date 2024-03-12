@@ -251,8 +251,8 @@
   __retres ∈ {0; 12}
 [eva:final-states] Values at end of function realpath:
   __fc_heap_status ∈ [--..--]
-  Frama_C_entropy_source ∈ [--..--]
   __fc_errno ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   resolved_name ∈
                {{ NULL ; &__malloc_main_l44[0] ; &__malloc_realpath_l224[0] ;
                   &__malloc_realpath_l224_0[0] }}
@@ -267,14 +267,14 @@
                           [1..4095] ∈ [--..--] or UNINITIALIZED
 [eva:final-states] Values at end of function canonicalize_file_name:
   __fc_heap_status ∈ [--..--]
-  Frama_C_entropy_source ∈ [--..--]
   __fc_errno ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   __malloc_realpath_l224_0[0] ∈ [--..--]
                           [1..4095] ∈ [--..--] or UNINITIALIZED
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
-  Frama_C_entropy_source ∈ [--..--]
   __fc_errno ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   p ∈ {{ NULL ; &__calloc_main_l15 }}
   nmemb ∈ [1..4294967295]
   q ∈ {{ NULL ; &__calloc_main_l22[0] }}
