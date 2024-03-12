@@ -296,7 +296,7 @@ let clear () =
   computed_flag := false;
   Stmt_table.clear ()
 
-let get_state_before_stmt _kf stmt =
+let get_state_before_stmt stmt =
   if is_computed ()
   then try Stmt_table.find stmt with Not_found -> None
   else None
