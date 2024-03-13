@@ -142,6 +142,9 @@
 [eva] computing for function unavailable_f <- main.
   Called from from_call.i:96.
 [eva] using specification for function unavailable_f
+[eva:garbled-mix:assigns] from_call.i:96: 
+  The specification of function unavailable_f
+  has generated a garbled mix of addresses for assigns clause AR.
 [eva] Done for function unavailable_f
 [eva] Recording results for main
 [eva] Done for function main

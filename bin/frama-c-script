@@ -195,7 +195,7 @@ flamegraph() {
   </body>
 </html>
 EOF
-    if [ -z "$NOGUI" ]; then
+    if [ -z "${NOGUI-}" ]; then
         open_file "$out_html"
     fi
 }

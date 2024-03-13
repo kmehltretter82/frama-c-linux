@@ -1,0 +1,52 @@
+[kernel] Parsing records.c (with preprocessing)
+[alias] analysing function: main
+[alias] analysing instruction: a = & x;
+[alias] May-aliases after instruction  a = & x;  are  <none>
+[alias] May-alias graph after instruction  a = & x;  is    0:{ a } → 1:{ x }
+[alias] analysing instruction: t.field = a;
+[alias] May-aliases after instruction  t.field = a;  are  { a; t.field }
+[alias] May-alias graph after instruction  t.field = a;  is
+  4:{ t } -field→ 5:{ a }   5:{ a } → 1:{ x }
+[alias] analysing instruction: z = & t;
+[alias] May-aliases after instruction  z = & t;  are  { z->field; a; t.field }
+[alias] May-alias graph after instruction  z = & t;  is
+  5:{ a } → 1:{ x }   6:{ z } → 7:{ t }   7:{ t } -field→ 5:{ a }
+[alias] analysing instruction: q = z;
+[alias] May-aliases after instruction  q = z;  are
+  { z->field; q->field; a; t.field }  { z; q }
+[alias] May-alias graph after instruction  q = z;  is
+  5:{ a } → 1:{ x }   9:{ z; q } → 10:{ t }   10:{ t } -field→ 5:{ a }
+[alias] analysing instruction: b = z->field;
+[alias] May-aliases after instruction  b = z->field;  are
+  { z; q }  { z->field; q->field; a; b; t.field }
+[alias] May-alias graph after instruction  b = z->field;  is
+  9:{ z; q } → 10:{ t }   10:{ t } -field→ 11:{ a; b }
+  11:{ a; b } → 12:{ x }
+[alias] analysing instruction: n = q->field;
+[alias] May-aliases after instruction  n = q->field;  are
+  { z; q }  { z->field; q->field; a; b; n; t.field }
+[alias] May-alias graph after instruction  n = q->field;  is
+  9:{ z; q } → 10:{ t }   10:{ t } -field→ 13:{ a; b; n }
+  13:{ a; b; n } → 14:{ x }
+[alias] analysing instruction: printf("%d\n%d\n",a == b,a == n);
+[alias:undefined:fn] records.c:21: Warning: function printf has no definition
+[alias] May-aliases after instruction  printf("%d\n%d\n",a == b,a == n);  are
+  { z; q }  { z->field; q->field; a; b; n; t.field }
+[alias] May-alias graph after instruction  printf("%d\n%d\n",a == b,a == n);  is
+  9:{ z; q } → 10:{ t }   10:{ t } -field→ 13:{ a; b; n }
+  13:{ a; b; n } → 14:{ x }
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases after instruction  __retres = 0;  are
+  { z; q }  { z->field; q->field; a; b; n; t.field }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  9:{ z; q } → 10:{ t }   10:{ t } -field→ 13:{ a; b; n }
+  13:{ a; b; n } → 14:{ x }
+[alias] May-aliases at the end of function main:
+  { z; q }  { z->field; q->field; a; b; n; t.field }
+[alias] May-alias graph at the end of function main:
+  9:{ z; q } → 10:{ t }   10:{ t } -field→ 13:{ a; b; n }
+  13:{ a; b; n } → 14:{ x }
+[alias] Summary of function main:
+  formals:     returns: __retres
+  state: { z; q }  { z->field; q->field; a; b; n; t.field }
+[alias] Analysis complete

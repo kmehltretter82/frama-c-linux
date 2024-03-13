@@ -12,7 +12,7 @@ Goal Assertion 'no_address_taken' (file global.c, line 17):
 Let a = Mptr_0[global(P_a_23)].
 Assume {
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Pre-condition *)
   Have: valid_rw(Malloc_0, a, 1).
 }

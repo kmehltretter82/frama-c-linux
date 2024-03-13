@@ -286,7 +286,7 @@ module Make_MapSet_Lattice
 
   type t = Top of KSet.t * Origin.t | Map of KVMap.t
 
-  let top = Top (KSet.top, Origin.top)
+  let top = Top (KSet.top, Origin.unknown)
 
   let bottom = Map KVMap.empty
 
@@ -366,12 +366,12 @@ module Make_MapSet_Lattice
     match t1, t2 with
     | Top _ as x, Map _
     | Map _, (Top _ as x) -> x (* arbitrary, may be approximated *)
-    | Top (s1, o1), Top (s2, o2) -> Top (KSet.link s1 s2, Origin.link o1 o2)
+    | Top (s1, o1), Top (s2, o2) -> Top (KSet.link s1 s2, Origin.join o1 o2)
     | Map m1, Map m2 -> Map (KVMap.link m1 m2)
 
   let meet t1 t2 =
     match t1, t2 with
-    | Top (s1, o1), Top (s2, o2) -> Top (KSet.meet s1 s2, Origin.meet o1 o2)
+    | Top (s1, o1), Top (s2, o2) -> Top (KSet.meet s1 s2, Origin.join o1 o2)
     | Top (KSet.Top, _), (Map _ as m)
     | (Map _ as m), Top (KSet.Top, _) -> m
     | Top (KSet.Set s, _), (Map m)
@@ -382,7 +382,7 @@ module Make_MapSet_Lattice
   let narrow t1 t2 =
     match t1, t2 with
     | Top (s1, o1), Top (s2, o2) ->
-      Top (KSet.narrow s1 s2, Origin.narrow o1 o2)
+      Top (KSet.narrow s1 s2, Origin.join o1 o2)
     | Top (KSet.Top, _), (Map _ as m)
     | (Map _ as m), Top (KSet.Top, _) -> m
     | Top (KSet.Set set, _), (Map m)
@@ -392,8 +392,7 @@ module Make_MapSet_Lattice
 
   let is_included t1 t2 =
     match t1, t2 with
-    | Top (s1, o1), Top (s2, o2)   ->
-      KSet.is_included s1 s2 && Origin.is_included o1 o2
+    | Top (s1, _), Top (s2, _)   -> KSet.is_included s1 s2
     | Map _, Top (KSet.Top, _)   -> true
     | Map m, Top (KSet.Set s, _) -> KVMap.for_all (fun k _ -> KSet.O.mem k s) m
     | Top _, Map _               -> false

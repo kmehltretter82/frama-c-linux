@@ -226,6 +226,9 @@
   Analysis of function escaping_stack is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function escaping_stack
+[eva:garbled-mix:assigns] recursion.c:311: 
+  The specification of function escaping_stack
+  has generated a garbled mix of addresses for assigns clause p.
 [eva:alarm] recursion.c:313: Warning: out of bounds write. assert \valid(p);
 [eva] recursion.c:314: Frama_C_show_each_1_2: {5}
 [eva:locals-escaping] recursion.c:312: Warning: 
@@ -236,6 +239,10 @@
   Analysis of function decr is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function decr
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    recursion.c:311: assigns clause on addresses
+      (read 2 times, propagated 1 times) garbled mix of &{x; a; \copy<x>[1]}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function alarm:
   res ∈ [10..2147483647]

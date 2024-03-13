@@ -32,5 +32,6 @@ stdenv.mkDerivation rec {
            rev = "$commit" ;
            shallow = true ;
          };
+  installPhase = "touch \$out";
 }
 EOL

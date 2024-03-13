@@ -51,8 +51,7 @@
 [eva:alarm] imprecise.c:19: Warning: 
   pointer downcast. assert (unsigned int)(&k) ≤ 2147483647;
 [eva:garbled-mix:write] imprecise.c:19: 
-  Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {imprecise.c:19}
+  Assigning imprecise value to p because of arithmetic operation on addresses.
 [eva:alarm] imprecise.c:20: Warning: out of bounds write. assert \valid(p);
 [eva] imprecise.c:21: 
   Frama_C_dump_each:
@@ -121,8 +120,7 @@
 [eva:alarm] imprecise.c:68: Warning: 
   signed overflow. assert (int)*((char *)(&p)) + 0 ≤ 2147483647;
 [eva:garbled-mix:write] imprecise.c:68: 
-  Assigning imprecise value to c3.
-  The imprecision originates from Misaligned {imprecise.c:68}
+  Assigning imprecise value to c3 because of misaligned read of addresses.
 [eva] Recording results for cast_address
 [from] Computing for function cast_address
 [from] Done for function cast_address
@@ -266,12 +264,16 @@
 [from] Computing for function main
 [from] Done for function main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    imprecise.c:19: arithmetic operation on addresses
+      (read 3 times, propagated 1 times) garbled mix of &{j; k}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cast_address:
   p ∈ {{ &x }}
   c1 ∈ {{ (char)&x }}
   c2# ∈ {{ (? *)&x }}%32, bits 0 to 7 
-  c3 ∈ {{ garbled mix of &{x} (origin: Misaligned {imprecise.c:68}) }}
+  c3 ∈ {{ garbled mix of &{x} (origin: Misaligned read {imprecise.c:68}) }}
 [eva:final-states] Values at end of function garbled_mix_null:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   p_gm_null ∈ [100..197]
@@ -315,11 +317,12 @@
   vy ∈ {1} or UNINITIALIZED
 [eva:final-states] Values at end of function write_garbled:
   NULL[rbits 800 to 1607] ∈
-      {{ garbled mix of &{j; k} (origin: Misaligned {imprecise.c:22}) }}
+      {{ garbled mix of &{j; k}
+       (origin: Misaligned write {imprecise.c:22}) }}
   i ∈ {1}
   j ∈ {{ NULL + [1..197] ; (int)&j ; &k + [0..16] }}
   k[0..4] ∈
-   {{ garbled mix of &{j; k} (origin: Misaligned {imprecise.c:22}) }}
+   {{ garbled mix of &{j; k} (origin: Misaligned write {imprecise.c:22}) }}
   p ∈ {{ NULL + [100..197] ; &j ; &k + [0..16] }}
 [eva:final-states] Values at end of function main:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
@@ -809,12 +812,16 @@
 [from] Computing for function main
 [from] Done for function main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    imprecise.c:19: arithmetic operation on addresses
+      (read 3 times, propagated 1 times) garbled mix of &{j; k}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function cast_address:
   p ∈ {{ &x }}
   c1 ∈ {{ (char)&x }}
   c2# ∈ {{ (? *)&x }}%32, bits 0 to 7 
-  c3 ∈ {{ garbled mix of &{x} (origin: Misaligned {imprecise.c:68}) }}
+  c3 ∈ {{ garbled mix of &{x} (origin: Misaligned read {imprecise.c:68}) }}
 [eva:final-states] Values at end of function garbled_mix_null:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   p_gm_null ∈ [100..197]
@@ -855,11 +862,12 @@
   vy ∈ {1} or UNINITIALIZED
 [eva:final-states] Values at end of function write_garbled:
   NULL[rbits 800 to 1607] ∈
-      {{ garbled mix of &{j; k} (origin: Misaligned {imprecise.c:22}) }}
+      {{ garbled mix of &{j; k}
+       (origin: Misaligned write {imprecise.c:22}) }}
   i ∈ {1}
   j ∈ {{ NULL + [1..197] ; (int)&j ; &k + [0..16] }}
   k[0..4] ∈
-   {{ garbled mix of &{j; k} (origin: Misaligned {imprecise.c:22}) }}
+   {{ garbled mix of &{j; k} (origin: Misaligned write {imprecise.c:22}) }}
   p ∈ {{ NULL + [100..197] ; &j ; &k + [0..16] }}
 [eva:final-states] Values at end of function main:
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR

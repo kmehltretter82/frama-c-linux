@@ -360,7 +360,7 @@ module Precedence = struct
     | Tapp({ l_var_info },[],[_;_])
       when l_var_info.lv_name = "\\repeat" -> bitwiseLevel
     (* Unary *)
-    | TCastE(_,_)
+    | TCast(false,_,_)
     | TAddrOf(_)
     | TStartOf(_)
     | TUnOp((Neg|BNot|LNot),_) -> unaryLevel
@@ -382,7 +382,7 @@ module Precedence = struct
     | TConst _
     | Tnull | TLval (TResult _,TNoOffset) | Tcomprehension _  | Tempty_set -> 0
     | Tif (_, _, _)  -> questionLevel
-    | TLogic_coerce(_,e) -> (getParenthLevelLogic e.term_node) + 1
+    | TCast (true,_,e) -> (getParenthLevelLogic e.term_node) + 1
 
   (* Create an expression of the same shape, and use {!getParenthLevel} *)
   let getParenthLevelAttrParam = function
@@ -468,12 +468,12 @@ let is_same_direction_rel dir op =
 
 let remove_no_op_coerce t =
   match t.term_node with
-  | TLogic_coerce (ty,t) when Cil.no_op_coerce ty t -> t
+  | TCast (true, ty,t) when Cil.no_op_coerce ty t -> t
   | _ -> t
 
 let rec is_singleton t =
   match t.term_node with
-  | TLogic_coerce(Ltype ({ lt_name = "set"},_), t') -> is_singleton t'
+  | TCast (true, Ltype ({ lt_name = "set"},_), t') -> is_singleton t'
   | _ -> not (Logic_const.is_set_type t.term_type)
 
 (* when pretty-printing relation chains, a < b && b' < c, it can happen that
@@ -2547,7 +2547,7 @@ class cil_printer () = object (self)
       fprintf fmt "@[%a@]" self#tand_list (get_tand_list l [r])
     | TBinOp (op,l,r) ->
       fprintf fmt "@[%a@ %a@ %a@]" term l self#term_binop op term r
-    | TCastE (ty,t) ->
+    | TCast (false, Ctype ty,t) ->
       begin match ty, t.term_node with
         | TFloat(fk,_) , TConst(LReal r as cst) when
             not Kernel.(is_debug_key_enabled dkey_print_logic_coercions) &&
@@ -2556,6 +2556,8 @@ class cil_printer () = object (self)
         | _ ->
           fprintf fmt "(%a)%a" (self#typ None) ty term t
       end
+    | TCast(false,_,_) ->
+      Kernel.fatal "Found a TCast to ctype without a Ctype associated"
     | TAddrOf lv ->
       fprintf fmt "&%a" (self#term_lval_prec Precedence.addrOfLevel) lv
     | TStartOf lv ->
@@ -2659,7 +2661,7 @@ class cil_printer () = object (self)
               self#quantifiers args)
         pp_defn
         term body
-    | TLogic_coerce(ty,t) ->
+    | TCast (true, ty,t) ->
       if (not (Cil.no_op_coerce ty t)) ||
          Kernel.is_debug_key_enabled Kernel.dkey_print_logic_coercions
       then

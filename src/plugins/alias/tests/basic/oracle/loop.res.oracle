@@ -2,18 +2,36 @@
 [alias] analysing function: main
 [alias] analysing instruction: int l[1] = {0};
 [alias] May-aliases after instruction  int l[1] = {0};  are  <none>
+[alias] May-alias graph after instruction  int l[1] = {0};  is    <empty>
 [alias] analysing instruction: int *n_0 = & l[1];
-[alias] May-aliases after instruction  int *n_0 = & l[1];  are  <none>
+[alias] May-aliases after instruction  int *n_0 = & l[1];  are  { l; n_0 }
+[alias] May-alias graph after instruction  int *n_0 = & l[1];  is
+  0:{ n_0 } → 1:{  }   2:{ l } → 1:{  }
 [alias] analysing instruction: n_0 = & l[1] + 0;
-[alias] May-aliases after instruction  n_0 = & l[1] + 0;  are  <none>
+[alias] May-aliases after instruction  n_0 = & l[1] + 0;  are  { l; n_0 }
+[alias] May-alias graph after instruction  n_0 = & l[1] + 0;  is
+  0:{ n_0 } → 1:{  }   2:{ l } → 1:{  }
 [alias] analysing instruction: int w = 0;
-[alias] May-aliases after instruction  int w = 0;  are  <none>
+[alias] May-aliases after instruction  int w = 0;  are  { l; n_0 }
+[alias] May-alias graph after instruction  int w = 0;  is
+  0:{ n_0 } → 1:{  }   2:{ l } → 1:{  }
 [alias] analysing instruction: l[0] = *(& l[1] + 0);
-[alias] May-aliases after instruction  l[0] = *(& l[1] + 0);  are  <none>
+[alias] May-aliases after instruction  l[0] = *(& l[1] + 0);  are  { l; n_0 }
+[alias] May-alias graph after instruction  l[0] = *(& l[1] + 0);  is
+  0:{ n_0 } → 1:{  }   2:{ l } → 1:{  }
 [alias] analysing instruction: int l[1] = {0};
-[alias] May-aliases after instruction  int l[1] = {0};  are  <none>
+[alias] May-aliases after instruction  int l[1] = {0};  are  { l; n_0 }
+[alias] May-alias graph after instruction  int l[1] = {0};  is
+  0:{ n_0 } → 1:{  }   2:{ l } → 1:{  }
 [alias] analysing instruction: int *n_0 = & l[1];
-[alias] May-aliases after instruction  int *n_0 = & l[1];  are  <none>
+[alias] May-aliases after instruction  int *n_0 = & l[1];  are  { l; n_0 }
+[alias] May-alias graph after instruction  int *n_0 = & l[1];  is
+  0:{ n_0 } → 1:{  }   2:{ l } → 1:{  }
 [alias:no-return] loop.c:4: Warning: 
   function main does not return; analysis may be unsound
 [alias] May-aliases at the end of function main: <none>
+[alias] May-alias graph at the end of function main:
+  <empty>
+[alias] Summary of function main:
+  formals:     returns: __retres    state: <none>
+[alias] Analysis complete

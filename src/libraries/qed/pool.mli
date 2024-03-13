@@ -29,6 +29,7 @@ sig
   type t
   val dummy : t
   val equal : t -> t -> bool
+  val compare : t -> t -> int
 end
 
 module Make(T : Type) :

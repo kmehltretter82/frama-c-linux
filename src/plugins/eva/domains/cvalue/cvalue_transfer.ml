@@ -22,7 +22,6 @@
 
 open Cil_types
 open Eval
-open Cvalue.Model
 
 type value = Main_values.CVal.t
 type origin = value
@@ -31,6 +30,40 @@ type location = Main_locations.PLoc.location
 let unbottomize = function
   | `Bottom -> Cvalue.V.bottom
   | `Value v -> v
+
+(* ---------------------------------------------------------------------- *)
+(*                        Garbled mix warnings                            *)
+(* ---------------------------------------------------------------------- *)
+
+let warn_imprecise_value ?prefix lval value =
+  match value with
+  | Locations.Location_Bytes.Top (bases, origin) ->
+    if Origin.register_write bases origin then
+      let prefix = Option.fold ~none:"A" ~some:(fun s -> s ^ ": a") prefix in
+      Self.warning ~wkey:Self.wkey_garbled_mix_write ~once:true ~current:true
+        "@[%sssigning imprecise value to %a@ because of %s.@]%t"
+        prefix Printer.pp_lval lval (Origin.descr origin)
+        Eva_utils.pp_callstack
+  | _ -> ()
+
+let warn_imprecise_location ?prefix loc =
+  match loc.Locations.loc with
+  | Locations.Location_Bits.Top (Base.SetLattice.Top, orig) ->
+    let prefix = Option.fold ~none:"" ~some:(fun s -> s ^ ": ") prefix in
+    Self.fatal ~current:true
+      "@[%swriting at a completely unknown address@ because of %s.@]@\nAborting."
+      prefix (Origin.descr orig)
+  | _ -> ()
+
+let warn_imprecise_write ?prefix lval loc value =
+  warn_imprecise_location ?prefix loc;
+  warn_imprecise_value ?prefix lval value
+
+let warn_imprecise_offsm_write ?prefix lval offsm =
+  let warn value =
+    warn_imprecise_value ?prefix lval (Cvalue.V_Or_Uninitialized.get_v value)
+  in
+  Cvalue.V_Offsetmap.iter_on_values warn offsm
 
 (* ---------------------------------------------------------------------- *)
 (*                               Assumptions                              *)
@@ -45,7 +78,7 @@ let reduce valuation lval value t =
     | `Value record ->
       let loc = Precise_locs.imprecise_location record.loc in
       if Locations.cardinal_zero_or_one loc
-      then reduce_indeterminate_binding t loc value
+      then Cvalue.Model.reduce_indeterminate_binding t loc value
       else t
     | `Top -> t (* Cannot reduce without the location of the lvalue. *)
 
@@ -90,38 +123,26 @@ let update valuation t =
 let write_abstract_value state (lval, loc, typ) assigned_value =
   let {v; initialized; escaping} = assigned_value in
   let value = unbottomize v in
-  Warn.warn_right_exp_imprecision lval loc value;
   let value =
     if Cil.typeHasQualifier "volatile" typ
     then Cvalue_forward.make_volatile value
     else value
   in
-  match loc.Locations.loc with
-  | Locations.Location_Bits.Top (Base.SetLattice.Top, orig) ->
-    Self.result
-      "State before degeneration:@\n======%a@\n======="
-      Cvalue.Model.pretty state;
-    Self.fatal ~current:true
-      "writing at a completely unknown address@[%a@].@\nAborting."
-      Origin.pretty_as_reason orig
-  | _ ->
-    let exact = Locations.cardinal_zero_or_one loc in
-    let value =
-      Cvalue.V_Or_Uninitialized.make ~initialized ~escaping value in
-    (* let value = Cvalue.V_Or_Uninitialized.initialized value in *)
-    add_indeterminate_binding ~exact state loc value
+  warn_imprecise_write lval loc value;
+  let exact = Locations.cardinal_zero_or_one loc in
+  let value = Cvalue.V_Or_Uninitialized.make ~initialized ~escaping value in
+  Cvalue.Model.add_indeterminate_binding ~exact state loc value;
 
 exception Do_assign_imprecise_copy
 
 let copy_one_loc state left_lv right_lv =
   let left_lval, left_loc, left_typ = left_lv
-  and right_lval, right_loc, right_typ = right_lv in
-  (* Warn if right_loc is imprecise *)
-  Warn.warn_imprecise_lval_read right_lval right_loc Cvalue.V.bottom;
+  and _right_lval, right_loc, right_typ = right_lv in
   (* top size is tested before this function is called, in which case
      the imprecise copy mode is used. *)
   let size = Int_Base.project right_loc.Locations.size in
-  let offsetmap = copy_offsetmap right_loc.Locations.loc size state in
+  let right_loc = right_loc.Locations.loc in
+  let offsetmap = Cvalue.Model.copy_offsetmap right_loc size state in
   let make_volatile =
     Cil.typeHasQualifier "volatile" left_typ ||
     Cil.typeHasQualifier "volatile" right_typ
@@ -139,9 +160,9 @@ let copy_one_loc state left_lv right_lv =
     in
     if not (Eval_typ.offsetmap_matches_type left_typ offsetmap) then
       raise Do_assign_imprecise_copy;
-    Cvalue_offsetmap.warn_right_imprecision left_lval left_loc offsetmap;
+    warn_imprecise_offsm_write left_lval offsetmap;
     `Value
-      (paste_offsetmap ~exact:true
+      (Cvalue.Model.paste_offsetmap ~exact:true
          ~from:offsetmap ~dst_loc:left_loc.Locations.loc ~size state)
 
 let make_determinate value =
@@ -164,9 +185,9 @@ let copy_right_lval state left_lv right_lv copied_value =
           and right_lv = right_lv.lval, right_loc, right_lv.ltyp in
           match copy_one_loc state left_lv right_lv with
           | `Bottom -> acc
-          | `Value state -> join acc state
+          | `Value state -> Cvalue.Model.join acc state
         in
-        Precise_locs.fold process right_lv.lloc bottom
+        Precise_locs.fold process right_lv.lloc Cvalue.Model.bottom
       with
         Do_assign_imprecise_copy ->
         write_abstract_value state (lval, loc, typ) copied_value
@@ -183,10 +204,10 @@ let assign _stmt { lval; ltyp; lloc } _expr assigned valuation state =
   in
   let aux_loc loc acc_state =
     let s = assign_one_loc loc in
-    join acc_state s
+    Cvalue.Model.join acc_state s
   in
-  let state = Precise_locs.fold aux_loc lloc bottom in
-  if not (is_reachable state)
+  let state = Precise_locs.fold aux_loc lloc Cvalue.Model.bottom in
+  if not (Cvalue.Model.is_reachable state)
   then `Bottom
   else `Value state
 
@@ -199,6 +220,7 @@ let actualize_formals state arguments =
     let offsm =
       Cvalue_offsetmap.offsetmap_of_assignment state arg.concrete arg.avalue
     in
+    warn_imprecise_offsm_write (Cil.var arg.formal) offsm;
     Cvalue.Model.add_base (Base.of_varinfo arg.formal) offsm state
   in
   List.fold_left treat_one_formal state arguments
@@ -206,26 +228,17 @@ let actualize_formals state arguments =
 let start_call _stmt call _recursion _valuation state =
   `Value (actualize_formals state call.arguments)
 
-let finalize_call stmt call _recursion ~pre:_ ~post:state =
-  (* Deallocate memory allocated via alloca().
-     To minimize computations, only do it for function definitions. *)
-  let state' =
-    if Kernel_function.is_definition call.kf then
-      let callstack = Eva_utils.current_call_stack () in
-      let callstack = Callstack.push call.kf stmt callstack in
-      Builtins_malloc.free_automatic_bases callstack state
-    else state
-  in
-  `Value state'
+let finalize_call _stmt _call _recursion ~pre:_ ~post:state =
+  `Value state
 
 let show_expr valuation state fmt expr =
   match expr.enode with
   | Lval lval | StartOf lval ->
-    let record = match valuation.Abstract_domain.find_loc lval with
-      | `Value record -> record
+    let loc = match valuation.Abstract_domain.find_loc lval with
+      | `Value record -> record.loc
       | `Top -> assert false
     in
-    let offsm = Cvalue_offsetmap.offsetmap_of_lval state lval record.loc in
+    let offsm = Bottom.non_bottom (Eval_op.offsetmap_of_loc loc state) in
     let typ = Cil.typeOfLval lval in
     Eval_op.pretty_offsetmap typ fmt offsm
   | _ -> Format.fprintf fmt "%s" (Unicode.top_string ())

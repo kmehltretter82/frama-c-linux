@@ -54,82 +54,82 @@
 ---
 > [eva] gauges.c:172: Frama_C_show_each: [2147483647..4294967294]
 > [eva] gauges.c:172: Frama_C_show_each: [2147483647..4294967294]
-244,245d225
+240,241d221
 < [eva:alarm] gauges.c:192: Warning: out of bounds write. assert \valid(p);
 < [eva:alarm] gauges.c:193: Warning: out of bounds write. assert \valid(q);
-253,258d232
+249,254d228
 < [eva:alarm] gauges.c:202: Warning: 
 <   out of bounds read. assert \valid_read(tmp);
 <                       (tmp from A++)
 < [eva:alarm] gauges.c:202: Warning: 
 <   out of bounds read. assert \valid_read(tmp_0);
 <                       (tmp_0 from B++)
-285,286d258
+281,282d254
 < [eva:alarm] gauges.c:220: Warning: 
 <   signed overflow. assert -2147483648 ≤ n - 1;
-300,302c272
+296,298c268
 < [eva:alarm] gauges.c:240: Warning: signed overflow. assert j + 1 ≤ 2147483647;
 < [eva] gauges.c:242: 
 <   Frama_C_show_each: {45; 46; 47; 48; 49; 50; 51}, [0..2147483647]
 ---
 > [eva] gauges.c:242: Frama_C_show_each: {47; 48}, {6}
-308,310c278
+304,306c274
 < [eva:alarm] gauges.c:251: Warning: signed overflow. assert j + 1 ≤ 2147483647;
 < [eva] gauges.c:254: 
 <   Frama_C_show_each: {48; 49; 50; 51; 52; 53; 54}, [0..2147483647]
 ---
 > [eva] gauges.c:254: Frama_C_show_each: {48; 49; 50; 51; 52; 53; 54}, {6; 7}
-316,318c284
+312,314c280
 < [eva:alarm] gauges.c:263: Warning: signed overflow. assert j + 1 ≤ 2147483647;
 < [eva] gauges.c:265: 
 <   Frama_C_show_each: {-59; -58; -57; -56; -55; -54; -53}, [0..2147483647]
 ---
 > [eva] gauges.c:265: Frama_C_show_each: {-58; -57}, {9}
-324d289
+320d285
 < [eva:alarm] gauges.c:274: Warning: signed overflow. assert j + 1 ≤ 2147483647;
-326c291
+322c287
 <   Frama_C_show_each: {-64; -63; -62; -61; -60; -59; -58}, [0..2147483647]
 ---
 >   Frama_C_show_each: {-64; -63; -62; -61; -60; -59; -58}, {9; 10}
-334d298
+330d294
 < [eva:alarm] gauges.c:293: Warning: signed overflow. assert j + 1 ≤ 2147483647;
-336c300
+332c296
 <   Frama_C_show_each: {-593; -592; -591; -590; -589; -588}, [0..2147483647]
 ---
 >   Frama_C_show_each: {-593; -592; -591; -590; -589; -588}, [99..119]
-398a363,366
+394a359,362
 >   # gauges:
 >   V: [{[ p -> {{ &x }}
 >          i -> {1} ]}]
 >   s398: λ(0)
-458a427,430
+454a423,426
 >   # gauges:
 >   V: [{[ i -> {1} ]}]
 >   s398: λ([0 .. 1])
 >         {[ i -> {1} ]}
-517a490,493
+513a486,489
 >   # gauges:
 >   V: [{[ i -> {1} ]}]
 >   s398: λ([0 .. 2])
 >         {[ i -> {1} ]}
-576a553,556
+572a549,552
 >   # gauges:
 >   V: [{[ i -> {1} ]}]
 >   s398: λ([0 .. 10])
 >         {[ i -> {1} ]}
-641a622,626
+637a618,622
 >   # gauges:
 >   V: [{[ p -> {{ &a }}
 >          i -> {2} ]}]
 >   s412: λ(0)
 >   s411: λ(0)
-702a688,692
+698a684,688
 >   # gauges:
 >   V: [{[ i -> {2} ]}]
 >   s412: λ(0)
 >   s411: λ([0 .. 1])
 >         {[ i -> {0} ]}
-704a695,822
+700a691,818
 > [eva] gauges.c:325: 
 >   Frama_C_dump_each:
 >   # cvalue:
@@ -258,9 +258,13 @@
 >   s411: λ([0 .. +oo])
 >         {[ i -> {0} ]}
 >   ==END OF DUMP==
-712a831,832
+708a827,828
 > [eva] gauges.c:343: Call to builtin malloc
 > [eva] gauges.c:343: Call to builtin malloc
+716c836
+<       (read 14 times, propagated 12 times) garbled mix of &{x; y}
+---
+>       (read 12 times, propagated 11 times) garbled mix of &{x; y}
 765,766c885,886
 <   A ∈ {{ &A + [0..--],0%4 }}
 <   B ∈ {{ &B + [0..--],0%4 }}

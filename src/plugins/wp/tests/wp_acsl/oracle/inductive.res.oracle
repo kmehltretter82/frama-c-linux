@@ -20,7 +20,7 @@ theory Compound
   
   (* use map.Map *)
   
-  (* use frama_c_wp.memory.Memory *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
   function shift_sint32 (p:addr) (k:int) : addr = shift p k
   
@@ -50,7 +50,7 @@ end
     lemma Q_test_no_label :
       forall a:int, b:int, d:int. P_is_gcd a b d -> not P_is_gcd b d a
     
-    (* use frama_c_wp.memory.Memory *)
+    (* use frama_c_wp.memaddr.MemAddr *)
     
     (* use Compound *)
     
@@ -109,7 +109,7 @@ end
     
     (* use map.Map *)
     
-    (* use frama_c_wp.memory.Memory *)
+    (* use frama_c_wp.memaddr.MemAddr *)
     
     (* use Compound *)
     

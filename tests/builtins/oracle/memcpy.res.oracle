@@ -100,13 +100,22 @@
 [eva] memcpy.c:85: function memcpy: precondition 'separation' got status valid.
 [eva:alarm] memcpy.c:87: Warning: 
   pointer downcast. assert (unsigned int)((struct t1 *)t) ≤ 2147483647;
+[eva:garbled-mix:write] memcpy.c:87: 
+  Assigning imprecise value to src
+  because of arithmetic operation on addresses.
 [eva] memcpy.c:87: Call to builtin memcpy
 [eva] memcpy.c:87: function memcpy: precondition 'valid_dest' got status valid.
 [eva:alarm] memcpy.c:87: Warning: 
   function memcpy: precondition 'valid_src' got status unknown.
 [eva] memcpy.c:87: function memcpy: precondition 'separation' got status valid.
+[eva:garbled-mix:write] memcpy.c:87: 
+  Builtin memcpy: assigning imprecise value to v3
+  because of misaligned read of addresses.
 [eva:alarm] memcpy.c:89: Warning: 
   pointer downcast. assert (unsigned int)(&v4) ≤ 2147483647;
+[eva:garbled-mix:write] memcpy.c:89: 
+  Assigning imprecise value to dest
+  because of arithmetic operation on addresses.
 [eva] memcpy.c:89: Call to builtin memcpy
 [eva:alarm] memcpy.c:89: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -118,6 +127,9 @@
   pointer downcast. assert (unsigned int)((struct t1 *)t) ≤ 2147483647;
 [eva:alarm] memcpy.c:91: Warning: 
   pointer downcast. assert (unsigned int)(&v5) ≤ 2147483647;
+[eva:garbled-mix:write] memcpy.c:91: 
+  Assigning imprecise value to dest
+  because of arithmetic operation on addresses.
 [eva] memcpy.c:91: Call to builtin memcpy
 [eva:alarm] memcpy.c:91: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -564,11 +576,11 @@
   v2.x ∈ {5}
     .y ∈ {7}
     {.p; .padding[0..23]} ∈ {0}
-  v3 ∈ {{ garbled mix of &{v1} (origin: Misaligned {memcpy.c:87}) }}
+  v3 ∈ {{ garbled mix of &{v1} (origin: Misaligned read {memcpy.c:87}) }}
   v4.x ∈ [--..--]
     .y ∈ {{ (int)&t }}
     {.p; .padding[0..23]} ∈ [--..--]
-  v5 ∈ {{ garbled mix of &{t} (origin: Misaligned {memcpy.c:91}) }}
+  v5 ∈ {{ garbled mix of &{t} (origin: Arithmetic {memcpy.c:91}) }}
   t{[0]; [1]{.x; .y}} ∈ {0}
    [1].p ∈ {{ &v1.y }}
    {[1].padding[0..23]; [2]; [3]{.x; .y}} ∈ {0}

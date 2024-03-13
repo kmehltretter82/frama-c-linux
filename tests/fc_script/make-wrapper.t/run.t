@@ -11,7 +11,7 @@ verbose output for Make.
   [kernel] Parsing make-wrapper.c (with preprocessing)
   [kernel] Parsing make-wrapper2.c (with preprocessing)
   
-  Command: frama-c -kernel-warn-key annot:missing-spec=abort -kernel-warn-key typing:implicit-function-declaration=abort -eva -eva-no-print -eva-no-show-progress -eva-msg-key=-initial-state -eva-print-callstacks -eva-warn-key alarm=inactive -no-deps-print -no-calldeps-print -eva-warn-key garbled-mix=active,garbled-mix:write=feedback -calldeps -from-verbose 0 -eva-warn-key builtins:missing-spec=abort
+  Command: frama-c -kernel-warn-key annot:missing-spec=abort -kernel-warn-key typing:implicit-function-declaration=abort -eva -eva-no-print -eva-no-show-progress -eva-msg-key=-initial-state -eva-print-callstacks -eva-warn-key alarm=inactive -no-deps-print -no-calldeps-print -eva-warn-key garbled-mix=active,garbled-mix:write=active -calldeps -from-verbose 0 -eva-warn-key builtins:missing-spec=abort
   
   [eva] Analyzing a complete application starting at main
   [eva:recursion] make-wrapper.c:17: 

@@ -401,6 +401,8 @@ let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
 
 let fc_internal_attributes = ["declspec"; "arraylen"; "fc_stdlib"]
 
+let cast_irrelevant_attributes = ["visibility"]
+
 let filter_qualifier_attributes al =
   List.filter
     (fun a -> List.mem (attributeName a) qualifier_attributes) al
@@ -1467,10 +1469,15 @@ and childrenTermNode vis tn =
     let t1' = vTerm t1 in
     let t2' = vTerm t2 in
     if t1' != t1 || t2' != t2 then TBinOp(op,t1',t2') else tn
-  | TCastE(ty,te) ->
+  | TCast(false, Ctype ty,te) ->
     let ty' = vTyp ty in
     let te' = vTerm te in
-    if ty' != ty || te' != te then TCastE(ty',te') else tn
+    if ty' != ty || te' != te then TCast(false, Ctype ty',te') else tn
+  | TCast (true, ty,t) ->
+    let ty' = visitCilLogicType vis ty in
+    let t' = visitCilTerm vis t in
+    if ty' != ty || t' != t then TCast (true, ty',t') else tn
+  | TCast(false,_,_) -> Kernel.fatal "TCast to ctype without Ctype"
   | TAddrOf tl ->
     let tl' = vTermLval tl in
     if tl' != tl then TAddrOf tl' else tn
@@ -1552,10 +1559,6 @@ and childrenTermNode vis tn =
     let def'= visitCilLogicInfo vis def in
     let body' = visitCilTerm vis body in
     if def != def' || body != body' then Tlet(def',body') else tn
-  | TLogic_coerce(ty,t) ->
-    let ty' = visitCilLogicType vis ty in
-    let t' = visitCilTerm vis t in
-    if ty' != ty || t' != t then TLogic_coerce(ty',t') else tn
 
 and visitCilLogicLabel vis l =
   doVisitCil vis
@@ -3186,14 +3189,14 @@ let isZero (e: exp) : bool =
 let rec isLogicZero t = match t.term_node with
   | TConst (Integer (n,_)) -> Integer.equal n Integer.zero
   | TConst (LChr c) -> Char.code c = 0
-  | TCastE(_, t) -> isLogicZero t
+  | TCast(_, _, t) -> isLogicZero t
   | _ -> false
 
 let isLogicNull t =
   isLogicZero t ||
   (let rec aux t = match t.term_node with
       | Tnull -> true
-      | TCastE(_, t) -> aux t
+      | TCast(_,_, t) -> aux t
       | _ -> false
    in aux t)
 
@@ -3461,7 +3464,7 @@ let rec stripCasts (e: exp) =
   match e.enode with CastE(_, e') -> stripCasts e' | _ -> e
 
 let rec stripTermCasts (t: term) =
-  match t.term_node with TCastE(_, t') -> stripTermCasts t' | _ -> t
+  match t.term_node with TCast(_,_, t') -> stripTermCasts t' | _ -> t
 
 (* Separate out the storage-modifier name attributes *)
 let separateStorageModifiers (al: attribute list) =
@@ -4509,7 +4512,7 @@ and bytesSizeOf t = (bitsSizeOf t) lsr 3
 
 and sizeOf ~loc t =
   try
-    integer ~loc ((bitsSizeOf t) lsr 3)
+    integer ~loc (bytesSizeOf t)
   with SizeOfError _ -> new_exp ~loc (SizeOf(t))
 
 and fieldBitsOffset (f : fieldinfo) : int * int =
@@ -4610,14 +4613,13 @@ and constFold (machdep: bool) (e: exp) : exp =
   | Const(CChr c) -> new_exp ~loc (Const(charConstToIntConstant c))
   | Const(CEnum {eival = v}) -> constFold machdep v
   | Const (CReal _ | CWStr _ | CStr _ | CInt64 _) -> e (* a constant *)
-  | SizeOf t when machdep -> begin
-      try
-        let bs = bitsSizeOf t in
-        kinteger ~loc theMachine.kindOfSizeOf (bs / 8)
+  | SizeOf t when machdep ->
+    begin
+      try kinteger ~loc theMachine.kindOfSizeOf (bytesSizeOf t)
       with SizeOfError _ -> e
     end
-  | SizeOfE e when machdep -> constFold machdep
-                                (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
+  | SizeOfE e when machdep ->
+    constFold machdep (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
   | SizeOfStr s when machdep ->
     kinteger ~loc theMachine.kindOfSizeOf (1 + String.length s)
   | AlignOf t when machdep ->
@@ -5020,14 +5022,20 @@ let spare_attributes_for_c_cast =
   fc_internal_attributes @ qualifier_attributes
 
 let type_remove_attributes_for_c_cast t =
-  let t = typeRemoveAttributesDeep fc_internal_attributes t in
+  let attributes_to_remove =
+    fc_internal_attributes @ cast_irrelevant_attributes
+  in
+  let t = typeRemoveAttributesDeep attributes_to_remove t in
   typeRemoveAttributes spare_attributes_for_c_cast t
 
 let spare_attributes_for_logic_cast =
   spare_attributes_for_c_cast
 
 let type_remove_attributes_for_logic_type t =
-  let t = typeRemoveAttributesDeep fc_internal_attributes t in
+  let attributes_to_remove =
+    fc_internal_attributes @ cast_irrelevant_attributes
+  in
+  let t = typeRemoveAttributesDeep attributes_to_remove t in
   typeRemoveAttributes spare_attributes_for_logic_cast t
 
 let () = Cil_datatype.drop_non_logic_attributes :=
@@ -6205,9 +6213,9 @@ let combineTypesGen ?emitwith (combF : combineFunction)
       raise (Cannot_combine "different vararg specifiers");
     (* If one does not have arguments, believe the one with the
      * arguments *)
-    let newargs, olda' =
-      if oldargs = None then args, olda
-      else if args = None then oldargs, olda
+    let newargs =
+      if oldargs = None then args
+      else if args = None then oldargs
       else
         let (oldargslist, oldghostargslist) = argsToPairOfLists oldargs in
         let (argslist, ghostargslist) = argsToPairOfLists args in
@@ -6239,21 +6247,20 @@ let combineTypesGen ?emitwith (combF : combineFunction)
                   in
                   let a = addAttributes oa aa in
                   (n, t, a))
-               oldargslist argslist),
-          olda
+               oldargslist argslist)
     in
     (* Drop missingproto as soon as one of the type is a properly declared one*)
-    let olda =
+    let olda' =
       if not (hasAttribute "missingproto" a) then
-        dropAttribute "missingproto" olda'
-      else olda'
+        dropAttribute "missingproto" olda
+      else olda
     in
-    let a =
-      if not (hasAttribute "missingproto" olda') then
+    let a' =
+      if not (hasAttribute "missingproto" olda) then
         dropAttribute "missingproto" a
       else a
     in
-    TFun (newrt, newargs, oldva, combineAttributes what olda a)
+    TFun (newrt, newargs, oldva, combineAttributes what olda' a')
 
   | TBuiltin_va_list olda, TBuiltin_va_list a ->
     TBuiltin_va_list (combineAttributes what olda a)
@@ -7356,7 +7363,7 @@ let rec free_vars_term bound_vars t = match t.term_node with
   | TSizeOfE t
   | TAlignOfE t
   | TUnOp (_,t)
-  | TCastE (_,t)
+  | TCast (_,_,t)
   | Tat (t,_)
   | Toffset (_,t)
   | Tbase_addr (_,t)
@@ -7429,7 +7436,6 @@ let rec free_vars_term bound_vars t = match t.term_node with
       free_vars_term (Logic_var.Set.add d.l_var_info bound_vars) b
     in
     Logic_var.Set.union fvd fvb
-  | TLogic_coerce(_,t) -> free_vars_term bound_vars t
 
 and free_vars_lval bv (h,o) =
   Logic_var.Set.union

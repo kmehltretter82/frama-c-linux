@@ -163,8 +163,7 @@
 [eva:alarm] conversion.i:39: Warning: 
   non-finite float value. assert \is_finite(*((float *)(&x)));
 [eva:garbled-mix:write] conversion.i:39: 
-  Assigning imprecise value to f.
-  The imprecision originates from Arithmetic {conversion.i:39}
+  Assigning imprecise value to f because of arithmetic operation on addresses.
 [eva] conversion.i:40: 
   Frama_C_dump_each:
   # cvalue:

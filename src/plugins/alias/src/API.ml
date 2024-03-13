@@ -1,0 +1,161 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of Frama-C.                                         *)
+(*                                                                        *)
+(*  Copyright (C) 2007-2023                                               *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+open Cil_types
+
+module EdgeLabel = Abstract_state.EdgeLabel
+
+(** Points-to graphs datastructure. *)
+module G = Abstract_state.G
+
+type v = G.V.t
+
+let vid = Abstract_state.vid
+
+module LSet = Abstract_state.LSet
+module VarSet = Abstract_state.VarSet
+
+module Abstract_state = Abstract_state
+
+let check_computed () =
+  if not (Analysis.is_computed ())
+  then
+    Options.abort "Static analysis must be called before any function of the API can be called"
+
+
+let lset ~stmt (get_set : Abstract_state.t -> LSet.t) =
+  check_computed ();
+  match Analysis.get_state_before_stmt stmt with
+  | None -> LSet.empty
+  | Some state -> get_set state
+
+let vars ~stmt (get_set : Abstract_state.t -> VarSet.t) =
+  check_computed ();
+  match Analysis.get_state_before_stmt stmt with
+  | None -> VarSet.empty
+  | Some state -> get_set state
+
+module Statement = struct
+  let points_to_vars ~stmt lv = vars ~stmt (Abstract_state.points_to_vars lv)
+  let points_to_lvals ~stmt lv = lset ~stmt (Abstract_state.points_to_lvals lv)
+  let alias_vars ~stmt lv = vars ~stmt (Abstract_state.alias_vars lv)
+  let aliases ~stmt lv = lset ~stmt (Abstract_state.find_all_aliases lv)
+
+  let are_aliased ~stmt (lv1: lval) (lv2:lval) : bool =
+    (* TODO: more efficient algorithm: do they share a successor? *)
+    LSet.mem lv2 @@ aliases ~stmt lv1
+end
+
+let points_to_set_stmt _kf stmt = Statement.points_to_lvals ~stmt
+
+let aliases_stmt _kf stmt = Statement.aliases ~stmt
+
+let new_aliases_stmt s lv =
+  let get_set state =
+    let new_state = Analysis.do_stmt state s in
+    Abstract_state.find_all_aliases lv new_state
+  in
+  lset ~stmt:s get_set
+
+module Function = struct
+  let return_stmt kf =
+    if Kernel_function.has_definition kf
+    then Kernel_function.find_return kf
+    else Options.abort "function %a has no definition" Kernel_function.pretty kf
+
+  let points_to_vars ~kf = Statement.points_to_vars ~stmt:(return_stmt kf)
+  let points_to_lvals ~kf = Statement.points_to_lvals ~stmt:(return_stmt kf)
+  let alias_vars ~kf = Statement.alias_vars ~stmt:(return_stmt kf)
+  let aliases ~kf = Statement.aliases ~stmt:(return_stmt kf)
+  let are_aliased ~kf = Statement.are_aliased ~stmt:(return_stmt kf)
+
+  let fundec_stmts ~kf lv =
+    if Kernel_function.has_definition kf
+    then
+      List.map
+        (fun s -> s, new_aliases_stmt s lv)
+        (Kernel_function.get_definition kf).sallstmts
+    else
+      Options.abort "fundec_stmts: function %a has no definition" Kernel_function.pretty kf
+end
+
+let points_to_set_kf kf = Function.points_to_lvals ~kf
+
+let aliases_kf kf = Function.aliases ~kf
+
+let fundec_stmts kf = Function.fundec_stmts ~kf
+
+
+let fold_points_to_set f_fold acc kf s lv =
+  LSet.fold (fun e a -> f_fold a e) (points_to_set_stmt kf s lv) acc
+
+let fold_aliases_stmt f_fold acc kf s lv =
+  LSet.fold (fun e a -> f_fold a e) (aliases_stmt kf s lv) acc
+
+let fold_new_aliases_stmt f_fold acc _kf s lv =
+  LSet.fold (fun e a -> f_fold a e) (new_aliases_stmt s lv) acc
+
+let fold_points_to_set_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
+  LSet.fold (fun e a -> f_fold a e) (points_to_set_kf kf lv) acc
+
+let fold_aliases_kf (f_fold : 'a -> lval -> 'a) (acc : 'a) kf lv : 'a =
+  LSet.fold (fun e a -> f_fold a e) (aliases_kf kf lv) acc
+
+let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
+  List.fold_left
+    (fun acc (s, set) ->
+       LSet.fold (fun lv a -> f_fold a s lv) set acc
+    )
+    acc
+    (fundec_stmts kf lv)
+
+let are_aliased (_kf: kernel_function) stmt = Statement.are_aliased ~stmt
+
+let fold_vertex (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (_kf: kernel_function) (s:stmt) (lv: lval) : 'a =
+  check_computed ();
+  match Analysis.get_state_before_stmt s with
+    None -> acc
+  | Some state ->
+    let v : G.V.t = Abstract_state.find_vertex lv state in
+    let set_aliases = Abstract_state.find_synonyms lv state in
+    LSet.fold (fun lv a -> f_fold a v lv) set_aliases acc
+
+let fold_vertex_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (_kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+  check_computed ();
+  match Analysis.get_state_before_stmt s with
+    None -> acc
+  | Some state ->
+    let list_closure : (G.V.t * LSet.t) list = Abstract_state.find_transitive_closure lv state in
+    List.fold_left
+      (fun acc (i,s) -> LSet.fold (fun lv a -> f_fold a i lv) s acc)
+      acc
+      list_closure
+
+let get_state_before_stmt _kf =
+  Analysis.get_state_before_stmt
+
+let call_function a f res args =
+  match Analysis.get_summary f with
+    None -> None
+  | Some su -> Some(Abstract_state.call a res args su)
+
+let simplify_lval = Simplified.Lval.simplify

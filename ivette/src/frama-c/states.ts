@@ -36,6 +36,7 @@ import { Order } from 'dome/data/compare';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 import { Client, useModel } from 'dome/table/models';
 import { CompactModel } from 'dome/table/arrays';
+import { FieldState, FieldError, isValid } from 'dome/layout/forms';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Server from './server';
 
@@ -305,6 +306,32 @@ export function useSyncValue<A>(value: Value<A>): A | undefined {
   st.online();
   const [v] = useGlobalState(st);
   return v;
+}
+
+/** Synchronize FieldState and server state only if there is no error. */
+export function useServerField<A>(
+  state: State<A>,
+  defaultValue: A,
+): FieldState<A> {
+  const [value, setState] = useSyncState(state);
+  const stateValue = value !== undefined ? value : defaultValue;
+  const [local, setLocal] = React.useState(stateValue);
+  const [error, setError] = React.useState<FieldError>(undefined);
+
+  const update = React.useCallback((newValue: A, newError: FieldError) => {
+    setLocal(newValue);
+    setError(newError);
+    if (isValid(newError)) {
+      setState(newValue);
+    }
+  }, [setState]);
+
+  return {
+    error,
+    value: isValid(error) ? stateValue : local,
+    reset: isValid(error) ? undefined : stateValue,
+    onChanged: update
+  };
 }
 
 // --------------------------------------------------------------------------

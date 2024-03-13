@@ -1,5 +1,5 @@
 The following set of packages is known to be a working configuration for
-compiling Frama-C 28.0.
+compiling Frama-C 28.1.
 
 - OCaml 4.13.1
 - alt-ergo.2.4.2 (for wp, optional)

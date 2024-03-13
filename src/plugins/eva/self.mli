@@ -56,7 +56,6 @@ val dkey_recursion : category
 
 val wkey_alarm: warn_category
 val wkey_locals_escaping: warn_category
-val wkey_garbled_mix_read: warn_category
 val wkey_garbled_mix_write: warn_category
 val wkey_garbled_mix_assigns: warn_category
 val wkey_garbled_mix_summary: warn_category

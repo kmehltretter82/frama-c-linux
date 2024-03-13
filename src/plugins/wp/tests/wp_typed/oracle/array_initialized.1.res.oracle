@@ -265,7 +265,7 @@ Goal Assertion (file array_initialized.c, line 283):
 Let a = global(K_p_34).
 Assume {
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 499).
   (* Initializer *)

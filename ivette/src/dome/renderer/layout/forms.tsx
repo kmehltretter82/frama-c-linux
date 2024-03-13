@@ -126,6 +126,7 @@ export type ResetCallback = () => void;
  */
 export class BufferController {
   private readonly evt = new Events();
+  private errors = 0;
 
   /** Notify all reset listener events. */
   reset(): void { this.evt.emit('reset'); }
@@ -139,18 +140,33 @@ export class BufferController {
   /** There are active listeners for Commit event. */
   hasCommit(): boolean { return this.evt.listenerCount('commit') > 0; }
 
+  /** Get the number of errors */
+  getErrors(): number { return  this.errors; }
+
   /** @internal */
   onReset(fn: ResetCallback): void { this.evt.addListener('reset', fn); }
 
   /** @internal */
-  offReset(fn: ResetCallback): void { this.evt.addListener('reset', fn); }
+  offReset(fn: ResetCallback): void { this.evt.removeListener('reset', fn); }
 
   /** @internal */
   onCommit(fn: ResetCallback): void { this.evt.addListener('commit', fn); }
 
   /** @internal */
-  offCommit(fn: ResetCallback): void { this.evt.addListener('commit', fn); }
+  offCommit(fn: ResetCallback): void { this.evt.removeListener('commit', fn); }
 
+  /** @internal */
+  addError(): void { this.errors++; }
+
+  /** @internal */
+  removeError(): void { this.errors--; }
+}
+
+export type Equal<A> = (a:A, b:A) => boolean;
+
+function compare<A>(equal: Equal<A> | undefined, a: A, b: A): boolean
+{
+  return equal ? equal(a, b) : a === b;
 }
 
 /**
@@ -162,7 +178,8 @@ export class BufferController {
 
    - on Reset event, the buffered state is restored to the input value.
 
-   - on Commit event, the buffered state is sent to the input callback.
+   - on Commit event,
+     the buffered state is sent to the input callback or restored.
 
    The returned field state reflects the internal buffer state. Its local
    reset value is either the input reset value or the current input value.
@@ -170,39 +187,55 @@ export class BufferController {
  */
 export function useBuffer<A>(
   remote : BufferController,
-  state: FieldState<A>
+  state: FieldState<A>,
+  equal?: Equal<A>,
 ): FieldState<A>
 {
   const { value, error, reset, onChanged } = state;
   const [ modified, setModified ] = React.useState(false);
   const [ buffer, setBuffer ] = React.useState<A>(value);
   const [ berror, setBerror ] = React.useState<FieldError>(error);
-  const staged = modified && !berror;
+
+  const valid = !isValid(berror);
+  const rollback = reset ?? value;
+
+  // --- Error Count
+  React.useEffect(() => {
+      if (valid) return;
+    remote.addError();
+    return () => remote.removeError();
+  }, [remote, valid]);
 
   // --- Reset
   React.useEffect(() => {
     if (modified) {
       const doReset = (): void => {
         setModified(false);
-        setBuffer(value);
-        setBerror(error);
+        setBuffer(rollback);
+        setBerror(undefined);
       };
       remote.onReset(doReset);
       return () => remote.offReset(doReset);
     } else return;
-  }, [remote, modified, value, error]);
+  }, [remote, modified, rollback]);
 
   // --- Commit
   React.useEffect(() => {
-    if (staged) {
+    if(modified) {
       const doCommit = (): void => {
-        setModified(false);
-        onChanged(buffer, undefined, false);
+        if (valid) {
+          setModified(false);
+          onChanged(buffer, undefined, false);
+        } else {
+          setModified(false);
+          setBuffer(rollback);
+          setBerror(undefined);
+        }
       };
       remote.onCommit(doCommit);
       return () => remote.offCommit(doCommit);
     } else return;
-  }, [remote, staged, buffer, onChanged]);
+  }, [remote, modified, valid, buffer, rollback, onChanged]);
 
   // --- Callback
   const onLocalChange = React.useCallback(
@@ -210,9 +243,9 @@ export function useBuffer<A>(
       setModified(!isReset);
       setBuffer(newValue);
       setBerror(newError);
-      if (isReset && newValue !== value)
+      if (isReset && !compare(equal, newValue, value))
         onChanged(newValue, newError, isReset);
-    }, [value, onChanged]);
+    }, [equal, value, onChanged]);
 
   return {
     value: modified ? buffer : value,

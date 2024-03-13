@@ -148,6 +148,15 @@ module State = struct
       finalize_recursive_call stmt call ~pre:(pre, clob) a post
     in
     let post = Option.fold ~some:finalize ~none:post recursion in
+    (* Deallocate memory allocated via alloca().
+       To minimize computations, only do it for function definitions. *)
+    let post =
+      if Kernel_function.is_definition call.kf then
+        let callstack = Eva_utils.current_call_stack () in
+        let callstack = Callstack.push call.kf stmt callstack in
+        Builtins_malloc.free_automatic_bases callstack post
+      else post
+    in
     Cvalue_transfer.finalize_call stmt call recursion ~pre ~post
     >>-: fun state ->
     state, clob

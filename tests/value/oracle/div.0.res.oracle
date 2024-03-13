@@ -38,8 +38,7 @@
 [eva:alarm] div.i:33: Warning: 
   signed overflow. assert (int)(&Z2) / Z2 ≤ 2147483647;
 [eva:garbled-mix:write] div.i:33: 
-  Assigning imprecise value to b.
-  The imprecision originates from Arithmetic {div.i:33}
+  Assigning imprecise value to b because of arithmetic operation on addresses.
 [eva:alarm] div.i:34: Warning: 
   pointer downcast. assert (unsigned int)(&X + 2) ≤ 2147483647;
 [eva:alarm] div.i:34: Warning: division by zero. assert (int)(&X + 2) ≢ 0;
@@ -48,8 +47,7 @@
 [eva:alarm] div.i:34: Warning: 
   signed overflow. assert 100 / (int)(&X + 2) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:34: 
-  Assigning imprecise value to d2.
-  The imprecision originates from Arithmetic {div.i:34}
+  Assigning imprecise value to d2 because of arithmetic operation on addresses.
 [eva:alarm] div.i:35: Warning: 
   pointer downcast. assert (unsigned int)(&X + 1) ≤ 2147483647;
 [eva:alarm] div.i:35: Warning: 
@@ -57,8 +55,7 @@
 [eva:alarm] div.i:35: Warning: 
   signed overflow. assert 100 / (int)(&X + 1) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:35: 
-  Assigning imprecise value to d1.
-  The imprecision originates from Arithmetic {div.i:35}
+  Assigning imprecise value to d1 because of arithmetic operation on addresses.
 [eva:alarm] div.i:36: Warning: 
   pointer downcast. assert (unsigned int)(&X) ≤ 2147483647;
 [eva:alarm] div.i:36: Warning: 
@@ -66,8 +63,7 @@
 [eva:alarm] div.i:36: Warning: 
   signed overflow. assert 100 / (int)(&X) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:36: 
-  Assigning imprecise value to d0.
-  The imprecision originates from Arithmetic {div.i:36}
+  Assigning imprecise value to d0 because of arithmetic operation on addresses.
 [eva:alarm] div.i:37: Warning: 
   pointer downcast. assert (unsigned int)(&X) ≤ 2147483647;
 [eva:alarm] div.i:37: Warning: 
@@ -75,8 +71,7 @@
 [eva:alarm] div.i:37: Warning: 
   signed overflow. assert -((int)(&X)) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:37: 
-  Assigning imprecise value to e.
-  The imprecision originates from Arithmetic {div.i:37}
+  Assigning imprecise value to e because of arithmetic operation on addresses.
 [eva] Recording results for main
 [eva] Done for function main
 [scope:rm_asserts] removing 2 assertion(s)

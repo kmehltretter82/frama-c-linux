@@ -285,16 +285,6 @@ let lval_to_exp =
   MemoLvalToExp.memo
     (fun lv -> Cil.new_exp ~loc:Cil_datatype.Location.unknown (Lval lv))
 
-let dump_garbled_mix () =
-  let l = Cvalue.V.get_garbled_mix () in
-  if l <> [] then
-    let pp_one fmt v = Format.fprintf fmt "@[<hov 2>%a@]" Cvalue.V.pretty v in
-    Self.warning ~wkey:Self.wkey_garbled_mix_summary
-      "Garbled mix generated during analysis:@.\
-       @[<v>%a@]"
-      (Pretty_utils.pp_list ~pre:"" ~suf:"" ~sep:"@ " pp_one) l
-
-
 type deps = Function_Froms.Deps.deps = {
   data: Locations.Zone.t;
   indirect: Locations.Zone.t;

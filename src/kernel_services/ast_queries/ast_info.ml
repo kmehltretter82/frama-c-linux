@@ -307,7 +307,7 @@ let constant_term loc i =
 let rec is_null_term t = match t.term_node with
   | TConst c when is_integral_logic_const c ->
     Integer.equal (value_of_integral_logic_const c) Integer.zero
-  | TCastE(_,t) -> is_null_term t
+  | TCast(false, _,t) -> is_null_term t
   | _ -> false
 
 (* ************************************************************************** *)
@@ -465,33 +465,37 @@ let pointed_type ty =
 (** {2 Predefined} *)
 (* ************************************************************************** *)
 
-let can_be_cea_function name =
-  String.starts_with ~prefix:"Frama_" name
+let start_with_frama_c name =
+  String.starts_with ~prefix:"Frama_C_" name
 
-let is_cea_function name =
+let is_show_each_builtin name =
   String.starts_with ~prefix:"Frama_C_show_each" name
 
-let is_cea_domain_function name =
+let is_domain_show_each_builtin name =
   String.starts_with ~prefix:"Frama_C_domain_show_each" name
 
-let is_cea_dump_function name =
+let is_dump_each_builtin name =
   String.starts_with ~prefix:"Frama_C_dump_each" name
 
-let is_cea_dump_file_function name =
+let is_dump_file_builtin name =
   String.starts_with ~prefix:"Frama_C_dump_each_file" name
 
-let is_cea_builtin name =
-  String.starts_with ~prefix:"Frama_C_builtin" name
+let is_split_builtin name =
+  String.starts_with ~prefix:"Frama_C_builtin_split" name
 
-let is_frama_c_builtin n =
-  can_be_cea_function n &&
-  (is_cea_dump_function n ||
-   is_cea_function n ||
-   is_cea_builtin n ||
-   is_cea_domain_function n ||
-   is_cea_dump_file_function n)
+let start_with_frama_c_builtin n =
+  start_with_frama_c n &&
+  (is_dump_each_builtin n ||
+   is_show_each_builtin n ||
+   is_split_builtin n ||
+   is_domain_show_each_builtin n ||
+   is_dump_file_builtin n)
 
-let () = Cil_builtins.add_special_builtin_family is_frama_c_builtin
+let () = Cil_builtins.add_special_builtin_family start_with_frama_c_builtin
+
+let is_frama_c_builtin v =
+  Cil_builtins.has_fc_builtin_attr v || start_with_frama_c_builtin v.vname
+
 
 (*
 Local Variables:

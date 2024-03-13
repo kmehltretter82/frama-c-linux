@@ -298,6 +298,9 @@
 [eva] computing for function f18 <- main18 <- main.
   Called from assigns_from.i:215.
 [eva] using specification for function f18
+[eva:garbled-mix:assigns] assigns_from.i:215: 
+  The specification of function f18 has generated a garbled mix of addresses
+  for assigns clause *x.
 [eva] Done for function f18
 [eva] Recording results for main18
 [from] Computing for function main18
@@ -370,17 +373,17 @@
   base_a ∈ {17}
   a_0.addr ∈
      {{ garbled mix of &{base_a; base_b}
-      (origin: Misaligned {assigns_from.i:215}) }}
+      (origin: Misaligned read {assigns_from.i:215}) }}
      .i ∈
      {{ garbled mix of &{base_a; base_b}
-      (origin: Misaligned {assigns_from.i:215}) }} or UNINITIALIZED
+      (origin: Misaligned read {assigns_from.i:215}) }} or UNINITIALIZED
   base_b ∈ {11}
   b.addr ∈
    {{ garbled mix of &{base_a; base_b}
-    (origin: Misaligned {assigns_from.i:215}) }}
+    (origin: Misaligned read {assigns_from.i:215}) }}
    .i ∈
    {{ garbled mix of &{base_a; base_b}
-    (origin: Misaligned {assigns_from.i:215}) }} or UNINITIALIZED
+    (origin: Misaligned read {assigns_from.i:215}) }} or UNINITIALIZED
 [eva:final-states] Values at end of function main2:
   a[0..2] ∈ {0}
    [3] ∈ {2}

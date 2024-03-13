@@ -117,5 +117,8 @@ int main() {
   rread = read(fd, buf, SSIZE_MAX);
   rread = read(fd, buf, SIZE_MAX);
 
+  r = rmdir("/tmp/foo");
+  //@ check ok: r == 0 || r == -1;
+
   return 0;
 }

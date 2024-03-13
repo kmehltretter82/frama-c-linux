@@ -582,8 +582,8 @@ and is_same_term_node t t' env =
   | TUnOp(op,t), TUnOp(op',t') -> Unop.equal op op' && is_same_term t t' env
   | TBinOp(op,t1,t2), TBinOp(op',t1',t2') ->
     Binop.equal op op' && is_same_term t1 t1' env && is_same_term t2 t2' env
-  | TCastE(typ,term), TCastE(typ',term') ->
-    is_same_type typ typ' env && is_same_term term term' env
+  | TCast(is_logic, typ, term), TCast(is_logic', typ', term') ->
+    is_logic = is_logic' && is_same_logic_type typ typ' env && is_same_term term term' env
   | TAddrOf lv, TAddrOf lv'
   | TStartOf lv, TStartOf lv' -> is_same_term_lval lv lv' env
   | Tapp(f,labs,args), Tapp(f',labs',args') ->
@@ -609,8 +609,6 @@ and is_same_term_node t t' env =
   | Tblock_length(l,t), Tblock_length(l',t') ->
     is_same_logic_label l l' env && is_same_term t t' env
   | Tnull, Tnull -> true
-  | TLogic_coerce(typ,t), TLogic_coerce(typ',t') ->
-    is_same_logic_type typ typ' env && is_same_term t t' env
   | TUpdate(a,o,v), TUpdate(a',o',v') ->
     is_same_term a a' env &&
     is_same_term_offset o o' env &&
@@ -634,9 +632,9 @@ and is_same_term_node t t' env =
       is_same_term t t' env
     end else false
   | (TConst _ | TLval _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
-    | TAlignOfE _ |  TUnOp _ | TBinOp _ | TCastE _ | TAddrOf _ | TStartOf _
+    | TAlignOfE _ |  TUnOp _ | TBinOp _ | TCast _ | TAddrOf _ | TStartOf _
     | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _ | Tbase_addr _
-    | Toffset _ | Tblock_length _ | Tnull | TLogic_coerce _ | TUpdate _
+    | Toffset _ | Tblock_length _ | Tnull | TUpdate _
     | Ttypeof _ | Ttype _ | Tempty_set | Tunion _ | Tinter _ | Tcomprehension _
     | Tlet _ | Trange _), _ -> false
 

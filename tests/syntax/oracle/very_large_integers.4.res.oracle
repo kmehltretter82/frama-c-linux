@@ -1,4 +1,5 @@
 [kernel] Parsing very_large_integers.c (with preprocessing)
+[kernel] very_large_integers.c:62: User Error: Array length is too large.
 [kernel] very_large_integers.c:62: User Error: 
   Array length 9999999999999999999U is too big: no explicit initializer allowed.
   60    

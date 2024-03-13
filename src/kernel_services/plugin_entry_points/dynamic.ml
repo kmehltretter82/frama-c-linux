@@ -145,6 +145,14 @@ let load_module m =
             load_plugin m
     end
 
+let () = Printexc.register_printer (function
+    | Dynlink.Error err -> Some (Dynlink.error_message err)
+    | _ -> None
+  )
+
+let () = Dynlink.allow_unsafe_modules true
+
+
 (* ************************************************************************* *)
 (** {2 Registering and accessing dynamic values} *)
 (* ************************************************************************* *)

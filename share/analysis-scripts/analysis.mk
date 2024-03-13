@@ -121,7 +121,7 @@ EVAFLAGS   ?= \
   -eva-no-print -eva-no-show-progress -eva-msg-key=-initial-state \
   -eva-print-callstacks -eva-warn-key alarm=inactive \
   -no-deps-print -no-calldeps-print \
-  -eva-warn-key garbled-mix=active,garbled-mix:write=feedback \
+  -eva-warn-key garbled-mix=active,garbled-mix:write=active \
   -calldeps -from-verbose 0 \
   $(if $(EVABUILTINS), -eva-builtin=$(call fc_list,$(EVABUILTINS)),) \
   $(if $(EVAUSESPECS), -eva-use-spec $(call fc_list,$(EVAUSESPECS)),)

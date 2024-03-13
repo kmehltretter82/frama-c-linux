@@ -21,7 +21,7 @@ theory Axiomatic1
   
   (* use map.Map *)
   
-  (* use frama_c_wp.memory.Memory *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
   function L_x (mint:addr -> int) (p:addr) : int = get mint p
 end
@@ -41,7 +41,7 @@ end
     
     (* use map.Map *)
     
-    (* use frama_c_wp.memory.Memory *)
+    (* use frama_c_wp.memaddr.MemAddr *)
     
     (* use Axiomatic1 *)
     

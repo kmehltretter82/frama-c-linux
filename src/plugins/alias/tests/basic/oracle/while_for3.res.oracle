@@ -2,18 +2,31 @@
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
 [alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *a = (int *)0;  is    <empty>
 [alias] analysing instruction: int *b = (int *)0;
 [alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *b = (int *)0;  is    <empty>
 [alias] analysing instruction: int *c = (int *)0;
 [alias] May-aliases after instruction  int *c = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *c = (int *)0;  is    <empty>
 [alias] analysing instruction: int i = 0;
 [alias] May-aliases after instruction  int i = 0;  are  <none>
+[alias] May-alias graph after instruction  int i = 0;  is    <empty>
 [alias] analysing instruction: a = b;
 [alias] May-aliases after instruction  a = b;  are  { a; b }
+[alias] May-alias graph after instruction  a = b;  is    0:{ a; b } → 1:{  }
 [alias] analysing instruction: __Cont: i ++;
 [alias] May-aliases after instruction  __Cont: i ++;  are  { a; b }
+[alias] May-alias graph after instruction  __Cont: i ++;  is    0:{ a; b } → 1:{  }
 [alias] analysing instruction: a = b;
 [alias] May-aliases after instruction  a = b;  are  { a; b }
+[alias] May-alias graph after instruction  a = b;  is    0:{ a; b } → 1:{  }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  { a; b }
+[alias] May-alias graph after instruction  __retres = 0;  is    0:{ a; b } → 1:{  }
 [alias] May-aliases at the end of function main: { a; b }
+[alias] May-alias graph at the end of function main:
+  0:{ a; b } → 1:{  }
+[alias] Summary of function main:
+  formals:     returns: __retres    state: { a; b }
+[alias] Analysis complete

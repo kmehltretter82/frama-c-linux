@@ -1,4 +1,5 @@
 [kernel] Parsing very_large_integers.c (with preprocessing)
+[kernel] very_large_integers.c:41: User Error: Array length is too large.
 [kernel] very_large_integers.c:42: User Error: 
   Cannot represent the integer 99999999999999999999U
 [kernel] very_large_integers.c:42: User Error: 

@@ -125,15 +125,14 @@
   pointer downcast. assert (unsigned int)(&d) ≤ 2147483647;
 [eva:alarm] builtins.c:107: Warning: 
   non-finite double value. assert \is_finite((double)((int)(&d)));
+[eva:garbled-mix:write] builtins.c:107: 
+  Assigning imprecise value to x because of arithmetic operation on addresses.
 [eva] builtins.c:107: Call to builtin log
 [eva:alarm] builtins.c:107: Warning: 
   function log: precondition 'finite_arg' got status unknown.
 [eva:alarm] builtins.c:107: Warning: 
   function log: precondition 'arg_positive' got status unknown.
 [eva] builtins.c:107: function Frama_C_log applied to address
-[eva:garbled-mix:write] builtins.c:107: 
-  Assigning imprecise value to l7.
-  The imprecision originates from Arithmetic {builtins.c:107}
 [eva:alarm] builtins.c:111: Warning: 
   accessing uninitialized left-value. assert \initialized(&x);
 [eva] Recording results for main_log_exp

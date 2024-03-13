@@ -82,7 +82,7 @@ let access_ptr_elts ~loc tlv =
   let base, basetype =
     if Logic_utils.isLogicVoidPointerType basetype then begin
       let typ = Ctype Cil.charPtrType in
-      Logic_const.term ~loc (TCastE(Cil.charPtrType,base)) typ, typ
+      Logic_const.term ~loc (TCast(false, Ctype Cil.charPtrType,base)) typ, typ
     end else base, basetype
   in
   let offset = Logic_const.term ~loc (TBinOp (PlusPI, base, range)) basetype in

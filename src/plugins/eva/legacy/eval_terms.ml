@@ -604,9 +604,9 @@ let pass_logic_cast exn typ trm =
 
 let is_same_term_coerce t1 t2 =
   match t1.term_node, t2.term_node with
-  | TLogic_coerce _, TLogic_coerce _ -> Logic_utils.is_same_term t1 t2
-  | TLogic_coerce (_,t1), _ -> Logic_utils.is_same_term t1 t2
-  | _, TLogic_coerce(_,t2) -> Logic_utils.is_same_term t1 t2
+  | TCast (true,_,_), TCast (true,_,_) -> Logic_utils.is_same_term t1 t2
+  | TCast (true, _,t1), _ -> Logic_utils.is_same_term t1 t2
+  | _, TCast (true, _,t2) -> Logic_utils.is_same_term t1 t2
   | _ -> Logic_utils.is_same_term t1 t2
 
 (* Constrain the ACSL range [idx] when it is used to access an array of
@@ -1142,7 +1142,7 @@ let rec eval_term ~alarm_mode env t =
       etype = Cil.intType;
       eunder; eover; empty; }
 
-  | TCastE (typ, t) ->
+  | TCast (false, Ctype typ, t) ->
     let r = eval_term ~alarm_mode env t in
     (* See if the cast does something. If not, we can keep eunder as is.*)
     if is_noop_cast ~src_typ:t.term_type ~dst_typ:typ
@@ -1153,6 +1153,36 @@ let rec eval_term ~alarm_mode env t =
       let eover = cast ~src_typ:r.etype ~dst_typ:typ r.eover in
       { etype = typ; ldeps = r.ldeps; eunder = under_from_over eover; eover;
         empty = r.empty; }
+  | TCast (false, _,_) -> assert false
+
+  | TCast (true, ltyp, t) ->
+    let r = eval_term ~alarm_mode env t in
+    (* we must handle coercion from singleton to set, for which there is
+       nothing to do, AND coercion from an integer type to a floating-point
+       type, that require a conversion. *)
+    (match Logic_const.plain_or_set Fun.id ltyp with
+     | Linteger when Logic_typing.is_integral_type t.term_type
+                  || Logic_const.is_boolean_type t.term_type -> r
+     | Ctype typ when Cil.isIntegralOrPointerType typ -> r
+     | Lreal ->
+       let eover =
+         if Logic_typing.is_integral_type t.term_type
+         then V.cast_int_to_float Fval.Real r.eover
+         else V.cast_float_to_float Fval.Real r.eover
+       in
+       { etype = Cil.longDoubleType; (* hack until logic type *)
+         ldeps = r.ldeps;
+         eover; eunder = under_from_over eover;
+         empty = r.empty }
+     | _ ->
+       if Logic_const.is_boolean_type ltyp
+       && Logic_typing.is_integral_type t.term_type
+       then cast_to_bool r
+       else
+         unsupported
+           (Format.asprintf "logic coercion %a -> %a@."
+              Printer.pp_logic_type t.term_type Printer.pp_logic_type ltyp)
+    )
 
   | Tif (tcond, ttrue, tfalse) ->
     eval_tif eval_term Cvalue.V.join Cvalue.V.meet ~alarm_mode env
@@ -1192,35 +1222,6 @@ let rec eval_term ~alarm_mode env t =
       eunder = Cvalue.V.singleton_zero;
       eover = Cvalue.V.singleton_zero;
       empty = false; }
-
-  | TLogic_coerce(ltyp, t) ->
-    let r = eval_term ~alarm_mode env t in
-    (* we must handle coercion from singleton to set, for which there is
-       nothing to do, AND coercion from an integer type to a floating-point
-       type, that require a conversion. *)
-    (match Logic_const.plain_or_set Fun.id ltyp with
-     | Linteger when Logic_typing.is_integral_type t.term_type
-                  || Logic_const.is_boolean_type t.term_type -> r
-     | Ctype typ when Cil.isIntegralOrPointerType typ -> r
-     | Lreal ->
-       let eover =
-         if Logic_typing.is_integral_type t.term_type
-         then V.cast_int_to_float Fval.Real r.eover
-         else V.cast_float_to_float Fval.Real r.eover
-       in
-       { etype = Cil.longDoubleType; (* hack until logic type *)
-         ldeps = r.ldeps;
-         eover; eunder = under_from_over eover;
-         empty = r.empty }
-     | _ ->
-       if Logic_const.is_boolean_type ltyp
-       && Logic_typing.is_integral_type t.term_type
-       then cast_to_bool r
-       else
-         unsupported
-           (Format.asprintf "logic coercion %a -> %a@."
-              Printer.pp_logic_type t.term_type Printer.pp_logic_type ltyp)
-    )
 
   (* TODO: the meaning of the label in \offset and \base_addr is not obvious
      at all *)
@@ -1781,7 +1782,7 @@ and eval_term_as_lval ~alarm_mode env t =
   | Tat (t, lab) ->
     ignore (env_state env lab);
     eval_term_as_lval ~alarm_mode { env with e_cur = lab } t
-  | TLogic_coerce (_lt, t) ->
+  | TCast (true, _lt, t) ->
     (* Logic coerce on locations (that are pointers) can only introduce
        sets, that do not change the abstract value. *)
     eval_term_as_lval ~alarm_mode env t
@@ -1816,7 +1817,7 @@ and eval_term_as_exact_locs ~alarm_mode env t =
     if Locations.is_bottom_loc loc then raise Not_an_exact_loc;
     Location (typ, loc)
 
-  | TLogic_coerce (Lreal, t) -> begin
+  | TCast (true, Lreal, t) -> begin
       match eval_term_as_exact_locs ~alarm_mode env t with
       | Logic_var _ as x -> x
       | Location (_, locs) as r ->
@@ -1841,13 +1842,13 @@ and eval_term_as_exact_locs ~alarm_mode env t =
         r
     end
 
-  | TLogic_coerce (_, t) ->
-    (* Otherwise it is always ok to pass through a TLogic_coerce, as the destination
+  | TCast (true, _, t) ->
+    (* Otherwise it is always ok to pass through a TCast (true,_,_), as the destination
        type is always a supertype *)
     eval_term_as_exact_locs ~alarm_mode env t
 
-  | TCastE (ctype, t') ->
-    pass_logic_cast Not_an_exact_loc (Ctype ctype) t';
+  | TCast (false, ctype, t') ->
+    pass_logic_cast Not_an_exact_loc ctype t';
     eval_term_as_exact_locs ~alarm_mode env t'
 
   | Tunion [t] ->
@@ -1947,7 +1948,7 @@ and reduce_by_valid env positive access (tset: term) =
 
     | TLval tlval -> aux_lval tlval env
 
-    | TCastE (typ, {term_node = TLval tlval}) -> aux_lval ~typ tlval env
+    | TCast (false, Ctype typ, {term_node = TLval tlval}) -> aux_lval ~typ tlval env
 
     | TAddrOf (TMem {term_node = TLval tlval}, offs) ->
       (try

@@ -76,6 +76,10 @@ module Queries = struct
   let is_float v =
     Cvalue.V.(is_included v top_float) && Cvalue.V.contains_non_zero v
 
+  let read_garbled_mix = function
+    | Cvalue.V.Top (bases, origin) -> Origin.register_read bases origin
+    | _ -> ()
+
   let extract_scalar_lval state lval typ loc =
     let process_one_loc = eval_one_loc state lval typ in
     let acc = Cvalue.V.bottom, None in
@@ -88,6 +92,7 @@ module Queries = struct
     let incompatible_type = is_float value <> Cil.isFloatingType typ in
     let origin = if incompatible_type then Some value else None in
     let value = Cvalue_forward.reinterpret typ value in
+    read_garbled_mix value;
     if Cvalue.V.is_bottom value
     then `Bottom, alarms
     else `Value (value, origin), alarms
@@ -106,6 +111,7 @@ module Queries = struct
         let value = Cvalue.V_Offsetmap.find_imprecise_everywhere offsm in
         let alarms = indeterminate_alarms lval value in
         let v = Cvalue.V_Or_Uninitialized.get_v value in
+        read_garbled_mix v;
         let v = if Cvalue.V.is_bottom v then `Bottom else `Value (v, None) in
         v, alarms
 

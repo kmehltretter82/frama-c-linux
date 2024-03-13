@@ -103,8 +103,12 @@ stdenvNoCC.mkDerivation {
     ''
     else "" ;
 
+  # The export NIX_GCC_DONT_MANGLE_PREFIX_MAP is meant to disable the
+  # transformation of the path of Frama-C into uppercase when using the
+  # __FILE__ macro.
   buildPhase = ''
     runHook preBuild
+    export NIX_GCC_DONT_MANGLE_PREFIX_MAP=
   '' +
   tests-command + ''
     runHook postBuild

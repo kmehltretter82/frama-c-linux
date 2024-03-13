@@ -45,7 +45,7 @@ let cluster_region () =
   Definitions.cluster ~id:"Region" ~title:"Region Index Constructors" ()
 
 (* Index *)
-let t_addr = MemMemory.t_addr
+let t_addr = MemAddr.t_addr
 let t_index = L.Data( Lang.datatype ~library "index" ,[] )
 let f_addrof = Lang.extern_f ~library ~result:t_addr "addrof"
 let f_consistent = Lang.extern_fp ~library "consistent"
@@ -59,12 +59,7 @@ let p_range k n ps = F.(p_leq e_zero k :: p_lt k n :: ps)
 (* Null *)
 let f_inull = Lang.extern_f ~library ~result:t_index "inull"
 let l_inull = F.e_fun f_inull []
-let a_null = MemMemory.a_null
-let p_inull l = F.p_equal a_null (a_addrof l)
-
-(* Address *)
-
-let p_separated p n q m = F.p_call MemMemory.p_separated [p;n;q;m]
+let p_inull l = F.p_equal MemAddr.null (a_addrof l)
 
 (* Constructors *)
 let region_ctor ~result =
@@ -86,7 +81,6 @@ let l_index_ref l = F.e_fun f_index_ref [l]
 
 (* Shifts *)
 
-let a_shift = MemMemory.a_shift
 let f_shift_index = Lang.extern_f ~library ~result:t_index "shift_index"
 let l_shift_index l p = F.e_fun f_shift_index [l;p]
 
@@ -120,10 +114,10 @@ let is_shiftable f =
 
 let phi_addrof index =
   match F.repr index with
-  | L.Fun(f,[]) when f == f_inull -> a_null
+  | L.Fun(f,[]) when f == f_inull -> MemAddr.null
   | L.Fun(f,[x]) when f == f_index_var -> a_addr_var x
   | L.Fun(f,[l]) when f == f_index_ref -> a_addr_ref (a_addrof l)
-  | L.Fun(f,l::p::_) when is_shiftable f -> a_shift (a_addrof l) p
+  | L.Fun(f,l::p::_) when is_shiftable f -> MemAddr.shift (a_addrof l) p
   | L.Fun(f,es) -> (IndexBuiltin.find f).addrof es
   | _ -> raise Not_found
 
@@ -160,9 +154,9 @@ let phi_consistent_range index sizeof =
 
 let () = Context.register
     begin fun () ->
-      MemMemory.register f_addr_var
+      MemAddr.register f_addr_var
         ~base:(F.e_fun f_base_var) ~offset:(fun _ -> F.e_zero) ;
-      MemMemory.register f_addr_ref
+      MemAddr.register f_addr_ref
         ~base:(F.e_fun f_base_ref) ;
       F.set_builtin_1 f_addrof phi_addrof ;
       F.set_builtin_1 f_consistent phi_consistent ;
@@ -252,7 +246,7 @@ struct
     | _ -> raise Not_found
 
   let builtin_addrof = function
-    | [l;p] -> a_shift (a_addrof l) p
+    | [l;p] -> MemAddr.shift (a_addrof l) p
     | _ -> raise Not_found
 
   let builtin_consistent fds = function
@@ -316,7 +310,7 @@ struct
   (* Address shift with coefficient c_i for each index k_i *)
   let rec shift a cs ks =
     match cs , ks with
-    | c::cs , k::ks -> shift (a_shift a (F.e_fact c k)) cs ks
+    | c::cs , k::ks -> shift (MemAddr.shift a (F.e_fact c k)) cs ks
     | _ -> a
 
   (* Address of an array index *)
@@ -785,7 +779,7 @@ struct
         let p = F.e_var xp in
         let a = to_addr loc in
         let n = F.e_int (Ctypes.bits_sizeof_object obj) in
-        let separated = p_separated p F.e_one a n in
+        let separated = F.p_call MemAddr.p_separated [ p ; F.e_one ; a ; n ] in
         let equal = F.p_equal (F.e_get m1 p) (F.e_get m2 p) in
         [xp],separated,equal
       else [],F.p_true,F.p_equal m1 m2
@@ -859,11 +853,11 @@ let sizeof = MODEL.sizeof
 
 let included s1 s2 =
   if disjoint_region s1 s2 then F.p_false else
-    MemMemory.included ~shift ~addrof ~sizeof s1 s2
+    MemAddr.included ~shift ~addrof ~sizeof s1 s2
 
 let separated s1 s2 =
   if disjoint_region s1 s2 then F.p_true else
-    MemMemory.separated ~shift ~addrof ~sizeof s1 s2
+    MemAddr.separated ~shift ~addrof ~sizeof s1 s2
 
 (* -------------------------------------------------------------------------- *)
 (* ---  TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO  --- *)
@@ -880,7 +874,7 @@ let apply _ _ = ()
 let literal ~eid _ = ignore eid ; GarbledMix
 
 let base_addr _l = GarbledMix
-let base_offset l = MemMemory.a_offset (addrof l)
+let base_offset l = MemAddr.offset (addrof l)
 let block_length _s _obj _l = F.e_zero
 
 let cast _ _l = GarbledMix

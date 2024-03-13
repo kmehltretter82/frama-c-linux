@@ -12,6 +12,7 @@
   \return(lseek) == -1 (auto)
   \return(pipe) == 0 (auto)
   \return(read) == -1, 32 (auto)
+  \return(rmdir) == 0 (auto)
   \return(setegid) == 0 (auto)
   \return(seteuid) == 0 (auto)
   \return(setgid) == 0 (auto)
@@ -58,6 +59,9 @@
   function execv: precondition 'valid_string_path' got status valid.
 [eva] unistd_h.c:17: 
   function execv: precondition 'valid_string_argv0' got status valid.
+[eva:garbled-mix:assigns] unistd_h.c:17: 
+  The specification of function execv has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] Done for function execv
 [eva] computing for function execv <- main.
   Called from unistd_h.c:17.
@@ -612,6 +616,13 @@
 [eva] computing for function read <- main.
   Called from unistd_h.c:118.
 [eva] Done for function read
+[eva] computing for function rmdir <- main.
+  Called from unistd_h.c:120.
+[eva] using specification for function rmdir
+[eva] unistd_h.c:120: 
+  function rmdir: precondition 'valid_name' got status valid.
+[eva] Done for function rmdir
+[eva] unistd_h.c:121: check 'ok' got status valid.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

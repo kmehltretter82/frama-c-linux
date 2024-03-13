@@ -13,6 +13,9 @@
 [eva] computing for function SendBuffer <- main <- main_main.
   Called from inout_proto.i:19.
 [eva] using specification for function SendBuffer
+[eva:garbled-mix:assigns] inout_proto.i:19: 
+  The specification of function SendBuffer
+  has generated a garbled mix of addresses for assigns clause *RETURN_CODE.
 [eva] Done for function SendBuffer
 [eva] Recording results for main
 [eva] Done for function main

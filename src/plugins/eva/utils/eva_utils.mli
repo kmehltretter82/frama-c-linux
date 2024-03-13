@@ -112,9 +112,6 @@ val is_value_zero: exp -> bool
 val lval_to_exp: lval -> exp
 (** This function is memoized to avoid creating too many expressions *)
 
-val dump_garbled_mix: unit -> unit
-(** print information on the garbled mix created during evaluation *)
-
 
 (** Dependences of expressions and lvalues. *)
 

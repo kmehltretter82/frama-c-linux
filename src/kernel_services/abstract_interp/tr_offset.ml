@@ -26,7 +26,7 @@ type t =
   | Invalid
   | Set of Int.t list
   | Interval of Int.t * Int.t * Int.t
-  | Overlap of Int.t * Int.t * Origin.t
+  | Overlap of Int.t * Int.t * Origin.t option
 
 let pretty fmt = function
   | Invalid -> Format.fprintf fmt "Invalid"
@@ -35,7 +35,8 @@ let pretty fmt = function
   | Interval (mn, mx, modu) -> Format.fprintf fmt "Interval (%a,%a,%a)"
                                  Int.pretty mn Int.pretty mx Int.pretty modu
   | Overlap (mn, mx, o) -> Format.fprintf fmt "Overlap (%a,%a,%a)"
-                             Int.pretty mn Int.pretty mx Origin.pretty o
+                             Int.pretty mn Int.pretty mx
+                             (Pretty_utils.pp_opt Origin.pretty) o
 
 (* Reduces [ival] for an access according to [validity]. *)
 let reduce_offset_by_validity origin ival size validity =
@@ -64,7 +65,7 @@ let reduce_offset_by_validity origin ival size validity =
   | Base.Unknown (min, _, max) -> reduce_for_bounds min max
   | Base.Variable v -> reduce_for_bounds Int.zero v.Base.max_alloc
 
-let trim_by_validity ?(origin=Origin.Unknown) ival size validity =
+let trim_by_validity ?origin ival size validity =
   reduce_offset_by_validity origin ival size validity
 
 (*
