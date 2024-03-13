@@ -422,10 +422,10 @@ module Make
     truncate_upper_bound overflow_kind expr range value
 
   let handle_integer_overflow context expr range value =
-    let is_signed = range.Eval_typ.i_signed in
-    let signed = is_signed && Kernel.SignedOverflow.get () in
-    let unsigned = not is_signed && Kernel.UnsignedOverflow.get () in
-    if signed || unsigned then
+    let signed = range.Eval_typ.i_signed in
+    let signed_overflow = signed && Kernel.SignedOverflow.get () in
+    let unsigned_overflow = not signed && Kernel.UnsignedOverflow.get () in
+    if signed_overflow || unsigned_overflow then
       let overflow_kind = if signed then Alarms.Signed else Alarms.Unsigned in
       truncate_integer overflow_kind expr range value
     else
@@ -492,8 +492,7 @@ module Make
       let expr = Eva_utils.lval_to_exp lval in
       let+ new_value = remove_special_float expr fkind value in
       new_value, origin
-    | TInt (IBool, _) when not (Kernel.InvalidBool.get ()) -> res
-    | TInt (IBool, _) ->
+    | TInt (IBool, _) when Kernel.InvalidBool.get () ->
       let one = Abstract_value.Int Integer.one in
       let truth = Value.assume_bounded Alarms.Upper_bound one value in
       let alarm () = Alarms.Invalid_bool lval in
@@ -965,10 +964,10 @@ module Make
     let open Evaluated.Operators in
     let lval_to_loc = internal_lval_to_loc env ~for_writing ~reduction in
     let* loc, typ, volatile = lval_to_loc lval in
-    let access = Alarms.(if for_writing then For_writing else For_reading) in
     if reduction then
       let bitfield = Cil.isBitfield lval in
       let truth = Loc.assume_valid_location ~for_writing ~bitfield loc in
+      let access = Alarms.(if for_writing then For_writing else For_reading) in
       let alarm () = Alarms.Memory_access (lval, access) in
       let+ valid_loc = interpret_truth ~alarm loc truth in
       let reduction = if Loc.equal_loc valid_loc loc then Neither else Forward in
@@ -1041,8 +1040,8 @@ module Make
       let open Evaluated.Operators in
       let attrs = Cil.filter_qualifier_attributes (Cil.typeAttrs typ) in
       let typ_fi = Cil.typeAddAttributes attrs fi.ftype in
-      let eval = eval_offset env ~reduce_valid_index typ_fi remaining in
-      let+ r, typ_res, volatile = eval in
+      let evaluated = eval_offset env ~reduce_valid_index typ_fi remaining in
+      let+ r, typ_res, volatile = evaluated in
       let off = Loc.forward_field typ fi r in
       off, typ_res, volatile
 
@@ -1156,15 +1155,19 @@ module Make
 
   (* Find the value of a previously evaluated expression. *)
   let find_val expr =
-    (* [expr] must have been evaluated already. *)
-    let record = Cache.find !cache expr |> Top.non_top in
-    record.value.v
+    match Cache.find !cache expr with
+    | `Value record -> record.value.v
+    | `Top -> assert false (* [expr] must have been evaluated already. *)
 
   (* Find the record computed for an lvalue.
      Return None if no reduction can be performed. *)
   let find_loc_for_reduction lval =
     if may_be_reduced_lval lval then
-      let record, report = Cache.find_loc' !cache lval |> Top.non_top in
+      let record, report =
+        match Cache.find_loc' !cache lval with
+        | `Value all -> all
+        | `Top -> assert false
+      in
       if (snd report).with_reduction then Some (record, report) else None
     else None
 
@@ -1176,7 +1179,8 @@ module Make
     with Not_found ->
       let* env = fast_eval_environment state in
       let+ _ = forward_eval env expr |> fst in
-      try Cache.find' !cache expr with Not_found -> assert false
+      try Cache.find' !cache expr
+      with Not_found -> assert false
 
   (* The backward propagation at a step is relevant only if:
      - the new value (if any) is more precise than the old one.
@@ -1220,8 +1224,12 @@ module Make
         if fuel > 0 then
           (* The reductions requested by the domains. *)
           let reductions_list = Domain.reduce_further state expr value in
-          let eval fuel e v = backward_eval fuel context state e (Some v) in
-          let reduce acc (expr, v) = let* () = acc in eval (pred fuel) expr v in
+          (* Reduces [expr] to value [v]. *)
+          let reduce acc (expr, value) =
+            (* If a previous reduction has returned bottom, return bottom. *)
+            let* () = acc in
+            backward_eval (pred fuel) context state expr (Some value)
+          in
           List.fold_left reduce continue reductions_list
         else continue
       else continue
@@ -1274,7 +1282,8 @@ module Make
     | BinOp (binop, e1, e2, typ) ->
       let resulting_type = Cil.unrollType typ in
       let input_type = Cil.typeOf e1 in
-      let* left = find_val e1 and* right = find_val e2 in
+      let* left = find_val e1
+      and* right = find_val e2 in
       let backward = Value.backward_binop context ~input_type ~resulting_type in
       let* v1, v2 = backward binop ~left ~right ~result:value in
       let* () = backward_eval fuel context state e1 v1 in
@@ -1293,7 +1302,8 @@ module Make
   and recursive_descent fuel context state expr =
     match expr.enode with
     | Lval lval -> backward_lval fuel context state lval
-    | UnOp (_, e, _) | CastE (_, e) -> backward_eval fuel context state e None
+    | UnOp (_, e, _)
+    | CastE (_, e) -> backward_eval fuel context state e None
     | BinOp (_binop, e1, e2, _typ) ->
       let* () = backward_eval fuel context state e1 None in
       backward_eval fuel context state e2 None
@@ -1377,10 +1387,12 @@ module Make
       let* v = find_val exp in
       let typ_pointed = Cil.typeOf_array_elem typ in
       let* env = fast_eval_environment state in
-      let eval_offset = eval_offset ~reduce_valid_index:true in
-      let* rem, _, _ = eval_offset env typ_pointed remaining |> fst in
-      let backward_index = Loc.backward_index ~index:v ~remaining:rem in
-      let* v', rem' = backward_index typ_pointed loc_offset in
+      let* rem, _, _ =
+        eval_offset env ~reduce_valid_index:true typ_pointed remaining |> fst
+      in
+      let* v', rem' =
+        Loc.backward_index ~index:v ~remaining:rem typ_pointed loc_offset
+      in
       let reduced_v = if Value.is_included v v' then None else Some v' in
       let* () = backward_eval fuel context state exp reduced_v in
       backward_offset fuel context state typ_pointed remaining rem'
@@ -1420,21 +1432,27 @@ module Make
       in
       let* evaled = new_value in
       let evaled = Value.reduce evaled in
-      let+ new_value = Value.(narrow value evaled) in
-      let kind () = if Value.equal value new_value then Neither else Forward in
-      if not (Value.is_included evaled value) then raise Not_Exact_Reduction
-      else reduce_expr_value (kind ()) expr new_value
+      let+ new_value = Value.narrow value evaled in
+      if Value.is_included evaled value then
+        let kind = if Value.equal value new_value then Neither else Forward in
+        reduce_expr_value kind expr new_value
+      else raise Not_Exact_Reduction
     else `Value ()
 
   and second_eval_lval state lval value =
     if may_be_reduced_lval lval then
-      let record, report = Cache.find_loc' !cache lval |> Top.non_top in
+      let record, report =
+        match Cache.find_loc' !cache lval with
+        | `Value all -> all
+        | `Top -> assert false
+      in
       let* env = fast_eval_environment state in
       let* () =
         if (fst report).reduction = Backward then
           let for_writing = false and reduction = true in
-          let reduced_to_loc = reduced_lval_to_loc ~for_writing ~reduction in
-          let+ loc, _, _, _ = reduced_to_loc env lval |> fst in
+          let+ loc, _, _, _ =
+            reduced_lval_to_loc ~for_writing ~reduction env lval |> fst
+          in
           (* TODO: Loc.narrow *)
           let record = { record with loc } in
           let in_record loc = Loc.equal_loc record.loc loc in
@@ -1450,7 +1468,8 @@ module Make
   and recursive_descent state expr =
     match expr.enode with
     | Lval lval -> recursive_descent_lval state lval
-    | UnOp (_, e, _) | CastE (_, e) -> second_forward_eval state e
+    | UnOp (_, e, _)
+    | CastE (_, e) -> second_forward_eval state e
     | BinOp (_, e1, e2, _) ->
       let* () = second_forward_eval state e1 in
       second_forward_eval state e2
@@ -1484,16 +1503,15 @@ module Make
     Abstract_domain.{ find ; fold ; find_loc }
 
   let evaluate ?(valuation=Cache.empty) ?(reduction=true) ?subdivnb state expr =
-    let open Evaluated.Operators in
     let eval, alarms = subdivided_forward_eval valuation ?subdivnb state expr in
-    let* env = root_environment ?subdivnb state, alarms in
     let result =
       if reduction && not (Alarmset.is_empty alarms) then
         let open Bottom.Operators in
         let* valuation, value = eval in
         cache := valuation;
-        let eval = backward_eval (backward_fuel ()) env.context in
-        let+ () = eval state expr None in
+        let fuel = backward_fuel () in
+        let* env = root_environment ?subdivnb state in
+        let+ () = backward_eval fuel env.context state expr None in
         !cache, value
       else eval
     in
@@ -1525,8 +1543,9 @@ module Make
     | Field (_, offset)    -> evaluate_offsets valuation ?subdivnb state offset
     | Index (expr, offset) ->
       let open Evaluated.Operators in
-      let subdivided_forward_eval = subdivided_forward_eval valuation in
-      let* valuation, _ = subdivided_forward_eval ?subdivnb state expr in
+      let* valuation, _ =
+        subdivided_forward_eval valuation ?subdivnb state expr
+      in
       evaluate_offsets valuation ?subdivnb state offset
 
   let evaluate_host valuation ?subdivnb state = function
@@ -1563,11 +1582,11 @@ module Make
     let& _, volatile = root_forward_eval env expr in
     let open Bottom.Operators in
     (* Reduce by [(e == 0) == 0] *)
-    let eval = backward_eval (backward_fuel ()) env.context in
-    let* () = eval state expr (Some Value.zero) in
+    let fuel = backward_fuel () in
+    let* () = backward_eval fuel env.context state expr (Some Value.zero) in
     try let+ () = second_forward_eval state expr in !cache
     with Not_Exact_Reduction ->
-      (* Avoids reduce_by_cond_enumerate on volatile expressions. *)
+      (* Avoids reduce_by_enumeration on volatile expressions. *)
       if not volatile then
         let* env = fast_eval_environment state in
         Subdivided_Evaluation.reduce_by_enumeration env !cache expr false
@@ -1576,8 +1595,8 @@ module Make
   let assume ?valuation:(valuation=Cache.empty) state expr value =
     cache := valuation;
     let* env = root_environment ~subdivnb:0 state in
-    let eval = backward_eval (backward_fuel ()) env.context in
-    let+ () = eval state expr (Some value) in
+    let fuel = backward_fuel () in
+    let+ () = backward_eval fuel env.context state expr (Some value) in
     !cache
 
 
