@@ -184,12 +184,11 @@ export function Graph(props: {
             d3VelocityDecay={1}
             dagLevelDistance={50}
             // Node selection
-
             onNodeClick={(node, event): void => {
-              // change the selected value of GraphProps
               if (props.graph.onSelection) {
                 props.graph.onSelection(String(node.id), event);
               }
+              // change the selected value of GraphProps
               props.setInitGraph((prevGraph) => {
                 return { ...prevGraph, selected: String(node.id) };
               });
@@ -231,9 +230,6 @@ export function Graph(props: {
 
 export default function GraphComponent(): JSX.Element {
   const [initGraph, setInitGraph] = React.useState<GraphProps>(setGraph());
-  const initGraphMemo = React.useMemo(() => {
-    return initGraph;
-  }, [initGraph]);
   // Generation of unique identifier
   function setGraph(N = 3): GraphProps {
     function generateUUIDs(): string[] {
@@ -295,10 +291,10 @@ export default function GraphComponent(): JSX.Element {
     };
     // Zoom In
     const updateZoomIn = (): void => {
-      setInitGraph((initGraphMemo) => {
+      setInitGraph((initGraph) => {
         return {
-          ...initGraphMemo,
-          zoom: initGraphMemo.zoom! + 1,
+          ...initGraph,
+          zoom: initGraph.zoom! + 1,
         };
       });
     };
@@ -334,7 +330,7 @@ export default function GraphComponent(): JSX.Element {
   }
   return (
     <>
-      <Graph graph={initGraphMemo} setInitGraph={setInitGraph} />
+      <Graph graph={initGraph} setInitGraph={setInitGraph} />
     </>
   );
 }
