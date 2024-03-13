@@ -43,13 +43,14 @@ import * as Ext from './Extensions';
 /* --- LabView State                                                      --- */
 /* -------------------------------------------------------------------------- */
 
+type tabKey = string;
 type viewId = string;
 
 interface Split { H: number, V: number }
 interface Layout { A: compId, B: compId, C: compId, D: compId }
 
 interface TabViewState {
-  key: string,
+  key: tabKey, /* viewId@custom for custom, or viewId */
   viewId: viewId,
   custom: number, /* -1: transient, 0: favorite, n: custom */
   split: Split,
@@ -61,8 +62,8 @@ interface LabViewState {
   stack: Layout[];
   panels: Set<compId>;
   docked: Map<compId, LayoutPosition>;
-  tabs: TabViewState[];
-  tabIndex: number;
+  tabs: Map<tabKey, TabViewState>;
+  tabKey: tabKey;
   sideView: viewId; // from Sidebar or TAB selection
   sideComp: compId; // from Sidebar selection
 }
@@ -75,8 +76,8 @@ const LAB = new States.GlobalState<LabViewState>({
   stack: [defaultLayout],
   panels: new Set(),
   docked: new Map(),
-  tabs: [],
-  tabIndex: -1,
+  tabs: new Map(),
+  tabKey: '',
   sideView: '',
   sideComp: '',
 });
@@ -142,11 +143,11 @@ const eLabSettings: Json.Encoder<LabSettings> =
   (s: LabSettings): Json.json => ((s as object) as Json.json);
 
 function labSettings(state: LabViewState): LabSettings {
-  let tabIndex = 0;
   const tabs: TabSettings[] = [];
-  state.tabs.forEach((tab, index) => {
+  let tabIndex = -1;
+  state.tabs.forEach((tab: TabViewState) => {
     if (tab.custom === 0) {
-      if (index === state.tabIndex)
+      if (tab.key === state.tabKey)
         tabIndex = tabs.length;
       tabs.push({
         view: tab.viewId,
@@ -323,41 +324,54 @@ function getLayoutPosition(
 /* --- Tabs Utilities                                                     --- */
 /* -------------------------------------------------------------------------- */
 
-function findTab(tabs: TabViewState[], viewId: viewId) : number
+function previousTab(tabs: Map<tabKey, TabViewState>, key: tabKey):
+  TabViewState | undefined
 {
-  return tabs.findIndex(tab => tab.viewId === viewId && tab.custom <= 0);
+  let prev: tabKey | undefined = undefined;
+  let last: tabKey | undefined = undefined;
+  tabs.forEach(t => {
+    if (t.key === key) prev = last; else last = t.key;
+  });
+  const next = prev || last;
+  return next && tabs.get(next);
 }
 
-function newCustom(tabs: TabViewState[], viewId: viewId): number
+function newCustom(tabs: Map<tabKey, TabViewState>, viewId: viewId): number
 {
-  return 1 + tabs.reduce((n, tab) => (
-    tab.viewId === viewId ? Math.max(n, tab.custom) : n
-  ), 0);
+  let custom = 0;
+  tabs.forEach(tab => {
+    if (tab.viewId === viewId)
+      custom = Math.max(custom, tab.custom);
+  });
+  return custom+1;
 }
 
 function newTab(
-  tabs: TabViewState[],
+  tabs: Map<tabKey, TabViewState>,
   view: Ivette.ViewLayoutProps,
   custom: number,
-): TabViewState[]
+): TabViewState
 {
-  return tabs.concat({
-    key: `${view.id}@${custom < 0 ? 0 : custom}`,
-    viewId: view.id, custom,
+  const { id: viewId } = view;
+  const key = custom > 0 ? `${viewId}@${custom}` : viewId;
+  const tab = {
+    key, viewId, custom,
     split: defaultSplit,
     stack: [makeViewLayout(view.layout)],
-  });
+  };
+  tabs.set(key, tab);
+  return tab;
 }
 
 function saveTab(
-  newTabs: TabViewState[],
+  tabs: Map<tabKey, TabViewState>,
   oldState: LabViewState,
 ): void {
-  const oldIndex = oldState.tabIndex;
-  const toSave = newTabs[oldIndex];
+  const oldKey = oldState.tabKey;
+  const toSave = tabs.get(oldKey);
   if (toSave !== undefined) {
     const { stack, split } = oldState;
-    newTabs[oldIndex] = { ...toSave, stack, split };
+    tabs.set(oldKey, { ...toSave, stack, split });
   }
 }
 
@@ -368,7 +382,6 @@ function addPanels(panels: Set<compId>, layout: Layout): Set<compId>
     return panels;
   else
     return copySet(panels).add(A).add(B).add(C).add(D);
-
 }
 
 /* -------------------------------------------------------------------------- */
@@ -403,14 +416,14 @@ function setCurrentNone(): void {
   LAB.setValue({ ...state, sideComp: '', sideView: '' });
 }
 
-function applyTab(index = -1): void {
+function applyTab(key: tabKey): void {
   const state = LAB.getValue();
-  const old = state.tabIndex;
-  const tab = state.tabs[index];
-  if (tab === undefined) return;
+  const old = state.tabKey;
+  if (old === key) return;
+  const tab = state.tabs.get(key);
+  if (!tab) return;
   const { stack, split } = tab;
-  if (old === index) return;
-  const tabs = [...state.tabs];
+  const tabs = copyMap(state.tabs);
   const layout = stack[0] ?? defaultLayout;
   saveTab(tabs, state);
   const panels = addPanels(state.panels, layout);
@@ -420,103 +433,90 @@ function applyTab(index = -1): void {
     stack,
     split,
     tabs,
-    tabIndex: index,
+    tabKey: key,
   });
 }
 
-function duplicateView(view: Ivette.ViewLayoutProps): void {
+function closeTab(key: tabKey): void {
   const state = LAB.getValue();
-  const custom = newCustom(state.tabs, view.id);
-  const tabs = newTab(state.tabs, view, custom);
-  LAB.setValue({
-    ...state,
-    tabs,
-  });
-}
-
-function closeTab(index: number): void {
-  const state = LAB.getValue();
-  const old = state.tabIndex;
-  const preTabs = state.tabs.slice(0, index);
-  const postTabs = state.tabs.slice(index+1);
-  const newTabs = [ ...preTabs, ...postTabs ];
-  const tabIndex = old > 0 ? old - 1 : 0;
-  const tab = newTabs[tabIndex];
+  const tab = previousTab(state.tabs, key);
+  const tabs = copyMap(state.tabs);
+  tabs.delete(key);
   if (tab === undefined) {
     LAB.setValue({
       ...state,
-      stack: [defaultLayout],
+      stack: [],
       split: defaultSplit,
-      tabs: newTabs,
-      tabIndex: -1,
+      tabs, tabKey: ''
     });
   } else {
-    const { stack, split } = tab;
+    const { key, stack, split } = tab;
     const layout = stack[0] ?? defaultLayout;
     const panels = addPanels(state.panels, layout);
     LAB.setValue({
       ...state,
-      panels,
-      stack,
-      split,
-      tabs: newTabs,
-      tabIndex,
+      panels, stack, split, tabs, tabKey: key
     });
+  }
+}
+
+function restoreDefault(key: tabKey): void {
+  const state = LAB.getValue();
+  const tab = state.tabs.get(key);
+  if (!tab) return;
+  const view = VIEW.getElement(tab.viewId);
+  if (!view) return;
+  const layout = makeViewLayout(view.layout);
+  const tabs = copyMap(state.tabs).set(key, { ...tab, stack: [layout] });
+  if (key === state.tabKey) {
+    LAB.setValue({ ...state, tabs, stack: [layout] });
+  } else {
+    LAB.setValue({ ...state, tabs });
   }
 }
 
 function applyView(view: Ivette.ViewLayoutProps): void {
   const state = LAB.getValue();
   const viewId = view.id;
-  const index = findTab(state.tabs, viewId);
-  if (0 <= index) {
-    applyTab(index);
-  } else {
+  if (state.tabs.has(viewId))
+    applyTab(viewId);
+  else {
     const layout = makeViewLayout(view.layout);
     const panels = addPanels(state.panels, layout);
-    const tabs = newTab(state.tabs, view, -1);
-    const tabIndex = tabs.length - 1;
+    const tabs = copyMap(state.tabs);
+    const tab = newTab(tabs, view, -1);
     saveTab(tabs, state);
     LAB.setValue({
       ...state,
       panels,
       split: defaultSplit,
       stack: [layout],
-      docked: state.docked,
-      tabs,
-      tabIndex,
+      tabs, tabKey: tab.key
     });
   }
 }
 
-function restoreDefault(view: Ivette.ViewLayoutProps): void {
+function duplicateView(view: Ivette.ViewLayoutProps): void {
   const state = LAB.getValue();
-  const viewId = view.id;
-  const index = findTab(state.tabs, viewId);
-  const layout = makeViewLayout(view.layout);
-  const tab = state.tabs[index];
-  const newTabs = [...state.tabs];
-  newTabs[index] = { ...tab, stack: [layout] };
-  if (index === state.tabIndex) {
-    LAB.setValue({ ...state, tabs: newTabs, stack: [layout] });
-  } else {
-    LAB.setValue({ ...state, tabs: newTabs });
-  }
+  const custom = newCustom(state.tabs, view.id);
+  const tabs = copyMap(state.tabs);
+  newTab(tabs, view, custom);
+  LAB.setValue({ ...state, tabs });
 }
 
-function applyFavorite(view: Ivette.ViewLayoutProps, favorite: boolean): void {
+function applyFavorite(
+  view: Ivette.ViewLayoutProps,
+  favorite: boolean
+): void {
   const state = LAB.getValue();
-  const index = findTab(state.tabs, view.id);
-  if (0 <= index) {
-    const tabs = [...state.tabs];
-    const tab = tabs[index];
+  const tab = state.tabs.get(view.id);
+  if (tab) {
     const custom = favorite ? 0 : -1;
-    if (tab.custom !== custom) {
-      tabs[index] = { ...tab, custom };
-      LAB.setValue({ ...state, tabs });
-    }
+    const tabs = copyMap(state.tabs).set(tab.key, { ...tab, custom });
+    LAB.setValue({ ...state, tabs });
   } else if (favorite) {
-    const tabs = newTab(state.tabs, view, 0);
+    const tabs = copyMap(state.tabs);
+    newTab(tabs, view, 0);
     LAB.setValue({ ...state, tabs });
   }
 }
@@ -609,12 +609,9 @@ Settings.onWindowSettings(() => {
       });
       if (gotoView !== undefined) {
         const state = LAB.getValue();
-        if (state.tabIndex < 0) {
-          const tabIndex = findTab(state.tabs, gotoView);
-          if (0 <= tabIndex) {
-            applyTab(tabIndex);
-            setCurrentNone();
-          }
+        if (!state.tabKey) {
+          applyTab(gotoView);
+          setCurrentNone();
         }
       }
     } finally {
@@ -898,7 +895,7 @@ function ViewItem(props: ViewItemProps): JSX.Element {
     setCurrentView(id);
     const onDisplay = (): void => applyView(view);
     const onFavorite = (): void => applyFavorite(view, !favorite);
-    const onRestore = (): void => restoreDefault(view);
+    const onRestore = (): void => restoreDefault(view.id);
     const onDuplicate = (): void => duplicateView(view);
     const favAction = !favorite ? 'Add to Favorite' : 'Remove from Favorite';
     Dome.popupMenu([
@@ -924,16 +921,13 @@ function ViewItem(props: ViewItemProps): JSX.Element {
 
 function ViewSection(): JSX.Element {
   const views = Ext.useElements(VIEW);
-  const [state] = States.useGlobalState(LAB);
-  const { tabs, tabIndex } = state;
-
+  const [{ tabs, tabKey, sideView, stack }] = States.useGlobalState(LAB);
   const items = views.map((view) => {
     const { id } = view;
-    const index = findTab(state.tabs, id);
-    const favorite = 0 <= index && tabs[index].custom === 0;
-    const displayed = 0 <= index && index === tabIndex;
-    const tab = 0 <= index ? tabs[index] : undefined;
-    const layout = displayed ? state.stack[0] : tab?.stack[0];
+    const tab = tabs.get(id);
+    const favorite = tab ? tab.custom === 0 : false;
+    const displayed = tab ? tab.key === tabKey : false;
+    const layout = displayed ? stack[0] : tab?.stack[0];
     return (
       <ViewItem
         key={id}
@@ -941,7 +935,7 @@ function ViewSection(): JSX.Element {
         favorite={favorite}
         layout={layout}
         displayed={displayed}
-        selected={id === state.sideView} />
+        selected={id === sideView} />
     );
   });
 
@@ -1166,17 +1160,16 @@ export function Dock(): JSX.Element {
 
 interface TabViewProps {
   tab: TabViewState;
-  index: number;
-  tabIndex: number;
+  tabKey: tabKey;
   layout: Layout;
 }
 
 function TabView(props: TabViewProps): JSX.Element | null {
-  const { tab, index, tabIndex } = props;
-  const { viewId, custom } = tab;
+  const { tab, tabKey } = props;
+  const { viewId, custom, key } = tab;
   const view = Ext.useElement(VIEW, viewId);
   if (!view) return null;
-  const selected = index === tabIndex;
+  const selected = key === tabKey;
   const top = tab.stack[0] ?? defaultLayout;
   const layout = selected ? props.layout : top;
   const modified = !compareLayout(layout, makeViewLayout(view.layout));
@@ -1188,12 +1181,12 @@ function TabView(props: TabViewProps): JSX.Element | null {
   const tmod = modified ? ' (modified)': '';
   const title = tdup + vname + tmod;
 
-  const onClick = (): void => { applyTab(index); setCurrentNone(); };
-  const onClose = (): void => closeTab(index);
+  const onClick = (): void => { applyTab(key); setCurrentNone(); };
+  const onClose = (): void => closeTab(key);
   const onContextMenu = (): void => {
-    const onDisplay = (): void => applyTab(index);
+    const onDisplay = (): void => applyTab(key);
     const onFavorite = (): void => applyFavorite(view, !favorite);
-    const onRestore = (): void => restoreDefault(view);
+    const onRestore = (): void => restoreDefault(key);
     const favAction = !favorite ? 'Add to Favorite' : 'Remove from Favorite';
     Dome.popupMenu([
       { label: 'Display View', enabled: !selected, onClick: onDisplay },
@@ -1209,8 +1202,7 @@ function TabView(props: TabViewProps): JSX.Element | null {
       icon={selected ? 'DISPLAY' : undefined}
       label={label}
       title={title}
-      value={index}
-      selection={tabIndex}
+      selected={selected}
       onClick={onClick}
       onContextMenu={onContextMenu}
     >
@@ -1225,16 +1217,17 @@ function TabView(props: TabViewProps): JSX.Element | null {
 }
 
 export function Tabs(): JSX.Element {
-  const [{ tabIndex, stack, tabs }] = States.useGlobalState(LAB);
+  const [{ tabKey, stack, tabs }] = States.useGlobalState(LAB);
   const layout = stack[0] ?? defaultLayout;
-  const items = tabs.map((tab: TabViewState, k: number) => (
-    <TabView
-      key={tab.key}
-      tab={tab}
-      index={k}
-      tabIndex={tabIndex}
-      layout={layout}
-    />
+  const items: JSX.Element[] = [];
+  tabs.forEach((tab: TabViewState) =>
+    items.push(
+      <TabView
+        key={tab.key}
+        tab={tab}
+        tabKey={tabKey}
+        layout={layout}
+      />
   ));
   return <>{items}</>;
 }
