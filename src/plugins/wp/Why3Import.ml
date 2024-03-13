@@ -30,12 +30,12 @@ let () =
       let libs = L.Library.get () in
       List.iter
         (fun dir ->
-           L.debug ~level:1 " + LIB %a@." Filepath.Normalized.pretty dir
+           L.debug ~level:0 " + LIB %a@." Filepath.Normalized.pretty dir
         ) libs ;
       let thys = L.Import.get () in
       List.iter
         (fun thy ->
-           L.debug ~level:1 " + THY %s@." thy
+           L.debug ~level:0 " + THY %s@." thy
         ) thys ;
     end
 
