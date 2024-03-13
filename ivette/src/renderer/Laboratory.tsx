@@ -49,6 +49,7 @@ interface Split { H: number, V: number }
 interface Layout { A: compId, B: compId, C: compId, D: compId }
 
 interface TabViewState {
+  key: string,
   viewId: viewId,
   custom: number, /* -1: transient, 0: favorite, n: custom */
   split: Split,
@@ -327,14 +328,12 @@ function findTab(tabs: TabViewState[], viewId: viewId) : number
   return tabs.findIndex(tab => tab.viewId === viewId && tab.custom <= 0);
 }
 
-/*
-function duplicateTab(tabs: TabViewState[], viewId: viewId): number
+function newCustom(tabs: TabViewState[], viewId: viewId): number
 {
-  return 1 + tabs.reduce((n, { view, custom }) => (
-    view === viewId ? Math.max(n, custom) : n
+  return 1 + tabs.reduce((n, tab) => (
+    tab.viewId === viewId ? Math.max(n, tab.custom) : n
   ), 0);
 }
-*/
 
 function newTab(
   tabs: TabViewState[],
@@ -343,6 +342,7 @@ function newTab(
 ): TabViewState[]
 {
   return tabs.concat({
+    key: `${view.id}@${custom < 0 ? 0 : custom}`,
     viewId: view.id, custom,
     split: defaultSplit,
     stack: [makeViewLayout(view.layout)],
@@ -421,6 +421,16 @@ function applyTab(index = -1): void {
     split,
     tabs,
     tabIndex: index,
+  });
+}
+
+function duplicateView(view: Ivette.ViewLayoutProps): void {
+  const state = LAB.getValue();
+  const custom = newCustom(state.tabs, view.id);
+  const tabs = newTab(state.tabs, view, custom);
+  LAB.setValue({
+    ...state,
+    tabs,
   });
 }
 
@@ -883,11 +893,12 @@ function ViewItem(props: ViewItemProps): JSX.Element {
     const onDisplay = (): void => applyView(view);
     const onFavorite = (): void => applyFavorite(view, !favorite);
     const onRestore = (): void => restoreDefault(view);
+    const onDuplicate = (): void => duplicateView(view);
     const favAction = !favorite ? 'Add to Favorite' : 'Remove from Favorite';
     Dome.popupMenu([
       { label: 'Display View', enabled: !displayed, onClick: onDisplay },
       { label: favAction, onClick: onFavorite },
-      // { label: 'Duplicate View' },
+      { label: 'Duplicate View', onClick: onDuplicate },
       { label: 'Restore Default', enabled: modified, onClick: onRestore },
     ]);
   };
@@ -1158,14 +1169,14 @@ function TabView(props: TabViewProps): JSX.Element | null {
   const { tab, index, tabIndex } = props;
   const { viewId, custom } = tab;
   const view = Ext.useElement(VIEW, viewId);
-  if (!view /* || custom < 0*/) return null;
+  if (!view) return null;
   const selected = index === tabIndex;
   const top = tab.stack[0] ?? defaultLayout;
   const layout = selected ? props.layout : top;
   const modified = !compareLayout(layout, makeViewLayout(view.layout));
   const vname = view.label;
   const favorite = custom === 0;
-  const tname = custom > 0 ? `${vname} — ${custom}` : vname;
+  const tname = custom > 0 ? `${vname} ~ ${custom}` : vname;
   const label = modified ? `${tname}*` : tname;
   const tdup = custom > 0 ? 'Custom ' : '';
   const tmod = modified ? ' (modified)': '';
@@ -1210,9 +1221,9 @@ function TabView(props: TabViewProps): JSX.Element | null {
 export function Tabs(): JSX.Element {
   const [{ tabIndex, stack, tabs }] = States.useGlobalState(LAB);
   const layout = stack[0] ?? defaultLayout;
-  const items = tabs.map((tab, k) => (
+  const items = tabs.map((tab: TabViewState, k: number) => (
     <TabView
-      key={tab.viewId}
+      key={tab.key}
       tab={tab}
       index={k}
       tabIndex={tabIndex}
