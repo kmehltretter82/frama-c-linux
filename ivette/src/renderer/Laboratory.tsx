@@ -538,6 +538,16 @@ function dockComponent(
   LAB.setValue({ ...state, docked, stack });
 }
 
+function undockComponent(compId: compId): void
+{
+  const state = LAB.getValue();
+  if (state.docked.has(compId)) {
+    const docked = copyMap(state.docked);
+    docked.delete(compId);
+    LAB.setValue({ ...state, docked });
+  }
+}
+
 function closeComponent(compId: compId): void
 {
   const state = LAB.getValue();
@@ -609,6 +619,7 @@ Settings.onWindowSettings(() => {
 
 interface Actions {
   dock: boolean;
+  undock: boolean;
   close: boolean;
 }
 
@@ -621,6 +632,7 @@ interface LayoutMenuState extends Actions {
 const closedMenu: LayoutMenuState = {
   compId: '',
   dock: false,
+  undock: false,
   close: false,
   x: 0,
   y: 0,
@@ -697,7 +709,7 @@ function LayoutMenu(): JSX.Element | null {
   const [panelWidth, setWidth] = React.useState(80);
   const [panelHeight, setHeight] = React.useState(80);
   const layout = state.stack[0] ?? defaultLayout;
-  const { compId, dock, close } = menu;
+  const { compId, dock, undock, close } = menu;
   const display = compId !== '';
 
   React.useEffect(() => {
@@ -729,6 +741,11 @@ function LayoutMenu(): JSX.Element | null {
     if (comp) dockComponent(comp);
   };
 
+  const onUndock = (): void => {
+    closeMenu();
+    undockComponent(compId);
+  };
+
   const onClose = (): void => {
     closeMenu();
     closeComponent(compId);
@@ -757,6 +774,8 @@ function LayoutMenu(): JSX.Element | null {
       <Action
         display={dock} label='Dock' icon='QSPLIT.DOCK' onClick={onDock} />
       <Action
+        display={undock} label='Undock' icon='QSPLIT.DOCK' onClick={onUndock} />
+      <Action
         display={close} label='Close' icon='TRASH' onClick={onClose} />
     </div>
   );
@@ -768,7 +787,7 @@ function LayoutMenu(): JSX.Element | null {
 
 interface PaneProps { compId: compId }
 
-const paneActions: Actions = { dock: true, close: true };
+const paneActions: Actions = { dock: true, undock: false, close: true };
 
 function Pane(props: PaneProps): JSX.Element | null {
   const { compId } = props;
@@ -956,7 +975,7 @@ function ComponentItem(props: ComponentItemProps): JSX.Element {
 
   const onContextMenu = (evt: React.MouseEvent): void => {
     setCurrentComp(id);
-    openLayoutMenu(id, { dock: !docked, close: active }, evt);
+    openLayoutMenu(id, { dock: !docked, undock: docked, close: active }, evt);
   };
 
   return (
@@ -1062,12 +1081,12 @@ Ivette.registerSidebar({
 
 interface DockItemProps {
   compId: compId;
-  enabled: boolean;
+  visible: boolean;
   position: LayoutPosition;
 }
 
 function DockItem(props: DockItemProps): JSX.Element | null {
-  const { compId, enabled, position } = props;
+  const { compId, visible, position } = props;
   const comp = Ext.useElement(COMPONENT, compId);
   if (comp === undefined) return null;
   const label = comp.label ?? compId;
@@ -1075,18 +1094,24 @@ function DockItem(props: DockItemProps): JSX.Element | null {
   const title = `Display ${label} (right-click for more actions)`;
 
   const className = classes(
-    'labview-docked', !enabled && 'disabled',
+    'labview-docked', visible && 'disabled',
   );
 
   const onClick = (): void => {
-    if (enabled) {
+    if (visible) {
+      dockComponent(comp);
+    } else {
       applyComponent(comp, position);
-      setCurrentNone();
     }
+    setCurrentNone();
   };
 
   const onContextMenu = (evt: React.MouseEvent): void => {
-    openLayoutMenu(compId, { dock: !enabled, close: true }, evt);
+    openLayoutMenu(compId, {
+      dock: visible,
+      undock: true,
+      close: true
+    }, evt);
   };
 
   return (
@@ -1111,7 +1136,7 @@ export function Dock(): JSX.Element {
       <DockItem
         key={compId}
         compId={compId}
-        enabled={curr === undefined}
+        visible={curr !== undefined}
         position={curr ?? pos}
       />);
   });
