@@ -621,7 +621,11 @@ module Domain = struct
 
   type 'a identity = 'a -> 'a
   type ('c, 'v, 'l) name = string -> ('c, 'v, 'l) structured_domain identity
-  let register_name : type c v l. (c, v, l) name = fun name (module D) ->
+
+  (* Change [Domain.register_global_state] to take -eva-no-results-domain into
+     account, according to the domain name. Need to be applied after the domain
+     has been built, in case of a domain functor. *)
+  let use_no_results : type c v l. (c, v, l) name = fun name (module D) ->
     let register = D.Store.register_global_state in
     let results () = not (Parameters.NoResultsDomains.mem name) in
     let f storage state = register (storage && results ()) state in
@@ -694,15 +698,15 @@ module Domain = struct
           (module Domain_lift.Make (D)
                (val ctx_converter) (val val_converter) (val loc_converter))
     in
-    (* Set the name of the domain. *)
-    let module Named = (val register_name registered.name lifted) in
+    (* Take -eva-no-results-domain into account for this domain. *)
+    let lifted = use_no_results registered.name lifted in
     (* Restricts the domain according to [mode]. *)
     let restricted : (c, v, l) structured_domain =
       match mode with
-      | None -> (module Named)
+      | None -> lifted
       | Some kf_modes ->
         let module Scope = struct let functions = kf_modes end in
-        (module Domain_builder.Restrict (Ctx) (Val) (Named) (Scope))
+        (module Domain_builder.Restrict (Ctx) (Val) (val lifted) (Scope))
     in
     let combined : (c, v, l) structured_domain =
       match structured with
