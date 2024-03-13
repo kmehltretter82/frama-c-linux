@@ -33,6 +33,13 @@ let create_why3_env =
       W.Env.create_env (WConf.loadpath (WConf.get_main (WConf.read_config None)))
     end
 
+let rec get_ty_symbols_from_ty (tys : W.Ty.tysymbol) (tymap) =
+  try W.Wstdlib.Mstr.find tymap tys
+  with Not_found ->
+    let ty = tys.tysymbol in
+    tymap <- Mty.add tys.tysymbol tymap;
+
+
 let () =
   Boot.Main.extend
     begin fun () ->
