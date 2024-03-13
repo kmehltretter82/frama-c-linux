@@ -21,8 +21,17 @@
 (**************************************************************************)
 
 module L = Wp_parameters
+module P = Why3.Pmodule
+module F = Filepath.Normalized
+module W = Why3
+module WConf = Why3.Whyconf
 
 (* -------------------------------------------------------------------------- *)
+
+let create_why3_env =
+    begin fun () ->
+      W.Env.create_env (WConf.loadpath (WConf.get_main (WConf.read_config None)))
+    end
 
 let () =
   Boot.Main.extend
@@ -30,13 +39,32 @@ let () =
       let libs = L.Library.get () in
       List.iter
         (fun dir ->
-           L.debug ~level:0 " + LIB %a@." Filepath.Normalized.pretty dir
-        ) libs ;
+          L.debug ~level:0 " + LIBS %s@." dir
+        ) (F.to_string_list libs) ;
       let thys = L.Import.get () in
       List.iter
         (fun thy ->
            L.debug ~level:0 " + THY %s@." thy
         ) thys ;
+
+      let libs = L.Library.get () in
+      let thys = L.Import.get () in
+      let env = create_why3_env () in
+      List.iter
+      (fun thy ->
+         let ns = (P.read_module env (F.to_string_list libs) thy).mod_export in
+         let _t = List.map (fun (ity : W.Ity.itysymbol) -> ity.its_ts) (W.Wstdlib.Mstr.values (ns.ns_ts)) in
+         List.iter (
+          fun _ty ->
+            match W.Ty.ts_hash _ty with
+            | 1 -> L.debug "NoDef %s@." thy
+            | _ -> L.debug "Otr %s@." thy
+         ) _t;
+      ) thys ;
+      (* let _ns = (P.read_module env (F.to_string_list libs) (List.hd thys)).mod_export in
+      L.debug ""; *)
+
+
     end
 
 (* -------------------------------------------------------------------------- *)
