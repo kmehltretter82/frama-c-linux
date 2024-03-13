@@ -1170,10 +1170,6 @@ function TabView(props: TabViewProps): JSX.Element | null {
   const tdup = custom > 0 ? 'Custom ' : '';
   const tmod = modified ? ' (modified)': '';
   const title = tdup + vname + tmod;
-  const icon =
-    (custom < 0) ? 'DISPLAY' :
-    selected ? 'FAVORITE' :
-    'STAR';
 
   const onClick = (): void => { applyTab(index); setCurrentNone(); };
   const onClose = (): void => closeTab(index);
@@ -1190,15 +1186,10 @@ function TabView(props: TabViewProps): JSX.Element | null {
     ]);
   };
 
-  const className = classes(
-    'labview-tab',
-    0 <= custom && 'persistent',
-  );
-
   return (
     <Toolbar.Button
-      className={className}
-      icon={icon}
+      className='labview-tab'
+      icon={selected ? 'DISPLAY' : undefined}
       label={label}
       title={title}
       value={index}
@@ -1208,8 +1199,8 @@ function TabView(props: TabViewProps): JSX.Element | null {
     >
       <IconButton
         className='labview-tab-closing'
-        display={custom < 0}
-        icon='CIRC.CLOSE'
+        icon={custom === 0 ? 'FAVORITE' : 'CIRC.CLOSE'}
+        enabled={custom !== 0}
         onClick={onClose}
       />
     </Toolbar.Button>
