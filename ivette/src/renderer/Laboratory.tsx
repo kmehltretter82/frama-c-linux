@@ -637,6 +637,7 @@ interface LayoutMenuState extends Actions {
   compId: compId;
   x: number;
   y: number;
+  fromDock: boolean;
 }
 
 const closedMenu: LayoutMenuState = {
@@ -644,6 +645,7 @@ const closedMenu: LayoutMenuState = {
   dock: false,
   undock: false,
   close: false,
+  fromDock: false,
   x: 0,
   y: 0,
 };
@@ -653,9 +655,13 @@ const MENU = new States.GlobalState<LayoutMenuState>(closedMenu);
 function openLayoutMenu(
   compId: compId,
   actions: Actions,
-  evt: React.MouseEvent
+  evt: React.MouseEvent,
+  fromDock = false
 ): void {
-  MENU.setValue({ ...actions, compId, x: evt.clientX, y: evt.clientY });
+  MENU.setValue({
+    ...actions, compId,
+    x: evt.clientX, y: evt.clientY, fromDock
+  });
 }
 
 function closeMenu(): void {
@@ -766,7 +772,7 @@ function LayoutMenu(): JSX.Element | null {
       ref={href}
       tabIndex={0}
       className={className}
-      style={{ left, top }}
+      style={menu.fromDock ? { left, bottom: 0 } : { left, top }}
       onBlur={closeMenu}
       onKeyDown={closeMenu}
     >
@@ -1122,7 +1128,7 @@ function DockItem(props: DockItemProps): JSX.Element | null {
       dock: visible,
       undock: true,
       close: true
-    }, evt);
+    }, evt, true);
   };
 
   return (
