@@ -20,70 +20,60 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Module abstract_state *)
+(** Module Abstract_state *)
+
+(** see API.Abstract_state for documentation *)
 
 open Cil_types
 
-(** Points-to graphs datastructure. *)
-module G: Graph.Sig.G with type V.t = int
+module EdgeLabel : sig
+  type t = Pointer | Field of fieldinfo
+
+  val compare : t -> t -> int
+  val default : t
+  val is_pointer : t -> bool
+  val is_field : t -> bool
+  val pretty : Format.formatter -> t -> unit
+end
+
+module G: Graph.Sig.G with type V.t = int and type E.t = int * EdgeLabel.t * int
 
 module LSet = Cil_datatype.LvalStructEq.Set
+module VarSet = Cil_datatype.Varinfo.Set
 
-(** Type denothing an abstract state of the analysis. It is a graph containing
-    all aliases and points-to information. *)
 type t
+type v = G.V.t
 
-val vid : G.V.t -> int
-
-(** access to the points-to graph *)
+val vid : v -> int
 val get_graph: t -> G.t
-
-(** set of lvals stored in a vertex *)
-val get_lval_set : G.V.t -> t -> LSet.t
-
-(** pretty printer; debug=true prints the graph, debug = false only
-    prints aliased variables *)
+val get_vars : v -> t -> VarSet.t
+val get_lval_set : v -> t -> LSet.t
 val pretty : ?debug:bool -> Format.formatter -> t -> unit
-
-(** dot printer; first argument is a file name *)
 val print_dot : string -> t -> unit
+val find_vertex : lval -> t -> v
+val find_vars : lval -> t -> VarSet.t
+val find_synonyms : lval -> t -> LSet.t
 
-(** finds the vertex corresponding to a lval.
-    @raise Not_found if such a vertex does not exist
-*)
-val find_vertex : lval -> t -> G.V.t
-
-(** same as previous function, but return a set of lval. Cannot
-    raise an exception but may return an empty set if the lval is not
-    in the graph *)
 val find_aliases : lval -> t -> LSet.t
+[@@alert deprecated "Use find_synonyms or find_all_aliases instead!"]
 
-(** similar to the previous functions, but does not only give the
-    equivalence class of lv, but also all lv that are aliases in
-    other vertex of the graph *)
+val alias_vars : lval -> t -> VarSet.t
 val find_all_aliases : lval -> t -> LSet.t
+val points_to_vars : lval -> t -> VarSet.t
+val points_to_lvals : lval -> t -> LSet.t
 
-(** the set of all lvars to which the given variable may point. *)
 val points_to_set : lval -> t -> LSet.t
+[@@alert deprecated "Use points_to_vars or points_to_lvals instead!"]
 
-(** find_aliases, then recursively finds other sets of lvals. We
-    have the property (if lval [lv] is in abstract state [x]) :
-    List.hd (find_transitive_closure lv x) = (find_vertex lv x,
-    find_aliases lv x) *)
-val find_transitive_closure : lval -> t -> (G.V.t * LSet.t) list
-
-(** inclusion test; [is_included a1 a2] tests if, for any lvl
-    present in a1 (associated to a vertex v1), that it is also
-    present in a2 (associated to a vertex v2) and that
-    get_lval_set(succ(v1) is included in get_lval_set(succ(v2)) *)
+val find_transitive_closure : lval -> t -> (v * LSet.t) list
 val is_included : t -> t -> bool
 
 (** check all the invariants that must be true on an abstract value
-      before and after each function call or transformation of the graph)  *)
+    before and after each function call or transformation of the graph) *)
 val assert_invariants : t -> unit
 
 (** Functions for Steensgaard's algorithm, see the paper *)
-val join : t -> G.V.t -> G.V.t -> t
+val join : t -> v -> v -> t
 
 (** transfert functions for different kinds of assignments *)
 val assignment : t -> lval -> exp -> t

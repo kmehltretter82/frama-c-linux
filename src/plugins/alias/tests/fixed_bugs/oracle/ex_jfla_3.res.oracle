@@ -30,8 +30,7 @@
   7:{ i2 } → 0:{ fst; __retres }
 [alias] Summary of function jfla:
   formals: fst  snd  i1→{ fst; __retres }  i2→{ fst; __retres }  bo
-  locals: __retres    returns: __retres
-  state: { i1; i2 }  { *i1; *i2; fst; __retres }
+  returns: __retres    state: { i1; i2 }  { *i1; *i2; fst; __retres }
 [alias] analysing function: main
 [alias] analysing instruction: int u = 11;
 [alias] May-aliases after instruction  int u = 11;  are  <none>
@@ -201,11 +200,7 @@
   47:{ t } → 35:{ u; v }   48:{ s1 } → 52:{ s }   51:{ s2 } → 52:{ s }
   52:{ s } -fst→ 34:{ a; b; c }   52:{ s } -snd→ 47:{ t }
 [alias] Summary of function main:
-  formals: 
-  locals: u  v  t→{ u; v }  a→{ u; v }  b→{ u; v }  c→{ u; v }
-           x→{ a; b; c }  y→{ a; b; c }  z→{ a; b; c }  s  s1→{ s }
-           s2→{ s }  __retres
-  returns: __retres
+  formals:     returns: __retres
   state: { x; y; z }
          { *x; *y; *z; s1->fst; s1->snd; s2->fst; s2->snd; t; a; b; c; 
            s.fst; s.snd }

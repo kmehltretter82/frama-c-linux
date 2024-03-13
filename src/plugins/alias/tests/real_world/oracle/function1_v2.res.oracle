@@ -8,7 +8,7 @@
 [alias] May-alias graph at the end of function alias:
   0:{ x } → 1:{  }   1:{  } → 2:{  }   3:{ y } → 1:{  }
 [alias] Summary of function alias:
-  formals: x  y    locals:     returns: <none>    state: { x; y }  { *x; *y }
+  formals: x  y    returns: <none>    state: { x; y }  { *x; *y }
 [alias] analysing function: main
 [alias] analysing instruction: int *a = malloc(sizeof(int));
 [alias] May-aliases after instruction  int *a = malloc(sizeof(int));  are  <none>
@@ -41,5 +41,5 @@
 [alias] May-alias graph at the end of function main:
   6:{ a; b } → 7:{  }   14:{  } → 6:{ a; b }   15:{  } → 6:{ a; b }
 [alias] Summary of function main:
-  formals:     locals: a  b  __retres    returns: __retres    state: { a; b }
+  formals:     returns: __retres    state: { a; b }
 [alias] Analysis complete

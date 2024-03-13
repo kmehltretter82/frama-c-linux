@@ -34,7 +34,6 @@
   0:{ a } → 1:{ x; z }   1:{ x; z } → 2:{  }   6:{ b } → 7:{ y }
   7:{ y } → 1:{ x; z }
 [alias] Summary of function main:
-  formals: 
-  locals: a→{ x; z }  b→{ y }  y→{ x; z }  x  z  p  __retres
-  returns: __retres    state: { *b; a; y }  { *(*b); *a; *y; x; z }
+  formals:     returns: __retres
+  state: { *b; a; y }  { *(*b); *a; *y; x; z }
 [alias] Analysis complete

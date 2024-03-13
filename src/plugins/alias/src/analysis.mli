@@ -62,7 +62,7 @@ val is_computed : unit -> bool
 val clear : unit -> unit
 
 (** see API.mli *)
-val get_state_before_stmt :  kernel_function -> stmt -> Abstract_state.t option
+val get_state_before_stmt : stmt -> Abstract_state.t option
 
 (** see API.mli *)
 val get_summary : kernel_function -> Abstract_state.summary option

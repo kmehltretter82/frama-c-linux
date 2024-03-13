@@ -30,6 +30,5 @@
 [alias] May-alias graph at the end of function f:
   4:{ p } → 5:{ f; q }   5:{ f; q } → 5:{ f; q }
 [alias] Summary of function f:
-  formals:     locals: q→{ f; q }  p→{ f; q }    returns: <none>
-  state: { *p; f; q; p }
+  formals:     returns: <none>    state: { *p; f; q; p }
 [alias] Analysis complete

@@ -42,8 +42,7 @@
 [alias] May-alias graph at the end of function main:
   <empty>
 [alias] Summary of function main:
-  formals:     locals: a  b  c  d  __retres    returns: __retres
-  state: <none>
+  formals:     returns: __retres    state: <none>
 [alias] analysing function: swap
 [alias] analysing instruction: int z = 0;
 [alias] May-aliases after instruction  int z = 0;  are  <none>

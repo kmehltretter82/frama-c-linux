@@ -34,6 +34,5 @@
 [alias] May-alias graph at the end of function main:
   0:{ p_x; p_y } → 1:{ x; y }
 [alias] Summary of function main:
-  formals:     locals: x  y  p_x→{ x; y }  p_y→{ x; y }  __retres
-  returns: __retres    state: { p_x; p_y }
+  formals:     returns: __retres    state: { p_x; p_y }
 [alias] Analysis complete

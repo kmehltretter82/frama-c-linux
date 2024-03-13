@@ -22,12 +22,17 @@
 
 open Cil_types
 
+module EdgeLabel = Abstract_state.EdgeLabel
+
 (** Points-to graphs datastructure. *)
 module G = Abstract_state.G
+
+type v = G.V.t
 
 let vid = Abstract_state.vid
 
 module LSet = Abstract_state.LSet
+module VarSet = Abstract_state.VarSet
 
 module Abstract_state = Abstract_state
 
@@ -37,60 +42,67 @@ let check_computed () =
     Options.abort "Static analysis must be called before any function of the API can be called"
 
 
-let lset
-    (get_set : Abstract_state.t -> LSet.t)
-    (kf : kernel_function) (s : stmt) =
+let lset ~stmt (get_set : Abstract_state.t -> LSet.t) =
   check_computed ();
-  match Analysis.get_state_before_stmt kf s with
+  match Analysis.get_state_before_stmt stmt with
   | None -> LSet.empty
   | Some state -> get_set state
 
-let points_to_set_stmt kf s lv = lset (Abstract_state.points_to_set lv) kf s
+let vars ~stmt (get_set : Abstract_state.t -> VarSet.t) =
+  check_computed ();
+  match Analysis.get_state_before_stmt stmt with
+  | None -> VarSet.empty
+  | Some state -> get_set state
 
-let new_points_to_set_stmt kf s lv =
-  let get_set state =
-    let new_state = Analysis.do_stmt state s in
-    Abstract_state.points_to_set lv new_state
-  in
-  lset get_set kf s
+module Statement = struct
+  let points_to_vars ~stmt lv = vars ~stmt (Abstract_state.points_to_vars lv)
+  let points_to_lvals ~stmt lv = lset ~stmt (Abstract_state.points_to_lvals lv)
+  let alias_vars ~stmt lv = vars ~stmt (Abstract_state.alias_vars lv)
+  let aliases ~stmt lv = lset ~stmt (Abstract_state.find_all_aliases lv)
 
-let aliases_stmt kf s lv =
-  lset (Abstract_state.find_all_aliases lv) kf s
+  let are_aliased ~stmt (lv1: lval) (lv2:lval) : bool =
+    (* TODO: more efficient algorithm: do they share a successor? *)
+    LSet.mem lv2 @@ aliases ~stmt lv1
+end
 
-let new_aliases_stmt kf s lv =
+let points_to_set_stmt _kf stmt = Statement.points_to_lvals ~stmt
+
+let aliases_stmt _kf stmt = Statement.aliases ~stmt
+
+let new_aliases_stmt s lv =
   let get_set state =
     let new_state = Analysis.do_stmt state s in
     Abstract_state.find_all_aliases lv new_state
   in
-  lset get_set kf s
+  lset ~stmt:s get_set
 
-let points_to_set_kf (kf : kernel_function) (lv : lval) =
-  check_computed ();
-  if Kernel_function.has_definition kf
-  then
-    let s = Kernel_function.find_return kf in
-    new_points_to_set_stmt kf s lv
-  else
-    Options.abort "points_to_set_kf: function %a has no definition" Kernel_function.pretty kf
+module Function = struct
+  let return_stmt kf =
+    if Kernel_function.has_definition kf
+    then Kernel_function.find_return kf
+    else Options.abort "function %a has no definition" Kernel_function.pretty kf
 
-let aliases_kf (kf : kernel_function) (lv : lval) =
-  check_computed ();
-  if Kernel_function.has_definition kf
-  then
-    let s = Kernel_function.find_return kf in
-    new_aliases_stmt kf s lv
-  else
-    Options.abort "aliases_kf: function %a has no definition" Kernel_function.pretty kf
+  let points_to_vars ~kf = Statement.points_to_vars ~stmt:(return_stmt kf)
+  let points_to_lvals ~kf = Statement.points_to_lvals ~stmt:(return_stmt kf)
+  let alias_vars ~kf = Statement.alias_vars ~stmt:(return_stmt kf)
+  let aliases ~kf = Statement.aliases ~stmt:(return_stmt kf)
+  let are_aliased ~kf = Statement.are_aliased ~stmt:(return_stmt kf)
 
-let fundec_stmts (kf : kernel_function) (lv : lval) =
-  check_computed ();
-  if Kernel_function.has_definition kf
-  then
-    List.map
-      (fun s -> s, new_aliases_stmt kf s lv)
-      (Kernel_function.get_definition kf).sallstmts
-  else
-    Options.abort "fundec_stmts: function %a has no definition" Kernel_function.pretty kf
+  let fundec_stmts ~kf lv =
+    if Kernel_function.has_definition kf
+    then
+      List.map
+        (fun s -> s, new_aliases_stmt s lv)
+        (Kernel_function.get_definition kf).sallstmts
+    else
+      Options.abort "fundec_stmts: function %a has no definition" Kernel_function.pretty kf
+end
+
+let points_to_set_kf kf = Function.points_to_lvals ~kf
+
+let aliases_kf kf = Function.aliases ~kf
+
+let fundec_stmts kf = Function.fundec_stmts ~kf
 
 
 let fold_points_to_set f_fold acc kf s lv =
@@ -99,13 +111,13 @@ let fold_points_to_set f_fold acc kf s lv =
 let fold_aliases_stmt f_fold acc kf s lv =
   LSet.fold (fun e a -> f_fold a e) (aliases_stmt kf s lv) acc
 
-let fold_new_aliases_stmt f_fold acc kf s lv =
-  LSet.fold (fun e a -> f_fold a e) (new_aliases_stmt kf s lv) acc
+let fold_new_aliases_stmt f_fold acc _kf s lv =
+  LSet.fold (fun e a -> f_fold a e) (new_aliases_stmt s lv) acc
 
 let fold_points_to_set_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
   LSet.fold (fun e a -> f_fold a e) (points_to_set_kf kf lv) acc
 
-let fold_aliases_kf (f_fold : 'a -> lval -> 'a) (acc : 'a) (kf : kernel_function) (lv : lval) : 'a =
+let fold_aliases_kf (f_fold : 'a -> lval -> 'a) (acc : 'a) kf lv : 'a =
   LSet.fold (fun e a -> f_fold a e) (aliases_kf kf lv) acc
 
 let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
@@ -116,26 +128,20 @@ let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_fu
     acc
     (fundec_stmts kf lv)
 
-let are_aliased (kf: kernel_function) (s:stmt) (lv1: lval) (lv2:lval) : bool =
-  check_computed ();
-  match Analysis.get_state_before_stmt kf s with
-    None -> false
-  | Some state ->
-    let setv1 = Abstract_state.find_all_aliases lv1 state in
-    LSet.mem lv2 setv1
+let are_aliased (_kf: kernel_function) stmt = Statement.are_aliased ~stmt
 
-let fold_vertex (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function) (s:stmt) (lv: lval) : 'a =
+let fold_vertex (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (_kf: kernel_function) (s:stmt) (lv: lval) : 'a =
   check_computed ();
-  match Analysis.get_state_before_stmt kf s with
+  match Analysis.get_state_before_stmt s with
     None -> acc
   | Some state ->
     let v : G.V.t = Abstract_state.find_vertex lv state in
-    let set_aliases = Abstract_state.find_aliases lv state in
-    LSet.fold (fun lv a-> f_fold a v lv) set_aliases acc
+    let set_aliases = Abstract_state.find_synonyms lv state in
+    LSet.fold (fun lv a -> f_fold a v lv) set_aliases acc
 
-let fold_vertex_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
+let fold_vertex_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (_kf: kernel_function)  (s:stmt) (lv: lval) : 'a =
   check_computed ();
-  match Analysis.get_state_before_stmt kf s with
+  match Analysis.get_state_before_stmt s with
     None -> acc
   | Some state ->
     let list_closure : (G.V.t * LSet.t) list = Abstract_state.find_transitive_closure lv state in
@@ -144,7 +150,7 @@ let fold_vertex_closure  (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (kf: ker
       acc
       list_closure
 
-let get_state_before_stmt =
+let get_state_before_stmt _kf =
   Analysis.get_state_before_stmt
 
 let call_function a f res args =

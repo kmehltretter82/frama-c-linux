@@ -27,6 +27,5 @@
 [alias] May-alias graph at the end of function main:
   2:{ x; y } → 3:{  }   4:{ mat } → 2:{ x; y }
 [alias] Summary of function main:
-  formals:     locals: mat→{ x; y }  x  y  __retres    returns: __retres
-  state: { mat[0..]; x; y }
+  formals:     returns: __retres    state: { mat[0..]; x; y }
 [alias] Analysis complete
