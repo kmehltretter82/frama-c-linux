@@ -433,6 +433,7 @@ internal-nightly:
 .build_template: &additional_arch_template
   stage: compatibility
   script:
+    - opam update
     - opam switch create --empty .
     - eval $(opam env --switch=. --set-switch)
     # Note: we use this to get an exact version corresponding to a minor version
@@ -471,14 +472,14 @@ additional-arch-release:
 .build_template: &ocaml_always_additional_versions_template
   parallel:
     matrix:
-      - OCAML: ["4.14"]
+      - OCAML: ["5.1"]
 
 # Uncomment this block when there are intermediate versions to check manully
-#.build_template: &ocaml_manual_additional_versions_template
-#  parallel:
-#    matrix:
-#      - OCAML: ["4.14"]
-#  when: manual
+.build_template: &ocaml_manual_additional_versions_template
+  parallel:
+    matrix:
+      - OCAML: ["4.14"]
+  when: manual
 
 .build_template: &ocaml_versions_template
   stage: compatibility
@@ -493,14 +494,14 @@ ocaml-versions:
     - schedules
 
 # Uncomment this section when there are additional versions of OCaml to test
-# ocaml-versions-more:
-#   <<: *ocaml_versions_template
-#   <<: *ocaml_manual_additional_versions_template
+ocaml-versions-more:
+  <<: *ocaml_versions_template
+  <<: *ocaml_manual_additional_versions_template
 
 ocaml-versions-nightly:
   <<: *ocaml_versions_template
   <<: *ocaml_always_additional_versions_template
-  # we still check them for the publisher pipeline job
+  # in publish schedule, we still check additional versions of OCaml
   <<: *when_publish
 
 # Opam pin
