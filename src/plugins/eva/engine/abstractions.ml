@@ -161,10 +161,10 @@ module Value = struct
     | Node (l, r) -> fold folder l (fold folder r acc)
 
   (* Folding over contexts dependencies of a value. *)
-  let rec fold_contexts : type c. 'a Context.folder -> c dependencies -> 'a -> 'a =
+  let rec fold_contexts : type v. 'a Context.folder -> v dependencies -> 'a -> 'a =
     fun folder dependencies acc ->
     match dependencies with
-    | Leaf (module R) -> Context.fold folder R.context acc
+    | Leaf (module V) -> Context.fold folder V.context acc
     | Node (l, r) -> fold_contexts folder l (fold_contexts folder r acc)
 
 
@@ -313,18 +313,26 @@ module Location = struct
 
   (* Folding over values dependencies *)
   type 'a folder = { folder : 'l. 'l location -> 'a -> 'a }
-  let rec fold : type v. 'a folder -> v dependencies -> 'a -> 'a =
+  let rec fold : type l. 'a folder -> l dependencies -> 'a -> 'a =
     fun folder dependencies acc ->
     match dependencies with
     | Leaf leaf -> folder.folder leaf acc
     | Node (l, r) -> fold folder l (fold folder r acc)
 
   (* Folding over the values dependencies of some locations dependencies. *)
-  let rec fold_values : type v. 'a Value.folder -> v dependencies -> 'a -> 'a =
+  let rec fold_values : type l. 'a Value.folder -> l dependencies -> 'a -> 'a =
     fun folder dependencies acc ->
     match dependencies with
-    | Leaf (module R) -> Value.fold folder R.value acc
+    | Leaf (module Loc) -> Value.fold folder Loc.value acc
     | Node (l, r) -> fold_values folder l (fold_values folder r acc)
+
+  (* Folding over contexts dependencies of the value dependencies of some
+     locations dependencies. *)
+  let rec fold_contexts : type l. 'a Context.folder -> l dependencies -> 'a -> 'a =
+    fun folder dependencies acc ->
+    match dependencies with
+    | Leaf (module Loc) -> Value.fold_contexts folder Loc.value acc
+    | Node (l, r) -> fold_contexts folder l (fold_contexts folder r acc)
 
 
   (* As for the value abstraction, building the location abstraction consists
@@ -735,8 +743,10 @@ module Domain = struct
     match registered.abstraction with
     | Domain (module Domain) ->
       Context.fold add_context Domain.context_dependencies contexts |>
-      Value.fold_contexts add_context Domain.value_dependencies
-    | Functor (module F) -> contexts
+      Value.fold_contexts add_context Domain.value_dependencies |>
+      Location.fold_contexts add_context Domain.location_dependencies
+    | Functor (module F) ->
+      Location.fold_contexts add_context F.location_dependencies contexts
 
   let add_values values (registered, _) =
     let add_value = Value.{ folder = add } in
