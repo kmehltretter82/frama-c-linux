@@ -24,9 +24,6 @@
 
 module Domain : sig
 
-  module type Context = Abstract.Context.External
-  module type Value = Abstract.Value.External
-
   (** Witness of the registration of an abstract domain, it can be used to
       programmatically enable the domain. *)
   type registered
@@ -51,6 +48,9 @@ module Domain : sig
   val dynamic_register :
     name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
     (unit -> (module Abstract_domain.Leaf)) -> unit
+
+  module type Context = Abstract.Context.External
+  module type Value = Abstract.Value.External
 
   (** Functor domain which can be built over any value abstractions, but with
       fixed locations dependencies. *)

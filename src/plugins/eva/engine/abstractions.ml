@@ -765,18 +765,18 @@ module Domain = struct
 
   let build domains =
     (* Build the contexts *)
-    let interactive_ctx c = Context.(make_interactive c |> assert_not_unit) in
     let contexts = List.fold_left add_contexts Context.init domains in
+    let interactive_ctx c = Context.(make_interactive c |> assert_not_unit) in
     let module Contexts = (val interactive_ctx contexts) in
     (* Build the values *)
     let init_values = Value.init (module Contexts) in
-    let interactive_value v = Value.(make_interactive v |> assert_not_unit) in
     let values = List.fold_left add_values init_values domains in
+    let interactive_value v = Value.(make_interactive v |> assert_not_unit) in
     let module Values = (val interactive_value values) in
     (* Build the locations *)
     let init_locations = Location.init (module Values) in
-    let interactive_loc l = Location.(make_interactive l |> assert_not_unit) in
     let locations = List.fold_left add_locations init_locations domains in
+    let interactive_loc l = Location.(make_interactive l |> assert_not_unit) in
     let module Locs = (val interactive_loc locations) in
     (* Build the domains *)
     let init_domain = init (module Contexts) (module Values) (module Locs) in
