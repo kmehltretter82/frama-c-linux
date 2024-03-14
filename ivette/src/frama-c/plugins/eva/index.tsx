@@ -35,24 +35,29 @@ import './style.css';
 // --- Export Component
 // --------------------------------------------------------------------------
 
-Ivette.registerView({
-  id: 'summary',
-  rank: 3,
-  label: 'Eva Summary',
-  layout: [
-    ['frama-c.plugins.eva_summary', 'frama-c.plugins.eva_coverage'],
-    'frama-c.messages',
-  ],
+Ivette.registerGroup({
+  id: 'fc.eva',
+  label: 'Eva Plugin'
 });
 
 Ivette.registerView({
-  id: 'values',
-  rank: 4,
+  id: 'fc.eva.summary',
+  label: 'Eva Summary',
+  layout: {
+    'A': 'fc.eva.summary',
+    'B': 'fc.eva.coverage',
+    'CD': 'fc.kernel.messages',
+  },
+});
+
+Ivette.registerView({
+  id: 'fc.eva.values',
   label: 'Eva Values',
-  layout: [
-    ['frama-c.astview', 'frama-c.astinfo'],
-    'frama-c.plugins.values',
-  ],
+  layout: {
+    'A': 'fc.kernel.astview',
+    'B': 'fc.kernel.astinfo',
+    'CD': 'fc.eva.values',
+  }
 });
 
 // --------------------------------------------------------------------------

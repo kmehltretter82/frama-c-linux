@@ -914,7 +914,7 @@ interface EvaluationModeProps {
 }
 
 const evalShortcut = System.platform === 'macos' ? 'Cmd+E' : 'Ctrl+E';
-const evalMode : Ivette.ModeProps = {
+const evalMode : Ivette.SearchProps = {
   id: 'frama-c.eva.evalMode',
   label: 'Evaluation',
   title: `Evaluate an ACSL expression (shortcut: ${evalShortcut})`,
@@ -929,10 +929,10 @@ Dome.addMenuItem({
   label: 'Evaluate',
   key: 'Cmd+E',
   enabled: false,
-  onClick: () => Ivette.focusMode(evalMode.id),
+  onClick: () => Ivette.focusSearchMode(evalMode.id),
 });
 
-Ivette.registerMode(evalMode);
+Ivette.registerSearchMode(evalMode);
 
 function useEvaluationMode(props: EvaluationModeProps): void {
   const { computationState, marker, scope, setLocPin } = props;
@@ -949,9 +949,9 @@ function useEvaluationMode(props: EvaluationModeProps): void {
         };
         Server.send(Ast.parseExpr, data).then(addProbe).catch(handleError);
       };
-      Ivette.updateMode({ id: evalMode.id, enabled: true, onEnter });
+      Ivette.updateSearchMode({ id: evalMode.id, enabled: true, onEnter });
     } else {
-      Ivette.updateMode({ id: evalMode.id, enabled: false });
+      Ivette.updateSearchMode({ id: evalMode.id, enabled: false });
     }
   }, [enabled, marker, scope, setLocPin]);
   React.useEffect(
@@ -1167,9 +1167,7 @@ function EvaTable(): JSX.Element {
 
 /* Registers the component in Ivette */
 Ivette.registerComponent({
-  id: 'frama-c.plugins.values',
-  group: 'frama-c.plugins',
-  rank: 1,
+  id: 'fc.eva.values',
   label: 'Eva Values',
   title: 'Values inferred by the Eva analysis',
   children: <EvaTable />,

@@ -172,9 +172,7 @@ export default function CoverageComponent(): JSX.Element {
 }
 
 Ivette.registerComponent({
-  id: 'frama-c.plugins.eva_coverage',
-  group: 'frama-c.plugins',
-  rank: 10,
+  id: 'fc.eva.coverage',
   label: 'Eva Coverage',
   title: 'Detailed coverage of the Eva analysis',
   children: <CoverageComponent />,

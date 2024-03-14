@@ -349,13 +349,11 @@ export function useWindowSettingsEvent(callback: () => void): void {
   });
 }
 
-/** @ignore DEPRECATED */
 export function onWindowSettings(callback: () => void): void {
   const { evt } = WindowSettingsDriver;
   SysEmitter.on(evt, callback);
 }
 
-/** @ignore DEPRECATED */
 export function offWindowSettings(callback: () => void): void {
   const { evt } = WindowSettingsDriver;
   SysEmitter.off(evt, callback);

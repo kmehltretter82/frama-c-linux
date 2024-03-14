@@ -232,9 +232,7 @@ function EvaSummaryComponent(): JSX.Element {
 }
 
 Ivette.registerComponent({
-  id: 'frama-c.plugins.eva_summary',
-  group: 'frama-c.plugins',
-  rank: 10,
+  id: 'fc.eva.summary',
   label: 'Eva Summary',
   title: 'Summary of the Eva analysis',
   children: <EvaSummaryComponent />,

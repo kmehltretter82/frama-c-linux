@@ -49,7 +49,7 @@ Menu.init();
 /* -------------------------------------------------------------------------- */
 
 Ivette.registerSidebar({
-  id: 'frama-c.globals',
+  id: 'fc.kernel.globals',
   label: 'AST',
   children: <>
     <Types />
@@ -58,68 +58,65 @@ Ivette.registerSidebar({
   </>
 });
 
-Ivette.registerToolbar({ id: 'frama-c.history', children: <History /> });
-Ivette.registerStatusbar({ id: 'frama-c.message', children: <Status /> });
+Ivette.registerToolbar({ id: 'ivette.history', children: <History /> });
+Ivette.registerStatusbar({ id: 'ivette.status', children: <Status /> });
 
 /* -------------------------------------------------------------------------- */
 /* --- Frama-C Kernel Groups                                              --- */
 /* -------------------------------------------------------------------------- */
 
 Ivette.registerGroup({
-  id: 'frama-c.kernel',
-  label: 'Frama-C Kernel',
-}, () => {
-  Ivette.registerComponent({
-    id: 'frama-c.astinfo',
-    label: 'Inspector',
-    title: 'Contextual information on selected AST elements',
-    children: <ASTinfo />
-  });
-  Ivette.registerComponent({
-    id: 'frama-c.astview',
-    label: 'AST',
-    title: 'Normalized C/ACSL Source Code',
-    children: <ASTview />,
-  });
-  Ivette.registerComponent({
-    id: 'frama-c.sourcecode',
-    label: 'Source Code',
-    title: 'C/ACSL Source Code',
-    children: <SourceCode />,
-  });
-  Ivette.registerComponent({
-    id: 'frama-c.locations',
-    label: 'Locations',
-    title: 'Selected list of locations',
-    children: <Locations />,
-  });
-  Ivette.registerComponent({
-    id: 'frama-c.properties',
-    label: 'Properties',
-    title: 'Status of ACSL Properties',
-    children: <Properties />,
-  });
-  Ivette.registerComponent({
-    id: 'frama-c.messages',
-    label: 'Messages',
-    title: 'Messages emitted by Frama-C',
-    children: <Messages />,
-  });
-  Ivette.registerComponent({
-    id: 'frama-c.pivottable',
-    label: 'Pivot Table',
-    title: 'Pivot Table',
-    children: <PivotTable />,
-  });
+  id: 'fc.kernel',
+  label: 'Frama-C',
 });
 
-/* -------------------------------------------------------------------------- */
-/* --- Frama-C Plug-ins Group                                             --- */
-/* -------------------------------------------------------------------------- */
+Ivette.registerComponent({
+  id: 'fc.kernel.astinfo',
+  label: 'Inspector',
+  title: 'Contextual information on selected AST elements',
+  children: <ASTinfo />
+});
 
-Ivette.registerGroup({
-  id: 'frama-c.plugins',
-  label: 'Frama-C Plug-ins',
+Ivette.registerComponent({
+  id: 'fc.kernel.astview',
+  label: 'AST',
+  title: 'Normalized C/ACSL Source Code',
+  children: <ASTview />,
+});
+
+Ivette.registerComponent({
+  id: 'fc.kernel.sourcecode',
+  label: 'Source Code',
+  title: 'C/ACSL Source Code',
+  children: <SourceCode />,
+});
+
+Ivette.registerComponent({
+  id: 'fc.kernel.locations',
+  label: 'Locations',
+  title: 'Selected list of locations',
+  children: <Locations />,
+});
+
+Ivette.registerComponent({
+  id: 'fc.kernel.properties',
+  label: 'Properties',
+  title: 'Status of ACSL Properties',
+  children: <Properties />,
+});
+
+Ivette.registerComponent({
+  id: 'fc.kernel.messages',
+  label: 'Messages',
+  title: 'Messages emitted by Frama-C',
+  children: <Messages />,
+});
+
+Ivette.registerComponent({
+  id: 'fc.kernel.pivottable',
+  label: 'Pivot Table',
+  title: 'Pivot Table',
+  children: <PivotTable />,
 });
 
 /* -------------------------------------------------------------------------- */
@@ -127,33 +124,30 @@ Ivette.registerGroup({
 /* -------------------------------------------------------------------------- */
 
 Ivette.registerView({
-  id: 'source',
-  rank: 1,
+  id: 'fc.kernel.source',
   label: 'Source Code',
   defaultView: true,
-  layout: [
-    ['frama-c.astview', 'frama-c.sourcecode'],
-    'frama-c.astinfo',
-  ],
+  layout: {
+    A: 'fc.kernel.astview',
+    B: 'fc.kernel.sourcecode',
+    CD: 'fc.kernel.astinfo',
+  }
 });
 
 Ivette.registerView({
-  id: 'properties',
-  rank: 2,
+  id: 'fc.kernel.properties',
   label: 'Properties',
-  layout: [
-    ['frama-c.astview', 'frama-c.sourcecode'],
-    'frama-c.properties',
-  ],
+  layout: {
+    A: 'fc.kernel.astview',
+    B: 'fc.kernel.sourcecode',
+    CD: 'fc.kernel.properties',
+  }
 });
 
 Ivette.registerView({
-  id: 'pivot-table',
-  rank: 6,
+  id: 'fc.kernel.pivot-table',
   label: 'Pivot Table',
-  layout: [
-    ['frama-c.pivottable'],
-  ],
+  layout: { 'ABCD': 'fc.kernel.pivottable' },
 });
 
 /* -------------------------------------------------------------------------- */

@@ -403,19 +403,16 @@ const RenderConsole = (): JSX.Element => {
 };
 
 Ivette.registerComponent({
-  id: 'frama-c.console',
-  group: 'frama-c.kernel',
+  id: 'ivette.console',
   label: 'Console',
   title: 'Frama-C Server Output & Command Line',
-  rank: -1,
   children: <RenderConsole />,
 });
 
 Ivette.registerView({
-  id: 'console',
-  rank: -1,
+  id: 'ivette.console',
   label: 'Console',
-  layout: 'frama-c.console',
+  layout: { ABCD: 'ivette.console' },
 });
 
 // --------------------------------------------------------------------------
@@ -478,7 +475,6 @@ export const Status = (): JSX.Element => {
     <>
       <LED status={led} blink={blink} />
       <Code icon={icon} label={running} title={title} />
-      <Toolbars.Separator />
     </>
   );
 };

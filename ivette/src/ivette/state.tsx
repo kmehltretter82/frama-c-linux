@@ -39,36 +39,26 @@ export interface ElementProps {
   children?: React.ReactNode;
 }
 
-function byRank(p: ElementProps, q: ElementProps): number {
-  const rp = p.rank ?? 0;
-  const rq = q.rank ?? 0;
-  if (rp < rq) return -1;
-  if (rp > rq) return +1;
-  const ip = p.id;
-  const iq = q.id;
-  if (ip < iq) return -1;
-  if (ip > iq) return +1;
-  return 0;
-}
-
 export class ElementRack<A extends ElementProps> {
 
-  private rank = 1;
   private readonly items = new Map<string, A>();
 
   register(elt: A): void {
-    if (elt.rank === undefined) elt.rank = this.rank;
-    this.rank++;
     this.items.set(elt.id, elt);
     UPDATED.emit();
   }
 
-  getElements(): A[] {
-    const buffer: A[] = [];
-    this.items.forEach((p) => { if (p.children) { buffer.push(p); } });
-    return buffer.sort(byRank);
-  }
+  getElement(id: string): A | undefined { return this.items.get(id); }
+  getElements(): A[] { return Array.from(this.items.values()); }
 
+}
+
+export function useElement<A extends ElementProps>(
+  E: ElementRack<A>, id: string | undefined
+): A | undefined
+{
+  Dome.useUpdate(UPDATED);
+  return id ? E.getElement(id) : undefined;
 }
 
 export function useElements<A extends ElementProps>(
@@ -85,4 +75,4 @@ export function useChildren<A extends ElementProps>(
   return React.Children.toArray(elements.map((e) => e.children));
 }
 
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
