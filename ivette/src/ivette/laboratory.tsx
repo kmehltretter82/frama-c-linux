@@ -1279,3 +1279,44 @@ export function Tabs(): JSX.Element {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Search Mode                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+function displayHints(): Ivette.Hint[] {
+  const hints: Ivette.Hint[]= [];
+  VIEW.getElements().forEach((view) => hints.push({
+    id: 'view#' + view.id,
+    name: view.label,
+    icon: 'DISPLAY',
+    label: view.label,
+    title: view.title,
+    onClick: () => applyView(view),
+  }));
+  COMPONENT.getElements().forEach((comp) => hints.push({
+    id: 'comp#' + comp.id,
+    name: comp.label,
+    icon: 'COMPONENT',
+    label: comp.label,
+    title: comp.title,
+    onClick: () => applyComponent(comp),
+  }));
+  return hints;
+}
+
+Ivette.registerSearchMode({
+  id: 'ivette.show',
+  label: 'Show',
+  title: 'Select Views & Components',
+  icon: 'DISPLAY',
+  hints: displayHints,
+});
+
+Dome.addMenuItem({
+  menu: 'View',
+  id: 'ivette.show',
+  label: 'Show View or Component …',
+  key: 'Cmd+K',
+  onClick: () => Ivette.focusSearchMode('ivette.show'),
+});
+
+/* -------------------------------------------------------------------------- */
