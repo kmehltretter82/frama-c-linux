@@ -230,9 +230,9 @@ export function registerStatusbar(status: ToolProps): void {
   STATUSBAR.register(status);
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Search Modes                                                       ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Search Modes                                                       --- */
+/* -------------------------------------------------------------------------- */
 
 export interface Hint {
   id: string;
@@ -244,7 +244,7 @@ export interface Hint {
   onClick?: () => void; // click on hint
 }
 
-export interface ModeProps {
+export interface SearchProps {
   id: string; // Mode identifier
   rank?: number; // Modes ordering
   icon?: string; // Search Field's Icons
@@ -258,12 +258,15 @@ export interface ModeProps {
   onEnter?: (pattern: string) => void; // Enter key for search field
 }
 
-export function registerMode(m: ModeProps): void { Search.registerMode(m); }
-export function updateMode(m: ModeProps): void { Search.updateMode(m); }
-export function removeMode(id: string): void { Search.removeMode(id); }
-export function selectMode(id: string): void { Search.selectMode(id); }
-export function focusMode(id: string): void { Search.focusMode(id); }
-export function useMode(m: ModeProps): void {
+/* eslint-disable max-len */
+export function registerSearchMode(m: SearchProps): void { Search.registerMode(m); }
+export function updateSearchMode(m: SearchProps): void { Search.updateMode(m); }
+export function removeSearchMode(id: string): void { Search.removeMode(id); }
+export function selectSearchMode(id: string): void { Search.selectMode(id); }
+export function focusSearchMode(id: string): void { Search.focusMode(id); }
+/* eslint-enable max-len */
+
+export function useSearchMode(m: SearchProps): void {
   React.useEffect(() => {
     const id = m.id;
     const m0 = Search.findMode(id);
@@ -277,9 +280,9 @@ export function useMode(m: ModeProps): void {
   }, [m]);
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Sandbox                                                            ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Sandbox                                                            --- */
+/* -------------------------------------------------------------------------- */
 
 if (DEVEL) {
   registerView({
