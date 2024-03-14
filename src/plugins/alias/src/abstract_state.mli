@@ -36,7 +36,7 @@ module EdgeLabel : sig
   val pretty : Format.formatter -> t -> unit
 end
 
-module G: Graph.Sig.G with type V.t = int and type E.t = int * EdgeLabel.t * int
+module G: Graph.Sig.G with type V.t = int and type E.label = EdgeLabel.t
 
 module LSet = Cil_datatype.LvalStructEq.Set
 module VarSet = Cil_datatype.Varinfo.Set
