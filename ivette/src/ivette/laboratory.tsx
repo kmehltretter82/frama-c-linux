@@ -621,6 +621,52 @@ Settings.onWindowSettings(() => {
 });
 
 /* -------------------------------------------------------------------------- */
+/* --- Exported API                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+export function useState(): LabViewState
+{
+  const [state] = States.useGlobalState(LAB);
+  return state;
+}
+
+export interface ViewStatus {
+  favorite: boolean;
+  displayed: boolean;
+  layout: Layout;
+}
+
+export function getViewStatus(
+  state: LabViewState,
+  viewId: viewId
+): ViewStatus
+{
+  const tab = state.tabs.get(viewId);
+  const favorite = tab ? tab.custom === 0 : false;
+  const displayed = tab ? tab.key === state.tabKey : false;
+  const layout = displayed ? state.stack[0] : tab?.stack[0];
+  return { favorite, displayed, layout: layout ?? defaultLayout };
+}
+
+export interface ComponentStatus {
+  active: boolean;
+  docked: boolean;
+  position: Ivette.LayoutPosition | undefined;
+}
+
+export function getComponentStatus(
+  state: LabViewState,
+  compId: compId
+): ComponentStatus
+{
+  const layout = state.stack[0] ?? defaultLayout;
+  const position= getLayoutPosition(layout, compId);
+  const active = state.panels.has(compId);
+  const docked = state.docked.has(compId);
+  return { position, active, docked };
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Layout Menu State                                                  --- */
 /* -------------------------------------------------------------------------- */
 
@@ -873,7 +919,7 @@ interface ViewItemProps {
   layout: Layout | undefined;
 }
 
-function ViewItem(props: ViewItemProps): JSX.Element {
+export function ViewItem(props: ViewItemProps): JSX.Element {
   const { view, favorite, displayed, selected, layout } = props;
   const { id, label: vname, title: vtitle } = view;
 
@@ -960,7 +1006,7 @@ interface ComponentItemProps {
   docked: boolean;
 }
 
-function ComponentItem(props: ComponentItemProps): JSX.Element {
+export function ComponentItem(props: ComponentItemProps): JSX.Element {
   const { comp, position, selected, active, docked } = props;
   const { id, label, title = label } = comp;
   const icon =
