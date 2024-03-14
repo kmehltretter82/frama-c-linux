@@ -159,7 +159,7 @@ function lookupHints(hs: Hint[], pattern: string): Toolbar.Hint[]
   return hs.filter((h) => lookupHint(h, p)).map(toHint);
 }
 
-export function SearchAction(): JSX.Element {
+export function SearchField(): JSX.Element {
   const [mode] = useGlobalState(allModes);
   const currMode = mode.id;
   const userMode = React.useRef('');

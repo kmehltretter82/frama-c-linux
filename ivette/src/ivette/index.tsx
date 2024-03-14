@@ -33,8 +33,8 @@ import React from 'react';
 import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
-import * as State from 'ivette/state';
-import * as Mode from 'ivette@mode';
+import * as State from './state';
+import * as Search from './search';
 
 /* -------------------------------------------------------------------------- */
 /* --- Items                                                              --- */
@@ -258,21 +258,21 @@ export interface ModeProps {
   onEnter?: (pattern: string) => void; // Enter key for search field
 }
 
-export function registerMode(m: ModeProps): void { Mode.registerMode(m); }
-export function updateMode(m: ModeProps): void { Mode.updateMode(m); }
-export function removeMode(id: string): void { Mode.removeMode(id); }
-export function selectMode(id: string): void { Mode.selectMode(id); }
-export function focusMode(id: string): void { Mode.focusMode(id); }
+export function registerMode(m: ModeProps): void { Search.registerMode(m); }
+export function updateMode(m: ModeProps): void { Search.updateMode(m); }
+export function removeMode(id: string): void { Search.removeMode(id); }
+export function selectMode(id: string): void { Search.selectMode(id); }
+export function focusMode(id: string): void { Search.focusMode(id); }
 export function useMode(m: ModeProps): void {
   React.useEffect(() => {
     const id = m.id;
-    const m0 = Mode.findMode(id);
-    Mode.registerMode({ ...m0, ...m });
+    const m0 = Search.findMode(id);
+    Search.registerMode({ ...m0, ...m });
     return () => {
       if (m0 !== undefined)
-        Mode.registerMode(m0);
+        Search.registerMode(m0);
       else
-        Mode.removeMode(id);
+        Search.removeMode(id);
     };
   }, [m]);
 }

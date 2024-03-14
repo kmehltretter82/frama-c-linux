@@ -32,10 +32,10 @@ import { Vfill } from 'dome/layout/boxes';
 import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Sidebar from './Sidebar';
-import * as Actions from './Actions';
 import * as Controller from './Controller';
 import * as Lab from './Laboratory';
 import * as State from 'ivette/state';
+import * as Search from 'ivette/search';
 import { TOOLBAR, STATUSBAR } from 'ivette';
 import * as IvettePrefs from 'ivette/prefs';
 import './loader';
@@ -71,7 +71,7 @@ export default function Application(): JSX.Element {
         <Toolbar.Filler />
         <IvettePrefs.ThemeSwitchTool />
         <IvettePrefs.FontTools />
-        <Actions.SearchAction />
+        <Search.SearchField />
         <Toolbar.Button
           icon="ITEMS.GRID"
           title="Customize Main View"
