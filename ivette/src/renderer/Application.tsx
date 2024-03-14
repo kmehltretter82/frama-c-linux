@@ -35,7 +35,7 @@ import * as Sidebar from './Sidebar';
 import * as Actions from './Actions';
 import * as Controller from './Controller';
 import * as Lab from './Laboratory';
-import * as Ext from './Extensions';
+import * as State from 'ivette/state';
 import { TOOLBAR, STATUSBAR } from 'ivette';
 import * as IvettePrefs from 'ivette/prefs';
 import './loader';
@@ -52,8 +52,8 @@ export default function Application(): JSX.Element {
   const [viewbar, flipViewbar] =
     Dome.useFlipSettings('frama-c.viewbar.unfold', true);
 
-  const ToolBar = Ext.useChildren(TOOLBAR);
-  const StatusBar = Ext.useChildren(STATUSBAR);
+  const ToolBar = State.useChildren(TOOLBAR);
+  const StatusBar = State.useChildren(STATUSBAR);
 
   return (
     <Vfill>

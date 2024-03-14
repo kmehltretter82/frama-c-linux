@@ -37,7 +37,7 @@ import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
 import * as Ivette from 'ivette';
 import { compId, LayoutPosition, VIEW, COMPONENT, GROUP } from 'ivette';
-import * as Ext from './Extensions';
+import * as State from 'ivette/state';
 
 /* -------------------------------------------------------------------------- */
 /* --- LabView State                                                      --- */
@@ -804,7 +804,7 @@ const paneActions: Actions = { dock: true, undock: false, close: true };
 
 function Pane(props: PaneProps): JSX.Element | null {
   const { compId } = props;
-  const component = Ext.useElement(COMPONENT, compId);
+  const component = State.useElement(COMPONENT, compId);
   const onLayout = React.useCallback(
     (evt) => openLayoutMenu(compId, paneActions, evt),
     [compId]
@@ -920,7 +920,7 @@ function ViewItem(props: ViewItemProps): JSX.Element {
 }
 
 function ViewSection(): JSX.Element {
-  const views = Ext.useElements(VIEW);
+  const views = State.useElements(VIEW);
   const [{ tabs, tabKey, sideView, stack }] = States.useGlobalState(LAB);
   const items = views.map((view) => {
     const { id } = view;
@@ -1019,7 +1019,7 @@ interface GroupSectionProps extends Ivette.ItemProps {
 function GroupSection(props: GroupSectionProps): JSX.Element | null {
   const { id, label, title, filter } = props;
   const settings = 'ivette.sidebar.group.' + id;
-  const components = Ext.useElements(COMPONENT).filter(filter) ?? [];
+  const components = State.useElements(COMPONENT).filter(filter) ?? [];
   const [{ panels, docked, sideComp, stack }] = States.useGlobalState(LAB);
   const layout = stack[0] ?? defaultLayout;
   const items = components.map((comp) => {
@@ -1059,7 +1059,7 @@ const Sandbox: Ivette.ItemProps = {
 };
 
 function ViewBar(): JSX.Element {
-  const groups = Ext.useElements(GROUP);
+  const groups = State.useElements(GROUP);
   const allGroups = groups.concat(Sandbox);
 
   return (
@@ -1098,7 +1098,7 @@ interface DockItemProps {
 
 function DockItem(props: DockItemProps): JSX.Element | null {
   const { compId, visible, position } = props;
-  const comp = Ext.useElement(COMPONENT, compId);
+  const comp = State.useElement(COMPONENT, compId);
   if (comp === undefined) return null;
   const label = comp.label ?? compId;
   const icon = 'QSPLIT.' + position;
@@ -1167,7 +1167,7 @@ interface TabViewProps {
 function TabView(props: TabViewProps): JSX.Element | null {
   const { tab, tabKey } = props;
   const { viewId, custom, key } = tab;
-  const view = Ext.useElement(VIEW, viewId);
+  const view = State.useElement(VIEW, viewId);
   if (!view) return null;
   const selected = key === tabKey;
   const top = tab.stack[0] ?? defaultLayout;

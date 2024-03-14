@@ -33,7 +33,7 @@ import React from 'react';
 import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
-import * as Ext from 'ivette@ext';
+import * as State from 'ivette/state';
 import * as Mode from 'ivette@mode';
 
 /* -------------------------------------------------------------------------- */
@@ -61,7 +61,7 @@ export interface ContentProps extends ItemProps {
 /* -------------------------------------------------------------------------- */
 
 /** @ignore */
-export const GROUP = new Ext.ElementRack<ItemProps>();
+export const GROUP = new State.ElementRack<ItemProps>();
 
 /** Defines a group of components.
 
@@ -116,7 +116,7 @@ export interface ViewLayoutProps extends ItemProps {
 }
 
 /** @ignore */
-export const VIEW = new Ext.ElementRack<ViewLayoutProps>();
+export const VIEW = new State.ElementRack<ViewLayoutProps>();
 
 /** Register a new View. */
 export function registerView(view: ViewLayoutProps): void {
@@ -138,7 +138,7 @@ export interface ComponentProps extends ContentProps {
 }
 
 /** @ignore */
-export const COMPONENT = new Ext.ElementRack<ComponentProps>();
+export const COMPONENT = new State.ElementRack<ComponentProps>();
 
 /**
    Register the given Ivette Component.
@@ -210,13 +210,13 @@ export interface ToolProps {
 }
 
 /** @ignore */
-export const SIDEBAR = new Ext.ElementRack<SidebarProps>();
+export const SIDEBAR = new State.ElementRack<SidebarProps>();
 
 /** @ignore */
-export const TOOLBAR = new Ext.ElementRack<ToolProps>();
+export const TOOLBAR = new State.ElementRack<ToolProps>();
 
 /** @ignore */
-export const STATUSBAR = new Ext.ElementRack<ToolProps>();
+export const STATUSBAR = new State.ElementRack<ToolProps>();
 
 export function registerSidebar(sidebar: SidebarProps): void {
   SIDEBAR.register(sidebar);
