@@ -30,8 +30,8 @@ open Eval
 module type Forward_Evaluation = sig
   type value
   type valuation
-  type context
-  val evaluate: subdivided:bool -> context -> valuation ->
+  type environment
+  val evaluate: subdivided:bool -> environment -> valuation ->
     exp -> (valuation * value) evaluated
 end
 
@@ -45,11 +45,11 @@ module Make
   : sig
 
     val evaluate:
-      Eva.context -> Valuation.t -> subdivnb:int ->
+      Eva.environment -> Valuation.t -> subdivnb:int ->
       exp -> (Valuation.t * Value.t) evaluated
 
     val reduce_by_enumeration:
-      Eva.context -> Valuation.t -> exp -> bool -> Valuation.t or_bottom
+      Eva.environment -> Valuation.t -> exp -> bool -> Valuation.t or_bottom
   end
 
 

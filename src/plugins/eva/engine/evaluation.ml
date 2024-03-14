@@ -1084,14 +1084,14 @@ module Make
   (* These two modules could be implemented as mutually recursive, to avoid
      the reference for the oracle given to the domains. *)
   module Forward_Evaluation = struct
-    type nonrec context = recursive_environment
-    let evaluate ~subdivided env valuation expr =
+    type environment = recursive_environment
+    let evaluate ~subdivided environment valuation expr =
       let open Evaluated.Operators in
       cache := valuation;
-      let root = not subdivided && env.root in
-      let subdivided = subdivided || env.subdivided in
-      let env = { env with root ; subdivided } in
-      let+ value, _ = root_forward_eval env expr in
+      let root = not subdivided && environment.root in
+      let subdivided = subdivided || environment.subdivided in
+      let environment = { environment with root ; subdivided } in
+      let+ value, _ = root_forward_eval environment expr in
       !cache, value
   end
 
