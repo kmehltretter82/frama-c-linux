@@ -20,9 +20,9 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* --------------------------------------------------------------------------*/
-/* --- Display Interaction                                                ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Display Interaction                                                --- */
+/* -------------------------------------------------------------------------- */
 
 /**
    @packageDocumentation
@@ -30,7 +30,7 @@
  */
 
 import React from 'react';
-import { VIEW, COMPONENT } from 'ivette';
+import { VIEW, COMPONENT, LayoutPosition } from 'ivette';
 import * as State from './state';
 import * as Laboratory from './laboratory';
 
@@ -44,7 +44,7 @@ export interface ItemProps {
  */
 export function ViemItem(props: ItemProps): JSX.Element | null {
   const { id, selected=false } = props;
-  const view = State.useElement(VIEW,id);
+  const view = State.useElement(VIEW, id);
   const state = Laboratory.useState();
   if (!view) return null;
   const status = Laboratory.getViewStatus(state, id);
@@ -62,7 +62,7 @@ export function ViemItem(props: ItemProps): JSX.Element | null {
  */
 export function ComponentItem(props: ItemProps): JSX.Element | null {
   const { id, selected=false } = props;
-  const comp = State.useElement(COMPONENT,id);
+  const comp = State.useElement(COMPONENT, id);
   const state = Laboratory.useState();
   if (!comp) return null;
   const status = Laboratory.getComponentStatus(state, id);
@@ -75,11 +75,54 @@ export function ComponentItem(props: ItemProps): JSX.Element | null {
   );
 }
 
+export interface GroupItemsProps {
+  id: string;
+  selected?: string;
+}
+
 /**
    A bundle of sidebar items for controlling an Ivette group of components.
  */
-export function GroupSection(props: ItemProps): JSX.Element | null {
-  return <>{props.id}</>;
+export function GroupItems(props: GroupItemsProps): JSX.Element | null {
+  const items =
+    State.useElements(COMPONENT)
+         .filter(Laboratory.inGroup(props))
+         .map(({ id }) => (
+           <ComponentItem
+             key={id}
+             id={id}
+             selected={id === props.selected} />
+         ));
+  return <>{items}</>;
 }
 
-/* --------------------------------------------------------------------------*/
+/** Switch display to specified view. */
+export function switchToView(id: string): void {
+  const view = VIEW.getElement(id);
+  if (view) Laboratory.applyView(view);
+}
+
+/** Show component. */
+export function showComponent(id: string, at?: LayoutPosition): void
+{
+  const comp = COMPONENT.getElement(id);
+  if (comp) Laboratory.applyComponent(comp, at);
+}
+
+/** Dock component. */
+export function dockComponent(id: string, at?: LayoutPosition): void
+{
+  const comp = COMPONENT.getElement(id);
+  if (comp) Laboratory.dockComponent(comp, at);
+}
+
+/** Component Status Hook. */
+export function useComponentStatus(
+  id: string | undefined
+): Laboratory.ComponentStatus
+{
+  const state = Laboratory.useState();
+  return Laboratory.getComponentStatus(state, id ?? '');
+}
+
+/* -------------------------------------------------------------------------- */

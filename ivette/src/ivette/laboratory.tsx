@@ -475,7 +475,7 @@ function restoreDefault(key: tabKey): void {
   }
 }
 
-function applyView(view: Ivette.ViewLayoutProps): void {
+export function applyView(view: Ivette.ViewLayoutProps): void {
   const state = LAB.getValue();
   const viewId = view.id;
   if (state.tabs.has(viewId))
@@ -521,7 +521,7 @@ function applyFavorite(
   }
 }
 
-function applyComponent(
+export function applyComponent(
   comp: Ivette.ComponentProps,
   at?: LayoutPosition
 ): void {
@@ -533,7 +533,7 @@ function applyComponent(
   LAB.setValue({ ...state, panels, stack });
 }
 
-function dockComponent(
+export function dockComponent(
   comp: Ivette.ComponentProps,
   at?: Ivette.LayoutPosition
 ): void
@@ -660,7 +660,7 @@ export function getComponentStatus(
 ): ComponentStatus
 {
   const layout = state.stack[0] ?? defaultLayout;
-  const position= getLayoutPosition(layout, compId);
+  const position = getLayoutPosition(layout, compId);
   const active = state.panels.has(compId);
   const docked = state.docked.has(compId);
   return { position, active, docked };
@@ -1054,9 +1054,9 @@ export function ComponentItem(props: ComponentItemProps): JSX.Element {
 
 interface ID { id: string }
 
-const inGroup = (group: ID) => (elt: ID) => elt.id.startsWith(group.id+'.');
-const groupOf = (elt: ID) => (group: ID) => elt.id.startsWith(group.id+'.');
-const inNoGroup = (groups: ID[]) => (elt: ID) => !groups.some(groupOf(elt));
+export const inGroup = (g: ID) => (e: ID) => e.id.startsWith(g.id+'.');
+export const groupOf = (e: ID) => (g: ID) => e.id.startsWith(g.id+'.');
+export const inNoGroup = (gs: ID[]) => (e: ID) => !gs.some(groupOf(e));
 
 interface GroupSectionProps extends Ivette.ItemProps {
   filter: (comp: ID) => boolean;
