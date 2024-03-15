@@ -22,6 +22,7 @@
 
 module L = Wp_parameters
 module P = Why3.Pmodule
+module T = Why3.Theory
 module F = Filepath.Normalized
 module W = Why3
 module WConf = Why3.Whyconf
@@ -33,11 +34,11 @@ let create_why3_env =
       W.Env.create_env (WConf.loadpath (WConf.get_main (WConf.read_config None)))
     end
 
-let rec get_ty_symbols_from_ty (tys : W.Ty.tysymbol) (tymap) =
+(* let rec get_ty_symbols_from_ty (tys : W.Ty.tysymbol) (tymap) =
   try W.Wstdlib.Mstr.find tymap tys
   with Not_found ->
     let ty = tys.tysymbol in
-    tymap <- Mty.add tys.tysymbol tymap;
+    tymap <- Mty.add tys.tysymbol tymap; *)
 
 
 let () =
@@ -54,21 +55,20 @@ let () =
            L.debug ~level:0 " + THY %s@." thy
         ) thys ;
 
-      let libs = L.Library.get () in
+      let _libs = L.Library.get () in
       let thys = L.Import.get () in
       let env = create_why3_env () in
       List.iter
       (fun thy ->
-         let ns = (P.read_module env (F.to_string_list libs) thy).mod_export in
-         let _t = List.map (fun (ity : W.Ity.itysymbol) -> ity.its_ts) (W.Wstdlib.Mstr.values (ns.ns_ts)) in
+        let _ns = (W.Env.read_theory env ["summodule"] "Sum").th_export in
+         let _t =  (W.Wstdlib.Mstr.values (_ns.ns_ts)) in
          List.iter (
           fun _ty ->
-            match W.Ty.ts_hash _ty with
-            | 1 -> L.debug "NoDef %s@." thy
-            | _ -> L.debug "Otr %s@." thy
+            L.debug "J'ai un TySymbol";
          ) _t;
       ) thys ;
-      (* let _ns = (P.read_module env (F.to_string_list libs) (List.hd thys)).mod_export in
+      (* let env = create_why3_env () in
+      let _ns = (W.Env.read_theory env ["summodule"] "Sum") in
       L.debug ""; *)
 
 
