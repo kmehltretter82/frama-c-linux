@@ -1,11 +1,10 @@
 [kernel] Parsing ghost_multiline_annot.c (with preprocessing)
-[kernel] ghost_multiline_annot.c:34: 
+[kernel] ghost_multiline_annot.c:35: 
   Ghost multi-line annotation not terminated:
-  Location: between lines 34 and 41
-  32    {
+  Location: between lines 35 and 41
   33      /*@ ghost
-  
   34          int x = 10;
+  
   35          /@ loop invariant x >= 0;
   36             loop assigns x;
   37             loop variant x;

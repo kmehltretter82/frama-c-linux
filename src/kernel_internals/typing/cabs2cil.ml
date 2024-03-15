@@ -127,11 +127,14 @@ let typeForInsertedVar: (Cil_types.typ -> Cil_types.typ) ref = ref (fun t -> t)
 
 let cabs_exp loc node = { expr_loc = loc; expr_node = node }
 
-let abort_context msg =
-  let pos = fst (Cil.CurrentLoc.get ()) in
+let abort_context ?loc msg =
+  let loc = match loc with
+    | None -> Cil.CurrentLoc.get()
+    | Some loc -> loc
+  in
   let append fmt =
     Format.pp_print_newline fmt ();
-    Errorloc.pp_context_from_file fmt pos
+    Errorloc.pp_context_from_file fmt loc
   in
   Kernel.abort ~current:true ~append msg
 
@@ -581,7 +584,8 @@ let check_aligned attrs =
    component [ci], and checks the alignment of aligned() attributes.
    This function is complemented by
    [process_pragmas_pack_align_field_attributes]. *)
-let process_pragmas_pack_align_comp_attributes ci cattrs =
+let process_pragmas_pack_align_comp_attributes loc ci cattrs =
+  let source = snd loc in
   match !current_packing_pragma, align_pragma_for_struct ci.corig_name with
   | None, None -> check_aligned cattrs
   | Some n, apragma ->
@@ -596,7 +600,7 @@ let process_pragmas_pack_align_comp_attributes ci cattrs =
            Drop existing "aligned" attributes, if there are invalid ones. *)
         if Cil.hasAttribute "packed" cattrs then (dropAttribute "aligned" cattrs)
         else begin
-          Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
+          Kernel.feedback ~source ~dkey:Kernel.dkey_typing_pragma
             "adding aligned(%a) attribute to comp '%s' due to packing pragma"
             Integer.pretty n ci.cname;
           addAttribute (Attr("aligned",[AInt n])) (dropAttribute "aligned" cattrs)
@@ -605,7 +609,7 @@ let process_pragmas_pack_align_comp_attributes ci cattrs =
         (* The largest aligned wins with GCC. Don't know
            with other compilers. *)
         let align = Integer.max n local in
-        Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
+        Kernel.feedback ~source ~dkey:Kernel.dkey_typing_pragma
           "setting aligned(%a) attribute to comp '%s' due to packing pragma"
           Integer.pretty align ci.cname;
         addAttribute (Attr("aligned",[AInt align]))
@@ -631,6 +635,7 @@ let process_pragmas_pack_align_comp_attributes ci cattrs =
      the minimum of both is taken into account (note that, in GCC, if a field
      has 2 alignment directives, it is the maximum of those that is taken). *)
 let process_pragmas_pack_align_field_attributes fi fattrs cattr =
+  Cil.CurrentLoc.set fi.floc;
   match !current_packing_pragma, align_pragma_for_struct fi.forig_name with
   | None, None -> check_aligned fattrs
   | Some n, apragma ->
@@ -2753,7 +2758,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
          prototypes. Logic specifications refer to the varinfo in this table. *)
       begin
         match vi.vtype with
-        | TFun (_,Some formals , _, _ ) ->
+        | TFun (_,Some formals , _, _) ->
           (try
              let old_formals_env = getFormalsDecl oldvi in
              List.iter2
@@ -2777,7 +2782,12 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                formals;
            with
            | Invalid_argument _ ->
-             abort_context "Inconsistent formals" ;
+             abort_context
+               "Function %a redeclared with incompatible formals \
+                (original declaration was at %a)"
+               Cil_datatype.Varinfo.pretty vi
+               Cil_datatype.Location.pretty oldloc
+             ;
            | Not_found ->
              Cil.setFormalsDecl oldvi vi.vtype)
         | _ -> ()
@@ -2942,7 +2952,10 @@ let rec setOneInit this o preinit =
     let idx, (* Index in the current comp *)
         restoff (* Rest offset *) =
       match o with
-      | Index({enode = Const(CInt64(i,_,_))}, off) -> to_integer i, off
+      | NoOffset -> assert false
+      | Index({enode = Const(CInt64(i,_,_));eloc}, off) ->
+        CurrentLoc.set eloc;
+        to_integer i, off
       | Field (f, off) ->
         (* Find the index of the field *)
         let rec loop (idx: int) = function
@@ -2958,7 +2971,9 @@ let rec setOneInit this o preinit =
           | _ :: restf -> loop (idx + 1) restf
         in
         loop 0 (Option.value ~default:[] f.fcomp.cfields), off
-      | _ -> abort_context "setOneInit: non-constant index"
+      | Index({ eloc },_) ->
+        CurrentLoc.set eloc;
+        abort_context "setOneInit: non-constant index"
     in
     let pMaxIdx, pArray =
       match this  with
@@ -3359,6 +3374,7 @@ let integerArrayLength (leno: exp option) : int =
     try lenOfArray leno
     with
     | LenOfArray cause ->
+      Cil.CurrentLoc.set len.eloc;
       abort_context
         "Array length %a is %a: no explicit initializer allowed."
         Cil_printer.pp_exp len Cil.pp_incorrect_array_length cause
@@ -4089,7 +4105,7 @@ let rec nested_call e =
    a struct-returning call. *)
 let contains_temp_subarray = ref false
 
-let rec doSpecList ghost (suggestedAnonName: string)
+let rec doSpecList loc ghost (suggestedAnonName: string)
     (* This string will be part of
      * the names for anonymous
      * structures and enums  *)
@@ -4270,7 +4286,7 @@ let rec doSpecList ghost (suggestedAnonName: string)
         if n <> "" then n else anonStructName "struct" suggestedAnonName in
       (* Use the (non-cv, non-name) attributes in !attrs now *)
       let a = extraAttrs @ (getTypeAttrs ()) in
-      makeCompType ghost true n' ~norig:n nglist (doAttributes ghost a)
+      makeCompType loc ghost true n' ~norig:n nglist (doAttributes ghost a)
 
     | [Cabs.Tunion (n, None, _)] -> (* A reference to a union *)
       if n = "" then
@@ -4282,7 +4298,7 @@ let rec doSpecList ghost (suggestedAnonName: string)
         if n <> "" then n else anonStructName "union" suggestedAnonName in
       (* Use the attributes now *)
       let a = extraAttrs @ (getTypeAttrs ()) in
-      makeCompType ghost false n' ~norig:n nglist (doAttributes ghost a)
+      makeCompType loc ghost false n' ~norig:n nglist (doAttributes ghost a)
 
     | [Cabs.Tenum (n, None, _)] -> (* Just a reference to an enum *)
       if n = "" then
@@ -4441,7 +4457,7 @@ let rec doSpecList ghost (suggestedAnonName: string)
       t'
 
     | [Cabs.TtypeofT (specs, dt)] ->
-      doOnlyType ghost specs dt
+      doOnlyType loc ghost specs dt
 
     | l ->
       abort_context
@@ -4588,9 +4604,9 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
           ACons(n', ae')
         end
       | Cabs.EXPR_SIZEOF e -> ASizeOfE (ae e)
-      | Cabs.TYPE_SIZEOF (bt, dt) -> ASizeOf (doOnlyType ghost bt dt)
+      | Cabs.TYPE_SIZEOF (bt, dt) -> ASizeOf (doOnlyType loc ghost bt dt)
       | Cabs.EXPR_ALIGNOF e -> AAlignOfE (ae e)
-      | Cabs.TYPE_ALIGNOF (bt, dt) -> AAlignOf (doOnlyType ghost bt dt)
+      | Cabs.TYPE_ALIGNOF (bt, dt) -> AAlignOf (doOnlyType loc ghost bt dt)
       | Cabs.BINARY(Cabs.AND, aa1, aa2) ->
         ABinOp(LAnd, ae aa1, ae aa2)
       | Cabs.BINARY(Cabs.OR, aa1, aa2) ->
@@ -4890,7 +4906,7 @@ and doType (ghost:bool) isFuncArg
       (* Make the argument as for a formal *)
       let doOneArg argl_length is_ghost (s, (n, ndt, a, cloc)) : varinfo =
         let ghost = is_ghost || ghost in
-        let s' = doSpecList ghost n s in
+        let s' = doSpecList cloc ghost n s in
         let vi = makeVarInfoCabs ~ghost ~isformal:true ~isglobal:false
             (convLoc cloc) s' (n,ndt,a) in
         if isVoidType vi.vtype then begin
@@ -5048,8 +5064,8 @@ and isVariableSizedArray ghost (dt: Cabs.decl_type)
   | None -> None
   | Some (se, e) -> Some (dt', se, e)
 
-and doOnlyType ghost (specs: Cabs.spec_elem list) (dt: Cabs.decl_type) : typ =
-  let bt',sto,inl,attrs = doSpecList ghost "" specs in
+and doOnlyType loc ghost (specs: Cabs.spec_elem list) (dt: Cabs.decl_type) : typ =
+  let bt',sto,inl,attrs = doSpecList loc ghost "" specs in
   if sto <> NoStorage || inl then
     Kernel.error ~once:true ~current:true "Storage or inline specifier in type only";
   let tres, nattr =
@@ -5060,7 +5076,7 @@ and doOnlyType ghost (specs: Cabs.spec_elem list) (dt: Cabs.decl_type) : typ =
   tres
 
 
-and makeCompType ghost (isstruct: bool)
+and makeCompType loc ghost (isstruct: bool)
     (n: string)
     ~(norig: string)
     (nglist: Cabs.field_group list)
@@ -5080,16 +5096,17 @@ and makeCompType ghost (isstruct: bool)
   let addFieldGroup ~last:last_group (flds : fieldinfo list)
       ((s: Cabs.spec_elem list), (nl: (Cabs.name * Cabs.expression option) list)) =
     (* Do the specifiers exactly once *)
-    let sugg = match nl with
-      | [] -> ""
-      | ((n, _, _, _), _) :: _ -> n
+    let sugg,loc = match nl with
+      | [] -> "",CurrentLoc.get()
+      | ((n, _, _, loc), _) :: _ -> n,loc
     in
-    let bt, sto, inl, attrs = doSpecList ghost sugg s in
+    let bt, sto, inl, attrs = doSpecList loc ghost sugg s in
     (* Do the fields *)
     let addFieldInfo ~last:last_field (flds : fieldinfo list)
         (((n,ndt,a,cloc) : Cabs.name), (widtho : Cabs.expression option))
       : fieldinfo list =
       let source = fst cloc in
+      Cil.CurrentLoc.set cloc;
       if sto <> NoStorage || inl then
         Kernel.error ~once:true ~source "Storage or inline not allowed for fields";
       let allowZeroSizeArrays = Cil.gccMode () || Cil.msvcMode () in
@@ -5206,7 +5223,8 @@ and makeCompType ghost (isstruct: bool)
             (* abort and not error, as this circularity could lead
                to infinite recursion... *)
             abort_context
-              "type %s %s is circular"
+              "field %s declaration contains a circular reference to type %s %s"
+              fname
               (if comp.cstruct then "struct" else "union")
               comp.cname;
           end else
@@ -5303,7 +5321,7 @@ and makeCompType ghost (isstruct: bool)
 
   (*  ignore (E.log "makeComp: %s: %a\n" comp.cname d_attrlist a); *)
   let a = Cil.addAttributes comp.cattr a in
-  comp.cattr <- process_pragmas_pack_align_comp_attributes comp a;
+  comp.cattr <- process_pragmas_pack_align_comp_attributes loc comp a;
   let res = TComp (comp, []) in
   (* Create a typedef for this one *)
   cabsPushGlobal (GCompTag (comp, CurrentLoc.get ()));
@@ -5313,11 +5331,11 @@ and makeCompType ghost (isstruct: bool)
   (* Now create a typedef with just this type *)
   res
 
-and preprocessCast ghost (specs: Cabs.specifier)
+and preprocessCast loc ghost (specs: Cabs.specifier)
     (dt: Cabs.decl_type)
     (ie: Cabs.init_expression)
   : Cabs.specifier * Cabs.decl_type * Cabs.init_expression =
-  let typ = doOnlyType ghost specs dt in
+  let typ = doOnlyType loc ghost specs dt in
   (* If we are casting to a union type then we have to treat this as a
    * constructor expression. This is to handle the gcc extension that allows
    * cast from a type of a field to the type of the union  *)
@@ -5728,7 +5746,7 @@ and doExp local_env
       end
 
     | Cabs.TYPE_SIZEOF (bt, dt) ->
-      let typ = doOnlyType local_env.is_ghost bt dt in
+      let typ = doOnlyType loc local_env.is_ghost bt dt in
       fail_if_incompatible_sizeof ~ensure_complete:true "sizeof" typ;
       let res = new_exp ~loc (SizeOf typ) in
       finishExp [] (unspecified_chunk empty) res theMachine.typeOfSizeOf
@@ -5755,7 +5773,7 @@ and doExp local_env
       finishExp [] scope_chunk size theMachine.typeOfSizeOf
 
     | Cabs.TYPE_ALIGNOF (bt, dt) ->
-      let typ = doOnlyType local_env.is_ghost bt dt in
+      let typ = doOnlyType loc local_env.is_ghost bt dt in
       fail_if_incompatible_sizeof ~ensure_complete:true "alignof" typ;
       let res = new_exp ~loc (AlignOf typ) in
       finishExp [] (unspecified_chunk empty) res theMachine.typeOfSizeOf
@@ -5777,9 +5795,9 @@ and doExp local_env
         theMachine.typeOfSizeOf
 
     | Cabs.CAST ((specs, dt), ie) ->
-      let s', dt', ie' = preprocessCast local_env.is_ghost specs dt ie in
+      let s', dt', ie' = preprocessCast loc local_env.is_ghost specs dt ie in
       (* We know now that we can do s' and dt' many times *)
-      let typ = doOnlyType local_env.is_ghost s' dt' in
+      let typ = doOnlyType loc local_env.is_ghost s' dt' in
       let what' =
         match what with
         | AExp (Some _) -> AExp (Some typ)
@@ -5806,7 +5824,7 @@ and doExp local_env
              * variable  *)
             let newvar = "__constr_expr_" ^ string_of_int (!constrExprId) in
             incr constrExprId;
-            let spec_res = doSpecList local_env.is_ghost "" s' in
+            let spec_res = doSpecList loc local_env.is_ghost "" s' in
             let se1 =
               if !scopes == [] then begin
                 (* This is a global.  Mark the new vars as static *)
@@ -5814,7 +5832,7 @@ and doExp local_env
                   let t, _, inl, attrs = spec_res in
                   t, Static, inl, attrs
                 in
-                ignore (createGlobal local_env.is_ghost None spec_res'
+                ignore (createGlobal loc local_env.is_ghost None spec_res'
                           ((newvar, dt', [], loc), ie'));
                 (unspecified_chunk empty)
               end else
@@ -7344,6 +7362,7 @@ and doExp local_env
       | Ok control_t ->
         let has_default, assocs =
           List.fold_left (fun (has_default, acc) (type_name, expr) ->
+              let loc = expr.expr_loc in
               match type_name with
               | None -> (* default *)
                 if has_default then
@@ -7351,7 +7370,7 @@ and doExp local_env
                     "multiple default clauses in _Generic selection";
                 true, ((None, expr) :: acc)
               | Some (spec, dt) ->
-                let t = doOnlyType ghost spec dt in
+                let t = doOnlyType loc ghost spec dt in
                 if not (Cil.isCompleteType t) then
                   abort_context
                     "generic association with incomplete type '%a'"
@@ -7888,7 +7907,7 @@ and doFullExp local_env const e what =
   (* there is a sequence point after a full exp *)
   empty @@@ (se', ghost), e',t
 
-and doInitializer local_env (vi: varinfo) (inite: Cabs.init_expression)
+and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
   (* Return the accumulated chunk, the initializer and the new type (might be
    * different for arrays), together with the lvals read during evaluation of
    * the initializer (for local intialization)
@@ -7914,7 +7933,7 @@ and doInitializer local_env (vi: varinfo) (inite: Cabs.init_expression)
   let acc, preinit, restl =
     let so = makeSubobj vi vi.vtype NoOffset in
     let asconst = if vi.vglob then CConst else CNoConst in
-    doInit local_env asconst Extlib.nop NoInitPre so
+    doInit loc local_env asconst Extlib.nop NoInitPre so
       (unspecified_chunk empty) [ (Cabs.NEXT_INIT, inite) ]
   in
   if restl <> [] then
@@ -7953,14 +7972,17 @@ and doInitializer local_env (vi: varinfo) (inite: Cabs.init_expression)
    – preinit corresponding to the complete initialization
    – the list of unused initializers if any (should be empty most of the time)
 *)
-and doInit local_env asconst add_implicit_ensures preinit so acc initl =
+and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
+  CurrentLoc.set loc;
+  let source = fst loc in
   let ghost = local_env.is_ghost in
   let whoami fmt = Cil_printer.pp_lval fmt (Var so.host, so.soOff) in
   let initl1 =
     match initl with
     | (Cabs.NEXT_INIT,
-       Cabs.SINGLE_INIT ({ expr_node = Cabs.CAST ((s, dt), ie)} as e)) :: rest ->
-      let s', dt', ie' = preprocessCast ghost s dt ie in
+       Cabs.SINGLE_INIT
+         ({ expr_node = Cabs.CAST ((s, dt), ie); expr_loc} as e)) :: rest ->
+      let s', dt', ie' = preprocessCast expr_loc ghost s dt ie in
       (Cabs.NEXT_INIT,
        Cabs.SINGLE_INIT
          ({expr_node = Cabs.CAST ((s', dt'), ie'); expr_loc = e.expr_loc}))
@@ -7973,9 +7995,12 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     match initl1 with
     | (what,
        Cabs.SINGLE_INIT
-         ({expr_node = Cabs.CAST ((specs, dt), Cabs.COMPOUND_INIT ci)})) :: rest ->
-      let s', dt', _ie' = preprocessCast ghost specs dt (Cabs.COMPOUND_INIT ci) in
-      let typ = doOnlyType ghost s' dt' in
+         ({expr_node = Cabs.CAST ((specs, dt), Cabs.COMPOUND_INIT ci);
+           expr_loc})) :: rest ->
+      let s', dt', _ie' =
+        preprocessCast expr_loc ghost specs dt (Cabs.COMPOUND_INIT ci)
+      in
+      let typ = doOnlyType expr_loc ghost s' dt' in
       if Typ.equal
           (Cil.typeDeepDropAllAttributes typ)
           (Cil.typeDeepDropAllAttributes so.soTyp)
@@ -8055,14 +8080,14 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     so'.stack <- [InArray(so'.curOff, bt, leno, ref 0)];
     normalSubobj so';
     let acc', preinit', initl' =
-      doInit local_env asconst add_implicit_ensures preinit so' acc charinits in
+      doInit loc local_env asconst add_implicit_ensures preinit so' acc charinits in
     if initl' <> [] then
-      Kernel.warning ~current:true
+      Kernel.warning ~source
         "Too many initializers for character array %t" whoami;
     (* Advance past the array *)
     advanceSubobj so;
     (* Continue *)
-    doInit local_env asconst add_implicit_ensures preinit' so acc' restil
+    doInit loc local_env asconst add_implicit_ensures preinit' so acc' restil
   (* If we are at an array of WIDE characters and the initializer is a
    * WIDE string literal (optionally enclosed in braces) then explore
    * the WIDE string into characters *)
@@ -8128,7 +8153,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     so'.stack <- [InArray(so'.curOff, bt, leno, ref 0)];
     normalSubobj so';
     let acc', preinit', initl' =
-      doInit local_env asconst add_implicit_ensures preinit so' acc charinits
+      doInit loc local_env asconst add_implicit_ensures preinit so' acc charinits
     in
     if initl' <> [] then
       (* sm: see above regarding ISO 6.7.8 para 14, which is not implemented
@@ -8139,7 +8164,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     (* Advance past the array *)
     advanceSubobj so;
     (* Continue *)
-    doInit local_env asconst add_implicit_ensures preinit' so acc' restil
+    doInit loc local_env asconst add_implicit_ensures preinit' so acc' restil
   (* If we are at an array and we see a single initializer then it must
    * be one for the first element *)
   | TArray(bt, leno, _), (Cabs.NEXT_INIT, Cabs.SINGLE_INIT _oneinit) :: _restil  ->
@@ -8148,12 +8173,12 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     so.stack <- InArray(so.soOff, bt, leno, ref 0) :: so.stack;
     normalSubobj so;
     (* Start over with the fields *)
-    doInit local_env asconst add_implicit_ensures preinit so acc allinitl
+    doInit loc local_env asconst add_implicit_ensures preinit so acc allinitl
   (* An incomplete structure with any initializer is an error. *)
   | TComp (comp, _), _ :: restil when comp.cfields = None ->
     Kernel.error ~current:true ~once:true
       "variable `%s' has initializer but incomplete type" so.host.vname;
-    doInit local_env asconst add_implicit_ensures preinit so acc restil
+    doInit loc local_env asconst add_implicit_ensures preinit so acc restil
   (* If we are at a composite and we see a single initializer of the same
    * type as the composite then grab it all. If the type is not the same
    * then we must go on and try to initialize the fields *)
@@ -8171,12 +8196,12 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
       (* Advance to the next subobject *)
       advanceSubobj so;
       let se = acc @@@ (se, ghost) in
-      doInit local_env asconst add_implicit_ensures preinit so se restil
+      doInit loc local_env asconst add_implicit_ensures preinit so se restil
     end else begin (* Try to initialize fields *)
       let toinit = fieldsToInit comp None in
       so.stack <- InComp(so.soOff, comp, toinit) :: so.stack;
       normalSubobj so;
-      doInit local_env asconst add_implicit_ensures preinit so acc allinitl
+      doInit loc local_env asconst add_implicit_ensures preinit so acc allinitl
     end
 
   (* A scalar with a single initializer *)
@@ -8196,7 +8221,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     (* Move on *)
     advanceSubobj so;
     let se = acc @@@ (se,ghost) in
-    doInit local_env asconst add_implicit_ensures preinit' so se restil
+    doInit loc local_env asconst add_implicit_ensures preinit' so se restil
   (* An array with a compound initializer. The initializer is for the
    * array elements *)
   | TArray (bt, leno, _), (Cabs.NEXT_INIT, Cabs.COMPOUND_INIT initl) :: restil ->
@@ -8219,7 +8244,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         acc, preinit', []
       | _ ->
         doInit
-          local_env asconst add_implicit_ensures preinit so' acc initl
+          loc local_env asconst add_implicit_ensures preinit so' acc initl
     in
     if initl' <> [] then
       Kernel.warning ~current:true
@@ -8227,7 +8252,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     (* Advance past the array *)
     advanceSubobj so;
     (* Continue *)
-    doInit local_env asconst add_implicit_ensures preinit' so acc' restil
+    doInit loc local_env asconst add_implicit_ensures preinit' so acc' restil
   (* We have a designator that tells us to select the matching union field.
    * This is to support a GCC extension *)
   | TComp(ci, _) as targ,
@@ -8252,14 +8277,14 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
     (* If this is a cast from union X to union X *)
     if Typ.equal t'noattr (Cil.typeDeepDropAllAttributes targ) then
       doInit
-        local_env asconst add_implicit_ensures preinit so acc
+        loc local_env asconst add_implicit_ensures preinit so acc
         [(Cabs.NEXT_INIT, Cabs.SINGLE_INIT oneinit)]
     else
       (* If this is a GNU extension with field-to-union cast find the field *)
       let fi = findField (Option.value ~default:[] ci.cfields) in
       (* Change the designator and redo *)
       doInit
-        local_env asconst add_implicit_ensures preinit so acc
+        loc local_env asconst add_implicit_ensures preinit so acc
         [Cabs.INFIELD_INIT (fi.fname, Cabs.NEXT_INIT), Cabs.SINGLE_INIT oneinit]
 
   (* A structure with a composite initializer. We initialize the fields*)
@@ -8277,14 +8302,14 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         let preinit' = setOneInit preinit so'.curOff (empty_preinit()) in
         acc, preinit', []
       | _ ->
-        doInit local_env asconst add_implicit_ensures preinit so' acc initl
+        doInit loc local_env asconst add_implicit_ensures preinit so' acc initl
     in
     if initl' <> [] then
       Kernel.warning ~current:true "Too many initializers for structure";
     (* Advance past the structure *)
     advanceSubobj so;
     (* Continue *)
-    doInit local_env asconst add_implicit_ensures preinit' so acc' restil
+    doInit loc local_env asconst add_implicit_ensures preinit' so acc' restil
   (* A scalar with a initializer surrounded by a number of braces *)
   | t, (Cabs.NEXT_INIT, next) :: restil ->
     begin
@@ -8306,7 +8331,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         (* Move on *)
         advanceSubobj so;
         let se = acc @@@ (se, ghost) in
-        doInit local_env asconst add_implicit_ensures preinit' so se restil
+        doInit loc local_env asconst add_implicit_ensures preinit' so se restil
       with Not_found ->
         abort_context
           "scalar value (of type %a) initialized by compound initializer"
@@ -8337,6 +8362,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
           end
 
         | Cabs.ATINDEX_INIT(idx, whatnext) -> begin
+            CurrentLoc.set idx.expr_loc;
             match unrollType so.soTyp with
             | TArray (bt, leno, _) ->
               let ilen = integerArrayLength leno in
@@ -8391,6 +8417,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
         in
         let doidxs = add_reads ~ghost idxs'.eloc rs doidxs in
         let doidxe = add_reads ~ghost idxe'.eloc re doidxe in
+        Cil.CurrentLoc.set (fst idxs'.eloc, snd idxe'.eloc);
         if isNotEmpty doidxs || isNotEmpty doidxe then
           abort_context "Range designators are not constants";
         let first, last =
@@ -8416,11 +8443,11 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
             :: loop (i + 1)
         in
         doInit
-          local_env asconst add_implicit_ensures preinit so acc (loop first)
+          loc local_env asconst add_implicit_ensures preinit so acc (loop first)
       | Cabs.NEXT_INIT -> (* We have not found any RANGE *)
         let acc' = addressSubobj so what acc in
         doInit
-          local_env asconst add_implicit_ensures preinit so acc'
+          loc local_env asconst add_implicit_ensures preinit so acc'
           ((Cabs.NEXT_INIT, ie) :: restil)
     in
     expandRange (fun x -> x) what
@@ -8429,7 +8456,7 @@ and doInit local_env asconst add_implicit_ensures preinit so acc initl =
 
 (* Create and add to the file (if not already added) a global. Return the
  * varinfo *)
-and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * Cabs.attribute list))
+and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * Cabs.attribute list))
     (((n,ndt,a,cloc), inite) : Cabs.init_name) : varinfo =
   Kernel.debug ~dkey:Kernel.dkey_typing_global "createGlobal: %s" n;
   (* If the global is a Frama-C builtin, set the generated flag *)
@@ -8481,7 +8508,9 @@ and createGlobal ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * C
     if inite = Cabs.NO_INIT then
       None
     else
-      let se, ie', et, _ = doInitializer (ghost_local_env ghost) vi inite in
+      let se, ie', et, _ =
+        doInitializer loc (ghost_local_env ghost) vi inite
+      in
       (* Maybe we now have a better type?  Use the type of the
        * initializer only if it really differs from the type of
        * the variable. *)
@@ -8715,7 +8744,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
   (* Maybe we have a function prototype in local scope. Make it global. We
    * do this even if the storage is Static *)
   | _ when isProto ndt ->
-    let vi = createGlobal ghost None specs init_name in
+    let vi = createGlobal loc ghost None specs init_name in
     (* Add it to the environment to shadow previous decls *)
     addLocalToEnv ghost n (EnvVar vi);
     LocalFuncHook.apply vi;
@@ -8760,7 +8789,9 @@ and createLocal ghost ((_, sto, _, _) as specs)
       if inite = Cabs.NO_INIT then
         None
       else begin
-        let se, ie', et, _ = doInitializer (ghost_local_env ghost) vi inite in
+        let se, ie', et, _ =
+          doInitializer loc (ghost_local_env ghost) vi inite
+        in
         (* Maybe we now have a better type?  Use the type of the
          * initializer only if it really differs from the type of
          * the variable. *)
@@ -8789,7 +8820,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     then
       Kernel.error ~current:true
         "\'extern\' local variable cannot have an initializer";
-    let vi = createGlobal ghost None specs init_name in
+    let vi = createGlobal loc ghost None specs init_name in
     (* Add it to the local environment to ensure that it shadows previous
      * local variables *)
     addLocalToEnv ghost n (EnvVar vi);
@@ -8919,7 +8950,9 @@ and createLocal ghost ((_, sto, _, _) as specs)
       (* TODO: if vi occurs in se4, this is not a real initialization. *)
       vi.vdefined <- true;
       contains_temp_subarray := false;
-      let se4, ie', et, r = doInitializer (ghost_local_env ghost) vi inite in
+      let se4, ie', et, r =
+        doInitializer loc (ghost_local_env ghost) vi inite
+      in
       let se4 = cleanup_autoreference vi se4 in
       (* Fix the length *)
       if Cil.isUnsizedArrayType vi.vtype && Cil.isSizedArrayType et
@@ -9007,7 +9040,8 @@ and doAliasFun ghost vtype (thisname:string) (othername:string)
 (* Do one declaration *)
 and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
   | Cabs.DECDEF (logic_spec, (s, nl), loc) ->
-    CurrentLoc.set (convLoc loc);
+    let cloc = convLoc loc in
+    CurrentLoc.set cloc;
     (* Do the specifiers exactly once *)
     let sugg =
       match nl with
@@ -9015,10 +9049,11 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
       | ((n, _, _, _), _) :: _ -> n
     in
     let ghost = local_env.is_ghost in
-    let spec_res = doSpecList ghost sugg s in
+    let spec_res = doSpecList cloc ghost sugg s in
     (* Do all the variables and concatenate the resulting statements *)
     let doOneDeclarator (acc: chunk) (name: init_name) =
       let (n,ndt,a,l),_ = name in
+      CurrentLoc.set l;
       if isglobal then begin
         let bt,_,_,attrs = spec_res in
         let vtype, nattr =
@@ -9026,14 +9061,14 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
             (AttrName false) bt (Cabs.PARENTYPE(attrs, ndt, a)) in
         (match filterAttributes "alias" nattr with
          | [] -> (* ordinary prototype. *)
-           ignore (createGlobal local_env.is_ghost logic_spec spec_res name)
+           ignore (createGlobal l local_env.is_ghost logic_spec spec_res name)
          (*  E.log "%s is not aliased\n" name *)
          | [Attr("alias", [AStr othername])] ->
            if not (isFunctionType vtype) || local_env.is_ghost then begin
              Kernel.warning ~current:true
                "%a: CIL only supports attribute((alias)) for C functions."
                Cil_printer.pp_location (CurrentLoc.get ());
-             ignore (createGlobal ghost logic_spec spec_res name)
+             ignore (createGlobal l ghost logic_spec spec_res name)
            end else
              doAliasFun ghost vtype n othername (s, (n,ndt,a,l)) loc
          | _ ->
@@ -9162,7 +9197,7 @@ and doDecl local_env (isglobal: bool) : Cabs.definition -> chunk = function
        * We'll do it later *)
       transparentUnionArgs := [];
 
-      let bt,sto,inl,attrs = doSpecList local_env.is_ghost n specs in
+      let bt,sto,inl,attrs = doSpecList idloc local_env.is_ghost n specs in
       !currentFunctionFDEC.svar.vinline <- inl;
       let ftyp, funattr =
         doType local_env.is_ghost false
@@ -9552,7 +9587,9 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
       "block-level typedefs currently unsupported;@ \
        trying to convert it to a global-level typedef.@ \
        Note that this may lead to incoherent error messages.";
-  let bt, sto, inl, attrs = doSpecList ghost (suggestAnonName nl) specs in
+  let bt, sto, inl, attrs =
+    doSpecList (CurrentLoc.get()) ghost (suggestAnonName nl) specs
+  in
   if sto <> NoStorage || inl then
     Kernel.error ~once:true ~current:true
       "Storage or inline specifier not allowed in typedef";
@@ -9651,7 +9688,9 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
   List.iter createTypedef nl
 
 and doOnlyTypedef ghost (specs: Cabs.spec_elem list) : unit =
-  let bt, sto, inl, attrs = doSpecList ghost "" specs in
+  let bt, sto, inl, attrs =
+    doSpecList (CurrentLoc.get()) ghost "" specs
+  in
   if sto <> NoStorage || inl then
     Kernel.error ~once:true ~current:true
       "Storage or inline specifier not allowed in typedef";
@@ -10178,7 +10217,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
         match var with
         | None -> Catch_all
         | Some (t,(n,ndt,a,ldecl)) ->
-          let spec = doSpecList ghost n t in
+          let spec = doSpecList ldecl ghost n t in
           let vi =
             makeVarInfoCabs
               ~ghost ~isformal:false ~isglobal:false ldecl spec (n,ndt,a)

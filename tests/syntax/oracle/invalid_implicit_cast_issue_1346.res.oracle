@@ -5,6 +5,6 @@
   12    
   13    void f(FILE *file) {
   14      (*(T*)&B) = 0; // error: implicit cast: cannot cast from int to T
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      ^
   15    }
 [kernel] Frama-C aborted: invalid user input.

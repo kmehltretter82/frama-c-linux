@@ -89,14 +89,15 @@ and isJUSTBASE = function
   | PARENTYPE (_, d, _) -> isJUSTBASE d
   | _ -> false
 
-let announceFunctionName ((n, decl, _, _):name) =
+let announceFunctionName ((n, decl, _, loc):name) =
   !Lexerhack.add_identifier n;
   (* Start a context that includes the parameter names and the whole body.
    * Will pop when we finish parsing the function body *)
   !Lexerhack.push_context ();
   (try findProto decl
    with NoProto ->
-     Errorloc.parse_error "Cannot find the prototype in a function definition");
+     Errorloc.parse_error
+       ~loc "Cannot find the prototype in a function definition");
   currentFunctionName := n
 
 let check_funspec_abrupt_clauses fname spec =
@@ -106,8 +107,8 @@ let check_funspec_abrupt_clauses fname spec =
 	(function
 	| (Cil_types.Normal | Cil_types.Exits),_ -> ()
 	| (Cil_types.Breaks | Cil_types.Continues | Cil_types.Returns),
-          { Logic_ptree.tp_statement = { lexpr_loc = (loc,_)}} ->
-          Errorloc.parse_error ~source:loc
+          { Logic_ptree.tp_statement = { lexpr_loc = loc}} ->
+          Errorloc.parse_error ~loc
             "Specification of function %s can only contain ensures or \
                  exits post-conditions" fname)
 	bhv.Logic_ptree.b_post_cond)
@@ -206,18 +207,18 @@ let doOldParDecl (names: string list)
   let args = List.map findOneName names in
   (args, isva)
 
-let int64_to_char value =
+let int64_to_char ~loc value =
   if (Int64.compare value (Int64.of_int 255) > 0) ||
     (Int64.compare value Int64.zero < 0) then
-    Errorloc.parse_error "integral literal 0x%Lx too big" value
+    Errorloc.parse_error ~loc "integral literal 0x%Lx too big" value
   else
     Char.chr (Int64.to_int value)
 
 (* takes a not-nul-terminated list, and converts it to a string. *)
-let intlist_to_string str =
+let intlist_to_string ~loc str =
   let buffer = Buffer.create 64 in
   let add_char c =
-    Buffer.add_char buffer (int64_to_char c)
+    Buffer.add_char buffer (int64_to_char ~loc c)
   in
   let add_char_list l = List.iter add_char l in
   List.iter add_char_list str ;
@@ -276,13 +277,14 @@ let transformOffsetOf (speclist, dtype) member =
   let rec replaceBase e =
     let node = match e.expr_node with
       | VARIABLE field ->
-	  MEMBEROFPTR (castExpr, field)
+        MEMBEROFPTR (castExpr, field)
       | MEMBEROF (base, field) ->
-	  MEMBEROF (replaceBase base, field)
+        MEMBEROF (replaceBase base, field)
       | INDEX (base, index) ->
-	  INDEX (replaceBase base, index)
+        INDEX (replaceBase base, index)
       | _ ->
-	Errorloc.parse_error "malformed offset expression in offsetof macro"
+        Errorloc.parse_error ~loc:e.expr_loc
+          "malformed offset expression in offsetof macro"
     in { e with expr_node = node }
   in
   let memberExpr = replaceBase member in
@@ -479,35 +481,41 @@ global:
 | EXTERN string_constant declaration
     { LINKAGE (fst $2, (*handleLoc*) (snd $2), [ $3 ]) }
 | EXTERN string_constant LBRACE globals RBRACE
-    { LINKAGE (fst $2, (*handleLoc*) (snd $2),
-                 List.map
-                   (fun (x,y) ->
-                      if x then
-                        Errorloc.parse_error "invalid ghost in extern linkage \
-                                              specification"
-		      else y)
-                   $4)  }
+    { LINKAGE (
+      fst $2, (*handleLoc*) (snd $2),
+      List.map
+        (fun (x,y) ->
+           if x then
+             let loc = Cabshelper.get_definitionloc y in
+             Errorloc.parse_error ~loc
+               "invalid ghost in extern linkage specification"
+           else y)
+      $4)
+    }
 | ASM LPAREN string_constant RPAREN SEMICOLON
                                         { GLOBASM (fst $3, (*handleLoc*) $1) }
 | pragma                                { $1 }
 /* (* Old-style function prototype. This should be somewhere else, like in
     * "declaration". For now we keep it at global scope only because in local
     * scope it looks too much like a function call  *) */
-| IDENT LPAREN old_parameter_list_ne RPAREN old_pardef_list SEMICOLON
-    {
-      let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
-      (* Convert pardecl to new style *)
-      let pardecl, isva = doOldParDecl $3 $5 in
-      (* Make the function declarator *)
-      doDeclaration None loc []
-        [(($1, PROTO(JUSTBASE, pardecl,[],isva),
-           ["FC_OLDSTYLEPROTO",[]], loc), NO_INIT)]
-    }
-| IDENT LPAREN RPAREN SEMICOLON {
-  let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
-  doDeclaration None loc []
-    [(($1, PROTO(JUSTBASE,[],[],false),
-       ["FC_OLDSTYLEPROTO",[]], loc), NO_INIT)]
+| f=IDENT LPAREN prms=old_parameter_list_ne RPAREN
+     decls=old_pardef_list SEMICOLON
+     {
+       let dloc = Cil_datatype.Location.of_lexing_loc $loc in
+       let floc = Cil_datatype.Location.of_lexing_loc $loc(f) in
+       (* Convert pardecl to new style *)
+       let pardecl, isva = doOldParDecl prms decls in
+       (* Make the function declarator *)
+       doDeclaration None dloc []
+         [((f, PROTO(JUSTBASE, pardecl,[],isva),
+            ["FC_OLDSTYLEPROTO",[]], floc), NO_INIT)]
+     }
+| f=IDENT LPAREN RPAREN SEMICOLON {
+  let dloc = Cil_datatype.Location.of_lexing_loc $loc in
+  let floc = Cil_datatype.Location.of_lexing_loc $loc(f) in
+  doDeclaration None dloc []
+    [((f, PROTO(JUSTBASE,[],[],false),
+       ["FC_OLDSTYLEPROTO",[]], floc), NO_INIT)]
 }
 ;
 
@@ -759,7 +767,9 @@ constant:
 string_constant:
 /* Now that we know this constant isn't part of a wstring, convert it
    back to a string for easy viewing. */
-    string_list                         { intlist_to_string (fst $1), snd $1 }
+    string_list                         {
+      let loc = Cil_datatype.Location.of_lexing_loc $loc in
+      intlist_to_string ~loc (fst $1), snd $1 }
 ;
 
 string_list:
@@ -979,7 +989,7 @@ statement:
           let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
           match $4 with
           | [] -> (* should not happen if grammar is written correctly *)
-            Errorloc.parse_error "empty statement after label"
+            Errorloc.parse_error ~loc "empty statement after label"
           | s :: others -> no_ghost [LABEL($1,s,loc)] @ others }
 
 |   CASE expression COLON annotated_statement
@@ -1061,32 +1071,40 @@ ghost_parameter:
 ;
 
 declaration:                                /* ISO 6.7.*/
-    decl_spec_list init_declarator_list SEMICOLON
-      { doDeclaration None ((snd $1)) (fst $1) $2 }
-|   decl_spec_list SEMICOLON
-      { if !Lexerhack.is_typedef () then begin
-          let source =
-            Cil_datatype.Position.of_lexing_pos $startpos($1)
-          in
-          Kernel.warning ~source ~wkey:Kernel.wkey_unnamed_typedef
-            "typedef without a name"
+    specif=decl_spec_list decls=init_declarator_list SEMICOLON
+  {
+    let loc = Cil_datatype.Location.of_lexing_loc $loc in
+    doDeclaration None loc (fst specif) decls
+  }
+|   decls=decl_spec_list SEMICOLON
+      {
+        let loc = Cil_datatype.Location.of_lexing_loc $loc in
+        if !Lexerhack.is_typedef () then begin
+          let source = fst loc in
+          let wkey = Kernel.wkey_unnamed_typedef in
+          Kernel.warning ~source ~wkey "typedef without a name"
         end;
         !Lexerhack.reset_typedef();
-        doDeclaration None ((snd $1)) (fst $1) []
+        doDeclaration None loc (fst decls) []
       }
-|   SPEC decl_spec_list init_declarator_list SEMICOLON
-          { doDeclaration (Some $1) ((snd $2)) (fst $2) $3 }
-|   SPEC decl_spec_list SEMICOLON
-      { if !Lexerhack.is_typedef () then begin
+|   spec=SPEC specif=decl_spec_list decls=init_declarator_list SEMICOLON
+          {
+            let loc = Cil_datatype.Location.of_lexing_loc $loc in
+            doDeclaration (Some spec) loc (fst specif) decls
+          }
+|   spec=SPEC specif=decl_spec_list SEMICOLON
+      {
+        let loc = Cil_datatype.Location.of_lexing_loc $loc in
+        if !Lexerhack.is_typedef () then begin
           let source =
-            Cil_datatype.Position.of_lexing_pos $startpos($2)
+            Cil_datatype.Position.of_lexing_pos $startpos(specif)
           in
-          Kernel.warning ~source ~wkey:Kernel.wkey_unnamed_typedef
-            "typedef without a name"
+          let wkey = Kernel.wkey_unnamed_typedef in
+          Kernel.warning ~source ~wkey "typedef without a name"
         end;
         !Lexerhack.reset_typedef();
-        doDeclaration (Some $1) ((snd $2)) (fst $2) [] }
-|   static_assert_declaration
+        doDeclaration (Some spec) loc (fst specif) [] }
+|   static_assert_declaration SEMICOLON
       { let (e, m, loc) = $1 in STATIC_ASSERT (e, m, loc) }
 ;
 
@@ -1109,7 +1127,8 @@ generic_selection: /* ISO C11 6.5.1.1 */
       }
 |   GENERIC LPAREN assignment_expression RPAREN
       {
-        Errorloc.parse_error
+        let loc = Cil_datatype.Location.of_lexing_loc $loc in
+        Errorloc.parse_error ~loc
           "_Generic requires at least one generic association";
       }
 
@@ -1442,12 +1461,14 @@ pointer_opt:
 ;
 
 type_name: /* (* ISO 6.7.6 *) */
-  decl_spec_list abstract_decl { let d, a = $2 in
-                                 if a <> [] then
-                                   Errorloc.parse_error
-                                     "attributes in type name";
-                                 (fst $1, d)
-                               }
+  specif=decl_spec_list name=abstract_decl {
+    let d, a = name in
+    if a <> [] then begin
+      let loc = Cil_datatype.Location.of_lexing_loc ($loc(name)) in
+      Errorloc.parse_error ~loc "attributes in type name"
+    end;
+    (fst specif, d)
+  }
 | decl_spec_list               { (fst $1, JUSTBASE) }
 ;
 abstract_decl: /* (* ISO 6.7.6. *) */
@@ -1556,9 +1577,7 @@ cvspec:
     {
       let annot, loc = $1 in
       if String.compare annot "\\ghost" = 0 then begin
-        let start = $startpos in
-        let source = Cil_datatype.Position.of_lexing_pos start in
-        Errorloc.parse_error ~source "Use of \\ghost out of ghost code"
+        Errorloc.parse_error ~loc "Use of \\ghost out of ghost code"
       end else
         SpecCV(CV_ATTRIBUTE_ANNOT annot), loc
     }
@@ -1834,8 +1853,14 @@ asmattr:
 |    CONST asmattr                      { ("const", []) :: $2 }
 ;
 asmtemplate:
-    one_string                         { [intlist_to_string [fst $1]] }
-|   one_string asmtemplate             { intlist_to_string [fst $1] :: $2 }
+    line=one_string                         {
+      let loc = Cil_datatype.Location.of_lexing_loc $loc in
+      [intlist_to_string ~loc [fst line]]
+    }
+|   line=one_string rest=asmtemplate             {
+  let loc = Cil_datatype.Location.of_lexing_loc $loc(line) in
+  intlist_to_string ~loc [fst line] :: rest
+}
 ;
 asmoutputs:
   /* empty */           { None }

@@ -4,7 +4,7 @@
   64    
   65    #ifdef INIT_DESIGNATOR2
   66    int arr3[1] = { [9999999999999999999U] = 42 };
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         ^^^^^^^^^^^^^^^^^^^^
   67    #endif
   68
 [kernel] Frama-C aborted: invalid user input.

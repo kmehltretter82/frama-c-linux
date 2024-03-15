@@ -4,7 +4,7 @@
   32    #ifdef T2
   33    void f() {
   34      --x;
-        ^^^^^^
+          ^^^
   35    }
   36    #endif
 [kernel] Frama-C aborted: invalid user input.

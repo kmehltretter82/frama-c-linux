@@ -4,7 +4,7 @@
   51    #ifdef T5
   52    void f(const int* x) {
   53      *x = 1;
-        ^^^^^^^^^
+          ^^^^^^
   54    }
   55    #endif
 [kernel] Frama-C aborted: invalid user input.

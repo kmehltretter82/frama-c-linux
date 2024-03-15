@@ -6,7 +6,7 @@
   24    void func(int e) {
   25      // error: assert must be a macro, not a function
   26      execute_handler(&(assert), e < 0);
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            ^^^^^^
   27    }
   28
 [kernel] Frama-C aborted: invalid user input.
