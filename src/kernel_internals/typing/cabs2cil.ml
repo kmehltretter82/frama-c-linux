@@ -2948,6 +2948,12 @@ let empty_preinit() =
 
 (* Set an initializer *)
 let rec setOneInit this o preinit =
+  let open Current_loc.Operators in
+  let<?> UpdatedCurrentLoc =
+    match o with
+    | Index (e, _) -> Some e.eloc
+    | _ -> None
+  in
   match o with
   | NoOffset -> preinit
   | _ ->
@@ -2974,8 +2980,7 @@ let rec setOneInit this o preinit =
         in
         loop 0 (Option.value ~default:[] f.fcomp.cfields), off
       | Index({ eloc },_) ->
-        CurrentLoc.set eloc;
-        abort_context "setOneInit: non-constant index"
+        abort_context ~loc:eloc "setOneInit: non-constant index"
     in
     let pMaxIdx, pArray =
       match this  with
@@ -3376,8 +3381,7 @@ let integerArrayLength (leno: exp option) : int =
     try lenOfArray leno
     with
     | LenOfArray cause ->
-      Cil.CurrentLoc.set len.eloc;
-      abort_context
+      abort_context ~loc:len.eloc
         "Array length %a is %a: no explicit initializer allowed."
         Cil_printer.pp_exp len Cil.pp_incorrect_array_length cause
 
@@ -5097,9 +5101,10 @@ and makeCompType loc ghost (isstruct: bool)
 
   let addFieldGroup ~last:last_group (flds : fieldinfo list)
       ((s: Cabs.spec_elem list), (nl: (Cabs.name * Cabs.expression option) list)) =
+    let open Current_loc.Operators in
     (* Do the specifiers exactly once *)
     let sugg,loc = match nl with
-      | [] -> "",CurrentLoc.get()
+      | [] -> "", Current_loc.get()
       | ((n, _, _, loc), _) :: _ -> n,loc
     in
     let bt, sto, inl, attrs = doSpecList loc ghost sugg s in
@@ -5108,7 +5113,7 @@ and makeCompType loc ghost (isstruct: bool)
         (((n,ndt,a,cloc) : Cabs.name), (widtho : Cabs.expression option))
       : fieldinfo list =
       let source = fst cloc in
-      Cil.CurrentLoc.set cloc;
+      let<> UpdatedCurrentLoc = cloc in
       if sto <> NoStorage || inl then
         Kernel.error ~once:true ~source "Storage or inline not allowed for fields";
       let allowZeroSizeArrays = Cil.gccMode () || Cil.msvcMode () in
@@ -7974,7 +7979,8 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
    – the list of unused initializers if any (should be empty most of the time)
 *)
 and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
-  CurrentLoc.set loc;
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = loc in
   let source = fst loc in
   let ghost = local_env.is_ghost in
   let whoami fmt = Cil_printer.pp_lval fmt (Var so.host, so.soOff) in
@@ -8363,7 +8369,7 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
           end
 
         | Cabs.ATINDEX_INIT(idx, whatnext) -> begin
-            CurrentLoc.set idx.expr_loc;
+            let<> UpdatedCurrentLoc = idx.expr_loc in
             match unrollType so.soTyp with
             | TArray (bt, leno, _) ->
               let ilen = integerArrayLength leno in
@@ -8418,7 +8424,7 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
         in
         let doidxs = add_reads ~ghost idxs'.eloc rs doidxs in
         let doidxe = add_reads ~ghost idxe'.eloc re doidxe in
-        Cil.CurrentLoc.set (fst idxs'.eloc, snd idxe'.eloc);
+        let<> UpdatedCurrentLoc = (fst idxs'.eloc, snd idxe'.eloc) in
         if isNotEmpty doidxs || isNotEmpty doidxe then
           abort_context "Range designators are not constants";
         let first, last =
@@ -9055,11 +9061,11 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       | ((n, _, _, _), _) :: _ -> n
     in
     let ghost = local_env.is_ghost in
-    let spec_res = doSpecList cloc ghost sugg s in
+    let spec_res = doSpecList loc ghost sugg s in
     (* Do all the variables and concatenate the resulting statements *)
     let doOneDeclarator (acc: chunk) (name: init_name) =
       let (n,ndt,a,l),_ = name in
-      CurrentLoc.set l;
+      let<> UpdatedCurrentLoc = l in
       if isglobal then begin
         let bt,_,_,attrs = spec_res in
         let vtype, nattr =
@@ -9593,7 +9599,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
        trying to convert it to a global-level typedef.@ \
        Note that this may lead to incoherent error messages.";
   let bt, sto, inl, attrs =
-    doSpecList (CurrentLoc.get()) ghost (suggestAnonName nl) specs
+    doSpecList (Current_loc.get()) ghost (suggestAnonName nl) specs
   in
   if sto <> NoStorage || inl then
     Kernel.error ~once:true ~current:true
@@ -9694,7 +9700,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
 
 and doOnlyTypedef ghost (specs: Cabs.spec_elem list) : unit =
   let bt, sto, inl, attrs =
-    doSpecList (CurrentLoc.get()) ghost "" specs
+    doSpecList (Current_loc.get()) ghost "" specs
   in
   if sto <> NoStorage || inl then
     Kernel.error ~once:true ~current:true
