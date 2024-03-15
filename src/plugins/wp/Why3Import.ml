@@ -29,9 +29,11 @@ module WConf = Why3.Whyconf
 
 (* -------------------------------------------------------------------------- *)
 
-let create_why3_env =
+let create_why3_env loadpath =
     begin fun () ->
-      W.Env.create_env (WConf.loadpath (WConf.get_main (WConf.read_config None)))
+      let main = WConf.get_main (WConf.read_config None) in
+      let loadpathes = (WConf.loadpath (main))@loadpath  in
+      W.Env.create_env loadpathes
     end
 
 (* let rec get_ty_symbols_from_ty (tys : W.Ty.tysymbol) (tymap) =
@@ -54,19 +56,36 @@ let () =
         (fun thy ->
            L.debug ~level:0 " + THY %s@." thy
         ) thys ;
-
-      let _libs = L.Library.get () in
-      let thys = L.Import.get () in
-      let env = create_why3_env () in
+      let loadpath = (WConf.loadpath (WConf.get_main (WConf.read_config None))) in
       List.iter
-      (fun thy ->
-        let _ns = (W.Env.read_theory env ["summodule"] "Sum").th_export in
-         let _t =  (W.Wstdlib.Mstr.values (_ns.ns_ts)) in
-         List.iter (
-          fun _ty ->
-            L.debug "J'ai un TySymbol";
-         ) _t;
-      ) thys ;
+        (fun lpath ->
+           L.debug ~level:0 " Loadpath %s@." lpath
+        ) loadpath ;
+
+      let libs = L.Library.get () in
+      let _thys = L.Import.get () in
+      let env = create_why3_env (F.to_string_list libs) () in
+      let loadpath = W.Env.get_loadpath env in
+      List.iter
+        (fun lpath ->
+           L.debug ~level:0 " Loadpath %s@." lpath
+        ) loadpath ;
+      (* List.iter
+      (fun _thy ->
+        try let _ns = (W.Env.read_theory env ["vlist"] "NexistePas") in
+        W.Pretty.print_theory Format.std_formatter _ns;
+
+        with W.Env.LibraryNotFound paths ->
+          List.iter (
+            fun path ->
+              L.debug ~level:0 "[ %s @.]" path;
+          ) paths;
+
+        (* let _ns = (W.Env.read_theory env (F.to_string_list libs) thy).th_export in *)
+
+         (* let _t =  (W.Wstdlib.Mstr.values (_ns.ns_ts)) in
+         L.debug "Nombres de itys trucs : %d" (List.length _t); *)
+      ) thys ; *)
       (* let env = create_why3_env () in
       let _ns = (W.Env.read_theory env ["summodule"] "Sum") in
       L.debug ""; *)
