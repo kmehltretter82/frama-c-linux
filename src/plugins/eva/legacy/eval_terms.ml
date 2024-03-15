@@ -1652,7 +1652,7 @@ and eval_let_binding ~alarm_mode env logic_info =
     let var = logic_info.l_var_info in
     let env = bind_logic_vars env [var] in
     let var_term = Logic_const.tvar var in
-    reduce_by_left_relation ~alarm_mode env true var_term Req term
+    reduce_left_by_relation ~alarm_mode env true var_term Req term
   | _ -> unsupported "\\let binding"
 
 (* -------------------------------------------------------------------------- *)
@@ -2057,8 +2057,17 @@ and reduce_by_valid_string ~alarm_mode env positive ~wide ~access arg =
   in
   reduce_exact_location ~alarm_mode env reduce arg
 
+(* Reduces [tl] so that [\base_addr(tl) == \base_addr(tr)] holds. *)
+and reduce_left_by_base_addr_eq ~alarm_mode env tl tr =
+  let right = eval_term ~alarm_mode env tr in
+  let right_bases = Cvalue.V.get_bases right.eover in
+  (* Avoids reducing the null base. *)
+  let filter base = Base.is_null base || Base.SetLattice.mem base right_bases in
+  let reduce _typ = Cvalue.V.filter_base filter in
+  reduce_exact_location ~alarm_mode env reduce tl
+
 (* reduce [tl] so that [rl rel tr] holds *)
-and reduce_by_left_relation ~alarm_mode env positive tl rel tr =
+and reduce_left_by_relation ~alarm_mode env positive tl rel tr =
   let rtl = eval_term ~alarm_mode env tr in
   let comp = Eva_utils.conv_relation rel in
   let reduce typ cvalue =
@@ -2077,12 +2086,21 @@ and reduce_by_relation ~alarm_mode env positive t1 rel t2 =
   | TBinOp (bop, t1', t2'), Req when is_rel_binop bop && Cil.isLogicZero t2 ->
     reduce_by_relation ~alarm_mode env (not positive) t1' (rel_of_binop bop) t2'
   | _ ->
-    let env = reduce_by_left_relation ~alarm_mode env positive t1 rel t2 in
+    (* Special case for \base_addr. *)
+    let reduce_left env t1 rel t2 =
+      match t1.term_node with
+      | Tbase_addr (_lbl, t1) ->
+        if rel = Req && positive || rel = Rneq && not positive
+        then reduce_left_by_base_addr_eq ~alarm_mode env t1 t2
+        else env
+      | _ -> reduce_left_by_relation ~alarm_mode env positive t1 rel t2
+    in
+    let env = reduce_left env t1 rel t2 in
     let sym_rel = match rel with
       | Rgt -> Rlt | Rlt -> Rgt | Rle -> Rge | Rge -> Rle
       | Req -> Req | Rneq -> Rneq
     in
-    reduce_by_left_relation ~alarm_mode env positive t2 sym_rel t1
+    reduce_left env t2 sym_rel t1
 
 (* if you add something here, update [known_predicates] above also
    (and of course [eval_known_papp] below).
