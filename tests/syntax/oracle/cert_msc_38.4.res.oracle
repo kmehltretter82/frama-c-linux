@@ -6,7 +6,7 @@
   45    
   46    #ifdef TEST_VACOPY
   47    void (*test2)() = &(va_copy);
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            ^^^^^^^
   48    #endif
   49
 [kernel] Frama-C aborted: invalid user input.

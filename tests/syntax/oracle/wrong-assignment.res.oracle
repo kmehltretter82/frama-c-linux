@@ -4,6 +4,6 @@
   11    void d() {
   12      // this assignment should be rejected
   13      c.a = b;
-        ^^^^^^^^^^
+                ^
   14    }
 [kernel] Frama-C aborted: invalid user input.

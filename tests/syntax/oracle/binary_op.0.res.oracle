@@ -4,7 +4,7 @@
   9     
   10    #ifdef BITWISE
   11    int v(void) { return 0 & v; }
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                             ^^^^^
   12    #endif
   13
 [kernel] Frama-C aborted: invalid user input.

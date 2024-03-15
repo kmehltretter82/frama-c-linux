@@ -83,28 +83,28 @@
   packing pragma: restoring alignment to default (16)
 [kernel:typing:pragma] pragma-pack.c:135: 
   packing pragma: pushing alignment 16, setting alignment to 4
-[kernel:typing:pragma] pragma-pack.c:136: 
+[kernel:typing:pragma] pragma-pack.c:137: 
   adding aligned(1) attribute to field '__anonstruct_test1_1.i' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:136: 
+[kernel:typing:pragma] pragma-pack.c:138: 
   setting aligned(2) attribute to field '__anonstruct_test1_1.j' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:136: 
+[kernel:typing:pragma] pragma-pack.c:139: 
   adding aligned(4) attribute to field '__anonstruct_test1_1.k' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:136: 
+[kernel:typing:pragma] pragma-pack.c:140: 
   adding aligned(1) attribute to field '__anonstruct_test1_1.l' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:136: 
+[kernel:typing:pragma] pragma-pack.c:141: 
   adding aligned(4) attribute to comp '__anonstruct_test1_1' due to packing pragma
 [kernel:typing:pragma] pragma-pack.c:142: packing pragma: popped alignment 16
 [kernel:typing:pragma] pragma-pack.c:152: 
   packing pragma: pushing alignment 16, setting alignment to 1
-[kernel:typing:pragma] pragma-pack.c:153: 
+[kernel:typing:pragma] pragma-pack.c:154: 
   adding aligned(1) attribute to field '__anonstruct_test2_3.i' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:153: 
+[kernel:typing:pragma] pragma-pack.c:155: 
   setting aligned(1) attribute to field '__anonstruct_test2_3.j' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:153: 
+[kernel:typing:pragma] pragma-pack.c:156: 
   adding aligned(1) attribute to field '__anonstruct_test2_3.k' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:153: 
+[kernel:typing:pragma] pragma-pack.c:157: 
   adding aligned(1) attribute to field '__anonstruct_test2_3.l' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:153: 
+[kernel:typing:pragma] pragma-pack.c:158: 
   adding aligned(1) attribute to comp '__anonstruct_test2_3' due to packing pragma
 [kernel:typing:pragma] pragma-pack.c:159: packing pragma: popped alignment 16
 [kernel:typing:pragma] pragma-pack.c:169: 
@@ -112,53 +112,53 @@
 [kernel:typing:pragma] pragma-pack.c:176: packing pragma: popped alignment 16
 [kernel:typing:pragma] pragma-pack.c:186: 
   packing pragma: pushing alignment 16, setting alignment to 2
-[kernel:typing:pragma] pragma-pack.c:187: 
+[kernel:typing:pragma] pragma-pack.c:189: 
   setting aligned(2) attribute to field '__anonstruct_test4_7.j' due to packing pragma
 [kernel:typing:pragma] pragma-pack.c:193: packing pragma: popped alignment 16
 [kernel:typing:pragma] pragma-pack.c:203: 
   packing pragma: pushing alignment 16, setting alignment to 2
-[kernel:typing:pragma] pragma-pack.c:204: 
+[kernel:typing:pragma] pragma-pack.c:206: 
   setting aligned(2) attribute to field '__anonstruct_test5_9.j' due to packing pragma
 [kernel:typing:pragma] pragma-pack.c:210: packing pragma: popped alignment 16
 [kernel:typing:pragma] pragma-pack.c:220: 
   packing pragma: pushing alignment 16, setting alignment to 2
-[kernel:typing:pragma] pragma-pack.c:221: 
+[kernel:typing:pragma] pragma-pack.c:223: 
   setting aligned(2) attribute to field '__anonstruct_test6_11.j' due to packing pragma
 [kernel:typing:pragma] pragma-pack.c:227: packing pragma: popped alignment 16
 [kernel:typing:pragma] pragma-pack.c:237: 
   packing pragma: pushing alignment 16, setting alignment to 2
-[kernel:typing:pragma] pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:239: 
   adding aligned(1) attribute to field '__anonstruct_test7_13.i' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:240: 
   setting aligned(2) attribute to field '__anonstruct_test7_13.j' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:241: 
   adding aligned(1) attribute to field '__anonstruct_test7_13.q' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:242: 
   adding aligned(2) attribute to field '__anonstruct_test7_13.p' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:243: 
   adding aligned(2) attribute to field '__anonstruct_test7_13.k' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:244: 
   adding aligned(1) attribute to field '__anonstruct_test7_13.l' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:238: 
+[kernel:typing:pragma] pragma-pack.c:245: 
   adding aligned(2) attribute to comp '__anonstruct_test7_13' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:246: 
+[kernel:typing:pragma] pragma-pack.c:247: 
   adding aligned(2) attribute to field '__anonstruct_test7_2_14.i' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:246: 
+[kernel:typing:pragma] pragma-pack.c:248: 
   adding aligned(1) attribute to field '__anonstruct_test7_2_14.j' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:246: 
+[kernel:typing:pragma] pragma-pack.c:249: 
   adding aligned(2) attribute to field '__anonstruct_test7_2_14.k' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:246: 
+[kernel:typing:pragma] pragma-pack.c:250: 
   adding aligned(2) attribute to field '__anonstruct_test7_2_14.l' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:246: 
+[kernel:typing:pragma] pragma-pack.c:251: 
   adding aligned(2) attribute to comp '__anonstruct_test7_2_14' due to packing pragma
 [kernel:typing:pragma] pragma-pack.c:252: packing pragma: popped alignment 16
 [kernel:typing:pragma] pragma-pack.c:336: 
   packing pragma: pushing alignment 16, setting alignment to 1
-[kernel:typing:pragma] pragma-pack.c:337: 
+[kernel:typing:pragma] pragma-pack.c:338: 
   adding aligned(1) attribute to field '__anonstruct_barcode_bmp_t_18.len' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:337: 
+[kernel:typing:pragma] pragma-pack.c:339: 
   adding aligned(1) attribute to field '__anonstruct_barcode_bmp_t_18.data' due to packing pragma
-[kernel:typing:pragma] pragma-pack.c:337: 
+[kernel:typing:pragma] pragma-pack.c:340: 
   adding aligned(1) attribute to comp '__anonstruct_barcode_bmp_t_18' due to packing pragma
 [kernel:typing:pragma] pragma-pack.c:341: packing pragma: popped alignment 16
 [eva] Analyzing a complete application starting at main

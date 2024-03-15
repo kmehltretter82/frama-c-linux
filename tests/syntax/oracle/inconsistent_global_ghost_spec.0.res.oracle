@@ -5,7 +5,7 @@
   9     
   10    void function(void) ;
   11    /*@ ghost void function(void){ } */
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                       ^^^^^^^^
   12    
   13    void user(void){
 [kernel] Frama-C aborted: invalid user input.

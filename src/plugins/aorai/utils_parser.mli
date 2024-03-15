@@ -25,10 +25,6 @@
 
 (** utilities for parsing automaton's formulas *)
 
-(** returns the position corresponding to the
-    current character in the lexbuf. *)
-val current_loc: Lexing.lexbuf -> Cil_datatype.Position.t
-
 (** aborts the execution using current lexbuf position as source. *)
 val abort_current:
   Lexing.lexbuf -> ('a, Format.formatter, unit, 'b) format4 -> 'a

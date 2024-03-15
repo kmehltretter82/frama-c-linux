@@ -138,19 +138,24 @@ let setCurrentFile n =
     }
   end
 
-(* Prints the [pos.pos_lnum]-th line from file [pos.pos_fname],
-   plus up to [ctx] lines before and after [pos.pos_lnum] (if they exist),
-   similar to 'grep -C<ctx>'. The first line is numbered 1.
+(* Prints the line(s) between start_pos and pos,
+   plus up to [ctx] lines before and after (if they exist),
+   similar to 'grep -C<ctx>'.
    Most exceptions are silently caught and printing is stopped if they occur. *)
-let pp_context_from_file ?(ctx=2) ?start_line fmt pos =
+let pp_context_from_file ?(ctx=2) fmt (start_pos, pos) =
+  let open Filepath in
   try
-    let in_ch = open_in (pos.Filepath.pos_path :> string) in
+    let start_pos =
+      if Normalized.equal start_pos.pos_path pos.pos_path then start_pos
+      else pos
+    in
+    let in_ch = open_in (pos.pos_path :> string) in
     try
       begin
-        let first_error_line, last_error_line =
-          match start_line with
-          | None -> pos.Filepath.pos_lnum, pos.Filepath.pos_lnum
-          | Some l -> min l pos.Filepath.pos_lnum, max l pos.Filepath.pos_lnum
+        let first_error_line, start_char, last_error_line =
+          min start_pos.pos_lnum pos.pos_lnum,
+          (start_pos.pos_cnum - start_pos.pos_bol + 1),
+          max start_pos.pos_lnum pos.pos_lnum
         in
         (* The difference between the first and last error lines can be very
            large; in this case, we print only the first and last [error_ctx]
@@ -161,7 +166,6 @@ let pp_context_from_file ?(ctx=2) ?start_line fmt pos =
         let error_height = last_error_line - first_error_line + 1 in
         let compress_error = error_height > 2 * error_ctx + 1 + 2 in
         let i = ref 1 in
-        let error_line_len = ref 0 in
         try
           (* advance to line *)
           while !i < first_to_print do
@@ -187,7 +191,6 @@ let pp_context_from_file ?(ctx=2) ?start_line fmt pos =
                     !i <= last_error_line - error_ctx then
               () (* ignore line *)
             else begin
-              error_line_len := String.length line;
               Format.fprintf fmt "%-6d%s\n" !i line;
             end;
             incr i
@@ -197,9 +200,13 @@ let pp_context_from_file ?(ctx=2) ?start_line fmt pos =
           if last_error_line <> first_error_line then
             Format.fprintf fmt "\n"
           else begin
+            let len = pos.pos_cnum - pos.pos_bol - start_char + 1 in
+            (* output at least one '^' *)
+            let len = if len = 0 then 1 else len in
             let cursor =
               String.make 6 ' ' ^
-              String.make !error_line_len '^'
+              String.make (start_char - 1) ' ' ^
+              String.make len '^'
             in
             Format.fprintf fmt "%s\n" cursor
           end;
@@ -244,38 +251,37 @@ let pp_location fmt (pos_start, pos_end) =
     Format.fprintf fmt "Location: between %a and %a"
       pp_pos pos_start pp_pos pos_end
 
-let parse_error ?source msg =
+let parse_error ?loc msg =
   let current = Option.get !current in
-  let last_pos =
-    match source with
-    | None ->
-      Cil_datatype.Position.of_lexing_pos current.lexbuf.Lexing.lex_curr_p
-    | Some s -> s
-  in
   (* there are cases when we are called before menhir has requested at
      least two tokens, ending up in an assertion failure. Unfortunately,
      ErrorReports API does not allow us to check whether the buffer is
      empty or not.
   *)
+  let all_pos = Stack.create() in
   let () =
-    try ignore (MenhirLib.ErrorReports.last current.menhir_pos) with _ -> ()
-  in
-  let start_pos =
+    (* this is absolutely not a hack and used MenhirLib exactly as intended. *)
     try
-      let pos,_ =
+      let pp loc = Stack.push loc all_pos; "" in
+      ignore (MenhirLib.ErrorReports.show pp current.menhir_pos)
+    with _ -> ()
+  in
+  let loc =
+    match loc with
+    | Some loc -> loc
+    | None ->
+      if Stack.is_empty all_pos then
         Cil_datatype.Location.of_lexing_loc
-          (MenhirLib.ErrorReports.last current.menhir_pos)
-      in
-      if Cil_datatype.Position.compare pos last_pos <= 0 then pos
+          (current.lexbuf.Lexing.lex_start_p, current.lexbuf.Lexing.lex_curr_p)
       else
-        (* during interaction between C and ACSL parser, it might happen,
-           at least as long as we haven't completed the move to menhir for
-           ACSL, that the start_pos seen by menhir is after the current position
-           of the (shared) lexbuf. This would lead to confusing error messages,
-           so we drop the one from menhir.
-        *)
-        last_pos
-    with _ -> last_pos
+        let _,start_pos = Stack.pop all_pos in
+        let last_pos =
+          if Stack.is_empty all_pos then
+            current.lexbuf.Lexing.lex_start_p
+          else
+            fst (Stack.pop all_pos)
+        in
+        Cil_datatype.Location.of_lexing_loc (start_pos, last_pos)
   in
   let pretty_token fmt token =
     (* prints more detailed information around the erroneous token;
@@ -287,13 +293,13 @@ let parse_error ?source msg =
       Format.fprintf fmt ", before or at token: %s" token
   in
   Pretty_utils.ksfprintf (fun str ->
-      Kernel.feedback ~source:start_pos "%s:@." str
+      Kernel.feedback ~source:(fst loc) "%s:@." str
         ~append:(fun fmt ->
             Format.fprintf fmt "%a%a\n"
-              pp_location (start_pos, last_pos)
+              pp_location loc
               pretty_token (Lexing.lexeme current.lexbuf);
             Format.fprintf fmt "%a@."
-              (pp_context_from_file ~start_line:start_pos.Filepath.pos_lnum ~ctx:2) last_pos);
+              (pp_context_from_file ~ctx:2) loc);
       raise (Log.AbortError "kernel"))
     msg
 

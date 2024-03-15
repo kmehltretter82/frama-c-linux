@@ -4,7 +4,7 @@
   11      void (*p)(void) = &f ;
   12      p = 1 ;
   13      *p = 1 ;
-        ^^^^^^^^^^
+          ^^^^^^
   14      return 0 ;
   15      }
 [kernel] Frama-C aborted: invalid user input.

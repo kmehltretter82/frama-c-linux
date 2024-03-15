@@ -262,14 +262,14 @@ function addLayoutComponent(
   stack = stack.map(removeLayout(compId)).filter(isDefined);
   const top = stack[0] ?? defaultLayout;
   const layout = addLayout(top, compId, at);
-  return unstackLayout(layout, stack.slice(1));
+  return unstackLayout(layout, stack);
 }
 
 function removeLayoutComponent(stack: Layout[], compId: compId): Layout[]
 {
   stack = stack.map(removeLayout(compId)).filter(isDefined);
   const top = stack[0] ?? defaultLayout;
-  return unstackLayout(top, stack.slice(1));
+  return unstackLayout(top, stack);
 }
 
 function completeLayout(m: Layout): Layout
@@ -512,8 +512,10 @@ function applyFavorite(
   const tab = state.tabs.get(view.id);
   if (tab) {
     const custom = favorite ? 0 : -1;
-    const tabs = copyMap(state.tabs).set(tab.key, { ...tab, custom });
-    LAB.setValue({ ...state, tabs });
+    if (tab.custom !== custom) {
+      const tabs = copyMap(state.tabs).set(tab.key, { ...tab, custom });
+      LAB.setValue({ ...state, tabs });
+    }
   } else if (favorite) {
     const tabs = copyMap(state.tabs);
     newTab(tabs, view, 0);
@@ -591,28 +593,27 @@ Settings.onWindowSettings(() => {
   if (synchronize) {
     try {
       synchronize = false;
+      const state = LAB.getValue();
       const settings = Settings.getWindowSettings(
         'ivette.laboratory', jLabSettings, defaultSettings
       );
-      let gotoView: viewId | undefined = undefined;
+      let gotoView: viewId = '';
       settings.tabs.forEach((tab, index) => {
         const view = VIEW.getElement(tab.view);
         if (view !== undefined) {
           applyFavorite(view, true);
-          if (index === settings.tabIndex) gotoView = tab.view;
+          if (index === settings.tabIndex)
+            gotoView = tab.view;
         }
       });
       settings.dock.forEach(dock => {
         const comp = COMPONENT.getElement(dock.comp);
-        if (comp !== undefined)
+        if (comp !== undefined && !state.docked.has(comp.id))
           dockComponent(comp, dock.position);
       });
-      if (gotoView !== undefined) {
-        const state = LAB.getValue();
-        if (!state.tabKey) {
-          applyTab(gotoView);
-          setCurrentNone();
-        }
+      if (!state.tabKey && !gotoView) {
+        applyTab(gotoView);
+        setCurrentNone();
       }
     } finally {
       synchronize = true;
