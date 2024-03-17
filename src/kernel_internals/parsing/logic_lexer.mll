@@ -381,6 +381,7 @@ rule token = parse
      check_ext_plugin (fst cabsloc) plugin tok
      }
   | '\\' rIdentifier { bs_identifier lexbuf }
+  | rIdentifier ( "::" rIdentifier )+ { lex_error lexbuf "unexpected long identifier" }
   | rIdentifier       {
       let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
       let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
