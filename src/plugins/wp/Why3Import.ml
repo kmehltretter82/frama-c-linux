@@ -98,11 +98,11 @@ let () =
            L.debug ~level:0 " Loadpath %s@." lpath
         ) loadpath ;
       List.iter
-      (fun _thy ->
+      (fun (thy_n, thy_p) ->
         try
-        (* let _ns = (W.Env.read_theory env (F.to_string_list libs) _thy) in
-        W.Pretty.print_theory Format.std_formatter _ns; *)
-        L.debug ~level:0 "INTHY %s" _thy;
+        let _ns = (W.Env.read_theory env ([String.concat "." thy_p]) (thy_n))  in
+        W.Pretty.print_theory Format.std_formatter _ns;
+        L.debug ~level:0 "INTHY %s" thy_n;
 
         with W.Env.LibraryNotFound paths ->
           List.iter (
@@ -114,7 +114,7 @@ let () =
 
          (* let _t =  (W.Wstdlib.Mstr.values (_ns.ns_ts)) in
          L.debug "Nombres de itys trucs : %d" (List.length _t); *)
-      ) (extract_theory_name thys) ;
+      ) (extract_last_segments thys) ;
       (* let env = create_why3_env () in
       let _ns = (W.Env.read_theory env ["summodule"] "Sum") in
       L.debug ""; *)
