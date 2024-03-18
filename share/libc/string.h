@@ -499,6 +499,21 @@ extern size_t strlcat(char *restrict dest, const char *restrict src, size_t n);
 extern size_t strxfrm (char *restrict dest,
 		       const char *restrict src, size_t n);
 
+// Non-POSIX; GNU extension
+/*@
+  requires valid_haystack: \valid_read((char*)haystack + (0 .. haystacklen-1));
+  requires valid_needle: \valid_read((char*)needle + (0 .. needlelen-1));
+  assigns \result \from haystack,
+                        indirect:((char*)haystack)[0 .. haystacklen-1],
+                        indirect:((char*)needle)[0 .. needlelen-1];
+  ensures result_null_or_valid:
+    \result == \null || \valid_read((char*)\result);
+  ensures result_null_or_same_base:
+    \result == \null || \base_addr(\result) == \base_addr(haystack);
+*/
+extern void *memmem(const void *haystack, size_t haystacklen,
+             const void *needle, size_t needlelen);
+
 // Allocate strings
 
 /*@ requires valid_string_s: valid_read_string(s);

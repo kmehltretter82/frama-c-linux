@@ -174,5 +174,15 @@ int main(int argc, char **argv)
   rchr = memrchr(c, 'n', strlen(c));
   //@ check imprecise: rchr == \null;
 
+  char mm_haystack[] = { 'I', 'h', 'a', 'v', 'e', '\0', 'z', 'e', 'r', 'o' };
+  char mm_needle[] = { 'z', 'e', 'r', 'o' };
+  char *memm =
+    memmem(mm_haystack, sizeof(mm_haystack), mm_needle, sizeof(mm_needle));
+  //@ check imprecise: memm == mm_haystack + 6;
+  char mm_needle2[] = { '0' };
+  memm =
+    memmem(mm_haystack, sizeof(mm_haystack), mm_needle2, sizeof(mm_needle2));
+  //@ check imprecise: memm == \null;
+
   return 0;
 }
