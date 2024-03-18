@@ -63,6 +63,7 @@ parser.add_argument(
     metavar="FILE",
     default="build_commands.json",
     help="path to JBDB (default: build_commands.json)",
+    type=Path,
 )
 parser.add_argument(
     "--machdep", metavar="MACHDEP", help="analysis machdep (default: Frama-C's default)"
@@ -208,7 +209,7 @@ def rel_prefix(path: Path) -> str:
     # and use an absolute one.
     relp = os.path.relpath(path, start=dot_framac_dir)
     if relp.startswith(os.path.join("..", "..")):
-        return path
+        return str(path)
     else:
         return relp
 
