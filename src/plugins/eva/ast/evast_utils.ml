@@ -35,12 +35,6 @@ module ConversionToCil =
       let dependencies = [ Ast.self ]
     end)
 
-let undefined_location =
-  let l = { Cil_datatype.Position.unknown with
-            Filepath.pos_path = Datatype.Filepath.of_string "__eva__" }
-  in
-  l, l
-
 let rec to_cil_exp exp =
   match exp.origin with
   | Exp e -> e
@@ -62,7 +56,7 @@ and build_cil_exp node =
     | AddrOf (lv) -> AddrOf (to_cil_lval lv)
     | StartOf (lv) -> StartOf (to_cil_lval lv)
   in
-  Cil.new_exp ~loc:undefined_location exp_node
+  Cil.new_exp ~loc:Cil_datatype.Location.unknown exp_node
 
 and to_cil_unop op =
   match op with
