@@ -90,6 +90,7 @@ let unsupported_specifications =
     "strerror", "string.c";
     "strndup", "string.c";
     "unsetenv", "stdlib.c";
+    "vasprintf", "stdio.c";
     "wcsdup", "wchar.c";
   ]
 

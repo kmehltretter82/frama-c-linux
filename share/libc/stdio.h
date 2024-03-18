@@ -614,10 +614,25 @@ extern FILE *fmemopen(void *restrict buf, size_t size,
   assigns \result \from indirect:fmt[0 ..], indirect:__fc_heap_status;
   assigns *strp \from fmt[0 ..], indirect:__fc_heap_status;
   //missing: variadic arguments
-  ensures result_error_or_written_byes: \result == -1 || \result >= 0;
+  ensures result_error_or_written_bytes: \result == -1 || \result >= 0;
   allocates *strp;
 */
 int asprintf(char **strp, const char *fmt, ...);
+
+// GNU extension
+/*@
+  requires valid_strp: \valid(strp);
+  requires valid_fmt: valid_read_string(fmt);
+  assigns __fc_heap_status
+    \from indirect:fmt[0 ..], indirect:ap, __fc_heap_status;
+  assigns \result \from indirect:fmt[0 ..], indirect:__fc_heap_status;
+  assigns *strp \from fmt[0 ..], ap, indirect:__fc_heap_status;
+  //missing: variadic arguments
+  ensures result_error_or_written_bytes: \result == -1 || \result >= 0;
+  allocates *strp;
+*/
+extern int vasprintf(char **restrict strp, const char *restrict fmt,
+                     va_list ap);
 
 __END_DECLS
 

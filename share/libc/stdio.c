@@ -118,19 +118,24 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream) {
 // Non-POSIX; arbitrarily allocates between 1 and 256 bytes.
 // This stub is unsound in the general case, but enough for
 // many test cases.
-int asprintf(char **strp, const char *fmt, ...) {
-  va_list args;
-  va_start(args, fmt);
+int vasprintf(char **strp, const char *fmt, va_list ap) {
   size_t len = Frama_C_interval(1, 256);
   *strp = malloc(len);
   if (!*strp) {
-    va_end(args);
     return -1;
   }
   // Emulate writing to the string
   Frama_C_make_unknown(*strp, len - 1U);
   (*strp)[len - 1U] = 0;
   return len;
+}
+
+int asprintf(char **strp, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  int res = vasprintf(strp, fmt, args);
+  va_end(args);
+  return res;
 }
 
 char *fgets(char *restrict s, int size, FILE *restrict stream) {

@@ -21,9 +21,8 @@ int main() {
   fclose(stream);
 
   if (nondet) {
-    // Test asprintf without a C stub; the specification
-    // uses an unsupported 'allocates' clause, so 's' will
-    // point to invalid memory.
+    // asprintf's stub calls vasprintf's stub, so this test
+    // also works for vasprintf.
     char *s;
     int r = asprintf(&s, "bla %s", 42);
     if (r == -1) return 1;
