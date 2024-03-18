@@ -350,6 +350,14 @@ let rE = ['E''e']['+''-']? rD+
 let rP = ['P''p']['+''-']? rD+
 let rFS	= ('f'|'F'|'l'|'L'|'d'|'D')
 let rIS = ('u'|'U'|'l'|'L')*
+let rOP = [
+  '=' '<' '>' '~'
+  '+' '-' '*' '/' '\\' '%'
+  '!' '$' '&' '?' '@' '^' '.' ':' '|' '#'
+  '_' '\''
+  'a'-'z' 'A'-'Z' '0'-'9'
+  '[' ']' '{' '}'
+]
 let comment_line = "//" [^'\n']*
 let rIdentifier = rL (rL | rD)*
 
@@ -381,7 +389,8 @@ rule token = parse
      check_ext_plugin (fst cabsloc) plugin tok
      }
   | '\\' rIdentifier { bs_identifier lexbuf }
-  | rIdentifier ( "::" rIdentifier )+ { lex_error lexbuf "unexpected long identifier" }
+  | rIdentifier ( "::" rIdentifier )+ { LONGIDENT (lexeme lexbuf) }
+  | rIdentifier ( "::" rIdentifier )* "::(" rOP+ ")" { LONGIDENT(lexeme lexbuf)}
   | rIdentifier       {
       let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
       let cabsloc = Cil_datatype.Location.of_lexing_loc loc in

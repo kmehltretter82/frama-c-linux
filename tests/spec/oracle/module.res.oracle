@@ -1,5 +1,5 @@
 [kernel] Parsing module.i (no preprocessing)
 [kernel:annot-error] module.i:7: Warning: 
-  lexical error, unexpected long identifier
+  unbound logic function int::Int::add. Ignoring global annotation
 [kernel] User Error: warning annot-error treated as fatal error.
 [kernel] Frama-C aborted: invalid user input.

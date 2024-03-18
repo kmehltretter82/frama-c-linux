@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2024                                               */
+/*  Copyright (C) 2007-2023                                               */
 /*    CEA   (Commissariat à l'énergie atomique et aux énergies            */
 /*           alternatives)                                                */
 /*    INRIA (Institut National de Recherche en Informatique et en         */
@@ -254,7 +254,7 @@
 
 %token MODULE FUNCTION CONTRACT INCLUDE EXT_AT EXT_LET
 /* ACSL extension for external spec  file */
-%token <string> IDENTIFIER TYPENAME IDENTIFIER_EXT
+%token <string> LONGIDENT IDENTIFIER TYPENAME IDENTIFIER_EXT
 %token <bool*string> STRING_LITERAL
 %token <string> INT_CONSTANT
 %token <string> FLOAT_CONSTANT
@@ -874,6 +874,7 @@ ne_logic_type_list(tname):
 
 full_identifier:
 | id = identifier { id }
+| id = LONGIDENT { id }
 | ADMIT { "admit" }
 | ALLOCATES { "allocates" }
 | ASSERT { "assert" }
@@ -1182,7 +1183,7 @@ ne_decreases:
 ;
 
 variant:
-| lexpr FOR any_identifier { ($1, Some $3) }
+| lexpr FOR full_identifier { ($1, Some $3) }
 | lexpr                    { ($1, None) }
 ;
 
@@ -1453,8 +1454,8 @@ loop_grammar_extension:
 }
 ;
 
-/*** code annotations ***/
 
+/*** code annotations ***/
 beg_code_annotation:
 | FOR {}
 | ASSERT {}
@@ -1901,7 +1902,7 @@ post_cond:
 
 is_acsl_spec:
 | post_cond  { snd $1 }
-| EXT_CONTRACT { $1 }
+| EXT_CONTRACT   { $1 }
 | ASSIGNS    { "assigns" }
 | ALLOCATES  { "allocates" }
 | FREES      { "frees" }
@@ -1917,8 +1918,8 @@ is_acsl_spec:
 
 is_acsl_decl_or_code_annot:
 | EXT_CODE_ANNOT { $1 }
-| EXT_GLOBAL { $1 }
-| EXT_GLOBAL_BLOCK { $1 }
+| EXT_GLOBAL     { $1 }
+| EXT_GLOBAL_BLOCK     { $1 }
 | IDENTIFIER_EXT { $1 }
 | ASSUMES   { "assumes" }
 | ASSERT    { "assert" }
@@ -2013,6 +2014,7 @@ bs_keyword:
 
 wildcard:
 | any_identifier { () }
+| LONGIDENT { () }
 | bs_keyword { () }
 | AMP { () }
 | AND { () }
