@@ -373,6 +373,13 @@ let rec print_decl fmt d =
   | LDaxiomatic (s,d) ->
     fprintf fmt "@[<2>axiomatic@ %s@ {@\n%a@]@\n}" s
       (pp_list ~sep:"@\n" print_decl) d
+  | LDmodule (s,d) ->
+    fprintf fmt "@[<2>module@ %s@ {@\n%a@]@\n}" s
+      (pp_list ~sep:"@\n" print_decl) d
+  | LDimport (s,None) ->
+    fprintf fmt "@[<2>import@ %s;@]@\n}" s
+  | LDimport (s,Some a) ->
+    fprintf fmt "@[<2>import@ %s \\as %s;@]@\n}" s a
   | LDinvariant (s,e) ->
     fprintf fmt "@[<2>invariant@ %s:@ %a;@]" s print_lexpr e
   | LDtype_annot ty -> print_type_annot fmt ty
