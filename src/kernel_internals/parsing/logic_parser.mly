@@ -252,8 +252,8 @@
 /* Otherwise, the token will not be usable inside a contract.                */
 /*****************************************************************************/
 
-%token MODULE FUNCTION CONTRACT INCLUDE EXT_AT EXT_LET
-/* ACSL extension for external spec  file */
+%token EXT_SPEC_MODULE EXT_SPEC_FUNCTION EXT_SPEC_CONTRACT EXT_SPEC_INCLUDE
+%token EXT_SPEC_AT EXT_SPEC_LET
 %token <string> LONGIDENT IDENTIFIER TYPENAME IDENTIFIER_EXT
 %token <bool*string> STRING_LITERAL
 %token <string> INT_CONSTANT
@@ -263,7 +263,7 @@
 %token LPAR RPAR IF ELSE COLON COLON2 COLONCOLON DOT DOTDOT DOTDOTDOT
 %token INT INTEGER REAL BOOLEAN BOOL FLOAT LT GT LE GE EQ NE COMMA ARROW EQUAL
 %token FORALL EXISTS IFF IMPLIES AND OR NOT SEPARATED
-%token TRUE FALSE OLD AT RESULT
+%token TRUE FALSE OLD AS AT RESULT
 %token BLOCK_LENGTH BASE_ADDR OFFSET VALID VALID_READ VALID_INDEX VALID_RANGE
 %token OBJECT_POINTER VALID_FUNCTION
 %token ALLOCATION STATIC REGISTER AUTOMATIC DYNAMIC UNALLOCATED
@@ -278,7 +278,8 @@
 %token <string> EXT_CODE_ANNOT EXT_GLOBAL EXT_GLOBAL_BLOCK EXT_CONTRACT
 %token EXITS BREAKS CONTINUES RETURNS
 %token VOLATILE READS WRITES
-%token LOGIC PREDICATE INDUCTIVE AXIOMATIC AXIOM LEMMA LBRACE RBRACE
+%token LOGIC PREDICATE INDUCTIVE AXIOM LEMMA LBRACE RBRACE
+%token AXIOMATIC MODULE IMPORT
 %token GHOST MODEL CASE
 %token VOID CHAR SIGNED UNSIGNED SHORT LONG DOUBLE STRUCT ENUM UNION
 %token BSUNION INTER
@@ -880,7 +881,6 @@ full_identifier:
 | ASSERT { "assert" }
 | ASSIGNS { "assigns" }
 | ASSUMES { "assumes" }
-| EXT_AT { "at" }
 | AXIOM { "axiom" }
 | AXIOMATIC { "axiomatic" }
 | BEHAVIOR { "behavior" }
@@ -888,19 +888,16 @@ full_identifier:
 | CHECK { "check" }
 | COMPLETE { "complete" }
 | CONTINUES { "continues" }
-| CONTRACT { "contract" }
 | DECREASES { "decreases" }
 | DISJOINT { "disjoint" }
 | ENSURES { "ensures" }
 | EXITS { "exits" }
 | FREES { "frees" }
-| FUNCTION { "function" }
 | GLOBAL { "global" }
+| IMPORT { "import" }
 | INDUCTIVE { "inductive" }
-| INCLUDE { "include" }
 | INVARIANT { "invariant" }
 | LEMMA { "lemma" }
-| EXT_LET { "let" }
 | LOGIC { "logic" }
 | LOOP { "loop" }
 | MODEL { "model" }
@@ -911,6 +908,12 @@ full_identifier:
 | TERMINATES { "terminates" }
 | TYPE { "type" }
 | VARIANT { "variant" }
+| EXT_SPEC_MODULE { "module" }
+| EXT_SPEC_FUNCTION { "function" }
+| EXT_SPEC_CONTRACT { "contract" }
+| EXT_SPEC_INCLUDE { "include" }
+| EXT_SPEC_AT { "at" }
+| EXT_SPEC_LET { "let" }
 | id = EXT_CODE_ANNOT { id }
 | id = EXT_CONTRACT { id }
 | id = EXT_GLOBAL { id }
@@ -940,9 +943,10 @@ ext_global_clauses:
 
 ext_global_clause:
 | decl  { Ext_decl (loc_decl $sloc $1) }
-| EXT_LET any_identifier EQUAL lexpr SEMICOLON { Ext_macro (false, $2, $4) }
-| GLOBAL EXT_LET any_identifier EQUAL lexpr SEMICOLON { Ext_macro (true, $3, $5) }
-| INCLUDE string SEMICOLON { let b,s = $2 in Ext_include(b,s, loc $sloc) }
+| GLOBAL
+  EXT_SPEC_LET any_identifier EQUAL lexpr SEMICOLON { Ext_macro (true, $3, $5) }
+| EXT_SPEC_LET any_identifier EQUAL lexpr SEMICOLON { Ext_macro (false, $2, $4) }
+| EXT_SPEC_INCLUDE string SEMICOLON { let b,s = $2 in Ext_include(b,s, loc $sloc) }
 ;
 
 ext_global_specs_opt:
@@ -1021,15 +1025,15 @@ ext_identifier:
 ;
 
 ext_module_markup:
-| MODULE ext_identifier COLON { $2 }
+| EXT_SPEC_MODULE ext_identifier COLON { $2 }
 ;
 
 ext_function_markup:
-| FUNCTION ext_identifier COLON { $2, loc $sloc }
+| EXT_SPEC_FUNCTION ext_identifier COLON { $2, loc $sloc }
 ;
 
 ext_contract_markup:
-| CONTRACT ext_identifier_opt COLON { $2 }
+| EXT_SPEC_CONTRACT ext_identifier_opt COLON { $2 }
 ;
 
 stmt_markup:
@@ -1043,7 +1047,7 @@ stmt_markup_attr:
 ;
 
 ext_at_stmt_markup:
-| EXT_AT stmt_markup_attr COLON { $2 }
+| EXT_SPEC_AT stmt_markup_attr COLON { $2 }
 ;
 
 /*** function and statement contracts ***/
@@ -1184,7 +1188,7 @@ ne_decreases:
 
 variant:
 | lexpr FOR full_identifier { ($1, Some $3) }
-| lexpr                    { ($1, None) }
+| lexpr                     { ($1, None) }
 ;
 
 simple_clauses:
@@ -1648,6 +1652,12 @@ logic_def:
       LDlemma (id, labels, tvars, toplevel_pred Admit $4) }
 | AXIOMATIC any_identifier LBRACE logic_decls RBRACE
     { LDaxiomatic($2,$4) }
+| MODULE LONGIDENT LBRACE logic_decls RBRACE
+    { LDmodule($2,$4) }
+| IMPORT LONGIDENT SEMICOLON
+    { LDimport($2,None) }
+| IMPORT LONGIDENT AS identifier SEMICOLON
+    { LDimport($2,Some $4) }
 | TYPE poly_id_type_add_typename EQUAL typedef SEMICOLON
         { let (id,tvars) = $2 in
           exit_type_variables_scope ();
@@ -1942,6 +1952,8 @@ is_acsl_decl_or_code_annot:
 | AXIOM     { "axiom" }
 | VARIANT   { "variant" }
 | AXIOMATIC { "axiomatic" }
+| MODULE    { "module" }
+| IMPORT    { "import" }
 ;
 
 is_acsl_typename:
@@ -1950,12 +1962,12 @@ is_acsl_typename:
 ;
 
 is_ext_spec:
-| CONTRACT { "contract" }
-| FUNCTION { "function" }
-| MODULE   { "module" }
-| INCLUDE  { "include" }
-| EXT_AT   { "at" }
-| EXT_LET  { "let" }
+| EXT_SPEC_MODULE   { "module" }
+| EXT_SPEC_FUNCTION { "function" }
+| EXT_SPEC_CONTRACT { "contract" }
+| EXT_SPEC_INCLUDE  { "include" }
+| EXT_SPEC_AT       { "at" }
+| EXT_SPEC_LET      { "let" }
 ;
 
 keyword:
@@ -1976,6 +1988,7 @@ bs_keyword:
 | ALLOCATION { () }
 | AUTOMATIC { () }
 | AT { () }
+| AS { () }
 | BASE_ADDR { () }
 | BLOCK_LENGTH { () }
 | BSGHOST { () }
@@ -2079,9 +2092,3 @@ any:
 ;
 
 %%
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

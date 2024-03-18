@@ -39,6 +39,8 @@
 
   exception Error of (int * int) * string
 
+  let ext_acsl_spec = ref false
+
   let loc lexbuf = (lexeme_start lexbuf, lexeme_end lexbuf)
 
   let lex_error lexbuf s =
@@ -112,8 +114,7 @@
         "assert", (fun _ -> ASSERT);
         "assigns", (fun _ -> ASSIGNS);
         "assumes", (fun _ -> ASSUMES);
-        "at", (fun _ -> EXT_AT);
-        (* ACSL extension for external spec file *)
+        "at", (fun _ -> EXT_SPEC_AT);
         "axiom", (fun _ -> AXIOM);
         "axiomatic", (fun _ -> AXIOMATIC);
         "behavior", (fun _ -> BEHAVIOR);
@@ -126,8 +127,7 @@
         "complete", (fun _ -> COMPLETE);
         "const", (fun _ -> CONST);
         "continues", (fun _ -> CONTINUES);
-        "contract", (fun _ -> CONTRACT);
-        (* ACSL extension for external spec file *)
+        "contract", (fun _ -> EXT_SPEC_CONTRACT);
         "decreases", (fun _ -> DECREASES);
         "disjoint", (fun _ -> DISJOINT);
         "double", (fun _ -> DOUBLE);
@@ -136,27 +136,26 @@
         "enum", (fun _ -> ENUM);
         "exits", (fun _ -> EXITS);
         "frees", (fun _ -> FREES);
-        "function", (fun _ -> FUNCTION);
-        (* ACSL extension for external spec file *)
+        "function", (fun _ -> EXT_SPEC_FUNCTION);
         "float", (fun _ -> FLOAT);
         "for", (fun _ -> FOR);
         "global", (fun _ -> GLOBAL);
         "if", (fun _ -> IF);
+        "import", (fun _ -> IMPORT);
 	"inductive", (fun _ -> INDUCTIVE);
-	"include", (fun _ -> INCLUDE);
-        (* ACSL extension for external spec file *)
+        "include", (fun _ -> EXT_SPEC_INCLUDE);
         "int", (fun _ -> INT);
         "invariant", (fun _ -> INVARIANT);
         "label", (fun _ -> LABEL);
         "lemma", (fun _ -> LEMMA);
-        "let", (fun _ -> EXT_LET);
+        "let", (fun _ -> EXT_SPEC_LET);
         (* ACSL extension for external spec file *)
         "logic", (fun _ -> LOGIC);
         "long", (fun _ -> LONG);
         "loop", (fun _ -> LOOP);
         "model", (fun _ -> MODEL);
         (* ACSL extension for model fields *)
-        "module", (fun _ -> MODULE);
+        "module", (fun _ -> if !ext_acsl_spec then EXT_SPEC_MODULE else MODULE);
         (* ACSL extension for external spec file *)
         "predicate", (fun _ -> PREDICATE);
         "reads", (fun _ -> READS);
@@ -218,6 +217,7 @@
         "\\allocation", ALLOCATION;
         "\\allocable", ALLOCABLE;
         "\\automatic", AUTOMATIC;
+        "\\as", AS;
         "\\at", AT;
         "\\base_addr", BASE_ADDR;
         "\\block_length", BLOCK_LENGTH;
@@ -278,8 +278,6 @@
   let update_file_pos lexbuf file =
    let pos = lexbuf.Lexing.lex_curr_p in
     lexbuf.Lexing.lex_curr_p <- { pos with Lexing.pos_fname = file }
-
-  let accept_c_comments_into_acsl_spec = ref false
 
   let hack_merge_tokens current next =
     match (current,next) with
@@ -378,7 +376,7 @@ rule token = parse
   | comment_line '\n' { Lexing.new_line lexbuf; token lexbuf }
   | comment_line eof { token lexbuf }
   | "*/" { lex_error lexbuf "unexpected block-comment closing" }
-  | "/*" { if !accept_c_comments_into_acsl_spec
+  | "/*" { if !ext_acsl_spec
            then comment lexbuf
            else lex_error lexbuf "unexpected block-comment opening"
          }
@@ -622,12 +620,11 @@ and comment = parse
   let spec = parse_from_position Logic_parser.spec
 
   let ext_spec lexbuf = try
-      accept_c_comments_into_acsl_spec := true ;
+      ext_acsl_spec := true ;
       let r = Logic_parser.ext_spec token lexbuf in
-      accept_c_comments_into_acsl_spec := false ;
-      r
+      ext_acsl_spec := false ; r
     with exn ->
-      accept_c_comments_into_acsl_spec := false ;
+      ext_acsl_spec := false ;
       raise exn
 
   type 'a parse = Filepath.position * string -> (Filepath.position * 'a) option
@@ -636,9 +633,3 @@ and comment = parse
     let buf = Buffer.create 16 in
     chr buf lexbuf
 }
-
-(*
-Local Variables:
-compile-command: "make -C ../../.. byte"
-End:
-*)

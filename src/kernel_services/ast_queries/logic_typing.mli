@@ -330,9 +330,3 @@ val get_typer_block:
   loc:Logic_ptree.location ->
   string * Logic_ptree.extended_decl list ->
   bool * Cil_types.acsl_extension_kind
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

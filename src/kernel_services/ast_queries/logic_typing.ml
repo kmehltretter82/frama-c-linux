@@ -4174,8 +4174,8 @@ struct
         ignore (Logic_env.Axiomatics.memo ~change (fun _ -> loc) id);
         Daxiomatic(id,l,[],loc)
       end
-    | LDmodule _ -> C.error loc "Unsupported module definition."
-    | LDimport _ -> C.error loc "Unsupported module import."
+    | LDmodule _ -> C.error loc "Unsupported module declaration"
+    | LDimport _ -> C.error loc "Unsupported module import"
     | LDtype(s,l,def) ->
       let env = init_type_variables loc l in
       let my_info =
@@ -4338,9 +4338,3 @@ struct
   let annot = C.on_error annot (fun _ -> rollback_transaction ())
 
 end
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
- *)

@@ -45,6 +45,7 @@ val spec : Logic_ptree.spec parse
 
 val ext_spec : Lexing.lexbuf -> Logic_ptree.ext_spec
 (** ACSL extension for parsing external spec file.
-    Here, the tokens "/*" and "*/" are accepted by the lexer
-    as unnested C comments into the external ACSL specifications.
+    Modifies tokens as follows:
+    - C-comments [/* ... */] can be used and can be nested
+    - ["module"] keyword is interpreted as [EXT_SPEC_MODULE]
 *)
