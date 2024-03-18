@@ -72,6 +72,11 @@ and pp_offset fmt = function
     Format.fprintf fmt "[%a]%a" pp_exp e pp_offset o
 
 and pp_exp fmt exp =
+  (* decay follows Cil_printer rules. Ideally, SizeOf and AlignOf should
+     be removed from the AST, removing the need for this argument. *)
+  pp_exp_aux ~decay:true fmt exp
+
+and pp_exp_aux ~decay fmt exp =
   let precedence = Precedence.exp_level exp in
   match exp.node with
   | Const (c) ->
@@ -90,17 +95,19 @@ and pp_exp fmt exp =
   | SizeOf (t,_) ->
     Format.fprintf fmt "sizeof(%a)" Printer.pp_typ t
   | SizeOfE (e,_) ->
-    Format.fprintf fmt "sizeof(%a)" pp_exp e
+    Format.fprintf fmt "sizeof(%a)" (pp_exp_aux ~decay:false) e
   | SizeOfStr (s,_) ->
     Format.fprintf fmt "sizeof(%a)" pp_string s
   | AlignOf (t,_) ->
     Format.fprintf fmt "__alignof__(%a)" Printer.pp_typ t
   | AlignOfE (e,_) ->
-    Format.fprintf fmt "__alignof__(%a)" pp_exp e
+    Format.fprintf fmt "__alignof__(%a)" (pp_exp_aux ~decay:false) e
   | AddrOf lv ->
     Format.fprintf fmt "& %a" (pp_lval' ~precedence) lv
   | StartOf(lv) ->
-    Format.fprintf fmt "&(%a[0])" (pp_lval' ~precedence) lv
+    if decay
+    then Format.fprintf fmt "%a" (pp_lval' ~precedence) lv
+    else Format.fprintf fmt "&(%a[0])" (pp_lval' ~precedence) lv
 
 and pp_exp' ~precedence fmt exp =
   if Precedence.exp_level exp >= precedence then
