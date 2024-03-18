@@ -61,6 +61,7 @@ interface LabViewState {
   split: Split;
   stack: Layout[];
   panels: Set<compId>;
+  alerts: Set<compId>;
   docked: Map<compId, LayoutPosition>;
   tabs: Map<tabKey, TabViewState>;
   tabKey: tabKey;
@@ -75,6 +76,7 @@ const LAB = new States.GlobalState<LabViewState>({
   split: defaultSplit,
   stack: [defaultLayout],
   panels: new Set(),
+  alerts: new Set(),
   docked: new Map(),
   tabs: new Map(),
   tabKey: '',
@@ -518,7 +520,9 @@ export function applyComponent(
   const pos = at ?? preferredPosition ?? 'D';
   const stack = addLayoutComponent(state.stack, id, pos);
   const panels = copySet(state.panels).add(id);
-  LAB.setValue({ ...state, panels, stack });
+  const alerts = copySet(state.alerts);
+  alerts.delete(id);
+  LAB.setValue({ ...state, panels, alerts, stack });
 }
 
 export function dockComponent(
@@ -555,6 +559,22 @@ function closeComponent(compId: compId): void
   panels.delete(compId);
   docked.delete(compId);
   LAB.setValue({ ...state, panels, docked, stack });
+}
+
+export function alertComponent(comp: Ivette.ComponentProps): void
+{
+  const { id } = comp;
+  const state = LAB.getValue();
+  /* Do nothing if the component if already visible. */
+  const layout = state.stack[0] ?? defaultLayout;
+  const curr = getLayoutPosition(layout, id);
+  if (curr !== undefined) return;
+  /* Add the component to the set of alerted components. */
+  const alerts = copySet(state.alerts).add(id);
+  LAB.setValue({ ...state, alerts });
+  /* Dock the component if it isn't already. */
+  if (state.docked.has(id)) return;
+  dockComponent(comp);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1126,11 +1146,12 @@ Ivette.registerSidebar({
 interface DockItemProps {
   compId: compId;
   visible: boolean;
+  alert: boolean;
   position: LayoutPosition;
 }
 
 function DockItem(props: DockItemProps): JSX.Element | null {
-  const { compId, visible, position } = props;
+  const { compId, visible, position, alert } = props;
   const comp = State.useElement(COMPONENT, compId);
   if (comp === undefined) return null;
   const label = comp.label ?? compId;
@@ -1138,7 +1159,7 @@ function DockItem(props: DockItemProps): JSX.Element | null {
   const title = `Display ${label} (right-click for more actions)`;
 
   const className = classes(
-    'labview-docked', visible && 'disabled',
+    'labview-docked', visible && 'disabled', alert && 'alert'
   );
 
   const onClick = (): void => {
@@ -1171,7 +1192,7 @@ function DockItem(props: DockItemProps): JSX.Element | null {
 }
 
 export function Dock(): JSX.Element {
-  const [{ docked, stack }] = States.useGlobalState(LAB);
+  const [{ docked, stack, alerts }] = States.useGlobalState(LAB);
   const items: JSX.Element[] = [];
   docked.forEach((pos, compId) => {
     const layout = stack[0] ?? defaultLayout;
@@ -1181,6 +1202,7 @@ export function Dock(): JSX.Element {
         key={compId}
         compId={compId}
         visible={curr !== undefined}
+        alert={alerts.has(compId)}
         position={curr ?? pos}
       />);
   });

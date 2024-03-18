@@ -34,6 +34,7 @@ import { Label, Cell } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
 import { Space } from 'dome/frame/toolbars';
 import { TitleBar } from 'ivette';
+import * as Display from 'ivette/display';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Status from 'frama-c/kernel/Status';
 import * as Server from 'frama-c/server';

@@ -116,6 +116,13 @@ export function dockComponent(id: string, at?: LayoutPosition): void
   if (comp) Laboratory.dockComponent(comp, at);
 }
 
+/** Alert component. */
+export function alertComponent(id: string): void
+{
+  const comp = COMPONENT.getElement(id);
+  if (comp) Laboratory.alertComponent(comp);
+}
+
 /** Component Status Hook. */
 export function useComponentStatus(
   id: string | undefined

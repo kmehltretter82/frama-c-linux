@@ -208,6 +208,10 @@
     border-radius: 5px;
 }
 
+.labview-docked.alert {
+    color: var(--warning);
+}
+
 .labview-docked.disabled {
     color: var(--disabled-text);
 }
