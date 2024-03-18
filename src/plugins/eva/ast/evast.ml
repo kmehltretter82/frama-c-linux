@@ -47,11 +47,6 @@ type exp = exp_node tag
 and exp_node =
   | Const      of constant
   | Lval       of lval
-  | SizeOf     of (typ * Integer.t option)
-  | SizeOfE    of (exp * Integer.t option)
-  | SizeOfStr  of (string * Integer.t option)
-  | AlignOf    of (typ * Integer.t option)
-  | AlignOfE   of (exp * Integer.t option)
   | UnOp       of unop * exp * typ
   | BinOp      of binop * exp * exp * typ
   | CastE      of typ * exp
@@ -60,6 +55,7 @@ and exp_node =
 
 (** Literal constants *)
 and constant =
+  | CTopInt of typ (* an unknown integer; currently introduced when sizeof/alignof cannot be evaluated as a constant *)
   | CInt64 of Integer.t * ikind * string option
   | CString of Base.t (* the base must be [Base.String _] *)
   | CChr of char

@@ -44,11 +44,6 @@ and build_cil_exp node =
   let exp_node = match node with
     | Const c -> Cil_types.Const (to_cil_const c)
     | Lval lv -> Lval (to_cil_lval lv)
-    | SizeOf (t, _) -> SizeOf (t)
-    | SizeOfE (e, _) -> SizeOfE (to_cil_exp e)
-    | SizeOfStr (s, _) -> SizeOfStr (s)
-    | AlignOf (t, _) -> AlignOf (t)
-    | AlignOfE (e, _) -> AlignOfE (to_cil_exp e)
     | UnOp (op, e, t) -> UnOp (to_cil_unop op, to_cil_exp e, t)
     | BinOp (op, e1, e2, t) ->
       BinOp (to_cil_binop op, to_cil_exp e1, to_cil_exp e2, t)
@@ -108,6 +103,7 @@ and to_cil_offset offset =
 
 and to_cil_const const =
   match const with
+  | CTopInt _ -> to_cil_fail ()
   | CInt64 (i, ik, s) -> Cil_types.CInt64 (i, ik, s)
   | CString (_base) -> to_cil_fail ()
   | CChr (c) -> CChr (c)
@@ -158,10 +154,9 @@ let is_initialized lval =
 
 let rec height_exp exp =
   match exp.node with
-  | Const _ | SizeOf _ | SizeOfStr _ | AlignOf _ -> 0
+  | Const _ -> 0
   | Lval lv | AddrOf lv | StartOf lv  -> height_lval lv + 1
-  | UnOp (_,e,_) | CastE (_, e) | SizeOfE (e,_) | AlignOfE (e,_)
-    -> height_exp e + 1
+  | UnOp (_,e,_) | CastE (_, e) -> height_exp e + 1
   | BinOp (_,e1,e2,_) -> max (height_exp e1) (height_exp e2) + 1
 
 and height_lval lv =
@@ -247,7 +242,7 @@ let rec deps_of_exp find_loc exp =
       Deps.join (process e1) (process e2)
     | StartOf lv | AddrOf lv ->
       Deps.data (indirect_zone_of_lval find_loc lv)
-    | Const _ | SizeOf _ | AlignOf _ | SizeOfStr _ | SizeOfE _ | AlignOfE _ ->
+    | Const _ ->
       Deps.bottom
   in
   process exp
@@ -321,17 +316,10 @@ let rec const_fold (exp: exp) : exp =
   match exp.node with
   | Const (CChr c) -> integer (Cil.charConstToInt c)
   | Const (CEnum(_ei, e)) -> const_fold e
-  | Const (CReal _ | CString _ | CInt64 _) -> exp
+  | Const (CTopInt _ | CReal _ | CString _ | CInt64 _) -> exp
   | Lval lv -> mk_exp (Lval (const_fold_lval lv))
   | AddrOf lv -> mk_exp (AddrOf (const_fold_lval lv))
   | StartOf lv -> mk_exp (StartOf (const_fold_lval lv))
-  | SizeOf (_, size_opt) | SizeOfE (_, size_opt) | SizeOfStr (_, size_opt)
-  | AlignOf (_, size_opt) | AlignOfE (_, size_opt) ->
-    begin match size_opt with
-      | None -> exp
-      | Some i ->
-        integer ~kind:Cil.theMachine.kindOfSizeOf i
-    end
   | CastE (t, e) -> const_fold_cast t e
   | UnOp (op, e, t) -> const_fold_unop op e t
   | BinOp (op, e1, e2, t) -> const_fold_binop op e1 e2 t

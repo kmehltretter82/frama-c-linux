@@ -38,13 +38,8 @@ struct
     | BinOp ((Div|Mod|Mult),_,_,_) -> 40
     | CastE (_,_) | AddrOf(_) | StartOf(_) | UnOp((Neg|BNot|LNot),_,_) -> 30
     | Lval (lval) -> lval_level lval
-    | SizeOf _ | SizeOfE _ | SizeOfStr _ -> 20
-    | AlignOf _ | AlignOfE _ -> 20
     | Const _ -> 0
 end
-
-let pp_string fmt s =
-  Format.fprintf fmt "\"%s\"" (Escape.escape_string s)
 
 let rec pp_lval fmt lval =
   let precedence = Precedence.lval_level lval in
@@ -72,11 +67,6 @@ and pp_offset fmt = function
     Format.fprintf fmt "[%a]%a" pp_exp e pp_offset o
 
 and pp_exp fmt exp =
-  (* decay follows Cil_printer rules. Ideally, SizeOf and AlignOf should
-     be removed from the AST, removing the need for this argument. *)
-  pp_exp_aux ~decay:true fmt exp
-
-and pp_exp_aux ~decay fmt exp =
   let precedence = Precedence.exp_level exp in
   match exp.node with
   | Const (c) ->
@@ -92,22 +82,10 @@ and pp_exp_aux ~decay fmt exp =
       (pp_exp' ~precedence) e2
   | CastE(t,e) ->
     Format.fprintf fmt "(%a)%a" Printer.pp_typ t (pp_exp' ~precedence) e
-  | SizeOf (t,_) ->
-    Format.fprintf fmt "sizeof(%a)" Printer.pp_typ t
-  | SizeOfE (e,_) ->
-    Format.fprintf fmt "sizeof(%a)" (pp_exp_aux ~decay:false) e
-  | SizeOfStr (s,_) ->
-    Format.fprintf fmt "sizeof(%a)" pp_string s
-  | AlignOf (t,_) ->
-    Format.fprintf fmt "__alignof__(%a)" Printer.pp_typ t
-  | AlignOfE (e,_) ->
-    Format.fprintf fmt "__alignof__(%a)" (pp_exp_aux ~decay:false) e
   | AddrOf lv ->
     Format.fprintf fmt "& %a" (pp_lval' ~precedence) lv
   | StartOf(lv) ->
-    if decay
-    then Format.fprintf fmt "%a" (pp_lval' ~precedence) lv
-    else Format.fprintf fmt "&(%a[0])" (pp_lval' ~precedence) lv
+    Format.fprintf fmt "%a" (pp_lval' ~precedence) lv
 
 and pp_exp' ~precedence fmt exp =
   if Precedence.exp_level exp >= precedence then
@@ -147,6 +125,8 @@ and pp_binop fmt b =
   Format.fprintf fmt "%s" s
 
 and pp_constant fmt = function
+  | CTopInt _ ->
+    Format.fprintf fmt "%s" (Unicode.top_string ())
   | CInt64 (_, _, Some s) ->
     Format.fprintf fmt "%s" s
   | CInt64 (i, _, _) ->

@@ -42,11 +42,6 @@ and hash_exp e =
   match e.node with
   | Const c -> Hashtbl.hash (1, hash_constant c)
   | Lval lv -> Hashtbl.hash (2, hash_lval lv)
-  | SizeOf (ty,_) -> Hashtbl.hash (3, Typ.hash ty)
-  | SizeOfE (e,_) -> Hashtbl.hash (4, hash_exp e)
-  | SizeOfStr (s,_) -> Hashtbl.hash (5, s)
-  | AlignOf (ty,_) -> Hashtbl.hash (6, Typ.hash ty)
-  | AlignOfE (e,_) -> Hashtbl.hash (7, hash_exp e)
   | UnOp (op, e, ty) ->
     Hashtbl.hash (8, op, hash_exp e, Typ.hash ty)
   | BinOp (op, e1, e2, ty) ->
@@ -56,10 +51,11 @@ and hash_exp e =
   | StartOf lv -> Hashtbl.hash (12, hash_lval lv)
 and hash_constant c =
   match c with
-  | CString _ | CChr _ -> Hashtbl.hash (1, c)
-  | CReal (fn, fk, _) -> Hashtbl.hash (2, fn, fk)
-  | CInt64 (n, k, _) -> Hashtbl.hash (3, n, k )
-  | CEnum (ei, _) -> Hashtbl.hash (4, ei.einame)
+  | CTopInt t -> Hashtbl.hash (1, Typ.hash t)
+  | CString _ | CChr _ -> Hashtbl.hash (2, c)
+  | CReal (fn, fk, _) -> Hashtbl.hash (3, fn, fk)
+  | CInt64 (n, k, _) -> Hashtbl.hash (4, n, k )
+  | CEnum (ei, _) -> Hashtbl.hash (5, ei.einame)
 
 
 (* Tag utility *)

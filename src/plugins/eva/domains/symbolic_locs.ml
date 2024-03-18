@@ -125,8 +125,7 @@ let interesting_exp get_locs get_val e =
       has_lvalue e
     | BinOp (op, e1, e2,_) ->
       not (is_comp op) && (has_lvalue e1 || has_lvalue e2)
-    | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _ | AlignOf _ | AlignOfE _
-    | StartOf _ | AddrOf _ ->
+    | Const _ | StartOf _ | AddrOf _ ->
       false
   in
   match e.node with
@@ -134,8 +133,7 @@ let interesting_exp get_locs get_val e =
     not (Precise_locs.cardinal_zero_or_one (get_locs lv))
   | BinOp (op, e1, e2,_) ->
     not (is_comp op) && has_lvalue e1 && has_lvalue e2
-  | CastE _ | UnOp _ | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _
-  | AlignOf _ | AlignOfE _ | StartOf _ | AddrOf _ ->
+  | CastE _ | UnOp _ | Const _ | StartOf _ | AddrOf _ ->
     false
 
 (* Locals and formals syntactically present in an expression or lvalue *)

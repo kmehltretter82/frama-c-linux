@@ -915,12 +915,6 @@ module Make
       in
       compute_reduction v volatile
 
-    | SizeOf (_,s) | SizeOfE (_,s) | SizeOfStr (_,s)
-    | AlignOf (_,s) | AlignOfE (_,s) ->
-      match s with
-      | Some v -> return (Value.inject_int expr.typ v, Neither, false)
-      | _      -> return (Value.top_int, Neither, false)
-
   and internal_forward_eval_constant env expr constant =
     let open Evaluated.Operators in
     let+ value =

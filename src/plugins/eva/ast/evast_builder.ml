@@ -69,17 +69,11 @@ let translate_binop = function
 
 
 let rec translate_exp e =
-  let eval_size e = Cil.constFoldToInt e in
   let node = match e.Cil_types.enode with
     | Cil_types.Const (Cil_types.CStr _ | Cil_types.CWStr _) ->
       Const (CString (Base.of_string_exp e))
     | Cil_types.Const cst -> Const (translate_constant cst)
     | Cil_types.Lval lval -> Lval (translate_lval lval)
-    | Cil_types.SizeOf typ -> SizeOf (typ, eval_size e)
-    | Cil_types.SizeOfE expr -> SizeOfE (translate_exp expr, eval_size e)
-    | Cil_types.SizeOfStr str -> SizeOfStr (str, eval_size e)
-    | Cil_types.AlignOf typ -> AlignOf (typ, eval_size e)
-    | Cil_types.AlignOfE expr -> AlignOfE (translate_exp expr, eval_size e)
     | Cil_types.UnOp (unop, expr, typ) ->
       UnOp (translate_unop unop, translate_exp expr, typ)
     | Cil_types.BinOp (binop, e1, e2, typ) ->
@@ -87,6 +81,10 @@ let rec translate_exp e =
     | Cil_types.CastE (typ, expr) -> CastE (typ, translate_exp expr)
     | Cil_types.AddrOf lval -> AddrOf (translate_lval lval)
     | Cil_types.StartOf lval -> StartOf (translate_lval lval)
+    | Cil_types.(SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _) ->
+      match (Cil.constFold true e).enode with
+      | Const c -> Const (translate_constant c)
+      | _ -> Const (CTopInt Cil.theMachine.typeOfSizeOf)
   in
   mk_exp ~origin:(Exp e) node
 

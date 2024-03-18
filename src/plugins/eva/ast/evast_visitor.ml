@@ -72,13 +72,7 @@ struct
     | CastE (t, e) ->
       let e' = visitor.exp e in
       replace_if (e' != e) (CastE (t, e'))
-    | SizeOfE (e,size_opt) ->
-      let e' = visitor.exp e in
-      replace_if (e' != e)  (SizeOfE (e',size_opt))
-    | AlignOfE (e,size_opt) ->
-      let e' = visitor.exp e in
-      replace_if (e' != e) (AlignOfE (e',size_opt))
-    | SizeOf _ | Const _ | SizeOfStr _ | AlignOf _ ->
+    | Const _ ->
       exp
 
   let rewrite_lval ~visitor lval =
@@ -152,11 +146,11 @@ struct
     match exp.node with
     | Lval lv | AddrOf lv | StartOf lv ->
       visitor.lval lv
-    | UnOp (_, e, _) | CastE (_, e) | SizeOfE (e, _) | AlignOfE (e, _) ->
+    | UnOp (_, e, _) | CastE (_, e) ->
       visitor.exp e
     | BinOp (_op, e1, e2, _t) ->
       visitor.combine (visitor.exp e1) (visitor.exp e2)
-    | SizeOf _ | Const _ | SizeOfStr _ | AlignOf _ ->
+    | Const _ ->
       visitor.neutral
 
   let fold_lval ~visitor lval =

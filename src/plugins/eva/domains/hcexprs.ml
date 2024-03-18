@@ -79,7 +79,6 @@ module E = struct
         if kind = Modified
         then exp
         else if Lval.equal lval late then raise NonExchangeable else exp
-      | AlignOfE _ -> raise NonExchangeable
       | _ -> default.rewrite_exp ~visitor exp
     in
     let rewriter = { default with rewrite_exp } in
@@ -148,11 +147,6 @@ let syntactic_lvalues expr =
       { lvalues with read = HCESet.add (HCE.of_lval lv) lvalues.read }
     | AddrOf lv | StartOf lv ->
       { lvalues with addr = HCESet.add (HCE.of_lval lv) lvalues.addr }
-    | AlignOfE (e,_) | SizeOfE (e,_) ->
-      (* The lvalues appearing in [e] are not read, and must all be in addr. *)
-      let new_lvalues = gather e empty_lvalues in
-      let new_addr = HCESet.union new_lvalues.read new_lvalues.addr in
-      { lvalues with addr = HCESet.union new_addr lvalues.addr }
     | UnOp (_, e, _) | CastE (_, e) -> gather e lvalues
     | BinOp (_, e1, e2, _) -> gather e1 (gather e2 lvalues)
     | _ -> lvalues

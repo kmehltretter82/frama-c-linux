@@ -227,8 +227,7 @@ let classify eval_ptr loop_effect (lval : Evast.lval) =
     | Lval lval -> classify_lval lval = Constant
     | UnOp (_, e, _) | CastE (_, e) -> is_const_expr e
     | BinOp (_, e1, e2, _) -> is_const_expr e1 && is_const_expr e2
-    | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _
-    | AlignOf _ | AlignOfE _ | AddrOf _ | StartOf _ -> true
+    | Const _ | AddrOf _ | StartOf _ -> true
   and classify_lval lv = match lv.node with
     | Var varinfo, offset ->
       if (varinfo.vglob && loop_effect.call)
@@ -263,8 +262,7 @@ let rec get_lvalues (expr : Evast.exp) =
   | Lval lval -> [ lval ]
   | UnOp (_, e, _) | CastE (_, e) -> get_lvalues e
   | BinOp (_op, e1, e2, _typ) -> get_lvalues e1 @ get_lvalues e2
-  | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _
-  | AlignOf _ | AlignOfE _ | AddrOf _ | StartOf _ -> []
+  | Const _ | AddrOf _ | StartOf _ -> []
 
 (* Finds the unique candidate lvalue for the automatic loop unrolling
    heuristic in the expression [expr], if it exists. Returns None otherwise.  *)

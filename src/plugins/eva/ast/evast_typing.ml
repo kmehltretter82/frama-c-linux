@@ -23,6 +23,7 @@
 open Evast
 
 let type_of_const : constant -> typ = function
+  | CTopInt t -> t
   | CInt64 (_, ik, _) -> Cil_types.TInt (ik, [])
   | CChr _ -> Cil.intType
   | CString (String (_, Base.CSString _)) -> Cil.theMachine.stringLiteralType
@@ -56,8 +57,6 @@ let type_of_lval_node (host, offset : lval_node) : typ =
 let type_of_exp_node : exp_node -> typ = function
   | Const c -> type_of_const c
   | Lval lv -> Cil.type_remove_qualifier_attributes lv.typ
-  | SizeOf _ | SizeOfE _ | SizeOfStr _ -> Cil.theMachine.typeOfSizeOf
-  | AlignOf _ | AlignOfE _ -> Cil.theMachine.typeOfSizeOf
   | UnOp (_, _, t) -> t
   | BinOp (_, _, _, t) -> t
   | CastE (t, _) -> t

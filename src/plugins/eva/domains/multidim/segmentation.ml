@@ -156,7 +156,6 @@ struct
   let rec linearity vi (exp : Evast.exp) =
     match exp.node with
     | Const _
-    | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
     | AddrOf _ | StartOf _ -> Integer.zero
     | Lval {node = Var vi', NoOffset} ->
       if Var.equal  vi' vi

@@ -268,10 +268,6 @@ let rec translate_expr eval oracle expr = match expr.node with
   | CastE (typ, e)->
     coerce ~cast:true eval typ (translate_expr_linearize eval oracle e)
   | AddrOf _ | StartOf _  -> raise (Out_of_Scope "translate_expr addr")
-  | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _  | AlignOfE _ ->
-    match Evast_utils.fold_to_integer expr with
-    | None -> raise (Out_of_Scope "translate_expr sizeof alignof")
-    | Some i -> Texpr1.Cst (Coeff.s_of_int (Integer.to_int_exn i))
 (* Expressions that cannot be translated by [translate_expr] are replaced
    using an oracle. Of course, this oracle must be sound!. If the oracle
    cannot find a suitable replacement, it can re-raise the expresssion. *)
