@@ -75,6 +75,7 @@ export function setSelection(s: MultiSelection): void
       text, title,
       kind: 'success'
     });
+    Display.alertComponent('fc.kernel.locations');
   }
 }
 
