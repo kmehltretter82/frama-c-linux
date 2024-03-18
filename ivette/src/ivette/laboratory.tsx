@@ -272,33 +272,6 @@ function removeLayoutComponent(stack: Layout[], compId: compId): Layout[]
   return unstackLayout(top, stack);
 }
 
-function completeLayout(m: Layout): Layout
-{
-  let { A, B, C, D } = m;
-  if (A && B && C && D) return m;
-  if (!A) {
-    const BD = B && B === D;
-    const CD = C && C === D;
-    A = BD ? C : CD ? B : (B || C || D);
-  }
-  if (!B) {
-    const AC = A && A === C;
-    const CD = C && C === D;
-    B = AC ? D : CD ? A : (A || D || C);
-  }
-  if (!C) {
-    const AB = A && A === B;
-    const BD = B && B === D;
-    C = AB ? D : BD ? A : (A || D || B);
-  }
-  if (!D) {
-    const AB = A && A === B;
-    const AC = A && A === C;
-    D = AB ? C : AC ? B : (B || C || A);
-  }
-  return { A, B, C, D };
-}
-
 function getLayoutPosition(
   layout: Layout, compId: compId
 ): LayoutPosition | undefined
@@ -892,7 +865,7 @@ export function LabView(): JSX.Element {
     [state]
   );
   const layout = state.stack[0] ?? defaultLayout;
-  const { A, B, C, D } = completeLayout(layout);
+  const { A, B, C, D } = layout;
   const { H, V } = state.split;
   const panels : JSX.Element[] = [];
   state.panels.forEach((id) => panels.push(<Pane key={id} compId={id}/>));
