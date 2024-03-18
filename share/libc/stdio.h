@@ -582,7 +582,7 @@ extern int pclose(FILE *stream);
 // ssize_t, so we must check it
 #ifdef __FC_POSIX_VERSION
 /*@ assigns (*lineptr)[0 .. *n-1], *n, *stream, \result \from *stream; */
-ssize_t getline(char **lineptr, size_t *n, FILE *stream);
+extern ssize_t getline(char **lineptr, size_t *n, FILE *stream);
 #endif
 
 // POSIX extension
@@ -617,7 +617,7 @@ extern FILE *fmemopen(void *restrict buf, size_t size,
   ensures result_error_or_written_bytes: \result == -1 || \result >= 0;
   allocates *strp;
 */
-int asprintf(char **strp, const char *fmt, ...);
+extern int asprintf(char **strp, const char *fmt, ...);
 
 // GNU extension
 /*@
