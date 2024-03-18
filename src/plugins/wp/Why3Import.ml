@@ -37,19 +37,21 @@ let create_why3_env loadpath =
       let loadpathes = (WConf.loadpath (main))@loadpath  in
       W.Env.create_env loadpathes
     end
-let extract_last_segment (str : string) : string * string list =
+let extract_last_segment (str : string) =
     let segments = String.split_on_char '.' str in
     match List.rev segments with
     | hd :: tl -> (hd, List.rev tl)
     | [] -> ("", [])
 
-let extract_last_segments (str_list : string list) : (string * string list) list =
+let extract_last_segments (str_list : string list) =
   List.map extract_last_segment str_list
-let destruct_theories_name struc_theories =
+let extract_theory_name struc_theories =
   let t = extract_last_segments struc_theories in
-  List.map (fun (name,_) -> name) t
+  List.map (fun (theory_name, _) -> theory_name) t
 
-
+let extract_theory_path struc_theories =
+    let t = extract_last_segments struc_theories in
+    List.map (fun (_, theory_path) -> theory_path) t
 
 (* let rec get_ty_symbols_from_ty (tys : W.Ty.tysymbol) (tymap) =
   try W.Wstdlib.Mstr.find tymap tys
@@ -72,8 +74,23 @@ let () =
            L.debug ~level:0 " + THY %s@." thy
         ) thys ;
 
+      List.iter
+        (fun thy ->
+           L.debug ~level:0 " + Extracted theory name %s@." thy
+        ) (extract_theory_name thys) ;
+
+      List.iter
+        (fun thy ->
+           List.iter
+            (fun p ->
+              L.debug ~level:0 " + Extracted theory path %s@." p
+            ) (thy);
+        ) (extract_theory_path thys) ;
+
+
+
       let libs = L.Library.get () in
-      let _thys = L.Import.get () in
+      let thys = L.Import.get () in
       let env = create_why3_env (F.to_string_list libs) () in
       let loadpath = W.Env.get_loadpath env in
       List.iter
@@ -82,8 +99,10 @@ let () =
         ) loadpath ;
       List.iter
       (fun _thy ->
-        try let _ns = (W.Env.read_theory env (F.to_string_list libs) _thy) in
-        W.Pretty.print_theory Format.std_formatter _ns;
+        try
+        (* let _ns = (W.Env.read_theory env (F.to_string_list libs) _thy) in
+        W.Pretty.print_theory Format.std_formatter _ns; *)
+        L.debug ~level:0 "INTHY %s" _thy;
 
         with W.Env.LibraryNotFound paths ->
           List.iter (
@@ -95,7 +114,7 @@ let () =
 
          (* let _t =  (W.Wstdlib.Mstr.values (_ns.ns_ts)) in
          L.debug "Nombres de itys trucs : %d" (List.length _t); *)
-      ) (destruct_theories_name thys) ;
+      ) (extract_theory_name thys) ;
       (* let env = create_why3_env () in
       let _ns = (W.Env.read_theory env ["summodule"] "Sum") in
       L.debug ""; *)
