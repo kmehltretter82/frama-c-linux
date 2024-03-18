@@ -123,6 +123,12 @@ and identified_axiomatic = {
   iax_attrs : attributes;
 }
 
+and identified_module = {
+  im_name : string;
+  im_props : identified_property list;
+  im_attrs : attributes;
+}
+
 and identified_lemma = {
   il_name : string;
   il_labels : logic_label list;
@@ -161,6 +167,7 @@ and identified_property =
   | IPPredicate of identified_predicate
   | IPExtended of identified_extended
   | IPAxiomatic of identified_axiomatic
+  | IPModule of identified_module
   | IPLemma of identified_lemma
   | IPBehavior of identified_behavior
   | IPComplete of identified_complete
@@ -234,7 +241,7 @@ let get_kinstr = function
   | IPFrom {if_kinstr=ki}
   | IPReachable {ir_kinstr=ki}
   | IPDecrease {id_kinstr=ki} -> ki
-  | IPAxiomatic _
+  | IPAxiomatic _ | IPModule _
   | IPLemma _  -> Kglobal
   | IPOther {io_loc} -> ki_of_o_loc io_loc
   | IPExtended {ie_loc} -> ki_of_e_loc ie_loc
@@ -261,7 +268,7 @@ let get_kf = function
   | IPFrom {if_kf=kf}
   | IPDecrease {id_kf=kf}
   | IPPropertyInstance {ii_kf=kf} -> Some kf
-  | IPAxiomatic _
+  | IPAxiomatic _ | IPModule _
   | IPLemma _ -> None
   | IPReachable {ir_kf} -> ir_kf
   | IPExtended {ie_loc} -> kf_of_loc_e ie_loc
@@ -271,9 +278,9 @@ let get_kf = function
 let get_ir p =
   let get_pp = function
     | IPPredicate {ip_kind = PKRequires _ | PKAssumes _ | PKTerminates }
-    | IPAxiomatic _ | IPLemma _ | IPComplete _ | IPDisjoint _ | IPCodeAnnot _
-    | IPAllocation _ | IPDecrease _ | IPPropertyInstance _ | IPOther _
-    | IPTypeInvariant _ | IPGlobalInvariant _
+    | IPAxiomatic _ | IPModule _ | IPLemma _ | IPComplete _ | IPDisjoint _
+    | IPCodeAnnot _ | IPAllocation _ | IPDecrease _ | IPPropertyInstance _
+    | IPOther _ | IPTypeInvariant _ | IPGlobalInvariant _
       -> Before
     | IPPredicate _ | IPAssigns _ | IPFrom _ | IPExtended _ | IPBehavior _
       -> After
@@ -302,6 +309,7 @@ let rec get_names = function
   | IPPredicate ip -> (Logic_const.pred_of_id_pred ip.ip_pred).pred_name
   | IPExtended { ie_ext = {ext_name = name} }
   | IPAxiomatic { iax_name = name }
+  | IPModule { im_name = name }
   | IPLemma { il_name = name }
   | IPBehavior { ib_bhv = {b_name = name} }
   | IPTypeInvariant { iti_name = name }
@@ -355,6 +363,10 @@ let rec location = function
     (match iax_props with
      | [] -> Cil_datatype.Location.unknown
      | p :: _ -> location p)
+  | IPModule {im_props} ->
+    (match im_props with
+     | [] -> Cil_datatype.Location.unknown
+     | p :: _ -> location p)
   | IPLemma {il_loc} -> il_loc
   | IPExtended {ie_ext={ext_loc}} -> ext_loc
   | IPOther {io_loc} -> loc_of_loc_o io_loc
@@ -388,6 +400,7 @@ let get_behavior = function
   | IPAssigns {ias_bhv=Id_loop _}
   | IPFrom {if_bhv=Id_loop _}
   | IPAxiomatic _
+  | IPModule _
   | IPExtended _
   | IPLemma _
   | IPCodeAnnot _
@@ -423,6 +436,7 @@ let get_for_behaviors = function
     end
 
   | IPAxiomatic _
+  | IPModule _
   | IPExtended _
   | IPLemma _
   | IPComplete _
@@ -457,7 +471,7 @@ let rec has_status = function
   | IPCodeAnnot {ica_ca={annot_content}} -> has_status_ca annot_content
   | IPPropertyInstance {ii_ip} -> has_status ii_ip
   | IPOther _ | IPReachable _
-  | IPAxiomatic _ | IPBehavior _
+  | IPAxiomatic _ | IPModule _ | IPBehavior _
   | IPDisjoint _ | IPComplete _
   | IPAssigns _ | IPFrom _
   | IPAllocation _ | IPDecrease _ | IPLemma _
@@ -482,6 +496,7 @@ let rec pretty_ip fmt = function
       Cil_printer.pp_identified_predicate ip_pred
   | IPExtended {ie_ext} -> Cil_printer.pp_extended fmt ie_ext
   | IPAxiomatic {iax_name} -> Format.fprintf fmt "axiomatic@ %s" iax_name
+  | IPModule {im_name} -> Format.fprintf fmt "module@ %s" im_name
   | IPLemma {il_name; il_pred} ->
     Format.fprintf fmt "%a@ %s"
       Cil_printer.pp_lemma_kind il_pred.tp_kind il_name
@@ -546,7 +561,8 @@ let rec hash_ip =
   in
   function
   | IPPredicate {ip_pred=x} -> Hashtbl.hash (1, x.ip_id)
-  | IPAxiomatic {iax_name=x} -> Hashtbl.hash (3, (x:string))
+  | IPAxiomatic {iax_name=x}
+  | IPModule {im_name=x} -> Hashtbl.hash (3, (x:string))
   | IPLemma {il_name=x} -> Hashtbl.hash (4, (x:string))
   | IPCodeAnnot {ica_ca=ca} -> Hashtbl.hash (5, ca.annot_id)
   | IPComplete {ic_kf=f; ic_kinstr=ki; ic_bhvs=y; ic_active=x} ->
@@ -637,6 +653,7 @@ include Datatype.Make_with_collections
         | IPExtended {ie_ext={ext_id=i1}}, IPExtended {ie_ext={ext_id=i2}} ->
           Datatype.Int.equal i1 i2
         | IPAxiomatic {iax_name=s1}, IPAxiomatic {iax_name=s2}
+        | IPModule {im_name=s1}, IPModule {im_name=s2}
         | IPTypeInvariant {iti_name=s1}, IPTypeInvariant {iti_name=s2}
         | IPGlobalInvariant {igi_name=s1}, IPGlobalInvariant {igi_name=s2}
         | IPLemma {il_name=s1}, IPLemma {il_name=s2} ->
@@ -676,7 +693,7 @@ include Datatype.Make_with_collections
           IPPropertyInstance {ii_kf=kf2;ii_stmt=s2;ii_ip=ip2} ->
           Kernel_function.equal kf1 kf2 &&
           Stmt.equal s1 s2 && equal ip1 ip2
-        | (IPPredicate _ | IPExtended _ | IPAxiomatic _ | IPLemma _
+        | (IPPredicate _ | IPExtended _ | IPAxiomatic _ | IPModule _ | IPLemma _
           | IPCodeAnnot _ | IPComplete _ | IPDisjoint _ | IPAssigns _
           | IPFrom _ | IPDecrease _ | IPBehavior _ | IPReachable _
           | IPAllocation _ | IPOther _ | IPPropertyInstance _
@@ -736,6 +753,7 @@ include Datatype.Make_with_collections
           else
             n
         | IPAxiomatic {iax_name=s1}, IPAxiomatic {iax_name=s2}
+        | IPModule {im_name=s1}, IPModule {im_name=s2}
         | IPTypeInvariant {iti_name=s1}, IPTypeInvariant {iti_name=s2}
         | IPGlobalInvariant {igi_name=s1}, IPGlobalInvariant {igi_name=s2}
         | IPLemma {il_name=s1}, IPLemma {il_name=s2} ->
@@ -754,7 +772,7 @@ include Datatype.Make_with_collections
             if c <> 0 then c else compare ip1 ip2
         | (IPPredicate _ | IPExtended _ | IPCodeAnnot _ | IPBehavior _ | IPComplete _ |
            IPDisjoint _ | IPAssigns _ | IPFrom _ | IPDecrease _ |
-           IPReachable _ | IPAxiomatic _ | IPLemma _ |
+           IPReachable _ | IPAxiomatic _ | IPModule _ | IPLemma _ |
            IPOther _ | IPAllocation _ | IPPropertyInstance _ |
            IPTypeInvariant _ | IPGlobalInvariant _) as x, y ->
           let nb = function
@@ -762,19 +780,20 @@ include Datatype.Make_with_collections
             | IPAssigns _ -> 2
             | IPDecrease _ -> 3
             | IPAxiomatic _ -> 5
-            | IPLemma _ -> 6
-            | IPCodeAnnot _ -> 7
-            | IPComplete _ -> 8
-            | IPDisjoint _ -> 9
-            | IPFrom _ -> 10
-            | IPBehavior _ -> 11
-            | IPReachable _ -> 12
-            | IPAllocation _ -> 13
-            | IPOther _ -> 14
-            | IPPropertyInstance _ -> 15
-            | IPTypeInvariant _ -> 16
-            | IPGlobalInvariant _ -> 17
-            | IPExtended _ -> 18
+            | IPModule _ -> 6
+            | IPLemma _ -> 7
+            | IPCodeAnnot _ -> 8
+            | IPComplete _ -> 9
+            | IPDisjoint _ -> 10
+            | IPFrom _ -> 11
+            | IPBehavior _ -> 12
+            | IPReachable _ -> 13
+            | IPAllocation _ -> 14
+            | IPOther _ -> 15
+            | IPPropertyInstance _ -> 16
+            | IPTypeInvariant _ -> 17
+            | IPGlobalInvariant _ -> 18
+            | IPExtended _ -> 19
           in
           Datatype.Int.compare (nb x) (nb y)
 
@@ -793,6 +812,7 @@ module Ordered_by_function = Datatype.Make_with_collections(
     let cmp_kind p1 p2 =
       let nb = function
         | IPAxiomatic _ -> 1
+        | IPModule _ -> 2
         | IPLemma _ -> 3
         | IPTypeInvariant _ -> 4
         | IPGlobalInvariant _ -> 5
@@ -822,6 +842,7 @@ module Ordered_by_function = Datatype.Make_with_collections(
     let rec cmp_same_kind p1 p2 =
       match (p1,p2) with
       | IPAxiomatic { iax_name = n1 }, IPAxiomatic { iax_name = n2 }
+      | IPModule { im_name = n1 }, IPModule { im_name = n2 }
       | IPLemma { il_name = n1 }, IPLemma { il_name = n2 }
       | IPTypeInvariant { iti_name = n1 }, IPTypeInvariant { iti_name = n2 }
       | IPGlobalInvariant { igi_name = n1 },
@@ -910,7 +931,8 @@ let rec short_pretty fmt p = match p with
   | IPExtended {ie_ext={ext_name}} -> Format.pp_print_string fmt ext_name
   | IPLemma {il_name=n}
   | IPTypeInvariant {iti_name=n} | IPGlobalInvariant {igi_name=n}
-  | IPAxiomatic {iax_name=n} -> Format.pp_print_string fmt n
+  | IPAxiomatic {iax_name=n} | IPModule {im_name=n} ->
+    Format.pp_print_string fmt n
   | IPBehavior {ib_kf; ib_bhv={b_name}} ->
     Format.fprintf fmt "behavior %s in function %a"
       b_name Kernel_function.pretty ib_kf
@@ -1031,6 +1053,11 @@ let rec pretty_debug fmt = function
       Cil_types_debug.pp_string iax_name
       (Cil_types_debug.pp_list pretty_debug) iax_props
       Cil_types_debug.pp_attributes iax_attrs
+  | IPModule {im_name; im_props; im_attrs} ->
+    Format.fprintf fmt "IPModule(%a,%a,%a)"
+      Cil_types_debug.pp_string im_name
+      (Cil_types_debug.pp_list pretty_debug) im_props
+      Cil_types_debug.pp_attributes im_attrs
   | IPLemma {il_name; il_labels; il_args; il_pred; il_attrs; il_loc} ->
     Format.fprintf fmt "IPLemma(%a,%a,%a,%a,%a,%a)"
       Cil_types_debug.pp_string il_name
@@ -1218,7 +1245,7 @@ struct
     | IPReachable {ir_kf=Some kf; ir_kinstr=Kstmt s; ir_program_point=After} ->
       [ K kf ; A "reachable_after" ; S s ]
 
-    | IPAxiomatic _ -> []
+    | IPAxiomatic _ | IPModule _ -> []
     | IPLemma {il_name=name; il_pred=p} ->
       let a = Cil_printer.ident_of_lemma p.tp_kind in
       [ A a ; A name ; P p.tp_statement ]
@@ -1493,6 +1520,9 @@ let ip_of_global_annotation a =
     | Daxiomatic(iax_name, l, iax_attrs, _) ->
       let iax_props = List.fold_left aux [] l in
       IPAxiomatic {iax_name; iax_props; iax_attrs} :: (iax_props @ acc)
+    | Dmodule(im_name, l, im_attrs, _) ->
+      let im_props = List.fold_left aux [] l in
+      IPModule {im_name; im_props; im_attrs} :: (im_props @ acc)
     | Dlemma(il_name, il_labels, il_args, il_pred, il_attrs, il_loc) ->
       ip_lemma {il_name; il_labels; il_args; il_pred; il_attrs; il_loc} :: acc
     | Dinvariant(l, igi_loc) ->
@@ -1529,9 +1559,3 @@ let ip_of_global_annotation_single a = match ip_of_global_annotation a with
   | ip :: _ ->
     (* the first one is the good one, see ip_of_global_annotation *)
     Some ip
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

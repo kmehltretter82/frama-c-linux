@@ -78,6 +78,7 @@ struct
   let t_global_invariant = t_kind "global_invariant" "Global invariant"
 
   let t_axiomatic = t_kind "axiomatic" "Axiomatic definitions"
+  let t_module = t_kind "module" "Logic module"
   let t_axiom = t_kind "axiom" "Logical axiom"
   let t_lemma = t_kind "lemma" "Logical lemma"
   let t_check_lemma = t_kind "check_lemma" "Logical check lemma"
@@ -101,6 +102,7 @@ struct
       end
     | IPExtended { ie_ext={ ext_name=_ } } -> t_ext
     | IPAxiomatic _ -> t_axiomatic
+    | IPModule _ -> t_module
     | IPLemma { il_pred = { tp_kind = Admit } } -> t_axiom
     | IPLemma { il_pred = { tp_kind = Assert } } -> t_lemma
     | IPLemma { il_pred = { tp_kind = Check } } -> t_check_lemma

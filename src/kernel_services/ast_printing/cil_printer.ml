@@ -3407,8 +3407,14 @@ class cil_printer () = object (self)
     | Daxiomatic(id,decls,_attr, _) ->
       (* attributes are meant to be purely internal for now. *)
       fprintf fmt "@[<v 2>@[%a %s {@]@\n%a}@]@\n"
-        self#pp_acsl_keyword "axiomatic"
-        id
+        self#pp_acsl_keyword "axiomatic" id
+        (Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
+           self#global_annotation)
+        decls
+    | Dmodule(id,decls,_attr, _) ->
+      (* attributes are meant to be purely internal for now. *)
+      fprintf fmt "@[<v 2>@[%a %s {@]@\n%a}@]@\n"
+        self#pp_acsl_keyword "module" id
         (Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
            self#global_annotation)
         decls

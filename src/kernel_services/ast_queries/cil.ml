@@ -428,7 +428,7 @@ let attributeHash: (string, attributeClass) Hashtbl.t =
       "selectany"; "allocate"; "nothrow"; "novtable"; "property";
       "uuid"; "align" ];
   List.iter (fun a -> Hashtbl.add table a (AttrFunType false))
-    [ "format"; "regparm"; "longcall"; "noinline"; "always_inline";];
+    [ "format"; "regparm"; "longcall"; "noinline"; "always_inline"; ];
   List.iter (fun a -> Hashtbl.add table a (AttrFunType true))
     [ "stdcall";"cdecl"; "fastcall"; "noreturn"];
   List.iter (fun a -> Hashtbl.add table a AttrType)
@@ -1916,12 +1916,13 @@ and childrenAnnotation vis a =
       Dvolatile(tset',rvi',wvi',attr',loc)
     else a
   | Daxiomatic(id,l,attr,loc) ->
- (*
-        Format.eprintf "cil.visitCilAnnotation on axiomatic %s@." id;
- *)
     let l' = Extlib.map_no_copy (visitCilAnnotation vis) l in
     let attr' = visitCilAttributes vis attr in
     if l' != l || attr != attr' then Daxiomatic(id,l',attr',loc) else a
+  | Dmodule(id,l,attr,loc) ->
+    let l' = Extlib.map_no_copy (visitCilAnnotation vis) l in
+    let attr' = visitCilAttributes vis attr in
+    if l' != l || attr != attr' then Dmodule(id,l',attr',loc) else a
   | Dextended (e,attr,loc) ->
     let e' = visitCilExtended vis e in
     let attr' = visitCilAttributes vis attr in
@@ -2177,7 +2178,7 @@ and visitCilStmt (vis:cilVisitor) (s: stmt) : stmt =
     let last = mkStmt ~ghost:res.ghost res.skind in
     let block = mkBlockNonScoping (List.map make instr_list @ [ last ]) in
     block.battrs <- addAttribute (Attr (vis_tmp_attr, [])) block.battrs;
-    (* Make our statement contain the instructions to prepend *)
+     (* Make our statement contain the instructions to prepend *)
     res.skind <- Block block;
     vis#pop_stmt s; res
 
@@ -4132,7 +4133,7 @@ and bitsSizeOf t =
     raise
       (SizeOfError
          (Format.sprintf "abstract type '%s'" (compFullName comp), t))
-  | TComp ({cfields=Some[]}, _) when acceptEmptyCompinfo () ->
+  | TComp ({cfields=Some[]}, _) when acceptEmptyCompinfo() ->
     find_sizeof t (fun () -> t,0)
   | TComp ({cfields=Some[]} as comp,_) ->
     find_sizeof t
@@ -5254,7 +5255,7 @@ let mapGlobals (fl: file)
 let global_annotation_attributes = function
   | Dfun_or_pred ({l_var_info = { lv_attr }}, _) -> lv_attr
   | Dvolatile (_,_,_,attrs,_) -> attrs
-  | Daxiomatic (_,_,attrs,_) -> attrs
+  | Daxiomatic (_,_,attrs,_) | Dmodule(_,_,attrs,_) -> attrs
   | Dtype ({ lt_attr }, _) -> lt_attr
   | Dlemma (_,_,_,_,attrs,_) -> attrs
   | Dinvariant ({l_var_info = { lv_attr }}, _) -> lv_attr
@@ -6693,14 +6694,14 @@ let rec has_flexible_array_member t =
   let is_flexible_array t =
     match unrollType t with
     | TArray (_, None, _) -> true
-    | TArray (_, Some z, _) -> (msvcMode () || gccMode ()) && isZero z
+    | TArray (_, Some z, _) -> (msvcMode() || gccMode()) && isZero z
     | _ -> false
   in
   match unrollType t with
   | TComp ({ cfields = Some ((_::_) as l) },_) ->
     let last = (Extlib.last l).ftype in
     is_flexible_array last ||
-    ((gccMode () || msvcMode ()) && has_flexible_array_member last)
+    ((gccMode() || msvcMode()) && has_flexible_array_member last)
   | _ -> false
 
 (* last_field is [true] if the given type is the type of the last field of

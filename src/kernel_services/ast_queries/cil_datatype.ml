@@ -2219,6 +2219,10 @@ module Global_annotation = struct
             if res = 0 then Attributes.compare attr1 attr2 else res
           | Daxiomatic _, _ -> -1
           | _, Daxiomatic _ -> 1
+          | Dmodule (m1,_,_,_), Dmodule (m2,_,_,_) ->
+            String.compare m1 m2
+          | Dmodule _, _ -> -1
+          | _, Dmodule _ -> 1
           | Dtype(t1,_), Dtype(t2,_) -> Logic_type_info.compare t1 t2
           | Dtype _, _ -> -1
           | _, Dtype _ -> 1
@@ -2250,6 +2254,7 @@ module Global_annotation = struct
           | Daxiomatic (_,[],_,_) -> 5
           (* Empty axiomatic is weird but authorized. *)
           | Daxiomatic (_,g::_,_,_) -> 5 * hash g
+          | Dmodule (m,_,_,_) -> 5 * Datatype.String.hash m
           | Dtype (t,_) -> 7 * Logic_type_info.hash t
           | Dlemma(n,_,_,_,_,_) -> 11 * Datatype.String.hash n
           | Dinvariant(l,_) -> 13 * Logic_info.hash l
@@ -2263,6 +2268,7 @@ module Global_annotation = struct
   let loc = function
     | Dfun_or_pred(_, loc)
     | Daxiomatic(_, _, _, loc)
+    | Dmodule(_, _, _, loc)
     | Dtype (_, loc)
     | Dlemma(_, _, _, _, _, loc)
     | Dinvariant(_, loc)
@@ -2273,7 +2279,7 @@ module Global_annotation = struct
 
   let attr = function
     | Dfun_or_pred({ l_var_info = { lv_attr }}, _) -> lv_attr
-    | Daxiomatic(_, _, attr, _) -> attr
+    | Daxiomatic(_, _, attr, _) | Dmodule(_, _, attr, _) -> attr
     | Dtype ({lt_attr}, _) -> lt_attr
     | Dlemma(_, _, _, _, attr, _) -> attr
     | Dinvariant({ l_var_info = { lv_attr }}, _) -> lv_attr
@@ -2682,9 +2688,3 @@ module Syntactic_scope =
 (* -------------------------------------------------------------------------- *)
 
 let clear_caches () = List.iter (fun f -> f ()) !clear_caches
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

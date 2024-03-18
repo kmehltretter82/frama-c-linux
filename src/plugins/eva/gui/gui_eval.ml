@@ -38,7 +38,7 @@ let classify_pre_post kf ip =
   let open Property in
   match ip with
   | IPPredicate {ip_kind = PKEnsures (_, Normal)} -> Some (GL_Post kf)
-  | IPPredicate {ip_kind=PKEnsures _} | IPAxiomatic _ | IPLemma _
+  | IPPredicate {ip_kind=PKEnsures _} | IPAxiomatic _ | IPModule _ | IPLemma _
   | IPTypeInvariant _ | IPGlobalInvariant _
   | IPOther _ | IPCodeAnnot _ | IPAllocation _ | IPReachable _
   | IPExtended _

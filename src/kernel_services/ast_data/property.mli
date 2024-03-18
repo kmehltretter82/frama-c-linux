@@ -154,6 +154,12 @@ and identified_axiomatic = {
   iax_attrs : attributes;
 }
 
+and identified_module = {
+  im_name : string;
+  im_props : identified_property list;
+  im_attrs : attributes;
+}
+
 and identified_lemma = {
   il_name : string;
   il_labels : logic_label list;
@@ -195,6 +201,7 @@ and identified_property = private
   | IPPredicate of identified_predicate
   | IPExtended of identified_extended
   | IPAxiomatic of identified_axiomatic
+  | IPModule of identified_module
   | IPLemma of identified_lemma
   | IPBehavior of identified_behavior
   | IPComplete of identified_complete
@@ -548,9 +555,3 @@ sig
   (** returns the basename of the property. *)
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

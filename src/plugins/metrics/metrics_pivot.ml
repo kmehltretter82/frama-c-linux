@@ -97,6 +97,7 @@ let node_of_global_annotation = function
   | Dfun_or_pred _ -> "logic_fun_or_pred"
   | Dvolatile _ ->  "logic_volatile"
   | Daxiomatic _ -> "axiomatic"
+  | Dmodule _ -> "module"
   | Dtype _ -> "logic_type"
   | Dlemma _ -> "logic_lemma"
   | Dinvariant _ -> "invariant"
@@ -142,6 +143,7 @@ let name_of_global_annotation = function
   | Dinvariant (li, _)
   | Dtype_annot (li, _) -> Some (name_of_logic_info li)
   | Daxiomatic (name, _, _, _)
+  | Dmodule (name, _, _, _)
   | Dtype ({lt_name = name}, _)
   | Dlemma (name, _, _, _, _, _)
   | Dmodel_annot ({mi_name = name}, _)
@@ -157,6 +159,7 @@ let node_of_property = function
     Format.asprintf "%a" Property.pretty_predicate_kind idp.ip_kind
   | IPCodeAnnot ica -> node_of_code_annotation_node ica.ica_ca.annot_content
   | IPAxiomatic _ -> "axiomatic"
+  | IPModule _ -> "module"
   | IPLemma _ -> "lemma"
   | IPBehavior _ -> "behavior"
   | IPComplete _ -> "complete"
@@ -176,6 +179,7 @@ let names_of_property = function
   | Property.IPPredicate idp -> idp.ip_pred.ip_content.tp_statement.pred_name
   | IPCodeAnnot _ -> []
   | IPAxiomatic _ -> []
+  | IPModule _ -> []
   | IPLemma _ -> []
   | IPBehavior _ -> []
   | IPComplete _ -> []

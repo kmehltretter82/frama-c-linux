@@ -1255,7 +1255,7 @@ let extract_logic_infos g =
     | Dfun_or_pred (li,_) | Dinvariant (li,_) | Dtype_annot (li,_) -> li :: acc
     | Dvolatile _ | Dtype _ | Dlemma _
     | Dmodel_annot _ | Dextended _ -> acc
-    | Daxiomatic(_,l,_,_) -> List.fold_left aux acc l
+    | Daxiomatic(_,l,_,_) | Dmodule(_,l,_,_) -> List.fold_left aux acc l
   in aux [] g
 
 let find_logic_info_decl li =

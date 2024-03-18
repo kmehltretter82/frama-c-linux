@@ -858,6 +858,9 @@ let rec global_annot_without_irrelevant_attributes ga =
   | Daxiomatic(n,l,attr,loc) ->
     Daxiomatic(n,List.map global_annot_without_irrelevant_attributes l,
                drop_attributes_for_merge attr,loc)
+  | Dmodule(n,l,attr,loc) ->
+    Dmodule(n,List.map global_annot_without_irrelevant_attributes l,
+            drop_attributes_for_merge attr,loc)
   | Dlemma (id,labs,typs,st,attr,loc) ->
     Dlemma (id,labs,typs,st,drop_attributes_for_merge attr,loc)
   | Dtype (lti,loc) ->
@@ -893,6 +896,11 @@ let rec global_annot_pass1 g =
          if Option.is_some wvi then process_term_kind (x,W))
       hs
   | Daxiomatic(id,decls,_,l) ->
+    ignore (PlainMerging.getNode laEq laSyn !currentFidx id (id,decls)
+              (Some (l,!currentDeclIdx)));
+    List.iter global_annot_pass1 decls
+  | Dmodule(id,decls,_,l) ->
+    Current_loc.set l;
     ignore (PlainMerging.getNode laEq laSyn !currentFidx id (id,decls)
               (Some (l,!currentDeclIdx)));
     List.iter global_annot_pass1 decls
@@ -1712,79 +1720,79 @@ let oneFilePass1 (f:file) : unit =
   let iter g =
     let<> UpdatedCurrentLoc = Cil_datatype.Global.loc g in
     match g with
-    | GVarDecl (vi, l) | GVar (vi, _, l) | GFunDecl (_, vi, l)->
-      incr currentDeclIdx;
-      if vi.vstorage <> Static then begin
-        matchVarinfo ~fromGFun:false vi (l, !currentDeclIdx);
-      end
+      | GVarDecl (vi, l) | GVar (vi, _, l) | GFunDecl (_, vi, l)->
+        incr currentDeclIdx;
+        if vi.vstorage <> Static then begin
+          matchVarinfo ~fromGFun:false vi (l, !currentDeclIdx);
+        end
 
-    | GFun (fdec, l) ->
-      incr currentDeclIdx;
-      (* Save the names of the formal arguments *)
-      let _, args, _, _ = splitFunctionTypeVI fdec.svar in
-      H.add formalNames (!currentFidx, fdec.svar.vname)
-        (List.map (fun (n,_,_) -> n) (argsToList args));
-      (* Force inline functions to be static. *)
-      (* GN: This turns out to be wrong. inline functions are external,
-        * unless specified to be static. *)
-          (*
-            if fdec.svar.vinline && fdec.svar.vstorage = NoStorage then
-            fdec.svar.vstorage <- Static;
-          *)
-      if fdec.svar.vstorage <> Static then begin
-        matchVarinfo ~fromGFun:true fdec.svar (l, !currentDeclIdx)
-      end else begin
-        if fdec.svar.vinline && mergeInlines then
-          (* Just create the nodes for inline functions *)
-          ignore (PlainMerging.getNode iEq iSyn !currentFidx
-                    fdec.svar.vname fdec.svar (Some (l, !currentDeclIdx)))
-      end
-    (* Make nodes for the defined type and structure tags *)
-    | GType (t, l) ->
-      incr currentDeclIdx;
-      t.treferenced <- false;
-      if t.tname <> "" then (* The empty names are just for introducing
-                             * undefined comp tags *)
-        ignore (PlainMerging.getNode tEq tSyn !currentFidx t.tname t
+      | GFun (fdec, l) ->
+        incr currentDeclIdx;
+        (* Save the names of the formal arguments *)
+        let _, args, _, _ = splitFunctionTypeVI fdec.svar in
+        H.add formalNames (!currentFidx, fdec.svar.vname)
+          (List.map (fun (n,_,_) -> n) (argsToList args));
+        (* Force inline functions to be static. *)
+        (* GN: This turns out to be wrong. inline functions are external,
+         * unless specified to be static. *)
+           (*
+             if fdec.svar.vinline && fdec.svar.vstorage = NoStorage then
+             fdec.svar.vstorage <- Static;
+           *)
+        if fdec.svar.vstorage <> Static then begin
+          matchVarinfo ~fromGFun:true fdec.svar (l, !currentDeclIdx)
+        end else begin
+          if fdec.svar.vinline && mergeInlines then
+            (* Just create the nodes for inline functions *)
+            ignore (PlainMerging.getNode iEq iSyn !currentFidx
+                      fdec.svar.vname fdec.svar (Some (l, !currentDeclIdx)))
+        end
+      (* Make nodes for the defined type and structure tags *)
+      | GType (t, l) ->
+        incr currentDeclIdx;
+        t.treferenced <- false;
+        if t.tname <> "" then (* The empty names are just for introducing
+                               * undefined comp tags *)
+          ignore (PlainMerging.getNode tEq tSyn !currentFidx t.tname t
+                    (Some (l, !currentDeclIdx)))
+        else begin (* Go inside and clean the referenced flag for the
+                    * declared tags *)
+          match t.ttype with
+            TComp (ci, _ ) ->
+            ci.creferenced <- false;
+            (* Create a node for it *)
+            ignore
+              (PlainMerging.getNode sEq sSyn !currentFidx ci.cname ci None)
+
+          | TEnum (ei, _) ->
+            ei.ereferenced <- false;
+            ignore
+              (EnumMerging.getNode eEq eSyn !currentFidx ei ei None)
+
+          | _ ->  (Kernel.fatal "Anonymous Gtype is not TComp")
+        end
+
+      | GCompTag (ci, l) ->
+        incr currentDeclIdx;
+        ci.creferenced <- false;
+        ignore (PlainMerging.getNode sEq sSyn !currentFidx ci.cname ci
                   (Some (l, !currentDeclIdx)))
-      else begin (* Go inside and clean the referenced flag for the
-                  * declared tags *)
-        match t.ttype with
-          TComp (ci, _ ) ->
-          ci.creferenced <- false;
-          (* Create a node for it *)
-          ignore
-            (PlainMerging.getNode sEq sSyn !currentFidx ci.cname ci None)
-
-        | TEnum (ei, _) ->
-          ei.ereferenced <- false;
-          ignore
-            (EnumMerging.getNode eEq eSyn !currentFidx ei ei None)
-
-        | _ ->  (Kernel.fatal "Anonymous Gtype is not TComp")
-      end
-
-    | GCompTag (ci, l) ->
-      incr currentDeclIdx;
-      ci.creferenced <- false;
-      ignore (PlainMerging.getNode sEq sSyn !currentFidx ci.cname ci
-                (Some (l, !currentDeclIdx)))
-    | GCompTagDecl (ci,_) -> ci.creferenced <- false
-    | GEnumTagDecl (ei,_) -> ei.ereferenced <- false
-    | GEnumTag (ei, l) ->
-      incr currentDeclIdx;
-      let orig_name =
-        if ei.eorig_name = "" then ei.ename else ei.eorig_name
-      in
-      ignore (Alpha.newAlphaName ~alphaTable:aeAlpha ~undolist:None
-                ~lookupname:orig_name ~data:l);
-      ei.ereferenced <- false;
-      ignore
-        (EnumMerging.getNode eEq eSyn !currentFidx ei ei
-           (Some (l, !currentDeclIdx)))
+      | GCompTagDecl (ci,_) -> ci.creferenced <- false
+      | GEnumTagDecl (ei,_) -> ei.ereferenced <- false
+      | GEnumTag (ei, l) ->
+        incr currentDeclIdx;
+        let orig_name =
+          if ei.eorig_name = "" then ei.ename else ei.eorig_name
+        in
+        ignore (Alpha.newAlphaName ~alphaTable:aeAlpha ~undolist:None
+                  ~lookupname:orig_name ~data:l);
+        ei.ereferenced <- false;
+        ignore
+          (EnumMerging.getNode eEq eSyn !currentFidx ei ei
+             (Some (l, !currentDeclIdx)))
     | GAnnot (gannot, _) ->
-      incr currentDeclIdx;
-      global_annot_pass1 gannot
+        incr currentDeclIdx;
+        global_annot_pass1 gannot
     | GText _ | GPragma _ | GAsm _ -> ()
   in
   List.iter iter f.globals
@@ -2194,7 +2202,9 @@ class renameInlineVisitorClass = object(self)
 end
 let renameInlinesVisitor = new renameInlineVisitorClass
 
-let rec logic_annot_pass2 ~in_axiomatic g a =
+type context = Toplevel | InAxiomatic | InModule
+
+let rec logic_annot_pass2 context g a =
   let open Current_loc.Operators in
   let<> UpdatedCurrentLoc = Cil_datatype.Global_annotation.loc a in
   match a with
@@ -2202,18 +2212,18 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
     begin
       match LogicMerging.findReplacement true lfEq !currentFidx li with
       | None ->
-        if not in_axiomatic then
+        if context = Toplevel then
           mergePushGlobals (visitCilGlobal renameVisitor g);
         Logic_utils.add_logic_function li;
       | Some _ -> ()
       (* FIXME: should we perform same actions
-          as the case Dlogic_reads above ? *)
+         as the case Dlogic_reads above ? *)
     end
   | Dtype (t, _) ->
     begin
       match PlainMerging.findReplacement true ltEq !currentFidx t.lt_name with
       | None ->
-        if not in_axiomatic then
+        if context = Toplevel then
           mergePushGlobals (visitCilGlobal renameVisitor g);
         let def =
           (PlainMerging.find_eq_table ltEq (!currentFidx,t.lt_name)).ndata
@@ -2231,7 +2241,7 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
     begin
       match LogicMerging.findReplacement true lfEq !currentFidx li with
       | None ->
-        if in_axiomatic then Kernel.abort ~current:true
+        if context <> Toplevel then Kernel.abort ~current:true
             "nested axiomatics are not allowed in ACSL";
         mergePushGlobals (visitCilGlobal renameVisitor g);
         Logic_utils.add_logic_function
@@ -2243,13 +2253,13 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
       match LogicMerging.findReplacement true lfEq !currentFidx n with
       | None ->
         let g = visitCilGlobal renameVisitor g in
-        if not in_axiomatic then
+        if context = Toplevel then
           mergePushGlobals g;
         Logic_utils.add_logic_function
           (LogicMerging.find_eq_table lfEq (!currentFidx,n)).ndata
       | Some _ -> ()
     end
-  | Dmodel_annot (mf, l) ->
+  | Dmodel_annot (mf,l) ->
     begin
       match
         ModelMerging.findReplacement
@@ -2263,8 +2273,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
               mfEq (!currentFidx,(mf'.mi_name,mf'.mi_base_type))
           in
           (* Adds a new representative. Do not replace directly
-              my_node, as there might be some pointers to it from
-              other files.
+             my_node, as there might be some pointers to it from
+             other files.
           *)
           let my_node' = { my_node with ndata = mf' } in
           my_node.nrep <- my_node'; (* my_node' represents my_node *)
@@ -2275,7 +2285,7 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
             (!currentFidx,(mf'.mi_name,mf'.mi_base_type))
             my_node';
         end;
-        if not in_axiomatic then begin
+        if context = Toplevel then begin
           mergePushGlobals [GAnnot (Dmodel_annot(mf',l),l)];
         end;
         Logic_env.add_model_field
@@ -2287,11 +2297,11 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
     begin
       match PlainMerging.findReplacement true llEq !currentFidx n with
         None ->
-        if not in_axiomatic then
+        if context = Toplevel then
           mergePushGlobals (visitCilGlobal renameVisitor g)
       | Some _ -> ()
     end
-  | Dvolatile(vi, rd, wr, attr, loc) ->
+  | Dvolatile(vi,rd,wr,attr,loc) ->
     let is_representative id =
       Option.is_none
         (VolatileMerging.findReplacement true lvEq !currentFidx id)
@@ -2345,10 +2355,32 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
     begin
       match PlainMerging.findReplacement true laEq !currentFidx n with
         None ->
-        if in_axiomatic then Kernel.abort ~current:true
+        begin match context with
+          | Toplevel -> ()
+          | InAxiomatic ->
+            Kernel.abort ~current:true
             "nested axiomatics are not allowed in ACSL";
+          | InModule ->
+            Kernel.abort ~current:true
+              "mixed axiomatics and modules are not allowed in ACSL";
+        end ;
         mergePushGlobals (visitCilGlobal renameVisitor g);
-        List.iter (logic_annot_pass2 ~in_axiomatic:true g) l
+        List.iter (logic_annot_pass2 InAxiomatic g) l
+      | Some _ -> ()
+    end
+  | Dmodule(n,l,_,loc) ->
+    begin
+      Current_loc.set loc;
+      match PlainMerging.findReplacement true laEq !currentFidx n with
+        None ->
+        begin match context with
+          | Toplevel | InModule -> ()
+          | InAxiomatic ->
+            Kernel.abort ~current:true
+              "mixed axiomatics and modules are not allowed in ACSL";
+        end ;
+        mergePushGlobals (visitCilGlobal renameVisitor g);
+        List.iter (logic_annot_pass2 InModule g) l
       | Some _ -> ()
     end
   | Dextended(ext, _, _) ->
@@ -2356,7 +2388,7 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
      | None -> mergePushGlobals (visitCilGlobal renameVisitor g);
      | Some _ -> ())
 
-let global_annot_pass2 g a = logic_annot_pass2 ~in_axiomatic:false g a
+let global_annot_pass2 g a = logic_annot_pass2 Toplevel g a
 
 (* sm: First attempt at a semantic checksum for function bodies.
  * Ideally, two function's checksums would be equal only when their
@@ -2972,8 +3004,8 @@ let oneFilePass2 (f: file) =
       end
     | GCompTagDecl (ci, _) -> begin
         (* This is here just to introduce an undefined
-         * structure. But maybe the structure was defined
-         * already.  *)
+                           * structure. But maybe the structure was defined
+                           * already.  *)
         (* Do not increment currentDeclIdx because it is not incremented in
          * pass 1*)
         if H.mem emittedCompDecls ci.cname then

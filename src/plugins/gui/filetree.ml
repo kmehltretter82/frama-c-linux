@@ -316,6 +316,7 @@ module MYTREE = struct
       Some (global_name li.l_var_info.lv_name)
     | Dvolatile _ -> Some "volatile clause"
     | Daxiomatic (s, _, _,_) -> Some (global_name s)
+    | Dmodule (s, _, _,_) -> Some (global_name s)
     | Dtype (lti, _) -> Some (global_name lti.lt_name)
     | Dlemma (s, _, _, _, _,_) -> Some (global_name s)
     | Dinvariant (li, _) -> Some (global_name li.l_var_info.lv_name)
