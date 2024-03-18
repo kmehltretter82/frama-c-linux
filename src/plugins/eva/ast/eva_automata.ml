@@ -232,7 +232,27 @@ let build_wto_index wto =
   in
   iter_wto [] wto
 
+let generate_literal_strings_bases kf =
+  (* Bases id for literal strings are generated the first time a base for the
+     string is required. The ordering of bases is built on this id, so the
+     order of generation changes the order of pretty printing. This function
+     visits the strings of a function in a standard order defined by frama-c
+     visitor to ensure the stability of pretty printing. *)
+  let visitor = object
+    inherit Visitor.frama_c_inplace
+    method !vexpr exp =
+      match exp.enode with
+      | Const (Cil_types.CStr _ | Cil_types.CWStr _) ->
+        ignore (Base.of_string_exp exp);
+        Cil.SkipChildren
+      | _ ->
+        Cil.DoChildren
+  end
+  in
+  ignore (Visitor.visitFramacKf visitor kf)
+
 let translate_automaton kf =
+  generate_literal_strings_bases kf;
   let module Src = Interpreted_automata in
   let module VertexTable = Src.Vertex.Hashtbl in
   let src = Interpreted_automata.get_automaton kf in
