@@ -661,7 +661,7 @@ sig
     Cil_types.logic_type -> Logic_ptree.code_annot -> code_annotation
   val type_annot : location -> Logic_ptree.type_annot -> logic_info
   val model_annot : location -> Logic_ptree.model_annot -> model_info
-  val annot : Logic_ptree.decl -> global_annotation
+  val annot : Logic_ptree.decl -> global_annotation option
   val funspec :
     string list ->
     varinfo -> (varinfo list) option -> typ -> Logic_ptree.spec -> funspec
@@ -4066,11 +4066,12 @@ struct
     | TDsum cons -> LTsum (List.map (type_datacons loc env my_info) cons)
     | TDsyn typ -> LTsyn (plain_logic_type loc env typ)
 
-  let rec annot in_axiomatic a =
+  let rec decl in_axiomatic a =
     let open Current_loc.Operators in
     let loc = a.decl_loc in
     let<> UpdatedCurrentLoc = loc in
     match a.decl_node with
+
     | LDlogic_reads (f, labels, poly, t, p, l) ->
       let env,info = logic_decl loc f labels poly ~return_type:t p in
       info.l_body <-
@@ -4085,7 +4086,8 @@ struct
          | None -> LBnone);
       (* potential creation of label w.r.t. reads clause *)
       update_info_wrt_default_label info;
-      Dfun_or_pred (info,loc)
+      Some (Dfun_or_pred (info,loc))
+
     | LDpredicate_reads (f, labels, poly, p, l) ->
       let env,info = logic_decl loc f labels poly p in
       info.l_body <-
@@ -4100,7 +4102,8 @@ struct
          | None -> LBnone);
       (* potential creation of label w.r.t. reads clause *)
       update_info_wrt_default_label info;
-      Dfun_or_pred (info,loc)
+      Some (Dfun_or_pred (info,loc))
+
     | LDlogic_def(f, labels, poly,t,p,e) ->
       let env,info = logic_decl loc f labels poly ~return_type:t p in
       let rt = match info.l_type with
@@ -4114,20 +4117,21 @@ struct
         info.l_body <- LBterm (update_term_wrt_default_label new_term);
         (* potential creation of label w.r.t. def *)
         update_info_wrt_default_label info;
-        Dfun_or_pred (info,loc)
+        Some (Dfun_or_pred (info,loc))
       end else
         C.error loc
-          "return type of logic function %s is %a but %a was expected"
-          f
+          "return type of logic function %s is %a but %a was expected" f
           Cil_printer.pp_logic_type new_typ
           Cil_printer.pp_logic_type rt
+
     | LDpredicate_def (f, labels, poly, p, e) ->
       let env,info = logic_decl loc f labels poly p in
       let e = update_predicate_wrt_default_label (predicate env e) in
       info.l_body <- LBpred e;
       (* potential creation of label w.r.t. def *)
       update_info_wrt_default_label info;
-      Dfun_or_pred (info,loc)
+      Some (Dfun_or_pred (info,loc))
+
     | LDinductive_def (f, input_labels, poly, p, indcases) ->
       let _env,info = logic_decl loc f input_labels poly p in
       (* env is ignored: because params names are indeed useless...*)
@@ -4154,28 +4158,26 @@ struct
          Update the inductive cases that need it (i.e. do not define
          their own label(s)).
       *)
-      let l =
-        List.rev_map update_ind_case_wrt_default_label l
-      in
+      let l = List.rev_map update_ind_case_wrt_default_label l in
       info.l_body <- LBinductive l;
       update_info_wrt_default_label info;
-      Dfun_or_pred (info,loc)
+      Some (Dfun_or_pred (info,loc))
+
     | LDaxiomatic(id,decls) ->
       if in_axiomatic then
         (* Not supported yet. See issue 43 on ACSL's github repository. *)
-        C.error loc "Nested axiomatic. Ignoring body of %s" id
-      else begin
+        C.error loc "Nested axiomatic. Ignoring body of %s" id ;
         let change oldloc =
           C.error loc
             "Duplicated axiomatics %s (first occurrence at %a)"
-            id Cil_printer.pp_location oldloc
-        in
-        let l = List.map (annot true) decls in
+          id Cil_printer.pp_location oldloc in
+      let l = List.filter_map (decl true) decls in
         ignore (Logic_env.Axiomatics.memo ~change (fun _ -> loc) id);
-        Daxiomatic(id,l,[],loc)
-      end
+      Some (Daxiomatic(id,l,[],loc))
+
     | LDmodule _ -> C.error loc "Unsupported module declaration"
     | LDimport _ -> C.error loc "Unsupported module import"
+
     | LDtype(s,l,def) ->
       let env = init_type_variables loc l in
       let my_info =
@@ -4183,14 +4185,14 @@ struct
           lt_params = l;
           lt_def = None; (* will be updated later *)
           lt_attr = [];
-        }
-      in
+        } in
       add_logic_type loc my_info;
       let tdef = Option.map (typedef loc env my_info) def in
       if is_cyclic_typedef s tdef then
         C.error loc "Definition of %s is cyclic" s;
       my_info.lt_def <- tdef;
-      Dtype (my_info,loc)
+      Some (Dtype (my_info,loc))
+
     | LDlemma (x,labels, poly, {tp_kind = kind; tp_statement = e}) ->
       if Logic_env.Lemmas.mem x then begin
         let old_def = Logic_env.Lemmas.find x in
@@ -4211,7 +4213,8 @@ struct
       in
       let def = Dlemma (x,labels, poly,  p, [], loc) in
       Logic_env.Lemmas.add x def;
-      def
+      Some def
+
     | LDinvariant (s, e) ->
       let labels,env = annot_env loc [] [] in
       let li = Cil_const.make_logic_info s in
@@ -4224,11 +4227,11 @@ struct
       li.l_body <- LBpred p;
       add_logic_function loc li;
       update_info_wrt_default_label li;
-      Dinvariant (li,loc)
-    | LDtype_annot l ->
-      Dtype_annot (type_annot loc l,loc)
-    | LDmodel_annot l ->
-      Dmodel_annot (model_annot loc l,loc);
+      Some (Dinvariant (li,loc))
+
+    | LDtype_annot l -> Some (Dtype_annot (type_annot loc l,loc))
+    | LDmodel_annot l -> Some (Dmodel_annot (model_annot loc l,loc))
+
     | LDvolatile (tsets, (rd_opt, wr_opt)) ->
       let env = keep_qualifiers (Lenv.empty ()) in
       let ctxt = base_ctxt env in
@@ -4316,25 +4319,27 @@ struct
       let tsets = List.map (Logic_const.new_identified_term) tsets in
       let rvi_opt = get_volatile_fct checks_reads_fct rd_opt in
       let wvi_opt = get_volatile_fct checks_writes_fct wr_opt in
-      Dvolatile (tsets, rvi_opt, wvi_opt, [], loc)
+      Some (Dvolatile (tsets, rvi_opt, wvi_opt, [], loc))
+
     | LDextended (Ext_lexpr(kind, content)) ->
       let typing_context = base_ctxt (Lenv.empty ()) in
       let status,tcontent = Extensions.typer kind ~typing_context ~loc content in
       let textended = Logic_const.new_acsl_extension kind loc status tcontent in
-      Dextended (textended, [], loc)
+      Some (Dextended (textended, [], loc))
+
     | LDextended (Ext_extension (kind, name, content)) ->
       let typing_context = base_ctxt (Lenv.empty ()) in
       let status,tcontent =
         Extensions.typer_block kind ~typing_context ~loc (name,content)
       in
       let textended = Logic_const.new_acsl_extension kind loc status tcontent in
-      Dextended (textended, [], loc)
+      Some (Dextended (textended, [], loc))
 
-  let annot a =
+  let annot = C.on_error
+      (fun a ->
     start_transaction ();
-    let res = annot false a in
-    finish_transaction (); res
-
-  let annot = C.on_error annot (fun _ -> rollback_transaction ())
+         let res = decl false a in
+         finish_transaction (); res)
+      (fun _ -> rollback_transaction ())
 
 end

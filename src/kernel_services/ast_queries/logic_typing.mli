@@ -202,7 +202,7 @@ sig
   val model_annot :
     location -> Logic_ptree.model_annot -> model_info
 
-  val annot : Logic_ptree.decl -> global_annotation
+  val annot : Logic_ptree.decl -> global_annotation option
 
   (** [funspec behaviors f prms typ spec] type-checks a function contract.
       @param behaviors list of existing behaviors (outside of the current
