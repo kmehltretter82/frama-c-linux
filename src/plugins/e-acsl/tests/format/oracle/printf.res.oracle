@@ -90,17 +90,17 @@
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:89: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:505: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:506: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:507: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:508: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:492: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:493: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:494: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:495: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
