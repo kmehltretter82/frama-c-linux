@@ -250,22 +250,15 @@ const getPosition = (d: Dragging, D: number, R: number): number =>
   d ? inRange(getDragPosition(d), D) : Math.round(D * R);
 
 type Pid = string | undefined;
-type Sid = string | undefined | null; // null means Top
 
 const sameOf = (P: Pid, Q: Pid): Pid => {
   if (P === Q) return P;
-  if (!P) return Q;
-  if (!Q) return P;
-  return undefined;
-};
-
-const merge = (U: Sid, V: Sid): Sid => {
-  return U === V ? U : null;
+  else return undefined;
 };
 
 const fullOf = (A: Pid, B: Pid, C: Pid, D: Pid): Pid => {
-  const S = merge(A, merge(B, merge(C, D)));
-  return (S === null ? undefined : S);
+  if (A === B && B === C && C === D) return A;
+  else return undefined;
 };
 
 function QSplitEngine(props: QSplitEngineProps): JSX.Element {
