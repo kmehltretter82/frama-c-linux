@@ -29,7 +29,6 @@ import * as Utils from 'dome/data/arrays';
 import * as States from 'frama-c/states';
 import * as Settings from 'dome/data/settings';
 import { IconButton } from 'dome/controls/buttons';
-import { Filler, Inset } from 'dome/frame/toolbars';
 import * as Studia from 'frama-c/plugins/studia';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { text } from 'frama-c/kernel/api/data';
@@ -739,14 +738,12 @@ export default function ASTview(): JSX.Element {
   return (
     <>
       <TitleBar>
-        <Filler />
         <IconButton
           icon={icon}
           onClick= {unFoldButtonClicked}
           title={title + ' all multi-line ACSL properties'}
           className="titlebar-thin-icon"
         />
-        <Inset />
       </TitleBar>
       <Component style={{ fontSize: `${fontSize}px` }} />
     </>
