@@ -190,14 +190,29 @@ module Memory = struct
   let find z m = Deps.to_zone (find_precise z m)
 end
 
-type t =
-  { deps_return : Deps.t;
-    deps_table : Memory.t }
+module Datatype_Input = struct
+  include Datatype.Serializable_undefined
+  type t = {
+    deps_return : Deps.t;
+    deps_table : Memory.t
+  }
+  [@@deriving eq,ord]
+  let name = "Eva.Froms"
+  let top = {
+    deps_return = Deps.top;
+    deps_table = Memory.top;
+  }
+  let reprs = [ top ]
+  let hash froms =
+    Hashtbl.hash (Memory.hash froms.deps_table, Deps.hash froms.deps_return)
+  let pretty fmt { deps_return = r ; deps_table = t } =
+    Format.fprintf fmt "%a@\n\\result FROM @[%a@]@\n"
+      Memory.pretty t
+      Deps.pretty r
+end
 
-let top = {
-  deps_return = Deps.top;
-  deps_table = Memory.top;
-}
+include Datatype.Make (Datatype_Input)
+include Datatype_Input
 
 let join x y =
   { deps_return = Deps.join x.deps_return y.deps_return ;
@@ -215,28 +230,3 @@ let outputs { deps_table = t } =
          | DepsBottom | Unassigned -> acc
          | AssignedFrom _ | MaybeAssignedFrom _ -> Locations.Zone.join z acc)
       m Locations.Zone.bottom
-
-module Datatype_Input = struct
-  include Datatype.Serializable_undefined
-  type nonrec t = t
-  let name = "Eva.Froms"
-
-  let reprs = [ top ]
-  let structural_descr =
-    Structural_descr.t_record [| Deps.packed_descr; Memory.packed_descr |]
-
-  let equal
-      { deps_return = dr ; deps_table = dt }
-      { deps_return = dr' ; deps_table = dt' } =
-    Memory.equal dt dt'&& Deps.equal dr dr'
-
-  let hash { deps_return = dr ; deps_table = dt } =
-    Memory.hash dt + 197 * Deps.hash dr
-
-  let pretty fmt { deps_return = r ; deps_table = t } =
-    Format.fprintf fmt "%a@\n\\result FROM @[%a@]@\n"
-      Memory.pretty t
-      Deps.pretty r
-end
-
-include (Datatype.Make (Datatype_Input) : Datatype.S with type t := t)
