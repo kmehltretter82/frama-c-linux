@@ -147,13 +147,13 @@ let eval_assigns_from pre_state it =
 (** Compute the validity status for [from] in [pre_state], assuming the
     entire clause is [assigns asgn \from from]. The inferred dependencies
     are [found_froms], while [asgn] evaluates to [assigns_zone]. *)
-let check_from pre_state asgn assigns_zone from found_froms =
+let check_from pre_state asgn assigns_zone from found_assigns =
   let open Locations in
   let found_deps =
     if Logic_utils.is_result asgn.it_content then
-      found_froms.Froms.deps_return
+      found_assigns.Assigns.return
     else
-      Froms.Memory.find_precise found_froms.deps_table assigns_zone
+      Assigns.Memory.find_precise found_assigns.memory assigns_zone
   in
   let (indirect_deps,direct_deps) =
     let filter x = List.mem "indirect" x.it_content.term_name in
@@ -213,7 +213,7 @@ let check_fct_assigns kf ab ~pre_state found_froms =
   let behaviors = Annotations.behaviors kf in
   (* Under-approximation of the union. *)
   let link zones = List.fold_left Zone.link Zone.bottom zones in
-  let outputs = Froms.outputs found_froms in
+  let outputs = Assigns.outputs found_froms in
   let check_for_behavior b =
     let activity = Active_behaviors.is_active ab b in
     match activity with

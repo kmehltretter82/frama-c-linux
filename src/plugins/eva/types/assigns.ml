@@ -193,33 +193,35 @@ end
 module Datatype_Input = struct
   include Datatype.Serializable_undefined
   type t = {
-    deps_return : Deps.t;
-    deps_table : Memory.t
+    return : Deps.t;
+    memory : Memory.t
   }
   [@@deriving eq,ord]
   let name = "Eva.Froms"
   let top = {
-    deps_return = Deps.top;
-    deps_table = Memory.top;
+    return = Deps.top;
+    memory = Memory.top;
   }
   let reprs = [ top ]
-  let hash froms =
-    Hashtbl.hash (Memory.hash froms.deps_table, Deps.hash froms.deps_return)
-  let pretty fmt { deps_return = r ; deps_table = t } =
+  let hash assigns =
+    Hashtbl.hash (Memory.hash assigns.memory, Deps.hash assigns.return)
+  let pretty fmt assigns =
     Format.fprintf fmt "%a@\n\\result FROM @[%a@]@\n"
-      Memory.pretty t
-      Deps.pretty r
+      Memory.pretty assigns.memory
+      Deps.pretty assigns.return
 end
 
 include Datatype.Make (Datatype_Input)
 include Datatype_Input
 
 let join x y =
-  { deps_return = Deps.join x.deps_return y.deps_return ;
-    deps_table = Memory.join x.deps_table y.deps_table }
+  {
+    return = Deps.join x.return y.return;
+    memory = Memory.join x.memory y.memory;
+  }
 
-let outputs { deps_table = t } =
-  match t with
+let outputs assigns =
+  match assigns.memory with
   | Memory.Top -> Locations.Zone.top
   | Memory.Bottom -> Locations.Zone.bottom
   | Memory.Map m ->

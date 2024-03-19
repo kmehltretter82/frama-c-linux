@@ -24,7 +24,7 @@ open Locations
 module Deps = Eva.Deps
 
 module DepsOrUnassigned = struct
-  include Eva.Froms.DepsOrUnassigned
+  include Eva.Assigns.DepsOrUnassigned
 
   let subst f d =
     match d with
@@ -68,7 +68,7 @@ module DepsOrUnassigned = struct
       Format.fprintf fmt "%a (and SELF)" Deps.pretty_precise fd
 end
 
-include Eva.Froms.Memory
+include Eva.Assigns.Memory
 
 let bind_var vi v m =
   let z = Locations.zone_of_varinfo vi in
@@ -217,9 +217,10 @@ let pretty_ind_data =
     precise information.
     @raise Error if the given type is not a function type
 *)
-let pretty_with_type ~indirect typ fmt Eva.Froms.{ deps_return = r; deps_table = t } =
+let pretty_with_type ~indirect typ fmt assigns =
+  let Eva.Assigns.{ memory; return } = assigns in
   let (rt_typ,_,_,_) = Cil.splitFunctionType typ in
-  if is_bottom t
+  if is_bottom memory
   then Format.fprintf fmt
       "@[NON TERMINATING - NO EFFECTS@]"
   else
@@ -230,18 +231,18 @@ let pretty_with_type ~indirect typ fmt Eva.Froms.{ deps_return = r; deps_table =
     in
     if Cil.isVoidType rt_typ
     then begin
-      if is_empty t
+      if is_empty memory
       then Format.fprintf fmt "@[NO EFFECTS@]"
-      else map_pretty fmt t
+      else map_pretty fmt memory
     end
     else
       let pp_space fmt =
-        if not (is_empty t) then
+        if not (is_empty memory) then
           Format.fprintf fmt "@ "
       in
       Format.fprintf fmt "@[<v>%a%t@[\\result FROM @[%a@]@]@]"
-        map_pretty t pp_space
-        (if indirect then Deps.pretty_precise else Deps.pretty) r
+        map_pretty memory pp_space
+        (if indirect then Deps.pretty_precise else Deps.pretty) return
 
 let pretty_with_type_indirect = pretty_with_type ~indirect:true
 let pretty_with_type = pretty_with_type ~indirect:false

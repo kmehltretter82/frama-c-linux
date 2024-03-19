@@ -634,7 +634,7 @@ module Eval: sig
                          callers, can be cached. *)
 end
 
-module Froms: sig
+module Assigns: sig
 
   module DepsOrUnassigned : sig
 
@@ -678,9 +678,9 @@ module Froms: sig
   end
 
   type t = {
-    deps_return : Deps.t
+    return : Deps.t
   (** Dependencies for the returned value *);
-    deps_table : Memory.t
+    memory : Memory.t
   (** Dependencies on all the zones modified by the function *);
   }
 
@@ -715,7 +715,7 @@ module Builtins: sig
     c_clobbered: Base.SetLattice.t;
     (** An over-approximation of the bases in which addresses of local variables
         might have been written *)
-    c_from: (Froms.t * Locations.Zone.t) option;
+    c_assigns: (Assigns.t * Locations.Zone.t) option;
     (** If not None, the froms of the function, and its sure outputs;
         i.e. the dependencies of the result and of each zone written to. *)
   }
@@ -766,7 +766,7 @@ module Cvalue_callbacks: sig
   (** If not None, the froms of the function, and its sure outputs;
       i.e. the dependencies of the result, and the dependencies
       of each zone written to. *)
-  type call_froms = (Froms.t * Locations.Zone.t) option
+  type call_assigns = (Assigns.t * Locations.Zone.t) option
 
   type analysis_kind =
     [ `Builtin (** A cvalue builtin is used to interpret the function. *)
@@ -791,7 +791,7 @@ module Cvalue_callbacks: sig
 
   (** Results of a function call. *)
   type call_results =
-    [ `Builtin of state list * call_froms
+    [ `Builtin of state list * call_assigns
     (** List of cvalue states at the end of the builtin. *)
     | `Spec of state list
     (** List of cvalue states at the end of the call. *)
@@ -861,7 +861,7 @@ module Logic_inout: sig
       and compare them with the given froms (computed by the from plugin).
       Emits warnings if needed, and sets statuses to the assigns clauses. *)
   val verify_assigns:
-    Cil_types.kernel_function -> pre:Cvalue.Model.t -> Froms.t -> unit
+    Cil_types.kernel_function -> pre:Cvalue.Model.t -> Assigns.t -> unit
 
 
   (** [accept_base ~formals ~locals kf b] returns [true] if and only if [b] is:

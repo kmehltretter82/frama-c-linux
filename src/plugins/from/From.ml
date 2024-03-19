@@ -27,7 +27,7 @@ let is_computed = Functionwise.is_computed
 let get = Functionwise.get
 let pretty = Functionwise.pretty
 
-let access zone mem = Eva.Froms.Memory.find mem zone
+let access zone mem = Eva.Assigns.Memory.find mem zone
 
 let display fmt = From_register.display (Some fmt)
 

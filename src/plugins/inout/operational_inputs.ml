@@ -514,8 +514,8 @@ let get_external_aux ?stmt kf =
         r
       else !ref_get_external kf
 
-let extract_inout_from_froms froms =
-  let Eva.Froms.{ deps_return; deps_table } = froms in
+let extract_inout_from_froms assigns =
+  let Eva.Assigns.{ return = deps_return; memory = deps_table } = assigns in
   let in_return = Eva.Deps.to_zone deps_return in
   let in_, out_ =
     match deps_table with
@@ -525,13 +525,13 @@ let extract_inout_from_froms froms =
       let aux_from out in_ (acc_in,acc_out as acc) =
         (* Skip zones fully unassigned, they are not really port of the
            dependencies, but just present in the offsetmap to avoid "holes" *)
-        match (in_ : Eva.Froms.DepsOrUnassigned.t) with
+        match (in_ : Eva.Assigns.DepsOrUnassigned.t) with
         | DepsBottom | Unassigned -> acc
         | AssignedFrom in_ | MaybeAssignedFrom in_ ->
           Zone.join acc_in (Eva.Deps.to_zone in_),
           Zone.join acc_out out
       in
-      Eva.Froms.Memory.fold aux_from m (Zone.bottom, Zone.bottom)
+      Eva.Assigns.Memory.fold aux_from m (Zone.bottom, Zone.bottom)
   in
   (Zone.join in_return in_), out_
 

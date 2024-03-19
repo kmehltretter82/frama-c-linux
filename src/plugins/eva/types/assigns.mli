@@ -66,9 +66,9 @@ module Memory : sig
 end
 
 type t = {
-  deps_return : Deps.t
+  return : Deps.t
 (** Dependencies for the returned value *);
-  deps_table : Memory.t
+  memory : Memory.t
 (** Dependencies on all the zones modified by the function *);
 }
 

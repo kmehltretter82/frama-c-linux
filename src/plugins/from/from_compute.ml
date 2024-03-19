@@ -33,16 +33,16 @@ module Record_From_Callbacks =
     (struct
       type t =
         (Kernel_function.t Stack.t) *
-        Eva.Froms.Memory.t Stmt.Hashtbl.t *
-        (Kernel_function.t * Eva.Froms.Memory.t) list Stmt.Hashtbl.t
+        Eva.Assigns.Memory.t Stmt.Hashtbl.t *
+        (Kernel_function.t * Eva.Assigns.Memory.t) list Stmt.Hashtbl.t
     end)
 
 module type To_Use =
 sig
-  val get_from_call : kernel_function -> stmt -> Eva.Froms.t
+  val get_from_call : kernel_function -> stmt -> Eva.Assigns.t
   val stmt_request : stmt -> Eva.Results.request
   val keep_base : kernel_function -> Base.t -> bool
-  val cleanup_and_save : kernel_function -> Eva.Froms.t -> Eva.Froms.t
+  val cleanup_and_save : kernel_function -> Eva.Assigns.t -> Eva.Assigns.t
 end
 
 let compute_using_prototype_for_state state kf assigns =
@@ -77,7 +77,7 @@ let compute_using_prototype_for_state state kf assigns =
              dependencies *)
           let input_deps = Eva.Deps.data input_zone in
           (* Weak update of the over-approximation of the zones assigned *)
-          let acc = Eva.Froms.Memory.add_binding ~exact:false
+          let acc = Eva.Assigns.Memory.add_binding ~exact:false
               acc output.over input_deps in
           (* Now, perform a strong update on the zones that are guaranteed
                    to be assigned (under-approximation) AND that do not depend
@@ -90,7 +90,7 @@ let compute_using_prototype_for_state state kf assigns =
             Zone.(if equal top input_zone then bottom
                   else diff output.under input_zone)
           in
-          let acc = Eva.Froms.Memory.add_binding ~exact:true
+          let acc = Eva.Assigns.Memory.add_binding ~exact:true
               acc sure_out_zone input_deps in
           acc
 
@@ -137,9 +137,9 @@ let compute_using_prototype_for_state state kf assigns =
       in
       return_assigns,
       List.fold_left
-        treat_assign Eva.Froms.Memory.empty other_assigns
+        treat_assign Eva.Assigns.Memory.empty other_assigns
   in
-  Eva.Froms.{ deps_return = return_deps; deps_table = deps }
+  Eva.Assigns.{ return = return_deps; memory = deps }
 
 module ZoneStmtMap = struct
   include
@@ -164,7 +164,7 @@ struct
           the statement that gave rise to the dependency. *)
       additional_deps : Zone.t;
       (** Union of the sets in {!additional_deps_table} *)
-      deps_table : Eva.Froms.Memory.t
+      deps_table : Eva.Assigns.Memory.t
       (** dependency table *)
     }
 
@@ -221,7 +221,7 @@ struct
     let request = To_Use.stmt_request stmt in
     let pre_trans = Eva.Results.expr_dependencies expr request in
     merge_deps
-      (fun d -> Eva.Froms.Memory.find_precise deps_tbl d) pre_trans
+      (fun d -> Eva.Assigns.Memory.find_precise deps_tbl d) pre_trans
 
   let lval_to_zone_with_deps stmt lv =
     let request = To_Use.stmt_request stmt in
@@ -238,12 +238,12 @@ struct
   let empty_from =
     { additional_deps_table = ZoneStmtMap.empty;
       additional_deps = Zone.bottom;
-      deps_table = Eva.Froms.Memory.empty }
+      deps_table = Eva.Assigns.Memory.empty }
 
   let bottom_from =
     { additional_deps_table = ZoneStmtMap.empty;
       additional_deps = Zone.bottom;
-      deps_table = Eva.Froms.Memory.bottom }
+      deps_table = Eva.Assigns.Memory.bottom }
 
   module Computer = struct
 
@@ -257,7 +257,7 @@ struct
       Eva.Deps.add_indirect subst_deps extra_loc
 
     let display_one_from fmt v =
-      Eva.Froms.Memory.pretty fmt v.deps_table;
+      Eva.Assigns.Memory.pretty fmt v.deps_table;
       Format.fprintf fmt "Additional Variable Map : %a@\n"
         ZoneStmtMap.pretty v.additional_deps_table;
       Format.fprintf fmt
@@ -291,10 +291,10 @@ struct
           m, new_z, false
       in
       let map =
-        Eva.Froms.Memory.join new_.deps_table old.deps_table
+        Eva.Assigns.Memory.join new_.deps_table old.deps_table
       in
       let included' =
-        Eva.Froms.Memory.is_included new_.deps_table old.deps_table
+        Eva.Assigns.Memory.is_included new_.deps_table old.deps_table
       in
       { deps_table = map;
         additional_deps_table = additional_map;
@@ -314,12 +314,12 @@ struct
       let deps, loc, exact =
         lval_to_precise_loc_with_deps stmt ~for_writing:(not init) lv
       in
-      let deps_of_deps = Eva.Froms.Memory.find state.deps_table deps in
+      let deps_of_deps = Eva.Assigns.Memory.find state.deps_table deps in
       let all_indirect = Zone.join state.additional_deps deps_of_deps in
       let deps = Eva.Deps.add_indirect deps_right all_indirect in
       let access = if init then Read else Write in
       { state with deps_table =
-                     Eva.Froms.Memory.add_binding_precise_loc
+                     Eva.Assigns.Memory.add_binding_precise_loc
                        ~exact access state.deps_table loc deps }
 
     let transfer_call stmt dest f args _loc state =
@@ -328,7 +328,7 @@ struct
       let called_vinfos = Eva.Results.(eval_callee f request |> default []) in
       let f_deps = Eva.Results.expr_deps f request in
       (* dependencies for the evaluation of [f] *)
-      let f_deps = Eva.Froms.Memory.find state.deps_table f_deps in
+      let f_deps = Eva.Assigns.Memory.find state.deps_table f_deps in
       let additional_deps =
         Zone.join
           state.additional_deps
@@ -348,8 +348,8 @@ struct
           state
         else
           let froms_call = To_Use.get_from_call kf stmt in
-          let froms_call_table = froms_call.Eva.Froms.deps_table in
-          if Eva.Froms.Memory.is_bottom froms_call_table then
+          let froms_call_table = froms_call.Eva.Assigns.memory in
+          if Eva.Assigns.Memory.is_bottom froms_call_table then
             bottom_from
           else
             let formal_args = Kernel_function.get_formals kf in
@@ -390,7 +390,7 @@ struct
             match dest with
             | None -> state
             | Some lv ->
-              let return_from = froms_call.Eva.Froms.deps_return in
+              let return_from = froms_call.Eva.Assigns.return in
               let deps_ret = subst_before_call return_from in
               let init = Cil.is_mutable_or_initialized lv in
               transfer_assign stmt ~init lv deps_ret state
@@ -402,7 +402,7 @@ struct
         | Some acc_memory ->
           Some
             {state with
-             deps_table = Eva.Froms.Memory.join
+             deps_table = Eva.Assigns.Memory.join
                  p.deps_table
                  acc_memory.deps_table}
       in
@@ -519,7 +519,7 @@ struct
     (* Filter out unreachable values. *)
     let transfer_stmt s d =
       if Eva.Results.is_reachable s &&
-         not (Eva.Froms.Memory.is_bottom d.deps_table)
+         not (Eva.Assigns.Memory.is_bottom d.deps_table)
       then transfer_stmt s d
       else []
 
@@ -545,12 +545,12 @@ struct
 
 
   (* Remove all local variables and formals from table *)
-  let externalize return kf state =
-    let deps_return =
-      (match return.skind with
+  let externalize return_stmt kf state =
+    let return =
+      (match return_stmt.skind with
        | Return (Some ({enode = Lval v}),_) ->
-         let zone = lval_to_zone_with_deps return v in
-         let deps = Eva.Froms.Memory.find_precise state.deps_table zone in
+         let zone = lval_to_zone_with_deps return_stmt v in
+         let deps = Eva.Assigns.Memory.find_precise state.deps_table zone in
          let size = Bit_utils.sizeof (Cil.typeOfLval v) in
          From_memory.add_to_return ~size deps
        | Return (None,_) ->
@@ -558,17 +558,14 @@ struct
        | _ -> assert false)
     in
     let accept = To_Use.keep_base kf in
-    let deps_table =
-      Eva.Froms.Memory.filter_base accept state.deps_table
-    in
-    Eva.Froms.{ deps_return = deps_return;
-                deps_table = deps_table }
+    let memory = Eva.Assigns.Memory.filter_base accept state.deps_table in
+    Eva.Assigns.{ return; memory }
 
   let compute_using_cfg kf =
     match kf.fundec with
     | Declaration _ -> assert false
     | Definition (f,_) ->
-      if not (Eva.Analysis.save_results kf) then Eva.Froms.top
+      if not (Eva.Analysis.save_results kf) then Eva.Assigns.top
       else
         try
           Stack.iter (fun g -> if kf == g then raise Exit) call_stack;
@@ -613,15 +610,19 @@ struct
                 From_parameters.result
                   "Non-terminating function %a (no dependencies)"
                   Kernel_function.pretty kf;
-                Eva.Froms.{ deps_return = From_memory.default_return;
-                            deps_table = Eva.Froms.Memory.bottom }
+                Eva.Assigns.{
+                  return = From_memory.default_return;
+                  memory = Eva.Assigns.Memory.bottom
+                }
               end
           in
           last_from
 
         with Exit (* Recursive call *) ->
-          { deps_return = From_memory.default_return;
-            deps_table = Eva.Froms.Memory.empty }
+          {
+            return = From_memory.default_return;
+            memory = Eva.Assigns.Memory.empty
+          }
 
   let compute_using_prototype kf =
     let state = Eva.Results.(at_start_of kf |> get_cvalue_model) in

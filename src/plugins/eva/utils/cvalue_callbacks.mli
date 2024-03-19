@@ -33,7 +33,7 @@ type state = Cvalue.Model.t
 (** If not None, the froms of the function, and its sure outputs;
     i.e. the dependencies of the result, and the dependencies
     of each zone written to. *)
-type call_froms = (Froms.t * Locations.Zone.t) option
+type call_assigns = (Assigns.t * Locations.Zone.t) option
 
 type analysis_kind =
   [ `Builtin (** A cvalue builtin is used to interpret the function. *)
@@ -58,7 +58,7 @@ type results = { before_stmts: state_by_stmt; after_stmts: state_by_stmt }
 
 (** Results of a function call. *)
 type call_results =
-  [ `Builtin of state list * call_froms
+  [ `Builtin of state list * call_assigns
   (** List of cvalue states at the end of the builtin. *)
   | `Spec of state list
   (** List of cvalue states at the end of the call. *)

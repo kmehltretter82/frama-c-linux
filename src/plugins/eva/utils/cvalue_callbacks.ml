@@ -41,13 +41,13 @@ let register_call_hook f =
 let apply_call_hooks callstack kf state kind =
   Call.apply (callstack, kf, state, kind)
 
-type call_froms = (Froms.t * Locations.Zone.t) option
+type call_assigns = (Assigns.t * Locations.Zone.t) option
 
 type state_by_stmt = (state Cil_datatype.Stmt.Hashtbl.t) Lazy.t
 type results = { before_stmts: state_by_stmt; after_stmts: state_by_stmt }
 
 type call_results =
-  [ `Builtin of state list * call_froms
+  [ `Builtin of state list * call_assigns
   | `Spec of state list
   | `Body of results * int
   | `Reuse of int

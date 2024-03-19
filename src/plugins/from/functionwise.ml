@@ -25,7 +25,7 @@ open Locations
 
 module Tbl =
   Kernel_function.Make_Table
-    (Eva.Froms)
+    (Eva.Assigns)
     (struct
       let name = "Functionwise dependencies"
       let size = 17
@@ -53,7 +53,7 @@ module To_Use = struct
     Eva.Logic_inout.accept_base ~formals:false ~locals:false kf
 
   let cleanup kf froms =
-    if Eva.Froms.Memory.is_bottom froms.Eva.Froms.deps_table
+    if Eva.Assigns.Memory.is_bottom froms.Eva.Assigns.memory
     then froms
     else
       let accept_base =
@@ -76,8 +76,8 @@ module To_Use = struct
         with Abstract_interp.Error_Top -> Zone.top
       in
       let map_zone = Eva.Deps.map zone_substitution in
-      { deps_table = From_memory.map map_zone froms.deps_table;
-        deps_return = Eva.Deps.map zone_substitution froms.deps_return;
+      { memory = From_memory.map map_zone froms.memory;
+        return = Eva.Deps.map zone_substitution froms.return;
       }
 
   let cleanup_and_save kf froms =

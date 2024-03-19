@@ -22,7 +22,7 @@
 
 (** Utilitary functions on the {!Eva.Froms.Memory.t} type. *)
 
-type t = Eva.Froms.Memory.t
+type t = Eva.Assigns.Memory.t
 
 val top : t
 
@@ -69,8 +69,10 @@ val collapse_return: return -> Eva.Deps.t
 
 (** Display dependencies of a function, using the function's type to improve
     readability *)
-val pretty_with_type: Cil_types.typ -> Eva.Froms.t Pretty_utils.formatter
+val pretty_with_type: Cil_types.typ -> Eva.Assigns.t Pretty_utils.formatter
 
 (** Display dependencies of a function, using the function's type to improve
     readability, separating direct and indirect dependencies *)
-val pretty_with_type_indirect: Cil_types.typ -> Eva.Froms.t Pretty_utils.formatter
+val pretty_with_type_indirect:
+  Cil_types.typ ->
+  Eva.Assigns.t Pretty_utils.formatter
