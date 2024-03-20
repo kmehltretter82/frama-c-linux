@@ -49,8 +49,6 @@ import './style.css';
 export default function Application(): JSX.Element {
   const [sidebar, flipSidebar] =
     Dome.useFlipSettings('frama-c.sidebar.unfold', true);
-  const [viewbar, flipViewbar] =
-    Dome.useFlipSettings('frama-c.viewbar.unfold', true);
 
   const ToolBar = State.useChildren(TOOLBAR);
   const StatusBar = State.useChildren(STATUSBAR);
@@ -72,12 +70,6 @@ export default function Application(): JSX.Element {
         <IvettePrefs.ThemeSwitchTool />
         <IvettePrefs.FontTools />
         <Search.SearchField />
-        <Toolbar.Button
-          icon="ITEMS.GRID"
-          title="Customize Main View"
-          selected={viewbar}
-          onClick={flipViewbar}
-        />
       </Toolbar.ToolBar>
       <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
         <Sidebar.Panel />
