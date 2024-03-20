@@ -300,13 +300,26 @@ function getLayoutPosition(
 function previousTab(tabs: Map<tabKey, TabViewState>, key: tabKey):
   TabViewState | undefined
 {
-  let prev: tabKey | undefined = undefined;
-  let last: tabKey | undefined = undefined;
+  let prev: TabViewState | undefined = undefined;
+  let last: TabViewState | undefined = undefined;
   tabs.forEach(t => {
-    if (t.key === key) prev = last; else last = t.key;
+    if (t.key === key) prev = last; else last = t;
   });
-  const next = prev || last;
-  return next && tabs.get(next);
+  return prev || last;
+}
+
+function nextTab(tabs: Map<tabKey, TabViewState>, key: tabKey):
+  TabViewState | undefined
+{
+  let next: TabViewState | undefined = undefined;
+  let first: TabViewState | undefined = undefined;
+  let prev = false;
+  tabs.forEach(t => {
+    if (first === undefined) first = t;
+    if (prev) next = t;
+    if (t.key === key) prev = true; else prev = false;
+  });
+  return next || first;
 }
 
 function newCustom(tabs: Map<tabKey, TabViewState>, viewId: viewId): number
@@ -1292,5 +1305,94 @@ Dome.addMenuItem({
   key: 'Cmd+K',
   onClick: () => Ivette.focusSearchMode('ivette.show'),
 });
+
+/* -------------------------------------------------------------------------- */
+/* --- Menu and shortcuts for tab selection                               --- */
+/* -------------------------------------------------------------------------- */
+
+function applyPrevTab(): void {
+  const state = LAB.getValue();
+  const tab = previousTab(state.tabs, state.tabKey);
+  if (tab) applyTab(tab.key);
+}
+
+function applyNextTab(): void {
+  const state = LAB.getValue();
+  const tab = nextTab(state.tabs, state.tabKey);
+  if (tab) applyTab(tab.key);
+}
+
+Dome.addMenuItem({
+  menu: 'View',
+  id: 'ivette.tab.next',
+  label: 'Select next tab',
+  key: 'Cmd+Tab',
+  onClick: applyNextTab,
+});
+
+Dome.addMenuItem({
+  menu: 'View',
+  id: 'ivette.tab.prev',
+  label: 'Select previous tab',
+  key: 'Cmd+Shift+Tab',
+  onClick: applyPrevTab,
+});
+
+/* The invisible menu items below are added to create more shortcuts for tab
+   selection. These menu items should be removed when shortcuts can be added
+   without creating dedicated menu items. */
+
+Dome.addMenuItem({
+  menu: 'View',
+  id: 'ivette.tab.next2',
+  label: 'Select next tab',
+  key: 'Cmd+PageDown',
+  visible: false,
+  onClick: applyNextTab,
+});
+
+Dome.addMenuItem({
+  menu: 'View',
+  id: 'ivette.tab.prev2',
+  label: 'Select previous tab',
+  key: 'Cmd+PageUp',
+  visible: false,
+  onClick: applyPrevTab,
+});
+
+function nthTab(tabs: Map<tabKey, TabViewState>, i: number):
+  TabViewState | undefined
+{
+  let tab = undefined;
+  let count = 1;
+  tabs.forEach(t => {
+    if (count === i) tab = t;
+    count++;
+  });
+  return tab;
+}
+
+function applyNthTab(i: number): void {
+  const state = LAB.getValue();
+  const tab = nthTab(state.tabs, i);
+  if (tab) applyTab(tab.key);
+}
+
+/* These shortcuts work on qwerty, azerty and dvorak keyboard layouts,
+   but not always on more exotic ones, such as bepo. */
+function addShortcutToNthTab(i: number): void {
+  Dome.addMenuItem({
+    menu: 'View',
+    id: `ivette.tab.${i}`,
+    label: `Select ${i}-nth tab`,
+    visible: false,
+    key: `Cmd+${i}`,
+    onClick: () => applyNthTab(i),
+  });
+}
+
+for (let i = 0; i < 10; i++) {
+  addShortcutToNthTab(i);
+}
 
 /* -------------------------------------------------------------------------- */
