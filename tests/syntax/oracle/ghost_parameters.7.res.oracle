@@ -1,8 +1,6 @@
 [kernel] Parsing ghost_parameters.c (with preprocessing)
 [kernel] ghost_parameters.c:146: User Error: 
   Declaration of function does not match previous declaration from ghost_parameters.c:142 (different number of arguments).
-[kernel] ghost_parameters.c:146: User Error: 
-  Function function redeclared with incompatible formals (original declaration was at ghost_parameters.c:142)
   144   }
   145   
   146   void function(int a, int b) /*@ ghost(int c, int d) */ {

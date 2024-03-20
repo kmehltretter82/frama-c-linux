@@ -52,14 +52,6 @@ val register_ignore_pure_exp_hook: (string -> Cil_types.exp -> unit) -> unit
 *)
 val register_implicit_prototype_hook: (Cil_types.varinfo -> unit) -> unit
 
-(** new hook called when two conflicting declarations are found.
-    The hook takes as argument the old and new varinfo, and a
-    description of the issue.
-    @since Carbon-20101201
-*)
-val register_incompatible_decl_hook:
-  (Cil_types.varinfo -> Cil_types.varinfo -> string -> unit) -> unit
-
 (** new hook called when a definition has a compatible but not
     strictly identical prototype than its declaration
     The hook takes as argument the old and new varinfo. Note that only the

@@ -149,12 +149,6 @@ module ImplicitPrototypeHook =
 
 let register_implicit_prototype_hook f = ImplicitPrototypeHook.extend f
 
-module IncompatibleDeclHook =
-  Hook.Build(struct type t = varinfo * varinfo * string end)
-
-let register_incompatible_decl_hook f =
-  IncompatibleDeclHook.extend (fun (x,y,z) -> f x y z)
-
 module DifferentDeclHook =
   Hook.Build(struct type t = varinfo * varinfo end)
 
@@ -2738,15 +2732,10 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
           end;
           Cil.update_var_type oldvi mytype;
         with Cannot_combine reason ->
-          Kernel.debug ~dkey:Kernel.dkey_typing_global
-            "old type = %a\nnew type = %a\n"
-            Cil_datatype.Typ.pretty oldvi.vtype
-            Cil_datatype.Typ.pretty vi.vtype ;
-          Kernel.error ~once:true ~current:true
+          abort_context
             "Declaration of %s does not match previous declaration from \
              %a (%s)."
-            vi.vname Cil_printer.pp_location oldloc reason;
-          IncompatibleDeclHook.apply (oldvi,vi,reason)
+            vi.vname Cil_printer.pp_location oldloc reason
       end;
       (* Update the storage and vdecl if useful. Do so only after the hooks have
          been applied, as they may need to read those fields *)
