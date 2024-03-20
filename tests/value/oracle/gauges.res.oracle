@@ -719,7 +719,8 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     gauges.c:188: arithmetic operation on addresses
-      (read 14 times, propagated 12 times) garbled mix of &{x; y}
+      (read in 2 statements, propagated through 2 statements)
+      garbled mix of &{x; y}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main0:
   i ∈ {1; 162}

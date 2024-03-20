@@ -675,7 +675,8 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     strchr.c:541: arithmetic operation on addresses
-      (read 1 times, propagated 3 times) garbled mix of &{x}
+      (read in 1 statement, propagated through 2 statements)
+      garbled mix of &{x}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function init_array_nondet:
   from ∈ {-1}

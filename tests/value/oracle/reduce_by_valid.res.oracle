@@ -182,7 +182,8 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     reduce_by_valid.i:272: assigns clause on addresses
-      (read 3 times, propagated 2 times) garbled mix of &{x; a}
+      (read in 2 statements, propagated through 1 statement)
+      garbled mix of &{x; a}
 [scope:rm_asserts] removing 12 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:

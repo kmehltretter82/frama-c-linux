@@ -565,7 +565,8 @@
 [eva] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    logic.c:411: assigns clause on addresses (read 1 times, propagated 2 times)
+    logic.c:411: assigns clause on addresses
+      (read in 1 statement, propagated through 1 statement)
       garbled mix of &{x_0}
 [eva] logic.c:530: 
   Cannot evaluate range bound __fc_len - 1

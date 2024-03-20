@@ -151,7 +151,8 @@
 [eva:garbled-mix:summary] Warning: 
   Origins of garbled mix generated during analysis:
     backward_add_ptr.c:68: arithmetic operation on addresses
-      (read 81 times, propagated 20 times) garbled mix of &{a; b; a; b; c}
+      (read in 30 statements, propagated through 11 statements)
+      garbled mix of &{a; b; a; b; c}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function gm:
   __retres ∈

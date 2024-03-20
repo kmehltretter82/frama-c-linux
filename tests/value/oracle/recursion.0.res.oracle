@@ -242,7 +242,8 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     recursion.c:311: assigns clause on addresses
-      (read 2 times, propagated 1 times) garbled mix of &{x; a; \copy<x>[1]}
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{x; a; \copy<x>[1]}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function alarm:
   res ∈ [10..2147483647]
