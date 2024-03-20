@@ -86,6 +86,10 @@ type type_namespace = Typedef | Struct | Union | Enum
 
 module Type_namespace: Datatype.S with type t = type_namespace
 
+type logic_infos =
+  | Ctor of logic_ctor_info
+  | Lfun of logic_info list
+
 (** Functions that can be called when type-checking an extension of ACSL.
 
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
@@ -180,6 +184,12 @@ sig
   val conditional_conversion:
     Cil_types.location -> Logic_ptree.relation option ->
     Cil_types.term -> Cil_types.term -> Cil_types.logic_type
+
+  (** Open module in local environment. *)
+  val add_import : ?alias:string -> string -> unit
+  val clear_imports : unit -> unit
+  val push_imports : unit -> unit
+  val pop_imports : unit -> unit
 
   (** type-checks a term. *)
   val term : Lenv.t -> Logic_ptree.lexpr -> term

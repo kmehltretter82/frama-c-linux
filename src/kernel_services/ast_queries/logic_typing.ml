@@ -495,6 +495,10 @@ module Type_namespace =
     let hash : t -> int = Hashtbl.hash
   end)
 
+type logic_infos =
+  | Ctor of logic_ctor_info
+  | Lfun of logic_info list
+
 type typing_context = {
   is_loop: unit -> bool;
   anonCompFieldName : string;
@@ -654,6 +658,12 @@ sig
   val conditional_conversion:
     Cil_types.location -> Logic_ptree.relation option ->
     Cil_types.term -> Cil_types.term -> Cil_types.logic_type
+
+  val add_import : ?alias:string -> string -> unit
+  val clear_imports : unit -> unit
+  val push_imports : unit -> unit
+  val pop_imports : unit -> unit
+
   val term : Lenv.t -> Logic_ptree.lexpr -> term
   val predicate : Lenv.t -> Logic_ptree.lexpr -> predicate
   val code_annot :
@@ -694,6 +704,66 @@ module Make
        val on_error: ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
      end) =
 struct
+
+  (* Imported Scope *)
+
+  let scopes = Stack.create ()
+  let imported = ref []
+
+  let pushScope m p =
+    let prefix m = m ^ "::" in
+    imported := (prefix m, Option.map prefix p) :: !imported
+
+  let clear_imports () = Stack.clear scopes ; imported := []
+  let push_imports () = Stack.push !imported scopes
+  let pop_imports () = imported := Stack.pop scopes
+
+  let add_import ?alias mid =
+    match alias with
+    | Some _ -> pushScope mid alias
+    | None ->
+      begin
+        match List.rev @@ String.split_on_char ':' mid with
+        | m::_ -> pushScope mid (Some m)
+        | [] -> ()
+      end ;
+      pushScope mid None
+
+  let find_import find a =
+    match find a with
+    | Some _ as r -> r
+    | None ->
+      let size = List.length @@ String.split_on_char ':' a in
+      if size > 3 then None else
+        let pmatch = function
+          | None -> size = 1
+          | Some prefix -> size = 3 && String.starts_with ~prefix a in
+        let rec lookup = function
+          | [] -> None
+          | (m,p)::scopes ->
+            if pmatch p then
+              match find (m ^ a) with
+              | None -> lookup scopes
+              | Some _ as r -> r
+            else lookup scopes
+        in lookup !imported
+
+  let find_logic_type =
+    find_import
+      begin fun t ->
+        try Some (C.find_logic_type t)
+        with Not_found -> None
+      end
+  [@@ warning "-32"]
+
+  let find_logic_infos =
+    find_import
+      begin fun a ->
+        try Some (Ctor (C.find_logic_ctor a)) with Not_found ->
+        match C.find_all_logic_functions a with
+        | [] -> None | ls -> Some (Lfun ls)
+      end
+  [@@ warning "-32"]
 
   let make_typing_context ~pre_state ~post_state ~assigns_env
       ~logic_type ~type_predicate ~type_term ~type_assigns = {
