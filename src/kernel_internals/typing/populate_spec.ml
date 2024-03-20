@@ -781,8 +781,7 @@ let get_config_custom () =
 let activated_config kf clauses =
   let default =
     if is_frama_c_builtin kf then build_config Frama_C
-    (* TODO: Use ACSL mode for frama-c's libc once all assigns are written. *)
-    else if Kernel_function.is_in_libc kf then build_config Frama_C
+    else if Kernel_function.is_in_libc kf then build_config ACSL
     else get_config_custom ()
   in
   let collect config clause =
