@@ -210,7 +210,8 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     bitfield.i:70: misaligned read of addresses
-      (read 5 times, propagated 7 times) garbled mix of &{b; ee}
+      (read in 2 statements, propagated through 2 statements)
+      garbled mix of &{b; ee}
 [eva] bitfield.i:102: assertion 'Eva,initialization' got final status invalid.
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======

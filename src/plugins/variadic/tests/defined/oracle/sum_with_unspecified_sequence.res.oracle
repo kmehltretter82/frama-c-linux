@@ -25,7 +25,7 @@
                    (tmp from vararg)
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    Initial state (read 12 times, propagated 6 times)
+    Initial state (read in 3 statements, propagated through 3 statements)
       garbled mix of &{S_0_S___va_params; S_1_S___va_params}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function sum:

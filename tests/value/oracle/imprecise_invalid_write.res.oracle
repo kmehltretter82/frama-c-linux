@@ -48,9 +48,11 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     imprecise_invalid_write.i:9: arithmetic operation on addresses
-      (read 2 times, propagated 1 times) garbled mix of &{main1}
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{main1}
     imprecise_invalid_write.i:16: arithmetic operation on addresses
-      (read 2 times, propagated 1 times) garbled mix of &{"abc"}
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{"abc"}
 [eva] imprecise_invalid_write.i:5: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] imprecise_invalid_write.i:10: 

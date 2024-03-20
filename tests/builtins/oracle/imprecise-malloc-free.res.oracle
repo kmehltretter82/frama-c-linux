@@ -67,7 +67,8 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     imprecise-malloc-free.c:13: arithmetic operation on addresses
-      (read 1 times, propagated 2 times) garbled mix of &{size2}
+      (read in 1 statement, propagated through 2 statements)
+      garbled mix of &{size2}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]

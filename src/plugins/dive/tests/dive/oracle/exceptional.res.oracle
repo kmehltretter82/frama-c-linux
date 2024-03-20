@@ -16,7 +16,8 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     exceptional.i:5: arithmetic operation on addresses
-      (read 3 times, propagated 3 times) garbled mix of &{i}
+      (read in 2 statements, propagated through 2 statements)
+      garbled mix of &{i}
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
   2 functions analyzed (out of 2): 100% coverage.

@@ -33,7 +33,7 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     alloc.c:51: arithmetic operation on addresses
-      (read 2 times, propagated 1 times)
+      (read in 1 statement, propagated through 1 statement)
       garbled mix of &{__malloc_main_abs_l50}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main_abs:

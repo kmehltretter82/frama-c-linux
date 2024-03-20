@@ -11,7 +11,3 @@
 > [eva] va_list2.c:21: 
 >   Frama_C_show_each_f:
 >   {{ garbled mix of &{S_0_S___va_params; S_1_S___va_params} (origin: Well) }}
-41c53
-<     Initial state (read 24 times, propagated 10 times)
----
->     Initial state (read 36 times, propagated 16 times)

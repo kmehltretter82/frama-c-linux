@@ -1,8 +1,0 @@
-48c48
-<       (read 2 times, propagated 2 times) garbled mix of &{x}
----
->       (read 3 times, propagated 2 times) garbled mix of &{x}
-161c161
-<       (read 2 times, propagated 2 times) garbled mix of &{x}
----
->       (read 3 times, propagated 2 times) garbled mix of &{x}

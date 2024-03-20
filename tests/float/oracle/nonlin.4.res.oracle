@@ -314,7 +314,8 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     nonlin.c:98: arithmetic operation on addresses
-      (read 1 times, propagated 2 times) garbled mix of &{x_0}
+      (read in 1 statement, propagated through 2 statements)
+      garbled mix of &{x_0}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function access_bits:
   rbits1 ∈ {0; 1; 2}

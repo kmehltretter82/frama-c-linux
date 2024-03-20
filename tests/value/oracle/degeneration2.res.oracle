@@ -26,7 +26,8 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     degeneration2.i:14: arithmetic operation on addresses
-      (read 6 times, propagated 1 times) garbled mix of &{B; C; D; E}
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{B; C; D; E}
 [eva] degeneration2.i:25: 
   assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======

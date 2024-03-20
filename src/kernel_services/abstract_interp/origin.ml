@@ -41,6 +41,10 @@ let kind_label = function
   | Merge -> "Merge"
   | Arith -> "Arithmetic"
 
+(* Ideally, we would use the current statement sid instead of the current
+   source file location. However, that would require passing the current
+   statement through any datastructures and operations that can create
+   garbled mixes, which would be an invasive change. *)
 type location = Cil_datatype.Location.t
 
 type tt =
@@ -139,9 +143,10 @@ module History_Info = struct
   let size = 32
 end
 
-(* Number of writes, number of reads, related bases. *)
-module History_Data =
-  Datatype.Triple (Datatype.Int) (Datatype.Int) (Base.SetLattice)
+module LocSet = Cil_datatype.Location.Set
+
+(* Locations of writes, locations of reads, related bases. *)
+module History_Data = Datatype.Triple (LocSet) (LocSet) (Base.SetLattice)
 module History = State_builder.Hashtbl (Hashtbl) (History_Data) (History_Info)
 
 let clear () = Id.reset (); History.clear ()
@@ -154,21 +159,35 @@ let is_current = function
    current location. *)
 let register_write bases t =
   if is_unknown t then false else
-    let change (w, r, b) = w+1, r, Base.SetLattice.join b bases in
-    let count, _, _ = History.memo ~change (fun _ -> 1, 0, bases) t in
-    count < 2 && is_current t
+    let current_loc = Cil.CurrentLoc.get () in
+    let is_new = not (History.mem t) in
+    let change (w, r, b) =
+      LocSet.add current_loc w, r, Base.SetLattice.join b bases
+    in
+    let create _ = LocSet.singleton current_loc, LocSet.empty, bases in
+    ignore (History.memo ~change create t);
+    is_new && is_current t
 
 (* Registers a read only if the current location is not that of the origin. *)
 let register_read bases t =
   if not (is_unknown t || is_current t) then
-    let change (w, r, b) = w, r+1, Base.SetLattice.join b bases in
-    ignore (History.memo ~change (fun _ -> 0, 1, bases) t)
+    let current_loc = Cil.CurrentLoc.get () in
+    let change (w, r, b) =
+      w, LocSet.add current_loc r, Base.SetLattice.join b bases
+    in
+    let create _ = LocSet.empty, LocSet.singleton current_loc, bases in
+    ignore (History.memo ~change create t)
 
 (* Returns the list of recorded origins, sorted by number of reads.
    Origins with no reads are filtered. *)
 let get_history () =
   let list = List.of_seq (History.to_seq ()) in
-  let list = List.filter (fun (_origin, (_, r, _)) -> r > 0) list in
+  let count (origin, (w, r, bases)) =
+    if LocSet.is_empty r
+    then None
+    else Some (origin, (LocSet.cardinal w, LocSet.cardinal r, bases))
+  in
+  let list = List.filter_map count list in
   let cmp (origin1, (_, r1, _)) (origin2, (_, r2, _)) =
     let r = r2 - r1 in
     if r <> 0 then r else compare origin1 origin2
@@ -185,12 +204,13 @@ let pretty_origin fmt origin =
 
 let pretty_history fmt =
   let list = get_history () in
+  let plural count = if count = 1 then "" else "s" in
   let pp_origin fmt (origin, (w, r, bases)) =
     let bases = Base.SetLattice.filter (fun b -> not (Base.is_null b)) bases in
     Format.fprintf fmt
-      "@[<hov 2>%a@ (read %i times, propagated %i times)@ \
+      "@[<hov 2>%a@ (read in %i statement%s, propagated through %i statement%s)@ \
        garbled mix of &%a@]"
-      pretty_origin origin r w Base.SetLattice.pretty bases
+      pretty_origin origin r (plural r) w (plural w) Base.SetLattice.pretty bases
   in
   if list <> [] then
     Format.fprintf fmt
