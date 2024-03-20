@@ -372,6 +372,20 @@ function addPanels(panels: Set<compId>, layout: Layout): Set<compId>
     return copySet(panels).add(A).add(B).add(C).add(D);
 }
 
+function removeAlerts(alerts: Set<compId>, layout: Layout): Set<compId>
+{
+  const { A, B, C, D } = layout;
+  if (alerts.has(A) || alerts.has(B) || alerts.has(C) || alerts.has(D)) {
+    const newAlerts = copySet(alerts);
+    newAlerts.delete(A);
+    newAlerts.delete(B);
+    newAlerts.delete(C);
+    newAlerts.delete(D);
+    return newAlerts;
+  }
+  return alerts;
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- LabView Actions                                                    --- */
 /* -------------------------------------------------------------------------- */
@@ -415,9 +429,11 @@ function applyTab(key: tabKey): void {
   const layout = stack[0] ?? defaultLayout;
   saveTab(tabs, state);
   const panels = addPanels(state.panels, layout);
+  const alerts = removeAlerts(state.alerts, layout);
   LAB.setValue({
     ...state,
     panels,
+    alerts,
     stack,
     split,
     tabs,
@@ -457,7 +473,8 @@ function restoreDefault(key: tabKey): void {
   const layout = makeViewLayout(view.layout);
   const tabs = copyMap(state.tabs).set(key, { ...tab, stack: [layout] });
   if (key === state.tabKey) {
-    LAB.setValue({ ...state, tabs, stack: [layout] });
+    const alerts = removeAlerts(state.alerts, layout);
+    LAB.setValue({ ...state, tabs, alerts, stack: [layout] });
   } else {
     LAB.setValue({ ...state, tabs });
   }
@@ -471,12 +488,14 @@ export function applyView(view: Ivette.ViewLayoutProps): void {
   else {
     const layout = makeViewLayout(view.layout);
     const panels = addPanels(state.panels, layout);
+    const alerts = removeAlerts(state.alerts, layout);
     const tabs = copyMap(state.tabs);
     const tab = newTab(tabs, view, -1);
     saveTab(tabs, state);
     LAB.setValue({
       ...state,
       panels,
+      alerts,
       split: defaultSplit,
       stack: [layout],
       tabs, tabKey: tab.key
@@ -545,8 +564,10 @@ function undockComponent(compId: compId): void
   const state = LAB.getValue();
   if (state.docked.has(compId)) {
     const docked = copyMap(state.docked);
+    const alerts = copySet(state.alerts);
     docked.delete(compId);
-    LAB.setValue({ ...state, docked });
+    alerts.delete(compId);
+    LAB.setValue({ ...state, docked, alerts });
   }
 }
 
@@ -556,8 +577,10 @@ function closeComponent(compId: compId): void
   const stack = removeLayoutComponent(state.stack, compId);
   const panels = copySet(state.panels);
   const docked = copyMap(state.docked);
+  const alerts = copySet(state.alerts);
   panels.delete(compId);
   docked.delete(compId);
+  alerts.delete(compId);
   LAB.setValue({ ...state, panels, docked, stack });
 }
 
