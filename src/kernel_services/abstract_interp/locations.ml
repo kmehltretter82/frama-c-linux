@@ -196,10 +196,9 @@ module Location_Bytes = struct
     if Base.Hptset.(equal b empty || equal b Base.null_set) then
       top_int
     else begin
-      if Base.Hptset.mem Base.null b then
-        Top (Base.SetLattice.inject b, o)
-      else
-        Top (Base.(SetLattice.inject (Hptset.add null b)), o)
+      let bases = Base.SetLattice.inject Base.(Hptset.add null b) in
+      Origin.register bases o;
+      Top (bases, o)
     end
 
   (** some functions can reduce a garbled mix, make sure to normalize
