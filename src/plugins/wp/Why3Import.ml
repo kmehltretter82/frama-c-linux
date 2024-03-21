@@ -59,6 +59,17 @@ let extract_theory_path struc_theories =
     let ty = tys.tysymbol in
     tymap <- Mty.add tys.tysymbol tymap; *)
 
+let get_name_from_ident (ident) =
+  let ident_printer = W.Ident.create_ident_printer [] in
+  W.Ident.id_unique (ident_printer) ident
+
+let get_theory_from_user (env) (path) (name) (map) =
+  let theory = W.Env.read_theory env ([String.concat "." path]) name in
+  let theory_uid = (get_name_from_ident(theory.th_name)) in
+    try W.Wstdlib.Mstr.find theory_uid map in map
+with Not_found ->
+     W.Wstdlib.Mstr.add (theory_uid) (theory) map
+
 
 let () =
   Boot.Main.extend
@@ -91,6 +102,7 @@ let () =
 
       let libs = L.Library.get () in
       let thys = L.Import.get () in
+      let theories_map : W.Theory.theory W.Wstdlib.Mstr.t = W.Wstdlib.Mstr.empty in
       let env = create_why3_env (F.to_string_list libs) () in
       let loadpath = W.Env.get_loadpath env in
       List.iter
@@ -100,8 +112,9 @@ let () =
       List.iter
       (fun (thy_n, thy_p) ->
         try
-        let _ns = (W.Env.read_theory env ([String.concat "." thy_p]) (thy_n))  in
-        W.Pretty.print_theory Format.std_formatter _ns;
+        let theory = (W.Env.read_theory env ([String.concat "." thy_p]) (thy_n))  in
+        in
+        W.Pretty.print_theory Format.std_formatter theory;
         L.debug ~level:0 "INTHY %s" thy_n;
 
         with W.Env.LibraryNotFound paths ->
