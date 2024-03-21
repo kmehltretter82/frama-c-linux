@@ -58,9 +58,15 @@ let open_theories_of_user (env) (theories) =
              | Decl decl ->
                (match (decl.d_node : W.Decl.decl_node) with
                 | Dtype dtype -> L.debug ~level:0 "Decl and type, named : %s.@"  (get_name_from_ident dtype.ts_name);
-                | Ddata _ -> L.debug ~level:0 "Decl and ddata"
-                | Dparam _ -> L.debug ~level:0 "Decl and dparam"
-                | Dlogic _ -> L.debug ~level:0 "Decl and dlogic"
+                | Ddata ddatas ->
+                  List.iter (fun ((tysymbol, _) : W.Decl.data_decl) ->
+                      L.debug ~level:0 "Decl and dtata, named : %s.@" (get_name_from_ident tysymbol.ts_name);
+                    ) ddatas;
+                | Dparam dparam -> L.debug ~level:0 "Decl and dparam, named : %s.@" (get_name_from_ident dparam.ls_name);
+                | Dlogic dlogics ->
+                  List.iter (fun ((ls,_):W.Decl.logic_decl) ->
+                      L.debug ~level:0 "Decl and dlogic, named : %s.@" (get_name_from_ident ls.ls_name);
+                    ) dlogics;
                 | _ -> L.debug ~level:0 "Decl but whatever")
              | Use _ -> L.debug ~level:0 "Use"
              | Clone _ -> L.debug ~level:0 "Clone"
