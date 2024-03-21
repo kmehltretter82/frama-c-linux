@@ -810,6 +810,10 @@ struct
   let add_rollback_action f x = Queue.add (fun () -> f x) rollback
 
   let add_logic_function loc li =
+    (try
+       let _ = Logic_env.find_logic_ctor li.l_var_info.lv_name in
+       C.error loc "constructor %s is already defined" li.l_var_info.lv_name
+     with Not_found -> ());
     let l = Logic_env.find_all_logic_functions li.l_var_info.lv_name in
     if List.exists (Logic_utils.is_same_logic_profile li) l then begin
       C.error loc
@@ -4129,7 +4133,11 @@ struct
        let info = C.find_logic_ctor name in
        C.error loc "type constructor %s is already used by type %s"
          name info.ctor_type.lt_name
-     with Not_found -> ());
+     with Not_found ->
+       let infos = C.find_all_logic_functions name in
+       if infos <> [] then
+         C.error loc "logic function %s is already defined" name
+    );
     let tparams = List.map (plain_logic_type loc env) params in
     let my_info =
       { ctor_name = name;
