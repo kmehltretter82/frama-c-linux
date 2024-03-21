@@ -50,13 +50,9 @@ let open_theory (env) (theories) =
        try
          let theory = (W.Env.read_theory env (thy_p) (thy_n)) in
          W.Pretty.print_theory Format.std_formatter theory;
-         L.debug ~level:0 "INTHY %s" thy_n;
 
        with W.Env.LibraryNotFound paths ->
-         List.iter (
-           fun path ->
-             L.debug ~level:0 "Library not found at %s " path;
-         ) paths;
+             L.debug ~level:0 "Library not found at %s " (String.concat "." paths);
     ) (extract_last_segments theories)
 
 
