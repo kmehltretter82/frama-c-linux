@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 module L = Wp_parameters
-module P = Why3.Pmodule
 module T = Why3.Theory
 module F = Filepath.Normalized
 module W = Why3
@@ -44,15 +43,32 @@ let extract_last_segments (str_list : string list) =
       | [] -> ("", [])
     ) str_list
 
+let get_name_from_ident (ident) =
+  let ident_printer = W.Ident.create_ident_printer [] in
+  W.Ident.id_unique (ident_printer) ident
+
+
 let open_theory (env) (theories) =
   List.iter
     (fun (thy_n, thy_p) ->
        try
          let theory = (W.Env.read_theory env (thy_p) (thy_n)) in
-         W.Pretty.print_theory Format.std_formatter theory;
+         List.iter ( fun (tdecl : T.tdecl) ->
+             match tdecl.td_node with
+             | Decl d ->
+               (match (d.d_node : W.Decl.decl_node) with
+                | Dtype dtype -> L.debug ~level:0 "Decl and type, named : %s.@"  (get_name_from_ident dtype.ts_name);
+                | Ddata _ -> L.debug ~level:0 "Decl and ddata"
+                | Dparam _ -> L.debug ~level:0 "Decl and dparam"
+                | Dlogic _ -> L.debug ~level:0 "Decl and dlogic"
+                | _ -> L.debug ~level:0 "Decl but whatever")
+             | Use _ -> L.debug ~level:0 "Use"
+             | Clone _ -> L.debug ~level:0 "Clone"
+             | Meta _ -> L.debug ~level:0 "Meta"
+           ) theory.th_decls;
 
        with W.Env.LibraryNotFound paths ->
-             L.debug ~level:0 "Library %s not found at %s " thy_n (String.concat "." paths);
+         L.debug ~level:0 "Library %s not found at %s " thy_n (String.concat "." paths);
     ) (extract_last_segments theories)
 
 
