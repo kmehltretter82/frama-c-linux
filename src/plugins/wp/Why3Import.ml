@@ -52,7 +52,7 @@ let open_theory (env) (theories) =
          W.Pretty.print_theory Format.std_formatter theory;
 
        with W.Env.LibraryNotFound paths ->
-             L.debug ~level:0 "Library not found at %s " (String.concat "." paths);
+             L.debug ~level:0 "Library %s not found at %s " thy_n (String.concat "." paths);
     ) (extract_last_segments theories)
 
 
