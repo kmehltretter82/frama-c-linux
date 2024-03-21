@@ -48,15 +48,15 @@ let get_name_from_ident (ident) =
   W.Ident.id_unique (ident_printer) ident
 
 
-let open_theory (env) (theories) =
+let open_theories_of_user (env) (theories) =
   List.iter
-    (fun (thy_n, thy_p) ->
+    (fun (theory_name, theory_path) ->
        try
-         let theory = (W.Env.read_theory env (thy_p) (thy_n)) in
+         let theory = (W.Env.read_theory env (theory_path) (theory_name)) in
          List.iter ( fun (tdecl : T.tdecl) ->
              match tdecl.td_node with
-             | Decl d ->
-               (match (d.d_node : W.Decl.decl_node) with
+             | Decl decl ->
+               (match (decl.d_node : W.Decl.decl_node) with
                 | Dtype dtype -> L.debug ~level:0 "Decl and type, named : %s.@"  (get_name_from_ident dtype.ts_name);
                 | Ddata _ -> L.debug ~level:0 "Decl and ddata"
                 | Dparam _ -> L.debug ~level:0 "Decl and dparam"
@@ -68,28 +68,28 @@ let open_theory (env) (theories) =
            ) theory.th_decls;
 
        with W.Env.LibraryNotFound paths ->
-         L.debug ~level:0 "Library %s not found at %s " thy_n (String.concat "." paths);
+         L.debug ~level:0 "Library %s not found at %s " theory_name (String.concat "." paths);
     ) (extract_last_segments theories)
 
 
 let () =
   Boot.Main.extend
     begin fun () ->
-      let libs = L.Library.get () in
-      List.iter
-        (fun dir ->
-           L.debug ~level:0 " + LIBS %s@." dir
-        ) (F.to_string_list libs) ;
-      let thys = L.Import.get () in
-      List.iter
-        (fun thy ->
-           L.debug ~level:0 " + THY %s@." thy
-        ) thys ;
+      let user_libraries = L.Library.get () in
+      (* DEBUG ONLY *)
+      List.iter (fun dir ->
+          L.debug ~level:0 " + LIBS %s@." dir
+        ) (F.to_string_list user_libraries) ;
+      (* DEBUG ONLY *)
+      let user_theories = L.Import.get () in
+      List.iter (fun thy ->
+          L.debug ~level:0 " + THY %s@." thy
+        ) user_theories ;
 
-      let libs = L.Library.get () in
-      let thys = L.Import.get () in
-      let env = create_why3_env (F.to_string_list libs) in
-      open_theory (env) (thys);
+      let user_libraries = L.Library.get () in
+      let user_theories = L.Import.get () in
+      let env = create_why3_env (F.to_string_list user_libraries) in
+      open_theories_of_user (env) (user_theories);
 
 
     end
