@@ -748,21 +748,21 @@ struct
             else lookup scopes
         in lookup !imported
 
-  let find_logic_type =
+  let resolve_ltype =
     find_import
       begin fun t ->
         try Some (C.find_logic_type t)
         with Not_found -> None
       end
-  [@@ warning "-32"]
 
-  let find_logic_infos =
-    find_import
-      begin fun a ->
-        try Some (Ctor (C.find_logic_ctor a)) with Not_found ->
-        match C.find_all_logic_functions a with
-        | [] -> None | ls -> Some (Lfun ls)
-      end
+  let resolve_lapp f env =
+    try Some (Lfun [Lenv.find_logic_info f env]) with Not_found ->
+      find_import
+        begin fun a ->
+          try Some (Ctor (C.find_logic_ctor a)) with Not_found ->
+          match C.find_all_logic_functions a with
+          | [] -> None | ls -> Some (Lfun ls)
+        end f
   [@@ warning "-32"]
 
   let make_typing_context ~pre_state ~post_state ~assigns_env
@@ -1007,6 +1007,7 @@ struct
     | LTint ikind -> Ctype (TInt (ikind, []))
     | LTfloat fkind -> Ctype (TFloat (fkind, []))
     | LTarray (ty,length) ->
+
       let size = match length with
         | ASnone -> None
         | ASinteger s ->
@@ -1036,8 +1037,8 @@ struct
             in size_exp size
           with Not_found ->
             ctxt.error loc "size of array must be an integral value";
-      in
-      Ctype (TArray (ctype ty, size,[]))
+      in Ctype (TArray (ctype ty, size,[]))
+
     | LTpointer ty -> Ctype (TPtr (ctype ty, []))
     | LTenum e ->
       (try Ctype (ctxt.find_type Enum e)
@@ -1048,35 +1049,43 @@ struct
     | LTunion u ->
       (try Ctype (ctxt.find_type Union u)
        with Not_found -> ctxt.error loc "no such union %s" u)
+
     | LTarrow (prms,rt) ->
       (* For now, our only function types are C function pointers. *)
       let prms = List.map (fun x -> "", ctype x, []) prms in
       let rt = ctype rt in
-      (match prms with
-         [] -> Ctype (TFun(rt,None,false,[]))
-       | [(_,arg_typ,_)] when isVoidType arg_typ ->
-         (* Same invariant as in C *)
-         Ctype (TFun(rt,Some [],false,[]))
-       | _ -> Ctype (TFun(rt,Some prms,false,[])))
+      begin
+        match prms with
+        | [] -> Ctype (TFun(rt,None,false,[]))
+        | [(_,arg_typ,_)] when isVoidType arg_typ ->
+          (* Same invariant as in C *)
+          Ctype (TFun(rt,Some [],false,[]))
+        | _ -> Ctype (TFun(rt,Some prms,false,[]))
+      end
+
     | LTnamed (id,[]) ->
-      (try Lenv.find_type_var id env
-       with Not_found ->
-       try Ctype (ctxt.find_type Typedef id) with Not_found ->
-       try
-         let info = ctxt.find_logic_type id in
-         if info.lt_params <> [] then
-           ctxt.error loc "wrong number of parameter for type %s" id
-         else Ltype (info,[])
-       with Not_found ->
-         ctxt.error loc "no such type %s" id)
+      begin
+        try Lenv.find_type_var id env
+        with Not_found ->
+        try Ctype (ctxt.find_type Typedef id) with Not_found ->
+        match resolve_ltype id with
+        | Some info ->
+          if info.lt_params <> [] then
+            ctxt.error loc "wrong number of parameter for type %s" id
+          else Ltype (info,[])
+        | None -> ctxt.error loc "no such type %s" id
+      end
+
     | LTnamed(id,l) ->
-      (try
-         let info = ctxt.find_logic_type id in
-         if List.length info.lt_params <> List.length l then
-           ctxt.error loc "wrong number of parameter for type %s" id
-         else Ltype (info,List.map ltype l)
-       with Not_found ->
-         ctxt.error loc "no such type %s" id)
+      begin
+        match resolve_ltype id with
+        | Some info ->
+          if List.length info.lt_params <> List.length l then
+            ctxt.error loc "wrong number of parameter for type %s" id
+          else Ltype (info,List.map ltype l)
+        | None -> ctxt.error loc "no such type %s" id
+      end
+
     | LTinteger -> Linteger
     | LTreal -> Lreal
     | LTattribute (ty,attr) ->
@@ -3029,14 +3038,14 @@ struct
       let env = drop_qualifiers env in
       let f _ op t1 t2 =
         (TBinOp(binop_of_rel op, t1, t2),
-         Ltype(ctxt.find_logic_type Utf8_logic.boolean,[]))
+         Ltype(C.find_logic_type Utf8_logic.boolean,[]))
       in
       type_relation ctxt env f t1 op t2
     | PLtrue ->
-      let ctrue = ctxt.find_logic_ctor "\\true" in
+      let ctrue = C.find_logic_ctor "\\true" in
       TDataCons(ctrue,[]), Ltype(ctrue.ctor_type,[])
     | PLfalse ->
-      let cfalse = ctxt.find_logic_ctor "\\false" in
+      let cfalse = C.find_logic_ctor "\\false" in
       TDataCons(cfalse,[]), Ltype(cfalse.ctor_type,[])
     | PLlambda(prms,e) ->
       let env = drop_qualifiers env in
@@ -3046,24 +3055,24 @@ struct
     | PLnot t ->
       let env = drop_qualifiers env in
       let t = type_bool_term ctxt env t in
-      TUnOp(LNot,t), Ltype (ctxt.find_logic_type Utf8_logic.boolean,[])
+      TUnOp(LNot,t), Ltype (C.find_logic_type Utf8_logic.boolean,[])
     | PLand (t1,t2) ->
       let env = drop_qualifiers env in
       let t1 = type_bool_term ctxt env t1 in
       let t2 = type_bool_term ctxt env t2 in
-      TBinOp(LAnd,t1,t2), Ltype (ctxt.find_logic_type Utf8_logic.boolean,[])
+      TBinOp(LAnd,t1,t2), Ltype (C.find_logic_type Utf8_logic.boolean,[])
     | PLor (t1,t2) ->
       let env = drop_qualifiers env in
       let t1 = type_bool_term ctxt env t1 in
       let t2 = type_bool_term ctxt env t2 in
-      TBinOp(LOr,t1,t2), Ltype (ctxt.find_logic_type Utf8_logic.boolean,[])
+      TBinOp(LOr,t1,t2), Ltype (C.find_logic_type Utf8_logic.boolean,[])
     | PLtypeof t1 ->
       let env = drop_qualifiers env in
       let t1 = term env t1 in
-      Ttypeof t1, Ltype (ctxt.find_logic_type "typetag",[])
+      Ttypeof t1, Ltype (C.find_logic_type "typetag",[])
     | PLtype ty ->
-      begin match logic_type  ctxt loc env ty with
-        | Ctype ty -> Ttype ty, Ltype (ctxt.find_logic_type "typetag",[])
+      begin match logic_type ctxt loc env ty with
+        | Ctype ty -> Ttype ty, Ltype (C.find_logic_type "typetag",[])
         | Linteger | Lreal | Ltype _ | Lvar _ | Larrow _ ->
           ctxt.error loc "cannot take type tag of logic type"
       end
@@ -3156,7 +3165,7 @@ struct
       let t1,ty1 = type_num_term_option ctxt env t1 in
       let t2,ty2 = type_num_term_option ctxt env t2 in
       (Trange(t1,t2),
-       Ltype(ctxt.find_logic_type "set", [arithmetic_conversion ty1 ty2]))
+       Ltype(C.find_logic_type "set", [arithmetic_conversion ty1 ty2]))
     | PLvalid _ | PLvalid_read _ | PLobject_pointer _ | PLvalid_function _
     | PLfresh _ | PLallocable _ | PLfreeable _
     | PLinitialized _ | PLdangling _ | PLexists _ | PLforall _
@@ -3351,12 +3360,12 @@ struct
     tt
 
   and type_bool_term ctxt env t =
-    let module [@warning "-60"] C = struct end in
+    let module [@warning "-60"] C0 = struct end in
     let tt = ctxt.type_term ctxt env t in
     if not (plain_boolean_type tt.term_type) then
       ctxt.error t.lexpr_loc "boolean expected but %a found"
         Cil_printer.pp_logic_type tt.term_type;
-    mk_cast tt (Ltype (ctxt.find_logic_type Utf8_logic.boolean,[]))
+    mk_cast tt (Ltype (C.find_logic_type Utf8_logic.boolean,[]))
 
   and type_num_term_option ctxt env t =
     let module [@warning "-60"] C = struct end in
