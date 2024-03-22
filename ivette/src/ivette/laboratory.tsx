@@ -61,6 +61,7 @@ interface LabViewState {
   split: Split;
   stack: Layout[];
   panels: Set<compId>;
+  alerts: Set<compId>;
   docked: Map<compId, LayoutPosition>;
   tabs: Map<tabKey, TabViewState>;
   tabKey: tabKey;
@@ -75,6 +76,7 @@ const LAB = new States.GlobalState<LabViewState>({
   split: defaultSplit,
   stack: [defaultLayout],
   panels: new Set(),
+  alerts: new Set(),
   docked: new Map(),
   tabs: new Map(),
   tabKey: '',
@@ -370,6 +372,20 @@ function addPanels(panels: Set<compId>, layout: Layout): Set<compId>
     return copySet(panels).add(A).add(B).add(C).add(D);
 }
 
+function removeAlerts(alerts: Set<compId>, layout: Layout): Set<compId>
+{
+  const { A, B, C, D } = layout;
+  if (alerts.has(A) || alerts.has(B) || alerts.has(C) || alerts.has(D)) {
+    const newAlerts = copySet(alerts);
+    newAlerts.delete(A);
+    newAlerts.delete(B);
+    newAlerts.delete(C);
+    newAlerts.delete(D);
+    return newAlerts;
+  }
+  return alerts;
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- LabView Actions                                                    --- */
 /* -------------------------------------------------------------------------- */
@@ -413,9 +429,11 @@ function applyTab(key: tabKey): void {
   const layout = stack[0] ?? defaultLayout;
   saveTab(tabs, state);
   const panels = addPanels(state.panels, layout);
+  const alerts = removeAlerts(state.alerts, layout);
   LAB.setValue({
     ...state,
     panels,
+    alerts,
     stack,
     split,
     tabs,
@@ -439,9 +457,10 @@ function closeTab(key: tabKey): void {
     const { key, stack, split } = tab;
     const layout = stack[0] ?? defaultLayout;
     const panels = addPanels(state.panels, layout);
+    const alerts = removeAlerts(state.alerts, layout);
     LAB.setValue({
       ...state,
-      panels, stack, split, tabs, tabKey: key
+      panels, alerts, stack, split, tabs, tabKey: key
     });
   }
 }
@@ -455,7 +474,8 @@ function restoreDefault(key: tabKey): void {
   const layout = makeViewLayout(view.layout);
   const tabs = copyMap(state.tabs).set(key, { ...tab, stack: [layout] });
   if (key === state.tabKey) {
-    LAB.setValue({ ...state, tabs, stack: [layout] });
+    const alerts = removeAlerts(state.alerts, layout);
+    LAB.setValue({ ...state, tabs, alerts, stack: [layout] });
   } else {
     LAB.setValue({ ...state, tabs });
   }
@@ -469,12 +489,14 @@ export function applyView(view: Ivette.ViewLayoutProps): void {
   else {
     const layout = makeViewLayout(view.layout);
     const panels = addPanels(state.panels, layout);
+    const alerts = removeAlerts(state.alerts, layout);
     const tabs = copyMap(state.tabs);
     const tab = newTab(tabs, view, -1);
     saveTab(tabs, state);
     LAB.setValue({
       ...state,
       panels,
+      alerts,
       split: defaultSplit,
       stack: [layout],
       tabs, tabKey: tab.key
@@ -518,7 +540,9 @@ export function applyComponent(
   const pos = at ?? preferredPosition ?? 'D';
   const stack = addLayoutComponent(state.stack, id, pos);
   const panels = copySet(state.panels).add(id);
-  LAB.setValue({ ...state, panels, stack });
+  const alerts = copySet(state.alerts);
+  alerts.delete(id);
+  LAB.setValue({ ...state, panels, alerts, stack });
 }
 
 export function dockComponent(
@@ -541,8 +565,10 @@ function undockComponent(compId: compId): void
   const state = LAB.getValue();
   if (state.docked.has(compId)) {
     const docked = copyMap(state.docked);
+    const alerts = copySet(state.alerts);
     docked.delete(compId);
-    LAB.setValue({ ...state, docked });
+    alerts.delete(compId);
+    LAB.setValue({ ...state, docked, alerts });
   }
 }
 
@@ -552,9 +578,27 @@ function closeComponent(compId: compId): void
   const stack = removeLayoutComponent(state.stack, compId);
   const panels = copySet(state.panels);
   const docked = copyMap(state.docked);
+  const alerts = copySet(state.alerts);
   panels.delete(compId);
   docked.delete(compId);
+  alerts.delete(compId);
   LAB.setValue({ ...state, panels, docked, stack });
+}
+
+export function alertComponent(comp: Ivette.ComponentProps): void
+{
+  const { id } = comp;
+  const state = LAB.getValue();
+  /* Do nothing if the component if already visible. */
+  const layout = state.stack[0] ?? defaultLayout;
+  const curr = getLayoutPosition(layout, id);
+  if (curr !== undefined) return;
+  /* Add the component to the set of alerted components. */
+  const alerts = copySet(state.alerts).add(id);
+  LAB.setValue({ ...state, alerts });
+  /* Dock the component if it isn't already. */
+  if (state.docked.has(id)) return;
+  dockComponent(comp);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1126,11 +1170,12 @@ Ivette.registerSidebar({
 interface DockItemProps {
   compId: compId;
   visible: boolean;
+  alert: boolean;
   position: LayoutPosition;
 }
 
 function DockItem(props: DockItemProps): JSX.Element | null {
-  const { compId, visible, position } = props;
+  const { compId, visible, position, alert } = props;
   const comp = State.useElement(COMPONENT, compId);
   if (comp === undefined) return null;
   const label = comp.label ?? compId;
@@ -1138,7 +1183,7 @@ function DockItem(props: DockItemProps): JSX.Element | null {
   const title = `Display ${label} (right-click for more actions)`;
 
   const className = classes(
-    'labview-docked', visible && 'disabled',
+    'labview-docked', visible && 'disabled', alert && 'alert'
   );
 
   const onClick = (): void => {
@@ -1171,7 +1216,7 @@ function DockItem(props: DockItemProps): JSX.Element | null {
 }
 
 export function Dock(): JSX.Element {
-  const [{ docked, stack }] = States.useGlobalState(LAB);
+  const [{ docked, stack, alerts }] = States.useGlobalState(LAB);
   const items: JSX.Element[] = [];
   docked.forEach((pos, compId) => {
     const layout = stack[0] ?? defaultLayout;
@@ -1181,6 +1226,7 @@ export function Dock(): JSX.Element {
         key={compId}
         compId={compId}
         visible={curr !== undefined}
+        alert={alerts.has(compId)}
         position={curr ?? pos}
       />);
   });
