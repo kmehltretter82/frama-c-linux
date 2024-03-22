@@ -28,91 +28,56 @@ module WConf = Why3.Whyconf
 
 (* -------------------------------------------------------------------------- *)
 
-type _theory = string * string list
-
 let create_why3_env loadpath =
-  let main = WConf.get_main (WConf.read_config None) in
-  let loadpathes = (WConf.loadpath (main))@loadpath  in
-  W.Env.create_env loadpathes
+  let main = WConf.get_main @@ WConf.read_config None in
+  W.Env.create_env @@ WConf.loadpath main @ F.to_string_list loadpath
 
-let extract_last_segments (str_list : string list) =
-  List.map (fun str ->
-      let segments = String.split_on_char '.' str in
-      match List.rev segments with
-      | hd :: tl -> (hd, List.rev tl)
-      | [] -> ("", [])
-    ) str_list
+let extract_path thname =
+  let segments = String.split_on_char '.' thname in
+  match List.rev segments with
+  | hd :: tl -> hd, List.rev tl
+  | [] -> "", []
 
-let get_name_from_ident (ident) =
-  let ident_printer = W.Ident.create_ident_printer [] in
-  W.Ident.id_unique (ident_printer) ident
+(* For debug only*)
+let pp_id fmt (id: W.Ident.ident) =
+  Format.pp_print_string fmt id.id_string
 
-
-let open_theories_of_user (env) (theories) =
-  List.iter
-    (fun (theory_name, theory_path) ->
-       try
-         let theory = (W.Env.read_theory env (theory_path) (theory_name)) in
-         List.iter ( fun (tdecl : T.tdecl) ->
-             match tdecl.td_node with
-             | Decl decl ->
-               (match (decl.d_node : W.Decl.decl_node) with
-                | Dtype dtype -> L.debug ~level:0 "Decl and type, named : %s.@"  (get_name_from_ident dtype.ts_name);
-                | Ddata ddatas ->
-                  List.iter (fun ((tysymbol, _) : W.Decl.data_decl) ->
-                      L.debug ~level:0 "Decl and dtata, named : %s.@" (get_name_from_ident tysymbol.ts_name);
-                    ) ddatas;
-                | Dparam dparam -> L.debug ~level:0 "Decl and dparam, named : %s.@" (get_name_from_ident dparam.ls_name);
-                | Dlogic dlogics ->
-                  List.iter (fun ((ls,_):W.Decl.logic_decl) ->
-                      L.debug ~level:0 "Decl and dlogic, named : %s.@" (get_name_from_ident ls.ls_name);
-                    ) dlogics;
-                | _ -> L.debug ~level:0 "Decl but whatever")
-             | Use _ -> L.debug ~level:0 "Use"
-             | Clone _ -> L.debug ~level:0 "Clone"
-             | Meta _ -> L.debug ~level:0 "Meta"
-           ) theory.th_decls;
-
-       with W.Env.LibraryNotFound paths ->
-         L.debug ~level:0 "Library %s not found at %s " theory_name (String.concat "." paths);
-    ) (extract_last_segments theories)
-
-
-let open_modules_of_user (env) (modules) =
-  List.iter
-  (fun (theory_name, theory_path) ->
-     try
-       let pmodule = (W.Pmodule.read_module env (theory_path) (theory_name)) in
-       List.iter ( fun (modunit : W.Pmodule.mod_unit) ->
-        L.debug ~level:0 "Meta";
-         ) pmodule.mod_units;
-
-     with W.Env.LibraryNotFound paths ->
-       L.debug ~level:0 "Library %s not found at %s " theory_name (String.concat "." paths);
-  ) (extract_last_segments modules)
-
-
+let import_theory env thname =
+  let theory_name, theory_path = extract_path thname in
+  try
+    let theory = W.Env.read_theory env theory_path theory_name in
+    List.iter (fun (tdecl : T.tdecl) ->
+        match tdecl.td_node with
+        | Decl decl ->
+          begin
+            match decl.d_node with
+            | Dtype ts ->
+              L.debug ~level:0 "Type %a"  pp_id ts.ts_name
+            | Ddata ddatas ->
+              List.iter
+                (fun ((ts, _) : W.Decl.data_decl) ->
+                   L.debug ~level:0 "Data %a" pp_id  ts.ts_name
+                ) ddatas
+            | Dparam ls ->
+              L.debug ~level:0 "Param %a" pp_id ls.ls_name
+            | Dlogic dlogics ->
+              List.iter
+                (fun ((ls,_):W.Decl.logic_decl) ->
+                   L.debug ~level:0 "Logic %a" pp_id ls.ls_name
+                ) dlogics
+            | _ -> ()
+          end
+        | Use th -> L.debug ~level:0 "Use %a" pp_id th.th_name
+        | Clone _ | Meta _ -> ()
+      ) theory.th_decls
+  with W.Env.LibraryNotFound _ ->
+    L.error "Library %s not found" thname
 
 let () =
   Boot.Main.extend
     begin fun () ->
-      let user_libraries = L.Library.get () in
-      (* DEBUG ONLY *)
-      List.iter (fun dir ->
-          L.debug ~level:0 " + LIBS %s@." dir
-        ) (F.to_string_list user_libraries) ;
-      (* DEBUG ONLY *)
-      let user_theories = L.Import.get () in
-      List.iter (fun thy ->
-          L.debug ~level:0 " + THY %s@." thy
-        ) user_theories ;
-
-      let user_libraries = L.Library.get () in
-      let user_theories = L.Import.get () in
-      let env = create_why3_env (F.to_string_list user_libraries) in
-      open_theories_of_user (env) (user_theories);
-
-
+      let env = create_why3_env @@ L.Library.get () in
+      List.iter (import_theory env) @@ L.Import.get ()
     end
 
 (* -------------------------------------------------------------------------- *)
