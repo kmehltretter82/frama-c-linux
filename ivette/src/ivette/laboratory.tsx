@@ -457,9 +457,10 @@ function closeTab(key: tabKey): void {
     const { key, stack, split } = tab;
     const layout = stack[0] ?? defaultLayout;
     const panels = addPanels(state.panels, layout);
+    const alerts = removeAlerts(state.alerts, layout);
     LAB.setValue({
       ...state,
-      panels, stack, split, tabs, tabKey: key
+      panels, alerts, stack, split, tabs, tabKey: key
     });
   }
 }
