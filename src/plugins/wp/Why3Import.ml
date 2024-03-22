@@ -42,6 +42,11 @@ let extract_path thname =
 let pp_id fmt (id: W.Ident.ident) =
   Format.pp_print_string fmt id.id_string
 
+let rec lt_of_ts : W.Ty.ty -> Cil_types.logic_type =
+  raise Not_found
+and lti_of_ls : W.Ty.tysymbol -> Cil_types.logic_type_info =
+  raise Not_found
+
 let import_theory env thname =
   let theory_name, theory_path = extract_path thname in
   try
