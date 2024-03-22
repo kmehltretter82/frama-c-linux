@@ -20,8 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
-open Cil_types
+open Evast
 open Abstract_interp
 open Cvalue
 
@@ -73,9 +72,8 @@ let warning warn s =
    singleton location with an arithmetic type, and that it contains no more than
    [max_card] elements. *)
 let split_v ~warn lv state max_card =
-  if Cil.isArithmeticOrPointerType (Cil.typeOfLval lv) then
-    let lv' = Evast.translate_lval lv in
-    let loc = Cvalue_queries.lval_to_loc state lv' in
+  if Cil.isArithmeticOrPointerType lv.typ then
+    let loc = Cvalue_queries.lval_to_loc state lv in
     if Locations.Location_Bits.cardinal_zero_or_one loc.Locations.loc then
       let v_indet = Cvalue.Model.find_indeterminate state loc in
       let v = Cvalue.V_Or_Uninitialized.get_v v_indet in
@@ -97,26 +95,26 @@ let split_v ~warn lv state max_card =
           V.fold_enum aux_v v []
         with Not_less_than ->
           warning warn "Location %a points to too many values (%a). \
-                        Cannot split." Printer.pp_lval lv V.pretty v;
+                        Cannot split." Evast.pp_lval lv V.pretty v;
           [state]
     else begin
       warning warn "Location %a is not a singleton (%a). Cannot split."
-        Printer.pp_lval lv Locations.pretty loc;
+        Evast.pp_lval lv Locations.pretty loc;
       [state]
     end
   else begin
     warning warn "Cannot split on lvalue %a of non-arithmetic type"
-      Printer.pp_lval lv;
+      Evast.pp_lval lv;
     [state]
   end
 
 (* For an lvalue '*p' or 'p->off', split the values of 'p'. Do not split
    anything else. *)
 let split_pointer ~warn lv state max_card =
-  match lv with
-  | (Mem {enode = Lval lv}, _) -> split_v ~warn lv state max_card
+  match lv.node with
+  | (Mem {node = Lval lv}, _) -> split_v ~warn lv state max_card
   | _ ->
-    warning warn "cannot split on non-pointer %a" Printer.pp_lval lv;
+    warning warn "cannot split on non-pointer %a" Evast.pp_lval lv;
     [state]
 
 (** The three functions below gather all lvalues with integral type that appear
@@ -126,15 +124,15 @@ let split_pointer ~warn lv state max_card =
     examing 't[i]+1', as it is important to proceed by case analysis on 'i'
     first, then on 't[i]'. *)
 let rec gather_lv_in_exp acc e =
-  match e.enode with
-  | Const _ | SizeOf _  | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ ->
-    acc
+  match e.node with
+  | Const _ -> acc
   | Lval lv | AddrOf lv | StartOf lv -> gather_lv_in_lv acc lv
   | UnOp (_, e, _) | CastE (_, e) -> gather_lv_in_exp acc e
   | BinOp (_, e1, e2, _) -> gather_lv_in_exp (gather_lv_in_exp acc e1) e2
-and gather_lv_in_lv acc (host, offset as lv) =
+and gather_lv_in_lv acc lv =
+  let (host, offset) = lv.node in
   let acc =
-    if Cil.isArithmeticOrPointerType (Cil.typeOfLval lv)
+    if Cil.isArithmeticOrPointerType lv.typ
     then lv :: acc
     else acc
   in
@@ -175,7 +173,7 @@ let split_all ~warn lv state max_card =
 (* Auxiliary function, used to register a 'Frama_C_split' variant. Only the
    parsing and the error handling is shared; all the hard work is done by [f] *)
 let aux_split f state = function
-  | [({ enode = (Lval lv | CastE (_, {enode = Lval lv}))}, _); (_, card)] ->
+  | [({ node = (Lval lv | CastE (_, {node = Lval lv}))}, _); (_, card)] ->
     let states =
       try
         let max_card =

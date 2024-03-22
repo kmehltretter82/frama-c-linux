@@ -61,7 +61,7 @@ val emitter : Emitter.t
 val get_slevel : Kernel_function.t -> Parameters.SlevelFunction.value
 val get_subdivision: stmt -> int
 val pretty_actuals :
-  Format.formatter -> (Cil_types.exp * Cvalue.V.t) list -> unit
+  Format.formatter -> (Evast.exp * Cvalue.V.t) list -> unit
 val pretty_current_cfunction_name : Format.formatter -> unit
 val warning_once_current : ('a, Format.formatter, unit) format -> 'a
 

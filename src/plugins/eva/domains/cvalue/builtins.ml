@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+open Evast
 
 exception Invalid_nb_of_args of int
 exception Outside_builtin_possibilities
@@ -244,7 +244,7 @@ let compute_arguments arguments rest =
   in
   let list = List.map (fun arg -> arg.concrete, compute arg.avalue) arguments in
   let rest = List.map (fun (exp, v) -> exp, compute v) rest in
-  List.map (fun (exp, v) -> Evast.to_cil_exp exp, v) (list @ rest)
+  list @ rest
 
 let process_result call state call_result =
   let clob = Locals_scoping.bottom () in

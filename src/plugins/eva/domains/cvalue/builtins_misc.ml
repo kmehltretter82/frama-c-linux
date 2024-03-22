@@ -37,7 +37,6 @@ let frama_C_assert state actuals =
       else if Cvalue.V.contains_zero arg
       then begin
         let state =
-          let arg_exp = Evast.translate_exp arg_exp in
           let* valuation = fst (Cvalue_queries.reduce state arg_exp true) in
           let valuation = Cvalue_queries.to_domain_valuation valuation in
           Cvalue_transfer.update valuation state

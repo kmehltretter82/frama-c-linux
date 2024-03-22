@@ -25,7 +25,7 @@
 (** Eva analysis builtins for the cvalue domain, more efficient than their
     equivalent in C. *)
 
-open Cil_types
+open Evast
 
 exception Invalid_nb_of_args of int
 exception Outside_builtin_possibilities
@@ -91,7 +91,7 @@ val is_builtin: string -> bool
 val prepare_builtins: unit -> unit
 
 (** Is a given function replaced by a builtin? *)
-val is_builtin_overridden: kernel_function -> bool
+val is_builtin_overridden: Cil_types.kernel_function -> bool
 
 (** [clobbered_set_from_ret state ret] can be used for functions that return
     a pointer to where they have written some data. It returns all the bases
@@ -106,7 +106,8 @@ type result = Cvalue.Model.t * Locals_scoping.clobbered_set
     evaluated along with the builtin.
     [prepare_builtins] should have been called before using this function. *)
 val find_builtin_override:
-  kernel_function -> (string * builtin * cacheable * funspec) option
+  Cil_types.kernel_function ->
+  (string * builtin * cacheable * Cil_types.funspec) option
 
 (* Applies a cvalue builtin for the given call, in the given cvalue state. *)
 val apply_builtin:

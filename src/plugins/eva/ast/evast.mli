@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+[@@@ api_start]
+
 (** Eva Syntax Tree. *)
 
 type origin =
@@ -331,3 +333,5 @@ sig
   val visit_lval : neutral:'a -> combine:('a -> 'a -> 'a) ->
     'a folder -> lval -> 'a
 end
+
+[@@@ api_end]

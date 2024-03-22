@@ -146,6 +146,10 @@ val by_callstack : request -> (Callstack.t * request) list
 
 (** State requests *)
 
+(** Returns the list of expressions which have been inferred to be equal to
+    the given expression by the Equality domain. *)
+val equality_class : Evast.exp -> request -> Evast.exp list result
+
 (** Returns the Cvalue state. Error cases are converted into the bottom or top
     cvalue state accordingly. *)
 val get_cvalue_model : request -> Cvalue.Model.t
