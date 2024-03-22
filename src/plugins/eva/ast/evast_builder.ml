@@ -228,7 +228,7 @@ let zero_typed (typ : Cil_types.typ) =
   | TPtr _ ->
     let ik = Cil.(theMachine.upointKind) in
     let zero = mk_exp (Const (CInt64 (Integer.zero, ik, None))) in
-    mk_exp (CastE (Cil.type_remove_qualifier_attributes typ, zero))
+    cast typ zero
   | typ ->
     Self.fatal ~current:true "non-scalar type %a" Printer.pp_typ typ
 
