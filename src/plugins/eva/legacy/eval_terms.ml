@@ -1990,6 +1990,59 @@ and reduce_by_valid env positive access (tset: term) =
   in
   do_one env tset
 
+(* Reduces the possible value of [arg] by assuming it points to a valid string
+   (or not if [positive] is false), for reading or writing according to [access].
+   This reduces the possible value of [arg] to a valid pointer (thus only
+   considering the first character of the string), and filters out bases that
+   cannot be a valid string because strlen returns bottom.
+   This reduction could be improved by also reducing offsets according to the
+   position of \0 in the pointed strings. *)
+and reduce_by_valid_string ~alarm_mode env positive ~wide ~access arg =
+  (* First, reduces [arg] assuming it is a valid pointer. *)
+  let env = reduce_by_valid env positive access arg in
+  try
+    let exact_location = eval_term_as_exact_locs ~alarm_mode env arg in
+    (* Reduce the cvalue [v]:
+       - if [positive] holds, remove bases which cannot be a valid string
+         as the proper strlen builtin returns bottom;
+       - if [positive] is false, remove bases which are a valid string,
+         as the proper strlen builtin returns no alarm. *)
+    let reduce v =
+      let wrapper =
+        if wide
+        then Builtins_string.frama_c_wcslen_wrapper
+        else Builtins_string.frama_c_strlen_wrapper
+      in
+      let aux base offset acc =
+        let value = Cvalue.V.inject base offset in
+        let v, alarms = apply_logic_builtin wrapper env [value] in
+        if (positive && Cvalue.V.is_bottom v)
+        || (not positive && not alarms)
+        then acc
+        else Cvalue.V.add base offset acc
+      in
+      Cvalue.V.fold_i aux v Cvalue.V.bottom
+    in
+    match exact_location with
+    | Logic_var logic_var ->
+      let cvalue = LogicVarEnv.find logic_var env.logic_vars in
+      let cvalue = reduce cvalue in
+      if V.is_bottom cvalue then raise Reduce_to_bottom;
+      add_logic_var env logic_var cvalue
+    | Location (typ_loc, locs) ->
+      let aux loc env =
+        let state = env_current_state env in
+        let v = find_or_alarm ~alarm_mode state loc in
+        let v = Cvalue_forward.reinterpret typ_loc v in
+        let v' = reduce v in
+        if V.is_bottom v' then raise Reduce_to_bottom;
+        if V.equal v' v then env else
+          let state' = Cvalue.Model.reduce_previous_binding state loc v' in
+          overwrite_current_state env state'
+      in
+      Eval_op.apply_on_all_locs aux locs env
+  with Not_an_exact_loc | LogicEvalError _ -> env
+
 (* reduce [tl] so that [rl rel tr] holds *)
 and reduce_by_left_relation ~alarm_mode env positive tl rel tr =
   try
@@ -2143,6 +2196,15 @@ and reduce_by_known_papp ~alarm_mode env positive li _labels args =
         in
         Eval_op.apply_on_all_locs aux locsl env
     end
+
+  | "valid_read_string", [arg] ->
+    reduce_by_valid_string ~alarm_mode env positive ~wide:false ~access:Read arg
+  | "valid_string", [arg] ->
+    reduce_by_valid_string ~alarm_mode env positive ~wide:false ~access:Write arg
+  | "valid_read_wstring", [arg] ->
+    reduce_by_valid_string ~alarm_mode env positive ~wide:true ~access:Read arg
+  | "valid_wstring", [arg] ->
+    reduce_by_valid_string ~alarm_mode env positive ~wide:true ~access:Write arg
 
   | _ -> (* Do not fail here. We can be asked to reduce on predicates that we
             can evaluate, but on which we are not able to reduce on (yet ?).*)

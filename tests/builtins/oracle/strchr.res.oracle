@@ -613,8 +613,6 @@
 [eva] strchr.c:524: Call to builtin strchr
 [eva:alarm] strchr.c:524: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva:alarm] strchr.c:524: Warning: 
-  pointer subtraction. assert \base_addr(_ss_0) ≡ \base_addr(s);
 [eva] strchr.c:524: Frama_C_show_each_mystrchr: [-1..26]
 [eva] strchr.c:525: assertion got status valid.
 [eva] computing for function init_array_nondet <- strchr_unbounded <- main.
@@ -653,9 +651,7 @@
   signed overflow. assert -2147483648 ≤ _ss - s;
 [eva:alarm] strchr.c:538: Warning: 
   signed overflow. assert _ss - s ≤ 2147483647;
-[eva] strchr.c:538: 
-  Frama_C_show_each_mystrchr:
-  {{ garbled mix of &{s; "hello"} (origin: Arithmetic {strchr.c:537}) }}
+[eva] strchr.c:538: Frama_C_show_each_mystrchr: [-2147483648..2147483647]
 [eva] Recording results for strchr_invalid
 [eva] Done for function strchr_invalid
 [eva] computing for function strchr_garbled_mix_in_char <- main.
@@ -677,7 +673,7 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     strchr.c:537: arithmetic operation on addresses
-      (read in 4 statements, propagated through 4 statements)
+      (read in 1 statement, propagated through 2 statements)
       garbled mix of &{s; "hello"}
     strchr.c:543: arithmetic operation on addresses
       (read in 1 statement, propagated through 2 statements)
@@ -743,11 +739,8 @@
    [3] ∈ {0}
   z3 ∈ {3}
 [eva:final-states] Values at end of function strchr_invalid:
-  s ∈
-   {{ garbled mix of &{s; "hello"} (origin: Arithmetic {strchr.c:537}) }}
-  unused ∈
-        {{ garbled mix of &{s; "hello"}
-         (origin: Arithmetic {strchr.c:537}) }}
+  s ∈ {{ &s + {0; 1; 2; 3} ; "hello" + {0; 1; 2; 3; 4; 5} }}
+  unused ∈ [--..--]
 [eva:final-states] Values at end of function strchr_large:
   Frama_C_entropy_source ∈ [--..--]
   c ∈ {0}
