@@ -9,6 +9,14 @@
     text-overflow: ellipsis;
 }
 
+.properties-section-names .dome-xSideBarSection-content label {
+    display: none;
+}
+
+.properties-section-names .dome-xSideBarSection-content .dome-xForm-field{
+    padding: 5px 10px;
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Lightweight Text Markers                                           --- */
 /* -------------------------------------------------------------------------- */
