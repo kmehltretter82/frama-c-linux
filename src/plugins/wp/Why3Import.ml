@@ -78,6 +78,21 @@ let open_theories_of_user (env) (theories) =
     ) (extract_last_segments theories)
 
 
+let open_modules_of_user (env) (modules) =
+  List.iter
+  (fun (theory_name, theory_path) ->
+     try
+       let pmodule = (W.Pmodule.read_module env (theory_path) (theory_name)) in
+       List.iter ( fun (modunit : W.Pmodule.mod_unit) ->
+        L.debug ~level:0 "Meta";
+         ) pmodule.mod_units;
+
+     with W.Env.LibraryNotFound paths ->
+       L.debug ~level:0 "Library %s not found at %s " theory_name (String.concat "." paths);
+  ) (extract_last_segments modules)
+
+
+
 let () =
   Boot.Main.extend
     begin fun () ->
