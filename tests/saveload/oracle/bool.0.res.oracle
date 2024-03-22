@@ -41,8 +41,8 @@
   x FROM \nothing
   y FROM \nothing
   S___fc_stdout[0].__fc_FILE_data
-               FROM S___fc_stdout[0]; "%d\n"; "%d\n"; "%d\n"; "%d\n";
-                    "%d,%d\n"[bits 0 to 55] (and SELF)
+               FROM S___fc_stdout[0]; "%d\n"; "%d\n";
+                    "%d,%d\n"[bits 0 to 55]; "%d\n"; "%d\n" (and SELF)
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function f:
@@ -52,5 +52,5 @@
 [inout] Out (internal) for function main:
     x; y; S___fc_stdout[0].__fc_FILE_data
 [inout] Inputs for function main:
-    x; y; S___fc_stdout[0]; "%d\n"; "%d\n"; "%d\n"; "%d\n";
-    "%d,%d\n"[bits 0 to 55]
+    x; y; S___fc_stdout[0]; "%d\n"; "%d\n"; "%d,%d\n"[bits 0 to 55]; "%d\n";
+    "%d\n"
