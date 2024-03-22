@@ -677,6 +677,14 @@ sig
     varinfo -> (varinfo list) option -> typ -> Logic_ptree.spec -> funspec
 end
 
+(*[LC] Remark:
+  - C.find_logic_type is always Logic_env.find_logic_type
+  - C.find_logic_ctor is always Logic_env.find_logic_ctor
+  - C.find_all_logic_functions is always
+    Logic_env.find_all_logic_functions_gen Logic_utils.is_same_logic_profile
+  - Same remarks for find_xxx and remove_xxx functions
+  - And so as the corresponding functions in typing_context
+*)
 module Make
     (C:
      sig
@@ -763,7 +771,6 @@ struct
           match C.find_all_logic_functions a with
           | [] -> None | ls -> Some (Lfun ls)
         end f
-  [@@ warning "-32"]
 
   let make_typing_context ~pre_state ~post_state ~assigns_env
       ~logic_type ~type_predicate ~type_term ~type_assigns = {
@@ -2075,7 +2082,7 @@ struct
   let rename_variable t v1 v2 =
     visitCilTerm (new rename_variable v1 v2) t
 
-  let find_logic_info v env =
+  let find_lv_logic_info v env =
     try Lenv.find_logic_info v.lv_name env
     with Not_found ->
       let l = C.find_all_logic_functions v.lv_name in
@@ -2113,7 +2120,7 @@ struct
                              to suppose that v has no label (this is checked
                              when type-checking v as a variable)
                           *)
-                          Tapp(find_logic_info v env,[],args);
+                          Tapp(find_lv_logic_info v env,[],args);
                         term_type = rt});
         term_type = v.lv_type}
     | _ -> { term_loc = loc; term_name = names;
@@ -2724,63 +2731,64 @@ struct
             | _ -> assert false
           end
         with Not_found ->
-        try
           fresh_type#reset ();
-          let info = ctxt.find_logic_ctor x in
-          match info.ctor_params with
-            [] ->
-            TDataCons(info,[]),
-            Ltype(info.ctor_type,
-                  List.map fresh_type_var
-                    info.ctor_type.lt_params)
-          | _ ->
-            ctxt.error loc "Data constructor %s needs arguments"
-              info.ctor_name
-        with Not_found ->
-          (* We have a global logic variable. It may depend on
-             a single state (multiple labels need to be explicitly
-             instantiated and are treated as PLapp below).
-             NB: for now, if we have a real function (with parameters
-             other than labels) and a label,
-             we end up with a Tapp with no argument, which is not
-             exactly good. Either TVar should take an optional label
-             for this particular case, or we should definitely move
-             to partial app everywhere (since we have support for
-             \lambda, this is not a very big step anyway)
-          *)
-          let make_expr f =
-            let typ =
-              match f.l_type, f.l_profile with
-              | Some t, [] -> t
-              | Some t, l -> Larrow (List.map (fun x -> x.lv_type) l, t)
-              | None, _ ->
-                if ctxt.silent then raise Backtrack;
-                ctxt.error loc "%s is not a logic variable" x
+          match resolve_lapp x env with
+          | None -> ctxt.error loc "unbound logic variable %s" x
+          | Some (Ctor info) ->
+            begin
+              match info.ctor_params with
+                [] ->
+                TDataCons(info,[]),
+                Ltype(info.ctor_type,
+                      List.map fresh_type_var
+                        info.ctor_type.lt_params)
+              | _ ->
+                ctxt.error loc "Data constructor %s needs arguments"
+                  info.ctor_name
+            end
+          | Some (Lfun ls) ->
+            (* We have a global logic variable. It may depend on
+               a single state (multiple labels need to be explicitly
+               instantiated and are treated as PLapp below).
+               NB: for now, if we have a real function (with parameters
+               other than labels) and a label,
+               we end up with a Tapp with no argument, which is not
+               exactly good. Either TVar should take an optional label
+               for this particular case, or we should definitely move
+               to partial app everywhere (since we have support for
+               \lambda, this is not a very big step anyway)
+            *)
+            let make_expr f =
+              let typ =
+                match f.l_type, f.l_profile with
+                | Some t, [] -> t
+                | Some t, l -> Larrow (List.map (fun x -> x.lv_type) l, t)
+                | None, _ ->
+                  if ctxt.silent then raise Backtrack;
+                  ctxt.error loc "%s is not a logic variable" x
+              in
+              let typ = fresh typ in
+              match f.l_labels with
+                [] ->
+                TLval (TVar(f.l_var_info),TNoOffset), typ
+              | [_] ->
+                let curr = find_current_label loc env in
+                Tapp(f,[curr],[]), typ
+              | _ ->
+                ctxt.error loc
+                  "%s labels must be explicitly instantiated" x
             in
-            let typ = fresh typ in
-            match f.l_labels with
-              [] ->
-              TLval (TVar(f.l_var_info),TNoOffset), typ
-            | [_] ->
-              let curr = find_current_label loc env in
-              Tapp(f,[curr],[]), typ
-            | _ ->
-              ctxt.error loc
-                "%s labels must be explicitly instantiated" x
-          in
-          match ctxt.find_all_logic_functions x with
-
-            [] -> ctxt.error loc "unbound logic variable %s" x
-          | [f] -> make_expr f
-          | l ->
-            (try
-               let f =
-                 List.find (fun info -> info.l_profile = []) l
-               in make_expr f
-             with Not_found ->
-               ctxt.error loc
-                 "invalid use of overloaded function \
-                  %s as constant" x)
+            match ls with
+            | [f] -> make_expr f
+            | l ->
+              try
+                let f =
+                  List.find (fun info -> info.l_profile = []) l
+                in make_expr f
+              with Not_found ->
+                ctxt.error loc
+                  "invalid use of overloaded function \
+                   %s as constant" x
       end
     | PLapp (f, labels, tl) ->
       let env = drop_qualifiers env in
