@@ -439,12 +439,12 @@ let in_ghost_block ?(battrs=[]) l =
 %type <Cabs.name> declarator
 %type <Cabs.name * expression option> field_decl
 %type <(Cabs.name * expression option) list> field_decl_list
-%type <string * Cabs.decl_type> direct_decl
+%type <string * Cabs.decl_type * cabsloc> direct_decl
 %type <Cabs.decl_type> abs_direct_decl abs_direct_decl_opt
 %type <Cabs.decl_type * Cabs.attribute list> abstract_decl
 
  /* (* Each element is a "* <type_quals_opt>". *) */
-%type <attribute list list * cabsloc> pointer pointer_opt
+%type <attribute list list> pointer pointer_opt
 %type <Cabs.spec_elem * cabsloc> cvspec
 %type <(Cabs.spec_elem list * Cabs.decl_type) option * expression> generic_association
 %type <((Cabs.spec_elem list * Cabs.decl_type) option * expression) list> generic_association_list
@@ -1343,7 +1343,8 @@ enumerator:
 
 declarator:  /* (* ISO 6.7.5. Plus Microsoft declarators.*) */
    pointer_opt direct_decl attributes_with_asm {
-     let (n, decl) = $2 in (n, applyPointer (fst $1) decl, $3, (snd $1))
+     let (n, decl, loc) = $2 in
+     (n, applyPointer $1 decl, $3, loc)
    }
 ;
 
@@ -1361,25 +1362,25 @@ attributes_or_static: /* 6.7.5.2/3 */
 direct_decl: /* (* ISO 6.7.5 *) */
                                    /* (* We want to be able to redefine named
                                     * types as variable names *) */
-|   id_or_typename                 { ($1, JUSTBASE) }
+|   id_or_typename                 { ($1, JUSTBASE, Cil_datatype.Location.of_lexing_loc $sloc) }
 
 |   LPAREN attributes declarator RPAREN
-                                   { let (n,decl,al,_) = $3 in
-                                     (n, PARENTYPE($2,decl,al)) }
+                                   { let (n,decl,al,loc) = $3 in
+                                     (n, PARENTYPE($2,decl,al), loc) }
 
 |   direct_decl LBRACKET attributes_or_static  RBRACKET
-                                   { let (n, decl) = $1 in
+                                   { let (n, decl, loc) = $1 in
                                      let (attrs, size) = $3 in
-                                     (n, ARRAY(decl, attrs, size)) }
+                                     (n, ARRAY(decl, attrs, size), loc) }
 |   direct_decl LPAREN RPAREN ghost_parameter_opt {
-   let (n,decl) = $1 in (n, PROTO(decl,[],$4,false))
+   let (n,decl,loc) = $1 in (n, PROTO(decl,[],$4,false), loc)
   }
 |   direct_decl parameter_list_startscope rest_par_list RPAREN ghost_parameter_opt
-                                   { let (n, decl) = $1 in
+                                   { let (n, decl, loc) = $1 in
                                      let (params, isva) = $3 in
                                      let ghost = $5 in
                                      !Lexerhack.pop_context ();
-                                     (n, PROTO(decl, params, ghost, isva))
+                                     (n, PROTO(decl, params, ghost, isva), loc)
                                    }
 ;
 parameter_list_startscope:
@@ -1402,25 +1403,27 @@ rest_par_list1:
 parameter_decl: /* (* ISO 6.7.5 *) */
    decl_spec_list declarator              { (fst $1, $2) }
 |  decl_spec_list abstract_decl           { let d, a = $2 in
-                                            (fst $1, ("", d, a, (*CEA*) cabslu)) }
-|  decl_spec_list                         { (fst $1, ("", JUSTBASE, [], (*CEA*) cabslu)) }
+                                            let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+                                            (fst $1, ("", d, a, loc)) }
+|  decl_spec_list                         { let loc = Cil_datatype.Location.of_lexing_loc $sloc in
+                                            (fst $1, ("", JUSTBASE, [], loc)) }
 |  LPAREN parameter_decl RPAREN           { $2 }
 ;
 
 /* (* Old style prototypes. Like a declarator *) */
 old_proto_decl:
-  pointer_opt direct_old_proto_decl   { let (n, decl, a) = $2 in
-                                        (n, applyPointer (fst $1) decl,
-                                         a, snd $1)
-                                      }
+  pointer_opt direct_old_proto_decl   {
+    let (n, decl, a, loc) = $2 in
+    (n, applyPointer $1 decl, a, loc)
+  }
 
 ;
 
 direct_old_proto_decl:
 | direct_decl LPAREN old_parameter_list_ne RPAREN old_pardef_list {
     let par_decl, isva = doOldParDecl $3 $5 in
-    let n, decl = $1 in
-    (n, PROTO(decl, par_decl, [],isva), ["FC_OLDSTYLEPROTO",[]])
+    let n, decl, loc = $1 in
+    (n, PROTO(decl, par_decl, [],isva), ["FC_OLDSTYLEPROTO",[]], loc)
   }
 
 /* (* appears sometimesm but generates a shift-reduce conflict. *)
@@ -1454,11 +1457,10 @@ old_pardef:
 
 
 pointer: /* (* ISO 6.7.5 *) */
-   STAR attributes pointer_opt  { $2 :: fst $3, $1 }
+   STAR attributes pointer_opt  { $2 :: $3 }
 ;
 pointer_opt:
-   /**/                          { let l = Errorloc.currentLoc () in
-                                   ([], l) }
+   /**/                          { [] }
 |  pointer                       { $1 }
 ;
 
@@ -1474,8 +1476,8 @@ type_name: /* (* ISO 6.7.6 *) */
 | decl_spec_list               { (fst $1, JUSTBASE) }
 ;
 abstract_decl: /* (* ISO 6.7.6. *) */
-  pointer_opt abs_direct_decl attributes  { applyPointer (fst $1) $2, $3 }
-| pointer                                 { applyPointer (fst $1) JUSTBASE, [] }
+  pointer_opt abs_direct_decl attributes  { applyPointer $1 $2, $3 }
+| pointer                                 { applyPointer $1 JUSTBASE, [] }
 ;
 
 abs_direct_decl: /* (* ISO 6.7.6. We do not support optional declarator for
