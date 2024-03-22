@@ -160,12 +160,15 @@ let binop op e1 e2 =
     let t = Cil.arithmeticConversion e1.typ e2.typ in
     mk_exp (BinOp (op,e1,e2,t))
 
-  | Eq |Ne |Lt |Le |Ge |Gt ->
+  | Eq | Ne | Lt | Le | Ge |Gt ->
     let t =
       if Cil.isArithmeticType e1.typ && Cil.isArithmeticType e2.typ then
         Cil.arithmeticConversion e1.typ e2.typ
       else if Cil.isPointerType e1.typ && Cil.isPointerType e2.typ then
-        Cil.theMachine.upointType
+        if Cil.need_cast ~force:true e1.typ e2.typ then
+          Cil.theMachine.upointType
+        else
+          e1.typ
       else
         invalid_arg "unsupported construction"
     in
