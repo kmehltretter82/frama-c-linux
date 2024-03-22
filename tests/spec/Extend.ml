@@ -91,7 +91,7 @@ let type_bla typing_context _loc l =
     match p.lexpr_node with
     | PLapp("\\trace", [], [pred]) ->
       let pred = typing_context.type_predicate typing_context env pred in
-      let li = List.hd (ctxt.find_all_logic_functions "\\trace") in
+      let li = List.hd (Logic_env.find_all_logic_functions "\\trace") in
       let i = Count.next () in
       let ti = Logic_const.tinteger ~loc:pred.pred_loc i in
       Bla_table.add i pred;

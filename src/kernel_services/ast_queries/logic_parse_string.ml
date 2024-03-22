@@ -96,13 +96,6 @@ let default_typer kf kinstr =
         let find_type = Globals.Types.find_type
 
         let find_label s = Kernel_function.find_label kf s
-        include Logic_env
-
-        let add_logic_function =
-          add_logic_function_gen Logic_utils.is_same_logic_profile
-
-        let remove_logic_info =
-          remove_logic_info_gen Logic_utils.is_same_logic_profile
 
         let integral_cast ty t =
           raise

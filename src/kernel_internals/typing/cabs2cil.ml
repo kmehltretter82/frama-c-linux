@@ -3584,14 +3584,6 @@ struct
 
   include Logic_labels
 
-  include Logic_env
-
-  let add_logic_function =
-    add_logic_function_gen Logic_utils.is_same_logic_profile
-
-  let remove_logic_info =
-    remove_logic_info_gen Logic_utils.is_same_logic_profile
-
   let integral_cast = integral_cast
 
   (* This function raises a non-recoverable when [-kernel-warn-key annot-error]

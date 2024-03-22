@@ -27,7 +27,6 @@ open Cil
 open Logic_ptree
 open Logic_const
 open Logic_utils
-open Format
 
 exception Backtrack
 
@@ -509,16 +508,6 @@ type typing_context = {
   find_comp_field: compinfo -> string -> offset;
   find_type : type_namespace -> string -> typ;
   find_label : string -> stmt ref;
-  remove_logic_function : string -> unit;
-  remove_logic_info: logic_info -> unit;
-  remove_logic_type: string -> unit;
-  remove_logic_ctor: string -> unit;
-  add_logic_function: logic_info -> unit;
-  add_logic_type: string -> logic_type_info -> unit;
-  add_logic_ctor: string -> logic_ctor_info -> unit;
-  find_all_logic_functions: string -> logic_info list;
-  find_logic_type: string -> logic_type_info;
-  find_logic_ctor: string -> logic_ctor_info;
   pre_state:Lenv.t;
   post_state:Cil_types.termination_kind list -> Lenv.t;
   assigns_env:Lenv.t;
@@ -535,7 +524,7 @@ type typing_context = {
     accept_formal:bool ->
     Lenv.t ->
     Logic_ptree.assigns -> Cil_types.assigns;
-  error: 'a 'b. location -> ('a,formatter,unit,'b) format4 -> 'a;
+  error: 'a 'b. location -> ('a,Format.formatter,unit,'b) format4 -> 'a;
   on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
 }
 
@@ -677,14 +666,6 @@ sig
     varinfo -> (varinfo list) option -> typ -> Logic_ptree.spec -> funspec
 end
 
-(*[LC] Remark:
-  - C.find_logic_type is always Logic_env.find_logic_type
-  - C.find_logic_ctor is always Logic_env.find_logic_ctor
-  - C.find_all_logic_functions is always
-    Logic_env.find_all_logic_functions_gen Logic_utils.is_same_logic_profile
-  - Same remarks for find_xxx and remove_xxx functions
-  - And so as the corresponding functions in typing_context
-*)
 module Make
     (C:
      sig
@@ -697,18 +678,8 @@ module Make
        val find_comp_field: compinfo -> string -> offset
        val find_type : type_namespace -> string -> typ
        val find_label : string -> stmt ref
-       val remove_logic_function : string -> unit
-       val remove_logic_info: logic_info -> unit
-       val remove_logic_type: string -> unit
-       val remove_logic_ctor: string -> unit
-       val add_logic_function: logic_info -> unit
-       val add_logic_type: string -> logic_type_info -> unit
-       val add_logic_ctor: string -> logic_ctor_info -> unit
-       val find_all_logic_functions: string -> logic_info list
-       val find_logic_type: string -> logic_type_info
-       val find_logic_ctor: string -> logic_ctor_info
        val integral_cast: Cil_types.typ -> Cil_types.term -> Cil_types.term
-       val error: location -> ('a,formatter,unit, 'b) format4 -> 'a
+       val error: location -> ('a,Format.formatter,unit, 'b) format4 -> 'a
        val on_error: ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
      end) =
 struct
@@ -759,7 +730,7 @@ struct
   let resolve_ltype =
     find_import
       begin fun t ->
-        try Some (C.find_logic_type t)
+        try Some (Logic_env.find_logic_type t)
         with Not_found -> None
       end
 
@@ -767,8 +738,8 @@ struct
     try Some (Lfun [Lenv.find_logic_info f env]) with Not_found ->
       find_import
         begin fun a ->
-          try Some (Ctor (C.find_logic_ctor a)) with Not_found ->
-          match C.find_all_logic_functions a with
+          try Some (Ctor (Logic_env.find_logic_ctor a)) with Not_found ->
+          match Logic_env.find_all_logic_functions a with
           | [] -> None | ls -> Some (Lfun ls)
         end f
 
@@ -791,16 +762,6 @@ struct
     find_comp_field = C.find_comp_field;
     find_type = C.find_type ;
     find_label = C.find_label;
-    remove_logic_function = C.remove_logic_function;
-    remove_logic_info = C.remove_logic_info;
-    remove_logic_type = C.remove_logic_type;
-    remove_logic_ctor = C.remove_logic_ctor;
-    add_logic_function = C.add_logic_function;
-    add_logic_type = C.add_logic_type;
-    add_logic_ctor = C.add_logic_ctor;
-    find_all_logic_functions = C.find_all_logic_functions;
-    find_logic_type = C.find_logic_type;
-    find_logic_ctor = C.find_logic_ctor;
     error = C.error;
     on_error = C.on_error;
   }
@@ -828,17 +789,18 @@ struct
         (match li.l_type with None -> "predicate" | Some _ -> "logic function")
         li.l_var_info.lv_name
     end else begin
-      C.add_logic_function li;
-      add_rollback_action C.remove_logic_info li
+      let eq = Logic_utils.is_same_logic_profile in
+      Logic_env.add_logic_function_gen eq li;
+      add_rollback_action (Logic_env.remove_logic_info_gen eq) li
     end
 
   let add_logic_type loc info =
     try
-      ignore (C.find_logic_type info.lt_name);
+      ignore (Logic_env.find_logic_type info.lt_name);
       C.error loc "logic type %s is already defined" info.lt_name
     with Not_found ->
-      C.add_logic_type info.lt_name info;
-      add_rollback_action C.remove_logic_type info.lt_name
+      Logic_env.add_logic_type info.lt_name info;
+      add_rollback_action Logic_env.remove_logic_type info.lt_name
 
   let check_non_void_ptr loc ty =
     if Logic_utils.isLogicVoidPointerType ty then
@@ -1376,7 +1338,7 @@ struct
         c_mk_cast ~force e oldt newt
       | t1, Ltype ({lt_name = name},[])
         when name = Utf8_logic.boolean && is_integral_type t1 ->
-        let t2 = Ltype (C.find_logic_type Utf8_logic.boolean,[]) in
+        let t2 = Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[]) in
         let e = mk_cast e Linteger in
         Logic_const.term ~loc (TBinOp(Ne,e,lzero ~loc())) t2
       | t1, Linteger when Logic_const.is_boolean_type t1 && explicit ->
@@ -1931,10 +1893,10 @@ struct
          prefer boolean as common type when doing comparison. *)
       | Ltype({lt_name = name},[]), t
         when is_integral_type t && name = Utf8_logic.boolean ->
-        Ltype(C.find_logic_type Utf8_logic.boolean,[])
+        Ltype(Logic_env.find_logic_type Utf8_logic.boolean,[])
       | t, Ltype({lt_name = name},[])
         when is_integral_type t && name = Utf8_logic.boolean ->
-        Ltype(C.find_logic_type Utf8_logic.boolean,[])
+        Ltype(Logic_env.find_logic_type Utf8_logic.boolean,[])
       | Lreal, Ctype ty | Ctype ty, Lreal when isArithmeticType ty -> Lreal
       | Ltype (s1,l1), Ltype (s2,l2)
         when s1.lt_name = s2.lt_name && List.for_all2 is_same_type l1 l2 ->
@@ -2085,7 +2047,7 @@ struct
   let find_lv_logic_info v env =
     try Lenv.find_logic_info v.lv_name env
     with Not_found ->
-      let l = C.find_all_logic_functions v.lv_name in
+      let l = Logic_env.find_all_logic_functions v.lv_name in
       (* Data constructors can not be in eta-reduced form. v must be
          a logic function, so that List.find can not fail here.
       *)
@@ -2585,7 +2547,7 @@ struct
     locs,typ
   and lfun_app ctxt env loc f labels ttl =
     try
-      let info = ctxt.find_logic_ctor f in
+      let info = Logic_env.find_logic_ctor f in
       if labels <> [] then begin
         if ctxt.silent then raise Backtrack;
         ctxt.error loc
@@ -3050,14 +3012,14 @@ struct
       let env = drop_qualifiers env in
       let f _ op t1 t2 =
         (TBinOp(binop_of_rel op, t1, t2),
-         Ltype(C.find_logic_type Utf8_logic.boolean,[]))
+         Ltype(Logic_env.find_logic_type Utf8_logic.boolean,[]))
       in
       type_relation ctxt env f t1 op t2
     | PLtrue ->
-      let ctrue = C.find_logic_ctor "\\true" in
+      let ctrue = Logic_env.find_logic_ctor "\\true" in
       TDataCons(ctrue,[]), Ltype(ctrue.ctor_type,[])
     | PLfalse ->
-      let cfalse = C.find_logic_ctor "\\false" in
+      let cfalse = Logic_env.find_logic_ctor "\\false" in
       TDataCons(cfalse,[]), Ltype(cfalse.ctor_type,[])
     | PLlambda(prms,e) ->
       let env = drop_qualifiers env in
@@ -3067,24 +3029,24 @@ struct
     | PLnot t ->
       let env = drop_qualifiers env in
       let t = type_bool_term ctxt env t in
-      TUnOp(LNot,t), Ltype (C.find_logic_type Utf8_logic.boolean,[])
+      TUnOp(LNot,t), Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[])
     | PLand (t1,t2) ->
       let env = drop_qualifiers env in
       let t1 = type_bool_term ctxt env t1 in
       let t2 = type_bool_term ctxt env t2 in
-      TBinOp(LAnd,t1,t2), Ltype (C.find_logic_type Utf8_logic.boolean,[])
+      TBinOp(LAnd,t1,t2), Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[])
     | PLor (t1,t2) ->
       let env = drop_qualifiers env in
       let t1 = type_bool_term ctxt env t1 in
       let t2 = type_bool_term ctxt env t2 in
-      TBinOp(LOr,t1,t2), Ltype (C.find_logic_type Utf8_logic.boolean,[])
+      TBinOp(LOr,t1,t2), Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[])
     | PLtypeof t1 ->
       let env = drop_qualifiers env in
       let t1 = term env t1 in
-      Ttypeof t1, Ltype (C.find_logic_type "typetag",[])
+      Ttypeof t1, Ltype (Logic_env.find_logic_type "typetag",[])
     | PLtype ty ->
       begin match logic_type ctxt loc env ty with
-        | Ctype ty -> Ttype ty, Ltype (C.find_logic_type "typetag",[])
+        | Ctype ty -> Ttype ty, Ltype (Logic_env.find_logic_type "typetag",[])
         | Linteger | Lreal | Ltype _ | Lvar _ | Larrow _ ->
           ctxt.error loc "cannot take type tag of logic type"
       end
@@ -3177,7 +3139,7 @@ struct
       let t1,ty1 = type_num_term_option ctxt env t1 in
       let t2,ty2 = type_num_term_option ctxt env t2 in
       (Trange(t1,t2),
-       Ltype(C.find_logic_type "set", [arithmetic_conversion ty1 ty2]))
+       Ltype(Logic_env.find_logic_type "set", [arithmetic_conversion ty1 ty2]))
     | PLvalid _ | PLvalid_read _ | PLobject_pointer _ | PLvalid_function _
     | PLfresh _ | PLallocable _ | PLfreeable _
     | PLinitialized _ | PLdangling _ | PLexists _ | PLforall _
@@ -3300,7 +3262,7 @@ struct
     let infos =
       try [Lenv.find_logic_info f env]
       with Not_found ->
-        C.find_all_logic_functions f in
+        Logic_env.find_all_logic_functions f in
     match infos with
     | [] -> C.error loc "unbound logic function %s" f
     | [info] ->
@@ -3377,7 +3339,7 @@ struct
     if not (plain_boolean_type tt.term_type) then
       ctxt.error t.lexpr_loc "boolean expected but %a found"
         Cil_printer.pp_logic_type tt.term_type;
-    mk_cast tt (Ltype (C.find_logic_type Utf8_logic.boolean,[]))
+    mk_cast tt (Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[]))
 
   and type_num_term_option ctxt env t =
     let module [@warning "-60"] C = struct end in
@@ -3593,7 +3555,7 @@ struct
               let info =
                 List.find
                   (fun x -> x.l_profile = [])
-                  (ctxt.find_all_logic_functions x)
+                  (Logic_env.find_all_logic_functions x)
               in make_app info
             with Not_found -> boolean_to_predicate ctxt env p0))
     | PLlet(x,def,body) ->
@@ -4138,11 +4100,11 @@ struct
 
   let type_datacons loc env type_info (name,params) =
     (try
-       let info = C.find_logic_ctor name in
+       let info = Logic_env.find_logic_ctor name in
        C.error loc "type constructor %s is already used by type %s"
          name info.ctor_type.lt_name
      with Not_found ->
-       let infos = C.find_all_logic_functions name in
+       let infos = Logic_env.find_all_logic_functions name in
        if infos <> [] then
          C.error loc "logic function %s is already defined" name
     );
@@ -4153,7 +4115,7 @@ struct
         ctor_params = tparams
       }
     in
-    C.add_logic_ctor name my_info;
+    Logic_env.add_logic_ctor name my_info;
     my_info
 
   let typedef loc env my_info def =
@@ -4404,7 +4366,7 @@ struct
       let get_volatile_fct checks_type = function
         | None -> None
         | Some fct ->
-          try (match (C.find_var fct).lv_origin
+          try (match (ctxt.find_var fct).lv_origin
                with
                | None -> raise Not_found
                | Some vi as vi_opt-> checks_type fct vi.vtype ; vi_opt)

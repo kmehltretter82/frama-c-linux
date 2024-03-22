@@ -108,16 +108,6 @@ type typing_context = {
   find_comp_field: compinfo -> string -> offset;
   find_type : type_namespace -> string -> typ;
   find_label : string -> stmt ref;
-  remove_logic_function : string -> unit;
-  remove_logic_info: logic_info -> unit;
-  remove_logic_type: string -> unit;
-  remove_logic_ctor: string -> unit;
-  add_logic_function: logic_info -> unit;
-  add_logic_type: string -> logic_type_info -> unit;
-  add_logic_ctor: string -> logic_ctor_info -> unit;
-  find_all_logic_functions: string -> logic_info list;
-  find_logic_type: string -> logic_type_info;
-  find_logic_ctor: string -> logic_ctor_info;
   pre_state:Lenv.t;
   post_state:termination_kind list -> Lenv.t;
   assigns_env: Lenv.t;
@@ -246,19 +236,6 @@ module Make
        val find_type : type_namespace -> string -> typ
        val find_comp_field: compinfo -> string -> offset
        val find_label : string -> stmt ref
-
-       val remove_logic_function : string -> unit
-       val remove_logic_info: logic_info -> unit
-       val remove_logic_type: string -> unit
-       val remove_logic_ctor: string -> unit
-
-       val add_logic_function: logic_info -> unit
-       val add_logic_type: string -> logic_type_info -> unit
-       val add_logic_ctor: string -> logic_ctor_info -> unit
-
-       val find_all_logic_functions : string -> Cil_types.logic_info list
-       val find_logic_type: string -> logic_type_info
-       val find_logic_ctor: string -> logic_ctor_info
 
        (** What to do when we have a term of type Integer in a context
            expecting a C integral type.
