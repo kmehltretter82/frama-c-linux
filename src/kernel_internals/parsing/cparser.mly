@@ -188,16 +188,15 @@ let doFunctionDef spec (loc: cabsloc)
   let b = if !ghost_global then { b with bstmts = in_ghost b.bstmts } else b in
   FUNDEF (spec, fname, b, loc, lend)
 
-let doOldParDecl (names: string list)
-                 ((pardefs: name_group list), (isva: bool))
-    : single_name list * bool =
+let doOldParDecl floc (names: string list)
+    ((pardefs: name_group list), (isva: bool)) : single_name list * bool =
   let findOneName n =
     (* Search in pardefs for the definition for this parameter *)
     let rec loopGroups = function
-        [] -> ([SpecType Tint], (n, JUSTBASE, [], cabslu))
+      | [] -> ([SpecType Tint], (n, JUSTBASE, [], floc))
       | (specs, names) :: restgroups ->
           let rec loopNames = function
-              [] -> loopGroups restgroups
+            | [] -> loopGroups restgroups
             | ((n',_, _, _) as sn) :: _ when n' = n -> (specs, sn)
             | _ :: restnames -> loopNames restnames
           in
@@ -1421,9 +1420,9 @@ old_proto_decl:
 
 direct_old_proto_decl:
 | direct_decl LPAREN old_parameter_list_ne RPAREN old_pardef_list {
-    let par_decl, isva = doOldParDecl $3 $5 in
-    let n, decl, loc = $1 in
-    (n, PROTO(decl, par_decl, [],isva), ["FC_OLDSTYLEPROTO",[]], loc)
+    let n, decl, floc = $1 in
+    let par_decl, isva = doOldParDecl floc $3 $5 in
+    (n, PROTO(decl, par_decl, [],isva), ["FC_OLDSTYLEPROTO",[]], floc)
   }
 
 /* (* appears sometimesm but generates a shift-reduce conflict. *)
@@ -1543,30 +1542,30 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 | IDENT parameter_list_startscope rest_par_list RPAREN ghost_parameter_opt
     { let (params, isva) = $3 in
       let ghost = $5 in
-      let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
-      let fdec = ($1, PROTO(JUSTBASE, params, ghost, isva), [], loc) in
+      let floc = Cil_datatype.Location.of_lexing_loc $loc($1) in
+      let fdec = ($1, PROTO(JUSTBASE, params, ghost, isva), [], floc) in
       announceFunctionName fdec;
       (* Default is int type *)
-      let defSpec = [SpecType Tint] in (loc, defSpec, fdec)
+      let defSpec = [SpecType Tint] in (floc, defSpec, fdec)
     }
 
 /* (* No return type and old-style parameter list *) */
 | IDENT LPAREN old_parameter_list_ne RPAREN old_pardef_list
     { (* Convert pardecl to new style *)
-      let pardecl, isva = doOldParDecl $3 $5 in
-      let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
+      let floc = Cil_datatype.Location.of_lexing_loc $loc($1) in
+      let pardecl, isva = doOldParDecl floc $3 $5 in
       (* Make the function declarator *)
-      let fdec = ($1, PROTO(JUSTBASE, pardecl,[],isva), [], loc) in
+      let fdec = ($1, PROTO(JUSTBASE, pardecl,[],isva), [], floc) in
       announceFunctionName fdec;
       (* Default is int type *)
-      (loc, [SpecType Tint], fdec)
+      (floc, [SpecType Tint], fdec)
     }
 | IDENT LPAREN RPAREN ghost_parameter_opt
   {
-    let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
-    let fdec = ($1, PROTO(JUSTBASE,[],$4,false),[],loc) in
+    let floc = Cil_datatype.Location.of_lexing_loc $loc($1) in
+    let fdec = ($1, PROTO(JUSTBASE,[],$4,false),[],floc) in
     announceFunctionName fdec;
-    (loc, [SpecType Tint], fdec)
+    (floc, [SpecType Tint], fdec)
   }
 ;
 
