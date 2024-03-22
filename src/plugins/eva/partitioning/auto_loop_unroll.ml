@@ -141,9 +141,8 @@ module Graph = struct
   (* A loop exit condition is an expression and a boolean expression whether the
      expression must be zero or not-zero to exit the loop. *)
   module Condition = struct
-    module Exp = Evast_datatype.Exp
     module Info = struct let module_name = "Condition" end
-    include Datatype.Pair_with_collections (Exp) (Datatype.Bool) (Info)
+    include Datatype.Pair_with_collections (Evast.Exp) (Datatype.Bool) (Info)
   end
 
   (* Returns a list of loop exit conditions. *)
@@ -284,15 +283,15 @@ let find_lonely_candidate eval_ptr loop_effect expr =
    - to the value of an expression [expr], it applies [f expr acc];
    - to a function call, or if [inner_loop] is true, it raises [exn]. *)
 let transfer_assign lval exn f ~inner_loop acc transition =
-  let is_lval = Evast_datatype.Lval.equal lval in
+  let is_lval = Evast.Lval.equal lval in
   match transition with
   | Eva_automata.Assign (lv, expr, _loc)
     when is_lval lv ->
     if inner_loop then raise exn else f expr acc
   | Init (vi, SingleInit (expr, _loc), _loc')
-    when is_lval (Evast_builder.var vi) && not inner_loop ->
+    when is_lval (Evast.Build.var vi) && not inner_loop ->
     f expr acc
-  | Init (vi, _, _) when is_lval (Evast_builder.var vi) -> raise exn
+  | Init (vi, _, _) when is_lval (Evast.Build.var vi) -> raise exn
   | Call (Some lv, _, _, _) when is_lval lv ->
     raise exn
   | _ -> acc
@@ -311,7 +310,7 @@ let cross_equality loop (lval : Evast.lval) =
     transfer_assign lval No_equality find_lval ~inner_loop lval transition
   in
   let join lv1 lv2 =
-    if Evast_datatype.Lval.equal lv1 lv2 then lv1 else raise No_equality
+    if Evast.Lval.equal lv1 lv2 then lv1 else raise No_equality
   in
   match Graph.compute ~backward:true loop transfer join lval with
   | Some lval -> lval
@@ -345,7 +344,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
      Raises NoIncrement if [expr] is not a constant integer expression. *)
   let add_to_delta context binop acc (expr : Evast.exp) =
     let typ = expr.typ in
-    match Evast_utils.fold_to_integer expr with
+    match Evast.fold_to_integer expr with
     | None -> raise NoIncrement
     | Some i ->
       let inject i = Val.inject_int typ i in
@@ -357,11 +356,11 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   let rec delta_assign context lval expr acc =
     (* Is the expression [e] equal to the lvalue [lval] (modulo cast)? *)
     let rec is_lval (e : Evast.exp) = match e.node with
-      | Lval lv -> Evast_datatype.Lval.equal lval lv
+      | Lval lv -> Evast.Lval.equal lval lv
       | CastE (typ, e) -> Cil.isIntegralType typ && is_lval e
       | _ -> false
     in
-    match Evast_utils.fold_to_integer expr with
+    match Evast.fold_to_integer expr with
     | Some i ->
       let v = Val.inject_int expr.typ i in
       { value = `Value v; delta = `Bottom; }
@@ -470,7 +469,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     (* If [lval] is not in scope at [stmt], introduces it into [state] so that
        the [condition] can be properly evaluated in [state]. *)
     let state = enter_scope state kf stmt lval in
-    let expr = Evast_builder.lval lval in
+    let expr = Evast.Build.lval lval in
     (* Evaluate the [condition] in the given [state]. *)
     fst (Eval.evaluate state condition) >> fun (valuation, _v) ->
     (* In the resulting valuation, replace the value of [expr] by [top_int]

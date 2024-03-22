@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Evast
+open Evast_types
 
 (* --- Constructors --- *)
 
@@ -119,65 +119,29 @@ let rec translate_init = function
     CompoundInit (t, List.map translate_field_init l)
 
 
-(* --- Smart constructors --- *)
+(* --- Relations --- *)
 
-let integer ?kind i = (* TODO: mathematical unbounded integer *)
-  let kind = match kind with
-    | Some k -> k
-    | None ->
-      if Cil.fitsInInt IInt i
-      then Cil_types.IInt
-      else Cil.intKindForValue i false
-  in
-  let i', _truncated = Cil.truncateInteger64 kind i in
-  mk_exp (Const (CInt64 (i', kind, None)))
+let invert_relation : binop -> binop = function
+  | Gt -> Le
+  | Lt -> Ge
+  | Le -> Gt
+  | Ge -> Lt
+  | Eq -> Ne
+  | Ne -> Eq
+  | _ -> invalid_arg "invert_relation: must be given a comparison operator"
 
-let int ?kind i =
-  integer ?kind (Integer.of_int i)
+let conv_relation : binop -> Abstract_interp.Comp.t =
+  function
+  | Eq -> Eq
+  | Ne -> Ne
+  | Le -> Le
+  | Lt -> Lt
+  | Ge -> Ge
+  | Gt -> Gt
+  | _ -> invalid_arg "conv_relation: must be given a comparison operator"
 
-let zero = int 0
-let one = int 1
-let bool = function false -> zero | true -> one
 
-let float ~kind f =
-  let f =
-    if kind = Cil_types.FFloat
-    then Floating_point.round_to_single_precision_float f
-    else f
-  in
-  mk_exp (Const (CReal(f,kind,None)))
-
-let cast typ exp =
-  if Cil.need_cast exp.typ typ
-  then mk_exp (CastE (Cil.type_remove_qualifier_attributes typ, exp))
-  else exp
-
-let binop op e1 e2 =
-  (* TODO: const folding *)
-  match op with
-  | PlusA | MinusA | Mult | Div ->
-    let t = Cil.arithmeticConversion e1.typ e2.typ in
-    mk_exp (BinOp (op,e1,e2,t))
-
-  | Eq | Ne | Lt | Le | Ge |Gt ->
-    let t =
-      if Cil.isArithmeticType e1.typ && Cil.isArithmeticType e2.typ then
-        Cil.arithmeticConversion e1.typ e2.typ
-      else if Cil.isPointerType e1.typ && Cil.isPointerType e2.typ then
-        if Cil.need_cast ~force:true e1.typ e2.typ then
-          Cil.theMachine.upointType
-        else
-          e1.typ
-      else
-        invalid_arg "unsupported construction"
-    in
-    mk_exp (BinOp (op, cast t e1, cast t e2, Cil.intType))
-
-  | _ -> invalid_arg "unsupported construction"
-
-let add = binop PlusA
-let eq = binop Eq
-let ne = binop Ne
+(* --- Offsets --- *)
 
 let rec concat_offset (o1 : offset) (o2 : offset) : offset =
   match o1 with
@@ -189,32 +153,96 @@ let add_offset (lval : lval) (offset : offset) : lval =
   let (lval_host, lval_offset) = lval.node in
   mk_lval (lval_host, concat_offset lval_offset offset)
 
-let index (base : lval) (index : exp) : lval =
-  assert(Cil.isArrayType base.typ);
-  add_offset base (Index (index, NoOffset))
 
-let field (base : lval) (field : Cil_types.fieldinfo) : lval =
-  let field_belongs_to_typ fi typ =
-    match typ with
-    | Cil_types.TComp (ci,_attr) -> ci == fi.Cil_types.fcomp
-    | _ -> false
-  in
-  assert(field_belongs_to_typ field base.typ);
-  add_offset base (Field (field, NoOffset))
+(* --- Smart constructors --- *)
 
-let addr (lval : lval) : exp =
-  mk_exp (AddrOf lval)
+module Build =
+struct
+  let integer ?kind i = (* TODO: mathematical unbounded integer *)
+    let kind = match kind with
+      | Some k -> k
+      | None ->
+        if Cil.fitsInInt IInt i
+        then Cil_types.IInt
+        else Cil.intKindForValue i false
+    in
+    let i', _truncated = Cil.truncateInteger64 kind i in
+    mk_exp (Const (CInt64 (i', kind, None)))
 
-let mem (exp : exp) : lval =
-  match exp.node with
-  | AddrOf lv -> lv
-  | StartOf lv -> index lv zero (* Must be an array *)
-  | _ -> mk_lval (Mem exp, NoOffset)
+  let int ?kind i =
+    integer ?kind (Integer.of_int i)
 
-let var vi = mk_lval (Var vi, NoOffset)
-let var_exp vi = mk_exp (Lval (var vi))
+  let zero = int 0
+  let one = int 1
+  let bool = function false -> zero | true -> one
 
-let lval lv = { lv with node=Lval lv }
+  let float ~kind f =
+    let f =
+      if kind = Cil_types.FFloat
+      then Floating_point.round_to_single_precision_float f
+      else f
+    in
+    mk_exp (Const (CReal(f,kind,None)))
+
+  let cast typ exp =
+    if Cil.need_cast exp.typ typ
+    then mk_exp (CastE (Cil.type_remove_qualifier_attributes typ, exp))
+    else exp
+
+  let binop op e1 e2 =
+    (* TODO: const folding *)
+    match op with
+    | PlusA | MinusA | Mult | Div ->
+      let t = Cil.arithmeticConversion e1.typ e2.typ in
+      mk_exp (BinOp (op,e1,e2,t))
+
+    | Eq | Ne | Lt | Le | Ge |Gt ->
+      let t =
+        if Cil.isArithmeticType e1.typ && Cil.isArithmeticType e2.typ then
+          Cil.arithmeticConversion e1.typ e2.typ
+        else if Cil.isPointerType e1.typ && Cil.isPointerType e2.typ then
+          if Cil.need_cast ~force:true e1.typ e2.typ then
+            Cil.theMachine.upointType
+          else
+            e1.typ
+        else
+          invalid_arg "unsupported construction"
+      in
+      mk_exp (BinOp (op, cast t e1, cast t e2, Cil.intType))
+
+    | _ -> invalid_arg "unsupported construction"
+
+  let add = binop PlusA
+  let eq = binop Eq
+  let ne = binop Ne
+
+  let index (base : lval) (index : exp) : lval =
+    assert(Cil.isArrayType base.typ);
+    add_offset base (Index (index, NoOffset))
+
+  let field (base : lval) (field : Cil_types.fieldinfo) : lval =
+    let field_belongs_to_typ fi typ =
+      match typ with
+      | Cil_types.TComp (ci,_attr) -> ci == fi.Cil_types.fcomp
+      | _ -> false
+    in
+    assert(field_belongs_to_typ field base.typ);
+    add_offset base (Field (field, NoOffset))
+
+  let addr (lval : lval) : exp =
+    mk_exp (AddrOf lval)
+
+  let mem (exp : exp) : lval =
+    match exp.node with
+    | AddrOf lv -> lv
+    | StartOf lv -> index lv zero (* Must be an array *)
+    | _ -> mk_lval (Mem exp, NoOffset)
+
+  let var vi = mk_lval (Var vi, NoOffset)
+  let var_exp vi = mk_exp (Lval (var vi))
+
+  let lval lv = { lv with node=Lval lv }
+end
 
 
 (* --- Condition normalization --- *)
@@ -227,19 +255,9 @@ let zero_typed (typ : Cil_types.typ) =
   | TPtr _ ->
     let ik = Cil.(theMachine.upointKind) in
     let zero = mk_exp (Const (CInt64 (Integer.zero, ik, None))) in
-    cast typ zero
+    Build.cast typ zero
   | typ ->
     Self.fatal ~current:true "non-scalar type %a" Printer.pp_typ typ
-
-(* duplicate of Evast_utils.invert_relation; needs to be removed *)
-let invert_relation : binop -> binop = function
-  | Gt -> Le
-  | Lt -> Ge
-  | Le -> Gt
-  | Ge -> Lt
-  | Eq -> Ne
-  | Ne -> Eq
-  | _ -> invalid_arg "invert_relation: must be given a comparison operator"
 
 (* Transform an expression supposed to be [positive] into an equivalent
    one in which the root expression is a comparison operator. *)

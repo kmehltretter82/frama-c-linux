@@ -20,7 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Evast
+open Evast_types
+open Evast_builder
 
 
 (* --- Conversion to Cil --- *)
@@ -173,28 +174,6 @@ and height_offset = function
   | Index (e,r) -> max (height_exp e) (height_offset r) + 1
 
 
-(* --- Relation inversion --- *)
-
-let invert_relation : binop -> binop = function
-  | Gt -> Le
-  | Lt -> Ge
-  | Le -> Gt
-  | Ge -> Lt
-  | Eq -> Ne
-  | Ne -> Eq
-  | _ -> invalid_arg "invert_relation: must be given a comparison operator"
-
-let conv_relation : binop -> Abstract_interp.Comp.t =
-  function
-  | Eq -> Eq
-  | Ne -> Ne
-  | Le -> Le
-  | Lt -> Lt
-  | Ge -> Ge
-  | Gt -> Gt
-  | _ -> invalid_arg "conv_relation: must be given a comparison operator"
-
-
 (* --- Specialized visitors --- *)
 
 let iter_lvals f =
@@ -312,9 +291,8 @@ let is_zero_ptr exp =
 
 (* These functions are largely based on Cil.constFold. See there for details. *)
 let rec const_fold (exp: exp) : exp =
-  let open Evast_builder in
   match exp.node with
-  | Const (CChr c) -> integer (Cil.charConstToInt c)
+  | Const (CChr c) -> Build.integer (Cil.charConstToInt c)
   | Const (CEnum(_ei, e)) -> const_fold e
   | Const (CTopInt _ | CReal _ | CString _ | CInt64 _) -> exp
   | Lval lv -> mk_exp (Lval (const_fold_lval lv))
@@ -325,7 +303,6 @@ let rec const_fold (exp: exp) : exp =
   | BinOp (op, e1, e2, t) -> const_fold_binop op e1 e2 t
 
 and const_fold_cast (t : typ) (e : exp) : exp  =
-  let open Evast_builder in
   let e' = const_fold e in
   let t' = Cil.(type_remove_attributes_for_c_cast (unrollType t)) in
   let default () = mk_exp (CastE (t, e')) in
@@ -333,38 +310,37 @@ and const_fold_cast (t : typ) (e : exp) : exp  =
   (* integer -> integer *)
   | Const (CInt64 (i,_k,_)), (TInt (ik, a) | TEnum ({ekind = ik}, a))
     when a = [] ->
-    integer ~kind:ik i
+    Build.integer ~kind:ik i
   (* real -> integer *)
   | Const (CReal (f,_,_)), (TInt(kind, a) | TEnum ({ekind = kind}, a))
     when a = [] ->
     begin try
         let i = Floating_point.truncate_to_integer f in
         if Cil.fitsInInt kind i
-        then integer ~kind i
+        then Build.integer ~kind i
         else default ()
       with Floating_point.Float_Non_representable_as_Int64 _ ->
         default ()
     end
   (* real -> float *)
   | Const (CReal (f,_,_)), TFloat (kind, a) when a = [] ->
-    float ~kind f
+    Build.float ~kind f
   (* int -> float *)
   | Const (CInt64(i,_,_)), (TFloat (kind, a)) when a = [] ->
     let f = Integer.to_float i in
-    float ~kind f
+    Build.float ~kind f
   | _, _ -> default ()
 
 and const_fold_unop (op : unop) (e : exp) (t : typ) : exp =
-  let open Evast_builder in
   let e' = const_fold e in
   let default () = mk_exp (UnOp (op, e', t)) in
   match e'.node, Cil.unrollType t with
   (* Integer operations *)
   | Const (CInt64 (i,_ik,_repr)), (TInt (ik, _) | TEnum ({ekind=ik},_)) ->
     begin match op with
-      | Neg -> integer ~kind:ik (Integer.neg i)
-      | BNot -> integer ~kind:ik (Integer.lognot i)
-      | LNot -> if Integer.(equal i zero) then int 1 else int 0
+      | Neg -> Build.integer ~kind:ik (Integer.neg i)
+      | BNot -> Build.integer ~kind:ik (Integer.lognot i)
+      | LNot -> if Integer.(equal i zero) then Build.int 1 else Build.int 0
     end
   (* Float operations*)
   | Const (CReal(f,_,_)), TFloat (fk,_) ->
@@ -382,7 +358,6 @@ and const_fold_unop (op : unop) (e : exp) (t : typ) : exp =
 
 and const_fold_binop (op : binop) (e1 : exp) (e2 : exp) (t : typ) : exp =
   (* TODO: float comparisons *)
-  let open Evast_builder in
   let e1' = const_fold e1 in
   let e2' = const_fold e2 in
   let default () = mk_exp (BinOp (op, e1', e2', t)) in
@@ -402,87 +377,87 @@ and const_fold_binop (op : binop) (e1 : exp) (e2 : exp) (t : typ) : exp =
       | PlusPI, _, Some z when Integer.is_zero z -> e1'
       | MinusPI, _, Some z when Integer.is_zero z -> e1'
       | PlusA, Some i1, Some i2 ->
-        integer ~kind (Integer.add i1 i2)
+        Build.integer ~kind (Integer.add i1 i2)
       | MinusA, Some i1, Some i2 ->
-        integer ~kind (Integer.sub i1 i2)
+        Build.integer ~kind (Integer.sub i1 i2)
       | Mult, Some i1, Some i2 ->
-        integer ~kind (Integer.mul i1 i2)
+        Build.integer ~kind (Integer.mul i1 i2)
       | Mult, Some z, _ when Integer.is_zero z -> e1'
       | Mult, Some i1, _ when Integer.is_one i1 -> e2'
       | Mult, _, Some z when Integer.is_zero z -> e2'
       | Mult, _, Some i2 when Integer.is_one i2 -> e1'
       | Div, Some i1, Some i2  ->
         begin
-          try integer ~kind (Integer.c_div i1 i2)
+          try Build.integer ~kind (Integer.c_div i1 i2)
           with Division_by_zero -> default ()
         end
       | Div, _, Some i2 when Integer.is_one i2 -> e1'
       | Mod, Some i1, Some i2 ->
         begin
-          try integer ~kind (Integer.c_rem i1 i2)
+          try Build.integer ~kind (Integer.c_rem i1 i2)
           with Division_by_zero -> default ()
         end
       | BAnd, Some i1, Some i2 ->
-        integer ~kind (Integer.logand i1 i2)
+        Build.integer ~kind (Integer.logand i1 i2)
       | BAnd, Some z, _ when Integer.is_zero z -> e1'
       | BAnd, _, Some z when Integer.is_zero z -> e2'
       | BOr, Some i1, Some i2 ->
-        integer ~kind (Integer.logor i1 i2)
+        Build.integer ~kind (Integer.logor i1 i2)
       | BOr, Some z, _ when Integer.is_zero z -> e2'
       | BOr, _, Some z when Integer.is_zero z -> e1'
       | BXor, Some i1, Some i2 ->
-        integer ~kind (Integer.logxor i1 i2)
+        Build.integer ~kind (Integer.logxor i1 i2)
       | Shiftlt, Some i1, Some i2 when shift_in_bounds i2 ->
-        integer ~kind (Integer.shift_left i1 i2)
+        Build.integer ~kind (Integer.shift_left i1 i2)
       | Shiftlt, Some z, _ when Integer.is_zero z -> e1'
       | Shiftlt, _, Some z when Integer.is_zero z -> e1'
       | Shiftrt, Some i1, Some i2 when shift_in_bounds i2 ->
         if Cil.isSigned kind then
-          integer ~kind (Integer.shift_right i1 i2)
+          Build.integer ~kind (Integer.shift_right i1 i2)
         else
-          integer ~kind (Integer.shift_right_logical i1 i2)
+          Build.integer ~kind (Integer.shift_right_logical i1 i2)
       | Shiftrt, Some z, _ when Integer.is_zero z -> e1'
       | Shiftrt, _, Some z when Integer.is_zero z -> e1'
       | Eq, Some i1, Some i2 ->
-        bool (Integer.equal i1 i2)
+        Build.bool (Integer.equal i1 i2)
       | Ne, Some i1, Some i2 ->
-        bool (not (Integer.equal i1 i2))
+        Build.bool (not (Integer.equal i1 i2))
       | Le, Some i1, Some i2 ->
-        bool (Integer.le i1 i2)
+        Build.bool (Integer.le i1 i2)
       | Ge, Some i1, Some i2 ->
-        bool (Integer.ge i1 i2)
+        Build.bool (Integer.ge i1 i2)
       | Lt, Some i1, Some i2 ->
-        bool (Integer.lt i1 i2)
+        Build.bool (Integer.lt i1 i2)
       | Gt, Some i1, Some i2 ->
-        bool (Integer.gt i1 i2)
+        Build.bool (Integer.gt i1 i2)
       | LAnd, Some i1, _ ->
-        if Integer.is_zero i1 then zero else e2'
+        if Integer.is_zero i1 then Build.zero else e2'
       | LAnd, _, Some i2 ->
-        if Integer.is_zero i2 then zero else e1'
+        if Integer.is_zero i2 then Build.zero else e1'
       | LOr, Some i1, _ ->
-        if Integer.is_zero i1 then e2' else one
+        if Integer.is_zero i1 then e2' else Build.one
       | LOr, _, Some i2 ->
-        if Integer.is_zero i2 then e1' else one
+        if Integer.is_zero i2 then e1' else Build.one
       | _ -> default ()
     end
   (* Floating-point operation *)
   | TFloat (fk, _) ->
     begin match op, to_float e1', to_float e2' with
       | PlusA, Some f1, Some f2 ->
-        float ~kind:fk (f1 +. f2)
+        Build.float ~kind:fk (f1 +. f2)
       | MinusA, Some f1, Some f2 ->
-        float ~kind:fk (f1 -. f2)
+        Build.float ~kind:fk (f1 -. f2)
       | Mult, Some f1, Some f2 ->
-        float ~kind:fk (f1 *. f2)
+        Build.float ~kind:fk (f1 *. f2)
       | Div, Some f1, Some f2 ->
-        float ~kind:fk (f1 /. f2)
+        Build.float ~kind:fk (f1 /. f2)
       | _ -> default ()
     end
   | _ -> default ()
 
 and const_fold_lval (lval : lval) : lval =
   let lhost, offset = lval.node in
-  Evast_builder.mk_lval (const_fold_lhost lhost, const_fold_offset offset)
+  mk_lval (const_fold_lhost lhost, const_fold_offset offset)
 
 and const_fold_lhost : lhost -> lhost = function
   | Mem e -> Mem (const_fold e)

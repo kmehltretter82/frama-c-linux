@@ -103,7 +103,7 @@ struct
   module Var = Cil_datatype.Varinfo
   module Exp =
   struct
-    include Evast_datatype.Exp
+    include Evast.Exp
     let equal e1 e2 =
       if e1 == e2 then true else equal e1 e2
   end
@@ -185,18 +185,18 @@ struct
   let of_exp (exp : Evast.exp) =
     check_support exp;
     (* Normalizes x + c, c + x and x - c *)
-    match Evast_utils.fold_to_integer exp with
+    match Evast.fold_to_integer exp with
     | Some i -> Const i
     | None ->
       match exp.node with
       | BinOp ((PlusA|PlusPI), e1, e2, _typ) ->
-        begin match Evast_utils.(fold_to_integer e1, fold_to_integer e2) with
+        begin match Evast.(fold_to_integer e1, fold_to_integer e2) with
           | None, Some i -> Exp (e1, i)
           | Some i, None -> Exp (e2, i)
           | _ -> Exp (exp, Integer.zero)
         end
       | BinOp ((MinusA|MinusPI), e1, e2, _typ) ->
-        begin match Evast_utils.fold_to_integer e2 with
+        begin match Evast.fold_to_integer e2 with
           | Some i -> Exp (e1, Integer.neg i)
           | None -> Exp (exp, Integer.zero)
         end

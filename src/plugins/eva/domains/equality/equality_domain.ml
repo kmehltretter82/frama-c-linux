@@ -200,7 +200,7 @@ struct
       Equality.Equality.fold
         (fun atom acc ->
            let e = HCE.to_exp atom in
-           if Evast_datatype.Exp.equal e expr
+           if Evast.Exp.equal e expr
            then acc else (e, value) :: acc)
         equality []
     | None -> []
@@ -240,7 +240,7 @@ struct
     | None -> `Value (Value.top, None), Alarmset.all
 
   let extract_expr ~oracle _context (equalities, _, _) expr =
-    let expr = Evast_utils.const_fold expr in
+    let expr = Evast.const_fold expr in
     let atom_e = HCE.of_exp expr in
     coop_eval oracle equalities atom_e
 
@@ -322,8 +322,8 @@ struct
         match lv.node with
         | Var vi, NoOffset -> Locations.zone_of_varinfo vi
         | _ ->
-          let expr = Evast_builder.lval lv in
-          Evast_utils.zone_of_exp (find_loc valuation) expr
+          let expr = Evast.Build.lval lv in
+          Evast.zone_of_exp (find_loc valuation) expr
       in
       Deps.add lval zone deps
 
@@ -379,8 +379,8 @@ struct
        the reevaluation of [right_expr] would reduce it incorrectly, by
        removing indeterminate flags without emitting alarms. *)
   let assign_eq left_lval right_expr value valuation state =
-    if Evast_utils.lval_contains_volatile left_lval ||
-       Evast_utils.exp_contains_volatile right_expr ||
+    if Evast.lval_contains_volatile left_lval ||
+       Evast.exp_contains_volatile right_expr ||
        not (Cil.isArithmeticOrPointerType left_lval.typ) ||
        indeterminate_copy value
     then state
@@ -401,12 +401,12 @@ struct
     let left_loc = Precise_locs.imprecise_location left_value.lloc in
     let direct_left_zone = Locations.(enumerate_valid_bits Write left_loc) in
     let state = kill Hcexprs.Modified direct_left_zone state in
-    let right_expr = Evast_utils.const_fold right_expr in
+    let right_expr = Evast.const_fold right_expr in
     try
       let indirect_left_zone =
-        Evast_utils.indirect_zone_of_lval (find_loc valuation) left_value.lval
+        Evast.indirect_zone_of_lval (find_loc valuation) left_value.lval
       and right_zone =
-        Evast_utils.zone_of_exp (find_loc valuation) right_expr
+        Evast.zone_of_exp (find_loc valuation) right_expr
       in
       (* After an assignment lv = e, the equality [lv == eq] holds iff the value
          of [e] and the location of [lv] are not modified by the assignment,
@@ -431,7 +431,7 @@ struct
         state
       else
         try
-          let left_value = Evast_builder.var arg.formal in
+          let left_value = Evast.Build.var arg.formal in
           assign_eq left_value arg.concrete arg.avalue valuation state
         with Top_location -> state
     in
@@ -453,10 +453,10 @@ struct
         if not (is_safe_equality valuation e1 e2)
         then `Value state
         else
-          let e1 = Evast_utils.const_fold e1
-          and e2 = Evast_utils.const_fold e2 in
-          if Evast_utils.exp_contains_volatile e1
-          || Evast_utils.exp_contains_volatile e2
+          let e1 = Evast.const_fold e1
+          and e2 = Evast.const_fold e2 in
+          if Evast.exp_contains_volatile e1
+          || Evast.exp_contains_volatile e2
           || not (Cil.isArithmeticOrPointerType e1.typ)
           || (expr_is_cardinal_zero_or_one_loc valuation e1 &&
               expr_cardinal_zero_or_one valuation e2)

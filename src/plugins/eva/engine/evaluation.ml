@@ -172,7 +172,7 @@ let rec signed_counterpart typ =
 let exp_alarm_signed_converted_downcast exp =
   let src_typ = exp.typ in
   let signed_typ = signed_counterpart src_typ in
-  Evast_builder.(cast signed_typ exp)
+  Evast.Build.(cast signed_typ exp)
 
 let return t = `Value t, Alarmset.none
 
@@ -247,8 +247,8 @@ module Make
   type origin = Domain.origin
   type loc = Loc.location
 
-  module ECache = Evast_datatype.Exp.Map
-  module LCache = Evast_datatype.Lval.Map
+  module ECache = Evast.Exp.Map
+  module LCache = Evast.Lval.Map
 
   (* Imperative cache for the evaluation:
      all intermediate results of an evaluation are cached here.
@@ -394,7 +394,7 @@ module Make
 
   let truncate_bound overflow_kind bound bound_kind expr value =
     let alarm () =
-      let cil_expr = Evast_utils.to_cil_exp expr in (* The expression does not necessary come from the original program *)
+      let cil_expr = Evast.to_cil_exp expr in (* The expression does not necessary come from the original program *)
       Alarms.Overflow (overflow_kind, cil_expr, bound, bound_kind)
     in
     let bound = Abstract_value.Int bound in
@@ -432,7 +432,7 @@ module Make
   let restrict_float ?(reduce=false) ~assume_finite expr fkind value =
     let truth = Value.assume_not_nan ~assume_finite fkind value in
     let alarm () =
-      let cil_expr = Evast_utils.to_cil_exp expr in
+      let cil_expr = Evast.to_cil_exp expr in
       if assume_finite
       then Alarms.Is_nan_or_infinite (cil_expr, fkind)
       else Alarms.Is_nan (cil_expr, fkind)
@@ -453,7 +453,7 @@ module Make
     let+ value =
       if Kernel.InvalidPointer.get () then
         let truth = Value.assume_pointer value in
-        let cil_expr = Evast_utils.to_cil_exp expr in
+        let cil_expr = Evast.to_cil_exp expr in
         let alarm () = Alarms.Invalid_pointer cil_expr in
         interpret_truth ~alarm value truth
       else return value
@@ -485,17 +485,17 @@ module Make
     let* value, origin = res in
     match lval.typ with
     | TFloat (fkind, _) ->
-      let expr = Evast_builder.lval lval in
+      let expr = Evast.Build.lval lval in
       let+ new_value = remove_special_float expr fkind value in
       new_value, origin
     | TInt (IBool, _) when Kernel.InvalidBool.get () ->
       let one = Abstract_value.Int Integer.one in
       let truth = Value.assume_bounded Alarms.Upper_bound one value in
-      let alarm () = Alarms.Invalid_bool (Evast_utils.to_cil_lval lval) in
+      let alarm () = Alarms.Invalid_bool (Evast.to_cil_lval lval) in
       let+ new_value = interpret_truth ~alarm value truth in
       new_value, origin
     | TPtr _ ->
-      let expr = Evast_builder.lval lval in
+      let expr = Evast.Build.lval lval in
       let+ new_value = assume_pointer context expr value in
       new_value, origin
     | _ -> res
@@ -507,7 +507,7 @@ module Make
     let size_int = Abstract_value.Int (Integer.of_int (size - 1)) in
     let zero_int = Abstract_value.Int Integer.zero in
     let alarm () =
-      Alarms.Invalid_shift (Evast_utils.to_cil_exp expr, Some size)
+      Alarms.Invalid_shift (Evast.to_cil_exp expr, Some size)
     in
     let truth = Value.assume_bounded Alarms.Lower_bound zero_int value in
     let* value = reduce_by_truth ~alarm (expr, value) truth in
@@ -523,7 +523,7 @@ module Make
       (* Cannot shift a negative value *)
       let zero_int = Abstract_value.Int Integer.zero in
       let alarm () =
-        Alarms.Invalid_shift (Evast_utils.to_cil_exp e1, None)
+        Alarms.Invalid_shift (Evast.to_cil_exp e1, None)
       in
       let truth = Value.assume_bounded Alarms.Lower_bound zero_int v1 in
       let+ v1 = reduce_by_truth ~alarm (e1, v1) truth in
@@ -535,7 +535,7 @@ module Make
     let open Evaluated.Operators in
     let size_int = Abstract_value.Int (Integer.pred size) in
     let zero_int = Abstract_value.Int Integer.zero in
-    let alarm_index_expr () = Evast_utils.to_cil_exp index_expr in
+    let alarm_index_expr () = Evast.to_cil_exp index_expr in
     let alarm () = Alarms.Index_out_of_bound (alarm_index_expr (), None) in
     let truth = Value.assume_bounded Alarms.Lower_bound zero_int value in
     let* value = reduce_by_truth ~alarm (index_expr, value) truth in
@@ -551,7 +551,7 @@ module Make
       match op with
       | Div | Mod ->
         let truth = Value.assume_non_zero v2 in
-        let alarm () = Alarms.Division_by_zero (Evast_utils.to_cil_exp e2) in
+        let alarm () = Alarms.Division_by_zero (Evast.to_cil_exp e2) in
         let+ v2 = reduce_by_truth ~alarm arg2 truth in
         v1, v2
       | Shiftrt ->
@@ -565,8 +565,8 @@ module Make
         let truth = Value.assume_comparable kind v1 v2 in
         let alarm () =
           Alarms.Differing_blocks (
-            Evast_utils.to_cil_exp e1,
-            Evast_utils.to_cil_exp e2)
+            Evast.to_cil_exp e1,
+            Evast.to_cil_exp e2)
         in
         let arg1 = Some e1, v1 in
         reduce_by_double_truth ~alarm arg1 arg2 truth
@@ -585,8 +585,8 @@ module Make
     let truth = Value.assume_comparable kind v1 v2 in
     let alarm () =
       Alarms.Pointer_comparison (
-        Option.map Evast_utils.to_cil_exp e1,
-        Evast_utils.to_cil_exp e2)
+        Option.map Evast.to_cil_exp e1,
+        Evast.to_cil_exp e2)
     in
     let propagate_all = propagate_all_pointer_comparison typ in
     let args, alarms =
@@ -619,7 +619,7 @@ module Make
     | Some kind ->
       let compute v1 v2 = Value.forward_binop context typ_e1 op v1 v2 in
       (* Detect zero expressions created by the evaluator *)
-      let e1 = if Evast_utils.is_zero_ptr e1 then None else Some e1 in
+      let e1 = if Evast.is_zero_ptr e1 then None else Some e1 in
       forward_comparison ~compute typ_e1 kind (e1, v1) arg2
     | None ->
       let& v1, v2 = assume_valid_binop typ arg1 op arg2 in
@@ -711,7 +711,7 @@ module Make
       then prev_float (Fval.kind fkind) fbound
       else fbound
     in
-    let cil_expr = Evast_utils.to_cil_exp expr in
+    let cil_expr = Evast.to_cil_exp expr in
     let alarm () = Alarms.Float_to_int (cil_expr, bound, bound_kind) in
     let bound = Abstract_value.Float (float_bound, fkind) in
     let truth = Value.assume_bounded bound_kind bound value in
@@ -973,10 +973,10 @@ module Make
     let lval_to_loc = internal_lval_to_loc env ~for_writing ~reduction in
     let* loc, volatile = lval_to_loc lval in
     if reduction then
-      let bitfield = Evast_utils.is_bitfield lval in
+      let bitfield = Evast.is_bitfield lval in
       let truth = Loc.assume_valid_location ~for_writing ~bitfield loc in
       let access = Alarms.(if for_writing then For_writing else For_reading) in
-      let cil_lval = Evast_utils.to_cil_lval lval in
+      let cil_lval = Evast.to_cil_lval lval in
       let alarm () = Alarms.Memory_access (cil_lval, access) in
       let+ valid_loc = interpret_truth ~alarm loc truth in
       let reduction = if Loc.equal_loc valid_loc loc then Neither else Forward in
@@ -989,12 +989,12 @@ module Make
   and internal_lval_to_loc env ~for_writing ~reduction lval =
     let open Evaluated.Operators in
     let host, offset = lval.node in
-    let basetyp = Evast_typing.type_of_lhost host in
+    let basetyp = Evast.type_of_lhost host in
     let reduce_valid_index = reduction in
     let evaluated = eval_offset env ~reduce_valid_index basetyp offset in
     let* (offs, offset_volatile) = evaluated in
     if for_writing && Eva_utils.is_const_write_invalid lval.typ then
-      let cil_lval = Evast_utils.to_cil_lval lval in
+      let cil_lval = Evast.to_cil_lval lval in
       let alarm = Alarms.(Memory_access (cil_lval, For_writing)) in
       `Bottom, Alarmset.singleton ~status:Alarmset.False alarm
     else
@@ -1069,7 +1069,7 @@ module Make
        - if it contains a sub-expression which is volatile (volatile_expr)
     *)
     let volatile = volatile_expr || Cil.typeHasQualifier "volatile" lval.typ in
-    let cil_lval = Evast_utils.to_cil_lval lval in
+    let cil_lval = Evast.to_cil_lval lval in
     (* Find the value of the location, if not bottom. *)
     let v, alarms = domain_query lval loc in
     let alarms = close_dereference_alarms cil_lval alarms in
@@ -1284,7 +1284,7 @@ module Make
     match expr.node with
     | Lval _lv -> assert false
     | UnOp (LNot, e, _) ->
-      let cond = Evast_builder.normalize_condition e false in
+      let cond = Evast.normalize_condition e false in
       (* TODO: should we compute the meet with the result of the call to
          Value.backward_unop? *)
       backward_eval fuel context state cond (Some value)
@@ -1537,7 +1537,7 @@ module Make
 
   let copy_lvalue ?(valuation=Cache.empty) ?subdivnb state lval =
     let open Evaluated.Operators in
-    let expr = Evast_builder.lval lval in
+    let expr = Evast.Build.lval lval in
     let* env = root_environment ?subdivnb state, Alarmset.none in
     try
       let record, report = Cache.find' valuation expr in
@@ -1575,7 +1575,7 @@ module Make
     (* If [for_writing] is true, the location of [lval] is reduced by removing
        const bases. Use [for_writing:false] if const bases can be written
        through a mutable field or an initializing function. *)
-    let mutable_or_init = Evast_utils.(is_mutable lval || is_initialized lval) in
+    let mutable_or_init = Evast.(is_mutable lval || is_initialized lval) in
     let for_writing = for_writing && not mutable_or_init in
     let (host, offset) = lval.node in
     let* valuation = evaluate_host valuation ?subdivnb state host in
@@ -1592,7 +1592,7 @@ module Make
   let reduce ?valuation:(valuation=Cache.empty) state expr positive =
     let open Evaluated.Operators in
     (* Generate [e == 0] *)
-    let expr = Evast_builder.normalize_condition expr (not positive) in
+    let expr = Evast.normalize_condition expr (not positive) in
     cache := valuation;
     (* Currently, no subdivisions are performed during the forward evaluation
        in this function, which is used to evaluate the conditions of if(…)
@@ -1636,7 +1636,7 @@ module Make
     else
       Self.fatal ~current:true
         "Function pointer evaluates to anything. function %a"
-        Evast_printer.pp_exp funcexp
+        Evast.pp_exp funcexp
 
   (* For pointer calls, we retro-propagate which function is being called
      in the abstract state. This may be useful:
@@ -1647,7 +1647,7 @@ module Make
   let backward_function_pointer valuation state expr kf =
     (* Builds the expression [exp_f != &f], and assumes it is false. *)
     let vi_f = Kernel_function.get_vi kf in
-    let expr = Evast_builder.(ne expr (addr (var vi_f))) in
+    let expr = Evast.Build.(ne expr (addr (var vi_f))) in
     fst (reduce ~valuation state expr false)
 
   let eval_function_exp ?subdivnb funcexp ?args state =
@@ -1677,8 +1677,8 @@ module Make
             else if alarm || alarm' then Alarmset.Unknown
             else Alarmset.True
           in
-          let cil_v = Evast_utils.to_cil_exp v in
-          let cil_args = Option.map (List.map (Evast_utils.to_cil_exp)) args in
+          let cil_v = Evast.to_cil_exp v in
+          let cil_args = Option.map (List.map (Evast.to_cil_exp)) args in
           let alarm = Alarms.Function_pointer (cil_v, cil_args) in
           let alarms = Alarmset.singleton ~status alarm in
           Bottom.bot_of_list list, alarms

@@ -141,7 +141,7 @@ module Variable : Variable = struct
 
   let lval (var, _) =
     match var with
-    | Var vi -> Some (Evast_builder.var vi)
+    | Var vi -> Some (Evast.Build.var vi)
     | Lval lval -> HCE.to_lval lval
     | Int _ | StartOf _ -> None
 
@@ -155,7 +155,7 @@ module Variable : Variable = struct
     | StartOf _ ->
       { data = Locations.Zone.bottom ; indirect = Locations.Zone.bottom }
     | Lval lval ->
-      Evast_utils.deps_of_lval eval_loc (Option.get (HCE.to_lval lval))
+      Evast.deps_of_lval eval_loc (Option.get (HCE.to_lval lval))
 end
 
 module VarSet =
@@ -466,7 +466,7 @@ module Rewriting = struct
       else
         let comp =
           if Ival.is_zero ival
-          then Evast_utils.invert_relation binop
+          then Evast.invert_relation binop
           else binop
         in
         let range = comparison_range comp in
@@ -484,7 +484,7 @@ module Rewriting = struct
       let aux has_better_bound bound bound_kind alarms =
         if Ival.is_bottom ival || has_better_bound ival ival_range >= 0
         then
-          let cil_expr = Evast_utils.to_cil_exp expr in
+          let cil_expr = Evast.to_cil_exp expr in
           let alarm = Alarms.Overflow (overflow, cil_expr, bound, bound_kind) in
           Alarmset.set alarm Alarmset.True alarms
         else alarms
@@ -1300,7 +1300,7 @@ module State = struct
       match exp.node with
       | Lval lval
         when Cil.isIntegralOrPointerType lval.typ
-          && not (Evast_utils.lval_contains_volatile lval)
+          && not (Evast.lval_contains_volatile lval)
           && not (is_singleton (eval exp)) ->
         Some (Variable.make_lval lval, Ival.zero)
 
@@ -1682,7 +1682,7 @@ module Domain = struct
               in
               let y_ival = Ival.narrow y_ival1 y_ival2 in
               if Ival.(equal top y_ival) then acc else
-                let y_expr = Evast_builder.lval lval in
+                let y_expr = Evast.Build.lval lval in
                 let y_cvalue = Cvalue.V.inject_ival y_ival in
                 (y_expr, y_cvalue) :: acc
           in
@@ -1720,7 +1720,7 @@ module Domain = struct
     else
       match expr.node with
       | Lval lval when Cil.(isIntegralType lval.typ)
-                    && not (Evast_utils.lval_contains_volatile lval) ->
+                    && not (Evast.lval_contains_volatile lval) ->
         let var = Variable.make_lval lval in
         let deps = Deps.add var (eval_deps var) state.deps in
         let intervals = Intervals.add var ival state.intervals in
@@ -1786,7 +1786,7 @@ module Domain = struct
       with Not_found -> State.remove state variable
     in
     let state = assign_interval eval_deps variable assigned state in
-    let left_expr = Evast_builder.lval lvalue in
+    let left_expr = Evast.Build.lval lvalue in
     (* On the assignment X = E; if X-E can be rewritten as ±(X±Y-v),
        then the octagonal constraint [X±Y ∈ v] holds. *)
     let octagons = Rewriting.rewrite_binop eval_exp env left_expr Sub expr in
@@ -1802,7 +1802,7 @@ module Domain = struct
   let assign kinstr left_value expr assigned valuation state =
     if kinstr <> Cil_types.Kglobal
     && Cil.isIntegralOrPointerType left_value.lval.typ
-    && not (Evast_utils.lval_contains_volatile left_value.lval)
+    && not (Evast.lval_contains_volatile left_value.lval)
     then assign_variable left_value.lval expr assigned valuation state
     else
       let written_loc = Precise_locs.imprecise_location left_value.lloc in
@@ -1834,7 +1834,7 @@ module Domain = struct
         `Value (start_recursive_call recursion state)
       | None ->
         let assign_formal state { formal; concrete; avalue } =
-          let lval = Evast_builder.var formal in
+          let lval = Evast.Build.var formal in
           if Cil.isIntegralOrPointerType formal.vtype
           then state >>- assign_variable lval concrete avalue valuation
           else state

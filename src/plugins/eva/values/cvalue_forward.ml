@@ -403,7 +403,7 @@ let forward_binop_int ~typ ev1 op ev2 =
       ~contains_zero: (V.contains_zero ev1 || V.contains_zero ev2)
       ~contains_non_zero:(V.contains_non_zero ev1 && V.contains_non_zero ev2)
   | Eq | Ne | Ge | Le | Gt | Lt ->
-    let op = Evast_utils.conv_relation op in
+    let op = Evast.conv_relation op in
     let signed = Bit_utils.is_signed_int_enum_pointer (Cil.unrollType typ) in
     V.inject_comp_result (V.forward_comp_int ~signed op ev1 ev2)
 
@@ -421,7 +421,7 @@ let forward_binop_float fkind ev1 op ev2 =
     | Mult ->    binary_float_floats "*." Fval.mul
     | Div ->     binary_float_floats "/." Fval.div
     | Eq | Ne | Lt | Gt | Le | Ge ->
-      let op = Evast_utils.conv_relation op in
+      let op = Evast.conv_relation op in
       V.inject_comp_result (Fval.forward_comp op f1 f2)
     | _ -> assert false
 

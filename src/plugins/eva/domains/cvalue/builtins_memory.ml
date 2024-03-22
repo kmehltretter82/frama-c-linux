@@ -32,9 +32,9 @@ let dkey = Self.register_category "imprecision"
 
 let rec lval_of_address exp =
   match exp.enode with
-  | AddrOf lval -> Evast_builder.translate_lval lval
+  | AddrOf lval -> Evast.translate_lval lval
   | CastE (_typ, exp) -> lval_of_address exp
-  | _ -> Evast_builder.mem (Evast_builder.translate_exp exp)
+  | _ -> Evast.(Build.mem (translate_exp exp))
 
 let plevel = Parameters.ArrayPrecisionLevel.get
 

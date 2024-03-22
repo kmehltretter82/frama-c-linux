@@ -548,13 +548,13 @@ let build_eval_lval_and_exp () =
   eval_lval, eval_exp
 
 let eval_lval lval req =
-  let lval = Evast_builder.translate_lval lval in
+  let lval = Evast.translate_lval lval in
   Value ((fst @@ build_eval_lval_and_exp ()) lval req)
 
 let eval_var vi req = eval_lval (Cil.var vi) req
 
 let eval_exp exp req =
-  let exp = Evast_builder.translate_exp exp in
+  let exp = Evast.translate_exp exp in
   Value ((snd @@ build_eval_lval_and_exp ()) exp req)
 
 let eval_address' ?(for_writing=false) lval req =
@@ -567,7 +567,7 @@ let eval_address' ?(for_writing=false) lval req =
     end : Lvaluation)
 
 let eval_address ?(for_writing=false) lval req =
-  let lval = Evast_builder.translate_lval lval in
+  let lval = Evast.translate_lval lval in
   eval_address' ~for_writing lval req
 
 let eval_callee exp req =
@@ -578,7 +578,7 @@ let eval_callee exp req =
       invalid_arg "The callee must be an lvalue with no offset"
   end;
   let module M = Make () in
-  let exp = Evast_builder.translate_exp exp in
+  let exp = Evast.translate_exp exp in
   M.eval_callee exp req
 
 let callee stmt =
@@ -703,20 +703,19 @@ let alarms : type a. a evaluation -> Alarms.t list =
 
 let expr_deps expr request =
   let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
-  Evast_utils.zone_of_exp lval_to_loc (Evast_builder.translate_exp expr)
+  Evast.zone_of_exp lval_to_loc (Evast.translate_exp expr)
 
 let lval_deps lval request =
   let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
-  Evast_utils.zone_of_lval lval_to_loc (Evast_builder.translate_lval lval)
+  Evast.zone_of_lval lval_to_loc (Evast.translate_lval lval)
 
 let address_deps lval request =
   let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
-  Evast_utils.indirect_zone_of_lval lval_to_loc
-    (Evast_builder.translate_lval lval)
+  Evast.indirect_zone_of_lval lval_to_loc (Evast.translate_lval lval)
 
 let expr_dependencies expr request =
   let lval_to_loc lv = eval_address' lv request |> as_precise_loc in
-  Evast_utils.deps_of_exp lval_to_loc (Evast_builder.translate_exp expr)
+  Evast.deps_of_exp lval_to_loc (Evast.translate_exp expr)
 
 (* Taint *)
 

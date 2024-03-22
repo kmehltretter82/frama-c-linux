@@ -45,7 +45,7 @@ module Queries = struct
     let status =
       if Cvalue.V.is_bottom (get_v v) then Alarmset.False else Alarmset.Unknown
     in
-    let lval = Evast_utils.to_cil_lval lval in
+    let lval = Evast.to_cil_lval lval in
     match v with
     | C_uninit_noesc _ -> Alarmset.singleton ~status (Alarms.Uninitialized lval)
     | C_init_esc _     -> Alarmset.singleton ~status (Alarms.Dangling lval)

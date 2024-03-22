@@ -327,7 +327,7 @@ module Make_Dataflow
       | None -> fun state -> [state]
       | Some return_exp ->
         let vi_ret = Option.get (Library_functions.get_retres_vi kf) in
-        let return_lval = Evast_builder.var vi_ret in
+        let return_lval = Evast.Build.var vi_ret in
         let kstmt = Kstmt stmt in
         fun state ->
           let kind = Abstract_domain.Result kf in
@@ -387,9 +387,9 @@ module Make_Dataflow
     | UnspecifiedSequence seq when Kernel.UnspecifiedAccess.get () ->
       let seq = List.map (fun (stmt, modified, writes, reads, refs) ->
           stmt,
-          List.map Evast_builder.translate_lval modified,
-          List.map Evast_builder.translate_lval writes,
-          List.map Evast_builder.translate_lval reads,
+          List.map Evast.translate_lval modified,
+          List.map Evast.translate_lval writes,
+          List.map Evast.translate_lval reads,
           refs) seq in
       let check s =
         Transfer.check_unspecified_sequence stmt s seq = `Value ()

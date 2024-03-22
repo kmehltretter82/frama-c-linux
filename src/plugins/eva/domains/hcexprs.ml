@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Exp = Evast_datatype.Exp
-module Lval = Evast_datatype.Lval
+module Exp = Evast.Exp
+module Lval = Evast.Lval
 
 (* lvalues are never stored under a constructor [E]. *)
 type unhashconsed_exprs = E of Exp.t | LV of Lval.t
@@ -41,7 +41,7 @@ module E = struct
 
       type t = unhashconsed_exprs
       let name = "Value.Symbolic_exprs.key"
-      let reprs = List.map (fun e -> E e) Evast_datatype.Exp.reprs
+      let reprs = List.map (fun e -> E e) Exp.reprs
 
       let structural_descr =
         Structural_descr.t_sum
@@ -70,7 +70,7 @@ module E = struct
     end)
 
   let replace kind ~late ~heir =
-    let open Evast_visitor.Rewrite in
+    let open Evast.Rewrite in
     let rewrite_exp ~visitor (exp : Evast.exp) =
       match exp.node with
       | Lval lval ->
@@ -82,7 +82,7 @@ module E = struct
       | _ -> default.rewrite_exp ~visitor exp
     in
     let rewriter = { default with rewrite_exp } in
-    Evast_visitor.Rewrite.visit_exp rewriter
+    Evast.Rewrite.visit_exp rewriter
 end
 
 module HCE = struct
@@ -107,7 +107,7 @@ module HCE = struct
 
   let to_exp h = match get h with
     | E e -> e
-    | LV lv -> Evast_builder.lval lv
+    | LV lv -> Evast.Build.lval lv
 
   let to_lval h = match get h with
     | E _ -> None
@@ -124,7 +124,7 @@ module HCE = struct
   let replace kind ~late ~heir h = match get h with
     | E e ->
       let e = E.replace kind ~late ~heir e in
-      if Evast_utils.height_exp e > height_limit
+      if Evast.height_exp e > height_limit
       then raise NonExchangeable
       else of_exp e
     | LV lval -> if Lval.equal lval late then of_exp heir else h

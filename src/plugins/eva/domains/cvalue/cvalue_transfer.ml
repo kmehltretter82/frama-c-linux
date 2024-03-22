@@ -42,7 +42,7 @@ let warn_imprecise_value ?prefix lval value =
       let prefix = Option.fold ~none:"A" ~some:(fun s -> s ^ ": a") prefix in
       Self.warning ~wkey:Self.wkey_garbled_mix_write ~once:true ~current:true
         "@[%sssigning imprecise value to %a@ because of %s.@]%t"
-        prefix Evast_printer.pp_lval lval (Origin.descr origin)
+        prefix pp_lval lval (Origin.descr origin)
         Eva_utils.pp_callstack
   | _ -> ()
 
@@ -218,7 +218,7 @@ let actualize_formals state arguments =
     let offsm =
       Cvalue_offsetmap.offsetmap_of_assignment state arg.concrete arg.avalue
     in
-    warn_imprecise_offsm_write (Evast_builder.var arg.formal) offsm;
+    warn_imprecise_offsm_write (Build.var arg.formal) offsm;
     Cvalue.Model.add_base (Base.of_varinfo arg.formal) offsm state
   in
   List.fold_left treat_one_formal state arguments

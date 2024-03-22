@@ -419,7 +419,7 @@ module Offsm
 
   let constant _context e _c =
     if store_redundant then
-      match Evast_utils.fold_to_integer e with
+      match Evast.fold_to_integer e with
       | Some i -> inject_int e.typ i
       | None -> Top
     else Top

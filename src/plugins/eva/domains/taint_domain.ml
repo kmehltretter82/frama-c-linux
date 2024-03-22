@@ -199,13 +199,13 @@ module TransferTaint = struct
         let loc = Precise_locs.imprecise_location ploc in
         Locations.enumerate_valid_bits Write loc
       in
-      let lv_indirect_zone = Evast_utils.indirect_zone_of_lval to_loc lval in
+      let lv_indirect_zone = Evast.indirect_zone_of_lval to_loc lval in
       lv_zone, lv_indirect_zone, singleton
 
   (* Propagates data- and control-taints for an assignement [lval = exp]. *)
   let assign_aux lval exp to_loc state =
     let lv_zone, lv_indirect_zone, singleton = compute_zones lval to_loc in
-    let exp_zone = Evast_utils.zone_of_exp to_loc exp in
+    let exp_zone = Evast.zone_of_exp to_loc exp in
     (* [lv] becomes data-tainted if a memory location on which the value of
        [exp] depends on is data-tainted. *)
     let data_tainted = Zone.intersects state.locs_data exp_zone in
@@ -246,7 +246,7 @@ module TransferTaint = struct
     let state = filter_active_tainted_assumes stmt state in
     (* Add [stmt] as assume statement in [state] as soon as [exp] is tainted. *)
     let to_loc = loc_of_lval valuation in
-    let exp_zone = Evast_utils.zone_of_exp to_loc exp in
+    let exp_zone = Evast.zone_of_exp to_loc exp in
     let state =
       if not state.dependent_call && LatticeTaint.intersects state exp_zone
       then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
@@ -265,7 +265,7 @@ module TransferTaint = struct
       let to_loc = loc_of_lval valuation in
       List.fold_left
         (fun s { Eval.concrete; formal; _ } ->
-           assign_aux (Evast_builder.var formal) concrete to_loc s)
+           assign_aux (Evast.Build.var formal) concrete to_loc s)
         state
         call.Eval.arguments
     in
@@ -279,7 +279,7 @@ module TransferTaint = struct
 
   let show_expr valuation state fmt exp =
     let to_loc = loc_of_lval valuation in
-    let exp_zone = Evast_utils.zone_of_exp to_loc exp in
+    let exp_zone = Evast.zone_of_exp to_loc exp in
     Format.fprintf fmt "%B" (LatticeTaint.intersects state exp_zone)
 
 end

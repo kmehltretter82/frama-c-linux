@@ -88,9 +88,9 @@ module Transition = Datatype.Make (struct
       function
       | Skip -> ()
       | Return (None,_) -> fprintf fmt "return"
-      | Return (Some exp,_) -> fprintf fmt "return %a" Evast_printer.pp_exp exp
-      | Guard (exp,Then,_) -> Evast_printer.pp_exp fmt exp
-      | Guard (exp,Else,_) -> fprintf fmt "!(%a)" Evast_printer.pp_exp exp
+      | Return (Some exp,_) -> fprintf fmt "return %a" Evast.pp_exp exp
+      | Guard (exp,Then,_) -> Evast.pp_exp fmt exp
+      | Guard (exp,Else,_) -> fprintf fmt "!(%a)" Evast.pp_exp exp
       | Assign (_,_,stmt)
       | Call (_,_,_,stmt)
       | Init (_,_,stmt)
@@ -182,34 +182,35 @@ let build_wto graph entry_point =
 
 let translate_instr stmt instr =
   let translate_call dest callee args _loc =
-    let dest' = Option.map Evast_builder.translate_lval dest in
-    let callee' = Evast_builder.translate_exp callee in
-    let args' = List.map Evast_builder.translate_exp args in
+    let dest' = Option.map translate_lval dest in
+    let callee' = translate_exp callee in
+    let args' = List.map translate_exp args in
     Call (dest', callee', args', stmt)
   in
   match instr with
   | Cil_types.Set (lval, exp, _loc) ->
-    let lval' = Evast_builder.translate_lval lval in
-    let exp' = Evast_builder.translate_exp exp in
+    let lval' = translate_lval lval in
+    let exp' = translate_exp exp in
     Assign (lval', exp', stmt)
   | Call (dest, callee, args, loc) ->
     translate_call dest callee args loc
   | Local_init (dest, Cil_types.ConsInit (callee, args, k), loc) ->
     Cil.treat_constructor_as_func translate_call dest callee args k loc
   | Local_init (vi, Cil_types.AssignInit init, _loc) ->
-    let init' = Evast_builder.translate_init init in
+    let init' = translate_init init in
     Init (vi, init', stmt)
   | Asm (attributes, string_list, ext_asm_opt, _loc) ->
     Asm (attributes, string_list, ext_asm_opt, stmt)
   | Skip (_loc) | Code_annot (_, _loc) ->
     Skip
 
-let translate_transition = function
+let translate_transition transition =
+  match transition with
   | Interpreted_automata.Skip -> Skip
   | Return (exp_opt, stmt) ->
-    Return (Option.map Evast_builder.translate_exp exp_opt, stmt)
+    Return (Option.map translate_exp exp_opt, stmt)
   | Guard (exp, guard_kind, stmt) ->
-    Guard (Evast_builder.translate_exp exp, guard_kind, stmt)
+    Guard (translate_exp exp, guard_kind, stmt)
   | Prop _ ->
     Skip
   | Instr (inst, stmt) ->

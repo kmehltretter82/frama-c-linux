@@ -318,7 +318,7 @@ let backward_comp_right op ~left ~right =
 let backward_binop _ctx ~input_type:_ ~resulting_type:_ op ~left ~right ~result =
   match op with
   | Evast.Ne | Eq | Le | Lt | Ge | Gt ->
-    let op = Evast_utils.conv_relation op in
+    let op = Evast.conv_relation op in
     if equal zero result then
       (* The comparison is false, as it always evaluate to false. Reduce by the
          fact that the inverse comparison is true.  *)

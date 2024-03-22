@@ -30,7 +30,7 @@ type split_kind = Eva_annotations.split_kind = Static | Dynamic
 
 (* Same as Eva_annotations.split_term but with Evast. *)
 type split_term =
-  | Expression of Evast_datatype.Exp.t
+  | Expression of Evast.Exp.t
   | Predicate of (Cil_datatype.Predicate.t
                   [@compare Logic_utils.compare_predicate]
                   [@equal Datatype.from_compare])
@@ -40,7 +40,7 @@ let translate_split_term
     (term : Eva_annotations.split_term) : split_term * Cil_types.location =
   match term with
   | Expression cil_exp ->
-    Expression (Evast_builder.translate_exp cil_exp), cil_exp.eloc
+    Expression (Evast.translate_exp cil_exp), cil_exp.eloc
   | Predicate pred ->
     Predicate pred, pred.pred_loc
 
@@ -69,7 +69,7 @@ let new_monitor
 module SplitTerm = Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
 
-    module Exp = Evast_datatype.Exp
+    module Exp = Evast.Exp
     module Predicate = Cil_datatype.PredicateStructEq
 
     type t = split_term [@@deriving eq, ord]
@@ -81,7 +81,7 @@ module SplitTerm = Datatype.Make_with_collections (struct
       Stdlib.List.map (fun p -> Predicate p) Predicate.reprs
 
     let pretty fmt = function
-      | Expression e -> Evast_printer.pp_exp fmt e
+      | Expression e -> Evast.pp_exp fmt e
       | Predicate p -> Printer.pp_predicate fmt p
 
     let hash = function
@@ -99,7 +99,7 @@ module SplitMonitor = Datatype.Make_with_collections (
     let name = "Partition.SplitMonitor"
 
     let reprs = [{
-        split_term = Expression (List.hd Evast_datatype.Exp.reprs);
+        split_term = Expression (List.hd Evast.Exp.reprs);
         split_kind = Static;
         split_loc = Cil_datatype.Location.unknown;
         split_limit = 0;
@@ -584,7 +584,7 @@ struct
         | Enter_loop limit_kind -> fun k x ->
           let limit = try match limit_kind with
             | ExpLimit cil_exp ->
-              let exp = Evast_builder.translate_exp cil_exp
+              let exp = Evast.translate_exp cil_exp
               and source = fst cil_exp.eloc in
               eval_exp_to_int ~source x exp
             | IntLimit i -> i

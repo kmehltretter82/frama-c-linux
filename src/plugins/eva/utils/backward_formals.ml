@@ -37,7 +37,7 @@ let safe_argument expr =
     | _, _ -> raise Unsafe
   in
   try
-    Evast_utils.iter_lvals f expr;
+    Evast.iter_lvals f expr;
     true
   with Unsafe -> false
 

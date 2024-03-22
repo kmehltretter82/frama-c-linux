@@ -20,7 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Evast
+open Evast_types
+
+let type_of node =
+  node.typ
 
 let type_of_const : constant -> typ = function
   | CTopInt t -> t

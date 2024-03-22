@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Evast
+open Evast_types
 
 module Precedence =
 struct

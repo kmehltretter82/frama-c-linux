@@ -489,7 +489,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   let do_next eval state eval_point callstack =
     match next_steps eval_point with
     | `Condition (stmt, cond) ->
-      let cond' = Evast_builder.translate_exp cond in
+      let cond' = Evast.translate_exp cond in
       let then_state = (A.assume_cond stmt state cond' true :> dstate) in
       let else_state = (A.assume_cond stmt state cond' false :> dstate) in
       Cond (eval then_state, eval else_state)
@@ -517,10 +517,10 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
   let evaluate (term, eval_point) callstack =
     match term with
     | Plval lval ->
-      let lval' = Evast_builder.translate_lval lval in
+      let lval' = Evast.translate_lval lval in
       eval_steps lval'.typ (eval_lval lval') eval_point callstack
     | Pexpr expr ->
-      let expr' = Evast_builder.translate_exp expr in
+      let expr' = Evast.translate_exp expr in
       eval_steps expr'.typ (eval_expr expr') eval_point callstack
     | Ppred pred ->
       eval_steps Cil.intType (eval_pred eval_point pred) eval_point callstack

@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Evast
+open Evast_types
 
 module Typ = Cil_datatype.Typ
 module Varinfo = Cil_datatype.Varinfo

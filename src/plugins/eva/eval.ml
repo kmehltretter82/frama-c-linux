@@ -155,7 +155,7 @@ let compute_englobing_subexpr ~subexpr ~expr =
      [subexpr], apart [subexpr] itself, or [None] if [subexpr] does not appear
      in [expr]. *)
   let rec compute expr =
-    if Evast_datatype.Exp.equal expr subexpr
+    if Evast.Exp.equal expr subexpr
     then Some []
     else
       let sublist = match expr.node with
@@ -181,9 +181,9 @@ let compute_englobing_subexpr ~subexpr ~expr =
   Option.value ~default:[] (compute expr)
 
 module Englobing =
-  Datatype.Pair_with_collections (Evast_datatype.Exp) (Evast_datatype.Exp)
+  Datatype.Pair_with_collections (Evast.Exp) (Evast.Exp)
     (struct  let module_name = "Subexpressions" end)
-module SubExprs = Datatype.List (Evast_datatype.Exp)
+module SubExprs = Datatype.List (Evast.Exp)
 
 module EnglobingSubexpr =
   State_builder.Hashtbl (Englobing.Hashtbl) (SubExprs)

@@ -1102,13 +1102,13 @@ module D = struct
   let log_category = Self.register_category "d-traces"
 
   let assign ki lv e _v _valuation state =
-    let cil_lval = Evast_utils.to_cil_lval lv.Eval.lval in
-    let cil_exp = Evast_utils.to_cil_exp e in
+    let cil_lval = Evast.to_cil_lval lv.Eval.lval in
+    let cil_exp = Evast.to_cil_exp e in
     let trans = Assign (ki, cil_lval, lv.lval.typ, cil_exp) in
     `Value (Traces.add_trans state trans)
 
   let assume stmt e pos _valuation state =
-    let cil_exp = Evast_utils.to_cil_exp e in
+    let cil_exp = Evast.to_cil_exp e in
     let trans = Assume (stmt, cil_exp, pos) in
     `Value (Traces.add_trans state trans)
 
@@ -1124,7 +1124,7 @@ module D = struct
           Traces.add_trans state
             (Assign (Kstmt stmt, Cil.var arg.Eval.formal,
                      arg.Eval.formal.Cil_types.vtype,
-                     Evast_utils.to_cil_exp arg.Eval.concrete)))
+                     Evast.to_cil_exp arg.Eval.concrete)))
           state call.Eval.arguments in
       `Value state
     else
@@ -1135,7 +1135,7 @@ module D = struct
         | None -> state in
       let exps =
         List.map
-          (fun arg -> Evast_utils.to_cil_exp arg.Eval.concrete)
+          (fun arg -> Evast.to_cil_exp arg.Eval.concrete)
           call.Eval.arguments
       in
       let state = Traces.add_trans state
@@ -1158,7 +1158,7 @@ module D = struct
 
   let empty () = Traces.empty
   let initialize_variable lv _ ~initialized:_ _ state =
-    Traces.add_trans state (Msg(Format.asprintf "initialize variable: %a" Evast_printer.pp_lval lv ))
+    Traces.add_trans state (Msg(Format.asprintf "initialize variable: %a" Evast.pp_lval lv ))
   let initialize_variable_using_type var_kind varinfo state =
     let kind_str =
       match var_kind with

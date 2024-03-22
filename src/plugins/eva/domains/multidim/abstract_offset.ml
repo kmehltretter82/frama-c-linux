@@ -37,7 +37,7 @@ let rec pretty fmt = function
       pretty s
   | Index (Some e, i, _t, s) ->
     Format.fprintf fmt "[%a∈%a]%a"
-      Evast_printer.pp_exp e
+      Evast.pp_exp e
       Int_val.pretty i
       pretty s
 
@@ -61,10 +61,10 @@ let add_index oracle base exp =
       let idx' = Int_val.add i (oracle exp) in
       let e = match e with (* If i is singleton, we can use this as the index expression *)
         | None when Int_val.is_singleton i ->
-          Some (Evast_builder.integer (Int_val.project_int i))
+          Some (Evast.Build.integer (Int_val.project_int i))
         | e -> e
       in
-      let e' = Option.map (Fun.flip (Evast_builder.add) exp) e in
+      let e' = Option.map (fun e -> Evast.Build.(add e exp)) e in
       (* TODO: is idx inside bounds ? *)
       `Value (Index (e', idx', t, sub))
     | Index (e, i, t, sub) ->
@@ -85,7 +85,7 @@ let rec join o1 o2 =
   | Index (e1, i1, t, sub1), Index (e2, i2, t', sub2)
     when Bit_utils.type_compatible t t' ->
     let e = match e1, e2 with
-      | Some e1, Some e2 when Evast_datatype.Exp.equal e1 e2 ->
+      | Some e1, Some e2 when Evast.Exp.equal e1 e2 ->
         Some e1 (* keep expression only when equivalent from both offsets *)
       | _ -> None
     in
@@ -246,7 +246,7 @@ let references =
     | NoOffset _ -> acc
     | Field (_, sub) | Index (None, _, _, sub) -> aux acc sub
     | Index (Some e, _, _, sub) ->
-      let r = Evast_utils.vars_in_exp e in
+      let r = Evast.vars_in_exp e in
       let acc = Cil_datatype.Varinfo.Set.union r acc in
       aux acc sub
   in
