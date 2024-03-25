@@ -42,14 +42,22 @@ let extract_path thname =
 let pp_id fmt (id: W.Ident.ident) =
   Format.pp_print_string fmt id.id_string
 
+(* For debug only*)
+let pp_id_loc fmt (id : W.Ident.ident) =
+  match id.id_loc with
+  | Some loc -> W.Loc.pp_position fmt loc
+  | None -> L.debug ~level:0 "No location found"
+
+
+
 (* logic_type =
-  | Ctype of typ (** a C type *)
-  | Ltype of logic_type_info * logic_type list
-  (** an user-defined logic type with its parameters *)
-  | Lvar of string (** a type variable. *)
-  | Linteger (** mathematical integers, {i i.e.} Z *)
-  | Lreal    (** mathematical reals, {i i.e.} R *)
-  | Larrow of logic_type list * logic_type (** (n-ary) function type *)*)
+   | Ctype of typ (** a C type *)
+   | Ltype of logic_type_info * logic_type list
+   (** an user-defined logic type with its parameters *)
+   | Lvar of string (** a type variable. *)
+   | Linteger (** mathematical integers, {i i.e.} Z *)
+   | Lreal    (** mathematical reals, {i i.e.} R *)
+   | Larrow of logic_type list * logic_type (** (n-ary) function type *)*)
 
 (*logic_type_info = {
   mutable lt_name: string;
@@ -59,18 +67,21 @@ let pp_id fmt (id: W.Ident.ident) =
   mutable lt_attr: attributes;
   (** attributes associated to the logic type.
       @since Phosphorus-20170501-beta1 *)
-}*)
+  }*)
 
-let rec lt_of_ts (ty : W.Ty.ty)  =
+let rec _lt_of_ts (ty : W.Ty.ty)  =
   match ty.ty_node with
   | W.Ty.Tyvar tvs ->
+    (* Tvs *)
     L.debug ~level:0 "Tvsymbol %a.@"  pp_id tvs.tv_name;
+    L.debug ~level:0 "Tvsymbol location %a.@"  pp_id_loc tvs.tv_name;
     (* Cil_types.Linteger *)
   | W.Ty.Tyapp (tys,tyl) ->
     L.debug ~level:0 "Tysymbol %a.@"  pp_id tys.ts_name;
-    List.iter (fun ty -> lt_of_ts ty ) tyl;
+    L.debug ~level:0 "Tysymbol location %a.@"  pp_id_loc tys.ts_name;
+    List.iter (fun ty -> _lt_of_ts ty ) tyl;
     (* Cil_types.Lreal *)
-and lti_of_ls (tys : W.Ty.tysymbol) : Cil_types.logic_type_info  =
+and _lti_of_ls (tys : W.Ty.tysymbol) : Cil_types.logic_type_info  =
   {
     lt_name = tys.ts_name.id_string;
     lt_params = [""];
@@ -88,18 +99,22 @@ let import_theory env thname =
           begin
             match decl.d_node with
             | Dtype ts ->
-              L.debug ~level:0 "Decl and type %a.@"  pp_id ts.ts_name
+              L.debug ~level:0 "Decl and type %a.@"  pp_id ts.ts_name;
+              L.debug ~level:0 "Location %a.@"  pp_id_loc ts.ts_name
             | Ddata ddatas ->
               List.iter
                 (fun ((ts, _) : W.Decl.data_decl) ->
                    L.debug ~level:0 "Decl and data %a.@" pp_id  ts.ts_name;
+                   L.debug ~level:0 "Location %a.@"  pp_id_loc ts.ts_name
                 ) ddatas
             | Dparam ls ->
-              L.debug ~level:0 "Decl and dparam %a.@" pp_id ls.ls_name
+              L.debug ~level:0 "Decl and dparam %a.@" pp_id ls.ls_name;
+              L.debug ~level:0 "Location %a.@"  pp_id_loc ls.ls_name
             | Dlogic dlogics ->
               List.iter
                 (fun ((ls,_):W.Decl.logic_decl) ->
-                   L.debug ~level:0 "Decl and dlogic %a.@" pp_id ls.ls_name
+                   L.debug ~level:0 "Decl and dlogic %a.@" pp_id ls.ls_name;
+                   L.debug ~level:0 "Location %a.@"  pp_id_loc ls.ls_name
                 ) dlogics
             | _ -> L.debug ~level:0 "Decl but whatever"
           end
