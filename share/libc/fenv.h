@@ -108,7 +108,7 @@ extern int fegetexceptflag(fexcept_t *flagp, int excepts);
 extern int fegetround(void);
 
 /*@
-  assigns *envp \from __fc_fenv_state;
+  assigns *envp, __fc_fenv_state \from __fc_fenv_state;
   assigns \result \from indirect:__fc_fenv_state;
 */
 extern int feholdexcept(fenv_t *envp);

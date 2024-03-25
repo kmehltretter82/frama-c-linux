@@ -123,8 +123,8 @@ extern void endnetent(void);
 extern void endprotoent(void);
 extern void endservent(void);
 /*@ requires addrinfo_valid: \valid(addrinfo);
-  assigns \nothing;
   frees addrinfo;
+  assigns \nothing;
   ensures allocation: \allocable(addrinfo);
 */
 extern void freeaddrinfo(struct addrinfo * addrinfo);
@@ -143,11 +143,11 @@ extern const char *gai_strerror(int errcode);
     requires hints_option: hints == \null || \valid_read(hints);
     requires valid_res: \valid(res);
 
+    allocates *res;
+
     assigns *res \from indirect:nodename, indirect:servname, indirect:hints;
     assigns \result \from indirect:nodename, indirect:servname,indirect:hints;
     assigns errno \from indirect:nodename, indirect:servname, indirect:hints;
-
-    allocates *res;
 
     behavior empty_request:
       assumes empty: nodename == \null && servname == \null;
@@ -180,6 +180,7 @@ extern int getaddrinfo(
 extern struct hostent *gethostbyaddr(const void *, socklen_t, int);
 
 /*@
+  allocates \result;
   assigns \result, *\result \from name[0 .. strlen(name)];
 */
 extern struct hostent *gethostbyname(const char *name);

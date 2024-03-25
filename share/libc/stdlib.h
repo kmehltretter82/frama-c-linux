@@ -377,8 +377,8 @@ extern long int jrand48 (unsigned short xsubi[3]);
 
   behavior no_allocation:
     assumes cannot_allocate: !is_allocable(nmemb * size);
-    assigns \result \from \nothing;
     allocates \nothing;
+    assigns \result \from \nothing;
     ensures null_result: \result == \null;
 
   complete behaviors;
@@ -395,8 +395,8 @@ extern void *calloc(size_t nmemb, size_t size);
   @   ensures allocation: \fresh(\result,size);
   @ behavior no_allocation:
   @   assumes cannot_allocate: !is_allocable(size);
-  @   assigns \result \from \nothing;
   @   allocates \nothing;
+  @   assigns \result \from \nothing;
   @   ensures null_result: \result==\null;
   @ complete behaviors;
   @ disjoint behaviors;
@@ -412,8 +412,8 @@ extern void *malloc(size_t size);
   @   ensures  freed: \allocable(p);
   @ behavior no_deallocation:
   @   assumes  null_p: p==\null;
-  @   assigns  \nothing;
   @   frees    \nothing;
+  @   assigns  \nothing;
   @ complete behaviors;
   @ disjoint behaviors;
   @*/
@@ -716,8 +716,8 @@ extern size_t wcstombs(char * restrict s,
     ensures result_zero: \result == 0;
   behavior no_allocation:
     assumes cannot_allocate: !is_allocable(size);
-    assigns \result \from indirect:alignment;
     allocates \nothing;
+    assigns \result \from indirect:alignment;
     ensures result_non_zero: \result < 0 || \result > 0;
   complete behaviors;
   disjoint behaviors;
@@ -779,14 +779,15 @@ extern int mkstemps(char *templat, int suffixlen);
     assumes valid_file_name: valid_read_string(file_name);
     assumes resolved_name_null: resolved_name == \null;
     assumes cannot_allocate: !is_allocable(PATH_MAX);
-    assigns \result \from \nothing;
     allocates \nothing;
+    assigns \result \from \nothing;
     ensures null_result: \result == \null;
     ensures errno_set: __fc_errno == ENOMEM;
   behavior resolved_name_buffer:
     assumes valid_file_name: valid_read_string(file_name);
     assumes allocated_resolved_name_or_fail:
       \valid(resolved_name+(0 .. PATH_MAX-1));
+    allocates \nothing;
     assigns \result \from resolved_name;
     assigns resolved_name[0 .. PATH_MAX-1] \from indirect:file_name[0..];
     ensures valid_string_resolved_name: valid_string(resolved_name)
@@ -794,15 +795,14 @@ extern int mkstemps(char *templat, int suffixlen);
     // missing: assigns \result,
     //                  resolved_name[0 .. PATH_MAX-1] \from 'filesystem';
     ensures resolved_result: \result == resolved_name;
-    allocates \nothing;
   behavior filesystem_error:
     assumes valid_file_name: valid_read_string(file_name);
+    allocates \nothing;
     assigns \result, __fc_errno
       \from indirect:file_name[0..]; // missing: indirect:'filesystem';
     ensures null_result: \result == \null;
     ensures errno_set:
       __fc_errno \in {EACCES, EIO, ELOOP, ENAMETOOLONG, ENOENT, ENOTDIR};
-    allocates \nothing;
 */
 extern char *realpath(const char *restrict file_name,
                       char *restrict resolved_name);

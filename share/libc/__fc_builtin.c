@@ -247,7 +247,12 @@ wint_t Frama_C_wint_t_interval(wint_t min, wint_t max)
   return r;
 }
 
-/*@ assigns \nothing; */
+/*@
+  terminates \false;
+  assigns \nothing;
+  ensures never_terminates: \false;
+  exits always_exits: \true;
+ */
 extern void __builtin_abort(void) __attribute__((noreturn)); // GCC builtin
 
 void Frama_C_abort(void)

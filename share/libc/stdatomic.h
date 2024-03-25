@@ -101,6 +101,8 @@ typedef _Atomic uintmax_t atomic_uintmax_t;
 // NOTE: The stubs below serve only to help parsing succeed and do not
 //       match expected concurrence semantics.
 
+/*@ assigns \nothing; */
+void __fc_atomic_init_marker(void *obj, unsigned long long value);
 #define atomic_init(obj, value)                                         \
   do { __fc_atomic_init_marker(obj, value); *obj = value; } while (0)
 
@@ -185,7 +187,7 @@ unsigned long long __fc_atomic_exchange_explicit(void *object,
           *((char*)expected+(0 .. obj_size-1)), desired, indirect:obj_size;
   assigns \result \from indirect:*((char*)object+(0 .. obj_size-1)),
                         indirect:*((char*)expected+(0 .. obj_size-1)),
-                        indirect:desired, indirect:obj_size;
+                        indirect:obj_size;
 */
 _Bool __fc_atomic_compare_exchange_strong(void *object, void *expected,
                                           unsigned long long desired,
@@ -201,7 +203,7 @@ _Bool __fc_atomic_compare_exchange_strong(void *object, void *expected,
           desired, indirect:success, indirect:failure, indirect:obj_size;
   assigns \result \from indirect:*((char*)object+(0 .. obj_size-1)),
                         indirect:*((char*)expected+(0 .. obj_size-1)),
-                        indirect:desired, indirect:success, indirect:failure,
+                        indirect:success, indirect:failure,
                         indirect:obj_size;
 */
 _Bool __fc_atomic_compare_exchange_strong_explicit(void *object, void *expected,

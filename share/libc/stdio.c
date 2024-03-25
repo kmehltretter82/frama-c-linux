@@ -251,7 +251,7 @@ enum length_modifier {
 };
 
 int vfscanf(FILE * restrict stream, const char * restrict format, va_list arg) {
-  char *p = format;
+  const char *p = format;
   char conversion_counter = 0;
   while (*p) {
     if (*p == '%') {
@@ -429,8 +429,11 @@ int vfscanf(FILE * restrict stream, const char * restrict format, va_list arg) {
           *va_arg(arg, double*) = Frama_C_double_interval(-DBL_MAX, DBL_MAX);
           break;
         case UPPER_L:
-          *va_arg(arg, long double*) =
-            Frama_C_long_double_interval(-LDBL_MAX, LDBL_MAX);
+          // TODO: use Frama_C_long_double_interval when it will be supported
+          {
+            volatile long double vld;
+            *va_arg(arg, long double*) = vld;
+          }
           break;
         default:
           // Undefined behavior

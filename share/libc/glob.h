@@ -69,14 +69,20 @@ typedef struct __fc_glob_t {
 } glob_t;
 
 /*@
-  assigns \result, *pglob \from indirect:pattern[0 .. strlen(pattern)],
-                                indirect:flags, indirect:errfunc;
+  allocates pglob->gl_pathv;
+  assigns *pglob \from indirect:pattern[0 .. strlen(pattern)],
+                       flags,
+                       indirect:errfunc;
+  assigns \result \from indirect:pattern[0 .. strlen(pattern)],
+                        indirect:flags,
+                        indirect:errfunc;
 */
 extern int glob(const char *pattern, int flags,
                 int (*errfunc) (const char *epath, int eerrno),
                 glob_t *pglob);
 
 /*@
+  frees pglob->gl_pathv;
   assigns *pglob \from *pglob;
  */
 extern void globfree(glob_t *pglob);

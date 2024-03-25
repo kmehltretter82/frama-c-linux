@@ -528,8 +528,8 @@ extern void *memmem(const void *haystack, size_t haystacklen,
   @     valid_string(\result) && strcmp(\result,s) == 0;
   @ behavior no_allocation:
   @   assumes cannot_allocate: !is_allocable(strlen(s));
-  @   assigns \result \from \nothing;
   @   allocates \nothing;
+  @   assigns \result \from \nothing;
   @   ensures result_null: \result == \null;
   @*/
 extern char *strdup (const char *s);
@@ -550,8 +550,8 @@ extern char *strdup (const char *s);
   @     strncmp(\result,s,n) == 0;
   @ behavior no_allocation:
   @   assumes cannot_allocate: !is_allocable(\min(strlen(s), n+1));
-  @   assigns \result \from \nothing;
   @   allocates \nothing;
+  @   assigns \result \from \nothing;
   @   ensures result_null: \result == \null;
   @*/
 extern char *strndup (const char *s, size_t n);
