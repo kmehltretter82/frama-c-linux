@@ -79,12 +79,15 @@ let rec _lt_of_ts (ty : W.Ty.ty)  =
   | W.Ty.Tyapp (tys,tyl) ->
     L.debug ~level:0 "Tysymbol %a.@"  pp_id tys.ts_name;
     L.debug ~level:0 "Tysymbol location %a.@"  pp_id_loc tys.ts_name;
+    (*lti_of_ls (?)*)
     List.iter (fun ty -> _lt_of_ts ty ) tyl;
     (* Cil_types.Lreal *)
 and _lti_of_ls (tys : W.Ty.tysymbol) : Cil_types.logic_type_info  =
   {
     lt_name = tys.ts_name.id_string;
-    lt_params = [""];
+    lt_params = List.map (fun (tvs : W.Ty.tvsymbol )->
+        tvs.tv_name.id_string
+      ) tys.ts_args;
     lt_def = None;
     lt_attr = [];
   }
