@@ -42,10 +42,34 @@ let extract_path thname =
 let pp_id fmt (id: W.Ident.ident) =
   Format.pp_print_string fmt id.id_string
 
-let rec lt_of_ts : W.Ty.ty -> Cil_types.logic_type =
+(* logic_type =
+  | Ctype of typ (** a C type *)
+  | Ltype of logic_type_info * logic_type list
+  (** an user-defined logic type with its parameters *)
+  | Lvar of string (** a type variable. *)
+  | Linteger (** mathematical integers, {i i.e.} Z *)
+  | Lreal    (** mathematical reals, {i i.e.} R *)
+  | Larrow of logic_type list * logic_type (** (n-ary) function type *)*)
+
+(*logic_type_info = {
+  mutable lt_name: string;
+  lt_params : string list; (** type parameters*)
+  mutable lt_def: logic_type_def option;
+  (** definition of the type. None for abstract types. *)
+  mutable lt_attr: attributes;
+  (** attributes associated to the logic type.
+      @since Phosphorus-20170501-beta1 *)
+}*)
+
+let rec lt_of_ts (_ty : W.Ty.ty) : Cil_types.logic_type  =
   raise Not_found
-and lti_of_ls : W.Ty.tysymbol -> Cil_types.logic_type_info =
-  raise Not_found
+and lti_of_ls (tys : W.Ty.tysymbol) : Cil_types.logic_type_info  =
+  {
+    lt_name = tys.ts_name.id_string;
+    lt_params = [""];
+    lt_def = None;
+    lt_attr = [];
+  }
 
 let import_theory env thname =
   let theory_name, theory_path = extract_path thname in
