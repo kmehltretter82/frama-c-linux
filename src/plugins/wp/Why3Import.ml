@@ -61,8 +61,15 @@ let pp_id fmt (id: W.Ident.ident) =
       @since Phosphorus-20170501-beta1 *)
 }*)
 
-let rec lt_of_ts (_ty : W.Ty.ty) : Cil_types.logic_type  =
-  raise Not_found
+let rec lt_of_ts (ty : W.Ty.ty)  =
+  match ty.ty_node with
+  | W.Ty.Tyvar tvs ->
+    L.debug ~level:0 "Tvsymbol %a.@"  pp_id tvs.tv_name;
+    (* Cil_types.Linteger *)
+  | W.Ty.Tyapp (tys,tyl) ->
+    L.debug ~level:0 "Tysymbol %a.@"  pp_id tys.ts_name;
+    List.iter (fun ty -> lt_of_ts ty ) tyl;
+    (* Cil_types.Lreal *)
 and lti_of_ls (tys : W.Ty.tysymbol) : Cil_types.logic_type_info  =
   {
     lt_name = tys.ts_name.id_string;
@@ -85,7 +92,7 @@ let import_theory env thname =
             | Ddata ddatas ->
               List.iter
                 (fun ((ts, _) : W.Decl.data_decl) ->
-                   L.debug ~level:0 "Decl and data %a.@" pp_id  ts.ts_name
+                   L.debug ~level:0 "Decl and data %a.@" pp_id  ts.ts_name;
                 ) ddatas
             | Dparam ls ->
               L.debug ~level:0 "Decl and dparam %a.@" pp_id ls.ls_name
