@@ -852,7 +852,7 @@ struct
 
   let () =
     Acsl_extension.register_behavior ~plugin:"wp"
-      "wp_nullable_args" Nullable_extension.typer false
+      "nullable_args" Nullable_extension.typer false
 
   module HasNullable =
     State_builder.Option_ref(Datatype.Bool)

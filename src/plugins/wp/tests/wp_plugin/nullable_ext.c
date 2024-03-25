@@ -17,7 +17,7 @@ int x;
 int *g;
 
 /*@ assigns *g, *p, x ;
-    \wp::wp_nullable_args p ;
+    \wp::nullable_args p ;
 */
 void nullable_coherence(int *p) {
   if (p == (void *)0) {
@@ -31,7 +31,7 @@ void nullable_coherence(int *p) {
 }
 
 /*@ assigns *p, *q, *r, *s, *t ;
-    \wp::wp_nullable_args p, q, r ;
+    \wp::nullable_args p, q, r ;
 */
 void nullable_in_context(int *p, int *q, int *r, int *s, int *t) {
   *p = 42;
@@ -41,35 +41,35 @@ void nullable_in_context(int *p, int *q, int *r, int *s, int *t) {
 }
 
 /*@ assigns *ptr ;
-    \wp::wp_nullable_args ptr  ;
+    \wp::nullable_args ptr  ;
 */
 void with_declaration(int *ptr);
 void with_declaration(int *ptr) {}
 
 #ifdef FAIL_1
 /*@ assigns *ptr ;
-    \wp::wp_nullable_args unexisting_ptr ;
+    \wp::nullable_args unexisting_ptr ;
 */
 void fails_no_variable(int *ptr) {}
 #endif
 
 #ifdef FAIL_2
 /*@ assigns *ptr ;
-    \wp::wp_nullable_args *ptr ;
+    \wp::nullable_args *ptr ;
 */
 void not_a_variable(int *ptr) {}
 #endif
 
 #ifdef FAIL_3
 /*@ assigns *ptr ;
-    \wp::wp_nullable_args g ;
+    \wp::nullable_args g ;
 */
 void not_a_formal(int *ptr) {}
 #endif
 
 #ifdef FAIL_4
 /*@ assigns x ;
-    \wp::wp_nullable_args f ;
+    \wp::nullable_args f ;
 */
 void not_a_pointer(int f) {}
 #endif

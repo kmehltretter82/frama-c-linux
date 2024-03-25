@@ -1919,12 +1919,12 @@ The syntax of ACSL extensions for proof strategies is defined below:
 
 \begin{center}
   \begin{tabular}{l}
-    \verb+@strategy+ \textit{name}\,: \\
+    \verb+@\wp::strategy+ \textit{name}\,: \\
     \quad\quad\textit{alternative}\,, \\
     \quad\quad\ldots, \\
     \quad\quad\textit{alternative}\,; \\
     \\
-    \verb+@proof+ \textit{name}\,: \textit{target}\pdots\textit{target}\,;
+    \verb+@\wp::proof+ \textit{name}\,: \textit{target}\pdots\textit{target}\,;
   \end{tabular}
 \end{center}
 
@@ -2051,7 +2051,7 @@ name to the strategies to use:
 
 \begin{center}
   \begin{tabular}{l}
-    \verb+@proof+ \textit{strategy}\,: smoke,\textit{target}\pdots\textit{target}\,;
+    \verb+@\wp::proof+ \textit{strategy}\,: smoke,\textit{target}\pdots\textit{target}\,;
   \end{tabular}
 \end{center}
 
