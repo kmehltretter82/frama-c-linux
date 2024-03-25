@@ -76,7 +76,13 @@ fenv_t;
 // From POSIX 1-2017:
 // - "fexcept_t does not have to be an integer type."
 // - "... the user cannot inspect it."
+#ifdef __FC_FEXCEPT_T_IS_SCALAR
+// Non-portable code may consider fexcept_t as a scalar; this allows
+// such code to be parsed.
 typedef unsigned int fexcept_t;
+#else
+typedef struct __fc_fexcept_t { int _fc; } fexcept_t;
+#endif
 
 __FC_EXTERN volatile fenv_t __fc_fenv_state;
 
