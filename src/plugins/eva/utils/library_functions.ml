@@ -91,6 +91,8 @@ let unsupported_specifications =
     "strndup", "string.c";
     "unsetenv", "stdlib.c";
     "vasprintf", "stdio.c";
+    "vfscanf", "stdio.c";
+    "vscanf", "stdio.c";
     "wcsdup", "wchar.c";
   ]
 

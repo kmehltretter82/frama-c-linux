@@ -2,7 +2,11 @@
 #include <string.h>
 #include "stdio.c"
 #include "__fc_builtin.h"
+
 volatile int nondet;
+
+int caller_stub_for_vscanf(const char * restrict format, ...);
+
 int main() {
   FILE *stream;
   char *line = NULL;
@@ -52,5 +56,27 @@ int main() {
     //@ assert at_least_one_char: \initialized(&buf[0]);
   }
 
+  int vscanf_d;
+  char vscanf_c;
+  long double vscanf_Ld;
+  char vscanf_s[30];
+  ptrdiff_t vscanf_t;
+  intmax_t vscanf_j;
+  size_t vscanf_z;
+  int vscanf_res = caller_stub_for_vscanf("%+d %-2c % 41.999Lf %s %ti %jx %zu", &vscanf_d, &vscanf_c, &vscanf_Ld, vscanf_s, &vscanf_t, &vscanf_j, &vscanf_z);
+  if (vscanf_res == 4) {
+    //@ check \initialized(&vscanf_d);
+    //@ check \initialized(&vscanf_s);
+    Frama_C_show_each_must_be_reachable(vscanf_d, &vscanf_c, &vscanf_Ld, vscanf_s, vscanf_t, vscanf_j, vscanf_z);
+  }
+
   return 0;
+}
+
+int caller_stub_for_vscanf(const char * restrict format, ...) {
+  va_list args;
+  va_start(args, format);
+  int res = vscanf(format, args);
+  va_end(args);
+  return res;
 }
