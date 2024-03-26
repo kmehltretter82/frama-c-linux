@@ -27,6 +27,7 @@ import * as Dome from 'dome/dome';
 import * as System from 'dome/system';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
+import * as Status from 'frama-c/kernel/Status';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Values from 'frama-c/plugins/eva/api/values';
@@ -943,9 +944,14 @@ function useEvaluationMode(props: EvaluationModeProps): void {
     if (enabled) {
       const onEnter = (pattern: string): void => {
         const data = { stmt: marker, term: pattern };
-        const handleError = (): void => { return; };
-        const addProbe = (target: Ast.marker | undefined): void => {
-          if (target) setLocPin(scope, target, true);
+        const handleError = (err: string): void => {
+          const text = `${pattern} could not be evaluated: ${err}.`;
+          Status.setMessage({ text, kind: 'error' });
+        };
+        const addProbe = (target: Ast.marker): void => {
+          setLocPin(scope, target, true);
+          const text = `${pattern} evaluated in the 'Eva Values' panel`;
+          Status.setMessage({ text, kind: 'success' });
         };
         Server.send(Ast.parseExpr, data).then(addProbe).catch(handleError);
       };
