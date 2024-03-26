@@ -76,7 +76,7 @@ void call_builtin_acsl () {
 }
 
 void f_slevel() {
-  //@ slevel 0;
+  //@ \eva::slevel 0;
   return;
 }
 

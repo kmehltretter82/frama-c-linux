@@ -161,7 +161,7 @@ let printer _pp fmt ext =
 
 let () =
   Acsl_extension.register_code_annot_next_both
-    "widen_hints" typer ~printer false
+    ~plugin:"eva" "widen_hints" typer ~printer false
 
 let get_widen_hints_annots stmt =
   Annotations.fold_code_annot

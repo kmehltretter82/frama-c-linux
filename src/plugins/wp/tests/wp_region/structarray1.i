@@ -6,7 +6,7 @@ typedef struct Matrix {
   int coef[4][4];
 } * matrix ;
 
-//@ region *X , *R ;
+//@ \wp::region *X , *R ;
 void job( matrix M , vector X , vector R )
 {
   for (int i = 0; i < 4; i++) {

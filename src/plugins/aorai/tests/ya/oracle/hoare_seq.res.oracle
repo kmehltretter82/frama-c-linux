@@ -115,7 +115,7 @@ enum aorai_OpStatusList {
     int aorai_intermediate_state_1_tmp;
     int aorai_intermediate_state_2_tmp;
     int aorai_reject_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
@@ -244,7 +244,7 @@ enum aorai_OpStatusList {
     int aorai_intermediate_state_1_tmp;
     int aorai_intermediate_state_2_tmp;
     int aorai_reject_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
@@ -441,7 +441,7 @@ int main_bhv_bhv(int c); */
     int aorai_intermediate_state_1_tmp;
     int aorai_intermediate_state_2_tmp;
     int aorai_reject_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
@@ -586,7 +586,7 @@ int main_bhv_bhv(int c); */
     int aorai_intermediate_state_1_tmp;
     int aorai_intermediate_state_2_tmp;
     int aorai_reject_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;

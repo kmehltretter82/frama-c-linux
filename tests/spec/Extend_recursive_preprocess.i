@@ -1,33 +1,33 @@
 /* run.config
- MODULE: @PTEST_NAME@
-   OPT: -kernel-warn-key=annot-error=active -print
+  MODULE: @PTEST_NAME@
+  OPT: -kernel-warn-key=annot-error=active -print
 */
 
-/*@ gl_foo foo1 {
-    gl_fooo must_replace(x);
-    gl_fooo must_not_replace(x);
-    gl_fooo must_replace(x);
+/*@ \test::gl_foo foo1 {
+    \test::gl_fooo must_replace(x);
+    \test::gl_fooo must_not_replace(x);
+    \test::gl_fooo must_replace(x);
 }*/
 
 
-/*@ gl_foo foo1 {
-    gl_foo foo2 {
-      gl_fooo must_replace(x);
-      gl_fooo must_not_replace(x);
+/*@ \test::gl_foo foo1 {
+    \test::gl_foo foo2 {
+      \test::gl_fooo must_replace(x);
+      \test::gl_fooo must_not_replace(x);
     }
 }*/
 
-/*@ gl_foo foo1 {
-    gl_fooo must_replace(x);
-    gl_foo foo2 {
-      gl_fooo must_replace(x);
-      gl_foo foo3 {
-         gl_fooo must_replace(x);
-	 gl_fooo must_not_replace(x);
+/*@ \test::gl_foo foo1 {
+    \test::gl_fooo must_replace(x);
+    \test::gl_foo foo2 {
+      \test::gl_fooo must_replace(x);
+      \test::gl_foo foo3 {
+         \test::gl_fooo must_replace(x);
+	 \test::gl_fooo must_not_replace(x);
       }
-      gl_fooo must_replace(x);
+      \test::gl_fooo must_replace(x);
     }
-    gl_fooo must_not_replace(x);
+    \test::gl_fooo must_not_replace(x);
 
 }*/
 

@@ -99,7 +99,7 @@ let register () =
   if not !registered && Wp_parameters.Probes.get () then
     begin
       registered := true ;
-      Acsl_extension.register_code_annot "probe" parse_probe false ;
+      Acsl_extension.register_code_annot ~plugin:"wp" "probe" parse_probe false ;
     end
 
 let () = Cmdline.run_after_configuring_stage register

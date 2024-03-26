@@ -39,6 +39,9 @@ val preprocess_extension:
 val preprocess_extension_block:
   string -> string * Logic_ptree.extended_decl list -> string * Logic_ptree.extended_decl list
 
+(** Return the plugin name of the extension *)
+val extension_from : string -> string
+
 (** {2 Global Tables} *)
 module Logic_info: State_builder.Hashtbl
   with type key = string and type data = Cil_types.logic_info list
@@ -221,6 +224,7 @@ val set_extension_handler:
   preprocess_block:
     (string -> string * Logic_ptree.extended_decl list ->
      string * Logic_ptree.extended_decl list) ->
+  extension_from:(string -> string) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this

@@ -48,7 +48,7 @@ enum aorai_OpStatusList {
     int S1_tmp;
     int S2_tmp;
     int main_0_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_decode_int;
@@ -104,7 +104,7 @@ enum aorai_OpStatusList {
     int S1_tmp;
     int S2_tmp;
     int main_0_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_decode_int;
@@ -235,7 +235,7 @@ int decode_int(char *s)
     int S1_tmp;
     int S2_tmp;
     int main_0_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_factorial;
@@ -293,7 +293,7 @@ int decode_int(char *s)
     int S1_tmp;
     int S2_tmp;
     int main_0_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_factorial;
@@ -375,7 +375,7 @@ int factorial(int value)
     int S1_tmp;
     int S2_tmp;
     int main_0_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
@@ -431,7 +431,7 @@ int factorial(int value)
     int S1_tmp;
     int S2_tmp;
     int main_0_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;

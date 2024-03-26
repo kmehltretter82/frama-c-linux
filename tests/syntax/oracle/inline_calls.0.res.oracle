@@ -315,14 +315,16 @@ void call_builtin_acsl(void)
 
 void f_slevel(void)
 {
-  /*@ slevel 0; */ ;
+  /*@ \eva::slevel 0; */ ;
   return;
 }
 
 void call_f_slevel(void)
 {
   {
-     /* __blockattribute__(____fc_inlined__("f_slevel")) *//*@ slevel 0; */ ;
+     /* __blockattribute__(____fc_inlined__("f_slevel")) *//*@
+                                                           \eva::slevel 0; */
+                                                           ;
     ;
   }
   return;

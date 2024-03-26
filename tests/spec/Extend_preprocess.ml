@@ -46,8 +46,8 @@ let register registration ?visitor ?printer ?short_printer kind =
 
 let () =
   let open Acsl_extension in
-  register register_behavior "bhv";
-  register register_code_annot_next_loop "nl";
-  register register_code_annot "ca";
-  register register_code_annot_next_stmt "ns";
-  register register_global "gl"
+  register (register_behavior ~plugin:"test" ) "bhv";
+  register (register_code_annot_next_loop ~plugin:"test") "nl";
+  register (register_code_annot ~plugin:"test") "ca";
+  register (register_code_annot_next_stmt ~plugin:"test") "ns";
+  register (register_global ~plugin:"test") "gl"

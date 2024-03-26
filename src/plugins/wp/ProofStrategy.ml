@@ -319,9 +319,9 @@ let register () =
       let printer hmap pp _ fmt = function
         | Ext_id id -> Option.iter (pp fmt) (Hashtbl.find_opt hmap id)
         | _ -> () in
-      Acsl_extension.register_global "strategy"
+      Acsl_extension.register_global ~plugin:"wp" "strategy"
         ~printer:(printer sid pp_strategy) parse_strategy false ;
-      Acsl_extension.register_global "proof"
+      Acsl_extension.register_global ~plugin:"wp" "proof"
         ~printer:(printer hid pp_hint) parse_proofs false ;
     end
 

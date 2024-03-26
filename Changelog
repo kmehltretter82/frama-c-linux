@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-    Kernel   [2024-03-26] Introduce \plugin:: prefix for ACSL extensions,
+                           unknown extensions can be safely ignored when the
+                           plug-in that handles them is not available
 -*   Variadic [2024-03-07] Make sure that generated functions have fresh names
 o!   Kernel   [2024-03-07] More coherent naming of functions determining if a
                            symbol is a Frama-C built-in.

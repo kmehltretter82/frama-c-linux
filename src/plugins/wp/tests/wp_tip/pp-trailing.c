@@ -8,8 +8,8 @@
 */
 
 /*@
-  strategy Prover: \prover("alt-ergo",0.1);
-  strategy Lazy:
+  \wp::strategy Prover: \prover("alt-ergo",0.1);
+  \wp::strategy Lazy:
     Prover,
     \tactic("Wp.overflow"
       ,\pattern(\any(P(_, (..)),Q((..))))

@@ -1,0 +1,6 @@
+[kernel:acsl-extension] Warning: 
+  Trying to register ACSL extension foo twice. Ignoring second extension
+[kernel] Parsing Extend_conflict.i (no preprocessing)
+[kernel] Extend_conflict.i:7: User Error: 
+  Extension 'foo' is from myplugin and not eva
+[kernel] Frama-C aborted: invalid user input.
