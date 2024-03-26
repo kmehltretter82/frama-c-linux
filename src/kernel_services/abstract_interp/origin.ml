@@ -159,7 +159,7 @@ let is_current = function
    current location. *)
 let register_write bases t =
   if is_unknown t then false else
-    let current_loc = Cil.CurrentLoc.get () in
+    let current_loc = Current_loc.get () in
     let is_new = not (History.mem t) in
     let change (w, r, b) =
       LocSet.add current_loc w, r, Base.SetLattice.join b bases
@@ -171,7 +171,7 @@ let register_write bases t =
 (* Registers a read only if the current location is not that of the origin. *)
 let register_read bases t =
   if not (is_unknown t || is_current t) then
-    let current_loc = Cil.CurrentLoc.get () in
+    let current_loc = Current_loc.get () in
     let change (w, r, b) =
       w, LocSet.add current_loc r, Base.SetLattice.join b bases
     in
