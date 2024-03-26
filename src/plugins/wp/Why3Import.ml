@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 module C = Cil_types
+module Cpp = Cil_printer
 module L = Wp_parameters
 module T = Why3.Theory
 module F = Filepath.Normalized
@@ -48,6 +49,9 @@ let pp_id_loc fmt (id : W.Ident.ident) =
   match id.id_loc with
   | Some loc -> W.Loc.pp_position fmt loc
   | None -> L.debug ~level:0 "No location found"
+
+let pp_lti fmt (lti : C.logic_type_info) =
+  Cpp.pp_logic_type_info fmt lti
 
 type tenv = C.logic_type_info W.Ty.Hts.t
 type tvars = C.logic_type W.Ty.Mtv.t
@@ -82,9 +86,18 @@ and ls_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
         lt_attr = [];
       }
     in W.Ty.Hts.add tenv ts lti ; lti
+(* and lt_def_of_ts () (ts : W.Ty.tysymbol)  =
+   match ts.ts_def with
+   | NoDef | Range _ | Float _ -> None
+   | Alias ty ->
+    let tvars =
+      List.fold_left
+        (fun (tvs: tvars) (tv: W.Ty.tvsymbol) ->
+           W.Ty.Mtv.add tv (C.Lvar tv.tv_name.id_string) tvs
+        ) W.Ty.Mtv.empty ts.ts_args
+        in (ty, tvars) *)
 
-
-let import_theory env thname =
+let import_theory env (tenv:tenv) thname =
   let theory_name, theory_path = extract_path thname in
   try
     let theory = W.Env.read_theory env theory_path theory_name in
@@ -95,7 +108,9 @@ let import_theory env thname =
             match decl.d_node with
             | Dtype ts ->
               L.debug ~level:0 "Decl and type %a.@"  pp_id ts.ts_name;
-              L.debug ~level:0 "Location %a.@"  pp_id_loc ts.ts_name
+              L.debug ~level:0 "Location %a.@"  pp_id_loc ts.ts_name;
+              let lti =  ls_of_ts  tenv ts in
+              L.debug ~level:0 "Correspondign LTI %a.@" pp_lti lti;
             | Ddata ddatas ->
               List.iter
                 (fun ((ts, _) : W.Decl.data_decl) ->
@@ -124,7 +139,10 @@ let () =
   Boot.Main.extend
     begin fun () ->
       let env = create_why3_env @@ L.Library.get () in
-      List.iter (import_theory env) @@ L.Import.get ()
+      let tenv : tenv = W.Ty.Hts.create 3 in
+      List.iter (import_theory env tenv) @@ L.Import.get ();
+      Seq.iter (fun (lti : C.logic_type_info) -> L.debug "LTI %a.@" pp_lti lti ) (W.Ty.Hts.to_seq_values tenv);
+      L.debug ~level:0 "Length of type environment : %d " (W.Ty.Hts.length tenv);
     end
 
 (* -------------------------------------------------------------------------- *)
