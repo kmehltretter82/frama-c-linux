@@ -192,9 +192,9 @@ module Extensions = struct
     let ext_common = find_common name in
     let plugin = ext_common.plugin in
     let full_name =
-      if Datatype.String.equal plugin "kernel" then name
-      else
-        Format.sprintf "\\%s::%s" plugin name
+      if Datatype.String.equal plugin "kernel"
+      then name
+      else Format.sprintf "\\%s::%s" plugin name
     in
     let pp = ext_common.printer printer in
     match kind with
