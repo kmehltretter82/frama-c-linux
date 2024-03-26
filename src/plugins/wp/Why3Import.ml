@@ -49,27 +49,6 @@ let pp_id_loc fmt (id : W.Ident.ident) =
   | Some loc -> W.Loc.pp_position fmt loc
   | None -> L.debug ~level:0 "No location found"
 
-
-
-(* logic_type =
-   | Ctype of typ (** a C type *)
-   | Ltype of logic_type_info * logic_type list
-   (** an user-defined logic type with its parameters *)
-   | Lvar of string (** a type variable. *)
-   | Linteger (** mathematical integers, {i i.e.} Z *)
-   | Lreal    (** mathematical reals, {i i.e.} R *)
-   | Larrow of logic_type list * logic_type (** (n-ary) function type *)*)
-
-(*logic_type_info = {
-  mutable lt_name: string;
-  lt_params : string list; (** type parameters*)
-  mutable lt_def: logic_type_def option;
-  (** definition of the type. None for abstract types. *)
-  mutable lt_attr: attributes;
-  (** attributes associated to the logic type.
-      @since Phosphorus-20170501-beta1 *)
-  }*)
-
 type tenv = C.logic_type_info W.Ty.Hts.t
 type tvars = C.logic_type W.Ty.Mtv.t
 
@@ -104,28 +83,6 @@ and ls_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
       }
     in W.Ty.Hts.add tenv ts lti ; lti
 
-let rec _lt_of_ts (ty : W.Ty.ty)  =
-  match ty.ty_node with
-  | W.Ty.Tyvar tvs ->
-    (* Tvs *)
-    L.debug ~level:0 "Tvsymbol %a.@"  pp_id tvs.tv_name;
-    L.debug ~level:0 "Tvsymbol location %a.@"  pp_id_loc tvs.tv_name;
-    (* Cil_types.Linteger *)
-  | W.Ty.Tyapp (tys,tyl) ->
-    L.debug ~level:0 "Tysymbol %a.@"  pp_id tys.ts_name;
-    L.debug ~level:0 "Tysymbol location %a.@"  pp_id_loc tys.ts_name;
-    (*lti_of_ls (?)*)
-    List.iter (fun ty -> _lt_of_ts ty ) tyl;
-    (* Cil_types.Lreal *)
-and _lti_of_ls (tys : W.Ty.tysymbol) : Cil_types.logic_type_info  =
-  {
-    lt_name = tys.ts_name.id_string;
-    lt_params = List.map (fun (tvs : W.Ty.tvsymbol )->
-        tvs.tv_name.id_string
-      ) tys.ts_args;
-    lt_def = None;
-    lt_attr = [];
-  }
 
 let import_theory env thname =
   let theory_name, theory_path = extract_path thname in
