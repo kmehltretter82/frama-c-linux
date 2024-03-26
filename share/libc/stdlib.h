@@ -70,26 +70,26 @@ typedef struct __fc_lldiv_t {
 #define MB_CUR_MAX __FC_MB_CUR_MAX
 
 /*@
-  requires valid_nptr: \valid_read(nptr); // cannot be precise, valid_read_string too strong
-  assigns \result \from indirect:nptr, indirect:nptr[0 ..];
+  requires valid_nptr: valid_read_string(nptr);
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)];
  */
 extern double atof(const char *nptr);
 
 /*@
-  requires valid_nptr: \valid_read(nptr); // cannot be precise, valid_read_string too strong
-  assigns \result \from indirect:nptr, indirect:nptr[0 ..];
+  requires valid_nptr: valid_read_string(nptr);
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)];
  */
 extern int atoi(const char *nptr);
 
 /*@
-  requires valid_nptr: \valid_read(nptr); // cannot be precise, valid_read_string too strong
-  assigns \result \from indirect:nptr, indirect:nptr[0 ..];
+  requires valid_nptr: valid_read_string(nptr);
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)];
  */
 extern long int atol(const char *nptr);
 
 /*@
-  requires valid_nptr: \valid_read(nptr); // cannot be precise, valid_read_string too strong
-  assigns \result \from indirect:nptr, indirect:nptr[0 ..];
+  requires valid_nptr: valid_read_string(nptr);
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)];
  */
 extern long long int atoll(const char *nptr);
 
@@ -98,19 +98,21 @@ extern long long int atoll(const char *nptr);
 /*@
   requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
-  assigns \result \from indirect:nptr, indirect:nptr[0 ..];
-  assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr;
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)];
+  assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                        indirect:endptr;
   behavior no_storage:
     assumes null_endptr: endptr == \null;
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..];
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)];
   behavior store_position:
     assumes nonnull_endptr: endptr != \null;
     requires valid_endptr: \valid(endptr);
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..];
-    assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)];
+    assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:endptr;
     ensures initialization: \initialized(endptr);
     ensures valid_endptr_content: \valid_read(*endptr);
-    ensures position_subset: \subset(*endptr, nptr + (0 ..));
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
   complete behaviors;
   disjoint behaviors;
 */
@@ -120,19 +122,20 @@ extern double strtod(const char * restrict nptr,
 /*@
   requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
-  assigns \result \from indirect:nptr, indirect:nptr[0 ..];
-  assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr;
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)];
+  assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                        indirect:endptr;
   behavior no_storage:
     assumes null_endptr: endptr == \null;
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..];
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)];
   behavior store_position:
     assumes nonnull_endptr: endptr != \null;
     requires valid_endptr: \valid(endptr);
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..];
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)];
     assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr;
     ensures initialization: \initialized(endptr);
     ensures valid_endptr_content: \valid_read(*endptr);
-    ensures position_subset: \subset(*endptr, nptr + (0 ..));
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
   complete behaviors;
   disjoint behaviors;
 */
@@ -142,19 +145,21 @@ extern float strtof(const char * restrict nptr,
 /*@
   requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
-  assigns \result \from indirect:nptr, indirect:nptr[0 ..];
-  assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr;
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)];
+  assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                        indirect:endptr;
   behavior no_storage:
     assumes null_endptr: endptr == \null;
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..];
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)];
   behavior store_position:
     assumes nonnull_endptr: endptr != \null;
     requires valid_endptr: \valid(endptr);
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..];
-    assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)];
+    assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:endptr;
     ensures initialization: \initialized(endptr);
     ensures valid_endptr_content: \valid_read(*endptr);
-    ensures position_subset: \subset(*endptr, nptr + (0 ..));
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
   complete behaviors;
   disjoint behaviors;
 */
@@ -166,19 +171,24 @@ extern long double strtold(const char * restrict nptr,
   requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
   requires base_range: base == 0 || 2 <= base <= 36;
-  assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
-  assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr, indirect:base;
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                        indirect:base;
+  assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                        indirect:endptr, indirect:base;
   behavior no_storage:
     assumes null_endptr: endptr == \null;
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
   behavior store_position:
     assumes nonnull_endptr: endptr != \null;
     requires valid_endptr: \valid(endptr);
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
-    assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr, indirect:base;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:endptr, indirect:base;
     ensures initialization: \initialized(endptr);
     ensures valid_endptr_content: \valid_read(*endptr);
-    ensures position_subset: \subset(*endptr, nptr + (0 ..));
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
   complete behaviors;
   disjoint behaviors;
 */
@@ -191,19 +201,24 @@ extern long int strtol(
   requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
   requires base_range: base == 0 || 2 <= base <= 36;
-  assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
-  assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr, indirect:base;
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                        indirect:base;
+  assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                        indirect:endptr, indirect:base;
   behavior no_storage:
     assumes null_endptr: endptr == \null;
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
   behavior store_position:
     assumes nonnull_endptr: endptr != \null;
     requires valid_endptr: \valid(endptr);
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
-    assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr, indirect:base;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:endptr, indirect:base;
     ensures initialization: \initialized(endptr);
     ensures valid_endptr_content: \valid_read(*endptr);
-    ensures position_subset: \subset(*endptr, nptr + (0 ..));
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
   complete behaviors;
   disjoint behaviors;
 */
@@ -216,19 +231,24 @@ extern long long int strtoll(
   requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
   requires base_range: base == 0 || 2 <= base <= 36;
-  assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
-  assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr, indirect:base;
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                        indirect:base;
+  assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                        indirect:endptr, indirect:base;
   behavior no_storage:
     assumes null_endptr: endptr == \null;
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
   behavior store_position:
     assumes nonnull_endptr: endptr != \null;
     requires valid_endptr: \valid(endptr);
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
-    assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr, indirect:base;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:endptr, indirect:base;
     ensures initialization: \initialized(endptr);
     ensures valid_endptr_content: \valid_read(*endptr);
-    ensures position_subset: \subset(*endptr, nptr + (0 ..));
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
   complete behaviors;
   disjoint behaviors;
 */
@@ -241,19 +261,24 @@ extern unsigned long int strtoul(
   requires valid_string_nptr: valid_read_string(nptr);
   requires separation: \separated(nptr, endptr);
   requires base_range: base == 0 || 2 <= base <= 36;
-  assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
-  assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr, indirect:base;
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                        indirect:base;
+  assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                        indirect:endptr, indirect:base;
   behavior no_storage:
     assumes null_endptr: endptr == \null;
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
   behavior store_position:
     assumes nonnull_endptr: endptr != \null;
     requires valid_endptr: \valid(endptr);
-    assigns \result \from indirect:nptr, indirect:nptr[0 ..], indirect:base;
-    assigns *endptr \from nptr, indirect:nptr[0 ..], indirect:endptr, indirect:base;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. strlen(nptr)],
+                          indirect:endptr, indirect:base;
     ensures initialization: \initialized(endptr);
     ensures valid_endptr_content: \valid_read(*endptr);
-    ensures position_subset: \subset(*endptr, nptr + (0 ..));
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
   complete behaviors;
   disjoint behaviors;
 */
@@ -266,9 +291,10 @@ extern unsigned long long int strtoull(
 const unsigned long __fc_rand_max = __FC_RAND_MAX;
 
 /* ISO C: 7.20.2 */
-/*@ assigns \result \from __fc_random_counter ;
-  @ assigns __fc_random_counter \from __fc_random_counter ;
-  @ ensures result_range: 0 <= \result <= __fc_rand_max ;
+/*@
+  assigns \result \from indirect:__fc_random_counter;
+  assigns __fc_random_counter \from __fc_random_counter;
+  ensures result_range: 0 <= \result <= __fc_rand_max;
 */
 extern int rand(void);
 
@@ -276,7 +302,7 @@ extern int rand(void);
 extern void srand(unsigned int seed);
 
 /*@
-  assigns \result \from __fc_random_counter;
+  assigns \result \from indirect:__fc_random_counter;
   ensures result_range: 0 <= \result <= __fc_rand_max;
 */
 extern long int random(void);
@@ -298,8 +324,9 @@ unsigned short *__fc_p_random48_counter = __fc_random48_counter;
 extern void srand48 (long int seed);
 
 /*@
+  requires valid_seed16v: \valid(seed16v+(0..2));
   requires initialization:initialized_seed16v: \initialized(seed16v+(0..2));
-  assigns __fc_random48_counter[0..2] \from indirect:seed16v[0..2];
+  assigns __fc_random48_counter[0..2] \from seed16v[0..2];
   assigns __fc_random48_init \from \nothing;
   assigns \result \from __fc_p_random48_counter;
   ensures random48_initialized: __fc_random48_init == 1;
@@ -308,7 +335,9 @@ extern void srand48 (long int seed);
 extern unsigned short *seed48(unsigned short seed16v[3]);
 
 /*@
-  assigns __fc_random48_counter[0..2] \from param[0..5];
+  requires valid_param: \valid(param+(0..6));
+  requires initialization:initialized_param: \initialized(param+(0..6));
+  assigns __fc_random48_counter[0..2] \from param[0..6];
   assigns __fc_random48_init \from \nothing;
   ensures random48_initialized: __fc_random48_init == 1;
 */
@@ -323,6 +352,7 @@ extern void lcong48(unsigned short param[7]);
 extern double drand48(void);
 
 /*@
+  requires valid_xsubi: \valid(xsubi+(0..2));
   requires initialization:initialized_xsubi: \initialized(xsubi+(0..2));
   assigns __fc_random48_counter[0..2] \from __fc_random48_counter[0..2];
   assigns \result \from __fc_random48_counter[0..2];
@@ -339,6 +369,7 @@ extern double erand48(unsigned short xsubi[3]);
 extern long int lrand48 (void);
 
 /*@
+  requires valid_xsubi: \valid(xsubi+(0..2));
   requires initialization:initialized_xsubi: \initialized(xsubi+(0..2));
   assigns __fc_random48_counter[0..2] \from __fc_random48_counter[0..2];
   assigns \result \from __fc_random48_counter[0..2];
@@ -355,6 +386,7 @@ extern long int nrand48 (unsigned short xsubi[3]);
 extern long int mrand48 (void);
 
 /*@
+  requires valid_xsubi: \valid(xsubi+(0..2));
   requires initialization:initialized_xsubi: \initialized(xsubi+(0..2));
   assigns __fc_random48_counter[0..2] \from __fc_random48_counter[0..2];
   assigns \result \from __fc_random48_counter[0..2];
@@ -520,8 +552,10 @@ extern char *__fc_env[ARG_MAX];
 
 /*@
   requires valid_name: valid_read_string(name);
-  assigns \result \from __fc_env[0..], indirect:name, name[0 ..];
-  ensures null_or_valid_result: \result == \null || \valid(\result);
+  assigns \result \from __fc_env[0..], indirect:name,
+                        indirect:name[0 .. strlen(name)];
+  ensures null_or_valid_result:
+    \result == \null || (\valid(\result) && valid_read_string(\result));
  */
 extern char *getenv(const char *name);
 
@@ -535,17 +569,51 @@ extern int putenv(char *string);
 /*@
   requires valid_name: valid_read_string(name);
   requires valid_value: valid_read_string(value);
+  allocates __fc_env[0..];
   assigns \result, __fc_env[0..]
-    \from __fc_env[0..], indirect:name, indirect:name[0 ..],
-          indirect:value, indirect:value[0 ..], indirect:overwrite;
+    \from __fc_env[0..], indirect:name[0 .. strlen(name)],
+    indirect:value[0 .. strlen(value)], indirect:overwrite;
+  assigns __fc_env[0..][0..] \from name[0 .. strlen(name)],
+                                   value[0 .. strlen(value)],
+                                   indirect:__fc_env[0..],
+                                   indirect:overwrite;
   ensures result_ok_or_error: \result == 0 || \result == -1;
+  behavior invalid_name:
+    assumes name_empty_or_with_equals_sign:
+      strlen(name) == 0 || strchr(name, '=');
+    allocates \nothing;
+    assigns \result \from indirect:name[0 .. strlen(name)];
+    assigns __fc_errno \from indirect:name[0 .. strlen(name)];
+    ensures error: \result == -1;
+    ensures errno_set: __fc_errno == EINVAL;
+  behavior out_of_memory:
+    assumes not_enough_memory: !is_allocable(strlen(name) + strlen(value) + 2);
+    allocates \nothing;
+    assigns \result, __fc_errno \from indirect:name[0 .. strlen(name)],
+                                      indirect:value[0 .. strlen(value)],
+                                      indirect:overwrite;
+    ensures error: \result == -1;
+    ensures errno_set: __fc_errno == ENOMEM;
+  behavior ok:
+    assumes name_not_empty: strlen(name) > 0;
+    assumes name_has_no_equals_sign: !strchr(name, '=');
+    assumes enough_memory: is_allocable(strlen(name) + strlen(value) + 2);
+    allocates __fc_env[0..];
+    assigns \result, __fc_env[0..]
+      \from __fc_env[0..], indirect:name[0 .. strlen(name)],
+            indirect:value[0 .. strlen(value)], indirect:overwrite;
+    assigns __fc_env[0..][0..] \from name[0 .. strlen(name)],
+                                     value[0 .. strlen(value)],
+                                     indirect:__fc_env[0..],
+                                     indirect:overwrite;
+    ensures ok: \result == 0;
 */
 extern int setenv(const char *name, const char *value, int overwrite);
 
 /*@
   requires valid_name: valid_read_string(name);
   assigns \result, __fc_env[0..]
-    \from __fc_env[0..], indirect:name, indirect:name[0 ..];
+    \from __fc_env[0..], indirect:name, indirect:name[0 .. strlen(name)];
   ensures result_ok_or_error: \result == 0 || \result == -1;
 */
 extern int unsetenv(const char *name);
@@ -559,7 +627,8 @@ extern void quick_exit(int status) __attribute__ ((__noreturn__));
 /*@
   requires null_or_valid_string_command:
      command == \null || valid_read_string(command);
-  assigns \result \from indirect:command, indirect:command[0 ..];
+  assigns \result \from indirect:command,
+                        indirect:command[0 .. strlen(command)];
 */
 extern int system(const char *command);
 
@@ -638,11 +707,25 @@ extern long int labs(long int j);
  */
 extern long long int llabs(long long int j);
 
-/*@ assigns \result \from numer,denom ; */
+/*@
+  requires denom_nonzero: denom != 0;
+  requires no_overflow: !(numer == INT_MIN && denom == -1);
+  assigns \result \from numer, denom;
+*/
 extern div_t div(int numer, int denom);
-/*@ assigns \result \from numer,denom ; */
+
+/*@
+  requires denom_nonzero: denom != 0;
+  requires no_overflow: !(numer == LONG_MIN && denom == -1);
+  assigns \result \from numer, denom;
+*/
 extern ldiv_t ldiv(long int numer, long int denom);
-/*@ assigns \result \from numer,denom ; */
+
+/*@
+  requires denom_nonzero: denom != 0;
+  requires no_overflow: !(numer == LLONG_MIN && denom == -1);
+  assigns \result \from numer, denom;
+*/
 extern lldiv_t lldiv(long long int numer, long long int denom);
 
 /* ISO C: 7.20.7 */

@@ -12,6 +12,8 @@ int compare_int(const void *a, const void *b) {
   return (*(int*)a < *(int*)b) ? -1 : (*(int*)a > *(int*)b);
 }
 
+char putenv_buf[30] = "PATH3=/:/foo:/bar:";
+
 volatile int nondet;
 int main() {
   int base = nondet ? 0 : nondet ? 2 : 36;
@@ -122,5 +124,26 @@ int main() {
   l = lrand48();
   //@ assert 0 <= l < 2147483648;
 
+  char *path = getenv("PATH");
+  if (path) {
+    //@ check imprecise: valid_read_string(path);
+  }
+  int setenv_res = setenv("PATH2", "/", 0);
+  //@ check setenv_res == -1 || setenv_res == 0;
+  int putenv_res = putenv(putenv_buf);
+
+  div_t div_res;
+  if (nondet) {
+    div_res = div(1, 0);
+    //@ check unreachable: \false;
+  }
+  if (nondet) {
+    div_res = div(INT_MIN, -1);
+    //@ check unreachable: \false;
+  }
+  div_res = div(INT_MAX, -1);
+
+  ldiv_t ldiv_res = ldiv(LONG_MAX, -1);
+  lldiv_t lldiv_res = lldiv(LLONG_MAX, -1);
   return 0;
 }

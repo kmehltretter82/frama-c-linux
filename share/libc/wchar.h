@@ -273,7 +273,7 @@ extern int wcscasecmp(const wchar_t *ws1, const wchar_t *ws2);
   assigns \result \from indirect:ws[0..wcslen(ws)], indirect:__fc_heap_status;
   behavior allocation:
     assumes can_allocate: is_allocable(wcslen(ws));
-    assigns __fc_heap_status \from indirect:ws[0 .. wcslen(ws),
+    assigns __fc_heap_status \from indirect:ws[0 .. wcslen(ws)],
                                    __fc_heap_status;
     assigns \result \from indirect:ws[0..wcslen(ws)], indirect:__fc_heap_status;
     ensures allocation: \fresh(\result,wcslen(ws) * sizeof(wchar_t));

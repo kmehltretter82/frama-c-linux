@@ -36,6 +36,7 @@ __PUSH_FC_STDLIB
 #define	GLOB_APPEND	(1 << 5)/* Append to results of a previous call.  */
 #define	GLOB_NOESCAPE	(1 << 6)/* Backslashes don't quote metacharacters.  */
 #define	GLOB_PERIOD	(1 << 7)/* Leading `.' can be matched by metachars.  */
+#define	GLOB_MAGCHAR	(1 << 8)/* GNU-specific */
 
 #define	GLOB_NOSPACE	1	/* Ran out of memory.  */
 #define	GLOB_ABORTED	2	/* Read error.  */
