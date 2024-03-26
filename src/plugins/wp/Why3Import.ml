@@ -20,6 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module C = Cil_types
 module L = Wp_parameters
 module T = Why3.Theory
 module F = Filepath.Normalized
@@ -68,6 +69,40 @@ let pp_id_loc fmt (id : W.Ident.ident) =
   (** attributes associated to the logic type.
       @since Phosphorus-20170501-beta1 *)
   }*)
+
+type tenv = C.logic_type_info W.Ty.Hts.t
+type tvars = C.logic_type W.Ty.Mtv.t
+
+let rec lt_of_ty (tenv : tenv) (tvs : tvars) (ty: W.Ty.ty) : C.logic_type =
+  match ty.ty_node with
+  | Tyvar x -> W.Ty.Mtv.find x tvs
+  | Tyapp(s,ts) -> C.Ltype( ls_of_ts tenv s, List.map (lt_of_ty tenv tvs) ts)
+
+and ls_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
+  try W.Ty.Hts.find tenv ts with Not_found ->
+    let lt_params =
+      List.map
+        (fun (tv : W.Ty.tvsymbol) -> tv.tv_name.id_string)
+        ts.ts_args in
+    let lt_def =
+      match ts.ts_def with
+      | NoDef | Range _ | Float _ -> None
+      | Alias ty ->
+        let tvars =
+          List.fold_left
+            (fun (tvs: tvars) (tv: W.Ty.tvsymbol) ->
+               W.Ty.Mtv.add tv (C.Lvar tv.tv_name.id_string) tvs
+            ) W.Ty.Mtv.empty ts.ts_args
+        in
+        Some (C.LTsyn (lt_of_ty tenv tvars ty))
+    in
+    let lti =
+      C.{
+        lt_name = ts.ts_name.id_string;
+        lt_params ; lt_def ;
+        lt_attr = [];
+      }
+    in W.Ty.Hts.add tenv ts lti ; lti
 
 let rec _lt_of_ts (ty : W.Ty.ty)  =
   match ty.ty_node with
