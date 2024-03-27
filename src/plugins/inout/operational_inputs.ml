@@ -514,26 +514,24 @@ let get_external_aux ?stmt kf =
         r
       else !ref_get_external kf
 
-let extract_inout_from_froms froms =
-  let open Function_Froms in
-  let {deps_return; deps_table } = froms in
-  let in_return = Deps.to_zone deps_return in
+let extract_inout_from_froms assigns =
+  let Eva.Assigns.{ return = deps_return; memory = deps_table } = assigns in
+  let in_return = Eva.Deps.to_zone deps_return in
   let in_, out_ =
     match deps_table with
-    | Memory.Top -> Zone.top, Zone.top
-    | Memory.Bottom -> Zone.bottom, Zone.bottom
-    | Memory.Map m ->
+    | Top -> Zone.top, Zone.top
+    | Bottom -> Zone.bottom, Zone.bottom
+    | Map m ->
       let aux_from out in_ (acc_in,acc_out as acc) =
-        let open DepsOrUnassigned in
         (* Skip zones fully unassigned, they are not really port of the
            dependencies, but just present in the offsetmap to avoid "holes" *)
-        match in_ with
+        match (in_ : Eva.Assigns.DepsOrUnassigned.t) with
         | DepsBottom | Unassigned -> acc
         | AssignedFrom in_ | MaybeAssignedFrom in_ ->
-          Zone.join acc_in (Deps.to_zone in_),
+          Zone.join acc_in (Eva.Deps.to_zone in_),
           Zone.join acc_out out
       in
-      Memory.fold aux_from m (Zone.bottom, Zone.bottom)
+      Eva.Assigns.Memory.fold aux_from m (Zone.bottom, Zone.bottom)
   in
   (Zone.join in_return in_), out_
 

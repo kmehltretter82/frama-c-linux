@@ -177,14 +177,6 @@ val lval_deps : Cil_types.lval -> request -> Locations.Zone.t
     evaluate the given lvalue, excluding the lvalue zone itself. *)
 val address_deps : Cil_types.lval -> request -> Locations.Zone.t
 
-(** Memory dependencies of an expression. *)
-type deps = Function_Froms.Deps.deps = {
-  data: Locations.Zone.t;
-  (** Memory zone directly required to evaluate the given expression. *)
-  indirect: Locations.Zone.t;
-  (** Memory zone read to compute data addresses. *)
-}
-
 (** Taint of a memory zone, according to the taint domain. *)
 type taint =
   | Direct
@@ -203,7 +195,7 @@ val is_tainted : Locations.Zone.t -> request -> (taint, error) Result.t
 
 (** Computes (an overapproximation of) the memory dependencies of an
     expression. *)
-val expr_dependencies : Cil_types.exp -> request -> deps
+val expr_dependencies : Cil_types.exp -> request -> Deps.t
 
 (** Evaluation *)
 

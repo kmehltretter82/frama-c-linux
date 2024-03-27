@@ -327,7 +327,7 @@ module EvaTaints = struct
 
   let evaluate expr request =
     let (let+) = Option.bind in
-    let { data ; indirect } = expr_dependencies expr request in
+    let Deps.{ data ; indirect } = expr_dependencies expr request in
     let+ data = is_tainted data request |> Result.to_option in
     let+ indirect = is_tainted indirect request |> Result.to_option in
     Some (data, indirect)

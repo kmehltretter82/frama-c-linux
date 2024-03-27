@@ -566,7 +566,7 @@ let finalize_pdg pdg from_opt =
      (* TODO : also add the nodes for the other from ! *)
      let state = match last_state with Some s -> s | None -> assert false in
      let process_out out deps s =
-       let open Function_Froms.DepsOrUnassigned in
+       let open Eva.Assigns.DepsOrUnassigned in
        if (equal Unassigned deps)
        then s
        else
@@ -574,24 +574,23 @@ let finalize_pdg pdg from_opt =
          let default = may_be_unassigned deps in
          add_from pdg state s out (default, from_out)
      in
-     let from_table = froms.Function_Froms.deps_table in
+     let from_table = froms.Eva.Assigns.memory in
      let new_state =
-       if Function_Froms.Memory.is_bottom from_table then
+       if Eva.Assigns.Memory.is_bottom from_table then
          Pdg_state.bottom
        else
          let new_state =
            match from_table with
-           | Function_Froms.Memory.Top ->
+           | Top ->
              process_out
-               Locations.Zone.top Function_Froms.DepsOrUnassigned.top state
-           | Function_Froms.Memory.Map m ->
-             Function_Froms.Memory.fold_fuse_same process_out m state
-           | Function_Froms.Memory.Bottom -> assert false (* checked above *)
+               Locations.Zone.top Eva.Assigns.DepsOrUnassigned.top state
+           | Map m ->
+             Eva.Assigns.Memory.fold_fuse_same process_out m state
+           | Bottom -> assert false (* checked above *)
          in
          if not (Kernel_function.returns_void pdg.fct) then begin
-           let from0 = froms.Function_Froms.deps_return in
-           let deps_ret = Function_Froms.Memory.collapse_return from0 in
-           let deps_ret = Function_Froms.Deps.to_zone deps_ret in
+           let deps_ret = froms.Eva.Assigns.return in
+           let deps_ret = Eva.Deps.to_zone deps_ret in
            ignore
              (create_fun_output_node pdg (Some new_state) deps_ret)
          end;
@@ -648,49 +647,44 @@ let process_args pdg st stmt argl =
     and [new_state] the state to modify.
  * Process call outputs (including returned value) *)
 let call_outputs  pdg state_before_call state_with_inputs stmt
-    lvaloption froms fct_dpds =
+    lvaloption assigns fct_dpds =
   (* obtain inputs from state_with_inputs
      to avoid mixing in and out *)
-  let froms_deps_return = froms.Function_Froms.deps_return in
-  let from_table = froms.Function_Froms.deps_table in
+  let Eva.Assigns.{ return = return_deps; memory = memory_deps } = assigns in
   let print_outputs fmt =
     Format.fprintf fmt "call outputs  : %a"
-      Function_Froms.Memory.pretty from_table;
+      Eva.Assigns.Memory.pretty memory_deps;
     if not (lvaloption = None) then
       Format.fprintf fmt "\t and \\result %a@."
-        Function_Froms.Deps.pretty froms_deps_return
+        Eva.Deps.pretty return_deps
   in
   debug "%t" print_outputs;
 
   let process_out out deps state =
-    if Function_Froms.DepsOrUnassigned.(equal Unassigned deps) then
+    if Eva.Assigns.DepsOrUnassigned.(equal Unassigned deps) then
       state
     else
-      let from_out = Function_Froms.DepsOrUnassigned.to_zone deps in
-      let default = Function_Froms.DepsOrUnassigned.may_be_unassigned deps in
+      let from_out = Eva.Assigns.DepsOrUnassigned.to_zone deps in
+      let default = Eva.Assigns.DepsOrUnassigned.may_be_unassigned deps in
       process_call_output
         pdg state_with_inputs state stmt out default from_out fct_dpds
   in
-  if Function_Froms.Memory.is_bottom from_table then
+  if Eva.Assigns.Memory.is_bottom memory_deps then
     Pdg_state.bottom
   else
     let state_with_outputs =
-      let open Function_Froms in
-      match from_table with
-      | Memory.Top ->
+      match memory_deps with
+      | Top ->
         process_out
-          Locations.Zone.top DepsOrUnassigned.top state_before_call
-      | Memory.Bottom -> assert false (* checked above *)
-      | Memory.Map m ->
-        Memory.fold_fuse_same process_out m state_before_call
+          Locations.Zone.top Eva.Assigns.DepsOrUnassigned.top state_before_call
+      | Bottom -> assert false (* checked above *)
+      | Map m ->
+        Eva.Assigns.Memory.fold_fuse_same process_out m state_before_call
     in
     match lvaloption with
     | None -> state_with_outputs
     | Some lval ->
-      let r_dpds =
-        Function_Froms.Memory.collapse_return froms_deps_return
-      in
-      let r_dpds = Function_Froms.Deps.to_zone r_dpds in
+      let r_dpds = Eva.Deps.to_zone return_deps in
       let (l_loc, exact, l_dpds, l_decl) = get_lval_infos lval stmt in
       process_call_return
         pdg

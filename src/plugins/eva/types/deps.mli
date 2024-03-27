@@ -20,34 +20,44 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Abstract_domain = Abstract_domain
-module Abstract_value = Abstract_value
-module Abstract_location = Abstract_location
-module Abstract = Abstract
-module Abstractions = Abstractions
-module Active_behaviors = Active_behaviors
-module Alarmset = Alarmset
-module Analysis = Analysis
-module Assigns = Assigns
-module Callstack = Callstack
-module Cvalue_domain = Cvalue_domain
-module Cvalue_results = Cvalue_results
-module Domain_builder = Domain_builder
-module Eva_dynamic = Eva_dynamic
-module Eva_results = Eva_results
-module Eva_utils = Eva_utils
-module Eval = Eval
-module Eval_annots = Eval_annots
-module Eval_op = Eval_op
-module Eval_terms = Eval_terms
-module Eval_typ = Eval_typ
-module Function_calls = Function_calls
-module Logic_inout = Logic_inout
-module Main_locations = Main_locations
-module Main_values = Main_values
-module Parameters = Parameters
-module Red_statuses = Red_statuses
-module Results = Results
-module Self = Self
-module Simple_memory = Simple_memory
-module Structure = Structure
+[@@@ api_start]
+
+(** Memory dependencies of an expression. *)
+type t = {
+  data: Locations.Zone.t;
+  (** Memory zone directly required to evaluate the given expression. *)
+  indirect: Locations.Zone.t;
+  (** Memory zone read to compute data addresses. *)
+}
+
+include Datatype.S with type t := t
+
+val pretty_precise: Format.formatter -> t -> unit
+val pretty_debug: Format.formatter -> t -> unit
+
+(* Constructors *)
+
+val top : t
+val bottom : t
+val data : Locations.Zone.t -> t
+val indirect : Locations.Zone.t -> t
+
+(* Conversion *)
+
+val to_zone : t -> Locations.Zone.t
+
+(* Mutators *)
+
+val add_data : t -> Locations.Zone.t -> t
+val add_indirect : t -> Locations.Zone.t -> t
+
+(* Map *)
+
+val map : (Locations.Zone.t -> Locations.Zone.t) -> t -> t
+
+(* Lattice operators *)
+
+val is_included : t -> t -> bool
+val join : t -> t -> t
+val narrow : t -> t -> t
+[@@@ api_end]

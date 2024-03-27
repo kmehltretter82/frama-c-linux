@@ -24,7 +24,7 @@ open Cil_types
 
 let pretty_with_indirect fmt v =
   let deps = Functionwise.get v in
-  Function_Froms.pretty_with_type_indirect (Kernel_function.get_type v) fmt deps
+  From_memory.pretty_with_type_indirect (Kernel_function.get_type v) fmt deps
 
 let display fmtopt =
   Option.iter (fun fmt -> Format.fprintf fmt "@[<v>") fmtopt;
@@ -138,8 +138,8 @@ let print_calldeps () =
        From_parameters.printf ~header
          "@[  %a@]"
          ((if From_parameters.ShowIndirectDeps.get ()
-           then Function_Froms.pretty_with_type_indirect
-           else Function_Froms.pretty_with_type) typ)
+           then From_memory.pretty_with_type_indirect
+           else From_memory.pretty_with_type) typ)
          d);
   From_parameters.feedback "====== END OF CALLWISE DEPENDENCIES ======"
 

@@ -31,7 +31,7 @@ type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers
 type full_result = {
   c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
   c_clobbered: Base.SetLattice.t;
-  c_from: (Function_Froms.froms * Locations.Zone.t) option;
+  c_assigns: (Assigns.t * Locations.Zone.t) option;
 }
 
 type call_result =
@@ -276,7 +276,7 @@ let apply_builtin (builtin:builtin) call ~pre ~post =
     let states = process_result call post call_result in
     let froms =
       match call_result with
-      | Full result -> result.c_from
+      | Full result -> result.c_assigns
       | States _ | Result _ -> None
     in
     let result = `Builtin (List.map fst states, froms) in

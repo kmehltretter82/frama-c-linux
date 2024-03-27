@@ -86,7 +86,7 @@ let clear_caches () =
   Cvalue.Model.clear_caches ();
   Locations.Location_Bytes.clear_caches ();
   Locations.Zone.clear_caches ();
-  Function_Froms.Memory.clear_caches ()
+  Assigns.Memory.clear_caches ()
 
 module type S = sig
   module Analysis : Analysis.S

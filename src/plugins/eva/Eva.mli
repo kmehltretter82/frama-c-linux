@@ -178,6 +178,48 @@ module Callstack: sig
 
 end
 
+module Deps: sig
+
+  (** Memory dependencies of an expression. *)
+  type t = {
+    data: Locations.Zone.t;
+    (** Memory zone directly required to evaluate the given expression. *)
+    indirect: Locations.Zone.t;
+    (** Memory zone read to compute data addresses. *)
+  }
+
+  include Datatype.S with type t := t
+
+  val pretty_precise: Format.formatter -> t -> unit
+  val pretty_debug: Format.formatter -> t -> unit
+
+  (* Constructors *)
+
+  val top : t
+  val bottom : t
+  val data : Locations.Zone.t -> t
+  val indirect : Locations.Zone.t -> t
+
+  (* Conversion *)
+
+  val to_zone : t -> Locations.Zone.t
+
+  (* Mutators *)
+
+  val add_data : t -> Locations.Zone.t -> t
+  val add_indirect : t -> Locations.Zone.t -> t
+
+  (* Map *)
+
+  val map : (Locations.Zone.t -> Locations.Zone.t) -> t -> t
+
+  (* Lattice operators *)
+
+  val is_included : t -> t -> bool
+  val join : t -> t -> t
+  val narrow : t -> t -> t
+end
+
 module Results: sig
 
   (** Eva's result API is a new interface to access the results of an analysis,
@@ -335,14 +377,6 @@ module Results: sig
       evaluate the given lvalue, excluding the lvalue zone itself. *)
   val address_deps : Cil_types.lval -> request -> Locations.Zone.t
 
-  (** Memory dependencies of an expression. *)
-  type deps = Function_Froms.Deps.deps = {
-    data: Locations.Zone.t;
-    (** Memory zone directly required to evaluate the given expression. *)
-    indirect: Locations.Zone.t;
-    (** Memory zone read to compute data addresses. *)
-  }
-
   (** Taint of a memory zone, according to the taint domain. *)
   type taint =
     | Direct
@@ -361,7 +395,7 @@ module Results: sig
 
   (** Computes (an overapproximation of) the memory dependencies of an
       expression. *)
-  val expr_dependencies : Cil_types.exp -> request -> deps
+  val expr_dependencies : Cil_types.exp -> request -> Deps.t
 
   (** Evaluation *)
 
@@ -600,6 +634,63 @@ module Eval: sig
                          callers, can be cached. *)
 end
 
+module Assigns: sig
+
+  module DepsOrUnassigned : sig
+
+    type t =
+      | DepsBottom (** Bottom of the lattice, never bound inside a memory state
+                       at a valid location. (May appear for bases for which the
+                       validity does not start at 0, currently only NULL.) *)
+      | Unassigned (** Location has never been assigned *)
+      | AssignedFrom of Deps.t (** Location guaranteed to have been overwritten,
+                                   its contents depend on the [Deps.t] value *)
+      | MaybeAssignedFrom of Deps.t  (** Location may or may not have been
+                                         overwritten *)
+
+    (** The lattice is [DepsBottom <= Unassigned], [DepsBottom <= AssignedFrom z],
+        [Unassigned <= MaybeAssignedFrom] and
+        [AssignedFrom z <= MaybeAssignedFrom z]. *)
+
+    val top : t
+    val equal : t -> t -> bool
+    val may_be_unassigned : t -> bool
+    val to_zone : t -> Locations.Zone.t
+  end
+
+  module Memory : sig
+    include Lmap_bitwise.Location_map_bitwise with type v = DepsOrUnassigned.t
+
+    val find : t -> Locations.Zone.t -> Locations.Zone.t
+    (** Imprecise version of find, in which data and indirect dependencies are
+        not distinguished *)
+
+    val find_precise : t -> Locations.Zone.t -> Deps.t
+    (** Precise version of find *)
+
+    val find_precise_loffset : LOffset.t -> Base.t -> Int_Intervals.t -> Deps.t
+
+    val add_binding : exact:bool -> t -> Locations.Zone.t -> Deps.t -> t
+    val add_binding_loc : exact:bool -> t -> Locations.location -> Deps.t -> t
+    val add_binding_precise_loc :
+      exact:bool -> Locations.access -> t ->
+      Precise_locs.precise_location -> Deps.t -> t
+  end
+
+  type t = {
+    return : Deps.t
+  (** Dependencies for the returned value *);
+    memory : Memory.t
+  (** Dependencies on all the zones modified by the function *);
+  }
+
+  include Datatype.S with type t := t
+
+  val top : t
+  val join : t -> t -> t
+
+end
+
 module Builtins: sig
 
   (** Eva analysis builtins for the cvalue domain, more efficient than their
@@ -624,9 +715,11 @@ module Builtins: sig
     c_clobbered: Base.SetLattice.t;
     (** An over-approximation of the bases in which addresses of local variables
         might have been written *)
-    c_from: (Function_Froms.froms * Locations.Zone.t) option;
-    (** If not None, the froms of the function, and its sure outputs;
-        i.e. the dependencies of the result and of each zone written to. *)
+    c_assigns: (Assigns.t * Locations.Zone.t) option;
+    (** If not None:
+        - the assigns of the function, i.e. the dependencies of the result
+          and of each zone written to.
+        - and its sure outputs, i.e. an under-approximation of written zones. *)
   }
 
   (** The result of a builtin can be given in different forms. *)
@@ -672,10 +765,11 @@ module Cvalue_callbacks: sig
 
   type state = Cvalue.Model.t
 
-  (** If not None, the froms of the function, and its sure outputs;
-      i.e. the dependencies of the result, and the dependencies
-      of each zone written to. *)
-  type call_froms = (Function_Froms.froms * Locations.Zone.t) option
+  (** If not None:
+      - the assigns of the function, i.e. the dependencies of the result
+        and the dependencies of each zone written to;
+      - and its sure outputs, i.e. an under-approximation of written zones. *)
+  type call_assigns = (Assigns.t * Locations.Zone.t) option
 
   type analysis_kind =
     [ `Builtin (** A cvalue builtin is used to interpret the function. *)
@@ -700,7 +794,7 @@ module Cvalue_callbacks: sig
 
   (** Results of a function call. *)
   type call_results =
-    [ `Builtin of state list * call_froms
+    [ `Builtin of state list * call_assigns
     (** List of cvalue states at the end of the builtin. *)
     | `Spec of state list
     (** List of cvalue states at the end of the call. *)
@@ -767,10 +861,10 @@ module Logic_inout: sig
     Cvalue.Model.t -> Locations.access -> Cil_types.term -> tlval_zones option
 
   (** Evaluate the assigns clauses of the given function in its given pre-state,
-      and compare them with the given froms (computed by the from plugin).
+      and compare them with the dependencies computed by the from plugin.
       Emits warnings if needed, and sets statuses to the assigns clauses. *)
   val verify_assigns:
-    Cil_types.kernel_function -> pre:Cvalue.Model.t -> Function_Froms.froms -> unit
+    Cil_types.kernel_function -> pre:Cvalue.Model.t -> Assigns.t -> unit
 
 
   (** [accept_base ~formals ~locals kf b] returns [true] if and only if [b] is:
