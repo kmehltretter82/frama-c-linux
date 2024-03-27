@@ -30,6 +30,7 @@ import * as States from 'frama-c/states';
 import * as Settings from 'dome/data/settings';
 import { IconButton } from 'dome/controls/buttons';
 import * as Studia from 'frama-c/plugins/studia';
+import * as Wp from 'frama-c/plugins/wp';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { text } from 'frama-c/kernel/api/data';
 import * as Eva from 'frama-c/plugins/eva/api/general';
@@ -546,6 +547,7 @@ function createContextMenuHandler(): Editor.Extension {
         });
       }
       Studia.buildMenu(items, attributes);
+      Wp.buildMenu(items, attributes);
       items.push({
         label: 'Copy to clipboard',
         onClick: () => {

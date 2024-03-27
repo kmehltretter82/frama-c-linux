@@ -382,6 +382,42 @@ let goals =
     gmodel
 
 (* -------------------------------------------------------------------------- *)
+(* --- Generate goals                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+let is_call stmt =
+  match stmt.Cil_types.skind with
+  | Instr (Call _) | Instr (Local_init (_, ConsInit _, _)) -> true
+  | _ -> false
+
+let () =
+  R.register ~package ~kind:`EXEC ~name:"startProofs"
+    ~descr:(Md.plain "Generate goals and run provers")
+    ~input:(module AST.Marker)
+    ~output:(module D.Junit)
+    begin function
+      | PExp _  | PTermLval _ | PLval _
+      | PGlobal _ | PType _ | PVDecl (None, _, _) ->
+        (* We cannot run anything here *) ()
+      | PStmtStart (_, stmt) | PStmt (_, stmt) when is_call stmt ->
+        VC.command @@ VC.generate_call stmt
+      | PStmtStart (kf, stmt) | PStmt (kf, stmt) ->
+        let fold_ips _ ca bag =
+          let ids = WpPropId.mk_code_annot_ids kf stmt ca in
+          let props = Bag.ulist @@
+            List.map VC.generate_ip @@
+            List.map WpPropId.property_of_id ids
+          in
+          Bag.concat bag props
+        in
+        VC.command @@ Annotations.fold_code_annot fold_ips stmt Bag.empty
+      | PVDecl (Some kf, _, _) ->
+        VC.command @@ VC.generate_kf kf
+      | PIP property ->
+        VC.command @@ VC.generate_ip property
+    end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Proof Server                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 

@@ -33,10 +33,33 @@ import { Group, Inset } from 'dome/frame/toolbars';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
+import * as Ast from 'frama-c/kernel/api/ast';
 import { GoalTable } from './goals';
 import { TIPView } from './tip';
 import * as WP from 'frama-c/plugins/wp/api';
 import './style.css';
+
+/* -------------------------------------------------------------------------- */
+/* --- Generate Goals                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+export function buildMenu(
+  menu: Dome.PopupMenuItem[],
+  attr: Ast.markerAttributesData,
+): void {
+  const { marker, kind } = attr;
+  switch (kind) {
+    case 'STMT':
+    case 'LFUN':
+    case 'DFUN':
+    case 'PROPERTY':
+      menu.push({
+        label: `Generate WP Goals`,
+        onClick: () => Server.send(WP.startProofs, marker)
+      });
+      return;
+  }
+}
 
 /* -------------------------------------------------------------------------- */
 /* --- Goal Component                                                     --- */
