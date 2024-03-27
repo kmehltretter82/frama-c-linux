@@ -55,13 +55,16 @@ let pp_lti fmt (lti : C.logic_type_info) =
 
 type tenv = C.logic_type_info W.Ty.Hts.t
 type tvars = C.logic_type W.Ty.Mtv.t
+type _uid_tvars = string W.Ty.Mtv.t
 
 let rec lt_of_ty (tenv : tenv) (tvs : tvars) (ty: W.Ty.ty) : C.logic_type =
+
   match ty.ty_node with
   | Tyvar x -> W.Ty.Mtv.find x tvs
   | Tyapp(s,ts) -> C.Ltype( ls_of_ts tenv s, List.map (lt_of_ty tenv tvs) ts)
 
 and ls_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
+  let temp_env : _uid_tvars = assert false in
   try W.Ty.Hts.find tenv ts with Not_found ->
     let lt_params =
       List.map
@@ -76,18 +79,19 @@ and ls_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
         lt_params ; lt_def ;
         lt_attr = [];
       }
-    in W.Ty.Hts.add tenv ts lti ; lti
+    in W.Ty.Hts.add tenv ts lti ;
+    L.debug ~level:0 "Added LTI %a" pp_lti lti; lti
 and lt_def_of_ts (tenv:tenv) (ts : W.Ty.tysymbol)  =
-match ts.ts_def with
-| NoDef | Range _ | Float _ -> None
-| Alias ty ->
-  let tvars =
-    List.fold_left
-      (fun (tvs: tvars) (tv: W.Ty.tvsymbol) ->
-         W.Ty.Mtv.add tv (C.Lvar tv.tv_name.id_string) tvs
-      ) W.Ty.Mtv.empty ts.ts_args
-  in
-  Some (C.LTsyn (lt_of_ty tenv tvars ty))
+  match ts.ts_def with
+  | NoDef | Range _ | Float _ -> None
+  | Alias ty ->
+    let tvars =
+      List.fold_left
+        (fun (tvs: tvars) (tv: W.Ty.tvsymbol) ->
+           W.Ty.Mtv.add tv (C.Lvar tv.tv_name.id_string) tvs
+        ) W.Ty.Mtv.empty ts.ts_args
+    in
+    Some (C.LTsyn (lt_of_ty tenv tvars ty))
 
 let import_theory env (tenv:tenv) thname =
   let theory_name, theory_path = extract_path thname in
@@ -99,24 +103,24 @@ let import_theory env (tenv:tenv) thname =
           begin
             match decl.d_node with
             | Dtype ts ->
-              L.debug ~level:0 "Decl and type %a.@"  pp_id ts.ts_name;
-              L.debug ~level:0 "Location %a.@"  pp_id_loc ts.ts_name;
+              L.debug ~level:0 "Decl and type %a"  pp_id ts.ts_name;
+              L.debug ~level:0 "Location %a"  pp_id_loc ts.ts_name;
               let lti =  ls_of_ts  tenv ts in
-              L.debug ~level:0 "Correspondign LTI %a.@" pp_lti lti;
+              L.debug ~level:0 "Correspondign LTI %a" pp_lti lti;
             | Ddata ddatas ->
               List.iter
                 (fun ((ts, _) : W.Decl.data_decl) ->
-                   L.debug ~level:0 "Decl and data %a.@" pp_id  ts.ts_name;
-                   L.debug ~level:0 "Location %a.@"  pp_id_loc ts.ts_name
+                   L.debug ~level:0 "Decl and data %a" pp_id  ts.ts_name;
+                   L.debug ~level:0 "Location %a"  pp_id_loc ts.ts_name
                 ) ddatas
             | Dparam ls ->
-              L.debug ~level:0 "Decl and dparam %a.@" pp_id ls.ls_name;
-              L.debug ~level:0 "Location %a.@"  pp_id_loc ls.ls_name
+              L.debug ~level:0 "Decl and dparam %a" pp_id ls.ls_name;
+              L.debug ~level:0 "Location %a"  pp_id_loc ls.ls_name
             | Dlogic dlogics ->
               List.iter
                 (fun ((ls,_):W.Decl.logic_decl) ->
-                   L.debug ~level:0 "Decl and dlogic %a.@" pp_id ls.ls_name;
-                   L.debug ~level:0 "Location %a.@"  pp_id_loc ls.ls_name
+                   L.debug ~level:0 "Decl and dlogic %a" pp_id ls.ls_name;
+                   L.debug ~level:0 "Location %a"  pp_id_loc ls.ls_name
                 ) dlogics
             | _ -> L.debug ~level:0 "Decl but whatever"
           end
@@ -133,7 +137,7 @@ let () =
       let env = create_why3_env @@ L.Library.get () in
       let tenv : tenv = W.Ty.Hts.create 3 in
       List.iter (import_theory env tenv) @@ L.Import.get ();
-      Seq.iter (fun (lti : C.logic_type_info) -> L.debug "LTI %a.@" pp_lti lti ) (W.Ty.Hts.to_seq_values tenv);
+      Seq.iter (fun (lti : C.logic_type_info) -> L.debug "LTI %a" pp_lti lti ) (W.Ty.Hts.to_seq_values tenv);
       L.debug ~level:0 "Length of type environment : %d " (W.Ty.Hts.length tenv);
     end
 
