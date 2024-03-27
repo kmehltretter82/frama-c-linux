@@ -64,14 +64,14 @@ let rec lt_of_ty (tenv : tenv) (tvs : tvars) (ty: W.Ty.ty) : C.logic_type =
   | Tyapp(s,ts) -> C.Ltype( ls_of_ts tenv s, List.map (lt_of_ty tenv tvs) ts)
 
 and ls_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
-  let temp_env : uid_tvars =
-      List.fold_left
-          (fun (tvs: uid_tvars) (tv: W.Ty.tvsymbol) ->
-             W.Ty.Mtv.add tv (tv.tv_name.id_string) tvs
-          ) W.Ty.Mtv.empty ts.ts_args
-    in
-  try W.Ty.Hts.find tenv ts with Not_found ->
 
+  try W.Ty.Hts.find tenv ts with Not_found ->
+    let temp_env : uid_tvars =
+      List.fold_left
+        (fun (tvs: uid_tvars) (tv: W.Ty.tvsymbol) ->
+           W.Ty.Mtv.add tv (tv.tv_name.id_string) tvs
+        ) W.Ty.Mtv.empty ts.ts_args
+    in
     let lt_params =
       List.map
         (fun (tv : W.Ty.tvsymbol) -> tv.tv_name.id_string)
@@ -93,10 +93,10 @@ and lt_def_of_ts (tenv:tenv) (ts : W.Ty.tysymbol) (temp_env : uid_tvars) =
   | Alias ty ->
     let tvars =
       (* List.fold_left
-        (fun (tvs: tvars) (tv: W.Ty.tvsymbol) ->
+         (fun (tvs: tvars) (tv: W.Ty.tvsymbol) ->
            W.Ty.Mtv.add tv (C.Lvar tv.tv_name.id_string) tvs
-        ) W.Ty.Mtv.empty ts.ts_args *)
-        W.Ty.Mtv.map (fun aleph_name -> C.Lvar aleph_name) temp_env
+         ) W.Ty.Mtv.empty ts.ts_args *)
+      W.Ty.Mtv.map (fun aleph_name -> C.Lvar aleph_name) temp_env
     in
     Some (C.LTsyn (lt_of_ty tenv tvars ty))
 
