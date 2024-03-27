@@ -382,6 +382,24 @@ let goals =
     gmodel
 
 (* -------------------------------------------------------------------------- *)
+(* --- Generate RTEs                                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () =
+  R.register ~package ~kind:`EXEC ~name:"generateRTEGuards"
+    ~descr:(Md.plain "Generate RTE guards for the function")
+    ~input:(module AST.Marker)
+    ~output:(module D.Junit)
+    begin function
+      | PVDecl (Some kf, _, _) ->
+        let setup = Factory.parse (Wp_parameters.Model.get ()) in
+        let driver = Driver.load_driver () in
+        let model = Factory.instance setup driver in
+        WpRTE.generate model kf
+      | _ -> ()
+    end
+
+(* -------------------------------------------------------------------------- *)
 (* --- Generate goals                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 

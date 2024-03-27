@@ -41,10 +41,10 @@ import * as WP from 'frama-c/plugins/wp/api';
 import './style.css';
 
 /* -------------------------------------------------------------------------- */
-/* --- Generate Goals                                                     --- */
+/* --- Context Menus                                                      --- */
 /* -------------------------------------------------------------------------- */
 
-function buildMenu(
+function addStartProofMenus(
   menu: Dome.PopupMenuItem[],
   attr: Ast.markerAttributesData,
 ): void {
@@ -62,7 +62,25 @@ function buildMenu(
   }
 }
 
-ASTview.registerMarkerMenuExtender(buildMenu);
+ASTview.registerMarkerMenuExtender(addStartProofMenus);
+
+function addGenerateRTEGuardsMenu(
+  menu: Dome.PopupMenuItem[],
+  attr: Ast.markerAttributesData,
+): void {
+  const { marker, kind } = attr;
+  switch (kind) {
+    case 'LFUN':
+    case 'DFUN':
+      menu.push({
+        label: `Populate WP RTE guards`,
+        onClick: () => Server.send(WP.generateRTEGuards, marker)
+      });
+      return;
+  }
+}
+
+ASTview.registerMarkerMenuExtender(addGenerateRTEGuardsMenu);
 
 /* -------------------------------------------------------------------------- */
 /* --- Goal Component                                                     --- */
