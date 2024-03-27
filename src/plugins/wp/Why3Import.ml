@@ -55,7 +55,7 @@ let pp_lti fmt (lti : C.logic_type_info) =
 
 type tenv = C.logic_type_info W.Ty.Hts.t
 type tvars = C.logic_type W.Ty.Mtv.t
-type _uid_tvars = string W.Ty.Mtv.t
+type uid_tvars = string W.Ty.Mtv.t
 
 let rec lt_of_ty (tenv : tenv) (tvs : tvars) (ty: W.Ty.ty) : C.logic_type =
 
@@ -64,14 +64,20 @@ let rec lt_of_ty (tenv : tenv) (tvs : tvars) (ty: W.Ty.ty) : C.logic_type =
   | Tyapp(s,ts) -> C.Ltype( ls_of_ts tenv s, List.map (lt_of_ty tenv tvs) ts)
 
 and ls_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
-  let temp_env : _uid_tvars = assert false in
+  let temp_env : uid_tvars =
+      List.fold_left
+          (fun (tvs: uid_tvars) (tv: W.Ty.tvsymbol) ->
+             W.Ty.Mtv.add tv (tv.tv_name.id_string) tvs
+          ) W.Ty.Mtv.empty ts.ts_args
+    in
   try W.Ty.Hts.find tenv ts with Not_found ->
+
     let lt_params =
       List.map
         (fun (tv : W.Ty.tvsymbol) -> tv.tv_name.id_string)
         ts.ts_args in
     let lt_def =
-      lt_def_of_ts tenv ts
+      lt_def_of_ts tenv ts temp_env
     in
     let lti =
       C.{
@@ -81,15 +87,16 @@ and ls_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
       }
     in W.Ty.Hts.add tenv ts lti ;
     L.debug ~level:0 "Added LTI %a" pp_lti lti; lti
-and lt_def_of_ts (tenv:tenv) (ts : W.Ty.tysymbol)  =
+and lt_def_of_ts (tenv:tenv) (ts : W.Ty.tysymbol) (temp_env : uid_tvars) =
   match ts.ts_def with
   | NoDef | Range _ | Float _ -> None
   | Alias ty ->
     let tvars =
-      List.fold_left
+      (* List.fold_left
         (fun (tvs: tvars) (tv: W.Ty.tvsymbol) ->
            W.Ty.Mtv.add tv (C.Lvar tv.tv_name.id_string) tvs
-        ) W.Ty.Mtv.empty ts.ts_args
+        ) W.Ty.Mtv.empty ts.ts_args *)
+        W.Ty.Mtv.map (fun aleph_name -> C.Lvar aleph_name) temp_env
     in
     Some (C.LTsyn (lt_of_ty tenv tvars ty))
 
