@@ -2046,6 +2046,8 @@ and reduce_by_valid_string ~alarm_mode env positive ~wide ~access arg =
     let aux base offset acc =
       let value = Cvalue.V.inject base offset in
       let v, alarms = apply_logic_builtin wrapper env [value] in
+      (* Beware of not removing const strings on the negation of \valid_string. *)
+      let alarms = alarms || (access = Write && Base.is_read_only base) in
       if (positive && Cvalue.V.is_bottom v)
       || (not positive && not alarms)
       then acc
