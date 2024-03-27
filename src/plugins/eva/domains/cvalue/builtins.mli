@@ -45,8 +45,10 @@ type full_result = {
   (** An over-approximation of the bases in which addresses of local variables
       might have been written *)
   c_assigns: (Assigns.t * Locations.Zone.t) option;
-  (** If not None, the froms of the function, and its sure outputs;
-      i.e. the dependencies of the result and of each zone written to. *)
+  (** If not None:
+      - the assigns of the function, i.e. the dependencies of the result
+        and of each zone written to.
+      - and its sure outputs, i.e. an under-approximation of written zones. *)
 }
 
 (** The result of a builtin can be given in different forms. *)

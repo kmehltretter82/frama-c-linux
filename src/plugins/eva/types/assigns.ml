@@ -30,6 +30,7 @@ module DepsOrUnassigned = struct
       | AssignedFrom of Deps.t
       | MaybeAssignedFrom of Deps.t
     [@@deriving eq,ord]
+
     let name = "Eva.Froms.DepsOrUnassigned"
 
     let pretty fmt = function
@@ -192,19 +193,25 @@ end
 
 module Datatype_Input = struct
   include Datatype.Serializable_undefined
+
   type t = {
     return : Deps.t;
     memory : Memory.t
   }
   [@@deriving eq,ord]
+
   let name = "Eva.Froms"
+
   let top = {
     return = Deps.top;
     memory = Memory.top;
   }
+
   let reprs = [ top ]
+
   let hash assigns =
     Hashtbl.hash (Memory.hash assigns.memory, Deps.hash assigns.return)
+
   let pretty fmt assigns =
     Format.fprintf fmt "%a@\n\\result FROM @[%a@]@\n"
       Memory.pretty assigns.memory

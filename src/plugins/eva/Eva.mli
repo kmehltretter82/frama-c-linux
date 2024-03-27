@@ -716,8 +716,10 @@ module Builtins: sig
     (** An over-approximation of the bases in which addresses of local variables
         might have been written *)
     c_assigns: (Assigns.t * Locations.Zone.t) option;
-    (** If not None, the froms of the function, and its sure outputs;
-        i.e. the dependencies of the result and of each zone written to. *)
+    (** If not None:
+        - the assigns of the function, i.e. the dependencies of the result
+          and of each zone written to.
+        - and its sure outputs, i.e. an under-approximation of written zones. *)
   }
 
   (** The result of a builtin can be given in different forms. *)
@@ -763,9 +765,10 @@ module Cvalue_callbacks: sig
 
   type state = Cvalue.Model.t
 
-  (** If not None, the froms of the function, and its sure outputs;
-      i.e. the dependencies of the result, and the dependencies
-      of each zone written to. *)
+  (** If not None:
+      - the assigns of the function, i.e. the dependencies of the result
+        and the dependencies of each zone written to;
+      - and its sure outputs, i.e. an under-approximation of written zones. *)
   type call_assigns = (Assigns.t * Locations.Zone.t) option
 
   type analysis_kind =
@@ -858,7 +861,7 @@ module Logic_inout: sig
     Cvalue.Model.t -> Locations.access -> Cil_types.term -> tlval_zones option
 
   (** Evaluate the assigns clauses of the given function in its given pre-state,
-      and compare them with the given froms (computed by the from plugin).
+      and compare them with the dependencies computed by the from plugin.
       Emits warnings if needed, and sets statuses to the assigns clauses. *)
   val verify_assigns:
     Cil_types.kernel_function -> pre:Cvalue.Model.t -> Assigns.t -> unit

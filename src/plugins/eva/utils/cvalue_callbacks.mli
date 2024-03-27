@@ -30,9 +30,10 @@
 
 type state = Cvalue.Model.t
 
-(** If not None, the froms of the function, and its sure outputs;
-    i.e. the dependencies of the result, and the dependencies
-    of each zone written to. *)
+(** If not None:
+    - the assigns of the function, i.e. the dependencies of the result
+      and the dependencies of each zone written to;
+    - and its sure outputs, i.e. an under-approximation of written zones. *)
 type call_assigns = (Assigns.t * Locations.Zone.t) option
 
 type analysis_kind =
