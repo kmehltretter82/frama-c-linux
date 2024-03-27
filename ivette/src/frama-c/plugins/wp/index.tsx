@@ -50,12 +50,22 @@ function addStartProofMenus(
 ): void {
   const { marker, kind } = attr;
   switch (kind) {
-    case 'STMT':
     case 'LFUN':
     case 'DFUN':
+      menu.push({
+        label: `Prove function using WP`,
+        onClick: () => Server.send(WP.startProofs, marker)
+      });
+      return;
+    case 'STMT':
+      menu.push({
+        label: `Prove statement annotations using WP`,
+        onClick: () => Server.send(WP.startProofs, marker)
+      });
+      return;
     case 'PROPERTY':
       menu.push({
-        label: `Generate WP Goals`,
+        label: `Prove property using WP`,
         onClick: () => Server.send(WP.startProofs, marker)
       });
       return;
