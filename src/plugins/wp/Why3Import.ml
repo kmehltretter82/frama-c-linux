@@ -68,16 +68,7 @@ and ls_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
         (fun (tv : W.Ty.tvsymbol) -> tv.tv_name.id_string)
         ts.ts_args in
     let lt_def =
-      match ts.ts_def with
-      | NoDef | Range _ | Float _ -> None
-      | Alias ty ->
-        let tvars =
-          List.fold_left
-            (fun (tvs: tvars) (tv: W.Ty.tvsymbol) ->
-               W.Ty.Mtv.add tv (C.Lvar tv.tv_name.id_string) tvs
-            ) W.Ty.Mtv.empty ts.ts_args
-        in
-        Some (C.LTsyn (lt_of_ty tenv tvars ty))
+      lt_def_of_ts tenv ts
     in
     let lti =
       C.{
@@ -86,16 +77,17 @@ and ls_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
         lt_attr = [];
       }
     in W.Ty.Hts.add tenv ts lti ; lti
-(* and lt_def_of_ts () (ts : W.Ty.tysymbol)  =
-   match ts.ts_def with
-   | NoDef | Range _ | Float _ -> None
-   | Alias ty ->
-    let tvars =
-      List.fold_left
-        (fun (tvs: tvars) (tv: W.Ty.tvsymbol) ->
-           W.Ty.Mtv.add tv (C.Lvar tv.tv_name.id_string) tvs
-        ) W.Ty.Mtv.empty ts.ts_args
-        in (ty, tvars) *)
+and lt_def_of_ts (tenv:tenv) (ts : W.Ty.tysymbol)  =
+match ts.ts_def with
+| NoDef | Range _ | Float _ -> None
+| Alias ty ->
+  let tvars =
+    List.fold_left
+      (fun (tvs: tvars) (tv: W.Ty.tvsymbol) ->
+         W.Ty.Mtv.add tv (C.Lvar tv.tv_name.id_string) tvs
+      ) W.Ty.Mtv.empty ts.ts_args
+  in
+  Some (C.LTsyn (lt_of_ty tenv tvars ty))
 
 let import_theory env (tenv:tenv) thname =
   let theory_name, theory_path = extract_path thname in
