@@ -64,7 +64,6 @@ let rec lt_of_ty (tenv : tenv) (tvs : tvars) (ty: W.Ty.ty) : C.logic_type =
   | Tyapp(s,ts) -> C.Ltype( ls_of_ts tenv s, List.map (lt_of_ty tenv tvs) ts)
 
 and ls_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
-
   try W.Ty.Hts.find tenv ts with Not_found ->
     let temp_env : uid_tvars =
       List.fold_left
@@ -92,10 +91,6 @@ and lt_def_of_ts (tenv:tenv) (ts : W.Ty.tysymbol) (temp_env : uid_tvars) =
   | NoDef | Range _ | Float _ -> None
   | Alias ty ->
     let tvars =
-      (* List.fold_left
-         (fun (tvs: tvars) (tv: W.Ty.tvsymbol) ->
-           W.Ty.Mtv.add tv (C.Lvar tv.tv_name.id_string) tvs
-         ) W.Ty.Mtv.empty ts.ts_args *)
       W.Ty.Mtv.map (fun aleph_name -> C.Lvar aleph_name) temp_env
     in
     Some (C.LTsyn (lt_of_ty tenv tvars ty))
@@ -144,8 +139,11 @@ let () =
       let env = create_why3_env @@ L.Library.get () in
       let tenv : tenv = W.Ty.Hts.create 3 in
       List.iter (import_theory env tenv) @@ L.Import.get ();
-      Seq.iter (fun (lti : C.logic_type_info) -> L.debug "LTI %a" pp_lti lti ) (W.Ty.Hts.to_seq_values tenv);
       L.debug ~level:0 "Length of type environment : %d " (W.Ty.Hts.length tenv);
+      W.Ty.Hts.iter (fun (ty) (lti) ->
+          L.debug ~level:0 "TY %a" pp_id ty.ts_name;
+          L.debug ~level:0 "LTI %a" pp_lti lti;
+        ) tenv
     end
 
 (* -------------------------------------------------------------------------- *)
