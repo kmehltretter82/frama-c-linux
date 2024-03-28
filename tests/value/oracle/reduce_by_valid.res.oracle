@@ -230,7 +230,7 @@
 [eva:final-states] Values at end of function main5:
   q ∈ {{ &y }}
   p ∈ {0}
-  r ∈ {{ &y }} or UNINITIALIZED
+  r ∈ {{ &y }}
 [eva:final-states] Values at end of function main6:
   S_f1_0_S_vs[0] ∈ {1}
              [1] ∈ [--..--]
