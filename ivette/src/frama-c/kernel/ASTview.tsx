@@ -29,7 +29,6 @@ import * as Utils from 'dome/data/arrays';
 import * as States from 'frama-c/states';
 import * as Settings from 'dome/data/settings';
 import { IconButton } from 'dome/controls/buttons';
-import * as Studia from 'frama-c/plugins/studia';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { text } from 'frama-c/kernel/api/data';
 import * as Eva from 'frama-c/plugins/eva/api/general';
@@ -492,6 +491,15 @@ function createPropertiesGutter(): Editor.Extension {
 //  Context menu
 // -----------------------------------------------------------------------------
 
+type MarkerMenuExtender =
+  (items: Dome.PopupMenuItem[], attr: Ast.markerAttributesData) => void;
+
+const MarkerMenuExtenders : MarkerMenuExtender[] = [];
+
+export function registerMarkerMenuExtender(e : MarkerMenuExtender) : void {
+  MarkerMenuExtenders.push(e);
+}
+
 // This field contains all the current function's callers, as inferred by Eva.
 const Callers = Editor.createField<Eva.CallSite[]>([]);
 
@@ -545,7 +553,7 @@ function createContextMenuHandler(): Editor.Extension {
           items.push({ label, onClick });
         });
       }
-      Studia.buildMenu(items, attributes);
+      MarkerMenuExtenders.forEach((ext) => ext(items, attributes));
       items.push({
         label: 'Copy to clipboard',
         onClick: () => {

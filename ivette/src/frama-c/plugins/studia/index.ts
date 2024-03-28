@@ -26,6 +26,7 @@ import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Status from 'frama-c/kernel/Status';
 import * as Ast from 'frama-c/kernel/api/ast';
+import * as ASTview from 'frama-c/kernel/ASTview';
 import * as Locations from 'frama-c/kernel/Locations';
 import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
 import './style.css';
@@ -104,6 +105,8 @@ export function buildMenu(
       return;
   }
 }
+
+ASTview.registerMarkerMenuExtender(buildMenu);
 
 const studiaReadsMode : Ivette.SearchProps = {
   id: 'frama-c.plugins.studia.reads',

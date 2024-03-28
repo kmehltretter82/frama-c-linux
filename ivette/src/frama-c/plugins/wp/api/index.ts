@@ -485,6 +485,26 @@ export const goalsDataDefault: goalsData =
     name: '', smoke: false, passed: false, status: statusDefault,
     stats: statsDefault, proof: false, script: undefined, saved: false };
 
+const generateRTEGuards_internal: Server.ExecRequest<marker,null> = {
+  kind: Server.RqKind.EXEC,
+  name: 'plugins.wp.generateRTEGuards',
+  input: jMarker,
+  output: Json.jNull,
+  signals: [],
+};
+/** Generate RTE guards for the function */
+export const generateRTEGuards: Server.ExecRequest<marker,null>= generateRTEGuards_internal;
+
+const startProofs_internal: Server.ExecRequest<marker,null> = {
+  kind: Server.RqKind.EXEC,
+  name: 'plugins.wp.startProofs',
+  input: jMarker,
+  output: Json.jNull,
+  signals: [],
+};
+/** Generate goals and run provers */
+export const startProofs: Server.ExecRequest<marker,null>= startProofs_internal;
+
 /** Proof Server Activity */
 export const serverActivity: Server.Signal = {
   name: 'plugins.wp.serverActivity',
