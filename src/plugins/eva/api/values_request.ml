@@ -83,15 +83,16 @@ let () = Analysis.register_computation_hook ~on:Computed
 (* -------------------------------------------------------------------------- *)
 
 let next_steps = function
-  | Initial | Pre _ -> []
+  | Initial | Pre _ -> `None
   | Stmt (_, stmt) ->
     match stmt.skind with
-    | If (cond, _, _, _) -> [ `Then cond ; `Else cond ]
-    | Instr (Set _ | Call _ | Local_init _) -> [ `After ]
-    | Instr (Asm _ | Code_annot _)
+    | If (cond, _, _, _) -> `Condition (stmt, cond)
+    | Instr (Set _ | Call _ | Local_init _) -> `Effect stmt
+    | Instr _ when Annotations.has_code_annot stmt -> `Effect stmt
+    | Instr (Asm _ | Code_annot _ | Skip _)
     | Switch _ | Loop _ | Block _ | UnspecifiedSequence _
     | TryCatch _ | TryFinally _ | TryExcept _
-    | Instr (Skip _) | Return _ | Break _ | Continue _ | Goto _ | Throw _ -> []
+    | Return _ | Break _ | Continue _ | Goto _ | Throw _ -> `None
 
 let probe_stmt stmt =
   match stmt.skind with
@@ -485,16 +486,16 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
 
   (* --- Evaluates all steps (before/after the statement). ------------------ *)
 
-  let do_next eval state stmt callstack =
-    match stmt.skind with
-    | If (cond, _, _, _) ->
+  let do_next eval state eval_point callstack =
+    match next_steps eval_point with
+    | `Condition (stmt, cond) ->
       let then_state = (A.assume_cond stmt state cond true :> dstate) in
       let else_state = (A.assume_cond stmt state cond false :> dstate) in
       Cond (eval then_state, eval else_state)
-    | Instr (Set _ | Call _ | Local_init _) ->
+    | `Effect stmt ->
       let after_state = get_stmt_state ~after:true stmt callstack in
       After (eval after_state)
-    | _ -> Nothing
+    | `None -> Nothing
 
   let eval_steps typ eval eval_point callstack =
     let default value = { value; alarms = []; pointed_vars = []; } in
@@ -506,8 +507,8 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
     let before = domain_state callstack eval_point in
     let here = eval before in
     let next =
-      match before, eval_point with
-      | `Value state, Stmt (_, stmt) -> do_next eval state stmt callstack
+      match before with
+      | `Value state -> do_next eval state eval_point callstack
       | _ -> Nothing
     in
     { here; next; }
@@ -624,12 +625,10 @@ let () =
       | Initial | Pre _ -> ()
       | Stmt (_kf, stmt) -> set_stmt rq (Some stmt)
     end ;
-    let on_steps = function
-      | `Here -> ()
-      | `Then _ | `Else _ -> set_condition rq true
-      | `After -> set_effects rq true
-    in
-    List.iter on_steps (next_steps eval_point)
+    match next_steps eval_point with
+    | `None -> ()
+    | `Condition _ -> set_condition rq true
+    | `Effect _ -> set_effects rq true
   in
   Request.register_sig ~package getProbeInfo
     ~kind:`GET ~name:"getProbeInfo"
