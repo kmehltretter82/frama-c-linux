@@ -131,7 +131,8 @@ let integer ?kind i = (* TODO: mathematical unbounded integer *)
       then Cil_types.IInt
       else Cil.intKindForValue i false
   in
-  mk_exp (Const (CInt64 (i, kind, None)))
+  let i', _truncated = Cil.truncateInteger64 kind i in
+  mk_exp (Const (CInt64 (i', kind, None)))
 
 let int ?kind i =
   integer ?kind (Integer.of_int i)
