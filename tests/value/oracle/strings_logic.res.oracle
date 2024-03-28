@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva] computing for function reduce_by_valid_string <- main.
-  Called from strings_logic.c:177.
+  Called from strings_logic.c:209.
 [eva:loop-unroll:auto] strings_logic.c:30: Automatic loop unrolling.
 [eva:loop-unroll:auto] strings_logic.c:36: Automatic loop unrolling.
 [eva:loop-unroll:auto] strings_logic.c:41: Automatic loop unrolling.
@@ -131,6 +131,21 @@
   (origin: Library function {strings_logic.c:151}) }}
 [eva] Recording results for reduce_by_valid_string
 [eva] Done for function reduce_by_valid_string
+[eva] computing for function reduce_by_valid_wstring <- main.
+  Called from strings_logic.c:210.
+[eva:alarm] strings_logic.c:193: Warning: assertion got status unknown.
+[eva] strings_logic.c:194: 
+  Frama_C_show_each_wide_string_valid_wstring: {{ &ws1 ; &ws_zero }}
+[eva:alarm] strings_logic.c:198: Warning: assertion got status unknown.
+[eva] strings_logic.c:199: 
+  Frama_C_show_each_wide_string_valid_read_wstring:
+  {{ &ws1 ; &ws_zero ; L"Wide literal" }}
+[eva:alarm] strings_logic.c:203: Warning: assertion got status unknown.
+[eva] strings_logic.c:204: 
+  Frama_C_show_each_wide_string_invalid_read_wstring:
+  {{ &ws1 ; &ws_zero ; &wchar ; &ws_with_hole ; L"Wide literal" }}
+[eva] Recording results for reduce_by_valid_wstring
+[eva] Done for function reduce_by_valid_wstring
 [eva] Recording results for main
 [eva] Done for function main
 [eva:garbled-mix:summary] 
@@ -202,12 +217,41 @@
           .[bits 104 to 127] ∈ UNINITIALIZED
   p ∈ {0}
   offset ∈ {5; 10; 20}
+[eva:final-states] Values at end of function reduce_by_valid_wstring:
+  ws1[0] ∈ {104}
+     [1] ∈ {101}
+     [2..3] ∈ {108}
+     [4] ∈ {111}
+     [5] ∈ {0}
+     [6] ∈ {32}
+     [7] ∈ {119}
+     [8] ∈ {105}
+     [9] ∈ {100}
+     [10] ∈ {101}
+     [11] ∈ {32}
+     [12] ∈ {119}
+     [13] ∈ {111}
+     [14] ∈ {114}
+     [15] ∈ {108}
+     [16] ∈ {100}
+     [17] ∈ {33}
+     [18] ∈ {0}
+  ws_zero[0..31] ∈ {0}
+  wchar ∈ {90}
+  ws_with_hole[0][bits 0 to 7]# ∈ {104}%32, bits 0 to 7 
+              [0][bits 8 to 15] ∈ {0}
+              [0][bits 16 to 31]# ∈ {104}%32, bits 16 to 31 
+              [1] ∈ {105}
+  wp ∈
+    {{ &ws1[0] ; &ws_zero[0] ; &wchar ; &ws_with_hole[0] ; L"Wide literal" }} or UNINITIALIZED
 [eva:final-states] Values at end of function main:
   
 [from] Computing for function reduce_by_valid_string
 [from] Computing for function garbled_mix <-reduce_by_valid_string
 [from] Done for function garbled_mix
 [from] Done for function reduce_by_valid_string
+[from] Computing for function reduce_by_valid_wstring
+[from] Done for function reduce_by_valid_wstring
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -215,6 +259,8 @@
 [from] Function garbled_mix:
   \result FROM p
 [from] Function reduce_by_valid_string:
+  NO EFFECTS
+[from] Function reduce_by_valid_wstring:
   NO EFFECTS
 [from] Function main:
   NO EFFECTS
@@ -225,6 +271,10 @@
     s_partially_valid[0..31]; i_1; s_imprecise[0..31]; i_2; s_unknown[0..31];
     i_3; anything{.ptr; .d; .c}; p; offset; tmp; tmp_0
 [inout] Inputs for function reduce_by_valid_string:
+    nondet
+[inout] Out (internal) for function reduce_by_valid_wstring:
+    ws1[0..18]; ws_zero[0..31]; wchar; ws_with_hole[0..1]; wp
+[inout] Inputs for function reduce_by_valid_wstring:
     nondet
 [inout] Out (internal) for function main:
     \nothing

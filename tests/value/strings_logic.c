@@ -5,7 +5,7 @@
 /* Tests the evaluation and reduction by ACSL predicate on strings. */
 
 #include "__fc_string_axiomatic.h"
-
+#include "wchar.h"
 volatile char nondet;
 
 struct anything {
@@ -173,6 +173,39 @@ void reduce_by_valid_string (void) {
   p = NULL;
 }
 
+void reduce_by_valid_wstring (void) {
+  wchar_t ws1[] = L"hello\000 wide world!";
+  wchar_t ws_zero[32] = {0};
+  wchar_t wchar = L'Z';
+  wchar_t ws_with_hole[2] = L"hi"; // no space for L'\0'!
+  ((char*)ws_with_hole)[1] = '\0'; // valid string but not valid wide string
+
+  wchar_t *wp;
+  switch (nondet) {
+    case 0: wp = ws1; break;
+    case 1: wp = L"Wide literal"; break;
+    case 2: wp = ws_zero; break;
+    case 3: wp = &wchar; break;
+    case 4: wp = ws_with_hole; break;
+  }
+
+  if (nondet) {
+    //@ assert valid_wstring(wp);
+    Frama_C_show_each_wide_string_valid_wstring(wp);
+  }
+
+  if (nondet) {
+    //@ assert valid_read_wstring(wp);
+    Frama_C_show_each_wide_string_valid_read_wstring(wp);
+  }
+
+  if (nondet) {
+    //@ assert !valid_read_wstring(wp);
+    Frama_C_show_each_wide_string_invalid_read_wstring(wp);
+  }
+}
+
 void main (void) {
   reduce_by_valid_string();
+  reduce_by_valid_wstring();
 }
