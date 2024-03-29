@@ -277,18 +277,6 @@ void init_shadow_layout_pre_main();
  * of the program). */
 void init_shadow_layout_main(int *argc_ref, char ***argv_ref);
 
-/*! \brief Register safe locations in the memory model.
- *  \param thread_only If true, only register safe locations specific to the
-           current thread, otherwise register all available safe locations. */
-void register_safe_locations(int thread_only);
-
-/*! \brief True value for the parameter of `register_safe_locations()`
- *  function. */
-#define E_ACSL_REGISTER_THREAD_LOCS 1
-/*! \brief False value for the parameter of `register_safe_locations()`
- *  function. */
-#define E_ACSL_REGISTER_ALL_LOCS 0
-
 /*! \brief Deallocate shadow regions used by runtime analysis */
 void clean_shadow_layout();
 /* }}} */

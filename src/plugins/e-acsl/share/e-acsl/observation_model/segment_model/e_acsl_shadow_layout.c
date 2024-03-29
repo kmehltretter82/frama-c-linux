@@ -596,23 +596,6 @@ void init_shadow_layout_main(int *argc_ref, char ***argv_ref) {
   mem_layout.is_initialized_main = 1;
 }
 
-void register_safe_locations(int thread_only) {
-  int count = get_safe_locations_count();
-  for (int i = 0; i < count; ++i) {
-    memory_location *loc = get_safe_location(i);
-    if (loc->is_on_static) {
-      void *addr = (void *)loc->address;
-      size_t len = loc->length;
-      if (!thread_only || IS_ON_THREAD(addr)) {
-        shadow_alloca(addr, len);
-        if (loc->is_initialized) {
-          unsafe_initialize(addr, len);
-        }
-      }
-    }
-  }
-}
-
 void clean_shadow_layout() {
   if (mem_layout.is_initialized_pre_main && mem_layout.is_initialized_main) {
     int i;

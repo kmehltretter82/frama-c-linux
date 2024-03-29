@@ -23,9 +23,10 @@
 /*! ***********************************************************************
  * \file
  *
- * Declaration of memory locations considered safe before a program starts.
- * Most of these should be declared somewhere in start procedures of c
- * and gcc libraries. One example of a safe location is errno.
+ * Declaration of memory locations considered safe (= allocated) before a
+ * program starts. Most of these should be declared somewhere in start
+ * procedures of c and gcc libraries. One example of a safe location is errno.
+ * These memory locations are not (necessarily) in any of the segments.
  **************************************************************************/
 
 #ifndef E_ACSL_SAFE_LOCATIONS_H
@@ -36,35 +37,20 @@
 
 /*! Simple representation of a safe location */
 struct memory_location {
-  /*! Name of the safe location (for debug purposes) */
   const char *name;
-  /*! Address */
   uintptr_t address;
-  /*! Byte-length */
-  uintptr_t length;
-  /*! Notion of initialization */
-  int is_initialized;
-  /*! True if the address is on static memory, false if it is on dynamic
-      memory */
-  int is_on_static;
+  uintptr_t length; /* in bytes */
+  int initialized;
+  int writeable;
+  int freeable;
 };
 typedef struct memory_location memory_location;
-
-struct segment_boundaries {
-  uintptr_t start;
-  uintptr_t end;
-};
-typedef struct segment_boundaries segment_boundaries;
-
-struct segment_boundaries safe_locations_boundaries;
 
 /*! Initialize the array of safe locations */
 void collect_safe_locations();
 
-/*! \return the number of safe locations collected */
-size_t get_safe_locations_count();
+memory_location *get_safe_location(uintptr_t addr, long size);
 
-/*! \return The i-th safe location collected */
-memory_location *get_safe_location(size_t i);
+int is_safe_location(uintptr_t addr, long size);
 
 #endif // E_ACSL_SAFE_LOCATIONS_H

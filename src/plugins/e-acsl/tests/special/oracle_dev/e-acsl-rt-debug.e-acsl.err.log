@@ -1,50 +1,21 @@
-Error while executing ./e-acsl-rt-debug.e-acsl
-
-STDOUT:
-/* ========================================================= */
- * E-ACSL instrumented run
- * Execution mode:  debug
- * Memory tracking: shadow memory
- *           Heap 128 MB
- *          Stack 16 MB
- *            TLS 2 MB
- *   Thread stack 4 MB
- * Assertions mode: abort
- * Validity notion: strong
- * Temporal checks: disabled
- * Format Checks:   disabled
-/* ========================================================= */
-
-STDERR:
 >>> HEAP ---------------------
-   Application: 128 MB [0x7f78-b804-b3e0, 0x7f78-c004-b3df]
-   Primary    : 128 MB [0x7f78-affb-b3e0, 0x7f78-b7fb-b3df]{ Offset: 134807552 }
-   Secondary  : 16 MB [0x7f78-aef2-b3e0, 0x7f78-aff2-b3df]{ Offset: 152174592 }
+   Application: xxMB [0x0000-0000-0000, 0x0000-0000-0000]
+   Primary    : xxMB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Secondary  : xxMB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
 >>> STACK --------------------
-   Application: 16 MB [0x7ffd-e674-b01e, 0x7ffd-e774-b01d]
-   Primary    : 16 MB [0x7f78-adb1-b3e0, 0x7f78-aeb1-b3df]{ Offset: 572182953022 }
-   Secondary  : 16 MB [0x7f78-aca8-b3e0, 0x7f78-ada8-b3df]{ Offset: 572200320062 }
+   Application: xxMB [0x0000-0000-0000, 0x0000-0000-0000]
+   Primary    : xxMB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Secondary  : xxMB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
 >>> GLOBAL -------------------
-   Application: 118 kB [0x40-0000, 0x41-db77]
-   Primary    : 118 kB [0x7f78-aee8-b3e0, 0x7f78-aeea-8f57]{ Offset: -140156303094752 }
-   Secondary  : 118 kB [0x7f78-aede-b3e0, 0x7f78-aee0-8f57]{ Offset: -140156302439392 }
+   Application: xxxkB [0x0000-0000-0000, 0x0000-0000-0000]
+   Primary    : xxxkB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Secondary  : xxxkB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
 >>> TLS ----------------------
-   Application: 568 B [0x7f78-c406-b748, 0x7f78-c406-b97f]
-   Primary    : 568 B [0x7f78-aec3-b3e0, 0x7f78-aec3-b617]{ Offset: 356713320 }
-   Secondary  : 568 B [0x7f78-aeba-b3e0, 0x7f78-aeba-b617]{ Offset: 357303144 }
+   Application: 720 B [0x0000-0000-0000, 0x0000-0000-0000]
+   Primary    : 720 B [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Secondary  : 720 B [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
 >>> VDSO ---------------------
-   Application: 8 kB [0x7ffd-e777-0000, 0x7ffd-e777-1fff]
-   Primary    : 8 kB [0x7f78-aed5-b3e0, 0x7f78-aed5-d3df]{ Offset: 572180745248 }
-   Secondary  : 8 kB [0x7f78-aecc-b3e0, 0x7f78-aecc-d3df]{ Offset: 572181335072 }
+   Application: xxxkB [0x0000-0000-0000, 0x0000-0000-0000]
+   Primary    : xxxkB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
+   Secondary  : xxxkB [0x0000-0000-0000, 0x0000-0000-0000]{ Offset:xxxxx }
 >>> --------------------------
-/home/jan/cea/frama-c/_build/install/default/bin/../share/frama-c/share/e-acsl/observation_model/segment_model/e_acsl_segment_tracking.c:271: Address 0x7f78-c406-b6c8 not on STATIC
-/** Backtrace **************************/
-trace à e_acsl_trace.c:87
- - raise_abort à e_acsl_private_assert.c:40
- - private_assert_fail à e_acsl_private_assert.c:71 (discriminator 1)
- - shadow_alloca à e_acsl_segment_tracking.c:271 (discriminator 20)
- - register_safe_locations à e_acsl_shadow_layout.c:622
- - do_eacsl_memory_init à e_acsl_segment_observation_model.c:325
- - __e_acsl_memory_init à e_acsl_segment_observation_model.c:331 (discriminator 1)
- - main à e-acsl-rt-debug.gcc.c:222
-/***************************************/
