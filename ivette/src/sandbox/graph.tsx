@@ -185,6 +185,8 @@ export function Graph(props: {
             dagLevelDistance={50}
             // Node selection
             onNodeClick={(node, event): void => {
+              // eslint-disable-next-line no-console
+              console.log(String(node.id));
               if (props.graph.onSelection) {
                 props.graph.onSelection(String(node.id), event);
               }
@@ -206,11 +208,13 @@ export function Graph(props: {
             nodeLabel={'name'}
             // How long (ms) to render for before stopping
             // and freezing the layout engine.
-            cooldownTime={1}
+            cooldownTime={50}
             onRenderFramePost={(): void => {
               if (props.graph.onReady) {
                 props.graph.onReady();
               }
+              // eslint-disable-next-line no-console
+              console.log("draw");
             }}
           />
         ) : (
@@ -230,8 +234,8 @@ export function Graph(props: {
 
 export default function GraphComponent(): JSX.Element {
   const [initGraph, setInitGraph] = React.useState<GraphProps>(setGraph());
-  // Generation of unique identifier
   function setGraph(N = 3): GraphProps {
+    // Generation of unique identifier
     function generateUUIDs(): string[] {
       const uuidArray: string[] = [];
 
