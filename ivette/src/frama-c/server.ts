@@ -25,16 +25,16 @@
 // --------------------------------------------------------------------------
 
 /**
-   Manage the current Frama-C server/client interface
-   @packageDocumentation
-   @module frama-c/server
+ Manage the current Frama-C server/client interface
+ @packageDocumentation
+ @module frama-c/server
 */
 
 import { debounce } from 'lodash';
-import Path from 'path';
+import * as Path from 'path';
 import React from 'react';
 import * as Dome from 'dome';
-import * as System from 'dome/system';
+import * as System from 'dome/misc/system';
 import * as Json from 'dome/data/json';
 import { TextBuffer } from 'dome/text/richtext';
 import { ChildProcess } from 'child_process';
@@ -491,7 +491,10 @@ async function _launch(): Promise<void> {
     cwd: working,
     stdout: { path: logout, pipe: true },
     stderr: { path: logerr, pipe: true },
-    env,
+    env: {
+      ...env,
+      ...window.electron.process.env
+    } as { [VAR: string]: string },
   };
   // Launch Process
   System.atExit(() => {

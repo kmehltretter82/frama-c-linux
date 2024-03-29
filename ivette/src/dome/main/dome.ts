@@ -37,8 +37,9 @@
    @module dome(main)
 */
 
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'dome/devtools';
-import SYS, * as System from 'dome/system';
+import _ from 'lodash';
+import fs from 'fs';
+import path from 'path';
 import {
   BrowserWindow,
   BrowserWindowConstructorOptions,
@@ -50,21 +51,15 @@ import {
   nativeTheme,
   shell,
 } from 'electron';
-import fs from 'fs';
-import _ from 'lodash';
-import path from 'path';
+import installExtension from 'electron-devtools-installer';
+import { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
+import SYS, * as System from 'dome/system';
 
 // --------------------------------------------------------------------------
 // --- Main Window Web Navigation
 // --------------------------------------------------------------------------
 
-import { URL } from 'url';
 import * as Menubar from './menubar';
-
-// The __static path is provided by webpack at execution time, but the static
-// type system is not aware of that for now. This is a workaround to avoid
-// an error during compilation.
-declare const __static: string;
 
 // --------------------------------------------------------------------------
 // --- System Helpers
@@ -341,11 +336,19 @@ ipcMain.on('dome.ipc.window.title', setTitle);
 ipcMain.on('dome.ipc.window.modified', setModified);
 
 function getURL(): string {
-  if (DEVEL)
-    return `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`;
-  if (LOCAL)
-    return `file://${path.join(__dirname, '../renderer/index.html')}`;
-  return `file://${__dirname}/index.html`;
+  if (DEVEL && process.env['ELECTRON_RENDERER_URL']) {
+    const url = process.env['ELECTRON_RENDERER_URL'];
+    console.log('[Dome] DEVEL - Loading URL', url);
+    return url;
+  }
+  if (LOCAL) {
+    const url = `file://${path.join(__dirname, '../renderer/index.html')}`;
+    console.log('[Dome] LOCAL - Loading URL', url);
+    return url;
+  }
+  const url = `file://${path.join(__dirname, '../renderer/index.html')}`;
+  console.log('[Dome] PROD - Loading URL', url);
+  return url;
 }
 
 function navigateURL(sender: Electron.WebContents) {
@@ -392,20 +395,24 @@ function createBrowserWindow(
   wdir?: string,
 ): BrowserWindow {
 
-  const isAppWindow = (argv !== undefined && wdir !== undefined);
-
+  const isAppWindow = argv !== undefined && wdir !== undefined;
   const browserArguments = isAppWindow
     ? SYS.WINDOW_APPLICATION_ARGV
     : SYS.WINDOW_PREFERENCES_ARGV;
+  console.log('[Dome] Browser Arguments', browserArguments);
 
   const options: BrowserWindowConstructorOptions = {
+    width: 900,
+    height: 670,
     show: false,
     backgroundColor: '#f0f0f0',
-    icon: path.join(__static, 'icon.png'),
+    icon: path.join(__dirname, 'icon.png'),
     webPreferences: {
-      nodeIntegration: true,
       contextIsolation: false,
+      nodeIntegration: true,
+      sandbox: false,
       additionalArguments: [browserArguments],
+      preload: path.join(__dirname, '../preload/index.js'),
     },
     ...config,
   };
@@ -423,7 +430,6 @@ function createBrowserWindow(
   }
 
   console.log('[Dome] Loading config file', configFile);
-
   const configData = loadSettings(configFile);
 
   const frame = jFrame(configData.frame);
@@ -463,19 +469,16 @@ function createBrowserWindow(
     WindowHandles.delete(wid);
   });
 
-  // Load the index.html of the app.
+  // Disable security warnings (unless build)
   if (DEVEL || LOCAL)
     process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
 
-  theWindow.loadURL(getURL());
-
   // Load Finished
-  theWindow.once('ready-to-show', () => {
+  theWindow.on('ready-to-show', () => {
+    console.log('[Dome] Window ready');
     if (DEVEL || LOCAL)
       process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'false';
-    if (DEVEL && devtools) {
-      webContents.openDevTools();
-    }
+    if (DEVEL && devtools) webContents.openDevTools();
     theWindow.show();
   });
 
@@ -498,7 +501,7 @@ function createBrowserWindow(
   });
 
   // Emitted when the window want's to close.
-  const closeHandler = function (event: Event): void {
+  const closeHandler = function (event: Electron.Event): void {
     // Do not call this handler in a cycle; the next close event will forcibly
     // close the window
     theWindow.off('close', closeHandler);
@@ -524,10 +527,15 @@ function createBrowserWindow(
     theWindow.on('moved', saveFrame);
   }
 
+  theWindow.loadURL(getURL()).catch(err =>
+    console.error("Cannot load window URL", err)
+  );
+
+
   return theWindow;
 }
 
-ipcMain.on('dome.ipc.closing.done', (_event, wid:number) => {
+ipcMain.on('dome.ipc.closing.done', (_event, wid: number) => {
   const handle = WindowHandles.get(wid);
   if (handle !== undefined) handle.window.close();
 });
@@ -538,12 +546,18 @@ ipcMain.on('dome.ipc.closing.done', (_event, wid:number) => {
 
 interface Cmd { wdir: string; argv: string[] }
 
-function stripElectronArgv(cmd: Cmd): Cmd
-{
-  const wdir = DEVEL ? cmd.argv[3] : cmd.wdir;
+function stripElectronArgv(cmd: Cmd): Cmd {
+  const devel = import.meta.env.MODE === "development";
+  const wdir = devel ? cmd.argv[2] : cmd.wdir;
+  let slice = 3;
+  if (!LOCAL && !devel) {
+    slice = 1;
+  } else if (LOCAL) {
+    slice = 2;
+  }
   const argv = cmd.argv
-      .slice(DEVEL ? 4 : (LOCAL ? 2 : 1))
-      .filter((p) => !!p && p !== "--no-sandbox");
+    .slice(slice)
+    .filter((p) => !!p && p !== "--no-sandbox");
   return { wdir, argv };
 }
 
@@ -551,11 +565,6 @@ function createPrimaryWindow(): void {
   // Initialize Menubar
   Menubar.install();
 
-  // React Developper Tools
-  if (DEVEL)
-    installExtension(REACT_DEVELOPER_TOOLS, true).catch((err) => {
-      console.error('[Dome] Enable to install React dev-tools', err);
-    });
   const cwd = process.cwd();
   const wdir = cwd === '/' ? app.getPath('home') : cwd;
   const cmd = stripElectronArgv({ wdir, argv: process.argv });
@@ -697,10 +706,18 @@ let isQuitting = false;
 /** Starts the main process. */
 export function start(): void {
 
+  app.on(
+    'certificate-error',
+    (event, _webContents, _url, _error, _certificate, callback) => {
+      event.preventDefault();
+      callback(true);
+    }
+  );
+
   // Workaround to recover the original commandline of a second instance
   // after chromium messes with the argument order.
   // See https://github.com/electron/electron/issues/20322 for more details.
-  app.commandLine.appendSwitch("second-instance", JSON.stringify(process.argv));
+  app.commandLine.appendSwitch('second-instance', JSON.stringify(process.argv));
 
   // Ensures second instance triggers the main one
   if (!app.requestSingleInstanceLock()) app.quit();
@@ -708,10 +725,18 @@ export function start(): void {
   // Change default locale
   app.commandLine.appendSwitch('lang', 'en');
 
-  // Listen to application events
   app.on('ready', createPrimaryWindow); // Wait for Electron init
   app.on('activate', activateWindows); // Mac OSX response to dock
   app.on('second-instance', createSecondaryWindow);
+
+  // Listen to application events
+  app.whenReady().then(() => {
+    if (DEVEL) {
+      installExtension(REACT_DEVELOPER_TOOLS)
+        .then((name) => console.log(`[Dome] Added Extension:  ${name}`))
+        .catch((err) => console.warn('[Dome] Extension error: ', err));
+    }
+  });
 
   // Configuring macOS for exiting
   app.on('before-quit', () => {

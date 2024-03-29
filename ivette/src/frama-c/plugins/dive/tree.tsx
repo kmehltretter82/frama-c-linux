@@ -36,15 +36,15 @@ import gearsIcon from '../eva/images/gears.svg';
 
 import './dive.css';
 
-const window = {
+const w = {
   perception: { backward: 3, forward: 0 },
   horizon: { backward: undefined, forward: undefined },
 };
 
 async function exec<I, O>(rq: Server.ExecRequest<I, O>, i: I):
-    Promise<O | undefined> {
+  Promise<O | undefined> {
   if (Server.isRunning()) {
-    await Server.send(API.window, window);
+    await Server.send(API.window, w);
     return await Server.send(rq, i);
   }
 
@@ -52,7 +52,7 @@ async function exec<I, O>(rq: Server.ExecRequest<I, O>, i: I):
 }
 
 async function requestLocation(location: States.Location):
-    Promise<number | undefined> {
+  Promise<number | undefined> {
   return await exec(API.add, location.marker);
 }
 
@@ -64,13 +64,18 @@ function isDependency(el: API.element): el is API.dependency {
   return 'dst' in el;
 }
 
-function Folder(props: {unfolded: boolean, onclick?: () => void}): JSX.Element {
+interface FolderProps {
+  unfolded: boolean;
+  onclick?: () => void
+}
+
+function Folder(props: FolderProps): JSX.Element {
   return <IconButton
-      icon={props.unfolded ? 'MINUS' : 'PLUS'}
-      title="Fold / Unfold the dependencies"
-      className="folder"
-      onClick={props.onclick}
-    />;
+    icon={props.unfolded ? 'MINUS' : 'PLUS'}
+    title="Fold / Unfold the dependencies"
+    className="folder"
+    onClick={props.onclick}
+  />;
 }
 
 function Exploring(): JSX.Element {
@@ -101,7 +106,7 @@ function Marker(props: MarkerProps): JSX.Element {
   );
 }
 
-type WithKey<P> = P & {key: string | number | null}
+type WithKey<P> = P & { key: string | number | null }
 
 type WithItemChildren<P> =
   P & {
@@ -138,22 +143,22 @@ function TreeNode(props: WithItemChildren<TreeNodeProps>): JSX.Element {
       <ul>
         {children.map((element) => <li key={element.key}>{element}</li>)}
       </ul> :
-        null
+      null
     }
-    </div>;
+  </div>;
 }
 
-function MarkerNode(props: WithItemChildren<{marker: marker}>):
-    JSX.Element {
+function MarkerNode(props: WithItemChildren<{ marker: marker }>):
+  JSX.Element {
   return <TreeNode
     unfolded={true}
     label={<Marker marker={props.marker} />}
     className="marker">
-      {props.children}
+    {props.children}
   </TreeNode>;
 }
 
-function GraphNode(props: {nodeId: number, unfolded?: boolean}): JSX.Element {
+function GraphNode(props: { nodeId: number, unfolded?: boolean }): JSX.Element {
   const graphData = States.useSyncArrayElt(API.graph, `n${props.nodeId}`);
   const graph = States.useSyncArrayData(API.graph);
 
@@ -175,24 +180,24 @@ function GraphNode(props: {nodeId: number, unfolded?: boolean}): JSX.Element {
           map.set(marker, entry);
         }
         entry.add(d.src);
-     });
+      });
     });
 
     return <TreeNode
-        unfolded={props.unfolded}
-        onunfold={() => explore(node)}
-        label={node.label}>
-          {node.backward_explored ?
-            Array.from(map.entries()).map(([m, sources]) =>
-              <MarkerNode marker={m} key={m}>
-                {Array.from(sources.values()).map((src) =>
-                  <GraphNode nodeId={src} key={src} />
-                ) }
-              </MarkerNode>
-            ) :
-            <Exploring key={null} />
-          }
-      </TreeNode>;
+      unfolded={props.unfolded}
+      onunfold={() => explore(node)}
+      label={node.label}>
+      {node.backward_explored ?
+        Array.from(map.entries()).map(([m, sources]) =>
+          <MarkerNode marker={m} key={m}>
+            {Array.from(sources.values()).map((src) =>
+              <GraphNode nodeId={src} key={src} />
+            )}
+          </MarkerNode>
+        ) :
+        <Exploring key={null} />
+      }
+    </TreeNode>;
   }
 
   return <>Error while building the tree</>;
@@ -205,7 +210,7 @@ export default function TreeComponent(): JSX.Element {
   useEffect(() => {
     const update = async (): Promise<void> => {
       if (current.marker) {
-        const node =  await requestLocation(current);
+        const node = await requestLocation(current);
         root === null && node !== null && node !== undefined && setRoot(node);
       }
     };
@@ -215,16 +220,16 @@ export default function TreeComponent(): JSX.Element {
   return <>
     <Ivette.TitleBar>
       <IconButton
-            icon="TRASH"
-            onClick={() => setRoot(null)}
-            title="Clear the graph"
-          />
+        icon="TRASH"
+        onClick={() => setRoot(null)}
+        title="Clear the graph"
+      />
     </Ivette.TitleBar>
     <EvaReady>
       {
         root === null ?
           <>Select an expression to investigate</>
-        :
+          :
           <div className="diveTree">
             <GraphNode nodeId={root} unfolded={true} />
           </div>

@@ -112,7 +112,7 @@ const jSplit: Json.Decoder<Split> =
 
 const jPosition: Json.Decoder<Ivette.LayoutPosition> =
   (js: Json.json) => {
-    switch(js) {
+    switch (js) {
       case 'A': case 'B': case 'C': case 'D':
       case 'AB': case 'AC': case 'BD': case 'CD':
       case 'ABCD':
@@ -182,32 +182,28 @@ function compareLayout(u: Layout, v: Layout): boolean {
   );
 }
 
-function isDefined(m: Layout): boolean
-{
+function isDefined(m: Layout): boolean {
   return !!m.A || !!m.B || !!m.C || !!m.D;
 }
 
-function isComplete(m: Layout): boolean
-{
+function isComplete(m: Layout): boolean {
   return !m.A && !m.B && !m.C && !m.D;
 }
 
-const removeLayout = (compId: compId) => (layout: Layout) : Layout =>
-  {
-    const { A, B, C, D } = layout;
-    return {
-      A: A !== compId ? A : '',
-      B: B !== compId ? B : '',
-      C: C !== compId ? C : '',
-      D: D !== compId ? D : '',
-    };
+const removeLayout = (compId: compId) => (layout: Layout): Layout => {
+  const { A, B, C, D } = layout;
+  return {
+    A: A !== compId ? A : '',
+    B: B !== compId ? B : '',
+    C: C !== compId ? C : '',
+    D: D !== compId ? D : '',
   };
+};
 
 function addLayout(
   layout: Layout, compId: compId, at: LayoutPosition
-): Layout
-{
-  switch(at) {
+): Layout {
+  switch (at) {
     case 'A': return { ...layout, A: compId };
     case 'B': return { ...layout, B: compId };
     case 'C': return { ...layout, C: compId };
@@ -221,28 +217,26 @@ function addLayout(
   }
 }
 
-function makeViewLayout(view: Ivette.Layout): Layout
-{
+function makeViewLayout(view: Ivette.Layout): Layout {
   type Unstructured = {
-    A ?: compId, B ?: compId, C ?: compId, D ?: compId,
-    AB ?: compId, AC ?: compId, BD ?: compId, CD ?: compId,
-    ABCD ?: compId
+    A?: compId, B?: compId, C?: compId, D?: compId,
+    AB?: compId, AC?: compId, BD?: compId, CD?: compId,
+    ABCD?: compId
   };
   const u = view as Unstructured;
-  const A : compId = u.A ?? u.AB ?? u.AC ?? u.ABCD ?? '';
-  const B : compId = u.B ?? u.AB ?? u.BD ?? u.ABCD ?? '';
-  const C : compId = u.C ?? u.AC ?? u.CD ?? u.ABCD ?? '';
-  const D : compId = u.D ?? u.CD ?? u.BD ?? u.ABCD ?? '';
+  const A: compId = u.A ?? u.AB ?? u.AC ?? u.ABCD ?? '';
+  const B: compId = u.B ?? u.AB ?? u.BD ?? u.ABCD ?? '';
+  const C: compId = u.C ?? u.AC ?? u.CD ?? u.ABCD ?? '';
+  const D: compId = u.D ?? u.CD ?? u.BD ?? u.ABCD ?? '';
   return { A, B, C, D };
 }
 
 function unstackLayout(
   layout: Layout,
   stack: Layout[],
-): Layout[]
-{
+): Layout[] {
   let k = 1;
-  while( !isComplete(layout) && k < stack.length ) {
+  while (!isComplete(layout) && k < stack.length) {
     const layer = stack[k];
     layout = {
       A: layout.A || layer.A,
@@ -252,23 +246,21 @@ function unstackLayout(
     };
     k++;
   }
-  return [layout, ... stack];
+  return [layout, ...stack];
 }
 
 function addLayoutComponent(
   stack: Layout[],
   compId: compId,
   at: LayoutPosition
-): Layout[]
-{
+): Layout[] {
   stack = stack.map(removeLayout(compId)).filter(isDefined);
   const top = stack[0] ?? defaultLayout;
   const layout = addLayout(top, compId, at);
   return unstackLayout(layout, stack);
 }
 
-function removeLayoutComponent(stack: Layout[], compId: compId): Layout[]
-{
+function removeLayoutComponent(stack: Layout[], compId: compId): Layout[] {
   stack = stack.map(removeLayout(compId)).filter(isDefined);
   const top = stack[0] ?? defaultLayout;
   return unstackLayout(top, stack);
@@ -276,8 +268,7 @@ function removeLayoutComponent(stack: Layout[], compId: compId): Layout[]
 
 function getLayoutPosition(
   layout: Layout, compId: compId
-): LayoutPosition | undefined
-{
+): LayoutPosition | undefined {
   const { A, B, C, D } = layout;
   const a = A === compId;
   const b = B === compId;
@@ -300,8 +291,7 @@ function getLayoutPosition(
 /* -------------------------------------------------------------------------- */
 
 function previousTab(tabs: Map<tabKey, TabViewState>, key: tabKey):
-  TabViewState | undefined
-{
+  TabViewState | undefined {
   let prev: TabViewState | undefined = undefined;
   let last: TabViewState | undefined = undefined;
   tabs.forEach(t => {
@@ -311,8 +301,7 @@ function previousTab(tabs: Map<tabKey, TabViewState>, key: tabKey):
 }
 
 function nextTab(tabs: Map<tabKey, TabViewState>, key: tabKey):
-  TabViewState | undefined
-{
+  TabViewState | undefined {
   let next: TabViewState | undefined = undefined;
   let first: TabViewState | undefined = undefined;
   let prev = false;
@@ -324,22 +313,20 @@ function nextTab(tabs: Map<tabKey, TabViewState>, key: tabKey):
   return next || first;
 }
 
-function newCustom(tabs: Map<tabKey, TabViewState>, viewId: viewId): number
-{
+function newCustom(tabs: Map<tabKey, TabViewState>, viewId: viewId): number {
   let custom = 0;
   tabs.forEach(tab => {
     if (tab.viewId === viewId)
       custom = Math.max(custom, tab.custom);
   });
-  return custom+1;
+  return custom + 1;
 }
 
 function newTab(
   tabs: Map<tabKey, TabViewState>,
   view: Ivette.ViewLayoutProps,
   custom: number,
-): TabViewState
-{
+): TabViewState {
   const { id: viewId } = view;
   const key = custom > 0 ? `${viewId}@${custom}` : viewId;
   const tab = {
@@ -363,17 +350,15 @@ function saveTab(
   }
 }
 
-function addPanels(panels: Set<compId>, layout: Layout): Set<compId>
-{
+function addPanels(panels: Set<compId>, layout: Layout): Set<compId> {
   const { A, B, C, D } = layout;
-  if ( panels.has(A) && panels.has(B) && panels.has(C) && panels.has(D) )
+  if (panels.has(A) && panels.has(B) && panels.has(C) && panels.has(D))
     return panels;
   else
     return copySet(panels).add(A).add(B).add(C).add(D);
 }
 
-function removeAlerts(alerts: Set<compId>, layout: Layout): Set<compId>
-{
+function removeAlerts(alerts: Set<compId>, layout: Layout): Set<compId> {
   const { A, B, C, D } = layout;
   if (alerts.has(A) || alerts.has(B) || alerts.has(C) || alerts.has(D)) {
     const newAlerts = copySet(alerts);
@@ -390,8 +375,7 @@ function removeAlerts(alerts: Set<compId>, layout: Layout): Set<compId>
 /* --- LabView Actions                                                    --- */
 /* -------------------------------------------------------------------------- */
 
-function copySet<A>(s: Set<A>): Set<A>
-{
+function copySet<A>(s: Set<A>): Set<A> {
   const r = new Set<A>();
   s.forEach((a) => r.add(a));
   return r;
@@ -403,12 +387,12 @@ function copyMap<A, B>(m: Map<A, B>): Map<A, B> {
   return u;
 }
 
-function setCurrentView(viewId: viewId = ''):void {
+function setCurrentView(viewId: viewId = ''): void {
   const state = LAB.getValue();
   LAB.setValue({ ...state, sideView: viewId, sideComp: '' });
 }
 
-function setCurrentComp(compId: compId = ''):void {
+function setCurrentComp(compId: compId = ''): void {
   const state = LAB.getValue();
   LAB.setValue({ ...state, sideComp: compId, sideView: '' });
 }
@@ -548,8 +532,7 @@ export function applyComponent(
 export function dockComponent(
   comp: Ivette.ComponentProps,
   at?: Ivette.LayoutPosition
-): void
-{
+): void {
   const { id, preferredPosition } = comp;
   const state = LAB.getValue();
   const top = state.stack[0] ?? defaultLayout;
@@ -560,8 +543,7 @@ export function dockComponent(
   LAB.setValue({ ...state, docked, stack });
 }
 
-function undockComponent(compId: compId): void
-{
+function undockComponent(compId: compId): void {
   const state = LAB.getValue();
   if (state.docked.has(compId)) {
     const docked = copyMap(state.docked);
@@ -572,8 +554,7 @@ function undockComponent(compId: compId): void
   }
 }
 
-function closeComponent(compId: compId): void
-{
+function closeComponent(compId: compId): void {
   const state = LAB.getValue();
   const stack = removeLayoutComponent(state.stack, compId);
   const panels = copySet(state.panels);
@@ -585,8 +566,7 @@ function closeComponent(compId: compId): void
   LAB.setValue({ ...state, panels, docked, stack });
 }
 
-export function alertComponent(comp: Ivette.ComponentProps): void
-{
+export function alertComponent(comp: Ivette.ComponentProps): void {
   const { id } = comp;
   const state = LAB.getValue();
   /* Do nothing if the component if already visible. */
@@ -655,8 +635,7 @@ Settings.onWindowSettings(() => {
 /* --- Exported API                                                       --- */
 /* -------------------------------------------------------------------------- */
 
-export function useState(): LabViewState
-{
+export function useState(): LabViewState {
   const [state] = States.useGlobalState(LAB);
   return state;
 }
@@ -670,8 +649,7 @@ export interface ViewStatus {
 export function getViewStatus(
   state: LabViewState,
   viewId: viewId
-): ViewStatus
-{
+): ViewStatus {
   const tab = state.tabs.get(viewId);
   const favorite = tab ? tab.custom === 0 : false;
   const displayed = tab ? tab.key === state.tabKey : false;
@@ -688,8 +666,7 @@ export interface ComponentStatus {
 export function getComponentStatus(
   state: LabViewState,
   compId: compId
-): ComponentStatus
-{
+): ComponentStatus {
   const layout = state.stack[0] ?? defaultLayout;
   const position = getLayoutPosition(layout, compId);
   const active = state.panels.has(compId);
@@ -755,7 +732,7 @@ interface QuarterProps {
 function Quarter(props: QuarterProps): JSX.Element {
   const { layout, compId, pos } = props;
   const icon = 'QSPLIT.' + pos;
-  const onClick = ():void => {
+  const onClick = (): void => {
     closeMenu();
     const comp = COMPONENT.getElement(compId);
     if (comp) applyComponent(comp, pos);
@@ -786,7 +763,7 @@ function Action(props: ActionProps): JSX.Element {
       label={label}
       onClick={onClick}
     >
-      <Icon className='labview-layout-action-icon' id={icon}/>
+      <Icon className='labview-layout-action-icon' id={icon} />
     </Label>
   );
 }
@@ -851,15 +828,15 @@ function LayoutMenu(): JSX.Element | null {
       onKeyDown={closeMenu}
     >
       <Grid columns='24px 24px 24px'>
-        <Quarter compId={compId} layout={layout} pos='A'    />
-        <Quarter compId={compId} layout={layout} pos='AB'   />
-        <Quarter compId={compId} layout={layout} pos='B'    />
-        <Quarter compId={compId} layout={layout} pos='AC'   />
+        <Quarter compId={compId} layout={layout} pos='A' />
+        <Quarter compId={compId} layout={layout} pos='AB' />
+        <Quarter compId={compId} layout={layout} pos='B' />
+        <Quarter compId={compId} layout={layout} pos='AC' />
         <Quarter compId={compId} layout={layout} pos='ABCD' />
-        <Quarter compId={compId} layout={layout} pos='BD'   />
-        <Quarter compId={compId} layout={layout} pos='C'    />
-        <Quarter compId={compId} layout={layout} pos='CD'   />
-        <Quarter compId={compId} layout={layout} pos='D'    />
+        <Quarter compId={compId} layout={layout} pos='BD' />
+        <Quarter compId={compId} layout={layout} pos='C' />
+        <Quarter compId={compId} layout={layout} pos='CD' />
+        <Quarter compId={compId} layout={layout} pos='D' />
       </Grid>
       <Action
         display={dock} label='Dock' icon='QSPLIT.DOCK' onClick={onDock} />
@@ -883,7 +860,7 @@ function Pane(props: PaneProps): JSX.Element | null {
   const { compId } = props;
   const component = State.useElement(COMPONENT, compId);
   const onLayout = React.useCallback(
-    (evt) => openLayoutMenu(compId, paneActions, evt),
+    (evt: React.MouseEvent) => openLayoutMenu(compId, paneActions, evt),
     [compId]
   );
   if (!component) return null;
@@ -918,14 +895,14 @@ function Pane(props: PaneProps): JSX.Element | null {
 export function LabView(): JSX.Element {
   const [state] = States.useGlobalState(LAB);
   const setPosition = React.useCallback(
-    (H, V) => LAB.setValue({ ...state, split: { H, V } }),
+    (H: number, V: number) => LAB.setValue({ ...state, split: { H, V } }),
     [state]
   );
   const layout = state.stack[0] ?? defaultLayout;
   const { A, B, C, D } = layout;
   const { H, V } = state.split;
-  const panels : JSX.Element[] = [];
-  state.panels.forEach((id) => panels.push(<Pane key={id} compId={id}/>));
+  const panels: JSX.Element[] = [];
+  state.panels.forEach((id) => panels.push(<Pane key={id} compId={id} />));
   return (
     <>
       <LayoutMenu />
@@ -954,7 +931,7 @@ export function ViewItem(props: ViewItemProps): JSX.Element {
   const { view, favorite, displayed, selected, layout } = props;
   const { id, label: vname, title: vtitle } = view;
 
-  const onSelection = (_evt:React.MouseEvent): void => {
+  const onSelection = (_evt: React.MouseEvent): void => {
     setCurrentView(id);
     applyView(view);
   };
@@ -962,7 +939,7 @@ export function ViewItem(props: ViewItemProps): JSX.Element {
   const icon = favorite ? 'FAVORITE' : 'DISPLAY';
   const modified =
     (layout !== undefined &&
-     !compareLayout(layout, makeViewLayout(view.layout)));
+      !compareLayout(layout, makeViewLayout(view.layout)));
 
   const label = modified ? vname + '*' : vname;
   const tname = vtitle || vname;
@@ -1042,15 +1019,15 @@ export function ComponentItem(props: ComponentItemProps): JSX.Element {
   const { id, label, title = label } = comp;
   const icon =
     position ? 'QSPLIT.' + position :
-    docked ? 'QSPLIT.DOCK' :
-    'COMPONENT';
+      docked ? 'QSPLIT.DOCK' :
+        'COMPONENT';
 
   const mlabel = !position && active ? label + '*' : label;
 
   const status =
     position ? 'Visible' :
-    docked ? 'Docked' :
-    active ? 'Running' : 'Closed';
+      docked ? 'Docked' :
+        active ? 'Running' : 'Closed';
 
   const onSelection = (): void => {
     setCurrentComp(id);
@@ -1085,8 +1062,8 @@ export function ComponentItem(props: ComponentItemProps): JSX.Element {
 
 interface ID { id: string }
 
-export const inGroup = (g: ID) => (e: ID) => e.id.startsWith(g.id+'.');
-export const groupOf = (e: ID) => (g: ID) => e.id.startsWith(g.id+'.');
+export const inGroup = (g: ID) => (e: ID) => e.id.startsWith(g.id + '.');
+export const groupOf = (e: ID) => (g: ID) => e.id.startsWith(g.id + '.');
 export const inNoGroup = (gs: ID[]) => (e: ID) => !gs.some(groupOf(e));
 
 interface GroupSectionProps extends Ivette.ItemProps {
@@ -1141,7 +1118,7 @@ function ViewBar(): JSX.Element {
 
   return (
     <Sidebars.SideBar>
-      <ViewSection key='views'/>
+      <ViewSection key='views' />
       {groups.map((group) =>
         <GroupSection
           key={group.id}
@@ -1257,7 +1234,7 @@ function TabView(props: TabViewProps): JSX.Element | null {
   const tname = custom > 0 ? `${vname} ~ ${custom}` : vname;
   const label = modified ? `${tname}*` : tname;
   const tdup = custom > 0 ? 'Custom ' : '';
-  const tmod = modified ? ' (modified)': '';
+  const tmod = modified ? ' (modified)' : '';
   const title = tdup + vname + tmod;
 
   const onClick = (): void => { applyTab(key); setCurrentNone(); };
@@ -1307,7 +1284,7 @@ export function Tabs(): JSX.Element {
         tabKey={tabKey}
         layout={layout}
       />
-  ));
+    ));
   return <>{items}</>;
 }
 
@@ -1316,7 +1293,7 @@ export function Tabs(): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 function displayHints(): Ivette.Hint[] {
-  const hints: Ivette.Hint[]= [];
+  const hints: Ivette.Hint[] = [];
   VIEW.getElements().forEach((view) => hints.push({
     id: 'view#' + view.id,
     name: view.label,
@@ -1407,8 +1384,7 @@ Dome.addMenuItem({
 });
 
 function nthTab(tabs: Map<tabKey, TabViewState>, i: number):
-  TabViewState | undefined
-{
+  TabViewState | undefined {
   let tab = undefined;
   let count = 1;
   tabs.forEach(t => {

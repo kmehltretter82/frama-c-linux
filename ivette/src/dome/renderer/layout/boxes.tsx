@@ -82,7 +82,7 @@ const makeBox = (
 ): JSX.Element => {
   const {
     className, style, children,
-    visible=true, display=true,
+    visible = true, display = true,
     ...others
   } = props;
   const allClasses = classes(

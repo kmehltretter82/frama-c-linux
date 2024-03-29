@@ -1,21 +1,17 @@
 # Dependencies
 
 Required package to be installed:
+- `node` version 20.x;
 - `yarn` for node pakage management;
-- `pandoc` for generating the documentation;
-- `node` version 16.x;
-
-We recommand to use node v16 as a workaroung against incompatible versions of
-SSL and Webpack packages. However, under Arch Linux, the standard node v17 is
-also known to work.
+- `pandoc` for generating the documentation.
 
 ## Linux
 
 ```sh
 $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-$ nvm install 16
-$ nvm use 16
-$ npm install yarn
+$ nvm install 20
+$ nvm use 20
+$ npm install --global yarn
 ```
 
 Under Arch you can simply rely on the `yarn` package and its `node` standard
@@ -30,8 +26,8 @@ $ pacman -S yarn
 ```sh
 $ brew install yarn
 $ brew install nvm # follow instructions
-$ nvm install 16
-$ nvm use 16
+$ nvm install 20
+$ nvm use 20
 ```
 
 # Installation
@@ -87,7 +83,8 @@ ivette [ivette options] [frama-c command line]
   -R|--reload re-run the last command from history (other options are discarded)
   -C|--working <dir> change the working directory used by ivette & frama-c
   -B|--command <bin> set the frama-c server to be launched
-  --socket <socket> set the Linux socket name to be used for the frama-c server
+  -U|--socket <socket> set the Linux socket name to be used for the frama-c server
+  --settings <file|DEFAULT> use the specified user settings
 ```
 
 See also the [CONTRIBUTING] guide for editor configuration if you want to hack in Ivette
