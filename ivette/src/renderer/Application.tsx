@@ -77,6 +77,7 @@ export default function Application(): JSX.Element {
       </LSplit>
       <Toolbar.ToolBar className="statusbar">
         <Controller.Status />
+        <Controller.Alerts />
         <>{StatusBar}</>
         <Toolbar.Filler />
         <Laboratory.Dock />

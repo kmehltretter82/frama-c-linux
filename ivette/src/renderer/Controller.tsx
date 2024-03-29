@@ -35,10 +35,15 @@ import { LED, LEDstatus } from 'dome/controls/displays';
 import { Label, Code } from 'dome/controls/labels';
 import * as Text from 'dome/text/richtext';
 import { TextBuffer, TextView } from 'dome/text/richtext';
-import { resolve } from 'dome/system';
+import { resolve, DEVEL } from 'dome/system';
+import { classes } from 'dome/misc/utils';
 
 import * as Ivette from 'ivette';
+import * as Laboratory from 'ivette/laboratory';
+
 import * as Server from 'frama-c/server';
+import { useSyncArrayData } from 'frama-c/states';
+import * as Kernel from 'frama-c/kernel/api/services';
 
 // --------------------------------------------------------------------------
 // --- Configure Server
@@ -216,6 +221,76 @@ export const Control = (): JSX.Element => {
         title="Shut down the server"
       />
     </Toolbars.ButtonGroup>
+  );
+};
+
+// --------------------------------------------------------------------------
+// --- Alerts
+// --------------------------------------------------------------------------
+enum TypeAlert { NONE, CONSOLE, MESSAGES }
+
+function getDataLength(data: Kernel.messageData[]): number {
+  return DEVEL ?
+    data.filter((elt) => elt.kind!=="DEBUG").length :
+    data.length;
+}
+
+export const Alerts = (): JSX.Element => {
+  const status = Server.useStatus();
+  const [newMess, setNewMess] = React.useState(false);
+  const data = useSyncArrayData(Kernel.message);
+  const oldDataLength = React.useRef(getDataLength(data));
+  const labState = Laboratory.useState();
+  const messageVisible = Boolean(Laboratory.getComponentStatus(
+    labState,
+    "fc.kernel.messages",
+  ).position);
+
+  const onClick = (): void => {
+    Laboratory.applyView({
+      id: "fc.ivette.alerts",
+      label: "",
+      layout: { ABCD: "ivette.console" }
+    });
+    Laboratory.applyComponent({ id: "ivette.console", label: "" }, "AB");
+    Laboratory.applyComponent({ id: "fc.kernel.messages", label: "" }, "CD");
+  };
+
+  React.useEffect(() => {
+    const dataLength = getDataLength(data);
+    if (messageVisible) {
+      oldDataLength.current = dataLength;
+      setNewMess(false);
+    } else if (dataLength !== oldDataLength.current) {
+      if(dataLength < oldDataLength.current) oldDataLength.current = 0;
+      setNewMess(true);
+    }
+  }, [data, messageVisible, setNewMess]);
+
+  const typeAlert = (
+    status === Server.Status.FAILURE ? TypeAlert.CONSOLE :
+    !messageVisible && newMess ? TypeAlert.MESSAGES :
+    TypeAlert.NONE
+  );
+  if(typeAlert === TypeAlert.NONE) return <></>;
+
+  const isConsoleAlert = typeAlert === TypeAlert.CONSOLE;
+  const AllClasses = classes(
+    "ivette-alerts",
+    isConsoleAlert && 'ivette-alert-blink'
+  );
+
+  return (
+    <IconButton
+      className = {AllClasses}
+      icon={"WARNING"}
+      size={14}
+      kind={isConsoleAlert ? "negative" : "warning"}
+      title={"Check the "+
+            (isConsoleAlert ?"console" :"message")+
+            " component for more information"}
+      onClick={onClick}
+    />
   );
 };
 
@@ -424,7 +499,6 @@ export const Status = (): JSX.Element => {
   const pending = Server.getPending();
   let led: LEDstatus = 'inactive';
   let title = undefined;
-  let icon = undefined;
   let running = 'OFF';
   let blink = false;
 
@@ -467,14 +541,13 @@ export const Status = (): JSX.Element => {
       blink = true;
       running = 'ERR';
       title = 'Server halted because of failure';
-      icon = 'WARNING';
       break;
   }
 
   return (
     <>
       <LED status={led} blink={blink} />
-      <Code icon={icon} label={running} title={title} />
+      <Code label={running} title={title} />
     </>
   );
 };
