@@ -25,31 +25,33 @@
 # --------------------------------------------------------------------------
 
 DOME_DEV_PACKAGES= \
-	@babel/core \
-	@babel/preset-env \
-	@babel/preset-react \
-	@babel/plugin-proposal-object-rest-spread \
-	electron@^16 \
-	electron-builder \
-	electron-webpack \
+	electron@^28 \
+	electron-builder@^24 \
+	electron-vite@^2 \
 	electron-devtools-installer \
-	webpack@^4 \
-	babel-loader \
-	css-loader@^5 \
-	react-hot-loader@^4 \
-	@hot-loader/react-dom@^16 \
-	@types/react@^16 \
-	@types/react-dom@^16 \
-	@types/react-virtualized@^9.21.0
+	@types/lodash@^4 \
+	@types/react@^18 \
+	@types/node@^18 \
+	@types/react-dom@^18 \
+	@types/react-virtualized@^9.21.8 \
+	@types/diff@^5 \
+	typescript@^5
 
 DOME_APP_PACKAGES= \
-	react@^16 \
-	react-dom@^16 \
+	react@^18 \
+	react-dom@^18 \
 	source-map-support \
-	lodash \
-	react-virtualized \
+	lodash@^4 \
+	react-virtualized@9.22.5 \
 	react-draggable \
 	react-fast-compare \
-	diff
+	diff@^5 \
+	codemirror@5.65.2 \
+	@codemirror/language@6.10.0 \
+    @codemirror/search@6.5.5 \
+    @codemirror/state@6.4.0 \
+    @codemirror/view@6.23.1 \
+	@lezer/cpp@^1 \
+	react-virtualized-auto-sizer@^1.0.22
 
 # --------------------------------------------------------------------------

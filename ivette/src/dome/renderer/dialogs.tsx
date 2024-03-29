@@ -26,7 +26,7 @@
    @module dome/dialogs
  */
 
-import filepath from 'path';
+import * as filepath from 'path';
 import { ipcRenderer } from 'electron';
 import * as System from 'dome/system';
 

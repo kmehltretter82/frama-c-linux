@@ -26,9 +26,9 @@
 
 import _ from 'lodash';
 import React from 'react';
+
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
-import * as States from 'frama-c/states';
 import * as Compare from 'dome/data/compare';
 import * as Settings from 'dome/data/settings';
 import { Label, Code } from 'dome/controls/labels';
@@ -36,20 +36,23 @@ import { Icon } from 'dome/controls/icons';
 import { IconButton, Checkbox } from 'dome/controls/buttons';
 import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
-import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
-import { TitleBar } from 'ivette';
 import { Scroll } from 'dome/layout/boxes';
 import { Section } from 'dome/frame/sidebars';
-
+import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { RSplit } from 'dome/layout/splitters';
+
+import { TitleBar } from 'ivette';
+
 
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Properties from 'frama-c/kernel/api/properties';
+import * as States from 'frama-c/states';
+
 
 type PropKey = Json.key<'#marker'>;
 type Property = Properties.statusData |
-                (Properties.statusData & Eva.propertiesData) ;
+  (Properties.statusData & Eva.propertiesData);
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -121,7 +124,7 @@ function useFilter(path: string): [boolean, () => void] {
   );
 }
 
-function resetFilters(prefix: string, b?: boolean) : void {
+function resetFilters(prefix: string, b?: boolean): void {
   for (const key in DEFAULTS) {
     if (key.startsWith(prefix)) {
       const target = b ?? DEFAULTS[key];
@@ -132,12 +135,12 @@ function resetFilters(prefix: string, b?: boolean) : void {
   Reload.emit();
 }
 
-function filterSummary(prefix: string) : string {
+function filterSummary(prefix: string): string {
   let total = 0;
   let enabled = 0;
   for (const key in DEFAULTS) {
     if (key.startsWith(prefix)) {
-      total ++;
+      total++;
       if (filter(key)) enabled++;
     }
   }
@@ -232,7 +235,7 @@ function filterEva(p: Property): boolean {
       case 'not_tainted':
       case 'not_applicable':
         return !filter('eva.data_tainted_only') &&
-               !filter('eva.ctrl_tainted_only');
+          !filter('eva.ctrl_tainted_only');
       case 'direct_taint':
         return !(filter('eva.ctrl_tainted_only'));
       case 'indirect_taint':
@@ -396,7 +399,7 @@ interface SectionProps {
   children: React.ReactNode;
 }
 
-function onContextMenu(prefix:string): void {
+function onContextMenu(prefix: string): void {
   const items: Dome.PopupMenuItem[] = [
     {
       label: 'Reset to default',
@@ -554,14 +557,14 @@ function PropertyColumns(): JSX.Element {
   const taintDict = States.useTags(Eva.taintStatusTags);
 
   const getScope = React.useCallback(
-    ({ scope }) => getDecl(scope)?.name
-    , [getDecl] );
+    ({ scope }: { scope: Property['scope'] }) => getDecl(scope)?.name
+    , [getDecl]);
   const getStatus = React.useCallback(
     ({ status: st }: Property) => (statusDict.get(st) ?? { name: st })
-    , [statusDict] );
+    , [statusDict]);
   const getKind = React.useCallback(
     ({ kind: kd }: Property) => (kindDict.get(kd) ?? { name: kd })
-    , [kindDict] );
+    , [kindDict]);
   const getAlarm = React.useCallback(
     ({ alarm }: Property) => (
       alarm === undefined ? alarm : (alarmDict.get(alarm) ?? { name: alarm })

@@ -29,9 +29,8 @@
    @packageDocumentation
    @module dome/data/states
 */
-
-import React from 'react';
 import Emitter from 'events';
+import React from 'react';
 import isEqual from 'react-fast-compare';
 import { Debug } from 'dome';
 

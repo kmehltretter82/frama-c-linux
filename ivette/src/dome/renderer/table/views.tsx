@@ -40,7 +40,7 @@ import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import { DraggableCore } from 'react-draggable';
 import {
-  AutoSizer, Size,
+  Size,
   SortDirection, SortDirectionType,
   Index, IndexRange,
   Table as VTable,
@@ -52,6 +52,7 @@ import {
   TableCellRenderer,
   RowMouseEventHandlerParams,
 } from 'react-virtualized';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 import { SVG as SVGraw } from 'dome/controls/icons';
 import { Trigger, Client, Sorting, SortingInfo, Model } from './models';
@@ -276,7 +277,7 @@ function makeDataRenderer(
     const { cellData } = props;
     try {
       const undef = cellData === null || cellData === undefined;
-      const contents =  undef ? null : render(cellData);
+      const contents = undef ? null : render(cellData);
       if (onContextMenu) {
         const callback = (evt: React.MouseEvent): void => {
           evt.stopPropagation();
@@ -856,7 +857,9 @@ function makeColumn<Key, Row>(
     props.disableSort || !sorting || !sorting.canSortBy(dataKey);
   const getter = state.computeGetter(id, dataKey, props);
   const render = state.computeRender(id, dataKey, props);
+  // Type incompatibility between react-virtualized & react
   return (
+    // @ts-expect-error (TODO Fix this type error, VColumn is not a ReactNode)
     <VColumn
       key={id}
       width={width}
@@ -1090,8 +1093,10 @@ function makeTable<Key, Row>(
     setImmediate(state.forceUpdate);
   }
 
+  // Type incompatibility between react-virtualized & react
   return (
     <div onKeyDown={state.onKeyDown}>
+      {/* @ts-expect-error (TODO Fix this type error) */}
       <VTable
         ref={state.tableRef}
         key="table"
@@ -1173,7 +1178,7 @@ export function Table<Key, Row>(props: TableProps<Key, Row>): JSX.Element {
     return state.unwind;
   });
   Settings.useGlobalSettingsEvent(state.importSettings);
-  const { display=true, visible=true, children: columns=[] } = props;
+  const { display = true, visible = true, children: columns = [] } = props;
   const classNames = classes(
     'dome-xTable',
     !display && 'dome-erased',

@@ -23,7 +23,7 @@ default:
 variables:
   DEFAULT: "master"
   OCAML: "4.13"
-  NODE: "16"
+  NODE: "20"
   PUBLISH: "no"
   RELEASE: "no"
 
@@ -132,7 +132,7 @@ frama-c:
 
 ivette:
   stage: build
-  image: node:lts-gallium
+  image: node:lts-buster
   cache:
     paths:
       - ivette/node_modules/
@@ -140,6 +140,7 @@ ivette:
     - node --version
     - npm --version
     - yarn --version
+    - make --version
     - make -C ivette check-lint dome-app
   tags:
     - docker
@@ -247,7 +248,6 @@ ivette-tests:
     - dune build -j2 @install
     - make -C ivette dist
     - cd ivette
-    - cp dist/renderer/* dist/main/
     - xvfb-run --auto-servernum -e /dev/stdout -s "-screen 0 1920x1080x24 -ac -nolisten tcp -nolisten unix" dune exec -- yarn playwright test --headed
   artifacts:
     paths:

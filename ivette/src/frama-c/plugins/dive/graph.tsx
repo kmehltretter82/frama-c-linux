@@ -345,9 +345,9 @@ class Dive {
 
   updateNode(data: NodeData):
     Cytoscape.NodeSingular {
-      const element = this.updateElement("nodes", data);
-      element.addClass('node');
-      return element;
+    const element = this.updateElement("nodes", data);
+    element.addClass('node');
+    return element;
   }
 
   updateEdge(src: NodeOrId, dst: NodeOrId, data: EdgeData):
@@ -433,9 +433,6 @@ class Dive {
     this._layout = layout;
     this.layoutOptions = {
       name: layout,
-      fit: true,
-      animate: true,
-      randomize: false, /* Keep previous positions if layout supports it */
       ...extendedOptions,
     };
 
@@ -621,7 +618,7 @@ type GraphViewRef = {
 
 const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
   (props: GraphViewProps, ref) => {
-  const { addSelection, grabbable, layout, selectionMode } = props;
+    const { addSelection, grabbable, layout, selectionMode } = props;
 
     const [dive, setDive] = useState(() => new Dive());
     const selection = States.useCurrentLocation();
@@ -656,14 +653,14 @@ const GraphView = React.forwardRef<GraphViewRef | undefined, GraphViewProps>(
       dive.selectLocation(selection, addSelection);
     }, [dive, addSelection, selection]);
 
-  return (
-    <CytoscapeComponent
-      stylesheet={style}
-      cy={setCy}
-      autoungrabify={!grabbable}
-      style={{ width: '100%', height: '100%' }}
-    />);
-});
+    return (
+      <CytoscapeComponent
+        stylesheet={style}
+        cy={setCy}
+        autoungrabify={!grabbable}
+        style={{ width: '100%', height: '100%' }}
+      />);
+  });
 
 GraphView.displayName = "GraphView";
 
@@ -711,17 +708,19 @@ export default function GraphComponent(): JSX.Element {
           icon="PIN"
           onClick={flipAddSelection}
           kind={addSelection ? 'positive' : 'negative'}
-          title={addSelection ?
-            'Do not add selected AST elements into the graph' :
-            'Add selected AST elements into the graph'}
+          title={
+            addSelection
+              ? 'Do not add selected AST elements into the graph'
+              : 'Add selected AST elements into the graph'
+          }
         />
         <IconButton
           icon="LOCK"
           onClick={flipGrabbable}
           kind={grabbable ? 'positive' : 'negative'}
-          title={grabbable ?
-            'Disallow nodes to be moved' :
-            'Allow nodes to be moved'}
+          title={
+            grabbable ? 'Disallow nodes to be moved' : 'Allow nodes to be moved'
+          }
         />
         <IconButton
           icon="SETTINGS"
@@ -738,9 +737,7 @@ export default function GraphComponent(): JSX.Element {
           icon="HELP"
           onClick={flipShowLegend}
           kind={showLegend ? 'positive' : 'default'}
-          title={showLegend ?
-            'Hide legend' :
-            'Show legend'}
+          title={showLegend ? 'Hide legend' : 'Show legend'}
         />
         <Space />
         <IconButton
@@ -750,13 +747,16 @@ export default function GraphComponent(): JSX.Element {
         />
       </Ivette.TitleBar>
       <EvaReady>
-        <GraphView
-          addSelection={addSelection}
-          grabbable={grabbable}
-          layout={layout}
-          selectionMode={selectionMode}
-          ref={graph}/>
-        { showLegend ? <Legend /> : null }
+        <>
+          <GraphView
+            addSelection={addSelection}
+            grabbable={grabbable}
+            layout={layout}
+            selectionMode={selectionMode}
+            ref={graph}
+          />
+          {showLegend ? <Legend /> : null}
+        </>
       </EvaReady>
     </>
   );

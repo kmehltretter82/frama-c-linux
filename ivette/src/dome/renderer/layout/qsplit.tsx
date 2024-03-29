@@ -32,7 +32,7 @@
 import * as React from 'react';
 import * as Utils from 'dome/misc/utils';
 import { DraggableCore, DraggableEventHandler } from 'react-draggable';
-import { AutoSizer, Size } from 'react-virtualized';
+import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
 
 /* -------------------------------------------------------------------------- */
 /* --- Q-Split Properties                                                 --- */

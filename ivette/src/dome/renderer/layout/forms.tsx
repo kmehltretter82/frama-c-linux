@@ -141,7 +141,7 @@ export class BufferController {
   hasCommit(): boolean { return this.evt.listenerCount('commit') > 0; }
 
   /** Get the number of errors */
-  getErrors(): number { return  this.errors; }
+  getErrors(): number { return this.errors; }
 
   /** @internal */
   onReset(fn: ResetCallback): void { this.evt.addListener('reset', fn); }
@@ -162,10 +162,9 @@ export class BufferController {
   removeError(): void { this.errors--; }
 }
 
-export type Equal<A> = (a:A, b:A) => boolean;
+export type Equal<A> = (a: A, b: A) => boolean;
 
-function compare<A>(equal: Equal<A> | undefined, a: A, b: A): boolean
-{
+function compare<A>(equal: Equal<A> | undefined, a: A, b: A): boolean {
   return equal ? equal(a, b) : a === b;
 }
 
@@ -186,22 +185,21 @@ function compare<A>(equal: Equal<A> | undefined, a: A, b: A): boolean
 
  */
 export function useBuffer<A>(
-  remote : BufferController,
+  remote: BufferController,
   state: FieldState<A>,
   equal?: Equal<A>,
-): FieldState<A>
-{
+): FieldState<A> {
   const { value, error, reset, onChanged } = state;
-  const [ modified, setModified ] = React.useState(false);
-  const [ buffer, setBuffer ] = React.useState<A>(value);
-  const [ berror, setBerror ] = React.useState<FieldError>(error);
+  const [modified, setModified] = React.useState(false);
+  const [buffer, setBuffer] = React.useState<A>(value);
+  const [berror, setBerror] = React.useState<FieldError>(error);
 
   const valid = !isValid(berror);
   const rollback = reset ?? value;
 
   // --- Error Count
   React.useEffect(() => {
-      if (valid) return;
+    if (valid) return;
     remote.addError();
     return () => remote.removeError();
   }, [remote, valid]);
@@ -221,7 +219,7 @@ export function useBuffer<A>(
 
   // --- Commit
   React.useEffect(() => {
-    if(modified) {
+    if (modified) {
       const doCommit = (): void => {
         if (valid) {
           setModified(false);
@@ -239,7 +237,7 @@ export function useBuffer<A>(
 
   // --- Callback
   const onLocalChange = React.useCallback(
-    (newValue, newError, isReset) => {
+    (newValue: A, newError: FieldError, isReset: boolean) => {
       setModified(!isReset);
       setBuffer(newValue);
       setBerror(newError);
@@ -316,7 +314,7 @@ export function useDefined<A>(
 ): FieldState<A | undefined> {
   const { value, error, reset, onChanged } = state;
   const update = React.useCallback(
-    (newValue: A | undefined, newError: FieldError, doReset) => {
+    (newValue: A | undefined, newError: FieldError, doReset: boolean) => {
       if (newValue !== undefined) {
         onChanged(newValue, newError, doReset);
       }
@@ -366,11 +364,10 @@ export function useChecker<A>(
 
 function convertReset<A, B>(
   fn: (value: A) => B, value: A | undefined
-): B | undefined
-{
+): B | undefined {
   try {
     return value ? fn(value) : undefined;
-  } catch(_err) {
+  } catch (_err) {
     return undefined;
   }
 }
@@ -505,7 +502,7 @@ export function useProperty<A, K extends keyof A>(
       const localError = { ...objError, [property]: propError };
       const finalError = isValidObject(localError) ? undefined : localError;
       onChanged(newValue, finalError, !finalError && isReset);
-    }, [value, error, onChanged, property, checker, ]);
+    }, [value, error, onChanged, property, checker,]);
 
   return {
     value: value[property],
@@ -828,8 +825,7 @@ type InputState = [string, FieldError, (evt: InputEvent) => void];
 
 function useChangeEvent(
   onChanged: Callback<string>
-): ((evt: InputEvent) => void)
-{
+): ((evt: InputEvent) => void) {
   return React.useCallback(
     (evt: InputEvent) => {
       onChanged(evt.target.value, undefined, false);
@@ -1512,11 +1508,12 @@ export function MenuField<A>(props: MenuFieldProps<A>): JSX.Element {
       return { field, option, value: e.value };
     }), [props.options]);
   const input = React.useCallback(
-    (v) => entries.find((e) => e.value === v)?.field
+    (v: A) => entries.find((e) => e.value === v)?.field
     , [entries]
   );
   const output = React.useCallback(
-    (f) => entries.find((e) => e.field === f)?.value ?? props.defaultValue
+    (f: string | undefined) =>
+      entries.find((e) => e.field === f)?.value ?? props.defaultValue
     , [entries, props.defaultValue]
   );
   const defaultField = React.useMemo(

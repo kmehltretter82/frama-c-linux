@@ -21,46 +21,19 @@
 /* ************************************************************************ */
 
 // --------------------------------------------------------------------------
-// --- Webpack extension for electron main-process
+// --- Electron main-process entry-point for Dome.
 // --------------------------------------------------------------------------
 
 /*
-   Template from $(DOME)/template/webpack.main.js
+   Template of ./src/main/index.ts
+   Imported from $(DOME)/template/main.ts
 
-   This webpack definitions will be merged into electron-webpack
-   ones thanks to electron-webpack.json configuration file.
+   The call to Dome.start() will initialize the Dome application
+   and create the main window that will run the renderer process
+   from `src/renderer/index.js`.
 
-   You may extend it with your own additions.
+   You may add your own code to be run in the Electron main-process
+   before or after the call to `Dome.start()`.
 */
 
-const path = require('path');
-const DOME = process.env.DOME || path.resolve( __dirname , 'dome' );
-
-// --------------------------------------------------------------------------
-
-module.exports = {
-  module: {
-    rules: [
-      { test: /\.css$/, use: [ 'css-loader' ] },
-      { test: /\.(ts|js)x?$/, use: [ 'babel-loader' ], exclude: /node_modules/ }
-    ],
-    strictExportPresence: true
-  },
-  resolve: {
-    extensions: ['.ts', '.tsx', '.js', 'jsx', '.json'],
-    alias: {
-      'dome/misc':    path.resolve( DOME , 'misc' ),
-      'dome/system':  path.resolve( DOME , 'misc/system.ts' ),
-      'dome$':        path.resolve( DOME , 'renderer/dome.tsx' ),
-      'dome':         path.resolve( DOME , 'renderer' ),
-      'react-dom':    '@hot-loader/react-dom'
-    }
-  },
-  devServer: {
-    watchOptions: {
-      ignored: '**/.#*'
-    }
-  }
-} ;
-
-// --------------------------------------------------------------------------
+import * as Dome from 'dome/main';

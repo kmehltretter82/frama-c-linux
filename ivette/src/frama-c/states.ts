@@ -501,14 +501,12 @@ export function useSyncArrayModel<K, A>(
 }
 
 /** Get Synchronized Array as data array. */
-export function getSyncArrayData<K, A>(arr: Array<K, A>): A[]
-{
+export function getSyncArrayData<K, A>(arr: Array<K, A>): A[] {
   return getSyncArray(arr).getArray();
 }
 
 /** Use Synchronized Array as a data array. */
-export function useSyncArrayData<K, A>(arr: Array<K, A>): A[]
-{
+export function useSyncArrayData<K, A>(arr: Array<K, A>): A[] {
   return useSyncArrayModel(arr).getArray();
 }
 

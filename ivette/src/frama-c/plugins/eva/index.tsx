@@ -25,10 +25,10 @@
 // --------------------------------------------------------------------------
 
 import * as Ivette from 'ivette';
-import { } from 'frama-c/plugins/eva/valuetable';
-import { } from './Summary';
-import { } from './Coverage';
-import { } from './DomainStates';
+import './valuetable';
+import './Summary';
+import './Coverage';
+import './DomainStates';
 import './style.css';
 
 // --------------------------------------------------------------------------

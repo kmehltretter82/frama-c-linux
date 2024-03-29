@@ -72,7 +72,7 @@ function QSplitSandbox(): JSX.Element {
   const [B, setB] = React.useState<string | undefined>('B');
   const [C, setC] = React.useState<string | undefined>('C');
   const [D, setD] = React.useState<string | undefined>('D');
-  const setPosition = React.useCallback((h, v) => {
+  const setPosition = React.useCallback((h: number, v: number) => {
     setH(h);
     setV(v);
   }, [setH, setV]);
