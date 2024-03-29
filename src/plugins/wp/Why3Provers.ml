@@ -90,7 +90,7 @@ let find_fallback name =
     match String.split_on_char ',' name with
     | shortname :: _ :: _ ->
       begin
-        match find_opt (String.lowercase_ascii shortname) with
+        match find_opt shortname with
         | Some prv -> Fallback prv
         | None -> NotFound
       end
