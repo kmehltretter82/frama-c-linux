@@ -1,14 +1,14 @@
-[variadic] FRAMAC_SHARE/libc/wchar.h:272: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:292: 
   Declaration of variadic function fwprintf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:274: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:294: 
   Declaration of variadic function swprintf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:276: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:296: 
   Declaration of variadic function wprintf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:279: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:299: 
   Declaration of variadic function wscanf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:281: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:301: 
   Declaration of variadic function fwscanf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:283: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:303: 
   Declaration of variadic function swscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:207: 
   Declaration of variadic function fprintf.
@@ -35,7 +35,7 @@
 [eva] Analyzing a complete application starting at main
 [eva] using specification for function wmemset
 [eva] using specification for function swprintf_va_1
-[eva] FRAMAC_SHARE/libc/wchar.h:274: 
+[eva] FRAMAC_SHARE/libc/wchar.h:294: 
   Cannot evaluate range bound wformat_length(format) - 1
   (unsupported ACSL construct: logic function wformat_length). Approximating
 [eva:alarm] swprintf.c:12: Warning: 
@@ -55,6 +55,7 @@
 #include "errno.h"
 #include "signal.h"
 #include "stdarg.h"
+#include "stddef.h"
 #include "stdio.h"
 #include "string.h"
 #include "strings.h"

@@ -2,16 +2,16 @@
 [e-acsl] Warning: annotating undefined function `strlen':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/string.h:141: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:158: Warning: 
   no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:281: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:141: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:158: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:143: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:160: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
@@ -82,9 +82,9 @@
 [eva:alarm] mainargs.c:16: Warning: assertion got status unknown.
 [eva:alarm] mainargs.c:18: Warning: 
   function __gen_e_acsl_strlen: precondition 'valid_string_s' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:141: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:158: Warning: 
   function strlen: precondition 'valid_string_s' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:143: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:160: Warning: 
   function __gen_e_acsl_strlen: postcondition 'acsl_c_equiv' got status unknown.
 [eva:alarm] mainargs.c:19: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||

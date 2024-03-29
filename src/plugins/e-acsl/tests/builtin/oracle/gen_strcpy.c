@@ -81,19 +81,20 @@ pid_t __gen_e_acsl_fork(void);
     allocates \result;
     
     behavior allocation:
-      assumes can_allocate: is_allocable(strlen(s));
-      ensures allocation: \fresh{Old, Here}(\result,strlen(\old(s)));
+      assumes can_allocate: is_allocable(strlen(s) + 1);
+      ensures allocation: \fresh{Old, Here}(\result,strlen(\old(s)) + 1);
       ensures
         result_valid_string_and_same_contents:
           valid_string(\result) && strcmp(\result, \old(s)) == 0;
       assigns __fc_heap_status, \result;
-      assigns __fc_heap_status \from (indirect: s), __fc_heap_status;
+      assigns __fc_heap_status
+        \from __fc_heap_status, (indirect: *(s + (0 .. strlen{Old}(s))));
       assigns \result
         \from (indirect: *(s + (0 .. strlen{Old}(s)))),
               (indirect: __fc_heap_status);
     
     behavior no_allocation:
-      assumes cannot_allocate: !is_allocable(strlen(s));
+      assumes cannot_allocate: !is_allocable(strlen(s) + 1);
       ensures result_null: \result == \null;
       assigns \result;
       assigns \result \from \nothing;
@@ -547,19 +548,20 @@ void test_memory_tracking(void)
     allocates \result;
     
     behavior allocation:
-      assumes can_allocate: is_allocable(strlen(s));
-      ensures allocation: \fresh{Old, Here}(\result,strlen(\old(s)));
+      assumes can_allocate: is_allocable(strlen(s) + 1);
+      ensures allocation: \fresh{Old, Here}(\result,strlen(\old(s)) + 1);
       ensures
         result_valid_string_and_same_contents:
           valid_string(\result) && strcmp(\result, \old(s)) == 0;
       assigns __fc_heap_status, \result;
-      assigns __fc_heap_status \from (indirect: s), __fc_heap_status;
+      assigns __fc_heap_status
+        \from __fc_heap_status, (indirect: *(s + (0 .. strlen{Old}(s))));
       assigns \result
         \from (indirect: *(s + (0 .. strlen{Old}(s)))),
               (indirect: __fc_heap_status);
     
     behavior no_allocation:
-      assumes cannot_allocate: !is_allocable(strlen(s));
+      assumes cannot_allocate: !is_allocable(strlen(s) + 1);
       ensures result_null: \result == \null;
       assigns \result;
       assigns \result \from \nothing;
@@ -585,7 +587,7 @@ char *__gen_e_acsl_strdup(char const *s)
       __gen_e_acsl_assert_data_4.pred_txt = "\\result == \\null";
       __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_4.fct = "strdup";
-      __gen_e_acsl_assert_data_4.line = 498;
+      __gen_e_acsl_assert_data_4.line = 580;
       __gen_e_acsl_assert_data_4.name = "no_allocation/result_null";
       __e_acsl_assert(__retres == (char *)0,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -771,7 +773,7 @@ void __gen_e_acsl_exit(int status)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "exit";
-    __gen_e_acsl_assert_data.line = 509;
+    __gen_e_acsl_assert_data.line = 541;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     return;

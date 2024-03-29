@@ -303,9 +303,7 @@
   Called from octagons.c:265.
 [eva] using specification for function Frama_C_float_interval
 [eva] octagons.c:265: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] octagons.c:265: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva] octagons.c:267: starting to merge loop iterations
 [eva] Recording results for arrays
