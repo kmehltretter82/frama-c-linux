@@ -113,7 +113,7 @@ struct __fc_pthread_mutexattr_t {
 };
 typedef struct __fc_pthread_mutexattr_t pthread_mutexattr_t;
 struct __fc_pthread_t {
-   int _fc ;
+   unsigned long _fc ;
 };
 typedef struct __fc_pthread_t pthread_t;
 typedef int pid_t;

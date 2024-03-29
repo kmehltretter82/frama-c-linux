@@ -50,7 +50,7 @@ typedef struct __fc_pthread_spinlock_t { int _fc; } pthread_spinlock_t;
 // such code to be parsed.
 typedef unsigned long pthread_t;
 #else
-typedef struct __fc_pthread_t { int _fc; } pthread_t;
+typedef struct __fc_pthread_t { unsigned long _fc; } pthread_t;
 #endif
 __END_DECLS
 __POP_FC_STDLIB
