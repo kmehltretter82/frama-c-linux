@@ -785,7 +785,7 @@ int __gen_e_acsl_pthread_join(pthread_t thread, void **retval)
     int __gen_e_acsl_or;
     int __gen_e_acsl_valid_2;
     __e_acsl_store_block((void *)(& retval),8UL);
-    __e_acsl_store_block((void *)(& thread),4UL);
+    __e_acsl_store_block((void *)(& thread),8UL);
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"retval",
@@ -1533,8 +1533,8 @@ int main(void)
   __e_acsl_store_block((void *)(& tmp_0),4UL);
   __e_acsl_store_block((void *)(& tmp),4UL);
   __e_acsl_store_block((void *)(args),40UL);
-  __e_acsl_store_block((void *)(readers),40UL);
-  __e_acsl_store_block((void *)(writers),40UL);
+  __e_acsl_store_block((void *)(readers),80UL);
+  __e_acsl_store_block((void *)(writers),80UL);
   __e_acsl_store_block((void *)(& __retres),4UL);
   __e_acsl_full_init((void *)(& tmp));
   tmp = __gen_e_acsl_pthread_mutex_init(& write_mutex,
