@@ -304,7 +304,7 @@ class full_visitor = object(self)
   inherit Cil.nopCilVisitor
   val mutable cur_func = None
   method add ?func ?node ?names domain =
-    let loc = Cil.CurrentLoc.get () in
+    let loc = Current_loc.get () in
     let func = if func <> None && func <> Some "" then func else cur_func in
     add_entry ?func ?node ?names loc domain
   method add_code ?func ?names node =
@@ -411,7 +411,7 @@ class code_annot_visitor = object(self)
   inherit Cil.nopCilVisitor
 
   method add_annot ?(names=[]) node =
-    let loc = Cil.CurrentLoc.get () in
+    let loc = Current_loc.get () in
     let func = !ca_visitor_cur_func in
     let plugin = !ca_visitor_cur_emitter in
     let domain = Syntax Annotation in

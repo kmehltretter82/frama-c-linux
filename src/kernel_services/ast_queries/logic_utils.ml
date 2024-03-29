@@ -96,12 +96,14 @@ let logicCType t =
   in plain_or_set logicCType t
 
 let plain_array_to_ptr ty =
+  let open Current_loc.Operators in
   match unroll_type ty with
   | Ctype(TArray(ty,lo,attr) as tarr) ->
     let length_attr =
       match lo with
       | None -> []
-      | Some _ ->
+      | Some e ->
+        let<> UpdatedCurrentLoc = e.eloc in
         try
           let len = Cil.bitsSizeOf tarr in
           let len = try len / (Cil.bitsSizeOf ty)

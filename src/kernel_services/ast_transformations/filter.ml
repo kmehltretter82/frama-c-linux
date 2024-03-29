@@ -432,7 +432,8 @@ end = struct
       new_locals
 
     method! vcode_annot v =
-      Option.iter Cil.CurrentLoc.set (Cil_datatype.Code_annotation.loc v);
+      let open Current_loc.Operators in
+      let<?> UpdatedCurrentLoc = Cil_datatype.Code_annotation.loc v in
       let stmt =
         Visitor_behavior.Get_orig.stmt
           self#behavior (Option.get self#current_stmt)

@@ -2280,12 +2280,7 @@ val constFoldVisitor: bool -> cilVisitor
 (** {2 Debugging support} *)
 (* ************************************************************************* *)
 
-(** A reference to the current location. If you are careful to set this to
-    the current location then you can use some built-in logging functions that
-    will print the location. *)
-module CurrentLoc: State_builder.Ref with type data = location
-
-(** Pretty-print [(Cil.CurrentLoc.get ())] *)
+(** Pretty-print [(Current_loc.get ())] *)
 val pp_thisloc: Format.formatter -> unit
 
 (** @return a dummy specification *)

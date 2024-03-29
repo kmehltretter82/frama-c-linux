@@ -46,9 +46,6 @@ open Cil_types
 
 val voidType: typ
 
-(** forward reference to current location (see {!Cil.CurrentLoc})*)
-module CurrentLoc: State_builder.Ref with type data = location
-
 module Vid: sig val next: unit -> int end
 module Sid: sig val next: unit -> int end
 module Eid: sig val next: unit -> int end

@@ -122,7 +122,7 @@ let kprintf phi ?(log=true) ?(severe=false) ?source ~effect message =
     (fun fmt ->
        Format.pp_print_flush fmt () ;
        let text = Buffer.contents buffer in
-       let loc = Cil_const.CurrentLoc.get () in
+       let loc = Current_loc.get () in
        if log then
          Wp_parameters.warning ~source:(fst loc) "%s" text ~once:true ;
        phi {

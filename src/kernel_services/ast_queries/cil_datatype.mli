@@ -242,6 +242,7 @@ module Stmt: sig
                       and type 'a map = 'a Hptmap.Shape(Stmt_Id).t
     val self: State.t
   end
+  val loc_skind: stmtkind -> location
   val loc: t -> location
   val pretty_sid: Format.formatter -> t -> unit
   (** Pretty print the sid of the statement

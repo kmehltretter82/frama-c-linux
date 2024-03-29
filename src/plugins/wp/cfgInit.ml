@@ -34,10 +34,9 @@ struct
              | `All -> true
              | `InitConst -> Cil.isGlobalInitConst var
            in if not do_init then obj
-           else let old_loc = Cil.CurrentLoc.get () in
-             Cil.CurrentLoc.set var.vdecl ;
-             let obj = W.init wenv var initinfo.init obj in
-             Cil.CurrentLoc.set old_loc ; obj
+           else
+             Current_loc.with_loc var.vdecl
+               (W.init wenv var initinfo.init) obj
       ) obj
 
   let process_global_const wenv obj =

@@ -444,7 +444,7 @@ module rec Transfer
   (*    let l = Globals.Vars.fold_in_file_order (fun v i l -> (v, i) :: l) [] in
         List.fold_left (fun state (v, i) -> do_one v i state) state l*)
 
-  (** The (backwards) transfer function for a branch. The [(Cil.CurrentLoc.get
+  (** The (backwards) transfer function for a branch. The [(Current_loc.get
       ())] is set before calling this. If it returns None, then we have some
       default handling. Otherwise, the returned data is the data before the
       branch (not considering the exception handlers) *)
@@ -584,7 +584,7 @@ module rec Transfer
 
 
   (** The (backwards) transfer function for an instruction. The
-      [(Cil.CurrentLoc.get ())] is set before calling this. If it returns
+      [(Current_loc.get ())] is set before calling this. If it returns
       None, then we have some default handling. Otherwise, the returned data is
       the data before the branch (not considering the exception handlers) *)
   let doInstr _stmt instr state =
@@ -734,7 +734,7 @@ let consolidated_must_monitor_vi vi =
 let concurrent_function_ref = ref None
 
 let abort_because_of_concurrent ~loc vi =
-  Cil.CurrentLoc.set loc;
+  Current_loc.set loc;
   Options.abort
     ~current:true
     "Found concurrent function %a and monitored memory properties.\n\

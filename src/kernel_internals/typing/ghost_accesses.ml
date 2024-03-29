@@ -115,7 +115,7 @@ class visitor = object(self)
 
   method private bad_ghost_function kf =
     let source = match prefered_loc with
-      | None -> fst (CurrentLoc.get())
+      | None -> fst (Current_loc.get())
       | Some l -> l
     in
     Error.cannot_check_ghost_call ~source ~current:true ~once:true kf

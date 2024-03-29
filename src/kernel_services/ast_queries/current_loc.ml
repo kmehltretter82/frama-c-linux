@@ -1,9 +1,9 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of WP plug-in of Frama-C.                           *)
+(*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
 (*  Copyright (C) 2007-2023                                               *)
-(*    CEA (Commissariat a l'energie atomique et aux energies              *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
@@ -20,46 +20,30 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Contextual Values *)
+include State_builder.Ref
+    (Cil_datatype.Location)
+    (struct
+      let dependencies = []
+      let name = "Current_loc"
+      let default () = Cil_datatype.Location.unknown
+    end)
 
-type 'a value
+let () = Log.set_current_source (fun () -> fst (get ()))
 
-val create : ?default:'a -> string -> 'a value
-(** Creates a new context with name *)
+let with_loc loc f x =
+  let oldLoc = get () in
+  let finally () = set oldLoc in
+  let work () = set loc; f x in
+  Fun.protect ~finally work
 
-val defined : 'a value -> bool
-(** The current value is defined. *)
+let with_loc_opt loc_opt f x =
+  match loc_opt with
+  | None -> f x
+  | Some loc -> with_loc loc f x
 
-val get : 'a value -> 'a
-(** Retrieves the current value of the context.
-    Raise an exception if not bound. *)
+module Operators = struct
+  type operation = UpdatedCurrentLoc
 
-val get_opt : 'a value -> 'a option
-(** Retrieves the current value of the context.
-    Return [None] if not bound. *)
-
-val set : 'a value -> 'a -> unit
-(** Define the current value. Previous one is lost *)
-
-val update : 'a value -> ('a -> 'a) -> unit
-(** Modification of the current value *)
-
-val bind : 'a value -> 'a -> ('b -> 'c) -> 'b -> 'c
-(** Performs the job with local context bound to local value. *)
-
-val free : 'a value -> ('b -> 'c) -> 'b -> 'c
-(** Performs the job with local context cleared. *)
-
-val clear : 'a value -> unit
-(** Clear the current value. *)
-
-val push : 'a value -> 'a -> 'a option
-val pop : 'a value -> 'a option -> unit
-
-val name : 'a value -> string
-
-val register : (unit -> unit) -> unit
-(** Register a global configure, to be executed once per project/ast. *)
-
-val configure : unit -> unit
-(** Apply global configure hooks, once per project/ast. *)
+  let ( let<> ) loc f = with_loc loc f UpdatedCurrentLoc
+  let ( let<?> ) loc_opt f = with_loc_opt loc_opt f UpdatedCurrentLoc
+end

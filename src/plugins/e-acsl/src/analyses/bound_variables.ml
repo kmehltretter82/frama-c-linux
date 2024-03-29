@@ -681,7 +681,7 @@ end
 = struct
 
   let process_quantif ~loc p =
-    Cil.CurrentLoc.set loc;
+    Current_loc.set loc;
     match p.pred_content with
     | Pforall(bound_vars, ({ pred_content = Pimplies(_, _) } as goal)) ->
       compute_guards loc ~is_forall:true p bound_vars goal

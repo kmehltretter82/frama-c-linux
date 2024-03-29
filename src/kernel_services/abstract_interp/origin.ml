@@ -58,7 +58,7 @@ module Id = State_builder.Counter (struct let name = "Origin.Id" end)
 
 let current kind =
   let id = Id.next () in
-  let loc = Cil.CurrentLoc.get () in
+  let loc = Current_loc.get () in
   Origin { kind; loc; id; }
 
 let well = Well
@@ -153,13 +153,13 @@ let clear () = Id.reset (); History.clear ()
 
 let is_current = function
   | Unknown | Well -> false
-  | Origin { loc } -> Cil_datatype.Location.equal loc (Cil.CurrentLoc.get ())
+  | Origin { loc } -> Cil_datatype.Location.equal loc (Current_loc.get ())
 
 (* Returns true if the origin has never been registered and is related to the
    current location. *)
 let register_write bases t =
   if is_unknown t then false else
-    let current_loc = Cil.CurrentLoc.get () in
+    let current_loc = Current_loc.get () in
     let is_new = not (History.mem t) in
     let change (w, r, b) =
       LocSet.add current_loc w, r, Base.SetLattice.join b bases
@@ -171,7 +171,7 @@ let register_write bases t =
 (* Registers a read only if the current location is not that of the origin. *)
 let register_read bases t =
   if not (is_unknown t || is_current t) then
-    let current_loc = Cil.CurrentLoc.get () in
+    let current_loc = Current_loc.get () in
     let change (w, r, b) =
       w, LocSet.add current_loc r, Base.SetLattice.join b bases
     in

@@ -355,7 +355,7 @@ let rec type_term
       mk_ctx ~use_gmp_opt:true (ty_of_interv i)
   in
   let infer t =
-    Cil.CurrentLoc.set t.term_loc;
+    Current_loc.set t.term_loc;
     (* this pattern matching implements the formal rules of the JFLA's paper
        (and of course also covers the missing cases). Also enforce the invariant
        that every subterm is typed, even if it is not an integer. *)
@@ -777,7 +777,7 @@ and type_predicate ~profile p =
     do_both f g = (try f() with e -> try g(); raise e with | _ -> raise e); g()
   in
   let p = Logic_normalizer.get_pred p in
-  Cil.CurrentLoc.set p.pred_loc;
+  Current_loc.set p.pred_loc;
   (* this pattern matching also follows the formal rules of the JFLA's paper *)
   match p.pred_content with
   | Pfalse | Ptrue -> ()

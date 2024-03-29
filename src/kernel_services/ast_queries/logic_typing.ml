@@ -2604,7 +2604,7 @@ struct
           (match lv.lv_type with
            | Ctype (TVoid _)->
              if ctxt.silent then raise Backtrack;
-             ctxt.error (CurrentLoc.get())
+             ctxt.error (Current_loc.get())
                "Variable %s is bound to a predicate, not a term" x
            | _ -> old_val lv)
         with Not_found ->
@@ -4099,8 +4099,9 @@ struct
     | TDsyn typ -> LTsyn (plain_logic_type loc env typ)
 
   let rec annot in_axiomatic a =
+    let open Current_loc.Operators in
     let loc = a.decl_loc in
-    Cil.CurrentLoc.set loc;
+    let<> UpdatedCurrentLoc = loc in
     match a.decl_node with
     | LDlogic_reads (f, labels, poly, t, p, l) ->
       let env,info = logic_decl loc f labels poly ~return_type:t p in

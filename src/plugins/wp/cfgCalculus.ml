@@ -204,7 +204,7 @@ struct
 
   let rec wp (env:env) (a:vertex) : W.t_prop =
     match Vhash.find env.wp a with
-    | None -> raise (NonNaturalLoop (Cil.CurrentLoc.get()));
+    | None -> raise (NonNaturalLoop (Current_loc.get()));
     | Some pi -> pi
     | exception Not_found ->
       (* cut circularities *)
@@ -216,28 +216,21 @@ struct
 
   (* Compute a stmt node *)
   and stmt env a (s: stmt) : W.t_prop =
-    let kl = Cil.CurrentLoc.get () in
-    try
-      Cil.CurrentLoc.set (Stmt.loc s) ;
-      let smoking = is_default_bhv env.mode && env.dead s in
-      let cas = CfgAnnot.get_code_assertions ~smoking env.mode.kf s in
-      let opt_fold f = Option.fold ~none:Fun.id ~some:f in
-      let do_assert env CfgAnnot.{ code_admitted ; code_verified } w =
-        opt_fold (prove_property env) code_verified @@
-        opt_fold (use_property env) code_admitted w
-      in
-      let probes = Probe.annotations s in
-      let do_probe env (probe,term) =
-        W.add_probe env.we ~stmt:s probe term in
-      let pi =
-        W.label env.we (Some s) (Clabels.stmt s) @@
-        List.fold_right (do_probe env) probes @@
-        List.fold_right (do_assert env) cas @@
-        control env a s
-      in
-      Cil.CurrentLoc.set kl ; pi
-    with err ->
-      Cil.CurrentLoc.set kl ; raise err
+    let open Current_loc.Operators in
+    let<> UpdatedCurrentLoc = Stmt.loc s in
+    let smoking = is_default_bhv env.mode && env.dead s in
+    let cas = CfgAnnot.get_code_assertions ~smoking env.mode.kf s in
+    let opt_fold f = Option.fold ~none:Fun.id ~some:f in
+    let do_assert env CfgAnnot.{ code_admitted ; code_verified } w =
+      opt_fold (prove_property env) code_verified @@
+      opt_fold (use_property env) code_admitted w
+    in
+    let probes = Probe.annotations s in
+    let do_probe env (probe,term) = W.add_probe env.we ~stmt:s probe term in
+    W.label env.we (Some s) (Clabels.stmt s) @@
+    List.fold_right (do_probe env) probes @@
+    List.fold_right (do_assert env) cas @@
+    control env a s
 
   (* Branching wrt control-flow *)
   and control env a s : W.t_prop =
