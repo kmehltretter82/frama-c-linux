@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* ************************************************************************ */
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
