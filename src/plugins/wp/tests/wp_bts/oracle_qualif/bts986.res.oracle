@@ -1,4 +1,4 @@
-# frama-c -wp -wp-steps 50 [...]
+# frama-c -wp [...]
 [kernel] Parsing bts986.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] [Valid] Goal f_exits (Cfg) (Unreachable)
