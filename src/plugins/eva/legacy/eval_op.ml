@@ -128,22 +128,28 @@ let reduce_by_initialized_defined f loc state =
     state
 
 let reduce_by_valid_loc ~positive access loc typ state =
-  let value = Cvalue.Model.find state loc in
-  let loc_bits = Locations.loc_bytes_to_loc_bits value in
+  let value = Cvalue.Model.find_indeterminate state loc in
+  let loc_bytes = Cvalue.V_Or_Uninitialized.get_v value in
+  let loc_bits = Locations.loc_bytes_to_loc_bits loc_bytes in
   let size = Bit_utils.sizeof_pointed typ in
-  let value_as_loc = Locations.make_loc loc_bits size in
-  let reduced_value =
-    Locations.loc_to_loc_without_size
-      (if positive
-       then Locations.valid_part access value_as_loc
-       else Locations.invalid_part value_as_loc )
+  let location = Locations.make_loc loc_bits size in
+  let reduced_location =
+    if positive
+    then Locations.valid_part access location
+    else Locations.invalid_part location
   in
-  if V.equal value reduced_value
+  let reduced_loc_bytes = Locations.loc_to_loc_without_size reduced_location in
+  let reduced_value =
+    if positive
+    then Cvalue.V_Or_Uninitialized.initialized reduced_loc_bytes
+    else Cvalue.V_Or_Uninitialized.map (fun _ -> reduced_loc_bytes) value
+  in
+  if Cvalue.V_Or_Uninitialized.equal value reduced_value
   then state
   else
-  if V.equal V.bottom reduced_value
+  if Cvalue.V_Or_Uninitialized.(equal bottom reduced_value)
   then Cvalue.Model.bottom
-  else Cvalue.Model.reduce_previous_binding state loc reduced_value
+  else Cvalue.Model.reduce_indeterminate_binding state loc reduced_value
 
 let make_loc_contiguous loc =
   try

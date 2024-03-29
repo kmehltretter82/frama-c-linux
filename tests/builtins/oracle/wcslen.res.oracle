@@ -478,8 +478,7 @@
             [1] ∈ {0}
 [eva:final-states] Values at end of function negative_offsets:
   Frama_C_entropy_source ∈ [--..--]
-  buf[0..88] ∈ {65} or UNINITIALIZED
-     [89..98] ∈ {0; 65} or UNINITIALIZED
+  buf[0..98] ∈ {65} or UNINITIALIZED
      [99] ∈ {0}
   len1 ∈ UNINITIALIZED
   len2 ∈ UNINITIALIZED
@@ -491,7 +490,7 @@
   offset4 ∈ {-1; 0; 1; 2}
   offset5 ∈ [-4..7]
   offset6 ∈ [-10..0]
-  p ∈ {{ &buf + [-40..0],0%4 }}
+  p ∈ {{ &buf[0] }}
 [eva:final-states] Values at end of function small_sets:
   s ∈ {{ L"b\000c" }}
   p ∈ {{ L"b\000c" + {0; 8} }}

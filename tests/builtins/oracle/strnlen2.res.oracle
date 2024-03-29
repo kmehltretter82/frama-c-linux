@@ -877,7 +877,7 @@
   offset4 ∈ {-1; 0; 1; 2}
   offset5 ∈ [-4..7]
   offset6 ∈ [-10..0]
-  p ∈ {{ &buf + [-10..0] }}
+  p ∈ {{ &buf[0] }}
 [eva:final-states] Values at end of function no_zero_but_ok:
   s[0..9] ∈ {1}
    [10] ∈ {0}

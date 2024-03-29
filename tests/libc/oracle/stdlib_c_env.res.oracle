@@ -163,8 +163,6 @@
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.c:137: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
 [eva] FRAMAC_SHARE/libc/stdlib.c:141: Call to builtin strlen
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.c:141: Warning: 
-  function strlen: precondition 'valid_string_s' got status unknown.
 [eva] FRAMAC_SHARE/libc/stdlib.c:147: 
   Reusing old results for call to __fc_initenv
 [eva] computing for function Frama_C_nondet <- setenv <- main.
@@ -237,11 +235,7 @@
 [eva] computing for function unsetenv <- main.
   Called from stdlib_c_env.c:24.
 [eva] FRAMAC_SHARE/libc/stdlib.c:167: Call to builtin strchr
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.c:167: Warning: 
-  function strchr: precondition 'valid_string_s' got status unknown.
 [eva] FRAMAC_SHARE/libc/stdlib.c:171: Call to builtin strlen
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.c:171: Warning: 
-  function strlen: precondition 'valid_string_s' got status unknown.
 [eva] FRAMAC_SHARE/libc/stdlib.c:177: 
   Reusing old results for call to __fc_initenv
 [eva] computing for function Frama_C_nondet <- unsetenv <- main.
@@ -311,7 +305,7 @@
    [8..9] ∈ {0}
   i2 ∈ [--..--]
   r1 ∈ {{ NULL ; &s[0] ; &__fc_env_strings + [0..63] ; "BLA=1" }}
-  r2 ∈ {{ NULL ; &s[0] ; &__fc_env_strings + [0..63] ; "BLA=1" }}
+  r2 ∈ {{ &s[0] ; &__fc_env_strings + [0..63] ; "BLA=1" }}
   i3 ∈ {-1; 0}
   i4 ∈ {-1; 0}
   i5 ∈ {-1; 0}
