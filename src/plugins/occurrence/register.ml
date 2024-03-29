@@ -132,7 +132,7 @@ class occurrence = object (self)
     DoChildren
 
   method! vstmt_aux s =
-    Db.yield ();
+    Async.yield ();
     super#vstmt_aux s
 
   initializer Eva.Analysis.compute ()
@@ -249,7 +249,7 @@ let print_all = print_all
 (* ************************************************************************** *)
 
 let main _fmt = if Print.get () then print_all ()
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (*
 Local Variables:

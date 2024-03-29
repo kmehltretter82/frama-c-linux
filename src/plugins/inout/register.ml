@@ -77,7 +77,7 @@ let main () =
          end)
   end
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 
 (*

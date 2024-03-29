@@ -108,12 +108,3 @@ let pretty_external fmt kf =
   Format.fprintf fmt "@[Derefs for function %a:@\n@[<hov 2>  %a@]@]@\n"
     Kernel_function.pretty kf
     Zone.pretty (get_external kf)
-
-let () =
-  Db.Derefs.self_internal := Analysis.Memo.self;
-  Db.Derefs.self_external := Externals.self;
-  Db.Derefs.get_internal := get_internal;
-  Db.Derefs.get_external := get_external;
-  Db.Derefs.compute := compute_external;
-  Db.Derefs.display := pretty_external;
-  Db.Derefs.statement := Analysis.statement

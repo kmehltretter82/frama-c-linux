@@ -2,30 +2,53 @@
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
 [alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *a = (int *)0;  is    <empty>
 [alias] analysing instruction: int *b = (int *)0;
 [alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *b = (int *)0;  is    <empty>
 [alias] analysing instruction: int *c = (int *)0;
 [alias] May-aliases after instruction  int *c = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *c = (int *)0;  is    <empty>
 [alias] analysing instruction: int *d = (int *)0;
 [alias] May-aliases after instruction  int *d = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *d = (int *)0;  is    <empty>
 [alias] analysing instruction: swap(a,b);
 [alias] analysing function: swap
 [alias] analysing instruction: int z = 0;
 [alias] May-aliases after instruction  int z = 0;  are  <none>
+[alias] May-alias graph after instruction  int z = 0;  is    <empty>
 [alias] analysing instruction: z = *x;
 [alias] May-aliases after instruction  z = *x;  are  <none>
+[alias] May-alias graph after instruction  z = *x;  is    <empty>
 [alias] analysing instruction: *x = *y;
 [alias] May-aliases after instruction  *x = *y;  are  <none>
+[alias] May-alias graph after instruction  *x = *y;  is    <empty>
 [alias] analysing instruction: *y = z;
 [alias] May-aliases after instruction  *y = z;  are  <none>
+[alias] May-alias graph after instruction  *y = z;  is    <empty>
 [alias] May-aliases at the end of function swap: <none>
+[alias] May-alias graph at the end of function swap:
+  <empty>
+[alias] Summary of function swap:
 [alias] May-aliases after instruction  swap(a,b);  are  <none>
+[alias] May-alias graph after instruction  swap(a,b);  is    <empty>
 [alias] analysing instruction: swap(c,d);
 [alias] May-aliases after instruction  swap(c,d);  are  <none>
+[alias] May-alias graph after instruction  swap(c,d);  is    <empty>
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  <none>
+[alias] May-alias graph after instruction  __retres = 0;  is    <empty>
 [alias] May-aliases at the end of function main: <none>
+[alias] May-alias graph at the end of function main:
+  <empty>
+[alias] Summary of function main:
+  formals:     returns: __retres    state: <none>
 [alias] analysing function: swap
 [alias] analysing instruction: int z = 0;
 [alias] May-aliases after instruction  int z = 0;  are  <none>
+[alias] May-alias graph after instruction  int z = 0;  is    <empty>
 [alias] May-aliases at the end of function swap: <none>
+[alias] May-alias graph at the end of function swap:
+  <empty>
+[alias] Summary of function swap:
+[alias] Analysis complete

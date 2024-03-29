@@ -77,9 +77,6 @@ type typeSpecifier = (* Merge all specifiers into one type *)
 and storage =
   | NO_STORAGE | AUTO | STATIC | EXTERN | REGISTER
 
-and funspec =
-  | INLINE | VIRTUAL | EXPLICIT
-
 and cvspec =
   | CV_CONST | CV_VOLATILE | CV_RESTRICT
   | CV_ATTRIBUTE_ANNOT of string | CV_GHOST
@@ -96,7 +93,6 @@ and spec_elem =
   | SpecStorage of storage
   | SpecInline
   | SpecType of typeSpecifier
-  | SpecPattern of string       (* specifier pattern variable *)
 
 (* decided to go ahead and replace 'spec_elem list' with specifier *)
 and specifier = spec_elem list
@@ -133,7 +129,6 @@ and name_group = specifier * name list
 (* The optional expression is the bitfield *)
 and field_group =
   | FIELD of specifier * (name * expression option) list
-  | TYPE_ANNOT of Logic_ptree.type_annot
   | STATIC_ASSERT_FG of expression * string * cabsloc
 
 (* like name_group, except the declared variables are allowed to have initializers *)
@@ -252,9 +247,6 @@ and raw_statement =
       front-ends.
   *)
 
-  | TRY_EXCEPT of block * expression * block * cabsloc (** MS SEH *)
-  | TRY_FINALLY of block * block * cabsloc (** MS SEH *)
-
   | CODE_ANNOT of (Logic_ptree.code_annot * cabsloc) (* annotations *)
   | CODE_SPEC of (Logic_ptree.spec * cabsloc) (* annotations *)
 
@@ -311,7 +303,6 @@ and cabsexp =
   | MEMBEROF of expression * string
   | MEMBEROFPTR of expression * string
   | GNU_BODY of block
-  | EXPR_PATTERN of string     (* pattern variable, and name *)
   | GENERIC of (expression * (((specifier * decl_type) option * expression) list))
 
 and constant =

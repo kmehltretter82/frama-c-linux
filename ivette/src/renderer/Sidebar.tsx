@@ -30,7 +30,7 @@ import { SideBar } from 'dome/frame/sidebars';
 import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
 import { SidebarProps, SIDEBAR } from 'ivette';
-import * as Ext from './Extensions';
+import * as State from 'ivette/state';
 
 /* -------------------------------------------------------------------------- */
 /* --- SideBar Selector                                                   --- */
@@ -73,6 +73,7 @@ function Wrapper(props: WrapperProps): JSX.Element {
 
   return (
     <SideBar className={className}>
+      <div className="sidebar-ruler"/>
       <Catch label={props.id}>
         {props.children}
       </Catch>
@@ -88,7 +89,7 @@ export function Panel(): JSX.Element {
   const [selected, setSelected] =
     Dome.useStringSettings('ivette.sidebar.selected');
 
-  const sidebars = Ext.useElements(SIDEBAR);
+  const sidebars = State.useElements(SIDEBAR);
 
   // Ensures there is one selected sidebar
   React.useEffect(() => {
@@ -121,7 +122,7 @@ export function Panel(): JSX.Element {
   );
 
   return (
-    <div className="sidebar-ruler">
+    <div className="sidebar-view">
       <div className={selectorClasses}>
         {items}
       </div>

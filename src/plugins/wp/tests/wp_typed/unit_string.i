@@ -1,5 +1,5 @@
 /* run.config_qualif
-   OPT: -wp-literals
+   OPT: -wp-literals -wp-msg-key print-generated
 */
 
 void f(void)

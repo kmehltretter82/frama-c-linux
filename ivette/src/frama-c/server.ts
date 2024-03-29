@@ -31,7 +31,7 @@
 */
 
 import { debounce } from 'lodash';
-const Path = require('path');
+import * as Path from 'path';
 import React from 'react';
 import * as Dome from 'dome';
 import * as System from 'dome/misc/system';
@@ -491,7 +491,10 @@ async function _launch(): Promise<void> {
     cwd: working,
     stdout: { path: logout, pipe: true },
     stderr: { path: logerr, pipe: true },
-    env: { ...env, ... window.electron.process.env },
+    env: {
+      ...env,
+      ...window.electron.process.env
+    } as { [VAR: string]: string },
   };
   // Launch Process
   System.atExit(() => {

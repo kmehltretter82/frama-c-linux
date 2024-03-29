@@ -44,7 +44,7 @@
   f_previous ∈ {{ &a }}
 [eva] computing for function f <- main.
   Called from from_call.i:81.
-[kernel:annot:missing-spec] from_call.i:13: Warning: 
+[kernel:annot:missing-spec] from_call.i:20: Warning: 
   Neither code nor specification for function h,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function h <- f <- main.
@@ -178,6 +178,9 @@
 [eva] computing for function unavailable_f <- main.
   Called from from_call.i:96.
 [eva] using specification for function unavailable_f
+[eva:garbled-mix:assigns] from_call.i:96: 
+  The specification of function unavailable_f
+  has generated a garbled mix of addresses for assigns clause AR.
 [eva] Done for function unavailable_f
 [eva] Recording results for main
 [from] Computing for function main

@@ -31,7 +31,7 @@ type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers
 type full_result = {
   c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
   c_clobbered: Base.SetLattice.t;
-  c_from: (Function_Froms.froms * Locations.Zone.t) option;
+  c_assigns: (Assigns.t * Locations.Zone.t) option;
 }
 
 type call_result =
@@ -252,6 +252,8 @@ let process_result call state call_result =
     | Some value, Some vi_ret ->
       let b_ret = Base.of_varinfo vi_ret in
       let offsm = Eval_op.offsetmap_of_v ~typ:vi_ret.vtype value in
+      let prefix = "Builtin " ^ Kernel_function.get_name call.kf in
+      Cvalue_transfer.warn_imprecise_offsm_write ~prefix (Cil.var vi_ret) offsm;
       Cvalue.Model.add_base b_ret offsm state, clob
     | _, _ -> state, clob (* TODO: error? *)
   in
@@ -274,7 +276,7 @@ let apply_builtin (builtin:builtin) call ~pre ~post =
     let states = process_result call post call_result in
     let froms =
       match call_result with
-      | Full result -> result.c_from
+      | Full result -> result.c_assigns
       | States _ | Result _ -> None
     in
     let result = `Builtin (List.map fst states, froms) in

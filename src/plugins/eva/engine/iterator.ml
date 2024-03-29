@@ -100,15 +100,6 @@ module Make_Dataflow
 
   (* --- Plugin parameters --- *)
 
-  type descending_strategy = NoIteration | FullIteration | ExitIteration
-
-  let descending_iteration : descending_strategy =
-    match Parameters.DescendingIteration.get () with
-    | "no" -> NoIteration
-    | "exits" -> ExitIteration
-    | "full" -> FullIteration
-    | _ -> assert false
-
   let hierachical_convergence : bool =
     Parameters.HierarchicalConvergence.get ()
 
@@ -447,10 +438,10 @@ module Make_Dataflow
     let {edge_transition=transition; edge_kinstr=kinstr} = e in
     let tank = get_edge_data e in
     let flow = Partitioning.drain tank in
-    Db.yield ();
+    Async.yield ();
     check_signals ();
     current_ki := kinstr;
-    Cil.CurrentLoc.set e.edge_loc;
+    Current_loc.set e.edge_loc;
     let flow = Partitioning.transfer (transfer_transition transition) flow in
     let flow = process_partitioning_transitions v1 v2 transition flow in
     if not (Partitioning.is_empty_flow flow) then
@@ -475,7 +466,7 @@ module Make_Dataflow
         (* Set location *)
         current_ki := Kstmt stmt;
         let current_loc = Cil_datatype.Stmt.loc stmt in
-        Cil.CurrentLoc.set current_loc
+        Current_loc.set current_loc
       | None -> ()
     end;
     (* Get vertex store *)
@@ -584,7 +575,7 @@ module Make_Dataflow
         incr iteration_count;
       done;
       (* Descending sequence *)
-      let l =  match descending_iteration with
+      let l =  match Parameters.DescendingIteration.get () with
         | NoIteration -> []
         | ExitIteration ->
           Self.debug ~dkey

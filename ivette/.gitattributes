@@ -6,11 +6,13 @@
 /sandboxer.js header_spec=.ignore
 /.babelrc header_spec=.ignore
 /.eslint* header_spec=.ignore
+/*.yml header_spec=.ignore
 /doc/**/*.js header_spec=.ignore
 /dome/doc/**/*.js header_spec=.ignore
 /src/dome/doc/template/static/fonts/*-webfont.* header_spec=.ignore
 /src/dome/template/git-ignore header_spec=.ignore
 /src/dome/doc/template/tmpl/*.tmpl header_spec=.ignore
+/src/dome/template/*.templ header_spec=.ignore
 /src/dome/doc/**/*.js header_spec=.ignore
 /src/dome/doc/**/*.htm header_spec=.ignore
 /src/dome/doc/**/*.txt header_spec=.ignore

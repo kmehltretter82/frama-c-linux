@@ -79,9 +79,8 @@ let process_call_res data stmt lvaloption froms =
   let data = match lvaloption with
     | None -> false, data
     | Some lval ->
-      let ret_dpds = froms.Function_Froms.deps_return in
-      let r_dpds = Function_Froms.Memory.collapse_return ret_dpds in
-      let r_dpds = Function_Froms.Deps.to_zone r_dpds in
+      let ret_dpds = froms.Eva.Assigns.return in
+      let r_dpds = Eva.Deps.to_zone ret_dpds in
       let l_dpds, exact, l_zone =
         get_lval_zones ~for_writing:true  stmt lval in
       compute_new_data data l_zone l_dpds exact r_dpds
@@ -92,10 +91,10 @@ let process_call_res data stmt lvaloption froms =
  * Moreover, we need to add the part of [data_after] that has not been
  * modified for sure. *)
 let process_froms data_after froms =
-  let from_table = froms.Function_Froms.deps_table in
+  let from_table = froms.Eva.Assigns.memory in
   let process_out_call out deps (to_prop, used, new_data) =
-    let out_dpds = Function_Froms.DepsOrUnassigned.to_zone deps in
-    let default = Function_Froms.DepsOrUnassigned.may_be_unassigned deps in
+    let out_dpds = Eva.Assigns.DepsOrUnassigned.to_zone deps in
+    let default = Eva.Assigns.DepsOrUnassigned.may_be_unassigned deps in
     let exact = not default in
     (* be careful to compare out with data_after and not new_data *)
     if (Data.intersects data_after out) then
@@ -113,12 +112,12 @@ let process_froms data_after froms =
   let used = false in (* is the call needed ? *)
   let to_prop, used, new_data =
     match from_table with
-    | Function_Froms.Memory.Bottom -> to_prop, used, new_data
-    | Function_Froms.Memory.Top ->
-      let v = Function_Froms.DepsOrUnassigned.top in
+    | Bottom -> to_prop, used, new_data
+    | Top ->
+      let v = Eva.Assigns.DepsOrUnassigned.top in
       process_out_call Locations.Zone.top v (to_prop, used, new_data)
-    | Function_Froms.Memory.Map m ->
-      Function_Froms.Memory.fold process_out_call m (to_prop, used, new_data)
+    | Map m ->
+      Eva.Assigns.Memory.fold process_out_call m (to_prop, used, new_data)
   in let data = Data.merge to_prop new_data in
   (used, data)
 

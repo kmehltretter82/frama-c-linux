@@ -16,6 +16,8 @@ The plugin implements a variant of « Steensgaard's algorithm ».
 Note that the Eva plugin also implements a points-to analysis, which is much
 more precise but also much less efficient than this plugin.
 
+This plugin is currently at an experimental stage.
+
 ## Usage
 
 To run the may-alias analysis either:
@@ -41,7 +43,6 @@ Therefore the analysis is efficient, whereas the results are not very precise.
 - recursive functions
 - user-defined variadic functions
 - function declared and used without being defined (i.e., no function body)
-- function pointers
 - assembly code
 - instructions longjmp and setjmp
 - complex instruction goto that breaks the natural control-flow of the program

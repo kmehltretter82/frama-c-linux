@@ -7,5 +7,5 @@
   13    int g(int);
   14    
   15    int g(short x) { return x; }
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                ^
 [kernel] Frama-C aborted: invalid user input.

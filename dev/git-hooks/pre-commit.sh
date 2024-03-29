@@ -23,8 +23,8 @@
 
 # Example of installation of this pre-commit hook (client side):
 # - (cd .git/hooks/ && ln -s ../../dev/git-hooks/pre-commit.sh pre-commit)
-# Note: if you decide to copy the file, the `SCRIPT_DIR` variable must be
-# fixed accordingly.
+
+ROOT=$(git rev-parse --show-toplevel)
 
 echo "Pre-commit Hook..."
 
@@ -36,5 +36,4 @@ then
   exit 0
 fi
 
-SCRIPT_DIR=$(dirname -- "$( readlink -f -- "$0"; )")
-"$SCRIPT_DIR/../check-files.sh" -c || exit 1
+"$ROOT/dev/check-files.sh" -c || exit 1

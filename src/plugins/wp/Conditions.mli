@@ -62,6 +62,7 @@ and condition =
   | Branch of pred * sequence * sequence (** If-Then-Else *)
   | Either of sequence list (** Disjunction *)
   | State of Mstate.state (** Memory Model snapshot *)
+  | Probe of Probe.t * term (** Named probes *)
 
 and sequence (** List of steps *)
 
@@ -143,6 +144,9 @@ val step_at : sequence -> int -> step
 val is_trivial : sequent -> bool
 (** Goal is true or hypotheses contains false. *)
 
+val probes : sequence -> term Probe.Map.t
+(** Collect all probes in the sequence *)
+
 (** {2 Transformations} *)
 
 val map_condition : (pred -> pred) -> condition -> condition
@@ -184,7 +188,7 @@ val introduction : sequent -> sequent option
 val introduction_eq : sequent -> sequent
 (** Same as [introduction] but returns the same sequent is None *)
 
-val lemma : pred -> sequent
+val lemma : loc:location -> pred -> sequent
 (** Performs existential, universal and hypotheses introductions *)
 
 val head : step -> pred
@@ -198,8 +202,8 @@ val pred_cond : condition -> pred
 val condition : sequence -> pred
 (** With free variables kept. *)
 
-val close : sequent -> pred
-(** With free variables {i quantified}. *)
+val property : sequent -> pred
+(** With free variables kept. *)
 
 val at_closure : (sequent -> sequent ) -> unit
 (** register a transformation applied just before close *)
@@ -234,6 +238,10 @@ val merge : bundle list -> bundle
     branches when possible.
     Linear complexity is achieved by assuming bundle ordering is consistent
     over the list. *)
+
+(** Inserts probes to a sequent. *)
+val probe : loc:location -> ?descr:string -> ?stmt:stmt -> name:string ->
+  term -> bundle -> bundle
 
 (** Assumes a list of predicates in a [Type] section on top of the bundle. *)
 val domain : F.pred list -> bundle -> bundle

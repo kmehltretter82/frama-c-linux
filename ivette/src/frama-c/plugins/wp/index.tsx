@@ -31,48 +31,132 @@ import { IconButton } from 'dome/controls/buttons';
 import { LED, Meter } from 'dome/controls/displays';
 import { Group, Inset } from 'dome/frame/toolbars';
 import * as Ivette from 'ivette';
+import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
+import * as Ast from 'frama-c/kernel/api/ast';
+import * as ASTview from 'frama-c/kernel/ASTview';
 import { GoalTable } from './goals';
+import { TIPView } from './tip';
 import * as WP from 'frama-c/plugins/wp/api';
 import './style.css';
+
+/* -------------------------------------------------------------------------- */
+/* --- Context Menus                                                      --- */
+/* -------------------------------------------------------------------------- */
+
+function addStartProofMenus(
+  menu: Dome.PopupMenuItem[],
+  attr: Ast.markerAttributesData,
+): void {
+  const { marker, kind } = attr;
+  switch (kind) {
+    case 'LFUN':
+    case 'DFUN':
+      menu.push({
+        label: `Prove function using WP`,
+        onClick: () => Server.send(WP.startProofs, marker)
+      });
+      return;
+    case 'STMT':
+      menu.push({
+        label: `Prove statement annotations using WP`,
+        onClick: () => Server.send(WP.startProofs, marker)
+      });
+      return;
+    case 'PROPERTY':
+      menu.push({
+        label: `Prove property using WP`,
+        onClick: () => Server.send(WP.startProofs, marker)
+      });
+      return;
+  }
+}
+
+ASTview.registerMarkerMenuExtender(addStartProofMenus);
+
+function addGenerateRTEGuardsMenu(
+  menu: Dome.PopupMenuItem[],
+  attr: Ast.markerAttributesData,
+): void {
+  const { marker, kind } = attr;
+  switch (kind) {
+    case 'LFUN':
+    case 'DFUN':
+      menu.push({
+        label: `Populate WP RTE guards`,
+        onClick: () => Server.send(WP.generateRTEGuards, marker)
+      });
+      return;
+  }
+}
+
+ASTview.registerMarkerMenuExtender(addGenerateRTEGuardsMenu);
 
 /* -------------------------------------------------------------------------- */
 /* --- Goal Component                                                     --- */
 /* -------------------------------------------------------------------------- */
 
+type Goal = WP.goal | undefined;
+
 function WPGoals(): JSX.Element {
   const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped');
   const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed');
+  const [tip, setTip] = React.useState(false);
+  const [current, setCurrent] = React.useState<Goal>(undefined);
+  Server.useShutdown(() => { setTip(false); setCurrent(undefined); });
   const scope = States.useCurrentScope();
   const [goals, setGoals] = React.useState(0);
   const [total, setTotal] = React.useState(0);
-  const onFilter = React.useCallback((goals, total) => {
-    setGoals(goals);
-    setTotal(total);
-  }, [setGoals, setTotal]);
-  const current = scoped ? scope : undefined;
-    return (
-      <>
-        <Ivette.TitleBar>
-          <Label display={goals < total}>
-            {goals} / {total}
-          </Label>
-          <Inset />
-          <IconButton icon='COMPONENT' title='Current Scope Only'
-                      enabled={!!current}
-                      selected={scoped} onClick={flipScoped} />
-          <IconButton icon='CIRC.QUESTION' title='Unresolved Goals Only'
-                      selected={failed} onClick={flipFailed} />
-        </Ivette.TitleBar>
-        <GoalTable scope={scope} failed={failed} onFilter={onFilter} />
-      </>
-    );
+  const hasGoals = total > 0;
+  return (
+    <>
+      <Ivette.TitleBar
+        label={tip ? 'WP — TIP' : 'WP — Goals'}
+        title={tip ? 'Interactive Proof Transformer' : 'Generated Goals'}
+      >
+        <Label display={goals < total}>
+          {goals} / {total}
+        </Label>
+        <Inset />
+        <IconButton
+          icon='CURSOR' title='Current Scope Only'
+          enabled={hasGoals}
+          selected={scoped}
+          onClick={flipScoped} />
+        <IconButton
+          icon='CIRC.QUESTION' title='Unresolved Goals Only'
+          enabled={hasGoals}
+          selected={failed}
+          onClick={flipFailed} />
+        <IconButton
+          icon='MEDIA.PLAY'
+          title={tip ? 'Back to Goals' : 'Interactive Proof Transformer'}
+          enabled={!!current}
+          selected={tip}
+          onClick={() => setTip(!tip)} />
+      </Ivette.TitleBar>
+      <GoalTable
+        display={!tip}
+        failed={failed}
+        scoped={scoped}
+        scope={scope}
+        current={current}
+        setCurrent={setCurrent}
+        setTIP={() => setTip(true)}
+        setGoals={setGoals}
+        setTotal={setTotal}
+      />
+      <TIPView
+        display={tip}
+        goal={current}
+        onClose={() => setTip(false)}
+      />
+    </>
+  );
 }
 
 Ivette.registerComponent({
-  id: 'frama-c.plugins.wp.goals',
-  group: 'frama-c.plugins',
-  rank: 10,
+  id: 'fc.wp.goals',
   label: 'WP Goals',
   title: 'WP Generated Verification Conditions',
   children: <WPGoals />,
@@ -83,24 +167,28 @@ Ivette.registerComponent({
 /* -------------------------------------------------------------------------- */
 
 function ServerActivity(): JSX.Element {
-  const rq = States.useRequest(WP.getScheduledTasks, null);
-  const active = rq ? rq.active > 0 : false;
-  const status = active ? 'active' : 'inactive';
+  const rq = States.useRequest(WP.getScheduledTasks, null, { pending: null });
+  const procs = rq ? rq.procs : 0;
+  const active = rq ? rq.active : 0;
+  const status = active > 0 ? 'active' : 'inactive';
   const done = rq ? rq.done : 0;
   const todo = rq ? rq.todo : 0;
   const total = done + todo;
+  const progress = done + active;
+  const objective = done + todo + procs;
+  const title = `${done} / ${todo} (${active} running, ${procs} procs)`;
   return (
-    <Group display={total > 0}>
+    <Group display={total > 0} title={title}>
       <LED status={status} />
       <Label>WP</Label>
-      <Meter value={done} min={0} max={done + total} />
+      <Meter min={0} value={progress} max={objective} />
       <Inset />
     </Group>
   );
 }
 
 Ivette.registerStatusbar({
-  id: 'frama-c.plugins.wp.server',
+  id: 'fc.wp.server',
   children: <ServerActivity />,
 });
 
@@ -109,13 +197,13 @@ Ivette.registerStatusbar({
 /* -------------------------------------------------------------------------- */
 
 Ivette.registerView({
-  id: 'frama-c.plugins.wp.main',
-  rank: 5,
+  id: 'fc.wp.main',
   label: 'WP View',
-  layout: [
-    ['frama-c.astview', 'frama-c.astinfo'],
-    'frama-c.plugins.wp.goals',
-  ],
+  layout: {
+    'A': 'fc.kernel.astview',
+    'B': 'fc.kernel.astinfo',
+    'CD': 'fc.wp.goals',
+  }
 });
 
 // --------------------------------------------------------------------------

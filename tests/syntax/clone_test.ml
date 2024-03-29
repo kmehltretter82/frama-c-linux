@@ -5,4 +5,4 @@ let run () =
   File.pretty_ast();
   Filecheck.check_ast "clone"
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

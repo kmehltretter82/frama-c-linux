@@ -34,11 +34,6 @@ let pp_storage  fmt = function
   |     EXTERN -> fprintf fmt "EXTERN"
   |     REGISTER -> fprintf fmt "REGISTER"
 
-let pp_fun_spec  fmt = function
-  |     INLINE -> fprintf fmt "INLINE"
-  |     VIRTUAL -> fprintf fmt "VIRTUAL"
-  |     EXPLICIT -> fprintf fmt "EXPLICIT"
-
 let pp_cvspec  fmt = function
   |     CV_CONST -> fprintf fmt "CV_CONST"
   |     CV_VOLATILE -> fprintf fmt "CV_VOLATILE"
@@ -102,7 +97,6 @@ and pp_spec_elem  fmt = function
   |     SpecStorage storage -> fprintf fmt "SpecStorage %a" pp_storage storage
   |     SpecInline -> fprintf fmt "SpecInline"
   |     SpecType typeSpec -> fprintf fmt "SpecType %a" pp_typeSpecifier typeSpec
-  |     SpecPattern s -> fprintf fmt "SpecPattern %s" s
 
 and pp_spec fmt spec_elems =
   fprintf fmt "@[<hv 2>{" ;
@@ -130,7 +124,6 @@ and pp_name_group fmt (spec, names) =
     names;
   fprintf fmt "}@]"
 
-(* Warning : printing for TYPE_ANNOT is not complete *)
 and pp_field_group fmt = function
   | FIELD (spec, l) ->
     fprintf fmt "@[<hov 2>FIELD spec(%a), {" pp_spec spec;
@@ -139,7 +132,6 @@ and pp_field_group fmt = function
         match e_opt with Some exp -> fprintf fmt "@ %a" pp_exp exp | _ -> ())
       l;
     fprintf fmt "}@]"
-  | TYPE_ANNOT _ -> fprintf fmt "TYPE_ANNOT"
   | STATIC_ASSERT_FG (exp, s, loc) ->
     fprintf  fmt "@[<hov 2>STATIC_ASSERT_FG exp(%a, %s, loc(%a))@]" pp_exp exp s pp_cabsloc loc
 
@@ -246,12 +238,6 @@ and pp_raw_stmt fmt = function
   |     COMPGOTO (exp, loc) ->  fprintf fmt "@[<hov 2>COMPGOTO exp(%a, loc(%a))@]" pp_exp exp pp_cabsloc loc
   |     DEFINITION def -> fprintf fmt "@[<hov 2>DEFINITION %a@]" pp_def def
   |     ASM (_,_,_,_) -> fprintf fmt "ASM"
-  |     TRY_EXCEPT (bl1, exp, bl2, loc) ->
-    fprintf fmt "@[<hov 2>TRY_EXCEPT block(%a) exp(%a) block(%a) loc(%a)@]"
-      pp_block bl1 pp_exp exp pp_block bl2 pp_cabsloc loc
-  |     TRY_FINALLY (bl1, bl2, loc) ->
-    fprintf fmt "@[<hov 2>TRY_EXCEPT block(%a) block(%a) loc(%a)@]"
-      pp_block bl1 pp_block bl2 pp_cabsloc loc
   |     THROW(e,loc) ->
     fprintf fmt "@[<hov 2>THROW %a, loc(%a)@]"
       (Format.pp_print_option pp_exp) e pp_cabsloc loc
@@ -362,7 +348,6 @@ and pp_exp_node fmt = function
   |   MEMBEROFPTR (exp, s) ->
     fprintf fmt "MEMBEROFPTR(%a,%s)" pp_exp exp s
   |   GNU_BODY bl -> fprintf fmt "GNU_BODY %a" pp_block bl
-  |   EXPR_PATTERN s -> fprintf fmt "EXPR_PATTERN %s" s
   |   GENERIC (exp, generic_assoc_list) ->
     fprintf fmt "GENERIC(%a,%a)"
       pp_exp exp

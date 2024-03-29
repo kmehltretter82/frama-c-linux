@@ -143,6 +143,16 @@ val dkey_visitor: category
 val wkey_annot_error: warn_category
 (** error in annotation. If only a warning, annotation will just be ignored. *)
 
+val wkey_plugin_not_loaded: warn_category
+(** Warning related to not loaded plugins.
+    @since Frama-C+dev
+*)
+
+val wkey_extension_unknown: warn_category
+(** Warning related to the use of an unregistered ACSL extension.
+    @since Frama-C+dev
+*)
+
 val wkey_ghost_already_ghost: warn_category
 (** ghost element is qualified with \ghost while this is already the case
     by default *)
@@ -157,6 +167,8 @@ val wkey_conditional_feature: warn_category
     (e.g. C11, gcc, ...). *)
 
 val wkey_drop_unused: warn_category
+
+val wkey_linker_weak: warn_category
 
 val wkey_implicit_conv_void_ptr: warn_category
 
@@ -202,6 +214,9 @@ val wkey_audit: warn_category
 
 val wkey_parser_unsupported: warn_category
 (** Warning related to unsupported parsing-related features. *)
+
+val wkey_parser_unsupported_attributes: warn_category
+(** Warning related to unsupported attributes during parsing. *)
 
 val wkey_asm: warn_category
 (** Warnings related to assembly code. *)

@@ -788,7 +788,7 @@ class error_manager ?reset (o_parent:GWindow.window_skel) : host =
       | Cmdline.Exit ->
         if cancelable then Project.Undo.clear_breakpoint ();
         None
-      | Sys.Break | Db.Cancel ->
+      | Sys.Break | Async.Cancel ->
         if cancelable then Project.Undo.restore ();
         self#error ?parent ~reset:true
           "Stopping current computation on user request.";
@@ -1017,10 +1017,10 @@ let spawn_command ?(timeout=0) ?stdout ?stderr s args f =
 let image_menu_item ~(image:GObj.widget) ~text ~packing =
   let mi = GMenu.menu_item () in
   let box =
-    GPack.hbox ~spacing:2 ~border_width:0 ~packing:mi#add ()
+    GPack.hbox ~spacing:4 ~border_width:0 ~packing:mi#add ()
   in
-  box#add image;
-  box#add (GMisc.label ~justify:`LEFT ~xalign:0. ~xpad:0 ~text ())#coerce;
+  box#pack image;
+  box#pack (GMisc.label ~text ())#coerce;
   packing mi;
   mi
 

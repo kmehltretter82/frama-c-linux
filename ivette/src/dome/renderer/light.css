@@ -64,7 +64,7 @@
 
     --warning-button-color: #fece72;
     --warning-led-img: radial-gradient(circle at center, #ffc749, #ecd44f);
-    --warning-button-img: linear-gradient(to bottom, #fece72 0%, #fcaa0e 100%);
+    --warning-button-img: linear-gradient(to bottom, #ffb000 0%, #ffb449 100%);
     --warning-button-hover: orange;
     --warning-button-active: #ffffff;
 

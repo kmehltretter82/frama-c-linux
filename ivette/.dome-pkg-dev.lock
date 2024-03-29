@@ -1,1 +1,1 @@
-@babel/core @babel/preset-env @babel/preset-react @babel/plugin-proposal-object-rest-spread electron@^25 electron-builder@^24 electron-vite@^1 electron-devtools-installer babel-loader css-loader@^5 @types/react@^18 @types/react-dom@^18 @types/react-virtualized@^9.21.8
+electron@^28 electron-builder@^24 electron-vite@^2 electron-devtools-installer @types/lodash@^4 @types/react@^18 @types/node@^18 @types/react-dom@^18 @types/react-virtualized@^9.21.8 @types/diff@^5 typescript@^5

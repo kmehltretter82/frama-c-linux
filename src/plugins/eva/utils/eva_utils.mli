@@ -112,9 +112,6 @@ val is_value_zero: exp -> bool
 val lval_to_exp: lval -> exp
 (** This function is memoized to avoid creating too many expressions *)
 
-val dump_garbled_mix: unit -> unit
-(** print information on the garbled mix created during evaluation *)
-
 
 (** Dependences of expressions and lvalues. *)
 
@@ -129,18 +126,12 @@ val indirect_zone_of_lval:
     on which the offset and the pointer expression (if any) of an lvalue depend.
 *)
 
-
-type deps = Function_Froms.Deps.deps = {
-  data: Locations.Zone.t;
-  indirect: Locations.Zone.t;
-}
-
 val deps_of_expr:
-  (lval -> Precise_locs.precise_location) -> exp -> deps
+  (lval -> Precise_locs.precise_location) -> exp -> Deps.t
 (** Given a function computing the location of lvalues, computes the memory
     dependencies of an expression. *)
 
-val deps_of_lval: (lval -> Precise_locs.precise_location) -> lval -> deps
+val deps_of_lval: (lval -> Precise_locs.precise_location) -> lval -> Deps.t
 (** Given a function computing the location of lvalues, computes the memory
     dependencies of an lvalue. *)
 

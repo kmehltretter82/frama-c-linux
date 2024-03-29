@@ -303,7 +303,7 @@ module rec Transfer
   and register_term kf varinfos term = match term.term_node with
     | TLval tlv | TAddrOf tlv | TStartOf tlv ->
       register_term_lval kf varinfos tlv
-    | TCastE(_, t) | Tat(t, _) ->
+    | TCast (_, _, t) | Tat(t, _) ->
       register_term kf varinfos t
     | Tlet(li, t) ->
       if may_alias li then Error.not_yet "let-binding on array or pointer"
@@ -339,7 +339,6 @@ module rec Transfer
     | Tbase_addr _ -> Error.not_yet "\\base_addr"
     | Toffset _ -> Error.not_yet "\\offset"
     | Tblock_length _ -> Error.not_yet "\\block_length"
-    | TLogic_coerce(_, t) -> register_term kf varinfos t
     | TUpdate _ -> Error.not_yet "functional update"
     | Ttypeof _ -> Error.not_yet "typeof"
     | Tempty_set -> Error.not_yet "empty set"
@@ -396,10 +395,10 @@ module rec Transfer
         (* no left-value inside inside: skip for efficiency *)
         Cil.SkipChildren
       | TUnOp _ | TBinOp _ | Ttypeof _ | TSizeOfE _
-      | TLval _ | TAlignOfE _ | TCastE _ | TAddrOf _
+      | TLval _ | TAlignOfE _ | TCast _ | TAddrOf _
       | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
       | TUpdate _ | Tunion _ | Tinter _
-      | Tcomprehension _ | Trange _ | TLogic_coerce _ ->
+      | Tcomprehension _ | Trange _  ->
         (* potential sub-term inside *)
         Cil.DoChildren
     method !vlogic_label _ = Cil.SkipChildren
@@ -445,7 +444,7 @@ module rec Transfer
   (*    let l = Globals.Vars.fold_in_file_order (fun v i l -> (v, i) :: l) [] in
         List.fold_left (fun state (v, i) -> do_one v i state) state l*)
 
-  (** The (backwards) transfer function for a branch. The [(Cil.CurrentLoc.get
+  (** The (backwards) transfer function for a branch. The [(Current_loc.get
       ())] is set before calling this. If it returns None, then we have some
       default handling. Otherwise, the returned data is the data before the
       branch (not considering the exception handlers) *)
@@ -585,7 +584,7 @@ module rec Transfer
 
 
   (** The (backwards) transfer function for an instruction. The
-      [(Cil.CurrentLoc.get ())] is set before calling this. If it returns
+      [(Current_loc.get ())] is set before calling this. If it returns
       None, then we have some default handling. Otherwise, the returned data is
       the data before the branch (not considering the exception handlers) *)
   let doInstr _stmt instr state =
@@ -735,7 +734,7 @@ let consolidated_must_monitor_vi vi =
 let concurrent_function_ref = ref None
 
 let abort_because_of_concurrent ~loc vi =
-  Cil.CurrentLoc.set loc;
+  Current_loc.set loc;
   Options.abort
     ~current:true
     "Found concurrent function %a and monitored memory properties.\n\

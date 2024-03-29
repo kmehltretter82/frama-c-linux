@@ -29,7 +29,7 @@ typedef int RES;
 #define STRING(var,str) var = str;
 
 #define TSZ 12
-const char* tab_str[TSZ] = 
+const char* tab_str[TSZ] =
   {
     "" , // 0
     "a", // 1
@@ -523,6 +523,7 @@ void strchr_unbounded() {
   IF_NONDET(s, t);
   STRCHR(RES, u2, s, 0, c); // alarm
   //@ assert (u2 >= -1 && u2 <= 26); // alarm
+  IF_NONDET(s, t);
   init_array_nondet(t, 0, 29, 0, 1);
   STRCHR(RES, u3, s, 0, c); // alarm
   //@ assert (u3 >= -1 && u3 <= 29); // alarm
@@ -533,7 +534,8 @@ void strchr_unbounded() {
 void strchr_invalid() {
   CHAR_PTR(s);
   STRING(s,"hello");
-  STRCHR(RES, unused, s, (unsigned int)&s, 1); // alarm
+  s = (char *)(s + (unsigned int)(&s));
+  STRCHR(RES, unused, s, 0, 1); // alarm
 }
 
 void strchr_garbled_mix_in_char() {

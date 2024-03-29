@@ -95,20 +95,11 @@ via \verb|ocamlfind|.
 
 \subsection{Declaring dependencies}
 
-Optional dependencies can be detected and disabled in different ways:
-
-\begin{itemize}
-\item If the module is dynamically accessible via \verb|Db| (see
-  Section~\ref{adv:static-registration} for more details), the detection
-  can be done directly in OCaml and requires no special handling in the
-  \verb|dune| file;
-\item Otherwise, you can define two versions of the implementation
-  (both implementing the same interface), in two different files.
-  One of these files will use the required module, while the other will
-  implement a dummy version without it.
-  The \verb|select| notation from the \verb|library| stanza allows telling
-  Dune which file to compile.
-\end{itemize}
+For optional dependencies, you can define two versions of the implementation
+(both implementing the same interface), in two different files. One of these
+files will use the required module, while the other will implement a dummy
+version without it. The \verb|select| notation from the \verb|library| stanza
+allows telling Dune which file to compile.
 
 Here is an example of \verb|select| from the \textsf{Aoraï} plug-in,
 which defines an optional dependency on the \textsf{Eva} plug-in:
@@ -1145,7 +1136,7 @@ plug-in general services.
 \begin{example}
 A minimal example of a plug-in using the logging services:
 \scodeidx{Plugin}{Register}
-\sscodeidx{Db}{Main}{extend}
+\sscodeidx{Boot}{Main}{extend}
 \begin{ocamlcode}
 module Self = Plugin.Register
   (struct
@@ -1164,7 +1155,7 @@ let run () =
   Self.debug ~level:1 "If you read this, %a." pp_dg 1;
   Self.debug ~level:3 "If you read this, %a." pp_dg 3;
 
-let () = Db.Main.extend run ()
+let () = Boot.Main.extend run ()
 \end{ocamlcode}
 \end{example}
 
@@ -1392,10 +1383,56 @@ specify a source location, either specifically or by using the current
 location of an \texttt{AST} visitor.
 \lstset{style=frama-c-style}
 \begin{itemize}
-\item[] \lstinline{~source:$s$} use the source location $s$ (see \texttt{Log.mli})
-\item[] \lstinline{~current:true} use the current source location
-  managed by \texttt{Cil.CurrentLoc}.
+\item[] \lstinline{~source:$s$} use the source position $s$ (see \texttt{Log.mli})
+\item[] \lstinline{~current:true} use the source location
+  managed by \texttt{Current\_loc} (see below).
 \end{itemize}
+
+\codeidxdef{Current\_loc}The \texttt{Current\_loc} module is used to
+manage the code location that is currently under focus.
+The current location must be set, either by \framac's kernel or by
+the plug-in themselves. In particular, \texttt{Cil} visitors update this
+location when visiting each node.
+
+\begin{example}
+The code samples below show how to use and set the current location.
+  \scodeidx{Current\_loc}{let-bindings}
+  \scodeidx{Current\_loc}{with\_loc\_opt}
+  \scodeidx{Current\_loc}{with\_loc}
+  \sscodeidx{Boot}{Main}{extend}
+  \begin{ocamlcode}
+  (* [Current_loc.get()] returns the last location set in Current_loc *)
+  let print_current_loc () =
+    Format.printf "%a@." Cil_datatype.Location.pretty (Current_loc.get ())
+
+  (* [with_loc loc f x] set the current location to loc, executes [f x] and set
+     the location to its old value before returning the result of [f x]. Raised
+     exceptions inside [f] will be caught and re-raised after resetting the
+     location to its previous value. *)
+  let apply_stmt f stmt =
+    Current_loc.with_loc (Cil_datatype.Stmt.loc s) f stmt
+
+  (* [with_loc_opt opt_loc f x] behaves like [with_loc] if [loc_opt] is
+     [Some loc], and does not update the current location if it is [None].*)
+  let apply_code_annot f ca =
+    Current_loc.with_loc_opt (Cil_datatype.Code_annotation.loc ca) f ca
+
+  (* Current_loc defines 2 let-binding operators which call [with_loc] and
+     [with_loc_opt]. Here is a function that set the current location to the
+     expr location, and reset it after the match. *)
+  let do_expr e =
+    let open Current_loc.Operators in
+    let$<>$ UpdatedCurrentLoc = e.eloc in
+    match e.enode with
+    | ...
+
+  (* When we only have a [loc option], we can use the $<?>$ operator *)
+  let do_code_annot f ca =
+    let open Current_loc.Operators in
+    let <?> UpdatedCurrentLoc = Cil_datatype.Code_annotation.loc ca in
+    f ca
+  \end{ocamlcode}
+  \end{example}
 
 \paragraph{Emission Options.} By default, a message is echoed to the
 user \emph{after} its construction, and it is sent to registered
@@ -1896,10 +1933,8 @@ Actually, there are three different ways, but the recommended one is through a
 \texttt{.mli} file.
 
 Section~\ref{adv:standard-registration} indicates how to register and access a
-plug-in through a \texttt{.mli} file. Section~\ref{adv:static-registration}
-indicates how to register and access a \emph{kernel-integrated} plug-in while
-Section~\ref{adv:dynamic-registration} details how to register and access a
-\emph{standard} plug-in.
+plug-in through a \texttt{.mli} file. Section~\ref{adv:dynamic-registration}
+details how to register and access a \emph{standard} plug-in.
 
 \subsection{Registration through a \texttt{.mli} File}
 \label{adv:standard-registration}
@@ -1916,96 +1951,6 @@ contain in its \texttt{libraries} clause \texttt{frama-c-a.core}
 (see Section~\ref{adv:dependencies}), or more generally the \texttt{public\_name}
 under which \texttt{A} is declared.
 
-\subsection{Kernel-integrated Registration and Access}
-\label{adv:static-registration}
-
-\begin{target}kernel-integrated plug-in developers.\end{target}
-
-\begin{prereq}
-  Accepting to modify the \framac kernel. Otherwise, you can still register
-  your plug-in as any standard plug-in (see
-  Section~\ref{adv:dynamic-registration} for details).
-\end{prereq}
-
-\begin{important}
-This registration method is deprecated and only kept here for historical purpose.
-No new entry point should be added in the \texttt{Db}, which will be removed in
-a future version of \framac.
-\end{important}
-
-A database, called \texttt{Db}\codeidxdef{Db} (in directory
-\texttt{src/kernel\_services/plugin\_entry\_points}), groups together
-the API of all kernel-integrated
-plug-ins. So it permits easy plug-in collaborations. Each kernel-integrated
-plug-in is only visible through \texttt{Db}. For example, if a plug-in
-\texttt{A} wants to know the results of another plug-in \texttt{B}, it uses the
-part of \texttt{Db} corresponding to \texttt{B}. A consequence of this design
-is that each plug-in has to register in \texttt{Db} by setting a function
-pointer to the right value in order to be usable from others plug-ins.
-
-\begin{example}
-Plug-in \texttt{Impact} registers function \texttt{compute\_pragmas} in the
-following way.
-
-\listingname{src/plugins/impact/register.ml}
-\scodeidx{Db}{Impact.compute\_pragmas}
-\begin{ocamlcode}
-let compute_pragmas () = ...
-let () = Db.Impact.compute_pragmas := compute_pragmas
-\end{ocamlcode}
-Thus each developer who wants to use this function calls it by pointer
-dereferencing like this.
-\begin{ocamlcode}
-let () = !Db.Impact.compute_pragmas ()
-\end{ocamlcode}
-\end{example}
-
-If a kernel-integrated plug-in has to export some datatypes usable by other
-plug-ins, such datatypes have to be visible from module
-\texttt{Db}\codeidx{Db}. Thus they cannot be declared in the plug-in
-implementation itself like any other plug-in declaration because postponed type
-declarations are not possible in \ocaml.
-
-Such datatypes are called \emph{plug-in types}\index{Plug-in!Types|bfit}. The
-solution is to put these plug-ins types in some files linked before
-\texttt{Db}; hence you have to put them in another directory than the plug-in
-directory. The best way is to create a directory dedicated to types.
-
-\begin{convention}
-  The suggested name for this directory is
-  \texttt{$p$\_types}\index{plug-in\_types@\texttt{$plugin$\_types}|bfit} for a
-  plug-in $p$.
-\end{convention}
-
-\begin{example}
-Suppose you are writing a plug-in \texttt{p} which exports a specific type
-\texttt{t} corresponding to the result of the plug-in analysis. The standard way
-to proceed is the following.
-
-\listingname{src/plugins/p\_types/p\_types.mli}
-\begin{ocamlcode}
-type t = ...
-\end{ocamlcode}
-
-\listingname{src/kernel\_services/plugin\_entry\_points/db.mli}
-\begin{ocamlcode}
-module P : sig
-  val run_and_get: (unit -> P_types.t) ref
-     (** Run plugin analysis (if it was never launched before).
-         @return result of the analysis. *)
-end
-\end{ocamlcode}
-\end{example}
-
-This design choice has a side effect : it reveals exported types.
-You can always hide them using a module to encapsulate the types
-(and provide corresponding getters and setters to access them).
-
-At this point, part of the plug-in code is outside the plug-in
-implementation. This code should be linked before \texttt{Db}
-\codeidx{Db}\footnote{A direct consequence is that you cannot use the whole
-\framac functionalities, such as module \texttt{Db}, inside this code.}.
-
 \subsection{Dynamic Registration and Access}
 \label{adv:dynamic-registration}
 \index{Plug-in!Registration}\index{Plug-in!Access}\index{Plug-in!API}
@@ -2017,11 +1962,8 @@ Dynamic registration is obsolete. Newer development should favor exporting
 a static API, as explained in Section~\ref{adv:standard-registration}.
 \end{important}
 
-Registration of kernel-integrated plug-ins requires to modify module
-\texttt{Db}\codeidx{Db} which belongs to the \framac kernel. Such a
-modification is not possible for standard plug-ins which are fully independent
-of \framac. Consequently, the \framac kernel provides another way for
-registering a plug-in through the module \texttt{Dynamic}\codeidxdef{Dynamic}.
+The \framac kernel provides another way for registering a plug-in through the
+module \texttt{Dynamic}\codeidxdef{Dynamic}.
 
 In short, you have to use the function
 \texttt{Dynamic.register}\scodeidxdef{Dynamic}{register} in order to register a
@@ -2312,7 +2254,7 @@ information attached to statements would result in the following piece of code.
 \codeidx{Kernel\_function}\sscodeidx{Datatype}{Ty}{t}
 \scodeidx{Cil\_types}{varinfo}
 \scodeidx{Cil\_datatype}{Stmt}\sscodeidx{Datatype}{S\_with\_collections}{Hashtbl}
-\sscodeidx{Db}{Value}{compute}
+\sscodeidx{Eva}{Analysis}{compute}
 \begin{ocamlcode}
 open Cil_datatype
 type info = Kernel_function.t * Cil_types.varinfo
@@ -2330,8 +2272,8 @@ the disk\index{Saving} and its value is never changed when setting the current
 project to a new one. For this purpose, one has to transform the above code into
 the following one. \scodeidx{Cil\_state\_builder}{Stmt\_hashtbl}
 \scodeidx{Datatype}{Pair} \codeidx{Kernel\_function}
-\scodeidx{Cil\_datatype}{Varinfo} \sscodeidx{Db}{Value}{self}
-\sscodeidx{Db}{Value}{compute} \codeidx{memo}
+\scodeidx{Cil\_datatype}{Varinfo} \sscodeidx{Eva}{Analysis}{self}
+\sscodeidx{Eva}{Analysis}{compute} \codeidx{memo}
 \begin{ocamlcode}
 module State =
   Cil_state_builder.Stmt_hashtbl
@@ -2398,32 +2340,13 @@ the right way to do this is the use of the function
 Section~\ref{adv:init} for advanced explanation about the way \framac is
 initialized).
 \begin{example}
-Plug-in \texttt{from}\index{From} puts a reference to its state kind in the
-following way. This reference is initialized at module initialization time.
+Plug-in \texttt{from}\index{From} creates a \texttt{State}\index{State} exposed
+via its API.
 
-\listingname{src/kernel\_services/plugin\_entry\_points/db.mli}
-\codeidx{State}
-\scodeidx{State}{dummy}
-\scodeidx{Db}{From.self}
-\begin{ocamlcode}
-module From = struct
-  ...
-  val self: State.t ref
-end
-\end{ocamlcode}
-
-\listingname{src/kernel\_services/plugin\_entry\_points/db.ml}
-\begin{ocamlcode}
-module From = struct
-  ...
-  val self = ref State.dummy (* postponed *)
-end
-\end{ocamlcode}
-
-\scodeidx{Kernel\_function}{Make\_Table}
-\sscodeidx{Db}{Value}{self}
-\scodeidx{Db}{From.self}
+\noindent
 \listingname{src/plugins/from/functionwise.ml}
+\scodeidx{Kernel\_function}{Make\_Table}
+\sscodeidx{Eva}{Analysis}{self}
 \begin{ocamlcode}
 module Tbl =
   Kernel_function.Make_Table
@@ -2433,34 +2356,40 @@ module Tbl =
        let size = 97
        let dependencies = [ Eva.Analysis.self ]
      end)
-let () =
-  (* performed at module initialization runtime. *)
-  Db.From.self := Tbl.self
+let self = Tbl.self
 \end{ocamlcode}
+\listingname{src/plugins/from/from.ml}
+\begin{ocamlcode}
+let self = Functionwise.self
+\end{ocamlcode}
+
 Plug-in \texttt{pdg}\index{Plug-in!Pdg|see{Pdg}}\index{Pdg} uses
 \texttt{from}\index{From} for computing its own internal state. So it declares
 this dependency as follows.
 
-\listingname{src/plugins/pdg/register.ml}
+\noindent\listingname{src/plugins/pdg/pdg\_tbl.ml}
 \scodeidx{Kernel\_function}{Make\_Table}
-\scodeidx{State\_dependency\_graph}{S.add\_codependencies}
-\scodeidx{Cmdline}{run\_after\_extended\_stage}
 \begin{ocamlcode}
 module Tbl =
   Kernel_function.Make_Table
     (PdgTypes.Pdg)
     (struct
        let name = "Pdg.State"
-       let dependencies = [] (* postponed because !Db.From.self may
-                                not exist yet *)
+       let dependencies = [] (* postponed because From.self may not exist yet *)
        let size = 97
     end)
+let self = Tbl.self
+\end{ocamlcode}
+\listingname{src/plugins/pdg/register.ml}
+\scodeidx{State\_dependency\_graph}{S.add\_codependencies}
+\scodeidx{Cmdline}{run\_after\_extended\_stage}
+\begin{ocamlcode}
 let () =
   Cmdline.run_after_extended_stage
     (fun () ->
        State_dependency_graph.add_codependencies
-         ~onto:Tbl.self
-         [ !Db.From.self ])
+         ~onto:Pdg_tbl.self
+         [ From.self ])
 \end{ocamlcode}
 \end{example}
 
@@ -2635,11 +2564,11 @@ Project.save "foo.sav"
 \end{ocamlcode}
 In a new \framac session, executing the following lines of code (assuming the
 value analysis has never been computed previously)
-\sscodeidx{Db}{Value}{is\_computed}
+\sscodeidx{Eva}{Analysis}{is\_computed}
 \scodeidx{Project}{current}
 \scodeidx{Project}{load}
 \scodeidx{Project}{set\_current}
-\sscodeidx{Db}{Value}{compute}
+\sscodeidx{Eva}{Analysis}{compute}
 \scodeidx{Project}{IOError}
 \begin{ocamlcode}
 let print_computed () =
@@ -2720,7 +2649,7 @@ consistently handle state dependencies\index{State!Dependency}.
   its dependencies in the current project.\index{State!Cleaning}
   \scodeidx{Project}{clear}
   \scodeidx{State\_selection}{with\_dependencies}
-  \sscodeidx{Db}{Value}{self}
+  \sscodeidx{Eva}{Analysis}{self}
 \begin{ocamlcode}
 let selection = State_selection.with_dependencies Eva.Analysis.self in
 Project.clear ~selection ()
@@ -2983,7 +2912,7 @@ ones.
 From the plug-in developer point of view, the hooks are registered by
 calling the \texttt{run\_after\_$xxx$\_stage} routines in
 \texttt{Cmdline}\codeidx{Cmdline} module and \texttt{extend} routine
-in the \texttt{Db.Main}\sscodeidx{Db}{Main}{extend} module.
+in the \texttt{Boot.Main}\sscodeidx{Boot}{Main}{extend} module.
 
 The initialization phases and stages of \framac are described below, in
 their execution order.
@@ -3150,7 +3079,7 @@ their execution order.
 
 \item \textbf{The Main Stage:} this is the step where plug-ins actually run
   their main entry points registered through
-  \texttt{Db.Main.extend}\sscodeidx{Db}{Main}{extend}. For all intents and purposes, you should consider
+  \texttt{Boot.Main.extend}\sscodeidx{Boot}{Main}{extend}. For all intents and purposes, you should consider
   that this stage is the one where these hooks are executed.
 
 \end{enumerate}
@@ -3754,7 +3683,7 @@ division in the program, stating that the divisor is not zero:
 \sscodeidx{Cil}{visitAction}{DoChildren}
 \scodeidx{File}{create\_project\_from\_visitor}
 \scodeidx{Annotations}{add\_assert}
-\sscodeidx{Db}{Main}{extend}
+\sscodeidx{Boot}{Main}{extend}
 \sscodeidx{Visitor\_behavior}{Get}{stmt}
 \sscodeidx{Visitor\_behavior}{Get}{kernel\_function}
 \sscodeidx{Cil}{cilVisitor}{behavior}
@@ -4263,7 +4192,7 @@ points. The documentation of the class type
 source documentation (see Section~\ref{tut2:doc}).
 
 Besides time-consuming computations have to call the function
-\texttt{!Db.progress}\scodeidx{Db}{progress} from time to time in order to keep the GUI reactive.
+\texttt{Async.yield}\scodeidx{Async}{yield} from time to time in order to keep the GUI reactive.
 
 %Mainly that's all!
 The GUI implementation uses

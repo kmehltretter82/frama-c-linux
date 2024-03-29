@@ -128,7 +128,7 @@ class behavior
         list#reload ;
         let to_prove g =
           not (Wpo.is_smoke_test g) &&
-          not (Wpo.is_valid g || Wpo.reduce g) in
+          not (Wpo.is_fully_valid g || Wpo.reduce g) in
         let has_proof g =
           match ProofEngine.get g with
           | `None -> false
@@ -298,7 +298,7 @@ class behavior
 
     method private popup_delete_script () =
       match popup_target with
-      | Some(w,_) -> ProofEngine.clear w ; ProofSession.remove w
+      | Some(w,_) -> ProofEngine.clear_goal w ; ProofSession.remove w
       | None -> ()
 
     method private popup_run mode () =

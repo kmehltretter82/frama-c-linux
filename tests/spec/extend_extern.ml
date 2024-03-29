@@ -17,7 +17,7 @@ let typer typing_context loc lexprs =
 
 
 let () =
-  Acsl_extension.register_global "why3" typer false
+  Acsl_extension.register_global ~plugin:"test" "why3" typer false
 
 let main () =
   try
@@ -33,4 +33,4 @@ let () = Kernel.TypeCheck.set false
 
 let () = Kernel.Debug.set 1
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

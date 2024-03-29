@@ -4,6 +4,6 @@
   6     
   7     int main(void) {
   8       int t /* [5] missing */ = { 1, 2, 3, 4, 5 };
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+              ^
   9     }
 [kernel] Frama-C aborted: invalid user input.

@@ -172,7 +172,7 @@ module TransferTaint = struct
     let assume_stmts =
       Stmt.Set.filter
         (fun assume_stmt ->
-           not (!Db.Postdominators.is_postdominator kf
+           not (Postdominators.is_postdominator kf
                   ~opening:assume_stmt ~closing:stmt))
         state.assume_stmts
     in
@@ -420,8 +420,8 @@ let () =
     let parse context = context.type_term context (get_state context) in
     Ext_terms (List.map (parse context) args)
   in
-  Acsl_extension.register_behavior "taints" (typer `Post) false;
-  Acsl_extension.register_code_annot_next_stmt "taint" (typer `Pre) false
+  Acsl_extension.register_behavior ~plugin:"eva" "taints" (typer `Post) false;
+  Acsl_extension.register_code_annot_next_stmt ~plugin:"eva" "taint" (typer `Pre) false
 
 (* Interpretation of logic by the taint domain, using the cvalue domain. *)
 module TaintLogic = struct

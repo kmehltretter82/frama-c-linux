@@ -177,7 +177,7 @@ let add_written_var vi effect =
 
 let is_frama_c_builtin exp =
   match exp.enode with
-  | Lval (Var vi, NoOffset) -> Ast_info.is_frama_c_builtin vi.vname
+  | Lval (Var vi, NoOffset) -> Ast_info.start_with_frama_c_builtin vi.vname
   | _ -> false
 
 let compute_instr_effect effect = function

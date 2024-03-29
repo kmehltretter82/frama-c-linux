@@ -107,6 +107,7 @@
 
 .dome-xSideBarSection-title {
     position: sticky ;
+    z-index: +1;
     top: 0px ;
     padding-top: 0px;
     padding-bottom: 0px ;
@@ -396,8 +397,8 @@
 /* Selected */
 
 .dome-xToolBar-control.dome-selected {
-    fill:  var(--info-text);
-    color: var(--info-text);
+    fill:  var(--text);
+    color: var(--text);
     border: 1px solid transparent ;
     background-color: var(--selected-button-img) ;
     background-image: none ;

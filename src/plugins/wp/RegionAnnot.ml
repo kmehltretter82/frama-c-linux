@@ -498,7 +498,7 @@ let register () =
   then
     begin
       registered := true ;
-      Acsl_extension.register_behavior "region"
+      Acsl_extension.register_behavior ~plugin:"wp" "region"
         typecheck ~printer:pp_extension false
     end
 

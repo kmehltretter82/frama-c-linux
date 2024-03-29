@@ -26,7 +26,7 @@ theory Chunk
   
   (* use map.Map *)
   
-  (* use frama_c_wp.memory.Memory *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
   (* use frama_c_wp.cint.Cint *)
   
@@ -51,7 +51,7 @@ theory Compound
   
   (* use map.Map *)
   
-  (* use frama_c_wp.memory.Memory *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
   function shift_sint32 (p:addr) (k:int) : addr = shift p k
 end
@@ -73,7 +73,7 @@ theory A_Occ
   
   (* use map.Map *)
   
-  (* use frama_c_wp.memory.Memory *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
   function L_occ (addr -> int) int addr int int : int
   
@@ -122,7 +122,7 @@ theory Axiomatic1
   
   (* use map.Map *)
   
-  (* use frama_c_wp.memory.Memory *)
+  (* use frama_c_wp.memaddr.MemAddr *)
   
   (* use Chunk *)
   
@@ -184,7 +184,7 @@ theory Chunk1
   
   (* use map.Map1 *)
   
-  (* use frama_c_wp.memory.Memory1 *)
+  (* use frama_c_wp.memaddr.MemAddr1 *)
   
   (* use frama_c_wp.cint.Cint1 *)
   
@@ -209,7 +209,7 @@ theory Compound1
   
   (* use map.Map1 *)
   
-  (* use frama_c_wp.memory.Memory1 *)
+  (* use frama_c_wp.memaddr.MemAddr1 *)
   
   function shift_sint321 (p:addr1) (k:int) : addr1 = shift1 p k
 end
@@ -231,7 +231,7 @@ theory A_Occ1
   
   (* use map.Map1 *)
   
-  (* use frama_c_wp.memory.Memory1 *)
+  (* use frama_c_wp.memaddr.MemAddr1 *)
   
   function L_occ1 (addr1 -> int) int addr1 int int : int
   
@@ -282,7 +282,7 @@ theory Axiomatic11
   
   (* use map.Map1 *)
   
-  (* use frama_c_wp.memory.Memory1 *)
+  (* use frama_c_wp.memaddr.MemAddr1 *)
   
   (* use Chunk1 *)
   
@@ -343,7 +343,7 @@ theory Chunk2
   
   (* use map.Map2 *)
   
-  (* use frama_c_wp.memory.Memory2 *)
+  (* use frama_c_wp.memaddr.MemAddr2 *)
   
   (* use frama_c_wp.cint.Cint2 *)
   
@@ -368,7 +368,7 @@ theory Compound2
   
   (* use map.Map2 *)
   
-  (* use frama_c_wp.memory.Memory2 *)
+  (* use frama_c_wp.memaddr.MemAddr2 *)
   
   function shift_sint322 (p:addr2) (k:int) : addr2 = shift2 p k
 end
@@ -390,7 +390,7 @@ theory A_Occ2
   
   (* use map.Map2 *)
   
-  (* use frama_c_wp.memory.Memory2 *)
+  (* use frama_c_wp.memaddr.MemAddr2 *)
   
   function L_occ2 (addr2 -> int) int addr2 int int : int
   
@@ -439,7 +439,7 @@ end
     
     (* use map.Map2 *)
     
-    (* use frama_c_wp.memory.Memory2 *)
+    (* use frama_c_wp.memaddr.MemAddr2 *)
     
     (* use Chunk2 *)
     

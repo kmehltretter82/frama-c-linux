@@ -114,7 +114,9 @@ dome-pkg: .dome-pkg.stamp
 	@echo "[Dome] building application dependencies"
 	@echo "[Dome] ----------------------------------------------------------------"
 	yarn install
-	cp ./src/dome/template/react-virtualized.hacked.onScroll.js ./node_modules/react-virtualized/dist/es/WindowScroller/utils/onScroll.js
+	cp \
+	  ./src/dome/template/react-virtualized.hacked.onScroll.js \
+	  ./node_modules/react-virtualized/dist/es/WindowScroller/utils/onScroll.js
 	yarn run electron-builder install-app-deps
 	@touch $@
 
@@ -150,8 +152,9 @@ endif
 .PHONY: dome-templ dome-reboot
 
 DOME_MK_TEMPLATES= \
-	src/main/index.js \
-	src/renderer/index.js
+	src/main/index.ts \
+	src/renderer/index.ts \
+	src/renderer/index.html
 
 dome-templ: $(DOME_MK_TEMPLATES)
 dome-reboot:
@@ -159,17 +162,22 @@ dome-reboot:
 	@for f in $(DOME_MK_TEMPLATES) ; do mv -fv $$f $$f.backup ; done
 	$(MAKE) dome-templ dome-pkg
 
-# Templated files
+# Templated files (*.templ is used to prevent tsc from typechecking templates)
 
-src/renderer/index.js: $(DOME)/template/update.sh $(DOME)/template/renderer.js
+src/renderer/index.html: $(DOME)/template/update.sh $(DOME)/template/index.html
 	@$^ $@
 
-src/main/index.js: $(DOME)/template/update.sh $(DOME)/template/main.js
-	@cp $(DOME)/template/main.js       $(DOME)/template/main.js.local
-	@echo "Dome.setName('$(APP)');" >> $(DOME)/template/main.js.local
-	@echo "Dome.start();"           >> $(DOME)/template/main.js.local
-	@$^.local $@
-	@rm -f $(DOME)/template/main.js.local
+src/renderer/index.ts: $(DOME)/template/update.sh $(DOME)/template/renderer.ts.templ
+	@$^ $@
+
+DOME_MK_LOCAL= $(DOME)/template/main.ts.local
+
+src/main/index.ts: $(DOME)/template/update.sh $(DOME)/template/main.ts.templ
+	@cp $(DOME)/template/main.ts.templ    $(DOME_MK_LOCAL)
+	@echo "Dome.setName('$(APP)');"    >> $(DOME_MK_LOCAL)
+	@echo "Dome.start();"              >> $(DOME_MK_LOCAL)
+	@$(DOME)/template/update.sh $(DOME)/template/main.ts.local $@
+	@rm -f $(DOME_MK_LOCAL)
 
 # --------------------------------------------------------------------------
 # ---  Custom Entry Points
@@ -177,17 +185,17 @@ src/main/index.js: $(DOME)/template/update.sh $(DOME)/template/main.js
 
 ifndef DOME_CUSTOM_ENTRIES
 
-dome-templ: src/renderer/Application.js
-src/renderer/Application.js:
+dome-templ: src/renderer/Application.ts
+src/renderer/Application.ts:
 	@echo "[Dome] creating $@ from template"
 	@mkdir -p src/renderer
-	@cp -f $(DOME)/template/Application.js $@
+	@cp -f $(DOME)/template/Application.ts.templ $@
 
-dome-templ: src/renderer/Preferences.js
-src/renderer/Preferences.js:
+dome-templ: src/renderer/Preferences.ts
+src/renderer/Preferences.ts:
 	@echo "[Dome] creating $@ from template"
 	@mkdir -p src/renderer
-	@cp -f $(DOME)/template/Preferences.js $@
+	@cp -f $(DOME)/template/Preferences.ts.templ $@
 
 endif
 
@@ -255,7 +263,7 @@ dome-dist-win: dome-app
 
 dome-dist-mac: dome-app
 	@echo "[Dome] packaging application (macOS exe)"
-	DOME=$(DOME) yarn run electron-builder --mac
+	DOME=$(DOME) yarn run electron-builder --mac -c.mac.identity=null
 	@echo "[Dome] application packaged in ./dist"
 
 # --------------------------------------------------------------------------

@@ -30,7 +30,7 @@ enum aorai_OpStatusList {
   void a_pre_func(void)
   {
     int S_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_a;
@@ -59,7 +59,7 @@ enum aorai_OpStatusList {
   void a_post_func(void)
   {
     int S_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_a;
@@ -99,7 +99,7 @@ void a(void)
   void main_pre_func(void)
   {
     int S_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
@@ -128,7 +128,7 @@ void a(void)
   void main_post_func(void)
   {
     int S_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;

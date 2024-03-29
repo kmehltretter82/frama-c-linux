@@ -13,4 +13,4 @@ let main () =
      Logic_env.Builtins is not projectified) *)
   Project.on p Ast.compute ()
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

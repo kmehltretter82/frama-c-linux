@@ -87,7 +87,7 @@ let get_writes stmt lval =
 let register_modified_zones lmap stmt =
   let register lmap zone = InitSid.add_zone lmap zone stmt in
   let aux_out out kf =
-    let inout= !Db.Operational_inputs.get_internal_precise ~stmt kf in
+    let inout= Inout.get_precise_inout ~stmt kf in
     Locations.Zone.join out inout.Inout_type.over_outputs
   in
   match stmt.skind with
@@ -126,10 +126,11 @@ let register_modified_zones lmap stmt =
  * @raise Kernel_function.No_Definition if [kf] has no definition
 *)
 let compute kf =
+  let open Current_loc.Operators in
   R.debug ~level:1 "computing for function %a" Kernel_function.pretty kf;
   let f = Kernel_function.get_definition kf in
   let do_stmt lmap s =
-    Cil.CurrentLoc.set (Cil_datatype.Stmt.loc s);
+    let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc s in
     if Eva.Results.is_reachable s
     then register_modified_zones lmap s
     else lmap

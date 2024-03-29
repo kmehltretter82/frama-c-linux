@@ -39,7 +39,7 @@ Let a = Mptr_0[global(G_p_20)].
 Let a_1 = shiftfield_F1_a(a).
 Assume {
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Goal *)
   When: !invalid(Malloc_0, a_1, 1).
   (* Pre-condition *)

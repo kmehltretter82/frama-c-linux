@@ -54,17 +54,7 @@ let get_locals f = match f.fundec with
 
 let get_statics f = match f.fundec with
   | Definition (d, _) ->
-    let statics = ref [] in
-    let local_statics_visitor =
-      object
-        inherit Cil.nopCilVisitor
-        method! vblock b =
-          statics := !statics @ b.bstatics;
-          Cil.DoChildren
-      end
-    in
-    ignore (Cil.visitCilBlock local_statics_visitor d.sbody);
-    !statics
+    Ast_info.Function.get_statics d
   | Declaration (_, _, _, _) -> []
 
 let () = Globals.get_statics := get_statics

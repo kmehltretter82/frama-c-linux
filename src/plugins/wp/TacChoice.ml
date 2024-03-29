@@ -33,7 +33,7 @@ class choice =
     inherit Tactical.make
         ~id:"Wp.choice"
         ~title:"Choice"
-        ~descr:"Select a Goal Alternative"
+        ~descr:"Select one alternative to be proved."
         ~params:[]
 
     method select _feedback (s : Tactical.selection) =
@@ -54,7 +54,7 @@ class absurd =
     inherit Tactical.make
         ~id:"Wp.absurd"
         ~title:"Absurd"
-        ~descr:"Contradict the Goal or an Hypothesis"
+        ~descr:"Contradict the selected clause."
         ~params:[]
 
     method select _feedback (s : Tactical.selection) =
@@ -78,7 +78,7 @@ class absurd =
               let seq = Conditions.replace ~at:s.id emp seq in
               [ "Absurd" , (fst seq , F.p_not p) ]
             in Applicable absurd
-          | Branch _ | Either _ | State _ ->
+          | Branch _ | Either _ | State _ | Probe _ ->
             Not_applicable
         end
   end
@@ -88,7 +88,7 @@ class contrapose =
     inherit Tactical.make
         ~id:"Wp.contrapose"
         ~title:"Contrapose"
-        ~descr:"Swap and Negate Hypothesis with Conclusion"
+        ~descr:"Swap hypothesis with conclusion."
         ~params:[]
 
     method select _feedback (s : Tactical.selection) =
@@ -100,13 +100,13 @@ class contrapose =
           match s.condition with
           | Have p | When p | Core p | Init p | Type p ->
             let contrapose (hs,goal) =
-              let descr = "Contrapose" in
+              let descr = "Contrapose the goal." in
               let goal = F.p_not goal in
               let goal = Conditions.(step ~descr (Have goal)) in
               let hs = Conditions.replace ~at:s.id goal (hs , F.p_false) in
               [ "Contrapose" , (fst hs , F.p_not p) ]
             in Applicable contrapose
-          | Branch _ | Either _ | State _ ->
+          | Branch _ | Either _ | State _ | Probe _ ->
             Not_applicable
         end
 

@@ -21,249 +21,201 @@
 (**************************************************************************)
 
 type kind =
-  | K_Misalign_read
-  | K_Leaf
-  | K_Merge
-  | K_Arith
+  | Misalign_read
+  | Misalign_write
+  | Leaf
+  | Merge
+  | Arith
 
-module Location = Cil_datatype.Location
+let kind_rank = function
+  | Misalign_read -> 0
+  | Misalign_write -> 1
+  | Leaf -> 2
+  | Merge -> 3
+  | Arith -> 4
 
-module LocationLattice = struct
+let kind_label = function
+  | Misalign_read -> "Misaligned read"
+  | Misalign_write -> "Misaligned write"
+  | Leaf -> "Library function"
+  | Merge -> "Merge"
+  | Arith -> "Arithmetic"
 
-  type t = Top | Bottom | Value of Location.t
+(* Ideally, we would use the current statement sid instead of the current
+   source file location. However, that would require passing the current
+   statement through any datastructures and operations that can create
+   garbled mixes, which would be an invasive change. *)
+type location = Cil_datatype.Location.t
 
-  module Datatype_Input = struct
-    include Datatype.Serializable_undefined
-
-    type nonrec t = t
-    let name = "Origin.LocationLattice"
-    let reprs = [ Top ]
-    let structural_descr =
-      Structural_descr.t_sum [| [| Location.packed_descr |] |]
-
-    let compare l1 l2 =
-      match l1, l2 with
-      | Top, Top | Bottom, Bottom -> 0
-      | Value loc1, Value loc2 -> Location.compare loc1 loc2
-      | Top, _ -> 1
-      | _, Top -> -1
-      | Bottom, _ -> -1
-      | _, Bottom -> 1
-
-    let equal l1 l2 =
-      match l1, l2 with
-      | Top, Top | Bottom, Bottom -> true
-      | Value loc1, Value loc2 -> Location.equal loc1 loc2
-      | _ -> false
-
-    let hash = function
-      | Top -> 3
-      | Bottom -> 5
-      | Value loc -> Location.hash loc * 7
-
-    let pretty fmt = function
-      | Top -> Format.fprintf fmt "Top"
-      | Bottom ->  Format.fprintf fmt "Bottom"
-      | Value loc -> Format.fprintf fmt "{%a}" Location.pretty loc
-  end
-
-  include (Datatype.Make (Datatype_Input) : Datatype.S with type t := t)
-
-  let current_loc () = Value (Cil.CurrentLoc.get ())
-
-  let join l1 l2 =
-    if l1 == l2 then l1 else
-      match l1, l2 with
-      | Top, _ | _, Top -> Top
-      | Bottom , l | l, Bottom -> l
-      | Value loc1, Value loc2 ->
-        if Location.equal loc1 loc2 then l1 else Top
-
-  let narrow l1 l2 =
-    if l1 == l2 then l1 else
-      match l1, l2 with
-      | Bottom, _ | _, Bottom -> Bottom
-      | Top , l | l, Top -> l
-      | Value loc1, Value loc2 ->
-        if Location.equal loc1 loc2 then l1 else Bottom
-
-  let meet = narrow
-end
-
-type origin =
-  | Misalign_read of LocationLattice.t
-  | Leaf of LocationLattice.t
-  | Merge of LocationLattice.t
-  | Arith of LocationLattice.t
+type tt =
+  | Origin of { kind: kind; loc: location; id: int; }
   | Well
   | Unknown
 
+(* Unique id for each origin. Used to keep the oldest origin when a garbled
+   mix may have several origins. *)
+module Id = State_builder.Counter (struct let name = "Origin.Id" end)
 
-let current = function
-  | K_Misalign_read -> Misalign_read (LocationLattice.current_loc ())
-  | K_Leaf -> Leaf (LocationLattice.current_loc ())
-  | K_Merge -> Merge (LocationLattice.current_loc ())
-  | K_Arith -> Arith (LocationLattice.current_loc ())
+let current kind =
+  let id = Id.next () in
+  let loc = Current_loc.get () in
+  Origin { kind; loc; id; }
 
-let equal o1 o2 = match o1, o2 with
-  | Well, Well | Unknown, Unknown -> true
-  | Leaf o1, Leaf o2 | Arith o1, Arith o2 | Merge o1, Merge o2
-  | Misalign_read o1, Misalign_read o2  ->
-    LocationLattice.equal o1 o2
-  | Misalign_read _, _ -> false
-  | _, Misalign_read _ -> false
-  |  Leaf _, _ -> false
-  |  _, Leaf _ -> false
-  | Merge _, _ -> false
-  | _, Merge _ -> false
-  | Arith _, _ -> false
-  | _, Arith _ -> false
-  | _, Well | Well, _ -> false
+let well = Well
+let unknown = Unknown
+let is_unknown t = t = Unknown
 
-let compare o1 o2 = match o1, o2 with
-  | Misalign_read s1, Misalign_read s2
-  | Leaf s1, Leaf s2
-  | Merge s1, Merge s2
-  | Arith s1, Arith s2 ->
-    LocationLattice.compare s1 s2
+module Prototype = struct
+  include Datatype.Serializable_undefined
+  type t = tt
+  let name = "Origin"
+  let reprs = [ Unknown ]
 
-  | Well, Well | Unknown, Unknown -> 0
+  let compare t1 t2 =
+    match t1, t2 with
+    | Origin o1, Origin o2 ->
+      if o1.kind = o2.kind
+      then Cil_datatype.Location.compare o1.loc o2.loc
+      else kind_rank o2.kind - kind_rank o1.kind
+    | Well, Well | Unknown, Unknown -> 0
+    | Origin _, _ | Well, Unknown -> 1
+    | _, Origin _ | Unknown, Well -> -1
 
-  | Misalign_read _, (Leaf _ | Merge _ | Arith _ | Well | Unknown)
-  | Leaf _, (Merge _ | Arith _ | Well | Unknown)
-  | Merge _, (Arith _ | Well | Unknown)
-  | Arith _, (Well | Unknown)
-  | Well, Unknown ->
-    -1
+  let equal = Datatype.from_compare
 
-  | Unknown, (Well | Arith _ | Merge _ | Leaf _ | Misalign_read _)
-  | Well, (Arith _ | Merge _ | Leaf _ | Misalign_read _)
-  | Arith _, (Merge _ | Leaf _ | Misalign_read _)
-  | Merge _, (Leaf _ | Misalign_read _)
-  | Leaf _, Misalign_read _
-    -> 1
+  let hash = function
+    | Well -> 0
+    | Unknown -> 1
+    | Origin { kind; loc; } ->
+      Hashtbl.hash (kind_rank kind, Cil_datatype.Location.hash loc) + 2
 
-let top = Unknown
-let is_top x = equal top x
+  let pretty fmt = function
+    | Well -> Format.fprintf fmt "Well"
+    | Unknown -> Format.fprintf fmt "Unknown"
+    | Origin { kind; loc; } ->
+      let pretty_loc = Cil_datatype.Location.pretty in
+      Format.fprintf fmt "%s@ {%a}" (kind_label kind) pretty_loc loc
+end
 
-
-let pretty_source fmt = function
-  | LocationLattice.Top -> () (* Hide unhelpful 'TopSet' *)
-  | LocationLattice.Value _ | LocationLattice.Bottom as s ->
-    Format.fprintf fmt "@ %a" LocationLattice.pretty s
-
-let pretty fmt o = match o with
-  | Unknown ->
-    Format.fprintf fmt "Unknown"
-  | Misalign_read o ->
-    Format.fprintf fmt "Misaligned%a" pretty_source o
-  | Leaf o ->
-    Format.fprintf fmt "Library function%a" pretty_source o
-  | Merge o ->
-    Format.fprintf fmt "Merge%a" pretty_source o
-  | Arith o ->
-    Format.fprintf fmt "Arithmetic%a" pretty_source o
-  | Well ->       Format.fprintf fmt "Well"
+include Datatype.Make_with_collections (Prototype)
 
 let pretty_as_reason fmt org =
-  if not (is_top org) then
-    Format.fprintf fmt " because of %a" pretty org
+  if not (is_unknown org)
+  then Format.fprintf fmt " because of %a" pretty org
+
+let descr = function
+  | Unknown -> "unknown origin"
+  | Well -> "well in initial state"
+  | Origin { kind } ->
+    match kind with
+    | Misalign_read -> "misaligned read of addresses"
+    | Misalign_write -> "misaligned write of addresses"
+    | Leaf -> "assigns clause on addresses"
+    | Merge -> "imprecise merge of addresses"
+    | Arith -> "arithmetic operation on addresses"
+
+(* Keep the oldest known origin: it is probably the most relevant origin, as
+   subsequent ones may have been created because of the first. *)
+let join t1 t2 =
+  if t1 == t2 then t1 else
+    match t1, t2 with
+    | Unknown, x | x, Unknown -> x
+    | Well, _ | _, Well -> Well
+    | Origin o1, Origin o2 -> if o1.id <= o2.id then t1 else t2
 
 
-let hash o = match o with
-  | Misalign_read o ->
-    2001 +  (LocationLattice.hash o)
-  | Leaf o ->
-    2501 + (LocationLattice.hash o)
-  | Merge o ->
-    3001 + (LocationLattice.hash o)
-  | Arith o ->
-    3557 + (LocationLattice.hash o)
-  | Well -> 17
-  | Unknown -> 97
+(* For each garbled mix origin, keep track of:
+   - the number of writes (according to [register_write] below), i.e. the number
+     of times a garbled mix with this origin has been written in a state during
+     the analysis.
+   - the number of reads (according to [register_read] below), i.e. the number
+     of times a garbled mix with this origin is used by the analysis.
+     Only reads at a different location than that of the origin are counted:
+     if a garbled mix is only used where it has been created, it has no more
+     impact on the analysis precision than any other imprecise value.
+   - the set of bases related to garbled mix with this origin.
 
-include Datatype.Make
-    (struct
-      type t = origin
-      let name = "Origin"
-      let structural_descr = Structural_descr.t_unknown
-      let reprs = [ Well; Unknown ]
-      let compare = compare
-      let equal = equal
-      let hash = hash
-      let rehash = Datatype.undefined
-      let copy = Datatype.undefined
-      let pretty = pretty
-      let mem_project = Datatype.never_any_project
-    end)
+   These info are printed at the end of an Eva analysis. *)
 
-let bottom = Arith LocationLattice.Bottom
+module History_Info = struct
+  let name = "Origin.History"
+  let dependencies = []
+  let size = 32
+end
 
-let join o1 o2 =
-  let result =
-    if o1 == o2
-    then o1
-    else
-      match o1, o2 with
-      | Unknown,_ | _, Unknown -> Unknown
-      | Well,_ | _ , Well   -> Well
-      | Misalign_read o1, Misalign_read o2 ->
-        Misalign_read(LocationLattice.join o1 o2)
-      | _, (Misalign_read _ as m) | (Misalign_read _ as m), _ -> m
-      | Leaf o1, Leaf o2 ->
-        Leaf(LocationLattice.join o1 o2)
-      | (Leaf _ as m), _ | _, (Leaf _ as m) -> m
-      | Merge o1, Merge o2 ->
-        Merge(LocationLattice.join o1 o2)
-      | (Merge _ as m), _ | _, (Merge _ as m) -> m
-      | Arith o1, Arith o2 ->
-        Arith(LocationLattice.join o1 o2)
-        (* | (Arith _ as m), _ | _, (Arith _ as m) -> m *)
+module LocSet = Cil_datatype.Location.Set
+
+(* Locations of writes, locations of reads, related bases. *)
+module History_Data = Datatype.Triple (LocSet) (LocSet) (Base.SetLattice)
+module History = State_builder.Hashtbl (Hashtbl) (History_Data) (History_Info)
+
+let clear () = Id.reset (); History.clear ()
+
+let is_current = function
+  | Unknown | Well -> false
+  | Origin { loc } -> Cil_datatype.Location.equal loc (Current_loc.get ())
+
+(* Returns true if the origin has never been registered and is related to the
+   current location. *)
+let register_write bases t =
+  if is_unknown t then false else
+    let current_loc = Current_loc.get () in
+    let is_new = not (History.mem t) in
+    let change (w, r, b) =
+      LocSet.add current_loc w, r, Base.SetLattice.join b bases
+    in
+    let create _ = LocSet.singleton current_loc, LocSet.empty, bases in
+    ignore (History.memo ~change create t);
+    is_new && is_current t
+
+(* Registers a read only if the current location is not that of the origin. *)
+let register_read bases t =
+  if not (is_unknown t || is_current t) then
+    let current_loc = Current_loc.get () in
+    let change (w, r, b) =
+      w, LocSet.add current_loc r, Base.SetLattice.join b bases
+    in
+    let create _ = LocSet.empty, LocSet.singleton current_loc, bases in
+    ignore (History.memo ~change create t)
+
+(* Returns the list of recorded origins, sorted by number of reads.
+   Origins with no reads are filtered. *)
+let get_history () =
+  let list = List.of_seq (History.to_seq ()) in
+  let count (origin, (w, r, bases)) =
+    if LocSet.is_empty r
+    then None
+    else Some (origin, (LocSet.cardinal w, LocSet.cardinal r, bases))
   in
-  (*  Format.printf "Origin.join %a %a -> %a@." pretty o1 pretty o2 pretty result;
-  *)
-  result
+  let list = List.filter_map count list in
+  let cmp (origin1, (_, r1, _)) (origin2, (_, r2, _)) =
+    let r = r2 - r1 in
+    if r <> 0 then r else compare origin1 origin2
+  in
+  List.sort cmp list
 
-let link = join
+let pretty_origin fmt origin =
+  match origin with
+  | Unknown -> Format.fprintf fmt "Unknown origin"
+  | Well -> Format.fprintf fmt "Initial state"
+  | Origin { loc } ->
+    Format.fprintf fmt "%a: %s"
+      Cil_datatype.Location.pretty loc (descr origin)
 
-let meet o1 o2 =
-  if o1 == o2
-  then o1
-  else
-    match o1, o2 with
-    | Arith o1, Arith o2 ->
-      Arith(LocationLattice.meet o1 o2)
-    | (Arith _ as m), _ | _, (Arith _ as m) -> m
-    | Merge o1, Merge o2 ->
-      Merge(LocationLattice.meet o1 o2)
-    | (Merge _ as m), _ | _, (Merge _ as m) -> m
-    | Leaf o1, Leaf o2 ->
-      Leaf(LocationLattice.meet o1 o2)
-    | (Leaf _ as m), _ | _, (Leaf _ as m) -> m
-    | Misalign_read o1, Misalign_read o2 ->
-      Misalign_read(LocationLattice.meet o1 o2)
-    | _, (Misalign_read _ as m) | (Misalign_read _ as m), _ -> m
-    | Well, Well -> Well
-    | Well,m | m, Well -> m
-    | Unknown, Unknown -> Unknown
-
-let narrow o1 o2 =
-  if o1 == o2
-  then o1
-  else
-    match o1, o2 with
-    | Arith o1, Arith o2 -> Arith (LocationLattice.narrow o1 o2)
-    | Merge o1, Merge o2 -> Merge (LocationLattice.narrow o1 o2)
-    | Leaf o1, Leaf o2 -> Leaf (LocationLattice.narrow o1 o2)
-    | Misalign_read o1, Misalign_read o2 ->
-      Misalign_read (LocationLattice.narrow o1 o2)
-    | Well, Well -> Well
-    | Unknown, m | m, Unknown -> m
-    | _, _ -> Unknown
-
-let is_included o1 o2 =
-  (equal o1 (meet o1 o2))
-
+let pretty_history fmt =
+  let list = get_history () in
+  let plural count = if count = 1 then "" else "s" in
+  let pp_origin fmt (origin, (w, r, bases)) =
+    let bases = Base.SetLattice.filter (fun b -> not (Base.is_null b)) bases in
+    Format.fprintf fmt
+      "@[<hov 2>%a@ (read in %i statement%s, propagated through %i statement%s)@ \
+       garbled mix of &%a@]"
+      pretty_origin origin r (plural r) w (plural w) Base.SetLattice.pretty bases
+  in
+  if list <> [] then
+    Format.fprintf fmt
+      "@[<v 2>Origins of garbled mix generated during analysis:@,%a@]"
+      (Pretty_utils.pp_list ~sep:"@," pp_origin) list
 
 (*
 Local Variables:

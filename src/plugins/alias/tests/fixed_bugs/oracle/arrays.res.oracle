@@ -1,0 +1,49 @@
+[kernel] Parsing arrays.c (with preprocessing)
+[alias] analysing function: main
+[alias] analysing instruction: t[0] = a;
+[alias] May-aliases after instruction  t[0] = a;  are  { a; t[0..] }
+[alias] May-alias graph after instruction  t[0] = a;  is
+  0:{ t } → 1:{ a }   1:{ a } → 2:{  }
+[alias] analysing instruction: z = & t;
+[alias] May-aliases after instruction  z = & t;  are
+  { *z; t }  { (*z)[0..]; a; t[0..] }
+[alias] May-alias graph after instruction  z = & t;  is
+  5:{ z } → 6:{ t }   6:{ t } → 7:{ a }   7:{ a } → 8:{  }
+[alias] analysing instruction: q = z;
+[alias] May-aliases after instruction  q = z;  are
+  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; t[0..] }
+[alias] May-alias graph after instruction  q = z;  is
+  10:{ z; q } → 11:{ t }   11:{ t } → 12:{ a }   12:{ a } → 13:{  }
+[alias] analysing instruction: b = (*(z + 0))[0];
+[alias] May-aliases after instruction  b = (*(z + 0))[0];  are
+  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; t[0..] }
+[alias] May-alias graph after instruction  b = (*(z + 0))[0];  is
+  10:{ z; q } → 11:{ t }   11:{ t } → 14:{ a; b }   14:{ a; b } → 15:{  }
+[alias] analysing instruction: n = (*(q + 0))[0];
+[alias] May-aliases after instruction  n = (*(q + 0))[0];  are
+  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+[alias] May-alias graph after instruction  n = (*(q + 0))[0];  is
+  10:{ z; q } → 11:{ t }   11:{ t } → 16:{ a; b; n }
+  16:{ a; b; n } → 17:{  }
+[alias] analysing instruction: printf("%d\n%d\n",a == b,a == n);
+[alias:undefined:fn] arrays.c:17: Warning: function printf has no definition
+[alias] May-aliases after instruction  printf("%d\n%d\n",a == b,a == n);  are
+  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+[alias] May-alias graph after instruction  printf("%d\n%d\n",a == b,a == n);  is
+  10:{ z; q } → 11:{ t }   11:{ t } → 16:{ a; b; n }
+  16:{ a; b; n } → 17:{  }
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases after instruction  __retres = 0;  are
+  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  10:{ z; q } → 11:{ t }   11:{ t } → 16:{ a; b; n }
+  16:{ a; b; n } → 17:{  }
+[alias] May-aliases at the end of function main:
+  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+[alias] May-alias graph at the end of function main:
+  10:{ z; q } → 11:{ t }   11:{ t } → 16:{ a; b; n }
+  16:{ a; b; n } → 17:{  }
+[alias] Summary of function main:
+  formals:     returns: __retres
+  state: { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+[alias] Analysis complete

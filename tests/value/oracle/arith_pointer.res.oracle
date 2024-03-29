@@ -25,17 +25,13 @@
 [eva:alarm] arith_pointer.c:54: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:garbled-mix:write] arith_pointer.c:54: 
-  Assigning imprecise value to p1.
-  The imprecision originates from Arithmetic {arith_pointer.c:54}
+  Assigning imprecise value to p1 because of arithmetic operation on addresses.
 [eva:alarm] arith_pointer.c:56: Warning: 
   pointer subtraction. assert \base_addr(p2) ≡ \base_addr(p1);
 [eva:alarm] arith_pointer.c:56: Warning: 
   signed overflow. assert -2147483648 ≤ p2 - p1;
 [eva:alarm] arith_pointer.c:56: Warning: 
   signed overflow. assert p2 - p1 ≤ 2147483647;
-[eva:garbled-mix:write] arith_pointer.c:56: 
-  Assigning imprecise value to d.
-  The imprecision originates from Arithmetic {arith_pointer.c:54}
 [eva] arith_pointer.c:57: 
   Frama_C_show_each:
   {{ garbled mix of &{x} (origin: Arithmetic {arith_pointer.c:54}) }}
@@ -46,6 +42,11 @@
 [eva] Done for function main2
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    arith_pointer.c:54: arithmetic operation on addresses
+      (read in 2 statements, propagated through 2 statements)
+      garbled mix of &{x}
 [eva] arith_pointer.c:30: 
   assertion 'Eva,differing_blocks' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
@@ -117,8 +118,7 @@
 [eva:alarm] arith_pointer.c:30: Warning: 
   signed overflow. assert p1 - p2 ≤ 2147483647;
 [eva:garbled-mix:write] arith_pointer.c:30: 
-  Assigning imprecise value to d.
-  The imprecision originates from Arithmetic {arith_pointer.c:30}
+  Assigning imprecise value to d because of arithmetic operation on addresses.
 [eva] arith_pointer.c:31: 
   Frama_C_show_each:
   {{ garbled mix of &{x; y} (origin: Arithmetic {arith_pointer.c:30}) }}
@@ -129,8 +129,7 @@
 [eva:alarm] arith_pointer.c:49: Warning: 
   signed overflow. assert p2 - p1 ≤ 2147483647;
 [eva:garbled-mix:write] arith_pointer.c:49: 
-  Assigning imprecise value to d.
-  The imprecision originates from Arithmetic {arith_pointer.c:49}
+  Assigning imprecise value to d because of arithmetic operation on addresses.
 [eva] arith_pointer.c:50: 
   Frama_C_show_each:
   {{ garbled mix of &{x; y} (origin: Arithmetic {arith_pointer.c:49}) }}
@@ -139,8 +138,7 @@
 [eva:alarm] arith_pointer.c:51: Warning: 
   signed overflow. assert p2 - p2 ≤ 2147483647;
 [eva:garbled-mix:write] arith_pointer.c:51: 
-  Assigning imprecise value to d.
-  The imprecision originates from Arithmetic {arith_pointer.c:51}
+  Assigning imprecise value to d because of arithmetic operation on addresses.
 [eva] arith_pointer.c:52: 
   Frama_C_show_each:
   {{ garbled mix of &{x; y} (origin: Arithmetic {arith_pointer.c:51}) }}
@@ -150,16 +148,28 @@
   signed overflow. assert -2147483648 ≤ p2 - p1;
 [eva:alarm] arith_pointer.c:56: Warning: 
   signed overflow. assert p2 - p1 ≤ 2147483647;
-[eva:garbled-mix:write] arith_pointer.c:56: 
-  Assigning imprecise value to d.
-  The imprecision originates from Arithmetic
 [eva] arith_pointer.c:57: 
-  Frama_C_show_each: {{ garbled mix of &{x} (origin: Arithmetic) }}
+  Frama_C_show_each:
+  {{ garbled mix of &{x} (origin: Arithmetic {arith_pointer.c:54}) }}
 [eva] arith_pointer.c:64: Frama_C_show_each: [-3..5]
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    arith_pointer.c:54: arithmetic operation on addresses
+      (read in 2 statements, propagated through 2 statements)
+      garbled mix of &{x}
+    arith_pointer.c:30: arithmetic operation on addresses
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{x; y}
+    arith_pointer.c:49: arithmetic operation on addresses
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{x; y}
+    arith_pointer.c:51: arithmetic operation on addresses
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{x; y}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   t[0..1] ∈ {-3}

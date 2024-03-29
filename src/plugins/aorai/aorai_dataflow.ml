@@ -621,7 +621,7 @@ let compute_func_aux stack call_site kf init_state =
           let source =
             match call_site with
             | Kglobal -> None
-            | Kstmt _ -> Some (fst (Cil_datatype.Kinstr.loc call_site))
+            | Kstmt stmt -> Some (fst (Cil_datatype.Stmt.loc stmt))
           in
           Aorai_option.warning ?source
             "Call to %a does not follow automaton's specification. \
@@ -962,6 +962,8 @@ let filter_init_state restrict initial map acc =
   with Not_found -> acc
 
 let backward_analysis_aux stack kf ret_state =
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = Kernel_function.get_location kf in
   if Data_for_aorai.isIgnoredFunction kf then
     Aorai_option.fatal
       "Call backward analysis on ignored function %a" Kernel_function.pretty kf

@@ -56,8 +56,8 @@ version=$(shell grep -o "^- OCaml [0-9.]\+" "../../reference-configuration.md" |
 BUILD_ARGS += --build-arg=OCAML_VERSION=$(version)
 
 %.debian: BUILD_ARGS += --build-arg=DISTRO=debian:bookworm-slim
-%.fedora: BUILD_ARGS += --build-arg=DISTRO=fedora:38
-%.alpine: BUILD_ARGS += --build-arg=DISTRO=alpine:3.18
+%.fedora: BUILD_ARGS += --build-arg=DISTRO=fedora:39
+%.alpine: BUILD_ARGS += --build-arg=DISTRO=alpine:3.19
 
 dev-all: dev.debian dev-stripped.debian dev-gui.debian \
          dev.fedora dev-stripped.fedora dev-gui.fedora \

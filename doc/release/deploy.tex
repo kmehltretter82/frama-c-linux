@@ -7,7 +7,7 @@ the Release Manager.
 
 \section{Release pipeline}
 
-Go to the CI/CD section of GitLab. Start the release pipeline:
+Go to the Build $\rightarrow$ Pipelines section of GitLab. Start the release pipeline:
 \begin{itemize}
   \item click ``Run Pipeline''
   \item select the stable branch
@@ -20,7 +20,7 @@ create the release artifacts. The most important for the remaining tasks are the
 following:
 \begin{description}
 \item[\texttt{release-content}] has all generated artifacts
-\item[\texttt{release-website}] creates a merge-request assigned to
+\item[\texttt{release-website}] creates a merge request assigned to
   you on the website repository,
 \item[\texttt{release-wiki}] creates a wiki page on the public
   Frama-C repository (you can see a link in the Activity section),
@@ -42,31 +42,32 @@ Once the pipeline for the website has run, open \texttt{https://pub.frama-c.com}
     \item the new event,
     \item a link to the (beta) release at the bottom.
   \end{itemize}
-  \item \texttt{/fc-versions/<version\_name>.html}:
+  \item \texttt{/fc-versions/<codename>.html}:
   \begin{itemize}
     \item check Changelog link,
     \item check manual links (reminder: the links are dead at this moment), it must contain \texttt{NN.N-Version}
     \item check ACSL version.
   \end{itemize}
-  \item \texttt{/html/changelog.html\#Version-NN.N}
+  \item \texttt{/html/changelog.html\#Codename-NN.N}
   \item \texttt{/html/acsl.html}: check ACSL versions list
   \item \texttt{rss.xml}: check last event
 \end{itemize}
 
 For a beta version, the installation pages for:
 \begin{itemize}
-\item \texttt{/html/installations/beta\_version\_name.html} should indicate the beta status
-\item \texttt{/html/installations/current\_version\_name.html} should not indicate anything
-\item \texttt{/html/installations/previous\_version\_name.html} should indicate older version
+\item \texttt{/html/installations/beta\_codename.html} should indicate the beta status
+\item \texttt{/html/installations/current\_codename.html} should not indicate anything
+\item \texttt{/html/installations/previous\_codename.html} should indicate older version
 \end{itemize}
 
 For a final version, the installation pages for:
 \begin{itemize}
-\item \texttt{/html/installations/version\_name.html} should not indicate anything
-\item \texttt{/html/installations/previous\_version\_name.html} should indicate older version
+\item \texttt{/html/installations/codename.html} should not indicate anything
+\item \texttt{/html/installations/previous\_codename.html} should indicate older version
 \end{itemize}
 
-On GitLab, the following files must appear as \textbf{new} in \texttt{download}:
+On GitLab, in the website repository, in the merge request assigned to you, the
+following files must appear as \textbf{new} in \texttt{download}:
 \begin{itemize}
   \item \texttt{acsl-X.XX.pdf}
   \item \texttt{acsl-implementation-NN.N-CODENAME.pdf}
@@ -84,7 +85,7 @@ On GitLab, the following files must appear as \textbf{new} in \texttt{download}:
   \item \texttt{hello-NN.N-CODENAME.tar.gz}
 \end{itemize}
 
-For final release \textbf{ONLY}, the following files must appear as \textbf{modified} in \texttt{download}:
+For a final release \textbf{ONLY}, the following files must appear as \textbf{modified} in \texttt{download}:
 
 \begin{itemize}
   \item \texttt{acsl.pdf}
@@ -94,7 +95,8 @@ For final release \textbf{ONLY}, the following files must appear as \textbf{modi
   \item \texttt{frama-c-server-api.tar.gz}
   \item \texttt{frama-c-user-manual.pdf}
   \item \texttt{frama-c-<plugin>-manual.pdf}\\
-        for Aorai, EVA, Metrics, RTE, \textbf{Value Analysis} and WP
+        for Aorai, Eva, Metrics, RTE, and WP
+  \item \texttt{frama-c-value-analysis.pdf}
   \item \texttt{e-acsl/e-acsl.pdf}
   \item \texttt{e-acsl/e-acsl-implementation.pdf}
   \item \texttt{e-acsl/e-acsl-manual.pdf}
@@ -126,7 +128,8 @@ version in \url{https://git.frama-c.com/pub/frama-c/-/tags}.
 
 \begin{itemize}
 \item Send an e-mail to \texttt{frama-c-discuss} announcing the release.
-\item Tweet the release, pointing to the Downloads page.
+\item Toot the release (\url{https://fosstodon.org/@frama_c}),
+  pointing to the Downloads page.
 \item Ideally, a blog post should arrive in a few days, with some interesting
   new features.
 \end{itemize}

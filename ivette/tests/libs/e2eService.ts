@@ -78,7 +78,7 @@ export async function launchApp(
 
 export async function testServerIsStarted(window: Page): Promise<void> {
   // Click on the Console tab in the right menu
-  await locs.getConsoleMenuItem(window).click();
+  await locs.getConsoleView(window).click();
 
   // Check the server status in the header's button bar
   await expect(locs.getStartServerButton(window)).toBeDisabled();
@@ -86,7 +86,8 @@ export async function testServerIsStarted(window: Page): Promise<void> {
 
   // Check the server status in the console view
   await expect(
-    locs.getConsoleView(window).getByText("[server] Socket server running.")
+    locs.getConsoleComponent(window)
+    .getByText("[server] Socket server running.")
   ).toBeVisible();
 
   // Check the server status in the footer
@@ -94,15 +95,14 @@ export async function testServerIsStarted(window: Page): Promise<void> {
 }
 
 export async function testFileIsLoaded(window: Page): Promise<void> {
-  await locs.getConsoleMenuItem(window).click();
+  await locs.getConsoleView(window).click();
   // Check if a message is present in the console view to confirm the file is
   // loaded
   await expect(
-    locs.getConsoleView(window).getByText("adpcm.c (with preprocessing)")
+    locs.getConsoleComponent(window).getByText("adpcm.c (with preprocessing)")
   ).toBeVisible();
 
   // Check if the main function is visible in the functions view
-  await expect(
-    locs.getFunctionsSideBar(window).getByText("main", { exact: true })
-  ).toBeVisible();
+  await locs.getFunctionsSideBar(window).click();
+  await expect(locs.getMainFunction(window)).toBeVisible();
 }

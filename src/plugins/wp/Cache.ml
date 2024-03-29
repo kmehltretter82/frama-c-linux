@@ -37,7 +37,8 @@ let get_miss () = !miss
 let get_removed () = !removed
 
 let mark_cache ~mode hash =
-  if mode = Cleanup || Fc_config.is_gui then Hashtbl.replace cleanup hash ()
+  if mode = Cleanup || Wp_parameters.is_interactive () then
+    Hashtbl.replace cleanup hash ()
 
 module CACHEDIR = WpContext.StaticGenerator(Datatype.Unit)
     (struct
@@ -156,7 +157,7 @@ let steps_seized steps steplimit =
 
 let promote ?timeout ?steplimit (res : VCS.result) =
   match res.verdict with
-  | VCS.NoResult | VCS.Computing _ | VCS.Failed -> VCS.no_result
+  | VCS.NoResult | VCS.Computing _ | VCS.Invalid | VCS.Failed -> VCS.no_result
   | VCS.Valid | VCS.Unknown ->
     if not (steps_fits res.prover_steps steplimit) then
       { res with verdict = Stepout }

@@ -246,7 +246,7 @@ README* header_spec=.ignore
 /doc/**/*.sh header_spec=.ignore
 
 /headers/open-source/* header_spec=.ignore
-/headers/close-source/* header_spec=.ignore
+/headers/closed-source/* header_spec=.ignore
 
 /licenses/* header_spec=.ignore
 
@@ -254,6 +254,7 @@ README* header_spec=.ignore
 
 /nix/empty header_spec=.ignore
 /nix/external-plugins.txt header_spec=.ignore
+/nix/ocaml-versions.txt header_spec=.ignore
 /nix/frama-c-public/known_hosts header_spec=.ignore
 /nix/sources.json header_spec=.ignore
 

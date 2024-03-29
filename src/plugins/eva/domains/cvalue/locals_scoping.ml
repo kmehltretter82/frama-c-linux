@@ -54,6 +54,17 @@ let offsetmap_contains_local offm =
   with Exit -> true
 
 
+let warn_locals_escape is_block fundec k locals =
+  let pretty_base = Base.pretty in
+  let pretty_block fmt = Pretty_utils.pp_cond is_block fmt "a block of " in
+  let sv = fundec.svar in
+  Self.warning
+    ~wkey:Self.wkey_locals_escaping
+    ~current:true ~once:true
+    "locals %a escaping the scope of %t%a through %a"
+    Base.Hptset.pretty locals pretty_block Printer.pp_varinfo sv pretty_base k
+
+
 (* Rebuild [offsm] by applying [f] to the bindings that verify [test].
    Also call [warn] in this case. *)
 let rebuild_offsetmap f warn offsm =
@@ -123,7 +134,7 @@ let make_escaping_fundec fundec clob vars state =
         | Base.SetLattice.Top -> escaping
         | Base.SetLattice.Set bases -> Base.Hptset.inter bases escaping
       in
-      Warn.warn_locals_escape is_inner_block fundec b bases
+      warn_locals_escape is_inner_block fundec b bases
     in
     make_escaping ~exact:true ~escaping ~on_escaping ~within:clob.clob state
 

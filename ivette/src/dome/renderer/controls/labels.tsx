@@ -61,6 +61,8 @@ export interface LabelProps {
   display?: boolean;
   /** Additional content of the `<label/>` element. */
   children?: React.ReactNode;
+  /** Html tag `<input />` element. */
+  htmlFor?: string;
   /** Click event callback. */
   onClick?: (evt: React.MouseEvent) => void;
   /** Click event callback. */
@@ -93,6 +95,7 @@ const makeLabel = (className: string) =>
         onClick={props.onClick}
         onDoubleClick={props.onDoubleClick}
         onContextMenu={props.onContextMenu}
+        htmlFor={props.htmlFor}
       >
         {props.icon &&
          <Icon title={props.title} id={props.icon} className={iconClass} />}
@@ -112,6 +115,7 @@ const DESCR = 'dome-xLabel dome-text-descr';
 const TDATA = 'dome-xLabel dome-text-data';
 const TCODE = 'dome-xLabel dome-text-code';
 const TCELL = 'dome-xLabel dome-text-cell';
+const TITEM = 'dome-xLabel dome-text-item';
 
 // --------------------------------------------------------------------------
 // --- Components
@@ -134,5 +138,8 @@ export const Code = React.forwardRef(makeLabel(TCODE));
 
 /** Selectable inlined source-code content with default cursor. */
 export const Cell = React.forwardRef(makeLabel(TCELL));
+
+/** Non-selectable inlined source-code content with default cursor. */
+export const Item = React.forwardRef(makeLabel(TITEM));
 
 // --------------------------------------------------------------------------

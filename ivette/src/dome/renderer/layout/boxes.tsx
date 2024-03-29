@@ -82,7 +82,7 @@ const makeBox = (
 ): JSX.Element => {
   const {
     className, style, children,
-    visible=true, display=true,
+    visible = true, display = true,
     ...others
   } = props;
   const allClasses = classes(
@@ -235,4 +235,34 @@ export const Folder = (props: FolderProps): JSX.Element => {
   );
 };
 
-// --------------------------------------------------------------------------
+/* -------------------------------------------------------------------------- */
+/* --- Overlay Boxes                                                      --- */
+/* -------------------------------------------------------------------------- */
+
+export interface OverlayProps {
+  /** Overlay displayed (default is false). */
+  display?: boolean;
+  /** Class of the overlay contents. */
+  className?: string;
+  /** Additional style of the overlay contents. */
+  style?: React.CSSProperties;
+  /** Contents of the overlay. */
+  children?: React.ReactNode;
+}
+
+export function Overlay(props: OverlayProps): JSX.Element {
+  const {
+    className, display=false, style, children,
+  } = props;
+  const anchor = classes('dome-xOverlay-anchor', !display && 'dome-erased');
+  const contents = classes('dome-xOverlay-contents', className);
+  return (
+    <div className={anchor}>
+      <div className={contents} style={style}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */

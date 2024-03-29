@@ -398,7 +398,7 @@ let main () =
   if force_semantic_folding then compute ()
 
 let () =
-  Db.Main.extend main
+  Boot.Main.extend main
 
 (*
 Local Variables:

@@ -24,10 +24,23 @@
 Plugin WP <next-release>
 ###############################################################################
 
+- WP          [2024-03-26] wp_nullable_args is renamed \wp::nullable_args to
+                           follow kernel changes
+- WP          [2024-01-24] Introduce counter examples via the new option
+                           -wp-counter-examples. Also introduce an ACSL extension
+                           to create probes on terms for counter examples.
+
+###############################################################################
+Plugin WP 28.1 (Nickel)
+###############################################################################
+
+-* WP         [2024-01-29] Fix interactive prover startup.
+
 ###############################################################################
 Plugin WP 28.0 (Nickel)
 ###############################################################################
 
+- WP          [2023-11-24] Ensure compatibility with Why3 1.7.0
 - WP          [2023-10-19] WP generates exits and terminates specification
                            on all functions, using the mechanism provided by
                            the Frama-C kernel

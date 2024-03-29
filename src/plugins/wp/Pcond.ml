@@ -37,7 +37,7 @@ let rec alloc_hyp pool f seq =
       (fun step ->
          if not (Vars.subset step.vars (Plang.alloc_domain pool)) then
            match step.condition with
-           | State _ ->
+           | State _ | Probe _ ->
              Plang.alloc_xs pool f step.vars
            | Have p | When p | Type p | Init p | Core p ->
              Plang.alloc_p pool f p
@@ -179,8 +179,8 @@ open Conditions
 let mark_step m step =
   (* sub-sequences are marked recursively marked later *)
   match step.condition with
-  | When p | Type p | Have p | Init p | Core p
-  | Branch(p,_,_) -> F.mark_p m p
+  | When p | Type p | Have p | Init p | Core p | Branch(p,_,_) -> F.mark_p m p
+  | Probe(_,t) -> F.mark_e m t
   | Either _ | State _ -> ()
 
 let spaced pp fmt a = Format.pp_print_space fmt () ; pp fmt a
@@ -215,28 +215,35 @@ class engine (lang : #Plang.engine) =
       Format.fprintf fmt "@[<hov 4>%a %a = %a.@]"
         self#pp_clause "Let" self#pp_name x self#pp_core e
 
-    method pp_intro ~step ~clause ?(dot=".") fmt p =
-      ignore step ;
+    method pp_intro ~clause ?(dot=".") fmt p =
       Format.fprintf fmt "@[<hov 4>%a %a%s@]"
         self#pp_clause clause lang#pp_pred p dot
+
+    method pp_probe fmt p t =
+      begin
+        Format.fprintf fmt "@[<hov 4>%a %a = %a.@]"
+          self#pp_clause "Probe" Probe.pretty p lang#pp_term t
+      end
 
     (* -------------------------------------------------------------------------- *)
     (* --- Block Printers                                                     --- *)
     (* -------------------------------------------------------------------------- *)
 
-    method pp_condition ~step fmt = function
+    method pp_condition fmt step =
+      match step.condition with
       | State _ -> ()
-      | Core p -> self#pp_intro ~step ~clause:"Core:" fmt p
-      | Type p -> self#pp_intro ~step ~clause:"Type:" fmt p
-      | Init p -> self#pp_intro ~step ~clause:"Init:" fmt p
-      | Have p -> self#pp_intro ~step ~clause:"Have:" fmt p
-      | When p -> self#pp_intro ~step ~clause:"When:" fmt p
+      | Probe(p,t) -> self#pp_probe fmt p t
+      | Core p -> self#pp_intro ~clause:"Core:" fmt p
+      | Type p -> self#pp_intro ~clause:"Type:" fmt p
+      | Init p -> self#pp_intro ~clause:"Init:" fmt p
+      | Have p -> self#pp_intro ~clause:"Have:" fmt p
+      | When p -> self#pp_intro ~clause:"When:" fmt p
       | Branch(p,sa,sb) ->
         begin
-          self#pp_intro ~step ~clause:"If" ~dot:"" fmt p ;
-          if not (Conditions.is_true sa)
+          self#pp_intro ~clause:"If" ~dot:"" fmt p ;
+          if not (Conditions.is_empty sa)
           then self#sequence ~clause:"Then" fmt sa ;
-          if not (Conditions.is_true sb)
+          if not (Conditions.is_empty sb)
           then self#sequence ~clause:"Else" fmt sb ;
         end
       | Either cases ->
@@ -253,21 +260,21 @@ class engine (lang : #Plang.engine) =
 
     method pp_step fmt step =
       match step.condition with
-      | State _ ->
-        self#pp_condition ~step fmt step.condition
+      | State _ -> self#pp_condition fmt step
       | _ ->
         begin
           ( match step.descr with None -> () | Some s ->
                 spaced self#pp_comment fmt s ) ;
           Warning.Set.iter (spaced self#pp_warning fmt) step.warn ;
           List.iter (spaced self#pp_property fmt) step.deps ;
-          spaced (self#pp_condition ~step) fmt step.condition ;
+          spaced self#pp_condition fmt step ;
         end
 
     method private sequence ~clause fmt seq =
       Format.pp_print_space fmt () ; self#pp_block ~clause fmt seq
+
     method pp_block ~clause fmt seq =
-      if Conditions.is_true seq then
+      if Conditions.is_empty seq then
         Format.fprintf fmt "%a {}" self#pp_clause clause
       else
         begin
@@ -286,7 +293,7 @@ class engine (lang : #Plang.engine) =
       Format.fprintf fmt "@[<hv 0>" ;
       List.iter (append (self#define env) fmt) (F.defs marks) ;
       lang#set_env env ;
-      if not (Conditions.is_true hs) then
+      if not (Conditions.is_empty hs) then
         begin
           self#pp_block ~clause:"Assume" fmt hs ;
           Format.pp_print_newline fmt () ;
@@ -337,7 +344,8 @@ class seqengine (lang : #state) =
   object(self)
     inherit engine lang as super
 
-    method private label step = function
+    method private label step =
+      match step.condition with
       | State _ ->
         (try Some (lang#label_at ~id:step.id)
          with Not_found -> None)
@@ -349,9 +357,9 @@ class seqengine (lang : #state) =
         if not (Bag.is_empty upd) then
           Bag.iter ((spaced (lang#pp_update lbl)) fmt) upd
 
-    method! pp_condition ~step fmt cond =
-      match self#label step cond with
-      | None -> super#pp_condition ~step fmt cond
+    method! pp_condition fmt step =
+      match self#label step with
+      | None -> super#pp_condition fmt step
       | Some lbl ->
         let before = match Pcfg.prev lbl with
           | [ pre ] when (Pcfg.branching pre) ->

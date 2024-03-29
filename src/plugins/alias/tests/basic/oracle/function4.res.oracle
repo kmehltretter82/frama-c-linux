@@ -1,17 +1,35 @@
 [kernel] Parsing function4.c (with preprocessing)
 [alias] analysing function: addr
 [alias] May-aliases at the end of function addr: <none>
+[alias] May-alias graph at the end of function addr:
+  <empty>
+[alias] Summary of function addr:
+  formals: x    returns: x    state: <none>
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
 [alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *a = (int *)0;  is    <empty>
 [alias] analysing instruction: int *b = (int *)0;
 [alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *b = (int *)0;  is    <empty>
 [alias] analysing instruction: int c = 0;
 [alias] May-aliases after instruction  int c = 0;  are  <none>
+[alias] May-alias graph after instruction  int c = 0;  is    <empty>
 [alias] analysing instruction: a = addr(& c);
 [alias] May-aliases after instruction  a = addr(& c);  are  <none>
+[alias] May-alias graph after instruction  a = addr(& c);  is
+  4:{ a } → 3:{ c }   7:{  } → 3:{ c }
 [alias] analysing instruction: b = & c;
 [alias] May-aliases after instruction  b = & c;  are  { a; b }
+[alias] May-alias graph after instruction  b = & c;  is
+  4:{ a } → 9:{ c }   7:{  } → 9:{ c }   8:{ b } → 9:{ c }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  { a; b }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  4:{ a } → 9:{ c }   7:{  } → 9:{ c }   8:{ b } → 9:{ c }
 [alias] May-aliases at the end of function main: { a; b }
+[alias] May-alias graph at the end of function main:
+  4:{ a } → 9:{ c }   7:{  } → 9:{ c }   8:{ b } → 9:{ c }
+[alias] Summary of function main:
+  formals:     returns: __retres    state: { a; b }
+[alias] Analysis complete

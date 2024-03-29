@@ -64,17 +64,13 @@ open Cil_types
    functions below. *)
 let check_invariants = false
 
-(* A reference to the current location *)
-module CurrentLoc = Cil_const.CurrentLoc
-let () = Log.set_current_source (fun () -> fst (CurrentLoc.get ()))
-
-let pp_thisloc fmt = Location.pretty fmt (CurrentLoc.get ())
+let pp_thisloc fmt = Location.pretty fmt (Current_loc.get ())
 
 let abort_context msg =
-  let pos = fst (CurrentLoc.get ()) in
+  let loc = Current_loc.get () in
   let append fmt =
     Format.pp_print_newline fmt ();
-    Errorloc.pp_context_from_file fmt pos
+    Errorloc.pp_context_from_file fmt loc
   in
   Kernel.abort ~current:true ~append msg
 
@@ -400,6 +396,8 @@ let setTypeAttrs t a =
 let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
 
 let fc_internal_attributes = ["declspec"; "arraylen"; "fc_stdlib"]
+
+let cast_irrelevant_attributes = ["visibility"]
 
 let filter_qualifier_attributes al =
   List.filter
@@ -1421,10 +1419,8 @@ let copy_logic_label is_copy l =
   end else l
 
 let rec visitCilTerm vis t =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set t.term_loc;
-  let res = doVisitCil vis (fun x-> x) vis#vterm childrenTerm t in
-  CurrentLoc.set oldloc; res
+  Current_loc.with_loc t.term_loc
+    (doVisitCil vis (fun x-> x) vis#vterm childrenTerm) t
 
 and childrenTerm vis t =
   let tn' = visitCilTermNode vis t.term_node in
@@ -1467,10 +1463,15 @@ and childrenTermNode vis tn =
     let t1' = vTerm t1 in
     let t2' = vTerm t2 in
     if t1' != t1 || t2' != t2 then TBinOp(op,t1',t2') else tn
-  | TCastE(ty,te) ->
+  | TCast(false, Ctype ty,te) ->
     let ty' = vTyp ty in
     let te' = vTerm te in
-    if ty' != ty || te' != te then TCastE(ty',te') else tn
+    if ty' != ty || te' != te then TCast(false, Ctype ty',te') else tn
+  | TCast (true, ty,t) ->
+    let ty' = visitCilLogicType vis ty in
+    let t' = visitCilTerm vis t in
+    if ty' != ty || t' != t then TCast (true, ty',t') else tn
+  | TCast(false,_,_) -> Kernel.fatal "TCast to ctype without Ctype"
   | TAddrOf tl ->
     let tl' = vTermLval tl in
     if tl' != tl then TAddrOf tl' else tn
@@ -1552,10 +1553,6 @@ and childrenTermNode vis tn =
     let def'= visitCilLogicInfo vis def in
     let body' = visitCilTerm vis body in
     if def != def' || body != body' then Tlet(def',body') else tn
-  | TLogic_coerce(ty,t) ->
-    let ty' = visitCilLogicType vis ty in
-    let t' = visitCilTerm vis t in
-    if ty' != ty || t' != t then TLogic_coerce(ty',t') else tn
 
 and visitCilLogicLabel vis l =
   doVisitCil vis
@@ -2075,13 +2072,12 @@ and childrenModelInfo vis m =
   else begin m.mi_attr <- mi_attr; m end
 
 and visitCilModelInfo vis m =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set m.mi_decl;
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = m.mi_decl in
   let m' =
     doVisitCil
       vis (Visitor_behavior.Memo.model_info vis#behavior) vis#vmodel_info childrenModelInfo m
   in
-  CurrentLoc.set oldloc;
   if m' != m then begin
     (* reflect changes in the behavior tables for copy visitor. *)
     Visitor_behavior.Set.model_info vis#behavior m m';
@@ -2090,11 +2086,8 @@ and visitCilModelInfo vis m =
   m'
 
 and visitCilAnnotation vis a =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set (Global_annotation.loc a);
-  let res = doVisitCil vis id vis#vannotation childrenAnnotation a in
-  CurrentLoc.set oldloc;
-  res
+  Current_loc.with_loc (Global_annotation.loc a)
+    (doVisitCil vis id vis#vannotation childrenAnnotation) a
 
 and childrenAnnotation vis a =
   match a with
@@ -2205,10 +2198,9 @@ and childrenCodeAnnot vis ca =
     else ca
 
 and visitCilExpr (vis: cilVisitor) (e: exp) : exp =
-  let oldLoc = CurrentLoc.get () in
-  CurrentLoc.set e.eloc;
-  let res = doVisitCil vis (Visitor_behavior.cexpr vis#behavior) vis#vexpr childrenExp e in
-  CurrentLoc.set oldLoc; res
+  Current_loc.with_loc (e.eloc)
+    (doVisitCil vis (Visitor_behavior.cexpr vis#behavior) vis#vexpr childrenExp)
+    e
 
 and childrenExp (vis: cilVisitor) (e: exp) : exp =
   let vExp e = visitCilExpr vis e in
@@ -2339,12 +2331,8 @@ and childrenLocal_init vi (vis: cilVisitor) li =
     if f' != f || args' != args then ConsInit(f',args',k) else li
 
 and visitCilInstr (vis: cilVisitor) (i: instr) : instr list =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set (Cil_datatype.Instr.loc i);
-  let res =
-    doVisitListCil vis id vis#vinst childrenInstr i in
-  CurrentLoc.set oldloc;
-  res
+  Current_loc.with_loc (Cil_datatype.Instr.loc i)
+    (doVisitListCil vis id vis#vinst childrenInstr) i
 
 and childrenInstr (vis: cilVisitor) (i: instr) : instr =
   let fExp = visitCilExpr vis in
@@ -2407,31 +2395,26 @@ and childrenInstr (vis: cilVisitor) (i: instr) : instr =
 
 (* visit all nodes in a Cil statement tree in preorder *)
 and visitCilStmt (vis:cilVisitor) (s: stmt) : stmt =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set (Stmt.loc s) ;
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc s in
   vis#push_stmt s; (*(vis#behavior.memo_stmt s);*)
   assertEmptyQueue vis;
   let toPrepend : instr list ref = ref [] in (* childrenStmt may add to this *)
   let res =
     doVisitCil vis
       (Visitor_behavior.Memo.stmt vis#behavior) vis#vstmt (childrenStmt toPrepend) s in
-  let ghost = res.ghost in
   (* Now see if we have saved some instructions *)
   toPrepend := !toPrepend @ vis#unqueueInstr ();
-  (match !toPrepend with
-     [] -> () (* Return the same statement *)
-   | _ ->
-     let b =
-       mkBlockNonScoping
-         ((List.map (fun i -> mkStmt ~ghost (Instr i)) !toPrepend)
-          @ [mkStmt ~ghost res.skind])
-     in
-     b.battrs <- addAttribute (Attr (vis_tmp_attr, [])) b.battrs;
-     (* Make our statement contain the instructions to prepend *)
-     res.skind <- Block b);
-  CurrentLoc.set oldloc;
-  vis#pop_stmt s;
-  res
+  match !toPrepend with
+    [] -> vis#pop_stmt s; res (* Return the same statement *)
+  | _ :: _ as instr_list ->
+    let make i = mkStmt ~ghost:res.ghost (Instr i) in
+    let last = mkStmt ~ghost:res.ghost res.skind in
+    let block = mkBlockNonScoping (List.map make instr_list @ [ last ]) in
+    block.battrs <- addAttribute (Attr (vis_tmp_attr, [])) block.battrs;
+    (* Make our statement contain the instructions to prepend *)
+    res.skind <- Block block;
+    vis#pop_stmt s; res
 
 and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
   let fExp e = (visitCilExpr vis e) in
@@ -2665,12 +2648,9 @@ and childrenType (vis : cilVisitor) (t : typ) : typ =
 (* for declarations, we visit the types inside; but for uses, *)
 (* we just visit the varinfo node *)
 and visitCilVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set v.vdecl;
-  let res =
-    doVisitCil vis (Visitor_behavior.Memo.varinfo vis#behavior)
-      vis#vvdec childrenVarDecl v
-  in CurrentLoc.set oldloc; res
+  Current_loc.with_loc v.vdecl
+    (doVisitCil vis (Visitor_behavior.Memo.varinfo vis#behavior)
+       vis#vvdec childrenVarDecl) v
 
 and childrenVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
   (* in case of refresh visitor, the associated new logic var has a different
@@ -2873,12 +2853,8 @@ let visitCilEnumInfo vis e =
   doVisitCil vis (Visitor_behavior.Memo.enuminfo vis#behavior) vis#venuminfo childrenEnumInfo e
 
 let rec visitCilGlobal (vis: cilVisitor) (g: global) : global list =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set (Global.loc g) ;
-  let res =
-    doVisitListCil vis id vis#vglob childrenGlobal g in
-  CurrentLoc.set oldloc;
-  res
+  Current_loc.with_loc (Global.loc g)
+    (doVisitListCil vis id vis#vglob childrenGlobal) g
 and childrenGlobal (vis: cilVisitor) (g: global) : global =
   match g with
   | GFun (f, l) ->
@@ -3186,14 +3162,14 @@ let isZero (e: exp) : bool =
 let rec isLogicZero t = match t.term_node with
   | TConst (Integer (n,_)) -> Integer.equal n Integer.zero
   | TConst (LChr c) -> Char.code c = 0
-  | TCastE(_, t) -> isLogicZero t
+  | TCast(_, _, t) -> isLogicZero t
   | _ -> false
 
 let isLogicNull t =
   isLogicZero t ||
   (let rec aux t = match t.term_node with
       | Tnull -> true
-      | TCastE(_, t) -> aux t
+      | TCast(_,_, t) -> aux t
       | _ -> false
    in aux t)
 
@@ -3461,7 +3437,7 @@ let rec stripCasts (e: exp) =
   match e.enode with CastE(_, e') -> stripCasts e' | _ -> e
 
 let rec stripTermCasts (t: term) =
-  match t.term_node with TCastE(_, t') -> stripTermCasts t' | _ -> t
+  match t.term_node with TCast(_,_, t') -> stripTermCasts t' | _ -> t
 
 (* Separate out the storage-modifier name attributes *)
 let separateStorageModifiers (al: attribute list) =
@@ -4509,7 +4485,7 @@ and bytesSizeOf t = (bitsSizeOf t) lsr 3
 
 and sizeOf ~loc t =
   try
-    integer ~loc ((bitsSizeOf t) lsr 3)
+    integer ~loc (bytesSizeOf t)
   with SizeOfError _ -> new_exp ~loc (SizeOf(t))
 
 and fieldBitsOffset (f : fieldinfo) : int * int =
@@ -4610,14 +4586,13 @@ and constFold (machdep: bool) (e: exp) : exp =
   | Const(CChr c) -> new_exp ~loc (Const(charConstToIntConstant c))
   | Const(CEnum {eival = v}) -> constFold machdep v
   | Const (CReal _ | CWStr _ | CStr _ | CInt64 _) -> e (* a constant *)
-  | SizeOf t when machdep -> begin
-      try
-        let bs = bitsSizeOf t in
-        kinteger ~loc theMachine.kindOfSizeOf (bs / 8)
+  | SizeOf t when machdep ->
+    begin
+      try kinteger ~loc theMachine.kindOfSizeOf (bytesSizeOf t)
       with SizeOfError _ -> e
     end
-  | SizeOfE e when machdep -> constFold machdep
-                                (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
+  | SizeOfE e when machdep ->
+    constFold machdep (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
   | SizeOfStr s when machdep ->
     kinteger ~loc theMachine.kindOfSizeOf (1 + String.length s)
   | AlignOf t when machdep ->
@@ -4981,8 +4956,7 @@ let compareConstant c1 c2 =
 (* Iterate over all globals, including the global initializer *)
 let iterGlobals (fl: file) (doone: global -> unit) : unit =
   let doone' g =
-    CurrentLoc.set (Global.loc g);
-    doone g
+    Current_loc.with_loc (Global.loc g) doone g
   in
   List.iter doone' fl.globals;
   match fl.globinit with
@@ -4992,8 +4966,7 @@ let iterGlobals (fl: file) (doone: global -> unit) : unit =
 (* Fold over all globals, including the global initializer *)
 let foldGlobals (fl: file) (doone: 'a -> global -> 'a) (acc: 'a) : 'a =
   let doone' acc g =
-    CurrentLoc.set (Global.loc g);
-    doone acc g
+    Current_loc.with_loc (Global.loc g) (doone acc) g
   in
   let acc' = List.fold_left doone' acc fl.globals in
   match fl.globinit with
@@ -5020,14 +4993,20 @@ let spare_attributes_for_c_cast =
   fc_internal_attributes @ qualifier_attributes
 
 let type_remove_attributes_for_c_cast t =
-  let t = typeRemoveAttributesDeep fc_internal_attributes t in
+  let attributes_to_remove =
+    fc_internal_attributes @ cast_irrelevant_attributes
+  in
+  let t = typeRemoveAttributesDeep attributes_to_remove t in
   typeRemoveAttributes spare_attributes_for_c_cast t
 
 let spare_attributes_for_logic_cast =
   spare_attributes_for_c_cast
 
 let type_remove_attributes_for_logic_type t =
-  let t = typeRemoveAttributesDeep fc_internal_attributes t in
+  let attributes_to_remove =
+    fc_internal_attributes @ cast_irrelevant_attributes
+  in
+  let t = typeRemoveAttributesDeep attributes_to_remove t in
   typeRemoveAttributes spare_attributes_for_logic_cast t
 
 let () = Cil_datatype.drop_non_logic_attributes :=
@@ -5848,10 +5827,12 @@ let rec isConstantGen lit_only is_varinfo_cst f e = match e.enode with
   | BinOp (_, e1, e2, _) ->
     isConstantGen lit_only is_varinfo_cst f e1 &&
     isConstantGen lit_only is_varinfo_cst f e2
-  | Lval (Var vi, _) ->
+  | Lval (Var vi, NoOffset) ->
     is_varinfo_cst vi ||
     (vi.vglob && isArrayType vi.vtype) ||
     isFunctionType vi.vtype
+  | Lval (Var vi, offset) ->
+    is_varinfo_cst vi && isConstantOffsetGen lit_only is_varinfo_cst f offset
   | Lval _ -> false
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> true
   (* see ISO 6.6.6 *)
@@ -6203,9 +6184,9 @@ let combineTypesGen ?emitwith (combF : combineFunction)
       raise (Cannot_combine "different vararg specifiers");
     (* If one does not have arguments, believe the one with the
      * arguments *)
-    let newargs, olda' =
-      if oldargs = None then args, olda
-      else if args = None then oldargs, olda
+    let newargs =
+      if oldargs = None then args
+      else if args = None then oldargs
       else
         let (oldargslist, oldghostargslist) = argsToPairOfLists oldargs in
         let (argslist, ghostargslist) = argsToPairOfLists args in
@@ -6237,21 +6218,20 @@ let combineTypesGen ?emitwith (combF : combineFunction)
                   in
                   let a = addAttributes oa aa in
                   (n, t, a))
-               oldargslist argslist),
-          olda
+               oldargslist argslist)
     in
     (* Drop missingproto as soon as one of the type is a properly declared one*)
-    let olda =
+    let olda' =
       if not (hasAttribute "missingproto" a) then
-        dropAttribute "missingproto" olda'
-      else olda'
+        dropAttribute "missingproto" olda
+      else olda
     in
-    let a =
-      if not (hasAttribute "missingproto" olda') then
+    let a' =
+      if not (hasAttribute "missingproto" olda) then
         dropAttribute "missingproto" a
       else a
     in
-    TFun (newrt, newargs, oldva, combineAttributes what olda a)
+    TFun (newrt, newargs, oldva, combineAttributes what olda' a')
 
   | TBuiltin_va_list olda, TBuiltin_va_list a ->
     TBuiltin_va_list (combineAttributes what olda a)
@@ -6328,13 +6308,10 @@ let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
 (******************** CASTING *****)
 
 let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
+  let dkey = Kernel.dkey_typing_cast in
+  let origin = if fromsource then "explicit cast:" else " implicit cast:" in
+  let error msg = abort_context ("%s " ^^ msg) origin in
   let rec default_rec oldt newt =
-    let dkey = Kernel.dkey_typing_cast in
-    let error s =
-      if fromsource
-      then abort_context s
-      else Kernel.fatal ~current:true s
-    in
     match unrollType oldt, unrollType newt with
     | TNamed _, _
     | _, TNamed _ -> Kernel.fatal ~current:true "unrollType failed in checkCast"
@@ -6459,7 +6436,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
       begin
         match isTransparentUnion oldt with
         | None ->
-          abort_context "cast from %a to %a"
+          error "cast from %a to %a"
             Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
         | Some _ -> ()
       end
@@ -6472,8 +6449,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
 
     | _, t1 when fromsource && not (isScalarType t1) ->
       (* ISO 6.5.4.2 *)
-      error "Cast over a non-scalar type %a"
-        Cil_datatype.Typ.pretty newt
+      error "cast over a non-scalar type %a" Cil_datatype.Typ.pretty newt
 
     | _ ->
       error "cannot cast from %a to %a@\n"
@@ -6482,6 +6458,8 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
 
 let rec castReduce fromsource force =
   let dkey = Kernel.dkey_typing_cast in
+  let origin = if fromsource then "explicit cast:" else " implicit cast:" in
+  let error msg = abort_context ("%s " ^^ msg) origin in
   let rec rec_default oldt newt e =
     let loc = e.eloc in
     let normalized_newt = type_remove_attributes_for_c_cast (unrollType newt) in
@@ -6525,7 +6503,7 @@ let rec castReduce fromsource force =
       begin
         match isTransparentUnion oldt with
         | None ->
-          abort_context "cast from %a to %a"
+          error "cast from %a to %a"
             Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
         | Some fstfield ->
           (* We do it now only if the expression is an lval *)
@@ -6535,8 +6513,7 @@ let rec castReduce fromsource force =
               new_exp ~loc:e.eloc
                 (Lval (addOffsetLval (Field (fstfield, NoOffset)) lv))
             | _ ->
-              Kernel.fatal ~current:true
-                "castTo: transparent union expression is not an lval: %a\n"
+              error "transparent union expression is not an lval: %a\n"
                 Cil_datatype.Exp.pretty e
 
           in
@@ -6852,7 +6829,7 @@ let foldLeftCompound
                 (* Some initializers are missing. Iterate over all the indexes in
                    the array, and use either the supplied initializer, or a generic
                    zero one.  *)
-                let loc = CurrentLoc.get () in
+                let loc = Current_loc.get () in
                 let zinit = makeZeroInit ~loc bt in
                 let acc = ref acc in
                 let initl = ref initl in
@@ -7054,15 +7031,14 @@ let uniqueVarNames (f: file) : unit =
              Hashtbl.add globalNames vi.vname vi.vid;
              (* And register it *)
              Alpha.registerAlphaName ~alphaTable:gAlphaTable
-               ~lookupname:vi.vname ~data:(CurrentLoc.get ())
+               ~lookupname:vi.vname ~data:(Current_loc.get ())
            end)
       | _ -> ());
 
   (* Now we must scan the function bodies and rename the locals *)
   iterGlobals f
     (function
-        GFun(fdec, l) -> begin
-          CurrentLoc.set l;
+        GFun(fdec, _) -> begin
           (* Setup an undo list to be able to revert the changes to the
            * global alpha table *)
           let undolist = ref [] in
@@ -7073,7 +7049,7 @@ let uniqueVarNames (f: file) : unit =
             let lookupname =
               if v.vorig_name = "" then v.vname else v.vorig_name
             in
-            let data = CurrentLoc.get () in
+            let data = Current_loc.get () in
             let newname, oldloc =
               Alpha.newAlphaName
                 ~alphaTable:gAlphaTable ~undolist:(Some undolist)
@@ -7357,7 +7333,7 @@ let rec free_vars_term bound_vars t = match t.term_node with
   | TSizeOfE t
   | TAlignOfE t
   | TUnOp (_,t)
-  | TCastE (_,t)
+  | TCast (_,_,t)
   | Tat (t,_)
   | Toffset (_,t)
   | Tbase_addr (_,t)
@@ -7430,7 +7406,6 @@ let rec free_vars_term bound_vars t = match t.term_node with
       free_vars_term (Logic_var.Set.add d.l_var_info bound_vars) b
     in
     Logic_var.Set.union fvd fvb
-  | TLogic_coerce(_,t) -> free_vars_term bound_vars t
 
 and free_vars_lval bv (h,o) =
   Logic_var.Set.union

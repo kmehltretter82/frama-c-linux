@@ -57,7 +57,7 @@ char *__gen_e_acsl_getenv(char const *name)
     __gen_e_acsl_assert_data_2.pred_txt = "\\result == \\null || \\valid(\\result)";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data_2.fct = "getenv";
-    __gen_e_acsl_assert_data_2.line = 523;
+    __gen_e_acsl_assert_data_2.line = 524;
     __gen_e_acsl_assert_data_2.name = "null_or_valid_result";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);

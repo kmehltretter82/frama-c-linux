@@ -51,7 +51,6 @@ module type S = sig
   type call_result = {
     states: (Partition.key * state) list;
     cacheable: Eval.cacheable;
-    builtin: bool;
   }
 
   val compute_call_ref:

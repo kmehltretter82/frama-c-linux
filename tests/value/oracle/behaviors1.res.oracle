@@ -305,22 +305,16 @@
 [eva] computing for function f <- test_assigns <- main.
   Called from behaviors1.i:473.
 [eva] using specification for function f
+[eva:garbled-mix:assigns] behaviors1.i:473: 
+  The specification of function f has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] Done for function f
-[eva:garbled-mix:write] behaviors1.i:473: 
-  Assigning imprecise value to tmp.
-  The imprecision originates from Library function {behaviors1.i:473}
-[eva:garbled-mix:write] behaviors1.i:473: 
-  Assigning imprecise value to p1.
-  The imprecision originates from Library function {behaviors1.i:473}
 [eva] computing for function f <- test_assigns <- main.
   Called from behaviors1.i:474.
+[eva:garbled-mix:assigns] behaviors1.i:474: 
+  The specification of function f has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] Done for function f
-[eva:garbled-mix:write] behaviors1.i:474: 
-  Assigning imprecise value to tmp_0.
-  The imprecision originates from Library function {behaviors1.i:474}
-[eva:garbled-mix:write] behaviors1.i:474: 
-  Assigning imprecise value to p2.
-  The imprecision originates from Library function {behaviors1.i:474}
 [eva] computing for function f <- test_assigns <- main.
   Called from behaviors1.i:475.
 [eva] Done for function f
@@ -337,7 +331,7 @@
 [eva] Done for function test_assigns2
 [eva] computing for function test_small1 <- main.
   Called from behaviors1.i:649.
-[kernel:annot:missing-spec] behaviors1.i:502: Warning: 
+[kernel:annot:missing-spec] behaviors1.i:506: Warning: 
   Neither code nor explicit assigns for function f3,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f3 <- test_small1 <- main.
@@ -352,7 +346,7 @@
 [eva] Done for function test_small1
 [eva] computing for function test_small2 <- main.
   Called from behaviors1.i:650.
-[kernel:annot:missing-spec] behaviors1.i:517: Warning: 
+[kernel:annot:missing-spec] behaviors1.i:521: Warning: 
   Neither code nor explicit assigns for function f4,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f4 <- test_small2 <- main.
@@ -371,7 +365,7 @@
 [eva] Done for function test_small2
 [eva] computing for function test_small3 <- main.
   Called from behaviors1.i:651.
-[kernel:annot:missing-spec] behaviors1.i:531: Warning: 
+[kernel:annot:missing-spec] behaviors1.i:534: Warning: 
   Neither code nor explicit assigns for function f5,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f5 <- test_small3 <- main.
@@ -382,7 +376,7 @@
 [eva] Done for function test_small3
 [eva] computing for function test_small4 <- main.
   Called from behaviors1.i:652.
-[kernel:annot:missing-spec] behaviors1.i:545: Warning: 
+[kernel:annot:missing-spec] behaviors1.i:548: Warning: 
   Neither code nor explicit assigns for function f6,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f6 <- test_small4 <- main.
@@ -393,7 +387,7 @@
 [eva] Done for function test_small4
 [eva] computing for function test_small5 <- main.
   Called from behaviors1.i:653.
-[kernel:annot:missing-spec] behaviors1.i:558: Warning: 
+[kernel:annot:missing-spec] behaviors1.i:561: Warning: 
   Neither code nor explicit assigns for function f7,
    generating default clauses. See -generated-spec-* options for more info
 [eva] computing for function f7 <- test_small5 <- main.
@@ -452,6 +446,14 @@
 [eva] Done for function test_narrow
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    behaviors1.i:473: assigns clause on addresses
+      (read in 1 statement, propagated through 2 statements)
+      garbled mix of &{a}
+    behaviors1.i:474: assigns clause on addresses
+      (read in 1 statement, propagated through 2 statements)
+      garbled mix of &{b}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test_123_comp_2345_comp_disj:
   a ∈ [--..--]

@@ -52,6 +52,7 @@ type extension_common = {
   visitor: extension_visitor ;
   printer: extension_printer ;
   short_printer: extension_printer ;
+  plugin: string;
 }
 
 let default_printer printer fmt = function
@@ -64,6 +65,7 @@ let default_printer printer fmt = function
 let default_short_printer name _printer fmt _ext_kind = Format.fprintf fmt "%s" name
 
 let make
+    ~plugin
     name category
     ?(preprocessor=Fun.id)
     typer
@@ -71,9 +73,11 @@ let make
     ?(printer=default_printer)
     ?(short_printer=default_short_printer name)
     status : extension_single*extension_common =
-  { preprocessor; typer; status},{ category; visitor; printer; short_printer }
+  { preprocessor; typer; status},
+  { category; visitor; printer; short_printer; plugin }
 
 let make_block
+    ~plugin
     name category
     ?(preprocessor=Fun.id)
     typer
@@ -81,7 +85,8 @@ let make_block
     ?(printer=default_printer)
     ?(short_printer=default_short_printer name)
     status : extension_block*extension_common =
-  { preprocessor; typer; status},{ category; visitor; printer; short_printer }
+  { preprocessor; typer; status},
+  { category; visitor; printer; short_printer; plugin }
 
 module Extensions = struct
   (*hash table for  category, visitor, printer and short_printer of extensions*)
@@ -113,10 +118,11 @@ module Extensions = struct
 
   let is_extension_block = Hashtbl.mem ext_block_tbl
 
-  let register
-      cat name ?preprocessor typer ?visitor ?printer ?short_printer status =
+  let register cat ~plugin name
+      ?preprocessor typer ?visitor ?printer ?short_printer status =
     let info1,info2 =
-      make name cat ?preprocessor typer ?visitor ?printer ?short_printer status
+      make ~plugin name cat ?preprocessor typer
+        ?visitor ?printer ?short_printer status
     in
     if is_extension name then
       Kernel.warning ~wkey:Kernel.wkey_acsl_extension
@@ -128,10 +134,11 @@ module Extensions = struct
         Hashtbl.add ext_tbl name info2
       end
 
-  let register_block
-      cat name ?preprocessor typer ?visitor ?printer ?short_printer status =
+  let register_block cat ~plugin name
+      ?preprocessor typer ?visitor ?printer ?short_printer status =
     let info1,info2 =
-      make_block name cat ?preprocessor typer ?visitor ?printer ?short_printer status
+      make_block ~plugin name cat ?preprocessor typer
+        ?visitor ?printer ?short_printer status
     in
     if is_extension name then
       Kernel.warning ~wkey:Kernel.wkey_acsl_extension
@@ -182,16 +189,25 @@ module Extensions = struct
   let visit name = (find_common name).visitor
 
   let print name printer fmt kind =
-    let pp = (find_common name).printer printer in
+    let ext_common = find_common name in
+    let plugin = ext_common.plugin in
+    let full_name =
+      if Datatype.String.equal plugin "kernel"
+      then name
+      else Format.sprintf "\\%s::%s" plugin name
+    in
+    let pp = ext_common.printer printer in
     match kind with
     | Ext_annot (id,_) ->
-      Format.fprintf fmt "@[<v 2>@[%s %s {@]@\n%a}@]" name id pp kind
+      Format.fprintf fmt "@[<v 2>@[%s %s {@]@\n%a}@]" full_name id pp kind
     | _ ->
-      Format.fprintf fmt "@[<hov 2>%s %a;@]" name pp kind
+      Format.fprintf fmt "@[<hov 2>%s %a;@]" full_name pp kind
 
   let short_print name printer fmt kind =
     let pp = (find_common name).short_printer in
     Format.fprintf fmt "%a" (pp printer) kind
+
+  let extension_from name = (find_common name).plugin
 end
 
 (* Registration functions *)
@@ -219,7 +235,8 @@ let () =
     ~is_extension: Extensions.is_extension
     ~preprocess: Extensions.preprocess
     ~is_extension_block: Extensions.is_extension_block
-    ~preprocess_block: Extensions.preprocess_block;
+    ~preprocess_block: Extensions.preprocess_block
+    ~extension_from:Extensions.extension_from;
   Logic_typing.set_extension_handler
     ~is_extension: Extensions.is_extension
     ~typer: Extensions.typing

@@ -353,10 +353,13 @@ struct
         end)
 
     let add_option name =
+      let help =
+        Format.asprintf "%s (preferably use %s=\"%s\")" X.help name X.arg_name
+      in
       Cmdline.add_option
         name
         ~argname:X.arg_name
-        ~help:X.help
+        ~help
         ~visible:is_visible
         ~ext_help:!Parameter_customize.optional_help_ref
         ~plugin:P.shortname
@@ -532,6 +535,127 @@ struct
         p
 
     let is_empty () = Filepath.Normalized.is_empty (get ())
+  end
+
+  (* ************************************************************************ *)
+  (** {3 Custom parameters} *)
+  (* ************************************************************************ *)
+
+  module Custom
+      (X: sig
+         include Parameter_sig.Input_with_arg
+         include Datatype.S
+         val default: t
+         val of_string: string -> t option
+         val to_string: t -> string
+       end) =
+  struct
+
+    include Build
+        (struct
+          include X
+          let default () = default
+          let functor_name = "Value"
+        end)
+
+    let possible_values = ref []
+    let set_possible_values s = possible_values := s
+    let get_possible_values () = !possible_values
+
+    (* Same interface as current module but with t replaced with string *)
+    module String_parameter =
+    struct
+      let get () =
+        X.to_string (get ())
+
+      let set s =
+        match X.of_string s with
+        | Some x -> set x
+        | None ->
+          (* Error during conversion from string to t, abort *)
+          let help_text =
+            match !possible_values with
+            | [] -> ""
+            | l ->
+              Format.asprintf "@ Possible values are: %a"
+                (Pretty_utils.pp_list ~sep:",@ " Format.pp_print_string) l
+          in
+          P.L.abort "invalid input '%s' for option %s. %s" s name help_text
+
+      let add_set_hook f =
+        let f' x1 x2 = f (X.to_string x1) (X.to_string x2) in
+        add_set_hook f'
+
+      let add_update_hook f =
+        let f' x1 x2 = f (X.to_string x1) (X.to_string x2) in
+        add_update_hook f'
+    end
+
+    let parameter =
+      let accessor =
+        let open String_parameter in
+        Typed_parameter.String (
+          { get; set; add_set_hook; add_update_hook },
+          get_possible_values)
+      in
+      let reconfigurable = is_parameter_reconfigurable stage in
+      let p =
+        Typed_parameter.create ~name ~help:X.help ~accessor
+          ~visible:is_visible ~reconfigurable ~is_set
+      in
+      add_parameter !Parameter_customize.group_ref stage p;
+      Cmdline.add_option option_name
+        ~argname:X.arg_name
+        ~help:X.help
+        ~visible:is_visible
+        ~ext_help:!Parameter_customize.optional_help_ref
+        ~plugin:P.shortname
+        ~group
+        stage
+        (Cmdline.String String_parameter.set);
+      Parameter_customize.reset ();
+      if is_dynamic then
+        Dynamic.register ~plugin:empty_string X.option_name Typed_parameter.ty p
+      else
+        p
+  end
+
+  module Enum
+      (X: sig
+         include Parameter_sig.Input_with_arg
+         type t
+         val default: t
+         val all_values: t list
+         val to_string: t -> string
+       end) =
+  struct
+    module Custom_input =
+    struct
+      include Datatype.Make (struct
+          include Datatype.Serializable_undefined
+          let name = "Parameter_builder.Enum(" ^ X.option_name ^ ")"
+          type t = X.t
+          let copy x = x
+          let compare = Stdlib.compare
+          let equal = Datatype.from_compare
+          let reprs = X.all_values
+        end)
+
+      include X
+
+      let of_string =
+        let table =
+          List.to_seq X.all_values
+          |> Seq.map (fun x -> X.to_string x, x)
+          |> Hashtbl.of_seq
+        in
+        Hashtbl.find_opt table
+    end
+
+    include Custom (Custom_input)
+
+    let () =
+      set_possible_values (List.map X.to_string X.all_values)
   end
 
   (* ************************************************************************ *)

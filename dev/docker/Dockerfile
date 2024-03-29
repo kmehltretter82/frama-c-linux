@@ -26,7 +26,7 @@ RUN /init/install.sh \
   unzip \
   wget
 
-RUN bash -c "yes '' | sh <(curl -fsSL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)" --version 2.1.3
+RUN bash -c "yes '' | sh <(curl -fsSL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)" --version 2.1.5
 
 # Avoid using root (opam dislikes it)
 COPY add-user.sh /init/

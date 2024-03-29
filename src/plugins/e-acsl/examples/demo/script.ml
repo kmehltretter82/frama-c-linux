@@ -113,4 +113,4 @@ let main () =
   let ppt, line = search kf in
   emit ppt line
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

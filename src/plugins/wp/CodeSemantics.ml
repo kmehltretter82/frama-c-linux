@@ -412,9 +412,9 @@ struct
   (* --- BootStrapping                                                      --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let exp env e = Context.with_current_loc e.eloc (exp_protected env) e
-  let cond env e = Context.with_current_loc e.eloc (cond_node env) e
-  let call env e = Context.with_current_loc e.eloc (call_node env) e
+  let exp env e = Current_loc.with_loc e.eloc (exp_protected env) e
+  let cond env e = Current_loc.with_loc e.eloc (cond_node env) e
+  let call env e = Current_loc.with_loc e.eloc (call_node env) e
   let result env tr = function
     | R_var x -> F.e_var x
     | R_loc l -> cval (M.load env (Ctypes.object_of tr) l)

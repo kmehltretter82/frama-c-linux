@@ -25,5 +25,5 @@
     precise than the functionwise results. *)
 
 val compute_all_calldeps : unit -> unit
-val iter : (Cil_types.kinstr -> Function_Froms.froms -> unit) -> unit
-val find : Cil_types.kinstr -> Function_Froms.froms
+val iter : (Cil_types.kinstr -> Eva.Assigns.t -> unit) -> unit
+val find : Cil_types.kinstr -> Eva.Assigns.t

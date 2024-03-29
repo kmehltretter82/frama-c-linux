@@ -48,4 +48,4 @@ let populate () =
 
 let () = Cmdline.run_after_configuring_stage populate
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

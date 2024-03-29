@@ -45,7 +45,7 @@ type stats = {
   noresult : int ;
   failed : int ;
   cached : int ;
-  cachemiss : int ;
+  cacheable : int ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -62,7 +62,7 @@ module Plist = Qed.Listmap.Make
 let pzero = {
   tmin = max_float ;
   tval = 0.0 ;
-  tmax = 0.0 ;
+  tmax = min_float ;
   tnbr = 0.0 ;
   time = 0.0 ;
   success = 0.0 ;
@@ -83,8 +83,11 @@ let padd a b =
 let pmerge = Plist.union (fun _ a b -> padd a b)
 
 let ptime t valid =
-  { tmin = t ; tval = t ; tmax = t ; time = t ; tnbr = 1.0 ;
-    success = if valid then 1.0 else 0.0 }
+  if t < Rformat.epsilon then
+    { pzero with tnbr = 1.0 ; success = if valid then 1.0 else 0.0 }
+  else
+    { tmin = t ; tval = t ; tmax = t ; time = t ; tnbr = 1.0 ;
+      success = if valid then 1.0 else 0.0 }
 
 let psolver r = ptime r.solver_time false
 let pqed r = if VCS.is_valid r then ptime r.solver_time true else pzero
@@ -107,12 +110,15 @@ let empty = {
   noresult = 0 ;
   failed = 0 ;
   cached = 0 ;
-  cachemiss = 0 ;
+  cacheable = 0 ;
 }
 
-let cacheable p r = p <> Qed && not @@ VCS.is_trivial r
+let cacheable p r =
+  p <> Qed && not @@ VCS.is_trivial r &&
+  VCS.is_auto p && not @@ VCS.has_counter_examples p
+
+let add_cacheable n (p,r) = if cacheable p r then succ n else n
 let add_cached n (p,r) = if cacheable p r && r.cached then succ n else n
-let add_cachemiss n (p,r) = if cacheable p r && not r.cached then succ n else n
 
 let results ~smoke results =
   let (p,r) = VCS.best results in
@@ -128,7 +134,7 @@ let results ~smoke results =
     best = r.verdict ; tactics = 0 ;
     proved ; timeout ; unknown ; failed ; noresult ;
     cached = List.fold_left add_cached 0 results ;
-    cachemiss = List.fold_left add_cachemiss 0 results ;
+    cacheable = List.fold_left add_cacheable 0 results ;
     provers =
       if p = Qed then [Qed,if smoke then qsmoked r else pqed r]
       else
@@ -148,7 +154,7 @@ let add a b =
       noresult = a.noresult + b.noresult ;
       failed = a.failed + b.failed ;
       cached = a.cached + b.cached ;
-      cachemiss = a.cachemiss + b.cachemiss ;
+      cacheable = a.cacheable + b.cacheable ;
     }
 
 let tactical ~qed children =
@@ -159,7 +165,7 @@ let tactical ~qed children =
   List.fold_left add { empty with best ; provers ; tactics = 1 } children
 
 let script stats =
-  let cached = stats.cachemiss = 0 in
+  let cached = stats.cached = stats.cacheable in
   let solver = List.fold_left
       (fun t (p,s) -> if p = Qed then t +. s.time else t) 0.0 stats.provers in
   let time = List.fold_left
@@ -175,7 +181,7 @@ let complete s = s.proved = subgoals s
 
 let pp_pstats fmt p =
   if p.tnbr > 0.0 &&
-     p.tmin > Rformat.epsilon &&
+     p.tmax > Rformat.epsilon &&
      not (Wp_parameters.has_dkey VCS.dkey_shell)
   then
     let mean = p.tval /. p.tnbr in
@@ -204,13 +210,14 @@ let pp_stats ~shell ~cache fmt s =
   let updating = Cache.is_updating cache in
   let qed_only = match s.provers with [Qed,_] -> true | _ -> false in
   let print_cache = not qed_only && Cache.is_active cache in
+  let cachemiss = s.cacheable - s.cached in
   List.iter
     (fun (p,pr) ->
        let success = truncate pr.success in
        let print_proofs = success > 0 && total > 1 in
        let print_perfo =
          pr.time > Rformat.epsilon &&
-         (not shell || (not updating && s.cachemiss > 0))
+         (not shell || (not updating && cachemiss > 0))
        in
        if p != Qed || qed_only || print_perfo || print_proofs
        then
@@ -224,21 +231,20 @@ let pp_stats ~shell ~cache fmt s =
            Format.fprintf fmt ")"
          end
     ) s.provers ;
-  if shell && s.cachemiss > 0 && not updating then
-    Format.fprintf fmt " (Cache miss %d)" s.cachemiss
+  if shell && cachemiss > 0 && not updating then
+    Format.fprintf fmt " (Cache miss %d)" cachemiss
   else
   if print_cache then
-    let cacheable = s.cachemiss + s.cached in
-    if cacheable = 0 then
+    if s.cacheable = 0 then
       if s.best = Valid then
         Format.pp_print_string fmt " (Trivial)"
       else
         Format.pp_print_string fmt " (No Cache)"
     else
-    if updating || s.cachemiss = 0 then
+    if updating || cachemiss = 0 then
       Format.pp_print_string fmt " (Cached)"
     else
-      Format.fprintf fmt " (Cached %d/%d)" s.cached cacheable
+      Format.fprintf fmt " (Cached %d/%d)" s.cached s.cacheable
 
 let pretty = pp_stats ~shell:false ~cache:NoCache
 

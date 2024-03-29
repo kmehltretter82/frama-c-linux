@@ -1,2 +1,2 @@
 let () =
-  Db.Main.extend Allocates.add_allocates_nothing
+  Boot.Main.extend Allocates.add_allocates_nothing

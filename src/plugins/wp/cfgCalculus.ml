@@ -204,7 +204,7 @@ struct
 
   let rec wp (env:env) (a:vertex) : W.t_prop =
     match Vhash.find env.wp a with
-    | None -> raise (NonNaturalLoop (Cil.CurrentLoc.get()));
+    | None -> raise (NonNaturalLoop (Current_loc.get()));
     | Some pi -> pi
     | exception Not_found ->
       (* cut circularities *)
@@ -216,24 +216,21 @@ struct
 
   (* Compute a stmt node *)
   and stmt env a (s: stmt) : W.t_prop =
-    let kl = Cil.CurrentLoc.get () in
-    try
-      Cil.CurrentLoc.set (Stmt.loc s) ;
-      let smoking = is_default_bhv env.mode && env.dead s in
-      let cas = CfgAnnot.get_code_assertions ~smoking env.mode.kf s in
-      let opt_fold f = Option.fold ~none:Fun.id ~some:f in
-      let do_assert env CfgAnnot.{ code_admitted ; code_verified } w =
-        opt_fold (prove_property env) code_verified @@
-        opt_fold (use_property env) code_admitted w
-      in
-      let pi =
-        W.label env.we (Some s) (Clabels.stmt s) @@
-        List.fold_right (do_assert env) cas @@
-        control env a s
-      in
-      Cil.CurrentLoc.set kl ; pi
-    with err ->
-      Cil.CurrentLoc.set kl ; raise err
+    let open Current_loc.Operators in
+    let<> UpdatedCurrentLoc = Stmt.loc s in
+    let smoking = is_default_bhv env.mode && env.dead s in
+    let cas = CfgAnnot.get_code_assertions ~smoking env.mode.kf s in
+    let opt_fold f = Option.fold ~none:Fun.id ~some:f in
+    let do_assert env CfgAnnot.{ code_admitted ; code_verified } w =
+      opt_fold (prove_property env) code_verified @@
+      opt_fold (use_property env) code_admitted w
+    in
+    let probes = Probe.annotations s in
+    let do_probe env (probe,term) = W.add_probe env.we ~stmt:s probe term in
+    W.label env.we (Some s) (Clabels.stmt s) @@
+    List.fold_right (do_probe env) probes @@
+    List.fold_right (do_assert env) cas @@
+    control env a s
 
   (* Branching wrt control-flow *)
   and control env a s : W.t_prop =
@@ -466,6 +463,13 @@ struct
     I.process_global_init env.we env.mode.kf @@
     W.scope env.we [] SC_Global w
 
+  let do_probe_formal env x w =
+    let probes = Wp_parameters.CounterExamples.get () in
+    if probes then
+      let term = Cil_builder.Exp.(cil_term ~loc:x.vdecl @@ var x) in
+      W.add_probe env.we x.vname term w
+    else w
+
   let do_preconditions env ~formals (b : CfgAnnot.behavior) w =
     let kf = env.mode.kf in
     let init = CfgInfos.is_entry_point kf in
@@ -482,6 +486,7 @@ struct
     List.fold_right (use_property env) b.bhv_requires @@
     List.fold_right (prove_property env) b.bhv_smokes @@
     List.fold_right (use_property env) side_behaviors @@
+    List.fold_right (do_probe_formal env) formals @@
     (* frame-in *)
     W.scope env.we formals SC_Frame_in w
 

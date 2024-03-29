@@ -11,7 +11,7 @@
   Z ∈ [--..--]
 [eva:alarm] loops.i:82: Warning: signed overflow. assert c + 10 ≤ 2147483647;
 [eva:alarm] loops.i:88: Warning: assertion got status unknown.
-[kernel:annot:missing-spec] loops.i:61: Warning: 
+[kernel:annot:missing-spec] loops.i:89: Warning: 
   Neither code nor specification for function stop,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function stop <- stop_f2.

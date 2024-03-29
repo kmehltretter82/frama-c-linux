@@ -38,10 +38,10 @@
 [e-acsl] FRAMAC_SHARE/libc/unistd.h:1149: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:505: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:506: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:507: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:508: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
@@ -158,7 +158,7 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:226: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/pthread.h:311: Warning: 
+[kernel:annot:missing-spec] parallel_threads.c:121: Warning: 
   Neither code nor specification for function pthread_mutex_trylock,
    generating default assigns. See -generated-spec-* options for more info
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:313: Warning: 

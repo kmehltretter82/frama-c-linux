@@ -44,7 +44,6 @@
 (** Printers for the Cabs AST *)
 val version : string
 
-val msvcMode : bool ref
 val printLn : bool ref
 val printLnComment : bool ref
 val printCounters : bool ref

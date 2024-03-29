@@ -28,8 +28,8 @@ val is_computed : kernel_function -> bool
 val compute : kernel_function -> unit
 val compute_all : unit -> unit
 
-val get : Cil_types.kernel_function -> Function_Froms.froms
-val access : Locations.Zone.t -> Function_Froms.Memory.t -> Locations.Zone.t
+val get : Cil_types.kernel_function -> Eva.Assigns.t
+val access : Locations.Zone.t -> Eva.Assigns.Memory.t -> Locations.Zone.t
 
 val self : State.t
 
@@ -42,6 +42,6 @@ val display : Format.formatter -> unit
 
 val compute_all_calldeps : unit -> unit
 module Callwise : sig
-  val iter : (Cil_types.kinstr -> Function_Froms.froms -> unit) -> unit
-  val find : Cil_types.kinstr -> Function_Froms.froms
+  val iter : (Cil_types.kinstr -> Eva.Assigns.t -> unit) -> unit
+  val find : Cil_types.kinstr -> Eva.Assigns.t
 end

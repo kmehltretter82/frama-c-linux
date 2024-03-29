@@ -12,5 +12,5 @@ let resname = "tests/slicing/adpcm.sliced" in
 ignore (test "uppol2" ~do_prop_to_callers:true ~resname (select_retres));;
 *)
 let () =
-  Db.Main.extend
+  Boot.Main.extend
     (fun _ -> ignore (test "uppol2" ~do_prop_to_callers:true (select_retres)))

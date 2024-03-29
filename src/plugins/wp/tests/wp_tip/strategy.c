@@ -16,21 +16,21 @@
 */
 
 /*@
-  strategy Prover: \prover("alt-ergo",0.1);
+  \wp::strategy Prover: \prover("alt-ergo",0.1);
 
-  strategy Lazy:
+  \wp::strategy Lazy:
     Prover,
     \tactic("Wp.overflow"
       ,\pattern(\any(to_uint32(_),to_sint32(_)))
     );
 
-  strategy Eager:
+  \wp::strategy Eager:
     \tactic("Wp.overflow"
       ,\pattern(\any(to_uint32(_),to_sint32(_)))
     ),
     Prover;
 
-  strategy EagerRange:
+  \wp::strategy EagerRange:
     \tactic("Wp.overflow"
       ,\pattern(\any(to_uint32(_),to_sint32(_)))
       ,\child("In-Range",EagerRange)

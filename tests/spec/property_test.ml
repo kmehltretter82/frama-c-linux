@@ -74,4 +74,4 @@ let run () =
   show_properties ();
   Project.on prj show_properties ()
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

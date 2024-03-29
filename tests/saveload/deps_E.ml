@@ -37,4 +37,4 @@ let main () =
   assert (StateB.get_option () = None); (* reset to default *)
   assert (StateC.get_option () = None) (* reset because of dependency of B *)
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

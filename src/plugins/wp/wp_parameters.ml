@@ -45,6 +45,10 @@ let on_reset f = resetdemon := f :: !resetdemon
 let reset () = List.iter (fun f -> f ()) !resetdemon
 let has_dkey (k:category) = is_debug_key_enabled k
 
+let server = ref false
+let () = Server.Main.once (fun () -> server := true)
+let is_interactive () = Fc_config.is_gui || !server
+
 (* ------------------------------------------------------------------------ *)
 (* ---  WP Generation                                                   --- *)
 (* ------------------------------------------------------------------------ *)
@@ -836,6 +840,28 @@ module Tactics = String_list
 let () = on_reset Tactics.clear
 
 let () = Parameter_customize.set_group wp_prover
+let () = Parameter_customize.is_invisible ()
+module Import =
+  String_list
+    (struct
+      let option_name = "-wp-import"
+      let arg_name = "thy,..."
+      let help = "Import Why3 theories"
+    end)
+
+let () = Parameter_customize.set_group wp_prover
+let () = Parameter_customize.is_invisible ()
+module Library =
+  Filepath_list
+    (struct
+      let option_name = "-wp-library"
+      let arg_name = "dir,..."
+      let file_kind = "Why3 load path"
+      let existence = Fc_Filepath.Must_exist
+      let help = "Load path for importing why3 theories"
+    end)
+
+let () = Parameter_customize.set_group wp_prover
 module Drivers =
   Filepath_list
     (struct
@@ -927,7 +953,7 @@ let () = Parameter_customize.set_group wp_prover
 module TimeExtra =
   Int(struct
     let option_name = "-wp-time-extra"
-    let default = 5
+    let default = 1
     let arg_name = "n"
     let help =
       Printf.sprintf
@@ -936,16 +962,16 @@ module TimeExtra =
 
 let () = Parameter_customize.set_group wp_prover
 module TimeMargin =
-  Int(struct
+  String(struct
     let option_name = "-wp-time-margin"
-    let default = 2
+    let default = "0.5"
     let arg_name = "n"
     let help =
       Printf.sprintf
         "Set margin-time (in seconds) for considering a proof automatic.\n\
          When using the 'tip' prover, scripts are created or cancelled\n\
          if the proof time is greater or lower than (timeout - margin).\n\
-         (default: %d)." default
+         (default: %s)." default
   end)
 
 let () = Parameter_customize.set_group wp_prover
@@ -1152,13 +1178,27 @@ module OutputDir =
                 Defaults to some temporary directory."
   end)
 
+module Probes =
+  True
+    (struct
+      let option_name = "-wp-probes"
+      let help = "Activate user-defines probes (@probe) (default: yes)"
+    end)
+
+module CounterExamples =
+  False
+    (struct
+      let option_name = "-wp-counter-examples"
+      let help = "Ask for counter examples when supported by provers"
+    end)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Output Dir                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
 let dkey = register_category "output"
 
-let has_out () = Fc_Filepath.Normalized.is_empty (OutputDir.get ())
+let has_out () = not @@ Fc_Filepath.Normalized.is_empty (OutputDir.get ())
 
 let make_output_dir dir =
   try
@@ -1206,17 +1246,13 @@ let base_output () =
     let output =
       let dir = OutputDir.get () in
       if Fc_Filepath.Normalized.is_empty dir then
-        if Fc_config.is_gui
+        if is_interactive ()
         then make_gui_dir ()
         else make_tmp_dir ()
-      else begin
-        make_output_dir dir ;
-        dir
-      end
-    in
+      else
+        ( make_output_dir dir ; dir ) in
     base_output := Some output;
-    Fc_Filepath.(add_symbolic_dir "WPOUT" output) ;
-    output
+    Fc_Filepath.add_symbolic_dir "WPOUT" output ; output
   | Some output -> output
 
 let get_output () =
@@ -1286,7 +1322,7 @@ let print_generated ?header file =
 let protect e =
   if debug_atleast 1 then false else
     match e with
-    | Sys.Break | Db.Cancel | Log.AbortError _ | Log.AbortFatal _ -> false
+    | Sys.Break | Async.Cancel | Log.AbortError _ | Log.AbortFatal _ -> false
     | _ -> true
 
 (* -------------------------------------------------------------------------- *)

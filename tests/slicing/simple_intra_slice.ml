@@ -47,7 +47,7 @@ let main _ =
   in
   let print_outputs fct_name =
     let fct = Globals.Functions.find_by_name fct_name in
-    let outs = !Db.Outputs.get_external fct in
+    let outs = Inout.kf_external_outputs fct in
     Format.printf "Sorties de la fonction %s = %a\n"
       fct_name Locations.Zone.pretty outs
   in
@@ -108,4 +108,4 @@ let main _ =
 
   Slicing.Api.Project.pretty Format.std_formatter
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

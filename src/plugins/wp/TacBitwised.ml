@@ -43,14 +43,14 @@ let rewrite descr u v = Tactical.rewrite [ descr , F.p_true , u , v ]
 
 let vrange,prange = Tactical.spinner ~id:"Wp.bitwised.range"
     ~vmin:0 ~vmax:64 ~default:32
-    ~title:"Bits" ~descr:"Number of bits for bitwise equality" ()
+    ~title:"Bits" ~descr:"Size of bitwise equality." ()
 
 class bitcase =
   object(self)
     inherit Tactical.make
         ~id:"Wp.bitwised"
         ~title:"Bitwise Eq."
-        ~descr:"Decompose Bitwise Equality"
+        ~descr:"Decompose bitwise equality."
         ~params:[prange]
 
     (*   range:(0 <= a < 2^n && 0 <= b < 2^n)
@@ -124,7 +124,7 @@ class autobitwise =
       Printf.sprintf "Auto Bitwise Eq. (%d)" self#nbits
 
     method descr =
-      Printf.sprintf "Apply Bitwise Equality on wordsize bits (%d)" self#nbits
+      Printf.sprintf "Consider %d-bits bitwise equality." self#nbits
 
     method search push (seq : Conditions.sequent) =
       let goal = snd seq in

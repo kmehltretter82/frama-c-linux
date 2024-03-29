@@ -255,8 +255,10 @@ let register =
   fun () ->
     if (not !once) then begin
       once := true;
-      Acsl_extension.register_code_annot_next_stmt "calls" typecheck true ;
-      Acsl_extension.register_behavior "instanceof" typecheck true ;
+      Acsl_extension.register_code_annot_next_stmt ~plugin:"kernel"
+        "calls" typecheck true ;
+      Acsl_extension.register_behavior ~plugin:"kernel"
+        "instanceof" typecheck true ;
     end
 
 let () = Cmdline.run_after_configuring_stage register

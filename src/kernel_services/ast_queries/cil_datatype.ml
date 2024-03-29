@@ -93,7 +93,7 @@ let rank_term = function
   | TAlignOfE _ -> 6
   | TUnOp _ -> 7
   | TBinOp _ -> 8
-  | TCastE _ -> 9
+  | TCast (false,_,_) -> 9
   | TAddrOf _ -> 10
   | TStartOf _ -> 11
   | Tapp _ -> 12
@@ -114,7 +114,7 @@ let rank_term = function
   | Tlet _ -> 29
   | Tcomprehension _ -> 30
   | Toffset _ -> 31
-  | TLogic_coerce _ -> 32
+  | TCast (true, _,_) -> 32
 
 let rank_predicate = function
   | Pfalse -> 0
@@ -362,10 +362,6 @@ module Kinstr = struct
             Format.fprintf fmt "Kglobal"
           | Kstmt s -> Stmt.pretty fmt s
       end)
-
-  let loc = function
-    | Kstmt st -> Stmt.loc st
-    | Kglobal -> assert false
 
   let kinstr_of_opt_stmt = function
     | None -> Kglobal
@@ -1642,9 +1638,11 @@ let rec compare_term t1 t2 =
       if c <> 0 then c else
         let cx = compare_term x1 x2 in
         if cx <> 0 then cx else compare_term y1 y2
-    | TCastE(ty1,t1) , TCastE(ty2,t2) ->
-      let c = Typ.compare ty1 ty2 in
-      if c <> 0 then c else compare_term t1 t2
+    | TCast (false, ty1,e1), TCast (false, ty2,e2)
+    | TCast (true, ty1,e1) , TCast (true, ty2,e2) ->
+      let ct = Logic_type.compare ty1 ty2 in
+      if ct <> 0 then ct
+      else compare_term e1 e2
     | Tapp(f1,labs1,ts1) , Tapp(f2,labs2,ts2) ->
       let cf = Logic_info.compare f1 f2 in
       if cf <> 0 then cf else
@@ -1687,18 +1685,13 @@ let rec compare_term t1 t2 =
       else
         let cq = compare_list Logic_var.compare q1 q2 in
         if cq <> 0 then cq else Option.compare compare_predicate p1 p2
-    | TLogic_coerce(ty1,e1), TLogic_coerce(ty2,e2) ->
-      let ct = Logic_type.compare ty1 ty2 in
-      if ct <> 0 then ct
-      else compare_term e1 e2
     | (TConst _ | TLval _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
-      | TAlignOfE _ | TUnOp _ | TBinOp _ | TCastE _ | TAddrOf _ | TStartOf _
+      | TAlignOfE _ | TUnOp _ | TBinOp _ | TCast _ | TAddrOf _ | TStartOf _
       | Tapp _ | Tlambda _ | TDataCons _ | Tif _ | Tat _
       | Tbase_addr _ | Tblock_length _ | Toffset _
       | Tnull | TUpdate _ | Ttypeof _
       | Ttype _ | Tempty_set | Tunion _ | Tinter _  | Tcomprehension _
-      | Trange _ | Tlet _
-      | TLogic_coerce _), _ -> assert false
+      | Trange _ | Tlet _ ), _ -> assert false
 
 and compare_tlval (h1,off1) (h2,off2) =
   let ch = compare_tlhost h1 h2 in
@@ -1858,9 +1851,12 @@ let rec hash_term (acc,depth,tot) t =
         hash_term (acc+19+Hashtbl.hash bop,depth-1,tot-2) t1
       in
       hash_term (hash1,depth-1,tot1) t2
-    | TCastE(ty,t) ->
+    | TCast(false, Ctype ty,t) ->
       let hash1 = Typ.hash ty in
       hash_term (acc+23+hash1,depth-1,tot-2) t
+    | TCast(true,_,e) -> hash_term (acc + 113, depth - 1, tot - 1) e
+    (* TODO (NB) : Check the magic values here (see if it can't be merged) *)
+    | TCast(false,_,_) -> assert false
     | TAddrOf lv -> hash_tlval (acc+29,depth-1,tot-1) lv
     | TStartOf lv -> hash_tlval (acc+31,depth-1,tot-1) lv
     | Tapp (li,labs,apps) ->
@@ -1939,7 +1935,6 @@ let rec hash_term (acc,depth,tot) t =
       hash_term
         (acc + 109 + Hashtbl.hash li.l_var_info.lv_name, depth-1, tot-1)
         t
-    | TLogic_coerce(_,e) -> hash_term (acc + 113, depth - 1, tot - 1) e
   end
 
 and hash_tlval (acc,depth,tot) (h,o) =

@@ -24,6 +24,7 @@ exception Translate_call_exn of Cil_types.varinfo
 
 val fallback_fun_call :
   builder:Builder.t -> callee:Cil_types.varinfo ->
+  Environment.t ->
   Va_types.variadic_function -> Cil_types.exp list -> unit
 
 val aggregator_call :

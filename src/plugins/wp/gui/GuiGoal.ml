@@ -161,8 +161,8 @@ class pane (gprovers : GuiConfig.provers) =
         scripter#on_click self#goto ;
         scripter#on_backtrack self#backtrack ;
         gprovers#connect self#register_provers ;
-        delete#connect (fun () -> self#interrupt ProofEngine.reset) ;
-        cancel#connect (fun () -> self#interrupt ProofEngine.cancel) ;
+        delete#connect (fun () -> self#interrupt ProofEngine.cancel_current_node) ;
+        cancel#connect (fun () -> self#interrupt ProofEngine.cancel_parent_tactic) ;
         forward#connect (fun () -> self#forward) ;
         next#connect (fun () -> self#navigate succ) ;
         prev#connect (fun () -> self#navigate pred) ;
@@ -279,7 +279,7 @@ class pane (gprovers : GuiConfig.provers) =
     method private play_script =
       match state with
       | Proof p ->
-        ProofEngine.reset p ;
+        ProofEngine.clear_tree p ;
         ProverScript.spawn
           ~provers:self#provers
           ~result:
@@ -382,7 +382,7 @@ class pane (gprovers : GuiConfig.provers) =
 
     method private update_tactics = function
       | None ->
-        printer#set_target Tactical.Empty ;
+        printer#highlight Tactical.Empty ;
         autosearch#connect None ;
         strategies#connect None ;
         List.iter (fun tactic -> tactic#clear) tactics
@@ -403,7 +403,7 @@ class pane (gprovers : GuiConfig.provers) =
                 tactic#select ~process ~composer ~browser ~tree sel
               ) tactics ;
             (* target selection feedback *)
-            printer#set_target
+            printer#highlight
               (if List.exists (fun tactics -> tactics#targeted) tactics
                then sel else Tactical.Empty)
           end ()
@@ -561,7 +561,7 @@ class pane (gprovers : GuiConfig.provers) =
             text#hrule ;
             scripter#tree proof ;
             text#hrule ;
-            text#printf "%a@." printer#pp_goal (ProofEngine.head_goal proof) ;
+            text#printf "@\n%a@." printer#pp_goal (ProofEngine.head_goal proof) ;
             text#printf "@{<bf>Goal id:@}  %s@." main.po_gid ;
             text#printf "@{<bf>Short id:@} %s@." main.po_sid ;
             text#hrule ;
@@ -577,7 +577,7 @@ class pane (gprovers : GuiConfig.provers) =
               self#update in
             text#printf "%t@." (composer#print cc ~quit) ;
             text#hrule ;
-            text#printf "%a@." printer#pp_goal (ProofEngine.head_goal proof) ;
+            text#printf "@\n%a@." printer#pp_goal (ProofEngine.head_goal proof) ;
           end ()
       | Browser(proof,cc,tgt) ->
         on_proof_context proof
@@ -589,7 +589,7 @@ class pane (gprovers : GuiConfig.provers) =
               self#update in
             text#printf "%t@." (browser#print cc ~quit) ;
             text#hrule ;
-            text#printf "%a@." printer#pp_goal (ProofEngine.head_goal proof) ;
+            text#printf "@\n%a@." printer#pp_goal (ProofEngine.head_goal proof) ;
           end ()
       | Forking _ -> ()
 

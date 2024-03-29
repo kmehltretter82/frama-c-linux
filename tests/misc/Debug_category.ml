@@ -43,4 +43,4 @@ let run () =
   feedback ~dkey "D is enabled";
   warning ~wkey "Another Warning A"
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

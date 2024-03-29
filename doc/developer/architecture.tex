@@ -196,12 +196,10 @@ has to be registered through \texttt{Plugin.Register}\scodeidx{Plugin}{Register}
 a plug-in $p$ can use a list of plug-ins $p_1$, \dots, $p_n$ and
 conversely. Mutual dependences between plug-ins are even possible. If a plug-in
 is designed to be used by another plug-in, it has to register its API either by
-providing a \texttt{.mli} file, or through modules
-\texttt{Dynamic}\codeidx{Dynamic} or \texttt{Db}\codeidx{Db}. The first method
+providing a \texttt{.mli} file or through module
+\texttt{Dynamic}\codeidx{Dynamic}. The first method
 is the preferred one, the second one (through module \texttt{Dynamic}) is the
-only possible one to define mutually dependent plug-ins while the third one
-(through module \texttt{Db}) is now fully deprecated even if most of the older
-\framac plug-ins are still defined this way.
+only possible one to define mutually dependent plug-ins.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -271,12 +269,12 @@ with the \framac kernel or other plug-ins.
 
 Next, \framac provides predefined ways to visit the ASTs, in particular through
 object-oriented visitors defined in directory
-\texttt{src/kernel\_services/visitors} (see Section~\ref{adv:visitors}). 
+\texttt{src/kernel\_services/visitors} (see Section~\ref{adv:visitors}).
 Some predefined analyzers, such as a multiple generic dataflow analysis
 are provided in directory \texttt{src/kernel\_services/analysis}, while some
 predefined program transformation, such as cloning a function, are provided in
 directory \texttt{src/kernel\_services/ast\_transformations}.
-Finally, \framac provides an abstract interpretation 
+Finally, \framac provides an abstract interpretation
 toolbox\index{Abstract Interpretation}
 with various lattices in directory \texttt{abstract\_interp}.
 

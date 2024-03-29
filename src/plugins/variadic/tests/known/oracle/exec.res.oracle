@@ -20,9 +20,21 @@
   Fallback translation of call execlp to a call to the specialized version execlp_fallback_1.
 [eva] Analyzing a complete application starting at main
 [eva] using specification for function execve
+[eva:garbled-mix:assigns] exec.c:9: 
+  The specification of function execve has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] using specification for function execv
+[eva:garbled-mix:assigns] exec.c:11: 
+  The specification of function execv has generated a garbled mix of addresses
+  for assigns clause \result.
 [eva] using specification for function execvp
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/unistd.h:821: Warning: 
+[eva:garbled-mix:assigns] exec.c:12: 
+  The specification of function execvp has generated a garbled mix of addresses
+  for assigns clause \result.
+[eva:garbled-mix:assigns] exec.c:13: 
+  The specification of function execve has generated a garbled mix of addresses
+  for assigns clause \result.
+[kernel:annot:missing-spec] exec.c:15: Warning: 
   Neither code nor specification for function execlp_fallback_1,
    generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function execlp_fallback_1

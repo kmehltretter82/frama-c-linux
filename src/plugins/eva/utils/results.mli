@@ -23,14 +23,7 @@
 [@@@ api_start]
 
 (** Eva's result API is a new interface to access the results of an analysis,
-    once it is completed. It may slightly change in the future. It aims at
-    replacing most uses of [Db.Value], and has some advantages over Db's :
-
-    - evaluations uses every available domains and not only Cvalue;
-    - the caller may distinguish failure cases when a request is unsucessful;
-    - working with callstacks is easy;
-    - some common shortcuts are provided (e.g. for extracting ival directly);
-    - overall, individual functions are simpler.
+    once it is completed. It may slightly change in the future.
 
     The idea behind this API is that requests must be decomposed in several
     steps. For instance, to evaluate an expression :
@@ -184,14 +177,6 @@ val lval_deps : Cil_types.lval -> request -> Locations.Zone.t
     evaluate the given lvalue, excluding the lvalue zone itself. *)
 val address_deps : Cil_types.lval -> request -> Locations.Zone.t
 
-(** Memory dependencies of an expression. *)
-type deps = Function_Froms.Deps.deps = {
-  data: Locations.Zone.t;
-  (** Memory zone directly required to evaluate the given expression. *)
-  indirect: Locations.Zone.t;
-  (** Memory zone read to compute data addresses. *)
-}
-
 (** Taint of a memory zone, according to the taint domain. *)
 type taint =
   | Direct
@@ -210,7 +195,7 @@ val is_tainted : Locations.Zone.t -> request -> (taint, error) Result.t
 
 (** Computes (an overapproximation of) the memory dependencies of an
     expression. *)
-val expr_dependencies : Cil_types.exp -> request -> deps
+val expr_dependencies : Cil_types.exp -> request -> Deps.t
 
 (** Evaluation *)
 

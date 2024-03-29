@@ -109,7 +109,9 @@ struct
     mutable time : float ;
     mutable simplified : bool ;
     mutable sequent : Conditions.sequent ;
-    mutable obligation : F.pred ;
+    mutable opened : F.pred ;
+    mutable closed : F.pred ;
+    mutable probes : F.term Probe.Map.t ;
   }
 
   let empty = Conditions.empty
@@ -118,21 +120,27 @@ struct
     time = 0.0 ;
     simplified = false ;
     sequent = empty , F.p_false ;
-    obligation = F.p_false ;
+    opened = F.p_false ;
+    closed = F.p_false ;
+    probes = Probe.Map.empty ;
   }
 
   let trivial = {
     time = 0.0 ;
     simplified = true ;
     sequent = empty , F.p_true ;
-    obligation = F.p_true ;
+    opened = F.p_true ;
+    closed = F.p_true ;
+    probes = Probe.Map.empty ;
   }
 
   let make sequent = {
     time = 0.0 ;
     simplified = false ;
     sequent = sequent ;
-    obligation = F.p_false ;
+    opened = F.p_false ;
+    closed = F.p_false ;
+    probes = Probe.Map.empty ;
   }
 
   let is_computed g = g.simplified
@@ -142,7 +150,7 @@ struct
 
   let apply option phi g =
     try
-      Db.yield () ;
+      Async.yield () ;
       Wp_parameters.debug ~dkey "Apply %s" option ;
       g.sequent <- phi g.sequent ;
     with exn when Wp_parameters.protect exn ->
@@ -178,9 +186,12 @@ struct
         if Wp_parameters.Clean.get ()
         then apply "-wp-clean" Conditions.clean g ;
       end ;
-    if Conditions.is_trivial g.sequent then
-      g.sequent <- Conditions.trivial ;
-    g.obligation <- Conditions.close g.sequent
+    begin
+      if Conditions.is_trivial g.sequent then
+        g.sequent <- Conditions.trivial ;
+      g.opened <- Conditions.property g.sequent ;
+      g.closed <- F.p_close g.opened ;
+    end
 
   let safecompute ~pid g =
     begin
@@ -191,6 +202,7 @@ struct
       Wp_parameters.debug ~dkey "Simplification time: %a"
         Rformat.pp_time !timer ;
       g.time <- !timer ;
+      g.probes <- Conditions.probes @@ fst g.sequent ;
     end
 
   let compute ~pid g =
@@ -198,7 +210,9 @@ struct
       Lang.local ~vars:(Conditions.vars_seq g.sequent)
         (safecompute ~pid) g
 
-  let compute_proof ~pid g = compute ~pid g ; g.obligation
+  let compute_proof ~pid ?(opened=false) g =
+    compute ~pid g ; if opened then g.opened else g.closed
+  let compute_probes ~pid g = compute ~pid g ; g.probes
   let compute_descr ~pid g = compute ~pid g ; g.sequent
   let get_descr g = g.sequent
   let qed_time g = g.time
@@ -286,7 +300,9 @@ struct
            if result.verdict <> NoResult then
              Format.fprintf fmt "Prover %a returns %t@\n"
                pp_prover prover
-               (pp_result_qualif prover result)
+               (pp_result_qualif prover result) ;
+           if Wp_parameters.CounterExamples.get () then
+             pp_model fmt result.prover_model
         ) results ;
     end
 
@@ -437,30 +453,28 @@ struct
     mutable dps : result Pmap.t ;
   }
 
-  let not_computing _ r =
-    match r.verdict with VCS.Computing _ -> false | _ -> true
-
   let create () = { dps = Pmap.empty }
 
   let get w p =
     Pmap.find p w.dps
 
-  let clear w = w.dps <- Pmap.empty
+  let clear w =
+    Pmap.iter (fun _ r ->
+        match r.verdict with
+        | VCS.Computing kill -> kill ()
+        | _ -> ()
+      ) w.dps ;
+    w.dps <- Pmap.empty
 
   let replace w p r =
     begin
       if p = Qed then
-        begin
-          w.dps <- Pmap.filter not_computing w.dps ;
-        end ;
+        (w.dps <- Pmap.filter (fun _ r -> VCS.is_verdict r) w.dps) ;
       w.dps <- Pmap.add p r w.dps
     end
 
   let list w =
-    Pmap.fold
-      (fun p r w ->
-         if is_verdict r then (p,r)::w else w
-      ) w.dps []
+    List.filter (fun (_,r) -> not @@ VCS.is_none r) @@ Pmap.bindings w.dps
 
 end
 
@@ -712,8 +726,11 @@ let get_result g p : VCS.result =
 
 let get_results g =
   let system = SYSTEM.get () in
-  try Results.list (WPOmap.find g system.results)
+  try Results.list @@ WPOmap.find g system.results
   with Not_found -> []
+
+let get_prover_results g =
+  List.filter (fun (p,_) -> VCS.is_prover p) @@ get_results g
 
 let is_trivial g =
   VC_Annot.is_trivial g.po_formula
@@ -741,23 +758,28 @@ let compute g =
   let seq = WpContext.on_context ctxt (GOAL.compute_descr ~pid) goal in
   if not qed then modified g ; seq
 
-let is_valid g =
-  is_trivial g || List.exists (fun (_,r) -> VCS.is_valid r) (get_results g)
+let is_fully_valid g =
+  is_trivial g ||
+  List.exists (fun (_,r) -> VCS.is_valid r) @@ get_results g
+
+let is_locally_valid g =
+  is_trivial g ||
+  List.exists (fun (p,r) -> VCS.is_prover p && VCS.is_valid r) @@ get_results g
 
 let all_not_valid g =
   not (is_trivial g) &&
-  List.for_all (fun (_,r) -> VCS.is_not_valid r) (get_results g)
+  List.for_all (fun (_,r) -> VCS.is_not_valid r) @@ get_results g
 
 let is_passed g =
   if is_smoke_test g then
     all_not_valid g
   else
-    is_valid g
+    is_fully_valid g
 
 let has_unknown g =
-  not (is_valid g) &&
+  not (is_fully_valid g) &&
   List.exists
-    (fun (_,r) -> VCS.is_verdict r && not (VCS.is_valid r))
+    (fun (p,r) -> VCS.is_prover p && VCS.is_verdict r && not (VCS.is_valid r))
     (get_results g)
 
 (* -------------------------------------------------------------------------- *)
@@ -849,12 +871,6 @@ let goals_of_property prop =
     with Not_found -> WPOset.empty
   in
   WPOset.elements poset
-
-(* -------------------------------------------------------------------------- *)
-(* --- Prover and Files                                                   --- *)
-(* -------------------------------------------------------------------------- *)
-
-let get_model w = w.po_model
 
 (* -------------------------------------------------------------------------- *)
 (* --- Generators                                                         --- *)

@@ -169,7 +169,7 @@ class postconditions_mention_result = object
 end
 let postconditions_mention_result spec =
   (* We save the current location because the visitor modifies it. *)
-  let loc = Cil.CurrentLoc.get () in
+  let loc = Current_loc.get () in
   let vis = new postconditions_mention_result in
   let aux_bhv bhv =
     let aux (_, post) = ignore (Visitor.visitFramacIdPredicate vis post) in
@@ -181,7 +181,7 @@ let postconditions_mention_result spec =
       false
     with Exit -> true
   in
-  Cil.CurrentLoc.set loc;
+  Current_loc.set loc;
   res
 
 let conv_comp op =
@@ -285,30 +285,6 @@ let lval_to_exp =
   MemoLvalToExp.memo
     (fun lv -> Cil.new_exp ~loc:Cil_datatype.Location.unknown (Lval lv))
 
-let dump_garbled_mix () =
-  let l = Cvalue.V.get_garbled_mix () in
-  if l <> [] then
-    let pp_one fmt v = Format.fprintf fmt "@[<hov 2>%a@]" Cvalue.V.pretty v in
-    Self.warning ~wkey:Self.wkey_garbled_mix_summary
-      "Garbled mix generated during analysis:@.\
-       @[<v>%a@]"
-      (Pretty_utils.pp_list ~pre:"" ~suf:"" ~sep:"@ " pp_one) l
-
-
-type deps = Function_Froms.Deps.deps = {
-  data: Locations.Zone.t;
-  indirect: Locations.Zone.t;
-}
-
-let bottom_deps =
-  { data = Locations.Zone.bottom; indirect = Locations.Zone.bottom }
-
-let join_deps a b =
-  { data = Locations.Zone.join a.data b.data;
-    indirect = Locations.Zone.join a.indirect b.indirect; }
-
-let deps_to_zone deps = Locations.Zone.join deps.data deps.indirect
-
 (* Computation of the inputs of an expression. *)
 let rec deps_of_expr find_loc expr =
   let rec process expr = match expr.enode with
@@ -320,7 +296,7 @@ let rec deps_of_expr find_loc expr =
       process e
     | BinOp (_, e1, e2, _) ->
       (* Binary operators. *)
-      join_deps (process e1) (process e2)
+      Deps.join (process e1) (process e2)
     | StartOf lv | AddrOf lv ->
       (* computation of an address: the inputs of the lvalue whose address
          is computed are read to compute said address. *)
@@ -328,11 +304,11 @@ let rec deps_of_expr find_loc expr =
         indirect = Locations.Zone.bottom; }
     | Const _ | SizeOf _ | AlignOf _ | SizeOfStr _ | SizeOfE _ | AlignOfE _ ->
       (* static constructs, nothing is read to evaluate them. *)
-      bottom_deps
+      Deps.bottom
   in
   process expr
 
-and zone_of_expr find_loc expr = deps_to_zone (deps_of_expr find_loc expr)
+and zone_of_expr find_loc expr = Deps.to_zone (deps_of_expr find_loc expr)
 
 (* dereference of an lvalue: first, its address must be computed,
    then its contents themselves are read *)

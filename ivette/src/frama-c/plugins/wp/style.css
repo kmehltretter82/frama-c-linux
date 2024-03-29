@@ -1,0 +1,216 @@
+/* -------------------------------------------------------------------------- */
+/* --- WP Goals                                                           --- */
+/* -------------------------------------------------------------------------- */
+
+.wp-empty-goals {
+    position: absolute;
+    top: 12px;
+    left: 20px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Sequent Editor                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+.wp .cm-gutter {
+    width: 3px;
+}
+
+.wp-gutter-part {
+    background: red;
+}
+
+.wp.cm-hovered-code,
+.wp.cm-hovered-code > span
+{
+    background: var(--code-hover);
+}
+
+.wp-printer
+{
+    position: absolute;
+    right: 18px;
+    top: 2px;
+    background: var(--background-report);
+}
+
+.wp-printer-field
+{
+    margin: 0px;
+    fill: var(--text-discrete);
+    color: var(--text-discrete);
+    font-size: x-small;
+    border-radius: 6px;
+    background: var(--background-report);
+}
+
+.wp-printer-field.selected
+{
+    font-weight: bolder;
+    fill: var(--positive-button-color);
+    color: var(--positive-button-color);
+}
+
+.wp-printer-field:hover
+{
+    /* fill: var(--default-button-color); */
+    /* color: var(--default-button-color); */
+    background: var(--background-button-hover) !important;
+}
+
+.wp-printer-button
+{
+    width: 30px;
+    padding: 5px 4px 5px 4px;
+}
+
+.wp-printer-locked
+{
+    fill: var(--negative-button-color);
+}
+
+.wp-printer-button dome-xIcon {
+    margin: 0px;
+    padding: 0px;
+}
+
+.wp-printer-select
+{
+    border: none;
+    box-shadow: none;
+    text-align: right;
+    padding: 0px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Navigation Bar                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+.wp-navbar {
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: var(--background-sidebar);
+}
+
+.wp-navbar-node {
+    padding-right: 8px;
+}
+
+.wp-navbar-node.parent {
+}
+
+.wp-navbar-node.current {
+    font-weight: bold;
+    padding-left: 4px;
+    background-color: var(--code-select);
+}
+
+.wp-navbar-node:hover {
+    background-color: var(--code-hover);
+}
+
+.wp-navbar-node.child {
+    padding-left: 8px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Tactics View                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+.wp-sidebar-view {
+    padding: 2px 0px 2px 3px;
+    align-content: flex-start;
+    overflow-y: auto;
+    border-width: 1px;
+    border-left-style: solid;
+}
+
+.wp-tactical-item {
+    flex: 0 0 auto;
+    margin: 2px;
+    width: 120px;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 6px;
+}
+
+.wp-tactical-item.selected {
+    background: var(--code-select);
+}
+
+.wp-tactical-item:hover {
+    background: var(--code-hover);
+}
+
+.wp-tactical-cell {
+    flex: 1 0 90px;
+    margin-right: 0px;
+    text-overflow: ellipsis;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Tactic Configuration                                               --- */
+/* -------------------------------------------------------------------------- */
+
+.wp-configure {
+    min-height: 32px;
+    align-items: baseline;
+    align-content: center;
+}
+
+.wp-configure .dome-xLabel {
+    padding: 0px 3px 0px 3px;
+    margin: 0px 3px 0px 3px;
+}
+
+.wp-configure .dome-xIconButton {
+    padding: 2px 5px 2px 5px;
+    width: 20px;
+}
+
+.wp-configure .dome-xIconButton.dome-control-enabled:hover {
+    border-radius: 4px;
+    background: var(--background-interaction);
+}
+
+.wp-config-tactic {
+    font-weight: bold;
+}
+
+.wp-config-info {
+    overflow: hidden;
+}
+
+.wp-config-field {
+    border: none;
+    margin-left: 4px;
+    border-radius: 4px;
+    background: var(--background-interaction);
+}
+
+.wp-config-checkbox .dome-xIcon-disabled {
+    fill: var(--disabled-text);
+}
+
+.wp-config-checkbox:hover {
+    border-radius: 6px;
+    background: var(--background-interaction);
+}
+
+.wp-config-switch {
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+.wp-config-spinner {
+    width: 60px;
+    color: var(--text-discrete);
+    background: var(--background-interaction);
+}
+
+input.wp-config-spinner:disabled {
+    color: var(--text-disabled);
+    background: var(--background-profound);
+}
+
+/* -------------------------------------------------------------------------- */

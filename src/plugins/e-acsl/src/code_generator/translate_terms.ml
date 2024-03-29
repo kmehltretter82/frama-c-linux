@@ -48,7 +48,7 @@ let translate_rte_exp_ref
 let constant_to_exp ~loc env t c =
   let mk_real s =
     let s = Gmp.Q.normalize_str s in
-    Cil.mkString ~loc s, Typed_number.Str_R
+    Cil.mkString ~loc s, Analyses_types.Str_R
   in
   match c with
   | Integer(n, _repr) ->
@@ -58,7 +58,7 @@ let constant_to_exp ~loc env t c =
      | Nan -> assert false
      | Real -> Error.not_yet "real number constant"
      | Rational -> mk_real (Integer.to_string n)
-     | Gmpz -> Cil.mkString ~loc (Integer.to_string n), Typed_number.Str_Z
+     | Gmpz -> Cil.mkString ~loc (Integer.to_string n), Analyses_types.Str_Z
      (* too large integer *)
      | C_float fkind ->
        Cil.kfloat ~loc fkind (Int64.to_float (Integer.to_int64_exn n)), C_number
@@ -67,7 +67,7 @@ let constant_to_exp ~loc env t c =
        match cast, kind with
        | Some ty, (ILongLong | IULongLong) when Gmp_types.Z.is_t ty ->
          (* too large integer *)
-         Cil.mkString ~loc (Integer.to_string n), Typed_number.Str_Z
+         Cil.mkString ~loc (Integer.to_string n), Analyses_types.Str_Z
        | Some ty, _ when Gmp_types.Q.is_t ty ->
          mk_real (Integer.to_string n)
        | (None | Some _), _ ->
@@ -77,15 +77,15 @@ let constant_to_exp ~loc env t c =
             long] addition and so [1LL]. If we keep the initial string
             representation, the kind would be ignored in the generated code and
             so [1] would be generated. *)
-         Cil.kinteger64 ~loc ~kind n, Typed_number.C_number)
-  | LStr s -> Cil.new_exp ~loc (Const (CStr s)), Typed_number.C_number
-  | LWStr s -> Cil.new_exp ~loc (Const (CWStr s)), Typed_number.C_number
-  | LChr c -> Cil.new_exp ~loc (Const (CChr c)), Typed_number.C_number
+         Cil.kinteger64 ~loc ~kind n, Analyses_types.C_number)
+  | LStr s -> Cil.new_exp ~loc (Const (CStr s)), Analyses_types.C_number
+  | LWStr s -> Cil.new_exp ~loc (Const (CWStr s)), Analyses_types.C_number
+  | LChr c -> Cil.new_exp ~loc (Const (CChr c)), Analyses_types.C_number
   | LReal lr ->
     if lr.r_lower = lr.r_upper
-    then Cil.kfloat ~loc FDouble lr.r_nearest, Typed_number.C_number
+    then Cil.kfloat ~loc FDouble lr.r_nearest, Analyses_types.C_number
     else mk_real lr.r_literal
-  | LEnum e -> Cil.new_exp ~loc (Const (CEnum e)), Typed_number.C_number
+  | LEnum e -> Cil.new_exp ~loc (Const (CEnum e)), Analyses_types.C_number
 
 (* Create and initialize a variable in the [env] according to [ty], [name] and
    [exp_init], return a tuple [varinfo * exp] and the [env] extended with the
@@ -255,7 +255,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     Env.Logic_binding.remove env k;
     let env = Env.add_stmt env (Smart_stmt.block_stmt final_stmt) in
     let adata = Assert.register_term ~loc t acc_as_exp adata in
-    acc_as_exp, adata, env, Typed_number.C_number, ""
+    acc_as_exp, adata, env, Analyses_types.C_number, ""
   | _ ->
     assert false
 
@@ -270,29 +270,29 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let lv, env, name = tlval_to_lval kf env lv in
     let e = Smart_exp.lval ~loc lv in
     let adata = Assert.register_term ~loc t e adata in
-    e, adata, env, Typed_number.C_number, name
+    e, adata, env, Analyses_types.C_number, name
   | TSizeOf ty ->
     let e = Cil.sizeOf ~loc ty in
     let adata = Assert.register_term ~loc ~force:true t e adata in
-    e, adata, env, Typed_number.C_number, "sizeof"
+    e, adata, env, Analyses_types.C_number, "sizeof"
   | TSizeOfE t' ->
     let e', _, env = to_exp ~adata:Assert.no_data kf env t' in
     let e = Cil.sizeOf ~loc (Cil.typeOf e') in
     let adata = Assert.register_term ~loc ~force:true t e adata in
-    e, adata, env, Typed_number.C_number, "sizeof"
+    e, adata, env, Analyses_types.C_number, "sizeof"
   | TSizeOfStr s ->
     let e = Cil.new_exp ~loc (SizeOfStr s) in
     let adata = Assert.register_term ~loc t e adata in
-    e, adata, env, Typed_number.C_number, "sizeofstr"
+    e, adata, env, Analyses_types.C_number, "sizeofstr"
   | TAlignOf ty ->
     let e = Cil.new_exp ~loc (AlignOf ty) in
     let adata = Assert.register_term ~loc t e adata in
-    e, adata, env, Typed_number.C_number, "alignof"
+    e, adata, env, Analyses_types.C_number, "alignof"
   | TAlignOfE t' ->
     let e', _, env = to_exp ~adata:Assert.no_data kf env t' in
     let e = Cil.new_exp ~loc (AlignOfE e') in
     let adata = Assert.register_term ~loc t e adata in
-    e, adata, env, Typed_number.C_number, "alignof"
+    e, adata, env, Analyses_types.C_number, "alignof"
   | TUnOp(Neg | BNot as op, t') ->
     let ty = Typing.get_typ ~logic_env t in
     let e, adata, env = to_exp ~adata kf env t' in
@@ -311,11 +311,11 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
           (Some t)
           (fun _ ev -> [ Smart_stmt.rtl_call ~loc ~prefix:"" name [ ev; e ] ])
       in
-      e, adata, env, Typed_number.C_number, ""
+      e, adata, env, Analyses_types.C_number, ""
     else if Gmp_types.Q.is_t ty then
       Env.not_yet env "reals: Neg | BNot"
     else
-      Cil.new_exp ~loc (UnOp(op, e, ty)), adata, env, Typed_number.C_number, ""
+      Cil.new_exp ~loc (UnOp(op, e, ty)), adata, env, Analyses_types.C_number, ""
   | TUnOp(LNot, t) ->
     let t = Logic_normalizer.get_term t in
     let ty = Typing.get_effective_typ ~logic_env t in
@@ -337,12 +337,12 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
           zero
           (Some t)
       in
-      e, adata, env, Typed_number.C_number, ""
+      e, adata, env, Analyses_types.C_number, ""
     else begin
       assert (Cil.isIntegralType ty);
       let e, adata, env = to_exp ~adata kf env t in
       let e = Smart_exp.lnot ~loc e in
-      e, adata, env, Typed_number.C_number, ""
+      e, adata, env, Analyses_types.C_number, ""
     end
   | TBinOp(PlusA | MinusA | Mult as bop, t1, t2) ->
     let ty = Typing.get_typ ~logic_env t in
@@ -350,14 +350,14 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let e2, adata, env = to_exp ~adata kf env t2 in
     if Gmp_types.Z.is_t ty then
       let e, env = Gmp.Z.binop ~loc (Some t) bop env kf e1 e2 in
-      e, adata, env, Typed_number.C_number, ""
+      e, adata, env, Analyses_types.C_number, ""
     else if Gmp_types.Q.is_t ty then
       let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
-      e, adata, env, Typed_number.C_number, ""
+      e, adata, env, Analyses_types.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
-      e, adata, env, Typed_number.C_number, ""
+      e, adata, env, Analyses_types.C_number, ""
     end
   | TBinOp(Div | Mod as bop, t1, t2) ->
     let ty = Typing.get_typ ~logic_env t in
@@ -416,17 +416,17 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       in
       let name = Misc.name_of_binop bop in
       let _, e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
-      e, adata, env, Typed_number.C_number, ""
+      e, adata, env, Analyses_types.C_number, ""
     else if Gmp_types.Q.is_t ty then
       let e2, adata, env = t2_to_exp adata env in
       let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
-      e, adata, env, Typed_number.C_number, ""
+      e, adata, env, Analyses_types.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
       (* no guard required since RTEs are generated separately *)
       let e2, adata, env = t2_to_exp adata env in
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
-      e, adata, env, Typed_number.C_number, ""
+      e, adata, env, Analyses_types.C_number, ""
     end
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
@@ -449,7 +449,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         t2
         (Some t)
     in
-    e, adata, env, Typed_number.C_number, ""
+    e, adata, env, Analyses_types.C_number, ""
   | TBinOp((Shiftlt | Shiftrt) as bop, t1, t2) ->
     (* left/right shift *)
     let ty = Typing.get_typ ~logic_env t in
@@ -473,8 +473,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         match t.term_node with
         | TConst _ -> "cst_"
         | TLval (TVar { lv_name }, _) -> lv_name ^ "_"
-        | TCastE (_, t) -> term_to_name t
-        | TLogic_coerce (_, t) -> term_to_name t
+        | TCast (_,_, t) -> term_to_name t
         | _ -> ""
       in
       let ctx = Typing.get_number_ty ~logic_env t in
@@ -625,13 +624,13 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       in
       let name = bop_name in
       let _, e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
-      e, adata, env, Typed_number.C_number, ""
+      e, adata, env, Analyses_types.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
       let e1, adata, env = t1_to_exp adata env in
       let e2, adata, env = t2_to_exp adata env in
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
-      e, adata, env, Typed_number.C_number, ""
+      e, adata, env, Analyses_types.C_number, ""
     end
   | TBinOp(LOr, t1, t2) ->
     (* t1 || t2 <==> if t1 then true else t2 *)
@@ -653,7 +652,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
              )
            env)
     in
-    e, adata, env, Typed_number.C_number, ""
+    e, adata, env, Analyses_types.C_number, ""
   | TBinOp(LAnd, t1, t2) ->
     (* t1 && t2 <==> if t1 then t2 else false *)
     let e, adata, env =
@@ -674,7 +673,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
              )
            env)
     in
-    e, adata, env, Typed_number.C_number, ""
+    e, adata, env, Analyses_types.C_number, ""
   | TBinOp((BOr | BXor | BAnd) as bop, t1, t2) ->
     (* other logic/arith operators  *)
     let ty = Typing.get_typ ~logic_env t in
@@ -689,11 +688,11 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       let name = Misc.name_of_binop bop in
       let t = Some t in
       let _, e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
-      e, adata, env, Typed_number.C_number, ""
+      e, adata, env, Analyses_types.C_number, ""
     else begin
       assert (Logic_typing.is_integral_type t.term_type);
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
-      e, adata, env, Typed_number.C_number, ""
+      e, adata, env, Analyses_types.C_number, ""
     end
   | TBinOp(PlusPI | MinusPI as bop, t1, t2) ->
     if Misc.is_set_of_ptr_or_array t1.term_type ||
@@ -710,7 +709,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let e1, adata, env = to_exp ~adata kf env t1 in
     let e2, adata, env = to_exp ~adata kf env t2 in
     let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
-    e, adata, env, Typed_number.C_number, ""
+    e, adata, env, Analyses_types.C_number, ""
   | TBinOp(MinusPP, t1, t2) ->
     begin match Typing.get_number_ty ~logic_env t with
       | C_integer _ ->
@@ -718,13 +717,13 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         let e2, adata, env = to_exp ~adata kf env t2 in
         let ty = Typing.get_typ ~logic_env t in
         let e = Cil.new_exp ~loc (BinOp(MinusPP, e1, e2, ty)) in
-        e, adata, env, Typed_number.C_number, ""
+        e, adata, env, Analyses_types.C_number, ""
       | Gmpz ->
         Env.not_yet env "pointer subtraction resulting in gmp"
       | C_float _ | Rational | Real | Nan ->
         assert false
     end
-  | TCastE(ty, t') ->
+  | TCast (false, Ctype ty, t') ->
     let e, adata, env = to_exp ~adata kf env t' in
     let e, env =
       Typed_number.add_cast
@@ -733,22 +732,23 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         env
         kf
         (Some ty)
-        Typed_number.C_number
+        Analyses_types.C_number
         (Some t)
         e
     in
-    e, adata, env, Typed_number.C_number, ""
-  | TLogic_coerce (_, t) -> context_insensitive_term_to_exp ~adata kf env t
+    e, adata, env, Analyses_types.C_number, ""
+  | TCast (true, _, t) -> context_insensitive_term_to_exp ~adata kf env t
+  | TCast (false, _,_) -> assert false
   | TAddrOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
     let e = Cil.mkAddrOf ~loc lv in
     let adata = Assert.register_term ~loc t e adata in
-    e, adata, env, Typed_number.C_number, "addrof"
+    e, adata, env, Analyses_types.C_number, "addrof"
   | TStartOf lv ->
     let lv, env, _ = tlval_to_lval kf env lv in
     let e = Cil.mkAddrOrStartOf ~loc lv in
     let adata = Assert.register_term ~loc t e adata in
-    e, adata, env, Typed_number.C_number, "startof"
+    e, adata, env, Analyses_types.C_number, "startof"
   | Tapp(li, _, [ t1; t2; {term_node = Tlambda([ _ ], _)} as lambda ])
     when li.l_body = LBnone && (li.l_var_info.lv_name = "\\sum" ||
                                 li.l_var_info.lv_name = "\\product")->
@@ -761,12 +761,12 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let e, adata, env =
       Logic_functions.app_to_exp ~adata ~loc ~tapp:t kf env li args in
     let adata = Assert.register_term ~loc t e adata in
-    e, adata, env, Typed_number.C_number, "app"
+    e, adata, env, Analyses_types.C_number, "app"
   | Tapp(_, _ :: _, _) ->
     Env.not_yet env "logic functions with labels"
   | Tlambda(_, lt) ->
     let exp, adata, env = to_exp ~adata kf env lt in
-    exp, adata, env, Typed_number.C_number, ""
+    exp, adata, env, Analyses_types.C_number, ""
   | TDataCons _ -> Env.not_yet env "constructor"
   | Tif(t1, t2, t3) ->
     let e, adata, env =
@@ -795,7 +795,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
              )
            env)
     in
-    e, adata, env, Typed_number.C_number, ""
+    e, adata, env, Analyses_types.C_number, ""
   | Tat(t', label) ->
     let e, adata, env =
       if inplace then
@@ -803,7 +803,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       else
         Translate_ats.to_exp ~loc ~adata kf env (PoT_term t) label
     in
-    e, adata, env, Typed_number.C_number, ""
+    e, adata, env, Analyses_types.C_number, ""
   | Tbase_addr(BuiltinLabel Here, t') ->
     let name = "base_addr" in
     let e, _, env =
@@ -817,7 +817,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         t'
     in
     let adata = Assert.register_term ~loc t e adata in
-    e, adata, env, Typed_number.C_number, name
+    e, adata, env, Analyses_types.C_number, name
   | Tbase_addr _ -> Env.not_yet env "labeled \\base_addr"
   | Toffset(BuiltinLabel Here, t') ->
     let size_t = Cil.theMachine.Cil.typeOfSizeOf in
@@ -826,7 +826,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       Memory_translate.call ~adata ~loc kf name size_t env t'
     in
     let adata = Assert.register_term ~loc t e adata in
-    e, adata, env, Typed_number.C_number, name
+    e, adata, env, Analyses_types.C_number, name
   | Toffset _ -> Env.not_yet env "labeled \\offset"
   | Tblock_length(BuiltinLabel Here, t') ->
     let size_t = Cil.theMachine.Cil.typeOfSizeOf in
@@ -835,11 +835,11 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       Memory_translate.call ~adata ~loc kf name size_t env t'
     in
     let adata = Assert.register_term ~loc t e adata in
-    e, adata, env, Typed_number.C_number, name
+    e, adata, env, Analyses_types.C_number, name
   | Tblock_length _ -> Env.not_yet env "labeled \\block_length"
   | Tnull ->
     let e = Smart_exp.null ~loc in
-    e, adata, env, Typed_number.C_number, "null"
+    e, adata, env, Analyses_types.C_number, "null"
   | TUpdate _ -> Env.not_yet env "functional update"
   | Ttypeof _ -> Env.not_yet env "typeof"
   | Ttype _ -> Env.not_yet env "C type"
@@ -858,7 +858,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     let e, adata, env = to_exp ~adata kf env t in
     (* Remove the logic var from the logic scope *)
     let env = Env.Logic_scope.remove env lvs in
-    e, adata, env, Typed_number.C_number, ""
+    e, adata, env, Analyses_types.C_number, ""
 
 (* Convert an ACSL term into a corresponding C expression (if any) in the given
    environment. Also extend this environment in order to include the generating
@@ -871,37 +871,36 @@ and to_exp ~adata ?inplace kf env t =
     (Env.Logic_env.get_profile env);
   let logic_env = Env.Logic_env.get env in
   let t = Logic_normalizer.get_term t in
-  let (rexp, _, _) as result =
-    Extlib.flatten
-      (Env.with_params_and_result
-         ~rte:false
-         ~f:(fun env ->
-             let e, adata, env, sty, name =
-               context_insensitive_term_to_exp ?inplace ~adata kf env t
-             in
-             let env =
-               if generate_rte then !translate_rte_exp_ref kf env e else env
-             in
-             let cast = Typing.get_cast ~logic_env t in
-             let name = if name = "" then None else Some name in
-             Extlib.nest
-               adata
-               (Typed_number.add_cast
-                  ~loc:t.term_loc
-                  ?name
-                  env
-                  kf
-                  cast
-                  sty
-                  (Some t)
-                  e)
-           )
-         env)
+  let ((rexp, _), _) as result =
+    Env.with_params_and_result
+      ~rte:false
+      ~f:(fun env ->
+          let e, adata, env, sty, name =
+            context_insensitive_term_to_exp ?inplace ~adata kf env t
+          in
+          let env =
+            if generate_rte then !translate_rte_exp_ref kf env e else env
+          in
+          let cast = Typing.get_cast ~logic_env t in
+          let name = if name = "" then None else Some name in
+          Extlib.nest
+            adata
+            (Typed_number.add_cast
+               ~loc:t.term_loc
+               ?name
+               env
+               kf
+               cast
+               sty
+               (Some t)
+               e)
+        )
+      env
   in
   Options.debug ~dkey ~level:4 "to_exp %a {%a} %a = %a"
     Kernel_function.pretty kf Profile.pretty (Env.Logic_env.get_profile env)
     Printer.pp_term t Printer.pp_exp rexp;
-  result
+  Extlib.flatten result
 
 
 let term_to_exp_without_inplace ~adata kf env t = to_exp ~adata kf env t

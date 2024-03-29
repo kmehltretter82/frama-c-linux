@@ -72,8 +72,6 @@ open Escape
 
 let version = "Cprint 2.1e 9.1.99 Hugues Cassé"
 
-let msvcMode = ref false
-
 let printLn = ref true
 let printLnComment = ref false
 
@@ -166,7 +164,6 @@ let get_operator exp =
   | MEMBEROF (_, _) -> ("", 15)
   | MEMBEROFPTR (_, _) -> ("", 15)
   | GNU_BODY _ -> ("", 17)
-  | EXPR_PATTERN _ -> ("", 16)     (* sm: not sure about this *)
   | GENERIC _ -> ("", 16)
 
 (*
@@ -197,7 +194,6 @@ let rec print_specifiers fmt (specs: spec_elem list) =
     | SpecCV CV_GHOST -> fprintf fmt "\\ghost"
     | SpecAttr al -> print_attribute fmt al
     | SpecType bt -> print_type_spec fmt bt
-    | SpecPattern name -> fprintf fmt "@@specifier(%s)" name
   in
   Pretty_utils.pp_list ~sep:"@ " print_spec_elem fmt specs
 
@@ -290,9 +286,6 @@ and print_field_group fmt fld = match fld with
     fprintf fmt "%a@ %a;"
       print_specifiers specs
       (pp_list ~sep:",@ " print_field) fields
-  | TYPE_ANNOT annot ->
-    fprintf fmt "@\n/*@@@[@ %a@]@ */@\n"
-      Logic_print.print_type_annot annot
   | STATIC_ASSERT_FG (e, s, _) ->
     fprintf fmt "@[_Static_assert (%a, %s)@]@\n" print_expression e s
 
@@ -358,10 +351,11 @@ and print_generic_association fmt (type_exp : (specifier * decl_type) option * e
 and print_expression fmt (exp: expression) = print_expression_level 0 fmt exp
 
 and print_expression_level (lvl: int) fmt (exp : expression) =
+  let open Current_loc.Operators in
   let (txt, lvl') = get_operator exp in
   let print_expression fmt exp = print_expression_level lvl' fmt exp in
   let print_exp fmt e =
-    Cil_const.CurrentLoc.set e.expr_loc;
+    let<> UpdatedCurrentLoc = e.expr_loc in
     match e.expr_node with
       NOTHING -> ()
     | PAREN exp -> print_expression fmt exp
@@ -413,7 +407,6 @@ and print_expression_level (lvl: int) fmt (exp : expression) =
       fprintf fmt "%a->%s"
         print_expression exp fld
     | GNU_BODY blk -> fprintf fmt "(@[%a@])" print_block blk
-    | EXPR_PATTERN (name) -> fprintf fmt "@@expr(%s)" name
     | COMMA l -> pp_list ~sep:",@ " print_expression fmt l
     | GENERIC (control_exp, typ_exps) ->
       fprintf fmt "_Generic(@[%a,@ %a@])" print_expression control_exp
@@ -432,12 +425,13 @@ and print_for_init fmt fc =
   | FC_DECL dec -> print_def fmt dec
 
 and print_statement fmt stat =
+  let open Current_loc.Operators in
   let loc = Cabshelper.get_statementloc stat in
-  Cil_const.CurrentLoc.set loc;
+  let<> UpdatedCurrentLoc = loc in
   if Kernel.debug_atleast 2 then
     fprintf fmt "@\n/* %a */@\n" Cil_printer.pp_location loc;
   match stat.stmt_node with
-    NOP _ -> pp_print_string fmt ";"
+  | NOP _ -> pp_print_string fmt ";"
   | COMPUTATION (exp,_) -> fprintf fmt "%a;" print_expression exp
   | BLOCK (blk, _,_) -> print_block fmt blk
   | SEQUENCE (s1, s2,_) ->
@@ -499,10 +493,7 @@ and print_statement fmt stat =
     let print_asm_operand fmt (_identop,cnstr, e) =
       fprintf fmt "@[%s@ (@[%a@])@]" cnstr print_expression e
     in
-    if !msvcMode then begin
-      fprintf fmt "__asm@ {@[%a@]}"
-        (pp_list ~sep:"@\n" pp_print_string) tlist
-    end else begin
+    begin
       let print_details
           fmt { aoutputs = outs; ainputs = ins; aclobbers = clobs } =
         pp_list ~sep:",@ " print_asm_operand fmt outs;
@@ -528,12 +519,6 @@ and print_statement fmt stat =
     fprintf fmt "@[<v 2>@[try %a {@]@;%a@]@;}@;"
       print_statement s
       (Pretty_utils.pp_list ~sep:"@;" print_one_catch) l
-  | TRY_FINALLY (b, h, _) ->
-    fprintf fmt "__try@ @[%a@]@ __finally@ @[%a@]"
-      print_block b print_block h
-  | TRY_EXCEPT (b, e, h, _) ->
-    fprintf fmt "__try@ @[%a@]@ __except(@[%a@])@ @[%a@]"
-      print_block b print_expression e print_block h
   | CODE_ANNOT (a, _) ->
     fprintf fmt "/*@@@ @[%a@]@ */"
       Logic_print.print_code_annot a
@@ -597,7 +582,8 @@ and print_defs fmt defs =
     defs
 
 and print_def fmt def =
-  Cil_const.CurrentLoc.set (Cabshelper.get_definitionloc def);
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = Cabshelper.get_definitionloc def in
   match def with
     FUNDEF (spec, proto, body, loc, _) ->
     if !printCounters then begin

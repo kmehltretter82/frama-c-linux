@@ -73,7 +73,7 @@ let relation_to_binop = function
 let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
   let loc = p.pred_loc in
   let logic_env = Env.Logic_env.get env in
-  Cil.CurrentLoc.set loc;
+  Current_loc.set loc;
   match p.pred_content with
   | Pfalse -> Cil.zero ~loc, adata, env
   | Ptrue -> Cil.one ~loc, adata, env
@@ -327,17 +327,7 @@ and to_exp ~adata ?inplace ?name kf ?rte env p =
            in
            let env = if rte then !translate_rte_exp_ref kf env e else env in
            let env = Assert.do_pending_register_data env in
-           Extlib.nest
-             adata
-             (Typed_number.add_cast
-                ~loc:p.pred_loc
-                ?name
-                env
-                kf
-                None
-                Typed_number.C_number
-                None
-                e)
+           (e, adata), env
          )
        env)
 

@@ -192,10 +192,10 @@ let optimize_comprehension term =
            let lv = Logic_const.addTermOffsetLval o lv in
            let ty = Cil.typeOfTermLval lv in
            Logic_utils.mk_logic_StartOf (Logic_const.term ~loc (TLval lv) ty))
-    | TLogic_coerce(lt,{ term_node = TLval(TVar y,TNoOffset)}) when is_x y ->
+    | TCast (true, lt,{ term_node = TLval(TVar y,TNoOffset)}) when is_x y ->
       (* { (lt)x | \subset(x, set) } -> (lt set)set *)
       { t with
-        term_node = TLogic_coerce(Logic_const.make_set_type lt,set);
+        term_node = TCast (true, Logic_const.make_set_type lt,set);
         term_type = Logic_const.make_set_type lt }
     | _ -> term
   in
@@ -206,8 +206,8 @@ let optimize_comprehension term =
          { pred_content =
              Papp({l_var_info = {lv_name="\\subset"}},[],[elt;set]) }) ->
     (match elt.term_node with
-     | TLogic_coerce
-         (_,
+     | TCast
+         (true,_,
           { term_node =
               TLval(TVar y, TNoOffset) })
        when Cil_datatype.Logic_var.equal x y ->
@@ -228,22 +228,22 @@ let lift_set f loc =
     | Tempty_set -> loc
     (* coercion from a set to another set: keep the current coercion
        over the result of the transformation. *)
-    | TLogic_coerce(set,t1)
+    | TCast (true, set,t1)
       when is_set_type set && is_set_type t1.term_type ->
       let res = aux t1 in
-      { loc with term_node = TLogic_coerce(set, res) }
+      { loc with term_node = TCast (true, set, res) }
     (* coercion from a singleton to a set: performs the transformation.
     *)
-    | TLogic_coerce(oset, t1) when is_set_type oset ->
+    | TCast (true, oset, t1) when is_set_type oset ->
       let t = f t1 in
       let nset = make_set_type t.term_type in
       (* performs the coercion into a set. *)
       let singleton_coerce =
-        { t with term_node = TLogic_coerce(nset, t); term_type = nset }
+        { t with term_node = TCast (true, nset, t); term_type = nset }
       in
       (* see whether we have to coerce the set type itself. *)
       if is_same_type oset nset then singleton_coerce
-      else { loc with term_node = TLogic_coerce(oset, singleton_coerce) }
+      else { loc with term_node = TCast (true, oset, singleton_coerce) }
     (* if we a term of type set, try to apply f to each
        element of x by using a comprehension, and see whether we can get
        rid of said comprehension afterwards. *)
@@ -257,7 +257,7 @@ let lift_set f loc =
       let t2 = Logic_const.tvar ~loc:loc.term_loc x in
       let t2 =
         Logic_const.term
-          ~loc:loc.term_loc (TLogic_coerce (loc.term_type,t2)) loc.term_type
+          ~loc:loc.term_loc (TCast (true, loc.term_type,t2)) loc.term_type
       in
       let p = Logic_const.papp ~loc:loc.term_loc (sub, [], [t2;loc]) in
       let c = { loc with term_node = Tcomprehension(t,[x],Some p) } in
@@ -1057,7 +1057,7 @@ struct
       | TLval _ -> true
       | TUnOp(_,t) -> needs_at t
       | TBinOp(_,t1,t2) -> needs_at t1 || needs_at t2
-      | TCastE(_,t) -> needs_at t
+      | TCast(_,_,t) -> needs_at t
       | TAddrOf (_,o) -> needs_at_offset o
       | TStartOf (_,o) -> needs_at_offset o
       | Tapp(_,_,l) | TDataCons(_,l) -> List.exists needs_at l
@@ -1071,7 +1071,6 @@ struct
       | Trange (Some t1, Some t2) -> needs_at t1 || needs_at t2
       | Tlet(_,t) -> needs_at t
       | Tif(t1,t2,t3) -> needs_at t1 || needs_at t2 || needs_at t3
-      | TLogic_coerce(_,t) -> needs_at t
     and needs_at_offset = function
       | TNoOffset -> false
       | TIndex (t,o) -> needs_at t || needs_at_offset o
@@ -1124,7 +1123,7 @@ struct
       if isPointerType newt && isLogicNull e && not (isLogicZero e) then
         (* \null can have any pointer type, see ACSL manual. *)
         (if force then
-           Logic_const.term ~loc (TCastE (newt, e)) (Ctype newt)
+           Logic_const.term ~loc (TCast (false, Ctype newt, e)) (Ctype newt)
          else
            { e with term_type = Ctype newt })
       else if isPointerType newt && isArrayType oldt then begin
@@ -1225,13 +1224,13 @@ struct
       | Tinter l ->
         { e with term_type = real_type; term_node = Tinter (List.map aux l) }
       | Tempty_set -> { e with term_type = real_type }
-      | TLogic_coerce(t2,e) when Cil.no_op_coerce t2 e ->
+      | TCast (true,t2,e) when Cil.no_op_coerce t2 e ->
         let e = aux e in
-        { e with term_type = real_type; term_node = TLogic_coerce(real_type,e) }
+        { e with term_type = real_type; term_node = TCast (true, real_type,e) }
       | _ when Cil.isLogicArithmeticType real_type ->
         Logic_utils.numeric_coerce real_type e
       | _ ->
-        { e with term_type = real_type; term_node = TLogic_coerce(real_type,e) }
+        { e with term_type = real_type; term_node = TCast (true, real_type,e) }
     in
     if is_same_type e.term_type t then e else aux e
 
@@ -1248,7 +1247,7 @@ struct
         let range = trange ~loc (Some (lzero ~loc ()), Some sizeof) in
         let converted_type = set_conversion (Ctype Cil.charPtrType) t.term_type
         in
-        let cast = term ~loc (TCastE(Cil.charPtrType, t)) converted_type in
+        let cast = term ~loc (TCast(false, Ctype Cil.charPtrType, t)) converted_type in
         term ~loc (TBinOp(PlusPI,cast,range)) (make_set_type converted_type)
     in
     lift_set convert_one_location t
@@ -1263,7 +1262,7 @@ struct
       if explicit then begin
         match Logic_const.unroll_ltdef newt with
         | Ctype cnewt ->
-          { e with term_node = TCastE(cnewt,e); term_type = newt }
+          { e with term_node = TCast(false, Ctype cnewt,e); term_type = newt }
         | _ -> e
       end else e
     end else if is_enum_cst e newt then { e with term_type = newt }
@@ -1284,7 +1283,7 @@ struct
         logic_coerce Linteger e
       | t1, Ctype t2 when Logic_const.is_boolean_type t1
                        && is_integral_type newt && explicit ->
-        Logic_const.term ~loc (TCastE (t2,e)) newt
+        Logic_const.term ~loc (TCast (false, Ctype t2,e)) newt
       | ty1, Ltype({lt_name="set"},[ty2])
         when is_pointer_type ty1 &&
              is_plain_pointer_type ty2 &&
@@ -1429,7 +1428,7 @@ struct
     (* Integer 0 is also a valid pointer. *)
     | Linteger, Ctype ty when Cil.isPointerType ty && isLogicNull oterm ->
       nt, { oterm with
-            term_node = TCastE(ty,oterm);
+            term_node = TCast(false, Ctype ty,oterm);
             term_type = nt }
     | Linteger, Ctype ty when Cil.isIntegralType ty ->
       (try
@@ -2058,7 +2057,7 @@ struct
         known_vars, kont (eta_expand term.term_loc term.term_name env v)
       | TConst _ | TLval _ | TSizeOf _ | TSizeOfE _
       | TSizeOfStr _ | TAlignOf _ | TAlignOfE _
-      | TUnOp _ | TBinOp _ | TCastE _ | TAddrOf _ | TStartOf _
+      | TUnOp _ | TBinOp _ | TCast _ | TAddrOf _ | TStartOf _
       | Tapp _  | TDataCons _ | Tbase_addr _ | Toffset _
       | Tblock_length _ | Tnull
       | TUpdate _ | Ttypeof _ | Ttype _ | Tempty_set
@@ -2068,7 +2067,7 @@ struct
          idea that you can always replace a term by a set of terms
       *)
       | Tunion _ | Tinter _ | Tcomprehension _
-      | Trange _ | TLogic_coerce _
+      | Trange _
 
         -> known_vars, kont term
       | Tlambda (quants,term) ->
@@ -2366,11 +2365,11 @@ struct
 
       | Tunion l | Tinter l -> List.for_all aux l
 
-      | TLogic_coerce (_,t) | Tat (t, _) | Tcomprehension (t,_,_) | Tlet (_, t)
+      | TCast (true,_,t) | Tat (t, _) | Tcomprehension (t,_,_) | Tlet (_, t)
         -> aux t
 
       | Trange _ | TConst _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _
-      | TAlignOfE _ | TUnOp (_,_) | TBinOp (_,_,_) | TCastE (_,_)
+      | TAlignOfE _ | TUnOp (_,_) | TBinOp (_,_,_) | TCast (false,_,_)
       | Tlambda (_,_) | TDataCons (_,_) | Tbase_addr (_,_)
       | Toffset (_,_) | Tblock_length (_,_) | Tnull | Tapp _
       | TUpdate (_,_,_) | Ttypeof _ | Ttype _ ->
@@ -2605,7 +2604,7 @@ struct
           (match lv.lv_type with
            | Ctype (TVoid _)->
              if ctxt.silent then raise Backtrack;
-             ctxt.error (CurrentLoc.get())
+             ctxt.error (Current_loc.get())
                "Variable %s is bound to a predicate, not a term" x
            | _ -> old_val lv)
         with Not_found ->
@@ -3159,7 +3158,7 @@ struct
     let check_lval t =
       match t.term_node with
         TLval lv
-      | TLogic_coerce(_,{term_node = TLval lv })
+      | TCast (true, _,{term_node = TLval lv })
       | Tat({term_node = TLval lv},_) -> f lv t
       | TStartOf lv
       | Tat ({term_node = TStartOf lv}, _) ->
@@ -3183,7 +3182,7 @@ struct
             term_type = type_of_pointed t.term_type;
             term_node = TLval lv }
       | TLval lv
-      | TLogic_coerce(_,{term_node = TLval lv })
+      | TCast (true, _,{term_node = TLval lv })
       | Tat({term_node = TLval lv},_) -> f lv t
       | TStartOf lv
       | Tat ({term_node = TStartOf lv}, _)
@@ -4100,8 +4099,9 @@ struct
     | TDsyn typ -> LTsyn (plain_logic_type loc env typ)
 
   let rec annot in_axiomatic a =
+    let open Current_loc.Operators in
     let loc = a.decl_loc in
-    Cil.CurrentLoc.set loc;
+    let<> UpdatedCurrentLoc = loc in
     match a.decl_node with
     | LDlogic_reads (f, labels, poly, t, p, l) ->
       let env,info = logic_decl loc f labels poly ~return_type:t p in

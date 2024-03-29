@@ -164,14 +164,14 @@ end
 
 let contains_c_at ca =
   let vis = new contains_c_at in
-  let loc = Cil.CurrentLoc.get () in
+  let loc = Current_loc.get () in
   let r =
     try
       ignore (Visitor.visitFramacCodeAnnotation vis ca);
       false
     with Exit -> true
   in
-  Cil.CurrentLoc.set loc;
+  Current_loc.set loc;
   r
 
 (* Re-evaluate all alarms, and see if we can put a 'green' or 'red' status,
@@ -187,7 +187,7 @@ let mark_green_and_red () =
       | AAssert (_, p) | AInvariant (_, true, p) ->
         let p = p.tp_statement in
         let loc = code_annotation_loc ca stmt in
-        Cil.CurrentLoc.set loc;
+        Current_loc.set loc;
         let kf = Kernel_function.find_englobing_kf stmt in
         let ip = Property.ip_of_code_annot_single kf stmt ca in
         (* This status is exact: we are _not_ refining the statuses previously

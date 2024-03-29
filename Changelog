@@ -18,6 +18,30 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!   Kernel   [2024-03-29] Refactor current location handling mechanism
+-    Kernel   [2024-03-26] Introduce \plugin:: prefix for ACSL extensions,
+                           unknown extensions can be safely ignored when the
+                           plug-in that handles them is not available
+-*   Variadic [2024-03-07] Make sure that generated functions have fresh names
+o!   Kernel   [2024-03-07] More coherent naming of functions determining if a
+                           symbol is a Frama-C built-in.
+-*   Kernel   [2024-03-04] Accept conditional expr whose 2d and 3d operands
+                           have type void, as per C11 6.5.15§3
+-*   Kernel   [2024-02-22] When an array is declared with a fixed length l,
+                           raise an error if l * sizeof(elem) > SIZE_MAX
+o!  Kernel    [2024-02-22] Merged AST nodes TCastE and TLogic_coerce
+o!  Kernel    [2024-01-29] Db is now mostly empty, the only remaining value is
+                           Db.Main.extend which is deprecated and replaced by
+                           Boot.Main.extend. Features related to asynchronous
+                           interactions are now handled in module Async
+
+###############################################################################
+Open Source Release 28.1 (Nickel)
+###############################################################################
+
+-*  Kernel    [2024-01-18] Fix Cil.isConstant on lvalues with offset.
+-*  Ivette    [2024-01-11] Fix Ivette shell wrapper on macOS.
+
 ###############################################################################
 Open Source Release 28.0 (Nickel)
 ###############################################################################

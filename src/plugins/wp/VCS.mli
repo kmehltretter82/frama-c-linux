@@ -55,6 +55,7 @@ val parse_prover : string -> prover option
 val pp_prover : Format.formatter -> prover -> unit
 val pp_mode : Format.formatter -> mode -> unit
 
+val eq_prover : prover -> prover -> bool
 val cmp_prover : prover -> prover -> int
 
 (* -------------------------------------------------------------------------- *)
@@ -92,7 +93,10 @@ type verdict =
   | Stepout
   | Computing of (unit -> unit) (* kill function *)
   | Valid
+  | Invalid (* model *)
   | Failed
+
+type model = Why3Provers.model Probe.Map.t
 
 type result = {
   verdict : verdict ;
@@ -102,6 +106,7 @@ type result = {
   prover_steps : int ;
   prover_errpos : Lexing.position option ;
   prover_errmsg : string ;
+  prover_model : model ;
 }
 
 val no_result : result
@@ -114,10 +119,15 @@ val failed : ?pos:Lexing.position -> string -> result
 val kfailed : ?pos:Lexing.position -> ('a,Format.formatter,unit,result) format4 -> 'a
 val cached : result -> result (** only for true verdicts *)
 
-val result : ?cached:bool -> ?solver:float -> ?time:float -> ?steps:int -> verdict -> result
+val result : ?model:model -> ?cached:bool ->
+  ?solver:float -> ?time:float -> ?steps:int -> verdict -> result
 
 val is_auto : prover -> bool
+val has_counter_examples : prover -> bool
+val is_prover : prover -> bool
+val is_extern : prover -> bool
 val is_result : verdict -> bool
+val is_none : result -> bool
 val is_verdict : result -> bool
 val is_valid: result -> bool
 val is_trivial: result -> bool
@@ -128,9 +138,10 @@ val is_proved: smoke:bool -> verdict -> bool
 val configure : result -> config
 val autofit : result -> bool (** Result that fits the default configuration *)
 
-val name_of_verdict : verdict -> string
+val name_of_verdict : ?computing:bool -> verdict -> string
 
 val pp_result : Format.formatter -> result -> unit
+val pp_model : Format.formatter -> model -> unit
 val pp_result_qualif : ?updating:bool -> prover -> result ->
   Format.formatter -> unit
 

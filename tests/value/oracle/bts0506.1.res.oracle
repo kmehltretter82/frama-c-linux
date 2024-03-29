@@ -10,7 +10,7 @@
 [eva] Done for function f
 [eva] computing for function main2 <- main.
   Called from bts0506.i:49.
-[kernel:annot:missing-spec] bts0506.i:6: Warning: 
+[kernel:annot:missing-spec] bts0506.i:15: Warning: 
   Neither code nor specification for function f1,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f1 <- main2 <- main.
@@ -26,7 +26,7 @@
 [eva] computing for function f1 <- main2 <- main.
   Called from bts0506.i:18.
 [eva] Done for function f1
-[kernel:annot:missing-spec] bts0506.i:7: Warning: 
+[kernel:annot:missing-spec] bts0506.i:20: Warning: 
   Neither code nor specification for function f2,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f2 <- main2 <- main.
@@ -39,7 +39,7 @@
 [eva] computing for function f2 <- main2 <- main.
   Called from bts0506.i:22.
 [eva] Done for function f2
-[kernel:annot:missing-spec] bts0506.i:8: Warning: 
+[kernel:annot:missing-spec] bts0506.i:24: Warning: 
   Neither code nor specification for function f3,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f3 <- main2 <- main.
@@ -49,7 +49,7 @@
 [eva] computing for function f3 <- main2 <- main.
   Called from bts0506.i:25.
 [eva] Done for function f3
-[kernel:annot:missing-spec] bts0506.i:9: Warning: 
+[kernel:annot:missing-spec] bts0506.i:27: Warning: 
   Neither code nor specification for function f4,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f4 <- main2 <- main.
@@ -62,7 +62,7 @@
 [eva:alarm] bts0506.i:28: Warning: 
   non-finite float value. assert \is_finite(tmp_9);
                           (tmp_9 from f4())
-[kernel:annot:missing-spec] bts0506.i:10: Warning: 
+[kernel:annot:missing-spec] bts0506.i:30: Warning: 
   Neither code nor specification for function f5,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f5 <- main2 <- main.
@@ -78,7 +78,7 @@
 [eva] computing for function f5 <- main2 <- main.
   Called from bts0506.i:31.
 [eva] Done for function f5
-[kernel:annot:missing-spec] bts0506.i:11: Warning: 
+[kernel:annot:missing-spec] bts0506.i:33: Warning: 
   Neither code nor specification for function f6,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f6 <- main2 <- main.
@@ -91,7 +91,7 @@
 [eva] computing for function f6 <- main2 <- main.
   Called from bts0506.i:35.
 [eva] Done for function f6
-[kernel:annot:missing-spec] bts0506.i:12: Warning: 
+[kernel:annot:missing-spec] bts0506.i:37: Warning: 
   Neither code nor specification for function f7,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f7 <- main2 <- main.

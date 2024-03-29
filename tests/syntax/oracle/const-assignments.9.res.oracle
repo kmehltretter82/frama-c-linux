@@ -4,7 +4,7 @@
   119   
   120   void mutable_test_ko(const T* t) {
   121     t->s.y = 32; // KO: although t->s could be modified, t->s.y is still const
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^
   122   }
   123
 [kernel] Frama-C aborted: invalid user input.

@@ -306,21 +306,25 @@ module Make
     let env = make_env pre in
     let assigns = get_assigns_for_behavior spec behavior in
     let check_one_assign cvalue_state (assign, _) =
-      match evaluate_location env retres_loc Assign assign with
-      | None -> ()
-      | Some location ->
-        let loc = Precise_locs.imprecise_location (get_ploc location) in
-        let cvalue = Cvalue.Model.find cvalue_state loc in
-        if Cvalue.V.is_imprecise cvalue
-        then
-          begin
-            ignore (Locations.Location_Bytes.track_garbled_mix cvalue);
-            Self.warning ~current:true ~once:true
-              ~wkey:Self.wkey_garbled_mix_assigns
-              "The specification of function %a has generated a garbled mix \
-               for %a."
-              Kernel_function.pretty kf pp_assign_clause (Assign, assign)
-          end
+      let location = evaluate_location env retres_loc Assign assign in
+      let precise_loc = Option.map get_ploc location in
+      let loc = Option.map Precise_locs.imprecise_location precise_loc in
+      match loc with
+      | None | Some Locations.{ size = Top } -> ()
+      | Some Locations.{ loc; size = Value size } ->
+        let offsm = Cvalue.Model.copy_offsetmap loc size cvalue_state in
+        let warn v =
+          match Cvalue.V_Or_Uninitialized.get_v v with
+          | Top (bases, origin) ->
+            if Origin.register_write bases origin then
+              Self.warning ~current:true ~once:true
+                ~wkey:Self.wkey_garbled_mix_assigns
+                "@[The specification of function %a@ has generated \
+                 a garbled mix of addresses@ for %a.@]"
+                Kernel_function.pretty kf pp_assign_clause (Assign, assign)
+          | _ -> ()
+        in
+        Bottom.iter (Cvalue.V_Offsetmap.iter_on_values warn) offsm
     in
     let check_one_state state =
       let cvalue_state = get_cvalue_or_top state in
@@ -335,7 +339,6 @@ module Make
      and [status] the status of the behaviors. *)
   let compute_effects ~warn kf spec result behaviors status states =
     States.join states >>- fun pre_state ->
-    Locations.Location_Bytes.do_track_garbled_mix false;
     let behavior = List.hd behaviors in
     let retres_loc = Option.map Location.eval_varinfo result in
     let assigns = get_assigns_for_behavior spec behavior in
@@ -353,7 +356,6 @@ module Make
     (* Warn on garbled mixes created by specifications, except on builtins. *)
     if warn
     then check_post_assigns kf retres_loc spec behavior ~pre:pre_state states;
-    Locations.Location_Bytes.do_track_garbled_mix true;
     states
 
   (* Reduces the [states] by the assumes and requires clauses of the [behavior]

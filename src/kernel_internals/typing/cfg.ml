@@ -352,6 +352,7 @@ let freshLabel (base:string) =
 
 
 let xform_switch_block ?(keepSwitch=false) b =
+  let open Current_loc.Operators in
   let breaks_stack = Stack.create () in
   let continues_stack = Stack.create () in
   (* NB: these are two stacks of stack, as the scope of
@@ -439,7 +440,7 @@ let xform_switch_block ?(keepSwitch=false) b =
       [] -> []
     | s :: rest ->
       begin
-        CurrentLoc.set (Stmt.loc s);
+        let<> UpdatedCurrentLoc = Stmt.loc s in
         if not keepSwitch then
           s.labels <- List.map (fun lab -> match lab with
                 Label _ -> lab

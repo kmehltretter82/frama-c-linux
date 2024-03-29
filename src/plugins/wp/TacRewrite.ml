@@ -53,7 +53,7 @@ class rewrite dir =
   let title = if dir then "Rewrite (<-)" else "Rewrite (->)" in
   object
     inherit Tactical.make
-        ~id ~title ~descr:"Rewrite from equality" ~params:[]
+        ~id ~title ~descr:"Rewrite from equality." ~params:[]
 
     method select _feedback select =
       try
@@ -106,7 +106,7 @@ class auto_rewrite =
   object
     method id = "wp:replace"
     method title = "Auto Replace"
-    method descr = "Lookup for equalities to Rewrite"
+    method descr = "Lookup for equalities to rewrite with."
     method search (push : Strategy.strategy -> unit) (hyps,goal) =
       Conditions.iter
         (fun s ->

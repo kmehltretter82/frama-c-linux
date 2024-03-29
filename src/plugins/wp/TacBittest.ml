@@ -55,7 +55,7 @@ class bittestrange =
     inherit Tactical.make
         ~id:"Wp.bittestrange"
         ~title:"Bit-Test Range"
-        ~descr:"Tighten Bounds with respect to bits"
+        ~descr:"Compute bounds with respect to bits."
         ~params:[]
 
     method select _feedback selection =
@@ -106,7 +106,7 @@ class autobittestrange : Strategy.heuristic =
 
     method id = "wp:bittestrange"
     method title = "Auto Bit-Test Range"
-    method descr = "Apply Bit-Test Range on bit-tests"
+    method descr = "Apply bitwise tactics on bit-tests expressions."
 
     method search push (seq : Conditions.sequent) =
       Conditions.iter

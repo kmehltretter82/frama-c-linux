@@ -26,7 +26,7 @@ module G = Services.G
 
 (* --- Package declaration --- *)
 
-let package = Package.package ~plugin:"callgraph" ~title:"Callgraph" ()
+let package = Package.package ~plugin:"callgraph" ~title:"Callgraph Services" ()
 
 
 (* --- Helper modules --- *)

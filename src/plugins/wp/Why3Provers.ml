@@ -32,7 +32,7 @@ let cfg = lazy
       Wp_parameters.abort "%a" Why3.Exn_printer.exn_printer exn
   end
 
-let version = Why3.Config.version
+let why3_version = Why3.Config.version
 let config () = Lazy.force cfg
 
 let set_procs = Why3.Controller_itp.set_session_max_tasks
@@ -62,16 +62,24 @@ let configure =
 
 type t = Why3.Whyconf.prover
 
+(* In an ambiguous map of provers, tries to find the basic alternative, if none
+   is found, just give an arbitrary one. *)
+let resolve_ambiguity provers =
+  let open Why3.Whyconf in
+  let provers = fst @@ List.split @@ Mprover.bindings provers in
+  try List.find (fun p -> p.prover_altern = "") provers
+  with Not_found -> List.hd provers
+
 let find_opt s =
+  let open Why3.Whyconf in
   try
     let config = Lazy.force cfg in
-    let filter = Why3.Whyconf.parse_filter_prover s in
-    Some ((Why3.Whyconf.filter_one_prover config filter).Why3.Whyconf.prover)
+    let filter = parse_filter_prover s in
+    Some ((filter_one_prover config filter).prover)
   with
-  | Why3.Whyconf.ProverNotFound _
-  | Why3.Whyconf.ParseFilterProver _
-  | Why3.Whyconf.ProverAmbiguity _  ->
-    None
+  | ParseFilterProver _ -> None
+  | ProverNotFound _ -> None
+  | ProverAmbiguity (_, _, provers)  -> Some (resolve_ambiguity provers)
 
 type fallback = Exact of t | Fallback of t | NotFound
 
@@ -79,18 +87,14 @@ let find_fallback name =
   match find_opt name with
   | Some prv -> Exact prv
   | None ->
-    (* Why3 should deal with this intermediate case *)
-    match find_opt (String.lowercase_ascii name) with
-    | Some prv -> Exact prv
-    | None ->
-      match String.split_on_char ',' name with
-      | shortname :: _ :: _ ->
-        begin
-          match find_opt (String.lowercase_ascii shortname) with
-          | Some prv -> Fallback prv
-          | None -> NotFound
-        end
-      | _ -> NotFound
+    match String.split_on_char ',' name with
+    | shortname :: _ :: _ ->
+      begin
+        match find_opt (String.lowercase_ascii shortname) with
+        | Some prv -> Fallback prv
+        | None -> NotFound
+      end
+    | _ -> NotFound
 
 let ident_why3 = Why3.Whyconf.prover_parseable_format
 let ident_wp s =
@@ -102,7 +106,23 @@ let title ?(version=true) p =
   if version then Pretty_utils.to_string Why3.Whyconf.print_prover p
   else p.Why3.Whyconf.prover_name
 let compare = Why3.Whyconf.Prover.compare
+let name p = p.Why3.Whyconf.prover_name
+let version p = p.Why3.Whyconf.prover_version
+let altern p = p.Why3.Whyconf.prover_altern
 let is_mainstream p = p.Why3.Whyconf.prover_altern = ""
+let is_auto (p : t) =
+  match p.prover_name with
+  | "Coq" | "Isabelle" -> false
+  | "Alt-Ergo" | "Z3" | "CVC4" | "CVC5" | "Colibri2" -> true
+  | _ ->
+    let config = config () in
+    try
+      let prover_config = Why3.Whyconf.get_prover_config config p in
+      not prover_config.interactive
+    with Not_found -> true
+let has_counter_examples p =
+  List.mem "counterexamples" @@
+  String.split_on_char '+' p.Why3.Whyconf.prover_altern
 
 let provers () =
   Why3.Whyconf.Mprover.keys (Why3.Whyconf.get_provers (config ()))
@@ -118,5 +138,19 @@ let has_shortcut p s =
           (Why3.Whyconf.get_prover_shortcuts (config ())) with
   | None -> false
   | Some p' -> Why3.Whyconf.Prover.equal p p'
+
+let with_counter_examples p =
+  if has_counter_examples p then Some p else
+    let name = p.prover_name in
+    List.find_opt
+      (fun (q : t) -> q.prover_name = name && has_counter_examples q)
+    @@ provers ()
+
+(* -------------------------------------------------------------------------- *)
+(* --- Models                                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+type model = Why3.Model_parser.concrete_syntax_term
+let pp_model = Why3.Model_parser.print_concrete_term
 
 (* -------------------------------------------------------------------------- *)

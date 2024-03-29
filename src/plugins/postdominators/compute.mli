@@ -20,4 +20,22 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Register the plugin in the Frama-C kernel. Nothing is exported. *)
+open Cil_types
+
+exception Top
+(** Used for postdominators-related functions, when the
+    postdominators of a statement cannot be computed. It means that
+    there is no path from this statement to the function return. *)
+
+val compute: kernel_function -> unit
+
+val stmt_postdominators:
+  kernel_function -> stmt -> Cil_datatype.Stmt.Hptset.t
+(** @raise Top (see above) *)
+
+val is_postdominator:
+  kernel_function -> opening:stmt -> closing:stmt -> bool
+
+val display: unit -> unit
+
+val self: State.t

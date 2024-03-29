@@ -230,8 +230,6 @@
 % Table of contents
 % --------------------------------------------------------------------------
 
-\newcommand\tocdotfill{{\normalfont\normalsize \TOCLineLeaderFill}}
-
 \titlecontents{chapter}
   [0em]
   {\bigskip}
@@ -244,14 +242,14 @@
   {\medskip}
   {\makebox[3em][l]{\thecontentslabel}}
   {\hspace*{3em}}
-  {\space\tocdotfill\makebox[1.5em]{\contentspage}}[]
+  {\titlerule*[1pc]{.}\makebox[1.5em]{\contentspage}}[]
 
 \titlecontents{subsection}
   [5em]
   {\smallskip}
   {\makebox[4.5em][l]{\thecontentslabel}}
   {\hspace*{4.5em}}
-  {\space\tocdotfill\makebox[1.5em]{\contentspage}}[]
+  {\titlerule*[1pc]{.}\makebox[1.5em]{\contentspage}}[]
 
 % --------------------------------------------------------------------------
 % Acknoledgements

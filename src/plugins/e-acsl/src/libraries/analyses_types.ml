@@ -92,3 +92,11 @@ type number_ty =
   | Rational
   | Real
   | Nan
+
+(** Type of a string that represents a number.
+    Used when a string is required to encode a constant number because it is not
+    representable in any C type  *)
+type strnum =
+  | Str_Z         (* integers *)
+  | Str_R         (* reals *)
+  | C_number      (* integers and floats included *)

@@ -27,6 +27,7 @@ open Logic_const
 open Cil_types
 
 exception Not_well_formed of Cil_types.location * string
+exception Unknown_ext
 
 let rec unroll_type ?(unroll_typedef=true) = function
   | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
@@ -95,12 +96,14 @@ let logicCType t =
   in plain_or_set logicCType t
 
 let plain_array_to_ptr ty =
+  let open Current_loc.Operators in
   match unroll_type ty with
   | Ctype(TArray(ty,lo,attr) as tarr) ->
     let length_attr =
       match lo with
       | None -> []
-      | Some _ ->
+      | Some e ->
+        let<> UpdatedCurrentLoc = e.eloc in
         try
           let len = Cil.bitsSizeOf tarr in
           let len = try len / (Cil.bitsSizeOf ty)
@@ -236,16 +239,16 @@ let mk_cast ?loc ?(force=false) newt t =
   let newt' = Cil.type_remove_attributes_for_logic_type newt in
   if equal_ltype (Ctype newt') t.term_type then t else
     let rec unroll_cast e = match e.term_node with
-      | TCastE(oldt,e)
+      | TCast(false, Ctype oldt,e)
         when (Cil.isPointerType newt' && Cil.isPointerType oldt)
           || equal_ltype
                (Ctype (Cil.type_remove_attributes_for_logic_type oldt))
                (Ctype newt')
         -> unroll_cast e
-      | TLogic_coerce(Linteger,e)
+      | TCast(true,Linteger,e)
         when Cil.isArithmeticOrPointerType newt'
         -> unroll_cast e
-      | TLogic_coerce(Lreal,e)
+      | TCast(true,Lreal,e)
         when Cil.isFloatingType newt'
         -> unroll_cast e
       | _ -> e
@@ -254,7 +257,7 @@ let mk_cast ?loc ?(force=false) newt t =
     let loc = match loc with None -> t.term_loc | Some loc -> loc in
     (* we keep newt as the cast target, as newt' might have unrolled typedefs
        in order to remove attributes, resulting in a less user-friendly type *)
-    Logic_const.term ~loc (TCastE (newt, tres)) (Ctype newt')
+    Logic_const.term ~loc (TCast (false, Ctype newt, tres)) (Ctype newt')
 
 
 (* -------------------------------------------------------------------------- *)
@@ -319,23 +322,23 @@ let parse_float ?loc literal =
   let vreal = Logic_const.term ?loc (TConst(LReal creal)) Lreal in
   if is_flt then
     let ty = TFloat(fk,[]) in
-    Logic_const.term ?loc (TCastE(ty,vreal)) (Ctype ty)
+    Logic_const.term ?loc (TCast(false, Ctype ty,vreal)) (Ctype ty)
   else vreal
 
 let mk_coerce ltyp t =
-  Logic_const.term ~loc:t.term_loc (TLogic_coerce(ltyp, t)) ltyp
+  Logic_const.term ~loc:t.term_loc (TCast (true, ltyp, t)) ltyp
 
 let rec numeric_coerce ltyp t =
   let oldt = unroll_type t.term_type in
   match t.term_node with
-  | TLogic_coerce(lt,e) when Cil.no_op_coerce lt e ->
+  | TCast (true, lt,e) when Cil.no_op_coerce lt e ->
     (* coercion hidden by the printer, but still present *)
     numeric_coerce ltyp e
   | TConst(LEnum _) | TConst(Integer _) when ltyp = Linteger
     -> { t with term_type = Linteger }
   | TConst(LReal _ ) when ltyp = Lreal ->
     { t with term_type = Lreal }
-  | TCastE(ty,e) ->
+  | TCast (false, Ctype ty,e) ->
     begin match ltyp, Cil.unrollType ty, e.term_node with
       | Linteger, TInt(ik,_), TConst(Integer(v,_))
         when Cil.fitsInInt ik v -> { e with term_type = Linteger }
@@ -658,7 +661,7 @@ let array_with_range arr size =
 
 let remove_logic_coerce t =
   match t.term_node with
-  | TLogic_coerce(_,t) -> t
+  | TCast (true, _,t) -> t
   | _ -> t
 
 let rec remove_term_offset o =
@@ -954,8 +957,8 @@ let rec is_same_term t1 t2 =
   | TUnOp (o1,t1), TUnOp(o2,t2) -> o1 = o2 && is_same_term t1 t2
   | TBinOp(o1,l1,r1), TBinOp(o2,l2,r2) ->
     is_same_binop o1 o2 && is_same_term l1 l2 && is_same_term r1 r2
-  | TCastE(typ1,t1), TCastE(typ2,t2) ->
-    Cil_datatype.TypByName.equal typ1 typ2 && is_same_term t1 t2
+  | TCast (b1, ty1,t1), TCast (b2, ty2,t2) ->
+    b1 = b2 && is_same_type ty1 ty2 && is_same_term t1 t2
   | TAddrOf l1, TAddrOf l2 -> is_same_tlval l1 l2
   | TStartOf l1, TStartOf l2 -> is_same_tlval l1 l2
   | Tapp(f1,labels1, args1), Tapp(f2, labels2, args2) ->
@@ -993,15 +996,13 @@ let rec is_same_term t1 t2 =
     is_same_opt is_same_term l1 l2 && is_same_opt is_same_term h1 h2
   | Tlet(d1,b1), Tlet(d2,b2) ->
     is_same_logic_info d1 d2 && is_same_term b1 b2
-  | TLogic_coerce(ty1,t1), TLogic_coerce(ty2,t2) ->
-    is_same_type ty1 ty2 && is_same_term t1 t2
   | (TConst _ | TLval _ | TSizeOf _ | TSizeOfE _ | TSizeOfStr _
-    | TAlignOf _ | TAlignOfE _ | TUnOp _ | TBinOp _ | TCastE _
+    | TAlignOf _ | TAlignOfE _ | TUnOp _ | TBinOp _ | TCast _
     | TAddrOf _ | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _
     | Tif _ | Tat _ | Tbase_addr _ | Tblock_length _ | Toffset _ | Tnull
     | TUpdate _ | Ttypeof _ | Ttype _
     | Tcomprehension _ | Tempty_set | Tunion _ | Tinter _ | Trange _
-    | Tlet _ | TLogic_coerce _
+    | Tlet _
     ),_ -> false
 
 and is_same_logic_info l1 l2 =
@@ -1508,9 +1509,14 @@ let rec hash_term (acc,depth,tot) t =
         hash_term (acc+152+Hashtbl.hash bop,depth-1,tot-2) t1
       in
       hash_term (hash1,depth-1,tot1) t2
-    | TCastE(ty,t) ->
+    | TCast (false, Ctype ty,t) ->
       let hash1 = Cil_datatype.TypByName.hash ty in
       hash_term (acc+171+hash1,depth-1,tot-2) t
+    | TCast (true, _,t) ->
+      hash_term (acc + 587, depth - 1, tot - 1) t
+    | TCast (false, _,_) -> assert false
+    (* TODO (NB) : Should check the magic values here to see if we can merge
+       them *)
     | TAddrOf lv -> hash_term_lval (acc+190,depth-1,tot-1) lv
     | TStartOf lv -> hash_term_lval (acc+209,depth-1,tot-1) lv
     | Tapp (li,labs,apps) -> hash_app (acc,depth,tot) li labs apps
@@ -1583,8 +1589,6 @@ let rec hash_term (acc,depth,tot) t =
       hash_term
         (acc + 570 + Hashtbl.hash li.l_var_info.lv_name, depth-1, tot-1)
         t
-    | TLogic_coerce(_,t) ->
-      hash_term (acc + 587, depth - 1, tot - 1) t
   end
 
 and hash_app (acc,depth,tot) li labs apps =
@@ -1740,11 +1744,14 @@ let rec compare_term t1 t2 =
     else res
   | TBinOp _, _ -> 1
   | _, TBinOp _ -> -1
-  | TCastE(typ1,t1), TCastE(typ2,t2) ->
-    let res = Cil_datatype.TypByName.compare typ1 typ2 in
+  | TCast (false, ty1,t1), TCast (false, ty2,t2)
+  | TCast (true, ty1,t1), TCast (true, ty2,t2) ->
+    let res = Cil_datatype.Logic_type_ByName.compare ty1 ty2 in
     if res = 0 then compare_term t1 t2 else res
-  | TCastE _, _ -> 1
-  | _, TCastE _ -> -1
+  | TCast (false,_,_), _ -> 1
+  | _, TCast (false,_,_) -> -1
+  | TCast(true,_,_), _ -> 1
+  | _, TCast(true,_,_) -> -1
   | TAddrOf l1, TAddrOf l2 -> compare_tlval l1 l2
   | TAddrOf _, _ -> 1
   | _, TAddrOf _ -> -1
@@ -1833,11 +1840,6 @@ let rec compare_term t1 t2 =
   | Tlet(d1,b1), Tlet(d2,b2) ->
     let res = compare_logic_info d1 d2 in
     if res = 0 then compare_term b1 b2 else res
-  | Tlet _, _ -> 1
-  | _, Tlet _ -> -1
-  | TLogic_coerce(ty1,t1), TLogic_coerce(ty2,t2) ->
-    let res = Cil_datatype.Logic_type_ByName.compare ty1 ty2 in
-    if res = 0 then compare_term t1 t2 else res
 
 and compare_logic_info l1 l2 =
   let res = compare_logic_signature l1 l2 in
@@ -2446,30 +2448,28 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Integer.t option =
       with Cil.SizeOfError _ -> None
     end
   | TAlignOfE _ -> None (* exp case is very complex, and possibly incorrect *)
-  | TCastE (typ, e) -> constFoldCastToInt ~machdep typ e
+  | TCast (false, Ctype typ, e) -> constFoldCastToInt ~machdep typ e
+  | TCast (true, Linteger, e) -> constFoldTermToInt ~machdep e
   | Toffset (_, t) -> if machdep then constFoldToffset t else None
   | Tif (c, e1, e2) -> begin
-      match constFoldTermToInt ~machdep c with
-      | None -> None
-      | Some i ->
-        constFoldTermToInt ~machdep (if Integer.is_zero i then e2 else e1)
+      Option.bind (constFoldTermToInt ~machdep c)
+        (fun i -> constFoldTermToInt ~machdep (if Integer.is_zero i then e2 else e1))
     end
-  | TLogic_coerce (lt, e) ->
-    if lt = Linteger then constFoldTermToInt ~machdep e else None
   | Tnull -> Some Integer.zero
   | Tapp (li, _, [{term_node = (Tunion args |
-                                TLogic_coerce (_, {term_node = Tunion args}))}])
+                                TCast (true, _, {term_node = Tunion args}))}])
     when is_max_function li ->
     constFoldMinMax ~machdep Integer.max args
   | Tapp (li, _, [{term_node = (Tunion args |
-                                TLogic_coerce (_, {term_node = Tunion args}))}])
+                                TCast (true, _, {term_node = Tunion args}))}])
     when is_min_function li ->
     constFoldMinMax ~machdep Integer.min args
 
   | TLval _ | TAddrOf _ | TStartOf _ | Tapp _ | Tlambda _ | TDataCons _
   | Tat _ | Tbase_addr _ | Tblock_length _
   | TUpdate _ | Ttypeof _ | Ttype _ | Tempty_set | Tunion _ | Tinter _
-  | Tcomprehension _ | Trange _ | Tlet _ ->
+  | Tcomprehension _ | Trange _ | Tlet _
+  | TCast _ ->
     None
 
 and constFoldCastToInt ~machdep typ e =

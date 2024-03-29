@@ -35,7 +35,7 @@ let clear_caches () =
   Cvalue.Model.clear_caches ();
   Locations.Location_Bytes.clear_caches ();
   Locations.Zone.clear_caches ();
-  Function_Froms.Memory.clear_caches ()
+  Assigns.Memory.clear_caches ()
 
 let () = State.add_hook_on_update Self.state clear_caches
 
@@ -101,7 +101,7 @@ let pre_analysis () =
   (* We may be resuming Value from a previously crashed analysis. Clear
      degeneration states *)
   Eva_utils.DegenerationPoints.clear ();
-  Cvalue.V.clear_garbled_mix ();
+  Origin.clear ();
   Eva_utils.clear_call_stack ()
 
 let post_analysis_cleanup ~aborted =
@@ -114,7 +114,7 @@ let post_analysis () =
   (* Garbled mix must be dumped here -- at least before the call to
      mark_green_and_red -- because fresh ones are created when re-evaluating
      all the alarms, and we get an unpleasant "ghost effect". *)
-  Eva_utils.dump_garbled_mix ();
+  Self.warning ~wkey:Self.wkey_garbled_mix_summary "%t" Origin.pretty_history;
   (* Mark unreachable and RTE statuses. Only do this there, not when the
      analysis was aborted (hence, not in post_cleanup), because the
      propagation is incomplete. Also do not mark unreachable statutes if
@@ -220,7 +220,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       end;
       apply_call_results_hooks call init_state (`Reuse i);
       (* call can be cached since it was cached once *)
-      Transfer.{states; cacheable = Cacheable; builtin=false}
+      Transfer.{ states; cacheable = Cacheable; }
 
   (* ----- Body or specification analysis ----------------------------------- *)
 
@@ -252,11 +252,15 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
      specification or body according to [target]. If [-eva-show-progress] is
      true, the callstack and additional information are printed. *)
   let compute_using_spec_or_body target kinstr call state =
-    if kinstr <> Kglobal && Parameters.ValShowProgress.get () then
-      Self.feedback
-        "@[computing for function %a.@\nCalled from %a.@]"
-        Callstack.pretty_short call.callstack
-        Cil_datatype.Location.pretty (Cil_datatype.Kinstr.loc kinstr);
+    begin
+      match kinstr with
+      | Kstmt stmt when Parameters.ValShowProgress.get () ->
+        Self.feedback
+          "@[computing for function %a.@\nCalled from %a.@]"
+          Callstack.pretty_short call.callstack
+          Cil_datatype.Location.pretty (Cil_datatype.Stmt.loc stmt)
+      | _ -> ()
+    end;
     let compute, kind =
       match target with
       | `Body (fundec, save_results) ->
@@ -269,7 +273,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     if Parameters.ValShowProgress.get () then
       Self.feedback
         "Done for function %a" Kernel_function.pretty call.kf;
-    Transfer.{ states = resulting_states; cacheable; builtin=false }
+    Transfer.{ states = resulting_states; cacheable; }
 
   (* ----- Use of cvalue builtins ------------------------------------------- *)
 
@@ -299,19 +303,14 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       Self.feedback ~current:true "Call to builtin %s%s"
         name (if kf_name = name then "" else " for function " ^ kf_name);
     apply_call_hooks call state `Builtin;
-    (* Do not track garbled mixes created when interpreting the specification,
-       as the result of the cvalue builtin will overwrite them. *)
-    Locations.Location_Bytes.do_track_garbled_mix false;
     let states =
       Spec.compute_using_specification ~warn:false kinstr call spec state
     in
-    Locations.Location_Bytes.do_track_garbled_mix true;
     let final_state = join_states states in
     match final_state with
     | `Bottom ->
       apply_call_results_hooks call state (`Builtin ([], None));
-      let cacheable = Eval.Cacheable in
-      Transfer.{states; cacheable; builtin=true}
+      Transfer.{ states; cacheable = Eval.Cacheable; }
     | `Value final_state ->
       let cvalue_call = get_cvalue_call call in
       let post = get_cvalue_or_top final_state in
@@ -324,7 +323,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         Abstract.Dom.set Cvalue_domain.State.key cvalue_state final_state
       in
       let states = List.map insert cvalue_states in
-      Transfer.{states; cacheable; builtin=true}
+      Transfer.{ states; cacheable; }
 
   (* Uses cvalue builtin only if the cvalue domain is available. Otherwise, only
      use the called function specification. *)

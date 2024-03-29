@@ -22,8 +22,7 @@
 [eva:alarm] alloc.c:51: Warning: 
   signed overflow. assert -((int)q) ≤ 2147483647;
 [eva:garbled-mix:write] alloc.c:51: 
-  Assigning imprecise value to r.
-  The imprecision originates from Arithmetic {alloc.c:51}
+  Assigning imprecise value to r because of arithmetic operation on addresses.
 [eva:alarm] alloc.c:54: Warning: out of bounds write. assert \valid(r);
 [eva:alarm] alloc.c:54: Warning: 
   pointer downcast. assert (unsigned int)r ≤ 2147483647;
@@ -31,11 +30,16 @@
 [eva:alarm] alloc.c:56: Warning: signed overflow. assert *q + 1 ≤ 2147483647;
 [eva] Recording results for main_abs
 [eva] Done for function main_abs
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    alloc.c:51: arithmetic operation on addresses
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{__malloc_main_abs_l50}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main_abs:
   NULL[rbits 2048 to 4103] ∈
       {{ garbled mix of &{__malloc_main_abs_l50}
-       (origin: Misaligned {alloc.c:54}) }}
+       (origin: Misaligned write {alloc.c:54}) }}
   __fc_heap_status ∈ [--..--]
   q ∈ {{ &__malloc_main_abs_l50 }}
   r ∈ {{ NULL + [256..509] ; &__malloc_main_abs_l50 }}

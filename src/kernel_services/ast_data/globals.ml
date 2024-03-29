@@ -251,9 +251,11 @@ module Functions = struct
      | _ -> kf.fundec <- fundec);
     (*    Kernel.feedback "UPDATE Spec of function %a (%a)"
           Cil_datatype.Kf.pretty kf Printer.pp_funspec spec;*)
-    (match fundec with
-     | Definition(_,loc) | Declaration(_,_,_,loc) -> CurrentLoc.set loc);
-    Logic_utils.merge_funspec ~oldloc kf.spec spec
+    let loc =
+      match fundec with Definition (_,loc) | Declaration (_,_,_,loc) -> loc
+    in
+    Current_loc.with_loc loc
+      (Logic_utils.merge_funspec ~oldloc kf.spec) spec
 
   let replace_by_declaration s v l=
     (*    Kernel.feedback "replacing %a by decl" Cil_datatype.Varinfo.pretty v;*)

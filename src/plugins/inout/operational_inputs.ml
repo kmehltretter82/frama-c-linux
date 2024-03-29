@@ -486,19 +486,23 @@ let compute_externals_using_prototype ?stmt kf =
   let internals = compute_using_prototype ?stmt kf in
   externalize ~with_formals:false kf internals
 
+let ref_get_internal = ref (fun _kf : t -> assert false)
+
 let get_internal_aux ?stmt kf =
   match stmt with
-  | None -> !Db.Operational_inputs.get_internal kf
+  | None -> !ref_get_internal kf
   | Some stmt ->
     try CallwiseResults.find (kf, Kstmt stmt)
     with Not_found ->
       if Eva.Analysis.use_spec_instead_of_definition kf then
         compute_using_prototype ~stmt kf
-      else !Db.Operational_inputs.get_internal kf
+      else !ref_get_internal kf
+
+let ref_get_external = ref (fun _kf : t -> assert false)
 
 let get_external_aux ?stmt kf =
   match stmt with
-  | None -> !Db.Operational_inputs.get_external kf
+  | None -> !ref_get_external kf
   | Some stmt ->
     try
       let internals = CallwiseResults.find (kf, Kstmt stmt) in
@@ -508,34 +512,34 @@ let get_external_aux ?stmt kf =
         let r = compute_externals_using_prototype ~stmt kf in
         CallwiseResults.add (kf, Kstmt stmt) r;
         r
-      else !Db.Operational_inputs.get_external kf
+      else !ref_get_external kf
 
-let extract_inout_from_froms froms =
-  let open Function_Froms in
-  let {deps_return; deps_table } = froms in
-  let in_return = Deps.to_zone deps_return in
+let extract_inout_from_froms assigns =
+  let Eva.Assigns.{ return = deps_return; memory = deps_table } = assigns in
+  let in_return = Eva.Deps.to_zone deps_return in
   let in_, out_ =
     match deps_table with
-    | Memory.Top -> Zone.top, Zone.top
-    | Memory.Bottom -> Zone.bottom, Zone.bottom
-    | Memory.Map m ->
+    | Top -> Zone.top, Zone.top
+    | Bottom -> Zone.bottom, Zone.bottom
+    | Map m ->
       let aux_from out in_ (acc_in,acc_out as acc) =
-        let open DepsOrUnassigned in
         (* Skip zones fully unassigned, they are not really port of the
            dependencies, but just present in the offsetmap to avoid "holes" *)
-        match in_ with
+        match (in_ : Eva.Assigns.DepsOrUnassigned.t) with
         | DepsBottom | Unassigned -> acc
         | AssignedFrom in_ | MaybeAssignedFrom in_ ->
-          Zone.join acc_in (Deps.to_zone in_),
+          Zone.join acc_in (Eva.Deps.to_zone in_),
           Zone.join acc_out out
       in
-      Memory.fold aux_from m (Zone.bottom, Zone.bottom)
+      Eva.Assigns.Memory.fold aux_from m (Zone.bottom, Zone.bottom)
   in
   (Zone.join in_return in_), out_
 
 
 [@@@ warning "-60"]
 module Callwise = struct
+
+  module Record_Inout_Callbacks = Hook.Build (struct type t = Inout_type.t end)
 
   let merge_call_in_local_table call local_table v =
     let prev =
@@ -580,7 +584,7 @@ module Callwise = struct
     | [] -> Inout_parameters.fatal "callwise: internal stack is empty"
 
   let end_record callstack kf inout =
-    Db.Operational_inputs.Record_Inout_Callbacks.apply inout;
+    Record_Inout_Callbacks.apply inout;
     let callsite = Eva.Callstack.top_callsite callstack in
     match callsite, !call_inout_stack with
     | Kstmt _, (_caller, table) :: _ ->
@@ -679,6 +683,15 @@ module Callwise = struct
     Eva.Cvalue_callbacks.register_call_results_hook record_for_callwise_inout;
     Eva.Cvalue_callbacks.register_call_hook call_for_callwise_inout
 
+  let _register_call_hook =
+    Dynamic.register
+      ~comment:"Registers a function to be applied on the inputs/outputs \
+                computed for each function call."
+      ~plugin:Inout_parameters.name
+      "register_call_hook"
+      Datatype.(func (func Inout_type.ty unit) unit)
+      Record_Inout_Callbacks.extend_once
+
 end
 
 
@@ -765,7 +778,7 @@ module Externals =
       let size = 17
     end)
 let get_external = Externals.memo (raw_externals ~with_formals:false)
-let compute_external kf = ignore (get_external kf)
+let compute kf = ignore (get_external kf)
 
 
 
@@ -795,17 +808,22 @@ let pretty_operational_inputs_external_with_formals fmt kf =
     Kernel_function.pretty kf
     Inout_type.pretty_operational_inputs (get_external_with_formals kf)
 
+let pretty fmt x =
+  Format.fprintf fmt "@[<v>";
+  Format.fprintf fmt "@[<v 2>Operational inputs:@ @[<hov>%a@]@]@ "
+    Locations.Zone.pretty (x.Inout_type.over_inputs);
+  Format.fprintf fmt "@[<v 2>Operational inputs on termination:@ @[<hov>%a@]@]@ "
+    Locations.Zone.pretty (x.Inout_type.over_inputs_if_termination);
+  Format.fprintf fmt "@[<v 2>Sure outputs:@ @[<hov>%a@]@]"
+    Locations.Zone.pretty (x.Inout_type.under_outputs_if_termination);
+  Format.fprintf fmt "@]"
+
+let get_internal_precise = get_internal_aux
 
 
 let () =
-  Db.Operational_inputs.self_internal := Internals.self;
-  Db.Operational_inputs.self_external := Externals.self;
-  Db.Operational_inputs.get_internal := get_internal;
-  Db.Operational_inputs.get_external := get_external;
-  Db.Operational_inputs.get_internal_precise := get_internal_aux;
-  Db.Operational_inputs.compute := compute_external;
-  Db.Operational_inputs.display := pretty_operational_inputs_internal
-
+  ref_get_internal := get_internal;
+  ref_get_external := get_external
 
 (*
 Local Variables:

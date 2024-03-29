@@ -146,7 +146,7 @@ let analysis_status kf =
 
 (* Must be consistent with the choice made by [analysis_target] below. *)
 let use_spec_instead_of_definition ?(recursion_depth = -1) kf =
-  Ast_info.is_frama_c_builtin (Kernel_function.get_name kf) ||
+  Ast_info.start_with_frama_c_builtin (Kernel_function.get_name kf) ||
   Builtins.is_builtin_overridden kf ||
   recursion_depth >= Parameters.RecursiveUnroll.get () ||
   not (Kernel_function.is_definition kf) ||
@@ -154,8 +154,13 @@ let use_spec_instead_of_definition ?(recursion_depth = -1) kf =
 
 (* Returns the function specification of [kf], with generated assigns clauses
    if they are missing. *)
-let get_funspec kf =
-  Populate_spec.populate_funspec ~do_body:true kf [`Assigns];
+let get_funspec callsite kf =
+  let loc =
+    match callsite with
+    | Kglobal -> None
+    | Kstmt stmt -> Some (Cil_datatype.Stmt.loc stmt)
+  in
+  Populate_spec.populate_funspec ?loc ~do_body:true kf [`Assigns];
   Annotations.funspec kf
 
 let analysis_target ~recursion_depth callsite kf =
@@ -166,14 +171,14 @@ let analysis_target ~recursion_depth callsite kf =
     if recursion_depth >= Parameters.RecursiveUnroll.get ()
     then begin
       Recursion.check_spec callsite kf;
-      `Spec (get_funspec kf)
+      `Spec (get_funspec callsite kf)
     end
     else
       match kf.fundec with
-      | Declaration _ -> `Spec (get_funspec kf)
+      | Declaration _ -> `Spec (get_funspec callsite kf)
       | Definition (def, _) ->
         if Kernel_function.Set.mem kf (Parameters.UsePrototype.get ())
-        then `Spec (get_funspec kf)
+        then `Spec (get_funspec callsite kf)
         else `Body (def, save_results def)
 
 let define_analysis_target ?(recursion_depth = -1) callsite kf  =

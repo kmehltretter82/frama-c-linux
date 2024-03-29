@@ -41,7 +41,6 @@ module type S = sig
   type call_result = {
     states: (Partition.key * state) list;
     cacheable: Eval.cacheable;
-    builtin: bool;
   }
   val compute_call_ref:
     (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
@@ -56,7 +55,7 @@ module InOutCallback =
     end)
 
 let register_callback () =
-  Db.Operational_inputs.Record_Inout_Callbacks.extend_once InOutCallback.set
+  Eva_dynamic.Inout.register_call_hook InOutCallback.set
 
 let () = Cmdline.run_after_configuring_stage register_callback
 
@@ -85,7 +84,7 @@ let do_copy_at = function
 let is_determinate kf =
   let name = Kernel_function.get_name kf in
   (warn_indeterminate kf || Function_calls.use_spec_instead_of_definition kf)
-  && not (Ast_info.is_frama_c_builtin name)
+  && not (Ast_info.start_with_frama_c_builtin name)
 
 let subdivide_stmt = Eva_utils.get_subdivision
 
@@ -189,13 +188,8 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   (* Assignment by copying the value of a right lvalue. *)
   let assign_by_copy ~subdivnb state valuation lval lloc ltyp =
-    (* This code about garbled mix is specific to the Cvalue domain.
-       Unfortunately, the current API for abstract_domain does not permit
-       distinguishing between an evaluation or a copy. *)
-    Locations.Location_Bytes.do_track_garbled_mix false;
-    let r = copy_lvalue_and_check ~valuation ~subdivnb state lval in
-    Locations.Location_Bytes.do_track_garbled_mix true;
-    r >>=: fun (valuation, value) ->
+    copy_lvalue_and_check ~valuation ~subdivnb state lval
+    >>=: fun (valuation, value) ->
     Copy ({lval; lloc; ltyp}, value), valuation
 
   (* For an initialization, use for_writing:false for the evaluation of
@@ -300,7 +294,6 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   type call_result = {
     states: (Partition.key * state) list;
     cacheable: cacheable;
-    builtin: bool;
   }
 
   (* Forward reference to [Eval_funs.compute_call] *)
@@ -309,14 +302,13 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
      call_result) ref
     = ref (fun _ -> assert false)
 
-  (* Returns the result of a call, and a boolean that indicates whether a
-     builtin has been used to interpret the call. *)
+  (* Returns the result of a call. *)
   let process_call stmt call recursion valuation state =
     Eva_utils.push_call_stack call.kf stmt;
     let cleanup () =
       Eva_utils.pop_call_stack ();
       (* Changed by compute_call_ref, called from process_call *)
-      Cil.CurrentLoc.set (Cil_datatype.Stmt.loc stmt);
+      Current_loc.set (Cil_datatype.Stmt.loc stmt);
     in
     let process () =
       let domain_valuation = Eval.to_domain_valuation valuation in
@@ -328,7 +320,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
           Domain.Store.register_initial_state callstack call.kf state;
           !compute_call_ref stmt call recursion state
         | `Bottom ->
-          { states = []; cacheable = Cacheable; builtin=false }
+          { states = []; cacheable = Cacheable; }
       in
       cleanup ();
       res
@@ -465,12 +457,6 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     (* Process the call according to the domain decision. *)
     let call_result = process_call stmt call recursion valuation state in
     let leaving_vars = leaving_vars kf_callee in
-    (* Do not try to reduce concrete arguments if a builtin was used. *)
-    let gather_reduced_arguments =
-      if call_result.builtin
-      then fun _ _ _ -> `Value []
-      else gather_reduced_arguments
-    in
     (* Treat each result one by one. *)
     let process state =
       (* Gathers the possible reductions on the value of the concrete arguments
@@ -691,7 +677,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let file = Format.sprintf "%s_%d" name n in
     let ch = open_out file in
     let fmt = Format.formatter_of_out_channel ch in
-    let l = fst (Cil.CurrentLoc.get ()) in
+    let l = fst (Current_loc.get ()) in
     Self.feedback ~current:true "Dumping state in file '%s'%t"
       file Eva_utils.pp_callstack;
     Format.fprintf fmt "DUMPING STATE at file %a line %d@."
@@ -713,15 +699,15 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   (** Applies the show_each or dump_each directives. *)
   let apply_special_directives ~subdivnb kf arguments state =
     let name = Kernel_function.get_name kf in
-    if Ast_info.can_be_cea_function name
+    if Ast_info.start_with_frama_c name
     then
-      if Ast_info.is_cea_function name
+      if Ast_info.is_show_each_builtin name
       then (show_each ~subdivnb name arguments state; true)
-      else if Ast_info.is_cea_domain_function name
+      else if Ast_info.is_domain_show_each_builtin name
       then (domain_show_each ~subdivnb name arguments state; true)
-      else if Ast_info.is_cea_dump_file_function name
+      else if Ast_info.is_dump_file_builtin name
       then (dump_state_file ~subdivnb name arguments state; true)
-      else if Ast_info.is_cea_dump_function name
+      else if Ast_info.is_dump_each_builtin name
       then (dump_state name state; true)
       else false
     else false

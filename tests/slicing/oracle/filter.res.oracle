@@ -11,7 +11,7 @@
 [eva] Done for function bts806
 [eva] computing for function unspec <- main.
   Called from filter.i:43.
-[kernel:annot:missing-spec] filter.i:6: Warning: 
+[kernel:annot:missing-spec] filter.i:36: Warning: 
   Neither code nor specification for function f,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- unspec <- main.

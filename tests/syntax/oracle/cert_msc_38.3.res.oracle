@@ -6,7 +6,7 @@
   41    // error: can't suppress va_* macros
   42    #ifdef TEST_VASTART
   43    void *(*test1)() = &(va_start);
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                             ^^^^^^^^
   44    #endif
   45
 [kernel] Frama-C aborted: invalid user input.

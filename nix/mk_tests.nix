@@ -26,6 +26,7 @@
 
 { lib
 , alt-ergo
+, cvc4
 , clang
 , frama-c
 , perl
@@ -60,7 +61,7 @@ stdenvNoCC.mkDerivation {
     yq
     which
   ] ++
-  (if has-wp-proofs then [ alt-ergo ] else []);
+  (if has-wp-proofs then [ alt-ergo cvc4 ] else []);
 
   postPatch = ''
     patchShebangs .
@@ -102,8 +103,12 @@ stdenvNoCC.mkDerivation {
     ''
     else "" ;
 
+  # The export NIX_GCC_DONT_MANGLE_PREFIX_MAP is meant to disable the
+  # transformation of the path of Frama-C into uppercase when using the
+  # __FILE__ macro.
   buildPhase = ''
     runHook preBuild
+    export NIX_GCC_DONT_MANGLE_PREFIX_MAP=
   '' +
   tests-command + ''
     runHook postBuild

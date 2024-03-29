@@ -1,5 +1,5 @@
 /* run.config
-COMMENT: eva plugin is required for the slevel annotation
+COMMENT: eva plugin is required for the \eva::slevel annotation
 PLUGIN: eva
   STDOPT:
 */
@@ -15,7 +15,7 @@ assert behavior = 0;
     ensures behavior >= 0;
 */
 int main () {
-  //@ slevel 4;
+  //@ \eva::slevel 4;
   behavior++;
   struct custom { int reads, behaviors, label ; } writes;
   //@ assert custom: writes.reads + writes.behaviors <= \let global = writes.label; global;
@@ -50,4 +50,4 @@ int requires(volatile int*a, int v) { *a = v; return v; }
 
 int slevel = 1000000;
 
-//@ lemma bar: slevel >= 0;
+//@ lemma bar: \eva::slevel >= 0;

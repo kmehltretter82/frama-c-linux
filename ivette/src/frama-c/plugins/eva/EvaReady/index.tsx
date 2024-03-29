@@ -49,7 +49,11 @@ class AckAbortedState extends GlobalState<boolean> {
 
 const ackAbortedState = new AckAbortedState(false);
 
-const EvaReady: React.FC = ({ children }) => {
+interface EvaReadyProps {
+  children: React.ReactNode;
+}
+
+function EvaReady(props: EvaReadyProps): JSX.Element {
   const state = States.useSyncValue(Eva.computationState);
   const [ackAborted, setAckAborted] = useGlobalState(ackAbortedState);
 
@@ -78,11 +82,11 @@ const EvaReady: React.FC = ({ children }) => {
       );
 
     case 'computed':
-      return <>{children}</>;
+      return <>{props.children}</>;
 
     case 'aborted':
       if (ackAborted) {
-        return <>{children}</>;
+        return <>{props.children}</>;
       }
       else {
         return (
@@ -101,6 +105,6 @@ const EvaReady: React.FC = ({ children }) => {
         );
       }
   }
-};
+}
 
 export default EvaReady;

@@ -38,7 +38,9 @@ let two_power n =
   else
     two_power_of_int k
 
-let power_int_positive_int = Big_int_Z.power_int_positive_int
+let power_int_positive_int_opt n e =
+  try Some (Big_int_Z.power_int_positive_int n e)
+  with Invalid_argument _ -> None
 
 let popcount = Z.popcount
 

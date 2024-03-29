@@ -1,0 +1,34 @@
+[kernel] Parsing reduce_by_valid.c (with preprocessing)
+[kernel:typing:incompatible-pointer-types] reduce_by_valid.c:5: Warning: 
+  casting function to int *
+[kernel:typing:incompatible-pointer-types] reduce_by_valid.c:5: Warning: 
+  casting function to int *
+[alias] analysing function: f
+[alias] analysing instruction: int *q = (int *)(& f);
+[alias:unsafe-cast] reduce_by_valid.c:5: Warning: 
+  unsafe cast from void (*)(void) to int *; analysis may be unsound
+[alias] May-aliases after instruction  int *q = (int *)(& f);  are  <none>
+[alias] May-alias graph after instruction  int *q = (int *)(& f);  is
+  0:{ q } → 1:{ f }
+[alias] analysing instruction: int *p = (int *)(& f);
+[alias:unsafe-cast] reduce_by_valid.c:5: Warning: 
+  unsafe cast from void (*)(void) to int *; analysis may be unsound
+[alias] May-aliases after instruction  int *p = (int *)(& f);  are  { q; p }
+[alias] May-alias graph after instruction  int *p = (int *)(& f);  is
+  0:{ q } → 5:{ f }   4:{ p } → 5:{ f }
+[alias] analysing instruction: p = (int *)(& q);
+[alias:unsafe-cast] reduce_by_valid.c:6: Warning: 
+  unsafe cast from int ** to int *; analysis may be unsound
+[alias:incoherent] Warning: 
+  loop on vertex 5 (following unsafe cast?); analysis may be unsound
+[alias:incoherent] Warning: 
+  cycle during readout of vertex 5, (following unsafe cast?); analysis may be unsound
+[alias] May-aliases after instruction  p = (int *)(& q);  are  { *p; f; q; p }
+[alias] May-alias graph after instruction  p = (int *)(& q);  is
+  4:{ p } → 5:{ f; q }   5:{ f; q } → 5:{ f; q }
+[alias] May-aliases at the end of function f: { *p; f; q; p }
+[alias] May-alias graph at the end of function f:
+  4:{ p } → 5:{ f; q }   5:{ f; q } → 5:{ f; q }
+[alias] Summary of function f:
+  formals:     returns: <none>    state: { *p; f; q; p }
+[alias] Analysis complete

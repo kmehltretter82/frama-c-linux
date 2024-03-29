@@ -1,6 +1,6 @@
 /* run.config
    STDOPT: #"-eva-no-builtins-auto -eva-slevel 1000 -eva-no-skip-stdlib-specs"
-*/ // slevel is used to unroll loops
+*/ // \eva::slevel is used to unroll loops
 
 #include "string.c"
 volatile int v;

@@ -672,8 +672,7 @@ struct
     | TUnOp(unop,t) -> term_unop unop (C.logic env t)
     | TBinOp(binop,a,b) -> term_binop env binop a b
 
-    | TCastE(ty,t) -> term_cast_to_ctype env ty t
-    | TLogic_coerce(typ,t) -> term_cast_to_ltype env typ t
+    | TCast (_, typ,t) -> term_cast_to_ltype env typ t
 
     | Tapp(f,ls,ts) ->
       let vs = List.map (val_of_term env) ts in
@@ -941,8 +940,7 @@ struct
       Warning.error "Complex let-binding not implemented yet (%a)"
         Printer.pp_term t
 
-    | TCastE (_,t)
-    | TLogic_coerce(_,t) -> C.region env t
+    | TCast (_,_,t) -> C.region env t
 
     | TBinOp _ | TUnOp _ | Trange _ | TUpdate _ | Tapp _ | Tif _
     | TConst _ | Tnull | TDataCons _ | Tlambda _
@@ -1000,13 +998,13 @@ struct
     p
 
   let pred polarity env p =
-    Context.with_current_loc p.pred_loc (pred_trigger polarity env) p
+    Current_loc.with_loc p.pred_loc (pred_trigger polarity env) p
 
   let logic env t =
-    Context.with_current_loc t.term_loc (term_trigger env) t
+    Current_loc.with_loc t.term_loc (term_trigger env) t
 
   let region env t =
-    Context.with_current_loc t.term_loc (assignable env) t
+    Current_loc.with_loc t.term_loc (assignable env) t
 
   let () = C.bootstrap_pred pred
   let () = C.bootstrap_term term

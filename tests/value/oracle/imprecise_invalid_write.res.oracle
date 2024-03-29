@@ -1,9 +1,9 @@
 [kernel] Parsing imprecise_invalid_write.i (no preprocessing)
-[kernel:CERT:MSC:37] imprecise_invalid_write.i:5: Warning: 
+[kernel:CERT:MSC:37] imprecise_invalid_write.i:6: Warning: 
   Body of function main1 falls-through. Adding a return statement
-[kernel:CERT:MSC:37] imprecise_invalid_write.i:10: Warning: 
+[kernel:CERT:MSC:37] imprecise_invalid_write.i:11: Warning: 
   Body of function main2 falls-through. Adding a return statement
-[kernel:CERT:MSC:37] imprecise_invalid_write.i:17: Warning: 
+[kernel:CERT:MSC:37] imprecise_invalid_write.i:18: Warning: 
   Body of function main3 falls-through. Adding a return statement
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -24,8 +24,7 @@
 [eva:alarm] imprecise_invalid_write.i:9: Warning: 
   pointer downcast. assert (unsigned int)(&main1) ≤ 2147483647;
 [eva:garbled-mix:write] imprecise_invalid_write.i:9: 
-  Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {imprecise_invalid_write.i:9}
+  Assigning imprecise value to p because of arithmetic operation on addresses.
 [eva:alarm] imprecise_invalid_write.i:10: Warning: 
   out of bounds write. assert \valid((int *)p);
 [kernel] imprecise_invalid_write.i:10: Warning: 
@@ -37,8 +36,7 @@
 [eva:alarm] imprecise_invalid_write.i:16: Warning: 
   pointer downcast. assert (unsigned int)s ≤ 2147483647;
 [eva:garbled-mix:write] imprecise_invalid_write.i:16: 
-  Assigning imprecise value to p.
-  The imprecision originates from Arithmetic {imprecise_invalid_write.i:16}
+  Assigning imprecise value to p because of arithmetic operation on addresses.
 [eva:alarm] imprecise_invalid_write.i:17: Warning: 
   out of bounds write. assert \valid(p);
 [kernel] imprecise_invalid_write.i:17: Warning: 
@@ -47,6 +45,14 @@
 [eva] Done for function main3
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    imprecise_invalid_write.i:9: arithmetic operation on addresses
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{main1}
+    imprecise_invalid_write.i:16: arithmetic operation on addresses
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{"abc"}
 [eva] imprecise_invalid_write.i:5: 
   assertion 'Eva,mem_access' got final status invalid.
 [eva] imprecise_invalid_write.i:10: 

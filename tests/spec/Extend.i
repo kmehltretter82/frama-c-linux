@@ -1,11 +1,11 @@
 /* run.config
-MODULE: @PTEST_NAME@
-OPT: -no-autoload-plugins -copy -kernel-warn-key=annot-error=active
+  MODULE: @PTEST_NAME@
+  OPT: -copy -kernel-warn-key=annot-error=active
 */
 
-/*@ foo x == 0;
-    bar \result == 0;
-    bla \trace(x<10) || \trace(x>40);
+/*@ \test::foo x == 0;
+    \test::bar \result == 0;
+    \test::bla \trace(x<10) || \trace(x>40);
  */
 int f(int x);
 
@@ -19,36 +19,42 @@ int g(int y);
 
 int f(int x) {
   int s = 0;
-  /*@ loop lfoo i<=x;
-      loop baz \at(i,LoopEntry), 0;
+  /*@ loop \test::lfoo i<=x;
+      loop \test::baz \at(i,LoopEntry), 0;
    */
   for (int i = 0; i < x; i++) s+=g(i);
-  /*@ ca_foo s == 0; */
+  /*@ \test::ca_foo s == 0; */
   return s;
 }
 
 /*@ behavior ko:
-  baz \true;
+    \test::baz \true;
+    baz \true;
 */
 int h(int z);
+
+/*@ behavior ko:
+    baz \true;
+*/
+int h2(int z);
 
 int k(int z) {
   int x = z;
   int y = 0;
-  /*@ ns_foo \at(x, Post) == z + 1; */
+  /*@ \test::ns_foo \at(x, Post) == z + 1; */
   y = x++;
   return y;
 }
 
-/*@ global_foo \forall integer x; x < x + 1
+/*@ \test::global_foo \forall integer x; x < x + 1
 ; */
 
 //@ behavior ca_foo: ensures ca_foo: \true;
 void loop (void) {
-  //@ for ca_foo: ca_foo \true;
-  //@ ns_foo \true;
-  //@ baz \true;
-  //@ empty_extension;
+  //@ for ca_foo: \test::ca_foo \true;
+  //@ \test::ns_foo \true;
+  //@ \test::baz \true;
+  //@ \test::empty_extension;
   /*@ loop invariant \true; */
   while (0) { }
 }

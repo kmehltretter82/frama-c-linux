@@ -20,8 +20,6 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 /**
    Dome Application (Renderer Process)
 
@@ -30,28 +28,30 @@
 
    Example:
 
-   * ```ts
-   *   // File 'src/renderer/index.js':
-   *   import Application from './Application.js' ;
-   *   Dome.setContent( Application );
-   * ```
+   ```ts
+   // File 'src/renderer/index.js':
+   import Application from './Application.js' ;
+   Dome.setContent( Application );
+   ```
 
    @packageDocumentation
    @module dome
  */
 
-import * as Json from 'dome/data/json';
-import * as Settings from 'dome/data/settings';
-import SYS, * as System from 'dome/system';
-import Emitter from 'events';
 import _ from 'lodash';
 import React from 'react';
+import Emitter from 'events';
 import { createRoot } from 'react-dom/client';
-import './dark.css';
+import { ipcRenderer } from 'electron';
+
+import SYS, * as System from 'dome/system';
 import { State } from './data/states';
+import * as Json from 'dome/data/json';
+import * as Settings from 'dome/data/settings';
+
+import './dark.css';
 import './light.css';
 import './style.css';
-const { ipcRenderer } = require('electron/renderer');
 
 // --------------------------------------------------------------------------
 // --- Context
@@ -61,11 +61,12 @@ const { ipcRenderer } = require('electron/renderer');
 let windowFocus = true;
 
 function setContextAppNode(): HTMLElement | null {
-  const node = document.getElementById('app');
+  const node = document.getElementById('root');
   if (node) {
+    const os = System.platform;
+    const focus = windowFocus ? 'active' : 'inactive';
     node.className =
-      `dome-container dome-platform-${System.platform
-      }${windowFocus ? ' dome-window-active' : ' dome-window-inactive'}`;
+      `dome-container dome-platform-${os} dome-window-${focus}`;
   }
   return node;
 }
@@ -327,10 +328,12 @@ function setContainer(
   Component: React.FunctionComponent | React.ComponentClass,
 ): void {
   Settings.synchronize();
-  const appNode = setContextAppNode()!;
-  const contents = <Component />;
-  const root = createRoot(appNode);
-  root.render(contents);
+  const appNode = setContextAppNode();
+  if (appNode)
+    createRoot(appNode).render(<Component />);
+  else
+    // eslint-disable-next-line no-console
+    console.error('[Dome] root element #root not found.');
 }
 
 // --------------------------------------------------------------------------
@@ -341,10 +344,10 @@ function setContainer(
    Defines the user's main window content.
 
    Binds the component to the main window.  A `<Component/>` instance is
-   generated and rendered in the `#app` window element. Its class name is set to
-   `dome-platform-<platform>` with the `<platform>` set to the `Dome.platform`
-   value. This class name can be used as a CSS selector for platform-dependent
-   styling.
+   generated and rendered in the `#root` window element. Its class name is set
+   to `dome-platform-<platform>` with the `<platform>` set to the
+   `Dome.platform` value. This class name can be used as a CSS selector for
+   platform-dependent styling.
 
    @param Component - to be rendered in the main window
 */
@@ -361,7 +364,7 @@ export function setApplicationWindow(
 /**
    Defines the user's preferences window content.
 
-   A `<Component/>` instance is generated and rendered in the `#app` window
+   A `<Component/>` instance is generated and rendered in the `#root` window
    element. Its class name is set to `dome-platform-<platform>` with the
    `<platform>` set to the `Dome.platform` value. This class name can be used as
    a CSS selector for platform-dependent styling.
@@ -444,7 +447,7 @@ export function addMenuItem(props: MenuItemProps): void {
     console.error('[Dome] Missing menu-item identifier', props);
     return;
   }
-  const { onClick, kind='normal', ...others } = props;
+  const { onClick, kind = 'normal', ...others } = props;
   if (onClick) customItemCallbacks.set(props.id, onClick);
   ipcRenderer.send('dome.ipc.menu.addmenuitem', { ...others, type: kind });
 }
@@ -569,8 +572,7 @@ export function useForceUpdate(): () => void {
  */
 export function useFlipState(
   init: boolean
-): [boolean, (forced?: boolean) => void]
-{
+): [boolean, (forced?: boolean) => void] {
   const [value, setValue] = React.useState(init);
   const flipValue = React.useCallback(
     (forced?: boolean) => {
@@ -586,7 +588,7 @@ export function useFlipState(
    Hook to re-render on Dome events (Custom React Hook).
    @param events - event names, defaults to a single `'dome.update'`.
 */
-export function useUpdate(...events: Event<any>[]): void {
+export function useUpdate(...events: Event<unknown>[]): void {
   const fn = useForceUpdate();
   React.useEffect(() => {
     const theEvents = events ? events.slice() : [update];
@@ -764,8 +766,7 @@ export function useClock(period: number, initStart = false): Timer {
    The polling is synchronized with all clocks and timers
    using the same period.
  */
-export function useTimer(period: number, callback: () => void): void
-{
+export function useTimer(period: number, callback: () => void): void {
   React.useEffect(() => {
     const event = INC_CLOCK(period);
     System.emitter.on(event, callback);
@@ -776,51 +777,68 @@ export function useTimer(period: number, callback: () => void): void
   }, [period, callback]);
 }
 
-/** Protected callback against unmounted component.
+type Callback<A> = (arg: A) => void;
 
-   The returned callback will not fired only when the component is mounted.
-
-   Unless constant, first create the callback with `React.useCallback()`, then
-   give it to `useActive()`.
+/**
+   Protected callback against unmounted component.
+   The returned callback will be only fired when the component is mounted.
+   The provided callback need not be memoized.
  */
-export function useActive<A>(
-  callback: (arg: A) => void,
-): (arg:A) => void
-{
-  const active = React.useRef(false);
+export function useProtected<A>(fn: Callback<A> | undefined): Callback<A> {
+  const cb = React.useRef<Callback<A>>();
   React.useEffect(() => {
-    active.current = true;
-    return () => { active.current = false; };
+    cb.current = fn;
+    return () => { cb.current = undefined; };
+  }, [fn]);
+  const trigger = React.useCallback((arg: A) => {
+    const fn = cb.current;
+    if (fn) fn(arg);
   }, []);
-  return React.useCallback((arg: A) => {
-    if (active.current) callback(arg);
-  }, [callback]);
+  return trigger;
 }
 
-/** Debounced callback (period in milliseconds).
-
-   The debounceded callback will not be fired when the component is unmounted.
-
-   Unless constant, first create the callback with `React.useCallback()`, then
-   give it to `useDebounced()`.
+/**
+   Debounced callback (waiting time in milliseconds).
+   The returned callback will be only fired when the component is mounted.
+   The provided callback need not be memoized.
  */
-export function useDebounced<A=void>(
-  callback: (arg: A) => void,
-  period: number,
-): (arg:A) => void
-{
-  const active = React.useRef(false);
+export function useDebounced<A = void>(
+  fn: Callback<A> | undefined,
+  delay: number
+): Callback<A> {
+  const cb = React.useRef<Callback<A>>();
   React.useEffect(() => {
-    active.current = true;
-    return () => { active.current = false; };
-  }, []);
-  return React.useMemo(() =>
-    _.debounce(
-      (arg: A) => {
-        if (active.current) callback(arg);
-      }, period
-    ), [callback, period]
-  );
+    cb.current = fn;
+    return () => { cb.current = undefined; };
+  }, [fn]);
+  const trigger = React.useMemo(
+    () => _.debounce((arg: A) => {
+      const fn = cb.current;
+      if (fn) fn(arg);
+    }, delay), [delay]);
+  return trigger;
+}
+
+/**
+   Throttled callback (waiting time in milliseconds).
+   The returned callback will be only fired when the component is mounted.
+   The provided callback need not be memoized.
+ */
+export function useThrottled<A = void>(
+  fn: Callback<A> | undefined,
+  period: number
+): Callback<A> {
+  const cb = React.useRef<Callback<A>>();
+  React.useEffect(() => {
+    cb.current = fn;
+    return () => { cb.current = undefined; };
+  }, [fn]);
+  const trigger = React.useMemo(
+    () => _.throttle((arg: A) => {
+      const fn = cb.current;
+      if (fn) fn(arg);
+    }, period), [period]);
+  return trigger;
 }
 
 // --------------------------------------------------------------------------
@@ -848,8 +866,7 @@ export class Sampler {
   }
 
   /** Resets the sampler. Forgets all previous measures. */
-  reset(): void
-  {
+  reset(): void {
     this.index = 0;
     this.values = 0;
     this.current = 0;

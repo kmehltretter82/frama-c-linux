@@ -82,14 +82,10 @@ end
 class nopCabsVisitor : cabsVisitor = object
   method vexpr (_e:expression) = DoChildren
   method vinitexpr (_e:init_expression) = DoChildren
-  method vstmt (s: statement) =
-    CurrentLoc.set (get_statementloc s);
-    DoChildren
+  method vstmt (_s: statement) = DoChildren
   method vblock (_b: block) = DoChildren
   method vvar (s: string) = s
-  method vdef (d: definition) =
-    CurrentLoc.set (get_definitionloc d);
-    DoChildren
+  method vdef (_d: definition) = DoChildren
   method vtypespec (_ts: typeSpecifier) = DoChildren
   method vdecltype (_dt: decl_type) = DoChildren
   method vname _k (_s:specifier) (_n: name) = DoChildren
@@ -125,7 +121,7 @@ and childrenTypeSpecifier vis ts =
       in
       let nel' = mapNoCopy doOneField nel in
       if s' != s || nel' != nel then FIELD (s', nel') else input
-    | TYPE_ANNOT _ | STATIC_ASSERT_FG _ -> input
+    | STATIC_ASSERT_FG _ -> input
   in
   match ts with
     Tstruct (n, Some fg, extraAttrs) ->
@@ -155,7 +151,7 @@ and childrenTypeSpecifier vis ts =
 
 and childrenSpecElem (vis: cabsVisitor) (se: spec_elem) : spec_elem =
   match se with
-    SpecTypedef | SpecInline | SpecStorage _ | SpecPattern _ -> se
+    SpecTypedef | SpecInline | SpecStorage _ -> se
   | SpecCV _ -> se    (* cop out *)
   | SpecAttr a -> begin
       let al' = visitCabsAttribute vis a in
@@ -233,7 +229,8 @@ and childrenSingleName vis (k: nameKind) (sn: single_name) : single_name =
   if s' != s || n' != n then (s', n') else sn
 
 and visitCabsDefinition vis (d: definition) : definition list =
-  doVisitList vis vis#vdef childrenDefinition d
+  Current_loc.with_loc (get_definitionloc d)
+    (doVisitList vis vis#vdef childrenDefinition) d
 and childrenDefinition vis d =
   match d with
     FUNDEF (spec,sn, b, l, lend) ->
@@ -278,7 +275,8 @@ and childrenBlock vis (b: block) : block =
   else
     b
 and visitCabsStatement vis (s: statement) :  statement list =
-  doVisitList vis vis#vstmt childrenStatement s
+  Current_loc.with_loc (get_statementloc s)
+    (doVisitList vis vis#vstmt childrenStatement) s
 and childrenStatement vis s =
   let ve e = visitCabsExpression vis e in
   let vs l s = match visitCabsStatement vis s with
@@ -383,16 +381,6 @@ and childrenStatement vis s =
     in
     if details' != details then
       {s with stmt_node = ASM (sl, b, details', l)} else s
-  | TRY_FINALLY (b1, b2, l) ->
-    let b1' = visitCabsBlock vis b1 in
-    let b2' = visitCabsBlock vis b2 in
-    if b1' != b1 || b2' != b2 then {s with stmt_node = TRY_FINALLY(b1', b2', l)} else s
-  | TRY_EXCEPT (b1, e, b2, l) ->
-    let b1' = visitCabsBlock vis b1 in
-    let e' = visitCabsExpression vis e in
-    let b2' = visitCabsBlock vis b2 in
-    if b1' != b1 || e' != e || b2' != b2 then
-      {s with stmt_node = TRY_EXCEPT(b1', e', b2', l)} else s
   | THROW (e,l) ->
     let e' = optMapNoCopy (visitCabsExpression vis) e in
     if e != e' then { s with stmt_node = THROW(e',l) } else s
@@ -482,7 +470,6 @@ and childrenExpression vis e =
   | GNU_BODY b ->
     let b' = visitCabsBlock vis b in
     if b' != b then { e with expr_node = GNU_BODY b' } else e
-  | EXPR_PATTERN _ -> e
   | GENERIC (e, generic_assocs) ->
     let e' = ve e in
     let exps = List.map snd generic_assocs in

@@ -52,7 +52,7 @@
    .t[0] ∈ {{ &y }}
    .t[1] ∈ {0}
   S_gpp[0..1] ∈ [--..--]
-[kernel:annot:missing-spec] origin.i:7: Warning: 
+[kernel:annot:missing-spec] origin.i:124: Warning: 
   Neither code nor specification for function f,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function f <- origin.
@@ -60,11 +60,9 @@
 [eva] using specification for function f
 [eva] Done for function f
 [eva:garbled-mix:write] origin.i:126: 
-  Assigning imprecise value to r.p.
-  The imprecision originates from Misaligned {origin.i:126}
+  Assigning imprecise value to r.p because of misaligned read of addresses.
 [eva:garbled-mix:write] origin.i:129: 
-  Assigning imprecise value to r.t[0].
-  The imprecision originates from Merge {origin.i:129}
+  Assigning imprecise value to r.t[0] because of imprecise merge of addresses.
 [eva:alarm] origin.i:130: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:alarm] origin.i:130: Warning: 
@@ -72,19 +70,21 @@
 [eva:alarm] origin.i:130: Warning: 
   signed overflow. assert -((int)(&x)) ≤ 2147483647;
 [eva:garbled-mix:write] origin.i:130: 
-  Assigning imprecise value to r.t[1].
-  The imprecision originates from Arithmetic {origin.i:130}
-[eva:garbled-mix:write] origin.i:131: 
-  Assigning imprecise value to \result<origin>.
-  The imprecision originates from Misaligned {origin.i:126}
+  Assigning imprecise value to r.t[1]
+  because of arithmetic operation on addresses.
 [eva] Recording results for origin
 [eva] Done for function origin
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    origin.i:126: misaligned read of addresses
+      (read in 1 statement, propagated through 2 statements)
+      garbled mix of &{x; y}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function origin:
   r.c ∈ [--..--]
    .[bits 8 to 15] ∈ UNINITIALIZED
    .i ∈ [--..--]
-   .p ∈ {{ garbled mix of &{x} (origin: Misaligned {origin.i:126}) }}
+   .p ∈ {{ garbled mix of &{x} (origin: Misaligned read {origin.i:126}) }}
    .t[0][bits 0 to 7] ∈
    {{ garbled mix of &{y} (origin: Merge {origin.i:129}) }}
    .t[0][bits 8 to 15]# ∈ {{ NULL ; (? *)&y }}%32, bits 24 to 31 

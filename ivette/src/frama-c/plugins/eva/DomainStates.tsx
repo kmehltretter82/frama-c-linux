@@ -118,9 +118,7 @@ function EvaStatesComponent(): JSX.Element {
 }
 
 Ivette.registerComponent({
-  id: 'frama-c.plugins.domain_states',
-  group: 'frama-c.plugins',
-  rank: 10,
+  id: 'fc.eva.states',
   label: 'Eva States',
   title: 'States of the Eva analysis',
   children: <EvaStatesComponent />,

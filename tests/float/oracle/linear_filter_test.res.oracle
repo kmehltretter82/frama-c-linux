@@ -1,0 +1,7 @@
+[kernel] Parsing linear_filter_test.i (no preprocessing)
+[kernel] Circle :
+  * 0 : [-31.3829787 .. 31.3829787]
+  * 1 : [-31.3829787 .. 31.3829787]
+[kernel] Simple :
+  * 0 : [5.7267253E-1 .. 2.4273275]
+  * 1 : [1.5726725 .. 3.4273275]

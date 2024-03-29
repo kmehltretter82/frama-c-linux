@@ -145,10 +145,10 @@
 [eva] computing for function garbled_mix <- main12 <- main.
   Called from reduce_by_valid.i:272.
 [eva] using specification for function garbled_mix
+[eva:garbled-mix:assigns] reduce_by_valid.i:272: 
+  The specification of function garbled_mix
+  has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function garbled_mix
-[eva:garbled-mix:write] reduce_by_valid.i:272: 
-  Assigning imprecise value to p.
-  The imprecision originates from Library function {reduce_by_valid.i:272}
 [eva] reduce_by_valid.i:273: 
   Frama_C_show_each_gm:
   {{ garbled mix of &{x; a}
@@ -170,15 +170,20 @@
   out of bounds write. assert \valid(r);
 [eva] computing for function garbled_mix <- main12 <- main.
   Called from reduce_by_valid.i:290.
+[eva:garbled-mix:assigns] reduce_by_valid.i:290: 
+  The specification of function garbled_mix
+  has generated a garbled mix of addresses for assigns clause \result.
 [eva] Done for function garbled_mix
-[eva:garbled-mix:write] reduce_by_valid.i:290: 
-  Assigning imprecise value to r.
-  The imprecision originates from Library function {reduce_by_valid.i:290}
 [eva:alarm] reduce_by_valid.i:291: Warning: assertion got status unknown.
 [eva] Recording results for main12
 [eva] Done for function main12
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    reduce_by_valid.i:272: assigns clause on addresses
+      (read in 2 statements, propagated through 1 statement)
+      garbled mix of &{x; a}
 [scope:rm_asserts] removing 12 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
@@ -225,7 +230,7 @@
 [eva:final-states] Values at end of function main5:
   q ∈ {{ &y }}
   p ∈ {0}
-  r ∈ {{ &y }} or UNINITIALIZED
+  r ∈ {{ &y }}
 [eva:final-states] Values at end of function main6:
   S_f1_0_S_vs[0] ∈ {1}
              [1] ∈ [--..--]

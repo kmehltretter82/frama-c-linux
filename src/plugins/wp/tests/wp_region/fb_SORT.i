@@ -16,10 +16,10 @@ typedef struct Block {
 } FB ;
 
 /*@
-  region Shared: *(fb->inp1 .. fb->inp3);
-  region IN:      (fb->inp1 .. fb->inp3);
-  region OUT:     (fb->out1 .. fb->out3);
-  region IDX:     (fb->idx1 .. fb->idx3);
+  \wp::region Shared: *(fb->inp1 .. fb->inp3);
+  \wp::region IN:      (fb->inp1 .. fb->inp3);
+  \wp::region OUT:     (fb->out1 .. fb->out3);
+  \wp::region IDX:     (fb->idx1 .. fb->idx3);
  */
 void job(FB *fb)
 {

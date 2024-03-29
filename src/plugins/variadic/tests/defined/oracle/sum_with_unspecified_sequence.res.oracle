@@ -5,9 +5,6 @@
   out of bounds read. assert \valid_read(list);
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   out of bounds read. assert \valid_read((int *)*list);
-[eva:garbled-mix:write] sum_with_unspecified_sequence.c:14: 
-  Assigning imprecise value to tmp_unroll_5.
-  The imprecision originates from Well
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   signed overflow.
   assert -2147483648 ≤ ret + tmp_unroll_5;
@@ -16,25 +13,20 @@
   signed overflow.
   assert ret + tmp_unroll_5 ≤ 2147483647;
   (tmp_unroll_5 from vararg)
-[eva:garbled-mix:write] sum_with_unspecified_sequence.c:14: 
-  Assigning imprecise value to ret.
-  The imprecision originates from Well
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   out of bounds read. assert \valid_read(list);
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   out of bounds read. assert \valid_read((int *)*list);
-[eva:garbled-mix:write] sum_with_unspecified_sequence.c:14: 
-  Assigning imprecise value to tmp.
-  The imprecision originates from Well
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   signed overflow. assert -2147483648 ≤ ret + tmp;
                    (tmp from vararg)
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   signed overflow. assert ret + tmp ≤ 2147483647;
                    (tmp from vararg)
-[eva:garbled-mix:write] sum_with_unspecified_sequence.c:17: 
-  Assigning imprecise value to \result<sum>.
-  The imprecision originates from Well
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    Initial state (read in 3 statements, propagated through 3 statements)
+      garbled mix of &{S_0_S___va_params; S_1_S___va_params}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function sum:
   ret ∈

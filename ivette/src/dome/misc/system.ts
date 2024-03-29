@@ -30,10 +30,11 @@
 // --- Evolved Spawn Process
 // --------------------------------------------------------------------------
 import _ from 'lodash';
-const Emitter = require('events');
-const Exec = require('child_process');
-const path = require('path');
-const fs = require('fs');
+import Emitter from 'events';
+import * as Exec from 'child_process';
+import path from 'path';
+import fs from 'fs';
+import { clipboard } from 'electron';
 
 // --------------------------------------------------------------------------
 // --- Logging
@@ -408,20 +409,20 @@ function rmDirNonRec(path: string): Promise<void> {
 }
 
 // Not (yet) implemented in Node for Electron
-async function rmDirRec(path: string): Promise<void> {
+async function rmDirRec(directory: string): Promise<void> {
   try {
-    const stats = fs.statSync(path);
+    const stats = fs.statSync(directory);
     if (stats.isFile()) {
-      await remove(path);
+      await remove(directory);
       return;
     }
     if (stats.isDirectory()) {
       const rmDirSub = (name: string): void => {
-        rmDirRec(path.join(path, name));
+        rmDirRec(path.join(directory, name));
       };
-      const entries = await readDir(path);
+      const entries = await readDir(directory);
       await Promise.all(entries.map(rmDirSub));
-      await rmDirNonRec(path);
+      await rmDirNonRec(directory);
       return;
     }
   } catch (err) {
@@ -613,6 +614,26 @@ export function spawn(
 
     result(child);
   });
+}
+
+// --------------------------------------------------------------------------
+// --- ClipBoard
+// --------------------------------------------------------------------------
+
+/**
+   Get plain text from system clipboard.
+*/
+export function readClipboardText(): string
+{
+  return clipboard.readText();
+}
+
+/**
+   Copy plain text to system clipboard.
+*/
+export function writeClipboardText(text: string): void
+{
+  clipboard.writeText(text);
 }
 
 // --------------------------------------------------------------------------

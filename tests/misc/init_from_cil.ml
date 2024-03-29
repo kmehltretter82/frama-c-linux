@@ -5,4 +5,4 @@ let run () =
   Project.set_current prj;
   Printer.pp_file Format.std_formatter (Ast.get())
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

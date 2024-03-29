@@ -16,7 +16,7 @@ typedef struct Block {
 } FB ;
 
 /*@
-  region A: fb ;
+  \wp::region A: fb ;
 */
 void job(FB *fb)
 {

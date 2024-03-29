@@ -97,7 +97,7 @@ let result ~status ~smoke (r:VCS.result) =
     match r.VCS.verdict with
     | VCS.NoResult | VCS.Computing _ -> NORESULT
     | VCS.Failed -> INCONCLUSIVE
-    | VCS.Unknown | VCS.Timeout | VCS.Stepout ->
+    | VCS.Unknown | VCS.Timeout | VCS.Stepout | VCS.Invalid ->
       if smoke then VALID else UNSUCCESS
     | VCS.Valid ->
       if smoke then UNSUCCESS else VALID

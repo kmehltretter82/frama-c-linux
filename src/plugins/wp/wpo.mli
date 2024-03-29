@@ -48,8 +48,9 @@ sig
   val is_computed : t -> bool
   val make : Conditions.sequent -> t
   val compute : pid:WpPropId.prop_id -> t -> unit
-  val compute_proof : pid:WpPropId.prop_id -> t -> F.pred
+  val compute_proof : pid:WpPropId.prop_id -> ?opened:bool -> t -> F.pred
   val compute_descr : pid:WpPropId.prop_id -> t -> Conditions.sequent
+  val compute_probes : pid:WpPropId.prop_id -> t -> F.term Probe.Map.t
   val get_descr : t -> Conditions.sequent
   val qed_time : t -> float
 end
@@ -149,8 +150,11 @@ val has_verdict : t -> prover -> bool
 (** Raw prover result (without any respect to smoke tests) *)
 val get_result : t -> prover -> result
 
-(** All raw prover results (without any respect to smoke tests) *)
+(** Return all results (without any respect to smoke tests). *)
 val get_results : t -> (prover * result) list
+
+(** Return all prover results (without any respect to smoke tests). *)
+val get_prover_results : t -> (prover * result) list
 
 (** Consolidated wrt to associated property and smoke test. *)
 val get_proof : t -> [`Passed|`Failed|`Unknown] * Property.t
@@ -161,8 +165,11 @@ val get_target : t -> Property.t
 val is_trivial : t -> bool
 (** Currently trivial sequent (no forced simplification) *)
 
-val is_valid : t -> bool
-(** Checks for some prover with valid verdict (no forced simplification) *)
+val is_fully_valid : t -> bool
+(** Checks for some prover or script with valid verdict (no forced qed) *)
+
+val is_locally_valid : t -> bool
+(** Checks for some prover (no tactic) with valid verdict (no forced qed) *)
 
 val all_not_valid : t -> bool
 (** Checks for all provers to give a non-valid, computed verdict *)

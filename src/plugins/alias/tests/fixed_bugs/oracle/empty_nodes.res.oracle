@@ -2,13 +2,33 @@
 [alias] analysing function: f
 [alias] analysing instruction: *y = t + (*y - *x);
 [alias] May-aliases after instruction  *y = t + (*y - *x);  are  { *y; t }
+[alias] May-alias graph after instruction  *y = t + (*y - *x);  is
+  0:{ y } → 1:{ t }   1:{ t } → 2:{  }
 [alias] analysing instruction: *z = t + (*z - *x);
 [alias] May-aliases after instruction  *z = t + (*z - *x);  are
-  { *y; *z; t }  { y; z }
+  { y; z }  { *y; *z; t }
+[alias] May-alias graph after instruction  *z = t + (*z - *x);  is
+  0:{ y } → 6:{ t }   5:{ z } → 6:{ t }   6:{ t } → 7:{  }
 [alias] analysing instruction: *x = t;
-[alias] May-aliases after instruction  *x = t;  are  { *x; *y; *z; t }  { x; y; z }
-[alias] May-aliases at the end of function f: { *x; *y; *z; t }  { x; y; z }
+[alias] May-aliases after instruction  *x = t;  are  { x; y; z }  { *x; *y; *z; t }
+[alias] May-alias graph after instruction  *x = t;  is
+  0:{ y } → 9:{ t }   5:{ z } → 9:{ t }   8:{ x } → 9:{ t }
+  9:{ t } → 10:{  }
+[alias] May-aliases at the end of function f: { x; y; z }  { *x; *y; *z; t }
+[alias] May-alias graph at the end of function f:
+  0:{ y } → 9:{ t }   5:{ z } → 9:{ t }   8:{ x } → 9:{ t }
+  9:{ t } → 10:{  }
+[alias] Summary of function f:
+  formals: x→{ t }  y→{ t }  z→{ t }    returns: <none>
+  state: { x; y; z }  { *x; *y; *z; t }
 [alias] analysing function: g
 [alias] analysing instruction: f(a,a,a);
 [alias] May-aliases after instruction  f(a,a,a);  are  <none>
+[alias] May-alias graph after instruction  f(a,a,a);  is
+  20:{  } → 21:{  }   22:{ a } → 20:{  }
 [alias] May-aliases at the end of function g: <none>
+[alias] May-alias graph at the end of function g:
+  20:{  } → 21:{  }   22:{ a } → 20:{  }
+[alias] Summary of function g:
+  formals: a    returns: <none>    state: <none>
+[alias] Analysis complete

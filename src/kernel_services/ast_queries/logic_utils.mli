@@ -31,6 +31,9 @@ open Cil_types
     syntactically not well-formed. *)
 exception Not_well_formed of location * string
 
+(** exception raised when an unknown extension is called. *)
+exception Unknown_ext
+
 (** basic utilities for logic terms and predicates. See also {! Logic_const}
     to build terms and predicates.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)

@@ -266,7 +266,7 @@ let loc = function
   | Cil_types.Kglobal -> (* can occur in case of obscure bugs (already happened)
                             with wacky initializers. Module Initial_state of
                             value analysis correctly positions the loc *)
-    Cil.CurrentLoc.get ()
+    Current_loc.get ()
   | Cil_types.Kstmt s -> Cil_datatype.Stmt.loc s
 
 let report_alarm ki annot msg =

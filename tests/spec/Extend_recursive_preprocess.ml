@@ -62,10 +62,10 @@ let ext_fooo_printer prt fmt ext =
     Pretty_utils.pp_list ~pre:"@[data:" ~sep:",@ " prt#predicate fmt ps
   | _ -> assert false
 
-let () =  Acsl_extension.register_global
+let () =  Acsl_extension.register_global ~plugin:"test"
     "gl_fooo" ~preprocessor:preprocess_fooo_ptree ext_typing_fooo
     ~printer:ext_fooo_printer ~visitor:ext_fooo_visitor false ;
-  Acsl_extension.register_global_block
+  Acsl_extension.register_global_block ~plugin:"test"
     "gl_foo" ~preprocessor:preprocess_foo_ptree ext_typing_foo
     ~visitor:ext_foo_visitor false
 
@@ -80,4 +80,4 @@ let run () =
   Filecheck.check_ast "Test";
   Project.set_current old
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

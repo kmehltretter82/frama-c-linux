@@ -20,4 +20,4 @@ let run () =
   let f = Ast.get () in
   Visitor.visitFramacFileSameGlobals (new check_float) f
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

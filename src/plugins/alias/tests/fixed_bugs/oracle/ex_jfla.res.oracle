@@ -1,0 +1,176 @@
+[kernel] Parsing ex_jfla.c (with preprocessing)
+[alias] analysing function: create_str_t
+[alias] analysing instruction: str_t *res = malloc(sizeof(str_t));
+[alias] May-aliases after instruction  str_t *res = malloc(sizeof(str_t));  are
+  <none>
+[alias] May-alias graph after instruction  str_t *res = malloc(sizeof(str_t));  is
+  0:{ res } → 1:{  }
+[alias] analysing instruction: res->a = (int *)malloc(sizeof(int));
+[alias] May-aliases after instruction  res->a = (int *)malloc(sizeof(int));  are
+  <none>
+[alias] May-alias graph after instruction  res->a = (int *)malloc(sizeof(int));
+  is    0:{ res } → 1:{  }   1:{  } -a→ 2:{  }   2:{  } → 3:{  }
+[alias] analysing instruction: res->b = (int *)malloc(sizeof(int));
+[alias] May-aliases after instruction  res->b = (int *)malloc(sizeof(int));  are
+  <none>
+[alias] May-alias graph after instruction  res->b = (int *)malloc(sizeof(int));
+  is
+  0:{ res } → 1:{  }   1:{  } -a→ 2:{  }   1:{  } -b→ 4:{  }
+  2:{  } → 3:{  }   4:{  } → 5:{  }
+[alias] analysing instruction: *(res->a) = va;
+[alias] May-aliases after instruction  *(res->a) = va;  are  <none>
+[alias] May-alias graph after instruction  *(res->a) = va;  is
+  0:{ res } → 1:{  }   1:{  } -a→ 2:{  }   1:{  } -b→ 4:{  }
+  2:{  } → 3:{  }   4:{  } → 5:{  }
+[alias] analysing instruction: res->b = b;
+[alias] May-aliases after instruction  res->b = b;  are  { res->b; b }
+[alias] May-alias graph after instruction  res->b = b;  is
+  0:{ res } → 1:{  }   1:{  } -a→ 2:{  }   1:{  } -b→ 4:{ b }
+  2:{  } → 3:{  }   4:{ b } → 5:{  }
+[alias] May-aliases at the end of function create_str_t: { res->b; b }
+[alias] May-alias graph at the end of function create_str_t:
+  0:{ res } → 1:{  }   1:{  } -a→ 2:{  }   1:{  } -b→ 4:{ b }
+  2:{  } → 3:{  }   4:{ b } → 5:{  }
+[alias] Summary of function create_str_t:
+  formals: va  b    returns: res    state: { res->b; b }
+[alias] analysing function: jfla
+[alias] analysing instruction: *(s->b) = *(s->a);
+[alias] May-aliases after instruction  *(s->b) = *(s->a);  are  <none>
+[alias] May-alias graph after instruction  *(s->b) = *(s->a);  is    <empty>
+[alias] analysing instruction: s->a = i1;
+[alias] May-aliases after instruction  s->a = i1;  are  { s->a; i1 }
+[alias] May-alias graph after instruction  s->a = i1;  is
+  8:{ s } → 9:{  }   9:{  } -a→ 10:{ i1 }   10:{ i1 } → 12:{  }
+[alias] analysing instruction: s->a = i2;
+[alias] May-aliases after instruction  s->a = i2;  are  { s->a; i2 }
+[alias] May-alias graph after instruction  s->a = i2;  is
+  13:{ s } → 14:{  }   14:{  } -a→ 15:{ i2 }   15:{ i2 } → 17:{  }
+[alias] May-aliases at the end of function jfla: { s->a; i1; i2 }
+[alias] May-alias graph at the end of function jfla:
+  8:{ s } → 9:{  }   9:{  } -a→ 10:{ i1; i2 }   10:{ i1; i2 } → 12:{  }
+[alias] Summary of function jfla:
+  formals: s  i1  i2  b    returns: <none>    state: { s->a; i1; i2 }
+[alias] analysing function: main
+[alias] analysing instruction: int u = 11;
+[alias] May-aliases after instruction  int u = 11;  are  <none>
+[alias] May-alias graph after instruction  int u = 11;  is    <empty>
+[alias] analysing instruction: int v = 12;
+[alias] May-aliases after instruction  int v = 12;  are  <none>
+[alias] May-alias graph after instruction  int v = 12;  is    <empty>
+[alias] analysing instruction: int t[3] = {0, 1, 2};
+[alias] May-aliases after instruction  int t[3] = {0, 1, 2};  are  <none>
+[alias] May-alias graph after instruction  int t[3] = {0, 1, 2};  is    <empty>
+[alias] analysing instruction: int *a = & t[1];
+[alias] May-aliases after instruction  int *a = & t[1];  are  { t; a }
+[alias] May-alias graph after instruction  int *a = & t[1];  is
+  18:{ a } → 19:{  }   20:{ t } → 19:{  }
+[alias] analysing instruction: int *b = & u;
+[alias] May-aliases after instruction  int *b = & u;  are  { t; a }
+[alias] May-alias graph after instruction  int *b = & u;  is
+  18:{ a } → 19:{  }   20:{ t } → 19:{  }   23:{ b } → 24:{ u }
+[alias] analysing instruction: int *c = & v;
+[alias] May-aliases after instruction  int *c = & v;  are  { t; a }
+[alias] May-alias graph after instruction  int *c = & v;  is
+  18:{ a } → 19:{  }   20:{ t } → 19:{  }   23:{ b } → 24:{ u }
+  27:{ c } → 28:{ v }
+[alias] analysing instruction: int **w = & a;
+[alias] May-aliases after instruction  int **w = & a;  are  { *w; t; a }
+[alias] May-alias graph after instruction  int **w = & a;  is
+  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
+  31:{ w } → 32:{ a }   32:{ a } → 33:{  }
+[alias] analysing instruction: str_t *s1 = create_str_t(-1,b);
+[alias] May-aliases after instruction  str_t *s1 = create_str_t(-1,b);  are
+  { s1->b; b }  { *w; t; a }
+[alias] May-alias graph after instruction  str_t *s1 = create_str_t(-1,b);  is
+  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
+  31:{ w } → 32:{ a }   32:{ a } → 33:{  }   36:{  } -a→ 37:{  }
+  36:{  } -b→ 39:{  }   37:{  } → 38:{  }   39:{  } → 24:{ u }
+  41:{ s1 } → 36:{  }
+[alias] analysing instruction: printf("a=%d\n",*(s1->a));
+[alias:undefined:fn] ex_jfla.c:42: Warning: function printf has no definition
+[alias] May-aliases after instruction  printf("a=%d\n",*(s1->a));  are
+  { s1->b; b }  { *w; t; a }
+[alias] May-alias graph after instruction  printf("a=%d\n",*(s1->a));  is
+  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
+  31:{ w } → 32:{ a }   32:{ a } → 33:{  }   36:{  } -a→ 37:{  }
+  36:{  } -b→ 39:{  }   37:{  } → 38:{  }   39:{  } → 24:{ u }
+  41:{ s1 } → 36:{  }
+[alias] analysing instruction: printf("b=%d\n",*(s1->b));
+[alias:undefined:fn] ex_jfla.c:43: Warning: function printf has no definition
+[alias] May-aliases after instruction  printf("b=%d\n",*(s1->b));  are
+  { s1->b; b }  { *w; t; a }
+[alias] May-alias graph after instruction  printf("b=%d\n",*(s1->b));  is
+  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
+  31:{ w } → 32:{ a }   32:{ a } → 33:{  }   36:{  } -a→ 37:{  }
+  36:{  } -b→ 39:{  }   37:{  } → 38:{  }   39:{  } → 24:{ u }
+  41:{ s1 } → 36:{  }
+[alias] analysing instruction: jfla(s1,a,& t[2],1);
+[alias] May-aliases after instruction  jfla(s1,a,& t[2],1);  are
+  { s1->b; b }  { *w; s1->a; t; a }
+[alias] May-alias graph after instruction  jfla(s1,a,& t[2],1);  is
+  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
+  31:{ w } → 32:{ a }   32:{ a } → 33:{  }   36:{  } -a→ 37:{  }
+  36:{  } -b→ 39:{  }   37:{  } → 33:{  }   39:{  } → 24:{ u }
+  41:{ s1 } → 36:{  }   48:{  } → 33:{  }
+[alias] analysing instruction: printf("a=%d\n",*(s1->a));
+[alias:undefined:fn] ex_jfla.c:45: Warning: function printf has no definition
+[alias] May-aliases after instruction  printf("a=%d\n",*(s1->a));  are
+  { s1->b; b }  { *w; s1->a; t; a }
+[alias] May-alias graph after instruction  printf("a=%d\n",*(s1->a));  is
+  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
+  31:{ w } → 32:{ a }   32:{ a } → 33:{  }   36:{  } -a→ 37:{  }
+  36:{  } -b→ 39:{  }   37:{  } → 33:{  }   39:{  } → 24:{ u }
+  41:{ s1 } → 36:{  }   48:{  } → 33:{  }
+[alias] analysing instruction: printf("b=%d\n",*(s1->b));
+[alias:undefined:fn] ex_jfla.c:46: Warning: function printf has no definition
+[alias] May-aliases after instruction  printf("b=%d\n",*(s1->b));  are
+  { s1->b; b }  { *w; s1->a; t; a }
+[alias] May-alias graph after instruction  printf("b=%d\n",*(s1->b));  is
+  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
+  31:{ w } → 32:{ a }   32:{ a } → 33:{  }   36:{  } -a→ 37:{  }
+  36:{  } -b→ 39:{  }   37:{  } → 33:{  }   39:{  } → 24:{ u }
+  41:{ s1 } → 36:{  }   48:{  } → 33:{  }
+[alias] analysing instruction: jfla(s1,t,c,0);
+[alias] May-aliases after instruction  jfla(s1,t,c,0);  are
+  { s1->b; b }  { *w; s1->a; t; a; c }
+[alias] May-alias graph after instruction  jfla(s1,t,c,0);  is
+  20:{ t } → 28:{ v }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
+  31:{ w } → 32:{ a }   32:{ a } → 28:{ v }   36:{  } -a→ 37:{  }
+  36:{  } -b→ 39:{  }   37:{  } → 28:{ v }   39:{  } → 24:{ u }
+  41:{ s1 } → 36:{  }   48:{  } → 28:{ v }
+[alias] analysing instruction: printf("a=%d\n",*(s1->a));
+[alias:undefined:fn] ex_jfla.c:48: Warning: function printf has no definition
+[alias] May-aliases after instruction  printf("a=%d\n",*(s1->a));  are
+  { s1->b; b }  { *w; s1->a; t; a; c }
+[alias] May-alias graph after instruction  printf("a=%d\n",*(s1->a));  is
+  20:{ t } → 28:{ v }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
+  31:{ w } → 32:{ a }   32:{ a } → 28:{ v }   36:{  } -a→ 37:{  }
+  36:{  } -b→ 39:{  }   37:{  } → 28:{ v }   39:{  } → 24:{ u }
+  41:{ s1 } → 36:{  }   48:{  } → 28:{ v }
+[alias] analysing instruction: printf("b=%d\n",*(s1->b));
+[alias:undefined:fn] ex_jfla.c:49: Warning: function printf has no definition
+[alias] May-aliases after instruction  printf("b=%d\n",*(s1->b));  are
+  { s1->b; b }  { *w; s1->a; t; a; c }
+[alias] May-alias graph after instruction  printf("b=%d\n",*(s1->b));  is
+  20:{ t } → 28:{ v }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
+  31:{ w } → 32:{ a }   32:{ a } → 28:{ v }   36:{  } -a→ 37:{  }
+  36:{  } -b→ 39:{  }   37:{  } → 28:{ v }   39:{  } → 24:{ u }
+  41:{ s1 } → 36:{  }   48:{  } → 28:{ v }
+[alias] analysing instruction: __retres = 0;
+[alias] May-aliases after instruction  __retres = 0;  are
+  { s1->b; b }  { *w; s1->a; t; a; c }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  20:{ t } → 28:{ v }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
+  31:{ w } → 32:{ a }   32:{ a } → 28:{ v }   36:{  } -a→ 37:{  }
+  36:{  } -b→ 39:{  }   37:{  } → 28:{ v }   39:{  } → 24:{ u }
+  41:{ s1 } → 36:{  }   48:{  } → 28:{ v }
+[alias] May-aliases at the end of function main: { s1->b; b }  { *w; s1->a; t; a; c }
+[alias] May-alias graph at the end of function main:
+  20:{ t } → 28:{ v }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
+  31:{ w } → 32:{ a }   32:{ a } → 28:{ v }   36:{  } -a→ 37:{  }
+  36:{  } -b→ 39:{  }   37:{  } → 28:{ v }   39:{  } → 24:{ u }
+  41:{ s1 } → 36:{  }   48:{  } → 28:{ v }
+[alias] Summary of function main:
+  formals:     returns: __retres
+  state: { s1->b; b }  { *w; s1->a; t; a; c }
+[alias] Analysis complete

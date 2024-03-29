@@ -13,7 +13,7 @@
 [variadic] open_wrong.c:13: 
   Fallback translation of call open to a call to the specialized version open_fallback_1.
 [eva] Analyzing a complete application starting at main
-[kernel:annot:missing-spec] FRAMAC_SHARE/libc/fcntl.h:136: Warning: 
+[kernel:annot:missing-spec] open_wrong.c:13: Warning: 
   Neither code nor specification for function open_fallback_1,
    generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function open_fallback_1

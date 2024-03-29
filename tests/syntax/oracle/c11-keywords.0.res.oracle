@@ -1,4 +1,4 @@
 [kernel] Parsing c11-keywords.c (with preprocessing)
-[kernel] c11-keywords.c:11: User Error: 
+[kernel] c11-keywords.c:14: User Error: 
   _Alignas is currently unsupported by Frama-C.
 [kernel] Frama-C aborted: invalid user input.

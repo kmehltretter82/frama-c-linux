@@ -24,6 +24,7 @@ include Plugin.S
 
 val reset : unit -> unit
 val hypothesis : 'a Log.pretty_printer
+val is_interactive : unit -> bool
 
 (** {2 Function Selection} *)
 
@@ -125,6 +126,8 @@ module Cache: Parameter_sig.String
 module CacheEnv: Parameter_sig.Bool
 module CacheDir: Parameter_sig.String
 module CachePrint: Parameter_sig.Bool
+module Import: Parameter_sig.String_list
+module Library: Parameter_sig.Filepath_list
 module Drivers: Parameter_sig.Filepath_list
 module Timeout: Parameter_sig.Int
 module Memlimit: Parameter_sig.Int
@@ -135,7 +138,7 @@ module FctTimeout:
 module SmokeTimeout: Parameter_sig.Int
 module InteractiveTimeout: Parameter_sig.Int
 module TimeExtra: Parameter_sig.Int
-module TimeMargin: Parameter_sig.Int
+module TimeMargin: Parameter_sig.String
 module Steps: Parameter_sig.Int
 module Procs: Parameter_sig.Int
 module ProofTrace: Parameter_sig.Bool
@@ -164,6 +167,8 @@ module SmokeDeadcode: Parameter_sig.Bool
 module SmokeDeadcall: Parameter_sig.Bool
 module SmokeDeadlocalinit: Parameter_sig.Bool
 module SmokeDeadloop: Parameter_sig.Bool
+module Probes: Parameter_sig.Bool
+module CounterExamples: Parameter_sig.Bool
 
 (** {2 Getters} *)
 

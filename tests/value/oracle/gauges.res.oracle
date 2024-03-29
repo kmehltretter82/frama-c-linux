@@ -235,11 +235,7 @@
 [eva:alarm] gauges.c:188: Warning: 
   signed overflow. assert (int)p + (int)q ≤ 2147483647;
 [eva:garbled-mix:write] gauges.c:188: 
-  Assigning imprecise value to z.
-  The imprecision originates from Arithmetic {gauges.c:188}
-[eva:garbled-mix:write] gauges.c:189: 
-  Assigning imprecise value to r.
-  The imprecision originates from Arithmetic {gauges.c:188}
+  Assigning imprecise value to z because of arithmetic operation on addresses.
 [eva:alarm] gauges.c:190: Warning: out of bounds write. assert \valid(r);
 [eva:alarm] gauges.c:192: Warning: out of bounds write. assert \valid(p);
 [eva:alarm] gauges.c:193: Warning: out of bounds write. assert \valid(q);
@@ -342,6 +338,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
@@ -402,6 +399,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
@@ -461,6 +459,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
@@ -520,6 +519,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
@@ -585,6 +585,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
@@ -646,6 +647,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
@@ -714,6 +716,11 @@
 [eva] Done for function main17
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    gauges.c:188: arithmetic operation on addresses
+      (read in 2 statements, propagated through 2 statements)
+      garbled mix of &{x; y}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main0:
   i ∈ {1; 162}

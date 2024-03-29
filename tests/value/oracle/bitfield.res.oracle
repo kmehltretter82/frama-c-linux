@@ -31,8 +31,8 @@
 [eva:alarm] bitfield.i:123: Warning: 
   pointer downcast. assert (unsigned int)(&v) ≤ 2147483647;
 [eva:garbled-mix:write] bitfield.i:123: 
-  Assigning imprecise value to v.c.
-  The imprecision originates from Arithmetic {bitfield.i:123}
+  Assigning imprecise value to v.c
+  because of arithmetic operation on addresses.
 [eva:alarm] bitfield.i:124: Warning: 
   pointer downcast. assert (unsigned int)(&v + 1) ≤ 2147483647;
 [eva:alarm] bitfield.i:125: Warning: 
@@ -83,8 +83,8 @@
 [eva:alarm] bitfield.i:130: Warning: 
   pointer downcast. assert (unsigned int)(&v + 1) ≤ 2147483647;
 [eva:garbled-mix:write] bitfield.i:130: 
-  Assigning imprecise value to h.c.
-  The imprecision originates from Arithmetic {bitfield.i:130}
+  Assigning imprecise value to h.c
+  because of arithmetic operation on addresses.
 [eva] computing for function return_8 <- main_old <- main.
   Called from bitfield.i:133.
 [eva] Recording results for return_8
@@ -99,37 +99,37 @@
   locals {v} escaping the scope of main_old through h
 [eva] computing for function imprecise_bts_1671 <- main.
   Called from bitfield.i:165.
-[kernel:annot:missing-spec] bitfield.i:61: Warning: 
+[kernel:annot:missing-spec] bitfield.i:70: Warning: 
   Neither code nor specification for function leaf,
    generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function leaf <- imprecise_bts_1671 <- main.
   Called from bitfield.i:70.
 [eva] using specification for function leaf
+[eva:garbled-mix:assigns] bitfield.i:70: 
+  The specification of function leaf has generated a garbled mix of addresses
+  for assigns clause *p1.
 [eva] Done for function leaf
 [eva] bitfield.i:71: 
   Frama_C_show_each:
-  {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 [eva] bitfield.i:73: 
   Frama_C_show_each:
-  .next ∈ {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  .next ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
   .bitf ∈ {0}
   .[bits 65 to 95] ∈
-  {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
-[eva:garbled-mix:write] bitfield.i:74: 
-  Assigning imprecise value to c.
-  The imprecision originates from Misaligned {bitfield.i:70}
+  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 [eva] bitfield.i:69: starting to merge loop iterations
 [eva] computing for function leaf <- imprecise_bts_1671 <- main.
   Called from bitfield.i:70.
 [eva] Done for function leaf
 [eva] bitfield.i:71: 
   Frama_C_show_each:
-  {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 [eva:alarm] bitfield.i:72: Warning: 
   out of bounds write. assert \valid(&c->bitf);
 [eva] bitfield.i:73: 
   Frama_C_show_each:
-  {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 [eva:alarm] bitfield.i:74: Warning: 
   out of bounds read. assert \valid_read(&c->next.next);
 [eva] computing for function leaf <- imprecise_bts_1671 <- main.
@@ -187,8 +187,8 @@
   G ∈ {1}
   H ∈ {0}
   b ∈ {0}
-  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned {bitfield.i:70}) }}
-  ee ∈ {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70}) }}
+  ee ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
   foo ∈ [--..--]
   y.v0_3 ∈ [--..--]
    .v4 ∈ {0}
@@ -207,6 +207,11 @@
 [eva] Done for function char_short
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    bitfield.i:70: misaligned read of addresses
+      (read in 2 statements, propagated through 2 statements)
+      garbled mix of &{b; ee}
 [eva] bitfield.i:102: assertion 'Eva,initialization' got final status invalid.
 [scope:rm_asserts] removing 1 assertion(s)
 [eva] ====== VALUES COMPUTED ======
@@ -225,8 +230,9 @@
   r ∈ {1}
 [eva:final-states] Values at end of function imprecise_bts_1671:
   b ∈ {0}
-  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned {bitfield.i:70}) }}
-  ee ∈ {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  c ∈
+   {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70}) }}
+  ee ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
 [eva:final-states] Values at end of function logic:
   y.v0_3 ∈ [--..--]
    .v4 ∈ {0}
@@ -276,8 +282,9 @@
   G ∈ {1}
   H ∈ {0}
   b ∈ {0}
-  c ∈ {{ garbled mix of &{b; ee} (origin: Misaligned {bitfield.i:70}) }}
-  ee ∈ {{ garbled mix of &{b} (origin: Misaligned {bitfield.i:70}) }}
+  c ∈
+   {{ garbled mix of &{b; ee} (origin: Misaligned read {bitfield.i:70}) }}
+  ee ∈ {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
   y.v0_3 ∈ [--..--]
    .v4 ∈ {0}
    .v5_31 ∈ [--..--]

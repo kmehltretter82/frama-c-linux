@@ -33,4 +33,4 @@ let run () =
   Visitor.visitFramacFileSameGlobals (new visitor) ast
 ;;
 
-Db.Main.extend run
+Boot.Main.extend run

@@ -22,7 +22,7 @@ let run () =
          | None -> prvs
          | Some VCS.Tactical -> prvs
          | Some prv -> (VCS.Batch, prv) :: prvs)
-      ["alt-ergo"] []
+      ["Alt-Ergo"] []
   in
 
   let spawn goal =
@@ -162,4 +162,4 @@ let run () =
     ordered_kf
 
 
-let () = Db.Main.extend run
+let () = Boot.Main.extend run

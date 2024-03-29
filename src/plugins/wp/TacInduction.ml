@@ -33,6 +33,7 @@ let filter_step n hs s =
   match s.Conditions.condition with
   | (Have _ | Type _ | Core _ | Init _ | When _)  ->
     Conditions.map_step (filter_pred n hs) s
+  | Probe _ -> s
   | (State _ | Branch _ | Either _) as c ->
     if F.Vars.mem n s.vars then
       (hs := Conditions.pred_cond c :: !hs ; Conditions.step (Have F.p_true))
@@ -83,14 +84,14 @@ let process value n0 sequent =
 (* -------------------------------------------------------------------------- *)
 
 let vbase,pbase = Tactical.composer ~id:"base"
-    ~title:"Base" ~descr:"Value of base case" ()
+    ~title:"Base" ~descr:"Value of base case." ()
 
 class induction =
   object(self)
     inherit Tactical.make
         ~id:"Wp.induction"
         ~title:"Induction"
-        ~descr:"Proof by integer induction"
+        ~descr:"Proof by integer induction."
         ~params:[pbase]
 
     method private get_base () =

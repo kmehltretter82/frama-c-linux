@@ -237,6 +237,7 @@ struct
 end
 
 let jpretty = Jbuffer.to_json
+let jtext s = `String s
 
 (* -------------------------------------------------------------------------- *)
 (* --- Functional API                                                     --- *)
@@ -579,7 +580,9 @@ end
 
 module type Info =
 sig
+  val package: package
   val name: string
+  val descr: Markdown.text
 end
 
 (** Simplified [Map.S] *)
@@ -590,6 +593,7 @@ sig
   val empty : 'a t
   val add : key -> 'a -> 'a t -> 'a t
   val find : key -> 'a t -> 'a
+  val remove : key -> 'a t -> 'a t
 end
 
 module type Index =
@@ -598,6 +602,7 @@ sig
   type tag
   val get : t -> tag
   val find : tag -> t
+  val remove : t -> unit
   val clear : unit -> unit
 end
 
@@ -608,6 +613,7 @@ sig
   val clear : index -> unit
   val get : index -> M.key -> int
   val find : index -> int -> M.key
+  val remove : index -> M.key -> unit
   val to_json : index -> M.key -> json
   val of_json : index -> json -> M.key
 end =
@@ -640,6 +646,13 @@ struct
       m.index <- M.add a id m.index ;
       Hashtbl.add m.lookup id a ; id
 
+  let remove m a =
+    try
+      let id = M.find a m.index in
+      Hashtbl.remove m.lookup id ;
+      m.index <- M.remove a m.index ;
+    with Not_found -> ()
+
   let find m id = Hashtbl.find m.lookup id
 
   let to_json m a = `Int (get m a)
@@ -659,10 +672,12 @@ struct
   let clear () = INDEX.clear index
   let get = INDEX.get index
   let find = INDEX.find index
+  let remove = INDEX.remove index
   include
     (struct
       type t = M.key
-      let jtype = Jindex I.name
+      let jtype =
+        declare ~package:I.package ~name:I.name ~descr:I.descr (Jindex I.name)
       let of_json = INDEX.of_json index
       let to_json = INDEX.to_json index
     end)
@@ -690,6 +705,7 @@ struct
 
   let index () = STATE.get ()
   let clear () = INDEX.clear (index())
+  let remove a = INDEX.remove (index()) a
 
   let get a = INDEX.get (index()) a
   let find id = INDEX.find (index()) id
@@ -697,7 +713,8 @@ struct
   include
     (struct
       type t = M.key
-      let jtype = Jindex I.name
+      let jtype =
+        declare ~package:I.package ~name:I.name ~descr:I.descr (Jindex I.name)
       let of_json js = INDEX.of_json (index()) js
       let to_json v = INDEX.to_json (index()) v
     end)
@@ -754,14 +771,18 @@ struct
   let get x =
     let tag = A.id x in
     let hash = lookup () in
-    if not (Hashtbl.mem hash tag) then
-      Hashtbl.add hash tag x ;
-    tag
+    if not (Hashtbl.mem hash tag) then Hashtbl.add hash tag x ; tag
+
+  let remove x =
+    let tag = A.id x in
+    let hash = lookup () in
+    Hashtbl.remove hash tag
 
   include
     (struct
       type t = A.t
-      let jtype = T.jtype I.name
+      let jtype =
+        declare ~package:I.package ~descr:I.descr ~name:I.name (T.jtype I.name)
       let to_json a = T.to_json (get a)
       let of_json js =
         let k = T.of_json js in
@@ -794,8 +815,8 @@ sig
 end
 
 module Tagged(A : TaggedType)(I : Info)
-  : Index with type t = A.t and type tag := string =
-  HASHED
+  : Index with type t = A.t and type tag := string
+  = HASHED
     (struct
       include Jstring
       type tag = string

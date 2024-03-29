@@ -303,6 +303,19 @@ struct
         path = path ;
       }
 
+  let probe_vc ~loc ?descr ?stmt ?warn ~name term vc =
+    let vars = F.vars term in
+    let hyps = Conditions.probe ~loc ?descr ?stmt ~name term vc.hyps in
+    let wrns = match warn with
+      | None -> vc.warn
+      | Some w -> Warning.Set.union w vc.warn in
+    { hyps = hyps ;
+      vars = vars ;
+      warn = wrns ;
+      goal = vc.goal ;
+      deps = vc.deps ;
+      path = vc.path }
+
   (* -------------------------------------------------------------------------- *)
   (* --- Branching                                                          --- *)
   (* -------------------------------------------------------------------------- *)
@@ -366,12 +379,7 @@ struct
       let deps = List.fold_left (fun d vc -> D.union d vc.deps) D.empty vcs in
       let warn = List.fold_left (fun d vc -> W.union d vc.warn) W.empty vcs in
       let path = List.fold_left (fun d vc -> S.union d vc.path) S.empty vcs in
-      { hyps = hyps ;
-        goal = goal ;
-        vars = vars ;
-        deps = deps ;
-        warn = warn ;
-        path = path }
+      { hyps ; goal ; vars ; deps ; warn ; path }
 
   (* -------------------------------------------------------------------------- *)
   (* --- Merging and Branching with Splitters                               --- *)
@@ -526,6 +534,19 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let add_axiom _id _l = ()
+
+  let add_probe wenv ?stmt probe term wp = in_wenv wenv wp
+      (fun env wp ->
+         let outcome =
+           Warning.catch
+             ~severe:false ~effect:"Skip probe"
+             (L.term env) term in
+         match outcome with
+         | Warning.Failed _warn -> wp
+         | Warning.Result(warn,value) ->
+           let add_probe_vc =
+             probe_vc ~loc:term.term_loc ?stmt ~warn ~name:probe value in
+           { wp with vcs = gmap add_probe_vc wp.vcs })
 
   let add_hyp ?for_pid wenv (hpid,predicate) wp = in_wenv wenv wp
       (fun env wp ->
@@ -1439,9 +1460,9 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let wp_scope env wp ~descr scope xs =
-    let post = L.current env in
-    let pre = M.alloc post xs in
-    let hs = M.scope { pre ; post } scope xs in
+    let sigma = L.current env in
+    let pre = M.alloc sigma xs in
+    let hs = M.scope { pre ; post = sigma } scope xs in
     let vcs = gmap (assume_vc ~descr hs) wp.vcs in
     { wp with sigma = Some pre ; vcs = vcs }
 
@@ -1631,7 +1652,7 @@ struct
       let id = WpPropId.mk_lemma_id l in
       let def = L.lemma l in
       let model = WpContext.get_model () in
-      let sequent = Conditions.lemma def.l_lemma in
+      let sequent = Conditions.lemma ~loc:l.lem_loc def.l_lemma in
       let vca = {
         Wpo.VC_Annot.axioms = Some (def.l_cluster, l.lem_depends) ;
         goal = GOAL.make sequent ;

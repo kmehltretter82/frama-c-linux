@@ -42,4 +42,4 @@ let main _ =
   Format.printf "%a@." (Pdg.Api.pretty ~bw:false) pdg;
   Pdg.Api.extract pdg "dyn_dpds_1.dot"
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

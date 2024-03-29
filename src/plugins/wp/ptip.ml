@@ -151,6 +151,7 @@ class autofocus =
           match step.condition with
           | When _ -> true
           | State s -> self#occurs_state s
+          | Probe(_,t) -> self#occurs_term t
           | Init p | Have p | Type p | Core p ->
             self#occurs_term (F.e_prop p)
           | Branch(p,sa,sb) ->
@@ -246,12 +247,13 @@ class autofocus =
         then Tactical.(Inside(Goal goal,a))
         else
           let pool = ref Tactical.Empty in
-          let lookup_pred s a p =
-            if F.is_subterm a (F.e_prop p) then
+          let lookup_term s a t =
+            if F.is_subterm a t then
               begin
                 pool := Tactical.(Inside(Step s,a));
                 raise Exit;
               end in
+          let lookup_pred s a p = lookup_term s a (F.e_prop p) in
           let rec lookup_sequence a hs =
             (*TODO: staged iter *)
             Conditions.iter
@@ -259,6 +261,7 @@ class autofocus =
                  match step.condition with
                  | (Type p | Init p | Have p | When p | Core p)
                    -> lookup_pred step a p
+                 | Probe(_,t) -> lookup_term step a t
                  | Branch(p,sa,sb) ->
                    lookup_pred step a p ;
                    lookup_sequence a sa ;
@@ -385,6 +388,8 @@ class pcond
              begin
                match step.condition with
                | State _ -> ()
+               | Probe(_,t) ->
+                 domain <- Vars.union (F.vars t) domain
                | Have p | Init p | Core p | When p | Type p ->
                  domain <- Vars.union (F.varsp p) domain
                | Branch(p,a,b) ->
@@ -483,7 +488,7 @@ class pseq
 
     method selected =
       begin
-        self#set_target self#selection ;
+        self#highlight self#selection ;
         List.iter (fun f -> f ()) demon ;
       end
 
@@ -529,7 +534,22 @@ class pseq
         in if selected then self#selected
       end
 
-    method set_target tgt =
+    method set_selection sel =
+      let current = self#selection in
+      if not @@ Tactical.equal current sel then
+        let target =
+          match sel with
+          | Tactical.Empty | Tactical.Compose _ | Tactical.Multi _ ->
+            Term, None
+          | Tactical.Clause(Goal p) -> Goal, Some (F.e_prop p)
+          | Tactical.Clause(Step s as clause) ->
+            Step s, Some (F.e_prop @@ Tactical.head clause)
+          | Tactical.Inside(Goal _,t) -> Goal, Some t
+          | Tactical.Inside(Step s,t) -> Step s, Some t
+        in
+        self#restore ~focus:`Focus target
+
+    method highlight tgt =
       match tgt with
       | Tactical.Empty | Tactical.Compose _ | Tactical.Multi _ ->
         begin
@@ -579,7 +599,7 @@ class pseq
       pcond#pp_esequent env fmt s
 
     method pp_goal fmt w =
-      Format.fprintf fmt "@\n@{<wp:clause>Goal@} %a:@\n" Wpo.pp_title w ;
+      Format.fprintf fmt "@{<wp:clause>Goal@} %a:@\n" Wpo.pp_title w ;
       let _,sequent = Wpo.compute w in
       self#pp_sequent fmt sequent
 

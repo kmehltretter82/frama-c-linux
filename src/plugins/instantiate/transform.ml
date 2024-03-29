@@ -55,7 +55,7 @@ class transformer = object(self)
 
   method! vfile _ =
     let post f =
-      f.globals <- (Global_context.globals (Cil.CurrentLoc.get())) @ f.globals ;
+      f.globals <- (Global_context.globals (Current_loc.get())) @ f.globals ;
       Ast.mark_as_changed () ;
       Ast.mark_as_grown () ;
       f
@@ -64,7 +64,7 @@ class transformer = object(self)
 
   method! vglob_aux _ =
     let post g =
-      let loc = Cil.CurrentLoc.get() in
+      let loc = Current_loc.get() in
       let folding l fd =
         if VISet.mem fd.svar !introduced_instantiators then l
         else begin

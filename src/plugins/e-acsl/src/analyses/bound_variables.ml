@@ -247,7 +247,7 @@ end = struct
   let get_bounded_var t ctxt =
     let rec aux t =
       match t.term_node with
-      | TLogic_coerce(_, t) -> aux t
+      | TCast (true, _, t) -> aux t
       | TLval(TVar lv, TNoOffset) when Logic_var.Set.mem lv ctxt.bounded_vars ->
         Some lv
       | _ -> None
@@ -524,7 +524,7 @@ let extract_constraint ctxt t1 r t2 =
      is not a variable ([TLval(TVar _, TNoOffset)]). *)
   let rec _get_logic_var_opt t =
     match t.term_node with
-    | TLogic_coerce(_, t) -> _get_logic_var_opt t
+    | TCast (true, _, t) -> _get_logic_var_opt t
     | TLval(TVar x, TNoOffset) -> Some x
     | _ -> None
   in
@@ -681,7 +681,7 @@ end
 = struct
 
   let process_quantif ~loc p =
-    Cil.CurrentLoc.set loc;
+    Current_loc.set loc;
     match p.pred_content with
     | Pforall(bound_vars, ({ pred_content = Pimplies(_, _) } as goal)) ->
       compute_guards loc ~is_forall:true p bound_vars goal

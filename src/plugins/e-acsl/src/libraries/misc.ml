@@ -27,7 +27,7 @@ open Cil_types
 (* ************************************************************************** *)
 
 let is_fc_or_compiler_builtin vi =
-  Cil_builtins.is_builtin vi
+  Cil_builtins.has_fc_builtin_attr vi
   ||
   (let prefix_length = 10 (* number of characters in "__builtin_" *) in
    String.length vi.vname > prefix_length

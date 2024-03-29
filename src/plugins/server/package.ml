@@ -236,7 +236,7 @@ type packageInfo = {
   p_package : string list ;
   p_title : string ;
   p_descr : Markdown.text ;
-  p_readme : Filepath.Normalized.t option ;
+  p_readme : string option ;
   p_content : declInfo list ;
 }
 
@@ -377,17 +377,6 @@ let register_ident id =
     Senv.fatal "Duplicate identifier '%a'" pp_ident id ;
   registry := IdSet.add id !registry
 
-let resolve_readme ~plugin = function
-  | None -> None
-  | Some readme ->
-    let file =
-      match plugin with
-      | Kernel ->
-        Filepath.Normalized.concats Fc_config.datadir ["server"; "doc"; readme]
-      | Plugin name ->
-        Filepath.Normalized.concats Fc_config.datadir [name; "doc"; readme]
-    in Some file
-
 (* -------------------------------------------------------------------------- *)
 (* --- Declarations                                                       --- *)
 (* -------------------------------------------------------------------------- *)
@@ -403,7 +392,7 @@ let package ?plugin ?name ~title ?(descr=[]) ?readme () =
     p_package = pkgname ;
     p_title = title ;
     p_descr = descr ;
-    p_readme = resolve_readme ~plugin readme ;
+    p_readme = readme ;
     p_content = [] ;
   } in
   let package = { pkgInfo ; revDecl=[] } in

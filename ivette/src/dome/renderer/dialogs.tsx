@@ -26,8 +26,8 @@
    @module dome/dialogs
  */
 
-const filepath = require('path');
-const { ipcRenderer } = require('electron/renderer');
+import * as filepath from 'path';
+import { ipcRenderer } from 'electron';
 import * as System from 'dome/system';
 
 // --------------------------------------------------------------------------

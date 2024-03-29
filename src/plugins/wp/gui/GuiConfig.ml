@@ -36,7 +36,7 @@ class provers =
         (* select automatically the provers set on the command line *)
         let cmdline =
           match Wp_parameters.Provers.get () with
-          | [] -> [ "alt-ergo" ]
+          | [] -> [ "Alt-Ergo" ]
           | prvs -> prvs
         in
         let selection = List.fold_left

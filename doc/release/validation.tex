@@ -192,6 +192,10 @@ and push it (e.g. via \texttt{git push origin \$(cat VERSION | sed -e "s/\textas
   the release pipeline will fail.
 }
 
+Note that an extra pipeline will be run when the tag is pushed, and it will
+likely fail due to external plugins. This is not a problem (if you really want
+to avoid it, you can create and push the tag to each external plug-in).
+
 %%%Local Variables:
 %%%TeX-master: "release"
 %%%End:

@@ -29,9 +29,8 @@
    @packageDocumentation
    @module dome/data/states
 */
-
+import Emitter from 'events';
 import React from 'react';
-const Emitter = require('events');
 import isEqual from 'react-fast-compare';
 import { Debug } from 'dome';
 

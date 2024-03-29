@@ -423,11 +423,9 @@ and ptry env p e =
 and pany env op rs es =
   match rs , es with
   | [] , [] -> ()
-  | rs , [] ->
-    let e = op [] in
-    List.iter (fun r -> pmatch env r e) rs
+  | [] , _ | _ , [] -> raise Not_found
+  | [r] , _ -> pmatch env r (op es)
   | r::rs , e::es -> pmatch env r e ; pany env op rs es
-  | [] , _::_ -> raise Not_found
 
 (* Pairwise matching *)
 and pargs env ps trail es =
@@ -498,12 +496,13 @@ let order (s : Conditions.step) : int =
   | Type _ -> 5
   | Either _ -> 6
   | State _ -> 7
+  | Probe _ -> 8
 
 let priority sa sb = order sa - order sb
 
 let push (step : Conditions.step) =
   match step.condition with
-  | Have _ | When _ | Core _ | Init _ | Type _ | State _ -> ()
+  | Have _ | When _ | Core _ | Init _ | Type _ | State _ | Probe _ -> ()
   | Branch(_,sa,sb) -> Queue.push sa queue ; Queue.push sb queue
   | Either cs -> List.iter (fun s -> Queue.push s queue) cs
 

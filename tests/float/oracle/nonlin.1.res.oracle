@@ -255,15 +255,12 @@
   non-finite float value.
   assert \is_finite((float)((int)(&x_0 + (int)(&x_0))));
 [eva:garbled-mix:write] nonlin.c:98: 
-  Assigning imprecise value to a_0.
-  The imprecision originates from Arithmetic {nonlin.c:98}
+  Assigning imprecise value to a_0
+  because of arithmetic operation on addresses.
 [eva:alarm] nonlin.c:99: Warning: 
   non-finite float value. assert \is_finite(a_0);
 [eva:alarm] nonlin.c:99: Warning: 
   non-finite float value. assert \is_finite(\add_float(a_0, a_0));
-[eva:garbled-mix:write] nonlin.c:99: 
-  Assigning imprecise value to f.
-  The imprecision originates from Arithmetic
 [eva] Recording results for garbled
 [eva] Done for function garbled
 [eva] computing for function around_zeros <- main.
@@ -314,6 +311,11 @@
 [eva] Done for function subdivide_strategy
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    nonlin.c:98: arithmetic operation on addresses
+      (read in 1 statement, propagated through 2 statements)
+      garbled mix of &{x_0}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function access_bits:
   rbits1 ∈ {0; 1; 2}
@@ -326,7 +328,7 @@
   res ∈ {-0x1.0000000000000p0}
 [eva:final-states] Values at end of function garbled:
   a_0 ∈ {{ garbled mix of &{x_0} (origin: Arithmetic {nonlin.c:98}) }}
-  f ∈ {{ garbled mix of &{x_0} (origin: Arithmetic) }}
+  f ∈ {{ garbled mix of &{x_0} (origin: Arithmetic {nonlin.c:98}) }}
 [eva:final-states] Values at end of function nonlin_f:
   Frama_C_entropy_source ∈ [--..--]
   a ∈ [0x1.4000000000000p2 .. 0x1.c000000000000p2]

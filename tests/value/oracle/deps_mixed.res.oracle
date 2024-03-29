@@ -33,11 +33,8 @@
 [eva:alarm] deps_mixed.i:24: Warning: 
   pointer downcast. assert (unsigned int)(p + (int)q) ≤ 2147483647;
 [eva:garbled-mix:write] deps_mixed.i:24: 
-  Assigning imprecise value to __retres.
-  The imprecision originates from Arithmetic {deps_mixed.i:24}
-[eva:garbled-mix:write] deps_mixed.i:24: 
-  Assigning imprecise value to \result<main>.
-  The imprecision originates from Arithmetic {deps_mixed.i:24}
+  Assigning imprecise value to __retres
+  because of arithmetic operation on addresses.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

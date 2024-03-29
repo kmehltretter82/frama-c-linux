@@ -165,13 +165,12 @@ let isCrossableAtInit tr func =
               bool_res (comp (Char.compare c1 c2))
             | TConst(LReal r1), TConst (LReal r2) ->
               bool_res (comp (compare r1.r_nearest r2.r_nearest))
-            | TCastE(ty1,t1), TCastE(ty2,t2)
+            | TCast (false, Ctype ty1,t1), TCast (false, Ctype ty2,t2)
               when Cil_datatype.Typ.equal ty1 ty2 ->
               comparison comp t1 t2
             | _ -> t
           in
           (match op, t1.term_node, t2.term_node with
-
            | PlusA, TConst(Integer(i1,_)), TConst(Integer(i2,_)) ->
              { t with term_node =
                         TConst(Integer(Integer.add i1 i2,None))}
@@ -208,11 +207,11 @@ let isCrossableAtInit tr func =
            | LOr, t1, t2 ->
              bool3_res t (Bool3.bool3or (is_true t1) (is_true t2))
            | _ -> t)
-        | TCastE(ty,t1) ->
+        | TCast (false, Ctype ty,t1) ->
           let t1 = aux t1 in
           (match t1.term_type with
-             Ctype ty1 when Cil_datatype.Typ.equal ty ty1 -> t1
-           | _ -> { t with term_node = TCastE(ty,t1) })
+           | Ctype ty1 when Cil_datatype.Typ.equal ty ty1 -> t1
+           | _ -> { t with term_node = TCast (false, Ctype ty,t1) })
         | _ -> t
       and aux_lv (base,off) =
         match base with
@@ -283,7 +282,8 @@ let isCrossableAtInit tr func =
         Bool3.bool3_of_bool (comp (Char.compare c1 c2))
       | TConst(LReal r1), TConst (LReal r2) ->
         Bool3.bool3_of_bool (comp (compare r1.r_nearest r2.r_nearest))
-      | TCastE(ty1,t1), TCastE(ty2,t2) when Cil_datatype.Typ.equal ty1 ty2 ->
+      | TCast (false, Ctype ty1,t1), TCast (false, Ctype ty2,t2)
+        when Cil_datatype.Typ.equal ty1 ty2 ->
         comparison t1 t2
       | _ -> Bool3.Undefined
     in
@@ -419,7 +419,7 @@ let rec term_to_exp t res =
   | TBinOp (binop, t1, t2)->
     new_exp ~loc
       (BinOp(binop, term_to_exp t1 res, term_to_exp t2 res, Cil.intType))
-  | TCastE(ty, {term_node = TConst(LReal lreal)}) when Cil.isFloatingType ty ->
+  | TCast (false, Ctype ty, {term_node = TConst(LReal lreal)}) when Cil.isFloatingType ty ->
     (match Cil.unrollType ty with
      | TFloat(fk,_) ->
        new_exp ~loc
@@ -427,10 +427,10 @@ let rec term_to_exp t res =
      | _ ->
        Aorai_option.fatal
          "A floating-point type was expected, got %a." Printer.pp_typ ty)
-  | TCastE (ty, t) -> new_exp ~loc (CastE (ty, term_to_exp t res))
+  | TCast (false, Ctype ty, t) -> new_exp ~loc (CastE (ty, term_to_exp t res))
   | TAddrOf tlval -> new_exp ~loc (AddrOf (tlval_to_lval tlval res))
   | TStartOf tlval -> new_exp ~loc (StartOf (tlval_to_lval tlval res))
-  | TLogic_coerce (_,t) -> term_to_exp t res
+  | TCast (true, _,t) -> term_to_exp t res
   | _ ->
     Aorai_option.fatal
       "Term %a cannot be transformed into exp."
@@ -510,7 +510,7 @@ let get_bhv_aux_fct kf bhv =
       [Normal,
        Logic_const.(
          new_predicate
-           (prel (Req,tlogic_coerce (tresult ret_typ) Linteger,lone())))]
+           (prel (Req, tlogic_coerce (tresult ret_typ) Linteger,lone())))]
     in
     let bhv_in =
       Cil.mk_behavior ~name:bhv.b_name ~assumes ~assigns ~post_cond ()
@@ -698,7 +698,7 @@ let add_gvar ?init vi =
   set_varinfo vi.vname vi
 
 let add_gvar_zeroinit vi =
-  add_gvar ~init:(Cil.makeZeroInit ~loc:(CurrentLoc.get()) vi.vtype) vi
+  add_gvar ~init:(Cil.makeZeroInit ~loc:(Current_loc.get()) vi.vtype) vi
 
 let mk_gvar ?init ~ty name =
   (* See if the variable is already declared *)
@@ -720,7 +720,7 @@ let mk_gvar_scalar ~init ?(ty = Cil.typeOf init) name =
   mk_gvar ~init:(SingleInit init) ~ty name
 
 let mk_integer value =
-  Cil.integer ~loc:(CurrentLoc.get()) value
+  Cil.integer ~loc:(Current_loc.get()) value
 
 (* Utilities for global enumerations *)
 let mk_global_c_enum_type_tagged name elements_l =

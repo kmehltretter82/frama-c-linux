@@ -24,10 +24,9 @@ Cil_types.stmtkind.UnspecifiedSequence/ of (Cil_types.stmt * Cil_types.lval list
 Cil_types.stmtkind.Break/ of Cil_types.location/A break to the end of the nearest enclosing Loop or Switch./
 Datatype.unit/unit Type.t/Add sets, maps and hashtables modules to an existing datatype, provided the equal, compare and hash functions are not Datatype.undefined./
 Globals/(Cil_types.stmt -> Cil_types.kernel_function) Stdlib.refend /Operations on globals./
-Db.Main/(unit -> unit) Stdlib.refend /Frama-C main interface./
+Boot.Main/(unit -> unit) Stdlib.refend /Frama-C main interface./
 Visitor_behavior.Get/Visitor_behavior.Get/Get operations on behaviors, allows to get the representative of an AST element in the current state of the visitor. Get.ast_element vis e with e of type ast_element gets the representative of e in vis. For example for Cil_types.varinfo: Get.varinfo vis vi./
 Visitor_behavior.Set/Visitor_behavior.Set/Set operations on behaviors, allows to change the representative of a given AST element in the current state of the visitor. Use with care (i.e. makes sure that the old one is not referenced anywhere in the AST, or sharing will be lost). Set.ast_element vis e s with e and s of type ast_element changes the representative of e to s in vis. For example, for Cil_types.varinfo: Set.varinfo vis vi new_representative./
-Db.Properties/Emitter.t -> Cil_types.kernel_function -> Cil_types.stmt -> string -> unitend /Dealing with logical properties./
 Visitor_behavior.Reset/Visitor_behavior.t -> unitend /Reset operations on behaviors, allows to reset the tables associated to a given kind of AST elements. If you use fresh instances of visitor for each round of transformation, you should not need this module. In place modifications do not need this at all. Reset.ast_element vis resets the tables associated to the considered type of AST elements in vis. For example for Cil_types.varinfo: Reset.varinfo vis./
 Cil_types.enuminfo//Information about an enumeration./
 Datatype.Polymorphic/((Project_skeleton.t -> bool) -> 'a -> bool) -> (Project_skeleton.t -> bool) -> 'a Datatype.t -> bool end ) -> Datatype.Polymorphic with type 'a poly = 'a P.t/Functor for polymorphic types with only 1 type variable./
@@ -41,18 +40,16 @@ Cmdline.stage.Extended//The stage where plug-ins are loaded.     It is also the 
 Pretty_source.localizable.PVDecl/ of (Cil_types.kernel_function option * Cil_types.kinstr * Cil_types.varinfo)/Declaration and definition of variables and function. Check the type  of the varinfo to distinguish between the various possibilities.  If the varinfo is a global or a local, the kernel_function is the  one in which the variable is declared. The kinstr argument is given  for local variables with an explicit initializer./
 Locations.Location/Datatype.S with type t = location/Misc/
 Parameter_sig.Builder.Int/int end ) -> Parameter_sig.Int/To be used by the plugin to output the results of the option  in a controlled way. See set_output_dependencies details./
-Db.Main.extend/(unit -> unit) -> unit/Register a function to be called by the Frama-C main entry point./
+Boot.Main.extend/(unit -> unit) -> unit/Register a function to be called by the Frama-C main entry point./
 Annotations/State.tend /Annotations in the AST. The AST should be computed before calling functions of this module./
 Cmdline.run_after_exiting_stage/(unit -> Cmdline.exit) -> unit/Register an action to be executed at the end of the exiting stage. The guarded action must finish by exit n./
 Cil.cilVisitor.vvrbl/Cil_types.varinfo -> Cil_types.varinfo Cil.visitAction/Invoked on each variable use. Here only the SkipChildren and  ChangeTo actions make sense since there are no subtrees. Note that  the type and attributes of the variable are not traversed for a  variable use./
 Cil_types.varinfo//Information about a variable./
 Lmap_bitwise/functor (V : Lmap_bitwise.With_default ) -> Lmap_bitwise.Location_map_bitwise with type v = V.tend /Functors making map indexed by zone./
 Cil.cilVisitor.behavior/Visitor_behavior.t/the kind of behavior expected for the behavior./
-Eva.Analysis.compute/unit -> unit/Computes the Eva analysis, if not already computed, using the entry point  of the current project. You may set it with Globals.set_entry_point. raised exceptions: , if the entry point is incorrect, if some arguments are  specified for the entry point using Db.Value.fun_set_args, and  an incorrect number of them is given./
 Datatype.Serializable_undefined/Datatype.Undefined/Same as Datatype.Undefined, but the type is supposed to be marshallable by the standard OCaml way (in particular, no hash-consing or projects inside the type)./
 Log.Messages.feedback/?ontty:Log.ontty -> ?level:int -> ?dkey:Log.Messages.category -> 'a Log.pretty_printer/Progress and feedback. Level is tested against the verbosity level./
 Log.set_echo/?plugin:string -> ?kind:Log.kind list -> bool -> unit/Turns echo on or off. Applies to all channel unless specified, and all kind of messages unless specified./
-Db.Value.self/State.t/Internal state of the value analysis from projects viewpoint./
 Log.new_channel/string -> Log.channel/Send an event over the associated listeners./
 Log.Messages.warning/?wkey:Log.Messages.warn_category -> 'a Log.pretty_printer/Hypothesis and restrictions./
 Datatype.Undefined/Datatype.Undefined/Sub-signature of Datatype.S./
@@ -118,7 +115,6 @@ Log.Messages.logwith/(Log.event option -> 'b) -> ?wkey:Log.Messages.warn_categor
 Logic_utils.expr_to_term/?coerce:bool -> Cil_types.exp -> Cil_types.term/Returns a logic term that has exactly the same semantics as the original C-expression. The type of the resulting term is determined by the ~coerce flag as follows:- when ~coerce:false is given (the default) the term has the same  c-type as the original expression.- when ~coerce:true is given, if the original expression has an int or  float type, then the returned term is coerced into the integer or real  logic type, respectively. Remark: when the original expression is a comparison, it is evaluated as an int or an integer depending on the ~coerce flag. To obtain a boolean or predicate, use expr_to_boolean or expr_to_predicate instead./
 Journal/(string -> Datatype.Filepath.t) Stdlib.refend /Journalization of functions./
 Cil.cilVisitor.vstmt/Cil_types.stmt -> Cil_types.stmt Cil.visitAction/Control-flow statement. The default DoChildren action does not create a  new statement when the components change. Instead it updates the contents  of the original statement. This is done to preserve the sharing with  Goto and Case statements that point to the original statement. If you  use the ChangeTo action then you should take care of preserving that  sharing yourself./
-Db.Value.is_computed/unit -> bool/Return true iff the value analysis has been done./
 Kernel.Unicode/('a -> 'b) -> 'a -> 'bend /Behavior of option "-unicode"./
 Design.register_extension/(Design.main_window_extension_points -> unit) -> unit/Register an extension to the main GUI. It will be invoked at initialization time./
 Cil_types.global//The main type for representing global declarations and definitions. A list of these form a CIL file. The order of globals in the file is generally important./
@@ -127,7 +123,6 @@ Datatype.func3/?label1:string * (unit -> 'a) option -> 'a Type.t -> ?label2:stri
 Cmdline.stage.Loading//After Extended, the stage where a previous Frama-C     internal states is restored (e.g. the one specified by     -load or by running the journal)./
 Cil.cilVisitor//A visitor interface for traversing CIL trees. Create instantiations of this type by specializing the class Cil.nopCilVisitor. Each of the specialized visiting functions can also call the queueInstr to specify that some instructions should be inserted before the current statement. Use syntax like self#queueInstr to call a method associated with the current object. Important Note for Frama-C Users: Unless you really know what you are doing, you should probably inherit from the Visitor.generic_frama_c_visitor instead of Cil.genericCilVisitor or Cil.nopCilVisitor/
 Cil.lzero/?loc:Cil_types.location -> unit -> Cil_types.term/The constant logic term zero./
-Db.Value.is_reachable/Db.Value.state -> bool/add_formals_to_state state kf exps evaluates exps in state  and binds them to the formal arguments of kf in the resulting  state/
 Cil_types.compinfo//The definition of a structure or union type. Use Cil.mkCompInfo to make one and use Cil.copyCompInfo to copy one (this ensures that a new key is assigned and that the fields have the right pointers to parents.)./
 Cil_types.logic_type_info//Description of a logic type./
 Cmdline.run_after_loading_stage/(unit -> unit) -> unit/Register an action to be executed at the end of the loading stage./
@@ -143,7 +138,6 @@ Cil_types.binop.Div////
 Parameter_sig.Bool/Parameter_sig.Bool/Signature for a boolean parameter./
 Cil_types.stmtkind.Instr/ of Cil_types.instr/An instruction that does not contain control flow. Control implicitly  falls through./
 Visitor.generic_frama_c_visitor/Visitor_behavior.t -> /Generic class that abstracts over frama_c_inplace and frama_c_copy./
-Db.Value.get_stmt_state/?after:bool -> Cil_types.stmt -> Db.Value.state/after is false by default./
 Logic_typing.typing_context//Functions that can be called when type-checking an extension of ACSL./
 Parameter_sig.Builder.False/functor (X : Parameter_sig.Input ) -> Parameter_sig.Bool/Set the boolean to false./
 Cil.cilVisitor.vglob/Cil_types.global -> Cil_types.global list Cil.visitAction/Global (vars, types, etc.)/
@@ -203,7 +197,6 @@ Cil_types.stmt//Statements./
 Cil.visitCilFileSameGlobals/Cil.cilVisitor -> Cil_types.file -> unit/A visitor for the whole file that does not *physically* change the globals (but maybe changes things inside the globals through side-effects). Use this function instead of Cil.visitCilFile whenever appropriate because it is more efficient for long files./
 Datatype.S_with_collections/Datatype.S_with_collections/A datatype for a type t extended with predefined set, map and hashtbl over t./
 Cmdline.run_after_extended_stage/(unit -> unit) -> unit/Register an action to be executed at the end of the extended stage./
-Db.Value.compute/(unit -> unit) Stdlib.ref/Compute the value analysis using the entry point of the current  project. You may set it with Globals.set_entry_point. raised exceptions: , if the entry point is incorrect, if some arguments are  specified for the entry point using Db.Value.fun_set_args, and  an incorrect number of them is given./
 Visitor_behavior.Get_orig/Visitor_behavior.Get/Get operations on behaviors, allows to get the original representative of an element of the new AST in the curent state of the visitor. Get_orig.ast_element vis new_e with new_e of type ast_element gets the original representative of new_e in vis. For example for Cil_types.varinfo: Get_orig.varinfo vis new_vi./
 Cil_types.stmtkind.TryFinally/ of Cil_types.block * Cil_types.block * Cil_types.location/On MSVC we support structured exception handling. This is what you might  expect. Control can get into the finally block either from the end of the  body block, or if an exception is thrown./
 Cil_types.logic_info//description of a logic function or predicate./
@@ -258,7 +251,7 @@ Cil_types.logic_var//description of a logic variable/
 Cil_types.exp_node.BinOp/ of Cil_types.binop * Cil_types.exp * Cil_types.exp * Cil_types.typ/Binary operation. Includes the type of the result. The arithmetic  conversions are made explicit for the arguments./
 Log.log_channel/Log.channel -> ?kind:Log.kind -> 'a Log.pretty_printer/logging function to user-created channel./
 Cil_types.stmtkind.Loop/ of Cil_types.code_annotation list * Cil_types.block * Cil_types.location * Cil_types.stmt option * Cil_types.stmt option/A while(1) loop. The termination test is implemented in the body of a  loop using a Break statement. If Cfg.prepareCFG has been called, the  first stmt option will point to the stmt containing the continue label  for this loop and the second will point to the stmt containing the break  label for this loop./
-Db.progress/(unit -> unit) Stdlib.ref/This function should be called from time to time by all analysers taking time. In GUI mode, this will make the interface reactive./
+Async.yield/(unit -> unit) Stdlib.ref/This function should be called from time to time by all analysers taking time. In GUI mode, this will make the interface reactive./
 Kernel_function.get_definition/t -> Cil_types.fundec/Returns the list of static variables declared inside the function. raised exception: No_Definition./
 Datatype.char/char Type.t//
 Visitor_behavior.Get.stmt/Visitor_behavior.t -> Cil_types.stmt -> Cil_types.stmt/Fold operations on table of a given type of AST elements. Fold.ast_element vis f, folds f over each pair of ast_element registered in vis. The ast_element in the old AST is presented to f first (that is, f looks like: let f old_e new_e acc = .... For example for Cil_types.varinfo: Fold.varinfo vis (fun old_vi new_vi acc -> ... )./
@@ -284,9 +277,7 @@ Visitor_behavior.Get.kernel_function/Visitor_behavior.t -> Cil_types.kernel_func
 Cmdline.stage.Configuring//The stage where all the parameters which were not already     set may be modified to take into account cmdline options.     Just after this stage, Frama-C will run the plug-in mains./
 Acsl_extension.register_global/string -> ?preprocessor:Acsl_extension.extension_preprocessor -> Acsl_extension.extension_typer -> ?visitor:Acsl_extension.extension_visitor -> ?printer:Acsl_extension.extension_printer -> ?short_printer:Acsl_extension.extension_printer -> bool -> unit/Registers extension for global annotation. See register_behavior./
 File.add_code_transformation_before_cleanup/?deps:(module Parameter_sig.S) list -> ?before:File.code_transformation_category list -> ?after:File.code_transformation_category list -> File.code_transformation_category -> (Cil_types.file -> unit) -> unit/add_code_transformation_before_cleanup name hook adds an hook in the corresponding category that will be called during the normalization of a linked file, before clean up and removal of temps and unused declarations. If this transformation involves changing statements of a function f, f must be flagged with File.must_recompute_cfg. The optional before (resp after) categories indicates that current transformation must be executed before (resp after) the corresponding ones, if they exist. In case of dependencies cycle, an arbitrary order will be chosen for the transformations involved in the cycle. The optional deps argument gives the list of options whose change (e.g. after a -then) will trigger the transformation over the already computed AST. If several transformations are triggered by the same option, their relative order is preserved. At this level, globals and ACSL annotations have not been registered./
-Db/end /Database in which static plugins are registered./
 Cmdline.stage.Extending//Before loading plug-ins. Run only once./
-Analysis.compute/unit -> unit/Computes the Eva analysis, if not already computed, using the entry point of the current project. You may set it with Globals.set_entry_point. raised exceptions: , if the entry point is incorrect, if some arguments are specified for the entry point using Db.Value.fun_set_args, and an incorrect number of them is given./
 Type.precedence.Basic//Normal precedence/
 FCHashtbl/int -> int -> 'a -> intend /Extension of OCaml's Hashtbl module./
 Cil_datatype.Fundec/Cil_datatype.S_with_collections_pretty with type t = fundec//

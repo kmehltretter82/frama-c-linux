@@ -1,0 +1,4 @@
+[kernel] Parsing Extend_kernel.i (no preprocessing)
+[kernel] Extend_kernel.i:11: User Error: 
+  Extension 'calls' from frama-c's kernel should not be used with the syntax \kernel::calls
+[kernel] Frama-C aborted: invalid user input.

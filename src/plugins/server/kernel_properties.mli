@@ -22,14 +22,6 @@
 
 (** Kernel Property Status *)
 
-(** Documentation of ACSL extensions for [propkind] server data. *)
-val register_propkind :
-  name:string ->
-  kind:[`Clause | `Loop | `Other] ->
-  ?label:Markdown.text ->
-  descr:Markdown.text ->
-  unit -> unit
-
 (** Trigger a full reload for the table of property status. *)
 val reload : unit -> unit
 

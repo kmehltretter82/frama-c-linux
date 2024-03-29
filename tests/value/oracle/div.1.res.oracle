@@ -60,8 +60,7 @@
 [eva:alarm] div.i:33: Warning: 
   signed overflow. assert (int)(&Z2) / Z2 ≤ 2147483647;
 [eva:garbled-mix:write] div.i:33: 
-  Assigning imprecise value to b.
-  The imprecision originates from Arithmetic {div.i:33}
+  Assigning imprecise value to b because of arithmetic operation on addresses.
 [eva:alarm] div.i:34: Warning: 
   assertion 'rte,pointer_downcast' got status unknown.
 [eva:alarm] div.i:34: Warning: 
@@ -74,8 +73,7 @@
 [eva:alarm] div.i:34: Warning: 
   signed overflow. assert 100 / (int)(&X + 2) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:34: 
-  Assigning imprecise value to d2.
-  The imprecision originates from Arithmetic {div.i:34}
+  Assigning imprecise value to d2 because of arithmetic operation on addresses.
 [eva:alarm] div.i:35: Warning: 
   assertion 'rte,pointer_downcast' got status unknown.
 [eva] div.i:35: assertion 'rte,division_by_zero' got status valid.
@@ -86,8 +84,7 @@
 [eva:alarm] div.i:35: Warning: 
   signed overflow. assert 100 / (int)(&X + 1) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:35: 
-  Assigning imprecise value to d1.
-  The imprecision originates from Arithmetic {div.i:35}
+  Assigning imprecise value to d1 because of arithmetic operation on addresses.
 [eva:alarm] div.i:36: Warning: 
   assertion 'rte,pointer_downcast' got status unknown.
 [eva] div.i:36: assertion 'rte,division_by_zero' got status valid.
@@ -98,8 +95,7 @@
 [eva:alarm] div.i:36: Warning: 
   signed overflow. assert 100 / (int)(&X) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:36: 
-  Assigning imprecise value to d0.
-  The imprecision originates from Arithmetic {div.i:36}
+  Assigning imprecise value to d0 because of arithmetic operation on addresses.
 [eva:alarm] div.i:37: Warning: 
   assertion 'rte,pointer_downcast' got status unknown.
 [eva:alarm] div.i:37: Warning: 
@@ -111,8 +107,7 @@
 [eva:alarm] div.i:37: Warning: 
   signed overflow. assert -((int)(&X)) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:37: 
-  Assigning imprecise value to e.
-  The imprecision originates from Arithmetic {div.i:37}
+  Assigning imprecise value to e because of arithmetic operation on addresses.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] div.i:22: assertion 'rte,signed_overflow' got final status valid.

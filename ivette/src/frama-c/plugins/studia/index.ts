@@ -26,6 +26,7 @@ import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
 import * as Status from 'frama-c/kernel/Status';
 import * as Ast from 'frama-c/kernel/api/ast';
+import * as ASTview from 'frama-c/kernel/ASTview';
 import * as Locations from 'frama-c/kernel/Locations';
 import { getWritesLval, getReadsLval } from 'frama-c/plugins/studia/api/studia';
 import './style.css';
@@ -95,17 +96,19 @@ export function buildMenu(
     case 'STMT':
       menu.push({
         label: `Studia: select reads of …`,
-        onClick: () => Ivette.focusMode(studiaReadsMode.id)
+        onClick: () => Ivette.focusSearchMode(studiaReadsMode.id)
       });
       menu.push({
         label: `Studia: select writes of …`,
-        onClick: () => Ivette.focusMode(studiaWritesMode.id)
+        onClick: () => Ivette.focusSearchMode(studiaWritesMode.id)
       });
       return;
   }
 }
 
-const studiaReadsMode : Ivette.ModeProps = {
+ASTview.registerMarkerMenuExtender(buildMenu);
+
+const studiaReadsMode : Ivette.SearchProps = {
   id: 'frama-c.plugins.studia.reads',
   rank: -1,
   label: 'Studia: reads',
@@ -116,7 +119,7 @@ const studiaReadsMode : Ivette.ModeProps = {
   onEnter: (p: string) => onEnter('Reads', p)
 };
 
-const studiaWritesMode : Ivette.ModeProps = {
+const studiaWritesMode : Ivette.SearchProps = {
   id: 'frama-c.plugins.studia.writes',
   rank: -1,
   label: 'Studia: writes',
@@ -129,19 +132,16 @@ const studiaWritesMode : Ivette.ModeProps = {
 
 async function onEnter(akind: access, term: string): Promise<void> {
   const stmt = States.getSelected();
-  const { kind: mkind } = States.getMarker(stmt);
-  if (mkind === 'STMT') {
-    const marker = await Server.send(Ast.parseLval, { stmt, term })
-      .catch(handleError);
-    if (marker) computeStudiaSelection(akind, marker, term);
-  }
+  const marker = await Server.send(Ast.parseLval, { stmt, term })
+    .catch(handleError);
+  if (marker) computeStudiaSelection(akind, marker, term);
 }
 
-Ivette.registerMode(studiaReadsMode);
-Ivette.registerMode(studiaWritesMode);
+Ivette.registerSearchMode(studiaReadsMode);
+Ivette.registerSearchMode(studiaWritesMode);
 States.GlobalHistory.on((s: States.History) => {
   const marker = s.curr.marker;
   const enabled = marker !== undefined;
-  Ivette.updateMode({ id: studiaReadsMode.id, enabled });
-  Ivette.updateMode({ id: studiaWritesMode.id, enabled });
+  Ivette.updateSearchMode({ id: studiaReadsMode.id, enabled });
+  Ivette.updateSearchMode({ id: studiaWritesMode.id, enabled });
 });

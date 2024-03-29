@@ -68,13 +68,20 @@ let path_for chapter filename =
   | `Kernel -> ".." , Printf.sprintf "kernel/%s" filename
   | `Plugin name -> "../.." , Printf.sprintf "plugins/%s/%s" name filename
 
-let page chapter ~title ?(descr=[]) ?readme ~filename () =
+let path_for_readme ~plugin filename =
+  let dirname = match plugin with Kernel -> "server" | Plugin p -> p in
+  Filepath.Normalized.concats
+    (Filepath.Normalized.of_string ".")
+    ["src";"plugins";dirname;"doc";filename]
+
+let page chapter ~title ?(descr=[]) ?(plugin=Kernel) ~readme ~filename () =
   let rootdir , path = path_for chapter filename in
   try
     let other = Pages.find path !pages in
     Senv.failure "Duplicate page '%s' path@." path ; other
   with Not_found ->
     let order = incr order ; !order in
+    let readme = Option.map (path_for_readme ~plugin) readme in
     let page = {
       order ; rootdir ; path ;
       chapter ; title ; descr ; readme ;
@@ -99,8 +106,7 @@ let publish ~page ?name ?(index=[]) ~title
   page.sections <- section :: page.sections ; href
 
 let protocol ~title ~readme:filename =
-  let readme = Filepath.Normalized.concats Fc_config.datadir ["server"; "doc"; filename] in
-  ignore (page `Protocol ~title ~readme ~filename ())
+  ignore (page `Protocol ~title ~readme:(Some filename) ~filename ())
 
 let () = protocol ~title:"Architecture" ~readme:"server.md"
 
@@ -131,7 +137,8 @@ let page_of_package pkg =
     page chapter
       ~title:pkg.p_title
       ~descr:(Markdown.par pkg.p_descr)
-      ?readme:pkg.p_readme
+      ~plugin:pkg.p_plugin
+      ~readme:pkg.p_readme
       ~filename ()
 
 let kind_of_decl = function
@@ -376,7 +383,7 @@ let dump ~root ?(meta=true) () =
   end
 
 let () =
-  Db.Main.extend begin
+  Boot.Main.extend begin
     fun () ->
       if not (Senv.Doc.is_empty ()) then
         let root = Senv.Doc.get () in

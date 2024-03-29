@@ -2,30 +2,61 @@
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
 [alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *a = (int *)0;  is    <empty>
 [alias] analysing instruction: int *b = (int *)0;
 [alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *b = (int *)0;  is    <empty>
 [alias] analysing instruction: int *c = (int *)0;
 [alias] May-aliases after instruction  int *c = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *c = (int *)0;  is    <empty>
 [alias] analysing instruction: int *d = (int *)0;
 [alias] May-aliases after instruction  int *d = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *d = (int *)0;  is    <empty>
 [alias] analysing instruction: swap(a,b);
 [alias] analysing function: swap
 [alias] analysing instruction: int *z = (int *)0;
 [alias] May-aliases after instruction  int *z = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *z = (int *)0;  is    <empty>
 [alias] analysing instruction: z = x;
 [alias] May-aliases after instruction  z = x;  are  { x; z }
+[alias] May-alias graph after instruction  z = x;  is    0:{ x; z } → 1:{  }
 [alias] analysing instruction: x = y;
 [alias] May-aliases after instruction  x = y;  are  { x; y; z }
+[alias] May-alias graph after instruction  x = y;  is    0:{ x; y; z } → 1:{  }
 [alias] analysing instruction: y = z;
 [alias] May-aliases after instruction  y = z;  are  { x; y; z }
+[alias] May-alias graph after instruction  y = z;  is    0:{ x; y; z } → 1:{  }
 [alias] May-aliases at the end of function swap: { x; y; z }
+[alias] May-alias graph at the end of function swap:
+  0:{ x; y; z } → 1:{  }
+[alias] Summary of function swap:
+  formals: x  y    returns: <none>    state: { x; y; z }
 [alias] May-aliases after instruction  swap(a,b);  are  { a; b }
+[alias] May-alias graph after instruction  swap(a,b);  is
+  8:{ a } → 7:{  }   10:{ b } → 7:{  }
 [alias] analysing instruction: swap(c,d);
 [alias] May-aliases after instruction  swap(c,d);  are  { a; b }  { c; d }
+[alias] May-alias graph after instruction  swap(c,d);  is
+  8:{ a } → 7:{  }   10:{ b } → 7:{  }   14:{ c } → 13:{  }
+  16:{ d } → 13:{  }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  { a; b }  { c; d }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  8:{ a } → 7:{  }   10:{ b } → 7:{  }   14:{ c } → 13:{  }
+  16:{ d } → 13:{  }
 [alias] May-aliases at the end of function main: { a; b }  { c; d }
+[alias] May-alias graph at the end of function main:
+  8:{ a } → 7:{  }   10:{ b } → 7:{  }   14:{ c } → 13:{  }
+  16:{ d } → 13:{  }
+[alias] Summary of function main:
+  formals:     returns: __retres    state: { a; b }  { c; d }
 [alias] analysing function: swap
 [alias] analysing instruction: int *z = (int *)0;
 [alias] May-aliases after instruction  int *z = (int *)0;  are  <none>
+[alias] May-alias graph after instruction  int *z = (int *)0;  is    <empty>
 [alias] May-aliases at the end of function swap: { x; y; z }
+[alias] May-alias graph at the end of function swap:
+  0:{ x; y; z } → 1:{  }
+[alias] Summary of function swap:
+  formals: x  y    returns: <none>    state: { x; y; z }
+[alias] Analysis complete

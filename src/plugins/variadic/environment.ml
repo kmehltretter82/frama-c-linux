@@ -90,6 +90,12 @@ let find_type (env : t) (namespace : Logic_typing.type_namespace)
   | Logic_typing.Enum ->
     TEnum (find_enum env tname, [])
 
+let mem_global (env : t) (vname : string) : bool =
+  Table.mem env.globals vname
+
+let mem_function (env : t) (vname : string) : bool =
+  Table.mem env.functions vname
+
 let from_file (file : file) : t =
   let env = empty () in
   let v = object inherit Cil.nopCilVisitor

@@ -205,14 +205,14 @@ open Tactical
 let positive_land =
   Tactical.checkbox
     ~id:"positive-land"
-    ~title:"Force positive logical-and"
+    ~title:"Pos."
     ~descr:"Requires to obtain a result from (at least one) positive operands"
     ~default:true ()
 
 let positive_lor =
   Tactical.checkbox
     ~id:"positive-lor"
-    ~title:"Force negative logical-or"
+    ~title:"Neg."
     ~descr:"Restrict to obtain a positive result from (all) positive operands"
     ~default:true ()
 
@@ -221,7 +221,7 @@ class bitrange =
     inherit Tactical.make
         ~id:"Wp.bitrange"
         ~title:"Bit Range"
-        ~descr:"Bounds of Bitwise Operators"
+        ~descr:"Compute bounds of bitwise operators."
         ~params:[snd positive_land;snd positive_lor]
 
     method select feedback = function
@@ -283,7 +283,7 @@ class autobitrange =
 
     method id = "wp:bitrange"
     method title = "Auto Bit-Range"
-    method descr = "Apply Bit-Range on comparison with bitwised operations"
+    method descr = "Compute bounds of bitwise operations."
 
     method search push (seq : Conditions.sequent) =
       let goal = snd seq in

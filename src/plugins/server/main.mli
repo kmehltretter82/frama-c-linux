@@ -94,10 +94,10 @@ val create :
 (** Start the server in background.
 
     The function returns immediately after installing a daemon that (only)
-    accepts GET requests received by the server on calls to [Db.yield()].
+    accepts GET requests received by the server on calls to [Async.yield()].
 
     Shall be scheduled at command line main stage {i via}
-    [Db.Main.extend] extension point.
+    [Boot.Main.extend] extension point.
 *)
 val start : 'a server -> unit
 
@@ -114,7 +114,7 @@ val stop : 'a server -> unit
 (** Run the server forever.
     The server would now accept any kind of requests and start handling them.
     While executing an [`EXEC] request, the server would
-    continue to handle (only) [`GET] pending requests on [Db.yield()]
+    continue to handle (only) [`GET] pending requests on [Async.yield()]
     at every [server.polling] time interval.
 
     The function will {i not} return until the server is actually shutdown.
@@ -140,6 +140,12 @@ val on_signal : signal -> (bool -> unit) -> unit
     All callbacks are executed in their order of registration.
     Callbacks shall {i never} raise any exception. *)
 val on : (bool -> unit) -> unit
+
+(** Register a callback to listen for server initialization. All callbacks are
+    executed once, in their order of registration, and before activity
+    callbacks.
+    Callbacks shall {i never} raise any exception. *)
+val once : (unit -> unit) -> unit
 
 (** Register an asynchronous task on the server.
     When the server is not working in background, this is

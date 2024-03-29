@@ -19,7 +19,7 @@ Let a_4 = shift_uint8(a_3, 0).
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1).
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Goal *)
   When: (0 <= i) /\ ((2 + i) <= len_0).
   (* Pre-condition 'write_access' *)
@@ -54,7 +54,7 @@ Let a_5 = shift_uint8(a_3, i).
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1).
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Goal *)
   When: (0 <= i) /\ ((2 + i) <= len_0).
   (* Pre-condition 'write_access' *)
@@ -89,7 +89,7 @@ Let a_5 = a_2[v <- a_2[v_1]].
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1) /\ is_sint32(len_1 - 1).
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Goal *)
   When: (0 <= i) /\ ((i + len_1) <= len_0).
   (* Pre-condition 'write_access' *)
@@ -140,7 +140,7 @@ Let a_4 = shift_uint8(a_3, 0).
 Assume {
   Type: is_sint32(len_1) /\ is_sint32(len_0) /\ is_sint32(len_0 - 1).
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Pre-condition 'write_access' *)
   Have: valid_rw(Malloc_0, a_1, len_1).
   (* Pre-condition 'read_access' *)
@@ -208,7 +208,7 @@ Let a_7 = shift_uint8(a_6, 0).
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1) /\ is_sint32(len_1 - 1).
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Goal *)
   When: !invalid(Malloc_0[P_src_24 <- 1][P_dst_25 <- 1], v, 1).
   (* Pre-condition 'write_access' *)
@@ -266,7 +266,7 @@ Let a_4 = shift_uint8(a_3, 0).
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1).
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Goal *)
   When: (0 <= i) /\ ((2 + i) <= len_0).
   (* Pre-condition 'write_access' *)
@@ -301,7 +301,7 @@ Let a_5 = shift_uint8(a_3, i).
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1).
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Goal *)
   When: (0 <= i) /\ ((2 + i) <= len_0).
   (* Pre-condition 'write_access' *)
@@ -336,7 +336,7 @@ Let a_5 = a_2[dst2_0 <- a_2[src2_0]].
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1) /\ is_sint32(len_1 - 1).
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Goal *)
   When: (0 <= i) /\ ((i + len_1) <= len_0).
   (* Pre-condition 'write_access' *)
@@ -387,7 +387,7 @@ Let a_4 = shift_uint8(a_3, 0).
 Assume {
   Type: is_sint32(len_1) /\ is_sint32(len_0) /\ is_sint32(len_0 - 1).
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Pre-condition 'write_access' *)
   Have: valid_rw(Malloc_0, a_1, len_1).
   (* Pre-condition 'read_access' *)
@@ -453,7 +453,7 @@ Let a_5 = shift_uint8(a_4, 0).
 Assume {
   Type: is_sint32(len_0) /\ is_sint32(len_1) /\ is_sint32(len_1 - 1).
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Goal *)
   When: !invalid(Malloc_0[P_src_47 <- 1][P_dst_48 <- 1], tmp_0, 1).
   (* Pre-condition 'write_access' *)

@@ -45,6 +45,7 @@ struct
         type t = tau
         let dummy = Prop
         let equal = Kind.eq_tau Field.equal ADT.equal
+        let compare = Kind.compare_tau Field.compare ADT.compare
       end)
 
   open POOL

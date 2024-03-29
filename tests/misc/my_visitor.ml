@@ -54,7 +54,7 @@ class foo = object (self)
   inherit Visitor.frama_c_inplace
 
   method! vstmt_aux stmt =
-    let loc = Cil.CurrentLoc.get () in
+    let loc = Current_loc.get () in
     add_assert loc (Option.get self#current_kf) stmt;
     DoChildren
 
@@ -81,7 +81,7 @@ let main () =
     print ()
   end
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main
 
 (* This other main is a simple test for deep copy. *)
 
@@ -95,4 +95,4 @@ let main () =
     assert (Project.on p ~selection (fun () -> not (Kernel.LibEntry.get ())) ())
   end
 
-let () = Db.Main.extend main
+let () = Boot.Main.extend main

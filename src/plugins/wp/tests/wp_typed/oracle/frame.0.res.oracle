@@ -52,7 +52,7 @@ Goal Assertion 'A,X' (file frame.i, line 34):
 Let a = Mptr_0[global(L_x_37)].
 Assume {
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Initializer *)
   Init: a = shiftfield_F2_S_b(global(P_s_36)).
 }
@@ -64,7 +64,7 @@ Goal Assertion 'A,Y' (file frame.i, line 35):
 Let a = Mptr_0[global(L_x_37)].
 Assume {
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Initializer *)
   Init: a = shiftfield_F2_S_b(global(P_s_36)).
   (* Assertion 'A,X' *)
@@ -81,7 +81,7 @@ Goal Assertion 'A,X' (file frame.i, line 25):
 Let a = Mptr_0[global(L_x_32)].
 Assume {
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Initializer *)
   Init: a = shift_sint8(global(L_b_31), 0).
 }
@@ -93,7 +93,7 @@ Goal Assertion 'A,Y' (file frame.i, line 26):
 Let a = Mptr_0[global(L_x_32)].
 Assume {
   (* Heap *)
-  Type: framed(Mptr_0) /\ linked(Malloc_0).
+  Type: linked(Malloc_0) /\ framed(Mptr_0).
   (* Initializer *)
   Init: a = shift_sint8(global(L_b_31), 0).
   (* Assertion 'A,X' *)

@@ -24,4 +24,4 @@ let show_correspondances () =
     Ast_diff.Kernel_function.iter show_fun;
   end
 
-let () = Db.Main.extend show_correspondances
+let () = Boot.Main.extend show_correspondances

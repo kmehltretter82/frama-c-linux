@@ -44,10 +44,10 @@
         "unknown-size"
       ],
       "disabled": [
-        "garbled-mix:assigns", "garbled-mix:read", "garbled-mix:summary",
-        "garbled-mix:write", "invalid-assigns", "loop-unroll:auto",
-        "loop-unroll:missing", "loop-unroll:missing:for",
-        "loop-unroll:partial", "malloc:weak", "watchpoint"
+        "garbled-mix:assigns", "garbled-mix:summary", "garbled-mix:write",
+        "invalid-assigns", "loop-unroll:auto", "loop-unroll:missing",
+        "loop-unroll:missing:for", "loop-unroll:partial", "malloc:weak",
+        "watchpoint"
       ]
     }
   },
@@ -57,11 +57,12 @@
         "*", "CERT", "CERT:EXP", "CERT:EXP:46", "CERT:MSC", "CERT:MSC:37",
         "CERT:MSC:38", "acsl-extension", "annot", "annot:missing-spec",
         "annot:multi-from", "annot-error", "asm", "asm:clobber", "audit",
-        "check", "check:volatile", "cmdline", "file", "ghost",
-        "ghost:bad-use", "inline", "linker",
-        "linker:drop-conflicting-unused", "parser",
+        "check", "check:volatile", "cmdline", "extension-unknown", "file",
+        "ghost", "ghost:bad-use", "inline", "linker",
+        "linker:drop-conflicting-unused", "linker:weak", "parser",
         "parser:conditional-feature", "parser:unnamed-typedef",
-        "parser:unsupported", "pp", "pp:compilation-db", "pp:line-directive",
+        "parser:unsupported", "parser:unsupported:attributes",
+        "plugin-not-loaded", "pp", "pp:compilation-db", "pp:line-directive",
         "typing", "typing:implicit-conv-void-ptr",
         "typing:implicit-function-declaration",
         "typing:incompatible-pointer-types",

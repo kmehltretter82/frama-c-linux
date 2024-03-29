@@ -488,13 +488,11 @@ export function selectLine(
 ): void {
   if (!view || view.state.doc.lines < line) return;
   const doc = view.state.doc;
-  const { from: here } = doc.lineAt(view.state.selection.main.from);
-  const { from: goto } = doc.line(Math.max(line, 1));
-  if (focus) view.dispatch({ selection: { anchor: goto } });
-  if (here === goto) return;
+  const { from: anchor } = doc.line(Math.max(line, 1));
+  if (focus) view.dispatch({ selection: { anchor } });
   if (isVisible(view, line)) return;
   const verticalScroll = atTop ? 'start' : 'center';
-  const effects = EditorView.scrollIntoView(goto, { y: verticalScroll });
+  const effects = EditorView.scrollIntoView(anchor, { y: verticalScroll });
   view.dispatch({ effects });
 }
 

@@ -8,6 +8,3 @@ coverage
 lib
 # don't lint the generated API
 api
-
-src/dome/renderer/layout/grids.tsx
-src/dome/renderer/olddnd.tsx

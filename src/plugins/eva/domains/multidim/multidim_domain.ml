@@ -75,12 +75,12 @@ struct
   let of_bit ~typ:_ = function
     | Abstract_memory.Uninitialized -> uninitialized
     | Zero i -> make i (V.inject_int Integer.zero)
-    | Any (Top, i) -> make i (V.top_with_origin Origin.top)
+    | Any (Top, i) -> make i (V.top_with_origin Origin.unknown)
     | Any (Set s, i) ->
       let v =
         if Base.Hptset.is_empty s
         then V.inject_ival Ival.top
-        else V.inject_top_origin Origin.top s
+        else V.inject_top_origin Origin.unknown s
       in
       make i v
 

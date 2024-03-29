@@ -1226,6 +1226,14 @@ extern int optind, opterr, optopt;
  */
 extern int getopt(int argc, char * const argv[], const char *optstring);
 
+/*@
+  // missing: assigns 'filesystem' \from name[0..];
+  // missing: assigns errno one of 13 different possible values
+  requires valid_name: valid_read_string(name);
+  assigns \result \from indirect:name[0..strlen(name)];
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int rmdir(const char *name);
 
 __END_DECLS
 

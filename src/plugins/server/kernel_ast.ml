@@ -608,7 +608,7 @@ struct
       if not libc then Kernel.PrintLibc.set false ; raise err
 
   let is_builtin kf =
-    Cil_builtins.is_builtin (Kernel_function.get_vi kf)
+    Cil_builtins.has_fc_builtin_attr (Kernel_function.get_vi kf)
 
   let is_extern kf =
     let vi = Kernel_function.get_vi kf in
@@ -618,7 +618,7 @@ struct
     Globals.Functions.iter
       (fun kf ->
          let name = Kernel_function.get_name kf in
-         if not (Ast_info.is_frama_c_builtin name) then f kf)
+         if not (Ast_info.start_with_frama_c_builtin name) then f kf)
 
   let array : kernel_function States.array =
     begin
@@ -965,7 +965,7 @@ let () = Information.register
     ~title:"Property Consolidated Status"
     begin fun fmt loc ->
       match loc with
-      | PIP prop ->
+      | PIP prop when Property.has_status prop ->
         Property_status.Feedback.pretty fmt @@
         Property_status.Feedback.get prop
       | _ -> raise Not_found

@@ -1,35 +1,80 @@
 [kernel] Parsing conditional3.c (with preprocessing)
 [alias] analysing function: main
 [alias] analysing instruction: a = b;
-[alias] May-aliases after instruction  a = b;  are  { a; b }
+[alias] May-aliases after instruction  a = b;  are
+  { a; b }  { *a; *b }  { *(*a); *(*b) }  { *(*(*a)); *(*(*b)) }
+[alias] May-alias graph after instruction  a = b;  is
+  0:{ a; b } → 1:{  }   1:{  } → 2:{  }   2:{  } → 3:{  }
+  3:{  } → 4:{  }
 [alias] analysing instruction: b = & i;
-[alias] May-aliases after instruction  b = & i;  are  { a; b }  { *a; *b; i }
+[alias] May-aliases after instruction  b = & i;  are
+  { a; b }  { *a; *b; i }  { *(*a); *(*b); *i }  { *(*(*a)); *(*(*b)); *(*i) }
+[alias] May-alias graph after instruction  b = & i;  is
+  0:{ a; b } → 1:{ i }   1:{ i } → 2:{  }   2:{  } → 3:{  }
+  3:{  } → 4:{  }
 [alias] analysing instruction: i = & x;
 [alias] May-aliases after instruction  i = & x;  are
   { a; b }  { *a; *b; i }  { *(*a); *(*b); *i; x }
+  { *(*(*a)); *(*(*b)); *(*i); *x }
+[alias] May-alias graph after instruction  i = & x;  is
+  0:{ a; b } → 1:{ i }   1:{ i } → 2:{ x }   2:{ x } → 3:{  }
+  3:{  } → 4:{  }
 [alias] analysing instruction: x = & t;
 [alias] May-aliases after instruction  x = & t;  are
   { a; b }  { *a; *b; i }  { *(*a); *(*b); *i; x }
   { *(*(*a)); *(*(*b)); *(*i); *x; t }
+[alias] May-alias graph after instruction  x = & t;  is
+  0:{ a; b } → 1:{ i }   1:{ i } → 2:{ x }   2:{ x } → 3:{ t }
+  3:{ t } → 4:{  }
 [alias] analysing instruction: a = c;
-[alias] May-aliases after instruction  a = c;  are  { a; c }
+[alias] May-aliases after instruction  a = c;  are
+  { a; c }  { *a; *c }  { *(*a); *(*c) }  { *(*(*a)); *(*(*c)) }
+[alias] May-alias graph after instruction  a = c;  is
+  22:{ a; c } → 23:{  }   23:{  } → 24:{  }   24:{  } → 25:{  }
+  25:{  } → 26:{  }
 [alias] analysing instruction: c = & j;
-[alias] May-aliases after instruction  c = & j;  are  { a; c }  { *a; *c; j }
+[alias] May-aliases after instruction  c = & j;  are
+  { a; c }  { *a; *c; j }  { *(*a); *(*c); *j }  { *(*(*a)); *(*(*c)); *(*j) }
+[alias] May-alias graph after instruction  c = & j;  is
+  22:{ a; c } → 23:{ j }   23:{ j } → 24:{  }   24:{  } → 25:{  }
+  25:{  } → 26:{  }
 [alias] analysing instruction: j = & y;
 [alias] May-aliases after instruction  j = & y;  are
   { a; c }  { *a; *c; j }  { *(*a); *(*c); *j; y }
+  { *(*(*a)); *(*(*c)); *(*j); *y }
+[alias] May-alias graph after instruction  j = & y;  is
+  22:{ a; c } → 23:{ j }   23:{ j } → 24:{ y }   24:{ y } → 25:{  }
+  25:{  } → 26:{  }
 [alias] analysing instruction: y = & u;
 [alias] May-aliases after instruction  y = & u;  are
   { a; c }  { *a; *c; j }  { *(*a); *(*c); *j; y }
   { *(*(*a)); *(*(*c)); *(*j); *y; u }
+[alias] May-alias graph after instruction  y = & u;  is
+  22:{ a; c } → 23:{ j }   23:{ j } → 24:{ y }   24:{ y } → 25:{ u }
+  25:{ u } → 26:{  }
 [alias] analysing instruction: p = 0;
 [alias] May-aliases after instruction  p = 0;  are
   { a; b; c }  { *a; *b; *c; i; j }  { *(*a); *(*b); *(*c); *i; *j; x; y }
   { *(*(*a)); *(*(*b)); *(*(*c)); *(*i); *(*j); *x; *y; t; u }
+[alias] May-alias graph after instruction  p = 0;  is
+  0:{ a; b; c } → 1:{ i; j }   1:{ i; j } → 2:{ x; y }
+  2:{ x; y } → 3:{ t; u }   3:{ t; u } → 4:{  }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
   { a; b; c }  { *a; *b; *c; i; j }  { *(*a); *(*b); *(*c); *i; *j; x; y }
   { *(*(*a)); *(*(*b)); *(*(*c)); *(*i); *(*j); *x; *y; t; u }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  0:{ a; b; c } → 1:{ i; j }   1:{ i; j } → 2:{ x; y }
+  2:{ x; y } → 3:{ t; u }   3:{ t; u } → 4:{  }
 [alias] May-aliases at the end of function main:
   { a; b; c }  { *a; *b; *c; i; j }  { *(*a); *(*b); *(*c); *i; *j; x; y }
   { *(*(*a)); *(*(*b)); *(*(*c)); *(*i); *(*j); *x; *y; t; u }
+[alias] May-alias graph at the end of function main:
+  0:{ a; b; c } → 1:{ i; j }   1:{ i; j } → 2:{ x; y }
+  2:{ x; y } → 3:{ t; u }   3:{ t; u } → 4:{  }
+[alias] Summary of function main:
+  formals:     returns: __retres
+  state: { a; b; c }  { *a; *b; *c; i; j }
+         { *(*a); *(*b); *(*c); *i; *j; x; y }
+         { *(*(*a)); *(*(*b)); *(*(*c)); *(*i); *(*j); *x; *y; t; u }
+[alias] Analysis complete

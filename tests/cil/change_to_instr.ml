@@ -7,11 +7,11 @@ class add_skip = object(_)
 
   method! vinst i =
     let open Cil_types in
-    Cil.ChangeTo [ Skip(Cil.CurrentLoc.get()) ; i ]
+    Cil.ChangeTo [ Skip(Current_loc.get()) ; i ]
 end
 
 let run () =
   Visitor.visitFramacFileSameGlobals (new add_skip) (Ast.get())
 
 let () =
-  Db.Main.extend run
+  Boot.Main.extend run

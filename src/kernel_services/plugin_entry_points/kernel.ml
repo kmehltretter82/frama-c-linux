@@ -142,6 +142,12 @@ let dkey_visitor = register_category "visitor"
 let wkey_annot_error = register_warn_category "annot-error"
 let () = set_warn_status wkey_annot_error Log.Wabort
 
+let wkey_plugin_not_loaded = register_warn_category "plugin-not-loaded"
+let () = set_warn_status wkey_plugin_not_loaded Log.Wactive
+
+let wkey_extension_unknown = register_warn_category "extension-unknown"
+let () = set_warn_status wkey_extension_unknown Log.Werror
+
 let wkey_ghost_already_ghost = register_warn_category "ghost:already-ghost"
 let () = set_warn_status wkey_ghost_already_ghost Log.Wfeedback
 
@@ -155,6 +161,8 @@ let wkey_conditional_feature =
   register_warn_category "parser:conditional-feature"
 
 let wkey_drop_unused = register_warn_category "linker:drop-conflicting-unused"
+
+let wkey_linker_weak = register_warn_category "linker:weak"
 
 let wkey_implicit_conv_void_ptr =
   register_warn_category "typing:implicit-conv-void-ptr"
@@ -209,6 +217,8 @@ let wkey_audit = register_warn_category "audit"
 let () = set_warn_status wkey_audit Log.Werror
 
 let wkey_parser_unsupported = register_warn_category "parser:unsupported"
+
+let wkey_parser_unsupported_attributes = register_warn_category "parser:unsupported:attributes"
 
 let wkey_asm = register_warn_category "asm:clobber"
 

@@ -84,15 +84,7 @@ struct
   let t_check_lemma = t_kind "check_lemma" "Logical check lemma"
 
   let t_ext = t_kind "extension" "ACSL extension"
-
-  let p_ext = Enum.prefix kinds ~name:"ext" ~var:"<clause>"
-      ~descr:(Md.plain "ACSL extension `<clause>`")
-
-  let p_loop_ext = Enum.prefix kinds ~name:"loop_ext" ~var:"<clause>"
-      ~descr:(Md.plain "ACSL loop extension `loop <clause>`")
-
-  let p_other = Enum.prefix kinds ~name:"prop" ~var:"<prop>"
-      ~descr:(Md.plain "Plugin Specific properties")
+  let t_other = t_kind "generic" "Generic Property"
 
   open Property
 
@@ -138,7 +130,7 @@ struct
     | IPPropertyInstance _ -> t_instance
     | IPTypeInvariant _ -> t_type_invariant
     | IPGlobalInvariant _ -> t_global_invariant
-    | IPOther { io_name } -> Enum.instance p_other io_name
+    | IPOther _ -> t_other
 
   let () = Enum.set_lookup kinds lookup
   let data = Request.dictionary ~package
@@ -148,14 +140,6 @@ struct
 
   include (val data : S with type t = Property.t)
 end
-
-let register_propkind ~name ~kind ?label ~descr () =
-  let open PropKind in
-  let prefix = match kind with
-    | `Clause -> p_ext
-    | `Loop -> p_loop_ext
-    | `Other -> p_other
-  in ignore @@ Enum.extends prefix ~name ?label ~descr
 
 (* -------------------------------------------------------------------------- *)
 (* --- Property Status                                                    --- *)
@@ -284,7 +268,13 @@ let () = States.column model ~name:"names"
 let () = States.column model ~name:"status"
     ~descr:(Md.plain "Status")
     ~data:(module PropStatus)
-    ~get:(Property_status.Feedback.get)
+    ~get:
+      begin fun ip ->
+        if Property.has_status ip
+        then Property_status.Feedback.get ip
+        else Property_status.Feedback.Never_tried
+      end
+
 
 let () = States.option model ~name:"scope"
     ~descr:(Md.plain "Declaration Scope")
@@ -318,7 +308,7 @@ let is_relevant ip =
   match Property.get_kf ip with
   | None -> true
   | Some kf ->
-    not (Ast_info.is_frama_c_builtin (Kernel_function.get_name kf)
+    not (Ast_info.start_with_frama_c_builtin (Kernel_function.get_name kf)
          || Cil_builtins.is_unused_builtin (Kernel_function.get_vi kf))
 
 let iter f =

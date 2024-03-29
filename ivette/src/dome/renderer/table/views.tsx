@@ -40,7 +40,7 @@ import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import { DraggableCore } from 'react-draggable';
 import {
-  AutoSizer, Size,
+  Size,
   SortDirection, SortDirectionType,
   Index, IndexRange,
   Table as VTable,
@@ -52,6 +52,7 @@ import {
   TableCellRenderer,
   RowMouseEventHandlerParams,
 } from 'react-virtualized';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 import { SVG as SVGraw } from 'dome/controls/icons';
 import { Trigger, Client, Sorting, SortingInfo, Model } from './models';
@@ -181,6 +182,8 @@ export interface TableProps<Key, Row> {
   selection?: Key;
   /** Selection callback. */
   onSelection?: (row: Row, key: Key, index: number) => void;
+  /** Double click callback. */
+  onDoubleClick?: (row: Row, index: number) => void;
   /** Context menu callback. */
   onContextMenu?: (row: Row, index: number) => void;
   /** Fallback for rendering an empty table. */
@@ -274,7 +277,7 @@ function makeDataRenderer(
     const { cellData } = props;
     try {
       const undef = cellData === null || cellData === undefined;
-      const contents =  undef ? null : render(cellData);
+      const contents = undef ? null : render(cellData);
       if (onContextMenu) {
         const callback = (evt: React.MouseEvent): void => {
           evt.stopPropagation();
@@ -337,6 +340,8 @@ class TableState<Key, Row> {
   selectedIndex?: number; // Current selected index
   sortBy?: string; // last sorting dataKey
   sortDirection?: SortDirectionType; // last sorting direction
+  onSelection?: (data: Row, key: Key, index: number) => void; // main callback
+  onDoubleClick?: (row: Row, index: number) => void; // double click callback
   onContextMenu?: (row: Row, index: number) => void; // context menu callback
   range?: IndexRange;
   rowCount = 0;
@@ -350,6 +355,7 @@ class TableState<Key, Row> {
     this.rowClassName = this.rowClassName.bind(this);
     this.onHeaderMenu = this.onHeaderMenu.bind(this);
     this.onRowClick = this.onRowClick.bind(this);
+    this.onRowDoubleClick = this.onRowDoubleClick.bind(this);
     this.onRowRightClick = this.onRowRightClick.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onSorting = this.onSorting.bind(this);
@@ -363,6 +369,7 @@ class TableState<Key, Row> {
     this.signal = undefined;
     this.onSelection = undefined;
     this.onContextMenu = undefined;
+    this.onDoubleClick = undefined;
   }
 
   forceUpdate(): void {
@@ -509,8 +516,6 @@ class TableState<Key, Row> {
 
   // ---- Selection Management
 
-  onSelection?: (data: Row, key: Key, index: number) => void;
-
   onRowClick(info: RowMouseEventHandlerParams): void {
     const { index } = info;
     const data = info.rowData as (Row | undefined);
@@ -529,7 +534,8 @@ class TableState<Key, Row> {
 
   rowClassName({ index }: Index): string {
     if (this.selectedIndex === index) return 'dome-xTable-selected';
-    return (index & 1 ? 'dome-xTable-even' : 'dome-xTable-odd'); // eslint-disable-line no-bitwise
+    // eslint-disable-next-line no-bitwise
+    return (index & 1 ? 'dome-xTable-even' : 'dome-xTable-odd');
   }
 
   keyStepper(index: number): void {
@@ -563,7 +569,17 @@ class TableState<Key, Row> {
 
   // ---- Row Events
 
-  onRowRightClick({ event, rowData, index }: RowMouseEventHandlerParams): void {
+  onRowDoubleClick({ event, rowData, index }: RowMouseEventHandlerParams): void
+  {
+    const callback = this.onDoubleClick;
+    if (callback) {
+      event.stopPropagation();
+      callback(rowData, index);
+    }
+  }
+
+  onRowRightClick({ event, rowData, index }: RowMouseEventHandlerParams): void
+  {
     const callback = this.onContextMenu;
     if (callback) {
       event.stopPropagation();
@@ -841,7 +857,9 @@ function makeColumn<Key, Row>(
     props.disableSort || !sorting || !sorting.canSortBy(dataKey);
   const getter = state.computeGetter(id, dataKey, props);
   const render = state.computeRender(id, dataKey, props);
+  // Type incompatibility between react-virtualized & react
   return (
+    // @ts-expect-error (TODO Fix this type error, VColumn is not a ReactNode)
     <VColumn
       key={id}
       width={width}
@@ -1075,8 +1093,10 @@ function makeTable<Key, Row>(
     setImmediate(state.forceUpdate);
   }
 
+  // Type incompatibility between react-virtualized & react
   return (
     <div onKeyDown={state.onKeyDown}>
+      {/* @ts-expect-error (TODO Fix this type error) */}
       <VTable
         ref={state.tableRef}
         key="table"
@@ -1092,6 +1112,7 @@ function makeTable<Key, Row>(
         headerRowRenderer={headerRowRenderer}
         onRowsRendered={state.onRowsRendered}
         onRowClick={state.onRowClick}
+        onRowDoubleClick={state.onRowDoubleClick}
         onRowRightClick={state.onRowRightClick}
         sortBy={state.sortBy}
         sortDirection={state.sortDirection}
@@ -1152,11 +1173,12 @@ export function Table<Key, Row>(props: TableProps<Key, Row>): JSX.Element {
     state.setSorting(props.sorting);
     state.setRendering(props.rendering);
     state.onSelection = props.onSelection;
+    state.onDoubleClick = props.onDoubleClick;
     state.onContextMenu = props.onContextMenu;
     return state.unwind;
   });
   Settings.useGlobalSettingsEvent(state.importSettings);
-  const { display=true, visible=true, children: columns=[] } = props;
+  const { display = true, visible = true, children: columns = [] } = props;
   const classNames = classes(
     'dome-xTable',
     !display && 'dome-erased',
