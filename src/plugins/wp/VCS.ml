@@ -239,6 +239,8 @@ let is_valid = function { verdict = Valid } -> true | _ -> false
 let is_trivial r = is_valid r && r.prover_time = 0.0
 let is_not_valid r = is_verdict r && not (is_valid r)
 let is_computing = function { verdict=Computing _ } -> true | _ -> false
+let has_model r = not @@ Probe.Map.is_empty r.prover_model
+
 let is_none = function { verdict=NoResult } -> true | _ -> false
 let is_proved ~smoke = function
   | NoResult | Computing _ | Failed -> false
