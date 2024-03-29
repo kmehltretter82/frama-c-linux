@@ -439,35 +439,35 @@ let is_matching_logic_type_var a a' env =
   | Some a'' -> Datatype.String.equal a' a''
 
 module Unop = struct
-  type t = [%import: Cil_types.unop] [@@deriving eq]
+  type t = Cil_types.unop [@@deriving eq]
 end
 
 module Binop = struct
-  type t = [%import: Cil_types.binop] [@@deriving eq]
+  type t = Cil_types.binop [@@deriving eq]
 end
 
 module Ikind = struct
-  type t = [%import: Cil_types.ikind] [@@deriving eq]
+  type t = Cil_types.ikind [@@deriving eq]
 end
 
 module Fkind = struct
-  type t = [%import: Cil_types.fkind] [@@deriving eq]
+  type t = Cil_types.fkind [@@deriving eq]
 end
 
 module Predicate_kind = struct
-  type t = [%import: Cil_types.predicate_kind] [@@deriving eq]
+  type t = Cil_types.predicate_kind [@@deriving eq]
 end
 
 module Logic_builtin_label = struct
-  type t = [%import: Cil_types.logic_builtin_label] [@@deriving eq]
+  type t = Cil_types.logic_builtin_label [@@deriving eq]
 end
 
 module Relation = struct
-  type t = [%import: Cil_types.relation] [@@deriving eq]
+  type t = Cil_types.relation [@@deriving eq]
 end
 
 module Termination_kind = struct
-  type t = [%import: Cil_types.termination_kind] [@@deriving eq]
+  type t = Cil_types.termination_kind [@@deriving eq]
 end
 
 let is_same_behavior_set l l' =
