@@ -213,8 +213,6 @@ export function Graph(props: {
               if (props.graph.onReady) {
                 props.graph.onReady();
               }
-              // eslint-disable-next-line no-console
-              console.log("draw");
             }}
           />
         ) : (
