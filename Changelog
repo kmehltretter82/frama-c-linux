@@ -18,6 +18,7 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!   Kernel   [2024-03-29] Refactor current location handling mechanism
 -    Kernel   [2024-03-26] Introduce \plugin:: prefix for ACSL extensions,
                            unknown extensions can be safely ignored when the
                            plug-in that handles them is not available
