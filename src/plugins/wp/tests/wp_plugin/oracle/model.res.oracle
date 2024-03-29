@@ -11,6 +11,7 @@
 --- Context 'typed_f' Cluster 'Compound' 
 ---------------------------------------------
 theory Compound
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -28,11 +29,13 @@ theory Compound
   (* use frama_c_wp.memaddr.MemAddr *)
   
   function shift_sint32 (p:addr) (k:int) : addr = shift p k
+  
 end
 ---------------------------------------------
 --- Context 'typed_f' Cluster 'Axiomatic' 
 ---------------------------------------------
 theory Axiomatic
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -48,9 +51,11 @@ theory Axiomatic
   (* use map.Map *)
   
   predicate P_P int
+  
 end
 [wp:print-generated] 
   theory WP
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -77,6 +82,7 @@ end
       forall t:addr -> int, i:int, a:addr.
        let x = get t (shift_sint32 a i) in
        region (a.base) <= 0 -> is_sint32 i -> is_sint32 x -> P_P x
+    
   end
 [wp] 1 goal generated
 ------------------------------------------------------------
@@ -100,6 +106,7 @@ Prove: P_P(x).
 --- Context 'typed_ref_f' Cluster 'Compound' 
 ---------------------------------------------
 theory Compound1
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool1 *)
@@ -117,11 +124,13 @@ theory Compound1
   (* use frama_c_wp.memaddr.MemAddr1 *)
   
   function shift_sint321 (p:addr1) (k:int) : addr1 = shift1 p k
+  
 end
 ---------------------------------------------
 --- Context 'typed_ref_f' Cluster 'Axiomatic' 
 ---------------------------------------------
 theory Axiomatic1
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool1 *)
@@ -137,9 +146,11 @@ theory Axiomatic1
   (* use map.Map1 *)
   
   predicate P_P1 int
+  
 end
 [wp:print-generated] 
   theory WP1
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool1 *)
@@ -166,6 +177,7 @@ end
       forall t:addr1 -> int, i:int, a:addr1.
        let x = get1 t (shift_sint321 a i) in
        region1 (a.base1) <=' 0 -> is_sint321 i -> is_sint321 x -> P_P1 x
+    
   end
 [wp] 1 goal generated
 ------------------------------------------------------------

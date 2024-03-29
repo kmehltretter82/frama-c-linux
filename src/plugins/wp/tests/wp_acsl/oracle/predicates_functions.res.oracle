@@ -4,6 +4,7 @@
 [wp] 1 goal scheduled
 [wp:print-generated] 
   theory WP
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -33,6 +34,7 @@
       forall i:int. L_RF i = (if i <= 0 then 0 else L_F i + L_RF ((- 1) + i))
     
     goal wp_goal : forall i:int. 0 < i -> P_RP (L_RF i)
+    
   end
 [wp] 1 goal generated
 ------------------------------------------------------------

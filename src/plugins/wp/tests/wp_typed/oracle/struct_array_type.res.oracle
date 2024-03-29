@@ -9,6 +9,7 @@
 --- Context 'typed_f' Cluster 'Matrix' 
 ---------------------------------------------
 theory Matrix
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -26,11 +27,13 @@ theory Matrix
   (* use frama_c_wp.cint.Cint *)
   
   predicate IsArray_sint32 (t:int -> int) = forall i:int. is_sint32 (get t i)
+  
 end
 ---------------------------------------------
 --- Context 'typed_f' Cluster 'S1_s' 
 ---------------------------------------------
 theory S1_s
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -54,9 +57,11 @@ theory S1_s
     IsArray_sint32 (F1_s_a s) /\ IsArray_sint32 (F1_s_b s)
   
   predicate IsArray_S1_s (t:int -> S1_s) = forall i:int. IsS1_s (get t i)
+  
 end
 [wp:print-generated] 
   theory WP
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -86,6 +91,7 @@ end
        is_uint32 i ->
        is_sint32 a2 ->
        is_sint32 a1 -> is_sint32 ((1 + ((- 1) * a1)) + a3) -> (2 * a1) <= a3
+    
   end
 [wp] 1 goal generated
 ------------------------------------------------------------
