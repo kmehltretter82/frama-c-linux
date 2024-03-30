@@ -106,16 +106,17 @@ module Location_Bytes : sig
   (** Subtracts the offsets of two locations. Same as [sub_pointwise factor:1],
       except that garbled mixes from operands are propagated into the result. *)
 
-  (** Topifying of values, in case of imprecise accesses *)
-  val topify_arith_origin : t -> t
-  val topify_misaligned_read_origin : t -> t
-  val topify_merge_origin : t -> t
-  val topify_leaf_origin : t -> t
+  val topify: Origin.kind -> t -> t
+  (** [topify kind v] converts [v] to a garbled mix of the addresses pointed to
+      by [v], with origin [kind]. Returns [v] unchanged if it is bottom,
+      the singleton zero or already a garbled mix. *)
+
   val topify_with_origin: Origin.t -> t -> t
-  val topify_with_origin_kind: Origin.kind -> t -> t
+  (** Same as [topify] above with the given origin. *)
+
   val inject_top_origin : Origin.t -> Base.Hptset.t -> t
-  (** [inject_top_origin origin p] creates a top with origin [origin]
-      and additional information [param] *)
+  (** [inject_top_origin origin bases] creates a garbled mix of bases [bases]
+      with origin [origin]. *)
 
   val top_with_origin: Origin.t -> t
   (** Completely imprecise value. Use only as last resort. *)

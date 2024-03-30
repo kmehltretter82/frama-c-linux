@@ -364,7 +364,7 @@ let forward_minus_pp ~typ ev1 ev2 =
     try
       V.inject_ival (conv (Cvalue.V.project_ival minus_val))
     with Cvalue.V.Not_based_on_null ->
-      V.topify_arith_origin (V.join ev1 ev2)
+      V.topify Origin.Arith (V.join ev1 ev2)
   else
     (* Pointwise arithmetics.*)
     let v = V.sub_pointer ev1 ev2 in
@@ -410,7 +410,7 @@ let forward_binop_int ~typ ev1 op ev2 =
 let forward_binop_float fkind ev1 op ev2 =
   match V.project_float ev1, V.project_float ev2 with
   | exception V.Not_based_on_null ->
-    V.topify_arith_origin (V.join ev1 ev2)
+    V.topify Origin.Arith (V.join ev1 ev2)
   | f1, f2 ->
     let binary_float_floats (_name: string) f =
       V.inject_float (f fkind f1 f2)
@@ -444,7 +444,7 @@ let forward_uneg v t =
   with V.Not_based_on_null ->
     if Cvalue.V.is_bottom v
     then v
-    else V.topify_arith_origin v
+    else V.topify Origin.Arith v
 
 let forward_unop typ op value =
   match op with

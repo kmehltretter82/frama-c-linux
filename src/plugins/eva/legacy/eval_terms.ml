@@ -1544,7 +1544,7 @@ and eval_float_builtin_arity2  ~alarm_mode env name arg1 arg2 =
       let f2 = Ival.project_float i2 in
       Cvalue.V.inject_float (fcaml f1 f2)
     with Cvalue.V.Not_based_on_null ->
-      Cvalue.V.topify_arith_origin (V.join r1.eover r2.eover)
+      Cvalue.V.topify Origin.Arith (V.join r1.eover r2.eover)
   in
   let eunder = under_from_over v in
   let ldeps = join_logic_deps r1.ldeps r2.ldeps in
@@ -1564,7 +1564,7 @@ and eval_float_builtin_arity1  ~alarm_mode env name arg =
       let f = Ival.project_float i in
       Cvalue.V.inject_float (fcaml f)
     with Cvalue.V.Not_based_on_null ->
-      Cvalue.V.topify_arith_origin r.eover
+      Cvalue.V.topify Origin.Arith r.eover
   in
   let eunder = under_from_over v in
   { etype = r.etype; eunder; eover = v; ldeps=r.ldeps; empty = r.empty; }
