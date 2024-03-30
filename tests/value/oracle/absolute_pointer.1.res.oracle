@@ -6,21 +6,16 @@
   NULL[rbits 0 to 147573952589676412935] ∈ [--..--]
   R ∈ {0}
   nondet ∈ [--..--]
-[eva:alarm] absolute_pointer.c:43: Warning: 
-  out of bounds write. assert \valid(p - 100);
-[kernel] absolute_pointer.c:43: Warning: 
-  all target addresses were invalid. This path is assumed to be dead.
+[eva] absolute_pointer.c:44: Frama_C_show_each: {4294967196}
 [eva] absolute_pointer.c:47: Frama_C_show_each: {4294967196}
 [eva] absolute_pointer.c:52: Frama_C_show_each: {4294967197}
 [eva] absolute_pointer.c:56: Frama_C_show_each: {4294967197}
 [eva] Recording results for negative_absolute_address
 [eva] Done for function negative_absolute_address
-[eva] absolute_pointer.c:43: 
-  assertion 'Eva,mem_access' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function negative_absolute_address:
   NULL[rbits 0 to 34359737567] ∈ [--..--]
-      [rbits 34359737568 to 34359737575] ∈ {1}
+      [rbits 34359737568 to 34359737575] ∈ {1; 25}
       [rbits 34359737576 to 34359737583] ∈ {2; 42}
       [rbits 34359737584 to 147573952589676412935] ∈ [--..--]
   uptr ∈ {0}

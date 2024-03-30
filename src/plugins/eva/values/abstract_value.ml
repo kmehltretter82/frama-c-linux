@@ -133,7 +133,8 @@ module type S = sig
   val forward_binop : typ -> binop -> t -> t -> t or_bottom
 
   (** [rewrap_integer irange t] wraps around the abstract value [t] to fit the
-      integer range [irange], assuming 2's complement. *)
+      integer range [irange], assuming 2's complement. Also used on absolute
+      addresses for pointer values, seen as unsigned integers. *)
   val rewrap_integer: Eval_typ.integer_range -> t -> t
 
   (** Abstract evaluation of casts operators from [src_type] to [dst_type]. *)
