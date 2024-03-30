@@ -1721,7 +1721,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
       let clip = clip_by_validity validity in
       let r = fold
           (fun (min, max as itv) (bound_v, _, _) acc ->
-             let new_v = V.join (V.topify_with_origin o bound_v) v in
+             let new_v = V.topify_with_origin o (V.join bound_v v) in
              let new_min, new_max = clip itv in
              if new_min <=~ new_max then (* [min..max] and validity intersect *)
                let acc =

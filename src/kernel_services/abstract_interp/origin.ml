@@ -171,7 +171,7 @@ let clear () = History.clear ()
 (* Keep the oldest known origin: it is probably the most relevant origin, as
    subsequent ones may have been created because of the first. *)
 let join t1 t2 =
-  if t1 == t2 then t1 else
+  if equal t1 t2 then t1 else
     match t1, t2 with
     | Unknown, x | x, Unknown -> x
     | Well, _ | _, Well -> Well

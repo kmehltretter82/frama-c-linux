@@ -213,11 +213,9 @@ module Location_Bytes = struct
 
   let topify_with_origin o v =
     match v with
-    | Top (s,a) ->
-      Top (s, Origin.join a o)
-    | v when is_zero v -> v
+    | Top _ -> v
     | Map _ ->
-      if equal v bottom then v
+      if is_zero v || equal v bottom then v
       else
         match get_keys v with
         | Base.SetLattice.Top -> top_with_origin o

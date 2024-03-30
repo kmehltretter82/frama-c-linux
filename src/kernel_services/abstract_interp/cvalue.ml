@@ -504,11 +504,7 @@ module V = struct
     with Not_based_on_null  ->
       if is_bottom e1 || is_bottom e2
       then bottom
-      else begin
-        join
-          (topify_with_origin_kind topify e1)
-          (topify_with_origin_kind topify e2)
-      end
+      else topify_with_origin_kind topify (join e1 e2)
 
   let arithmetic_function = import_function ~topify:Origin.Arith
 
@@ -540,9 +536,7 @@ module V = struct
         try (* On the off chance that someone writes [i+(int)&p]... *)
           Location_Bytes.shift (project_ival_bottom e1) e2
         with Not_based_on_null ->
-          join
-            (topify_with_origin_kind topify e1)
-            (topify_with_origin_kind topify e2)
+          topify_with_origin_kind topify (join e1 e2)
       end
     with Not_found ->
     (* we end up here if the only way left to make this
@@ -551,9 +545,7 @@ module V = struct
       let right = Ival.scale_int_base factor (project_ival_bottom e2)
       in Location_Bytes.shift right e1
     with Not_based_on_null  -> (* from [project_ival] *)
-      join
-        (topify_with_origin_kind topify e1)
-        (topify_with_origin_kind topify e2)
+      topify_with_origin_kind topify (join e1 e2)
 
   (* Under-approximating variant of add_untyped. Takes two
      under-approximation, and returns an under-approximation.*)
@@ -669,9 +661,7 @@ module V = struct
       then
         bottom
       else
-        join
-          (topify_with_origin_kind topify acc)
-          (topify_with_origin_kind topify value)
+        topify_with_origin_kind topify (join acc value)
     end
     else
       add_untyped ~topify ~factor:Int_Base.one value acc
