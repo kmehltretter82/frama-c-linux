@@ -390,7 +390,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
       let kf = Option.get self#current_kf in
       let new_kf = Visitor_behavior.Get.kernel_function self#behavior kf in
       let old_behaviors =
-        Annotations.fold_behaviors (fun e b acc -> (e,b)::acc) kf []
+        Annotations.fold_behaviors_by_emitter (fun e b acc -> (e,b)::acc) kf []
       in
       let old_complete =
         Annotations.fold_complete (fun e c acc -> (e,c)::acc) kf []

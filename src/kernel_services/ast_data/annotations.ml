@@ -589,6 +589,9 @@ let fold_global f =
          h
          acc)
 
+let iter_behaviors f kf =
+  List.iter f (behaviors kf)
+
 let iter_spec_gen get iter f kf =
   try
     let tbl = Funspecs.find kf in
@@ -604,7 +607,7 @@ let iter_spec_gen get iter f kf =
   with Not_found ->
     ()
 
-let iter_behaviors f =
+let iter_behaviors_by_emitter f =
   iter_spec_gen
     (fun s -> s.spec_behavior)
     (fun f l -> List.iter (fun b -> f { b with b_name = b.b_name}) l)
@@ -657,6 +660,9 @@ let iter_allocates f =
 
 let iter_extended f = iter_bhv_gen (fun b -> b.b_extended) List.iter f
 
+let fold_behaviors f kf acc =
+  List.fold_left (Fun.flip f) acc (behaviors kf)
+
 let fold_spec_gen get fold f kf acc =
   try
     let tbl = Funspecs.find kf in
@@ -672,7 +678,7 @@ let fold_spec_gen get fold f kf acc =
   with Not_found ->
     acc
 
-let fold_behaviors f =
+let fold_behaviors_by_emitter f =
   fold_spec_gen
     (fun s -> s.spec_behavior)
     (fun f l acc ->
