@@ -60,9 +60,9 @@ type uid_tvars = string W.Ty.Mtv.t
 let rec lt_of_ty (tenv : tenv) (tvs : tvars) (ty: W.Ty.ty) : C.logic_type =
   match ty.ty_node with
   | Tyvar x -> W.Ty.Mtv.find x tvs
-  | Tyapp(s,ts) -> C.Ltype( ls_of_ts tenv s, List.map (lt_of_ty tenv tvs) ts)
+  | Tyapp(s,ts) -> C.Ltype( lti_of_ts tenv s, List.map (lt_of_ty tenv tvs) ts)
 
-and ls_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
+and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
   try W.Ty.Hts.find tenv ts with Not_found ->
     let temp_env = create_temp_env ts
     in
@@ -90,10 +90,10 @@ and lt_def_of_ts (tenv:tenv) (ts : W.Ty.tysymbol) (temp_env : uid_tvars) =
     in
     Some (C.LTsyn (lt_of_ty tenv tvars ty))
 and create_temp_env (ts: W.Ty.tysymbol) : uid_tvars =
-    List.fold_left
-      (fun (tvs: uid_tvars) (tv: W.Ty.tvsymbol) ->
-         W.Ty.Mtv.add tv (tv.tv_name.id_string) tvs
-      ) W.Ty.Mtv.empty ts.ts_args
+  List.fold_left
+    (fun (tvs: uid_tvars) (tv: W.Ty.tvsymbol) ->
+       W.Ty.Mtv.add tv (tv.tv_name.id_string) tvs
+    ) W.Ty.Mtv.empty ts.ts_args
 
 let import_theory env (tenv:tenv) thname =
   let theory_name, theory_path = extract_path thname in
@@ -107,13 +107,15 @@ let import_theory env (tenv:tenv) thname =
             | Dtype ts ->
               L.debug ~level:0 "Decl and type %a"  pp_id ts.ts_name;
               L.debug ~level:0 "Location %a"  pp_id_loc ts.ts_name;
-              let lti =  ls_of_ts  tenv ts in
+              let lti =  lti_of_ts  tenv ts in
               L.debug ~level:0 "Correspondign LTI %a" pp_lti lti;
             | Ddata ddatas ->
               List.iter
                 (fun ((ts, _) : W.Decl.data_decl) ->
                    L.debug ~level:0 "Decl and data %a" pp_id  ts.ts_name;
-                   L.debug ~level:0 "Location %a"  pp_id_loc ts.ts_name
+                   L.debug ~level:0 "Location %a"  pp_id_loc ts.ts_name;
+                   let lti =  lti_of_ts  tenv ts in
+                   L.debug ~level:0 "Correspondign LTI %a" pp_lti lti;
                 ) ddatas
             | Dparam ls ->
               L.debug ~level:0 "Decl and dparam %a" pp_id ls.ls_name;
