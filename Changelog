@@ -22,9 +22,9 @@ Open Source Release <next-release>
               with an incompatible type, instead of trying to finish
               type-checking, preventing misleading error msgs after the first
               report. IncompatibleDeclHook has thus been removed from the API.
-o   Kernel    [2024-04-02] Annotations.{fold,iter}_behavior now pass full
+o   Kernel    [2024-04-02] Annotations.{fold,iter}_behaviors now pass full
               behaviors to the iterated function. To iter on fragments split by
-              behavior and emitter, use {fold,iter}_behavior_by_emitter.
+              behavior and emitter, use {fold,iter}_behaviors_by_emitter.
 o!  Kernel    [2024-03-29] Refactor current location handling mechanism
 -   Kernel    [2024-03-26] Introduce \plugin:: prefix for ACSL extensions,
               unknown extensions can be safely ignored when the plug-in that
