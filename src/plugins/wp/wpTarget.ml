@@ -149,7 +149,7 @@ let check_properties behaviors props kf =
     in
     List.iter check_stmt stmts
   in
-  let check_funbhv _ bv = check_bhv kf Kglobal bv in
+  let check_funbhv bv = check_bhv kf Kglobal bv in
   Annotations.iter_behaviors check_funbhv kf ;
   check_code ()
 

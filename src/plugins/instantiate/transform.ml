@@ -145,7 +145,7 @@ let compute_postconditions_statuses kf =
     List.iter validate_property
       (Property.ip_post_cond_of_behavior kf ~active:[] Kglobal bhv)
   in
-  Annotations.iter_behaviors (fun _ -> posts) kf
+  Annotations.iter_behaviors posts kf
 
 let compute_comp_disj_statuses kf =
   let open Property in
