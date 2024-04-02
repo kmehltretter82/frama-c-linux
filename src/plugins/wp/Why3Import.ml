@@ -50,6 +50,7 @@ let pp_id_loc fmt (id : W.Ident.ident) =
   | Some loc -> W.Loc.pp_position fmt loc
   | None -> L.debug ~level:0 "No location found"
 
+
 let pp_lti fmt (lti : C.logic_type_info) =
   Cpp.pp_logic_type_info fmt lti
 
@@ -81,6 +82,11 @@ and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
       }
     in W.Ty.Hts.add tenv ts lti ;
     L.debug ~level:0 "Added LTI %a" pp_lti lti; lti
+(* and lti_of_ls (tenv:tenv) (ls : W.Term.lsymbol) (lsdef : W.Decl.ls_defn) =
+   (* let temp_env = create_temp_env lsdef. *)
+   let tvars =
+    W.Ty.Mtv.map (fun aleph_name -> C.Lvar aleph_name) temp_env
+   in List.map (fun (ty:W.Ty.ty) -> lt_of_ty tenv tvars ty) ls.ls_args *)
 and lt_def_of_ts (tenv:tenv) (ts : W.Ty.tysymbol) (temp_env : uid_tvars) =
   match ts.ts_def with
   | NoDef | Range _ | Float _ -> None
@@ -115,7 +121,7 @@ let import_theory env (tenv:tenv) thname =
                    L.debug ~level:0 "Decl and data %a" pp_id  ts.ts_name;
                    L.debug ~level:0 "Location %a"  pp_id_loc ts.ts_name;
                    let lti =  lti_of_ts  tenv ts in
-                   L.debug ~level:0 "Correspondign LTI %a" pp_lti lti;
+                   L.debug ~level:0 "Correspondign data LTI %a" pp_lti lti;
                 ) ddatas
             | Dparam ls ->
               L.debug ~level:0 "Decl and dparam %a" pp_id ls.ls_name;
@@ -124,7 +130,8 @@ let import_theory env (tenv:tenv) thname =
               List.iter
                 (fun ((ls,_):W.Decl.logic_decl) ->
                    L.debug ~level:0 "Decl and dlogic %a" pp_id ls.ls_name;
-                   L.debug ~level:0 "Location %a"  pp_id_loc ls.ls_name
+                   L.debug ~level:0 "Location %a"  pp_id_loc ls.ls_name;
+                   (* lti_of_ls tenv ls; *)
                 ) dlogics
             | _ -> L.debug ~level:0 "Decl but whatever"
           end
