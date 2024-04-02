@@ -149,12 +149,6 @@ module ImplicitPrototypeHook =
 
 let register_implicit_prototype_hook f = ImplicitPrototypeHook.extend f
 
-module IncompatibleDeclHook =
-  Hook.Build(struct type t = varinfo * varinfo * string end)
-
-let register_incompatible_decl_hook f =
-  IncompatibleDeclHook.extend (fun (x,y,z) -> f x y z)
-
 module DifferentDeclHook =
   Hook.Build(struct type t = varinfo * varinfo end)
 
@@ -2738,15 +2732,10 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
           end;
           Cil.update_var_type oldvi mytype;
         with Cannot_combine reason ->
-          Kernel.debug ~dkey:Kernel.dkey_typing_global
-            "old type = %a\nnew type = %a\n"
-            Cil_datatype.Typ.pretty oldvi.vtype
-            Cil_datatype.Typ.pretty vi.vtype ;
-          Kernel.error ~once:true ~current:true
+          abort_context
             "Declaration of %s does not match previous declaration from \
              %a (%s)."
-            vi.vname Cil_printer.pp_location oldloc reason;
-          IncompatibleDeclHook.apply (oldvi,vi,reason)
+            vi.vname Cil_printer.pp_location oldloc reason
       end;
       (* Update the storage and vdecl if useful. Do so only after the hooks have
          been applied, as they may need to read those fields *)
@@ -2760,14 +2749,18 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
          prototypes. Logic specifications refer to the varinfo in this table. *)
       begin
         match vi.vtype with
-        | TFun (_,Some formals , _, _) ->
+        | TFun (_, Some formals , _, _) ->
           (try
              let old_formals_env = getFormalsDecl oldvi in
              List.iter2
                (fun old ((name,typ,attr) as decl) ->
                   let new_ghost = Cil.isGhostFormalVarDecl decl in
                   if old.vghost <> new_ghost then
-                    raise (Invalid_argument "Incompatible ghost status")
+                    abort_context
+                      "Function %a redeclared with incompatible ghost status \
+                       in formals (original declaration was at %a)"
+                      Cil_datatype.Varinfo.pretty vi
+                      Cil_datatype.Location.pretty oldloc
                   else if name <> "" then begin
                     Kernel.debug ~dkey:Kernel.dkey_typing_global
                       "replacing formal %s with %s" old.vname name;
@@ -2776,24 +2769,15 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                       Cil.update_var_type old typ;
                       old.vattr <- attr;
                     end;
-                    (match old.vlogic_var_assoc with
-                     | None -> ()
-                     | Some old_lv -> old_lv.lv_name <- name)
+                    match old.vlogic_var_assoc with
+                    | None -> ()
+                    | Some old_lv -> old_lv.lv_name <- name
                   end)
                old_formals_env
-               formals;
-           with
-           | Invalid_argument _ ->
-             abort_context
-               "Function %a redeclared with incompatible formals \
-                (original declaration was at %a)"
-               Cil_datatype.Varinfo.pretty vi
-               Cil_datatype.Location.pretty oldloc
-             ;
-           | Not_found ->
-             Cil.setFormalsDecl oldvi vi.vtype)
+               formals
+           with Not_found -> Cil.setFormalsDecl oldvi vi.vtype)
         | _ -> ()
-      end ;
+      end;
       (* if [isadef] is true, [vi] is a definition.  *)
       if isadef then begin
         (* always favor the location of the definition.*)
