@@ -1683,10 +1683,6 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& __fc_p_fopen));
     __e_acsl_store_block((void *)(__fc_fopen),128UL);
     __e_acsl_full_init((void *)(& __fc_fopen));
-    __e_acsl_store_block((void *)(& stdout),8UL);
-    __e_acsl_full_init((void *)(& stdout));
-    __e_acsl_store_block((void *)(& stdin),8UL);
-    __e_acsl_full_init((void *)(& stdin));
     __e_acsl_store_block((void *)(& __fc_interrupted),4UL);
     __e_acsl_full_init((void *)(& __fc_interrupted));
     __e_acsl_store_block((void *)(& __fc_p_time_tm),8UL);
@@ -1703,8 +1699,6 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& __fc_p_sigaction));
     __e_acsl_store_block((void *)(sigaction),2080UL);
     __e_acsl_full_init((void *)(& sigaction));
-    __e_acsl_store_block((void *)(& errno),4UL);
-    __e_acsl_full_init((void *)(& errno));
   }
   return;
 }
@@ -1729,8 +1723,6 @@ void __e_acsl_globals_clean(void)
   __e_acsl_delete_block((void *)(__fc_tmpnam));
   __e_acsl_delete_block((void *)(& __fc_p_fopen));
   __e_acsl_delete_block((void *)(__fc_fopen));
-  __e_acsl_delete_block((void *)(& stdout));
-  __e_acsl_delete_block((void *)(& stdin));
   __e_acsl_delete_block((void *)(& __fc_interrupted));
   __e_acsl_delete_block((void *)(& __fc_p_time_tm));
   __e_acsl_delete_block((void *)(& __fc_time_tm));
@@ -1739,7 +1731,6 @@ void __e_acsl_globals_clean(void)
   __e_acsl_delete_block((void *)(& __fc_time));
   __e_acsl_delete_block((void *)(& __fc_p_sigaction));
   __e_acsl_delete_block((void *)(sigaction));
-  __e_acsl_delete_block((void *)(& errno));
   return;
 }
 
