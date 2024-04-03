@@ -677,7 +677,7 @@ let markReferenced ast =
 (* Assumption: one can order logic labels according to their visibility.
 
    The goal of this function is to minimize name clash when the program contains
-   C labels with a name that correspond to a builtin logic label. Parsing the
+   C labels with a name that corresponds to a builtin logic label. Parsing the
    result should not lead to a program with a different semantics.
    For example:                              [Here: Old: ;]
    cannot be normalized into:                [Here: ;]
@@ -685,7 +685,7 @@ let markReferenced ast =
 
    The behavior is as follows:
    - select a name without name clash if there is one,
-   - else, order preferencer by visibility: Post > Old > Loop* > Other
+   - else, select according to visibility: Post > Old > Loop* > Other
 
    A difference in semantics can appear if:
    - there are several builtin label names with different visibilities
@@ -693,9 +693,9 @@ let markReferenced ast =
    - we select a visible label from the list
 
    By selecting the less visible we guarantee that we do not change the
-   semantics: either the selected label was not visible, it is not more visible
-   now, or it was already visible and thus already masked during the typing
-   phase.
+   semantics: either original name did not correspond to a visible logic label,
+   and this is also the case for the selected one, or it was already masked
+   during the typing phase.
 *)
 
 let prefer ~new_label ~old_label =
