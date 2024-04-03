@@ -43,15 +43,20 @@ end
     
     (* use frama_c_wp.memaddr.MemAddr *)
     
+    (* use frama_c_wp.cint.Cint *)
+    
     (* use Axiomatic1 *)
     
     goal wp_goal :
-      forall t:addr -> int, a:addr. region (a.base) <= 0 -> L_x t a <= 255
+      forall t:addr -> int, a:addr.
+       let x = get t a in
+       let x1 = L_x t a in
+       region (a.base) <= 0 -> is_uint8 x -> is_uint8 x1 -> x = x1 /\ x1 <= 255
   end
-[wp] [Unsuccess] typed_g_ensures_A (Alt-Ergo) (Cached)
-[wp] Proved goals:    0 / 1
-  Unsuccess:       1
+[wp] [Valid] typed_g_ensures_A (Alt-Ergo) (Cached)
+[wp] Proved goals:    1 / 1
+  Alt-Ergo:        1
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  g                         -        -        1       0.0%
+  g                         -        1        1       100%
 ------------------------------------------------------------

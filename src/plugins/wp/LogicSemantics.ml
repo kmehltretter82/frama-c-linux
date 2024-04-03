@@ -681,7 +681,12 @@ struct
         | ACSLDEF -> C.call_fun env result f ls vs
         | HACK phi -> phi vs
         | LFUN f -> e_fun ~result f vs
-      in Vexp r
+      in
+      begin match t.term_type with
+        | Ctype t -> Lang.assume (Cvalues.has_ctype t r)
+        | _ -> ()
+      end ;
+      Vexp r
 
     | Tlambda _ ->
       Warning.error "Lambda-functions not yet implemented"

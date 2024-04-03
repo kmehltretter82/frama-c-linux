@@ -24,7 +24,13 @@ Prove: (0 <= L_t) /\ (L_t <= 127).
 ------------------------------------------------------------
 
 Goal Post-condition 'A' in 'g':
-Assume { (* Heap *) Type: region(p.base) <= 0. }
-Prove: L_x(Mint_0, p) <= 255.
+Let x = Mint_0[p].
+Let x_1 = L_x(Mint_0, p).
+Assume {
+  Type: is_uint8(x) /\ is_uint8(x_1).
+  (* Heap *)
+  Type: region(p.base) <= 0.
+}
+Prove: (x = x_1) /\ (x_1 <= 255).
 
 ------------------------------------------------------------
