@@ -720,6 +720,14 @@ let prefer ~new_label ~old_label =
       (* ok, now we give up: anything else is visible in code annotations *)
       | _ -> false
 
+(* if we're forced to keep a C label whose name match a builtin logic label,
+   we'll rename it to ensure no confusion can arise.
+   Since the original name is supposed to be unique in the function, and
+   users are not supposed to use symbols starting with an underscore, the chosen
+   name ought to be unique.
+*)
+let rename_c_label lab = "__fc_user_label_" ^ lab
+
 (* We keep only one label, preferably one that was not introduced by CIL.
  * Scan a list of labels and return the data for the label that should be
  * kept, and the remaining filtered list of labels *)
@@ -730,7 +738,13 @@ let labelsToKeep is_removable ll =
       let newlabel, keepl =
         match l with
         | Case _ | Default _ -> sofar, true
-        | Label (ln, _, _) as lab -> begin
+        | Label (ln, loc, isuser) as lab ->
+          let lab =
+            match Logic_typing.builtin_label ln with
+            | None -> lab
+            | Some _ -> Label(rename_c_label ln, loc, isuser)
+          in
+          begin
             match is_removable lab, sofar with
             | true, ("", _) ->
               (* keep this one only if we have no label so far *)

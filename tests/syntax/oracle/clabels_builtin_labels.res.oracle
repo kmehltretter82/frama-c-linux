@@ -109,109 +109,109 @@ void named(void)
 
 void post_over_old_1(void)
 {
-  Post: ;
+  __fc_user_label_Post: ;
   return;
 }
 
 void post_over_old_2(void)
 {
-  Post: ;
+  __fc_user_label_Post: ;
   return;
 }
 
 void post_over_loop_1(void)
 {
-  Post: ;
+  __fc_user_label_Post: ;
   return;
 }
 
 void post_over_loop_2(void)
 {
-  Post: ;
+  __fc_user_label_Post: ;
   return;
 }
 
 void post_over_other_1(void)
 {
-  Post: ;
+  __fc_user_label_Post: ;
   return;
 }
 
 void post_over_other_2(void)
 {
-  Post: ;
+  __fc_user_label_Post: ;
   return;
 }
 
 void post_over_other_3(void)
 {
-  Post: ;
+  __fc_user_label_Post: ;
   return;
 }
 
 void old_over_loop_1(void)
 {
-  Old: ;
+  __fc_user_label_Old: ;
   return;
 }
 
 void old_over_loop_2(void)
 {
-  Old: ;
+  __fc_user_label_Old: ;
   return;
 }
 
 void old_over_other_1(void)
 {
-  Old: ;
+  __fc_user_label_Old: ;
   return;
 }
 
 void old_over_other_2(void)
 {
-  Old: ;
+  __fc_user_label_Old: ;
   return;
 }
 
 void old_over_other_3(void)
 {
-  Old: ;
+  __fc_user_label_Old: ;
   return;
 }
 
 void loop_over_other_1(void)
 {
-  LoopEntry: ;
+  __fc_user_label_LoopEntry: ;
   return;
 }
 
 void loop_over_other_2(void)
 {
-  LoopCurrent: ;
+  __fc_user_label_LoopCurrent: ;
   return;
 }
 
 void loop_over_other_3(void)
 {
-  LoopEntry: ;
+  __fc_user_label_LoopEntry: ;
   return;
 }
 
 void arbitray_other_1(void)
 {
-  Here: ;
+  __fc_user_label_Here: ;
   return;
 }
 
 void arbitray_other_2(void)
 {
-  Init: ;
+  __fc_user_label_Init: ;
   return;
 }
 
 void arbitray_other_3(void)
 {
-  Pre: ;
+  __fc_user_label_Pre: ;
   return;
 }
 
