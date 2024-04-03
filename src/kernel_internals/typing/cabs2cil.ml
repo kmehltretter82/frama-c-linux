@@ -2770,7 +2770,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                       old.vattr <- attr;
                     end;
                     match old.vlogic_var_assoc with
-                     | None -> ()
+                    | None -> ()
                     | Some old_lv -> old_lv.lv_name <- name
                   end)
                old_formals_env
@@ -8592,15 +8592,15 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
                   let<> UpdatedCurrentLoc = loc in
                   let loc = Current_loc.get () in
                   let res =
-                  try
-                    (* it can not have old behavior names, since this is the
-                       first time we see the declaration.
-                    *)
-                    Ltyping.funspec [] vi None vi.vtype spec
-                  with LogicTypeError ((source,_),msg) ->
-                    Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
-                      "%s. Ignoring specification of function %s" msg vi.vname;
-                    empty_funspec ()
+                    try
+                      (* it can not have old behavior names, since this is the
+                         first time we see the declaration.
+                      *)
+                      Ltyping.funspec [] vi None vi.vtype spec
+                    with LogicTypeError ((source,_),msg) ->
+                      Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
+                        "%s. Ignoring specification of function %s" msg vi.vname;
+                      empty_funspec ()
                   in
                   res, loc
                 end
