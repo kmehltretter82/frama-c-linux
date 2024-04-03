@@ -54,15 +54,14 @@ open Cabshelper
 (*
 ** Expression building
 *)
-let smooth_expression sloc lst =
-  let expr_loc = Cil_datatype.Location.of_lexing_loc sloc in
+let smooth_expression lst =
   match lst with
-    [] -> { expr_loc; expr_node = NOTHING }
+  | [] -> Kernel.fatal "empty COMMA expression, should not happen"
   | [expr] -> expr
-  | _ ->
-      let beg_loc = fst (List.hd lst).expr_loc in
-      let end_loc = snd (Extlib.last lst).expr_loc in
-      { expr_loc = (beg_loc,end_loc); expr_node = COMMA (lst) }
+  | hd :: _ ->
+    let beg_loc = fst hd.expr_loc in
+    let end_loc = snd (Extlib.last lst).expr_loc in
+    { expr_loc = (beg_loc,end_loc); expr_node = COMMA (lst) }
 
 let merge_string (c1,(b1,_)) (l2,(_,e2)) = c1 :: l2, (b1,e2)
 
@@ -541,7 +540,7 @@ primary_expression:                     /*(* 6.5.1. *)*/
 |        	constant {
   let (v,expr_loc) = $1 in { expr_loc; expr_node = CONSTANT v } }
 |		paren_comma_expression
-		        { make_expr $sloc (PAREN (smooth_expression $sloc $1)) }
+		        { make_expr $sloc (PAREN (smooth_expression $1)) }
 |		LPAREN block RPAREN { make_expr $sloc (GNU_BODY (fst3 $2)) }
 |  generic_selection { make_expr $sloc (GENERIC $1) }
 ;
@@ -549,7 +548,7 @@ primary_expression:                     /*(* 6.5.1. *)*/
 postfix_expression:                     /*(* 6.5.2 *)*/
 | primary_expression { $1 }
 | postfix_expression bracket_comma_expression
-      { make_expr $sloc (INDEX ($1, smooth_expression $loc($2) $2))}
+      { make_expr $sloc (INDEX ($1, smooth_expression $2))}
 | postfix_expression LPAREN arguments RPAREN ghost_arguments_opt
       { make_expr $sloc (CALL ($1, $3, $5))}
 | BUILTIN_VA_ARG LPAREN expression COMMA type_name RPAREN
@@ -599,7 +598,7 @@ offsetof_member_designator:	/* GCC extension for __builtin_offsetof */
 |		offsetof_member_designator DOT IDENT
 			{ make_expr $sloc (MEMBEROF ($1, $3)) }
 |		offsetof_member_designator bracket_comma_expression
-			{ make_expr $sloc (INDEX ($1, smooth_expression $loc($2) $2)) }
+			{ make_expr $sloc (INDEX ($1, smooth_expression $2)) }
 ;
 
 unary_expression:   /*(* 6.5.3 *)*/
@@ -845,7 +844,7 @@ arguments:
 
 opt_expression:
 	        /* empty */ {make_expr $sloc NOTHING}
-|	        comma_expression {smooth_expression $sloc $1 }
+|	        comma_expression {smooth_expression $1 }
 ;
 
 comma_expression:
@@ -855,7 +854,7 @@ comma_expression:
 
 comma_expression_opt:
                 /* empty */         { make_expr $sloc NOTHING }
-|               comma_expression    { smooth_expression $sloc $1 }
+|               comma_expression    { smooth_expression $1 }
 ;
 
 paren_comma_expression:
@@ -957,25 +956,25 @@ statement:
       }
 |   comma_expression SEMICOLON
 	  { let loc = Cil_datatype.Location.of_lexing_loc $sloc in
-            no_ghost [COMPUTATION (smooth_expression $loc($1) $1,loc)]}
+            no_ghost [COMPUTATION (smooth_expression $1,loc)]}
 |   block { let (x,y,z) = $1 in no_ghost [BLOCK (x, y, z)]}
 |   IF paren_comma_expression annotated_statement else_part
         { let loc = Cil_datatype.Location.of_lexing_loc $sloc in
-          no_ghost [IF (smooth_expression $loc($2) $2,
+          no_ghost [IF (smooth_expression $2,
                        in_block $loc($3) $3, $4, loc)]}
 |   SWITCH paren_comma_expression annotated_statement
         { let loc = Cil_datatype.Location.of_lexing_loc $sloc in
-          no_ghost [SWITCH (smooth_expression $loc($2) $2, in_block $loc($3) $3, loc)]}
+          no_ghost [SWITCH (smooth_expression $2, in_block $loc($3) $3, loc)]}
 |   opt_loop_annotations
     WHILE paren_comma_expression annotated_statement
     { let first = Cil_datatype.Position.of_lexing_pos $startpos($2) in
       let last = Cil_datatype.Position.of_lexing_pos $endpos in
-      no_ghost [WHILE ($1, smooth_expression $loc($3) $3, in_block $loc($4) $4, (first,last))] }
+      no_ghost [WHILE ($1, smooth_expression $3, in_block $loc($4) $4, (first,last))] }
 |   opt_loop_annotations
     DO annotated_statement WHILE paren_comma_expression SEMICOLON
     { let first = Cil_datatype.Position.of_lexing_pos $startpos($2) in
       let last = Cil_datatype.Position.of_lexing_pos $endpos in
-      no_ghost [DOWHILE ($1, smooth_expression $loc($5) $5, in_block $loc($3) $3, (first,last))]}
+      no_ghost [DOWHILE ($1, smooth_expression $5, in_block $loc($3) $3, (first,last))]}
 |   opt_loop_annotations
     FOR LPAREN for_clause opt_expression
     SEMICOLON opt_expression RPAREN annotated_statement
@@ -1008,7 +1007,7 @@ statement:
     }
 |   RETURN comma_expression SEMICOLON {
       let loc = Cil_datatype.Location.of_lexing_loc $sloc in
-      no_ghost [RETURN (smooth_expression $loc($2) $2, loc)]
+      no_ghost [RETURN (smooth_expression $2, loc)]
     }
 |   BREAK SEMICOLON     {
       let loc = Cil_datatype.Location.of_lexing_loc $sloc in
@@ -1024,7 +1023,7 @@ statement:
     }
 |   GOTO STAR comma_expression SEMICOLON {
       let loc = Cil_datatype.Location.of_lexing_loc $sloc in
-      no_ghost [COMPGOTO (smooth_expression $loc($3) $3, loc) ]
+      no_ghost [COMPGOTO (smooth_expression $3, loc) ]
     }
 |   ASM GOTO asmattr LPAREN asmtemplate asmoutputs RPAREN SEMICOLON {
       let loc = Cil_datatype.Location.of_lexing_loc $loc in
@@ -1351,10 +1350,10 @@ declarator:  /* (* ISO 6.7.5. Plus Microsoft declarators.*) */
 attributes_or_static: /* 6.7.5.2/3 */
 | attributes comma_expression_opt { $1,$2 }
 | attribute attributes STATIC comma_expression {
-    fst $1::$2  @ ["static",[]], smooth_expression $loc($4) $4
+    fst $1::$2  @ ["static",[]], smooth_expression $4
   }
 | STATIC attributes comma_expression {
-    ("static",[]) :: $2, smooth_expression $loc($3) $3
+    ("static",[]) :: $2, smooth_expression $3
   }
 ;
 
