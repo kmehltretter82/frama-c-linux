@@ -213,7 +213,7 @@ type scalar_typ =
 
 let pointer_range () =
   { i_bits = Cil.bitsSizeOfInt Cil.theMachine.Cil.upointKind;
-    i_signed = Cil.isSigned Cil.theMachine.Cil.upointKind }
+    i_signed = false; }
 
 let classify_as_scalar typ =
   match Cil.unrollType typ with
