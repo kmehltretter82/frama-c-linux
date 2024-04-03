@@ -12,7 +12,7 @@ let buffer = '// Ivette Sandboxes Loader (generated)\n';
 
 inputFiles.forEach((file) => {
   try {
-    const box = path.relative('./src',file);
+    const box = path.relative('./src',file).replace(/\.[^/.]+$/, "");
     console.log(`[Ivette] sandbox ${box}`);
     buffer += `import '../${box}';\n`;
   } catch(err) {

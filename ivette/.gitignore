@@ -10,6 +10,7 @@
 node_modules
 yarn-error.log
 /dist
+/out
 /doc/html
 /src/renderer/loader.ts
 /src/renderer/sandbox.ts

@@ -448,7 +448,7 @@
   offset4 ∈ {-1; 0; 1; 2}
   offset5 ∈ [-4..7]
   offset6 ∈ [-10..0]
-  p ∈ {{ &buf + [-10..0] }}
+  p ∈ {{ &buf[0] }}
 [eva:final-states] Values at end of function small_sets:
   s ∈ {{ "b\000c" }}
   p ∈ {{ "b\000c" + {0; 2} }}

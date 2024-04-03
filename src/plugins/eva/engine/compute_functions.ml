@@ -220,7 +220,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       end;
       apply_call_results_hooks call init_state (`Reuse i);
       (* call can be cached since it was cached once *)
-      Transfer.{states; cacheable = Cacheable; builtin=false}
+      Transfer.{ states; cacheable = Cacheable; }
 
   (* ----- Body or specification analysis ----------------------------------- *)
 
@@ -273,7 +273,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     if Parameters.ValShowProgress.get () then
       Self.feedback
         "Done for function %a" Kernel_function.pretty call.kf;
-    Transfer.{ states = resulting_states; cacheable; builtin=false }
+    Transfer.{ states = resulting_states; cacheable; }
 
   (* ----- Use of cvalue builtins ------------------------------------------- *)
 
@@ -310,8 +310,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     match final_state with
     | `Bottom ->
       apply_call_results_hooks call state (`Builtin ([], None));
-      let cacheable = Eval.Cacheable in
-      Transfer.{states; cacheable; builtin=true}
+      Transfer.{ states; cacheable = Eval.Cacheable; }
     | `Value final_state ->
       let cvalue_call = get_cvalue_call call in
       let post = get_cvalue_or_top final_state in
@@ -324,7 +323,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         Abstract.Dom.set Cvalue_domain.State.key cvalue_state final_state
       in
       let states = List.map insert cvalue_states in
-      Transfer.{states; cacheable; builtin=true}
+      Transfer.{ states; cacheable; }
 
   (* Uses cvalue builtin only if the cvalue domain is available. Otherwise, only
      use the called function specification. *)

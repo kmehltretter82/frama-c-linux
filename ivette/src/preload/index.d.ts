@@ -20,55 +20,11 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-// --------------------------------------------------------------------------
-// --- Webpack extension for electron main-process
-// --------------------------------------------------------------------------
+export { };
+import { ElectronAPI } from '@electron-toolkit/preload';
 
-/*
-   Template of ./webpack.main.js from $(DOME)/template/webpack.main.js
-
-   This webpack definitions will be merged into electron-webpack
-   ones thanks to electron-webpack.json configuration file.
-
-   You may extend it with your own additions.
-*/
-
-const path = require('path');
-const DOME = process.env.DOME || path.resolve(__dirname , 'dome');
-const ENV = process.env.DOME_ENV ;
-
-// Do not use electron-devtools-installer in production mode
-function domeDevtools() {
-  switch(ENV) {
-  case 'dev':
-    return 'electron-devtools-installer';
-  default:
-    return path.resolve( DOME , 'misc/devtools.js' );
+declare global {
+  interface Window {
+    electron: ElectronAPI;
   }
 }
-
-// --------------------------------------------------------------------------
-
-module.exports = {
-  module: {
-    rules: [
-      { test: /\.(ts|js)x?$/, use: [ 'babel-loader' ], exclude: /node_modules/ }
-    ],
-    strictExportPresence: true
-  },
-  resolve: {
-    extensions: ['.ts', '.tsx', '.js', 'jsx', '.json'],
-    alias: {
-      'dome$':         path.resolve( DOME , 'main/dome.ts' ),
-      'dome/system$':  path.resolve( DOME , 'misc/system.ts' ),
-      'dome/devtools': domeDevtools()
-    }
-  },
-  devServer: {
-    watchOptions: {
-      ignored: '**/.#'
-    }
-  }
-} ;
-
-// --------------------------------------------------------------------------

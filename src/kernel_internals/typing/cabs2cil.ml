@@ -149,12 +149,6 @@ module ImplicitPrototypeHook =
 
 let register_implicit_prototype_hook f = ImplicitPrototypeHook.extend f
 
-module IncompatibleDeclHook =
-  Hook.Build(struct type t = varinfo * varinfo * string end)
-
-let register_incompatible_decl_hook f =
-  IncompatibleDeclHook.extend (fun (x,y,z) -> f x y z)
-
 module DifferentDeclHook =
   Hook.Build(struct type t = varinfo * varinfo end)
 
@@ -2738,15 +2732,10 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
           end;
           Cil.update_var_type oldvi mytype;
         with Cannot_combine reason ->
-          Kernel.debug ~dkey:Kernel.dkey_typing_global
-            "old type = %a\nnew type = %a\n"
-            Cil_datatype.Typ.pretty oldvi.vtype
-            Cil_datatype.Typ.pretty vi.vtype ;
-          Kernel.error ~once:true ~current:true
+          abort_context
             "Declaration of %s does not match previous declaration from \
              %a (%s)."
-            vi.vname Cil_printer.pp_location oldloc reason;
-          IncompatibleDeclHook.apply (oldvi,vi,reason)
+            vi.vname Cil_printer.pp_location oldloc reason
       end;
       (* Update the storage and vdecl if useful. Do so only after the hooks have
          been applied, as they may need to read those fields *)
@@ -2760,14 +2749,18 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
          prototypes. Logic specifications refer to the varinfo in this table. *)
       begin
         match vi.vtype with
-        | TFun (_,Some formals , _, _) ->
+        | TFun (_, Some formals , _, _) ->
           (try
              let old_formals_env = getFormalsDecl oldvi in
              List.iter2
                (fun old ((name,typ,attr) as decl) ->
                   let new_ghost = Cil.isGhostFormalVarDecl decl in
                   if old.vghost <> new_ghost then
-                    raise (Invalid_argument "Incompatible ghost status")
+                    abort_context
+                      "Function %a redeclared with incompatible ghost status \
+                       in formals (original declaration was at %a)"
+                      Cil_datatype.Varinfo.pretty vi
+                      Cil_datatype.Location.pretty oldloc
                   else if name <> "" then begin
                     Kernel.debug ~dkey:Kernel.dkey_typing_global
                       "replacing formal %s with %s" old.vname name;
@@ -2776,24 +2769,15 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                       Cil.update_var_type old typ;
                       old.vattr <- attr;
                     end;
-                    (match old.vlogic_var_assoc with
-                     | None -> ()
-                     | Some old_lv -> old_lv.lv_name <- name)
+                    match old.vlogic_var_assoc with
+                    | None -> ()
+                    | Some old_lv -> old_lv.lv_name <- name
                   end)
                old_formals_env
-               formals;
-           with
-           | Invalid_argument _ ->
-             abort_context
-               "Function %a redeclared with incompatible formals \
-                (original declaration was at %a)"
-               Cil_datatype.Varinfo.pretty vi
-               Cil_datatype.Location.pretty oldloc
-             ;
-           | Not_found ->
-             Cil.setFormalsDecl oldvi vi.vtype)
+               formals
+           with Not_found -> Cil.setFormalsDecl oldvi vi.vtype)
         | _ -> ()
-      end ;
+      end;
       (* if [isadef] is true, [vi] is a definition.  *)
       if isadef then begin
         (* always favor the location of the definition.*)
@@ -7919,6 +7903,7 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
    * the initializer (for local intialization)
   *)
   : chunk * init * typ * Cil_datatype.Lval.Set.t =
+  let open Current_loc.Operators in
 
   let checkArrayInit ty init =
     if Cil.isArrayType ty then
@@ -7939,7 +7924,8 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
   let acc, preinit, restl =
     let so = makeSubobj vi vi.vtype NoOffset in
     let asconst = if vi.vglob then CConst else CNoConst in
-    doInit loc local_env asconst Extlib.nop NoInitPre so
+    let<> UpdatedCurrentLoc = loc in
+    doInit local_env asconst NoInitPre so
       (unspecified_chunk empty) [ (Cabs.NEXT_INIT, inite) ]
   in
   if restl <> [] then
@@ -7964,9 +7950,6 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
    – local_env is the current environment
    – asconst is used to indicate that expressions must be compile-time constant
      (i.e. we are in a global initializer)
-   – add_implicit_ensures is a callback to add an ensures clause to contracts
-     above current initialized part when it is partially initialized.
-     Does nothing initially. Useful only for initialization of locals
    – preinit corresponds to the initializers seen previously (for globals)
    – so contains the information about the current subobject currently being
      initialized
@@ -7978,10 +7961,7 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
    – preinit corresponding to the complete initialization
    – the list of unused initializers if any (should be empty most of the time)
 *)
-and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
-  let open Current_loc.Operators in
-  let<> UpdatedCurrentLoc = loc in
-  let source = fst loc in
+and doInit local_env asconst preinit so acc initl =
   let ghost = local_env.is_ghost in
   let whoami fmt = Cil_printer.pp_lval fmt (Var so.host, so.soOff) in
   let initl1 =
@@ -8087,14 +8067,14 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
     so'.stack <- [InArray(so'.curOff, bt, leno, ref 0)];
     normalSubobj so';
     let acc', preinit', initl' =
-      doInit loc local_env asconst add_implicit_ensures preinit so' acc charinits in
+      doInit local_env asconst preinit so' acc charinits in
     if initl' <> [] then
-      Kernel.warning ~source
+      Kernel.warning ~source:(fst e.expr_loc)
         "Too many initializers for character array %t" whoami;
     (* Advance past the array *)
     advanceSubobj so;
     (* Continue *)
-    doInit loc local_env asconst add_implicit_ensures preinit' so acc' restil
+    doInit local_env asconst preinit' so acc' restil
   (* If we are at an array of WIDE characters and the initializer is a
    * WIDE string literal (optionally enclosed in braces) then explore
    * the WIDE string into characters *)
@@ -8160,7 +8140,7 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
     so'.stack <- [InArray(so'.curOff, bt, leno, ref 0)];
     normalSubobj so';
     let acc', preinit', initl' =
-      doInit loc local_env asconst add_implicit_ensures preinit so' acc charinits
+      doInit local_env asconst preinit so' acc charinits
     in
     if initl' <> [] then
       (* sm: see above regarding ISO 6.7.8 para 14, which is not implemented
@@ -8171,7 +8151,7 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
     (* Advance past the array *)
     advanceSubobj so;
     (* Continue *)
-    doInit loc local_env asconst add_implicit_ensures preinit' so acc' restil
+    doInit local_env asconst preinit' so acc' restil
   (* If we are at an array and we see a single initializer then it must
    * be one for the first element *)
   | TArray(bt, leno, _), (Cabs.NEXT_INIT, Cabs.SINGLE_INIT _oneinit) :: _restil  ->
@@ -8180,12 +8160,12 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
     so.stack <- InArray(so.soOff, bt, leno, ref 0) :: so.stack;
     normalSubobj so;
     (* Start over with the fields *)
-    doInit loc local_env asconst add_implicit_ensures preinit so acc allinitl
+    doInit local_env asconst preinit so acc allinitl
   (* An incomplete structure with any initializer is an error. *)
   | TComp (comp, _), _ :: restil when comp.cfields = None ->
     Kernel.error ~current:true ~once:true
       "variable `%s' has initializer but incomplete type" so.host.vname;
-    doInit loc local_env asconst add_implicit_ensures preinit so acc restil
+    doInit local_env asconst preinit so acc restil
   (* If we are at a composite and we see a single initializer of the same
    * type as the composite then grab it all. If the type is not the same
    * then we must go on and try to initialize the fields *)
@@ -8203,12 +8183,12 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
       (* Advance to the next subobject *)
       advanceSubobj so;
       let se = acc @@@ (se, ghost) in
-      doInit loc local_env asconst add_implicit_ensures preinit so se restil
+      doInit local_env asconst preinit so se restil
     end else begin (* Try to initialize fields *)
       let toinit = fieldsToInit comp None in
       so.stack <- InComp(so.soOff, comp, toinit) :: so.stack;
       normalSubobj so;
-      doInit loc local_env asconst add_implicit_ensures preinit so acc allinitl
+      doInit local_env asconst preinit so acc allinitl
     end
 
   (* A scalar with a single initializer *)
@@ -8228,7 +8208,7 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
     (* Move on *)
     advanceSubobj so;
     let se = acc @@@ (se,ghost) in
-    doInit loc local_env asconst add_implicit_ensures preinit' so se restil
+    doInit local_env asconst preinit' so se restil
   (* An array with a compound initializer. The initializer is for the
    * array elements *)
   | TArray (bt, leno, _), (Cabs.NEXT_INIT, Cabs.COMPOUND_INIT initl) :: restil ->
@@ -8250,8 +8230,7 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
            no need to change the chunk.*)
         acc, preinit', []
       | _ ->
-        doInit
-          loc local_env asconst add_implicit_ensures preinit so' acc initl
+        doInit local_env asconst preinit so' acc initl
     in
     if initl' <> [] then
       Kernel.warning ~current:true
@@ -8259,7 +8238,7 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
     (* Advance past the array *)
     advanceSubobj so;
     (* Continue *)
-    doInit loc local_env asconst add_implicit_ensures preinit' so acc' restil
+    doInit local_env asconst preinit' so acc' restil
   (* We have a designator that tells us to select the matching union field.
    * This is to support a GCC extension *)
   | TComp(ci, _) as targ,
@@ -8283,15 +8262,13 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
     in
     (* If this is a cast from union X to union X *)
     if Typ.equal t'noattr (Cil.typeDeepDropAllAttributes targ) then
-      doInit
-        loc local_env asconst add_implicit_ensures preinit so acc
+      doInit local_env asconst preinit so acc
         [(Cabs.NEXT_INIT, Cabs.SINGLE_INIT oneinit)]
     else
       (* If this is a GNU extension with field-to-union cast find the field *)
       let fi = findField (Option.value ~default:[] ci.cfields) in
       (* Change the designator and redo *)
-      doInit
-        loc local_env asconst add_implicit_ensures preinit so acc
+      doInit local_env asconst preinit so acc
         [Cabs.INFIELD_INIT (fi.fname, Cabs.NEXT_INIT), Cabs.SINGLE_INIT oneinit]
 
   (* A structure with a composite initializer. We initialize the fields*)
@@ -8309,14 +8286,14 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
         let preinit' = setOneInit preinit so'.curOff (empty_preinit()) in
         acc, preinit', []
       | _ ->
-        doInit loc local_env asconst add_implicit_ensures preinit so' acc initl
+        doInit local_env asconst preinit so' acc initl
     in
     if initl' <> [] then
       Kernel.warning ~current:true "Too many initializers for structure";
     (* Advance past the structure *)
     advanceSubobj so;
     (* Continue *)
-    doInit loc local_env asconst add_implicit_ensures preinit' so acc' restil
+    doInit local_env asconst preinit' so acc' restil
   (* A scalar with a initializer surrounded by a number of braces *)
   | t, (Cabs.NEXT_INIT, next) :: restil ->
     begin
@@ -8338,7 +8315,7 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
         (* Move on *)
         advanceSubobj so;
         let se = acc @@@ (se, ghost) in
-        doInit loc local_env asconst add_implicit_ensures preinit' so se restil
+        doInit local_env asconst preinit' so se restil
       with Not_found ->
         abort_context
           "scalar value (of type %a) initialized by compound initializer"
@@ -8369,6 +8346,7 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
           end
 
         | Cabs.ATINDEX_INIT(idx, whatnext) -> begin
+            let open Current_loc.Operators in
             let<> UpdatedCurrentLoc = idx.expr_loc in
             match unrollType so.soTyp with
             | TArray (bt, leno, _) ->
@@ -8416,6 +8394,7 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
       | Cabs.ATINDEX_INIT (idx, whatnext) ->
         expandRange (fun what -> top (Cabs.ATINDEX_INIT(idx, what))) whatnext
       | Cabs.ATINDEXRANGE_INIT (idxs, idxe) ->
+        let open Current_loc.Operators in
         let (rs, doidxs, idxs', _) =
           doExp (no_paren_local_env local_env) CConst idxs (AExp(Some intType))
         in
@@ -8449,12 +8428,10 @@ and doInit loc local_env asconst add_implicit_ensures preinit so acc initl =
                  Cabs.NEXT_INIT)), ie)
             :: loop (i + 1)
         in
-        doInit
-          loc local_env asconst add_implicit_ensures preinit so acc (loop first)
+        doInit local_env asconst preinit so acc (loop first)
       | Cabs.NEXT_INIT -> (* We have not found any RANGE *)
         let acc' = addressSubobj so what acc in
-        doInit
-          loc local_env asconst add_implicit_ensures preinit so acc'
+        doInit local_env asconst preinit so acc'
           ((Cabs.NEXT_INIT, ie) :: restil)
     in
     expandRange (fun x -> x) what

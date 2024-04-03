@@ -31,6 +31,6 @@ struct signal tsig [3] = { 0.1, INVALID, 3, VALID };
 
 void main() {
   static unsigned char STR [] = { "123456" };
-
+  char ch[3] = "hello"; // Emit a warning
   int i = STR[2];
 }

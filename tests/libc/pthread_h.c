@@ -1,3 +1,9 @@
+/*run.config
+  STDOPT:
+  STDOPT: -cpp-extra-args="-D__FC_PTHREAD_T_IS_SCALAR -DNON_PORTABLE"
+  EXIT: 1
+  STDOPT: -cpp-extra-args="-DNON_PORTABLE"
+ */
 #define _GNU_SOURCE // if you want to compile with GCC
 #include <pthread.h>
 #include <stdio.h>
@@ -37,5 +43,13 @@ int main() {
     return 1;
   }
   printf("pthread_join succeeded, retval = %d\n", *retv);
+
+  // Test non-portable usage of pthread_t
+#ifdef NON_PORTABLE
+  if (thread == 0) {
+    return 2;
+  }
+#endif
+
   return 0;
 }

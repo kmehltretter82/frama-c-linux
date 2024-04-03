@@ -57,7 +57,7 @@ export interface ModeProps {
   onEnter?: (pattern: string) => void;
 }
 
-const defaultMode : ModeProps = { id: '' };
+const defaultMode: ModeProps = { id: '' };
 
 class ModeManager extends GlobalState<ModeProps> {
   constructor() { super(defaultMode); }
@@ -68,7 +68,7 @@ class ModeManager extends GlobalState<ModeProps> {
   }
 
   register(mode: ModeProps): void {
-    const { id, icon='SEARCH', ...data } = mode;
+    const { id, icon = 'SEARCH', ...data } = mode;
     this.registry.set(id, { id, icon, ...data });
     const id0 = this.getValue().id;
     if (id0 === '' || id0 === id) this.setValue(mode);
@@ -118,7 +118,7 @@ export function focusMode(id: string): void {
   const m = allModes.find(id);
   if (m !== undefined) {
     allModes.setValue(m);
-    const { enabled=true } = m;
+    const { enabled = true } = m;
     if (enabled) focus.emit();
   }
 }
@@ -127,7 +127,7 @@ export function focusMode(id: string): void {
 // --- Search Mode Selector
 // --------------------------------------------------------------------------
 
-const switchMode : ModeProps = {
+const switchMode: ModeProps = {
   id: 'ivette.switchmode',
   icon: 'TUNINGS',
   title: 'Search & Action Modes',
@@ -147,14 +147,12 @@ function lookupHint(h: Hint, lp: string): boolean {
   return hn ? hn.toLowerCase().includes(lp) : false;
 }
 
-function toHint(h: Hint): Toolbar.Hint
-{
+function toHint(h: Hint): Toolbar.Hint {
   const label = h.label ?? h.name ?? String(h.id);
   return { ...h, label };
 }
 
-function lookupHints(hs: Hint[], pattern: string): Toolbar.Hint[]
-{
+function lookupHints(hs: Hint[], pattern: string): Toolbar.Hint[] {
   const p = pattern.toLowerCase();
   return hs.filter((h) => lookupHint(h, p)).map(toHint);
 }
@@ -165,7 +163,7 @@ export function SearchField(): JSX.Element {
   const userMode = React.useRef('');
   const [pattern, onPattern] = React.useState('');
   const disabled = mode.id === '';
-  const { hints: getHints, enabled=true } = mode;
+  const { hints: getHints, enabled = true } = mode;
   const hints = React.useMemo(() => {
     if (!getHints) return [];
     return lookupHints(getHints(), pattern);

@@ -460,7 +460,7 @@ module rec Transfer
              let state =
                if (is_first || is_last) && Functions.RTL.is_generated_kf kf then
                  Annotations.fold_behaviors
-                   (fun _ bhv s ->
+                   (fun bhv s ->
                       let handle_annot test f s =
                         if test then
                           f

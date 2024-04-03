@@ -21,20 +21,19 @@
 /* ************************************************************************ */
 
 /**
-   @packageDocumentation
-   @module dome/system
+  @packageDocumentation
+  @module dome/system
 */
 
 /* eslint-disable max-len */
-
 // --------------------------------------------------------------------------
 // --- Evolved Spawn Process
 // --------------------------------------------------------------------------
 
 import _ from 'lodash';
 import Emitter from 'events';
-import Exec from 'child_process';
-import fspath from 'path';
+import * as Exec from 'child_process';
+import path from 'path';
 import fs from 'fs';
 import { clipboard } from 'electron';
 
@@ -194,7 +193,7 @@ export function getArguments(): string[] { return COMMAND_ARGV; }
    @description
    Same as [Node `path.join`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_join_paths)
 */
-export const { join } = fspath;
+export const { join } = path;
 
 /**
    @summary Absolute (joined) file paths.
@@ -203,7 +202,7 @@ export const { join } = fspath;
    @description
    Same as [Node `path.resolve`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_resolve_paths)
 */
-export const { resolve } = fspath;
+export const { resolve } = path;
 
 /**
    @summary Dirname of path.
@@ -212,7 +211,7 @@ export const { resolve } = fspath;
    @description
    Same as [Node `path.dirname`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_dirname_path)
 */
-export const { dirname } = fspath;
+export const { dirname } = path;
 
 /**
    @summary Basename of path.
@@ -222,7 +221,7 @@ export const { dirname } = fspath;
    @description
    Same as [Node `path.basename`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_basename_path_ext)
 */
-export const { basename } = fspath;
+export const { basename } = path;
 
 /**
    @summary File extension of path.
@@ -231,7 +230,7 @@ export const { basename } = fspath;
    @description
    Same as [Node `path.extname`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_extname_path)
 */
-export const { extname } = fspath;
+export const { extname } = path;
 
 // --------------------------------------------------------------------------
 // --- File Stats
@@ -411,20 +410,20 @@ function rmDirNonRec(path: string): Promise<void> {
 }
 
 // Not (yet) implemented in Node for Electron
-async function rmDirRec(path: string): Promise<void> {
+async function rmDirRec(directory: string): Promise<void> {
   try {
-    const stats = fs.statSync(path);
+    const stats = fs.statSync(directory);
     if (stats.isFile()) {
-      await remove(path);
+      await remove(directory);
       return;
     }
     if (stats.isDirectory()) {
       const rmDirSub = (name: string): void => {
-        rmDirRec(fspath.join(path, name));
+        rmDirRec(path.join(directory, name));
       };
-      const entries = await readDir(path);
+      const entries = await readDir(directory);
       await Promise.all(entries.map(rmDirSub));
-      await rmDirNonRec(path);
+      await rmDirNonRec(directory);
       return;
     }
   } catch (err) {
@@ -567,7 +566,6 @@ export function spawn(
   options?: ProcessOptions,
 ): Promise<Exec.ChildProcess> {
   return new Promise((result, reject) => {
-
     const cwd = options ? options.cwd : undefined;
     const opt = options ? options.env : undefined;
     const env = // Forces 'PWD' env. variable for executing a non-shell process

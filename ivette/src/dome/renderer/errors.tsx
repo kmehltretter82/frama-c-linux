@@ -29,7 +29,7 @@
    @module dome/errors
 */
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Debug } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { Button } from 'dome/controls/buttons';
@@ -53,6 +53,8 @@ export interface CatchProps {
   label?: string;
   /** Alternative renderer callback in case of errors. */
   onError?: JSX.Element | ErrorRenderer;
+
+  children: ReactNode;
 }
 
 interface CatchState {
@@ -65,8 +67,8 @@ interface CatchState {
  */
 export class Catch extends React.Component<CatchProps, CatchState, unknown> {
 
-  constructor(props: CatchProps) {
-    super(props);
+  constructor(private p: CatchProps) {
+    super(p);
     this.state = {};
     this.logerr = this.logerr.bind(this);
     this.reload = this.reload.bind(this);
@@ -87,16 +89,16 @@ export class Catch extends React.Component<CatchProps, CatchState, unknown> {
 
   render(): JSX.Element {
     const { error, info } = this.state;
+    const { onError, label = 'Error' } = this.p;
     if (error) {
-      const { onError, label = 'Error' } = this.props;
-      if (typeof (onError) === 'function')
+      if (typeof onError === 'function')
         return onError(error, info, this.reload);
       return (
         <div>
           <Button
             icon="WARNING"
             kind="warning"
-            title={typeof(error) === 'string' ? error : undefined}
+            title={typeof (error) === 'string' ? error : undefined}
             onClick={this.logerr}
           />
           <Button icon="RELOAD" onClick={this.reload} />
@@ -104,7 +106,7 @@ export class Catch extends React.Component<CatchProps, CatchState, unknown> {
         </div>
       );
     }
-    return (<>{this.props.children}</>);
+    return (<>{this.p.children}</>);
   }
 }
 

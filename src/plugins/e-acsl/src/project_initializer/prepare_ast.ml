@@ -253,7 +253,7 @@ let dup_global loc spec sound_verdict_vi kf vi new_vi =
      with neither contract nor body  *)
   if Kernel_function.is_definition kf then begin
     let old_bhvs =
-      Annotations.fold_behaviors (fun e b acc -> (e, b) :: acc) kf []
+      Annotations.fold_behaviors_by_emitter (fun e b acc -> (e, b) :: acc) kf []
     in
     List.iter
       (fun (e, b) -> Annotations.remove_behavior ~force:true e kf b)

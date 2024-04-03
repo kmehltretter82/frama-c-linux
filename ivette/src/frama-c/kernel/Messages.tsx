@@ -22,7 +22,6 @@
 
 import * as React from 'react';
 import * as Dome from 'dome';
-
 import { IconButton } from 'dome/controls/buttons';
 import { Label, Cell } from 'dome/controls/labels';
 import { Page } from 'dome/text/pages';
@@ -446,7 +445,7 @@ export default function RenderMessages(): JSX.Element {
   const filterState = useGlobalState(globalFilterState);
   const [filter] = filterState;
   const selectedDecl = States.useCurrentScope();
-  const [selectedMsg, selectMsg] = React.useState<Message|undefined>(undefined);
+  const [selectedMsg, selectMsg] = React.useState<Message>();
   const [text, setText] = React.useState('');
 
   React.useEffect(() => {
