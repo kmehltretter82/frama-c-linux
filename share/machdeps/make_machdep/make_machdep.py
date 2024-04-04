@@ -392,7 +392,7 @@ if proc.returncode == 0:
         # standard macros. Leave them alone.
         if re.match(r"#define *__STDC", line):
             continue
-        macro = re.match(r"# *define *(\w+) *(\w*)", line)
+        macro = re.match(r"# *define *([^ ]*) *(.*)", line)
         if not macro:
             # This skips over ifndef/endif blocs for msvc, maybe this
             # will be a problem later.
