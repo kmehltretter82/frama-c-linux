@@ -162,6 +162,8 @@ val wkey_ghost_bad_use: warn_category
 
 val wkey_acsl_float_compare: warn_category
 
+val wkey_large_array: warn_category
+
 val wkey_conditional_feature: warn_category
 (** parsing feature that is only supported in specific modes
     (e.g. C11, gcc, ...). *)

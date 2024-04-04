@@ -4826,7 +4826,8 @@ and doType (ghost:bool) isFuncArg
                    let size_max = Cil.max_unsigned_number size_t in
                    let array_size = Integer.mul i elem_size in
                    if Integer.gt array_size size_max then
-                     Kernel.error ~once:true ~current:true
+                     Kernel.warning ~wkey:Kernel.wkey_large_array
+                       ~once:true ~current:true
                        "Array length is too large.";
                  with
                  | SizeOfError (msg,_) ->
