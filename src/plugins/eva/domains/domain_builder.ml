@@ -291,6 +291,12 @@ end
 
 (* -------------------------------------------------------------------------- *)
 
+let unique_name =
+  let counter = ref 0 in
+  fun name ->
+    incr counter;
+    name ^ string_of_int !counter
+
 module Restrict
     (Value: Abstract_value.S)
     (Domain: Abstract.Domain.Internal with type value = Value.t)
@@ -328,11 +334,13 @@ module Restrict
        transfer functions are applied accordingly. The current mode is replaced
        at function calls by [mode.calls]. *)
 
-  module Info = struct let module_name = Domain.name ^ " restricted" end
-  module D = Datatype.Pair_with_collections (Domain) (Mode) (Info)
+  let info suffix =
+    let name = unique_name (Domain.name ^ " " ^ suffix) in
+    let module Info = struct let module_name = name end in
+    (module Info: Datatype.Functor_info)
 
-  module I = struct let module_name = Domain.name ^ " option" end
-  include Datatype.Option_with_collections (D) (I)
+  module D = Datatype.Pair_with_collections (Domain) (Mode) (val info "restricted")
+  include Datatype.Option_with_collections (D) (val info "option")
   let name = Domain.name
 
   let default = Domain.top, Mode.all
