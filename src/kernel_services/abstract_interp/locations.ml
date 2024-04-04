@@ -196,10 +196,9 @@ module Location_Bytes = struct
     if Base.Hptset.(equal b empty || equal b Base.null_set) then
       top_int
     else begin
-      if Base.Hptset.mem Base.null b then
-        Top (Base.SetLattice.inject b, o)
-      else
-        Top (Base.(SetLattice.inject (Hptset.add null b)), o)
+      let bases = Base.SetLattice.inject Base.(Hptset.add null b) in
+      Origin.register bases o;
+      Top (bases, o)
     end
 
   (** some functions can reduce a garbled mix, make sure to normalize
@@ -212,21 +211,18 @@ module Location_Bytes = struct
   let narrow m1 m2 = normalize_top (narrow m1 m2)
   let meet m1 m2 = normalize_top (meet m1 m2)
 
-  let topify_with_origin o v =
-    match v with
-    | Top (s,a) ->
-      Top (s, Origin.join a o)
-    | v when is_zero v -> v
-    | Map _ ->
-      if equal v bottom then v
-      else
-        match get_keys v with
-        | Base.SetLattice.Top -> top_with_origin o
-        | Base.SetLattice.Set b -> inject_top_origin o b
+  let is_top = function
+    | Top _ -> true
+    | Map _ -> false
 
-  let topify_with_origin_kind ok v =
-    let o = Origin.current ok in
-    topify_with_origin o v
+  let topify_with_origin o v =
+    if is_top v || is_zero v || is_bottom v then v
+    else
+      match get_keys v with
+      | Base.SetLattice.Top -> top_with_origin o
+      | Base.SetLattice.Set b -> inject_top_origin o b
+
+  let topify kind = topify_with_origin (Origin.current kind)
 
   let get_bases = get_keys
 
@@ -237,18 +233,6 @@ module Location_Bytes = struct
       | Base.Empty | Base.Known _ | Base.Unknown _ | Base.Invalid -> true
       | Base.Variable { Base.weak } -> not weak
     with Not_found -> false
-
-  let topify_merge_origin v =
-    topify_with_origin_kind Origin.Merge v
-
-  let topify_misaligned_read_origin v =
-    topify_with_origin_kind Origin.Misalign_read v
-
-  let topify_arith_origin v =
-    topify_with_origin_kind Origin.Arith v
-
-  let topify_leaf_origin v =
-    topify_with_origin_kind Origin.Leaf v
 
   let may_reach base loc =
     if Base.is_null base then true

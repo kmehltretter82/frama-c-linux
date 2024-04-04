@@ -212,7 +212,7 @@ module State = struct
         | Some location ->
           let location = Precise_locs.imprecise_location location in
           let v = Cvalue.Model.find ~conflate_bottom:false state location in
-          Cvalue.V.join acc (Cvalue.V.topify_leaf_origin v)
+          Cvalue.V.topify Origin.Leaf (Cvalue.V.join acc v)
       else acc
     in
     List.fold_left one_from_contents Cvalue.V.top_int deps

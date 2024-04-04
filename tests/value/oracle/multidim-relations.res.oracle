@@ -53,9 +53,6 @@
     multidim-relations.c:19: imprecise merge of addresses
       (read in 2 statements, propagated through 0 statements)
       garbled mix of &{g; h}
-    multidim-relations.c:18: imprecise merge of addresses
-      (read in 1 statement, propagated through 0 statements)
-      garbled mix of &{g; h}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function init_array:
   t[0]{.kind; .[bits 8 to 31]#} ∈ {0; 1} repeated %8 

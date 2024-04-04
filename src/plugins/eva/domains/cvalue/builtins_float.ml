@@ -51,7 +51,7 @@ let arity2 fk caml_fun _state actuals =
         let f' = Cvalue.V.inject_float (caml_fun (Fval.kind fk) f1 f2) in
         remove_special_float fk f'
       with Cvalue.V.Not_based_on_null ->
-        Cvalue.V.topify_arith_origin (V.join arg1 arg2)
+        Cvalue.V.topify Origin.Arith (V.join arg1 arg2)
     in
     let result = if V.is_bottom r then [] else [r] in
     Builtins.Result result
@@ -89,7 +89,7 @@ let arity1 name fk caml_fun _state actuals =
         end else begin
           Self.result ~once:true ~current:true
             "function %s applied to address" name;
-          Cvalue.V.topify_arith_origin arg
+          Cvalue.V.topify Origin.Arith arg
         end
     in
     let result = if V.is_bottom r then [] else [r] in
