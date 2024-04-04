@@ -28,7 +28,13 @@ let gen_define fmt macro pp def =
 let gen_include fmt file =
   Format.fprintf fmt "#include <%s>@\n" file
 
-let gen_undef fmt macro = Format.fprintf fmt "#undef %s@\n" macro
+let gen_undef fmt macro =
+  let macro =
+    match String.index_from_opt macro 0 '(' with
+    | None -> macro
+    | Some n -> String.sub macro 0 n
+  in
+  Format.fprintf fmt "#undef %s@\n" macro
 
 let gen_define_string fmt macro def =
   gen_define fmt macro Format.pp_print_string def
