@@ -41,10 +41,7 @@ let gen_define_macro fmt macro def =
   else gen_define_string fmt macro def
 
 let gen_define_custom_macros fmt key_values =
-  let rec iter = function
-    | (k,v)::kvs -> gen_define_macro fmt k v; iter kvs
-    | _ -> Format.fprintf fmt "@\n"
-  in iter key_values
+  List.iter (fun (k,v) -> gen_undef fmt k; gen_define_macro fmt k v) key_values
 
 let gen_define_int fmt macro def = gen_define fmt macro Format.pp_print_int def
 

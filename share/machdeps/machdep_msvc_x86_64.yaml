@@ -13,35 +13,72 @@ char_is_unsigned: false
 compiler: msvc
 cpp_arch_flags:
 - -m64
-custom_defs: |
-  #define _MSC_FULL_VER 160040219
-  #define _MSC_VER 1600
-  #undef __ptr64
-  #define __ptr64
-  #undef __ptr32
-  #define __ptr32
-  #undef __unaligned
-  #define __unaligned
-  #undef __cdecl
-  #define __cdecl
-  #undef __possibly_notnullterminated
-  #define __possibly_notnullterminated
-  #ifndef errno_t
-  # define errno_t int
-  # define _ERRNO_T_DEFINED
-  #endif
-  #ifndef _WIN64
-  # define _WIN64 1
-  #endif
-  #ifndef _AMD64_
-  # define _AMD64_ 1
-  #endif
-  #ifndef _M_AMD64
-  # define _M_AMD64 1
-  #endif
-  #ifndef _M_X64
-  # define _M_X64 1
-  #endif
+has__builtin_va_list: false
+int_fast8_t: signed char
+int_fast16_t: signed int
+int_fast32_t: signed int
+int_fast64_t: signed long long
+intptr_t: signed long long
+little_endian: true
+nsig: '23'
+ptrdiff_t: long long
+# NB: wasn't defined at all in old __fc_machdep.h
+sig_atomic_t: int
+size_t: unsigned long long
+sizeof_double: 8
+sizeof_float: 4
+sizeof_fun: -1
+sizeof_int: 4
+sizeof_long: 4
+sizeof_longdouble: 8
+sizeof_longlong: 8
+sizeof_ptr: 8
+sizeof_short: 2
+sizeof_void: 0
+ssize_t: long long
+time_t: long long
+uint_fast8_t: unsigned char
+uint_fast16_t: unsigned int
+uint_fast32_t: unsigned int
+uint_fast64_t: unsigned long long
+uintptr_t: unsigned long long
+version: MSVC - X86-64bits mode
+wchar_t: unsigned short
+weof: (0xffffU)
+wint_t: unsigned short
+wordsize: '64'
+posix_version: ''
+
+# NB: except for l_tmpnam, the following macro are not defined in the old
+# __fc_machdep.h in the MSVC_X86_64 section. The values below have thus been 
+# taken from gnu
+bufsiz: '8192'
+eof: '(-1)'
+fopen_max: '20'
+host_name_max: '255'
+path_max: '256'
+tty_name_max: '32'
+filename_max: '2048'
+l_tmpnam: '20'
+tmp_max: '0xFFFFFFFF'
+rand_max: '32767'
+mb_cur_max: '((size_t)16)'
+machdep_name: machdep_msvc_x86_64
+
+custom_defs:
+    _MSC_FULL_VER: '160040219'
+    _MSC_VER: '1600'
+    __ptr64: ''
+    __ptr32: ''
+    __unaligned: ''
+    __cdecl: ''
+    __possibly_notnullterminated: ''
+    errno_t: int
+    _ERRNO_T_DEFINED: ''
+    _WIN64: '1'
+    _AMD64_: '1'
+    _M_AMD64: '1'
+    _M_X64: '1'
 
 errno:
     eperm: '1'
@@ -123,53 +160,3 @@ errno:
     ecanceled: '105'
     eownerdead: '133'
     enotrecoverable: '127'
-has__builtin_va_list: false
-int_fast8_t: signed char
-int_fast16_t: signed int
-int_fast32_t: signed int
-int_fast64_t: signed long long
-intptr_t: signed long long
-little_endian: true
-nsig: '23'
-ptrdiff_t: long long
-# NB: wasn't defined at all in old __fc_machdep.h
-sig_atomic_t: int
-size_t: unsigned long long
-sizeof_double: 8
-sizeof_float: 4
-sizeof_fun: -1
-sizeof_int: 4
-sizeof_long: 4
-sizeof_longdouble: 8
-sizeof_longlong: 8
-sizeof_ptr: 8
-sizeof_short: 2
-sizeof_void: 0
-ssize_t: long long
-time_t: long long
-uint_fast8_t: unsigned char
-uint_fast16_t: unsigned int
-uint_fast32_t: unsigned int
-uint_fast64_t: unsigned long long
-uintptr_t: unsigned long long
-version: MSVC - X86-64bits mode
-wchar_t: unsigned short
-weof: (0xffffU)
-wint_t: unsigned short
-wordsize: '64'
-posix_version: ''
-# NB: except for l_tmpnam, the corresponding macro are not defined in the old
-# __fc_machdep.h in the MSVC_X86_64 section. The values below have thus been 
-# taken from gnu
-bufsiz: '8192'
-eof: '(-1)'
-fopen_max: '20'
-host_name_max: '255'
-path_max: '256'
-tty_name_max: '32'
-filename_max: '2048'
-l_tmpnam: '20'
-tmp_max: '0xFFFFFFFF'
-rand_max: '32767'
-mb_cur_max: '((size_t)16)'
-machdep_name: machdep_msvc_x86_64
