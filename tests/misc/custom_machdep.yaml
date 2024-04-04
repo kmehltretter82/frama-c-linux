@@ -81,5 +81,5 @@ errno:
   enomem: "47"
   enotsup: "48"
 machdep_name: custom_machdep
-custom_defs: |
-  #define CUSTOM_MACHDEP 1
+custom_defs:
+  CUSTOM_MACHDEP: '1'
