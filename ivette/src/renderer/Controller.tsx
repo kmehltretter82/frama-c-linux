@@ -39,7 +39,7 @@ import { resolve, DEVEL } from 'dome/system';
 import { classes } from 'dome/misc/utils';
 
 import * as Ivette from 'ivette';
-import * as Laboratory from 'ivette/laboratory';
+import * as Display from 'ivette/display';
 
 import * as Server from 'frama-c/server';
 import { useSyncArrayData } from 'frama-c/states';
@@ -229,70 +229,45 @@ export const Control = (): JSX.Element => {
 // --------------------------------------------------------------------------
 enum TypeAlert { NONE, CONSOLE, MESSAGES }
 
-function getDataLength(data: Kernel.messageData[]): number {
+function getNumberOfMessages(data: Kernel.messageData[]): number {
   return DEVEL ?
-    data.filter((elt) => elt.kind!=="DEBUG").length :
+    data.filter((elt) => elt.kind !== "DEBUG").length :
     data.length;
 }
 
-export const Alerts = (): JSX.Element => {
+export function Alerts(): JSX.Element | null {
   const status = Server.useStatus();
   const [newMess, setNewMess] = React.useState(false);
   const data = useSyncArrayData(Kernel.message);
-  const oldDataLength = React.useRef(getDataLength(data));
-  const labState = Laboratory.useState();
-  const messageVisible = Boolean(Laboratory.getComponentStatus(
-    labState,
-    "fc.kernel.messages",
-  ).position);
-
-  const onClick = (): void => {
-    Laboratory.applyView({
-      id: "fc.ivette.alerts",
-      label: "",
-      layout: { ABCD: "ivette.console" }
-    });
-    Laboratory.applyComponent({ id: "ivette.console", label: "" }, "AB");
-    Laboratory.applyComponent({ id: "fc.kernel.messages", label: "" }, "CD");
-  };
-
-  React.useEffect(() => {
-    const dataLength = getDataLength(data);
-    if (messageVisible) {
-      oldDataLength.current = dataLength;
-      setNewMess(false);
-    } else if (dataLength !== oldDataLength.current) {
-      if(dataLength < oldDataLength.current) oldDataLength.current = 0;
-      setNewMess(true);
-    }
-  }, [data, messageVisible, setNewMess]);
+  const messages = getNumberOfMessages(data);
+  const messageStatus = Display.useComponentStatus('fc.messages');
+  const messageVisible = messageStatus.position !== undefined;
+  React.useEffect(() => setNewMess(messages > 0), [messages]);
+  const onClick = (): void => Display.switchToView('ivette.main');
 
   const typeAlert = (
     status === Server.Status.FAILURE ? TypeAlert.CONSOLE :
-    !messageVisible && newMess ? TypeAlert.MESSAGES :
-    TypeAlert.NONE
+      !messageVisible && newMess ? TypeAlert.MESSAGES :
+        TypeAlert.NONE
   );
-  if(typeAlert === TypeAlert.NONE) return <></>;
+  if (typeAlert === TypeAlert.NONE) return null;
 
   const isConsoleAlert = typeAlert === TypeAlert.CONSOLE;
-  const AllClasses = classes(
+  const className = classes(
     "ivette-alerts",
     isConsoleAlert && 'ivette-alert-blink'
   );
+  const eventName = isConsoleAlert ? "Server failure" : "New message(s)";
 
   return (
     <IconButton
-      className = {AllClasses}
-      icon={"WARNING"}
-      size={14}
+      className={className} size={14} icon="WARNING"
       kind={isConsoleAlert ? "negative" : "warning"}
-      title={"Check the "+
-            (isConsoleAlert ?"console" :"message")+
-            " component for more information"}
+      title={eventName + " (click to open Command view)"}
       onClick={onClick}
     />
   );
-};
+}
 
 // --------------------------------------------------------------------------
 // --- Server Console
@@ -300,7 +275,7 @@ export const Alerts = (): JSX.Element => {
 
 const editor = new TextBuffer();
 
-const RenderConsole = (): JSX.Element => {
+export function RenderConsole(): JSX.Element {
   const scratch = React.useRef([] as string[]);
   const [cursor, setCursor] = React.useState(-1);
   const [isEmpty, setEmpty] = React.useState(true);
@@ -475,20 +450,7 @@ const RenderConsole = (): JSX.Element => {
       />
     </>
   );
-};
-
-Ivette.registerComponent({
-  id: 'ivette.console',
-  label: 'Console',
-  title: 'Frama-C Server Output & Command Line',
-  children: <RenderConsole />,
-});
-
-Ivette.registerView({
-  id: 'ivette.console',
-  label: 'Console',
-  layout: { ABCD: 'ivette.console' },
-});
+}
 
 // --------------------------------------------------------------------------
 // --- Status

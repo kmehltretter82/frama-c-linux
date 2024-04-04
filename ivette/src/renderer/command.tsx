@@ -20,44 +20,28 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-// --------------------------------------------------------------------------
-// --- Eva Values
-// --------------------------------------------------------------------------
-
+import React from 'react';
+import * as Controller from './Controller';
+import * as Messages from './Messages';
 import * as Ivette from 'ivette';
-import './valuetable';
-import './Summary';
-import './Coverage';
-import './DomainStates';
-import './style.css';
 
-// --------------------------------------------------------------------------
-// --- Export Component
-// --------------------------------------------------------------------------
+Ivette.registerComponent({
+    id: 'ivette.console',
+    label: 'Console',
+    title: 'Frama-C Command Line',
+    children: <Controller.RenderConsole />,
+});
 
-Ivette.registerGroup({
-  id: 'fc.eva',
-  label: 'Eva Plugin'
+Ivette.registerComponent({
+    id: 'ivette.messages',
+    label: 'Messages',
+    title: 'Frama-C Messages',
+    children: <Messages.RenderMessages />,
 });
 
 Ivette.registerView({
-  id: 'fc.eva.summary',
-  label: 'Eva Summary',
-  layout: {
-    'A': 'fc.eva.summary',
-    'B': 'fc.eva.coverage',
-    'CD': 'ivette.messages',
-  },
+    id: 'ivette.command',
+    label: 'Frama-C',
+    title: 'Frama-C Console & Messages',
+    layout: { AB: 'ivette.console', CD: 'ivette.messages' },
 });
-
-Ivette.registerView({
-  id: 'fc.eva.values',
-  label: 'Eva Values',
-  layout: {
-    'A': 'fc.kernel.astview',
-    'B': 'fc.kernel.astinfo',
-    'CD': 'fc.eva.values',
-  }
-});
-
-// --------------------------------------------------------------------------

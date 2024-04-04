@@ -36,7 +36,6 @@ import SourceCode from 'frama-c/kernel/SourceCode';
 import PivotTable from 'frama-c/kernel/PivotTable';
 import Locations from 'frama-c/kernel/Locations';
 import Properties from 'frama-c/kernel/Properties';
-import Messages from 'frama-c/kernel/Messages';
 
 import 'frama-c/kernel/style.css';
 
@@ -103,13 +102,6 @@ Ivette.registerComponent({
   label: 'Properties',
   title: 'Status of ACSL Properties',
   children: <Properties />,
-});
-
-Ivette.registerComponent({
-  id: 'fc.kernel.messages',
-  label: 'Messages',
-  title: 'Messages emitted by Frama-C',
-  children: <Messages />,
 });
 
 Ivette.registerComponent({

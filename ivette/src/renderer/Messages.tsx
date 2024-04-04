@@ -425,7 +425,7 @@ const byMessage: Compare.ByFields<Message> = {
 
 const globalFilterState = new GlobalState(defaultFilter);
 
-export default function RenderMessages(): JSX.Element {
+export function RenderMessages(): JSX.Element {
 
   const [model] = React.useState(() => {
     const f = (msg: Message): string => msg.key;
