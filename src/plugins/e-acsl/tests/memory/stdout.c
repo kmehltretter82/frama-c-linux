@@ -6,7 +6,7 @@
 
 int main(void) {
   /*@assert \valid(stderr); */
-  /*@assert \valid(stdin); */
+  /*@assert \valid_read(stdin); */
   /*@assert \valid(stdout); */
   return 0;
 }

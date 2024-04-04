@@ -126,20 +126,21 @@ void *thread_start(void *arg)
   }
   /*@ assert \valid(__fc_stderr) && \initialized(__fc_stderr); */ ;
   {
-    int __gen_e_acsl_valid_3;
+    int __gen_e_acsl_valid_read;
     int __gen_e_acsl_and_3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
-    __gen_e_acsl_valid_3 = __e_acsl_valid((void *)stdin,sizeof(FILE),
-                                          (void *)stdin,(void *)(& stdin));
+    __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)stdin,sizeof(FILE),
+                                                  (void *)stdin,
+                                                  (void *)(& stdin));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,"__fc_stdin",
                                  (void *)stdin);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_3,
                                    "sizeof(FILE)",0,sizeof(FILE));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_3,
-                                 "\\valid(__fc_stdin)",0,
-                                 __gen_e_acsl_valid_3);
-    if (__gen_e_acsl_valid_3) {
+                                 "\\valid_read(__fc_stdin)",0,
+                                 __gen_e_acsl_valid_read);
+    if (__gen_e_acsl_valid_read) {
       int __gen_e_acsl_initialized_3;
       __gen_e_acsl_initialized_3 = __e_acsl_initialized((void *)stdin,
                                                         sizeof(FILE));
@@ -155,14 +156,14 @@ void *thread_start(void *arg)
     else __gen_e_acsl_and_3 = 0;
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
-    __gen_e_acsl_assert_data_3.pred_txt = "\\valid(__fc_stdin) && \\initialized(__fc_stdin)";
+    __gen_e_acsl_assert_data_3.pred_txt = "\\valid_read(__fc_stdin) && \\initialized(__fc_stdin)";
     __gen_e_acsl_assert_data_3.file = "threads_safe_locations.c";
     __gen_e_acsl_assert_data_3.fct = "thread_start";
     __gen_e_acsl_assert_data_3.line = 8;
     __e_acsl_assert(__gen_e_acsl_and_3,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
-  /*@ assert \valid(__fc_stdin) && \initialized(__fc_stdin); */ ;
+  /*@ assert \valid_read(__fc_stdin) && \initialized(__fc_stdin); */ ;
   int *addrof_errno = & errno;
   __e_acsl_store_block((void *)(& addrof_errno),8UL);
   __e_acsl_full_init((void *)(& addrof_errno));
@@ -182,8 +183,8 @@ void *thread_start(void *arg)
                                  "\\initialized(&addrof_errno)",0,
                                  __gen_e_acsl_initialized_4);
     if (__gen_e_acsl_initialized_4) {
-      int __gen_e_acsl_valid_4;
-      __gen_e_acsl_valid_4 = __e_acsl_valid((void *)addrof_errno,sizeof(int),
+      int __gen_e_acsl_valid_3;
+      __gen_e_acsl_valid_3 = __e_acsl_valid((void *)addrof_errno,sizeof(int),
                                             (void *)addrof_errno,
                                             (void *)(& addrof_errno));
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
@@ -192,8 +193,8 @@ void *thread_start(void *arg)
                                      "sizeof(int)",0,sizeof(int));
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
                                    "\\valid(addrof_errno)",0,
-                                   __gen_e_acsl_valid_4);
-      __gen_e_acsl_and_4 = __gen_e_acsl_valid_4;
+                                   __gen_e_acsl_valid_3);
+      __gen_e_acsl_and_4 = __gen_e_acsl_valid_3;
     }
     else __gen_e_acsl_and_4 = 0;
     if (__gen_e_acsl_and_4) {
