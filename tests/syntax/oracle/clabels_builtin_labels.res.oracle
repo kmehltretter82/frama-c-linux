@@ -109,7 +109,7 @@ void named(void)
 
 void post_over_old_1(void)
 {
-  __fc_user_label_Post: ;
+  __fc_user_label_Old: ;
   return;
 }
 
@@ -121,7 +121,7 @@ void post_over_old_2(void)
 
 void post_over_loop_1(void)
 {
-  __fc_user_label_Post: ;
+  __fc_user_label_LoopEntry: ;
   return;
 }
 
@@ -133,7 +133,7 @@ void post_over_loop_2(void)
 
 void post_over_other_1(void)
 {
-  __fc_user_label_Post: ;
+  __fc_user_label_Here: ;
   return;
 }
 
@@ -145,13 +145,13 @@ void post_over_other_2(void)
 
 void post_over_other_3(void)
 {
-  __fc_user_label_Post: ;
+  __fc_user_label_Init: ;
   return;
 }
 
 void old_over_loop_1(void)
 {
-  __fc_user_label_Old: ;
+  __fc_user_label_LoopEntry: ;
   return;
 }
 
@@ -163,7 +163,7 @@ void old_over_loop_2(void)
 
 void old_over_other_1(void)
 {
-  __fc_user_label_Old: ;
+  __fc_user_label_Here: ;
   return;
 }
 
@@ -175,13 +175,13 @@ void old_over_other_2(void)
 
 void old_over_other_3(void)
 {
-  __fc_user_label_Old: ;
+  __fc_user_label_Init: ;
   return;
 }
 
 void loop_over_other_1(void)
 {
-  __fc_user_label_LoopEntry: ;
+  __fc_user_label_Here: ;
   return;
 }
 
@@ -193,7 +193,7 @@ void loop_over_other_2(void)
 
 void loop_over_other_3(void)
 {
-  __fc_user_label_LoopEntry: ;
+  __fc_user_label_Init: ;
   return;
 }
 

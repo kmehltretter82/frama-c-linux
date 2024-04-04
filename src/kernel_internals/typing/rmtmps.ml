@@ -674,51 +674,15 @@ let markReferenced ast =
  *
  **********************************************************************)
 
-(* Assumption: one can order logic labels according to their visibility.
-
-   The goal of this function is to minimize name clash when the program contains
-   C labels with a name that corresponds to a builtin logic label. Parsing the
-   result should not lead to a program with a different semantics.
-   For example:                              [Here: Old: ;]
-   cannot be normalized into:                [Here: ;]
-   because it could change the semantics of: [//@ assert P{Old};]
-
-   The behavior is as follows:
-   - select a name without name clash if there is one,
-   - else, select according to visibility: Post > Old > Loop* > Other
-
-   A difference in semantics can appear if:
-   - there are several builtin label names with different visibilities
-   - there is an assertion that uses one non-visible label from this list
-   - we select a visible label from the list
-
-   By selecting the less visible we guarantee that we do not change the
-   semantics: either original name did not correspond to a visible logic label,
-   and this is also the case for the selected one, or it was already masked
-   during the typing phase.
-*)
-
+(* We prefer a label when it does not require renaming *)
 let prefer ~new_label ~old_label =
   old_label = "" ||
   match Logic_typing.builtin_label old_label with
   | None -> false (* the old label already has a good name *)
-  | Some l_over ->
+  | Some _ ->
     match Logic_typing.builtin_label new_label with
     | None -> true (* the old label is a builtin name, the new one is better *)
-    | Some l_label ->
-      (* Ok, from now, we only have choices that are not good :( let's try to
-         minimize name clashes ...
-      *)
-      match l_label, l_over with
-      (* only visible in function contracts *)
-      | Post, _ -> true | _, Post -> false
-      (* only visible in contracts *)
-      | Old, _ -> true  | _, Old -> false
-      (* only visible in annotations associated to a loop *)
-      | (LoopCurrent | LoopEntry), _ -> true
-      | _, (LoopCurrent | LoopEntry) -> false
-      (* ok, now we give up: anything else is visible in code annotations *)
-      | _ -> false
+    | Some _ -> false (* let us keep the old name *)
 
 (* if we're forced to keep a C label whose name match a builtin logic label,
    we'll rename it to ensure no confusion can arise.
