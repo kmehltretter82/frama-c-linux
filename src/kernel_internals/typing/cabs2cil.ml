@@ -2749,7 +2749,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
          prototypes. Logic specifications refer to the varinfo in this table. *)
       begin
         match vi.vtype with
-        | TFun (_, Some formals , _, _) ->
+        | TFun (_,Some formals , _, _ ) ->
           (try
              let old_formals_env = getFormalsDecl oldvi in
              List.iter2
@@ -2777,7 +2777,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                formals
            with Not_found -> Cil.setFormalsDecl oldvi vi.vtype)
         | _ -> ()
-      end;
+      end ;
       (* if [isadef] is true, [vi] is a definition.  *)
       if isadef then begin
         (* always favor the location of the definition.*)
@@ -10052,6 +10052,17 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     defaultChunk ~ghost loc' (doStatement local_env s)
   | Cabs.LABEL (l, s, loc) ->
     let loc' = convLoc loc in
+    Option.iter
+      begin fun label ->
+        let context = match label with
+          | Here | Pre | Init -> "annotations"
+          | LoopEntry | LoopCurrent -> "loop annotations"
+          | Old | Post -> "contracts"
+        in
+        Kernel.warning ~current:true
+          "%s is a builtin ACSL label, this C label is hidden in %s" l context
+      end
+      (Logic_typing.builtin_label l) ;
     add_label_env l;
     C_logic_env.add_current_label l;
     (* Lookup the label because it might have been locally defined *)
