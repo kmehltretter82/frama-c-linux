@@ -43,7 +43,7 @@ export interface ItemProps {
    A sidebar item for controlling an Ivette view.
  */
 export function ViemItem(props: ItemProps): JSX.Element | null {
-  const { id, selected=false } = props;
+  const { id, selected = false } = props;
   const view = State.useElement(VIEW, id);
   const state = Laboratory.useState();
   if (!view) return null;
@@ -61,7 +61,7 @@ export function ViemItem(props: ItemProps): JSX.Element | null {
    A sidebar item for controlling an Ivette component.
  */
 export function ComponentItem(props: ItemProps): JSX.Element | null {
-  const { id, selected=false } = props;
+  const { id, selected = false } = props;
   const comp = State.useElement(COMPONENT, id);
   const state = Laboratory.useState();
   if (!comp) return null;
@@ -86,48 +86,40 @@ export interface GroupItemsProps {
 export function GroupItems(props: GroupItemsProps): JSX.Element | null {
   const items =
     State.useElements(COMPONENT)
-         .filter(Laboratory.inGroup(props))
-         .map(({ id }) => (
-           <ComponentItem
-             key={id}
-             id={id}
-             selected={id === props.selected} />
-         ));
+      .filter(Laboratory.inGroup(props))
+      .map(({ id }) => (
+        <ComponentItem
+          key={id}
+          id={id}
+          selected={id === props.selected} />
+      ));
   return <>{items}</>;
 }
 
 /** Switch display to specified view. */
 export function switchToView(id: string): void {
-  const view = VIEW.getElement(id);
-  if (view) Laboratory.applyView(view);
+  Laboratory.switchToView(id);
 }
 
 /** Show component. */
-export function showComponent(id: string, at?: LayoutPosition): void
-{
-  const comp = COMPONENT.getElement(id);
-  if (comp) Laboratory.applyComponent(comp, at);
+export function showComponent(id: string, at?: LayoutPosition): void {
+  Laboratory.showComponent(id, at);
 }
 
 /** Dock component. */
-export function dockComponent(id: string, at?: LayoutPosition): void
-{
-  const comp = COMPONENT.getElement(id);
-  if (comp) Laboratory.dockComponent(comp, at);
+export function dockComponent(id: string, at?: LayoutPosition): void {
+  Laboratory.dockComponent(id, at);
 }
 
 /** Alert component. */
-export function alertComponent(id: string): void
-{
-  const comp = COMPONENT.getElement(id);
-  if (comp) Laboratory.alertComponent(comp);
+export function alertComponent(id: string): void {
+  Laboratory.alertComponent(id);
 }
 
 /** Component Status Hook. */
 export function useComponentStatus(
   id: string | undefined
-): Laboratory.ComponentStatus
-{
+): Laboratory.ComponentStatus {
   const state = Laboratory.useState();
   return Laboratory.getComponentStatus(state, id ?? '');
 }

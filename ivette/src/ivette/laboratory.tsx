@@ -465,7 +465,7 @@ function restoreDefault(key: tabKey): void {
   }
 }
 
-export function applyView(view: Ivette.ViewLayoutProps): void {
+function applyView(view: Ivette.ViewLayoutProps): void {
   const state = LAB.getValue();
   const viewId = view.id;
   if (state.tabs.has(viewId))
@@ -515,7 +515,7 @@ function applyFavorite(
   }
 }
 
-export function applyComponent(
+function applyComponent(
   comp: Ivette.ComponentProps,
   at?: LayoutPosition
 ): void {
@@ -529,7 +529,7 @@ export function applyComponent(
   LAB.setValue({ ...state, panels, alerts, stack });
 }
 
-export function dockComponent(
+function applyDock(
   comp: Ivette.ComponentProps,
   at?: Ivette.LayoutPosition
 ): void {
@@ -564,21 +564,6 @@ function closeComponent(compId: compId): void {
   docked.delete(compId);
   alerts.delete(compId);
   LAB.setValue({ ...state, panels, docked, stack });
-}
-
-export function alertComponent(comp: Ivette.ComponentProps): void {
-  const { id } = comp;
-  const state = LAB.getValue();
-  /* Do nothing if the component if already visible. */
-  const layout = state.stack[0] ?? defaultLayout;
-  const curr = getLayoutPosition(layout, id);
-  if (curr !== undefined) return;
-  /* Add the component to the set of alerted components. */
-  const alerts = copySet(state.alerts).add(id);
-  LAB.setValue({ ...state, alerts });
-  /* Dock the component if it isn't already. */
-  if (state.docked.has(id)) return;
-  dockComponent(comp);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -619,7 +604,7 @@ Settings.onWindowSettings(() => {
       settings.dock.forEach(dock => {
         const comp = COMPONENT.getElement(dock.comp);
         if (comp !== undefined && !state.docked.has(comp.id))
-          dockComponent(comp, dock.position);
+          applyDock(comp, dock.position);
       });
       if (!state.tabKey && !gotoView) {
         applyTab(gotoView);
@@ -805,7 +790,7 @@ function LayoutMenu(): JSX.Element | null {
   const onDock = (): void => {
     closeMenu();
     const comp = COMPONENT.getElement(compId);
-    if (comp) dockComponent(comp);
+    if (comp) applyDock(comp);
   };
 
   const onUndock = (): void => {
@@ -1165,7 +1150,7 @@ function DockItem(props: DockItemProps): JSX.Element | null {
 
   const onClick = (): void => {
     if (visible) {
-      dockComponent(comp);
+      applyDock(comp);
     } else {
       applyComponent(comp, position);
     }
@@ -1286,6 +1271,37 @@ export function Tabs(): JSX.Element {
       />
     ));
   return <>{items}</>;
+}
+
+export function switchToView(id: string): void {
+  const view = VIEW.getElement(id);
+  if (view) applyView(view);
+}
+
+export function showComponent(id: string, at?: LayoutPosition): void {
+  const comp = COMPONENT.getElement(id);
+  if (comp) applyComponent(comp, at);
+}
+
+export function dockComponent(id: string, at?: LayoutPosition): void {
+  const comp = COMPONENT.getElement(id);
+  if (comp) applyDock(comp, at);
+}
+
+export function alertComponent(id: string): void {
+  const comp = COMPONENT.getElement(id);
+  if (!comp) return;
+  const state = LAB.getValue();
+  /* Do nothing if the component if already visible. */
+  const layout = state.stack[0] ?? defaultLayout;
+  const curr = getLayoutPosition(layout, id);
+  if (curr !== undefined) return;
+  /* Add the component to the set of alerted components. */
+  const alerts = copySet(state.alerts).add(id);
+  LAB.setValue({ ...state, alerts });
+  /* Dock the component if it isn't already. */
+  if (state.docked.has(id)) return;
+  applyDock(comp);
 }
 
 /* -------------------------------------------------------------------------- */
