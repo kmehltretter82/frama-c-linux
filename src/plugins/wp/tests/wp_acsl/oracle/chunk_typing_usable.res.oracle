@@ -12,6 +12,7 @@
 --- Context 'typed_usable_lemma' Cluster 'Chunk' 
 ---------------------------------------------
 theory Chunk
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -32,11 +33,13 @@ theory Chunk
   
   predicate is_sint32_chunk (m:addr -> int) =
     forall a:addr. is_sint32 (get m a)
+  
 end
 ---------------------------------------------
 --- Context 'typed_usable_lemma' Cluster 'Compound' 
 ---------------------------------------------
 theory Compound
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -54,11 +57,13 @@ theory Compound
   (* use frama_c_wp.memaddr.MemAddr *)
   
   function shift_sint32 (p:addr) (k:int) : addr = shift p k
+  
 end
 ---------------------------------------------
 --- Context 'typed_usable_lemma' Cluster 'A_Occ' 
 ---------------------------------------------
 theory A_Occ
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -103,11 +108,13 @@ theory A_Occ
      f < t ->
      is_sint32_chunk mint ->
      is_sint32 v -> is_sint32 x1 -> L_occ mint v p f x = L_occ mint v p f t
+  
 end
 ---------------------------------------------
 --- Context 'typed_usable_lemma' Cluster 'Axiomatic1' 
 ---------------------------------------------
 theory Axiomatic1
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -135,9 +142,11 @@ theory Axiomatic1
      is_sint32_chunk mint ->
      is_sint32 v ->
      (L_occ mint v p f s + L_occ mint v p s t) = L_occ mint v p f t
+  
 end
 [wp:print-generated] 
   theory WP
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -165,11 +174,13 @@ end
        is_uint32 i ->
        is_sint32 i2 ->
        (L_occ t i2 a i i3 + L_occ t i2 a i3 i1) = L_occ t i2 a i i1
+    
   end
 ---------------------------------------------
 --- Context 'typed_usable_axiom' Cluster 'Chunk' 
 ---------------------------------------------
 theory Chunk1
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool1 *)
@@ -190,11 +201,13 @@ theory Chunk1
   
   predicate is_sint32_chunk1 (m:addr1 -> int) =
     forall a:addr1. is_sint321 (get1 m a)
+  
 end
 ---------------------------------------------
 --- Context 'typed_usable_axiom' Cluster 'Compound' 
 ---------------------------------------------
 theory Compound1
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool1 *)
@@ -212,11 +225,13 @@ theory Compound1
   (* use frama_c_wp.memaddr.MemAddr1 *)
   
   function shift_sint321 (p:addr1) (k:int) : addr1 = shift1 p k
+  
 end
 ---------------------------------------------
 --- Context 'typed_usable_axiom' Cluster 'A_Occ' 
 ---------------------------------------------
 theory A_Occ1
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool1 *)
@@ -263,11 +278,13 @@ theory A_Occ1
      is_sint32_chunk1 mint ->
      is_sint321 v ->
      is_sint321 x1 -> L_occ1 mint v p f x = L_occ1 mint v p f t
+  
 end
 ---------------------------------------------
 --- Context 'typed_usable_axiom' Cluster 'Axiomatic1' 
 ---------------------------------------------
 theory Axiomatic11
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool1 *)
@@ -295,9 +312,11 @@ theory Axiomatic11
      is_sint32_chunk1 mint ->
      is_sint321 v ->
      (L_occ1 mint v p f s +' L_occ1 mint v p s t) = L_occ1 mint v p f t
+  
 end
 [wp:print-generated] 
   theory WP1
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool1 *)
@@ -324,11 +343,13 @@ end
        is_sint32_chunk1 t ->
        is_uint321 i1 ->
        is_uint321 i -> is_sint321 i2 -> L_occ1 t i2 a i x = L_occ1 t i2 a i i1
+    
   end
 ---------------------------------------------
 --- Context 'typed' Cluster 'Chunk' 
 ---------------------------------------------
 theory Chunk2
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool2 *)
@@ -349,11 +370,13 @@ theory Chunk2
   
   predicate is_sint32_chunk2 (m:addr2 -> int) =
     forall a:addr2. is_sint322 (get2 m a)
+  
 end
 ---------------------------------------------
 --- Context 'typed' Cluster 'Compound' 
 ---------------------------------------------
 theory Compound2
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool2 *)
@@ -371,11 +394,13 @@ theory Compound2
   (* use frama_c_wp.memaddr.MemAddr2 *)
   
   function shift_sint322 (p:addr2) (k:int) : addr2 = shift2 p k
+  
 end
 ---------------------------------------------
 --- Context 'typed' Cluster 'A_Occ' 
 ---------------------------------------------
 theory A_Occ2
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool2 *)
@@ -422,9 +447,11 @@ theory A_Occ2
      is_sint32_chunk2 mint ->
      is_sint322 v ->
      is_sint322 x1 -> L_occ2 mint v p f x = L_occ2 mint v p f t
+  
 end
 [wp:print-generated] 
   theory WP2
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool2 *)
@@ -452,6 +479,7 @@ end
        is_sint32_chunk2 t ->
        is_sint322 i3 ->
        (L_occ2 t i3 a i i1 +'' L_occ2 t i3 a i1 i2) = L_occ2 t i3 a i i2
+    
   end
 [wp] 3 goals generated
 ------------------------------------------------------------

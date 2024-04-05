@@ -126,14 +126,17 @@ val is_auto : prover -> bool
 val has_counter_examples : prover -> bool
 val is_prover : prover -> bool
 val is_extern : prover -> bool
+
 val is_result : verdict -> bool
+val is_proved: smoke:bool -> verdict -> bool
+
 val is_none : result -> bool
 val is_verdict : result -> bool
 val is_valid: result -> bool
 val is_trivial: result -> bool
 val is_not_valid: result -> bool
 val is_computing: result -> bool
-val is_proved: smoke:bool -> verdict -> bool
+val has_model: result -> bool
 
 val configure : result -> config
 val autofit : result -> bool (** Result that fits the default configuration *)

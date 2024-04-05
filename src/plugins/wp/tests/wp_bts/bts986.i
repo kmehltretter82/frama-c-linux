@@ -1,8 +1,8 @@
 /* run.config_qualif
-   OPT: -wp -wp-par 1 -wp-steps 50
+   OPT: -wp -wp-par 1
 */
 
-void f (void) 
+void f (void)
 {
   int * p ;
   {
@@ -11,4 +11,3 @@ void f (void)
   }
   //@ assert A:!\valid(p);
 }
-

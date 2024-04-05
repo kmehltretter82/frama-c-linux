@@ -6,6 +6,7 @@
 --- Context 'typed' Cluster 'Compound' 
 ---------------------------------------------
 theory Compound
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -25,9 +26,11 @@ theory Compound
   function shift_sint32 (p:addr) (k:int) : addr = shift p k
   
   function shiftfield_F1__list_next (p:addr) : addr = shift p 1
+  
 end
 [wp:print-generated] 
   theory WP
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -67,9 +70,11 @@ end
     goal wp_goal :
       forall t:int -> int, t1:int -> int, t2:addr -> addr, t3:addr -> addr, a:
        addr, a1:addr. P_reachable t1 t3 a a1 -> not P_reachable t t2 a a1
+    
   end
 [wp:print-generated] 
   theory WP1
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -92,9 +97,11 @@ end
     
     goal wp_goal :
       forall i:int, i1:int, i2:int. P_is_gcd1 i i1 i2 -> not P_is_gcd1 i1 i2 i
+    
   end
 [wp:print-generated] 
   theory WP2
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -179,6 +186,7 @@ end
       forall t:addr -> int, t1:addr -> int, t2:addr -> int, a:addr, a1:addr, i:
        int, i1:int, i2:int, i3:int.
        P_same_elements t1 t2 a a1 i i2 -> not P_same_elements t t1 a1 a i1 i3
+    
   end
 [wp] 3 goals generated
 ------------------------------------------------------------

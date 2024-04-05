@@ -1,6 +1,6 @@
 FILEREG: .*\.why
 DEPS: ~/.why3.conf
-CMD: why3 -L @PTEST_SHARE_DIR@/why3 prove -P alt-ergo
+CMD: why3 -L @PTEST_SHARE_DIR@/why3 prove -P Alt-Ergo,2.5.3
 OPT:
 COMMENT: the filter remove the information about time and steps
 FILTER: sed -e 's|\(.*\)\( (.*)\)|\1|'

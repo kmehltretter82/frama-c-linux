@@ -3,7 +3,7 @@
  */
 
 /* run.config_qualif
-   OPT: -wp-driver %{dep:@PTEST_DIR@/bit_test.driver} -wp-prover why3:alt-ergo
+   OPT: -wp-driver %{dep:@PTEST_DIR@/bit_test.driver} -wp-prover why3:Alt-Ergo
 */
 
 /*@

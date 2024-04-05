@@ -7,6 +7,7 @@
 --- Context 'typed_g' Cluster 'Axiomatic1' 
 ---------------------------------------------
 theory Axiomatic1
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -24,9 +25,11 @@ theory Axiomatic1
   (* use frama_c_wp.memaddr.MemAddr *)
   
   function L_x (mint:addr -> int) (p:addr) : int = get mint p
+  
 end
 [wp:print-generated] 
   theory WP
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -52,6 +55,7 @@ end
        let x = get t a in
        let x1 = L_x t a in
        region (a.base) <= 0 -> is_uint8 x -> is_uint8 x1 -> x = x1 /\ x1 <= 255
+    
   end
 [wp] [Valid] typed_g_ensures_A (Alt-Ergo) (Cached)
 [wp] Proved goals:    1 / 1

@@ -9,6 +9,7 @@
 --- Context 'typed_f' Cluster 'Compound' 
 ---------------------------------------------
 theory Compound
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -26,11 +27,13 @@ theory Compound
   (* use frama_c_wp.memaddr.MemAddr *)
   
   function shift_sint8 (p:addr) (k:int) : addr = shift p k
+  
 end
 ---------------------------------------------
 --- Context 'typed_f' Cluster 'cstring' 
 ---------------------------------------------
 theory Cstring
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -123,9 +126,11 @@ theory Cstring
     forall mchar:addr -> int, i:int.
      sconst mchar ->
      get mchar (shift_sint8 (global Str_4) i) = get Lit_7BA4 i
+  
 end
 [wp:print-generated] 
   theory WP
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -143,10 +148,12 @@ end
     (* use Cstring *)
     
     goal wp_goal : not Str_4 = Str_3
+    
   end
 [wp] [Valid] typed_f_assert_AB (Alt-Ergo) (Cached)
 [wp:print-generated] 
   theory WP1
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -167,10 +174,12 @@ end
       forall t:int -> int.
        not Str_4 = Str_3 ->
        linked t -> valid_rd t (shift_sint8 (global Str_3) 0) 3
+    
   end
 [wp] [Valid] typed_f_assert_B_valid (Alt-Ergo) (Cached)
 [wp:print-generated] 
   theory WP2
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -203,10 +212,12 @@ end
        sconst t1 ->
        is_sint8 x ->
        valid_rd t (shift_sint8 a2 0) 3 -> x = 0 /\ valid_rd t a3 1
+    
   end
 [wp] [Valid] typed_f_assert_B_end (Alt-Ergo) (Cached)
 [wp:print-generated] 
   theory WP3
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -237,10 +248,12 @@ end
        sconst t1 ->
        valid_rd t (shift_sint8 a2 0) 3 ->
        valid_rd t a3 1 -> not valid_rd t (shift_sint8 a2 4) 1
+    
   end
 [wp] [Valid] typed_f_assert_B_out (Alt-Ergo) (Cached)
 [wp:print-generated] 
   theory WP4
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -273,10 +286,12 @@ end
        valid_rd t a3 1 ->
        not valid_rd t (shift_sint8 a2 4) 1 ->
        not valid_rw t (shift_sint8 a2 1) 1
+    
   end
 [wp] [Valid] typed_f_assert_B_rw (Alt-Ergo) (Cached)
 [wp:print-generated] 
   theory WP5
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -312,6 +327,7 @@ end
        not valid_rd t (shift_sint8 a2 4) 1 ->
        not valid_rw t (shift_sint8 a2 1) 1 ->
        get t1 (shift_sint8 (global Str_1) (3 + i)) = get t1 (shift_sint8 a2 i)
+    
   end
 [wp] [Valid] typed_f_assert_VAL (Alt-Ergo) (Cached)
 [wp] Proved goals:    8 / 8

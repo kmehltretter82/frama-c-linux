@@ -40,12 +40,13 @@ theory Cbits
   function lnot int : int
 
   function land int int : int
-  function lxor int int : int
-  function lor  int int : int
+  clone algebra.AC as Land with type t = int, function op = land, axiom .
 
-  meta AC function land
-  meta AC function lxor
-  meta AC function lor
+  function lxor int int : int
+  clone algebra.AC as Lxor with type t = int, function op = lxor, axiom .
+
+  function lor  int int : int
+  clone algebra.AC as Lor  with type t = int, function op = lor, axiom .
 
   function lsl  int int : int
   function lsr  int int : int
