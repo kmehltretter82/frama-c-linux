@@ -46,8 +46,15 @@ let gen_define_macro fmt macro def =
   if def = "" then gen_undef fmt macro
   else gen_define_string fmt macro def
 
-let gen_define_custom_macros fmt key_values =
-  List.iter (fun (k,v) -> gen_undef fmt k; gen_define_macro fmt k v) key_values
+let gen_define_custom_macros fmt censored key_values =
+  List.iter
+    (fun (k,v) ->
+       if not (Datatype.String.Set.mem (Extlib.strip_underscore k) censored)
+       then begin
+         gen_undef fmt k;
+         gen_define_macro fmt k v
+       end)
+    key_values
 
 let gen_define_int fmt macro def = gen_define fmt macro Format.pp_print_int def
 
@@ -276,7 +283,7 @@ let machdep_macro_name s =
   in
   String.map tr s
 
-let gen_all_defines fmt mach =
+let gen_all_defines fmt ?(censored_macros=Datatype.String.Set.empty) mach =
   Format.fprintf fmt "/* Machdep-specific info for Frama-C's libc */@\n";
   Format.fprintf fmt "#ifndef __FC_MACHDEP@\n#define __FC_MACHDEP@\n";
   gen_define_int fmt ("__FC_" ^ (machdep_macro_name mach.machdep_name)) 1;
@@ -347,17 +354,17 @@ let gen_all_defines fmt mach =
   if mach.compiler = "gcc" then
     gen_include fmt "__fc_gcc_builtins.h";
 
-  gen_define_custom_macros fmt mach.custom_defs;
+  gen_define_custom_macros fmt censored_macros mach.custom_defs;
 
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"
 
-let generate_machdep_header mach =
+let generate_machdep_header ?censored_macros mach =
   let debug = Kernel.(is_debug_key_enabled dkey_pp) in
   let temp = Extlib.temp_dir_cleanup_at_exit ~debug "__fc_machdep" in
   let file = Filepath.Normalized.concat temp "__fc_machdep.h" in
   let chan = open_out (file:>string) in
   let fmt = Format.formatter_of_out_channel chan in
-  gen_all_defines fmt mach;
+  gen_all_defines fmt ?censored_macros mach;
   flush chan;
   close_out chan;
   temp

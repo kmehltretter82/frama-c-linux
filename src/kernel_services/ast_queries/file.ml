@@ -502,9 +502,24 @@ let silence_cpp_machdep_warnings cmdl =
   else
     []
 
+let known_bad_macros = [ "SSE" ]
+
+let censored_macros cpp_args =
+  List.fold_left
+    (fun acc arg ->
+       let open Option.Operators in
+       let none = acc in
+       let some = Fun.flip Datatype.String.Set.add acc in
+       (let+ name = Extlib.string_del_prefix "-U" arg in
+        Extlib.strip_underscore name)
+       |> Option.fold ~none ~some)
+    (Datatype.String.Set.of_list known_bad_macros)
+    (List.(flatten (map (String.split_on_char ' ') cpp_args)))
+
 let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
   | NeedCPP (f, cmdl, extra_for_this_file, is_gnu_like) ->
+    let extra_args = extra_for_this_file @ Kernel.CppExtraArgs.get () in
     if not (Filepath.exists f) then
       Kernel.abort "source file %a does not exist"
         Filepath.Normalized.pretty f;
@@ -530,7 +545,10 @@ let build_cpp_cmd = function
     let fc_include_args =
       if Kernel.FramaCStdLib.get () then
         begin
-          let machdep_dir = Machdep.generate_machdep_header (get_machdep()) in
+          let censored_macros = censored_macros extra_args in
+          let machdep_dir =
+            Machdep.generate_machdep_header ~censored_macros (get_machdep())
+          in
           [(machdep_dir:>string); (Fc_config.framac_libc:>string)]
         end
       else []
@@ -558,8 +576,7 @@ let build_cpp_cmd = function
     in
     let supp_args =
       string_of_supp_args
-        (gnu_implicit_args @ clang_no_warn @
-         extra_for_this_file @ (Kernel.CppExtraArgs.get ()))
+        (gnu_implicit_args @ clang_no_warn @ extra_args)
         fc_include_args fc_define_args
     in
     let cpp_command =
