@@ -107,10 +107,10 @@ let () =
     ~descr:(Md.plain "Frama-C Kernel configuration")
     signature
     begin fun rq () ->
-      set_version rq Fc_config.version ;
-      set_datadir rq (Filepath.Normalized.to_string_list Fc_config.datadirs);
+      set_version rq System_config.version ;
+      set_datadir rq (Filepath.Normalized.to_string_list System_config.datadirs);
       set_pluginpath rq
-        (Filepath.Normalized.to_string_list Fc_config.plugin_dir) ;
+        (Filepath.Normalized.to_string_list System_config.plugin_dir) ;
     end
 
 (* -------------------------------------------------------------------------- *)

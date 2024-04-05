@@ -84,7 +84,7 @@ let long_plugin_name s =
   if s = Log.kernel_label_name then "Frama-C" else "Plug-in " ^ s
 
 let additional_info () =
-  if Fc_config.is_gui then
+  if System_config.is_gui then
     "\nReverting to previous state.\n\
      Check the Console tab for additional information."
   else
@@ -114,7 +114,7 @@ let request_crash_report =
      Note that a version and a backtrace alone often do not contain enough\n\
      information to understand the bug. Guidelines for reporting bugs are at:\n\
      https://git.frama-c.com/pub/frama-c/-/wikis/Guidelines-for-reporting-bugs\n"
-    Fc_config.version_and_codename
+    System_config.version_and_codename
 
 let protect = function
   | Sys.Break ->
@@ -1033,7 +1033,7 @@ let plugin_help shortname =
 let help () =
   Log.print_on_output
     begin fun fmt ->
-      Format.fprintf fmt "\nThis is Frama-C %s\n" Fc_config.version_and_codename ;
+      Format.fprintf fmt "\nThis is Frama-C %s\n" System_config.version_and_codename ;
       Format.fprintf fmt "\nUsage:\n    %s [options files ...]\n" Sys.argv.(0) ;
       let print_line fmt s =
         Format.(pp_print_string fmt s ; pp_print_newline fmt ()) in

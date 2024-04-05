@@ -33,14 +33,14 @@ let print_config () =
            FRAMAC_SHARE  = %S@\n  \
            FRAMAC_PLUGIN = %S@\n  \
            FRAMAC_LIB    = %S%t@."
-          Fc_config.version_and_codename
-          (String.concat ":" (Filepath.Normalized.to_string_list Fc_config.datadirs))
-          (String.concat ":" (Filepath.Normalized.to_string_list Fc_config.plugin_dir))
-          (String.concat ":" (Filepath.Normalized.to_string_list Fc_config.libdirs))
+          System_config.version_and_codename
+          (String.concat ":" (Filepath.Normalized.to_string_list System_config.datadirs))
+          (String.concat ":" (Filepath.Normalized.to_string_list System_config.plugin_dir))
+          (String.concat ":" (Filepath.Normalized.to_string_list System_config.libdirs))
           (fun fmt ->
-             if Fc_config.preprocessor = "" then
+             if System_config.preprocessor = "" then
                Format.fprintf fmt "@\nWarning: no default preprocessor"
-             else if not Fc_config.preprocessor_keep_comments then
+             else if not System_config.preprocessor_keep_comments then
                Format.fprintf fmt
                  "@\nWarning: default preprocessor is not able to keep comments \
                   (hence ACSL annotations) in its output")
@@ -66,21 +66,21 @@ let print_configl get value () =
   end
 
 let print_version =
-  print_config Kernel.PrintVersion.get Fc_config.version_and_codename
+  print_config Kernel.PrintVersion.get System_config.version_and_codename
 let () = Cmdline.run_after_early_stage print_version
 
 let print_version_newline =
-  print_config ~newline:true Kernel.Version.get Fc_config.version_and_codename
+  print_config ~newline:true Kernel.Version.get System_config.version_and_codename
 let () = Cmdline.run_after_early_stage print_version_newline
 
-let print_sharepath = print_configl Kernel.PrintShare.get Fc_config.datadirs
+let print_sharepath = print_configl Kernel.PrintShare.get System_config.datadirs
 let () = Cmdline.run_after_early_stage print_sharepath
 
-let print_libpath = print_configl Kernel.PrintLib.get [Fc_config.libdir]
+let print_libpath = print_configl Kernel.PrintLib.get [System_config.libdir]
 let () = Cmdline.run_after_early_stage print_libpath
 
 let print_pluginpath =
-  print_config Kernel.PrintPluginPath.get Fc_config.plugin_path
+  print_config Kernel.PrintPluginPath.get System_config.plugin_path
 let () = Cmdline.run_after_early_stage print_pluginpath
 
 (**************************************************************************)

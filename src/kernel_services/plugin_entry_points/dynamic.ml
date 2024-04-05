@@ -119,7 +119,7 @@ let load_packages pkgs =
 (* -------------------------------------------------------------------------- *)
 
 let load_plugin_path () =
-  if Fc_config.is_gui then Config_data.Plugins.Plugins_gui.load_all ();
+  if System_config.is_gui then Config_data.Plugins.Plugins_gui.load_all ();
   Config_data.Plugins.Plugins.load_all ()
 
 let load_plugin m =

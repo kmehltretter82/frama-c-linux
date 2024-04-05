@@ -81,7 +81,7 @@ let cpp_opt_kind () =
   else Unknown
 
 let is_cpp_gnu_like () =
-  let open Fc_config in
+  let open System_config in
   let cpp_cmd = Kernel.CppCommand.get () in
   match cpp_cmd = "", using_default_cpp, preprocessor_is_gnu_like with
   | true, true, true -> Gnu
@@ -92,10 +92,10 @@ let is_cpp_gnu_like () =
    If the program has an explicit argument -cpp-command "XX -Y"
    (quotes are required by the shell)
    then XX -Y
-   else use the command in [Fc_config.preprocessor].*)
+   else use the command in [System_config.preprocessor].*)
 let get_preprocessor_command () =
   let cmdline = Kernel.CppCommand.get() in
-  if cmdline <> "" then cmdline else Fc_config.preprocessor
+  if cmdline <> "" then cmdline else System_config.preprocessor
 
 let from_filename ?cpp f =
   let cpp =
@@ -130,7 +130,7 @@ let from_filename ?cpp f =
     if Hashtbl.mem check_suffixes suf then
       External (f, suf)
     else if cpp <> "" then begin
-      if not Fc_config.preprocessor_keep_comments then
+      if not System_config.preprocessor_keep_comments then
         Kernel.warning ~once:true
           "Default preprocessor does not keep comments. Any ACSL annotations \
            on non-preprocessed files will be discarded.";
@@ -490,7 +490,7 @@ let build_cpp_cmd = function
           let machdep_dir =
             Machdep.generate_machdep_header ~censored_macros (get_machdep())
           in
-          [(machdep_dir:>string); (Fc_config.framac_libc:>string)]
+          [(machdep_dir:>string); (System_config.framac_libc:>string)]
         end
       else []
     in
@@ -1865,7 +1865,7 @@ let init_from_cmdline () =
     Project.set_current prj2;
   end;
   let files = Kernel.Files.get () in
-  if files = [] && not Fc_config.is_gui then Kernel.warning "no input file.";
+  if files = [] && not System_config.is_gui then Kernel.warning "no input file.";
   let files = List.map (fun f -> from_filename f) files in
   try
     init_from_c_files files;

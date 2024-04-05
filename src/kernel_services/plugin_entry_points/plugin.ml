@@ -444,7 +444,7 @@ struct
                     (may be used if the plug-in is not installed at the same place as Frama-C)"
       end)
       (struct
-        let dirs () = Fc_config.datadirs
+        let dirs () = System_config.datadirs
         let visible_ref = !share_visible_ref
       end)
 

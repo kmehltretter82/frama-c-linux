@@ -20,4 +20,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let () = Topdirs.dir_directory Fc_config.libdir
+let () = Topdirs.dir_directory System_config.libdir

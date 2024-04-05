@@ -370,7 +370,7 @@ let dump ~root ?(meta=true) () =
       Yojson.Basic.to_file (path:>string) maindata ;
       let body =
         [ Md.H1 (Md.plain "Presentation", None);
-          Md.Block (Md.text (Md.format "Version %s" Fc_config.version))]
+          Md.Block (Md.text (Md.format "Version %s" System_config.version))]
         @
         table_of_contents ()
         @

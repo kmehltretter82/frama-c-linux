@@ -546,7 +546,7 @@ let classify () =
     report_number "Unclassified: " !nb_unclassified R.OutputUnclassified.get ;
     if !nb_errors > 0 && R.Exit.get () then
       R.abort "Classified errors found" ;
-    if not Fc_config.is_gui then clear_events () ;
+    if not System_config.is_gui then clear_events () ;
   end
 
 (* -------------------------------------------------------------------------- *)
