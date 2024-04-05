@@ -1846,8 +1846,8 @@ class main_window () : main_window_extension_points =
   end
 
 let make_splash () =
-  GMain.Rc.add_default_file ((System_config.datadir:>string) ^"/frama-c.rc");
-  GMain.Rc.add_default_file ((System_config.datadir:>string) ^"/frama-c-user.rc");
+  GMain.Rc.add_default_file ((System_config.Share.main:>string) ^"/frama-c.rc");
+  GMain.Rc.add_default_file ((System_config.Share.main:>string) ^"/frama-c-user.rc");
   (*print_endline ("BOOT: " ^ (Glib.Main.setlocale `ALL None));*)
   let (_:string) = GtkMain.Main.init ~setlocale:false () in
   (*print_endline ("START: " ^ (Glib.Main.setlocale `ALL None));*)

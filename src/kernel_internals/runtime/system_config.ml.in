@@ -22,56 +22,63 @@
 
 # 24 "src/kernel_internals/runtime/system_config.ml.in"
 
-let version = "@VERSION@"
-let codename = "@VERSION_CODENAME@"
-let version_and_codename = version ^ " (" ^ codename ^ ")"
-
-let major_version = @MAJOR_VERSION@
-
-let minor_version = @MINOR_VERSION@
+module Version = struct
+  let id = "@VERSION@"
+  let codename = "@VERSION_CODENAME@"
+  let id_and_codename = id ^ " (" ^ codename ^ ")"
+  let major = @MAJOR_VERSION@
+  let minor = @MINOR_VERSION@
+end
 
 let is_gui = Frama_c_very_first.Gui_init.is_gui
 
-let datadirs = (List.map Filepath.Normalized.of_string Config_data.Sites.share)
-let datadir = List.hd (List.rev datadirs)
+module Share = struct
+  let dirs = List.map Filepath.Normalized.of_string Config_data.Sites.share
+  let main = List.hd (List.rev dirs)
+  let libc = Filepath.Normalized.concat main "libc"
 
-let libdirs = (List.map Filepath.Normalized.of_string Config_data.Sites.lib)
-let libdir = List.hd (List.rev libdirs)
+  let () = Filepath.add_symbolic_dir_list "FRAMAC_SHARE" dirs
+end
 
-let plugin_dir = List.map Filepath.Normalized.of_string Config_data.Sites.plugins
+module Lib = struct
+  let dirs = List.map Filepath.Normalized.of_string Config_data.Sites.lib
+  let main = List.hd (List.rev dirs)
+end
 
-let plugin_path =
-  String.concat ":" (Filepath.Normalized.to_string_list plugin_dir)
+module Plugins = struct
+  let dirs = List.map Filepath.Normalized.of_string Config_data.Sites.plugins
+  let path = String.concat ":" (Filepath.Normalized.to_string_list dirs)
 
-let framac_libc = Filepath.Normalized.concat datadir "libc"
+  let () = Filepath.add_symbolic_dir_list "FRAMAC_PLUGIN" dirs
+end
 
-let () = Filepath.add_symbolic_dir_list "FRAMAC_SHARE" datadirs
-let () = Filepath.add_symbolic_dir_list "FRAMAC_PLUGIN" plugin_dir
+module Preprocessor = struct
+  let default = "@FRAMAC_DEFAULT_CPP@"
 
-let default_cpp = "@FRAMAC_DEFAULT_CPP@"
+  let default_args = " @FRAMAC_DEFAULT_CPP_ARGS@"
 
-let default_cpp_args = " @FRAMAC_DEFAULT_CPP_ARGS@"
+  let env_or_default f vdefault =
+    try
+      let env = Sys.getenv "CPP" ^ default_args in
+      if env = default then vdefault else f env
+    with Not_found -> vdefault
 
-let env_or_default f vdefault =
-  try
-    let env = Sys.getenv "CPP" ^ default_cpp_args in
-    if env=default_cpp then vdefault else f env
-  with Not_found -> vdefault
+  let command = env_or_default (fun x -> x) default
 
-let preprocessor = env_or_default (fun x -> x) default_cpp
+  let is_default = env_or_default (fun _ -> false) true
 
-let using_default_cpp = env_or_default (fun _ -> false) true
+  let is_gnu_like =
+    env_or_default
+      (fun _ ->
+         (* be more lenient when trying to determine if the preprocessor
+            is gnu-like: in Cygwin, for instance, CC is "<prefix>-gcc" but
+            CPP is "<prefix>-cpp", so this extra test allows proper detection.
+         *)
+         let env = Sys.getenv "CC" ^ default_args in
+         env=default) @FRAMAC_GNU_CPP@
 
-let preprocessor_is_gnu_like =
-  env_or_default
-    (fun _ ->
-       (* be more lenient when trying to determine if the preprocessor
-          is gnu-like: in Cygwin, for instance, CC is "<prefix>-gcc" but
-          CPP is "<prefix>-cpp", so this extra test allows proper detection. *)
-       let env = Sys.getenv "CC" ^ default_cpp_args in
-       env=default_cpp) @FRAMAC_GNU_CPP@
+  let keep_comments =
+    env_or_default (fun _ -> true) @DEFAULT_CPP_KEEP_COMMENTS@
 
-let preprocessor_supported_arch_options = [@DEFAULT_CPP_SUPPORTED_ARCH_OPTS@]
-
-let preprocessor_keep_comments =
-  env_or_default (fun _ -> true) @DEFAULT_CPP_KEEP_COMMENTS@
+  let supported_arch_options = [@DEFAULT_CPP_SUPPORTED_ARCH_OPTS@]
+end

@@ -294,7 +294,7 @@ module MYTREE = struct
 
   let comes_from_share filename =
     let path = Filepath.Normalized.of_string filename in
-    Filepath.is_relative ~base_name:System_config.datadir path
+    Filepath.is_relative ~base_name:System_config.Share.main path
 
   let is_function t = match t with
     | MFile _ -> false

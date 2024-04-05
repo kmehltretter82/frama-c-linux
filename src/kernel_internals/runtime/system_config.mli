@@ -20,27 +20,85 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Information about version of Frama-C.
-    The body of this module is generated from Makefile. *)
+(** Information about the enrivonment *)
 
-val version: string
-(** Frama-C Version identifier. *)
+module Version : sig
+  val id: string
+  (** Frama-C Version identifier. *)
 
-val codename: string
-(** Frama-C version codename.
-    @since 18.0-Argon *)
+  val codename: string
+  (** Frama-C version codename. *)
 
-val version_and_codename: string
-(** Frama-C version and codename.
-    @since 18.0-Argon *)
+  val id_and_codename: string
+  (** Frama-C version and codename. *)
 
-val major_version: int
-(** Frama-C major version number.
-    @since 19.0-Potassium *)
+  val major: int
+  (** Frama-C major version number. *)
 
-val minor_version: int
-(** Frama-C minor version number.
-    @since 19.0-Potassium *)
+  val minor: int
+  (** Frama-C minor version number. *)
+end
+
+module Share : sig
+  val dirs: Filepath.Normalized.t list
+  (** Directories where architecture independent files are in order of
+      priority.
+  *)
+
+  val main: Filepath.Normalized.t
+  (** Last directory of dirs (the directory of frama-c installation) *)
+
+  val libc: Filepath.Normalized.t
+  (** Directory where Frama-C libc headers are. *)
+end
+
+module Lib : sig
+  val dirs: Filepath.Normalized.t list
+  (** Directories where library and executable files are, in order of
+      priority. *)
+
+  val main: Filepath.Normalized.t
+  (** Last directory of libdirs (the directory of frama-c installation) *)
+end
+
+module Plugins : sig
+  val dirs: Filepath.Normalized.t list
+  (** Directories where the Frama-C dynamic plug-ins are. *)
+
+  val path: string
+  (** The colon-separated concatenation of [plugin_dir]. *)
+end
+
+module Preprocessor : sig
+  val command: string
+  (** Name of the default command to call the preprocessor.
+      If the CPP environment variable is set, use it
+      else use the built-in default from autoconf. Usually this is
+      "gcc -C -E -I."
+  *)
+
+  val is_default: bool
+  (** whether the preprocessor command is the one defined at configure time
+      or the result of taking a CPP environment variable, in case it differs
+  *)
+
+  val is_gnu_like: bool
+  (** whether the default preprocessor accepts the same options as gcc
+      (i.e. is either gcc or clang), when this is the case, the default
+      command line for preprocessing contains more options.
+  *)
+
+  val keep_comments: bool
+  (** [true] if the default preprocessor selected during compilation is
+      able to keep comments (hence ACSL annotations) in its output.
+  *)
+
+  val supported_arch_options: string list
+  (** architecture-related options (e.g. -m32) known to be supported by
+      the default preprocessor. Used to match preprocessor commands to
+      selected machdeps.
+  *)
+end
 
 val is_gui: bool
 (** Is the Frama-C GUI running?
@@ -48,68 +106,6 @@ val is_gui: bool
       @since frama-c-trunk not anymore a reference
 *)
 
-val datadirs: Filepath.Normalized.t list
-(** Directories where architecture independent files are in order of
-    priority.
-    @since 19.0-Potassium *)
-
-val datadir: Filepath.Normalized.t
-(** Last directory of datadirs (the directory of frama-c installation)
-    @since 19.0-Potassium *)
-
-val framac_libc: Filepath.Normalized.t
-(** Directory where Frama-C libc headers are.
-    @since 19.0-Potassium *)
-
-val libdirs: Filepath.Normalized.t list
-(** Directories where library and executable files are, in order of
-    priority.
-    @since 26.0-Iron *)
-
-val libdir: Filepath.Normalized.t
-(** Last directory of libdirs (the directory of frama-c installation)
-    @since 26.0-Iron *)
-
-val plugin_dir: Filepath.Normalized.t list
-(** Directory where the Frama-C dynamic plug-ins are. *)
-
-val plugin_path: string
-(** The colon-separated concatenation of [plugin_dir].
-    @since Magnesium-20151001 *)
-
-val preprocessor: string
-(** Name of the default command to call the preprocessor.
-    If the CPP environment variable is set, use it
-    else use the built-in default from autoconf. Usually this is
-    "gcc -C -E -I."
-    @since Oxygen-20120901 *)
-
-val using_default_cpp: bool
-(** whether the preprocessor command is the one defined at configure time
-    or the result of taking a CPP environment variable, in case it differs
-    from the configure-time command.
-
-    @since Phosphorus-20170501-beta1 *)
-
-val preprocessor_is_gnu_like: bool
-(** whether the default preprocessor accepts the same options as gcc
-    (i.e. is either gcc or clang), when this is the case, the default
-    command line for preprocessing contains more options.
-    @since Sodium-20150201
-*)
-
-val preprocessor_supported_arch_options: string list
-(** architecture-related options (e.g. -m32) known to be supported by
-    the default preprocessor. Used to match preprocessor commands to
-    selected machdeps.
-    @since Phosphorus-20170501-beta1
-*)
-
-val preprocessor_keep_comments: bool
-(** [true] if the default preprocessor selected during compilation is
-    able to keep comments (hence ACSL annotations) in its output.
-    @since Neon-rc3
-*)
 
 (*
   Local Variables:

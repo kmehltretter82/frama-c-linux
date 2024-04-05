@@ -111,7 +111,7 @@ let warn_unsupported_spec name =
       "@[The specification of function '%s' is currently not supported by Eva.@ \
        Consider adding '%a'@ to the analyzed source files.@]"
       name Filepath.Normalized.pretty
-      (Filepath.Normalized.concat System_config.framac_libc header)
+      (Filepath.Normalized.concat System_config.Share.libc header)
   with Not_found -> ()
 
 

@@ -28,7 +28,7 @@ let frama_c_sarif () =
     if Mdr_params.SarifDeterministic.get () then
       "0+omitted-for-deterministic-output", ""
     else
-      System_config.version_and_codename, System_config.version
+      System_config.Version.id_and_codename, System_config.Version.id
   in
   let fullName = name ^ "-" ^ version in
   let downloadUri = "https://frama-c.com/download.html" in
