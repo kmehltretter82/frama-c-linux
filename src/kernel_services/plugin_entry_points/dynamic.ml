@@ -121,9 +121,12 @@ let load_packages pkgs =
 let load_plugin_path () =
   System_config.Plugins.load_all ()
 
-
 let load_plugin m =
-  System_config.Plugins.load m
+  try System_config.Plugins.load m
+  (* Ok, this is ugly, but Dune Site does not give any way to catch this ...
+     Note that we abort with a user error.
+  *)
+  with _ -> Klog.abort "Failed to load plug-in %S" m
 
 let load_module m =
   let base,ext = split_ext m in
