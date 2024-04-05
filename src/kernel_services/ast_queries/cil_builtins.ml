@@ -387,16 +387,14 @@ let instantiate_available_templates type_table name (entry : builtin_template) =
 
 let init_gcc_builtin_templates () =
   let fp =
-    Datatype.Filepath.concat ~existence:Filepath.Must_exist
-      System_config.Share.main "compliance/gcc_builtins.json"
+    Kernel.Share.get_dir ~mode:`Must_exist "compliance/gcc_builtins.json"
   in
   Json.init_builtin_templates ~default_compiler:GCC fp;
   Gcc_builtin_templates_loaded.set true
 
 let init_other_builtin_templates () =
   let fp =
-    Datatype.Filepath.concat ~existence:Filepath.Must_exist
-      System_config.Share.main "compliance/compiler_builtins.json"
+    Kernel.Share.get_dir ~mode:`Must_exist "compliance/compiler_builtins.json"
   in
   Json.init_builtin_templates fp
 
