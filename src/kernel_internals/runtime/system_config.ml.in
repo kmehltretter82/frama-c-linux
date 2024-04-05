@@ -50,6 +50,13 @@ module Plugins = struct
   let path = String.concat ":" (Filepath.Normalized.to_string_list dirs)
 
   let () = Filepath.add_symbolic_dir_list "FRAMAC_PLUGIN" dirs
+
+  let load name =
+    Config_data.Plugins.Plugins.load name
+
+  let load_all () =
+    if is_gui then Config_data.Plugins.Plugins_gui.load_all ();
+    Config_data.Plugins.Plugins.load_all ()
 end
 
 module Preprocessor = struct

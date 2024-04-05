@@ -67,6 +67,12 @@ module Plugins : sig
 
   val path: string
   (** The colon-separated concatenation of [plugin_dir]. *)
+
+  val load: string -> unit
+  (** Load given plug-in name *)
+
+  val load_all: unit -> unit
+  (** Load all plug-ins, do not load GUI plug-in when not in GTK GUI mode *)
 end
 
 module Preprocessor : sig
@@ -101,10 +107,7 @@ module Preprocessor : sig
 end
 
 val is_gui: bool
-(** Is the Frama-C GUI running?
-      @since Beryllium-20090601-beta1
-      @since frama-c-trunk not anymore a reference
-*)
+(** Is the Frama-C GUI running? *)
 
 
 (*
