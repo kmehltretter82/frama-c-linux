@@ -30,13 +30,12 @@ import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 import * as Preferences from 'ivette/prefs';
 import * as Toolbars from 'dome/frame/toolbars';
-import { IconButton } from 'dome/controls/buttons';
+import { IconButton, IconButtonProps } from 'dome/controls/buttons';
 import { LED, LEDstatus } from 'dome/controls/displays';
 import { Label, Code } from 'dome/controls/labels';
 import * as Text from 'dome/text/richtext';
 import { TextBuffer, TextView } from 'dome/text/richtext';
-import { resolve, DEVEL } from 'dome/system';
-import { classes } from 'dome/misc/utils';
+import { resolve } from 'dome/system';
 
 import * as Ivette from 'ivette';
 import * as Display from 'ivette/display';
@@ -227,46 +226,105 @@ export const Control = (): JSX.Element => {
 // --------------------------------------------------------------------------
 // --- Alerts
 // --------------------------------------------------------------------------
-enum TypeAlert { NONE, CONSOLE, MESSAGES }
 
-function getNumberOfMessages(data: Kernel.messageData[]): number {
-  return DEVEL ?
-    data.filter((elt) => elt.kind !== "DEBUG").length :
-    data.length;
+type alertLevel = undefined | Kernel.logkind;
+
+function rank(level: alertLevel): number {
+  if (!level) return 0;
+  switch (level) {
+    case 'DEBUG':
+    case 'FEEDBACK':
+      return 0;
+    case 'RESULT':
+      return 1;
+    case 'WARNING':
+      return 2;
+    case 'ERROR':
+      return 3;
+    case 'FAILURE':
+    default:
+      return 4;
+  }
+}
+
+function alertProps(level: Kernel.logkind): IconButtonProps {
+  switch (level) {
+    case 'WARNING':
+      return {
+        icon: 'WARNING', kind: 'warning',
+        title: 'New Warning(s)'
+      };
+    case 'ERROR':
+      return {
+        className: 'ivette-alert-blink',
+        icon: 'WARNING', kind: 'negative',
+        title: 'New Error(s)'
+      };
+    case 'FAILURE':
+      return {
+        className: 'ivette-alert-blink',
+        icon: 'WARNING', kind: 'negative',
+        title: 'New Failure Message(s)'
+      };
+    default:
+      return {
+        className: 'ivette-alert-blink',
+        icon: 'CIRC.INFO', kind: 'default',
+        title: 'New Message(s)'
+      };
+  }
+}
+
+function processMessages(
+  data: Kernel.messageData[],
+  from: number,
+  level: alertLevel,
+): alertLevel {
+  let rk = rank(level);
+  if (rk >= 4) return Kernel.logkind.FAILURE;
+  for (let k = from; k < data.length; k++) {
+    const msg = data[k];
+    const mk = rank(msg.kind);
+    if (mk >= 4) return Kernel.logkind.FAILURE;
+    if (mk > rk) { level = msg.kind; rk = mk; }
+  }
+  return level;
 }
 
 export function Alerts(): JSX.Element | null {
   const status = Server.useStatus();
-  const [newMess, setNewMess] = React.useState(false);
+  const cursor = React.useRef(0);
+  const level = React.useRef<alertLevel>();
+  const [alert, setAlert] = React.useState<alertLevel>();
   const data = useSyncArrayData(Kernel.message);
-  const messages = getNumberOfMessages(data);
-  const messageStatus = Display.useComponentStatus('fc.messages');
-  const messageVisible = messageStatus.position !== undefined;
-  React.useEffect(() => setNewMess(messages > 0), [messages]);
-  const onClick = (): void => Display.switchToView('ivette.main');
 
-  const typeAlert = (
-    status === Server.Status.FAILURE ? TypeAlert.CONSOLE :
-      !messageVisible && newMess ? TypeAlert.MESSAGES :
-        TypeAlert.NONE
-  );
-  if (typeAlert === TypeAlert.NONE) return null;
+  React.useEffect(() => {
+    level.current = processMessages(data, cursor.current, level.current);
+    cursor.current = data.length;
+    setAlert(level.current);
+  }, [data]);
 
-  const isConsoleAlert = typeAlert === TypeAlert.CONSOLE;
-  const className = classes(
-    "ivette-alerts",
-    isConsoleAlert && 'ivette-alert-blink'
-  );
-  const eventName = isConsoleAlert ? "Server failure" : "New message(s)";
+  React.useEffect(() => {
+    switch (status) {
+      case 'OFF':
+        cursor.current = 0;
+        level.current = undefined;
+        setAlert(undefined);
+        break;
+      case 'FAILURE':
+        setAlert(Kernel.logkind.FAILURE);
+        break;
+    }
+  }, [status]);
 
-  return (
-    <IconButton
-      className={className} size={14} icon="WARNING"
-      kind={isConsoleAlert ? "negative" : "warning"}
-      title={eventName + " (click to open Command view)"}
-      onClick={onClick}
-    />
-  );
+  if (alert === undefined) return null;
+  const props = alertProps(alert);
+  const onClick = (): void => {
+    setAlert(undefined);
+    level.current = undefined;
+    Display.switchToView('ivette.command');
+  };
+  return <IconButton {...props} onClick={onClick} />;
 }
 
 // --------------------------------------------------------------------------

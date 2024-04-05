@@ -227,19 +227,15 @@
 /* --- Alerts                                                             --- */
 /* -------------------------------------------------------------------------- */
 
-.ivette-alerts {
-    padding-left: 10px;
-}
-
 .ivette-alert-blink {
-    animation: Alert-blinker 1s linear infinite;
+    animation: ivette-alert-blinker 1s linear infinite;
 }
 
 .ivette-alert-blink:hover {
     animation: none;
 }
 
-@keyframes Alert-blinker {
+@keyframes ivette-alert-blinker {
     from {
         fill: var(--negative-button-color);
     }
