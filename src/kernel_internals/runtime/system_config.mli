@@ -48,6 +48,9 @@ module Share : sig
   val main: Filepath.Normalized.t
   (** Last directory of dirs (the directory of frama-c installation) *)
 
+  val path: string
+  (** The colon-separated concatenation of {!dirs}. *)
+
   val libc: Filepath.Normalized.t
   (** Directory where Frama-C libc headers are. *)
 end
@@ -56,6 +59,9 @@ module Lib : sig
   val dirs: Filepath.Normalized.t list
   (** Directories where library and executable files are, in order of
       priority. *)
+
+  val path: string
+  (** The colon-separated concatenation of {!dirs}. *)
 
   val main: Filepath.Normalized.t
   (** Last directory of libdirs (the directory of frama-c installation) *)
@@ -66,7 +72,7 @@ module Plugins : sig
   (** Directories where the Frama-C dynamic plug-ins are. *)
 
   val path: string
-  (** The colon-separated concatenation of [plugin_dir]. *)
+  (** The colon-separated concatenation of {!dirs}. *)
 
   val load: string -> unit
   (** Load given plug-in name *)

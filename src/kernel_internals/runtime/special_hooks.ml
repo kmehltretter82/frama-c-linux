@@ -34,9 +34,9 @@ let print_config () =
            FRAMAC_PLUGIN = %S@\n  \
            FRAMAC_LIB    = %S%t@."
           System_config.Version.id_and_codename
-          (String.concat ":" (Filepath.Normalized.to_string_list System_config.Share.dirs))
-          (String.concat ":" (Filepath.Normalized.to_string_list System_config.Plugins.dirs))
-          (String.concat ":" (Filepath.Normalized.to_string_list System_config.Lib.dirs))
+          (System_config.Share.path)
+          (System_config.Plugins.path)
+          (System_config.Lib.path)
           (fun fmt ->
              if System_config.Preprocessor.command = "" then
                Format.fprintf fmt "@\nWarning: no default preprocessor"

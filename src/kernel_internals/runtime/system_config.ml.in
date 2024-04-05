@@ -34,6 +34,7 @@ let is_gui = Frama_c_very_first.Gui_init.is_gui
 
 module Share = struct
   let dirs = List.map Filepath.Normalized.of_string Config_data.Sites.share
+  let path = String.concat ":" (Filepath.Normalized.to_string_list dirs)
   let main = List.hd (List.rev dirs)
   let libc = Filepath.Normalized.concat main "libc"
 
@@ -42,6 +43,7 @@ end
 
 module Lib = struct
   let dirs = List.map Filepath.Normalized.of_string Config_data.Sites.lib
+  let path = String.concat ":" (Filepath.Normalized.to_string_list dirs)
   let main = List.hd (List.rev dirs)
 end
 
