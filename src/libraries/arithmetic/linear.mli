@@ -70,6 +70,10 @@ module Space (Field : Field.S) : sig
         absolute values of its coordinates. *)
     val norm   : 'n vector -> scalar
 
+    (* The call [max l r] returns a vector for which each coordinate is the
+       maximum between the corresponding coordinates of [l] and [r]. *)
+    val max : 'n vector -> 'n vector -> 'n vector
+
   end
 
 
@@ -84,8 +88,12 @@ module Space (Field : Field.S) : sig
     (** The call [zero n m] returns the 0 matrix in 𝕂ⁿˣᵐ. *)
     val zero : 'n succ nat -> 'm succ nat -> ('n succ, 'm succ) matrix
 
-    (** The call [get i j m] returns the coefficient of the i-th row and
-        the j-th column. *)
+    (* The call [shift n] returns a square matrix in 𝕂ⁿˣⁿ such as the first row
+       and the last column is all zero, and the remaining is the identity. *)
+    val shift : 'n succ nat -> ('n succ, 'n succ) matrix
+
+    (* The call [get i j m] returns the coefficient of the i-th row and
+       the j-th column. *)
     val get : 'n finite -> 'm finite -> ('n, 'm) matrix -> scalar
 
     (** The call [set i j x m] returns a new matrix of the same linear space as
@@ -93,9 +101,13 @@ module Space (Field : Field.S) : sig
         and the j-th column, which is set to the scalar [x]. *)
     val set : 'n finite -> 'm finite -> scalar -> ('n, 'm) matrix -> ('n, 'm) matrix
 
-    (** The call [norm m] computes the ∞-norm of [m], i.e the maximum of the
-        absolute sums of the rows of [m]. *)
-    val norm : ('n, 'm) matrix -> scalar
+    (* The call [norm_inf m] computes the ∞-norm of [m], i.e the maximum of the
+       absolute sums of the rows of [m]. *)
+    val norm_inf : ('n, 'm) matrix -> scalar
+
+    (* The call [norm_one m] computes the 1-norm of [m], i.e the maximum of the
+       absolute sums of the columns of [m]. *)
+    val norm_one : ('n, 'm) matrix -> scalar
 
     (** The call [transpose m] for m in 𝕂ⁿˣᵐ returns a new matrix in 𝕂ᵐˣⁿ with
         all the coefficients transposed. *)
@@ -107,15 +119,29 @@ module Space (Field : Field.S) : sig
     (** Matrices addition. The dimensions compatibility is statically ensured. *)
     val ( + ) : ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
 
-    (** Matrices multiplication. The dimensions compatibility is statically
-        ensured. *)
+    (* Matrices substraction. As for the addition, the dimensions compatibility
+       is statically ensured. *)
+    val ( - ) : ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
+
+    (* Matrices multiplication. The dimensions compatibility is statically
+       ensured. *)
     val ( * ) : ('n, 'm) matrix -> ('m, 'p) matrix -> ('n, 'p) matrix
 
-    (** Matrix exponentiation. The call [power m] returns a memoized function.
-        When one needs to compute several exponentiations of the same matrix,
-        one should perform the call [power m] once and used the returned
-        function each times one needs it. *)
+    (* Scalar multiplication. *)
+    val ( ** ) : scalar -> ('n, 'm) matrix  -> ('n, 'm) matrix
+
+    (* Matrix exponentiation. The call [power m] returns a memoized function.
+       When one needs to compute several exponentiations of the same matrix, one
+       should perform the call [power m] once and used the returned function
+       each times one needs it. *)
     val power : ('n, 'n) matrix -> (int -> ('n, 'n) matrix)
+
+    (* Matrix inverse. Returns None if the input matrix is singular. *)
+    val inverse : ('n, 'n) matrix -> ('n, 'n) matrix option
+
+    (* The call [abs m] returns a matrix for which each coordinate is the
+       absolute value of the corresponding coordinate of [m]. *)
+    val abs : ('n, 'm) matrix -> ('n, 'm) matrix
 
   end
 

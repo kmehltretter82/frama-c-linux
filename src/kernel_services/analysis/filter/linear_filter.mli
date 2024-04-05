@@ -20,53 +20,77 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Nat
-open Finite
-
-(* A filter corresponds to the recursive equation
-   X[k + 1] = AX[k] + Bε[k + 1] + C where :
-   - n is the filter's order and m its number of inputs ;
-   - X[k] ∈ ℝ^n is the filter's state at iteration [k] ;
-   - ε[k] ∈ ℝ^m is the filters's inputs at iteration [k] ;
-   - A ∈ ℝ^(n×n) is the filter's state matrix ;
-   - B ∈ ℝ^(n×m) is the filter's input matrix ;
-   - C ∈ ℝ^n is the filter's center.
+(* A filter corresponds to the following recursive equation :
+      X[t + 1] = AX[t] + ∑B(ω)ε(ω)[k + 1] + C
+   where :
+    - n is the filter's order ;
+    - ω is a measure's source (for instance, a specific sensor in a
+      cyberphysical system) ;
+    - m(ω) is the delay for the source (ω) ;
+    - X[t] ∈ 𝕂^n is the filter's state at iteration [t] ;
+    - ε(ω)[t] ∈ 𝕂^m(ω) is the measure at iteration [t] for the source (ω) ;
+    - A ∈ 𝕂^(nxn) is the filter's state matrix ;
+    - B(ω) ∈ 𝕂^(nxm(ω)) is the source matrix for the source (ω) ;
+    - C ∈ 𝕂^n is the filter's center.
 
    The goal of this module is to compute filters invariants, i.e bounds for
    each of the filter's state dimensions when the iterations goes to infinity.
-   To do so, it only suppose that, at each iteration, each input εi is bounded
-   by [-λi .. λi]. Each input is thus supposed centered around zero but each
-   one can have different bounds.
+   To do so, each measure of a given source is supposed bounded by the same
+   interval, represented as a center and a deviation. Each source can thus be
+   bounded by a different interval.
 
    {!Linear_filter_test} is an example using this module. *)
 module Make (Field : Field.S) : sig
 
+  (* The linear space in which the filters are defined. *)
   module Linear : module type of Linear.Space (Field)
+  open Finite
+  open Nat
 
-  (* A value of type [(n, m) filter] describes a linear filter of order n (i.e
-     with n state variables) and with m inputs. *)
-  type ('n, 'm) filter
 
-  (* Create a filter's representation. The inputs are as following :
-     - state is the filter's state matrix ;
-     - input is the filter's input matrix ;
-     - center is the filter's center ;
-     - measure is a vector representing upper bounds for the filter's inputs. *)
+  (* A source describes a source of measures, for instance a specific sensor,
+     that is treated at each iteration by the filter. Measures can be centered
+     around any scalar, and are thus described by a center and a deviation. The
+     source's delay is hidden inside the type. *)
+  type 'n source
+
+  (* Sources constructor. The inputs are as following :
+      - matrix is the source matrix, describing how the current and past
+        measures are taken into account ;
+      - center is the measures center ;
+      - deviation is the measures deviation. *)
+  val source :
+    matrix    : ('n succ, 'm succ) Linear.matrix ->
+    center    : Field.scalar ->
+    deviation : Field.scalar ->
+    'n succ source
+
+  
+  (* A value of type [n filter] describes a filter of order (i.e with n state
+     variables). The sources delays are contained by each one of them. *)
+  type 'n filter
+
+  (* Filters constructors. The inputs are as following :
+      - center is the filter's center ;
+      - state is the filter's state matrix ;
+      - sources is the list of the filter's sources. *)
   val create :
-    state : ('n succ, 'n succ) Linear.matrix ->
-    input : ('n succ, 'm succ) Linear.matrix ->
-    center : 'n succ Linear.vector ->
-    measure : 'm succ Linear.vector ->
-    ('n succ, 'm succ) filter
+    state   : ('n succ, 'n succ) Linear.matrix ->
+    center  : 'n succ Linear.vector ->
+    sources : 'n succ source list ->
+    'n succ filter
+  
+  (* Filters pretty printer. *)
+  val pretty : Format.formatter -> 'n filter -> unit
 
-  val pretty : Format.formatter -> ('n, 'm) filter -> unit
 
   (* Representation of a filter's invariant. Bounds for each dimension can be
      accessed using the corresponding functions. *)
   type 'n invariant
-  val lower : 'n finite -> 'n invariant -> Field.scalar
-  val upper : 'n finite -> 'n invariant -> Field.scalar
+  val lower  : 'n finite -> 'n invariant -> Field.scalar
+  val upper  : 'n finite -> 'n invariant -> Field.scalar
   val bounds : 'n finite -> 'n invariant -> Field.scalar * Field.scalar
+
 
   (* Invariant computation. The computation of [invariant filter k] relies on
      the search of an exponent such as the norm of the state matrix is strictly
@@ -82,10 +106,7 @@ module Make (Field : Field.S) : sig
      The only thing limiting the invariant optimality is [k]. However, for most
      simple filters, k = 200 will gives exact bounds up to at least ten digits,
      which is more than enough. Moreover, for those simple filters, the
-     computation is immediate, even when using rational numbers. Indeed, the
-     invariant computation complexity is bounded by O(kn^3 + mn^2) with [n]
-     the filter's order and [m] its number of inputs. It is thus linear in
-     the targeted exponent. *)
-  val invariant : ('n, 'm) filter -> int -> 'n invariant option
+     computation is immediate, even when using rational numbers. *)
+  val invariant : 'n filter -> int -> 'n invariant option
 
 end

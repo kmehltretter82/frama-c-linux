@@ -30,10 +30,15 @@ open Nat
     performed. *)
 type 'n finite
 
-val first : 'n succ finite
-val last  : 'n succ nat -> 'n succ finite
-val next  : 'n finite -> 'n succ finite
-val ( = ) : 'n finite -> 'n finite -> bool
+val first  : 'n succ finite
+val last   : 'n succ nat -> 'n succ finite
+val next   : 'n finite -> 'n succ finite
+val prev   : 'n succ finite -> 'n finite
+val weaken : 'n finite -> 'n succ finite
+val ( = )  : 'n finite -> 'n finite -> bool
+val ( < )  : 'n finite -> 'n finite -> bool
+
+val strenghten : 'n nat -> 'n succ finite -> 'n finite option
 
 (** The call [of_int limit n] returns a finite value representing the n-nd
     element of a finite set of cardinal limit. If n is not in the bounds, [None]
