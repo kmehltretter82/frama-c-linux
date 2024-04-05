@@ -28,7 +28,6 @@ module Make (Field : Field.S) = struct
   open Option.Operators
   open Pretty_utils
   open Linear
-  open Finite
   open Nat
 
 
@@ -125,6 +124,7 @@ module Make (Field : Field.S) = struct
      bounds for each state variables, and the second one containing upper bounds
      for those state variables. *)
   type 'n invariant = 'n vector * 'n vector
+  type 'n finite = 'n Finite.finite
 
   (* Lower bound for a given dimension. *)
   let lower : type n. n finite -> n invariant -> scalar = fun i (lower, _) ->
@@ -141,7 +141,7 @@ module Make (Field : Field.S) = struct
 
   (* Invariant computation. The computation of the sum of all past
      contributions, and in particuler the oldest ones, implies to check
-     if an infinite series converge and to compute its limit. This is done
+     is an infinite series converge and to compute its limit. This is done
      by grouping iterations by pack of size [e] and factorizing the common
      state matrix power. This leads to an infinite geometric series in the
      matrix space. If the spectral radius of this matrix is stricly lower
