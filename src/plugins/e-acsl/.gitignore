@@ -48,7 +48,6 @@
 /doc/userman/*.idx
 /doc/userman/*.log
 /doc/userman/*.lof
-/doc/userman/eacslversion.tex
 /tests/*/result*/*
 .frama-c
 META.frama-c-e_acsl

@@ -11,7 +11,7 @@ MAIN=main
 
 C_CODE=$(wildcard examples/*.[ci])
 
-DEPS_MODERN=eacslversion.tex biblio.bib macros.tex \
+DEPS_MODERN=biblio.bib macros.tex \
 	introduction.tex \
 	provides.tex \
 	limitations.tex \
@@ -33,7 +33,7 @@ $(MAIN).pdf: $(DEPS_MODERN) $(FRAMAC_MODERN)
 clean:
 	rm -rf *~ *.aux *.log *.nav *.out *.snm *.toc *.lof *.pp *.bnf \
 		*.haux  *.hbbl *.htoc *.cb *.cm? *.bbl *.blg *.idx *.ind *.ilg \
-		transf trans.ml pp.ml pp eacslversion.tex
+		transf trans.ml pp.ml pp
 
 super-clean: clean
 	rm -f $(MAIN).pdf
