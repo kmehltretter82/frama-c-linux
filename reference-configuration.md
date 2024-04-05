@@ -13,7 +13,6 @@ compiling Frama-C 28.1.
 - ocamlgraph.2.1.0
 - ppx_deriving_yaml.0.2.1
 - ppx_deriving_yojson.3.7.0
-- ppx_import.1.10.0
 - unionFind.20220122
 - why3.1.7.1
 - yojson.2.0.2
