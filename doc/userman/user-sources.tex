@@ -287,7 +287,14 @@ Apart from these default platforms, it is possible to give as argument
 to \texttt{-machdep} option the path of a YAML file containing the information
 needed by \FramaC. The Plug-in Development Guide~\cite{plugin-dev-guide} describes
 this format in more detail, as well as the use of the \texttt{make\_machdep.py}
-script to automatically generate it.
+script to automatically generate it. The YAML schema contains a list of builtins
+macros with their values. However, any such \texttt{MACRO} can be undefined by passing
+\texttt{-UMACRO} in the preprocessor arguments
+(using \texttt{-cpp-extra-args} or its per-file counterpart as in Sect.~\ref{sec:preprocessing},
+or a compilation database as in Sect.~\ref{sec:using-json-comp}). In addition,
+since compilers tend to define builtin macros with a varying number of
+underscores as prefix and suffix, \texttt{-UMACRO} will also undefine
+\texttt{\_MACRO}, \texttt{\_\_MACRO}, \texttt{\_\_MACRO\_\_}, etc.
 
 \item \optiondef{-}{simplify-cfg} allows \FramaC to remove break, continue and
   switch statements. This option is automatically set by some plug-ins that
