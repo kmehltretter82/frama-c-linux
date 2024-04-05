@@ -39,7 +39,7 @@ machdep_%.yaml: machdep_gcc_%.yaml Makefile
              -e 's/alignof_fun: .*/alignof_fun: -1/' \
              -e 's/compiler: .*/compiler: generic/' \
              -e 's/machdep_name: *machdep_gcc_\([[:alnum:]]*\)/machdep_name: machdep_\1/' \
-             -e '/ *__GCC.*/d' \
+             -e '/ *__GCC.*/d' -e '/ *__GNU/d' -e '/ *__gnu/d' -e '/ *GXX/d' \
              $< > $@
 
 .%.validated: % machdep-schema.yaml
