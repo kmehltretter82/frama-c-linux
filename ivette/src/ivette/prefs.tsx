@@ -104,6 +104,6 @@ export const ConsoleScrollback =
 
 // in seconds; 0 means no timeout
 export const NotificationTimer =
-  new Settings.GNumber('Laboratory.Notifications', 5);
+  new Settings.GNumber('Laboratory.Notifications', 10);
 
 // --------------------------------------------------------------------------

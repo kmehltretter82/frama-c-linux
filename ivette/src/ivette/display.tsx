@@ -124,10 +124,12 @@ export function useComponentStatus(
   return Laboratory.getComponentStatus(state, id ?? '');
 }
 
-export type Message = undefined | null | string;
+export type ShortMessage = undefined | null | string;
+export type Message = ShortMessage | Laboratory.Notification;
+export type Warning = ShortMessage | { label: string, title: string };
 
 /** Message notification */
-export function showMessage(msg: Message | Laboratory.Notification): void {
+export function showMessage(msg: Message): void {
   if (!msg) return;
   Laboratory.showMessage(typeof msg === 'string' ? { label: msg } : msg);
 }
@@ -135,13 +137,19 @@ export function showMessage(msg: Message | Laboratory.Notification): void {
 /** Warning notification. */
 export function showWarning(msg: Message): void {
   if (!msg) return;
-  Laboratory.showMessage({ kind: 'warning', label: msg });
+  const short = typeof msg === 'string';
+  const label = short ? msg : msg.label;
+  const title = short ? msg : undefined;
+  Laboratory.showMessage({ kind: 'warning', label, title });
 }
 
 /** Error notification */
 export function showError(msg: Message): void {
   if (!msg) return;
-  Laboratory.showMessage({ kind: 'error', label: msg });
+  const short = typeof msg === 'string';
+  const label = short ? msg : msg.label;
+  const title = short ? msg : undefined;
+  Laboratory.showMessage({ kind: 'error', label, title });
 }
 
 export function clearMessages(): void {

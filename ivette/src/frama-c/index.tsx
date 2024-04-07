@@ -29,7 +29,6 @@ import * as Ivette from 'ivette';
 
 import History from 'frama-c/kernel/History';
 import { Functions, Globals, Types } from 'frama-c/kernel/Globals';
-import Status from 'frama-c/kernel/Status';
 import ASTview from 'frama-c/kernel/ASTview';
 import ASTinfo from 'frama-c/kernel/ASTinfo';
 import SourceCode from 'frama-c/kernel/SourceCode';
@@ -58,7 +57,6 @@ Ivette.registerSidebar({
 });
 
 Ivette.registerToolbar({ id: 'ivette.history', children: <History /> });
-Ivette.registerStatusbar({ id: 'ivette.status', children: <Status /> });
 
 /* -------------------------------------------------------------------------- */
 /* --- Frama-C Kernel Groups                                              --- */
