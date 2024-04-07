@@ -29,6 +29,7 @@ Ivette.registerComponent({
     id: 'ivette.console',
     label: 'Console',
     title: 'Frama-C Command Line',
+    preferredPosition: 'AB',
     children: <Controller.RenderConsole />,
 });
 
@@ -36,6 +37,7 @@ Ivette.registerComponent({
     id: 'ivette.messages',
     label: 'Messages',
     title: 'Frama-C Messages',
+    preferredPosition: 'CD',
     children: <Messages.RenderMessages />,
 });
 

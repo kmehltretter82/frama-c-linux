@@ -414,6 +414,7 @@ Server.onStatus((s: Server.Status) => {
       return;
     case Server.Status.FAILURE:
       Display.showError('Frama-C Server Failure');
+      Display.alertComponent('ivette.console');
       return;
   }
 });
