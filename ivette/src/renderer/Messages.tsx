@@ -533,10 +533,10 @@ let CURSOR = 0;
 
 States.onSyncArray(Kernel.message, () => {
   const data = States.getSyncArrayData(Kernel.message);
-  const k = data.length < CURSOR ? 0 : CURSOR;
+  const curr = data.length < CURSOR ? 0 : CURSOR;
   let errors = 0;
   const plugins = new Set<string>();
-  while (k < data.length) {
+  for (let k = curr; k < data.length; k++) {
     const m = data[k];
     switch (m.kind) {
       case Kernel.logkind.ERROR:

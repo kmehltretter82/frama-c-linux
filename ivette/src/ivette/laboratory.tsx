@@ -37,6 +37,7 @@ import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
 import * as Ivette from 'ivette';
 import { compId, LayoutPosition, VIEW, COMPONENT, GROUP } from 'ivette';
+import { NotificationTimer } from 'ivette/prefs';
 import * as State from 'ivette/state';
 
 /* -------------------------------------------------------------------------- */
@@ -858,7 +859,7 @@ const NOTIFICATIONS = new States.GlobalState<NotificationState>({
 
 function clearMessage(id: string): void {
   let { kid, index } = NOTIFICATIONS.getValue();
-  if (index.has(id)) return;
+  if (!index.has(id)) return;
   index = copyMap(index);
   index.delete(id);
   NOTIFICATIONS.setValue({ kid, index });
@@ -901,7 +902,9 @@ export function showMessage(msg: Notification): void {
   const id = `W${++kid}`;
   index = copyMap(index).set(id, { ...msg, id });
   NOTIFICATIONS.setValue({ kid, index });
-  if (msg.kind !== 'error') setTimeout(() => clearMessage(id), 3000);
+  const timer = Settings.getGlobalSettings(NotificationTimer);
+  if (timer > 0 && timer < 60)
+    setTimeout(() => clearMessage(id), timer * 1000);
 }
 
 /* -------------------------------------------------------------------------- */

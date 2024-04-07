@@ -410,6 +410,8 @@ export function RenderConsole(): JSX.Element {
 Server.onStatus((s: Server.Status) => {
   switch (s) {
     case Server.Status.OFF:
+    case Server.Status.STARTING:
+    case Server.Status.RESTARTING:
       Display.clearMessages();
       return;
     case Server.Status.FAILURE:

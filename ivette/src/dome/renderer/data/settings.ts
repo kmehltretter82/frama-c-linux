@@ -112,8 +112,7 @@ export class GString extends GlobalSettings<string> {
 
 /** Smart constructor for optional (JSON serializable) data. */
 export class GOption<A extends JSON.json>
-  extends GlobalSettings<A | undefined>
-{
+  extends GlobalSettings<A | undefined> {
   constructor(name: string, encoder: JSON.Decoder<A>, defaultValue?: A) {
     super(name, encoder, JSON.identity, defaultValue);
   }
@@ -441,6 +440,14 @@ const GlobalSettingsDriver = new Driver({
   globals: true,
   defaults: true,
 });
+
+/**
+   Returns the current value of the global settings.
+ */
+export function getGlobalSettings<A>(S: GlobalSettings<A>): A {
+  const data = GlobalSettingsDriver.load(S.name);
+  return JSON.jCatch(S.decoder, S.defaultValue)(data);
+}
 
 /**
    Returns a global state, which is synchronized among all windows, and saved

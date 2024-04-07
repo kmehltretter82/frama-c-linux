@@ -98,8 +98,12 @@ export const EditorCommand =
 export const ConsoleScrollback =
   new Settings.GNumber('Console.Scrollback', 2000);
 
-export interface ConsoleScrollbackProps {
-  scrollback: Settings.GlobalSettings<number>;
-}
+// --------------------------------------------------------------------------
+// --- Notification Stack
+// --------------------------------------------------------------------------
+
+// in seconds; 0 means no timeout
+export const NotificationTimer =
+  new Settings.GNumber('Laboratory.Notifications', 5);
 
 // --------------------------------------------------------------------------
