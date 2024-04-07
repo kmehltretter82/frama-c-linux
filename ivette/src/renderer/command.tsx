@@ -42,7 +42,7 @@ Ivette.registerComponent({
 });
 
 Ivette.registerView({
-    id: 'ivette.command',
+    id: 'ivette.console',
     label: 'Frama-C',
     title: 'Frama-C Console & Messages',
     layout: { AB: 'ivette.console', CD: 'ivette.messages' },
