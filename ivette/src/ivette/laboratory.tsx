@@ -1252,10 +1252,13 @@ function TabView(props: TabViewProps): JSX.Element | null {
     ]);
   };
 
+  const icon =
+    favorite ? (selected ? 'FAVORITE' : 'STAR') : 'DISPLAY';
+
   return (
     <Toolbar.Button
       className='labview-tab'
-      icon={selected ? 'DISPLAY' : undefined}
+      icon={icon}
       label={label}
       title={title}
       selected={selected}
@@ -1264,8 +1267,9 @@ function TabView(props: TabViewProps): JSX.Element | null {
     >
       <IconButton
         className='labview-tab-closing'
-        icon={custom === 0 ? 'FAVORITE' : 'CIRC.CLOSE'}
-        enabled={custom !== 0}
+        icon='CIRC.CLOSE'
+        visible={!favorite}
+        enabled={!favorite}
         onClick={onClose}
       />
     </Toolbar.Button>
