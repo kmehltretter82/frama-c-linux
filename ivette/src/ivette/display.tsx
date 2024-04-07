@@ -124,4 +124,28 @@ export function useComponentStatus(
   return Laboratory.getComponentStatus(state, id ?? '');
 }
 
+export type Message = undefined | null | string;
+
+/** Message notification */
+export function showMessage(msg: Message | Laboratory.Notification): void {
+  if (!msg) return;
+  Laboratory.showMessage(typeof msg === 'string' ? { label: msg } : msg);
+}
+
+/** Warning notification. */
+export function showWarning(msg: Message): void {
+  if (!msg) return;
+  Laboratory.showMessage({ kind: 'warning', label: msg });
+}
+
+/** Error notification */
+export function showError(msg: Message): void {
+  if (!msg) return;
+  Laboratory.showMessage({ kind: 'error', label: msg });
+}
+
+export function clearMessages(): void {
+  Laboratory.clearMessages();
+}
+
 /* -------------------------------------------------------------------------- */

@@ -686,7 +686,7 @@ const closedMenu: LayoutMenuState = {
   y: 0,
 };
 
-const MENU = new States.GlobalState<LayoutMenuState>(closedMenu);
+const LAYOUTMENU = new States.GlobalState<LayoutMenuState>(closedMenu);
 
 function openLayoutMenu(
   compId: compId,
@@ -694,14 +694,14 @@ function openLayoutMenu(
   evt: React.MouseEvent,
   fromDock = false
 ): void {
-  MENU.setValue({
+  LAYOUTMENU.setValue({
     ...actions, compId,
     x: evt.clientX, y: evt.clientY, fromDock
   });
 }
 
 function closeMenu(): void {
-  MENU.setValue(closedMenu);
+  LAYOUTMENU.setValue(closedMenu);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -756,7 +756,7 @@ function Action(props: ActionProps): JSX.Element {
 function LayoutMenu(): JSX.Element | null {
   const href = React.useRef<HTMLDivElement>(null);
   const divElt = href.current;
-  const [menu] = States.useGlobalState(MENU);
+  const [menu] = States.useGlobalState(LAYOUTMENU);
   const [state] = States.useGlobalState(LAB);
   const [panelWidth, setWidth] = React.useState(80);
   const [panelHeight, setHeight] = React.useState(80);
@@ -834,6 +834,77 @@ function LayoutMenu(): JSX.Element | null {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Notification Stack                                                 --- */
+/* -------------------------------------------------------------------------- */
+
+type NotificationKind = 'message' | 'warning' | 'error';
+
+export interface Notification {
+  kind?: NotificationKind;
+  label: string;
+  title?: string;
+}
+
+interface NotificationItemProps extends Notification { id: string }
+
+type NotificationState = {
+  kid: number,
+  index: Map<string, NotificationItemProps>,
+};
+
+const NOTIFICATIONS = new States.GlobalState<NotificationState>({
+  kid: 0, index: new Map()
+});
+
+function clearMessage(id: string): void {
+  let { kid, index } = NOTIFICATIONS.getValue();
+  if (index.has(id)) return;
+  index = copyMap(index);
+  index.delete(id);
+  NOTIFICATIONS.setValue({ kid, index });
+}
+
+function NotificationItem(props: NotificationItemProps): JSX.Element {
+  const { id, kind = 'message', label, title } = props;
+  const className = classes(
+    'labview-notification-item',
+    'labview-notification-' + kind,
+  );
+  const icon = props.kind === 'message' ? 'CIRC.INFO' : 'WARNING';
+  const onClick = (): void => clearMessage(id);
+  return (
+    <Label
+      className={className}
+      icon={icon} title={title} label={label}
+      onClick={onClick} />
+  );
+}
+
+function Notifications(): JSX.Element {
+  const [{ index }] = States.useGlobalState(NOTIFICATIONS);
+  const className = classes(
+    'labview-notification-stack',
+    index.size === 0 && 'dome-erased'
+  );
+  const items: JSX.Element[] = [];
+  index.forEach(p => items.push(<NotificationItem key={p.id} {...p} />));
+  return <div className={className}>{items}</div>;
+}
+
+export function clearMessages(): void {
+  const { kid: kid } = NOTIFICATIONS.getValue();
+  NOTIFICATIONS.setValue({ kid: kid, index: new Map() });
+}
+
+export function showMessage(msg: Notification): void {
+  let { kid, index } = NOTIFICATIONS.getValue();
+  const id = `W${++kid}`;
+  index = copyMap(index).set(id, { ...msg, id });
+  NOTIFICATIONS.setValue({ kid, index });
+  if (msg.kind !== 'error') setTimeout(() => clearMessage(id), 3000);
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Pane Component                                                     --- */
 /* -------------------------------------------------------------------------- */
 
@@ -891,6 +962,7 @@ export function LabView(): JSX.Element {
   return (
     <>
       <LayoutMenu />
+      <Notifications />
       <QSplit
         className='labview-container'
         A={A} B={B} C={C} D={D} H={H} V={V}
