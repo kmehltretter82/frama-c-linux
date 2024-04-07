@@ -193,6 +193,14 @@ export function onShutdown(callback: () => void): void {
   SHUTDOWN.on(callback);
 }
 
+/**
+ *  Register callback on server status events.
+ *  @param {function} callback Invoked when the server leaves running stage.
+ */
+export function onStatus(callback: (s: Status) => void): void {
+  STATUS.on(callback);
+}
+
 // --------------------------------------------------------------------------
 // --- Status Hooks
 // --------------------------------------------------------------------------

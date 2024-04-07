@@ -35,6 +35,7 @@ import * as Compare from 'dome/data/compare';
 import { State, GlobalState, useGlobalState } from 'dome/data/states';
 
 import { TitleBar } from 'ivette';
+// import * as Display from 'ivette/display';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Kernel from 'frama-c/kernel/api/services';
@@ -523,3 +524,61 @@ export function RenderMessages(): JSX.Element {
     </>
   );
 }
+
+// --------------------------------------------------------------------------
+// --- Alerts
+// --------------------------------------------------------------------------
+
+type alertLevel = undefined | Kernel.logkind;
+
+function rank(level: alertLevel): number {
+  if (!level) return 0;
+  switch (level) {
+    case 'DEBUG':
+    case 'FEEDBACK':
+      return 0;
+    case 'RESULT':
+      return 1;
+    case 'WARNING':
+      return 2;
+    case 'ERROR':
+      return 3;
+    case 'FAILURE':
+    default:
+      return 4;
+  }
+}
+
+function processMessages(
+  data: Kernel.messageData[],
+  from: number,
+  level: alertLevel,
+): alertLevel {
+  let rk = rank(level);
+  if (rk >= 4) return Kernel.logkind.FAILURE;
+  for (let k = from; k < data.length; k++) {
+    const msg = data[k];
+    const mk = rank(msg.kind);
+    if (mk >= 4) return Kernel.logkind.FAILURE;
+    if (mk > rk) { level = msg.kind; rk = mk; }
+  }
+  return level;
+}
+
+export function Alerts(): JSX.Element | null {
+  const cursor = React.useRef(0);
+  const level = React.useRef<alertLevel>();
+  const [alert, setAlert] = React.useState<alertLevel>();
+  const data = States.useSyncArrayData(Kernel.message);
+
+  React.useEffect(() => {
+    level.current = processMessages(data, cursor.current, level.current);
+    cursor.current = data.length;
+    setAlert(level.current);
+  }, [data]);
+
+  if (alert === undefined) return null;
+  return <></>;
+}
+
+/* -------------------------------------------------------------------------- */

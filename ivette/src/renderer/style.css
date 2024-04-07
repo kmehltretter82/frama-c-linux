@@ -273,29 +273,3 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Alerts                                                             --- */
-/* -------------------------------------------------------------------------- */
-
-.ivette-alert-blink {
-    animation: ivette-alert-blinker 1s linear infinite;
-}
-
-.ivette-alert-blink:hover {
-    animation: none;
-}
-
-@keyframes ivette-alert-blinker {
-    from {
-        fill: var(--negative-button-color);
-    }
-
-    70% {
-        fill: var(---default-button-img);
-    }
-
-    to {
-        fill: var(---default-button-img);
-    }
-}
-
-/* -------------------------------------------------------------------------- */
