@@ -35,3 +35,6 @@ val display: Format.formatter -> unit
 (** Reset the internal state of the module; to call at the very
     beginning of the analysis. *)
 val reset: unit -> unit
+
+module EvaFlamegraph :
+  State_builder.Hashtbl with type key = Callstack.t and type data = float

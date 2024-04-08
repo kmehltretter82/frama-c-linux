@@ -364,6 +364,16 @@ let stack_flamegraph = ref []
    callee, or when the analysis of the function ends. This stack is never
    empty when an analysis is in progress. *)
 
+module EvaFlamegraph =
+  State_builder.Hashtbl
+    (Callstack.Hashtbl)
+    (Datatype.Float)
+    (struct
+      let name = "Eva.Flamegraph"
+      let dependencies = [ Ast.self ]
+      let size = 20
+    end)
+
 (* pretty-prints the functions in a Value callstack, starting by main (i.e.
    in reverse order). *)
 let pretty_callstack oc callstack =
@@ -392,6 +402,7 @@ let start_doing_flamegraph callstack =
       let file = Parameters.ValPerfFlamegraphs.get () in
       try
         (* Flamegraphs must be computed. Set up the stack and the output file *)
+        EvaFlamegraph.clear ();
         let oc = open_out (file:>string) in
         oc_flamegraph := Some oc;
         stack_flamegraph := [ (Sys.time (), 0.) ]
@@ -421,6 +432,10 @@ let stop_doing_flamegraph callstack =
     | [] -> assert false
     | (_, total) :: q ->
       (* dump the total time (that we just updated) for the current function *)
+      let prev_total =
+        try EvaFlamegraph.find callstack with Not_found -> 0.0
+      in
+      EvaFlamegraph.replace callstack (prev_total +. total);
       Printf.fprintf oc "%a %.3f\n%!"
         pretty_callstack callstack (total *. 1000.);
       match q with
@@ -435,7 +450,9 @@ let stop_doing_flamegraph callstack =
 let reset_flamegraph () =
   match !oc_flamegraph with
   | None -> ()
-  | Some fd -> close_out fd; stack_flamegraph := []; oc_flamegraph := None
+  | Some fd ->
+    close_out fd; stack_flamegraph := []; oc_flamegraph := None;
+    EvaFlamegraph.clear ()
 
 
 (* -------------------------------------------------------------------------- *)
