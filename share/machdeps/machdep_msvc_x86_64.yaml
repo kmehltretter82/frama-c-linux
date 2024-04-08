@@ -49,7 +49,7 @@ wint_t: unsigned short
 wordsize: '64'
 posix_version: ''
 
-# NB: except for l_tmpnam, the following macro are not defined in the old
+# NB: except for l_tmpnam, the following macros are not defined in the old
 # __fc_machdep.h in the MSVC_X86_64 section. The values below have thus been 
 # taken from gnu
 bufsiz: '8192'
