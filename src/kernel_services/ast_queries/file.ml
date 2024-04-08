@@ -422,7 +422,7 @@ let silence_cpp_machdep_warnings cmdl =
   else
     []
 
-let known_bad_macros = [ "SSE" ]
+let known_bad_macros = [ "SIZEOF_INT128"; "SSE" ]
 
 let censored_macros cpp_args =
   List.fold_left
