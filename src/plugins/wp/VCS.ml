@@ -46,21 +46,11 @@ let parse_prover = function
   | "why3" -> Some (Why3 { Why3.Whyconf.prover_name = "why3";
                            Why3.Whyconf.prover_version = "";
                            Why3.Whyconf.prover_altern = "generate only" })
-  | s ->
-    let prv = String.split_on_char ':' s in
-    let prv = match prv with "why3"::prv -> prv | _ -> prv in
-    let name = String.concat "," prv in
-    match Why3Provers.find_fallback name with
-    | Exact p -> Some (Why3 p)
-    | Fallback p ->
-      Wp_parameters.warning ~current:false ~once:true
-        "Prover '%s' not found, fallback to '%s'"
-        (String.concat ":" prv) (Why3Provers.ident_wp p) ;
-      Some (Why3 p)
-    | NotFound ->
-      Wp_parameters.error ~once:true
-        "Prover '%s' not found in why3.conf" name ;
-      None
+  | name ->
+    match Why3Provers.lookup name with
+    | Some p -> Some (Why3 p)
+    | None -> Wp_parameters.error ~once:true
+                "Prover '%s' not found in why3.conf" name ; None
 
 let parse_mode m =
   match String.lowercase_ascii m with
