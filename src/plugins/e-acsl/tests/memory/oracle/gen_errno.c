@@ -10,28 +10,10 @@
 #include "time.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-void __e_acsl_globals_init(void)
-{
-  static char __e_acsl_already_run = 0;
-  if (! __e_acsl_already_run) {
-    __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& errno),4UL);
-    __e_acsl_full_init((void *)(& errno));
-  }
-  return;
-}
-
-void __e_acsl_globals_clean(void)
-{
-  __e_acsl_delete_block((void *)(& errno));
-  return;
-}
-
 int main(int argc, char const **argv)
 {
   int __retres;
   __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
-  __e_acsl_globals_init();
   int *p = & errno;
   __e_acsl_store_block((void *)(& p),8UL);
   __e_acsl_full_init((void *)(& p));
@@ -72,7 +54,6 @@ int main(int argc, char const **argv)
   /*@ assert \valid(p); */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& p));
-  __e_acsl_globals_clean();
   __e_acsl_memory_clean();
   return __retres;
 }

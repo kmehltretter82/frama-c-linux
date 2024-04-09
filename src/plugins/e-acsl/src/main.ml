@@ -49,6 +49,7 @@ let generate_code =
             (* preparation of the AST does not concern the E-ACSL RTL:
                do it first *)
             Prepare_ast.prepare ();
+            Memory_tracking.SpecialPointers.initialize ();
             Rtl.link rtl_prj;
             (* the E-ACSL type system ensures the soundness of the generated
                arithmetic operations. Therefore, deactivate the corresponding

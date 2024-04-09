@@ -140,6 +140,9 @@ void eacsl_mark_readonly(void *ptr) {
 /* ********************** */
 
 int eacsl_freeable(void *ptr) {
+  if (get_safe_location((uintptr_t)ptr, 1) != NULL)
+    return 1;
+
   E_ACSL_RLOCK(__e_acsl_segment_model_global_lock);
   int result = unsafe_freeable(ptr);
   E_ACSL_RWUNLOCK(__e_acsl_segment_model_global_lock);
@@ -147,32 +150,39 @@ int eacsl_freeable(void *ptr) {
 }
 
 int eacsl_valid(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
-  int result = size == 0;
-  if (!result) {
-    E_ACSL_RLOCK(__e_acsl_segment_model_global_lock);
-    result = allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
-             && !readonly(ptr)
+  if (size == 0)
+    return 1;
+
+  memory_location *safeloc = get_safe_location((uintptr_t)ptr, size);
+  if (safeloc != NULL)
+    return safeloc->writeable;
+
+  E_ACSL_RLOCK(__e_acsl_segment_model_global_lock);
+  int result = allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
+               && !readonly(ptr)
 #ifdef E_ACSL_TEMPORAL
-             && temporal_valid(ptr_base, addrof_base)
+               && temporal_valid(ptr_base, addrof_base)
 #endif
-        ;
-    E_ACSL_RWUNLOCK(__e_acsl_segment_model_global_lock);
-  }
+      ;
+  E_ACSL_RWUNLOCK(__e_acsl_segment_model_global_lock);
   return result;
 }
 
 int eacsl_valid_read(void *ptr, size_t size, void *ptr_base,
                      void *addrof_base) {
-  int result = size == 0;
-  if (!result) {
-    E_ACSL_RLOCK(__e_acsl_segment_model_global_lock);
-    result = allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
+  if (size == 0)
+    return 1;
+
+  if (get_safe_location((uintptr_t)ptr, size) != NULL)
+    return 1;
+
+  E_ACSL_RLOCK(__e_acsl_segment_model_global_lock);
+  int result = allocated((uintptr_t)ptr, size, (uintptr_t)ptr_base)
 #ifdef E_ACSL_TEMPORAL
-             && temporal_valid(ptr_base, addrof_base)
+               && temporal_valid(ptr_base, addrof_base)
 #endif
-        ;
-    E_ACSL_RWUNLOCK(__e_acsl_segment_model_global_lock);
-  }
+      ;
+  E_ACSL_RWUNLOCK(__e_acsl_segment_model_global_lock);
   return result;
 }
 
@@ -180,6 +190,10 @@ int eacsl_valid_read(void *ptr, size_t size, void *ptr_base,
    \p _base_addr macro that will eventually call ::TRY_SEGMENT. The following
    implementation is preferred for performance reasons. */
 void *eacsl_base_addr(void *ptr) {
+  memory_location *safeloc = get_safe_location((uintptr_t)ptr, 1);
+  if (safeloc != NULL)
+    return (void *)safeloc->address;
+
   void *result = NULL;
   E_ACSL_RLOCK(__e_acsl_segment_model_global_lock);
   TRY_SEGMENT(ptr, result = (void *)heap_info((uintptr_t)ptr, 'B'),
@@ -192,6 +206,10 @@ void *eacsl_base_addr(void *ptr) {
    via \p _block_length macro. A more direct approach via ::TRY_SEGMENT
    is preferred for performance reasons. */
 size_t eacsl_block_length(void *ptr) {
+  memory_location *safeloc = get_safe_location((uintptr_t)ptr, 1);
+  if (safeloc != NULL)
+    return safeloc->length;
+
   size_t result = 0;
   E_ACSL_RLOCK(__e_acsl_segment_model_global_lock);
   TRY_SEGMENT(ptr, result = heap_info((uintptr_t)ptr, 'L'),
@@ -201,17 +219,27 @@ size_t eacsl_block_length(void *ptr) {
 }
 
 size_t eacsl_offset(void *ptr) {
+  uintptr_t addr = (uintptr_t)ptr;
+
+  memory_location *safeloc = get_safe_location(addr, 1);
+  if (safeloc != NULL)
+    return (safeloc->address - addr);
+
   size_t result = 0;
   E_ACSL_RLOCK(__e_acsl_segment_model_global_lock);
-  TRY_SEGMENT(ptr, result = heap_info((uintptr_t)ptr, 'O'),
-              result = static_info((uintptr_t)ptr, 'O'));
+  TRY_SEGMENT(ptr, result = heap_info(addr, 'O'),
+              result = static_info(addr, 'O'));
   E_ACSL_RWUNLOCK(__e_acsl_segment_model_global_lock);
   return result;
 }
 
 int eacsl_initialized(void *ptr, size_t size) {
-  int result = 0;
   uintptr_t addr = (uintptr_t)ptr;
+
+  if (get_safe_location(addr, size) != NULL)
+    return 1;
+
+  int result = 0;
   E_ACSL_RLOCK(__e_acsl_segment_model_global_lock);
   TRY_SEGMENT_WEAK(addr, result = heap_initialized(addr, size),
                    result = static_initialized(addr, size));
@@ -321,7 +349,6 @@ void do_eacsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   shadow_alloca(&main, sizeof(&main));
   initialize_static_region((uintptr_t)&main, sizeof(&main));
   /* Tracking safe locations */
-  register_safe_locations(E_ACSL_REGISTER_ALL_LOCS);
   init_infinity_values();
 }
 

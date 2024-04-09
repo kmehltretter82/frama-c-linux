@@ -5,7 +5,7 @@
 void *thread_start(void *arg) {
   //@ assert \valid(stdout) && \initialized(stdout);
   //@ assert \valid(stderr) && \initialized(stderr);
-  //@ assert \valid(stdin) && \initialized(stdin);
+  //@ assert \valid_read(stdin) && \initialized(stdin);
   int *addrof_errno = &errno;
   //@ assert \valid(addrof_errno) && \initialized(addrof_errno);
   return NULL;

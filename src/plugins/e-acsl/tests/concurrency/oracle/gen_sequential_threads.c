@@ -435,20 +435,8 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_join),1UL);
-    __e_acsl_full_init((void *)(& __gen_e_acsl_pthread_join));
-    __e_acsl_store_block((void *)(& __gen_e_acsl_pthread_create),1UL);
-    __e_acsl_full_init((void *)(& __gen_e_acsl_pthread_create));
-    __e_acsl_store_block((void *)(& read_value),1UL);
-    __e_acsl_full_init((void *)(& read_value));
-    __e_acsl_store_block((void *)(& write_value),1UL);
-    __e_acsl_full_init((void *)(& write_value));
     __e_acsl_store_block((void *)(values),80UL);
     __e_acsl_full_init((void *)(& values));
-    __e_acsl_store_block((void *)(& free),1UL);
-    __e_acsl_full_init((void *)(& free));
-    __e_acsl_store_block((void *)(& malloc),1UL);
-    __e_acsl_full_init((void *)(& malloc));
     __e_acsl_store_block((void *)(& __fc_p_random48_counter),8UL);
     __e_acsl_full_init((void *)(& __fc_p_random48_counter));
     __e_acsl_store_block((void *)(random48_counter),6UL);
@@ -473,23 +461,13 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& __fc_p_sigaction));
     __e_acsl_store_block((void *)(sigaction),2080UL);
     __e_acsl_full_init((void *)(& sigaction));
-    __e_acsl_store_block((void *)(& pthread_join),1UL);
-    __e_acsl_full_init((void *)(& pthread_join));
-    __e_acsl_store_block((void *)(& pthread_create),1UL);
-    __e_acsl_full_init((void *)(& pthread_create));
   }
   return;
 }
 
 void __e_acsl_globals_clean(void)
 {
-  __e_acsl_delete_block((void *)(& __gen_e_acsl_pthread_join));
-  __e_acsl_delete_block((void *)(& __gen_e_acsl_pthread_create));
-  __e_acsl_delete_block((void *)(& read_value));
-  __e_acsl_delete_block((void *)(& write_value));
   __e_acsl_delete_block((void *)(values));
-  __e_acsl_delete_block((void *)(& free));
-  __e_acsl_delete_block((void *)(& malloc));
   __e_acsl_delete_block((void *)(& __fc_p_random48_counter));
   __e_acsl_delete_block((void *)(random48_counter));
   __e_acsl_delete_block((void *)(& __fc_random48_init));
@@ -502,8 +480,6 @@ void __e_acsl_globals_clean(void)
   __e_acsl_delete_block((void *)(& __fc_time));
   __e_acsl_delete_block((void *)(& __fc_p_sigaction));
   __e_acsl_delete_block((void *)(sigaction));
-  __e_acsl_delete_block((void *)(& pthread_join));
-  __e_acsl_delete_block((void *)(& pthread_create));
   return;
 }
 
