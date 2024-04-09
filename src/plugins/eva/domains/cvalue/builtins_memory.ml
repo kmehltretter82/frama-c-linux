@@ -61,17 +61,17 @@ let reduce_to_valid_loc dst size access =
 (* -------------------------------------------------------------------------- *)
 
 (*  Warns when the value is indeterminate. *)
-let warn_indeterminate_value ?(precise = false) = function
+let warn_indeterminate_value ~name ?(precise = false) = function
   | V_Or_Uninitialized.C_init_noesc _ -> ()
   | _ ->
     Self.result ~dkey ~current:true ~once:true
-      "@[In memcpy builtin:@ %sprecise copy@ of indeterminate values.@]%t"
-      (if precise then "" else "im") Eva_utils.pp_callstack
+      "@[In %s builtin:@ %sprecise copy@ of indeterminate values.@]%t"
+      name (if precise then "" else "im") Eva_utils.pp_callstack
 
 (*  Warns when the offsetmap contains an indeterminate value. *)
-let check_indeterminate_offsetmap offsm =
+let check_indeterminate_offsetmap ~name offsm =
   if Self.is_debug_key_enabled dkey then
-    let warn _ (v, _, _) = warn_indeterminate_value ~precise:true v in
+    let warn _ (v, _, _) = warn_indeterminate_value ~name ~precise:true v in
     V_Offsetmap.iter warn offsm
 
 (* Adds \from dependency from [src_loc] to [dst_loc]. *)
@@ -94,12 +94,12 @@ let add_sure_deps ~size ~src ~dst (deps_table, sure_output) =
   deps_table, Zone.join sure_zone sure_output
 
 (* Copy the offsetmap of size [size] from [src] to [dst] in [state]. *)
-let copy_offsetmap ~exact ~size ~src ~dst ~dst_lval state =
+let copy_offsetmap ~name ~exact ~size ~src ~dst ~dst_lval state =
   match Cvalue.Model.copy_offsetmap src size state with
   | `Bottom -> Cvalue.Model.bottom
   | `Value offsetmap ->
-    check_indeterminate_offsetmap offsetmap;
-    let prefix = "Builtin memcpy" in
+    check_indeterminate_offsetmap ~name offsetmap;
+    let prefix = "Builtin " ^ name in
     Cvalue_transfer.warn_imprecise_offsm_write ~prefix dst_lval offsetmap;
     Cvalue.Model.paste_offsetmap ~from:offsetmap ~dst_loc:dst ~size ~exact state
 
@@ -124,7 +124,7 @@ let shift ~factor:i src dst size =
    after the copy for the minimum size has already been done.
    Iterates on all possible values of [size] (after the first), and does the
    copy for [previous_size..size]. *)
-let copy_remaining_size_by_size ~src ~dst ~dst_lval ~size state =
+let copy_remaining_size_by_size ~name ~src ~dst ~dst_lval ~size state =
   let exception Result of Cvalue.Model.t in
   let do_size size (state, previous_size) =
     (* First iteration: this copy has already been performed, skip. *)
@@ -136,7 +136,7 @@ let copy_remaining_size_by_size ~src ~dst ~dst_lval ~size state =
       (* [exact] is false as all these copies may not happen according to the
           concrete value of [size]. *)
       let exact = false in
-      let new_state = copy_offsetmap ~exact ~size ~src ~dst ~dst_lval state in
+      let new_state = copy_offsetmap ~name ~exact ~size ~src ~dst ~dst_lval state in
       (* If this copy failed, the current size is completely invalid, and so
          will be the following ones. Stop now with the previous state. *)
       if not (Cvalue.Model.is_reachable new_state) then raise (Result state);
@@ -146,15 +146,15 @@ let copy_remaining_size_by_size ~src ~dst ~dst_lval ~size state =
   with Result state -> state
 
 (* Copy the value at location [src_loc] to location [dst_loc] in [state]. *)
-let imprecise_copy ~src_loc ~dst_loc ~dst_lval state =
-  Self.debug ~dkey ~once:true
-    ~current:true "In memcpy builtin: too many sizes to enumerate, \
-                   possible loss of precision";
+let imprecise_copy ~name ~src_loc ~dst_loc ~dst_lval state =
+  Self.debug ~dkey ~once:true ~current:true
+    "In %s builtin: too many sizes to enumerate, possible loss of precision"
+    name;
   (* conflate_bottom:false as we want to copy padding bits *)
   let v = Model.find_indeterminate ~conflate_bottom:false state src_loc in
-  warn_indeterminate_value v;
+  warn_indeterminate_value ~name v;
   let value = Cvalue.V_Or_Uninitialized.get_v v in
-  let prefix = "Builtin memcpy" in
+  let prefix = "Builtin " ^ name in
   Cvalue_transfer.warn_imprecise_write ~prefix dst_lval dst_loc value;
   let new_state =
     Cvalue.Model.add_indeterminate_binding ~exact:false state dst_loc v
@@ -176,7 +176,7 @@ let char_location loc max_size =
   let loc = Location_Bits.shift shift loc in
   make_loc loc (Int_Base.inject size_char)
 
-let compute_memcpy ~dst_lval ~dst ~src ~size state =
+let compute_memcpy ~name ~dst_lval ~dst ~src ~size state =
   let size_min, size_max = min_max_size size in
   (* Empty \from dependencies and sure output *)
   let empty_deps = Assigns.Memory.empty, Zone.bottom in
@@ -186,7 +186,7 @@ let compute_memcpy ~dst_lval ~dst ~src ~size state =
     if Int.gt size_min Int.zero
     then
       let state =
-        copy_offsetmap ~exact:true ~size:size_min ~src ~dst ~dst_lval state
+        copy_offsetmap ~name ~exact:true ~size:size_min ~src ~dst ~dst_lval state
       in
       (* If the copy succeeded, update \from dependencies and sure output. *)
       if Cvalue.Model.is_reachable state
@@ -212,12 +212,12 @@ let compute_memcpy ~dst_lval ~dst ~src ~size state =
        write the result as one byte in dst+(size_min..size_max-1). *)
     let state =
       if Ival.cardinal_is_less_than size (plevel () / 10)
-      then copy_remaining_size_by_size ~src ~dst ~dst_lval ~size state
-      else imprecise_copy ~src_loc ~dst_loc ~dst_lval state
+      then copy_remaining_size_by_size ~name ~src ~dst ~dst_lval ~size state
+      else imprecise_copy ~name ~src_loc ~dst_loc ~dst_lval state
     in
     state, deps_table, written_zone
 
-let frama_c_memcpy _name state actuals =
+let frama_c_memcpy name state actuals =
   match actuals with
   | [(dst_exp, dst_cvalue); (_src_exp, src_cvalue); (_size_exp, size_cvalue)] ->
     let dst_lval = lval_of_address dst_exp in
@@ -234,7 +234,7 @@ let frama_c_memcpy _name state actuals =
     let dst = reduce_to_valid_loc dst size Locations.Write in
     (* Do the copy. *)
     let state, memory, sure_output =
-      compute_memcpy ~dst_lval ~dst ~src ~size state
+      compute_memcpy ~name ~dst_lval ~dst ~src ~size state
     in
     (* Build the builtin results. *)
     let return = deps_nth_arg 0 in
