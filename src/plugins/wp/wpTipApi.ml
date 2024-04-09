@@ -99,7 +99,7 @@ let () =
   let set_header = R.result_opt inode ~name:"header"
       ~descr:(Md.plain "Proof node tactic label (if any)")
       (module D.Jstring) in
-  let set_child = R.result_opt inode ~name:"child"
+  let set_child_label = R.result_opt inode ~name:"childLabel"
       ~descr:(Md.plain "Proof node child label (from parent, if any)")
       (module D.Jstring) in
   let set_path = R.result inode ~name:"path"
@@ -116,12 +116,12 @@ let () =
       set_proved rq (ProofEngine.fully_proved node);
       set_pending rq (ProofEngine.pending node);
       let s = ProofEngine.stats node in
-      set_size rq (Stats.subgoals @@ s);
+      set_size rq (Stats.subgoals s);
       set_stats rq (Pretty_utils.to_string Stats.pretty s);
       set_results rq (Wpo.get_results @@ ProofEngine.goal node);
       set_tactic rq (ProofEngine.tactic node);
       set_header rq (ProofEngine.tactic_label node);
-      set_child rq (ProofEngine.child_label node);
+      set_child_label rq (ProofEngine.child_label node);
       set_path rq (ProofEngine.path node);
       set_children rq (ProofEngine.subgoals node);
     end
@@ -154,15 +154,15 @@ let () =
       ~descr:(Md.plain "Pending proof nodes") (module D.Jint) in
   let set_current = R.result state ~name:"current"
       ~descr:(Md.plain "Current proof node") (module Node) in
-  let set_above = R.result state ~name:"above"
-      ~descr:(Md.plain "Above nodes (up to current when internal)")
-      (module Path) in
-  let set_below = R.result state ~name:"below"
-      ~descr:(Md.plain "Below nodes (including current when pending)")
+  let set_parents = R.result state ~name:"parents"
+      ~descr:(Md.plain "parents nodes")
       (module Path) in
   let set_tactic = R.result_opt state ~name:"tactic"
       ~descr:(Md.plain "Applied tactic (if any)")
       (module Tactic) in
+  let set_children = R.result state ~name:"children"
+      ~descr:(Md.plain "Children nodes")
+      (module Path) in
   R.register_sig ~package
     ~kind:`GET ~name:"getProofStatus"
     ~descr:(Md.plain "Current Proof Status of a Goal") state
@@ -179,22 +179,9 @@ let () =
       in
       set_index rq index ;
       set_current rq current ;
+      set_parents rq @@ ProofEngine.path current ;
       set_tactic rq @@ ProofEngine.tactic current ;
-      let above = ProofEngine.path current in
-      let below = ProofEngine.subgoals current in
-      if below = [] then
-        match above with
-        | [] ->
-          set_above rq [] ;
-          set_below rq [] ;
-        | p::_ ->
-          set_above rq above ;
-          set_below rq (ProofEngine.subgoals p) ;
-      else
-        begin
-          set_above rq (current::above) ;
-          set_below rq below ;
-        end
+      set_children rq @@ ProofEngine.subgoals current ;
     end
 
 (* -------------------------------------------------------------------------- *)

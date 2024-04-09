@@ -96,21 +96,22 @@
     padding-right: 8px;
 }
 
-.wp-navbar-node.parent {
-}
-
-.wp-navbar-node.current {
-    font-weight: bold;
-    padding-left: 4px;
-    background-color: var(--code-select);
-}
-
 .wp-navbar-node:hover {
     background-color: var(--code-hover);
 }
 
+.wp-navbar-node.parent {
+    padding-left: 0px;
+}
+
 .wp-navbar-node.child {
-    padding-left: 8px;
+    padding-left: 12px;
+}
+
+.wp-navbar-node.current {
+    font-weight: bold;
+    padding-left: 0px;
+    background-color: var(--code-select);
 }
 
 /* -------------------------------------------------------------------------- */
