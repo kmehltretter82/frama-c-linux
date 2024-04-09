@@ -153,14 +153,19 @@ export const getResult: Server.GetRequest<
   >= getResult_internal;
 
 const getProofStatus_internal: Server.GetRequest<
-  goal,
-  { index: number, pending: number, current: node, parents: node[],
-    tactic?: tactic, children: node[] }
+  { main: goal, unproved?: boolean, subtree?: boolean },
+  { size: number, index: number, pending: number, current: node,
+    parents: node[], tactic?: tactic, children: node[] }
   > = {
   kind: Server.RqKind.GET,
   name: 'plugins.wp.tip.getProofStatus',
-  input: jGoal,
+  input: Json.jObject({
+           main: jGoal,
+           unproved: Json.jOption(Json.jBoolean),
+           subtree: Json.jOption(Json.jBoolean),
+         }),
   output: Json.jObject({
+            size: Json.jNumber,
             index: Json.jNumber,
             pending: Json.jNumber,
             current: jNode,
@@ -172,9 +177,9 @@ const getProofStatus_internal: Server.GetRequest<
 };
 /** Current Proof Status of a Goal */
 export const getProofStatus: Server.GetRequest<
-  goal,
-  { index: number, pending: number, current: node, parents: node[],
-    tactic?: tactic, children: node[] }
+  { main: goal, unproved?: boolean, subtree?: boolean },
+  { size: number, index: number, pending: number, current: node,
+    parents: node[], tactic?: tactic, children: node[] }
   >= getProofStatus_internal;
 
 const goForward_internal: Server.SetRequest<goal,null> = {

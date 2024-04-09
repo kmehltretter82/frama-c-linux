@@ -237,14 +237,19 @@ export interface TIPProps {
 
 export function TIPView(props: TIPProps): JSX.Element {
   const { display, goal, onClose } = props;
+  // --- navbar settings
+  const [unproved, flipU] = Dome.useFlipSettings('frama-c.wp.goals.unproved');
+  const [subtree, flipT] = Dome.useFlipSettings('frama-c.wp.goals.subtree');
   // --- current goal
   const infos =
     States.useSyncArrayElt(WP.goals, goal) ?? WP.goalsDataDefault;
   // --- proof status
   const {
-    current, index = -1, pending = 0,
+    current, index = -1, pending = 0, size = 0,
     tactic: nodeTactic, parents = [], children = [],
-  } = States.useRequest(TIP.getProofStatus, goal, { pending: null }) ?? {};
+  } = States.useRequest(TIP.getProofStatus, goal ? {
+    main: goal, unproved, subtree,
+  } : undefined, { pending: null }) ?? {};
   // --- script status
   const { saved = false, proof = false, script } =
     States.useRequest(TIP.getScriptStatus, goal, { pending: null }) ?? {};
@@ -336,14 +341,20 @@ export function TIPView(props: TIPProps): JSX.Element {
   return (
     <Vfill display={display}>
       <ToolBar>
-        <Cell
-          icon='HOME'
-          label={infos.wpo} title='Goal identifier' />
+        <Cell icon='HOME' label={infos.wpo} title='Goal identifier' />
         <Item
           icon='CODE'
           display={0 <= index && index < pending && 1 < pending}
           label={`${index + 1}/${pending}`} title='Pending proof nodes' />
         <Item {...getStatus(infos)} />
+        <IconButton
+          display={size > 1}
+          icon='CIRC.PLUS' selected={subtree} onClick={flipT}
+          title='Show all tactic nodes' />
+        <IconButton
+          display={size > 1}
+          icon='CIRC.CHECK' selected={unproved} onClick={flipU}
+          title='Show unproved sub-goals only' />
         <Filler />
         <IconButton
           icon={copied ? 'DUPLICATE' : (saved ? 'FOLDER' : 'FOLDER.OPEN')}
