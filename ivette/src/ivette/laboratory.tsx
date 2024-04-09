@@ -607,13 +607,13 @@ Settings.onWindowSettings(() => {
       const settings = Settings.getWindowSettings(
         'ivette.laboratory', jLabSettings, defaultSettings
       );
-      let gotoView: viewId = '';
+      let selectTab: viewId = '';
       settings.tabs.forEach((tab, index) => {
         const view = VIEW.getElement(tab.view);
         if (view !== undefined) {
           applyFavorite(view, true);
           if (index === settings.tabIndex)
-            gotoView = tab.view;
+            selectTab = tab.view;
         }
       });
       settings.dock.forEach(dock => {
@@ -621,8 +621,13 @@ Settings.onWindowSettings(() => {
         if (comp !== undefined && !state.docked.has(comp.id))
           dockComponent(comp, dock.position);
       });
-      if (!state.tabKey && !gotoView) {
-        applyTab(gotoView);
+      if (!state.tabKey) {
+        if (selectTab)
+          applyTab(selectTab);
+        else {
+          const console = VIEW.getElement('ivette.console');
+          if (console !== undefined) applyView(console);
+        }
         setCurrentNone();
       }
     } finally {
@@ -1252,10 +1257,13 @@ function TabView(props: TabViewProps): JSX.Element | null {
     ]);
   };
 
+  const icon =
+    favorite ? (selected ? 'FAVORITE' : 'STAR') : 'DISPLAY';
+
   return (
     <Toolbar.Button
       className='labview-tab'
-      icon={selected ? 'DISPLAY' : undefined}
+      icon={icon}
       label={label}
       title={title}
       selected={selected}
@@ -1264,8 +1272,9 @@ function TabView(props: TabViewProps): JSX.Element | null {
     >
       <IconButton
         className='labview-tab-closing'
-        icon={custom === 0 ? 'FAVORITE' : 'CIRC.CLOSE'}
-        enabled={custom !== 0}
+        icon='CIRC.CLOSE'
+        visible={!favorite}
+        enabled={!favorite}
         onClick={onClose}
       />
     </Toolbar.Button>
