@@ -35,6 +35,7 @@ import * as Compare from 'dome/data/compare';
 import { State, GlobalState, useGlobalState } from 'dome/data/states';
 
 import { TitleBar } from 'ivette';
+import * as Display from 'ivette/display';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Kernel from 'frama-c/kernel/api/services';
@@ -425,7 +426,7 @@ const byMessage: Compare.ByFields<Message> = {
 
 const globalFilterState = new GlobalState(defaultFilter);
 
-export default function RenderMessages(): JSX.Element {
+export function RenderMessages(): JSX.Element {
 
   const [model] = React.useState(() => {
     const f = (msg: Message): string => msg.key;
@@ -523,3 +524,35 @@ export default function RenderMessages(): JSX.Element {
     </>
   );
 }
+
+// --------------------------------------------------------------------------
+// --- Alerts
+// --------------------------------------------------------------------------
+
+let CURSOR = 0;
+
+States.onSyncArray(Kernel.message, () => {
+  const data = States.getSyncArrayData(Kernel.message);
+  const curr = data.length < CURSOR ? 0 : CURSOR;
+  let errors = 0;
+  const plugins = new Set<string>();
+  for (let k = curr; k < data.length; k++) {
+    const m = data[k];
+    switch (m.kind) {
+      case Kernel.logkind.ERROR:
+      case Kernel.logkind.FAILURE:
+        errors++;
+        plugins.add(m.plugin);
+        break;
+    }
+  }
+  CURSOR = data.length;
+  const from = Array.of(plugins).join(',');
+  const many = errors > 0 ? 's' : '';
+  if (errors) {
+    Display.showError(`Frama-C/${from} Error${many}`);
+    Display.alertComponent('ivette.messages');
+  }
+});
+
+/* -------------------------------------------------------------------------- */

@@ -22,9 +22,9 @@
 
 import * as Dome from 'dome';
 import * as Ivette from 'ivette';
+import * as Display from 'ivette/display';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
-import * as Status from 'frama-c/kernel/Status';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as ASTview from 'frama-c/kernel/ASTview';
 import * as Locations from 'frama-c/kernel/Locations';
@@ -34,8 +34,7 @@ import './style.css';
 type access = 'Reads' | 'Writes';
 
 function handleError(err: string): void {
-  const text = `Studia failure: ${err}.`;
-  Status.setMessage({ text, kind: 'error' });
+  Display.showWarning({ label: 'Studia Failure', title: `Error (${err})` });
 }
 
 async function computeStudiaSelection(
@@ -68,7 +67,7 @@ export function buildMenu(
   attr: Ast.markerAttributesData,
 ): void {
   const { marker, kind } = attr;
-  switch(kind) {
+  switch (kind) {
     case 'LVAL':
       menu.push({
         label: 'Studia: select reads of l-value',
@@ -108,7 +107,7 @@ export function buildMenu(
 
 ASTview.registerMarkerMenuExtender(buildMenu);
 
-const studiaReadsMode : Ivette.SearchProps = {
+const studiaReadsMode: Ivette.SearchProps = {
   id: 'frama-c.plugins.studia.reads',
   rank: -1,
   label: 'Studia: reads',
@@ -119,7 +118,7 @@ const studiaReadsMode : Ivette.SearchProps = {
   onEnter: (p: string) => onEnter('Reads', p)
 };
 
-const studiaWritesMode : Ivette.SearchProps = {
+const studiaWritesMode: Ivette.SearchProps = {
   id: 'frama-c.plugins.studia.writes',
   rank: -1,
   label: 'Studia: writes',

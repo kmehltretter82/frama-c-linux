@@ -25,16 +25,19 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import { TitleBar } from 'ivette';
-import * as Server from 'frama-c/server';
 import { Button } from 'dome/controls/buttons';
 import { LED } from 'dome/controls/displays';
 import { Scroll } from 'dome/layout/boxes';
-import * as Status from 'frama-c/kernel/Status';
-import * as States from 'frama-c/states';
 import { GlobalState, useGlobalState } from 'dome/data/states';
+
+import { TitleBar } from 'ivette';
+import * as Display from 'ivette/display';
+
+import * as Server from 'frama-c/server';
+import * as States from 'frama-c/states';
 import * as PivotState from 'frama-c/plugins/pivot/api/general';
 import PivotTableUI from 'react-pivottable/PivotTableUI';
+
 import 'frama-c/kernel/PivotTable-style.css';
 
 // --------------------------------------------------------------------------
@@ -78,10 +81,9 @@ function PivotTableBuild(): JSX.Element {
   const [computing, setComputing] = React.useState(false);
   const [error, setError] = React.useState('');
   async function handleError(err: string): Promise<void> {
-    const msg =
-      `The pivot table could not be built: an error has occured (${err}).`;
-    setError(msg);
-    Status.setMessage({ text: msg, kind: 'error' });
+    const label = 'Pivot Table Error';
+    const title = `Building error (${err})`;
+    Display.showError({ label, title });
   }
   async function compute(): Promise<void> {
     setComputing(true);

@@ -101,14 +101,34 @@ function EditorFields(): JSX.Element {
 // --- Console Scrollback Forms
 // --------------------------------------------------------------------------
 
-function ConsoleScrollbackFields(
-  props: IvettePrefs.ConsoleScrollbackProps
-): JSX.Element {
+function ConsoleFields(): JSX.Element {
   const scrollback = Forms.useDefined(Forms.useValid(
-    Settings.useGlobalSettings(props.scrollback),
+    Settings.useGlobalSettings(IvettePrefs.ConsoleScrollback),
   ));
-  const title = 'Maximum number of lines in the console window';
-  return (<Forms.NumberField state={scrollback} label="Lines" title={title} />);
+  return (
+    <Forms.SpinnerField
+      state={scrollback}
+      label="Console History"
+      title="Number of lines kept from Frama-C output"
+      units="l"
+      min={0} step={500} max={20_000}
+    />
+  );
+}
+
+function NotificationFields(): JSX.Element {
+  const timer = Forms.useDefined(Forms.useValid(
+    Settings.useGlobalSettings(IvettePrefs.NotificationTimer),
+  ));
+  return (
+    <Forms.SpinnerField
+      state={timer}
+      label="Notification Timer"
+      title="Time before notifications vanish (in seconds, 0 means no timer)"
+      units="s"
+      min={0} step={1} max={60}
+    />
+  );
 }
 
 // --------------------------------------------------------------------------
@@ -124,8 +144,9 @@ export default function Preferences(): JSX.Element {
       <Forms.Section label="Editors" unfold>
         <EditorFields />
       </Forms.Section>
-      <Forms.Section label="Console Scrollback" unfold>
-        <ConsoleScrollbackFields scrollback={IvettePrefs.ConsoleScrollback} />
+      <Forms.Section label="Console" unfold>
+        <ConsoleFields />
+        <NotificationFields />
       </Forms.Section>
     </Forms.Page>
   );
