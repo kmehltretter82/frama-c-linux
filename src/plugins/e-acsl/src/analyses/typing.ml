@@ -530,6 +530,18 @@ let rec type_term
              ?ctx
              ~profile x)
       in
+      let type_args type_arg =
+        (* type all arguments using typing function [type_arg] while
+           making sure that later arguments are typed even if an exception is
+           raised during the typing of an earlier argument. *)
+        let exn_o = ref None in
+        let type_arg arg =
+          try type_arg arg
+          with exn -> match !exn_o with None -> exn_o := Some exn | Some _ -> ()
+        in
+        List.iter (fun arg -> type_arg arg) args;
+        Option.iter raise !exn_o
+      in
       if Builtins.mem li.l_var_info.lv_name then
         let typ_arg lvi arg =
           (* a built-in is a C function, so the context is necessarily a C
@@ -550,7 +562,7 @@ let rec type_term
         | LBpred p ->
           (* possible to have an [LBpred] here because we transformed
              [Papp] into [Tapp] *)
-          List.iter type_arg args;
+          type_args type_arg;
           let new_profile =
             Profile.make
               li.l_profile
@@ -562,7 +574,7 @@ let rec type_term
             pending_typing;
           c_int
         | LBterm t_body ->
-          List.iter type_arg args;
+          type_args type_arg;
           let new_profile =
             Profile.make
               li.l_profile
@@ -633,7 +645,7 @@ let rec type_term
              let type_arg arg =
                ignore @@ type_term ~use_gmp_opt:true ~arith_operand:false ~profile arg
              in
-             List.iter type_arg args;
+             type_args type_arg;
              (* TODO : improve error message to distinguish error messages
                 corresponding to unsupported primitives and wrong application
                 of supported primitive
