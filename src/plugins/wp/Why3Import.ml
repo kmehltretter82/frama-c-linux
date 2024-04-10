@@ -55,13 +55,15 @@ let pp_lti fmt (lti : C.logic_type_info) =
   Cpp.pp_logic_type_info fmt lti
 
 type tenv = C.logic_type_info W.Ty.Hts.t
-type tvars = C.logic_type W.Ty.Mtv.t
+type tvars = C.logic_type W.Ty.Mtv.t (*string * C.lt*)
+
 type uid_tvars = string W.Ty.Mtv.t
 
 let rec lt_of_ty (tenv : tenv) (tvs : tvars) (ty: W.Ty.ty) : C.logic_type =
   match ty.ty_node with
   | Tyvar x -> W.Ty.Mtv.find x tvs
   | Tyapp(s,ts) -> C.Ltype( lti_of_ts tenv s, List.map (lt_of_ty tenv tvs) ts)
+
 
 and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
   try W.Ty.Hts.find tenv ts with Not_found ->
@@ -82,11 +84,8 @@ and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
       }
     in W.Ty.Hts.add tenv ts lti ;
     L.debug ~level:0 "Added LTI %a" pp_lti lti; lti
-(* and lti_of_ls (tenv:tenv) (ls : W.Term.lsymbol) (lsdef : W.Decl.ls_defn) =
-   (* let temp_env = create_temp_env lsdef. *)
-   let tvars =
-    W.Ty.Mtv.map (fun aleph_name -> C.Lvar aleph_name) temp_env
-   in List.map (fun (ty:W.Ty.ty) -> lt_of_ty tenv tvars ty) ls.ls_args *)
+
+
 and lt_def_of_ts (tenv:tenv) (ts : W.Ty.tysymbol) (temp_env : uid_tvars) =
   match ts.ts_def with
   | NoDef | Range _ | Float _ -> None
@@ -95,11 +94,19 @@ and lt_def_of_ts (tenv:tenv) (ts : W.Ty.tysymbol) (temp_env : uid_tvars) =
       W.Ty.Mtv.map (fun aleph_name -> C.Lvar aleph_name) temp_env
     in
     Some (C.LTsyn (lt_of_ty tenv tvars ty))
+
+
 and create_temp_env (ts: W.Ty.tysymbol) : uid_tvars =
   List.fold_left
     (fun (tvs: uid_tvars) (tv: W.Ty.tvsymbol) ->
        W.Ty.Mtv.add tv (tv.tv_name.id_string) tvs
     ) W.Ty.Mtv.empty ts.ts_args
+
+let rec lti_of_ls (tenv:tenv) (ls : W.Term.lsymbol)  =
+let temp_env = create_temp_env (*tysymbol*) in
+let tvars =
+ W.Ty.Mtv.map (fun aleph_name -> C.Lvar aleph_name) temp_env
+in List.map (fun (ty:W.Ty.ty) -> lt_of_ty tenv tvars ty) ls.ls_args
 
 let import_theory env (tenv:tenv) thname =
   let theory_name, theory_path = extract_path thname in
