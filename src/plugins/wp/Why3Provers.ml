@@ -139,8 +139,8 @@ let select ~name ?version () =
     List.sort by_version @@ List.filter (filter ~name ?version) @@ provers ()
   with p::_ -> Some p | [] -> None
 
-let lookup ?(fallback=false) name =
-  match String.split_on_char ':' @@ String.lowercase_ascii name with
+let lookup ?(fallback=false) prover_name =
+  match String.split_on_char ':' @@ String.lowercase_ascii prover_name with
   | [name] -> select ~name ()
   | [name;version] ->
     begin
@@ -152,7 +152,8 @@ let lookup ?(fallback=false) name =
           | None -> None
           | Some p as res ->
             Wp_parameters.warning ~once:true
-              "Prover %s not found, fallback to %s" name (ident_wp p) ; res
+              "Prover %s not found, fallback to %s" prover_name (ident_wp p) ;
+            res
         else None
     end
   | _ -> None
