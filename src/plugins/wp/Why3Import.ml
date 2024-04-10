@@ -66,6 +66,7 @@ let pp_li fmt (li : C.logic_info) =
 
 type tenv = C.logic_type_info W.Ty.Hts.t
 type tvars = C.logic_type W.Ty.Mtv.t
+type tlogics = C.logic_info W.Term.Hls.t
 
 let tvars_of_txs (txs: W.Ty.tvsymbol list) : string list * tvars =
   List.fold_right
@@ -110,21 +111,22 @@ let lr_of_ty_opt (lt_opt) =
   | Some tr -> tr
 
 
-let lti_of_ls (tenv:tenv) (ls : W.Term.lsymbol) : C.logic_info =
+let li_of_ls (tenv:tenv) (ls : W.Term.lsymbol) (tlogics:tlogics) : C.logic_info =
   let l_tparams,tvars =
     tvars_of_txs @@ W.Ty.Stv.elements @@  W.Term.ls_ty_freevars ls in
   let l_type = Option.map (lt_of_ty tenv tvars) ls.ls_value in
   let l_profile = List.mapi (lv_of_ty tenv tvars) ls.ls_args in
   let l_args = List.map ( fun (lv:C.logic_var) -> lv.lv_type) l_profile in
   let signature = C.Larrow (l_args, lr_of_ty_opt l_type) in
-  {
-    l_var_info = Cil_const.make_logic_var_global "?" signature; (*"int::Int::add"*)
-    l_labels = [];
-    l_tparams;
-    l_type;
-    l_profile ;
-    l_body = C.LBnone;
-  }
+  let li =
+    C.{
+      l_var_info = Cil_const.make_logic_var_global ls.ls_name.id_string signature; (*"int::Int::add"*)
+      l_labels = [];
+      l_tparams;
+      l_type;
+      l_profile ;
+      l_body = C.LBnone;
+    } in W.Term.Hls.add tlogics ls li; li
 
 
 (* -------------------------------------------------------------------------- *)
@@ -134,7 +136,7 @@ let lti_of_ls (tenv:tenv) (ls : W.Term.lsymbol) : C.logic_info =
 
 
 
-let import_theory env (tenv:tenv) thname =
+let import_theory env (tenv:tenv) (tlogics:tlogics) thname =
   let theory_name, theory_path = extract_path thname in
   try
     let theory = W.Env.read_theory env theory_path theory_name in
@@ -164,7 +166,7 @@ let import_theory env (tenv:tenv) thname =
                 (fun ((ls,_):W.Decl.logic_decl) ->
                    L.debug ~level:0 "Decl and dlogic %a" pp_id ls.ls_name;
                    L.debug ~level:0 "Location %a"  pp_id_loc ls.ls_name;
-                   let li = lti_of_ls tenv ls in
+                   let li = li_of_ls tenv  ls tlogics in
                    L.debug ~level:0 "Corresponding dlogic LTI %a" pp_li li;
                 ) dlogics
             | _ -> L.debug ~level:0 "Decl but whatever"
@@ -180,13 +182,19 @@ let () =
   Boot.Main.extend
     begin fun () ->
       let env = create_why3_env @@ L.Library.get () in
-      let tenv : tenv = W.Ty.Hts.create 3 in
-      List.iter (import_theory env tenv) @@ L.Import.get ();
+      let tenv : tenv = W.Ty.Hts.create 0 in
+      let tlogics : tlogics = W.Term.Hls.create 0 in
+      List.iter (import_theory env tenv tlogics) @@ L.Import.get ();
       L.debug ~level:0 "Length of type environment : %d " (W.Ty.Hts.length tenv);
       W.Ty.Hts.iter (fun (ty) (lti) ->
           L.debug ~level:0 "TY %a" pp_id ty.ts_name;
           L.debug ~level:0 "LTI %a" pp_lti lti;
-        ) tenv
+        ) tenv;
+      W.Term.Hls.iter (fun (ls) (li) ->
+          L.debug ~level:0 "TY %a" pp_id ls.ls_name;
+          L.debug ~level:0 "LI %a" pp_li li;
+        ) tlogics
+
     end
 
 (* -------------------------------------------------------------------------- *)
