@@ -52,8 +52,13 @@ let pp_id_loc fmt (id : W.Ident.ident) =
   | Some loc -> W.Loc.pp_position fmt loc
   | None -> L.debug ~level:0 "No location found"
 
+(* For debug only*)
 let pp_lti fmt (lti : C.logic_type_info) =
   Cpp.pp_logic_type_info fmt lti
+
+(* For debug only*)
+let pp_li fmt (li : C.logic_info) =
+  Cpp.pp_logic_info fmt li
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Types                                                           --- *)
@@ -97,7 +102,7 @@ and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
 
 let lv_of_ty (tenv:tenv) (tvars:tvars) (index) (ty:W.Ty.ty)  : C.logic_var =
   Cil_const.make_logic_var_formal (Printf.sprintf "x%d" index)
-   @@ lt_of_ty tenv tvars ty
+  @@ lt_of_ty tenv tvars ty
 
 let lr_of_ty_opt (lt_opt) =
   match lt_opt with
@@ -108,18 +113,18 @@ let lr_of_ty_opt (lt_opt) =
 let lti_of_ls (tenv:tenv) (ls : W.Term.lsymbol) : C.logic_info =
   let l_tparams,tvars =
     tvars_of_txs @@ W.Ty.Stv.elements @@  W.Term.ls_ty_freevars ls in
-    let l_type = Option.map (lt_of_ty tenv tvars) ls.ls_value in
-    let l_profile = List.mapi (lv_of_ty tenv tvars) ls.ls_args in
-    let l_args = List.map ( fun (lv:C.logic_var) -> lv.lv_type) l_profile in
-    let signature = C.Larrow (l_args, lr_of_ty_opt l_type) in
-    {
-         l_var_info = Cil_const.make_logic_var_global "?" signature; (*"int::Int::add"*)
-         l_labels = [];
-         l_tparams;
-         l_type;
-         l_profile ;
-         l_body = C.LBnone;
-      }
+  let l_type = Option.map (lt_of_ty tenv tvars) ls.ls_value in
+  let l_profile = List.mapi (lv_of_ty tenv tvars) ls.ls_args in
+  let l_args = List.map ( fun (lv:C.logic_var) -> lv.lv_type) l_profile in
+  let signature = C.Larrow (l_args, lr_of_ty_opt l_type) in
+  {
+    l_var_info = Cil_const.make_logic_var_global "?" signature; (*"int::Int::add"*)
+    l_labels = [];
+    l_tparams;
+    l_type;
+    l_profile ;
+    l_body = C.LBnone;
+  }
 
 
 (* -------------------------------------------------------------------------- *)
@@ -159,7 +164,8 @@ let import_theory env (tenv:tenv) thname =
                 (fun ((ls,_):W.Decl.logic_decl) ->
                    L.debug ~level:0 "Decl and dlogic %a" pp_id ls.ls_name;
                    L.debug ~level:0 "Location %a"  pp_id_loc ls.ls_name;
-                   (* lti_of_ls tenv ls; *)
+                   let li = lti_of_ls tenv ls in
+                   L.debug ~level:0 "Corresponding dlogic LTI %a" pp_li li;
                 ) dlogics
             | _ -> L.debug ~level:0 "Decl but whatever"
           end
