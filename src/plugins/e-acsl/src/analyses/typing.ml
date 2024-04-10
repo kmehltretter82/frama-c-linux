@@ -509,6 +509,27 @@ let rec type_term
       Nan
 
     | Tapp(li, _, args) ->
+      let type_arg x =
+        let ctx = match x.term_type with
+          | Linteger ->
+            (* If the function parameter is an integer,
+               the kernel introduces a coercion to integer, so we will
+               always see integer here.*)
+            begin match x.term_node with
+              | TCast (true,_,_) -> None
+              |_ -> if Options.Gmp_only.get() then Some Gmpz else None
+            end
+          | Lreal -> Some Real
+          | Ctype _| Ltype _| Larrow _ | Lvar _ -> None
+        in
+        ignore
+          (type_term
+             ~use_gmp_opt:true
+             ~under_lambda:true
+             ~arith_operand
+             ?ctx
+             ~profile x)
+      in
       if Builtins.mem li.l_var_info.lv_name then
         let typ_arg lvi arg =
           (* a built-in is a C function, so the context is necessarily a C
@@ -529,28 +550,7 @@ let rec type_term
         | LBpred p ->
           (* possible to have an [LBpred] here because we transformed
              [Papp] into [Tapp] *)
-          List.iter
-            (fun x ->
-               let ctx = match x.term_type with
-                 | Linteger ->
-                   (* If the function parameter is an integer,
-                      the kernel introduces a coercion to integer, so we will
-                      always see integer here.*)
-                   begin match x.term_node with
-                     | TCast (true,_,_) -> None
-                     |_ -> if Options.Gmp_only.get() then Some Gmpz else None
-                   end
-                 | Lreal -> Some Real
-                 | Ctype _| Ltype _| Larrow _ | Lvar _ -> None
-               in
-               ignore
-                 (type_term
-                    ~use_gmp_opt:true
-                    ~under_lambda:true
-                    ~arith_operand
-                    ?ctx
-                    ~profile x))
-            args;
+          List.iter type_arg args;
           let new_profile =
             Profile.make
               li.l_profile
@@ -562,28 +562,7 @@ let rec type_term
             pending_typing;
           c_int
         | LBterm t_body ->
-          List.iter
-            (fun x ->
-               let ctx = match x.term_type with
-                 | Linteger ->
-                   (* If the function parameter is an integer,
-                      the kernel introduces a coercion to integer, so we will
-                      always see integer here.*)
-                   begin match x.term_node with
-                     | TCast (true,_,_) -> None
-                     |_ -> if Options.Gmp_only.get() then Some Gmpz else None
-                   end
-                 | Lreal -> Some Real
-                 | Ctype _| Ltype _| Larrow _ | Lvar _ -> None
-               in
-               ignore
-                 (type_term
-                    ~use_gmp_opt:true
-                    ~under_lambda:true
-                    ~arith_operand
-                    ?ctx
-                    ~profile x))
-            args;
+          List.iter type_arg args;
           let new_profile =
             Profile.make
               li.l_profile
