@@ -2471,9 +2471,11 @@ void argz_stringify(char *argz, size_t len, int sep)
   return;
 }
 
-/*@ assigns *to, *to_len;
-    assigns *to \from *(buf + (0 .. buf_len - 1));
-    assigns *to_len \from *(buf + (0 .. buf_len - 1));
+/*@ assigns *to, *to_len, *(*(to + (0 .. \old(*to_len) + buf_len)));
+    assigns *to \from *to, (indirect: *to_len), (indirect: buf_len);
+    assigns *to_len \from *to_len, buf_len;
+    assigns *(*(to + (0 .. \old(*to_len) + buf_len)))
+      \from *(*(to + (0 .. \old(*to_len)))), *(buf + (0 .. buf_len));
  */
 static void str_append(char **to, size_t *to_len, char const *buf,
                        size_t const buf_len)
