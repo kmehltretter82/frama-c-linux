@@ -49,8 +49,9 @@ let parse_prover = function
   | name ->
     match Why3Provers.lookup name with
     | Some p -> Some (Why3 p)
-    | None -> Wp_parameters.error ~once:true
-                "Prover '%s' not found in why3.conf" name ; None
+    | None ->
+      Wp_parameters.error ~once:true
+        "Prover '%s' not found in why3.conf" name ; None
 
 let parse_mode m =
   match String.lowercase_ascii m with
@@ -61,13 +62,20 @@ let parse_mode m =
   | "fixup" -> FixUpdate
   | _ ->
     Wp_parameters.error ~once:true
-      "Unrecognized mode %S (use 'batch' instead)" m ;
-    Batch
+      "Unrecognized mode %S (use 'batch' instead)" m ; Batch
 
 let name_of_prover = function
   | Why3 s -> Why3Provers.ident_wp s
   | Qed -> "qed"
   | Tactical -> "script"
+
+let prover_of_name ?fallback = function
+  | "qed" -> Some Qed
+  | "script" -> Some Tactical
+  | name ->
+    match Why3Provers.lookup ?fallback name with
+    | None -> None
+    | Some prv -> Some (Why3 prv)
 
 let title_of_prover ?version = function
   | Why3 s ->

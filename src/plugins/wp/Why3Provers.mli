@@ -35,7 +35,7 @@ val version : t -> string
 val altern : t -> string
 val compare : t -> t -> int
 
-val lookup : string -> t option
+val lookup : ?fallback:bool -> string -> t option
 val provers : unit -> t list
 val provers_set : unit -> Why3.Whyconf.Sprover.t
 val is_auto : t -> bool
