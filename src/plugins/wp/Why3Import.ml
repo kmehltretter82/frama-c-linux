@@ -76,11 +76,7 @@ let rec lt_of_ty (tenv : tenv) (tvs : tvars) (ty: W.Ty.ty) : C.logic_type =
 
 and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
   try W.Ty.Hts.find tenv ts with Not_found ->
-    let tvars = tvars_of_txs ts.ts_args in
-    let lt_params =
-      List.map
-        (fun (tv : W.Ty.tvsymbol) -> tv.tv_name.id_string)
-        ts.ts_args in
+    let (lt_params,tvars) = tvars_of_txs ts.ts_args in
     let lt_def =
       match ts.ts_def with
       | NoDef | Range _ | Float _ -> None
@@ -88,7 +84,7 @@ and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
     in
     let lti =
       C.{
-        lt_name = ts.ts_name.id_string;
+        lt_name = ts.ts_name.id_string; (* "int::Int::add" *)
         lt_params ; lt_def ;
         lt_attr = [];
       }
@@ -98,9 +94,32 @@ and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol): C.logic_type_info =
 (* -------------------------------------------------------------------------- *)
 (* ---    Functions                                                       --- *)
 (* -------------------------------------------------------------------------- *)
-let lti_of_ls (_:tenv) (ls : W.Term.lsymbol) : C.logic_info =
 
-  assert false
+let lv_of_ty (tenv:tenv) (tvars:tvars) (index) (ty:W.Ty.ty)  : C.logic_var =
+  Cil_const.make_logic_var_formal (Printf.sprintf "x%d" index)
+   @@ lt_of_ty tenv tvars ty
+
+let lr_of_ty_opt (lt_opt) =
+  match lt_opt with
+  | None -> C.Ctype (C.TVoid []) (* Same as logic_typing *)
+  | Some tr -> tr
+
+
+let lti_of_ls (tenv:tenv) (ls : W.Term.lsymbol) : C.logic_info =
+  let l_tparams,tvars =
+    tvars_of_txs @@ W.Ty.Stv.elements @@  W.Term.ls_ty_freevars ls in
+    let l_type = Option.map (lt_of_ty tenv tvars) ls.ls_value in
+    let l_profile = List.mapi (lv_of_ty tenv tvars) ls.ls_args in
+    let l_args = List.map ( fun (lv:C.logic_var) -> lv.lv_type) l_profile in
+    let signature = C.Larrow (l_args, lr_of_ty_opt l_type) in
+    {
+         l_var_info = Cil_const.make_logic_var_global "?" signature; (*"int::Int::add"*)
+         l_labels = [];
+         l_tparams;
+         l_type;
+         l_profile ;
+         l_body = C.LBnone;
+      }
 
 
 (* -------------------------------------------------------------------------- *)
