@@ -26,7 +26,7 @@
 /* -------------------------------------------------------------------------- */
 
 import React from 'react';
-
+import * as Dome from 'dome';
 import { ToolBar, Filler } from 'dome/frame/toolbars';
 import { Code } from 'dome/controls/labels';
 import { Button, IconButton } from 'dome/controls/buttons';

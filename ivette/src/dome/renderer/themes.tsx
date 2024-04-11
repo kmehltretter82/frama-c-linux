@@ -33,6 +33,7 @@ import * as Dome from 'dome';
 import * as Settings from 'dome/data/settings';
 import { State } from 'dome/data/states';
 import { ipcRenderer } from 'electron';
+
 /* -------------------------------------------------------------------------- */
 /* --- Global Settings                                                    --- */
 /* -------------------------------------------------------------------------- */
