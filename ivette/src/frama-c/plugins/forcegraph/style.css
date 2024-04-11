@@ -1,3 +1,13 @@
 /* -------------------------------------------------------------------------- */
 /* --- Styling Graph Components                                           --- */
 /* -------------------------------------------------------------------------- */
+.forcegraph-item-graph{
+    color: var(--text);
+    background-color:  var(--background-profound);
+    
+}
+.forcegraph-item-graph .toolbar{
+    text-align: right;
+    
+    
+}

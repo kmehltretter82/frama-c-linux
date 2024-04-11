@@ -22,7 +22,12 @@
 
 import React from 'react';
 // import other libs
-import './style.css';
+import ForceGraph2D, {
+  ForceGraphMethods as ForceGraphMethods2D,
+} from 'react-force-graph-2d';
+import ForceGraph3D, {
+  ForceGraphMethods as ForceGraphMethods3D,
+} from 'react-force-graph-3d';
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Specifications                                               --- */
@@ -59,7 +64,7 @@ export interface Edge extends Attributes {
 }
 
 export type Callback = () => void;
-export type SelectionCallback = (node: string, evt: React.MouseEvent) => void;
+export type SelectionCallback = (node: string, evt: MouseEvent) => void;
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Implementation                                               --- */
@@ -95,7 +100,7 @@ export interface GraphProps {
   layout?: Layout;
 
   /** Invoked when a node is selected. */
-  onSelection?: Callback;
+  onSelection?: SelectionCallback;
 
   /** Invoked after layout is computed (typically used after a reset). */
   onReady?: Callback;
@@ -114,8 +119,120 @@ export interface GraphProps {
 /* --- Graph Component                                                    --- */
 /* -------------------------------------------------------------------------- */
 
-export function Graph(_props: GraphProps): JSX.Element {
-  return <></>;
+/* -------------------------------------------------------------------------- */
+/* --- Graph Component                                                    --- */
+/* -------------------------------------------------------------------------- */
+
+export function Graph(props: {
+  graph: GraphProps;
+  setInitGraph: React.Dispatch<React.SetStateAction<GraphProps>>;
+}): JSX.Element {
+  const fgRef2D = React.useRef<ForceGraphMethods2D | undefined>(undefined);
+  const fgRef3D = React.useRef<ForceGraphMethods3D | undefined>(undefined);
+  const [graph2D, setGraph2D] = React.useState({
+    nodes: props.graph.nodes.map((node) => {
+      return { id: node.id, name: node.label };
+    }),
+    links: props.graph.edges.map((edge) => {
+      return { source: edge.fromNode, target: edge.toNode };
+    }),
+  });
+
+  // add and remove node on ForceGraph2D
+  React.useEffect(() => {
+    setGraph2D((prevGraph) => {
+      if (props.graph.nodes.length > prevGraph.nodes.length) {
+        const newNode = {
+          id: props.graph.nodes[props.graph.nodes.length - 1].id,
+          name: props.graph.nodes[props.graph.nodes.length - 1].label,
+        };
+        const fromNodeId = prevGraph.nodes[prevGraph.nodes.length - 1].id;
+        const newEdge = { source: fromNodeId, target: newNode.id };
+
+        return {
+          ...prevGraph,
+          nodes: [...prevGraph.nodes, newNode],
+          links: [...prevGraph.links, newEdge],
+        };
+      } else {
+        if (props.graph.nodes.length < prevGraph.nodes.length) {
+          return {
+            ...prevGraph,
+            nodes: prevGraph.nodes.slice(0, -1),
+            links: prevGraph.links.slice(0, -1),
+          };
+        } else {
+          return { nodes: prevGraph.nodes, links: prevGraph.links };
+        }
+      }
+    });
+  }, [props.graph.nodes, props.graph.edges]);
+
+  React.useEffect(() => {
+    // Zoom update on ForceGraph2D
+    fgRef2D.current?.zoom(props.graph.zoom || 0);
+    // fgRef3D.current?.cameraPosition();
+  }, [props.graph.zoom]);
+
+  return (
+    <div className={props.graph.className}>
+      {props.graph.children}
+      {props.graph.display ? (
+        props.graph.layout === '2D' ? (
+          <ForceGraph2D
+            ref={fgRef2D}
+            graphData={graph2D}
+            // autoPauseRedraw performance optimization to automatically
+            // pause redrawing the 2D canvas at every frame whenever
+            // the simulation engine is halted
+            autoPauseRedraw={true}
+            // Nodes velocity decay that simulates the medium resistance.
+            d3VelocityDecay={1}
+            dagLevelDistance={50}
+            // Node selection
+            onNodeClick={(node, event): void => {
+              if (props.graph.onSelection) {
+                props.graph.onSelection(String(node.id), event);
+              }
+              // change the selected value of GraphProps
+              props.setInitGraph((prevGraph) => {
+                return { ...prevGraph, selected: String(node.id) };
+              });
+            }}
+            onNodeDragEnd={(): void => {
+              // Change x and y value on node ForceGraph2D
+              setGraph2D((prevGraph) => {
+                return { ...prevGraph };
+              });
+              // Change the x value and y value of GraphProps
+              props.setInitGraph((prevGraph) => {
+                return { ...prevGraph };
+              });
+            }}
+            nodeLabel={'name'}
+            // How long (ms) to render for before stopping
+            // and freezing the layout engine.
+            cooldownTime={50}
+            onRenderFramePost={(): void => {
+              if (props.graph.onReady) {
+                props.graph.onReady();
+              }
+            }}
+          />
+        ) : (
+          <ForceGraph3D
+            ref={fgRef3D}
+            graphData={graph2D}
+            d3VelocityDecay={1}
+            dagLevelDistance={50}
+          />
+        )
+      ) : (
+        <></>
+      )}
+    </div>
+  );
 }
+
 
 /* -------------------------------------------------------------------------- */
