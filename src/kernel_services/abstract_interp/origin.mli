@@ -54,6 +54,9 @@ val descr: t -> string
 
 val join: t -> t -> t
 
+(** Records the creation of an imprecise value of the given bases. *)
+val register: Base.SetLattice.t -> t -> unit
+
 (** Records the write of an imprecise value of the given bases,
     with the given origin.
     Returns [true] if the given origin has never been written before,

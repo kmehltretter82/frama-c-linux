@@ -39,10 +39,10 @@ theory Vset
   function singleton 'a : set 'a
 
   function union (set 'a) (set 'a) : set 'a
-  function inter  (set 'a) (set 'a) : set 'a
+  clone algebra.AC as Lunion with type t = set 'a, function op = union with axiom .
 
-  meta AC function union
-  meta AC function inter
+  function inter (set 'a) (set 'a) : set 'a
+  clone algebra.AC as Linter with type t = set 'a, function op = inter with axiom .
 
   predicate member 'a (set 'a)
   function member_bool 'a (set 'a) : bool
@@ -66,7 +66,7 @@ theory Vset
   axiom member_bool : forall x:'a. forall s:set 'a [member_bool x s].
     if member x s then member_bool x s = True else member_bool x s = False
 
-  axiom member_empty : forall x:'a [member x empty]. 
+  axiom member_empty : forall x:'a [member x empty].
     not (member x empty)
 
   axiom member_singleton : forall x:'a,y:'a [member x (singleton y)].

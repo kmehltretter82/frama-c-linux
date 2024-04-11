@@ -74,6 +74,7 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
   let loc = p.pred_loc in
   let logic_env = Env.Logic_env.get env in
   Current_loc.set loc;
+  let of_bool = function true -> Cil.one ~loc | false -> Cil.zero ~loc in
   match p.pred_content with
   | Pfalse -> Cil.zero ~loc, adata, env
   | Ptrue -> Cil.one ~loc, adata, env
@@ -216,21 +217,29 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
       Translate_ats.to_exp ~loc ~adata kf env (PoT_pred p) label
   | Pvalid_read(BuiltinLabel Here, t) as pc
   | (Pvalid(BuiltinLabel Here, t) as pc) ->
-    let call_valid ~adata t p =
-      let name = match pc with
-        | Pvalid _ -> "valid"
-        | Pvalid_read _ -> "valid_read"
-        | _ -> assert false
-      in
-      let e, adata, env =
-        Memory_translate.call_valid ~adata ~loc kf name Cil.intType env t p
-      in
-      let adata = Assert.register_pred ~loc env p e adata in
-      e, adata, env
-    in
-    (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
-       now convert this right-most valid. *)
-    call_valid ~adata t p
+    begin
+      match pc, Memory_tracking.SpecialPointers.pointer_of_term t with
+      (* static resolution: \valid(stdout) ≡ 1; \valid(stdin) ≡ 0; etc. *)
+      | Pvalid _, Some spec -> of_bool spec.writeable, adata, env
+      (* static resolution: \valid_read(stdin) ≡ 1; \valid_read(&errno) ≡ 1; etc. *)
+      | Pvalid_read _, Some _spec -> of_bool true, adata, env
+      | _ ->
+        let call_valid ~adata t p =
+          let name = match pc with
+            | Pvalid _ -> "valid"
+            | Pvalid_read _ -> "valid_read"
+            | _ -> assert false
+          in
+          let e, adata, env =
+            Memory_translate.call_valid ~adata ~loc kf name Cil.intType env t p
+          in
+          let adata = Assert.register_pred ~loc env p e adata in
+          e, adata, env
+        in
+        (* we already transformed \valid(t) into \initialized(&t) && \valid(t):
+           now convert this right-most valid. *)
+        call_valid ~adata t p
+    end
   | Pvalid _ -> Env.not_yet env "labeled \\valid"
   | Pvalid_read _ -> Env.not_yet env "labeled \\valid_read"
   | Pseparated tlist ->
@@ -267,38 +276,46 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
     let adata = Assert.register_pred ~loc env p e adata in
     e, adata, env
   | Pinitialized(BuiltinLabel Here, t) ->
-    let e, adata, env =
-      (match t.term_node with
-       (* optimisation when we know that the initialisation is ok *)
-       | TAddrOf (TResult _, TNoOffset) -> Cil.one ~loc, adata, env
-       | TAddrOf (TVar { lv_origin = Some vi }, TNoOffset)
-         when
-           vi.vformal || vi.vglob || Functions.RTL.is_generated_name vi.vname ->
-         Cil.one ~loc, adata, env
-       | _ ->
-         let e, adata, env =
-           Memory_translate.call_with_size
-             ~adata
-             ~loc
-             kf
-             "initialized"
-             Cil.intType
-             env
-             [ t ]
-             p
-         in
-         let adata = Assert.register_pred ~loc env p e adata in
-         e, adata, env)
-    in
-    e, adata, env
+    begin
+      match Memory_tracking.SpecialPointers.pointer_of_term t with
+      (* static resolutions: \initialized(stdout) ≡ 1; etc. *)
+      | Some spec -> of_bool spec.initialized, adata, env
+      | None ->
+        match t.term_node with
+        (* optimisation when we know that the initialisation is ok *)
+        | TAddrOf (TResult _, TNoOffset) -> Cil.one ~loc, adata, env
+        | TAddrOf (TVar { lv_origin = Some vi }, TNoOffset)
+          when
+            vi.vformal || vi.vglob || Functions.RTL.is_generated_name vi.vname ->
+          Cil.one ~loc, adata, env
+        | _ ->
+          let e, adata, env =
+            Memory_translate.call_with_size
+              ~adata
+              ~loc
+              kf
+              "initialized"
+              Cil.intType
+              env
+              [ t ]
+              p
+          in
+          let adata = Assert.register_pred ~loc env p e adata in
+          e, adata, env
+    end
   | Pinitialized _ -> Env.not_yet env "labeled \\initialized"
   | Pallocable _ -> Env.not_yet env "\\allocate"
-  | Pfreeable(BuiltinLabel Here, t) ->
-    let e, adata, env =
-      Memory_translate.call ~adata ~loc kf "freeable" Cil.intType env t
-    in
-    let adata = Assert.register_pred ~loc env p e adata in
-    e, adata, env
+  | Pfreeable(BuiltinLabel Here, t) -> begin
+      match Memory_tracking.SpecialPointers.pointer_of_term t with
+      (* static resolutions: \freeable(stdout) ≡ 0; etc. *)
+      | Some spec -> of_bool spec.freeable, adata, env
+      | None ->
+        let e, adata, env =
+          Memory_translate.call ~adata ~loc kf "freeable" Cil.intType env t
+        in
+        let adata = Assert.register_pred ~loc env p e adata in
+        e, adata, env
+    end
   | Pfreeable _ -> Env.not_yet env "labeled \\freeable"
   | Pfresh _ -> Env.not_yet env "\\fresh"
 

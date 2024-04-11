@@ -36,7 +36,6 @@ import { Space } from 'dome/frame/toolbars';
 import { TitleBar } from 'ivette';
 import * as Display from 'ivette/display';
 import * as Ast from 'frama-c/kernel/api/ast';
-import * as Status from 'frama-c/kernel/Status';
 import * as Server from 'frama-c/server';
 
 // --------------------------------------------------------------------------
@@ -61,20 +60,16 @@ export function useSelection(): MultiSelection {
   return s;
 }
 
-export function setSelection(s: MultiSelection): void
-{
+export function setSelection(s: MultiSelection): void {
   MultiSelection.setValue(s);
   const marker = s.index !== undefined ? s.markers[s.index] : undefined;
   if (marker) States.setSelected(marker);
   if (s.plugin && s.markers.length > 0) {
-    const text =
+    const label =
       `${s.plugin}: ${s.markers.length} locations selected, \
       listed in the 'Locations' panel`;
     const title = `${s.label}: ${s.markers.length} locations selected`;
-    Status.setMessage({
-      text, title,
-      kind: 'success'
-    });
+    Display.showMessage({ label, title });
     Display.alertComponent('fc.kernel.locations');
   }
 }
@@ -86,16 +81,14 @@ export function setIndex(index: number): void {
   setSelection({ ...s, index });
 }
 
-function sameMarkers(xs: Ast.marker[], ys: Ast.marker[]): boolean
-{
+function sameMarkers(xs: Ast.marker[], ys: Ast.marker[]): boolean {
   if (xs.length !== ys.length) return false;
   for (let k = 0; k < xs.length; k++)
     if (xs[k] !== ys[k]) return false;
   return true;
 }
 
-function sameSelection(u: MultiSelection, v: MultiSelection): boolean
-{
+function sameSelection(u: MultiSelection, v: MultiSelection): boolean {
   if (u.label !== v.label) return false;
   if (u.title !== v.title) return false;
   return sameMarkers(u.markers, v.markers);
@@ -105,12 +98,11 @@ function sameSelection(u: MultiSelection, v: MultiSelection): boolean
    Update the list of markers and select its first element,
    or cycle to the next element wrt current selection.
  */
-export function setNextSelection(s: MultiSelection): void
-{
+export function setNextSelection(s: MultiSelection): void {
   const selection = MultiSelection.getValue();
   if (s.index === undefined && sameSelection(selection, s)) {
     const { index, markers } = selection;
-    const target = index === undefined ? 0 : index+1;
+    const target = index === undefined ? 0 : index + 1;
     const select = target < markers.length ? target : 0;
     setSelection({ ...selection, index: select });
   } else {
@@ -143,14 +135,14 @@ class Model extends CompactModel<Ast.marker, Data> {
 }
 
 const renderIndex: Renderer<number> =
-  (index) => <Cell label={`${index+1}`}/>;
+  (index) => <Cell label={`${index + 1}`} />;
 
 const renderDecl: Renderer<Data> =
-(d) => {
-  const name = d.decl.name;
-  const label = d.decl.label;
-  return <Cell label={name} title={label} />;
-};
+  (d) => {
+    const name = d.decl.name;
+    const label = d.decl.label;
+    return <Cell label={name} title={label} />;
+  };
 
 const renderLocation: Renderer<Data> =
   (d) => {
@@ -183,7 +175,7 @@ export default function LocationsTable(): JSX.Element {
   const selected = index !== undefined ? markers[index] : undefined;
   const size = markers.length;
   const kindex = index === undefined ? (-1) : index;
-  const indexLabel = index === undefined ? '…' : index+1;
+  const indexLabel = index === undefined ? '…' : index + 1;
   const positionLabel = `${indexLabel} / ${size}`;
 
   // Component
@@ -194,13 +186,13 @@ export default function LocationsTable(): JSX.Element {
           icon='ANGLE.LEFT'
           title='Previous location'
           enabled={0 < kindex}
-          onClick={() => gotoIndex(kindex-1)}
+          onClick={() => gotoIndex(kindex - 1)}
         />
         <IconButton
           icon='ANGLE.RIGHT'
           title='Next location'
           enabled={(-1) <= kindex && kindex + 1 < size}
-          onClick={() => gotoIndex(kindex+1)}
+          onClick={() => gotoIndex(kindex + 1)}
         />
         <Space />
         <Label
@@ -218,11 +210,11 @@ export default function LocationsTable(): JSX.Element {
       <Label className='locations' label={label} title={title} />
       <Table
         model={model}
-        display={size >0}
+        display={size > 0}
         selection={selected}
         onSelection={(_row, _key, index) => gotoIndex(index)}
         settings="ivette.locations.table"
-        >
+      >
         <Column
           id='index' label='#' align='center' width={25}
           render={renderIndex} />

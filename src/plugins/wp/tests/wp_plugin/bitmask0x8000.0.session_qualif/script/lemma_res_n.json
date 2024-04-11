@@ -4,6 +4,6 @@
                 "target": "not (bit_test off_0 15)",
                 "pattern": "!bit_test$off15" },
     "children": { "Bit #15 (inf)": [ { "prover": "qed", "verdict": "valid" } ],
-                  "Bit #15 (sup)": [ { "prover": "Alt-Ergo:2.4.2",
+                  "Bit #15 (sup)": [ { "prover": "Alt-Ergo:2.5.3",
                                        "verdict": "valid", "time": 0.0204,
                                        "steps": 52 } ] } } ]

@@ -22,17 +22,17 @@
 
 import React from 'react';
 import _ from 'lodash';
-import * as Ivette from 'ivette';
 import * as Dome from 'dome';
 import * as System from 'dome/system';
+import { GlobalState, useGlobalState } from 'dome/data/states';
+import * as Ivette from 'ivette';
+import * as Display from 'ivette/display';
 import * as States from 'frama-c/states';
 import * as Server from 'frama-c/server';
-import * as Status from 'frama-c/kernel/Status';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Values from 'frama-c/plugins/eva/api/values';
 import EvaReady from './EvaReady';
-import { GlobalState, useGlobalState } from 'dome/data/states';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
@@ -921,7 +921,7 @@ interface EvaluationModeProps {
 }
 
 const evalShortcut = System.platform === 'macos' ? 'Cmd+E' : 'Ctrl+E';
-const evalMode : Ivette.SearchProps = {
+const evalMode: Ivette.SearchProps = {
   id: 'frama-c.eva.evalMode',
   label: 'Evaluation',
   title: `Evaluate an ACSL expression (shortcut: ${evalShortcut})`,
@@ -951,13 +951,14 @@ function useEvaluationMode(props: EvaluationModeProps): void {
       const onEnter = (pattern: string): void => {
         const data = { stmt: marker, term: pattern };
         const handleError = (err: string): void => {
-          const text = `${pattern} could not be evaluated: ${err}.`;
-          Status.setMessage({ text, kind: 'error' });
+          const label = 'Evaluation Error';
+          const title = `${pattern} could not be evaluated: ${err}.`;
+          Display.showWarning({ label, title });
         };
         const addProbe = (target: Ast.marker): void => {
           setLocPin(scope, target, true);
-          const text = `${pattern} evaluated in the 'Eva Values' panel`;
-          Status.setMessage({ text, kind: 'success' });
+          Display.showMessage('New Probe');
+          Display.alertComponent('fc.eva.values');
         };
         Server.send(Ast.parseExpr, data).then(addProbe).catch(handleError);
       };

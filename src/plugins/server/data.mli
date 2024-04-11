@@ -81,6 +81,7 @@ module Jint : S with type t = int
 module Jfloat : S with type t = float
 module Jstring : S with type t = string
 module Jalpha : S with type t = string
+module Jfile : S with type t = Filepath.Normalized.t
 
 (** Rich text encoding, see [Jbuffer]. *)
 module Jtext : S with type t = json

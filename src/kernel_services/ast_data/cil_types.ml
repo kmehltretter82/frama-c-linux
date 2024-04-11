@@ -55,6 +55,118 @@
 (****************************************************************************)
 
 (* ************************************************************************* *)
+(** {2 Simple types} *)
+(* ************************************************************************* *)
+
+(* ************************************************************************* *)
+(** {3 Operators} *)
+(* ************************************************************************* *)
+
+(** Unary operators *)
+type unop =
+  | Neg   (** Unary minus *)
+  | BNot  (** Bitwise complement (~) *)
+  | LNot  (** Logical Not (!) *)
+[@@deriving eq]
+
+(** Binary operations *)
+type binop =
+    PlusA    (** arithmetic + *)
+  | PlusPI   (** pointer + integer *)
+  | MinusA   (** arithmetic - *)
+  | MinusPI  (** pointer - integer *)
+  | MinusPP  (** pointer - pointer *)
+  | Mult     (** * *)
+  | Div      (** /
+                 @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+  | Mod      (** %
+                 @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+  | Shiftlt  (** shift left *)
+  | Shiftrt  (** shift right *)
+
+  | Lt       (** <  (arithmetic comparison) *)
+  | Gt       (** >  (arithmetic comparison) *)
+  | Le       (** <= (arithmetic comparison) *)
+  | Ge       (** >= (arithmetic comparison) *)
+  | Eq       (** == (arithmetic comparison) *)
+  | Ne       (** != (arithmetic comparison) *)
+  | BAnd     (** bitwise and *)
+  | BXor     (** exclusive-or *)
+  | BOr      (** inclusive-or *)
+
+  | LAnd     (** logical and. Unlike other expressions this one does not always
+                 evaluate both operands. If you want
+                 to use these, you must set
+                 {!Cil.useLogicalOperators}. *)
+  | LOr      (** logical or. Unlike other expressions this one does not always
+                 evaluate both operands.  If you
+                 want to use these, you must set
+                 {!Cil.useLogicalOperators}. *)
+[@@deriving eq]
+
+(* ************************************************************************* *)
+(** {3 Types} *)
+(* ************************************************************************* *)
+
+(** Various kinds of integers *)
+type ikind =
+  | IBool       (** [_Bool] *)
+  | IChar       (** [char] *)
+  | ISChar      (** [signed char] *)
+  | IUChar      (** [unsigned char] *)
+  | IInt        (** [int] *)
+  | IUInt       (** [unsigned int] *)
+  | IShort      (** [short] *)
+  | IUShort     (** [unsigned short] *)
+  | ILong       (** [long] *)
+  | IULong      (** [unsigned long] *)
+  | ILongLong   (** [long long] (or [_int64] on Microsoft Visual C) *)
+  | IULongLong  (** [unsigned long long] (or [unsigned _int64] on MSVC) *)
+[@@deriving eq]
+
+(** Various kinds of floating-point numbers*)
+type fkind =
+  | FFloat      (** [float] *)
+  | FDouble     (** [double] *)
+  | FLongDouble (** [long double] *)
+[@@deriving eq]
+
+(* ************************************************************************* *)
+(** {3 Logic} *)
+(* ************************************************************************* *)
+
+type predicate_kind = Assert | Check | Admit
+[@@deriving eq]
+
+(** builtin logic labels defined in ACSL. *)
+type logic_builtin_label =
+  | Here
+  | Old
+  | Pre
+  | Post
+  | LoopEntry
+  | LoopCurrent
+  | Init
+[@@deriving eq]
+
+(** comparison relations*)
+type relation =
+  | Rlt
+  | Rgt
+  | Rle
+  | Rge
+  | Req
+  | Rneq
+  (** Different
+      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
+  *)
+[@@deriving eq]
+
+(** kind of termination a post-condition applies to. See ACSL manual. *)
+type termination_kind = Normal | Exits | Breaks | Continues | Returns
+[@@deriving eq]
+
+(* ************************************************************************* *)
 (** {2 Root of the AST} *)
 (* ************************************************************************* *)
 
@@ -242,28 +354,6 @@ and typ =
 
   | TBuiltin_va_list of attributes
   (** This is the same as the gcc's type with the same name *)
-
-(** Various kinds of integers *)
-and ikind =
-    IBool       (** [_Bool] *)
-  | IChar       (** [char] *)
-  | ISChar      (** [signed char] *)
-  | IUChar      (** [unsigned char] *)
-  | IInt        (** [int] *)
-  | IUInt       (** [unsigned int] *)
-  | IShort      (** [short] *)
-  | IUShort     (** [unsigned short] *)
-  | ILong       (** [long] *)
-  | IULong      (** [unsigned long] *)
-  | ILongLong   (** [long long] (or [_int64] on Microsoft Visual C) *)
-  | IULongLong  (** [unsigned long long] (or [unsigned _int64] on Microsoft
-                    Visual C) *)
-
-(** Various kinds of floating-point numbers*)
-and fkind =
-    FFloat      (** [float] *)
-  | FDouble     (** [double] *)
-  | FLongDouble (** [long double] *)
 
 (* ************************************************************************* *)
 (** {2 Attributes} *)
@@ -741,46 +831,6 @@ and constant =
   | CEnum of enumitem
   (** An enumeration constant. Use [Cillower.lowerEnumVisitor] to replace these
       with integer constants. *)
-
-(** Unary operators *)
-and unop =
-    Neg   (** Unary minus *)
-  | BNot  (** Bitwise complement (~) *)
-  | LNot  (** Logical Not (!) *)
-
-(** Binary operations *)
-and binop =
-    PlusA    (** arithmetic + *)
-  | PlusPI   (** pointer + integer *)
-  | MinusA   (** arithmetic - *)
-  | MinusPI  (** pointer - integer *)
-  | MinusPP  (** pointer - pointer *)
-  | Mult     (** * *)
-  | Div      (** /
-                 @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-  | Mod      (** %
-                 @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-  | Shiftlt  (** shift left *)
-  | Shiftrt  (** shift right *)
-
-  | Lt       (** <  (arithmetic comparison) *)
-  | Gt       (** >  (arithmetic comparison) *)
-  | Le       (** <= (arithmetic comparison) *)
-  | Ge       (** >= (arithmetic comparison) *)
-  | Eq       (** == (arithmetic comparison) *)
-  | Ne       (** != (arithmetic comparison) *)
-  | BAnd     (** bitwise and *)
-  | BXor     (** exclusive-or *)
-  | BOr      (** inclusive-or *)
-
-  | LAnd     (** logical and. Unlike other expressions this one does not always
-                 evaluate both operands. If you want
-                 to use these, you must set
-                 {!Cil.useLogicalOperators}. *)
-  | LOr      (** logical or. Unlike other expressions this one does not always
-                 evaluate both operands.  If you
-                 want to use these, you must set
-                 {!Cil.useLogicalOperators}. *)
 
 (* ************************************************************************* *)
 (** {2 Left values} *)
@@ -1321,16 +1371,6 @@ and logic_label =
   | FormalLabel of string (** label of global annotation. *)
   | BuiltinLabel of logic_builtin_label
 
-(** builtin logic labels defined in ACSL. *)
-and logic_builtin_label =
-  | Here
-  | Old
-  | Pre
-  | Post
-  | LoopEntry
-  | LoopCurrent
-  | Init
-
 (* ************************************************************************* *)
 (** {2 Terms} *)
 (* ************************************************************************* *)
@@ -1523,19 +1563,6 @@ and logic_ctor_info =
 (** variables bound by a quantifier. *)
 and quantifiers = logic_var list
 
-(** comparison relations*)
-and relation =
-  | Rlt
-  | Rgt
-  | Rle
-  | Rge
-  | Req
-  | Rneq
-  (** Different
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
-  *)
-
-
 (** predicates *)
 and predicate_node =
   | Pfalse (** always-false predicate. *)
@@ -1577,11 +1604,6 @@ and identified_predicate = {
   ip_id: int; (** identifier *)
   ip_content: toplevel_predicate; (** the predicate itself*)
 }
-
-and predicate_kind =
-  | Assert
-  | Check
-  | Admit
 
 (** main statement of an annotation. *)
 and toplevel_predicate = {
@@ -1712,9 +1734,6 @@ and behavior = {
   mutable b_extended : acsl_extension list
   (** extensions *)
 }
-
-(** kind of termination a post-condition applies to. See ACSL manual. *)
-and termination_kind = Normal | Exits | Breaks | Continues | Returns
 
 (** Pragmas for the value analysis plugin of Frama-C. *)
 and loop_pragma =

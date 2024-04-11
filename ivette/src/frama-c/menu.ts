@@ -24,14 +24,14 @@
 /* --- Frama-C MENU                                                       ---*/
 /* --------------------------------------------------------------------------*/
 
+import { ipcRenderer } from 'electron';
 import * as Dome from 'dome';
 import * as Dialogs from 'dome/dialogs';
+import * as Display from 'ivette/display';
 import * as Server from 'frama-c/server';
 import * as Services from 'frama-c/kernel/api/services';
 import * as Ast from 'frama-c/kernel/api/ast';
-import * as Status from 'frama-c/kernel/Status';
 import * as States from 'frama-c/states';
-import { ipcRenderer } from 'electron';
 
 const cFilter = {
   name: 'C source files',
@@ -43,10 +43,9 @@ const allFilter = {
 };
 
 async function parseFiles(files: string[]): Promise<void> {
-  Status.setMessage({ text: 'Parsing source files…', kind: 'progress' });
   await Server.send(Ast.setFiles, files);
   await Server.send(Ast.compute, {});
-  Status.setMessage({ text: 'Source files parsed.', kind: 'success' });
+  Display.showMessage('Source files parsed.');
   return;
 }
 
@@ -77,7 +76,6 @@ async function addFiles(): Promise<void> {
 }
 
 async function reparseFiles(): Promise<void> {
-  Status.setMessage({ text: 'Parsing source files…', kind: 'progress' });
   const files = await Server.send(Ast.getFiles, {});
   if (files) {
     await Server.send(Ast.setFiles, []);
@@ -88,15 +86,9 @@ async function reparseFiles(): Promise<void> {
 
 async function loadSession(): Promise<void> {
   const file = await Dialogs.showOpenFile({ title: 'Load a saved session' });
-  Status.setMessage({ text: 'Loading session…', kind: 'progress' });
   const error = await Server.send(Services.load, file);
   States.clearHistory();
   if (error) {
-    Status.setMessage({
-      text: 'Error when loading the session',
-      title: error,
-      kind: 'error',
-    });
     await Dialogs.showMessageBox({
       message: 'An error has occurred when loading the file',
       details: `File: ${file}\nError: ${error}`,
@@ -104,33 +96,20 @@ async function loadSession(): Promise<void> {
       buttons: [{ label: 'Cancel' }],
     });
   }
-  else
-    Status.setMessage({
-      text: 'Session successfully loaded.',
-      kind: 'success',
-    });
   return;
 }
 
 async function saveSession(): Promise<void> {
   const title = 'Save the current session';
   const file = await Dialogs.showSaveFile({ title });
-  Status.setMessage({ text: 'Saving session…', kind: 'progress' });
   const error = await Server.send(Services.save, file);
   if (error) {
-    Status.setMessage({
-      text: 'Error when saving the session',
-      title: error,
-      kind: 'error',
-    });
     await Dialogs.showMessageBox({
       message: 'An error has occurred when saving the session',
       kind: 'error',
       buttons: [{ label: 'Cancel' }],
     });
   }
-  else
-    Status.setMessage({ text: 'Session successfully saved.', kind: 'success' });
   return;
 }
 

@@ -11,6 +11,7 @@
 --- Context 'typed_myMain' Cluster 'S2_A' 
 ---------------------------------------------
 theory S2_A
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -33,11 +34,13 @@ theory S2_A
   predicate IsS2_A (s:S2_A) = is_sint32 (F2_A_dummy s)
   
   predicate EqS2_A (s:S2_A) (s1:S2_A) = F2_A_dummy s1 = F2_A_dummy s
+  
 end
 ---------------------------------------------
 --- Context 'typed_myMain' Cluster 'Compound' 
 ---------------------------------------------
 theory Compound
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -82,9 +85,11 @@ theory Compound
      [Load_S2_A p (havoc mint1 mint q n)].
      separated p 1 q n ->
      Load_S2_A p (havoc mint1 mint q n) = Load_S2_A p mint
+  
 end
 [wp:print-generated] 
   theory WP
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -113,6 +118,7 @@ end
        region (a1.base) <= 0 ->
        region (a.base) <= 0 ->
        is_sint32 i -> IsS2_A a3 -> is_sint32 x -> IsS2_A a4 -> EqS2_A a4 a3
+    
   end
 [wp] [Generated] Goal typed_myMain_terminates (Qed)
 [wp] 3 goals generated

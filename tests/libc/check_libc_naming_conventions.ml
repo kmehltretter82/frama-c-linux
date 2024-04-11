@@ -56,7 +56,7 @@ let () =
               | Declaration (_, vi, _, _) -> vi.vattr
             in
             if Cil.is_in_libc fun_attrs then begin
-              Annotations.iter_behaviors (fun _emitter bhv ->
+              Annotations.iter_behaviors (fun bhv ->
                   List.iter (fun ip ->
                       let pred = Logic_const.pred_of_id_pred ip in
                       warn_if_unnamed "requires" pred;

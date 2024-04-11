@@ -202,26 +202,6 @@ module Widening_output =
       by case basis."
     end)
 
-let () = Parameter_customize.set_group help
-module Version =
-  False
-    (struct
-      let option_name = "-e-acsl-version"
-      let help = "version of plug-in E-ACSL"
-    end)
-
-let version () =
-  if Version.get () then begin
-    Log.print_on_output
-      (fun fmt ->
-         Format.fprintf
-           fmt
-           "Version of plug-in E-ACSL: %s@?"
-           Local_config.version);
-    raise Cmdline.Exit
-  end
-let () = Cmdline.run_after_configuring_stage version
-
 let parameter_states =
   [ Valid.self;
     Gmp_only.self;

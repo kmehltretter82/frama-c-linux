@@ -262,7 +262,7 @@ Editing scripts interactively allows the user to finish the proofs. Once proofs 
 
 The \verb+script+ prover only runs the proof scripts edited by the user from the TIP, including the scripts being complete or known to being stuck at some sub-goal. The other proof obligations are transmitted to other provers, if some are provided.
 
-This mode is well suited for replaying a proof bench, by using a combination of provers such as \verb+-wp-prover script,alt-ergo+. Moreover, the \verb+script+ prover never modifies the proof session and the proof scripts.
+This mode is well suited for replaying a proof bench, by using a combination of provers such as \verb+-wp-prover script,Alt-Ergo+. Moreover, the \verb+script+ prover never modifies the proof session and the proof scripts.
 
 The \verb+tip+ prover is similar, except that it never runs sub-goals that are known to be stuck but updates the proof scripts on success or when an automated proof fails. Using the \verb+tip+ prover is less time consuming and eventually prepares new scripts for failed proofs to be edited later under the TIP.
 
@@ -273,7 +273,7 @@ A typical proof session consists then in the following stages:
 
 a. Collecting the automated proofs and preparing for the TIP.
 \begin{logs}
-  frama-c [...] -wp-prover tip,alt-ergo
+  frama-c [...] -wp-prover tip,Alt-Ergo
 \end{logs}
 
 This runs all existing scripts (none at the very beginning) in success-mode only, and try Alt-Ergo on the others. Failed proofs lead to new empty scripts created.
@@ -291,7 +291,7 @@ Any number of phase a. and b. can be executed and interleaved. This incrementall
 
 c. Consolidating the Bench.
 \begin{logs}
-  frama-c [...] -wp-prover script,alt-ergo
+  frama-c [...] -wp-prover script,Alt-Ergo
 \end{logs}
 
 This mode replays the automated proofs and the interactive ones, re-running Alt-Ergo on every \textsf{WP} goals and every proof tactic sub-goals. The user scripts are never modified — this is a replay mode only.
@@ -1338,7 +1338,7 @@ See \texttt{-wp-interactive <mode>} option for details.
 \begin{description}
 \item[\tt -wp-prover <dp,...>] selects the decision procedures used to
   discharge proof obligations. See below for supported provers.  By
-  default, \texttt{alt-ergo} is selected, but you may specify another
+  default, \texttt{Alt-Ergo} is selected, but you may specify another
   decision procedure or a list of to try with.  Finally, you should
   supply \texttt{none} for this option to skip the proof step.
 
@@ -1436,7 +1436,7 @@ See \texttt{-wp-interactive <mode>} option for details.
 Suppose you have the following configuration:
 
 \begin{logs}
-# ./bin/frama-c -wp-detect
+# frama-c -wp-detect
 [wp] Prover   Alt-Ergo 2.0.0  [alt-ergo|altergo|Alt-Ergo:2.0.0]
 [wp] Prover       CVC4 1.6    [cvc4|CVC4:1.6]
 [wp] Prover       CVC4 1.6    [cvc4-ce|CVC4:1.6,counterexamples]

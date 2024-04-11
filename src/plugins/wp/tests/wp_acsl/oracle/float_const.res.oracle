@@ -13,6 +13,7 @@
 [wp] 8 goals scheduled
 [wp:print-generated] 
   theory WP
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -41,9 +42,11 @@
       forall f:t.
        let r = of_f32 f in
        eq_f32 f (0x1.99999Ap-4:t) -> of_f32 (to_f32 (of_f64 (to_f64 r))) = r
+    
   end
 [wp:print-generated] 
   theory WP1
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -72,9 +75,11 @@
       forall f:t.
        eq_f32 f (0x1.99999Ap-4:t) ->
        not of_f32 f = (3602879701896397.0 / 36028797018963968.0)
+    
   end
 [wp:print-generated] 
   theory WP2
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -102,9 +107,11 @@
     goal wp_goal :
       forall f:t.
        eq_f32 f (0x1.99999Ap-4:t) -> of_f32 f = (13421773.0 / 134217728.0)
+    
   end
 [wp:print-generated] 
   theory WP3
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -131,9 +138,11 @@
     
     goal wp_goal :
       forall f:t. eq_f32 f (0x1.99999Ap-4:t) -> not of_f32 f = (1.0 / 10.0)
+    
   end
 [wp:print-generated] 
   theory WP4
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool1 *)
@@ -162,9 +171,11 @@
       forall f:t1.
        let r = of_f321 (to_f321 (of_f641 f)) in
        eq_f64 f (0x1.999999999999Ap-4:t1) -> of_f641 (to_f641 r) = r
+    
   end
 [wp:print-generated] 
   theory WP5
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool1 *)
@@ -193,9 +204,11 @@
       forall f:t1.
        eq_f64 f (0x1.999999999999Ap-4:t1) ->
        not of_f641 f = (13421773.0 /' 134217728.0)
+    
   end
 [wp:print-generated] 
   theory WP6
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool1 *)
@@ -224,9 +237,11 @@
       forall f:t1.
        eq_f64 f (0x1.999999999999Ap-4:t1) ->
        of_f641 f = (3602879701896397.0 /' 36028797018963968.0)
+    
   end
 [wp:print-generated] 
   theory WP7
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool1 *)
@@ -254,6 +269,7 @@
     goal wp_goal :
       forall f:t1.
        eq_f64 f (0x1.999999999999Ap-4:t1) -> not of_f641 f = (1.0 /' 10.0)
+    
   end
 [wp] 8 goals generated
 ------------------------------------------------------------

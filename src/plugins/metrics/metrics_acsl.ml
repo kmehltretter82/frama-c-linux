@@ -230,7 +230,7 @@ let treat_behavior local_stats ki b =
 
 let add_function_contract_stats kf =
   let local_stats = get_kf_stats kf in
-  let treat_behavior _ b = treat_behavior local_stats Kglobal b in
+  let treat_behavior b = treat_behavior local_stats Kglobal b in
   Annotations.iter_behaviors treat_behavior kf
 
 let add_code_annot_stats stmt _ ca =

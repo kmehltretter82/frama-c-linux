@@ -9,19 +9,19 @@
 [wp] [Valid] Goal lxor_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal lxor_terminates (Cfg) (Trivial)
 [wp] 6 goals scheduled
-[wp] [Unsuccess] typed_land_check_A (Alt-Ergo) (Cached)
-[wp] [Unsuccess] typed_land_check_B (Alt-Ergo) (Cached)
-[wp] [Unsuccess] typed_lor_check_A (Alt-Ergo) (Cached)
-[wp] [Unsuccess] typed_lor_check_B (Alt-Ergo) (Cached)
-[wp] [Unsuccess] typed_lxor_check_A (Alt-Ergo) (Cached)
-[wp] [Unsuccess] typed_lxor_check_B (Alt-Ergo) (Cached)
-[wp] Proved goals:    6 / 12
+[wp] [Valid] typed_land_check_A (Alt-Ergo) (Cached)
+[wp] [Valid] typed_land_check_B (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lor_check_A (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lor_check_B (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lxor_check_A (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lxor_check_B (Alt-Ergo) (Cached)
+[wp] Proved goals:   12 / 12
   Terminating:     3
   Unreachable:     3
-  Unsuccess:       6
+  Alt-Ergo:        6
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  land                      -        -        2       0.0%
-  lor                       -        -        2       0.0%
-  lxor                      -        -        2       0.0%
+  land                      -        2        2       100%
+  lor                       -        2        2       100%
+  lxor                      -        2        2       100%
 ------------------------------------------------------------

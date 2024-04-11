@@ -127,7 +127,7 @@ let createMachine () = (* Contain dummy values *)
     lowerConstants = false(*true*);
     insertImplicitCasts = true;
     stringLiteralType = charConstPtrType;
-    upointKind = IChar;
+    upointKind = IUChar;
     upointType = voidType;
     wcharKind = IChar;
     wcharType = voidType;
@@ -760,7 +760,6 @@ let setFormals (f: fundec) (forms: varinfo list) =
   unsafeSetFormalsDecl f.svar forms;
   List.iter (fun v -> v.vformal <- true) forms;
   f.sformals <- forms; (* Set the formals *)
-  assert (getFormalsDecl f.svar == f.sformals);
   match unrollType f.svar.vtype with
     TFun(rt, _, isva, fa) ->
     update_var_type f.svar

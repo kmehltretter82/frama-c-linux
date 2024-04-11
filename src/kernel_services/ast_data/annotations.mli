@@ -225,13 +225,27 @@ val fold_extended:
   kernel_function -> string -> 'a -> 'a
 
 val iter_behaviors:
-  (Emitter.t -> funbehavior -> unit) -> kernel_function -> unit
+  (funbehavior -> unit) -> kernel_function -> unit
 (** Iter on the behaviors of the given kernel function.
-    @since Fluorine-20130401 *)
+    @since Fluorine-20130401
+    @before Frama-C+dev previous version was behaving as
+    {!iter_behaviors_by_emitter} *)
 
 val fold_behaviors:
+  (funbehavior -> 'a -> 'a) -> kernel_function -> 'a -> 'a
+(** Fold on the behaviors of the given kernel function.
+    @before Frama-C+dev previous version was behaving as
+    {!fold_behaviors_by_emitter} *)
+
+val iter_behaviors_by_emitter:
+  (Emitter.t -> funbehavior -> unit) -> kernel_function -> unit
+(** Iter on the behaviors, for each emitter, of the given kernel function.
+    @since Frama-C+dev *)
+
+val fold_behaviors_by_emitter:
   (Emitter.t -> funbehavior -> 'a -> 'a) -> kernel_function -> 'a -> 'a
-(** Fold on the behaviors of the given kernel function. *)
+(** Fold on the behaviors, for each emitter, of the given kernel function.
+    @since Frama-C+dev *)
 
 val iter_complete:
   (Emitter.t -> string list -> unit) -> kernel_function -> unit

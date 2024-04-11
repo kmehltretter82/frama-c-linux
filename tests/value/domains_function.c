@@ -1,5 +1,6 @@
 /* run.config*
    STDOPT: #"-eva-domains-function symbolic-locations:infer+w,symbolic-locations:use+r,symbolic-locations:test_propagation-,symbolic-locations:enabled,symbolic-locations:disabled-,symbolic-locations:recursively_enabled+"
+   STDOPT: #"-eva @EVA_CONFIG@ -main test_successive_runs -eva-domains-function octagon:need_symbolic_locations,symbolic-locations:need_octagon -then -eva-domains-function symbolic-locations:need_symbolic_locations,octagon:need_octagon"
 */
 
 #include <__fc_builtin.h>
@@ -120,4 +121,26 @@ void main () {
   test ();
   recursively_enabled ();
   test_propagation ();
+}
+
+
+int need_octagon(int x, int y) {
+  if (x < y)
+    return y - x;
+  else
+    return x - y;
+}
+
+int need_symbolic_locations(int x, int y) {
+  int *p = undet ? &x : &y;
+  if (*p < 10) return *p;
+  return 0;
+}
+
+void test_successive_runs (void) {
+  int a = Frama_C_interval(-100, 100);
+  int b = Frama_C_interval(-100, 100);
+  int abs_diff = need_octagon(a, b);
+  int bounded = need_symbolic_locations(abs_diff, abs_diff);
+  //@ check 0 <= bounded < 10;
 }

@@ -81,7 +81,7 @@ module PLoc = struct
   let forward_index typ_pointed index remaining =
     match remaining with
     | Imprecise offset ->
-      let bases = Cvalue.V.topify_arith_origin index in
+      let bases = Cvalue.V.topify Origin.Arith index in
       Imprecise (Cvalue.V.join bases offset)
     | Precise offset ->
       try
@@ -94,7 +94,7 @@ module PLoc = struct
       with Cvalue.V.Not_based_on_null ->
         (* result will be a garbled mix: collect all the bases involved in
            the evaluation of [offset], and raise an exception *)
-        Imprecise (Cvalue.V.topify_arith_origin index)
+        Imprecise (Cvalue.V.topify Origin.Arith index)
 
   (* ------------------------------------------------------------------------ *)
   (*                             Locations                                    *)

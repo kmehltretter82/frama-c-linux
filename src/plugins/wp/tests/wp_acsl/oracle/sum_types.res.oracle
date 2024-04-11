@@ -6,6 +6,7 @@
 --- Context 'typed' Cluster 'A_A' 
 ---------------------------------------------
 theory A_A
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -33,11 +34,13 @@ theory A_A
     | Q_IAi : forall p:int. is_InAxiomatic (C_IAi p)
   
   predicate P_P A_InAxiomatic
+  
 end
 ---------------------------------------------
 --- Context 'typed' Cluster 'Axiomatic1' 
 ---------------------------------------------
 theory Axiomatic1
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -67,11 +70,13 @@ theory Axiomatic1
   (* use A_A *)
   
   lemma Q_LA : forall a:A_InAxiomatic. is_InAxiomatic a -> P_P a
+  
 end
 ---------------------------------------------
 --- Context 'typed' Cluster 'A_X' 
 ---------------------------------------------
 theory A_X
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -89,11 +94,13 @@ theory A_X
   (* use Axiomatic1 *)
   
   predicate P_Q A_AtTopLevel
+  
 end
 ---------------------------------------------
 --- Context 'typed' Cluster 'Axiomatic2' 
 ---------------------------------------------
 theory Axiomatic2
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -124,11 +131,13 @@ theory Axiomatic2
   (* use A_X *)
   
   lemma Q_LB : forall a:A_AtTopLevel. is_AtTopLevel a -> P_Q a
+  
 end
 ---------------------------------------------
 --- Context 'typed' Cluster 'A_Y' 
 ---------------------------------------------
 theory A_Y
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -146,9 +155,11 @@ theory A_Y
   (* use Axiomatic2 *)
   
   predicate P_R A_Rec
+  
 end
 [wp:print-generated] 
   theory WP
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -168,9 +179,11 @@ end
     (* use A_Y *)
     
     goal wp_goal : forall r:A_Rec. is_Rec r -> P_R r
+    
   end
 [wp:print-generated] 
   theory WP1
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -190,9 +203,11 @@ end
     (* use A_X *)
     
     goal wp_goal : forall a:A_AtTopLevel. is_AtTopLevel a -> P_Q a
+    
   end
 [wp:print-generated] 
   theory WP2
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -210,6 +225,7 @@ end
     (* use A_A *)
     
     goal wp_goal : forall i:A_InAxiomatic. is_InAxiomatic i -> P_P i
+    
   end
 [wp] 3 goals generated
 ------------------------------------------------------------

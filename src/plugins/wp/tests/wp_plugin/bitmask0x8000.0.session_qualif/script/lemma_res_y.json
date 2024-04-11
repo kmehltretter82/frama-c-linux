@@ -3,7 +3,7 @@
     "select": { "select": "inside-step", "at": 1, "kind": "have", "occur": 0,
                 "target": "(bit_test off_0 15)",
                 "pattern": "bit_test$off15" },
-    "children": { "Bit #15 (inf)": [ { "prover": "Alt-Ergo:2.4.2",
+    "children": { "Bit #15 (inf)": [ { "prover": "Alt-Ergo:2.5.3",
                                        "verdict": "valid", "time": 0.0194,
                                        "steps": 52 } ],
                   "Bit #15 (sup)": [ { "prover": "qed", "verdict": "valid" } ] } } ]

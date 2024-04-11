@@ -93,7 +93,7 @@ let getProvers () =
   | None ->
     let cmdline =
       match Wp_parameters.Provers.get () with
-      | [] -> [ "alt-ergo" ]
+      | [] -> [ "Alt-Ergo" ]
       | prvs -> prvs in
     let parse s =
       match VCS.parse_prover s with

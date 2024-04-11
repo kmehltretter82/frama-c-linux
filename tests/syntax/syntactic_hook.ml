@@ -46,17 +46,6 @@ let warn_proto vi =
 Cabs2cil.register_implicit_prototype_hook warn_proto
 ;;
 
-let warn_conflict oldvi vi reason =
-  Kernel.warning
-    ~source:(fst vi.vdecl)
-    "[SH]: conflict with declaration of %a at line %d: %s"
-    Format.pp_print_string vi.vname
-    (fst oldvi.vdecl).Filepath.pos_lnum
-    reason
-;;
-
-Cabs2cil.register_incompatible_decl_hook warn_conflict;;
-
 let warn_distinct oldvi vi =
   Kernel.warning
     ~source:(fst vi.vdecl)

@@ -37,6 +37,7 @@ import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
 import * as Ivette from 'ivette';
 import { compId, LayoutPosition, VIEW, COMPONENT, GROUP } from 'ivette';
+import { NotificationTimer } from 'ivette/prefs';
 import * as State from 'ivette/state';
 
 /* -------------------------------------------------------------------------- */
@@ -465,7 +466,7 @@ function restoreDefault(key: tabKey): void {
   }
 }
 
-export function applyView(view: Ivette.ViewLayoutProps): void {
+function applyView(view: Ivette.ViewLayoutProps): void {
   const state = LAB.getValue();
   const viewId = view.id;
   if (state.tabs.has(viewId))
@@ -515,7 +516,7 @@ function applyFavorite(
   }
 }
 
-export function applyComponent(
+function applyComponent(
   comp: Ivette.ComponentProps,
   at?: LayoutPosition
 ): void {
@@ -529,7 +530,7 @@ export function applyComponent(
   LAB.setValue({ ...state, panels, alerts, stack });
 }
 
-export function dockComponent(
+function applyDock(
   comp: Ivette.ComponentProps,
   at?: Ivette.LayoutPosition
 ): void {
@@ -566,21 +567,6 @@ function closeComponent(compId: compId): void {
   LAB.setValue({ ...state, panels, docked, stack });
 }
 
-export function alertComponent(comp: Ivette.ComponentProps): void {
-  const { id } = comp;
-  const state = LAB.getValue();
-  /* Do nothing if the component if already visible. */
-  const layout = state.stack[0] ?? defaultLayout;
-  const curr = getLayoutPosition(layout, id);
-  if (curr !== undefined) return;
-  /* Add the component to the set of alerted components. */
-  const alerts = copySet(state.alerts).add(id);
-  LAB.setValue({ ...state, alerts });
-  /* Dock the component if it isn't already. */
-  if (state.docked.has(id)) return;
-  dockComponent(comp);
-}
-
 /* -------------------------------------------------------------------------- */
 /* --- Settings Update                                                    --- */
 /* -------------------------------------------------------------------------- */
@@ -607,22 +593,27 @@ Settings.onWindowSettings(() => {
       const settings = Settings.getWindowSettings(
         'ivette.laboratory', jLabSettings, defaultSettings
       );
-      let gotoView: viewId = '';
+      let selectTab: viewId = '';
       settings.tabs.forEach((tab, index) => {
         const view = VIEW.getElement(tab.view);
         if (view !== undefined) {
           applyFavorite(view, true);
           if (index === settings.tabIndex)
-            gotoView = tab.view;
+            selectTab = tab.view;
         }
       });
       settings.dock.forEach(dock => {
         const comp = COMPONENT.getElement(dock.comp);
         if (comp !== undefined && !state.docked.has(comp.id))
-          dockComponent(comp, dock.position);
+          applyDock(comp, dock.position);
       });
-      if (!state.tabKey && !gotoView) {
-        applyTab(gotoView);
+      if (!state.tabKey) {
+        if (selectTab)
+          applyTab(selectTab);
+        else {
+          const console = VIEW.getElement('ivette.console');
+          if (console !== undefined) applyView(console);
+        }
         setCurrentNone();
       }
     } finally {
@@ -701,7 +692,7 @@ const closedMenu: LayoutMenuState = {
   y: 0,
 };
 
-const MENU = new States.GlobalState<LayoutMenuState>(closedMenu);
+const LAYOUTMENU = new States.GlobalState<LayoutMenuState>(closedMenu);
 
 function openLayoutMenu(
   compId: compId,
@@ -709,14 +700,14 @@ function openLayoutMenu(
   evt: React.MouseEvent,
   fromDock = false
 ): void {
-  MENU.setValue({
+  LAYOUTMENU.setValue({
     ...actions, compId,
     x: evt.clientX, y: evt.clientY, fromDock
   });
 }
 
 function closeMenu(): void {
-  MENU.setValue(closedMenu);
+  LAYOUTMENU.setValue(closedMenu);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -771,7 +762,7 @@ function Action(props: ActionProps): JSX.Element {
 function LayoutMenu(): JSX.Element | null {
   const href = React.useRef<HTMLDivElement>(null);
   const divElt = href.current;
-  const [menu] = States.useGlobalState(MENU);
+  const [menu] = States.useGlobalState(LAYOUTMENU);
   const [state] = States.useGlobalState(LAB);
   const [panelWidth, setWidth] = React.useState(80);
   const [panelHeight, setHeight] = React.useState(80);
@@ -805,7 +796,7 @@ function LayoutMenu(): JSX.Element | null {
   const onDock = (): void => {
     closeMenu();
     const comp = COMPONENT.getElement(compId);
-    if (comp) dockComponent(comp);
+    if (comp) applyDock(comp);
   };
 
   const onUndock = (): void => {
@@ -846,6 +837,79 @@ function LayoutMenu(): JSX.Element | null {
         display={close} label='Close' icon='TRASH' onClick={onClose} />
     </div>
   );
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Notification Stack                                                 --- */
+/* -------------------------------------------------------------------------- */
+
+type NotificationKind = 'message' | 'warning' | 'error';
+
+export interface Notification {
+  kind?: NotificationKind;
+  label: string;
+  title?: string;
+}
+
+interface NotificationItemProps extends Notification { id: string }
+
+type NotificationState = {
+  kid: number,
+  index: Map<string, NotificationItemProps>,
+};
+
+const NOTIFICATIONS = new States.GlobalState<NotificationState>({
+  kid: 0, index: new Map()
+});
+
+function clearMessage(id: string): void {
+  let { kid, index } = NOTIFICATIONS.getValue();
+  if (!index.has(id)) return;
+  index = copyMap(index);
+  index.delete(id);
+  NOTIFICATIONS.setValue({ kid, index });
+}
+
+function NotificationItem(props: NotificationItemProps): JSX.Element {
+  const { id, kind = 'message', label, title } = props;
+  const className = classes(
+    'labview-notification-item',
+    'labview-notification-' + kind,
+  );
+  const icon = props.kind === 'message' ? 'CIRC.INFO' : 'WARNING';
+  const onClick = (): void => clearMessage(id);
+  return (
+    <Label
+      className={className}
+      icon={icon} title={title} label={label}
+      onClick={onClick} />
+  );
+}
+
+function Notifications(): JSX.Element {
+  const [{ index }] = States.useGlobalState(NOTIFICATIONS);
+  const className = classes(
+    'labview-notification-stack',
+    index.size === 0 && 'dome-erased'
+  );
+  const items: JSX.Element[] = [];
+  index.forEach(p => items.push(<NotificationItem key={p.id} {...p} />));
+  return <div className={className}>{items}</div>;
+}
+
+export function clearMessages(): void {
+  const { kid: kid } = NOTIFICATIONS.getValue();
+  NOTIFICATIONS.setValue({ kid: kid, index: new Map() });
+}
+
+export function showMessage(msg: Notification): void {
+  let { kid, index } = NOTIFICATIONS.getValue();
+  const id = `W${++kid}`;
+  index = copyMap(index).set(id, { ...msg, id });
+  NOTIFICATIONS.setValue({ kid, index });
+  const timer = Settings.getGlobalSettings(NotificationTimer);
+  if (timer > 0 && timer < 60)
+    setTimeout(() => clearMessage(id), timer * 1000);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -906,6 +970,7 @@ export function LabView(): JSX.Element {
   return (
     <>
       <LayoutMenu />
+      <Notifications />
       <QSplit
         className='labview-container'
         A={A} B={B} C={C} D={D} H={H} V={V}
@@ -1165,7 +1230,7 @@ function DockItem(props: DockItemProps): JSX.Element | null {
 
   const onClick = (): void => {
     if (visible) {
-      dockComponent(comp);
+      applyDock(comp);
     } else {
       applyComponent(comp, position);
     }
@@ -1252,10 +1317,13 @@ function TabView(props: TabViewProps): JSX.Element | null {
     ]);
   };
 
+  const icon =
+    favorite ? (selected ? 'FAVORITE' : 'STAR') : 'DISPLAY';
+
   return (
     <Toolbar.Button
       className='labview-tab'
-      icon={selected ? 'DISPLAY' : undefined}
+      icon={icon}
       label={label}
       title={title}
       selected={selected}
@@ -1264,8 +1332,9 @@ function TabView(props: TabViewProps): JSX.Element | null {
     >
       <IconButton
         className='labview-tab-closing'
-        icon={custom === 0 ? 'FAVORITE' : 'CIRC.CLOSE'}
-        enabled={custom !== 0}
+        icon='CIRC.CLOSE'
+        visible={!favorite}
+        enabled={!favorite}
         onClick={onClose}
       />
     </Toolbar.Button>
@@ -1286,6 +1355,37 @@ export function Tabs(): JSX.Element {
       />
     ));
   return <>{items}</>;
+}
+
+export function switchToView(id: string): void {
+  const view = VIEW.getElement(id);
+  if (view) applyView(view);
+}
+
+export function showComponent(id: string, at?: LayoutPosition): void {
+  const comp = COMPONENT.getElement(id);
+  if (comp) applyComponent(comp, at);
+}
+
+export function dockComponent(id: string, at?: LayoutPosition): void {
+  const comp = COMPONENT.getElement(id);
+  if (comp) applyDock(comp, at);
+}
+
+export function alertComponent(id: string): void {
+  const comp = COMPONENT.getElement(id);
+  if (!comp) return;
+  const state = LAB.getValue();
+  /* Do nothing if the component if already visible. */
+  const layout = state.stack[0] ?? defaultLayout;
+  const curr = getLayoutPosition(layout, id);
+  if (curr !== undefined) return;
+  /* Add the component to the set of alerted components. */
+  const alerts = copySet(state.alerts).add(id);
+  LAB.setValue({ ...state, alerts });
+  /* Dock the component if it isn't already. */
+  if (state.docked.has(id)) return;
+  applyDock(comp);
 }
 
 /* -------------------------------------------------------------------------- */

@@ -2,7 +2,10 @@
 [kernel] rettype.i:12: User Error: 
   Declaration of foo does not match previous declaration from rettype.i:9 (different integer types:
   'int' and 'unsigned short').
-[kernel] rettype.i:11: Warning: 
-  found two contracts (old location: rettype.i:8). Merging them
-[kernel] User Error: stopping on file "rettype.i" that has errors.
+  10    
+  11    //@ ensures 0 <= \result < 25;
+  12    unsigned short foo()
+                        ^^^
+  13    {
+  14      return 0;
 [kernel] Frama-C aborted: invalid user input.

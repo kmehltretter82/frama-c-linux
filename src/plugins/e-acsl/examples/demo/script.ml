@@ -63,7 +63,7 @@ let is_predicate p line = (fst (p.ip_loc)).Lexing.pos_lnum = line
 let search_funspec_part iter convert kf =
   try
     Annotations.iter_behaviors
-      (fun _ bhv -> iter (fun _ a -> convert bhv a) kf bhv.b_name)
+      (fun bhv -> iter (fun _ a -> convert bhv a) kf bhv.b_name)
       kf;
     assert false
   with Found(ppt, line) ->

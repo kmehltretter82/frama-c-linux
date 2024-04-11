@@ -451,12 +451,18 @@ module Make
     | _            -> assert false
 
   let assume_pointer expr value =
-    if Kernel.InvalidPointer.get ()
-    then
-      let truth = Value.assume_pointer value in
-      let alarm () = Alarms.Invalid_pointer expr in
-      interpret_truth ~alarm value truth
-    else return value
+    let value, alarms =
+      if Kernel.InvalidPointer.get ()
+      then
+        let truth = Value.assume_pointer value in
+        let alarm () = Alarms.Invalid_pointer expr in
+        interpret_truth ~alarm value truth
+      else return value
+    in
+    (* Rewrap absolute addresses of pointer values, seen as unsigned
+       integers, to ensure a consistent representation of pointers. *)
+    let range = Eval_typ.pointer_range () in
+    value >>-: Value.rewrap_integer range, alarms
 
   let handle_overflow ~may_overflow expr typ value =
     match Eval_typ.classify_as_scalar typ with

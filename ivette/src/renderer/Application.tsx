@@ -38,6 +38,7 @@ import * as State from 'ivette/state';
 import * as Search from 'ivette/search';
 import * as Laboratory from 'ivette/laboratory';
 import * as IvettePrefs from 'ivette/prefs';
+import './command';
 import './loader';
 import './sandbox';
 import './style.css';

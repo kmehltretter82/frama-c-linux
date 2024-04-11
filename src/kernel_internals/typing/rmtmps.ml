@@ -674,6 +674,24 @@ let markReferenced ast =
  *
  **********************************************************************)
 
+(* We prefer a label when it does not require renaming *)
+let prefer ~new_label ~old_label =
+  old_label = "" ||
+  match Logic_typing.builtin_label old_label with
+  | None -> false (* the old label already has a good name *)
+  | Some _ ->
+    match Logic_typing.builtin_label new_label with
+    | None -> true (* the old label is a builtin name, the new one is better *)
+    | Some _ -> false (* let us keep the old name *)
+
+(* if we're forced to keep a C label whose name match a builtin logic label,
+   we'll rename it to ensure no confusion can arise.
+   Since the original name is supposed to be unique in the function, and
+   users are not supposed to use symbols starting with an underscore, the chosen
+   name ought to be unique.
+*)
+let rename_c_label lab = "__fc_user_label_" ^ lab
+
 (* We keep only one label, preferably one that was not introduced by CIL.
  * Scan a list of labels and return the data for the label that should be
  * kept, and the remaining filtered list of labels *)
@@ -684,17 +702,27 @@ let labelsToKeep is_removable ll =
       let newlabel, keepl =
         match l with
         | Case _ | Default _ -> sofar, true
-        | Label (ln, _, _) as lab -> begin
+        | Label (ln, loc, isuser) as lab ->
+          let lab =
+            match Logic_typing.builtin_label ln with
+            | None -> lab
+            | Some _ -> Label(rename_c_label ln, loc, isuser)
+          in
+          begin
             match is_removable lab, sofar with
             | true, ("", _) ->
               (* keep this one only if we have no label so far *)
               (ln, lab), false
-            | true, _ -> sofar, false
+            | true, _ ->
+              sofar, false
             | false, (_, lab') when is_removable lab' ->
               (* this is an original label; prefer it to temporary or
                * missing labels *)
               (ln, lab), false
-            | false, _ -> sofar, false
+            | false, (ln', _) when prefer ~new_label:ln ~old_label:ln' ->
+              (ln, lab), false
+            | false, _ ->
+              sofar, false
           end
       in
       let newlabel', rest' = loop newlabel rest in

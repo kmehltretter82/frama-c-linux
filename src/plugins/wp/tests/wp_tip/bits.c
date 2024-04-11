@@ -20,7 +20,7 @@
       \select(E), \param("inf",0), \param("sup",255),
       \children(RangeThenProver)
   ),
-  \prover("alt-ergo");
+  \prover("Alt-Ergo");
 
   proof RangeThenProver: dn3;
 */

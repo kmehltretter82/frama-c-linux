@@ -29,14 +29,12 @@ import * as Ivette from 'ivette';
 
 import History from 'frama-c/kernel/History';
 import { Functions, Globals, Types } from 'frama-c/kernel/Globals';
-import Status from 'frama-c/kernel/Status';
 import ASTview from 'frama-c/kernel/ASTview';
 import ASTinfo from 'frama-c/kernel/ASTinfo';
 import SourceCode from 'frama-c/kernel/SourceCode';
 import PivotTable from 'frama-c/kernel/PivotTable';
 import Locations from 'frama-c/kernel/Locations';
 import Properties from 'frama-c/kernel/Properties';
-import Messages from 'frama-c/kernel/Messages';
 
 import 'frama-c/kernel/style.css';
 
@@ -59,7 +57,6 @@ Ivette.registerSidebar({
 });
 
 Ivette.registerToolbar({ id: 'ivette.history', children: <History /> });
-Ivette.registerStatusbar({ id: 'ivette.status', children: <Status /> });
 
 /* -------------------------------------------------------------------------- */
 /* --- Frama-C Kernel Groups                                              --- */
@@ -103,13 +100,6 @@ Ivette.registerComponent({
   label: 'Properties',
   title: 'Status of ACSL Properties',
   children: <Properties />,
-});
-
-Ivette.registerComponent({
-  id: 'fc.kernel.messages',
-  label: 'Messages',
-  title: 'Messages emitted by Frama-C',
-  children: <Messages />,
 });
 
 Ivette.registerComponent({

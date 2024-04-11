@@ -25,6 +25,14 @@ open Cil_types
 (** Compute a sound over-approximation of what left-values must be tracked by
     the memory model library *)
 
+module SpecialPointers : sig
+  type spec = {pointer : bool; freeable : bool; writeable : bool; initialized : bool}
+  val initialize : unit -> unit
+
+  (* is this one of stdin/stdout/stderr/&errno? If so, return spec *)
+  val pointer_of_term : term -> spec option
+end
+
 val reset: unit -> unit
 (** Must be called to redo the analysis *)
 

@@ -114,8 +114,7 @@ let empty = {
 }
 
 let cacheable p r =
-  p <> Qed && not @@ VCS.is_trivial r &&
-  VCS.is_auto p && not @@ VCS.has_counter_examples p
+  p <> Qed && not @@ VCS.is_trivial r && VCS.is_auto p && not @@ VCS.has_model r
 
 let add_cacheable n (p,r) = if cacheable p r then succ n else n
 let add_cached n (p,r) = if cacheable p r && r.cached then succ n else n

@@ -38,6 +38,9 @@ void describe_observation_model() {
 }
 
 int allocated(uintptr_t addr, long size, uintptr_t base) {
+  if (get_safe_location(addr, size) != NULL)
+    return 1;
+
   TRY_SEGMENT_WEAK(addr, return heap_allocated(addr, size, base),
                    return static_allocated(addr, size, base));
   if (!IS_ON_VALID(addr))
@@ -47,9 +50,18 @@ int allocated(uintptr_t addr, long size, uintptr_t base) {
 
 int readonly(void *ptr) {
   uintptr_t addr = (uintptr_t)ptr;
+
+  memory_location *safeloc = get_safe_location(addr, 1);
+  if (safeloc != NULL)
+    return !safeloc->writeable;
+
   return IS_ON_GLOBAL(addr) && global_readonly(addr) ? 1 : 0;
 }
 
 int writeable(uintptr_t addr, long size, uintptr_t base_ptr) {
+  memory_location *safeloc = get_safe_location(addr, 1);
+  if (safeloc != NULL)
+    return !safeloc->writeable;
+
   return allocated(addr, size, base_ptr) && !readonly((void *)addr);
 }

@@ -75,6 +75,9 @@ val ik_attrs_range: ikind -> attributes -> integer_range
 (** Range for an integer type with some attributes. The attribute
     {!Cil.bitfield_attribute_name} influences the width of the type. *)
 
+val pointer_range: unit -> integer_range
+(** Range for a pointer type. *)
+
 val range_inclusion: integer_range -> integer_range -> bool
 (** Checks inclusion of two integer ranges. *)
 

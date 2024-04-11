@@ -172,9 +172,14 @@ void eacsl_mark_readonly(void *ptr) {
 /**************************/
 
 int eacsl_freeable(void *ptr) {
-  bt_block *tmp;
   if (ptr == NULL)
     return 0;
+
+  memory_location *safeloc = get_safe_location((uintptr_t)ptr, 1);
+  if (safeloc != NULL)
+    return safeloc->freeable;
+
+  bt_block *tmp;
   tmp = bt_lookup(ptr);
   if (tmp == NULL)
     return 0;
@@ -183,6 +188,10 @@ int eacsl_freeable(void *ptr) {
 
 /* return whether the size bytes of ptr are initialized */
 int eacsl_initialized(void *ptr, size_t size) {
+  memory_location *safeloc = get_safe_location((uintptr_t)ptr, size);
+  if (safeloc != NULL)
+    return safeloc->initialized;
+
   unsigned i;
   bt_block *tmp = bt_find(ptr);
   if (tmp == NULL)
@@ -208,6 +217,10 @@ int eacsl_initialized(void *ptr, size_t size) {
 
 /** \brief \return the length (in bytes) of the block containing ptr */
 size_t eacsl_block_length(void *ptr) {
+  memory_location *safeloc = get_safe_location((uintptr_t)ptr, 1);
+  if (safeloc != NULL)
+    return safeloc->length;
+
   bt_block *blk = bt_find(ptr);
   /* Hard failure when un-allocated memory is used */
   private_assert(blk != NULL, "\\block_length of unallocated memory\n", NULL);
@@ -232,29 +245,44 @@ static bt_block *lookup_allocated(void *ptr, size_t size, void *ptr_base) {
 
 /* return whether the size bytes of ptr are readable/writable */
 int eacsl_valid(void *ptr, size_t size, void *ptr_base, void *addrof_base) {
+  if (size == 0)
+    return 1;
+
+  memory_location *safeloc = get_safe_location((uintptr_t)ptr, size);
+  if (safeloc != NULL)
+    return safeloc->writeable;
+
   bt_block *blk = lookup_allocated(ptr, size, ptr_base);
-  return size == 0
-         || (blk != NULL && !blk->is_readonly
+  return (blk != NULL && !blk->is_readonly
 #ifdef E_ACSL_TEMPORAL
-             && temporal_valid(ptr_base, addrof_base)
+          && temporal_valid(ptr_base, addrof_base)
 #endif
-         );
+  );
 }
 
 /* return whether the size bytes of ptr are readable */
 int eacsl_valid_read(void *ptr, size_t size, void *ptr_base,
                      void *addrof_base) {
+  if (size == 0)
+    return 1;
+
+  if (get_safe_location((uintptr_t)ptr, size) != NULL)
+    return 1;
   bt_block *blk = lookup_allocated(ptr, size, ptr_base);
-  return size == 0
-         || (blk != NULL
+
+  return (blk != NULL
 #ifdef E_ACSL_TEMPORAL
-             && temporal_valid(ptr_base, addrof_base)
+          && temporal_valid(ptr_base, addrof_base)
 #endif
-         );
+  );
 }
 
 /* return the base address of the block containing ptr */
 void *eacsl_base_addr(void *ptr) {
+  memory_location *safeloc = get_safe_location((uintptr_t)ptr, 1);
+  if (safeloc != NULL)
+    return (void *)safeloc->address;
+
   bt_block *tmp = bt_find(ptr);
   private_assert(tmp != NULL, "\\base_addr of unallocated memory\n", NULL);
   return (void *)tmp->ptr;
@@ -262,9 +290,15 @@ void *eacsl_base_addr(void *ptr) {
 
 /* return the offset of `ptr` within its block */
 size_t eacsl_offset(void *ptr) {
+  uintptr_t addr = (uintptr_t)ptr;
+
+  memory_location *safeloc = get_safe_location(addr, 1);
+  if (safeloc != NULL)
+    return (safeloc->address - addr);
+
   bt_block *tmp = bt_find(ptr);
   private_assert(tmp != NULL, "\\offset of unallocated memory\n", NULL);
-  return ((uintptr_t)ptr - tmp->ptr);
+  return (addr - tmp->ptr);
 }
 /* }}} */
 
@@ -569,18 +603,6 @@ void eacsl_memory_init(int *argc_ref, char ***argv_ref, size_t ptr_size) {
   if (argc_ref)
     argv_alloca(argc_ref, argv_ref);
   /* Tracking safe locations */
-  collect_safe_locations();
-  int i;
-  for (i = 0; i < get_safe_locations_count(); i++) {
-    memory_location *loc = get_safe_location(i);
-    if (loc->is_on_static) {
-      void *addr = (void *)loc->address;
-      uintptr_t len = loc->length;
-      eacsl_store_block(addr, len);
-      if (loc->is_initialized)
-        eacsl_initialize(addr, len);
-    }
-  }
   init_infinity_values();
 }
 /* }}} */

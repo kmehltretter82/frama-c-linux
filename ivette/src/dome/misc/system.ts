@@ -108,7 +108,7 @@ export const platform = thePlatform;
 // --------------------------------------------------------------------------
 
 export const emitter = new Emitter();
-emitter.setMaxListeners(250);
+emitter.setMaxListeners(1_000);
 
 // --------------------------------------------------------------------------
 // --- At Exit

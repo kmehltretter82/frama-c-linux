@@ -28,6 +28,48 @@ module Dataflow = Dataflow2
 let dkey = Options.Dkey.mtracking
 module Error = Error.Make(struct let phase = dkey end)
 
+(* Some pointers (stdin, stdout, stderr, &errno) are special in the sense that
+   they need not be allocated, initialized, and in that they are not freeable,
+   and that some of them are statically known to be writeable/read-only.
+   There is no need to monitor the corresponding memory regions. *)
+module SpecialPointers = struct
+  type spec = {pointer : bool; freeable : bool; writeable : bool; initialized : bool}
+
+  let specs = [
+    "errno",  {pointer = false; freeable = false; writeable = true;  initialized = true};
+    "stdin",  {pointer = true;  freeable = false; writeable = false; initialized = true};
+    "stdout", {pointer = true;  freeable = false; writeable = true;  initialized = true};
+    "stderr", {pointer = true;  freeable = false; writeable = true;  initialized = true}
+  ]
+
+  let tbl = Varinfo.Hashtbl.create 5
+
+  let initialize () =
+    let add_builtin (name, spec) =
+      let name = if Kernel.FramaCStdLib.get () then "__fc_" ^ name else name in
+      let vi_o = Globals.Syntactic_search.find_in_scope name Global in
+      Option.iter (fun vi -> Varinfo.Hashtbl.add tbl vi spec) vi_o
+    in List.iter add_builtin specs
+
+  let clear () = Varinfo.Hashtbl.clear tbl
+
+  let mem = Varinfo.Hashtbl.mem tbl
+
+  let find_opt = Varinfo.Hashtbl.find_opt tbl
+
+  let pointer_of_term t =
+    let filter_opt f = function
+      | None -> None
+      | Some x -> if f x then Some x else None
+    in
+    match t.term_node with
+    | TLval (TVar {lv_origin = Some v}, TNoOffset) ->
+      filter_opt (fun spec -> spec.pointer) (find_opt v)
+    | TAddrOf (TVar {lv_origin = Some v}, TNoOffset) ->
+      filter_opt (fun spec -> not @@ spec.pointer) (find_opt v)
+    | _ -> None
+end
+
 let must_never_monitor vi =
   (* E-ACSL, please do not monitor yourself! *)
   Rtl.Symbols.mem_vi vi.vname
@@ -39,6 +81,11 @@ let must_never_monitor vi =
   ||
   (* incomplete types cannot be properly monitored. See BTS #2406. *)
   not (Cil.isCompleteType vi.vtype)
+  ||
+  (* function pointers are not yet supported. *)
+  Cil.isFunctionType vi.vtype
+  ||
+  SpecialPointers.mem vi
 
 (* ********************************************************************** *)
 (* Backward dataflow analysis to compute a sound over-approximation of what
@@ -160,6 +207,7 @@ end
 
 let reset () =
   Options.feedback ~dkey ~level:2 "clearing environment.";
+  SpecialPointers.clear ();
   Env.clear ()
 
 module rec Transfer
@@ -460,7 +508,7 @@ module rec Transfer
              let state =
                if (is_first || is_last) && Functions.RTL.is_generated_kf kf then
                  Annotations.fold_behaviors
-                   (fun _ bhv s ->
+                   (fun bhv s ->
                       let handle_annot test f s =
                         if test then
                           f

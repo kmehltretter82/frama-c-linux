@@ -1,12 +1,17 @@
 { lib
 , buildDunePackage
-, fetchFromGitHub
+, fetchurl
 , camlzip
 , cmdliner
-, dune-configurator
+, dolmen
+, dolmen_loop
+, dolmen_type
+, dune-build-info
+, dune-site
+, fmt
 , menhir
-, num
 , ocplib-simplex
+, ppx_blob
 , psmt2-frontend
 , seq
 , stdlib-shims
@@ -16,25 +21,31 @@
 
 let
   pname = "alt-ergo";
-  version = "2.4.2";
+  version = "2.5.3";
 
-  configureScript = "ocaml unix.cma configure.ml";
-
-  src = fetchFromGitHub {
-    owner = "OCamlPro";
-    repo = pname;
-    rev = "refs/tags/${version}";
-    hash = "sha256-8pJ/1UAbheQaLFs5Uubmmf5D0oFJiPxF6e2WTZgRyAc=";
+  src = fetchurl {
+    url = "https://github.com/OCamlPro/alt-ergo/releases/download/v${version}/alt-ergo-${version}.tbz";
+    sha256 = "sha256-tmWLZBLfdmfYlCQq+zcUneeueDAE6AJeZMy8kfNCC04=";
   };
 in
 
 let alt-ergo-lib = buildDunePackage rec {
   pname = "alt-ergo-lib";
-  inherit version src configureScript;
-  configureFlags = [ pname ];
+  inherit version src ;
   nativeBuildInputs = [ which ];
-  buildInputs = [ dune-configurator ];
-  propagatedBuildInputs = [ num ocplib-simplex seq stdlib-shims zarith ];
+  propagatedBuildInputs = [
+    camlzip
+    dolmen
+    dolmen_loop
+    dolmen_type
+    dune-build-info
+    fmt
+    ocplib-simplex
+    ppx_blob
+    seq
+    stdlib-shims
+    zarith
+  ];
   preBuild = ''
     substituteInPlace src/lib/util/version.ml --replace 'version="dev"' 'version="${version}"'
   '';
@@ -42,20 +53,28 @@ let alt-ergo-lib = buildDunePackage rec {
 
 let alt-ergo-parsers = buildDunePackage rec {
   pname = "alt-ergo-parsers";
-  inherit version src configureScript;
-  configureFlags = [ pname ];
-  nativeBuildInputs = [ which menhir ];
-  propagatedBuildInputs = [ alt-ergo-lib camlzip psmt2-frontend ];
+  inherit version src ;
+  nativeBuildInputs = [
+    menhir
+    which
+  ];
+  propagatedBuildInputs = [
+    alt-ergo-lib
+    psmt2-frontend
+  ];
 }; in
 
 buildDunePackage {
-
-  inherit pname version src configureScript;
-
-  configureFlags = [ pname ];
-
-  nativeBuildInputs = [ which menhir ];
-  buildInputs = [ alt-ergo-parsers cmdliner ];
+  inherit pname version src ;
+  nativeBuildInputs = [
+    menhir
+    which
+  ];
+  buildInputs = [
+    alt-ergo-parsers
+    cmdliner
+    dune-site
+  ];
 
   meta = {
     description = "High-performance theorem prover and SMT solver";

@@ -99,7 +99,7 @@ let () =
   let set_header = R.result_opt inode ~name:"header"
       ~descr:(Md.plain "Proof node tactic label (if any)")
       (module D.Jstring) in
-  let set_child = R.result_opt inode ~name:"child"
+  let set_child_label = R.result_opt inode ~name:"childLabel"
       ~descr:(Md.plain "Proof node child label (from parent, if any)")
       (module D.Jstring) in
   let set_path = R.result inode ~name:"path"
@@ -116,12 +116,12 @@ let () =
       set_proved rq (ProofEngine.fully_proved node);
       set_pending rq (ProofEngine.pending node);
       let s = ProofEngine.stats node in
-      set_size rq (Stats.subgoals @@ s);
+      set_size rq (Stats.subgoals s);
       set_stats rq (Pretty_utils.to_string Stats.pretty s);
       set_results rq (Wpo.get_results @@ ProofEngine.goal node);
       set_tactic rq (ProofEngine.tactic node);
       set_header rq (ProofEngine.tactic_label node);
-      set_child rq (ProofEngine.child_label node);
+      set_child_label rq (ProofEngine.child_label node);
       set_path rq (ProofEngine.path node);
       set_children rq (ProofEngine.subgoals node);
     end
@@ -142,59 +142,69 @@ let () =
     end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Proof Cursor                                                       --- *)
+(* --- Proof Status                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
 let () =
-  let state = R.signature ~input:(module W.Goal) () in
-  let set_index = R.result state ~name:"index"
+  let status = R.signature () in
+  let get_main = R.param status ~name:"main"
+      ~descr:(Md.plain "Proof Obligation") (module W.Goal) in
+  let get_unproved = R.param status ~name:"unproved" ~default:false
+      ~descr:(Md.plain "Report unproved children only")
+      (module D.Jbool) in
+  let get_subtree = R.param status ~name:"subtree" ~default:false
+      ~descr:(Md.plain "Report subtree children only")
+      (module D.Jbool) in
+  let set_size = R.result status ~name:"size"
+      ~descr:(Md.plain "Proof size") (module D.Jint) in
+  let set_index = R.result status ~name:"index"
       ~descr:(Md.plain "Current node index among pending nodes (else -1)")
       (module D.Jint) in
-  let set_pending = R.result state ~name:"pending"
+  let set_pending = R.result status ~name:"pending"
       ~descr:(Md.plain "Pending proof nodes") (module D.Jint) in
-  let set_current = R.result state ~name:"current"
+  let set_current = R.result status ~name:"current"
       ~descr:(Md.plain "Current proof node") (module Node) in
-  let set_above = R.result state ~name:"above"
-      ~descr:(Md.plain "Above nodes (up to current when internal)")
+  let set_parents = R.result status ~name:"parents"
+      ~descr:(Md.plain "parents nodes")
       (module Path) in
-  let set_below = R.result state ~name:"below"
-      ~descr:(Md.plain "Below nodes (including current when pending)")
-      (module Path) in
-  let set_tactic = R.result_opt state ~name:"tactic"
+  let set_tactic = R.result_opt status ~name:"tactic"
       ~descr:(Md.plain "Applied tactic (if any)")
       (module Tactic) in
-  R.register_sig ~package
+  let set_children = R.result status ~name:"children"
+      ~descr:(Md.plain "Children nodes")
+      (module Path) in
+  R.register_sig ~package status
     ~kind:`GET ~name:"getProofStatus"
-    ~descr:(Md.plain "Current Proof Status of a Goal") state
+    ~descr:(Md.plain "Current Proof Status of a Goal")
     ~signals:[proofStatus]
-    begin fun rq wpo ->
-      let tree = ProofEngine.proof  ~main:wpo in
+    begin fun rq () ->
+      let tree = ProofEngine.proof ~main:(get_main rq) in
       let root = ProofEngine.root tree in
       set_pending rq (ProofEngine.pending root) ;
+      set_size rq (Stats.subgoals @@ ProofEngine.stats root);
       let current, index =
         match ProofEngine.current tree with
         | `Main -> root, -1
         | `Internal node -> node, -1
         | `Leaf(idx,node) -> node, idx
       in
+      let subgoals = ProofEngine.subgoals current in
       set_index rq index ;
       set_current rq current ;
+      set_parents rq @@ ProofEngine.path current ;
       set_tactic rq @@ ProofEngine.tactic current ;
-      let above = ProofEngine.path current in
-      let below = ProofEngine.subgoals current in
-      if below = [] then
-        match above with
-        | [] ->
-          set_above rq [] ;
-          set_below rq [] ;
-        | p::_ ->
-          set_above rq above ;
-          set_below rq (ProofEngine.subgoals p) ;
-      else
-        begin
-          set_above rq (current::above) ;
-          set_below rq below ;
-        end
+      set_children rq @@
+      match get_unproved rq, get_subtree rq with
+      | false, false -> subgoals
+      | false, true ->
+        List.filter (fun n -> ProofEngine.subgoals n <> []) subgoals
+      | true, false ->
+        List.filter (fun n -> ProofEngine.pending n > 0) subgoals
+      | true, true ->
+        List.filter (fun n ->
+            ProofEngine.pending n > 0 ||
+            ProofEngine.subgoals n <> []
+          ) subgoals
     end
 
 (* -------------------------------------------------------------------------- *)
