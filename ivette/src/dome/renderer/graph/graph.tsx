@@ -119,10 +119,6 @@ export interface GraphProps {
 /* --- Graph Component                                                    --- */
 /* -------------------------------------------------------------------------- */
 
-/* -------------------------------------------------------------------------- */
-/* --- Graph Component                                                    --- */
-/* -------------------------------------------------------------------------- */
-
 export function Graph(props: {
   graph: GraphProps;
   setInitGraph: React.Dispatch<React.SetStateAction<GraphProps>>;
