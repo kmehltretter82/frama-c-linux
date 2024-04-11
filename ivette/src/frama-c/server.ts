@@ -37,7 +37,7 @@ import * as Dome from 'dome';
 import * as System from 'dome/misc/system';
 import * as Json from 'dome/data/json';
 import { TextBuffer } from 'dome/text/richtext';
-const ChildProcess = require('child_process');
+import { ChildProcess } from 'child_process';
 import { client } from './client_socket';
 // import { client } from './client_zmq';
 
@@ -121,7 +121,7 @@ interface PendingRequest {
 const pending = new Map<string, PendingRequest>();
 
 /** Server process. */
-let process: typeof ChildProcess | undefined;
+let process: ChildProcess | undefined;
 
 /** Polling timeout when server is busy. */
 const pollingTimeout = 50;

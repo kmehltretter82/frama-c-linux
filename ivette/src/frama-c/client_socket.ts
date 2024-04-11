@@ -20,7 +20,7 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-const Net = require('net');
+import Net from 'net';
 import { Debug } from 'dome';
 import { json } from 'dome/data/json';
 import { Client } from './client';
