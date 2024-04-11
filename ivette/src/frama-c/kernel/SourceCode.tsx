@@ -39,7 +39,6 @@ import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 
-
 // -----------------------------------------------------------------------------
 //  Utilitary types and functions
 // -----------------------------------------------------------------------------
