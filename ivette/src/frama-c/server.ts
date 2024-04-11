@@ -39,6 +39,7 @@ import * as Json from 'dome/data/json';
 import { TextBuffer } from 'dome/text/richtext';
 import { ChildProcess } from 'child_process';
 import { client } from './client_socket';
+import { logModel, status as statutLog } from './kernel/ServerLogs';
 // import { client } from './client_zmq';
 
 // --------------------------------------------------------------------------
@@ -253,6 +254,8 @@ export async function start(): Promise<void> {
     case Status.OFF:
     case Status.FAILURE:
     case Status.RESTARTING:
+      logModel.clear();
+      logModel.registerFeedback('Server starting...');
       _status(Status.STARTING);
       try {
         await _launch();
@@ -262,6 +265,8 @@ export async function start(): Promise<void> {
       }
       return;
     case Status.HALTING:
+      logModel.clear();
+      logModel.registerFeedback('Server restarting...');
       _status(Status.RESTARTING);
       return;
     case Status.ON:
@@ -330,6 +335,7 @@ export function kill(): void {
     case Status.HALTING:
     case Status.STARTING:
     case Status.RESTARTING:
+      logModel.registerFeedback('Killing server...');
       _status(Status.HALTING);
       _kill();
       return;
@@ -363,10 +369,14 @@ export function restart(): void {
       return;
     case Status.ON:
     case Status.CMD:
+      logModel.clear();
+      logModel.registerFeedback('Server restarting...');
       _status(Status.RESTARTING);
       _shutdown();
       return;
     case Status.HALTING:
+      logModel.clear();
+      logModel.registerFeedback('Server restarting...');
       _status(Status.RESTARTING);
       return;
     case Status.STARTING:
@@ -527,6 +537,7 @@ async function _launch(): Promise<void> {
     _exit(false);
     return;
   });
+  logModel.registerFeedback('Socket server is running');
   // Connect to Server
   client.connect(sockaddr);
 }
@@ -574,6 +585,7 @@ function _kill(): void {
 async function _shutdown(): Promise<void> {
   _clear();
   client.shutdown();
+  logModel.registerFeedback('Server shutdown');
   const killingPromise = new Promise((resolve) => {
     if (!killingTimer) {
       if (process) {
@@ -645,6 +657,7 @@ class SignalHandler {
     if (this.active && !this.listen) {
       this.listen = true;
       client.sigOn(this.id);
+      logModel.registerSignal(this.id, statutLog.SIGON);
     }
   }
 
@@ -654,6 +667,7 @@ class SignalHandler {
       if (isRunning()) {
         this.listen = false;
         client.sigOff(this.id);
+        logModel.registerSignal(this.id, statutLog.SIGOFF);
       }
     }
   }
@@ -787,6 +801,16 @@ export function send<In, Out>(
   if (!request.name) return Promise.reject('Undefined request');
   const rid = `RQ.${rqCount}`;
   rqCount += 1;
+  const { kind, name } = request;
+  logModel.registerRequest(
+    {
+      rid,
+      kind,
+      name,
+      param: param as unknown as Json.json,
+      statut: statutLog.PENDING
+    }
+  );
   const response: Response<Out> = new Promise<Out>((resolve, reject) => {
     const unwrap = (js: Json.json): void => {
       try {
@@ -828,6 +852,7 @@ client.onConnect((err?: Error) => {
     _status(Status.FAILURE);
     _clear();
   } else {
+    logModel.registerFeedback('Client connected');
     _status(Status.CMD);
     _startPolling();
   }
@@ -838,6 +863,9 @@ client.onData((id: string, data: Json.json) => {
   if (p) {
     p.resolve(data);
     _resolved(id);
+    logModel.registerRequest(
+      { rid: id, param: data, statut: statutLog.RESOLVED }
+    );
   }
 });
 
@@ -854,6 +882,9 @@ client.onRejected((id: string) => {
   if (p) {
     p.reject('rejected');
     _resolved(id);
+    logModel.registerRequest(
+      { rid: id, statut: statutLog.REJECTED }
+    );
   }
 });
 
@@ -862,6 +893,9 @@ client.onError((id: string, msg: string) => {
   if (p) {
     p.reject(`error (${msg})`);
     _resolved(id);
+    logModel.registerRequest(
+      { rid: id, param: msg, statut: statutLog.ERROR }
+    );
   }
 });
 
