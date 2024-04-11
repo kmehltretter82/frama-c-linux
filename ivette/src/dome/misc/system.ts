@@ -29,6 +29,7 @@
 // --------------------------------------------------------------------------
 // --- Evolved Spawn Process
 // --------------------------------------------------------------------------
+
 import _ from 'lodash';
 import Emitter from 'events';
 import * as Exec from 'child_process';
