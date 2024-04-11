@@ -5,16 +5,15 @@
 [wp] [Valid] Goal job_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled
-[wp] :0: Warning: Prover Alt-Ergo:1.2.0 not found, fallback to Alt-Ergo:2.5.3
-[wp] [NoResult] typed_job_ensures (Qed)
-[wp] Proved goals:    2 / 3
+[wp] Warning: Prover Alt-Ergo:1.2.0 not found, fallback to Alt-Ergo:2.5.3
+[wp] [Valid] typed_job_ensures (Alt-Ergo) (Cached)
+[wp] Proved goals:    3 / 3
   Terminating:     1
   Unreachable:     1
-  Unsuccess:       1
-  Missing:         1
+  Alt-Ergo:        1
 [wp] Session can be updated
    - 1 script unused (now automated)
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  job                       -        -        1       0.0%
+  job                       -        1        1       100%
 ------------------------------------------------------------

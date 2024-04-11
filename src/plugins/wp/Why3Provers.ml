@@ -151,7 +151,7 @@ let lookup ?(fallback=false) prover_name =
           match select ~name () with
           | None -> None
           | Some p as res ->
-            Wp_parameters.warning ~once:true
+            Wp_parameters.warning ~once:true ~current:false
               "Prover %s not found, fallback to %s" prover_name (ident_wp p) ;
             res
         else None
