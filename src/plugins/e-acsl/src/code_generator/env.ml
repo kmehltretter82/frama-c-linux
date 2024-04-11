@@ -40,7 +40,7 @@ type localized_scope =
   | LLocal_block of kernel_function
 
 type mp_tbl = {
-  new_exps: (varinfo * exp) Term.Map.t;
+  new_exps: varinfo Term.Map.t;
   (* generated mp variables as exp from terms *)
   clear_stmts: stmt list;
   (* stmts freeing the memory before exiting the block *)
@@ -244,7 +244,7 @@ let do_new_var ~loc ?(scope=Varname.Block) ?(name="") env kf t ty mk_stmts =
       { clear_stmts = !gmp_clear_ref loc e :: tbl.clear_stmts;
         new_exps = match t with
           | None -> tbl.new_exps
-          | Some t -> Term.Map.add t (v, e) tbl.new_exps }
+          | Some t -> Term.Map.add t v tbl.new_exps }
     in
     match scope with
     | Varname.Global | Varname.Function ->
@@ -285,8 +285,8 @@ let new_var ~loc ?(scope=Varname.Block) ?name env kf t ty mk_stmts =
       match t with
       | None -> raise No_term
       | Some t ->
-        let v, e = Term.Map.find t tbl.new_exps in
-        if Typ.equal ty v.vtype then v, e, env else raise No_term
+        let v = Term.Map.find t tbl.new_exps in
+        if Typ.equal ty v.vtype then v, Cil.evar v, env else raise No_term
     with Not_found | No_term ->
       do_new_var ~loc ~scope ?name env kf t ty mk_stmts
   in
