@@ -366,12 +366,12 @@ struct pollfd {
    short revents ;
 };
 typedef unsigned long nfds_t;
-typedef int jmp_buf[5];
-struct __fc_sigjmp_buf {
-   jmp_buf buf ;
+typedef int __jmp_buf[8];
+struct __jmp_buf_tag {
+   __jmp_buf __jmpbuf ;
+   int saved ;
    sigset_t sigs ;
 };
-typedef struct __fc_sigjmp_buf sigjmp_buf;
 struct __fc_code {
    char const *c_name ;
    int c_val ;
@@ -11902,16 +11902,22 @@ int pthread_setname_np(pthread_t thread, char const *name);
  */
 int pthread_getname_np(pthread_t thread, char *name, size_t len);
 
-/*@ assigns *(env + (0 .. 4)); */
-extern int setjmp(int env[5]);
+/*@ assigns \result;
+    assigns \result \from (indirect: env); */
+extern int setjmp(struct __jmp_buf_tag env[1]);
 
 /*@ ensures never_terminates: \false;
     assigns \nothing; */
-extern void longjmp(int env[5], int val);
+extern void longjmp(struct __jmp_buf_tag env[1], int val);
+
+/*@ assigns \result;
+    assigns \result \from (indirect: env), (indirect: savesigs);
+ */
+extern int sigsetjmp(struct __jmp_buf_tag env[1], int savesigs);
 
 /*@ ensures never_terminates: \false;
     assigns \nothing; */
-extern void siglongjmp(sigjmp_buf env, int val);
+extern void siglongjmp(struct __jmp_buf_tag env[1], int val);
 
 /*@ assigns \result;
     assigns \result \from (indirect: fd), (indirect: request);
