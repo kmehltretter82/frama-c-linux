@@ -94,7 +94,7 @@ const UPDATE = 'dome.states.update';
 export class GlobalState<A> {
 
   private value: A;
-  private emitter: typeof Emitter;
+  private emitter: Emitter;
 
   constructor(initValue: A) {
     this.value = initValue;

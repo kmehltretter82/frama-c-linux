@@ -113,7 +113,7 @@
 
 import _ from 'lodash';
 import React from 'react';
-import * as Dome from '$dome';
+import * as Dome from 'dome';
 import EventEmitter from 'events';
 
 // --------------------------------------------------------------------------
