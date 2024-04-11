@@ -705,14 +705,6 @@ let isQuitting = false;
 
 /** Starts the main process. */
 export function start(): void {
-  // WORKS
-  app.on(
-    'certificate-error',
-    (event, _webContents, _url, _error, _certificate, callback) => {
-      event.preventDefault();
-      callback(true);
-    }
-  );
 
   app.on(
     'certificate-error',
@@ -764,6 +756,7 @@ export function start(): void {
   app.on('window-all-closed', () => {
     if (isQuitting || System.platform !== 'macos') app.quit();
   });
+
 }
 
 // --------------------------------------------------------------------------
