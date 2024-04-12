@@ -286,7 +286,7 @@ let print_stmt_table_elt fmt k v :unit =
     | None -> Format.fprintf fmt "<Bot>"
     | Some a -> Abstract_state.pretty ~debug:(Options.DebugTable.get ()) fmt a
   in
-  Format.fprintf fmt "Before statement %a :@[<hov 2> %a@]" print_key k print_value v
+  Format.fprintf fmt "Before statement %a :@[<hov 2> %a@]@." print_key k print_value v
 
 let print_function_table_elt fmt kf s : unit =
   let function_name = Kernel_function.get_name kf in
