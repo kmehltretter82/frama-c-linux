@@ -125,7 +125,7 @@ export function Graph(props: {
 }): JSX.Element {
   const fgRef2D = React.useRef<ForceGraphMethods2D | undefined>(undefined);
   const fgRef3D = React.useRef<ForceGraphMethods3D | undefined>(undefined);
-  const [graph2D, setGraph2D] = React.useState({
+  const [graphData, setGraphData] = React.useState({
     nodes: props.graph.nodes.map((node) => {
       return { id: node.id, name: node.label };
     }),
@@ -136,7 +136,7 @@ export function Graph(props: {
 
   // add and remove node on ForceGraph2D
   React.useEffect(() => {
-    setGraph2D((prevGraph) => {
+    setGraphData((prevGraph) => {
       if (props.graph.nodes.length > prevGraph.nodes.length) {
         const newNode = {
           id: props.graph.nodes[props.graph.nodes.length - 1].id,
@@ -177,7 +177,7 @@ export function Graph(props: {
         props.graph.layout === '2D' ? (
           <ForceGraph2D
             ref={fgRef2D}
-            graphData={graph2D}
+            graphData={graphData}
             // autoPauseRedraw performance optimization to automatically
             // pause redrawing the 2D canvas at every frame whenever
             // the simulation engine is halted
@@ -197,7 +197,7 @@ export function Graph(props: {
             }}
             onNodeDragEnd={(): void => {
               // Change x and y value on node ForceGraph2D
-              setGraph2D((prevGraph) => {
+              setGraphData((prevGraph) => {
                 return { ...prevGraph };
               });
               // Change the x value and y value of GraphProps
@@ -218,7 +218,7 @@ export function Graph(props: {
         ) : (
           <ForceGraph3D
             ref={fgRef3D}
-            graphData={graph2D}
+            graphData={graphData}
             d3VelocityDecay={1}
             dagLevelDistance={50}
           />
