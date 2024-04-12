@@ -20,10 +20,14 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-import { registerSandbox } from 'ivette';
-import React, { useEffect } from 'react';
+/* -------------------------------------------------------------------------- */
+/* --- Sandbox Testing for Force Graph component                          --- */
+/* -------------------------------------------------------------------------- */
+
+import React from 'react';
 import { Button } from 'dome/controls/buttons';
-import { GraphProps, Graph, Node, Edge } from 'dome/graph/graph';
+import {  Graph, Node, Edge, Layout } from 'dome/graph/graph';
+import { registerSandbox } from 'ivette';
 
 // --------------------------------------------------------------------------
 // --- Init functions for nodes and edges
@@ -54,112 +58,83 @@ function createEdge(nodes: Node[]): Edge[] {
 // --------------------------------------------------------------------------
 
 export default function GraphComponent(): JSX.Element {
-  const nodes = createNode(5);
-  const edges = createEdge(nodes);
-  const [initGraph, setInitGraph] = React.useState<GraphProps>({
-    nodes,
-    edges,
-  });
+  // Set initial configs
+  const [nodes, setNodes] = React.useState<Node[]>(createNode(5));
+  const [edges, setEdges] = React.useState<Edge[]>(createEdge(nodes));
+  const [display, setDisplay] = React.useState<boolean>(true);
+  const [layout, setLayout] = React.useState<Layout>('2D');
+  const [zoom, setZoom] = React.useState<number>(2);
+  const [nodeSelected, setNodeSelected] = React.useState<string>('0');
 
   // Display or hide the graph
-  const updateDisplay = (): void => {
-    setInitGraph((p) => {
-      return { ...p, display: !p.display };
-    });
-  };
+  const updateDisplay = (): void => setDisplay(!display);
 
-  // add Node GraphProps
+  // Add Node
   const addNode = (): void => {
-    setInitGraph((prevGraph) => {
-      const uniqueId = String(prevGraph.nodes.length);
-      const newNode = { id: uniqueId, label: `Node: ${uniqueId}` };
-      const fromNodeId = prevGraph.nodes[prevGraph.nodes.length - 1].id;
-      const newEdge = { fromNode: fromNodeId, toNode: newNode.id };
-      return {
-        ...prevGraph,
-        nodes: [...prevGraph.nodes, newNode],
-        edges: [...prevGraph.edges, newEdge],
-      };
-    });
+    const uniqueId = String(nodes.length);
+    const newNode = { id: uniqueId, label: `Node: ${uniqueId}` };
+    const fromNodeId = nodes[nodes.length - 1].id;
+    const newEdge = { fromNode: fromNodeId, toNode: newNode.id };
+
+    setNodes((prevNodes) => ([...prevNodes, newNode]));
+    setEdges((prevEdges) => ([...prevEdges, newEdge]));
   };
 
   // Remove Node GraphProps
   const deleteNode = (): void => {
-    setInitGraph((prevState) => ({
-      ...prevState,
-      nodes: prevState.nodes.slice(0, -1),
-      edges: prevState.edges.slice(0, -1),
-    }));
+    const newNodes = nodes.slice(0, -1);
+    const newEdges = edges.slice(0, -1);
+    setNodes(newNodes);
+    setEdges(newEdges);
   };
 
   // Transition from 2D to 3D or 3D to 2D
   const updateLayout = (): void => {
-    setInitGraph((prevGraph) => {
-      return {
-        ...prevGraph,
-        layout: prevGraph.layout === '2D' ? '3D' : '2D',
-      };
-    });
+    layout === '2D' ? setLayout('3D') : setLayout('2D');
   };
 
   // Zoom out
-  const updateZoomOut = (): void => {
-    setInitGraph((prevGraph) => {
-      return {
-        ...prevGraph,
-        zoom: prevGraph.zoom! - 1,
-      };
-    });
-  };
+  const updateZoomOut = (): void => setZoom(zoom - 1);
   // Zoom In
-  const updateZoomIn = (): void => {
-    setInitGraph((initGraph) => {
-      return {
-        ...initGraph,
-        zoom: initGraph.zoom! + 1,
-      };
-    });
-  };
+  const updateZoomIn = (): void => setZoom(zoom + 1);
 
-  useEffect(() => {
-    setInitGraph((p) => {
-      return {
-        ...p,
-        selected: '0',
-        zoom: 2,
-        layout: '2D',
-        display: true,
-        className: 'dome-xGraph-item-graph',
-        children: (
-          <div className='toolbar'>
-            <Button icon='DISPLAY' title='Display' onClick={updateDisplay} />
-            <Button icon='COMPONENT' title='Layout' onClick={updateLayout} />
-            <Button icon='ZOOM.IN' title='Zoom in' onClick={updateZoomIn} />
-            <Button icon='ZOOM.OUT' title='Zoom out' onClick={updateZoomOut} />
-            <Button icon='PLUS' title='Add' onClick={addNode} />
-            <Button icon='MINUS' title='Delete' onClick={deleteNode} />
-          </div>
-        ),
+  const GraphChildren = ():JSX.Element => (
+    <div className='toolbar'>
+      <Button icon='DISPLAY' title='Display' onClick={updateDisplay} />
+      <Button icon='COMPONENT' title='Layout' onClick={updateLayout} />
+      <Button icon='ZOOM.IN' title='Zoom in' onClick={updateZoomIn} />
+      <Button icon='ZOOM.OUT' title='Zoom out' onClick={updateZoomOut} />
+      <Button icon='PLUS' title='Add' onClick={addNode} />
+      <Button icon='MINUS' title='Delete' onClick={deleteNode} />
+    </div>
+  );
 
-        onSelection: (_n, _e) => {},
-        onReady: () => {},
-      };
-    });
-  }, []);
-
-  return <Graph graph={initGraph} setInitGraph={setInitGraph} />;
+  return (
+    <Graph
+      nodes={nodes}
+      edges={edges}
+      selected={nodeSelected}
+      zoom={zoom}
+      layout={layout}
+      display={display}
+      className='dome-xGraph-item-graph'
+      onSelection={(_n, _e) => { setNodeSelected(_n); }}
+      onReady={() => {}}
+    >
+      <GraphChildren />
+    </Graph>
+  );
 }
 
-// --------------------------------------------------------------------------
 /* -------------------------------------------------------------------------- */
 /* --- Sandbox                                                            --- */
 /* -------------------------------------------------------------------------- */
 
 registerSandbox({
-  id: 'sandbox.icons',
+  id: 'sandbox.graph',
   label: 'Force Graph',
-  title: 'Display a graph showing calls between functions.',
   children: <GraphComponent />,
 });
 
-/* -------------------------------------------------------------------------- */
+
+// --------------------------------------------------------------------------

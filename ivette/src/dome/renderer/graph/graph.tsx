@@ -96,7 +96,7 @@ export interface GraphProps {
    */
   zoom?: number;
 
-  /** Kayout engine. */
+  /** Layout engine. */
   layout?: Layout;
 
   /** Invoked when a node is selected. */
@@ -119,17 +119,14 @@ export interface GraphProps {
 /* --- Graph Component                                                    --- */
 /* -------------------------------------------------------------------------- */
 
-export function Graph(props: {
-  graph: GraphProps;
-  setInitGraph: React.Dispatch<React.SetStateAction<GraphProps>>;
-}): JSX.Element {
+export function Graph(props: GraphProps): JSX.Element {
   const fgRef2D = React.useRef<ForceGraphMethods2D | undefined>(undefined);
   const fgRef3D = React.useRef<ForceGraphMethods3D | undefined>(undefined);
   const [graphData, setGraphData] = React.useState({
-    nodes: props.graph.nodes.map((node) => {
+    nodes: props.nodes.map((node) => {
       return { id: node.id, name: node.label };
     }),
-    links: props.graph.edges.map((edge) => {
+    links: props.edges.map((edge) => {
       return { source: edge.fromNode, target: edge.toNode };
     }),
   });
@@ -137,10 +134,10 @@ export function Graph(props: {
   // add and remove node on ForceGraph2D
   React.useEffect(() => {
     setGraphData((prevGraph) => {
-      if (props.graph.nodes.length > prevGraph.nodes.length) {
+      if (props.nodes.length > prevGraph.nodes.length) {
         const newNode = {
-          id: props.graph.nodes[props.graph.nodes.length - 1].id,
-          name: props.graph.nodes[props.graph.nodes.length - 1].label,
+          id: props.nodes[props.nodes.length - 1].id,
+          name: props.nodes[props.nodes.length - 1].label,
         };
         const fromNodeId = prevGraph.nodes[prevGraph.nodes.length - 1].id;
         const newEdge = { source: fromNodeId, target: newNode.id };
@@ -151,7 +148,7 @@ export function Graph(props: {
           links: [...prevGraph.links, newEdge],
         };
       } else {
-        if (props.graph.nodes.length < prevGraph.nodes.length) {
+        if (props.nodes.length < prevGraph.nodes.length) {
           return {
             ...prevGraph,
             nodes: prevGraph.nodes.slice(0, -1),
@@ -162,19 +159,19 @@ export function Graph(props: {
         }
       }
     });
-  }, [props.graph.nodes, props.graph.edges]);
+  }, [props.nodes, props.edges]);
 
   React.useEffect(() => {
     // Zoom update on ForceGraph2D
-    fgRef2D.current?.zoom(props.graph.zoom || 0);
-    // fgRef3D.current?.cameraPosition();
-  }, [props.graph.zoom]);
+    fgRef2D.current?.zoom(props.zoom || 0);
+    // fgRef3D.current?.zoomToFit(props.zoom);
+  }, [props.zoom]);
 
   return (
-    <div className={props.graph.className}>
-      {props.graph.children}
-      {props.graph.display ? (
-        props.graph.layout === '2D' ? (
+    <div className={props.className}>
+      {props.children}
+      {props.display && (
+        props.layout === '2D' ? (
           <ForceGraph2D
             ref={fgRef2D}
             graphData={graphData}
@@ -187,32 +184,16 @@ export function Graph(props: {
             dagLevelDistance={50}
             // Node selection
             onNodeClick={(node, event): void => {
-              if (props.graph.onSelection) {
-                props.graph.onSelection(String(node.id), event);
-              }
-              // change the selected value of GraphProps
-              props.setInitGraph((prevGraph) => {
-                return { ...prevGraph, selected: String(node.id) };
-              });
+              if (props.onSelection)
+                props.onSelection(String(node.id), event);
             }}
-            onNodeDragEnd={(): void => {
-              // Change x and y value on node ForceGraph2D
-              setGraphData((prevGraph) => {
-                return { ...prevGraph };
-              });
-              // Change the x value and y value of GraphProps
-              props.setInitGraph((prevGraph) => {
-                return { ...prevGraph };
-              });
-            }}
-            nodeLabel={'label'}
+            nodeLabel={"name"}
             // How long (ms) to render for before stopping
             // and freezing the layout engine.
             cooldownTime={50}
             onRenderFramePost={(): void => {
-              if (props.graph.onReady) {
-                props.graph.onReady();
-              }
+              if (props.onReady)
+                props.onReady();
             }}
           />
         ) : (
@@ -220,11 +201,16 @@ export function Graph(props: {
             ref={fgRef3D}
             graphData={graphData}
             d3VelocityDecay={1}
+            nodeLabel={"name"}
+            onNodeClick={(node, event): void => {
+              if (props.onSelection)
+                props.onSelection(String(node.id), event);
+            }}
+
+            cooldownTime={50}
             dagLevelDistance={50}
           />
         )
-      ) : (
-        <></>
       )}
     </div>
   );
