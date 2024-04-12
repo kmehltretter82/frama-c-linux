@@ -196,6 +196,11 @@ module Readout = struct
     let list_pred = List.map (fun b -> get_lval_set b s) (G.ppred s.graph v) in
     List.fold_left LSet.union LSet.empty list_pred
 
+  let vars_pointing_to_vertex v s : VarSet.t =
+    let preds = G.ppred s.graph v in
+    let pred_vars = List.map (fun p -> get_vars p s) preds in
+    List.fold_left VarSet.union VarSet.empty pred_vars
+
   let find_vars lv s =
     let lv = Lval.simplify lv in
     try let v = find_lval_vertex lv s in get_vars v s
@@ -209,10 +214,10 @@ module Readout = struct
   let alias_vars lv s : VarSet.t =
     try
       let v = find_lval_vertex lv s in
-      let succs = G.psucc s.graph v in
-      let pred_succs = List.concat_map (G.ppred s.graph) succs in
-      let pred_vars = List.map (fun p -> get_vars p s) pred_succs in
-      List.fold_left VarSet.union VarSet.empty pred_vars
+      List.fold_left
+        (fun acc succ -> VarSet.union acc @@ vars_pointing_to_vertex succ s)
+        VarSet.empty
+        (G.psucc s.graph v)
     with Not_found -> VarSet.empty
 
   let alias_lvals lv s : LSet.t =
