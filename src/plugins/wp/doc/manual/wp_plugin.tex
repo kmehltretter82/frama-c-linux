@@ -1450,8 +1450,11 @@ Similarly, if you want to use \textsf{Z3 4.6.0} without bitvectors, you can use 
 Finally, since \textsf{Why-3} also provides the alias
 \verb+altergo+ for this prover, \verb+-wp-prover altergo+ will also run it \emph{via} \textsf{Why-3}.
 
-If you require a specific version of a prover which is not installed,
-\textsf{WP} will fallback to the default version available to \textsf{Why-3} for this prover, if any.
+If you require on command line a specific version of a prover which is not
+installed, \textsf{WP} will emit an error. When a script contains a couple
+prover/version that is not installed, \textsf{WP} will try to find another
+version of the same prover and fallback on this solver (emitting a warning) if
+it finds one. In this case, one should update the scripts.
 
 Notice that \textsf{Why-3} provers benefit from a cache management when used in combination
 with a \textsf{WP}-session, see Section~\ref{wp-cache} for more details.
