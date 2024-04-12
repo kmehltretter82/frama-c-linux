@@ -20,10 +20,10 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+import { registerSandbox } from 'ivette';
 import React, { useEffect } from 'react';
 import { Button } from 'dome/controls/buttons';
 import { GraphProps, Graph, Node, Edge } from 'dome/graph/graph';
-import './style.css';
 
 // --------------------------------------------------------------------------
 // --- Init functions for nodes and edges
@@ -151,3 +151,15 @@ export default function GraphComponent(): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
+/* -------------------------------------------------------------------------- */
+/* --- Sandbox                                                            --- */
+/* -------------------------------------------------------------------------- */
+
+registerSandbox({
+  id: 'sandbox.icons',
+  label: 'Force Graph',
+  title: 'Display a graph showing calls between functions.',
+  children: <GraphComponent />,
+});
+
+/* -------------------------------------------------------------------------- */
