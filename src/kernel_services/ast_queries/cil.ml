@@ -5322,7 +5322,7 @@ let rec constFoldTermNodeAtTop = function
       | BNot -> constFoldTermUnOp Integer.lognot
       | LNot -> constFoldTermUnOp
                   (fun i -> if Integer.is_zero i
-                    then Integer.zero else Integer.one)
+                    then Integer.one else Integer.zero)
     end
   | TBinOp (op, {term_node = t1; term_type = typ1}, {term_node = t2}) as t ->
     begin

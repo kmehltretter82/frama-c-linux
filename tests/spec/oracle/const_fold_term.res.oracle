@@ -1,7 +1,7 @@
 [kernel] Parsing const_fold_term.i (no preprocessing)
 Custom terms : 
-  !(21 + 21) folds to 1
-  !(21 - 21) folds to 0
+  !(21 + 21) folds to 0
+  !(21 - 21) folds to 1
 File terms : 
   -(21 + 21) folds to -42
   21 + 21 folds to 42
