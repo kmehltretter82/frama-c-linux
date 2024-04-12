@@ -23,7 +23,6 @@
 import React, { useEffect } from 'react';
 import { Button } from 'dome/controls/buttons';
 import { GraphProps, Graph, Node, Edge } from 'dome/graph/graph';
-import { v4 as uuidv4 } from 'uuid';
 import './style.css';
 
 // --------------------------------------------------------------------------
@@ -34,7 +33,7 @@ function createNode(numberNode: number): Node[] {
   const nodes: Node[] = [];
 
   for (let i = 0; i < numberNode; i++) {
-    const uniqueId = uuidv4();
+    const uniqueId = String(i);
     const newNode = { id: uniqueId, label: `Node: ${uniqueId}` };
     nodes.push(newNode);
   }
@@ -49,7 +48,6 @@ function createEdge(nodes: Node[]): Edge[] {
   }
   return edges;
 }
-
 
 // --------------------------------------------------------------------------
 // --- Main force graph component
@@ -72,9 +70,9 @@ export default function GraphComponent(): JSX.Element {
 
   // add Node GraphProps
   const addNode = (): void => {
-    const uniqueId = uuidv4();
-    const newNode = { id: uniqueId, label: `Node: ${uniqueId}` };
     setInitGraph((prevGraph) => {
+      const uniqueId = String(prevGraph.nodes.length);
+      const newNode = { id: uniqueId, label: `Node: ${uniqueId}` };
       const fromNodeId = prevGraph.nodes[prevGraph.nodes.length - 1].id;
       const newEdge = { fromNode: fromNodeId, toNode: newNode.id };
       return {
