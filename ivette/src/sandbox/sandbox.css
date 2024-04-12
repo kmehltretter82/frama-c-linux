@@ -19,12 +19,12 @@
 .cm-global-box .hover {
     background: yellow;
 }
-.forcegraph-item-graph{
+.dome-xGraph-item-graph{
     color: var(--text);
     background-color:  var(--background-profound);
     
 }
-.forcegraph-item-graph .toolbar{
+.dome-xGraph-item-graph .toolbar{
     text-align: right;
     
     
