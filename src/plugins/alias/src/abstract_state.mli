@@ -65,6 +65,8 @@ val find_all_aliases : lval -> t -> LSet.t
 
 val points_to_vars : lval -> t -> VarSet.t
 val points_to_lvals : lval -> t -> LSet.t
+val alias_sets_vars : t -> VarSet.t list
+val alias_sets_lvals : t -> LSet.t list
 
 val points_to_set : lval -> t -> LSet.t
 [@@alert deprecated "Use points_to_vars or points_to_lvals instead!"]

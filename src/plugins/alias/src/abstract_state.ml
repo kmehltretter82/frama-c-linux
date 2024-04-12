@@ -238,11 +238,24 @@ module Readout = struct
     | None -> LSet.empty
     | Some succ_v -> get_lval_set succ_v s
 
+  let alias_sets_vars s =
+    let alias_set_of_vertex (i, _) =
+      let aliases = vars_pointing_to_vertex i s in
+      if VarSet.cardinal aliases >= 2 then Some aliases else None
+    in
+    List.filter_map alias_set_of_vertex @@ VMap.bindings s.vmap
+
+  let alias_sets_lvals s =
+    let alias_set_of_vertex (i, _) =
+      let aliases = lvals_pointing_to_vertex i s in
+      if LSet.cardinal aliases >= 2 then Some aliases else None
+    in
+    List.filter_map alias_set_of_vertex @@ VMap.bindings s.vmap
+
 end
 
 
 module Pretty = struct
-
   let pp_debug fmt s =
     Format.fprintf fmt "@[<v>";
     Format.fprintf fmt "@[Edges:";
@@ -283,13 +296,8 @@ module Pretty = struct
           G.iter_vertex pp_unconnected_vertex s.graph)
 
   let pp_aliases fmt s =
-    let alias_set_of_vertex (i, _) =
-      let aliases = Readout.lvals_pointing_to_vertex i s in
-      if LSet.cardinal aliases >= 2 then Some aliases else None
-    in
-    let alias_sets = List.filter_map alias_set_of_vertex @@ VMap.bindings s.vmap in
+    let alias_sets = Readout.alias_sets_lvals s in
     Pretty_utils.pp_list ~empty:"<none>" ~sep:"@;<2>" LSet.pretty fmt alias_sets
-
 end
 
 (* invariants of type t must be true before and after each functon call *)
@@ -935,6 +943,8 @@ module API = struct
   let points_to_vars = Readout.points_to_vars
   let points_to_set = Readout.points_to_lvals
   let points_to_lvals = Readout.points_to_lvals
+  let alias_sets_vars = Readout.alias_sets_vars
+  let alias_sets_lvals = Readout.alias_sets_lvals
 
   let get_graph s = s.graph
 

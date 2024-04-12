@@ -52,6 +52,12 @@ module Statement : sig
   (** see [Abstract_state.points_to_lvals] *)
   val points_to_lvals : stmt:stmt -> lval -> LSet.t
 
+  (** see [Abstract_state.alias_sets_vars] *)
+  val alias_sets_vars : stmt:stmt -> VarSet.t list
+
+  (** see [Abstract_state.alias_sets_lvals] *)
+  val alias_sets_lvals : stmt:stmt -> LSet.t list
+
   (** see [Abstract_state.alias_vars] *)
   val alias_vars : stmt:stmt -> lval -> VarSet.t
 
@@ -78,6 +84,12 @@ module Function : sig
 
   (** see [Abstract_state.points_to_lvals] *)
   val points_to_lvals : kf:kernel_function -> lval -> LSet.t
+
+  (** see [Abstract_state.alias_sets_vars] *)
+  val alias_sets_vars : kf:kernel_function -> VarSet.t list
+
+  (** see [Abstract_state.alias_sets_lvals] *)
+  val alias_sets_lvals : kf:kernel_function -> LSet.t list
 
   (** see [Abstract_state.alias_vars] *)
   val alias_vars : kf:kernel_function -> lval -> VarSet.t
@@ -244,6 +256,18 @@ module Abstract_state : sig
 
   val points_to_set : lval -> t -> LSet.t
   [@@alert deprecated "Use points_to_vars or points_to_lvals instead!"]
+
+  (** all the alias sets of a given state
+      Example: {a,b} → {c} ← {d} ← {e,f}
+      The aliases sets are {{a,b,d}, {e,f}}
+  *)
+  val alias_sets_vars : t -> VarSet.t list
+
+  (** all the alias sets of a given state, including reconstructed lvals
+      Example: {a,b} → {c} ← {d} ← {e,f}
+      The aliases sets are {{a,b,d,*e,*f}, {e,f}}
+  *)
+  val alias_sets_lvals : t -> LSet.t list
 
   (** alias_lvals, then recursively finds other sets of lvals. We
       have the property (if lval [lv] is in abstract state [x]) :

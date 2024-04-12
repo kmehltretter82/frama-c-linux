@@ -41,22 +41,21 @@ let check_computed () =
   then
     Options.abort "Static analysis must be called before any function of the API can be called"
 
-
-let lset ~stmt (get_set : Abstract_state.t -> LSet.t) =
+let get_of_stmt ~stmt empty (get : Abstract_state.t -> 'a) =
   check_computed ();
   match Analysis.get_state_before_stmt stmt with
-  | None -> LSet.empty
-  | Some state -> get_set state
+  | None -> empty
+  | Some state -> get state
 
-let vars ~stmt (get_set : Abstract_state.t -> VarSet.t) =
-  check_computed ();
-  match Analysis.get_state_before_stmt stmt with
-  | None -> VarSet.empty
-  | Some state -> get_set state
+let lset ~stmt get_set = get_of_stmt ~stmt LSet.empty get_set
+let vars ~stmt get_set = get_of_stmt ~stmt VarSet.empty get_set
+let get_list ~stmt get = get_of_stmt ~stmt [] get
 
 module Statement = struct
   let points_to_vars ~stmt lv = vars ~stmt (Abstract_state.points_to_vars lv)
   let points_to_lvals ~stmt lv = lset ~stmt (Abstract_state.points_to_lvals lv)
+  let alias_sets_vars ~stmt = get_list ~stmt Abstract_state.alias_sets_vars
+  let alias_sets_lvals ~stmt = get_list ~stmt Abstract_state.alias_sets_lvals
   let alias_vars ~stmt lv = vars ~stmt (Abstract_state.alias_vars lv)
   let alias_lvals ~stmt lv = lset ~stmt (Abstract_state.alias_lvals lv)
   let aliases = alias_lvals (* deprecated *)
@@ -92,6 +91,8 @@ module Function = struct
 
   let points_to_vars ~kf = Statement.points_to_vars ~stmt:(return_stmt kf)
   let points_to_lvals ~kf = Statement.points_to_lvals ~stmt:(return_stmt kf)
+  let alias_sets_vars ~kf = Statement.alias_sets_vars ~stmt:(return_stmt kf)
+  let alias_sets_lvals ~kf = Statement.alias_sets_lvals ~stmt:(return_stmt kf)
   let alias_vars ~kf = Statement.alias_vars ~stmt:(return_stmt kf)
   let alias_lvals ~kf = Statement.alias_lvals ~stmt:(return_stmt kf)
   let aliases = alias_lvals (* deprecated *)
