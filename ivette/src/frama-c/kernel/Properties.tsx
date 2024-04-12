@@ -34,6 +34,7 @@ import * as Settings from 'dome/data/settings';
 import { Label, Code } from 'dome/controls/labels';
 import { Icon } from 'dome/controls/icons';
 import { IconButton, Checkbox } from 'dome/controls/buttons';
+import * as Form from 'dome/layout/forms';
 import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
 import { Scroll } from 'dome/layout/boxes';
@@ -124,7 +125,22 @@ function useFilter(path: string): [boolean, () => void] {
   );
 }
 
-function resetFilters(prefix: string, b?: boolean): void {
+function useFilterStr(path: string): Form.FieldState<string> {
+  const [value, setValue] = Dome.useStringSettings(
+    `ivette.properties.filter.${path}`
+  );
+  const [error, setError] = React.useState<Form.FieldError>(undefined);
+  const onChanged = React.useCallback(
+    (newValue: string, newError: Form.FieldError) => {
+      setValue(newValue);
+      setError(newError);
+      if(Form.isValid(newError)) Reload.emit();
+    }, [setValue],
+  );
+  return { value, error, onChanged };
+}
+
+function resetFilters(prefix: string, b?: boolean) : void {
   for (const key in DEFAULTS) {
     if (key.startsWith(prefix)) {
       const target = b ?? DEFAULTS[key];
@@ -245,11 +261,24 @@ function filterEva(p: Property): boolean {
   return true;
 }
 
+function filterNames(names: string[]): boolean {
+  const field = Settings.getWindowSettings(
+    `ivette.properties.filter.names`,
+    Json.jString,
+    "",
+  );
+  if (!field || field.length < 2) return true;
+  const strNames = names.join(':');
+  const regex = new RegExp(field, 'i');
+  return regex.test(strNames);
+}
+
 function filterProperty(p: Property): boolean {
   return filterStatus(p.status)
     && filterKind(p.kind)
     && filterAlarm(p.alarm)
-    && filterEva(p);
+    && filterEva(p)
+    && filterNames(p.names);
 }
 
 // --------------------------------------------------------------------------
@@ -469,9 +498,33 @@ function CheckField(props: CheckFieldProps): JSX.Element {
 /* eslint-disable max-len */
 
 function PropertyFilter(): JSX.Element {
+  const namesState = useFilterStr("names");
+  const checkerNames = (names: string | undefined): Form.FieldError => {
+    if( names === undefined || names === "" || names.length > 1) return true;
+    return "At least 2 characters";
+  };
+
   return (
     <Scroll>
       <CheckField label="Current scope" path="currentScope" />
+      <Section
+        label="Search"
+        defaultUnfold={true}
+        className="properties-section-names"
+        infos={Form.isValid(namesState.error) && namesState.value.length >= 2 ? "Active" : ""}
+        summary={!Form.isValid(namesState.error) ?
+          <IconButton icon='WARNING' kind="warning" title={`Errors in section`}/>
+          : undefined
+        }
+      >
+        <Form.TextField
+          label={""}
+          placeholder="Names"
+          title={'Filters names based on regular expressions; enter 2 or more characters to filter'}
+          state={namesState as Form.FieldState<string | undefined>}
+          checker={checkerNames}
+        />
+      </Section>
       <FilterSection label="Status" prefix="status" unfold>
         <CheckField label="Valid" path="status.valid" />
         <CheckField label="Valid under hyp." path="status.valid_hyp" />
