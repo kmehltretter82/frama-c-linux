@@ -136,7 +136,6 @@ function Graph2D({
   React.useEffect(() => {
     // Zoom update on ForceGraph2D
     fgRef2D.current?.zoom(zoom || 0);
-    // fgRef3D.current?.zoomToFit(props.zoom);
   }, [zoom]);
 
   return (
@@ -184,7 +183,7 @@ function Graph3D({
 }
 
 export function Graph(props: GraphProps): JSX.Element {
-  const [graphData, setGraphData] = React.useState({
+  const [graphData, setGraphData] = React.useState<GraphData>({
     nodes: props.nodes.map((node) => {
       return { id: node.id, name: node.label };
     }),

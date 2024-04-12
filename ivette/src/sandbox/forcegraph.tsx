@@ -26,7 +26,7 @@
 
 import React from 'react';
 import { Button } from 'dome/controls/buttons';
-import {  Graph, Node, Edge, Layout } from 'dome/graph/graph';
+import { Graph, Node, Edge, Layout } from 'dome/graph/graph';
 import { registerSandbox } from 'ivette';
 
 // --------------------------------------------------------------------------
@@ -76,8 +76,8 @@ export default function GraphComponent(): JSX.Element {
     const fromNodeId = nodes[nodes.length - 1].id;
     const newEdge = { fromNode: fromNodeId, toNode: newNode.id };
 
-    setNodes((prevNodes) => ([...prevNodes, newNode]));
-    setEdges((prevEdges) => ([...prevEdges, newEdge]));
+    setNodes((prevNodes) => [...prevNodes, newNode]);
+    setEdges((prevEdges) => [...prevEdges, newEdge]);
   };
 
   // Remove Node GraphProps
@@ -98,12 +98,18 @@ export default function GraphComponent(): JSX.Element {
   // Zoom In
   const updateZoomIn = (): void => setZoom(zoom + 1);
 
-  const GraphChildren = ():JSX.Element => (
+  const GraphChildren = (): JSX.Element => (
     <div className='toolbar'>
       <Button icon='DISPLAY' title='Display' onClick={updateDisplay} />
       <Button icon='COMPONENT' title='Layout' onClick={updateLayout} />
-      <Button icon='ZOOM.IN' title='Zoom in' onClick={updateZoomIn} />
-      <Button icon='ZOOM.OUT' title='Zoom out' onClick={updateZoomOut} />
+      {layout === '2D' ? (
+        <>
+          <Button icon='ZOOM.IN' title='Zoom in' onClick={updateZoomIn} />
+          <Button icon='ZOOM.OUT' title='Zoom out' onClick={updateZoomOut} />
+        </>
+      ) : (
+        <></>
+      )}
       <Button icon='PLUS' title='Add' onClick={addNode} />
       <Button icon='MINUS' title='Delete' onClick={deleteNode} />
     </div>
@@ -118,7 +124,9 @@ export default function GraphComponent(): JSX.Element {
       layout={layout}
       display={display}
       className='dome-xGraph-item-graph'
-      onSelection={(_n, _e) => { setNodeSelected(_n); }}
+      onSelection={(_n, _e) => {
+        setNodeSelected(_n);
+      }}
       onReady={() => {}}
     >
       <GraphChildren />
@@ -135,6 +143,5 @@ registerSandbox({
   label: 'Force Graph',
   children: <GraphComponent />,
 });
-
 
 // --------------------------------------------------------------------------
