@@ -129,7 +129,7 @@ export default function GraphComponent(): JSX.Element {
         zoom: 2,
         layout: '2D',
         display: true,
-        className: 'forcegraph-item-graph',
+        className: 'dome-xGraph-item-graph',
         children: (
           <div className='toolbar'>
             <Button icon='DISPLAY' title='Display' onClick={updateDisplay} />

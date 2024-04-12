@@ -205,7 +205,7 @@ export function Graph(props: {
                 return { ...prevGraph };
               });
             }}
-            nodeLabel={'name'}
+            nodeLabel={'label'}
             // How long (ms) to render for before stopping
             // and freezing the layout engine.
             cooldownTime={50}
