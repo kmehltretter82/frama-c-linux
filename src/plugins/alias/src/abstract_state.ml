@@ -215,7 +215,7 @@ module Readout = struct
       List.fold_left VarSet.union VarSet.empty pred_vars
     with Not_found -> VarSet.empty
 
-  let find_all_aliases lv s : LSet.t =
+  let alias_lvals lv s : LSet.t =
     let v_opt = try Some (find_lval_vertex lv s) with Not_found -> None in
     match Option.bind v_opt @@ G.psucc_opt s.graph with
     | None -> LSet.empty
@@ -925,7 +925,8 @@ module API = struct
   let find_synonyms = Readout.find_synonyms
   let find_aliases = Readout.find_synonyms
   let alias_vars = Readout.alias_vars
-  let find_all_aliases = Readout.find_all_aliases
+  let alias_lvals = Readout.alias_lvals
+  let find_all_aliases = Readout.alias_lvals (* deprecated *)
   let points_to_vars = Readout.points_to_vars
   let points_to_set = Readout.points_to_lvals
   let points_to_lvals = Readout.points_to_lvals

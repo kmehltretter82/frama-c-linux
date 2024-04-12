@@ -58,7 +58,22 @@ module Statement = struct
   let points_to_vars ~stmt lv = vars ~stmt (Abstract_state.points_to_vars lv)
   let points_to_lvals ~stmt lv = lset ~stmt (Abstract_state.points_to_lvals lv)
   let alias_vars ~stmt lv = vars ~stmt (Abstract_state.alias_vars lv)
-  let aliases ~stmt lv = lset ~stmt (Abstract_state.find_all_aliases lv)
+  let alias_lvals ~stmt lv = lset ~stmt (Abstract_state.alias_lvals lv)
+  let aliases = alias_lvals (* deprecated *)
+
+  let new_aliases_lvals ~stmt lv =
+    let get_set state =
+      let new_state = Analysis.do_stmt state stmt in
+      Abstract_state.alias_lvals lv new_state
+    in
+    lset ~stmt:stmt get_set
+
+  let new_aliases_vars ~stmt lv =
+    let get_set state =
+      let new_state = Analysis.do_stmt state stmt in
+      Abstract_state.alias_vars lv new_state
+    in
+    vars ~stmt:stmt get_set
 
   let are_aliased ~stmt (lv1: lval) (lv2:lval) : bool =
     (* TODO: more efficient algorithm: do they share a successor? *)
@@ -69,13 +84,6 @@ let points_to_set_stmt _kf stmt = Statement.points_to_lvals ~stmt
 
 let aliases_stmt _kf stmt = Statement.aliases ~stmt
 
-let new_aliases_stmt s lv =
-  let get_set state =
-    let new_state = Analysis.do_stmt state s in
-    Abstract_state.find_all_aliases lv new_state
-  in
-  lset ~stmt:s get_set
-
 module Function = struct
   let return_stmt kf =
     if Kernel_function.has_definition kf
@@ -85,14 +93,15 @@ module Function = struct
   let points_to_vars ~kf = Statement.points_to_vars ~stmt:(return_stmt kf)
   let points_to_lvals ~kf = Statement.points_to_lvals ~stmt:(return_stmt kf)
   let alias_vars ~kf = Statement.alias_vars ~stmt:(return_stmt kf)
-  let aliases ~kf = Statement.aliases ~stmt:(return_stmt kf)
+  let alias_lvals ~kf = Statement.alias_lvals ~stmt:(return_stmt kf)
+  let aliases = alias_lvals (* deprecated *)
   let are_aliased ~kf = Statement.are_aliased ~stmt:(return_stmt kf)
 
   let fundec_stmts ~kf lv =
     if Kernel_function.has_definition kf
     then
       List.map
-        (fun s -> s, new_aliases_stmt s lv)
+        (fun stmt -> stmt, Statement.new_aliases_lvals ~stmt lv)
         (Kernel_function.get_definition kf).sallstmts
     else
       Options.abort "fundec_stmts: function %a has no definition" Kernel_function.pretty kf
@@ -112,7 +121,7 @@ let fold_aliases_stmt f_fold acc kf s lv =
   LSet.fold (fun e a -> f_fold a e) (aliases_stmt kf s lv) acc
 
 let fold_new_aliases_stmt f_fold acc _kf s lv =
-  LSet.fold (fun e a -> f_fold a e) (new_aliases_stmt s lv) acc
+  LSet.fold (fun e a -> f_fold a e) (Statement.new_aliases_lvals ~stmt:s lv) acc
 
 let fold_points_to_set_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
   LSet.fold (fun e a -> f_fold a e) (points_to_set_kf kf lv) acc

@@ -55,10 +55,14 @@ val find_vars : lval -> t -> VarSet.t
 val find_synonyms : lval -> t -> LSet.t
 
 val find_aliases : lval -> t -> LSet.t
-[@@alert deprecated "Use find_synonyms or find_all_aliases instead!"]
+[@@alert deprecated "Use find_synonyms or alias_lvals instead!"]
 
 val alias_vars : lval -> t -> VarSet.t
+val alias_lvals : lval -> t -> LSet.t
+
 val find_all_aliases : lval -> t -> LSet.t
+[@@alert deprecated "Use alias_lvals instead!"]
+
 val points_to_vars : lval -> t -> VarSet.t
 val points_to_lvals : lval -> t -> LSet.t
 

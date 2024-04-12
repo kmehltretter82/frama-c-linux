@@ -55,8 +55,17 @@ module Statement : sig
   (** see [Abstract_state.alias_vars] *)
   val alias_vars : stmt:stmt -> lval -> VarSet.t
 
-  (** see [Abstract_state.find_all_aliases] *)
   val aliases : stmt:stmt -> lval -> LSet.t
+  [@@alert deprecated "Use Statement.alias_lvals instead!"]
+
+  (** see [Abstract_state.alias_lvals] *)
+  val alias_lvals : stmt:stmt -> lval -> LSet.t
+
+  (** aliases of the given lval [lv] created by stmt [s] *)
+  val new_aliases_lvals : stmt:stmt -> lval -> LSet.t
+
+  (** aliases of the given lval [lv] created by stmt [s] *)
+  val new_aliases_vars : stmt:stmt -> lval -> VarSet.t
 
   val are_aliased: stmt:stmt -> lval -> lval -> bool
 end
@@ -73,8 +82,11 @@ module Function : sig
   (** see [Abstract_state.alias_vars] *)
   val alias_vars : kf:kernel_function -> lval -> VarSet.t
 
-  (** see [Abstract_state.find_all_aliases] *)
   val aliases : kf:kernel_function -> lval -> LSet.t
+  [@@alert deprecated "Use Function.alias_lvals instead!"]
+
+  (** see [Abstract_state.alias_lvals] *)
+  val alias_lvals : kf:kernel_function -> lval -> LSet.t
 
   val are_aliased: kf:kernel_function -> lval -> lval -> bool
 
@@ -107,10 +119,9 @@ val fold_aliases_stmt:
   ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a
 [@@alert deprecated "Use LSet.fold and Statement.aliases instead!"]
 
-(** [fold_new_aliases_stmt f acc kf s lv] folds [f acc] over all the aliases of
-    the given lval [lv] created by stmt [s] in function [kf]. *)
 val fold_new_aliases_stmt:
   ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a
+[@@alert deprecated "Use Statement.new_aliases with LSet.fold instead!"]
 
 val fold_points_to_set_kf :
   ('a -> lval -> 'a) -> 'a -> kernel_function -> lval -> 'a
@@ -183,7 +194,7 @@ module Abstract_state : sig
      Does not raise an exception but returns an empty set for inexisting lval. *)
   val find_vars : lval -> t -> VarSet.t
 
-  (** Note: You probably want to use [find_all_aliases] instead of this function.
+  (** Note: You probably want to use [alias_lvals] instead of this function.
       Combining [find_vertex] with [get_lval_set], this function yields all the
       different ways the vertex containing the given lval can be referred to.
       Example: {a} → {b,c}
@@ -205,9 +216,9 @@ module Abstract_state : sig
   val alias_vars : lval -> t -> VarSet.t
 
   val find_aliases : lval -> t -> LSet.t
-  [@@alert deprecated "Use find_synonyms, alias_vars, or find_all_aliases instead!"]
+  [@@alert deprecated "Use find_synonyms, alias_vars, or alias_lvals instead!"]
 
-  (** Yields all lvals that are alias of a given lval [lv]. This includes:
+  (** Yields all lvals that are an alias of a given lval [lv]. This includes:
       - variables sharing an equivalence class (or: vertex) with [lv]
       - variables from a neighbouring vertex, i.e. a vertex that shares a
         successor with the vertex of [lv].
@@ -216,11 +227,14 @@ module Abstract_state : sig
       Example: {a,b} → {c} ← {d} ← {e}
       The aliases of "a" are {a,b,d,*e}:
       - "b" shares a vertex with "a"
-      - "d" is in a neighbouring vertex, pointing to "c" as does {a,b}
+      - "d" is in a neighbouring vertex, as it shares a successor with {a,b}
       - *e is obtained by following backwards the pointer edge from {d} to {e}. *)
-  val find_all_aliases : lval -> t -> LSet.t
+  val alias_lvals : lval -> t -> LSet.t
 
-  (** the set of all lvars to which the given variable may point. *)
+  val find_all_aliases : lval -> t -> LSet.t
+  [@@alert deprecated "Use alias_lvals instead!"]
+
+  (** the set of all variables to which the given variable may point. *)
   val points_to_vars : lval -> t -> VarSet.t
 
   (** the set of all lvals to which the given variable may point including
@@ -231,7 +245,7 @@ module Abstract_state : sig
   val points_to_set : lval -> t -> LSet.t
   [@@alert deprecated "Use points_to_vars or points_to_lvals instead!"]
 
-  (** find_aliases, then recursively finds other sets of lvals. We
+  (** alias_lvals, then recursively finds other sets of lvals. We
       have the property (if lval [lv] is in abstract state [x]) :
       List.hd (find_transitive_closure lv x) = (find_vertex lv x,
       find_aliases lv x).
