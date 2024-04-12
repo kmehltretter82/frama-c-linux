@@ -65,7 +65,7 @@ and constant_exp e =
   | _ -> Warning.error "constant(%a)" Printer.pp_exp e
 
 and constant_term t =
-  let e = Cil.constFoldTerm true t in
+  let e = Cil.constFoldTerm t in
   match e.term_node with
   | TConst c -> logic_constant c
   | _ -> Warning.error "constant(%a)" Printer.pp_term t

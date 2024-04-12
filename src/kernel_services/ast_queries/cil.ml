@@ -5351,12 +5351,11 @@ let rec constFoldTermNodeAtTop = function
     end
   | t -> t
 
-let constFoldTerm machdep t =
+let constFoldTerm t =
   let visitor = object
     inherit nopCilVisitor
     method! vterm_node t =
-      if machdep then ChangeToPost (t,constFoldTermNodeAtTop)
-      else DoChildren
+      ChangeToPost (t,constFoldTermNodeAtTop)
   end
   in
   visitCilTerm visitor t
