@@ -3,8 +3,6 @@
 */
 /* run.config_qualif
    OPT: -wp-prop="-ko"
-   OPT: -wp-prover why3:Alt-Ergo -wp-prop="-ko"
-   OPT: -wp-prover "Alt-Ergo" -wp-prop="ko" -wp-steps 50
 */
 
 //@ axiomatic Eq { predicate Peq(integer x,integer y) = x == y ; }

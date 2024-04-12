@@ -6,8 +6,6 @@
    OPT: -wp-rte -wp-prover=Alt-Ergo,script -wp-prop=-lack @USING_WP_SESSION@
 */
 
-// The use '-wp-prover=z3,why3:Alt-Ergo' or using Alt-Ergo 2.3.0 gives better results.
-
 typedef unsigned uint32_t ;
 typedef unsigned long long uint64_t ;
 
