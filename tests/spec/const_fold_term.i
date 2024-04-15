@@ -14,9 +14,9 @@ void binop(int a) {
   //@ assert 84 - 42 == 42;
   //@ assert 6 * 7 == 42;
   //@ assert 21 << 1 == 42;
-  //@ assert 672 >> 4 == 42;
+  //@ assert 672 >> sizeof(int) == 42;
   //@ assert (58 & 47) == 42;
-  //@ assert (34 | 8) == 42;
+  //@ assert (34 | sizeof("frama-c")) == 42;
   //@ assert (63 ^ 21) == 42;
-  //@ assert 168 / 4 == 42;
+  //@ assert 168 / sizeof(a) == 42;
 }
