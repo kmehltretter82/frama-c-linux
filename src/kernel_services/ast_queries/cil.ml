@@ -5346,6 +5346,22 @@ let rec constFoldTermNodeAtTop = function
       | BAnd -> constFoldTermBinOp Integer.logand
       | BXor -> constFoldTermBinOp Integer.logxor
       | BOr -> constFoldTermBinOp Integer.logor
+      | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr ->
+        let bool_op = match op with
+          | Lt -> Integer.lt
+          | Gt -> Integer.gt
+          | Le -> Integer.le
+          | Ge -> Integer.ge
+          | Eq -> Integer.equal
+          | Ne -> (fun i1 i2 -> not (Integer.equal i1 i2))
+          | LAnd ->
+            (fun i1 i2 -> not (Integer.is_zero i1) && not (Integer.is_zero i2))
+          | LOr ->
+            (fun i1 i2 -> not (Integer.is_zero i1) || not (Integer.is_zero i2))
+          | _ -> assert false
+        in
+        constFoldTermBinOp
+          (fun i1 i2 -> if bool_op i1 i2 then Integer.one else Integer.zero)
       | _ ->
         TBinOp (op, {t1 with term_node = n1}, {t2 with term_node = n2})
     end
@@ -5355,7 +5371,7 @@ let constFoldTerm t =
   let visitor = object
     inherit nopCilVisitor
     method! vterm_node t =
-      ChangeToPost (t,constFoldTermNodeAtTop)
+      ChangeToPost (t, constFoldTermNodeAtTop)
   end
   in
   visitCilTerm visitor t
