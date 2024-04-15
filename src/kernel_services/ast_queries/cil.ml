@@ -5324,7 +5324,7 @@ let rec constFoldTermNodeAtTop = function
                   (fun i -> if Integer.is_zero i
                     then Integer.one else Integer.zero)
     end
-  | TBinOp (op, {term_node = t1; term_type = typ1}, {term_node = t2}) as t ->
+  | TBinOp (op, {term_node = t1}, {term_node = t2}) as t ->
     begin
       let constFoldTermBinOp int_bop =
         match constFoldTermNodeAtTop t1, constFoldTermNodeAtTop t2 with
@@ -5337,13 +5337,8 @@ let rec constFoldTermNodeAtTop = function
       | MinusA -> constFoldTermBinOp Integer.sub
       | Mult -> constFoldTermBinOp Integer.mul
       | Shiftlt -> constFoldTermBinOp Integer.shift_left
-      | Shiftrt ->
-        let int_op =
-          match typ1 with
-          | Ctype ct when isUnsignedInteger ct -> Integer.shift_right_logical
-          | _ -> Integer.shift_right
-        in
-        constFoldTermBinOp int_op
+      | Shiftrt -> (* right-shifting Lintegers is always arithmetic *)
+        constFoldTermBinOp Integer.shift_right
       | BAnd -> constFoldTermBinOp Integer.logand
       | BXor -> constFoldTermBinOp Integer.logxor
       | BOr -> constFoldTermBinOp Integer.logor
