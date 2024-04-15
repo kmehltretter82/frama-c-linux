@@ -4590,6 +4590,10 @@ and constFold (machdep: bool) (e: exp) : exp =
       try kinteger ~loc theMachine.kindOfSizeOf (bytesSizeOf t)
       with SizeOfError _ -> e
     end
+  | SizeOfE { enode = Const (CWStr l) } when machdep ->
+    let len = List.length l in
+    let wchar_size = bitsSizeOfInt theMachine.wcharKind / 8 in
+    kinteger ~loc theMachine.kindOfSizeOf ((len + 1) * wchar_size)
   | SizeOfE e when machdep ->
     constFold machdep (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
   | SizeOfStr s when machdep ->
