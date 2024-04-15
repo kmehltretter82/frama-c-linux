@@ -179,43 +179,62 @@ function Graph3D({
 
 export function Graph(props: GraphProps): JSX.Element {
   const [graphData, setGraphData] = React.useState<GraphData>({
-    nodes: props.nodes.map((node) => {
-      return { id: node.id, name: node.label };
-    }),
-    links: props.edges.map((edge) => {
-      return { source: edge.fromNode, target: edge.toNode };
-    }),
+    nodes: [],
+    links: [],
   });
 
   // add and remove node on ForceGraph2D
   React.useEffect(() => {
-    setGraphData((prevGraph) => {
-      if (props.nodes.length > prevGraph.nodes.length) {
-        const newNode = {
-          id: props.nodes[props.nodes.length - 1].id,
-          name: props.nodes[props.nodes.length - 1].label,
-        };
-        const fromNodeId = prevGraph.nodes[prevGraph.nodes.length - 1].id;
-        const newEdge = { source: fromNodeId, target: newNode.id };
+    const sortNodes: Node[] = props.nodes
+      .slice()
+      .sort((a: Node, b: Node) => Number(a.id) - Number(b.id));
+    const sortEdges: Edge[] = props.edges
+      .slice()
+      .sort(
+        (a, b) =>
+          Number(a.fromNode) - Number(b.fromNode) &&
+          Number(a.toNode) - Number(b.toNode)
+      );
 
-        return {
-          ...prevGraph,
-          nodes: [...prevGraph.nodes, newNode],
-          links: [...prevGraph.links, newEdge],
-        };
-      } else {
-        if (props.nodes.length < prevGraph.nodes.length) {
+    if (graphData.nodes.length === 0) {
+      setGraphData({
+        nodes: sortNodes.map((node) => {
+          return { id: node.id, name: node.label };
+        }),
+        links: sortEdges.map((edge) => {
+          return { source: edge.fromNode, target: edge.toNode };
+        }),
+      });
+    } else {
+      setGraphData((prevGraph) => {
+        if (sortNodes.length > prevGraph.nodes.length) {
+          const newNode = {
+            id: sortNodes[sortNodes.length - 1].id,
+            name: sortNodes[sortNodes.length - 1].label,
+          };
+
+          const fromNodeId = prevGraph.nodes[prevGraph.nodes.length - 1].id;
+          const newEdge = { source: fromNodeId, target: newNode.id };
+
           return {
             ...prevGraph,
-            nodes: prevGraph.nodes.slice(0, -1),
-            links: prevGraph.links.slice(0, -1),
+            nodes: [...prevGraph.nodes, newNode],
+            links: [...prevGraph.links, newEdge],
           };
         } else {
-          return { nodes: prevGraph.nodes, links: prevGraph.links };
+          if (sortNodes.length < prevGraph.nodes.length) {
+            return {
+              ...prevGraph,
+              nodes: prevGraph.nodes.slice(0, -1),
+              links: prevGraph.links.slice(0, -1),
+            };
+          } else {
+            return { nodes: prevGraph.nodes, links: prevGraph.links };
+          }
         }
-      }
-    });
-  }, [props.nodes, props.edges]);
+      });
+    }
+  }, [props.nodes, props.edges, graphData.nodes.length]);
 
   return (
     <div className={props.className}>

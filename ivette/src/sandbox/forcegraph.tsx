@@ -46,9 +46,11 @@ function createNode(numberNode: number): Node[] {
 }
 function createEdge(nodes: Node[]): Edge[] {
   const edges: Edge[] = [];
-  for (let i = 0; i < nodes.length - 1; i++) {
-    const newEdge = { fromNode: nodes[i].id, toNode: nodes[i + 1].id };
-    edges.push(newEdge);
+  if (nodes.length > 1) {
+    for (let i = 0; i < nodes.length - 1; i++) {
+      const newEdge = { fromNode: nodes[i].id, toNode: nodes[i + 1].id };
+      edges.push(newEdge);
+    }
   }
   return edges;
 }
@@ -59,7 +61,7 @@ function createEdge(nodes: Node[]): Edge[] {
 
 export default function GraphComponent(): JSX.Element {
   // Set initial configs
-  const [nodes, setNodes] = React.useState<Node[]>(createNode(5));
+  const [nodes, setNodes] = React.useState<Node[]>(createNode(0));
   const [edges, setEdges] = React.useState<Edge[]>(createEdge(nodes));
   const [display, setDisplay] = React.useState<boolean>(true);
   const [layout, setLayout] = React.useState<Layout>('2D');
@@ -73,11 +75,12 @@ export default function GraphComponent(): JSX.Element {
   const addNode = (): void => {
     const uniqueId = String(nodes.length);
     const newNode = { id: uniqueId, label: `Node: ${uniqueId}` };
-    const fromNodeId = nodes[nodes.length - 1].id;
-    const newEdge = { fromNode: fromNodeId, toNode: newNode.id };
-
     setNodes((prevNodes) => [...prevNodes, newNode]);
-    setEdges((prevEdges) => [...prevEdges, newEdge]);
+    if (nodes.length > 1) {
+      const fromNodeId = nodes[nodes.length - 1].id;
+      const newEdge = { fromNode: fromNodeId, toNode: newNode.id };
+      setEdges((prevEdges) => [...prevEdges, newEdge]);
+    }
   };
 
   // Remove Node GraphProps
