@@ -127,7 +127,6 @@ export default function GraphComponent(): JSX.Element {
       onSelection={(_n, _e) => {
         setNodeSelected(_n);
       }}
-      onReady={() => {}}
     >
       <GraphChildren />
     </Graph>

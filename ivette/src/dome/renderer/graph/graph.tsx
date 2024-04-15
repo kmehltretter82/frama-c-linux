@@ -124,12 +124,10 @@ function Graph2D({
   graphData,
   zoom,
   onSelection,
-  onReady,
 }: {
   graphData: GraphData;
   zoom?: number;
   onSelection?: SelectionCallback;
-  onReady?: Callback;
 }): JSX.Element {
   const fgRef2D = React.useRef<ForceGraphMethods2D | undefined>(undefined);
 
@@ -151,9 +149,6 @@ function Graph2D({
         }}
         nodeLabel={'name'}
         cooldownTime={50}
-        onRenderFramePost={(): void => {
-          if (onReady) onReady();
-        }}
       />
     </>
   );
@@ -231,7 +226,6 @@ export function Graph(props: GraphProps): JSX.Element {
             graphData={graphData}
             zoom={props.zoom}
             onSelection={props.onSelection}
-            onReady={props.onReady}
           />
         ) : (
           <Graph3D graphData={graphData} onSelection={props.onSelection} />
