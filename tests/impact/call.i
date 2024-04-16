@@ -1,8 +1,8 @@
 /* run.config
 
-   STDOPT: +"-impact-pragma main"
-   STDOPT: +"-impact-pragma main2" +"-main main2"
-   STDOPT: +"-impact-pragma main3" +"-main main3"
+   STDOPT: +"-impact-annot main"
+   STDOPT: +"-impact-annot main2" +"-main main2"
+   STDOPT: +"-impact-annot main3" +"-main main3"
    */
 
 /*@ ghost int G; */

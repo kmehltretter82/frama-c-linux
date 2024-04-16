@@ -22,8 +22,8 @@
 
 include Plugin.S
 
-module Pragma: Parameter_sig.Kernel_function_set
-(** Use pragmas of given function. *)
+module Annot: Parameter_sig.Kernel_function_set
+(** Use impact annotations of given function. *)
 
 module Print: Parameter_sig.Bool
 (** Print the impacted stmt on stdout. *)

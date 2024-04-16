@@ -1,6 +1,6 @@
 /* run.config
 
-   STDOPT: +"-impact-pragma impact" +"-lib-entry" +"-main impact" +"-impact-slicing" +"-then-on 'impact slicing'" +"-print"
+   STDOPT: +"-impact-annot impact" +"-lib-entry" +"-main impact" +"-impact-slicing" +"-then-on 'impact slicing'" +"-print"
    */
 
 int a, b, c, e, x, y, z, f, w;

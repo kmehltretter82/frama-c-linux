@@ -1,6 +1,6 @@
 /* run.config
-   STDOPT: +"-impact-pragma g" +"-lib-entry" +"-main g"
-   STDOPT: +"-impact-pragma h" +"-lib-entry" +"-main h"
+   STDOPT: +"-impact-annot g" +"-lib-entry" +"-main g"
+   STDOPT: +"-impact-annot h" +"-lib-entry" +"-main h"
    */
 
 int X;

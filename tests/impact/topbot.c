@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-impact-pragma main -pdg -pdg-print"
+   STDOPT: +"-impact-annot main -pdg -pdg-print"
    */
 
 //@ requires \false;

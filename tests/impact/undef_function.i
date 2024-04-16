@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-impact-pragma main"
+   STDOPT: +"-impact-annot main"
    */
 int y;
 void g(int);

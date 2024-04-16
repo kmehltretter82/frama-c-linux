@@ -1,6 +1,6 @@
 /* run.config
 
-   STDOPT: +"-impact-pragma loop" +"-lib-entry" +"-main loop"
+   STDOPT: +"-impact-annot loop" +"-lib-entry" +"-main loop"
    */
 
 int c,x,y,z,w;

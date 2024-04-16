@@ -119,7 +119,7 @@ let compute_annots () =
   (* Returns the list of statements of function [kf] that have an impact
      annotation. *)
   let compute_impact_stmts kf acc =
-    (* Pragma option only accept defined functions. *)
+    (* Annot option only accept defined functions. *)
     let fundec = Kernel_function.get_definition kf in
     let has_impact_annot stmt =
       let impact_annots = Annotations.code_annot ~filter:is_impact_annot stmt in
@@ -129,7 +129,7 @@ let compute_annots () =
     if impact_stmts = [] then acc
     else (kf, impact_stmts) :: acc
   in
-  let impact_stmts = Options.Pragma.fold compute_impact_stmts [] in
+  let impact_stmts = Options.Annot.fold compute_impact_stmts [] in
   let skip = Compute_impact.skip () in
   (* compute impact analyses on each kf *)
   let nodes = List.fold_left
@@ -149,7 +149,7 @@ let from_nodes = compute_from_nodes
 let main () =
   if Options.is_on () then begin
     Options.feedback "beginning analysis";
-    assert (not (Options.Pragma.is_empty ()));
+    assert (not (Options.Annot.is_empty ()));
     ignore (compute_annots ());
     Options.feedback "analysis done"
   end

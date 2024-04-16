@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-impact-pragma main -lib-entry -calldeps" +"-then -ulevel 10"
+   STDOPT: #"-impact-annot main -lib-entry -calldeps" +"-then -ulevel 10"
    */
 
 

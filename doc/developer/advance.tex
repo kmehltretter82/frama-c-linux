@@ -2765,17 +2765,17 @@ module Print: Parameter_sig.Bool
 \end{ocamlcode}
 
 Another example is the parameter corresponding to the option
-\texttt{-impact-pragma} of the plug-in \texttt{impact}. This parameter is
-defined by the module \texttt{Pragma} (defined in the file
+\texttt{-impact-annot} of the plug-in \texttt{impact}. This parameter is
+defined by the module \texttt{Annot} (defined in the file
 \texttt{src/plugins/impact/options.ml}). It is implemented as follows.
 \sscodeidx{Parameter\_sig}{Builder}{Kernel\_function\_set}
 \begin{ocamlcode}
-module Pragma =
+module Annot =
   Kernel_function_set
     (struct
-       let option_name = "-impact-pragma"
+       let option_name = "-impact-annot"
        let arg_name = "f1, ..., fn"
-       let help = "use the impact pragmas in the code of functions f1,...,fn"
+       let help = "use the impact annotations in the code of functions f1,...,fn"
      end)
 \end{ocamlcode}
 Thus it is a set of \texttt{kernel\_function}s initialized by default to
@@ -2785,7 +2785,7 @@ displaying help. The field \texttt{help} is the help message itself. The
 Interface for this module is simple:
 \scodeidx{Parameter\_sig}{Kernel\_function\_set}
 \begin{ocamlcode}
-module Pragma: Parameter_sig.Kernel_function_set
+module Annot: Parameter_sig.Kernel_function_set
 \end{ocamlcode}
 \end{example}
 
