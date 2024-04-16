@@ -267,7 +267,12 @@ module Make
       else
         let var_kind = Abstract_domain.Formal kf in
         let state = Domain.enter_scope var_kind l state in
-        List.fold_right (Domain.initialize_variable_using_type var_kind) l state
+        let init vi state =
+          let open Current_loc.Operators in
+          let<> UpdatedCurrentLoc = vi.vdecl in
+          Domain.initialize_variable_using_type var_kind vi state
+        in
+        List.fold_right init l state
 
   (* Use the values supplied in [actuals] for the formals of [kf], and
      bind them in [state] *)
