@@ -3043,7 +3043,6 @@ let rec collectInitializer
             | _ ->
               abort_context
                 "\"Variable length array in structure\" extension is not supported"
-                len
           end
         | _ ->
           (* unsized array case, length comes from initializers *)
