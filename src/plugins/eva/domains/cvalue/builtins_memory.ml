@@ -163,7 +163,7 @@ let imprecise_copy ~name ~src_loc ~dst_loc ~dst_lval state =
      return [bottom]. In this case, return the previously computed state *)
   if Model.is_reachable new_state then new_state else state
 
-(* Creates the location {loc + [0..size]} of size char. *)
+(* Creates the location {loc + [0..max_size-1]} of size char. *)
 let char_location loc max_size =
   let size_char = Bit_utils.sizeofchar () in
   let max = Int.sub max_size size_char in
