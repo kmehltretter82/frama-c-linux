@@ -80,7 +80,7 @@
 [from] Computing for function f <-loop_body
 [from] Done for function f
 [from] Done for function loop_body
-[pdg] bts324_bis.i:47: Warning: no final state. Probably unreachable...
+[pdg] bts324_bis.i:46: Warning: no final state. Probably unreachable...
 [pdg] done for function main
 [sparecode] add selection in function 'main'
 [sparecode] selecting output zones ki[0..1]; k; s0; s1; is_ok; f_si[0..1]; f_so[0..1]
@@ -98,7 +98,7 @@
 [sparecode] add selection in function 'main'
 [sparecode] look for annotations in function main_bis
 [pdg] computing for function main_bis
-[pdg] Warning: unreachable entry point (sid:32, function main_bis)
+[pdg] Warning: unreachable entry point (sid:31, function main_bis)
 [pdg] Bottom for function main_bis
 [sparecode] pdg bottom: skip annotations
 [sparecode] finalize call input propagation
@@ -123,7 +123,6 @@ int f(int vi, int i)
 
 int volatile e0;
 int volatile e1;
-int s0;
 int s1;
 void loop_body(void)
 {
@@ -148,7 +147,6 @@ void main(void)
   init();
   while (1) {
     loop_body();
-    /*@ impact pragma expr s0; */ ;
     /*@ slice pragma expr s1; */ ;
   }
   return;
