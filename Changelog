@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Alias     [2024-04-16] Fix analysis results in the presence of structures.
+              Complete rework of the API. Improved documentation. Fix stack
+              overflow in case of a cyclic graph.
 -   Kernel    [2024-04-04] Avoid ambiguous pretty-printing when C labels match
               the name of an ACSL built-in label (fix #@1359)
 -!  Kernel    [2024-04-02] Systematically abort when a function is redeclared

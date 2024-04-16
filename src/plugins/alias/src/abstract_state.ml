@@ -196,6 +196,11 @@ module Readout = struct
     let list_pred = List.map (fun b -> get_lval_set b s) (G.ppred s.graph v) in
     List.fold_left LSet.union LSet.empty list_pred
 
+  let vars_pointing_to_vertex v s : VarSet.t =
+    let preds = G.ppred s.graph v in
+    let pred_vars = List.map (fun p -> get_vars p s) preds in
+    List.fold_left VarSet.union VarSet.empty pred_vars
+
   let find_vars lv s =
     let lv = Lval.simplify lv in
     try let v = find_lval_vertex lv s in get_vars v s
@@ -209,13 +214,13 @@ module Readout = struct
   let alias_vars lv s : VarSet.t =
     try
       let v = find_lval_vertex lv s in
-      let succs = G.psucc s.graph v in
-      let pred_succs = List.concat_map (G.ppred s.graph) succs in
-      let pred_vars = List.map (fun p -> get_vars p s) pred_succs in
-      List.fold_left VarSet.union VarSet.empty pred_vars
+      List.fold_left
+        (fun acc succ -> VarSet.union acc @@ vars_pointing_to_vertex succ s)
+        VarSet.empty
+        (G.psucc s.graph v)
     with Not_found -> VarSet.empty
 
-  let find_all_aliases lv s : LSet.t =
+  let alias_lvals lv s : LSet.t =
     let v_opt = try Some (find_lval_vertex lv s) with Not_found -> None in
     match Option.bind v_opt @@ G.psucc_opt s.graph with
     | None -> LSet.empty
@@ -233,11 +238,24 @@ module Readout = struct
     | None -> LSet.empty
     | Some succ_v -> get_lval_set succ_v s
 
+  let alias_sets_vars s =
+    let alias_set_of_vertex (i, _) =
+      let aliases = vars_pointing_to_vertex i s in
+      if VarSet.cardinal aliases >= 2 then Some aliases else None
+    in
+    List.filter_map alias_set_of_vertex @@ VMap.bindings s.vmap
+
+  let alias_sets_lvals s =
+    let alias_set_of_vertex (i, _) =
+      let aliases = lvals_pointing_to_vertex i s in
+      if LSet.cardinal aliases >= 2 then Some aliases else None
+    in
+    List.filter_map alias_set_of_vertex @@ VMap.bindings s.vmap
+
 end
 
 
 module Pretty = struct
-
   let pp_debug fmt s =
     Format.fprintf fmt "@[<v>";
     Format.fprintf fmt "@[Edges:";
@@ -278,13 +296,8 @@ module Pretty = struct
           G.iter_vertex pp_unconnected_vertex s.graph)
 
   let pp_aliases fmt s =
-    let alias_set_of_vertex (i, _) =
-      let aliases = Readout.lvals_pointing_to_vertex i s in
-      if LSet.cardinal aliases >= 2 then Some aliases else None
-    in
-    let alias_sets = List.filter_map alias_set_of_vertex @@ VMap.bindings s.vmap in
+    let alias_sets = Readout.alias_sets_lvals s in
     Pretty_utils.pp_list ~empty:"<none>" ~sep:"@;<2>" LSet.pretty fmt alias_sets
-
 end
 
 (* invariants of type t must be true before and after each functon call *)
@@ -925,10 +938,13 @@ module API = struct
   let find_synonyms = Readout.find_synonyms
   let find_aliases = Readout.find_synonyms
   let alias_vars = Readout.alias_vars
-  let find_all_aliases = Readout.find_all_aliases
+  let alias_lvals = Readout.alias_lvals
+  let find_all_aliases = Readout.alias_lvals (* deprecated *)
   let points_to_vars = Readout.points_to_vars
   let points_to_set = Readout.points_to_lvals
   let points_to_lvals = Readout.points_to_lvals
+  let alias_sets_vars = Readout.alias_sets_vars
+  let alias_sets_lvals = Readout.alias_sets_lvals
 
   let get_graph s = s.graph
 
