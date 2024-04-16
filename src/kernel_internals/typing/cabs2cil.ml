@@ -3042,9 +3042,8 @@ let rec collectInitializer
             | Some ni when Integer.ge ni Integer.zero -> to_integer ni, false
             | _ ->
               abort_context
-                "Array length %a is not a compile-time constant: \
-                 no explicit initializer allowed."
-                Cil_printer.pp_exp len
+                "\"Variable length array in structure\" extension is not supported"
+                len
           end
         | _ ->
           (* unsized array case, length comes from initializers *)
@@ -4850,10 +4849,7 @@ and doType (ghost:bool) isFuncArg
                  Cil_printer.pp_exp cst
              else
                Kernel.error ~once:true ~current:true
-                 "Array length %a is not a compile-time constant,@ \
-                  and currently VLAs may only have their first dimension \
-                  as variable."
-                 Cil_printer.pp_exp cst
+                 "\"Variable length array in structure\" extension is not supported"
            | _ -> ());
           if Cil.isZero len' && not allowZeroSizeArrays &&
              not (Cil.gccMode () || Cil.msvcMode ())
