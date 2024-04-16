@@ -25,7 +25,7 @@ void g2() {
 
 void main () {
   g1();
-  //@ impact pragma stmt;
+  //@ impact_stmt;
   f();
   g2();
 }

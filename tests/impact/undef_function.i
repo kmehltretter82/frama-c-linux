@@ -5,7 +5,7 @@ int y;
 void g(int);
 
 int main() {
-  /*@ impact pragma stmt; */
+  /*@ impact_stmt; */
   y=2;
   g(y);
   return y;

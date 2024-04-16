@@ -54,7 +54,7 @@ int w;
 void impact(void)
 {
   if (c) a = 18;
-  /*@ impact pragma stmt; */
+  /*@ \impact::impact_stmt ; */
   b = a;
   if (c) {
     x = b + c;

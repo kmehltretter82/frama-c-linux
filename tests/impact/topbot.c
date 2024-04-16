@@ -7,7 +7,7 @@ void f() { // Bottom PDG
 }
 
 void main(int c) {
-  /*@ impact pragma stmt; */
+  /*@ impact_stmt; */
   int x = 1;
   int y, z;
   if (c) {

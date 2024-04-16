@@ -20,7 +20,7 @@ void f(int i) {
 }
 
 void main() {
-  //@ impact pragma stmt;
+  //@ impact_stmt;
   init ();
   for (int i=0; i<10; i++) {
     if (t[i]) // should not be selected

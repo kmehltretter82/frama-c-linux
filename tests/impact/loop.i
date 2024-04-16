@@ -1,5 +1,5 @@
 /* run.config
-   
+
    STDOPT: +"-impact-pragma loop" +"-lib-entry" +"-main loop"
    */
 
@@ -9,7 +9,7 @@ void loop () {
   while (c) {
     z = w + 1;
     z = y + 1;
-    /*@ impact pragma stmt; */
+    /*@ impact_stmt; */
     x = x + 1;
     y = x + 1;
   }

@@ -1,13 +1,13 @@
 /* run.config
    COMMENT: also tests the parsing of cmdline options of type string_set
-   STDOPT: +"-impact-pragma main" +"-then -main main1 -impact-pragma='-main,+main1'" +"-then -main main2 -impact-pragma='-@all,+main2'" +"-then -main main3 -impact-pragma='+aux3,-main2'" +"-then -main main4 -impact-pragma='-aux3,+aux4'" 
+   STDOPT: +"-impact-pragma main" +"-then -main main1 -impact-pragma='-main,+main1'" +"-then -main main2 -impact-pragma='-@all,+main2'" +"-then -main main3 -impact-pragma='+aux3,-main2'" +"-then -main main4 -impact-pragma='-aux3,+aux4'"
    */
 
 int f(int, ...);
 
 int main () {
   int i=0;
-  /*@ impact pragma stmt; */
+  /*@ impact_stmt; */
   i++;
   f(i);
 }
@@ -25,7 +25,7 @@ void g2(int x, ...);
 
 int main1() {
   int x = 3;
-  //@ impact pragma stmt;
+  //@ impact_stmt;
   g1(1, 2, 3);
   g1(1, 2);
   return y;
@@ -33,7 +33,7 @@ int main1() {
 
 int main2() {
   int x = 3;
-  //@ impact pragma stmt;
+  //@ impact_stmt;
   g2(1, 2, 3);
   g2(1, 2);
   return y;
@@ -47,7 +47,7 @@ void g3(int , ...);
 
 int aux3(int x, ...) {
   int t = 3;
-  //@ impact pragma stmt;
+  //@ impact_stmt;
   g1(t);
   g1(t);
   return y;
@@ -60,7 +60,7 @@ int main3() {
 }
 
 void aux4(int x) {
-  //@ impact pragma stmt;
+  //@ impact_stmt;
   y = x;
 }
 

@@ -12,7 +12,7 @@ void f() {
 }
 
 void g() {
-  //@ impact pragma stmt;
+  //@ impact_stmt;
   d = 2;
   e = d;
   f();
@@ -24,4 +24,3 @@ void main () {
   a = 0;
   g();
 }
-

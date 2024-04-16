@@ -6,7 +6,7 @@ int P,c;
 
 /*@ requires \valid(x); */
 int f(int *x) {
-  /*@ impact pragma stmt; */
+  /*@ impact_stmt; */
   int *y = x+1;
   *y = 4;
   int a = *(x+1) + 2;
