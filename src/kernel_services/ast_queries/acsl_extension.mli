@@ -100,7 +100,7 @@ type extension_printer =
       | [] -> let id = !count in incr count; Ext_id id
       | _ -> typing_context.error loc "expecting a predicate after keyword FOO"
     let () =
-      Acsl_extension.register_behavior ~pugin:"myplugin" "FOO" foo_typer false
+      Acsl_extension.register_behavior ~plugin:"myplugin" "FOO" foo_typer false
     ]
     @before Frama-C+dev the parameter [plugin] was not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
