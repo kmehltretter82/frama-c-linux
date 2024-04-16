@@ -612,7 +612,8 @@ module Make (X: Analysis.S) = struct
                            In this case, nothing is displayed by the GUI. *)
     | `Bottom -> [], [] (* Bottom case: nothing is displayed either. *)
     | `Value before ->
-      Current_loc.set (gui_loc_loc loc);
+      let open Current_loc.Operators in
+      let<> UpdatedCurrentLoc = gui_loc_loc loc in
       clear_caches ();
       make_data_all_callstacks_from_states ev ~before ~after:states_after v
 end

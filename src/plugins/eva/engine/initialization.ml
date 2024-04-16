@@ -309,7 +309,8 @@ module Make
     with Initialization_failed -> `Bottom
 
   let initialize_global_variable ~lib_entry vi init state =
-    Current_loc.set vi.vdecl;
+    let open Current_loc.Operators in
+    let<> UpdatedCurrentLoc = vi.vdecl in
     let state = Domain.enter_scope Abstract_domain.Global [vi] state in
     let state = if vi.vsource then
         let initialize =
