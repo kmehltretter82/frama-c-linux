@@ -329,36 +329,18 @@ let temp_dir_cleanup_at_exit ?(debug=false) base =
 (** Strings *)
 (* ************************************************************************* *)
 
-let compare_strings s1 s2 len =
-  try
-    for i = 0 to len - 1 do if s1.[i] <> s2.[i] then raise Exit; done;
-    true
-  with Exit -> false
-     | Invalid_argument _ -> raise (Invalid_argument "Extlib.compare_strings")
-
-let string_prefix ?(strict=false) prefix s =
-  let add = if strict then 1 else 0 in
-  String.length s >= String.length prefix + add
-  && compare_strings prefix s (String.length prefix)
-
 let string_del_prefix ?(strict=false) prefix s =
-  if string_prefix ~strict prefix s then
-    Some
-      (String.sub s
-         (String.length prefix) (String.length s - String.length prefix))
+  if String.starts_with ~prefix s then
+    let n = String.length s in
+    let p = String.length prefix in
+    if not strict || n > p then Some (String.sub s p (n-p)) else None
   else None
 
-let string_suffix ?(strict=false) suffix s =
-  let len = String.length s in
-  let suf_len = String.length suffix in
-  let strict_len = if strict then suf_len + 1 else suf_len in
-  len >= strict_len &&
-  compare_strings suffix (String.sub s (len - suf_len) suf_len) suf_len
-
 let string_del_suffix ?(strict=false) suffix s =
-  if string_suffix ~strict suffix s then
-    Some
-      (String.sub s 0 (String.length s - String.length suffix))
+  if String.ends_with ~suffix s then
+    let n = String.length s in
+    let p = String.length suffix in
+    if not strict || n > p then Some (String.sub s 0 (n-p)) else None
   else None
 
 let make_unique_name mem ?(sep=" ") ?(start=2) from =
