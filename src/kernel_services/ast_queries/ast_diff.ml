@@ -195,6 +195,17 @@ type is_same_env =
     enumitem: enumitem Cil_datatype.Enumitem.Map.t;
   }
 
+let is_same_acsl_extension_kind:
+  (string->acsl_extension_kind->acsl_extension_kind->is_same_env->bool) ref
+  = Extlib.mk_fun "Ast_diff.is_same_acsl_extension"
+
+let set_extension_diff ~is_same_ext =
+  is_same_acsl_extension_kind := is_same_ext
+
+let is_same_acsl_extension ext1 ext2 env =
+  ext1.ext_name = ext2.ext_name &&
+  !is_same_acsl_extension_kind ext1.ext_name ext1.ext_kind ext2.ext_kind env
+
 module type Correspondence_table = sig
   include State_builder.Hashtbl
   val pretty_data: Format.formatter -> data -> unit
@@ -693,7 +704,9 @@ and is_same_behavior b b' env =
   is_same_list is_same_identified_predicate b.b_assumes b'.b_assumes env &&
   is_same_list is_same_post_cond b.b_post_cond b'.b_post_cond env &&
   is_same_assigns b.b_assigns b'.b_assigns env &&
-  is_same_allocation b.b_allocation b'.b_allocation env
+  is_same_allocation b.b_allocation b'.b_allocation env &&
+  is_same_list is_same_acsl_extension b.b_extended b'.b_extended env
+
 (* TODO: also consider ACSL extensions, with the help of the plugins
    that handle them. *)
 
