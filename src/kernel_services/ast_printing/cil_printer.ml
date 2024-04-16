@@ -341,7 +341,7 @@ module Precedence = struct
     | Const _ -> 0                        (* Constants *)
 
   let rec getParenthLevelLogic = function
-    | Trange _ -> upperLevel
+    | Trange _ -> 0
     | Tlambda _ | Tlet _ -> binderLevel
     | TBinOp(LAnd, _,_) -> and_level
     | TBinOp(LOr, _,_) -> or_level
@@ -2517,6 +2517,13 @@ class cil_printer () = object (self)
         self#term_binop LAnd
         self#tand_list l
 
+  method private range fmt (low, high) =
+    fprintf fmt "@[%a..%a@]"
+      (Pretty_utils.pp_opt
+         (fun fmt v -> Format.fprintf fmt "%a " (self#term_prec Precedence.upperLevel) v)) low
+      (Pretty_utils.pp_opt
+         (fun fmt v -> Format.fprintf fmt "@ %a" (self#term_prec Precedence.upperLevel) v)) high;
+
   method term_node fmt t =
     let current_level = Precedence.getParenthLevelLogic t.term_node in
     let term = self#term_prec current_level in
@@ -2631,11 +2638,7 @@ class cil_printer () = object (self)
         (Pretty_utils.pp_opt
            (fun fmt p -> fprintf fmt ";@ %a" self#predicate p)) p
     | Trange(low,high) ->
-      fprintf fmt "@[%a..%a@]"
-        (Pretty_utils.pp_opt
-           (fun fmt v -> Format.fprintf fmt "%a " term v)) low
-        (Pretty_utils.pp_opt
-           (fun fmt v -> Format.fprintf fmt "@ %a" term v)) high;
+      fprintf fmt "(%a)" self#range (low, high)
     | Tlet(def,body) ->
       assert
         (Kernel.verify (def.l_labels = [])
@@ -2699,6 +2702,8 @@ class cil_printer () = object (self)
       fprintf fmt ".%a%a" self#field fi self#term_offset o
     | TModel (mi,o) ->
       fprintf fmt ".%a%a" self#model_field mi self#term_offset o
+    | TIndex({term_node = Trange(low,high); _},o) ->
+      fprintf fmt "[%a]%a" self#range (low,high) self#term_offset o
     | TIndex(e,o) -> fprintf fmt "[%a]%a" self#term e self#term_offset o
 
   method term_lhost fmt (lh:term_lhost) =
