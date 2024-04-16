@@ -1,0 +1,13 @@
+[kernel] Parsing implicit-calls.c (with preprocessing)
+[kernel:typing:implicit-function-declaration] implicit-calls.c:8: Warning: 
+  Calling undeclared function bar. Old style K&R code?
+[kernel] implicit-calls.c:8: User Error: 
+  nested calls of bar without a prototype and incompatible arguments : different integer types:
+  'int' and 'unsigned int'
+  6     
+  7     #ifdef INCOMP1
+  8         void foo(unsigned x) { bar(bar(0, 12), x); }
+                                   ^^^^^^^^^^^^^^^^^^
+  9     #endif
+  10
+[kernel] Frama-C aborted: invalid user input.

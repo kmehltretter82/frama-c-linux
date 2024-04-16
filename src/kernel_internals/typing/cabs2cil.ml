@@ -6463,7 +6463,7 @@ and doExp local_env
              *)
              if not isSpecialBuiltin && not are_ghost then begin
                warn_no_proto f;
-               let typ = TFun (resType, Some [], false,attrs) in
+               let typ = TFun (resType, Some [], false, attrs) in
                Cil.update_var_type f typ;
              end
            | None, _ (* TODO: treat function pointers. *)
@@ -6599,6 +6599,17 @@ and doExp local_env
                    (List.mapi default_argument_promotion args)
                in
                let typ = TFun (resType, Some prm_types, false,attrs) in
+               begin
+                 try
+                   (* Nested calls of a function without a prototype : inner
+                      calls will update f type but the information is not
+                      communicated to outer ones, hence [argTypes] is not up to
+                      date and we need to check that types are compagtibles. *)
+                   ignore(Cil.compatibleTypes f.vtype typ);
+                 with Cannot_combine msg ->
+                   abort_context "nested calls of %s without a prototype and \
+                                  incompatible arguments : %s" f.vname msg
+               end;
                Cil.update_var_type f typ;
                Cil.setFormalsDecl f typ;
                (chunk,args)
