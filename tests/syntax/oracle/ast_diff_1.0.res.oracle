@@ -21,10 +21,14 @@
 [AST diff test] Variable g:  => g
 [AST diff test] Variable se:  => se
 [AST diff test] Variable S:  => S
-[AST diff test] Variable has_static_local_x:  => has_static_local_y
+[AST diff test] Variable with_loop_unroll_same:  => with_loop_unroll_same
+[AST diff test] Variable i_0:  => i_0
 [AST diff test] Variable h:  => h
-[AST diff test] Variable __retres:  => __retres
+[AST diff test] Variable with_loop_unroll_diff:  => with_loop_unroll_diff
+[AST diff test] Variable i_0:  => i_0
+[AST diff test] Variable has_static_local_x:  => has_static_local_y
 [AST diff test] Variable use_logic_builtin:  => use_logic_builtin
+[AST diff test] Variable __retres:  => __retres
 [AST diff test] Variable x:  => x
 [AST diff test] Variable y:  => y
 [AST diff test] Variable has_static_local:  => has_static_local
@@ -39,7 +43,9 @@
 [AST diff test] Function with_goto_unchanged:  => with_goto_unchanged
 [AST diff test] Function g: N/A
 [AST diff test] Function se:  => se
+[AST diff test] Function with_loop_unroll_same:  => with_loop_unroll_same
 [AST diff test] Function h: -> h (body changed)
+[AST diff test] Function with_loop_unroll_diff:  => with_loop_unroll_diff
 [AST diff test] Function use_logic_builtin:  => use_logic_builtin
 [AST diff test] Function has_static_local:  => has_static_local
 [AST diff test] Function decl:  => decl
