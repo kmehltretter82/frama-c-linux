@@ -35,28 +35,18 @@ import ForceGraph3D, {
 
 export interface Attributes {
   label?: string;
-  title?: string;
-  className?: string;
 }
 
-export type Shape = 'dot' | 'box' | 'circle';
-export type ArrowType = '--' | '->' | '<-' | '<->';
 export type Layout = '2D' | '3D';
 
 export interface Node extends Attributes {
   /** Node identifier (unique). */
   id: string;
-
-  /** defaults to `"dot"` */
-  shape?: Shape;
 }
 
 export interface Edge extends Attributes {
   fromNode: string;
   toNode: string;
-
-  /** defaults to `"->"` */
-  arrowType?: ArrowType;
 }
 
 export type Callback = () => void;
@@ -183,7 +173,6 @@ export function Graph(props: GraphProps): JSX.Element {
     links: [],
   });
 
-  // add and remove node on ForceGraph2D
   React.useEffect(() => {
     const sortNodes: Node[] = props.nodes
       .slice()
