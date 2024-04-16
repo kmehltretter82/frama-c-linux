@@ -115,11 +115,38 @@ function isValidArray(err: FieldError[]): boolean {
   return true;
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Reset Hooks                                                        ---*/
-/* --------------------------------------------------------------------------*/
+/**
+ * A fieldState can be stable or unstable.
+ *
+ * A stable fieldState means that the value of the field valid
+ * and has no reset value.
+ *
+ * There are three cases of an unstable fieldState :
+ * - Error : There is an error in the field.
+ * - Resetable : The fieldState has a reset value.
+ * - Commitable : The fieldState has a reset value and is valid (!Error).
+ */
+export function isError<A>( state: FieldState<A> ): boolean {
+  return !isValid(state.error);
+}
 
-export type ResetCallback = () => void;
+export function isResetAble<A>( state: FieldState<A> ): boolean {
+  return state.reset !== undefined;
+}
+
+export function isCommitAble<A>( state: FieldState<A> ): boolean {
+  return isResetAble(state) && !isError(state);
+}
+
+export function isStable<A>( state: FieldState<A> ): boolean {
+  return !isResetAble(state) && !isError(state);
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Buffer Controller                                                  --- */
+/* -------------------------------------------------------------------------- */
+
+export type BufferCallback = () => void;
 
 /**
    Controller for _buffered_ field states.
@@ -144,25 +171,76 @@ export class BufferController {
   getErrors(): number { return this.errors; }
 
   /** @internal */
-  onReset(fn: ResetCallback): void { this.evt.addListener('reset', fn); }
+  onReset(fn: BufferCallback): void {
+    this.evt.addListener('reset', fn);
+    this.notify();
+  }
 
   /** @internal */
-  offReset(fn: ResetCallback): void { this.evt.removeListener('reset', fn); }
+  protected notify(): void { this.evt.emit('update'); }
 
   /** @internal */
-  onCommit(fn: ResetCallback): void { this.evt.addListener('commit', fn); }
+  onChange(fn: BufferCallback): void { this.evt.addListener('update', fn); }
 
   /** @internal */
-  offCommit(fn: ResetCallback): void { this.evt.removeListener('commit', fn); }
+  offChange(fn: BufferCallback): void { this.evt.removeListener('update', fn); }
 
   /** @internal */
-  addError(): void { this.errors++; }
+  offReset(fn: BufferCallback): void {
+    this.evt.removeListener('reset', fn);
+    this.notify();
+  }
 
   /** @internal */
-  removeError(): void { this.errors--; }
+  onCommit(fn: BufferCallback): void {
+    this.evt.addListener('commit', fn);
+    this.notify();
+  }
+
+  /** @internal */
+  offCommit(fn: BufferCallback): void {
+    this.evt.removeListener('commit', fn);
+    this.notify();
+  }
+
+  /** @internal */
+  addError(): void {
+    this.errors++;
+    this.notify();
+  }
+
+  /** @internal */
+  removeError(): void {
+    this.errors--;
+    this.notify();
+  }
 }
 
-export type Equal<A> = (a: A, b: A) => boolean;
+/**
+   Hook for using a Buffer Controller. Typical use cases:
+
+   - `const ctrl = useController()` to obtain a new, monitored controller;
+   - `useController(ctrl)` to monitor changes on existing controller `ctrl`.
+
+   You can also use a mix of the two usages, to monitor an optional controller
+   or a local one.
+ */
+export function useController(ctrl?: BufferController): BufferController {
+  const self = React.useMemo(() => new BufferController(), []);
+  const current = ctrl ?? self;
+  const update = Dome.useForceUpdate();
+  React.useEffect(() => {
+    current.onChange(update);
+    return () => current.offChange(update);
+  }, [current, update]);
+  return current;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Buffered State                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+export type Equal<A> = (a:A, b:A) => boolean;
 
 function compare<A>(equal: Equal<A> | undefined, a: A, b: A): boolean {
   return equal ? equal(a, b) : a === b;
@@ -190,11 +268,12 @@ export function useBuffer<A>(
   equal?: Equal<A>,
 ): FieldState<A> {
   const { value, error, reset, onChanged } = state;
-  const [modified, setModified] = React.useState(false);
-  const [buffer, setBuffer] = React.useState<A>(value);
-  const [berror, setBerror] = React.useState<FieldError>(error);
+  const [ modified, setModified ] = React.useState(false);
+  const [ commited, setCommited ] = React.useState(false);
+  const [ buffer, setBuffer ] = React.useState<A>(value);
+  const [ berror, setBerror ] = React.useState<FieldError>(error);
 
-  const valid = !isValid(berror);
+  const valid = isValid(berror);
   const rollback = reset ?? value;
 
   // --- Error Count
@@ -203,6 +282,17 @@ export function useBuffer<A>(
     remote.addError();
     return () => remote.removeError();
   }, [remote, valid]);
+
+  /* TODO :
+   * add a timeout to handle the case where the server takes
+   * this old value before the new value is returned to the field.
+   */
+  React.useEffect(() => {
+    setCommited((val) => {
+      if(!val) setModified(false);
+      return true;
+    });
+  }, [value]);
 
   // --- Reset
   React.useEffect(() => {
@@ -222,7 +312,7 @@ export function useBuffer<A>(
     if (modified) {
       const doCommit = (): void => {
         if (valid) {
-          setModified(false);
+          setCommited(false);
           onChanged(buffer, undefined, false);
         } else {
           setModified(false);
@@ -241,13 +331,15 @@ export function useBuffer<A>(
       setModified(!isReset);
       setBuffer(newValue);
       setBerror(newError);
-      if (isReset && !compare(equal, newValue, value))
+      if (isReset && !compare(equal, newValue, value)) {
+        setCommited(false);
         onChanged(newValue, newError, isReset);
+      }
     }, [equal, value, onChanged]);
 
   return {
-    value: modified ? buffer : value,
-    error: modified ? berror : error,
+    value: modified || !commited ? buffer : value,
+    error: modified || !commited ? berror : error,
     reset: reset ?? (modified ? value : undefined),
     onChanged: onLocalChange,
   };

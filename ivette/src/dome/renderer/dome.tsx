@@ -562,8 +562,8 @@ export function popupMenu(
    Returns a callback to trigger a render on demand.
 */
 export function useForceUpdate(): () => void {
-  const [tac, onTic] = React.useState(false);
-  return () => onTic(!tac);
+  const [, onTic] = React.useState(false);
+  return React.useCallback(() => onTic((tac) => !tac), []);
 }
 
 /**
