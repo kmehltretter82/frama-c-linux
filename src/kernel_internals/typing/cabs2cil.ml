@@ -9210,9 +9210,14 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
        * that all uses of this function will refer to the renamed
        * function *)
       addGlobalToEnv ghost n (EnvVar !currentFunctionFDEC.svar);
-      if H.mem alreadyDefined !currentFunctionFDEC.svar.vname then
-        Kernel.error ~once:true ~current:true "There is a definition already for %s" n;
-
+      H.find_opt alreadyDefined !currentFunctionFDEC.svar.vname
+      |>
+      (Option.iter
+         (fun loc ->
+            abort_context
+              "There is a definition already for %s \
+               (previous definition was at %a)."
+              n Cil_datatype.Location.pretty loc));
       H.add alreadyDefined !currentFunctionFDEC.svar.vname idloc;
 
 
