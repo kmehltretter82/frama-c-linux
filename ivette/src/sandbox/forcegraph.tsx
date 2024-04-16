@@ -25,7 +25,8 @@
 /* -------------------------------------------------------------------------- */
 
 import React from 'react';
-import { Button } from 'dome/controls/buttons';
+import { Code } from 'dome/controls/labels';
+import { ToolBar, ButtonGroup, Button, Filler } from 'dome/frame/toolbars';
 import { Graph, Node, Edge, Layout } from 'dome/graph/graph';
 import { registerSandbox } from 'ivette';
 
@@ -33,106 +34,80 @@ import { registerSandbox } from 'ivette';
 // --- Init functions for nodes and edges
 // --------------------------------------------------------------------------
 
-function createNode(numberNode: number): Node[] {
-  const nodes: Node[] = [];
+let Kid = 0;
+const random = (n: number): number => Math.floor(Math.random() * n);
 
-  for (let i = 0; i < numberNode; i++) {
-    const uniqueId = String(i);
-    const newNode = { id: uniqueId, label: `Node: ${uniqueId}` };
-    nodes.push(newNode);
-  }
-
-  return nodes;
+function addNode(nodes: readonly Node[]): readonly Node[] {
+  const k = Kid++;
+  return nodes.concat({ id: `N${k}`, label: `Node #${k}}` });
 }
-function createEdge(nodes: Node[]): Edge[] {
-  const edges: Edge[] = [];
-  if (nodes.length > 1) {
-    for (let i = 0; i < nodes.length - 1; i++) {
-      const newEdge = { fromNode: nodes[i].id, toNode: nodes[i + 1].id };
-      edges.push(newEdge);
-    }
-  }
-  return edges;
+
+function addEdge(
+  nodes: readonly Node[],
+  edges: readonly Edge[]
+): readonly Edge[] {
+  const n = nodes.length;
+  if (n <= 2) return edges;
+  const source = nodes[random(n)].id;
+  const target = nodes[random(n)].id;
+  return edges.concat({ source, target });
 }
 
 // --------------------------------------------------------------------------
 // --- Main force graph component
 // --------------------------------------------------------------------------
 
-export default function GraphComponent(): JSX.Element {
+function GraphSample(): JSX.Element {
   // Set initial configs
-  const [nodes, setNodes] = React.useState<Node[]>(createNode(0));
-  const [edges, setEdges] = React.useState<Edge[]>(createEdge(nodes));
-  const [display, setDisplay] = React.useState<boolean>(true);
+  const [nodes, setNodes] = React.useState<readonly Node[]>([]);
+  const [edges, setEdges] = React.useState<readonly Edge[]>([]);
   const [layout, setLayout] = React.useState<Layout>('2D');
-  const [zoom, setZoom] = React.useState<number>(2);
-  const [nodeSelected, setNodeSelected] = React.useState<string>('0');
-
-  // Display or hide the graph
-  const updateDisplay = (): void => setDisplay(!display);
-
-  // Add Node
-  const addNode = (): void => {
-    const uniqueId = String(nodes.length);
-    const newNode = { id: uniqueId, label: `Node: ${uniqueId}` };
-    setNodes((prevNodes) => [...prevNodes, newNode]);
-    if (nodes.length > 1) {
-      const fromNodeId = nodes[nodes.length - 1].id;
-      const newEdge = { fromNode: fromNodeId, toNode: newNode.id };
-      setEdges((prevEdges) => [...prevEdges, newEdge]);
-    }
-  };
-
-  // Remove Node GraphProps
-  const deleteNode = (): void => {
-    const newNodes = nodes.slice(0, -1);
-    const newEdges = edges.slice(0, -1);
-    setNodes(newNodes);
-    setEdges(newEdges);
-  };
-
-  // Transition from 2D to 3D or 3D to 2D
-  const updateLayout = (): void => {
-    layout === '2D' ? setLayout('3D') : setLayout('2D');
-  };
-
-  // Zoom out
-  const updateZoomOut = (): void => setZoom(zoom - 1);
-  // Zoom In
-  const updateZoomIn = (): void => setZoom(zoom + 1);
-
-  const GraphChildren = (): JSX.Element => (
-    <div className='toolbar'>
-      <Button icon='DISPLAY' title='Display' onClick={updateDisplay} />
-      <Button icon='COMPONENT' title='Layout' onClick={updateLayout} />
-      {layout === '2D' ? (
-        <>
-          <Button icon='ZOOM.IN' title='Zoom in' onClick={updateZoomIn} />
-          <Button icon='ZOOM.OUT' title='Zoom out' onClick={updateZoomOut} />
-        </>
-      ) : (
-        <></>
-      )}
-      <Button icon='PLUS' title='Add' onClick={addNode} />
-      <Button icon='MINUS' title='Delete' onClick={deleteNode} />
-    </div>
-  );
+  const [selected, setSelected] = React.useState<string>();
 
   return (
-    <Graph
-      nodes={nodes}
-      edges={edges}
-      selected={nodeSelected}
-      zoom={zoom}
-      layout={layout}
-      display={display}
-      className='dome-xGraph-item-graph'
-      onSelection={(_n, _e) => {
-        setNodeSelected(_n);
-      }}
-    >
-      <GraphChildren />
-    </Graph>
+    <>
+      <ToolBar>
+        <ButtonGroup>
+          <Button
+            label='2D'
+            selected={layout === '2D'}
+            onClick={() => setLayout('2D')} />
+          <Button
+            label='3D'
+            selected={layout === '3D'}
+            onClick={() => setLayout('3D')} />
+        </ButtonGroup>
+        <Code>Selected: {selected ?? '-'}</Code>
+        <Filler/>
+        <Code>Nodes: {nodes.length} Edges: {edges.length}</Code>
+        <Button
+          icon='CIRC.PLUS'
+          label='Node'
+          onClick={() => setNodes(addNode(nodes))}
+        />
+        <Button
+          icon='CIRC.PLUS'
+          label='Edge'
+          onClick={() => setEdges(addEdge(nodes, edges))}
+        />
+        <Button
+          icon='CIRC.CLOSE' kind='negative'
+          label='Clear'
+          onClick={() => {
+            setEdges([]);
+            setNodes([]);
+            setSelected(undefined);
+          }}
+        />
+      </ToolBar>
+      <Graph
+        nodes={nodes}
+        edges={edges}
+        layout={layout}
+        selected={selected}
+        onSelection={setSelected}
+      />
+    </>
   );
 }
 
@@ -142,8 +117,9 @@ export default function GraphComponent(): JSX.Element {
 
 registerSandbox({
   id: 'sandbox.graph',
-  label: 'Force Graph',
-  children: <GraphComponent />,
+  label: 'Graph 2D/3D',
+  preferredPosition: 'ABCD',
+  children: <GraphSample />,
 });
 
 // --------------------------------------------------------------------------
