@@ -2049,10 +2049,6 @@ and childrenLoopPragma vis p =
   match p with
   | Unroll_specs lt -> let lt' = mapNoCopy (visitCilTerm vis) lt in
     if lt' != lt then Unroll_specs lt' else p
-  | Widen_hints lt -> let lt' = mapNoCopy (visitCilTerm vis) lt in
-    if lt' != lt then Widen_hints lt' else p
-  | Widen_variables lt -> let lt' = mapNoCopy (visitCilTerm vis) lt in
-    if lt' != lt then Widen_variables lt' else p
 
 and childrenModelInfo vis m =
   let field_type = visitCilLogicType vis m.mi_field_type in

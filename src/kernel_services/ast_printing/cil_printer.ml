@@ -3164,12 +3164,6 @@ class cil_printer () = object (self)
       (pp_list false self#disjoint_behaviors) disjoint
 
   method private loop_pragma fmt = function
-    | Widen_hints terms ->
-      fprintf fmt "WIDEN_HINTS @[%a@]"
-        (Pretty_utils.pp_list ~sep:",@ " self#term) terms
-    | Widen_variables terms ->
-      fprintf fmt "WIDEN_VARIABLES @[%a@]"
-        (Pretty_utils.pp_list ~sep:",@ " self#term) terms
     | Unroll_specs terms ->
       fprintf fmt "UNROLL @[%a@]"
         (Pretty_utils.pp_list ~sep:",@ " self#term) terms

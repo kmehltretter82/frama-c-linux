@@ -1738,8 +1738,6 @@ and behavior = {
 (** Pragmas for the value analysis plugin of Frama-C. *)
 and loop_pragma =
   | Unroll_specs of term list
-  | Widen_hints of term list
-  | Widen_variables of term list
 
 (** Pragmas for the slicing plugin of Frama-C. *)
 and slice_pragma =
