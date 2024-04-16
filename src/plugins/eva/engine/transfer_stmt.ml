@@ -305,11 +305,6 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   (* Returns the result of a call. *)
   let process_call stmt call recursion valuation state =
     Eva_utils.push_call_stack call.kf stmt;
-    let cleanup () =
-      Eva_utils.pop_call_stack ();
-      (* Changed by compute_call_ref, called from process_call *)
-      Current_loc.set (Cil_datatype.Stmt.loc stmt);
-    in
     let process () =
       let domain_valuation = Eval.to_domain_valuation valuation in
       let res =
@@ -322,11 +317,11 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         | `Bottom ->
           { states = []; cacheable = Cacheable; }
       in
-      cleanup ();
+      Eva_utils.pop_call_stack ();
       res
     in
     Eva_utils.protect process
-      ~cleanup:(fun () -> InOutCallback.clear (); cleanup ())
+      ~cleanup:(fun () -> InOutCallback.clear (); Eva_utils.pop_call_stack ())
 
   (* ------------------- Retro propagation on formals ----------------------- *)
 

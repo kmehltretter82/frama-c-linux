@@ -37,7 +37,7 @@
 [eva] computing for function should_never_end <- main.
   Called from noreturn.i:32.
 [eva] Recording results for should_never_end
-[eva] noreturn.i:13: Warning: 
+[eva] noreturn.i:32: Warning: 
   function should_never_end may terminate but has the noreturn attribute
 [eva] Done for function should_never_end
 [eva] computing for function should_never_end <- main.
