@@ -391,7 +391,6 @@ class full_visitor = object(self)
   method! vallocates _ = Cil.DoChildren
   method! vallocation _ = Cil.DoChildren
   method! vslice_pragma _ = Cil.DoChildren
-  method! vimpact_pragma _ = Cil.DoChildren
   method! vdeps _ = Cil.DoChildren
   method! vfrom _ = Cil.DoChildren
   method! vcode_annot _ =

@@ -452,7 +452,7 @@ let get_zone_from_annot a (ki,kf) loop_body_opt results =
     add_results_from_pred ctx results pred
   in
   match a.annot_content with
-  | APragma (Slice_pragma (SPexpr term) | Impact_pragma (IPexpr term)) ->
+  | APragma (Slice_pragma (SPexpr term)) ->
     results |>
     (* to preserve the interpretation of the pragma *)
     get_zone_from_term ki term |>
@@ -461,7 +461,7 @@ let get_zone_from_annot a (ki,kf) loop_body_opt results =
   | APragma (Slice_pragma SPctrl) ->
     (* to select the reachability of the pragma *)
     add_ctrl_pragma ki results
-  | APragma (Slice_pragma SPstmt | Impact_pragma IPstmt) ->
+  | APragma (Slice_pragma SPstmt) ->
     (* to preserve the effect of the statement *)
     add_stmt_pragma ki results
   | AAssert (_behav,pred) ->
@@ -580,7 +580,6 @@ let code_annot_filter annot ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop
   | AInvariant(_,false,_) -> others
   | AAllocation _ -> others
   | AAssigns _ -> others
-  | APragma (Impact_pragma _) -> others
   | AStmtSpec _  | AExtended _ (* TODO *) -> false
 
 

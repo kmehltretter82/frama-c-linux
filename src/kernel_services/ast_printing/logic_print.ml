@@ -456,15 +456,9 @@ let print_slice_pragma fmt p =
   | SPctrl -> pp_print_string fmt "ctrl"
   | SPstmt -> pp_print_string fmt "stmt"
 
-let print_impact_pragma fmt p =
-  match p with
-  | IPexpr e -> fprintf fmt "expr@ %a" print_lexpr e
-  | IPstmt -> pp_print_string fmt "stmt"
-
 let print_pragma fmt p =
   match p with
   | Slice_pragma p -> fprintf fmt "slice@ pragma@ %a;" print_slice_pragma p
-  | Impact_pragma p -> fprintf fmt "impact@ pragma@ %a;" print_impact_pragma p
 
 let print_extension fmt (name, ext) =
   fprintf fmt "%s %a" name (pp_list ~sep:",@ " print_lexpr) ext

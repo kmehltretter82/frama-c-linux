@@ -3185,10 +3185,6 @@ class cil_printer () = object (self)
     | SPctrl -> Format.pp_print_string fmt "ctrl"
     | SPstmt -> Format.pp_print_string fmt "stmt"
 
-  method private impact_pragma fmt = function
-    | IPexpr t -> fprintf fmt "expr @[%a@]" self#term t
-    | IPstmt -> Format.pp_print_string fmt "stmt"
-
   (* TODO: add the annot ID in debug mode?*)
   method code_annotation fmt ca =
     let pp_for_behavs fmt l =
@@ -3209,10 +3205,6 @@ class cil_printer () = object (self)
       fprintf fmt "@[%a@ %a;@]"
         self#pp_acsl_keyword "slice pragma"
         self#slice_pragma sp
-    | APragma (Impact_pragma sp) ->
-      fprintf fmt "@[%a@ %a;@]"
-        self#pp_acsl_keyword "impact pragma"
-        self#impact_pragma sp
     | AStmtSpec(for_bhv, spec) ->
       fprintf fmt "@[<hv 2>%a%a@]"
         pp_for_behavs for_bhv

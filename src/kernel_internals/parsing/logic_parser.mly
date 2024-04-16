@@ -1475,7 +1475,6 @@ beg_pragma_or_code_annotation:
 
 pragma_or_code_annotation:
 | slice_pragma     { APragma (Slice_pragma $1) }
-| impact_pragma    { APragma (Impact_pragma $1) }
 | code_annotation  { $1 []  }
 ;
 
@@ -1525,15 +1524,6 @@ slice_pragma:
     { if $3 = "ctrl" then SPctrl
       else if $3 = "stmt" then SPstmt
       else raise (Not_well_formed (loc $sloc, "Unknown slice pragma")) }
-;
-
-impact_pragma:
-| IMPACT PRAGMA any_identifier lexpr SEMICOLON
-    { if $3 = "expr" then IPexpr $4
-      else raise (Not_well_formed (loc $sloc, "Unknown impact pragma")) }
-| IMPACT PRAGMA any_identifier SEMICOLON
-    { if $3 = "stmt" then IPstmt
-      else raise (Not_well_formed (loc $sloc, "Unknown impact pragma")) }
 ;
 
 /*** declarations and logical definitions ***/

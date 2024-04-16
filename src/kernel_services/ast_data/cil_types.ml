@@ -1743,15 +1743,9 @@ and slice_pragma =
   | SPctrl
   | SPstmt
 
-(** Pragmas for the impact plugin of Frama-C. *)
-and impact_pragma =
-  | IPexpr of term
-  | IPstmt
-
 (** The various kinds of pragmas. *)
 and pragma =
   | Slice_pragma of slice_pragma
-  | Impact_pragma of impact_pragma
 
 (** all annotations that can be found in the code.
     This type shares the name of its constructors with

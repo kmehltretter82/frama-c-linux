@@ -720,17 +720,9 @@ and is_same_slice_pragma p p' env =
   | SPstmt, SPstmt -> true
   | (SPexpr _ | SPctrl | SPstmt), _ -> false
 
-and is_same_impact_pragma p p' env =
-  match p, p' with
-  | IPexpr t, IPexpr t' -> is_same_term t t' env
-  | IPstmt, IPstmt -> true
-  | (IPexpr _ | IPstmt), _ -> false
-
 and is_same_pragma p p' env =
   match p,p' with
   | Slice_pragma p, Slice_pragma p' -> is_same_slice_pragma p p' env
-  | Impact_pragma p, Impact_pragma p' -> is_same_impact_pragma p p' env
-  | (Slice_pragma _ | Impact_pragma _), _ -> false
 
 and are_same_behaviors bhvs bhvs' env =
   let treat_one_behavior acc b =

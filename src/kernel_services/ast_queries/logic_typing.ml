@@ -3839,10 +3839,6 @@ struct
     | SPctrl -> Cil_types.SPctrl
     | SPstmt -> Cil_types.SPstmt
 
-  let impact_pragma env = function
-      IPexpr t -> Cil_types.IPexpr (term env t)
-    | IPstmt -> Cil_types.IPstmt
-
   let code_annot_env () =
     let env = append_here_label (append_pre_label (append_init_label
                                                      (Lenv.empty()))) in
@@ -3860,9 +3856,6 @@ struct
         let p = predicate (code_annot_env()) p in
         let p = Logic_const.toplevel_predicate ~kind p in
         Cil_types.AAssert(behav,p)
-      | APragma (Impact_pragma sp) ->
-        Cil_types.APragma
-          (Cil_types.Impact_pragma (impact_pragma (code_annot_env()) sp))
       | APragma (Slice_pragma sp) ->
         Cil_types.APragma
           (Cil_types.Slice_pragma (slice_pragma (code_annot_env()) sp))

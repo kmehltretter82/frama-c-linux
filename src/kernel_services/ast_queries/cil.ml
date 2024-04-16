@@ -875,7 +875,6 @@ class type cilVisitor = object
     allocation -> allocation visitAction
 
   method vslice_pragma: slice_pragma -> slice_pragma visitAction
-  method vimpact_pragma: impact_pragma -> impact_pragma visitAction
 
   method vdeps:
     deps -> deps visitAction
@@ -1010,7 +1009,6 @@ class internal_genericCilVisitor current_func behavior queue: cilVisitor =
     method vallocation _s = DoChildren
 
     method vslice_pragma _ = DoChildren
-    method vimpact_pragma _ = DoChildren
 
     method vdeps _ = DoChildren
 
@@ -1844,12 +1842,6 @@ and childrenSlicePragma vis p =
     let t' = visitCilTerm vis t in if t' != t then SPexpr t' else p
   | SPctrl | SPstmt -> p
 
-and visitCilImpactPragma vis p =
-  doVisitCil vis id vis#vimpact_pragma childrenImpactPragma p
-
-and childrenImpactPragma vis p = match p with
-  | IPexpr t -> let t' = visitCilTerm vis t in if t' != t then IPexpr t' else p
-  | IPstmt -> p
 
 and childrenModelInfo vis m =
   let field_type = visitCilLogicType vis m.mi_field_type in
@@ -1963,9 +1955,6 @@ and childrenCodeAnnot vis ca =
     let p' = vPred p in if p' != p then
       change_content (AAssert (behav,p'))
     else ca
-  | APragma (Impact_pragma t) ->
-    let t' = visitCilImpactPragma vis t in
-    if t' != t then change_content (APragma (Impact_pragma t')) else ca
   | APragma (Slice_pragma t) ->
     let t' = visitCilSlicePragma vis t in
     if t' != t then change_content (APragma (Slice_pragma t')) else ca

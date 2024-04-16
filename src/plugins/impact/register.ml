@@ -116,8 +116,9 @@ let is_impact_annot code_annot =
 
 let compute_annots () =
   Ast.compute ();
-  (* fill [pragmas] with all the pragmas of all the selected functions *)
-  let process kf acc =
+  (* Returns the list of statements of function [kf] that have an impact
+     annotation. *)
+  let compute_impact_stmts kf acc =
     (* Pragma option only accept defined functions. *)
     let fundec = Kernel_function.get_definition kf in
     let has_impact_annot stmt =
@@ -128,7 +129,7 @@ let compute_annots () =
     if impact_stmts = [] then acc
     else (kf, impact_stmts) :: acc
   in
-  let impact_stmts = Options.Pragma.fold process [] in
+  let impact_stmts = Options.Pragma.fold compute_impact_stmts [] in
   let skip = Compute_impact.skip () in
   (* compute impact analyses on each kf *)
   let nodes = List.fold_left

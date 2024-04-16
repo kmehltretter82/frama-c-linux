@@ -934,15 +934,9 @@ and pp_slice_pragma fmt = function
   | SPctrl -> Format.fprintf fmt "SPctrl"
   | SPstmt -> Format.fprintf fmt "SPstmt"
 
-and pp_impact_pragma fmt = function
-  | IPexpr(term) -> Format.fprintf fmt "IPexpr(%a)" pp_term term
-  | IPstmt -> Format.fprintf fmt "IPstmt"
-
 and pp_pragma fmt = function
   | Slice_pragma(term) ->
     Format.fprintf fmt "Slice_pragma(%a)" pp_slice_pragma term
-  | Impact_pragma(term) ->
-    Format.fprintf fmt "Impact_pragma(%a)" pp_impact_pragma term
 
 and pp_code_annotation_node fmt = function
   | AAssert(string_list,p) ->

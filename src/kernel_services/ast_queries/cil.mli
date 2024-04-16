@@ -1919,7 +1919,6 @@ class type cilVisitor = object
   (**   @since Oxygen-20120901 *)
 
   method vslice_pragma: slice_pragma -> slice_pragma visitAction
-  method vimpact_pragma: impact_pragma -> impact_pragma visitAction
 
   method vdeps: deps -> deps visitAction
   method vfrom: from -> from visitAction

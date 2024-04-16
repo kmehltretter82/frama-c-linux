@@ -142,8 +142,6 @@ val pp_termination_kind :
   Format.formatter -> Cil_types.termination_kind -> unit
 val pp_slice_pragma :
   Format.formatter -> Cil_types.slice_pragma -> unit
-val pp_impact_pragma :
-  Format.formatter -> Cil_types.impact_pragma -> unit
 val pp_pragma :
   Format.formatter -> Cil_types.pragma -> unit
 val pp_code_annotation_node :

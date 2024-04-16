@@ -714,7 +714,7 @@ let is_trivially_true p =
 
 let is_annot_next_stmt c =
   match c.annot_content with
-  | AStmtSpec _ | APragma (Slice_pragma SPstmt | Impact_pragma IPstmt) -> true
+  | AStmtSpec _ | APragma (Slice_pragma SPstmt) -> true
   | AExtended(_,is_loop,{ext_name}) ->
     let warn_not_a_code_annot () =
       Kernel.(
@@ -730,7 +730,6 @@ let is_annot_next_stmt c =
   | AAssert _ | AInvariant _ | AVariant _
   | AAssigns _ | AAllocation _
   | APragma (Slice_pragma (SPctrl | SPexpr _))
-  | APragma (Impact_pragma (IPexpr _))
     -> false
 
 let rec add_attribute_glob_annot a g =
@@ -1182,17 +1181,9 @@ let is_same_slice_pragma p1 p2 =
   | SPctrl, SPctrl | SPstmt, SPstmt -> true
   | (SPexpr _ | SPctrl | SPstmt), _ -> false
 
-let is_same_impact_pragma p1 p2 =
-  match p1,p2 with
-  | IPexpr t1, IPexpr t2 -> is_same_term t1 t2
-  | IPstmt, IPstmt -> true
-  | (IPexpr _ | IPstmt), _ -> false
-
 let is_same_pragma p1 p2 =
   match p1,p2 with
   | Slice_pragma p1, Slice_pragma p2 -> is_same_slice_pragma p1 p2
-  | Impact_pragma p1, Impact_pragma p2 -> is_same_impact_pragma p1 p2
-  | (Slice_pragma _ | Impact_pragma _), _ -> false
 
 let rec is_same_extension x1 x2 =
   Datatype.String.equal x1.ext_name x2.ext_name &&
@@ -2273,9 +2264,6 @@ let is_pragma ca =
 let is_slice_pragma ca =
   match ca.annot_content with APragma (Slice_pragma _) -> true | _ -> false
 
-let is_impact_pragma ca =
-  match ca.annot_content with APragma (Impact_pragma _) -> true | _ -> false
-
 let is_loop_extension ca =
   match ca.annot_content with AExtended (_,is_loop,_) -> is_loop | _ -> false
 
@@ -2291,8 +2279,7 @@ let is_trivial_annotation a =
     -> false
 
 let is_property_pragma = function
-  | Slice_pragma (SPexpr _ | SPctrl | SPstmt)
-  | Impact_pragma (IPexpr _ | IPstmt) -> false
+  | Slice_pragma (SPexpr _ | SPctrl | SPstmt) -> false
 (* If at some time a pragma becomes something which should be proven,
    update the pragma-related code in gui/property_navigator.ml *)
 
