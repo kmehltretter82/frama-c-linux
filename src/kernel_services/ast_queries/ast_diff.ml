@@ -268,6 +268,9 @@ let make_correspondence candidate has_same_spec code_corres =
   | true, ((`Body_changed|`Callees_changed) as c) ->
     `Partial(candidate, c)
 
+let make_body_correspondence has_same_spec code_corres =
+  if has_same_spec then code_corres else `Body_changed
+
 let (&&>) (res,env) f =
   match res with
   | `Body_changed -> `Body_changed, env
@@ -1169,8 +1172,9 @@ and is_same_stmt s s' env =
         | _ -> `Body_changed, env
       end else `Body_changed, env
   in
-  let res = make_correspondence s' annot_res code_res in
-  Stmt.add s res; code_res, env
+  let corres = make_correspondence s' annot_res code_res in
+  let res = make_body_correspondence annot_res code_res in
+  Stmt.add s corres; res, env
 
 (* is_same_block will return its modified environment in order
    to update correspondence table with respect to locals, in case

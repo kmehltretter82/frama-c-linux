@@ -15,7 +15,6 @@
 [AST diff test] Variable has_static_local_x:  => has_static_local_y
 [AST diff test] Variable i:  => i
 [AST diff test] Variable i_0:  => i_0
-[AST diff test] Variable i_0:  => i_0
 [AST diff test] Variable local_var_use:  => local_var_use
 [AST diff test] Variable ptr_func:  => ptr_func
 [AST diff test] Variable s: N/A
@@ -45,5 +44,5 @@
 [AST diff test] Function use_s: N/A
 [AST diff test] Function with_goto_changed: -> with_goto_changed (body changed)
 [AST diff test] Function with_goto_unchanged:  => with_goto_unchanged
-[AST diff test] Function with_loop_unroll_diff:  => with_loop_unroll_diff
+[AST diff test] Function with_loop_unroll_diff: -> with_loop_unroll_diff (body changed)
 [AST diff test] Function with_loop_unroll_same:  => with_loop_unroll_same
