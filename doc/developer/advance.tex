@@ -3908,13 +3908,13 @@ different flavors, determined by the \scodeidx{Cil\_types}{ext\_code\_annot\_con
 \end{itemize}
 
 An extension is characterized by its introducing keyword \texttt{kw}, or
-\texttt{loop kw} for a loop extension. It is not possible to have the same
-keyword for two distinct extensions, especially if they belong to different
-categories, as this would lead to ambiguities in the parser. It is advised to
-prefix the keyword with the plug-in that registers it, for example
+\texttt{loop kw} for a loop extension. Having the same keyword for two distinct
+extensions is not possible, especially if they belong to different categories,
+as this would lead to ambiguities in the parser. It is advised to prefix the
+keyword with the plug-in that registers it, for example
 \lstinline{\wp::strategy}, by doing this, one assures that when the plug-in that
-registers the extension is not available, the extension will be ignored (with
-a warning) and the parsing will continue.
+registers the extension is not available, the extension will be ignored (with a
+warning) and the parsing will continue.
 
 Once an extension is registered a clause of the form \verb|kw e1,...,en;|, where each \verb|ei| can be
 any syntactically valid ACSL term or predicate, will be treated by the parser as belonging to the
