@@ -14,4 +14,5 @@ let type_foo typing_context _loc l =
   in
   Ext_terms res
 
-let () = Acsl_extension.register_behavior "foo" type_foo false
+let () =
+  Acsl_extension.register_behavior ~plugin:"my_plugin" "foo" type_foo false
