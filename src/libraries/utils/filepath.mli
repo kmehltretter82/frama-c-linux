@@ -74,6 +74,14 @@ module Normalized: sig
   *)
   val of_string: ?existence:existence -> ?base_name:string -> string -> t
 
+  (** [extend ~existence file ext] returns the normalized path to the file
+      [file] ^ [ext]. Note that it does not introduce a dot.
+      The resulting path must respect [existence].
+
+      @since Frama-C+dev
+  *)
+  val extend: ?existence:existence -> t -> string -> t
+
   (** [concat ~existence dir file] returns the normalized path
       resulting from the concatenation of [dir] ^ "/" ^ [file].
       The resulting path must respect [existence].
@@ -82,11 +90,10 @@ module Normalized: sig
   *)
   val concat: ?existence:existence -> t -> string -> t
 
-  (**
-     [concats ~existence dir paths] concatenates a list of paths, as per
-     the [concat] function.
+  (** [concats ~existence dir paths] concatenates a list of paths, as per
+      the [concat] function.
 
-     @since 28.0-Nickel
+      @since 28.0-Nickel
   *)
   val concats: ?existence:existence -> t -> string list -> t
 
