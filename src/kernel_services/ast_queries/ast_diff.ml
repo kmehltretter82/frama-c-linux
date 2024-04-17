@@ -707,9 +707,6 @@ and is_same_behavior b b' env =
   is_same_allocation b.b_allocation b'.b_allocation env &&
   is_same_list is_same_acsl_extension b.b_extended b'.b_extended env
 
-(* TODO: also consider ACSL extensions, with the help of the plugins
-   that handle them. *)
-
 and is_same_variant (v,m) (v',m') env =
   is_same_term v v' env && is_same_opt is_matching_logic_info m m' env
 
@@ -775,7 +772,10 @@ and is_same_code_annotation a a' env =
   | AAllocation(bhvs, a), AAllocation(bhvs',a') ->
     is_same_behavior_set bhvs bhvs' && is_same_allocation a a' env
   | APragma p, APragma p' -> is_same_pragma p p' env
-  | AExtended _, AExtended _ -> true (*TODO: checks also for extended clauses*)
+  | AExtended (bhvs, is_next, ext),
+    AExtended (bhvs', is_next', ext') ->
+    is_same_behavior_set bhvs bhvs' && is_next = is_next' &&
+    is_same_acsl_extension ext ext' env
   | (AAssert _ | AStmtSpec _ | AInvariant _ | AVariant _ | AAssigns _
     | AAllocation _ | APragma _ | AExtended _), _ -> false
 
@@ -1550,9 +1550,8 @@ let rec gannot_correspondence =
     ignore (logic_info_correspondence ~loc li empty_env)
   | Dmodel_annot (mi,loc) ->
     ignore (model_info_correspondence ~loc mi)
-  | Dextended _ -> ()
-(* TODO: provide mechanism for extension themselves
-   to give relevant information. *)
+  | Dextended _ -> () (* TODO: as for lemmas, we don't really have a structure
+                         where to look for a matching extended annotation. *)
 
 let global_correspondence g =
   match g with
