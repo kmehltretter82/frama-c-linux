@@ -18,6 +18,7 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o   Kernel    [2024-04-17] Remove deprecated funcs Extlib.string_{pre,suf}fix
 -   Alias     [2024-04-16] Fix analysis results in the presence of structures.
               Complete rework of the API. Improved documentation. Fix stack
               overflow in case of a cyclic graph.
