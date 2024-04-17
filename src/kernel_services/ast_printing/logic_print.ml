@@ -450,10 +450,6 @@ let print_spec fmt spec =
        ~sep:"@\n" ~suf:"@\n" (pp_list ~sep:",@ " pp_print_string))
     spec.spec_disjoint_behaviors
 
-let print_loop_pragma fmt p =
-  match p with
-    Unroll_specs l -> fprintf fmt "UNROLL@ %a" (pp_list ~sep:",@ " print_lexpr) l
-
 let print_slice_pragma fmt p =
   match p with
   | SPexpr e -> fprintf fmt "expr@ %a" print_lexpr e
@@ -467,7 +463,6 @@ let print_impact_pragma fmt p =
 
 let print_pragma fmt p =
   match p with
-    Loop_pragma p -> fprintf fmt "loop@ pragma@ %a;" print_loop_pragma p
   | Slice_pragma p -> fprintf fmt "slice@ pragma@ %a;" print_slice_pragma p
   | Impact_pragma p -> fprintf fmt "impact@ pragma@ %a;" print_impact_pragma p
 

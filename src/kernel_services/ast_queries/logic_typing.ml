@@ -3632,10 +3632,6 @@ struct
 
   let plain_logic_type loc env t = logic_type (base_ctxt env) loc env t
 
-  let loop_pragma env p =
-    match p with
-    | Unroll_specs l -> Cil_types.Unroll_specs (List.map (term env) l)
-
   let model_annot loc ti =
     let env = Lenv.empty() in
     let model_for_type =
@@ -3870,9 +3866,6 @@ struct
       | APragma (Slice_pragma sp) ->
         Cil_types.APragma
           (Cil_types.Slice_pragma (slice_pragma (code_annot_env()) sp))
-      | APragma (Loop_pragma lp) ->
-        Cil_types.APragma
-          (Cil_types.Loop_pragma (loop_pragma (code_annot_env()) lp))
       | AStmtSpec (behav,s) ->
         (* function behaviors and statement behaviors are not at the
            same level. Do not mix them in a complete or disjoint clause

@@ -929,10 +929,6 @@ and pp_termination_kind fmt = function
   | Continues -> Format.fprintf fmt "Continues"
   | Returns -> Format.fprintf fmt "Returns"
 
-and pp_loop_pragma fmt = function
-  | Unroll_specs(term_list) ->
-    Format.fprintf fmt "Unroll_specs(%a)" (pp_list pp_term) term_list
-
 and pp_slice_pragma fmt = function
   | SPexpr(term) -> Format.fprintf fmt "SPexpr(%a)" pp_term term
   | SPctrl -> Format.fprintf fmt "SPctrl"
@@ -943,8 +939,6 @@ and pp_impact_pragma fmt = function
   | IPstmt -> Format.fprintf fmt "IPstmt"
 
 and pp_pragma fmt = function
-  | Loop_pragma(term) ->
-    Format.fprintf fmt "Loop_pragma(%a)" pp_loop_pragma term
   | Slice_pragma(term) ->
     Format.fprintf fmt "Slice_pragma(%a)" pp_slice_pragma term
   | Impact_pragma(term) ->

@@ -1735,10 +1735,6 @@ and behavior = {
   (** extensions *)
 }
 
-(** Pragmas for the value analysis plugin of Frama-C. *)
-and loop_pragma =
-  | Unroll_specs of term list
-
 (** Pragmas for the slicing plugin of Frama-C. *)
 and slice_pragma =
   | SPexpr of term
@@ -1752,7 +1748,6 @@ and impact_pragma =
 
 (** The various kinds of pragmas. *)
 and pragma =
-  | Loop_pragma of loop_pragma
   | Slice_pragma of slice_pragma
   | Impact_pragma of impact_pragma
 

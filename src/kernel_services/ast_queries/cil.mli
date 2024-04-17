@@ -2013,7 +2013,6 @@ class type cilVisitor = object
   method vallocation: allocation -> allocation visitAction
   (**   @since Oxygen-20120901 *)
 
-  method vloop_pragma: loop_pragma -> loop_pragma visitAction
   method vslice_pragma: slice_pragma -> slice_pragma visitAction
   method vimpact_pragma: impact_pragma -> impact_pragma visitAction
 

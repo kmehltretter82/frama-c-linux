@@ -1402,8 +1402,6 @@ loop_annot_stack:
       check_empty
         (pos,"loop annotations can have at most one variant.") v ;
       (i,fa,a,b,AVariant loop_variant::v,p,e) }
-| loop_pragma loop_annot_opt
-    { let (i,fa,a,b,v,p,e) = $2 in (i,fa,a,b,v,APragma (Loop_pragma $1)::p,e) }
 | loop_grammar_extension loop_annot_opt {
     let (i,fa,a,b,v,p,e) = $2 in
     (i,fa,a,b,v,p, $1::e)
@@ -1456,15 +1454,6 @@ loop_grammar_extension:
     Kernel.fatal ~source:(pos $startpos($2))
       "%s is not a code annotation extension. Parser got wrong lexeme." ext
 }
-;
-
-loop_pragma:
-| LOOP PRAGMA any_identifier ne_lexpr_list SEMICOLON
-  { if $3 = "UNROLL_LOOP" || $3 = "UNROLL" then
-      (if $3 <> "UNROLL" then
-	 Format.eprintf "Warning: use of deprecated keyword '%s'.\nShould use 'UNROLL' instead.@." $3;
-       Unroll_specs $4)
-    else raise (Not_well_formed (loc $sloc,"Unknown loop pragma")) }
 ;
 
 /*** code annotations ***/

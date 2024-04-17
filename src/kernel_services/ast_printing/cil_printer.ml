@@ -3163,11 +3163,6 @@ class cil_printer () = object (self)
       (pp_list nl_complete self#complete_behaviors) complete
       (pp_list false self#disjoint_behaviors) disjoint
 
-  method private loop_pragma fmt = function
-    | Unroll_specs terms ->
-      fprintf fmt "UNROLL @[%a@]"
-        (Pretty_utils.pp_list ~sep:",@ " self#term) terms
-
   method private slice_pragma fmt = function
     |SPexpr t -> fprintf fmt "expr @[%a@]" self#term t
     | SPctrl -> Format.pp_print_string fmt "ctrl"
@@ -3201,10 +3196,6 @@ class cil_printer () = object (self)
       fprintf fmt "@[%a@ %a;@]"
         self#pp_acsl_keyword "impact pragma"
         self#impact_pragma sp
-    | APragma (Loop_pragma lp) ->
-      fprintf fmt "@[%a@ %a;@]"
-        self#pp_acsl_keyword "loop pragma"
-        self#loop_pragma lp
     | AStmtSpec(for_bhv, spec) ->
       fprintf fmt "@[<hv 2>%a%a@]"
         pp_for_behavs for_bhv
