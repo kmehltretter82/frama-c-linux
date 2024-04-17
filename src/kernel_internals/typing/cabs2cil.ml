@@ -2119,7 +2119,8 @@ struct
     }
 
   let gotoChunk ~ghost (ln: string) (l: location) : chunk =
-    let gref = ref dummyStmt in
+    let dummy = {dummyStmt with labels = [Label (ln, l, false)]} in
+    let gref = ref dummy in
     addGoto ln gref;
     { stmts = [ mkStmt ~ghost ~valid_sid (Goto (gref, l)),[],[],[],[] ];
       cases = [];
