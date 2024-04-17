@@ -1679,10 +1679,10 @@
 [inout] Inputs for function filtep:
     \nothing
 [inout] Out (internal) for function filtez:
-    bpl; dlt_0; i; zl; tmp; tmp_0; __retres; tmp_1_unroll_123;
-    tmp_2_unroll_123; tmp_1_unroll_126; tmp_2_unroll_126; tmp_1_unroll_129;
-    tmp_2_unroll_129; tmp_1_unroll_132; tmp_2_unroll_132; tmp_1_unroll_135;
-    tmp_2_unroll_135
+    bpl; dlt_0; i; zl; tmp; tmp_0; __retres; tmp_1_unfold_123;
+    tmp_2_unfold_123; tmp_1_unfold_126; tmp_2_unfold_126; tmp_1_unfold_129;
+    tmp_2_unfold_129; tmp_1_unfold_132; tmp_2_unfold_132; tmp_1_unfold_135;
+    tmp_2_unfold_135
 [inout] Inputs for function filtez:
     delay_bpl[0..5]; delay_dltx[0..5]; delay_dhx[0..5]; delay_bph[0..5]
 [inout] Out (internal) for function logsch:
@@ -1720,28 +1720,28 @@
     rlt1; rlt2; detl; deth; sh; eh; dh; ih; nbh; szh; sph; ph; yh;
     delay_dhx{[0..1]; [3..5]}; delay_bph[0..5]; ah1; ah2; ph1; ph2; rh1; 
     rh2; i; h_ptr; tqmf_ptr; tqmf_ptr1; xa; xb; decis; tmp; tmp_0; tmp_1;
-    tmp_2; tmp_7; tmp_8; tmp_9; tmp_12; tmp_13; __retres; tmp_3_unroll_8;
-    tmp_4_unroll_8; tmp_5_unroll_8; tmp_6_unroll_8; tmp_3_unroll_12;
-    tmp_4_unroll_12; tmp_5_unroll_12; tmp_6_unroll_12; tmp_3_unroll_16;
-    tmp_4_unroll_16; tmp_5_unroll_16; tmp_6_unroll_16; tmp_3_unroll_20;
-    tmp_4_unroll_20; tmp_5_unroll_20; tmp_6_unroll_20; tmp_3_unroll_24;
-    tmp_4_unroll_24; tmp_5_unroll_24; tmp_6_unroll_24; tmp_3_unroll_28;
-    tmp_4_unroll_28; tmp_5_unroll_28; tmp_6_unroll_28; tmp_3_unroll_32;
-    tmp_4_unroll_32; tmp_5_unroll_32; tmp_6_unroll_32; tmp_3_unroll_36;
-    tmp_4_unroll_36; tmp_5_unroll_36; tmp_6_unroll_36; tmp_3_unroll_40;
-    tmp_4_unroll_40; tmp_5_unroll_40; tmp_6_unroll_40; tmp_3_unroll_44;
-    tmp_4_unroll_44; tmp_5_unroll_44; tmp_6_unroll_44; tmp_10_unroll_51;
-    tmp_11_unroll_51; tmp_10_unroll_54; tmp_11_unroll_54; tmp_10_unroll_57;
-    tmp_11_unroll_57; tmp_10_unroll_60; tmp_11_unroll_60; tmp_10_unroll_63;
-    tmp_11_unroll_63; tmp_10_unroll_66; tmp_11_unroll_66; tmp_10_unroll_69;
-    tmp_11_unroll_69; tmp_10_unroll_72; tmp_11_unroll_72; tmp_10_unroll_75;
-    tmp_11_unroll_75; tmp_10_unroll_78; tmp_11_unroll_78; tmp_10_unroll_81;
-    tmp_11_unroll_81; tmp_10_unroll_84; tmp_11_unroll_84; tmp_10_unroll_87;
-    tmp_11_unroll_87; tmp_10_unroll_90; tmp_11_unroll_90; tmp_10_unroll_93;
-    tmp_11_unroll_93; tmp_10_unroll_96; tmp_11_unroll_96; tmp_10_unroll_99;
-    tmp_11_unroll_99; tmp_10_unroll_102; tmp_11_unroll_102; tmp_10_unroll_105;
-    tmp_11_unroll_105; tmp_10_unroll_108; tmp_11_unroll_108; tmp_10_unroll_111;
-    tmp_11_unroll_111; tmp_10_unroll_114; tmp_11_unroll_114
+    tmp_2; tmp_7; tmp_8; tmp_9; tmp_12; tmp_13; __retres; tmp_3_unfold_8;
+    tmp_4_unfold_8; tmp_5_unfold_8; tmp_6_unfold_8; tmp_3_unfold_12;
+    tmp_4_unfold_12; tmp_5_unfold_12; tmp_6_unfold_12; tmp_3_unfold_16;
+    tmp_4_unfold_16; tmp_5_unfold_16; tmp_6_unfold_16; tmp_3_unfold_20;
+    tmp_4_unfold_20; tmp_5_unfold_20; tmp_6_unfold_20; tmp_3_unfold_24;
+    tmp_4_unfold_24; tmp_5_unfold_24; tmp_6_unfold_24; tmp_3_unfold_28;
+    tmp_4_unfold_28; tmp_5_unfold_28; tmp_6_unfold_28; tmp_3_unfold_32;
+    tmp_4_unfold_32; tmp_5_unfold_32; tmp_6_unfold_32; tmp_3_unfold_36;
+    tmp_4_unfold_36; tmp_5_unfold_36; tmp_6_unfold_36; tmp_3_unfold_40;
+    tmp_4_unfold_40; tmp_5_unfold_40; tmp_6_unfold_40; tmp_3_unfold_44;
+    tmp_4_unfold_44; tmp_5_unfold_44; tmp_6_unfold_44; tmp_10_unfold_51;
+    tmp_11_unfold_51; tmp_10_unfold_54; tmp_11_unfold_54; tmp_10_unfold_57;
+    tmp_11_unfold_57; tmp_10_unfold_60; tmp_11_unfold_60; tmp_10_unfold_63;
+    tmp_11_unfold_63; tmp_10_unfold_66; tmp_11_unfold_66; tmp_10_unfold_69;
+    tmp_11_unfold_69; tmp_10_unfold_72; tmp_11_unfold_72; tmp_10_unfold_75;
+    tmp_11_unfold_75; tmp_10_unfold_78; tmp_11_unfold_78; tmp_10_unfold_81;
+    tmp_11_unfold_81; tmp_10_unfold_84; tmp_11_unfold_84; tmp_10_unfold_87;
+    tmp_11_unfold_87; tmp_10_unfold_90; tmp_11_unfold_90; tmp_10_unfold_93;
+    tmp_11_unfold_93; tmp_10_unfold_96; tmp_11_unfold_96; tmp_10_unfold_99;
+    tmp_11_unfold_99; tmp_10_unfold_102; tmp_11_unfold_102; tmp_10_unfold_105;
+    tmp_11_unfold_105; tmp_10_unfold_108; tmp_11_unfold_108; tmp_10_unfold_111;
+    tmp_11_unfold_111; tmp_10_unfold_114; tmp_11_unfold_114
 [inout] Inputs for function encode:
     tqmf[0..23]; h[0..23]; xl; xh; il; szl; spl; sl; el;
     qq4_code4_table{[1]; [8]; [15]}; delay_bpl[0..5]; delay_dltx[0..5];

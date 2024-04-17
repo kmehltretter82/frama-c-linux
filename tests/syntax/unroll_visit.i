@@ -6,7 +6,7 @@ PLUGIN: eva,scope,from,inout
 typedef char i8; // ideally, pretty-printing should keep 'i8' for some casts
 
 void main() {
-   /*@ loop pragma UNROLL 2; */
+   /*@ loop unfold 2; */
   for(i8 i=0; i<100; i++) {
     i--;
     //@ assert i<100;

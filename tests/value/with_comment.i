@@ -1,5 +1,5 @@
 /* run.config*
-  
+
   STDOPT: #"-main main2"
 */
 /* Commentaire avant G comment*/ /* Commentaire avant G2 comment*/
@@ -16,7 +16,7 @@ int main2 () {
   G = 0;
 
 /* Commentaire avant loop comment*/
- /*@ loop pragma UNROLL 0; */
+ /*@ loop unfold 0; */
   for(i=0; i<=10; i++)
     G++;
 

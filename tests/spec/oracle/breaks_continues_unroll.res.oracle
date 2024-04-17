@@ -7,7 +7,7 @@ int unroll(int c)
     /*@ breaks x ≡ 13; */
     {
       case 11: x ++;
-      goto unrolling_3_loop;
+      goto unfolding_3_loop;
       case 12: x ++;
       case 13: break;
       default: ;
@@ -15,12 +15,12 @@ int unroll(int c)
   }
   if (x < c) {
     x ++;
-    goto unrolling_3_loop;
+    goto unfolding_3_loop;
   }
-  goto unrolling_2_loop;
-  unrolling_3_loop: ;
-  /*@ loop pragma UNROLL 1;
-      loop pragma UNROLL "done", 1; */
+  goto unfolding_2_loop;
+  unfolding_3_loop: ;
+  /*@ loop unfold 1;
+      loop unfold "done", 1; */
   while (1) {
     /*@ breaks \false;
         continues x ≡ \old(x) + 1; */
@@ -44,7 +44,7 @@ int unroll(int c)
       break;
     }
   }
-  unrolling_2_loop: ;
+  unfolding_2_loop: ;
   return x;
 }
 

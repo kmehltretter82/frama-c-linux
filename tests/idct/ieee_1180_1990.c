@@ -173,7 +173,7 @@ int main()
   long i, j, k, m1[8][8], m2[8][8], m3[8][8], m4[8][8], succ, omse, ome, err;
 
   succ = 1;
-/*@ loop pragma UNROLL 7; */
+/*@ loop unfold 7; */
   for(i = 0; i < 6; i++)
     for(j = 0; j < 8; j++)
       for(k = 0; k < 8; k++)
@@ -198,7 +198,7 @@ int main()
     }
   /*fprintf(stderr, "------------------------------------------------->\n");*/
 
-/* loop pragma UNROLL 0 */
+/* loop unfold 0 */
   for(i = 0; i < 10000; i++)
     {
     if((i + 1) % 200 == 0)

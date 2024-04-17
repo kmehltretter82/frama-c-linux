@@ -19,7 +19,7 @@ char Q, R, S, T, U, V, W, X, Y, Z;
 
 char *strcpy(char*dst, char*src) {
   char* ldst=dst;
-  /*@ loop pragma UNROLL 20; */
+  /*@ loop unfold 20; */
   while (*ldst++ = *src++)
     ;
   return dst;
@@ -27,7 +27,7 @@ char *strcpy(char*dst, char*src) {
 
 unsigned int strlen(char *s) {
   unsigned int l=0;
- /*@ loop pragma UNROLL 20; */
+ /*@ loop unfold 20; */
   while(*s++ != 0)
     l++;
   return l;

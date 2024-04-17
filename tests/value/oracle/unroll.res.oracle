@@ -1,7 +1,7 @@
 [kernel] Parsing unroll.i (no preprocessing)
 [kernel] unroll.i:49: Warning: 
-  ignoring unrolling directive (not an understood constant expression)
-[kernel] unroll.i:54: Warning: ignoring invalid unrolling directive
+  ignoring unfolding directive (not an understood constant expression)
+[kernel] unroll.i:54: Warning: ignoring invalid unfolding directive
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -32,8 +32,8 @@
   NO EFFECTS
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    c; G; i; MAX; JMAX; j; k; S; tmp; tmp_unroll_3752; tmp_unroll_3760;
-    tmp_unroll_3768; tmp_unroll_3776; tmp_unroll_3784; tmp_unroll_3792;
-    tmp_unroll_3800; tmp_unroll_3808; tmp_unroll_3816; tmp_unroll_3824
+    c; G; i; MAX; JMAX; j; k; S; tmp; tmp_unfold_3752; tmp_unfold_3760;
+    tmp_unfold_3768; tmp_unfold_3776; tmp_unfold_3784; tmp_unfold_3792;
+    tmp_unfold_3800; tmp_unfold_3808; tmp_unfold_3816; tmp_unfold_3824
 [inout] Inputs for function main:
     \nothing
