@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Syntactic loop unrolling. *)
+(** Syntactic loop unfolding. *)
 
 open Cil_types
 open Cil
@@ -41,7 +41,7 @@ let update_info global_find_init emitter info spec =
   | {term_type=typ}  when Logic_typing.is_integral_type typ ->
     if Option.is_some info.unroll_number && not info.ignore_unroll then begin
       Kernel.warning ~once:true ~current:true
-        "ignoring unrolling directive (directive already defined)";
+        "ignoring unfolding directive (directive already defined)";
       info
     end else begin
       try
@@ -54,37 +54,36 @@ let update_info global_find_init emitter info spec =
           | Some _ as unroll_number -> { info with unroll_number }
           | None ->
             Kernel.warning ~once:true ~current:true
-              "ignoring unrolling directive (not an understood constant \
+              "ignoring unfolding directive (not an understood constant \
                expression)";
             info
         end
       with Invalid_argument s ->
         Kernel.warning ~once:true ~current:true
-          "ignoring unrolling directive (%s)" s;
+          "ignoring unfolding directive (%s)" s;
         info
     end
   | {term_node=TConst (LStr "done") } -> { info with ignore_unroll = true }
   | {term_node=TConst (LStr "completely") } ->
     if Option.is_some info.total_unroll then begin
       Kernel.warning ~once:true ~current:true
-        "found two total unroll pragmas";
+        "found two complete unfolding annotations";
       info
     end else { info with total_unroll = Some emitter }
   | _ ->
     Kernel.warning ~once:true ~current:true
-      "ignoring invalid unrolling directive";
+      "ignoring invalid unfolding directive";
     info
 
-let extract_from_pragmas global_find_init s =
-  let filter _ a = Logic_utils.is_loop_pragma a in
-  let pragmas = Annotations.code_annot_emitter ~filter s in
-  let get_infos info (a,e) =
-    match a.annot_content with
-    | APragma (Loop_pragma (Unroll_specs specs)) ->
-      List.fold_left (update_info global_find_init e) info specs
-    | _ -> assert false (* should have been filtered above. *)
-  in
-  List.fold_left get_infos empty_info pragmas
+let extract_unroll_spec global_find_init s =
+  let infos = ref empty_info in
+  Annotations.iter_code_annot (fun e (ca: code_annotation) ->
+      match ca.annot_content with
+      | AExtended (_,_, { ext_name = "unfold" ; ext_kind = Ext_terms args }) ->
+        infos := List.fold_left (update_info global_find_init e) !infos args
+      | _ -> ()
+    ) s ;
+  !infos
 
 let fresh_label =
   let counter = ref (-1) in
@@ -95,7 +94,7 @@ let fresh_label =
       | Some loc -> loc, true
     and new_label_name =
       let prefix = match label_name with None -> "" | Some s -> s ^ "_"
-      in Format.sprintf "%sunrolling_%d_loop" prefix (- !counter)
+      in Format.sprintf "%sunfolding_%d_loop" prefix (- !counter)
     in Label (new_label_name,
               loc,
               orig)
@@ -111,7 +110,7 @@ let copy_var =
     decr counter;
     fun vi ->
       let vi' = Cil_const.copy_with_new_vid vi in
-      let name = vi.vname ^ "_unroll_" ^ (string_of_int (- !counter)) in
+      let name = vi.vname ^ "_unfold_" ^ (string_of_int (- !counter)) in
       Cil_const.change_varinfo_name vi' name;
       vi'
 
@@ -190,7 +189,7 @@ let copy_annotations kf assoc labelled_stmt_tbl (break_continue_must_change, stm
             with Not_found -> SkipChildren
                | Invalid_argument _ ->
                  Kernel.abort
-                   "Loop unrolling: cannot find new representative for \
+                   "Loop unfolding: cannot find new representative for \
                     local var %s"
                    vi.vname
           end
@@ -603,14 +602,14 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
         s
       in
       ChangeDoChildrenPost (s, update)
-    | Loop _ ->
-      let infos = extract_from_pragmas global_find_init s in
+    | Loop(_,_,loc,_,_) ->
+      let infos = extract_unroll_spec global_find_init s in
       let number = Option.value ~default:times infos.unroll_number in
       let total_unrolling = infos.total_unroll in
       let is_ignored_unrolling = not force && infos.ignore_unroll in
       let f sloop =
         Kernel.debug ~dkey
-          "Unrolling loop stmt %d (%d times) inside function %a@."
+          "unfolding loop stmt %d (%d times) inside function %a@."
           sloop.sid number Kernel_function.pretty (Option.get self#current_kf);
         file_has_unrolled_loop <- true ;
         has_unrolled_loop <- true ;
@@ -692,13 +691,12 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
           new_stmts
       in
       let h sloop new_stmts = (* To indicate that the unrolling has been done *)
-        let specs = Unroll_specs [(Logic_const.term (TConst (LStr "done"))
-                                     (Ctype Cil.charPtrType)) ;
-                                  Logic_const.tinteger number
-                                 ] in
-        let annot =
-          Logic_const.new_code_annotation (APragma (Loop_pragma specs))
-        in
+        let kind = Ext_terms [
+            (Logic_const.term (TConst (LStr "done")) (Ctype Cil.charPtrType)) ;
+            Logic_const.tinteger number
+          ] in
+        let ext = Logic_const.new_acsl_extension "unfold" loc false kind in
+        let annot =Logic_const.new_code_annotation (AExtended([],true,ext)) in
         Annotations.add_code_annot
           Emitter.end_user ~kf:(Option.get self#current_kf) sloop annot;
         new_stmts
@@ -730,12 +728,12 @@ let apply_transformation ?(force=true) nb file =
       try (Globals.Vars.find vi).init with Not_found -> None
     in
     let visitor = new do_it global_find_init (force, nb) in
-    Kernel.debug ~dkey "Using -ulevel %d option and UNROLL loop pragmas@." nb;
+    Kernel.debug ~dkey "Using -ulevel %d option and loop unfold annotations@." nb;
     visitFramacFileFunctions (visitor:>Visitor.frama_c_visitor) file;
     if !ast_has_changed then Ast.mark_as_changed ()
     else begin
       Kernel.debug ~dkey
-        "No unrolling is done; all UNROLL loop pragmas are ignored@."
+        "No unfolding is done; all loop unfold annotations are ignored@."
     end
 
 (* Performs and closes all syntactic transformations *)
@@ -745,7 +743,7 @@ let compute file =
   apply_transformation ~force nb file
 
 let unroll_transform =
-  File.register_code_transformation_category "loop unrolling"
+  File.register_code_transformation_category "loop unfolding"
 
 let () =
   File.add_code_transformation_after_cleanup
@@ -753,8 +751,11 @@ let () =
            (module Kernel.UnrollingForce:Parameter_sig.S)]
     unroll_transform compute
 
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+let unroll_typer (ctxt: Logic_typing.typing_context) (_loc:location) args =
+  let open Logic_typing in
+  let env =
+    Lenv.empty () |> append_here_label |> append_init_label |> append_pre_label
+  in Ext_terms (List.map (ctxt.type_term ctxt env) args)
+
+let () = Acsl_extension.register_code_annot_next_loop
+    ~plugin:"kernel" "unfold" unroll_typer false
