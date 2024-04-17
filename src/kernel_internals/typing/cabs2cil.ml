@@ -6602,9 +6602,12 @@ and doExp local_env
                begin
                  try
                    (* Nested calls of a function without a prototype : inner
-                      calls will update f type but the information is not
+                      calls will update [f] type but the information is not
                       communicated to outer ones, hence [argTypes] is not up to
-                      date and we need to check that types are compagtibles. *)
+                      date and we need to check that types are compatibles
+                      before updating [f] type (see issue-641-implicit-calls.c
+                      test).
+                   *)
                    ignore(Cil.compatibleTypes f.vtype typ);
                  with Cannot_combine msg ->
                    abort_context "nested calls of %s without a prototype and \
@@ -6612,6 +6615,21 @@ and doExp local_env
                end;
                Cil.update_var_type f typ;
                Cil.setFormalsDecl f typ;
+               (* We need to check that the update of [f] did not create
+                  inconsistencies with call' arguments. It can happen when [f]
+                  is used as an lvalue in its own arguments. Updating [f] type
+                  will recursively change the type of [f] inside parameters ,
+                  therefore [f] type is not up to date anymore, etc (see
+                  issue-641-implicit-calls.c test). *)
+               let check_arg e (_, at, _) =
+                 let typ = Cil.typeOf e in
+                 if not @@ Cil_datatype.Typ.equal typ at then
+                   abort_context "call to %s with a reference to itself in its \
+                                  own parameters" f.vname
+               in
+               (* args and prm_types should have the same length here, since
+                  they both come from the same split.  *)
+               List.iter2 check_arg args prm_types;
                (chunk,args)
              end
            | None, _ -> res
