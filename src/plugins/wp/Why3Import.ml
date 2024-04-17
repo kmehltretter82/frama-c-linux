@@ -79,12 +79,15 @@ let tvars_of_txs (txs: W.Ty.tvsymbol list) : string list * tvars =
        x :: txs, W.Ty.Mtv.add tv (C.Lvar x) tvs
     ) txs ([], W.Ty.Mtv.empty)
 
-let rec lt_of_ty (tenv : tenv) (tvs : tvars) ((thname, thpaths)) (ty: W.Ty.ty) : C.logic_type =
+
+let rec lt_of_ty (tenv : tenv) (tvs : tvars) (thname, thpaths) (ty: W.Ty.ty) : C.logic_type =
   match ty.ty_node with
   | Tyvar x -> W.Ty.Mtv.find x tvs
-  | Tyapp(s,ts) -> C.Ltype( lti_of_ts tenv s (thname, thpaths), List.map (lt_of_ty tenv tvs (thname, thpaths)) ts)
+  | Tyapp(s,ts) -> C.Ltype( lti_of_ts tenv s (thname, thpaths),
+                            List.map (lt_of_ty tenv tvs (thname, thpaths)) ts)
 
-and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol) ((thname, thpaths)): C.logic_type_info =
+
+and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol) (thname, thpaths): C.logic_type_info =
   try W.Ty.Hts.find tenv ts with Not_found ->
     let (lt_params,tvars) = tvars_of_txs ts.ts_args in
     let lt_def =
@@ -94,7 +97,7 @@ and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol) ((thname, thpaths)): C.logic_ty
     in
     let lti =
       C.{
-        lt_name =  construct_acsl_name thpaths thname ts.ts_name.id_string; (* "int::Int::add" *)
+        lt_name =  construct_acsl_name thpaths thname ts.ts_name.id_string;
         lt_params ; lt_def ;
         lt_attr = [];
       }
@@ -105,9 +108,9 @@ and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol) ((thname, thpaths)): C.logic_ty
 (* ---    Functions                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let lv_of_ty (tenv:tenv) (tvars:tvars) ((thname, thpaths)) (index) (ty:W.Ty.ty)  : C.logic_var =
+let lv_of_ty (tenv:tenv) (tvars:tvars) (thname, thpaths)(index) (ty:W.Ty.ty) : C.logic_var =
   Cil_const.make_logic_var_formal (Printf.sprintf "x%d" index)
-  @@ (lt_of_ty tenv tvars ((thname, thpaths)) ty)
+  @@ (lt_of_ty tenv tvars (thname, thpaths) ty)
 
 let lr_of_ty_opt (lt_opt) =
   match lt_opt with
@@ -115,7 +118,7 @@ let lr_of_ty_opt (lt_opt) =
   | Some tr -> tr
 
 
-let li_of_ls (tenv:tenv) (ls : W.Term.lsymbol) (lenv:lenv) ((thname, thpaths)) : C.logic_info =
+let li_of_ls (tenv:tenv) (ls : W.Term.lsymbol) (lenv:lenv) (thname, thpaths) : C.logic_info =
   let l_tparams,tvars =
     tvars_of_txs @@ W.Ty.Stv.elements @@  W.Term.ls_ty_freevars ls in
   let l_type = Option.map (lt_of_ty tenv tvars (thname, thpaths)) ls.ls_value in
@@ -138,8 +141,6 @@ let li_of_ls (tenv:tenv) (ls : W.Term.lsymbol) (lenv:lenv) ((thname, thpaths)) :
 (* -------------------------------------------------------------------------- *)
 (* ---    Theory                                                          --- *)
 (* -------------------------------------------------------------------------- *)
-
-
 
 
 let import_theory env (tenv:tenv) (lenv:lenv) thname =
@@ -206,7 +207,6 @@ let () =
           L.debug ~level:0 "TY %a" pp_id ls.ls_name;
           L.debug ~level:0 "LI %a" pp_li li;
         ) lenv
-
     end
 
 (* -------------------------------------------------------------------------- *)
