@@ -341,14 +341,15 @@ module Precedence = struct
     | Const _ -> 0                        (* Constants *)
 
   let rec getParenthLevelLogic = function
-    | Trange _ -> 0
     | Tlambda _ | Tlet _ -> binderLevel
-    | TBinOp(LAnd, _,_) -> and_level
+    | Tif (_, _, _)  -> questionLevel
     | TBinOp(LOr, _,_) -> or_level
+    | TBinOp(LAnd, _,_) -> and_level
     (* Bit operations. *)
     | TBinOp((BOr|BXor|BAnd),_,_) -> bitwiseLevel
     | Tapp({ l_var_info },[],[_;_])
-      when l_var_info.lv_name = "\\concat" -> bitwiseLevel
+      when l_var_info.lv_name = "\\repeat" || l_var_info.lv_name = "\\concat" ->
+      bitwiseLevel
     (* Comparisons *)
     | TBinOp((Eq|Ne|Gt|Lt|Ge|Le),_,_) -> comparativeLevel
     (* Additive. Shifts can have higher level than + or - but I want parentheses
@@ -357,8 +358,6 @@ module Precedence = struct
               PlusPI|Shiftlt|Shiftrt),_,_) -> additiveLevel
     (* Multiplicative *)
     | TBinOp((Div|Mod|Mult),_,_) -> multiplicativeLevel
-    | Tapp({ l_var_info },[],[_;_])
-      when l_var_info.lv_name = "\\repeat" -> bitwiseLevel
     (* Unary *)
     | TCast(false,_,_)
     | TAddrOf(_)
@@ -377,12 +376,14 @@ module Precedence = struct
     | Tblock_length _ | Tbase_addr _ | Toffset _ | Tat (_, _)
     | Tunion _ | Tinter _
     | TUpdate _ | Ttypeof _ | Ttype _ -> applicationLevel
+    | TCast (true,_,e) -> (getParenthLevelLogic e.term_node) + 1
     | TLval(TVar _, TNoOffset) -> 0        (* Plain variables *)
+    (* Trange always requires parenthesis, except inside indexes. These cases
+       are handled in [term_node] and [term_offset] functions. *)
+    | Trange _ -> 0
     (* Constructions that do not require parentheses *)
     | TConst _
     | Tnull | TLval (TResult _,TNoOffset) | Tcomprehension _  | Tempty_set -> 0
-    | Tif (_, _, _)  -> questionLevel
-    | TCast (true,_,e) -> (getParenthLevelLogic e.term_node) + 1
 
   (* Create an expression of the same shape, and use {!getParenthLevel} *)
   let getParenthLevelAttrParam = function
