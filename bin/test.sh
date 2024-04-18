@@ -226,8 +226,16 @@ do
             ALIAS_NAME=$2
             shift
             ;;
-       *)
-            TESTS+=" $1"
+        *)
+            if [ -f $1 ] || [ -d $1 ]; then
+                TESTS+=" $1"
+            elif [ -d tests/$1 ]; then
+                TESTS+=" tests/$1"
+            elif [ -d src/plugins/$1/tests ]; then
+                TESTS+=" src/plugins/$1/tests"
+            else
+                ErrorUsage "'$1' is not a test file or directory"
+            fi
             ;;
     esac
     shift
