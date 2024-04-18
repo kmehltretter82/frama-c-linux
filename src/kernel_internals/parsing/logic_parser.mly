@@ -1464,10 +1464,6 @@ loop_pragma:
       (if $3 <> "UNROLL" then
 	 Format.eprintf "Warning: use of deprecated keyword '%s'.\nShould use 'UNROLL' instead.@." $3;
        Unroll_specs $4)
-    else if $3 = "WIDEN_VARIABLES" then
-      Widen_variables $4
-    else if $3 = "WIDEN_HINTS" then
-      Widen_hints $4
     else raise (Not_well_formed (loc $sloc,"Unknown loop pragma")) }
 ;
 
