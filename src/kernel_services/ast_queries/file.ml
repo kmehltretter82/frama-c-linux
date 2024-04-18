@@ -331,9 +331,32 @@ let get_machdep () =
   | Error (`Msg s) ->
     Kernel.abort "Error during machdep parsing: %s" s
 
+
+let unsupported_float_type_macros acc name =
+  List.fold_left
+    (fun acc s -> Datatype.String.Set.add (name ^ "_" ^ s) acc)
+    acc
+    [ "DECIMAL_DIG"; "DENORM_MIN"; "DIG"; "HAS_DENORM"; "HAS_INFINITY";
+      "HAS_QUIET_NAN"; "IS_IEC_60559"; "MANT_DIG";
+      "MAX"; "MAX_10_EXP"; "MAX_EXP";
+      "MIN"; "MIN_10_EXP"; "MIN_EXP";
+      "NORM_MAX"; "EPSILON";
+    ]
+
+let unsupported_float_types =
+  List.fold_left unsupported_float_type_macros
+    Datatype.String.Set.empty
+    [ "BFLT16"; "FLT16"; "FLT128"; "LDBL"; ]
+
+let known_bad_macros =
+  Datatype.String.Set.add_seq (List.to_seq ["SIZEOF_INT128"; "SSE" ])
+    unsupported_float_types
+
 let print_machdep_header () =
   if Kernel.PrintMachdepHeader.get () then begin
-    Machdep.gen_all_defines Format.std_formatter (get_machdep());
+    let censored_macros = known_bad_macros in
+    Machdep.gen_all_defines
+      Format.std_formatter ~censored_macros (get_machdep());
     raise Cmdline.Exit
   end else Cmdline.nop
 
@@ -422,8 +445,6 @@ let silence_cpp_machdep_warnings cmdl =
   else
     []
 
-let known_bad_macros = [ "SIZEOF_INT128"; "SSE" ]
-
 let censored_macros cpp_args =
   List.fold_left
     (fun acc arg ->
@@ -433,7 +454,7 @@ let censored_macros cpp_args =
        (let+ name = Extlib.string_del_prefix "-U" arg in
         Extlib.strip_underscore name)
        |> Option.fold ~none ~some)
-    (Datatype.String.Set.of_list known_bad_macros)
+    known_bad_macros
     (List.(flatten (map (String.split_on_char ' ') cpp_args)))
 
 let build_cpp_cmd = function
