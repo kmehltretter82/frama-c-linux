@@ -315,6 +315,8 @@ function PrepareCoverage
         Cmd rm -rf _bisect
         Cmd mkdir _coverage
         Cmd mkdir _bisect
+
+        DUNE_OPT+="--workspace dev/dune-workspace.cover "
     fi
 }
 
@@ -371,9 +373,6 @@ function PrepareTests
 [ "$DUNE_LOG" = "" ] || rm -rf $DUNE_LOG
 function RunAlias
 {
-    if [ "$COVER" = "yes" ]; then
-        DUNE_OPT+="--workspace dev/dune-workspace.cover "
-    fi
     Head "Running tests..."
     if [ "$DUNE_LOG" = "" ]; then
         Run dune build $DUNE_OPT $@
