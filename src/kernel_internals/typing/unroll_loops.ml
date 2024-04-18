@@ -720,9 +720,9 @@ end
 (* Performs unrolling transformation without using -ulevel option.
    Do not forget to apply  [transformations_closure] afterwards. *)
 let apply_transformation ?(force=true) nb file =
-  (* [nb] default number of unrolling used when there is no UNROLL loop pragma.
-     When [nb] is negative, no unrolling is done; all UNROLL loop pragmas
-     are ignored. *)
+  (* [nb] default number of unrolling used when there is no loop unfold.
+     When [nb] is negative, no unrolling is done and all loop unfold
+     specifications are ignored. *)
   if nb >= 0 then
     let global_find_init vi =
       try (Globals.Vars.find vi).init with Not_found -> None

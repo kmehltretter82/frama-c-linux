@@ -1284,7 +1284,7 @@ module UnrollingForce =
       let default = false
       let option_name = "-ulevel-force"
       let help =
-        "ignore UNROLL loop pragmas disabling unrolling."
+        "ignore loop unfold \"done\" specifications (force unrolling)."
     end)
 
 let () = Parameter_customize.set_group normalisation
