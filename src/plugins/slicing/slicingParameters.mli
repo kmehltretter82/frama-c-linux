@@ -30,7 +30,7 @@ module Select : sig
   module Return: Parameter_sig.Kernel_function_set
   module Threat: Parameter_sig.Kernel_function_set
   module Assert: Parameter_sig.Kernel_function_set
-  module Pragma: Parameter_sig.Kernel_function_set
+  module SliceAnnot: Parameter_sig.Kernel_function_set
   module LoopInv: Parameter_sig.Kernel_function_set
   module LoopVar: Parameter_sig.Kernel_function_set
   module RdAccess: Parameter_sig.String_set

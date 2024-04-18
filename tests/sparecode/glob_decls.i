@@ -1,7 +1,7 @@
 /* run.config
   STDOPT: +"-lib-entry -sparecode-analysis "
 PLUGIN: @PTEST_PLUGIN@ slicing
-  STDOPT: +"-lib-entry -slice-pragma main -slice-return main -then-on 'Slicing export' -print"
+  STDOPT: +"-lib-entry -slice-annot main -slice-return main -then-on 'Slicing export' -print"
  STDOPT: +"-sparecode-rm-unused-globals"
 */
 

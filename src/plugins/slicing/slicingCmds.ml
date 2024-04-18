@@ -634,7 +634,7 @@ let add_persistent_cmdline () =
              SlicingParameters.Select.Calls.get
              select_func_calls_to;
            add_selection
-             SlicingParameters.Select.Pragma.get
+             SlicingParameters.Select.SliceAnnot.get
              (fun s -> select_func_annots s top_mark
                  ~threat:false ~user_assert:false ~slicing_annot:true
                  ~loop_inv:false ~loop_var:false);

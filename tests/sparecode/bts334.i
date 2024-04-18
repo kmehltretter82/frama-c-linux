@@ -1,8 +1,8 @@
 /*run.config
   STDOPT: +"-sparecode-debug 0 -main main_init -sparecode-analysis -sparecode-no-annot "
 PLUGIN: @PTEST_PLUGIN@ slicing
-  STDOPT: +"-sparecode-debug 0 -main main_init -slice-pragma loop_body -then-on 'Slicing export' -print"
-  STDOPT: +"-sparecode-debug 0 -main main_init -slice-pragma loop_body -calldeps -then-on 'Slicing export' -print"
+  STDOPT: +"-sparecode-debug 0 -main main_init -slice-annot loop_body -then-on 'Slicing export' -print"
+  STDOPT: +"-sparecode-debug 0 -main main_init -slice-annot loop_body -calldeps -then-on 'Slicing export' -print"
  */
 int kf ;
 int k[2] ;

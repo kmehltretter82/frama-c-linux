@@ -86,19 +86,21 @@ module Select = struct
         let help = "select the loop variants of functions f1,...,fn"
       end)
 
-  module Pragma =
+  module SliceAnnot =
     Kernel_function_set
       (struct
-        let option_name = "-slice-pragma"
+        let option_name = "-slice-annot"
         let arg_name = "f1, ..., fn"
         let help =
           "use the slicing pragmas in the code of functions f1,...,fn as \
            slicing criteria:\n\
-           //@ slice pragma ctrl;  to reach this control-flow point\n\
-           //@ slice pragma expr <expr_desc;>  to preserve the value of an expression at \
+           //@ slice_preserve_ctrl;  to reach this control-flow point\n\
+           //@ slice_preserve_expr <expr>;  to preserve the value of an expression at \
            this control-flow point\n\
-           //@ slice pragma stmt;  to preserve the effect of the next statement"
+           //@ slice_preserve_stmt;  to preserve the effect of the next statement"
       end)
+  let () =
+    SliceAnnot.add_aliases ~visible:false ~deprecated:true ["-slice-pragma"]
 
   module RdAccess =
     String_set
@@ -222,7 +224,7 @@ let () =
       Select.Assert.self;
       Select.LoopInv.self;
       Select.LoopVar.self;
-      Select.Pragma.self;
+      Select.SliceAnnot.self;
       Select.RdAccess.self;
       Select.WrAccess.self;
       Select.Value.self;
@@ -240,7 +242,7 @@ let is_on () =
         && Select.Assert.is_empty ()
         && Select.LoopInv.is_empty ()
         && Select.LoopVar.is_empty ()
-        && Select.Pragma.is_empty ()
+        && Select.SliceAnnot.is_empty ()
         && Select.RdAccess.is_empty ()
         && Select.WrAccess.is_empty ()
         && Select.Value.is_empty ()))
@@ -259,7 +261,7 @@ let clear () =
   Select.Assert.clear () ;
   Select.LoopInv.clear () ;
   Select.LoopVar.clear () ;
-  Select.Pragma.clear () ;
+  Select.SliceAnnot.clear () ;
   Select.RdAccess.clear () ;
   Select.WrAccess.clear () ;
   Select.Value.clear () ;
