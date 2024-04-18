@@ -42,7 +42,7 @@ int main(void)
 {
   int __retres;
   g();
-  /*@ slice pragma expr S.b; */ ;
+  /*@ \slicing::slice_preserve_expr S.b; */ ;
   S.ab = 1;
   __retres = S.a;
   return __retres;

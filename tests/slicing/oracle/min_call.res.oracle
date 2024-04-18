@@ -265,8 +265,8 @@ Print slice = f_slice_1: (InCtrl: <[--d], [ S ]>)
                         (In4: <[--d], [ S ]>) */
   /* <[--d], [ S ]> */
   /* <[---], [---]> */ int z = k(G,0,0,0);
-  /*@ slice pragma expr z; */ /* <[---], [---]> */
-                              ;
+  /*@ \slicing::slice_preserve_expr z; */ /* <[---], [---]> */
+                                          ;
   /* invisible call */ /* <[---], [---]> */
   send(z);
   /* <[---], [---]> */
@@ -416,8 +416,8 @@ Print slice = f_slice_1: (InCtrl: <[--d], [ S ]>)
                         (In4: <[--d], [ S ]>) */
   /* <[--d], [ S ]> */
   /* <[---], [---]> */ int z = k(G,0,0,0);
-  /*@ slice pragma expr z; */ /* <[---], [---]> */
-                              ;
+  /*@ \slicing::slice_preserve_expr z; */ /* <[---], [---]> */
+                                          ;
   /* invisible call */ /* <[---], [---]> */
   send(z);
   /* <[---], [---]> */
@@ -555,8 +555,8 @@ Print slice = f_slice_1: (InCtrl: <[acd], [---]>)
   /* call to k_slice_1:  */
   /* <[acd], [---]> */
   /* <[---], [---]> */ int z = k(G,0,0,0);
-  /*@ slice pragma expr z; */ /* <[---], [---]> */
-                              ;
+  /*@ \slicing::slice_preserve_expr z; */ /* <[---], [---]> */
+                                          ;
   /* invisible call */ /* <[---], [---]> */
   send(z);
   /* <[---], [---]> */

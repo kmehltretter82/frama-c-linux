@@ -168,7 +168,7 @@ void main(void)
     /*@ assert b ≡ 0; */ ;
     a = 1;
   }
-  /*@ slice pragma expr a + b; */ ;
+  /*@ \slicing::slice_preserve_expr a + b; */ ;
   return;
 }
 

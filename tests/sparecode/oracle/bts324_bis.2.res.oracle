@@ -94,7 +94,7 @@
 [pdg] computing for function loop_body
 [pdg] done for function loop_body
 [sparecode] look for annotations in function main
-[sparecode] selecting annotation : slice pragma expr s1;
+[sparecode] selecting annotation : \slicing::slice_preserve_expr s1;
 [sparecode] add selection in function 'main'
 [sparecode] look for annotations in function main_bis
 [pdg] computing for function main_bis
@@ -147,7 +147,7 @@ void main(void)
   init();
   while (1) {
     loop_body();
-    /*@ slice pragma expr s1; */ ;
+    /*@ \slicing::slice_preserve_expr s1; */ ;
   }
   return;
 }

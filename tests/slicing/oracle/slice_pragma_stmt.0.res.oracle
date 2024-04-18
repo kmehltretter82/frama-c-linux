@@ -4,28 +4,28 @@ int x;
 int y;
 void nop1(int c1, int c2)
 {
-  /*@ slice pragma stmt; */ ;
+  /*@ \slicing::slice_preserve_stmt ; */ ;
   x = 1;
   return;
 }
 
 void nop2(int c1, int c2)
 {
-  /*@ slice pragma stmt; */ ;
+  /*@ \slicing::slice_preserve_stmt ; */ ;
   x = 1;
   return;
 }
 
 void nop3(int c1, int c2)
 {
-  /*@ slice pragma stmt; */ ;
+  /*@ \slicing::slice_preserve_stmt ; */ ;
   x = 1;
   return;
 }
 
 void nop4(int c1, int c2)
 {
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   if (c1) ;
   x = 1;
   return;
@@ -34,7 +34,7 @@ void nop4(int c1, int c2)
 void nop5(int c1, int c2)
 {
   if (c2) goto L;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   L: ;
   x = 1;
   return;
@@ -42,7 +42,7 @@ void nop5(int c1, int c2)
 
 void nop6(int c1, int c2)
 {
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   L: ;
   x = 1;
   return;
@@ -50,7 +50,7 @@ void nop6(int c1, int c2)
 
 void nop7(int c1, int c2)
 {
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   L: ;
   x = 1;
   return;
@@ -58,7 +58,7 @@ void nop7(int c1, int c2)
 
 void nop8(int c1, int c2)
 {
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   L: ;
   x = 1;
   return;
@@ -67,7 +67,7 @@ void nop8(int c1, int c2)
 void double_effect1(int c1, int c2)
 {
   int tmp;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   { /* sequence */
     tmp = y;
     y ++;
@@ -78,7 +78,7 @@ void double_effect1(int c1, int c2)
 
 void double_effect2(int c1, int c2)
 {
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   {
     int tmp;
     tmp = y;
@@ -92,7 +92,7 @@ void double_effect3(int c1, int c2)
 {
   int tmp;
   if (c2) goto L;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   {
     L: { /* sequence */
          tmp = y;
@@ -106,7 +106,7 @@ void double_effect3(int c1, int c2)
 void double_effect4(int c1, int c2)
 {
   if (c2) goto L;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   L: {
        int tmp;
        tmp = y;
@@ -119,7 +119,7 @@ void double_effect4(int c1, int c2)
 void double_effect5(int c1, int c2)
 {
   if (c2) {
-    /*@ slice pragma stmt; */
+    /*@ \slicing::slice_preserve_stmt ; */
     {
       int tmp;
       tmp = y;
@@ -133,7 +133,7 @@ void double_effect5(int c1, int c2)
 void test1(int c1, int c2)
 {
   if (c1 < c2) c1 = c2;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   x = c1;
   return;
 }
@@ -141,7 +141,7 @@ void test1(int c1, int c2)
 void test2(int c1, int c2)
 {
   if (c1 < c2) c1 = c2;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   x = c1;
   y = c2;
   return;
@@ -150,7 +150,7 @@ void test2(int c1, int c2)
 void test3(int c1, int c2)
 {
   if (c1 < c2) c1 = c2;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   x = c1;
   y = c2;
   return;
@@ -159,7 +159,7 @@ void test3(int c1, int c2)
 void test4(int c1, int c2)
 {
   if (c1 < c2) c1 = c2;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   {
     x = c1;
     c2 ++;
@@ -172,7 +172,7 @@ void test5(int c1, int c2)
 {
   if (c1 < c2) goto L;
   c1 = c2;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   L: x = c1;
   y = c2;
   return;
@@ -183,7 +183,7 @@ void test6(int c1, int c2)
   int tmp;
   if (c1 < c2) goto L;
   c1 = c2;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   {
     L: { /* sequence */
          tmp = c1;
@@ -199,7 +199,7 @@ void test7(int c1, int c2)
 {
   if (c1 < c2) goto L;
   c1 = c2;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   L: {
        int tmp;
        tmp = c1;
@@ -215,7 +215,7 @@ void test8(int c1, int c2)
 {
   if (c1 < c2) goto L;
   c1 = c2;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   {
     int tmp;
     L: { /* sequence */
@@ -233,7 +233,7 @@ void test9(int c1, int c2)
 {
   if (c1 < c2) goto L;
   c1 = c2;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   {
     x = c1;
     L: c2 ++;

@@ -45,7 +45,7 @@
 [pdg] Bottom for function main
 [sparecode] pdg bottom: skip annotations
 [sparecode] look for annotations in function main_bis
-[sparecode] selecting annotation : slice pragma expr o0;
+[sparecode] selecting annotation : \slicing::slice_preserve_expr o0;
 [sparecode] add selection in function 'main_bis'
 [sparecode] look for annotations in function main_ter
 [pdg] computing for function main_ter
@@ -72,7 +72,7 @@ void main_bis(void)
   if (is_ko) 
     while (1) {
       loop_body();
-      /*@ slice pragma expr o0; */ ;
+      /*@ \slicing::slice_preserve_expr o0; */ ;
     }
   return;
 }

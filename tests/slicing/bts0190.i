@@ -4,7 +4,7 @@ STDOPT: +"-slicing-warn-key cmdline=active -slice-rd y -then-on 'Slicing export'
 int z1(void);
 
 int x(int y, int z){
-/*@ slice pragma expr y == 1; */
+/*@ slice_preserve_expr y == 1; */
 //@ assert y == 1;
 //@ assert y + z == 3;
  return 2*y*z1();

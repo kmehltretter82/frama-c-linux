@@ -14,7 +14,7 @@ void g (void) {
 }
 int main (void) {
   g();
-  //@  slice pragma expr S.b;
+  //@  slice_preserve_expr S.b;
   S.ab = 1; /* so that S.ab is sparecode in g() */
   return S.a ;
 }

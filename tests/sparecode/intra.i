@@ -102,10 +102,10 @@ int main (int noreturn, int halt) {
 struct { struct { int x; int y; } a; int b; } X10;
 int Y10;
 int f10 (int x) {
-  //@ slice pragma expr X10;
-  //@ slice pragma expr X10.a;
-  //@ slice pragma expr X10.a.x;
-  //@ slice pragma expr Y10;
+  //@ slice_preserve_expr X10;
+  //@ slice_preserve_expr X10.a;
+  //@ slice_preserve_expr X10.a.x;
+  //@ slice_preserve_expr Y10;
   //@ assert X10.a.x >= 0;
   return x;
 }

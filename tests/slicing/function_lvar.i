@@ -5,6 +5,6 @@ int g(int x) { return x; }
 
 int main() {
   /*@ assert &g == &g; */
-  /*@ slice pragma stmt; */
+  /*@ slice_preserve_stmt; */
   g(0);
 }

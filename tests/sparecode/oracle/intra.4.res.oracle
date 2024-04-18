@@ -45,7 +45,7 @@ struct __anonstruct_X10_1 {
 struct __anonstruct_X10_1 X10;
 int f10_slice_1(int x)
 {
-  /*@ slice pragma expr X10.a.x; */ ;
+  /*@ \slicing::slice_preserve_expr X10.a.x; */ ;
   /*@ assert X10.a.x ≥ 0; */ ;
   return x;
 }

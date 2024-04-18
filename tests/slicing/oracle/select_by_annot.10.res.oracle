@@ -169,7 +169,7 @@ void f7_slice_1(int cond)
 {
   int *p = & S.a;
   if (cond) {
-    /*@ slice pragma stmt; */
+    /*@ \slicing::slice_preserve_stmt ; */
     {
       Sa = *p;
       Sa ++;

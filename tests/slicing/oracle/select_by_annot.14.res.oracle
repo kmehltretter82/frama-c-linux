@@ -164,7 +164,7 @@ void f9_slice_1(int c1, int c2)
 {
   if (c1 > c2) goto L;
   c1 = c2;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   L: X9 = c1;
   return;
 }

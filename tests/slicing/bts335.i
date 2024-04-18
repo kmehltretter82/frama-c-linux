@@ -8,5 +8,5 @@ bin/toplevel.opt -pdg-debug -pdg -pdg-debug "-pdg-pot bts335" %{dep:./bts335.c}
  */
 int T[2]  = {0, 0};
 void f (int i) { T[i]++; }
-void g (void) { f(0); /*@ slice pragma expr T[0]; */ }
+void g (void) { f(0); /*@ slice_preserve_expr T[0]; */ }
 void main (int c) { if (c) g(); else f(1); }

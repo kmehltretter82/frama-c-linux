@@ -34,7 +34,7 @@ void func(  void  )
 		} 
 	} 
 
-	//@slice pragma stmt;
+	//@slice_preserve_stmt;
 	 65 != var2 ? assert ( 5 != var1):1;
 } 
 

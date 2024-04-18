@@ -28,7 +28,7 @@ int g() {
   /* Note: y is not initialised by g. */
   /* Note: GCC without optimization gives X1 == y. */
   printf ("%d\n", y);
-  //@slice pragma expr y ;
+  //@slice_preserve_expr y ;
   //@assert X1 == y ;
   return y;
 }

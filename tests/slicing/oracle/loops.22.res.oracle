@@ -73,7 +73,7 @@ void loop_slice_1(void)
   {
     int c = 0;
     while (1) {
-      /*@ slice pragma ctrl; */ ;
+      /*@ \slicing::slice_preserve_ctrl ; */ ;
       if (c) Y = Z;
       c = 1;
       /*@ assert c ≡ 1; */ ;

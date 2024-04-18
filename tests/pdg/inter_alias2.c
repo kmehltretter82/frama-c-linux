@@ -22,6 +22,6 @@ int f2 (int b) {
 int main (int i1, int i2) {
   int v1 = f1 (i1);
   int v2 = f2 (i2);
-  /*@ slice pragma expr v1; */
+  /*@ slice_preserve_expr v1; */
   return v1 + v2;
 }

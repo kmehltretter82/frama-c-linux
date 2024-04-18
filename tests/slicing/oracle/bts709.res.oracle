@@ -87,7 +87,7 @@ void func_slice_1(void)
         var1 = 3;
         var2 = 3;
       }
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   if (65 != var2) __FC_assert((5 != var1) != 0,"bts709.c",38,"5 != var1");
   return;
 }

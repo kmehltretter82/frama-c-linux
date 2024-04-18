@@ -42,7 +42,7 @@ void L(float u, int nn, float *dabs, float *y)
     *y = (float)((double)u - (double)*(dabs + (ii + 1)) * 2.0);
     ii --;
   }
-  /*@ slice pragma expr *y; */ ;
+  /*@ \slicing::slice_preserve_expr *y; */ ;
   return;
 }
 

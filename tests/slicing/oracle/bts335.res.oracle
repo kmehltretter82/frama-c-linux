@@ -67,7 +67,7 @@ void f_slice_1(int i)
 void g_slice_1(void)
 {
   f_slice_1(0);
-  /*@ slice pragma expr T[0]; */ ;
+  /*@ \slicing::slice_preserve_expr T[0]; */ ;
   return;
 }
 

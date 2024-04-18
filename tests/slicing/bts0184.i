@@ -3,7 +3,7 @@
  **/
 int x(int y, int z)
 {
-/*@ slice pragma expr y == 1; */
+/*@ slice_preserve_expr y == 1; */
 //@ assert y == 1;
 //@ assert y + z == 3;
  return y;

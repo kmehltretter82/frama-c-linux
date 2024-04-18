@@ -41,7 +41,7 @@ void L (float u,int nn, float dabs[], float *y) {
     *y = u - dabs[ii+1] * 2.0;
     //@ assert (\forall integer k; u<=dabs[k]);
   }
-  //@slice pragma expr *y;
+  //@slice_preserve_expr *y;
 }
 
 int bts1110(int x) {

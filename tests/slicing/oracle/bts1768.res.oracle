@@ -231,7 +231,7 @@ void main(void)
     lecture_slice_1();
     fsm_transition_slice_1();
     if (state == 3) {
-      /*@ slice pragma ctrl; */ ;
+      /*@ \slicing::slice_preserve_ctrl ; */ ;
       break;
     }
     step ++;

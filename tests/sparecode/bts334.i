@@ -27,7 +27,7 @@ void loop_body(void)
   int val0 ;
   int val1 ;
 
-  {/*@ slice pragma expr s0;
+  {/*@ slice_preserve_expr s0;
 
    */
    ;

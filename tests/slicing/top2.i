@@ -23,6 +23,6 @@ int f(void) {
 int main(void) {
  int x = f();
  G += 1 ;
- //@ slice pragma expr G ;
+ //@ slice_preserve_expr G ;
  return x;
 }

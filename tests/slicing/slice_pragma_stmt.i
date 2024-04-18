@@ -27,96 +27,96 @@ typedef int stmt, expr, slice;
 int x, y ;
 //-------------------
 void nop1(int c1, int c2) {
-  //@ slice pragma stmt; // <----- slicing isn't correct since the effect...
+  //@ slice_preserve_stmt; // <----- slicing isn't correct since the effect...
   ; // <----- ...is missing with -print option
   x = 1 ;
  }
 void nop2(int c1, int c2) {
-  //@ slice pragma stmt; // <----- slicing isn't correct since the effect...
+  //@ slice_preserve_stmt; // <----- slicing isn't correct since the effect...
   {;} // <----- ...is missing with -print option
   x = 1 ;
  }
 
 void nop3(int c1, int c2) {
-  //@ slice pragma stmt;  // <----- slicing isn't correct since the effect...
+  //@ slice_preserve_stmt;  // <----- slicing isn't correct since the effect...
   {;{;;};} // <----- ...is missing with -print option
   x = 1 ;
  }
 void nop4(int c1, int c2) {
-  //@ slice pragma stmt;
+  //@ slice_preserve_stmt;
   if (c1) {;{;;};}
   x = 1 ;
  }
 void nop5(int c1, int c2) {
   if (c2) goto L ;
-  //@ slice pragma stmt; // <----- slicing is correct, but not the output
+  //@ slice_preserve_stmt; // <----- slicing is correct, but not the output
  L:;
   x = 1 ;
  }
 void nop6(int c1, int c2) {
-  //@ slice pragma stmt; // <----- slicing is correct, but not the output
+  //@ slice_preserve_stmt; // <----- slicing is correct, but not the output
  L:;
   x = 1 ;
  }
 void nop7(int c1, int c2) {
-  //@ slice pragma stmt; // <----- slicing is correct, but not the output
+  //@ slice_preserve_stmt; // <----- slicing is correct, but not the output
  L:{;}
   x = 1 ;
  }
 void nop8(int c1, int c2) {
-  //@ slice pragma stmt; // <----- slicing is correct, but not the output
+  //@ slice_preserve_stmt; // <----- slicing is correct, but not the output
   {L:{;}}
   x = 1 ;
  }
 //-------------------
 void double_effect1(int c1, int c2) {
-  //@ slice pragma stmt;  // <----- slicing isn't correct since the...
+  //@ slice_preserve_stmt;  // <----- slicing isn't correct since the...
   x += y++ ;   // <----- ...effect is lost with -print option
  }
 void double_effect2(int c1, int c2) {
-  //@ slice pragma stmt; // <----- slicing isn't correct since the...
+  //@ slice_preserve_stmt; // <----- slicing isn't correct since the...
   { x += y++ ; }   // <----- ...effect is lost with -print option
  }
 void double_effect3(int c1, int c2) {
   if (c2) goto L ;
-  //@ slice pragma stmt; // <----- slicing isn't correct since the...
+  //@ slice_preserve_stmt; // <----- slicing isn't correct since the...
   L: x += y++ ;   // <----- ...effect is lost with -print option
  }
 void double_effect4(int c1, int c2) {
   if (c2) goto L ;
-  //@ slice pragma stmt; // <----- slicing isn't correct since the...
+  //@ slice_preserve_stmt; // <----- slicing isn't correct since the...
  L: {x += y++ ; }   // <----- ...effect is lost with -print option
  }
 void double_effect5(int c1, int c2) {
   if (c2)
-    //@ slice pragma stmt;
+    //@ slice_preserve_stmt;
     {x += y++ ; }
  }
 //-------------------
 void test1(int c1, int c2) {
   if (c1 < c2)
     c1 = c2 ;
-  //@ slice pragma stmt;
+  //@ slice_preserve_stmt;
   x = c1 ;
 }
 void test2(int c1, int c2) {
   if (c1 < c2)
     c1 = c2 ;
-  //@ slice pragma stmt;
+  //@ slice_preserve_stmt;
   x = c1 ;
   y = c2 ;
 }
 void test3(int c1, int c2) {
   if (c1 < c2)
     c1 = c2 ;
-  //@ slice pragma stmt;
+  //@ slice_preserve_stmt;
   {x = c1 ;}
   y = c2 ;
 }
 void test4(int c1, int c2) {
   if (c1 < c2)
     c1 = c2 ;
-  //@ slice pragma stmt; // <----- slicing isn't correct since the...
+  //@ slice_preserve_stmt; // <----- slicing isn't correct since the...
   {x = c1 ; c2 ++ ;}  // <----- ...effect is lost with -print option
   y = c2 ;
 }
@@ -124,7 +124,7 @@ void test5(int c1, int c2) {
   if (c1 < c2)
     goto L;
   c1 = c2 ;
-  //@ slice pragma stmt; // <----- slicing isn't correct since the...
+  //@ slice_preserve_stmt; // <----- slicing isn't correct since the...
  L: x = c1 ;   // <----- ...effect is lost with -print option
   y = c2 ;
 }
@@ -132,7 +132,7 @@ void test6(int c1, int c2) {
   if (c1 < c2)
     goto L;
   c1 = c2 ;
-  //@ slice pragma stmt;  // <----- slicing isn't correct since the...
+  //@ slice_preserve_stmt;  // <----- slicing isn't correct since the...
  L: x = c1++ ;   // <----- ...effect is lost with -print option
   y = c2 ;
 }
@@ -140,7 +140,7 @@ void test7(int c1, int c2) {
   if (c1 < c2)
     goto L;
   c1 = c2 ;
-  //@ slice pragma stmt; // <----- slicing isn't correct since the...
+  //@ slice_preserve_stmt; // <----- slicing isn't correct since the...
  L: {x = c1++ ; c2 ++ ;}   // <----- ...effect is lost with -print option
   y = c2 ;
 }
@@ -148,7 +148,7 @@ void test8(int c1, int c2) {
   if (c1 < c2)
     goto L;
   c1 = c2 ;
-  //@ slice pragma stmt; // <----- slicing isn't correct since the...
+  //@ slice_preserve_stmt; // <----- slicing isn't correct since the...
   { L: x = c1++ ; c2 ++ ;}   // <----- ...effect is lost with -print option
   y = c2 ;
 }
@@ -156,7 +156,7 @@ void test9(int c1, int c2) {
   if (c1 < c2)
     goto L;
   c1 = c2 ;
-  //@ slice pragma stmt; // <----- slicing isn't correct since the...
+  //@ slice_preserve_stmt; // <----- slicing isn't correct since the...
   { x = c1 ; L: c2 = c2 + 1 ;}   // <----- ...effect is lost with -print option
   y = c2 ;
 }

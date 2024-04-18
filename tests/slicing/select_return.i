@@ -49,7 +49,7 @@ int f(int y) {
   k(0,0,0,0);
   int r = k(0,y,0,0);
   int z = k(G,0,0,0);
-  //@ slice pragma expr z;
+  //@ slice_preserve_expr z;
   send (z);
   return z;
 }

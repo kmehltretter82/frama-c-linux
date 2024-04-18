@@ -51,7 +51,7 @@ void stop_f1(void)
 {
   int x;
   x = 1;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   x ++;
   return;
 }

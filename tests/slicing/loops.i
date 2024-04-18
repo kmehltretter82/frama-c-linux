@@ -39,7 +39,7 @@ int f1 (int c) {
     }
   else
     x = 1;
-   //@ slice pragma stmt;
+   //@ slice_preserve_stmt;
   x ++;
   return x;
 }
@@ -52,7 +52,7 @@ void f2 (int c) {
       x1++;
     else
       x2++;
-    //@slice pragma expr x1;
+    //@slice_preserve_expr x1;
     //@ assert x2 > 0 ;
   }
 }
@@ -71,7 +71,7 @@ int stop_f1 (int c) {
     }
   else
     x = 1;
-   //@ slice pragma stmt;
+   //@ slice_preserve_stmt;
   x ++;
   return x;
 }
@@ -84,7 +84,7 @@ void stop_f2 (int c) {
       x1++;
     else
       x2++;
-    //@slice pragma expr x1;
+    //@slice_preserve_expr x1;
     //@ assert x2 > 0 ;
     stop () ; /* never loops nor returns */
     x1++;     /* dead code */
@@ -174,7 +174,7 @@ void loop (int cond) {
   if (cond) {
     int c = 0 ;
     while (1) {
-      //@ slice pragma ctrl ;
+      //@ slice_preserve_ctrl ;
       if (c) {
         X++;
         Y = Z ;

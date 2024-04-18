@@ -45,7 +45,7 @@ int main() {
   lecture() ;
     fsm_transition() ;
     if (state == 3) {
-      /*@ slice pragma ctrl ;*/
+      /*@ slice_preserve_ctrl ;*/
       break ;
     }
     step ++ ;

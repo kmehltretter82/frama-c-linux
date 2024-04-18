@@ -41,7 +41,7 @@ int * PX;
 
 /*@ requires S2.a > S2.b ; */
 int main (int x, Ts s) {
-  //@ slice pragma expr S2 ;
+  //@ slice_preserve_expr S2 ;
   int y = 3;
   y += Y;
   y += *PX;

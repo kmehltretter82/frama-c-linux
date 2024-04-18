@@ -121,7 +121,7 @@
 [pdg] computing for function main
 [pdg] done for function main
 Slicing project worklist [default] =
-[main_slice_1 = change_call for call 23 -> A_slice_1][A_slice_1 = change_call for call 10 -> incr_slice_1]
+[main_slice_1 = change_call for call 22 -> A_slice_1][A_slice_1 = change_call for call 10 -> incr_slice_1]
 
 [slicing] exporting project to 'Sliced code'...
 [slicing] applying all slicing requests...

@@ -115,7 +115,7 @@ int f_slice_1(int y)
 {
   int r = k(0,y,0,0);
   int z = k(G,0,0,0);
-  /*@ slice pragma expr z; */ ;
+  /*@ \slicing::slice_preserve_expr z; */ ;
   return z;
 }
 

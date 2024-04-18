@@ -101,6 +101,6 @@ int main (void) {
   r += SizeOfE_pt_tab_1 ();
   r += SizeOfE_pt_tab_2 ();
   r += SizeOfE_tab_acces_1 ();
-  //@ slice pragma expr r;
+  //@ slice_preserve_expr r;
   return r;
 }

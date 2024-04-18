@@ -26,7 +26,7 @@
 void nop5(int c2)
 {
   if (c2) goto L;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   L: ;
   return;
 }

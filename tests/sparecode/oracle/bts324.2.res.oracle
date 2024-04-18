@@ -50,7 +50,7 @@
 [pdg] Bottom for function main_bis
 [sparecode] pdg bottom: skip annotations
 [sparecode] look for annotations in function main_ter
-[sparecode] selecting annotation : slice pragma stmt;
+[sparecode] selecting annotation : \slicing::slice_preserve_stmt ;
 [sparecode] add selection in function 'main_ter'
 [sparecode] finalize call input propagation
 [sparecode] add selection in function 'main_ter'
@@ -71,7 +71,7 @@ void main_ter(void)
   init(& is_ko);
   if (is_ko) 
     while (1) 
-      /*@ slice pragma stmt; */
+      /*@ \slicing::slice_preserve_stmt ; */
       loop_body();
   return;
 }

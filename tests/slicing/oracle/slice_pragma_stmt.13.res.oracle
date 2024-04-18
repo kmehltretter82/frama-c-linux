@@ -28,7 +28,7 @@ int y;
 void double_effect5(int c2)
 {
   if (c2) {
-    /*@ slice pragma stmt; */
+    /*@ \slicing::slice_preserve_stmt ; */
     {
       int tmp;
       tmp = y;

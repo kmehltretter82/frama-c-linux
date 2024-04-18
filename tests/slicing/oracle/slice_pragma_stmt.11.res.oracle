@@ -29,7 +29,7 @@ void double_effect3(int c2)
 {
   int tmp;
   if (c2) goto L;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   {
     L: { /* sequence */
          tmp = y;
