@@ -344,6 +344,35 @@ function GenerateCoverage
 # ---  Test Suite Preparation
 # --------------------------------------------------------------------------
 
+function GenerateDuneFiles
+{
+    Head "Generating dune files..."
+    Cmd make run-ptests
+}
+
+function CheckDuneFiles
+{
+    DEFAULT_FILE=tests/syntax/result/dune
+    if [ "$PREPARE" != "yes" ] ;
+    then
+        if [ ! -f "$DEFAULT_FILE" ] ;
+        then
+            GenerateDuneFiles
+        else
+            DATE_TEST_MODIFICATION=$(find $TESTS -type f \
+                                    -not -path "*/result*/*" \
+                                    -not -path "*/oracle*/*" \
+                                    -exec stat --printf "%Y\n" {} \+ | \
+                                    sort -n -r | head -n 1)
+            DATE_TEST_GENERATION=$(stat $DEFAULT_FILE --printf "%Y\n")
+            if [ $DATE_TEST_MODIFICATION -gt $DATE_TEST_GENERATION ] ;
+            then
+                GenerateDuneFiles
+            fi
+        fi
+    fi
+}
+
 function PrepareTests
 {
     if [ "$TESTS" = "" ]; then
@@ -361,8 +390,7 @@ function PrepareTests
     fi
     if [ "$PREPARE" = "yes" ]
     then
-        Head "Generating dune files..."
-        Cmd make run-ptests
+        GenerateDuneFiles
     fi
 }
 
@@ -530,6 +558,7 @@ SetEnv
 PullCache
 PrepareCoverage
 PrepareTests
+CheckDuneFiles
 Register $TESTS
 RunAlias ${DUNE_ALIAS}
 Commits ${COMMITS}
