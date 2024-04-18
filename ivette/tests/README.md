@@ -3,46 +3,26 @@ overall architecture, and how to launch current tests and write new ones.
 
 ## Overall Architecture
 
-The framework is based on two main testing libraries:
+The framework is based on [Playwright](https://playwright.dev) library.
 
-- `Playwright`: <https://playwright.dev/>
-- `Gremlins.js`: <https://github.com/marmelab/gremlins.js>
+`Playwright` is meant for end-to-end testing, i.e. for testing specific
+behaviors. Here is how the framework is organized:
 
-`Playwright` is meant for end-to-end (e2e) testing, i.e. for testing specific
-behaviors, while `Gremlins.js` provides monkey testing, i.e. robustness/stress
-testing of the entire application.
-
-Here is how the framework is organized:
-
-- `e2e/` contains the end-to-end tests,
-- `monkey/` cointains the monkey tests,
-- `lib/` contains utilities for writing tests using the `Playwright`
-  infrastructure. These utilities are used both for e2e and monkey testing.
+- `src/` contains the end-to-end tests,
+- `lib/` contains utilities for writing tests using `Playwright`
 
 ## Executing tests
 
 **Requirement:** In order to execute the tests, Frama-C has to be built
 beforehand.
 
-Testing Ivette, in terms of both the e2e and monkey tests, amounts to the
-execution of the following commands from the Frama-C root directory:
+Testing Ivette amounts to the execution of the following commands from the
+Frama-C root directory:
 
 ```sh
 $ make                         // builds Frama-C, if not already
 $ cd ivette
 $ make tests                   // builds Ivette and execute all tests
-```
-
-To execute the e2e tests only, the last command to execute is the following:
-
-```sh
-$ make tests-e2e
-```
-
-To execute the monkey tests only, the last command to execute is the following:
-
-```sh
-$ make tests-monkey
 ```
 
 ## Executing tests (Advanced)
@@ -135,19 +115,4 @@ window with a `Pick locator` button at the bottom, which provides the necessary
 locator any selected element (i.e., it works similarly to the inspect
 functionality of most browser developer tools).
 
-Complete test scenarios are provided in the sub-directory `/tests/e2e/`.
-
-## Monkey Testing
-
-Monkey testing is meant for testing the Ivette robustness by performing a stress
-testing of the UI. This is done by using the `gremlins.js` library.
-
-Please refer to the [library
-documentation](https://github.com/marmelab/gremlins.js) for more details, or
-look at the `/tests/monkey/monkey-testing.spec.ts` for an example.
-
-Note that, to obtain reproducible tests, one should seed a randomizer (see the
-`randomizer` value in `monkey-testing.spec.ts` for an example). For that, one
-should also launch Ivette with either default settings, by using the
-`-settings CLEAN` option, or fixed settings, by using the `--settings
-</path/to/json-file-with-settings>` option.
+Complete test scenarios are provided in the sub-directory `/tests/src/`.

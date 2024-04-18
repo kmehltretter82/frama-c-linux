@@ -283,14 +283,4 @@ tests: dist
 	@echo "[Ivette] running tests"
 	@dune exec -- yarn playwright test
 
-tests-e2e: dist
-	@cp -r out/renderer/* out/main/
-	@echo "[Ivette] running tests (e2e)"
-	@dune exec -- yarn playwright test tests/e2e
-
-tests-monkey: dist
-	@cp -r out/renderer/* out/main/
-	@echo "[Ivette] running tests (monkey)"
-	@dune exec -- yarn playwright test tests/monkey
-
 # --------------------------------------------------------------------------

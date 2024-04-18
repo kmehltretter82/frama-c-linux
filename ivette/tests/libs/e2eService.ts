@@ -25,7 +25,7 @@ import { _electron as electron } from "playwright-core";
 import * as locs from "./locatorsUtil";
 
 /**
- * Basic Electron launch of Ivette for Playwright e2e tests
+ * Basic Electron launch of Ivette for Playwright tests
  */
 export async function launchIvette(
   ...params: string[]
