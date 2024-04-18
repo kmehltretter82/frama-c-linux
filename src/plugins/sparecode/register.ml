@@ -60,13 +60,13 @@ let rm_unused_globals ?new_proj_name ?(project=Project.current ()) () =
   P.result "removed unused global declarations in new project '%s'" new_proj_name;
   Project.on project Globs.rm_unused_decl new_proj_name
 
-let run select_annot select_slice_pragma =
+let run select_annot select_slice_annot =
   P.feedback "remove unused code...";
   (*let initial_file = Ast.get () in*)
   let kf_entry, _library = Globals.entry_point () in
   let proj =
     Spare_marks.select_useful_things
-      ~select_annot ~select_slice_pragma kf_entry
+      ~select_annot ~select_slice_annot kf_entry
   in
   let old_proj_name = Project.get_name (Project.current ()) in
   let new_proj_name = (old_proj_name^" without sparecode") in
@@ -81,16 +81,16 @@ let run select_annot select_slice_pragma =
   Project.copy ~selection:ctx new_prj;
   new_prj
 
-let get ~select_annot ~select_slice_pragma =
+let get ~select_annot ~select_slice_annot =
   Result.memo
-    (fun _ -> run select_annot select_slice_pragma)
-    (select_annot, select_slice_pragma)
+    (fun _ -> run select_annot select_slice_annot)
+    (select_annot, select_slice_annot)
 
 let main () =
   if Sparecode_params.Analysis.get () then begin
     let select_annot = Sparecode_params.Annot.get () in
-    let select_slice_pragma = true in
-    let new_proj = get ~select_annot ~select_slice_pragma in
+    let select_slice_annot = true in
+    let new_proj = get ~select_annot ~select_slice_annot in
     File.pretty_ast ~prj:new_proj ()
   end
   else if Sparecode_params.GlobDecl.get () then begin

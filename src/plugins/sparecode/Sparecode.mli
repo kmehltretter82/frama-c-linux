@@ -24,10 +24,10 @@
 (** Interface for the unused code detection. *)
 
 module Register: sig
-  val get: select_annot:bool -> select_slice_pragma:bool -> Project.t
+  val get: select_annot:bool -> select_slice_annot:bool -> Project.t
   (** Remove in each function what isn't used to compute its outputs,
       or its annotations when [select_annot] is true,
-      or its slicing pragmas when [select_slice_pragmas] is true.
+      or its slicing pragmas when [select_slice_annot] is true.
       @return a new project where the sparecode has been removed.
   *)
 
