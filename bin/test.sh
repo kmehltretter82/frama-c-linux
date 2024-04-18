@@ -22,7 +22,7 @@
 ##########################################################################
 
 THIS_SCRIPT="$0"
-CONFIG="<all>"
+CONFIG="<default>"
 VERBOSE=
 CLEAN=
 PREPARE=
@@ -45,6 +45,7 @@ LOCAL_WP_CACHE=$(pwd -P)/.wp-cache
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
 TEST_DIRS="tests/* src/plugins/*/tests/* src/kernel_internals/parsing/tests"
+TESTS=""
 
 # --------------------------------------------------------------------------
 # ---  Help Message
@@ -60,11 +61,13 @@ function Usage
     echo ""
     echo "  Tip: use shell completion"
     echo ""
-    echo "  <DIR>     all tests in <DIR>"
     echo "  <FILE>    single test file <FILE>"
+    echo "  <DIR>     all tests in <DIR>,"
+    echo "            or in directory tests/<DIR> (if it exists)"
+    echo "            or in plugin src/plugins/<DIR> (if it exists)"
     echo ""
-    echo "  -a|--all            run all tests (default behavior)"
-    echo "  -d|--default        run tests from default config only"
+    echo "  -a|--all            run all config"
+    echo "  -d|--default        run tests from default config only (by default)"
     echo "  -c|--config <name>  run tests from specified config only"
     echo ""
     echo ""
@@ -155,6 +158,16 @@ do
             Usage
             exit 0
             ;;
+        "-a"|"--all")
+            CONFIG="<all>"
+            ;;
+        "-d"|"--default")
+            CONFIG="<default>"
+            ;;
+        "-c"|"--config")
+            CONFIG=$2
+            shift
+            ;;
         "-r"|"--clean")
             CLEAN=yes
             PREPARE=yes
@@ -197,13 +210,6 @@ do
         "-s"|"--save" )
             SAVE=yes
             ;;
-        "-d"|"--default")
-            CONFIG="<default>"
-            ;;
-        "-c"|"--config")
-            CONFIG=$2
-            shift
-            ;;
         "--coverage")
             COVER=yes
             HTML=yes
@@ -219,14 +225,6 @@ do
         "-n"|"--name")
             ALIAS_NAME=$2
             shift
-            ;;
-        "-a"|"--all")
-            TESTS=""
-            for dir in $TEST_DIRS ; do
-                if [ -d "$dir" ]; then
-                    TESTS="$TESTS $dir"
-                fi
-            done
             ;;
        *)
             TESTS+=" $1"
@@ -335,6 +333,14 @@ function GenerateCoverage
 
 function PrepareTests
 {
+    if [ "$TESTS" = "" ]; then
+        for dir in $TEST_DIRS ; do
+            if [ -d "$dir" ]; then
+                TESTS+=" $dir"
+            fi
+        done
+    fi
+
     if [ "$CLEAN" = "yes" ]
     then
         Head "Cleaning all tests..."
@@ -484,7 +490,7 @@ function Status
             #-- Details
             Head "Details by directory:"
             if  [ "$NB" != "0" ]; then
-                for dir in $TEST_DIRS ; do
+                for dir in $TESTS ; do
                     if [ -d "$dir" ]; then
                         NB=$(grep -c "^frama-c-wtests $dir" "$1")
                         [ "$NB" = "0" ] || echo "- $dir= $NB"
