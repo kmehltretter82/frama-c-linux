@@ -226,6 +226,9 @@ do
             ALIAS_NAME=$2
             shift
             ;;
+        "eva")
+            TESTS+=" tests/value tests/builtins tests/float tests/idct"
+            ;;
         *)
             if [ -f $1 ] || [ -d $1 ]; then
                 TESTS+=" $1"
