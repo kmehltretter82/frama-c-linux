@@ -5,8 +5,11 @@ release. First we list changes of the last release.
 
 \section*{Frama-C+dev}
 \begin{itemize}
-\item \textbf{Normalizing the Source Code:} document the possibility of
+  \item \textbf{Normalizing the Source Code:} document the possibility of
   undefining builtin macros from the chosen \texttt{-machdep}.
+\item \textbf{Preparing the Sources:} loop pragmas are removed and replaced
+  by dedicated ACSL extension.
+  Use \verb+loop unfold+ in place of \verb+loop pragma UNROLL+.
 \item \textbf{Preparing the Sources:} add subsection on standard library about
   portability considerations.
 \end{itemize}

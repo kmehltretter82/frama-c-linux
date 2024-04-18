@@ -304,10 +304,18 @@ underscores as prefix and suffix, \texttt{-UMACRO} will also undefine
   \texttt{do ... while(0)}. This option is set by default.
 
 \item \texttt{\optiondef{-}{ulevel} <n>} unrolls all loops n times. This is a
-  purely syntactic operation.  Loops can be unfolded individually, by
+  purely syntactic operation. Loops can be unfolded individually, by
   inserting a \verb+loop unfold+ annotation just before the loop statement. Do
   not confuse this option with plug-in-specific options that may also be called
-  ``unrolling''~\cite{value}. Below is a typical example of use.
+  ``unrolling''~\cite{value}\footnote{
+    Historically, \textit{syntactic} loop unrolling was denoted by
+    \texttt{loop pragma UNROLL} annotations. Later on, \textsf{EVA} introduced
+    \textit{semantic} unrolling with \texttt{loop unroll} annotations.
+    Loop pragams was removed for Frama-C 29 (Copper) and it was
+    decided to introduce \texttt{loop unfold} annotations for \textit{syntactic}
+    unrolling and to reserve \texttt{loop unroll} annotations for \textit{semantic}
+    loop unrolling with \textsf{EVA}.
+  }. Below is a typical example of use:
 \begin{ccode}
 /*@ loop unfold 10; */
 for(i = 0; i < 9; i++) ...
