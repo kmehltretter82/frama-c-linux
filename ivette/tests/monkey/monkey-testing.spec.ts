@@ -28,10 +28,8 @@ let gremlins: any;
 
 test("run gremlins.js", async () => {
   test.slow(); // long timeout for a very slow test.
-
-  const launchAppResult = await e2eService.launchApp(
-    e2eService.argsLaunchWithTestFile,
-  );
+  const launchAppResult =
+    await e2eService.launchIvette("../tests/test/adpcm.c");
   const electronApp = launchAppResult.app;
   const window = launchAppResult.page;
 
