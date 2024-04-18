@@ -108,7 +108,7 @@ let find_code_annot_nodes pdg stmt annot =
   if Eva.Results.is_reachable stmt then
     begin
       let kf =  PdgTypes.Pdg.get_kf pdg in
-      let (data_info, decl_label_info), pragmas =
+      let (data_info, decl_label_info), slices =
         Logic_deps.from_stmt_annot annot (stmt, kf)
       in
       let data_dpds = zone_info_nodes pdg data_info in
@@ -125,10 +125,10 @@ let find_code_annot_nodes pdg stmt annot =
         try Sets.find_stmt_and_blocks_nodes pdg s @ acc
         with Not_found -> acc
       in
-      (* can safely ignore pragmas.ctrl
+      (* can safely ignore slices.ctrl
        * because we already have the ctrl dpds from the stmt node. *)
-      let stmt_pragmas = pragmas.Logic_deps.stmt in
-      let ctrl_dpds = Stmt.Set.fold add_stmt_nodes stmt_pragmas ctrl_dpds in
+      let stmt_slices = slices.Logic_deps.stmt in
+      let ctrl_dpds = Stmt.Set.fold add_stmt_nodes stmt_slices ctrl_dpds in
       let add_label_nodes l acc = match l with
         | StmtLabel stmt ->
           (* TODO: we could be more precise here if we knew which label

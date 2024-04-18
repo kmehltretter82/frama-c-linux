@@ -329,12 +329,14 @@ let select_annotations ~select_annot ~select_slice_pragma proj =
     else if PdgTypes.Pdg.is_bottom pdg
     then debug 1 "pdg bottom: skip annotations"
     else begin
-      let filter annot = match annot.Cil_types.annot_content with
+        match annot.Cil_types.annot_content with
         | Cil_types.APragma (Cil_types.Slice_pragma _) -> select_slice_pragma
         | Cil_types.AAssert _-> (* Never select alarms, they are not useful *)
           (match Alarms.find annot with
            | None -> select_annot
            | Some _ -> false)
+        | AExtended (_, _, ext) when Logic_deps.is_slice_directive ext ->
+          select_slice_pragma
         | _ -> select_annot
       in
       try

@@ -253,7 +253,7 @@ module Select : sig
     spare:bool ->
     threat:bool ->
     user_assert:bool ->
-    slicing_pragma:bool ->
+    slicing_annot:bool ->
     loop_inv:bool ->
     loop_var:bool -> Cil_datatype.Stmt.t -> Cil_types.kernel_function -> set
 
@@ -301,7 +301,7 @@ module Select : sig
   (** To select the annotations related to a function. *)
   val select_func_annots :
     set -> Mark.t -> spare:bool -> threat:bool -> user_assert:bool ->
-    slicing_pragma:bool -> loop_inv:bool -> loop_var:bool ->
+    slicing_annot:bool -> loop_inv:bool -> loop_var:bool ->
     Cil_types.kernel_function -> set
 
   (** {3 Pdg selectors.} *)

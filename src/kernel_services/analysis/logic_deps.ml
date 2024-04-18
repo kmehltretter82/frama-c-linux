@@ -31,6 +31,49 @@ let not_yet_implemented = ref ""
     term depends. *)
 let compute_term_deps = ref (fun _stmt _expr -> None)
 
+
+(* Register slice ACSL extensions: these are directives for the slicing plugin,
+   but they are processed in this file so we also register them here. *)
+let () =
+  let typer typing_context loc args =
+    match args with
+    | [] -> Ext_terms []
+    | _ -> typing_context.Logic_typing.error loc "Invalid slice directive"
+  in
+  Acsl_extension.register_code_annot_next_stmt
+    ~plugin:"slicing" "slice_preserve_stmt" typer false;
+  Acsl_extension.register_code_annot
+    ~plugin:"slicing" "slice_preserve_ctrl" typer false;
+  let expr_typer typing_context loc args =
+    match args with
+    | [] -> typing_context.Logic_typing.error loc "Invalid slice directive"
+    | _ ->
+      let type_term =
+        let open Logic_typing in
+        typing_context.type_term typing_context typing_context.pre_state
+      in
+      Ext_terms (List.map type_term args)
+  in
+  Acsl_extension.register_code_annot
+    ~plugin:"slicing" "slice_preserve_expr" expr_typer false
+
+type slice_directive = Stmt | Ctrl | Terms of term list
+
+let slice_directive acsl_extension =
+  match acsl_extension.ext_name with
+  | "slice_preserve_stmt" -> Some Stmt
+  | "slice_preserve_ctrl" -> Some Ctrl
+  | "slice_preserve_expr" ->
+    begin
+      match acsl_extension.ext_kind with
+      | Ext_terms terms -> Some (Terms terms)
+      | _ -> assert false
+    end
+  | _ -> None
+
+let is_slice_directive acsl_ext = Option.is_some (slice_directive acsl_ext)
+
+
 type ctx = {
   site: ctx_site;
   before: bool option;
@@ -42,7 +85,7 @@ and ctx_site =
   | StatementContract of stmt
   | StatementAnnotation of stmt
 
-type pragmas = {ctrl: Stmt.Set.t ; stmt: Stmt.Set.t}
+type slices = {ctrl: Stmt.Set.t ; stmt: Stmt.Set.t}
 type t = {before:bool ; ki:stmt ; zone:Locations.Zone.t}
 type zone_info = (t list) option
 type decl = {var: Varinfo.Set.t ; lbl: Logic_label.Set.t}
@@ -57,18 +100,18 @@ let mk_ctx_stmt_annot kf stmt =
   { before=Some true; site=StatementAnnotation stmt; kf }
 
 type result = {
-  pragmas: pragmas;
+  slices: slices;
   locals: Varinfo.Set.t;
   labels: Logic_label.Set.t;
   zones: (Locations.Zone.t * Locations.Zone.t) Stmt.Map.t option;
 }
 
-let empty_pragmas =
+let empty_slices =
   { ctrl = Stmt.Set.empty;
     stmt = Stmt.Set.empty }
 
 let empty_results = {
-  pragmas = empty_pragmas;
+  slices = empty_slices;
   locals = Varinfo.Set.empty;
   labels = Logic_label.Set.empty;
   zones = Some Stmt.Map.empty;
@@ -117,7 +160,7 @@ let get_result result =
   zones, {var = result.locals; lbl = result.labels}
 
 let get_annot_result result =
-  get_result result, result.pragmas
+  get_result result, result.slices
 
 (** Logic_var utility: *)
 let extract_locals logicvars =
@@ -387,14 +430,14 @@ let populate_zone ctx visit cil_node current_zones =
   with NYI msg ->
     add_top_zone msg (vis#get_zones)
 
-let update_pragmas f results =
-  { results with pragmas = f results.pragmas }
+let update_slices f results =
+  { results with slices = f results.slices }
 
-let add_ctrl_pragma stmt =
-  update_pragmas (fun x -> { x with ctrl = Stmt.Set.add stmt x.ctrl })
+let add_ctrl_slice stmt =
+  update_slices (fun x -> { x with ctrl = Stmt.Set.add stmt x.ctrl })
 
-let add_stmt_pragma stmt =
-  update_pragmas (fun x -> { x with stmt = Stmt.Set.add stmt x.stmt })
+let add_stmt_slice stmt =
+  update_slices (fun x -> { x with stmt = Stmt.Set.add stmt x.stmt })
 
 let add_results_from_term ctx results t =
   let zones = populate_zone ctx Visitor.visitFramacTerm t results.zones in
@@ -447,6 +490,9 @@ let get_zone_from_annot a (ki,kf) loop_body_opt results =
   let get_zone_from_term k term results =
     let ctx = mk_ctx_stmt_annot kf k in
     add_results_from_term ctx results term
+  and get_zone_from_term_list k terms results =
+    let ctx = mk_ctx_stmt_annot kf k in
+    List.fold_left (add_results_from_term ctx) results terms
   and get_zone_from_pred k pred results =
     let ctx = mk_ctx_stmt_annot kf k in
     add_results_from_pred ctx results pred
@@ -457,13 +503,13 @@ let get_zone_from_annot a (ki,kf) loop_body_opt results =
     (* to preserve the interpretation of the pragma *)
     get_zone_from_term ki term |>
     (* to select the reachability of the pragma *)
-    add_ctrl_pragma ki
+    add_ctrl_slice ki
   | APragma (Slice_pragma SPctrl) ->
     (* to select the reachability of the pragma *)
-    add_ctrl_pragma ki results
+    add_ctrl_slice ki results
   | APragma (Slice_pragma SPstmt) ->
     (* to preserve the effect of the statement *)
-    add_stmt_pragma ki results
+    add_stmt_slice ki results
   | AAssert (_behav,pred) ->
     (* to preserve the interpretation of the assertion *)
     get_zone_from_pred ki pred.tp_statement results
@@ -500,25 +546,44 @@ let get_zone_from_annot a (ki,kf) loop_body_opt results =
       results l
   | AStmtSpec _ -> (* TODO *)
     raise (NYI "[logic_interp] statement contract")
-  | AExtended(_,_, { ext_kind = Ext_preds preds }) ->
-    (* to select the declaration of the variables *)
-    List.fold_left
-      (fun results pred -> {
-           results with
-           locals = Varinfo.Set.union (extract_locals_from_pred pred) results.locals;
-           labels = Logic_label.Set.union (extract_labels_from_pred pred) results.labels
-         })
-      results preds
-  | AExtended(_,_, { ext_kind = Ext_terms terms }) ->
-    (* to select the declaration of the variables *)
-    List.fold_left
-      (fun results term -> {
-           results with
-           locals = Varinfo.Set.union (extract_locals_from_term term) results.locals;
-           labels = Logic_label.Set.union (extract_labels_from_term term) results.labels
-         })
-      results terms
-  | AExtended _ -> raise (NYI "[logic_interp] extension")
+  | AExtended (_, _, acsl_extension) ->
+    begin
+      match slice_directive acsl_extension with
+      | Some Stmt ->
+        (* to preserve the effect of the statement *)
+        add_stmt_slice ki results
+      | Some Ctrl ->
+        (* to select the reachability of the slice directive *)
+        add_ctrl_slice ki results
+      | Some (Terms terms) ->
+        results |>
+        (* to preserve the interpretation of the term *)
+        get_zone_from_term_list ki terms |>
+        (* to select the reachability of the directive *)
+        add_ctrl_slice ki
+      | None ->
+        match acsl_extension.ext_kind with
+        | Ext_preds preds ->
+          (* to select the declaration of the variables *)
+          List.fold_left
+            (fun results pred -> {
+                 results with
+                 locals = Varinfo.Set.union (extract_locals_from_pred pred) results.locals;
+                 labels = Logic_label.Set.union (extract_labels_from_pred pred) results.labels
+               })
+            results preds
+        | Ext_terms terms ->
+          (* to select the declaration of the variables *)
+          List.fold_left
+            (fun results term -> {
+                 results with
+                 locals = Varinfo.Set.union (extract_locals_from_term term) results.locals;
+                 labels = Logic_label.Set.union (extract_labels_from_term term) results.labels
+               })
+            results terms
+        | _ -> raise (NYI "[logic_interp] extension")
+    end
+
 
 (* Used by annotations entry points. *)
 let get_from_stmt_annots code_annot_filter ((ki, _kf) as stmt) results =
@@ -568,9 +633,9 @@ let from_func_annots iter_on_kf_stmt code_annot_filter kf =
   get_annot_result !results
 
 (** To quickly build a annotation filter *)
-let code_annot_filter annot ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop_var ~others =
+let code_annot_filter annot ~threat ~user_assert ~slicing_annot ~loop_inv ~loop_var ~others =
   match annot.annot_content with
-  | APragma (Slice_pragma _) -> slicing_pragma
+  | APragma (Slice_pragma _) -> slicing_annot
   | AAssert _ ->
     (match Alarms.find annot with
      | None -> user_assert
@@ -580,7 +645,8 @@ let code_annot_filter annot ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop
   | AInvariant(_,false,_) -> others
   | AAllocation _ -> others
   | AAssigns _ -> others
-  | AStmtSpec _  | AExtended _ (* TODO *) -> false
+  | AExtended (_, _, ext) when is_slice_directive ext -> slicing_annot
+  | AStmtSpec _ | AExtended _ (* TODO *) -> false
 
 
 exception Prune
