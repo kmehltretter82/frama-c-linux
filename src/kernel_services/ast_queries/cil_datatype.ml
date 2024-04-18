@@ -2471,7 +2471,7 @@ module Code_annotation = struct
     | AAssert(_,{ tp_statement = {pred_loc=loc}})
     | AInvariant(_,_,{tp_statement = {pred_loc=loc}})
     | AVariant({term_loc=loc},_) -> Some loc
-    | AAssigns _ | AAllocation _ | APragma _ | AExtended _
+    | AAssigns _ | AAllocation _ | AExtended _
     | AStmtSpec _ -> None
 
 end

@@ -131,7 +131,6 @@ let pre_code_annotation kf stmt env annot =
            then Env.not_yet env "allocation")
         ppts;
       env
-    | APragma _ -> Env.not_yet env "pragma"
     | AExtended _ -> env (* never translate extensions. *)
   in
   Env.handle_error convert env
@@ -150,7 +149,6 @@ let post_code_annotation kf stmt env annot =
     | AVariant _
     | AAssigns _
     | AAllocation _
-    | APragma _
     | AExtended _ -> env
   in
   Env.handle_error convert env

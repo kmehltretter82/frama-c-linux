@@ -249,7 +249,7 @@ let add_code_annot_stats stmt _ ca =
     List.iter
       (function (_,FromAny) -> () | (_,From _) -> incr_all incr_loop_froms) l
   | AAllocation _ -> () (* TODO *)
-  | APragma _ | AExtended _ -> ()
+  | AExtended _ -> ()
 
 let compute () =
   if not (Computed.get()) then begin

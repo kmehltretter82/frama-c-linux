@@ -70,7 +70,6 @@ let search_security_requirements () =
            | AStmtSpec { spec_requires = l } ->
                List.exists
                  (is_security_predicate $ Logic_const.pred_of_id_pred) l
-           | APragma _
            | AInvariant _ (* | ALoopBehavior _ *)
                (* [JS 2008/02/26] may contain a security predicate *)
            | AVariant _ | AAssigns _

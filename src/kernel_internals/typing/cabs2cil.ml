@@ -9823,7 +9823,6 @@ and doBody local_env (blk: Cabs.block) : chunk =
                      (fun x -> x.Logic_ptree.b_name)
                      s.Logic_ptree.spec_behavior,
                    true
-                 | CODE_ANNOT(Logic_ptree.APragma _,_) -> [], true
                  | CODE_ANNOT
                      (Logic_ptree.AExtended(_,is_loop,(name,_)),loc) ->
                    let source = fst loc in

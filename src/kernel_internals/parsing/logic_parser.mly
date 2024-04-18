@@ -1474,7 +1474,6 @@ beg_pragma_or_code_annotation:
 ;
 
 pragma_or_code_annotation:
-| slice_pragma     { APragma (Slice_pragma $1) }
 | code_annotation  { $1 []  }
 ;
 
@@ -1514,16 +1513,6 @@ code_annotation:
       Kernel.fatal ~source:(pos $startpos($1))
         "%s is not a code annotation extension. Parser got wrong lexeme" ext
   }
-;
-
-slice_pragma:
-| SLICE PRAGMA any_identifier lexpr SEMICOLON
-    { if $3 = "expr" then SPexpr $4
-      else raise (Not_well_formed (loc $sloc, "Unknown slice pragma")) }
-| SLICE PRAGMA any_identifier SEMICOLON
-    { if $3 = "ctrl" then SPctrl
-      else if $3 = "stmt" then SPstmt
-      else raise (Not_well_formed (loc $sloc, "Unknown slice pragma")) }
 ;
 
 /*** declarations and logical definitions ***/

@@ -1918,8 +1918,6 @@ class type cilVisitor = object
   method vallocation: allocation -> allocation visitAction
   (**   @since Oxygen-20120901 *)
 
-  method vslice_pragma: slice_pragma -> slice_pragma visitAction
-
   method vdeps: deps -> deps visitAction
   method vfrom: from -> from visitAction
   method vcode_annot: code_annotation -> code_annotation visitAction

@@ -421,7 +421,6 @@ let rec monitored_property ip =
   | IPFrom _-> true
   | IPDecrease _ -> true
   | IPCodeAnnot {ica_ca = { annot_content = AStmtSpec _ }} -> false
-  | IPCodeAnnot {ica_ca = { annot_content = APragma _ }} -> false
   | IPCodeAnnot {ica_ca = { annot_content = AExtended _ }} -> true
   | IPCodeAnnot {ica_ca = { annot_content = AAssert _ }} -> true
   | IPCodeAnnot {ica_ca = { annot_content = AInvariant _ }} -> true

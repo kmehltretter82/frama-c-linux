@@ -3834,11 +3834,6 @@ struct
         List.fold_left add_formal env formals
     in type_spec old_behaviors vi.vdecl false log_return_typ env s
 
-  let slice_pragma env = function
-      SPexpr t -> Cil_types.SPexpr (term env t)
-    | SPctrl -> Cil_types.SPctrl
-    | SPstmt -> Cil_types.SPstmt
-
   let code_annot_env () =
     let env = append_here_label (append_pre_label (append_init_label
                                                      (Lenv.empty()))) in
@@ -3856,9 +3851,6 @@ struct
         let p = predicate (code_annot_env()) p in
         let p = Logic_const.toplevel_predicate ~kind p in
         Cil_types.AAssert(behav,p)
-      | APragma (Slice_pragma sp) ->
-        Cil_types.APragma
-          (Cil_types.Slice_pragma (slice_pragma (code_annot_env()) sp))
       | AStmtSpec (behav,s) ->
         (* function behaviors and statement behaviors are not at the
            same level. Do not mix them in a complete or disjoint clause

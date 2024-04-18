@@ -929,15 +929,6 @@ and pp_termination_kind fmt = function
   | Continues -> Format.fprintf fmt "Continues"
   | Returns -> Format.fprintf fmt "Returns"
 
-and pp_slice_pragma fmt = function
-  | SPexpr(term) -> Format.fprintf fmt "SPexpr(%a)" pp_term term
-  | SPctrl -> Format.fprintf fmt "SPctrl"
-  | SPstmt -> Format.fprintf fmt "SPstmt"
-
-and pp_pragma fmt = function
-  | Slice_pragma(term) ->
-    Format.fprintf fmt "Slice_pragma(%a)" pp_slice_pragma term
-
 and pp_code_annotation_node fmt = function
   | AAssert(string_list,p) ->
     Format.fprintf fmt "AAssert(%a,%a)"
@@ -956,8 +947,6 @@ and pp_code_annotation_node fmt = function
   | AAllocation(string_list,allocation) ->
     Format.fprintf fmt "AAllocation(%a,%a)"  (pp_list pp_string) string_list
       pp_allocation allocation
-  | APragma(pragma) ->
-    Format.fprintf fmt "APragma(%a)" pp_pragma pragma
   | AExtended(string_list,is_loop,acsl_extension) ->
     Format.fprintf fmt "AExtended(%a,%B,%a)"
       (pp_list pp_string) string_list  is_loop pp_acsl_extension acsl_extension

@@ -330,7 +330,6 @@ let select_annotations ~select_annot ~select_slice_pragma proj =
     then debug 1 "pdg bottom: skip annotations"
     else begin
         match annot.Cil_types.annot_content with
-        | Cil_types.APragma (Cil_types.Slice_pragma _) -> select_slice_pragma
         | Cil_types.AAssert _-> (* Never select alarms, they are not useful *)
           (match Alarms.find annot with
            | None -> select_annot

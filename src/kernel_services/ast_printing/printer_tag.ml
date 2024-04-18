@@ -823,10 +823,7 @@ struct
 
     method! code_annotation fmt ca =
       match ca.annot_content with
-      | APragma p when not (Logic_utils.is_property_pragma p) ->
-        (* Not currently localizable. Will be linked to the next stmt *)
-        super#code_annotation fmt ca
-      | AAssert _ | AInvariant _ | APragma _ | AVariant _ ->
+      | AAssert _ | AInvariant _ | AVariant _ ->
         let ip =
           Property.ip_of_code_annot_single
             (Option.get self#current_kf)

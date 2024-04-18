@@ -1737,15 +1737,6 @@ and behavior = {
   (** extensions *)
 }
 
-(** Pragmas for the slicing plugin of Frama-C. *)
-and slice_pragma =
-  | SPexpr of term
-  | SPctrl
-  | SPstmt
-
-(** The various kinds of pragmas. *)
-and pragma =
-  | Slice_pragma of slice_pragma
 
 (** all annotations that can be found in the code.
     This type shares the name of its constructors with
@@ -1778,7 +1769,6 @@ and code_annotation_node =
       At most one clause associated to a given (statement, behavior) couple.
       @since Oxygen-20120901 when [b_allocation] has been added.  *)
 
-  | APragma of pragma (** pragma. *)
   | AExtended of string list * bool * acsl_extension
   (** extension in a code or loop annotation.
       Boolean flag is true for loop extensions and false for code extensions

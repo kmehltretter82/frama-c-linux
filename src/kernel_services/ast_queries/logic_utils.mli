@@ -373,8 +373,6 @@ val is_same_logic_type_def :
   logic_type_def -> logic_type_def -> bool
 val is_same_logic_type_info :
   logic_type_info -> logic_type_info -> bool
-val is_same_slice_pragma : slice_pragma -> slice_pragma -> bool
-val is_same_pragma : pragma -> pragma -> bool
 val is_same_code_annotation : code_annotation -> code_annotation -> bool
 val is_same_global_annotation : global_annotation -> global_annotation -> bool
 val is_same_axiomatic :
@@ -457,14 +455,9 @@ val is_invariant : code_annotation -> bool
 val is_variant : code_annotation -> bool
 val is_allocation: code_annotation -> bool
 val is_assigns : code_annotation -> bool
-val is_pragma : code_annotation -> bool
-val is_slice_pragma : code_annotation -> bool
 val is_loop_annot : code_annotation -> bool
 
 val is_trivial_annotation : code_annotation -> bool
-
-val is_property_pragma : pragma -> bool
-(** Should this pragma be proved by plugins *)
 
 val extract_contract :
   code_annotation list -> (string list * funspec) list

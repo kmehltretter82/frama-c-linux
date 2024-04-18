@@ -713,17 +713,6 @@ and is_same_behavior b b' env =
 and is_same_variant (v,m) (v',m') env =
   is_same_term v v' env && is_same_opt is_matching_logic_info m m' env
 
-and is_same_slice_pragma p p' env =
-  match p, p' with
-  | SPexpr t, SPexpr t' -> is_same_term t t' env
-  | SPctrl, SPctrl -> true
-  | SPstmt, SPstmt -> true
-  | (SPexpr _ | SPctrl | SPstmt), _ -> false
-
-and is_same_pragma p p' env =
-  match p,p' with
-  | Slice_pragma p, Slice_pragma p' -> is_same_slice_pragma p p' env
-
 and are_same_behaviors bhvs bhvs' env =
   let treat_one_behavior acc b =
     match List.partition (fun b' -> b.b_name = b'.b_name) acc with
@@ -761,13 +750,12 @@ and is_same_code_annotation a a' env =
     is_same_behavior_set bhvs bhvs' && is_same_assigns a a' env
   | AAllocation(bhvs, a), AAllocation(bhvs',a') ->
     is_same_behavior_set bhvs bhvs' && is_same_allocation a a' env
-  | APragma p, APragma p' -> is_same_pragma p p' env
   | AExtended (bhvs, is_next, ext),
     AExtended (bhvs', is_next', ext') ->
     is_same_behavior_set bhvs bhvs' && is_next = is_next' &&
     is_same_acsl_extension ext ext' env
   | (AAssert _ | AStmtSpec _ | AInvariant _ | AVariant _ | AAssigns _
-    | AAllocation _ | APragma _ | AExtended _), _ -> false
+    | AAllocation _ | AExtended _), _ -> false
 
 and is_same_logic_type t t' env =
   match t,t' with

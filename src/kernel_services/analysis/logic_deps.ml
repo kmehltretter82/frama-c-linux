@@ -498,18 +498,6 @@ let get_zone_from_annot a (ki,kf) loop_body_opt results =
     add_results_from_pred ctx results pred
   in
   match a.annot_content with
-  | APragma (Slice_pragma (SPexpr term)) ->
-    results |>
-    (* to preserve the interpretation of the pragma *)
-    get_zone_from_term ki term |>
-    (* to select the reachability of the pragma *)
-    add_ctrl_slice ki
-  | APragma (Slice_pragma SPctrl) ->
-    (* to select the reachability of the pragma *)
-    add_ctrl_slice ki results
-  | APragma (Slice_pragma SPstmt) ->
-    (* to preserve the effect of the statement *)
-    add_stmt_slice ki results
   | AAssert (_behav,pred) ->
     (* to preserve the interpretation of the assertion *)
     get_zone_from_pred ki pred.tp_statement results
@@ -635,7 +623,6 @@ let from_func_annots iter_on_kf_stmt code_annot_filter kf =
 (** To quickly build a annotation filter *)
 let code_annot_filter annot ~threat ~user_assert ~slicing_annot ~loop_inv ~loop_var ~others =
   match annot.annot_content with
-  | APragma (Slice_pragma _) -> slicing_annot
   | AAssert _ ->
     (match Alarms.find annot with
      | None -> user_assert

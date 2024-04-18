@@ -242,7 +242,7 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
   let assert_of_returns ca =
     match ca.annot_content with
     | AAssert _ | AInvariant _ | AVariant _
-    | AAssigns _ | AAllocation _ | APragma _ | AExtended _ -> ptrue
+    | AAssigns _ | AAllocation _ | AExtended _ -> ptrue
     | AStmtSpec (_bhvs,s) ->
       let res =
         List.fold_left

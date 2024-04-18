@@ -363,7 +363,7 @@ let xform_switch_block ?(keepSwitch=false) b =
   let assert_of_clause f ca =
     match ca.annot_content with
     | AAssert _ | AInvariant _ | AVariant _
-    | AAssigns _ | AAllocation _ | APragma _ | AExtended _ -> Logic_const.ptrue
+    | AAssigns _ | AAllocation _ | AExtended _ -> Logic_const.ptrue
     | AStmtSpec (_bhv,s) ->
       let open Logic_const in
       List.fold_left

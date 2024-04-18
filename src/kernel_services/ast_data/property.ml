@@ -419,7 +419,7 @@ let get_for_behaviors = function
       | AStmtSpec(bhvs,_)
       | AAssigns(bhvs,_)
       | AAllocation(bhvs,_) -> bhvs
-      | AVariant _ | APragma _ | AExtended _ -> []
+      | AVariant _ | AExtended _ -> []
     end
 
   | IPAxiomatic _
@@ -445,7 +445,6 @@ let has_status_ca = function
   | AAssert _ | AStmtSpec _ | AInvariant _ | AVariant _ | AAllocation _
   | AAssigns _ -> true
   | AExtended(_,_,e) -> has_status_ext e
-  | APragma _ -> false
 
 let has_status_pkind = function
   | PKAssumes _ -> false
@@ -804,7 +803,6 @@ module Ordered_by_function = Datatype.Make_with_collections(
         | IPPredicate { ip_kind = PKEnsures _ } -> 10
         | IPCodeAnnot { ica_ca = { annot_content = AAssert _ }} -> 11
         | IPCodeAnnot { ica_ca = { annot_content = AInvariant _ }} -> 12
-        | IPCodeAnnot { ica_ca = { annot_content = APragma _ }} -> 13
         | IPAssigns _ -> 14
         | IPFrom _ -> 15
         | IPAllocation _ -> 16
@@ -1184,8 +1182,6 @@ struct
 
     | IPCodeAnnot {ica_kf=kf; ica_stmt=stmt; ica_ca={annot_content=AStmtSpec _}} ->
       [ K kf ; A "contract" ; S stmt ]
-    | IPCodeAnnot {ica_kf=kf; ica_stmt=stmt; ica_ca={annot_content=APragma _}} ->
-      [ K kf ; A "pragma" ; S stmt ]
     | IPCodeAnnot {ica_kf=kf; ica_stmt=stmt;
                    ica_ca={annot_content=AExtended (_, _, {ext_name})}} ->
       [ K kf ; A ext_name ; S stmt ]
@@ -1468,9 +1464,6 @@ let ip_of_code_annot kf stmt ca =
   | AAssigns _ ->
     Option.to_list (ip_assigns_of_code_annot kf ki ca)
     @ ip_from_of_code_annot kf ki ca
-  | APragma p when Logic_utils.is_property_pragma p ->
-    [ IPCodeAnnot {ica_kf=kf; ica_stmt=stmt; ica_ca=ca} ]
-  | APragma _ -> []
   | AExtended(_,_,ext) ->
     if ext.ext_has_status then
       [IPExtended {ie_loc=ELStmt(kf,stmt); ie_ext=ext}]

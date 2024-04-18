@@ -644,7 +644,7 @@ let annot_hints hs = function
     List.iter (add_hint hs) bs ;
     assigns_hints hs froms
   | AAllocation _ | AAssigns(_,WritesAny) | AStmtSpec _
-  | AVariant _ | APragma _ | AExtended _ -> ()
+  | AVariant _ | AExtended _ -> ()
 
 let property_hints hs =
   let open Property in function

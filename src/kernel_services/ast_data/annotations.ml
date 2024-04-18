@@ -1637,7 +1637,7 @@ let do_add_code_annot ~keep_empty emitter ?kf stmt ca =
        Kernel.fatal
          "More than one loop assigns clause for a statement. \
           Annotations internal state broken.")
-  | APragma _ | AExtended _ ->
+  | AExtended _ ->
     fill_tables ca (Property.ip_of_code_annot kf stmt ca)
 
 let add_code_annot ?(keep_empty=true) emitter ?kf stmt ca =

@@ -47,7 +47,7 @@ type behavior_or_loop = (* private *)
       based on different sets of active behaviors. *)
   | Id_loop of code_annotation
 
-(** Only AAssert, AInvariant, or APragma. Other code annotations are
+(** Only AAssert or AInvariant. Other code annotations are
     dispatched as identified_property of their own. *)
 type identified_code_annotation = {
   ica_kf : kernel_function;

@@ -140,10 +140,6 @@ val pp_acsl_extension_kind :
 val pp_behavior : Format.formatter -> Cil_types.behavior -> unit
 val pp_termination_kind :
   Format.formatter -> Cil_types.termination_kind -> unit
-val pp_slice_pragma :
-  Format.formatter -> Cil_types.slice_pragma -> unit
-val pp_pragma :
-  Format.formatter -> Cil_types.pragma -> unit
 val pp_code_annotation_node :
   Format.formatter -> Cil_types.code_annotation_node -> unit
 val pp_funspec : Format.formatter -> Cil_types.funspec -> unit
