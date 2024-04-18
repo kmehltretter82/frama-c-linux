@@ -179,22 +179,22 @@ do
             PULLCACHE=yes
             ;;
         "-f"|"--force")
-            DUNE_OPT+="--force "
+            DUNE_OPT+=" --force"
             ;;
         "-u"|"--update")
-            DUNE_OPT+="--auto-promote "
+            DUNE_OPT+=" --auto-promote"
             UPDATE=yes
             ;;
         "--watch")
-            DUNE_OPT+="--watch "
+            DUNE_OPT+=" --watch"
             ;;
         "-v"|"--verbose")
-            DUNE_OPT+="--display=short "
+            DUNE_OPT+=" --display=short"
             VERBOSE=yes
             ;;
         "-j"|"--jobs")
             if [[ $2 == "auto" ]] || ([[ $2 != \-* ]] && [[ $2 -ge 1 ]]); then
-                DUNE_OPT+="-j $2 "
+                DUNE_OPT+=" -j $2"
                 shift
             else
                 ErrorUsage \
@@ -316,7 +316,7 @@ function PrepareCoverage
         Cmd mkdir _coverage
         Cmd mkdir _bisect
 
-        DUNE_OPT+="--workspace dev/dune-workspace.cover "
+        DUNE_OPT+=" --workspace dev/dune-workspace.cover"
     fi
 }
 
