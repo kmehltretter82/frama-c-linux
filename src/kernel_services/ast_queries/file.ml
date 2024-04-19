@@ -314,86 +314,6 @@ let set_machdep () =
 
 let () = Cmdline.run_after_configuring_stage set_machdep
 
-let yaml_dict_to_list = function
-  | `O l ->
-    let make_one acc (k,v) =
-      Result.(
-        bind acc
-          (fun l ->
-             match Yaml.Util.to_string v with
-             | Ok s -> Ok((k,s) :: l)
-             | Error (`Msg s) ->
-               Error (`Msg ("Unexpected value for key " ^ k ^ ": " ^ s))))
-    in
-    List.fold_left make_one (Ok []) l
-  | _ -> Error (`Msg "Unexpected YAML value instead of dictionary of strings")
-
-type mach = Cil_types.mach = {
-  sizeof_short: int;
-  sizeof_int: int;
-  sizeof_long: int ;
-  sizeof_longlong: int;
-  sizeof_ptr: int;
-  sizeof_float: int;
-  sizeof_double: int;
-  sizeof_longdouble: int;
-  sizeof_void: int;
-  sizeof_fun: int;
-  size_t: string;
-  ssize_t: string;
-  wchar_t: string;
-  ptrdiff_t: string;
-  intptr_t: string;
-  uintptr_t: string;
-  int_fast8_t: string;
-  int_fast16_t: string;
-  int_fast32_t: string;
-  int_fast64_t: string;
-  uint_fast8_t: string;
-  uint_fast16_t: string;
-  uint_fast32_t: string;
-  uint_fast64_t: string;
-  wint_t: string;
-  sig_atomic_t: string;
-  time_t: string;
-  alignof_short: int;
-  alignof_int: int;
-  alignof_long: int;
-  alignof_longlong: int;
-  alignof_ptr: int;
-  alignof_float: int;
-  alignof_double: int;
-  alignof_longdouble: int;
-  alignof_str: int;
-  alignof_fun: int;
-  char_is_unsigned: bool;
-  little_endian: bool;
-  alignof_aligned: int;
-  has__builtin_va_list: bool;
-  compiler: string;
-  cpp_arch_flags: string list;
-  version: string;
-  weof: string;
-  wordsize: string;
-  posix_version: string;
-  bufsiz: string;
-  eof: string;
-  fopen_max: string;
-  filename_max: string;
-  host_name_max: string;
-  tty_name_max: string;
-  l_tmpnam: string;
-  path_max: string;
-  tmp_max: string;
-  rand_max: string;
-  mb_cur_max: string;
-  nsig: string;
-  errno: (string * string) list [@of_yaml yaml_dict_to_list];
-  machdep_name: string;
-  custom_defs: string;
-}
-[@@deriving yaml]
-
 (* Local to this module. Use Cil.theMachine.theMachine outside *)
 let get_machdep () =
   let m = Kernel.Machdep.get () in
@@ -404,16 +324,39 @@ let get_machdep () =
   let res =
     Result.bind
       (Yaml_unix.of_file (Fpath.v (file:>string)))
-      mach_of_yaml
+      Cil_types.mach_of_yaml
   in
   match res with
   | Ok machdep -> machdep
   | Error (`Msg s) ->
     Kernel.abort "Error during machdep parsing: %s" s
 
+
+let unsupported_float_type_macros acc name =
+  List.fold_left
+    (fun acc s -> Datatype.String.Set.add (name ^ "_" ^ s) acc)
+    acc
+    [ "DECIMAL_DIG"; "DENORM_MIN"; "DIG"; "HAS_DENORM"; "HAS_INFINITY";
+      "HAS_QUIET_NAN"; "IS_IEC_60559"; "MANT_DIG";
+      "MAX"; "MAX_10_EXP"; "MAX_EXP";
+      "MIN"; "MIN_10_EXP"; "MIN_EXP";
+      "NORM_MAX"; "EPSILON";
+    ]
+
+let unsupported_float_types =
+  List.fold_left unsupported_float_type_macros
+    Datatype.String.Set.empty
+    [ "BFLT16"; "FLT16"; "FLT128"; "LDBL"; ]
+
+let known_bad_macros =
+  Datatype.String.Set.add_seq (List.to_seq ["SIZEOF_INT128"; "SSE" ])
+    unsupported_float_types
+
 let print_machdep_header () =
   if Kernel.PrintMachdepHeader.get () then begin
-    Machdep.gen_all_defines Format.std_formatter (get_machdep());
+    let censored_macros = known_bad_macros in
+    Machdep.gen_all_defines
+      Format.std_formatter ~censored_macros (get_machdep());
     raise Cmdline.Exit
   end else Cmdline.nop
 
@@ -502,9 +445,22 @@ let silence_cpp_machdep_warnings cmdl =
   else
     []
 
+let censored_macros cpp_args =
+  List.fold_left
+    (fun acc arg ->
+       let open Option.Operators in
+       let none = acc in
+       let some = Fun.flip Datatype.String.Set.add acc in
+       (let+ name = Extlib.string_del_prefix "-U" arg in
+        Extlib.strip_underscore name)
+       |> Option.fold ~none ~some)
+    known_bad_macros
+    (List.(flatten (map (String.split_on_char ' ') cpp_args)))
+
 let build_cpp_cmd = function
   | NoCPP _ | External _ -> None
   | NeedCPP (f, cmdl, extra_for_this_file, is_gnu_like) ->
+    let extra_args = extra_for_this_file @ Kernel.CppExtraArgs.get () in
     if not (Filepath.exists f) then
       Kernel.abort "source file %a does not exist"
         Filepath.Normalized.pretty f;
@@ -530,7 +486,10 @@ let build_cpp_cmd = function
     let fc_include_args =
       if Kernel.FramaCStdLib.get () then
         begin
-          let machdep_dir = Machdep.generate_machdep_header (get_machdep()) in
+          let censored_macros = censored_macros extra_args in
+          let machdep_dir =
+            Machdep.generate_machdep_header ~censored_macros (get_machdep())
+          in
           [(machdep_dir:>string); (Fc_config.framac_libc:>string)]
         end
       else []
@@ -558,8 +517,7 @@ let build_cpp_cmd = function
     in
     let supp_args =
       string_of_supp_args
-        (gnu_implicit_args @ clang_no_warn @
-         extra_for_this_file @ (Kernel.CppExtraArgs.get ()))
+        (gnu_implicit_args @ clang_no_warn @ extra_args)
         fc_include_args fc_define_args
     in
     let cpp_command =
