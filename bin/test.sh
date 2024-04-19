@@ -500,27 +500,35 @@ function Register
 # ---  Tests Create New Oracles
 # --------------------------------------------------------------------------
 
+function CreateNewOraclesAux
+{
+    for log in $1*.$2.log
+    do
+        # Only non-empty oracles
+        if [ -s "$log" ];
+        then
+            dest="${log//result/oracle}"
+            dest="${dest//$2.log/$2.oracle}"
+            # Only non-existing oracles, existing ones will be updated via
+            # dune --auto-promote
+            if [ ! -f "../../$dest" ];
+            then
+                echo "Create oracle $dest"
+                cp -f $log "../../$dest"
+            fi
+        fi
+    done
+}
+
 function CreateNewOracles
 {
     while [ "$1" != "" ]
     do
         cd _build/default
-        for log in $1*.res.log
-        do
-            # Only non-empty oracles
-            if [ -s "$log" ];
-            then
-                dest="${log//result/oracle}"
-                dest="${dest//res.log/res.oracle}"
-                # Only non-existing oracles, existing ones will be updated via
-                # dune --auto-promote
-                if [ ! -f "../../$dest" ];
-                then
-                    echo "Create oracle $dest"
-                    cp -f $log "../../$dest"
-                fi
-            fi
-        done
+
+        CreateNewOraclesAux $1 res
+        CreateNewOraclesAux $1 err
+
         cd ../..
         shift
     done
