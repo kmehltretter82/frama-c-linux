@@ -192,7 +192,7 @@ export function Button<A = undefined>(
       onContextMenu={onContextMenu && ((evt) => onContextMenu(value, evt))}
       title={props.title}
     >
-      {props.icon && <SVG id={props.icon} />}
+      {props.icon && <SVG offset={-1} id={props.icon} />}
       {props.label && <label>{props.label}</label>}
       {props.children}
     </button>

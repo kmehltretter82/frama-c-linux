@@ -42,7 +42,7 @@
     --default-button-color: #3c495b;
     --default-led-img: radial-gradient(circle at center, #5f92b9, #4189bf);
     --default-button-img: linear-gradient(to bottom, #3c495b 0%, #455164 100%);
-    --default-button-hover: #364355;
+    --default-button-hover: #154240;
     --default-button-active: #303d4f;
 
     --primary-button-color: #146bbf;
@@ -72,8 +72,8 @@
     --cancel-button-hover: #0e2638;
     --cancel-button-active: #041c2e;
 
-    --selected-button-img: #355174;
-    --selected-button-hover: #456184;
+    --selected-button-img: #336cb3;
+    --selected-button-hover: #116cdc;
 
     --activated-button-color: #348bdf;
     --activated-button-hover: #b53d9e;
