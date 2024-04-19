@@ -46,3 +46,10 @@ machdep_%.yaml: machdep_gcc_%.yaml Makefile
 	@echo "Checking $*"
 	@./make_machdep/make_machdep.py --from-file $* --check-only
 	@touch $@
+
+.PHONY: check-schema
+
+check-schema:
+	@$(foreach machdep, $(wildcard machdep_*.yaml), \
+           ./make_machdep/make_machdep.py --from-file $(machdep) --check-only \
+           || echo "$(machdep) does not conform to machdep schema";)
