@@ -85,13 +85,16 @@ module Make
   (* Map from the arguments of a call to stored results. *)
   module ArgsToStoredCalls = ActualArgs.Map.Make (InputBasesToCallEffect)
 
+  let name = "Mem_exec.PreviousCalls(" ^ Value.name ^ ", " ^ Domain.name ^")"
+  let unique_name = State.unique_name_from_name name
+
   module PreviousCalls =
     Kernel_function.Make_Table
       (ArgsToStoredCalls)
       (struct
         let size = 17
         let dependencies = cache_dependencies
-        let name = "Mem_exec.PreviousCalls(" ^ Value.name ^ ", " ^ Domain.name ^")"
+        let name = unique_name
       end)
 
   let cleanup = !cleanup_ref
