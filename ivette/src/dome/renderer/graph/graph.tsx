@@ -33,6 +33,10 @@ import ForceGraph3D, {
   LinkObject as LinkObject3D,
   NodeObject as NodeObject3D,
 } from 'react-force-graph-3d';
+
+import { Size } from 'react-virtualized';
+import AutoSizer from 'react-virtualized-auto-sizer';
+
 // ForceGraphMethods as ForceGraphMethods3D,
 
 /* -------------------------------------------------------------------------- */
@@ -107,6 +111,7 @@ interface GProps {
   data: GData;
   onSelection?: SelectionCallback;
   selected: string | undefined;
+  size: Size;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -114,45 +119,49 @@ interface GProps {
 /* -------------------------------------------------------------------------- */
 
 function Graph2D(props: GProps): JSX.Element {
-  const { data, onSelection, selected } = props;
+  const { data, onSelection, selected, size } = props;
+  const { width, height } = size;
+
   const fgRef2D = React.useRef<
     | ForceGraphMethods2D<NodeObject2D<GNode>, LinkObject2D<GNode, GLink>>
     | undefined
   >(undefined);
+
   React.useEffect(() => {
     if (fgRef2D.current && selected) {
       const selectedNode: NodeObject2D | undefined = data.nodes.find(
         (node) => node.id === selected
       );
-      if (selectedNode)
+      if (selectedNode?.x && selectedNode?.y)
         fgRef2D.current.centerAt(selectedNode.x, selectedNode.y, 500);
     }
   }, [selected, data]);
+
   return (
-    <>
-      <ForceGraph2D<GNode, GLink>
-        ref={fgRef2D}
-        nodeId='id'
-        nodeLabel='label'
-        linkSource='source'
-        linkTarget='target'
-        graphData={data}
-        autoPauseRedraw={true}
-        // default value of intensity
-        d3AlphaDecay={0.0228}
-        dagLevelDistance={50}
-        onNodeClick={(node, event): void => {
-          if (onSelection) onSelection(node.id, event);
-        }}
-        // Fix target position on drag end
-        onNodeDragEnd={(node) => {
-          node.fx = node.x;
-          node.fy = node.y;
-        }}
-        cooldownTime={50}
-        nodeColor={(node) => (node.id === selected ? '#F4D03F' : '#5DADE2')}
-      />
-    </>
+    <ForceGraph2D<GNode, GLink>
+      ref={fgRef2D}
+      width={width}
+      height={height}
+      nodeId='id'
+      nodeLabel='label'
+      linkSource='source'
+      linkTarget='target'
+      graphData={data}
+      autoPauseRedraw={true}
+      // default value of intensity
+      d3AlphaDecay={0.0228}
+      dagLevelDistance={50}
+      onNodeClick={(node, event): void => {
+        if (onSelection) onSelection(node.id, event);
+      }}
+      // Fix target position on drag end
+      onNodeDragEnd={(node) => {
+        node.fx = node.x;
+        node.fy = node.y;
+      }}
+      cooldownTime={50}
+      nodeColor={(node) => (node.id === selected ? '#F4D03F' : '#5DADE2')}
+    />
   );
 }
 
@@ -161,15 +170,18 @@ function Graph2D(props: GProps): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 function Graph3D(props: GProps): JSX.Element {
-  const { data, onSelection, selected } = props;
+  const { data, onSelection, selected, size } = props;
+  const { width, height } = size;
+
   const fgRef3D = React.useRef<
     | ForceGraphMethods3D<NodeObject3D<GNode>, LinkObject3D<GNode, GLink>>
     | undefined
   >(undefined);
+
   React.useEffect(() => {
     if (fgRef3D.current && selected) {
       // distance to set between camera and node
-      const distance = 100;
+      const distance = 370;
       const selectedNode: NodeObject3D | undefined = data.nodes.find(
         (node) => node.id === selected
       );
@@ -187,9 +199,12 @@ function Graph3D(props: GProps): JSX.Element {
       }
     }
   }, [selected, data]);
+
   return (
     <ForceGraph3D<GNode, GLink>
       ref={fgRef3D}
+      width={width}
+      height={height}
       nodeId='id'
       nodeLabel='label'
       linkSource='source'
@@ -226,25 +241,40 @@ export function Graph(props: GraphProps): JSX.Element {
     }),
     [nodes, edges]
   );
+
   return (
-    <div className={props.className}>
+    <>
       {display && props.layout === '2D' && (
-        <Graph2D
-          key='2D'
-          data={data}
-          onSelection={onSelection}
-          selected={selected}
-        />
+        <AutoSizer>
+          {(size: Size) => (
+            <div className={props.className}>
+              <Graph2D
+                key='2D'
+                data={data}
+                onSelection={onSelection}
+                selected={selected}
+                size={size}
+              />
+            </div>
+          )}
+        </AutoSizer>
       )}
       {display && props.layout === '3D' && (
-        <Graph3D
-          key='3D'
-          data={data}
-          onSelection={onSelection}
-          selected={selected}
-        />
+        <AutoSizer>
+          {(size: Size) => (
+            <div className={props.className}>
+              <Graph3D
+                key='3D'
+                data={data}
+                onSelection={onSelection}
+                selected={selected}
+                size={size}
+              />
+            </div>
+          )}
+        </AutoSizer>
       )}
-    </div>
+    </>
   );
 }
 
