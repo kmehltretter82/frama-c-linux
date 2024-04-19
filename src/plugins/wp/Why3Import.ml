@@ -42,8 +42,24 @@ let extract_path thname =
   | hd :: tl -> hd, List.rev tl
   | [] -> "", []
 
-let construct_acsl_name thpaths thname sname =
-  (String.concat "::" thpaths) ^ "::" ^ thname ^ "::" ^ sname
+let of_infix s =
+  let rec unwrap_any s = function
+    | [] -> s
+    | prefix::others ->
+      if String.starts_with ~prefix s then
+        let n = String.length s in
+        let p = String.length prefix in
+        Printf.sprintf "(%s)" @@ String.sub s p (n-p)
+      else unwrap_any s others
+  in unwrap_any s ["prefix ";"infix ";"mixfix "]
+
+
+let construct_acsl_name thpaths (id : W.Ident.ident) =
+  let (paths,name,scopes) = T.restore_path id in
+  let modscopes = "::" ^ name ^ "::" ^ (String.concat "::" (List.map (of_infix) scopes)) in
+  match paths with
+  | [] -> (String.concat "::" thpaths) ^ modscopes
+  | _ -> (String.concat "::" paths) ^ modscopes
 
 (* For debug only*)
 let pp_id fmt (id: W.Ident.ident) =
@@ -80,24 +96,24 @@ let tvars_of_txs (txs: W.Ty.tvsymbol list) : string list * tvars =
     ) txs ([], W.Ty.Mtv.empty)
 
 
-let rec lt_of_ty (tenv : tenv) (tvs : tvars) (thname, thpaths) (ty: W.Ty.ty) : C.logic_type =
+let rec lt_of_ty (tenv : tenv) (tvs : tvars) thpaths (ty: W.Ty.ty) : C.logic_type =
   match ty.ty_node with
   | Tyvar x -> W.Ty.Mtv.find x tvs
-  | Tyapp(s,ts) -> C.Ltype( lti_of_ts tenv s (thname, thpaths),
-                            List.map (lt_of_ty tenv tvs (thname, thpaths)) ts)
+  | Tyapp(s,ts) -> C.Ltype( lti_of_ts tenv s  thpaths,
+                            List.map (lt_of_ty tenv tvs  thpaths) ts)
 
 
-and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol) (thname, thpaths): C.logic_type_info =
+and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol) (thpaths): C.logic_type_info =
   try W.Ty.Hts.find tenv ts with Not_found ->
     let (lt_params,tvars) = tvars_of_txs ts.ts_args in
     let lt_def =
       match ts.ts_def with
       | NoDef | Range _ | Float _ -> None
-      | Alias ty -> Some (C.LTsyn (lt_of_ty tenv tvars (thname, thpaths) ty))
+      | Alias ty -> Some (C.LTsyn (lt_of_ty tenv tvars  thpaths ty))
     in
     let lti =
       C.{
-        lt_name =  construct_acsl_name thpaths thname ts.ts_name.id_string;
+        lt_name =  construct_acsl_name thpaths ts.ts_name;
         lt_params ; lt_def ;
         lt_attr = [];
       }
@@ -108,27 +124,26 @@ and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol) (thname, thpaths): C.logic_type
 (* ---    Functions                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-let lv_of_ty (tenv:tenv) (tvars:tvars) (thname, thpaths)(index) (ty:W.Ty.ty) : C.logic_var =
+let lv_of_ty (tenv:tenv) (tvars:tvars) thpaths (index) (ty:W.Ty.ty) : C.logic_var =
   Cil_const.make_logic_var_formal (Printf.sprintf "x%d" index)
-  @@ (lt_of_ty tenv tvars (thname, thpaths) ty)
+  @@ (lt_of_ty tenv tvars thpaths ty)
 
 let lr_of_ty_opt (lt_opt) =
   match lt_opt with
   | None -> C.Ctype (C.TVoid []) (* Same as logic_typing *)
   | Some tr -> tr
 
-
-let li_of_ls (tenv:tenv) (ls : W.Term.lsymbol) (lenv:lenv) (thname, thpaths) : C.logic_info =
+let li_of_ls (tenv:tenv) (ls : W.Term.lsymbol) (lenv:lenv) thpaths : C.logic_info =
   let l_tparams,tvars =
     tvars_of_txs @@ W.Ty.Stv.elements @@  W.Term.ls_ty_freevars ls in
-  let l_type = Option.map (lt_of_ty tenv tvars (thname, thpaths)) ls.ls_value in
-  let l_profile = List.mapi (lv_of_ty tenv tvars (thname, thpaths)) ls.ls_args in
+  let l_type = Option.map (lt_of_ty tenv tvars thpaths) ls.ls_value in
+  let l_profile = List.mapi (lv_of_ty tenv tvars  thpaths) ls.ls_args in
   let l_args = List.map ( fun (lv:C.logic_var) -> lv.lv_type) l_profile in
   let signature = C.Larrow (l_args, lr_of_ty_opt l_type) in
   let li =
     C.{
       l_var_info = Cil_const.make_logic_var_global
-          (construct_acsl_name thpaths thname ls.ls_name.id_string)
+          (construct_acsl_name thpaths ls.ls_name)
           signature;
       l_labels = [];
       l_tparams;
@@ -157,14 +172,14 @@ let import_theory env (tenv:tenv) (lenv:lenv) thname =
             | Dtype ts ->
               L.debug ~level:0 "Decl and type %a"  pp_id ts.ts_name;
               L.debug ~level:0 "Location %a"  pp_id_loc ts.ts_name;
-              let lti =  lti_of_ts  tenv ts (theory_name, theory_path) in
+              let lti =  lti_of_ts  tenv ts theory_path in
               L.debug ~level:0 "Correspondign LTI %a" pp_lti lti;
             | Ddata ddatas ->
               List.iter
                 (fun ((ts, _) : W.Decl.data_decl) ->
                    L.debug ~level:0 "Decl and data %a" pp_id  ts.ts_name;
                    L.debug ~level:0 "Location %a"  pp_id_loc ts.ts_name;
-                   let lti =  lti_of_ts  tenv ts (theory_name, theory_path) in
+                   let lti =  lti_of_ts  tenv ts  theory_path in
                    L.debug ~level:0 "Correspondign data LTI %a" pp_lti lti;
                 ) ddatas
             | Dparam ls ->
@@ -175,7 +190,7 @@ let import_theory env (tenv:tenv) (lenv:lenv) thname =
                 (fun ((ls,_):W.Decl.logic_decl) ->
                    L.debug ~level:0 "Decl and dlogic %a" pp_id ls.ls_name;
                    L.debug ~level:0 "Location %a"  pp_id_loc ls.ls_name;
-                   let li = li_of_ls tenv ls lenv (theory_name,theory_path) in
+                   let li = li_of_ls tenv ls lenv theory_path in
                    L.debug ~level:0 "Corresponding dlogic LTI %a" pp_li li;
                 ) dlogics
             | _ -> L.debug ~level:0 "Decl but whatever"
