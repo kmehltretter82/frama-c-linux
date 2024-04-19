@@ -28,6 +28,6 @@ test("server connection with a C file to analyze", async () => {
     await e2eService.launchIvette("../tests/test/adpcm.c");
   const electronApp = launchAppResult.app;
   const window = launchAppResult.page;
-  await e2eService.testFileIsLoaded(window, "../tests/test/adpcm.c");
+  await e2eService.testFileIsLoaded(window, "tests/test/adpcm.c");
   await electronApp.close();
 });
