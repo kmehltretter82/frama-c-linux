@@ -108,10 +108,17 @@ function Graph2D(props: GProps): JSX.Element {
         linkTarget='target'
         graphData={data}
         autoPauseRedraw={true}
-        d3VelocityDecay={1}
+        // default value of intensity
+        d3AlphaDecay={0.0228}
         dagLevelDistance={50}
         onNodeClick={(node, event): void => {
           if (onSelection) onSelection(node.id, event);
+        }}
+        // Fix target position on drag end
+        onNodeDragEnd={(node) => {
+          node.fx = node.x;
+          node.fy = node.y;
+          node.fz = node.z;
         }}
         cooldownTime={50}
       />
@@ -134,12 +141,19 @@ function Graph3D(props: GProps): JSX.Element {
       linkSource='source'
       linkTarget='target'
       graphData={data}
-      d3VelocityDecay={1}
+      d3AlphaDecay={0.0228}
       onNodeClick={(node, event): void => {
         if (onSelection) onSelection(node.id, event);
       }}
       cooldownTime={50}
       dagLevelDistance={50}
+      controlType='orbit'
+      // Fix target position on drag end
+      onNodeDragEnd={(node) => {
+        node.fx = node.x;
+        node.fy = node.y;
+        node.fz = node.z;
+      }}
     />
   );
 }
