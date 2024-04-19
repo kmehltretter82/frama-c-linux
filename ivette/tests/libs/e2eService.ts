@@ -43,7 +43,7 @@ export async function launchIvette(
       ...process.env,
       NODE_ENV: "development",
     },
-    args: params,
+    args: args,
   });
 
   // Get the first window that the app opens, wait if necessary
