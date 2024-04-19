@@ -22,9 +22,17 @@
 
 import React from 'react';
 
-import ForceGraph2D from 'react-force-graph-2d';
-// ForceGraphMethods as ForceGraphMethods2D,
-import ForceGraph3D from 'react-force-graph-3d';
+import ForceGraph2D, {
+  ForceGraphMethods as ForceGraphMethods2D,
+  LinkObject as LinkObject2D,
+  NodeObject as NodeObject2D,
+} from 'react-force-graph-2d';
+
+import ForceGraph3D, {
+  ForceGraphMethods as ForceGraphMethods3D,
+  LinkObject as LinkObject3D,
+  NodeObject as NodeObject3D,
+} from 'react-force-graph-3d';
 // ForceGraphMethods as ForceGraphMethods3D,
 
 /* -------------------------------------------------------------------------- */
@@ -41,8 +49,8 @@ export interface Node {
 }
 
 export interface Edge {
-  source: string; /** Source node identifier */
-  target: string; /** Target node identifier */
+  source: string /** Source node identifier */;
+  target: string /** Target node identifier */;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -82,13 +90,23 @@ export interface GraphProps {
 /* --- Force Graph Components                                             --- */
 /* -------------------------------------------------------------------------- */
 
-interface GNode { id: string, label?: string }
-interface GLink { source: string, target: string }
-interface GData { nodes: GNode[], links: GLink[] }
+interface GNode {
+  id: string;
+  label?: string;
+}
+interface GLink {
+  source: string;
+  target: string;
+}
+interface GData {
+  nodes: GNode[];
+  links: GLink[];
+}
 
 interface GProps {
   data: GData;
   onSelection?: SelectionCallback;
+  selected: string | undefined;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -96,12 +114,24 @@ interface GProps {
 /* -------------------------------------------------------------------------- */
 
 function Graph2D(props: GProps): JSX.Element {
-  const { data, onSelection } = props;
-  // const fgRef2D = React.useRef<ForceGraphMethods2D | undefined>(undefined);
+  const { data, onSelection, selected } = props;
+  const fgRef2D = React.useRef<
+    | ForceGraphMethods2D<NodeObject2D<GNode>, LinkObject2D<GNode, GLink>>
+    | undefined
+  >(undefined);
+  React.useEffect(() => {
+    if (fgRef2D.current && selected) {
+      const selectedNode: NodeObject2D | undefined = data.nodes.find(
+        (node) => node.id === selected
+      );
+      if (selectedNode)
+        fgRef2D.current.centerAt(selectedNode.x, selectedNode.y, 500);
+    }
+  }, [selected, data]);
   return (
     <>
       <ForceGraph2D<GNode, GLink>
-        // ref={fgRef2D}
+        ref={fgRef2D}
         nodeId='id'
         nodeLabel='label'
         linkSource='source'
@@ -118,9 +148,9 @@ function Graph2D(props: GProps): JSX.Element {
         onNodeDragEnd={(node) => {
           node.fx = node.x;
           node.fy = node.y;
-          node.fz = node.z;
         }}
         cooldownTime={50}
+        nodeColor={(node) => (node.id === selected ? '#F4D03F' : '#5DADE2')}
       />
     </>
   );
@@ -131,11 +161,35 @@ function Graph2D(props: GProps): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 function Graph3D(props: GProps): JSX.Element {
-  const { data, onSelection } = props;
-  // const fgRef3D = React.useRef<ForceGraphMethods3D | undefined>(undefined);
+  const { data, onSelection, selected } = props;
+  const fgRef3D = React.useRef<
+    | ForceGraphMethods3D<NodeObject3D<GNode>, LinkObject3D<GNode, GLink>>
+    | undefined
+  >(undefined);
+  React.useEffect(() => {
+    if (fgRef3D.current && selected) {
+      // distance to set between camera and node
+      const distance = 100;
+      const selectedNode: NodeObject3D | undefined = data.nodes.find(
+        (node) => node.id === selected
+      );
+      if (selectedNode) {
+        const { x, y, z } = selectedNode;
+        if (x && y && z) {
+          const distRatio = 1 + distance / Math.hypot(x, y, z);
+          fgRef3D.current.cameraPosition(
+            // new position
+            { x: x * distRatio, y: y * distRatio, z: z * distRatio },
+            { x, y, z }, // lookAt Parameter
+            1000 // ms transition duration
+          );
+        }
+      }
+    }
+  }, [selected, data]);
   return (
     <ForceGraph3D<GNode, GLink>
-      // ref={fgRef3D}
+      ref={fgRef3D}
       nodeId='id'
       nodeLabel='label'
       linkSource='source'
@@ -154,6 +208,7 @@ function Graph3D(props: GProps): JSX.Element {
         node.fy = node.y;
         node.fz = node.z;
       }}
+      nodeColor={(node) => (node.id === selected ? '#F4D03F' : '#5DADE2')}
     />
   );
 }
@@ -163,17 +218,32 @@ function Graph3D(props: GProps): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 export function Graph(props: GraphProps): JSX.Element {
-  const { nodes, edges, onSelection, display = true } = props;
-  const data: GData = React.useMemo(() => ({
-    nodes: nodes.slice(),
-    links: edges.slice(),
-  }), [nodes, edges]);
+  const { nodes, edges, onSelection, display = true, selected } = props;
+  const data: GData = React.useMemo(
+    () => ({
+      nodes: nodes.slice(),
+      links: edges.slice(),
+    }),
+    [nodes, edges]
+  );
   return (
     <div className={props.className}>
-      {display && props.layout === '2D' &&
-        <Graph2D key='2D' data={data} onSelection={onSelection} />}
-      {display && props.layout === '3D' &&
-        <Graph3D key='3D' data={data} onSelection={onSelection} />}
+      {display && props.layout === '2D' && (
+        <Graph2D
+          key='2D'
+          data={data}
+          onSelection={onSelection}
+          selected={selected}
+        />
+      )}
+      {display && props.layout === '3D' && (
+        <Graph3D
+          key='3D'
+          data={data}
+          onSelection={onSelection}
+          selected={selected}
+        />
+      )}
     </div>
   );
 }
