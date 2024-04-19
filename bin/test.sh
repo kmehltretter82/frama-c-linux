@@ -29,7 +29,6 @@ PREPARE=
 PULLCACHE=
 UPDATE=
 LOGS=
-COMMIT=
 TESTS=
 SAVE=
 COVER=
@@ -45,7 +44,6 @@ LOCAL_WP_CACHE=$(pwd -P)/.wp-cache
 FRAMAC_WP_CACHE_GIT=git@git.frama-c.com:frama-c/wp-cache.git
 
 TEST_DIRS="tests/* src/plugins/*/tests/* src/kernel_internals/parsing/tests"
-TESTS=""
 
 # --------------------------------------------------------------------------
 # ---  Help Message
@@ -79,8 +77,8 @@ function Usage
     echo "  -w|--wp-cache       prepare (pull) WP-cache"
     echo "  -f|--force          force re-run tests"
     echo "  -l|--logs           print output of tests (single file, no diff)"
-    echo "  -u|--update         run tests and update oracles (and WP-cache)"
-    echo "  -k|--commit         commit new test oracles"
+    echo "  -u|--update         update oracles (and WP-cache) and create new"
+    echo "                      test oracles"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
     echo "  -j|--jobs <jobs>    run no more than <jobs> commands simultaneously."
@@ -203,9 +201,6 @@ do
             ;;
         "-l"|"--logs")
             LOGS=yes
-            ;;
-        "-k"|"--commit")
-            COMMIT=yes
             ;;
         "-s"|"--save" )
             SAVE=yes
@@ -470,7 +465,7 @@ function TestFile
         else
             ALIAS+=" @$res/${FILE%.*}.diff"
         fi
-        if [ "$COMMIT" = "yes" ]; then
+        if [ "$UPDATE" = "yes" ]; then
             COMMITS+=" $res/${FILE%.*}"
         fi
     done
@@ -502,20 +497,29 @@ function Register
 }
 
 # --------------------------------------------------------------------------
-# ---  Tests Commits
+# ---  Tests Create New Oracles
 # --------------------------------------------------------------------------
 
-function Commits
+function CreateNewOracles
 {
     while [ "$1" != "" ]
     do
         cd _build/default
         for log in $1*.res.log
         do
-            echo "Commit $log"
-            dest="${log//result/oracle}"
-            dest="${dest//res.log/res.oracle}"
-            cp -f $log "../../$dest"
+            # Only non-empty oracles
+            if [ -s "$log" ];
+            then
+                dest="${log//result/oracle}"
+                dest="${dest//res.log/res.oracle}"
+                # Only non-existing oracles, existing ones will be updated via
+                # dune --auto-promote
+                if [ ! -f "../../$dest" ];
+                then
+                    echo "Create oracle $dest"
+                    cp -f $log "../../$dest"
+                fi
+            fi
         done
         cd ../..
         shift
@@ -570,7 +574,7 @@ PrepareTests
 CheckDuneFiles
 Register $TESTS
 RunAlias ${DUNE_ALIAS}
-Commits ${COMMITS}
+CreateNewOracles ${COMMITS}
 Status $DUNE_LOG
 GenerateCoverage
 
