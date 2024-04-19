@@ -449,7 +449,11 @@ function TestFile
     FILE=$(basename $1)
 
     case "$CONFIG" in
-        "<all>"|"<default>")
+        "<all>")
+            RESULT="result*"
+            CFG="(all config)"
+            ;;
+        "<default>")
             RESULT=result
             CFG="(default config)"
             ;;
@@ -458,16 +462,21 @@ function TestFile
             CFG="(config $CONFIG)"
             ;;
     esac
-    if [ "$LOGS" = "yes" ]; then
-        ALIAS=$DIR/$RESULT/$FILE
-    else
-        ALIAS=$DIR/$RESULT/${FILE%.*}.diff
-    fi
-    if [ "$COMMIT" = "yes" ]; then
-        COMMITS="${COMMITS} $DIR/$RESULT/${FILE%.*}"
-    fi
+
+    RESULTS="$DIR/$RESULT"
+    for res in $RESULTS ; do
+        if [ "$LOGS" = "yes" ]; then
+            ALIAS+=" @$res/$FILE"
+        else
+            ALIAS+=" @$res/${FILE%.*}.diff"
+        fi
+        if [ "$COMMIT" = "yes" ]; then
+            COMMITS+=" $res/${FILE%.*}"
+        fi
+    done
+
     Head "Register test on file $1 $CFG"
-    DUNE_ALIAS="${DUNE_ALIAS} @$ALIAS"
+    DUNE_ALIAS="${DUNE_ALIAS} $ALIAS"
 }
 
 # --------------------------------------------------------------------------
