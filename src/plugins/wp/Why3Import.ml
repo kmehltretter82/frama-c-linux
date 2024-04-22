@@ -56,8 +56,12 @@ let of_infix s =
 
 let construct_acsl_name (id : W.Ident.ident) =
   let (paths,name,scopes) = T.restore_path id in
-  let modscopes = "::" ^ name ^ "::" ^ (String.concat "::" (List.map (of_infix) scopes)) in
-  (String.concat "::" paths) ^ modscopes
+  match List.rev scopes with
+  |  (t::q) ->
+    let modscopes = "::" ^ name ^ "::" ^ (String.concat "::" (List.rev_append q [(of_infix t)])) in
+    (String.concat "::" paths) ^ modscopes
+  | [] -> ""
+
 
 (* For debug only*)
 let pp_id fmt (id: W.Ident.ident) =
