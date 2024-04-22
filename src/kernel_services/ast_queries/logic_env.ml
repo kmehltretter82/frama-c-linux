@@ -156,6 +156,14 @@ module Axiomatics =
       let size = 17
     end)
 
+module Modules =
+  State_builder.Hashtbl(Datatype.String.Hashtbl)(Cil_datatype.Location)
+    (struct
+      let name = "Logic_env.Modules"
+      let dependencies = []
+      let size = 17
+    end)
+
 module Model_info =
   State_builder.Hashtbl
     (Datatype.String.Hashtbl)

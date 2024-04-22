@@ -4061,7 +4061,17 @@ struct
     in
     labels,env
 
-  let logic_decl loc f labels poly ?return_type p =
+  type context =
+    | Toplevel
+    | InAxiomatic
+    | InModule of string
+
+  let fullname ~context name =
+    match context with
+    | Toplevel | InAxiomatic -> name
+    | InModule m -> Format.sprintf "%s::%s" m name
+
+  let logic_decl loc ~context f labels poly ?return_type p =
     let labels,env = annot_env loc labels poly in
     let t = match return_type with
       | None -> None;
@@ -4069,7 +4079,7 @@ struct
     in
     let p, env = formals loc env p in
     check_polymorphism loc ?return_type:t p;
-    let info = Cil_const.make_logic_info f in
+    let info = Cil_const.make_logic_info (fullname ~context f) in
     (* Should we add implicitly a default label for the declaration? *)
     let labels = match !Lenv.default_label with
         None -> labels
@@ -4092,13 +4102,14 @@ struct
   let type_annot loc ti =
     let p = ti.this_type, ti.this_name in
     (* Note: Logic_decl registers the logic function *)
-    let env, info = logic_decl loc ti.inv_name [] [] [p] in
+    let env, info = logic_decl loc ~context:Toplevel ti.inv_name [] [] [p] in
     let body = predicate env ti.inv in
     info.l_body <- LBpred body;
     update_info_wrt_default_label info;
     info
 
-  let type_datacons loc env type_info (name,params) =
+  let type_datacons loc env type_info ~context (name,params) =
+    let name = fullname ~context name in
     (try
        let info = Logic_env.find_logic_ctor name in
        C.error loc "type constructor %s is already used by type %s"
@@ -4118,19 +4129,19 @@ struct
     Logic_env.add_logic_ctor name my_info;
     my_info
 
-  let typedef loc env my_info def =
+  let typedef loc ~context env my_info def =
     match def with
-    | TDsum cons -> LTsum (List.map (type_datacons loc env my_info) cons)
+    | TDsum cons -> LTsum (List.map (type_datacons loc env my_info ~context) cons)
     | TDsyn typ -> LTsyn (plain_logic_type loc env typ)
 
-  let rec decl in_axiomatic a =
+  let rec decl ~context a =
     let open Current_loc.Operators in
     let loc = a.decl_loc in
     let<> UpdatedCurrentLoc = loc in
     match a.decl_node with
 
     | LDlogic_reads (f, labels, poly, t, p, l) ->
-      let env,info = logic_decl loc f labels poly ~return_type:t p in
+      let env,info = logic_decl loc ~context f labels poly ~return_type:t p in
       info.l_body <-
         (match l with
          | Some l ->
@@ -4146,7 +4157,7 @@ struct
       Some (Dfun_or_pred (info,loc))
 
     | LDpredicate_reads (f, labels, poly, p, l) ->
-      let env,info = logic_decl loc f labels poly p in
+      let env,info = logic_decl loc ~context f labels poly p in
       info.l_body <-
         (match l with
          | Some l ->
@@ -4162,7 +4173,7 @@ struct
       Some (Dfun_or_pred (info,loc))
 
     | LDlogic_def(f, labels, poly,t,p,e) ->
-      let env,info = logic_decl loc f labels poly ~return_type:t p in
+      let env,info = logic_decl loc ~context f labels poly ~return_type:t p in
       let rt = match info.l_type with
         | None -> assert false
         | Some t -> t
@@ -4182,7 +4193,7 @@ struct
           Cil_printer.pp_logic_type rt
 
     | LDpredicate_def (f, labels, poly, p, e) ->
-      let env,info = logic_decl loc f labels poly p in
+      let env,info = logic_decl loc ~context f labels poly p in
       let e = update_predicate_wrt_default_label (predicate env e) in
       info.l_body <- LBpred e;
       (* potential creation of label w.r.t. def *)
@@ -4190,7 +4201,7 @@ struct
       Some (Dfun_or_pred (info,loc))
 
     | LDinductive_def (f, input_labels, poly, p, indcases) ->
-      let _env,info = logic_decl loc f input_labels poly p in
+      let _env,info = logic_decl loc ~context f input_labels poly p in
       (* env is ignored: because params names are indeed useless...*)
       let (global_default, l) =
         List.fold_left
@@ -4221,18 +4232,39 @@ struct
       Some (Dfun_or_pred (info,loc))
 
     | LDaxiomatic(id,decls) ->
-      if in_axiomatic then
+      begin match context with
+        | Toplevel -> ()
+        | InAxiomatic ->
         (* Not supported yet. See issue 43 on ACSL's github repository. *)
-        C.error loc "Nested axiomatic. Ignoring body of %s" id ;
-        let change oldloc =
-          C.error loc
-            "Duplicated axiomatics %s (first occurrence at %a)"
+          C.error loc "Nested axiomatic. Ignoring body of %s" id
+        |  InModule _ ->
+          C.error loc "Nested modules and axiomatic. Ignoring body of %s" id
+      end;
+      let change oldloc =
+        C.error loc
+          "Duplicated axiomatics %s (first occurrence at %a)"
           id Cil_printer.pp_location oldloc in
-      let l = List.filter_map (decl true) decls in
-        ignore (Logic_env.Axiomatics.memo ~change (fun _ -> loc) id);
+      let l = List.filter_map (decl ~context:InAxiomatic) decls in
+      ignore (Logic_env.Axiomatics.memo ~change (fun _ -> loc) id);
       Some (Daxiomatic(id,l,[],loc))
 
-    | LDmodule _ -> C.error loc "Unsupported module declaration"
+    | LDmodule(id,decls) ->
+      begin match context with
+        | Toplevel | InModule _ -> ()
+        | InAxiomatic ->
+          (* Not supported yet. See issue 43 on ACSL's github repository. *)
+          C.error loc "Nested module and axiomatic. Ignoring body of %s" id
+      end;
+      let name = fullname ~context id in
+      let context = InModule name in
+      let change oldloc =
+        C.error loc
+          "Duplicated module %s (first occurrence at %a)"
+          id Cil_printer.pp_location oldloc in
+      let l = List.filter_map (decl ~context) decls in
+      ignore (Logic_env.Modules.memo ~change (fun _ -> loc) name);
+      Some (Dmodule(name,l,[],loc))
+
     | LDimport _ -> C.error loc "Unsupported module import"
 
     | LDtype(s,l,def) ->
@@ -4244,21 +4276,22 @@ struct
           lt_attr = [];
         } in
       add_logic_type loc my_info;
-      let tdef = Option.map (typedef loc env my_info) def in
+      let tdef = Option.map (typedef loc ~context env my_info) def in
       if is_cyclic_typedef s tdef then
         C.error loc "Definition of %s is cyclic" s;
       my_info.lt_def <- tdef;
       Some (Dtype (my_info,loc))
 
-    | LDlemma (x,labels, poly, {tp_kind = kind; tp_statement = e}) ->
-      if Logic_env.Lemmas.mem x then begin
-        let old_def = Logic_env.Lemmas.find x in
+    | LDlemma (name,labels, poly, {tp_kind = kind; tp_statement = e}) ->
+      let name = fullname ~context name in
+      if Logic_env.Lemmas.mem name then begin
+        let old_def = Logic_env.Lemmas.find name in
         let old_kind = match old_def with
           | Dlemma(_,_,_,{tp_kind },_,_) -> tp_kind
           | _ -> Assert in
         let old_loc = Cil_datatype.Global_annotation.loc old_def in
         C.error loc "%a %s is already registered as %a (%a)"
-          Cil_printer.pp_lemma_kind kind x
+          Cil_printer.pp_lemma_kind kind name
           Cil_printer.pp_lemma_kind old_kind
           Cil_datatype.Location.pretty old_loc
       end;
@@ -4268,8 +4301,8 @@ struct
         | None -> labels
         | Some lab -> [lab]
       in
-      let def = Dlemma (x,labels, poly,  p, [], loc) in
-      Logic_env.Lemmas.add x def;
+      let def = Dlemma (name,labels, poly,  p, [], loc) in
+      Logic_env.Lemmas.add name def;
       Some def
 
     | LDinvariant (s, e) ->
@@ -4394,8 +4427,8 @@ struct
 
   let annot = C.on_error
       (fun a ->
-    start_transaction ();
-         let res = decl false a in
+         start_transaction ();
+         let res = decl ~context:Toplevel a in
          finish_transaction (); res)
       (fun _ -> rollback_transaction ())
 
