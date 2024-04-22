@@ -25,9 +25,22 @@
 
 (** Prints on the given formatter all [#define] directives
     required by [share/libc/features.h] and other system-dependent headers.
+    @param censored_macros prevents the generation of directives for the
+    builtin macros in [mach.custom_defs] whose names match. empty by default.
+    @before Frama-C+dev censored_macros did not exist
 *)
-val gen_all_defines: Format.formatter -> Cil_types.mach -> unit
+val gen_all_defines:
+  Format.formatter ->
+  ?censored_macros:Datatype.String.Set.t ->
+  Cil_types.mach ->
+  unit
 
 (** generates a [__fc_machdep.h] file in a temp directory and returns the
-    directory name, to be added to the search path for preprocessing stdlib *)
-val generate_machdep_header: Cil_types.mach -> Filepath.Normalized.t
+    directory name, to be added to the search path for preprocessing stdlib.
+    @param see {!gen_all_defines}
+    @before Frama-C+dev censored_macros did not exist.
+*)
+val generate_machdep_header:
+  ?censored_macros:Datatype.String.Set.t ->
+  Cil_types.mach ->
+  Filepath.Normalized.t

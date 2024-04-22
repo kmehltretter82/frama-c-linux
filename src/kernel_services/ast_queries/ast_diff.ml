@@ -702,11 +702,7 @@ and is_same_variant (v,m) (v',m') env =
 
 and is_same_loop_pragma p p' env =
   match p, p' with
-  | Unroll_specs l, Unroll_specs l'
-  | Widen_hints l, Widen_hints l'
-  | Widen_variables l, Widen_variables l' ->
-    is_same_list is_same_term l l' env
-  | (Unroll_specs _ | Widen_hints _ | Widen_variables _), _ -> false
+  | Unroll_specs l, Unroll_specs l' -> is_same_list is_same_term l l' env
 
 and is_same_slice_pragma p p' env =
   match p, p' with

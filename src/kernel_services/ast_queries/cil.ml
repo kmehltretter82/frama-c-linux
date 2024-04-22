@@ -2049,10 +2049,6 @@ and childrenLoopPragma vis p =
   match p with
   | Unroll_specs lt -> let lt' = mapNoCopy (visitCilTerm vis) lt in
     if lt' != lt then Unroll_specs lt' else p
-  | Widen_hints lt -> let lt' = mapNoCopy (visitCilTerm vis) lt in
-    if lt' != lt then Widen_hints lt' else p
-  | Widen_variables lt -> let lt' = mapNoCopy (visitCilTerm vis) lt in
-    if lt' != lt then Widen_variables lt' else p
 
 and childrenModelInfo vis m =
   let field_type = visitCilLogicType vis m.mi_field_type in
@@ -5294,8 +5290,10 @@ let constFoldVisitor (machdep: bool) = new constFoldVisitorClass machdep
 
 let rec constFoldTermNodeAtTop = function
   | TSizeOf typ as t ->
-    (try integer_lconstant (bytesSizeOf typ)
-     with SizeOfError _ -> t)
+    begin
+      try integer_lconstant (bytesSizeOf typ)
+      with SizeOfError _ -> t
+    end
   | TSizeOfStr str -> integer_lconstant (String.length str + 1)
   | TAlignOf typ as t ->
     begin
@@ -5308,14 +5306,68 @@ let rec constFoldTermNodeAtTop = function
   | TSizeOfE _ | TAlignOfE _ ->
     assert false (* sizeof/alignof of logic types are rejected
                     by typing anyway. *)
+  | TUnOp (op, ({ term_node = n1 } as t1)) ->
+    begin
+      let constFoldTermUnOp int_unop =
+        match constFoldTermNodeAtTop n1 with
+        | TConst (Integer (i, _)) -> TConst (Integer (int_unop i, None))
+        | n1 -> TUnOp (op, {t1 with term_node = n1})
+      in
+      match op with
+      | Neg -> constFoldTermUnOp Integer.neg
+      | BNot -> constFoldTermUnOp Integer.lognot
+      | LNot -> constFoldTermUnOp
+                  (fun i -> if Integer.is_zero i
+                    then Integer.one else Integer.zero)
+    end
+  | TBinOp (op, ({term_node = n1} as t1), ({term_node = n2} as t2)) ->
+    begin
+      let n1 = constFoldTermNodeAtTop n1 in
+      let n2 = constFoldTermNodeAtTop n2 in
+      let constFoldTermBinOp int_bop =
+        match n1, n2 with
+        | TConst (Integer (i1, _)), TConst (Integer (i2, _)) ->
+          TConst (Integer (int_bop i1 i2, None))
+        | n1, n2 ->
+          TBinOp (op, {t1 with term_node = n1}, {t2 with term_node = n2})
+
+      in
+      match op with
+      | PlusA -> constFoldTermBinOp Integer.add
+      | MinusA -> constFoldTermBinOp Integer.sub
+      | Mult -> constFoldTermBinOp Integer.mul
+      | Shiftlt -> constFoldTermBinOp Integer.shift_left
+      | Shiftrt -> (* right-shifting Lintegers is always arithmetic *)
+        constFoldTermBinOp Integer.shift_right
+      | BAnd -> constFoldTermBinOp Integer.logand
+      | BXor -> constFoldTermBinOp Integer.logxor
+      | BOr -> constFoldTermBinOp Integer.logor
+      | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr ->
+        let bool_op = match op with
+          | Lt -> Integer.lt
+          | Gt -> Integer.gt
+          | Le -> Integer.le
+          | Ge -> Integer.ge
+          | Eq -> Integer.equal
+          | Ne -> (fun i1 i2 -> not (Integer.equal i1 i2))
+          | LAnd ->
+            (fun i1 i2 -> not (Integer.is_zero i1) && not (Integer.is_zero i2))
+          | LOr ->
+            (fun i1 i2 -> not (Integer.is_zero i1) || not (Integer.is_zero i2))
+          | _ -> assert false
+        in
+        constFoldTermBinOp
+          (fun i1 i2 -> if bool_op i1 i2 then Integer.one else Integer.zero)
+      | _ ->
+        TBinOp (op, {t1 with term_node = n1}, {t2 with term_node = n2})
+    end
   | t -> t
 
-let constFoldTerm machdep t =
+let constFoldTerm t =
   let visitor = object
     inherit nopCilVisitor
     method! vterm_node t =
-      if machdep then ChangeToPost (t,constFoldTermNodeAtTop)
-      else DoChildren
+      ChangeToPost (t, constFoldTermNodeAtTop)
   end
   in
   visitCilTerm visitor t

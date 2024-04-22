@@ -263,8 +263,8 @@ let isCrossableAtInit tr func =
     end
   in
   let eval_rel_at_init rel t1 t2 =
-    let t1 = eval_term_at_init (Cil.constFoldTerm true t1) in
-    let t2 = eval_term_at_init (Cil.constFoldTerm true t2) in
+    let t1 = eval_term_at_init (Cil.constFoldTerm t1) in
+    let t2 = eval_term_at_init (Cil.constFoldTerm t2) in
     let comp =
       match rel with
       | Req -> ((=) 0)

@@ -39,10 +39,17 @@ machdep_%.yaml: machdep_gcc_%.yaml Makefile
              -e 's/alignof_fun: .*/alignof_fun: -1/' \
              -e 's/compiler: .*/compiler: generic/' \
              -e 's/machdep_name: *machdep_gcc_\([[:alnum:]]*\)/machdep_name: machdep_\1/' \
-             -e '/ *#undef __GCC.*/d' -e '/ *#define __GCC.*/d' \
+             -e '/ *__GCC.*/d' -e '/ *__GNU/d' -e '/ *__gnu/d' -e '/ *GXX/d' \
              $< > $@
 
 .%.validated: % machdep-schema.yaml
 	@echo "Checking $*"
 	@./make_machdep/make_machdep.py --from-file $* --check-only
 	@touch $@
+
+.PHONY: check-schema
+
+check-schema:
+	@$(foreach machdep, $(wildcard machdep_*.yaml), \
+           ./make_machdep/make_machdep.py --from-file $(machdep) --check-only \
+           || echo "$(machdep) does not conform to machdep schema";)

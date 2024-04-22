@@ -17,6 +17,9 @@
     - --target=x86_64
   eof: (-1)
   errno:
+    edom: '33'
+    eilseq: '84'
+    erange: '34'
     e2big: '7'
     eacces: '13'
     eaddrinuse: '98'
@@ -42,7 +45,6 @@
     edeadlk: '35'
     edeadlock: '35'
     edestaddrreq: '89'
-    edom: '33'
     edquot: '122'
     eexist: '17'
     efault: '14'
@@ -50,7 +52,6 @@
     ehostdown: '112'
     ehostunreach: '113'
     eidrm: '43'
-    eilseq: '84'
     einprogress: '115'
     eintr: '4'
     einval: '22'
@@ -67,9 +68,9 @@
     el3rst: '47'
     elibacc: '79'
     elibbad: '80'
-    elibexec: '83'
     elibmax: '82'
     elibscn: '81'
+    elibexec: '83'
     eloop: '40'
     emediumtype: '124'
     emfile: '24'
@@ -118,15 +119,14 @@
     eproto: '71'
     eprotonosupport: '93'
     eprototype: '91'
-    erange: '34'
     eremchg: '78'
     eremote: '66'
     eremoteio: '121'
     erestart: '85'
     erofs: '30'
     eshutdown: '108'
-    esocktnosupport: '94'
     espipe: '29'
+    esocktnosupport: '94'
     esrch: '3'
     estale: '116'
     estrpipe: '86'
@@ -143,10 +143,10 @@
   fopen_max: '16'
   has__builtin_va_list: true
   host_name_max: '64'
+  int_fast8_t: signed char
   int_fast16_t: long
   int_fast32_t: long
   int_fast64_t: long
-  int_fast8_t: signed char
   intptr_t: long
   l_tmpnam: '20'
   little_endian: true
@@ -173,10 +173,10 @@
   time_t: long
   tmp_max: '238328'
   tty_name_max: '32'
+  uint_fast8_t: unsigned char
   uint_fast16_t: unsigned long
   uint_fast32_t: unsigned long
   uint_fast64_t: unsigned long
-  uint_fast8_t: unsigned char
   uintptr_t: unsigned long
   wchar_t: int
   weof: (0xffffffffu)

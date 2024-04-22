@@ -20,5 +20,6 @@ mk_tests {
       src/plugins/server/tests/batch \
       tests/fc_script \
       tests/syntax
+    make -C share/machdeps check-schema
   '';
 }

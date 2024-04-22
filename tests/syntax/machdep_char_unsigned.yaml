@@ -180,4 +180,4 @@ errno:
     exdev: '18'
     exfull: '54'
 machdep_name: 'machdep_char_unsigned'
-custom_defs: ''
+custom_defs: { }

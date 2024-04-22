@@ -82,7 +82,6 @@ let extract_from_pragmas global_find_init s =
     match a.annot_content with
     | APragma (Loop_pragma (Unroll_specs specs)) ->
       List.fold_left (update_info global_find_init e) info specs
-    | APragma (Loop_pragma _) -> info
     | _ -> assert false (* should have been filtered above. *)
   in
   List.fold_left get_infos empty_info pragmas

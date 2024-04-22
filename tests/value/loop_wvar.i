@@ -9,9 +9,6 @@
 void main(void)
 { int n = 13;
   int i,j;
-// ceci était une annotation, mais on ne fait pas moins bien sans
-// maintenant:
-// loop pragma WIDEN_VARIABLES i;
   /*@ loop widen_hints i, 12, 13; */
   for (i=0; i<n; i++)
     {
@@ -35,7 +32,6 @@ void main_err1(void)
 void main_err2(void)
 { int n = 13;
   int i,j;
-  /*@ loop pragma WIDEN_VARIABLES 12; */
   for (i=0; i<n; i++)
     {
       j = 4 * i + 7;
@@ -48,7 +44,7 @@ void main_unhelpful () {
   int next = 0;
   int i;
 
-/*@ loop widen_hints next, 24; */ // This pragma is unhelpful, but used to interfere with the bound for i.
+/*@ loop widen_hints next, 24; */ // This hint is unhelpful, but used to interfere with the bound for i.
   for (i=0;i<30;i++) {
     int vsize = max;
     int vnext = next;
