@@ -50,7 +50,7 @@
 #typeset -A opt_args
 
 # filter_load takes a command line calling frama-c and
-# removes everything not a -load-module or -load-script
+# removes everything not a -load-module
 # argument 1 is the variable name of the input
 # argument 2 is the variable name of the output
 function filter_load () {
@@ -64,7 +64,7 @@ function filter_load () {
     else
       # very strange behaviour when ' is used instead of " around -load-*
       # actually not related to this
-      if [[ $w = '-load-module' ]] || [[ $w = '-load-script' ]]; then
+      if [[ $w = '-load-module' ]]; then
         my_args+=("$w")
         next=1
       fi
@@ -86,7 +86,7 @@ function _frama_c () {
     if $my_words[1] 2>/dev/null; then
       local -a the_args
       local -a the_previous_args
-      # we keep only parts of the command line relevant to -load-module/-load-script
+      # we keep only parts of the command line relevant to -load-module
       filter_load my_words the_args
       # we load the previous filtered command from cache if available
       _retrieve_cache frama-c_previous_command # can overwrite the_previous_args
