@@ -43,7 +43,6 @@ fi
 
 find . -name dune-project -exec $SED -i -e "s/(lang dune [1-9]\.[0-9]*)/(lang dune ${VERSION})/gI" '{}' ';'
 find . -name dune-workspace.* -exec $SED -i -e "s/(lang dune [1-9]\.[0-9]*)/(lang dune ${VERSION})/gI" '{}' ';'
-$SED -i -e "s/(lang dune [1-9]\.[0-9]*)/(lang dune ${VERSION})/gI" ./bin/frama-c-build-scripts.sh
 
 echo "All dune-project related files have been updated".
 echo "Remember to update:"

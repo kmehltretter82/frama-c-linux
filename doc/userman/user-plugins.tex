@@ -58,6 +58,43 @@ installation. Loading will fail and a warning will be emitted at launch if this
 is not the case.
 \end{important}
 
+\subsection{Loading Single OCaml Files as Plug-ins}
+
+\FramaC used to have an option \texttt{-load-script} that allowed loading a
+single OCaml file as a mini-plug-in. Since \FramaC 26 (Iron), the use of Dune
+requires a different approach: you need to create a directory containing the
+following files:
+\begin{itemize}
+\item a \texttt{dune-project} file;
+\item a \texttt{dune} file;
+\item the \texttt{script.ml} file that you want to load with \FramaC.
+\end{itemize}
+With these files, you will be able to run \texttt{dune build} to compile the
+script, and then \texttt{frama-c -load-module script.cmxs} to load it.
+
+Here is an example \texttt{dune-project} file:
+\begin{dunecode}
+(lang dune 3.7)
+\end{dunecode}
+
+Note: you can match the language version (here, 3.7) to the one of your
+installed \texttt{dune} package. Later versions often enable additional
+warnings.
+
+Here is an example \texttt{dune} file:
+\begin{dunecode}
+(executable
+  (name "script") ; must match the name of the .ml file
+  (modes plugin)
+  (libraries frama-c.init.cmdline frama-c.kernel) ; add more if needed
+  (flags -open Frama_c_kernel :standard)
+  (promote (until-clean)) ; keeps script.cmxs in the base directory
+)
+\end{dunecode}
+
+If your script depends on \FramaC plug-ins, you need to add them to
+\texttt{libraries}, e.g. \texttt{frama-c-<plugin>.core}.
+
 % Local Variables:
 % ispell-local-dictionary: "english"
 % TeX-master: "userman.tex"
