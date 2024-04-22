@@ -24,14 +24,10 @@ import { test } from "@playwright/test";
 import * as e2eService from "../libs/e2eService";
 
 test("server connection with a C file to analyze", async () => {
-  const launchAppResult = await e2eService.launchApp(
-    e2eService.argsLaunchWithTestFile,
-  );
+  const launchAppResult =
+    await e2eService.launchIvette("../tests/test/adpcm.c");
   const electronApp = launchAppResult.app;
   const window = launchAppResult.page;
-
-  await e2eService.testFileIsLoaded(window);
-
-  // Exit app.
+  await e2eService.testFileIsLoaded(window, "tests/test/adpcm.c");
   await electronApp.close();
 });

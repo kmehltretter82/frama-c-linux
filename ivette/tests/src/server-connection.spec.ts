@@ -24,14 +24,9 @@ import { test } from "@playwright/test";
 import * as e2eService from "../libs/e2eService";
 
 test("check server connection", async () => {
-  const launchAppResult = await e2eService.launchApp(
-    e2eService.argsLaunchWithDefaultSettings,
-  );
+  const launchAppResult = await e2eService.launchIvette();
   const electronApp = launchAppResult.app;
   const window = launchAppResult.page;
-
   await e2eService.testServerIsStarted(window);
-
-  // Exit app.
   await electronApp.close();
 });

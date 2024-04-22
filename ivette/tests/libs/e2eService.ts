@@ -25,46 +25,25 @@ import { _electron as electron } from "playwright-core";
 import * as locs from "./locatorsUtil";
 
 /**
- * Basic Electron configuration for Playwright e2e tests of Ivette
+ * Basic Electron launch of Ivette for Playwright tests
  */
-export const argsDefaultLaunch: string[] = [
-  "./out/main/index.js",
-  "--no-sandbox",
-];
-
-/**
- * Electron configuration for Playwright e2e tests of Ivette's default settings
- */
-export const argsLaunchWithDefaultSettings: string[] = [
-  "./out/main/index.js",
-  "--no-sandbox",
-  "--settings",
-  "DEFAULT"
-];
-
-/**
- * Electron configuration for Playwright e2e tests of Ivette on a C file
- */
-export const argsLaunchWithTestFile: string[] = [
-  "./out/main/index.js",
-  "--no-sandbox",
-  "--settings",
-  "./tests/settings.json",
-  "../tests/test/adpcm.c",
-];
-
-/**
- * Basic Electron launch of Ivette for Playwright e2e tests
- */
-export async function launchApp(
-  params: string[]
+export async function launchIvette(
+  ...params: string[]
 ): Promise<{ app: ElectronApplication; page: Page }> {
+  const args: string[] = [
+    "./out/main/index.js",
+    "--no-sandbox",
+    "--settings", "DEFAULT"
+  ];
+  params.forEach(p => {
+    p.trim().split(/\s+/).forEach(a => args.push(a));
+  });
   const electronApp = await electron.launch({
     env: {
       ...process.env,
       NODE_ENV: "development",
     },
-    args: params,
+    args: args,
   });
 
   // Get the first window that the app opens, wait if necessary
@@ -87,19 +66,20 @@ export async function testServerIsStarted(window: Page): Promise<void> {
   // Check the server status in the console view
   await expect(
     locs.getConsoleComponent(window)
-    .getByText("[server] Socket server running.")
+      .getByText("[server] Socket server running.")
   ).toBeVisible();
 
   // Check the server status in the footer
   await expect(locs.getServerStatusLabel(window)).toHaveText("ON");
 }
 
-export async function testFileIsLoaded(window: Page): Promise<void> {
+export async function testFileIsLoaded(window: Page, file: string):
+  Promise<void> {
   await locs.getConsoleView(window).click();
   // Check if a message is present in the console view to confirm the file is
   // loaded
   await expect(
-    locs.getConsoleComponent(window).getByText("adpcm.c (with preprocessing)")
+    locs.getConsoleComponent(window).getByText(`${file} (with preprocessing)`)
   ).toBeVisible();
 
   // Check if the main function is visible in the functions view
