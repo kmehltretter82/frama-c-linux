@@ -1413,10 +1413,11 @@ let editor_command pconf =
 
 let scriptfile ~force ~ext wpo =
   let dir = Wp_parameters.get_session_dir ~force "interactive" in
-  Filepath.Normalized.concat dir (wpo.Wpo.po_sid ^ ext)
+  let filenoext = Filepath.Normalized.concat dir wpo.Wpo.po_sid in
+  Filepath.Normalized.extend filenoext ext
 
 let updatescript ~script driver task =
-  let backup = Filepath.Normalized.concat script ".bak" in
+  let backup = Filepath.Normalized.extend script ".bak" in
   Filepath.rename script backup ;
   let old = open_in (backup :> string) in
   Command.pp_to_file script

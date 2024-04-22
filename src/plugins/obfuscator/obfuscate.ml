@@ -212,7 +212,7 @@ let obfuscate_behaviors () =
   Globals.Functions.iter
     (fun kf ->
        let h = Datatype.String.Hashtbl.create 7 in
-       Annotations.iter_behaviors
+       Annotations.iter_behaviors_by_emitter
          (fun emitter b ->
             if Emitter.equal emitter Emitter.end_user
             && not (Cil.is_default_behavior b)

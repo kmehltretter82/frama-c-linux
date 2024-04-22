@@ -423,6 +423,8 @@ let loop_contract_pids kf stmt =
   | _ -> []
 
 let compile Key.{ kf ; smoking ; bhv ; prop } =
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = Kernel_function.get_location kf in
   let body, checkpath, reachability =
     if Kernel_function.has_definition kf then
       let cfg = Cfg.get_automaton kf in

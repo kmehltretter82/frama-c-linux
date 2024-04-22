@@ -33,7 +33,7 @@ import * as React from 'react';
 import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
 import { DraggableCore, DraggableEventHandler } from 'react-draggable';
-import { AutoSizer, Size } from 'react-virtualized';
+import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
 
 // --------------------------------------------------------------------------
 // --- Splitter

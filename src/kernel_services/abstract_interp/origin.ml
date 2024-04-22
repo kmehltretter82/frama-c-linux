@@ -41,25 +41,16 @@ let kind_label = function
   | Merge -> "Merge"
   | Arith -> "Arithmetic"
 
+(* Ideally, we would use the current statement sid instead of the current
+   source file location. However, that would require passing the current
+   statement through any datastructures and operations that can create
+   garbled mixes, which would be an invasive change. *)
 type location = Cil_datatype.Location.t
 
 type tt =
-  | Origin of { kind: kind; loc: location; id: int; }
+  | Origin of { kind: kind; loc: location; }
   | Well
   | Unknown
-
-(* Unique id for each origin. Used to keep the oldest origin when a garbled
-   mix may have several origins. *)
-module Id = State_builder.Counter (struct let name = "Origin.Id" end)
-
-let current kind =
-  let id = Id.next () in
-  let loc = Cil.CurrentLoc.get () in
-  Origin { kind; loc; id; }
-
-let well = Well
-let unknown = Unknown
-let is_unknown t = t = Unknown
 
 module Prototype = struct
   include Datatype.Serializable_undefined
@@ -95,9 +86,9 @@ end
 
 include Datatype.Make_with_collections (Prototype)
 
-let pretty_as_reason fmt org =
-  if not (is_unknown org)
-  then Format.fprintf fmt " because of %a" pretty org
+let pretty_as_reason fmt origin =
+  if origin <> Unknown
+  then Format.fprintf fmt " because of %a" pretty origin
 
 let descr = function
   | Unknown -> "unknown origin"
@@ -110,17 +101,16 @@ let descr = function
     | Merge -> "imprecise merge of addresses"
     | Arith -> "arithmetic operation on addresses"
 
-(* Keep the oldest known origin: it is probably the most relevant origin, as
-   subsequent ones may have been created because of the first. *)
-let join t1 t2 =
-  if t1 == t2 then t1 else
-    match t1, t2 with
-    | Unknown, x | x, Unknown -> x
-    | Well, _ | _, Well -> Well
-    | Origin o1, Origin o2 -> if o1.id <= o2.id then t1 else t2
+
+let current kind = Origin { kind; loc = Current_loc.get (); }
+
+let well = Well
+let unknown = Unknown
+let is_unknown t = t = Unknown
 
 
 (* For each garbled mix origin, keep track of:
+   - a unique id used to keep the oldest origin when merging two garbled mix.
    - the number of writes (according to [register_write] below), i.e. the number
      of times a garbled mix with this origin has been written in a state during
      the analysis.
@@ -133,42 +123,111 @@ let join t1 t2 =
 
    These info are printed at the end of an Eva analysis. *)
 
-module History_Info = struct
-  let name = "Origin.History"
-  let dependencies = []
-  let size = 32
+module LocSet = Cil_datatype.Location.Set
+
+module History = struct
+
+  module Counter = State_builder.Counter (struct let name = "Origin.Id.Counter" end)
+
+  (* Locations of writes, locations of reads, related bases. *)
+  module Data = Datatype.Triple (LocSet) (LocSet) (Base.SetLattice)
+  module IdData = Datatype.Pair (Datatype.Int) (Data)
+
+  module History_Info = struct
+    let name = "Origin.History"
+    let dependencies = []
+    let size = 10
+  end
+
+  module Table = State_builder.Hashtbl (Hashtbl) (IdData) (History_Info)
+
+  let create () =
+    let id = Counter.next () in
+    id, (LocSet.empty, LocSet.empty, Base.SetLattice.bottom)
+
+  let register origin =
+    if not (Table.mem origin)
+    then Table.replace origin (create ())
+
+  let apply ~change origin =
+    let id, data = try Table.find origin with Not_found -> create () in
+    Table.replace origin (id, change data)
+
+  let cardinal_writes origin =
+    try let (_, (w, _r, _b)) = Table.find origin in LocSet.cardinal w
+    with Not_found -> 0
+
+  let id origin =
+    try fst (Table.find origin)
+    with Not_found -> Stdlib.max_int
+
+  let to_list () = List.of_seq (Table.to_seq ())
+
+  let clear () = Counter.reset (); Table.clear ()
 end
 
-(* Number of writes, number of reads, related bases. *)
-module History_Data =
-  Datatype.Triple (Datatype.Int) (Datatype.Int) (Base.SetLattice)
-module History = State_builder.Hashtbl (Hashtbl) (History_Data) (History_Info)
+let clear () = History.clear ()
 
-let clear () = Id.reset (); History.clear ()
+(* Keep the oldest known origin: it is probably the most relevant origin, as
+   subsequent ones may have been created because of the first. *)
+let join t1 t2 =
+  if equal t1 t2 then t1 else
+    match t1, t2 with
+    | Unknown, x | x, Unknown -> x
+    | Well, _ | _, Well -> Well
+    | Origin _, Origin _ -> if History.id t1 < History.id t2 then t1 else t2
 
 let is_current = function
   | Unknown | Well -> false
-  | Origin { loc } -> Cil_datatype.Location.equal loc (Cil.CurrentLoc.get ())
+  | Origin { loc } -> Cil_datatype.Location.equal loc (Current_loc.get ())
 
-(* Returns true if the origin has never been registered and is related to the
-   current location. *)
+(* Registers the creation of the garbled mix of some origins: Misalign_write and
+   Merge, which are directly written in the cvalue states, and Arith which can
+   be created by many cvalue operations.
+   Does not register:
+   - Leaf origins, as garbled mix are often created by assigns clause and then
+     reduced to precise values by postconditions. Garbled mix with leaf origin
+     are thus registered by [register_write] called at the end of the
+     interpretation of a function specification.
+   - Misalign_read, which should be registered as a read by the cvalue domain.
+     This avoids prioritizing garbled mix created by the bitwise domain.
+   - Unknown and Well origins, which are processed separately by the [join]. *)
+let register _bases t =
+  match t with
+  | Origin { kind = Misalign_write | Merge | Arith } -> History.register t
+  | Origin { kind = Leaf | Misalign_read } | Unknown | Well -> ()
+
+(* Registers a write of a garbled mix of known origin.
+   Returns true if it is related to the current location. *)
 let register_write bases t =
   if is_unknown t then false else
-    let change (w, r, b) = w+1, r, Base.SetLattice.join b bases in
-    let count, _, _ = History.memo ~change (fun _ -> 1, 0, bases) t in
-    count < 2 && is_current t
+    let current_loc = Current_loc.get () in
+    let is_new = History.cardinal_writes t = 0 in
+    let change (w, r, b) =
+      LocSet.add current_loc w, r, Base.SetLattice.join b bases
+    in
+    History.apply ~change t;
+    is_new && is_current t
 
 (* Registers a read only if the current location is not that of the origin. *)
 let register_read bases t =
   if not (is_unknown t || is_current t) then
-    let change (w, r, b) = w, r+1, Base.SetLattice.join b bases in
-    ignore (History.memo ~change (fun _ -> 0, 1, bases) t)
+    let current_loc = Current_loc.get () in
+    let change (w, r, b) =
+      w, LocSet.add current_loc r, Base.SetLattice.join b bases
+    in
+    History.apply ~change t
 
 (* Returns the list of recorded origins, sorted by number of reads.
    Origins with no reads are filtered. *)
 let get_history () =
-  let list = List.of_seq (History.to_seq ()) in
-  let list = List.filter (fun (_origin, (_, r, _)) -> r > 0) list in
+  let list = History.to_list () in
+  let count (origin, (_id, (w, r, bases))) =
+    if LocSet.is_empty r
+    then None
+    else Some (origin, (LocSet.cardinal w, LocSet.cardinal r, bases))
+  in
+  let list = List.filter_map count list in
   let cmp (origin1, (_, r1, _)) (origin2, (_, r2, _)) =
     let r = r2 - r1 in
     if r <> 0 then r else compare origin1 origin2
@@ -185,12 +244,13 @@ let pretty_origin fmt origin =
 
 let pretty_history fmt =
   let list = get_history () in
+  let plural count = if count = 1 then "" else "s" in
   let pp_origin fmt (origin, (w, r, bases)) =
     let bases = Base.SetLattice.filter (fun b -> not (Base.is_null b)) bases in
     Format.fprintf fmt
-      "@[<hov 2>%a@ (read %i times, propagated %i times)@ \
+      "@[<hov 2>%a@ (read in %i statement%s, propagated through %i statement%s)@ \
        garbled mix of &%a@]"
-      pretty_origin origin r w Base.SetLattice.pretty bases
+      pretty_origin origin r (plural r) w (plural w) Base.SetLattice.pretty bases
   in
   if list <> [] then
     Format.fprintf fmt

@@ -58,6 +58,11 @@ sig_atomic_t: int
 time_t: long
 nsig: ''
 errno:
+  eacces: "13"
+  eloop: "5"
+  enametoolong: "11"
+  enoent: "2"
+  enotdir: "20"
   edom: "33"
   eilseq: "84"
   erange: "34"
@@ -76,5 +81,5 @@ errno:
   enomem: "47"
   enotsup: "48"
 machdep_name: custom_machdep
-custom_defs: |
-  #define CUSTOM_MACHDEP 1
+custom_defs:
+  CUSTOM_MACHDEP: '1'

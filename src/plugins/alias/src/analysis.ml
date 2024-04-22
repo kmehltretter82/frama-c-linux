@@ -101,23 +101,37 @@ let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp
           Some a
     end
   | _ -> (* general case *)
-    let summary =
+    let get_function kf = try Function_table.find kf with Not_found -> doFunction kf in
+    let summaries =
       match Kernel_function.get_called ef with
-      | Some kf when Kernel_function.is_main kf -> None
-      | Some kf -> (try Function_table.find kf with Not_found -> doFunction kf)
-      | None ->
-        Options.warning ~wkey:Options.Warn.unsupported_function ~source:(fst loc)
-          "unsupported feature: call to function pointer: %a" Exp.pretty ef;
-        None
+      | Some kf when Kernel_function.is_main kf -> []
+      | Some kf -> [get_function kf]
+      | None -> (* dereference function pointer using the results of the points-to analysis *)
+        begin match ef, Stmt_table.find stmt with
+          | {enode = Lval lv; _}, Some state ->
+            let targets = Abstract_state.find_vars lv state in
+            Options.feedback ~level:3 "%a is an indirect function call to one of %a"
+              Printer.pp_stmt stmt
+              Abstract_state.VarSet.pretty targets;
+            let kf_of_var {vname; _} =
+              try Some (Globals.Functions.find_def_by_name vname) with Not_found -> None
+            in
+            let kfs = Seq.filter_map kf_of_var @@ Abstract_state.VarSet.to_seq targets in
+            List.of_seq @@ Seq.map get_function kfs
+          | _ ->
+            Options.fatal "unsupported call to function pointer: %a" Exp.pretty ef
+        end
     in
-    begin match (state, summary) with
+    let apply_summary state summary =
+      match (state, summary) with
       | (None, _) -> None
       | (Some a, Some summary) -> Some (Abstract_state.call a res args summary)
       | (Some a, None) ->
         Options.warning ~wkey:Options.Warn.undefined_function ~once:true ~source:(fst loc)
           "function %a has no definition" Exp.pretty ef;
         Some a
-    end
+    in
+    List.fold_left apply_summary state summaries
 
 let do_cons_init (s:stmt) (v:varinfo) f arg t loc state =
   Cil.treat_constructor_as_func (do_function_call s state) v f arg t loc
@@ -272,7 +286,7 @@ let print_stmt_table_elt fmt k v :unit =
     | None -> Format.fprintf fmt "<Bot>"
     | Some a -> Abstract_state.pretty ~debug:(Options.DebugTable.get ()) fmt a
   in
-  Format.fprintf fmt "Before statement %a :@[<hov 2> %a@]" print_key k print_value v
+  Format.fprintf fmt "Before statement %a :@[<hov 2> %a@]@." print_key k print_value v
 
 let print_function_table_elt fmt kf s : unit =
   let function_name = Kernel_function.get_name kf in
@@ -296,7 +310,7 @@ let clear () =
   computed_flag := false;
   Stmt_table.clear ()
 
-let get_state_before_stmt _kf stmt =
+let get_state_before_stmt stmt =
   if is_computed ()
   then try Stmt_table.find stmt with Not_found -> None
   else None

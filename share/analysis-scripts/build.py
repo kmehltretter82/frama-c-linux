@@ -63,6 +63,7 @@ parser.add_argument(
     metavar="FILE",
     default="build_commands.json",
     help="path to JBDB (default: build_commands.json)",
+    type=Path,
 )
 parser.add_argument(
     "--machdep", metavar="MACHDEP", help="analysis machdep (default: Frama-C's default)"
@@ -208,7 +209,7 @@ def rel_prefix(path: Path) -> str:
     # and use an absolute one.
     relp = os.path.relpath(path, start=dot_framac_dir)
     if relp.startswith(os.path.join("..", "..")):
-        return path
+        return str(path)
     else:
         return relp
 
@@ -301,9 +302,7 @@ if sources:
     sources_map[targets[0]] = sources
 elif os.path.isfile(jbdb_path):
     # JBDB exists
-    with open(jbdb_path, "r") as data:
-        jbdb = json.load(data)
-    blug_jbdb.absolutize_jbdb(jbdb)
+    jbdb = blug_jbdb.open_and_absolutize_jbdb(jbdb_path)
     filter_source, filter_target = blug_jbdb.get_filters("c-programs")
     # program_targets are those we prefer, and the only ones used in "automatic" mode;
     # non_program_targets are only used if the user specified them in the command line.

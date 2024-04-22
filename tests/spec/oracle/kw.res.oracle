@@ -30,7 +30,7 @@ int main(void)
   struct custom writes;
   struct at include;
   struct loop assert;
-  /*@ slevel 4; */ ;
+  /*@ \eva::slevel 4; */ ;
   behavior ++;
   /*@
   assert

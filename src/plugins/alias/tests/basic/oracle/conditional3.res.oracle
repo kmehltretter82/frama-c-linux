@@ -73,10 +73,7 @@
   0:{ a; b; c } → 1:{ i; j }   1:{ i; j } → 2:{ x; y }
   2:{ x; y } → 3:{ t; u }   3:{ t; u } → 4:{  }
 [alias] Summary of function main:
-  formals: 
-  locals: a→{ i; j }  b→{ i; j }  c→{ i; j }  i→{ x; y }  j→{ x; y }
-           x→{ t; u }  y→{ t; u }  t  u  p  __retres
-  returns: __retres
+  formals:     returns: __retres
   state: { a; b; c }  { *a; *b; *c; i; j }
          { *(*a); *(*b); *(*c); *i; *j; x; y }
          { *(*(*a)); *(*(*b)); *(*(*c)); *(*i); *(*j); *x; *y; t; u }

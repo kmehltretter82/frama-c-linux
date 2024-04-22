@@ -150,14 +150,14 @@
      on Frama-C's command line. A value of -1 will deactivate the macro (all of
      them are optional).
 */
-#define STR(S) # S
-#define expand(macro) STR(macro)
+#define __FC_STR(S) # S
+#define __fc_expand(macro) __FC_STR(macro)
 
 /* Maximum number of bytes in a pathname, including the terminating
    null character. (Minimum is 256.) */
 #ifdef __FC_PATH_MAX
 #  if __FC_PATH_MAX >= 0
-      _Static_assert(__FC_PATH_MAX >=_POSIX_PATH_MAX, "__FC_PATH_MAX is too small (" expand(__FC_PATH_MAX) "): minimal value is " expand( _POSIX_PATH_MAX));
+      _Static_assert(__FC_PATH_MAX >=_POSIX_PATH_MAX, "__FC_PATH_MAX is too small (" __fc_expand(__FC_PATH_MAX) "): minimal value is " __fc_expand( _POSIX_PATH_MAX));
 #      define PATH_MAX __FC_PATH_MAX
 #  else
 #    undef PATH_MAX
@@ -173,7 +173,7 @@
 */
 #ifdef __FC_HOST_NAME_MAX
 #  if __FC_HOST_NAME_MAX >= 0
-     // _Static_assert(__FC_HOST_NAME_MAX >=_POSIX_HOST_NAME_MAX, "__FC_HOST_NAME_MAX is too small (" expand(__FC_HOST_NAME_MAX) "): minimal value is " expand(_POSIX_HOST_NAME_MAX));
+     // _Static_assert(__FC_HOST_NAME_MAX >=_POSIX_HOST_NAME_MAX, "__FC_HOST_NAME_MAX is too small (" __fc_expand(__FC_HOST_NAME_MAX) "): minimal value is " __fc_expand(_POSIX_HOST_NAME_MAX));
 #    define HOST_NAME_MAX __FC_HOST_NAME_MAX
 #  else
 #    undef HOST_NAME_MAX
@@ -185,7 +185,7 @@
 /* Maximum length of a terminal device name. */
 #ifdef __FC_TTY_NAME_MAX
 #  if __FC_TTY_NAME_MAX >= 0
-     _Static_assert(__FC_HOST_NAME_MAX >=_POSIX_TTY_NAME_MAX, "__FC_TTY_NAME_MAX is too small (" expand(__FC_TTY_NAME_MAX) "): minimal value is " expand(_POSIX_TTY_NAME_MAX));
+     _Static_assert(__FC_HOST_NAME_MAX >=_POSIX_TTY_NAME_MAX, "__FC_TTY_NAME_MAX is too small (" __fc_expand(__FC_TTY_NAME_MAX) "): minimal value is " __fc_expand(_POSIX_TTY_NAME_MAX));
 #    define TTY_NAME_MAX __FC_TTY_NAME_MAX
 #  else
 #    undef TTY_NAME_MAX
@@ -201,7 +201,7 @@
  */
 #ifdef __FC_ARG_MAX
 #  if __FC_ARG_MAX >= 0
-     _Static_assert(__FC_ARG_MAX >=_POSIX_ARG_MAX, "__FC_ARG_MAX is too small (" expand(__FC_ARG_MAX) "): minimal value is " expand(__POSIX_ARG_MAX));
+     _Static_assert(__FC_ARG_MAX >=_POSIX_ARG_MAX, "__FC_ARG_MAX is too small (" __fc_expand(__FC_ARG_MAX) "): minimal value is " __fc_expand(__POSIX_ARG_MAX));
 #    define ARG_MAX __FC_ARG_MAX
 #  else
 #    undef ARG_MAX
@@ -214,7 +214,7 @@
 // Must be >= _XOPEN_IOV_MAX, which is 16.
 #ifdef __FC_IOV_MAX
 #  if __FC_IOV_MAX >= 0
-     _Static_assert(__FC_IOV_MAX >=_XOPEN_IOV_MAX, "__FC_IOV_MAX is too small (" expand(__FC_IOV_MAX) "): minimal value is " expand(_XOPEN_IOV_MAX));
+     _Static_assert(__FC_IOV_MAX >=_XOPEN_IOV_MAX, "__FC_IOV_MAX is too small (" __fc_expand(__FC_IOV_MAX) "): minimal value is " __fc_expand(_XOPEN_IOV_MAX));
 #    define IOV_MAX __FC_IOV_MAX
 #  else
 #    undef IOV_MAX

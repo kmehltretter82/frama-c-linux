@@ -14,7 +14,3 @@
 > [eva] bitfield.i:73: 
 >   Frama_C_show_each:
 >   {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
-213c228
-<       (read 5 times, propagated 7 times) garbled mix of &{b; ee}
----
->       (read 9 times, propagated 11 times) garbled mix of &{b; ee}

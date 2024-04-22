@@ -23,7 +23,3 @@
 >   Called from backward_add_ptr.c:160.
 > [eva] Recording results for gm
 > [eva] Done for function gm
-154c163
-<       (read 81 times, propagated 20 times) garbled mix of &{a; b; a; b; c}
----
->       (read 86 times, propagated 26 times) garbled mix of &{a; b; a; b; c}

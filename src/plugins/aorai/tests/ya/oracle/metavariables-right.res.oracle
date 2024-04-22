@@ -119,7 +119,7 @@ check lemma e_deterministic_trans{L}:
    @/
   void f_pre_func(int x)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
@@ -183,7 +183,7 @@ check lemma e_deterministic_trans{L}:
    @/
   void f_post_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
@@ -261,7 +261,7 @@ void f(int x)
    @/
   void g_pre_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_g;
@@ -321,7 +321,7 @@ void f(int x)
    @/
   void g_post_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_g;
@@ -394,7 +394,7 @@ void g(void)
    @/
   void h_pre_func(int x)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_h;
@@ -456,7 +456,7 @@ void g(void)
    @/
   void h_post_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_h;
@@ -529,7 +529,7 @@ void h(int x)
    @/
   void i_pre_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_i;
@@ -600,7 +600,7 @@ void h(int x)
    @/
   void i_post_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_i;
@@ -682,7 +682,7 @@ void i(void)
    @/
   void main_pre_func(int t)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
@@ -742,7 +742,7 @@ void i(void)
    @/
   void main_post_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;

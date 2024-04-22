@@ -538,6 +538,41 @@ void plet () {
   /*@ assert unsupported: \let id = (\lambda integer y; y); id(42) == 42; */
 }
 
+
+/*@ assigns \result \from p; */
+int* garbled_mix (int *p);
+
+/* Tests the reduction by \base_addr(p) == …. */
+void reduce_base_addr () {
+  int a, b, c;
+  int t[50], u[50], w[50];
+  int offset = Frama_C_interval(0, 49);
+  int *p, *q, *r;
+  p = &a;
+  q = t + offset;
+  //@ check valid: \base_addr(p) == (char*)&a;
+  //@ check valid: \base_addr(q) == (char*)t;
+  if (v) { p = 0; q = &b; }
+  //@ check unknown: \base_addr(p) == (char*)&a;
+  //@ check unknown: \base_addr(q) == (char*)t;
+  p = v ? p : (v ? &c : (v ? t+offset : u+offset));
+  q = v ? q : (v ? &c : (v ? t+offset : w+offset));
+  if (v) {
+    //@ assert \base_addr(p) == \base_addr(q);
+    Frama_C_show_each(p, q);
+  }
+  /* Test with a pointer that may be uninitialized: no reduction for now. */
+  if (v) r = &a;
+  if (v) {
+    //@ assert \base_addr(p) == \base_addr(r);
+    Frama_C_domain_show_each(p, r);
+  }
+  /* Test with garbled mix. */
+  q = garbled_mix(q);
+  //@ assert \base_addr(p) == \base_addr(q);
+  Frama_C_show_each(p, q);
+}
+
 void main () {
   eq_tsets();
   eq_char();
@@ -557,4 +592,5 @@ void main () {
   set_comprehension();
   set_comprehension_assigns();
   plet();
+  reduce_base_addr();
 }

@@ -2,7 +2,7 @@
    OPT: -wp-gen -wp-rte -wp-prover why3 -wp-msg-key print-generated
 */
 /* run.config_qualif
-   OPT: -wp-rte -wp-prover alt-ergo
+   OPT: -wp-rte
 */
 
 /*@

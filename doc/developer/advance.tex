@@ -269,7 +269,8 @@ new ones. Finally, you can use \verb|frama-c-ptests -remove-empty-oracles|
 to remove empty oracles (typically, messages sent to the standard error)
 before committing the files to version control.
 
-If you simply want to re-run all tests for your plug-in, run \verb|make tests|.
+If you simply want to re-run all tests for your plug-in (and you have included
+the shared testing \verb|Makefile|) run \verb|make tests|.
 
 \subsection{Test directory structure}\label{ptests:structure}
 
@@ -1383,10 +1384,56 @@ specify a source location, either specifically or by using the current
 location of an \texttt{AST} visitor.
 \lstset{style=frama-c-style}
 \begin{itemize}
-\item[] \lstinline{~source:$s$} use the source location $s$ (see \texttt{Log.mli})
-\item[] \lstinline{~current:true} use the current source location
-  managed by \texttt{Cil.CurrentLoc}.
+\item[] \lstinline{~source:$s$} use the source position $s$ (see \texttt{Log.mli})
+\item[] \lstinline{~current:true} use the source location
+  managed by \texttt{Current\_loc} (see below).
 \end{itemize}
+
+\codeidxdef{Current\_loc}The \texttt{Current\_loc} module is used to
+manage the code location that is currently under focus.
+The current location must be set, either by \framac's kernel or by
+the plug-in themselves. In particular, \texttt{Cil} visitors update this
+location when visiting each node.
+
+\begin{example}
+The code samples below show how to use and set the current location.
+  \scodeidx{Current\_loc}{let-bindings}
+  \scodeidx{Current\_loc}{with\_loc\_opt}
+  \scodeidx{Current\_loc}{with\_loc}
+  \sscodeidx{Boot}{Main}{extend}
+  \begin{ocamlcode}
+  (* [Current_loc.get()] returns the last location set in Current_loc *)
+  let print_current_loc () =
+    Format.printf "%a@." Cil_datatype.Location.pretty (Current_loc.get ())
+
+  (* [with_loc loc f x] set the current location to loc, executes [f x] and set
+     the location to its old value before returning the result of [f x]. Raised
+     exceptions inside [f] will be caught and re-raised after resetting the
+     location to its previous value. *)
+  let apply_stmt f stmt =
+    Current_loc.with_loc (Cil_datatype.Stmt.loc s) f stmt
+
+  (* [with_loc_opt opt_loc f x] behaves like [with_loc] if [loc_opt] is
+     [Some loc], and does not update the current location if it is [None].*)
+  let apply_code_annot f ca =
+    Current_loc.with_loc_opt (Cil_datatype.Code_annotation.loc ca) f ca
+
+  (* Current_loc defines 2 let-binding operators which call [with_loc] and
+     [with_loc_opt]. Here is a function that set the current location to the
+     expr location, and reset it after the match. *)
+  let do_expr e =
+    let open Current_loc.Operators in
+    let$<>$ UpdatedCurrentLoc = e.eloc in
+    match e.enode with
+    | ...
+
+  (* When we only have a [loc option], we can use the $<?>$ operator *)
+  let do_code_annot f ca =
+    let open Current_loc.Operators in
+    let <?> UpdatedCurrentLoc = Cil_datatype.Code_annotation.loc ca in
+    f ca
+  \end{ocamlcode}
+  \end{example}
 
 \paragraph{Emission Options.} By default, a message is echoed to the
 user \emph{after} its construction, and it is sent to registered
@@ -2137,7 +2184,7 @@ following.
   With such a selection,
   you can control on which states project operations are consistently applied
   (see Section~\ref{proj:selection}). For example, it is possible to clear all
-  the states which depend on Value Analysis results.
+  the states which depend on value analysis results.
 \item It is possible to ensure inter-analysis consistency\index{Consistency} by
   setting state dependencies\index{State!Dependency}. For example, if the entry
   point\index{Entry Point} of the analyzed program is changed (using
@@ -3533,7 +3580,7 @@ for each of the types above.
 \item \verb+Get_orig+\scodeidxdef{Visitor\_behavior}{Get\_orig}
   gets the original value corresponding to a copy (and behaves as the identity
   if the given value is not known).
-\item \verb+Set+\emph{name}\scodeidxdef{Visitor\_behavior}{Set} sets a copy for a
+\item \verb+Set+\scodeidxdef{Visitor\_behavior}{Set} sets a copy for a
   given value. Be sure to use it before any occurrence of the old value has
   been copied, or sharing will be lost.
 \item \verb+Set_orig+\scodeidxdef{Visitor\_behavior}{Set\_orig} sets the original
@@ -3541,7 +3588,7 @@ for each of the types above.
 \end{itemize}
 
 \begin{important}
-  Functions from the \verb+Get_orig+\emph{name} modules allow to retrieve additional
+  Functions from the \verb+Get_orig.+\emph{name} modules allow to retrieve additional
   information tied to the original AST nodes. Its result must not be modified
   in place\index{AST!Modification} (this would defeat the purpose of operating
   on a copy to leave the original AST untouched). Moreover, note that whenever
@@ -3843,7 +3890,7 @@ Such clauses can be of different categories, as described by
 \scodeidx{Cil\_types}{ext\_category}\texttt{Cil\_types.ext\_category}.
 \begin{itemize}
 \item A contract extension will be
-stored in the \texttt{b\_extended}\scodeidx{Cil\_types}{behavior}{b\_extended} field of
+stored in the \texttt{b\_extended}\scodeidx{Cil\_types.behavior}{b\_extended} field of
 \texttt{Cil\_types.behavior}\scodeidx{Cil\_types}{behavior}.
 \item A global extension will be found as a global ACSL annotation in the form of a
 \sscodeidx{Cil\_types}{global\_annotation}{Dextended}\texttt{Cil\_types.Dextended} constructor.
@@ -3860,9 +3907,14 @@ different flavors, determined by the \scodeidx{Cil\_types}{ext\_code\_annot\_con
 \end{itemize}
 \end{itemize}
 
-An extension is characterized by its introducing keyword \texttt{kw}, or \texttt{loop kw} for a loop
-extension. It is not possible to have the same keyword for two distinct extensions, especially if
-they belong to different categories, as this would lead to ambiguities in the parser.
+An extension is characterized by its introducing keyword \texttt{kw}, or
+\texttt{loop kw} for a loop extension. Having the same keyword for two distinct
+extensions is not possible, especially if they belong to different categories,
+as this would lead to ambiguities in the parser. It is advised to prefix the
+keyword with the plug-in that registers it, for example
+\lstinline{\wp::strategy}, by doing this, one assures that when the plug-in that
+registers the extension is not available, the extension will be ignored (with a
+warning) and the parsing will continue.
 
 Once an extension is registered a clause of the form \verb|kw e1,...,en;|, where each \verb|ei| can be
 any syntactically valid ACSL term or predicate, will be treated by the parser as belonging to the
@@ -3889,25 +3941,30 @@ Namely, \verb|for bhv: loop kw e1, ..., en;| will indicate that the
 active (although it is ultimately up to the plugin to decide what to do with
 this information).
 
-An \texttt{acsl\_extension}\scodeidx{Cil\_types}{acsl\_extension} is a triple
-\texttt{(id, kw, ext)} where \texttt{id} is its unique ID, used in annotation tables and generated
-by \scodeidx{Logic\_const}{new\_acsl\_extension}\texttt{Logic\_const.new\_acsl\_extension},
-\texttt{kw} identifies the extension, and \texttt{ext} is an
-\texttt{acsl\_extension\_kind}\scodeidx{Cil\_types}{acsl\_extension\_kind}
-and can take three forms:
+An \texttt{acsl\_extension}\scodeidx{Cil\_types}{acsl\_extension} is a record
+with:
 \begin{itemize}
-\item \texttt{Ext\_id id} with \texttt{id} an \texttt{int}
-that the plugin can use to refer to the annotation in its internal state.
-This identifier is under the full responsibility of the plugin
- and will never be used by the kernel.
-\item \texttt{Ext\_preds preds} with \texttt{preds} a possibly empty list of
-predicates.
-\item \texttt{Ext\_terms terms} with \texttt{terms} a possibly empty list of
-  terms.
+  \item \texttt{ext\_id}: its unique ID, used in annotation tables and generated
+        by \scodeidx{Logic\_const}{new\_acsl\_extension}\texttt{Logic\_const.new\_acsl\_extension},
+  \item \texttt{ext\_name}: the keyword that identifies the extension,
+  \item \texttt{ext\_loc}: the location of the extension in the source file,
+  \item \texttt{ext\_status}: the fact that a property status is associated to
+        the extension, or not. It is set during extension registration,
+  \item \texttt{ext\_kind} is an \texttt{acsl\_extension\_kind}\scodeidx{Cil\_types}{acsl\_extension\_kind}
+        that can take three forms:
+        \begin{itemize}
+          \item \texttt{Ext\_id id} with \texttt{id} an \texttt{int}
+                that the plugin can use to refer to the annotation in its
+                internal state. This identifier is under the full responsibility
+                of the plugin and will never be used by the kernel,
+          \item \texttt{Ext\_preds preds} with \texttt{preds} a possibly empty
+                list of predicates (traversed normally by the visitor,
+                see section~\ref{adv:visitors}),
+          \item \texttt{Ext\_terms terms} with \texttt{terms} a possibly empty
+                list of terms (traversed normally by the visitor,
+                see section~\ref{adv:visitors}).
+        \end{itemize}
 \end{itemize}
-For the latter two cases,
-the corresponding list is traversed normally by the visitor
-(see section~\ref{adv:visitors}).
 
 In order for the extension to be recognized by the parser, it must be
 registered by one of the following functions, depending on its category.
@@ -3930,6 +3987,8 @@ registered by one of the following functions, depending on its category.
 
 Each function takes the following mandatory arguments:
 \begin{itemize}
+\item \texttt{$\sim$plugin} the plug-in that registers the extension
+      (\texttt{"kernel"} for the kernel),
 \item \texttt{kw} the name of the extension,
 \item \texttt{typer} the type-checking function itself.
 \item \texttt{status}, a boolean flag indicating whether the extended
@@ -3960,11 +4019,11 @@ occurrences of \verb|\foo| by \verb|42|.
 With this extension enabled, \framac will interpret the following clause in
 a given source file:
 \begin{lstlisting}[language=C,alsolanguage=ACSL]
-/*@ foo 84 == \foo + \foo; */
+/*@ \my_plugin::foo 84 == \foo + \foo; */
 \end{lstlisting}
 as the following type-checked AST fragment:
 \begin{lstlisting}[language=C,alsolanguage=ACSL]
-/*@ foo 84 == 42 + 42; */
+/*@ \my_plugin::foo 84 == 42 + 42; */
 \end{lstlisting}
 
 If the extended clause is of kind \verb|Ext_preds l| or \verb|Ext_terms l|,
@@ -4039,7 +4098,7 @@ can be used in ACSL specification.
 Namely, specification:
 
 \begin{lstlisting}[style=c]
-/*@ ext_type load: foo ; */
+/*@ \tloader::ext_type load: foo ; */
 /*@
   axiomatic Pred {
     predicate P(foo f) reads \nothing ;

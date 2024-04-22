@@ -47,6 +47,6 @@
   9:{ z; q } → 10:{ t }   10:{ t } -field→ 13:{ a; b; n }
   13:{ a; b; n } → 14:{ x }
 [alias] Summary of function main:
-  formals:     locals: __retres    returns: __retres
+  formals:     returns: __retres
   state: { z; q }  { z->field; q->field; a; b; n; t.field }
 [alias] Analysis complete

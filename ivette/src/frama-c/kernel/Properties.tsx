@@ -26,30 +26,34 @@
 
 import _ from 'lodash';
 import React from 'react';
+
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
-import * as States from 'frama-c/states';
 import * as Compare from 'dome/data/compare';
 import * as Settings from 'dome/data/settings';
 import { Label, Code } from 'dome/controls/labels';
 import { Icon } from 'dome/controls/icons';
 import { IconButton, Checkbox } from 'dome/controls/buttons';
+import * as Form from 'dome/layout/forms';
 import * as Models from 'dome/table/models';
 import * as Arrays from 'dome/table/arrays';
-import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
-import { TitleBar } from 'ivette';
 import { Scroll } from 'dome/layout/boxes';
 import { Section } from 'dome/frame/sidebars';
-
+import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { RSplit } from 'dome/layout/splitters';
+
+import { TitleBar } from 'ivette';
+
 
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Properties from 'frama-c/kernel/api/properties';
+import * as States from 'frama-c/states';
+
 
 type PropKey = Json.key<'#marker'>;
 type Property = Properties.statusData |
-                (Properties.statusData & Eva.propertiesData) ;
+  (Properties.statusData & Eva.propertiesData);
 
 // --------------------------------------------------------------------------
 // --- Filters
@@ -121,6 +125,21 @@ function useFilter(path: string): [boolean, () => void] {
   );
 }
 
+function useFilterStr(path: string): Form.FieldState<string> {
+  const [value, setValue] = Dome.useStringSettings(
+    `ivette.properties.filter.${path}`
+  );
+  const [error, setError] = React.useState<Form.FieldError>(undefined);
+  const onChanged = React.useCallback(
+    (newValue: string, newError: Form.FieldError) => {
+      setValue(newValue);
+      setError(newError);
+      if(Form.isValid(newError)) Reload.emit();
+    }, [setValue],
+  );
+  return { value, error, onChanged };
+}
+
 function resetFilters(prefix: string, b?: boolean) : void {
   for (const key in DEFAULTS) {
     if (key.startsWith(prefix)) {
@@ -132,12 +151,12 @@ function resetFilters(prefix: string, b?: boolean) : void {
   Reload.emit();
 }
 
-function filterSummary(prefix: string) : string {
+function filterSummary(prefix: string): string {
   let total = 0;
   let enabled = 0;
   for (const key in DEFAULTS) {
     if (key.startsWith(prefix)) {
-      total ++;
+      total++;
       if (filter(key)) enabled++;
     }
   }
@@ -232,7 +251,7 @@ function filterEva(p: Property): boolean {
       case 'not_tainted':
       case 'not_applicable':
         return !filter('eva.data_tainted_only') &&
-               !filter('eva.ctrl_tainted_only');
+          !filter('eva.ctrl_tainted_only');
       case 'direct_taint':
         return !(filter('eva.ctrl_tainted_only'));
       case 'indirect_taint':
@@ -242,11 +261,24 @@ function filterEva(p: Property): boolean {
   return true;
 }
 
+function filterNames(names: string[]): boolean {
+  const field = Settings.getWindowSettings(
+    `ivette.properties.filter.names`,
+    Json.jString,
+    "",
+  );
+  if (!field || field.length < 2) return true;
+  const strNames = names.join(':');
+  const regex = new RegExp(field, 'i');
+  return regex.test(strNames);
+}
+
 function filterProperty(p: Property): boolean {
   return filterStatus(p.status)
     && filterKind(p.kind)
     && filterAlarm(p.alarm)
-    && filterEva(p);
+    && filterEva(p)
+    && filterNames(p.names);
 }
 
 // --------------------------------------------------------------------------
@@ -396,7 +428,7 @@ interface SectionProps {
   children: React.ReactNode;
 }
 
-function onContextMenu(prefix:string): void {
+function onContextMenu(prefix: string): void {
   const items: Dome.PopupMenuItem[] = [
     {
       label: 'Reset to default',
@@ -466,9 +498,33 @@ function CheckField(props: CheckFieldProps): JSX.Element {
 /* eslint-disable max-len */
 
 function PropertyFilter(): JSX.Element {
+  const namesState = useFilterStr("names");
+  const checkerNames = (names: string | undefined): Form.FieldError => {
+    if( names === undefined || names === "" || names.length > 1) return true;
+    return "At least 2 characters";
+  };
+
   return (
     <Scroll>
       <CheckField label="Current scope" path="currentScope" />
+      <Section
+        label="Search"
+        defaultUnfold={true}
+        className="properties-section-names"
+        infos={Form.isValid(namesState.error) && namesState.value.length >= 2 ? "Active" : ""}
+        summary={!Form.isValid(namesState.error) ?
+          <IconButton icon='WARNING' kind="warning" title={`Errors in section`}/>
+          : undefined
+        }
+      >
+        <Form.TextField
+          label={""}
+          placeholder="Names"
+          title={'Filters names based on regular expressions; enter 2 or more characters to filter'}
+          state={namesState as Form.FieldState<string | undefined>}
+          checker={checkerNames}
+        />
+      </Section>
       <FilterSection label="Status" prefix="status" unfold>
         <CheckField label="Valid" path="status.valid" />
         <CheckField label="Valid under hyp." path="status.valid_hyp" />
@@ -554,14 +610,14 @@ function PropertyColumns(): JSX.Element {
   const taintDict = States.useTags(Eva.taintStatusTags);
 
   const getScope = React.useCallback(
-    ({ scope }) => getDecl(scope)?.name
-    , [getDecl] );
+    ({ scope }: { scope: Property['scope'] }) => getDecl(scope)?.name
+    , [getDecl]);
   const getStatus = React.useCallback(
     ({ status: st }: Property) => (statusDict.get(st) ?? { name: st })
-    , [statusDict] );
+    , [statusDict]);
   const getKind = React.useCallback(
     ({ kind: kd }: Property) => (kindDict.get(kd) ?? { name: kd })
-    , [kindDict] );
+    , [kindDict]);
   const getAlarm = React.useCallback(
     ({ alarm }: Property) => (
       alarm === undefined ? alarm : (alarmDict.get(alarm) ?? { name: alarm })

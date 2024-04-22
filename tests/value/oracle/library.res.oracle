@@ -138,11 +138,14 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     library.i:31: assigns clause on addresses
-      (read 2 times, propagated 2 times) garbled mix of &{S_gpi}
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{S_gpi}
     library.i:41: assigns clause on addresses
-      (read 2 times, propagated 2 times) garbled mix of &{S_gpf}
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{S_gpf}
     library.i:45: assigns clause on addresses
-      (read 2 times, propagated 2 times) garbled mix of &{S_gpd}
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{S_gpd}
 [eva] library.i:38: assertion 'Eva,function_pointer' got final status invalid.
 [eva] library.i:39: assertion 'Eva,function_pointer' got final status invalid.
 [eva] library.i:40: assertion 'Eva,function_pointer' got final status invalid.

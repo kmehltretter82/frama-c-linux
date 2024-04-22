@@ -117,44 +117,49 @@ function RFormatSelector(props: Selector<TIP.rformat>): JSX.Element {
 
 interface NodeProps {
   node: TIP.node;
-  current: Node;
   parent?: boolean;
+  child?: boolean;
+  hasChildren?: boolean;
 }
 
-function Node(props: NodeProps): JSX.Element
-{
+function Node(props: NodeProps): JSX.Element {
   const cellRef = React.useRef<HTMLLabelElement>(null);
-  const { node, parent } = props;
-  const current = node === props.current;
+  const {
+    node,
+    parent = false,
+    child = false,
+    hasChildren = false,
+  } = props;
   const debug = `#${node}`;
   const {
-    title=debug, child='Script', header=debug,
-    proved=false, pending=0, size=0
+    title = debug, childLabel = 'Script', header,
+    proved = false, pending = 0, size = 0
   } = States.useRequest(
     TIP.getNodeInfos, node, { pending: null, onError: null }
   ) ?? {};
   const elt = cellRef.current;
+  const current = !child && !parent;
   React.useEffect(() => {
     if (current && elt) elt.scrollIntoView();
   }, [elt, current]);
   const className = classes(
     'wp-navbar-node',
     parent && 'parent',
+    child && 'child',
     current && 'current',
-    !parent && !current && 'child',
   );
   const icon =
-    current
-    ? (parent ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT')
-    : (parent ? 'ANGLE.DOWN' : 'ANGLE.RIGHT');
+    parent ? 'ANGLE.DOWN' :
+      child ? 'ANGLE.RIGHT' :
+        hasChildren ? 'TRIANGLE.RIGHT' : 'TRIANGLE.RIGHT';
   const kind = proved ? 'positive' : (parent ? 'default' : 'warning');
-  const nodeName = parent ? `${child}: ${header}` : child;
+  const nodeName = header ? `${childLabel}: ${header}` : childLabel;
   const nodeRest = size <= 1 ? '?' : `${pending}/${size}`;
   const nodeFull = size <= 1 ? nodeName : `${nodeName} (${size})`;
   const nodeLabel = proved ? nodeFull : `${nodeName} (${nodeRest})`;
   const proofState =
     proved ? 'proved' :
-    pending < size ? `pending ${pending}/${size}` : 'unproved';
+      pending < size ? `pending ${pending}/${size}` : 'unproved';
   const fullTitle = `${title} (${proofState})`;
   const onSelection = (): void => { Server.send(TIP.goToNode, node); };
   return (
@@ -169,23 +174,28 @@ function Node(props: NodeProps): JSX.Element
 }
 
 interface NavBarProps {
-  above: TIP.node[];
-  below: TIP.node[];
-  current: Node;
+  current: TIP.node | undefined;
+  parents: TIP.node[];
+  subgoals: TIP.node[];
 }
 
 function NavBar(props: NavBarProps): JSX.Element {
-  const { current } = props;
-  const parents = props.above.map(n => (
-    <Node key={n} node={n} parent current={current} />
+  const parents = props.parents.map(n => (
+    <Node key={n} node={n} parent />
   )).reverse();
-  const children = props.below.map(n => (
-    <Node key={n} node={n} current={current} />
+  const children = props.subgoals.map(n => (
+    <Node key={n} node={n} child />
   ));
+  const hasChildren = children.length > 0;
+  const current = (n => n ?
+    <Node key={n} node={n} hasChildren={hasChildren} />
+    : undefined
+  )(props.current);
   return (
     <Vbox className='wp-navbar'>
       <Vbox>
         {parents}
+        {current}
         {children}
       </Vbox>
     </Vbox>
@@ -227,30 +237,36 @@ export interface TIPProps {
 
 export function TIPView(props: TIPProps): JSX.Element {
   const { display, goal, onClose } = props;
+  // --- navbar settings
+  const [unproved, flipU] = Dome.useFlipSettings('frama-c.wp.goals.unproved');
+  const [subtree, flipT] = Dome.useFlipSettings('frama-c.wp.goals.subtree');
   // --- current goal
   const infos =
-    States.useSyncArrayElt( WP.goals, goal ) ?? WP.goalsDataDefault;
+    States.useSyncArrayElt(WP.goals, goal) ?? WP.goalsDataDefault;
   // --- proof status
   const {
-    current, above=[], below=[], index=-1, pending=0, tactic: nodeTactic
-  } = States.useRequest( TIP.getProofStatus, goal, { pending: null } ) ?? {};
+    current, index = -1, pending = 0, size = 0,
+    tactic: nodeTactic, parents = [], children = [],
+  } = States.useRequest(TIP.getProofStatus, goal ? {
+    main: goal, unproved, subtree,
+  } : undefined, { pending: null }) ?? {};
   // --- script status
-  const { saved=false, proof=false, script } =
-    States.useRequest( TIP.getScriptStatus, goal, { pending: null } ) ?? {};
+  const { saved = false, proof = false, script } =
+    States.useRequest(TIP.getScriptStatus, goal, { pending: null }) ?? {};
   // --- provers
   const available = States.useSyncArrayData(WP.ProverInfos);
-  const [ provers=[], setProvers ] = States.useSyncState(WP.provers);
+  const [provers = [], setProvers] = States.useSyncState(WP.provers);
   // --- sidebar & toolbar states
-  const [ copied, setCopied ] = React.useState(false);
-  const [ tactic, setTactic ] = React.useState<Tactic>();
-  const [ prover, setProver ] = React.useState<Prover>();
+  const [copied, setCopied] = React.useState(false);
+  const [tactic, setTactic] = React.useState<Tactic>();
+  const [prover, setProver] = React.useState<Prover>();
   // --- printer settings
-  const [ autofocus, setAF ] = Dome.useBoolSettings('wp.tip.autofocus', true);
-  const [ memory, setMEM ] = Dome.useBoolSettings('wp.tip.unmangled', true);
-  const [ iformat, setIformat ] = Dome.useWindowSettings<TIP.iformat>(
+  const [autofocus, setAF] = Dome.useBoolSettings('wp.tip.autofocus', true);
+  const [memory, setMEM] = Dome.useBoolSettings('wp.tip.unmangled', true);
+  const [iformat, setIformat] = Dome.useWindowSettings<TIP.iformat>(
     'wp.tip.iformat', TIP.jIformat, 'dec'
   );
-  const [ rformat, setRformat ] = Dome.useWindowSettings<TIP.rformat>(
+  const [rformat, setRformat] = Dome.useWindowSettings<TIP.rformat>(
     'wp.tip.rformat', TIP.jRformat, 'ratio'
   );
 
@@ -271,13 +287,13 @@ export function TIPView(props: TIPProps): JSX.Element {
   const configuredTactic = nodeTactic ?? tactic;
 
   // --- current prover
-  const onSelectedProver = React.useCallback((prv) => {
+  const onSelectedProver = React.useCallback((prv: Prover) => {
     setTactic(undefined);
     setProver(prv);
   }, []);
 
   // --- current tactic
-  const onSelectedTactic = React.useCallback((tac) => {
+  const onSelectedTactic = React.useCallback((tac: Tactic) => {
     setTactic(tac);
     setProver(undefined);
   }, []);
@@ -288,7 +304,7 @@ export function TIPView(props: TIPProps): JSX.Element {
   };
 
   // --- Delete button
-  const deleteAble = locked || above.length > 0;
+  const deleteAble = locked || children.length > 0;
   const onDelete = (): void => {
     const request = locked ? TIP.clearNodeTactic : TIP.clearParentTactic;
     Server.send(request, current);
@@ -298,22 +314,22 @@ export function TIPView(props: TIPProps): JSX.Element {
   // --- Next button
   const nextIndex =
     pending <= 0 ? undefined :
-    pending === 1 ? (index === 0 ? undefined : 0) :
-    (index + 1 < pending ? index + 1 : 0);
+      pending === 1 ? (index === 0 ? undefined : 0) :
+        (index + 1 < pending ? index + 1 : 0);
   const prevIndex =
     pending <= 0 ? undefined :
-    pending === 1 ? (index === 0 ? undefined : 0) :
-    (index < 1 ? pending - 1 : index - 1);
+      pending === 1 ? (index === 0 ? undefined : 0) :
+        (index < 1 ? pending - 1 : index - 1);
   const nextAble = goal !== undefined && nextIndex !== undefined;
   const prevAble = goal !== undefined && prevIndex !== undefined;
   const nextTitle =
     nextIndex !== undefined
-    ? `Goto Next Pending Goal (#${nextIndex+1} / ${pending})`
-    : `Goto Next Pending Goal (if any)`;
+      ? `Goto Next Pending Goal (#${nextIndex + 1} / ${pending})`
+      : `Goto Next Pending Goal (if any)`;
   const prevTitle =
     prevIndex !== undefined
-    ? `Goto Previous Pending Goal (#${prevIndex+1} / ${pending})`
-    : `Goto Previous Pending Goal (if any)`;
+      ? `Goto Previous Pending Goal (#${prevIndex + 1} / ${pending})`
+      : `Goto Previous Pending Goal (if any)`;
   const onNext = (): void => {
     Server.send(TIP.goToIndex, [goal, nextIndex]);
   };
@@ -325,15 +341,21 @@ export function TIPView(props: TIPProps): JSX.Element {
   return (
     <Vfill display={display}>
       <ToolBar>
-        <Cell
-          icon='HOME'
-          label={infos.wpo} title='Goal identifier' />
+        <Cell icon='HOME' label={infos.wpo} title='Goal identifier' />
         <Item
           icon='CODE'
           display={0 <= index && index < pending && 1 < pending}
-          label={`${index+1}/${pending}`} title='Pending proof nodes'/>
-        <Item {...getStatus(infos)}/>
-        <Filler/>
+          label={`${index + 1}/${pending}`} title='Pending proof nodes' />
+        <Item {...getStatus(infos)} />
+        <IconButton
+          display={size > 1}
+          icon='CIRC.PLUS' selected={subtree} onClick={flipT}
+          title='Show all tactic nodes' />
+        <IconButton
+          display={size > 1}
+          icon='CIRC.CHECK' selected={unproved} onClick={flipU}
+          title='Show unproved sub-goals only' />
+        <Filler />
         <IconButton
           icon={copied ? 'DUPLICATE' : (saved ? 'FOLDER' : 'FOLDER.OPEN')}
           visible={script !== undefined}
@@ -342,13 +364,13 @@ export function TIPView(props: TIPProps): JSX.Element {
         <ButtonGroup>
           <Button
             icon='RELOAD'
-            enabled={ script !== undefined && !saved }
+            enabled={script !== undefined && !saved}
             title='Replay Proof Script from Disk'
             onClick={onReload}
           />
           <Button
             icon='SAVE'
-            enabled={ proof && !saved }
+            enabled={proof && !saved}
             title='Save Proof Script on Disk'
             onClick={onSave}
           />
@@ -363,7 +385,7 @@ export function TIPView(props: TIPProps): JSX.Element {
           <Button
             icon='CROSS'
             kind='negative'
-            enabled={ proof || script !== undefined }
+            enabled={proof || script !== undefined}
             title='Clear Proof and Remove Script (if any)'
             onClick={onTrash}
           />
@@ -391,9 +413,9 @@ export function TIPView(props: TIPProps): JSX.Element {
       </ToolBar>
       <Hfill>
         <NavBar
-          above={above}
-          below={below}
           current={current}
+          parents={parents}
+          subgoals={children}
         />
         <Vfill className='dome-positionned'>
           <Overlay display className='wp-printer'>
@@ -408,8 +430,8 @@ export function TIPView(props: TIPProps): JSX.Element {
             <AFormatSelector
               value={memory} setValue={setMEM}
               label='MEM' title='Memory model internals.' />
-            <IFormatSelector value={iformat} setValue={setIformat}/>
-            <RFormatSelector value={rformat} setValue={setRformat}/>
+            <IFormatSelector value={iformat} setValue={setIformat} />
+            <RFormatSelector value={rformat} setValue={setRformat} />
           </Overlay>
           <GoalView
             node={current}

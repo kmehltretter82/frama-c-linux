@@ -134,8 +134,7 @@
   18:{  } → 2:{ x1; x2 }   20:{ b } → 16:{  }   21:{ z1 } → 8:{  }
   22:{ a } → 14:{  }
 [alias] Summary of function main:
-  formals:     locals: x1  x2  tab_y  z1  z2  t  a  b  __retres
-  returns: __retres
+  formals:     returns: __retres
   state: { (t->t)->s; z1->s; z2->s; tab_y[0..] }  { t->t; z1 }
          { (t->t)->c; z1->c; t->d; a }  { z2->c; b }
 [alias] Analysis complete

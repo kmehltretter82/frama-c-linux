@@ -33,7 +33,6 @@
 , ppx_deriving
 , ppx_deriving_yaml
 , ppx_deriving_yojson
-, ppx_import
 , unionFind
 , yojson
 , which
@@ -96,7 +95,6 @@ stdenvNoCC.mkDerivation rec {
     ppx_deriving
     ppx_deriving_yaml
     ppx_deriving_yojson
-    ppx_import
     unionFind
     yojson
     which
@@ -145,8 +143,12 @@ stdenvNoCC.mkDerivation rec {
     export FRAMAC_WP_CACHEDIR=$wp_cache
   '';
 
+  # The export NIX_GCC_DONT_MANGLE_PREFIX_MAP is meant to disable the
+  # transformation of the path of Frama-C into uppercase when using the
+  # __FILE__ macro.
   checkPhase = ''
     runHook preCheck
+    export NIX_GCC_DONT_MANGLE_PREFIX_MAP=
     dune exec -- frama-c-ptests -never-disabled tests src/plugins/*/tests
     dune build -j1 --display short @ptests_config
   '';

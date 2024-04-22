@@ -443,6 +443,16 @@ let append_loop_labels env =
   Lenv.add_logic_label "LoopEntry" Logic_const.loop_entry_label
     (Lenv.add_logic_label "LoopCurrent" Logic_const.loop_current_label env)
 
+let builtin_label = function
+  | "Init" -> Some Init
+  | "Pre" -> Some Pre
+  | "Old" -> Some Old
+  | "Post" -> Some Post
+  | "Here" -> Some Here
+  | "LoopCurrent" -> Some LoopCurrent
+  | "LoopEntry" -> Some LoopEntry
+  | _ -> None
+
 let add_var var info env = Lenv.add_var var info env
 
 let add_result env typ =
@@ -2604,7 +2614,7 @@ struct
           (match lv.lv_type with
            | Ctype (TVoid _)->
              if ctxt.silent then raise Backtrack;
-             ctxt.error (CurrentLoc.get())
+             ctxt.error (Current_loc.get())
                "Variable %s is bound to a predicate, not a term" x
            | _ -> old_val lv)
         with Not_found ->
@@ -3622,29 +3632,9 @@ struct
 
   let plain_logic_type loc env t = logic_type (base_ctxt env) loc env t
 
-  (* For Widen_hints and Widen_variables, we check that the arguments of the
-     pragma can be understood later. Keep this code synchronized with
-     src/plugins/eva/utils/widen.ml. *)
   let loop_pragma env p =
-    let accept_int = function
-        { term_node = TConst (Integer _)} -> true | _ -> false
-    in
-    let accept_var = function
-        { term_node = TLval (TVar {lv_origin = Some _}, _)} -> true | _ -> false
-    in
-    (* fail when the translation of [p] does not verify the predicate [accept]*)
-    let term_accept accept p =
-      let t = term env p in
-      if not (accept t) then
-        C.error t.term_loc "invalid pragma '%a'" Cil_printer.pp_term t;
-      t
-    in
     match p with
     | Unroll_specs l -> Cil_types.Unroll_specs (List.map (term env) l)
-    | Widen_variables l -> Cil_types.Widen_variables (List.map (term_accept accept_var) l)
-    | Widen_hints l ->
-      let accept t = accept_int t || accept_var t in
-      Cil_types.Widen_hints (List.map (term_accept accept) l)
 
   let model_annot loc ti =
     let env = Lenv.empty() in
@@ -4099,8 +4089,9 @@ struct
     | TDsyn typ -> LTsyn (plain_logic_type loc env typ)
 
   let rec annot in_axiomatic a =
+    let open Current_loc.Operators in
     let loc = a.decl_loc in
-    Cil.CurrentLoc.set loc;
+    let<> UpdatedCurrentLoc = loc in
     match a.decl_node with
     | LDlogic_reads (f, labels, poly, t, p, l) ->
       let env,info = logic_decl loc f labels poly ~return_type:t p in

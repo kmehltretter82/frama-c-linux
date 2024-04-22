@@ -287,7 +287,14 @@ Apart from these default platforms, it is possible to give as argument
 to \texttt{-machdep} option the path of a YAML file containing the information
 needed by \FramaC. The Plug-in Development Guide~\cite{plugin-dev-guide} describes
 this format in more detail, as well as the use of the \texttt{make\_machdep.py}
-script to automatically generate it.
+script to automatically generate it. The YAML schema contains a list of builtin
+macros with their values. However, any such \texttt{MACRO} can be undefined by passing
+\texttt{-UMACRO} in the preprocessor arguments
+(using \texttt{-cpp-extra-args} or its per-file counterpart as in Sect.~\ref{sec:preprocessing},
+or a compilation database as in Sect.~\ref{sec:using-json-comp}). In addition,
+since compilers tend to define builtin macros with a varying number of
+underscores as prefix and suffix, \texttt{-UMACRO} will also undefine
+\texttt{\_MACRO}, \texttt{\_\_MACRO}, \texttt{\_\_MACRO\_\_}, etc.
 
 \item \optiondef{-}{simplify-cfg} allows \FramaC to remove break, continue and
   switch statements. This option is automatically set by some plug-ins that
@@ -593,6 +600,36 @@ defined in GNU/Linux's libc, and may differ from those in your system.
 As stated before, if you want to ensure the code analyzed by \FramaC is
 strictly equivalent to the one from the target system, you must either
 proofread the definitions, or provide your own library files.
+
+\subsection*{Portability considerations}
+
+A few POSIX types are specified in an abstract way: {\em not required to be
+  arithmetic types}. This enables them to be defined as e.g. structures.
+Portable code using these types must not inspect them or apply operators
+that are only compatible with arithmetic types (e.g. comparing them with
+\texttt{NULL}). However, such comparisons do exist in the wild, and their
+parsing leads to two issues:
+\begin{itemize}
+\item \FramaC will fail parsing with a generic typing error message;
+\item the user may be unable or unwilling to modify the non-portable code,
+  since they may assume a specific libc implementation that uses an arithmetic
+  type.
+\end{itemize}
+The table below lists a few of such types that currently have special support
+in \FramaC's libc: by adding {\em \#define} macros to the preprocessing
+command-line (e.g. via \texttt{-cpp-extra-args=-D<macro>}), the user can ask
+\FramaC to handle such types as arithmetic.
+
+\begin{table}[!ht]
+  \centering
+  \begin{tabular}{l|l|l}
+    \textbf{Type name} & \textbf{Header} & \textbf{Macro name} \\
+    \midrule
+    \lstinline|pthread_t| & \lstinline|sys/types.h| & \lstinline|__FC_PTHREAD_T_IS_SCALAR| \\
+    \lstinline|fexcept_t| & \lstinline|fenv.h| & \lstinline|__FC_FEXCEPT_T_IS_SCALAR| \\
+  \end{tabular}
+\end{table}
+
 
 \section{Warnings during normalization}\label{sec:warnings-normalize}
 

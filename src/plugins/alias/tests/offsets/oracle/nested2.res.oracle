@@ -84,7 +84,7 @@
   3:{  } -t→ 13:{ z1 }   3:{  } -d→ 14:{ a }   6:{  } → 7:{  }
   7:{  } → 8:{ x1; x2 }   13:{ z1 } → 1:{  }   14:{ a } → 5:{  }
 [alias] Summary of function main:
-  formals:     locals: x1  x2  z1  t  a  __retres    returns: __retres
+  formals:     returns: __retres
   state: { t->t; z1 }  { (t->t)->c; z1->c; t->d; a }  { (t->t)->s; z1->s }
          { (t->t)->s[0..]; z1->s[0..] }
 [alias] Analysis complete

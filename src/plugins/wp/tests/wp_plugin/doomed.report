@@ -2,7 +2,7 @@
 @ZERO "   -"
         &30:   Qed Ergo Failed
 @PROPERTY
-  %name &30: %qed %alt-ergo %failed
+  %name &30: %qed %Alt-Ergo %failed
 @END
 @TAIL
 -------------------------------------------------------------

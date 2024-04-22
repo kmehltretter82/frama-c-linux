@@ -681,7 +681,12 @@ struct
         | ACSLDEF -> C.call_fun env result f ls vs
         | HACK phi -> phi vs
         | LFUN f -> e_fun ~result f vs
-      in Vexp r
+      in
+      begin match t.term_type with
+        | Ctype t -> Lang.assume (Cvalues.has_ctype t r)
+        | _ -> ()
+      end ;
+      Vexp r
 
     | Tlambda _ ->
       Warning.error "Lambda-functions not yet implemented"
@@ -998,13 +1003,13 @@ struct
     p
 
   let pred polarity env p =
-    Context.with_current_loc p.pred_loc (pred_trigger polarity env) p
+    Current_loc.with_loc p.pred_loc (pred_trigger polarity env) p
 
   let logic env t =
-    Context.with_current_loc t.term_loc (term_trigger env) t
+    Current_loc.with_loc t.term_loc (term_trigger env) t
 
   let region env t =
-    Context.with_current_loc t.term_loc (assignable env) t
+    Current_loc.with_loc t.term_loc (assignable env) t
 
   let () = C.bootstrap_pred pred
   let () = C.bootstrap_term term

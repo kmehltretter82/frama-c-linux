@@ -4,9 +4,10 @@ let
     # External Packages
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
     combinetura = oself.callPackage ./combinetura.nix {};
-    headache = oself.callPackage ./headache.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
-    ocplib-simplex = oself.callPackage ./ocplib-simplex.nix {};
+    odoc = oself.callPackage ./odoc.nix {};
+    odoc-parser = oself.callPackage ./odoc-parser.nix {};
+    ppxlib = oself.callPackage ./ppxlib.nix {};
     why3 = oself.callPackage ./why3.nix {};
 
     # Helpers
@@ -68,8 +69,8 @@ let
     niv = (import sources.niv {}).niv;
     ocaml-ng = super.lib.mapAttrs (
       name: value:
-        if builtins.hasAttr "overrideScope'" value
-        then value.overrideScope' ocamlOverlay
+        if builtins.hasAttr "overrideScope" value
+        then value.overrideScope ocamlOverlay
         else value
     ) super.ocaml-ng;
     inherit (super.callPackage sources."gitignore.nix" {}) gitignoreSource;

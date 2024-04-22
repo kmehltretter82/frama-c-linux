@@ -16,5 +16,5 @@
   @ ensures qed_ko: 0<=t<128 ; */
 void f(void) {return;}
 
-//@ ensures A: x(p) <= 255 ;
+//@ ensures A: *p == x(p) <= 255 ;
 void g(unsigned char* p){}

@@ -441,7 +441,8 @@ module Make_Dataflow
     Async.yield ();
     check_signals ();
     current_ki := kinstr;
-    Cil.CurrentLoc.set e.edge_loc;
+    let open Current_loc.Operators in
+    let<> UpdatedCurrentLoc = e.edge_loc in
     let flow = Partitioning.transfer (transfer_transition transition) flow in
     let flow = process_partitioning_transitions v1 v2 transition flow in
     if not (Partitioning.is_empty_flow flow) then
@@ -461,14 +462,10 @@ module Make_Dataflow
 
   let update_vertex ?(widening : bool = false) (v : vertex)
       (sources : ('branch * flow) list) : bool =
-    begin match v.vertex_start_of with
-      | Some stmt ->
-        (* Set location *)
-        current_ki := Kstmt stmt;
-        let current_loc = Cil_datatype.Stmt.loc stmt in
-        Cil.CurrentLoc.set current_loc
-      | None -> ()
-    end;
+    Option.iter (fun stmt -> current_ki := Kstmt stmt) v.vertex_start_of;
+    let location = Option.map Cil_datatype.Stmt.loc v.vertex_start_of in
+    let open Current_loc.Operators in
+    let<?> UpdatedCurrentLoc = location in
     (* Get vertex store *)
     let store = get_vertex_store v in
     (* Join incoming states *)

@@ -896,6 +896,11 @@ int heap_allocated(uintptr_t addr, size_t size, uintptr_t base_ptr) {
 
 int unsafe_freeable(void *ptr) { /* + */
   uintptr_t addr = (uintptr_t)ptr;
+
+  memory_location *safeloc = get_safe_location(addr, 1);
+  if (safeloc != NULL)
+    safeloc->freeable;
+
   /* Address is not on the program's heap, so cannot be freed */
   if (!IS_ON_HEAP(addr))
     return 0;

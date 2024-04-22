@@ -1079,10 +1079,9 @@ val constFoldToInt: ?machdep:bool -> exp -> Integer.t option
 val constFoldTermNodeAtTop:  term_node -> term_node
 
 (** Do constant folding on an term.
-    If the first argument is true then
-    will also compute compiler-dependent expressions such as [sizeof]
-    and [alignof]. *)
-val constFoldTerm: bool -> term -> term
+    @before Frama-C+Dev takes a boolean [machdep] to decide if we actually do
+            the fold or not. *)
+val constFoldTerm: term -> term
 
 (** Do constant folding on a {!Cil_types.offset}. If the second argument is true
     then will also compute compiler-dependent expressions such as [sizeof]. *)
@@ -2280,12 +2279,7 @@ val constFoldVisitor: bool -> cilVisitor
 (** {2 Debugging support} *)
 (* ************************************************************************* *)
 
-(** A reference to the current location. If you are careful to set this to
-    the current location then you can use some built-in logging functions that
-    will print the location. *)
-module CurrentLoc: State_builder.Ref with type data = location
-
-(** Pretty-print [(Cil.CurrentLoc.get ())] *)
+(** Pretty-print [(Current_loc.get ())] *)
 val pp_thisloc: Format.formatter -> unit
 
 (** @return a dummy specification *)

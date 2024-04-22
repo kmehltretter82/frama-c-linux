@@ -21,68 +21,51 @@
 /**************************************************************************/
 
 #include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 
 #include "../../internals/e_acsl_config.h"
 #include "e_acsl_safe_locations.h"
 
-/* An array storing safe locations up to `safe_location_counter` position.
+/* An array storing safe locations up to `loc_count` position.
  * This array should be initialized via a below function called
  * `collect_safe_locations`. */
-static __thread memory_location safe_locations[16];
-static __thread int safe_location_counter = 0;
+static __thread memory_location locs[16];
+static __thread int loc_count = 0;
 
-#define add_safe_location(_addr, _len, _init, _on_static)                      \
+// These variables allow for an optimisation of get_safe_location.
+static __thread uintptr_t min_addr = __UINTPTR_MAX__;
+static __thread uintptr_t max_addr = 0;
+
+#define add_safe_location(_name, _addr, _len, _init, _writeable, _freeable)    \
   do {                                                                         \
-    safe_locations[safe_location_counter].name = #_addr;                       \
-    safe_locations[safe_location_counter].address = _addr;                     \
-    safe_locations[safe_location_counter].length = _len;                       \
-    safe_locations[safe_location_counter].is_initialized = _init;              \
-    safe_locations[safe_location_counter].is_on_static = _on_static;           \
-    safe_location_counter++;                                                   \
+    min_addr = min_addr <= _addr ? min_addr : _addr;                           \
+    max_addr = max_addr >= _addr + _len ? max_addr : _addr + _len;             \
+    locs[loc_count].name = _name;                                              \
+    locs[loc_count].address = _addr;                                           \
+    locs[loc_count].length = _len;                                             \
+    locs[loc_count].initialized = _init;                                       \
+    locs[loc_count].writeable = _writeable;                                    \
+    locs[loc_count].freeable = _freeable;                                      \
+    loc_count++;                                                               \
   } while (0)
-
-struct segment_boundaries safe_locations_boundaries = {
-    .start = 0,
-    .end = 0,
-};
-
-uintptr_t get_safe_locations_start() {
-  uintptr_t min = get_safe_location(0)->address;
-  for (int i = 1; i < get_safe_locations_count(); i++) {
-    memory_location *location = get_safe_location(i);
-    if (min >= location->address)
-      min = location->address;
-  }
-  return min;
-}
-
-uintptr_t get_safe_locations_end() {
-  uintptr_t max = get_safe_location(0)->address;
-  for (int i = 1; i < get_safe_locations_count(); i++) {
-    memory_location *location = get_safe_location(i);
-    if (max <= location->address)
-      max = location->address;
-  }
-  return max;
-}
 
 void collect_safe_locations() {
   /* Tracking of errno and standard streams */
-  add_safe_location((uintptr_t)&errno, sizeof(int), 1, E_ACSL_OS_IS_LINUX);
-  add_safe_location((uintptr_t)stdout, sizeof(FILE), 1, E_ACSL_OS_IS_LINUX);
-  add_safe_location((uintptr_t)stderr, sizeof(FILE), 1, E_ACSL_OS_IS_LINUX);
-  add_safe_location((uintptr_t)stdin, sizeof(FILE), 1, E_ACSL_OS_IS_LINUX);
-  safe_locations_boundaries.start = get_safe_locations_start();
-  safe_locations_boundaries.end = get_safe_locations_end();
+  add_safe_location("&errno", (uintptr_t)&errno, sizeof(int), 1, 1, 0);
+  add_safe_location("stdout", (uintptr_t)stdout, sizeof(FILE), 1, 1, 0);
+  add_safe_location("stderr", (uintptr_t)stderr, sizeof(FILE), 1, 1, 0);
+  add_safe_location("stdin", (uintptr_t)stdin, sizeof(FILE), 1, 0, 0);
 }
 
-/* collect_safe_locations(); */
-
-size_t get_safe_locations_count() {
-  return safe_location_counter;
-}
-
-memory_location *get_safe_location(size_t i) {
-  return &safe_locations[i];
+memory_location *get_safe_location(uintptr_t addr, long size) {
+  if (addr < min_addr || addr > max_addr) // covers virtually all cases
+    return NULL;
+  for (int i = 0; i < loc_count; i++) {
+    memory_location safeloc = locs[i];
+    if (addr >= safeloc.address
+        && addr + size <= safeloc.address + safeloc.length)
+      return &locs[i];
+  }
+  return NULL;
 }

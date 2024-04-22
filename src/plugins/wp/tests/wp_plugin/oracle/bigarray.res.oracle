@@ -1,6 +1,6 @@
 # frama-c -wp [...]
 [kernel] Parsing bigarray.c (with preprocessing)
-[kernel] bigarray.c:19: Warning: 
+[kernel] bigarray.c:15: Warning: 
   Cannot represent length of array as an attribute
 [wp] Running WP plugin...
 [wp] [Valid] Goal f_exits (Cfg) (Unreachable)

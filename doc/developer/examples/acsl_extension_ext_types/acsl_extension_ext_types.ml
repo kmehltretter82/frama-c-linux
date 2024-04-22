@@ -38,5 +38,5 @@ let printer = gen_printer false
 let short_printer = gen_printer true
 
 let () =
-  Acsl_extension.register_global
+  Acsl_extension.register_global ~plugin:"tloader"
     "ext_type" ~preprocessor typer ~visitor ~printer ~short_printer false

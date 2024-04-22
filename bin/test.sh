@@ -81,6 +81,7 @@ function Usage
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
     echo "  -j|--jobs <jobs>    run no more than <jobs> commands simultaneously."
+    echo "  --watch             run dune in watch mode."
     echo "  --coverage          compute test coverage in html format"
     echo "  --coverage-xml      compute test coverage in Cobertura XML format"
     echo "  --coverage-json     compute test coverage in Coveralls JSON format"
@@ -170,6 +171,9 @@ do
         "-u"|"--update")
             DUNE_OPT+="--auto-promote "
             UPDATE=yes
+            ;;
+        "--watch")
+            DUNE_OPT+="--watch "
             ;;
         "-v"|"--verbose")
             DUNE_OPT+="--display=short "

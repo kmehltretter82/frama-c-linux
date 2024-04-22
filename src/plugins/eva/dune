@@ -45,7 +45,7 @@
  (libraries frama-c.kernel frama-c-server.core frama-c-postdominators.core)
  (instrumentation (backend landmarks))
  (instrumentation (backend bisect_ppx))
- (preprocess (staged_pps ppx_deriving.eq ppx_deriving.ord)))
+ (preprocess (pps ppx_deriving.eq ppx_deriving.ord)))
 
 (plugin
  (name eva)
@@ -112,8 +112,9 @@
  (mode (promote (only Eva.mli)))
  (deps
   gen-api.sh Eva.header
-  engine/analysis.mli types/callstack.mli utils/results.mli parameters.mli
-  utils/eva_annotations.mli eval.mli domains/cvalue/builtins.mli
-  utils/cvalue_callbacks.mli legacy/logic_inout.mli utils/eva_results.mli
+  engine/analysis.mli types/callstack.mli types/deps.mli utils/results.mli parameters.mli
+  utils/eva_annotations.mli eval.mli types/assigns.mli
+  domains/cvalue/builtins.mli utils/cvalue_callbacks.mli legacy/logic_inout.mli
+  utils/eva_results.mli
   utils/unit_tests.mli)
  (action (run bash %{deps})))

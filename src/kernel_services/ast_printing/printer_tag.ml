@@ -408,7 +408,7 @@ let loc_of_localizable = function
     Stmt.loc st
   | PIP ip -> Property.location ip
   | PVDecl (_,_,vi) ->
-    if vi.vglob
+    if vi.vglob && vi.vsource
     then Global.loc (Ast.def_or_last_decl vi)
     else vi.vdecl
   | PGlobal g -> Global.loc g

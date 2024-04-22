@@ -27,6 +27,7 @@ open Logic_const
 open Cil_types
 
 exception Not_well_formed of Cil_types.location * string
+exception Unknown_ext
 
 let rec unroll_type ?(unroll_typedef=true) = function
   | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
@@ -95,12 +96,14 @@ let logicCType t =
   in plain_or_set logicCType t
 
 let plain_array_to_ptr ty =
+  let open Current_loc.Operators in
   match unroll_type ty with
   | Ctype(TArray(ty,lo,attr) as tarr) ->
     let length_attr =
       match lo with
       | None -> []
-      | Some _ ->
+      | Some e ->
+        let<> UpdatedCurrentLoc = e.eloc in
         try
           let len = Cil.bitsSizeOf tarr in
           let len = try len / (Cil.bitsSizeOf ty)
@@ -1176,9 +1179,6 @@ let is_same_logic_type_info t1 t2 =
 let is_same_loop_pragma p1 p2 =
   match p1,p2 with
     Unroll_specs l1, Unroll_specs l2 -> is_same_list is_same_term l1 l2
-  | Widen_hints l1, Widen_hints l2 -> is_same_list is_same_term l1 l2
-  | Widen_variables l1, Widen_variables l2 -> is_same_list is_same_term l1 l2
-  | (Unroll_specs _ | Widen_hints _ | Widen_variables _), _ -> false
 
 let is_same_slice_pragma p1 p2 =
   match p1,p2 with
@@ -2299,7 +2299,7 @@ let is_trivial_annotation a =
     -> false
 
 let is_property_pragma = function
-  | Loop_pragma (Unroll_specs _ | Widen_hints _ | Widen_variables _)
+  | Loop_pragma (Unroll_specs _)
   | Slice_pragma (SPexpr _ | SPctrl | SPstmt)
   | Impact_pragma (IPexpr _ | IPstmt) -> false
 (* If at some time a pragma becomes something which should be proven,

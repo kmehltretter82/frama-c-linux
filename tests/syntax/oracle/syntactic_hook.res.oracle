@@ -36,12 +36,8 @@
   expression x ? x++ : x++. It is not always executed.
 [kernel] syntactic_hook.i:30: User Error: 
   Declaration of f does not match previous declaration from syntactic_hook.i:8 (different number of arguments).
-[kernel] syntactic_hook.i:30: Warning: 
-  [SH]: conflict with declaration of f at line 8: different number of arguments
-[kernel] syntactic_hook.i:30: User Error: 
-  Inconsistent formals
   28    }
   29    
   30    int f(int); //error: conflicting decls
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            ^
 [kernel] Frama-C aborted: invalid user input.

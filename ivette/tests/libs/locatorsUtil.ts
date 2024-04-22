@@ -25,11 +25,11 @@ import { Locator, Page } from "@playwright/test";
 /**
  * Locator to select "Console" in the right menu
  */
-export function getConsoleMenuItem(window: Page): Locator {
-  return window
-    .getByText("ViewsConsoleSource Code")
-    .getByText("Console")
-    .first();
+export function getConsoleView(window: Page): Locator {
+  window
+    .getByText("Other Plugins")
+    .click();
+  return window.getByText("Console").first();
 }
 
 /**
@@ -51,7 +51,7 @@ export function getShutDownServerButton(window: Page): Locator {
 /**
  * Locator to select the Console View
  */
-export function getConsoleView(window: Page): Locator {
+export function getConsoleComponent(window: Page): Locator {
   return window.locator(".cm-global-box");
 }
 
@@ -59,7 +59,11 @@ export function getConsoleView(window: Page): Locator {
  * Locator to select the Functions side bar when loading a file
  */
 export function getFunctionsSideBar(window: Page): Locator {
-  return window.locator(".dome-xSideBar").first();
+  return window.getByText("AST").first();
+}
+
+export function getMainFunction(window: Page): Locator {
+  return window.getByText("main", { exact: true });
 }
 
 export function getServerStatusLabel(window: Page): Locator {

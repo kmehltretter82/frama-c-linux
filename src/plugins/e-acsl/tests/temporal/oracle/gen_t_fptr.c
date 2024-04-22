@@ -14,29 +14,11 @@ int *foo(int *p)
   return q;
 }
 
-void __e_acsl_globals_init(void)
-{
-  static char __e_acsl_already_run = 0;
-  if (! __e_acsl_already_run) {
-    __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& foo),1UL);
-    __e_acsl_full_init((void *)(& foo));
-  }
-  return;
-}
-
-void __e_acsl_globals_clean(void)
-{
-  __e_acsl_delete_block((void *)(& foo));
-  return;
-}
-
 int main(int argc, char const **argv)
 {
   int __retres;
   int *q;
   __e_acsl_memory_init(& argc,(char ***)(& argv),8UL);
-  __e_acsl_globals_init();
   __e_acsl_store_block((void *)(& q),8UL);
   int *p = & argc;
   __e_acsl_temporal_store_nblock((void *)(& p),(void *)(& argc));
@@ -98,7 +80,6 @@ int main(int argc, char const **argv)
   __e_acsl_delete_block((void *)(& fp));
   __e_acsl_delete_block((void *)(& q));
   __e_acsl_delete_block((void *)(& p));
-  __e_acsl_globals_clean();
   __e_acsl_memory_clean();
   return __retres;
 }

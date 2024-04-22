@@ -119,7 +119,7 @@ module type ForwardsTransfer = sig
       [stmt] is the corresponding [If] statement, passed as information only. *)
 
   val doStmt: Cil_types.stmt -> t -> t stmtaction
-  (** The (forwards) transfer function for a statement. The [(Cil.CurrentLoc.get
+  (** The (forwards) transfer function for a statement. The [(Current_loc.get
       ())] * is set before calling this. The default action is to do the
       instructions * in this statement, if applicable, and continue with the
       successors. *)
@@ -188,14 +188,14 @@ module type BackwardsTransfer = sig
   (** Take the data from two successors and combine it *)
 
   val doStmt: Cil_types.stmt -> t action
-  (** The (backwards) transfer function for a branch. The [(Cil.CurrentLoc.get
+  (** The (backwards) transfer function for a branch. The [(Current_loc.get
       ())] is set before calling this. If it returns None, then we have some
       default handling. Otherwise, the returned data is the data before the
       branch (not considering the exception handlers) *)
 
   val doInstr: Cil_types.stmt -> Cil_types.instr -> t -> t action
   (** The (backwards) transfer function for an instruction. The
-      [(Cil.CurrentLoc.get ())] is set before calling this. If it returns None,
+      [(Current_loc.get ())] is set before calling this. If it returns None,
       then we have some default handling. Otherwise, the returned data is the
       data before the branch (not considering the exception handlers) *)
 

@@ -95,7 +95,7 @@ int rr = 1;
     int S5_tmp;
     int S6_tmp;
     int S7_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_opa;
@@ -199,7 +199,7 @@ int rr = 1;
     int S5_tmp;
     int S6_tmp;
     int S7_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_opa;
@@ -327,7 +327,7 @@ int opa(int r)
     int S5_tmp;
     int S6_tmp;
     int S7_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_opb;
@@ -428,7 +428,7 @@ int opa(int r)
     int S5_tmp;
     int S6_tmp;
     int S7_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_opb;
@@ -544,7 +544,7 @@ void opb(void)
     int S5_tmp;
     int S6_tmp;
     int S7_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_opc;
@@ -638,7 +638,7 @@ void opb(void)
     int S5_tmp;
     int S6_tmp;
     int S7_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_opc;
@@ -773,7 +773,7 @@ void opc(void)
     int S5_tmp;
     int S6_tmp;
     int S7_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
@@ -874,7 +874,7 @@ void opc(void)
     int S5_tmp;
     int S6_tmp;
     int S7_tmp;
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;

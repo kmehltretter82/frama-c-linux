@@ -25,7 +25,7 @@ open Cil_datatype
 
 module Tbl =
   Cil_state_builder.Kinstr_hashtbl
-    (Function_Froms)
+    (Eva.Assigns)
     (struct
       let name = "Callwise dependencies"
       let size = 17
@@ -36,7 +36,7 @@ let () = From_parameters.ForceCallDeps.set_output_dependencies [Tbl.self]
 let merge_call_froms table callsite froms =
   try
     let current = Kinstr.Hashtbl.find table callsite in
-    let new_froms = Function_Froms.join froms current in
+    let new_froms = Eva.Assigns.join froms current in
     Kinstr.Hashtbl.replace table callsite new_froms
   with Not_found ->
     Kinstr.Hashtbl.add table callsite froms
@@ -44,7 +44,7 @@ let merge_call_froms table callsite froms =
 (** State for the analysis of one function call *)
 type from_state = {
   current_function: Kernel_function.t (** Function being analyzed *);
-  table_for_calls: Function_Froms.t Kinstr.Hashtbl.t
+  table_for_calls: Eva.Assigns.t Kinstr.Hashtbl.t
 (** State of the From plugin for each statement containing a function call
     in the body of [current_function]. Updated incrementally each time
     Value analyses such a statement *);
@@ -59,7 +59,7 @@ let call_froms_stack : from_state list ref = ref []
 let record_callwise_dependencies_in_db call_site froms =
   try
     let previous = Tbl.find call_site in
-    Tbl.replace call_site (Function_Froms.join previous froms)
+    Tbl.replace call_site (Eva.Assigns.join previous froms)
   with Not_found -> Tbl.add call_site froms
 
 let call_for_individual_froms _callstack current_function _state call_type =
@@ -97,7 +97,7 @@ let end_record callstack froms =
 module MemExec =
   State_builder.Hashtbl
     (Datatype.Int.Hashtbl)
-    (Function_Froms)
+    (Eva.Assigns)
     (struct
       let size = 17
       let dependencies = [Tbl.self]
@@ -135,7 +135,7 @@ let record_for_individual_froms callstack kf pre_state value_res =
         let froms =
           if Eva.Analysis.save_results kf
           then compute_call_from_value_states kf (Lazy.force before_stmts)
-          else Function_Froms.top
+          else Eva.Assigns.top
         in
         if From_parameters.VerifyAssigns.get () then
           Eva.Logic_inout.verify_assigns kf ~pre:pre_state froms;

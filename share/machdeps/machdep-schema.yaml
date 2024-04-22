@@ -98,9 +98,17 @@ cpp_arch_flags:
 
 custom_defs:
   description: |
-    arbitrary text that will be reproduced verbatim in the generated
-    header
-  type: string
+    builtin macros (and their definition) for the given architecture and
+    compiler
+  type: list
+  items:
+    type: object
+    name:
+      description: macro name
+      type: string
+    value:
+      description: actual value
+      type: string
 
 eof:
 

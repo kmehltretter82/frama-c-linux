@@ -43,6 +43,5 @@
   0:{ y1; y2 } -s→ 1:{  }   1:{  } → 2:{ x1; x2 }   8:{ z } -t→ 9:{  }
   9:{  } → 0:{ y1; y2 }
 [alias] Summary of function main:
-  formals:     locals: x1  x2  y1  y2  z  __retres    returns: __retres
-  state: { (z.t)->s; y1.s; y2.s }
+  formals:     returns: __retres    state: { (z.t)->s; y1.s; y2.s }
 [alias] Analysis complete

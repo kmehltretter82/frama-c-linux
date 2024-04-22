@@ -194,6 +194,19 @@ export const jNumber: Decoder<number> = (js: json) => {
   }
 };
 
+/** JSON number in range with default value. */
+export function jRange(
+  min: number,
+  max: number,
+  def: number
+): Decoder<number> {
+  return (js: json): number => {
+    if (typeof js === 'number')
+      return Math.max(Math.min(js, max), min);
+    return def;
+  };
+}
+
 /** Primitive JSON number if it is an integer or throws JsonError. */
 export const jInt: Decoder<number> = (js: json) => {
   if (typeof js === 'number' && Number.isInteger(js)) {
@@ -203,6 +216,19 @@ export const jInt: Decoder<number> = (js: json) => {
     throw new JsonTypeError("integer", js);
   }
 };
+
+/** JSON number in range with default value. */
+export function jRangeInt(
+  min: number,
+  max: number,
+  def: number
+): Decoder<number> {
+  return (js: json): number => {
+    if (typeof js === 'number')
+      return Math.max(Math.min(Math.round(js), max), min);
+    return def;
+  };
+}
 
 /** Primitive JSON number or `0`. */
 export const jZero: Decoder<number> = (js: json) => (

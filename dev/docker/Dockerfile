@@ -26,7 +26,7 @@ RUN /init/install.sh \
   unzip \
   wget
 
-RUN bash -c "yes '' | sh <(curl -fsSL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)" --version 2.1.3
+RUN bash -c "yes '' | sh <(curl -fsSL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)" --version 2.1.5
 
 # Avoid using root (opam dislikes it)
 COPY add-user.sh /init/
@@ -281,7 +281,6 @@ RUN rm -rf /home/opam/.opam/${OCAML_VERSION}/lib/alt-ergo
 RUN rm -rf /home/opam/.opam/${OCAML_VERSION}/lib/lablgtk3
 RUN rm -rf /home/opam/.opam/${OCAML_VERSION}/lib/lablgtk3-sourceview3
 RUN rm -rf /home/opam/.opam/${OCAML_VERSION}/lib/ppx_deriving
-RUN rm -rf /home/opam/.opam/${OCAML_VERSION}/lib/ppx_import
 RUN rm -rf /home/opam/.opam/${OCAML_VERSION}/lib/ppx_tools
 RUN rm -rf /home/opam/.opam/${OCAML_VERSION}/lib/ppxlib
 RUN rm -rf /home/opam/.opam/${OCAML_VERSION}/lib/psmt2-frontend

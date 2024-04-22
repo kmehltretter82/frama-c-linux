@@ -41,7 +41,7 @@ class provers =
         in
         let selection = List.fold_left
             (fun acc e ->
-               match Why3Provers.find_opt e with
+               match Why3Provers.lookup e with
                | None -> acc
                | Some p -> S.add p acc)
             S.empty cmdline

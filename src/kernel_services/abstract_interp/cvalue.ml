@@ -422,37 +422,30 @@ module V = struct
       let i = project_ival v in
       let i = Ival.reinterpret_as_float fkind i in
       inject_ival i
-    with Not_based_on_null ->
-      if is_bottom v
-      then bottom
-      else topify_arith_origin v
+    with Not_based_on_null -> topify Origin.Arith v
 
   let cast_float_to_float fkind v =
     try
       let i = project_ival v in
       let i = Ival.cast_float_to_float fkind i in
       inject_ival i
-    with Not_based_on_null ->
-      if is_bottom v
-      then bottom
-      else topify_arith_origin v
+    with Not_based_on_null -> topify Origin.Arith v
 
   (* Auxiliary functions for cast and reinterpration to an integer type.
      [on_null] is the function to apply on the numerical part. *)
   let to_int on_null ~size ~signed v =
     let integer_part, pointer_part = split Base.null v in
     let integer_part'= on_null ~size ~signed integer_part in
-    (* ok_garbled indicates that we do _not_ create a (new) garbled mix *)
-    let pointer_part', ok_garbled =
-      if Int.ge size (Int.of_int (Bit_utils.sizeofpointer ())) ||
-         is_bottom pointer_part || is_imprecise pointer_part
-      then pointer_part, true
-      else topify_arith_origin pointer_part, false
+    (* no_garble indicates that we do _not_ create a (new) garbled mix *)
+    let no_garble =
+      Int.ge size (Int.of_int (Bit_utils.sizeofpointer ())) ||
+      is_bottom pointer_part || is_imprecise pointer_part
     in
-    if ok_garbled && integer_part' == integer_part then
+    if no_garble && integer_part' == integer_part then
       v (* both pointer and integer part are unchanged *)
     else
-      join (inject_ival integer_part') pointer_part'
+      let v = join (inject_ival integer_part') pointer_part in
+      if no_garble then v else topify Origin.Arith v
 
   let cast_int_to_int ~size ~signed v =
     to_int Ival.cast_int_to_int ~size ~signed v
@@ -465,10 +458,7 @@ module V = struct
       let v1 = project_ival v in
       let r = Ival.cast_float_to_int ~signed ~size v1 in
       inject_ival r
-    with Not_based_on_null ->
-      if is_bottom v
-      then v
-      else topify_arith_origin v
+    with Not_based_on_null -> topify Origin.Arith v
 
   let cast_float_to_int_inverse ~single_precision i =
     try
@@ -482,10 +472,7 @@ module V = struct
       let i = project_ival v in
       let r = Ival.cast_int_to_float kind i in
       inject_ival r
-    with Not_based_on_null ->
-      if is_bottom v
-      then bottom
-      else topify_arith_origin v
+    with Not_based_on_null -> topify Origin.Arith v
 
   let cast_int_to_float_inverse ~single_precision vf =
     try
@@ -496,7 +483,7 @@ module V = struct
 
   (** Binary functions *)
 
-  let import_function ~topify f e1 e2 =
+  let arithmetic_function f e1 e2 =
     try
       let v1 = project_ival e1 in
       let v2 = project_ival e2 in
@@ -504,13 +491,7 @@ module V = struct
     with Not_based_on_null  ->
       if is_bottom e1 || is_bottom e2
       then bottom
-      else begin
-        join
-          (topify_with_origin_kind topify e1)
-          (topify_with_origin_kind topify e2)
-      end
-
-  let arithmetic_function = import_function ~topify:Origin.Arith
+      else topify Origin.Arith (join e1 e2)
 
   (* Compute the pointwise difference between two Locations_Bytes.t. *)
   let sub_untyped_pointwise = sub_pointwise
@@ -521,7 +502,7 @@ module V = struct
      MinusPP, by setting [factor] accordingly. This is more precise than
      having multiple functions, as computations such as
      [(int)&t[1] - (int)&t[2]] would not be treated precisely otherwise. *)
-  let add_untyped ~topify ~factor e1 e2 =
+  let add_untyped ~origin ~factor e1 e2 =
     try
       if Int_Base.equal factor (Int_Base.minus_one)
       then
@@ -540,9 +521,7 @@ module V = struct
         try (* On the off chance that someone writes [i+(int)&p]... *)
           Location_Bytes.shift (project_ival_bottom e1) e2
         with Not_based_on_null ->
-          join
-            (topify_with_origin_kind topify e1)
-            (topify_with_origin_kind topify e2)
+          topify origin (join e1 e2)
       end
     with Not_found ->
     (* we end up here if the only way left to make this
@@ -551,9 +530,7 @@ module V = struct
       let right = Ival.scale_int_base factor (project_ival_bottom e2)
       in Location_Bytes.shift right e1
     with Not_based_on_null  -> (* from [project_ival] *)
-      join
-        (topify_with_origin_kind topify e1)
-        (topify_with_origin_kind topify e2)
+      topify origin (join e1 e2)
 
   (* Under-approximating variant of add_untyped. Takes two
      under-approximation, and returns an under-approximation.*)
@@ -600,13 +577,13 @@ module V = struct
     else if equal singleton_zero v2 then v1
     else if equal v1 v2 && cardinal_zero_or_one v1 then v1
     else
-      import_function ~topify:Origin.Arith Ival.bitwise_or v1 v2
+      arithmetic_function Ival.bitwise_or v1 v2
 
   let bitwise_and v1 v2 =
     if equal v1 v2 && cardinal_zero_or_one v1 then v1
     else
       let f i1 i2 = Ival.bitwise_and i1 i2 in
-      import_function ~topify:Origin.Arith f v1 v2
+      arithmetic_function f v1 v2
 
   let shift_right e1 e2 =
     arithmetic_function Ival.shift_right e1 e2
@@ -615,15 +592,14 @@ module V = struct
     try
       let i = project_ival v in
       inject_ival (Ival.bitwise_signed_not i)
-    with Not_based_on_null -> topify_arith_origin v
-
+    with Not_based_on_null -> topify Origin.Arith v
   let bitwise_not ~size ~signed v =
     try
       let i = project_ival v in
       inject_ival (Ival.bitwise_not ~size ~signed i)
-    with Not_based_on_null -> topify_arith_origin v
+    with Not_based_on_null -> topify Origin.Arith v
 
-  let extract_bits ~topify ~start ~stop ~size v =
+  let extract_bits ~topify:origin ~start ~stop ~size v =
     try
       let i = project_ival_bottom v in
       false, inject_ival (Ival.extract_bits ~start ~stop ~size i)
@@ -639,10 +615,10 @@ module V = struct
            Int.equal (Int.succ stop) ptr_size &&
            Int.equal size ptr_size
         then false, v
-        else true, topify_with_origin_kind topify v
+        else true, topify origin v
 
   (* Computes [e * 2^factor]. Auxiliary function for foo_endian_merge_bits *)
-  let shift_left_by_integer ~topify factor v =
+  let shift_left_by_integer ~topify:origin factor v =
     try
       let i = project_ival_bottom v in
       inject_ival (Ival.scale (Int.two_power factor) i)
@@ -650,7 +626,7 @@ module V = struct
     | Not_based_on_null  ->
       if Integer.is_zero factor
       then v
-      else topify_with_origin_kind topify v
+      else topify origin v
     | Z.Overflow -> top_int
 
   let restrict_topint_to_size value size =
@@ -662,19 +638,14 @@ module V = struct
     let v = restrict_topint_to_size v (Integer.to_int_exn size) in
     shift_left_by_integer ~topify offset v
 
-  let merge_distinct_bits ~topify ~conflate_bottom value acc =
+  let merge_distinct_bits ~topify:origin ~conflate_bottom value acc =
     if is_bottom acc || is_bottom value
-    then begin
+    then
       if conflate_bottom
-      then
-        bottom
-      else
-        join
-          (topify_with_origin_kind topify acc)
-          (topify_with_origin_kind topify value)
-    end
+      then bottom
+      else topify origin (join acc value)
     else
-      add_untyped ~topify ~factor:Int_Base.one value acc
+      add_untyped ~origin ~factor:Int_Base.one value acc
 
   (* neutral value for foo_endian_merge_bits *)
   let merge_neutral_element = singleton_zero
@@ -706,7 +677,7 @@ module V = struct
       Int.min card (Int.two_power size)
 
   let add_untyped ~factor v1 v2 =
-    add_untyped ~topify:Origin.Arith ~factor v1 v2
+    add_untyped ~origin:Origin.Arith ~factor v1 v2
 
 end
 

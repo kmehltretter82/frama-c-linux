@@ -54,9 +54,8 @@ function globalHints(): Ivette.Hint[] {
   }));
 }
 
-const globalMode : Ivette.ModeProps = {
+const globalMode : Ivette.SearchProps = {
   id: 'frama-c.kernel.globals',
-  rank: 1,
   label: 'Globals',
   title: 'Lookup for Global Declarations',
   placeholder: 'declaration',
@@ -64,13 +63,13 @@ const globalMode : Ivette.ModeProps = {
 };
 
 function resetMode(enabled: boolean): void {
-  Ivette.updateMode({ id: globalMode.id, enabled });
-  Ivette.selectMode(globalMode.id);
+  Ivette.updateSearchMode({ id: globalMode.id, enabled });
+  Ivette.selectSearchMode(globalMode.id);
 }
 
 {
-  Ivette.registerMode(globalMode);
-  Dome.find.on(() => Ivette.focusMode(globalMode.id));
+  Ivette.registerSearchMode(globalMode);
+  Dome.find.on(() => Ivette.focusSearchMode(globalMode.id));
   Server.onReady(() => resetMode(true));
   Server.onShutdown(() => resetMode(false));
   resetMode(false);

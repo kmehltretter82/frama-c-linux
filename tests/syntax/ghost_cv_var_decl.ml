@@ -14,12 +14,12 @@ let rec ghost_status fmt lval =
     Format.fprintf fmt " -> %a" comp_ghost_status lval
   | _ -> ()
 and pointed_ghost_status fmt lval =
-  let loc = Cil.CurrentLoc.get() in
+  let loc = Current_loc.get() in
   let exp = Cil.new_exp (Lval lval) ~loc in
   let lval = Mem(exp), NoOffset in
   Format.fprintf fmt "%a" ghost_status lval
 and in_array_ghost_status fmt lval =
-  let loc = Cil.CurrentLoc.get() in
+  let loc = Current_loc.get() in
   let lval = Cil.addOffsetLval (Index((Cil.zero ~loc), NoOffset)) lval in
   Format.fprintf fmt "%a" ghost_status lval
 and comp_ghost_status fmt lval =
@@ -38,7 +38,7 @@ class visitor = object(_)
 
   method! vvdec v =
     Kernel.feedback "%a@. %a: %a"
-      Cil_datatype.Location.pretty (Cil.CurrentLoc.get())
+      Cil_datatype.Location.pretty (Current_loc.get())
       Cil_datatype.Varinfo.pretty v
       ghost_status (Cil.var v) ;
     Cil.DoChildren

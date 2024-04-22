@@ -126,18 +126,12 @@ val indirect_zone_of_lval:
     on which the offset and the pointer expression (if any) of an lvalue depend.
 *)
 
-
-type deps = Function_Froms.Deps.deps = {
-  data: Locations.Zone.t;
-  indirect: Locations.Zone.t;
-}
-
 val deps_of_expr:
-  (lval -> Precise_locs.precise_location) -> exp -> deps
+  (lval -> Precise_locs.precise_location) -> exp -> Deps.t
 (** Given a function computing the location of lvalues, computes the memory
     dependencies of an expression. *)
 
-val deps_of_lval: (lval -> Precise_locs.precise_location) -> lval -> deps
+val deps_of_lval: (lval -> Precise_locs.precise_location) -> lval -> Deps.t
 (** Given a function computing the location of lvalues, computes the memory
     dependencies of an lvalue. *)
 

@@ -168,21 +168,15 @@ class postconditions_mention_result = object
     | _ -> Cil.DoChildren
 end
 let postconditions_mention_result spec =
-  (* We save the current location because the visitor modifies it. *)
-  let loc = Cil.CurrentLoc.get () in
   let vis = new postconditions_mention_result in
   let aux_bhv bhv =
     let aux (_, post) = ignore (Visitor.visitFramacIdPredicate vis post) in
     List.iter aux bhv.b_post_cond
   in
-  let res =
-    try
-      List.iter aux_bhv spec.spec_behavior;
-      false
-    with Exit -> true
-  in
-  Cil.CurrentLoc.set loc;
-  res
+  try
+    List.iter aux_bhv spec.spec_behavior;
+    false
+  with Exit -> true
 
 let conv_comp op =
   let module C = Abstract_interp.Comp in
@@ -285,20 +279,6 @@ let lval_to_exp =
   MemoLvalToExp.memo
     (fun lv -> Cil.new_exp ~loc:Cil_datatype.Location.unknown (Lval lv))
 
-type deps = Function_Froms.Deps.deps = {
-  data: Locations.Zone.t;
-  indirect: Locations.Zone.t;
-}
-
-let bottom_deps =
-  { data = Locations.Zone.bottom; indirect = Locations.Zone.bottom }
-
-let join_deps a b =
-  { data = Locations.Zone.join a.data b.data;
-    indirect = Locations.Zone.join a.indirect b.indirect; }
-
-let deps_to_zone deps = Locations.Zone.join deps.data deps.indirect
-
 (* Computation of the inputs of an expression. *)
 let rec deps_of_expr find_loc expr =
   let rec process expr = match expr.enode with
@@ -310,7 +290,7 @@ let rec deps_of_expr find_loc expr =
       process e
     | BinOp (_, e1, e2, _) ->
       (* Binary operators. *)
-      join_deps (process e1) (process e2)
+      Deps.join (process e1) (process e2)
     | StartOf lv | AddrOf lv ->
       (* computation of an address: the inputs of the lvalue whose address
          is computed are read to compute said address. *)
@@ -318,11 +298,11 @@ let rec deps_of_expr find_loc expr =
         indirect = Locations.Zone.bottom; }
     | Const _ | SizeOf _ | AlignOf _ | SizeOfStr _ | SizeOfE _ | AlignOfE _ ->
       (* static constructs, nothing is read to evaluate them. *)
-      bottom_deps
+      Deps.bottom
   in
   process expr
 
-and zone_of_expr find_loc expr = deps_to_zone (deps_of_expr find_loc expr)
+and zone_of_expr find_loc expr = Deps.to_zone (deps_of_expr find_loc expr)
 
 (* dereference of an lvalue: first, its address must be computed,
    then its contents themselves are read *)

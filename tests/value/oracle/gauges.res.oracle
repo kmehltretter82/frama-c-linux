@@ -338,6 +338,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
@@ -398,6 +399,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
@@ -457,6 +459,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
@@ -516,6 +519,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
@@ -581,6 +585,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
@@ -642,6 +647,7 @@
   Frama_C_dump_each:
   # cvalue:
   __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
@@ -713,7 +719,8 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     gauges.c:188: arithmetic operation on addresses
-      (read 14 times, propagated 12 times) garbled mix of &{x; y}
+      (read in 2 statements, propagated through 2 statements)
+      garbled mix of &{x; y}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main0:
   i ∈ {1; 162}

@@ -143,9 +143,11 @@
 [eva] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    leaf.i:55: assigns clause on addresses (read 10 times, propagated 2 times)
+    leaf.i:55: assigns clause on addresses
+      (read in 4 statements, propagated through 1 statement)
       garbled mix of &{pg}
-    leaf.i:50: assigns clause on addresses (read 4 times, propagated 2 times)
+    leaf.i:50: assigns clause on addresses
+      (read in 2 statements, propagated through 1 statement)
       garbled mix of &{g}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

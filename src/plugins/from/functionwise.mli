@@ -29,5 +29,5 @@ val self : State.t
 val compute : kernel_function -> unit
 val compute_all : unit -> unit
 val is_computed : kernel_function -> bool
-val get : Cil_types.kernel_function -> Function_Froms.froms
+val get : Cil_types.kernel_function -> Eva.Assigns.t
 val pretty : Format.formatter -> kernel_function -> unit

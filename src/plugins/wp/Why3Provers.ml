@@ -62,40 +62,6 @@ let configure =
 
 type t = Why3.Whyconf.prover
 
-(* In an ambiguous map of provers, tries to find the basic alternative, if none
-   is found, just give an arbitrary one. *)
-let resolve_ambiguity provers =
-  let open Why3.Whyconf in
-  let provers = fst @@ List.split @@ Mprover.bindings provers in
-  try List.find (fun p -> p.prover_altern = "") provers
-  with Not_found -> List.hd provers
-
-let find_opt s =
-  let open Why3.Whyconf in
-  try
-    let config = Lazy.force cfg in
-    let filter = parse_filter_prover s in
-    Some ((filter_one_prover config filter).prover)
-  with
-  | ParseFilterProver _ -> None
-  | ProverNotFound _ -> None
-  | ProverAmbiguity (_, _, provers)  -> Some (resolve_ambiguity provers)
-
-type fallback = Exact of t | Fallback of t | NotFound
-
-let find_fallback name =
-  match find_opt name with
-  | Some prv -> Exact prv
-  | None ->
-    match String.split_on_char ',' name with
-    | shortname :: _ :: _ ->
-      begin
-        match find_opt (String.lowercase_ascii shortname) with
-        | Some prv -> Fallback prv
-        | None -> NotFound
-      end
-    | _ -> NotFound
-
 let ident_why3 = Why3.Whyconf.prover_parseable_format
 let ident_wp s =
   let name = Why3.Whyconf.prover_parseable_format s in
@@ -133,18 +99,64 @@ let provers_set () : Why3.Whyconf.Sprover.t =
 let is_available p =
   Why3.Whyconf.Mprover.mem p (Why3.Whyconf.get_provers (config ()))
 
-let has_shortcut p s =
-  match Why3.Wstdlib.Mstr.find_opt s
-          (Why3.Whyconf.get_prover_shortcuts (config ())) with
-  | None -> false
-  | Some p' -> Why3.Whyconf.Prover.equal p p'
-
 let with_counter_examples p =
   if has_counter_examples p then Some p else
     let name = p.prover_name in
+    let version = p.prover_version in
     List.find_opt
-      (fun (q : t) -> q.prover_name = name && has_counter_examples q)
+      (fun (q : t) ->
+         q.prover_name = name &&
+         q.prover_version = version &&
+         has_counter_examples q)
     @@ provers ()
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Prover Lookup                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+(* semantical version comparison *)
+
+type sem = V of int | S of string
+let sem s = try V (int_of_string s) with Failure _ -> S s
+let cmp x y =
+  match x,y with
+  | V a,V b -> b - a
+  | V _,S _ -> (-1)
+  | S _,V _ -> (+1)
+  | S a,S b -> String.compare a b
+let scmp u v = cmp (sem u) (sem v)
+let vcmp u v =
+  List.compare scmp (String.split_on_char '.' u) (String.split_on_char '.' v)
+let by_version (p:t) (q:t) = vcmp p.prover_version q.prover_version
+
+let filter ~name ?version (p:t) =
+  p.prover_altern = "" &&
+  String.lowercase_ascii p.prover_name = name &&
+  match version with None -> true | Some v -> p.prover_version = v
+
+let select ~name ?version () =
+  match
+    List.sort by_version @@ List.filter (filter ~name ?version) @@ provers ()
+  with p::_ -> Some p | [] -> None
+
+let lookup ?(fallback=false) prover_name =
+  match String.split_on_char ':' @@ String.lowercase_ascii prover_name with
+  | [name] -> select ~name ()
+  | [name;version] ->
+    begin
+      match select ~name ~version () with
+      | Some _ as res -> res
+      | None ->
+        if fallback then
+          match select ~name () with
+          | None -> None
+          | Some p as res ->
+            Wp_parameters.warning ~once:true ~current:false
+              "Prover %s not found, fallback to %s" prover_name (ident_wp p) ;
+            res
+        else None
+    end
+  | _ -> None
 
 (* -------------------------------------------------------------------------- *)
 (* --- Models                                                             --- *)

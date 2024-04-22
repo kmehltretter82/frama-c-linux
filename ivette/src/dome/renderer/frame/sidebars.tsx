@@ -184,9 +184,11 @@ export interface ItemProps {
   /** Selection state. */
   selected?: boolean;
   /** Selection callback. */
-  onSelection?: () => void;
+  onSelection ?: (e: React.MouseEvent) => void
+  /** Double-click callback. */
+  onDoubleClick ?: (e: React.MouseEvent) => void
   /** Right-click callback. */
-  onContextMenu?: () => void;
+  onContextMenu?: (e: React.MouseEvent) => void;
   /** Additional class. */
   className?: string;
   /** Additional styles. */
@@ -201,10 +203,28 @@ export function Item(props: ItemProps): JSX.Element {
   const isDisabled = disabled || !enabled;
   const ref = React.useRef<HTMLDivElement>(null);
   const [clicked, setClicked] = React.useState(false);
-  const onSelection = isDisabled ? undefined : props.onSelection;
+
+  const fnClick = isDisabled ? undefined : props.onSelection;
   const onClick =
-    onSelection ? () => { setClicked(true); onSelection(); } : undefined;
-  const onContextMenu = isDisabled ? undefined : props.onContextMenu;
+    fnClick ? (e: React.MouseEvent) => {
+      setClicked(true);
+      fnClick(e);
+    } : undefined;
+
+  const fnDoubleClick = isDisabled ? undefined : props.onDoubleClick;
+  const onDoubleClick =
+    fnDoubleClick ? (e: React.MouseEvent) => {
+      setClicked(true);
+      fnDoubleClick(e);
+    } : undefined;
+
+  const fnContextMenu = isDisabled ? undefined : props.onContextMenu;
+  const onContextMenu =
+    fnContextMenu ? (e: React.MouseEvent) => {
+      setClicked(true);
+      fnContextMenu(e);
+    } : undefined;
+
   const className = classes(
     'dome-xSideBarItem',
     selected ? 'dome-active' : 'dome-inactive',
@@ -216,7 +236,7 @@ export function Item(props: ItemProps): JSX.Element {
     if (!clicked && selected) {
       ref?.current?.scrollIntoView({
         behavior: 'auto',
-        block: 'center',
+        inline: 'nearest',
       });
     }
     if (!selected && clicked)
@@ -229,8 +249,9 @@ export function Item(props: ItemProps): JSX.Element {
       className={className}
       style={props.style}
       title={props.title}
-      onContextMenu={onContextMenu}
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
+      onContextMenu={onContextMenu}
     >
       <Label icon={props.icon} label={props.label} />
       {props.children}

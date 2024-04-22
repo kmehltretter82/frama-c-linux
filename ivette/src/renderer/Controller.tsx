@@ -38,6 +38,7 @@ import { TextBuffer, TextView } from 'dome/text/richtext';
 import { resolve } from 'dome/system';
 
 import * as Ivette from 'ivette';
+import * as Display from 'ivette/display';
 import * as Server from 'frama-c/server';
 
 // --------------------------------------------------------------------------
@@ -225,7 +226,7 @@ export const Control = (): JSX.Element => {
 
 const editor = new TextBuffer();
 
-const RenderConsole = (): JSX.Element => {
+export function RenderConsole(): JSX.Element {
   const scratch = React.useRef([] as string[]);
   const [cursor, setCursor] = React.useState(-1);
   const [isEmpty, setEmpty] = React.useState(true);
@@ -400,34 +401,31 @@ const RenderConsole = (): JSX.Element => {
       />
     </>
   );
-};
-
-Ivette.registerComponent({
-  id: 'frama-c.console',
-  group: 'frama-c.kernel',
-  label: 'Console',
-  title: 'Frama-C Server Output & Command Line',
-  rank: -1,
-  children: <RenderConsole />,
-});
-
-Ivette.registerView({
-  id: 'console',
-  rank: -1,
-  label: 'Console',
-  layout: 'frama-c.console',
-});
+}
 
 // --------------------------------------------------------------------------
 // --- Status
 // --------------------------------------------------------------------------
+
+Server.onStatus((s: Server.Status) => {
+  switch (s) {
+    case Server.Status.OFF:
+    case Server.Status.STARTING:
+    case Server.Status.RESTARTING:
+      Display.clearMessages();
+      return;
+    case Server.Status.FAILURE:
+      Display.showError('Frama-C Server Failure');
+      Display.alertComponent('ivette.console');
+      return;
+  }
+});
 
 export const Status = (): JSX.Element => {
   const status = Server.useStatus();
   const pending = Server.getPending();
   let led: LEDstatus = 'inactive';
   let title = undefined;
-  let icon = undefined;
   let running = 'OFF';
   let blink = false;
 
@@ -470,27 +468,15 @@ export const Status = (): JSX.Element => {
       blink = true;
       running = 'ERR';
       title = 'Server halted because of failure';
-      icon = 'WARNING';
       break;
   }
 
   return (
     <>
       <LED status={led} blink={blink} />
-      <Code icon={icon} label={running} title={title} />
-      <Toolbars.Separator />
+      <Code label={running} title={title} />
     </>
   );
-};
-
-// --------------------------------------------------------------------------
-// --- Server Stats
-// --------------------------------------------------------------------------
-
-export const Stats = (): (null | JSX.Element) => {
-  Server.useStatus();
-  const pending = Server.getPending();
-  return pending > 0 ? <Code>{pending} rq.</Code> : null;
 };
 
 // --------------------------------------------------------------------------

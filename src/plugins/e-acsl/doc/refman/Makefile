@@ -8,7 +8,7 @@ include $(EACSL_DIR)/doc/Makefile.common
 ##########
 
 MAIN=main
-DEPS_MODERN=macros_modern.tex eacslversion.tex biblio.bib \
+DEPS_MODERN=macros_modern.tex biblio.bib \
 	intro_modern.tex speclang_modern.tex \
 	libraries_modern.tex concl_modern.tex changes_modern.tex \
 	term_modern.bnf binders_modern.bnf predicate_modern.bnf \
@@ -21,7 +21,8 @@ DEPS_MODERN=macros_modern.tex eacslversion.tex biblio.bib \
 	higherorder_modern.bnf logictypedecl_modern.bnf logicreads_modern.bnf \
 	allocation_modern.bnf abrupt_modern.bnf dependencies_modern.bnf \
 	volatile-gram_modern.bnf \
-	bsearch.c bsearch2.c link.c
+	bsearch.c bsearch2.c link.c \
+	$(VERSION_FILE)
 
 ##############
 # Main rules #

@@ -323,8 +323,6 @@ type spec = {
 
 type loop_pragma =
   | Unroll_specs of lexpr list
-  | Widen_hints of lexpr list
-  | Widen_variables of lexpr list
 
 (** Pragmas for the slicing plugin of Frama-C. *)
 and slice_pragma =

@@ -9,6 +9,7 @@
 --- Context 'typed_f' Cluster 'Compound' 
 ---------------------------------------------
 theory Compound
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -26,9 +27,11 @@ theory Compound
   (* use frama_c_wp.memaddr.MemAddr *)
   
   function shift_sint32 (p:addr) (k:int) : addr = shift p k
+  
 end
 [wp:print-generated] 
   theory WP
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -67,6 +70,7 @@ end
        valid_rw t a1 10 ->
        (forall i2:int. 0 <= i2 -> i2 <= 9 -> 0 <= get t1 (shift_sint32 a i2)) ->
        0 <= get (set m3 (shift_sint32 a 4) (get m3 a2)) (shift_sint32 a i)
+    
   end
 [wp] 1 goal generated
 ------------------------------------------------------------

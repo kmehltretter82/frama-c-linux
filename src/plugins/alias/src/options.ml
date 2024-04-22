@@ -40,13 +40,13 @@ module Enabled = False
 module ShowFunctionTable = False
     (struct
       let option_name = "-alias-show-function-table"
-      let help = "display summary for each function at the end of the analysis"
+      let help = "display summary for each function after the analysis"
     end)
 
 module ShowStmtTable = False
     (struct
       let option_name = "-alias-show-stmt-table"
-      let help = "display abstract state for each function at the end of the analysis"
+      let help = "display abstract state for each statement after the analysis"
     end)
 
 

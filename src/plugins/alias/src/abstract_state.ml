@@ -71,6 +71,8 @@ module G = struct
     | _ -> Options.fatal "Invariant violated: more than one successor"
 end
 
+type v = G.V.t
+
 module V = G.V
 module E = struct
   include G.E
@@ -107,7 +109,7 @@ let fresh_node_id () =
   node_counter := !node_counter + 1;
   id
 
-let find_varset v s : VarSet.t =
+let get_vars v s : VarSet.t =
   try VMap.find v s.vmap with Not_found -> VarSet.empty
 
 (* raises Not_found *)
@@ -139,10 +141,6 @@ let rec find_lval_vertex ((lhost, offset) : lval) s : V.t =
 
 module Readout = struct
 
-  let get_lval_set v s =
-    let mk_lval var = Var var, NoOffset in
-    LSet.of_seq @@ Seq.map mk_lval @@ VarSet.to_seq @@ find_varset v s
-
   (* Reconstruct all lvals that are represented by the given node.
      Nodes only carry varinfos. In order to obtain lvals we recursively walk
      backwards in the graph inductively constructing lvals from scratch.
@@ -151,7 +149,7 @@ module Readout = struct
        modified according to the edge type used:
        * Pointer: add a star (x → *x)
        * Field f: add an offset (x -> x.f) *)
-  let reconstruct_lvals s v : LSet.t =
+  let get_lval_set v s : LSet.t =
     assert (G.mem_vertex s.graph v);
     (* cycles can occur with unsafe casts such as: x->f = (int* ) x; *)
     let rec checking_for_cycles s visited v =
@@ -185,38 +183,79 @@ module Readout = struct
             )
             (G.pred_e s.graph v)
         in
-        let lvals_of_v = get_lval_set v s in
+        let lvals_of_v =
+          let mk_lval var = (Var var), NoOffset in
+          LSet.of_seq @@ Seq.map mk_lval @@ VarSet.to_seq @@ get_vars v s
+        in
         List.fold_left LSet.union lvals_of_v modified_predecessors
     in
     checking_for_cycles s VSet.empty v
 
   let lvals_pointing_to_vertex v s : LSet.t =
     assert (G.mem_vertex s.graph v);
-    let list_pred = List.map (reconstruct_lvals s) @@ G.ppred s.graph v in
+    let list_pred = List.map (fun b -> get_lval_set b s) (G.ppred s.graph v) in
     List.fold_left LSet.union LSet.empty list_pred
 
-  let find_aliases lv s =
+  let vars_pointing_to_vertex v s : VarSet.t =
+    let preds = G.ppred s.graph v in
+    let pred_vars = List.map (fun p -> get_vars p s) preds in
+    List.fold_left VarSet.union VarSet.empty pred_vars
+
+  let find_vars lv s =
+    let lv = Lval.simplify lv in
+    try let v = find_lval_vertex lv s in get_vars v s
+    with Not_found -> VarSet.empty
+
+  let find_synonyms lv s =
     let lv = Lval.simplify lv in
     try let v = find_lval_vertex lv s in get_lval_set v s
     with Not_found -> LSet.empty
 
-  let find_all_aliases lv s : LSet.t =
+  let alias_vars lv s : VarSet.t =
+    try
+      let v = find_lval_vertex lv s in
+      List.fold_left
+        (fun acc succ -> VarSet.union acc @@ vars_pointing_to_vertex succ s)
+        VarSet.empty
+        (G.psucc s.graph v)
+    with Not_found -> VarSet.empty
+
+  let alias_lvals lv s : LSet.t =
     let v_opt = try Some (find_lval_vertex lv s) with Not_found -> None in
     match Option.bind v_opt @@ G.psucc_opt s.graph with
     | None -> LSet.empty
     | Some succ -> lvals_pointing_to_vertex succ s
 
-  let points_to_set lv s : LSet.t =
+  let points_to_vars lv s : VarSet.t =
+    let succ = try G.psucc_opt s.graph @@ find_lval_vertex lv s with Not_found -> None in
+    match succ with
+    | None -> VarSet.empty
+    | Some succ_v -> get_vars succ_v s
+
+  let points_to_lvals lv s : LSet.t =
     let succ = try G.psucc_opt s.graph @@ find_lval_vertex lv s with Not_found -> None in
     match succ with
     | None -> LSet.empty
     | Some succ_v -> get_lval_set succ_v s
 
+  let alias_sets_vars s =
+    let alias_set_of_vertex (i, _) =
+      let aliases = vars_pointing_to_vertex i s in
+      if VarSet.cardinal aliases >= 2 then Some aliases else None
+    in
+    List.filter_map alias_set_of_vertex @@ VMap.bindings s.vmap
+
+  let alias_sets_lvals s =
+    let alias_set_of_vertex (i, _) =
+      let aliases = lvals_pointing_to_vertex i s in
+      if LSet.cardinal aliases >= 2 then Some aliases else None
+    in
+    List.filter_map alias_set_of_vertex @@ VMap.bindings s.vmap
+
 end
 
 
 module Pretty = struct
-
   let pp_debug fmt s =
     Format.fprintf fmt "@[<v>";
     Format.fprintf fmt "@[Edges:";
@@ -257,13 +296,8 @@ module Pretty = struct
           G.iter_vertex pp_unconnected_vertex s.graph)
 
   let pp_aliases fmt s =
-    let alias_set_of_vertex (i, _) =
-      let aliases = Readout.lvals_pointing_to_vertex i s in
-      if LSet.cardinal aliases >= 2 then Some aliases else None
-    in
-    let alias_sets = List.filter_map alias_set_of_vertex @@ VMap.bindings s.vmap in
+    let alias_sets = Readout.alias_sets_lvals s in
     Pretty_utils.pp_list ~empty:"<none>" ~sep:"@;<2>" LSet.pretty fmt alias_sets
-
 end
 
 (* invariants of type t must be true before and after each functon call *)
@@ -433,9 +467,9 @@ let merge s v1 v2 =
   then s
   else
     (* update varmap : every lval in v2 must now be associated with v1 *)
-    let new_varmap = VarSet.fold (fun lv2 -> VarMap.add lv2 v1) (find_varset v2 s) s.varmap in
+    let new_varmap = VarSet.fold (fun lv2 -> VarMap.add lv2 v1) (get_vars v2 s) s.varmap in
     let new_vmap =
-      let new_set = VarSet.union (find_varset v1 s) (find_varset v2 s) in
+      let new_set = VarSet.union (get_vars v1 s) (get_vars v2 s) in
       VMap.add v1 new_set @@ VMap.remove v2 s.vmap
     in
     let new_graph = (* update the graph *)
@@ -710,7 +744,6 @@ module Summary = struct
   (* a type for summaries of functions *)
   type t = {state   : state option;
             formals : lval list;
-            locals  : lval list;
             return  : exp option}
 
   let make s (kf : kernel_function) =
@@ -735,7 +768,6 @@ module Summary = struct
     in
     {state = Some s;
      formals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_formals kf);
-     locals = List.map (fun v -> (Var v,NoOffset)) (Kernel_function.get_locals kf);
      return = exp_return}
 
   let pretty ?(debug=false) fmt summary =
@@ -744,9 +776,9 @@ module Summary = struct
       let pp_elem lv =
         if !is_first then is_first := false else Format.fprintf fmt "@  ";
         Format.fprintf fmt "@[%a" Cil_datatype.Lval.pretty lv;
-        let pointees = Readout.points_to_set lv s in
-        if not @@ LSet.is_empty pointees then
-          Format.fprintf fmt "→%a" LSet.pretty pointees;
+        let pointees = Readout.points_to_vars lv s in
+        if not @@ VarSet.is_empty pointees then
+          Format.fprintf fmt "→%a" VarSet.pretty pointees;
         Format.fprintf fmt "@]";
       in
       List.iter pp_elem l
@@ -759,9 +791,8 @@ module Summary = struct
     | None -> if debug then Format.fprintf fmt "not found"
     | Some s when is_empty s -> if debug then Format.fprintf fmt "empty"
     | Some s ->
-      Format.fprintf fmt "@[formals: @[%a@]@;<4>locals: @[%a@]@;<4>returns: @[%a@]@;<4>state: @[%a@] "
+      Format.fprintf fmt "@[formals: @[%a@]@;<4>returns: @[%a@]@;<4>state: @[%a@] "
         (pp_list_lval s) summary.formals
-        (pp_list_lval s) summary.locals
         (pp_option Exp.pretty) summary.return
         (pp_option @@ pretty ~debug) summary.state
 
@@ -859,7 +890,7 @@ let call s (res : lval option) (args : exp list) (summary : Summary.t) : state =
     (List.fold_left join_succs s @@ List.map fst vertex_pairs)
 
 module Dot = struct
-  let find_varset_ref = Extlib.mk_fun "find_varset"
+  let find_vars_ref = Extlib.mk_fun "find_vars"
 
   include Graph.Graphviz.Dot (struct
       include G
@@ -867,7 +898,7 @@ module Dot = struct
       let default_edge_attributes _ = []
       let get_subgraph _ = None
       let vertex_attributes v =
-        let lset = !find_varset_ref v in
+        let lset = !find_vars_ref v in
         let label =
           VarSet.pretty Format.str_formatter lset;
           Format.flush_str_formatter ()
@@ -903,15 +934,23 @@ module API = struct
   (* TODO : what about offsets ? *)
 
   let get_lval_set = Readout.get_lval_set
-  let find_aliases = Readout.find_aliases
-  let find_all_aliases = Readout.find_all_aliases
-  let points_to_set = Readout.points_to_set
+  let find_vars = Readout.find_vars
+  let find_synonyms = Readout.find_synonyms
+  let find_aliases = Readout.find_synonyms
+  let alias_vars = Readout.alias_vars
+  let alias_lvals = Readout.alias_lvals
+  let find_all_aliases = Readout.alias_lvals (* deprecated *)
+  let points_to_vars = Readout.points_to_vars
+  let points_to_set = Readout.points_to_lvals
+  let points_to_lvals = Readout.points_to_lvals
+  let alias_sets_vars = Readout.alias_sets_vars
+  let alias_sets_lvals = Readout.alias_sets_lvals
 
   let get_graph s = s.graph
 
   let print_dot filename s =
     let file = open_out filename in
-    Dot.find_varset_ref := (fun v -> find_varset v s);
+    Dot.find_vars_ref := (fun v -> get_vars v s);
     Dot.output_graph file s.graph;
     close_out file
 end

@@ -24,7 +24,8 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     empty_struct.c:99: assigns clause on addresses
-      (read 2 times, propagated 3 times) garbled mix of &{gs}
+      (read in 1 statement, propagated through 2 statements)
+      garbled mix of &{gs}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main4:
   r ∈

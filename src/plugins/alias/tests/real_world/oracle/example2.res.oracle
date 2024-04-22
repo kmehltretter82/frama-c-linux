@@ -122,8 +122,7 @@
   4:{ idata } → 5:{  }   6:{  } → 4:{ idata }   8:{ odata } → 9:{  }
   10:{  } → 8:{ odata }
 [alias] Summary of function f1:
-  formals: x    locals: tmp  idata  odata  idx  i  tmp_1  __retres
-  returns: __retres
+  formals: x    returns: __retres
   state: { x; tmp }  { x->t2; tmp->t2 }  { x->t2[0..]; tmp->t2[0..]; idata }
          { x->t1; tmp->t1 }  { x->t1[0..]; tmp->t1[0..]; odata }
 [alias] analysing function: f2
@@ -232,8 +231,7 @@
   18:{ idata } → 19:{  }   20:{  } → 18:{ idata }
   22:{ odata } → 23:{  }   24:{  } → 22:{ odata }
 [alias] Summary of function f2:
-  formals: x    locals: tmp  idx  idata  odata  i  __retres
-  returns: __retres
+  formals: x    returns: __retres
   state: { x; tmp }  { x->t1; tmp->t1 }  { x->t1[0..]; tmp->t1[0..]; idata }
          { x->t2; tmp->t2 }  { x->t2[0..]; tmp->t2[0..]; odata }
 [alias] analysing function: main
@@ -379,8 +377,7 @@
   62:{  } → 60:{  }   70:{  } → 71:{  }   72:{  } → 70:{  }
   74:{  } → 75:{  }   76:{  } → 74:{  }
 [alias] Summary of function main:
-  formals:     locals: a  b  i  __retres    returns: __retres
-  state: { a->n1; b->n1 }  { a->n2; b->n2 }
+  formals:     returns: __retres    state: { a->n1; b->n1 }  { a->n2; b->n2 }
 [alias] analysing function: swap
 [alias] May-aliases at the end of function swap: <none>
 [alias] May-alias graph at the end of function swap:

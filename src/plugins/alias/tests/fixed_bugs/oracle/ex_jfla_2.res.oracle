@@ -32,7 +32,7 @@
   0:{ res } → 1:{  }   1:{  } -fst→ 2:{  }   1:{  } -snd→ 4:{ b }
   2:{  } → 3:{  }   4:{ b } → 5:{  }
 [alias] Summary of function create_str_t:
-  formals: va  b    locals: res    returns: res    state: { res->snd; b }
+  formals: va  b    returns: res    state: { res->snd; b }
 [alias] analysing function: jfla
 [alias] analysing instruction: *(s->snd) = *(s->fst);
 [alias] May-aliases after instruction  *(s->snd) = *(s->fst);  are  <none>
@@ -49,8 +49,7 @@
 [alias] May-alias graph at the end of function jfla:
   8:{ s } → 9:{  }   9:{  } -fst→ 10:{ i1; i2 }   10:{ i1; i2 } → 12:{  }
 [alias] Summary of function jfla:
-  formals: s  i1  i2  b    locals:     returns: <none>
-  state: { s->fst; i1; i2 }
+  formals: s  i1  i2  b    returns: <none>    state: { s->fst; i1; i2 }
 [alias] analysing function: main
 [alias] analysing instruction: int u = 11;
 [alias] May-aliases after instruction  int u = 11;  are  <none>
@@ -215,9 +214,6 @@
   52:{  } -fst→ 53:{  }   52:{  } -snd→ 55:{  }   53:{  } → 54:{  }
   55:{  } → 33:{ v }   57:{ s2 } → 52:{  }   64:{  } → 33:{ v }
 [alias] Summary of function main:
-  formals: 
-  locals: u  v  t→{ v }  a→{ v }  b→{ u }  c→{ v }  x→{ a }
-           y→{ b }  z→{ c }  s1  s2  __retres
-  returns: __retres
+  formals:     returns: __retres
   state: { *x; *z; s1->fst; s2->snd; t; a; c }  { *y; s1->snd; b }
 [alias] Analysis complete

@@ -2,7 +2,7 @@
   STDOPT: #"-e-acsl-full-mtracking"
 */
 /* run.config_dev
-  DONTRUN: MACRO: ROOT_EACSL_GCC_OPTS_EXT --full-mtracking --rt-debug
+  MACRO: ROOT_EACSL_GCC_OPTS_EXT --full-mtracking --rt-debug
 */
 
 #include <time.h>

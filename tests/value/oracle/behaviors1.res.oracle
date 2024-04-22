@@ -449,9 +449,11 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     behaviors1.i:473: assigns clause on addresses
-      (read 1 times, propagated 3 times) garbled mix of &{a}
+      (read in 1 statement, propagated through 2 statements)
+      garbled mix of &{a}
     behaviors1.i:474: assigns clause on addresses
-      (read 1 times, propagated 3 times) garbled mix of &{b}
+      (read in 1 statement, propagated through 2 statements)
+      garbled mix of &{b}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test_123_comp_2345_comp_disj:
   a ∈ [--..--]

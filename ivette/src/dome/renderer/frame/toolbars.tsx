@@ -160,9 +160,11 @@ export interface ButtonProps<A> {
   /** Currently selected value. */
   selection?: A;
   /** Selection callback. Receives the button's value. */
-  onClick?: (value: A | undefined) => void;
+  onClick?: (value: A | undefined, evt:React.MouseEvent) => void;
   /** Right-Click callback. Receives the button's value. */
-  onContextMenu?: (value: A | undefined) => void;
+  onContextMenu?: (value: A | undefined, evt:React.MouseEvent) => void;
+  /** Further Styling */
+  className?: string;
   /** Button contents */
   children?: React.ReactNode;
 }
@@ -176,18 +178,21 @@ export function Button<A = undefined>(
   const { enabled = true, disabled = false } = props;
   const { selected, value, selection, onClick, onContextMenu } = props;
   const isSelected = selected !== undefined
-    ? selected
-    : (value !== undefined && value === selection);
+    ? selected : (value !== undefined && value === selection);
+  const className = classes(
+    isSelected ? SELECT : (BUTTON + KIND(props.kind)),
+    props.className,
+  );
   return (
     <button
       type="button"
       disabled={disabled || !enabled}
-      className={isSelected ? SELECT : (BUTTON + KIND(props.kind))}
-      onClick={onClick && (() => onClick(value))}
-      onContextMenu={onContextMenu && (() => onContextMenu(value))}
+      className={className}
+      onClick={onClick && ((evt) => onClick(value, evt))}
+      onContextMenu={onContextMenu && ((evt) => onContextMenu(value, evt))}
       title={props.title}
     >
-      {props.icon && <SVG id={props.icon} />}
+      {props.icon && <SVG offset={-1} id={props.icon} />}
       {props.label && <label>{props.label}</label>}
       {props.children}
     </button>
@@ -330,13 +335,7 @@ export interface Hint {
   label: string;
   icon?: string;
   title?: string;
-  rank?: number;
   onClick?: () => void;
-}
-
-/** Total order on hints. */
-export function byHint(a: Hint, b: Hint): number {
-  return (a.rank ?? 0) - (b.rank ?? 0);
 }
 
 // --------------------------------------------------------------------------

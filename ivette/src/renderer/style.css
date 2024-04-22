@@ -14,9 +14,8 @@
     height: 0px;
 }
 
-.sidebar-items.dome-color-frame
-{
-    background: var(--background-intense) ;
+.sidebar-items.dome-color-frame {
+    background: var(--background-intense);
 }
 
 .sidebar-selector {
@@ -51,7 +50,7 @@
 }
 
 .component-info {
-    color: var(--text) ;
+    color: var(--text);
     min-width: 50px;
     padding-top: 4px;
     font-size: smaller;
@@ -66,8 +65,8 @@
 /* -------------------------------------------------------------------------- */
 
 .labview-field {
-    position: relative ;
-    left: -8px ;
+    position: relative;
+    left: -8px;
 }
 
 .labview-stock:hover {
@@ -75,36 +74,32 @@
 }
 
 .labview-stock:hover * {
-    cursor: move ;
+    cursor: move;
 }
 
-.labview-stock.dome-dragging
-{
-    border-radius: 4px ;
+.labview-stock.dome-dragging {
+    border-radius: 4px;
     background: var(--background-profound);
-    border: thin solid black ;
+    border: thin solid black;
 }
 
-.labview-content
-{
+.labview-content {
+    height: 100%;
     background: var(--background);
 }
 
-.labview-titlebar
-{
+.labview-titlebar {
     background: var(--background-profound);
     height: 24px
 }
 
-.labview-handle
-{
-    flex: 1 1 auto ;
-    cursor: move ;
+.labview-handle {
+    flex: 1 1 auto;
+    cursor: move;
 }
 
-.labview-close:hover
-{
-    fill: var(--negative-button-color) ;
+.labview-close:hover {
+    fill: var(--negative-button-color);
 }
 
 .labview-icon {
@@ -112,51 +107,168 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Temporary styling selection view on toolbar                        --- */
+/* --- Styling Notification Stack                                         --- */
 /* -------------------------------------------------------------------------- */
-.views-list {
+
+.labview-notification-stack {
+    position: fixed;
+    z-index: 2;
+    right: 0px;
+    bottom: 25px;
+    background: transparent;
+    padding: 2px;
     display: flex;
-    flex-wrap: nowrap;
+    flex-direction: column;
+    border: var(--border);
 }
 
-.views-list,
-.views-list .dome-xSideBarSection {
-    width: 100%;
+.labview-notification-item {
+    flex: 1 1 auto;
+    max-width: 200px;
+    border: thin solid var(--border);
+    border-radius: 8px;
+    margin: 2px 1px 2px 0px;
+    padding: 2px 10px 3px 2px;
+    font-size: smaller;
 }
 
-.views-list .dome-xSideBarSection-content {
-    width: 100%;
+.labview-notification-message {
+    background: var(--primary-button-color);
+}
+
+.labview-notification-message:hover {
+    background: var(--primary-button-hover);
+}
+
+.labview-notification-warning {
+    background: var(--warning-button-color);
+}
+
+.labview-notification-warning:hover {
+    background: var(--warning-button-hover);
+}
+
+.labview-notification-error {
+    background: var(--negative-button-color);
+}
+
+.labview-notification-error:hover {
+    background: var(--negative-button-hover);
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Styling PanelLayoutSelector                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.labview-layout-menu {
+    background: var(--background-softer);
+    box-shadow: 0px 0px 0px 1px var(--background-intense);
+    border-radius: 8px;
+    outline: none;
+    margin: 2px;
+    padding: 2px;
+    position: fixed;
+    z-index: 3;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
 }
 
-.views-list  .dome-xIcon.dome-xIcon-default,
-.views-list  .dome-xSideBarSection-title {
-    display: none;
+.labview-layout-quarter {
+    justify-self: center;
+    border-radius: 4px;
+    padding: 2px 4px 2px 4px;
 }
 
-.views-list  .dome-xSideBarItem {
-    border-radius: 2em 2em;
-    border: solid 1px var(--splitter);
-    margin: 2px 3px;
-    padding: 2px 10px;
+.labview-layout-action {
+    border: none;
+    position: relative;
+    width: 70px;
+    padding: 2px 0px 2px 6px;
+    background: var(--background-softer);
 }
 
-.views-list  .dome-xSideBarItem.dome-active {
-    border: solid 2px;
+
+.labview-layout-action:hover {
+    background: var(--background-profound-hover);
+    border-radius: 4px;
 }
 
-.views-list  .dome-xLabel.dome-text-label {
-    margin: 0;
-    padding: 0;
+.labview-layout-action-icon {
+    position: absolute;
+    top: -3px;
+    right: 1px;
+    fill: var(--info-text);
 }
 
-.views-list  .dome-xSideBarItem .dome-xLabel:hover,
-.views-list  .dome-xSideBarItem:hover {
-    cursor: pointer;
+.labview-layout-action:hover .labview-layout-action-icon {
+    fill: var(--text);
 }
 
-.views-list  .dome-xIcon {
-    margin: auto 4px;
+/* -------------------------------------------------------------------------- */
+/* --- Dock & Tabs                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+.labview-tab {
+    position: relative;
+    fill: var(--info-text);
+    color: var(--info-text);
+    font-size: smaller;
+    background: var(--background);
+    background-image: none;
+    border-radius: 8px;
+    padding-left: 10px;
 }
+
+.labview-tab-closing {
+    fill: var(--info-text-discrete);
+}
+
+.labview-tab:not(:hover) .labview-tab-closing {
+    visibility: hidden;
+}
+
+.labview-tab:hover {
+    fill: var(--text);
+    color: var(--text);
+}
+
+.labview-tab.dome-selected:hover {
+    background: var(--default-button-hover);
+}
+
+.labview-tab.dome-selected {
+    background: var(--background-softer);
+    padding-right: 0px;
+    min-width: 200px;
+}
+
+.labview-docked {
+    font-size: smaller;
+    background: var(--background-softer);
+    padding: 2px 8px 2px 2px;
+    border-radius: 5px;
+}
+
+.labview-docked.alert {
+    color: var(--warning);
+}
+
+.labview-docked.disabled {
+    color: var(--disabled-text);
+}
+
+.labview-docked.disabled svg {
+    fill: var(--disabled-text);
+}
+
+.labview-docked:hover {
+    background: var(--background-profound-hover);
+}
+
+.labview-docked svg {
+    bottom: 0px !important;
+    height: 8px;
+}
+
 /* -------------------------------------------------------------------------- */

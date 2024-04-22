@@ -3,11 +3,9 @@
 */
 /* run.config_qualif
    OPT: -wp-prop="-ko"
-   OPT: -wp-prover why3:alt-ergo -wp-prop="-ko"
-   OPT: -wp-prover "alt-ergo" -wp-prop="ko" -wp-steps 50
 */
 
-//@ axiomatic Eq { predicate Peq(integer x,integer y) = x == y ; } 
+//@ axiomatic Eq { predicate Peq(integer x,integer y) = x == y ; }
 
 /*@
   @ ensures  d0: div_pos_pos:      Peq(   5  /   3 ,  1 );

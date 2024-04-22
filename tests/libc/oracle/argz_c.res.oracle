@@ -21,6 +21,7 @@
   \return(reallocarray) == 0 (auto)
   \return(getenv) == 0 (auto)
   \return(bsearch) == 0 (auto)
+  \return(realpath) == 0 (auto)
   \return(memchr) == 0 (auto)
   \return(memrchr) == 0 (auto)
   \return(memcpy) == 0 (auto)

@@ -11,7 +11,7 @@ static int static_fun() {
 }
 
 void k() {
-  /*@ loop unroll 10; */ // Eva is not loaded, so we must ignore the annotation
+  /*@ loop \eva::unroll 10; */ // Eva is not loaded, so we must ignore the annotation
   for (int i = 0; i < 10; i++) {
     extf();
   }

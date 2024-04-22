@@ -355,7 +355,7 @@ let rec type_term
       mk_ctx ~use_gmp_opt:true (ty_of_interv i)
   in
   let infer t =
-    Cil.CurrentLoc.set t.term_loc;
+    Current_loc.set t.term_loc;
     (* this pattern matching implements the formal rules of the JFLA's paper
        (and of course also covers the missing cases). Also enforce the invariant
        that every subterm is typed, even if it is not an integer. *)
@@ -509,6 +509,39 @@ let rec type_term
       Nan
 
     | Tapp(li, _, args) ->
+      let type_arg x =
+        let ctx = match x.term_type with
+          | Linteger ->
+            (* If the function parameter is an integer,
+               the kernel introduces a coercion to integer, so we will
+               always see integer here.*)
+            begin match x.term_node with
+              | TCast (true,_,_) -> None
+              |_ -> if Options.Gmp_only.get() then Some Gmpz else None
+            end
+          | Lreal -> Some Real
+          | Ctype _| Ltype _| Larrow _ | Lvar _ -> None
+        in
+        ignore
+          (type_term
+             ~use_gmp_opt:true
+             ~under_lambda:true
+             ~arith_operand
+             ?ctx
+             ~profile x)
+      in
+      let type_args type_arg =
+        (* type all arguments using typing function [type_arg] while
+           making sure that later arguments are typed even if an exception is
+           raised during the typing of an earlier argument. *)
+        let exn_o = ref None in
+        let type_arg arg =
+          try type_arg arg
+          with exn -> match !exn_o with None -> exn_o := Some exn | Some _ -> ()
+        in
+        List.iter (fun arg -> type_arg arg) args;
+        Option.iter raise !exn_o
+      in
       if Builtins.mem li.l_var_info.lv_name then
         let typ_arg lvi arg =
           (* a built-in is a C function, so the context is necessarily a C
@@ -529,28 +562,7 @@ let rec type_term
         | LBpred p ->
           (* possible to have an [LBpred] here because we transformed
              [Papp] into [Tapp] *)
-          List.iter
-            (fun x ->
-               let ctx = match x.term_type with
-                 | Linteger ->
-                   (* If the function parameter is an integer,
-                      the kernel introduces a coercion to integer, so we will
-                      always see integer here.*)
-                   begin match x.term_node with
-                     | TCast (true,_,_) -> None
-                     |_ -> if Options.Gmp_only.get() then Some Gmpz else None
-                   end
-                 | Lreal -> Some Real
-                 | Ctype _| Ltype _| Larrow _ | Lvar _ -> None
-               in
-               ignore
-                 (type_term
-                    ~use_gmp_opt:true
-                    ~under_lambda:true
-                    ~arith_operand
-                    ?ctx
-                    ~profile x))
-            args;
+          type_args type_arg;
           let new_profile =
             Profile.make
               li.l_profile
@@ -562,28 +574,7 @@ let rec type_term
             pending_typing;
           c_int
         | LBterm t_body ->
-          List.iter
-            (fun x ->
-               let ctx = match x.term_type with
-                 | Linteger ->
-                   (* If the function parameter is an integer,
-                      the kernel introduces a coercion to integer, so we will
-                      always see integer here.*)
-                   begin match x.term_node with
-                     | TCast (true,_,_) -> None
-                     |_ -> if Options.Gmp_only.get() then Some Gmpz else None
-                   end
-                 | Lreal -> Some Real
-                 | Ctype _| Ltype _| Larrow _ | Lvar _ -> None
-               in
-               ignore
-                 (type_term
-                    ~use_gmp_opt:true
-                    ~under_lambda:true
-                    ~arith_operand
-                    ?ctx
-                    ~profile x))
-            args;
+          type_args type_arg;
           let new_profile =
             Profile.make
               li.l_profile
@@ -654,7 +645,7 @@ let rec type_term
              let type_arg arg =
                ignore @@ type_term ~use_gmp_opt:true ~arith_operand:false ~profile arg
              in
-             List.iter type_arg args;
+             type_args type_arg;
              (* TODO : improve error message to distinguish error messages
                 corresponding to unsupported primitives and wrong application
                 of supported primitive
@@ -777,7 +768,7 @@ and type_predicate ~profile p =
     do_both f g = (try f() with e -> try g(); raise e with | _ -> raise e); g()
   in
   let p = Logic_normalizer.get_pred p in
-  Cil.CurrentLoc.set p.pred_loc;
+  Current_loc.set p.pred_loc;
   (* this pattern matching also follows the formal rules of the JFLA's paper *)
   match p.pred_content with
   | Pfalse | Ptrue -> ()

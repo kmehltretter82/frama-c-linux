@@ -34,6 +34,5 @@
 [alias] May-alias graph at the end of function main:
   0:{ a } → 1:{ b }   1:{ b } → 9:{ c; d }   9:{ c; d } → 10:{  }
 [alias] Summary of function main:
-  formals:     locals: a→{ b }  b→{ c; d }  c  d  __retres
-  returns: __retres    state: { *a; b }  { *(*a); *b; c; d }
+  formals:     returns: __retres    state: { *a; b }  { *(*a); *b; c; d }
 [alias] Analysis complete

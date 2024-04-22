@@ -142,6 +142,12 @@ let dkey_visitor = register_category "visitor"
 let wkey_annot_error = register_warn_category "annot-error"
 let () = set_warn_status wkey_annot_error Log.Wabort
 
+let wkey_plugin_not_loaded = register_warn_category "plugin-not-loaded"
+let () = set_warn_status wkey_plugin_not_loaded Log.Wactive
+
+let wkey_extension_unknown = register_warn_category "extension-unknown"
+let () = set_warn_status wkey_extension_unknown Log.Werror
+
 let wkey_ghost_already_ghost = register_warn_category "ghost:already-ghost"
 let () = set_warn_status wkey_ghost_already_ghost Log.Wfeedback
 

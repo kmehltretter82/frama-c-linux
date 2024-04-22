@@ -1,11 +1,11 @@
 [kernel] Parsing ghost_else_bad.c (with preprocessing)
 [kernel] ghost_else_bad.c:49: 
   syntax error:
-  Location: line 49, between columns 5 and 9, before or at token: else
+  Location: line 49, between columns 0 and 5, before or at token: else
   47      } /*@ ghost
   48        //@ ensures \true ;
   49        else {
-        ^^^^^^^^^^
+        ^^^^^
   50          y++ ;
   51        }
 [kernel] Frama-C aborted: invalid user input.

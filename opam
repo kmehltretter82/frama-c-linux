@@ -136,7 +136,7 @@ depends: [
   "ocamlgraph" { with-test & >= "2.1.0" }
   "odoc" { with-doc }
   "unionFind" { >= "20220107" }
-  "why3" { >= "1.6.0" & ( < "1.7.0" | !with-test ) }
+  "why3" { >= "1.7.1" & (< "1.8.0" | !with-test) }
   "yaml" { >= "3.0.0" }
   "yojson" {>= "1.6.0" & (>= "2.0.1" | !with-test)}
   "zarith" { >= "1.9" }
@@ -145,7 +145,6 @@ depends: [
   "ppx_deriving"
   "ppx_deriving_yojson"
   "ppx_deriving_yaml" { >= "0.2.0" }
-  "ppx_import"
 
   # GTK3 disabled on macOS (segfaults), and made optional on Windows
   # (due to complex situation with Cygwin + MinGW).
@@ -183,8 +182,8 @@ Use 'why3 config detect' to configure new provers.
 "Ivette is a new GUI for Frama-C, currently in development.
 Run 'ivette' once to finalize installation (requires an internet connection).
 Once finalized, 'ivette' will work offline.
-Finalization also requires Node v16 and Yarn:
+Finalization also requires Node v20 and Yarn:
 - install NVM (https://github.com/nvm-sh/nvm)
-- run 'nvm use 16'
+- run 'nvm use 20'
 - run 'npm install --global yarn'" { success }
 ]

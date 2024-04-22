@@ -109,16 +109,24 @@ let type_empty _ loc = function
   | _ -> Kernel.abort ~loc "empty_extension should not have arguments"
 
 let () =
-  Acsl_extension.register_behavior "foo" type_foo false ;
-  Acsl_extension.register_code_annot_next_loop "lfoo" type_foo false ;
-  Acsl_extension.register_code_annot "ca_foo" type_foo false ;
-  Acsl_extension.register_code_annot_next_stmt "ns_foo" type_foo false ;
-  Acsl_extension.register_global "global_foo" type_foo false ;
-  Acsl_extension.register_behavior
+  Acsl_extension.register_behavior ~plugin:"test"
+    "foo" type_foo false ;
+  Acsl_extension.register_code_annot_next_loop ~plugin:"test"
+    "lfoo" type_foo false ;
+  Acsl_extension.register_code_annot ~plugin:"test"
+    "ca_foo" type_foo false ;
+  Acsl_extension.register_code_annot_next_stmt ~plugin:"test"
+    "ns_foo" type_foo false ;
+  Acsl_extension.register_global ~plugin:"test"
+    "global_foo" type_foo false ;
+  Acsl_extension.register_behavior ~plugin:"test"
     "bar" type_bar ~printer:print_bar ~visitor:visit_bar false ;
-  Acsl_extension.register_behavior "bla" type_bla false ;
-  Acsl_extension.register_code_annot_next_both "baz" type_baz false;
-  Acsl_extension.register_code_annot "empty_extension" type_empty false
+  Acsl_extension.register_behavior ~plugin:"test"
+    "bla" type_bla false ;
+  Acsl_extension.register_code_annot_next_both ~plugin:"test"
+    "baz" type_baz false;
+  Acsl_extension.register_code_annot ~plugin:"test"
+    "empty_extension" type_empty false
 
 let run () =
   Ast.compute ();

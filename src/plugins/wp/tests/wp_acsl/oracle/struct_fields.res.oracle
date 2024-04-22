@@ -9,6 +9,7 @@
 --- Context 'typed_foo' Cluster 'Chunk' 
 ---------------------------------------------
 theory Chunk
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -35,11 +36,13 @@ theory Chunk
   
   predicate is_sint32_chunk (m:addr -> int) =
     forall a:addr. is_sint32 (get m a)
+  
 end
 ---------------------------------------------
 --- Context 'typed_foo' Cluster 'S1_X' 
 ---------------------------------------------
 theory S1_X
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -61,11 +64,13 @@ theory S1_X
   
   predicate IsS1_X (s:S1_X) =
     (is_sint8 (F1_X_a s) /\ is_sint16 (F1_X_b s)) /\ is_sint32 (F1_X_c s)
+  
 end
 ---------------------------------------------
 --- Context 'typed_foo' Cluster 'Init_S1_X' 
 ---------------------------------------------
 theory Init_S1_X
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -82,11 +87,13 @@ theory Init_S1_X
   
   type Init_S1_X =
     | Init_S1_X1 (Init_F1_X_a:bool) (Init_F1_X_b:bool) (Init_F1_X_c:bool)
+  
 end
 ---------------------------------------------
 --- Context 'typed_foo' Cluster 'Compound' 
 ---------------------------------------------
 theory Compound
+  
   (* use why3.BuiltIn.BuiltIn *)
   
   (* use bool.Bool *)
@@ -211,9 +218,11 @@ theory Compound
      [Load_Init_S1_X p (havoc init1 init q n)].
      separated p 3 q n ->
      Load_Init_S1_X p (havoc init1 init q n) = Load_Init_S1_X p init
+  
 end
 [wp:print-generated] 
   theory WP
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -249,9 +258,11 @@ end
        sconst t2 ->
        cinits t ->
        valid_rd t1 a 3 -> IsS1_X (Load_S1_X a t2 t3 t4) -> valid_rw t1 a 3
+    
   end
 [wp:print-generated] 
   theory WP1
+    
     (* use why3.BuiltIn.BuiltIn *)
     
     (* use bool.Bool *)
@@ -287,6 +298,7 @@ end
        linked t1 ->
        sconst t2 ->
        cinits t -> IsS1_X (Load_S1_X a t2 t3 t4) -> valid_rd t1 a 3
+    
   end
 [wp] 2 goals generated
 ------------------------------------------------------------

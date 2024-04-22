@@ -1,13 +1,12 @@
 [kernel] Parsing ghost_else_bad_oneline.i (no preprocessing)
 [kernel] ghost_else_bad_oneline.i:8: 
   syntax error:
-  Location: between lines 8 and 9, before or at token: 
+  Location: line 8, column 18, before or at token: 
   
   6       if (x) {
   7         x++;
-  
   8       } //@ ghost else
+                          ^
   9       y++;
-  
   10    }
 [kernel] Frama-C aborted: invalid user input.

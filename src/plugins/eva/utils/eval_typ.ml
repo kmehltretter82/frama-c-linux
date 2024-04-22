@@ -211,16 +211,15 @@ type scalar_typ =
   | TSPtr of integer_range
   | TSFloat of fkind
 
+let pointer_range () =
+  { i_bits = Cil.bitsSizeOfInt Cil.theMachine.Cil.upointKind;
+    i_signed = false; }
+
 let classify_as_scalar typ =
   match Cil.unrollType typ with
   | TInt (ik, attrs) | TEnum ({ekind=ik}, attrs) ->
     Some (TSInt (ik_attrs_range ik attrs))
-  | TPtr _ ->
-    let range =
-      { i_bits = Cil.bitsSizeOfInt Cil.theMachine.Cil.upointKind;
-        i_signed = Cil.isSigned Cil.theMachine.Cil.upointKind }
-    in
-    Some (TSPtr range)
+  | TPtr _ -> Some (TSPtr (pointer_range ()))
   | TFloat (fk, _) -> Some (TSFloat fk)
   | _ -> None
 

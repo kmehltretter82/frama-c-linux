@@ -31,9 +31,10 @@ module Extensions = struct
   let ref_preprocess = ref (fun _ -> assert false)
   let ref_is_extension_block = ref (fun _ -> assert false)
   let ref_preprocess_block = ref (fun _ -> assert false)
+  let ref_extension_from = ref (fun _ -> assert false)
 
-  let set_extension_handler
-      ~category ~is_extension ~preprocess ~is_extension_block ~preprocess_block =
+  let set_extension_handler ~category ~is_extension ~preprocess
+      ~is_extension_block ~preprocess_block ~extension_from =
     assert (not !initialized) ;
     ref_is_extension := is_extension ;
     ref_category := category ;
@@ -41,6 +42,7 @@ module Extensions = struct
     ref_is_extension_block := is_extension_block;
     ref_preprocess_block := preprocess_block;
     initialized := true ;
+    ref_extension_from := extension_from;
     ()
 
   let is_extension s = !ref_is_extension s
@@ -48,6 +50,7 @@ module Extensions = struct
   let category s = !ref_category s
   let preprocess s = !ref_preprocess s
   let preprocess_block s = !ref_preprocess_block s
+  let extension_from s = !ref_extension_from s
 end
 let set_extension_handler = Extensions.set_extension_handler
 let is_extension = Extensions.is_extension
@@ -55,8 +58,7 @@ let is_extension_block = Extensions.is_extension_block
 let extension_category = Extensions.category
 let preprocess_extension = Extensions.preprocess
 let preprocess_extension_block = Extensions.preprocess_block
-
-module CurrentLoc = Cil_const.CurrentLoc
+let extension_from = Extensions.extension_from
 
 let error (b,_e) fstring =
   Kernel.abort
@@ -224,7 +226,7 @@ let add_logic_function_gen is_same_profile li =
   let name = li.l_var_info.lv_name in
   if is_builtin_logic_function name then
     error
-      (CurrentLoc.get())
+      (Current_loc.get())
       "logic function or predicate %s is built-in. You cannot redefine it"
       name;
   match Logic_info.find name with
@@ -233,7 +235,7 @@ let add_logic_function_gen is_same_profile li =
       (fun li' ->
          if is_same_profile li li' then
            error
-             (CurrentLoc.get ())
+             (Current_loc.get ())
              "already declared logic function or predicate %s \
               with same profile"
              name)
@@ -261,14 +263,14 @@ let find_logic_type = Logic_type_info.find
 let add_logic_type t infos =
   if is_logic_type t
   (* type variables hide type definitions on their scope *)
-  then error (CurrentLoc.get ()) "logic type %s already declared" t
+  then error (Current_loc.get ()) "logic type %s already declared" t
   else Logic_type_info.add t infos
 
 let is_logic_ctor = Logic_ctor_info.mem
 let find_logic_ctor = Logic_ctor_info.find
 let add_logic_ctor c infos =
   if is_logic_ctor c
-  then error (CurrentLoc.get ()) "logic constructor %s already declared" c
+  then error (Current_loc.get ()) "logic constructor %s already declared" c
   else Logic_ctor_info.add c infos
 let remove_logic_ctor = Logic_ctor_info.remove
 
@@ -304,7 +306,7 @@ let find_model_field s typ =
 let add_model_field m =
   try
     ignore (find_model_field m.mi_name m.mi_base_type);
-    error (CurrentLoc.get())
+    error (Current_loc.get())
       "Cannot add model field %s to type %a: it already exists."
       m.mi_name Cil_datatype.Typ.pretty m.mi_base_type
   with Not_found -> Model_info.add m.mi_name m
@@ -371,7 +373,7 @@ let add_builtin_logic_function_gen is_same_profile bl =
     List.iter
       (fun bl' ->
          if is_same_profile bl bl' then
-           error (CurrentLoc.get ())
+           error (Current_loc.get ())
              "already declared builtin logic function or predicate \
               %s with same profile"
              bl.bl_name)

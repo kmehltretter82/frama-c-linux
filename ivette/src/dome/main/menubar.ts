@@ -34,6 +34,7 @@ import {
   MenuItem,
   shell,
   KeyboardEvent,
+  IpcMainInvokeEvent,
 } from 'electron';
 import * as System from 'dome/system';
 
@@ -527,7 +528,8 @@ interface PopupMenuItemProps {
 
 type PopupMenuItem = PopupMenuItemProps | 'separator';
 
-function handlePopupMenu(_: Event, items: PopupMenuItem[]): Promise<number> {
+function handlePopupMenu(_: IpcMainInvokeEvent, items: PopupMenuItem[]):
+  Promise<number> {
   return new Promise((resolve) => {
     const menu = new Menu();
     let kid = 0;

@@ -1,5 +1,9 @@
 /* run.config*
- OPT: -machdep %{dep:@PTEST_DIR@/@PTEST_NAME@.yaml} -print
+ MACRO: machdep %{dep:@PTEST_DIR@/@PTEST_NAME@.yaml}
+ OPT: -machdep @machdep@ -print
+ COMMENT: we can't only use -D, as the __fc_machdep.h define takes precedence
+ COMMENT: with -U, our cmdline definition is used in the code
+ OPT: -machdep @machdep@ -cpp-extra-args="-UCUSTOM_MACHDEP -DCUSTOM_MACHDEP=42" -print
 */
 // most of the following includes are not directly used, but they test if
 // the custom machdep has defined the necessary constants

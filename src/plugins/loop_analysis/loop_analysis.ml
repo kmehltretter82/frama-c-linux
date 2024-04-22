@@ -361,7 +361,8 @@ module Store(* (B:sig *)
       end
 
   let mu (f:(t -> t)) (value,conds,stmt) =
-    Cil.CurrentLoc.set (Cil_datatype.Stmt.loc stmt);
+    let open Current_loc.Operators in
+    let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc stmt in
     let (result,final_conds,_) = f (init stmt) in
 
     (* Induction variables is a map from each Varinfo to its increment. *)

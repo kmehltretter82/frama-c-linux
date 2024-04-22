@@ -6,7 +6,7 @@
   47    void case_range() {
   48      switch (nondetul)
   49      case 0 ... 9999999999999999999U:;
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   50      case 0 ... 199999999999999999U:;
   51    }
 [kernel] Frama-C aborted: invalid user input.

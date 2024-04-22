@@ -4,7 +4,7 @@
   38    #ifdef T3
   39    void f() {
   40      x += 3;
-        ^^^^^^^^^
+          ^^^^^^
   41    }
   42    #endif
 [kernel] Frama-C aborted: invalid user input.

@@ -32,14 +32,16 @@ import { Vfill } from 'dome/layout/boxes';
 import { LSplit } from 'dome/layout/splitters';
 import * as Toolbar from 'dome/frame/toolbars';
 import * as Sidebar from './Sidebar';
-import * as Actions from './Actions';
 import * as Controller from './Controller';
-import * as Laboratory from './Laboratory';
-import * as Ext from './Extensions';
 import { TOOLBAR, STATUSBAR } from 'ivette';
+import * as State from 'ivette/state';
+import * as Search from 'ivette/search';
+import * as Laboratory from 'ivette/laboratory';
 import * as IvettePrefs from 'ivette/prefs';
+import './command';
 import './loader';
 import './sandbox';
+import './style.css';
 
 // --------------------------------------------------------------------------
 // --- Main View
@@ -48,11 +50,9 @@ import './sandbox';
 export default function Application(): JSX.Element {
   const [sidebar, flipSidebar] =
     Dome.useFlipSettings('frama-c.sidebar.unfold', true);
-  const [viewbar, flipViewbar] =
-    Dome.useFlipSettings('frama-c.viewbar.unfold', true);
 
-  const ToolBar = Ext.useChildren(TOOLBAR);
-  const StatusBar = Ext.useChildren(STATUSBAR);
+  const ToolBar = State.useChildren(TOOLBAR);
+  const StatusBar = State.useChildren(STATUSBAR);
 
   return (
     <Vfill>
@@ -66,28 +66,21 @@ export default function Application(): JSX.Element {
         <Controller.Control />
         <>{ToolBar}</>
         <Toolbar.Filler />
+        <Laboratory.Tabs />
+        <Toolbar.Filler />
         <IvettePrefs.ThemeSwitchTool />
         <IvettePrefs.FontTools />
-        <Actions.SearchAction />
-        <Toolbar.Button
-          icon="ITEMS.GRID"
-          title="Customize Main View"
-          selected={viewbar}
-          onClick={flipViewbar}
-        />
+        <Search.SearchField />
       </Toolbar.ToolBar>
       <LSplit settings="frama-c.sidebar.split" unfold={sidebar}>
         <Sidebar.Panel />
-        <Laboratory.LabView
-          customize={viewbar}
-          settings="frama-c.labview"
-        />
+        <Laboratory.LabView />
       </LSplit>
       <Toolbar.ToolBar className="statusbar">
         <Controller.Status />
         <>{StatusBar}</>
         <Toolbar.Filler />
-        <Controller.Stats />
+        <Laboratory.Dock />
       </Toolbar.ToolBar>
     </Vfill>
   );

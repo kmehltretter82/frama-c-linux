@@ -125,11 +125,11 @@ int ai4[] = {1, [7205759403792793] = 11};
 
 int main() {
 #ifdef EVA_UNROLL
-  //@ loop unroll (-9999999999999999999); // IntLimit
+  //@ loop \eva::unroll (-9999999999999999999); // IntLimit
   while (nondet);
-  //@ loop unroll too_large_integer; // ExpLimit
+  //@ loop \eva::unroll too_large_integer; // ExpLimit
   while (nondet);
-  //@ slevel 9999999999999999999;
+  //@ \eva::slevel 9999999999999999999;
   while (nondet);
 #endif
 #ifdef CABS_DOWHILE

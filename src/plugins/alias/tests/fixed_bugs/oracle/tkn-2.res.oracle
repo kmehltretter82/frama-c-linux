@@ -15,5 +15,5 @@
 [alias] May-alias graph at the end of function main:
   0:{ a } → 1:{  }   2:{  } → 0:{ a }
 [alias] Summary of function main:
-  formals:     locals: a  __retres    returns: __retres    state: <none>
+  formals:     returns: __retres    state: <none>
 [alias] Analysis complete

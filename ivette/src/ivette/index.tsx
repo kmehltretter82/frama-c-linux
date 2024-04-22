@@ -33,10 +33,8 @@ import React from 'react';
 import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
-import { GridItem, GridHbox, GridVbox } from 'dome/layout/grids';
-import * as Lab from 'ivette@lab';
-import * as Ext from 'ivette@ext';
-import * as Mode from 'ivette@mode';
+import * as State from './state';
+import * as Search from './search';
 
 /* -------------------------------------------------------------------------- */
 /* --- Items                                                              --- */
@@ -62,56 +60,54 @@ export interface ContentProps extends ItemProps {
 /* --- Groups                                                             --- */
 /* -------------------------------------------------------------------------- */
 
-let GROUP: string | undefined;
+/** @ignore */
+export const GROUP = new State.ElementRack<ItemProps>();
 
-/**
-   Defines a group of components.
-   To arrach components to the group, use their `group` property.
-   Empty groups are not displayed.
+/** Defines a group of components.
 
-   If provided, the group is used by default for all components registered
-   during the continuation.
+   The group with identifier `G` contains
+   implicitely all components identified by pattern `G.*`. For instance,
+   component `fc.kernel.ast` belongs to group `kernel`.
+
+   Group `fc.kernel` is dedicated to components of the Kernel.
+   Group `fc.<plugin>` is dedicated to components of plugin `<plugin>`.
+   Groups `ivette` and `sandbox` are reserved for Ivette usage.
+
  */
-export function registerGroup(group: ItemProps, job?: () => void): void {
-  Lab.addLibraryItem('groups', group);
-  if (job) {
-    const STACK = GROUP;
-    try {
-      GROUP = group.id;
-      job();
-    } finally {
-      GROUP = STACK;
-    }
-  }
+export function registerGroup(group: ItemProps): void {
+  GROUP.register(group);
 }
 
 /* -------------------------------------------------------------------------- */
 /* --- View Layout                                                        --- */
 /* -------------------------------------------------------------------------- */
 
-/**
-   Alternating V-split and H-split layouts.
- */
-export type Layout = string | Layout[];
+/** Component identifier. */
+export type compId = string;
 
-function makeLayout(ly: Layout, hsplit = false): JSX.Element | null {
-  if (typeof (ly) === 'string') return <GridItem id={ly} />;
-  if (!ly) return null;
-  if (hsplit) {
-    return (
-      <GridHbox>
-        {React.Children.toArray(ly.map((l) => makeLayout(l, false)))}
-      </GridHbox>
-    );
-  }
-  return (
-    <GridVbox>
-      {React.Children.toArray(ly.map((l) => makeLayout(l, true)))}
-    </GridVbox>
-  );
+/** Four elements layout */
+export type Layout4 = { A: compId, B: compId, C: compId, D: compId };
 
-}
+/** Three elements layout: one component spreads over two quarters. */
+export type Layout3 =
+  | { AB: compId, C: compId, D: compId }
+  | { AC: compId, B: compId, D: compId }
+  | { A: compId, B: compId, CD: compId }
+  | { A: compId, BD: compId, C: compId }
 
+/** Two elements layout: each component spreads over two quarters. */
+export type Layout2 =
+  | { AB: compId, CD: compId }
+  | { AC: compId, BD: compId }
+
+/** One elements layout: a single component spreads over all quarters. */
+export type Layout1 =
+  | { ABCD: compId }
+
+/** A layout displays one to four components. */
+export type Layout = Layout1 | Layout2 | Layout3 | Layout4;
+
+/** A view dispatches elements over a predefined layout. */
 export interface ViewLayoutProps extends ItemProps {
   /** Use this view by default. */
   defaultView?: boolean;
@@ -119,31 +115,52 @@ export interface ViewLayoutProps extends ItemProps {
   layout: Layout;
 }
 
+/** @ignore */
+export const VIEW = new State.ElementRack<ViewLayoutProps>();
+
 /** Register a new View. */
 export function registerView(view: ViewLayoutProps): void {
-  const { layout, ...viewprops } = view;
-  Lab.addLibraryItem('views', {
-    ...viewprops,
-    children: makeLayout(layout),
-  });
+  VIEW.register(view);
 }
 
 /* -------------------------------------------------------------------------- */
 /* --- Components                                                         --- */
 /* -------------------------------------------------------------------------- */
 
+export type LayoutPosition =
+  | 'A' | 'B' | 'C' | 'D'
+  | 'AB' | 'AC' | 'BD' | 'CD'
+  | 'ABCD';
+
 export interface ComponentProps extends ContentProps {
-  /** Group attachment. */
-  group?: string;
+  /** Defaults to 'D' */
+  preferredPosition?: LayoutPosition;
 }
+
+/** @ignore */
+export const COMPONENT = new State.ElementRack<ComponentProps>();
 
 /**
    Register the given Ivette Component.
    Components are sorted by rank and identifier among each group.
  */
 export function registerComponent(props: ComponentProps): void {
-  Lab.addLibraryItem('components', { group: GROUP, ...props });
+  COMPONENT.register(props);
 }
+
+/* -------------------------------------------------------------------------- */
+/* --- TitleBar Component                                                 --- */
+/* -------------------------------------------------------------------------- */
+
+/** @ignore */
+export interface TitleContext {
+  id?: string;
+  label?: string;
+  title?: string;
+}
+
+/** @ignore */
+export const TitleContext = React.createContext<TitleContext>({});
 
 export interface TitleBarProps {
   /** Displayed icon. */
@@ -163,7 +180,7 @@ export interface TitleBarProps {
  */
 export function TitleBar(props: TitleBarProps): JSX.Element | null {
   const { icon, label, title, children } = props;
-  const context = Lab.useTitleContext();
+  const context = React.useContext(TitleContext);
   if (!context.id) return null;
   return (
     <DefineElement id={`labview.title.${context.id}`}>
@@ -193,13 +210,13 @@ export interface ToolProps {
 }
 
 /** @ignore */
-export const SIDEBAR = new Ext.ElementRack<SidebarProps>();
+export const SIDEBAR = new State.ElementRack<SidebarProps>();
 
 /** @ignore */
-export const TOOLBAR = new Ext.ElementRack<ToolProps>();
+export const TOOLBAR = new State.ElementRack<ToolProps>();
 
 /** @ignore */
-export const STATUSBAR = new Ext.ElementRack<ToolProps>();
+export const STATUSBAR = new State.ElementRack<ToolProps>();
 
 export function registerSidebar(sidebar: SidebarProps): void {
   SIDEBAR.register(sidebar);
@@ -213,9 +230,9 @@ export function registerStatusbar(status: ToolProps): void {
   STATUSBAR.register(status);
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Search Modes                                                       ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Search Modes                                                       --- */
+/* -------------------------------------------------------------------------- */
 
 export interface Hint {
   id: string;
@@ -227,7 +244,7 @@ export interface Hint {
   onClick?: () => void; // click on hint
 }
 
-export interface ModeProps {
+export interface SearchProps {
   id: string; // Mode identifier
   rank?: number; // Modes ordering
   icon?: string; // Search Field's Icons
@@ -241,46 +258,49 @@ export interface ModeProps {
   onEnter?: (pattern: string) => void; // Enter key for search field
 }
 
-export function registerMode(m: ModeProps): void { Mode.registerMode(m); }
-export function updateMode(m: ModeProps): void { Mode.updateMode(m); }
-export function removeMode(id: string): void { Mode.removeMode(id); }
-export function selectMode(id: string): void { Mode.selectMode(id); }
-export function focusMode(id: string): void { Mode.focusMode(id); }
-export function useMode(m: ModeProps): void {
+/* eslint-disable max-len */
+export function registerSearchMode(m: SearchProps): void { Search.registerMode(m); }
+export function updateSearchMode(m: SearchProps): void { Search.updateMode(m); }
+export function removeSearchMode(id: string): void { Search.removeMode(id); }
+export function selectSearchMode(id: string): void { Search.selectMode(id); }
+export function focusSearchMode(id: string): void { Search.focusMode(id); }
+/* eslint-enable max-len */
+
+export function useSearchMode(m: SearchProps): void {
   React.useEffect(() => {
     const id = m.id;
-    const m0 = Mode.findMode(id);
-    Mode.registerMode({ ...m0, ...m });
+    const m0 = Search.findMode(id);
+    Search.registerMode({ ...m0, ...m });
     return () => {
       if (m0 !== undefined)
-        Mode.registerMode(m0);
+        Search.registerMode(m0);
       else
-        Mode.removeMode(id);
+        Search.removeMode(id);
     };
   }, [m]);
 }
 
-/* --------------------------------------------------------------------------*/
-/* --- Sandbox                                                            ---*/
-/* --------------------------------------------------------------------------*/
+/* -------------------------------------------------------------------------- */
+/* --- Sandbox                                                            --- */
+/* -------------------------------------------------------------------------- */
 
 if (DEVEL) {
-  registerGroup({
-    id: 'sandbox',
-    label: 'Sandbox',
-    title: 'Ivette Sandbox Components (only in DEVEL mode)',
-  });
   registerView({
     id: 'sandbox',
-    rank: -2,
     label: 'Sandbox',
     title: 'Sandbox Playground (only in DEVEL mode)',
-    layout: [],
+    layout: { ABCD: 'sandbox.qsplit' },
   });
 }
 
 export function registerSandbox(props: ComponentProps): void {
-  if (DEVEL) registerComponent({ ...props, group: 'sandbox' });
+  if (DEVEL) {
+    if (!props.id.startsWith('sandbox.')) {
+      // eslint-disable-next-line no-console
+      console.error('SANDBOX wrong identifier', props.id);
+    }
+    registerComponent(props);
+  }
 }
 
 /* -------------------------------------------------------------------------- */

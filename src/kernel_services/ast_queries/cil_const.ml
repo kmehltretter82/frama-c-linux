@@ -43,15 +43,6 @@
 
 open Cil_types
 
-module CurrentLoc =
-  State_builder.Ref
-    (Cil_datatype.Location)
-    (struct
-      let dependencies = []
-      let name = "CurrentLoc"
-      let default () = Cil_datatype.Location.unknown
-    end)
-
 let voidType = TVoid([])
 
 module Vid = State_builder.SharedCounter(struct let name = "vid_counter" end)

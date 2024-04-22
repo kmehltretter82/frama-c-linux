@@ -6,7 +6,7 @@
 [alias] May-alias graph at the end of function CPS_SplitWord:
   <empty>
 [alias] Summary of function CPS_SplitWord:
-  formals: line    locals:     returns: line    state: <none>
+  formals: line    returns: line    state: <none>
 [alias:unsafe-cast] union_vmap.c:11: Warning: 
   unsafe cast from char const * to char *; analysis may be unsound
 [alias] May-aliases after instruction  char *s2 = CPS_SplitWord((char *)"a");  are
@@ -32,12 +32,11 @@
 [alias] May-alias graph at the end of function CPS_ParseKey:
   4:{ s2; s3 } → 3:{  }   10:{ key } → 4:{ s2; s3 }
 [alias] Summary of function CPS_ParseKey:
-  formals:     locals: key→{ s2; s3 }  s2  s3    returns: <none>
-  state: { *key; s2; s3 }
+  formals:     returns: <none>    state: { *key; s2; s3 }
 [alias] analysing function: CPS_SplitWord
 [alias] May-aliases at the end of function CPS_SplitWord: <none>
 [alias] May-alias graph at the end of function CPS_SplitWord:
   <empty>
 [alias] Summary of function CPS_SplitWord:
-  formals: line    locals:     returns: line    state: <none>
+  formals: line    returns: line    state: <none>
 [alias] Analysis complete

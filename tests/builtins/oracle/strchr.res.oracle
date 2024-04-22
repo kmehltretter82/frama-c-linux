@@ -19,7 +19,7 @@
   strchr_misc_static_str ∈ {0}
   strchr_misc_zero_str ∈ {0}
 [eva] computing for function strchr_small_sets <- main.
-  Called from strchr.c:546.
+  Called from strchr.c:548.
 [eva] strchr.c:88: Call to builtin strchr
 [eva] strchr.c:88: 
   function strchr: precondition 'valid_string_s' got status valid.
@@ -50,7 +50,7 @@
 [eva] Recording results for strchr_small_sets
 [eva] Done for function strchr_small_sets
 [eva] computing for function strchr_zero_termination <- main.
-  Called from strchr.c:547.
+  Called from strchr.c:549.
 [eva] strchr.c:113: Call to builtin strchr
 [eva:alarm] strchr.c:113: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
@@ -65,7 +65,7 @@
 [eva] Recording results for strchr_zero_termination
 [eva] Done for function strchr_zero_termination
 [eva] computing for function strchr_initialization <- main.
-  Called from strchr.c:548.
+  Called from strchr.c:550.
 [eva] strchr.c:132: Call to builtin strchr
 [eva:alarm] strchr.c:132: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
@@ -87,7 +87,7 @@
 [eva] Recording results for strchr_initialization
 [eva] Done for function strchr_initialization
 [eva] computing for function strchr_large <- main.
-  Called from strchr.c:549.
+  Called from strchr.c:551.
 [eva] computing for function init_array_nondet <- strchr_large <- main.
   Called from strchr.c:197.
 [eva] strchr.c:189: Call to builtin memset
@@ -158,7 +158,7 @@
 [eva] Recording results for strchr_large
 [eva] Done for function strchr_large
 [eva] computing for function strchr_large_uninit <- main.
-  Called from strchr.c:550.
+  Called from strchr.c:552.
 [eva] computing for function init_array_nondet <- strchr_large_uninit <- main.
   Called from strchr.c:229.
 [eva] strchr.c:189: Call to builtin memset
@@ -205,7 +205,7 @@
 [eva] Recording results for strchr_large_uninit
 [eva] Done for function strchr_large_uninit
 [eva] computing for function strchr_misc_array <- main.
-  Called from strchr.c:551.
+  Called from strchr.c:553.
 [eva] computing for function Frama_C_interval <- strchr_misc_array <- main.
   Called from strchr.c:270.
 [eva] strchr.c:270: 
@@ -221,7 +221,7 @@
 [eva] Recording results for strchr_misc_array
 [eva] Done for function strchr_misc_array
 [eva] computing for function strchr_misc <- main.
-  Called from strchr.c:552.
+  Called from strchr.c:554.
 [eva] strchr.c:301: Call to builtin strchr
 [eva:alarm] strchr.c:301: Warning: 
   function strchr: precondition 'valid_string_s' got status invalid.
@@ -263,7 +263,7 @@
 [eva] Recording results for strchr_misc
 [eva] Done for function strchr_misc
 [eva] computing for function strchr_misc2 <- main.
-  Called from strchr.c:553.
+  Called from strchr.c:555.
 [eva] strchr.c:326: Call to builtin strchr
 [eva] strchr.c:326: 
   function strchr: precondition 'valid_string_s' got status valid.
@@ -300,14 +300,14 @@
 [eva] Recording results for strchr_misc2
 [eva] Done for function strchr_misc2
 [eva] computing for function strchr_bitfields <- main.
-  Called from strchr.c:554.
+  Called from strchr.c:556.
 [eva] strchr.c:166: Call to builtin strchr
 [eva:alarm] strchr.c:166: Warning: 
   function strchr: precondition 'valid_string_s' got status invalid.
 [eva] Recording results for strchr_bitfields
 [eva] Done for function strchr_bitfields
 [eva] computing for function strchr_bitfields2 <- main.
-  Called from strchr.c:555.
+  Called from strchr.c:557.
 [eva] strchr.c:183: Call to builtin strchr
 [eva] strchr.c:183: 
   function strchr: precondition 'valid_string_s' got status valid.
@@ -316,7 +316,7 @@
 [eva] Recording results for strchr_bitfields2
 [eva] Done for function strchr_bitfields2
 [eva] computing for function strchr_escaping <- main.
-  Called from strchr.c:556.
+  Called from strchr.c:558.
 [eva:alarm] strchr.c:258: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
 [eva:locals-escaping] strchr.c:258: Warning: 
@@ -334,7 +334,7 @@
 [eva] Recording results for strchr_escaping
 [eva] Done for function strchr_escaping
 [eva] computing for function strchr_big_array <- main.
-  Called from strchr.c:557.
+  Called from strchr.c:559.
 [eva:alarm] strchr.c:353: Warning: out of bounds write. assert \valid(p);
 [eva:alarm] strchr.c:355: Warning: out of bounds write. assert \valid(p);
 [eva:alarm] strchr.c:357: Warning: out of bounds write. assert \valid(p);
@@ -430,7 +430,7 @@
 [eva] Recording results for strchr_big_array
 [eva] Done for function strchr_big_array
 [eva] computing for function strchr_no_zero_but_ok <- main.
-  Called from strchr.c:558.
+  Called from strchr.c:560.
 [eva] strchr.c:422: Call to builtin strchr
 [eva] strchr.c:422: 
   function strchr: precondition 'valid_string_s' got status valid.
@@ -459,7 +459,7 @@
 [eva] Recording results for strchr_no_zero_but_ok
 [eva] Done for function strchr_no_zero_but_ok
 [eva] computing for function strchr_small_sets_chars <- main.
-  Called from strchr.c:559.
+  Called from strchr.c:561.
 [eva] strchr.c:463: Frama_C_show_each_c: {97}
 [eva] strchr.c:464: Call to builtin strchr
 [eva] strchr.c:464: 
@@ -604,7 +604,7 @@
 [eva] Recording results for strchr_small_sets_chars
 [eva] Done for function strchr_small_sets_chars
 [eva] computing for function strchr_unbounded <- main.
-  Called from strchr.c:560.
+  Called from strchr.c:562.
 [eva] strchr.c:519: Call to builtin strchr
 [eva] strchr.c:519: 
   function strchr: precondition 'valid_string_s' got status valid.
@@ -613,60 +613,58 @@
 [eva] strchr.c:524: Call to builtin strchr
 [eva:alarm] strchr.c:524: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva:alarm] strchr.c:524: Warning: 
-  pointer subtraction. assert \base_addr(_ss_0) ≡ \base_addr(s);
 [eva] strchr.c:524: Frama_C_show_each_mystrchr: [-1..26]
 [eva] strchr.c:525: assertion got status valid.
 [eva] computing for function init_array_nondet <- strchr_unbounded <- main.
-  Called from strchr.c:526.
+  Called from strchr.c:527.
 [eva] strchr.c:189: Call to builtin memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet
-[eva] strchr.c:527: Call to builtin strchr
-[eva:alarm] strchr.c:527: Warning: 
+[eva] strchr.c:528: Call to builtin strchr
+[eva:alarm] strchr.c:528: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva:alarm] strchr.c:527: Warning: 
+[eva:alarm] strchr.c:528: Warning: 
   pointer subtraction. assert \base_addr(_ss_1) ≡ \base_addr(s);
-[eva] strchr.c:527: Frama_C_show_each_mystrchr: [-1..29]
-[eva] strchr.c:528: assertion got status valid.
-[eva] strchr.c:529: Call to builtin strchr
-[eva:alarm] strchr.c:529: Warning: 
+[eva] strchr.c:528: Frama_C_show_each_mystrchr: [-1..29]
+[eva] strchr.c:529: assertion got status valid.
+[eva] strchr.c:530: Call to builtin strchr
+[eva:alarm] strchr.c:530: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva:alarm] strchr.c:529: Warning: 
+[eva:alarm] strchr.c:530: Warning: 
   pointer subtraction. assert \base_addr(_ss_2) ≡ \base_addr(s);
-[eva] strchr.c:529: Frama_C_show_each_mystrchr: [-1..29]
-[eva] strchr.c:530: assertion got status valid.
+[eva] strchr.c:530: Frama_C_show_each_mystrchr: [-1..29]
+[eva] strchr.c:531: assertion got status valid.
 [eva] Recording results for strchr_unbounded
 [eva] Done for function strchr_unbounded
 [eva] computing for function strchr_invalid <- main.
-  Called from strchr.c:561.
-[eva:garbled-mix:write] strchr.c:536: 
+  Called from strchr.c:563.
+[eva:garbled-mix:write] strchr.c:537: 
   Assigning imprecise value to s because of arithmetic operation on addresses.
-[eva] strchr.c:536: Call to builtin strchr
-[eva:alarm] strchr.c:536: Warning: 
+[eva] strchr.c:538: Call to builtin strchr
+[eva:alarm] strchr.c:538: Warning: 
   function strchr: precondition 'valid_string_s' got status unknown.
-[eva:alarm] strchr.c:536: Warning: 
+[eva:alarm] strchr.c:538: Warning: 
   pointer comparison. assert \pointer_comparable((void *)_ss, (void *)0);
-[eva:alarm] strchr.c:536: Warning: 
+[eva:alarm] strchr.c:538: Warning: 
   pointer subtraction. assert \base_addr(_ss) ≡ \base_addr(s);
-[eva:alarm] strchr.c:536: Warning: 
+[eva:alarm] strchr.c:538: Warning: 
   signed overflow. assert -2147483648 ≤ _ss - s;
-[eva:alarm] strchr.c:536: Warning: 
+[eva:alarm] strchr.c:538: Warning: 
   signed overflow. assert _ss - s ≤ 2147483647;
-[eva] strchr.c:536: Frama_C_show_each_mystrchr: [-2147483648..2147483647]
+[eva] strchr.c:538: Frama_C_show_each_mystrchr: [-2147483648..2147483647]
 [eva] Recording results for strchr_invalid
 [eva] Done for function strchr_invalid
 [eva] computing for function strchr_garbled_mix_in_char <- main.
-  Called from strchr.c:562.
-[eva:alarm] strchr.c:541: Warning: 
+  Called from strchr.c:564.
+[eva:alarm] strchr.c:543: Warning: 
   pointer downcast. assert (unsigned int)(&x) ≤ 2147483647;
-[eva:garbled-mix:write] strchr.c:541: 
+[eva:garbled-mix:write] strchr.c:543: 
   Assigning imprecise value to garbled
   because of arithmetic operation on addresses.
-[eva:alarm] strchr.c:542: Warning: 
+[eva:alarm] strchr.c:544: Warning: 
   pointer downcast. assert (unsigned int)garbled ≤ 2147483647;
-[eva] strchr.c:542: Call to builtin strchr
-[eva:alarm] strchr.c:542: Warning: 
+[eva] strchr.c:544: Call to builtin strchr
+[eva:alarm] strchr.c:544: Warning: 
   function strchr: precondition 'valid_string_s' got status invalid.
 [eva] Recording results for strchr_garbled_mix_in_char
 [eva] Done for function strchr_garbled_mix_in_char
@@ -674,8 +672,12 @@
 [eva] Done for function main
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
-    strchr.c:541: arithmetic operation on addresses
-      (read 1 times, propagated 3 times) garbled mix of &{x}
+    strchr.c:537: arithmetic operation on addresses
+      (read in 1 statement, propagated through 2 statements)
+      garbled mix of &{s; "hello"}
+    strchr.c:543: arithmetic operation on addresses
+      (read in 1 statement, propagated through 2 statements)
+      garbled mix of &{x}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function init_array_nondet:
   from ∈ {-1}
@@ -724,7 +726,7 @@
   z1 ∈ {0}
   z2 ∈ {0}
 [eva:final-states] Values at end of function strchr_garbled_mix_in_char:
-  garbled ∈ {{ garbled mix of &{x} (origin: Arithmetic {strchr.c:541}) }}
+  garbled ∈ {{ garbled mix of &{x} (origin: Arithmetic {strchr.c:543}) }}
 [eva:final-states] Values at end of function strchr_initialization:
   c ∈ {0}
   empty_or_uninitialized[0] ∈ {0} or UNINITIALIZED
@@ -737,7 +739,7 @@
    [3] ∈ {0}
   z3 ∈ {3}
 [eva:final-states] Values at end of function strchr_invalid:
-  s ∈ {{ "hello" }}
+  s ∈ {{ &s + {0; 1; 2; 3} ; "hello" + {0; 1; 2; 3; 4; 5} }}
   unused ∈ [--..--]
 [eva:final-states] Values at end of function strchr_large:
   Frama_C_entropy_source ∈ [--..--]

@@ -255,7 +255,7 @@
 [eva:garbled-mix:summary] 
   Origins of garbled mix generated during analysis:
     spawn_h.c:36: assigns clause on addresses
-      (read 20 times, propagated 13 times)
+      (read in 3 statements, propagated through 2 statements)
       garbled mix of &{S_argv; S_0_S_argv; S_1_S_argv}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:

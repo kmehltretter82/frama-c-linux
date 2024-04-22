@@ -35,22 +35,22 @@
 [wp] [Unsuccess] typed_test_check_unknown_12 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_test_check_provable_3 (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_test_check_unknown_13 (Alt-Ergo) (Cached)
-[wp] [Valid] typed_test_check_provable_4 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_test_check_provable_4 (Alt-Ergo) (Cached)
 [wp] [Valid] typed_glob_var_ensures_provable (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_glob_var_ensures_unknown (Alt-Ergo) (Cached)
 [wp] [Valid] typed_glob_arr_ensures_provable (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_glob_arr_ensures_unknown (Alt-Ergo) (Cached)
 [wp] [Valid] typed_formal_assert_provable (Alt-Ergo) (Cached)
 [wp] [Valid] typed_ptr_on_local_assert_provable (Alt-Ergo) (Cached)
-[wp] Proved goals:   24 / 39
+[wp] Proved goals:   23 / 39
   Terminating:     5
   Unreachable:     5
   Qed:             6
-  Alt-Ergo:        8
-  Unsuccess:      15
+  Alt-Ergo:        7
+  Unsuccess:      16
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  test                      6        4       23      43.5%
+  test                      6        3       23      39.1%
   glob_var                  -        1        2      50.0%
   glob_arr                  -        1        2      50.0%
   formal                    -        1        1       100%

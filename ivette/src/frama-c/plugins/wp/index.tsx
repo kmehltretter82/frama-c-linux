@@ -33,10 +33,64 @@ import { Group, Inset } from 'dome/frame/toolbars';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
+import * as Ast from 'frama-c/kernel/api/ast';
+import * as ASTview from 'frama-c/kernel/ASTview';
 import { GoalTable } from './goals';
 import { TIPView } from './tip';
 import * as WP from 'frama-c/plugins/wp/api';
 import './style.css';
+
+/* -------------------------------------------------------------------------- */
+/* --- Context Menus                                                      --- */
+/* -------------------------------------------------------------------------- */
+
+function addStartProofMenus(
+  menu: Dome.PopupMenuItem[],
+  attr: Ast.markerAttributesData,
+): void {
+  const { marker, kind } = attr;
+  switch (kind) {
+    case 'LFUN':
+    case 'DFUN':
+      menu.push({
+        label: `Prove function using WP`,
+        onClick: () => Server.send(WP.startProofs, marker)
+      });
+      return;
+    case 'STMT':
+      menu.push({
+        label: `Prove statement annotations using WP`,
+        onClick: () => Server.send(WP.startProofs, marker)
+      });
+      return;
+    case 'PROPERTY':
+      menu.push({
+        label: `Prove property using WP`,
+        onClick: () => Server.send(WP.startProofs, marker)
+      });
+      return;
+  }
+}
+
+ASTview.registerMarkerMenuExtender(addStartProofMenus);
+
+function addGenerateRTEGuardsMenu(
+  menu: Dome.PopupMenuItem[],
+  attr: Ast.markerAttributesData,
+): void {
+  const { marker, kind } = attr;
+  switch (kind) {
+    case 'LFUN':
+    case 'DFUN':
+      menu.push({
+        label: `Populate WP RTE guards`,
+        onClick: () => Server.send(WP.generateRTEGuards, marker)
+      });
+      return;
+  }
+}
+
+ASTview.registerMarkerMenuExtender(addGenerateRTEGuardsMenu);
 
 /* -------------------------------------------------------------------------- */
 /* --- Goal Component                                                     --- */
@@ -102,9 +156,7 @@ function WPGoals(): JSX.Element {
 }
 
 Ivette.registerComponent({
-  id: 'frama-c.plugins.wp.goals',
-  group: 'frama-c.plugins',
-  rank: 10,
+  id: 'fc.wp.goals',
   label: 'WP Goals',
   title: 'WP Generated Verification Conditions',
   children: <WPGoals />,
@@ -136,7 +188,7 @@ function ServerActivity(): JSX.Element {
 }
 
 Ivette.registerStatusbar({
-  id: 'frama-c.plugins.wp.server',
+  id: 'fc.wp.server',
   children: <ServerActivity />,
 });
 
@@ -145,13 +197,13 @@ Ivette.registerStatusbar({
 /* -------------------------------------------------------------------------- */
 
 Ivette.registerView({
-  id: 'frama-c.plugins.wp.main',
-  rank: 5,
+  id: 'fc.wp.main',
   label: 'WP View',
-  layout: [
-    ['frama-c.astview', 'frama-c.astinfo'],
-    'frama-c.plugins.wp.goals',
-  ],
+  layout: {
+    'A': 'fc.kernel.astview',
+    'B': 'fc.kernel.astinfo',
+    'CD': 'fc.wp.goals',
+  }
 });
 
 // --------------------------------------------------------------------------

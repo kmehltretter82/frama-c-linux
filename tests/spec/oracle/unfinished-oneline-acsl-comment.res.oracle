@@ -5,5 +5,5 @@
   4      */
   5     // If you edit this file, make sure it ends WITHOUT a newline
   6     //@ bad
-        ^^^^^^^
+               ^
 [kernel] Frama-C aborted: invalid user input.

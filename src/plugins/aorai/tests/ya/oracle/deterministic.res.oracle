@@ -115,7 +115,7 @@ check lemma S0_deterministic_trans{L}:
    @/
   void g_pre_func(int x)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_g;
@@ -185,7 +185,7 @@ check lemma S0_deterministic_trans{L}:
    @/
   void g_post_func(void)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_g;
@@ -264,7 +264,7 @@ void g(int x)
    @/
   void f_pre_func(int x)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_f;
@@ -323,7 +323,7 @@ void g(int x)
    @/
   void f_post_func(int res)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_f;
@@ -410,7 +410,7 @@ int f(int x)
    @/
   void real_main_pre_func(int c)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_real_main;
@@ -475,7 +475,7 @@ int f(int x)
    @/
   void real_main_post_func(int res)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_real_main;
@@ -548,7 +548,7 @@ int real_main(int c)
    @/
   void main_pre_func(int c)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Called;
     aorai_CurOperation = op_main;
@@ -605,7 +605,7 @@ int real_main(int c)
    @/
   void main_post_func(int res)
   {
-    /@ slevel full; @/
+    /@ \eva::slevel full; @/
     ;
     aorai_CurOpStatus = aorai_Terminated;
     aorai_CurOperation = op_main;

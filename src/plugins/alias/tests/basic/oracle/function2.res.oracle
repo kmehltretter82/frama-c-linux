@@ -20,7 +20,7 @@
 [alias] May-alias graph at the end of function my_malloc:
   0:{ res } → 1:{  }
 [alias] Summary of function my_malloc:
-  formals: size    locals: res    returns: res    state: <none>
+  formals: size    returns: res    state: <none>
 [alias] May-aliases after instruction  a = my_malloc(2);  are  <none>
 [alias] May-alias graph after instruction  a = my_malloc(2);  is
   4:{ a } → 3:{  }
@@ -36,7 +36,7 @@
 [alias] May-alias graph at the end of function main:
   4:{ a } → 3:{  }   8:{ b } → 7:{  }
 [alias] Summary of function main:
-  formals:     locals: a  b  __retres    returns: __retres    state: <none>
+  formals:     returns: __retres    state: <none>
 [alias] analysing function: my_malloc
 [alias] analysing instruction: int *res = (int *)0;
 [alias] May-aliases after instruction  int *res = (int *)0;  are  <none>
@@ -45,5 +45,5 @@
 [alias] May-alias graph at the end of function my_malloc:
   0:{ res } → 1:{  }
 [alias] Summary of function my_malloc:
-  formals: size    locals: res    returns: res    state: <none>
+  formals: size    returns: res    state: <none>
 [alias] Analysis complete

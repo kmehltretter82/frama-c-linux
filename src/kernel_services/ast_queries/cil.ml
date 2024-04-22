@@ -64,17 +64,13 @@ open Cil_types
    functions below. *)
 let check_invariants = false
 
-(* A reference to the current location *)
-module CurrentLoc = Cil_const.CurrentLoc
-let () = Log.set_current_source (fun () -> fst (CurrentLoc.get ()))
-
-let pp_thisloc fmt = Location.pretty fmt (CurrentLoc.get ())
+let pp_thisloc fmt = Location.pretty fmt (Current_loc.get ())
 
 let abort_context msg =
-  let pos = fst (CurrentLoc.get ()) in
+  let loc = Current_loc.get () in
   let append fmt =
     Format.pp_print_newline fmt ();
-    Errorloc.pp_context_from_file fmt pos
+    Errorloc.pp_context_from_file fmt loc
   in
   Kernel.abort ~current:true ~append msg
 
@@ -131,7 +127,7 @@ let createMachine () = (* Contain dummy values *)
     lowerConstants = false(*true*);
     insertImplicitCasts = true;
     stringLiteralType = charConstPtrType;
-    upointKind = IChar;
+    upointKind = IUChar;
     upointType = voidType;
     wcharKind = IChar;
     wcharType = voidType;
@@ -764,7 +760,6 @@ let setFormals (f: fundec) (forms: varinfo list) =
   unsafeSetFormalsDecl f.svar forms;
   List.iter (fun v -> v.vformal <- true) forms;
   f.sformals <- forms; (* Set the formals *)
-  assert (getFormalsDecl f.svar == f.sformals);
   match unrollType f.svar.vtype with
     TFun(rt, _, isva, fa) ->
     update_var_type f.svar
@@ -1423,10 +1418,8 @@ let copy_logic_label is_copy l =
   end else l
 
 let rec visitCilTerm vis t =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set t.term_loc;
-  let res = doVisitCil vis (fun x-> x) vis#vterm childrenTerm t in
-  CurrentLoc.set oldloc; res
+  Current_loc.with_loc t.term_loc
+    (doVisitCil vis (fun x-> x) vis#vterm childrenTerm) t
 
 and childrenTerm vis t =
   let tn' = visitCilTermNode vis t.term_node in
@@ -2056,10 +2049,6 @@ and childrenLoopPragma vis p =
   match p with
   | Unroll_specs lt -> let lt' = mapNoCopy (visitCilTerm vis) lt in
     if lt' != lt then Unroll_specs lt' else p
-  | Widen_hints lt -> let lt' = mapNoCopy (visitCilTerm vis) lt in
-    if lt' != lt then Widen_hints lt' else p
-  | Widen_variables lt -> let lt' = mapNoCopy (visitCilTerm vis) lt in
-    if lt' != lt then Widen_variables lt' else p
 
 and childrenModelInfo vis m =
   let field_type = visitCilLogicType vis m.mi_field_type in
@@ -2078,13 +2067,12 @@ and childrenModelInfo vis m =
   else begin m.mi_attr <- mi_attr; m end
 
 and visitCilModelInfo vis m =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set m.mi_decl;
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = m.mi_decl in
   let m' =
     doVisitCil
       vis (Visitor_behavior.Memo.model_info vis#behavior) vis#vmodel_info childrenModelInfo m
   in
-  CurrentLoc.set oldloc;
   if m' != m then begin
     (* reflect changes in the behavior tables for copy visitor. *)
     Visitor_behavior.Set.model_info vis#behavior m m';
@@ -2093,11 +2081,8 @@ and visitCilModelInfo vis m =
   m'
 
 and visitCilAnnotation vis a =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set (Global_annotation.loc a);
-  let res = doVisitCil vis id vis#vannotation childrenAnnotation a in
-  CurrentLoc.set oldloc;
-  res
+  Current_loc.with_loc (Global_annotation.loc a)
+    (doVisitCil vis id vis#vannotation childrenAnnotation) a
 
 and childrenAnnotation vis a =
   match a with
@@ -2208,10 +2193,9 @@ and childrenCodeAnnot vis ca =
     else ca
 
 and visitCilExpr (vis: cilVisitor) (e: exp) : exp =
-  let oldLoc = CurrentLoc.get () in
-  CurrentLoc.set e.eloc;
-  let res = doVisitCil vis (Visitor_behavior.cexpr vis#behavior) vis#vexpr childrenExp e in
-  CurrentLoc.set oldLoc; res
+  Current_loc.with_loc (e.eloc)
+    (doVisitCil vis (Visitor_behavior.cexpr vis#behavior) vis#vexpr childrenExp)
+    e
 
 and childrenExp (vis: cilVisitor) (e: exp) : exp =
   let vExp e = visitCilExpr vis e in
@@ -2342,12 +2326,8 @@ and childrenLocal_init vi (vis: cilVisitor) li =
     if f' != f || args' != args then ConsInit(f',args',k) else li
 
 and visitCilInstr (vis: cilVisitor) (i: instr) : instr list =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set (Cil_datatype.Instr.loc i);
-  let res =
-    doVisitListCil vis id vis#vinst childrenInstr i in
-  CurrentLoc.set oldloc;
-  res
+  Current_loc.with_loc (Cil_datatype.Instr.loc i)
+    (doVisitListCil vis id vis#vinst childrenInstr) i
 
 and childrenInstr (vis: cilVisitor) (i: instr) : instr =
   let fExp = visitCilExpr vis in
@@ -2410,31 +2390,26 @@ and childrenInstr (vis: cilVisitor) (i: instr) : instr =
 
 (* visit all nodes in a Cil statement tree in preorder *)
 and visitCilStmt (vis:cilVisitor) (s: stmt) : stmt =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set (Stmt.loc s) ;
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = Cil_datatype.Stmt.loc s in
   vis#push_stmt s; (*(vis#behavior.memo_stmt s);*)
   assertEmptyQueue vis;
   let toPrepend : instr list ref = ref [] in (* childrenStmt may add to this *)
   let res =
     doVisitCil vis
       (Visitor_behavior.Memo.stmt vis#behavior) vis#vstmt (childrenStmt toPrepend) s in
-  let ghost = res.ghost in
   (* Now see if we have saved some instructions *)
   toPrepend := !toPrepend @ vis#unqueueInstr ();
-  (match !toPrepend with
-     [] -> () (* Return the same statement *)
-   | _ ->
-     let b =
-       mkBlockNonScoping
-         ((List.map (fun i -> mkStmt ~ghost (Instr i)) !toPrepend)
-          @ [mkStmt ~ghost res.skind])
-     in
-     b.battrs <- addAttribute (Attr (vis_tmp_attr, [])) b.battrs;
-     (* Make our statement contain the instructions to prepend *)
-     res.skind <- Block b);
-  CurrentLoc.set oldloc;
-  vis#pop_stmt s;
-  res
+  match !toPrepend with
+    [] -> vis#pop_stmt s; res (* Return the same statement *)
+  | _ :: _ as instr_list ->
+    let make i = mkStmt ~ghost:res.ghost (Instr i) in
+    let last = mkStmt ~ghost:res.ghost res.skind in
+    let block = mkBlockNonScoping (List.map make instr_list @ [ last ]) in
+    block.battrs <- addAttribute (Attr (vis_tmp_attr, [])) block.battrs;
+    (* Make our statement contain the instructions to prepend *)
+    res.skind <- Block block;
+    vis#pop_stmt s; res
 
 and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
   let fExp e = (visitCilExpr vis e) in
@@ -2668,12 +2643,9 @@ and childrenType (vis : cilVisitor) (t : typ) : typ =
 (* for declarations, we visit the types inside; but for uses, *)
 (* we just visit the varinfo node *)
 and visitCilVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set v.vdecl;
-  let res =
-    doVisitCil vis (Visitor_behavior.Memo.varinfo vis#behavior)
-      vis#vvdec childrenVarDecl v
-  in CurrentLoc.set oldloc; res
+  Current_loc.with_loc v.vdecl
+    (doVisitCil vis (Visitor_behavior.Memo.varinfo vis#behavior)
+       vis#vvdec childrenVarDecl) v
 
 and childrenVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
   (* in case of refresh visitor, the associated new logic var has a different
@@ -2876,12 +2848,8 @@ let visitCilEnumInfo vis e =
   doVisitCil vis (Visitor_behavior.Memo.enuminfo vis#behavior) vis#venuminfo childrenEnumInfo e
 
 let rec visitCilGlobal (vis: cilVisitor) (g: global) : global list =
-  let oldloc = CurrentLoc.get () in
-  CurrentLoc.set (Global.loc g) ;
-  let res =
-    doVisitListCil vis id vis#vglob childrenGlobal g in
-  CurrentLoc.set oldloc;
-  res
+  Current_loc.with_loc (Global.loc g)
+    (doVisitListCil vis id vis#vglob childrenGlobal) g
 and childrenGlobal (vis: cilVisitor) (g: global) : global =
   match g with
   | GFun (f, l) ->
@@ -4618,6 +4586,10 @@ and constFold (machdep: bool) (e: exp) : exp =
       try kinteger ~loc theMachine.kindOfSizeOf (bytesSizeOf t)
       with SizeOfError _ -> e
     end
+  | SizeOfE { enode = Const (CWStr l) } when machdep ->
+    let len = List.length l in
+    let wchar_size = bitsSizeOfInt theMachine.wcharKind / 8 in
+    kinteger ~loc theMachine.kindOfSizeOf ((len + 1) * wchar_size)
   | SizeOfE e when machdep ->
     constFold machdep (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
   | SizeOfStr s when machdep ->
@@ -4983,8 +4955,7 @@ let compareConstant c1 c2 =
 (* Iterate over all globals, including the global initializer *)
 let iterGlobals (fl: file) (doone: global -> unit) : unit =
   let doone' g =
-    CurrentLoc.set (Global.loc g);
-    doone g
+    Current_loc.with_loc (Global.loc g) doone g
   in
   List.iter doone' fl.globals;
   match fl.globinit with
@@ -4994,8 +4965,7 @@ let iterGlobals (fl: file) (doone: global -> unit) : unit =
 (* Fold over all globals, including the global initializer *)
 let foldGlobals (fl: file) (doone: 'a -> global -> 'a) (acc: 'a) : 'a =
   let doone' acc g =
-    CurrentLoc.set (Global.loc g);
-    doone acc g
+    Current_loc.with_loc (Global.loc g) (doone acc) g
   in
   let acc' = List.fold_left doone' acc fl.globals in
   match fl.globinit with
@@ -5320,8 +5290,10 @@ let constFoldVisitor (machdep: bool) = new constFoldVisitorClass machdep
 
 let rec constFoldTermNodeAtTop = function
   | TSizeOf typ as t ->
-    (try integer_lconstant (bytesSizeOf typ)
-     with SizeOfError _ -> t)
+    begin
+      try integer_lconstant (bytesSizeOf typ)
+      with SizeOfError _ -> t
+    end
   | TSizeOfStr str -> integer_lconstant (String.length str + 1)
   | TAlignOf typ as t ->
     begin
@@ -5334,14 +5306,68 @@ let rec constFoldTermNodeAtTop = function
   | TSizeOfE _ | TAlignOfE _ ->
     assert false (* sizeof/alignof of logic types are rejected
                     by typing anyway. *)
+  | TUnOp (op, ({ term_node = n1 } as t1)) ->
+    begin
+      let constFoldTermUnOp int_unop =
+        match constFoldTermNodeAtTop n1 with
+        | TConst (Integer (i, _)) -> TConst (Integer (int_unop i, None))
+        | n1 -> TUnOp (op, {t1 with term_node = n1})
+      in
+      match op with
+      | Neg -> constFoldTermUnOp Integer.neg
+      | BNot -> constFoldTermUnOp Integer.lognot
+      | LNot -> constFoldTermUnOp
+                  (fun i -> if Integer.is_zero i
+                    then Integer.one else Integer.zero)
+    end
+  | TBinOp (op, ({term_node = n1} as t1), ({term_node = n2} as t2)) ->
+    begin
+      let n1 = constFoldTermNodeAtTop n1 in
+      let n2 = constFoldTermNodeAtTop n2 in
+      let constFoldTermBinOp int_bop =
+        match n1, n2 with
+        | TConst (Integer (i1, _)), TConst (Integer (i2, _)) ->
+          TConst (Integer (int_bop i1 i2, None))
+        | n1, n2 ->
+          TBinOp (op, {t1 with term_node = n1}, {t2 with term_node = n2})
+
+      in
+      match op with
+      | PlusA -> constFoldTermBinOp Integer.add
+      | MinusA -> constFoldTermBinOp Integer.sub
+      | Mult -> constFoldTermBinOp Integer.mul
+      | Shiftlt -> constFoldTermBinOp Integer.shift_left
+      | Shiftrt -> (* right-shifting Lintegers is always arithmetic *)
+        constFoldTermBinOp Integer.shift_right
+      | BAnd -> constFoldTermBinOp Integer.logand
+      | BXor -> constFoldTermBinOp Integer.logxor
+      | BOr -> constFoldTermBinOp Integer.logor
+      | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr ->
+        let bool_op = match op with
+          | Lt -> Integer.lt
+          | Gt -> Integer.gt
+          | Le -> Integer.le
+          | Ge -> Integer.ge
+          | Eq -> Integer.equal
+          | Ne -> (fun i1 i2 -> not (Integer.equal i1 i2))
+          | LAnd ->
+            (fun i1 i2 -> not (Integer.is_zero i1) && not (Integer.is_zero i2))
+          | LOr ->
+            (fun i1 i2 -> not (Integer.is_zero i1) || not (Integer.is_zero i2))
+          | _ -> assert false
+        in
+        constFoldTermBinOp
+          (fun i1 i2 -> if bool_op i1 i2 then Integer.one else Integer.zero)
+      | _ ->
+        TBinOp (op, {t1 with term_node = n1}, {t2 with term_node = n2})
+    end
   | t -> t
 
-let constFoldTerm machdep t =
+let constFoldTerm t =
   let visitor = object
     inherit nopCilVisitor
     method! vterm_node t =
-      if machdep then ChangeToPost (t,constFoldTermNodeAtTop)
-      else DoChildren
+      ChangeToPost (t, constFoldTermNodeAtTop)
   end
   in
   visitCilTerm visitor t
@@ -6858,7 +6884,7 @@ let foldLeftCompound
                 (* Some initializers are missing. Iterate over all the indexes in
                    the array, and use either the supplied initializer, or a generic
                    zero one.  *)
-                let loc = CurrentLoc.get () in
+                let loc = Current_loc.get () in
                 let zinit = makeZeroInit ~loc bt in
                 let acc = ref acc in
                 let initl = ref initl in
@@ -7060,15 +7086,14 @@ let uniqueVarNames (f: file) : unit =
              Hashtbl.add globalNames vi.vname vi.vid;
              (* And register it *)
              Alpha.registerAlphaName ~alphaTable:gAlphaTable
-               ~lookupname:vi.vname ~data:(CurrentLoc.get ())
+               ~lookupname:vi.vname ~data:(Current_loc.get ())
            end)
       | _ -> ());
 
   (* Now we must scan the function bodies and rename the locals *)
   iterGlobals f
     (function
-        GFun(fdec, l) -> begin
-          CurrentLoc.set l;
+        GFun(fdec, _) -> begin
           (* Setup an undo list to be able to revert the changes to the
            * global alpha table *)
           let undolist = ref [] in
@@ -7079,7 +7104,7 @@ let uniqueVarNames (f: file) : unit =
             let lookupname =
               if v.vorig_name = "" then v.vname else v.vorig_name
             in
-            let data = CurrentLoc.get () in
+            let data = Current_loc.get () in
             let newname, oldloc =
               Alpha.newAlphaName
                 ~alphaTable:gAlphaTable ~undolist:(Some undolist)

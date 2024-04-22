@@ -57,7 +57,7 @@ let update_global_hints new_hints =
   let hints = Widen_type.join (Global_Static_Hints.get ()) new_hints in
   Global_Static_Hints.set hints;
 
-class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
+class widen_visitor init_widen_hints init_enclosing_loops = object(self)
   inherit Visitor.frama_c_inplace
 
   val widen_hints = init_widen_hints
@@ -69,58 +69,8 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
     then update_global_hints new_hints
     else widen_hints := Widen_type.join new_hints !widen_hints
 
-  method private add_float_thresholds ?base float_thresholds =
-    let new_hints = Widen_type.float_hints None base float_thresholds in
-    if Option.fold ~none:false ~some:Base.is_global base
-    then update_global_hints new_hints
-    else widen_hints := Widen_type.join new_hints !widen_hints
-
   method private add_var_hints ~stmt hints =
     widen_hints := Widen_type.join (Widen_type.var_hints stmt hints) !widen_hints
-
-  method private process_loop_pragma stmt p =
-    match p with
-    | Widen_variables l -> begin
-        let f (lv, lt) t = match t with
-          | { term_node= TLval (TVar {lv_origin = Some vi}, _)} ->
-            (Base.Set.add (Base.of_varinfo vi) lv, lt)
-          | _ -> (lv, t::lt)
-        in
-        match List.fold_left f (Base.Set.empty, []) l with
-        | (var_hints, []) ->
-          (* the annotation is empty or contains only variables *)
-          self#add_var_hints ~stmt var_hints
-        | (_lv, _lt) ->
-          Self.warning ~once:true
-            "could not interpret loop pragma relative to widening variables"
-      end
-    | Widen_hints l -> begin
-        let f (lv, lint, lfloat, lt) t = match t with
-          | { term_node= TLval (TVar { lv_origin = Some vi}, _)} ->
-            (Base.of_varinfo vi :: lv, lint, lfloat, lt)
-          | { term_node= TConst (Integer(v,_))} ->
-            (lv, IntSet.add v lint, lfloat, lt)
-          | _ ->
-            match constFoldTermToReal t.term_node with
-            | Some f -> (lv, lint, FloatSet.add f lfloat, lt)
-            | None -> (lv, lint, lfloat, t::lt)
-        in
-        match List.fold_left f ([], IntSet.empty, FloatSet.empty, []) l with
-        | (vars, int_thresholds, float_thresholds, []) ->
-          (* the annotation is empty or contains only variables *)
-          if vars = [] then begin
-            self#add_int_thresholds int_thresholds;
-            self#add_float_thresholds float_thresholds
-          end else
-            List.iter (fun base ->
-                self#add_int_thresholds ~base int_thresholds;
-                self#add_float_thresholds ~base float_thresholds;
-              ) vars
-        | _ ->
-          Self.warning ~once:true
-            "could not interpret loop pragma relative to widening hint"
-      end
-    | _ -> ()
 
   method! vstmt (s:stmt) =
     match s.skind with
@@ -128,11 +78,8 @@ class pragma_widen_visitor init_widen_hints init_enclosing_loops = object(self)
         (* ZZZ: this code does not handle loops that are created using gotos. We
            could improve this by finding the relevant statements using a
            traversal of the CFG. *)
-        let annot = Annotations.code_annot s in
-        let pragmas = Logic_utils.extract_loop_pragma annot in
-        List.iter (self#process_loop_pragma s) pragmas;
         let new_loop_info = s :: enclosing_loops in
-        let visitor = new pragma_widen_visitor widen_hints new_loop_info in
+        let visitor = new widen_visitor widen_hints new_loop_info in
         ignore (Visitor.visitFramacBlock visitor bl);
         Cil.SkipChildren (* Otherwise the inner statements are visited multiple
                             times needlessly *)
@@ -408,7 +355,7 @@ let compute_global_static_hints () =
 
 let per_function_static_hints fdec =
   let widen_hints = ref Widen_type.empty in
-  let visitor_pragma = new pragma_widen_visitor widen_hints [] in
+  let visitor_pragma = new widen_visitor widen_hints [] in
   ignore (Visitor.visitFramacFunction visitor_pragma fdec);
   let visitor_local = new hints_visitor widen_hints false in
   ignore (Visitor.visitFramacFunction visitor_local fdec);

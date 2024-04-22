@@ -1,13 +1,3 @@
-/* run.config
-   OPT: -wp-model Caveat
- */
-
-/* run.config_qualif
-   OPT: -wp -wp-model Caveat -wp-prover alt-ergo -wp-prop="-ko"
-   OPT: -wp -wp-model Caveat -wp-prover why3:alt-ergo -wp-prop="-ko,-bug_why3"
-   OPT: -wp -wp-model Caveat -wp-prover alt-ergo -wp-prop="ko" -wp-steps 50
-*/
-
 //@ ghost int call_seq;
 /*@ axiomatic Call {
   @   logic \list<integer> call_obs{L} reads call_seq ;

@@ -22,7 +22,7 @@ int main() {
     //@ assert valid_read_string(pwd_out.pw_dir);
     //@ assert valid_read_string(pwd_out.pw_shell);
   }
-  //@ slevel merge;
+  //@ \eva::slevel merge;
   struct passwd pwd_out2;
   res = getpwnam_r("root", &pwd_out2, buf, buflen, &result);
   if (result) {

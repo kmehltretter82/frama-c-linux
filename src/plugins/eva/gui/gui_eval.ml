@@ -86,7 +86,7 @@ let clear_caches () =
   Cvalue.Model.clear_caches ();
   Locations.Location_Bytes.clear_caches ();
   Locations.Zone.clear_caches ();
-  Function_Froms.Memory.clear_caches ()
+  Assigns.Memory.clear_caches ()
 
 module type S = sig
   module Analysis : Analysis.S
@@ -612,7 +612,8 @@ module Make (X: Analysis.S) = struct
                            In this case, nothing is displayed by the GUI. *)
     | `Bottom -> [], [] (* Bottom case: nothing is displayed either. *)
     | `Value before ->
-      Cil.CurrentLoc.set (gui_loc_loc loc);
+      let open Current_loc.Operators in
+      let<> UpdatedCurrentLoc = gui_loc_loc loc in
       clear_caches ();
       make_data_all_callstacks_from_states ev ~before ~after:states_after v
 end

@@ -534,6 +534,15 @@ let same_etype t1 t2 =
   | TPtr (p1, _), TPtr (p2, _) -> Cil_datatype.Typ.equal p1 p2
   | _, _ -> Cil_datatype.Typ.equal t1 t2
 
+(* Returns the kind of floating-point represented by a logic type, or None. *)
+let logic_type_fkind = function
+  | Ctype typ -> begin
+      match Cil.unrollType typ with
+      | TFloat (fkind, _) -> Some fkind
+      | _ -> None
+    end
+  | _ -> None
+
 let infer_binop_res_type op targ =
   match op with
   | PlusA | MinusA | Mult | Div -> targ
@@ -1189,7 +1198,7 @@ let rec eval_term ~alarm_mode env t =
       tcond ttrue tfalse
 
   | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _ | TAlignOfE _ ->
-    let e = Cil.constFoldTerm true t in
+    let e = Cil.constFoldTerm t in
     let v = match e.term_node with
       | TConst (Integer (v, _)) -> Cvalue.V.inject_int v
       | _ -> V.top_int
@@ -1535,7 +1544,7 @@ and eval_float_builtin_arity2  ~alarm_mode env name arg1 arg2 =
       let f2 = Ival.project_float i2 in
       Cvalue.V.inject_float (fcaml f1 f2)
     with Cvalue.V.Not_based_on_null ->
-      Cvalue.V.topify_arith_origin (V.join r1.eover r2.eover)
+      Cvalue.V.topify Origin.Arith (V.join r1.eover r2.eover)
   in
   let eunder = under_from_over v in
   let ldeps = join_logic_deps r1.ldeps r2.ldeps in
@@ -1555,7 +1564,7 @@ and eval_float_builtin_arity1  ~alarm_mode env name arg =
       let f = Ival.project_float i in
       Cvalue.V.inject_float (fcaml f)
     with Cvalue.V.Not_based_on_null ->
-      Cvalue.V.topify_arith_origin r.eover
+      Cvalue.V.topify Origin.Arith r.eover
   in
   let eunder = under_from_over v in
   { etype = r.etype; eunder; eover = v; ldeps=r.ldeps; empty = r.empty; }
@@ -1643,7 +1652,7 @@ and eval_let_binding ~alarm_mode env logic_info =
     let var = logic_info.l_var_info in
     let env = bind_logic_vars env [var] in
     let var_term = Logic_const.tvar var in
-    reduce_by_left_relation ~alarm_mode env true var_term Req term
+    reduce_left_by_relation ~alarm_mode env true var_term Req term
   | _ -> unsupported "\\let binding"
 
 (* -------------------------------------------------------------------------- *)
@@ -1864,6 +1873,29 @@ and eval_term_as_exact_locs ~alarm_mode env t =
 (* --- Reduction by predicates                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
+(* Apply [reduce] to the value of location [arg] if it is an exact location. *)
+and reduce_exact_location ~alarm_mode env reduce loc =
+  match eval_term_as_exact_locs ~alarm_mode env loc with
+  | Logic_var logic_var ->
+    let cvalue = LogicVarEnv.find logic_var env.logic_vars in
+    let cvalue = reduce logic_var.lv_type cvalue in
+    if V.is_bottom cvalue then raise Reduce_to_bottom;
+    add_logic_var env logic_var cvalue
+  | Location (typ_loc, locs) ->
+    let aux loc env =
+      let state = env_current_state env in
+      let v = find_or_alarm ~alarm_mode state loc in
+      let v = Cvalue_forward.reinterpret typ_loc v in
+      let v' = reduce (Ctype typ_loc) v in
+      if V.is_bottom v' then raise Reduce_to_bottom;
+      if V.equal v' v then env else
+        let state' = Cvalue.Model.reduce_previous_binding state loc v' in
+        overwrite_current_state env state'
+    in
+    Eval_op.apply_on_all_locs aux locs env
+  | exception Not_an_exact_loc
+  | exception LogicEvalError _ -> env
+
 and reduce_by_valid env positive access (tset: term) =
   let exception DoNotReduce in
   (* Auxiliary function that reduces \valid(lv+offs), where lv is atomic
@@ -1990,49 +2022,58 @@ and reduce_by_valid env positive access (tset: term) =
   in
   do_one env tset
 
+(* Reduces the possible value of [arg] by assuming it points to a valid string
+   (or not if [positive] is false), for reading or writing according to [access].
+   This reduces the possible value of [arg] to a valid pointer (thus only
+   considering the first character of the string), and filters out bases that
+   cannot be a valid string because strlen returns bottom.
+   This reduction could be improved by also reducing offsets according to the
+   position of \0 in the pointed strings. *)
+and reduce_by_valid_string ~alarm_mode env positive ~wide ~access arg =
+  (* First, reduces [arg] assuming it is a valid pointer. *)
+  let env = reduce_by_valid env positive access arg in
+  (* Reduce the cvalue [v]:
+     - if [positive] holds, remove bases which cannot be a valid string
+       as the proper strlen builtin returns bottom;
+     - if [positive] is false, remove bases which are a valid string,
+       as the proper strlen builtin returns no alarm. *)
+  let reduce _typ v =
+    let wrapper =
+      if wide
+      then Builtins_string.frama_c_wcslen_wrapper
+      else Builtins_string.frama_c_strlen_wrapper
+    in
+    let aux base offset acc =
+      let value = Cvalue.V.inject base offset in
+      let v, alarms = apply_logic_builtin wrapper env [value] in
+      (* Beware of not removing const strings on the negation of \valid_string. *)
+      let alarms = alarms || (access = Write && Base.is_read_only base) in
+      if (positive && Cvalue.V.is_bottom v)
+      || (not positive && not alarms)
+      then acc
+      else Cvalue.V.add base offset acc
+    in
+    Cvalue.V.fold_i aux v Cvalue.V.bottom
+  in
+  reduce_exact_location ~alarm_mode env reduce arg
+
+(* Reduces [tl] so that [\base_addr(tl) == \base_addr(tr)] holds. *)
+and reduce_left_by_base_addr_eq ~alarm_mode env tl tr =
+  let right = eval_term ~alarm_mode env tr in
+  let right_bases = Cvalue.V.get_bases right.eover in
+  (* Avoids reducing the null base. *)
+  let filter base = Base.is_null base || Base.SetLattice.mem base right_bases in
+  let reduce _typ = Cvalue.V.filter_base filter in
+  reduce_exact_location ~alarm_mode env reduce tl
+
 (* reduce [tl] so that [rl rel tr] holds *)
-and reduce_by_left_relation ~alarm_mode env positive tl rel tr =
-  try
-    let debug = false in
-    if debug then Format.printf "#Left term %a@." Printer.pp_term tl;
-    let exact_location = eval_term_as_exact_locs ~alarm_mode env tl in
-    let rtl = eval_term ~alarm_mode env tr in
-    let cond_v = rtl.eover in
-    let comp = Eva_utils.conv_relation rel in
-    match exact_location with
-    | Logic_var logic_var ->
-      let cvalue = LogicVarEnv.find logic_var env.logic_vars in
-      let reduce = Eval_op.backward_comp_left_from_type logic_var.lv_type in
-      let cvalue = reduce positive comp cvalue cond_v in
-      if V.is_bottom cvalue then raise Reduce_to_bottom;
-      add_logic_var env logic_var cvalue
-    | Location (typ_loc, locs) ->
-      let reduce = Eval_op.backward_comp_left_from_type (Ctype typ_loc) in
-      if debug then Format.printf "#Val right term %a@." V.pretty cond_v;
-      let aux loc env =
-        let state = env_current_state env in
-        if debug then Format.printf "#Left term as lv loc %a, typ %a@."
-            Locations.pretty loc Printer.pp_typ typ_loc;
-        let v = find_or_alarm ~alarm_mode state loc in
-        if debug then Format.printf "#Val left lval %a@." V.pretty v;
-        let v = Cvalue_forward.reinterpret typ_loc v in
-        if debug then Format.printf "#Cast left lval %a@." V.pretty v;
-        let v' = reduce positive comp v cond_v in
-        if debug then Format.printf "#Val reduced %a@." V.pretty v';
-        (* TODOBY: if loc is an int that has been silently cast to real, we end
-           up reducing an int according to a float. Instead, we should convert v
-           to  real, then cast back v_asym to the good range *)
-        if V.is_bottom v' then raise Reduce_to_bottom;
-        if V.equal v' v then
-          env
-        else
-          let state' =
-            Cvalue.Model.reduce_previous_binding state loc v'
-          in
-          overwrite_current_state env state'
-      in
-      Eval_op.apply_on_all_locs aux locs env
-  with Not_an_exact_loc | LogicEvalError _ -> env
+and reduce_left_by_relation ~alarm_mode env positive tl rel tr =
+  let rtl = eval_term ~alarm_mode env tr in
+  let comp = Eva_utils.conv_relation rel in
+  let reduce typ cvalue =
+    Eval_op.backward_comp_left_from_type typ positive comp cvalue rtl.eover
+  in
+  reduce_exact_location ~alarm_mode env reduce tl
 
 and reduce_by_relation ~alarm_mode env positive t1 rel t2 =
   (* special case: t1 is a term of the form "a rel' b",
@@ -2045,12 +2086,21 @@ and reduce_by_relation ~alarm_mode env positive t1 rel t2 =
   | TBinOp (bop, t1', t2'), Req when is_rel_binop bop && Cil.isLogicZero t2 ->
     reduce_by_relation ~alarm_mode env (not positive) t1' (rel_of_binop bop) t2'
   | _ ->
-    let env = reduce_by_left_relation ~alarm_mode env positive t1 rel t2 in
+    (* Special case for \base_addr. *)
+    let reduce_left env t1 rel t2 =
+      match t1.term_node with
+      | Tbase_addr (_lbl, t1) ->
+        if rel = Req && positive || rel = Rneq && not positive
+        then reduce_left_by_base_addr_eq ~alarm_mode env t1 t2
+        else env
+      | _ -> reduce_left_by_relation ~alarm_mode env positive t1 rel t2
+    in
+    let env = reduce_left env t1 rel t2 in
     let sym_rel = match rel with
       | Rgt -> Rlt | Rlt -> Rgt | Rle -> Rge | Rge -> Rle
       | Req -> Req | Rneq -> Rneq
     in
-    reduce_by_left_relation ~alarm_mode env positive t2 sym_rel t1
+    reduce_left env t2 sym_rel t1
 
 (* if you add something here, update [known_predicates] above also
    (and of course [eval_known_papp] below).
@@ -2061,31 +2111,21 @@ and reduce_by_known_papp ~alarm_mode env positive li _labels args =
      reduces its value in [env] by using the backward propagator on fval
      [fval_reduce]. *)
   let reduce_float fval_reduce arg =
-    try
-      match eval_term_as_exact_locs ~alarm_mode env arg with
-      | Logic_var _ -> env
-      | Location (typ_loc, locs) ->
-        let aux loc env =
-          let state = env_current_state env in
-          let v = find_or_alarm ~alarm_mode state loc in
-          let v =  Cvalue_forward.reinterpret typ_loc v in
-          let v = match Cil.unrollType typ_loc with
-            | TFloat (fkind,_) -> begin
-                let v = Cvalue.V.project_float v in
-                let kind = Fval.kind fkind in
-                match fval_reduce kind v with
-                | `Value f -> V.inject_float f
-                | `Bottom -> V.bottom
-              end
-            | _ -> (* Better safe than sorry, we may have e.g. an int location
-                      here *)
-              raise Not_an_exact_loc
-          in
-          let state' = Cvalue.Model.reduce_previous_binding state loc v in
-          overwrite_current_state env state'
-        in
-        Eval_op.apply_on_all_locs aux locs env
-    with Cvalue.V.Not_based_on_null -> env
+    let reduce typ cvalue =
+      match logic_type_fkind typ with
+      | Some fkind -> begin
+          try
+            let v = Cvalue.V.project_float cvalue in
+            let kind = Fval.kind fkind in
+            match fval_reduce kind v with
+            | `Value f -> V.inject_float f
+            | `Bottom -> V.bottom
+          with Cvalue.V.Not_based_on_null -> cvalue
+        end
+      | None -> cvalue (* Better safe than sorry, we may have e.g. an int
+                          location here *)
+    in
+    reduce_exact_location ~alarm_mode env reduce arg
   in
   (* Reduces [f] to positive or negative infinity (according to [pos]),
      or to the complement if [positive] is false. *)
@@ -2121,28 +2161,18 @@ and reduce_by_known_papp ~alarm_mode env positive li _labels args =
     reduce_by_relation ~alarm_mode env positive t1 Rgt t2
   | ("\\ge_float" | "\\ge_double"), [t1;t2] ->
     reduce_by_relation ~alarm_mode env positive t1 Rge t2
-  | "\\subset", [argl;argr] when positive -> begin
-      let alarm_mode = alarm_reduce_mode () in
-      let vr = (eval_term ~alarm_mode env argr).eover in
-      match eval_term_as_exact_locs ~alarm_mode env argl with
-      | Logic_var logic_var ->
-        let vl = LogicVarEnv.find logic_var env.logic_vars in
-        let reduced = Cvalue.V.narrow vl vr in
-        if V.equal V.bottom reduced then raise Reduce_to_bottom;
-        add_logic_var env logic_var reduced
-      | Location (_typ, locsl) ->
-        let aux locl env =
-          let state = env_current_state env in
-          let vl = find_or_alarm ~alarm_mode state locl in
-          let reduced = V.narrow vl vr in
-          if V.equal V.bottom reduced then raise Reduce_to_bottom;
-          let state' =
-            Cvalue.Model.reduce_previous_binding state locl reduced
-          in
-          overwrite_current_state env state'
-        in
-        Eval_op.apply_on_all_locs aux locsl env
-    end
+  | "\\subset", [argl;argr] when positive ->
+    let vr = (eval_term ~alarm_mode env argr).eover in
+    let reduce _typ vl = Cvalue.V.narrow vl vr in
+    reduce_exact_location ~alarm_mode env reduce argl
+  | "valid_read_string", [arg] ->
+    reduce_by_valid_string ~alarm_mode env positive ~wide:false ~access:Read arg
+  | "valid_string", [arg] ->
+    reduce_by_valid_string ~alarm_mode env positive ~wide:false ~access:Write arg
+  | "valid_read_wstring", [arg] ->
+    reduce_by_valid_string ~alarm_mode env positive ~wide:true ~access:Read arg
+  | "valid_wstring", [arg] ->
+    reduce_by_valid_string ~alarm_mode env positive ~wide:true ~access:Write arg
 
   | _ -> (* Do not fail here. We can be asked to reduce on predicates that we
             can evaluate, but on which we are not able to reduce on (yet ?).*)

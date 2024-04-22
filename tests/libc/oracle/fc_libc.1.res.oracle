@@ -113,7 +113,7 @@ struct __fc_pthread_mutexattr_t {
 };
 typedef struct __fc_pthread_mutexattr_t pthread_mutexattr_t;
 struct __fc_pthread_t {
-   int _fc ;
+   unsigned long _fc ;
 };
 typedef struct __fc_pthread_t pthread_t;
 typedef int pid_t;
@@ -4553,7 +4553,7 @@ int getaddrinfo(char const * restrict nodename,
       }
       tmp_3 = Frama_C_interval(0,43);
       sa->sa_family = (sa_family_t)tmp_3;
-      /*@ slevel 15; */ ;
+      /*@ \eva::slevel 15; */ ;
       {
         int i = 0;
         while (i < 14) {
@@ -4565,7 +4565,7 @@ int getaddrinfo(char const * restrict nodename,
           i ++;
         }
       }
-      /*@ slevel default; */ ;
+      /*@ \eva::slevel default; */ ;
       ai->ai_flags = 0;
       ai->ai_family = (int)sa->sa_family;
       ai->ai_socktype = Frama_C_interval(0,5);
@@ -7194,6 +7194,78 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
   return_label: return __retres;
 }
 
+/*@ requires
+      valid_file_name_or_null:
+        file_name ≡ \null ∨ valid_read_string(file_name);
+    requires
+      resolved_name_null_or_allocated:
+        resolved_name ≡ \null ∨ \valid(resolved_name + (0 .. 4096 - 1));
+    assigns __fc_heap_status, *(\result + (0 .. 4096 - 1)),
+            *(resolved_name + (0 .. 4096 - 1)), __fc_errno;
+    assigns __fc_heap_status
+      \from (indirect: resolved_name), __fc_heap_status;
+    assigns *(\result + (0 .. 4096 - 1))
+      \from (indirect: __fc_heap_status), (indirect: resolved_name),
+            (indirect: *(file_name + (0 ..)));
+    assigns *(resolved_name + (0 .. 4096 - 1))
+      \from (indirect: __fc_heap_status), (indirect: resolved_name),
+            (indirect: *(file_name + (0 ..)));
+    assigns __fc_errno
+      \from (indirect: file_name), (indirect: *(file_name + (0 ..))),
+            (indirect: resolved_name), (indirect: __fc_heap_status);
+    
+    behavior null_file_name:
+      assumes null_file_name: file_name ≡ \null;
+      ensures null_result: \result ≡ \null;
+      ensures errno_set: __fc_errno ≡ 22;
+      assigns \result, __fc_errno;
+      assigns \result \from (indirect: file_name);
+      assigns __fc_errno \from (indirect: file_name);
+    
+    behavior allocate_resolved_name:
+      assumes valid_file_name: valid_read_string(file_name);
+      assumes resolved_name_null: resolved_name ≡ \null;
+      assumes can_allocate: is_allocable(4096);
+      ensures allocation: \fresh{Old, Here}(\result,4096);
+      assigns __fc_heap_status, \result;
+      assigns __fc_heap_status \from __fc_heap_status;
+      assigns \result \from (indirect: __fc_heap_status);
+    
+    behavior not_enough_memory:
+      assumes valid_file_name: valid_read_string(file_name);
+      assumes resolved_name_null: resolved_name ≡ \null;
+      assumes cannot_allocate: ¬is_allocable(4096);
+      ensures null_result: \result ≡ \null;
+      ensures errno_set: __fc_errno ≡ 12;
+      assigns \result;
+      assigns \result \from \nothing;
+      allocates \nothing;
+    
+    behavior resolved_name_buffer:
+      assumes valid_file_name: valid_read_string(file_name);
+      assumes
+        allocated_resolved_name_or_fail:
+          \valid(resolved_name + (0 .. 4096 - 1));
+      ensures
+        valid_string_resolved_name:
+          valid_string(\old(resolved_name)) ∧
+          strlen(\old(resolved_name)) < 4096;
+      ensures resolved_result: \result ≡ \old(resolved_name);
+      assigns \result, *(resolved_name + (0 .. 4096 - 1));
+      assigns \result \from resolved_name;
+      assigns *(resolved_name + (0 .. 4096 - 1))
+        \from (indirect: *(file_name + (0 ..)));
+      allocates \nothing;
+    
+    behavior filesystem_error:
+      assumes valid_file_name: valid_read_string(file_name);
+      ensures null_result: \result ≡ \null;
+      ensures errno_set: __fc_errno ∈ {13, 5, 40, 36, 2, 20};
+      assigns \result, __fc_errno;
+      assigns \result \from (indirect: *(file_name + (0 ..)));
+      assigns __fc_errno \from (indirect: *(file_name + (0 ..)));
+      allocates \nothing;
+ */
 char *realpath(char const * restrict file_name, char * restrict resolved_name)
 {
   char *__retres;

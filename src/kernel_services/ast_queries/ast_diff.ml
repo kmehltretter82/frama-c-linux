@@ -438,38 +438,6 @@ let is_matching_logic_type_var a a' env =
   | None -> false
   | Some a'' -> Datatype.String.equal a' a''
 
-module Unop = struct
-  type t = [%import: Cil_types.unop] [@@deriving eq]
-end
-
-module Binop = struct
-  type t = [%import: Cil_types.binop] [@@deriving eq]
-end
-
-module Ikind = struct
-  type t = [%import: Cil_types.ikind] [@@deriving eq]
-end
-
-module Fkind = struct
-  type t = [%import: Cil_types.fkind] [@@deriving eq]
-end
-
-module Predicate_kind = struct
-  type t = [%import: Cil_types.predicate_kind] [@@deriving eq]
-end
-
-module Logic_builtin_label = struct
-  type t = [%import: Cil_types.logic_builtin_label] [@@deriving eq]
-end
-
-module Relation = struct
-  type t = [%import: Cil_types.relation] [@@deriving eq]
-end
-
-module Termination_kind = struct
-  type t = [%import: Cil_types.termination_kind] [@@deriving eq]
-end
-
 let is_same_behavior_set l l' =
   Datatype.String.Set.(equal (of_list l) (of_list l'))
 
@@ -494,7 +462,7 @@ let is_same_logic_label l l' _env =
        Cil_datatype.Stmt.equal !s' s''
      | exception Not_found -> false)
   | FormalLabel s, FormalLabel s' -> Datatype.String.equal s s'
-  | BuiltinLabel l, BuiltinLabel l' -> Logic_builtin_label.equal l l'
+  | BuiltinLabel l, BuiltinLabel l' -> equal_logic_builtin_label l l'
   | (StmtLabel _ | FormalLabel _ | BuiltinLabel _), _ -> false
 
 let rec is_same_predicate p p' env =
@@ -511,7 +479,7 @@ and is_same_predicate_node p p' env =
     is_same_list is_same_term args args' env
   | Pseparated t, Pseparated t' -> is_same_list is_same_term t t' env
   | Prel (r,t1,t2), Prel(r',t1',t2') ->
-    Relation.equal r r' && is_same_term t1 t1' env && is_same_term t2 t2' env
+    equal_relation r r' && is_same_term t1 t1' env && is_same_term t2 t2' env
   | Pand(p1,p2), Pand(p1',p2')
   | Por(p1,p2), Por(p1',p2')
   | Pxor(p1,p2), Pxor(p1',p2')
@@ -579,9 +547,9 @@ and is_same_term_node t t' env =
   | TSizeOfE t, TSizeOfE t'
   | TAlignOfE t, TAlignOfE t' -> is_same_term t t' env
   | TSizeOfStr s, TSizeOfStr s' -> String.length s = String.length s'
-  | TUnOp(op,t), TUnOp(op',t') -> Unop.equal op op' && is_same_term t t' env
+  | TUnOp(op,t), TUnOp(op',t') -> equal_unop op op' && is_same_term t t' env
   | TBinOp(op,t1,t2), TBinOp(op',t1',t2') ->
-    Binop.equal op op' && is_same_term t1 t1' env && is_same_term t2 t2' env
+    equal_binop op op' && is_same_term t1 t1' env && is_same_term t2 t2' env
   | TCast(is_logic, typ, term), TCast(is_logic', typ', term') ->
     is_logic = is_logic' && is_same_logic_type typ typ' env && is_same_term term term' env
   | TAddrOf lv, TAddrOf lv'
@@ -685,7 +653,7 @@ and is_same_term_offset lo lo' env =
   | (TNoOffset | TField _ | TModel _ | TIndex _), _ -> false
 
 and is_same_toplevel_predicate p p' env =
-  Predicate_kind.equal p.tp_kind p'.tp_kind &&
+  equal_predicate_kind p.tp_kind p'.tp_kind &&
   is_same_predicate p.tp_statement p'.tp_statement env
 
 and is_same_identified_predicate p p' env =
@@ -695,7 +663,7 @@ and is_same_identified_term t t' env =
   is_same_term t.it_content t'.it_content env
 
 and is_same_post_cond (k,p) (k',p') env =
-  Termination_kind.equal k k' && is_same_identified_predicate p p' env
+  equal_termination_kind k k' && is_same_identified_predicate p p' env
 
 and is_same_deps d d' env =
   match d,d' with
@@ -734,11 +702,7 @@ and is_same_variant (v,m) (v',m') env =
 
 and is_same_loop_pragma p p' env =
   match p, p' with
-  | Unroll_specs l, Unroll_specs l'
-  | Widen_hints l, Widen_hints l'
-  | Widen_variables l, Widen_variables l' ->
-    is_same_list is_same_term l l' env
-  | (Unroll_specs _ | Widen_hints _ | Widen_variables _), _ -> false
+  | Unroll_specs l, Unroll_specs l' -> is_same_list is_same_term l l' env
 
 and is_same_slice_pragma p p' env =
   match p, p' with
@@ -877,9 +841,9 @@ and is_same_type t t' env =
   match t, t' with
   | TVoid a, TVoid a' -> Cil_datatype.Attributes.equal a a'
   | TInt (ik,a), TInt(ik',a') ->
-    Ikind.equal ik ik' && Cil_datatype.Attributes.equal a a'
+    equal_ikind ik ik' && Cil_datatype.Attributes.equal a a'
   | TFloat (fk,a), TFloat(fk', a') ->
-    Fkind.equal fk fk' && Cil_datatype.Attributes.equal a a'
+    equal_fkind fk fk' && Cil_datatype.Attributes.equal a a'
   | TBuiltin_va_list a, TBuiltin_va_list a' ->
     Cil_datatype.Attributes.equal a a'
   | TPtr(t,a), TPtr(t',a') ->
@@ -922,7 +886,7 @@ and is_same_compinfo ci ci' env =
 and is_same_enuminfo ei ei' env =
   let res, _ =
     (Cil_datatype.Attributes.equal ei.eattr ei'.eattr &&
-     Ikind.equal ei.ekind ei'.ekind, env) &&&
+     equal_ikind ei.ekind ei'.ekind, env) &&&
     is_same_list_env is_same_enumitem ei.eitems ei'.eitems
   in
   res
@@ -994,9 +958,9 @@ and is_same_exp e e' env =
   | AlignOf t, AlignOf t' -> is_same_type t t' env
   | AlignOfE e, AlignOfE e' -> is_same_exp e e' env
   | UnOp(op,e,t), UnOp(op',e',t') ->
-    Unop.equal op op' && is_same_exp e e' env && is_same_type t t' env
+    equal_unop op op' && is_same_exp e e' env && is_same_type t t' env
   | BinOp(op,e1,e2,t), BinOp(op',e1',e2',t') ->
-    Binop.equal op op' && is_same_exp e1 e1' env && is_same_exp e2 e2' env
+    equal_binop op op' && is_same_exp e1 e1' env && is_same_exp e2 e2' env
     && is_same_type t t' env
   | CastE(t,e), CastE(t',e') -> is_same_type t t' env && is_same_exp e e' env
   | AddrOf lv, AddrOf lv' -> is_same_lval lv lv' env

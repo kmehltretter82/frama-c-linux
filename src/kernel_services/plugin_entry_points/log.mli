@@ -47,7 +47,7 @@ type 'a pretty_printer =
     Frama-C.
    - When [current] is [false] (default for most of the channels),
      no location is output. When it is [true], the last registered location
-     is used as current (see {!Cil_const.CurrentLoc}).
+     is used as current (see {!Current_loc}).
    - [source] is the location to be output. If nil, [current] is used to
      determine if a location should be output
    - [emitwith] function which is called each time an event is processed

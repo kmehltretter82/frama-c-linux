@@ -30,6 +30,7 @@ FILTER= \
 	--exclude "dist" \
 	--exclude "tests" \
 	--exclude "_build" \
+	--exclude "out" \
 	--exclude "node_modules" \
 
 OS?=

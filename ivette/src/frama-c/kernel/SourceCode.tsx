@@ -96,7 +96,7 @@ async function displayShortcuts(): Promise<void> {
 
 // Toplevel Declaration Markers
 function isToplevelDecl(kind: Ast.markerKind): boolean {
-  switch(kind) {
+  switch (kind) {
     case 'DFUN':
     case 'DECLARATION':
       return true;
@@ -253,7 +253,7 @@ export default function SourceCode(): JSX.Element {
           onClick={displayShortcuts}
           title='Useful shortcuts'
         />
-        <Toolbars.Inset/>
+        <Toolbars.Inset />
       </Ivette.TitleBar>
       <Component style={{ fontSize: `${fontSize}px` }} />
     </>

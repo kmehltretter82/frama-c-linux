@@ -41,7 +41,6 @@ module type S = sig
   type call_result = {
     states: (Partition.key * state) list;
     cacheable: Eval.cacheable;
-    builtin: bool;
   }
   val compute_call_ref:
     (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
@@ -295,7 +294,6 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   type call_result = {
     states: (Partition.key * state) list;
     cacheable: cacheable;
-    builtin: bool;
   }
 
   (* Forward reference to [Eval_funs.compute_call] *)
@@ -304,15 +302,9 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
      call_result) ref
     = ref (fun _ -> assert false)
 
-  (* Returns the result of a call, and a boolean that indicates whether a
-     builtin has been used to interpret the call. *)
+  (* Returns the result of a call. *)
   let process_call stmt call recursion valuation state =
     Eva_utils.push_call_stack call.kf stmt;
-    let cleanup () =
-      Eva_utils.pop_call_stack ();
-      (* Changed by compute_call_ref, called from process_call *)
-      Cil.CurrentLoc.set (Cil_datatype.Stmt.loc stmt);
-    in
     let process () =
       let domain_valuation = Eval.to_domain_valuation valuation in
       let res =
@@ -323,13 +315,13 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
           Domain.Store.register_initial_state callstack call.kf state;
           !compute_call_ref stmt call recursion state
         | `Bottom ->
-          { states = []; cacheable = Cacheable; builtin=false }
+          { states = []; cacheable = Cacheable; }
       in
-      cleanup ();
+      Eva_utils.pop_call_stack ();
       res
     in
     Eva_utils.protect process
-      ~cleanup:(fun () -> InOutCallback.clear (); cleanup ())
+      ~cleanup:(fun () -> InOutCallback.clear (); Eva_utils.pop_call_stack ())
 
   (* ------------------- Retro propagation on formals ----------------------- *)
 
@@ -460,12 +452,6 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     (* Process the call according to the domain decision. *)
     let call_result = process_call stmt call recursion valuation state in
     let leaving_vars = leaving_vars kf_callee in
-    (* Do not try to reduce concrete arguments if a builtin was used. *)
-    let gather_reduced_arguments =
-      if call_result.builtin
-      then fun _ _ _ -> `Value []
-      else gather_reduced_arguments
-    in
     (* Treat each result one by one. *)
     let process state =
       (* Gathers the possible reductions on the value of the concrete arguments
@@ -686,7 +672,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let file = Format.sprintf "%s_%d" name n in
     let ch = open_out file in
     let fmt = Format.formatter_of_out_channel ch in
-    let l = fst (Cil.CurrentLoc.get ()) in
+    let l = fst (Current_loc.get ()) in
     Self.feedback ~current:true "Dumping state in file '%s'%t"
       file Eva_utils.pp_callstack;
     Format.fprintf fmt "DUMPING STATE at file %a line %d@."
