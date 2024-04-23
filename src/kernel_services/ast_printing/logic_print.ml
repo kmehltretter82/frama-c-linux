@@ -39,6 +39,9 @@ let print_constant fmt = function
 
 let module_prefix : string Stack.t = Stack.create ()
 
+let module_name a =
+  try Stack.top module_prefix ^ a with Stack.Empty -> a
+
 let print_qid fmt name =
   try
     let prefix = Stack.top module_prefix in
@@ -390,7 +393,7 @@ let rec print_decl fmt d =
   | LDmodule (name,ds) ->
     begin
       try
-        Stack.push (name ^ "::") module_prefix ;
+        Stack.push (module_name name ^ "::") module_prefix ;
         fprintf fmt "@[<2>module@ %s@ {@\n%a@]@\n}" name
           (pp_list ~sep:"@\n" print_decl) ds ;
         ignore @@ Stack.pop module_prefix ;

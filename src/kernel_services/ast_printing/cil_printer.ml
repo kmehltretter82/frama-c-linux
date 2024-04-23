@@ -1263,9 +1263,9 @@ class cil_printer () = object (self)
   method builtin_logic_info fmt bli =
     fprintf fmt "%a" self#varname bli.bl_name
 
-  method logic_type_info fmt s = fprintf fmt "%a" self#varname s.lt_name
+  method logic_type_info fmt s = fprintf fmt "%a" self#logic_name s.lt_name
 
-  method logic_ctor_info fmt ci =  fprintf fmt "%a" self#varname ci.ctor_name
+  method logic_ctor_info fmt ci =  fprintf fmt "%a" self#logic_name ci.ctor_name
 
   method initinfo fmt io =
     match io.init with
@@ -2401,7 +2401,7 @@ class cil_printer () = object (self)
         if Kernel.Unicode.get () then Utf8_logic.real else "real"
       in
       Format.fprintf fmt "%s%t" res pname
-    | Ltype ({ lt_name = name},[]) when name = Utf8_logic.boolean->
+    | Ltype ({ lt_name = name},[]) when name = Utf8_logic.boolean ->
       let res =
         if Kernel.Unicode.get () then Utf8_logic.boolean else "boolean"
       in
@@ -2417,7 +2417,7 @@ class cil_printer () = object (self)
       fprintf fmt "@[@[<2>{@ %a@]}@]%a%t"
         (Pretty_utils.pp_list ~sep:",@ " (self#logic_type None)) args
         (self#logic_type None) rt pname
-    | Lvar s -> fprintf fmt "%a%t" self#varname s pname
+    | Lvar s -> fprintf fmt "%s%t" s pname
 
   method private name fmt s =
     if needs_quote s then Format.fprintf fmt "\"%s\"" s
@@ -2539,7 +2539,7 @@ class cil_printer () = object (self)
            (Pretty_utils.pp_list
               ~sep:",@ " ~pre:"@[<hov>" ~suf:"@]@;" self#term_node) l
        | _ ->
-         fprintf fmt "%a%a" self#varname ci.ctor_name
+         fprintf fmt "%a%a" self#logic_name ci.ctor_name
            (Pretty_utils.pp_list ~pre:"(@[" ~suf:"@])" ~sep:",@ " self#term)
            args)
     | TLval lv -> fprintf fmt "%a" (self#term_lval_prec current_level) lv
@@ -2721,6 +2721,18 @@ class cil_printer () = object (self)
   method term_lhost fmt (lh:term_lhost) =
     self#term_lval fmt (lh, TNoOffset)
 
+
+  val module_stack : string Stack.t = Stack.create ()
+
+  method logic_name fmt a =
+    try
+      let prefix = Stack.top module_stack in
+      match Extlib.string_del_prefix prefix a with
+      | Some x -> pp_print_string fmt x
+      | None -> self#varname fmt a
+    with Stack.Empty ->
+      self#varname fmt a
+
   method logic_info fmt li = self#logic_var fmt li.l_var_info
 
   method logic_var fmt v =
@@ -2731,7 +2743,7 @@ class cil_printer () = object (self)
        | Some v -> Format.fprintf fmt "vid:%d, " v.vid);
       Format.fprintf fmt "lvid:%d */" v.lv_id
     end;
-    self#varname fmt v.lv_name
+    self#logic_name fmt v.lv_name
 
   method quantifiers fmt l =
     Pretty_utils.pp_list ~sep:",@ "
@@ -3308,7 +3320,7 @@ class cil_printer () = object (self)
       let old_lab = current_label in
       fprintf fmt "@[<hv 2>@[<hov 1>%a %a%a%a:@]@ %t%a;@]@\n"
         self#pp_lemma_kind pred.tp_kind
-        self#varname name
+        self#logic_name name
         self#labels labels
         self#polyTypePrms tvars
         (* pretty printing of lemma statement is done inside an environment
@@ -3322,7 +3334,7 @@ class cil_printer () = object (self)
     | Dtype (ti,_) ->
       fprintf fmt "@[<hv 2>@[%a %a%a%a;@]@\n"
         self#pp_acsl_keyword "type"
-        self#varname ti.lt_name self#polyTypePrms ti.lt_params
+        self#logic_name ti.lt_name self#polyTypePrms ti.lt_params
         (fun fmt -> function
            | None -> fprintf fmt "@]"
            | Some d -> fprintf fmt " =@]@ %a" self#logic_type_def d)
@@ -3412,12 +3424,21 @@ class cil_printer () = object (self)
            self#global_annotation)
         decls
     | Dmodule(id,decls,_attr, _) ->
-      (* attributes are meant to be purely internal for now. *)
-      fprintf fmt "@[<v 2>@[%a %s {@]@\n%a}@]@\n"
-        self#pp_acsl_keyword "module" id
-        (Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
-           self#global_annotation)
-        decls
+      begin
+        (* attributes are meant to be purely internal for now. *)
+        fprintf fmt "@[<v 2>@[%a %a {@]"
+          self#pp_acsl_keyword "module" self#logic_name id ;
+        try
+          Stack.push (id ^ "::") module_stack ;
+          fprintf fmt "@\n%a}@]@\n"
+            (Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
+               self#global_annotation)
+            decls ;
+          ignore @@ Stack.pop module_stack ;
+        with err ->
+          ignore @@ Stack.pop module_stack ;
+          raise err
+      end
     | Dextended (e,_attr,_) -> self#extended fmt e
 
   method logic_type_def fmt = function

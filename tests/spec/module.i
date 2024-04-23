@@ -11,7 +11,7 @@
   }
   module foo::Jazz {
     import foo::Bar \as X;
-    logic t inv(t x);
+    logic t inv(X::t x);
     logic t opN(t x, integer n) = n >= 0 ? X::opN(x,n) : X::opN(inv(x),-n);
   }
   import foo::Bar \as A;
