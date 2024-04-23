@@ -686,46 +686,57 @@ struct
 
   (* Imported Scope *)
 
-  let scopes = Stack.create ()
-  let imported = ref []
+  type scope = {
+    long_prefix: string; (* last '::' included *)
+    short_prefix: string; (* last '::' included *)
+  }
 
-  let pushScope m p =
-    let prefix m = m ^ "::" in
-    imported := (prefix m, Option.map prefix p) :: !imported
+  let pp_scope fmt s =
+    Format.fprintf fmt "{ long: %S; short: %S }"
+      s.long_prefix s.short_prefix
+  [@@ warning "-32"]
+
+  let scopes : scope list Stack.t = Stack.create ()
+  let imported : scope list ref = ref []
+
+  let open_scope ~name ?alias () =
+    let short = match alias with Some a -> a | None ->
+      List.hd @@ List.rev @@ String.split_on_char ':'  name
+    in imported := {
+      long_prefix = name ^ "::";
+      short_prefix = short ^ "::";
+    } :: !imported
 
   let clear_imports () = Stack.clear scopes ; imported := []
   let push_imports () = Stack.push !imported scopes
   let pop_imports () = imported := Stack.pop scopes
 
-  let add_import ?alias mid =
+  let add_import ?alias name =
     match alias with
-    | Some _ -> pushScope mid alias
+    | Some _ -> open_scope ~name ?alias ()
     | None ->
       begin
-        match List.rev @@ String.split_on_char ':' mid with
-        | m::_ -> pushScope mid (Some m)
-        | [] -> ()
-      end ;
-      pushScope mid None
+        match List.rev @@ String.split_on_char ':' name with
+        | alias::_ -> open_scope ~name ~alias ()
+        | [] -> open_scope ~name ()
+      end
 
   let find_import find a =
-    match find a with
-    | Some _ as r -> r
-    | None ->
-      let size = List.length @@ String.split_on_char ':' a in
-      if size > 3 then None else
-        let pmatch = function
-          | None -> size = 1
-          | Some prefix -> size = 3 && String.starts_with ~prefix a in
-        let rec lookup = function
-          | [] -> None
-          | (m,p)::scopes ->
-            if pmatch p then
-              match find (m ^ a) with
-              | None -> lookup scopes
-              | Some _ as r -> r
-            else lookup scopes
-        in lookup !imported
+    let xs = String.split_on_char ':' a in
+    let n = List.length xs in
+    if n = 1 then (* unqualified name *)
+      match List.find_map (fun s -> find (s.long_prefix ^ a)) !imported with
+      | Some _ as result -> result
+      | None -> find a
+    else
+    if n = 3 then (* single module qualified name *)
+      let is_short s = String.starts_with ~prefix:s.short_prefix a in
+      match List.find_opt is_short !imported with
+      | Some s ->
+        let x = List.hd @@ List.rev xs in
+        find (s.long_prefix ^ x)
+      | None -> find a
+    else (* long qualified name *) find a
 
   let resolve_ltype =
     find_import
@@ -2546,8 +2557,9 @@ struct
     let locs = List.rev_map (make_set_conversion convert_ptr) locs in
     locs,typ
   and lfun_app ctxt env loc f labels ttl =
-    try
-      let info = Logic_env.find_logic_ctor f in
+    match resolve_lapp f env with
+    | None -> C.error loc "unbound logic function %s" f
+    | Some (Ctor info) ->
       if labels <> [] then begin
         if ctxt.silent then raise Backtrack;
         ctxt.error loc
@@ -2555,18 +2567,13 @@ struct
            It cannot have logic labels" f;
       end;
       let params = List.map fresh info.ctor_params in
-      let env, tl =
-        type_arguments ~overloaded:false env loc params ttl
-      in
-      let t = Ltype(info.ctor_type,
-                    List.map fresh_type_var
-                      info.ctor_type.lt_params)
-      in
-      let t = instantiate env t in
+      let env, tl = type_arguments ~overloaded:false env loc params ttl in
+      let alphas = List.map fresh_type_var info.ctor_type.lt_params in
+      let t = instantiate env @@ Ltype(info.ctor_type,alphas) in
       TDataCons(info,tl), t
-    with Not_found ->
+    | Some (Lfun infos) ->
       let info, label_assoc, tl, t =
-        type_logic_app env loc f labels ttl
+        type_logic_app_infos env loc f infos labels ttl
       in
       match t with
       | None ->
@@ -3252,26 +3259,26 @@ struct
       | TAddrOf lv
       | Tat ({term_node = TAddrOf lv}, _) ->
         f lv t
-      | _ -> C.error t.term_loc "not a dependency value: %a"
-               Cil_printer.pp_term t
+      | _ ->
+        C.error t.term_loc "not a dependency value: %a" Cil_printer.pp_term t
     in
     lift_set check_from t
 
   and type_logic_app env loc f labels ttl =
-    (* support for overloading *)
-    let infos =
-      try [Lenv.find_logic_info f env]
-      with Not_found ->
-        Logic_env.find_all_logic_functions f in
+    match resolve_lapp f env with
+    | Some (Lfun infos) -> type_logic_app_infos env loc f infos labels ttl
+    | Some (Ctor info) ->
+      C.error loc "not a predicate: constructor %s" info.ctor_name
+    | None ->
+      C.error loc "unbound logic predicate %s" f
+
+  and type_logic_app_infos env loc f (infos : logic_info list) labels ttl =
     match infos with
-    | [] -> C.error loc "unbound logic function %s" f
     | [info] ->
       begin
         let labels = List.map (find_logic_label loc env) labels in
         let params = List.map (fun x -> fresh x.lv_type) info.l_profile in
-        let env, tl =
-          type_arguments ~overloaded:false env loc params ttl
-        in
+        let env, tl = type_arguments ~overloaded:false env loc params ttl in
         let label_assoc = labels_assoc loc f env info.l_labels labels in
         match info.l_type with
         | Some t ->
@@ -3289,26 +3296,19 @@ struct
              try
                let labels = List.map (find_logic_label loc env) labels in
                let params =
-                 List.map (fun x -> fresh x.lv_type) info.l_profile
-               in
+                 List.map (fun x -> fresh x.lv_type) info.l_profile in
                let env, tl =
-                 type_arguments ~overloaded:true env loc params ttl
-               in
-               let tl =
-                 List.combine (List.map (instantiate env) params) tl
-               in
-               let label_assoc = labels_assoc loc f env info.l_labels labels
-               in
+                 type_arguments ~overloaded:true env loc params ttl in
+               let tl = List.combine (List.map (instantiate env) params) tl in
+               let label_assoc = labels_assoc loc f env info.l_labels labels in
                match info.l_type with
                | Some t ->
                  let t = fresh t in
                  let t =
                    try instantiate env t
                    with _ -> raise Not_applicable
-                 in
-                 (info, label_assoc, tl, Some t)::acc
-               | None ->
-                 (info, label_assoc, tl, None)::acc
+                 in (info, label_assoc, tl, Some t)::acc
+               | None -> (info, label_assoc, tl, None)::acc
              with Not_applicable -> acc)
           [] infos
       in
@@ -3454,7 +3454,7 @@ struct
          prel ~loc (Cil_types.Req, t, Cil.lzero ~loc ())
        | p -> pnot ~loc p)
     | PLapp (p, labels, tl) ->
-      let ttl= List.map (term env) tl in
+      let ttl = List.map (term env) tl in
       let info, label_assoc, tl, t = type_logic_app env loc p labels ttl in
       begin
         match t with
@@ -4261,24 +4261,29 @@ struct
         C.error loc
           "Duplicated module %s (first occurrence at %a)"
           id Cil_printer.pp_location oldloc in
+      push_imports () ;
+      open_scope ~name () ;
       let l = List.filter_map (decl ~context) decls in
+      pop_imports () ;
       ignore (Logic_env.Modules.memo ~change (fun _ -> loc) name);
       Some (Dmodule(name,l,[],loc))
 
-    | LDimport _ -> C.error loc "Unsupported module import"
+    | LDimport(name,alias) ->
+      open_scope ~name ?alias () ; None
 
-    | LDtype(s,l,def) ->
+    | LDtype(name,l,def) ->
       let env = init_type_variables loc l in
+      let name = fullname ~context name in
       let my_info =
-        { lt_name = s;
+        { lt_name = name;
           lt_params = l;
           lt_def = None; (* will be updated later *)
           lt_attr = [];
         } in
       add_logic_type loc my_info;
       let tdef = Option.map (typedef loc ~context env my_info) def in
-      if is_cyclic_typedef s tdef then
-        C.error loc "Definition of %s is cyclic" s;
+      if is_cyclic_typedef name tdef then
+        C.error loc "Definition of %s is cyclic" name;
       my_info.lt_def <- tdef;
       Some (Dtype (my_info,loc))
 
