@@ -112,6 +112,7 @@
 [eva] Recording results for main
 [eva] Done for function main
 [eva] red_alarms.i:45: assertion 'Eva,index_bound' got final status invalid.
+[eva] Listing red statuses in file red_alarms.csv
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function in_bound:
   y ∈ [0..99]
@@ -136,7 +137,6 @@
   x ∈ [--..--]
 [eva:final-states] Values at end of function main:
   
-[eva] Listing red statuses in file red_alarms.csv
 [from] Computing for function in_bound
 [from] Done for function in_bound
 [from] Computing for function maybe_swap

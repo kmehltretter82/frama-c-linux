@@ -127,7 +127,8 @@ let post_analysis () =
   Eva_dynamic.RteGen.mark_generated_rte ();
   post_analysis_cleanup ~aborted:false;
   (* Remove redundant alarms *)
-  if Parameters.RmAssert.get () then Eva_dynamic.Scope.rm_asserts ()
+  if Parameters.RmAssert.get () then Eva_dynamic.Scope.rm_asserts ();
+  Red_statuses.report ()
 
 (* Registers signal handlers for SIGUSR1 and SIGINT to cleanly abort the Eva
    analysis. Returns a function that restores previous signal behaviors after
