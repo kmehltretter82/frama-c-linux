@@ -20,6 +20,8 @@ Open Source Release <next-release>
 
 o   Dev       [2024-04-22] Remove frama-c-build-scripts.sh; add a section in
               the user manual about how to manually replace it.
+-!  Kernel    [2024-04-19] Change format of custom_defs field in machdep schema
+              and allow #undefining builtin macros in the command-line.
 o   Kernel    [2024-04-17] Remove deprecated funcs Extlib.string_{pre,suf}fix
 -   Alias     [2024-04-16] Fix analysis results in the presence of structures.
               Complete rework of the API. Improved documentation. Fix stack
