@@ -172,10 +172,10 @@ let pretty_hash fmt callstack =
     Format.fprintf fmt "<%s> " (base58_of_int (stable_hash callstack))
   else Format.ifprintf fmt ""
 
-let pretty_short fmt callstack =
-  Format.fprintf fmt "%a" pretty_hash callstack;
+let pretty_short ~hide_hash ~sep fmt callstack =
+  if not hide_hash then Format.fprintf fmt "%a" pretty_hash callstack;
   let list = List.rev (to_kf_list callstack) in
-  Pretty_utils.pp_flowlist ~left:"" ~sep:" <- " ~right:""
+  Pretty_utils.pp_flowlist ~left:"" ~sep ~right:""
     (fun fmt kf -> Kernel_function.pretty fmt kf)
     fmt list
 

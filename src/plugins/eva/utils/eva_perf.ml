@@ -353,7 +353,7 @@ let reset_perf () =
 
 (* Set to [Some _] if option [-eva-flamegraph] is set and [main] is
    currently being analyzed and the file is ok. Otherwise, set to [None]. *)
-let oc_flamegraph = ref None
+let oc_fmt_flamegraph = ref None
 
 let stack_flamegraph = ref []
 (* Callstack for flamegraphs. The most recent function is at the top of the
@@ -374,16 +374,6 @@ module EvaFlamegraph =
       let size = 20
     end)
 
-(* pretty-prints the functions in a Value callstack, starting by main (i.e.
-   in reverse order). *)
-let pretty_callstack oc callstack =
-  let rec aux oc = function
-    | [] -> () (* does not happen in theory *)
-    | [main] -> Printf.fprintf oc "%s" (Kernel_function.get_name main)
-    | kf :: q -> Printf.fprintf oc "%s;%a" (Kernel_function.get_name kf) aux q
-  in
-  aux oc (Callstack.to_kf_list callstack)
-
 (* update the [self_total_time] information for the function being analyzed,
    assuming that the current time is [time] *)
 let update_self_total_time time =
@@ -398,36 +388,30 @@ let start_doing_flamegraph callstack =
   match callstack.Callstack.stack with
   | [] ->
     (* Analysis of main *)
+    EvaFlamegraph.clear ();
+    stack_flamegraph := [ (Sys.time (), 0.) ];
     if not (Parameters.ValPerfFlamegraphs.is_empty ()) then begin
       let file = Parameters.ValPerfFlamegraphs.get () in
       try
-        (* Flamegraphs must be computed. Set up the stack and the output file *)
-        EvaFlamegraph.clear ();
         let oc = open_out (file:>string) in
-        oc_flamegraph := Some oc;
-        stack_flamegraph := [ (Sys.time (), 0.) ]
+        oc_fmt_flamegraph := Some (oc, Format.formatter_of_out_channel oc);
       with e ->
         Self.error "cannot open flamegraph file: %s"
           (Printexc.to_string e);
-        oc_flamegraph := None (* to be on the safe side  *)
+        oc_fmt_flamegraph := None (* to be on the safe side  *)
     end
   | _ :: _ ->
-    if !oc_flamegraph <> None then
-      (* Flamegraphs are being computed. Update time spent in current function
-         so far, then push a slot for the analysis of the new function *)
-      let time = Sys.time () in
-      update_self_total_time time;
-      stack_flamegraph := (time, 0.) :: !stack_flamegraph;
+    let time = Sys.time () in
+    update_self_total_time time;
+    stack_flamegraph := (time, 0.) :: !stack_flamegraph;
 ;;
 
 (* called when the analysis of a function ends. This function is at the top
    of [callstack] *)
 let stop_doing_flamegraph callstack =
-  match !oc_flamegraph with
-  | None -> ()
-  | Some oc -> (* Flamegraphs are being recorded *)
-    let time = Sys.time() in
-    update_self_total_time time; (* update current function *)
+  let time = Sys.time() in
+  update_self_total_time time; (* update current function *)
+  begin
     match !stack_flamegraph with
     | [] -> assert false
     | (_, total) :: q ->
@@ -436,8 +420,14 @@ let stop_doing_flamegraph callstack =
         try EvaFlamegraph.find callstack with Not_found -> 0.0
       in
       EvaFlamegraph.replace callstack (prev_total +. total);
-      Printf.fprintf oc "%a %.3f\n%!"
-        pretty_callstack callstack (total *. 1000.);
+      begin
+        match !oc_fmt_flamegraph with
+        | None -> ()
+        | Some (_, fmt) -> (* Flamegraphs are being written to a file *)
+          Format.fprintf fmt "%a %.3f\n%!"
+            (Callstack.pretty_short ~hide_hash:true ~sep:";") callstack
+            (total *. 1000.)
+      end;
       match q with
       | [] -> stack_flamegraph := [] (* we are back to the main function *)
       | (_, total_caller) :: q' ->
@@ -445,15 +435,15 @@ let stop_doing_flamegraph callstack =
            the 'current time' information, so that the time spent in the
            callee is not counted. *)
         stack_flamegraph := (time, total_caller) :: q'
-;;
+  end
 
 let reset_flamegraph () =
-  match !oc_flamegraph with
+  EvaFlamegraph.clear ();
+  stack_flamegraph := [];
+  match !oc_fmt_flamegraph with
   | None -> ()
-  | Some fd ->
-    close_out fd; stack_flamegraph := []; oc_flamegraph := None;
-    EvaFlamegraph.clear ()
-
+  | Some (oc, _) ->
+    close_out oc; oc_fmt_flamegraph := None
 
 (* -------------------------------------------------------------------------- *)
 (* --- Exported interface                                                 --- *)
@@ -461,19 +451,15 @@ let reset_flamegraph () =
 
 let start_doing callgraph =
   start_doing_perf callgraph;
-  start_doing_flamegraph callgraph;
-;;
+  start_doing_flamegraph callgraph
 
 let stop_doing callgraph =
   stop_doing_perf callgraph;
-  stop_doing_flamegraph callgraph;
-;;
-
+  stop_doing_flamegraph callgraph
 
 let reset () =
   reset_perf ();
-  reset_flamegraph ();
-;;
+  reset_flamegraph ()
 
 
 (* TODO: Output files with more graphical outputs, such as

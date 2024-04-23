@@ -41,8 +41,12 @@ type callstack = {
 
 include Datatype.S_with_collections with type t = callstack
 
-(** Prints a callstack without displaying call sites. *)
-val pretty_short : Format.formatter -> t -> unit
+(** Prints a callstack without displaying call sites.
+    ~sep is the separator between function names.
+    ~hide_hash forces printing wihout hash (see {!pretty_hash}),
+    useful when a precise format is expected. *)
+val pretty_short :
+  hide_hash:bool -> sep:Pretty_utils.sformat -> Format.formatter -> t -> unit
 
 (** Prints a hash of the callstack when '-kernel-msg-key callstack'
     is enabled (prints nothing otherwise). *)
