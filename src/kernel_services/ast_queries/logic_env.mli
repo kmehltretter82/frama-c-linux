@@ -64,7 +64,7 @@ module Lemmas: State_builder.Hashtbl
 module Axiomatics: State_builder.Hashtbl
   with type key = string and type data = Cil_types.location
 
-  (** @since Frama-C+dev *)
+(** @since Frama-C+dev *)
 module Modules: State_builder.Hashtbl
   with type key = string and type data = Cil_types.location
 
