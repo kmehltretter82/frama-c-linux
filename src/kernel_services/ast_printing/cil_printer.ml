@@ -2703,8 +2703,17 @@ class cil_printer () = object (self)
       fprintf fmt ".%a%a" self#field fi self#term_offset o
     | TModel (mi,o) ->
       fprintf fmt ".%a%a" self#model_field mi self#term_offset o
-    | TIndex({term_node = Trange(low,high); _},o) ->
-      fprintf fmt "[%a]%a" self#range (low,high) self#term_offset o
+    | TIndex({term_node = Trange(low,high); term_name; _},o) ->
+      (* Make sure range names are printed (as in [self#term]). *)
+      let aux fmt () =
+        match term_name with
+        | [] -> self#range fmt (low, high)
+        | _ :: _ ->
+          fprintf fmt "@[%a:@ (%a)@]"
+            (Pretty_utils.pp_list ~sep:":@ " self#name) term_name
+            self#range (low, high)
+      in
+      fprintf fmt "[%a]%a" aux () self#term_offset o
     | TIndex(e,o) -> fprintf fmt "[%a]%a" self#term e self#term_offset o
 
   method term_lhost fmt (lh:term_lhost) =
