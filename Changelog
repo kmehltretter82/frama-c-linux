@@ -64,6 +64,12 @@ o   Dev       [2024-04-22] Remove frama-c-build-scripts.sh; add a section in
 -   Eva       [2024-04-18] Remove support for deprecated WIDEN_HINTS loop pragma.
               Use ACSL extension "widen_hints" instead.
 o   Kernel    [2024-04-17] Remove deprecated funcs Extlib.string_{pre,suf}fix
+-   Kernel    [2024-04-22] Support for ACSL modules. o!  Dev       [2024-04-22]
+Move functions for finding logic types, functions, predicates and constructors
+              from Logic_typing to Logic_env. o   Dev       [2024-04-22] Remove
+frama-c-build-scripts.sh; add a section in the user manual about how to manually
+              replace it. o   Kernel    [2024-04-17] Remove deprecated funcs
+Extlib.string_{pre,suf}fix
 -   Alias     [2024-04-16] Fix analysis results in the presence of structures.
               Complete rework of the API. Improved documentation. Fix stack
               overflow in case of a cyclic graph.
