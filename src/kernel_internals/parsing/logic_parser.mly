@@ -86,6 +86,35 @@
       | (Lt|Le), (Unknown|Less) -> Less, true
       | _ -> sense, false
 
+  let module_stack = Stack.create ()
+  let module_types = Hashtbl.create 0
+
+  let push_typename ?(export=true) t =
+    Logic_env.add_typename t ;
+    try
+      let m = Stack.top module_stack in
+      Hashtbl.add module_types m (export,t)
+    with Stack.Empty -> ()
+
+  let import_typenames mId asId =
+    List.iter (fun (export,t) ->
+      if export then
+        begin
+          push_typename ~export:false t ;
+          match asId with
+          | None -> ()
+          | Some a ->
+            push_typename ~export:false @@ Printf.sprintf "%s::%s" a t
+        end
+    ) @@ Hashtbl.find_all module_types mId
+
+  let pop_module_types () =
+    let m = Stack.pop module_stack in
+    List.iter (fun (export,t) ->
+      Logic_env.remove_typename t ;
+      if export then Logic_env.add_typename (Printf.sprintf "%s::%s" m t)
+    ) @@ Hashtbl.find_all module_types m
+
   let type_variables_stack = Stack.create ()
 
   let enter_type_variables_scope l =
@@ -1594,14 +1623,14 @@ poly_id_type:
 | full_identifier
     { enter_type_variables_scope []; ($1,[]) }
 | full_identifier LT ne_tvar_list GT
-        { enter_type_variables_scope $3; ($1,$3) }
+    { enter_type_variables_scope $3; ($1,$3) }
 ;
 
 /* we need to recognize the typename as soon as it has been declared,
   so that it can be used in data constructors in the type definition itself
 */
 poly_id_type_add_typename:
-| poly_id_type { let (id,_) = $1 in Logic_env.add_typename id; $1 }
+| poly_id_type { push_typename (fst $1) ; $1 }
 ;
 
 poly_id:
@@ -1652,17 +1681,21 @@ logic_def:
       LDlemma (id, labels, tvars, toplevel_pred Admit $4) }
 | AXIOMATIC any_identifier LBRACE logic_decls RBRACE
     { LDaxiomatic($2,$4) }
-| MODULE LONGIDENT LBRACE logic_decls RBRACE
-    { LDmodule($2,$4) }
+| MODULE push_module_identifier LBRACE logic_decls RBRACE
+    { pop_module_types () ; LDmodule($2,$4) }
 | IMPORT LONGIDENT SEMICOLON
-    { LDimport($2,None) }
+    { import_typenames $2 None ; LDimport($2,None) }
 | IMPORT LONGIDENT AS identifier SEMICOLON
-    { LDimport($2,Some $4) }
+    { let asId = Some $4 in import_typenames $2 asId ; LDimport($2,asId) }
 | TYPE poly_id_type_add_typename EQUAL typedef SEMICOLON
         { let (id,tvars) = $2 in
           exit_type_variables_scope ();
           LDtype(id,tvars,Some $4)
         }
+;
+
+push_module_identifier:
+| LONGIDENT { Stack.push $1 module_stack ; $1 }
 ;
 
 deprecated_logic_decl:
@@ -1683,7 +1716,7 @@ deprecated_logic_decl:
 /* OBSOLETE: type declaration */
 | TYPE poly_id_type SEMICOLON
     { let (id,tvars) = $2 in
-      Logic_env.add_typename id;
+      Logic_env.add_typename id ; (* not in a module! *)
       exit_type_variables_scope ();
       let source = pos $symbolstartpos in
       obsolete "logic type declaration" ~source ~now:"an axiomatic block";
@@ -1721,8 +1754,8 @@ logic_decl:
 /* type declaration */
 | TYPE poly_id_type SEMICOLON
     { let (id,tvars) = $2 in
-      Logic_env.add_typename id;
       exit_type_variables_scope ();
+      push_typename id;
       LDtype(id,tvars,None) }
 /* axiom */
 | AXIOM poly_id COLON lexpr SEMICOLON

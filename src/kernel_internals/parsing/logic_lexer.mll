@@ -142,7 +142,7 @@
         "global", (fun _ -> GLOBAL);
         "if", (fun _ -> IF);
         "import", (fun _ -> IMPORT);
-	"inductive", (fun _ -> INDUCTIVE);
+        "inductive", (fun _ -> INDUCTIVE);
         "include", (fun _ -> EXT_SPEC_INCLUDE);
         "int", (fun _ -> INT);
         "invariant", (fun _ -> INVARIANT);
@@ -266,6 +266,10 @@
           else IDENTIFIER s
       end
 
+  let longident lexbuf =
+    let s = lexeme lexbuf in
+    if Logic_env.typename_status s then TYPENAME s else LONGIDENT s
+
   (* Update lexer buffer. *)
   let update_line_pos lexbuf line =
     let pos = lexbuf.Lexing.lex_curr_p in
@@ -387,8 +391,8 @@ rule token = parse
      check_ext_plugin (fst cabsloc) plugin tok
      }
   | '\\' rIdentifier { bs_identifier lexbuf }
-  | rIdentifier ( "::" rIdentifier )+ { LONGIDENT (lexeme lexbuf) }
-  | rIdentifier ( "::" rIdentifier )* "::(" rOP+ ")" { LONGIDENT(lexeme lexbuf)}
+  | rIdentifier ( "::" rIdentifier )+ { longident lexbuf }
+  | rIdentifier ( "::" rIdentifier )* "::(" rOP+ ")" { longident lexbuf }
   | rIdentifier       {
       let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
       let cabsloc = Cil_datatype.Location.of_lexing_loc loc in

@@ -1,13 +1,21 @@
 /* run.config
-   EXIT: 1
-   OPT:
+   STDOPT:
  */
 
 /*@
-  logic integer foo(integer x) = 2*x;
-  import int::Int \as Z;
-  logic integer foo(integer x) = 2*x;
   module foo::Bar {
-    logic integer next(integer x) = Z::add::(+)(x,1);
+    type t;
+    logic t e;
+    logic t op(t x, t y);
+    logic t opN(t x, integer n) = n >= 0 ? op(x, opN(x,n-1)) : e;
   }
+  module foo::Jazz {
+    import foo::Bar \as X;
+    logic t inv(t x);
+    logic t opN(t x, integer n) = n >= 0 ? X::opN(x,n) : X::opN(inv(x),-n);
+  }
+  import foo::Bar \as A;
+  import foo::Jazz \as B;
+  lemma AbsOp: \forall foo::Bar::t x, integer n;
+    B::opN(x,\abs(n)) == A::opN(x,\abs(n));
  */
