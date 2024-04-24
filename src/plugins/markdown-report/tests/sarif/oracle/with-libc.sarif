@@ -3316,7 +3316,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text": "from clause of term *(dest +\n                      (strlen{Old}(dest) ..\n                                           strlen{Old}(dest) +\n                                           strlen{Old}(src))) in function strcat."
+            "text": "from clause of term *(dest +\n                      (strlen{Old}(dest) ..\n                       strlen{Old}(dest) + strlen{Old}(src))) in function strcat."
           },
           "locations": [
             {
@@ -6001,7 +6001,7 @@
           "kind": "pass",
           "level": "none",
           "message": {
-            "text": "from clause of term *(dest +\n                      (strlen{Old}(dest) ..\n                                           strlen{Old}(dest) +\n                                           strlen{Old}(src))) in function strncat."
+            "text": "from clause of term *(dest +\n                      (strlen{Old}(dest) ..\n                       strlen{Old}(dest) + strlen{Old}(src))) in function strncat."
           },
           "locations": [
             {

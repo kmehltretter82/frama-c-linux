@@ -341,14 +341,15 @@ module Precedence = struct
     | Const _ -> 0                        (* Constants *)
 
   let rec getParenthLevelLogic = function
-    | Trange _ -> upperLevel
     | Tlambda _ | Tlet _ -> binderLevel
-    | TBinOp(LAnd, _,_) -> and_level
+    | Tif (_, _, _)  -> questionLevel
     | TBinOp(LOr, _,_) -> or_level
+    | TBinOp(LAnd, _,_) -> and_level
     (* Bit operations. *)
     | TBinOp((BOr|BXor|BAnd),_,_) -> bitwiseLevel
     | Tapp({ l_var_info },[],[_;_])
-      when l_var_info.lv_name = "\\concat" -> bitwiseLevel
+      when l_var_info.lv_name = "\\repeat" || l_var_info.lv_name = "\\concat" ->
+      bitwiseLevel
     (* Comparisons *)
     | TBinOp((Eq|Ne|Gt|Lt|Ge|Le),_,_) -> comparativeLevel
     (* Additive. Shifts can have higher level than + or - but I want parentheses
@@ -357,8 +358,6 @@ module Precedence = struct
               PlusPI|Shiftlt|Shiftrt),_,_) -> additiveLevel
     (* Multiplicative *)
     | TBinOp((Div|Mod|Mult),_,_) -> multiplicativeLevel
-    | Tapp({ l_var_info },[],[_;_])
-      when l_var_info.lv_name = "\\repeat" -> bitwiseLevel
     (* Unary *)
     | TCast(false,_,_)
     | TAddrOf(_)
@@ -377,12 +376,14 @@ module Precedence = struct
     | Tblock_length _ | Tbase_addr _ | Toffset _ | Tat (_, _)
     | Tunion _ | Tinter _
     | TUpdate _ | Ttypeof _ | Ttype _ -> applicationLevel
+    | TCast (true,_,e) -> (getParenthLevelLogic e.term_node) + 1
     | TLval(TVar _, TNoOffset) -> 0        (* Plain variables *)
+    (* Trange always requires parenthesis, except inside indexes. These cases
+       are handled in [term_node] and [term_offset] functions. *)
+    | Trange _ -> 0
     (* Constructions that do not require parentheses *)
     | TConst _
     | Tnull | TLval (TResult _,TNoOffset) | Tcomprehension _  | Tempty_set -> 0
-    | Tif (_, _, _)  -> questionLevel
-    | TCast (true,_,e) -> (getParenthLevelLogic e.term_node) + 1
 
   (* Create an expression of the same shape, and use {!getParenthLevel} *)
   let getParenthLevelAttrParam = function
@@ -2436,7 +2437,7 @@ class cil_printer () = object (self)
     begin match t.term_name with
       | [] -> self#term_node fmt t
       | _ :: _ ->
-        fprintf fmt "(@[%a:@ %a@])"
+        fprintf fmt "(@[<2>%a:@ %a@])"
           (Pretty_utils.pp_list ~sep:":@ " self#name) t.term_name
           self#term_node t
     end;
@@ -2516,6 +2517,14 @@ class cil_printer () = object (self)
         (self#term_prec Precedence.and_level) t
         self#term_binop LAnd
         self#tand_list l
+
+  method private range fmt (low, high) =
+    let pp_opt = Pretty_utils.pp_opt ~pre:"" ~suf:"" in
+    fprintf fmt "@[%a..%a@]"
+      (pp_opt
+         (fun fmt v -> Format.fprintf fmt "%a " (self#term_prec Precedence.upperLevel) v)) low
+      (pp_opt
+         (fun fmt v -> Format.fprintf fmt "@ %a" (self#term_prec Precedence.upperLevel) v)) high;
 
   method term_node fmt t =
     let current_level = Precedence.getParenthLevelLogic t.term_node in
@@ -2631,11 +2640,7 @@ class cil_printer () = object (self)
         (Pretty_utils.pp_opt
            (fun fmt p -> fprintf fmt ";@ %a" self#predicate p)) p
     | Trange(low,high) ->
-      fprintf fmt "@[%a..%a@]"
-        (Pretty_utils.pp_opt
-           (fun fmt v -> Format.fprintf fmt "%a " term v)) low
-        (Pretty_utils.pp_opt
-           (fun fmt v -> Format.fprintf fmt "@ %a" term v)) high;
+      fprintf fmt "(%a)" self#range (low, high)
     | Tlet(def,body) ->
       assert
         (Kernel.verify (def.l_labels = [])
@@ -2699,6 +2704,17 @@ class cil_printer () = object (self)
       fprintf fmt ".%a%a" self#field fi self#term_offset o
     | TModel (mi,o) ->
       fprintf fmt ".%a%a" self#model_field mi self#term_offset o
+    | TIndex({term_node = Trange(low,high); term_name; _},o) ->
+      (* Make sure range names are printed (as in [self#term]). *)
+      let aux fmt () =
+        match term_name with
+        | [] -> self#range fmt (low, high)
+        | _ :: _ ->
+          fprintf fmt "@[<2>%a:@ (%a)@]"
+            (Pretty_utils.pp_list ~sep:":@ " self#name) term_name
+            self#range (low, high)
+      in
+      fprintf fmt "[%a]%a" aux () self#term_offset o
     | TIndex(e,o) -> fprintf fmt "[%a]%a" self#term e self#term_offset o
 
   method term_lhost fmt (lh:term_lhost) =
