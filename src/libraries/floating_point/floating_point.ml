@@ -27,8 +27,8 @@ external get_rounding_mode : unit -> rounding = "frama_c_get_round_mode" [@@noal
 external round_to_single_precision : float -> float = "round_to_single"
 
 let round_if_single_precision = function
-  | Cil_types.FFloat -> round_to_single_precision
-  | FDouble | FLongDouble -> Fun.id
+  | Cil_types.FFloat | FFloat32 -> round_to_single_precision
+  | FDouble | FFloat64 | FLongDouble -> Fun.id
 
 
 type truncated_to_integer =
@@ -133,15 +133,16 @@ let pretty fmt f =
 
 
 let suffix_of_fkind = function
-  | Cil_types.FFloat -> 'F'
-  | Cil_types.FDouble -> 'D'
-  | Cil_types.FLongDouble -> 'L'
+  | Cil_types.FFloat   -> "F"
+  | Cil_types.FFloat32 -> "F32"
+  | Cil_types.FFloat64 -> "F64"
+  | Cil_types.FDouble  -> "D"
+  | Cil_types.FLongDouble -> "L"
 
 let has_suffix fkind literal =
-  let ln = String.length literal in
   let suffix = suffix_of_fkind fkind in
-  ln > 0 && Char.uppercase_ascii literal.[ln - 1] = suffix
-
+  let literal_upper = String.uppercase_ascii literal in
+  String.ends_with ~suffix literal_upper
 
 type format = Single | Double
 

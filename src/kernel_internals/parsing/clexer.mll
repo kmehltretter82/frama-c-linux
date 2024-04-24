@@ -130,7 +130,9 @@ let init_lexicon () =
   valid "_Bool" (fun loc -> BOOL loc) ;
   valid "int" (fun loc -> INT loc) ;
   valid "float" (fun loc -> FLOAT loc) ;
+  valid "_Float32" (fun loc -> FLOAT32 loc) ;
   valid "double" (fun loc -> DOUBLE loc) ;
+  valid "_Float64" (fun loc -> FLOAT64 loc) ;
   valid "void" (fun loc -> VOID loc) ;
   valid "enum" (fun loc -> ENUM loc) ;
   valid "struct" (fun loc -> STRUCT loc) ;
@@ -453,7 +455,7 @@ let hexfloat =
     hexprefix hexfraction binexponent
   | hexprefix hexdigit+   binexponent
 
-let floatsuffix = ['f' 'F' 'l' 'L']
+let floatsuffix = ['f' 'F' 'l' 'L'] | "f32" | "F32" | "f64" | "F64"
 let floatnum = (decfloat | hexfloat) floatsuffix?
 
 let ident = (letter|'_')(letter|decdigit|'_'|'$')*

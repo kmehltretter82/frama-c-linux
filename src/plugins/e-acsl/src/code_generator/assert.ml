@@ -134,6 +134,8 @@ let add_pending_register_data ~loc { data_ptr } name e =
       match ty.tnode with
       | TInt ikind -> ikind_to_string ikind, [ Cil.zero ~loc; e ]
       | TFloat FFloat -> "float", [ e ]
+      | TFloat FFloat32 -> "_Float32", [ e ]
+      | TFloat FFloat64 -> "_Float64", [ e ]
       | TFloat FDouble -> "double", [ e ]
       | TFloat FLongDouble -> "longdouble", [ e ]
       | TPtr _ -> "ptr", [ e ]

@@ -44,9 +44,8 @@ let returned_value kf =
   | TComp _ when Cil.is_fully_arithmetic return_type -> Cvalue.V.top_int
   | TPtr _ | TComp _ -> Cvalue.V.inject Base.null Ival.zero
   | TInt _ | TEnum _ ->  Cvalue.V.top_int
-  | TFloat FFloat -> Cvalue.V.top_single_precision_float
-  | TFloat FDouble
-  | TFloat FLongDouble -> Cvalue.V.top_float
+  | TFloat (FFloat  | FFloat32) -> Cvalue.V.top_single_precision_float
+  | TFloat (FDouble | FFloat64 | FLongDouble) -> Cvalue.V.top_float
   | TBuiltin_va_list ->
     Self.error ~current:true ~once:true ~stacktrace:true
       "functions returning variadic arguments must be stubbed";

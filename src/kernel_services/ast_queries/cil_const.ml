@@ -66,8 +66,10 @@ let voidConstPtrType =
 let intPtrType  = mk_tptr intType
 let uintPtrType = mk_tptr uintType
 
-let doubleType     = mk_tfloat FDouble
 let floatType      = mk_tfloat FFloat
+let float32Type    = mk_tfloat FFloat32
+let float64Type    = mk_tfloat FFloat64
+let doubleType     = mk_tfloat FDouble
 let longDoubleType = mk_tfloat FLongDouble
 
 module Vid = State_builder.SharedCounter(struct let name = "vid_counter" end)

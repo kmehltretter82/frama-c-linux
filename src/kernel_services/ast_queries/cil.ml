@@ -3111,6 +3111,8 @@ let frank = function
   | FFloat -> 1
   | FDouble -> 2
   | FLongDouble -> 3
+  | FFloat32 -> 4
+  | FFloat64 -> 5
 
 
 (* Convert 2 integer constants to integers with the same type, in preparation
@@ -3195,9 +3197,9 @@ let rec bytesAlignOf ~standard_or_gcc t =
     | TInt (ILongLong|IULongLong) ->
       Alignof.longlong ()
     | TEnum ei ->  bytesAlignOf ~standard_or_gcc (Cil_const.mk_tint ei.ekind)
-    | TFloat FFloat ->
+    | TFloat (FFloat|FFloat32) ->
       Alignof.float ()
-    | TFloat FDouble ->
+    | TFloat (FDouble|FFloat64) ->
       Alignof.double ()
     | TFloat FLongDouble ->
       Alignof.longdouble ()

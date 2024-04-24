@@ -110,6 +110,8 @@ let make_c_float = function
 
 let c_float fkind =
   match fkind with
+  | FFloat32 -> Float32
+  | FFloat64 -> Float64
   | FFloat -> make_c_float (Machine.Sizeof.float ())
   | FDouble -> make_c_float (Machine.Sizeof.double ())
   | FLongDouble -> make_c_float (Machine.Sizeof.longdouble ())

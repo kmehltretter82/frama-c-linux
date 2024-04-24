@@ -639,12 +639,15 @@ class cil_printer () = object (self)
 
     | CChr(c) -> fprintf fmt "'%s'" (Escape.escape_char c)
     | CReal(_, _, Some s) -> fprintf fmt "%s" s
-    | CReal(f, FFloat, None) ->
-      fprintf fmt "%af" Floating_point.pretty f
-    | CReal(f, FDouble, None) ->
-      fprintf fmt "%a" Floating_point.pretty f
-    | CReal(f, FLongDouble, None) ->
-      fprintf fmt "%aL" Floating_point.pretty f
+    | CReal(f, fsize, None) ->
+      fprintf fmt "%a%s"
+        Floating_point.pretty f
+        (match fsize with
+         | FFloat   -> "f"
+         | FFloat32 -> "f32"
+         | FFloat64 -> "f64"
+         | FDouble  -> ""
+         | FLongDouble -> "L")
     | CEnum {einame = s} -> self#varname fmt s
 
   (*** VARIABLES ***)
@@ -1928,8 +1931,10 @@ class cil_printer () = object (self)
     | Some e -> fprintf fmt "%s_Alignas(%a)" (if space then " " else "") self#exp e
 
   method fkind fmt = function
-    | FFloat -> fprintf fmt "float"
-    | FDouble -> fprintf fmt "double"
+    | FFloat   -> fprintf fmt "float"
+    | FFloat32 -> fprintf fmt "_Float32"
+    | FFloat64 -> fprintf fmt "_Float64"
+    | FDouble  -> fprintf fmt "double"
     | FLongDouble -> fprintf fmt "long double"
 
   method ikind fmt c =

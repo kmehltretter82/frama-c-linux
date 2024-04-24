@@ -19,8 +19,8 @@ let compare = ()
 type kind = Float_sig.prec = Single | Double | Long_Double | Real
 
 let kind = function
-  | Cil_types.FFloat -> Single
-  | Cil_types.FDouble -> Double
+  | Cil_types.(FFloat  | FFloat32) -> Single
+  | Cil_types.(FDouble | FFloat64) -> Double
   | Cil_types.FLongDouble -> Long_Double
 
 let pretty_kind fmt kind =

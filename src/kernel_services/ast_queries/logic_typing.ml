@@ -1966,6 +1966,8 @@ struct
                   let kind =
                     match Ast_types.unroll_node ty1 with
                     | TFloat FFloat -> "float"
+                    | TFloat FFloat32 -> "_Float32"
+                    | TFloat FFloat64 -> "_Float64"
                     | TFloat FDouble -> "double"
                     | TFloat FLongDouble -> "long double"
                     | _ -> Kernel.fatal "floating point type expected"

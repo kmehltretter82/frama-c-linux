@@ -73,9 +73,10 @@ val is_nan : float -> bool
 val pretty_normal : use_hex:bool -> Format.formatter -> float -> unit
 val pretty : Format.formatter -> float -> unit
 
-(** True if the given string's last character corresponds to the given
-    format, i.e 'F' for single precision, 'D' for double precision and
-    'L' for extended precision. *)
+(** True if the given string's suffix corresponds to the given
+    format, i.e "F" for single precision (or "F32" for _Float32),
+    "D" (or "F64") for double precision (_Float64), and
+    "L" for extended precision. *)
 val has_suffix : Cil_types.fkind -> string -> bool
 
 

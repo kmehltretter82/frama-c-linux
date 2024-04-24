@@ -248,6 +248,8 @@ let report_alarm ~pos annot msg =
 
 let string_fkind = function
   | Cil_types.FFloat -> "float"
+  | Cil_types.FFloat32 -> "_Float32"
+  | Cil_types.FFloat64 -> "_Float64"
   | Cil_types.FDouble -> "double"
   | Cil_types.FLongDouble -> "long double"
 

@@ -124,8 +124,8 @@ struct
 
   let fkind_to_char (fkind : Cil_types.fkind) =
     match fkind with
-    | FFloat -> 'f'
-    | FDouble | FLongDouble -> 'd'
+    | FFloat  | FFloat32 -> 'f'
+    | FDouble | FFloat64 | FLongDouble -> 'd'
 
   let typ_to_char (ty: Cil_types.typ) =
     match ty.tnode with

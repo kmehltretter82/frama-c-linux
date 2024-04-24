@@ -4216,8 +4216,10 @@ let rec doSpecList loc ghost
 
     | [Cabs.Tunsigned; Cabs.Tint64] -> ulongLongType
 
-    | [Cabs.Tfloat]  -> floatType
-    | [Cabs.Tdouble] -> doubleType
+    | [Cabs.Tfloat]   -> floatType
+    | [Cabs.Tfloat32] -> float32Type
+    | [Cabs.Tfloat64] -> float64Type
+    | [Cabs.Tdouble]  -> doubleType
 
     | [Cabs.Tlong; Cabs.Tdouble] -> longDoubleType
 

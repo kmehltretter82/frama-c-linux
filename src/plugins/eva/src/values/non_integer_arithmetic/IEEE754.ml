@@ -128,6 +128,8 @@ module Make (Model : Modeling) = struct
 
   let format_of_fkind = function
     | Cil_types.FFloat      -> Format Single
+    | Cil_types.FFloat32    -> Format Float32
+    | Cil_types.FFloat64    -> Format Float64
     | Cil_types.FDouble     -> Format Double
     | Cil_types.FLongDouble ->
       Kernel.warning ~wkey:Kernel.wkey_long_double

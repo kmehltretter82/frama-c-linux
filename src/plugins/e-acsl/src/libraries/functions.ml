@@ -122,8 +122,8 @@ module Libc = struct
       (* Format-based functions expect only double-precision floats.
          Single-precision floating points are promoted to doubles so
          this case should never happen in fact. *)
-      | FFloat -> assert false (* "f" *) (* [float] *)
-      | FDouble  -> "e" (* [float/double] *)
+      | FFloat  | FFloat32 -> assert false (* "f" *) (* [float] *)
+      | FDouble | FFloat64 -> "e" (* [float/double] *)
       | FLongDouble -> "E" (* [long double] *)
     in
     (* get a character representing a pointer type *)

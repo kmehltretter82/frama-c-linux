@@ -955,12 +955,12 @@ let reinterpret_as_float kind i =
       inject_float (Bottom.non_bottom f)
     in
     match kind with
-    | Cil_types.FDouble ->
-      let conv v = Fval.F.of_float (Int64.float_of_bits (Z.to_int64 v)) in
-      reinterpret 64 Fval.Double Typed_float.Double conv
-    | Cil_types.FFloat ->
+    | Cil_types.(FFloat  | FFloat32) ->
       let conv v = Fval.F.of_float(Int32.float_of_bits (Z.to_int32 v)) in
       reinterpret 32 Fval.Single Typed_float.Single conv
+    | Cil_types.(FDouble | FFloat64) ->
+      let conv v = Fval.F.of_float (Int64.float_of_bits (Z.to_int64 v)) in
+      reinterpret 64 Fval.Double Typed_float.Double conv
     | Cil_types.FLongDouble ->
       (* currently always imprecise *)
       top_float
