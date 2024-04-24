@@ -579,7 +579,7 @@ function closeComponent(compId: compId): void {
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Tabs Update                                                        --- */
+/* --- Update from Settings                                               --- */
 /* -------------------------------------------------------------------------- */
 
 const filterComponent = (id: compId): compId =>
@@ -599,10 +599,12 @@ function updateTab(
   const { custom, view: viewId } = tab;
   const view = VIEW.getElement(viewId);
   if (!view) return false;
-  const tabKey = tabKeyOf(viewId,custom);
+  const tabKey = tabKeyOf(viewId, custom);
   const tabState = newTabs.get(tabKey);
   const oldStack =
-    tabState !== undefined ? tabState.stack : [makeViewLayout(view.layout)];
+    tabState !== undefined ? tabState.stack : [
+      defaultLayout, makeViewLayout(view.layout)
+    ]; // unstack starts at depth 1
   const stack = unstackLayout(filterLayout(tab.layout), oldStack);
   if (
     tabState === undefined ||
@@ -677,7 +679,7 @@ Settings.onWindowSettings(() => {
       });
       const newDock = copyMap(state.docked);
       settings.dock.forEach(dock => {
-        if (updateDock(newDock, dock)) modified = false;
+        if (updateDock(newDock, dock)) modified = true;
       });
       if (modified) LAB.setValue({ ...state, tabs: newTabs, docked: newDock });
       if (!state.tabKey) updateIndex( settings );
