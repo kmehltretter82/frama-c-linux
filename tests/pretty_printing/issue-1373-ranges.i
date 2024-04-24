@@ -4,7 +4,13 @@
 
 struct foo { char bar[4]; };
 
-/*@ assigns x->bar[name_range1:(0..3)] \from x->bar[0..3]; */
+// Long names to check Format indentation
+int const aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa = 0;
+int const bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb = 3;
+
+/*@ assigns x->bar[name_range1:(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb)]
+      \from x->bar[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb];
+*/
 int f(struct foo* x);
 
 void main() {

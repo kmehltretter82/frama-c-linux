@@ -2437,7 +2437,7 @@ class cil_printer () = object (self)
     begin match t.term_name with
       | [] -> self#term_node fmt t
       | _ :: _ ->
-        fprintf fmt "(@[%a:@ %a@])"
+        fprintf fmt "(@[<2>%a:@ %a@])"
           (Pretty_utils.pp_list ~sep:":@ " self#name) t.term_name
           self#term_node t
     end;
@@ -2519,10 +2519,11 @@ class cil_printer () = object (self)
         self#tand_list l
 
   method private range fmt (low, high) =
+    let pp_opt = Pretty_utils.pp_opt ~pre:"" ~suf:"" in
     fprintf fmt "@[%a..%a@]"
-      (Pretty_utils.pp_opt
+      (pp_opt
          (fun fmt v -> Format.fprintf fmt "%a " (self#term_prec Precedence.upperLevel) v)) low
-      (Pretty_utils.pp_opt
+      (pp_opt
          (fun fmt v -> Format.fprintf fmt "@ %a" (self#term_prec Precedence.upperLevel) v)) high;
 
   method term_node fmt t =
@@ -2709,7 +2710,7 @@ class cil_printer () = object (self)
         match term_name with
         | [] -> self#range fmt (low, high)
         | _ :: _ ->
-          fprintf fmt "@[%a:@ (%a)@]"
+          fprintf fmt "@[<2>%a:@ (%a)@]"
             (Pretty_utils.pp_list ~sep:":@ " self#name) term_name
             self#range (low, high)
       in
