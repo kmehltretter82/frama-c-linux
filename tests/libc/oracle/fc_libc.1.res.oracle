@@ -118,10 +118,7 @@ struct __fc_pthread_mutexattr_t {
    int _fc ;
 };
 typedef struct __fc_pthread_mutexattr_t pthread_mutexattr_t;
-struct __fc_pthread_t {
-   unsigned long _fc ;
-};
-typedef struct __fc_pthread_t pthread_t;
+typedef unsigned long pthread_t;
 typedef int pid_t;
 typedef unsigned int gid_t;
 typedef unsigned int uid_t;
@@ -11787,8 +11784,9 @@ extern int pthread_cond_wait(pthread_cond_t * restrict cond,
     requires valid_routine: \valid_function(start_routine);
     requires valid_null_arg: arg ≡ \null ∨ \valid((char *)arg);
     ensures
-      success_or_error:
-        \result ≡ 0 ∨ \result ≡ 11 ∨ \result ≡ 22 ∨ \result ≡ 1;
+      initialization: success_or_error:
+        (\result ≡ 0 ∧ \initialized(\old(thread))) ∨ \result ≡ 11 ∨
+        \result ≡ 22 ∨ \result ≡ 1;
     assigns *thread, \result;
     assigns *thread \from *attr;
     assigns \result \from (indirect: *attr);

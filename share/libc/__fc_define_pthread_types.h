@@ -44,7 +44,7 @@ typedef struct __fc_pthread_once_t { int _fc; } pthread_once_t;
 typedef struct __fc_pthread_rwlock_t { int _fc; } pthread_rwlock_t;
 typedef struct __fc_pthread_rwlockattr_t { int _fc; } pthread_rwlockattr_t;
 typedef struct __fc_pthread_spinlock_t { int _fc; } pthread_spinlock_t;
-typedef struct unsigned long pthread_t;
+typedef unsigned long pthread_t;
 __END_DECLS
 __POP_FC_STDLIB
 #endif

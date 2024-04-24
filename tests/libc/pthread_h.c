@@ -1,3 +1,6 @@
+/* run.config
+   STDOPT: #"-eva-slevel 4"
+ */
 #define _GNU_SOURCE // if you want to compile with GCC
 #include <pthread.h>
 #include <stdio.h>

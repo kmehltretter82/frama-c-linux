@@ -38,6 +38,15 @@
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:226: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
+  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
+  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
+                                                        \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:231: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
@@ -49,3 +58,7 @@
                                                       \valid(data->values) got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
+  function __gen_e_acsl_pthread_create: postcondition 'initialization,success_or_error' got status unknown.
+[eva:alarm] sequential_threads.c:29: Warning: 
+  accessing uninitialized left-value. assert \initialized(&t);
