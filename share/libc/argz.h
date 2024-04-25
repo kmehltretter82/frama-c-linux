@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 1995-2024                                               */
+/*  Copyright (C) 1995-2021                                               */
 /*    Free Software Foundation, Inc.                                      */
 /*  Copyright (C) 2021-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
