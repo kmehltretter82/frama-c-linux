@@ -213,11 +213,8 @@ end
 (* --- Domain Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jcallstack :
-sig
-  include Data.S with type t = Callstack.t
-  val get : Callstack.t -> int
-end = Data.Index
+module Jcallstack : S with type t = Callstack.t =
+  Data.Index
     (Callstack.Map)
     (struct
       let package = package
@@ -724,46 +721,99 @@ let () =
         | Nothing -> ()
     end
 
+(* -------------------------------------------------------------------------- *)
+(* --- Flamegraph                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+module Jkfstack :
+sig
+  include Data.S with type t = Eva_perf.KfList.t
+  val get : Eva_perf.KfList.t -> int
+end = Data.Index
+    (Eva_perf.KfList.Map)
+    (struct
+      let package = package
+      let name = "kfstack"
+      let descr = Md.plain "Kernel function stack identifier"
+    end)
+
+module Jkfs : Request.Output with type t = Eva_perf.KfList.t = struct
+
+  type t = Eva_perf.KfList.t
+
+  let jcalllink = Server.Data.declare ~package
+      ~name:"calllink" ~descr:(Md.plain "Kernel function list infos")
+      (Jrecord [
+          "callee" , Jdecl.jtype ;
+          "caller" , Joption Jdecl.jtype ;
+        ])
+
+  let jtype = Package.(Jarray jcalllink)
+
+  let jkfstack ~jcaller ~jcallee =
+    `Assoc [
+      "callee", jcallee ;
+      "caller", jcaller ;
+    ]
+
+  let to_json (cl : t) =
+    let aux (acc, jcaller) callee =
+      let jcallee = Jdecl.to_json (SFunction callee) in
+      jkfstack ~jcaller ~jcallee :: acc, jcallee
+    in
+    match cl with
+    | [] -> `List []
+    | entry :: r ->
+      let entry_point = Jdecl.to_json (SFunction entry) in
+      let l, _last_callee =
+        List.fold_left aux
+          ([`Assoc [ "callee", entry_point ]], entry_point)
+          (List.rev r)
+      in `List l
+
+end
+
 let _evaFlamegraph =
   let model = States.model () in
-  (* This field is usefull for interact with other components,
+  (* This field is useful for interacting with other components,
      eg. the currently selected callstack in EVA values *)
   States.column model ~name:"stack"
-    ~descr:(Markdown.plain "Callstack identifier")
-    ~data:(module Jcallstack) ~get:fst ;
+    ~descr:(Markdown.plain "Caller list identifier")
+    ~data:(module Jkfstack) ~get:fst ;
   (* This field contains the computation time *)
   States.column model ~name:"time"
-    ~descr:(Markdown.plain "Computation time for the callstack")
-    ~data:(module Data.Jfloat) ~get:snd ;
-  (* This field might be usefull to display tooltips on the flames *)
+    ~descr:(Markdown.plain "Computation time for the kernel function stack")
+    ~data:(module Data.Jfloat)
+    ~get:(fun (_cs, (_start, duration)) -> duration);
+  (* This field might be useful to display tooltips on the flames *)
   States.column model ~name:"title"
-    ~descr:(Markdown.plain "Callstack description")
+    ~descr:(Markdown.plain "Kernel function description")
     ~data:(module Data.Jstring)
-    ~get:(fun (cs,_) -> Pretty_utils.to_string Callstack.pretty cs);
-  (* This field contains the name of the function on top of the callstack *)
+    ~get:(fun (cl,_) -> Pretty_utils.to_string Eva_perf.KfList.pretty cl);
+  (* This field contains the name of the function on top of the
+     kernel function stack *)
   States.column model ~name:"name"
     ~descr:(Markdown.plain "Function name")
     ~data:(module Data.Jstring)
-    ~get:(fun (cs,_) -> Kernel_function.get_name (Callstack.top_kf cs));
-  (* This field contains the list of the function name *)
+    ~get:(fun (cl,_) -> Kernel_function.get_name (List.(hd (rev cl))));
+  (* This field contains the list of the function names *)
   States.column model ~name:"funlist"
     ~descr:(Markdown.plain "Function list")
     ~data:(module Data.Jstring)
-    ~get:(fun (cs,_) -> List.fold_left (fun acc kf->
-        match acc with
-        | "" -> Kernel_function.get_name kf
-        | _ -> acc ^ ":" ^ Kernel_function.get_name kf) "" (Callstack.to_kf_list cs));
-  (* This field contains the declaration of the function on top of the callstack *)
+    ~get:(fun (cl,_) ->
+        Pretty_utils.to_string (Eva_perf.KfList.pretty ~sep:":") cl);
+  (* This field contains the declaration of the function on top of the
+     kernel function stack *)
   States.column model ~name:"kfkey"
     ~descr:(Markdown.plain "Kernel function key")
     ~data:(module Data.Jstring)
-    ~get:(fun (cs,_) -> Kernel_ast.Decl.index (SFunction (Callstack.top_kf cs)));
+    ~get:(fun (cl,_) -> Kernel_ast.Decl.index (SFunction (List.(hd (rev cl)))));
   (* Add/remove other fields if necessary... *)
   States.register_framac_array
     ~package
     ~name:"evaFlamegraph"
     ~descr:(Markdown.plain "Data for Eva flamegraph")
-    ~key:(fun cs -> Format.sprintf "#%06d" @@ Jcallstack.get cs)
+    ~key:(fun cl -> Format.sprintf "#%06d" @@ Jkfstack.get cl)
     model (module Eva_perf.EvaFlamegraph)
 
 (* -------------------------------------------------------------------------- *)

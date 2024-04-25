@@ -232,15 +232,48 @@ export const getValues: Server.GetRequest<
     vElse?: evaluation }
   >= getValues_internal;
 
+/** Kernel function stack identifier */
+export type kfstack = Json.index<'#kfstack'>;
+
+/** Decoder for `kfstack` */
+export const jKfstack: Json.Decoder<kfstack> =
+  Json.jIndex<'#kfstack'>('#kfstack');
+
+/** Natural order for `kfstack` */
+export const byKfstack: Compare.Order<kfstack> = Compare.number;
+
+/** Default value for `kfstack` */
+export const kfstackDefault: kfstack =
+  Json.jIndex<'#kfstack'>('#kfstack')(-1);
+
+/** Kernel function list infos */
+export type calllink = { callee: decl, caller?: decl };
+
+/** Decoder for `calllink` */
+export const jCalllink: Json.Decoder<calllink> =
+  Json.jObject({ callee: jDecl, caller: Json.jOption(jDecl),});
+
+/** Natural order for `calllink` */
+export const byCalllink: Compare.Order<calllink> =
+  Compare.byFields
+    <{ callee: decl, caller?: decl }>({
+    callee: byDecl,
+    caller: Compare.defined(byDecl),
+  });
+
+/** Default value for `calllink` */
+export const calllinkDefault: calllink =
+  { callee: declDefault, caller: undefined };
+
 /** Data for array rows [`evaFlamegraph`](#evaflamegraph)  */
 export interface evaFlamegraphData {
   /** Entry identifier. */
   key: Json.key<'#evaFlamegraph'>;
-  /** Callstack identifier */
-  stack: callstack;
-  /** Computation time for the callstack */
+  /** Caller list identifier */
+  stack: kfstack;
+  /** Computation time for the kernel function stack */
   time: number;
-  /** Callstack description */
+  /** Kernel function description */
   title: string;
   /** Function name */
   name: string;
@@ -254,7 +287,7 @@ export interface evaFlamegraphData {
 export const jEvaFlamegraphData: Json.Decoder<evaFlamegraphData> =
   Json.jObject({
     key: Json.jKey<'#evaFlamegraph'>('#evaFlamegraph'),
-    stack: jCallstack,
+    stack: jKfstack,
     time: Json.jNumber,
     title: Json.jString,
     name: Json.jString,
@@ -265,10 +298,10 @@ export const jEvaFlamegraphData: Json.Decoder<evaFlamegraphData> =
 /** Natural order for `evaFlamegraphData` */
 export const byEvaFlamegraphData: Compare.Order<evaFlamegraphData> =
   Compare.byFields
-    <{ key: Json.key<'#evaFlamegraph'>, stack: callstack, time: number,
+    <{ key: Json.key<'#evaFlamegraph'>, stack: kfstack, time: number,
        title: string, name: string, funlist: string, kfkey: string }>({
     key: Compare.string,
-    stack: byCallstack,
+    stack: byKfstack,
     time: Compare.number,
     title: Compare.string,
     name: Compare.string,
@@ -337,7 +370,7 @@ export const evaFlamegraph: State.Array<
 /** Default value for `evaFlamegraphData` */
 export const evaFlamegraphDataDefault: evaFlamegraphData =
   { key: Json.jKey<'#evaFlamegraph'>('#evaFlamegraph')(''),
-    stack: callstackDefault, time: 0, title: '', name: '', funlist: '',
+    stack: kfstackDefault, time: 0, title: '', name: '', funlist: '',
     kfkey: '' };
 
 /* ------------------------------------- */

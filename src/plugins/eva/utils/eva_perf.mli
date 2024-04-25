@@ -20,13 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Call [start_doing] when starting analyzing a new function. The new
-    function is on the top of the call stack.*)
-val start_doing: Callstack.t -> unit
+(** Call [start_call] when starting analyzing a new function call.
+    The new function is on the top of the call stack.*)
+val start_call: prev:Callstack.t option -> Callstack.t -> unit
 
-(** Call [start_doing] when finishing analyzing a function. The
+(** Call [end_call] when finishing analyzing a function. The
     function must still be on the top of the call stack. *)
-val stop_doing: Callstack.t -> unit
+val end_call: Callstack.t -> unit
 
 (** Display a complete summary of performance informations. Can be
     called during the analysis. *)
@@ -36,5 +36,12 @@ val display: Format.formatter -> unit
     beginning of the analysis. *)
 val reset: unit -> unit
 
+module KfList : sig
+  include Datatype.S_with_collections with type t = Kernel_function.t list
+  val pretty : ?sep:Pretty_utils.sformat -> Format.formatter ->
+    Kernel_function.t list -> unit
+end
+
 module EvaFlamegraph :
-  State_builder.Hashtbl with type key = Callstack.t and type data = float
+  State_builder.Hashtbl with type key = KfList.t
+                         and type data = float * float

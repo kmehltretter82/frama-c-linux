@@ -133,11 +133,14 @@ module Callstack: sig
   include Datatype.S_with_collections with type t = callstack
 
   (** Prints a callstack without displaying call sites.
-      ~sep is the separator between function names.
-      ~hide_hash forces printing wihout hash (see {!pretty_hash}),
-      useful when a precise format is expected. *)
+      - ~hide_hash forces printing wihout hash (see {!pretty_hash}),
+        useful when a precise format is expected.
+      - ~sep is the separator between function names.
+      - ~rev reverses the list (if true, print caller -> callee -> ...).
+  *)
   val pretty_short :
-    hide_hash:bool -> sep:Pretty_utils.sformat -> Format.formatter -> t -> unit
+    hide_hash:bool -> sep:Pretty_utils.sformat -> rev:bool -> Format.formatter ->
+    t -> unit
 
   (** Prints a hash of the callstack when '-kernel-msg-key callstack'
       is enabled (prints nothing otherwise). *)
