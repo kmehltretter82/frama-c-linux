@@ -5254,8 +5254,7 @@ static int res_search(char const *dname, int rec_class, int type,
   return tmp;
 }
 
-/*@ assigns \result, *\result;
-    assigns \result \from *(name + (0 .. strlen{Old}(name)));
+/*@ assigns *\result;
     assigns *\result \from *(name + (0 .. strlen{Old}(name)));
     allocates \result;
  */
@@ -8346,12 +8345,16 @@ int putenv(char *string)
 /*@ requires valid_name: valid_read_string(name);
     requires valid_value: valid_read_string(value);
     ensures result_ok_or_error: \result ≡ 0 ∨ \result ≡ -1;
-    assigns \result, __fc_env[0 ..], *(__fc_env[0 ..] + (0 ..));
+    assigns \result, __fc_env[0 ..], __fc_errno, *(__fc_env[0 ..] + (0 ..));
     assigns \result
       \from __fc_env[0 ..], (indirect: *(name + (0 .. strlen{Old}(name)))),
             (indirect: *(value + (0 .. strlen{Old}(value)))),
             (indirect: overwrite);
     assigns __fc_env[0 ..]
+      \from __fc_env[0 ..], (indirect: *(name + (0 .. strlen{Old}(name)))),
+            (indirect: *(value + (0 .. strlen{Old}(value)))),
+            (indirect: overwrite);
+    assigns __fc_errno
       \from __fc_env[0 ..], (indirect: *(name + (0 .. strlen{Old}(name)))),
             (indirect: *(value + (0 .. strlen{Old}(value)))),
             (indirect: overwrite);
@@ -10245,10 +10248,12 @@ wchar_t *wcsncat(wchar_t *dest, wchar_t const *src, size_t n)
 }
 
 /*@ requires valid_wstring: valid_read_wstring(ws);
-    assigns \result;
+    assigns \result, __fc_heap_status;
     assigns \result
       \from (indirect: *(ws + (0 .. wcslen{Old}(ws)))),
             (indirect: __fc_heap_status);
+    assigns __fc_heap_status
+      \from (indirect: *(ws + (0 .. wcslen{Old}(ws)))), __fc_heap_status;
     allocates \result;
     
     behavior allocation:

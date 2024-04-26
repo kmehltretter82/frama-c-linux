@@ -424,6 +424,9 @@
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
+  __fc_errno ∈
+            {{ garbled mix of &{S_0___fc_env; S_1___fc_env}
+             (origin: Library function {stdlib_h.c:131}) }}
   __fc_random48_init ∈ {1}
   __fc_random48_counter[0..2] ∈ [--..--]
   __fc_env[0..4095] ∈

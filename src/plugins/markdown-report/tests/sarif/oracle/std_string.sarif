@@ -18252,6 +18252,31 @@
           "kind": "pass",
           "level": "none",
           "message": {
+            "text": "from clause of term __fc_errno in function setenv."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 573,
+                  "startColumn": 34,
+                  "endLine": 573,
+                  "endColumn": 44,
+                  "byteLength": 10
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
             "text": "from clause of term *(__fc_env[0 ..] + (0 ..)) in function setenv."
           },
           "locations": [

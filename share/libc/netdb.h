@@ -181,7 +181,7 @@ extern struct hostent *gethostbyaddr(const void *, socklen_t, int);
 
 /*@
   allocates \result;
-  assigns \result, *\result \from name[0 .. strlen(name)];
+  assigns *\result \from name[0 .. strlen(name)];
 */
 extern struct hostent *gethostbyname(const char *name);
 

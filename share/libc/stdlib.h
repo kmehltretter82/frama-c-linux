@@ -570,7 +570,7 @@ extern int putenv(char *string);
   requires valid_name: valid_read_string(name);
   requires valid_value: valid_read_string(value);
   allocates __fc_env[0..];
-  assigns \result, __fc_env[0..]
+  assigns \result, __fc_env[0..], __fc_errno
     \from __fc_env[0..], indirect:name[0 .. strlen(name)],
     indirect:value[0 .. strlen(value)], indirect:overwrite;
   assigns __fc_env[0..][0..] \from name[0 .. strlen(name)],
