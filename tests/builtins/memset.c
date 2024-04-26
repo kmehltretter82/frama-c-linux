@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: #"-calldeps -eva-msg-key imprecision -eva-plevel 500" +"-inout -no-deps"
+   STDOPT: #"-calldeps -eva-msg-key imprecision -eva-plevel 500 -absolute-valid-range 0x10-0xf0" +"-inout -no-deps"
 */
 
 #include "string.h"
@@ -26,7 +26,7 @@ struct s {
 };
 
 struct s ts[5];
-
+extern struct incomplete *incomplete_type;
 volatile int vol;
 
 void test() {
@@ -70,6 +70,11 @@ void test() {
   unsigned k = vol;
   //@ assert Assume: k <= 12;
   memset(t12+k*8, 1, 4); // Imprecise, because of double congruences
+
+  memset(t1, 1, 0); // size is negative or null
+  memset(incomplete_type, 'A', 1); // destination type and size differ
+  char *absolute_valid_range = (char*)0x10;
+  memset(absolute_valid_range, 'B', 2); // destination has an unknown form
 }
 
 /* Should not crash and emit uninitialization alarms.
