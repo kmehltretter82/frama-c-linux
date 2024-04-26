@@ -231,9 +231,5 @@ let compute =
 
 let () = Parameters.ForceValues.set_output_dependencies [Self.state]
 
-let main () =
-  (* Value computations *)
-  if Parameters.ForceValues.get () then compute ();
-  if is_computed () then Red_statuses.report ()
-
+let main () = if Parameters.ForceValues.get () then compute ()
 let () = Boot.Main.extend main
