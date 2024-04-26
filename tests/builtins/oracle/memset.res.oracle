@@ -4,8 +4,15 @@
   'char' and 'int')
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
+[eva:initial-state] 
+  creating variable S_incomplete_type with imprecise size (type struct incomplete [2])
+[eva:unknown-size] memset.c:29: Warning: 
+  during initialization of variable 'incomplete_type', size of
+  type 'struct incomplete' cannot be computed
+  (abstract type 'struct incomplete')
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
+  NULL[rbits 128 to 1927] ∈ [--..--]
   t1[0..99] ∈ {0}
   t2[0..99] ∈ {0}
   t3[0..99] ∈ {0}
@@ -19,9 +26,11 @@
   t11[0..99] ∈ {0}
   t12[0..99] ∈ {0}
   ts[0..4] ∈ {0}
+  incomplete_type ∈ {{ NULL ; (struct incomplete *)&S_incomplete_type }}
   vol ∈ [--..--]
+  S_incomplete_type[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
 [eva] computing for function test <- main.
-  Called from memset.c:88.
+  Called from memset.c:93.
 [eva] memset.c:33: Call to builtin memset
 [eva] memset.c:33: function memset: precondition 'valid_s' got status valid.
 [eva] FRAMAC_SHARE/libc/string.h:134: 
@@ -33,10 +42,6 @@
 [eva] memset.c:34: Call to builtin memset
 [eva:alarm] memset.c:34: Warning: 
   function memset: precondition 'valid_s' got status unknown.
-[eva:imprecision] memset.c:34: 
-  Call to builtin precise_memset(({{ garbled mix of &{t2}
-                                  (origin: Arithmetic {memset.c:34}) }},
-                                  {18},{400})) failed; destination is not exact
 [eva] memset.c:35: Call to builtin memset
 [eva:alarm] memset.c:35: Warning: 
   function memset: precondition 'valid_s' got status unknown.
@@ -62,8 +67,6 @@
 [eva] memset.c:47: Call to builtin memset
 [eva:alarm] memset.c:47: Warning: 
   function memset: precondition 'valid_s' got status unknown.
-[eva:imprecision] memset.c:47: 
-  Call to builtin precise_memset(({{ NULL ; (void *)&t8 }},{34},{16})) failed; destination is not exact
 [eva] memset.c:50: starting to merge loop iterations
 [eva] memset.c:54: Call to builtin memset
 [eva:alarm] memset.c:54: Warning: 
@@ -85,18 +88,32 @@
 [eva] memset.c:72: function memset: precondition 'valid_s' got status valid.
 [eva:imprecision] memset.c:72: 
   Call to builtin precise_memset(({{ &t12 + [0..384],0%32 }},{1},{4})) failed; destination is not exact
+[eva] memset.c:74: Call to builtin memset
+[eva] memset.c:74: function memset: precondition 'valid_s' got status valid.
+[eva:imprecision] memset.c:74: 
+  Call to builtin precise_memset(({{ (void *)&t1 }},{1},{0})) failed; size is negative or null
+[eva] memset.c:75: Call to builtin memset
+[eva:alarm] memset.c:75: Warning: 
+  function memset: precondition 'valid_s' got status unknown.
+[eva:imprecision] memset.c:75: 
+  Call to builtin precise_memset(({{ NULL ; (void *)&S_incomplete_type }},
+                                  {65},{1})) failed; destination type and size differ
+[eva] memset.c:77: Call to builtin memset
+[eva] memset.c:77: function memset: precondition 'valid_s' got status valid.
+[eva:imprecision] memset.c:77: 
+  Call to builtin precise_memset(({16},{66},{2})) failed; destination has an unknown form
 [eva] Recording results for test
 [from] Computing for function test
 [from] Done for function test
 [eva] Done for function test
 [eva] computing for function uninit <- main.
-  Called from memset.c:89.
-[eva:alarm] memset.c:80: Warning: 
+  Called from memset.c:94.
+[eva:alarm] memset.c:85: Warning: 
   accessing uninitialized left-value. assert \initialized(&x);
-[eva:alarm] memset.c:84: Warning: 
+[eva:alarm] memset.c:89: Warning: 
   accessing uninitialized left-value. assert \initialized(&x);
-[eva] memset.c:84: Call to builtin memset
-[eva] memset.c:84: function memset: precondition 'valid_s' got status valid.
+[eva] memset.c:89: Call to builtin memset
+[eva] memset.c:89: function memset: precondition 'valid_s' got status valid.
 [eva] Recording results for uninit
 [from] Computing for function uninit
 [from] Done for function uninit
@@ -105,11 +122,13 @@
 [from] Computing for function main
 [from] Done for function main
 [eva] Done for function main
-[eva] memset.c:80: assertion 'Eva,initialization' got final status invalid.
+[eva] memset.c:85: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function test:
+  NULL[rbits 128 to 143] ∈ {66} repeated %8 
+      [rbits 144 to 1927] ∈ [--..--]
   t1[0..99] ∈ {286331153}
-  t2[0..99] ∈ [--..--]
+  t2[0..99] ∈ {303174162}
   t3[0..9] ∈ {0}
     [10..99]# ∈ {0; 17} repeated %8 
   t4[0..99] ∈ {0}
@@ -120,7 +139,7 @@
     [14..99] ∈ {0}
   t7[0..3]# ∈ {0; 34} repeated %8 
     [4..99] ∈ {0}
-  t8[0..3]# ∈ {0; 34} repeated %8 
+  t8[0..3] ∈ {572662306}
     [4..99] ∈ {0}
   t9[0..19] ∈ {0}
     [20..99]# ∈ {0; 254} repeated %8 
@@ -160,12 +179,17 @@
   s ∈ {12; 36}
   s1 ∈ {8; 16}
   k ∈ [0..12]
+  absolute_valid_range ∈ {16}
+  S_incomplete_type[bits 0 to 7] ∈ {65}
+                   [bits 8 to ..] ∈ [--..--] or UNINITIALIZED
 [eva:final-states] Values at end of function uninit:
   x ∈ {{ (void *)&a }}
   a ∈ {0}
 [eva:final-states] Values at end of function main:
+  NULL[rbits 128 to 143] ∈ {66} repeated %8 
+      [rbits 144 to 1927] ∈ [--..--]
   t1[0..99] ∈ {286331153}
-  t2[0..99] ∈ [--..--]
+  t2[0..99] ∈ {303174162}
   t3[0..9] ∈ {0}
     [10..99]# ∈ {0; 17} repeated %8 
   t4[0..99] ∈ {0}
@@ -176,7 +200,7 @@
     [14..99] ∈ {0}
   t7[0..3]# ∈ {0; 34} repeated %8 
     [4..99] ∈ {0}
-  t8[0..3]# ∈ {0; 34} repeated %8 
+  t8[0..3] ∈ {572662306}
     [4..99] ∈ {0}
   t9[0..19] ∈ {0}
     [20..99]# ∈ {0; 254} repeated %8 
@@ -211,12 +235,14 @@
     [4].[bits 8 to 15] ∈ {0; 254}
     [4].f2 ∈ {-258; 0}
     [4]{.f3; .f4[0..2]} ∈ {-16843010; 0}
+  S_incomplete_type[bits 0 to 7] ∈ {65}
+                   [bits 8 to ..] ∈ [--..--] or UNINITIALIZED
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to memset at memset.c:33 (by test):
   t1[0..99] FROM c
   \result FROM s
 [from] call to memset at memset.c:34 (by test):
-  t2[0..99] FROM c (and SELF)
+  t2[0..99] FROM c
   \result FROM s
 [from] call to memset at memset.c:35 (by test):
   t3[10..99] FROM c (and SELF)
@@ -232,7 +258,7 @@
   t7[0..3] FROM c (and SELF)
   \result FROM s
 [from] call to memset at memset.c:47 (by test):
-  t8[0..3] FROM c (and SELF)
+  t8[0..3] FROM c
   \result FROM s
 [from] call to memset at memset.c:54 (by test):
   t9[20..99] FROM c (and SELF)
@@ -251,18 +277,27 @@
 [from] call to memset at memset.c:72 (by test):
   t12[0..96] FROM c (and SELF)
   \result FROM s
-[from] call to memset at memset.c:84 (by uninit):
+[from] call to memset at memset.c:74 (by test):
+  \result FROM s
+[from] call to memset at memset.c:75 (by test):
+  S_incomplete_type[bits 0 to 7] FROM c
+  \result FROM s
+[from] call to memset at memset.c:77 (by test):
+  NULL[16..17] FROM c
+  \result FROM s
+[from] call to memset at memset.c:89 (by uninit):
   a FROM c
   \result FROM s
-[from] call to test at memset.c:88 (by main):
+[from] call to test at memset.c:93 (by main):
+  NULL[16..17] FROM \nothing
   t1[0..99] FROM \nothing
-  t2[0..99] FROM \nothing (and SELF)
+  t2[0..99] FROM \nothing
   t3[10..99] FROM \nothing (and SELF)
   t4[1..99] FROM vol (and SELF)
   t5[0..99] FROM \nothing
   t6[10..13] FROM \nothing (and SELF)
   t7[0..3] FROM \nothing (and SELF)
-  t8[0..3] FROM \nothing (and SELF)
+  t8[0..3] FROM \nothing
   t9[20..99] FROM \nothing (and SELF)
   t10[4..6] FROM \nothing
      [7..12] FROM \nothing (and SELF)
@@ -270,17 +305,19 @@
      [3] FROM \nothing
   t12[0..96] FROM \nothing (and SELF)
   ts[0..4] FROM vol (and SELF)
-[from] call to uninit at memset.c:89 (by main):
+  S_incomplete_type[bits 0 to 7] FROM \nothing
+[from] call to uninit at memset.c:94 (by main):
   NO EFFECTS
 [from] entry point:
+  NULL[16..17] FROM \nothing
   t1[0..99] FROM \nothing
-  t2[0..99] FROM \nothing (and SELF)
+  t2[0..99] FROM \nothing
   t3[10..99] FROM \nothing (and SELF)
   t4[1..99] FROM vol (and SELF)
   t5[0..99] FROM \nothing
   t6[10..13] FROM \nothing (and SELF)
   t7[0..3] FROM \nothing (and SELF)
-  t8[0..3] FROM \nothing (and SELF)
+  t8[0..3] FROM \nothing
   t9[20..99] FROM \nothing (and SELF)
   t10[4..6] FROM \nothing
      [7..12] FROM \nothing (and SELF)
@@ -288,20 +325,24 @@
      [3] FROM \nothing
   t12[0..96] FROM \nothing (and SELF)
   ts[0..4] FROM vol (and SELF)
+  S_incomplete_type[bits 0 to 7] FROM \nothing
 [from] ====== END OF CALLWISE DEPENDENCIES ======
 [inout] Out (internal) for function test:
-    t1[0..99]; t2[0..99]; t3[10..99]; t4[1..99]; t5[0..99]; t6[10..13];
-    t7[0..3]; t8[0..3]; t9[20..99]; t10[4..12]; t11[2..6]; t12[0..96];
-    ts[0..4]; dst; p; tmp_0; s; s1; k
+    NULL[16..17]; t1[0..99]; t2[0..99]; t3[10..99]; t4[1..99]; t5[0..99];
+    t6[10..13]; t7[0..3]; t8[0..3]; t9[20..99]; t10[4..12]; t11[2..6];
+    t12[0..96]; ts[0..4]; dst; p; tmp_0; s; s1; k; absolute_valid_range;
+    S_incomplete_type[bits 0 to 7]
 [inout] Inputs for function test:
-    vol
+    incomplete_type; vol
 [inout] InOut (internal) for function test:
   Operational inputs:
-    vol
+    incomplete_type; vol
   Operational inputs on termination:
-    vol
+    incomplete_type; vol
   Sure outputs:
-    t1[0..99]; t5[0..99]; t10[4..6]; t11[3]; dst; p; tmp_0; s; s1; k
+    NULL[16..17]; t1[0..99]; t2[0..99]; t5[0..99]; t8[0..3]; t10[4..6]; 
+    t11[3]; dst; p; tmp_0; s; s1; k; absolute_valid_range;
+    S_incomplete_type[bits 0 to 7]
 [inout] Out (internal) for function uninit:
     x; a
 [inout] Inputs for function uninit:
@@ -314,15 +355,16 @@
   Sure outputs:
     a
 [inout] Out (internal) for function main:
-    t1[0..99]; t2[0..99]; t3[10..99]; t4[1..99]; t5[0..99]; t6[10..13];
-    t7[0..3]; t8[0..3]; t9[20..99]; t10[4..12]; t11[2..6]; t12[0..96]; 
-    ts[0..4]
+    NULL[16..17]; t1[0..99]; t2[0..99]; t3[10..99]; t4[1..99]; t5[0..99];
+    t6[10..13]; t7[0..3]; t8[0..3]; t9[20..99]; t10[4..12]; t11[2..6];
+    t12[0..96]; ts[0..4]; S_incomplete_type[bits 0 to 7]
 [inout] Inputs for function main:
-    vol
+    incomplete_type; vol
 [inout] InOut (internal) for function main:
   Operational inputs:
-    vol
+    incomplete_type; vol
   Operational inputs on termination:
-    vol
+    incomplete_type; vol
   Sure outputs:
-    t1[0..99]; t5[0..99]; t10[4..6]; t11[3]
+    NULL[16..17]; t1[0..99]; t2[0..99]; t5[0..99]; t8[0..3]; t10[4..6]; 
+    t11[3]; S_incomplete_type[bits 0 to 7]
