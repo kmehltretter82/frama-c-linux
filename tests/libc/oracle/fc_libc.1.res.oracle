@@ -43,10 +43,7 @@ struct __fc_fenv_t {
    unsigned short __unused5 ;
 };
 typedef struct __fc_fenv_t fenv_t;
-struct __fc_fexcept_t {
-   int _fc ;
-};
-typedef struct __fc_fexcept_t fexcept_t;
+typedef unsigned int fexcept_t;
 struct __fc_glob_t {
    unsigned int gl_pathc ;
    char **gl_pathv ;
