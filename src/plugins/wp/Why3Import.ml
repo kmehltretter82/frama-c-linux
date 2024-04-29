@@ -58,18 +58,21 @@ let construct_acsl_name (id : W.Ident.ident) =
   let (paths,name,scopes) = T.restore_path id in
   match List.rev scopes with
   |  (t::q) ->
-    let modscopes = "::" ^ name ^ "::" ^ (String.concat "::" (List.rev_append q [(of_infix t)])) in
-    (String.concat "::" paths) ^ modscopes
+    let modscopes = List.rev_append q [(of_infix t)] in
+    String.concat "::" (paths @ name::modscopes)
   | [] -> ""
+
 
 
 (* For debug only*)
 let pp_id fmt (id: W.Ident.ident) =
   Format.pp_print_string fmt id.id_string
 
+(* For debug only*)
 let pp_tys fmt (tys: W.Ty.tysymbol) =
   W.Pretty.print_ty_decl fmt tys
 
+(* For debug only*)
 let pp_ls fmt ls =
   W.Pretty.print_ls fmt ls
 
