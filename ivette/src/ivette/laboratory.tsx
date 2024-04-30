@@ -21,6 +21,7 @@
 /* ************************************************************************ */
 
 import React from 'react';
+import equal from 'react-fast-compare';
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import * as States from 'dome/data/states';
@@ -91,7 +92,9 @@ const LAB = new States.GlobalState<LabViewState>({
 
 interface TabSettings {
   view: viewId,
+  custom: number,
   split: Split,
+  layout: Layout,
 }
 
 interface DockSettings {
@@ -104,6 +107,14 @@ interface LabSettings {
   tabs: TabSettings[];
   dock: DockSettings[];
 }
+
+const jLayout: Json.Decoder<Layout> =
+  Json.jObject({
+    A: Json.jString,
+    B: Json.jString,
+    C: Json.jString,
+    D: Json.jString,
+  });
 
 const jSplit: Json.Decoder<Split> =
   Json.jObject({
@@ -126,7 +137,9 @@ const jPosition: Json.Decoder<Ivette.LayoutPosition> =
 const jTabSettings: Json.Decoder<TabSettings> =
   Json.jObject({
     view: Json.jString,
+    custom: Json.jNumber,
     split: jSplit,
+    layout: jLayout,
   });
 
 const jDockSettings: Json.Decoder<DockSettings> =
@@ -149,26 +162,21 @@ function labSettings(state: LabViewState): LabSettings {
   const tabs: TabSettings[] = [];
   let tabIndex = -1;
   state.tabs.forEach((tab: TabViewState) => {
-    if (tab.custom === 0) {
-      if (tab.key === state.tabKey)
-        tabIndex = tabs.length;
-      tabs.push({
-        view: tab.viewId,
-        split: tab.split,
-      });
-    }
+    const current = tab.key === state.tabKey;
+    if (current) tabIndex = tabs.length;
+    tabs.push({
+      view: tab.viewId,
+      custom: tab.custom,
+      split: current ? state.split : tab.split,
+      layout: current ? state.stack[0] : tab.stack[0],
+    });
   });
   const dock: DockSettings[] = [];
-  state.docked.forEach((position, compId) => dock.push({
-    comp: compId,
-    position,
-  }));
+  state.docked.forEach((position, comp) => dock.push({ comp, position }));
   return { tabIndex, tabs, dock };
 }
 
-const defaultSettings: LabSettings = {
-  tabIndex: 0, tabs: [], dock: [],
-};
+const defaultSettings: LabSettings = { tabIndex: 0, tabs: [], dock: [] };
 
 /* -------------------------------------------------------------------------- */
 /* --- Layout Utilities                                                   --- */
@@ -323,13 +331,16 @@ function newCustom(tabs: Map<tabKey, TabViewState>, viewId: viewId): number {
   return custom + 1;
 }
 
+const tabKeyOf = (viewId: viewId, custom: number): tabKey =>
+  custom > 0 ? `${viewId}@${custom}` : viewId;
+
 function newTab(
   tabs: Map<tabKey, TabViewState>,
   view: Ivette.ViewLayoutProps,
   custom: number,
 ): TabViewState {
   const { id: viewId } = view;
-  const key = custom > 0 ? `${viewId}@${custom}` : viewId;
+  const key = tabKeyOf(viewId, custom);
   const tab = {
     key, viewId, custom,
     split: defaultSplit,
@@ -568,6 +579,73 @@ function closeComponent(compId: compId): void {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Update from Settings                                               --- */
+/* -------------------------------------------------------------------------- */
+
+const filterComponent = (id: compId): compId =>
+  COMPONENT.getElement(id) !== undefined ? id : '';
+
+const filterLayout = (w: Layout): Layout => ({
+  A: filterComponent(w.A),
+  B: filterComponent(w.B),
+  C: filterComponent(w.C),
+  D: filterComponent(w.D),
+});
+
+function updateTab(
+  newTabs: Map<tabKey, TabViewState>,
+  tab: TabSettings
+): boolean {
+  const { custom, view: viewId } = tab;
+  const view = VIEW.getElement(viewId);
+  if (!view) return false;
+  const tabKey = tabKeyOf(viewId, custom);
+  const tabState = newTabs.get(tabKey);
+  const oldStack =
+    tabState !== undefined ? tabState.stack : [
+      defaultLayout, makeViewLayout(view.layout)
+    ]; // unstack starts at depth 1
+  const stack = unstackLayout(filterLayout(tab.layout), oldStack);
+  if (
+    tabState === undefined ||
+    tabState.custom !== tab.custom ||
+    !equal(tabState.stack[0], stack[0]) ||
+    !equal(tabState.split, tab.split)
+  ) {
+    newTabs.set(tabKey, {
+      key: tabKey, viewId, custom: tab.custom, stack, split: tab.split,
+    });
+    return true;
+  } else
+    return false;
+}
+
+function updateDock(
+  newDock: Map<compId, LayoutPosition>,
+  dock: DockSettings,
+): boolean {
+  const { comp, position } = dock;
+  if (COMPONENT.getElement(comp) === undefined) return false;
+  const current = newDock.get(comp);
+  if (current !== position) {
+    newDock.set(comp, position);
+    return true;
+  } else
+    return false;
+}
+
+function updateIndex(settings: LabSettings): void {
+  const theTab = settings.tabs[settings.tabIndex];
+  if (theTab) {
+    applyTab(tabKeyOf(theTab.view, theTab.custom));
+  } else {
+    const console = VIEW.getElement('ivette.console');
+    if (console !== undefined) applyView(console);
+  }
+  setCurrentNone();
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Settings Update                                                    --- */
 /* -------------------------------------------------------------------------- */
 
@@ -589,33 +667,22 @@ Settings.onWindowSettings(() => {
   if (synchronize) {
     try {
       synchronize = false;
-      const state = LAB.getValue();
       const settings = Settings.getWindowSettings(
         'ivette.laboratory', jLabSettings, defaultSettings
       );
-      let selectTab: viewId = '';
-      settings.tabs.forEach((tab, index) => {
-        const view = VIEW.getElement(tab.view);
-        if (view !== undefined) {
-          applyFavorite(view, true);
-          if (index === settings.tabIndex)
-            selectTab = tab.view;
-        }
+      let modified = false;
+      const state = LAB.getValue();
+      const newTabs = copyMap(state.tabs);
+      saveTab(newTabs, state);
+      settings.tabs.forEach(tab => {
+        if (updateTab(newTabs, tab)) modified = true;
       });
+      const newDock = copyMap(state.docked);
       settings.dock.forEach(dock => {
-        const comp = COMPONENT.getElement(dock.comp);
-        if (comp !== undefined && !state.docked.has(comp.id))
-          applyDock(comp, dock.position);
+        if (updateDock(newDock, dock)) modified = true;
       });
-      if (!state.tabKey) {
-        if (selectTab)
-          applyTab(selectTab);
-        else {
-          const console = VIEW.getElement('ivette.console');
-          if (console !== undefined) applyView(console);
-        }
-        setCurrentNone();
-      }
+      if (modified) LAB.setValue({ ...state, tabs: newTabs, docked: newDock });
+      if (!state.tabKey) updateIndex( settings );
     } finally {
       synchronize = true;
     }
