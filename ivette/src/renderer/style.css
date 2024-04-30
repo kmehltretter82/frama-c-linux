@@ -69,20 +69,6 @@
     left: -8px;
 }
 
-.labview-stock:hover {
-    background: var(--background-profound);
-}
-
-.labview-stock:hover * {
-    cursor: move;
-}
-
-.labview-stock.dome-dragging {
-    border-radius: 4px;
-    background: var(--background-profound);
-    border: thin solid black;
-}
-
 .labview-content {
     height: 100%;
     background: var(--background);
@@ -95,7 +81,6 @@
 
 .labview-handle {
     flex: 1 1 auto;
-    cursor: move;
 }
 
 .labview-close:hover {
