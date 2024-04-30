@@ -54,7 +54,7 @@ interface Layout { A: compId, B: compId, C: compId, D: compId }
 interface TabViewState {
   key: tabKey, /* viewId@custom for custom, or viewId */
   viewId: viewId,
-  custom: number, /* -1: transient, 0: favorite, n: custom */
+  custom: number, /* -1: transient, n: custom */
   split: Split,
   stack: Layout[], /* current at index 0 */
 }
@@ -508,25 +508,6 @@ function duplicateView(view: Ivette.ViewLayoutProps): void {
   LAB.setValue({ ...state, tabs });
 }
 
-function applyFavorite(
-  view: Ivette.ViewLayoutProps,
-  favorite: boolean
-): void {
-  const state = LAB.getValue();
-  const tab = state.tabs.get(view.id);
-  if (tab) {
-    const custom = favorite ? 0 : -1;
-    if (tab.custom !== custom) {
-      const tabs = copyMap(state.tabs).set(tab.key, { ...tab, custom });
-      LAB.setValue({ ...state, tabs });
-    }
-  } else if (favorite) {
-    const tabs = copyMap(state.tabs);
-    newTab(tabs, view, 0);
-    LAB.setValue({ ...state, tabs });
-  }
-}
-
 function applyComponent(
   comp: Ivette.ComponentProps,
   at?: LayoutPosition
@@ -699,7 +680,6 @@ export function useState(): LabViewState {
 }
 
 export interface ViewStatus {
-  favorite: boolean;
   displayed: boolean;
   layout: Layout;
 }
@@ -709,10 +689,9 @@ export function getViewStatus(
   viewId: viewId
 ): ViewStatus {
   const tab = state.tabs.get(viewId);
-  const favorite = tab ? tab.custom === 0 : false;
   const displayed = tab ? tab.key === state.tabKey : false;
   const layout = displayed ? state.stack[0] : tab?.stack[0];
-  return { favorite, displayed, layout: layout ?? defaultLayout };
+  return { displayed, layout: layout ?? defaultLayout };
 }
 
 export interface ComponentStatus {
@@ -1053,14 +1032,13 @@ export function LabView(): JSX.Element {
 
 interface ViewItemProps {
   view: Ivette.ViewLayoutProps;
-  favorite: boolean;
   selected: boolean;
   displayed: boolean;
   layout: Layout | undefined;
 }
 
 export function ViewItem(props: ViewItemProps): JSX.Element {
-  const { view, favorite, displayed, selected, layout } = props;
+  const { view, displayed, selected, layout } = props;
   const { id, label: vname, title: vtitle } = view;
 
   const onSelection = (_evt: React.MouseEvent): void => {
@@ -1068,7 +1046,7 @@ export function ViewItem(props: ViewItemProps): JSX.Element {
     applyView(view);
   };
 
-  const icon = favorite ? 'FAVORITE' : 'DISPLAY';
+  const icon = 'DISPLAY';
   const modified =
     (layout !== undefined &&
       !compareLayout(layout, makeViewLayout(view.layout)));
@@ -1080,13 +1058,10 @@ export function ViewItem(props: ViewItemProps): JSX.Element {
   const onContextMenu = (): void => {
     setCurrentView(id);
     const onDisplay = (): void => applyView(view);
-    const onFavorite = (): void => applyFavorite(view, !favorite);
     const onRestore = (): void => restoreDefault(view.id);
     const onDuplicate = (): void => duplicateView(view);
-    const favAction = !favorite ? 'Add to Favorite' : 'Remove from Favorite';
     Dome.popupMenu([
       { label: 'Display View', enabled: !displayed, onClick: onDisplay },
-      { label: favAction, onClick: onFavorite },
       { label: 'Duplicate View', onClick: onDuplicate },
       { label: 'Restore Default', enabled: modified, onClick: onRestore },
     ]);
@@ -1111,14 +1086,12 @@ function ViewSection(): JSX.Element {
   const items = views.map((view) => {
     const { id } = view;
     const tab = tabs.get(id);
-    const favorite = tab ? tab.custom === 0 : false;
     const displayed = tab ? tab.key === tabKey : false;
     const layout = displayed ? stack[0] : tab?.stack[0];
     return (
       <ViewItem
         key={id}
         view={view}
-        favorite={favorite}
         layout={layout}
         displayed={displayed}
         selected={id === sideView} />
@@ -1362,7 +1335,6 @@ function TabView(props: TabViewProps): JSX.Element | null {
   const layout = selected ? props.layout : top;
   const modified = !compareLayout(layout, makeViewLayout(view.layout));
   const vname = view.label;
-  const favorite = custom === 0;
   const tname = custom > 0 ? `${vname} ~ ${custom}` : vname;
   const label = modified ? `${tname}*` : tname;
   const tdup = custom > 0 ? 'Custom ' : '';
@@ -1373,19 +1345,15 @@ function TabView(props: TabViewProps): JSX.Element | null {
   const onClose = (): void => closeTab(key);
   const onContextMenu = (): void => {
     const onDisplay = (): void => applyTab(key);
-    const onFavorite = (): void => applyFavorite(view, !favorite);
     const onRestore = (): void => restoreDefault(key);
-    const favAction = !favorite ? 'Add to Favorite' : 'Remove from Favorite';
     Dome.popupMenu([
       { label: 'Display View', enabled: !selected, onClick: onDisplay },
-      { label: favAction, display: custom <= 0, onClick: onFavorite },
       { label: 'Restore Default', enabled: modified, onClick: onRestore },
       { label: 'Close Tab', display: custom < 0, onClick: onClose },
     ]);
   };
 
-  const icon =
-    favorite ? (selected ? 'FAVORITE' : 'STAR') : 'DISPLAY';
+  const icon = 'DISPLAY';
 
   return (
     <Toolbar.Button
@@ -1400,8 +1368,6 @@ function TabView(props: TabViewProps): JSX.Element | null {
       <IconButton
         className='labview-tab-closing'
         icon='CIRC.CLOSE'
-        visible={!favorite}
-        enabled={!favorite}
         onClick={onClose}
       />
     </Toolbar.Button>
