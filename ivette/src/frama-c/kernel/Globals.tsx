@@ -106,6 +106,10 @@ function List(props: ListProps): JSX.Element {
   const { name, total, filteringMenuItems, children } = props;
   const Name = name.charAt(0).toUpperCase() + name.slice(1);
   const count = children.length;
+  const [slice, setSlice] = React.useState(1500);
+  React.useEffect(() => {
+    if (count < slice) setSlice(1500);
+  }, [count]);
 
   const filterButtonProps = {
     icon: 'TUNINGS',
@@ -131,11 +135,16 @@ function List(props: ListProps): JSX.Element {
   const omittedItems =
     <div className='dome-xSideBarSection-content'>
       <label className='globals-info'>
-        ({children.length - 1500} omitted)
+        ({count - slice} omitted)
       </label>
+      <Button
+        icon='CIRC.PLUS'
+        label="Show more"
+        onClick={() => setSlice(slice+500)}
+      />
     </div>;
 
-  const items = children.length > 1500 ? children.slice(0, 1500) : children;
+  const items = count > slice ? children.slice(0, slice) : children;
 
   return (
     <Section
