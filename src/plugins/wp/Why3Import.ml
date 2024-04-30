@@ -36,6 +36,8 @@ let create_why3_env loadpath =
   let main = WConf.get_main @@ WConf.read_config None in
   W.Env.create_env @@ WConf.loadpath main @ F.to_string_list loadpath
 
+
+
 let extract_path thname =
   let segments = String.split_on_char '.' thname in
   match List.rev segments with
@@ -99,6 +101,18 @@ type lenv = C.logic_info W.Term.Hls.t
 type tvars = C.logic_type W.Ty.Mtv.t
 
 
+let populate_tenv_builtin (tenv:tenv) =
+  let integer = C.Linteger in
+  let bool =  C.{ lt_name=Utf8_logic.boolean; lt_params=[]; lt_def=None; lt_attr=[] } in
+  let real = C.Lreal in
+  let list = C.{ lt_name="\\list"; lt_params=[]; lt_def=None; lt_attr=[]} in
+  let set = C.{ lt_name = "set"; lt_params=["elem"]; lt_def=None; lt_attr=[] } in
+  tenv
+
+(* -------------------------------------------------------------------------- *)
+(* ---    Type conversion                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
 let tvars_of_txs (txs: W.Ty.tvsymbol list) : string list * tvars =
   List.fold_right
     (fun (tv: W.Ty.tvsymbol) (txs,tvs) ->
@@ -132,7 +146,7 @@ and lti_of_ts (tenv : tenv) (ts : W.Ty.tysymbol) : C.logic_type_info =
     lti
 
 (* -------------------------------------------------------------------------- *)
-(* ---    Functions                                                       --- *)
+(* ---    Functions conversion                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 let lv_of_ty (tenv:tenv) (tvars:tvars) (index) (ty:W.Ty.ty) : C.logic_var =
