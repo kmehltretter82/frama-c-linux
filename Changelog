@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Kernel    [2024-04-30] new warning category too-large-array, allowing to
+              use array > SIZE_MAX by changing its status (default is error).
 o   Dev       [2024-04-22] Remove frama-c-build-scripts.sh; add a section in
               the user manual about how to manually replace it.
 -!  Kernel    [2024-04-19] Change format of custom_defs field in machdep schema
