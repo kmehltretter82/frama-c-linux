@@ -24,13 +24,14 @@
 // --- Frama-C Globals
 // --------------------------------------------------------------------------
 
-import React from 'react';
+import React, { ReactNode } from 'react';
 import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item } from 'dome/frame/sidebars';
 import { Button } from 'dome/controls/buttons';
+import { Label } from 'dome/controls/labels';
 
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
@@ -46,7 +47,7 @@ import * as Eva from 'frama-c/plugins/eva/api/general';
 
 function globalHints(): Ivette.Hint[] {
   const globals = States.getSyncArray(Ast.declAttributes).getArray();
-  return globals.map((g : Ast.declAttributesData) => ({
+  return globals.map((g: Ast.declAttributesData) => ({
     id: g.decl,
     name: g.name,
     label: g.label,
@@ -54,7 +55,7 @@ function globalHints(): Ivette.Hint[] {
   }));
 }
 
-const globalMode : Ivette.SearchProps = {
+const globalMode: Ivette.SearchProps = {
   id: 'frama-c.kernel.globals',
   label: 'Globals',
   title: 'Lookup for Global Declarations',
@@ -127,6 +128,15 @@ function List(props: ListProps): JSX.Element {
       <Button {...filterButtonProps} label={`${Name}s filters`} />
     </div>;
 
+  const omittedItems =
+    <div className='dome-xSideBarSection-content'>
+      <label className='globals-info'>
+        ({children.length - 1500} omitted)
+      </label>
+    </div>;
+
+  const items = children.length > 1500 ? children.slice(0, 1500) : children;
+
   return (
     <Section
       label={`${Name}s`}
@@ -137,7 +147,8 @@ function List(props: ListProps): JSX.Element {
       summary={[count]}
       className='globals-section'
     >
-      {count > 0 ? children : total > 0 ? allFiltered : noItems}
+      {count > 0 ? items : total > 0 ? allFiltered : noItems}
+      {children.length > 1500 ? omittedItems : null}
     </Section>
   );
 }
@@ -223,7 +234,7 @@ export function Functions(): JSX.Element {
   const multipleSelection: States.Scope[] =
     React.useMemo(
       () => markers.map((m) => getMarker(m)?.scope)
-      , [ getMarker, markers ]);
+      , [getMarker, markers]);
   const multipleSelectionActive = multipleSelection.length > 0;
   const evaComputed = States.useSyncValue(computationState) === 'computed';
 
@@ -245,9 +256,9 @@ export function Functions(): JSX.Element {
       && (extern[0] || !fct.extern)
       && (!multipleSelectionActive || !selected[0] || isSelected(fct))
       && (evaAnalyzed[0] || !evaComputed ||
-          !('eva_analyzed' in fct && fct.eva_analyzed === true))
+        !('eva_analyzed' in fct && fct.eva_analyzed === true))
       && (evaUnreached[0] || !evaComputed ||
-          ('eva_analyzed' in fct && fct.eva_analyzed === true));
+        ('eva_analyzed' in fct && fct.eva_analyzed === true));
     return !!visible;
   }
 
@@ -266,6 +277,11 @@ export function Functions(): JSX.Element {
     'separator',
     menuItem('Selected only', selected, multipleSelectionActive),
   ];
+
+  // Truncated
+  const allFunctions =
+    fcts.length > 1500 ? fcts.slice(0, 1500) : fcts;
+  const omitted = fcts.length - 1500;
 
   // Filtered
   const items =
@@ -410,7 +426,7 @@ function makeItem(
 }
 
 export function Declarations(props: DeclarationsProps): JSX.Element {
-  const { id, label, title, filter, defaultUnfold=false } = props;
+  const { id, label, title, filter, defaultUnfold = false } = props;
   const settings = React.useMemo(() => `frama-c.sidebar.${id}`, [id]);
   const data = States.useSyncArrayData(Ast.declAttributes);
   const scope = States.useCurrentScope();
@@ -440,7 +456,7 @@ export function Declarations(props: DeclarationsProps): JSX.Element {
 // --------------------------------------------------------------------------
 
 const filterTypes = (d: Ast.declAttributesData): boolean => {
-  switch(d.kind) {
+  switch (d.kind) {
     case 'TYPE':
     case 'ENUM':
     case 'UNION':
