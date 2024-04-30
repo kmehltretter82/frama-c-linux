@@ -39,6 +39,7 @@
     display: inline-block;
     margin: 5px;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .sidebar-selector:hover {
@@ -77,6 +78,10 @@
 .labview-titlebar {
     background: var(--background-profound);
     height: 24px
+}
+
+.labview-titlebar .dome-xIcon {
+    cursor: pointer;
 }
 
 .labview-handle {
