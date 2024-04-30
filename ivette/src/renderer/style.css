@@ -225,7 +225,6 @@
 .labview-tab.dome-selected {
     background: var(--background-softer);
     padding-right: 0px;
-    min-width: 200px;
 }
 
 .labview-docked {
