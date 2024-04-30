@@ -77,7 +77,7 @@ Ivette.registerGroup({
 });
 
 Ivette.registerComponent({
-  id: 'fc.kernel.serverlogs',
+  id: 'fc.server.serverlogs',
   label: 'Server Logs',
   title: 'Frama-C server output logs',
   children: <ServerLogs />
