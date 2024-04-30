@@ -69,10 +69,10 @@ function updateSelection(s: MultiSelection): void {
 export function setSelection(s: MultiSelection): void {
   updateSelection(s);
   if (s.plugin && s.markers.length > 0) {
-    const label =
-      `${s.plugin}: ${s.markers.length} locations selected, \
-      listed in the 'Locations' panel`;
-    const title = `${s.label}: ${s.markers.length} locations selected`;
+    const label = `${s.plugin}: ${s.markers.length} locations selected`;
+    const title =
+      `${s.label}: ${s.markers.length} locations selected`
+      + `\nListed in the 'Locations' panel`;
     Display.showMessage({ label, title });
     Display.alertComponent('fc.kernel.locations');
   }
