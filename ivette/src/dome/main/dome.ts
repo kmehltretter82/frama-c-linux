@@ -406,7 +406,7 @@ function createBrowserWindow(
     height: 670,
     show: false,
     backgroundColor: '#f0f0f0',
-    icon: path.join(__dirname, 'icon.png'),
+    icon: path.join(__dirname, '../../static/icon.png'),
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: true,
