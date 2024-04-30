@@ -157,6 +157,9 @@ let () = set_warn_status wkey_ghost_bad_use Log.Werror
 let wkey_acsl_float_compare = register_warn_category "acsl-float-compare"
 let () = set_warn_status wkey_acsl_float_compare Log.Winactive
 
+let wkey_large_array = register_warn_category "too-large-array"
+let () = set_warn_status wkey_large_array Log.Werror
+
 let wkey_conditional_feature =
   register_warn_category "parser:conditional-feature"
 

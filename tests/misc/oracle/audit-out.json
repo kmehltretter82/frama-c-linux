@@ -63,7 +63,7 @@
         "parser:conditional-feature", "parser:unnamed-typedef",
         "parser:unsupported", "parser:unsupported:attributes",
         "plugin-not-loaded", "pp", "pp:compilation-db", "pp:line-directive",
-        "typing", "typing:implicit-conv-void-ptr",
+        "too-large-array", "typing", "typing:implicit-conv-void-ptr",
         "typing:implicit-function-declaration",
         "typing:incompatible-pointer-types",
         "typing:incompatible-types-call", "typing:inconsistent-specifier",
