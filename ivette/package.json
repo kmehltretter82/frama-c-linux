@@ -99,7 +99,7 @@
           ]
         }
       ],
-      "icon": "static/icon256.png",
+      "icon": "static/icon.png",
       "legalTrademarks": "LGPL-2.1"
     },
     "linux": {
@@ -117,7 +117,7 @@
       "category": "Profiling"
     },
     "mac": {
-      "icon": "static/icon512.png",
+      "icon": "static/icon.png",
       "identity": null,
       "mergeASARs": true,
       "target": [
