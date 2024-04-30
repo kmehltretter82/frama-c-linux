@@ -541,8 +541,8 @@ export function RecordingLogs(): JSX.Element {
   const onClick = (): void => RECORDING.setValue(!isRecording);
   return (
     <IconButton
-      kind={isRecording ? 'negative' : 'warning'}
-      icon={isRecording ? 'MEDIA.STOP' : 'MEDIA.PAUSE'}
+      kind={isRecording ? 'negative' : 'default'}
+      icon="MEDIA.HALT"
       display={active}
       onClick={onClick}
       title='Stop recording logs'

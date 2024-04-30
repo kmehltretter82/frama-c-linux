@@ -28,7 +28,7 @@ import React from 'react';
 import * as Dome from 'dome';
 import { Label } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
-import { LED, Meter } from 'dome/controls/displays';
+import { Meter } from 'dome/controls/displays';
 import { Group, Inset } from 'dome/frame/toolbars';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
@@ -37,6 +37,7 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as ASTview from 'frama-c/kernel/ASTview';
 import { GoalTable } from './goals';
 import { TIPView } from './tip';
+import * as TIP from './tip';
 import * as WP from 'frama-c/plugins/wp/api';
 import './style.css';
 
@@ -167,21 +168,19 @@ Ivette.registerComponent({
 /* -------------------------------------------------------------------------- */
 
 function ServerActivity(): JSX.Element {
-  const rq = States.useRequest(WP.getScheduledTasks, null, { pending: null });
-  const procs = rq ? rq.procs : 0;
-  const active = rq ? rq.active : 0;
-  const status = active > 0 ? 'active' : 'inactive';
-  const done = rq ? rq.done : 0;
-  const todo = rq ? rq.todo : 0;
+  const { done, todo, active, procs, running } = TIP.useServerActivity();
   const total = done + todo;
   const progress = done + active;
   const objective = done + todo + procs;
   const title = `${done} / ${todo} (${active} running, ${procs} procs)`;
   return (
     <Group display={total > 0} title={title}>
-      <LED status={status} />
       <Label>WP</Label>
       <Meter min={0} value={progress} max={objective} />
+      <Inset />
+      <IconButton
+        icon="MEDIA.HALT" kind="negative" enabled={running}
+        onClick={TIP.cancelProofTasks} />
       <Inset />
     </Group>
   );
