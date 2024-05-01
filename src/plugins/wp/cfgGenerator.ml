@@ -119,7 +119,8 @@ let add_fun_task model pool ~kf ?infos ?bhvs ?target () =
   end
 
 let notyet prop =
-  Wp_parameters.warning ~once:true
+  let source = fst (Property.location prop) in
+  Wp_parameters.warning ~once:true ~source
     "Not yet implemented wp for '%a'" Property.pretty prop
 
 (* -------------------------------------------------------------------------- *)
