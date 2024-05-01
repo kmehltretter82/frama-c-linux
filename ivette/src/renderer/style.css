@@ -204,8 +204,6 @@
     fill: var(--info-text);
     color: var(--info-text);
     font-size: smaller;
-    background: var(--background);
-    background-image: none;
     border-radius: 8px;
     padding-left: 10px;
 }
@@ -221,15 +219,6 @@
 .labview-tab:hover {
     fill: var(--text);
     color: var(--text);
-}
-
-.labview-tab.dome-selected:hover {
-    background: var(--default-button-hover);
-}
-
-.labview-tab.dome-selected {
-    background: var(--background-softer);
-    padding-right: 0px;
 }
 
 .labview-docked {
