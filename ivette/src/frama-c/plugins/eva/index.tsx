@@ -46,7 +46,7 @@ Ivette.registerView({
   layout: {
     'A': 'fc.eva.summary',
     'B': 'fc.eva.coverage',
-    'CD': 'ivette.messages',
+    'CD': 'fc.kernel.messages',
   },
 });
 

@@ -536,7 +536,7 @@ function computeDelta(log?: Log): void {
 // -------------------------------------------------------------------------
 
 export function RecordingLogs(): JSX.Element {
-  const { active } = Display.useComponentStatus('fc.kernel.serverlogs');
+  const { active } = Display.useComponentStatus('fc.server.serverlogs');
   const [isRecording] = useGlobalState(RECORDING);
   const onClick = (): void => RECORDING.setValue(!isRecording);
   return (

@@ -639,7 +639,7 @@ function updateIndex(settings: LabSettings): void {
   if (theTab) {
     applyTab(tabKeyOf(theTab.view, theTab.custom));
   } else {
-    const console = VIEW.getElement('ivette.console');
+    const console = VIEW.getElement('fc.kernel.console');
     if (console !== undefined) applyView(console);
   }
   setCurrentNone();
