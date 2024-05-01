@@ -19,6 +19,7 @@
 }
 
 .sidebar-selector {
+    min-height: 35px;
     min-width: 35px;
     text-align: center;
 }
@@ -33,6 +34,10 @@
 
 .sidebar-selector-icon:hover {
     background-color: var(--background-profound-hover);
+}
+
+.sidebar-selector-label {
+    padding-top: 6px;
 }
 
 .sidebar-selector-label {
