@@ -54,7 +54,7 @@ interface Layout { A: compId, B: compId, C: compId, D: compId }
 interface TabViewState {
   key: tabKey, /* viewId@custom for custom, or viewId */
   viewId: viewId,
-  custom: number, /* -1: transient, n: custom */
+  custom: number, /* 0: normal, n>0: custom */
   split: Split,
   stack: Layout[], /* current at index 0 */
 }
@@ -487,7 +487,7 @@ function applyView(view: Ivette.ViewLayoutProps): void {
     const panels = addPanels(state.panels, layout);
     const alerts = removeAlerts(state.alerts, layout);
     const tabs = copyMap(state.tabs);
-    const tab = newTab(tabs, view, -1);
+    const tab = newTab(tabs, view, 0);
     saveTab(tabs, state);
     LAB.setValue({
       ...state,
@@ -1349,7 +1349,7 @@ function TabView(props: TabViewProps): JSX.Element | null {
     Dome.popupMenu([
       { label: 'Display View', enabled: !selected, onClick: onDisplay },
       { label: 'Restore Default', enabled: modified, onClick: onRestore },
-      { label: 'Close Tab', display: custom < 0, onClick: onClose },
+      { label: 'Close Tab', display: custom <= 0, onClick: onClose },
     ]);
   };
 
