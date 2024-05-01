@@ -124,14 +124,15 @@ export function useComponentStatus(
   return Laboratory.getComponentStatus(state, id ?? '');
 }
 
-export type ShortMessage = undefined | null | string;
-export type Message = ShortMessage | Laboratory.Notification;
-export type Warning = ShortMessage | { label: string, title: string };
+export type Message = string | { label: string, title: string };
 
 /** Message notification */
 export function showMessage(msg: Message): void {
   if (!msg) return;
-  Laboratory.showMessage(typeof msg === 'string' ? { label: msg } : msg);
+  const short = typeof msg === 'string';
+  const label = short ? msg : msg.label;
+  const title = short ? msg : msg.title;
+  Laboratory.showMessage({ kind: "message", label, title });
 }
 
 /** Warning notification. */
@@ -139,7 +140,7 @@ export function showWarning(msg: Message): void {
   if (!msg) return;
   const short = typeof msg === 'string';
   const label = short ? msg : msg.label;
-  const title = short ? msg : undefined;
+  const title = short ? msg : msg.title;
   Laboratory.showMessage({ kind: 'warning', label, title });
 }
 
@@ -148,7 +149,7 @@ export function showError(msg: Message): void {
   if (!msg) return;
   const short = typeof msg === 'string';
   const label = short ? msg : msg.label;
-  const title = short ? msg : undefined;
+  const title = short ? msg : msg.title;
   Laboratory.showMessage({ kind: 'error', label, title });
 }
 

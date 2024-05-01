@@ -913,7 +913,7 @@ function LayoutMenu(): JSX.Element | null {
 type NotificationKind = 'message' | 'warning' | 'error';
 
 export interface Notification {
-  kind?: NotificationKind;
+  kind: NotificationKind;
   label: string;
   title?: string;
 }

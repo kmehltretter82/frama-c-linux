@@ -60,15 +60,19 @@ export function useSelection(): MultiSelection {
   return s;
 }
 
-export function setSelection(s: MultiSelection): void {
+function updateSelection(s: MultiSelection): void {
   MultiSelection.setValue(s);
   const marker = s.index !== undefined ? s.markers[s.index] : undefined;
   if (marker) States.setSelected(marker);
+}
+
+export function setSelection(s: MultiSelection): void {
+  updateSelection(s);
   if (s.plugin && s.markers.length > 0) {
-    const label =
-      `${s.plugin}: ${s.markers.length} locations selected, \
-      listed in the 'Locations' panel`;
-    const title = `${s.label}: ${s.markers.length} locations selected`;
+    const label = `${s.plugin}: ${s.markers.length} locations selected`;
+    const title =
+      `${s.label}: ${s.markers.length} locations selected`
+      + `\nListed in the 'Locations' panel`;
     Display.showMessage({ label, title });
     Display.alertComponent('fc.kernel.locations');
   }
@@ -78,7 +82,7 @@ Server.onShutdown(() => MultiSelection.setValue(emptySelection));
 
 export function setIndex(index: number): void {
   const s = MultiSelection.getValue();
-  setSelection({ ...s, index });
+  updateSelection({ ...s, index });
 }
 
 function sameMarkers(xs: Ast.marker[], ys: Ast.marker[]): boolean {
@@ -104,9 +108,9 @@ export function setNextSelection(s: MultiSelection): void {
     const { index, markers } = selection;
     const target = index === undefined ? 0 : index + 1;
     const select = target < markers.length ? target : 0;
-    setSelection({ ...selection, index: select });
+    updateSelection({ ...selection, index: select });
   } else {
-    setSelection(s);
+    updateSelection(s);
   }
 }
 
@@ -117,7 +121,7 @@ export function clearSelection(): void {
 function gotoIndex(index: number): void {
   const selection = MultiSelection.getValue();
   if (0 <= index && index <= selection.markers.length)
-    setSelection({ ...selection, index });
+    updateSelection({ ...selection, index });
 }
 
 // --------------------------------------------------------------------------
