@@ -383,7 +383,7 @@ function scrollToRef(r: null | HTMLLabelElement): void {
 
 function Suggestions(props: SuggestionsProps): JSX.Element {
   const { hints, onHint, index, onClose } = props;
-  const theHints = hints.length > 100 ? hints.slice(0,100) : hints;
+  const theHints = hints.length > 100 ? hints.slice(0, 100) : hints;
   const suggestions = theHints.map((h, k) => {
     const selected = k === index || hints.length === 1;
     const classSelected = selected && 'dome-xToolBar-searchIndex';
@@ -415,7 +415,9 @@ function Suggestions(props: SuggestionsProps): JSX.Element {
       onMouseDown={(event) => event.preventDefault()}
     >
       {suggestions}
-      {hints.length > 100 ? <Label>({hints.length - 100} omitted)</Label> : null}
+      {hints.length > 100 ?
+        <Label>({hints.length - 100} omitted)</Label> :
+        null}
     </div>
   );
 }
