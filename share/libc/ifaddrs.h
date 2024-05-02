@@ -57,10 +57,29 @@ struct ifmaddrs {
 	struct sockaddr	*ifma_lladdr;
 };
 
-extern int getifaddrs(struct ifaddrs **);
-extern void freeifaddrs(struct ifaddrs *);
-extern int getifmaddrs(struct ifmaddrs **);
-extern void freeifmaddrs(struct ifmaddrs *);
+/*@
+  allocates *ifap;
+  assigns \result, *ifap \from \nothing; // missing: \from 'system interfaces'
+*/
+extern int getifaddrs(struct ifaddrs **ifap);
+
+/*@
+  frees ifa;
+  assigns \nothing;
+*/
+extern void freeifaddrs(struct ifaddrs *ifa);
+
+/*@
+  allocates *ifmap;
+  assigns \result, *ifmap \from \nothing; // missing: \from 'system interfaces'
+*/
+extern int getifmaddrs(struct ifmaddrs **ifmap);
+
+/*@
+  frees ifmp;
+  assigns \nothing;
+*/
+extern void freeifmaddrs(struct ifmaddrs *ifmp);
 
 __END_DECLS
 

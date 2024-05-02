@@ -119,10 +119,32 @@ struct addrinfo
 # define EAI_SYSTEM	  -11	/* System error returned in `errno'.  */
 # define EAI_OVERFLOW	  -12	/* Argument buffer overflow.  */
 
+// dummy data, used for assigns clauses
+extern struct hostent __fc_dummy_hostent;
+extern struct netent __fc_dummy_netent;
+extern struct protoent __fc_dummy_protoent;
+extern struct servent __fc_dummy_servent;
+
+/*@
+  assigns __fc_dummy_hostent \from \nothing;
+*/
 extern void endhostent(void);
+
+/*@
+  assigns __fc_dummy_netent \from \nothing;
+*/
 extern void endnetent(void);
+
+/*@
+  assigns __fc_dummy_protoent \from \nothing;
+*/
 extern void endprotoent(void);
+
+/*@
+  assigns __fc_dummy_servent \from \nothing;
+*/
 extern void endservent(void);
+
 /*@ requires addrinfo_valid: \valid(addrinfo);
   frees addrinfo;
   assigns \nothing;
@@ -178,32 +200,102 @@ extern int getaddrinfo(
   const struct addrinfo *restrict hints,
   struct addrinfo **restrict res);
 
-extern struct hostent *gethostbyaddr(const void *, socklen_t, int);
+/*@
+  assigns \result \from &__fc_dummy_hostent;
+  assigns *\result \from __fc_dummy_hostent, len, type;
+*/
+extern struct hostent *gethostbyaddr(const void *addr, socklen_t len, int type);
 
 /*@
-  allocates \result;
-  assigns *\result \from name[0 .. strlen(name)], Frama_C_entropy_source;
-  assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+  assigns \result \from &__fc_dummy_hostent;
+  assigns *\result \from __fc_dummy_hostent, name[0..];
 */
 extern struct hostent *gethostbyname(const char *name);
 
+/*@
+  assigns \result \from &__fc_dummy_hostent;
+*/
 extern struct hostent *gethostent(void);
-extern int getnameinfo(const struct sockaddr *restrict, socklen_t,
- char *restrict, socklen_t, char *restrict,
- socklen_t, int);
-extern struct netent *getnetbyaddr(uint32_t, int);
-extern struct netent *getnetbyname(const char *);
+
+/*@
+  assigns \result, host[0..hostlen-1], serv[0..servlen-1]
+    \from ((char*)addr)[0..addrlen-1];
+*/
+extern int getnameinfo(const struct sockaddr *restrict addr, socklen_t addrlen,
+                       char *restrict host, socklen_t hostlen,
+                       char *restrict serv, socklen_t servlen,
+                       int flags);
+
+/*@
+  assigns \result \from &__fc_dummy_netent;
+  assigns __fc_dummy_netent \from __fc_dummy_netent, net, type;
+*/
+extern struct netent *getnetbyaddr(uint32_t net, int type);
+
+/*@
+  assigns \result \from &__fc_dummy_netent;
+  assigns __fc_dummy_netent \from __fc_dummy_netent, name[0..];
+*/
+extern struct netent *getnetbyname(const char *name);
+
+/*@
+  assigns \result \from &__fc_dummy_netent;
+*/
 extern struct netent *getnetent(void);
-extern struct protoent *getprotobyname(const char *);
-extern struct protoent *getprotobynumber(int);
+
+/*@
+  assigns \result \from &__fc_dummy_protoent;
+  assigns __fc_dummy_protoent \from __fc_dummy_protoent, name[0..];
+*/
+extern struct protoent *getprotobyname(const char *name);
+
+/*@
+  assigns \result \from &__fc_dummy_protoent;
+  assigns __fc_dummy_protoent \from __fc_dummy_protoent, proto;
+*/
+extern struct protoent *getprotobynumber(int proto);
+
+/*@
+  assigns \result \from &__fc_dummy_protoent;
+*/
 extern struct protoent *getprotoent(void);
-extern struct servent *getservbyname(const char *, const char *);
-extern struct servent *getservbyport(int, const char *);
+
+/*@
+  assigns \result \from &__fc_dummy_servent;
+  assigns __fc_dummy_servent \from __fc_dummy_servent, name[0..], proto[0..];
+*/
+extern struct servent *getservbyname(const char *name, const char *proto);
+
+/*@
+  assigns \result \from &__fc_dummy_servent;
+  assigns __fc_dummy_servent \from __fc_dummy_servent, port, proto[0..];
+*/
+extern struct servent *getservbyport(int port, const char *proto);
+
+/*@
+  assigns \result \from &__fc_dummy_servent;
+*/
 extern struct servent *getservent(void);
-extern void sethostent(int);
-extern void setnetent(int);
-extern void setprotoent(int);
-extern void setservent(int);
+
+/*@
+  assigns __fc_dummy_hostent \from indirect:stayopen;
+*/
+extern void sethostent(int stayopen);
+
+/*@
+  assigns __fc_dummy_netent \from indirect:stayopen;
+*/
+extern void setnetent(int stayopen);
+
+/*@
+  assigns __fc_dummy_protoent \from indirect:stayopen;
+*/
+extern void setprotoent(int stayopen);
+
+/*@
+  assigns __fc_dummy_servent \from indirect:stayopen;
+*/
+extern void setservent(int stayopen);
 
 __END_DECLS
 

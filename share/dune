@@ -137,6 +137,7 @@
 (libc/__fc_runtime.c as libc/__fc_runtime.c)
 (libc/__fc_select.h as libc/__fc_select.h)
 (libc/__fc_string_axiomatic.h as libc/__fc_string_axiomatic.h)
+(libc/__fc_utmp_constants.h as libc/__fc_utmp_constants.h)
 (libc/aio.h as libc/aio.h)
 (libc/alloca.h as libc/alloca.h)
 (libc/argz.c as libc/argz.c)
