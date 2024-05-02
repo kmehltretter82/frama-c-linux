@@ -1,0 +1,37 @@
+[kernel] Parsing langinfo_h.c (with preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva] computing for function setlocale <- main.
+  Called from langinfo_h.c:7.
+[eva] using specification for function setlocale
+[eva] langinfo_h.c:7: 
+  function setlocale: precondition 'locale_null_or_valid_string' got status valid.
+[eva] Done for function setlocale
+[eva] computing for function setlocale <- main.
+  Called from langinfo_h.c:8.
+[eva] langinfo_h.c:8: 
+  function setlocale: precondition 'locale_null_or_valid_string' got status valid.
+[eva] Done for function setlocale
+[kernel:annot:missing-spec] langinfo_h.c:10: Warning: 
+  Neither code nor specification for function nl_langinfo,
+   generating default assigns. See -generated-spec-* options for more info
+[eva] computing for function nl_langinfo <- main.
+  Called from langinfo_h.c:10.
+[eva] using specification for function nl_langinfo
+[eva] Done for function nl_langinfo
+[eva] computing for function printf_va_1 <- main.
+  Called from langinfo_h.c:10.
+[eva] using specification for function printf
+[eva:alarm] langinfo_h.c:10: Warning: 
+  function printf_va_1: precondition valid_read_string(param0) got status invalid.
+[eva] langinfo_h.c:10: 
+  function printf_va_1: no state left, precondition valid_read_string(format) got status valid.
+[eva] Done for function printf_va_1
+[eva] Recording results for main
+[eva] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  NON TERMINATING FUNCTION
