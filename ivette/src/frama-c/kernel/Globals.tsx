@@ -141,6 +141,7 @@ function List(props: ListProps): JSX.Element {
   }
   else {
     contents =
+      // @ts-expect-error (incompatibility due to @types/react versions)
       <InfiniteScroll
         pageStart={0}
         loadMore={() => setDisplayedCount(displayedCount + 100)}
