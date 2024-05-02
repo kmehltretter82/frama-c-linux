@@ -101,12 +101,12 @@ type lenv = C.logic_info W.Term.Hls.t
 type tvars = C.logic_type W.Ty.Mtv.t
 
 
-let populate_tenv_builtin (tenv:tenv) =
-  let integer = C.Linteger in
-  let bool =  C.{ lt_name=Utf8_logic.boolean; lt_params=[]; lt_def=None; lt_attr=[] } in
-  let real = C.Lreal in
-  let list = C.{ lt_name="\\list"; lt_params=[]; lt_def=None; lt_attr=[]} in
-  let set = C.{ lt_name = "set"; lt_params=["elem"]; lt_def=None; lt_attr=[] } in
+let _populate_tenv_builtin (tenv:tenv) =
+  let _integer = C.Linteger in
+  let _real = C.Lreal in
+  let _bool =  C.{ lt_name=Utf8_logic.boolean; lt_params=[]; lt_def=None; lt_attr=[] } in
+  let _list = C.{ lt_name="\\list"; lt_params=[]; lt_def=None; lt_attr=[]} in
+  let _set = C.{ lt_name = "set"; lt_params=["elem"]; lt_def=None; lt_attr=[] } in
   tenv
 
 (* -------------------------------------------------------------------------- *)
