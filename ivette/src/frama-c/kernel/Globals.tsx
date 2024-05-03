@@ -122,7 +122,7 @@ function List(props: ListProps): JSX.Element {
 
   let contents;
 
-  if (count <= 0) {
+  if (count <= 0 && total > 0) {
     contents =
       <div className='dome-xSideBarSection-content'>
         <label className='globals-info'>

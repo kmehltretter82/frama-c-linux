@@ -50,6 +50,8 @@ Menu.init();
 Ivette.registerSidebar({
   id: 'fc.kernel.globals',
   label: 'AST',
+  icon: 'DUPLICATE',
+  title: 'Global Declarations (AST)',
   children: <Globals />
 });
 
