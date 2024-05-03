@@ -1239,9 +1239,10 @@ function ViewBar(): JSX.Element {
 }
 
 Ivette.registerSidebar({
-  id: "ivette.views",
-  label: "Views",
-  title: "View Selector",
+  id: 'ivette.views',
+  label: 'Views',
+  icon: 'DISPLAY',
+  title: 'Views & Components Selector',
   children: <ViewBar />,
 });
 

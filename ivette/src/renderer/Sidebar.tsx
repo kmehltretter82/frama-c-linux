@@ -26,6 +26,7 @@
 
 import React from 'react';
 import * as Dome from 'dome';
+import { Icon } from 'dome/controls/icons';
 import { SideBar } from 'dome/frame/sidebars';
 import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
@@ -42,16 +43,17 @@ interface SelectorProps extends SidebarProps {
 }
 
 function Selector(props: SelectorProps): JSX.Element {
-  const { id, iconPath, selected, setSelected, label, title } = props;
+  const { id, icon, selected, setSelected, label } = props;
   const className = classes(
     'sidebar-selector',
     'dome-color-frame',
     selected === id && 'sidebar-selector-selected',
   );
   const onClick = React.useCallback(() => setSelected(id), [setSelected, id]);
+  const title = props.title ?? `${label} Sidebar`;
   const component =
-    iconPath
-    ? <img className="sidebar-selector-icon" src={iconPath} alt={label} />
+    icon
+    ? <Icon size={20} className="sidebar-selector-icon" id={icon}/>
     : <label className="sidebar-selector-label">{label}</label>;
   return (
     <div className={className} title={title} onClick={onClick}>

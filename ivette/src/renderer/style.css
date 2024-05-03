@@ -19,21 +19,16 @@
 }
 
 .sidebar-selector {
-    min-height: 35px;
+    margin: 0px;
+    min-height: 40px;
     min-width: 35px;
     text-align: center;
+    border-left: solid 3px transparent;
 }
 
 .sidebar-selector-icon {
-    margin-top: 5px;
-    margin-left: 25%;
-    margin-right: 25%;
-    width: 25px;
-    height: 25px;
-}
-
-.sidebar-selector-icon:hover {
-    background-color: var(--background-profound-hover);
+    position: relative;
+    top: 6px;
 }
 
 .sidebar-selector-label {
@@ -48,11 +43,12 @@
 }
 
 .sidebar-selector:hover {
-    background-color: var(--background-profound-hover);
+    background-color: var(--default-button-hover);
 }
 
 .sidebar-selector-selected {
     background-color: var(--background-profound);
+    border-color: var(--selected-button-img);
 }
 
 .component-info {

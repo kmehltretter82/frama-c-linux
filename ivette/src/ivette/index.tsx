@@ -202,7 +202,7 @@ export function TitleBar(props: TitleBarProps): JSX.Element | null {
 /* -------------------------------------------------------------------------- */
 
 export interface SidebarProps extends ContentProps {
-  iconPath?: string;
+  icon?: string;
 }
 
 export interface ToolProps {
