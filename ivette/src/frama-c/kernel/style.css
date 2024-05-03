@@ -9,6 +9,14 @@
     text-overflow: ellipsis;
 }
 
+.properties-section-names .dome-xSideBarSection-content label {
+    display: none;
+}
+
+.properties-section-names .dome-xSideBarSection-content .dome-xForm-field{
+    padding: 5px 10px;
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Lightweight Text Markers                                           --- */
 /* -------------------------------------------------------------------------- */
@@ -199,6 +207,19 @@
 .message-page {
     user-select: text;
     white-space: pre-line;
+    background-color: var(--background-report);
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Server Logs                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+.server-logs-tab {
+    padding: 8px 12px;
+    border-right: 1px solid var(--splitter);
+}
+
+.server-logs-tab-active {
     background-color: var(--background-report);
 }
 

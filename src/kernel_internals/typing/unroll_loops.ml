@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -82,7 +82,6 @@ let extract_from_pragmas global_find_init s =
     match a.annot_content with
     | APragma (Loop_pragma (Unroll_specs specs)) ->
       List.fold_left (update_info global_find_init e) info specs
-    | APragma (Loop_pragma _) -> info
     | _ -> assert false (* should have been filtered above. *)
   in
   List.fold_left get_infos empty_info pragmas

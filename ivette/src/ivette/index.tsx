@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -33,6 +33,7 @@ import React from 'react';
 import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
+import { Inset } from 'dome/frame/toolbars';
 import * as State from './state';
 import * as Search from './search';
 
@@ -191,6 +192,7 @@ export function TitleBar(props: TitleBarProps): JSX.Element | null {
         title={title || context.title}
       />
       {children}
+      <Inset />
     </DefineElement>
   );
 }

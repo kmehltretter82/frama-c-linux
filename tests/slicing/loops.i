@@ -173,7 +173,7 @@ int X, Y, Z ;
 void loop (int cond) {
   if (cond) {
     int c = 0 ;
-    /*@ loop pragma WIDEN_HINTS X, 10, 100 ; */ while (1) {
+    while (1) {
       //@ slice pragma ctrl ;
       if (c) {
         X++;

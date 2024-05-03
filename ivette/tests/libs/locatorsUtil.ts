@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -26,8 +26,10 @@ import { Locator, Page } from "@playwright/test";
  * Locator to select "Console" in the right menu
  */
 export function getConsoleView(window: Page): Locator {
-  return window
-    .getByText("Console").first();
+  window
+    .getByText("Other Plugins")
+    .click();
+  return window.getByText("Console").first();
 }
 
 /**

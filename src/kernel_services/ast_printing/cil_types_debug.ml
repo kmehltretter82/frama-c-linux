@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -932,10 +932,6 @@ and pp_termination_kind fmt = function
 and pp_loop_pragma fmt = function
   | Unroll_specs(term_list) ->
     Format.fprintf fmt "Unroll_specs(%a)" (pp_list pp_term) term_list
-  | Widen_hints(term_list) ->
-    Format.fprintf fmt "Widen_hints(%a)" (pp_list pp_term) term_list
-  | Widen_variables(term_list) ->
-    Format.fprintf fmt "Widen_variables(%a)" (pp_list pp_term) term_list
 
 and pp_slice_pragma fmt = function
   | SPexpr(term) -> Format.fprintf fmt "SPexpr(%a)" pp_term term

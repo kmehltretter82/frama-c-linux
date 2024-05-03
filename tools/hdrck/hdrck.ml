@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -422,7 +422,7 @@ let check_spec_discrepancies
     (specs: (string, string) Hashtbl.t)
     (headers: (string, string) Hashtbl.t) : unit =
   let eq_header orig_file template_hdr =
-    let cmd = Format.sprintf "headache -c %s -e %s | diff --strip-trailing-cr -q - %s > /dev/null"
+    let cmd = Format.sprintf "headache -c %s -e %s | diff -B -q - %s > /dev/null"
         config_file_opts orig_file template_hdr
     in
     let ret = Sys.command cmd in

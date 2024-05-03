@@ -39,6 +39,7 @@
 (*                        énergies alternatives)                            *)
 (*               and INRIA (Institut National de Recherche en Informatique  *)
 (*                          et Automatique).                                *)
+(*                                                                          *)
 (****************************************************************************)
 
 (** The Abstract Syntax of CIL.
@@ -1738,8 +1739,6 @@ and behavior = {
 (** Pragmas for the value analysis plugin of Frama-C. *)
 and loop_pragma =
   | Unroll_specs of term list
-  | Widen_hints of term list
-  | Widen_variables of term list
 
 (** Pragmas for the slicing plugin of Frama-C. *)
 and slice_pragma =
@@ -1886,6 +1885,20 @@ type syntactic_scope =
       @since 27.0-Cobalt
   *)
 
+let yaml_dict_to_list = function
+  | `O l ->
+    let make_one acc (k,v) =
+      Result.(
+        bind acc
+          (fun l ->
+             match Yaml.Util.to_string v with
+             | Ok s -> Ok((k,s) :: l)
+             | Error (`Msg s) ->
+               Error (`Msg ("Unexpected value for key " ^ k ^ ": " ^ s))))
+    in
+    List.fold_left make_one (Ok []) l
+  | _ -> Error (`Msg "Unexpected YAML value instead of dictionary of strings")
+
 (** Definition of a machine model (architecture + compiler).
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 type mach = {
@@ -1950,13 +1963,9 @@ type mach = {
   rand_max: string; (* expansion of RAND_MAX macro *)
   mb_cur_max: string; (* expansion of MB_CUR_MAX macro *)
   nsig: string; (* expansion of non-standard NSIG macro, empty if undefined *)
-  errno: (string * string) list; (* list of macros defining errors in errno.h*)
+  (* list of macros defining errors in errno.h*)
+  errno: (string * string) list  [@of_yaml yaml_dict_to_list];
   machdep_name: string; (* name of the machdep *)
-  custom_defs: string; (* arbitrary text to be written in the header *)
-}
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+  (* sequence of key/value for C macros *)
+  custom_defs: (string * string) list [@of_yaml yaml_dict_to_list];
+} [@@deriving yaml]

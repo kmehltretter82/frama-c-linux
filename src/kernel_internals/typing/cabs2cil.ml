@@ -39,6 +39,7 @@
 (*                        énergies alternatives)                            *)
 (*               and INRIA (Institut National de Recherche en Informatique  *)
 (*                          et Automatique).                                *)
+(*                                                                          *)
 (****************************************************************************)
 
 (* Modified by TrustInSoft *)
@@ -2119,7 +2120,8 @@ struct
     }
 
   let gotoChunk ~ghost (ln: string) (l: location) : chunk =
-    let gref = ref dummyStmt in
+    let dummy = {dummyStmt with labels = [Label (ln, l, false)]} in
+    let gref = ref dummy in
     addGoto ln gref;
     { stmts = [ mkStmt ~ghost ~valid_sid (Goto (gref, l)),[],[],[],[] ];
       cases = [];
@@ -4825,7 +4827,8 @@ and doType (ghost:bool) isFuncArg
                    let size_max = Cil.max_unsigned_number size_t in
                    let array_size = Integer.mul i elem_size in
                    if Integer.gt array_size size_max then
-                     Kernel.error ~once:true ~current:true
+                     Kernel.warning ~wkey:Kernel.wkey_large_array
+                       ~once:true ~current:true
                        "Array length is too large.";
                  with
                  | SizeOfError (msg,_) ->
@@ -6462,7 +6465,7 @@ and doExp local_env
              *)
              if not isSpecialBuiltin && not are_ghost then begin
                warn_no_proto f;
-               let typ = TFun (resType, Some [], false,attrs) in
+               let typ = TFun (resType, Some [], false, attrs) in
                Cil.update_var_type f typ;
              end
            | None, _ (* TODO: treat function pointers. *)
@@ -6598,8 +6601,37 @@ and doExp local_env
                    (List.mapi default_argument_promotion args)
                in
                let typ = TFun (resType, Some prm_types, false,attrs) in
+               begin
+                 try
+                   (* Nested calls of a function without a prototype : inner
+                      calls will update [f] type but the information is not
+                      communicated to outer ones, hence [argTypes] is not up to
+                      date and we need to check that types are compatibles
+                      before updating [f] type (see issue-641-implicit-calls.c
+                      test).
+                   *)
+                   ignore(Cil.compatibleTypes f.vtype typ);
+                 with Cannot_combine msg ->
+                   abort_context "nested calls of %s without a prototype and \
+                                  incompatible arguments : %s" f.vname msg
+               end;
                Cil.update_var_type f typ;
                Cil.setFormalsDecl f typ;
+               (* We need to check that the update of [f] did not create
+                  inconsistencies with call' arguments. It can happen when [f]
+                  is used as an lvalue in its own arguments. Updating [f] type
+                  will recursively change the type of [f] inside parameters ,
+                  therefore [f] type is not up to date anymore, etc (see
+                  issue-641-implicit-calls.c test). *)
+               let check_arg e (_, at, _) =
+                 let typ = Cil.typeOf e in
+                 if not @@ Cil_datatype.Typ.equal typ at then
+                   abort_context "call to %s with a reference to itself in its \
+                                  own parameters" f.vname
+               in
+               (* args and prm_types should have the same length here, since
+                  they both come from the same split.  *)
+               List.iter2 check_arg args prm_types;
                (chunk,args)
              end
            | None, _ -> res
@@ -9210,9 +9242,14 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
        * that all uses of this function will refer to the renamed
        * function *)
       addGlobalToEnv ghost n (EnvVar !currentFunctionFDEC.svar);
-      if H.mem alreadyDefined !currentFunctionFDEC.svar.vname then
-        Kernel.error ~once:true ~current:true "There is a definition already for %s" n;
-
+      H.find_opt alreadyDefined !currentFunctionFDEC.svar.vname
+      |>
+      (Option.iter
+         (fun loc ->
+            abort_context
+              "There is a definition already for %s \
+               (previous definition was at %a)."
+              n Cil_datatype.Location.pretty loc));
       H.add alreadyDefined !currentFunctionFDEC.svar.vname idloc;
 
 

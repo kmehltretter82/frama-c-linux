@@ -3844,28 +3844,6 @@ thresholds.
 Dynamic hints are automatically global; the \lstinline|global| prefix must not
 be applied to them.
 
-\subsubsection*{Deprecated: \texttt{WIDEN\_HINTS} loop pragma}
-
-\begin{important}
-  This syntax has been deprecated in favor of the previous one
-  and it is kept here only for reference.
-\end{important}
-
-The \lstinline|loop widen_hints| annotation above has an obsoleted syntax: \\
-\lstinline|//@ loop pragma WIDEN_HINTS $v_1,\ldots,v_n$, $e_1,\ldots,e_m$ ;|\\
-which serves the same purpose but has a few differences:
-
-\begin{itemize}
-\item it is restricted to loop annotations;
-\item more than one variable ($v_1,\ldots,v_n$) can be specified in a single hint;
-\item if no variables are specified, it works as the special value \lstinline|"all"|,
-  that is, all variables in the loop are affected;
-\item it does not accept the \lstinline|global| label.
-\end{itemize}
-
-Example:
-\csource{examples/parametrizing/pragma-widen-hints.c}
-
 \subsubsection{Loop invariants}
 
 A last technique consists in using the loop invariant construct of ACSL.
@@ -3915,7 +3893,7 @@ within bounds\footnote{And more precisely between \lstinline+t[1]+ and
 \lstinline+t[9]+, since \lstinline+p+
 is incremented before the affectation to \lstinline+*p+.}.
 Thus, this technique is complementary to the use of
-\lstinline+WIDEN_HINTS+, which only accepts integers --- hence not
+\lstinline+widen_hints+, which only accepts integers --- hence not
 \lstinline+&t[N-1]+. Compared to the use
 of \lstinline+-eva-slevel+ or \lstinline+-ulevel+,
 the technique above does not unroll the loop; thus the overall results

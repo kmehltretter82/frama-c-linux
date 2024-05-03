@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -612,7 +612,8 @@ module Make (X: Analysis.S) = struct
                            In this case, nothing is displayed by the GUI. *)
     | `Bottom -> [], [] (* Bottom case: nothing is displayed either. *)
     | `Value before ->
-      Current_loc.set (gui_loc_loc loc);
+      let open Current_loc.Operators in
+      let<> UpdatedCurrentLoc = gui_loc_loc loc in
       clear_caches ();
       make_data_all_callstacks_from_states ev ~before ~after:states_after v
 end

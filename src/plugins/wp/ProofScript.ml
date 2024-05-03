@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -358,8 +358,9 @@ let json_of_result (p : VCS.prover) (r : VCS.result) =
   `Assoc (name :: verdict :: (time @ steps))
 
 let prover_of_json js =
-  try VCS.parse_prover (js >? "prover" |> Json.string)
-  with Not_found -> None
+  match js >? "prover" |> Json.string with
+  | exception Not_found -> None
+  | pname -> VCS.prover_of_name ~fallback:true pname
 
 let result_of_json js =
   let verdict = try js >? "verdict" |> verdict_of_json with _ -> VCS.NoResult in
@@ -417,8 +418,7 @@ and alternative js =
   | Some prover -> Prover(prover,result_of_json js)
   | None ->
     match tactic_of_json js with
-    | Some(tactic, children) ->
-      a_tactic tactic (List.map subscript children)
+    | Some(tactic, children) -> a_tactic tactic (List.map subscript children)
     | None -> Error("Invalid Tactic",js)
 
 let rec encode script = `List (alternatives script)

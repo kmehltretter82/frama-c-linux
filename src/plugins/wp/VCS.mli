@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -50,7 +50,12 @@ val filename_for_prover : prover -> string
 val title_of_mode : mode -> string
 
 val parse_mode : string -> mode
+
+(** For the command line *)
 val parse_prover : string -> prover option
+
+(** For scripts *)
+val prover_of_name : ?fallback:bool -> string -> prover option
 
 val pp_prover : Format.formatter -> prover -> unit
 val pp_mode : Format.formatter -> mode -> unit

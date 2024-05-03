@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -55,12 +55,18 @@ val find_vars : lval -> t -> VarSet.t
 val find_synonyms : lval -> t -> LSet.t
 
 val find_aliases : lval -> t -> LSet.t
-[@@alert deprecated "Use find_synonyms or find_all_aliases instead!"]
+[@@alert deprecated "Use find_synonyms or alias_lvals instead!"]
 
 val alias_vars : lval -> t -> VarSet.t
+val alias_lvals : lval -> t -> LSet.t
+
 val find_all_aliases : lval -> t -> LSet.t
+[@@alert deprecated "Use alias_lvals instead!"]
+
 val points_to_vars : lval -> t -> VarSet.t
 val points_to_lvals : lval -> t -> LSet.t
+val alias_sets_vars : t -> VarSet.t list
+val alias_sets_lvals : t -> LSet.t list
 
 val points_to_set : lval -> t -> LSet.t
 [@@alert deprecated "Use points_to_vars or points_to_lvals instead!"]

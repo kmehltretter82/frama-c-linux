@@ -3,7 +3,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2023                                               #
+#  Copyright (C) 2007-2024                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -43,7 +43,6 @@ fi
 
 find . -name dune-project -exec $SED -i -e "s/(lang dune [1-9]\.[0-9]*)/(lang dune ${VERSION})/gI" '{}' ';'
 find . -name dune-workspace.* -exec $SED -i -e "s/(lang dune [1-9]\.[0-9]*)/(lang dune ${VERSION})/gI" '{}' ';'
-$SED -i -e "s/(lang dune [1-9]\.[0-9]*)/(lang dune ${VERSION})/gI" ./bin/frama-c-build-scripts.sh
 
 echo "All dune-project related files have been updated".
 echo "Remember to update:"

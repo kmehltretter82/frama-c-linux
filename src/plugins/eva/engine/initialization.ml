@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -267,7 +267,12 @@ module Make
       else
         let var_kind = Abstract_domain.Formal kf in
         let state = Domain.enter_scope var_kind l state in
-        List.fold_right (Domain.initialize_variable_using_type var_kind) l state
+        let init vi state =
+          let open Current_loc.Operators in
+          let<> UpdatedCurrentLoc = vi.vdecl in
+          Domain.initialize_variable_using_type var_kind vi state
+        in
+        List.fold_right init l state
 
   (* Use the values supplied in [actuals] for the formals of [kf], and
      bind them in [state] *)
@@ -309,7 +314,8 @@ module Make
     with Initialization_failed -> `Bottom
 
   let initialize_global_variable ~lib_entry vi init state =
-    Current_loc.set vi.vdecl;
+    let open Current_loc.Operators in
+    let<> UpdatedCurrentLoc = vi.vdecl in
     let state = Domain.enter_scope Abstract_domain.Global [vi] state in
     let state = if vi.vsource then
         let initialize =

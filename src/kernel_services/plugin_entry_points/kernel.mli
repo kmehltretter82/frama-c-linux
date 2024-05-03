@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -161,6 +161,8 @@ val wkey_ghost_bad_use: warn_category
 (** error in ghost code *)
 
 val wkey_acsl_float_compare: warn_category
+
+val wkey_large_array: warn_category
 
 val wkey_conditional_feature: warn_category
 (** parsing feature that is only supported in specific modes

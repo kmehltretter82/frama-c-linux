@@ -234,11 +234,11 @@
 /* -------------------------------------------------------------------------- */
 
 .dome-xToolBar-group {
-    flex: 0 0 auto ;
+    flex: 1 0 auto ;
     min-height: 24px ;
     display: flex ;
     flex-direction: row ;
-    flex-wrap: wrap ;
+    flex-wrap: nowrap;
     align-items: center ;
     margin-left: 2px ;
     margin-right: 2px ;
@@ -290,7 +290,7 @@
     flex: 0 0 auto ;
     height: 21px ;
     margin: 6px 5px 6px 5px ;
-    padding: 0px 4px 2px 4px ;
+    padding: 2px 5px 2px 5px ;
     box-shadow: 0 1px 1px rgba(0, 0, 0, .06);
     border: 1px solid transparent;
     border-radius: 4px;

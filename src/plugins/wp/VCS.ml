@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -46,21 +46,12 @@ let parse_prover = function
   | "why3" -> Some (Why3 { Why3.Whyconf.prover_name = "why3";
                            Why3.Whyconf.prover_version = "";
                            Why3.Whyconf.prover_altern = "generate only" })
-  | s ->
-    let prv = String.split_on_char ':' s in
-    let prv = match prv with "why3"::prv -> prv | _ -> prv in
-    let name = String.concat "," prv in
-    match Why3Provers.find_fallback name with
-    | Exact p -> Some (Why3 p)
-    | Fallback p ->
-      Wp_parameters.warning ~current:false ~once:true
-        "Prover '%s' not found, fallback to '%s'"
-        (String.concat ":" prv) (Why3Provers.ident_wp p) ;
-      Some (Why3 p)
-    | NotFound ->
+  | name ->
+    match Why3Provers.lookup name with
+    | Some p -> Some (Why3 p)
+    | None ->
       Wp_parameters.error ~once:true
-        "Prover '%s' not found in why3.conf" name ;
-      None
+        "Prover '%s' not found in why3.conf" name ; None
 
 let parse_mode m =
   match String.lowercase_ascii m with
@@ -71,13 +62,20 @@ let parse_mode m =
   | "fixup" -> FixUpdate
   | _ ->
     Wp_parameters.error ~once:true
-      "Unrecognized mode %S (use 'batch' instead)" m ;
-    Batch
+      "Unrecognized mode %S (use 'batch' instead)" m ; Batch
 
 let name_of_prover = function
   | Why3 s -> Why3Provers.ident_wp s
   | Qed -> "qed"
   | Tactical -> "script"
+
+let prover_of_name ?fallback = function
+  | "qed" -> Some Qed
+  | "script" -> Some Tactical
+  | name ->
+    match Why3Provers.lookup ?fallback name with
+    | None -> None
+    | Some prv -> Some (Why3 prv)
 
 let title_of_prover ?version = function
   | Why3 s ->

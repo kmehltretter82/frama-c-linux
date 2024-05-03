@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -226,6 +226,32 @@ export function popupProvers(config: ProverConfig): void {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Active Tasks                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+export interface ServerActivity {
+  procs: number,
+  active: number,
+  done: number,
+  todo: number,
+  running: boolean,
+}
+
+export function useServerActivity(): ServerActivity {
+  const rq = States.useRequest(WP.getScheduledTasks, null, { pending: null });
+  const procs = rq ? rq.procs : 0;
+  const active = rq ? rq.active : 0;
+  const done = rq ? rq.done : 0;
+  const todo = rq ? rq.todo : 0;
+  const running = active + todo > 0;
+  return { procs, active, done, todo, running };
+}
+
+export function cancelProofTasks(): void {
+  Server.send(WP.cancelProofTasks, null);
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- TIP View                                                           --- */
 /* -------------------------------------------------------------------------- */
 
@@ -256,6 +282,7 @@ export function TIPView(props: TIPProps): JSX.Element {
   // --- provers
   const available = States.useSyncArrayData(WP.ProverInfos);
   const [provers = [], setProvers] = States.useSyncState(WP.provers);
+  const server = useServerActivity();
   // --- sidebar & toolbar states
   const [copied, setCopied] = React.useState(false);
   const [tactic, setTactic] = React.useState<Tactic>();
@@ -410,6 +437,13 @@ export function TIPView(props: TIPProps): JSX.Element {
           icon='SETTINGS'
           title='Active Provers Selection'
           onClick={onProverSelection} />
+        <Button
+          icon='MEDIA.HALT'
+          kind='negative'
+          enabled={server.running}
+          title={`Interrrupt (${server.todo}/${server.todo + server.done})`}
+          onClick={cancelProofTasks}
+        />
       </ToolBar>
       <Hfill>
         <NavBar

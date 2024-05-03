@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -406,7 +406,7 @@ function createBrowserWindow(
     height: 670,
     show: false,
     backgroundColor: '#f0f0f0',
-    icon: path.join(__dirname, 'icon.png'),
+    icon: path.join(__dirname, '../../static/icon.png'),
     webPreferences: {
       contextIsolation: false,
       nodeIntegration: true,

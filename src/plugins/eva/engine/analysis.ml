@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -231,9 +231,5 @@ let compute =
 
 let () = Parameters.ForceValues.set_output_dependencies [Self.state]
 
-let main () =
-  (* Value computations *)
-  if Parameters.ForceValues.get () then compute ();
-  if is_computed () then Red_statuses.report ()
-
+let main () = if Parameters.ForceValues.get () then compute ()
 let () = Boot.Main.extend main

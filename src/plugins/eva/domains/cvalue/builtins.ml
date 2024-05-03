@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -204,14 +204,15 @@ let prepare_builtins () =
   (* Overrides builtins attribution according to the -eva-builtin option. *)
   Parameters.BuiltinsOverrides.iter
     (fun (kf, name) ->
-       prepare_builtin kf (Hashtbl.find table (Option.get name)))
+       prepare_builtin kf (Hashtbl.find table (Option.get name)));
+  BuiltinsOverride.mark_as_computed ()
 
 let find_builtin_override = Hashtbl.find_opt builtins_table
 
-let is_builtin_overridden name =
+let is_builtin_overridden kf =
   if not (BuiltinsOverride.is_computed ())
   then prepare_builtins ();
-  BuiltinsOverride.mem name
+  BuiltinsOverride.mem kf
 
 (* -------------------------------------------------------------------------- *)
 (* --- Applying a builtin                                                 --- *)

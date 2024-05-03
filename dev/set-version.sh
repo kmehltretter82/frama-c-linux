@@ -3,7 +3,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2023                                               #
+#  Copyright (C) 2007-2024                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -124,9 +124,6 @@ else
     doc/aorai/main.tex
   $SED -i "s/\(^\\\\section\*{E-ACSL \\\\eacslpluginversion \\\\eacslplugincodename}\)/%\1\n\n\\\\section\*{E-ACSL $NEXT_MAJOR.$NEXT_MINOR $NEXT_CODENAME}/g" \
     src/plugins/e-acsl/doc/userman/changes.tex
-
-  # Frama-C build script
-  $SED -i "s/(\\\\\\\"frama-c\\\\\\\" (>= [1-9][0-9]\.[0-9]))/(\\\\\\\"frama-c\\\\\\\" (>= $NEXT_MAJOR.$NEXT_MINOR))/g" bin/frama-c-build-scripts.sh
 
   # Reference configuration
   $SED -i "s/Frama-C [1-9][0-9]\.[0-9]/Frama-C $NEXT_MAJOR.$NEXT_MINOR/gI" \

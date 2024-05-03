@@ -39,6 +39,7 @@
     display: inline-block;
     margin: 5px;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .sidebar-selector:hover {
@@ -69,20 +70,6 @@
     left: -8px;
 }
 
-.labview-stock:hover {
-    background: var(--background-profound);
-}
-
-.labview-stock:hover * {
-    cursor: move;
-}
-
-.labview-stock.dome-dragging {
-    border-radius: 4px;
-    background: var(--background-profound);
-    border: thin solid black;
-}
-
 .labview-content {
     height: 100%;
     background: var(--background);
@@ -93,9 +80,12 @@
     height: 24px
 }
 
+.labview-titlebar .dome-xIcon {
+    cursor: pointer;
+}
+
 .labview-handle {
     flex: 1 1 auto;
-    cursor: move;
 }
 
 .labview-close:hover {
@@ -124,12 +114,11 @@
 
 .labview-notification-item {
     flex: 1 1 auto;
-    max-width: 200px;
+    max-width: 400px;
     border: thin solid var(--border);
     border-radius: 8px;
     margin: 2px 1px 2px 0px;
-    padding: 2px 10px 3px 2px;
-    font-size: smaller;
+    padding: 3px 15px 1px 4px;
 }
 
 .labview-notification-message {
@@ -214,8 +203,6 @@
     fill: var(--info-text);
     color: var(--info-text);
     font-size: smaller;
-    background: var(--background);
-    background-image: none;
     border-radius: 8px;
     padding-left: 10px;
 }
@@ -231,16 +218,6 @@
 .labview-tab:hover {
     fill: var(--text);
     color: var(--text);
-}
-
-.labview-tab.dome-selected:hover {
-    background: var(--default-button-hover);
-}
-
-.labview-tab.dome-selected {
-    background: var(--background-softer);
-    padding-right: 0px;
-    min-width: 200px;
 }
 
 .labview-docked {

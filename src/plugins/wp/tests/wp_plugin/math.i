@@ -3,8 +3,7 @@
 */
 
 /* run.config_qualif
-   OPT: -wp-prover Alt-Ergo -wp-prop=-ko
-   OPT: -wp-prover Alt-Ergo -wp-prop=ko -wp-steps 10
+   OPT: -wp-prop=-ko
 */
 
 // --------------------------------------------------------------------------

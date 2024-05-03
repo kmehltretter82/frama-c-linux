@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -323,8 +323,6 @@ type spec = {
 
 type loop_pragma =
   | Unroll_specs of lexpr list
-  | Widen_hints of lexpr list
-  | Widen_variables of lexpr list
 
 (** Pragmas for the slicing plugin of Frama-C. *)
 and slice_pragma =

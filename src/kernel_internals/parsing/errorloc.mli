@@ -39,6 +39,7 @@
 (*                        énergies alternatives)                            *)
 (*               and INRIA (Institut National de Recherche en Informatique  *)
 (*                          et Automatique).                                *)
+(*                                                                          *)
 (****************************************************************************)
 
 (** The module stores the current file,line, and working directory in a

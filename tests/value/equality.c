@@ -4,7 +4,7 @@
 
 /* Tests for the equality domain. */
 
-#include <__fc_builtin.h>
+#include "__fc_builtin.h"
 #include <math.h>
 
 volatile int rand;

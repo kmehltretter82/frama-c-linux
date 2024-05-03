@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -1198,7 +1198,7 @@ let rec eval_term ~alarm_mode env t =
       tcond ttrue tfalse
 
   | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _ | TAlignOfE _ ->
-    let e = Cil.constFoldTerm true t in
+    let e = Cil.constFoldTerm t in
     let v = match e.term_node with
       | TConst (Integer (v, _)) -> Cvalue.V.inject_int v
       | _ -> V.top_int

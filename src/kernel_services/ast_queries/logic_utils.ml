@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -1179,9 +1179,6 @@ let is_same_logic_type_info t1 t2 =
 let is_same_loop_pragma p1 p2 =
   match p1,p2 with
     Unroll_specs l1, Unroll_specs l2 -> is_same_list is_same_term l1 l2
-  | Widen_hints l1, Widen_hints l2 -> is_same_list is_same_term l1 l2
-  | Widen_variables l1, Widen_variables l2 -> is_same_list is_same_term l1 l2
-  | (Unroll_specs _ | Widen_hints _ | Widen_variables _), _ -> false
 
 let is_same_slice_pragma p1 p2 =
   match p1,p2 with
@@ -2302,7 +2299,7 @@ let is_trivial_annotation a =
     -> false
 
 let is_property_pragma = function
-  | Loop_pragma (Unroll_specs _ | Widen_hints _ | Widen_variables _)
+  | Loop_pragma (Unroll_specs _)
   | Slice_pragma (SPexpr _ | SPctrl | SPstmt)
   | Impact_pragma (IPexpr _ | IPstmt) -> false
 (* If at some time a pragma becomes something which should be proven,

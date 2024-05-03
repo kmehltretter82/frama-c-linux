@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -23,15 +23,10 @@
 import { test } from "@playwright/test";
 import * as e2eService from "../libs/e2eService";
 
-test("server connection with a C file to analyze", async () => {
-  const launchAppResult = await e2eService.launchApp(
-    e2eService.argsLaunchWithTestFile,
-  );
+test("check server connection", async () => {
+  const launchAppResult = await e2eService.launchIvette();
   const electronApp = launchAppResult.app;
   const window = launchAppResult.page;
-
-  await e2eService.testFileIsLoaded(window);
-
-  // Exit app.
+  await e2eService.testServerIsStarted(window);
   await electronApp.close();
 });

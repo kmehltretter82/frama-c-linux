@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -453,10 +453,6 @@ let print_spec fmt spec =
 let print_loop_pragma fmt p =
   match p with
     Unroll_specs l -> fprintf fmt "UNROLL@ %a" (pp_list ~sep:",@ " print_lexpr) l
-  | Widen_hints l ->
-    fprintf fmt "WIDEN_HINTS@ %a" (pp_list ~sep:",@ " print_lexpr) l
-  | Widen_variables l ->
-    fprintf fmt "WIDEN_VARIABLES@ %a" (pp_list ~sep:",@ " print_lexpr) l
 
 let print_slice_pragma fmt p =
   match p with

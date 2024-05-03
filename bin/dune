@@ -2,7 +2,7 @@
 ;;                                                                        ;;
 ;;  This file is part of Frama-C.                                         ;;
 ;;                                                                        ;;
-;;  Copyright (C) 2007-2023                                               ;;
+;;  Copyright (C) 2007-2024                                               ;;
 ;;    CEA (Commissariat à l'énergie atomique et aux énergies              ;;
 ;;         alternatives)                                                  ;;
 ;;                                                                        ;;
@@ -27,6 +27,5 @@
   (frama-c-script as frama-c-script)
   (frama-c-config as frama-c-config)
   (test.sh as frama-c-test.sh)
-  (frama-c-build-scripts.sh as frama-c-build-scripts.sh)
  )
 )

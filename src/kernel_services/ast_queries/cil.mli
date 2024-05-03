@@ -39,6 +39,7 @@
 (*                        énergies alternatives)                            *)
 (*               and INRIA (Institut National de Recherche en Informatique  *)
 (*                          et Automatique).                                *)
+(*                                                                          *)
 (****************************************************************************)
 
 (** CIL main API.
@@ -1079,10 +1080,9 @@ val constFoldToInt: ?machdep:bool -> exp -> Integer.t option
 val constFoldTermNodeAtTop:  term_node -> term_node
 
 (** Do constant folding on an term.
-    If the first argument is true then
-    will also compute compiler-dependent expressions such as [sizeof]
-    and [alignof]. *)
-val constFoldTerm: bool -> term -> term
+    @before Frama-C+Dev takes a boolean [machdep] to decide if we actually do
+            the fold or not. *)
+val constFoldTerm: term -> term
 
 (** Do constant folding on a {!Cil_types.offset}. If the second argument is true
     then will also compute compiler-dependent expressions such as [sizeof]. *)

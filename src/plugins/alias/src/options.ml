@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -40,13 +40,13 @@ module Enabled = False
 module ShowFunctionTable = False
     (struct
       let option_name = "-alias-show-function-table"
-      let help = "display summary for each function at the end of the analysis"
+      let help = "display summary for each function after the analysis"
     end)
 
 module ShowStmtTable = False
     (struct
       let option_name = "-alias-show-stmt-table"
-      let help = "display abstract state for each function at the end of the analysis"
+      let help = "display abstract state for each statement after the analysis"
     end)
 
 

@@ -81,7 +81,6 @@
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "gremlins.js": "^2.2.0",
     "prettier": "^3.2.4",
     "typescript": "^5.3.3",
     "vite": "^5.0.12",
@@ -90,7 +89,7 @@
   "build": {
     "appId": "com.framac.ivette",
     "compression": "store",
-    "copyright": "Copyright © 2007-2023 Frama-C. All Rights Reserved.",
+    "copyright": "Copyright © 2007-2024 Frama-C. All Rights Reserved.",
     "artifactName": "${productName}-${arch}-${version}.${ext}",
     "win": {
       "target": [
@@ -102,7 +101,7 @@
           ]
         }
       ],
-      "icon": "static/icon256.png",
+      "icon": "static/icon.png",
       "legalTrademarks": "LGPL-2.1"
     },
     "linux": {
@@ -120,7 +119,7 @@
       "category": "Profiling"
     },
     "mac": {
-      "icon": "static/icon512.png",
+      "icon": "static/icon.png",
       "identity": null,
       "mergeASARs": true,
       "target": [

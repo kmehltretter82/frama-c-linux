@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -3632,29 +3632,9 @@ struct
 
   let plain_logic_type loc env t = logic_type (base_ctxt env) loc env t
 
-  (* For Widen_hints and Widen_variables, we check that the arguments of the
-     pragma can be understood later. Keep this code synchronized with
-     src/plugins/eva/utils/widen.ml. *)
   let loop_pragma env p =
-    let accept_int = function
-        { term_node = TConst (Integer _)} -> true | _ -> false
-    in
-    let accept_var = function
-        { term_node = TLval (TVar {lv_origin = Some _}, _)} -> true | _ -> false
-    in
-    (* fail when the translation of [p] does not verify the predicate [accept]*)
-    let term_accept accept p =
-      let t = term env p in
-      if not (accept t) then
-        C.error t.term_loc "invalid pragma '%a'" Cil_printer.pp_term t;
-      t
-    in
     match p with
     | Unroll_specs l -> Cil_types.Unroll_specs (List.map (term env) l)
-    | Widen_variables l -> Cil_types.Widen_variables (List.map (term_accept accept_var) l)
-    | Widen_hints l ->
-      let accept t = accept_int t || accept_var t in
-      Cil_types.Widen_hints (List.map (term_accept accept) l)
 
   let model_annot loc ti =
     let env = Lenv.empty() in

@@ -30,6 +30,7 @@
 , clang
 , frama-c
 , perl
+, python3Packages
 , stdenvNoCC
 , time
 , unixtools
@@ -56,6 +57,7 @@ stdenvNoCC.mkDerivation {
     clang
     frama-c
     perl
+    python3Packages.jsonschema
     time
     unixtools.getopt
     yq

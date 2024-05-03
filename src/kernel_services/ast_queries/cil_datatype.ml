@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -2753,7 +2753,7 @@ let dummy_machdep =
       "erange", "34";
     ];
     machdep_name = "dummy";
-    custom_defs = "";
+    custom_defs = [];
   }
 
 module Machdep = Datatype.Make_with_collections(struct

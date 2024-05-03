@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -35,6 +35,7 @@ import SourceCode from 'frama-c/kernel/SourceCode';
 import PivotTable from 'frama-c/kernel/PivotTable';
 import Locations from 'frama-c/kernel/Locations';
 import Properties from 'frama-c/kernel/Properties';
+import { RecordingLogs, ServerLogs } from 'frama-c/kernel/ServerLogs';
 
 import 'frama-c/kernel/style.css';
 
@@ -56,7 +57,15 @@ Ivette.registerSidebar({
   </>
 });
 
-Ivette.registerToolbar({ id: 'ivette.history', children: <History /> });
+Ivette.registerToolbar({
+  id: 'ivette.history',
+  children: <History />
+});
+
+Ivette.registerStatusbar({
+  id: 'fc.kernel.recordinglogs',
+  children: <RecordingLogs />
+});
 
 /* -------------------------------------------------------------------------- */
 /* --- Frama-C Kernel Groups                                              --- */
@@ -65,6 +74,13 @@ Ivette.registerToolbar({ id: 'ivette.history', children: <History /> });
 Ivette.registerGroup({
   id: 'fc.kernel',
   label: 'Frama-C',
+});
+
+Ivette.registerComponent({
+  id: 'fc.server.serverlogs',
+  label: 'Server Logs',
+  title: 'Frama-C server output logs',
+  children: <ServerLogs />
 });
 
 Ivette.registerComponent({

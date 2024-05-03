@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Aorai plug-in of Frama-C.                        *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -263,8 +263,8 @@ let isCrossableAtInit tr func =
     end
   in
   let eval_rel_at_init rel t1 t2 =
-    let t1 = eval_term_at_init (Cil.constFoldTerm true t1) in
-    let t2 = eval_term_at_init (Cil.constFoldTerm true t2) in
+    let t1 = eval_term_at_init (Cil.constFoldTerm t1) in
+    let t2 = eval_term_at_init (Cil.constFoldTerm t2) in
     let comp =
       match rel with
       | Req -> ((=) 0)

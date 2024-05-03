@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -41,7 +41,7 @@ class provers =
         in
         let selection = List.fold_left
             (fun acc e ->
-               match Why3Provers.find_opt e with
+               match Why3Provers.lookup e with
                | None -> acc
                | Some p -> S.add p acc)
             S.empty cmdline

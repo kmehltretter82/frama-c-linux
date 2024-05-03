@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -277,6 +277,7 @@ module Normalized = struct
   type t = string
 
   let of_string ?existence ?base_name s = normalize ?existence ?base_name s
+  let extend ?existence t ext = normalize ?existence (t ^ ext)
   let concat ?existence t s = normalize ?existence (t ^ "/" ^ s)
   let concats ?existence t sl =
     let s' = List.fold_left (fun acc s -> acc ^ "/" ^ s) "" sl in

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -37,7 +37,7 @@ theory Cbits
 
   (** * C-Integer Bits * **)
 
-  function lnot int : int
+  function lnot (x:int) : int = -x-1
 
   function land int int : int
   clone algebra.AC as Land with type t = int, function op = land, axiom .
@@ -53,8 +53,6 @@ theory Cbits
 
 
 (** * Bitwise identities *)
-(** ** lnot identities *)
-  axiom lnot_bool: ((lnot 0) = (-1)) /\ ((lnot (-1)) = 0)
 
 (** ** land identities *)
   axiom land_idemp: forall x:int [land x x]. (land x x) = x
@@ -499,7 +497,7 @@ theory Cbits
   meta "remove_for_" lemma is_sint_lsl1_sup
 
 (** *** Cast to sint8 C type *)
-  axiom is_sint8_lnot: forall x:int [to_sint8 (lnot x)].
+  lemma is_sint8_lnot: forall x:int [to_sint8 (lnot x)].
     is_sint8 x ->  to_sint8 (lnot x) = lnot x
 
   axiom is_sint8_lxor: forall x y:int [to_sint8 (lxor x y)].
@@ -524,7 +522,7 @@ theory Cbits
     8<=y -> to_sint8 (lsl 1 y) = 0
 
 (** *** Cast to sint16 C type *)
-  axiom is_sint16_lnot : forall x:int [to_sint16 (lnot x)].
+  lemma is_sint16_lnot : forall x:int [to_sint16 (lnot x)].
     is_sint16 x -> to_sint16 (lnot x) = lnot x
 
   axiom is_sint16_lxor : forall x y:int [to_sint16 (lxor x y)].
@@ -549,7 +547,7 @@ theory Cbits
     16<=y -> to_sint16 (lsl 1 y) = 0
 
 (** *** Cast to sint32 C type *)
-  axiom is_sint32_lnot : forall x:int [to_sint32(lnot(x))].
+  lemma is_sint32_lnot : forall x:int [to_sint32(lnot(x))].
     is_sint32 x -> to_sint32 (lnot x) = lnot x
 
   axiom is_sint32_lxor : forall x y:int [to_sint32 (lxor x y)].
@@ -574,7 +572,7 @@ theory Cbits
     32<=y -> to_sint32 (lsl 1 y) = 0
 
 (** *** Cast to sint64 C type *)
-  axiom is_sint64_lnot : forall x:int [to_sint64 (lnot x)].
+  lemma is_sint64_lnot : forall x:int [to_sint64 (lnot x)].
     is_sint64 x -> to_sint64 (lnot x) = lnot x
 
   axiom is_sint64_lxor : forall x y:int [to_sint64 (lxor x y)].

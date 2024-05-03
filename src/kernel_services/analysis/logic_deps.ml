@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -478,9 +478,7 @@ let get_zone_from_annot a (ki,kf) loop_body_opt results =
   | AVariant (term,_) ->
     (* to preserve the interpretation of the variant *)
     get_zone_from_term (Option.get loop_body_opt) term results
-  | APragma (Loop_pragma (Unroll_specs terms))
-  | APragma (Loop_pragma (Widen_hints terms))
-  | APragma (Loop_pragma (Widen_variables terms)) ->
+  | APragma (Loop_pragma (Unroll_specs terms)) ->
     (* to select the declaration of the variables *)
     List.fold_left
       (fun results term -> {

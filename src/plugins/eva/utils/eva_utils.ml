@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -168,21 +168,15 @@ class postconditions_mention_result = object
     | _ -> Cil.DoChildren
 end
 let postconditions_mention_result spec =
-  (* We save the current location because the visitor modifies it. *)
-  let loc = Current_loc.get () in
   let vis = new postconditions_mention_result in
   let aux_bhv bhv =
     let aux (_, post) = ignore (Visitor.visitFramacIdPredicate vis post) in
     List.iter aux bhv.b_post_cond
   in
-  let res =
-    try
-      List.iter aux_bhv spec.spec_behavior;
-      false
-    with Exit -> true
-  in
-  Current_loc.set loc;
-  res
+  try
+    List.iter aux_bhv spec.spec_behavior;
+    false
+  with Exit -> true
 
 let conv_comp op =
   let module C = Abstract_interp.Comp in

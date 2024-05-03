@@ -121,8 +121,6 @@
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva] memcpy.c:89: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:89: function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:89: 
-  writing somewhere in {NULL; v4} because of Arithmetic {memcpy.c:89}.
 [eva:alarm] memcpy.c:90: Warning: 
   pointer downcast. assert (unsigned int)((struct t1 *)t) ≤ 2147483647;
 [eva:alarm] memcpy.c:91: Warning: 
@@ -135,8 +133,6 @@
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva] memcpy.c:91: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:91: function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:91: 
-  writing somewhere in {NULL; v5} because of Arithmetic {memcpy.c:91}.
 [eva] memcpy.c:96: Call to builtin memcpy
 [eva:alarm] memcpy.c:96: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -220,7 +216,7 @@
 [eva] memcpy.c:172: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:172: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:172: 
-  In memcpy builtin: precise copy of indeterminate values UNINITIALIZED
+  In memcpy builtin: precise copy of indeterminate values.
 [eva] memcpy.c:173: assertion got status valid.
 [eva] computing for function itv <- main_uninit <- main_all.
   Called from memcpy.c:174.
@@ -233,7 +229,7 @@
 [eva:imprecision] memcpy.c:174: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:174: 
-  In memcpy builtin: imprecise copy of indeterminate values
+  In memcpy builtin: imprecise copy of indeterminate values.
 [eva] memcpy.c:175: assertion got status valid.
 [eva] computing for function make_unknown <- main_uninit <- main_all.
   Called from memcpy.c:178.
@@ -255,7 +251,7 @@
 [eva:imprecision] memcpy.c:181: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:181: 
-  In memcpy builtin: imprecise copy of indeterminate values
+  In memcpy builtin: imprecise copy of indeterminate values.
 [eva:alarm] memcpy.c:182: Warning: 
   accessing uninitialized left-value. assert \initialized(&b[11]);
 [eva] computing for function make_unknown <- main_uninit <- main_all.
@@ -267,7 +263,7 @@
 [eva] memcpy.c:187: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:187: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:187: 
-  In memcpy builtin: precise copy of indeterminate values UNINITIALIZED
+  In memcpy builtin: precise copy of indeterminate values.
 [eva] memcpy.c:188: assertion got status valid.
 [eva] computing for function itv <- main_uninit <- main_all.
   Called from memcpy.c:190.
@@ -279,7 +275,7 @@
 [eva:imprecision] memcpy.c:190: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:190: 
-  In memcpy builtin: imprecise copy of indeterminate values
+  In memcpy builtin: imprecise copy of indeterminate values.
 [eva] memcpy.c:191: assertion got status valid.
 [eva:alarm] memcpy.c:192: Warning: 
   accessing uninitialized left-value. assert \initialized(&b[8]);
@@ -306,7 +302,7 @@
 [eva:imprecision] memcpy.c:200: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
 [eva:imprecision] memcpy.c:200: 
-  In memcpy builtin: imprecise copy of indeterminate values
+  In memcpy builtin: imprecise copy of indeterminate values.
 [eva:alarm] memcpy.c:201: Warning: 
   accessing uninitialized left-value. assert \initialized(&b[11]);
 [eva] Recording results for main_uninit
@@ -577,10 +573,19 @@
     .y ∈ {7}
     {.p; .padding[0..23]} ∈ {0}
   v3 ∈ {{ garbled mix of &{v1} (origin: Misaligned read {memcpy.c:87}) }}
-  v4.x ∈ [--..--]
+  v4.x[bits 0 to 7]# ∈ {0; 5}%32, bits 0 to 7 
+    .x[bits 8 to 31] ∈ [--..--]
     .y ∈ {{ (int)&t }}
-    {.p; .padding[0..23]} ∈ [--..--]
-  v5 ∈ {{ garbled mix of &{t} (origin: Misaligned read {memcpy.c:91}) }}
+    {.p; .padding[0..14]} ∈ [--..--]
+    .padding[15]# ∈ {0; 7}%32, bits 24 to 31 
+    .padding[16..23] ∈ {0}
+  v5.x[bits 0 to 7]# ∈ {0; 5}%32, bits 0 to 7 
+    .x[bits 8 to 31] ∈ [--..--]
+    .y[bits 0 to 7]# ∈ {{ NULL + [--..--] ; (? *)&t }}%32, bits 0 to 7 
+    {.y[bits 8 to 31]; .p; .padding[0..14]} ∈
+    {{ garbled mix of &{t} (origin: Merge {memcpy.c:91}) }}
+    .padding[15]# ∈ {{ NULL + [--..--] ; (? *)&t }}%32, bits 24 to 31 
+    .padding[16..23] ∈ [--..--]
   t{[0]; [1]{.x; .y}} ∈ {0}
    [1].p ∈ {{ &v1.y }}
    {[1].padding[0..23]; [2]; [3]{.x; .y}} ∈ {0}

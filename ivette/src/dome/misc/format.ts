@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -33,9 +33,12 @@
    Formats a duration, specified in seconds, into hour, minutes, seconds,
    milliseconds or nanoseconds, depending on range.
 
+   Negative or null durations are reported by `'0'`.
+
    For instance, returns `'250ms'` for an input time of `.25`.
  */
 export function duration(time : number) : string {
+  if (time <= 0.0) return '0';
   if (time < 1.0e-3) return `${Math.round(time * 1.0e6)}µs`;
   if (time < 1.0) return `${Math.round(time * 1.0e3)}ms`;
   if (time < 60) return `${Math.round(time)}s`;

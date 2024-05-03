@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -65,7 +65,7 @@ and constant_exp e =
   | _ -> Warning.error "constant(%a)" Printer.pp_exp e
 
 and constant_term t =
-  let e = Cil.constFoldTerm true t in
+  let e = Cil.constFoldTerm t in
   match e.term_node with
   | TConst c -> logic_constant c
   | _ -> Warning.error "constant(%a)" Printer.pp_term t

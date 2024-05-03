@@ -1,9 +1,11 @@
 # frama-c -wp [...]
 [kernel] Parsing bitwise.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] [Valid] Goal baddnot_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal baddnot_terminates (Cfg) (Trivial)
+[wp] Warning: Missing RTE guards
 [wp] [Valid] Goal band_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal band_terminates (Cfg) (Trivial)
-[wp] Warning: Missing RTE guards
 [wp] [Valid] Goal band_bool_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal band_bool_terminates (Cfg) (Trivial)
 [wp] [Valid] Goal bnot_exits (Cfg) (Unreachable)
@@ -24,6 +26,16 @@
 [wp] [Valid] Goal lshift_terminates (Cfg) (Trivial)
 [wp] [Valid] Goal rshift_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal rshift_terminates (Cfg) (Trivial)
+------------------------------------------------------------
+  Function baddnot
+------------------------------------------------------------
+
+Goal Post-condition (file bitwise.i, line 58) in 'baddnot':
+Let x_1 = lnot(lnot(x) - k).
+Assume { Type: is_sint32(k) /\ is_sint32(x) /\ is_sint32(x_1). }
+Prove: (k + x) = x_1.
+
+------------------------------------------------------------
 ------------------------------------------------------------
   Function band
 ------------------------------------------------------------
@@ -94,7 +106,7 @@ Prove: true.
   Function band_bool with behavior false
 ------------------------------------------------------------
 
-Goal Post-condition for 'false' (file bitwise.i, line 91) in 'band_bool':
+Goal Post-condition for 'false' (file bitwise.i, line 94) in 'band_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(b).
   (* Pre-condition for 'false' *)
@@ -107,7 +119,7 @@ Prove: land(a, b) = 0.
   Function band_bool with behavior true
 ------------------------------------------------------------
 
-Goal Post-condition for 'true' (file bitwise.i, line 88) in 'band_bool':
+Goal Post-condition for 'true' (file bitwise.i, line 91) in 'band_bool':
 Prove: true.
 
 ------------------------------------------------------------
@@ -160,7 +172,7 @@ Prove: true.
   Function bor_bool with behavior false
 ------------------------------------------------------------
 
-Goal Post-condition for 'false' (file bitwise.i, line 81) in 'bor_bool':
+Goal Post-condition for 'false' (file bitwise.i, line 84) in 'bor_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(b).
   (* Pre-condition for 'false' *)
@@ -173,7 +185,7 @@ Prove: (a = 0) /\ (b = 0).
   Function bor_bool with behavior true
 ------------------------------------------------------------
 
-Goal Post-condition for 'true' (file bitwise.i, line 78) in 'bor_bool':
+Goal Post-condition for 'true' (file bitwise.i, line 81) in 'bor_bool':
 Prove: true.
 
 ------------------------------------------------------------
@@ -213,7 +225,7 @@ Prove: true.
   Function bxor_bool with behavior false
 ------------------------------------------------------------
 
-Goal Post-condition for 'false' (file bitwise.i, line 100) in 'bxor_bool':
+Goal Post-condition for 'false' (file bitwise.i, line 103) in 'bxor_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(b).
   (* Pre-condition for 'false' *)
@@ -226,7 +238,7 @@ Prove: b = a.
   Function bxor_bool with behavior true
 ------------------------------------------------------------
 
-Goal Post-condition for 'true' (file bitwise.i, line 97) in 'bxor_bool':
+Goal Post-condition for 'true' (file bitwise.i, line 100) in 'bxor_bool':
 Assume {
   Type: is_bool(a) /\ is_bool(b).
   (* Pre-condition for 'true' *)
@@ -239,97 +251,97 @@ Prove: b != a.
   Function cast_uchar
 ------------------------------------------------------------
 
-Goal Post-condition (file bitwise.i, line 131) in 'cast_uchar':
+Goal Post-condition (file bitwise.i, line 134) in 'cast_uchar':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_test,ok' (file bitwise.i, line 134):
+Goal Check 'bit_test,ok' (file bitwise.i, line 137):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_test1,ok' (file bitwise.i, line 135):
+Goal Check 'bit_test1,ok' (file bitwise.i, line 138):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_unset,ok' (file bitwise.i, line 136):
+Goal Check 'bit_unset,ok' (file bitwise.i, line 139):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_set_unset,ok' (file bitwise.i, line 137):
+Goal Check 'bit_set_unset,ok' (file bitwise.i, line 140):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_set_unset2,ok' (file bitwise.i, line 138):
+Goal Check 'bit_set_unset2,ok' (file bitwise.i, line 141):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_defined,ok' (file bitwise.i, line 140):
+Goal Check 'bit_defined,ok' (file bitwise.i, line 143):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_defined2,ok' (file bitwise.i, line 141):
+Goal Check 'bit_defined2,ok' (file bitwise.i, line 144):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_to_signed_positive,ok' (file bitwise.i, line 143):
+Goal Check 'bit_to_signed_positive,ok' (file bitwise.i, line 146):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_to_signed_positive2,ok' (file bitwise.i, line 144):
+Goal Check 'bit_to_signed_positive2,ok' (file bitwise.i, line 147):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_to_signed_negative,ok' (file bitwise.i, line 145):
+Goal Check 'bit_to_signed_negative,ok' (file bitwise.i, line 148):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_to_signed_negative2,ok' (file bitwise.i, line 146):
+Goal Check 'bit_to_signed_negative2,ok' (file bitwise.i, line 149):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_to_signed,ok' (file bitwise.i, line 147):
+Goal Check 'bit_to_signed,ok' (file bitwise.i, line 150):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_to_signed2,ok' (file bitwise.i, line 148):
+Goal Check 'bit_to_signed2,ok' (file bitwise.i, line 151):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_lsl_lowest,ok' (file bitwise.i, line 150):
+Goal Check 'bit_lsl_lowest,ok' (file bitwise.i, line 153):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_lsl_higher_set,ok' (file bitwise.i, line 151):
+Goal Check 'bit_lsl_higher_set,ok' (file bitwise.i, line 154):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_lsl_higher_unset,ok' (file bitwise.i, line 152):
+Goal Check 'bit_lsl_higher_unset,ok' (file bitwise.i, line 155):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_lsr_set,ok' (file bitwise.i, line 154):
+Goal Check 'bit_lsr_set,ok' (file bitwise.i, line 157):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'bit_lsr_unset,ok' (file bitwise.i, line 155):
+Goal Check 'bit_lsr_unset,ok' (file bitwise.i, line 158):
 Prove: true.
 
 ------------------------------------------------------------
@@ -337,36 +349,21 @@ Prove: true.
   Function lemma
 ------------------------------------------------------------
 
-Goal Check 'zbit,a1' (file bitwise.i, line 105):
+Goal Check 'zbit,a1' (file bitwise.i, line 108):
 Assume { Type: is_uint32(a). }
 Prove: (a + lnot(a)) = (-1).
 
 ------------------------------------------------------------
 
-Goal Check 'zbit,a2' (file bitwise.i, line 106):
+Goal Check 'zbit,a2' (file bitwise.i, line 109):
 Assume { Type: is_uint32(a). }
 Prove: lor(a, lnot(a)) = (-1).
 
 ------------------------------------------------------------
 
-Goal Check 'zbit,a3' (file bitwise.i, line 107):
+Goal Check 'zbit,a3' (file bitwise.i, line 110):
 Assume { Type: is_uint32(a). }
 Prove: land(a, lnot(a)) = 0.
-
-------------------------------------------------------------
-
-Goal Check (file bitwise.i, line 108):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Check (file bitwise.i, line 109):
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Check (file bitwise.i, line 110):
-Prove: true.
 
 ------------------------------------------------------------
 
@@ -380,25 +377,40 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'zbit,a4' (file bitwise.i, line 114):
+Goal Check (file bitwise.i, line 113):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check (file bitwise.i, line 114):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check (file bitwise.i, line 115):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Check 'zbit,a4' (file bitwise.i, line 117):
 Assume { Type: is_uint32(a) /\ is_uint32(b). }
 Prove: (land(a, b) % 256) = land(255, land(a, b)).
 
 ------------------------------------------------------------
 
-Goal Check (file bitwise.i, line 118):
+Goal Check (file bitwise.i, line 121):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Check 'zbit,a5' (file bitwise.i, line 120):
+Goal Check 'zbit,a5' (file bitwise.i, line 123):
 Let x = lsl(1, k).
 Assume { Type: is_uint32(a) /\ is_uint32(b) /\ is_uint32(k). }
 Prove: (land(77, land(a, b)) % x) = land(77, land(a, land(b, x - 1))).
 
 ------------------------------------------------------------
 
-Goal Check (file bitwise.i, line 124):
+Goal Check (file bitwise.i, line 127):
 Prove: true.
 
 ------------------------------------------------------------
@@ -406,7 +418,7 @@ Prove: true.
   Function lshift
 ------------------------------------------------------------
 
-Goal Post-condition (file bitwise.i, line 58) in 'lshift':
+Goal Post-condition (file bitwise.i, line 61) in 'lshift':
 Prove: true.
 
 ------------------------------------------------------------
@@ -435,7 +447,7 @@ Prove: true.
   Function rshift
 ------------------------------------------------------------
 
-Goal Post-condition (file bitwise.i, line 69) in 'rshift':
+Goal Post-condition (file bitwise.i, line 72) in 'rshift':
 Prove: true.
 
 ------------------------------------------------------------

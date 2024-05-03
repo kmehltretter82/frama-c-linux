@@ -1,5 +1,5 @@
 /* run.config_qualif
-   OPT: -wp -wp-prover Alt-Ergo
+   OPT: -wp
 */
 
 /*@

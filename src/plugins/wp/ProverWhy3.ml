@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -1413,10 +1413,11 @@ let editor_command pconf =
 
 let scriptfile ~force ~ext wpo =
   let dir = Wp_parameters.get_session_dir ~force "interactive" in
-  Filepath.Normalized.concat dir (wpo.Wpo.po_sid ^ ext)
+  let filenoext = Filepath.Normalized.concat dir wpo.Wpo.po_sid in
+  Filepath.Normalized.extend filenoext ext
 
 let updatescript ~script driver task =
-  let backup = Filepath.Normalized.concat script ".bak" in
+  let backup = Filepath.Normalized.extend script ".bak" in
   Filepath.rename script backup ;
   let old = open_in (backup :> string) in
   Command.pp_to_file script
