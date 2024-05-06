@@ -53,7 +53,6 @@ type extension_printer =
 
 (** type of functions that compare two extensions (with the same keyword)
     to decide if they're identical or not. See {!Ast_diff} for more information.
-
     @since Frama-C+dev
 *)
 type extension_same =
@@ -115,7 +114,6 @@ type extension_same =
     @before Frama-C+dev parameters [plugin] and [is_same_ext] were not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
-
 type register_extension =
   plugin:string -> string ->
   ?preprocessor:extension_preprocessor -> extension_typer ->
