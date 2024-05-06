@@ -93,6 +93,7 @@
 #include "syslog.h"
 #include "termios.h"
 #include "time.h"
+#include "trace.h"
 #include "uchar.h"
 #include "unistd.c"
 #include "unistd.h"

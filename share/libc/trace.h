@@ -28,6 +28,7 @@ __PUSH_FC_STDLIB
 #include "__fc_define_pthread_types.h"
 #include "__fc_define_size_t.h"
 #include "__fc_define_timespec.h"
+#include "limits.h"
 
 __BEGIN_DECLS
 
@@ -39,10 +40,6 @@ typedef struct __fc_trace_attr_t {
    int _fc ;
 } trace_attr_t;
 
-typedef struct __fc_trace_event_set_t {
-   int _fc ;
-} trace_event_set_t;
-
 struct posix_trace_event_info {
   trace_event_id_t posix_event_id;
   pid_t posix_pid;
@@ -51,6 +48,12 @@ struct posix_trace_event_info {
   struct timespec posix_timestamp;
   int posix_truncation_status;
 };
+
+typedef struct __fc_trace_event_set_t {
+   int _fc_trevset;
+} trace_event_set_t;
+
+extern trace_event_set_t __fc_cur_trace;
 
 struct posix_trace_status_info {
   int posix_stream_full_status;
@@ -103,135 +106,301 @@ struct posix_trace_status_info {
 #define POSIX_TRACE_UNTIL_FULL 27
 #define POSIX_TRACE_WOPID_EVENTS 28
 
-extern int posix_trace_attr_destroy(trace_attr_t *);
+/*@
+  assigns \result, *attr \from *attr;
+*/
+extern int posix_trace_attr_destroy(trace_attr_t *attr);
 
-extern int posix_trace_attr_getclockres(const trace_attr_t *,
-                                        struct timespec *);
+/*@
+  assigns \result, *resolution \from *attr;
+*/
+extern int posix_trace_attr_getclockres(const trace_attr_t *attr,
+                                        struct timespec *resolution);
 
-extern int posix_trace_attr_getcreatetime(const trace_attr_t *,
-                                          struct timespec *);
+/*@
+  assigns \result, *createtime \from *attr;
+*/
+extern int posix_trace_attr_getcreatetime(const trace_attr_t *attr,
+                                          struct timespec *createtime);
 
-extern int posix_trace_attr_getgenversion(const trace_attr_t *, char *);
+/*@
+  assigns \result, *genversion \from *attr;
+*/
+extern int posix_trace_attr_getgenversion(const trace_attr_t *attr,
+                                          char *genversion);
 
-extern int posix_trace_attr_getinherited(const trace_attr_t *restrict,
-                                         int *restrict);
+/*@
+  assigns \result, *inheritancepolicy \from *attr;
+*/
+extern int posix_trace_attr_getinherited(const trace_attr_t *restrict attr,
+                                         int *restrict inheritancepolicy);
 
-extern int posix_trace_attr_getlogfullpolicy(const trace_attr_t *restrict,
-                                             int *restrict);
+/*@
+  assigns \result, *logpolicy \from *attr;
+*/
+extern int posix_trace_attr_getlogfullpolicy(const trace_attr_t *restrict attr,
+                                             int *restrict logpolicy);
 
-extern int posix_trace_attr_getlogsize(const trace_attr_t *restrict,
-                                       size_t *restrict);
+/*@
+  assigns \result, *logsize \from *attr;
+*/
+extern int posix_trace_attr_getlogsize(const trace_attr_t *restrict attr,
+                                       size_t *restrict logsize);
 
-extern int posix_trace_attr_getmaxdatasize(const trace_attr_t *restrict,
-                                           size_t *restrict);
+/*@
+  assigns \result, *maxdatasize \from *attr;
+*/
+extern int posix_trace_attr_getmaxdatasize(const trace_attr_t *restrict attr,
+                                           size_t *restrict maxdatasize);
 
-extern int posix_trace_attr_getmaxsystemeventsize(const trace_attr_t *restrict,
-                                                  size_t *restrict);
+/*@
+  assigns \result, *eventsize \from *attr;
+*/
+extern int posix_trace_attr_getmaxsystemeventsize(const trace_attr_t *restrict attr,
+                                                  size_t *restrict eventsize);
 
-extern int posix_trace_attr_getmaxusereventsize(const trace_attr_t *restrict,
-                                                size_t, size_t *restrict);
+/*@
+  assigns \result, *eventsize \from *attr;
+*/
+extern int posix_trace_attr_getmaxusereventsize(const trace_attr_t *restrict attr,
+                                                size_t, size_t *restrict eventsize);
 
-extern int posix_trace_attr_getname(const trace_attr_t *, char *);
+/*@
+  assigns \result, tracename[0 .. TRACE_NAME_MAX-1] \from *attr;
+*/
+extern int posix_trace_attr_getname(const trace_attr_t *attr, char *tracename);
 
-extern int posix_trace_attr_getstreamfullpolicy(const trace_attr_t *restrict,
-                                                int *restrict);
+/*@
+  assigns \result, *streampolicy \from *attr;
+*/
+extern int posix_trace_attr_getstreamfullpolicy(const trace_attr_t *restrict attr,
+                                                int *restrict streampolicy);
 
-extern int posix_trace_attr_getstreamsize(const trace_attr_t *restrict,
-                                          size_t *restrict);
+/*@
+  assigns \result, *streamsize \from *attr;
+*/
+extern int posix_trace_attr_getstreamsize(const trace_attr_t *restrict attr,
+                                          size_t *restrict streamsize);
 
-extern int posix_trace_attr_init(trace_attr_t *);
+/*@
+  assigns \result, *attr \from *attr;
+*/
+extern int posix_trace_attr_init(trace_attr_t *attr);
 
-extern int posix_trace_attr_setinherited(trace_attr_t *, int);
+/*@
+  assigns \result, *attr \from inheritancepolicy;
+*/
+extern int posix_trace_attr_setinherited(trace_attr_t *attr, int inheritancepolicy);
 
-extern int posix_trace_attr_setlogfullpolicy(trace_attr_t *, int);
+/*@
+  assigns \result, *attr \from logpolicy;
+*/
+extern int posix_trace_attr_setlogfullpolicy(trace_attr_t *attr, int logpolicy);
 
-extern int posix_trace_attr_setlogsize(trace_attr_t *, size_t);
+/*@
+  assigns \result, *attr \from logsize;
+*/
+extern int posix_trace_attr_setlogsize(trace_attr_t *attr, size_t logsize);
 
-extern int posix_trace_attr_setmaxdatasize(trace_attr_t *, size_t);
+/*@
+  assigns \result, *attr \from maxdatasize;
+*/
+extern int posix_trace_attr_setmaxdatasize(trace_attr_t *attr, size_t maxdatasize);
 
-extern int posix_trace_attr_setname(trace_attr_t *, const char *);
+/*@
+  assigns \result, *attr \from tracename[0..];
+*/
+extern int posix_trace_attr_setname(trace_attr_t *attr, const char *tracename);
 
-extern int posix_trace_attr_setstreamfullpolicy(trace_attr_t *, int);
+/*@
+  assigns \result, *attr \from streampolicy;
+*/
+extern int posix_trace_attr_setstreamfullpolicy(trace_attr_t *attr, int streampolicy);
 
-extern int posix_trace_attr_setstreamsize(trace_attr_t *, size_t);
+/*@
+  assigns \result, *attr \from streamsize;
+*/
+extern int posix_trace_attr_setstreamsize(trace_attr_t *attr, size_t streamsize);
 
-extern int posix_trace_clear(trace_id_t);
+/*@
+  assigns \result \from trid;
+*/
+extern int posix_trace_clear(trace_id_t trid);
 
-extern int posix_trace_close(trace_id_t);
+/*@
+  assigns \result \from trid;
+*/
+extern int posix_trace_close(trace_id_t trid);
 
-extern int posix_trace_create(pid_t, const trace_attr_t *restrict,
-                              trace_id_t *restrict);
+/*@
+  assigns \result, *trid \from *attr, pid; //missing: system clock
+*/
+extern int posix_trace_create(pid_t pid, const trace_attr_t *restrict attr,
+                              trace_id_t *restrict trid);
 
-extern int posix_trace_create_withlog(pid_t, const trace_attr_t *restrict,
-                                      int, trace_id_t *restrict);
+/*@
+  allocates trid;
+  assigns \result, *trid \from *attr, pid, file_desc; //missing: system clock
+*/
+extern int posix_trace_create_withlog(pid_t pid, const trace_attr_t *restrict attr,
+                                      int file_desc, trace_id_t *restrict trid);
 
-extern void posix_trace_event(trace_event_id_t, const void *restrict, size_t);
+/*@
+  assigns __fc_cur_trace \from __fc_cur_trace, event_id,
+                               ((char*)data_ptr)[0 .. data_len - 1];
+*/
+extern void posix_trace_event(trace_event_id_t event_id,
+                              const void *restrict data_ptr, size_t data_len);
 
-extern int posix_trace_eventid_equal(trace_id_t, trace_event_id_t,
-                                     trace_event_id_t);
+/*@
+  assigns \result \from indirect:trid, indirect:event1, indirect:event2;
+*/
+extern int posix_trace_eventid_equal(trace_id_t trid, trace_event_id_t event1,
+                                     trace_event_id_t event2);
 
-extern int posix_trace_eventid_get_name(trace_id_t, trace_event_id_t, char *);
+/*@
+  assigns \result, event_name[0 .. TRACE_EVENT_NAME_MAX-1] \from trid, event;
+*/
+extern int posix_trace_eventid_get_name(trace_id_t trid, trace_event_id_t event,
+                                        char *event_name);
 
-extern int posix_trace_eventid_open(const char *restrict,
-                                    trace_event_id_t *restrict);
+/*@
+  assigns \result, *event_id \from event_name[0..];
+*/
+extern int posix_trace_eventid_open(const char *restrict event_name,
+                                    trace_event_id_t *restrict event_id);
 
-extern int posix_trace_eventset_add(trace_event_id_t, trace_event_set_t *);
+/*@
+  assigns \result, *set \from *set, event_id;
+*/
+extern int posix_trace_eventset_add(trace_event_id_t event_id, trace_event_set_t *set);
 
-extern int posix_trace_eventset_del(trace_event_id_t, trace_event_set_t *);
+/*@
+  assigns \result, *set \from *set, event_id;
+*/
+extern int posix_trace_eventset_del(trace_event_id_t event_id, trace_event_set_t *set);
 
-extern int posix_trace_eventset_empty(trace_event_set_t *);
+/*@
+  assigns \result, *set \from *set;
+*/
+extern int posix_trace_eventset_empty(trace_event_set_t *set);
 
-extern int posix_trace_eventset_fill(trace_event_set_t *, int);
+/*@
+  assigns \result, *set \from *set, what;
+*/
+extern int posix_trace_eventset_fill(trace_event_set_t *set, int what);
 
-extern int posix_trace_eventset_ismember(trace_event_id_t,
-                                         const trace_event_set_t *restrict,
-                                         int *restrict);
+/*@
+  assigns \result, *ismember \from event_id, *set;
+*/
+extern int posix_trace_eventset_ismember(trace_event_id_t event_id,
+                                         const trace_event_set_t *restrict set,
+                                         int *restrict ismember);
 
-extern int posix_trace_eventtypelist_getnext_id(trace_id_t,
-                                                trace_event_id_t *restrict,
-                                                int *restrict);
+/*@
+  assigns \result, *event, *unavailable \from trid;
+*/
+extern int posix_trace_eventtypelist_getnext_id(trace_id_t trid,
+                                                trace_event_id_t *restrict event,
+                                                int *restrict unavailable);
 
-int posix_trace_eventtypelist_rewind(trace_id_t);
+/*@
+  assigns \result \from trid;
+*/
+extern int posix_trace_eventtypelist_rewind(trace_id_t trid);
 
-extern int posix_trace_flush(trace_id_t);
+/*@
+  assigns \result \from trid;
+*/
+extern int posix_trace_flush(trace_id_t trid);
 
-extern int posix_trace_get_attr(trace_id_t, trace_attr_t *);
+/*@
+  assigns \result, *attr \from trid;
+*/
+extern int posix_trace_get_attr(trace_id_t trid, trace_attr_t *attr);
 
-extern int posix_trace_get_filter(trace_id_t, trace_event_set_t *);
+/*@
+  assigns \result, *set \from trid;
+*/
+extern int posix_trace_get_filter(trace_id_t trid, trace_event_set_t *set);
 
-extern int posix_trace_get_status(trace_id_t,
-                                  struct posix_trace_status_info *);
+/*@
+  assigns \result, *statusinfo \from trid;
+*/
+extern int posix_trace_get_status(trace_id_t trid,
+                                  struct posix_trace_status_info *statusinfo);
 
-extern int posix_trace_getnext_event(trace_id_t,
-                                     struct posix_trace_event_info *restrict,
-                                     void *restrict, size_t, size_t *restrict,
-                                     int *restrict);
+/*@
+  assigns \result, *event, ((char*)data)[0..num_bytes-1], *data_len,
+          *unavailable
+    \from trid;
+*/
+extern int posix_trace_getnext_event(trace_id_t trid,
+                                     struct posix_trace_event_info *restrict event,
+                                     void *restrict data, size_t num_bytes,
+                                     size_t *restrict data_len,
+                                     int *restrict unavailable);
 
-extern int posix_trace_open(int, trace_id_t *);
+/*@
+  assigns \result, *trid \from file_desc;
+*/
+extern int posix_trace_open(int file_desc, trace_id_t *trid);
 
-extern int posix_trace_rewind(trace_id_t);
+/*@
+  assigns \result \from trid;
+*/
+extern int posix_trace_rewind(trace_id_t trid);
 
-extern int posix_trace_set_filter(trace_id_t, const trace_event_set_t *, int);
+/*@
+  assigns \result \from trid, *set, how;
+*/
+extern int posix_trace_set_filter(trace_id_t trid, const trace_event_set_t *set,
+                                  int how);
 
-extern int posix_trace_shutdown(trace_id_t);
+/*@
+  assigns \result \from trid;
+*/
+extern int posix_trace_shutdown(trace_id_t trid);
 
-extern int posix_trace_start(trace_id_t);
+/*@
+  assigns \result \from trid;
+*/
+extern int posix_trace_start(trace_id_t trid);
 
-extern int posix_trace_stop(trace_id_t);
+/*@
+  assigns \result \from trid;
+*/
+extern int posix_trace_stop(trace_id_t trid);
 
-extern int posix_trace_timedgetnext_event(trace_id_t,
+/*@
+  assigns \result, *event, ((char*)data)[0..num_bytes-1], *data_len, *unavailable
+    \from trid, *abstime;
+*/
+extern int posix_trace_timedgetnext_event(trace_id_t trid,
                                           struct posix_trace_event_info
-                                          *restrict, void *restrict, size_t,
-                                          size_t *restrict, int *restrict,
-                                          const struct timespec *restrict);
+                                          *restrict event, void *restrict data,
+                                          size_t num_bytes,
+                                          size_t *restrict data_len,
+                                          int *restrict unavailable,
+                                          const struct timespec *restrict abstime);
 
-extern int posix_trace_trid_eventid_open(trace_id_t, const char *restrict,
-                                         trace_event_id_t *restrict);
+/*@
+  assigns \result, *event \from event_name[0..], trid;
+*/
+extern int posix_trace_trid_eventid_open(trace_id_t trid,
+                                         const char *restrict event_name,
+                                         trace_event_id_t *restrict event);
 
-extern int posix_trace_trygetnext_event(trace_id_t,
+/*@
+  assigns \result, *event, ((char*)data)[0..num_bytes-1], *data_len,
+    *unavailable \from trid;
+*/
+extern int posix_trace_trygetnext_event(trace_id_t trid,
                                         struct posix_trace_event_info
-                                        *restrict, void *restrict, size_t,
-                                        size_t *restrict, int *restrict);
+                                        *restrict event, void *restrict data,
+                                        size_t num_bytes,
+                                        size_t *restrict data_len,
+                                        int *restrict unavailable);
 
 __END_DECLS
 
