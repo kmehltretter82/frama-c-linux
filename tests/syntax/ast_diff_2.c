@@ -102,3 +102,13 @@ void se() {
   struct s S;
   S.c[0] = 1;
 }
+
+void with_loop_unroll_same() {
+  //@ loop unroll 5;
+  for (int i = 0; i < 5; i++);
+}
+
+void with_loop_unroll_diff() {
+  //@ loop unroll 5;
+  for (int i = 0; i < 5; i++);
+}

@@ -51,11 +51,15 @@ type extension_printer =
   Printer_api.extensible_printer_type -> Format.formatter ->
   acsl_extension_kind -> unit
 
+(** type of functions that compare two extensions (with the same keyword)
+    to decide if they're identical or not. See {!Ast_diff} for more information.
+    @since Frama-C+dev
+*)
+type extension_same =
+  acsl_extension_kind -> acsl_extension_kind -> Ast_diff.is_same_env -> bool
 
-(** [register_behavior
-      ~plugin name ~preprocessor typer ~visitor ~printer ~short_printer status]
-    registers new ACSL extension to be used in function contracts with name
-    [name] and plugin [plugin].
+(** type of functions that register new ACSL extensions to be used in place of
+    various kinds of ACSL annotations.
 
     The labelled parameter [plugin] is used to specify which plugin registers
     this new extension. It can be used, together with the syntax
@@ -84,6 +88,11 @@ type extension_printer =
     behavior for the ACSL extension. By default, it just prints the [name]. It
     is for example used for the filetree in the GUI.
 
+    The optional [is_same_ext] parameter allows checking whether two versions
+    of the extended annotation are identical or not during a run of
+    {!Ast_diff.compare_ast}. By default, [Ast_diff] will compare the lists
+    of terms/predicates.
+
     The [status] indicates whether the extension can be assigned a property
     status or not.
 
@@ -100,89 +109,47 @@ type extension_printer =
       | [] -> let id = !count in incr count; Ext_id id
       | _ -> typing_context.error loc "expecting a predicate after keyword FOO"
     let () =
-      Acsl_extension.register_behavior ~pugin:"myplugin" "FOO" foo_typer false
+      Acsl_extension.register_behavior ~plugin:"myplugin" "FOO" foo_typer false
     ]
-    @before Frama-C+dev the parameter [plugin] was not present
+    @before Frama-C+dev parameters [plugin] and [is_same_ext] were not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
-val register_behavior:
+type register_extension =
   plugin:string -> string ->
   ?preprocessor:extension_preprocessor -> extension_typer ->
   ?visitor:extension_visitor ->
-  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
+  ?printer:extension_printer -> ?short_printer:extension_printer ->
+  ?is_same_ext:extension_same -> bool ->
   unit
 
-(** Registers extension for global annotation. See {!register_behavior}.
-
-    @before Frama-C+dev the parameter [plugin] was not present
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
-*)
-val register_global:
-  plugin:string -> string ->
-  ?preprocessor:extension_preprocessor -> extension_typer ->
-  ?visitor:extension_visitor ->
-  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
-  unit
-
-(** Registers extension for global block annotation. See {!register_behavior}.
-
-    @before Frama-C+dev the parameter [plugin] was not present
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
-*)
-val register_global_block:
-  plugin:string -> string ->
+(** same as {!register_extension}, but for extensions that parse an axiomatic
+    block, resulting in a {!Cil_types.Ext_annot}. *)
+type register_extension_block =
+  plugin: string -> string ->
   ?preprocessor:extension_preprocessor_block -> extension_typer_block ->
   ?visitor:extension_visitor ->
-  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
-  unit
+  ?printer:extension_printer -> ?short_printer:extension_printer ->
+  ?is_same_ext:extension_same -> bool -> unit
+
+(** Register a behavior extension, i.e. new clauses of contracts *)
+val register_behavior: register_extension
+
+(** Register extension for global annotation. *)
+val register_global: register_extension
+
+(** Registers extension for global block annotation. *)
+val register_global_block: register_extension_block
 
 (** Registers extension for code annotation to be evaluated at _current_
-    program point. See {!register_behavior}.
-
-    @before Frama-C+dev the parameter [plugin] was not present
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
-*)
-val register_code_annot:
-  plugin:string -> string ->
-  ?preprocessor:extension_preprocessor -> extension_typer ->
-  ?visitor:extension_visitor ->
-  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
-  unit
+    program point. *)
+val register_code_annot: register_extension
 
 (** Registers extension for code annotation to be evaluated for the _next_
-    statement. See {!register_behavior}.
+    statement. *)
+val register_code_annot_next_stmt: register_extension
 
-    @before Frama-C+dev the parameter [plugin] was not present
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
-*)
-val register_code_annot_next_stmt:
-  plugin:string -> string ->
-  ?preprocessor:extension_preprocessor -> extension_typer ->
-  ?visitor:extension_visitor ->
-  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
-  unit
+(** Registers extension for loop annotation. *)
+val register_code_annot_next_loop: register_extension
 
-(** Registers extension for loop annotation. See {!register_behavior}.
-
-    @before Frama-C+dev the parameter [plugin] was not present
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
-*)
-val register_code_annot_next_loop:
-  plugin:string -> string ->
-  ?preprocessor:extension_preprocessor -> extension_typer ->
-  ?visitor:extension_visitor ->
-  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
-  unit
-
-(** Registers extension both for code and loop annotations.
-    See {!register_behavior}.
-
-    @before Frama-C+dev the parameter [plugin] was not present
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
-*)
-val register_code_annot_next_both:
-  plugin:string -> string ->
-  ?preprocessor:extension_preprocessor -> extension_typer ->
-  ?visitor:extension_visitor ->
-  ?printer:extension_printer -> ?short_printer:extension_printer -> bool ->
-  unit
+(** Registers extension both for code and loop annotations. *)
+val register_code_annot_next_both: register_extension

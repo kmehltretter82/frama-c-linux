@@ -1,4 +1,6 @@
 /* run.config
+   COMMENT: we need Eva for the loop unroll ACSL extension
+   PLUGIN: eva
    MODULE: @PTEST_NAME@
      OPT: -then -ast-diff %{dep:ast_diff_2.c}
      OPT: -then -ast-diff %{dep:ast_diff_2.c} -cpp-extra-args="-DADD_ENUM_TAG"
@@ -106,4 +108,14 @@ struct s { char c[t]; };
 void se() {
   struct s S;
   S.c[0] = 1;
+}
+
+void with_loop_unroll_same() {
+  //@ loop unroll 5;
+  for (int i = 0; i < 5; i++);
+}
+
+void with_loop_unroll_diff() {
+  //@ loop unroll 4;
+  for (int i = 0; i < 5; i++);
 }

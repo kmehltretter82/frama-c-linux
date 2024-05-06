@@ -37,6 +37,24 @@ type extension_visitor =
 type extension_printer =
   Printer_api.extensible_printer_type -> Format.formatter ->
   acsl_extension_kind -> unit
+type extension_same =
+  acsl_extension_kind -> acsl_extension_kind -> Ast_diff.is_same_env -> bool
+
+type register_extension =
+  plugin:string -> string ->
+  ?preprocessor:extension_preprocessor -> extension_typer ->
+  ?visitor:extension_visitor ->
+  ?printer:extension_printer -> ?short_printer:extension_printer ->
+  ?is_same_ext:extension_same -> bool ->
+  unit
+
+type register_extension_block =
+  plugin: string -> string ->
+  ?preprocessor:extension_preprocessor_block -> extension_typer_block ->
+  ?visitor:extension_visitor ->
+  ?printer:extension_printer -> ?short_printer:extension_printer ->
+  ?is_same_ext:extension_same -> bool -> unit
+
 type extension_single = {
   preprocessor: extension_preprocessor ;
   typer: extension_typer ;
@@ -53,6 +71,7 @@ type extension_common = {
   printer: extension_printer ;
   short_printer: extension_printer ;
   plugin: string;
+  is_same_ext: extension_same;
 }
 
 let default_printer printer fmt = function
@@ -64,6 +83,19 @@ let default_printer printer fmt = function
 
 let default_short_printer name _printer fmt _ext_kind = Format.fprintf fmt "%s" name
 
+let rec default_is_same_ext ext1 ext2 env =
+  match ext1, ext2 with
+  | Ext_id n1, Ext_id n2 -> n1 = n2
+  | Ext_terms l1, Ext_terms l2 ->
+    Ast_diff.is_same_list Ast_diff.is_same_term l1 l2 env
+  | Ext_preds l1, Ext_preds l2 ->
+    Ast_diff.is_same_list Ast_diff.is_same_predicate l1 l2 env
+  | Ext_annot(s1,l1), Ext_annot(s2,l2) ->
+    s1 = s2 && Ast_diff.is_same_list default_is_same_ext_kind l1 l2 env
+  | (Ext_id _ | Ext_terms _ | Ext_preds _ | Ext_annot _), _ -> false
+and default_is_same_ext_kind ext1 ext2 env =
+  default_is_same_ext ext1.ext_kind ext2.ext_kind env
+
 let make
     ~plugin
     name category
@@ -72,9 +104,10 @@ let make
     ?(visitor=fun _ _ -> Cil.DoChildren)
     ?(printer=default_printer)
     ?(short_printer=default_short_printer name)
+    ?(is_same_ext=default_is_same_ext)
     status : extension_single*extension_common =
   { preprocessor; typer; status},
-  { category; visitor; printer; short_printer; plugin }
+  { category; visitor; printer; short_printer; plugin; is_same_ext }
 
 let make_block
     ~plugin
@@ -84,9 +117,10 @@ let make_block
     ?(visitor=fun _ _ -> Cil.DoChildren)
     ?(printer=default_printer)
     ?(short_printer=default_short_printer name)
+    ?(is_same_ext=default_is_same_ext)
     status : extension_block*extension_common =
   { preprocessor; typer; status},
-  { category; visitor; printer; short_printer; plugin }
+  { category; visitor; printer; short_printer; plugin; is_same_ext }
 
 module Extensions = struct
   (*hash table for  category, visitor, printer and short_printer of extensions*)
@@ -119,10 +153,10 @@ module Extensions = struct
   let is_extension_block = Hashtbl.mem ext_block_tbl
 
   let register cat ~plugin name
-      ?preprocessor typer ?visitor ?printer ?short_printer status =
+      ?preprocessor typer ?visitor ?printer ?short_printer ?is_same_ext status =
     let info1,info2 =
       make ~plugin name cat ?preprocessor typer
-        ?visitor ?printer ?short_printer status
+        ?visitor ?printer ?short_printer ?is_same_ext status
     in
     if is_extension name then
       Kernel.warning ~wkey:Kernel.wkey_acsl_extension
@@ -135,10 +169,10 @@ module Extensions = struct
       end
 
   let register_block cat ~plugin name
-      ?preprocessor typer ?visitor ?printer ?short_printer status =
+      ?preprocessor typer ?visitor ?printer ?short_printer ?is_same_ext status =
     let info1,info2 =
       make_block ~plugin name cat ?preprocessor typer
-        ?visitor ?printer ?short_printer status
+        ?visitor ?printer ?short_printer ?is_same_ext status
     in
     if is_extension name then
       Kernel.warning ~wkey:Kernel.wkey_acsl_extension
@@ -207,6 +241,10 @@ module Extensions = struct
     let pp = (find_common name).short_printer in
     Format.fprintf fmt "%a" (pp printer) kind
 
+  let is_same_ext name ext1 ext2 =
+    let is_same = (find_common name).is_same_ext in
+    is_same ext1 ext2
+
   let extension_from name = (find_common name).plugin
 end
 
@@ -245,4 +283,6 @@ let () =
     ~visit: Extensions.visit ;
   Cil_printer.set_extension_handler
     ~print: Extensions.print
-    ~short_print:Extensions.short_print
+    ~short_print:Extensions.short_print;
+  Ast_diff.set_extension_diff
+    ~is_same_ext: Extensions.is_same_ext
