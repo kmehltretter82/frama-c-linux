@@ -6150,7 +6150,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
             warning
               ~wkey:Kernel.wkey_int_conversion
               ~current:true
-              "Integer compatibily is machine-dependent : %a and %a\n"
+              "Integer compatibility is machine-dependent: %a and %a\n"
               Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t;
             result k oldk
           end
