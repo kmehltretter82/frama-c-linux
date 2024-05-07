@@ -89,6 +89,7 @@ type mach = {
   filename_max: string;
   host_name_max: string;
   tty_name_max: string;
+  l_ctermid: string;
   l_tmpnam: string;
   path_max: string;
   tmp_max: string;
@@ -156,6 +157,7 @@ let dummy = {
   path_max = "256";
   tty_name_max = "255";
   host_name_max = "255";
+  l_ctermid = "16";
   l_tmpnam = "63";
   tmp_max = "1024";
   rand_max = "0xFFFFFFFE";
@@ -200,8 +202,10 @@ module Machdep = struct
        char_is_unsigned=%b;little_endian=%b;has__builtin_va_list=%b;\
        compiler=%s;cpp_arch_flags=%a;version=%s;weof=%s;wordsize=%s;\
        posix_version=%s;bufsiz=%s;eof=%s;fopen_max=%s;filename_max=%s;\
-       path_max=%s;tty_name_max=%s;host_name_max=%s;l_tmpnam=%s;tmp_max=%s;\
-       rand_max=%s;mb_cur_max=%s;nsig=%s;errno=%a;machdep_name=%s;custom_defs=%a}"
+       path_max=%s;tty_name_max=%s;host_name_max=%s;l_ctermid=%s;\
+       l_tmpnam=%s;tmp_max=%s;\
+       rand_max=%s;mb_cur_max=%s;nsig=%s;errno=%a;machdep_name=%s;\
+       custom_defs=%a}"
       mach.sizeof_short
       mach.sizeof_int
       mach.sizeof_long
@@ -257,6 +261,7 @@ module Machdep = struct
       mach.path_max
       mach.tty_name_max
       mach.host_name_max
+      mach.l_ctermid
       mach.l_tmpnam
       mach.tmp_max
       mach.rand_max
@@ -598,6 +603,7 @@ let gen_all_defines fmt ?(censored_macros=Datatype.String.Set.empty) mach =
   gen_define_macro fmt "__FC_EOF" mach.eof;
   gen_define_macro fmt "__FC_FOPEN_MAX" mach.fopen_max;
   gen_define_macro fmt "__FC_FILENAME_MAX" mach.filename_max;
+  gen_define_macro fmt "__FC_L_ctermid" mach.l_ctermid;
   gen_define_macro fmt "__FC_L_tmpnam" mach.l_tmpnam;
   gen_define_macro fmt "__FC_TMP_MAX" mach.tmp_max;
   gen_define_macro fmt "__FC_RAND_MAX" mach.rand_max;

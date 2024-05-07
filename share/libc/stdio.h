@@ -51,6 +51,11 @@ __PUSH_FC_STDLIB
 #endif
 #define L_tmpnam __FC_L_tmpnam
 
+#ifndef __FC_L_ctermid
+#error machdep should have defined __FC_L_ctermid!
+#endif
+#define L_ctermid __FC_L_ctermid
+
 #include "__fc_define_seek_macros.h"
 
 #define TMP_MAX __FC_TMP_MAX
@@ -573,15 +578,43 @@ extern int ferror_unlocked(FILE *stream);
 */
 extern int fileno_unlocked(FILE *stream);
 
+/*@
+  assigns \result \from indirect:*stream;
+*/
 extern int fflush_unlocked(FILE *stream);
+
+/*@
+  assigns \result \from indirect:*stream;
+*/
 extern int fgetc_unlocked(FILE *stream);
+
+/*@
+  assigns \result \from c, indirect:*stream;
+*/
 extern int fputc_unlocked(int c, FILE *stream);
+
+/*@
+  assigns \result, ((char*)ptr)[0 .. (n * size)-1] \from indirect:size,
+    indirect:n, indirect:*stream;
+*/
 extern size_t fread_unlocked(void *ptr, size_t size, size_t n,
                              FILE *stream);
-extern size_t fwrite_unlocked(const void *ptr, size_t size, size_t n,
-		       FILE *stream);
 
+/*@
+  assigns \result \from indirect:((char*)ptr)[0 .. (n * size)-1], indirect:size,
+    indirect:n, indirect:*stream;
+*/
+extern size_t fwrite_unlocked(const void *ptr, size_t size, size_t n,
+                              FILE *stream);
+
+/*@
+  assigns \result, s[0 .. n-1] \from indirect:*stream;
+*/
 extern char *fgets_unlocked(char *s, int n, FILE *stream);
+
+/*@
+  assigns \result \from indirect:s[0..], indirect:*stream;
+*/
 extern int fputs_unlocked(const char *s, FILE *stream);
 
 extern int dprintf(int fd, const char *restrict format, ...);
@@ -672,6 +705,26 @@ extern int asprintf(char **strp, const char *fmt, ...);
 */
 extern int vasprintf(char **restrict strp, const char *restrict fmt,
                      va_list ap);
+
+char __fc_ctermid[L_ctermid];
+char* const __fc_p_ctermid = __fc_ctermid;
+
+/*@
+  assigns \result \from __fc_p_ctermid, s;
+  assigns __fc_ctermid[0..] \from __fc_ctermid[0..];
+*/
+extern char *ctermid(char *s);
+
+// Note: since L_cuserid has been removed from POSIX since Issue 6,
+// we will not add it to our machdep.
+char __fc_cuserid[9];
+char* const __fc_p_cuserid = __fc_cuserid;
+
+/*@
+  assigns \result \from __fc_p_cuserid, s;
+  assigns __fc_cuserid[0..] \from __fc_cuserid[0..];
+*/
+extern char *cuserid(char *s);
 
 __END_DECLS
 

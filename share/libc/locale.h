@@ -154,9 +154,23 @@ extern struct lconv *localeconv(void);
   assigns *\result \from *locobj;
  */
 extern locale_t duplocale(locale_t locobj);
-extern void freelocale(locale_t);
-extern locale_t newlocale(int, const char *, locale_t);
-extern locale_t uselocale(locale_t);
+
+/*@
+  frees locobj;
+  assigns \nothing;
+*/
+extern void freelocale(locale_t locobj);
+
+/*@
+  allocates \result;
+  assigns *\result \from mask, *locale, *base;
+ */
+extern locale_t newlocale(int mask, const char *locale, locale_t base);
+
+/*@
+  assigns \result \from *newloc;
+ */
+extern locale_t uselocale(locale_t newloc);
 
 __END_DECLS
 

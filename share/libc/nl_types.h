@@ -30,9 +30,26 @@ typedef unsigned long nl_catd;
 typedef unsigned long nl_item;
 #define NL_SETD 1
 #define NL_CAT_LOCALE 1
-extern int       catclose(nl_catd);
-extern char     *catgets(nl_catd, int, int, const char *);
-extern nl_catd   catopen(const char *, int);
+
+/*@
+  assigns \result \from catd;
+*/
+extern int catclose(nl_catd catd);
+
+char __fc_catgets[256]; // arbitrary size
+char* const __fc_p_catgets = __fc_catgets;
+
+/*@
+  assigns \result \from __fc_p_catgets, s, indirect:catd, indirect:set_id,
+  indirect:msg_id;
+  assigns __fc_catgets[0..] \from __fc_catgets[0..];
+*/
+extern char *catgets(nl_catd catd, int set_id, int msg_id, const char *s);
+
+/*@
+  assigns \result \from name[0..], oflag;
+*/
+extern nl_catd catopen(const char *name, int oflag);
 
 __END_DECLS
 

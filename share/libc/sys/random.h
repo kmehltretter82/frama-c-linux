@@ -29,10 +29,16 @@ __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
 
-extern ssize_t getrandom (void *__buffer, size_t __length,
-                          unsigned int __flags);
+/*@
+  assigns \result, ((char*)buffer)[0 .. length-1] \from flags;
+*/
+extern ssize_t getrandom (void *buffer, size_t length,
+                          unsigned int flags);
 
-extern int getentropy (void *__buffer, size_t __length);
+/*@
+  assigns \result, ((char*)buffer)[0 .. length-1] \from \nothing;
+*/
+extern int getentropy (void *buffer, size_t length);
 
 // Non-POSIX
 #define GRND_NONBLOCK 0x01

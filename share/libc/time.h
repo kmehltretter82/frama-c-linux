@@ -197,9 +197,17 @@ extern size_t strftime(char * restrict s,
                        const struct tm * restrict tm);
 
 /* POSIX */
-extern char *asctime_r(const struct tm *restrict, char *restrict);
+/*@
+  assigns \result \from buf;
+  assigns buf[0..] \from indirect:*tm; //missing: \from 'system clock'
+*/
+extern char *asctime_r(const struct tm *restrict tm, char *restrict buf);
 
-extern int clock_getres(clockid_t, struct timespec *);
+/*@
+  assigns \result \from indirect:clock_id; //missing: \from 'clock'
+  assigns *res \from indirect:clock_id; //missing: \from 'clock'
+*/
+extern int clock_getres(clockid_t clock_id, struct timespec *res);
 
 /*@
   requires tp: \valid(tp);
@@ -294,8 +302,27 @@ extern int clock_gettime(clockid_t clk_id, struct timespec *tp);
 extern int clock_nanosleep(clockid_t clock_id, int flags,
                            const struct timespec *rqtp, struct timespec *rmtp);
 
-extern int clock_settime(clockid_t, const struct timespec *);
+/*@
+  assigns \result \from clock_id, *tp;
+*/
+extern int clock_settime(clockid_t clock_id, const struct timespec *tp);
+
+/*@
+  assigns \result \from buf;
+  assigns *buf \from *timep;
+*/
 extern char *ctime_r(const time_t *timep, char *buf);
+
+extern int getdate_err;
+
+struct tm __fc_getdate;
+struct tm * const __fc_p_getdate = &__fc_getdate;
+
+/*@
+  assigns \result \from __fc_p_getdate;
+  assigns __fc_getdate \from __fc_getdate;
+  assigns getdate_err \from string[0..];
+*/
 extern struct tm *getdate(const char *string);
 
 /*@
@@ -348,15 +375,41 @@ extern int nanosleep(const struct timespec *rqtp, struct timespec *rmtp);
 // locale_t, timer_t
 //extern size_t strftime_l(char *restrict, size_t, const char *restrict,
 //                         const struct tm *restrict, locale_t);
-extern char *strptime(const char *restrict s, const char *restrict format,
+
+/*@
+  assigns \result \from buf, indirect:buf[0..], indirect:format[0..];
+  assigns *tm \from indirect:buf[0..], indirect:format[0..];
+*/
+extern char *strptime(const char *restrict buf, const char *restrict format,
                       struct tm *restrict tm);
-extern int timer_create(clockid_t, struct sigevent *restrict,
-                        timer_t *restrict);
-extern int timer_delete(timer_t);
-extern int timer_getoverrun(timer_t);
-extern int timer_gettime(timer_t, struct itimerspec *);
-extern int timer_settime(timer_t, int, const struct itimerspec *restrict,
-                         struct itimerspec *restrict);
+
+/*@
+  assigns \result, *evp, *timerid \from clockid; //missing: assigns clock
+*/
+extern int timer_create(clockid_t clockid, struct sigevent *restrict evp,
+                        timer_t *restrict timerid);
+
+/*@
+  assigns \result \from indirect:timerid; //missing: assigns clock
+*/
+extern int timer_delete(timer_t timerid);
+
+/*@
+  assigns \result \from timerid;
+*/
+extern int timer_getoverrun(timer_t timerid);
+
+/*@
+  assigns \result, *value \from timerid;
+*/
+extern int timer_gettime(timer_t timerid, struct itimerspec *value);
+
+/*@
+  assigns \result, *ovalue \from timerid, flags, *value;
+*/
+extern int timer_settime(timer_t timerid, int flags,
+                         const struct itimerspec *restrict value,
+                         struct itimerspec *restrict ovalue);
 
 extern int daylight;
 extern long timezone;

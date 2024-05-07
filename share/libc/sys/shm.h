@@ -56,10 +56,27 @@ struct shmid_ds {
   time_t shm_ctime;
 };
 
-extern void *shmat(int, const void *, int);
-extern int   shmctl(int, int, struct shmid_ds *);
-extern int   shmdt(const void *);
-extern int   shmget(key_t, size_t, int);
+/*@
+  allocates \result;
+  assigns \result \from indirect:shmid, shmaddr, indirect:shmflg;
+*/
+extern void *shmat(int shmid, const void *shmaddr, int shmflg);
+
+/*@
+  assigns \result, *buf \from shmid, cmd;
+*/
+extern int shmctl(int shmid, int cmd, struct shmid_ds *buf);
+
+/*@
+  frees shmaddr;
+  assigns \result \from shmaddr;
+*/
+extern int shmdt(const void *shmaddr);
+
+/*@
+  assigns \result \from key, size, shmflg;
+*/
+extern int shmget(key_t key, size_t size, int shmflg);
 
 __END_DECLS
 __POP_FC_STDLIB

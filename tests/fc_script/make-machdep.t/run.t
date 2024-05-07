@@ -149,6 +149,7 @@
   int_fast32_t: long
   int_fast64_t: long
   intptr_t: long
+  l_ctermid: '9'
   l_tmpnam: '20'
   little_endian: true
   machdep_name: anonymous_machdep

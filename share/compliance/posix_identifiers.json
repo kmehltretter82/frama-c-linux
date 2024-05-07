@@ -862,7 +862,7 @@
         "ctlbuf": {"id_type":"field", "header":"stropts.h", "extensions":[]},
         "cuid": {"id_type":"field", "header":"sys/ipc.h", "extensions":[]},
         "currency_symbol": {"id_type":"field", "header":"locale.h", "extensions":[]},
-        "cuserid": {"id_type":"function", "header":"stdint.h", "extensions":["REM"]},
+        "cuserid": {"id_type":"function", "header":"stdio.h", "extensions":["REM"]},
         "D_FMT": {"id_type":"constant", "header":"langinfo.h", "extensions":[]},
         "d_ino": {"id_type":"field", "header":"dirent.h", "extensions":["XSI"]},
         "d_name": {"id_type":"field", "header":"dirent.h", "extensions":[]},

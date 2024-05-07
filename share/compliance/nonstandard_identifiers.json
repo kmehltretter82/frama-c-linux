@@ -11,6 +11,7 @@
         "facilitynames": {"header":"syslog.h"},
         "freeifaddrs": {"header":"ifaddrs.h"},
         "freeifmaddrs": {"header":"ifaddrs.h"},
+        "getdtablesize": {"header":"unistd.h"},
         "getifaddrs": {"header":"ifaddrs.h"},
         "getifmaddrs": {"header":"ifaddrs.h"},
         "getresgid": {"header":"unistd.h"},
@@ -28,6 +29,8 @@
         "strcspn": {"header":"string.h"},
         "strlcat": {"header":"string.h"},
         "strlcpy": {"header":"string.h"},
+        "timex": {"header":"sys/timex.h"},
+        "ualarm": {"header":"unistd.h"},
         "utmp": {"header":"tmp.h"},
         "wcslcat": {"header":"wchar.h"},
         "wcslcpy": {"header":"wchar.h"}

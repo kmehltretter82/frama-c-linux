@@ -57,7 +57,7 @@ struct passwd __fc_pwd =
    .pw_dir = __fc_getpw_pw_dir,
    .pw_shell = __fc_getpw_pw_shell};
 
-struct passwd *__fc_p_pwd = & __fc_pwd;
+struct passwd * const __fc_p_pwd = &__fc_pwd;
 
 /*@
   // missing: may assign to errno: EIO, EINTR, EMFILE, ENFILE
@@ -119,7 +119,7 @@ struct passwd __fc_pwent;
 /*@
   assigns __fc_pwent \from __fc_pwent;
 */
-extern void           endpwent(void);
+extern void endpwent(void);
 
 /*@
   assigns __fc_pwent \from __fc_pwent;
@@ -130,7 +130,7 @@ extern struct passwd *getpwent(void);
 /*@
   assigns __fc_pwent \from __fc_pwent;
 */
-extern void           setpwent(void);
+extern void setpwent(void);
 
 __END_DECLS
 

@@ -63,10 +63,20 @@ struct sembuf {
   short sem_flg;
 };
 
+/*@
+  assigns \result \from semid, semnum, cmd;
+  //missing: assigns <optional 4th argument>
+*/
 extern int semctl(int semid, int semnum, int cmd, ...);
 
+/*@
+  assigns \result \from key, nsems, semflg;
+*/
 extern int semget(key_t key, int nsems, int semflg);
 
+/*@
+  assigns \result \from semid, *sops, nsops;
+*/
 extern int semop(int semid, struct sembuf *sops, size_t nsops);
 
 __END_DECLS

@@ -314,7 +314,7 @@ extern void srandom(unsigned int seed);
 int __fc_random48_init;
 
 __FC_EXTERN unsigned short __fc_random48_counter[3];
-unsigned short *__fc_p_random48_counter = __fc_random48_counter;
+unsigned short * const __fc_p_random48_counter = __fc_random48_counter;
 
 /*@
   assigns __fc_random48_counter[0..2] \from seed;

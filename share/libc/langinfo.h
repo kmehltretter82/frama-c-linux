@@ -154,7 +154,19 @@ enum
 #define CRNCYSTR CRNCYSTR
 };
 
+char __fc_langinfo[64];
+char* const __fc_p_langinfo = __fc_langinfo;
+
+/*@
+  assigns \result \from __fc_p_langinfo, indirect:item;
+  assigns __fc_langinfo[0..] \from __fc_langinfo[0..];
+*/
 extern char *nl_langinfo(nl_item item);
+
+/*@
+  assigns \result \from __fc_p_langinfo, indirect:item, indirect:locale;
+  assigns __fc_langinfo[0..] \from __fc_langinfo[0..];
+*/
 extern char *nl_langinfo_l(nl_item item, locale_t locale);
 
 __END_DECLS

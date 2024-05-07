@@ -191,6 +191,12 @@ intptr_t:
 
   type: string
 
+l_ctermid:
+
+  description: value of 'L_ctermid' macro
+
+  type: string
+
 l_tmpnam:
 
   description: value of 'L_tmpnam' macro

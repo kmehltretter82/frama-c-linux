@@ -53,8 +53,14 @@ enum {
 #define ST_NOSUID    ST_NOSUID
 };
 
+/*@
+  assigns \result, *buf \from fildes;
+*/
 extern int fstatvfs(int fildes, struct statvfs *buf);
 
+/*@
+  assigns \result, *buf \from path[0..];
+*/
 extern int statvfs(const char *restrict path, struct statvfs *restrict buf);
 
 __END_DECLS
