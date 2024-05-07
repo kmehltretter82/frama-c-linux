@@ -662,17 +662,19 @@ let () =
    other unused globals according to relevant command-line parameters.
    This function is meant to be passed to {!Rmtmps.removeUnused}. *)
 let isRoot g =
-  let specs = Kernel.Keep_unused_specified_functions.get () in
+  let keepFuncs = Kernel.KeepUnusedFunctions.get () in
   let keepTypes = Kernel.Keep_unused_types.get () in
   Rmtmps.isExportedRoot g ||
   match g with
   | GFun({svar = v; sspec = spec},_)
   | GFunDecl(spec,v,_) ->
+    (* Always keep the declaration of the entry point... *)
     Kernel.MainFunction.get_plain_string () = v.vname
-    (* Always keep the declaration of the entry point *)
-    || (specs && not (is_empty_funspec spec))
-  (* and the declarations carrying specifications according to the
-     command line.*)
+    (* ... and the declarations of unused functions according to
+       the command-line option *)
+    || keepFuncs = "all_debug"
+    || (keepFuncs = "all" && not (Cil_builtins.Builtin_functions.mem v.vname))
+    || (keepFuncs = "specified" && not (is_empty_funspec spec))
   | GType _ | GCompTag _ | GCompTagDecl _ | GEnumTag _ | GEnumTagDecl _ ->
     keepTypes
   | _ -> false

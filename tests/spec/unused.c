@@ -1,5 +1,5 @@
 /* run.config
-STDOPT: +"-remove-unused-specified-functions" +"-kernel-msg-key printer:builtins"
+STDOPT: +"-keep-unused-functions none" +"-kernel-msg-key printer:builtins"
 */
 typedef struct { int i; } T;
 

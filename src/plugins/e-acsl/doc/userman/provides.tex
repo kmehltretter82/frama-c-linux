@@ -330,7 +330,7 @@ folder of \framac and \texttt{\$E\_ACSL\_LIB} points to the
 \texttt{lib/frama-c/e-acsl} folder of \framac):
 \begin{frama-c-commands}
   \$ frama-c \
-        -remove-unused-specified-functions \
+        -keep-unused-functions none \
         -machdep gcc_x86_64 \
         -cpp-extra-args="-std=c99 -D_DEFAULT_SOURCE -D__NO_CTYPE \
                          -D__FC_MACHDEP_X86_64" \

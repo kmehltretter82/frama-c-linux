@@ -1346,13 +1346,19 @@ module KeepSwitch =
   end)
 
 let () = Parameter_customize.set_group normalisation
-let () = Parameter_customize.set_negative_option_name "-remove-unused-specified-functions"
-module Keep_unused_specified_functions =
-  True(struct
-    let option_name = "-keep-unused-specified-functions"
-    let module_name = "Keep_unused_specified_functions"
-    let help = "keep specified-but-unused functions"
+module KeepUnusedFunctions =
+  String(struct
+    let module_name = "KeepUnusedFunctions"
+    let option_name = "-keep-unused-functions"
+    let default = "specified"
+    let arg_name = "none|specified|all|all_debug"
+    let help = "whether to keep unused function declarations: none, \
+                only functions with specifications (by default), \
+                or keep all unused functions (all_debug also includes \
+                compiler builtins)"
   end)
+let () = KeepUnusedFunctions.set_possible_values ["none"; "specified"; "all";
+                                                  "all_debug"]
 
 let () = Parameter_customize.set_group normalisation
 let () = Parameter_customize.set_negative_option_name "-remove-unused-types"
