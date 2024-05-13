@@ -123,7 +123,7 @@ They shall succeed. Collect the artifacts of the following targets:
   \item manuals
 \end{itemize}
 
-Check that these artifacts are as expected. In particular:
+\noindent Check that these artifacts are as expected. In particular:
 \begin{itemize}
   \item API documentatation:
     \begin{itemize}
@@ -151,7 +151,7 @@ Check that these artifacts are as expected. In particular:
     \end{itemize}
 \end{itemize}
 
-Alternatively, you can use \texttt{docker} to compile the archive against a
+\noindent Alternatively, you can use \texttt{docker} to compile the archive against a
 precise configuration:
 \begin{itemize}
   \item \verb+cp distributed/frama-c-<VERSION>.tar.gz developer_tools/docker+
@@ -160,10 +160,19 @@ precise configuration:
   \item \verb+docker build . -t framac/frama-c:dev --target frama-c-gui-slim \+\\
         \verb+  -f Dockerfile.dev --build-arg=from_archive=frama-c-<VERSION>.tar.gz+
 \end{itemize}
-For the GUI: in order to be able to launch
-\verb+x11docker framac/frama-c:dev frama-c-gui+,
+For the GUI: in order to be able to launch \verb+x11docker framac/frama-c:dev frama-c-gui+,
 you might want to install the
 \href{https://github.com/mviereck/x11docker}{\texttt{x11docker}} script.
+
+\noindent \FramaC's GUI can be tested with :
+\begin{itemize}
+  \item \texttt{bin/frama-c-gui} for the old GUI.
+  \item \texttt{bin/ivette} for the new GUI.
+\end{itemize}
+\Eva can be tested with \texttt{<gui> -eva tests/idtc/*.c} and \Wp with
+\texttt{<gui> -wp -wp-rte src/plugins/wp/tests/wp\_gallery/find.i}. Try to
+navigate in the code, check some values with \Eva, check that \Wp prove some
+annotations, this should be enough.
 
 \section{Validate release}
 
