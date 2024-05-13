@@ -21,7 +21,7 @@ default:
 ### VARIABLES
 
 variables:
-  DEFAULT: "stable/copper"
+  DEFAULT: "master"
   OCAML: "4.13"
   NODE: "20"
   PUBLISH: "no"
