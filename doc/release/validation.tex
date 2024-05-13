@@ -100,7 +100,8 @@ git ls-files -z | \
 parallel -0 -n1 git blame --line-porcelain | \
 sed -n 's/^author //p' | sort -f | uniq -ic | sort -nr
 \end{verbatim}
-(source for the command: \url{https://gist.github.com/amitchhajer/4461043})
+This requires to install the package \texttt{parallel} (source for the command:
+\url{https://gist.github.com/amitchhajer/4461043}).
 
 \subsection{Commit}
 
