@@ -28,6 +28,7 @@ __PUSH_FC_STDLIB
 #include "netinet/in.h"
 #include "sys/socket.h"
 #include "inttypes.h"
+#include "__fc_builtin.h"
 #include "__fc_string_axiomatic.h"
 
 __BEGIN_DECLS
@@ -181,7 +182,8 @@ extern struct hostent *gethostbyaddr(const void *, socklen_t, int);
 
 /*@
   allocates \result;
-  assigns *\result \from name[0 .. strlen(name)];
+  assigns *\result \from name[0 .. strlen(name)], Frama_C_entropy_source;
+  assigns Frama_C_entropy_source \from Frama_C_entropy_source;
 */
 extern struct hostent *gethostbyname(const char *name);
 

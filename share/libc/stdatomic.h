@@ -119,7 +119,7 @@ extern void atomic_thread_fence(memory_order order);
 extern void atomic_signal_fence(memory_order order);
 
 /*@
-  assigns \result \from indirect:((char*)obj)[0 .. obj_size-1];
+  assigns \result \from indirect:obj, indirect:obj_size; // in reality, should be '\from typeof(obj)'
 */
 _Bool __fc_atomic_is_lock_free(void *obj, size_t obj_size);
 #define atomic_is_lock_free(obj) __fc_atomic_is_lock_free(obj, sizeof(obj))

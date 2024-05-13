@@ -52,12 +52,12 @@
   \return(inet_addr) == 4294967295 (auto)
   \return(inet_ntoa) == 0 (auto)
   \return(inet_ntop) == 0 (auto)
-  \return(gai_strerror) == 0 (auto)
-  \return(getaddrinfo) == 0 (auto)
-  \return(gethostbyname) == 0 (auto)
   \return(Frama_C_nondet) == 0 (auto)
   \return(Frama_C_nondet_ptr) == 0 (auto)
   \return(Frama_C_malloc_fresh) == 0 (auto)
+  \return(gai_strerror) == 0 (auto)
+  \return(getaddrinfo) == 0 (auto)
+  \return(gethostbyname) == 0 (auto)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

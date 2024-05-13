@@ -5254,8 +5254,10 @@ static int res_search(char const *dname, int rec_class, int type,
   return tmp;
 }
 
-/*@ assigns *\result;
-    assigns *\result \from *(name + (0 .. strlen{Old}(name)));
+/*@ assigns *\result, Frama_C_entropy_source;
+    assigns *\result
+      \from *(name + (0 .. strlen{Old}(name))), Frama_C_entropy_source;
+    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
     allocates \result;
  */
 struct hostent *gethostbyname(char const *name)
@@ -6314,7 +6316,7 @@ void atomic_signal_fence(memory_order order)
 }
 
 /*@ assigns \result;
-    assigns \result \from (indirect: *((char *)obj + (0 .. obj_size - 1)));
+    assigns \result \from (indirect: obj), (indirect: obj_size);
  */
 _Bool __fc_atomic_is_lock_free(void *obj, size_t obj_size)
 {
