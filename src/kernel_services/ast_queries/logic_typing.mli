@@ -281,7 +281,7 @@ val append_pre_label: Lenv.t -> Lenv.t
 val append_init_label: Lenv.t -> Lenv.t
 
 (** returns the builtin label corresponding to the given name if it exists
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 val builtin_label: string -> logic_builtin_label option
 

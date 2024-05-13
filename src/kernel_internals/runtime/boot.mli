@@ -22,7 +22,7 @@
 
 (** Frama-C main interface.
     @since Lithium-20081201
-    @before Frama-C+dev it was in a module named Db
+    @before 29.0-Copper it was in a module named Db
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Main : sig
   val extend : (unit -> unit) -> unit
@@ -33,7 +33,7 @@ end
 val play_analysis : unit -> unit
 (** Run all the Frama-C analyses. This function should be called only by
     toplevels.
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 
 val boot : unit -> unit
@@ -41,6 +41,6 @@ val boot : unit -> unit
 
 val set_toplevel: ((unit -> unit) -> unit) -> unit
 (** Changes the toplevel function to run on boot
-    @since Frama-C+dev
-    @before Frama-C+dev it was provided in a different way in Db.Toplevel
+    @since 29.0-Copper
+    @before 29.0-Copper it was provided in a different way in Db.Toplevel
 *)

@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ###############################################################################
 
+###############################################################################
+Open Source Release 29.0 (Copper)
+###############################################################################
+
 -   Kernel    [2024-04-30] new warning category too-large-array, allowing to
               use array > SIZE_MAX by changing its status (default is error).
 o   Dev       [2024-04-22] Remove frama-c-build-scripts.sh; add a section in

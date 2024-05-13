@@ -75,7 +75,7 @@ val finishParsing: unit -> unit (** Call this function to finish parsing and
     the location will be underlined with [^]
     NB: if the two positions in the location refer to different files, the
     first position will not be considered.
-    @before Frama-C+dev: the function took as argument a single position and
+    @before 29.0-Copper: the function took as argument a single position and
     and an optional [start_line] (as an [int]) to indicate a different starting
     line.
 *)

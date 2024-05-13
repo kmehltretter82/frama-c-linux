@@ -145,12 +145,12 @@ val wkey_annot_error: warn_category
 
 val wkey_plugin_not_loaded: warn_category
 (** Warning related to not loaded plugins.
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 
 val wkey_extension_unknown: warn_category
 (** Warning related to the use of an unregistered ACSL extension.
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 
 val wkey_ghost_already_ghost: warn_category

@@ -26,7 +26,7 @@ open Lang.F
     symbols. Types indicates in the documentation are Why3 types, not OCaml
     types.
 
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 
 val t_addr : Lang.tau
