@@ -24,6 +24,10 @@
 Plugin WP <next-release>
 ###############################################################################
 
+###############################################################################
+Plugin WP 29.0 (Copper)
+###############################################################################
+
 - WP          [2024-03-26] wp_nullable_args is renamed \wp::nullable_args to
                            follow kernel changes
 - WP          [2024-01-24] Introduce counter examples via the new option

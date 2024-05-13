@@ -508,7 +508,7 @@ module type Counter = sig
       @since Fluorine-20130401 *)
 
   (** Resets the counter to 0.
-      @since Frama-C+dev *)
+      @since 29.0-Copper *)
   val reset: unit -> unit
 
   val self: State.t

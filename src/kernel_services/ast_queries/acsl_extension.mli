@@ -53,7 +53,7 @@ type extension_printer =
 
 (** type of functions that compare two extensions (with the same keyword)
     to decide if they're identical or not. See {!Ast_diff} for more information.
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 type extension_same =
   acsl_extension_kind -> acsl_extension_kind -> Ast_diff.is_same_env -> bool
@@ -111,7 +111,7 @@ type extension_same =
     let () =
       Acsl_extension.register_behavior ~plugin:"myplugin" "FOO" foo_typer false
     ]
-    @before Frama-C+dev parameters [plugin] and [is_same_ext] were not present
+    @before 29.0-Copper parameters [plugin] and [is_same_ext] were not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 type register_extension =

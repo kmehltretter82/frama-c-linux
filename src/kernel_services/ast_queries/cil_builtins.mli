@@ -59,12 +59,12 @@ module Frama_c_builtins:
 
 val is_builtin: varinfo -> bool
 (** @return true if {!has_fc_builtin_attr} or {!is_special_builtin} are true.
-    @before Frama-C+dev Only check for {!has_fc_builtin_attr}.
+    @before 29.0-Copper Only check for {!has_fc_builtin_attr}.
     @since Fluorine-20130401 *)
 
 val has_fc_builtin_attr: varinfo -> bool
 (** @return true if the given variable has a FC_BUILTIN attribute
-    @since Frama-C+dev *)
+    @since 29.0-Copper *)
 
 val is_unused_builtin: varinfo -> bool
 (** @return true if the given variable refers to a Frama-C builtin that
