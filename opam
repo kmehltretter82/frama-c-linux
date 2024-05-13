@@ -72,7 +72,7 @@ authors: [
 homepage: "https://frama-c.com/"
 license: "LGPL-2.1-only"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
-doc: "http://frama-c.com/download/user-manual-29.0-Copper.pdf"
+doc: "http://frama-c.com/download/user-manual-29.0-beta-Copper.pdf"
 bug-reports: "https://git.frama-c.com/pub/frama-c/issues"
 tags: [
   "deductive"
