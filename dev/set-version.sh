@@ -87,6 +87,9 @@ else
   echo "$NEXT" >VERSION
   echo "$NEXT_CODENAME" >VERSION_CODENAME
 
+  # Ivette
+  $SED -i "s/^  \"version\": .*/  \"version\": \"$CURRENT_MAJOR.$CURRENT_MINOR.0\",/g" ivette/package.json
+
   # Opam files
   $SED -i "s/^version: .*/version: \"$NEXT\"/g" opam
   $SED -i "s/\(.*\)$CURRENT_MAJOR.$CURRENT_MINOR-$CURRENT_CODENAME\(.*\)/\1$NEXT_MAJOR.$NEXT_MINOR-$NEXT_CODENAME\2/g" opam
