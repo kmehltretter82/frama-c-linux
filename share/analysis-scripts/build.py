@@ -56,7 +56,7 @@ parser.add_argument(
     "--base",
     metavar="DIR",
     default=".",
-    help="base directory used for pretty-printing relative paths (default: PWD)",
+    help="base directory to use when pretty-printing relative paths (default: PWD)",
     type=Path,
 )
 parser.add_argument(

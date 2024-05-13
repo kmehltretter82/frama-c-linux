@@ -96,7 +96,7 @@ def get_dir(path):
 
 
 def collect_files_and_local_dirs(paths) -> tuple[set[Path], set[Path]]:
-    """Returns the list of directories (and their subdirectories) containing
+    """Returns the list of files and directories (and their subdirectories) containing
     the specified paths. Note that this also includes subdirectories which do not
     themselves contain any .c files, but which may contain .h files."""
     dirs: set[Path] = set()
