@@ -55,13 +55,6 @@ export function getConsoleComponent(window: Page): Locator {
   return window.locator(".cm-global-box");
 }
 
-/**
- * Locator to select the Functions side bar when loading a file
- */
-export function getFunctionsSideBar(window: Page): Locator {
-  return window.getByText("AST").first();
-}
-
 export function getMainFunction(window: Page): Locator {
   return window.getByText("main", { exact: true });
 }
