@@ -92,9 +92,15 @@ let pp_lti fmt (lti : C.logic_type_info) =
 let pp_li fmt (li : C.logic_info) =
   Cpp.pp_logic_info fmt li
 
-(* -------------------------------------------------------------------------- *)
-(* ---    Types                                                           --- *)
-(* -------------------------------------------------------------------------- *)
+(* For debug only*)
+let pp_lvs fmt (lvs : C.logic_var list) =
+  List.iter (fun (lv: C.logic_var) -> Cpp.pp_logic_var fmt lv;
+              Cpp.pp_logic_type fmt lv.lv_type)
+    lvs;
+
+  (* -------------------------------------------------------------------------- *)
+  (* ---    Types                                                           --- *)
+  (* -------------------------------------------------------------------------- *)
 
 type tenv = C.logic_type_info W.Ty.Hts.t
 type lenv = C.logic_info W.Term.Hls.t
@@ -114,10 +120,15 @@ let _populate_tenv_builtin (tenv:tenv) =
 (* -------------------------------------------------------------------------- *)
 
 let tvars_of_txs (txs: W.Ty.tvsymbol list) : string list * tvars =
+  L.debug ~level:3 "Called tvars_of_txs";
+  List.iter (fun (tv: W.Ty.tvsymbol) ->
+      L.debug ~level:3 "Name of : %a" pp_id tv.tv_name) txs;
   List.fold_right
     (fun (tv: W.Ty.tvsymbol) (txs,tvs) ->
        let x = tv.tv_name.id_string in
-       x :: txs, W.Ty.Mtv.add tv (C.Lvar x) tvs
+       match x with
+       | "int" -> x :: txs, W.Ty.Mtv.add tv (C.Linteger) tvs
+       | _ ->  x :: txs, W.Ty.Mtv.add tv (C.Lvar x) tvs
     ) txs ([], W.Ty.Mtv.empty)
 
 
@@ -241,7 +252,8 @@ let () =
         ) tenv;
       W.Term.Hls.iter (fun (ls) (li) ->
           L.debug ~level:1 "Why3 logic symbol : %a" pp_ls ls;
-          L.debug ~level:1 "Corresponding CIL logic info %a" pp_li li;
+          L.debug ~level:1 "Corresponding CIL logic info : %a" pp_li li;
+          L.debug ~level:1 "Associated parameters : %a" pp_lvs li.l_profile;
         ) lenv
     end
 
