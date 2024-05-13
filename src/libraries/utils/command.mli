@@ -126,7 +126,7 @@ val command :
     process will be filled into the arguments buffer.
     @raise Sys_error when a system error occurs
     @raise Async.Cancel when the computation is interrupted or on timeout
-    @before Frama-C+dev Async.Cancel was Db.Cancel
+    @before 29.0-Copper Async.Cancel was Db.Cancel
 *)
 
 (*

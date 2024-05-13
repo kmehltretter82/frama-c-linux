@@ -31,6 +31,8 @@ import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item } from 'dome/frame/sidebars';
 import { Button } from 'dome/controls/buttons';
+import { Label } from 'dome/controls/labels';
+import InfiniteScroll from 'react-infinite-scroller';
 
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
@@ -40,13 +42,14 @@ import * as Locations from 'frama-c/kernel/Locations';
 import { computationState } from 'frama-c/plugins/eva/api/general';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 
+
 // --------------------------------------------------------------------------
 // --- Global Search Hints
 // --------------------------------------------------------------------------
 
 function globalHints(): Ivette.Hint[] {
   const globals = States.getSyncArray(Ast.declAttributes).getArray();
-  return globals.map((g : Ast.declAttributesData) => ({
+  return globals.map((g: Ast.declAttributesData) => ({
     id: g.decl,
     name: g.name,
     label: g.label,
@@ -54,7 +57,7 @@ function globalHints(): Ivette.Hint[] {
   }));
 }
 
-const globalMode : Ivette.SearchProps = {
+const globalMode: Ivette.SearchProps = {
   id: 'frama-c.kernel.globals',
   label: 'Globals',
   title: 'Lookup for Global Declarations',
@@ -94,15 +97,20 @@ function menuItem(label: string, [b, flip]: setting, enabled?: boolean)
 // --- Lists
 // --------------------------------------------------------------------------
 
-interface ListProps {
+interface InfiniteScrollableListProps {
+  scrollableParent: React.RefObject<HTMLDivElement>;
+}
+
+type ListProps = {
   name: string;
   total: number;
   filteringMenuItems: Dome.PopupMenuItem[];
   children: JSX.Element[];
-}
+} & InfiniteScrollableListProps
 
 function List(props: ListProps): JSX.Element {
-  const { name, total, filteringMenuItems, children } = props;
+  const [displayedCount, setDisplayedCount] = React.useState(100);
+  const { name, total, filteringMenuItems, children, scrollableParent } = props;
   const Name = name.charAt(0).toUpperCase() + name.slice(1);
   const count = children.length;
 
@@ -112,20 +120,39 @@ function List(props: ListProps): JSX.Element {
     onClick: () => Dome.popupMenu(filteringMenuItems),
   };
 
-  const noItems =
-    <div className='dome-xSideBarSection-content'>
-      <label className='globals-info'>
-        There is no {name} to display.
-      </label>
-    </div>;
+  let contents;
 
-  const allFiltered =
-    <div className='dome-xSideBarSection-content'>
-      <label className='globals-info'>
-        All {name}s are filtered. Try adjusting {name} filters.
-      </label>
-      <Button {...filterButtonProps} label={`${Name}s filters`} />
-    </div>;
+  if (count <= 0 && total > 0) {
+    contents =
+      <div className='dome-xSideBarSection-content'>
+        <label className='globals-info'>
+          All {name}s are filtered. Try adjusting {name} filters.
+        </label>
+        <Button {...filterButtonProps} label={`${Name}s filters`} />
+      </div>;
+  }
+  else if (total <= 0) {
+    contents =
+      <div className='dome-xSideBarSection-content'>
+        <label className='globals-info'>
+          There is no {name} to display.
+        </label>
+      </div>;
+  }
+  else {
+    contents =
+      // @ts-expect-error (incompatibility due to @types/react versions)
+      <InfiniteScroll
+        pageStart={0}
+        loadMore={() => setDisplayedCount(displayedCount + 100)}
+        hasMore={displayedCount < count}
+        loader={<Label key={-1}>Loading more...</Label>}
+        useWindow={false}
+        getScrollParent={() => scrollableParent.current}
+      >
+        {children.slice(0, displayedCount)}
+      </InfiniteScroll>;
+  }
 
   return (
     <Section
@@ -137,7 +164,7 @@ function List(props: ListProps): JSX.Element {
       summary={[count]}
       className='globals-section'
     >
-      {count > 0 ? children : total > 0 ? allFiltered : noItems}
+      {contents}
     </Section>
   );
 }
@@ -196,7 +223,9 @@ function computeFcts(
   return arr.sort((f, g) => alpha(f.name, g.name));
 }
 
-export function Functions(): JSX.Element {
+type FunctionProps = InfiniteScrollableListProps
+
+export function Functions(props: FunctionProps): JSX.Element {
 
   // Hooks
   const scope = States.useCurrentScope();
@@ -223,7 +252,7 @@ export function Functions(): JSX.Element {
   const multipleSelection: States.Scope[] =
     React.useMemo(
       () => markers.map((m) => getMarker(m)?.scope)
-      , [ getMarker, markers ]);
+      , [getMarker, markers]);
   const multipleSelectionActive = multipleSelection.length > 0;
   const evaComputed = States.useSyncValue(computationState) === 'computed';
 
@@ -245,9 +274,9 @@ export function Functions(): JSX.Element {
       && (extern[0] || !fct.extern)
       && (!multipleSelectionActive || !selected[0] || isSelected(fct))
       && (evaAnalyzed[0] || !evaComputed ||
-          !('eva_analyzed' in fct && fct.eva_analyzed === true))
+        !('eva_analyzed' in fct && fct.eva_analyzed === true))
       && (evaUnreached[0] || !evaComputed ||
-          ('eva_analyzed' in fct && fct.eva_analyzed === true));
+        ('eva_analyzed' in fct && fct.eva_analyzed === true));
     return !!visible;
   }
 
@@ -278,6 +307,7 @@ export function Functions(): JSX.Element {
       name="function"
       total={fcts.length}
       filteringMenuItems={contextMenuItems}
+      scrollableParent={props.scrollableParent}
     >
       {items}
     </List>
@@ -304,7 +334,9 @@ function makeVarItem(
   );
 }
 
-export function Globals(): JSX.Element {
+type VariablesProps = InfiniteScrollableListProps
+
+export function Variables(props: VariablesProps): JSX.Element {
 
   // Hooks
   const scope = States.useCurrentScope();
@@ -374,6 +406,7 @@ export function Globals(): JSX.Element {
       name="variable"
       total={variables.length}
       filteringMenuItems={contextMenuItems}
+      scrollableParent={props.scrollableParent}
     >
       {items}
     </List>
@@ -410,7 +443,7 @@ function makeItem(
 }
 
 export function Declarations(props: DeclarationsProps): JSX.Element {
-  const { id, label, title, filter, defaultUnfold=false } = props;
+  const { id, label, title, filter, defaultUnfold = false } = props;
   const settings = React.useMemo(() => `frama-c.sidebar.${id}`, [id]);
   const data = States.useSyncArrayData(Ast.declAttributes);
   const scope = States.useCurrentScope();
@@ -440,7 +473,7 @@ export function Declarations(props: DeclarationsProps): JSX.Element {
 // --------------------------------------------------------------------------
 
 const filterTypes = (d: Ast.declAttributesData): boolean => {
-  switch(d.kind) {
+  switch (d.kind) {
     case 'TYPE':
     case 'ENUM':
     case 'UNION':
@@ -459,6 +492,21 @@ export function Types(): JSX.Element {
       title='Typedefs, Structs, Unions and Enums'
       filter={filterTypes}
     />
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- All globals
+// --------------------------------------------------------------------------
+
+export default function Globals(): JSX.Element {
+  const scrollableArea = React.useRef<HTMLDivElement>(null);
+  return (
+    <div ref={scrollableArea} className="globals-scrollable-area">
+      <Types />
+      <Variables scrollableParent={scrollableArea} />
+      <Functions scrollableParent={scrollableArea} />
+    </div>
   );
 }
 

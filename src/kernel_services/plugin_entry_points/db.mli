@@ -22,10 +22,10 @@
 
 (** DEPRECATED Frama-C main interface.
     @since Lithium-20081201
-    @deprecated Frama-C+dev Use module {!Boot.Main} *)
+    @deprecated 29.0-Copper Use module {!Boot.Main} *)
 module Main: sig
   val extend : (unit -> unit) -> unit
   [@@ deprecated "Use module Boot.Main"]
   (** Register a function to be called by the Frama-C main entry point.
-      @deprecated Frama-C+dev Use module {!Boot.Main} *)
+      @deprecated 29.0-Copper Use module {!Boot.Main} *)
 end

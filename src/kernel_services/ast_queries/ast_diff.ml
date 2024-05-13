@@ -195,6 +195,17 @@ type is_same_env =
     enumitem: enumitem Cil_datatype.Enumitem.Map.t;
   }
 
+let is_same_acsl_extension_kind:
+  (string->acsl_extension_kind->acsl_extension_kind->is_same_env->bool) ref
+  = Extlib.mk_fun "Ast_diff.is_same_acsl_extension"
+
+let set_extension_diff ~is_same_ext =
+  is_same_acsl_extension_kind := is_same_ext
+
+let is_same_acsl_extension ext1 ext2 env =
+  ext1.ext_name = ext2.ext_name &&
+  !is_same_acsl_extension_kind ext1.ext_name ext1.ext_kind ext2.ext_kind env
+
 module type Correspondence_table = sig
   include State_builder.Hashtbl
   val pretty_data: Format.formatter -> data -> unit
@@ -256,6 +267,9 @@ let make_correspondence candidate has_same_spec code_corres =
     `Same candidate
   | true, ((`Body_changed|`Callees_changed) as c) ->
     `Partial(candidate, c)
+
+let make_body_correspondence has_same_spec code_corres =
+  if has_same_spec then code_corres else `Body_changed
 
 let (&&>) (res,env) f =
   match res with
@@ -693,9 +707,8 @@ and is_same_behavior b b' env =
   is_same_list is_same_identified_predicate b.b_assumes b'.b_assumes env &&
   is_same_list is_same_post_cond b.b_post_cond b'.b_post_cond env &&
   is_same_assigns b.b_assigns b'.b_assigns env &&
-  is_same_allocation b.b_allocation b'.b_allocation env
-(* TODO: also consider ACSL extensions, with the help of the plugins
-   that handle them. *)
+  is_same_allocation b.b_allocation b'.b_allocation env &&
+  is_same_list is_same_acsl_extension b.b_extended b'.b_extended env
 
 and is_same_variant (v,m) (v',m') env =
   is_same_term v v' env && is_same_opt is_matching_logic_info m m' env
@@ -762,7 +775,10 @@ and is_same_code_annotation a a' env =
   | AAllocation(bhvs, a), AAllocation(bhvs',a') ->
     is_same_behavior_set bhvs bhvs' && is_same_allocation a a' env
   | APragma p, APragma p' -> is_same_pragma p p' env
-  | AExtended _, AExtended _ -> true (*TODO: checks also for extended clauses*)
+  | AExtended (bhvs, is_next, ext),
+    AExtended (bhvs', is_next', ext') ->
+    is_same_behavior_set bhvs bhvs' && is_next = is_next' &&
+    is_same_acsl_extension ext ext' env
   | (AAssert _ | AStmtSpec _ | AInvariant _ | AVariant _ | AAssigns _
     | AAllocation _ | APragma _ | AExtended _), _ -> false
 
@@ -1156,8 +1172,9 @@ and is_same_stmt s s' env =
         | _ -> `Body_changed, env
       end else `Body_changed, env
   in
-  let res = make_correspondence s' annot_res code_res in
-  Stmt.add s res; code_res, env
+  let corres = make_correspondence s' annot_res code_res in
+  let res = make_body_correspondence annot_res code_res in
+  Stmt.add s corres; res, env
 
 (* is_same_block will return its modified environment in order
    to update correspondence table with respect to locals, in case
@@ -1537,9 +1554,8 @@ let rec gannot_correspondence =
     ignore (logic_info_correspondence ~loc li empty_env)
   | Dmodel_annot (mi,loc) ->
     ignore (model_info_correspondence ~loc mi)
-  | Dextended _ -> ()
-(* TODO: provide mechanism for extension themselves
-   to give relevant information. *)
+  | Dextended _ -> () (* TODO: as for lemmas, we don't really have a structure
+                         where to look for a matching extended annotation. *)
 
 let global_correspondence g =
   match g with
