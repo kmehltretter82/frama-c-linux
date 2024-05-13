@@ -39,7 +39,7 @@ const random = (n: number): number => Math.floor(Math.random() * n);
 
 function addNode(nodes: readonly Node[]): readonly Node[] {
   const k = Kid++;
-  return nodes.concat({ id: `N${k}`, label: `Node #${k}}` });
+  return nodes.concat({ id: `N${k}`, label: `Node #${k}` });
 }
 
 function addEdge(
