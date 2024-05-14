@@ -13,6 +13,7 @@
 [eva] for_loops.c:39: 
   Frama_C_dump_each:
   # cvalue:
+  __fc_heap_status ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   x ∈ {0}
   j ∈ UNINITIALIZED
@@ -24,6 +25,7 @@
 [eva] for_loops.c:41: 
   Frama_C_dump_each:
   # cvalue:
+  __fc_heap_status ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   x ∈ {0}
   j ∈ [0..1000]

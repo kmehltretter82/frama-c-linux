@@ -23,7 +23,7 @@
 [eva] strchr.c:88: Call to builtin strchr
 [eva] strchr.c:88: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:181: 
+[eva] FRAMAC_SHARE/libc/string.h:202: 
   cannot evaluate ACSL term, unsupported logic var p
 [eva] strchr.c:88: Frama_C_show_each_mystrchr: {3}
 [eva] strchr.c:89: assertion got status valid.
@@ -92,7 +92,7 @@
   Called from strchr.c:197.
 [eva] strchr.c:189: Call to builtin memset
 [eva] strchr.c:189: function memset: precondition 'valid_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:134: 
+[eva] FRAMAC_SHARE/libc/string.h:151: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet

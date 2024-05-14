@@ -90,6 +90,10 @@ let unsupported_specifications =
     "strerror", "string.c";
     "strndup", "string.c";
     "unsetenv", "stdlib.c";
+    "vasprintf", "stdio.c";
+    "vfscanf", "stdio.c";
+    "vscanf", "stdio.c";
+    "wcsdup", "wchar.c";
   ]
 
 let unsupported_specs_tbl =

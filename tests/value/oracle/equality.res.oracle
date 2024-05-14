@@ -26,16 +26,12 @@
   Called from equality.c:52.
 [eva] using specification for function Frama_C_float_interval
 [eva] equality.c:52: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] equality.c:52: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva] computing for function Frama_C_float_interval <- symbolic <- main.
   Called from equality.c:53.
 [eva] equality.c:53: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] equality.c:53: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva] equality.c:57: Call to builtin sqrtf
 [eva] equality.c:57: function sqrtf: precondition 'finite_arg' got status valid.

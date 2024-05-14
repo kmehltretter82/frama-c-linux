@@ -2,7 +2,7 @@
 < [eva] octagons.c:54: Frama_C_show_each_unreduced_char: [-128..127], [-128..127]
 ---
 > [eva] octagons.c:54: Frama_C_show_each_unreduced_char: [-118..114], [6..127]
-358c358
+356c356
 <   ct ∈ [--..--] or UNINITIALIZED
 ---
 >   ct ∈ [6..127] or UNINITIALIZED

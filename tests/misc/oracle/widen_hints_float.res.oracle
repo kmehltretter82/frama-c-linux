@@ -13,25 +13,19 @@
   Called from widen_hints_float.c:17.
 [eva] using specification for function Frama_C_double_interval
 [eva] widen_hints_float.c:17: 
-  function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] widen_hints_float.c:17: 
-  function Frama_C_double_interval: precondition 'order' got status valid.
+  function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] widen_hints_float.c:20: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- parabola <- main.
   Called from widen_hints_float.c:24.
 [eva] widen_hints_float.c:24: 
-  function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] widen_hints_float.c:24: 
-  function Frama_C_double_interval: precondition 'order' got status valid.
+  function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] widen_hints_float.c:27: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- parabola <- main.
   Called from widen_hints_float.c:31.
 [eva] widen_hints_float.c:31: 
-  function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] widen_hints_float.c:31: 
-  function Frama_C_double_interval: precondition 'order' got status valid.
+  function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] widen_hints_float.c:33: starting to merge loop iterations
 [eva:alarm] widen_hints_float.c:34: Warning: 
@@ -46,9 +40,7 @@
 [eva] computing for function Frama_C_double_interval <- trigo <- main.
   Called from widen_hints_float.c:42.
 [eva] widen_hints_float.c:42: 
-  function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] widen_hints_float.c:42: 
-  function Frama_C_double_interval: precondition 'order' got status valid.
+  function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] widen_hints_float.c:42: Call to builtin sin
 [eva] widen_hints_float.c:42: 
@@ -81,9 +73,7 @@
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
   Called from widen_hints_float.c:49.
 [eva] widen_hints_float.c:49: 
-  function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] widen_hints_float.c:49: 
-  function Frama_C_double_interval: precondition 'order' got status valid.
+  function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] widen_hints_float.c:48: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
@@ -104,9 +94,7 @@
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
   Called from widen_hints_float.c:54.
 [eva] widen_hints_float.c:54: 
-  function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] widen_hints_float.c:54: 
-  function Frama_C_double_interval: precondition 'order' got status valid.
+  function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] widen_hints_float.c:53: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
