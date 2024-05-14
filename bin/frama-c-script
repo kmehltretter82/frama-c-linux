@@ -22,7 +22,7 @@
 ##########################################################################
 
 usage() {
-   echo "usage: $0 cmd [args]"
+   echo "usage: frama-c-script cmd [args]"
    echo ""
    echo "  where cmd is:"
    echo ""
@@ -89,7 +89,7 @@ usage() {
    echo ""
    echo "  - make-machdep [--compiler=<cc>] [--cpp-arch-flags=<flags>]"
    echo "      Creates a new machdep definition for a specific target."
-   echo "      Use $0 make-machdep --help for more information"
+   echo "      Use frama-c-script make-machdep --help for more information"
    echo ""
    echo "  - make-wrapper [target] [arg...]"
    echo "      Runs 'make target arg...', parsing the output to suggest"
@@ -103,7 +103,7 @@ usage() {
    echo "  - summary [options]"
    echo "      Monitors and summarizes multiple analyses dispatched by a Makefile"
    echo "      in the current PWD."
-   echo "      Use $0 summary --help for more information."
+   echo "      Use frama-c-script summary --help for more information."
    exit "$1"
 }
 
