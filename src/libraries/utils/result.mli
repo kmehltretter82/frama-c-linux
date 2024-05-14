@@ -25,6 +25,9 @@
 
 include module type of Stdlib.Result
 
+(** [zip r1 r2] regroups values in a pair [Ok (v1, v2)] if both arguments are
+    [Ok v1] and [Ok v2] and propagate errors in other cases. If both [r1]
+    and [r2] are errors we keep the first one, in this case [r1]. *)
 val zip : ('a, 'e) result -> ('b, 'e) result -> ('a * 'b, 'e) result
 
 module Operators : sig
