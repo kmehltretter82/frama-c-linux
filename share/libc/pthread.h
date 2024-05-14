@@ -226,8 +226,8 @@ extern int pthread_condattr_setpshared(pthread_condattr_t *, int);
     requires valid_null_arg: arg == \null || \valid((char*)arg);
     assigns *thread \from *attr;
     assigns \result \from indirect:*attr;
-    ensures success_or_error:
-      \result == 0 ||
+    ensures initialization:success_or_error:
+      (\result == 0 && \initialized(thread)) ||
       \result == EAGAIN || \result == EINVAL || \result == EPERM;
  */
 extern int pthread_create(pthread_t *restrict thread,

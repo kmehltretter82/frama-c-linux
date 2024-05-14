@@ -25,6 +25,7 @@
 """This script finds files containing likely declarations and definitions
 for a given function name, via heuristic syntactic matching."""
 
+from pathlib import Path
 import sys
 import build_callgraph
 
@@ -45,7 +46,7 @@ If --dot is specified, print in DOT (Graphviz) format
 to file outfile, or to stdout if outfile is '-'."""
     )
 
-cg = build_callgraph.compute(args)
+cg = build_callgraph.compute(set([Path(a) for a in args]))
 if dotfile:
     if dotfile == "-":
         out = sys.stdout

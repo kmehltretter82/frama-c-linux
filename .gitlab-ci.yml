@@ -172,13 +172,6 @@ e-acsl-tests:
     - ./nix/build-proxy.sh e-acsl-tests
   <<: *coverage
 
-e-acsl-dev-tests:
-  stage: tests
-  script:
-    - ./nix/build-proxy.sh e-acsl-dev-tests
-  <<: *coverage
-  allow_failure: true
-
 .build_template: &eva_template
   stage: tests
   script:
@@ -231,6 +224,7 @@ wp-tests:
 ivette-tests:
   stage: tests
   image: "ocaml/opam:ubuntu-lts-ocaml-$OCAML"
+  when: manual
   before_script:
     - sudo apt update
     - sudo apt install -y xvfb curl unzip libnss3 libasound2
@@ -255,7 +249,6 @@ ivette-tests:
       - ivette/screenshots
     when: always
     expire_in: 1 day
-  allow_failure: true
   tags:
     - docker
 

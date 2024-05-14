@@ -26,6 +26,7 @@
 __PUSH_FC_STDLIB
 
 #include "__fc_machdep.h"
+#include "__fc_string_axiomatic.h"
 
 #define	GLOB_ERR	(1 << 0)/* Return on read errors.  */
 #define	GLOB_MARK	(1 << 1)/* Append a slash to each name.  */
@@ -35,6 +36,7 @@ __PUSH_FC_STDLIB
 #define	GLOB_APPEND	(1 << 5)/* Append to results of a previous call.  */
 #define	GLOB_NOESCAPE	(1 << 6)/* Backslashes don't quote metacharacters.  */
 #define	GLOB_PERIOD	(1 << 7)/* Leading `.' can be matched by metachars.  */
+#define	GLOB_MAGCHAR	(1 << 8)/* GNU-specific */
 
 #define	GLOB_NOSPACE	1	/* Ran out of memory.  */
 #define	GLOB_ABORTED	2	/* Read error.  */
@@ -67,10 +69,23 @@ typedef struct __fc_glob_t {
 #endif
 } glob_t;
 
+/*@
+  allocates pglob->gl_pathv;
+  assigns *pglob \from indirect:pattern[0 .. strlen(pattern)],
+                       flags,
+                       indirect:errfunc;
+  assigns \result \from indirect:pattern[0 .. strlen(pattern)],
+                        indirect:flags,
+                        indirect:errfunc;
+*/
 extern int glob(const char *pattern, int flags,
                 int (*errfunc) (const char *epath, int eerrno),
                 glob_t *pglob);
 
+/*@
+  frees pglob->gl_pathv;
+  assigns *pglob \from *pglob;
+ */
 extern void globfree(glob_t *pglob);
 
 __END_DECLS

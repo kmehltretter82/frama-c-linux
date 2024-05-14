@@ -38,16 +38,16 @@
 [e-acsl] FRAMAC_SHARE/libc/unistd.h:1149: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:506: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:538: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:508: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:540: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:486: Warning: 
   no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:281: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
@@ -143,6 +143,15 @@
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:226: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
+  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
+  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
+                                                        \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:231: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
@@ -154,6 +163,8 @@
                                                       \valid(data->values) got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
+  function __gen_e_acsl_pthread_create: postcondition 'initialization,success_or_error' got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:223: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:226: Warning: 

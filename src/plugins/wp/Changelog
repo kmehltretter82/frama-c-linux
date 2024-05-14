@@ -28,11 +28,16 @@ Plugin WP <next-release>
 Plugin WP 29.0 (Copper)
 ###############################################################################
 
+
+- WP          [2024-04-16] Fix interactive prover startup when the script already
+                           exists
+- WP          [2024-03-29] Type logic function calls when they have C types
 - WP          [2024-03-26] wp_nullable_args is renamed \wp::nullable_args to
                            follow kernel changes
 - WP          [2024-01-24] Introduce counter examples via the new option
                            -wp-counter-examples. Also introduce an ACSL extension
                            to create probes on terms for counter examples.
+- Gui         [2023-12-05] Introduce goal visualization and tactics in Ivette
 
 ###############################################################################
 Plugin WP 28.1 (Nickel)

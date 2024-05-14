@@ -21,12 +21,13 @@
 /**************************************************************************/
 
 #include "__fc_builtin.h"
+#include "errno.h"
+#include "float.h" // for DBL_MAX
 #include "stdbool.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "stdint.h" // for SIZE_MAX
 #include "sys/types.h" // for ssize_t
-#include "errno.h"
 __PUSH_FC_STDLIB
 
 FILE __fc_initial_stdout = {.__fc_FILE_id=1}; 
@@ -44,6 +45,7 @@ FILE * __fc_stdin = &__fc_initial_stdin;
 // "rb+","r+b","wb+","w+b","ab+","a+b".
 /*@
   requires valid_mode: valid_read_string(mode);
+  assigns \result \from mode[0 .. strlen(mode)];
  */
 static bool is_valid_mode(char const *mode) {
   if (!(mode[0] != 'r' || mode[0] != 'w' || mode[0] != 'a')) return false;
@@ -117,19 +119,24 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream) {
 // Non-POSIX; arbitrarily allocates between 1 and 256 bytes.
 // This stub is unsound in the general case, but enough for
 // many test cases.
-int asprintf(char **strp, const char *fmt, ...) {
-  va_list args;
-  va_start(args, fmt);
+int vasprintf(char **strp, const char *fmt, va_list ap) {
   size_t len = Frama_C_interval(1, 256);
   *strp = malloc(len);
   if (!*strp) {
-    va_end(args);
     return -1;
   }
   // Emulate writing to the string
   Frama_C_make_unknown(*strp, len - 1U);
   (*strp)[len - 1U] = 0;
   return len;
+}
+
+int asprintf(char **strp, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  int res = vasprintf(strp, fmt, args);
+  va_end(args);
+  return res;
 }
 
 char *fgets(char *restrict s, int size, FILE *restrict stream) {
@@ -235,6 +242,275 @@ FILE *fmemopen(void *restrict buf, size_t size,
     return NULL;
   }
   return &__fc_fopen[Frama_C_interval(0, __FC_FOPEN_MAX-1)];
+}
+
+#include "stdarg.h"
+
+enum length_modifier {
+  NONE, HH, H, L, LL, J, Z, T, UPPER_L
+};
+
+int vfscanf(FILE * restrict stream, const char * restrict format, va_list arg) {
+  const char *p = format;
+  char conversion_counter = 0;
+  while (*p) {
+    if (*p == '%') {
+      enum length_modifier lm = NONE;
+      char asterisks = 0;
+      p++;
+      if (*p == '%') {
+        break;
+      }
+      // skip any flags
+      while (1) {
+        switch (*p) {
+        case '-':
+        case '+':
+        case ' ':
+        case '#':
+        case '0':
+          break;
+        default:
+          goto post_flags;
+        }
+        p++;
+      }
+    post_flags:
+      // skip field width
+      while (*p >= '0' && *p <= '9') {
+        p++;
+      }
+      // special field width
+      if (*p == '*') {
+        asterisks++;
+        p++;
+      }
+      if (*p == '.') {
+        // skip precision
+        p++;
+        while (*p >= '0' && *p <= '9') {
+          p++;
+        }
+        // special precision
+        if (*p == '*') {
+          asterisks++;
+          p++;
+        }
+      }
+      // length modifier
+      switch (*p) {
+      case 'h':
+        p++;
+        if (*p == 'h') {
+          p++;
+          lm = HH;
+        } else {
+          lm = H;
+        }
+        break;
+      case 'l':
+        p++;
+        if (*p == 'l') {
+          p++;
+          lm = LL;
+        } else {
+          lm = L;
+        }
+        break;
+      case 'j':
+        p++;
+        lm = J;
+        break;
+      case 'z':
+        p++;
+        lm = Z;
+        break;
+      case 't':
+        p++;
+        lm = T;
+        break;
+      case 'L':
+        p++;
+        lm = UPPER_L;
+        break;
+      }
+      // read asterisks
+      while (asterisks) {
+        // reading the arguments ensures that initialization errors are detected
+        int ignored = va_arg(arg, int);
+        (void)(ignored); // avoid GCC warning about unused variable
+        asterisks--;
+      }
+      // conversion specifier
+      switch (*p) {
+      case 'd':
+      case 'i':
+        switch (lm) {
+        case NONE:
+          *va_arg(arg, int*) = Frama_C_interval(INT_MIN, INT_MAX);
+          break;
+        case HH:
+          *va_arg(arg, char*) = Frama_C_char_interval(CHAR_MIN, CHAR_MAX);
+          break;
+        case H:
+          *va_arg(arg, short*) = Frama_C_short_interval(SHRT_MIN, SHRT_MAX);
+          break;
+        case L:
+          *va_arg(arg, long*) = Frama_C_long_interval(LONG_MIN, LONG_MAX);
+          break;
+        case LL:
+        case UPPER_L: // 'Ld' is not in ISO C, but GCC/Clang treat it like 'lld'
+          *va_arg(arg, long long*) =
+            Frama_C_long_long_interval(LLONG_MIN, LLONG_MAX);
+          break;
+        case J:
+          *va_arg(arg, intmax_t*) =
+            Frama_C_intmax_t_interval(INTMAX_MIN, INTMAX_MAX);
+          break;
+        case Z:
+          *va_arg(arg, size_t*) = Frama_C_size_t_interval(0, SIZE_MAX);
+          break;
+        case T:
+          *va_arg(arg, ptrdiff_t*) =
+            Frama_C_ptrdiff_t_interval(PTRDIFF_MIN, PTRDIFF_MAX);
+          break;
+        }
+        break;
+      case 'o':
+      case 'u':
+      case 'x':
+      case 'X':
+        switch (lm) {
+        case NONE:
+          *va_arg(arg, unsigned*) =
+            Frama_C_unsigned_int_interval(0, UINT_MAX);
+          break;
+        case HH:
+          *va_arg(arg, unsigned char*) =
+            Frama_C_unsigned_char_interval(0, UCHAR_MAX);
+          break;
+        case H:
+          *va_arg(arg, unsigned short*) =
+            Frama_C_unsigned_short_interval(0, USHRT_MAX);
+          break;
+        case L:
+          *va_arg(arg, unsigned long*) =
+            Frama_C_unsigned_long_interval(0, ULONG_MAX);
+          break;
+        case LL:
+        case UPPER_L: // 'Ld' is not in ISO C, but GCC/Clang treat it like 'lld'
+          *va_arg(arg, unsigned long long*) =
+            Frama_C_unsigned_long_long_interval(0, ULLONG_MAX);
+          break;
+        case J:
+          *va_arg(arg, uintmax_t*) = Frama_C_uintmax_t_interval(0, UINTMAX_MAX);
+          break;
+        case Z:
+          *va_arg(arg, size_t*) = Frama_C_size_t_interval(0, SIZE_MAX);
+          break;
+        case T:
+          *va_arg(arg, ptrdiff_t*) =
+            Frama_C_ptrdiff_t_interval(PTRDIFF_MIN, PTRDIFF_MAX);
+          break;
+        }
+        break;
+      case 'f':
+      case 'F':
+      case 'e':
+      case 'E':
+      case 'g':
+      case 'G':
+      case 'a':
+      case 'A':
+        switch (lm) {
+        case NONE:
+        case L:
+          // no effect
+          *va_arg(arg, double*) = Frama_C_double_interval(-DBL_MAX, DBL_MAX);
+          break;
+        case UPPER_L:
+          // TODO: use Frama_C_long_double_interval when it will be supported
+          {
+            volatile long double vld;
+            *va_arg(arg, long double*) = vld;
+          }
+          break;
+        default:
+          // Undefined behavior
+          //@ assert invalid_scanf_specifier: \false;
+          ;
+        }
+        break;
+      case 'c':
+        switch (lm) {
+        case NONE:
+          *va_arg(arg, char*) = Frama_C_char_interval(CHAR_MIN, CHAR_MAX);
+          break;
+        case L:
+          *va_arg(arg, wint_t*) = Frama_C_wint_t_interval(WINT_MIN, WINT_MAX);
+        default:
+          // Undefined behavior
+          //@ assert invalid_scanf_specifier: \false;
+          ;
+        }
+        break;
+      case 's':
+        switch (lm) {
+        case NONE:
+          // TODO: take into account field width
+          Frama_C_make_unknown(va_arg(arg, char*),
+                               Frama_C_size_t_interval(0, SIZE_MAX));
+          break;
+        case L:
+          // TODO: take into account field width
+          Frama_C_make_unknown_wchar(va_arg(arg, wchar_t*),
+                                     Frama_C_size_t_interval(0, SIZE_MAX/sizeof(wchar_t)));
+        default:
+          // Undefined behavior
+          //@ assert invalid_scanf_specifier: \false;
+          ;
+        }
+        break;
+      case 'n':
+        switch (lm) {
+        case NONE:
+          *va_arg(arg, int*) = conversion_counter;
+          break;
+        case HH:
+          *va_arg(arg, char*) = conversion_counter;
+          break;
+        case H:
+          *va_arg(arg, short*) = conversion_counter;
+          break;
+        case L:
+          *va_arg(arg, long*) = conversion_counter;
+          break;
+        case LL:
+        case UPPER_L: // 'Ld' is not in ISO C, but GCC/Clang treat it like 'lld'
+          *va_arg(arg, long long*) = conversion_counter;
+          break;
+        case J:
+          *va_arg(arg, intmax_t*) = conversion_counter;
+          break;
+        case Z:
+          *va_arg(arg, size_t*) = conversion_counter;
+          break;
+        case T:
+          *va_arg(arg, ptrdiff_t*) = conversion_counter;
+          break;
+        }
+        break;
+        //TODO
+      }
+      conversion_counter++;
+    }
+    p++;
+  }
+  return conversion_counter;
+}
+
+int vscanf(const char * restrict format, va_list arg) {
+  return vfscanf(__fc_stdin, format, arg);
 }
 
 __POP_FC_STDLIB

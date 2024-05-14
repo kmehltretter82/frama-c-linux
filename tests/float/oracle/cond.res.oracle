@@ -16,24 +16,18 @@
   Called from cond.c:12.
 [eva] using specification for function Frama_C_float_interval
 [eva] cond.c:12: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] cond.c:12: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva] computing for function Frama_C_float_interval <- main.
   Called from cond.c:15.
 [eva] cond.c:15: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] cond.c:15: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva:alarm] cond.c:18: Warning: assertion got status unknown.
 [eva] computing for function Frama_C_float_interval <- main.
   Called from cond.c:20.
 [eva] cond.c:20: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] cond.c:20: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva] Recording results for main
 [eva] Done for function main

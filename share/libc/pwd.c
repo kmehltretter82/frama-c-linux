@@ -48,6 +48,11 @@ static int __fc_getpw_init; // used to initialize the __fc_getpw* strings
   remaining -= len
 
 // Common code between getpwman_r and getpwuid_r
+/*@ assigns __fc_getpw_init, __fc_getpw_pw_name[0..63],
+            __fc_getpw_pw_passwd[0..63], __fc_getpw_pw_gecos[0..63],
+            __fc_getpw_pw_dir[0..63], __fc_getpw_pw_shell[0..63],
+            buf[0 .. buflen-1], *pwd, *result, \result
+      \from __fc_pwd; */
 static int __fc_getpw_r(struct passwd *pwd, char *buf,
                         size_t buflen, struct passwd **result) {
   // initialize global strings (only during first execution)

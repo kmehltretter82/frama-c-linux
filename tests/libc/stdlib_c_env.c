@@ -23,5 +23,9 @@ int main() {
   //@ assert i7 == -1; // contains '='
   int i8 = unsetenv(r2);
   char *r3 = getenv(r2);
+  int i9 = setenv("BLA=", "val", 0);
+  //@ check i9 == -1; // contains '='
+  int i10 = setenv("", "val", 0);
+  //@ check i10 == -1; // empty name
   return 0;
 }

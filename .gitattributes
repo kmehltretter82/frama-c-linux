@@ -280,6 +280,11 @@ README* header_spec=.ignore
 
 /doc/aorai/Makefile header_spec=AORAI_LGPL
 
+/share/analysis-scripts/fc-estimate-difficulty.mk header_spec=.ignore
+/share/analysis-scripts/fced-lin.Dockerfile header_spec=.ignore
+/share/analysis-scripts/fced-win.Dockerfile header_spec=.ignore
+/share/analysis-scripts/fced-test/a.c header_spec=.ignore
+/share/analysis-scripts/fced-test/a.h header_spec=.ignore
 /share/analysis-scripts/flamegraph.pl header_spec=CDDL
 /share/emacs/acsl.el header_spec=CEA_PR_LGPL
 /share/libc/argz.h header_spec=CEA_FSF_LGPL

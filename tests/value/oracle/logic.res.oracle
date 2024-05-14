@@ -440,9 +440,7 @@
   Called from logic.c:426.
 [eva] using specification for function Frama_C_double_interval
 [eva] logic.c:426: 
-  function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] logic.c:426: 
-  function Frama_C_double_interval: precondition 'order' got status valid.
+  function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function fabs <- float_abs <- main.
   Called from logic.c:427.
@@ -451,9 +449,7 @@
 [eva] computing for function Frama_C_double_interval <- float_abs <- main.
   Called from logic.c:429.
 [eva] logic.c:429: 
-  function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] logic.c:429: 
-  function Frama_C_double_interval: precondition 'order' got status valid.
+  function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function fabs <- float_abs <- main.
   Called from logic.c:430.
@@ -462,9 +458,7 @@
 [eva] computing for function Frama_C_double_interval <- float_abs <- main.
   Called from logic.c:432.
 [eva] logic.c:432: 
-  function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] logic.c:432: 
-  function Frama_C_double_interval: precondition 'order' got status valid.
+  function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function fabs <- float_abs <- main.
   Called from logic.c:433.
@@ -473,9 +467,7 @@
 [eva] computing for function Frama_C_double_interval <- float_abs <- main.
   Called from logic.c:435.
 [eva] logic.c:435: 
-  function Frama_C_double_interval: precondition 'finite' got status valid.
-[eva] logic.c:435: 
-  function Frama_C_double_interval: precondition 'order' got status valid.
+  function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
 [eva] computing for function fabs <- float_abs <- main.
   Called from logic.c:436.
