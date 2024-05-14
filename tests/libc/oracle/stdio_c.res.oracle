@@ -575,8 +575,6 @@
   out of bounds write. assert \valid(tmp_17);
                        (tmp_17 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/stdio.c:435: Warning: 
-  accessing uninitialized left-value. assert \initialized(&vld);
-[eva:alarm] FRAMAC_SHARE/libc/stdio.c:435: Warning: 
   non-finite long double value. assert \is_finite(vld);
 [eva:alarm] FRAMAC_SHARE/libc/stdio.c:440: Warning: 
   assertion 'invalid_scanf_specifier' got status invalid (stopping propagation).
