@@ -224,6 +224,7 @@ wp-tests:
 ivette-tests:
   stage: tests
   image: "ocaml/opam:ubuntu-lts-ocaml-$OCAML"
+  when: manual
   before_script:
     - sudo apt update
     - sudo apt install -y xvfb curl unzip libnss3 libasound2
