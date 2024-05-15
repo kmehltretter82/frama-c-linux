@@ -106,7 +106,9 @@ type tenv = C.logic_type_info W.Ty.Hts.t
 type lenv = C.logic_info W.Term.Hls.t
 type tvars = C.logic_type W.Ty.Mtv.t
 
-
+(* -------------------------------------------------------------------------- *)
+(* ---    Built-in                                                        --- *)
+(* -------------------------------------------------------------------------- *)
 let _populate_tenv_builtin (tenv:tenv) =
   let _integer = C.Linteger in
   let _real = C.Lreal in
@@ -128,6 +130,7 @@ let tvars_of_txs (txs: W.Ty.tvsymbol list) : string list * tvars =
        let x = tv.tv_name.id_string in
        match x with
        | "int" -> x :: txs, W.Ty.Mtv.add tv (C.Linteger) tvs
+       | "real" -> x :: txs, W.Ty.Mtv.add tv (C.Lreal) tvs
        | _ ->  x :: txs, W.Ty.Mtv.add tv (C.Lvar x) tvs
     ) txs ([], W.Ty.Mtv.empty)
 
@@ -164,7 +167,7 @@ let lv_of_ty (tenv:tenv) (tvars:tvars) (index) (ty:W.Ty.ty) : C.logic_var =
   Cil_const.make_logic_var_formal (Printf.sprintf "x%d" index)
   @@ (lt_of_ty tenv tvars ty)
 
-let lr_of_ty_opt (lt_opt) =
+let lt_of_ty_opt (lt_opt) =
   match lt_opt with
   | None -> C.Ctype (C.TVoid []) (* Same as logic_typing *)
   | Some tr -> tr
@@ -175,7 +178,7 @@ let li_of_ls (tenv:tenv) (ls : W.Term.lsymbol) (lenv:lenv)  : C.logic_info =
   let l_type = Option.map (lt_of_ty tenv tvars ) ls.ls_value in
   let l_profile = List.mapi (lv_of_ty tenv tvars ) ls.ls_args in
   let l_args = List.map ( fun (lv:C.logic_var) -> lv.lv_type) l_profile in
-  let signature = C.Larrow (l_args, lr_of_ty_opt l_type) in
+  let signature = C.Larrow (l_args, lt_of_ty_opt l_type) in
   let li =
     C.{
       l_var_info = Cil_const.make_logic_var_global
