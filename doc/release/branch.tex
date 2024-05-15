@@ -106,6 +106,27 @@ This will:
 
 Commit this change and push.
 
+\section{External plugins}
+
+List of external plugins repo names:
+\begin{itemize}
+  \item ACSL-importer
+  \item Caveat-importer
+  \item Cfp
+  \item frama-clang
+  \item GenAssigns
+  \item Meta
+  \item Mthread
+  \item PathCrawler
+  \item Security
+  \item Volatile
+\end{itemize}
+For each one of them, check that versions in the \texttt{dune-project} files are
+coherent with \FramaC's new release. If not, update them and run \verb+make+ to
+generate the new opam file. Create a new branch, commit and push. Create a merge
+request targetting \texttt{stable/copper} on each plugin and assign your co-rm.
+This changes will need to be merged on master's branches later.
+
 \section{Copyright}
 
 Check that the date in copyright headers is correct. If not then:
