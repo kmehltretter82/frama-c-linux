@@ -431,7 +431,7 @@ int vfscanf(FILE * restrict stream, const char * restrict format, va_list arg) {
         case UPPER_L:
           // TODO: use Frama_C_long_double_interval when it will be supported
           {
-            volatile long double vld;
+            volatile long double vld = 0.0;
             *va_arg(arg, long double*) = vld;
           }
           break;

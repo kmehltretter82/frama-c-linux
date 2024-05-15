@@ -7990,8 +7990,8 @@ int vfscanf(FILE * restrict stream, char const * restrict format, va_list arg)
           break;
           case UPPER_L:
           {
-            long double volatile vld;
             long double *tmp_17;
+            long double volatile vld = (long double)0.0;
             tmp_17 = *((long double **)*arg);
             arg ++;
             *tmp_17 = vld;
