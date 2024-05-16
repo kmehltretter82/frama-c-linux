@@ -105,13 +105,19 @@ let pp_lvs fmt (lvs : C.logic_var list) =
 
 type tvars = C.logic_type W.Ty.Mtv.t
 
+type why3module = {
+  paths : string list;
+  types : C.logic_type_info list;
+  logics : C.logic_info list;
+}
+
 type env = {
   wenv : W.Env.env;
   tenv : C.logic_type_info W.Ty.Hts.t;
   lenv : C.logic_info W.Term.Hls.t;
   lils : W.Term.lsymbol Logic_info.Hashtbl.t;
   ltits : W.Ty.tysymbol Logic_type_info.Hashtbl.t;
-  _menv : (list C.global_annotation) Datatype.String.Hashtbl.t
+  _menv : why3module Datatype.String.Hashtbl.t
 }
 
 
@@ -178,16 +184,6 @@ and lti_of_ts (env : env) (ts : W.Ty.tysymbol) : C.logic_type_info =
       }
     in W.Ty.Hts.add env.tenv ts lti ;
     Logic_type_info.Hashtbl.add env.ltits lti ts;
-    let _gtype : C.typeinfo = C.{
-      torig_name = ts.ts_name.id_string;
-    }
-    (* Datatype.String.Hashtbl.add env._menv (construct_acsl_name ts.ts_name)
-      C.GType (
-        C.{
-          torig_name = ts.ts_name.id_string;
-          tname = ts.ts_name.id_string;
-        }
-        ); *)
     lti
 
 
