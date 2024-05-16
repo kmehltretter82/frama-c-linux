@@ -106,9 +106,9 @@ let pp_lvs fmt (lvs : C.logic_var list) =
 type tvars = C.logic_type W.Ty.Mtv.t
 
 type why3module = {
-  paths : string list;
-  types : C.logic_type_info list;
-  logics : C.logic_info list;
+  _paths : string list;
+  _types : C.logic_type_info list;
+  _logics : C.logic_info list;
 }
 
 type env = {
@@ -230,6 +230,8 @@ let li_of_ls (env:env) (ls : W.Term.lsymbol)  : C.logic_info =
 let import_theory (env : env) thname =
   let theory_name, theory_path = extract_path thname in
   try
+    Datatype.String.Hashtbl.add env._menv thname
+      { _logics = []; _types = []; _paths = theory_path};
     let theory = W.Env.read_theory env.wenv theory_path theory_name in
     List.iter (fun (tdecl : T.tdecl) ->
         match tdecl.td_node with
@@ -291,12 +293,15 @@ let () =
           W.Ty.Hts.iter (fun (tys) (lti) ->
               L.result "Why3 type symbol : %a" pp_tys tys;
               L.result "Corresponding CIL logic type info %a" pp_lti lti;
-            ) tenv;
+            ) env.tenv;
           W.Term.Hls.iter (fun (ls) (li) ->
               L.result "Why3 logic symbol : %a" pp_ls ls;
               L.result "Corresponding CIL logic info : %a" pp_li li;
               L.result "Associated parameters : @[<hov2>%a@]" pp_lvs li.l_profile;
-            ) lenv;
+            ) env.lenv;
+          Datatype.String.Hashtbl.iter (fun (s) (why3mod) ->
+              L.result "Encoutered %s at %s" s (String.concat "::" why3mod._paths)
+            ) env._menv
         end
 
     end
