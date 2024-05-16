@@ -110,6 +110,20 @@ type tvars = C.logic_type W.Ty.Mtv.t
 
 type genv = W.Env.env * tenv * lenv
 
+module LogicMap = Map.Make(struct
+    type t = C.logic_info
+    let compare = compare (* Use the default comparison function for type A *)
+  end)
+
+module TypeMap = Map.Make(struct
+    type t = C.logic_type
+    let compare = compare (* Use the default comparison function for type A *)
+  end)
+
+
+type _reverse_logic_info = W.Term.lsymbol LogicMap.t
+type _reverse_logic_type = W.Ty.tysymbol TypeMap.t
+
 (* -------------------------------------------------------------------------- *)
 (* ---    Built-in                                                        --- *)
 (* -------------------------------------------------------------------------- *)
@@ -117,8 +131,7 @@ type genv = W.Env.env * tenv * lenv
 let add_builtin (tenv : tenv) ts lt_name lt_params  =
   W.Ty.Hts.add tenv ts C.{lt_name ; lt_params; lt_def=None; lt_attr=[] }
 
-
-let find_ts wenv pkg thy name =
+let find_ts ((wenv,_,_) : genv) pkg thy name =
   let th = Why3.Env.read_theory wenv pkg thy in
   try
     Why3.Theory.ns_find_ts th.th_export name
@@ -126,14 +139,20 @@ let find_ts wenv pkg thy name =
     L.fatal "Cannot find %s.%s.%s"
       (String.concat "." pkg ) thy (String.concat "." name)
 
-let add_builtins (wenv : W.Env.env) (tenv:tenv) =
+let add_builtins ((wenv,tenv,lenv) : genv) =
   begin
-    let ts_list = find_ts wenv ["list"] "List" ["list"] in
-    let ts_set = find_ts wenv ["set"] "Set" ["set"] in
+    let ts_list = find_ts (wenv,tenv,lenv) ["list"] "List" ["list"] in
+    let ts_set = find_ts (wenv,tenv,lenv) ["set"] "Set" ["set"] in
     add_builtin tenv W.Ty.ts_bool Utf8_logic.boolean [];
     add_builtin tenv ts_list "\\list" ["A"];
     add_builtin tenv ts_set "set" ["A"];
   end
+
+(* -------------------------------------------------------------------------- *)
+(* ---    Reverse tables                                                  --- *)
+(* -------------------------------------------------------------------------- *)
+
+
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Type conversion                                                 --- *)
@@ -268,7 +287,8 @@ let () =
           let wenv = create_why3_env @@ libs in
           let tenv : tenv = W.Ty.Hts.create 0 in
           let lenv : lenv = W.Term.Hls.create 0 in
-          add_builtins wenv tenv;
+          let genv : genv = (wenv , tenv , lenv) in
+          add_builtins genv;
           List.iter (import_theory wenv tenv lenv) @@ imports;
           W.Ty.Hts.iter (fun (tys) (lti) ->
               L.result "Why3 type symbol : %a" pp_tys tys;
