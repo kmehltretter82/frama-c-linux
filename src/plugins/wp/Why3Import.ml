@@ -28,6 +28,8 @@ module F = Filepath.Normalized
 module W = Why3
 module WConf = Why3.Whyconf
 
+
+
 let dkey = L.register_category "why3.import"
 
 (* -------------------------------------------------------------------------- *)
@@ -108,21 +110,18 @@ type tenv = C.logic_type_info W.Ty.Hts.t
 type lenv = C.logic_info W.Term.Hls.t
 type tvars = C.logic_type W.Ty.Mtv.t
 
-type genv = W.Env.env * tenv * lenv
+type lils = W.Term.lsymbol Logic_info.Hashtbl.t
+type ltits = W.Ty.tysymbol Logic_type_info.Hashtbl.t
+type menv = C.global Datatype.String.Hashtbl.t
 
-module LogicMap = Map.Make(struct
-    type t = C.logic_info
-    let compare = compare (* Use the default comparison function for type A *)
-  end)
-
-module TypeMap = Map.Make(struct
-    type t = C.logic_type
-    let compare = compare (* Use the default comparison function for type A *)
-  end)
-
-
-type _reverse_logic_info = W.Term.lsymbol LogicMap.t
-type _reverse_logic_type = W.Ty.tysymbol TypeMap.t
+type genv = {
+  wenv : W.Env.env;
+  tenv : tenv;
+  lenv : lenv;
+  lils : lils;
+  ltits : ltits;
+  menv : menv
+}
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Built-in                                                        --- *)
@@ -131,21 +130,21 @@ type _reverse_logic_type = W.Ty.tysymbol TypeMap.t
 let add_builtin (tenv : tenv) ts lt_name lt_params  =
   W.Ty.Hts.add tenv ts C.{lt_name ; lt_params; lt_def=None; lt_attr=[] }
 
-let find_ts ((wenv,_,_) : genv) pkg thy name =
-  let th = Why3.Env.read_theory wenv pkg thy in
+let find_ts genv pkg thy name =
+  let th = Why3.Env.read_theory genv.wenv pkg thy in
   try
     Why3.Theory.ns_find_ts th.th_export name
   with Not_found ->
     L.fatal "Cannot find %s.%s.%s"
       (String.concat "." pkg ) thy (String.concat "." name)
 
-let add_builtins ((wenv,tenv,lenv) : genv) =
+let add_builtins genv =
   begin
-    let ts_list = find_ts (wenv,tenv,lenv) ["list"] "List" ["list"] in
-    let ts_set = find_ts (wenv,tenv,lenv) ["set"] "Set" ["set"] in
-    add_builtin tenv W.Ty.ts_bool Utf8_logic.boolean [];
-    add_builtin tenv ts_list "\\list" ["A"];
-    add_builtin tenv ts_set "set" ["A"];
+    let ts_list = find_ts genv ["list"] "List" ["list"] in
+    let ts_set = find_ts genv ["set"] "Set" ["set"] in
+    add_builtin genv.tenv W.Ty.ts_bool Utf8_logic.boolean [];
+    add_builtin genv.tenv ts_list "\\list" ["A"];
+    add_builtin genv.tenv ts_set "set" ["A"];
   end
 
 (* -------------------------------------------------------------------------- *)
@@ -287,7 +286,10 @@ let () =
           let wenv = create_why3_env @@ libs in
           let tenv : tenv = W.Ty.Hts.create 0 in
           let lenv : lenv = W.Term.Hls.create 0 in
-          let genv : genv = (wenv , tenv , lenv) in
+          let lils : lils = Logic_info.Hashtbl.create 0 in
+          let ltits : ltits = Logic_type_info.Hashtbl.create 0 in
+          let menv : menv = Datatype.String.Hashtbl.create 0 in
+          let genv : genv = { wenv ; tenv; lenv; lils; ltits; menv } in
           add_builtins genv;
           List.iter (import_theory wenv tenv lenv) @@ imports;
           W.Ty.Hts.iter (fun (tys) (lti) ->
