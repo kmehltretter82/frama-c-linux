@@ -109,9 +109,9 @@ type env = {
   wenv : W.Env.env;
   tenv : C.logic_type_info W.Ty.Hts.t;
   lenv : C.logic_info W.Term.Hls.t;
-  _lils : W.Term.lsymbol Logic_info.Hashtbl.t;
-  _ltits : W.Ty.tysymbol Logic_type_info.Hashtbl.t;
-  _menv : C.global Datatype.String.Hashtbl.t
+  lils : W.Term.lsymbol Logic_info.Hashtbl.t;
+  ltits : W.Ty.tysymbol Logic_type_info.Hashtbl.t;
+  _menv : (list C.global_annotation) Datatype.String.Hashtbl.t
 }
 
 
@@ -177,7 +177,17 @@ and lti_of_ts (env : env) (ts : W.Ty.tysymbol) : C.logic_type_info =
         lt_attr = [];
       }
     in W.Ty.Hts.add env.tenv ts lti ;
-    Logic_type_info.Hashtbl.add env._ltits lti ts;
+    Logic_type_info.Hashtbl.add env.ltits lti ts;
+    let _gtype : C.typeinfo = C.{
+      torig_name = ts.ts_name.id_string;
+    }
+    (* Datatype.String.Hashtbl.add env._menv (construct_acsl_name ts.ts_name)
+      C.GType (
+        C.{
+          torig_name = ts.ts_name.id_string;
+          tname = ts.ts_name.id_string;
+        }
+        ); *)
     lti
 
 
@@ -212,7 +222,8 @@ let li_of_ls (env:env) (ls : W.Term.lsymbol)  : C.logic_info =
       l_profile ;
       l_body = C.LBnone;
     } in W.Term.Hls.add env.lenv ls li;
-  Logic_info.Hashtbl.add env._lils li ls;
+  Logic_info.Hashtbl.add env.lils li ls;
+
   li
 
 
@@ -275,10 +286,10 @@ let () =
           let wenv = create_why3_env @@ libs in
           let tenv  = W.Ty.Hts.create 0 in
           let lenv  = W.Term.Hls.create 0 in
-          let _lils  = Logic_info.Hashtbl.create 0 in
-          let _ltits  = Logic_type_info.Hashtbl.create 0 in
+          let lils  = Logic_info.Hashtbl.create 0 in
+          let ltits  = Logic_type_info.Hashtbl.create 0 in
           let _menv  = Datatype.String.Hashtbl.create 0 in
-          let env : env = { wenv; tenv; lenv; _lils; _ltits; _menv } in
+          let env : env = { wenv; tenv; lenv; lils; ltits; _menv } in
           add_builtins env;
           List.iter (import_theory env) @@ imports;
           W.Ty.Hts.iter (fun (tys) (lti) ->
