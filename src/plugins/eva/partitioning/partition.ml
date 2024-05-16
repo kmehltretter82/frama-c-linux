@@ -316,7 +316,7 @@ let to_list (p : 'a partition) : (key * 'a) list =
 type unroll_limit =
   | ExpLimit of Cil_types.exp
   | IntLimit of int
-  | AutoUnroll of Cil_types.stmt * int * int
+  | AutoUnroll of Eva_automata.vertex * int * int
 
 type action =
   | Enter_loop of unroll_limit
@@ -586,12 +586,11 @@ struct
               and source = fst cil_exp.eloc in
               eval_exp_to_int ~source x exp
             | IntLimit i -> i
-            | AutoUnroll (stmt, min_unroll, max_unroll) ->
-              match AutoLoopUnroll.compute ~max_unroll x stmt with
+            | AutoUnroll (vertex, min_unroll, max_unroll) ->
+              match AutoLoopUnroll.compute ~max_unroll x vertex with
               | None -> min_unroll
               | Some i ->
-                let source = fst (Cil_datatype.Stmt.loc stmt) in
-                Self.warning ~once:true ~current:true ~source
+                Self.warning ~once:true ~current:true
                   ~wkey:Self.wkey_loop_unroll_auto
                   "Automatic loop unrolling.";
                 i

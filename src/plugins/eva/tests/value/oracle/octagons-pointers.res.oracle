@@ -80,7 +80,7 @@
   out of bounds read. assert \valid_read(elt3);
 [eva] Recording results for cmdRead
 [eva] Done for function cmdRead
-[eva:loop-unroll:partial] octagons-pointers.c:49: loop not completely unrolled
+[eva:loop-unroll:partial] octagons-pointers.c:43: loop not completely unrolled
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

@@ -25,10 +25,16 @@ open Eva_ast
 
 (* --- Vertices and Edges types --- *)
 
+type info =
+  | NoneInfo
+  | LoopHead of stmt
+
 type vertex = {
+  vertex_kf : kernel_function;
   vertex_key : int;
   vertex_start_of : Cil_types.stmt option;
-  mutable vertex_wto_index : vertex list
+  vertex_info : info;
+  mutable vertex_wto_index : vertex list;
 }
 
 type guard_kind = Interpreted_automata.guard_kind = Then | Else
@@ -52,8 +58,10 @@ type edge = {
 }
 
 let dummy_vertex = {
+  vertex_kf = List.hd (Cil_datatype.Kf.reprs);
   vertex_key = -1;
   vertex_start_of = None;
+  vertex_info = NoneInfo;
   vertex_wto_index = [];
 }
 
@@ -220,6 +228,10 @@ let translate_transition transition =
   | Leave block ->
     Leave block
 
+let translate_info : Interpreted_automata.info -> info = function
+  | NoneInfo -> NoneInfo
+  | LoopHead (stmt,_) -> LoopHead stmt
+
 (* Fill the wto index of the vertices *)
 let build_wto_index wto =
   let rec iter_wto index w =
@@ -262,8 +274,10 @@ let translate_automaton kf =
   let table = VertexTable.create size in
   let translate_vertex (v : Src.vertex) =
     let v' = {
+      vertex_kf = kf;
       vertex_key = v.vertex_key;
       vertex_start_of = v.vertex_start_of;
+      vertex_info = translate_info v.vertex_info;
       vertex_wto_index = [];
     }
     in

@@ -501,7 +501,7 @@ struct
     | NoneInfo, NoneInfo -> 0
     | NoneInfo, _ -> -1
     | _ , NoneInfo -> 1
-    | LoopHead i, LoopHead j -> Stdlib.compare j i
+    | LoopHead (_, i), LoopHead (_, j) -> Stdlib.compare j i
 
   module Automata = Interpreted_automata.UnrollUnnatural.Version
   type nodes = {
@@ -757,7 +757,7 @@ struct
 
   let compute_kf kf =
     let open Interpreted_automata in
-    let autom = Compute.get_automaton ~annotations:true kf in
+    let autom = Compute.get_automaton kf in
     (* let cout = open_out (Format.sprintf "/tmp/cfg_automata_%s.dot" (Kernel_function.get_name kf)) in
      * Interpreted_automata.Compute.output_to_dot cout autom;
      * close_out cout; *)

@@ -2,6 +2,6 @@ memexec-hits	g		3
 memexec-misses	g		5
 memexec-misses	f		2
 memexec-misses	main		1
-partitioning-index-misses			57
+partitioning-index-misses			59
 max-widenings	f	statistics.i:12	1
 iterations	f	statistics.i:12	8

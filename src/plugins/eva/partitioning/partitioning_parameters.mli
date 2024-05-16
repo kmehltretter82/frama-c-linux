@@ -27,7 +27,7 @@ module Make (_ : sig val kf: kernel_function end) : sig
   val widening_period : int
   val slevel : stmt -> int
   val merge : stmt -> bool
-  val unroll : stmt -> Partition.unroll_limit
+  val unroll : Eva_automata.vertex -> Partition.unroll_limit
   val history_size : int
   val universal_splits : Partition.action list
   val flow_actions : stmt -> Partition.action list

@@ -72,19 +72,21 @@ module Graph = struct
 
   (* Builds the loop type for the englobing loop of statement [stmt]
      in function [kf]. Raises [Not_found] if no loop is found. *)
-  let find_loop kf stmt =
+  let find_loop kf vertex =
     let automaton = get_automaton kf in
     let graph = automaton.graph in
-    let vertex, _ = Cil_datatype.Stmt.Hashtbl.find automaton.stmt_table stmt in
     match vertex.vertex_wto_index with
-    | [] -> raise Not_found
+    | [] ->
+      raise Not_found
     | head :: _ ->
       (* Find in the wto the component whose head is [head]. *)
       let rec find = function
         | [] -> assert false
         | Wto.Node _ :: tl -> find tl
         | Wto.Component (h, l) :: tl ->
-          if Vertex.equal h head then {graph; head; wto = l} else find (l @ tl)
+          if Vertex.equal h head
+          then {graph; head; wto = l}
+          else find (l @ tl)
       in
       find automaton.wto
 
@@ -566,14 +568,20 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
        iteration by [limit]. *)
     List.exists is_bounded_by_condition exit_conditions
 
-  (* Computes an automatic loop unrolling for statement [stmt] in state [state],
-     with a maximum limit. Returns None for no automatic loop unrolling. *)
-  let compute ~max_unroll state stmt =
+  (* Computes an automatic loop unrolling for loop identified by [vertex] in
+     state [state], with a maximum limit. Returns None for no automatic loop
+     unrolling. *)
+  let compute ~max_unroll state vertex =
     let open Option.Operators in
     let* from_domains = Dom.build_context state |> Bottom.to_option in
     try
-      let kf = Kernel_function.find_englobing_kf stmt in
-      let loop = Graph.find_loop kf stmt in
+      let kf = vertex.Eva_automata.vertex_kf in
+      let loop = Graph.find_loop kf vertex in
+      let stmt =
+        match vertex.vertex_info with
+        | LoopHead stmt-> stmt
+        | NoneInfo -> Option.get vertex.vertex_start_of
+      in
       if is_bounded_loop kf stmt loop { from_domains } state max_unroll
       then Some max_unroll
       else None

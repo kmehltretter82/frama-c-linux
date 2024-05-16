@@ -20,7 +20,7 @@
   Called from octagons-pointers-intermediate.c:45.
 [eva] Recording results for cmdRead
 [eva] Done for function cmdRead
-[eva:loop-unroll:partial] octagons-pointers-intermediate.c:47: 
+[eva:loop-unroll:partial] octagons-pointers-intermediate.c:42: 
   loop not completely unrolled
 [eva] Recording results for main
 [eva] Done for function main

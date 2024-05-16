@@ -28,7 +28,7 @@ open Cil_types
 
 type info =
   | NoneInfo
-  | LoopHead of int (* level *)
+  | LoopHead of stmt * int (* level *)
 
 type 'a control =
   | Edges (* control flow is only given by vertex edges *)
@@ -290,7 +290,8 @@ let make_annotation kf stmt annot labels =
 (** Build an automaton from a kf. It first traverses all the statements
     recursively. The recursion does not go deeper into instructions or
     expression. After this traversal, the goto edges are added. *)
-let build_automaton ~annotations kf =
+let build_automaton kf =
+  let annotations = true in
   let fundec = Kernel_function.get_definition kf in
   (* These objects are "global" through the traversal of the function *)
   let g = G.create () in
@@ -421,7 +422,7 @@ let build_automaton ~annotations kf =
        to distinguish between the state juste before the loop (or the goto)
        and the states in the loop (or coming from the goto statements). *)
     let control =
-      if not annotations && (is_loop stmt || is_goto_destination stmt)
+      if is_loop stmt || is_goto_destination stmt
       then
         let src = add_vertex () in
         add_edge control.src src kinstr Skip loc;
@@ -550,7 +551,7 @@ let build_automaton ~annotations kf =
                  we can't separate loop_entry from loop_current *)
             let loop_head_point = add_vertex () in
             add_edge control.src loop_head_point kinstr Skip loc;
-            loop_head_point.vertex_info <- LoopHead (!loop_level);
+            loop_head_point.vertex_info <- LoopHead (stmt, !loop_level);
             let labels =
               LabelMap.(add_builtin LoopEntry control.src
                           (add_builtin LoopCurrent loop_head_point labels))
@@ -926,7 +927,7 @@ module WTOIndex =
 module Compute = struct
 
   let output_to_dot = output_to_dot
-  let get_automaton ~annotations = build_automaton ~annotations
+  let get_automaton = build_automaton
   let exit_strategy = exit_strategy
 
   type wto_index_table = wto_index Vertex.Hashtbl.t
@@ -937,7 +938,7 @@ module Compute = struct
       | NoneInfo, NoneInfo -> 0
       | NoneInfo, _ -> -1
       | _ , NoneInfo -> 1
-      | LoopHead i, LoopHead j -> - (compare i j)
+      | LoopHead (_, i), LoopHead (_, j) -> - (compare i j)
     in
     build_wto ~pref automaton
 
@@ -997,7 +998,7 @@ module AutomatonState = Kernel_function.Make_Table (Automaton)
       let dependencies = [Ast.self]
     end)
 
-let get_automaton = AutomatonState.memo (build_automaton ~annotations:false)
+let get_automaton = AutomatonState.memo build_automaton
 
 module WTOState = Kernel_function.Make_Table (WTO)
     (struct
@@ -1006,17 +1007,27 @@ module WTOState = Kernel_function.Make_Table (WTO)
       let dependencies = [Ast.self]
     end)
 
+(* Preferences for wto head vertices *)
+let default_pref v1 v2 =
+  match v1.vertex_info, v2.vertex_info with
+  (* If there is a loop statement in the Cil representation, use the
+     LoopCurrent labelled vertex as the loop head. Use the outermost
+     (lowest level) loop first in case of nested loops. *)
+  | LoopHead (_, i), LoopHead (_, j) -> - (compare i j)
+  | NoneInfo, LoopHead _ -> -1
+  | LoopHead _ , NoneInfo -> 1
+  | NoneInfo, NoneInfo ->
+    (* Otherwise, use the vertex which is the start of a statement. *)
+    match v1.vertex_start_of, v2.vertex_start_of with
+    | None, None -> 0
+    | None, _ -> -1
+    | _ , None -> 1
+    | Some _, Some _ -> 0
+
 let get_wto =
   let build kf =
     let automaton = get_automaton kf in
-    let pref v1 v2 =
-      match v1.vertex_start_of, v2.vertex_start_of with
-      | None, None -> 0
-      | None, _ -> -1
-      | _ , None -> 1
-      | Some _, Some _ -> 0
-    in
-    build_wto ~pref automaton
+    build_wto ~pref:default_pref automaton
   in
   WTOState.memo build
 

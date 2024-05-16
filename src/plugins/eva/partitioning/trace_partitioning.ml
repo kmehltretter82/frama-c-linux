@@ -47,6 +47,7 @@ struct
     flow_actions : action list; (* partitioning actions to be applied *)
     rationing: bool; (* Is there a slevel rationing in above actions? *)
     store_stmt : stmt option;
+    store_is_loop_head : bool;
     store_index : Index.t; (* Index of all states stored: used to quickly remove
                               new states that have already been propagated. *)
     mutable store_partition : state partition; (* partition of states *)
@@ -73,7 +74,7 @@ struct
 
   (* Constructors *)
 
-  let empty_store ~(stmt : stmt option) : store =
+  let empty_store ~(stmt : stmt option) ~(is_loop_head : bool) : store =
     let rationing_parameters, flow_actions = match stmt with
       | None -> None, []
       | Some stmt ->
@@ -96,6 +97,7 @@ struct
       flow_actions;
       rationing = rationing_parameters <> None;
       store_stmt = stmt;
+      store_is_loop_head = is_loop_head;
       store_index = Index.empty ();
       store_partition = Partition.empty;
       incoming_states = 0;
@@ -164,10 +166,10 @@ struct
 
   (* Partition transfer functions *)
 
-  let enter_loop (flow : flow) (i : stmt) : flow =
+  let enter_loop (flow : flow) (i : Eva_automata.vertex) : flow =
     Flow.transfer_keys flow (Enter_loop (unroll i))
 
-  let leave_loop (flow : flow) (_i : stmt) : flow =
+  let leave_loop (flow : flow) (_i : Eva_automata.vertex) : flow =
     Flow.transfer_keys flow Leave_loop
 
   let next_loop_iteration (flow : flow) (_i : stmt) : flow =
@@ -256,11 +258,6 @@ struct
       stmt.sid dest.incoming_states (flow_size flow)
 
   let join (sources : (branch*flow) list) (dest : store) : flow =
-    let is_loop_head =
-      match dest.store_stmt with
-      | Some {skind=Cil_types.Loop _} -> true
-      | _ -> false
-    in
     (* Get every source flow *)
     let sources_states =
       (* Is there more than one non-empty incomming flow ? *)
@@ -302,7 +299,7 @@ struct
               None
             else begin
               (* Propagate the join of the two states *)
-              if is_loop_head then
+              if dest.store_is_loop_head then
                 Self.feedback ~dkey ~level:1 ~once:true ~current:true
                   "starting to merge loop iterations";
               Some (Domain.join previous_state current_state)

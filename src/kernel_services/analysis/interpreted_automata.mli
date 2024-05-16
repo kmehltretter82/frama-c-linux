@@ -38,7 +38,7 @@ open Cil_types
 
 type info =
   | NoneInfo
-  | LoopHead of int (* level *)
+  | LoopHead of stmt * int (* level *)
 
 (** Control flow informations for outgoing edges, if any. *)
 type 'a control =
@@ -146,7 +146,7 @@ module WTO : sig
   include Datatype.S with type t = wto
 end
 
-(** Get the automaton for the given kernel_function without annotations *)
+(** Get the automaton for the given kernel_function *)
 val get_automaton : Cil_types.kernel_function -> automaton
 
 (** Get the wto for the automaton of the given kernel_function *)
@@ -205,7 +205,7 @@ module Compute: sig
       Note that the automata construction may lead to the build of new Cil
       expressions which will be different at each call: you may need to
       memoize the results of this function. *)
-  val get_automaton : annotations:bool -> Cil_types.kernel_function -> automaton
+  val get_automaton : Cil_types.kernel_function -> automaton
 
   (** Build the wto for the given automaton (No memoization, use get_wto
       instead) *)

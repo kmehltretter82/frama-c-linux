@@ -28,9 +28,15 @@
 open Cil_types
 open Eva_ast
 
+type info =
+  | NoneInfo
+  | LoopHead of stmt
+
 type vertex = private {
+  vertex_kf : kernel_function;
   vertex_key : int;
   vertex_start_of : Cil_types.stmt option;
+  vertex_info : info;
   mutable vertex_wto_index : vertex list;
 }
 

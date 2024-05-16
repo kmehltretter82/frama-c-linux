@@ -41,7 +41,7 @@ sig
 
   (* --- Constructors --- *)
 
-  val empty_store : stmt:Cil_types.stmt option -> store
+  val empty_store : stmt:Cil_types.stmt option -> is_loop_head:bool -> store
   val empty_flow : flow
   val empty_tank : unit -> tank
   val empty_widening : stmt:Cil_types.stmt option -> widening
@@ -82,8 +82,8 @@ sig
 
   (* --- Partition transfer functions --- *)
 
-  val enter_loop : flow -> Cil_types.stmt -> flow
-  val leave_loop : flow -> Cil_types.stmt -> flow
+  val enter_loop : flow -> Eva_automata.vertex -> flow
+  val leave_loop : flow -> Eva_automata.vertex -> flow
   val next_loop_iteration : flow -> Cil_types.stmt -> flow
   val split_return : flow -> Eva_ast.exp option -> flow
 
