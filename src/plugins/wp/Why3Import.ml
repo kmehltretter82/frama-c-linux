@@ -28,6 +28,8 @@ module F = Filepath.Normalized
 module W = Why3
 module WConf = Why3.Whyconf
 
+let dkey = L.register_category "why3.import"
+
 (* -------------------------------------------------------------------------- *)
 (* ---    Why3 Environment                                                --- *)
 (* -------------------------------------------------------------------------- *)
@@ -93,9 +95,10 @@ let pp_li fmt (li : C.logic_info) =
 
 (* For debug only*)
 let pp_lvs fmt (lvs : C.logic_var list) =
-  List.iter (fun (lv: C.logic_var) -> Cpp.pp_logic_var fmt lv;
-              Cpp.pp_logic_type fmt lv.lv_type)
-    lvs;
+  List.iter (fun (lv: C.logic_var) ->
+      Format.fprintf fmt "@ %a: %a"
+        Cpp.pp_logic_var lv Cpp.pp_logic_type lv.lv_type
+    ) lvs;
 
   (* -------------------------------------------------------------------------- *)
   (* ---    Types                                                           --- *)
@@ -108,13 +111,27 @@ type tvars = C.logic_type W.Ty.Mtv.t
 (* -------------------------------------------------------------------------- *)
 (* ---    Built-in                                                        --- *)
 (* -------------------------------------------------------------------------- *)
-let _populate_tenv_builtin (tenv:tenv) =
-  let _integer = C.Linteger in
-  let _real = C.Lreal in
-  let _bool =  C.{ lt_name=Utf8_logic.boolean; lt_params=[]; lt_def=None; lt_attr=[] } in
-  let _list = C.{ lt_name="\\list"; lt_params=[]; lt_def=None; lt_attr=[]} in
-  let _set = C.{ lt_name = "set"; lt_params=["elem"]; lt_def=None; lt_attr=[] } in
-  tenv
+
+let add_builtin (tenv : tenv) ts lt_name lt_params  =
+  W.Ty.Hts.add tenv ts C.{lt_name ; lt_params; lt_def=None; lt_attr=[] }
+
+
+let find_ts wenv pkg thy name =
+  let th = Why3.Env.read_theory wenv pkg thy in
+  try
+    Why3.Theory.ns_find_ts th.th_export name
+  with Not_found ->
+    L.fatal "Cannot find %s.%s.%s"
+      (String.concat "." pkg ) thy (String.concat "." name)
+
+let add_builtins (wenv : W.Env.env) (tenv:tenv) =
+  begin
+    let ts_list = find_ts wenv ["list"] "List" ["list"] in
+    let ts_set = find_ts wenv ["set"] "Set" ["set"] in
+    add_builtin tenv W.Ty.ts_bool Utf8_logic.boolean [];
+    add_builtin tenv ts_list "\\list" ["A"];
+    add_builtin tenv ts_set "set" ["A"];
+  end
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Type conversion                                                 --- *)
@@ -127,13 +144,15 @@ let tvars_of_txs (txs: W.Ty.tvsymbol list) : string list * tvars =
   List.fold_right
     (fun (tv: W.Ty.tvsymbol) (txs,tvs) ->
        let x = tv.tv_name.id_string in
-        x :: txs, W.Ty.Mtv.add tv (C.Lvar x) tvs
+       x :: txs, W.Ty.Mtv.add tv (C.Lvar x) tvs
     ) txs ([], W.Ty.Mtv.empty)
 
 
 let rec lt_of_ty (tenv : tenv) (tvs : tvars)  (ty: W.Ty.ty) : C.logic_type =
   match ty.ty_node with
   | Tyvar x -> W.Ty.Mtv.find x tvs
+  | Tyapp(s,[]) when W.Ty.(ts_equal s ts_int) -> C.Linteger
+  | Tyapp(s,[]) when W.Ty.(ts_equal s ts_real) -> C.Lreal
   | Tyapp(s,ts) -> C.Ltype( lti_of_ts tenv s ,
                             List.map (lt_of_ty tenv tvs ) ts)
 
@@ -203,32 +222,32 @@ let import_theory env (tenv:tenv) (lenv:lenv) thname =
           begin
             match decl.d_node with
             | Dtype ts ->
-              L.debug ~level:2 "Decl and type %a"  pp_id ts.ts_name;
-              L.debug ~level:2 "Location %a"  pp_id_loc ts.ts_name;
+              L.debug ~dkey "Decl and type %a"  pp_id ts.ts_name;
+              L.debug ~dkey "Location %a"  pp_id_loc ts.ts_name;
               let lti =  lti_of_ts  tenv ts in
-              L.debug ~level:2 "Correspondign LTI %a" pp_lti lti;
+              L.debug ~dkey "Correspondign LTI %a" pp_lti lti;
             | Ddata ddatas ->
               List.iter
                 (fun ((ts, _) : W.Decl.data_decl) ->
-                   L.debug ~level:2 "Decl and data %a" pp_id  ts.ts_name;
-                   L.debug ~level:2 "Location %a"  pp_id_loc ts.ts_name;
+                   L.debug ~dkey "Decl and data %a" pp_id  ts.ts_name;
+                   L.debug ~dkey "Location %a"  pp_id_loc ts.ts_name;
                    let lti =  lti_of_ts  tenv ts  in
-                   L.debug ~level:2 "Correspondign data LTI %a" pp_lti lti;
+                   L.debug ~dkey "Correspondign data LTI %a" pp_lti lti;
                 ) ddatas
             | Dparam ls ->
-              L.debug ~level:2 "Decl and dparam %a" pp_id ls.ls_name;
-              L.debug ~level:2 "Location %a"  pp_id_loc ls.ls_name
+              L.debug ~dkey "Decl and dparam %a" pp_id ls.ls_name;
+              L.debug ~dkey "Location %a"  pp_id_loc ls.ls_name
             | Dlogic dlogics ->
               List.iter
                 (fun ((ls,_):W.Decl.logic_decl) ->
-                   L.debug ~level:2 "Decl and dlogic %a" pp_id ls.ls_name;
-                   L.debug ~level:2 "Location %a"  pp_id_loc ls.ls_name;
+                   L.debug ~dkey "Decl and dlogic %a" pp_id ls.ls_name;
+                   L.debug ~dkey "Location %a"  pp_id_loc ls.ls_name;
                    let li = li_of_ls tenv ls lenv in
-                   L.debug ~level:2 "Corresponding dlogic LTI %a" pp_li li;
+                   L.debug ~dkey "Corresponding dlogic LTI %a" pp_li li;
                 ) dlogics
-            | _ -> L.debug ~level:2 "Decl and whatever"
+            | _ -> L.debug ~dkey "Decl and whatever"
           end
-        | Use _| Clone _| Meta _ -> L.debug ~level:2 ""
+        | Use _| Clone _| Meta _ -> L.debug ~dkey ""
       ) theory.th_decls
   with W.Env.LibraryNotFound _ ->
     L.error "Library %s not found" thname
@@ -240,20 +259,26 @@ let import_theory env (tenv:tenv) (lenv:lenv) thname =
 let () =
   Boot.Main.extend
     begin fun () ->
-      let env = create_why3_env @@ L.Library.get () in
-      let tenv : tenv = W.Ty.Hts.create 0 in
-      let lenv : lenv = W.Term.Hls.create 0 in
-      List.iter (import_theory env tenv lenv) @@ L.Import.get ();
-      L.debug ~level:2 "Length of type environment : %d " (W.Ty.Hts.length tenv);
-      W.Ty.Hts.iter (fun (tys) (lti) ->
-          L.debug ~level:1 "Why3 type symbol : %a" pp_tys tys;
-          L.debug ~level:1 "Corresponding CIL logic type info %a" pp_lti lti;
-        ) tenv;
-      W.Term.Hls.iter (fun (ls) (li) ->
-          L.debug ~level:1 "Why3 logic symbol : %a" pp_ls ls;
-          L.debug ~level:1 "Corresponding CIL logic info : %a" pp_li li;
-          L.debug ~level:1 "Associated parameters : %a" pp_lvs li.l_profile;
-        ) lenv
+      let libs = L.Library.get() in
+      let imports = L.Import.get() in
+      if libs <> [] || imports <> [] then
+        begin
+          let wenv = create_why3_env @@ libs in
+          let tenv : tenv = W.Ty.Hts.create 0 in
+          let lenv : lenv = W.Term.Hls.create 0 in
+          add_builtins wenv tenv;
+          List.iter (import_theory wenv tenv lenv) @@ imports;
+          W.Ty.Hts.iter (fun (tys) (lti) ->
+              L.result "Why3 type symbol : %a" pp_tys tys;
+              L.result "Corresponding CIL logic type info %a" pp_lti lti;
+            ) tenv;
+          W.Term.Hls.iter (fun (ls) (li) ->
+              L.result "Why3 logic symbol : %a" pp_ls ls;
+              L.result "Corresponding CIL logic info : %a" pp_li li;
+              L.result "Associated parameters : @[<hov2>%a@]" pp_lvs li.l_profile;
+            ) lenv;
+        end
+
     end
 
 (* -------------------------------------------------------------------------- *)
