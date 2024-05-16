@@ -108,6 +108,8 @@ type tenv = C.logic_type_info W.Ty.Hts.t
 type lenv = C.logic_info W.Term.Hls.t
 type tvars = C.logic_type W.Ty.Mtv.t
 
+type genv = W.Env.env * tenv * lenv
+
 (* -------------------------------------------------------------------------- *)
 (* ---    Built-in                                                        --- *)
 (* -------------------------------------------------------------------------- *)
