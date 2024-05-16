@@ -59,9 +59,8 @@ let of_infix s =
 let construct_acsl_name (id : W.Ident.ident) =
   let (paths,name,scopes) = T.restore_path id in
   match List.rev scopes with
-  |  (t::q) ->
-    let modscopes = List.rev_append q [(of_infix t)] in
-    String.concat "::" (paths @ name::modscopes)
+  | (t::q) ->
+    String.concat "::" (paths @ name :: List.rev_append q [of_infix t])
   | [] -> ""
 
 
@@ -128,10 +127,7 @@ let tvars_of_txs (txs: W.Ty.tvsymbol list) : string list * tvars =
   List.fold_right
     (fun (tv: W.Ty.tvsymbol) (txs,tvs) ->
        let x = tv.tv_name.id_string in
-       match x with
-       | "int" -> x :: txs, W.Ty.Mtv.add tv (C.Linteger) tvs
-       | "real" -> x :: txs, W.Ty.Mtv.add tv (C.Lreal) tvs
-       | _ ->  x :: txs, W.Ty.Mtv.add tv (C.Lvar x) tvs
+        x :: txs, W.Ty.Mtv.add tv (C.Lvar x) tvs
     ) txs ([], W.Ty.Mtv.empty)
 
 
@@ -230,7 +226,7 @@ let import_theory env (tenv:tenv) (lenv:lenv) thname =
                    let li = li_of_ls tenv ls lenv in
                    L.debug ~level:2 "Corresponding dlogic LTI %a" pp_li li;
                 ) dlogics
-            | _ -> L.debug ~level:2 "Decl but whatever"
+            | _ -> L.debug ~level:2 "Decl and whatever"
           end
         | Use _| Clone _| Meta _ -> L.debug ~level:2 ""
       ) theory.th_decls
